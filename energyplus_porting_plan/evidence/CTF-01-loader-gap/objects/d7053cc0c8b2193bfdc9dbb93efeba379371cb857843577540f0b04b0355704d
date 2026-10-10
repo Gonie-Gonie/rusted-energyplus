@@ -1,0 +1,83 @@
+--- .runtime/porting/CTF-01/existing-rust-observer-prep-01/ctf01_existing_observer.rs
++++ .runtime/porting/CTF-01/candidate-production-observer-prep-02/ctf01_candidate_production_observer.rs
+@@ -1,8 +1,12 @@
+-//! Existing public fixed-CON loader/compiler/initialization observations only.
++//! Actual candidate public fixed-CON loader/compiler/initialization owners only.
+ #[path = "../../ep_runtime/examples/clk02_probe_support/digest.rs"]
+ mod digest;
+-#[path = "ctf01_existing_support/fields.rs"]
++#[path = "ctf01_candidate_production_support/fields.rs"]
+ mod fields;
++// Exact accepted serializer copy includes unit-only helpers and path constants.
++#[allow(dead_code)]
++#[path = "ctf01_candidate_production_support/unit_fields.rs"]
++mod unit_fields;
+ 
+ use ep_model::SimulationModel;
+ use serde_json::{Value, json};
+@@ -38,12 +42,11 @@
+     }
+     Ok((path, bytes))
+ }
+-fn source_pins(root: &Path, supplied: &Value, expected: &[(&str, &str)]) -> Result<()> {
++fn source_pins(root: &Path, supplied: &Value, expected: &[&str]) -> Result<()> {
+     let supplied = rows(supplied)?;
+     require(supplied.len() == expected.len(), "source inventory length differs")?;
+-    for (binding, (path, sha)) in supplied.iter().zip(expected) {
+-        require(text(&binding["path"])? == *path && text(&binding["sha256"])? == *sha,
+-            "source identity/order differs from reviewed baseline")?;
++    for (binding, path) in supplied.iter().zip(expected) {
++        require(text(&binding["path"])? == *path, "candidate source path/order differs")?;
+         bound(root, binding)?;
+     }
+     Ok(())
+@@ -92,6 +95,7 @@
+             out["initialization"] = json!({"invoked":true,"status":"source-returned",
+                 "initial_zone_air_temperature_c":fields::scalar(initial),"external_CTF_rows_supplied":false});
+             out["initialized_state_context"] = fields::state(&state);
++            out["selected_CTF01_owners"] = fields::selected(&state);
+         }
+         Err(error) => out["initialization"] = json!({"invoked":true,"status":"source-error-returned",
+             "message":error.to_string(),"initial_zone_air_temperature_c":fields::scalar(initial),
+@@ -113,9 +117,10 @@
+     let original = std::fs::read(&request_path)?;
+     let request: Value = serde_json::from_slice(&original)?;
+     keys(&request, &["schema","fixed_scope","model_cases","initial_zone_air_temperature_c","observer_sources",
+-        "actual_public_API_sources","frozen_before_execution","expected_values_supplied","Native_results_supplied"])?;
+-    require(request["schema"] == "ctf01-existing-observer-request.v1" && request["frozen_before_execution"] == true
+-        && request["expected_values_supplied"] == false && request["Native_results_supplied"] == false,
++        "actual_public_API_sources","actual_Cargo_source_capture_must_match","frozen_before_execution","expected_values_supplied","Native_results_supplied"])?;
++    require(request["schema"] == "ctf01-candidate-production-observer-request.v1" && request["frozen_before_execution"] == true
++        && request["expected_values_supplied"] == false && request["Native_results_supplied"] == false
++        && request["actual_Cargo_source_capture_must_match"] == true,
+         "frozen input-only observer request required")?;
+     require(request["fixed_scope"]["path"] == "energyplus_porting_plan/contracts/scope.json"
+         && request["fixed_scope"]["sha256"] == "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879",
+@@ -131,7 +136,7 @@
+     let initial = f64::from_bits(u64::from_str_radix(initial_bits,16)?);
+     require(initial.is_finite(), "finite declared initialization caller required")?;
+     observer_pins(&root, &request["observer_sources"])?;
+-    source_pins(&root, &request["actual_public_API_sources"], fields::API_SOURCES)?;
++    source_pins(&root, &request["actual_public_API_sources"], fields::API_PATHS)?;
+     let mut bindings = vec![request["fixed_scope"].clone()];
+     for (case, scope_row) in cases.iter().zip(admitted) {
+         keys(case, &["id","input","conversion_available","epjson_input","conversion_unavailable_reason","conversion_proof_bindings"])?;
+@@ -152,13 +157,16 @@
+     let models = cases.iter().map(|case| model_case(&root,case,initial)).collect::<Result<Vec<_>>>()?;
+     for binding in &bindings { bound(&root,binding)?; }
+     observer_pins(&root, &request["observer_sources"])?;
+-    source_pins(&root, &request["actual_public_API_sources"], fields::API_SOURCES)?;
++    source_pins(&root, &request["actual_public_API_sources"], fields::API_PATHS)?;
+     require(std::fs::read(&request_path)? == original, "observer request changed during public calls")?;
+-    println!("{}",serde_json::to_string_pretty(&json!({"schema":"ctf01-existing-observer-results.v1",
++    println!("{}",serde_json::to_string_pretty(&json!({"schema":"ctf01-candidate-production-observer-results.v1",
+         "actual_request":{"path":request_path,"sha256":digest::sha256(&original)},
+         "fixed_scope":request["fixed_scope"],"observer_sources":request["observer_sources"],
+         "actual_public_API_sources":request["actual_public_API_sources"],"model_cases":models,
+         "all_bound_inputs_unchanged":true,"same_original_IDF_order_overlay_used":true,
++        "actual_Cargo_source_capture_must_be_validated_independently":true,
++        "observations_copied_from_actual_initialized_owner":true,
++        "preprocessing_reexecuted_by_observer":false,
+         "scientific_comparison_performed":false,"numerical_PASS_claimed":false,
+         "gates_updated":false,"CTF02_through_CTF10_certified":false}))?);
+     Ok(())

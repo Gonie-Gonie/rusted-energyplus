@@ -1,0 +1,896 @@
+{
+  "schema": "ctf01-candidate-production-observer-source-proposal.v1",
+  "status": "SOURCE-READY-held-uncompiled-unexecuted",
+  "held_utc": "2026-10-10T12:01:04.108761+00:00",
+  "own_sources": [
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-02/ctf01_candidate_production_observer.rs",
+        "sha256": "275391e7d4c8a63870fa9c659695ae369af841d660af89d468f2a6d17702dd39",
+        "size_bytes": 10760,
+        "line_count": 173
+      },
+      "proposed_canonical_path": "crates/ep_run/examples/ctf01_candidate_production_observer.rs"
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-02/fields.rs",
+        "sha256": "621c2fa2b63f0ffff091dec75e05e2a131019ff47acc4c23a3534d743f82652e",
+        "size_bytes": 8134,
+        "line_count": 118
+      },
+      "proposed_canonical_path": "crates/ep_run/examples/ctf01_candidate_production_support/fields.rs"
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-02/unit_fields.rs",
+        "sha256": "c096f7df02fdb772b44eb8a4727abb7be4db4d3345f0c2563eb1f36ff3a2d82b",
+        "size_bytes": 4758,
+        "line_count": 79
+      },
+      "proposed_canonical_path": "crates/ep_run/examples/ctf01_candidate_production_support/unit_fields.rs"
+    }
+  ],
+  "README": {
+    "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-02/README.md",
+    "sha256": "3edd102b745c51bec2128a9f1b7e28e89b63548edd5910f2c7f14c646ac5f45e",
+    "size_bytes": 6041,
+    "line_count": 91
+  },
+  "exact_diffs_from_accepted_existing_observer": [
+    {
+      "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-02/ctf01_candidate_production_observer.rs.from-existing.diff",
+      "sha256": "d7053cc0c8b2193bfdc9dbb93efeba379371cb857843577540f0b04b0355704d",
+      "size_bytes": 5618,
+      "line_count": 83
+    },
+    {
+      "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-02/fields.rs.from-existing.diff",
+      "sha256": "8f6fc5f92efe7039e04e0d34e60c9b94d3556e37e3803e898f50bee57b87d568",
+      "size_bytes": 10295,
+      "line_count": 138
+    }
+  ],
+  "accepted_existing_observer_manifest": {
+    "path": ".runtime/porting/CTF-01/existing-rust-observer-prep-01/manifest.json",
+    "sha256": "76881b27fbcc166b4dc7087ed86c2319f6120db88e99bd320a5d52a0c99c2598",
+    "size_bytes": 12974,
+    "line_count": 358
+  },
+  "accepted_existing_observer_sources": [
+    {
+      "path": ".runtime/porting/CTF-01/existing-rust-observer-prep-01/ctf01_existing_observer.rs",
+      "sha256": "d4605573b97071c5db4fb80f5a9ce2d3aab0f170f01ae973eca6ed9afe4ac36d",
+      "size_bytes": 10252,
+      "line_count": 165
+    },
+    {
+      "path": ".runtime/porting/CTF-01/existing-rust-observer-prep-01/fields.rs",
+      "sha256": "d95665510e156e0120e5c28b69f49db67ffe7ffe6ba0247f980d43eb40c4c6be",
+      "size_bytes": 8504,
+      "line_count": 107
+    }
+  ],
+  "exact_reused_unit_serializer": {
+    "held_source": {
+      "path": ".runtime/porting/CTF-01/candidate-unit-observer-prep-01/fields.rs",
+      "sha256": "c096f7df02fdb772b44eb8a4727abb7be4db4d3345f0c2563eb1f36ff3a2d82b",
+      "size_bytes": 4758,
+      "line_count": 79
+    },
+    "copied_source": {
+      "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-02/unit_fields.rs",
+      "sha256": "c096f7df02fdb772b44eb8a4727abb7be4db4d3345f0c2563eb1f36ff3a2d82b",
+      "size_bytes": 4758,
+      "line_count": 79
+    },
+    "byte_exact": true
+  },
+  "accepted_unit_observer_manifest": {
+    "path": ".runtime/porting/CTF-01/candidate-unit-observer-prep-01/manifest.json",
+    "sha256": "7653a43ff1f0c65091df59ee18af6e79ea0523dbd6f9c408b585de9b04e8ec2f",
+    "size_bytes": 12955,
+    "line_count": 330
+  },
+  "accepted_preprocessing_source_manifest": {
+    "path": ".runtime/porting/CTF-01/rust-layer-prep-02/manifest.json",
+    "sha256": "8bdc24412a991409e9ba5209ef8514a3904b371a42f37d1a5837d9c5a086c9ea",
+    "size_bytes": 26580,
+    "line_count": 681
+  },
+  "accepted_Native_production_source_manifest": {
+    "path": ".runtime/porting/CTF-01/native-production-prep-02/manifest.json",
+    "sha256": "a16ee13158dbe7dfb42f5c38ae1059f62b4526bea811eebfe03fccc826edba07",
+    "size_bytes": 33224,
+    "line_count": 913
+  },
+  "actual_public_API_sources_at_source_preparation": [
+    {
+      "path": "crates/ep_run/Cargo.toml",
+      "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+      "size_bytes": 524,
+      "line_count": 21
+    },
+    {
+      "path": "crates/ep_raw_model/src/lib.rs",
+      "sha256": "08f4a3bcf27c2f4e2577b534ad505176d0877b46709bb512b71685ebef6fa9a8",
+      "size_bytes": 16493,
+      "line_count": 491
+    },
+    {
+      "path": "crates/ep_raw_model/src/idf_order.rs",
+      "sha256": "5f2a1984ebc76a51938232ab7002c9c683666cf88d765af8e02dbf126bad7772",
+      "size_bytes": 28468,
+      "line_count": 789
+    },
+    {
+      "path": "crates/ep_compiler/src/lib.rs",
+      "sha256": "1931ed21f1fae2fe5d7e90bb954f1f91812fec1d1eeb7daf102a6ba0007424fe",
+      "size_bytes": 165,
+      "line_count": 7
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler.rs",
+      "sha256": "7beb7b863c86addd2a56391384bc02d587b910b05dcc7229fc296b9d77a907bc",
+      "size_bytes": 771761,
+      "line_count": 19737
+    },
+    {
+      "path": "crates/ep_model/src/lib.rs",
+      "sha256": "2a756532553034fb2b92c892cb2e6f3c147aa129f6dce64b63763f364cb3cee4",
+      "size_bytes": 284,
+      "line_count": 15
+    },
+    {
+      "path": "crates/ep_model/src/model.rs",
+      "sha256": "8fe75e51f50682d68d185d18613b4e1505093d071cc4db19947ef03756bbbf32",
+      "size_bytes": 92680,
+      "line_count": 2322
+    },
+    {
+      "path": "crates/ep_model/src/objects/materials.rs",
+      "sha256": "23d9f6dd7af7ef0aff73f3e4697ece3e5acd58104d2d5e3e1edbc46bfaa71653",
+      "size_bytes": 54627,
+      "line_count": 1205
+    },
+    {
+      "path": "crates/ep_model/src/objects/construction.rs",
+      "sha256": "f1886c8b2f9aede1e661210520b668d52f74d884d9a207de9f0c046e4170f191",
+      "size_bytes": 18134,
+      "line_count": 445
+    },
+    {
+      "path": "crates/ep_runtime/src/lib.rs",
+      "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+      "size_bytes": 868,
+      "line_count": 41
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "45e6f8b9dfc0d7f85bd854a849cc0092c3ee7739fd4895c543aa73a1ea8bce46",
+      "size_bytes": 1344,
+      "line_count": 58
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "ba68a33bd1c42a6b63b3fb317e68017f5c196d6a95eb15a3ea305d265ba4db34",
+      "size_bytes": 11004,
+      "line_count": 220
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "sha256": "2b3343ff4f3cec29be8cc77bcd4d14a8bbcc78464812ad04b88d22469f7f0dfb",
+      "size_bytes": 4401,
+      "line_count": 118
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "sha256": "a930446e8c4fa6d3c24a493fad544c85d0aa8aedec10b1dd16656813a84ad567",
+      "size_bytes": 1877,
+      "line_count": 39
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "sha256": "787dc3a49755352c84af477bbe2c11e09b793e8dcee13181162d5a78b12bec8f",
+      "size_bytes": 5815,
+      "line_count": 168
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "sha256": "0683867f8d719af7d317cb1bdb7380bfee83b3bcc4cd446ae114e1dc5aeda252",
+      "size_bytes": 15063,
+      "line_count": 399
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "e04b95dbb47eed514647bfdaf9332b6538e49cbfbb30625e4e02acd50a071448",
+      "size_bytes": 46220,
+      "line_count": 1013
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "sha256": "b79c21fd3126a460c17cd54ec5f66d37e723e0348ac6b6af9e9fedd9e78ea3ec",
+      "size_bytes": 28663,
+      "line_count": 790
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+      "size_bytes": 3172,
+      "line_count": 75
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "sha256": "20cfeef6709b59ed4ef66eb863f079edfd7803fc4522e18419429de49fe5a989",
+      "size_bytes": 11736,
+      "line_count": 316
+    },
+    {
+      "path": "crates/ep_model/src/objects/building.rs",
+      "sha256": "d6a3fbc6b39106f8d0b5195822bfc354e505e557f2b9406409b68aebfb089ef0",
+      "size_bytes": 11621,
+      "line_count": 373
+    }
+  ],
+  "runtime_actual_public_API_path_order": [
+    "crates/ep_run/Cargo.toml",
+    "crates/ep_raw_model/src/lib.rs",
+    "crates/ep_raw_model/src/idf_order.rs",
+    "crates/ep_compiler/src/lib.rs",
+    "crates/ep_compiler/src/compiler.rs",
+    "crates/ep_model/src/lib.rs",
+    "crates/ep_model/src/model.rs",
+    "crates/ep_model/src/objects/materials.rs",
+    "crates/ep_model/src/objects/construction.rs",
+    "crates/ep_runtime/src/lib.rs",
+    "crates/ep_runtime/src/heat_balance/mod.rs",
+    "crates/ep_runtime/src/heat_balance/initialization.rs",
+    "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+    "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+    "crates/ep_runtime/src/heat_balance/state.rs",
+    "crates/ep_runtime/src/heat_balance/ctf.rs",
+    "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+    "crates/ep_model/src/objects/building.rs"
+  ],
+  "runtime_observer_path_order": [
+    "crates/ep_run/examples/ctf01_candidate_production_observer.rs",
+    "crates/ep_run/examples/ctf01_candidate_production_support/fields.rs",
+    "crates/ep_run/examples/ctf01_candidate_production_support/unit_fields.rs"
+  ],
+  "API_inventory_is_full_transitive_Cargo_source_closure": false,
+  "runtime_current_formatted_identities_must_match_actual_Cargo_source_capture": true,
+  "ignored_source_hashes_are_compiled_current_identity": false,
+  "source_contexts": [
+    {
+      "source": {
+        "path": "crates/ep_raw_model/src/lib.rs",
+        "sha256": "08f4a3bcf27c2f4e2577b534ad505176d0877b46709bb512b71685ebef6fa9a8",
+        "size_bytes": 16493,
+        "line_count": 491
+      },
+      "start_line": 302,
+      "end_line": 316,
+      "range_sha256": "76eb2a00626c52f2290f75978652748cd141bb7ccd8afc50536a5ccc8fffae84",
+      "range_size_bytes": 662,
+      "role": "actual original-IDF overlay loader"
+    },
+    {
+      "source": {
+        "path": "crates/ep_compiler/src/compiler.rs",
+        "sha256": "7beb7b863c86addd2a56391384bc02d587b910b05dcc7229fc296b9d77a907bc",
+        "size_bytes": 771761,
+        "line_count": 19737
+      },
+      "start_line": 417,
+      "end_line": 456,
+      "range_sha256": "0b74850a33192ec97f807215035ef3d930a86312ee572314cd134d09a3db14a5",
+      "range_size_bytes": 1290,
+      "role": "actual compile report and optional model"
+    },
+    {
+      "source": {
+        "path": "crates/ep_compiler/src/compiler.rs",
+        "sha256": "7beb7b863c86addd2a56391384bc02d587b910b05dcc7229fc296b9d77a907bc",
+        "size_bytes": 771761,
+        "line_count": 19737
+      },
+      "start_line": 4184,
+      "end_line": 4216,
+      "range_sha256": "6d82d2864cb96c0adfb3e97dea24331069545a8c6bba4385fe7d3b0c0bea8c01",
+      "range_size_bytes": 1096,
+      "role": "actual Regular stored resistance producer"
+    },
+    {
+      "source": {
+        "path": "crates/ep_model/src/model.rs",
+        "sha256": "8fe75e51f50682d68d185d18613b4e1505093d071cc4db19947ef03756bbbf32",
+        "size_bytes": 92680,
+        "line_count": 2322
+      },
+      "start_line": 549,
+      "end_line": 562,
+      "range_sha256": "71195e33eb50d6b31343b2f17c8d6ea04f9265bae36dfb84c8fa485a4a8a127f",
+      "range_size_bytes": 406,
+      "role": "actual SimulationModel construction"
+    },
+    {
+      "source": {
+        "path": "crates/ep_model/src/objects/materials.rs",
+        "sha256": "23d9f6dd7af7ef0aff73f3e4697ece3e5acd58104d2d5e3e1edbc46bfaa71653",
+        "size_bytes": 54627,
+        "line_count": 1205
+      },
+      "start_line": 192,
+      "end_line": 220,
+      "range_sha256": "688daece6a9b5742c3a0053f7596bf9e267f17d07cc37a6bfc6addf714a09b9e",
+      "range_size_bytes": 1171,
+      "role": "actual Regular and NoMass stored owners"
+    },
+    {
+      "source": {
+        "path": "crates/ep_model/src/objects/construction.rs",
+        "sha256": "f1886c8b2f9aede1e661210520b668d52f74d884d9a207de9f0c046e4170f191",
+        "size_bytes": 18134,
+        "line_count": 445
+      },
+      "start_line": 374,
+      "end_line": 444,
+      "range_sha256": "0f5673f1614802374cafbfdb1f9fb53c2d95f2c7478ecec9e8a94571bc98f15b",
+      "range_size_bytes": 3110,
+      "role": "actual construction IDs and ordered layer ownership"
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+        "sha256": "2b3343ff4f3cec29be8cc77bcd4d14a8bbcc78464812ad04b88d22469f7f0dfb",
+        "size_bytes": 4401,
+        "line_count": 118
+      },
+      "start_line": 17,
+      "end_line": 53,
+      "range_sha256": "47a9f0db87c91d2cf9541af37ade0f37f571a499f59b74f79f07989a2bd45451",
+      "range_size_bytes": 1642,
+      "role": "actual ordinary empty-override initializer"
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+        "sha256": "ba68a33bd1c42a6b63b3fb317e68017f5c196d6a95eb15a3ea305d265ba4db34",
+        "size_bytes": 11004,
+        "line_count": 220
+      },
+      "start_line": 100,
+      "end_line": 160,
+      "range_sha256": "f8144b3ae8ea88941167cf790ef6b8c9be0ce703f68253d3edf2dbc3c3b1718d",
+      "range_size_bytes": 3371,
+      "role": "actual cache and initialized surface handoff"
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+        "sha256": "a930446e8c4fa6d3c24a493fad544c85d0aa8aedec10b1dd16656813a84ad567",
+        "size_bytes": 1877,
+        "line_count": 39
+      },
+      "start_line": 8,
+      "end_line": 38,
+      "range_sha256": "47f864e3845b7c581fa3c949b2ec10e851de6773cad1dce110d0a72a282dfd71",
+      "range_size_bytes": 1592,
+      "role": "actual public preprocessing owner handoff"
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+        "sha256": "0683867f8d719af7d317cb1bdb7380bfee83b3bcc4cd446ae114e1dc5aeda252",
+        "size_bytes": 15063,
+        "line_count": 399
+      },
+      "start_line": 76,
+      "end_line": 120,
+      "range_sha256": "b4df8a3ac07c7442d05f391017e4f2e89a42175c9a68eb7327dde2884179ad97",
+      "range_size_bytes": 2068,
+      "role": "actual surface-derived use and selected shared error order"
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+        "sha256": "0683867f8d719af7d317cb1bdb7380bfee83b3bcc4cd446ae114e1dc5aeda252",
+        "size_bytes": 15063,
+        "line_count": 399
+      },
+      "start_line": 142,
+      "end_line": 151,
+      "range_sha256": "cf4208c1dbe9720ead539240b1742acd312ac0e9a520e388606fba6b1353d7a9",
+      "range_size_bytes": 295,
+      "role": "actual cache-owner vector copy"
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+        "sha256": "0683867f8d719af7d317cb1bdb7380bfee83b3bcc4cd446ae114e1dc5aeda252",
+        "size_bytes": 15063,
+        "line_count": 399
+      },
+      "start_line": 217,
+      "end_line": 248,
+      "range_sha256": "0c66b53b112ae501041aa52648f6906833c5fc75c44f4cf55941d4cbd2620f23",
+      "range_size_bytes": 1340,
+      "role": "actual effective layer inputs and retained result owner"
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "e04b95dbb47eed514647bfdaf9332b6538e49cbfbb30625e4e02acd50a071448",
+        "size_bytes": 46220,
+        "line_count": 1013
+      },
+      "start_line": 46,
+      "end_line": 65,
+      "range_sha256": "c439846a1d49f28e5c1aea08dd1803aed310e5130ad199026a365314db9894db",
+      "range_size_bytes": 1088,
+      "role": "actual public initialized preprocessing vector"
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+        "sha256": "20cfeef6709b59ed4ef66eb863f079edfd7803fc4522e18419429de49fe5a989",
+        "size_bytes": 11736,
+        "line_count": 316
+      },
+      "start_line": 98,
+      "end_line": 150,
+      "range_sha256": "a2bd7ae8977f7eb16702571bbb98f2b446d2ef3dd82ab08f1a40518a343adb12",
+      "range_size_bytes": 2252,
+      "role": "actual optional phase and construction result types"
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+        "sha256": "20cfeef6709b59ed4ef66eb863f079edfd7803fc4522e18419429de49fe5a989",
+        "size_bytes": 11736,
+        "line_count": 316
+      },
+      "start_line": 152,
+      "end_line": 188,
+      "range_sha256": "e697ed2f7a24b37179e2571bfeeafb028de5d7f23f473fa470a773af263968b9",
+      "range_size_bytes": 1402,
+      "role": "actual typed member copy adapter; no observer arithmetic"
+    },
+    {
+      "source": {
+        "path": "crates/ep_model/src/objects/building.rs",
+        "sha256": "d6a3fbc6b39106f8d0b5195822bfc354e505e557f2b9406409b68aebfb089ef0",
+        "size_bytes": 11621,
+        "line_count": 373
+      },
+      "start_line": 154,
+      "end_line": 158,
+      "range_sha256": "1d046b45ec466c7eda75aa9cd97a3f7da723af28d705f7b6a83d9da1d7a4460f",
+      "range_size_bytes": 117,
+      "role": "actual existing typed timestep integer owner; no derived Native dt fields"
+    }
+  ],
+  "fixed_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879",
+    "size_bytes": 15325,
+    "line_count": 418
+  },
+  "all_45_guard_refs": [
+    {
+      "case_id": "A-24H",
+      "role": "input",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+      }
+    },
+    {
+      "case_id": "A-24H",
+      "role": "weather",
+      "binding": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      }
+    },
+    {
+      "case_id": "A-24H",
+      "role": "metadata",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+        "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+      }
+    },
+    {
+      "case_id": "A-72H",
+      "role": "input",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+        "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+      }
+    },
+    {
+      "case_id": "A-72H",
+      "role": "weather",
+      "binding": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      }
+    },
+    {
+      "case_id": "A-72H",
+      "role": "metadata",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+        "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+      }
+    },
+    {
+      "case_id": "A-ANNUAL",
+      "role": "input",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+        "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+      }
+    },
+    {
+      "case_id": "A-ANNUAL",
+      "role": "weather",
+      "binding": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      }
+    },
+    {
+      "case_id": "A-ANNUAL",
+      "role": "metadata",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
+        "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb"
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-24H",
+      "role": "input",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+        "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-24H",
+      "role": "weather",
+      "binding": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-24H",
+      "role": "metadata",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+        "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-72H",
+      "role": "input",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+        "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-72H",
+      "role": "weather",
+      "binding": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-72H",
+      "role": "metadata",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+        "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e"
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-ANNUAL",
+      "role": "input",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+        "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-ANNUAL",
+      "role": "weather",
+      "binding": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-ANNUAL",
+      "role": "metadata",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+        "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8"
+      }
+    },
+    {
+      "case_id": "B-FLOW-24H",
+      "role": "input",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+        "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+      }
+    },
+    {
+      "case_id": "B-FLOW-24H",
+      "role": "weather",
+      "binding": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      }
+    },
+    {
+      "case_id": "B-FLOW-24H",
+      "role": "metadata",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+        "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+      }
+    },
+    {
+      "case_id": "B-FLOW-72H",
+      "role": "input",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+        "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+      }
+    },
+    {
+      "case_id": "B-FLOW-72H",
+      "role": "weather",
+      "binding": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      }
+    },
+    {
+      "case_id": "B-FLOW-72H",
+      "role": "metadata",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+        "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29"
+      }
+    },
+    {
+      "case_id": "B-FLOW-ANNUAL",
+      "role": "input",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+        "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+      }
+    },
+    {
+      "case_id": "B-FLOW-ANNUAL",
+      "role": "weather",
+      "binding": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      }
+    },
+    {
+      "case_id": "B-FLOW-ANNUAL",
+      "role": "metadata",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+        "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6"
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-24H",
+      "role": "input",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+        "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-24H",
+      "role": "weather",
+      "binding": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-24H",
+      "role": "metadata",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+        "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-72H",
+      "role": "input",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+        "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-72H",
+      "role": "weather",
+      "binding": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-72H",
+      "role": "metadata",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+        "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd"
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-ANNUAL",
+      "role": "input",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+        "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-ANNUAL",
+      "role": "weather",
+      "binding": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-ANNUAL",
+      "role": "metadata",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+        "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3"
+      }
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "role": "input",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+        "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+      }
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "role": "weather",
+      "binding": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      }
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "role": "metadata",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+        "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+      }
+    },
+    {
+      "case_id": "B-BOTH-72H",
+      "role": "input",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+        "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+      }
+    },
+    {
+      "case_id": "B-BOTH-72H",
+      "role": "weather",
+      "binding": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      }
+    },
+    {
+      "case_id": "B-BOTH-72H",
+      "role": "metadata",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+        "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+      }
+    },
+    {
+      "case_id": "B-BOTH-ANNUAL",
+      "role": "input",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+        "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+      }
+    },
+    {
+      "case_id": "B-BOTH-ANNUAL",
+      "role": "weather",
+      "binding": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      }
+    },
+    {
+      "case_id": "B-BOTH-ANNUAL",
+      "role": "metadata",
+      "binding": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+        "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4"
+      }
+    }
+  ],
+  "request_protocol": {
+    "schema": "ctf01-candidate-production-observer-request.v1",
+    "model_cases": 15,
+    "input_only": true,
+    "actual_Cargo_source_capture_must_match": true,
+    "frozen_before_execution": true,
+    "expected_values_supplied": false,
+    "Native_results_supplied": false
+  },
+  "result_schema": "ctf01-candidate-production-observer-results.v1",
+  "actual_initialized_owners_copied": [
+    "HeatBalanceState.construction_ctf01_layers",
+    "construction_id",
+    "is_used_ctf",
+    "actual Result and optional checkpoints",
+    "selected outgoing ErrorsFound"
+  ],
+  "no_preprocessing_reexecution_or_expected_array_construction": true,
+  "Native_whole_IsUsedCTF_DoReport_later_errors_and_coefficients": "unpaired; no Rust Native-owner claim",
+  "context_R_C_steady_CTF_numerically_paired": false,
+  "new_QA_framework_or_execution_stage_required": false,
+  "source_only_authoring_helper": {
+    "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-01/prepare_sources.py",
+    "sha256": "9e9a191ed93097bf486ffa06c694de12d71c8c8a8335b971bb9aa261b76ea9ee",
+    "size_bytes": 8345,
+    "line_count": 104
+  },
+  "canonical_or_Git_changes": false,
+  "project_import_compile_engine_or_result_binary_payload_read": false,
+  "scientific_comparison_or_PASS_claimed": false,
+  "authorship_limits": "Author wrote input/freezer and Original DataQA; reused Raw unit serializer and preprocessing ownership is disclosed. Other-author peer and Root full review required before use.",
+  "previous_held_source_manifest": {
+    "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-01/manifest.json",
+    "sha256": "1f91ba1faddc19f7466e5147c83dc5aee1b17d4952a9cfbac51590d6500d02c2",
+    "size_bytes": 30975,
+    "line_count": 855
+  },
+  "fresh02_delta_scope": "Copy actual TypedModel.timestep.number_of_timesteps_per_hour and add existing building.rs selected API path only; no arithmetic or Native field reconstruction.",
+  "exact_diffs_from_held01": [
+    {
+      "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-02/fields.rs.from-01.diff",
+      "sha256": "36b1185ca0234874ef86ce249ba67f7399d8ce2c74e2533803c3fa3a63da12d7",
+      "size_bytes": 1336,
+      "line_count": 20
+    },
+    {
+      "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-02/README.md.from-01.diff",
+      "sha256": "5aa823955bb7dcbae462996b28bc5678177985afa78d9eb7c2f6281a99330976",
+      "size_bytes": 2816,
+      "line_count": 42
+    }
+  ]
+}

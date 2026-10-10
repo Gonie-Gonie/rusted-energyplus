@@ -1,0 +1,2216 @@
+{
+  "schema": "native-reference-efficiency-read-only-audit.v1",
+  "completed_utc": "2026-10-08T01:13:11.112200+00:00",
+  "scope": "Existing verified GNU13.2 binaries/link metadata only; no next-card scientific preparation",
+  "core_build": {
+    "path": ".runtime/porting/reference-energyplus-26.1.0/native-core-build.json",
+    "sha256": "68682bdaaf61e5381084a5d138d07f511e2f431082f1426230be0d3231f9193b"
+  },
+  "current_driver_build": {
+    "path": ".runtime/porting/ZON-01/native-build-01/native-driver-build.json",
+    "sha256": "4fd88058f53aae38b49dc774550cb4b875ec3516275dc323c97fb24f8039bdd9"
+  },
+  "publisher_receipt": {
+    "path": ".runtime/porting/reference-energyplus-26.1.0/provenance/winlibs-gcc13-toolchain-receipt.json",
+    "sha256": "ddc475481139ca95fc520c47bb326bd996ac377919d3fb1a634c8baaca334ab9",
+    "bytes": 2249
+  },
+  "actual_current_link_log": {
+    "path": ".runtime/porting/ZON-01/native-build-01/build-stdout.log",
+    "sha256": "e63ba6465e2d7479f762a87a16fadf388b041945610852897d864ca8c100cebd"
+  },
+  "actual_current_link_commands": [
+    "[3/4] C:\\WINDOWS\\system32\\cmd.exe /C \"cd . && C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\g++.exe -Wa,-mbig-obj -ffp-contract=off -O0 -g -DNDEBUG  CMakeFiles/zon01_reference.dir/C_/Users/GonieGonie/Documents/GitHub/rusted-energyplus/tools/porting/zon01_reference.cpp.obj -o Products\\zon01_reference.exe -Wl,--out-implib,Products\\libzon01_reference.dll.a -Wl,--major-image-version,0,--minor-image-version,0  Products/libobjexx.a  -lbcrypt  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 && cd .\"",
+    "[4/4] C:\\WINDOWS\\system32\\cmd.exe /C \"cd . && C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\g++.exe -Wa,-mbig-obj -ffp-contract=off -O0 -g -DNDEBUG -pthread CMakeFiles/zon01_reference_helper.dir/C_/Users/GonieGonie/Documents/GitHub/rusted-energyplus/tools/porting/zon01_reference_helper.cpp.obj -o Products\\zon01_reference_helper.exe -Wl,--out-implib,Products\\libzon01_reference_helper.dll.a -Wl,--major-image-version,0,--minor-image-version,0  Products/libenergypluslib.a  Products/libembedded_epjson_source.a  Products/libobjexx.a  Products/libsqlite.a  Products/libbcvtb.a  -lwsock32  Products/libepfmiimport.a  Products/libepexpat.a  Products/libminiziplib.a  Products/libre2.a  Products/libDElight.a  third_party/kiva/libkiva.a  Products/libWindows-CalcEngine.a  Products/libairflownetworklib.a  Products/libbtwxt.a  Products/ssc.a  Products/shared.a  Products/splinter.a  Products/libjsoncpp.a  Products/liblibtk205.a  Products/libpenumbra.a  Products/libfmt.a  Products/libglad.a  Products/libglfw3.a  Products/libtess2.a  -lShlwapi  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 && cd .\""
+  ],
+  "current_CMake_source": {
+    "path": "tools/porting/zon01_reference.cmake",
+    "sha256": "64cbd5a57412e3ab135d71e03f1f24d42a37d6639ee8dbdfc2e2f9c54516aad1"
+  },
+  "current_archived_CMake_cache": {
+    "path": ".runtime/porting/ZON-01/native-build-01/CMakeCache.txt",
+    "sha256": "01d14a47ec5484045a2a39746c4064bef976b6b1bacd0a50a68721159ccf49e5"
+  },
+  "configuration": {
+    "build_type": "RelWithDebInfo",
+    "reference_optimization_override": "-O0 -g -DNDEBUG",
+    "source_default_optimized_build_passes": false,
+    "cmake_variables": {
+      "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+      "CMAKE_CXX_FLAGS": "-Wa,-mbig-obj -ffp-contract=off",
+      "CMAKE_CXX_FLAGS_RELWITHDEBINFO": "-O0 -g -DNDEBUG",
+      "CMAKE_C_FLAGS": "",
+      "CMAKE_C_FLAGS_RELWITHDEBINFO": "-O2 -g -DNDEBUG",
+      "CMAKE_C_COMPILER": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/gcc.exe",
+      "CMAKE_CXX_COMPILER": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/g++.exe",
+      "CMAKE_CXX_COMPILER_LAUNCHER": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/ccache.exe",
+      "CMAKE_CXX_STANDARD": null,
+      "FORCE_DEBUG_ARITHM_GCC_OR_CLANG": "OFF",
+      "ENABLE_PCH": "ON",
+      "ENABLE_OPENMP": "OFF",
+      "USE_PSYCH_ERRORS": "ON",
+      "USE_PSYCH_STATS": "OFF",
+      "USE_PSYCH_CACHE": null,
+      "USE_GLYCOL_CACHE": null,
+      "BUILD_TESTING": "OFF",
+      "BUILD_FORTRAN": "OFF",
+      "LINK_WITH_PYTHON": "OFF"
+    },
+    "actual_options": {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/provenance/final-core/actual-options.json",
+      "sha256": "1c08b4f4a8584fcc4ae4e8987c420a3ed409a1fc10a9025a55d4b3f6d43a2b47",
+      "bytes": 14359
+    }
+  },
+  "compiler": {
+    "version": "g++.exe (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders) 13.2.0",
+    "abi": "x86_64 Windows MinGW-w64 UCRT POSIX SEH, libstdc++ non-debug containers",
+    "binary": {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/g++.exe",
+      "sha256": "d977abd355b8821f7347de03ed95a5976a2ebe6cd77a025ce8f83c79b77262d3",
+      "bytes": 1713166
+    },
+    "toolchain_publisher_receipt": {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/provenance/winlibs-gcc13-toolchain-receipt.json",
+      "sha256": "ddc475481139ca95fc520c47bb326bd996ac377919d3fb1a634c8baaca334ab9",
+      "bytes": 2249
+    },
+    "object_cache_publisher_receipt": {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/provenance/ccache-tool-receipt.json",
+      "sha256": "80516516db7e97d59edbc3108e33825388e961d9d25f20f94afd01ca079908b7",
+      "bytes": 605
+    }
+  },
+  "api": {
+    "binary": {
+      "path": ".runtime/ep261-gcc13-o0/Products/energyplusapi.dll",
+      "sha256": "1b0146200b27ce5c240a46582626a7c516d9875c1bc2474da81ba7acdcd23f33",
+      "bytes": 1305150896
+    },
+    "size_bytes": 1305150896,
+    "machine_hex": "8664",
+    "pe32_plus": true,
+    "image_base_hex": "212700000",
+    "entry_point_rva": 4754,
+    "section_alignment": 4096,
+    "file_alignment": 512,
+    "image_size": 1208422400,
+    "coff_symbol_count": 1556917,
+    "coff_symbol_table_offset": 1208312832,
+    "sections": [
+      {
+        "name": ".text",
+        "rva": 4096,
+        "virtual_size": 39150952,
+        "raw_size": 39151104,
+        "raw_offset": 1536,
+        "characteristics_hex": "60000060",
+        "executable": true,
+        "readable": true,
+        "writable": false,
+        "discardable": false,
+        "raw_sha256": "30c9fe211c4356a53c5ece02ad5b2b5ef43db3b2dc9d9b5dfaa3ebc8f5ee3acc"
+      },
+      {
+        "name": ".data",
+        "rva": 39157760,
+        "virtual_size": 83232,
+        "raw_size": 83456,
+        "raw_offset": 39152640,
+        "characteristics_hex": "c0000040",
+        "executable": false,
+        "readable": true,
+        "writable": true,
+        "discardable": false,
+        "raw_sha256": "67c16000f920855c9c00b48e309bac726e370d7f11b4105afaf5f92e08d9d5b8"
+      },
+      {
+        "name": ".rdata",
+        "rva": 39243776,
+        "virtual_size": 27145620,
+        "raw_size": 27145728,
+        "raw_offset": 39236096,
+        "characteristics_hex": "40000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": false,
+        "raw_sha256": "adb8f6cd03296b4e7547fcb4b6f8895f7afa4b8821b6b0caf3f1237683cdf2e8"
+      },
+      {
+        "name": ".eh_frame",
+        "rva": 66392064,
+        "virtual_size": 4,
+        "raw_size": 512,
+        "raw_offset": 66381824,
+        "characteristics_hex": "c0000040",
+        "executable": false,
+        "readable": true,
+        "writable": true,
+        "discardable": false,
+        "raw_sha256": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560"
+      },
+      {
+        "name": ".pdata",
+        "rva": 66396160,
+        "virtual_size": 1628628,
+        "raw_size": 1628672,
+        "raw_offset": 66382336,
+        "characteristics_hex": "40000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": false,
+        "raw_sha256": "53b1396473216d1afe6eb55c4dea855242dc347fdc92a9da87bfdb461fd69b20"
+      },
+      {
+        "name": ".xdata",
+        "rva": 68026368,
+        "virtual_size": 2628904,
+        "raw_size": 2629120,
+        "raw_offset": 68011008,
+        "characteristics_hex": "40000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": false,
+        "raw_sha256": "9eaa8dd6d7de635220d575fe14aa5891f74e2cc1274f7e7102ffcbe046adf70e"
+      },
+      {
+        "name": ".bss",
+        "rva": 70656000,
+        "virtual_size": 54368,
+        "raw_size": 0,
+        "raw_offset": 0,
+        "characteristics_hex": "c0000080",
+        "executable": false,
+        "readable": true,
+        "writable": true,
+        "discardable": false,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": ".edata",
+        "rva": 70713344,
+        "virtual_size": 6277,
+        "raw_size": 6656,
+        "raw_offset": 70640128,
+        "characteristics_hex": "40000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": false,
+        "raw_sha256": "027815647abd3e403d3e5dd8c13401ce8fc43b107660334893917292bb523aca"
+      },
+      {
+        "name": ".idata",
+        "rva": 70721536,
+        "virtual_size": 33476,
+        "raw_size": 33792,
+        "raw_offset": 70646784,
+        "characteristics_hex": "c0000040",
+        "executable": false,
+        "readable": true,
+        "writable": true,
+        "discardable": false,
+        "raw_sha256": "79e2dfb8d8626d9511ef118f524a7b4558c1006b0d110fa55852c6ab21a9d28f"
+      },
+      {
+        "name": ".CRT",
+        "rva": 70758400,
+        "virtual_size": 88,
+        "raw_size": 512,
+        "raw_offset": 70680576,
+        "characteristics_hex": "c0000040",
+        "executable": false,
+        "readable": true,
+        "writable": true,
+        "discardable": false,
+        "raw_sha256": "c5bb7e594156ddd53cf98fb0a6530f5aeeeeb8ac2bbcd82ec546e883763f2bb0"
+      },
+      {
+        "name": ".tls",
+        "rva": 70762496,
+        "virtual_size": 16,
+        "raw_size": 512,
+        "raw_offset": 70681088,
+        "characteristics_hex": "c0000040",
+        "executable": false,
+        "readable": true,
+        "writable": true,
+        "discardable": false,
+        "raw_sha256": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560"
+      },
+      {
+        "name": ".rsrc",
+        "rva": 70766592,
+        "virtual_size": 3208,
+        "raw_size": 3584,
+        "raw_offset": 70681600,
+        "characteristics_hex": "40000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": false,
+        "raw_sha256": "80678a6c06652187c3f6e98f5bc2e1e2eac929b6b933317011ef2d1384b4a516"
+      },
+      {
+        "name": ".reloc",
+        "rva": 70770688,
+        "virtual_size": 621432,
+        "raw_size": 621568,
+        "raw_offset": 70685184,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true,
+        "raw_sha256": "c3c6612025800f6bb01c5a9977b0e6f0f9d81149d9d77ae8af4c530de2ee7092"
+      },
+      {
+        "name": ".debug_aranges",
+        "rva": 71393280,
+        "virtual_size": 7787776,
+        "raw_size": 7788032,
+        "raw_offset": 71306752,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_info",
+        "rva": 79183872,
+        "virtual_size": 1050428316,
+        "raw_size": 1050428416,
+        "raw_offset": 79094784,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_abbrev",
+        "rva": 1129615360,
+        "virtual_size": 3936592,
+        "raw_size": 3936768,
+        "raw_offset": 1129523200,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_line",
+        "rva": 1133555712,
+        "virtual_size": 39925659,
+        "raw_size": 39925760,
+        "raw_offset": 1133459968,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_frame",
+        "rva": 1173483520,
+        "virtual_size": 8775168,
+        "raw_size": 8775168,
+        "raw_offset": 1173385728,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_str",
+        "rva": 1182261248,
+        "virtual_size": 8614755,
+        "raw_size": 8614912,
+        "raw_offset": 1182160896,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_line_str",
+        "rva": 1190879232,
+        "virtual_size": 2687887,
+        "raw_size": 2688000,
+        "raw_offset": 1190775808,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_loclists",
+        "rva": 1193570304,
+        "virtual_size": 8607924,
+        "raw_size": 8608256,
+        "raw_offset": 1193463808,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_rnglists",
+        "rva": 1202180096,
+        "virtual_size": 6240331,
+        "raw_size": 6240768,
+        "raw_offset": 1202072064,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      }
+    ],
+    "data_directories": [
+      {
+        "index": 0,
+        "rva": 70713344,
+        "size": 6277
+      },
+      {
+        "index": 1,
+        "rva": 70721536,
+        "size": 33476
+      },
+      {
+        "index": 2,
+        "rva": 70766592,
+        "size": 3208
+      },
+      {
+        "index": 3,
+        "rva": 66396160,
+        "size": 1628628
+      },
+      {
+        "index": 4,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 5,
+        "rva": 70770688,
+        "size": 621432
+      },
+      {
+        "index": 6,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 7,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 8,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 9,
+        "rva": 65761632,
+        "size": 40
+      },
+      {
+        "index": 10,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 11,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 12,
+        "rva": 70727256,
+        "size": 5296
+      },
+      {
+        "index": 13,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 14,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 15,
+        "rva": 0,
+        "size": 0
+      }
+    ],
+    "named_export_count": 168,
+    "exports": [
+      {
+        "name": "_Z13EnergyPlusPgmRKSt6vectorINSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESaIS5_EERKS5_",
+        "ordinal": 1,
+        "rva": 119792,
+        "forwarded": false
+      },
+      {
+        "name": "_Z13RunEnergyPlusRN10EnergyPlus14EnergyPlusDataERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE",
+        "ordinal": 2,
+        "rva": 123898,
+        "forwarded": false
+      },
+      {
+        "name": "_Z20StoreMessageCallbackRN10EnergyPlus14EnergyPlusDataEPFvRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEE",
+        "ordinal": 3,
+        "rva": 124823,
+        "forwarded": false
+      },
+      {
+        "name": "_Z21StoreProgressCallbackRN10EnergyPlus14EnergyPlusDataEPFviE",
+        "ordinal": 4,
+        "rva": 124767,
+        "forwarded": false
+      },
+      {
+        "name": "_Z21registerErrorCallbackPvSt8functionIFvN10EnergyPlus5ErrorERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEEE",
+        "ordinal": 5,
+        "rva": 47584,
+        "forwarded": false
+      },
+      {
+        "name": "_Z22registerStdOutCallbackPvSt8functionIFvRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEEE",
+        "ordinal": 6,
+        "rva": 54364,
+        "forwarded": false
+      },
+      {
+        "name": "_Z24registerProgressCallbackPvSt8functionIFviEE",
+        "ordinal": 7,
+        "rva": 54211,
+        "forwarded": false
+      },
+      {
+        "name": "_Z27callbackUnitarySystemSizingPvRKSt8functionIFvS_EE",
+        "ordinal": 8,
+        "rva": 57771,
+        "forwarded": false
+      },
+      {
+        "name": "_Z27registerExternalHVACManagerPvSt8functionIFvS_EE",
+        "ordinal": 9,
+        "rva": 54576,
+        "forwarded": false
+      },
+      {
+        "name": "_Z48callbackBeginZoneTimestepBeforeSetCurrentWeatherPvRKSt8functionIFvS_EE",
+        "ordinal": 10,
+        "rva": 54894,
+        "forwarded": false
+      },
+      {
+        "name": "_ZN10EnergyPlus20CommandLineInterface11ProcessArgsERNS_14EnergyPlusDataERKSt6vectorINSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESaIS9_EE",
+        "ordinal": 11,
+        "rva": 6390,
+        "forwarded": false
+      },
+      {
+        "name": "actualDateTime",
+        "ordinal": 12,
+        "rva": 96830,
+        "forwarded": false
+      },
+      {
+        "name": "actualTime",
+        "ordinal": 13,
+        "rva": 96342,
+        "forwarded": false
+      },
+      {
+        "name": "apiDataFullyReady",
+        "ordinal": 14,
+        "rva": 73122,
+        "forwarded": false
+      },
+      {
+        "name": "apiErrorFlag",
+        "ordinal": 15,
+        "rva": 73189,
+        "forwarded": false
+      },
+      {
+        "name": "apiVersionFromEPlus",
+        "ordinal": 16,
+        "rva": 47522,
+        "forwarded": false
+      },
+      {
+        "name": "calendarYear",
+        "ordinal": 17,
+        "rva": 94713,
+        "forwarded": false
+      },
+      {
+        "name": "callbackAfterNewEnvironmentWarmupComplete",
+        "ordinal": 18,
+        "rva": 55119,
+        "forwarded": false
+      },
+      {
+        "name": "callbackAfterPredictorAfterHVACManagers",
+        "ordinal": 19,
+        "rva": 55969,
+        "forwarded": false
+      },
+      {
+        "name": "callbackAfterPredictorBeforeHVACManagers",
+        "ordinal": 20,
+        "rva": 55799,
+        "forwarded": false
+      },
+      {
+        "name": "callbackBeginNewEnvironment",
+        "ordinal": 21,
+        "rva": 54779,
+        "forwarded": false
+      },
+      {
+        "name": "callbackBeginTimeStepBeforePredictor",
+        "ordinal": 22,
+        "rva": 55629,
+        "forwarded": false
+      },
+      {
+        "name": "callbackBeginZoneTimeStepAfterInitHeatBalance",
+        "ordinal": 23,
+        "rva": 55459,
+        "forwarded": false
+      },
+      {
+        "name": "callbackBeginZoneTimeStepBeforeInitHeatBalance",
+        "ordinal": 24,
+        "rva": 55289,
+        "forwarded": false
+      },
+      {
+        "name": "callbackBeginZoneTimestepBeforeSetCurrentWeather",
+        "ordinal": 25,
+        "rva": 54949,
+        "forwarded": false
+      },
+      {
+        "name": "callbackEndOfAfterComponentGetInput",
+        "ordinal": 26,
+        "rva": 57329,
+        "forwarded": false
+      },
+      {
+        "name": "callbackEndOfSystemSizing",
+        "ordinal": 27,
+        "rva": 57159,
+        "forwarded": false
+      },
+      {
+        "name": "callbackEndOfSystemTimeStepAfterHVACReporting",
+        "ordinal": 28,
+        "rva": 56819,
+        "forwarded": false
+      },
+      {
+        "name": "callbackEndOfSystemTimeStepBeforeHVACReporting",
+        "ordinal": 29,
+        "rva": 56649,
+        "forwarded": false
+      },
+      {
+        "name": "callbackEndOfZoneSizing",
+        "ordinal": 30,
+        "rva": 56989,
+        "forwarded": false
+      },
+      {
+        "name": "callbackEndOfZoneTimeStepAfterZoneReporting",
+        "ordinal": 31,
+        "rva": 56479,
+        "forwarded": false
+      },
+      {
+        "name": "callbackEndOfZoneTimeStepBeforeZoneReporting",
+        "ordinal": 32,
+        "rva": 56309,
+        "forwarded": false
+      },
+      {
+        "name": "callbackInsideSystemIterationLoop",
+        "ordinal": 33,
+        "rva": 56139,
+        "forwarded": false
+      },
+      {
+        "name": "callbackUnitarySystemSizing",
+        "ordinal": 34,
+        "rva": 57826,
+        "forwarded": false
+      },
+      {
+        "name": "callbackUserDefinedComponentModel",
+        "ordinal": 35,
+        "rva": 57583,
+        "forwarded": false
+      },
+      {
+        "name": "currentEnvironmentNum",
+        "ordinal": 36,
+        "rva": 95886,
+        "forwarded": false
+      },
+      {
+        "name": "currentSimTime",
+        "ordinal": 37,
+        "rva": 107671,
+        "forwarded": false
+      },
+      {
+        "name": "currentTime",
+        "ordinal": 38,
+        "rva": 95051,
+        "forwarded": false
+      },
+      {
+        "name": "dayOfMonth",
+        "ordinal": 39,
+        "rva": 94810,
+        "forwarded": false
+      },
+      {
+        "name": "dayOfWeek",
+        "ordinal": 40,
+        "rva": 94857,
+        "forwarded": false
+      },
+      {
+        "name": "dayOfYear",
+        "ordinal": 41,
+        "rva": 94904,
+        "forwarded": false
+      },
+      {
+        "name": "daylightSavingsTimeIndicator",
+        "ordinal": 42,
+        "rva": 94951,
+        "forwarded": false
+      },
+      {
+        "name": "energyPlusVersion",
+        "ordinal": 43,
+        "rva": 47555,
+        "forwarded": false
+      },
+      {
+        "name": "energyplus",
+        "ordinal": 44,
+        "rva": 53072,
+        "forwarded": false
+      },
+      {
+        "name": "epwFilePath",
+        "ordinal": 45,
+        "rva": 73485,
+        "forwarded": false
+      },
+      {
+        "name": "freeAPIData",
+        "ordinal": 46,
+        "rva": 70373,
+        "forwarded": false
+      },
+      {
+        "name": "freeObjectNames",
+        "ordinal": 47,
+        "rva": 74195,
+        "forwarded": false
+      },
+      {
+        "name": "getAPIData",
+        "ordinal": 48,
+        "rva": 67626,
+        "forwarded": false
+      },
+      {
+        "name": "getActuatorHandle",
+        "ordinal": 49,
+        "rva": 77390,
+        "forwarded": false
+      },
+      {
+        "name": "getActuatorValue",
+        "ordinal": 50,
+        "rva": 81754,
+        "forwarded": false
+      },
+      {
+        "name": "getConstructionHandle",
+        "ordinal": 51,
+        "rva": 95986,
+        "forwarded": false
+      },
+      {
+        "name": "getEMSGlobalVariableHandle",
+        "ordinal": 52,
+        "rva": 84066,
+        "forwarded": false
+      },
+      {
+        "name": "getEMSGlobalVariableValue",
+        "ordinal": 53,
+        "rva": 84370,
+        "forwarded": false
+      },
+      {
+        "name": "getInternalVariableHandle",
+        "ordinal": 54,
+        "rva": 82595,
+        "forwarded": false
+      },
+      {
+        "name": "getInternalVariableValue",
+        "ordinal": 55,
+        "rva": 83207,
+        "forwarded": false
+      },
+      {
+        "name": "getMeterHandle",
+        "ordinal": 56,
+        "rva": 76537,
+        "forwarded": false
+      },
+      {
+        "name": "getMeterValue",
+        "ordinal": 57,
+        "rva": 76696,
+        "forwarded": false
+      },
+      {
+        "name": "getNumNodesInCondFDSurfaceLayer",
+        "ordinal": 58,
+        "rva": 74236,
+        "forwarded": false
+      },
+      {
+        "name": "getObjectNames",
+        "ordinal": 59,
+        "rva": 73648,
+        "forwarded": false
+      },
+      {
+        "name": "getPluginGlobalVariableHandle",
+        "ordinal": 60,
+        "rva": 85787,
+        "forwarded": false
+      },
+      {
+        "name": "getPluginGlobalVariableValue",
+        "ordinal": 61,
+        "rva": 85955,
+        "forwarded": false
+      },
+      {
+        "name": "getPluginTrendVariableAverage",
+        "ordinal": 62,
+        "rva": 88583,
+        "forwarded": false
+      },
+      {
+        "name": "getPluginTrendVariableDirection",
+        "ordinal": 63,
+        "rva": 93447,
+        "forwarded": false
+      },
+      {
+        "name": "getPluginTrendVariableHandle",
+        "ordinal": 64,
+        "rva": 87236,
+        "forwarded": false
+      },
+      {
+        "name": "getPluginTrendVariableMax",
+        "ordinal": 65,
+        "rva": 91015,
+        "forwarded": false
+      },
+      {
+        "name": "getPluginTrendVariableMin",
+        "ordinal": 66,
+        "rva": 89799,
+        "forwarded": false
+      },
+      {
+        "name": "getPluginTrendVariableSum",
+        "ordinal": 67,
+        "rva": 92231,
+        "forwarded": false
+      },
+      {
+        "name": "getPluginTrendVariableValue",
+        "ordinal": 68,
+        "rva": 87368,
+        "forwarded": false
+      },
+      {
+        "name": "getVariableHandle",
+        "ordinal": 69,
+        "rva": 74640,
+        "forwarded": false
+      },
+      {
+        "name": "getVariableValue",
+        "ordinal": 70,
+        "rva": 75044,
+        "forwarded": false
+      },
+      {
+        "name": "glycolConductivity",
+        "ordinal": 71,
+        "rva": 48258,
+        "forwarded": false
+      },
+      {
+        "name": "glycolDelete",
+        "ordinal": 72,
+        "rva": 48005,
+        "forwarded": false
+      },
+      {
+        "name": "glycolDensity",
+        "ordinal": 73,
+        "rva": 48139,
+        "forwarded": false
+      },
+      {
+        "name": "glycolNew",
+        "ordinal": 74,
+        "rva": 47818,
+        "forwarded": false
+      },
+      {
+        "name": "glycolSpecificHeat",
+        "ordinal": 75,
+        "rva": 48020,
+        "forwarded": false
+      },
+      {
+        "name": "glycolViscosity",
+        "ordinal": 76,
+        "rva": 48377,
+        "forwarded": false
+      },
+      {
+        "name": "holidayIndex",
+        "ordinal": 77,
+        "rva": 95550,
+        "forwarded": false
+      },
+      {
+        "name": "hour",
+        "ordinal": 78,
+        "rva": 94998,
+        "forwarded": false
+      },
+      {
+        "name": "initializeFunctionalAPI",
+        "ordinal": 79,
+        "rva": 47344,
+        "forwarded": false
+      },
+      {
+        "name": "inputFilePath",
+        "ordinal": 80,
+        "rva": 73308,
+        "forwarded": false
+      },
+      {
+        "name": "isRaining",
+        "ordinal": 81,
+        "rva": 95654,
+        "forwarded": false
+      },
+      {
+        "name": "issueSevere",
+        "ordinal": 82,
+        "rva": 53797,
+        "forwarded": false
+      },
+      {
+        "name": "issueText",
+        "ordinal": 83,
+        "rva": 54004,
+        "forwarded": false
+      },
+      {
+        "name": "issueWarning",
+        "ordinal": 84,
+        "rva": 53590,
+        "forwarded": false
+      },
+      {
+        "name": "kindOfSim",
+        "ordinal": 85,
+        "rva": 95936,
+        "forwarded": false
+      },
+      {
+        "name": "listAllAPIDataCSV",
+        "ordinal": 86,
+        "rva": 70815,
+        "forwarded": false
+      },
+      {
+        "name": "minutes",
+        "ordinal": 87,
+        "rva": 95304,
+        "forwarded": false
+      },
+      {
+        "name": "month",
+        "ordinal": 88,
+        "rva": 94760,
+        "forwarded": false
+      },
+      {
+        "name": "numTimeStepsInHour",
+        "ordinal": 89,
+        "rva": 95450,
+        "forwarded": false
+      },
+      {
+        "name": "psyCpAirFnW",
+        "ordinal": 90,
+        "rva": 49610,
+        "forwarded": false
+      },
+      {
+        "name": "psyHFnTdbRhPb",
+        "ordinal": 91,
+        "rva": 51231,
+        "forwarded": false
+      },
+      {
+        "name": "psyHFnTdbW",
+        "ordinal": 92,
+        "rva": 49549,
+        "forwarded": false
+      },
+      {
+        "name": "psyHfgAirFnWTdb",
+        "ordinal": 93,
+        "rva": 49431,
+        "forwarded": false
+      },
+      {
+        "name": "psyHgAirFnWTdb",
+        "ordinal": 94,
+        "rva": 49490,
+        "forwarded": false
+      },
+      {
+        "name": "psyPsatFnTemp",
+        "ordinal": 95,
+        "rva": 50253,
+        "forwarded": false
+      },
+      {
+        "name": "psyRhFnTdbRhov",
+        "ordinal": 96,
+        "rva": 50593,
+        "forwarded": false
+      },
+      {
+        "name": "psyRhFnTdbWPb",
+        "ordinal": 97,
+        "rva": 50711,
+        "forwarded": false
+      },
+      {
+        "name": "psyRhoFnPbTdbW",
+        "ordinal": 98,
+        "rva": 49341,
+        "forwarded": false
+      },
+      {
+        "name": "psyRhovFnTdbRh",
+        "ordinal": 99,
+        "rva": 50475,
+        "forwarded": false
+      },
+      {
+        "name": "psyRhovFnTdbWPb",
+        "ordinal": 100,
+        "rva": 49718,
+        "forwarded": false
+      },
+      {
+        "name": "psyTdbFnHW",
+        "ordinal": 101,
+        "rva": 49657,
+        "forwarded": false
+      },
+      {
+        "name": "psyTdpFnTdbTwbPb",
+        "ordinal": 102,
+        "rva": 51483,
+        "forwarded": false
+      },
+      {
+        "name": "psyTdpFnWPb",
+        "ordinal": 103,
+        "rva": 51365,
+        "forwarded": false
+      },
+      {
+        "name": "psyTsatFnHPb",
+        "ordinal": 104,
+        "rva": 50357,
+        "forwarded": false
+      },
+      {
+        "name": "psyTwbFnTdbWPb",
+        "ordinal": 105,
+        "rva": 49793,
+        "forwarded": false
+      },
+      {
+        "name": "psyVFnTdbWPb",
+        "ordinal": 106,
+        "rva": 49927,
+        "forwarded": false
+      },
+      {
+        "name": "psyWFnTdbH",
+        "ordinal": 107,
+        "rva": 50061,
+        "forwarded": false
+      },
+      {
+        "name": "psyWFnTdbRhPb",
+        "ordinal": 108,
+        "rva": 50963,
+        "forwarded": false
+      },
+      {
+        "name": "psyWFnTdbTwbPb",
+        "ordinal": 109,
+        "rva": 51097,
+        "forwarded": false
+      },
+      {
+        "name": "psyWFnTdpPb",
+        "ordinal": 110,
+        "rva": 50845,
+        "forwarded": false
+      },
+      {
+        "name": "refrigerantDelete",
+        "ordinal": 111,
+        "rva": 48683,
+        "forwarded": false
+      },
+      {
+        "name": "refrigerantNew",
+        "ordinal": 112,
+        "rva": 48496,
+        "forwarded": false
+      },
+      {
+        "name": "refrigerantSaturatedDensity",
+        "ordinal": 113,
+        "rva": 49071,
+        "forwarded": false
+      },
+      {
+        "name": "refrigerantSaturatedEnthalpy",
+        "ordinal": 114,
+        "rva": 48936,
+        "forwarded": false
+      },
+      {
+        "name": "refrigerantSaturatedSpecificHeat",
+        "ordinal": 115,
+        "rva": 49206,
+        "forwarded": false
+      },
+      {
+        "name": "refrigerantSaturationPressure",
+        "ordinal": 116,
+        "rva": 48698,
+        "forwarded": false
+      },
+      {
+        "name": "refrigerantSaturationTemperature",
+        "ordinal": 117,
+        "rva": 48817,
+        "forwarded": false
+      },
+      {
+        "name": "registerErrorCallback",
+        "ordinal": 118,
+        "rva": 47711,
+        "forwarded": false
+      },
+      {
+        "name": "registerExternalHVACManager",
+        "ordinal": 119,
+        "rva": 54659,
+        "forwarded": false
+      },
+      {
+        "name": "registerProgressCallback",
+        "ordinal": 120,
+        "rva": 54296,
+        "forwarded": false
+      },
+      {
+        "name": "registerStdOutCallback",
+        "ordinal": 121,
+        "rva": 54501,
+        "forwarded": false
+      },
+      {
+        "name": "requestVariable",
+        "ordinal": 122,
+        "rva": 74476,
+        "forwarded": false
+      },
+      {
+        "name": "resetActuator",
+        "ordinal": 123,
+        "rva": 80159,
+        "forwarded": false
+      },
+      {
+        "name": "resetErrorFlag",
+        "ordinal": 124,
+        "rva": 73256,
+        "forwarded": false
+      },
+      {
+        "name": "setActuatorValue",
+        "ordinal": 125,
+        "rva": 80868,
+        "forwarded": false
+      },
+      {
+        "name": "setConsoleOutputState",
+        "ordinal": 126,
+        "rva": 53398,
+        "forwarded": false
+      },
+      {
+        "name": "setEMSGlobalVariableValue",
+        "ordinal": 127,
+        "rva": 85074,
+        "forwarded": false
+      },
+      {
+        "name": "setEnergyPlusRootDirectory",
+        "ordinal": 128,
+        "rva": 53463,
+        "forwarded": false
+      },
+      {
+        "name": "setPluginGlobalVariableValue",
+        "ordinal": 129,
+        "rva": 86595,
+        "forwarded": false
+      },
+      {
+        "name": "stateDelete",
+        "ordinal": 130,
+        "rva": 59595,
+        "forwarded": false
+      },
+      {
+        "name": "stateNew",
+        "ordinal": 131,
+        "rva": 59312,
+        "forwarded": false
+      },
+      {
+        "name": "stateNewPython",
+        "ordinal": 132,
+        "rva": 59402,
+        "forwarded": false
+      },
+      {
+        "name": "stateReset",
+        "ordinal": 133,
+        "rva": 59517,
+        "forwarded": false
+      },
+      {
+        "name": "stopSimulation",
+        "ordinal": 134,
+        "rva": 53349,
+        "forwarded": false
+      },
+      {
+        "name": "sunIsUp",
+        "ordinal": 135,
+        "rva": 95600,
+        "forwarded": false
+      },
+      {
+        "name": "systemTimeStep",
+        "ordinal": 136,
+        "rva": 95824,
+        "forwarded": false
+      },
+      {
+        "name": "todayWeatherAlbedoAtTime",
+        "ordinal": 137,
+        "rva": 101702,
+        "forwarded": false
+      },
+      {
+        "name": "todayWeatherBeamSolarRadiationAtTime",
+        "ordinal": 138,
+        "rva": 100954,
+        "forwarded": false
+      },
+      {
+        "name": "todayWeatherDiffuseSolarRadiationAtTime",
+        "ordinal": 139,
+        "rva": 101328,
+        "forwarded": false
+      },
+      {
+        "name": "todayWeatherHorizontalIRSkyAtTime",
+        "ordinal": 140,
+        "rva": 100580,
+        "forwarded": false
+      },
+      {
+        "name": "todayWeatherIsRainAtTime",
+        "ordinal": 141,
+        "rva": 97229,
+        "forwarded": false
+      },
+      {
+        "name": "todayWeatherIsSnowAtTime",
+        "ordinal": 142,
+        "rva": 97595,
+        "forwarded": false
+      },
+      {
+        "name": "todayWeatherLiquidPrecipitationAtTime",
+        "ordinal": 143,
+        "rva": 102076,
+        "forwarded": false
+      },
+      {
+        "name": "todayWeatherOutBarometricPressureAtTime",
+        "ordinal": 144,
+        "rva": 98710,
+        "forwarded": false
+      },
+      {
+        "name": "todayWeatherOutDewPointAtTime",
+        "ordinal": 145,
+        "rva": 98336,
+        "forwarded": false
+      },
+      {
+        "name": "todayWeatherOutDryBulbAtTime",
+        "ordinal": 146,
+        "rva": 97962,
+        "forwarded": false
+      },
+      {
+        "name": "todayWeatherOutRelativeHumidityAtTime",
+        "ordinal": 147,
+        "rva": 99084,
+        "forwarded": false
+      },
+      {
+        "name": "todayWeatherSkyTemperatureAtTime",
+        "ordinal": 148,
+        "rva": 100206,
+        "forwarded": false
+      },
+      {
+        "name": "todayWeatherWindDirectionAtTime",
+        "ordinal": 149,
+        "rva": 99832,
+        "forwarded": false
+      },
+      {
+        "name": "todayWeatherWindSpeedAtTime",
+        "ordinal": 150,
+        "rva": 99458,
+        "forwarded": false
+      },
+      {
+        "name": "tomorrowWeatherAlbedoAtTime",
+        "ordinal": 151,
+        "rva": 106923,
+        "forwarded": false
+      },
+      {
+        "name": "tomorrowWeatherBeamSolarRadiationAtTime",
+        "ordinal": 152,
+        "rva": 106175,
+        "forwarded": false
+      },
+      {
+        "name": "tomorrowWeatherDiffuseSolarRadiationAtTime",
+        "ordinal": 153,
+        "rva": 106549,
+        "forwarded": false
+      },
+      {
+        "name": "tomorrowWeatherHorizontalIRSkyAtTime",
+        "ordinal": 154,
+        "rva": 105801,
+        "forwarded": false
+      },
+      {
+        "name": "tomorrowWeatherIsRainAtTime",
+        "ordinal": 155,
+        "rva": 102450,
+        "forwarded": false
+      },
+      {
+        "name": "tomorrowWeatherIsSnowAtTime",
+        "ordinal": 156,
+        "rva": 102816,
+        "forwarded": false
+      },
+      {
+        "name": "tomorrowWeatherLiquidPrecipitationAtTime",
+        "ordinal": 157,
+        "rva": 107297,
+        "forwarded": false
+      },
+      {
+        "name": "tomorrowWeatherOutBarometricPressureAtTime",
+        "ordinal": 158,
+        "rva": 103931,
+        "forwarded": false
+      },
+      {
+        "name": "tomorrowWeatherOutDewPointAtTime",
+        "ordinal": 159,
+        "rva": 103557,
+        "forwarded": false
+      },
+      {
+        "name": "tomorrowWeatherOutDryBulbAtTime",
+        "ordinal": 160,
+        "rva": 103183,
+        "forwarded": false
+      },
+      {
+        "name": "tomorrowWeatherOutRelativeHumidityAtTime",
+        "ordinal": 161,
+        "rva": 104305,
+        "forwarded": false
+      },
+      {
+        "name": "tomorrowWeatherSkyTemperatureAtTime",
+        "ordinal": 162,
+        "rva": 105427,
+        "forwarded": false
+      },
+      {
+        "name": "tomorrowWeatherWindDirectionAtTime",
+        "ordinal": 163,
+        "rva": 105053,
+        "forwarded": false
+      },
+      {
+        "name": "tomorrowWeatherWindSpeedAtTime",
+        "ordinal": 164,
+        "rva": 104679,
+        "forwarded": false
+      },
+      {
+        "name": "warmupFlag",
+        "ordinal": 165,
+        "rva": 95708,
+        "forwarded": false
+      },
+      {
+        "name": "year",
+        "ordinal": 166,
+        "rva": 94663,
+        "forwarded": false
+      },
+      {
+        "name": "zoneTimeStep",
+        "ordinal": 167,
+        "rva": 95762,
+        "forwarded": false
+      },
+      {
+        "name": "zoneTimeStepNum",
+        "ordinal": 168,
+        "rva": 95500,
+        "forwarded": false
+      }
+    ],
+    "debug_section_raw_bytes": 1137006080,
+    "nondebug_section_raw_bytes": 71305216
+  },
+  "observer": {
+    "binary": {
+      "path": ".runtime/porting/ZON-01/native-build-01/zon01_reference.exe",
+      "sha256": "a1a51495d6c3441ed7031ad2b80827bb92008326eaf8832d7c80dd92155fef87"
+    },
+    "size_bytes": 9941020,
+    "machine_hex": "8664",
+    "pe32_plus": true,
+    "image_base_hex": "140000000",
+    "entry_point_rva": 4389,
+    "section_alignment": 4096,
+    "file_alignment": 512,
+    "image_size": 6410240,
+    "coff_symbol_count": 33008,
+    "coff_symbol_table_offset": 6361600,
+    "sections": [
+      {
+        "name": ".text",
+        "rva": 4096,
+        "virtual_size": 401280,
+        "raw_size": 401408,
+        "raw_offset": 1536,
+        "characteristics_hex": "60000060",
+        "executable": true,
+        "readable": true,
+        "writable": false,
+        "discardable": false,
+        "raw_sha256": "336f383f25494775b3cc51235dcfe2717a6c8e1e60fb12322f5696aa4f108413"
+      },
+      {
+        "name": ".data",
+        "rva": 405504,
+        "virtual_size": 400,
+        "raw_size": 512,
+        "raw_offset": 402944,
+        "characteristics_hex": "c0000040",
+        "executable": false,
+        "readable": true,
+        "writable": true,
+        "discardable": false,
+        "raw_sha256": "1200e957e43fcf3c85e0c3dcf369e4833973befc13c1c0157e0dfb9f5477acab"
+      },
+      {
+        "name": ".rdata",
+        "rva": 409600,
+        "virtual_size": 63008,
+        "raw_size": 63488,
+        "raw_offset": 403456,
+        "characteristics_hex": "40000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": false,
+        "raw_sha256": "5271d68835e5650b9566072a3d5ee3c29e36876d3616cfb32cfb3134c5f41a88"
+      },
+      {
+        "name": ".eh_frame",
+        "rva": 475136,
+        "virtual_size": 4,
+        "raw_size": 512,
+        "raw_offset": 466944,
+        "characteristics_hex": "c0000040",
+        "executable": false,
+        "readable": true,
+        "writable": true,
+        "discardable": false,
+        "raw_sha256": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560"
+      },
+      {
+        "name": ".pdata",
+        "rva": 479232,
+        "virtual_size": 40896,
+        "raw_size": 40960,
+        "raw_offset": 467456,
+        "characteristics_hex": "40000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": false,
+        "raw_sha256": "64ed41cc9c5544bcd71226dd14bb3c8d92a1b1b95b8b76197a21ad1caddbf000"
+      },
+      {
+        "name": ".xdata",
+        "rva": 520192,
+        "virtual_size": 50768,
+        "raw_size": 51200,
+        "raw_offset": 508416,
+        "characteristics_hex": "40000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": false,
+        "raw_sha256": "8cb79ee9c7721e75141b6d414ee0ddd732be99660533cae950e0fb3ef3e9d293"
+      },
+      {
+        "name": ".bss",
+        "rva": 573440,
+        "virtual_size": 3520,
+        "raw_size": 0,
+        "raw_offset": 0,
+        "characteristics_hex": "c0000080",
+        "executable": false,
+        "readable": true,
+        "writable": true,
+        "discardable": false,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": ".idata",
+        "rva": 577536,
+        "virtual_size": 10028,
+        "raw_size": 10240,
+        "raw_offset": 559616,
+        "characteristics_hex": "c0000040",
+        "executable": false,
+        "readable": true,
+        "writable": true,
+        "discardable": false,
+        "raw_sha256": "1d6f39b467590cbdea65c10a34a505889ce6eeffb329feb532820472e29160e5"
+      },
+      {
+        "name": ".CRT",
+        "rva": 589824,
+        "virtual_size": 96,
+        "raw_size": 512,
+        "raw_offset": 569856,
+        "characteristics_hex": "c0000040",
+        "executable": false,
+        "readable": true,
+        "writable": true,
+        "discardable": false,
+        "raw_sha256": "c8801f8a0e0036d6c0538adbfde2af1564c9a542529dee757b4fd7f8fa914d90"
+      },
+      {
+        "name": ".tls",
+        "rva": 593920,
+        "virtual_size": 16,
+        "raw_size": 512,
+        "raw_offset": 570368,
+        "characteristics_hex": "c0000040",
+        "executable": false,
+        "readable": true,
+        "writable": true,
+        "discardable": false,
+        "raw_sha256": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560"
+      },
+      {
+        "name": ".reloc",
+        "rva": 598016,
+        "virtual_size": 2176,
+        "raw_size": 2560,
+        "raw_offset": 570880,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true,
+        "raw_sha256": "5b5213c05b9f108cef83e016066097a126b1a64887ae1109dda51c0f916d08ef"
+      },
+      {
+        "name": ".debug_aranges",
+        "rva": 602112,
+        "virtual_size": 51888,
+        "raw_size": 52224,
+        "raw_offset": 573440,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_info",
+        "rva": 655360,
+        "virtual_size": 5182650,
+        "raw_size": 5182976,
+        "raw_offset": 625664,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_abbrev",
+        "rva": 5840896,
+        "virtual_size": 13125,
+        "raw_size": 13312,
+        "raw_offset": 5808640,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_line",
+        "rva": 5857280,
+        "virtual_size": 193429,
+        "raw_size": 193536,
+        "raw_offset": 5821952,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_frame",
+        "rva": 6053888,
+        "virtual_size": 221680,
+        "raw_size": 221696,
+        "raw_offset": 6015488,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_str",
+        "rva": 6279168,
+        "virtual_size": 66666,
+        "raw_size": 67072,
+        "raw_offset": 6237184,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_line_str",
+        "rva": 6348800,
+        "virtual_size": 23134,
+        "raw_size": 23552,
+        "raw_offset": 6304256,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_rnglists",
+        "rva": 6373376,
+        "virtual_size": 33572,
+        "raw_size": 33792,
+        "raw_offset": 6327808,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      }
+    ],
+    "data_directories": [
+      {
+        "index": 0,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 1,
+        "rva": 577536,
+        "size": 10028
+      },
+      {
+        "index": 2,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 3,
+        "rva": 479232,
+        "size": 40896
+      },
+      {
+        "index": 4,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 5,
+        "rva": 598016,
+        "size": 2176
+      },
+      {
+        "index": 6,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 7,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 8,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 9,
+        "rva": 460064,
+        "size": 40
+      },
+      {
+        "index": 10,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 11,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 12,
+        "rva": 579312,
+        "size": 1472
+      },
+      {
+        "index": 13,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 14,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 15,
+        "rva": 0,
+        "size": 0
+      }
+    ],
+    "named_export_count": 0,
+    "exports": [],
+    "debug_section_raw_bytes": 5788160,
+    "nondebug_section_raw_bytes": 571904
+  },
+  "helper": {
+    "binary": {
+      "path": ".runtime/porting/ZON-01/native-build-01/zon01_reference_helper.exe",
+      "sha256": "a7d0612dbb020cc8dd5ea523d7a2576a5c516e1dc7517f0e52d3d6f13c797861"
+    },
+    "size_bytes": 1296118832,
+    "machine_hex": "8664",
+    "pe32_plus": true,
+    "image_base_hex": "140000000",
+    "entry_point_rva": 4389,
+    "section_alignment": 4096,
+    "file_alignment": 512,
+    "image_size": 1200046080,
+    "coff_symbol_count": 1541076,
+    "coff_symbol_table_offset": 1199950848,
+    "sections": [
+      {
+        "name": ".text",
+        "rva": 4096,
+        "virtual_size": 38929656,
+        "raw_size": 38929920,
+        "raw_offset": 1536,
+        "characteristics_hex": "60000060",
+        "executable": true,
+        "readable": true,
+        "writable": false,
+        "discardable": false,
+        "raw_sha256": "0ffb05d18730d67898fe133445752ca50ccbd64acf4cfb092de210c9f0e80d0f"
+      },
+      {
+        "name": ".data",
+        "rva": 38936576,
+        "virtual_size": 82912,
+        "raw_size": 82944,
+        "raw_offset": 38931456,
+        "characteristics_hex": "c0000040",
+        "executable": false,
+        "readable": true,
+        "writable": true,
+        "discardable": false,
+        "raw_sha256": "412ffb5e4c4a5035a04993e053b3357ab422d8d123e8040cd90a0f424258d4b9"
+      },
+      {
+        "name": ".rdata",
+        "rva": 39022592,
+        "virtual_size": 26892784,
+        "raw_size": 26892800,
+        "raw_offset": 39014400,
+        "characteristics_hex": "40000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": false,
+        "raw_sha256": "c11746f6fe5da71f11d3c0c83d74f01f0aee13abe603330952383246f832075f"
+      },
+      {
+        "name": ".eh_frame",
+        "rva": 65916928,
+        "virtual_size": 4,
+        "raw_size": 512,
+        "raw_offset": 65907200,
+        "characteristics_hex": "c0000040",
+        "executable": false,
+        "readable": true,
+        "writable": true,
+        "discardable": false,
+        "raw_sha256": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560"
+      },
+      {
+        "name": ".pdata",
+        "rva": 65921024,
+        "virtual_size": 1612848,
+        "raw_size": 1613312,
+        "raw_offset": 65907712,
+        "characteristics_hex": "40000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": false,
+        "raw_sha256": "4e88d7fb0f3b21a66fd7ce58193afc7ee43161bacdc64a75e1912dffa1a194d3"
+      },
+      {
+        "name": ".xdata",
+        "rva": 67534848,
+        "virtual_size": 2602960,
+        "raw_size": 2603008,
+        "raw_offset": 67521024,
+        "characteristics_hex": "40000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": false,
+        "raw_sha256": "e91a581802968f86fb6cb2f7e544eaa0a27c4b82261a20a1e692013f4c1c8602"
+      },
+      {
+        "name": ".bss",
+        "rva": 70139904,
+        "virtual_size": 52352,
+        "raw_size": 0,
+        "raw_offset": 0,
+        "characteristics_hex": "c0000080",
+        "executable": false,
+        "readable": true,
+        "writable": true,
+        "discardable": false,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": ".idata",
+        "rva": 70193152,
+        "virtual_size": 33408,
+        "raw_size": 33792,
+        "raw_offset": 70124032,
+        "characteristics_hex": "c0000040",
+        "executable": false,
+        "readable": true,
+        "writable": true,
+        "discardable": false,
+        "raw_sha256": "bcf1dbdcd39f8f909d92c241748c82bb595acfb4e66726682bb5b1f9f940e544"
+      },
+      {
+        "name": ".CRT",
+        "rva": 70230016,
+        "virtual_size": 96,
+        "raw_size": 512,
+        "raw_offset": 70157824,
+        "characteristics_hex": "c0000040",
+        "executable": false,
+        "readable": true,
+        "writable": true,
+        "discardable": false,
+        "raw_sha256": "06aa6f53cfc60934f8d189c9acd8307b81a36467b254be099f1758d8f46f738f"
+      },
+      {
+        "name": ".tls",
+        "rva": 70234112,
+        "virtual_size": 16,
+        "raw_size": 512,
+        "raw_offset": 70158336,
+        "characteristics_hex": "c0000040",
+        "executable": false,
+        "readable": true,
+        "writable": true,
+        "discardable": false,
+        "raw_sha256": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560"
+      },
+      {
+        "name": ".reloc",
+        "rva": 70238208,
+        "virtual_size": 612724,
+        "raw_size": 612864,
+        "raw_offset": 70158848,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true,
+        "raw_sha256": "43611dcb2d9dac25f3e4d803d194766568196529c3314b3b85ab725eb4ba9d96"
+      },
+      {
+        "name": ".debug_aranges",
+        "rva": 70852608,
+        "virtual_size": 7711120,
+        "raw_size": 7711232,
+        "raw_offset": 70771712,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_info",
+        "rva": 78565376,
+        "virtual_size": 1043373422,
+        "raw_size": 1043373568,
+        "raw_offset": 78482944,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_abbrev",
+        "rva": 1121939456,
+        "virtual_size": 3886598,
+        "raw_size": 3887104,
+        "raw_offset": 1121856512,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_line",
+        "rva": 1125826560,
+        "virtual_size": 39570285,
+        "raw_size": 39570432,
+        "raw_offset": 1125743616,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_frame",
+        "rva": 1165398016,
+        "virtual_size": 8690272,
+        "raw_size": 8690688,
+        "raw_offset": 1165314048,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_str",
+        "rva": 1174089728,
+        "virtual_size": 8548514,
+        "raw_size": 8548864,
+        "raw_offset": 1174004736,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_line_str",
+        "rva": 1182642176,
+        "virtual_size": 2637055,
+        "raw_size": 2637312,
+        "raw_offset": 1182553600,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_loclists",
+        "rva": 1185280000,
+        "virtual_size": 8573586,
+        "raw_size": 8573952,
+        "raw_offset": 1185190912,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      },
+      {
+        "name": ".debug_rnglists",
+        "rva": 1193857024,
+        "virtual_size": 6185627,
+        "raw_size": 6185984,
+        "raw_offset": 1193764864,
+        "characteristics_hex": "42000040",
+        "executable": false,
+        "readable": true,
+        "writable": false,
+        "discardable": true
+      }
+    ],
+    "data_directories": [
+      {
+        "index": 0,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 1,
+        "rva": 70193152,
+        "size": 33408
+      },
+      {
+        "index": 2,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 3,
+        "rva": 65921024,
+        "size": 1612848
+      },
+      {
+        "index": 4,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 5,
+        "rva": 70238208,
+        "size": 612724
+      },
+      {
+        "index": 6,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 7,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 8,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 9,
+        "rva": 65292608,
+        "size": 40
+      },
+      {
+        "index": 10,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 11,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 12,
+        "rva": 70198872,
+        "size": 5296
+      },
+      {
+        "index": 13,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 14,
+        "rva": 0,
+        "size": 0
+      },
+      {
+        "index": 15,
+        "rva": 0,
+        "size": 0
+      }
+    ],
+    "named_export_count": 0,
+    "exports": [],
+    "debug_section_raw_bytes": 1129179136,
+    "nondebug_section_raw_bytes": 70770176
+  },
+  "strip_identity": {
+    "installed_binary": {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/strip.exe",
+      "sha256": "a7e319e63bb15c58c99102460297604fef428dcdf221ae56718d8c079a42722f"
+    },
+    "size_bytes": 1318414,
+    "publisher_archive": {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-13.2.0-mingw-w64ucrt-11.0.1-r3.zip",
+      "sha256": "4889a18dd97d601c1d6c2f141865469979472846751e444840532257dfac44b6"
+    },
+    "archive_member": "mingw64/bin/strip.exe",
+    "byte_equal_to_verified_publisher_archive_member": true,
+    "tool_executed": false
+  },
+  "selected_current_private_symbol_export_checks": {
+    "beginEnvironmentInit": [],
+    "InitZoneAirSetPoints": [],
+    "EnergyPlusData_ctor": [],
+    "EnergyPlusData_dtor": [],
+    "CalculateZoneVolume": []
+  },
+  "recommendation": "For future static-core helpers, keep original compile/link flags and retain only a validated debug-stripped derivative after a recorded link. Preserve exact original core/API once; do not rewrite any current proof. Dynamic API remains sufficient for passive observers, but direct private calls require actual export availability.",
+  "not_yet_proven": [
+    "No stripped derivative was produced; size after strip is an estimate from present section sizes.",
+    "No relink against the shared API/import library was attempted; absent exports cannot be treated as private ABI availability.",
+    "The strip binary was authenticated against the verified publisher ZIP, but its version/help/runtime behavior was not executed.",
+    "Before future execution require all retained PE section content/RVA/virtual size/characteristics plus entry/image layout, imports/exports/TLS/exception/relocation tables unchanged; only debug and COFF symbol metadata may differ.",
+    "Build product original identity is historical and derivative identity distinct. Exact unstripped recovery requires deterministic rebuild or preserved per-card original; no current deletion is proposed."
+  ],
+  "future_candidate_command_not_executed": [
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\strip.exe",
+    "--strip-debug",
+    "-o",
+    "<fresh-derivative.exe>",
+    "<fresh-recorded-unstripped.exe>"
+  ],
+  "native_tools_engines_compilers_Cargo_Git_executed": false,
+  "frozen_artifacts_mutated": false,
+  "scientific_gates_updated": false,
+  "executed_metadata_reader": {
+    "path": ".runtime/porting/native-efficiency-audit-01/inspect_native_02.py",
+    "sha256": "5112f90529a041e42ac469fe88987cb34a90276c51841285e9bad0e34b26157f"
+  }
+}

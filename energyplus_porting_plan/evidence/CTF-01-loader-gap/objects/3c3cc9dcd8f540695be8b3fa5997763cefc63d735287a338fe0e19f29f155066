@@ -1,0 +1,11 @@
+--- .runtime/porting/CTF-01/native-production-prep-01/ctf01_production_admission.hh
++++ .runtime/porting/CTF-01/native-production-prep-02/ctf01_production_admission.hh
+@@ -7,7 +7,7 @@
+ namespace Ctf01 {
+ inline json production_loader_order()
+ {
+-    return {"InputProcessor::processInput", "SimulationManager::PostIPProcessing", "EnergyPlusData::init_state",
++    return {"InputProcessor::processInput", "SimulationManager::PostIPProcessing", "EnergyPlusData::init_constant_state", "EnergyPlusData::init_state",
+         "OutputReportPredefined::SetPredefinedTables", "HeatBalanceManager::SetPreConstructionInputParameters",
+         "OutputProcessor::SetupTimePointers(Zone)", "OutputProcessor::SetupTimePointers(System)",
+         "HeatBalanceManager::GetProjectControlData", "HeatBalanceManager::GetSiteAtmosphereData",

@@ -1,0 +1,32 @@
+# Separate target; preserve the already configured unit helper and original archive.
+if(NOT DEFINED CLK03_REPOSITORY_ROOT OR NOT DEFINED CTF01_PRODUCTION_SOURCE_DIR OR NOT DEFINED CTF01_OBSERVER_SOURCE_DIR)
+  message(FATAL_ERROR "CTF production requires explicit repository/production/observer directories")
+endif()
+include("${CLK03_REPOSITORY_ROOT}/.runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference.cmake")
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+  get_property(_ctf01_prod_scheduled GLOBAL PROPERTY CTF01_PRODUCTION_SCHEDULED)
+  if(NOT _ctf01_prod_scheduled)
+    set_property(GLOBAL PROPERTY CTF01_PRODUCTION_SCHEDULED TRUE)
+    function(ctf01_add_production_reference)
+      if(NOT TARGET energypluslib)
+        message(FATAL_ERROR "CTF production requires the genuine unchanged core archive")
+      endif()
+      get_target_property(_ctf01_prod_defs energypluslib COMPILE_DEFINITIONS)
+      get_directory_property(_ctf01_prod_dir_defs DIRECTORY "${CMAKE_SOURCE_DIR}/src/EnergyPlus" COMPILE_DEFINITIONS)
+      list(APPEND _ctf01_prod_defs ${_ctf01_prod_dir_defs})
+      list(FILTER _ctf01_prod_defs EXCLUDE REGEX "-NOTFOUND$")
+      list(REMOVE_DUPLICATES _ctf01_prod_defs)
+      add_executable(ctf01_production_helper
+        "${CTF01_PRODUCTION_SOURCE_DIR}/ctf01_production_helper.cpp"
+        "${CTF01_OBSERVER_SOURCE_DIR}/Construction.ctf01.cc"
+        "${CTF01_OBSERVER_SOURCE_DIR}/ctf01_observer.cc")
+      target_include_directories(ctf01_production_helper PRIVATE "$<TARGET_PROPERTY:energypluslib,INCLUDE_DIRECTORIES>"
+        "${CTF01_PRODUCTION_SOURCE_DIR}" "${CTF01_OBSERVER_SOURCE_DIR}")
+      target_compile_definitions(ctf01_production_helper PRIVATE ${_ctf01_prod_defs})
+      target_link_libraries(ctf01_production_helper PRIVATE energypluslib project_options project_fp_options project_warnings bcrypt)
+      target_compile_features(ctf01_production_helper PRIVATE cxx_std_20)
+      target_link_options(ctf01_production_helper PRIVATE "-Wl,-Map,${CMAKE_CURRENT_BINARY_DIR}/ctf01_production_helper.map")
+    endfunction()
+    cmake_language(DEFER CALL ctf01_add_production_reference)
+  endif()
+endif()

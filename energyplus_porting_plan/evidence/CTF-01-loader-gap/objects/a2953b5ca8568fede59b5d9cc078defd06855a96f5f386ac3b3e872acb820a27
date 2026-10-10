@@ -1,0 +1,152 @@
+--- .runtime/porting/CTF-01/candidate-production-observer-prep-01/manifest.json
++++ .runtime/porting/CTF-01/candidate-production-observer-prep-02/manifest.json
+@@ -1,11 +1,11 @@
+ {
+   "schema": "ctf01-candidate-production-observer-source-proposal.v1",
+   "status": "SOURCE-READY-held-uncompiled-unexecuted",
+-  "held_utc": "2026-10-10T11:50:05.420341+00:00",
++  "held_utc": "2026-10-10T12:01:04.108761+00:00",
+   "own_sources": [
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-01/ctf01_candidate_production_observer.rs",
++        "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-02/ctf01_candidate_production_observer.rs",
+         "sha256": "275391e7d4c8a63870fa9c659695ae369af841d660af89d468f2a6d17702dd39",
+         "size_bytes": 10760,
+         "line_count": 173
+@@ -14,16 +14,16 @@
+     },
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-01/fields.rs",
+-        "sha256": "81680544a932f4bd692e041b676859cae920548467632e2bd53f551fd6d6a28d",
+-        "size_bytes": 7987,
+-        "line_count": 116
++        "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-02/fields.rs",
++        "sha256": "621c2fa2b63f0ffff091dec75e05e2a131019ff47acc4c23a3534d743f82652e",
++        "size_bytes": 8134,
++        "line_count": 118
+       },
+       "proposed_canonical_path": "crates/ep_run/examples/ctf01_candidate_production_support/fields.rs"
+     },
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-01/unit_fields.rs",
++        "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-02/unit_fields.rs",
+         "sha256": "c096f7df02fdb772b44eb8a4727abb7be4db4d3345f0c2563eb1f36ff3a2d82b",
+         "size_bytes": 4758,
+         "line_count": 79
+@@ -32,23 +32,23 @@
+     }
+   ],
+   "README": {
+-    "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-01/README.md",
+-    "sha256": "45d13d1a549da44f77662a8eb67163e523ff30474786a2d8a32bef7ecaec6937",
+-    "size_bytes": 5657,
+-    "line_count": 87
++    "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-02/README.md",
++    "sha256": "3edd102b745c51bec2128a9f1b7e28e89b63548edd5910f2c7f14c646ac5f45e",
++    "size_bytes": 6041,
++    "line_count": 91
+   },
+   "exact_diffs_from_accepted_existing_observer": [
+     {
+-      "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-01/ctf01_candidate_production_observer.rs.from-existing.diff",
+-      "sha256": "e50156c382354226447068eee537a6cc63ced37feb32f351ecfdb6b3f4960b7a",
++      "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-02/ctf01_candidate_production_observer.rs.from-existing.diff",
++      "sha256": "d7053cc0c8b2193bfdc9dbb93efeba379371cb857843577540f0b04b0355704d",
+       "size_bytes": 5618,
+       "line_count": 83
+     },
+     {
+-      "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-01/fields.rs.from-existing.diff",
+-      "sha256": "a214fdd96df7278b6563a3f9aa690587584e12afb1f9bdc7216c77d635e599e4",
+-      "size_bytes": 9600,
+-      "line_count": 131
++      "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-02/fields.rs.from-existing.diff",
++      "sha256": "8f6fc5f92efe7039e04e0d34e60c9b94d3556e37e3803e898f50bee57b87d568",
++      "size_bytes": 10295,
++      "line_count": 138
+     }
+   ],
+   "accepted_existing_observer_manifest": {
+@@ -79,7 +79,7 @@
+       "line_count": 79
+     },
+     "copied_source": {
+-      "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-01/unit_fields.rs",
++      "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-02/unit_fields.rs",
+       "sha256": "c096f7df02fdb772b44eb8a4727abb7be4db4d3345f0c2563eb1f36ff3a2d82b",
+       "size_bytes": 4758,
+       "line_count": 79
+@@ -224,6 +224,12 @@
+       "sha256": "20cfeef6709b59ed4ef66eb863f079edfd7803fc4522e18419429de49fe5a989",
+       "size_bytes": 11736,
+       "line_count": 316
++    },
++    {
++      "path": "crates/ep_model/src/objects/building.rs",
++      "sha256": "d6a3fbc6b39106f8d0b5195822bfc354e505e557f2b9406409b68aebfb089ef0",
++      "size_bytes": 11621,
++      "line_count": 373
+     }
+   ],
+   "runtime_actual_public_API_path_order": [
+@@ -246,7 +252,8 @@
+     "crates/ep_runtime/src/heat_balance/state.rs",
+     "crates/ep_runtime/src/heat_balance/ctf.rs",
+     "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+-    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs"
++    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
++    "crates/ep_model/src/objects/building.rs"
+   ],
+   "runtime_observer_path_order": [
+     "crates/ep_run/examples/ctf01_candidate_production_observer.rs",
+@@ -451,6 +458,19 @@
+       "range_sha256": "e697ed2f7a24b37179e2571bfeeafb028de5d7f23f473fa470a773af263968b9",
+       "range_size_bytes": 1402,
+       "role": "actual typed member copy adapter; no observer arithmetic"
++    },
++    {
++      "source": {
++        "path": "crates/ep_model/src/objects/building.rs",
++        "sha256": "d6a3fbc6b39106f8d0b5195822bfc354e505e557f2b9406409b68aebfb089ef0",
++        "size_bytes": 11621,
++        "line_count": 373
++      },
++      "start_line": 154,
++      "end_line": 158,
++      "range_sha256": "1d046b45ec466c7eda75aa9cd97a3f7da723af28d705f7b6a83d9da1d7a4460f",
++      "range_size_bytes": 117,
++      "role": "actual existing typed timestep integer owner; no derived Native dt fields"
+     }
+   ],
+   "fixed_scope": {
+@@ -851,5 +871,26 @@
+   "canonical_or_Git_changes": false,
+   "project_import_compile_engine_or_result_binary_payload_read": false,
+   "scientific_comparison_or_PASS_claimed": false,
+-  "authorship_limits": "Author wrote input/freezer and Original DataQA; reused Raw unit serializer and preprocessing ownership is disclosed. Other-author peer and Root full review required before use."
++  "authorship_limits": "Author wrote input/freezer and Original DataQA; reused Raw unit serializer and preprocessing ownership is disclosed. Other-author peer and Root full review required before use.",
++  "previous_held_source_manifest": {
++    "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-01/manifest.json",
++    "sha256": "1f91ba1faddc19f7466e5147c83dc5aee1b17d4952a9cfbac51590d6500d02c2",
++    "size_bytes": 30975,
++    "line_count": 855
++  },
++  "fresh02_delta_scope": "Copy actual TypedModel.timestep.number_of_timesteps_per_hour and add existing building.rs selected API path only; no arithmetic or Native field reconstruction.",
++  "exact_diffs_from_held01": [
++    {
++      "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-02/fields.rs.from-01.diff",
++      "sha256": "36b1185ca0234874ef86ce249ba67f7399d8ce2c74e2533803c3fa3a63da12d7",
++      "size_bytes": 1336,
++      "line_count": 20
++    },
++    {
++      "path": ".runtime/porting/CTF-01/candidate-production-observer-prep-02/README.md.from-01.diff",
++      "sha256": "5aa823955bb7dcbae462996b28bc5678177985afa78d9eb7c2f6281a99330976",
++      "size_bytes": 2816,
++      "line_count": 42
++    }
++  ]
+ }

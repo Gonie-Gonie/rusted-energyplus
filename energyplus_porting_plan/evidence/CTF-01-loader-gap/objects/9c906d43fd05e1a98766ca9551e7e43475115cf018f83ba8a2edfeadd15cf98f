@@ -1,0 +1,127 @@
+"""Freeze source/scope/policy metadata only, before the real CON15 helper run."""
+from pathlib import Path
+import argparse
+import datetime
+import hashlib
+import json
+
+ROOT = Path.cwd().resolve()
+BASE = ROOT / '.runtime/porting/CTF-01'
+PREP = BASE / 'native-production-prep-02'
+MANIFEST_SHA = 'a16ee13158dbe7dfb42f5c38ae1059f62b4526bea811eebfe03fccc826edba07'
+TOL_SHA = '29e90047ef65553891106199c83926f62f0cbd1fd371e508e5ede01048e1556b'
+guards = []
+
+
+def ref(path):
+    path = path.resolve()
+    assert path.is_relative_to(ROOT) and path.is_file()
+    data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(data).hexdigest(), 'size_bytes': len(data)}
+
+
+def bind(binding):
+    path = (ROOT / binding['path']).resolve()
+    actual = ref(path)
+    assert actual['sha256'] == binding['sha256']
+    assert binding.get('size_bytes', actual['size_bytes']) == actual['size_bytes']
+    guards.append(actual)
+    return path
+
+
+def load(path):
+    return json.loads(path.read_text(encoding='utf-8'))
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output-dir', required=True)
+    args = parser.parse_args()
+    out = Path(args.output_dir).resolve()
+    assert out.is_relative_to(BASE) and out != BASE and not out.exists()
+    writer_ref = ref(Path(__file__))
+    bind(writer_ref)
+    manifest_ref = ref(PREP / 'manifest.json')
+    assert manifest_ref['sha256'] == MANIFEST_SHA
+    manifest = load(bind(manifest_ref))
+    selected = load(bind(manifest['selected_inputs']))
+    scope_ref = selected['fixed_scope']
+    scope = load(bind(scope_ref))
+    assert len(scope['cases']) == len(selected['model_inputs']) == 15
+    models = []
+    for selected_row, scope_row in zip(selected['model_inputs'], scope['cases']):
+        assert selected_row == {'id': scope_row['id'], 'input': scope_row['input']}
+        models.append({**selected_row, 'lane': 'fixed-CON15-production-loader', 'caller': {
+            'TimeStepsInHour': 4, 'MinutesInTimeStep': 15,
+            'TimeStepZone': {'bits': '3fd0000000000000'},
+            'TimeStepZoneSec': {'bits': '408c200000000000'}}})
+    expected_guards = [row[key] for row in scope['cases'] for key in ('input', 'weather', 'metadata')]
+    assert expected_guards == selected['all_45_guard_refs'] and len(expected_guards) == 45
+    for binding in expected_guards + manifest['runtime_protocol']['native_source_files']:
+        bind(binding)
+    sources = []
+    for row in manifest['actual_API_source_bindings']:
+        path = bind(row['source'])
+        sources.append({**ref(path), 'path': path.relative_to(ROOT / '.reference/energyplus-src/26.1.0').as_posix(),
+                        'selected_ranges': row['selected_ranges']})
+    unit_policy_ref = ref(BASE / 'frozen-packet-01/tolerances.json')
+    assert unit_policy_ref['sha256'] == TOL_SHA
+    unit_policy = load(bind(unit_policy_ref))
+    profiles = unit_policy['arithmetic_profiles_by_variable']
+    assert len(profiles) == 18 and all(p['atol'] == p['rtol'] == 0 and p['class_exact'] and p['shape_exact'] for p in profiles)
+    scope_pair = {key: ref(BASE / path) for key, path in (
+        ('actual_scope_amendment', 'scope-amendment-01/amendment.json'),
+        ('actual_scope_amendment_execution', 'scope-amendment-command-01/receipt.json'))}
+    for binding in scope_pair.values():
+        bind(binding)
+    policy = {'frozen_before_this_production_helper_execution': True, 'expected_values_supplied': False,
+              'expected_exits_supplied': False, 'scientific_execution_performed': False}
+    out.mkdir(parents=True)
+
+    def emit(name, value):
+        path = out / name
+        assert not path.exists()
+        path.write_text(json.dumps(value, indent=2, allow_nan=False) + '\n', encoding='utf-8')
+        return ref(path)
+
+    source = emit('source.json', {'schema': 'ctf01-production-source-contract.v1', **policy,
+        'energyplus_commit': manifest['energyplus_commit'], 'source_files': sources, 'helper_source_manifest': manifest_ref,
+        'selected_source_boundary': 'unchanged whole methods; selected CTF01 phases only, no CTF02-10 completion'})
+    tolerance = emit('tolerances.json', {'schema': 'ctf01-production-tolerances-contract.v1', **policy,
+        'inherited_pre_unit_output_policy': unit_policy_ref, 'arithmetic_profiles_by_variable': profiles,
+        'copied_input_and_owner_profile': unit_policy['copied_input_and_owner_profile'],
+        'discrete_exact': unit_policy['discrete_exact'], 'nonfinite_policy': unit_policy['nonfinite_policy'],
+        'tolerance_changes_after_output_inspection_permitted': False})
+    contracts = {'source': source, 'tolerances': tolerance}
+    order = manifest['runtime_protocol']['loader_phase_order']
+    counts = {'model_cases': 15, 'loader_phase_records': 15 * len(order)}
+    unit_request = load(bind({'path': '.runtime/porting/CTF-01/frozen-packet-01/helper-request.json',
+        'sha256': '3fdf7a110a7b68b4c04415fd2de7a7a93d2bccce044a892d9688f604199d4c57'}))
+    request = emit('helper-request.json', {'schema': 'ctf01-production-helper-cases.v1', **policy, **scope_pair,
+        'energyplus_commit': manifest['energyplus_commit'], 'fixed_scope': scope_ref, 'all_45_guard_refs': expected_guards,
+        'contracts': contracts, 'model_cases': models, 'loader_phase_order': order,
+        'requested_counts': counts, 'observation_policy': unit_request['observation_policy']})
+    cases = emit('cases.json', {'schema': 'ctf01-production-cases-contract.v1', **policy, **contracts,
+        'helper_request': request, 'fixed_CON_scope': scope_ref, 'all_45_guard_refs': expected_guards})
+    contracts = {**contracts, 'cases': cases}
+    projection = emit('projection.json', {'schema': 'ctf01-production-observation-projection.v1', **policy,
+        'helper_request': request, 'contracts': contracts, 'native_observation_policy': unit_request['observation_policy'],
+        'whole_call_count': 'derive from actual loaded Construct owners; incomplete loader obligations unknown'})
+    admission = emit('native-admission-contract.json', {'schema': 'ctf01-production-native-admission-contract.v1', **policy, **scope_pair,
+        'energyplus_commit': manifest['energyplus_commit'], 'helper_request': request, 'fixed_scope': scope_ref,
+        'all_45_guard_refs': expected_guards, 'contracts': contracts, 'projection': projection,
+        'native_source_files': manifest['runtime_protocol']['native_source_files'], 'loader_phase_order': order, 'requested_counts': counts})
+    for binding in guards:
+        assert ref(ROOT / binding['path']) == binding
+    receipt = {'schema': 'ctf01-production-frozen-packet.v1', **policy,
+        'status': 'frozen-input-and-inherited-zero-policy-before-production-helper',
+        'finished_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'executed_writer': writer_ref,
+        'source_manifest': manifest_ref, 'helper_request': request, 'native_admission_contract': admission,
+        'projection': projection, 'contracts': contracts, 'requested_counts': counts,
+        'all_input_and_source_refs_unchanged': True, 'numeric_PASS_claimed': False, 'gates_updated': False}
+    emit('freeze-receipt.json', receipt)
+    print(json.dumps(receipt, indent=2, allow_nan=False))
+
+
+if __name__ == '__main__':
+    main()

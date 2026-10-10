@@ -1,0 +1,20 @@
+--- .runtime/porting/CTF-01/candidate-production-observer-prep-01/fields.rs
++++ .runtime/porting/CTF-01/candidate-production-observer-prep-02/fields.rs
+@@ -44,7 +44,8 @@
+         };
+         json!({"model_vector_index":index,"id":material.id.0,"name":material.name.0,"payload":payload})
+     }).collect::<Vec<_>>();
+-    json!({"materials":materials,"constructions":model.constructions.iter().enumerate().map(|(index,source)|json!({
++    json!({"actual_timestep_number_of_timesteps_per_hour":model.timestep.number_of_timesteps_per_hour,
++        "materials":materials,"constructions":model.constructions.iter().enumerate().map(|(index,source)|json!({
+         "model_vector_index":index,"id":source.id.0,"name":source.name.0,"kind":format!("{:?}",source.kind),
+         "declared_layer_ids":source.layers.iter().map(|id|id.0).collect::<Vec<_>>(),
+         "effective_layer_ids":source.effective_layers().iter().map(|id|id.0).collect::<Vec<_>>(),
+@@ -108,6 +109,7 @@
+     "crates/ep_runtime/src/heat_balance/ctf.rs",
+     "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+     "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
++    "crates/ep_model/src/objects/building.rs",
+ ];
+ pub(super) const OBSERVER_PATHS: &[&str] = &[
+     "crates/ep_run/examples/ctf01_candidate_production_observer.rs",

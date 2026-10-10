@@ -1,0 +1,58 @@
+{
+  "schema": "ctf01-production-frozen-packet.v1",
+  "frozen_before_this_production_helper_execution": true,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "scientific_execution_performed": false,
+  "status": "frozen-input-and-inherited-zero-policy-before-production-helper",
+  "finished_utc": "2026-10-10T11:50:49.966901+00:00",
+  "executed_writer": {
+    "path": ".runtime/porting/CTF-01/production-inputs-prep-02/freeze_packet.py",
+    "sha256": "9c906d43fd05e1a98766ca9551e7e43475115cf018f83ba8a2edfeadd15cf98f",
+    "size_bytes": 7322
+  },
+  "source_manifest": {
+    "path": ".runtime/porting/CTF-01/native-production-prep-02/manifest.json",
+    "sha256": "a16ee13158dbe7dfb42f5c38ae1059f62b4526bea811eebfe03fccc826edba07",
+    "size_bytes": 33224
+  },
+  "helper_request": {
+    "path": ".runtime/porting/CTF-01/production-frozen-packet-01/helper-request.json",
+    "sha256": "400beabb42dceafc0db6e0a7f3ebaf14bb54bb9e037b8c8777043e74233e301d",
+    "size_bytes": 22703
+  },
+  "native_admission_contract": {
+    "path": ".runtime/porting/CTF-01/production-frozen-packet-01/native-admission-contract.json",
+    "sha256": "ba267ebf570204b51249e5e26205a9761f45857ab4400360736706dea073256f",
+    "size_bytes": 12605
+  },
+  "projection": {
+    "path": ".runtime/porting/CTF-01/production-frozen-packet-01/projection.json",
+    "sha256": "5b298b624bc7af52e2f2c29bf2e81b545a52bec9f4926a032a9e13081ead79fa",
+    "size_bytes": 5848
+  },
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/CTF-01/production-frozen-packet-01/source.json",
+      "sha256": "89c2629f2789b82ffd4b6d92c552391843eb2d793702116dd73beaae5579e9d3",
+      "size_bytes": 15919
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CTF-01/production-frozen-packet-01/tolerances.json",
+      "sha256": "b370c6b8f535cfe161fa553ca4045ef864dc9a1812b7f0c35420ca40545f1b84",
+      "size_bytes": 4310
+    },
+    "cases": {
+      "path": ".runtime/porting/CTF-01/production-frozen-packet-01/cases.json",
+      "sha256": "b0615462065844a20d4cf50534286d24f8ad81f8aa772272b3aa63852ffe9af4",
+      "size_bytes": 9145
+    }
+  },
+  "requested_counts": {
+    "model_cases": 15,
+    "loader_phase_records": 195
+  },
+  "all_input_and_source_refs_unchanged": true,
+  "numeric_PASS_claimed": false,
+  "gates_updated": false
+}

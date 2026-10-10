@@ -1,0 +1,118 @@
+//! Copies of actual compiled inputs and initialized public candidate owners.
+use super::unit_fields;
+use ep_model::{MaterialDefinition, TypedModel};
+use ep_runtime::heat_balance::{HeatBalanceState, SurfaceCtfState};
+use serde_json::{Value, json};
+
+pub(super) use super::unit_fields::scalar;
+fn values(source: &[f64]) -> Vec<Value> { source.iter().copied().map(scalar).collect() }
+fn missing(reason: &str) -> Value {
+    json!({"owner_available":false,"value":null,"reason":reason,"counted_as_PASS":false})
+}
+pub(super) fn unavailable() -> Value {
+    json!({"owner_available":false,"construction_preprocessing":null,
+        "reason":"initializer has not returned an actual HeatBalanceState owner",
+        "counted_as_PASS":false,"Native_IsUsedCTF":missing("Native flag has no Rust owner"),
+        "Native_DoCTFErrorReport":unit_fields::unpaired_later_flag()})
+}
+pub(super) fn selected(source: &HeatBalanceState) -> Value {
+    json!({"owner_available":true,"construction_preprocessing":source.construction_ctf01_layers.iter()
+        .enumerate().map(|(index,actual)|json!({"state_vector_index":index,
+            "construction_id":actual.construction_id.0,
+            "actual_Rust_surface_derived_is_used_ctf":actual.is_used_ctf,
+            "result":unit_fields::result(&actual.result)})).collect::<Vec<_>>(),
+        "actual_owner_count":source.construction_ctf01_layers.len(),
+        "Native_IsUsedCTF":missing("Rust use owner is surface-derived; Native loader flag remains separately unpaired"),
+        "Native_DoCTFErrorReport":unit_fields::unpaired_later_flag(),
+        "Native_whole_solver_final_ErrorsFound":missing("selected Rust preprocessing flag is not the whole Native solver flag"),
+        "selected_ErrorsFound_observed_only_in_actual_results":true,
+        "preprocessing_reexecuted_by_observer":false,"numerical_PASS_claimed":false})
+}
+pub(super) fn typed(model: &TypedModel) -> Value {
+    let materials = model.materials.iter().enumerate().map(|(index,material)| {
+        let payload = match material.definition {
+            MaterialDefinition::Regular(source) => json!({"kind":"Regular","fields":{
+                "Thickness":scalar(source.thickness_m),"Conductivity":scalar(source.conductivity_w_per_m_k),
+                "Density":scalar(source.density_kg_per_m3),"SpecHeat":scalar(source.specific_heat_j_per_kg_k)},
+                "stored_Resistance":{"owner_available":true,"value":scalar(source.thermal_resistance_m2_k_per_w)},
+                "actual_selected_ROnly_mapping":false}),
+            MaterialDefinition::NoMass(source) => json!({"kind":"NoMass",
+                "stored_Resistance":{"owner_available":true,"value":scalar(source.thermal_resistance_m2_k_per_w)},
+                "regular_member_fields":null,"regular_member_fields_fabricated":false,"actual_selected_ROnly_mapping":true}),
+            _ => json!({"kind":format!("{:?}",material.family()),"selected_member_payload":null,
+                "unavailable_reason":"material family outside selected Regular/NoMass observer payload"}),
+        };
+        json!({"model_vector_index":index,"id":material.id.0,"name":material.name.0,"payload":payload})
+    }).collect::<Vec<_>>();
+    json!({"actual_timestep_number_of_timesteps_per_hour":model.timestep.number_of_timesteps_per_hour,
+        "materials":materials,"constructions":model.constructions.iter().enumerate().map(|(index,source)|json!({
+        "model_vector_index":index,"id":source.id.0,"name":source.name.0,"kind":format!("{:?}",source.kind),
+        "declared_layer_ids":source.layers.iter().map(|id|id.0).collect::<Vec<_>>(),
+        "effective_layer_ids":source.effective_layers().iter().map(|id|id.0).collect::<Vec<_>>(),
+        "outside_layer_id":source.outside_layer.map(|id|id.0),
+        "internal_heat_source_declaration":format!("{:?}",source.internal_heat_source),
+        "actual_surface_associations":model.surfaces.iter().filter(|surface|surface.construction == source.id)
+            .map(|surface|json!({"surface_id":surface.id.0,"surface_name":surface.name.0})).collect::<Vec<_>>()
+    })).collect::<Vec<_>>(),"surfaces":model.surfaces.iter().enumerate().map(|(index,source)|json!({
+        "model_vector_index":index,"id":source.id.0,"name":source.name.0,"construction_id":source.construction.0
+    })).collect::<Vec<_>>()})
+}
+fn ctf(source: &SurfaceCtfState) -> Value {
+    json!({"context_only_unpaired":true,"outside_0":scalar(source.outside_0_w_per_m2_k),
+        "cross_0":scalar(source.cross_0_w_per_m2_k),"inside_0":scalar(source.inside_0_w_per_m2_k),
+        "flux_0":source.flux_0.map(scalar),"const_in_part":scalar(source.const_in_part_w_per_m2),
+        "const_out_part":scalar(source.const_out_part_w_per_m2),
+        "outside_history":values(&source.outside_history_w_per_m2_k),"cross_history":values(&source.cross_history_w_per_m2_k),
+        "inside_history":values(&source.inside_history_w_per_m2_k),"flux_history":values(&source.flux_history),
+        "outside_temperature_history":values(&source.outside_temperature_history_c),
+        "inside_temperature_history":values(&source.inside_temperature_history_c),
+        "outside_flux_history":values(&source.outside_flux_history_w_per_m2),
+        "inside_flux_history":values(&source.inside_flux_history_w_per_m2)})
+}
+pub(super) fn state(source: &HeatBalanceState) -> Value {
+    json!({"context_only_unpaired":true,"timestep_index":source.timestep_index,
+        "cache_summary":{"hash":source.construction_cache_hash,"entry_count":source.construction_cache_entry_count,
+            "no_mass_count":source.construction_cache_no_mass_count,"massive_count":source.construction_cache_massive_ctf_count,
+            "eio_seeded_count":source.construction_cache_eio_seeded_count,
+            "rust_generated_count":source.construction_cache_rust_generated_count},
+        "private_cache_rows_directly_observed":false,"surfaces":source.surfaces.iter().enumerate().map(|(index,s)|json!({
+            "state_vector_index":index,"surface_id":s.surface_id.0,"surface_name":s.surface_name,
+            "construction_id":s.construction_id.0,"construction_name":s.construction_name,
+            "actual_cache_index_copy":s.construction_thermal_data_index,
+            "outside_layer_material_id":s.outside_layer_material_id.0,
+            "outside_layer_material_name":s.outside_layer_material_name,
+            "SI_resistance_context":scalar(s.thermal_resistance_m2_k_per_w),
+            "SI_heat_capacity_context":s.heat_capacity_j_per_m2_k.map(scalar),"ctf_context":ctf(&s.ctf)
+        })).collect::<Vec<_>>()})
+}
+
+// Exact path inventory; actual formatted identities are runtime input bindings.
+// Admission must separately match every binding to the actual Cargo source capture.
+pub(super) const API_PATHS: &[&str] = &[
+    "crates/ep_run/Cargo.toml",
+    "crates/ep_raw_model/src/lib.rs",
+    "crates/ep_raw_model/src/idf_order.rs",
+    "crates/ep_compiler/src/lib.rs",
+    "crates/ep_compiler/src/compiler.rs",
+    "crates/ep_model/src/lib.rs",
+    "crates/ep_model/src/model.rs",
+    "crates/ep_model/src/objects/materials.rs",
+    "crates/ep_model/src/objects/construction.rs",
+    "crates/ep_runtime/src/lib.rs",
+    "crates/ep_runtime/src/heat_balance/mod.rs",
+    "crates/ep_runtime/src/heat_balance/initialization.rs",
+    "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+    "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+    "crates/ep_runtime/src/heat_balance/state.rs",
+    "crates/ep_runtime/src/heat_balance/ctf.rs",
+    "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+    "crates/ep_model/src/objects/building.rs",
+];
+pub(super) const OBSERVER_PATHS: &[&str] = &[
+    "crates/ep_run/examples/ctf01_candidate_production_observer.rs",
+    "crates/ep_run/examples/ctf01_candidate_production_support/fields.rs",
+    "crates/ep_run/examples/ctf01_candidate_production_support/unit_fields.rs",
+];

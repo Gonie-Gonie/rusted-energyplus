@@ -1,0 +1,25 @@
+--- .runtime/porting/CTF-01/production-inputs-prep-01/freeze_packet.py
++++ .runtime/porting/CTF-01/production-inputs-prep-02/freeze_packet.py
+@@ -48,6 +48,13 @@
+     scope_ref = selected['fixed_scope']
+     scope = load(bind(scope_ref))
+     assert len(scope['cases']) == len(selected['model_inputs']) == 15
++    models = []
++    for selected_row, scope_row in zip(selected['model_inputs'], scope['cases']):
++        assert selected_row == {'id': scope_row['id'], 'input': scope_row['input']}
++        models.append({**selected_row, 'lane': 'fixed-CON15-production-loader', 'caller': {
++            'TimeStepsInHour': 4, 'MinutesInTimeStep': 15,
++            'TimeStepZone': {'bits': '3fd0000000000000'},
++            'TimeStepZoneSec': {'bits': '408c200000000000'}}})
+     expected_guards = [row[key] for row in scope['cases'] for key in ('input', 'weather', 'metadata')]
+     assert expected_guards == selected['all_45_guard_refs'] and len(expected_guards) == 45
+     for binding in expected_guards + manifest['runtime_protocol']['native_source_files']:
+@@ -92,7 +99,7 @@
+         'sha256': '3fdf7a110a7b68b4c04415fd2de7a7a93d2bccce044a892d9688f604199d4c57'}))
+     request = emit('helper-request.json', {'schema': 'ctf01-production-helper-cases.v1', **policy, **scope_pair,
+         'energyplus_commit': manifest['energyplus_commit'], 'fixed_scope': scope_ref, 'all_45_guard_refs': expected_guards,
+-        'contracts': contracts, 'model_cases': selected['model_inputs'], 'loader_phase_order': order,
++        'contracts': contracts, 'model_cases': models, 'loader_phase_order': order,
+         'requested_counts': counts, 'observation_policy': unit_request['observation_policy']})
+     cases = emit('cases.json', {'schema': 'ctf01-production-cases-contract.v1', **policy, **contracts,
+         'helper_request': request, 'fixed_CON_scope': scope_ref, 'all_45_guard_refs': expected_guards})

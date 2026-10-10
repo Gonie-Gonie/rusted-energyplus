@@ -1,0 +1,23 @@
+{
+  "schema": "native-strip-command.v1",
+  "command": [
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\strip.exe",
+    "--strip-debug",
+    "--preserve-dates",
+    "-o",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\production-native-build-01\\derivation\\derived-helper.exe",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0\\Products\\ctf01_production_helper.exe"
+  ],
+  "cwd": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus",
+  "started_utc": "2026-10-10T12:06:47.861679+00:00",
+  "exit_code": 0,
+  "finished_utc": "2026-10-10T12:06:49.382253+00:00",
+  "stdout": {
+    "path": ".runtime/porting/CTF-01/production-native-build-01/derivation/strip-stdout.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CTF-01/production-native-build-01/derivation/strip-stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

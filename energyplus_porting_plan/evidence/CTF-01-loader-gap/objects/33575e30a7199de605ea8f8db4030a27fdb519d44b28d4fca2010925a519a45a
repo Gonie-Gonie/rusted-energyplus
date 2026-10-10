@@ -1,0 +1,48 @@
+{
+  "schema": "native-strip-local-help-receipt.v1",
+  "actual_argv": [
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\strip.exe",
+    "--help"
+  ],
+  "cwd": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus",
+  "started_utc": "2026-10-08T01:35:27.239179+00:00",
+  "finished_utc": "2026-10-08T01:35:27.399179+00:00",
+  "exit_code": 0,
+  "tool_before": {
+    "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/strip.exe",
+    "sha256": "a7e319e63bb15c58c99102460297604fef428dcdf221ae56718d8c079a42722f"
+  },
+  "tool_after": {
+    "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/strip.exe",
+    "sha256": "a7e319e63bb15c58c99102460297604fef428dcdf221ae56718d8c079a42722f"
+  },
+  "stdout": {
+    "path": ".runtime/porting/native-debug-derivative-plan-01/help-stdout.log",
+    "sha256": "c5f983b10499e330a3e9779e4fce00d4649e669763899bbbc9ba46a004cca832"
+  },
+  "stderr": {
+    "path": ".runtime/porting/native-debug-derivative-plan-01/help-stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "prior_publisher_identity_audit": {
+    "path": ".runtime/porting/native-efficiency-audit-01/audit.json",
+    "sha256": "5377a49adb9929b5779219689e4ef951197bfd53f2a07f805196c2f2bbf2da5f"
+  },
+  "executed_help_reader": {
+    "path": ".runtime/porting/native-debug-derivative-plan-01/read_strip_help.py",
+    "sha256": "03a6a1206eb3a29678ea5a2960bfb0616aa19334c5c8b619373d215e24709804"
+  },
+  "actual_reader_argv": [
+    "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime/porting/native-debug-derivative-plan-01/read_strip_help.py"
+  ],
+  "only_documentation_option_executed": true,
+  "strip_transformation_executed": false,
+  "derivative_created": false,
+  "engines_compilers_Cargo_Git_executed": false,
+  "existing_native_proofs_mutated": false,
+  "gates_updated": false
+}

@@ -9358,7 +9358,9 @@
         },
         "native_build_and_PE_verified_before_engine": true,
         "legacy_missing_owner_inventory_confirmed": true,
-        "candidate_stored_Regular_R_and_normalized_owners_applied": true
+        "candidate_stored_Regular_R_and_normalized_owners_applied": true,
+        "actual_production_loader_lane_executed": true,
+        "actual_production_surface_order_discrete_mismatches": 84
       },
       "actual_original_and_existing_baseline": {
         "path": "energyplus_porting_plan/evidence/CTF-01-baseline/summary.json",
@@ -9369,6 +9371,11 @@
         "path": "energyplus_porting_plan/evidence/CTF-01-unit/summary.json",
         "sha256": "ecbc8f1cd91573cf1bc9dcef813bc45340bcd83f2050fb1e08ff3f7306454428",
         "size_bytes": 1819
+      },
+      "actual_loader_lane_gap": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-loader-gap/summary.json",
+        "sha256": "01444b2ccbeeffdb09ff8de49603900e14453f3005ab5ca56527a9070f5118cd",
+        "size_bytes": 3602
       }
     },
     {

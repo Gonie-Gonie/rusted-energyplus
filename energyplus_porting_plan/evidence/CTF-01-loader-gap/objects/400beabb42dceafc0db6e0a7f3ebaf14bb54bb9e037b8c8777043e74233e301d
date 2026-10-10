@@ -1,0 +1,599 @@
+{
+  "schema": "ctf01-production-helper-cases.v1",
+  "frozen_before_this_production_helper_execution": true,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "scientific_execution_performed": false,
+  "actual_scope_amendment": {
+    "path": ".runtime/porting/CTF-01/scope-amendment-01/amendment.json",
+    "sha256": "b49e658bbd004d8c6a0c56e5666cbf98d8403df848d47afdb72c2d15990d2968",
+    "size_bytes": 1933
+  },
+  "actual_scope_amendment_execution": {
+    "path": ".runtime/porting/CTF-01/scope-amendment-command-01/receipt.json",
+    "sha256": "c82731cb5dfd1536934b7231288e870c73d094492b6158b4d567d0777c125571",
+    "size_bytes": 3014
+  },
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "fixed_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879",
+    "size_bytes": 15325,
+    "line_count": 418
+  },
+  "all_45_guard_refs": [
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+      "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+      "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+      "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+      "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
+      "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+      "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+      "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+      "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+      "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+      "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+      "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+      "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+      "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+      "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+      "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+      "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+      "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+      "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+      "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+      "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+      "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+      "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+      "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+      "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+      "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+      "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+      "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+      "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+      "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4"
+    }
+  ],
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/CTF-01/production-frozen-packet-01/source.json",
+      "sha256": "89c2629f2789b82ffd4b6d92c552391843eb2d793702116dd73beaae5579e9d3",
+      "size_bytes": 15919
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CTF-01/production-frozen-packet-01/tolerances.json",
+      "sha256": "b370c6b8f535cfe161fa553ca4045ef864dc9a1812b7f0c35420ca40545f1b84",
+      "size_bytes": 4310
+    }
+  },
+  "model_cases": [
+    {
+      "id": "A-24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+      },
+      "lane": "fixed-CON15-production-loader",
+      "caller": {
+        "TimeStepsInHour": 4,
+        "MinutesInTimeStep": 15,
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        }
+      }
+    },
+    {
+      "id": "A-72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+        "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+      },
+      "lane": "fixed-CON15-production-loader",
+      "caller": {
+        "TimeStepsInHour": 4,
+        "MinutesInTimeStep": 15,
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        }
+      }
+    },
+    {
+      "id": "A-ANNUAL",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+        "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+      },
+      "lane": "fixed-CON15-production-loader",
+      "caller": {
+        "TimeStepsInHour": 4,
+        "MinutesInTimeStep": 15,
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        }
+      }
+    },
+    {
+      "id": "B-NOLIMIT-24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+        "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+      },
+      "lane": "fixed-CON15-production-loader",
+      "caller": {
+        "TimeStepsInHour": 4,
+        "MinutesInTimeStep": 15,
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        }
+      }
+    },
+    {
+      "id": "B-NOLIMIT-72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+        "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+      },
+      "lane": "fixed-CON15-production-loader",
+      "caller": {
+        "TimeStepsInHour": 4,
+        "MinutesInTimeStep": 15,
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        }
+      }
+    },
+    {
+      "id": "B-NOLIMIT-ANNUAL",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+        "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+      },
+      "lane": "fixed-CON15-production-loader",
+      "caller": {
+        "TimeStepsInHour": 4,
+        "MinutesInTimeStep": 15,
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        }
+      }
+    },
+    {
+      "id": "B-FLOW-24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+        "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+      },
+      "lane": "fixed-CON15-production-loader",
+      "caller": {
+        "TimeStepsInHour": 4,
+        "MinutesInTimeStep": 15,
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        }
+      }
+    },
+    {
+      "id": "B-FLOW-72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+        "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+      },
+      "lane": "fixed-CON15-production-loader",
+      "caller": {
+        "TimeStepsInHour": 4,
+        "MinutesInTimeStep": 15,
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        }
+      }
+    },
+    {
+      "id": "B-FLOW-ANNUAL",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+        "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+      },
+      "lane": "fixed-CON15-production-loader",
+      "caller": {
+        "TimeStepsInHour": 4,
+        "MinutesInTimeStep": 15,
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        }
+      }
+    },
+    {
+      "id": "B-CAPACITY-24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+        "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+      },
+      "lane": "fixed-CON15-production-loader",
+      "caller": {
+        "TimeStepsInHour": 4,
+        "MinutesInTimeStep": 15,
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        }
+      }
+    },
+    {
+      "id": "B-CAPACITY-72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+        "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+      },
+      "lane": "fixed-CON15-production-loader",
+      "caller": {
+        "TimeStepsInHour": 4,
+        "MinutesInTimeStep": 15,
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        }
+      }
+    },
+    {
+      "id": "B-CAPACITY-ANNUAL",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+        "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+      },
+      "lane": "fixed-CON15-production-loader",
+      "caller": {
+        "TimeStepsInHour": 4,
+        "MinutesInTimeStep": 15,
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        }
+      }
+    },
+    {
+      "id": "B-BOTH-24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+        "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+      },
+      "lane": "fixed-CON15-production-loader",
+      "caller": {
+        "TimeStepsInHour": 4,
+        "MinutesInTimeStep": 15,
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        }
+      }
+    },
+    {
+      "id": "B-BOTH-72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+        "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+      },
+      "lane": "fixed-CON15-production-loader",
+      "caller": {
+        "TimeStepsInHour": 4,
+        "MinutesInTimeStep": 15,
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        }
+      }
+    },
+    {
+      "id": "B-BOTH-ANNUAL",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+        "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+      },
+      "lane": "fixed-CON15-production-loader",
+      "caller": {
+        "TimeStepsInHour": 4,
+        "MinutesInTimeStep": 15,
+        "TimeStepZone": {
+          "bits": "3fd0000000000000"
+        },
+        "TimeStepZoneSec": {
+          "bits": "408c200000000000"
+        }
+      }
+    }
+  ],
+  "loader_phase_order": [
+    "InputProcessor::processInput",
+    "SimulationManager::PostIPProcessing",
+    "EnergyPlusData::init_constant_state",
+    "EnergyPlusData::init_state",
+    "OutputReportPredefined::SetPredefinedTables",
+    "HeatBalanceManager::SetPreConstructionInputParameters",
+    "OutputProcessor::SetupTimePointers(Zone)",
+    "OutputProcessor::SetupTimePointers(System)",
+    "HeatBalanceManager::GetProjectControlData",
+    "HeatBalanceManager::GetSiteAtmosphereData",
+    "Material::GetMaterialData",
+    "HeatBalanceManager::GetConstructData",
+    "HeatBalanceManager::GetBuildingData"
+  ],
+  "requested_counts": {
+    "model_cases": 15,
+    "loader_phase_records": 195
+  },
+  "observation_policy": {
+    "selected_source": {
+      "version": "26.1.0",
+      "commit": "6f2e40d10250a105b49966baa24d843711e61048",
+      "symbol": "Construction::ConstructionProps::calculateTransferFunction",
+      "card_range": [
+        59,
+        401
+      ],
+      "actual_invocation": "whole original public method continues through1103; no prefix replacement or early observer stop",
+      "callbacks": [
+        {
+          "phase": "PostLoad",
+          "after_original_line": 309
+        },
+        {
+          "phase": "PostMerge",
+          "after_original_line": 372
+        },
+        {
+          "phase": "PostConversion",
+          "after_original_line": 401
+        }
+      ]
+    },
+    "required_observed_fields_when_phase_reached": {
+      "every_phase": [
+        "LayersInConstruct",
+        "NumResLayers",
+        "copied_layer_count",
+        "ErrorsFound",
+        "active_prefix_available"
+      ],
+      "active_prefix": [
+        "dl",
+        "rk",
+        "rho",
+        "cp",
+        "lr",
+        "ResLayer"
+      ],
+      "PostConversion_only": [
+        "dyn",
+        "rs",
+        "cnd"
+      ],
+      "original_owner_context": [
+        "actual material IDs/order/members",
+        "actual construction index",
+        "TotLayers",
+        "LayerPoint",
+        "IsUsedCTF",
+        "SourceSinkPresent",
+        "SolutionDimensions",
+        "TimeStepZone"
+      ]
+    },
+    "pairing": {
+      "Native_rhs": "actual passive local copies only, never reconstructed arrays/formulas or public post-whole-call approximations",
+      "Rust_lhs": "actual reached normalization owner fields from a separately authenticated real Rust invocation; missing owner is unavailable/failure",
+      "PostLoad": "actual Rust after_load with active layers/count and selected sticky error state",
+      "PostMerge": "actual Rust after_merge with active layers/count",
+      "PostConversion": "actual Rust after_conversion.active/dyn_spacing/total_resistance/conductance",
+      "identity": "join declared logical inputs with observed actual owner IDs; no arbitrary ordinal/name remapping of original LayerPoint order",
+      "normalized_material_ID_mapping": "unavailable: source merges local numerical arrays without updating original TotLayers/LayerPoint; do not invent material labels",
+      "merge_order": "source loop/index order is frozen; compare actual before/after active arrays on repeated/disjoint canaries; no invented per-merge event trace",
+      "DoCTFErrorReport": "Native actual formal flag recorded, unpaired because proposed Rust preprocessing has no matching owner",
+      "Native_after_whole_method_flags_and_coefficients": "context-only unpaired outside selected prefix; cannot relabel them selected preprocessing state"
+    },
+    "availability": {
+      "unreached_phase": "unavailable with actual reason/source/process outcome; zero numerical comparisons and no PASS",
+      "unused": "actual IsUsedCTF false returns before local allocation; no arithmetic coverage or zero-prefix success",
+      "load_error": "actual PostLoad may be available while later phases are unreached; preserve selected error and ordered diagnostics",
+      "required_reached_operand_absence": "one-sided or both-sided absence fails; no generic null equality",
+      "observer_error": "identity/binding/duplicate/order/prefix errors fail observation integrity, never repair source state",
+      "nonfinite_observed_return_or_local": "remains observed/available with actual bits/class; never null because isfinite=false",
+      "OS_crash_or_exception": "separate actual process/method ledger; never fabricate phase contents, invocation counts or successful return",
+      "array_tail": "indices beyond actual LayersInConstruct are not observations, even after source zeros shifted slots",
+      "complete_observation_or_PASS_claimed_by_this_proposal": false
+    },
+    "excluded": [
+      "SourceSinkPresent true/high-diffusivity warning branch and source/temp-layer adjustment",
+      "SolutionDimensions other than1 and perpendicular dyn calculation",
+      "zero or greater-than-MaxLayers Native active input counts",
+      "unsupported Material/Construction families excluded by CON-01",
+      "CTF-02 throughCTF-10 coefficient/reverse/stability results",
+      "thermal surface/gain execution and Native-output injection into Rust"
+    ],
+    "production_fixed15_real_loader_lane": "separate-required-pending; not certified by this explicit-member packet"
+  }
+}

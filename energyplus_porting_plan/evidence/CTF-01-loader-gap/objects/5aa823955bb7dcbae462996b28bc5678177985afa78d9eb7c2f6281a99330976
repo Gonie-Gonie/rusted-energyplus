@@ -1,0 +1,42 @@
+--- .runtime/porting/CTF-01/candidate-production-observer-prep-01/README.md
++++ .runtime/porting/CTF-01/candidate-production-observer-prep-02/README.md
+@@ -16,7 +16,9 @@
+    diagnostics/defaults and model availability. A compiler failure stops that
+    case without fabricating partial typed owners.
+ 4. Copy the actual typed materials, construction IDs/order/layer membership,
+-   and actual surface-to-construction associations.
++   and actual surface-to-construction associations. The typed payload also copies
++   the existing actual timestep.number_of_timesteps_per_hour integer; no Native
++   TimeStepZone/TimeStepZoneSec value is derived or fabricated.
+ 5. Call `SimulationModel::from_typed` and the ordinary empty-override public
+    `initialize_heat_balance_state`. Copy its actual returned public state.
+ 
+@@ -61,12 +63,12 @@
+ The observer verifies identity/bytes; Root independently admits actual converter
+ command semantics. No proof or output supplies an arithmetic operand.
+ 
+-The three observer paths and twenty selected public-API paths have exact order.
++The three observer paths and twenty-one selected public-API paths have exact order.
+ Runtime SHA/optional size bindings use actual formatted canonical bytes, not
+ the ignored proposal's hashes. Root must independently match every binding
+ against the genuine Cargo source capture and emitted executable identity before
+-admitting observations. The twenty paths are the prior nineteen plus the real
+-preprocessing module. This is a selected API inventory, not a claimed complete
++admitting observations. The twenty-one paths are the prior nineteen plus the real
++preprocessing module and the existing building.rs timestep declaration. This is a selected API inventory, not a claimed complete
+ transitive Cargo closure. No hardcoded historical Rust SHA is replayed.
+ Every bound source/input is rehashed after the calls; request bytes are unchanged.
+ 
+@@ -80,8 +82,10 @@
+ No executable identity, result hash, converter outcome, or future exit is guessed.
+ 
+ The two `.from-existing.diff` files are exact source deltas. `unit_fields.rs`
+-is byte-identical to the held candidate unit serializer. `prepare_sources.py`
+-only wrote this ignored source proposal; it is not a runtime dependency or stage.
++is byte-identical to the held candidate unit serializer. the historical `prepare_sources.py` in proposal01
++only wrote that ignored source proposal; it is not a runtime dependency or stage.
++Fresh02 preserves01 and changes only the copied timestep integer/API path plus
++source documentation and metadata bindings.
+ Authorship limits: this author wrote the input contract and Original DataQA;
+ the unit serializer and preprocessing implementation were authored by Raw.
+ Independent source peer and Root's full read are still required before use.

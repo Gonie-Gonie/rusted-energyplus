@@ -1,0 +1,56 @@
+{
+  "schema": "ctf01-production-independent-build-PE-review.v1",
+  "status": "pass-exact-retained-PE-runtime-and-actual-build-identity",
+  "observed_utc": "2026-10-10T12:07:45.817777+00:00",
+  "build": {
+    "path": ".runtime/porting/CTF-01/production-native-build-01/native-build.json",
+    "sha256": "d8770150bb00e04dcfb0ea5c4bc44961326c5daf7cd465548e58473032022331",
+    "size_bytes": 4276
+  },
+  "helper_binary": {
+    "path": ".runtime/porting/CTF-01/production-native-build-01/derivation/derived-helper.exe",
+    "sha256": "360eb29e38e7b427d7d198dbeaa9ac23d49f851cbea5658d8f4713ada7a733ba",
+    "size_bytes": 150525672
+  },
+  "linked_original": {
+    "path": ".runtime/ep261-gcc13-o0/Products/ctf01_production_helper.exe",
+    "sha256": "5d891767bb9d3baaa77e93041a4cdf6ab25bc63978fd1b80668b8be5e6fcbdaf",
+    "size_bytes": 1299650087
+  },
+  "validated_derivative": {
+    "path": ".runtime/porting/CTF-01/production-native-build-01/derivation/receipt.json",
+    "sha256": "00eaafeadd588c1683e0decc9acb6d7a1596c22d99b7a477017b630ebc56d14d",
+    "size_bytes": 13219
+  },
+  "native_pe_source": {
+    "path": "tools/porting/native_pe.py",
+    "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+    "size_bytes": 20217
+  },
+  "executed_reader": {
+    "path": ".runtime/porting/CTF-01/production-independent-native-build-review-01/review_build.py",
+    "sha256": "42370e6a8c34ba19b1845d99cfc265194ab989566831e2c1948962342c0068cc",
+    "size_bytes": 4246
+  },
+  "maps": {
+    "original": {
+      "path": ".runtime/porting/CTF-01/production-independent-native-build-review-01/original-pe.json",
+      "sha256": "d72ea3d5e58fe87e84c6cd8402a7d25bdbcc799c31608e8dfae298e1af99f50e",
+      "size_bytes": 16047
+    },
+    "derived": {
+      "path": ".runtime/porting/CTF-01/production-independent-native-build-review-01/derived-pe.json",
+      "sha256": "45b6ae92e8dda01e33425c4cef85d4531210e119cbbff97db2ecc3bbd645c7b4",
+      "size_bytes": 12193
+    },
+    "comparison": {
+      "path": ".runtime/porting/CTF-01/production-independent-native-build-review-01/comparison-pe.json",
+      "sha256": "cea80b0e4fef1f009fd0e1ed0f10316ba10c13d2793839f03924a439aa2165ba",
+      "size_bytes": 4820
+    }
+  },
+  "retained_runtime_exact": true,
+  "engine_invoked": false,
+  "scientific_execution_certified": false,
+  "gates_updated": false
+}

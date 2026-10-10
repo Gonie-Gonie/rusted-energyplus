@@ -1,0 +1,91 @@
+# CTF-01 candidate fixed-CON15 public Rust production observer
+
+SOURCE ONLY. This proposal has not been compiled, imported, or executed by its
+author. Root alone may promote the three source files, format/build them, bind
+the actual Cargo source capture, prepare the input-only request, and execute it.
+There is no new review recorder, build-freeze framework, or approval stage.
+
+The proposal reuses the accepted existing observer's ordinary public route:
+
+1. Authenticate the fixed scope and its fifteen ordered IDF/weather/metadata
+   triples. Retain all forty-five bindings, including repeated files.
+2. Authenticate the original IDF plus genuinely converted epJSON and the supplied
+   input-only conversion provenance. Conversion unavailable means no loader,
+   compiler, or initializer invocation, no model fabrication, and no PASS.
+3. Call `load_epjson_file_with_idf_order`, then `compile_raw_model`. Record actual
+   diagnostics/defaults and model availability. A compiler failure stops that
+   case without fabricating partial typed owners.
+4. Copy the actual typed materials, construction IDs/order/layer membership,
+   and actual surface-to-construction associations. The typed payload also copies
+   the existing actual timestep.number_of_timesteps_per_hour integer; no Native
+   TimeStepZone/TimeStepZoneSec value is derived or fabricated.
+5. Call `SimulationModel::from_typed` and the ordinary empty-override public
+   `initialize_heat_balance_state`. Copy its actual returned public state.
+
+No observer call to `preprocess_ctf_layers`, resistance accessor, classifier,
+merge function, conversion evaluator, or expected-array generator is present.
+Regular stored Resistance is copied from the new real typed field. NoMass R is
+copied from its real field. `actual_selected_ROnly_mapping` describes the actual
+Regular/NoMass enum mapping used by the public preprocessing adapter; it is not
+a claim that Rust stores the Native MaterialBase ROnly member. Unsupported
+material families remain explicit unavailable payloads.
+
+`selected_CTF01_owners.construction_preprocessing` preserves the actual
+`HeatBalanceState.construction_ctf01_layers` vector order. Each row copies its
+construction ID, actual Rust surface-derived use owner, and actual `Result`.
+The exact accepted unit serializer is reused as `unit_fields.rs`. It copies
+the actual optional PostLoad/PostMerge/PostConversion owners, active prefix,
+NumResLayers, selected outgoing ErrorsFound, issues, dyn/rs/cnd, binary64
+classes and bits. Absent phases remain unavailable and are never counted PASS.
+The serializer does not invent normalized material IDs or unused array tails.
+
+The old SI R/C/cache/steady-CTF surface payload remains context only and unpaired.
+Native whole-loader IsUsedCTF, whole-method DoCTFErrorReport, later-solver final
+ErrorsFound, and coefficients have no paired Rust owner in this observation.
+Actual Rust surface associations and the actual Rust use owner are separately
+reported; neither is renamed as the Native flag. There is no CTF-02..10 claim.
+
+Input schema: `ctf01-candidate-production-observer-request.v1`, exact ten keys:
+`schema`, `fixed_scope`, `model_cases`, `initial_zone_air_temperature_c`,
+`observer_sources`, `actual_public_API_sources`,
+`actual_Cargo_source_capture_must_match`, `frozen_before_execution`,
+`expected_values_supplied`, `Native_results_supplied`.
+The final four flags must be true/true/false/false respectively.
+The finite initial temperature is an explicitly declared `{bits:16lowerhex}`
+caller; it is not a reference-derived operand.
+
+Each model row has exactly six keys: `id`, `input`, `conversion_available`,
+`epjson_input`, `conversion_unavailable_reason`, `conversion_proof_bindings`.
+The first two equal the same ordered fixed-scope row. Available conversion
+requires a genuine epJSON binding and null unavailable reason. Unavailable
+conversion requires null epJSON and a nonempty reason. Provenance bindings are
+input-conversion metadata only, never Native/reference/comparison/report data.
+The observer verifies identity/bytes; Root independently admits actual converter
+command semantics. No proof or output supplies an arithmetic operand.
+
+The three observer paths and twenty-one selected public-API paths have exact order.
+Runtime SHA/optional size bindings use actual formatted canonical bytes, not
+the ignored proposal's hashes. Root must independently match every binding
+against the genuine Cargo source capture and emitted executable identity before
+admitting observations. The twenty-one paths are the prior nineteen plus the real
+preprocessing module and the existing building.rs timestep declaration. This is a selected API inventory, not a claimed complete
+transitive Cargo closure. No hardcoded historical Rust SHA is replayed.
+Every bound source/input is rehashed after the calls; request bytes are unchanged.
+
+Result schema: `ctf01-candidate-production-observer-results.v1`, full JSON stdout.
+An input-integrity error prints stderr and exits 2. Actual public API failures
+remain case-local actual statuses/messages. There is no numerical comparison,
+overall PASS, expected outcome, or Native failure classification in this source.
+
+Root-only future command shape, after actual request and build admission:
+`<genuine Cargo-emitted ctf01_candidate_production_observer executable> <request>`.
+No executable identity, result hash, converter outcome, or future exit is guessed.
+
+The two `.from-existing.diff` files are exact source deltas. `unit_fields.rs`
+is byte-identical to the held candidate unit serializer. the historical `prepare_sources.py` in proposal01
+only wrote that ignored source proposal; it is not a runtime dependency or stage.
+Fresh02 preserves01 and changes only the copied timestep integer/API path plus
+source documentation and metadata bindings.
+Authorship limits: this author wrote the input contract and Original DataQA;
+the unit serializer and preprocessing implementation were authored by Raw.
+Independent source peer and Root's full read are still required before use.

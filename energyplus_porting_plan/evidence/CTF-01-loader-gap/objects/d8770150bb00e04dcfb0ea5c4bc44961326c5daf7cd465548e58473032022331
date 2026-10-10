@@ -1,0 +1,100 @@
+{
+  "schema": "ctf01-production-native-build.v1",
+  "status": "pass-actual-3TU-link-and-preservation",
+  "authorship": "Root assembled these completed actual records; no guessed future build or binary identity. Genuine unit core-before-check is explicitly reused with all protected core artifacts and present objects reverified before and after this production compile.",
+  "observed_utc": "2026-10-10T12:07:04.436718+00:00",
+  "helper_binary": {
+    "path": ".runtime/porting/CTF-01/production-native-build-01/derivation/derived-helper.exe",
+    "sha256": "360eb29e38e7b427d7d198dbeaa9ac23d49f851cbea5658d8f4713ada7a733ba",
+    "size_bytes": 150525672
+  },
+  "linked_original": {
+    "path": ".runtime/ep261-gcc13-o0/Products/ctf01_production_helper.exe",
+    "sha256": "5d891767bb9d3baaa77e93041a4cdf6ab25bc63978fd1b80668b8be5e6fcbdaf",
+    "size_bytes": 1299650087
+  },
+  "native_source_files": [
+    {
+      "path": ".runtime/porting/CTF-01/native-observer-prep-01/Construction.ctf01.cc",
+      "sha256": "2201e38989c37c6f9569c605b0b01a0346e166e67768942e47e842900239ecb5",
+      "size_bytes": 110855,
+      "line_count": 2122
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-observer-prep-01/ctf01_observer.hh",
+      "sha256": "2bc6fb8e9c9c7f566967f0ac2b956ad3af34a76d4a22ae24d63a1b37ba7d3f36",
+      "size_bytes": 3936,
+      "line_count": 110
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-observer-prep-01/ctf01_observer.cc",
+      "sha256": "30d95e80d465bde316f2098fa33ad77467f673730b41447f07ce0a54be80bfe9",
+      "size_bytes": 5842,
+      "line_count": 142
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production_helper.cpp",
+      "sha256": "c0f5e27e58bfb579ea44842cecbce13617dd0f7d1fa735a57e81238231285f5e",
+      "size_bytes": 18257,
+      "line_count": 231
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_reference_metadata.hh",
+      "sha256": "6332546299553c1c8f4d0de36676067decf6921c7e3e27ebc7bd2d6ca6f0dee9",
+      "size_bytes": 7434,
+      "line_count": 147
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production_fields.hh",
+      "sha256": "fc76a30a452c013497c5b89bea59efe0f93b0a4d872d2bc8a5dbe492eaab2abe",
+      "size_bytes": 8382,
+      "line_count": 117
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production_admission.hh",
+      "sha256": "6bacfd7aff6992aec4dbc4edd1d041daa67b127ebffd2c80d3c9ef0f5b1547ad",
+      "size_bytes": 8255,
+      "line_count": 92
+    }
+  ],
+  "configure_execution": {
+    "path": ".runtime/porting/CTF-01/production-native-configure-command-01/receipt.json",
+    "sha256": "0b829eb6097fb38753a9ca5ec4cbe59fc8812ba8c990934562b41d858c279d05",
+    "size_bytes": 6811
+  },
+  "compile_execution": {
+    "path": ".runtime/porting/CTF-01/production-native-compile-command-01/receipt.json",
+    "sha256": "9f6085c4e2849ba8b8c25f974cb198a8be6bf5dbd095a8ae573325e33eb17ed8",
+    "size_bytes": 4466
+  },
+  "derivation_execution": {
+    "path": ".runtime/porting/CTF-01/production-native-derive-command-01/receipt.json",
+    "sha256": "73ece5d57f40c7ad7af9ac283dd653520fe07b1f4202a58f65e20775aab582e5",
+    "size_bytes": 3630
+  },
+  "validated_derivative": {
+    "path": ".runtime/porting/CTF-01/production-native-build-01/derivation/receipt.json",
+    "sha256": "00eaafeadd588c1683e0decc9acb6d7a1596c22d99b7a477017b630ebc56d14d",
+    "size_bytes": 13219
+  },
+  "preservation": {
+    "path": ".runtime/porting/CTF-01/production-native-build-01/preservation-after.json",
+    "sha256": "634172b57f6d9426569ee6e0fb4ea74ecd24e2760a08f3747ea2455b20bf2f97",
+    "size_bytes": 161752
+  },
+  "core_before_check": {
+    "path": ".runtime/porting/CTF-01/native-core-before-check-command-01/receipt.json",
+    "sha256": "e1da6904b99a635a16994406919608fa7284f19276d8d3a45eb4f3df8c807702",
+    "size_bytes": 3019
+  },
+  "previous_compile_rows": 664,
+  "current_compile_rows": 667,
+  "core_registered": 643,
+  "core_present": 631,
+  "core_absent": 12,
+  "all_previous_compile_commands_unchanged": true,
+  "protected_artifacts_and_present_core_objects_unchanged": true,
+  "link_provider_verified": true,
+  "scientific_execution_certified": false,
+  "gates_updated": false
+}

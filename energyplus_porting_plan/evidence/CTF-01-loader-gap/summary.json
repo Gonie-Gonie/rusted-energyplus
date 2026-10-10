@@ -1,0 +1,89 @@
+{
+  "schema": "ctf01-actual-loader-owner-gap-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-01-loader-gap/manifest.json",
+    "sha256": "216f33bacb5ebb0b54255ed65e3e4bff4f3928d2d8ba9370f482e9f3028d0fe5",
+    "size_bytes": 194209
+  },
+  "Original_data_review": {
+    "path": ".runtime/porting/CTF-01/production-original-data-review-01/review.json",
+    "sha256": "47c7801aa1b59473a49360ecd3e8efd1e963509e1351a1fb27dfe8fa2e5e6a57",
+    "size_bytes": 48512
+  },
+  "comparison": {
+    "path": ".runtime/porting/CTF-01/candidate-production-comparison-01/comparison.json",
+    "sha256": "576e950f81acb0e481ee709ff8f94158c1012121e44835ac3bdf3b388e01c8e4",
+    "size_bytes": 107992
+  },
+  "comparison_execution": {
+    "path": ".runtime/porting/CTF-01/candidate-production-comparison-command-01/receipt.json",
+    "sha256": "16db43f5321374ee7da0928bca17711241da610b9277efc1a6b28c0ed72d6486",
+    "size_bytes": 4595
+  },
+  "actual_Native_counts": {
+    "model_cases": 15,
+    "loader_phase_records": 195,
+    "operation_records": 21,
+    "actual_CTF_invocations": 21,
+    "actual_CTF_skipped_construct_rows": 0,
+    "loader_unavailable_model_cases": 0,
+    "actual_phase_callback_count": 63,
+    "unreached_phase_records": 0,
+    "scalar_DTO_visits": 2610,
+    "snapshot_visits": 462,
+    "unavailable_snapshot_records": 0,
+    "actual_source_function_counts": {
+      "InputProcessor::processInput": 15,
+      "SimulationManager::PostIPProcessing": 15,
+      "EnergyPlusData::init_constant_state": 15,
+      "EnergyPlusData::init_state": 15,
+      "OutputReportPredefined::SetPredefinedTables": 15,
+      "HeatBalanceManager::SetPreConstructionInputParameters": 15,
+      "OutputProcessor::SetupTimePointers(Zone)": 15,
+      "OutputProcessor::SetupTimePointers(System)": 15,
+      "HeatBalanceManager::GetProjectControlData": 15,
+      "HeatBalanceManager::GetSiteAtmosphereData": 15,
+      "Material::GetMaterialData": 15,
+      "HeatBalanceManager::GetConstructData": 15,
+      "HeatBalanceManager::GetBuildingData": 15,
+      "calculateTransferFunction": 21
+    },
+    "actual_CTF_status_counts": {
+      "source_returned": 21
+    },
+    "actual_loader_status_counts": {
+      "source_returned": 195
+    },
+    "actual_constructor_status_counts": {
+      "source_returned": 15
+    },
+    "actual_phase_callback_counts": {
+      "PostLoad": 21,
+      "PostMerge": 21,
+      "PostConversion": 21
+    },
+    "unknown_whole_call_obligations_for_unavailable_loaders": 0
+  },
+  "actual_Rust_initialized_cases": 15,
+  "actual_Rust_preprocessing_owners": 21,
+  "numeric_comparisons": 378,
+  "discrete_comparisons": 1614,
+  "numeric_mismatches": 0,
+  "discrete_mismatches": 84,
+  "all_18_selected_profile_max_error_and_RMSE_zero": true,
+  "gap": "Twelve B models have real surface registration/ID differences: Native Wall,Floor,Roof; Rust original declaration order Floor,Roof,Wall. Actual failed84 records are retained; compiler source repair is pending. No comparer sorting or tolerance change.",
+  "selected_loader_lane_PASS": false,
+  "integration_PASS": false,
+  "production_PASS": false,
+  "complete_CTF01_PASS": false,
+  "quality_clippy": {
+    "path": ".runtime/porting/CTF-01/candidate-production-quality-clippy-command-01/receipt.json",
+    "sha256": "6ec3bfcdcb9de96ac0323d5fcfda96d8b55b81a1ebbb1df9140fc25ecb145fc6",
+    "size_bytes": 3056
+  },
+  "quality_fmt": {
+    "path": ".runtime/porting/CTF-01/candidate-production-quality-fmt-command-01/receipt.json",
+    "sha256": "40afbb38d4a3d52c88229635ebe6a5f97975c5951ba45cb0ed6888996c6dd790",
+    "size_bytes": 2938
+  }
+}

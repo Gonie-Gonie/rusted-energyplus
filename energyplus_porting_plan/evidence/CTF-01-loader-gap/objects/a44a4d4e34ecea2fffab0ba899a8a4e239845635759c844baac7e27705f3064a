@@ -1,0 +1,56 @@
+--- .runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_fields.hh
++++ .runtime/porting/CTF-01/native-production-prep-02/ctf01_production_fields.hh
+@@ -1,11 +1,13 @@
+ // Pure copies of actual public members and the separately captured private locals.
+-#ifndef CTF01_REFERENCE_FIELDS_HH
+-#define CTF01_REFERENCE_FIELDS_HH
++#ifndef CTF01_PRODUCTION_FIELDS_HH
++#define CTF01_PRODUCTION_FIELDS_HH
+ #include "ctf01_reference_metadata.hh"
+ #include "ctf01_observer.hh"
+ #include <EnergyPlus/Data/EnergyPlusData.hh>
+ #include <EnergyPlus/DataErrorTracking.hh>
+ #include <EnergyPlus/DataGlobals.hh>
++#include <EnergyPlus/DataHeatBalance.hh>
++#include <EnergyPlus/DataSurfaces.hh>
+ #include <EnergyPlus/IOFiles.hh>
+ #include <EnergyPlus/Material.hh>
+ #include <EnergyPlus/UtilityRoutines.hh>
+@@ -79,5 +81,37 @@
+         {"duplicate_phase", capture.duplicate_phase}, {"phase_order_invalid", capture.phase_order_invalid},
+         {"active_prefix_invalid", capture.active_prefix_invalid}, {"unused_fixed_array_tail_emitted", false}};
+ }
++inline json production_snapshot(EnergyPlus::EnergyPlusData const &state, bool input_errors, bool ctf_errors, bool report)
++{
++    auto result = snapshot(state, ctf_errors, report); json surfaces = json::array(), material_map = json::array();
++    for (auto const &[name, index] : state.dataMaterial->materialMap)
++        material_map.push_back({{"key", name}, {"actual_material_Num", index}});
++    for (int i = 1; i <= state.dataConstruction->Construct.isize(); ++i)
++        result["constructions"].at(static_cast<std::size_t>(i - 1))["IsUsed"] = state.dataConstruction->Construct(i).IsUsed;
++    for (int i = 1; i <= state.dataSurface->Surface.isize(); ++i) {
++        auto const &surface = state.dataSurface->Surface(i);
++        surfaces.push_back({{"array_index", i}, {"Name", surface.Name}, {"Construction", surface.Construction},
++            {"Zone", surface.Zone}, {"Class", static_cast<int>(surface.Class)}, {"HeatTransSurf", surface.HeatTransSurf},
++            {"HeatTransferAlgorithm", static_cast<int>(surface.HeatTransferAlgorithm)}});
++    }
++    result["loader_ErrorsFound"] = input_errors;
++    result["TimeStepsInHour"] = state.dataGlobal->TimeStepsInHour;
++    result["MinutesInTimeStep"] = state.dataGlobal->MinutesInTimeStep;
++    result["isEpJSON"] = state.dataGlobal->isEpJSON; result["preserveIDFOrder"] = state.dataGlobal->preserveIDFOrder;
++    result["MaxSolidWinLayers"] = state.dataHeatBal->MaxSolidWinLayers;
++    result["NumOfZones"] = state.dataGlobal->NumOfZones; result["TotSurfaces"] = state.dataSurface->TotSurfaces;
++    result["OverallHeatTransferSolutionAlgo"] = static_cast<int>(state.dataHeatBal->OverallHeatTransferSolutionAlgo);
++    result["AnyCTF"] = state.dataHeatBal->AnyCTF; result["AnyEMPD"] = state.dataHeatBal->AnyEMPD;
++    result["material_map_actual_entries"] = material_map; result["material_map_iteration_is_registration_order"] = false;
++    result["allocated_surface_owner_rows"] = surfaces;
++    return result;
++}
++inline bool actual_caller_matches(EnergyPlus::EnergyPlusData const &state, json const &caller)
++{
++    return state.dataGlobal->TimeStepsInHour == caller.at("TimeStepsInHour").get<int>() &&
++        state.dataGlobal->MinutesInTimeStep == caller.at("MinutesInTimeStep").get<int>() &&
++        std::bit_cast<std::uint64_t>(state.dataGlobal->TimeStepZone) == std::bit_cast<std::uint64_t>(input_real(caller.at("TimeStepZone"))) &&
++        std::bit_cast<std::uint64_t>(state.dataGlobal->TimeStepZoneSec) == std::bit_cast<std::uint64_t>(input_real(caller.at("TimeStepZoneSec")));
++}
+ } // namespace Ctf01
+ #endif

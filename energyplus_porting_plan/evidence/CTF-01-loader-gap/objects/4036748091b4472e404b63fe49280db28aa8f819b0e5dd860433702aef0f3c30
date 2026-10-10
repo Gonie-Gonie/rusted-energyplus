@@ -1,0 +1,371 @@
+--- .runtime/porting/CTF-01/original-data-review-prep-02/shape.py
++++ .runtime/porting/CTF-01/production-original-data-review-prep-01/shape.py
+@@ -10,7 +10,7 @@
+ 
+ def review(result, request, need, bind):
+     counts = Counter()
+-    statuses, ctor_statuses, init_statuses, phases = Counter(), Counter(), Counter(), Counter()
++    statuses, ctor_statuses, loader_statuses, phases, functions = (Counter() for _ in range(5))
+     integrity = []
+ 
+     def integer(value, low=0, high=None):
+@@ -35,186 +35,202 @@
+                  "Scalar decimal serialization disagrees with bits")
+         counts["scalar_DTO_visits"] += 1
+ 
+-    def snapshot(row):
+-        if row is None:
+-            return
+-        need(isinstance(row, dict), "Snapshot object or actual absent owner required")
+-        for name in ["TimeStepZone", "TimeStepZoneSec"]:
+-            scalar(row[name])
+-        for name in ["ErrorsFound", "DoCTFErrorReport"]:
+-            boolean(row[name])
+-        for name in ["TotalWarningErrors", "TotalSevereErrors"]:
+-            integer(row[name])
++    def snapshot(wrapper, label):
++        need(isinstance(wrapper, dict), "Actual availability-wrapped snapshot required")
++        boolean(wrapper["available"])
++        if not wrapper["available"]:
++            need(wrapper["snapshot"] is None and isinstance(wrapper["unavailable_reason"], str), "Absent owner must remain unavailable")
++            if wrapper["unavailable_reason"] == "observer_public_owner_copy_failed":
++                need(isinstance(wrapper["observer_exception_message"], str), "Actual observer exception text required")
++                integrity.append(label + "/observer-public-owner-copy-failed")
++            else:
++                need(wrapper["unavailable_reason"] == "EnergyPlusData_constructor_did_not_complete", "Unknown owner absence reason")
++            counts["unavailable_snapshot_records"] += 1
++            return None
++        need(wrapper["unavailable_reason"] is None and isinstance(wrapper["snapshot"], dict), "Available snapshot owner required")
++        row = wrapper["snapshot"]
++        for name in ["TimeStepZone", "TimeStepZoneSec"]: scalar(row[name])
++        for name in ["ErrorsFound", "DoCTFErrorReport", "loader_ErrorsFound", "isEpJSON", "preserveIDFOrder", "AnyCTF", "AnyEMPD"]: boolean(row[name])
++        for name in ["TotalWarningErrors", "TotalSevereErrors", "TimeStepsInHour", "MinutesInTimeStep", "MaxSolidWinLayers", "NumOfZones", "TotSurfaces"]: integer(row[name])
++        integer(row["OverallHeatTransferSolutionAlgo"], -1)
+         need(row["CTF_coefficients_or_later_solver_storage_paired"] is False and
+-             isinstance(row["materials"], list) and isinstance(row["constructions"], list), "Actual snapshot scope required")
++             row["material_map_iteration_is_registration_order"] is False, "Actual owner scope differs")
++        for name in ["materials", "constructions", "material_map_actual_entries", "allocated_surface_owner_rows"]:
++            need(isinstance(row[name], list), "Actual allocated owner array required")
+         for index, material in enumerate(row["materials"], 1):
+-            integer(material["array_index"], 1); integer(material["Num"], 1)
+-            need(material["array_index"] == index and material["Num"] == index and isinstance(material["Name"], str), "Actual material owner order required")
+-            integer(material["group"], -1)
+-            boolean(material["ROnly"])
+-            for name in MATERIAL_SCALARS:
+-                scalar(material[name])
++            need(material["array_index"] == index and isinstance(material["Name"], str), "Material array order differs")
++            integer(material["array_index"], 1); integer(material["Num"]); integer(material["group"], -1); boolean(material["ROnly"])
++            for name in MATERIAL_SCALARS: scalar(material[name])
++        map_keys = set()
++        for entry in row["material_map_actual_entries"]:
++            need(isinstance(entry["key"], str) and entry["key"] not in map_keys, "Actual material map key shape differs")
++            map_keys.add(entry["key"]); integer(entry["actual_material_Num"], 0, len(row["materials"]))
+         for index, construction in enumerate(row["constructions"], 1):
+-            integer(construction["array_index"], 1)
+-            need(construction["array_index"] == index and isinstance(construction["Name"], str), "Actual construction owner order required")
+-            integer(construction["TotLayers"], 0, 11)
+-            need(len(construction["LayerPoint_active"]) == construction["TotLayers"], "Actual owner active membership shape differs")
+-            for material in construction["LayerPoint_active"]:
+-                integer(material, 1, len(row["materials"]))
+-            for name in ["IsUsedCTF", "SourceSinkPresent"]:
+-                boolean(construction[name])
+-            for name in ["SolutionDimensions", "SourceAfterLayer", "TempAfterLayer"]:
+-                integer(construction[name])
++            need(construction["array_index"] == index and isinstance(construction["Name"], str), "Construction array order differs")
++            integer(construction["array_index"], 1); integer(construction["TotLayers"], 0, 11)
++            need(isinstance(construction["LayerPoint_active"], list) and len(construction["LayerPoint_active"]) == construction["TotLayers"], "Actual active membership shape differs")
++            # Zero references can be genuine partially initialized loader storage.
++            for material in construction["LayerPoint_active"]: integer(material, 0, len(row["materials"]))
++            for name in ["IsUsedCTF", "IsUsed", "SourceSinkPresent"]: boolean(construction[name])
++            for name in ["SolutionDimensions", "SourceAfterLayer", "TempAfterLayer"]: integer(construction[name])
+             scalar(construction["ThicknessPerpend"])
++        for index, surface in enumerate(row["allocated_surface_owner_rows"], 1):
++            need(surface["array_index"] == index and isinstance(surface["Name"], str), "Actual surface array order differs")
++            integer(surface["array_index"], 1); integer(surface["Construction"], 0, len(row["constructions"]))
++            integer(surface["Zone"]); integer(surface["Class"], -1); integer(surface["HeatTransferAlgorithm"], -1); boolean(surface["HeatTransSurf"])
+         counts["snapshot_visits"] += 1
++        return row
+ 
+     def outcome(row, invoked, prior):
+         boolean(invoked)
+         status = row["status"]
+         expected = {"source_returned": (False, False), "source_fatal": (True, False),
+                     "source_exception": (False, True), "source_nonstandard_exception": (False, True),
+-                    "source_not_invoked_after_stop": (None, None)}
+-        need(status in expected and (status != "source_not_invoked_after_stop") is invoked, "Actual invocation/outcome ledger differs")
++                    "source_not_invoked_due_to_unavailable_prerequisite": (None, None)}
++        need(status in expected and (status != "source_not_invoked_due_to_unavailable_prerequisite") is invoked, "Actual invocation/outcome ledger differs")
+         need((row["source_fatal"], row["source_exception"]) == expected[status], "Actual fatal/exception flags differ")
+-        if invoked:
+-            boolean(row["source_fatal"]); boolean(row["source_exception"])
++        if invoked: boolean(row["source_fatal"]); boolean(row["source_exception"])
+         for name in ["exception_type", "exception_message"]:
+             need(row[name] is None or isinstance(row[name], str), "Actual exception metadata type differs")
+         if status in ["source_fatal", "source_exception"]:
+-            need(isinstance(row["exception_type"], str) and isinstance(row["exception_message"], str), "Caught standard exception metadata required")
+-        if status in ["source_returned", "source_nonstandard_exception", "source_not_invoked_after_stop"]:
+-            need(row["exception_type"] is None and row["exception_message"] is None, "Unexpected fabricated exception metadata")
++            need(isinstance(row["exception_type"], str) and isinstance(row["exception_message"], str), "Caught actual exception metadata required")
++        else:
++            need(row["exception_type"] is None and row["exception_message"] is None, "Unexpected exception metadata")
+         if not invoked:
+-            need(prior is not None and row["prior_source_stop_reason"] == prior, "Actual prior source-stop reason differs")
++            need(prior is not None and row["unavailable_reason"] == prior, "Actual prerequisite stop reason differs")
+         return None if status == "source_returned" else status if invoked else prior
+ 
+-    need(len(result["model_cases"]) == len(request["model_cases"]), "Complete actual model record ledger required")
++    def observations(observed, label):
++        for flag in ["observer_failure", "binding_error", "identity_mismatch", "duplicate_phase", "phase_order_invalid", "active_prefix_invalid"]:
++            boolean(observed[flag])
++            if observed[flag]: integrity.append(label + "/" + flag)
++        need(observed["observer_failure"] is any(observed[flag] for flag in ["binding_error", "identity_mismatch", "duplicate_phase", "phase_order_invalid", "active_prefix_invalid"]), "Observer aggregate flag differs")
++        need(observed["unused_fixed_array_tail_emitted"] is False, "Unused array tail must remain excluded")
++        actual_total, missing_prior = 0, False
++        for phase in PHASES:
++            item = observed[phase]; boolean(item["reached"]); boolean(item["available"]); integer(item["actual_phase_callback_count"])
++            need((item["actual_phase_callback_count"] > 0) is item["reached"], "Actual callback count/reached differs")
++            if item["actual_phase_callback_count"] > 1: need(observed["duplicate_phase"] is True, "Duplicate callback requires integrity flag")
++            actual_total += item["actual_phase_callback_count"]
++            if not item["reached"]:
++                need(item["available"] is False and item["snapshot"] is None and item["unavailable_reason"] == "callback_not_reached", "Unreached phase must remain unavailable")
++                missing_prior = True; counts["unreached_phase_records"] += 1; continue
++            need(not missing_prior or observed["phase_order_invalid"] is True, "Actual phase order differs without integrity flag")
++            phases[phase] += 1
++            state = item["snapshot"]; need(isinstance(state, dict), "Reached phase snapshot required")
++            need(type(state["LayersInConstruct"]) is int and type(state["NumResLayers"]) is int, "Actual counters must retain integer types")
++            integer(state["copied_layer_count"], 0, 11)
++            for name in ["ErrorsFound", "DoCTFErrorReport", "active_prefix_available"]: boolean(state[name])
++            need(item["available"] is state["active_prefix_available"], "Phase prefix availability differs")
++            if not item["available"]:
++                need(item["unavailable_reason"] == "observer_active_prefix_invalid" and state["active_prefix"] is None, "Invalid actual prefix must remain unavailable")
++                integrity.append(label + "/" + phase + "/required-prefix-absent")
++            else:
++                integer(state["LayersInConstruct"], 1, 11); integer(state["NumResLayers"], 0, 11)
++                need(item["unavailable_reason"] is None and state["copied_layer_count"] == state["LayersInConstruct"] == len(state["active_prefix"]), "Actual active-prefix shape differs")
++                for layer in state["active_prefix"]:
++                    need(set(layer) == set(SCALARS + ["ResLayer"]), "Exact actual layer fields required")
++                    boolean(layer["ResLayer"])
++                    for name in SCALARS: scalar(layer[name])
++            for name in ["dyn", "rs", "cnd"]:
++                if phase == "PostConversion": scalar(state[name])
++                else: need(state[name] is None, "Preconversion scalar must remain unavailable")
++        integer(observed["actual_callback_count"])
++        need(observed["actual_callback_count"] == actual_total or observed["identity_mismatch"] is True, "Total callbacks differ without identity error")
++        counts["actual_phase_callback_count"] += observed["actual_callback_count"]
++
++    need(len(result["model_cases"]) == len(request["model_cases"]), "Complete actual model ledger required")
+     for expected, model in zip(request["model_cases"], result["model_cases"]):
+-        model_integrity_start = len(integrity)
+-        need(model["id"] == expected["id"] and model["lane"] == expected["lane"] and
+-             model["declared_caller"] == expected["caller"], "Actual model input identity/order differs")
+-        ctor, initialized = model["constructor"], model["constant_initialization"]
+-        need(ctor["kind"] == "EnergyPlusData::EnergyPlusData" and ctor["actual_source_invoked"] is True, "Actual constructor invocation required")
++        label = expected["id"]; model_integrity_start = len(integrity)
++        need(model["id"] == expected["id"] and model["lane"] == expected["lane"] and model["actual_input"] == expected["input"] and
++             model["declared_caller"] == expected["caller"], "Actual case/input/caller order differs")
++        for name in ["manual_material_or_construction_or_use_seeding", "wrapper_Resistance_calculation", "CTF02_through_CTF10_or_whole_building_simulation_certified"]:
++            need(model[name] is False, "Actual source observation scope differs")
++        ctor = model["constructor"]
++        need(ctor["kind"] == "EnergyPlusData::EnergyPlusData" and ctor["actual_source_invoked"] is True, "Actual constructor required")
+         stop = outcome(ctor["call_outcome"], True, None); ctor_statuses[ctor["call_outcome"]["status"]] += 1
+-        need((ctor["after"] is None) is (stop is not None), "Actual constructor owner availability differs")
+-        need(initialized["kind"] == "EnergyPlusData::init_constant_state" and initialized["actual_source_invoked"] is (stop is None), "Actual constant-init stop mask differs")
+-        stop = outcome(initialized["call_outcome"], initialized["actual_source_invoked"], stop)
+-        init_statuses[initialized["call_outcome"]["status"]] += 1
+-        for state in [ctor["after"], initialized["before"], initialized["after"], model["before_member_inputs"], model["after_member_inputs"], model["final_state"]]:
+-            snapshot(state)
+-        if initialized["actual_source_invoked"] is False:
+-            need(initialized["before"] is None and initialized["after"] is None, "Uninvoked initialization has fabricated snapshots")
+-        if stop is None:
+-            identity, seeded = model["actual_input_owner_identity"], model["after_member_inputs"]
+-            need(seeded is not None and identity["literal_member_seeding"] is True and
+-                 identity["Material_GetMaterialData_or_construction_loader_invoked"] is False and identity["wrapper_Resistance_calculation"] is False,
+-                 "Actual explicit-member owner seeding required")
+-            for name in ["TimeStepZone", "TimeStepZoneSec"]:
+-                need(seeded[name]["value_bits"] == expected["caller"][name]["bits"], "Actual seeded caller bits differ from frozen literals")
+-            for name in ["ErrorsFound", "DoCTFErrorReport"]:
+-                need(seeded[name] is expected["caller"][name], "Actual seeded shared caller flag differs")
+-            material_indices = {material["id"]: index for index, material in enumerate(expected["materials"], 1)}
+-            for family in ["materials", "constructions"]:
+-                need(len(identity[family]) == len(expected[family]) == len(seeded[family]), "Actual seeded owner shape differs")
+-                for index, (declared, observed) in enumerate(zip(expected[family], identity[family]), 1):
+-                    need(observed["logical_input_id"] == declared["id"] and observed["actual_array_index"] == index and
+-                         observed["actual_Name"] == declared["Name"] and seeded[family][index - 1]["Name"] == declared["Name"], "Actual input owner identity/order differs")
+-                    if family == "materials":
+-                        need(observed["actual_Num"] == index, "Actual material Num differs")
+-                        for name in MATERIAL_SCALARS:
+-                            need(seeded[family][index - 1][name]["value_bits"] == declared[name]["bits"], "Actual seeded material bits differ from frozen literals")
+-                        need(seeded[family][index - 1]["ROnly"] is declared["ROnly"], "Actual seeded ROnly differs")
+-                    else:
+-                        actual = seeded[family][index - 1]
+-                        membership = [material_indices[name] for name in declared["layer_material_ids"]]
+-                        need(actual["LayerPoint_active"] == membership and actual["TotLayers"] == len(membership), "Actual seeded construction membership/order differs")
+-                        for name in ["IsUsedCTF", "SourceSinkPresent"]:
+-                            need(actual[name] is declared[name], "Actual seeded construction flag differs")
+-                        for name in ["SolutionDimensions", "SourceAfterLayer", "TempAfterLayer"]:
+-                            need(actual[name] == declared[name], "Actual seeded construction integer differs")
+-                        need(actual["ThicknessPerpend"]["value_bits"] == declared["ThicknessPerpend"]["bits"], "Actual seeded construction bits differ")
+-        else:
+-            need(model["actual_input_owner_identity"] is None, "Stopped model has fabricated seeded owner identity")
+-        diagnostics = model["source_diagnostics"]
+-        boolean(diagnostics["available"])
+-        need(isinstance(diagnostics["messages"], list), "Actual ordered diagnostic messages required")
++        need(len(model["lifecycle"]) == len(request["loader_phase_order"]), "Complete 13-phase lifecycle ledger required")
++        previous_end = 0
++        for index, (kind, item) in enumerate(zip(request["loader_phase_order"], model["lifecycle"])):
++            need(item["kind"] == kind and item["actual_source_invoked"] is (stop is None), "Actual loader phase order/stop mask differs")
++            before = snapshot(item["before"], label + "/" + kind + "/before")
++            invoked = item["actual_source_invoked"]
++            stop = outcome(item["call_outcome"], invoked, stop)
++            after = snapshot(item["after"], label + "/" + kind + "/after")
++            loader_statuses[item["call_outcome"]["status"]] += 1
++            if invoked: functions[kind] += 1
++            counts["loader_phase_records"] += 1
++            begin, end = item["diagnostic_message_begin"], item["diagnostic_message_end"]
++            integer(begin, previous_end); integer(end, begin); previous_end = end
++            if stop is None:
++                need(after is not None, "A returned source phase requires its actual owner snapshot")
++                if after["loader_ErrorsFound"]: stop = "wrapper_requires_loader_ErrorsFound_false"
++            if index == 3:
++                boolean(model["source_produced_caller_matches_declared"])
++                matches = stop is None and after is not None and all(after[name] == expected["caller"][name] for name in ["TimeStepsInHour", "MinutesInTimeStep"]) and all(
++                    after[name]["value_bits"] == expected["caller"][name]["bits"] for name in ["TimeStepZone", "TimeStepZoneSec"])
++                need(model["source_produced_caller_matches_declared"] is matches, "Actual timestep match flag differs")
++                if stop is None and not matches: stop = "declared_caller_differs_from_source_produced_timestep"
++        need(model["constant_initialization"] == model["lifecycle"][2], "Actual constants third-phase alias differs")
++        boolean(model["loader_ready"]); boolean(model["whole_call_obligation_available"])
++        need(model["loader_ready"] is (stop is None) and model["whole_call_obligation_available"] is model["loader_ready"] and
++             model["loader_unavailable_reason"] == stop, "Actual loader readiness/unknown obligation differs")
++        initialized = snapshot(model["initialized_owners"], label + "/initialized")
++        integer(model["actual_Construct_array_size"])
++        if initialized is not None:
++            need(len(initialized["constructions"]) == model["actual_Construct_array_size"], "Actual loaded Construct array count differs")
++        if model["loader_ready"]:
++            need(initialized is not None and initialized["loader_ErrorsFound"] is False, "Ready loader requires actual complete owners")
++            for construction in initialized["constructions"]:
++                for member in construction["LayerPoint_active"]: integer(member, 1, len(initialized["materials"]))
++        else: counts["loader_unavailable_model_cases"] += 1
++        need(len(model["operations"]) == model["actual_Construct_array_size"], "Complete dynamic Construct whole-call ledger required")
++        for index, operation in enumerate(model["operations"], 1):
++            need(operation["kind"] == "calculateTransferFunction" and operation["actual_construction_index"] == index and
++                 isinstance(operation["actual_construction_Name"], str) and operation["actual_source_invoked"] is (stop is None), "Actual dynamic whole-call owner/order/stop differs")
++            before = snapshot(operation["before"], label + "/CTF" + str(index) + "/before")
++            if before is not None:
++                need(len(before["constructions"]) == model["actual_Construct_array_size"] and before["constructions"][index - 1]["Name"] == operation["actual_construction_Name"], "Actual whole-call construction association differs")
++            invoked = operation["actual_source_invoked"]
++            stop = outcome(operation["call_outcome"], invoked, stop)
++            snapshot(operation["after"], label + "/CTF" + str(index) + "/after")
++            statuses[operation["call_outcome"]["status"]] += 1
++            counts["operation_records"] += 1; counts["actual_CTF_invocations" if invoked else "actual_CTF_skipped_construct_rows"] += 1
++            begin, end = operation["diagnostic_message_begin"], operation["diagnostic_message_end"]
++            integer(begin, previous_end); integer(end, begin); previous_end = end
++            if invoked: observations(operation["observations"], label + "/CTF" + str(index))
++            else: need(operation["observations"] is None, "Uninvoked whole call cannot have phase observations")
++        snapshot(model["final_state"], label + "/final")
++        diagnostics = model["source_diagnostics"]; boolean(diagnostics["available"])
++        need(isinstance(diagnostics["messages"], list) and previous_end <= len(diagnostics["messages"]), "Actual diagnostic cursor differs")
+         for message in diagnostics["messages"]:
+-            integer(message["level"], -1); need(isinstance(message["message"], str), "Actual diagnostic text required")
++            integer(message["level"], -1); need(isinstance(message["message"], str), "Actual diagnostic message required")
+         if diagnostics["available"]:
+-            need(diagnostics["unavailable_reason"] is None and set(diagnostics["logs"]) == {"err", "audit.txt", "eso.txt", "eio.txt"} and
+-                 diagnostics["actual_native_stringstream_sinks"] is True and diagnostics["diagnostic_text_numerically_paired"] is False, "Actual diagnostic sinks required")
++            need(set(diagnostics["logs"]) == {"err", "audit", "eso", "eio", "mtr", "bnd", "debug", "rdd", "mdd", "mtd", "edd", "dfs", "shade"} and
++                 diagnostics["actual_native_stringstream_sinks"] is True and diagnostics["diagnostic_text_numerically_paired"] is False, "Actual 13 diagnostic sinks required")
+             for ref in diagnostics["logs"].values(): bind(ref)
+-        else:
+-            need(diagnostics["logs"] is None and isinstance(diagnostics["unavailable_reason"], str), "Unavailable diagnostic sink must remain explicit")
+-        need(len(model["operations"]) == len(expected["operations"]), "Complete actual operation ledger required")
+-        previous_end = 0
+-        for index, (declared, operation) in enumerate(zip(expected["operations"], model["operations"]), 1):
+-            need(operation["id"] == declared["id"] and operation["kind"] == declared["kind"] and
+-                 operation["logical_construction_id"] == declared["construction_id"] and operation["actual_source_invoked"] is (stop is None), "Actual whole-call order/stop mask differs")
+-            invoked = operation["actual_source_invoked"]
+-            if invoked: integer(operation["actual_construction_index"], 1)
+-            stop = outcome(operation["call_outcome"], invoked, stop)
+-            statuses[operation["call_outcome"]["status"]] += 1
+-            counts["operation_records"] += 1; counts["actual_operation_invocations" if invoked else "actual_operations_skipped"] += 1
+-            need(operation["actual_construction_index"] == (index if invoked else None), "Actual whole-call owner index differs")
+-            snapshot(operation["before"]); snapshot(operation["after"])
+-            begin, end = operation["diagnostic_message_begin"], operation["diagnostic_message_end"]
+-            integer(begin, previous_end, len(diagnostics["messages"])); integer(end, begin, len(diagnostics["messages"])); previous_end = end
+-            observed = operation["observations"]
+-            if not invoked:
+-                need(observed is None, "Uninvoked source has fabricated phase observations"); continue
+-            for flag in ["observer_failure", "binding_error", "identity_mismatch", "duplicate_phase", "phase_order_invalid", "active_prefix_invalid"]:
+-                boolean(observed[flag])
+-                if observed[flag]: integrity.append(model["id"] + "/" + operation["id"] + "/" + flag)
+-            need(observed["observer_failure"] is any(observed[flag] for flag in ["binding_error", "identity_mismatch", "duplicate_phase", "phase_order_invalid", "active_prefix_invalid"]), "Observer aggregate flag differs")
+-            need(observed["unused_fixed_array_tail_emitted"] is False, "Unused array tail must not become operands")
+-            actual_total, missing_prior = 0, False
+-            for phase in PHASES:
+-                item = observed[phase]; boolean(item["reached"]); boolean(item["available"])
+-                integer(item["actual_phase_callback_count"])
+-                need((item["actual_phase_callback_count"] > 0) is item["reached"], "Actual callback count/reached flag differs")
+-                if item["actual_phase_callback_count"] > 1: need(observed["duplicate_phase"] is True, "Duplicate actual callback requires its integrity flag")
+-                actual_total += item["actual_phase_callback_count"]
+-                if not item["reached"]:
+-                    need(item["available"] is False and item["snapshot"] is None and item["unavailable_reason"] == "callback_not_reached", "Unreached phase must remain unavailable")
+-                    missing_prior = True; counts["unreached_phase_records"] += 1; continue
+-                need(not missing_prior or observed["phase_order_invalid"] is True, "Actual callback source order differs without its integrity flag")
+-                phases[phase] += 1
+-                state = item["snapshot"]; need(isinstance(state, dict), "Reached phase snapshot is required")
+-                need(type(state["LayersInConstruct"]) is int and type(state["NumResLayers"]) is int, "Actual phase counters must retain integer types")
+-                integer(state["copied_layer_count"], 0, 11)
+-                for flag in ["ErrorsFound", "DoCTFErrorReport", "active_prefix_available"]: boolean(state[flag])
+-                need(item["available"] is state["active_prefix_available"], "Phase prefix availability differs")
+-                if not item["available"]:
+-                    need(item["unavailable_reason"] == "observer_active_prefix_invalid" and state["active_prefix"] is None, "Unavailable invalid prefix must remain explicit")
+-                    integrity.append(model["id"] + "/" + operation["id"] + "/" + phase + "/required-prefix-absent")
+-                else:
+-                    integer(state["LayersInConstruct"], 1, 11); integer(state["NumResLayers"], 0, 11)
+-                    need(item["unavailable_reason"] is None and state["copied_layer_count"] == state["LayersInConstruct"] == len(state["active_prefix"]), "Reached actual active-prefix shape differs")
+-                    for layer in state["active_prefix"]:
+-                        need(set(layer) == set(SCALARS + ["ResLayer"]), "Exact actual layer fields required")
+-                        boolean(layer["ResLayer"])
+-                        for name in SCALARS: scalar(layer[name])
+-                for name in ["dyn", "rs", "cnd"]:
+-                    if phase == "PostConversion": scalar(state[name])
+-                    else: need(state[name] is None, "Preconversion optional scalar must remain unavailable")
+-            integer(observed["actual_callback_count"], actual_total)
+-            need(observed["actual_callback_count"] == actual_total or observed["identity_mismatch"] is True, "Actual total callback count differs without identity-error flag")
+-            counts["actual_phase_callback_count"] += observed["actual_callback_count"]
++        else: need(diagnostics["logs"] is None, "Unavailable diagnostics must not fabricate log refs")
+         boolean(model["observer_integrity_failed"])
+-        need(model["observer_integrity_failed"] is (len(integrity) > model_integrity_start), "Model observer integrity summary differs")
+-        need(model["later_CTF_coefficients_or_thermal_results_paired"] is False, "Later solver context must remain unpaired")
++        need(model["observer_integrity_failed"] is (len(integrity) > model_integrity_start), "Actual model observer-integrity summary differs")
+         counts["model_cases"] += 1
++    functions["calculateTransferFunction"] = counts["actual_CTF_invocations"]
++    for table in [result["actual_source_function_counts"], result["actual_CTF_status_counts"], result["actual_loader_status_counts"]]:
++        need(isinstance(table, dict), "Actual count table required")
++        for value in table.values(): integer(value)
++    need(result["actual_source_function_counts"] == dict(functions) and result["actual_CTF_status_counts"] == dict(statuses) and
++         result["actual_loader_status_counts"] == dict(loader_statuses), "Actual source function/status counts differ")
++    for name in ["actual_CTF_invocations", "actual_CTF_skipped_construct_rows", "loader_unavailable_model_cases", "actual_phase_callback_count"]:
++        integer(result[name]); need(result[name] == counts[name], "Actual emitted count differs from records")
++    unknown = result["unknown_whole_call_obligations_for_unavailable_loaders"]
++    need((type(unknown) is int and unknown == 0) if counts["loader_unavailable_model_cases"] == 0 else unknown is None,
++         "Unavailable loader obligations must remain unknown")
+     boolean(result["observer_integrity_failed"])
+-    need(result["observer_integrity_failed"] is bool(integrity), "Global observer integrity summary differs")
+-    for key in ["actual_operation_invocations", "actual_operations_skipped", "actual_phase_callback_count"]:
+-        integer(result[key])
+-    for table in [result["actual_source_function_counts"], result["actual_source_status_counts"]]:
+-        for value in table.values(): integer(value)
+-    need(result["actual_operation_invocations"] == counts["actual_operation_invocations"] and result["actual_operations_skipped"] == counts["actual_operations_skipped"] and
+-         result["actual_source_function_counts"] == {"calculateTransferFunction": counts["actual_operation_invocations"]} and
+-         result["actual_source_status_counts"] == dict(statuses) and result["actual_phase_callback_count"] == counts["actual_phase_callback_count"], "Reported actual counts differ from genuine records")
+-    return {**{key: counts[key] for key in ["model_cases", "operation_records", "actual_operation_invocations", "actual_operations_skipped", "actual_phase_callback_count", "unreached_phase_records", "scalar_DTO_visits", "snapshot_visits"]},
+-            "actual_source_function_counts": {"calculateTransferFunction": counts["actual_operation_invocations"]},
+-            "actual_source_status_counts": dict(statuses), "actual_constructor_status_counts": dict(ctor_statuses),
+-            "actual_initialization_status_counts": dict(init_statuses), "actual_phase_callback_counts": {phase: phases[phase] for phase in PHASES}}, integrity
++    need(result["observer_integrity_failed"] is bool(integrity), "Actual global observer integrity summary differs")
++    return {**{name: counts[name] for name in ["model_cases", "loader_phase_records", "operation_records", "actual_CTF_invocations",
++            "actual_CTF_skipped_construct_rows", "loader_unavailable_model_cases", "actual_phase_callback_count", "unreached_phase_records",
++            "scalar_DTO_visits", "snapshot_visits", "unavailable_snapshot_records"]},
++            "actual_source_function_counts": dict(functions), "actual_CTF_status_counts": dict(statuses),
++            "actual_loader_status_counts": dict(loader_statuses), "actual_constructor_status_counts": dict(ctor_statuses),
++            "actual_phase_callback_counts": {phase: phases[phase] for phase in PHASES},
++            "unknown_whole_call_obligations_for_unavailable_loaders": result["unknown_whole_call_obligations_for_unavailable_loaders"]}, integrity
++

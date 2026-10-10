@@ -1,0 +1,23 @@
+--- .runtime/porting/CTF-01/native-production-prep-01/ctf01_production_helper.cpp
++++ .runtime/porting/CTF-01/native-production-prep-02/ctf01_production_helper.cpp
+@@ -55,10 +55,6 @@
+         state->dataGlobal->errorCallback = [this](EnergyPlus::Error level, std::string const &message) {
+             messages.push_back({{"level", static_cast<int>(level)}, {"message", message}});
+         };
+-        auto const initialized = invoke([&] { state->init_constant_state(*state); });
+-        constant_initialization = {{"kind", "EnergyPlusData::init_constant_state"}, {"actual_source_invoked", true}, {"call_outcome", initialized}};
+-        stopped = initialized.at("status") != "source_returned";
+-        if (stopped) stop_reason = initialized.at("status").get<std::string>();
+     }
+     ~Factory() { if (state) state->dataMaterial->clear_state(); }
+     json observed(bool input_errors, bool ctf_errors, bool report)
+@@ -124,6 +120,9 @@
+                   [&] { factory.state->dataInputProcessing->inputProcessor->processInput(*factory.state); });
+     factory.phase(lifecycle, "SimulationManager::PostIPProcessing", input_errors, ctf_errors, report,
+                   [&] { EnergyPlus::SimulationManager::PostIPProcessing(*factory.state); });
++    factory.phase(lifecycle, "EnergyPlusData::init_constant_state", input_errors, ctf_errors, report,
++                  [&] { factory.state->init_constant_state(*factory.state); });
++    factory.constant_initialization = lifecycle.back();
+     factory.phase(lifecycle, "EnergyPlusData::init_state", input_errors, ctf_errors, report, [&] { factory.state->init_state(*factory.state); });
+     bool caller_matches = false;
+     if (!factory.stopped) {

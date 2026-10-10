@@ -1,0 +1,367 @@
+--- .runtime/porting/CTF-01/native-production-prep-01/manifest.json
++++ .runtime/porting/CTF-01/native-production-prep-02/manifest.json
+@@ -5,10 +5,10 @@
+   "own_sources": [
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-01/native-production-prep-01/ctf01_production_helper.cpp",
+-        "sha256": "e26fa852f477489764f6ddb26b9bf05c19878a20712baab0ddb80b0d6bc6172f",
+-        "size_bytes": 18399,
+-        "line_count": 232
++        "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production_helper.cpp",
++        "sha256": "c0f5e27e58bfb579ea44842cecbce13617dd0f7d1fa735a57e81238231285f5e",
++        "size_bytes": 18257,
++        "line_count": 231
+       },
+       "reviewed_before": {
+         "path": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_helper.cpp",
+@@ -17,15 +17,27 @@
+         "line_count": 214
+       },
+       "source_diff": {
+-        "path": ".runtime/porting/CTF-01/native-production-prep-01/ctf01_production_helper.cpp.from-unit.diff",
+-        "sha256": "695ad41183a4d5e4d814c6b5b23bfe542da2541ef305c04fd3a3fe6164ef489b",
+-        "size_bytes": 29948,
+-        "line_count": 366
++        "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production_helper.cpp.from-unit.diff",
++        "sha256": "2b97df67bd5d9e06e4ae727cd6aea45072f4a22c5b55fa49c2e142aade874daa",
++        "size_bytes": 30046,
++        "line_count": 369
++      },
++      "previous_source": {
++        "path": ".runtime/porting/CTF-01/native-production-prep-01/ctf01_production_helper.cpp",
++        "sha256": "e26fa852f477489764f6ddb26b9bf05c19878a20712baab0ddb80b0d6bc6172f",
++        "size_bytes": 18399,
++        "line_count": 232
++      },
++      "from_previous_diff": {
++        "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production_helper.cpp.from-01.diff",
++        "sha256": "5efb944975d92866caf6fe8a6fb20f60c4d4b58c7a490d751162a60b85a38ec6",
++        "size_bytes": 1699,
++        "line_count": 23
+       }
+     },
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-01/native-production-prep-01/ctf01_reference_metadata.hh",
++        "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_reference_metadata.hh",
+         "sha256": "6332546299553c1c8f4d0de36676067decf6921c7e3e27ebc7bd2d6ca6f0dee9",
+         "size_bytes": 7434,
+         "line_count": 147
+@@ -37,7 +49,19 @@
+         "line_count": 147
+       },
+       "source_diff": {
+-        "path": ".runtime/porting/CTF-01/native-production-prep-01/ctf01_reference_metadata.hh.from-unit.diff",
++        "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_reference_metadata.hh.from-unit.diff",
++        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++        "size_bytes": 0,
++        "line_count": 0
++      },
++      "previous_source": {
++        "path": ".runtime/porting/CTF-01/native-production-prep-01/ctf01_reference_metadata.hh",
++        "sha256": "6332546299553c1c8f4d0de36676067decf6921c7e3e27ebc7bd2d6ca6f0dee9",
++        "size_bytes": 7434,
++        "line_count": 147
++      },
++      "from_previous_diff": {
++        "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_reference_metadata.hh.from-01.diff",
+         "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+         "size_bytes": 0,
+         "line_count": 0
+@@ -45,7 +69,7 @@
+     },
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-01/native-production-prep-01/ctf01_production_fields.hh",
++        "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production_fields.hh",
+         "sha256": "fc76a30a452c013497c5b89bea59efe0f93b0a4d872d2bc8a5dbe492eaab2abe",
+         "size_bytes": 8382,
+         "line_count": 117
+@@ -57,17 +81,29 @@
+         "line_count": 83
+       },
+       "source_diff": {
+-        "path": ".runtime/porting/CTF-01/native-production-prep-01/ctf01_production_fields.hh.from-unit.diff",
+-        "sha256": "489afabbb09f5eed9c922de8d01489946aea44c85fc58d6e6db86e312767f71d",
++        "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production_fields.hh.from-unit.diff",
++        "sha256": "a44a4d4e34ecea2fffab0ba899a8a4e239845635759c844baac7e27705f3064a",
+         "size_bytes": 3621,
+         "line_count": 56
++      },
++      "previous_source": {
++        "path": ".runtime/porting/CTF-01/native-production-prep-01/ctf01_production_fields.hh",
++        "sha256": "fc76a30a452c013497c5b89bea59efe0f93b0a4d872d2bc8a5dbe492eaab2abe",
++        "size_bytes": 8382,
++        "line_count": 117
++      },
++      "from_previous_diff": {
++        "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production_fields.hh.from-01.diff",
++        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++        "size_bytes": 0,
++        "line_count": 0
+       }
+     },
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-01/native-production-prep-01/ctf01_production_admission.hh",
+-        "sha256": "0475ebd3e7269441c3ef38ad8e75c69d315d98cb169133efb6a8552763c2c3f6",
+-        "size_bytes": 8216,
++        "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production_admission.hh",
++        "sha256": "6bacfd7aff6992aec4dbc4edd1d041daa67b127ebffd2c80d3c9ef0f5b1547ad",
++        "size_bytes": 8255,
+         "line_count": 92
+       },
+       "reviewed_before": {
+@@ -77,15 +113,27 @@
+         "line_count": 120
+       },
+       "source_diff": {
+-        "path": ".runtime/porting/CTF-01/native-production-prep-01/ctf01_production_admission.hh.from-unit.diff",
+-        "sha256": "a621b57671cd79c2ea919ead8eb028bff65cda88a9f36c132d878cf7c0f5b4de",
+-        "size_bytes": 17179,
++        "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production_admission.hh.from-unit.diff",
++        "sha256": "5090c7d4e3f63dd5af11eb1b940012ada15b81cd8ddc5640fd502b2e8d683e13",
++        "size_bytes": 17218,
+         "line_count": 178
++      },
++      "previous_source": {
++        "path": ".runtime/porting/CTF-01/native-production-prep-01/ctf01_production_admission.hh",
++        "sha256": "0475ebd3e7269441c3ef38ad8e75c69d315d98cb169133efb6a8552763c2c3f6",
++        "size_bytes": 8216,
++        "line_count": 92
++      },
++      "from_previous_diff": {
++        "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production_admission.hh.from-01.diff",
++        "sha256": "3c3cc9dcd8f540695be8b3fa5997763cefc63d735287a338fe0e19f29f155066",
++        "size_bytes": 823,
++        "line_count": 11
+       }
+     },
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-01/native-production-prep-01/ctf01_production.cmake",
++        "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production.cmake",
+         "sha256": "e08eb161676abef6aaa30c7417439015dc0766b9bf9a567c7cdcfc699c36d479",
+         "size_bytes": 2142,
+         "line_count": 32
+@@ -97,10 +145,22 @@
+         "line_count": 34
+       },
+       "source_diff": {
+-        "path": ".runtime/porting/CTF-01/native-production-prep-01/ctf01_production.cmake.from-unit.diff",
+-        "sha256": "5b9a1befa7880e9bd39e37a9d06c3ce8802217cb6fd6a1fb754b3537739c3240",
++        "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production.cmake.from-unit.diff",
++        "sha256": "81c41b5842f9ab294850ae97bf90784fb57a6a7e880237d6c1a98acb16c13251",
+         "size_bytes": 4360,
+         "line_count": 60
++      },
++      "previous_source": {
++        "path": ".runtime/porting/CTF-01/native-production-prep-01/ctf01_production.cmake",
++        "sha256": "e08eb161676abef6aaa30c7417439015dc0766b9bf9a567c7cdcfc699c36d479",
++        "size_bytes": 2142,
++        "line_count": 32
++      },
++      "from_previous_diff": {
++        "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production.cmake.from-01.diff",
++        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++        "size_bytes": 0,
++        "line_count": 0
+       }
+     }
+   ],
+@@ -125,13 +185,13 @@
+     }
+   ],
+   "documentation": {
+-    "path": ".runtime/porting/CTF-01/native-production-prep-01/README.md",
+-    "sha256": "3f120e64d05e037960549714cc7ac9ae7d2c6b728596c32cce76703805bc879f",
+-    "size_bytes": 6127,
+-    "line_count": 97
++    "path": ".runtime/porting/CTF-01/native-production-prep-02/README.md",
++    "sha256": "96fe46276d8dc8314c543005e31a624bec9dff41446d69d268625bf17c22e4bc",
++    "size_bytes": 7043,
++    "line_count": 111
+   },
+   "selected_inputs": {
+-    "path": ".runtime/porting/CTF-01/native-production-prep-01/selected-inputs.json",
++    "path": ".runtime/porting/CTF-01/native-production-prep-02/selected-inputs.json",
+     "sha256": "d3df00038047d297872934928106585bdb1138213ab7cbe9edb595e6fe82ff39",
+     "size_bytes": 11669,
+     "line_count": 302
+@@ -630,6 +690,54 @@
+           "end_line": 347,
+           "sha256": "3afed117f4c309f3588fea8f14e786255d175057124f185a9fafc40bba034202",
+           "size_bytes": 2603,
++          "bytes_normalized": false
++        }
++      ]
++    },
++    {
++      "source": {
++        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/api/EnergyPlusPgm.cc",
++        "sha256": "2789f0ddea774deb1c3de15f0266e20ee1855c7f8051394e66e58a7ac592210e",
++        "size_bytes": 24694,
++        "line_count": 530
++      },
++      "selected_ranges": [
++        {
++          "start_line": 292,
++          "end_line": 356,
++          "sha256": "73d2de1cee0a325046e49bd1ddc7ef44299a45e00d4fbc16eb3ca31d07c64bd5",
++          "size_bytes": 2172,
++          "bytes_normalized": false
++        },
++        {
++          "start_line": 413,
++          "end_line": 425,
++          "sha256": "263849c297f4f8184ebe97eb80f488f3ebb0d440922c801bfcfe8cbeff1659a4",
++          "size_bytes": 551,
++          "bytes_normalized": false
++        },
++        {
++          "start_line": 470,
++          "end_line": 480,
++          "sha256": "9be63136ffeb2bd04ef6dcf269cdea6e93dbbcc219ea1fbe6674aecdd6b907b1",
++          "size_bytes": 512,
++          "bytes_normalized": false
++        }
++      ]
++    },
++    {
++      "source": {
++        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/api/state.cc",
++        "sha256": "ee6d3ef12048ea82bd1cb942f2bdb7755fe4a39cdcb91272a37aee742ad3b639",
++        "size_bytes": 4299,
++        "line_count": 79
++      },
++      "selected_ranges": [
++        {
++          "start_line": 56,
++          "end_line": 74,
++          "sha256": "eabe2ac4ef5496c1fb06f2a18e6c017aa30e9ef6f7be6506f570aafada44e0fa",
++          "size_bytes": 541,
+           "bytes_normalized": false
+         }
+       ]
+@@ -678,33 +786,34 @@
+         "line_count": 142
+       },
+       {
+-        "path": ".runtime/porting/CTF-01/native-production-prep-01/ctf01_production_helper.cpp",
+-        "sha256": "e26fa852f477489764f6ddb26b9bf05c19878a20712baab0ddb80b0d6bc6172f",
+-        "size_bytes": 18399,
+-        "line_count": 232
++        "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production_helper.cpp",
++        "sha256": "c0f5e27e58bfb579ea44842cecbce13617dd0f7d1fa735a57e81238231285f5e",
++        "size_bytes": 18257,
++        "line_count": 231
+       },
+       {
+-        "path": ".runtime/porting/CTF-01/native-production-prep-01/ctf01_reference_metadata.hh",
++        "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_reference_metadata.hh",
+         "sha256": "6332546299553c1c8f4d0de36676067decf6921c7e3e27ebc7bd2d6ca6f0dee9",
+         "size_bytes": 7434,
+         "line_count": 147
+       },
+       {
+-        "path": ".runtime/porting/CTF-01/native-production-prep-01/ctf01_production_fields.hh",
++        "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production_fields.hh",
+         "sha256": "fc76a30a452c013497c5b89bea59efe0f93b0a4d872d2bc8a5dbe492eaab2abe",
+         "size_bytes": 8382,
+         "line_count": 117
+       },
+       {
+-        "path": ".runtime/porting/CTF-01/native-production-prep-01/ctf01_production_admission.hh",
+-        "sha256": "0475ebd3e7269441c3ef38ad8e75c69d315d98cb169133efb6a8552763c2c3f6",
+-        "size_bytes": 8216,
++        "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production_admission.hh",
++        "sha256": "6bacfd7aff6992aec4dbc4edd1d041daa67b127ebffd2c80d3c9ef0f5b1547ad",
++        "size_bytes": 8255,
+         "line_count": 92
+       }
+     ],
+     "loader_phase_order": [
+       "InputProcessor::processInput",
+       "SimulationManager::PostIPProcessing",
++      "EnergyPlusData::init_constant_state",
+       "EnergyPlusData::init_state",
+       "OutputReportPredefined::SetPredefinedTables",
+       "HeatBalanceManager::SetPreConstructionInputParameters",
+@@ -718,18 +827,21 @@
+     ],
+     "requested_counts": {
+       "model_cases": 15,
+-      "loader_phase_records": 180
++      "loader_phase_records": 195
+     },
+     "CTF_operation_count": "observed only from actual loader-owned Construct array; unknown for unavailable loaders",
+     "scope_pair": "actual_scope_amendment/actual_scope_amendment_execution runtime refs; no future result identities",
+-    "freeze_flag": "frozen_before_this_production_helper_execution"
++    "freeze_flag": "frozen_before_this_production_helper_execution",
++    "constant_initialization_record": "exact copy of third lifecycle record; actual not-invoked if an earlier phase stopped"
+   },
+   "source_only_checks": {
+     "exact_metadata_copy": true,
+     "checkpoint_and_observations_function_bodies_byte_identical": true,
+     "source_phase_list_equals_admission_order": true,
+     "all_15_input_hashes_and_45_guards_verified": true,
+-    "no_timestep_or_material_Resistance_or_use_assignment": true
++    "no_timestep_or_material_Resistance_or_use_assignment": true,
++    "constant_init_not_called_in_Factory_constructor": true,
++    "constant_initialization_record_equals_actual_third_phase": true
+   },
+   "unavailable_prerequisites": [
+     "constructor or constant initialization did not complete",
+@@ -752,5 +864,50 @@
+   "numerical_PASS_claimed": false,
+   "canonical_files_updated": false,
+   "gates_updated": false,
+-  "new_QA_execution_framework_added": false
++  "new_QA_execution_framework_added": false,
++  "previous_source_preparation": {
++    "path": ".runtime/porting/CTF-01/native-production-prep-01/manifest.json",
++    "sha256": "1c6d2bf17ef107fe64a713b0e032986aa15f54a7c3d40839610278d58f09bb5b",
++    "size_bytes": 26679,
++    "line_count": 756
++  },
++  "from_previous_diffs": [
++    {
++      "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production_helper.cpp.from-01.diff",
++      "sha256": "5efb944975d92866caf6fe8a6fb20f60c4d4b58c7a490d751162a60b85a38ec6",
++      "size_bytes": 1699,
++      "line_count": 23
++    },
++    {
++      "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_reference_metadata.hh.from-01.diff",
++      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++      "size_bytes": 0,
++      "line_count": 0
++    },
++    {
++      "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production_fields.hh.from-01.diff",
++      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++      "size_bytes": 0,
++      "line_count": 0
++    },
++    {
++      "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production_admission.hh.from-01.diff",
++      "sha256": "3c3cc9dcd8f540695be8b3fa5997763cefc63d735287a338fe0e19f29f155066",
++      "size_bytes": 823,
++      "line_count": 11
++    },
++    {
++      "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production.cmake.from-01.diff",
++      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++      "size_bytes": 0,
++      "line_count": 0
++    },
++    {
++      "path": ".runtime/porting/CTF-01/native-production-prep-02/README.md.from-01.diff",
++      "sha256": "07abab28017a290a408fa80c436f79cd4b9f00c6a461004cd71b767ce5ea547d",
++      "size_bytes": 4173,
++      "line_count": 70
++    }
++  ],
++  "lifecycle_repair_scope": "Only constant initialization placement/actual phase alias and derived13/195 ledger metadata; idempotence is not used as phase-equivalence proof."
+ }

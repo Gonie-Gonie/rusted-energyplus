@@ -1,0 +1,111 @@
+# CTF-01 genuine fixed-CON15 loader helper source proposal
+
+This is an unexecuted, separate production entrypoint. It uses the ordered 15 raw
+IDF inputs in the authentic CON scope, not the 39 explicit-member unit models.
+No frozen production packet, successful loader outcome, numerical result or PASS
+is claimed. Root must review and freeze the actual request/projection/criteria
+before this production helper is invoked.
+
+Fresh02 preserves the unexecuted01 proposal and repairs its constant-init order.
+The helper constructs fresh EnergyPlusData and installs I/O sinks per input.
+Actual InputProcessor::processInput reads the original IDF, followed by actual
+PostIPProcessing, init_constant_state and whole init_state once in that order.
+The latter genuinely calls GetProjectData and ProcessScheduleInput; the helper
+does not call those two methods again. Constants are not initialized in Factory.
+The separate constant_initialization record is an exact copy of lifecycle phase3,
+including actual not-invoked status if construction, parsing or PostIP stopped.
+TimeStepsInHour, MinutesInTimeStep, TimeStepZone and TimeStepZoneSec are copied from
+the source-produced owners and checked against the declared 4/15/0.25/900 caller.
+No timestep field is overwritten. The production admission requires that exact
+caller and does not infer it from Native or Rust observations.
+
+The thirteen fixed phase records are, in order:
+
+1. InputProcessor::processInput.
+2. SimulationManager::PostIPProcessing.
+3. EnergyPlusData::init_constant_state.
+4. EnergyPlusData::init_state.
+5. OutputReportPredefined::SetPredefinedTables.
+6. HeatBalanceManager::SetPreConstructionInputParameters.
+7. OutputProcessor::SetupTimePointers for the actual Zone timestep owner.
+8. OutputProcessor::SetupTimePointers for the actual System timestep owner.
+9. HeatBalanceManager::GetProjectControlData.
+10. HeatBalanceManager::GetSiteAtmosphereData.
+11. Material::GetMaterialData.
+12. HeatBalanceManager::GetConstructData.
+13. HeatBalanceManager::GetBuildingData.
+
+
+Fresh-engine source proof: api/EnergyPlusPgm.cc commonRun292-323 parses input;
+initializeEnergyPlus324-350 and initializeAsLibrary352-356 reach commonRun before
+RunEnergyPlus423 / library entry479 invoke ManageSimulation. That method199-211
+performs PostIPProcessing then constants then init_state. api/state.cc56-60
+stateNew only constructs. stateReset69-74 calls constants on a distinct reset
+route. EnergyPlusData.cc581-585 is an idempotence guard; it is not evidence that
+moving constant initialization before fresh input parsing preserves source order.
+
+GetBuildingData executes real shadowing input, zone/space input and whole
+SetupZoneGeometry. GetSurfaceData genuinely resolves constructions and sets
+IsUsed; its internal GetSurfaceHeatTransferAlgorithmOverrides assigns the
+actual surface algorithms and IsUsedCTF. No wrapper use flags or geometry
+fragments substitute for those calls. The existing GEO02/03 prepared helpers
+are not a loader or use-owner certificate. Optional window/spectral/hysteresis,
+source/sink, F/C-factor and override families are absent from these exact fixed
+inputs; this selected route does not claim whole GetHeatBalanceInput execution.
+
+All actual loader materials, their Num/map membership and stored Resistance,
+construction array order/LayerPoint/IsUsed/IsUsedCTF, allocated surface rows and
+algorithm associations are copied. Regular Resistance is computed only by the
+real Material loader. NoMass uses that loader's actual stored member/defaults.
+Map iteration is explicitly separate from the real material registration array.
+
+After successful preparation, each actual Construct array element receives one
+whole calculateTransferFunction call in stored order, including unused elements.
+One fresh ErrorsFound/DoCTFErrorReport pair is shared across that actual call loop,
+matching the selected InitConductionTransferFunctions loop; loader ErrorsFound
+is a separate input-stage flag. Returned CTF errors remain sticky and do not skip
+later calls. The whole InitConductionTransferFunctions reporting routine and
+whole building simulation are not claimed.
+
+Source fatal/std/nonstandard exceptions stop later calls for that model and are
+recorded distinctly. The wrapper also stops preparation after an actual loader
+ErrorsFound=true or a source-produced caller mismatch, with an explicit wrapper
+prerequisite reason. Partial owner snapshots are retained when copyable. A failed
+owner copy is an observer failure, not a source exception. Unknown whole-call
+obligations after incomplete loading are null, never a fabricated zero. An OS
+crash has no fabricated completed result; its process receipt remains external.
+
+The unchanged passive adapter records only actual reached PostLoad/PostMerge/
+PostConversion active prefixes and real dyn/rs/cnd. Unreached phases remain
+unavailable. Later coefficients, solver errors and thermal results are unpaired.
+
+Output I/O uses actual InputOutputFile stringstreams: audit/eso/eio/mtr/bnd/debug/
+rdd/mdd/mtd/edd/dfs/shade, plus the actual error stream/callback. OpenOutputFiles
+therefore sees already-open real ESO/EIO/MTR/BND streams. Other explicit output
+paths and the performance-log path are contained per case. Diagnostic text is
+not a numerical comparison operand; no output-control or scientific field is
+retuned. MaterialData::clear_state releases its actual raw-pointer owners once.
+
+CLI: ctf01_production_helper ROOT FROZEN_REQUEST PRODUCTION_ADMISSION FRESH_OUTPUT.
+The request has model_cases with exactly id/lane/input/caller; all 15 must equal
+scope order/identities. The caller has exactly the four time fields above, with
+binary64 inputs as {bits: sixteen lowercase hexadecimal digits}. Counts request
+15 model records and 195 loader-phase records; CTF counts derive only from actual
+loaded owners. One-way source/tolerances -> request -> cases -> projection ->
+admission bindings and all 45 guards are authenticated before and after calls.
+Production schemas use ctf01-production- prefixes as recorded in manifest.json.
+The distinct frozen_before_this_production_helper_execution flag does not claim
+that this future packet predates earlier unit observations.
+
+The CMake include adds a separate executable with three distinct object paths:
+this main, the unchanged full derived Construction TU, and unchanged callback TU.
+It preserves the unit helper/cache settings and existing archive/command rows.
+Future actual build proof must derive command counts, retain registered-versus-
+present core-object distinctions, hash existing protected artifacts, and inspect
+the real link map for the derived Construction provider and absence of the
+original Construction archive member. Existing unit/core targets are unmodified.
+
+No compiler/formatter/project import/engine, binary or scientific result read,
+canonical edit, Git action, or new QA execution framework was used to author this
+proposal. Helper and callback authorship is disclosed; source review is not an
+independent certification of the author's own algorithms.
