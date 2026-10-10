@@ -1,0 +1,114 @@
+{
+  "schema": "ctf03-fixed6-cli-actual-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-03-production-cli/manifest.json",
+    "sha256": "fb2464b02a152e84b9963d2de25347f306bb4a0d02b3b91589cbfd26d0137805",
+    "size_bytes": 17907
+  },
+  "selected_initial_comparison": {
+    "path": "energyplus_porting_plan/evidence/CTF-03-unit/summary.json",
+    "sha256": "6dcdbff9f94a6d6c66216f8f8c0e24af5500ba7c10d71d7a726ec13a33d85230",
+    "size_bytes": 10148
+  },
+  "actual_executions": {
+    "path": ".runtime/porting/CTF-03/production-cli-inputs-01/execution-summary.json",
+    "sha256": "eb0d83ef9b8f7e0d8cfc2a904f1eb1f71538c3725fb5055a64cd91efcac265a7",
+    "size_bytes": 3004
+  },
+  "same_actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/eb/eb7b5e9050a1f2194e5f18016d06e094934f2d2097463ac938c48834a3afb0c3",
+    "sha256": "eb7b5e9050a1f2194e5f18016d06e094934f2d2097463ac938c48834a3afb0c3"
+  },
+  "runs": [
+    {
+      "id": "A-24H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-03/production-cli-output-01/A-24H/run-summary.json",
+        "sha256": "9a6a31af5b7faf60813c8ad71eb6fb0d8df7134f5fa738f2151fb62f7d859fe5",
+        "size_bytes": 28691
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": null
+    },
+    {
+      "id": "A-72H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-03/production-cli-output-01/A-72H/run-summary.json",
+        "sha256": "b3730592b13572f5ef244640acfebfcbf735dda0b2fb312b15292f870be57a71",
+        "size_bytes": 28688
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": null
+    },
+    {
+      "id": "B-NOLIMIT-24H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-03/production-cli-output-01/B-NOLIMIT-24H/run-summary.json",
+        "sha256": "dcf1bc0e9f3ebf34e5399b9d9e920426a4748fbda738ea5dcdbd6eae4d8d4750",
+        "size_bytes": 1498419
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": false
+    },
+    {
+      "id": "B-FLOW-24H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-03/production-cli-output-01/B-FLOW-24H/run-summary.json",
+        "sha256": "06441e8acc5092c068d2ba9110454b9e6161eb2cb4989db54afd18a4d455daa0",
+        "size_bytes": 1498308
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": false
+    },
+    {
+      "id": "B-CAPACITY-24H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-03/production-cli-output-01/B-CAPACITY-24H/run-summary.json",
+        "sha256": "3ca10dfcd1cca4716237e62a874c7a0cdad88ba385b6ea19951e70212ed36592",
+        "size_bytes": 1498242
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": false
+    },
+    {
+      "id": "B-BOTH-24H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-03/production-cli-output-01/B-BOTH-24H/run-summary.json",
+        "sha256": "7a98af450e8a66dff461f9705475e8994887c3fc8eef800648dbd543ccf138d8",
+        "size_bytes": 1498715
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": false
+    }
+  ],
+  "all45_input_guards_unchanged_after": true,
+  "first_build_wrong_package_exit101_preserved_and_corrected_before_execution": true,
+  "actual_CLI_build_used": "production-cli-build-command-02, ep_cli/eplus-rs",
+  "numerical_equivalence_certified": false,
+  "complete_CTF03_PASS_claimed": false,
+  "integration_and_production_gates_remain_pending": true
+}
