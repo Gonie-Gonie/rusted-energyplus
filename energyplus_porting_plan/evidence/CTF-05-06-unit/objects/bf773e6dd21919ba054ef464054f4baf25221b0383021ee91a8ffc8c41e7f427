@@ -1,0 +1,31 @@
+{
+  "schema": "ctf06-test-only-lint-correction-source.v1",
+  "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner_tests.rs",
+  "before": {
+    "path": ".runtime/porting/CTF-06/test-lint-fix-prep-01/before.rs",
+    "sha256": "b8daa30e19285ed60f28da79d344985228d97b5cabfadc7a93be14003d4764d3",
+    "size_bytes": 7387,
+    "line_count": 203
+  },
+  "proposed": {
+    "path": ".runtime/porting/CTF-06/test-lint-fix-prep-01/proposed.rs",
+    "sha256": "783caae798e3d2c0f7e9401e93e8e89ac3e885c5af42d6e16f36977ab803e51c",
+    "size_bytes": 7807,
+    "line_count": 217
+  },
+  "exact_diff": {
+    "path": ".runtime/porting/CTF-06/test-lint-fix-prep-01/exact.diff",
+    "sha256": "4d25e0b10db51695e7e17892682ed4e552c3ab9990ca26d8e9ae6fd32a56ba43",
+    "size_bytes": 5866,
+    "line_count": 152
+  },
+  "failed_Clippy_execution": {
+    "path": ".runtime/porting/CTF-06/quality-clippy-command-01/receipt.json",
+    "sha256": "c7ef615c61acbc98b17ea946849fdd14f809f07213c1f74fc9ce7314acd786b1",
+    "size_bytes": 5400,
+    "line_count": 75
+  },
+  "change": "Three test panic branches return actual TestResult errors; four tests propagate errors. Assertions, fixtures, all cases, scientific functions and production sources unchanged.",
+  "executed": false,
+  "canonical_written": false
+}

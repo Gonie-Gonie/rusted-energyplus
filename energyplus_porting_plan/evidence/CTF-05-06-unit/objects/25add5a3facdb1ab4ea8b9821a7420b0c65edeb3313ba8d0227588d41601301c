@@ -1,0 +1,13 @@
+--- accepted/crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs
++++ crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs
+@@ -45,9 +45,7 @@
+         .ok()
+         .filter(|&n| n > 0)
+         .ok_or(CtfInverseScopeError::Dimension(input.rcmax))?;
+-    let size = n
+-        .checked_mul(n)
+-        .ok_or(CtfInverseScopeError::MatrixShape)?;
++    let size = n.checked_mul(n).ok_or(CtfInverseScopeError::MatrixShape)?;
+     if input.a_mat.len() != size || input.iden_matrix.len() != size {
+         return Err(CtfInverseScopeError::MatrixShape);
+     }

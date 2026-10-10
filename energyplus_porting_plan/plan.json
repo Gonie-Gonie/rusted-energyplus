@@ -10057,11 +10057,11 @@
       "excludes": "CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다. 실행 가능 여부를 확인하지 않고 무조건 0으로 대체하지 않는다.",
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/Construction.cc",
       "scope_review": "통과",
-      "unit_gate": "미확인",
+      "unit_gate": "통과",
       "integration_gate": "미확인",
       "production_gate": "미확인",
       "applicability": "A/B",
-      "source_boundary_note": "Root FULL and other-author FULL completed immutable pure/public/combined ingress/Native observer/helper/freezer/PE/OriginalDataQA Source review. Held candidates are unapplied and no actual05/06 build or engine has run. Scope only; all three remaining gates and predecessor completion stay pending.",
+      "source_boundary_note": "Actual Original DataQA and fresh unchanged Rust04 baseline preceded application. Real ordered first exponential then inverse use the same original AMat/Iden/context; 25 selected unit pairs and15 fixed production pairs pass all nine separate exact profiles with zero mismatch. Unit157300 numeric/721458 discrete; production3180/19328, all zero mismatch. Workspace4709 passed before one test-only panic-to-Result correction; six changed tests, final Clippy/fmt and actual candidate build/run/comparers passed. Later16 Native visits and all unavailable contexts remain unpaired/noPASS. Retry, final coefficient handoff, complete-card integration/production gates and fixed6 CLI for this source remain pending.",
       "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
       "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
       "source_ranges_input_only": [
@@ -10339,6 +10339,16 @@
         "removal_requires_separate_Root_authorized_actual_retention_record": true,
         "earlier_live_refs_reinterpreted": false,
         "deletion_performed": false
+      },
+      "actual_Original_and_unchanged_Rust_baseline": {
+        "path": "energyplus_porting_plan/evidence/CTF-05-06-original-baseline/summary.json",
+        "sha256": "bd260fdd353512b841e631abb44bb22dcaeb119d521d96dc9f5dd5ab7ab9ae62",
+        "size_bytes": 13107
+      },
+      "actual_candidate_unit_and_loader_comparisons": {
+        "path": "energyplus_porting_plan/evidence/CTF-05-06-unit/summary.json",
+        "sha256": "80670a91b1c5d8087cf2e2229e633c80dd4ab5f6ab61d85899769b385935816a",
+        "size_bytes": 16534
       }
     },
     {
@@ -10362,11 +10372,11 @@
       "excludes": "CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다. 실행 가능 여부를 확인하지 않고 무조건 0으로 대체하지 않는다.",
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/Construction.cc",
       "scope_review": "통과",
-      "unit_gate": "미확인",
+      "unit_gate": "통과",
       "integration_gate": "미확인",
       "production_gate": "미확인",
       "applicability": "A/B",
-      "source_boundary_note": "Root FULL and other-author FULL completed immutable pure/public/combined ingress/Native observer/helper/freezer/PE/OriginalDataQA Source review. Held candidates are unapplied and no actual05/06 build or engine has run. Scope only; all three remaining gates and predecessor completion stay pending.",
+      "source_boundary_note": "Actual Original DataQA and fresh unchanged Rust04 baseline preceded application. Real ordered first exponential then inverse use the same original AMat/Iden/context; 25 selected unit pairs and15 fixed production pairs pass all nine separate exact profiles with zero mismatch. Unit157300 numeric/721458 discrete; production3180/19328, all zero mismatch. Workspace4709 passed before one test-only panic-to-Result correction; six changed tests, final Clippy/fmt and actual candidate build/run/comparers passed. Later16 Native visits and all unavailable contexts remain unpaired/noPASS. Retry, final coefficient handoff, complete-card integration/production gates and fixed6 CLI for this source remain pending.",
       "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
       "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
       "source_ranges_input_only": [
@@ -10684,6 +10694,16 @@
         "removal_requires_separate_Root_authorized_actual_retention_record": true,
         "earlier_live_refs_reinterpreted": false,
         "deletion_performed": false
+      },
+      "actual_Original_and_unchanged_Rust_baseline": {
+        "path": "energyplus_porting_plan/evidence/CTF-05-06-original-baseline/summary.json",
+        "sha256": "bd260fdd353512b841e631abb44bb22dcaeb119d521d96dc9f5dd5ab7ab9ae62",
+        "size_bytes": 13107
+      },
+      "actual_candidate_unit_and_loader_comparisons": {
+        "path": "energyplus_porting_plan/evidence/CTF-05-06-unit/summary.json",
+        "sha256": "80670a91b1c5d8087cf2e2229e633c80dd4ab5f6ab61d85899769b385935816a",
+        "size_bytes": 16534
       }
     },
     {

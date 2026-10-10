@@ -6,7 +6,9 @@ use ep_model::{ConstructionId, MaterialId, MaterialSurfaceRoughness};
 
 mod construction_cache;
 pub mod ctf_all_resistive;
+pub mod ctf_exponential_matrix;
 pub mod ctf_initial_discretization;
+pub mod ctf_inverse_matrix;
 pub mod ctf_layer_preprocessing;
 pub mod ctf_state_space_assembly;
 

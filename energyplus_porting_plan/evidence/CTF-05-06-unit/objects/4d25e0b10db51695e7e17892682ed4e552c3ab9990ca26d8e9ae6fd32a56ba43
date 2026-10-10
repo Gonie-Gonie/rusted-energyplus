@@ -1,0 +1,152 @@
+--- a/crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner_tests.rs
++++ b/crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner_tests.rs
+@@ -43,35 +43,45 @@
+     }
+ }
+ 
+-fn reached_mut(owner: &mut ConstructionCtfFirstAssembly) -> &mut CtfStateSpaceAssembly {
+-    match owner.result.as_mut().expect("assembly owner exists") {
+-        CtfAssemblyObservation::Assembled(reached) => reached,
+-        CtfAssemblyObservation::Unavailable(_) => panic!("test setup must have actual assembly"),
+-    }
+-}
+-
+-fn exponential(owner: &ConstructionCtfFirstExponential) -> &CtfExponentialMatrix {
++type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
++
++fn reached_mut(owner: &mut ConstructionCtfFirstAssembly) -> TestResult<&mut CtfStateSpaceAssembly> {
++    match owner
++        .result
++        .as_mut()
++        .map_err(|error| std::io::Error::other(format!("{error:?}")))?
++    {
++        CtfAssemblyObservation::Assembled(reached) => Ok(reached),
++        CtfAssemblyObservation::Unavailable(_) => {
++            Err(std::io::Error::other("test setup must have actual assembly").into())
++        }
++    }
++}
++
++fn exponential(owner: &ConstructionCtfFirstExponential) -> TestResult<&CtfExponentialMatrix> {
+     match owner
+         .result
+         .as_ref()
+-        .expect("selected first exponential exists")
++        .map_err(|error| std::io::Error::other(format!("{error:?}")))?
+     {
+-        CtfExponentialObservation::Exponential(reached) => reached,
++        CtfExponentialObservation::Exponential(reached) => Ok(reached),
+         CtfExponentialObservation::Unavailable(_) => {
+-            panic!("first selected result cannot be unavailable")
++            Err(std::io::Error::other("first selected result cannot be unavailable").into())
+         }
+     }
+ }
+ 
+ #[test]
+-fn first_result_preserves_actual_context_and_immutable_input_owners() {
++fn first_result_preserves_actual_context_and_immutable_input_owners() -> TestResult {
+     let assembly = first_assembly();
+     let before = assembly.clone();
+     let output = initialize_construction_ctf_first_exponential(&assembly);
+-    let result = exponential(&output);
++    let result = exponential(&output)?;
+     let source = match assembly.result.as_ref().expect("actual assembly") {
+         CtfAssemblyObservation::Assembled(source) => source,
+-        CtfAssemblyObservation::Unavailable(_) => panic!("actual test assembly"),
++        CtfAssemblyObservation::Unavailable(_) => {
++            return Err(std::io::Error::other("actual test assembly").into());
++        }
+     };
+     assert_eq!(output.construction_id, assembly.construction_id);
+     assert_eq!(result.context, source.context);
+@@ -82,18 +92,20 @@
+     assert_eq!(result.rcmax, source.rcmax);
+     assert_eq!(result.a_exp.len(), source.a_mat.len());
+     assert_eq!(assembly, before);
+-}
+-
+-#[test]
+-fn actual_stored_identity_is_borrowed_without_reconstruction() {
++    Ok(())
++}
++
++#[test]
++fn actual_stored_identity_is_borrowed_without_reconstruction() -> TestResult {
+     let original = first_assembly();
+     let baseline = initialize_construction_ctf_first_exponential(&original);
+     let mut changed = original.clone();
+-    reached_mut(&mut changed).iden_matrix[0] = 2.0;
++    reached_mut(&mut changed)?.iden_matrix[0] = 2.0;
+     let before = changed.clone();
+     let output = initialize_construction_ctf_first_exponential(&changed);
+-    assert_ne!(exponential(&baseline).a_exp, exponential(&output).a_exp);
++    assert_ne!(exponential(&baseline)?.a_exp, exponential(&output)?.a_exp);
+     assert_eq!(changed, before);
++    Ok(())
+ }
+ 
+ #[test]
+@@ -134,7 +146,7 @@
+ }
+ 
+ #[test]
+-fn stale_construction_and_later_attempt_contexts_do_not_publish_results() {
++fn stale_construction_and_later_attempt_contexts_do_not_publish_results() -> TestResult {
+     let mut assembly = first_assembly();
+     assembly.construction_id = ConstructionId(8);
+     assert_eq!(
+@@ -143,23 +155,24 @@
+     );
+     for ordinal in [0, 2, 3] {
+         let mut assembly = first_assembly();
+-        reached_mut(&mut assembly).context.attempt_ordinal = ordinal;
++        reached_mut(&mut assembly)?.context.attempt_ordinal = ordinal;
+         assert_eq!(
+             initialize_construction_ctf_first_exponential(&assembly).result,
+             Err(CtfFirstExponentialUnavailable::NotFirstAttempt(ordinal))
+         );
+     }
+     let mut assembly = first_assembly();
+-    reached_mut(&mut assembly).context.route =
++    reached_mut(&mut assembly)?.context.route =
+         CtfAssemblyRoute::Unavailable(CtfAssemblyUnavailable::AllResistive);
+     assert_eq!(
+         initialize_construction_ctf_first_exponential(&assembly).result,
+         Err(CtfFirstExponentialUnavailable::AssemblyRouteMismatch)
+     );
+-}
+-
+-#[test]
+-fn pure_scope_and_actual_matrix_shape_stops_remain_explicit() {
++    Ok(())
++}
++
++#[test]
++fn pure_scope_and_actual_matrix_shape_stops_remain_explicit() -> TestResult {
+     let cases: [(fn(&mut CtfStateSpaceAssembly), CtfExponentialScopeError); 5] = [
+         (
+             |owner| {
+@@ -186,18 +199,19 @@
+     ];
+     for (mutate, expected) in cases {
+         let mut assembly = first_assembly();
+-        mutate(reached_mut(&mut assembly));
++        mutate(reached_mut(&mut assembly)?);
+         assert_eq!(
+             initialize_construction_ctf_first_exponential(&assembly).result,
+             Err(CtfFirstExponentialUnavailable::ExponentialScope(expected))
+         );
+     }
+     let mut assembly = first_assembly();
+-    reached_mut(&mut assembly).context.node_source = 1;
++    reached_mut(&mut assembly)?.context.node_source = 1;
+     assert_eq!(
+         initialize_construction_ctf_first_exponential(&assembly).result,
+         Err(CtfFirstExponentialUnavailable::ExponentialScope(
+             CtfExponentialScopeError::SourceNodeState
+         ))
+     );
+-}
++    Ok(())
++}

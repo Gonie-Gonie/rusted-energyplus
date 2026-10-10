@@ -59,7 +59,7 @@ CTF-07 gamma 계산 연결
 ## 종료 체크
 
 - [x] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
+- [x] 단위시험 통과 및 실제 활성 분기 확인
 - [ ] 상태·시간·호출순서를 포함한 연결시험 통과
 - [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
@@ -81,3 +81,14 @@ Actual AInv/final_AMat1 with exact typed shape/class/signedzero/control/caller s
 Primary separate profiles: AInv, final_AMat1. Each prospectively fixed atol0.0/rtol0.0, exact class/shape/signedzero. Seven inherited assembly profiles, three initial profiles and eighteen preprocessing profiles remain separate handoff checks. Native actual entry/stage/control/final/caller-return ledgers are retained without caps or reconstruction. Missing first owner on either or both sides is a comparison failure; later visits and unavailable contexts are never PASS.
 
 Same literal unit39/42 and fixed production15/195/45 input guards only. Both CTF05 and CTF06 real card checks are required before input freeze. Root FULL and independent other-author FULL Source review preceded this amendment. Future actual build/PE/OriginalDataQA must precede fresh unchanged Rust baseline and candidate application. No actual build, engine output, numeric equivalence or remaining-gate PASS is claimed. New06 debug originals follow forward-only prospective retention until a separate actual approved cleanup; earlier histories remain literal.
+
+
+## Actual selected first-method comparison
+
+Actual Original DataQA and fresh unchanged Rust04 baseline preceded this application. The original first assembly feeds the real exponential then inverse APIs; inverse receives original AMat/Iden, not AExp. Unit25 and fixed-production15 first owner pairs passed all nine frozen zero-tolerance profiles.
+
+Unit:157300 numeric +721458 discrete comparisons; production:3180 +19328. Every mismatch count, primary maximum absolute error and RMSE is zero. Seven assembly handoff profiles, three initial profiles and eighteen preprocessing profiles remain separate. Unit16 later Native visits and88 unavailable observations; production30 unavailable observations remain unpaired/noPASS.
+
+Workspace4709 tests passed before a single test-only panic-to-Result correction; all six changed tests and final Clippy/fmt passed afterwards. Actual final SourceSnapshot `0e7cbb48fbacb668fff054aa9248ee9db5462cee1b0d6c322b70bcf7fa9ec483` binds the real Cargo artifacts, both actual runs and strict comparison receipts. Failed first Clippy is preserved. Full Native/Rust scientific JSON bytes are retained with verified gzip SHA256/size roundtrips.
+
+Evidence: `energyplus_porting_plan/evidence/CTF-05-06-unit/summary.json`. This selects the first no-source1D method invocation only. Retry/convergence, Gamma/final coefficients, complete-card integration/production and the fresh fixed-six CLI remain pending; no whole-card completion is claimed.

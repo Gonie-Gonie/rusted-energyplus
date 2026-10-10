@@ -1,0 +1,142 @@
+--- accepted/crates/ep_run/examples/ctf06_candidate_unit_support/fields.rs
++++ crates/ep_run/examples/ctf06_candidate_unit_support/fields.rs
+@@ -2,14 +2,6 @@
+ use ep_runtime::heat_balance::ctf_first_assembly_owner::{
+     ConstructionCtfFirstAssembly, CtfFirstAssemblyUnavailable,
+ };
+-use ep_runtime::heat_balance::ctf_initial_owner::{
+-    ConstructionCtfInitialDiscretization, CtfInitialUnavailable,
+-};
+-use ep_runtime::heat_balance::surface_manager::ctf_layer_preprocessing::{
+-    ConstructionCtfLayerPreprocessing, CtfLayerCheckpoint, CtfLayerInput, CtfLayerPreprocessing,
+-    CtfLayerScopeError,
+-};
+-use ep_runtime::heat_balance::surface_manager::ctf_state_space_assembly::CtfAssemblyObservation;
+ use ep_runtime::heat_balance::ctf_first_exponential_owner::{
+     ConstructionCtfFirstExponential, CtfFirstExponentialUnavailable,
+ };
+@@ -17,8 +9,16 @@
+ use ep_runtime::heat_balance::ctf_first_matrix_owner::{
+     ConstructionCtfFirstInverseAfterExponential, PriorExponentialUnavailable,
+ };
++use ep_runtime::heat_balance::ctf_initial_owner::{
++    ConstructionCtfInitialDiscretization, CtfInitialUnavailable,
++};
+ use ep_runtime::heat_balance::surface_manager::ctf_exponential_matrix::CtfExponentialObservation;
++use ep_runtime::heat_balance::surface_manager::ctf_layer_preprocessing::{
++    ConstructionCtfLayerPreprocessing, CtfLayerCheckpoint, CtfLayerInput, CtfLayerPreprocessing,
++    CtfLayerScopeError,
++};
+ use ep_runtime::heat_balance::surface_manager::ctf_state_space_assembly::CtfAssemblyContext;
++use ep_runtime::heat_balance::surface_manager::ctf_state_space_assembly::CtfAssemblyObservation;
+ use serde_json::{Value, json};
+ 
+ pub(super) fn scalar(value: f64) -> Value {
+@@ -271,8 +271,10 @@
+                 "IdenMatrix":matrix_values(&actual.iden_matrix),
+                 "actual_AMat_value_count":actual.a_mat.len(),"actual_IdenMatrix_value_count":actual.iden_matrix.len()},
+             "unavailable_reason":null,"storage_order":"source_i1_outer_i2_inner_row_first","counted_as_PASS":false}),
+-        _ => json!({"owner_available":false,"construction_id":owner.construction_id.0,"snapshot":null,
+-            "unavailable_reason":format!("{:?}",owner.result),"counted_as_PASS":false}),
++        _ => {
++            json!({"owner_available":false,"construction_id":owner.construction_id.0,"snapshot":null,
++            "unavailable_reason":format!("{:?}",owner.result),"counted_as_PASS":false})
++        }
+     }
+ }
+ pub(super) fn first_exponential(
+@@ -282,18 +284,29 @@
+     let (available, route, reason, snapshot) = match &source.result {
+         Err(reason) => {
+             let route = match reason {
+-                CtfFirstExponentialUnavailable::FirstAssemblyUnavailable(_) => "FirstAssemblyUnavailable",
++                CtfFirstExponentialUnavailable::FirstAssemblyUnavailable(_) => {
++                    "FirstAssemblyUnavailable"
++                }
+                 CtfFirstExponentialUnavailable::AssemblyUnavailable(_) => "AssemblyUnavailable",
+-                CtfFirstExponentialUnavailable::ConstructionIdentityMismatch => "ConstructionIdentityMismatch",
++                CtfFirstExponentialUnavailable::ConstructionIdentityMismatch => {
++                    "ConstructionIdentityMismatch"
++                }
+                 CtfFirstExponentialUnavailable::AssemblyRouteMismatch => "AssemblyRouteMismatch",
+                 CtfFirstExponentialUnavailable::NotFirstAttempt(_) => "NotFirstAttempt",
+                 CtfFirstExponentialUnavailable::ExponentialScope(_) => "ExponentialScope",
+             };
+             (false, route, Some(format!("{reason:?}")), Value::Null)
+         }
+-        Ok(CtfExponentialObservation::Unavailable(reason)) =>
+-            (false, "ExponentialUnavailable", Some(format!("{reason:?}")), Value::Null),
+-        Ok(CtfExponentialObservation::Exponential(actual)) => (true, "FirstExponentialReturned", None,
++        Ok(CtfExponentialObservation::Unavailable(reason)) => (
++            false,
++            "ExponentialUnavailable",
++            Some(format!("{reason:?}")),
++            Value::Null,
++        ),
++        Ok(CtfExponentialObservation::Exponential(actual)) => (
++            true,
++            "FirstExponentialReturned",
++            None,
+             json!({"context":attempt_context(&actual.context),"rcmax":actual.rcmax,
+                 "AMatRowNormMax":scalar(actual.a_mat_row_norm_max),"k":actual.k,
+                 "fact":scalar(actual.fact),"CheckVal":scalar(actual.check_val),"l":actual.l,
+@@ -305,7 +318,8 @@
+                     "AMato":matrix_values(&actual.a_mato),"AMatN":matrix_values(&actual.a_mat_n)},
+                 "actual_matrix_value_counts":{"AExp":actual.a_exp.len(),"AMat1":actual.a_mat1.len(),
+                     "AMato":actual.a_mato.len(),"AMatN":actual.a_mat_n.len()},
+-                "storage_order":"source_i1_outer_i2_inner_row_first"})),
++                "storage_order":"source_i1_outer_i2_inner_row_first"}),
++        ),
+     };
+     json!({"protocol":"ctf06-first-exponential.v1","construction_id":source.construction_id.0,
+         "owner_available":available,"selected_first_exponential_operands":available,
+@@ -327,26 +341,43 @@
+                 PriorExponentialUnavailable::Error(_) => "PriorExponentialError",
+                 PriorExponentialUnavailable::Route(_) => "PriorExponentialRouteUnavailable",
+             };
+-            (false, false, route, Some(format!("{reason:?}")), Value::Null)
++            (
++                false,
++                false,
++                route,
++                Some(format!("{reason:?}")),
++                Value::Null,
++            )
+         }
+         Ok(owner) => match &owner.result {
+             Err(reason) => {
+                 let route = match reason {
+-                    CtfFirstInverseUnavailable::FirstAssemblyUnavailable(_) => "FirstAssemblyUnavailable",
+-                    CtfFirstInverseUnavailable::AssemblyRouteUnavailable(_) => "AssemblyRouteUnavailable",
+-                    CtfFirstInverseUnavailable::ConstructionIdentityMismatch => "ConstructionIdentityMismatch",
++                    CtfFirstInverseUnavailable::FirstAssemblyUnavailable(_) => {
++                        "FirstAssemblyUnavailable"
++                    }
++                    CtfFirstInverseUnavailable::AssemblyRouteUnavailable(_) => {
++                        "AssemblyRouteUnavailable"
++                    }
++                    CtfFirstInverseUnavailable::ConstructionIdentityMismatch => {
++                        "ConstructionIdentityMismatch"
++                    }
+                     CtfFirstInverseUnavailable::NonFirstAttempt(_) => "NonFirstAttempt",
+                     CtfFirstInverseUnavailable::AssemblyContext => "AssemblyContext",
+                     CtfFirstInverseUnavailable::InverseScope(_) => "InverseScope",
+                 };
+                 (true, false, route, Some(format!("{reason:?}")), Value::Null)
+             }
+-            Ok(actual) => (true, true, "FirstInverseReturned", None,
++            Ok(actual) => (
++                true,
++                true,
++                "FirstInverseReturned",
++                None,
+                 json!({"actual_public_owner_construction_id":owner.construction_id.0,
+                     "context":attempt_context(&actual.context),"rcmax":actual.inverse.rcmax,
+                     "matrices":{"AInv":matrix_values(&actual.inverse.a_inv),"AMat1":matrix_values(&actual.inverse.a_mat1)},
+                     "actual_matrix_value_counts":{"AInv":actual.inverse.a_inv.len(),"AMat1":actual.inverse.a_mat1.len()},
+-                    "storage_order":"source_i1_outer_i2_inner_row_first"})),
++                    "storage_order":"source_i1_outer_i2_inner_row_first"}),
++            ),
+         },
+     };
+     json!({"protocol":"ctf05-first-inverse-after-exponential.v1","construction_id":source.construction_id.0,

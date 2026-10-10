@@ -1,0 +1,114 @@
+--- accepted/crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix/tests.rs
++++ crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix/tests.rs
+@@ -23,7 +23,11 @@
+     context: CtfAssemblyContext,
+ ) -> CtfExponentialMatrix {
+     let owner = match calculate_selected_ctf_matrix_exponential(
+-        CtfExponentialInput { rcmax, a_mat, iden_matrix },
++        CtfExponentialInput {
++            rcmax,
++            a_mat,
++            iden_matrix,
++        },
+         context,
+     )
+     .expect("selected source-defined helper scope")
+@@ -39,28 +43,49 @@
+     let mut actual = context();
+     actual.route = CtfAssemblyRoute::Unavailable(CtfAssemblyUnavailable::UnusedConstruction);
+     let result = calculate_selected_ctf_matrix_exponential(
+-        CtfExponentialInput { rcmax: 0, a_mat: &[], iden_matrix: &[] },
++        CtfExponentialInput {
++            rcmax: 0,
++            a_mat: &[],
++            iden_matrix: &[],
++        },
+         actual,
+     );
+-    assert_eq!(result, Ok(CtfExponentialObservation::Unavailable(
+-        CtfAssemblyUnavailable::UnusedConstruction,
+-    )));
++    assert_eq!(
++        result,
++        Ok(CtfExponentialObservation::Unavailable(
++            CtfAssemblyUnavailable::UnusedConstruction,
++        ))
++    );
+ }
+ 
+ #[test]
+ fn actual_owner_shapes_and_context_are_required() {
+-    let input = CtfExponentialInput { rcmax: 2, a_mat: &[0.0; 4], iden_matrix: &[1.0] };
+-    assert_eq!(calculate_selected_ctf_matrix_exponential(input, context()),
+-        Err(CtfExponentialScopeError::MatrixShape));
+-    let input = CtfExponentialInput { rcmax: 1, a_mat: &[0.0], iden_matrix: &[1.0] };
++    let input = CtfExponentialInput {
++        rcmax: 2,
++        a_mat: &[0.0; 4],
++        iden_matrix: &[1.0],
++    };
++    assert_eq!(
++        calculate_selected_ctf_matrix_exponential(input, context()),
++        Err(CtfExponentialScopeError::MatrixShape)
++    );
++    let input = CtfExponentialInput {
++        rcmax: 1,
++        a_mat: &[0.0],
++        iden_matrix: &[1.0],
++    };
+     let mut actual = context();
+     actual.attempt_ordinal = 0;
+-    assert_eq!(calculate_selected_ctf_matrix_exponential(input, actual),
+-        Err(CtfExponentialScopeError::AttemptOrdinal));
++    assert_eq!(
++        calculate_selected_ctf_matrix_exponential(input, actual),
++        Err(CtfExponentialScopeError::AttemptOrdinal)
++    );
+     actual = context();
+     actual.node_source = 1;
+-    assert_eq!(calculate_selected_ctf_matrix_exponential(input, actual),
+-        Err(CtfExponentialScopeError::SourceNodeState));
++    assert_eq!(
++        calculate_selected_ctf_matrix_exponential(input, actual),
++        Err(CtfExponentialScopeError::SourceNodeState)
++    );
+ }
+ 
+ #[test]
+@@ -69,7 +94,13 @@
+     assert!(owner.k < 0);
+     assert_eq!(owner.a_mat_row_norm_max, 1e-12);
+     assert_eq!(owner.a_exp[0].to_bits(), 1.0_f64.to_bits());
+-    assert_eq!(owner.power_steps, vec![CtfExponentialPowerStep { i: 2, sig_fig_limit: true }]);
++    assert_eq!(
++        owner.power_steps,
++        vec![CtfExponentialPowerStep {
++            i: 2,
++            sig_fig_limit: true
++        }]
++    );
+     assert_eq!(owner.final_power_i, 100);
+     assert!(owner.square_steps.is_empty());
+     assert_eq!(owner.context, context());
+@@ -134,10 +165,17 @@
+     assert!(owner.a_exp[0].is_nan());
+     assert!(owner.power_steps.iter().all(|step| !step.sig_fig_limit));
+     assert_eq!(owner.final_power_i, owner.l);
+-    assert_eq!(calculate_selected_ctf_matrix_exponential(
+-        CtfExponentialInput { rcmax: 1, a_mat: &[f64::INFINITY], iden_matrix: &[1.0] },
+-        context(),
+-    ), Err(CtfExponentialScopeError::UndefinedScalingExponent));
++    assert_eq!(
++        calculate_selected_ctf_matrix_exponential(
++            CtfExponentialInput {
++                rcmax: 1,
++                a_mat: &[f64::INFINITY],
++                iden_matrix: &[1.0]
++            },
++            context(),
++        ),
++        Err(CtfExponentialScopeError::UndefinedScalingExponent)
++    );
+ }
+ 
+ #[test]

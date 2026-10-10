@@ -1,0 +1,126 @@
+use super::{CtfInverseInput, CtfInverseScopeError, invert_selected_ctf_matrix};
+
+fn bits(values: &[f64]) -> Vec<u64> {
+    values.iter().map(|value| value.to_bits()).collect()
+}
+
+#[test]
+fn asymmetric_two_by_two_preserves_source_orientation_and_workspace() {
+    let a = [2.0, 1.0, 4.0, 4.0];
+    let identity = [1.0, 0.0, 0.0, 1.0];
+    let output = invert_selected_ctf_matrix(CtfInverseInput {
+        rcmax: 2,
+        a_mat: &a,
+        iden_matrix: &identity,
+    })
+    .expect("valid source-shaped matrices");
+    assert_eq!(bits(&output.a_inv), bits(&[1.0, -0.25, -1.0, 0.5]));
+    assert_eq!(bits(&output.a_mat1), bits(&identity));
+    // Independent residual check, using the actual row-first input orientation.
+    for row in 0..2 {
+        for column in 0..2 {
+            let residual =
+                a[row * 2] * output.a_inv[column] + a[row * 2 + 1] * output.a_inv[2 + column];
+            assert_eq!(residual, if row == column { 1.0 } else { 0.0 });
+        }
+    }
+}
+
+#[test]
+fn three_by_three_reaches_both_forward_and_reverse_inner_rows() {
+    let a = [2.0, 0.0, 0.0, 2.0, 2.0, 0.0, 0.0, 2.0, 2.0];
+    let identity = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0];
+    let output = invert_selected_ctf_matrix(CtfInverseInput {
+        rcmax: 3,
+        a_mat: &a,
+        iden_matrix: &identity,
+    })
+    .expect("valid source-shaped matrices");
+    assert_eq!(
+        bits(&output.a_inv),
+        bits(&[0.5, 0.0, 0.0, -0.5, 0.5, 0.0, 0.5, -0.5, 0.5])
+    );
+    assert_eq!(bits(&output.a_mat1), bits(&identity));
+}
+
+#[test]
+fn last_row_only_boundary_uses_the_supplied_identity_owner() {
+    // A deliberate helper-input canary, not a permitted whole-engine case.
+    let output = invert_selected_ctf_matrix(CtfInverseInput {
+        rcmax: 1,
+        a_mat: &[2.0],
+        iden_matrix: &[3.0],
+    })
+    .expect("the helper copies its actual identity owner without substitution");
+    assert_eq!(output.a_inv[0].to_bits(), 1.5_f64.to_bits());
+    assert_eq!(output.a_mat1[0].to_bits(), 1.0_f64.to_bits());
+}
+
+#[test]
+fn source_and_identity_input_buffers_are_unchanged() {
+    let a = [2.0, -0.0, 4.0, 4.0];
+    let identity = [1.0, -0.0, 0.0, 1.0];
+    let before_a = bits(&a);
+    let before_identity = bits(&identity);
+    let _output = invert_selected_ctf_matrix(CtfInverseInput {
+        rcmax: 2,
+        a_mat: &a,
+        iden_matrix: &identity,
+    })
+    .expect("valid source-shaped matrices");
+    assert_eq!(bits(&a), before_a);
+    assert_eq!(bits(&identity), before_identity);
+}
+
+#[test]
+fn zero_diagonal_division_is_not_replaced_by_pivot_or_scope_error() {
+    // Pure Rust behavior only; these are not new full Native input fixtures.
+    for (zero, expected) in [(0.0, f64::INFINITY), (-0.0, f64::NEG_INFINITY)] {
+        let output = invert_selected_ctf_matrix(CtfInverseInput {
+            rcmax: 1,
+            a_mat: &[zero],
+            iden_matrix: &[1.0],
+        })
+        .expect("literal Native helper has no zero-pivot rejection");
+        assert_eq!(output.a_inv[0].to_bits(), expected.to_bits());
+        assert_eq!(output.a_mat1[0].to_bits(), 1.0_f64.to_bits());
+    }
+}
+
+#[test]
+fn singular_matrix_keeps_source_nonfinite_arithmetic() {
+    let output = invert_selected_ctf_matrix(CtfInverseInput {
+        rcmax: 2,
+        a_mat: &[0.0, 1.0, 1.0, 1.0],
+        iden_matrix: &[1.0, 0.0, 0.0, 1.0],
+    })
+    .expect("no singularity guard was present in the selected source");
+    assert!(output.a_inv.iter().any(|value| !value.is_finite()));
+}
+
+#[test]
+fn invalid_shapes_are_not_synthetic_native_method_outcomes() {
+    for rcmax in [0, -1] {
+        assert_eq!(
+            invert_selected_ctf_matrix(CtfInverseInput {
+                rcmax,
+                a_mat: &[],
+                iden_matrix: &[],
+            }),
+            Err(CtfInverseScopeError::Dimension(rcmax))
+        );
+    }
+    for (a, identity) in [
+        (&[1.0][..], &[1.0, 0.0, 0.0, 1.0][..]),
+        (&[1.0, 0.0, 0.0, 1.0][..], &[1.0][..]),
+    ] {
+        assert_eq!(
+            invert_selected_ctf_matrix(CtfInverseInput {
+                rcmax: 2,
+                a_mat: a,
+                iden_matrix: identity,
+            }),
+            Err(CtfInverseScopeError::MatrixShape)
+        );
+    }
+}

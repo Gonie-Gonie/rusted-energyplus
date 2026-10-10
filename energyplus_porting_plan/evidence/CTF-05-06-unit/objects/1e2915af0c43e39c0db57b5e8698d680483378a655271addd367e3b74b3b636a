@@ -1,0 +1,202 @@
+use super::*;
+use crate::heat_balance::ctf_first_assembly_owner::CtfFirstAssemblyUnavailable;
+use crate::heat_balance::ctf_initial_owner::CtfInitialUnavailable;
+use crate::heat_balance::surface_manager::ctf_exponential_matrix::CtfExponentialScopeError;
+use crate::heat_balance::surface_manager::ctf_inverse_matrix::{
+    CtfInverseInput, invert_selected_ctf_matrix,
+};
+use crate::heat_balance::surface_manager::ctf_layer_preprocessing::CtfNormalizedLayer;
+use crate::heat_balance::surface_manager::ctf_state_space_assembly::{
+    CtfAssemblyInput, CtfAssemblyRoute, CtfStateSpaceAssembly, assemble_1d_ctf_state_space,
+};
+
+type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
+
+fn source_assembly() -> TestResult<ConstructionCtfFirstAssembly> {
+    let layers = [CtfNormalizedLayer {
+        dl: 0.5,
+        rk: 0.25,
+        rho: 1.0,
+        cp: 1.0,
+        lr: 2.0,
+        res_layer: false,
+    }];
+    let context = CtfAssemblyContext {
+        construction_id: ConstructionId(7),
+        route: CtfAssemblyRoute::Assemble,
+        solution_dimensions: 1,
+        source_sink_present: false,
+        node_source: 0,
+        node_user_temp: 0,
+        attempt_ordinal: 1,
+        time_step_zone: 0.25,
+        ctf_time_step: 0.5,
+        num_histories: 2,
+    };
+    let result = assemble_1d_ctf_state_space(
+        CtfAssemblyInput {
+            layers: &layers,
+            nodes: &[6],
+            dx: &[0.1],
+            rcmax: 5,
+        },
+        context,
+    )
+    .map_err(|error| std::io::Error::other(format!("{error:?}")))?;
+    Ok(ConstructionCtfFirstAssembly {
+        construction_id: context.construction_id,
+        result: Ok(result),
+    })
+}
+
+fn source_mut(owner: &mut ConstructionCtfFirstAssembly) -> TestResult<&mut CtfStateSpaceAssembly> {
+    match owner.result.as_mut().map_err(|error| *error)? {
+        CtfAssemblyObservation::Assembled(actual) => Ok(actual),
+        CtfAssemblyObservation::Unavailable(_) => {
+            Err(std::io::Error::other("fixture has no actual assembly").into())
+        }
+    }
+}
+
+#[test]
+fn successful_ordered_outcomes_borrow_original_assembly_not_exponential() -> TestResult {
+    let assembly = source_assembly()?;
+    let before = assembly.clone();
+    let pair = initialize_construction_ctf_first_matrix_functions(&assembly);
+    let CtfAssemblyObservation::Assembled(source) =
+        assembly.result.as_ref().map_err(|error| *error)?
+    else {
+        return Err(std::io::Error::other("fixture assembly unavailable").into());
+    };
+    let CtfExponentialObservation::Exponential(exponential) = pair.exponential.result? else {
+        return Err(std::io::Error::other("actual exponential unavailable").into());
+    };
+    assert_eq!(
+        pair.exponential.construction_id,
+        source.context.construction_id
+    );
+    assert_eq!(exponential.context, source.context);
+    assert_eq!(pair.inverse.construction_id, source.context.construction_id);
+    assert_eq!(pair.inverse.assembly_context, Some(source.context));
+    let invoked_inverse = pair.inverse.result?;
+    let inverse = invoked_inverse.result?;
+    assert_eq!(
+        invoked_inverse.construction_id,
+        source.context.construction_id
+    );
+    assert_eq!(inverse.context, source.context);
+    assert_eq!(assembly, before);
+    // Routing regression only: compare two real Rust helper inputs, no Native answer.
+    let original_input = invert_selected_ctf_matrix(CtfInverseInput {
+        rcmax: source.rcmax,
+        a_mat: &source.a_mat,
+        iden_matrix: &source.iden_matrix,
+    })
+    .map_err(|error| std::io::Error::other(format!("{error:?}")))?;
+    let wrong_exponential_input = invert_selected_ctf_matrix(CtfInverseInput {
+        rcmax: source.rcmax,
+        a_mat: &exponential.a_exp,
+        iden_matrix: &source.iden_matrix,
+    })
+    .map_err(|error| std::io::Error::other(format!("{error:?}")))?;
+    assert_eq!(inverse.inverse, original_input);
+    assert_ne!(inverse.inverse.a_inv, wrong_exponential_input.a_inv);
+    assert_ne!(
+        inverse.context.time_step_zone.to_bits(),
+        inverse.context.ctf_time_step.to_bits()
+    );
+    Ok(())
+}
+
+#[test]
+fn earlier_exponential_scope_failure_keeps_inverse_not_invoked() -> TestResult {
+    let mut assembly = source_assembly()?;
+    source_mut(&mut assembly)?.a_mat.fill(f64::INFINITY);
+    let before = assembly.clone();
+    let pair = initialize_construction_ctf_first_matrix_functions(&assembly);
+    let reason = CtfFirstExponentialUnavailable::ExponentialScope(
+        CtfExponentialScopeError::UndefinedScalingExponent,
+    );
+    assert_eq!(pair.exponential.result, Err(reason));
+    assert_eq!(
+        pair.inverse.result,
+        Err(PriorExponentialUnavailable::Error(reason))
+    );
+    assert!(pair.inverse.assembly_context.is_some());
+    assert_eq!(assembly, before);
+    // The inverse API would accept these existing buffer shapes; the combined
+    // caller deliberately does not invoke it after the actual exponential error.
+    assert!(
+        initialize_construction_ctf_first_inverse(&assembly)
+            .result
+            .is_ok()
+    );
+    Ok(())
+}
+
+#[test]
+fn prior_construction_routes_keep_order_and_explicit_no_inverse_owner() {
+    let reasons = [
+        CtfInitialUnavailable::UnusedConstruction,
+        CtfInitialUnavailable::PreprocessingErrorReturn,
+        CtfInitialUnavailable::AllResistiveBranch,
+        CtfInitialUnavailable::ReverseConstruction {
+            construction_id: ConstructionId(3),
+        },
+    ];
+    for (id, reason) in [10_u32, 11, 12, 13].into_iter().zip(reasons) {
+        let id = ConstructionId(id);
+        let first_error = CtfFirstAssemblyUnavailable::InitialUnavailable(reason);
+        let assembly = ConstructionCtfFirstAssembly {
+            construction_id: id,
+            result: Err(first_error),
+        };
+        let pair = initialize_construction_ctf_first_matrix_functions(&assembly);
+        let exponential_error =
+            CtfFirstExponentialUnavailable::FirstAssemblyUnavailable(first_error);
+        assert_eq!(pair.exponential.construction_id, id);
+        assert_eq!(pair.exponential.result, Err(exponential_error));
+        assert_eq!(pair.inverse.construction_id, id);
+        assert_eq!(pair.inverse.assembly_context, None);
+        assert_eq!(
+            pair.inverse.result,
+            Err(PriorExponentialUnavailable::Error(exponential_error))
+        );
+    }
+}
+
+#[test]
+fn inconsistent_association_retains_actual_context_without_calling_inverse() -> TestResult {
+    let mut assembly = source_assembly()?;
+    assembly.construction_id = ConstructionId(8);
+    let pair = initialize_construction_ctf_first_matrix_functions(&assembly);
+    assert_eq!(pair.inverse.construction_id, ConstructionId(8));
+    assert_eq!(
+        pair.inverse
+            .assembly_context
+            .map(|context| context.construction_id),
+        Some(ConstructionId(7))
+    );
+    assert_eq!(
+        pair.inverse.result,
+        Err(PriorExponentialUnavailable::Error(
+            CtfFirstExponentialUnavailable::ConstructionIdentityMismatch,
+        ))
+    );
+    assembly.construction_id = ConstructionId(7);
+    source_mut(&mut assembly)?.context.attempt_ordinal = 2;
+    let pair = initialize_construction_ctf_first_matrix_functions(&assembly);
+    assert_eq!(
+        pair.inverse
+            .assembly_context
+            .map(|context| context.attempt_ordinal),
+        Some(2)
+    );
+    assert_eq!(
+        pair.inverse.result,
+        Err(PriorExponentialUnavailable::Error(
+            CtfFirstExponentialUnavailable::NotFirstAttempt(2),
+        ))
+    );
+    Ok(())
+}

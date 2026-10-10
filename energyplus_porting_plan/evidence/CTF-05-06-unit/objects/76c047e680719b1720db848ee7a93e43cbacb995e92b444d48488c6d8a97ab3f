@@ -1,0 +1,15 @@
+--- accepted/crates/ep_run/examples/ctf06_candidate_production_observer.rs
++++ crates/ep_run/examples/ctf06_candidate_production_observer.rs
+@@ -292,7 +292,11 @@
+         )?;
+         bindings.push(native[key].clone());
+     }
+-    require(native["actual_scope_amendment_executions"] == admission["actual_scope_amendment_executions"], "both real card check mappings differ")?;
++    require(
++        native["actual_scope_amendment_executions"]
++            == admission["actual_scope_amendment_executions"],
++        "both real card check mappings differ",
++    )?;
+     for card in ["CTF-05", "CTF-06"] {
+         bindings.push(native["actual_scope_amendment_executions"][card].clone());
+     }

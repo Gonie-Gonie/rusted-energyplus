@@ -1,0 +1,102 @@
+//! First exponential from an existing first-assembly owner; no cache driver.
+
+use super::ctf_first_assembly_owner::{ConstructionCtfFirstAssembly, CtfFirstAssemblyUnavailable};
+use super::surface_manager::ctf_exponential_matrix::{
+    CtfExponentialInput, CtfExponentialObservation, CtfExponentialScopeError,
+    calculate_selected_ctf_matrix_exponential,
+};
+use super::surface_manager::ctf_state_space_assembly::{
+    CtfAssemblyObservation, CtfAssemblyRoute, CtfAssemblyUnavailable,
+};
+use ep_model::ConstructionId;
+
+/// An unavailable prerequisite or an inconsistent first-attempt association.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum CtfFirstExponentialUnavailable {
+    /// The existing first-assembly owner retained this actual unavailable reason.
+    FirstAssemblyUnavailable(CtfFirstAssemblyUnavailable),
+    /// The pure assembly retained an explicit route with no initialized buffers.
+    AssemblyUnavailable(CtfAssemblyUnavailable),
+    /// The wrapper and reached assembly refer to different constructions.
+    ConstructionIdentityMismatch,
+    /// A reached assembly cannot carry an unavailable route in its context.
+    AssemblyRouteMismatch,
+    /// This API consumes only the actual first assembly, never a later retry.
+    NotFirstAttempt(usize),
+    /// The unchanged pure exponential rejected its scope, shape or cast domain.
+    ExponentialScope(CtfExponentialScopeError),
+}
+
+impl std::fmt::Display for CtfFirstExponentialUnavailable {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            formatter,
+            "first CTF exponential owner unavailable: {self:?}"
+        )
+    }
+}
+
+impl std::error::Error for CtfFirstExponentialUnavailable {}
+
+/// The actual first exponential result, distinct from later attempts or CTFs.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ConstructionCtfFirstExponential {
+    /// Original typed identity; exponential workspaces introduce no new IDs.
+    pub construction_id: ConstructionId,
+    /// A reached pure result or an explicit unavailable prerequisite.
+    pub result: Result<CtfExponentialObservation, CtfFirstExponentialUnavailable>,
+}
+
+/// Borrow the actual first assembly and invoke the accepted pure helper once.
+///
+/// The caller supplies its existing construction-owned first assembly. AMat,
+/// IdenMatrix, rcmax and the entire attempt context are passed unchanged. This
+/// API never regenerates identity, selects a timestep or executes assembly.
+/// The future combined caller must invoke exponential before inverse, as in
+/// Construction.cc 884 then 887; this module does not activate a cache driver.
+pub fn initialize_construction_ctf_first_exponential(
+    assembly: &ConstructionCtfFirstAssembly,
+) -> ConstructionCtfFirstExponential {
+    use CtfFirstExponentialUnavailable as Unavailable;
+
+    let result = (|| {
+        let observation = assembly
+            .result
+            .as_ref()
+            .map_err(|reason| Unavailable::FirstAssemblyUnavailable(*reason))?;
+        let reached = match observation {
+            CtfAssemblyObservation::Unavailable(reason) => {
+                return Err(Unavailable::AssemblyUnavailable(*reason));
+            }
+            CtfAssemblyObservation::Assembled(reached) => reached,
+        };
+        if reached.context.construction_id != assembly.construction_id {
+            return Err(Unavailable::ConstructionIdentityMismatch);
+        }
+        if reached.context.route != CtfAssemblyRoute::Assemble {
+            return Err(Unavailable::AssemblyRouteMismatch);
+        }
+        if reached.context.attempt_ordinal != 1 {
+            return Err(Unavailable::NotFirstAttempt(
+                reached.context.attempt_ordinal,
+            ));
+        }
+        calculate_selected_ctf_matrix_exponential(
+            CtfExponentialInput {
+                rcmax: reached.rcmax,
+                a_mat: &reached.a_mat,
+                iden_matrix: &reached.iden_matrix,
+            },
+            reached.context,
+        )
+        .map_err(Unavailable::ExponentialScope)
+    })();
+    ConstructionCtfFirstExponential {
+        construction_id: assembly.construction_id,
+        result,
+    }
+}
+
+#[cfg(test)]
+#[path = "ctf_first_exponential_owner_tests.rs"]
+mod tests;

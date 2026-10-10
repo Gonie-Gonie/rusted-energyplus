@@ -1,0 +1,29 @@
+    Checking ep_runtime v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_runtime)
+error: `panic` should not be present in production code
+  --> crates\ep_runtime\src\heat_balance\ctf_first_exponential_owner_tests.rs:49:51
+   |
+49 |         CtfAssemblyObservation::Unavailable(_) => panic!("test setup must have actual assembly"),
+   |                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.96.0/index.html#panic
+   = note: requested on the command line with `-D clippy::panic`
+
+error: `panic` should not be present in production code
+  --> crates\ep_runtime\src\heat_balance\ctf_first_exponential_owner_tests.rs:61:13
+   |
+61 |             panic!("first selected result cannot be unavailable")
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.96.0/index.html#panic
+
+error: `panic` should not be present in production code
+  --> crates\ep_runtime\src\heat_balance\ctf_first_exponential_owner_tests.rs:74:51
+   |
+74 |         CtfAssemblyObservation::Unavailable(_) => panic!("actual test assembly"),
+   |                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.96.0/index.html#panic
+
+    Checking ep_run v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_run)
+    Checking ep_cli v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_cli)
+error: could not compile `ep_runtime` (lib test) due to 3 previous errors

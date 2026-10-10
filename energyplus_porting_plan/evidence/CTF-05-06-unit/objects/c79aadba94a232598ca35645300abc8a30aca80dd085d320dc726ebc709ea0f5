@@ -1,0 +1,73 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\ctf06_candidate_unit_observer.exe",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-06\\frozen-packet-01\\helper-request.json",
+    "a1351d421228b39f7fcce969b2274503a9848cbcaf95e30f0b03c73b120712a1",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-06\\frozen-packet-01\\native-admission-contract.json",
+    "880fea8f293d7437b9344af23001e41c4983c5ff0f05bd70bb6d463365f05f78",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-06\\candidate-unit-inputs-01\\source-bindings.json"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-10T18:21:59.068674+00:00",
+  "finished_utc": "2026-10-10T18:22:09.546313+00:00",
+  "elapsed_seconds": 10.477729799982626,
+  "repository_before": {
+    "head": "d9defe30905337e98004f1ea40dd3c9224e19fc2",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/heat_balance/initialization/state_shell.rs\u0000 M crates/ep_runtime/src/heat_balance/mod.rs\u0000 M crates/ep_runtime/src/heat_balance/state.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs\u0000?? crates/ep_run/examples/ctf06_candidate_production_observer.rs\u0000?? crates/ep_run/examples/ctf06_candidate_production_support/\u0000?? crates/ep_run/examples/ctf06_candidate_unit_observer.rs\u0000?? crates/ep_run/examples/ctf06_candidate_unit_support/\u0000?? crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix/\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix/\u0000"
+  },
+  "repository_after": {
+    "head": "d9defe30905337e98004f1ea40dd3c9224e19fc2",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/heat_balance/initialization/state_shell.rs\u0000 M crates/ep_runtime/src/heat_balance/mod.rs\u0000 M crates/ep_runtime/src/heat_balance/state.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs\u0000?? crates/ep_run/examples/ctf06_candidate_production_observer.rs\u0000?? crates/ep_run/examples/ctf06_candidate_production_support/\u0000?? crates/ep_run/examples/ctf06_candidate_unit_observer.rs\u0000?? crates/ep_run/examples/ctf06_candidate_unit_support/\u0000?? crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix/\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix/\u0000"
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/0e/0e7cbb48fbacb668fff054aa9248ee9db5462cee1b0d6c322b70bcf7fa9ec483",
+    "sha256": "0e7cbb48fbacb668fff054aa9248ee9db5462cee1b0d6c322b70bcf7fa9ec483"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CTF-06/candidate-unit-command-01/stdout.log",
+    "sha256": "f68693503da8b82a2e7069ae5d1f9e8d6fd55012326079576b609a6028aea8cc"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CTF-06/candidate-unit-command-01/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-10T18:22:09.546313+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

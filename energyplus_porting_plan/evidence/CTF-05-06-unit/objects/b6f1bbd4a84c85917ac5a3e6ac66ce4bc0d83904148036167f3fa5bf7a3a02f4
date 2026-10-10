@@ -1,0 +1,62 @@
+--- accepted/crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs
++++ crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs
+@@ -127,7 +127,9 @@
+         .ok()
+         .filter(|&n| n > 0)
+         .ok_or(CtfExponentialScopeError::Dimension(input.rcmax))?;
+-    let size = n.checked_mul(n).ok_or(CtfExponentialScopeError::MatrixShape)?;
++    let size = n
++        .checked_mul(n)
++        .ok_or(CtfExponentialScopeError::MatrixShape)?;
+     if input.a_mat.len() != size || input.iden_matrix.len() != size {
+         return Err(CtfExponentialScopeError::MatrixShape);
+     }
+@@ -228,29 +230,29 @@
+             break;
+         }
+     }
+-    Ok(CtfExponentialObservation::Exponential(Box::new(CtfExponentialMatrix {
+-        context,
+-        rcmax: input.rcmax,
+-        a_mat_row_norm_max,
+-        k,
+-        fact,
+-        check_val,
+-        l,
+-        final_power_i: i,
+-        power_steps,
+-        square_steps,
+-        a_mat1,
+-        a_mato,
+-        a_mat_n,
+-        a_exp,
+-    })))
++    Ok(CtfExponentialObservation::Exponential(Box::new(
++        CtfExponentialMatrix {
++            context,
++            rcmax: input.rcmax,
++            a_mat_row_norm_max,
++            k,
++            fact,
++            check_val,
++            l,
++            final_power_i: i,
++            power_steps,
++            square_steps,
++            a_mat1,
++            a_mato,
++            a_mat_n,
++            a_exp,
++        },
++    )))
+ }
+ 
+ fn source_i32(value: f64) -> Option<i32> {
+     let truncated = value.trunc();
+-    if !truncated.is_finite()
+-        || truncated < f64::from(i32::MIN)
+-        || truncated > f64::from(i32::MAX)
++    if !truncated.is_finite() || truncated < f64::from(i32::MIN) || truncated > f64::from(i32::MAX)
+     {
+         return None;
+     }

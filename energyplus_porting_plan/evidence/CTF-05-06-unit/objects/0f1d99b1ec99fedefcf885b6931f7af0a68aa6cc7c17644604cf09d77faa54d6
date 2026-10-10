@@ -1,0 +1,14 @@
+--- accepted/crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs
++++ crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs
+@@ -25,7 +25,10 @@
+ 
+ impl std::fmt::Display for PriorExponentialUnavailable {
+     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+-        write!(formatter, "inverse not invoked after first exponential: {self:?}")
++        write!(
++            formatter,
++            "inverse not invoked after first exponential: {self:?}"
++        )
+     }
+ }
+ 

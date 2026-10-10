@@ -1,0 +1,538 @@
+{
+  "schema": "ctf05-ctf06-actual-selected-first-exponential-inverse-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-05-06-unit/manifest.json",
+    "sha256": "cc4e8e9a09400a010fe01ef767befc5b46cb662ccb529e16a5494c4d0cb744a5",
+    "size_bytes": 478747
+  },
+  "prior_actual_Original_and_unchanged_Rust_baseline": {
+    "path": "energyplus_porting_plan/evidence/CTF-05-06-original-baseline/summary.json",
+    "sha256": "bd260fdd353512b841e631abb44bb22dcaeb119d521d96dc9f5dd5ab7ab9ae62",
+    "size_bytes": 13107
+  },
+  "actual_applied_source": {
+    "path": ".runtime/porting/CTF-06/applied-final-source-02/manifest.json",
+    "sha256": "f0a529c58db5483369b1337a2a10a4d790b7459b3704b5abd82e638ef215b963",
+    "size_bytes": 27093
+  },
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/0e/0e7cbb48fbacb668fff054aa9248ee9db5462cee1b0d6c322b70bcf7fa9ec483",
+    "sha256": "0e7cbb48fbacb668fff054aa9248ee9db5462cee1b0d6c322b70bcf7fa9ec483"
+  },
+  "actual_Cargo_build": {
+    "path": ".runtime/porting/CTF-06/candidate-build-command-01/receipt.json",
+    "sha256": "18a612feab4cf168947b72acf17887a0a4774c0fdc082eb3dc641bd90209fe01",
+    "size_bytes": 8686
+  },
+  "actual_unit_execution": {
+    "path": ".runtime/porting/CTF-06/candidate-unit-command-01/receipt.json",
+    "sha256": "c79aadba94a232598ca35645300abc8a30aca80dd085d320dc726ebc709ea0f5",
+    "size_bytes": 5971
+  },
+  "actual_production_execution": {
+    "path": ".runtime/porting/CTF-06/candidate-production-command-01/receipt.json",
+    "sha256": "915bbc3cfbcaf94c02dc5c913b564039b6f1bf3fdbebf13edf7f73519f5a2495",
+    "size_bytes": 5637
+  },
+  "actual_unit_comparison": {
+    "path": ".runtime/porting/CTF-06/unit-comparison-01/comparison.json",
+    "sha256": "8496fdf2f1bfc1ba56913b953abdb6d65d0a4778acd9d49e2d00481ab7526a1a",
+    "size_bytes": 6956714
+  },
+  "actual_unit_comparison_execution": {
+    "path": ".runtime/porting/CTF-06/unit-comparison-command-01/receipt.json",
+    "sha256": "115c8b53ddb7dcba12a4361a2b0bf748869cc7f596da5c4dfd98e5496a562b73",
+    "size_bytes": 6392
+  },
+  "actual_production_comparison": {
+    "path": ".runtime/porting/CTF-06/production-comparison-01/comparison.json",
+    "sha256": "b73f1a0616d5a8fa0fafc3b4071a9c2ab5e066403c52bd23048d1b04a21a87b6",
+    "size_bytes": 421303
+  },
+  "actual_production_comparison_execution": {
+    "path": ".runtime/porting/CTF-06/production-comparison-command-01/receipt.json",
+    "sha256": "8ab6b4870fbe5baf0b88ca252690028d1856d174535c42da8f9157a241730840",
+    "size_bytes": 6777
+  },
+  "unit": {
+    "status": "pass-selected-first-exponential-and-inverse",
+    "numeric_comparisons": 157300,
+    "discrete_comparisons": 721458,
+    "mismatch_count": 0,
+    "primary9_metrics": {
+      "CTF06.AExp": {
+        "count": 19625,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.final_AMat1": {
+        "count": 19625,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.final_AMato": {
+        "count": 19625,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.final_AMatN": {
+        "count": 19625,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.AMatRowNormMax": {
+        "count": 25,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.fact": {
+        "count": 25,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.CheckVal": {
+        "count": 25,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF05.AInv": {
+        "count": 19625,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF05.final_AMat1": {
+        "count": 19625,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "assembly7_handoff_metrics": {
+      "AMat": {
+        "count": 19625,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "IdenMatrix": {
+        "count": 19625,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "BMat": {
+        "count": 75,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CMat": {
+        "count": 50,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "DMat": {
+        "count": 50,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "assembly_CTFTimeStep": {
+        "count": 25,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "caller_TimeStepZone": {
+        "count": 25,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "unavailable_observation_count": 88,
+    "unavailable_counted_as_PASS": false,
+    "actual_method_observation_counts": {
+      "method_whole_call_records": 42,
+      "method_uninvoked_whole_call_records": 0,
+      "actual_exponential_observation_counts": {
+        "actual_invocation_count": 41,
+        "actual_retained_invocation_count": 41,
+        "actual_stage_callback_counts": [
+          41,
+          41,
+          41,
+          3154,
+          469,
+          41,
+          41
+        ],
+        "stage_records_omitted": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "failure_event_counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "actual_retained_power_control_count": 3154,
+        "actual_retained_square_control_count": 469,
+        "method_copy_integrity_failed": false,
+        "complete_method_return_parity_claimed": false,
+        "numerical_PASS_claimed": false
+      },
+      "exponential_selected_first_invocation_count": 25,
+      "exponential_later_unpaired_invocation_count": 16,
+      "exponential_actual_return_marker_count": 41,
+      "actual_inverse_observation_counts": {
+        "actual_invocation_count": 41,
+        "actual_retained_invocation_count": 41,
+        "actual_stage_callback_counts": [
+          41,
+          41,
+          0,
+          0,
+          0,
+          41,
+          41
+        ],
+        "stage_records_omitted": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "failure_event_counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "actual_retained_power_control_count": 0,
+        "actual_retained_square_control_count": 0,
+        "method_copy_integrity_failed": false,
+        "complete_method_return_parity_claimed": false,
+        "numerical_PASS_claimed": false
+      },
+      "inverse_selected_first_invocation_count": 25,
+      "inverse_later_unpaired_invocation_count": 16,
+      "inverse_actual_return_marker_count": 41
+    }
+  },
+  "fixed15_production": {
+    "status": "pass-selected-loader-to-first-exponential-and-inverse",
+    "numeric_comparisons": 3180,
+    "discrete_comparisons": 19328,
+    "mismatch_count": 0,
+    "primary9_metrics": {
+      "CTF06.AExp": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.final_AMat1": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.final_AMato": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.final_AMatN": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.AMatRowNormMax": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.fact": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.CheckVal": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF05.AInv": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF05.final_AMat1": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "assembly7_handoff_metrics": {
+      "AMat": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "IdenMatrix": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "BMat": {
+        "count": 45,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CMat": {
+        "count": 30,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "DMat": {
+        "count": 30,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "assembly_CTFTimeStep": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "caller_TimeStepZone": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "unavailable_observation_count": 30,
+    "unavailable_counted_as_PASS": false,
+    "actual_method_observation_counts": {
+      "method_whole_call_records": 21,
+      "method_uninvoked_whole_call_records": 0,
+      "actual_exponential_observation_counts": {
+        "actual_invocation_count": 15,
+        "actual_retained_invocation_count": 15,
+        "actual_stage_callback_counts": [
+          15,
+          15,
+          15,
+          213,
+          60,
+          15,
+          15
+        ],
+        "stage_records_omitted": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "failure_event_counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "actual_retained_power_control_count": 213,
+        "actual_retained_square_control_count": 60,
+        "method_copy_integrity_failed": false,
+        "complete_method_return_parity_claimed": false,
+        "numerical_PASS_claimed": false
+      },
+      "exponential_selected_first_invocation_count": 15,
+      "exponential_later_unpaired_invocation_count": 0,
+      "exponential_actual_return_marker_count": 15,
+      "actual_inverse_observation_counts": {
+        "actual_invocation_count": 15,
+        "actual_retained_invocation_count": 15,
+        "actual_stage_callback_counts": [
+          15,
+          15,
+          0,
+          0,
+          0,
+          15,
+          15
+        ],
+        "stage_records_omitted": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "failure_event_counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "actual_retained_power_control_count": 0,
+        "actual_retained_square_control_count": 0,
+        "method_copy_integrity_failed": false,
+        "complete_method_return_parity_claimed": false,
+        "numerical_PASS_claimed": false
+      },
+      "inverse_selected_first_invocation_count": 15,
+      "inverse_later_unpaired_invocation_count": 0,
+      "inverse_actual_return_marker_count": 15
+    }
+  },
+  "quality": {
+    "workspace_tests_before_test_only_lint_correction": {
+      "execution": {
+        "path": ".runtime/porting/CTF-06/quality-tests-command-01/receipt.json",
+        "sha256": "ed6eef64bae005fa29592cb4820eb23b2dafa6ec6d07bea4c917fbb28ae3a091",
+        "size_bytes": 5359
+      },
+      "passed": 4709,
+      "failed": 0,
+      "ignored": 0,
+      "snapshot_sha256": "0c0ef2d51f45f1f3522b3b79e603ffb0fbafbf71ea9a510141444f4eda9e310c"
+    },
+    "focused_ctf_tests_before_test_only_correction": {
+      "execution": {
+        "path": ".runtime/porting/CTF-06/matrix-functions-tests-command-01/receipt.json",
+        "sha256": "98bb82c52dbb943aac44adc6cd5abca7281acde446d82df702df28403e779807",
+        "size_bytes": 5390
+      },
+      "passed": 93
+    },
+    "test_only_lint_correction": {
+      "path": ".runtime/porting/CTF-06/test-lint-fix-prep-01/manifest.json",
+      "sha256": "bf773e6dd21919ba054ef464054f4baf25221b0383021ee91a8ffc8c41e7f427",
+      "size_bytes": 1301
+    },
+    "focused_changed_tests_final_source": {
+      "execution": {
+        "path": ".runtime/porting/CTF-06/owner-tests-command-02/receipt.json",
+        "sha256": "258d3bab0f97c28dcfdea3e15f33394f6d566c0aa88b3e194710df8c0f902df3",
+        "size_bytes": 5412
+      },
+      "passed": 6,
+      "failed": 0
+    },
+    "final_Clippy": {
+      "path": ".runtime/porting/CTF-06/quality-clippy-command-02/receipt.json",
+      "sha256": "a8749e942a0f9fa54ced152d7f15dd1eec2ad8ba24403f917ac2080e4277f6c3",
+      "size_bytes": 5400
+    },
+    "final_fmt": {
+      "path": ".runtime/porting/CTF-06/quality-fmt-command-01/receipt.json",
+      "sha256": "75b8b51d11ca6062043d1b2a7d0f6fdedc306b66ac34262af063439bc3adcb9c",
+      "size_bytes": 5336
+    },
+    "failed_first_Clippy_preserved": {
+      "path": ".runtime/porting/CTF-06/quality-clippy-command-01/receipt.json",
+      "sha256": "c7ef615c61acbc98b17ea946849fdd14f809f07213c1f74fc9ce7314acd786b1",
+      "size_bytes": 5400
+    }
+  },
+  "source_review": {
+    "Root_and_other_author_FULL_before_application": true,
+    "Root_and_Base_full_formatter_correspondence_before_tests": true,
+    "Root_and_Header_test_only_fix_review_before_execution": true,
+    "test_only_correction_changes_math_or_production": false
+  },
+  "selected_unit_and_fixed15_first_method_PASS_claimed": true,
+  "inherited_profiles_kept_separate": {
+    "assembly": 7,
+    "initial": 3,
+    "preprocessing": 18
+  },
+  "only_selected_first_no_source_1D_invocations_paired": true,
+  "later_Native_visits_or_unavailable_context_counted_as_PASS": false,
+  "complete_CTF05_PASS_claimed": false,
+  "complete_CTF06_PASS_claimed": false,
+  "retry_driver_or_final_coefficient_handoff_certified": false,
+  "fixed6_CLI_for_this_source_completed": false,
+  "integration_gate_pass_claimed": false,
+  "production_gate_pass_claimed": false,
+  "Original_binaries_retained_pending_separate_actual_retention": true,
+  "Root_authored_summary_is_not_command_recorder_output": true,
+  "full_actual_Native_and_Rust_scientific_bytes_archived_with_verified_gzip_roundtrip": true
+}

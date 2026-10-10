@@ -1,0 +1,12 @@
+--- accepted/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
++++ crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
+@@ -142,7 +142,8 @@
+             );
+             // Same original first assembly: real06 must return before real05.
+             // The combined owner retains a typed non-invocation on prior failure.
+-            let first_functions = initialize_construction_ctf_first_matrix_functions(&first_assembly);
++            let first_functions =
++                initialize_construction_ctf_first_matrix_functions(&first_assembly);
+             first_exponentials.push(first_functions.exponential);
+             first_inverses.push(first_functions.inverse);
+             first_assemblies.push(first_assembly);

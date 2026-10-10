@@ -1,0 +1,11 @@
+
+running 6 tests
+test heat_balance::ctf_first_exponential_owner::tests::all_actual_unreached_assembly_routes_remain_unavailable ... ok
+test heat_balance::ctf_first_exponential_owner::tests::first_result_preserves_actual_context_and_immutable_input_owners ... ok
+test heat_balance::ctf_first_exponential_owner::tests::actual_stored_identity_is_borrowed_without_reconstruction ... ok
+test heat_balance::ctf_first_exponential_owner::tests::pure_scope_and_actual_matrix_shape_stops_remain_explicit ... ok
+test heat_balance::ctf_first_exponential_owner::tests::stale_construction_and_later_attempt_contexts_do_not_publish_results ... ok
+test heat_balance::ctf_first_exponential_owner::tests::unavailable_first_assembly_reason_is_preserved_without_a_work_owner ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 3067 filtered out; finished in 0.00s
+

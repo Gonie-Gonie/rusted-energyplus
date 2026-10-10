@@ -1,0 +1,26 @@
+--- accepted/crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix/tests.rs
++++ crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix/tests.rs
+@@ -19,8 +19,8 @@
+     // Independent residual check, using the actual row-first input orientation.
+     for row in 0..2 {
+         for column in 0..2 {
+-            let residual = a[row * 2] * output.a_inv[column]
+-                + a[row * 2 + 1] * output.a_inv[2 + column];
++            let residual =
++                a[row * 2] * output.a_inv[column] + a[row * 2 + 1] * output.a_inv[2 + column];
+             assert_eq!(residual, if row == column { 1.0 } else { 0.0 });
+         }
+     }
+@@ -110,8 +110,10 @@
+             Err(CtfInverseScopeError::Dimension(rcmax))
+         );
+     }
+-    for (a, identity) in [(&[1.0][..], &[1.0, 0.0, 0.0, 1.0][..]),
+-        (&[1.0, 0.0, 0.0, 1.0][..], &[1.0][..])] {
++    for (a, identity) in [
++        (&[1.0][..], &[1.0, 0.0, 0.0, 1.0][..]),
++        (&[1.0, 0.0, 0.0, 1.0][..], &[1.0][..]),
++    ] {
+         assert_eq!(
+             invert_selected_ctf_matrix(CtfInverseInput {
+                 rcmax: 2,

@@ -1,0 +1,34 @@
+--- accepted/crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs
++++ crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs
+@@ -64,7 +64,9 @@
+     use CtfFirstInverseUnavailable as Unavailable;
+ 
+     let result = (|| {
+-        let observed = assembly.result.as_ref()
++        let observed = assembly
++            .result
++            .as_ref()
+             .map_err(|reason| Unavailable::FirstAssemblyUnavailable(*reason))?;
+         let actual = match observed {
+             CtfAssemblyObservation::Unavailable(reason) => {
+@@ -90,10 +92,17 @@
+             rcmax: actual.rcmax,
+             a_mat: &actual.a_mat,
+             iden_matrix: &actual.iden_matrix,
+-        }).map_err(Unavailable::InverseScope)?;
+-        Ok(CtfFirstInverse { context: actual.context, inverse })
++        })
++        .map_err(Unavailable::InverseScope)?;
++        Ok(CtfFirstInverse {
++            context: actual.context,
++            inverse,
++        })
+     })();
+-    ConstructionCtfFirstInverse { construction_id: assembly.construction_id, result }
++    ConstructionCtfFirstInverse {
++        construction_id: assembly.construction_id,
++        result,
++    }
+ }
+ 
+ #[cfg(test)]

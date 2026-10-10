@@ -1,0 +1,185 @@
+--- accepted/crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner_tests.rs
++++ crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner_tests.rs
+@@ -20,13 +20,27 @@
+         num_histories: 2,
+     };
+     let layers = [CtfNormalizedLayer {
+-        dl: 0.5, rk: 0.125, rho: 32.0, cp: 0.25, lr: 4.0, res_layer: false,
++        dl: 0.5,
++        rk: 0.125,
++        rho: 32.0,
++        cp: 0.25,
++        lr: 4.0,
++        res_layer: false,
+     }];
+     let observation = assemble_1d_ctf_state_space(
+-        CtfAssemblyInput { layers: &layers, nodes: &[6], dx: &[0.125], rcmax: 5 },
++        CtfAssemblyInput {
++            layers: &layers,
++            nodes: &[6],
++            dx: &[0.125],
++            rcmax: 5,
++        },
+         context,
+-    ).expect("literal actual assembly inputs are selected");
+-    ConstructionCtfFirstAssembly { construction_id: context.construction_id, result: Ok(observation) }
++    )
++    .expect("literal actual assembly inputs are selected");
++    ConstructionCtfFirstAssembly {
++        construction_id: context.construction_id,
++        result: Ok(observation),
++    }
+ }
+ 
+ fn reached_mut(owner: &mut ConstructionCtfFirstAssembly) -> &mut CtfStateSpaceAssembly {
+@@ -37,9 +51,15 @@
+ }
+ 
+ fn exponential(owner: &ConstructionCtfFirstExponential) -> &CtfExponentialMatrix {
+-    match owner.result.as_ref().expect("selected first exponential exists") {
++    match owner
++        .result
++        .as_ref()
++        .expect("selected first exponential exists")
++    {
+         CtfExponentialObservation::Exponential(reached) => reached,
+-        CtfExponentialObservation::Unavailable(_) => panic!("first selected result cannot be unavailable"),
++        CtfExponentialObservation::Unavailable(_) => {
++            panic!("first selected result cannot be unavailable")
++        }
+     }
+ }
+ 
+@@ -78,21 +98,38 @@
+ 
+ #[test]
+ fn unavailable_first_assembly_reason_is_preserved_without_a_work_owner() {
+-    let reason = CtfFirstAssemblyUnavailable::InitialUnavailable(CtfInitialUnavailable::UnusedConstruction);
+-    let assembly = ConstructionCtfFirstAssembly { construction_id: ConstructionId(3), result: Err(reason) };
++    let reason =
++        CtfFirstAssemblyUnavailable::InitialUnavailable(CtfInitialUnavailable::UnusedConstruction);
++    let assembly = ConstructionCtfFirstAssembly {
++        construction_id: ConstructionId(3),
++        result: Err(reason),
++    };
+     let output = initialize_construction_ctf_first_exponential(&assembly);
+     assert_eq!(output.construction_id, ConstructionId(3));
+-    assert_eq!(output.result, Err(CtfFirstExponentialUnavailable::FirstAssemblyUnavailable(reason)));
++    assert_eq!(
++        output.result,
++        Err(CtfFirstExponentialUnavailable::FirstAssemblyUnavailable(
++            reason
++        ))
++    );
+ }
+ 
+ #[test]
+ fn all_actual_unreached_assembly_routes_remain_unavailable() {
+-    for reason in [CtfAssemblyUnavailable::UnusedConstruction, CtfAssemblyUnavailable::LoadingError,
+-        CtfAssemblyUnavailable::AllResistive, CtfAssemblyUnavailable::ReversedConstructionReuse] {
+-        let assembly = ConstructionCtfFirstAssembly { construction_id: ConstructionId(4),
+-            result: Ok(CtfAssemblyObservation::Unavailable(reason)) };
+-        assert_eq!(initialize_construction_ctf_first_exponential(&assembly).result,
+-            Err(CtfFirstExponentialUnavailable::AssemblyUnavailable(reason)));
++    for reason in [
++        CtfAssemblyUnavailable::UnusedConstruction,
++        CtfAssemblyUnavailable::LoadingError,
++        CtfAssemblyUnavailable::AllResistive,
++        CtfAssemblyUnavailable::ReversedConstructionReuse,
++    ] {
++        let assembly = ConstructionCtfFirstAssembly {
++            construction_id: ConstructionId(4),
++            result: Ok(CtfAssemblyObservation::Unavailable(reason)),
++        };
++        assert_eq!(
++            initialize_construction_ctf_first_exponential(&assembly).result,
++            Err(CtfFirstExponentialUnavailable::AssemblyUnavailable(reason))
++        );
+     }
+ }
+ 
+@@ -100,37 +137,67 @@
+ fn stale_construction_and_later_attempt_contexts_do_not_publish_results() {
+     let mut assembly = first_assembly();
+     assembly.construction_id = ConstructionId(8);
+-    assert_eq!(initialize_construction_ctf_first_exponential(&assembly).result,
+-        Err(CtfFirstExponentialUnavailable::ConstructionIdentityMismatch));
++    assert_eq!(
++        initialize_construction_ctf_first_exponential(&assembly).result,
++        Err(CtfFirstExponentialUnavailable::ConstructionIdentityMismatch)
++    );
+     for ordinal in [0, 2, 3] {
+         let mut assembly = first_assembly();
+         reached_mut(&mut assembly).context.attempt_ordinal = ordinal;
+-        assert_eq!(initialize_construction_ctf_first_exponential(&assembly).result,
+-            Err(CtfFirstExponentialUnavailable::NotFirstAttempt(ordinal)));
++        assert_eq!(
++            initialize_construction_ctf_first_exponential(&assembly).result,
++            Err(CtfFirstExponentialUnavailable::NotFirstAttempt(ordinal))
++        );
+     }
+     let mut assembly = first_assembly();
+-    reached_mut(&mut assembly).context.route = CtfAssemblyRoute::Unavailable(CtfAssemblyUnavailable::AllResistive);
+-    assert_eq!(initialize_construction_ctf_first_exponential(&assembly).result,
+-        Err(CtfFirstExponentialUnavailable::AssemblyRouteMismatch));
++    reached_mut(&mut assembly).context.route =
++        CtfAssemblyRoute::Unavailable(CtfAssemblyUnavailable::AllResistive);
++    assert_eq!(
++        initialize_construction_ctf_first_exponential(&assembly).result,
++        Err(CtfFirstExponentialUnavailable::AssemblyRouteMismatch)
++    );
+ }
+ 
+ #[test]
+ fn pure_scope_and_actual_matrix_shape_stops_remain_explicit() {
+     let cases: [(fn(&mut CtfStateSpaceAssembly), CtfExponentialScopeError); 5] = [
+-        (|owner| { let _ = owner.a_mat.pop(); }, CtfExponentialScopeError::MatrixShape),
+-        (|owner| owner.iden_matrix.clear(), CtfExponentialScopeError::MatrixShape),
+-        (|owner| owner.rcmax = 0, CtfExponentialScopeError::Dimension(0)),
+-        (|owner| owner.context.source_sink_present = true, CtfExponentialScopeError::InternalSource),
+-        (|owner| owner.context.solution_dimensions = 2, CtfExponentialScopeError::UnsupportedDimensions(2)),
++        (
++            |owner| {
++                let _ = owner.a_mat.pop();
++            },
++            CtfExponentialScopeError::MatrixShape,
++        ),
++        (
++            |owner| owner.iden_matrix.clear(),
++            CtfExponentialScopeError::MatrixShape,
++        ),
++        (
++            |owner| owner.rcmax = 0,
++            CtfExponentialScopeError::Dimension(0),
++        ),
++        (
++            |owner| owner.context.source_sink_present = true,
++            CtfExponentialScopeError::InternalSource,
++        ),
++        (
++            |owner| owner.context.solution_dimensions = 2,
++            CtfExponentialScopeError::UnsupportedDimensions(2),
++        ),
+     ];
+     for (mutate, expected) in cases {
+         let mut assembly = first_assembly();
+         mutate(reached_mut(&mut assembly));
+-        assert_eq!(initialize_construction_ctf_first_exponential(&assembly).result,
+-            Err(CtfFirstExponentialUnavailable::ExponentialScope(expected)));
++        assert_eq!(
++            initialize_construction_ctf_first_exponential(&assembly).result,
++            Err(CtfFirstExponentialUnavailable::ExponentialScope(expected))
++        );
+     }
+     let mut assembly = first_assembly();
+     reached_mut(&mut assembly).context.node_source = 1;
+-    assert_eq!(initialize_construction_ctf_first_exponential(&assembly).result,
+-        Err(CtfFirstExponentialUnavailable::ExponentialScope(CtfExponentialScopeError::SourceNodeState)));
+-}
++    assert_eq!(
++        initialize_construction_ctf_first_exponential(&assembly).result,
++        Err(CtfFirstExponentialUnavailable::ExponentialScope(
++            CtfExponentialScopeError::SourceNodeState
++        ))
++    );
++}

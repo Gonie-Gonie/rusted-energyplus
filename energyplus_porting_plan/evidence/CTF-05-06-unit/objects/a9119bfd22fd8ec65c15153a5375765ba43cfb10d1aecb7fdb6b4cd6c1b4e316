@@ -1,0 +1,25 @@
+--- accepted/crates/ep_run/examples/ctf06_candidate_unit_observer.rs
++++ crates/ep_run/examples/ctf06_candidate_unit_observer.rs
+@@ -6,8 +6,8 @@
+ 
+ use ep_model::{Construction, ConstructionId, ConstructionKind, MaterialId, NormalizedName};
+ use ep_runtime::heat_balance::ctf_first_assembly_owner::initialize_construction_ctf_first_assembly;
++use ep_runtime::heat_balance::ctf_first_matrix_owner::initialize_construction_ctf_first_matrix_functions;
+ use ep_runtime::heat_balance::ctf_initial_owner::initialize_construction_ctf_initial;
+-use ep_runtime::heat_balance::ctf_first_matrix_owner::initialize_construction_ctf_first_matrix_functions;
+ use ep_runtime::heat_balance::surface_manager::ctf_layer_preprocessing::{
+     ConstructionCtfLayerPreprocessing, CtfLayerContext, CtfLayerInput, preprocess_ctf_layers,
+ };
+@@ -347,7 +347,11 @@
+         require(admission[key] == request[key], "scope pair differs")?;
+         bindings.push(request[key].clone());
+     }
+-    require(request["actual_scope_amendment_executions"] == admission["actual_scope_amendment_executions"], "both real card check mappings differ")?;
++    require(
++        request["actual_scope_amendment_executions"]
++            == admission["actual_scope_amendment_executions"],
++        "both real card check mappings differ",
++    )?;
+     for card in ["CTF-05", "CTF-06"] {
+         bindings.push(request["actual_scope_amendment_executions"][card].clone());
+     }
