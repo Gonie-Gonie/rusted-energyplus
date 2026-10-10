@@ -10349,6 +10349,11 @@
         "path": "energyplus_porting_plan/evidence/CTF-05-06-unit/summary.json",
         "sha256": "80670a91b1c5d8087cf2e2229e633c80dd4ab5f6ab61d85899769b385935816a",
         "size_bytes": 16534
+      },
+      "actual_fixed6_production_cli": {
+        "path": "energyplus_porting_plan/evidence/CTF-05-06-production-cli/summary.json",
+        "sha256": "809c5b3ab05df720cdc4ea46d9b446c6461a588d6d9b2a55f111c16d446eb76b",
+        "size_bytes": 4306
       }
     },
     {
@@ -10704,6 +10709,11 @@
         "path": "energyplus_porting_plan/evidence/CTF-05-06-unit/summary.json",
         "sha256": "80670a91b1c5d8087cf2e2229e633c80dd4ab5f6ab61d85899769b385935816a",
         "size_bytes": 16534
+      },
+      "actual_fixed6_production_cli": {
+        "path": "energyplus_porting_plan/evidence/CTF-05-06-production-cli/summary.json",
+        "sha256": "809c5b3ab05df720cdc4ea46d9b446c6461a588d6d9b2a55f111c16d446eb76b",
+        "size_bytes": 4306
       }
     },
     {

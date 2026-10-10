@@ -1,0 +1,118 @@
+{
+  "schema": "ctf05-ctf06-fixed-six-cli-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-05-06-production-cli/manifest.json",
+    "sha256": "62301c7b9aa5b9f7e73e1c1397491d6934632adf46f2f674bf1317ec0b08c8b7",
+    "size_bytes": 16936
+  },
+  "selected_first_matrix_functions_comparison": {
+    "path": "energyplus_porting_plan/evidence/CTF-05-06-unit/summary.json",
+    "sha256": "80670a91b1c5d8087cf2e2229e633c80dd4ab5f6ab61d85899769b385935816a",
+    "size_bytes": 16534
+  },
+  "actual_executions": {
+    "path": ".runtime/porting/CTF-06/production-cli-inputs-01/execution-summary.json",
+    "sha256": "3e2109b3e97121ec3e700b291ac4edfefb041f54e0c2686a5b977337f347e83b",
+    "size_bytes": 2804
+  },
+  "same_actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/0e/0e7cbb48fbacb668fff054aa9248ee9db5462cee1b0d6c322b70bcf7fa9ec483",
+    "sha256": "0e7cbb48fbacb668fff054aa9248ee9db5462cee1b0d6c322b70bcf7fa9ec483"
+  },
+  "runs": [
+    {
+      "id": "A-24H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-06/production-cli-output-01/A-24H/run-summary.json",
+        "sha256": "afa3ab450cbd32964b2e5c1a9af6b0cbdca2ab405880098429faf62dff27286e",
+        "size_bytes": 28692
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": null
+    },
+    {
+      "id": "A-72H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-06/production-cli-output-01/A-72H/run-summary.json",
+        "sha256": "5a458b42a4d577aa076b84310431634ed0230ba935ad9abe61de0bd7f2fe2406",
+        "size_bytes": 28691
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": null
+    },
+    {
+      "id": "B-NOLIMIT-24H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-06/production-cli-output-01/B-NOLIMIT-24H/run-summary.json",
+        "sha256": "8fc674a14cb32a2b64d679a7a9810db3384dcb705ab70806f25a27ec69d5878d",
+        "size_bytes": 1498421
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": false
+    },
+    {
+      "id": "B-FLOW-24H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-06/production-cli-output-01/B-FLOW-24H/run-summary.json",
+        "sha256": "f628809d0882cad71d177178dec8a7d9ac8d63806b39df613ac419e9b09400bf",
+        "size_bytes": 1498306
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": false
+    },
+    {
+      "id": "B-CAPACITY-24H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-06/production-cli-output-01/B-CAPACITY-24H/run-summary.json",
+        "sha256": "f4128f4646a4f90280198b2bbb84da0492148917543b6c91127600b074fc154c",
+        "size_bytes": 1498241
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": false
+    },
+    {
+      "id": "B-BOTH-24H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-06/production-cli-output-01/B-BOTH-24H/run-summary.json",
+        "sha256": "8bc0e9e8281f2e6a5b185295c2ec4547c7c08120034314467949e39863349d41",
+        "size_bytes": 1498716
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": false
+    }
+  ],
+  "all45_input_guards_unchanged_after": true,
+  "actual_CLI_build_used": {
+    "path": ".runtime/porting/CTF-06/production-cli-build-command-01/receipt.json",
+    "sha256": "bc3c881bda9f22b5a40e5ec4e9079173b67e48900065e55c82724302ef516a23",
+    "size_bytes": 4151
+  },
+  "numerical_equivalence_certified": false,
+  "complete_CTF05_PASS_claimed": false,
+  "complete_CTF06_PASS_claimed": false,
+  "integration_and_production_gates_remain_pending": true
+}
