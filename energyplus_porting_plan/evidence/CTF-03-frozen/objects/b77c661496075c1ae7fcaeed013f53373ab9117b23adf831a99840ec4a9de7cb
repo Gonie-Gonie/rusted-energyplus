@@ -1,0 +1,88 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime\\porting\\CTF-03\\input-writer-prep-01\\freeze_packet.py",
+    "--lane",
+    "unit",
+    "--approved-source-sha256",
+    "7db87df1d8d34f2e6b1bb022807734b55ff2d8437b5cc4217d7edf29bd0269e1",
+    "--source-manifest",
+    ".runtime/porting/CTF-03/input-writer-prep-01/manifest.json#ef1cb5e60a9e5f58a1a8c6f35eedbc79ab6c1dcef90f5921894a0371f81371d8",
+    "--native-source-manifest",
+    ".runtime/porting/CTF-03/native-helper-prep-01/manifest.json#34dad09e4e7825006cc237d3b36aa3e649f637e328bd5bf39def1c07ebe45322",
+    "--current-card",
+    "energyplus_porting_plan/cards/CTF-03.md#c8acfe5da560a14bf97f3d2b12741eea37905b7a04e56eee08559fd6c822aec7",
+    "--actual-scope-amendment",
+    ".runtime/porting/CTF-03/scope-amendment-01/amendment.json#87e91fb88589a55fb9d97fdc63f5a7c7a79f41dcd6b5de5a672795149c752714",
+    "--actual-scope-amendment-execution",
+    ".runtime/porting/CTF-03/scope-amendment-check-command-01/receipt.json#801f7dc2e645f56857bb8d880140bcc5d56777323fd2708dd2f95e7cef922d44",
+    "--output-dir",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-03\\frozen-packet-01"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-10T14:32:25.152269+00:00",
+  "finished_utc": "2026-10-10T14:32:25.890774+00:00",
+  "elapsed_seconds": 0.7384781000146177,
+  "repository_before": {
+    "head": "2d1a5cc4ba884f0abdba6981b819d56469581387",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/runtime/tests.rs\u0000 M energyplus_porting_plan/cards/CTF-02.md\u0000 M energyplus_porting_plan/cards/CTF-03.md\u0000 M energyplus_porting_plan/energyplus_porting_checklist.html\u0000 M energyplus_porting_plan/plan.json\u0000?? crates/ep_runtime/src/runtime/tests/ctf02_surface_integration.rs\u0000?? energyplus_porting_plan/evidence/CTF-02-surface-regressions/\u0000"
+  },
+  "repository_after": {
+    "head": "2d1a5cc4ba884f0abdba6981b819d56469581387",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/runtime/tests.rs\u0000 M energyplus_porting_plan/cards/CTF-02.md\u0000 M energyplus_porting_plan/cards/CTF-03.md\u0000 M energyplus_porting_plan/energyplus_porting_checklist.html\u0000 M energyplus_porting_plan/plan.json\u0000?? crates/ep_runtime/src/runtime/tests/ctf02_surface_integration.rs\u0000?? energyplus_porting_plan/evidence/CTF-02-surface-regressions/\u0000"
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/e3/e393963443f0bf45c25c0a3a83e2df8a7185024e38664523bcd1ee1e0bdcdde7",
+    "sha256": "e393963443f0bf45c25c0a3a83e2df8a7185024e38664523bcd1ee1e0bdcdde7"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CTF-03/input-freeze-command-01/stdout.log",
+    "sha256": "593f4bd42746eaacda625b50f5a7a829d0a3c707946b535bc77c2c7714b15fa6"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CTF-03/input-freeze-command-01/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-10T14:32:25.890774+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

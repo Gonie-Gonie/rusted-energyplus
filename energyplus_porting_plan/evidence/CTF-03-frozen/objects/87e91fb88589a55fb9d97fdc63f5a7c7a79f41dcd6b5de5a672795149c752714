@@ -1,0 +1,68 @@
+{
+  "schema": "ctf03-source-scope-amendment.v1",
+  "card": "CTF-03",
+  "created_utc": "2026-10-10T14:31:37.359848+00:00",
+  "purpose": "Actual Root-authored initial-phase source scope and exact profiles before any CTF03 configure/compile/helper or Rust candidate application; recorder validates documents and does not author this amendment.",
+  "native_observer": {
+    "path": ".runtime/porting/CTF-03/native-helper-prep-01/manifest.json",
+    "sha256": "34dad09e4e7825006cc237d3b36aa3e649f637e328bd5bf39def1c07ebe45322",
+    "size_bytes": 35224
+  },
+  "initial_policy_source_inventory": {
+    "path": ".runtime/porting/CTF-03/native-helper-prep-01/projection-policy-proposal.json",
+    "sha256": "3a7777be0fa9dca428fdc287db38f242507b0a0e405b35b2cd6f893103b4af76",
+    "size_bytes": 5214
+  },
+  "scope_review_passed": true,
+  "all_other_gates_pending": true,
+  "strict_profiles_settled_before_outputs": true,
+  "actual_CTF03_build_or_engine_execution_performed": false,
+  "requested_counts": {
+    "unit": {
+      "model_cases": 39,
+      "calculateTransferFunction": 42
+    },
+    "production": {
+      "model_cases": 15,
+      "loader_phase_records": 195
+    }
+  },
+  "before_documents": [
+    {
+      "path": ".runtime/porting/CTF-03/scope-amendment-01/before-card.md",
+      "sha256": "9f5e99ba92e6ef018c7a1f4e4dee075c86ad7d6b35d24b7db368b0e5c57f1847",
+      "size_bytes": 2779
+    },
+    {
+      "path": ".runtime/porting/CTF-03/scope-amendment-01/before-plan.json",
+      "sha256": "3a68b004d278bfa0386b7d4d696bb331f7062558c07487df38a3e23140e65c77",
+      "size_bytes": 624013
+    }
+  ],
+  "after_documents": [
+    {
+      "path": "energyplus_porting_plan/cards/CTF-03.md",
+      "sha256": "c8acfe5da560a14bf97f3d2b12741eea37905b7a04e56eee08559fd6c822aec7",
+      "size_bytes": 4657
+    },
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "c8056745a64a22f3c8b35b2a51c16195de558118da49d971b2dba8ac9da237d0",
+      "size_bytes": 630960
+    }
+  ],
+  "immutable_after_document_copies": [
+    {
+      "path": ".runtime/porting/CTF-03/scope-amendment-01/after-card.md",
+      "sha256": "c8acfe5da560a14bf97f3d2b12741eea37905b7a04e56eee08559fd6c822aec7",
+      "size_bytes": 4657
+    },
+    {
+      "path": ".runtime/porting/CTF-03/scope-amendment-01/after-plan.json",
+      "sha256": "c8056745a64a22f3c8b35b2a51c16195de558118da49d971b2dba8ac9da237d0",
+      "size_bytes": 630960
+    }
+  ],
+  "Rust_CTF03_candidate_applied": false,
+  "numerical_PASS_claimed": false
+}

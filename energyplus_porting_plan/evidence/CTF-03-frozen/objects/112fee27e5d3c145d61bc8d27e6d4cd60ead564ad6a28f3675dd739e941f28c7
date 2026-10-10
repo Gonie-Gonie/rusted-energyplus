@@ -1,0 +1,119 @@
+"""Validate actual post-619 copies and their source handoff; no node evaluator."""
+
+VARIABLES = ["dx", "initial_CTFTimeStep", "caller_TimeStepZone"]
+COUNTS = ["initial_record_count", "initial_reached_phase_records", "initial_unreached_phase_records",
+          "initial_available_owner_count", "initial_unavailable_owner_count",
+          "initial_selected_1D_owner_count", "initial_unselected_context_count", "actual_initial_callback_count"]
+POLICY = {
+    "protocol": "ctf03-initial-discretization.v1",
+    "phase": "after_original_Construction_cc619_before_matrix_allocation_and_retry",
+    "selection": "actual_initial_callback_reached_and_intact_active_prefix",
+    "required_owner_context": {"SourceSinkPresent": False, "SolutionDimensions": 1},
+    "active_layer_fields": ["Nodes", "dx"],
+    "integer_fields": ["LayersInConstruct", "NumResLayers", "rcmax", "NodeSource", "NodeUserTemp", "NumHistories"],
+    "scalar_fields": ["CTFTimeStep", "TimeStepZone"],
+    "initial_state_distinct_from_whole_return_and_retry_state": True,
+    "PostConversion_layer_handoff_retained": True,
+    "PostConversion_handoff_fields": ["LayersInConstruct", "NumResLayers", "dl", "rk", "rho", "cp", "lr", "ResLayer"],
+    "capacitance_factors_are_actual_rho_and_cp_not_recomputed_products": True,
+    "required_reached_fields_absent_is_integrity_failure": True,
+    "unreached_counted_as_PASS": False, "branch_or_numeric_answers_reconstructed": False,
+}
+
+
+def packet(freeze, request, admission, projection, tolerances, inherited_tolerances, need):
+    for item in [freeze, request, admission, projection, tolerances]:
+        need(item["frozen_before_this_CTF03_helper_execution"] is True and item["expected_values_supplied"] is False and
+             item["expected_exits_supplied"] is False and item["scientific_execution_performed"] is False,
+             "Fresh input-only initial-state policy differs")
+    for item in [request, admission, projection, tolerances]:
+        need(item["ctf03_initial_observation_policy"] == POLICY, "Exact initial-state policy required")
+    profiles = tolerances["arithmetic_profiles_by_variable"]
+    need(isinstance(profiles, list) and [row["variable"] for row in profiles] == VARIABLES,
+         "Three separate initial-state profiles required")
+    for index, row in enumerate(profiles):
+        need(type(row["atol"]) is float and row["atol"] == 0.0 and type(row["rtol"]) is float and row["rtol"] == 0.0 and
+             row["class_exact"] is True and row["shape_exact"] is True and row["signed_zero_exact"] is True and
+             row["required_shape"] == ("actual_LayersInConstruct_active_prefix" if index == 0 else "scalar"),
+             "Frozen initial zero/class/shape/signedzero profile differs")
+    need(tolerances["ctf01_preprocessing_profiles"] == inherited_tolerances["arithmetic_profiles_by_variable"] and
+         len(tolerances["ctf01_preprocessing_profiles"]) == 18 and
+         tolerances["tolerance_changes_after_output_inspection_permitted"] is False,
+         "Inherited18 context must remain separate and unchanged")
+    need(freeze["inherited_CTF01_freeze_claimed_as_fresh_CTF03_freeze"] is False,
+         "Historical CTF01 freeze cannot replace this initial-observation freeze")
+
+
+def review(operation, owner_snapshot, need, scalar, counts, integrity, label):
+    """Return the genuine fourth callback count, without inferring a branch."""
+    counts["initial_record_count"] += 1
+    if not operation["actual_source_invoked"]:
+        need(operation["observations"] is None, "Uninvoked source cannot have initial observations")
+        counts["initial_unavailable_owner_count"] += 1
+        return 0
+    observed = operation["observations"]
+    need(isinstance(observed, dict), "Invoked source requires actual observation ledger")
+    row = observed["InitialDiscretization"]
+    need(isinstance(row, dict) and set(row) == {"reached", "available", "unavailable_reason", "actual_phase_callback_count", "snapshot"},
+         "Exact initial callback record required")
+    need(type(row["reached"]) is bool and type(row["available"]) is bool and
+         type(row["actual_phase_callback_count"]) is int and row["actual_phase_callback_count"] >= 0,
+         "Typed initial availability/callback count required")
+    callbacks = row["actual_phase_callback_count"]
+    need((callbacks > 0) is row["reached"], "Initial callback count/reached flag differs")
+    if callbacks > 1: need(observed["duplicate_phase"] is True, "Duplicate initial callback lacks integrity flag")
+    counts["actual_initial_callback_count"] += callbacks
+    if not row["reached"]:
+        need(row["available"] is False and row["snapshot"] is None and row["unavailable_reason"] == "callback_not_reached",
+             "Unreached initial state must remain unavailable; no zero result")
+        counts["initial_unreached_phase_records"] += 1
+        counts["initial_unavailable_owner_count"] += 1
+        return callbacks
+    counts["initial_reached_phase_records"] += 1
+    state = row["snapshot"]
+    keys = set(POLICY["integer_fields"] + POLICY["scalar_fields"] +
+               ["ErrorsFound", "DoCTFErrorReport", "active_prefix_available", "copied_layer_count", "active_prefix"])
+    need(isinstance(state, dict) and set(state) == keys, "Reached initial state requires every actual captured field")
+    for name in POLICY["integer_fields"]: need(type(state[name]) is int, "Actual initial integer owner required")
+    for name in ["ErrorsFound", "DoCTFErrorReport", "active_prefix_available"]:
+        need(type(state[name]) is bool, "Actual initial flag owner required")
+    need(type(state["copied_layer_count"]) is int and 0 <= state["copied_layer_count"] <= 11 and
+         row["available"] is state["active_prefix_available"], "Actual initial prefix count/availability differs")
+    for name in POLICY["scalar_fields"]: scalar(state[name])
+    if not row["available"]:
+        need(row["unavailable_reason"] == "observer_active_prefix_invalid" and state["active_prefix"] is None and
+             observed["active_prefix_invalid"] is True, "Reached invalid prefix must retain its real integrity flag")
+        integrity.append(label + "/InitialDiscretization/required-prefix-absent")
+        counts["initial_unavailable_owner_count"] += 1
+        return callbacks
+    need(row["unavailable_reason"] is None and 1 <= state["LayersInConstruct"] <= 11 and
+         isinstance(state["active_prefix"], list) and
+         state["copied_layer_count"] == state["LayersInConstruct"] == len(state["active_prefix"]),
+         "Actual initial active-prefix shape differs")
+    for layer in state["active_prefix"]:
+        need(isinstance(layer, dict) and set(layer) == {"Nodes", "dx"} and type(layer["Nodes"]) is int,
+             "Actual integer Nodes and scalar dx fields required")
+        scalar(layer["dx"])
+    converted = observed["PostConversion"]
+    need(converted["reached"] is True or observed["phase_order_invalid"] is True,
+         "Initial state without actual preceding conversion needs an integrity flag")
+    if converted["reached"] and converted["available"]:
+        source = converted["snapshot"]
+        need(isinstance(source, dict) and source["LayersInConstruct"] == state["LayersInConstruct"] and
+             source["NumResLayers"] == state["NumResLayers"] and source["copied_layer_count"] == state["copied_layer_count"],
+             "Actual converted-layer prefix handoff differs from initial state")
+        for layer in source["active_prefix"]:
+            need(set(layer) == {"dl", "rk", "rho", "cp", "lr", "ResLayer"},
+                 "Actual thickness/conductivity/capacitance-factor handoff fields required")
+    else:
+        integrity.append(label + "/InitialDiscretization/required-converted-handoff-absent")
+    index = operation["actual_construction_index"]
+    need(isinstance(owner_snapshot, dict) and type(index) is int and 1 <= index <= len(owner_snapshot["constructions"]),
+         "Reached initial capture requires its actual construction owner")
+    owner = owner_snapshot["constructions"][index - 1]
+    need(state["TimeStepZone"]["value_bits"] == owner_snapshot["TimeStepZone"]["value_bits"],
+         "Actual caller timestep copy differs")
+    selected = not observed["observer_failure"] and owner["SourceSinkPresent"] is False and owner["SolutionDimensions"] == 1
+    counts["initial_available_owner_count"] += 1
+    counts["initial_selected_1D_owner_count" if selected else "initial_unselected_context_count"] += 1
+    return callbacks

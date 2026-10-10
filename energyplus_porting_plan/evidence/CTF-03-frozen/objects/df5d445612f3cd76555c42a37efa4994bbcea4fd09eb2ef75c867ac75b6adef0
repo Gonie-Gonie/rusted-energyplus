@@ -1,0 +1,106 @@
+"""Independent actual CTF03 build/PE inspection; no engine is invoked."""
+from pathlib import Path
+import argparse
+import datetime
+import hashlib
+import importlib.util
+import json
+
+ROOT = Path.cwd().resolve()
+parser = argparse.ArgumentParser()
+parser.add_argument('--lane', choices=('unit', 'production'), required=True)
+parser.add_argument('--build', required=True, help='Actual build manifest path#sha256')
+parser.add_argument('--output-dir', required=True)
+args = parser.parse_args()
+OUT = (ROOT / args.output_dir).resolve()
+assert OUT.is_relative_to(ROOT) and not OUT.exists()
+
+
+def ref(path):
+    path = path if isinstance(path, Path) else ROOT / path
+    digest = hashlib.sha256()
+    with path.open('rb') as stream:
+        while chunk := stream.read(16 * 1024 * 1024):
+            digest.update(chunk)
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': digest.hexdigest(),
+            'size_bytes': path.stat().st_size}
+
+
+def bound(binding):
+    path = (ROOT / binding['path']).resolve()
+    assert path.is_relative_to(ROOT) and path.is_file()
+    observed = ref(path)
+    assert observed['sha256'] == binding['sha256']
+    assert binding.get('size_bytes', observed['size_bytes']) == observed['size_bytes']
+    return path
+
+
+def write(path, value):
+    assert not path.exists()
+    path.write_text(json.dumps(value, indent=2) + '\n', encoding='utf-8')
+
+
+build_name, separator, build_sha = args.build.rpartition('#')
+assert separator and len(build_sha) == 64 and all(c in '0123456789abcdef' for c in build_sha)
+build_path = bound({'path': build_name, 'sha256': build_sha})
+build = json.loads(build_path.read_text(encoding='utf-8'))
+prefix = 'ctf03' if args.lane == 'unit' else 'ctf03-production'
+target = 'ctf03_' + args.lane + '_helper'
+assert build['schema'] == prefix + '-native-build.v1'
+assert build['target'] == target
+assert build['status'] == 'pass-actual-3TU-link-and-preservation'
+for key in ('configure_execution', 'compile_execution', 'derivation_execution'):
+    receipt = json.loads(bound(build[key]).read_text(encoding='utf-8'))
+    assert receipt['exit_code'] == 0 and receipt['source_bytes_match_before_and_after']
+    for stream in ('stdout', 'stderr'):
+        bound(receipt[stream])
+for key in ('all_previous_compile_commands_unchanged',
+            'protected_artifacts_and_present_core_objects_unchanged', 'link_provider_verified'):
+    assert build[key] is True
+for key in ('previous_compile_rows', 'current_compile_rows', 'core_registered', 'core_present', 'core_absent', 'protected_ref_count'):
+    assert type(build[key]) is int and build[key] >= 0
+# Two new targets with three genuine source objects each; actual before inventory is Root-owned.
+assert build['current_compile_rows'] == build['previous_compile_rows'] + 6
+assert (build['core_registered'], build['core_present'], build['core_absent']) == (643, 631, 12)
+assert build['protected_ref_count'] > 0
+assert len(build['native_source_files']) == 8
+for binding in build['native_source_files']:
+    bound(binding)
+preservation = json.loads(bound(build['preservation']).read_text(encoding='utf-8'))
+assert preservation['selected_core_Construction_object_hits'] == 0
+assert 'Construction.ctf03.cc.obj' in preservation['derived_provider']['section_provider']['text']
+assert len(preservation['present_objects']) == build['core_present']
+assert len(preservation['protected_refs']) == build['protected_ref_count']
+assert all(preservation[key] == build[key] for key in ('previous_compile_rows', 'current_compile_rows', 'core_registered'))
+derivation = json.loads(bound(build['validated_derivative']).read_text(encoding='utf-8'))
+assert derivation['status'] == 'pass-exact-retained-runtime-sections-and-directories'
+reader = ROOT / 'tools/porting/native_pe.py'
+spec = importlib.util.spec_from_file_location('actual_ctf_pe', reader)
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+original = module.inspect(bound(build['linked_original']))
+derived = module.inspect(bound(build['helper_binary']))
+comparison = module.compare(original, derived)
+assert comparison['status'] == 'pass-exact-retained-runtime-sections-and-directories'
+assert original == json.loads(bound(derivation['maps']['original_before']).read_text(encoding='utf-8'))
+assert derived == json.loads(bound(derivation['maps']['derived']).read_text(encoding='utf-8'))
+OUT.mkdir(parents=True)
+maps = {}
+for name, value in (('original', original), ('derived', derived), ('comparison', comparison)):
+    path = OUT / (name + '-pe.json')
+    write(path, value)
+    maps[name] = ref(path)
+report = {'schema': prefix + '-independent-build-PE-review.v1',
+          'status': 'pass-exact-retained-PE-runtime-and-actual-build-identity',
+          'observed_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+          'lane': args.lane, 'target': target,
+          'actual_previous_compile_rows': build['previous_compile_rows'],
+          'actual_current_compile_rows': build['current_compile_rows'],
+          'actual_protected_ref_count': build['protected_ref_count'],
+          'build': ref(build_path), 'helper_binary': build['helper_binary'],
+          'linked_original': build['linked_original'], 'validated_derivative': build['validated_derivative'],
+          'native_pe_source': ref(reader), 'executed_reader': ref(Path(__file__).resolve()),
+          'maps': maps, 'retained_runtime_exact': True,
+          'engine_invoked': False, 'scientific_execution_certified': False, 'gates_updated': False}
+write(OUT / 'review.json', report)
+print(json.dumps({'review': ref(OUT / 'review.json'), 'status': report['status']}))

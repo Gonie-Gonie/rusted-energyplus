@@ -1,0 +1,83 @@
+# CTF03 genuine Original data and provenance review source
+
+SOURCE ONLY, HELD unexecuted. These six stdlib modules adapt accepted CTF02
+OriginalDataQA02. Root alone runs them against future genuine Native records.
+No new SourceQA/proof framework, engine call, expected array, node evaluator,
+classifier or coefficient algorithm is introduced. AST checks do not import or
+execute these modules. All earlier holds/before copies remain byte-exact.
+
+Lane mains retain the existing direct runtime CLI:
+--approved-source-sha256 <actual main SHA>
+--approved-build-review-source-sha256 <approved actual PE reader SHA>
+--native-execution <actual direct Native recorder path#SHA>
+--results <actual ctf03[-production]-helper-results.json path#SHA, or missing path>
+--freeze-receipt <actual fresh per-lane freeze path#SHA>
+--freeze-execution <actual freezer recorder path#SHA>
+--build <actual lane build metadata path#SHA>
+--build-execution <actual compile recorder path#SHA>
+--build-review <actual PE report path#SHA>
+--build-review-execution <actual PE reader recorder path#SHA>
+--output-dir <fresh CTF03 DataQA directory>
+
+Schemas are ctf03[-production]-independent-original-data-review.v1. Success
+status remains pass-actual-original[-production]-data-and-provenance-before-Rust;
+actual failure status and process/source stop outcomes stay separate. Future
+refs/digests/outcomes are runtime supplied, never guessed. A factual DataQA0
+certifies input/provenance/record integrity, not numerical parity or all callbacks
+reached. Explicit unavailable records never count as numerical PASS.
+
+The mains authenticate actual full freezer stdout0 and its reviewed writer217
+source/adjacent stdlib helper, source archives, exact master input rows/callers,
+Native8 lane identity and actual one-way request/contracts/projection/admission.
+They preserve unit39/42 and fixed15/195 array-derived obligations; production
+Construct whole-call counts remain dynamic. The old18 preprocessing profiles stay
+unchanged separate context and the fresh three initial profiles stay zero with
+class/shape/signedzero exact. Native source/45 guard refs are hashed only; weather
+payloads are not parsed.
+
+Build metadata uses actual source-derived +6 compile rows, core643 preservation,
+and typed actual protected_ref_count agreement with preserved refs. No future
+protected32/30 count is assumed. Actual target/lane/copied PE inventory are bound.
+The approved106-line PE reader runs the existing argv11 --lane/--build/--output-dir
+protocol and emits compact {review,status}; its full report/actual script/stdout
+binding and actual maps establish binary identity/size. DataQA never re-opens
+Native helper or linked-original binary payloads and never claims the compile
+recorder authored Root's build metadata. Sourceguards are required; clean-worktree
+status is not substituted for stable source bytes.
+
+unit_shape and production_shape retain actual constructor/init/whole-loader/whole
+operation ordering, diagnostics, literal unit seed bits/membership, source-produced
+production timestep, Native owner IDs/maps/surface associations, and the original
+three preprocessing checkpoints. The shared initial_shape replaces the CTF02
+public coefficient validator. It validates a separate fourth actual callback:
+observations.InitialDiscretization. Capture.phases remains3; counts index3 belongs
+to this separate snapshot. The genuine total is all four observed callback counts.
+
+Reached initial snapshots require exact fields and active-prefix shape: actual
+integer Nodes, scalar dx, LayersInConstruct/NumResLayers, rcmax, reset selectors,
+initial CTFTimeStep/NumHistories and caller TimeStepZone. Scalar validation checks
+only DTO bits/class/decimal consistency. No Nodes/dx/dt/history/rcmax formula is
+recomputed. Actual PostConversion dl/rk/rho/cp/lr/ResLayer, prefix/count/NumResLayers
+handoff remains visible; rho/cp are copied capacitance factors, not a product.
+Original material membership is distinct from merged arrays and no new IDs arise.
+
+Required reached absence fails integrity. Invalid reached prefixes retain real
+observer flags and known structured counts. Unreached initial phases stay null,
+with genuine callback counts and explicit noPASS. No reverse/allR reachability is
+inferred from values. Actual no-source1D owner context is counted separately from
+outside-selected context. A reached initial snapshot is retained after later fatal
+or exception; whole method outcome remains separate. Initial dt/history are never
+replaced by retries908-936 or final public fields. Unknown OS/spawn/missing-output
+records do not acquire invented method outcomes/counts; helper exit2 with a genuine
+complete JSON ledger keeps known counts while blocking release.
+
+actual_observation_counts adds initial reached/unreached/available/unavailable,
+selected1D/context and actual initial callback counts. The phase table names the
+old three plus InitialDiscretization; count values are derived solely from records.
+Direct reviewed refs and actual output inventories retain the existing QA protocol.
+Future production/universal card gates remain pending.
+
+Author limits: this author wrote passive03 and earlier CTF01 input/QA glue. Root
+and another author must full-review this source integration; it is no independent
+certificate of the author's earlier arithmetic. The old CTF02 card live alias is
+historical only, authenticated by scope-amendment-01/before-card.md c9b29a1d.

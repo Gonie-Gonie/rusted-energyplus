@@ -1,0 +1,770 @@
+{
+  "schema": "ctf02-surface-integration-source-readiness.v1",
+  "status": "source-proposal-only-no-integration-PASS",
+  "scope": [
+    "selected reached all-resistive CTF-02 storage",
+    "SUR-04 inside consumer",
+    "SUR-07 conduction report signs",
+    "actual caller timestep and fresh history handoff"
+  ],
+  "source_files": [
+    {
+      "path": "energyplus_porting_plan/cards/CTF-02.md",
+      "sha256": "7f9216094de87205b74ec90679a65b80a18a188755c5309cb43ea9e346d6f7ad",
+      "size_bytes": 5366,
+      "line_count": 78
+    },
+    {
+      "path": "energyplus_porting_plan/cards/SUR-04.md",
+      "sha256": "2600037f7f93de77879788f5c69763a9d769d7dbafd366293c3aa7992b9becca",
+      "size_bytes": 2801,
+      "line_count": 70
+    },
+    {
+      "path": "energyplus_porting_plan/cards/SUR-07.md",
+      "sha256": "8168c75802126d29ad376f4345b7f28251e769bdd2de362c349e33cd447cd84b",
+      "size_bytes": 2767,
+      "line_count": 70
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "sha256": "0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c",
+      "size_bytes": 698972,
+      "line_count": 10119
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.hh",
+      "sha256": "9f5a1b891eb0152f210f6b2f0cc0f882854439082e598446bb8dd23376309cc9",
+      "size_bytes": 14686,
+      "line_count": 320
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalSurface.hh",
+      "sha256": "ffdf2d16d8b90ab091861614bc02922e2f76889b9e16ee7ee5edc376492729cb",
+      "size_bytes": 19511,
+      "line_count": 257
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+      "size_bytes": 133816,
+      "line_count": 2059
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "sha256": "53a14b2a45860255267e6ebf780a50fc8aefc4ba30ae3df589062601a20f999a",
+      "size_bytes": 24041,
+      "line_count": 383
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SimulationManager.cc",
+      "sha256": "bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685",
+      "size_bytes": 168527,
+      "line_count": 2941
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "sha256": "7506de40b75a45b9c8f2c01c0b5a4f1ffc5f82ebb1861413a04e7c17ebc342e4",
+      "size_bytes": 29922,
+      "line_count": 814
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "230a806183db9871b725892e4c413a704d9fb8ee944e94213eca9e0ac5e04e57",
+      "size_bytes": 11491,
+      "line_count": 232
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "sha256": "2b3343ff4f3cec29be8cc77bcd4d14a8bbcc78464812ad04b88d22469f7f0dfb",
+      "size_bytes": 4401,
+      "line_count": 118
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "4b1cec732ab81f8f6dc8ebcba70eb043751c3baacfaa5a59d726933fd185564f",
+      "size_bytes": 46440,
+      "line_count": 1016
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "sha256": "062ef1e4cc4f8175b03e3f88daf54bd34387b8c5e3bfc9f9fabe6602ab4dafab",
+      "size_bytes": 17043,
+      "line_count": 443
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+      "sha256": "8e02f58b2da67416342b15f281cd270f80c1bafcd7600931899aef2f920f2bfc",
+      "size_bytes": 4902,
+      "line_count": 122
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive_tests.rs",
+      "sha256": "f0f9e1240bb62d5b9104b11518f455bce1b06c5022775f9d722c738d1cfdde84",
+      "size_bytes": 10547,
+      "line_count": 274
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_loop.rs",
+      "sha256": "198cb8cc0df3323290d1d72987cb77ea45fd932d44e8adae7c6607bc41d49073",
+      "size_bytes": 20244,
+      "line_count": 428
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/timestep.rs",
+      "sha256": "c3691f65dcb4abd5d3dc11dd81ab59daecaf888c1edc84a97ef4cb143c65aff4",
+      "size_bytes": 38979,
+      "line_count": 808
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/run_period.rs",
+      "sha256": "f43d0aa74109034f77797da695d8a89d0b677993f028397d2a19d9446bc58ad8",
+      "size_bytes": 54954,
+      "line_count": 932
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/reports.rs",
+      "sha256": "a3ea6e5ba816b625a97785625df58150b8e012c8604db0ad0d321394805dcedc",
+      "size_bytes": 39851,
+      "line_count": 899
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/trace.rs",
+      "sha256": "8a5a190a29a365fdd06e7e5d55700c0bad491712a5c503c2aeb1f86ab73de695",
+      "size_bytes": 41213,
+      "line_count": 812
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/summary.rs",
+      "sha256": "c6c0c2e0da04ce2e8ba319764f23188eb67dd812d867705f323ad697d8b3a955",
+      "size_bytes": 8113,
+      "line_count": 156
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime.rs",
+      "sha256": "106652a0add9f4d670f9900c6d3f7b8aeffb8fd153e9e7a617cae9e148006894",
+      "size_bytes": 24089,
+      "line_count": 541
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+      "sha256": "b730956c47a069469572cec8dfb6c469912444a94dc8aa0b7fd7d463b263f602",
+      "size_bytes": 595815,
+      "line_count": 10367
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests/part03.rs",
+      "sha256": "ebd2f380dde5e33258eea080602bf723de88a7fef0dc0972670aa40ea18b018c",
+      "size_bytes": 46864,
+      "line_count": 1161
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests/part09.rs",
+      "sha256": "b409783d09b9944e0459db69c44dec800bc4493ffee6778ad07f2f1e466c5456",
+      "size_bytes": 14415,
+      "line_count": 388
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests.rs",
+      "sha256": "bb353501a9145cd600531a122f2080400a44c109bc6bdc2f75834dca2d25dfcf",
+      "size_bytes": 456,
+      "line_count": 15
+    },
+    {
+      "path": "crates/ep_model/src/objects/surfaces.rs",
+      "sha256": "54569b984efd25320447a8eecb94f351037ab6b63a5cfb31d0af1ecc225a1755",
+      "size_bytes": 6656,
+      "line_count": 197
+    },
+    {
+      "path": "crates/ep_run/src/pipeline.rs",
+      "sha256": "f4f4fb7931f3f1e36bff1a92ec5776b18487258a96acd63522be263836df5e11",
+      "size_bytes": 821302,
+      "line_count": 14597
+    },
+    {
+      "path": ".runtime/porting/CTF-02/native-observer-prep-01/ctf02_production_helper.cpp",
+      "sha256": "726b7e4509f7b269d726f0c87fb5184399d57068718924fb00db19428a6bf9a5",
+      "size_bytes": 18997,
+      "line_count": 241
+    }
+  ],
+  "source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 145,
+      "end_line": 216,
+      "sha256": "78072bff639c7aa3427f69ed737a204865259bb606ca0cfaafd28b6b2ff55ec1",
+      "size_bytes": 3039
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 272,
+      "end_line": 405,
+      "sha256": "70bea3c2f72658895c50a449c477b70cfb01496ee45406728c69fc838581e941",
+      "size_bytes": 7042
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 493,
+      "end_line": 535,
+      "sha256": "e3216f421a2589f4294d9cb50ee21f7e5d14854808187d4f0dbb07de01ef8a23",
+      "size_bytes": 2661
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 2248,
+      "end_line": 2268,
+      "sha256": "ececfd5e04b3affa8f8aa7ebddd48692b0fb833dccd6a90579bf917aee8ac77a",
+      "size_bytes": 1504
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 2323,
+      "end_line": 2346,
+      "sha256": "f24e99176127da539ef6435b50d1a16c3aec6a091ed3c859167be0f98d5c0734",
+      "size_bytes": 1703
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 4951,
+      "end_line": 5020,
+      "sha256": "7153d7976cf88aa7bb87187406f1947202decf595b07513ee91707cb69358f8f",
+      "size_bytes": 4023
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 5275,
+      "end_line": 5330,
+      "sha256": "06a8a6c09dfdf8f532547767123557a6c3f2db3515aaac5e1ca933eb510692f0",
+      "size_bytes": 4478
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 5410,
+      "end_line": 5480,
+      "sha256": "8cb31e36f1de99281569ae4d6e9ec74490a2a318a133bb8f3e2f89ac1d810591",
+      "size_bytes": 6302
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 6605,
+      "end_line": 6632,
+      "sha256": "01b8e53da59541d4c594c0e6ca3c15b096fd6efb129c24c2214486198f0998e3",
+      "size_bytes": 1387
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 6743,
+      "end_line": 6831,
+      "sha256": "cd0e869e46335bc75f66d37ad092332c117d3c5d9b72f4d21e67067c3ecefed3",
+      "size_bytes": 6756
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 6859,
+      "end_line": 6888,
+      "sha256": "c55e9a004f37edde732d8c8e4bfdba04ae0e4e826ef0d2be3f37fcb812154370",
+      "size_bytes": 2406
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 7775,
+      "end_line": 7813,
+      "sha256": "1eb96ba4332dc3f7e676ca0a7d87f9a62408b1959ca6796252e13a40483be2d9",
+      "size_bytes": 2169
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 8658,
+      "end_line": 8745,
+      "sha256": "607bb941f57a7762bab5e843a9470cd802ca68ae512cc4163b74a617bf37bf87",
+      "size_bytes": 5197
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 8785,
+      "end_line": 8810,
+      "sha256": "f00bcc6095fc1d2c88b86eb3f487f44268a2814a768d6d28007832fc6863b3a3",
+      "size_bytes": 1685
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 8884,
+      "end_line": 8938,
+      "sha256": "5549d565e9fe13a4599dee01ca8b5407c7d2c6cdc5b13aa6d4fb386f7f929cfb",
+      "size_bytes": 5210
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.hh",
+      "start_line": 97,
+      "end_line": 153,
+      "sha256": "cc85c12866f1d56932214ce792b79484660b5866e48ea69bddb8cd579529467d",
+      "size_bytes": 2275
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.hh",
+      "start_line": 180,
+      "end_line": 192,
+      "sha256": "5d9cf31f3f5bf51f30f714076b0182a5225c55d9cd606a77e0197e9c2a554e1a",
+      "size_bytes": 1079
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalSurface.hh",
+      "start_line": 59,
+      "end_line": 73,
+      "sha256": "9f57ed5f758e576fa54e848162de053c0d9841a60ae3f07b7208abf7121bc17d",
+      "size_bytes": 1060
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "start_line": 426,
+      "end_line": 434,
+      "sha256": "61817e858504cf2022ad9caf9a610f700e80e4f0f934c1ec95318992692cc2a6",
+      "size_bytes": 560
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "start_line": 64,
+      "end_line": 71,
+      "sha256": "988207df3fa9ffa0df069b75d999f1ded915c04bbf72cb891c7d149bfc3d4880",
+      "size_bytes": 440
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "start_line": 153,
+      "end_line": 170,
+      "sha256": "57659f405ff94a8c5376929fcd50f70728ecb61582a98b4864f0b5119314ff08",
+      "size_bytes": 1770
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SimulationManager.cc",
+      "start_line": 878,
+      "end_line": 880,
+      "sha256": "e1e9efc3583e7e5cf81b1f43e616a3785d93432574e6e17e05a2a0681515db91",
+      "size_bytes": 273
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "start_line": 18,
+      "end_line": 19,
+      "sha256": "dc3813b6ef1cb275f5a1b24e14b0c91ff057a2556d74f81670d2d61ddcac1636",
+      "size_bytes": 139
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "start_line": 71,
+      "end_line": 93,
+      "sha256": "ed5f2a480fc0fbf7a1dda9179d3b6debdf8f52a0b168b9980891ac9ce654c41d",
+      "size_bytes": 1258
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "start_line": 166,
+      "end_line": 177,
+      "sha256": "0276525fd769c930a7a866158b1f0cc574fba316eccad7736874bac2644db914",
+      "size_bytes": 638
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "start_line": 214,
+      "end_line": 253,
+      "sha256": "020c5a30bf2081b35121e2ef61ed2c26805bbaf04f7bc37a9694de35d1af8b3b",
+      "size_bytes": 1644
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "start_line": 347,
+      "end_line": 427,
+      "sha256": "f9e7a35cc3d6cc497c67779739c245882a817c87681f92fe1ad9c6ab5c395958",
+      "size_bytes": 2794
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "start_line": 539,
+      "end_line": 556,
+      "sha256": "c47ff15b802ea30e29961fd1f1ecb0016ab4797991d7934f5403175cc7df06d2",
+      "size_bytes": 600
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "start_line": 669,
+      "end_line": 810,
+      "sha256": "44c1925d497f641c241cfe4510bb748424eaceb8d7890268d5d4ad6e54bd7f2b",
+      "size_bytes": 4653
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "start_line": 35,
+      "end_line": 43,
+      "sha256": "7dc874ae005a03a204216774a01eec31d533e9f506e7611cdfd1b55cea349ec9",
+      "size_bytes": 538
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "start_line": 100,
+      "end_line": 158,
+      "sha256": "aca029ad7cf2078ed5e3f2b1823efc99e48749ffa4b5948eb2f669f45b39ede3",
+      "size_bytes": 3007
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "start_line": 170,
+      "end_line": 195,
+      "sha256": "ebff99c6607de16d0045d7898dd18c470431b5a2cd2ebe4695c49851775e84e5",
+      "size_bytes": 1397
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "start_line": 17,
+      "end_line": 55,
+      "sha256": "f76ff362e1bbbda29dca60c87ed4b1549d00ff50e187f271ab644c8e93213803",
+      "size_bytes": 1692
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "start_line": 48,
+      "end_line": 64,
+      "sha256": "854c2af47b9692a96c179be3b3c93f515d3200089a6dfa165423abf601ee91f2",
+      "size_bytes": 1034
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "start_line": 258,
+      "end_line": 285,
+      "sha256": "77aaa6e834899e33fb2f86d1080c67caa2a29a554164e749c096aaadb85bccb7",
+      "size_bytes": 1298
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "start_line": 350,
+      "end_line": 370,
+      "sha256": "1e61857cdb53048e1a1e48f76722a440b0ba7cf7b297505e0b9aae0f224092b5",
+      "size_bytes": 937
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "start_line": 400,
+      "end_line": 420,
+      "sha256": "ffd50b0f0ce67e5ae5effa9947fd47cfa12a50f573f9e3fff7568d6d942f0b17",
+      "size_bytes": 1320
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "start_line": 432,
+      "end_line": 471,
+      "sha256": "3db0bb58aedb1ea92d01f4e9299356079b6e443bbbc5d3631ff41033bc8db424",
+      "size_bytes": 1909
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "start_line": 220,
+      "end_line": 237,
+      "sha256": "8279279793f2b449443804a3b7882bdfc2f460a85bbf0042bf0ad836484ee620",
+      "size_bytes": 937
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+      "start_line": 9,
+      "end_line": 28,
+      "sha256": "0d064758a7a9f84f3a7c43c48818105aba5fd3a713bb6ab90311d31487f9d5ca",
+      "size_bytes": 945
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+      "start_line": 60,
+      "end_line": 77,
+      "sha256": "cbdeff0698123c1b4ac22a5a15fc852224f20091792d7f578c223d3d437a2a91",
+      "size_bytes": 940
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+      "start_line": 93,
+      "end_line": 122,
+      "sha256": "d6d04fd79c18dbab4bba8d8a8abec27e81037e42e0b6b4fd622579d89fed6b3e",
+      "size_bytes": 978
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive_tests.rs",
+      "start_line": 141,
+      "end_line": 184,
+      "sha256": "ca00bcc47839ab31bb32ee81c4779153792aec29d99cf95a36c0957fdb612ebb",
+      "size_bytes": 1658
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive_tests.rs",
+      "start_line": 186,
+      "end_line": 274,
+      "sha256": "a08c43cd5bfa13c0237e1d49d1c2b0fb7684b014dcf71fb2228cb3385f1f12c0",
+      "size_bytes": 3609
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_loop.rs",
+      "start_line": 335,
+      "end_line": 423,
+      "sha256": "8a3769ebd8129e27e486279196f2d884ea6bb79617ad073377e94b1249d009b7",
+      "size_bytes": 5110
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/timestep.rs",
+      "start_line": 704,
+      "end_line": 744,
+      "sha256": "0e90febef6955c3166c55f1b5aca594b7e336cd16ce45a0ac71c1338654b1e5a",
+      "size_bytes": 2003
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/run_period.rs",
+      "start_line": 205,
+      "end_line": 245,
+      "sha256": "844ab987cc15c509731883fea482c7b6203ece5c7ff03c74f6aec46797f97217",
+      "size_bytes": 1776
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/run_period.rs",
+      "start_line": 541,
+      "end_line": 590,
+      "sha256": "e26d332676ff53d15642af59b69f937d7035c7c7310893b80084a6d044905be8",
+      "size_bytes": 3375
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/run_period.rs",
+      "start_line": 812,
+      "end_line": 875,
+      "sha256": "c64327770951fa7b0b9b8ecedacac61deb4bc32ec4fab6a1e1354657509b1316",
+      "size_bytes": 3547
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/reports.rs",
+      "start_line": 69,
+      "end_line": 90,
+      "sha256": "ecc1b6d63321b625836c43f69e41d5ce455d5253fb142b472a926336b69bba3b",
+      "size_bytes": 805
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/reports.rs",
+      "start_line": 700,
+      "end_line": 729,
+      "sha256": "c439ebaa173be9a017384226ccd42138da1fbc81a7e0e3b61e1b24540c0eca1a",
+      "size_bytes": 1407
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/reports.rs",
+      "start_line": 772,
+      "end_line": 843,
+      "sha256": "6029a47fb12168813bd3407c4e92b1f6476ee5ad45621190daae22120e05617a",
+      "size_bytes": 3212
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/trace.rs",
+      "start_line": 757,
+      "end_line": 810,
+      "sha256": "28768e19469b3747b17e067ae559be6c36cf54f54c2a65a51025475ec90a46ce",
+      "size_bytes": 2336
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/summary.rs",
+      "start_line": 123,
+      "end_line": 142,
+      "sha256": "708f9590443d1ad5c7653d482e5e0e32dfbc2e4c9d14410d2506ae14f72e825b",
+      "size_bytes": 1705
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime.rs",
+      "start_line": 282,
+      "end_line": 294,
+      "sha256": "7900cbd369426a73df9c3d35f0500246b832fa801e80fea0566608773b874b11",
+      "size_bytes": 457
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime.rs",
+      "start_line": 320,
+      "end_line": 348,
+      "sha256": "ccd80bbb1049438f5d3d6522351c740e37feb58687aea01c5241cf16dcc97c64",
+      "size_bytes": 1284
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime.rs",
+      "start_line": 419,
+      "end_line": 430,
+      "sha256": "c0c922e1689e99366863dae0ef0f71df19c8dddb91a946b54052e61f984a631b",
+      "size_bytes": 433
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+      "start_line": 5996,
+      "end_line": 6018,
+      "sha256": "e07806aab72db67573a3d0559a822e69e34606e73a24b096cb51ac28793b4ff7",
+      "size_bytes": 1292
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests/part03.rs",
+      "start_line": 834,
+      "end_line": 862,
+      "sha256": "ba9a2d625d5d11d35d41ae5ffae983a45fa484b752397d484d8c44c8d427f82c",
+      "size_bytes": 1444
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests/part03.rs",
+      "start_line": 1052,
+      "end_line": 1118,
+      "sha256": "787c4e723d7eb47a3b8d0c4b7902fce5473542670fc1c0f426c50efd989637c4",
+      "size_bytes": 2575
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests/part09.rs",
+      "start_line": 33,
+      "end_line": 65,
+      "sha256": "c28c078f50b7ea553ce94f7e492aa61b8522ad19b341e6274f50c706c1b58ad6",
+      "size_bytes": 1288
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests/part09.rs",
+      "start_line": 72,
+      "end_line": 118,
+      "sha256": "4f28710bade10c4b8d3cf179614cd491bdc697ba01df9f004da6101dad2c7ab3",
+      "size_bytes": 1984
+    },
+    {
+      "path": "crates/ep_model/src/objects/surfaces.rs",
+      "start_line": 74,
+      "end_line": 93,
+      "sha256": "d607c4996cadd844144825594d0098209ac70882e60d5a521865d9d736343175",
+      "size_bytes": 533
+    },
+    {
+      "path": "crates/ep_run/src/pipeline.rs",
+      "start_line": 3585,
+      "end_line": 3605,
+      "sha256": "de8adb0c5c29f1a9088fbd026ee273652a91875875531467fcdb5a04c7bc0a3a",
+      "size_bytes": 1120
+    },
+    {
+      "path": "crates/ep_run/src/pipeline.rs",
+      "start_line": 3798,
+      "end_line": 3820,
+      "sha256": "5b1108694b043ab19838d6aa95e393a8b18b471df44da668fe6008c5e3888ad8",
+      "size_bytes": 1274
+    },
+    {
+      "path": ".runtime/porting/CTF-02/native-observer-prep-01/ctf02_production_helper.cpp",
+      "start_line": 118,
+      "end_line": 185,
+      "sha256": "34edb4e4ee602c0bcab8a27360ad4ecbfde90a8f418429109190d1fa21320fb7",
+      "size_bytes": 6108
+    }
+  ],
+  "actual_owner_chain": [
+    "TypedModel timestep -> ConstructionThermalDataCache -> generate_all_resistive_ctf",
+    "ordinary initialize_heat_balance_state -> empty override slice -> selected construction owner",
+    "actual construction association -> all_resistive_surface_ctf_state -> SurfaceCtfState",
+    "surface_loop actual history constants / outside operand / inside update",
+    "timestep actual pre-advance and post-advance history owners",
+    "run_period actual report operand -> ordered sums -> trace average -> OutputSeries"
+  ],
+  "selected_storage_contract": {
+    "num_histories": 1,
+    "num_ctf_terms": 1,
+    "ctf_time_step": "actual typed 1.0 / steps, retained in construction owner",
+    "surface_owner_timestep_field": "absent; selected association remains in construction owner",
+    "history_extent": "Rust one history slot corresponds to Native history index2; current is Native index1",
+    "initial_temperature": "Native InitThermalAndFluxHistories uses SurfInitialTemp23.0; Rust initializer copies its explicit caller. Paired future calls must declare the same initialization phase/caller; local Rust fresh-state tests vary it without a Native equivalence claim.",
+    "native_constant_parts": "Native resets constants to0 and skips history summation for NumCTFTerms<=1; Rust traverses its one zero-coefficient history slot. No general massive/history equivalence is claimed.",
+    "general_history_interpolation": "not proved; NumHistories>1 is outside selected CTF-02 route"
+  },
+  "sur04": {
+    "source_operands": [
+      "CTFInside0",
+      "CTFCross0",
+      "SurfIsAdiabatic",
+      "SurfCTFConstInPart",
+      "actual SurfTempOutHist",
+      "RefAirTemp",
+      "SurfHConvInt",
+      "SurfTempInsOld",
+      "actual non-pool/source-free source terms",
+      "IterDampConst5.0"
+    ],
+    "actual_rule": "Adiabatic subtracts cross0 in denominator and removes current outside-temperature coupling. Ordinary route uses actual inside-update outside operand.",
+    "preexisting_unresolved_differences": [
+      "Native computes reciprocal then multiplies numerator; Rust divides the completed numerator.",
+      "Rust has EPS-denominator fallback to previous inside temperature; Native selected statement is unguarded.",
+      "Native whole CTF-only call iterates/converges and invokes real radiation/convection dependencies; one Rust kernel update cannot be compared to final Native converged state as the same operation."
+    ],
+    "proposal_changes_math": false,
+    "integration_PASS_available": false
+  },
+  "sur07": {
+    "actual_native_phase": "UpdateThermalHistories writes current fluxes and negates outside internal flux; later ReportSurfaceHeatBalance copies rates/area/energies/gain-loss/storage. UpdateIntermediateSurfaceHeatBalanceResults is not the opaque-conduction calculation.",
+    "inside_report_sign": "+ area * Qin_internal",
+    "outside_report_sign": "- area * Qout_internal",
+    "storage_sign": "- (inside_report_W + outside_report_W)",
+    "units": [
+      "W/m2 before area",
+      "W after area",
+      "J after TimeStepZoneSec"
+    ],
+    "phase_obligation": "Retain the actual inside-update outside-temperature operand; separate later outside-face report recomputation cannot replace it.",
+    "proposal_changes_math": false,
+    "integration_PASS_available": false
+  },
+  "native_observation_gap": {
+    "current_helper": "real fixed-CON loaders / GetBuildingData / whole calculateTransferFunction only",
+    "surface_heat_balance_initialized_by_current_helper": false,
+    "future_genuine_route": "source-audit genuine initialization and whole ManageSurfaceHeatBalance or its genuine whole caller chain; preserve all prerequisites and method execution",
+    "candidate_passive_sites": [
+      {
+        "after_line": 8933,
+        "purpose": "actual per-iteration inside assignment and copied operands; retain actual iteration identity"
+      },
+      {
+        "after_line": 5327,
+        "purpose": "actual current opaque conduction flux/report signs before history mutation"
+      },
+      {
+        "after_line": 6825,
+        "purpose": "actual populated per-surface reporting owners after real report calculations"
+      }
+    ],
+    "site_file": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+    "sites_are_implemented": false,
+    "caller_feasibility_complete": false,
+    "required_future_proof": [
+      "actual source calls and phases",
+      "same input/initialization/timestep",
+      "actual construction/surface IDs",
+      "real availability and errors",
+      "all actual consumed coefficients",
+      "same per-iteration operand phase",
+      "no substituted local formulas or injected Native results"
+    ],
+    "uninvoked_or_unavailable": "honest unavailable/noPASS; required paired selected observation absence must fail"
+  },
+  "existing_observation_reuse": {
+    "runtime": "HeatBalanceState pre/post-history owners and HeatBalanceSimulationSummary initial/first/hourly history slots already exist; ResultStore has actual conduction/storage vectors.",
+    "ordinary_bounded_porting_cli_full_history_export": "not established by this audit; diagnostic main.rs exposes separate CTF summaries and must not be relabelled as the bounded production route",
+    "minimal_future_copy": "If needed, copy actual returned state/summary/ResultStore through the existing production observer/transport. No coefficient evaluation, rerun or new QA execution framework."
+  },
+  "test_proposal": {
+    "count": 3,
+    "new_owner": "crates/ep_runtime/src/runtime/tests/ctf02_surface_integration.rs",
+    "declaration_only_parent": "crates/ep_runtime/src/runtime/tests.rs",
+    "fixture": "existing typed cube_model with real NoMass material, ordinary initializer, no override rows",
+    "tests_run": false,
+    "numerical_Native_answers_injected": false,
+    "new_comparison_tolerances": false,
+    "complete_SUR04_SUR07_science_certificate": false
+  },
+  "excluded": [
+    "massive CTF solver",
+    "NumHistories>1 interpolation",
+    "EIO/Native expected rows",
+    "pool/source-sink/EMPD/Kiva/EMS expansion",
+    "SUR04/SUR07 gate completion",
+    "new QA framework"
+  ],
+  "target_imported": false,
+  "target_executed": false,
+  "scientific_payloads_read": false,
+  "binary_payloads_read": false,
+  "canonical_sources_modified": false
+}

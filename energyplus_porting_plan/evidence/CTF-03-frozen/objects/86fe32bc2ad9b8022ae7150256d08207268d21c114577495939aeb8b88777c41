@@ -1,0 +1,65 @@
+--- .runtime/porting/CTF-01/native-observer-prep-01/ctf01_observer.cc
++++ .runtime/porting/CTF-03/native-observer-prep-01/ctf03_observer.cc
+@@ -1,5 +1,5 @@
+ // No engine calls, floating-point arithmetic, allocation, I/O or scientific writes.
+-#include "ctf01_observer.hh"
++#include "ctf03_observer.hh"
+ 
+ #include <cstring>
+ #include <limits>
+@@ -139,4 +139,55 @@
+     }
+ }
+ 
++void post_initial_discretization(EnergyPlusData const &state,
++                                 Construction::ConstructionProps const &construction,
++                                 bool ErrorsFound, bool DoCTFErrorReport,
++                                 int LayersInConstruct, int NumResLayers,
++                                 Array1D_int const &Nodes, Array1D<Real64> const &dx,
++                                 Real64 const &TimeStepZone) noexcept
++{
++    Capture *capture = active_capture;
++    if (capture == nullptr) {
++        return;
++    }
++    std::size_t const index = static_cast<std::size_t>(Phase::InitialDiscretization);
++    std::size_t const previous_count = capture->actual_callback_count++;
++    if (capture->bound_state != &state || capture->bound_construction != &construction) {
++        capture->identity_mismatch = true;
++        return;
++    }
++    ++capture->actual_phase_callback_counts[index];
++    if (previous_count != index) {
++        capture->phase_order_invalid = true;
++    }
++    InitialDiscretizationSnapshot &snapshot = capture->initial_discretization;
++    if (snapshot.reached) {
++        capture->duplicate_phase = true;
++        return;
++    }
++    snapshot.reached = true;
++    snapshot.ErrorsFound = ErrorsFound;
++    snapshot.DoCTFErrorReport = DoCTFErrorReport;
++    snapshot.LayersInConstruct = LayersInConstruct;
++    snapshot.NumResLayers = NumResLayers;
++    snapshot.rcmax = construction.rcmax;
++    snapshot.NodeSource = construction.NodeSource;
++    snapshot.NodeUserTemp = construction.NodeUserTemp;
++    snapshot.CTFTimeStep = copy_bits(construction.CTFTimeStep);
++    snapshot.NumHistories = construction.NumHistories;
++    snapshot.TimeStepZone = copy_bits(TimeStepZone);
++    if (LayersInConstruct < 0 || LayersInConstruct > Construction::MaxLayersInConstruct ||
++        !covers_prefix(Nodes, LayersInConstruct) || !covers_prefix(dx, LayersInConstruct)) {
++        capture->active_prefix_invalid = true;
++        return;
++    }
++    for (int layer = 1; layer <= LayersInConstruct; ++layer) {
++        InitialLayerSnapshot &copy = snapshot.active_prefix[static_cast<std::size_t>(layer - 1)];
++        copy.Nodes = Nodes(layer);
++        copy.dx = copy_bits(dx(layer));
++    }
++    snapshot.copied_layer_count = static_cast<std::size_t>(LayersInConstruct);
++    snapshot.active_prefix_available = true;
++}
++
+ } // namespace EnergyPlus::CTF01Observation

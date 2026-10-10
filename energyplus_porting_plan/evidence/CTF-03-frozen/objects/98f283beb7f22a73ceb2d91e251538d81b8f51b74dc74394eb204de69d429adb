@@ -1,0 +1,52 @@
+--- /dev/null
++++ .runtime/porting/CTF-03/native-helper-prep-01/ctf03_initial_fields.hh
+@@ -0,0 +1,49 @@
++// Pure serialization of the actual passive post-619 capture; no node evaluator.
++#ifndef CTF03_INITIAL_FIELDS_HH
++#define CTF03_INITIAL_FIELDS_HH
++#include "ctf01_reference_metadata.hh"
++#include "ctf03_observer.hh"
++
++namespace Ctf01 {
++inline json ctf03_initial_policy()
++{
++    return {{"protocol", "ctf03-initial-discretization.v1"},
++        {"phase", "after_original_Construction_cc619_before_matrix_allocation_and_retry"},
++        {"selection", "actual_initial_callback_reached_and_intact_active_prefix"},
++        {"required_owner_context", {{"SourceSinkPresent", false}, {"SolutionDimensions", 1}}},
++        {"active_layer_fields", {"Nodes", "dx"}},
++        {"integer_fields", {"LayersInConstruct", "NumResLayers", "rcmax", "NodeSource", "NodeUserTemp", "NumHistories"}},
++        {"scalar_fields", {"CTFTimeStep", "TimeStepZone"}},
++        {"initial_state_distinct_from_whole_return_and_retry_state", true},
++        {"PostConversion_layer_handoff_retained", true},
++        {"PostConversion_handoff_fields", {"LayersInConstruct", "NumResLayers", "dl", "rk", "rho", "cp", "lr", "ResLayer"}},
++        {"capacitance_factors_are_actual_rho_and_cp_not_recomputed_products", true},
++        {"required_reached_fields_absent_is_integrity_failure", true},
++        {"unreached_counted_as_PASS", false}, {"branch_or_numeric_answers_reconstructed", false}};
++}
++inline json initial_checkpoint(EnergyPlus::CTF01Observation::InitialDiscretizationSnapshot const &source,
++                               std::size_t actual_count)
++{
++    if (!source.reached) return {{"reached", false}, {"available", false},
++        {"unavailable_reason", "callback_not_reached"}, {"actual_phase_callback_count", actual_count}, {"snapshot", nullptr}};
++    json layers = nullptr;
++    if (source.active_prefix_available) {
++        require(source.copied_layer_count <= source.active_prefix.size(), "Actual initial copied prefix exceeds its capacity");
++        layers = json::array();
++        for (std::size_t i = 0; i < source.copied_layer_count; ++i) {
++            auto const &layer = source.active_prefix[i];
++            layers.push_back({{"Nodes", layer.Nodes}, {"dx", scalar_bits(layer.dx.bits)}});
++        }
++    }
++    return {{"reached", true}, {"available", source.active_prefix_available},
++        {"unavailable_reason", source.active_prefix_available ? json(nullptr) : json("observer_active_prefix_invalid")},
++        {"actual_phase_callback_count", actual_count}, {"snapshot", {
++            {"LayersInConstruct", source.LayersInConstruct}, {"NumResLayers", source.NumResLayers},
++            {"ErrorsFound", source.ErrorsFound}, {"DoCTFErrorReport", source.DoCTFErrorReport},
++            {"active_prefix_available", source.active_prefix_available}, {"copied_layer_count", source.copied_layer_count},
++            {"active_prefix", layers}, {"rcmax", source.rcmax}, {"NodeSource", source.NodeSource},
++            {"NodeUserTemp", source.NodeUserTemp}, {"CTFTimeStep", scalar_bits(source.CTFTimeStep.bits)},
++            {"NumHistories", source.NumHistories}, {"TimeStepZone", scalar_bits(source.TimeStepZone.bits)}}}};
++}
++} // namespace Ctf01
++#endif

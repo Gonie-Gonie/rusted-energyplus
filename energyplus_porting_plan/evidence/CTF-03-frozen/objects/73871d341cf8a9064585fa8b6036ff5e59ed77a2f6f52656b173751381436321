@@ -1,0 +1,40 @@
+# CTF03 actual Native build and strict PE review source
+
+SOURCE ONLY, HELD unexecuted. This is the accepted CTF02 reader97 adapted to
+CTF03 unit/production targets. Root alone supplies real future build metadata,
+executes this same review stage, and reads binaries. No new SourceQA framework,
+engine call, actual result, expected outcome or future digest is created here.
+
+CLI remains `python -X utf8 -B review_build.py --lane unit|production --build
+<actual-build-manifest-path#SHA> --output-dir <fresh-review-directory>` (11 argv).
+Schemas: ctf03[-production]-native-build.v1 and corresponding
+independent-build-PE-review.v1. Build target must be ctf03_unit_helper or
+ctf03_production_helper; status pass-actual-3TU-link-and-preservation.
+All configure/compile/derive receipts must be actual source-preserving exit0.
+
+The source recipe adds two targets of helper+derived Construction+observer,
+therefore current_compile_rows must equal actual previous_compile_rows+6.
+Previous/current rows are typed actual runtime inventory counts, not invented
+future facts. The unchanged registered core643/present631/absent12 remains a
+preservation obligation. Root computes protected_ref_count from genuine before
+inventory, and it must be typed positive and equal actual preservation refs.
+No guessed32/30 count replaces that actual inventory. Earlier protected binaries
+and all present core objects remain preserved by actual Root evidence.
+
+Native8 direct source refs are byte-authenticated. The original core Construction
+object must have zero selected hits; actual provider text must name the new
+Construction.ctf03.cc.obj. These are real link metadata requirements, not an
+assumed successful future link. The accepted native_pe primitive performs the
+same actual original/derived inspect+exact runtime comparison, comparing the
+actual maps to the real derivation maps. No engine/scientific result is read.
+
+Output remains compact stdout {review:<actual report ref>,status:<actual status>}.
+The full report retains actual build/binary/derivative/PE source/maps and reader
+identity; additive typed observed before/current/protected counts are copied.
+OriginalDataQA later authenticates this exact approved reader SHA/argv/stdout;
+it does not re-open helper or original binary payloads.
+
+Before copy and exact normalized-text diff preserve the accepted source. Root
+and another author must review this held source before actual use. This author
+wrote passive03 and earlier CTF01 input/QA glue; no independent scientific or
+own-formula certificate is claimed. Current scope/freeze/build refs stay runtime.

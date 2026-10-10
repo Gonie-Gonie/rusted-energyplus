@@ -1,0 +1,51 @@
+{
+  "schema": "ctf02-actual-Rust-surface-regressions.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-02-surface-regressions/manifest.json",
+    "sha256": "2d058af68b565bf43dc404ac7a94a1b8031a642662f5d5d57c2ead702a4294b6",
+    "size_bytes": 17559
+  },
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/e3/e393963443f0bf45c25c0a3a83e2df8a7185024e38664523bcd1ee1e0bdcdde7",
+    "sha256": "e393963443f0bf45c25c0a3a83e2df8a7185024e38664523bcd1ee1e0bdcdde7"
+  },
+  "actual_selected_tests": {
+    "command": "cargo test --locked -p ep_runtime ctf02_",
+    "passed": 3,
+    "failed": 0,
+    "ignored": 0,
+    "filtered_out": 3014,
+    "execution": {
+      "path": "energyplus_porting_plan/evidence/CTF-02-surface-regressions/objects/20c41528ef4fc1a718ea207871135c285560b6d41c2aef1182660818eafa6cd5",
+      "sha256": "20c41528ef4fc1a718ea207871135c285560b6d41c2aef1182660818eafa6cd5",
+      "size_bytes": 2921
+    }
+  },
+  "actual_clippy": {
+    "path": "energyplus_porting_plan/evidence/CTF-02-surface-regressions/objects/4a7ccfedf90254aeb450be47d6d63bb5ce05a8eadaf646c7e084f6a3a2de0ec2",
+    "sha256": "4a7ccfedf90254aeb450be47d6d63bb5ce05a8eadaf646c7e084f6a3a2de0ec2",
+    "size_bytes": 2975
+  },
+  "actual_fmt": {
+    "path": "energyplus_porting_plan/evidence/CTF-02-surface-regressions/objects/c9bfa3c291314ede12a2afb518a0a437b14ab9922b758fb221abf1dd99c9cc56",
+    "sha256": "c9bfa3c291314ede12a2afb518a0a437b14ab9922b758fb221abf1dd99c9cc56",
+    "size_bytes": 2886
+  },
+  "Source_review": "Root FULL124/tests afterformat; Base other-author FULL; exact parent include and all30refs/66ranges",
+  "Native_answers_supplied": false,
+  "production_math_changed": false,
+  "Native_SUR04_SUR07_parity_certified": false,
+  "CTF02_integration_gate_passed": false,
+  "complete_CTF02_PASS_claimed": false,
+  "checks": [
+    "ordinary empty-override initialization and actual generated construction-to-surface copies",
+    "actual caller timestep and fresh independent history state",
+    "boundary and damping dependence of actual inside consumer",
+    "report signs, retained inside-phase outside operand and actual history commit"
+  ],
+  "pending": [
+    "genuine Native surface-HB initialization/caller and same per-iteration/report/history observations",
+    "source reciprocal-then-multiply versus existing Rust divide/EPS fallback in future SUR04 scope",
+    "actual whole timestep driver option/phase equivalence"
+  ]
+}

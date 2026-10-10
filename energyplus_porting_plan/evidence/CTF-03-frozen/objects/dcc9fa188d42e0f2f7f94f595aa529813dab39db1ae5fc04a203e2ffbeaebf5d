@@ -1,0 +1,69 @@
+# CTF-03 passive initial-discretization source preparation
+
+This held source fork extends the accepted CTF-01 whole Construction observer
+with one passive callback immediately after original Construction.cc line 619,
+before the initial matrix allocations and before the convergence/retry loop.
+It does not execute a helper, amend a packet or establish comparison policy.
+
+The fresh full derived translation unit differs from the held CTF-01 derived
+unit only in the observer include and the added callback. All three old
+callback callsites remain byte-identical. Removing all four passive callback
+calls and the observer include restores the full pinned original Construction.cc
+bytes exactly. All code below this new checkpoint continues unchanged.
+
+The replacement observation header/implementation retain the existing
+CTF01Observation namespace and binding identity to the actual state and stable
+Construction array element. This preserves the old three callback bodies and
+their Snapshot[3] owners. The phase count array becomes length four, and a
+separate InitialDiscretizationSnapshot is added. Its phase ordinal is three,
+after PostLoad/PostMerge/PostConversion. Duplicate/order/binding/identity and
+active-prefix errors use the same existing capture flags and factual counters.
+
+Only the actual one-through-LayersInConstruct Nodes/dx prefix is copied. The
+snapshot preserves integer Nodes, raw IEEE binary64 dx bits, actual rcmax,
+actual NodeSource/NodeUserTemp, initial CTFTimeStep bits, initial NumHistories,
+actual caller TimeStepZone bits, and the two actual shared flags. There is no
+node sum, layer classification, integer conversion, timestep reconstruction,
+expected array, tolerance, physical evaluator or scientific write in the copy.
+The original converted-layer prefix remains in the old PostConversion owner;
+no original material IDs are invented for merged positions.
+
+The callback increments actual total and phase counts when an active binding
+exists, and validates its exact actual object identity and ordinal. It marks
+the checkpoint reached before copying real fields. Invalid allocated/lower-
+bound/upper-bound prefix shape sets active_prefix_invalid and leaves the
+prefix unavailable. Unreached default members are not observed operands:
+future serialization must emit unavailable/null rather than default zeros.
+The source never allocates, performs floating-point arithmetic, invokes the
+engine, writes files or mutates any scientific state from this callback.
+
+Source branches returning unused, shared-loading-error, all-resistive or
+reversed reuse do not call this checkpoint. Their absent initial state remains
+unavailable and cannot count as PASS. The snapshot does not infer which route
+was taken from numerical values. Future helpers must preserve real outcomes
+and route provenance, rather than manufacture invocation records for absence.
+
+The no-source selector reset is the real setNodeSourceAndUserTemp assignment
+at 2047-2050, already called at line 573. Initial dt/history are copied after
+the source's full 584-618 selection. Later retry assignments at 908-936 do not
+recalculate Nodes/dx and must have separate attempt state. This package never
+substitutes the final returned CTFTimeStep for the initial checkpoint value.
+
+Raw's held CTF-03 pure proposal borrows actual CtfConvertedLayers plus the
+actual caller zone-hours and exposes active {nodes,dx}, rcmax, selectors and
+initial dt/history. This passive Native owner supplies independent actual
+observations of the same selected fields. The Rust proposal is not assumed
+canonical, built or numerically verified by this source package.
+
+The future CTF-03 target must compile this replacement observer and derived
+TU together, with their matching header. It must not also compile/link the
+old CTF-01 observer implementation, nor mix old/new Capture definitions.
+Existing CTF-01/02 helpers and artifacts remain untouched. No helper/CMake,
+input matrix, freeze writer, output serializer or QA framework is added here.
+
+Root must fully read this source and obtain ordinary other-author peer review
+before any later compilation or execution. This package is only source-ready.
+Source/before/diff/restoration and bounded source hashes are checked without
+project imports, compiler, formatter, Cargo, Git, engine, binaries, scientific
+results or weather. Actual branch observations and every card gate remain
+pending; no numerical or integration PASS is claimed.

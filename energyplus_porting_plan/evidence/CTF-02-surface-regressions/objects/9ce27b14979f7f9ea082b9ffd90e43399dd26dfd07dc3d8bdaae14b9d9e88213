@@ -1,0 +1,259 @@
+"""Prepare ignored source/readiness proposals only; import no project modules."""
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+assert ROOT.name == "rusted-energyplus"
+assert not (OUT / "manifest.json").exists(), "held preparation is immutable"
+
+def digest(data):
+    return hashlib.sha256(data).hexdigest()
+
+def ref(path):
+    data = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": digest(data),
+            "size_bytes": len(data), "line_count": len(data.splitlines())}
+
+NATIVE = ".reference/energyplus-src/26.1.0/src/EnergyPlus/"
+RUNTIME = "crates/ep_runtime/src/"
+specs = [
+    ("energyplus_porting_plan/cards/CTF-02.md", []),
+    ("energyplus_porting_plan/cards/SUR-04.md", []),
+    ("energyplus_porting_plan/cards/SUR-07.md", []),
+    (NATIVE + "HeatBalanceSurfaceManager.cc", [(145,216),(272,405),(493,535),
+        (2248,2268),(2323,2346),(4951,5020),(5275,5330),(5410,5480),
+        (6605,6632),(6743,6831),(6859,6888),(7775,7813),(8658,8745),
+        (8785,8810),(8884,8938)]),
+    (NATIVE + "HeatBalanceSurfaceManager.hh", [(97,153),(180,192)]),
+    (NATIVE + "DataHeatBalSurface.hh", [(59,73)]),
+    (NATIVE + "DataHeatBalance.hh", [(426,434)]),
+    (NATIVE + "Construction.hh", [(64,71),(153,170)]),
+    (NATIVE + "SimulationManager.cc", [(878,880)]),
+    (RUNTIME + "heat_balance/ctf.rs", [(18,19),(71,93),(166,177),(214,253),
+        (347,427),(539,556),(669,810)]),
+    (RUNTIME + "heat_balance/initialization.rs", [(35,43),(100,158),(170,195)]),
+    (RUNTIME + "heat_balance/initialization/schedule_cache.rs", [(17,55)]),
+    (RUNTIME + "heat_balance/state.rs", [(48,64),(258,285),(350,370),(400,420),(432,471)]),
+    (RUNTIME + "heat_balance/surface_manager/construction_cache.rs", [(220,237)]),
+    (RUNTIME + "heat_balance/surface_manager/ctf_all_resistive.rs", [(9,28),(60,77),(93,122)]),
+    (RUNTIME + "heat_balance/surface_manager/ctf_all_resistive_tests.rs", [(141,184),(186,274)]),
+    (RUNTIME + "heat_balance/surface_loop.rs", [(335,423)]),
+    (RUNTIME + "heat_balance/timestep.rs", [(704,744)]),
+    (RUNTIME + "heat_balance/run_period.rs", [(205,245),(541,590),(812,875)]),
+    (RUNTIME + "heat_balance/reports.rs", [(69,90),(700,729),(772,843)]),
+    (RUNTIME + "heat_balance/trace.rs", [(757,810)]),
+    (RUNTIME + "heat_balance/summary.rs", [(123,142)]),
+    (RUNTIME + "runtime.rs", [(282,294),(320,348),(419,430)]),
+    (RUNTIME + "ideal_loads/coupled_runtime.rs", [(5996,6018)]),
+    (RUNTIME + "runtime/tests/part03.rs", [(834,862),(1052,1118)]),
+    (RUNTIME + "runtime/tests/part09.rs", [(33,65),(72,118)]),
+    (RUNTIME + "runtime/tests.rs", []),
+    ("crates/ep_model/src/objects/surfaces.rs", [(74,93)]),
+    ("crates/ep_run/src/pipeline.rs", [(3585,3605),(3798,3820)]),
+    (".runtime/porting/CTF-02/native-observer-prep-01/ctf02_production_helper.cpp", [(118,185)]),
+]
+
+source_refs = []
+ranges = []
+for name, spans in specs:
+    path = ROOT / name
+    source_refs.append(ref(path))
+    lines = path.read_bytes().splitlines(keepends=True)
+    for start, end in spans:
+        assert 1 <= start <= end <= len(lines), (name, start, end, len(lines))
+        body = b"".join(lines[start - 1:end])
+        ranges.append({"path": name, "start_line": start, "end_line": end,
+                       "sha256": digest(body), "size_bytes": len(body)})
+
+readiness = {
+    "schema": "ctf02-surface-integration-source-readiness.v1",
+    "status": "source-proposal-only-no-integration-PASS",
+    "scope": ["selected reached all-resistive CTF-02 storage", "SUR-04 inside consumer",
+              "SUR-07 conduction report signs", "actual caller timestep and fresh history handoff"],
+    "source_files": source_refs,
+    "source_ranges": ranges,
+    "actual_owner_chain": [
+        "TypedModel timestep -> ConstructionThermalDataCache -> generate_all_resistive_ctf",
+        "ordinary initialize_heat_balance_state -> empty override slice -> selected construction owner",
+        "actual construction association -> all_resistive_surface_ctf_state -> SurfaceCtfState",
+        "surface_loop actual history constants / outside operand / inside update",
+        "timestep actual pre-advance and post-advance history owners",
+        "run_period actual report operand -> ordered sums -> trace average -> OutputSeries"
+    ],
+    "selected_storage_contract": {
+        "num_histories": 1, "num_ctf_terms": 1,
+        "ctf_time_step": "actual typed 1.0 / steps, retained in construction owner",
+        "surface_owner_timestep_field": "absent; selected association remains in construction owner",
+        "history_extent": "Rust one history slot corresponds to Native history index2; current is Native index1",
+        "initial_temperature": "Native InitThermalAndFluxHistories uses SurfInitialTemp23.0; Rust initializer copies its explicit caller. Paired future calls must declare the same initialization phase/caller; local Rust fresh-state tests vary it without a Native equivalence claim.",
+        "native_constant_parts": "Native resets constants to0 and skips history summation for NumCTFTerms<=1; Rust traverses its one zero-coefficient history slot. No general massive/history equivalence is claimed.",
+        "general_history_interpolation": "not proved; NumHistories>1 is outside selected CTF-02 route"
+    },
+    "sur04": {
+        "source_operands": ["CTFInside0", "CTFCross0", "SurfIsAdiabatic", "SurfCTFConstInPart",
+            "actual SurfTempOutHist", "RefAirTemp", "SurfHConvInt", "SurfTempInsOld",
+            "actual non-pool/source-free source terms", "IterDampConst5.0"],
+        "actual_rule": "Adiabatic subtracts cross0 in denominator and removes current outside-temperature coupling. Ordinary route uses actual inside-update outside operand.",
+        "preexisting_unresolved_differences": [
+            "Native computes reciprocal then multiplies numerator; Rust divides the completed numerator.",
+            "Rust has EPS-denominator fallback to previous inside temperature; Native selected statement is unguarded.",
+            "Native whole CTF-only call iterates/converges and invokes real radiation/convection dependencies; one Rust kernel update cannot be compared to final Native converged state as the same operation."
+        ],
+        "proposal_changes_math": False,
+        "integration_PASS_available": False
+    },
+    "sur07": {
+        "actual_native_phase": "UpdateThermalHistories writes current fluxes and negates outside internal flux; later ReportSurfaceHeatBalance copies rates/area/energies/gain-loss/storage. UpdateIntermediateSurfaceHeatBalanceResults is not the opaque-conduction calculation.",
+        "inside_report_sign": "+ area * Qin_internal",
+        "outside_report_sign": "- area * Qout_internal",
+        "storage_sign": "- (inside_report_W + outside_report_W)",
+        "units": ["W/m2 before area", "W after area", "J after TimeStepZoneSec"],
+        "phase_obligation": "Retain the actual inside-update outside-temperature operand; separate later outside-face report recomputation cannot replace it.",
+        "proposal_changes_math": False,
+        "integration_PASS_available": False
+    },
+    "native_observation_gap": {
+        "current_helper": "real fixed-CON loaders / GetBuildingData / whole calculateTransferFunction only",
+        "surface_heat_balance_initialized_by_current_helper": False,
+        "future_genuine_route": "source-audit genuine initialization and whole ManageSurfaceHeatBalance or its genuine whole caller chain; preserve all prerequisites and method execution",
+        "candidate_passive_sites": [
+            {"after_line": 8933, "purpose": "actual per-iteration inside assignment and copied operands; retain actual iteration identity"},
+            {"after_line": 5327, "purpose": "actual current opaque conduction flux/report signs before history mutation"},
+            {"after_line": 6824, "purpose": "actual populated per-surface reporting owners after real report calculations"}
+        ],
+        "site_file": NATIVE + "HeatBalanceSurfaceManager.cc",
+        "sites_are_implemented": False,
+        "caller_feasibility_complete": False,
+        "required_future_proof": ["actual source calls and phases", "same input/initialization/timestep",
+            "actual construction/surface IDs", "real availability and errors", "all actual consumed coefficients",
+            "same per-iteration operand phase", "no substituted local formulas or injected Native results"],
+        "uninvoked_or_unavailable": "honest unavailable/noPASS; required paired selected observation absence must fail"
+    },
+    "existing_observation_reuse": {
+        "runtime": "HeatBalanceState pre/post-history owners and HeatBalanceSimulationSummary initial/first/hourly history slots already exist; ResultStore has actual conduction/storage vectors.",
+        "ordinary_bounded_porting_cli_full_history_export": "not established by this audit; diagnostic main.rs exposes separate CTF summaries and must not be relabelled as the bounded production route",
+        "minimal_future_copy": "If needed, copy actual returned state/summary/ResultStore through the existing production observer/transport. No coefficient evaluation, rerun or new QA execution framework."
+    },
+    "test_proposal": {
+        "count": 3,
+        "new_owner": "crates/ep_runtime/src/runtime/tests/ctf02_surface_integration.rs",
+        "declaration_only_parent": "crates/ep_runtime/src/runtime/tests.rs",
+        "fixture": "existing typed cube_model with real NoMass material, ordinary initializer, no override rows",
+        "tests_run": False,
+        "numerical_Native_answers_injected": False,
+        "new_comparison_tolerances": False,
+        "complete_SUR04_SUR07_science_certificate": False
+    },
+    "excluded": ["massive CTF solver", "NumHistories>1 interpolation", "EIO/Native expected rows",
+                 "pool/source-sink/EMPD/Kiva/EMS expansion", "SUR04/SUR07 gate completion", "new QA framework"],
+    "target_imported": False, "target_executed": False,
+    "scientific_payloads_read": False, "binary_payloads_read": False,
+    "canonical_sources_modified": False
+}
+
+def write_json(path, value):
+    path.write_text(json.dumps(value, indent=2, ensure_ascii=True) + "\n", encoding="utf-8", newline="\n")
+
+write_json(OUT / "readiness.json", readiness)
+readme = """# CTF-02 surface integration source proposal
+
+This is an ignored, unexecuted source/readiness proposal. Canonical mathematics,
+production paths, comparison profiles, and held CTF-02 proposals are unchanged.
+The exact source/range inventory is in readiness.json. No engine, target import,
+compiler, formatter, scientific result or binary payload was used.
+
+Actual construction storage already reaches ordinary surface initialization.
+The three proposed Rust tests strengthen that ingress rather than importing any
+Native coefficient answer: they use the existing NoMass cube fixture, the public
+ordinary initializer's empty override path, and actual generated owner copies.
+They exercise fresh timestep/history state; actual boundary/damping dependence;
+and report signs, retained outside operand and history commit. The older synthetic
+sign test and CTF generation/copy tests remain unchanged. These tests have not run.
+
+The only proposed canonical source changes are a new included test file and one
+include line in runtime/tests.rs. The new tests use existing APIs and add no math,
+lookup, production collector or public owner field. See the exact unified diffs.
+Root must apply/format/review/run any accepted source proposal; no application is
+performed here. They are Rust integration checks, not an Original equivalence PASS.
+
+Native SUR-04 computes reciprocal then multiplies, whereas the current Rust kernel
+divides the completed numerator and retains an existing EPS-denominator fallback.
+Those source differences are explicitly unresolved for a future SUR-04 paired
+domain/profile decision; this proposal changes neither arithmetic nor tolerance.
+The Native whole inside call includes convergence and real dependent routines.
+Its final result cannot stand in for one inside-iteration observation.
+
+For SUR-07 Native UpdateThermalHistories computes current fluxes and negates the
+outside internal flux before the later report. Inside W is area*Qin, outside W is
+-area*Qout, and storage is -(inside+outside). A later report-face recomputation must
+not replace the outside-temperature operand used by the inside CTF phase.
+
+The current genuine Native helper establishes loader/geometry associations and
+whole construction-method observations only. It does not initialize or execute
+surface heat balance. Future paired integration needs genuine initialization and
+whole-call execution plus passive copies at actual source sites; readiness.json
+lists candidate sites and unavailable prerequisites. No new harness is authored.
+
+Native history initialization uses source SurfInitialTemp23.0 and zeros fluxes;
+Rust initialization copies its explicit caller. The local fresh-state tests vary
+that caller to detect stale state. They do not assert those values are the Native
+default. A future paired call must bind the same initialization phase/caller.
+Selected all-resistive storage has one history term/one zone-step history interval;
+general massive histories and interpolation remain unproved and outside this plan.
+
+The author previously authored the CTF-01 preprocessing and CTF-02 observers/
+comparers. This readiness proposal supplies source/transport facts and proposed
+tests, not an independent numerical certificate for those algorithms.
+"""
+(OUT / "README.md").write_text(readme, encoding="utf-8", newline="\n")
+
+parent = ROOT / (RUNTIME + "runtime/tests.rs")
+before = parent.read_bytes()
+(OUT / "before").mkdir(exist_ok=True)
+(OUT / "proposed").mkdir(exist_ok=True)
+(OUT / "before/tests.rs").write_bytes(before)
+line_end = b"\r\n" if b"\r\n" in before else b"\n"
+addition = b'include!("tests/ctf02_surface_integration.rs");' + line_end
+assert addition.strip() not in before
+after = before + (b"" if before.endswith(b"\n") else line_end) + addition
+(OUT / "proposed/tests.rs").write_bytes(after)
+
+def write_diff(a, b, old_name, new_name, target):
+    body = "".join(difflib.unified_diff(a.decode("utf-8").splitlines(True),
+        b.decode("utf-8").splitlines(True), fromfile=old_name, tofile=new_name))
+    target.write_text(body, encoding="utf-8", newline="")
+
+write_diff(before, after, "a/" + parent.relative_to(ROOT).as_posix(),
+    "b/" + parent.relative_to(ROOT).as_posix(), OUT / "tests.rs.diff")
+new_test = OUT / "new/ctf02_surface_integration.rs"
+write_diff(b"", new_test.read_bytes(), "/dev/null",
+    "b/" + readiness["test_proposal"]["new_owner"], OUT / "ctf02_surface_integration.rs.new.diff")
+
+for row in source_refs:
+    assert ref(ROOT / row["path"]) == row, "source changed while preparing: " + row["path"]
+
+own_names = ["prepare.py", "readiness.json", "README.md", "new/ctf02_surface_integration.rs",
+             "before/tests.rs", "proposed/tests.rs", "tests.rs.diff", "ctf02_surface_integration.rs.new.diff"]
+manifest = {
+    "schema": "ctf02-surface-integration-source-preparation.v1",
+    "status": "SOURCE-READY-UNEXECUTED",
+    "own_files": [ref(OUT / name) for name in own_names],
+    "source_file_count": len(source_refs), "source_range_count": len(ranges),
+    "source_inventory": ref(OUT / "readiness.json"),
+    "proposed_changes": [
+        {"historical_path": readiness["test_proposal"]["new_owner"], "before": None,
+         "proposed": ref(new_test), "diff": ref(OUT / "ctf02_surface_integration.rs.new.diff")},
+        {"historical_path": parent.relative_to(ROOT).as_posix(), "before": ref(OUT / "before/tests.rs"),
+         "proposed": ref(OUT / "proposed/tests.rs"), "diff": ref(OUT / "tests.rs.diff")}
+    ],
+    "tests_run": False, "production_math_changes": False,
+    "scientific_payloads_read": False, "binary_payloads_read": False,
+    "target_imported": False, "target_executed": False, "canonical_writes": False
+}
+write_json(OUT / "manifest.json", manifest)
+print(json.dumps({"manifest": ref(OUT / "manifest.json"),
+                  "new_tests": ref(new_test), "readiness": ref(OUT / "readiness.json"),
+                  "source_file_count": len(source_refs), "source_range_count": len(ranges)}))

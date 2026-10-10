@@ -1,0 +1,97 @@
+{
+  "schema": "ctf03-native-build-review-source-preparation.v1",
+  "status": "SOURCE-READY-HELD-unexecuted",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/CTF-03/native-build-review-prep-01/review_build.py",
+      "sha256": "df5d445612f3cd76555c42a37efa4994bbcea4fd09eb2ef75c867ac75b6adef0",
+      "size_bytes": 5613,
+      "line_count": 106
+    }
+  ],
+  "before_sources": [
+    {
+      "historical_path": ".runtime/porting/CTF-02/native-build-review-prep-01/review_build.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-03/native-build-review-prep-01/before/review_build.py",
+        "sha256": "776b0a2fdae777a73386355f63734e60f42e4068cbaf55ddfcf2590ba3658104",
+        "size_bytes": 4905,
+        "line_count": 97
+      }
+    }
+  ],
+  "exact_source_diffs": [
+    {
+      "path": ".runtime/porting/CTF-03/native-build-review-prep-01/review_build.py.from-ctf02.diff",
+      "sha256": "cb631a3a16bb9a4fe76190211ec2c624c78755a46059222e824daea403e48ae2",
+      "size_bytes": 3661,
+      "line_count": 55
+    }
+  ],
+  "README": {
+    "path": ".runtime/porting/CTF-03/native-build-review-prep-01/README.md",
+    "sha256": "73871d341cf8a9064585fa8b6036ff5e59ed77a2f6f52656b173751381436321",
+    "size_bytes": 2598,
+    "line_count": 40
+  },
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/CTF-02/native-build-review-prep-01/manifest.json",
+      "sha256": "4f5c8750663f8e667934859377528136d07bbdd5c0ae8ffde9a1bc260387ed17",
+      "size_bytes": 9590,
+      "line_count": 246
+    },
+    {
+      "path": "tools/porting/native_pe.py",
+      "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+      "size_bytes": 20217,
+      "line_count": 346
+    },
+    {
+      "path": ".runtime/porting/CTF-03/native-helper-prep-01/manifest.json",
+      "sha256": "34dad09e4e7825006cc237d3b36aa3e649f637e328bd5bf39def1c07ebe45322",
+      "size_bytes": 35224,
+      "line_count": 875
+    },
+    {
+      "path": ".runtime/porting/CTF-03/native-helper-prep-01/ctf03_reference.cmake",
+      "sha256": "a218b2a8545b2726a2f0df963387cf334280477652eecc191e9abc160ee91ca0",
+      "size_bytes": 2299,
+      "line_count": 37
+    }
+  ],
+  "inherited_source_contexts": [],
+  "runtime_build_protocol": {
+    "schemas": [
+      "ctf03-native-build.v1",
+      "ctf03-production-native-build.v1"
+    ],
+    "status": "pass-actual-3TU-link-and-preservation",
+    "targets": [
+      "ctf03_unit_helper",
+      "ctf03_production_helper"
+    ],
+    "new_compile_rows_source_obligation": 6,
+    "actual_previous_compile_rows": null,
+    "actual_current_compile_rows": null,
+    "actual_protected_ref_count": null,
+    "core_preservation": {
+      "registered": 643,
+      "present": 631,
+      "absent": 12
+    },
+    "native_source_files_each_lane": 8
+  },
+  "checks": {
+    "stdlib_AST_parse_only": true,
+    "before_raw_bytes_exact": true,
+    "exact_diff_generated": true,
+    "no_fixed_future_protected_count": true
+  },
+  "authorship_limits": "Author of passive03 and earlier CTF01 input/QA glue; factual source/provenance adaptation only.",
+  "project_imports_or_targets_executed": false,
+  "actual_binary_or_scientific_result_payloads_read": false,
+  "canonical_files_changed": false,
+  "new_QA_framework": false,
+  "numerical_PASS_claimed": false
+}

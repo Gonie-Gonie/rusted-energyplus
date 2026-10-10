@@ -1,0 +1,136 @@
+// One-way frozen CTF input admission; no expected arrays or source outcomes.
+#ifndef CTF03_UNIT_ADMISSION_HH
+#define CTF03_UNIT_ADMISSION_HH
+#include "ctf01_reference_metadata.hh"
+#include "ctf03_initial_fields.hh"
+#include <set>
+
+namespace Ctf01 {
+struct Packet { json request, admission, contracts, requested_counts; fs::path projection_path; };
+inline Packet admit(fs::path const &root, fs::path const &request_path, fs::path const &admission_path)
+{
+    Packet packet; packet.request = read_json(request_path); packet.admission = read_json(admission_path);
+    auto const &request = packet.request; auto const &admission = packet.admission;
+    require(request.at("schema") == "ctf03-helper-cases.v1" && admission.at("schema") == "ctf03-native-admission-contract.v1" &&
+        request.at("energyplus_commit") == "6f2e40d10250a105b49966baa24d843711e61048" &&
+        admission.at("energyplus_commit") == request.at("energyplus_commit"), "Wrong pinned source/schema");
+    for (auto const *value : {&request, &admission}) require(value->at("frozen_before_this_CTF03_helper_execution") == true &&
+        value->at("expected_values_supplied") == false && value->at("expected_exits_supplied") == false &&
+        value->at("scientific_execution_performed") == false, "Frozen input-only pre-execution policy required");
+    for (auto const *key : {"actual_scope_amendment", "actual_scope_amendment_execution"}) {
+        require(request.at(key) == admission.at(key), "Actual scope authority binding differs");
+        bound_path(root, request.at(key));
+    }
+    require(bound_path(root, admission.at("helper_request")) == fs::weakly_canonical(request_path) &&
+        request.at("fixed_scope") == admission.at("fixed_scope") && request.at("all_45_guard_refs") == admission.at("all_45_guard_refs"),
+        "One-way request/scope binding differs");
+    auto const scope = read_json(bound_path(root, request.at("fixed_scope"))); json guards = json::array();
+    for (auto const &row : scope.at("cases")) for (auto const *key : {"input", "weather", "metadata"}) guards.push_back(row.at(key));
+    require(guards.size() == 45 && guards == request.at("all_45_guard_refs"), "Exact ordered 45 inherited CON input guards required");
+    for (auto const &row : guards) bound_path(root, row);
+    require(request.at("contracts").is_object() && request.at("contracts").size() == 2 &&
+        admission.at("contracts").is_object() && admission.at("contracts").size() == 3 &&
+        request.at("contracts").at("source") == admission.at("contracts").at("source") &&
+        request.at("contracts").at("tolerances") == admission.at("contracts").at("tolerances"), "One-way source/tolerance DAG differs");
+    packet.contracts = json::object();
+    for (auto const *key : {"source", "cases", "tolerances"}) {
+        auto const path = bound_path(root, admission.at("contracts").at(key)); auto const value = read_json(path);
+        require(value.at("schema") == std::string("ctf03-") + key + "-contract.v1" && value.at("frozen_before_this_CTF03_helper_execution") == true,
+                "Contract schema/frozen policy differs");
+        if (std::string(key) == "source") {
+            require(value.at("energyplus_commit") == request.at("energyplus_commit"), "Original source identity differs");
+            auto const source_root = fs::weakly_canonical(root / ".reference/energyplus-src/26.1.0");
+            for (auto const &row : value.at("source_files")) {
+                json binding = row;
+                binding["path"] = (fs::path(".reference/energyplus-src/26.1.0") / row.at("path").get<std::string>()).generic_string();
+                auto const actual = bound_path(root, binding); auto const inside = actual.lexically_relative(source_root);
+                require(!inside.empty() && *inside.begin() != "..", "Pinned source path escapes original tree");
+            }
+        }
+        if (std::string(key) == "cases") require(value.at("helper_request") == admission.at("helper_request") &&
+            value.at("source") == admission.at("contracts").at("source") && value.at("tolerances") == admission.at("contracts").at("tolerances") &&
+            value.at("fixed_CON_scope") == request.at("fixed_scope") && value.at("all_45_guard_refs") == guards, "Case contract DAG differs");
+        packet.contracts[key] = file_ref(path);
+    }
+    require(admission.at("native_source_files").is_array() && admission.at("native_source_files").size() == 8,
+            "Exact inherited helper/observer sources and initial capture serializer required");
+    std::set<std::string> names;
+    for (auto const &row : admission.at("native_source_files"))
+        require(names.insert(bound_path(root, row).filename().string()).second, "Duplicate Native source filename");
+    require(names == std::set<std::string>{"ctf03_unit_helper.cpp", "ctf01_reference_metadata.hh", "ctf03_unit_fields.hh",
+        "ctf03_unit_admission.hh", "Construction.ctf03.cc", "ctf03_observer.hh", "ctf03_observer.cc", "ctf03_initial_fields.hh"}, "Native source inventory differs");
+    packet.projection_path = bound_path(root, admission.at("projection")); auto const projection = read_json(packet.projection_path);
+    require(projection.at("schema") == "ctf03-observation-projection.v1" && projection.at("frozen_before_this_CTF03_helper_execution") == true &&
+        projection.at("helper_request") == admission.at("helper_request") && projection.at("contracts") == admission.at("contracts") &&
+        projection.at("native_observation_policy") == request.at("observation_policy"), "Observation DAG differs");
+    require(request.at("ctf03_initial_observation_policy") == ctf03_initial_policy() &&
+        admission.at("ctf03_initial_observation_policy") == ctf03_initial_policy() &&
+        projection.at("ctf03_initial_observation_policy") == ctf03_initial_policy(),
+        "Frozen initial post-619 observation policy differs");
+    auto const tolerances = read_json(bound_path(root, admission.at("contracts").at("tolerances")));
+    require(tolerances.at("ctf03_initial_observation_policy") == ctf03_initial_policy(), "Initial-state tolerance scope differs");
+    std::array<char const *, 3> const variables{{"dx", "initial_CTFTimeStep", "caller_TimeStepZone"}};
+    auto const &profiles = tolerances.at("arithmetic_profiles_by_variable");
+    require(profiles.is_array() && profiles.size() == variables.size(), "Three distinct initial-state profiles required");
+    for (std::size_t i = 0; i < variables.size(); ++i) {
+        auto const &profile = profiles.at(i);
+        require(profile.at("variable") == variables[i] && profile.at("atol") == 0.0 && profile.at("rtol") == 0.0 &&
+            profile.at("class_exact") == true && profile.at("shape_exact") == true && profile.at("signed_zero_exact") == true,
+            "Frozen exact initial-state profile differs");
+    }
+    auto const &models = request.at("model_cases");
+    require(models.is_array() && !models.empty() && models.size() <= 256, "Bounded nonempty model array required");
+    std::set<std::string> model_ids; std::size_t calls = 0;
+    for (auto const &row : models) {
+        require(row.is_object() && row.size() == 6 && row.at("lane") == "explicit-member-unit", "Exact selected member-input model required");
+        identifier(row.at("id")); require(model_ids.insert(row.at("id").get<std::string>()).second, "Duplicate model ID");
+        auto const &caller = row.at("caller");
+        require(caller.is_object() && caller.size() == 4 && caller.at("ErrorsFound").is_boolean() && caller.at("DoCTFErrorReport").is_boolean(),
+                "Exact caller members and typed shared flags required");
+        require(input_real(caller.at("TimeStepZone")) > 0.0 && input_real(caller.at("TimeStepZoneSec")) > 0.0,
+                "Positive literal caller time members required");
+        auto const &materials = row.at("materials"); std::set<std::string> material_ids, material_names;
+        require(materials.is_array() && !materials.empty() && materials.size() <= 256, "Bounded real material owners required");
+        for (auto const &material : materials) {
+            require(material.is_object() && material.size() == 8 && material.at("ROnly").is_boolean(), "Exact typed material members required");
+            identifier(material.at("id")); identifier(material.at("Name"));
+            require(material_ids.insert(material.at("id").get<std::string>()).second &&
+                    material_names.insert(material.at("Name").get<std::string>()).second, "Duplicate material input ID/name");
+            double const d = input_real(material.at("Thickness")), k = input_real(material.at("Conductivity"));
+            double const rho = input_real(material.at("Density")), cp = input_real(material.at("SpecHeat"));
+            require(input_real(material.at("Resistance")) > 0.0, "Positive literal stored Resistance required");
+            if (material.at("ROnly").get<bool>()) {
+                for (auto value : {d, k, rho, cp}) require(std::bit_cast<std::uint64_t>(value) == 0, "Selected NoMass base members require actual positive-zero defaults");
+            } else require(d > 0.0 && k > 0.0 && rho > 0.0 && cp > 0.0, "Selected explicit regular mass members must be positive");
+        }
+        auto const &constructions = row.at("constructions"); auto const &operations = row.at("operations");
+        require(constructions.is_array() && !constructions.empty() && constructions.size() <= 64 &&
+                operations.is_array() && operations.size() == constructions.size(), "Each actual ordered construction requires one genuine call");
+        std::set<std::string> construction_ids, construction_names, operation_ids;
+        for (std::size_t i = 0; i < constructions.size(); ++i) {
+            auto const &construction = constructions.at(i); auto const &operation = operations.at(i);
+            require(construction.is_object() && construction.size() == 9 && construction.at("IsUsedCTF").is_boolean() &&
+                construction.at("SourceSinkPresent").is_boolean() && construction.at("SourceSinkPresent") == false &&
+                construction.at("SolutionDimensions").is_number_integer() && construction.at("SolutionDimensions") == 1 &&
+                construction.at("SourceAfterLayer").is_number_integer() && construction.at("SourceAfterLayer") == 0 &&
+                construction.at("TempAfterLayer").is_number_integer() && construction.at("TempAfterLayer") == 0 &&
+                std::bit_cast<std::uint64_t>(input_real(construction.at("ThicknessPerpend"))) == 0, "Only the selected normal no-source construction lane is admitted");
+            identifier(construction.at("id")); identifier(construction.at("Name"));
+            require(construction_ids.insert(construction.at("id").get<std::string>()).second &&
+                construction_names.insert(construction.at("Name").get<std::string>()).second, "Duplicate construction input ID/name");
+            auto const &layers = construction.at("layer_material_ids");
+            require(layers.is_array() && !layers.empty() && layers.size() <= 11, "Actual one-through-eleven ordered layer membership required");
+            for (auto const &id : layers) require(id.is_string() && material_ids.contains(id.get<std::string>()), "Unknown literal material membership");
+            require(operation.is_object() && operation.size() == 3 && operation.at("kind") == "calculateTransferFunction" &&
+                operation.at("construction_id") == construction.at("id"), "Actual construction array order must equal declared whole-call order");
+            identifier(operation.at("id")); require(operation_ids.insert(operation.at("id").get<std::string>()).second, "Duplicate operation ID");
+        }
+        calls += operations.size();
+    }
+    packet.requested_counts = {{"model_cases", models.size()}, {"calculateTransferFunction", calls}, {"total_operations", calls}};
+    require(request.at("requested_counts") == packet.requested_counts && admission.at("requested_counts") == packet.requested_counts,
+            "Requested counts differ from literal arrays");
+    return packet;
+}
+} // namespace Ctf01
+#endif

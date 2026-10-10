@@ -1,0 +1,66 @@
+--- .runtime/porting/CTF-02/native-observer-prep-01/ctf02_reference.cmake
++++ .runtime/porting/CTF-03/native-helper-prep-01/ctf03_reference.cmake
+@@ -1,37 +1,37 @@
+ # Source-only additional targets; preserve current helpers and original archive.
+-if(NOT DEFINED CLK03_REPOSITORY_ROOT OR NOT DEFINED CTF02_SOURCE_DIR OR NOT DEFINED CTF01_OBSERVER_SOURCE_DIR)
+-  message(FATAL_ERROR "CTF02 requires explicit repository/source/inherited observer directories")
++if(NOT DEFINED CLK03_REPOSITORY_ROOT OR NOT DEFINED CTF03_SOURCE_DIR OR NOT DEFINED CTF03_OBSERVER_SOURCE_DIR)
++  message(FATAL_ERROR "CTF03 requires explicit repository/source/inherited observer directories")
+ endif()
+-include("${CLK03_REPOSITORY_ROOT}/.runtime/porting/CTF-01/native-production-prep-02/ctf01_production.cmake")
++include("${CLK03_REPOSITORY_ROOT}/.runtime/porting/CTF-02/native-observer-prep-01/ctf02_reference.cmake")
+ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+-  get_property(_ctf02_scheduled GLOBAL PROPERTY CTF02_REFERENCE_SCHEDULED)
+-  if(NOT _ctf02_scheduled)
+-    set_property(GLOBAL PROPERTY CTF02_REFERENCE_SCHEDULED TRUE)
+-    function(ctf02_add_reference)
++  get_property(_ctf03_scheduled GLOBAL PROPERTY CTF03_REFERENCE_SCHEDULED)
++  if(NOT _ctf03_scheduled)
++    set_property(GLOBAL PROPERTY CTF03_REFERENCE_SCHEDULED TRUE)
++    function(ctf03_add_reference)
+       if(NOT TARGET energypluslib)
+-        message(FATAL_ERROR "CTF02 requires the unchanged genuine core archive")
++        message(FATAL_ERROR "CTF03 requires the unchanged genuine core archive")
+       endif()
+-      get_target_property(_ctf02_defs energypluslib COMPILE_DEFINITIONS)
+-      get_directory_property(_ctf02_dir_defs DIRECTORY "${CMAKE_SOURCE_DIR}/src/EnergyPlus" COMPILE_DEFINITIONS)
+-      list(APPEND _ctf02_defs ${_ctf02_dir_defs})
+-      list(FILTER _ctf02_defs EXCLUDE REGEX "-NOTFOUND$")
+-      list(REMOVE_DUPLICATES _ctf02_defs)
+-      foreach(_ctf02_lane IN ITEMS unit production)
+-        set(_ctf02_target "ctf02_${_ctf02_lane}_helper")
+-        add_executable(${_ctf02_target}
+-          "${CTF02_SOURCE_DIR}/ctf02_${_ctf02_lane}_helper.cpp"
+-          "${CTF01_OBSERVER_SOURCE_DIR}/Construction.ctf01.cc"
+-          "${CTF01_OBSERVER_SOURCE_DIR}/ctf01_observer.cc")
+-        target_include_directories(${_ctf02_target} PRIVATE "$<TARGET_PROPERTY:energypluslib,INCLUDE_DIRECTORIES>"
+-          "${CTF02_SOURCE_DIR}" "${CTF01_OBSERVER_SOURCE_DIR}"
++      get_target_property(_ctf03_defs energypluslib COMPILE_DEFINITIONS)
++      get_directory_property(_ctf03_dir_defs DIRECTORY "${CMAKE_SOURCE_DIR}/src/EnergyPlus" COMPILE_DEFINITIONS)
++      list(APPEND _ctf03_defs ${_ctf03_dir_defs})
++      list(FILTER _ctf03_defs EXCLUDE REGEX "-NOTFOUND$")
++      list(REMOVE_DUPLICATES _ctf03_defs)
++      foreach(_ctf03_lane IN ITEMS unit production)
++        set(_ctf03_target "ctf03_${_ctf03_lane}_helper")
++        add_executable(${_ctf03_target}
++          "${CTF03_SOURCE_DIR}/ctf03_${_ctf03_lane}_helper.cpp"
++          "${CTF03_OBSERVER_SOURCE_DIR}/Construction.ctf03.cc"
++          "${CTF03_OBSERVER_SOURCE_DIR}/ctf03_observer.cc")
++        target_include_directories(${_ctf03_target} PRIVATE "$<TARGET_PROPERTY:energypluslib,INCLUDE_DIRECTORIES>"
++          "${CTF03_SOURCE_DIR}" "${CTF03_OBSERVER_SOURCE_DIR}"
+           "${CLK03_REPOSITORY_ROOT}/.runtime/porting/CTF-01/native-helper-prep-01"
+           "${CLK03_REPOSITORY_ROOT}/.runtime/porting/CTF-01/native-production-prep-02")
+-        target_compile_definitions(${_ctf02_target} PRIVATE ${_ctf02_defs})
+-        target_link_libraries(${_ctf02_target} PRIVATE energypluslib project_options project_fp_options project_warnings bcrypt)
+-        target_compile_features(${_ctf02_target} PRIVATE cxx_std_20)
+-        target_link_options(${_ctf02_target} PRIVATE "-Wl,-Map,${CMAKE_CURRENT_BINARY_DIR}/${_ctf02_target}.map")
++        target_compile_definitions(${_ctf03_target} PRIVATE ${_ctf03_defs})
++        target_link_libraries(${_ctf03_target} PRIVATE energypluslib project_options project_fp_options project_warnings bcrypt)
++        target_compile_features(${_ctf03_target} PRIVATE cxx_std_20)
++        target_link_options(${_ctf03_target} PRIVATE "-Wl,-Map,${CMAKE_CURRENT_BINARY_DIR}/${_ctf03_target}.map")
+       endforeach()
+     endfunction()
+-    cmake_language(DEFER CALL ctf02_add_reference)
++    cmake_language(DEFER CALL ctf03_add_reference)
+   endif()
+ endif()

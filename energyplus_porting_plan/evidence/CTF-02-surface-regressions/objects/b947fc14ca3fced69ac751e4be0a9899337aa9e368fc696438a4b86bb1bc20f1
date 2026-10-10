@@ -1,0 +1,11 @@
+--- .runtime/porting/CTF-02/surface-integration-readiness-prep-01/readiness.json
++++ .runtime/porting/CTF-02/surface-integration-readiness-prep-02/readiness.json
+@@ -721,7 +721,7 @@
+         "purpose": "actual current opaque conduction flux/report signs before history mutation"
+       },
+       {
+-        "after_line": 6825,
++        "after_line": 6824,
+         "purpose": "actual populated per-surface reporting owners after real report calculations"
+       }
+     ],

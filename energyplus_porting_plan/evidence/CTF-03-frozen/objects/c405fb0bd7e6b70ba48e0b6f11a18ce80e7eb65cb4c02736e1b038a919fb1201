@@ -1,0 +1,565 @@
+{
+  "schema": "ctf03-observation-projection.v1",
+  "frozen_before_this_CTF03_helper_execution": true,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "scientific_execution_performed": false,
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "fixed_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879",
+    "size_bytes": 15325
+  },
+  "all_45_guard_refs": [
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+      "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+      "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+      "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+      "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
+      "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+      "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+      "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+      "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+      "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+      "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+      "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+      "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+      "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+      "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+      "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+      "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+      "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+      "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+      "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+      "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+      "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+      "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+      "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+      "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+      "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+      "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+      "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+      "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+      "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4"
+    }
+  ],
+  "actual_scope_amendment": {
+    "path": ".runtime/porting/CTF-03/scope-amendment-01/amendment.json",
+    "sha256": "87e91fb88589a55fb9d97fdc63f5a7c7a79f41dcd6b5de5a672795149c752714",
+    "size_bytes": 2492
+  },
+  "actual_scope_amendment_execution": {
+    "path": ".runtime/porting/CTF-03/scope-amendment-check-command-01/receipt.json",
+    "sha256": "801f7dc2e645f56857bb8d880140bcc5d56777323fd2708dd2f95e7cef922d44",
+    "size_bytes": 3500
+  },
+  "helper_request": {
+    "path": ".runtime/porting/CTF-03/frozen-packet-01/helper-request.json",
+    "sha256": "60209985d95028e192b0b9226cd57cd9f4f4d5c1c7fc32a9f5b4a1f96fe389b4",
+    "size_bytes": 104817
+  },
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/CTF-03/frozen-packet-01/source.json",
+      "sha256": "ba71d21a37ee40b1d95e359e5ea3f6109123fc4ab707e994f54e5d94ec97a269",
+      "size_bytes": 17386
+    },
+    "cases": {
+      "path": ".runtime/porting/CTF-03/frozen-packet-01/cases.json",
+      "sha256": "b388cdeb116e74b91fc3df2671a40f81bd5861f4ed2b7052d00e578fb5799290",
+      "size_bytes": 9270
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CTF-03/frozen-packet-01/tolerances.json",
+      "sha256": "2d8d295429103cc3a8d27e66e783eff0509b5bd88a656d7a796be94100c72037",
+      "size_bytes": 5915
+    }
+  },
+  "native_observation_policy": {
+    "selected_source": {
+      "version": "26.1.0",
+      "commit": "6f2e40d10250a105b49966baa24d843711e61048",
+      "symbol": "Construction::ConstructionProps::calculateTransferFunction",
+      "card_range": [
+        59,
+        401
+      ],
+      "actual_invocation": "whole original public method continues through1103; no prefix replacement or early observer stop",
+      "callbacks": [
+        {
+          "phase": "PostLoad",
+          "after_original_line": 309
+        },
+        {
+          "phase": "PostMerge",
+          "after_original_line": 372
+        },
+        {
+          "phase": "PostConversion",
+          "after_original_line": 401
+        }
+      ]
+    },
+    "required_observed_fields_when_phase_reached": {
+      "every_phase": [
+        "LayersInConstruct",
+        "NumResLayers",
+        "copied_layer_count",
+        "ErrorsFound",
+        "active_prefix_available"
+      ],
+      "active_prefix": [
+        "dl",
+        "rk",
+        "rho",
+        "cp",
+        "lr",
+        "ResLayer"
+      ],
+      "PostConversion_only": [
+        "dyn",
+        "rs",
+        "cnd"
+      ],
+      "original_owner_context": [
+        "actual material IDs/order/members",
+        "actual construction index",
+        "TotLayers",
+        "LayerPoint",
+        "IsUsedCTF",
+        "SourceSinkPresent",
+        "SolutionDimensions",
+        "TimeStepZone"
+      ]
+    },
+    "pairing": {
+      "Native_rhs": "actual passive local copies only, never reconstructed arrays/formulas or public post-whole-call approximations",
+      "Rust_lhs": "actual reached normalization owner fields from a separately authenticated real Rust invocation; missing owner is unavailable/failure",
+      "PostLoad": "actual Rust after_load with active layers/count and selected sticky error state",
+      "PostMerge": "actual Rust after_merge with active layers/count",
+      "PostConversion": "actual Rust after_conversion.active/dyn_spacing/total_resistance/conductance",
+      "identity": "join declared logical inputs with observed actual owner IDs; no arbitrary ordinal/name remapping of original LayerPoint order",
+      "normalized_material_ID_mapping": "unavailable: source merges local numerical arrays without updating original TotLayers/LayerPoint; do not invent material labels",
+      "merge_order": "source loop/index order is frozen; compare actual before/after active arrays on repeated/disjoint canaries; no invented per-merge event trace",
+      "DoCTFErrorReport": "Native actual formal flag recorded, unpaired because proposed Rust preprocessing has no matching owner",
+      "Native_after_whole_method_flags_and_coefficients": "context-only unpaired outside selected prefix; cannot relabel them selected preprocessing state"
+    },
+    "availability": {
+      "unreached_phase": "unavailable with actual reason/source/process outcome; zero numerical comparisons and no PASS",
+      "unused": "actual IsUsedCTF false returns before local allocation; no arithmetic coverage or zero-prefix success",
+      "load_error": "actual PostLoad may be available while later phases are unreached; preserve selected error and ordered diagnostics",
+      "required_reached_operand_absence": "one-sided or both-sided absence fails; no generic null equality",
+      "observer_error": "identity/binding/duplicate/order/prefix errors fail observation integrity, never repair source state",
+      "nonfinite_observed_return_or_local": "remains observed/available with actual bits/class; never null because isfinite=false",
+      "OS_crash_or_exception": "separate actual process/method ledger; never fabricate phase contents, invocation counts or successful return",
+      "array_tail": "indices beyond actual LayersInConstruct are not observations, even after source zeros shifted slots",
+      "complete_observation_or_PASS_claimed_by_this_proposal": false
+    },
+    "excluded": [
+      "SourceSinkPresent true/high-diffusivity warning branch and source/temp-layer adjustment",
+      "SolutionDimensions other than1 and perpendicular dyn calculation",
+      "zero or greater-than-MaxLayers Native active input counts",
+      "unsupported Material/Construction families excluded by CON-01",
+      "CTF-02 throughCTF-10 coefficient/reverse/stability results",
+      "thermal surface/gain execution and Native-output injection into Rust"
+    ],
+    "production_fixed15_real_loader_lane": "separate-required-pending; not certified by this explicit-member packet"
+  },
+  "ctf03_initial_observation_policy": {
+    "protocol": "ctf03-initial-discretization.v1",
+    "phase": "after_original_Construction_cc619_before_matrix_allocation_and_retry",
+    "selection": "actual_initial_callback_reached_and_intact_active_prefix",
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "active_layer_fields": [
+      "Nodes",
+      "dx"
+    ],
+    "integer_fields": [
+      "LayersInConstruct",
+      "NumResLayers",
+      "rcmax",
+      "NodeSource",
+      "NodeUserTemp",
+      "NumHistories"
+    ],
+    "scalar_fields": [
+      "CTFTimeStep",
+      "TimeStepZone"
+    ],
+    "initial_state_distinct_from_whole_return_and_retry_state": true,
+    "PostConversion_layer_handoff_retained": true,
+    "PostConversion_handoff_fields": [
+      "LayersInConstruct",
+      "NumResLayers",
+      "dl",
+      "rk",
+      "rho",
+      "cp",
+      "lr",
+      "ResLayer"
+    ],
+    "capacitance_factors_are_actual_rho_and_cp_not_recomputed_products": true,
+    "required_reached_fields_absent_is_integrity_failure": true,
+    "unreached_counted_as_PASS": false,
+    "branch_or_numeric_answers_reconstructed": false
+  },
+  "initial_state_pairing_and_availability": {
+    "schema": "ctf03-initial-discretization-projection-source-proposal.v1",
+    "status": "SOURCE-PROPOSAL-not-yet-frozen",
+    "ctf03_initial_observation_policy": {
+      "protocol": "ctf03-initial-discretization.v1",
+      "phase": "after_original_Construction_cc619_before_matrix_allocation_and_retry",
+      "selection": "actual_initial_callback_reached_and_intact_active_prefix",
+      "required_owner_context": {
+        "SourceSinkPresent": false,
+        "SolutionDimensions": 1
+      },
+      "active_layer_fields": [
+        "Nodes",
+        "dx"
+      ],
+      "integer_fields": [
+        "LayersInConstruct",
+        "NumResLayers",
+        "rcmax",
+        "NodeSource",
+        "NodeUserTemp",
+        "NumHistories"
+      ],
+      "scalar_fields": [
+        "CTFTimeStep",
+        "TimeStepZone"
+      ],
+      "initial_state_distinct_from_whole_return_and_retry_state": true,
+      "PostConversion_layer_handoff_retained": true,
+      "PostConversion_handoff_fields": [
+        "LayersInConstruct",
+        "NumResLayers",
+        "dl",
+        "rk",
+        "rho",
+        "cp",
+        "lr",
+        "ResLayer"
+      ],
+      "capacitance_factors_are_actual_rho_and_cp_not_recomputed_products": true,
+      "required_reached_fields_absent_is_integrity_failure": true,
+      "unreached_counted_as_PASS": false,
+      "branch_or_numeric_answers_reconstructed": false
+    },
+    "selected_owner_identity": [
+      "same case/operation/construction index/name and actual member or original IDF input",
+      "actual SourceSinkPresent=false and SolutionDimensions=1 owner context; retain all other actual source observations as context",
+      "actual post-619 callback and intact binding/identity/order/prefix; do not infer reverse selection from values",
+      "same actual PostConversion active layer prefix count and NumResLayers handoff"
+    ],
+    "selected_fields": [
+      "active_prefix.Nodes",
+      "active_prefix.dx",
+      "LayersInConstruct",
+      "NumResLayers",
+      "rcmax",
+      "NodeSource",
+      "NodeUserTemp",
+      "CTFTimeStep",
+      "NumHistories",
+      "TimeStepZone"
+    ],
+    "actual_input_handoff": {
+      "phase": "PostConversion",
+      "active_prefix_fields": [
+        "dl",
+        "rk",
+        "rho",
+        "cp",
+        "lr",
+        "ResLayer"
+      ],
+      "prefix_metadata": [
+        "LayersInConstruct",
+        "NumResLayers",
+        "copied_layer_count"
+      ],
+      "capacitance_inputs": "actual rho and cp fields retained separately; no product or diffusivity recomputation",
+      "owner_membership": "original actual TotLayers/LayerPoint and material indices/names retained separately from merged local arrays"
+    },
+    "observed_context_only": [
+      "whole source final ErrorsFound/DoCTFErrorReport and outcome",
+      "allR/reverse/unused/loading-error routes without an actual initial callback",
+      "retry dt/history after original908-936",
+      "outside-selected source/2D initial captures if any; never counted as selected 1D parity"
+    ],
+    "availability": {
+      "required_reached_one_or_both_missing": "FAIL; no numerical PASS",
+      "genuinely_unreached": "explicit unavailable/excluded; zero comparisons and never PASS",
+      "observer_integrity_failure": "factual failure; not an optional branch",
+      "source_fatal_exception_OS_nonzero": "separate whole/process ledgers; retain genuine completed callbacks; no invented source status or invocation",
+      "later_whole_failure": "actual reached initial snapshot remains observed, with separate later outcome; no whole-method PASS inferred"
+    },
+    "arithmetic_profiles_by_variable": [
+      {
+        "variable": "dx",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "class_exact": true,
+        "shape_exact": true,
+        "signed_zero_exact": true,
+        "required_shape": "actual_LayersInConstruct_active_prefix"
+      },
+      {
+        "variable": "initial_CTFTimeStep",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "class_exact": true,
+        "shape_exact": true,
+        "signed_zero_exact": true,
+        "required_shape": "scalar"
+      },
+      {
+        "variable": "caller_TimeStepZone",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "class_exact": true,
+        "shape_exact": true,
+        "signed_zero_exact": true,
+        "required_shape": "scalar"
+      }
+    ],
+    "discrete_exact": [
+      "case/owner/order/membership and actual phase identities",
+      "reached/available/prefix shape/count and integrity flags",
+      "Nodes/rcmax/NodeSource/NodeUserTemp/NumHistories integer values",
+      "binary64 class and signed-zero sign"
+    ],
+    "nonfinite_policy": "retain actual DTO bits/class/availability; required nonfinite numeric operands unavailable/fail, never numerical PASS",
+    "inherited_preprocessing_policy": {
+      "path": ".runtime/porting/CTF-01/frozen-packet-01/tolerances.json",
+      "sha256": "29e90047ef65553891106199c83926f62f0cbd1fd371e508e5ede01048e1556b",
+      "size_bytes": 5520
+    },
+    "preprocessing_profiles_changed": false,
+    "independent_Rust_operands": "actual converted prefix and actual caller-owned initial discretization output only; Native observations/proofs never become Rust operands",
+    "not_observed_or_paired": [
+      "matrix/private inverse/exponential workspaces",
+      "final retry dt or complete retry-driver parity",
+      "later coefficients and whole thermal simulation"
+    ],
+    "numerical_PASS_claimed": false,
+    "gates_updated": false
+  },
+  "numeric_policy": {
+    "path": ".runtime/porting/CTF-03/frozen-packet-01/tolerances.json",
+    "sha256": "2d8d295429103cc3a8d27e66e783eff0509b5bd88a656d7a796be94100c72037",
+    "size_bytes": 5915
+  },
+  "source_authorities": {
+    "current_card": {
+      "path": "energyplus_porting_plan/cards/CTF-03.md",
+      "sha256": "c8acfe5da560a14bf97f3d2b12741eea37905b7a04e56eee08559fd6c822aec7",
+      "size_bytes": 4657
+    },
+    "actual_scope_amendment": {
+      "path": ".runtime/porting/CTF-03/scope-amendment-01/amendment.json",
+      "sha256": "87e91fb88589a55fb9d97fdc63f5a7c7a79f41dcd6b5de5a672795149c752714",
+      "size_bytes": 2492
+    },
+    "actual_scope_amendment_execution": {
+      "path": ".runtime/porting/CTF-03/scope-amendment-check-command-01/receipt.json",
+      "sha256": "801f7dc2e645f56857bb8d880140bcc5d56777323fd2708dd2f95e7cef922d44",
+      "size_bytes": 3500
+    },
+    "historical_scope_documents": [
+      {
+        "path": ".runtime/porting/CTF-03/scope-amendment-01/before-card.md",
+        "sha256": "9f5e99ba92e6ef018c7a1f4e4dee075c86ad7d6b35d24b7db368b0e5c57f1847",
+        "size_bytes": 2779
+      },
+      {
+        "path": ".runtime/porting/CTF-03/scope-amendment-01/before-plan.json",
+        "sha256": "3a68b004d278bfa0386b7d4d696bb331f7062558c07487df38a3e23140e65c77",
+        "size_bytes": 624013
+      }
+    ],
+    "scope_recorder_role": "validated-Root-authored-documents; did-not-author-amendment",
+    "native_source_manifest": {
+      "path": ".runtime/porting/CTF-03/native-helper-prep-01/manifest.json",
+      "sha256": "34dad09e4e7825006cc237d3b36aa3e649f637e328bd5bf39def1c07ebe45322",
+      "size_bytes": 35224
+    },
+    "initial_policy_source_inventory": {
+      "path": ".runtime/porting/CTF-03/native-helper-prep-01/projection-policy-proposal.json",
+      "sha256": "3a7777be0fa9dca428fdc287db38f242507b0a0e405b35b2cd6f893103b4af76",
+      "size_bytes": 5214
+    },
+    "inherited_input_only_packet": {
+      "request": {
+        "path": ".runtime/porting/CTF-01/frozen-packet-01/helper-request.json",
+        "sha256": "3fdf7a110a7b68b4c04415fd2de7a7a93d2bccce044a892d9688f604199d4c57",
+        "size_bytes": 103619
+      },
+      "source": {
+        "path": ".runtime/porting/CTF-01/frozen-packet-01/source.json",
+        "sha256": "ec9af3f79dbeff23fd8190429a680c8ece2cc0f0c500f5b20f3845fdb517e1db",
+        "size_bytes": 15120
+      },
+      "tolerances": {
+        "path": ".runtime/porting/CTF-01/frozen-packet-01/tolerances.json",
+        "sha256": "29e90047ef65553891106199c83926f62f0cbd1fd371e508e5ede01048e1556b",
+        "size_bytes": 5520
+      }
+    }
+  },
+  "scientific_values_compared_or_PASS_claimed": false
+}

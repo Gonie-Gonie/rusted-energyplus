@@ -1,0 +1,11 @@
+--- .runtime/porting/CTF-02/surface-integration-readiness-prep-01/prepare.py
++++ .runtime/porting/CTF-02/surface-integration-readiness-prep-02/prepare.py
+@@ -122,7 +122,7 @@
+         "candidate_passive_sites": [
+             {"after_line": 8933, "purpose": "actual per-iteration inside assignment and copied operands; retain actual iteration identity"},
+             {"after_line": 5327, "purpose": "actual current opaque conduction flux/report signs before history mutation"},
+-            {"after_line": 6825, "purpose": "actual populated per-surface reporting owners after real report calculations"}
++            {"after_line": 6824, "purpose": "actual populated per-surface reporting owners after real report calculations"}
+         ],
+         "site_file": NATIVE + "HeatBalanceSurfaceManager.cc",
+         "sites_are_implemented": False,

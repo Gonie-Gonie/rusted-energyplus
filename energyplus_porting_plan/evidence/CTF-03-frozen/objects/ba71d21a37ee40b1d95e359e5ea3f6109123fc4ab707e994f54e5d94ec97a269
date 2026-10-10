@@ -1,0 +1,463 @@
+{
+  "schema": "ctf03-source-contract.v1",
+  "frozen_before_this_CTF03_helper_execution": true,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "scientific_execution_performed": false,
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "source_files": [
+    {
+      "path": "src/EnergyPlus/Construction.cc",
+      "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+      "size_bytes": 110319
+    },
+    {
+      "path": "src/EnergyPlus/Construction.hh",
+      "sha256": "53a14b2a45860255267e6ebf780a50fc8aefc4ba30ae3df589062601a20f999a",
+      "size_bytes": 24041
+    },
+    {
+      "path": "src/EnergyPlus/Material.hh",
+      "sha256": "9f59a6937c224b6e0b50dab42d614e190696ee5bf3684b1b159907e6964f7b38",
+      "size_bytes": 43487
+    },
+    {
+      "path": "src/EnergyPlus/Material.cc",
+      "sha256": "6f5bb1801fd401971b2a6152a4f6b53748c68050cc210b7ff5e27e1d520f2a54",
+      "size_bytes": 179008
+    },
+    {
+      "path": "src/EnergyPlus/DataConversions.hh",
+      "sha256": "5d0064d5f44fa927fc83455a55ab7ab5b5d35f3c31a141dbda5bea0cae829a8e",
+      "size_bytes": 4666
+    },
+    {
+      "path": "src/EnergyPlus/HeatBalanceManager.cc",
+      "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+      "size_bytes": 371103
+    },
+    {
+      "path": "idd/Energy+.idd.in",
+      "sha256": "62c94fef08c6a90f08630c6250a9f19d9dd701f249e2ff631070511ebfba651f",
+      "size_bytes": 4504288
+    }
+  ],
+  "inherited_primary_source_ranges": [
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+        "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+        "size_bytes": 110319,
+        "line_count": 2115
+      },
+      "start_line": 59,
+      "end_line": 165,
+      "range_sha256": "8066d1a2bdb638c04723001c2649714566a61039a27117f4eacc44bd69722d13",
+      "range_size_bytes": 5356
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+        "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+        "size_bytes": 110319,
+        "line_count": 2115
+      },
+      "start_line": 167,
+      "end_line": 221,
+      "range_sha256": "9a655f284e4f7ee90edf137ba08dbb8581a2715a1b5b8d4b225139feb939f486",
+      "range_size_bytes": 3269
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+        "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+        "size_bytes": 110319,
+        "line_count": 2115
+      },
+      "start_line": 222,
+      "end_line": 261,
+      "range_sha256": "6a4b4830620e530e0df70ec562660b1591778408f96e2798231660cad6f0e6d5",
+      "range_size_bytes": 2742
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+        "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+        "size_bytes": 110319,
+        "line_count": 2115
+      },
+      "start_line": 263,
+      "end_line": 309,
+      "range_sha256": "fde914907c00f879b42f3d27cb9c4e6afd771b3c7a357b9c21eb06100c051c52",
+      "range_size_bytes": 2559
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+        "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+        "size_bytes": 110319,
+        "line_count": 2115
+      },
+      "start_line": 311,
+      "end_line": 315,
+      "range_sha256": "9ccf38c42272a61edacaf753cd265d2ae20a11cab8766426ad10d8d743579ae5",
+      "range_size_bytes": 92
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+        "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+        "size_bytes": 110319,
+        "line_count": 2115
+      },
+      "start_line": 317,
+      "end_line": 372,
+      "range_sha256": "9c04174085728fd3dd85a9f9d952a19d085d60221982008b82cc9b94c046ef82",
+      "range_size_bytes": 3117
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+        "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+        "size_bytes": 110319,
+        "line_count": 2115
+      },
+      "start_line": 374,
+      "end_line": 401,
+      "range_sha256": "59384c38d247fe901c56b63bd0ab0bb2ca7d0038a80f2f99fb95e75dc7af9e4d",
+      "range_size_bytes": 1077
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+        "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+        "size_bytes": 110319,
+        "line_count": 2115
+      },
+      "start_line": 403,
+      "end_line": 466,
+      "range_sha256": "9e455ec8139043ad9529fdbb4920402c7906152e6a856e16e6f2791ed0647bfd",
+      "range_size_bytes": 2969
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+        "sha256": "53a14b2a45860255267e6ebf780a50fc8aefc4ba30ae3df589062601a20f999a",
+        "size_bytes": 24041,
+        "line_count": 383
+      },
+      "start_line": 67,
+      "end_line": 67,
+      "range_sha256": "84b616615f7f7d7755b8feb43f11a7950819b64e2547f4ab8e1263d9a3807a0b",
+      "range_size_bytes": 105
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+        "sha256": "53a14b2a45860255267e6ebf780a50fc8aefc4ba30ae3df589062601a20f999a",
+        "size_bytes": 24041,
+        "line_count": 383
+      },
+      "start_line": 138,
+      "end_line": 145,
+      "range_sha256": "08fa78c55501638f2b9fa3b20a5876c89fdfd766d508d65361b809884d69e3fe",
+      "range_size_bytes": 678
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+        "sha256": "53a14b2a45860255267e6ebf780a50fc8aefc4ba30ae3df589062601a20f999a",
+        "size_bytes": 24041,
+        "line_count": 383
+      },
+      "start_line": 188,
+      "end_line": 198,
+      "range_sha256": "7bad6bd137cedd19ec6ef404c82a006a030edbc3b1d0d9b78040d1d8ad886787",
+      "range_size_bytes": 974
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+        "sha256": "53a14b2a45860255267e6ebf780a50fc8aefc4ba30ae3df589062601a20f999a",
+        "size_bytes": 24041,
+        "line_count": 383
+      },
+      "start_line": 260,
+      "end_line": 260,
+      "range_sha256": "b3d39a2771edc981981be9f49fe45a20c8ba1c67c72b13fcff60857f9dfb1312",
+      "range_size_bytes": 122
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+        "sha256": "53a14b2a45860255267e6ebf780a50fc8aefc4ba30ae3df589062601a20f999a",
+        "size_bytes": 24041,
+        "line_count": 383
+      },
+      "start_line": 317,
+      "end_line": 333,
+      "range_sha256": "5290cca49b8aa019ce7cf938188660124faebf43b13a949924fd82ead40301cb",
+      "range_size_bytes": 1062
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Material.hh",
+        "sha256": "9f59a6937c224b6e0b50dab42d614e190696ee5bf3684b1b159907e6964f7b38",
+        "size_bytes": 43487,
+        "line_count": 991
+      },
+      "start_line": 218,
+      "end_line": 241,
+      "range_sha256": "0fd68905a452eebb9365d5448b54e073bf09402f4ba40df56cfbcb6345957c19",
+      "range_size_bytes": 1324
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Material.cc",
+        "sha256": "6f5bb1801fd401971b2a6152a4f6b53748c68050cc210b7ff5e27e1d520f2a54",
+        "size_bytes": 179008,
+        "line_count": 3562
+      },
+      "start_line": 170,
+      "end_line": 225,
+      "range_sha256": "c87660062931b163209977b93cba94079019254943bbf8876d2c31a6ca33456b",
+      "range_size_bytes": 2941
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Material.cc",
+        "sha256": "6f5bb1801fd401971b2a6152a4f6b53748c68050cc210b7ff5e27e1d520f2a54",
+        "size_bytes": 179008,
+        "line_count": 3562
+      },
+      "start_line": 249,
+      "end_line": 285,
+      "range_sha256": "7ed37a5cd0e40b4365b48c60c33af85335b3114841032633e542ff101ae93af0",
+      "range_size_bytes": 1525
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataConversions.hh",
+        "sha256": "5d0064d5f44fa927fc83455a55ab7ab5b5d35f3c31a141dbda5bea0cae829a8e",
+        "size_bytes": 4666,
+        "line_count": 76
+      },
+      "start_line": 58,
+      "end_line": 69,
+      "range_sha256": "9b8bafd4ec0544caf9ff1414be4b94a0944d815e6ad2256e6062bb694aad2d84",
+      "range_size_bytes": 1023
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+        "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+        "size_bytes": 371103,
+        "line_count": 6206
+      },
+      "start_line": 1403,
+      "end_line": 1413,
+      "range_sha256": "51a10be06d41e220132a18c53a95050984d97e080721ac7f938ebcc5b9277e11",
+      "range_size_bytes": 676
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+        "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+        "size_bytes": 371103,
+        "line_count": 6206
+      },
+      "start_line": 6153,
+      "end_line": 6167,
+      "range_sha256": "d6bc15a5a44c0c36ddb7cb63b1c42c20044e92db98923ac65c56752cd75acbe9",
+      "range_size_bytes": 750
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/idd/Energy+.idd.in",
+        "sha256": "62c94fef08c6a90f08630c6250a9f19d9dd701f249e2ff631070511ebfba651f",
+        "size_bytes": 4504288,
+        "line_count": 109473
+      },
+      "start_line": 4912,
+      "end_line": 4948,
+      "range_sha256": "b2153be29d8cca9fa6e94e15ef792ebe9c4a9775df9cb756e61652afe86f05aa",
+      "range_size_bytes": 831
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/idd/Energy+.idd.in",
+        "sha256": "62c94fef08c6a90f08630c6250a9f19d9dd701f249e2ff631070511ebfba651f",
+        "size_bytes": 4504288,
+        "line_count": 109473
+      },
+      "start_line": 4965,
+      "end_line": 4985,
+      "range_sha256": "68d26ee7d781c8a371154eb91afda0febba2fc4d97da5854e42a6fdfaf57b0cf",
+      "range_size_bytes": 545
+    }
+  ],
+  "ctf03_selected_primary_ranges": [
+    {
+      "source": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 59,
+      "end_line": 200,
+      "range_sha256": "50f23e532c2a28d762e26b7221369b49a6e48f1b266459715c07224fa8e88f91",
+      "range_size_bytes": 7839,
+      "reason": "entry/caller/allocations"
+    },
+    {
+      "source": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 201,
+      "end_line": 401,
+      "range_sha256": "c6dca56824dc2ca5bc00e3a32f2dee16be5eea062ba9884db65a0ade790ab4ef",
+      "range_size_bytes": 10378,
+      "reason": "unchanged loaded merged converted handoff"
+    },
+    {
+      "source": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 404,
+      "end_line": 489,
+      "range_sha256": "b4f55f1fe967fe898032d2ddb9a73def377829a9d5463b407f6ac5d144544453",
+      "range_size_bytes": 3902,
+      "reason": "actual massive/reverse routing"
+    },
+    {
+      "source": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 490,
+      "end_line": 619,
+      "range_sha256": "f6bbe30caf9e842c89fef7850d39e3fb91d1cf03e2c30a2e8cf4da41f3b4076a",
+      "range_size_bytes": 6450,
+      "reason": "complete selected initial 1D nodes/dx/dt/history block"
+    },
+    {
+      "source": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 620,
+      "end_line": 659,
+      "range_sha256": "e2f66cee05524043244a89dafa6472e2133853cb4a423d1b916a44b92392c466",
+      "range_size_bytes": 1705,
+      "reason": "post-capture matrix allocation boundary"
+    },
+    {
+      "source": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 908,
+      "end_line": 936,
+      "range_sha256": "d2ae848dcdf26bab27f2f4e226831e041a05ef7fac4c726efffbc5cb795083b0",
+      "range_size_bytes": 1681,
+      "reason": "later retry timing remains distinct"
+    },
+    {
+      "source": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 2045,
+      "end_line": 2051,
+      "range_sha256": "5061e89c9dc53e1a12e6f8a60beebf104afe5ef459a1e32f39eddf593e499d92",
+      "range_size_bytes": 183,
+      "reason": "actual reset selectors helper"
+    },
+    {
+      "source": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "start_line": 67,
+      "end_line": 68,
+      "range_sha256": "554ecbf10477a94f04a42c5e7e2fc2f3fe76b4d81e6ec39e36d0ed0de39d6fcd",
+      "range_size_bytes": 213,
+      "reason": "active layer capacity"
+    },
+    {
+      "source": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "start_line": 159,
+      "end_line": 191,
+      "range_sha256": "a941cb8808edf55cc8bf0aa2739cdd622cad2fe0a762fc997c80eec4c00ab906",
+      "range_size_bytes": 2885,
+      "reason": "actual Construction owner context"
+    },
+    {
+      "source": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "start_line": 304,
+      "end_line": 342,
+      "range_sha256": "fbcb4d693cf6124c674cc4e4c9673e0319674407efe9d937bc330c14f73c3779",
+      "range_size_bytes": 2495,
+      "reason": "actual integer/time and private owner declarations"
+    },
+    {
+      "source": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataConversions.hh",
+      "start_line": 58,
+      "end_line": 69,
+      "range_sha256": "9b8bafd4ec0544caf9ff1414be4b94a0944d815e6ad2256e6062bb694aad2d84",
+      "range_size_bytes": 1023,
+      "reason": "unchanged conversion constants"
+    },
+    {
+      "source": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SimulationManager.cc",
+      "start_line": 876,
+      "end_line": 880,
+      "range_sha256": "efeda1020eecda4e5a7e6d194661a1e064c7c38dcab3451d655e2130cf5b0a23",
+      "range_size_bytes": 284,
+      "reason": "whole setup source call"
+    },
+    {
+      "source": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "start_line": 6153,
+      "end_line": 6167,
+      "range_sha256": "d6bc15a5a44c0c36ddb7cb63b1c42c20044e92db98923ac65c56752cd75acbe9",
+      "range_size_bytes": 750,
+      "reason": "actual ordered whole CTF callsite"
+    }
+  ],
+  "source_authorities": {
+    "current_card": {
+      "path": "energyplus_porting_plan/cards/CTF-03.md",
+      "sha256": "c8acfe5da560a14bf97f3d2b12741eea37905b7a04e56eee08559fd6c822aec7",
+      "size_bytes": 4657
+    },
+    "actual_scope_amendment": {
+      "path": ".runtime/porting/CTF-03/scope-amendment-01/amendment.json",
+      "sha256": "87e91fb88589a55fb9d97fdc63f5a7c7a79f41dcd6b5de5a672795149c752714",
+      "size_bytes": 2492
+    },
+    "actual_scope_amendment_execution": {
+      "path": ".runtime/porting/CTF-03/scope-amendment-check-command-01/receipt.json",
+      "sha256": "801f7dc2e645f56857bb8d880140bcc5d56777323fd2708dd2f95e7cef922d44",
+      "size_bytes": 3500
+    },
+    "historical_scope_documents": [
+      {
+        "path": ".runtime/porting/CTF-03/scope-amendment-01/before-card.md",
+        "sha256": "9f5e99ba92e6ef018c7a1f4e4dee075c86ad7d6b35d24b7db368b0e5c57f1847",
+        "size_bytes": 2779
+      },
+      {
+        "path": ".runtime/porting/CTF-03/scope-amendment-01/before-plan.json",
+        "sha256": "3a68b004d278bfa0386b7d4d696bb331f7062558c07487df38a3e23140e65c77",
+        "size_bytes": 624013
+      }
+    ],
+    "scope_recorder_role": "validated-Root-authored-documents; did-not-author-amendment",
+    "native_source_manifest": {
+      "path": ".runtime/porting/CTF-03/native-helper-prep-01/manifest.json",
+      "sha256": "34dad09e4e7825006cc237d3b36aa3e649f637e328bd5bf39def1c07ebe45322",
+      "size_bytes": 35224
+    },
+    "initial_policy_source_inventory": {
+      "path": ".runtime/porting/CTF-03/native-helper-prep-01/projection-policy-proposal.json",
+      "sha256": "3a7777be0fa9dca428fdc287db38f242507b0a0e405b35b2cd6f893103b4af76",
+      "size_bytes": 5214
+    },
+    "inherited_input_only_packet": {
+      "request": {
+        "path": ".runtime/porting/CTF-01/frozen-packet-01/helper-request.json",
+        "sha256": "3fdf7a110a7b68b4c04415fd2de7a7a93d2bccce044a892d9688f604199d4c57",
+        "size_bytes": 103619
+      },
+      "source": {
+        "path": ".runtime/porting/CTF-01/frozen-packet-01/source.json",
+        "sha256": "ec9af3f79dbeff23fd8190429a680c8ece2cc0f0c500f5b20f3845fdb517e1db",
+        "size_bytes": 15120
+      },
+      "tolerances": {
+        "path": ".runtime/porting/CTF-01/frozen-packet-01/tolerances.json",
+        "sha256": "29e90047ef65553891106199c83926f62f0cbd1fd371e508e5ede01048e1556b",
+        "size_bytes": 5520
+      }
+    }
+  },
+  "selected_source_boundary": "unchanged whole calls; selected no-source 1D initial post619 state; actual retry/final state separate"
+}

@@ -1,0 +1,49 @@
+# CTF-02 surface integration source proposal
+
+This is an ignored, unexecuted source/readiness proposal. Canonical mathematics,
+production paths, comparison profiles, and held CTF-02 proposals are unchanged.
+The exact source/range inventory is in readiness.json. No engine, target import,
+compiler, formatter, scientific result or binary payload was used.
+
+Actual construction storage already reaches ordinary surface initialization.
+The three proposed Rust tests strengthen that ingress rather than importing any
+Native coefficient answer: they use the existing NoMass cube fixture, the public
+ordinary initializer's empty override path, and actual generated owner copies.
+They exercise fresh timestep/history state; actual boundary/damping dependence;
+and report signs, retained outside operand and history commit. The older synthetic
+sign test and CTF generation/copy tests remain unchanged. These tests have not run.
+
+The only proposed canonical source changes are a new included test file and one
+include line in runtime/tests.rs. The new tests use existing APIs and add no math,
+lookup, production collector or public owner field. See the exact unified diffs.
+Root must apply/format/review/run any accepted source proposal; no application is
+performed here. They are Rust integration checks, not an Original equivalence PASS.
+
+Native SUR-04 computes reciprocal then multiplies, whereas the current Rust kernel
+divides the completed numerator and retains an existing EPS-denominator fallback.
+Those source differences are explicitly unresolved for a future SUR-04 paired
+domain/profile decision; this proposal changes neither arithmetic nor tolerance.
+The Native whole inside call includes convergence and real dependent routines.
+Its final result cannot stand in for one inside-iteration observation.
+
+For SUR-07 Native UpdateThermalHistories computes current fluxes and negates the
+outside internal flux before the later report. Inside W is area*Qin, outside W is
+-area*Qout, and storage is -(inside+outside). A later report-face recomputation must
+not replace the outside-temperature operand used by the inside CTF phase.
+
+The current genuine Native helper establishes loader/geometry associations and
+whole construction-method observations only. It does not initialize or execute
+surface heat balance. Future paired integration needs genuine initialization and
+whole-call execution plus passive copies at actual source sites; readiness.json
+lists candidate sites and unavailable prerequisites. No new harness is authored.
+
+Native history initialization uses source SurfInitialTemp23.0 and zeros fluxes;
+Rust initialization copies its explicit caller. The local fresh-state tests vary
+that caller to detect stale state. They do not assert those values are the Native
+default. A future paired call must bind the same initialization phase/caller.
+Selected all-resistive storage has one history term/one zone-step history interval;
+general massive histories and interpolation remain unproved and outside this plan.
+
+The author previously authored the CTF-01 preprocessing and CTF-02 observers/
+comparers. This readiness proposal supplies source/transport facts and proposed
+tests, not an independent numerical certificate for those algorithms.

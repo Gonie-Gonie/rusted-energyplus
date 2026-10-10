@@ -1,0 +1,21 @@
+--- .runtime/porting/CTF-01/native-observer-prep-01/Construction.ctf01.cc
++++ .runtime/porting/CTF-03/native-observer-prep-01/Construction.ctf03.cc
+@@ -53,7 +53,7 @@
+ #include <EnergyPlus/Material.hh>
+ #include <EnergyPlus/OutputReportPredefined.hh>
+ #include <EnergyPlus/UtilityRoutines.hh>
+-#include "ctf01_observer.hh"
++#include "ctf03_observer.hh"
+ 
+ namespace EnergyPlus::Construction {
+ 
+@@ -624,6 +624,9 @@
+                 }
+             }
+ 
++            EnergyPlus::CTF01Observation::post_initial_discretization(state, *this, ErrorsFound, DoCTFErrorReport,
++                LayersInConstruct, NumResLayers, Nodes, dx, state.dataGlobal->TimeStepZone);
++
+             // Calculate the CTFs using the state space method
+             // outlined in Seem's dissertation.  The main matrices
+             // AMat, BMat, CMat, and DMat must be derived from

@@ -1,0 +1,144 @@
+{
+  "schema": "ctf03-initial-discretization-projection-source-proposal.v1",
+  "status": "SOURCE-PROPOSAL-not-yet-frozen",
+  "ctf03_initial_observation_policy": {
+    "protocol": "ctf03-initial-discretization.v1",
+    "phase": "after_original_Construction_cc619_before_matrix_allocation_and_retry",
+    "selection": "actual_initial_callback_reached_and_intact_active_prefix",
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "active_layer_fields": [
+      "Nodes",
+      "dx"
+    ],
+    "integer_fields": [
+      "LayersInConstruct",
+      "NumResLayers",
+      "rcmax",
+      "NodeSource",
+      "NodeUserTemp",
+      "NumHistories"
+    ],
+    "scalar_fields": [
+      "CTFTimeStep",
+      "TimeStepZone"
+    ],
+    "initial_state_distinct_from_whole_return_and_retry_state": true,
+    "PostConversion_layer_handoff_retained": true,
+    "PostConversion_handoff_fields": [
+      "LayersInConstruct",
+      "NumResLayers",
+      "dl",
+      "rk",
+      "rho",
+      "cp",
+      "lr",
+      "ResLayer"
+    ],
+    "capacitance_factors_are_actual_rho_and_cp_not_recomputed_products": true,
+    "required_reached_fields_absent_is_integrity_failure": true,
+    "unreached_counted_as_PASS": false,
+    "branch_or_numeric_answers_reconstructed": false
+  },
+  "selected_owner_identity": [
+    "same case/operation/construction index/name and actual member or original IDF input",
+    "actual SourceSinkPresent=false and SolutionDimensions=1 owner context; retain all other actual source observations as context",
+    "actual post-619 callback and intact binding/identity/order/prefix; do not infer reverse selection from values",
+    "same actual PostConversion active layer prefix count and NumResLayers handoff"
+  ],
+  "selected_fields": [
+    "active_prefix.Nodes",
+    "active_prefix.dx",
+    "LayersInConstruct",
+    "NumResLayers",
+    "rcmax",
+    "NodeSource",
+    "NodeUserTemp",
+    "CTFTimeStep",
+    "NumHistories",
+    "TimeStepZone"
+  ],
+  "actual_input_handoff": {
+    "phase": "PostConversion",
+    "active_prefix_fields": [
+      "dl",
+      "rk",
+      "rho",
+      "cp",
+      "lr",
+      "ResLayer"
+    ],
+    "prefix_metadata": [
+      "LayersInConstruct",
+      "NumResLayers",
+      "copied_layer_count"
+    ],
+    "capacitance_inputs": "actual rho and cp fields retained separately; no product or diffusivity recomputation",
+    "owner_membership": "original actual TotLayers/LayerPoint and material indices/names retained separately from merged local arrays"
+  },
+  "observed_context_only": [
+    "whole source final ErrorsFound/DoCTFErrorReport and outcome",
+    "allR/reverse/unused/loading-error routes without an actual initial callback",
+    "retry dt/history after original908-936",
+    "outside-selected source/2D initial captures if any; never counted as selected 1D parity"
+  ],
+  "availability": {
+    "required_reached_one_or_both_missing": "FAIL; no numerical PASS",
+    "genuinely_unreached": "explicit unavailable/excluded; zero comparisons and never PASS",
+    "observer_integrity_failure": "factual failure; not an optional branch",
+    "source_fatal_exception_OS_nonzero": "separate whole/process ledgers; retain genuine completed callbacks; no invented source status or invocation",
+    "later_whole_failure": "actual reached initial snapshot remains observed, with separate later outcome; no whole-method PASS inferred"
+  },
+  "arithmetic_profiles_by_variable": [
+    {
+      "variable": "dx",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_LayersInConstruct_active_prefix"
+    },
+    {
+      "variable": "initial_CTFTimeStep",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    },
+    {
+      "variable": "caller_TimeStepZone",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    }
+  ],
+  "discrete_exact": [
+    "case/owner/order/membership and actual phase identities",
+    "reached/available/prefix shape/count and integrity flags",
+    "Nodes/rcmax/NodeSource/NodeUserTemp/NumHistories integer values",
+    "binary64 class and signed-zero sign"
+  ],
+  "nonfinite_policy": "retain actual DTO bits/class/availability; required nonfinite numeric operands unavailable/fail, never numerical PASS",
+  "inherited_preprocessing_policy": {
+    "path": ".runtime/porting/CTF-01/frozen-packet-01/tolerances.json",
+    "sha256": "29e90047ef65553891106199c83926f62f0cbd1fd371e508e5ede01048e1556b",
+    "size_bytes": 5520
+  },
+  "preprocessing_profiles_changed": false,
+  "independent_Rust_operands": "actual converted prefix and actual caller-owned initial discretization output only; Native observations/proofs never become Rust operands",
+  "not_observed_or_paired": [
+    "matrix/private inverse/exponential workspaces",
+    "final retry dt or complete retry-driver parity",
+    "later coefficients and whole thermal simulation"
+  ],
+  "numerical_PASS_claimed": false,
+  "gates_updated": false
+}

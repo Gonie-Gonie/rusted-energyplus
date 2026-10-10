@@ -1,0 +1,62 @@
+# CTF03 inherited-input and initial-policy freezer source
+
+SOURCE ONLY, HELD unexecuted. Root owns source approval, current card/scope
+amendment, actual recording and future Native invocation. This package adds no
+SourceQA execution, builder stage, expected answers or engine invocation.
+
+The existing CTF02 writer217 and stdlib helper99 are adapted by exact bounded
+diffs. Both source files are authenticated before use; Root supplies the actual
+approved writer SHA and held source-manifest identity. The only dynamic import
+is the adjacent SHA-authenticated stdlib packet_io; no project code is imported.
+Fresh output is contained under .runtime/porting/CTF-03 and must not exist.
+
+Inputs come exclusively from accepted CTF01 input-only packets. Unit39 models
+and42 whole-call rows retain exact literal material/caller/construction/order/bit
+DTOs. Production15 models retain real original IDF refs and all13 loader phases
+(195 requested records); Construct whole-call counts stay actual/dynamic. Counts
+are derived from those arrays and checked against the inherited packet identity.
+No R=d/k, classifier, timestep, expected arrays or branch outcome is generated.
+Fixed CON scope15 and ordered45 guard refs remain exact, byte-hashed only.
+
+The new held Native source manifest pins lane-specific eight sources, including
+the accepted passive initial callback39eb and the pure active-prefix serializer.
+The new three profiles are dx/initial_CTFTimeStep/caller_TimeStepZone with zero
+atol/rtol, exact class/shape/signedzero. The old18 preprocessing profiles remain
+unchanged separate context. Actual PostConversion dl/rk/rho/cp/lr/ResLayer and
+count handoff are retained; no product/effective property is calculated.
+Initial post619 state and retries908-936 remain separate policy authorities.
+
+CLI arguments, all required:
+--lane unit|production
+--approved-source-sha256 <actual approved freeze_packet.py SHA>
+--source-manifest <this manifest path#SHA>
+--native-source-manifest <held native-helper-prep-01 manifest path#SHA>
+--current-card <actual current CTF-03.md path#SHA>
+--actual-scope-amendment <actual amendment path#SHA>
+--actual-scope-amendment-execution <actual validation receipt path#SHA>
+--output-dir <fresh CTF03 packet directory>
+
+The runtime amendment schema is ctf03-source-scope-amendment.v1/card CTF-03.
+Required flags: scope_review_passed, all_other_gates_pending and
+strict_profiles_settled_before_outputs=true;
+actual_CTF03_build_or_engine_execution_performed=false. Bind native_observer
+to the held helper manifest and initial_policy_source_inventory to its actual
+projection-policy-proposal.json. requested_counts equals unit{model_cases39,
+calculateTransferFunction42}, production{model_cases15,loader_phase_records195}.
+Actual before/after document refs establish the historical-card?amended-current
+card correspondence. The source-preserving recorder must be actual check_plan
+--check --card CTF-03 exit0 with empty stderr; it validates Root-authored docs
+and never claims to have authored the amendment. No future identity is guessed.
+
+Fresh per-lane DAG: source/tolerances?request?cases?projection?admission?receipt.
+Frozen flag is frozen_before_this_CTF03_helper_execution; inherited CTF01 freeze
+is never represented as this new CTF03 freeze. Lowercase policy field is
+ctf03_initial_observation_policy; projection initial_state_pairing_and_availability
+contains the full reviewed policy. Native build metadata never points backward
+into the already-frozen packet. Actual writer source archives and UTC receipt
+are emitted with full typed JSON stdout, before/after source byte rechecks.
+
+This source author wrote passive03 and earlier CTF01 input/QA glue. Header/Root
+source peers are needed for new source/provenance integration. No scientific
+comparison, required-unavailable PASS, card completion, canonical mutation or
+future execution result is claimed. All actual scope/freeze refs remain pending.

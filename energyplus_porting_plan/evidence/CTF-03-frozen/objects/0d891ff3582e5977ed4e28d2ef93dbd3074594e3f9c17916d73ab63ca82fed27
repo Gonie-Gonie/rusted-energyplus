@@ -1,0 +1,22 @@
+--- .runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_fields.hh
++++ .runtime/porting/CTF-03/native-helper-prep-01/ctf03_unit_fields.hh
+@@ -1,8 +1,8 @@
+ // Pure copies of actual public members and the separately captured private locals.
+-#ifndef CTF01_REFERENCE_FIELDS_HH
+-#define CTF01_REFERENCE_FIELDS_HH
++#ifndef CTF03_UNIT_FIELDS_HH
++#define CTF03_UNIT_FIELDS_HH
+ #include "ctf01_reference_metadata.hh"
+-#include "ctf01_observer.hh"
++#include "ctf03_initial_fields.hh"
+ #include <EnergyPlus/Data/EnergyPlusData.hh>
+ #include <EnergyPlus/DataErrorTracking.hh>
+ #include <EnergyPlus/DataGlobals.hh>
+@@ -74,6 +74,7 @@
+     return {{"PostLoad", checkpoint(capture.phases[0], capture.actual_phase_callback_counts[0])},
+         {"PostMerge", checkpoint(capture.phases[1], capture.actual_phase_callback_counts[1])},
+         {"PostConversion", checkpoint(capture.phases[2], capture.actual_phase_callback_counts[2])},
++        {"InitialDiscretization", initial_checkpoint(capture.initial_discretization, capture.actual_phase_callback_counts[3])},
+         {"actual_callback_count", capture.actual_callback_count}, {"observer_failure", observer_failed(capture)},
+         {"binding_error", capture.binding_error}, {"identity_mismatch", capture.identity_mismatch},
+         {"duplicate_phase", capture.duplicate_phase}, {"phase_order_invalid", capture.phase_order_invalid},

@@ -1,0 +1,7 @@
+--- a/crates/ep_runtime/src/runtime/tests.rs
++++ b/crates/ep_runtime/src/runtime/tests.rs
+@@ -13,3 +13,4 @@
+ include!("tests/part13.rs");
+ include!("tests/part14_geometry.rs");
+ include!("tests/production_weather.rs");
++include!("tests/ctf02_surface_integration.rs");

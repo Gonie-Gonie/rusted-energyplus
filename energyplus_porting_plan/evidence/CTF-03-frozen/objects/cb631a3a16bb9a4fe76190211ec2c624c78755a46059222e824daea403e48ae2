@@ -1,0 +1,55 @@
+--- .runtime/porting/CTF-02/native-build-review-prep-01/review_build.py
++++ .runtime/porting/CTF-03/native-build-review-prep-01/review_build.py
+@@ -1,4 +1,4 @@
+-"""Independent actual CTF02 build/PE inspection; no engine is invoked."""
++"""Independent actual CTF03 build/PE inspection; no engine is invoked."""
+ from pathlib import Path
+ import argparse
+ import datetime
+@@ -44,8 +44,8 @@
+ assert separator and len(build_sha) == 64 and all(c in '0123456789abcdef' for c in build_sha)
+ build_path = bound({'path': build_name, 'sha256': build_sha})
+ build = json.loads(build_path.read_text(encoding='utf-8'))
+-prefix = 'ctf02' if args.lane == 'unit' else 'ctf02-production'
+-target = 'ctf02_' + args.lane + '_helper'
++prefix = 'ctf03' if args.lane == 'unit' else 'ctf03-production'
++target = 'ctf03_' + args.lane + '_helper'
+ assert build['schema'] == prefix + '-native-build.v1'
+ assert build['target'] == target
+ assert build['status'] == 'pass-actual-3TU-link-and-preservation'
+@@ -57,15 +57,21 @@
+ for key in ('all_previous_compile_commands_unchanged',
+             'protected_artifacts_and_present_core_objects_unchanged', 'link_provider_verified'):
+     assert build[key] is True
+-assert (build['previous_compile_rows'], build['current_compile_rows'],
+-        build['core_registered'], build['core_present'], build['core_absent']) == (667, 673, 643, 631, 12)
++for key in ('previous_compile_rows', 'current_compile_rows', 'core_registered', 'core_present', 'core_absent', 'protected_ref_count'):
++    assert type(build[key]) is int and build[key] >= 0
++# Two new targets with three genuine source objects each; actual before inventory is Root-owned.
++assert build['current_compile_rows'] == build['previous_compile_rows'] + 6
++assert (build['core_registered'], build['core_present'], build['core_absent']) == (643, 631, 12)
++assert build['protected_ref_count'] > 0
+ assert len(build['native_source_files']) == 8
+ for binding in build['native_source_files']:
+     bound(binding)
+ preservation = json.loads(bound(build['preservation']).read_text(encoding='utf-8'))
+ assert preservation['selected_core_Construction_object_hits'] == 0
+-assert 'Construction.ctf01.cc.obj' in preservation['derived_provider']['section_provider']['text']
+-assert len(preservation['present_objects']) == 631 and len(preservation['protected_refs']) == 28
++assert 'Construction.ctf03.cc.obj' in preservation['derived_provider']['section_provider']['text']
++assert len(preservation['present_objects']) == build['core_present']
++assert len(preservation['protected_refs']) == build['protected_ref_count']
++assert all(preservation[key] == build[key] for key in ('previous_compile_rows', 'current_compile_rows', 'core_registered'))
+ derivation = json.loads(bound(build['validated_derivative']).read_text(encoding='utf-8'))
+ assert derivation['status'] == 'pass-exact-retained-runtime-sections-and-directories'
+ reader = ROOT / 'tools/porting/native_pe.py'
+@@ -88,6 +94,9 @@
+           'status': 'pass-exact-retained-PE-runtime-and-actual-build-identity',
+           'observed_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+           'lane': args.lane, 'target': target,
++          'actual_previous_compile_rows': build['previous_compile_rows'],
++          'actual_current_compile_rows': build['current_compile_rows'],
++          'actual_protected_ref_count': build['protected_ref_count'],
+           'build': ref(build_path), 'helper_binary': build['helper_binary'],
+           'linked_original': build['linked_original'], 'validated_derivative': build['validated_derivative'],
+           'native_pe_source': ref(reader), 'executed_reader': ref(Path(__file__).resolve()),

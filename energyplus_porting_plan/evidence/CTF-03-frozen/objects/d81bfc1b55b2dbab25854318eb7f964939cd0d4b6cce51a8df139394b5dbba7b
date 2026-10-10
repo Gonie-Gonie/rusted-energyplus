@@ -1,0 +1,76 @@
+--- .runtime/porting/CTF-02/original-data-review-prep-02/production_shape.py
++++ .runtime/porting/CTF-03/original-data-review-prep-01/production_shape.py
+@@ -8,7 +8,7 @@
+ MATERIAL_SCALARS = ["Thickness", "Conductivity", "Density", "SpecHeat", "Resistance"]
+ 
+ 
+-def review(result, request, need, bind, public):
++def review(result, request, need, bind, initial):
+     counts = Counter()
+     statuses, ctor_statuses, loader_statuses, phases, functions = (Counter() for _ in range(5))
+     integrity = []
+@@ -40,9 +40,9 @@
+         boolean(wrapper["available"])
+         if not wrapper["available"]:
+             need(wrapper["snapshot"] is None and isinstance(wrapper["unavailable_reason"], str), "Absent owner must remain unavailable")
+-            if wrapper["unavailable_reason"] == "observer_public_owner_copy_failed":
++            if wrapper["unavailable_reason"] == "observer_initial_owner_copy_failed":
+                 need(isinstance(wrapper["observer_exception_message"], str), "Actual observer exception text required")
+-                integrity.append(label + "/observer-public-owner-copy-failed")
++                integrity.append(label + "/observer-initial-owner-copy-failed")
+             else:
+                 need(wrapper["unavailable_reason"] == "EnergyPlusData_constructor_did_not_complete", "Unknown owner absence reason")
+             counts["unavailable_snapshot_records"] += 1
+@@ -100,13 +100,13 @@
+             need(prior is not None and row["unavailable_reason"] == prior, "Actual prerequisite stop reason differs")
+         return None if status == "source_returned" else status if invoked else prior
+ 
+-    def observations(observed, label):
++    def observations(observed, label, initial_count):
+         for flag in ["observer_failure", "binding_error", "identity_mismatch", "duplicate_phase", "phase_order_invalid", "active_prefix_invalid"]:
+             boolean(observed[flag])
+             if observed[flag]: integrity.append(label + "/" + flag)
+         need(observed["observer_failure"] is any(observed[flag] for flag in ["binding_error", "identity_mismatch", "duplicate_phase", "phase_order_invalid", "active_prefix_invalid"]), "Observer aggregate flag differs")
+         need(observed["unused_fixed_array_tail_emitted"] is False, "Unused array tail must remain excluded")
+-        actual_total, missing_prior = 0, False
++        actual_total, missing_prior = initial_count, False
+         for phase in PHASES:
+             item = observed[phase]; boolean(item["reached"]); boolean(item["available"]); integer(item["actual_phase_callback_count"])
+             need((item["actual_phase_callback_count"] > 0) is item["reached"], "Actual callback count/reached differs")
+@@ -194,12 +194,12 @@
+             invoked = operation["actual_source_invoked"]
+             stop = outcome(operation["call_outcome"], invoked, stop)
+             after = snapshot(operation["after"], label + "/CTF" + str(index) + "/after")
+-            public.review(operation, after, need, scalar, counts, integrity, label + "/CTF" + str(index))
++            initial_count = initial.review(operation, after, need, scalar, counts, integrity, label + "/CTF" + str(index))
+             statuses[operation["call_outcome"]["status"]] += 1
+             counts["operation_records"] += 1; counts["actual_CTF_invocations" if invoked else "actual_CTF_skipped_construct_rows"] += 1
+             begin, end = operation["diagnostic_message_begin"], operation["diagnostic_message_end"]
+             integer(begin, previous_end); integer(end, begin); previous_end = end
+-            if invoked: observations(operation["observations"], label + "/CTF" + str(index))
++            if invoked: observations(operation["observations"], label + "/CTF" + str(index), initial_count)
+             else: need(operation["observations"] is None, "Uninvoked whole call cannot have phase observations")
+         snapshot(model["final_state"], label + "/final")
+         diagnostics = model["source_diagnostics"]; boolean(diagnostics["available"])
+@@ -225,15 +225,17 @@
+     unknown = result["unknown_whole_call_obligations_for_unavailable_loaders"]
+     need((type(unknown) is int and unknown == 0) if counts["loader_unavailable_model_cases"] == 0 else unknown is None,
+          "Unavailable loader obligations must remain unknown")
+-    need(counts["public_record_count"] == counts["operation_records"] == counts["public_owner_copy_count"] + counts["unavailable_public_owner_count"] and
+-         counts["public_owner_copy_count"] == counts["selected_public_owner_count"] + counts["unselected_public_context_count"], "Actual public ledger counts differ")
++    need(counts["initial_record_count"] == counts["operation_records"] == counts["initial_available_owner_count"] + counts["initial_unavailable_owner_count"] and
++         counts["initial_available_owner_count"] == counts["initial_selected_1D_owner_count"] + counts["initial_unselected_context_count"], "Actual initial ledger counts differ")
++    need(counts["initial_reached_phase_records"] + counts["initial_unreached_phase_records"] == counts["actual_CTF_invocations"],
++         "Every actual invocation requires its genuine initial reached/unreached record")
+     boolean(result["observer_integrity_failed"])
+     need(result["observer_integrity_failed"] is bool(integrity), "Actual global observer integrity summary differs")
+-    return {**{name: counts[name] for name in public.COUNTS}, **{name: counts[name] for name in ["model_cases", "loader_phase_records", "operation_records", "actual_CTF_invocations",
++    return {**{name: counts[name] for name in initial.COUNTS}, **{name: counts[name] for name in ["model_cases", "loader_phase_records", "operation_records", "actual_CTF_invocations",
+             "actual_CTF_skipped_construct_rows", "loader_unavailable_model_cases", "actual_phase_callback_count", "unreached_phase_records",
+             "scalar_DTO_visits", "snapshot_visits", "unavailable_snapshot_records"]},
+             "actual_source_function_counts": dict(functions), "actual_CTF_status_counts": dict(statuses),
+             "actual_loader_status_counts": dict(loader_statuses), "actual_constructor_status_counts": dict(ctor_statuses),
+-            "actual_phase_callback_counts": {phase: phases[phase] for phase in PHASES},
++            "actual_phase_callback_counts": {**{phase: phases[phase] for phase in PHASES}, "InitialDiscretization": counts["initial_reached_phase_records"]},
+             "unknown_whole_call_obligations_for_unavailable_loaders": result["unknown_whole_call_obligations_for_unavailable_loaders"]}, integrity
+ 

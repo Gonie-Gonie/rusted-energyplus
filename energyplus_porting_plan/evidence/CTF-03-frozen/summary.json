@@ -1,0 +1,72 @@
+{
+  "schema": "ctf03-fresh-initial-observation-policy-freeze-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-03-frozen/manifest.json",
+    "sha256": "d98addc8b1b3f5d43f570268581c765ff9ed630363e0125493953f7ac5d0024d",
+    "size_bytes": 85394
+  },
+  "actual_scope_amendment": {
+    "path": "energyplus_porting_plan/evidence/CTF-03-frozen/objects/87e91fb88589a55fb9d97fdc63f5a7c7a79f41dcd6b5de5a672795149c752714",
+    "sha256": "87e91fb88589a55fb9d97fdc63f5a7c7a79f41dcd6b5de5a672795149c752714",
+    "size_bytes": 2492
+  },
+  "actual_scope_validation_execution": {
+    "path": "energyplus_porting_plan/evidence/CTF-03-frozen/objects/801f7dc2e645f56857bb8d880140bcc5d56777323fd2708dd2f95e7cef922d44",
+    "sha256": "801f7dc2e645f56857bb8d880140bcc5d56777323fd2708dd2f95e7cef922d44",
+    "size_bytes": 3500
+  },
+  "actual_unit_freeze_execution": {
+    "path": "energyplus_porting_plan/evidence/CTF-03-frozen/objects/b77c661496075c1ae7fcaeed013f53373ab9117b23adf831a99840ec4a9de7cb",
+    "sha256": "b77c661496075c1ae7fcaeed013f53373ab9117b23adf831a99840ec4a9de7cb",
+    "size_bytes": 4540
+  },
+  "actual_production_freeze_execution": {
+    "path": "energyplus_porting_plan/evidence/CTF-03-frozen/objects/5c2924ceff6069297e4f87f482cb9e5095b345785d16b5d255725e7395f16b48",
+    "sha256": "5c2924ceff6069297e4f87f482cb9e5095b345785d16b5d255725e7395f16b48",
+    "size_bytes": 4579
+  },
+  "actual_unit_freeze": {
+    "path": "energyplus_porting_plan/evidence/CTF-03-frozen/objects/b78f08e1e853626040babf1cf49aaa29a641c9edd9b99e4872266c2c59687d84",
+    "sha256": "b78f08e1e853626040babf1cf49aaa29a641c9edd9b99e4872266c2c59687d84",
+    "size_bytes": 22033
+  },
+  "actual_production_freeze": {
+    "path": "energyplus_porting_plan/evidence/CTF-03-frozen/objects/37f6c93129e174b65cf5ce0d3affe55f66e22a4db92c5074e014e5d56d59d491",
+    "sha256": "37f6c93129e174b65cf5ce0d3affe55f66e22a4db92c5074e014e5d56d59d491",
+    "size_bytes": 27519
+  },
+  "strict_initial_profiles": [
+    "dx",
+    "initial_CTFTimeStep",
+    "caller_TimeStepZone"
+  ],
+  "all_three_atol_and_rtol": 0,
+  "class_shape_signedzero_exact": true,
+  "inherited18_preprocessing_profiles_separate_unchanged": true,
+  "requested_counts": {
+    "unit": {
+      "model_cases": 39,
+      "calculateTransferFunction": 42
+    },
+    "production": {
+      "model_cases": 15,
+      "loader_phase_records": 195
+    }
+  },
+  "Source_reviews": {
+    "Native_passive_and_helper_and_freezer": "Root FULL and Header other-author FULL",
+    "actual_PE_reader106": "Root FULL and Raw other-author FULL",
+    "OriginalDataQA_six_modules1236": "Root FULL and Header other-author FULL"
+  },
+  "actual_CTF03_configure_compile_or_engine_execution_performed": false,
+  "Rust_CTF03_candidate_applied": false,
+  "scientific_values_or_expected_exits_supplied": false,
+  "numerical_comparison_or_PASS_claimed": false,
+  "complete_CTF03_PASS_claimed": false,
+  "pending": [
+    "actual preserved-core build and independent strict PE review",
+    "genuine Native39/42 and fixed15/195 data review",
+    "fresh unchanged Rust baseline before candidate application",
+    "selected candidate comparisons and CTF04/production handoff"
+  ]
+}

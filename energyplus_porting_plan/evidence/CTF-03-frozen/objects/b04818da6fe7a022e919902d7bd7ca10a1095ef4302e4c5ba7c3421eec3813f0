@@ -1,0 +1,77 @@
+--- .runtime/porting/CTF-01/native-observer-prep-01/ctf01_observer.hh
++++ .runtime/porting/CTF-03/native-observer-prep-01/ctf03_observer.hh
+@@ -1,6 +1,6 @@
+ // Output-only observations of actual Construction.cc local storage.
+-#ifndef CTF01_OBSERVER_HH_INCLUDED
+-#define CTF01_OBSERVER_HH_INCLUDED
++#ifndef CTF03_OBSERVER_HH_INCLUDED
++#define CTF03_OBSERVER_HH_INCLUDED
+ 
+ #include <EnergyPlus/Construction.hh>
+ #include <ObjexxFCL/Array1D.hh>
+@@ -16,7 +16,8 @@
+ {
+     PostLoad = 0,
+     PostMerge = 1,
+-    PostConversion = 2
++    PostConversion = 2,
++    InitialDiscretization = 3
+ };
+ 
+ // Object-representation copies preserve signed zero and nonfinite payload bits.
+@@ -52,13 +53,40 @@
+     std::optional<Binary64Copy> cnd;
+ };
+ 
++// Actual initial state after original Construction.cc 619, before retries.
++struct InitialLayerSnapshot
++{
++    int Nodes = 0;
++    Binary64Copy dx;
++};
++
++struct InitialDiscretizationSnapshot
++{
++    bool reached = false;
++    bool active_prefix_available = false;
++    bool ErrorsFound = false;
++    bool DoCTFErrorReport = false;
++    int LayersInConstruct = 0;
++    int NumResLayers = 0;
++    std::size_t copied_layer_count = 0;
++    // Only the copied active prefix is observed. Never emit the unused tail.
++    std::array<InitialLayerSnapshot, Construction::MaxLayersInConstruct> active_prefix{};
++    int rcmax = 0;
++    int NodeSource = 0;
++    int NodeUserTemp = 0;
++    Binary64Copy CTFTimeStep;
++    int NumHistories = 0;
++    Binary64Copy TimeStepZone;
++};
++
+ struct Capture
+ {
+     // Internal identity checks only. A future helper supplies its real owner ID.
+     EnergyPlusData const *bound_state = nullptr;
+     Construction::ConstructionProps const *bound_construction = nullptr;
+     std::array<Snapshot, 3> phases{};
+-    std::array<std::size_t, 3> actual_phase_callback_counts{};
++    InitialDiscretizationSnapshot initial_discretization{};
++    std::array<std::size_t, 4> actual_phase_callback_counts{};
+     std::size_t actual_callback_count = 0;
+     bool binding_error = false;
+     bool identity_mismatch = false;
+@@ -105,6 +133,13 @@
+                      Array1D<Real64> const &lr, Array1D_bool const &ResLayer,
+                      Real64 const &dyn, Real64 const &rs, Real64 const &cnd) noexcept;
+ 
++void post_initial_discretization(EnergyPlusData const &state,
++                                 Construction::ConstructionProps const &construction,
++                                 bool ErrorsFound, bool DoCTFErrorReport,
++                                 int LayersInConstruct, int NumResLayers,
++                                 Array1D_int const &Nodes, Array1D<Real64> const &dx,
++                                 Real64 const &TimeStepZone) noexcept;
++
+ } // namespace EnergyPlus::CTF01Observation
+ 
+ #endif

@@ -1,0 +1,108 @@
+{
+  "schema": "ctf02-surface-integration-source-preparation.v1",
+  "status": "SOURCE-READY-UNEXECUTED",
+  "own_files": [
+    {
+      "path": ".runtime/porting/CTF-02/surface-integration-readiness-prep-01/prepare.py",
+      "sha256": "1d1f12cd984a09e9fff842c4c8b29fd95163762364557c80ddbef5858373aa76",
+      "size_bytes": 16354,
+      "line_count": 259
+    },
+    {
+      "path": ".runtime/porting/CTF-02/surface-integration-readiness-prep-01/readiness.json",
+      "sha256": "da23e2d7c0f83a303f49b9875ebe1bfdce489be7d510a4c083ca4f63d57bb295",
+      "size_bytes": 29427,
+      "line_count": 770
+    },
+    {
+      "path": ".runtime/porting/CTF-02/surface-integration-readiness-prep-01/README.md",
+      "sha256": "2df9d5b0853c5bcc9f58c5ab0e92717cb0182cc30ec49f78f727a8ff1adfa120",
+      "size_bytes": 3248,
+      "line_count": 49
+    },
+    {
+      "path": ".runtime/porting/CTF-02/surface-integration-readiness-prep-01/new/ctf02_surface_integration.rs",
+      "sha256": "54ed775a69d8abfac25c40d77defb64b8cacd857480d6ee4fd3b098e10023b36",
+      "size_bytes": 7991,
+      "line_count": 124
+    },
+    {
+      "path": ".runtime/porting/CTF-02/surface-integration-readiness-prep-01/before/tests.rs",
+      "sha256": "bb353501a9145cd600531a122f2080400a44c109bc6bdc2f75834dca2d25dfcf",
+      "size_bytes": 456,
+      "line_count": 15
+    },
+    {
+      "path": ".runtime/porting/CTF-02/surface-integration-readiness-prep-01/proposed/tests.rs",
+      "sha256": "15e1fa2ba20f8c2b6a89d4671e73c239ebb161f82bba3fe62efb0dcada51eebd",
+      "size_bytes": 504,
+      "line_count": 16
+    },
+    {
+      "path": ".runtime/porting/CTF-02/surface-integration-readiness-prep-01/tests.rs.diff",
+      "sha256": "4626d120ff5c0bd57609a858498e7edbfa62492666feee731e0302e1f0050687",
+      "size_bytes": 268,
+      "line_count": 7
+    },
+    {
+      "path": ".runtime/porting/CTF-02/surface-integration-readiness-prep-01/ctf02_surface_integration.rs.new.diff",
+      "sha256": "724c1085f203d4adec1d3930a59874bf1ebf69209070c78b5af0a636aae43ac9",
+      "size_bytes": 8218,
+      "line_count": 127
+    }
+  ],
+  "source_file_count": 30,
+  "source_range_count": 66,
+  "source_inventory": {
+    "path": ".runtime/porting/CTF-02/surface-integration-readiness-prep-01/readiness.json",
+    "sha256": "da23e2d7c0f83a303f49b9875ebe1bfdce489be7d510a4c083ca4f63d57bb295",
+    "size_bytes": 29427,
+    "line_count": 770
+  },
+  "proposed_changes": [
+    {
+      "historical_path": "crates/ep_runtime/src/runtime/tests/ctf02_surface_integration.rs",
+      "before": null,
+      "proposed": {
+        "path": ".runtime/porting/CTF-02/surface-integration-readiness-prep-01/new/ctf02_surface_integration.rs",
+        "sha256": "54ed775a69d8abfac25c40d77defb64b8cacd857480d6ee4fd3b098e10023b36",
+        "size_bytes": 7991,
+        "line_count": 124
+      },
+      "diff": {
+        "path": ".runtime/porting/CTF-02/surface-integration-readiness-prep-01/ctf02_surface_integration.rs.new.diff",
+        "sha256": "724c1085f203d4adec1d3930a59874bf1ebf69209070c78b5af0a636aae43ac9",
+        "size_bytes": 8218,
+        "line_count": 127
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/runtime/tests.rs",
+      "before": {
+        "path": ".runtime/porting/CTF-02/surface-integration-readiness-prep-01/before/tests.rs",
+        "sha256": "bb353501a9145cd600531a122f2080400a44c109bc6bdc2f75834dca2d25dfcf",
+        "size_bytes": 456,
+        "line_count": 15
+      },
+      "proposed": {
+        "path": ".runtime/porting/CTF-02/surface-integration-readiness-prep-01/proposed/tests.rs",
+        "sha256": "15e1fa2ba20f8c2b6a89d4671e73c239ebb161f82bba3fe62efb0dcada51eebd",
+        "size_bytes": 504,
+        "line_count": 16
+      },
+      "diff": {
+        "path": ".runtime/porting/CTF-02/surface-integration-readiness-prep-01/tests.rs.diff",
+        "sha256": "4626d120ff5c0bd57609a858498e7edbfa62492666feee731e0302e1f0050687",
+        "size_bytes": 268,
+        "line_count": 7
+      }
+    }
+  ],
+  "tests_run": false,
+  "production_math_changes": false,
+  "scientific_payloads_read": false,
+  "binary_payloads_read": false,
+  "target_imported": false,
+  "target_executed": false,
+  "canonical_writes": false
+}

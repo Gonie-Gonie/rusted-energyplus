@@ -1,0 +1,8 @@
+
+running 3 tests
+test runtime::tests::ctf02_generated_surface_owner_drives_inside_boundary_and_damping_operands ... ok
+test runtime::tests::ctf02_generated_surface_owner_retains_report_signs_phase_and_history_commit ... ok
+test runtime::tests::ctf02_ordinary_initialization_carries_timestep_and_fresh_surface_history ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 3014 filtered out; finished in 0.00s
+

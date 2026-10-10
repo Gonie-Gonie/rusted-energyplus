@@ -1,0 +1,71 @@
+# CTF03 initial-state Native continuation source
+
+SOURCE ONLY. Root must review this exact source, obtain an other-author peer,
+then supply a real scope amendment and fresh packet before any new helper run.
+Nothing here records a build, Native result, Rust result, or gate completion.
+
+The two new helpers fork the accepted CTF02 whole-call transports. They retain
+exact CTF01 literal unit39/42 inputs and fixed CON15/195 loader inputs. Production
+whole Construct call counts remain dynamic actual observations. Original public
+loader phases, source stop outcomes, diagnostics and owner snapshots stay intact.
+The CTF02 coefficient copier is removed from these forks; coefficients are outside
+this initial-state projection.
+
+Each operation retains PostLoad, PostMerge and PostConversion exactly and adds
+`observations.InitialDiscretization`. Capture.phases still has three Snapshot
+entries; initial_discretization is a separate owner and callback count index3.
+It copies the accepted passive callback after original Construction.cc619:
+actual active Nodes/dx, counts, rcmax, reset NodeSource/NodeUserTemp, initial
+CTFTimeStep/NumHistories and caller TimeStepZone. It never reruns a node formula.
+Initial state is separate from whole-call return and retries at original908-936.
+
+The selected pairing requires actual SourceSinkPresent=false/SolutionDimensions=1
+owner context and an intact actual initial capture. AllR, unused, loading-error
+and reversed routes can genuinely leave the callback unreached; they remain
+unavailable/noPASS. No reverse flag or callback reachability is reconstructed.
+A reached missing/invalid required field is an integrity failure. Actual reached
+snapshots survive a later source fatal/exception, with that whole outcome retained
+separately. OS failure without structured output gives no invented source ledger.
+
+PostConversion remains required handoff context: actual dl/rk/rho/cp/lr/ResLayer,
+LayersInConstruct/NumResLayers and active-prefix count. rho and cp are copied
+capacitance factors, not a recomputed product. Original material membership stays
+separate from merged local arrays; no normalized material IDs are invented.
+Unused fixed tails and unassigned locals are never serialized.
+
+Three fresh variable profiles (dx, initial_CTFTimeStep, caller_TimeStepZone) use
+0.0 atol/rtol with exact class/shape/signed-zero rules. Nodes/counts/selectors/history
+are exact integers. The inherited 18 preprocessing profiles stay unchanged as
+separate context, and copied input/owner bits stay exact. No expected arrays,
+branch outcomes, expected exits, or reference answers are supplied.
+
+CLI: `<helper> <repository-root> <frozen-request> <native-admission-contract>
+<fresh-output>`. Schemas are ctf03[-production]-helper-cases.v1,
+native-admission-contract.v1, observation-projection.v1 and helper-results.v1.
+Policy key is lowercase ctf03_initial_observation_policy in frozen metadata and
+uppercase CTF03_initial_observation_policy in the result. Unit and production
+lane fields are independent serializer forks. Each Native source inventory has
+exactly eight source identities: main, metadata, lane fields, admission, shared
+initial serializer, derived Construction and passive observer header/implementation.
+
+CMake includes the accepted CTF02 target recipe, preserving every earlier target.
+Root must supply existing CLK03_REPOSITORY_ROOT, CTF02_SOURCE_DIR and
+CTF01_OBSERVER_SOURCE_DIR as before, plus CTF03_SOURCE_DIR and
+CTF03_OBSERVER_SOURCE_DIR. Each new target adds only helper+full derived
+Construction+observer objects before the unchanged static archive; actual link-map
+provider, protected bytes and prior compile rows must be established by Root.
+No original source/core object is changed by this source proposal.
+
+The future freezer reuses the accepted one-way source/tolerances?request?cases?
+projection?admission?receipt DAG. Current card/scope pair is supplied at runtime;
+this manifest retains the historical card bytes at publication. Its proposed
+scope schema is ctf03-source-scope-amendment.v1 with native_observer and
+initial_policy_source_inventory refs, unit39/42 and production15/195 counts,
+and real check_plan validation provenance. That recorder validates Root-authored
+documents; it does not claim to have authored the amendment.
+
+Before copies and exact diffs preserve inherited sources. Passive observer39eb
+is already accepted separately and remains immutable. This author wrote that
+passive extension and prior CTF01 input/QA glue; source/provenance peers are not
+an independent scientific certificate of those earlier formulas. Actual drivers,
+Rust comparison, CTF04 matrix handoff and retry integration remain future work.
