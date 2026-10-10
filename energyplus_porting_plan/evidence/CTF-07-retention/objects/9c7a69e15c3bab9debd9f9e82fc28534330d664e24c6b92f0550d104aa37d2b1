@@ -1,0 +1,91 @@
+"""Root-only exact-pair metadata plan; no deletion, registry or gate writes."""
+import argparse
+import sys
+from common import *
+from proofs import all_proofs, protected
+
+
+def candidate(target):
+    original = TARGETS[target]
+    raw_products = ROOT / '.runtime/ep261-gcc13-o0/Products'
+    products = path_of(raw_products)
+    require(products == raw_products and products.is_dir()
+            and not getattr(raw_products.lstat(), 'st_file_attributes', 0) & 0x400,
+            'Exact regular Products directory required')
+    value = regular(original['historical_path'])
+    require(value == ROOT / original['historical_path'] and value.parent == products
+            and value.name == target + '.exe', 'Exact contained single target required')
+    ref(value, original['sha256'], original['size_bytes'], remember=False)
+    return {**original, 'resolved_absolute_path': str(value), 'resolved_products_directory': str(products),
+            'currently_present': True, 'regular_non_reparse_file': True}
+
+
+def archive_sources(output):
+    directory = output / 'source'
+    directory.mkdir()
+    rows = []
+    for name in NAMES:
+        source = Path(__file__).parent / name
+        destination = directory / name
+        with destination.open('xb') as stream:
+            stream.write(source.read_bytes())
+        require(ref(source)['sha256'] == ref(destination)['sha256'], 'Executed source/archive mismatch')
+        rows.append({'historical_path': source.relative_to(ROOT).as_posix(), 'archive': ref(destination)})
+    return rows
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for key in ['proof-bindings', 'source-manifest', 'approved-source-sha256', 'output-dir']:
+        parser.add_argument('--' + key, required=True)
+    args = parser.parse_args()
+    require(Path.cwd().resolve() == ROOT, 'Actual repository cwd required')
+    output = fresh_output(args.output_dir)
+    started = now()
+    source_manifest = approved_sources(pin(args.source_manifest), args.approved_source_sha256, 'write_plan.py')
+    proof_binding = pin(args.proof_bindings)
+    builds, refs, archive = all_proofs(proof_binding, started)
+    kept = protected(builds)
+    candidates = {target: candidate(target) for target in TARGETS}
+    unchanged()
+    output.mkdir()
+    archives = archive_sources(output)
+    pins_target = output / 'source/proof-bindings.json'
+    with pins_target.open('xb') as stream:
+        stream.write(regular(proof_binding['path']).read_bytes())
+    require(ref(pins_target)['sha256'] == proof_binding['sha256'], 'Actual approved proof-bindings archive differs')
+    plan = {
+        'schema': 'ctf07-two-original-retention-removal-plan.v1',
+        'status': 'pass-selected07-prerequisites-removal-not-performed',
+        'started_utc': started, 'completed_utc': now(), 'actual_writer_command': list(sys.orig_argv),
+        'actual_writer_cwd': str(ROOT), 'approved_source_manifest': source_manifest,
+        'only_candidates': candidates, 'evidence': refs, 'committed_archive': archive,
+        'actual_build_bindings': {lane: BUILDS[lane] for lane in ['unit', 'production']},
+        'protected_and_retained_observations': kept, 'historical_before_inventory': BEFORE,
+        'executed_source_archives': archives, 'authenticated_proof_bindings_archive': ref(pins_target),
+        'Root_checked_report_facts_reused_without_scientific_report_parsing': True,
+        'scientific_report_values_or_metrics_parsed_or_recomputed': False,
+        'complete_CTF04_PASS_claimed': False, 'complete_CTF05_PASS_claimed': False, 'complete_CTF06_PASS_claimed': False, 'complete_CTF07_PASS_claimed': False, 'all_four_card_gates_claimed': False,
+        'removal_authorized_by_this_plan': False, 'registry_admission_performed': False,
+        'deletion_or_move_performed': False, 'full_debug_copy_created': False,
+        'actual_storage_savings_bytes': 0,
+        'potential_exact_original_removal_bytes': sum(item['size_bytes'] for item in TARGETS.values()),
+        'engines_Cargo_Git_compilers_strip_or_comparers_executed': False,
+        'limits': [
+            'Only these two prospectively declared CTF07 linked originals are eligible; no directory, glob, failed or earlier original.',
+            'Forty prior protected files, both07 derivatives, 631 present core objects and 12 absent registered paths remain unchanged.',
+            'Root supplies checked actual report metadata and committed archive coverage; this reader authenticates exact bytes and actual recorder guards.',
+            'Historical references, registries and launchers remain literal. A fresh original-first run requires a live original and will fail after retirement.',
+            'The separate actual pair record/tombstones are future admission evidence, not a rewrite of any earlier live-original contract.',
+            'Hashes/maps do not recover discarded debug bytes; no relink recovery or whole-card completion is claimed.',
+            'Root must separately invoke reviewed retire.py --apply --authorize-targets with this exact ordered pair.',
+        ],
+    }
+    unchanged()
+    result = write(output, 'plan.json', plan)
+    print(json.dumps({'plan': result, 'status': plan['status'], 'targets': list(TARGETS),
+                      'deletion_performed': False, 'registry_admission_performed': False}, allow_nan=False))
+
+
+if __name__ == '__main__':
+    main()

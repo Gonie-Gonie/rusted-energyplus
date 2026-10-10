@@ -1,0 +1,6 @@
+tree 556c9db9c7e81f4ab26d0ab5d7bd7c6fac39a345
+parent 6e37fd83f9fb581d063b40d7513a90f75b4ea7b3
+author Hyeong-Gon Jo <hg221089@gmail.com> 1791664340 +0900
+committer Hyeong-Gon Jo <hg221089@gmail.com> 1791664340 +0900
+
+test(ctf): record six ordinary CLI runs after Gamma port

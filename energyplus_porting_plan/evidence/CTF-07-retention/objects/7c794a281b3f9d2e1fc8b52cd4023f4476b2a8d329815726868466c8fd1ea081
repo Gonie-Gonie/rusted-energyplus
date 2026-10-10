@@ -1,0 +1,43 @@
+{
+  "schema": "ctf07-exact-pair-retirement-attempt.v1",
+  "entries": [
+    {
+      "target": "ctf07_unit_helper",
+      "original_link": {
+        "historical_path": ".runtime/ep261-gcc13-o0/Products/ctf07_unit_helper.exe",
+        "sha256": "52231b5ca6a1be36179c2ee489520539d6651c32630afcfa26bbbc3eab7c88de",
+        "size_bytes": 1300191163
+      },
+      "retained_derivative": {
+        "path": ".runtime/porting/CTF-07/native-build-01/unit/derivation/derived-helper.exe",
+        "sha256": "5d6eeeed72513f856d82e32382c2273e2b656ff420d53aea0ad33aa017270023",
+        "size_bytes": 151547427
+      },
+      "status": "retained-derivative-original-retired",
+      "removal_receipt": {
+        "path": ".runtime/porting/CTF-07/retirement-01/ctf07_unit_helper-removal-receipt.json",
+        "sha256": "c4f30f3bd919655215ec2e869038470cc1caff72dba08c5925aa2ccbed4d2369"
+      },
+      "actual_removal_observed": true
+    },
+    {
+      "target": "ctf07_production_helper",
+      "original_link": {
+        "historical_path": ".runtime/ep261-gcc13-o0/Products/ctf07_production_helper.exe",
+        "sha256": "499e6b2e85bda5cc9ef0a717c9eecf74a9122acf2b0d15126f73d001a8883585",
+        "size_bytes": 1302795649
+      },
+      "retained_derivative": {
+        "path": ".runtime/porting/CTF-07/native-build-01/production/derivation/derived-helper.exe",
+        "sha256": "d3ac3948f782ebb4fc1e00a8e60755e31c6086a0ce772c29f07c1569b0404d43",
+        "size_bytes": 151863712
+      },
+      "status": "retained-derivative-original-retired",
+      "removal_receipt": {
+        "path": ".runtime/porting/CTF-07/retirement-01/ctf07_production_helper-removal-receipt.json",
+        "sha256": "05328bf6edb00b8dfdd16f235b794c59fc334eb3837df15fcbc5c101aa5b3b6a"
+      },
+      "actual_removal_observed": true
+    }
+  ]
+}

@@ -112,3 +112,7 @@ pending. Full retry, final coefficients, SI19 stores and surface handoff are pen
 ## Actual six ordinary CLI executions
 
 A-24H, A-72H, B-NOLIMIT-24H, B-FLOW-24H, B-CAPACITY-24H and B-BOTH-24H all exited zero at Source293f3e45. All 45 fixed input hashes remained unchanged. Actual Cargo artifacts were used; compatibility/partial deny/full trace, no hours override, no oracle comparison. [Evidence](../evidence/CTF-07-production-cli/summary.json). Complete integration and production gates remain pending.
+
+## Actual precise two-Original retirement
+
+Removed only the two newly verified CTF07 linked debug Originals (2602986812 bytes). Actual plan/action, independent metadata review, genuine final Source293f comparisons/quality/CLI6 and Git archive508-file coverage are preserved. Prior40 artifacts, verified07 derivatives2, core631 present/12 absent and prior04/06 retirements remain unchanged. [Evidence](../evidence/CTF-07-retention/summary.json). No gate completion or recovery claim follows from removal.

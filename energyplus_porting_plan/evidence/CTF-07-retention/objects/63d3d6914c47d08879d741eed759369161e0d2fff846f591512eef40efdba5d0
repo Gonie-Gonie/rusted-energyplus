@@ -1,0 +1,1 @@
+{"plan": {"path": ".runtime/porting/CTF-07/retirement-plan-01/plan.json", "sha256": "1cb47e08ce3c4319b8f887ea5bb7fcbe62adc5e8c108f6cc7290df0bece020ca"}, "status": "pass-selected07-prerequisites-removal-not-performed", "targets": ["ctf07_unit_helper", "ctf07_production_helper"], "deletion_performed": false, "registry_admission_performed": false}

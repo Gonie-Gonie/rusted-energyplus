@@ -1,0 +1,82 @@
+--- before-CTF06/common.py
++++ common.py
+@@ -1,4 +1,4 @@
+-"""Byte guards for Root's exact two-original CTF06 retention action."""
++"""Byte guards for Root's exact two-original CTF07 retention action."""
+ from __future__ import annotations
+ from datetime import datetime, timezone
+ import hashlib
+@@ -8,37 +8,49 @@
+ import stat
+ 
+ ROOT = Path(__file__).resolve().parents[4]
+-BASE = '.runtime/porting/CTF-06/'
++BASE = '.runtime/porting/CTF-07/'
+ NAMES = ['common.py', 'proofs.py', 'write_plan.py', 'retire.py']
+ TARGETS = {
+-    'ctf06_unit_helper': {
+-        'historical_path': '.runtime/ep261-gcc13-o0/Products/ctf06_unit_helper.exe',
+-        'sha256': 'ccdbaa2fad8aa937c91e5ca7a239ff96f85f4291b7d6d0fc1f1787375e38d44f',
+-        'size_bytes': 1299892676,
++    'ctf07_unit_helper': {
++        'historical_path': '.runtime/ep261-gcc13-o0/Products/ctf07_unit_helper.exe',
++        'sha256': '52231b5ca6a1be36179c2ee489520539d6651c32630afcfa26bbbc3eab7c88de',
++        'size_bytes': 1300191163,
+     },
+-    'ctf06_production_helper': {
+-        'historical_path': '.runtime/ep261-gcc13-o0/Products/ctf06_production_helper.exe',
+-        'sha256': '95dd013e8fed710b9968ec811a6b929a0289a0c1c3e7c1c5a915b769b54deac6',
+-        'size_bytes': 1302497162,
++    'ctf07_production_helper': {
++        'historical_path': '.runtime/ep261-gcc13-o0/Products/ctf07_production_helper.exe',
++        'sha256': '499e6b2e85bda5cc9ef0a717c9eecf74a9122acf2b0d15126f73d001a8883585',
++        'size_bytes': 1302795649,
+     },
+ }
+ BUILDS = {
+     'unit': {'path': BASE + 'native-build-01/unit/native-build.json',
+-             'sha256': 'b2cf10f2b9e32c837c77e8f1d7f666d352b44393bfee5fe30c607389537791b1'},
++             'sha256': '4a9229ad19645f63608e2cf4b6b7fe012549356519ae0d9db05b618813fce7da'},
+     'production': {'path': BASE + 'native-build-01/production/native-build.json',
+-                   'sha256': '5167cbdde90f97d9e3d421a84967cfbd54fafdeea31a176b3506abf3339a5beb'},
++                   'sha256': 'a5fa87ec99caebb2ca361f50905d9cc652c060ee1693d6c5693ac2ca9af1e3dc'},
+ }
+ BEFORE = {'path': BASE + 'native-build-01/before/preservation.json',
+-          'sha256': '3c39dff0e9027d792cc733b819d5e176e68ae260d560f6a8a4b71687ea766be5'}
++          'sha256': '7d0f45375a79b3fa3032827082c1624aa4d5f12116a2e37bb20b2ede635f177d'}
+ QUALITY_SOURCE_METADATA = {
+     'final_source_manifest': {'path': BASE + 'applied-final-source-02/manifest.json',
+-                              'sha256': 'f0a529c58db5483369b1337a2a10a4d790b7459b3704b5abd82e638ef215b963'},
+-    'test_lint_fix_manifest': {'path': BASE + 'test-lint-fix-prep-01/manifest.json',
+-                              'sha256': 'bf773e6dd21919ba054ef464054f4baf25221b0383021ee91a8ffc8c41e7f427'},
++                              'sha256': 'c67e440187bc3731d667d8bb79970c80ef82f9e37c26eac3dda4fc66c116414b'},
++    'prior_formatted_source_manifest': {'path': BASE + 'applied-final-source-01/manifest.json',
++                              'sha256': '344ed7b311e745f4556378655a90fff602cb4a178b44d7d88c927af0ccfe424f'},
++    'reviewed_lint_source_preparation': {'path': BASE + 'lint-amendment-prep-01/manifest.json',
++                                       'sha256': 'a79f7cb070c6cff248c0b55bc7dad460e12a5dbade0be0c6a475fbf9b6f491db'},
++}
++SCOPE_METADATA = {
++    'amendment': {'path': BASE + 'scope-amendment-01/amendment.json',
++                  'sha256': '05b73dcc989959b5f1b5b473387b3e498b69bac11173103d2746118c9da80423'},
++    'execution': {'path': BASE + 'scope-check-command-01/receipt.json',
++                  'sha256': '9f3ebf7081519e9aea26410a1e0a197bfa5af31fe884a1ac074366d811c1cea8'},
+ }
+ PRIOR_RETIRED_CTF04_ORIGINAL_PATHS = [
+     '.runtime/ep261-gcc13-o0/Products/ctf04_unit_helper.exe',
+     '.runtime/ep261-gcc13-o0/Products/ctf04_production_helper.exe',
++]
++PRIOR_RETIRED_CTF06_ORIGINAL_PATHS = [
++    '.runtime/ep261-gcc13-o0/Products/ctf06_unit_helper.exe',
++    '.runtime/ep261-gcc13-o0/Products/ctf06_production_helper.exe',
+ ]
+ SEEN = {}
+ 
+@@ -199,7 +211,7 @@
+ 
+ def approved_sources(manifest_ref, approved_sha, entry):
+     manifest = read(manifest_ref)
+-    require(manifest['schema'] == 'ctf06-two-original-retention-source-proposal.v1', 'Reviewed exact source manifest required')
++    require(manifest['schema'] == 'ctf07-two-original-retention-source-proposal.v1', 'Reviewed exact source manifest required')
+     rows = manifest['own_sources']
+     require([Path(row['path']).name for row in rows] == NAMES, 'Exactly four ordered source files required')
+     for name, row in zip(NAMES, rows):

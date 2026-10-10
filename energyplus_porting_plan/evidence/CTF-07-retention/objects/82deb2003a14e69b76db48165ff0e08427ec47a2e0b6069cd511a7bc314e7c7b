@@ -1,0 +1,72 @@
+# CTF07 exact-pair Original retirement source proposal
+
+SOURCE ONLY, unexecuted. Root must fully review these four sources and obtain an other-author full source peer before using them. All earlier holds and actual failed attempts stay immutable. This adapts the accepted CTF06 four-script retirement mechanism; it adds no execution or QA stage.
+
+Only the two prospectively declared CTF07 linked Originals are eligible. Selected first Gamma comparison, four final-source quality receipts, the fixed six ordinary CLI runs, published selected evidence, actual scope custody and a committed archive are runtime prerequisites. No whole-card, retry, final coefficient or downstream completion is inferred.
+
+## Exact eligible pair and preserved files
+
+1. `.runtime/ep261-gcc13-o0/Products/ctf07_unit_helper.exe`: SHA256 `52231b5ca6a1be36179c2ee489520539d6651c32630afcfa26bbbc3eab7c88de`, 1,300,191,163 bytes.
+2. `.runtime/ep261-gcc13-o0/Products/ctf07_production_helper.exe`: SHA256 `499e6b2e85bda5cc9ef0a717c9eecf74a9122acf2b0d15126f73d001a8883585`, 1,302,795,649 bytes.
+
+These identities are copied from genuine Root-authored CTF07 build metadata. This preparation did not open or hash either binary. The possible exact-pair removal is 2,602,986,812 bytes; realized savings remain zero until a successful actual action.
+
+The pinned pre07 inventory has 40 prior protected files, 631 present registered core objects and 12 absent registered core paths. Both genuine CTF07 derivatives join the live protection set: 42 retained artifacts and 631 present objects are physically checked when Root executes. Earlier CTF04/CTF06 derivatives retain their original inventory positions. Both literal prior retirement records/recorders are authenticated, and all four old Original paths must remain absent. No prior registry, record, launcher or live-reference policy is rewritten.
+
+## Runtime proof bindings supplied by Root
+
+`--proof-bindings` accepts one actual `path#sha256` JSON, schema `ctf07-two-original-retention-proof-bindings.v1`, scope `selected-CTF07-first-Gammas-only`, `Root_approved_for_exact_pair:true`, `future_hashes_guessed:false`, and the exact ordered two target names.
+
+`lanes` has exactly `unit` and `production`. Each has exactly `build`, `PE`, `helper`, `DataQA`, `comparison`. Build identities are the actual CTF07 metadata pins in `common.py`. Their configure/compile/derivation/core-check recorders and derivative/preservation identities are authenticated. The genuine prospective Original retention intent must match exactly.
+
+Every other lane role has `report`, `execution`, `Root_semantically_verified:true`, and `Root_checked_metadata`. The latter contains normalized `source_report:{path,sha256}`, actual `schema`/`status`, and these Root-extracted facts:
+
+- PE: lane-specific CTF07 independent build/PE schema; status `pass-exact-retained-PE-runtime-and-actual-build-identity`; `original_and_derivative_verified:true`; exact build `linked_original`/`helper_binary` identities.
+- Helper: actual `ctf07[-production]-helper-results.v1` schema; `actual_helper_exit_code` integer zero; `preservation_checks_passed:true`. Its status is explicitly Root-normalized real process/custody evidence, not a fabricated raw helper status.
+- DataQA: lane-specific CTF07 OriginalDataQA schema and genuine release status; `structural_provenance_release_passed:true`; `numerical_PASS_claimed:false`.
+- Unit comparison: `ctf07-unit-comparison.v1`; `pass-selected-first-Gammas`; `selected_unit_PASS_claimed:true`.
+- Production comparison: `ctf07-production-comparison.v1`; `pass-selected-loader-to-first-Gammas`; `selected_fixed15_first_Gammas_PASS_claimed:true`.
+- Both comparison extractions: integer `comparison.mismatch_count:0`; `complete_CTF04_PASS_claimed`, `complete_CTF05_PASS_claimed`, `complete_CTF06_PASS_claimed`, `complete_CTF07_PASS_claimed` all false.
+
+Reports are authenticated as bytes without parsing scientific values. Root is the disclosed semantic extraction authority. No report or expected result becomes a Native/Rust operand.
+
+`quality` has exactly four successful genuine recorder roles, all on one actual final source snapshot:
+
+- `focused_Gamma_tests`: `cargo test --locked -p ep_runtime --lib ctf_`.
+- `workspace_tests`: `cargo test --locked --workspace --all-targets`.
+- `clippy`: `cargo clippy --locked --workspace --all-targets -- -D warnings`.
+- `format_check`: `cargo fmt --all -- --check`.
+
+The recorded executable basename must be `cargo` or `cargo.exe`; argument tails are exact. No prior-snapshot quality exception or fifth role exists. The failed Clippy01 remains preserved documentary evidence and cannot satisfy a required successful role.
+
+`quality_source` has exactly `final_source_manifest` and `final_source_snapshot`. The first is the actual `applied-final-source-02/manifest.json` pin `c67e4401...`, schema `ctf07-actual-final-lint-reviewed-source.v1`. It authenticates the prior formatted inventory `344ed7b3...`, reviewed loop-scoped lint hold `a79f7cb0...`, and separate exact 13-line lint delta. All 16 historical format deltas remain descriptions of formatter01 only. Fifteen complete source rows remain literal01; the sole Gamma current archive must equal the approved lint proposal. No mixed format/lint change is called rustfmt.
+
+The final source snapshot is a runtime-supplied actual recorder ref; no future hash is pinned. Its 16 corresponding source rows must match the final archives' SHA/size exactly. All four quality receipts, both selected comparison receipts and all six real CLI receipts must bind that same final snapshot. No current source identity is inferred from a recent directory or a prior receipt.
+
+`source_scope` has exactly `amendment` and `execution`: the actual immutable CTF07 scope amendment `05b73dcc...` and real CTF07 `check_plan.py --check --card CTF-07` recorder `9f3ebf70...`. Their genuine zero/source guard, UTC order, original pre-output flags, held observer/policy and before-document archive identities are checked. The two after-document SHA/size identities remain historical and are never rebound to later published live plan/card bytes. Requested unit39/42 and production15/195 remain literal scope counts, not assumed scientific outcome counts.
+
+`selected_published_summary` has `report`, `Root_semantically_verified:true`, and `Root_checked_metadata:{source_report,selected_unit_and_fixed15_comparisons_passed:true,complete_CTF04_PASS_claimed:false,complete_CTF05_PASS_claimed:false,complete_CTF06_PASS_claimed:false,complete_CTF07_PASS_claimed:false}`. It binds the actual published selected summary separately from the CLI summary, without another execution stage.
+
+`fixed_six_CLI` uses the same report/execution/extraction wrapper. Its schema is `ctf07-fixed-six-actual-cli-executions.v1`; `execution_role` is `actual-plan-validation-after-Root-authored-CLI-summary`; `all6_exit0_and_source_unchanged:true`; `all45_input_guards_unchanged_after:true`; and `executions` contains six distinct actual child recorder refs. The wrapper execution validates Root-authored metadata after those six runs; it is not the summary author or engine driver. All six receipts must precede retirement and match the final snapshot.
+
+`committed_archive` retains the accepted offline mechanism: actual archive `manifest`; actual uncompressed `commit`/`trees` with `{raw_body,git_object_id}`; bounded unique `indexed_files` with `{path,file:{path,sha256,size_bytes},git_blob_oid}`; and `Root_verified_archive_complete_for_selected_CTF07:true`. Actual commit/tree/path/blob/SHA associations are verified without invoking Git. Root verifies selected archive coverage. No future commit, receipt, count, exit or hash is supplied here.
+
+Every required successful recorder is `recorded-porting-command.v1`, integer zero, no launch error, unchanged source bytes and HEAD, correct repository cwd and UTC interval, with authenticated streams/source snapshot/recorder archive. Streams are byte-checked without interpreting engine payloads.
+
+## Root-only plan and exact file action
+
+`write_plan.py --proof-bindings <actual#sha> --source-manifest <this-manifest#sha> --approved-source-sha256 <reviewed-write-plan-sha> --output-dir <fresh-under-CTF-07>`
+
+The plan emits metadata and actual source/proof copies. Its compact stdout remains exactly `{plan,status,targets,deletion_performed:false,registry_admission_performed:false}`. Root records it with the existing recorder.
+
+`retire.py --plan <actual#sha> --plan-execution <actual-recorder#sha> --source-manifest <this-manifest#sha> --approved-source-sha256 <reviewed-retire-sha> --output-dir <fresh-under-CTF-07> --apply --authorize-targets ctf07_unit_helper ctf07_production_helper`
+
+`candidate`, `ps_quote`, and `removal_script` are AST-identical to accepted CTF06. Immediately before each action, exact cwd/Products/leaf/non-reparse/size/SHA checks precede native PowerShell `Remove-Item -LiteralPath`. There is no recursive/glob/directory deletion, shell switching, move or debug copy. Both candidates are checked before the pair, and all protected artifacts/core absences/proof bytes are rechecked around each individual action.
+
+Each actual action records command, script, spawn error, exit, streams, actual absence and preservation failures. A failed first action preserves its genuine partial attempt and stops. Separate before/after records and tombstones are forward-only evidence. Removal does not validate old original-first launchers, recover debug bytes, admit a registry, or close all four card gates.
+
+## Held source verification and limits
+
+`before-CTF06` contains exact accepted four bodies, README and manifest. Four unified diffs reproduce these sources. The manifest binds source/protocol and actual build/custody metadata only; future quality/comparison/CLI/archive proof bindings remain null until Root supplies actual values.
+
+Preparation used source/metadata reads, SHA/size/line checks, AST parsing and exact diffs only. It imported or executed no reviewed script, parsed no scientific/weather payload, opened no executable/core object, ran no engine/build/test/formatter/Git, and made no canonical edit, plan, deletion, registry or gate write. Header authored earlier Gamma/helper/DataQA glue; this retention proposal authenticates custody and exact-file actions, not independent scientific formulas or outcomes.
