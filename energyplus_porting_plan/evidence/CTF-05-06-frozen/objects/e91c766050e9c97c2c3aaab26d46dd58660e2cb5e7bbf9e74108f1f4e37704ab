@@ -1,0 +1,172 @@
+//! HeatBalanceSurfaceManager source-order stage contract.
+
+use crate::execution_plan::{EnergyPlusCompatibilityStage, ExecutionStageKind};
+use crate::heat_balance::ctf::ConstructionCtfCoefficientOverride;
+use ep_model::{ConstructionId, MaterialId, MaterialSurfaceRoughness};
+
+mod construction_cache;
+pub mod ctf_all_resistive;
+pub mod ctf_initial_discretization;
+pub mod ctf_inverse_matrix;
+pub mod ctf_layer_preprocessing;
+
+pub use construction_cache::ConstructionCtfCoefficientSource;
+pub(crate) use construction_cache::{ConstructionThermalDataCache, surface_thermal_properties};
+
+const SOURCE_FILE: &str = "src/EnergyPlus/HeatBalanceSurfaceManager.cc";
+
+#[derive(Clone, Debug, PartialEq)]
+pub(crate) struct ConstructionThermalData {
+    pub(crate) cache_index: usize,
+    pub(crate) construction_id: ConstructionId,
+    pub(crate) construction_name: String,
+    pub(crate) material_layer_stack: Vec<MaterialId>,
+    pub(crate) ctf01_layer_preprocessing:
+        ctf_layer_preprocessing::ConstructionCtfLayerPreprocessing,
+    pub(crate) ctf02_coefficients: ctf_all_resistive::ConstructionCtfAllResistive,
+    pub(crate) outside_layer_material_id: MaterialId,
+    pub(crate) outside_layer_material_name: String,
+    pub(crate) outside_layer_roughness: MaterialSurfaceRoughness,
+    pub(crate) thermal_resistance_m2_k_per_w: f64,
+    pub(crate) heat_capacity_j_per_m2_k: Option<f64>,
+    pub(crate) thermal_absorptance: f64,
+    pub(crate) inside_thermal_absorptance: f64,
+    pub(crate) solar_absorptance: f64,
+    pub(crate) ctf_coefficient_source: ConstructionCtfCoefficientSource,
+    pub(crate) ctf_coefficients: Vec<ConstructionCtfCoefficientOverride>,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub(crate) struct ConstructionCacheInvalidationToken {
+    pub(crate) coefficient_cache_hash: u64,
+}
+
+impl ConstructionCacheInvalidationToken {
+    pub(crate) const fn from_coefficient_cache_hash(coefficient_cache_hash: u64) -> Self {
+        Self {
+            coefficient_cache_hash,
+        }
+    }
+}
+
+const fn stage(
+    kind: ExecutionStageKind,
+    stage_name: &'static str,
+    source_routine: &'static str,
+) -> EnergyPlusCompatibilityStage {
+    EnergyPlusCompatibilityStage {
+        kind,
+        stage_name,
+        source_file: SOURCE_FILE,
+        source_routine,
+    }
+}
+
+/// EnergyPlus `HeatBalanceSurfaceManager::ManageSurfaceHeatBalance`.
+#[must_use]
+pub const fn manage_surface_heat_balance_stage() -> EnergyPlusCompatibilityStage {
+    stage(
+        ExecutionStageKind::ManageSurfaceHeatBalance,
+        "manage-surface-heat-balance",
+        "ManageSurfaceHeatBalance",
+    )
+}
+
+/// EnergyPlus `HeatBalanceSurfaceManager::ManageSurfaceHeatBalance` source-order wrapper.
+pub(crate) fn manage_surface_heat_balance_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
+}
+
+/// EnergyPlus `HeatBalanceSurfaceManager::InitSurfaceHeatBalance`.
+#[must_use]
+pub const fn init_surface_heat_balance_stage() -> EnergyPlusCompatibilityStage {
+    stage(
+        ExecutionStageKind::InitSurfaceHeatBalance,
+        "init-surface-heat-balance",
+        "InitSurfaceHeatBalance",
+    )
+}
+
+/// EnergyPlus `HeatBalanceSurfaceManager::InitSurfaceHeatBalance` source-order wrapper.
+pub(crate) fn init_surface_heat_balance_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
+}
+
+/// EnergyPlus `HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf`.
+#[must_use]
+pub const fn calc_heat_balance_outside_surf_stage() -> EnergyPlusCompatibilityStage {
+    stage(
+        ExecutionStageKind::CalcHeatBalanceOutsideSurf,
+        "calc-heat-balance-outside-surf",
+        "CalcHeatBalanceOutsideSurf",
+    )
+}
+
+/// EnergyPlus `HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf` source-order wrapper.
+pub(crate) fn calc_heat_balance_outside_surf_source_order_path<T>(
+    execute: impl FnOnce() -> T,
+) -> T {
+    execute()
+}
+
+/// EnergyPlus `HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf`.
+#[must_use]
+pub const fn calc_heat_balance_inside_surf_stage() -> EnergyPlusCompatibilityStage {
+    stage(
+        ExecutionStageKind::CalcHeatBalanceInsideSurf,
+        "calc-heat-balance-inside-surf",
+        "CalcHeatBalanceInsideSurf",
+    )
+}
+
+/// EnergyPlus `HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf` source-order wrapper.
+pub(crate) fn calc_heat_balance_inside_surf_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
+}
+
+/// EnergyPlus `HeatBalanceSurfaceManager::UpdateFinalSurfaceHeatBalance`.
+#[must_use]
+pub const fn update_final_surface_heat_balance_stage() -> EnergyPlusCompatibilityStage {
+    stage(
+        ExecutionStageKind::UpdateFinalSurfaceHeatBalance,
+        "update-final-surface-heat-balance",
+        "UpdateFinalSurfaceHeatBalance",
+    )
+}
+
+/// EnergyPlus `HeatBalanceSurfaceManager::UpdateFinalSurfaceHeatBalance` source-order wrapper.
+pub(crate) fn update_final_surface_heat_balance_source_order_path<T>(
+    execute: impl FnOnce() -> T,
+) -> T {
+    execute()
+}
+
+/// EnergyPlus `HeatBalanceSurfaceManager::UpdateThermalHistories`.
+#[must_use]
+pub const fn update_thermal_histories_stage() -> EnergyPlusCompatibilityStage {
+    stage(
+        ExecutionStageKind::UpdateThermalHistories,
+        "update-thermal-histories",
+        "UpdateThermalHistories",
+    )
+}
+
+/// EnergyPlus `HeatBalanceSurfaceManager::UpdateThermalHistories` source-order wrapper.
+pub(crate) fn update_thermal_histories_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
+}
+
+/// EnergyPlus `HeatBalanceSurfaceManager::ReportSurfaceHeatBalance`.
+#[must_use]
+pub const fn report_surface_heat_balance_stage() -> EnergyPlusCompatibilityStage {
+    stage(
+        ExecutionStageKind::ReportSurfaceHeatBalance,
+        "report-surface-heat-balance",
+        "ReportSurfaceHeatBalance",
+    )
+}
+
+/// EnergyPlus `HeatBalanceSurfaceManager::ReportSurfaceHeatBalance` source-order wrapper.
+pub(crate) fn report_surface_heat_balance_source_order_path<T>(execute: impl FnOnce() -> T) -> T {
+    execute()
+}

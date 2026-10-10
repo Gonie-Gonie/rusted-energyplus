@@ -1,0 +1,226 @@
+// Genuine whole public Construction calls with separately captured private locals.
+#include "ctf06_unit_fields.hh"
+#include "ctf06_unit_admission.hh"
+#include "ctf06_observation_fields.hh"
+#include <iostream>
+#include <map>
+#include <memory>
+#include <typeinfo>
+
+namespace Ctf01 {
+template<class Function> json invoke(Function &&function)
+{
+    try {
+        function();
+        return {{"status", "source_returned"}, {"source_fatal", false}, {"source_exception", false},
+                {"exception_type", nullptr}, {"exception_message", nullptr}};
+    } catch (EnergyPlus::FatalError const &error) {
+        return {{"status", "source_fatal"}, {"source_fatal", true}, {"source_exception", false},
+                {"exception_type", typeid(error).name()}, {"exception_message", error.what()}};
+    } catch (std::exception const &error) {
+        return {{"status", "source_exception"}, {"source_fatal", false}, {"source_exception", true},
+                {"exception_type", typeid(error).name()}, {"exception_message", error.what()}};
+    } catch (...) {
+        return {{"status", "source_nonstandard_exception"}, {"source_fatal", false}, {"source_exception", true},
+                {"exception_type", nullptr}, {"exception_message", nullptr}};
+    }
+}
+inline json not_invoked(std::string const &reason)
+{
+    return {{"status", "source_not_invoked_after_stop"}, {"source_fatal", nullptr}, {"source_exception", nullptr},
+            {"exception_type", nullptr}, {"exception_message", nullptr}, {"prior_source_stop_reason", reason}};
+}
+struct Factory {
+    std::unique_ptr<EnergyPlus::EnergyPlusData> state;
+    std::ostringstream *error_text = nullptr;
+    json messages = json::array(), constructor, initialization;
+    bool stopped = false;
+    std::string stop_reason;
+
+    void initialize(bool ErrorsFound, bool DoCTFErrorReport)
+    {
+        auto const outcome = invoke([&] { state = std::make_unique<EnergyPlus::EnergyPlusData>(); });
+        constructor = {{"kind", "EnergyPlusData::EnergyPlusData"}, {"actual_source_invoked", true}, {"call_outcome", outcome},
+            {"after", state ? snapshot(*state, ErrorsFound, DoCTFErrorReport) : json(nullptr)}};
+        stopped = outcome.at("status") != "source_returned";
+        if (stopped) {
+            stop_reason = outcome.at("status").get<std::string>();
+            initialization = {{"kind", "EnergyPlusData::init_constant_state"}, {"actual_source_invoked", false},
+                {"call_outcome", not_invoked(stop_reason)}, {"before", nullptr}, {"after", nullptr}};
+            return;
+        }
+        auto sink = std::make_unique<std::ostringstream>(); error_text = sink.get(); state->files.err_stream = std::move(sink);
+        state->files.audit.open_as_stringstream(); state->files.eso.open_as_stringstream(); state->files.eio.open_as_stringstream();
+        state->dataGlobal->errorCallback = [this](EnergyPlus::Error level, std::string const &message) {
+            messages.push_back({{"level", static_cast<int>(level)}, {"message", message}});
+        };
+        auto const before = snapshot(*state, ErrorsFound, DoCTFErrorReport);
+        auto const initialized = invoke([&] { state->init_constant_state(*state); });
+        initialization = {{"kind", "EnergyPlusData::init_constant_state"}, {"actual_source_invoked", true},
+            {"call_outcome", initialized}, {"before", before}, {"after", snapshot(*state, ErrorsFound, DoCTFErrorReport)}};
+        stopped = initialized.at("status") != "source_returned";
+        if (stopped) stop_reason = initialized.at("status").get<std::string>();
+    }
+    ~Factory()
+    {
+        // MaterialData owns these raw pointers. EnergyPlusData's default destructor
+        // does not call clear_state; release the real owner exactly once here.
+        if (state) state->dataMaterial->clear_state();
+    }
+    json diagnostics(fs::path const &output, std::string const &id)
+    {
+        if (!state || error_text == nullptr) return {{"available", false}, {"unavailable_reason", "diagnostic_sinks_not_installed"},
+            {"messages", messages}, {"logs", nullptr}};
+        json logs = json::object();
+        for (auto const &[name, text] : std::array<std::pair<std::string, std::string>, 4>{
+            {{"err", error_text->str()}, {"audit.txt", state->files.audit.get_output()},
+             {"eso.txt", state->files.eso.get_output()}, {"eio.txt", state->files.eio.get_output()}}}) {
+            auto const path = output / (id + "." + name); write_text(path, text); logs[name] = file_ref(path);
+        }
+        return {{"available", true}, {"unavailable_reason", nullptr}, {"messages", messages}, {"logs", logs},
+            {"actual_native_stringstream_sinks", true}, {"diagnostic_text_numerically_paired", false}};
+    }
+};
+
+json seed_members(Factory &factory, json const &row)
+{
+    auto &state = *factory.state;
+    require(state.dataMaterial->materials.empty() && state.dataConstruction->Construct.empty(), "Fresh real owners required before literal member seeding");
+    state.dataGlobal->TimeStepZone = input_real(row.at("caller").at("TimeStepZone"));
+    state.dataGlobal->TimeStepZoneSec = input_real(row.at("caller").at("TimeStepZoneSec"));
+    std::map<std::string, int> material_indices; json material_ids = json::array(), construction_ids = json::array();
+    // Allocate both real arrays before any whole call. All pointees/array elements
+    // remain stable, including the original reverse-construction scan's `this`.
+    state.dataMaterial->materials.dimension(static_cast<int>(row.at("materials").size()),
+                                            static_cast<EnergyPlus::Material::MaterialBase *>(nullptr));
+    for (std::size_t i = 0; i < row.at("materials").size(); ++i) {
+        auto const &input = row.at("materials").at(i); int const index = static_cast<int>(i + 1);
+        auto material = std::make_unique<EnergyPlus::Material::MaterialBase>();
+        material->Name = input.at("Name").get<std::string>(); material->Num = index;
+        material->group = EnergyPlus::Material::Group::Regular;
+        material->Thickness = input_real(input.at("Thickness")); material->Conductivity = input_real(input.at("Conductivity"));
+        material->Density = input_real(input.at("Density")); material->SpecHeat = input_real(input.at("SpecHeat"));
+        material->Resistance = input_real(input.at("Resistance")); material->ROnly = input.at("ROnly").get<bool>();
+        // No loader call or Resistance/NominalR calculation is substituted here.
+        state.dataMaterial->materials(index) = material.release();
+        material_indices.emplace(input.at("id").get<std::string>(), index);
+        material_ids.push_back({{"logical_input_id", input.at("id")}, {"actual_array_index", index},
+            {"actual_Num", state.dataMaterial->materials(index)->Num}, {"actual_Name", state.dataMaterial->materials(index)->Name}});
+    }
+    state.dataConstruction->Construct.allocate(static_cast<int>(row.at("constructions").size()));
+    for (std::size_t i = 0; i < row.at("constructions").size(); ++i) {
+        auto const &input = row.at("constructions").at(i); int const index = static_cast<int>(i + 1);
+        auto &construction = state.dataConstruction->Construct(index);
+        construction.Name = input.at("Name").get<std::string>(); construction.IsUsedCTF = input.at("IsUsedCTF").get<bool>();
+        construction.SourceSinkPresent = input.at("SourceSinkPresent").get<bool>();
+        construction.SolutionDimensions = input.at("SolutionDimensions").get<int>();
+        construction.SourceAfterLayer = input.at("SourceAfterLayer").get<int>(); construction.TempAfterLayer = input.at("TempAfterLayer").get<int>();
+        construction.ThicknessPerpend = input_real(input.at("ThicknessPerpend"));
+        construction.TotLayers = static_cast<int>(input.at("layer_material_ids").size());
+        for (int j = 1; j <= construction.TotLayers; ++j)
+            construction.LayerPoint(j) = material_indices.at(input.at("layer_material_ids").at(static_cast<std::size_t>(j - 1)).get<std::string>());
+        construction_ids.push_back({{"logical_input_id", input.at("id")}, {"actual_array_index", index}, {"actual_Name", construction.Name}});
+    }
+    return {{"materials", material_ids}, {"constructions", construction_ids}, {"literal_member_seeding", true},
+        {"Material_GetMaterialData_or_construction_loader_invoked", false}, {"wrapper_Resistance_calculation", false}};
+}
+
+json model_case(json const &row, fs::path const &output)
+{
+    bool ErrorsFound = row.at("caller").at("ErrorsFound").get<bool>();
+    bool DoCTFErrorReport = row.at("caller").at("DoCTFErrorReport").get<bool>();
+    Factory factory; factory.initialize(ErrorsFound, DoCTFErrorReport);
+    json const before_members = factory.state ? snapshot(*factory.state, ErrorsFound, DoCTFErrorReport) : json(nullptr);
+    json const identity_ledger = factory.stopped ? json(nullptr) : seed_members(factory, row);
+    json const after_members = factory.state ? snapshot(*factory.state, ErrorsFound, DoCTFErrorReport) : json(nullptr);
+    json operations = json::array(); bool observer_integrity_failed = false;
+    for (std::size_t i = 0; i < row.at("operations").size(); ++i) {
+        auto const &operation = row.at("operations").at(i); bool const invoked = !factory.stopped;
+        json const before = factory.state ? snapshot(*factory.state, ErrorsFound, DoCTFErrorReport) : json(nullptr);
+        auto const diagnostic_start = factory.messages.size(); json outcome = not_invoked(factory.stop_reason), observed = nullptr;
+        if (invoked) {
+            Observation::Capture capture;
+            {
+                auto &construction = factory.state->dataConstruction->Construct(static_cast<int>(i + 1));
+                Observation::Binding binding(capture, *factory.state, construction);
+                // Observer metadata failures do not alter or short-circuit source execution.
+                outcome = invoke([&] { construction.calculateTransferFunction(*factory.state, ErrorsFound, DoCTFErrorReport); });
+            }
+            observed = observations(capture); observer_integrity_failed = observer_integrity_failed || observer_failed(capture);
+            if (outcome.at("status") != "source_returned") {
+                factory.stopped = true; factory.stop_reason = outcome.at("status").get<std::string>();
+            }
+        }
+        operations.push_back({{"id", operation.at("id")}, {"kind", operation.at("kind")},
+            {"logical_construction_id", operation.at("construction_id")},
+            {"actual_construction_index", invoked ? json(i + 1) : json(nullptr)}, {"actual_source_invoked", invoked},
+            {"call_outcome", outcome}, {"before", before},
+            {"after", factory.state ? snapshot(*factory.state, ErrorsFound, DoCTFErrorReport) : json(nullptr)}, {"observations", observed},
+            {"diagnostic_message_begin", diagnostic_start}, {"diagnostic_message_end", factory.messages.size()}});
+    }
+    return {{"id", row.at("id")}, {"lane", row.at("lane")}, {"declared_caller", row.at("caller")},
+        {"constructor", factory.constructor}, {"constant_initialization", factory.initialization},
+        {"before_member_inputs", before_members}, {"after_member_inputs", after_members}, {"actual_input_owner_identity", identity_ledger},
+        {"operations", operations}, {"final_state", factory.state ? snapshot(*factory.state, ErrorsFound, DoCTFErrorReport) : json(nullptr)},
+        {"source_diagnostics", factory.diagnostics(output, row.at("id").get<std::string>())},
+        {"observer_integrity_failed", observer_integrity_failed}, {"later_CTF_coefficients_or_thermal_results_paired", false}};
+}
+} // namespace Ctf01
+
+int main(int argc, char **argv)
+{
+    using namespace Ctf01;
+    try {
+        require(argc == 5, "Usage: ctf06_unit_helper <root> <frozen-request> <native-admission-contract> <fresh-output>");
+        auto const root = fs::weakly_canonical(fs::absolute(argv[1]));
+        auto const request_path = fs::absolute(argv[2]), admission_path = fs::absolute(argv[3]), output = fs::absolute(argv[4]);
+        auto const inside = fs::weakly_canonical(output).lexically_relative(root / ".runtime/porting/CTF-06");
+        require(!inside.empty() && *inside.begin() != ".." && !fs::exists(output), "Fresh contained CTF-06 output directory required");
+        auto const packet = admit(root, request_path, admission_path); fs::create_directories(output);
+        json rows = json::array(), statuses = json::object(); std::size_t invoked = 0, skipped = 0, callback_count = 0, matrix_callbacks = 0, matrix_retained = 0, matrix_omitted = 0;
+        bool observer_integrity_failed = false; MethodTotals exponential_totals, inverse_totals;
+        for (auto const &row : packet.request.at("model_cases")) rows.push_back(model_case(row, output));
+        for (auto const &row : rows) {
+            observer_integrity_failed = observer_integrity_failed || row.at("observer_integrity_failed").get<bool>();
+            for (auto const &operation : row.at("operations")) {
+                auto const status = operation.at("call_outcome").at("status").get<std::string>();
+                statuses[status] = (statuses.contains(status) ? statuses.at(status).get<std::size_t>() : 0) + 1;
+                if (operation.at("actual_source_invoked").get<bool>()) {
+                    ++invoked; callback_count += operation.at("observations").at("actual_callback_count").get<std::size_t>();
+                    auto const &matrix = operation.at("observations").at("MatrixAssembly");
+                    matrix_callbacks += matrix.at("actual_matrix_attempt_callback_count").get<std::size_t>();
+                    matrix_retained += matrix.at("actual_retained_attempt_count").get<std::size_t>();
+                    matrix_omitted += matrix.at("matrix_attempt_records_omitted").get<std::size_t>();
+                    add_method_totals(exponential_totals, operation.at("observations").at("Exponential"));
+                    add_method_totals(inverse_totals, operation.at("observations").at("Inverse"));
+                } else ++skipped;
+            }
+        }
+        auto const after = admit(root, request_path, admission_path);
+        require(after.request == packet.request && after.admission == packet.admission && after.contracts == packet.contracts,
+                "Frozen input/source admission changed during actual calls");
+        int const helper_exit = observer_integrity_failed ? 2 : 0;
+        json const result = {{"schema", "ctf06-helper-results.v1"}, {"energyplus_commit", packet.request.at("energyplus_commit")},
+            {"actual_request", file_ref(request_path)}, {"native_admission_contract", file_ref(admission_path)},
+            {"actual_scope_amendment", packet.request.at("actual_scope_amendment")},
+            {"actual_scope_amendment_execution", packet.request.at("actual_scope_amendment_execution")},
+            {"observation_projection", file_ref(packet.projection_path)}, {"contracts", packet.contracts},
+            {"fixed_scope", packet.request.at("fixed_scope")}, {"all_45_guard_refs", packet.request.at("all_45_guard_refs")},
+            {"actual_binary", file_ref(fs::absolute(argv[0]))}, {"native_source_files", packet.admission.at("native_source_files")},
+            {"model_cases", rows}, {"requested_counts", packet.requested_counts},
+            {"actual_operation_invocations", invoked}, {"actual_operations_skipped", skipped},
+            {"actual_source_function_counts", {{"calculateTransferFunction", invoked}}},
+            {"actual_source_status_counts", statuses}, {"actual_phase_callback_count", callback_count},
+            {"observer_integrity_failed", observer_integrity_failed}, {"actual_helper_exit_code", helper_exit},
+            {"complete_requested_record_ledger", true}, {"complete_all_phase_observations_claimed", false},
+            {"CTF03_initial_observation_policy", ctf03_initial_policy()}, {"CTF04_matrix_observation_policy", ctf04_matrix_policy()},
+            {"CTF06_exponential_observation_policy", ctf06_exponential_policy()}, {"CTF05_inverse_observation_policy", ctf05_inverse_policy()},
+            {"linked_original_retention_intent", packet.request.at("linked_original_retention_intent")},
+            {"actual_exponential_observation_counts", method_totals(exponential_totals)}, {"actual_inverse_observation_counts", method_totals(inverse_totals)},
+            {"actual_matrix_attempt_callback_count", matrix_callbacks}, {"actual_retained_matrix_attempt_count", matrix_retained},
+            {"matrix_attempt_records_omitted", matrix_omitted}, {"complete_matrix_attempt_parity_claimed", false}, {"scientific_comparison_performed", false}, {"numerical_PASS_claimed", false}, {"gates_updated", false},
+            {"Material_loader_or_fixed15_production_certified", false}, {"CTF02_through_CTF10_certified", false}};
+        write_text(output / "ctf06-helper-results.json", result.dump() + "\n");
+        return helper_exit;
+    } catch (std::exception const &error) { std::cerr << error.what() << '\n'; return 1; }
+}

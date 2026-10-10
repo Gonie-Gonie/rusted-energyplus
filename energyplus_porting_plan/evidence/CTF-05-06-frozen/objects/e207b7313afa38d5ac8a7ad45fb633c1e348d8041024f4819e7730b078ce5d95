@@ -1,0 +1,193 @@
+--- ctf04_observer.hh
++++ ctf06_observer.hh
+@@ -1,6 +1,6 @@
+ // Output-only observations of actual Construction.cc local storage.
+-#ifndef CTF04_OBSERVER_HH_INCLUDED
+-#define CTF04_OBSERVER_HH_INCLUDED
++#ifndef CTF06_OBSERVER_HH_INCLUDED
++#define CTF06_OBSERVER_HH_INCLUDED
+ 
+ #include <EnergyPlus/Construction.hh>
+ #include <ObjexxFCL/Array1D.hh>
+@@ -12,7 +12,7 @@
+ #include <optional>
+ #include <vector>
+ 
+-namespace EnergyPlus::CTF01Observation {
++namespace EnergyPlus::CTF06Observation {
+ 
+ enum class Phase : std::size_t
+ {
+@@ -159,6 +159,130 @@
+     std::array<Binary64Copy, 2> DMat{};
+ };
+ 
++
++// Separate actual method visits; none of these counters modifies the old ledger.
++enum class MethodKind : std::size_t { Exponential = 0, Inverse = 1 };
++enum class MethodStage : std::size_t
++{
++    Entry = 0, InitializedInputs = 1, ScalingControls = 2,
++    PowerControl = 3, SquareControl = 4, FinalWorkspace = 5, SourceReturn = 6
++};
++enum class MethodFailureKind : std::size_t
++{
++    IdentityMismatch = 0, AssociationFailure = 1, OrderFailure = 2,
++    MatrixShape = 3, CopyException = 4, LedgerAppendException = 5
++};
++enum class MatrixOwner : std::size_t
++{
++    AMat = 0, IdenMatrix = 1, AMat1 = 2, AMato = 3,
++    AMatN = 4, AExp = 5, AInv = 6
++};
++
++struct MethodFailure
++{
++    MethodKind method = MethodKind::Exponential;
++    std::size_t invocation_ordinal = 0;
++    std::size_t assembly_ordinal = 0;
++    MethodStage stage = MethodStage::Entry;
++    MethodFailureKind kind = MethodFailureKind::IdentityMismatch;
++};
++
++struct MethodContext
++{
++    // Fresh copies of actual Construction members at this callback.
++    bool IsUsedCTF = false;
++    bool SourceSinkPresent = false;
++    int SolutionDimensions = 0;
++    int TotLayers = 0;
++    int rcmax = 0;
++    int NodeSource = 0;
++    int NodeUserTemp = 0;
++    Binary64Copy CTFTimeStep;
++    int NumHistories = 0;
++    // These are explicitly the checked earlier assembly's actual stack context.
++    bool assembly_context_available = false;
++    bool assembly_ErrorsFound = false;
++    bool assembly_DoCTFErrorReport = false;
++    Binary64Copy assembly_TimeStepZone;
++};
++
++struct MethodMatrixSnapshot
++{
++    MatrixOwner owner = MatrixOwner::AMat;
++    std::optional<Array2Bounds> bounds;
++    bool copy_available = false;
++    std::vector<Binary64Copy> values;
++};
++
++struct ExponentialControls
++{
++    Binary64Copy AMatRowNormMax;
++    int k = 0;
++    Binary64Copy fact;
++    Binary64Copy CheckVal;
++    int l = 0;
++    // Available only at the final boundary; not an iteration count.
++    std::optional<int> final_i;
++};
++
++struct MethodValueSnapshot
++{
++    bool reached = false;
++    bool matrices_available = false;
++    MethodContext context;
++    std::size_t observed_matrix_count = 0;
++    // Only [0, observed_matrix_count) is observed; never serialize unused slots.
++    std::array<MethodMatrixSnapshot, 4> matrices{};
++    std::optional<ExponentialControls> exponential_controls;
++    // Populated only at the actual caller-return site, with actual stack inputs.
++    bool caller_context_available = false;
++    bool caller_ErrorsFound = false;
++    bool caller_DoCTFErrorReport = false;
++    std::optional<Binary64Copy> caller_TimeStepZone;
++};
++
++struct PowerControlSnapshot
++{
++    std::size_t observed_event_ordinal = 0;
++    int i = 0;
++    bool SigFigLimit = false;
++};
++struct SquareControlSnapshot
++{
++    std::size_t observed_event_ordinal = 0;
++    int isq = 0;
++    bool Backup = false;
++};
++
++struct MethodInvocationSnapshot
++{
++    std::size_t observed_invocation_ordinal = 0;
++    std::size_t observed_assembly_ordinal = 0;
++    bool association_available = false;
++    std::array<bool, 6> failure_kinds{};
++    std::array<std::size_t, 7> actual_stage_callback_counts{};
++    MethodValueSnapshot entry;
++    MethodValueSnapshot initialized_inputs;
++    MethodValueSnapshot scaling_controls;
++    std::vector<PowerControlSnapshot> power_controls;
++    std::vector<SquareControlSnapshot> square_controls;
++    MethodValueSnapshot final_workspace;
++    MethodValueSnapshot source_return;
++};
++
++struct MethodCapture
++{
++    std::size_t actual_invocation_count = 0;
++    std::array<std::size_t, 7> actual_stage_callback_counts{};
++    std::vector<MethodInvocationSnapshot> invocations;
++    // Every actual callback without its required retained record is counted.
++    std::array<std::size_t, 7> stage_records_omitted{};
++    bool observer_failure = false;
++    std::array<std::size_t, 6> failure_event_counts{};
++    std::optional<MethodFailure> first_failure;
++    std::optional<MethodFailure> last_failure;
++};
++
+ struct Capture
+ {
+     // Internal identity checks only. A future helper supplies its real owner ID.
+@@ -181,6 +305,8 @@
+     std::array<std::size_t, 6> matrix_failure_event_counts{};
+     std::optional<MatrixAttemptFailure> first_matrix_failure;
+     std::optional<MatrixAttemptFailure> last_matrix_failure;
++    MethodCapture exponential;
++    MethodCapture inverse;
+ };
+ 
+ // A helper binds its explicit actual state/array element before one genuine call.
+@@ -238,6 +364,31 @@
+                           Array1D_int const &Nodes, Array1D<Real64> const &dx,
+                           Real64 const &TimeStepZone) noexcept;
+ 
+-} // namespace EnergyPlus::CTF01Observation
++
++// Entry has no invented state/local-work operands. The active real binding is used.
++void method_entry(MethodKind method, Construction::ConstructionProps const &construction) noexcept;
++void exponential_initialized(Construction::ConstructionProps const &construction,
++                             Array2D<Real64> const &AMat1, Array2D<Real64> const &AMato,
++                             Array2D<Real64> const &AMatN) noexcept;
++void exponential_scaled(Construction::ConstructionProps const &construction,
++                        Array2D<Real64> const &AMat1, Real64 const &AMatRowNormMax,
++                        int k, Real64 const &fact, Real64 const &CheckVal, int l) noexcept;
++void exponential_power_control(Construction::ConstructionProps const &construction,
++                               int i, bool SigFigLimit) noexcept;
++void exponential_square_control(Construction::ConstructionProps const &construction,
++                                int isq, bool Backup) noexcept;
++void exponential_final(Construction::ConstructionProps const &construction,
++                       Array2D<Real64> const &AMat1, Array2D<Real64> const &AMato,
++                       Array2D<Real64> const &AMatN, Real64 const &AMatRowNormMax,
++                       int k, Real64 const &fact, Real64 const &CheckVal, int l, int i) noexcept;
++void inverse_initialized(Construction::ConstructionProps const &construction,
++                         Array2D<Real64> const &AMat1) noexcept;
++void inverse_final(Construction::ConstructionProps const &construction,
++                   Array2D<Real64> const &AMat1) noexcept;
++void method_return(MethodKind method, EnergyPlusData const &state,
++                   Construction::ConstructionProps const &construction,
++                   bool ErrorsFound, bool DoCTFErrorReport, Real64 const &TimeStepZone) noexcept;
++
++} // namespace EnergyPlus::CTF06Observation
+ 
+ #endif

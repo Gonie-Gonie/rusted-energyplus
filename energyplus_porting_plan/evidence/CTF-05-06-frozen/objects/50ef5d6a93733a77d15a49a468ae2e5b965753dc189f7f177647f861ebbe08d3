@@ -1,0 +1,10 @@
+--- crates/ep_runtime/src/heat_balance/surface_manager.rs
++++ .runtime/porting/CTF-05/rust-inverse-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager.rs
+@@ -6,6 +6,7 @@
+ 
+ mod construction_cache;
+ pub mod ctf_layer_preprocessing;
++pub mod ctf_inverse_matrix;
+ 
+ pub use construction_cache::ConstructionCtfCoefficientSource;
+ pub(crate) use construction_cache::{ConstructionThermalDataCache, surface_thermal_properties};

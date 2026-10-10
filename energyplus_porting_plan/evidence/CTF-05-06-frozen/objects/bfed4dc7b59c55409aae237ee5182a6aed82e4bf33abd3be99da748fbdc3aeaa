@@ -1,0 +1,21 @@
+# Deferred combined first-attempt caller
+
+This is a source-only plan, not an activated implementation or passed gate.
+
+1. Retain the actual construction's existing preprocessing and initial owners.
+2. Produce one first-assembly owner from those same owners and literal initial
+   caller/dt/history, using the accepted CTF04 source API once.
+3. Borrow that first assembly for `initialize_construction_ctf_first_exponential`.
+4. Then borrow the same unchanged original AMat/IdenMatrix for the independently
+   prepared first-inverse API. Do not pass AExp or exponential local workspaces
+   as inverse operands. Preserve Native884→887 order in the actual caller.
+5. Preserve explicit unavailable Results separately. A later owner cannot stand
+   in for an absent first owner. Any actual continuation/stop decision must be
+   specified from the genuine combined source route, not inferred by this plan.
+6. Copy reached first owners into an actual ordered cache/state ledger only
+   after the combined caller and field declarations are reviewed and applied.
+
+Do not add an independent exponential pass after an already executed inverse
+pass, or certify retry/Gamma/coefficient behavior from these isolated APIs.
+Runtime source identities, future builds, observations and comparison receipts
+remain actual Root-supplied evidence; no future digest or outcome is declared.

@@ -1,0 +1,139 @@
+--- /dev/null
++++ crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner_tests.rs
+@@ -0,0 +1,136 @@
++use super::*;
++use crate::heat_balance::ctf_initial_owner::CtfInitialUnavailable;
++use crate::heat_balance::surface_manager::ctf_exponential_matrix::CtfExponentialMatrix;
++use crate::heat_balance::surface_manager::ctf_layer_preprocessing::CtfNormalizedLayer;
++use crate::heat_balance::surface_manager::ctf_state_space_assembly::{
++    CtfAssemblyContext, CtfAssemblyInput, CtfStateSpaceAssembly, assemble_1d_ctf_state_space,
++};
++
++fn first_assembly() -> ConstructionCtfFirstAssembly {
++    let context = CtfAssemblyContext {
++        construction_id: ConstructionId(7),
++        route: CtfAssemblyRoute::Assemble,
++        solution_dimensions: 1,
++        source_sink_present: false,
++        node_source: 0,
++        node_user_temp: 0,
++        attempt_ordinal: 1,
++        time_step_zone: 0.25,
++        ctf_time_step: 0.5,
++        num_histories: 2,
++    };
++    let layers = [CtfNormalizedLayer {
++        dl: 0.5, rk: 0.125, rho: 32.0, cp: 0.25, lr: 4.0, res_layer: false,
++    }];
++    let observation = assemble_1d_ctf_state_space(
++        CtfAssemblyInput { layers: &layers, nodes: &[6], dx: &[0.125], rcmax: 5 },
++        context,
++    ).expect("literal actual assembly inputs are selected");
++    ConstructionCtfFirstAssembly { construction_id: context.construction_id, result: Ok(observation) }
++}
++
++fn reached_mut(owner: &mut ConstructionCtfFirstAssembly) -> &mut CtfStateSpaceAssembly {
++    match owner.result.as_mut().expect("assembly owner exists") {
++        CtfAssemblyObservation::Assembled(reached) => reached,
++        CtfAssemblyObservation::Unavailable(_) => panic!("test setup must have actual assembly"),
++    }
++}
++
++fn exponential(owner: &ConstructionCtfFirstExponential) -> &CtfExponentialMatrix {
++    match owner.result.as_ref().expect("selected first exponential exists") {
++        CtfExponentialObservation::Exponential(reached) => reached,
++        CtfExponentialObservation::Unavailable(_) => panic!("first selected result cannot be unavailable"),
++    }
++}
++
++#[test]
++fn first_result_preserves_actual_context_and_immutable_input_owners() {
++    let assembly = first_assembly();
++    let before = assembly.clone();
++    let output = initialize_construction_ctf_first_exponential(&assembly);
++    let result = exponential(&output);
++    let source = match assembly.result.as_ref().expect("actual assembly") {
++        CtfAssemblyObservation::Assembled(source) => source,
++        CtfAssemblyObservation::Unavailable(_) => panic!("actual test assembly"),
++    };
++    assert_eq!(output.construction_id, assembly.construction_id);
++    assert_eq!(result.context, source.context);
++    assert_eq!(result.context.time_step_zone.to_bits(), 0.25_f64.to_bits());
++    assert_eq!(result.context.ctf_time_step.to_bits(), 0.5_f64.to_bits());
++    assert_eq!(result.context.num_histories, 2);
++    assert_eq!(result.context.attempt_ordinal, 1);
++    assert_eq!(result.rcmax, source.rcmax);
++    assert_eq!(result.a_exp.len(), source.a_mat.len());
++    assert_eq!(assembly, before);
++}
++
++#[test]
++fn actual_stored_identity_is_borrowed_without_reconstruction() {
++    let original = first_assembly();
++    let baseline = initialize_construction_ctf_first_exponential(&original);
++    let mut changed = original.clone();
++    reached_mut(&mut changed).iden_matrix[0] = 2.0;
++    let before = changed.clone();
++    let output = initialize_construction_ctf_first_exponential(&changed);
++    assert_ne!(exponential(&baseline).a_exp, exponential(&output).a_exp);
++    assert_eq!(changed, before);
++}
++
++#[test]
++fn unavailable_first_assembly_reason_is_preserved_without_a_work_owner() {
++    let reason = CtfFirstAssemblyUnavailable::InitialUnavailable(CtfInitialUnavailable::UnusedConstruction);
++    let assembly = ConstructionCtfFirstAssembly { construction_id: ConstructionId(3), result: Err(reason) };
++    let output = initialize_construction_ctf_first_exponential(&assembly);
++    assert_eq!(output.construction_id, ConstructionId(3));
++    assert_eq!(output.result, Err(CtfFirstExponentialUnavailable::FirstAssemblyUnavailable(reason)));
++}
++
++#[test]
++fn all_actual_unreached_assembly_routes_remain_unavailable() {
++    for reason in [CtfAssemblyUnavailable::UnusedConstruction, CtfAssemblyUnavailable::LoadingError,
++        CtfAssemblyUnavailable::AllResistive, CtfAssemblyUnavailable::ReversedConstructionReuse] {
++        let assembly = ConstructionCtfFirstAssembly { construction_id: ConstructionId(4),
++            result: Ok(CtfAssemblyObservation::Unavailable(reason)) };
++        assert_eq!(initialize_construction_ctf_first_exponential(&assembly).result,
++            Err(CtfFirstExponentialUnavailable::AssemblyUnavailable(reason)));
++    }
++}
++
++#[test]
++fn stale_construction_and_later_attempt_contexts_do_not_publish_results() {
++    let mut assembly = first_assembly();
++    assembly.construction_id = ConstructionId(8);
++    assert_eq!(initialize_construction_ctf_first_exponential(&assembly).result,
++        Err(CtfFirstExponentialUnavailable::ConstructionIdentityMismatch));
++    for ordinal in [0, 2, 3] {
++        let mut assembly = first_assembly();
++        reached_mut(&mut assembly).context.attempt_ordinal = ordinal;
++        assert_eq!(initialize_construction_ctf_first_exponential(&assembly).result,
++            Err(CtfFirstExponentialUnavailable::NotFirstAttempt(ordinal)));
++    }
++    let mut assembly = first_assembly();
++    reached_mut(&mut assembly).context.route = CtfAssemblyRoute::Unavailable(CtfAssemblyUnavailable::AllResistive);
++    assert_eq!(initialize_construction_ctf_first_exponential(&assembly).result,
++        Err(CtfFirstExponentialUnavailable::AssemblyRouteMismatch));
++}
++
++#[test]
++fn pure_scope_and_actual_matrix_shape_stops_remain_explicit() {
++    let cases: [(fn(&mut CtfStateSpaceAssembly), CtfExponentialScopeError); 5] = [
++        (|owner| { let _ = owner.a_mat.pop(); }, CtfExponentialScopeError::MatrixShape),
++        (|owner| owner.iden_matrix.clear(), CtfExponentialScopeError::MatrixShape),
++        (|owner| owner.rcmax = 0, CtfExponentialScopeError::Dimension(0)),
++        (|owner| owner.context.source_sink_present = true, CtfExponentialScopeError::InternalSource),
++        (|owner| owner.context.solution_dimensions = 2, CtfExponentialScopeError::UnsupportedDimensions(2)),
++    ];
++    for (mutate, expected) in cases {
++        let mut assembly = first_assembly();
++        mutate(reached_mut(&mut assembly));
++        assert_eq!(initialize_construction_ctf_first_exponential(&assembly).result,
++            Err(CtfFirstExponentialUnavailable::ExponentialScope(expected)));
++    }
++    let mut assembly = first_assembly();
++    reached_mut(&mut assembly).context.node_source = 1;
++    assert_eq!(initialize_construction_ctf_first_exponential(&assembly).result,
++        Err(CtfFirstExponentialUnavailable::ExponentialScope(CtfExponentialScopeError::SourceNodeState)));
++}

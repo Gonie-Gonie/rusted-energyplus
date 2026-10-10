@@ -1,0 +1,73 @@
+{
+  "schema": "ctf05-ctf06-source-scope-amendment.v1",
+  "created_utc": "2026-10-10T17:13:52.919560+00:00",
+  "cards": [
+    "CTF-05",
+    "CTF-06"
+  ],
+  "scope_review_passed": true,
+  "all_other_gates_pending": true,
+  "strict_profiles_settled_before_outputs": true,
+  "actual_CTF05_or_CTF06_build_or_engine_execution_performed": false,
+  "native_observer": {
+    "path": ".runtime/porting/CTF-06/native-helper-prep-01/manifest.json",
+    "sha256": "a1bd7873b5792c5fcd9e4227068d43cc2299de4f51ccb6548a8d9a53f9725633",
+    "size_bytes": 19694
+  },
+  "passive_observer": {
+    "path": ".runtime/porting/CTF-06/native-observer-prep-01/manifest.json",
+    "sha256": "24ea19879d35d761f0b56c4a08de794c5c71d9b2519e377caf5bda9fd8730d03",
+    "size_bytes": 26224
+  },
+  "method_policy_source_inventory": {
+    "path": ".runtime/porting/CTF-06/native-helper-prep-01/projection-policy-proposal.json",
+    "sha256": "3649c701e9a9b2c719ef9fe0ff733d56d1d48fb76915c1f294bba3479f246541",
+    "size_bytes": 14786
+  },
+  "requested_counts": {
+    "unit": {
+      "model_cases": 39,
+      "calculateTransferFunction": 42
+    },
+    "production": {
+      "model_cases": 15,
+      "loader_phase_records": 195
+    }
+  },
+  "before_documents": [
+    {
+      "path": ".runtime/porting/CTF-06/scope-amendment-01/before-plan.json",
+      "sha256": "e23dac7d90bbc240f3520a969be588bc31f1f0f546c5f7e4f0a4e6a2196aee97",
+      "size_bytes": 645459
+    },
+    {
+      "path": ".runtime/porting/CTF-06/scope-amendment-01/before-CTF-05.md",
+      "sha256": "07feb3acadd06b6829fe7c2976a196fb859105c39a4c41259c67bdf021a9e9d1",
+      "size_bytes": 2627
+    },
+    {
+      "path": ".runtime/porting/CTF-06/scope-amendment-01/before-CTF-06.md",
+      "sha256": "0946a82d6c904e564dc4d11ddb862ded60a055013f144371dd6637bce83368ab",
+      "size_bytes": 2659
+    }
+  ],
+  "after_documents": [
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "06e2b45fe874af1ebf1eab1211a3954ecfd5ce4dfb0fb086814f1754c0267320",
+      "size_bytes": 672068
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CTF-05.md",
+      "sha256": "c303a87b5f7133f6439206066323a788fe3a7ec31593fb0ce48978ce9eea87b2",
+      "size_bytes": 4378
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CTF-06.md",
+      "sha256": "ace8920255ea2b224ce6f9b67bc7fdfe8978406c1d15502abd2ee461944a6b27",
+      "size_bytes": 4571
+    }
+  ],
+  "recorder_role": "real-card-checks-validate-Root-authored-documents; neither-check-authors-amendment",
+  "scope_only_no_numerical_PASS": true
+}

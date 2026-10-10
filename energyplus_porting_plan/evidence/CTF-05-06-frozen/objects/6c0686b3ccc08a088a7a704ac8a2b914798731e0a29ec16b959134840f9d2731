@@ -1,0 +1,152 @@
+use super::*;
+use ep_model::ConstructionId;
+
+fn context() -> CtfAssemblyContext {
+    CtfAssemblyContext {
+        construction_id: ConstructionId(7),
+        route: CtfAssemblyRoute::Assemble,
+        solution_dimensions: 1,
+        source_sink_present: false,
+        node_source: 0,
+        node_user_temp: 0,
+        attempt_ordinal: 3,
+        time_step_zone: 0.25,
+        ctf_time_step: 1.0,
+        num_histories: 4,
+    }
+}
+
+fn reached(
+    a_mat: &[f64],
+    iden_matrix: &[f64],
+    rcmax: i32,
+    context: CtfAssemblyContext,
+) -> CtfExponentialMatrix {
+    let owner = match calculate_selected_ctf_matrix_exponential(
+        CtfExponentialInput { rcmax, a_mat, iden_matrix },
+        context,
+    )
+    .expect("selected source-defined helper scope")
+    {
+        CtfExponentialObservation::Exponential(owner) => Some(*owner),
+        CtfExponentialObservation::Unavailable(_) => None,
+    };
+    owner.expect("selected test owner unexpectedly unavailable")
+}
+
+#[test]
+fn unused_route_has_no_matrix_or_work_owner() {
+    let mut actual = context();
+    actual.route = CtfAssemblyRoute::Unavailable(CtfAssemblyUnavailable::UnusedConstruction);
+    let result = calculate_selected_ctf_matrix_exponential(
+        CtfExponentialInput { rcmax: 0, a_mat: &[], iden_matrix: &[] },
+        actual,
+    );
+    assert_eq!(result, Ok(CtfExponentialObservation::Unavailable(
+        CtfAssemblyUnavailable::UnusedConstruction,
+    )));
+}
+
+#[test]
+fn actual_owner_shapes_and_context_are_required() {
+    let input = CtfExponentialInput { rcmax: 2, a_mat: &[0.0; 4], iden_matrix: &[1.0] };
+    assert_eq!(calculate_selected_ctf_matrix_exponential(input, context()),
+        Err(CtfExponentialScopeError::MatrixShape));
+    let input = CtfExponentialInput { rcmax: 1, a_mat: &[0.0], iden_matrix: &[1.0] };
+    let mut actual = context();
+    actual.attempt_ordinal = 0;
+    assert_eq!(calculate_selected_ctf_matrix_exponential(input, actual),
+        Err(CtfExponentialScopeError::AttemptOrdinal));
+    actual = context();
+    actual.node_source = 1;
+    assert_eq!(calculate_selected_ctf_matrix_exponential(input, actual),
+        Err(CtfExponentialScopeError::SourceNodeState));
+}
+
+#[test]
+fn zero_singleton_preserves_negative_k_and_actual_significance_iteration() {
+    let owner = reached(&[0.0], &[1.0], 1, context());
+    assert!(owner.k < 0);
+    assert_eq!(owner.a_mat_row_norm_max, 1e-12);
+    assert_eq!(owner.a_exp[0].to_bits(), 1.0_f64.to_bits());
+    assert_eq!(owner.power_steps, vec![CtfExponentialPowerStep { i: 2, sig_fig_limit: true }]);
+    assert_eq!(owner.final_power_i, 100);
+    assert!(owner.square_steps.is_empty());
+    assert_eq!(owner.context, context());
+}
+
+#[test]
+fn asymmetric_nilpotent_storage_keeps_column_norm_and_source_orientation() {
+    let a = [0.0, 0.25, 0.0, 0.0];
+    let iden = [1.0, 0.0, 0.0, 1.0];
+    let a_before = a.map(f64::to_bits);
+    let iden_before = iden.map(f64::to_bits);
+    let owner = reached(&a, &iden, 2, context());
+    // Norm=1/4 gives the literal trunc(log(norm)/log(2))+1 == -1.
+    // Source performs no squaring for negative k, retaining the scaled linear term.
+    assert_eq!(owner.k, -1);
+    assert_eq!(owner.a_mat1, vec![0.0, 0.5, 0.0, 0.0]);
+    assert_eq!(owner.a_exp, vec![1.0, 0.5, 0.0, 1.0]);
+    assert_eq!(owner.final_power_i, owner.l);
+    assert!(owner.power_steps.iter().all(|step| !step.sig_fig_limit));
+    assert!(owner.square_steps.is_empty());
+    assert_eq!(a.map(f64::to_bits), a_before);
+    assert_eq!(iden.map(f64::to_bits), iden_before);
+}
+
+#[test]
+fn exact_power_of_two_norm_keeps_plus_one_and_current_attempt_timestep() {
+    let a = [-2.0];
+    let iden = [1.0];
+    let first = reached(&a, &iden, 1, context());
+    assert_eq!(first.a_mat_row_norm_max, 2.0);
+    assert_eq!(first.k, 2);
+    assert_eq!(first.fact, 0.25);
+    assert_eq!(first.square_steps.len(), 2);
+    let mut actual = context();
+    actual.ctf_time_step = 0.5;
+    actual.num_histories = 2;
+    let second = reached(&a, &iden, 1, actual);
+    assert_eq!(second.a_mat_row_norm_max, 1.0);
+    assert_eq!(second.k, 1);
+    assert_eq!(second.context, actual);
+    assert_eq!(second.square_steps.len(), 1);
+    assert_ne!(first.a_exp[0].to_bits(), second.a_exp[0].to_bits());
+}
+
+#[test]
+fn squaring_backup_restores_the_previous_nonzero_owner() {
+    let owner = reached(&[-1024.0], &[1.0], 1, context());
+    let last = owner.square_steps.last().expect("actual squaring steps");
+    assert!(last.backup);
+    assert!(last.isq < owner.k);
+    assert_ne!(owner.a_exp[0].to_bits(), 0.0_f64.to_bits());
+    assert_eq!(owner.a_exp[0].to_bits(), owner.a_mato[0].to_bits());
+}
+
+#[test]
+fn nonfinite_scalars_are_not_blanket_normalized_or_rejected() {
+    let payload = f64::from_bits(0x7ff8_0000_0000_1234);
+    let owner = reached(&[payload], &[1.0], 1, context());
+    // The ordered source max ignores the unordered norm comparison. The
+    // method remains in the defined cast domain but preserves a nonfinite owner.
+    assert_eq!(owner.a_mat_row_norm_max, 1e-12);
+    assert!(owner.a_exp[0].is_nan());
+    assert!(owner.power_steps.iter().all(|step| !step.sig_fig_limit));
+    assert_eq!(owner.final_power_i, owner.l);
+    assert_eq!(calculate_selected_ctf_matrix_exponential(
+        CtfExponentialInput { rcmax: 1, a_mat: &[f64::INFINITY], iden_matrix: &[1.0] },
+        context(),
+    ), Err(CtfExponentialScopeError::UndefinedScalingExponent));
+}
+
+#[test]
+fn source_int_conversion_truncates_only_within_defined_signed32_domain() {
+    assert_eq!(source_i32(-1.9), Some(-1));
+    assert_eq!(source_i32(f64::from(i32::MAX) + 0.5), Some(i32::MAX));
+    assert_eq!(source_i32(f64::from(i32::MIN) - 0.5), Some(i32::MIN));
+    assert_eq!(source_i32(f64::from(i32::MAX) + 1.0), None);
+    assert_eq!(source_i32(f64::from(i32::MIN) - 1.0), None);
+    assert_eq!(source_i32(f64::NAN), None);
+    assert_eq!(source_i32(f64::INFINITY), None);
+}

@@ -1,0 +1,139 @@
+--- Construction.ctf04.cc
++++ Construction.ctf06.cc
+@@ -53,7 +53,7 @@
+ #include <EnergyPlus/Material.hh>
+ #include <EnergyPlus/OutputReportPredefined.hh>
+ #include <EnergyPlus/UtilityRoutines.hh>
+-#include "ctf04_observer.hh"
++#include "ctf06_observer.hh"
+ 
+ namespace EnergyPlus::Construction {
+ 
+@@ -308,7 +308,7 @@
+             }
+         } // ... end of resistive layer determination IF-THEN block.
+     } // ... end of layer loop.
+-    EnergyPlus::CTF01Observation::post_load(state, *this, ErrorsFound, DoCTFErrorReport,
++    EnergyPlus::CTF06Observation::post_load(state, *this, ErrorsFound, DoCTFErrorReport,
+         LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer);
+ 
+     // If errors have been found, just return
+@@ -373,7 +373,7 @@
+             }
+         }
+     }
+-    EnergyPlus::CTF01Observation::post_merge(state, *this, ErrorsFound, DoCTFErrorReport,
++    EnergyPlus::CTF06Observation::post_merge(state, *this, ErrorsFound, DoCTFErrorReport,
+         LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer);
+ 
+     // Convert SI units to English.  In theory, conversion to English
+@@ -404,7 +404,7 @@
+     }
+ 
+     cnd = 1.0 / rs; // Conductivity is the inverse of resistivity
+-    EnergyPlus::CTF01Observation::post_conversion(state, *this, ErrorsFound, DoCTFErrorReport,
++    EnergyPlus::CTF06Observation::post_conversion(state, *this, ErrorsFound, DoCTFErrorReport,
+         LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer, dyn, rs, cnd);
+ 
+     bool RevConst = false;
+@@ -624,7 +624,7 @@
+                 }
+             }
+ 
+-            EnergyPlus::CTF01Observation::post_initial_discretization(state, *this, ErrorsFound, DoCTFErrorReport,
++            EnergyPlus::CTF06Observation::post_initial_discretization(state, *this, ErrorsFound, DoCTFErrorReport,
+                 LayersInConstruct, NumResLayers, Nodes, dx, state.dataGlobal->TimeStepZone);
+ 
+             // Calculate the CTFs using the state space method
+@@ -736,7 +736,7 @@
+                     this->CMat(2) = rk(LayersInConstruct) / dx(LayersInConstruct);  // of all other
+                     this->DMat(1) = rk(1) / dx(1);                                  // matrices for the state
+                     this->DMat(2) = -rk(LayersInConstruct) / dx(LayersInConstruct); // space method
+-                    EnergyPlus::CTF01Observation::post_matrix_assembly(state, *this, ErrorsFound, DoCTFErrorReport,
++                    EnergyPlus::CTF06Observation::post_matrix_assembly(state, *this, ErrorsFound, DoCTFErrorReport,
+                                                                        LayersInConstruct, NumResLayers, dl, rk, rho, cp,
+                                                                        lr, ResLayer, Nodes, dx, state.dataGlobal->TimeStepZone);
+ 
+@@ -895,9 +895,13 @@
+ 
+                 //          CALL DisplayNumberAndString(ConstrNum,'Matrix exponential for Construction #')
+                 this->calculateExponentialMatrix(); // Compute exponential of AMat
++                EnergyPlus::CTF06Observation::method_return(EnergyPlus::CTF06Observation::MethodKind::Exponential,
++                    state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone);
+ 
+                 //          CALL DisplayNumberAndString(ConstrNum,'Invert Matrix for Construction #')
+                 this->calculateInverseMatrix(); // Compute inverse of AMat
++                EnergyPlus::CTF06Observation::method_return(EnergyPlus::CTF06Observation::MethodKind::Inverse,
++                    state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone);
+ 
+                 //          CALL DisplayNumberAndString(ConstrNum,'Gamma calculation for Construction #')
+                 this->calculateGammas();
+@@ -1189,6 +1193,7 @@
+     // the significant figure limit for REAL(r64)
+     // variables reached)
+ 
++    EnergyPlus::CTF06Observation::method_entry(EnergyPlus::CTF06Observation::MethodKind::Exponential, *this);
+     AMat1.allocate(this->rcmax, this->rcmax);
+     AMato.allocate(this->rcmax, this->rcmax);
+     AMatN.allocate(this->rcmax, this->rcmax);
+@@ -1201,6 +1206,7 @@
+     this->AExp = 0.0;
+     AMato = 0.0;
+     AMatN = 0.0;
++    EnergyPlus::CTF06Observation::exponential_initialized(*this, AMat1, AMato, AMatN);
+ 
+     // Step 1, page 128 (Seem's thesis):  Compute the matrix row norm.
+     // See equation (A.3) which states that the matrix row norm is the
+@@ -1262,6 +1268,7 @@
+ 
+     CheckVal = min(3.0 * AMatRowNormMax + 6.0, 100.0);
+     l = int(CheckVal);
++    EnergyPlus::CTF06Observation::exponential_scaled(*this, AMat1, AMatRowNormMax, k, fact, CheckVal, l);
+ 
+     // Step 5, page 128:  Calculate the exponential.  First, add the
+     // linear term to the identity matrix.
+@@ -1338,6 +1345,7 @@
+                 break; // DO loop (anytime SigFigLimit is false, AMat must continue to be raised another power)
+             }
+         }
++        EnergyPlus::CTF06Observation::exponential_power_control(*this, i, SigFigLimit);
+ 
+         // Compute next term, only if necessary.  If SigFigLimit is still true,
+         // then all of the new terms being added to AExp are too small to
+@@ -1372,6 +1380,7 @@
+                 }
+             }
+         }
++        EnergyPlus::CTF06Observation::exponential_square_control(*this, isq, Backup);
+         // Backup is true when every item of AExp didn't pass the TinyLimit test
+         if (Backup) {
+             this->AExp = AMato;
+@@ -1379,6 +1388,7 @@
+         }
+ 
+     } // ... end of squaring loop and Step 6.
++    EnergyPlus::CTF06Observation::exponential_final(*this, AMat1, AMato, AMatN, AMatRowNormMax, k, fact, CheckVal, l, i);
+ 
+     AMat1.deallocate();
+     AMato.deallocate();
+@@ -1414,10 +1424,12 @@
+     Array2D<Real64> AMat1; // Intermediate calculation matrix equivalent at first to AMat
+ 
+     // Subroutine initializations ...
++    EnergyPlus::CTF06Observation::method_entry(EnergyPlus::CTF06Observation::MethodKind::Inverse, *this);
+     AMat1.allocate(this->rcmax, this->rcmax);
+ 
+     AMat1 = AMat;                  // Set AMat1 = AMat to avoid AMat changes
+     this->AInv = this->IdenMatrix; // Set AInv to Identity Matrix
++    EnergyPlus::CTF06Observation::inverse_initialized(*this, AMat1);
+ 
+     // Use Gaussian elimination to zero all of the elements of AMat left
+     // of the diagonal.
+@@ -1499,6 +1511,7 @@
+             AMat1(ir, irr) = 0.0;
+         }
+     } // ... end of reverse elimination loop.
++    EnergyPlus::CTF06Observation::inverse_final(*this, AMat1);
+ 
+     // At this point, AMat1 is equal to the identity matrix (I)
+     // and AInv is equal to the inverse of AMat.

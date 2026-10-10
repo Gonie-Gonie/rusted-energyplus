@@ -1,0 +1,245 @@
+// Actual fixed-CON IDF loaders, actual use owners, and unchanged whole CTF calls.
+#include "ctf06_production_fields.hh"
+#include "ctf06_production_admission.hh"
+#include "ctf06_observation_fields.hh"
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <iostream>
+#include <memory>
+#include <typeinfo>
+#include <utility>
+
+namespace Ctf01 {
+template<class Function> json invoke(Function &&function)
+{
+    try {
+        function();
+        return {{"status", "source_returned"}, {"source_fatal", false}, {"source_exception", false},
+                {"exception_type", nullptr}, {"exception_message", nullptr}};
+    } catch (EnergyPlus::FatalError const &error) {
+        return {{"status", "source_fatal"}, {"source_fatal", true}, {"source_exception", false},
+                {"exception_type", typeid(error).name()}, {"exception_message", error.what()}};
+    } catch (std::exception const &error) {
+        return {{"status", "source_exception"}, {"source_fatal", false}, {"source_exception", true},
+                {"exception_type", typeid(error).name()}, {"exception_message", error.what()}};
+    } catch (...) {
+        return {{"status", "source_nonstandard_exception"}, {"source_fatal", false}, {"source_exception", true},
+                {"exception_type", nullptr}, {"exception_message", nullptr}};
+    }
+}
+inline json not_invoked(std::string const &reason)
+{
+    return {{"status", "source_not_invoked_due_to_unavailable_prerequisite"}, {"source_fatal", nullptr}, {"source_exception", nullptr},
+            {"exception_type", nullptr}, {"exception_message", nullptr}, {"unavailable_reason", reason}};
+}
+struct Factory {
+    std::unique_ptr<EnergyPlus::EnergyPlusData> state;
+    std::ostringstream *error_text = nullptr;
+    json messages = json::array(), constructor, constant_initialization;
+    bool stopped = false, observer_integrity_failed = false;
+    std::string stop_reason;
+    Factory()
+    {
+        auto const created = invoke([&] { state = std::make_unique<EnergyPlus::EnergyPlusData>(); });
+        constructor = {{"kind", "EnergyPlusData::EnergyPlusData"}, {"actual_source_invoked", true}, {"call_outcome", created}};
+        stopped = created.at("status") != "source_returned";
+        if (stopped) { stop_reason = created.at("status").get<std::string>(); return; }
+        auto sink = std::make_unique<std::ostringstream>(); error_text = sink.get(); state->files.err_stream = std::move(sink);
+        for (auto *stream : {&state->files.audit, &state->files.eso, &state->files.eio, &state->files.mtr,
+                            &state->files.bnd, &state->files.debug, &state->files.rdd, &state->files.mdd,
+                            &state->files.mtd, &state->files.edd, &state->files.dfs, &state->files.shade}) stream->open_as_stringstream();
+        state->dataGlobal->errorCallback = [this](EnergyPlus::Error level, std::string const &message) {
+            messages.push_back({{"level", static_cast<int>(level)}, {"message", message}});
+        };
+    }
+    ~Factory() { if (state) state->dataMaterial->clear_state(); }
+    json observed(bool input_errors, bool ctf_errors, bool report)
+    {
+        if (!state) return {{"available", false}, {"unavailable_reason", "EnergyPlusData_constructor_did_not_complete"}, {"snapshot", nullptr}};
+        try { return {{"available", true}, {"unavailable_reason", nullptr}, {"snapshot", production_snapshot(*state, input_errors, ctf_errors, report)}}; }
+        catch (std::exception const &error) {
+            observer_integrity_failed = true;
+            return {{"available", false}, {"unavailable_reason", "observer_public_owner_copy_failed"}, {"observer_exception_message", error.what()}, {"snapshot", nullptr}};
+        }
+    }
+    void transport(fs::path const &input, fs::path const &output)
+    {
+        // These are I/O destinations and the actual raw-IDF input, not scientific owner seeds.
+        state->dataStrGlobals->inputFilePath = input;
+        state->dataStrGlobals->outDirPath = output;
+        state->dataStrGlobals->outputPerfLogFilePath = output / "eplusout_perflog.csv";
+        state->files.outputErrFilePath = output / "eplusout.err";
+        state->files.sln.filePath = output / "eplusout.sln"; state->files.dxf.filePath = output / "eplusout.dxf";
+        state->files.sci.filePath = output / "eplusout.sci"; state->files.wrl.filePath = output / "eplusout.wrl";
+        state->files.endFile.filePath = output / "eplusout.end";
+        require(!state->dataGlobal->isEpJSON && state->dataGlobal->preserveIDFOrder &&
+                !state->dataGlobal->outputEpJSONConversion && !state->dataGlobal->outputEpJSONConversionOnly,
+                "Actual raw-IDF/default preserved-order/no-conversion context required");
+    }
+    template<class Function> void phase(json &ledger, char const *kind, bool &input_errors, bool ctf_errors, bool report, Function &&function)
+    {
+        bool const invoked = !stopped; auto const before = observed(input_errors, ctf_errors, report);
+        auto const begin = messages.size(); json outcome = not_invoked(stop_reason);
+        if (invoked) {
+            outcome = invoke(std::forward<Function>(function));
+            if (outcome.at("status") != "source_returned") {
+                stopped = true; stop_reason = outcome.at("status").get<std::string>();
+            } else if (input_errors) {
+                stopped = true; stop_reason = "wrapper_requires_loader_ErrorsFound_false";
+            }
+        }
+        ledger.push_back({{"kind", kind}, {"actual_source_invoked", invoked}, {"call_outcome", outcome},
+            {"before", before}, {"after", observed(input_errors, ctf_errors, report)},
+            {"diagnostic_message_begin", begin}, {"diagnostic_message_end", messages.size()}});
+    }
+    json diagnostics(fs::path const &output)
+    {
+        if (!state || error_text == nullptr) return {{"available", false}, {"messages", messages}, {"logs", nullptr}};
+        json logs = json::object(); write_text(output / "err.txt", error_text->str()); logs["err"] = file_ref(output / "err.txt");
+        for (auto const &[name, stream] : std::array<std::pair<char const *, EnergyPlus::InputOutputFile *>, 12>{{
+            {"audit", &state->files.audit}, {"eso", &state->files.eso}, {"eio", &state->files.eio}, {"mtr", &state->files.mtr},
+            {"bnd", &state->files.bnd}, {"debug", &state->files.debug}, {"rdd", &state->files.rdd}, {"mdd", &state->files.mdd},
+            {"mtd", &state->files.mtd}, {"edd", &state->files.edd}, {"dfs", &state->files.dfs}, {"shade", &state->files.shade}}}) {
+            auto const path = output / (std::string(name) + ".txt"); write_text(path, stream->get_output()); logs[name] = file_ref(path);
+        }
+        return {{"available", true}, {"messages", messages}, {"logs", logs}, {"actual_native_stringstream_sinks", true},
+            {"diagnostic_text_numerically_paired", false}};
+    }
+};
+json model_case(json const &row, fs::path const &root, fs::path const &output)
+{
+    auto const input = bound_path(root, row.at("input")); auto const directory = output / row.at("id").get<std::string>();
+    fs::create_directory(directory); Factory factory;
+    bool input_errors = false, ctf_errors = false, report = false; json lifecycle = json::array(), operations = json::array();
+    if (!factory.stopped) factory.transport(input, directory);
+    factory.phase(lifecycle, "InputProcessor::processInput", input_errors, ctf_errors, report,
+                  [&] { factory.state->dataInputProcessing->inputProcessor->processInput(*factory.state); });
+    factory.phase(lifecycle, "SimulationManager::PostIPProcessing", input_errors, ctf_errors, report,
+                  [&] { EnergyPlus::SimulationManager::PostIPProcessing(*factory.state); });
+    factory.phase(lifecycle, "EnergyPlusData::init_constant_state", input_errors, ctf_errors, report,
+                  [&] { factory.state->init_constant_state(*factory.state); });
+    factory.constant_initialization = lifecycle.back();
+    factory.phase(lifecycle, "EnergyPlusData::init_state", input_errors, ctf_errors, report, [&] { factory.state->init_state(*factory.state); });
+    bool caller_matches = false;
+    if (!factory.stopped) {
+        caller_matches = actual_caller_matches(*factory.state, row.at("caller"));
+        if (!caller_matches) { factory.stopped = true; factory.stop_reason = "declared_caller_differs_from_source_produced_timestep"; }
+    }
+    factory.phase(lifecycle, "OutputReportPredefined::SetPredefinedTables", input_errors, ctf_errors, report,
+                  [&] { EnergyPlus::OutputReportPredefined::SetPredefinedTables(*factory.state); });
+    factory.phase(lifecycle, "HeatBalanceManager::SetPreConstructionInputParameters", input_errors, ctf_errors, report,
+                  [&] { EnergyPlus::HeatBalanceManager::SetPreConstructionInputParameters(*factory.state); });
+    factory.phase(lifecycle, "OutputProcessor::SetupTimePointers(Zone)", input_errors, ctf_errors, report,
+                  [&] { EnergyPlus::OutputProcessor::SetupTimePointers(*factory.state, EnergyPlus::OutputProcessor::TimeStepType::Zone, factory.state->dataGlobal->TimeStepZone); });
+    factory.phase(lifecycle, "OutputProcessor::SetupTimePointers(System)", input_errors, ctf_errors, report,
+                  [&] { EnergyPlus::OutputProcessor::SetupTimePointers(*factory.state, EnergyPlus::OutputProcessor::TimeStepType::System, factory.state->dataHVACGlobal->TimeStepSys); });
+    factory.phase(lifecycle, "HeatBalanceManager::GetProjectControlData", input_errors, ctf_errors, report,
+                  [&] { EnergyPlus::HeatBalanceManager::GetProjectControlData(*factory.state, input_errors); });
+    factory.phase(lifecycle, "HeatBalanceManager::GetSiteAtmosphereData", input_errors, ctf_errors, report,
+                  [&] { EnergyPlus::HeatBalanceManager::GetSiteAtmosphereData(*factory.state, input_errors); });
+    factory.phase(lifecycle, "Material::GetMaterialData", input_errors, ctf_errors, report,
+                  [&] { EnergyPlus::Material::GetMaterialData(*factory.state, input_errors); });
+    factory.phase(lifecycle, "HeatBalanceManager::GetConstructData", input_errors, ctf_errors, report,
+                  [&] { EnergyPlus::HeatBalanceManager::GetConstructData(*factory.state, input_errors); });
+    factory.phase(lifecycle, "HeatBalanceManager::GetBuildingData", input_errors, ctf_errors, report,
+                  [&] { EnergyPlus::HeatBalanceManager::GetBuildingData(*factory.state, input_errors); });
+    bool const loader_ready = !factory.stopped; auto const initialized_owners = factory.observed(input_errors, ctf_errors, report);
+    // The loader-owned array is stable now. No material/construction/use member is assigned by this helper.
+    int const count = factory.state ? factory.state->dataConstruction->Construct.isize() : 0;
+    for (int index = 1; index <= count; ++index) {
+        bool const invoked = !factory.stopped; auto const before = factory.observed(input_errors, ctf_errors, report);
+        auto const begin = factory.messages.size(); json outcome = not_invoked(factory.stop_reason), observed = nullptr;
+        if (invoked) {
+            Observation::Capture capture;
+            {
+                auto &construction = factory.state->dataConstruction->Construct(index);
+                Observation::Binding binding(capture, *factory.state, construction);
+                outcome = invoke([&] { construction.calculateTransferFunction(*factory.state, ctf_errors, report); });
+            }
+            observed = observations(capture); factory.observer_integrity_failed = factory.observer_integrity_failed || observer_failed(capture);
+            if (outcome.at("status") != "source_returned") {
+                factory.stopped = true; factory.stop_reason = outcome.at("status").get<std::string>();
+            }
+        }
+        operations.push_back({{"kind", "calculateTransferFunction"}, {"actual_construction_index", index},
+            {"actual_construction_Name", factory.state->dataConstruction->Construct(index).Name},
+            {"actual_source_invoked", invoked}, {"call_outcome", outcome}, {"before", before},
+            {"after", factory.observed(input_errors, ctf_errors, report)}, {"observations", observed},
+            {"diagnostic_message_begin", begin}, {"diagnostic_message_end", factory.messages.size()}});
+    }
+    return {{"id", row.at("id")}, {"lane", row.at("lane")}, {"actual_input", row.at("input")}, {"declared_caller", row.at("caller")},
+        {"constructor", factory.constructor}, {"constant_initialization", factory.constant_initialization}, {"lifecycle", lifecycle},
+        {"source_produced_caller_matches_declared", caller_matches}, {"loader_ready", loader_ready},
+        {"loader_unavailable_reason", loader_ready ? json(nullptr) : json(factory.stop_reason)}, {"initialized_owners", initialized_owners},
+        {"actual_Construct_array_size", count}, {"whole_call_obligation_available", loader_ready}, {"operations", operations},
+        {"final_state", factory.observed(input_errors, ctf_errors, report)}, {"source_diagnostics", factory.diagnostics(directory)},
+        {"observer_integrity_failed", factory.observer_integrity_failed}, {"manual_material_or_construction_or_use_seeding", false}, {"wrapper_Resistance_calculation", false},
+        {"CTF02_through_CTF10_or_whole_building_simulation_certified", false}};
+}
+} // namespace Ctf01
+
+int main(int argc, char **argv)
+{
+    using namespace Ctf01;
+    try {
+        require(argc == 5, "Usage: ctf06_production_helper <root> <frozen-production-request> <production-admission> <fresh-output>");
+        auto const root = fs::weakly_canonical(fs::absolute(argv[1]));
+        auto const request_path = fs::absolute(argv[2]), admission_path = fs::absolute(argv[3]), output = fs::absolute(argv[4]);
+        auto const inside = fs::weakly_canonical(output).lexically_relative(root / ".runtime/porting/CTF-06");
+        require(!inside.empty() && *inside.begin() != ".." && !fs::exists(output), "Fresh contained CTF production output required");
+        auto const packet = admit_production(root, request_path, admission_path); fs::create_directories(output);
+        json rows = json::array(), statuses = json::object(), loader_statuses = json::object(), functions = json::object(); std::size_t invoked = 0, skipped = 0, callbacks = 0, unavailable = 0, matrix_callbacks = 0, matrix_retained = 0, matrix_omitted = 0;
+        bool observer_integrity_failed = false; MethodTotals exponential_totals, inverse_totals;
+        for (auto const &row : packet.request.at("model_cases")) rows.push_back(model_case(row, root, output));
+        for (auto const &row : rows) {
+            if (!row.at("loader_ready").get<bool>()) ++unavailable;
+            observer_integrity_failed = observer_integrity_failed || row.at("observer_integrity_failed").get<bool>();
+            for (auto const &phase : row.at("lifecycle")) {
+                auto const kind = phase.at("kind").get<std::string>(), status = phase.at("call_outcome").at("status").get<std::string>();
+                loader_statuses[status] = (loader_statuses.contains(status) ? loader_statuses.at(status).get<std::size_t>() : 0) + 1;
+                if (phase.at("actual_source_invoked").get<bool>()) functions[kind] = (functions.contains(kind) ? functions.at(kind).get<std::size_t>() : 0) + 1;
+            }
+            for (auto const &operation : row.at("operations")) {
+                auto const status = operation.at("call_outcome").at("status").get<std::string>();
+                statuses[status] = (statuses.contains(status) ? statuses.at(status).get<std::size_t>() : 0) + 1;
+                if (operation.at("actual_source_invoked").get<bool>()) {
+                    ++invoked; callbacks += operation.at("observations").at("actual_callback_count").get<std::size_t>();
+                    auto const &matrix = operation.at("observations").at("MatrixAssembly");
+                    matrix_callbacks += matrix.at("actual_matrix_attempt_callback_count").get<std::size_t>();
+                    matrix_retained += matrix.at("actual_retained_attempt_count").get<std::size_t>();
+                    matrix_omitted += matrix.at("matrix_attempt_records_omitted").get<std::size_t>();
+                    add_method_totals(exponential_totals, operation.at("observations").at("Exponential"));
+                    add_method_totals(inverse_totals, operation.at("observations").at("Inverse"));
+                }
+                else ++skipped;
+            }
+        }
+        functions["calculateTransferFunction"] = invoked;
+        auto const after = admit_production(root, request_path, admission_path);
+        require(after.request == packet.request && after.admission == packet.admission && after.contracts == packet.contracts, "Production packet changed during calls");
+        int const exit = observer_integrity_failed ? 2 : 0;
+        json const result = {{"schema", "ctf06-production-helper-results.v1"}, {"energyplus_commit", packet.request.at("energyplus_commit")},
+            {"actual_request", file_ref(request_path)}, {"native_admission_contract", file_ref(admission_path)},
+            {"observation_projection", file_ref(packet.projection_path)}, {"contracts", packet.contracts},
+            {"actual_scope_amendment", packet.request.at("actual_scope_amendment")}, {"actual_scope_amendment_execution", packet.request.at("actual_scope_amendment_execution")},
+            {"fixed_scope", packet.request.at("fixed_scope")}, {"all_45_guard_refs", packet.request.at("all_45_guard_refs")},
+            {"native_source_files", packet.admission.at("native_source_files")}, {"actual_binary", file_ref(fs::absolute(argv[0]))},
+            {"model_cases", rows}, {"requested_counts", packet.requested_counts}, {"actual_CTF_invocations", invoked}, {"actual_CTF_skipped_construct_rows", skipped},
+            {"loader_unavailable_model_cases", unavailable}, {"unknown_whole_call_obligations_for_unavailable_loaders", unavailable == 0 ? json(0) : json(nullptr)},
+            {"actual_CTF_status_counts", statuses}, {"actual_loader_status_counts", loader_statuses}, {"actual_source_function_counts", functions}, {"actual_phase_callback_count", callbacks}, {"observer_integrity_failed", observer_integrity_failed},
+            {"actual_helper_exit_code", exit}, {"complete_requested_model_ledger", true}, {"complete_all_phase_observations_claimed", false},
+            {"CTF03_initial_observation_policy", ctf03_initial_policy()}, {"CTF04_matrix_observation_policy", ctf04_matrix_policy()},
+            {"CTF06_exponential_observation_policy", ctf06_exponential_policy()}, {"CTF05_inverse_observation_policy", ctf05_inverse_policy()},
+            {"linked_original_retention_intent", packet.request.at("linked_original_retention_intent")},
+            {"actual_exponential_observation_counts", method_totals(exponential_totals)}, {"actual_inverse_observation_counts", method_totals(inverse_totals)},
+            {"actual_matrix_attempt_callback_count", matrix_callbacks}, {"actual_retained_matrix_attempt_count", matrix_retained},
+            {"matrix_attempt_records_omitted", matrix_omitted}, {"complete_matrix_attempt_parity_claimed", false}, {"scientific_comparison_performed", false}, {"numerical_PASS_claimed", false}, {"gates_updated", false},
+            {"whole_building_or_CTF02_through_CTF10_certified", false}};
+        write_text(output / "ctf06-production-helper-results.json", result.dump() + "\n"); return exit;
+    } catch (std::exception const &error) { std::cerr << error.what() << '\n'; return 1; }
+}

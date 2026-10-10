@@ -1,0 +1,105 @@
+# Combined CTF05/06 OriginalDataQA source preparation
+
+SOURCE-READY HELD, unexecuted. This adapts the two accepted CTF04 readers and
+their four support modules, adding one shared structural method validator.
+The same existing OriginalDataQA unit/production stages and CLI are retained.
+There is no extra executed source-review, proof, launcher or QA framework.
+Root alone supplies actual receipts and reads genuine scientific observations.
+
+## Actual input/source/provenance
+
+CLI remains `python -X utf8 -B review_unit.py|review_production.py` with required
+`--approved-source-sha256 <this reader SHA>` and
+`--approved-build-review-source-sha256 <held PE06 reader SHA>`, followed by
+`--native-execution`, `--results`, `--freeze-receipt`, `--freeze-execution`,
+`--build`, `--build-execution`, `--build-review`, `--build-review-execution`
+(each actual path#SHA), and `--output-dir <fresh contained directory>`.
+An absent actual result path may be supplied without SHA; it stays a real process
+failure with unavailable observations, no invented result or method outcome.
+Existing files always require their actual preserved SHA.
+
+Both actual approved reader/script identities, full typed freeze stdout, fresh
+freezer argv25, real Native argc5, PE argv11 and compact {review,status} stdout
+are authenticated. Freeze must precede compilation, PE and actual Native calls.
+Build/PE counts and protected refs remain actual runtime facts; no prospective
+retirement or protected38 is assumed. Both linked Original/helper were verified
+by the real PE stage; DataQA consumes factual maps and never rehashes those binaries.
+Compiled Native8 and Original7/21 source refs remain authenticated. Unit39/42 and
+fixed production15/195 rows/callers/order/45 guards stay inherited input-only bytes.
+
+The combined real scope amendment, both actual successful CTF05/CTF06 card checks,
+all three before and after doc refs, both current cards and current plan are checked.
+The singular `actual_scope_amendment_execution` is explicitly the real CTF-06
+check only; the complete mandatory mapping authenticates BOTH checks. No synthetic
+pair receipt or false claim that the check command authored the amendment is made.
+The unchanged helper result echoes its existing singular source ref; full dual
+scope provenance is validated from the authenticated packet and copied to review.
+
+## Complete structural observations, without evaluating physics
+
+All old preprocessing/initial619/four callback and matrix-attempt records remain
+validated. The actual initial/matrix review bodies are AST-identical to CTF04;
+only the fresh freeze key, retention intent and projection inventory key adapt.
+Inherited18 + initial3 + assembly7 stay separate. Fresh exponential7 and inverse2
+zero/class/shape/signedzero profiles and policies match held immutable proposals.
+
+The method validator checks all Exponential/Inverse actual entries, independent
+invocation and assembly ordinals, seven stage counters, retained/omitted ledgers,
+power/square event ordinals and actual typed i/SigFigLimit/isq/Backup fields.
+Actual final_i is kept distinct from the observed control event count. Every
+reached value stage retains exact source owner names, actual Objexx bounds,
+rcmax-square row-first storage and every scalar DTO's class/decimal/binary64 bits.
+It checks source-produced AMat/Iden owner handoffs, actual converted/initial and
+assembly associations, actual checked earlier caller context and genuine caller
+return markers. No matrix, identity, node, timestep, control or retry is evaluated.
+
+Only actual first method invocation1 / assembly1 in selected no-source1D context
+is identified for later strict comparison, joining real initial619 dt/history.
+No initialdt==caller assumption is added. All later actual visits remain observed,
+unpaired context/noPASS. Both one-sided and both-sided selected owner absence
+remain a future strict comparison failure, never optional equivalence.
+
+Real caught source stops retain partial reached stages and independent source
+outcomes. Unreached stages stay null; final workspace never implies a return.
+A normally returned whole call with observed method entry must retain its genuine
+final/caller-return sites. Exponential return must precede inverse in the same
+real assembly association. New controls and method counters never contaminate
+the existing old callback or assembly ledgers.
+
+Six failure-kind counters/flags and actual first/last failure events, omissions,
+ordinal gaps, missing required copies, shape or order integrity failures all fail.
+Repeated failure events need not equal per-record boolean flag counts; flags
+require source event counts and ALL failure counts remain retained. Counts are
+validated against actual retained records/omissions, without inventing failure
+events that the observer does not emit. Partial matrix copies retain successful
+sibling values; failed copies remain null and the whole stage is unavailable.
+Identity-failed entry with zero observed slots has context=null, not fabricated
+defaults. No arbitrary visit cap, truncation, deduplication or default arrays.
+
+## Bounds, outputs and custody
+
+Only full scientific observation files use the prospectively chosen 1GiB physical
+bound via a separate observation binder/recheck table. Source/ref bounds remain
+64MB and small metadata/contracts remain16MB. Oversize observations fail, with no
+dropping/truncation. Native compact dump preserves all typed observations.
+The two review schemas are ctf06[-production]-independent-original-data-review.v1;
+successful status stays pass-actual-original[-production]-data-and-provenance-before-Rust.
+Each lane archives its main, shape, initial validator, method validator and IO
+(five actual executed sources). Full typed review stdout includes actual observed
+method totals, both scope checks, actual source outcomes and release decision.
+It compares no science values between engines and claims no numerical PASS.
+
+New06 prospective-debug-original intent is copied beside the actual linked file
+ref. No removal, registry write, reinterpretation of earlier live refs or gate
+update occurs. Actual future receipts remain CLI inputs, never guessed identities.
+Header authored the Native observer/helper and earlier ingress; this factual
+source/provenance adapter is not an independent certificate of own formulas.
+Root and an other-author full source peer review these immutable sources first.
+No target imports/runs, builds, formatting, scientific/weather/binary payload reads,
+canonical changes or Git actions occurred during this source preparation.
+
+Fresh02 preserves held01 and corrects only the production output inventory: the
+already authenticated scientific result_ref is reused for result_path, preserving
+its1GiB bound. All auxiliary files retain the existing64MB source/ref limit and
+small metadata retains16MB. The stale physical-bound source comment is corrected.
+No method, policy, comparison, source outcome or availability behavior changes.

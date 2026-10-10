@@ -1,0 +1,125 @@
+{
+  "schema": "ctf06-native-build-review-source-preparation.v1",
+  "status": "SOURCE-READY-HELD-unexecuted",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/CTF-06/native-build-review-prep-01/review_build.py",
+      "sha256": "33cf9bbdc7108731d57e9f248447355a34cc0dbcfcd112f57815c8ad7ce2b33a",
+      "size_bytes": 6214,
+      "line_count": 109
+    }
+  ],
+  "before_sources": [
+    {
+      "historical_path": ".runtime/porting/CTF-04/native-build-review-prep-01/review_build.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-06/native-build-review-prep-01/before/review_build.py",
+        "sha256": "131c021d256db2a5d493508ceae63f9555947f9052c47ed30cb0a562a3e2a392",
+        "size_bytes": 6214,
+        "line_count": 109
+      }
+    }
+  ],
+  "exact_source_diffs": [
+    {
+      "path": ".runtime/porting/CTF-06/native-build-review-prep-01/review_build.py.from-ctf04.diff",
+      "sha256": "e37ef1636bbc741038235f0116b7d38c7139c23c70fbd241f55b81441079192d",
+      "size_bytes": 2805,
+      "line_count": 33
+    }
+  ],
+  "README": {
+    "path": ".runtime/porting/CTF-06/native-build-review-prep-01/README.md",
+    "sha256": "ee6a5113590e746db9a1167e66fd894baff3620cba84ecd3e5eed10e45daeb3e",
+    "size_bytes": 2663,
+    "line_count": 40
+  },
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/CTF-04/native-build-review-prep-01/manifest.json",
+      "sha256": "1e618aeb8ba003f758c4948a538d77abe876dd70923e83d74010be856247a8c7",
+      "size_bytes": 4333,
+      "line_count": 120
+    },
+    {
+      "path": "tools/porting/native_pe.py",
+      "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+      "size_bytes": 20217,
+      "line_count": 346
+    },
+    {
+      "path": ".runtime/porting/CTF-06/native-helper-prep-01/manifest.json",
+      "sha256": "a1bd7873b5792c5fcd9e4227068d43cc2299de4f51ccb6548a8d9a53f9725633",
+      "size_bytes": 19694,
+      "line_count": 515
+    },
+    {
+      "path": ".runtime/porting/CTF-06/native-observer-prep-01/manifest.json",
+      "sha256": "24ea19879d35d761f0b56c4a08de794c5c71d9b2519e377caf5bda9fd8730d03",
+      "size_bytes": 26224,
+      "line_count": 640
+    },
+    {
+      "path": ".runtime/porting/CTF-06/native-helper-prep-01/ctf06_reference.cmake",
+      "sha256": "c0a41733e1aa01716f2d93131f27efc9559d60565b9e3b8c81555ce3491c83f1",
+      "size_bytes": 2297,
+      "line_count": 37
+    },
+    {
+      "path": ".runtime/porting/CTF-06/input-writer-prep-01/manifest.json",
+      "sha256": "5f499a25428d7a4bbdf29df93ed2b10eb749e89d3c7d3a05bc9fed5030fb2bca",
+      "size_bytes": 28566,
+      "line_count": 754
+    }
+  ],
+  "runtime_build_protocol": {
+    "schemas": [
+      "ctf06-native-build.v1",
+      "ctf06-production-native-build.v1"
+    ],
+    "status": "pass-actual-3TU-link-and-preservation",
+    "targets": [
+      "ctf06_unit_helper",
+      "ctf06_production_helper"
+    ],
+    "new_compile_rows_source_obligation": 6,
+    "actual_previous_compile_rows": null,
+    "actual_current_compile_rows": null,
+    "actual_protected_ref_count": null,
+    "core_preservation": {
+      "registered": 643,
+      "present": 631,
+      "absent": 12
+    },
+    "native_source_files_each_lane": 8,
+    "linked_original_retention_intent": {
+      "schema": "ctf06-debug-original-retention-intent.v1",
+      "role": "prospective-debug-original",
+      "scope": "new-CTF06-linked-originals-only",
+      "actual_file_identity_required": true,
+      "both_original_and_helper_verified_before_execution": true,
+      "retain_through_PE_validation_and_current_helper_execution": true,
+      "removal_requires_separate_Root_authorized_actual_retention_record": true,
+      "earlier_live_refs_reinterpreted": false,
+      "deletion_performed": false
+    },
+    "prospective_compile_rows_before_after": [
+      685,
+      691
+    ],
+    "prospective_protected_count_after_separate_actual_retirement": 38
+  },
+  "checks": {
+    "AST_parse_only": true,
+    "before_raw_bytes_exact": true,
+    "exact_diff_generated": true,
+    "preservation_and_PE_logic_unchanged": true,
+    "no_assumed_retirement_or_fixed_future_protected_count": true
+  },
+  "authorship_limits": "Author of prior Native helper, CTF03 ingress and CTF04 identity amendment; source/provenance glue, no independent own-formula certificate.",
+  "project_imports_or_targets_executed": false,
+  "actual_binary_or_scientific_result_payloads_read": false,
+  "canonical_files_changed": false,
+  "new_QA_framework": false,
+  "numerical_PASS_claimed": false
+}

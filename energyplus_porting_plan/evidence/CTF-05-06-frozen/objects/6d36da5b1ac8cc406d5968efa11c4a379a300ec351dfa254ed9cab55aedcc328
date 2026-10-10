@@ -1,0 +1,122 @@
+# CTF05 + CTF06 genuine Native observation readiness
+
+SOURCE-READY readiness only. This combines the accepted CTF05 inverse boundary
+note with a full read of pinned Construction.cc1105-1373. No executable observer,
+helper, serializer, input, numerical contract, QA stage or production activation
+is added. The old CTF04 passive package and its four checkpoints/matrix-attempt
+ledger remain immutable. A future fresh derived whole translation unit must
+retain them unchanged and restore exactly to the pinned original after removal
+of its declared passive include/calls. Root reviews this plan before code prep.
+
+The actual whole-method order is assembly661-728, exponential884, inverse887,
+Gammas890, final coefficients894, then convergence/retry903-978. Both helpers
+borrow the same original AMat and once-produced IdenMatrix638-648. Exponential
+does not replace AMat; inverse must not receive AExp. Retry changes current
+CTFTimeStep/NumHistories908-936, not the initial619 stamp or original identity.
+All reached later visits remain real context; none replaces a missing first visit.
+
+## Association and lifetime
+
+The future helper retains its actual model/lane/whole-call ordinal, construction
+array index/name/original membership and bound state/construction identity.
+The existing CTF04 post728 counter is the actual selected-1D assembly ordinal.
+New method-entry counters must be independent actual observations, with per-
+method invocation ordinal and the associated existing assembly ordinal. Equality
+between those counters must be checked, never assumed from an expected count.
+The methods have no state parameter: use the existing active bound Capture plus
+the actual construction this pointer; pointer values are internal checks, not IDs.
+If the assembly record is omitted or association fails, retain known entry counts
+and explicit integrity failure. Do not invent a valid assembly owner or renumber.
+
+At helper entry, copy only actual allocated AMat/Iden bounds and values, rcmax,
+current CTFTimeStep/NumHistories and selected context. Entry is distinct from
+initialized workspace, final values and a completed source return. Caller return
+markers immediately after884 and887 establish actual completed handoffs before
+the next call; private output capture alone does not establish normal return.
+Stored AExp/AInv/AMat/Iden are deallocated1079-1089 before the whole method returns.
+Public post-whole-call sampling cannot recover these owners or private workspaces.
+
+## Exponential boundaries: Construction.cc1105-1373
+
+| Proposed actual site | Live observed state | Source meaning |
+| --- | --- | --- |
+| Method entry before1179 | original AMat/Iden, rcmax, current attempt context | Invocation reached before any local allocation; no local workspace claimed. |
+| After1190 | AMat1/AMato/AMatN, AExp, actual input owners | All three locals allocated1179-1181; AMat1 copied1185 and actual zero assignments1188-1190 completed. |
+| After1251 | AMatRowNormMax, k, fact, CheckVal, l, scaled AMat1 | Actual ordered norm/scaling/int conversions completed; copy scalars without recomputing expressions. |
+| After1327, before1333 | actual i and SigFigLimit | One actual power iteration completed its ordered significance scan; preserve the flag before i may become100. |
+| After1361, before1363 | actual isq and Backup | One actual squaring multiplication completed; retain Backup before its restore/break branch. |
+| After1368, before1370 | final i, norm/scaling controls, AMat1/AMato/AMatN and AExp | Required final workspace/result boundary, after any Backup restore and before deallocation. |
+| Immediately after caller884 | source-return marker and retained AExp/input owners | Actual exponential returned before inverse887. |
+
+SigFigLimit is scoped to each power iteration1271-1338; Backup to each squaring
+iteration1348-1368. They cannot be read at method end or reconstructed from final
+arrays. Keep actual ordered control-event ledgers and counts; final i may be100
+and is not an iteration count. Negative k legitimately executes no squaring loop.
+Do not read other uninitialized loop locals or infer an absent event's flag.
+The minimal control events need the actual i/SigFigLimit or isq/Backup, without
+per-element term traces or repeated full-matrix snapshots. Final matrices suffice
+for the held pure06 returned workspace owners; stop-before-final remains partial.
+
+Literal constants/operations remain unchanged: DPLimit1e-20 at1141; floor1e-12
+at1201; rTinyValue is binary64 epsilon, not a smallest normal number. Preserve
+ordered Objexx min/max, log/division/int+1 at1219, pow at1225, source while/break
+and Backup restore. No extra finite check, iteration bound, clamp, identity,
+exponential evaluator or math-library substitution belongs in passive Native code.
+Undefined source integer conversions are an explicit future admission-domain
+question; observation must not repair them. Root freezes supported inputs before
+the first capture, independently of any future actual outcome.
+
+## Inverse boundaries: Construction.cc1375-1494
+
+| Proposed actual site | Live observed state | Source meaning |
+| --- | --- | --- |
+| Method entry before1404 | original AMat/Iden, rcmax, current attempt context | Real inverse entry, distinct from successful local allocation. |
+| After1407 | AMat1 and AInv plus unchanged inputs | Actual AMat1=AMat1406 and AInv=Iden1407 completed. |
+| After1488, before1493 | final AMat1 and AInv plus unchanged inputs | Final literal elimination workspace and output, still alive. |
+| Immediately after caller887 | source-return marker and retained AInv/input owners | Actual inverse returned before Gammas890. |
+
+AMat1 is a real local allocated1404 and destroyed1493. Copy its actual final
+contents, never an identity implied by comments. Preserve forward1416-1456,
+last-column1463-1466 and reverse1481-1488 loops and axes. There is no pivot,
+singularity/finite fallback or residual evaluator. The card's later residual and
+Gamma integration obligations remain pending; this observation plan does not
+perform them. Exponential output and inverse input are distinct owner routes.
+
+## Shape, failure, availability and prospective profiles
+
+Every reached required matrix needs real allocated bounds1..rcmax on both axes,
+positive rcmax and exactly rcmax squared elements with checked copy size. Copy
+i1 outer/i2 inner; i2 is contiguous in actual Objexx storage. Retain full shapes,
+binary64 class/raw bits including signed zero/nonfinite values, not inferred band
+zeros. Preserve actual input and final-output copies as separate immutable records.
+Copied context/input identities use exact bits; IDs, shapes, ordinals, integer
+controls, Boolean controls and event order use exact equality.
+
+Before any first capture, Root must freeze distinct named CTF06 arithmetic profiles
+for AExp, final_AMat1, final_AMato, final_AMatN, AMatRowNormMax, fact and CheckVal;
+and distinct CTF05 profiles for AInv and final_AMat1. Zero atol/rtol with exact
+class/shape/signed-zero treatment is the proposed starting policy, not a frozen
+or passed contract here. Actual input AMat/Iden/caller bindings keep their earlier
+exact input policy; old CTF04 seven/CTF03 three/CTF01 eighteen remain separate
+context. No output-driven widening, shared generic profile or guessed errors.
+
+Future first-only pairing requires genuine selected1D/no-source/nonreverse route,
+same whole call, assembly ordinal1, exponential invocation1 then inverse invocation1,
+and actual initial619 dt/history equality. Later invocations/control events stay
+observed context/unpaired/noPASS until a real Rust retry driver owns them. No
+counts, execution digests, outcomes, coefficients or expected arrays are supplied.
+
+Binding/order/bounds/copy/allocation/ledger failures must set explicit observer-
+failure and typed per-kind/omission counts even in noexcept code; preserve known
+visit identities while allowing unchanged Native continuation. A reached required
+owner that cannot be copied is integrity FAIL/unavailable, never an optional omission
+or PASS. Do not add scientific guards or suppress source exceptions. Uninvoked
+routes, captured entry without final/return, source fatal/exception, and OS-unknown
+stops remain distinct. Process failure does not erase genuine retained records or
+invent method outcomes/invocation counts; malformed or missing results are unknown.
+
+This source readiness authorship includes pure04/05 and first06 ownership glue;
+it is not independent formula or scientific-output certification. No target import,
+build/Cargo/formatter/engine/Git, canonical edit, scientific/weather/binary read or
+new QA/proof/execution framework occurred. Only this ignored README/manifest is
+prepared; old source holds remain unchanged and future code/driver approval pending.

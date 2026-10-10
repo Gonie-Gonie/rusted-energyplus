@@ -1,0 +1,106 @@
+//! Literal Construction.cc 1375-1494 inverse helper, without pivoting.
+
+/// Actual source-owned matrices, in the same layout as CTF-04 AMat.
+#[derive(Clone, Copy, Debug)]
+pub struct CtfInverseInput<'a> {
+    /// Actual positive rcmax from the selected assembly owner.
+    pub rcmax: i32,
+    /// AMat(i1,i2), with i2 contiguous: (i1-1)*rcmax+(i2-1).
+    pub a_mat: &'a [f64],
+    /// The actual initialized IdenMatrix; never reconstructed by this helper.
+    pub iden_matrix: &'a [f64],
+}
+
+/// Invalid owner shape, distinct from any Native source outcome.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum CtfInverseScopeError {
+    /// The helper requires a reached matrix with positive dimension.
+    Dimension(i32),
+    /// Both actual buffers must have exactly rcmax squared elements.
+    MatrixShape,
+}
+
+/// Actual helper state before Native destroys its local AMat1 at line 1493.
+#[derive(Clone, Debug, PartialEq)]
+pub struct CtfInverseMatrix {
+    /// Actual source matrix dimension, retained without recalculation.
+    pub rcmax: i32,
+    /// Final local AMat1 workspace, in the input's source index orientation.
+    pub a_mat1: Vec<f64>,
+    /// Actual AInv output, in the input's source index orientation.
+    pub a_inv: Vec<f64>,
+}
+
+/// Port the actual selected helper's forward and reverse elimination loops.
+///
+/// The caller supplies a reached CTF-04 AMat and its real initialized identity
+/// owner for the same attempt. Unused, loading-error, all-resistive and reverse
+/// reuse routes have no input owner and must remain unavailable at the caller.
+/// This function preserves divisions by zero and nonfinite arithmetic. It adds
+/// no pivoting, singularity test, identity substitution or generic solver.
+pub fn invert_selected_ctf_matrix(
+    input: CtfInverseInput<'_>,
+) -> Result<CtfInverseMatrix, CtfInverseScopeError> {
+    let n = usize::try_from(input.rcmax)
+        .ok()
+        .filter(|&n| n > 0)
+        .ok_or(CtfInverseScopeError::Dimension(input.rcmax))?;
+    let size = n
+        .checked_mul(n)
+        .ok_or(CtfInverseScopeError::MatrixShape)?;
+    if input.a_mat.len() != size || input.iden_matrix.len() != size {
+        return Err(CtfInverseScopeError::MatrixShape);
+    }
+
+    // Objexx Array2(i1,i2) stores i2 contiguously. Keep source one-based loops.
+    let at = |i1: usize, i2: usize| (i1 - 1) * n + i2 - 1;
+    let mut a_mat1 = input.a_mat.to_vec();
+    let mut a_inv = input.iden_matrix.to_vec();
+
+    for ir in 1..n {
+        for ic in ir + 1..=n {
+            let diagonal = a_mat1[at(ir, ir)];
+            a_mat1[at(ic, ir)] /= diagonal;
+        }
+        for ic in 1..=ir {
+            a_inv[at(ic, ir)] /= a_mat1[at(ir, ir)];
+        }
+        a_mat1[at(ir, ir)] = 1.0;
+
+        for irr in ir + 1..=n {
+            for ic in ir + 1..=n {
+                let product = a_mat1[at(ir, irr)] * a_mat1[at(ic, ir)];
+                a_mat1[at(ic, irr)] -= product;
+            }
+            for ic in 1..=ir {
+                let product = a_mat1[at(ir, irr)] * a_inv[at(ic, ir)];
+                a_inv[at(ic, irr)] -= product;
+            }
+            a_mat1[at(ir, irr)] = 0.0;
+        }
+    }
+
+    for ic in 1..=n {
+        a_inv[at(ic, n)] /= a_mat1[at(n, n)];
+    }
+    a_mat1[at(n, n)] = 1.0;
+
+    for ir in (2..=n).rev() {
+        for irr in 1..ir {
+            for ic in 1..=n {
+                let product = a_mat1[at(ir, irr)] * a_inv[at(ic, ir)];
+                a_inv[at(ic, irr)] -= product;
+            }
+            a_mat1[at(ir, irr)] = 0.0;
+        }
+    }
+
+    Ok(CtfInverseMatrix {
+        rcmax: input.rcmax,
+        a_mat1,
+        a_inv,
+    })
+}
+
+#[cfg(test)]
+mod tests;

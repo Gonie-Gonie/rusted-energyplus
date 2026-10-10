@@ -1,0 +1,62 @@
+# CTF-06 selected exponential owner source proposal
+
+SOURCE ONLY. These ignored sources have not been imported, compiled, formatted
+or executed. Root released the literal pure-owner proposal after the pinned
+readiness audit. No numeric policy, helper input packet, result or gate is
+created by this package. Existing CTF-01/02/03/04/05 holds stay immutable.
+
+The proposed public function consumes borrowed actual AMat and IdenMatrix plus
+the actual CTF-04 assembly context for one selected attempt. AMat has the same
+row-first `(i1-1)*rcmax+(i2-1)` orientation used by CTF-04 and CTF-05. The
+enclosing caller must genuinely establish the massive/nonreverse 1D/no-source
+route. Explicit unavailable caller routes return no work matrix. Selected
+dimensions, no-source selectors, one-based attempt and exact square buffer
+shapes are checked. No material classification, node placement, identity
+construction, timestep default, history calculation or retry is added.
+
+The actual source-owned identity matrix is still an integration gap. Native
+Construction.cc 638-648 initializes it before the retry loop; the held CTF-04
+owner does not retain it. A future genuine owner must preserve and pass that
+buffer. This proposal never generates an identity to substitute for its
+absence. The CTF-04 module dependency is source-prepared and not yet assumed to
+be canonical or passed. Root must compose/rebase the additive parent module
+declaration when the earlier owner proposals are actually applied.
+
+Construction.cc 1105-1373 is translated with literal scalar operation order.
+The floored norm traverses columns in source i/j order; Objexx ordered min/max
+NaN behavior is retained. Scaling uses ln(norm)/ln(2), truncation plus one, and
+pow(2.0,k). Negative k is retained; no ceil/log2/clamp is substituted. CheckVal
+uses the original unscaled norm. Power loops remain ir/ic/ict and significance
+loops preserve both breaks. The actual step ledger records i before its source
+overwrite with 100. Squaring is ir/ic/idm, includes only literal epsilon-tested
+products, and preserves Backup restore/break. The threshold is binary64
+epsilon from DataGlobalConstants.hh 608, not the minimum positive float.
+
+Source int conversions require a finite truncated value representable in i32;
+the k + 1 addition must also be representable. Unsupported conversion returns
+an explicit scope error before any reached owner is published. This is the
+defined C++ conversion domain, not Rust saturation. No blanket finite check,
+matrix fallback, defensive zero or mathematical normalization is added. IEEE
+values admitted by the actual source branches remain values, not absent owners.
+The future pre-output input admission still belongs to Root.
+
+The reached owner retains AExp and the final local AMat1/AMato/AMatN before
+Native deallocation, plus actual k/l/fact/norm/CheckVal, unchanged attempt
+context and actual control-step ledgers. Immutable inputs are never changed.
+The original call order remains exponential884, inverse887, Gamma890; inverse
+independently borrows the original AMat/Iden, never the new AExp output.
+
+Eight unexecuted focused tests cover unavailable routes, shapes/context,
+negative-k singleton/significance counters, asymmetric nilpotent orientation,
+exact power-of-two scaling/current timestep, actual Backup restore, source
+nonfinite branch behavior and signed-int conversion boundaries. These simple
+source cases are not frozen Native test inputs or replacement reference
+answers. Genuine future Native observations and element/branch comparisons
+remain required. Existing runtime test-only expect/unwrap allowance is reused;
+no new lint allowance is added.
+
+The audit's textual squaring-loop shorthand 1343 is corrected here to the
+actual for-loop at 1344. Its pinned full 1339-1373 range was correct. No held
+audit bytes were rewritten. No downstream Gamma/coefficients, reverse-reuse,
+retry driver, 2D/internal source, production wiring, new QA framework,
+scientific output or numerical PASS is claimed.

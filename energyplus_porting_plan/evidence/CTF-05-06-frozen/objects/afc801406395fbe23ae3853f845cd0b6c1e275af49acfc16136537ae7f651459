@@ -1,0 +1,388 @@
+--- ctf04_observer.cc
++++ ctf06_observer.cc
+@@ -1,10 +1,11 @@
+ // Output-only copies; observation allocation exceptions never reach the engine.
+-#include "ctf04_observer.hh"
++#include "ctf06_observer.hh"
+ 
+ #include <cstring>
++#include <initializer_list>
+ #include <limits>
+ 
+-namespace EnergyPlus::CTF01Observation {
++namespace EnergyPlus::CTF06Observation {
+ namespace {
+ 
+ static_assert(sizeof(Real64) == sizeof(std::uint64_t));
+@@ -350,4 +351,370 @@
+     }
+ }
+ 
+-} // namespace EnergyPlus::CTF01Observation
++
++namespace {
++
++MethodCapture &method_capture(Capture &capture, MethodKind method) noexcept
++{
++    return method == MethodKind::Exponential ? capture.exponential : capture.inverse;
++}
++
++void method_failure(Capture &capture, MethodKind method, MethodInvocationSnapshot *invocation,
++                    MethodStage stage, MethodFailureKind kind) noexcept
++{
++    MethodCapture &ledger = method_capture(capture, method);
++    ledger.observer_failure = true;
++    std::size_t const index = static_cast<std::size_t>(kind);
++    ++ledger.failure_event_counts[index];
++    if (invocation != nullptr) invocation->failure_kinds[index] = true;
++    MethodFailure const failure{method, ledger.actual_invocation_count,
++        invocation == nullptr ? capture.actual_matrix_attempt_callback_count : invocation->observed_assembly_ordinal,
++        stage, kind};
++    if (!ledger.first_failure) ledger.first_failure = failure;
++    ledger.last_failure = failure;
++}
++
++MatrixAttemptSnapshot const *associated_assembly(Capture const &capture,
++                                                Construction::ConstructionProps const &construction,
++                                                std::size_t ordinal) noexcept
++{
++    if (ordinal == 0 || ordinal != capture.actual_matrix_attempt_callback_count ||
++        capture.matrix_attempts.empty()) return nullptr;
++    MatrixAttemptSnapshot const &assembly = capture.matrix_attempts.back();
++    if (assembly.observed_attempt_ordinal != ordinal || !assembly.reached ||
++        !assembly.active_prefix_available || !assembly.matrices_available) return nullptr;
++    for (bool failed : assembly.failure_kinds) if (failed) return nullptr;
++    if (assembly.IsUsedCTF != construction.IsUsedCTF ||
++        assembly.SourceSinkPresent != construction.SourceSinkPresent ||
++        assembly.SolutionDimensions != construction.SolutionDimensions ||
++        assembly.TotLayers != construction.TotLayers || assembly.rcmax != construction.rcmax ||
++        assembly.NodeSource != construction.NodeSource || assembly.NodeUserTemp != construction.NodeUserTemp ||
++        assembly.NumHistories != construction.NumHistories ||
++        assembly.CTFTimeStep.bits != copy_bits(construction.CTFTimeStep).bits) return nullptr;
++    return &assembly;
++}
++
++MethodContext method_context(Capture const &capture,
++                             Construction::ConstructionProps const &construction,
++                             std::size_t ordinal) noexcept
++{
++    MethodContext context;
++    context.IsUsedCTF = construction.IsUsedCTF;
++    context.SourceSinkPresent = construction.SourceSinkPresent;
++    context.SolutionDimensions = construction.SolutionDimensions;
++    context.TotLayers = construction.TotLayers;
++    context.rcmax = construction.rcmax;
++    context.NodeSource = construction.NodeSource;
++    context.NodeUserTemp = construction.NodeUserTemp;
++    context.CTFTimeStep = copy_bits(construction.CTFTimeStep);
++    context.NumHistories = construction.NumHistories;
++    MatrixAttemptSnapshot const *assembly = associated_assembly(capture, construction, ordinal);
++    if (assembly != nullptr) {
++        context.assembly_context_available = true;
++        context.assembly_ErrorsFound = assembly->ErrorsFound;
++        context.assembly_DoCTFErrorReport = assembly->DoCTFErrorReport;
++        context.assembly_TimeStepZone = assembly->TimeStepZone;
++    }
++    return context;
++}
++
++MethodInvocationSnapshot *method_visit(Capture &capture, MethodKind method,
++                                       Construction::ConstructionProps const &construction,
++                                       MethodStage stage) noexcept
++{
++    MethodCapture &ledger = method_capture(capture, method);
++    std::size_t const index = static_cast<std::size_t>(stage);
++    ++ledger.actual_stage_callback_counts[index];
++    if (ledger.invocations.empty() ||
++        ledger.invocations.back().observed_invocation_ordinal != ledger.actual_invocation_count) {
++        ++ledger.stage_records_omitted[index];
++        method_failure(capture, method, nullptr, stage, MethodFailureKind::AssociationFailure);
++        return nullptr;
++    }
++    MethodInvocationSnapshot &invocation = ledger.invocations.back();
++    ++invocation.actual_stage_callback_counts[index];
++    if (stage != MethodStage::PowerControl && stage != MethodStage::SquareControl &&
++        invocation.actual_stage_callback_counts[index] > 1) {
++        ++ledger.stage_records_omitted[index];
++        method_failure(capture, method, &invocation, stage, MethodFailureKind::OrderFailure);
++        return nullptr; // Preserve the first real value record, retaining the extra visit count.
++    }
++    if (capture.bound_state == nullptr || capture.bound_construction != &construction) {
++        method_failure(capture, method, &invocation, stage, MethodFailureKind::IdentityMismatch);
++    }
++    if (invocation.observed_invocation_ordinal != invocation.observed_assembly_ordinal ||
++        associated_assembly(capture, construction, invocation.observed_assembly_ordinal) == nullptr) {
++        method_failure(capture, method, &invocation, stage, MethodFailureKind::AssociationFailure);
++    }
++    bool ordered = invocation.entry.reached && !invocation.source_return.reached;
++    switch (stage) {
++    case MethodStage::InitializedInputs:
++        ordered = ordered && !invocation.initialized_inputs.reached;
++        break;
++    case MethodStage::ScalingControls:
++        ordered = ordered && method == MethodKind::Exponential && invocation.initialized_inputs.reached &&
++                  !invocation.scaling_controls.reached;
++        break;
++    case MethodStage::PowerControl:
++        ordered = ordered && method == MethodKind::Exponential && invocation.scaling_controls.reached &&
++                  !invocation.final_workspace.reached &&
++                  invocation.actual_stage_callback_counts[static_cast<std::size_t>(MethodStage::SquareControl)] == 0;
++        break;
++    case MethodStage::SquareControl:
++        ordered = ordered && method == MethodKind::Exponential && invocation.scaling_controls.reached &&
++                  !invocation.final_workspace.reached;
++        break;
++    case MethodStage::FinalWorkspace:
++        ordered = ordered && !invocation.final_workspace.reached && invocation.initialized_inputs.reached &&
++                  (method == MethodKind::Inverse || invocation.scaling_controls.reached);
++        break;
++    case MethodStage::SourceReturn:
++        ordered = ordered && invocation.final_workspace.reached;
++        break;
++    case MethodStage::Entry:
++        ordered = false; // Entry has its own independent actual invocation counter.
++        break;
++    }
++    if (!ordered) method_failure(capture, method, &invocation, stage, MethodFailureKind::OrderFailure);
++    return &invocation;
++}
++
++struct MatrixView
++{
++    MatrixOwner owner;
++    Array2D<Real64> const *values;
++};
++
++void copy_method_matrices(Capture &capture, MethodKind method, MethodInvocationSnapshot &invocation,
++                          MethodStage stage, Construction::ConstructionProps const &construction,
++                          MethodValueSnapshot &snapshot,
++                          std::initializer_list<MatrixView> views) noexcept
++{
++    snapshot.reached = true;
++    snapshot.context = method_context(capture, construction, invocation.observed_assembly_ordinal);
++    if (views.size() > snapshot.matrices.size()) {
++        method_failure(capture, method, &invocation, stage, MethodFailureKind::MatrixShape);
++        return;
++    }
++    snapshot.observed_matrix_count = views.size();
++    std::size_t index = 0;
++    for (MatrixView const &view : views) {
++        MethodMatrixSnapshot &copy = snapshot.matrices[index++];
++        copy.owner = view.owner;
++        copy.bounds = array_bounds(*view.values);
++    }
++    int const dimension = snapshot.context.rcmax;
++    if (dimension < 1) {
++        method_failure(capture, method, &invocation, stage, MethodFailureKind::MatrixShape);
++        return;
++    }
++    std::size_t const count = static_cast<std::size_t>(dimension);
++    if (count > std::numeric_limits<std::size_t>::max() / count) {
++        method_failure(capture, method, &invocation, stage, MethodFailureKind::MatrixShape);
++        return;
++    }
++    std::size_t const elements = count * count;
++    index = 0;
++    bool complete = true;
++    for (MatrixView const &view : views) {
++        MethodMatrixSnapshot &copy = snapshot.matrices[index++];
++        if (!exact_square(copy.bounds, dimension, elements)) {
++            complete = false;
++            method_failure(capture, method, &invocation, stage, MethodFailureKind::MatrixShape);
++            continue;
++        }
++        try {
++            copy.values.reserve(elements);
++            for (int i1 = 1; i1 <= dimension; ++i1) {
++                for (int i2 = 1; i2 <= dimension; ++i2) {
++                    copy.values.push_back(copy_bits((*view.values)(i1, i2)));
++                }
++            }
++            copy.copy_available = copy.values.size() == elements;
++            if (!copy.copy_available) {
++                complete = false;
++                method_failure(capture, method, &invocation, stage, MethodFailureKind::MatrixShape);
++            }
++        } catch (...) {
++            copy.values.clear();
++            complete = false;
++            method_failure(capture, method, &invocation, stage, MethodFailureKind::CopyException);
++        }
++    }
++    snapshot.matrices_available = complete;
++}
++
++ExponentialControls copy_controls(Real64 const &norm, int k, Real64 const &fact,
++                                  Real64 const &check, int l, std::optional<int> final_i) noexcept
++{
++    return ExponentialControls{copy_bits(norm), k, copy_bits(fact), copy_bits(check), l, final_i};
++}
++
++} // namespace
++
++void method_entry(MethodKind method, Construction::ConstructionProps const &construction) noexcept
++{
++    Capture *capture = active_capture;
++    if (capture == nullptr) return;
++    MethodCapture &ledger = method_capture(*capture, method);
++    std::size_t const ordinal = ++ledger.actual_invocation_count;
++    ++ledger.actual_stage_callback_counts[static_cast<std::size_t>(MethodStage::Entry)];
++    bool const previous_returned = ordinal == 1 ||
++        (!ledger.invocations.empty() && ledger.invocations.back().observed_invocation_ordinal == ordinal - 1 &&
++         ledger.invocations.back().source_return.reached);
++    try {
++        ledger.invocations.emplace_back();
++    } catch (...) {
++        ++ledger.stage_records_omitted[static_cast<std::size_t>(MethodStage::Entry)];
++        method_failure(*capture, method, nullptr, MethodStage::Entry, MethodFailureKind::LedgerAppendException);
++        return;
++    }
++    MethodInvocationSnapshot &invocation = ledger.invocations.back();
++    invocation.observed_invocation_ordinal = ordinal;
++    invocation.observed_assembly_ordinal = capture->actual_matrix_attempt_callback_count;
++    ++invocation.actual_stage_callback_counts[static_cast<std::size_t>(MethodStage::Entry)];
++    if (capture->bound_state == nullptr || capture->bound_construction != &construction) {
++        method_failure(*capture, method, &invocation, MethodStage::Entry, MethodFailureKind::IdentityMismatch);
++        invocation.entry.reached = true;
++        return;
++    }
++    invocation.association_available = ordinal == invocation.observed_assembly_ordinal &&
++        associated_assembly(*capture, construction, invocation.observed_assembly_ordinal) != nullptr;
++    if (!invocation.association_available) {
++        method_failure(*capture, method, &invocation, MethodStage::Entry, MethodFailureKind::AssociationFailure);
++    }
++    bool ordered = previous_returned;
++    if (method == MethodKind::Exponential) {
++        ordered = ordered && capture->inverse.actual_invocation_count == ordinal - 1 &&
++            capture->inverse.actual_stage_callback_counts[static_cast<std::size_t>(MethodStage::SourceReturn)] == ordinal - 1;
++    } else {
++        ordered = ordered && capture->exponential.actual_invocation_count == ordinal &&
++            capture->exponential.actual_stage_callback_counts[static_cast<std::size_t>(MethodStage::SourceReturn)] == ordinal &&
++            !capture->exponential.invocations.empty() &&
++            capture->exponential.invocations.back().observed_invocation_ordinal == ordinal &&
++            capture->exponential.invocations.back().source_return.reached;
++    }
++    if (!ordered) method_failure(*capture, method, &invocation, MethodStage::Entry, MethodFailureKind::OrderFailure);
++    copy_method_matrices(*capture, method, invocation, MethodStage::Entry, construction, invocation.entry,
++        {{MatrixOwner::AMat, &construction.AMat}, {MatrixOwner::IdenMatrix, &construction.IdenMatrix}});
++}
++
++void exponential_initialized(Construction::ConstructionProps const &construction,
++                             Array2D<Real64> const &AMat1, Array2D<Real64> const &AMato,
++                             Array2D<Real64> const &AMatN) noexcept
++{
++    Capture *capture = active_capture;
++    if (capture == nullptr) return;
++    MethodInvocationSnapshot *invocation = method_visit(*capture, MethodKind::Exponential, construction, MethodStage::InitializedInputs);
++    if (invocation == nullptr) return;
++    copy_method_matrices(*capture, MethodKind::Exponential, *invocation, MethodStage::InitializedInputs, construction,
++        invocation->initialized_inputs, {{MatrixOwner::AMat1, &AMat1}, {MatrixOwner::AMato, &AMato},
++        {MatrixOwner::AMatN, &AMatN}, {MatrixOwner::AExp, &construction.AExp}});
++}
++
++void exponential_scaled(Construction::ConstructionProps const &construction,
++                        Array2D<Real64> const &AMat1, Real64 const &AMatRowNormMax,
++                        int k, Real64 const &fact, Real64 const &CheckVal, int l) noexcept
++{
++    Capture *capture = active_capture;
++    if (capture == nullptr) return;
++    MethodInvocationSnapshot *invocation = method_visit(*capture, MethodKind::Exponential, construction, MethodStage::ScalingControls);
++    if (invocation == nullptr) return;
++    invocation->scaling_controls.exponential_controls = copy_controls(AMatRowNormMax, k, fact, CheckVal, l, std::nullopt);
++    copy_method_matrices(*capture, MethodKind::Exponential, *invocation, MethodStage::ScalingControls, construction,
++        invocation->scaling_controls, {{MatrixOwner::AMat1, &AMat1}});
++}
++
++void exponential_power_control(Construction::ConstructionProps const &construction, int i, bool SigFigLimit) noexcept
++{
++    Capture *capture = active_capture;
++    if (capture == nullptr) return;
++    MethodInvocationSnapshot *invocation = method_visit(*capture, MethodKind::Exponential, construction, MethodStage::PowerControl);
++    if (invocation == nullptr) return;
++    std::size_t const ordinal = invocation->actual_stage_callback_counts[static_cast<std::size_t>(MethodStage::PowerControl)];
++    try {
++        invocation->power_controls.push_back(PowerControlSnapshot{ordinal, i, SigFigLimit});
++    } catch (...) {
++        ++capture->exponential.stage_records_omitted[static_cast<std::size_t>(MethodStage::PowerControl)];
++        method_failure(*capture, MethodKind::Exponential, invocation, MethodStage::PowerControl, MethodFailureKind::LedgerAppendException);
++    }
++}
++
++void exponential_square_control(Construction::ConstructionProps const &construction, int isq, bool Backup) noexcept
++{
++    Capture *capture = active_capture;
++    if (capture == nullptr) return;
++    MethodInvocationSnapshot *invocation = method_visit(*capture, MethodKind::Exponential, construction, MethodStage::SquareControl);
++    if (invocation == nullptr) return;
++    std::size_t const ordinal = invocation->actual_stage_callback_counts[static_cast<std::size_t>(MethodStage::SquareControl)];
++    try {
++        invocation->square_controls.push_back(SquareControlSnapshot{ordinal, isq, Backup});
++    } catch (...) {
++        ++capture->exponential.stage_records_omitted[static_cast<std::size_t>(MethodStage::SquareControl)];
++        method_failure(*capture, MethodKind::Exponential, invocation, MethodStage::SquareControl, MethodFailureKind::LedgerAppendException);
++    }
++}
++
++void exponential_final(Construction::ConstructionProps const &construction,
++                       Array2D<Real64> const &AMat1, Array2D<Real64> const &AMato,
++                       Array2D<Real64> const &AMatN, Real64 const &AMatRowNormMax,
++                       int k, Real64 const &fact, Real64 const &CheckVal, int l, int i) noexcept
++{
++    Capture *capture = active_capture;
++    if (capture == nullptr) return;
++    MethodInvocationSnapshot *invocation = method_visit(*capture, MethodKind::Exponential, construction, MethodStage::FinalWorkspace);
++    if (invocation == nullptr) return;
++    invocation->final_workspace.exponential_controls = copy_controls(AMatRowNormMax, k, fact, CheckVal, l, i);
++    copy_method_matrices(*capture, MethodKind::Exponential, *invocation, MethodStage::FinalWorkspace, construction,
++        invocation->final_workspace, {{MatrixOwner::AMat1, &AMat1}, {MatrixOwner::AMato, &AMato},
++        {MatrixOwner::AMatN, &AMatN}, {MatrixOwner::AExp, &construction.AExp}});
++}
++
++void inverse_initialized(Construction::ConstructionProps const &construction, Array2D<Real64> const &AMat1) noexcept
++{
++    Capture *capture = active_capture;
++    if (capture == nullptr) return;
++    MethodInvocationSnapshot *invocation = method_visit(*capture, MethodKind::Inverse, construction, MethodStage::InitializedInputs);
++    if (invocation == nullptr) return;
++    copy_method_matrices(*capture, MethodKind::Inverse, *invocation, MethodStage::InitializedInputs, construction,
++        invocation->initialized_inputs, {{MatrixOwner::AMat1, &AMat1}, {MatrixOwner::AInv, &construction.AInv}});
++}
++
++void inverse_final(Construction::ConstructionProps const &construction, Array2D<Real64> const &AMat1) noexcept
++{
++    Capture *capture = active_capture;
++    if (capture == nullptr) return;
++    MethodInvocationSnapshot *invocation = method_visit(*capture, MethodKind::Inverse, construction, MethodStage::FinalWorkspace);
++    if (invocation == nullptr) return;
++    copy_method_matrices(*capture, MethodKind::Inverse, *invocation, MethodStage::FinalWorkspace, construction,
++        invocation->final_workspace, {{MatrixOwner::AMat1, &AMat1}, {MatrixOwner::AInv, &construction.AInv}});
++}
++
++void method_return(MethodKind method, EnergyPlusData const &state,
++                   Construction::ConstructionProps const &construction,
++                   bool ErrorsFound, bool DoCTFErrorReport, Real64 const &TimeStepZone) noexcept
++{
++    Capture *capture = active_capture;
++    if (capture == nullptr) return;
++    MethodInvocationSnapshot *invocation = method_visit(*capture, method, construction, MethodStage::SourceReturn);
++    if (invocation == nullptr) return;
++    if (capture->bound_state != &state) {
++        method_failure(*capture, method, invocation, MethodStage::SourceReturn, MethodFailureKind::IdentityMismatch);
++    }
++    MethodValueSnapshot &snapshot = invocation->source_return;
++    snapshot.caller_context_available = capture->bound_state == &state && capture->bound_construction == &construction;
++    snapshot.caller_ErrorsFound = ErrorsFound;
++    snapshot.caller_DoCTFErrorReport = DoCTFErrorReport;
++    snapshot.caller_TimeStepZone = copy_bits(TimeStepZone);
++    MatrixAttemptSnapshot const *assembly = associated_assembly(*capture, construction, invocation->observed_assembly_ordinal);
++    if (assembly == nullptr || assembly->ErrorsFound != ErrorsFound ||
++        assembly->DoCTFErrorReport != DoCTFErrorReport || assembly->TimeStepZone.bits != copy_bits(TimeStepZone).bits) {
++        method_failure(*capture, method, invocation, MethodStage::SourceReturn, MethodFailureKind::AssociationFailure);
++    }
++    copy_method_matrices(*capture, method, *invocation, MethodStage::SourceReturn, construction, snapshot,
++        {{MatrixOwner::AMat, &construction.AMat}, {MatrixOwner::IdenMatrix, &construction.IdenMatrix},
++        {method == MethodKind::Exponential ? MatrixOwner::AExp : MatrixOwner::AInv,
++         method == MethodKind::Exponential ? &construction.AExp : &construction.AInv}});
++}
++
++} // namespace EnergyPlus::CTF06Observation

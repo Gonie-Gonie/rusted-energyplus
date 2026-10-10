@@ -1,0 +1,265 @@
+--- /dev/null
++++ crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs
+@@ -0,0 +1,262 @@
++//! Literal Construction.cc 1105-1373 exponential helper for one actual attempt.
++
++use super::ctf_state_space_assembly::{
++    CtfAssemblyContext, CtfAssemblyRoute, CtfAssemblyUnavailable,
++};
++
++/// The actual initialized matrix owners for the same assembly attempt.
++#[derive(Clone, Copy, Debug)]
++pub struct CtfExponentialInput<'a> {
++    /// Actual positive source matrix dimension.
++    pub rcmax: i32,
++    /// AMat(i1,i2), with i2 contiguous: (i1-1)*rcmax+(i2-1).
++    pub a_mat: &'a [f64],
++    /// Actual caller-owned IdenMatrix; this helper never manufactures it.
++    pub iden_matrix: &'a [f64],
++}
++
++/// Owner/scope errors, distinct from any observed Native method outcome.
++#[derive(Clone, Copy, Debug, Eq, PartialEq)]
++pub enum CtfExponentialScopeError {
++    /// Selected assembly must have positive dimension.
++    Dimension(i32),
++    /// Both source buffers must contain exactly rcmax squared elements.
++    MatrixShape,
++    /// This selected path accepts only one solution dimension.
++    UnsupportedDimensions(i32),
++    /// Internal-source equations are not admitted.
++    InternalSource,
++    /// The actual no-source helper must reset both node selectors.
++    SourceNodeState,
++    /// Actual attempt ordinal must be one-based.
++    AttemptOrdinal,
++    /// The source log-ratio cast or following signed-int addition is undefined.
++    UndefinedScalingExponent,
++    /// The source CheckVal signed-int conversion is undefined.
++    UndefinedPowerLimit,
++}
++
++/// Actual power-loop control state before the source may overwrite i with 100.
++#[derive(Clone, Copy, Debug, Eq, PartialEq)]
++pub struct CtfExponentialPowerStep {
++    /// Actual incremented loop counter for this executed iteration.
++    pub i: i32,
++    /// Actual significance flag after the ordered scan and early breaks.
++    pub sig_fig_limit: bool,
++}
++
++/// Actual squaring control state after multiplication, before Backup handling.
++#[derive(Clone, Copy, Debug, Eq, PartialEq)]
++pub struct CtfExponentialSquareStep {
++    /// Actual one-based squaring iteration, not an inferred declared count.
++    pub isq: i32,
++    /// True only when every tested product failed the source epsilon test.
++    pub backup: bool,
++}
++
++/// Selected helper outputs and local workspace before source deallocation.
++#[derive(Clone, Debug, PartialEq)]
++pub struct CtfExponentialMatrix {
++    /// Actual enclosing route and current-attempt metadata, copied unchanged.
++    pub context: CtfAssemblyContext,
++    /// Source matrix dimension.
++    pub rcmax: i32,
++    /// Actual floored column-norm maximum before matrix scaling.
++    pub a_mat_row_norm_max: f64,
++    /// Actual source scaling exponent; it can be negative.
++    pub k: i32,
++    /// Actual timestep divided by pow(2.0,k).
++    pub fact: f64,
++    /// Actual unscaled-norm power-limit expression.
++    pub check_val: f64,
++    /// Actual source integer power limit.
++    pub l: i32,
++    /// Final source i; a significance exit sets it to 100.
++    pub final_power_i: i32,
++    /// Actual executed power iterations; length is independent of final i.
++    pub power_steps: Vec<CtfExponentialPowerStep>,
++    /// Actual executed squaring iterations, including a Backup restore.
++    pub square_steps: Vec<CtfExponentialSquareStep>,
++    /// Scaled local AMat1, unchanged after the initial scaling.
++    pub a_mat1: Vec<f64>,
++    /// Final local AMato at the method's deallocation boundary.
++    pub a_mato: Vec<f64>,
++    /// Final local AMatN at the method's deallocation boundary.
++    pub a_mat_n: Vec<f64>,
++    /// Actual retained AExp, in the source row-first orientation.
++    pub a_exp: Vec<f64>,
++}
++
++/// Unreached routes have no initialized exponential or local-work owner.
++#[derive(Clone, Debug, PartialEq)]
++pub enum CtfExponentialObservation {
++    /// Actual caller-selected route did not invoke the selected helper.
++    Unavailable(CtfAssemblyUnavailable),
++    /// Complete helper owner for one actual selected attempt.
++    Exponential(Box<CtfExponentialMatrix>),
++}
++
++/// Preserve the literal scaling, ordered scalar powers and Backup branches.
++///
++/// The caller supplies actual CTF-04 AMat, actual initialized IdenMatrix and
++/// current-attempt CTFTimeStep. No identity owner, route or retry is inferred.
++/// Nonfinite intermediate values keep the source comparisons and arithmetic;
++/// only undefined source signed-int conversions stop this selected scope.
++pub fn calculate_selected_ctf_matrix_exponential(
++    input: CtfExponentialInput<'_>,
++    context: CtfAssemblyContext,
++) -> Result<CtfExponentialObservation, CtfExponentialScopeError> {
++    if let CtfAssemblyRoute::Unavailable(reason) = context.route {
++        return Ok(CtfExponentialObservation::Unavailable(reason));
++    }
++    if context.source_sink_present {
++        return Err(CtfExponentialScopeError::InternalSource);
++    }
++    if context.solution_dimensions != 1 {
++        return Err(CtfExponentialScopeError::UnsupportedDimensions(
++            context.solution_dimensions,
++        ));
++    }
++    if context.node_source != 0 || context.node_user_temp != 0 {
++        return Err(CtfExponentialScopeError::SourceNodeState);
++    }
++    if context.attempt_ordinal == 0 {
++        return Err(CtfExponentialScopeError::AttemptOrdinal);
++    }
++    let n = usize::try_from(input.rcmax)
++        .ok()
++        .filter(|&n| n > 0)
++        .ok_or(CtfExponentialScopeError::Dimension(input.rcmax))?;
++    let size = n.checked_mul(n).ok_or(CtfExponentialScopeError::MatrixShape)?;
++    if input.a_mat.len() != size || input.iden_matrix.len() != size {
++        return Err(CtfExponentialScopeError::MatrixShape);
++    }
++    let at = |i1: usize, i2: usize| (i1 - 1) * n + i2 - 1;
++    let mut a_mat1 = input.a_mat.to_vec();
++    let mut a_mato = vec![0.0; size];
++    let mut a_mat_n = vec![0.0; size];
++    let mut a_exp = vec![0.0; size];
++    let mut a_mat_row_norm_max = 1e-12;
++    for i in 1..=n {
++        let mut a_mat_row_norm = 0.0;
++        for j in 1..=n {
++            a_mat_row_norm += a_mat1[at(j, i)].abs();
++        }
++        a_mat_row_norm *= context.ctf_time_step;
++        // Objexx max(a,b) is a<b ? b:a; Rust max changes NaN behavior.
++        if a_mat_row_norm_max < a_mat_row_norm {
++            a_mat_row_norm_max = a_mat_row_norm;
++        }
++    }
++    let k = source_i32(a_mat_row_norm_max.ln() / 2.0_f64.ln())
++        .and_then(|value| value.checked_add(1))
++        .ok_or(CtfExponentialScopeError::UndefinedScalingExponent)?;
++    let fact = context.ctf_time_step / 2.0_f64.powf(f64::from(k));
++    for value in &mut a_mat1 {
++        *value *= fact;
++    }
++    let limit = 3.0 * a_mat_row_norm_max + 6.0;
++    // Objexx min(a,b) is a<b ? a:b, including unordered comparisons.
++    let check_val = if limit < 100.0 { limit } else { 100.0 };
++    let l = source_i32(check_val).ok_or(CtfExponentialScopeError::UndefinedPowerLimit)?;
++    for index in 0..size {
++        a_exp[index] = a_mat1[index] + input.iden_matrix[index];
++    }
++    a_mato.copy_from_slice(&a_mat1);
++    let mut i = 1;
++    let mut power_steps = Vec::new();
++    while i < l {
++        i += 1;
++        let mut sig_fig_limit = true;
++        for ir in 1..=n {
++            for ic in 1..=n {
++                a_mat_n[at(ic, ir)] = 0.0;
++                for ict in 1..=n {
++                    if a_mat1[at(ic, ict)].abs() > f64::EPSILON
++                        && a_mato[at(ict, ir)].abs()
++                            > (f64::from(i) * f64::EPSILON / a_mat1[at(ic, ict)]).abs()
++                    {
++                        a_mat_n[at(ic, ir)] +=
++                            a_mato[at(ict, ir)] * a_mat1[at(ic, ict)] / f64::from(i);
++                    }
++                }
++            }
++        }
++        a_mato.copy_from_slice(&a_mat_n);
++        for index in 0..size {
++            a_exp[index] += a_mato[index];
++        }
++        for ir in 1..=n {
++            for ic in 1..=n {
++                if a_exp[at(ic, ir)].abs() > f64::EPSILON {
++                    if (a_mato[at(ic, ir)] / a_exp[at(ic, ir)]).abs() > 1.0e-20 {
++                        sig_fig_limit = false;
++                        break;
++                    }
++                } else {
++                    sig_fig_limit = false;
++                    break;
++                }
++            }
++            if !sig_fig_limit {
++                break;
++            }
++        }
++        power_steps.push(CtfExponentialPowerStep { i, sig_fig_limit });
++        if sig_fig_limit {
++            i = 100;
++        }
++    }
++    let mut square_steps = Vec::new();
++    for isq in 1..=k {
++        a_mato.copy_from_slice(&a_exp);
++        let mut backup = true;
++        a_exp.fill(0.0);
++        for ir in 1..=n {
++            for ic in 1..=n {
++                for idm in 1..=n {
++                    if (a_mato[at(idm, ir)] * a_mato[at(ic, idm)]).abs() > f64::EPSILON {
++                        a_exp[at(ic, ir)] += a_mato[at(idm, ir)] * a_mato[at(ic, idm)];
++                        backup = false;
++                    }
++                }
++            }
++        }
++        square_steps.push(CtfExponentialSquareStep { isq, backup });
++        if backup {
++            a_exp.copy_from_slice(&a_mato);
++            break;
++        }
++    }
++    Ok(CtfExponentialObservation::Exponential(Box::new(CtfExponentialMatrix {
++        context,
++        rcmax: input.rcmax,
++        a_mat_row_norm_max,
++        k,
++        fact,
++        check_val,
++        l,
++        final_power_i: i,
++        power_steps,
++        square_steps,
++        a_mat1,
++        a_mato,
++        a_mat_n,
++        a_exp,
++    })))
++}
++
++fn source_i32(value: f64) -> Option<i32> {
++    let truncated = value.trunc();
++    if !truncated.is_finite()
++        || truncated < f64::from(i32::MIN)
++        || truncated > f64::from(i32::MAX)
++    {
++        return None;
++    }
++    // The explicit source-defined range check prevents Rust's saturating extension.
++    Some(truncated as i32)
++}
++
++#[cfg(test)]
++mod tests;

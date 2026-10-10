@@ -1,0 +1,104 @@
+--- /dev/null
++++ crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs
+@@ -0,0 +1,101 @@
++//! Selected first-inverse owner; production driver activation is deferred.
++
++use super::ctf_first_assembly_owner::{ConstructionCtfFirstAssembly, CtfFirstAssemblyUnavailable};
++use super::surface_manager::ctf_inverse_matrix::{
++    CtfInverseInput, CtfInverseMatrix, CtfInverseScopeError, invert_selected_ctf_matrix,
++};
++use super::surface_manager::ctf_state_space_assembly::{
++    CtfAssemblyContext, CtfAssemblyObservation, CtfAssemblyRoute, CtfAssemblyUnavailable,
++};
++use ep_model::ConstructionId;
++
++/// An actual unavailable assembly prerequisite or inconsistent association.
++#[derive(Clone, Copy, Debug, Eq, PartialEq)]
++pub enum CtfFirstInverseUnavailable {
++    /// The real first-assembly owner returned this prerequisite error.
++    FirstAssemblyUnavailable(CtfFirstAssemblyUnavailable),
++    /// The pure assembly retained an actual unselected branch.
++    AssemblyRouteUnavailable(CtfAssemblyUnavailable),
++    /// Wrapper and matrix context do not carry the same original construction.
++    ConstructionIdentityMismatch,
++    /// This selected owner accepts only the real first assembly invocation.
++    NonFirstAttempt(usize),
++    /// The matrix context is outside the selected one-dimensional no-source route.
++    AssemblyContext,
++    /// The accepted inverse helper rejected its actual borrowed buffer shape.
++    InverseScope(CtfInverseScopeError),
++}
++
++impl std::fmt::Display for CtfFirstInverseUnavailable {
++    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
++        write!(formatter, "first CTF inverse owner unavailable: {self:?}")
++    }
++}
++
++impl std::error::Error for CtfFirstInverseUnavailable {}
++
++/// Output of one direct selected helper call with its unchanged assembly identity.
++#[derive(Clone, Debug, PartialEq)]
++pub struct CtfFirstInverse {
++    /// Actual first-assembly metadata; no retry state is generated here.
++    pub context: CtfAssemblyContext,
++    /// Actual accepted inverse return, including the final local AMat1 workspace.
++    pub inverse: CtfInverseMatrix,
++}
++
++/// Construction-associated first inverse, distinct from any whole solver result.
++#[derive(Clone, Debug, PartialEq)]
++pub struct ConstructionCtfFirstInverse {
++    /// Original typed construction ID; never a merged layer position.
++    pub construction_id: ConstructionId,
++    /// A reached direct helper result or its explicit unavailable prerequisite.
++    pub result: Result<CtfFirstInverse, CtfFirstInverseUnavailable>,
++}
++
++/// Call the accepted inverse once on the same first-assembly AMat and identity.
++///
++/// This is a direct selected helper API, not an active production cache driver.
++/// Native calls exponential before inverse (Construction.cc 884 then 887).
++/// Future production wiring must retain that order once CTF06 is available.
++/// No identity, matrix, timestep, route or retry state is reconstructed here.
++pub fn initialize_construction_ctf_first_inverse(
++    assembly: &ConstructionCtfFirstAssembly,
++) -> ConstructionCtfFirstInverse {
++    use CtfFirstInverseUnavailable as Unavailable;
++
++    let result = (|| {
++        let observed = assembly.result.as_ref()
++            .map_err(|reason| Unavailable::FirstAssemblyUnavailable(*reason))?;
++        let actual = match observed {
++            CtfAssemblyObservation::Unavailable(reason) => {
++                return Err(Unavailable::AssemblyRouteUnavailable(*reason));
++            }
++            CtfAssemblyObservation::Assembled(actual) => actual,
++        };
++        if assembly.construction_id != actual.context.construction_id {
++            return Err(Unavailable::ConstructionIdentityMismatch);
++        }
++        if actual.context.attempt_ordinal != 1 {
++            return Err(Unavailable::NonFirstAttempt(actual.context.attempt_ordinal));
++        }
++        if actual.context.route != CtfAssemblyRoute::Assemble
++            || actual.context.solution_dimensions != 1
++            || actual.context.source_sink_present
++            || actual.context.node_source != 0
++            || actual.context.node_user_temp != 0
++        {
++            return Err(Unavailable::AssemblyContext);
++        }
++        let inverse = invert_selected_ctf_matrix(CtfInverseInput {
++            rcmax: actual.rcmax,
++            a_mat: &actual.a_mat,
++            iden_matrix: &actual.iden_matrix,
++        }).map_err(Unavailable::InverseScope)?;
++        Ok(CtfFirstInverse { context: actual.context, inverse })
++    })();
++    ConstructionCtfFirstInverse { construction_id: assembly.construction_id, result }
++}
++
++#[cfg(test)]
++#[path = "ctf_first_inverse_owner_tests.rs"]
++mod tests;

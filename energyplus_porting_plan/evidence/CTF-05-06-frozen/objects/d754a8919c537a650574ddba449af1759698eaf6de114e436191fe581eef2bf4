@@ -1,0 +1,20 @@
+--- .runtime/porting/CTF-06/original-data-review-prep-01/review_production.py
++++ .runtime/porting/CTF-06/original-data-review-prep-02/review_production.py
+@@ -232,7 +232,7 @@
+     if result_path.is_file() and native["launch_error"] is None:
+         m.require(result_sha is not None, "Existing actual result requires its supplied SHA")
+         result_ref = m.bind_observation({"path": result_name, "sha256": result_sha})
+-        # Actual scientific serialization uses the 64MB physical bound, not the 16MB small-metadata parser cap.
++        # Actual scientific serialization uses the 1GiB physical bound, not the 16MB small-metadata parser cap.
+         result = json.loads(result_path.read_text(encoding="utf-8"), object_pairs_hook=m.unique_object,
+                             parse_constant=lambda value: m.require(False, "Nonfinite JSON literal: " + value))
+         m.require(result["schema"] == "ctf06-production-helper-results.v1" and result["complete_requested_model_ledger"] is True and
+@@ -265,7 +265,7 @@
+         output_files = []
+         for path in sorted(actual_files):
+             m.require(path.suffix.lower() not in [".exe", ".dll", ".obj", ".a"], "Native build payload is not a helper output")
+-            output_files.append(m.bind(m.identity(path)))
++            output_files.append(result_ref if path == result_path else m.bind(m.identity(path)))
+         # Retain additional genuine source-created text outputs; never hide them or invent a fixed count.
+         complete = True
+     release = complete and not integrity and native["exit_code"] == 0 and native["launch_error"] is None and counts["loader_unavailable_model_cases"] == 0

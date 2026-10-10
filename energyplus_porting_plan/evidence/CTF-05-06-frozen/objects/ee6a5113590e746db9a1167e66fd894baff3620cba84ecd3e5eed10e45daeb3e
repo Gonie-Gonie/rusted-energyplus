@@ -1,0 +1,40 @@
+# CTF06 combined-method actual Native build/PE reader
+
+SOURCE-READY HELD, unexecuted. Existing CTF04 reader109 is adapted solely to
+ctf06 unit/production target/schema/provider names and the forward-only new06
+linked Original retention intent. The native_pe implementation and actual
+inspection flow remain unchanged. Root alone invokes this existing build/PE
+stage; no engine call or new source-review/proof execution stage is introduced.
+
+CLI remains eleven argv: python -X utf8 -B review_build.py --lane
+unit|production --build <actual-build-path#SHA> --output-dir <freshdir>.
+The actual build schema is ctf06[-production]-native-build.v1 and its status is
+pass-actual-3TU-link-and-preservation; target ctf06_unit_helper or
+ctf06_production_helper. The output report uses the corresponding
+independent-build-PE-review.v1 schema and compact stdout {review,status}.
+
+Both targets add three objects each. The intended existing compile inventory
+is 685 -> 691 registrations; this source retains the accepted actual before
+inventory plus6 proof and reports real typed counts. Core643 registered,
+631 present and12 absent remain exact. All prior rows/options and protected
+artifacts/present objects must have genuine unchanged preservation evidence.
+Protected38 is prospective only after Root's separate real retirement record
+establishes the before inventory (legacy36 plus two retained04 derivatives).
+This reader neither assumes retirement nor removes/reinterprets prior refs:
+it requires the actual protected_ref_count and exact matching preserved list.
+
+Native8 refs each lane are authenticated. Real map evidence must establish
+Construction.ctf06.cc.obj as provider and original archive Construction hits0.
+Both real linked Original and derivative are independently inspected and their
+actual maps compared to the derivation maps. Prospective retention metadata is
+never a replacement for either actual file before execution. Later removal
+requires a separate Root-authorized actual record, with earlier live refs intact.
+Actual configure/compile/derive recorder0/sourceguard and stream refs remain
+mandatory. Real before/current/protected counts and actual file identities are
+copied into the report; engine/science certification and gate updates are false.
+
+Exact old source bytes/diff and held helper/passive/freezer/PE primitive refs are
+retained. Header's helper/observer/ingress authorship limits this to source and
+provenance glue review, without independent certification of own formulas.
+No project/target import, binary read/hash, build, engine or result read occurred
+during preparation. All actual build/derivation/PE refs remain runtime supplied.

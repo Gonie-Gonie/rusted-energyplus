@@ -1,0 +1,279 @@
+"""Source text adaptation and metadata only; never imports project/target modules."""
+from pathlib import Path
+import ast
+import difflib
+import hashlib
+import json
+import re
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+COMBINED = ROOT / ".runtime/porting/CTF-06/combined-first-matrix-ingress-prep-01"
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(raw).hexdigest(),
+            "size_bytes": len(raw), "line_count": len(raw.splitlines())}
+
+
+def once(text, old, new):
+    assert text.count(old) == 1, old
+    return text.replace(old, new, 1)
+
+
+def namespace(text):
+    for old, new in [("ctf04_candidate_", "ctf06_candidate_"),
+                     ("ctf04-candidate-", "ctf06-candidate-"),
+                     ("ctf04-helper-cases.v1", "ctf06-helper-cases.v1"),
+                     ("ctf04-native-admission-contract.v1", "ctf06-native-admission-contract.v1"),
+                     ("ctf04-production-helper-cases.v1", "ctf06-production-helper-cases.v1"),
+                     ("ctf04-production-native-admission-contract.v1", "ctf06-production-native-admission-contract.v1"),
+                     ("frozen_before_this_CTF04_helper_execution", "frozen_before_this_CTF06_helper_execution"),
+                     ("actual frozen CTF04 production packet differs", "actual frozen CTF06 production packet differs")]:
+        text = text.replace(old, new)
+    return text
+
+
+METHOD_IMPORTS = r'''use ep_runtime::heat_balance::ctf_first_exponential_owner::{
+    ConstructionCtfFirstExponential, CtfFirstExponentialUnavailable,
+};
+use ep_runtime::heat_balance::ctf_first_inverse_owner::CtfFirstInverseUnavailable;
+use ep_runtime::heat_balance::ctf_first_matrix_owner::{
+    ConstructionCtfFirstInverseAfterExponential, PriorExponentialUnavailable,
+};
+use ep_runtime::heat_balance::surface_manager::ctf_exponential_matrix::CtfExponentialObservation;
+use ep_runtime::heat_balance::surface_manager::ctf_state_space_assembly::CtfAssemblyContext;
+'''
+
+METHOD_FIELDS = r'''fn matrix_values(source: &[f64]) -> Vec<Value> {
+    source.iter().copied().map(scalar).collect()
+}
+fn attempt_context(source: &CtfAssemblyContext) -> Value {
+    json!({"construction_id":source.construction_id.0,"route":format!("{:?}",source.route),
+        "SourceSinkPresent":source.source_sink_present,"SolutionDimensions":source.solution_dimensions,
+        "NodeSource":source.node_source,"NodeUserTemp":source.node_user_temp,
+        "attempt_ordinal":source.attempt_ordinal,"TimeStepZone":scalar(source.time_step_zone),
+        "CTFTimeStep":scalar(source.ctf_time_step),"NumHistories":source.num_histories})
+}
+fn original_assembly(source: Option<&ConstructionCtfFirstAssembly>) -> Value {
+    let Some(owner) = source else {
+        return json!({"owner_available":false,"snapshot":null,
+            "unavailable_reason":"matching original first assembly owner not supplied","counted_as_PASS":false});
+    };
+    match &owner.result {
+        Ok(CtfAssemblyObservation::Assembled(actual)) => json!({"owner_available":true,
+            "construction_id":owner.construction_id.0,"snapshot":{"rcmax":actual.rcmax,
+                "context":attempt_context(&actual.context),"AMat":matrix_values(&actual.a_mat),
+                "IdenMatrix":matrix_values(&actual.iden_matrix),
+                "actual_AMat_value_count":actual.a_mat.len(),"actual_IdenMatrix_value_count":actual.iden_matrix.len()},
+            "unavailable_reason":null,"storage_order":"source_i1_outer_i2_inner_row_first","counted_as_PASS":false}),
+        _ => json!({"owner_available":false,"construction_id":owner.construction_id.0,"snapshot":null,
+            "unavailable_reason":format!("{:?}",owner.result),"counted_as_PASS":false}),
+    }
+}
+pub(super) fn first_exponential(
+    source: &ConstructionCtfFirstExponential,
+    assembly: Option<&ConstructionCtfFirstAssembly>,
+) -> Value {
+    let (available, route, reason, snapshot) = match &source.result {
+        Err(reason) => {
+            let route = match reason {
+                CtfFirstExponentialUnavailable::FirstAssemblyUnavailable(_) => "FirstAssemblyUnavailable",
+                CtfFirstExponentialUnavailable::AssemblyUnavailable(_) => "AssemblyUnavailable",
+                CtfFirstExponentialUnavailable::ConstructionIdentityMismatch => "ConstructionIdentityMismatch",
+                CtfFirstExponentialUnavailable::AssemblyRouteMismatch => "AssemblyRouteMismatch",
+                CtfFirstExponentialUnavailable::NotFirstAttempt(_) => "NotFirstAttempt",
+                CtfFirstExponentialUnavailable::ExponentialScope(_) => "ExponentialScope",
+            };
+            (false, route, Some(format!("{reason:?}")), Value::Null)
+        }
+        Ok(CtfExponentialObservation::Unavailable(reason)) =>
+            (false, "ExponentialUnavailable", Some(format!("{reason:?}")), Value::Null),
+        Ok(CtfExponentialObservation::Exponential(actual)) => (true, "FirstExponentialReturned", None,
+            json!({"context":attempt_context(&actual.context),"rcmax":actual.rcmax,
+                "AMatRowNormMax":scalar(actual.a_mat_row_norm_max),"k":actual.k,
+                "fact":scalar(actual.fact),"CheckVal":scalar(actual.check_val),"l":actual.l,
+                "final_i":actual.final_power_i,
+                "PowerControl":actual.power_steps.iter().map(|event|json!({"i":event.i,"SigFigLimit":event.sig_fig_limit})).collect::<Vec<_>>(),
+                "SquareControl":actual.square_steps.iter().map(|event|json!({"isq":event.isq,"Backup":event.backup})).collect::<Vec<_>>(),
+                "actual_power_control_count":actual.power_steps.len(),"actual_square_control_count":actual.square_steps.len(),
+                "matrices":{"AExp":matrix_values(&actual.a_exp),"AMat1":matrix_values(&actual.a_mat1),
+                    "AMato":matrix_values(&actual.a_mato),"AMatN":matrix_values(&actual.a_mat_n)},
+                "actual_matrix_value_counts":{"AExp":actual.a_exp.len(),"AMat1":actual.a_mat1.len(),
+                    "AMato":actual.a_mato.len(),"AMatN":actual.a_mat_n.len()},
+                "storage_order":"source_i1_outer_i2_inner_row_first"})),
+    };
+    json!({"protocol":"ctf06-first-exponential.v1","construction_id":source.construction_id.0,
+        "owner_available":available,"selected_first_exponential_operands":available,
+        "actual_source_route":route,"unavailable_reason":reason,"snapshot":snapshot,
+        "actual_public_API":"initialize_construction_ctf_first_exponential",
+        "actual_public_API_invoked":true,"original_first_assembly":original_assembly(assembly),
+        "only_first_Rust_method_invocation_owned":true,"retry_driver_available":false,
+        "later_Native_method_visits_paired":false,"later_Native_method_visits_counted_as_PASS":false,
+        "Native_stage_callback_or_return_counts_inferred":false,
+        "observer_matrix_control_or_timestep_arithmetic_performed":false,"counted_as_PASS":false})
+}
+pub(super) fn first_inverse(
+    source: &ConstructionCtfFirstInverseAfterExponential,
+    assembly: Option<&ConstructionCtfFirstAssembly>,
+) -> Value {
+    let (invoked, available, route, reason, snapshot) = match &source.result {
+        Err(reason) => {
+            let route = match reason {
+                PriorExponentialUnavailable::Error(_) => "PriorExponentialError",
+                PriorExponentialUnavailable::Route(_) => "PriorExponentialRouteUnavailable",
+            };
+            (false, false, route, Some(format!("{reason:?}")), Value::Null)
+        }
+        Ok(owner) => match &owner.result {
+            Err(reason) => {
+                let route = match reason {
+                    CtfFirstInverseUnavailable::FirstAssemblyUnavailable(_) => "FirstAssemblyUnavailable",
+                    CtfFirstInverseUnavailable::AssemblyRouteUnavailable(_) => "AssemblyRouteUnavailable",
+                    CtfFirstInverseUnavailable::ConstructionIdentityMismatch => "ConstructionIdentityMismatch",
+                    CtfFirstInverseUnavailable::NonFirstAttempt(_) => "NonFirstAttempt",
+                    CtfFirstInverseUnavailable::AssemblyContext => "AssemblyContext",
+                    CtfFirstInverseUnavailable::InverseScope(_) => "InverseScope",
+                };
+                (true, false, route, Some(format!("{reason:?}")), Value::Null)
+            }
+            Ok(actual) => (true, true, "FirstInverseReturned", None,
+                json!({"actual_public_owner_construction_id":owner.construction_id.0,
+                    "context":attempt_context(&actual.context),"rcmax":actual.inverse.rcmax,
+                    "matrices":{"AInv":matrix_values(&actual.inverse.a_inv),"AMat1":matrix_values(&actual.inverse.a_mat1)},
+                    "actual_matrix_value_counts":{"AInv":actual.inverse.a_inv.len(),"AMat1":actual.inverse.a_mat1.len()},
+                    "storage_order":"source_i1_outer_i2_inner_row_first"})),
+        },
+    };
+    json!({"protocol":"ctf05-first-inverse-after-exponential.v1","construction_id":source.construction_id.0,
+        "owner_available":available,"selected_first_inverse_operands":available,
+        "actual_source_route":route,"unavailable_reason":reason,"snapshot":snapshot,
+        "actual_public_API":"initialize_construction_ctf_first_inverse","actual_public_API_invoked":invoked,
+        "not_invoked_after_prior_exponential_unavailable":!invoked,
+        "actual_orchestration_assembly_context":source.assembly_context.as_ref().map(attempt_context),
+        "actual_public_owner_construction_id":source.result.as_ref().ok().map(|owner|owner.construction_id.0),
+        "original_first_assembly":original_assembly(assembly),
+        "inverse_input_is_original_AMat_and_IdenMatrix":true,"AExp_supplied_as_inverse_input":false,
+        "only_first_Rust_method_invocation_owned":true,"retry_driver_available":false,
+        "later_Native_method_visits_paired":false,"later_Native_method_visits_counted_as_PASS":false,
+        "Native_stage_callback_or_return_counts_inferred":false,
+        "observer_inverse_or_timestep_arithmetic_performed":false,"counted_as_PASS":false})
+}
+
+'''
+
+PRODUCTION_FIELDS = r'''pub(super) fn ctf06_unavailable() -> Value {
+    json!({"owner_available":false,"construction_first_exponential":null,
+        "unavailable_reason":"initializer has not returned an actual HeatBalanceState owner","counted_as_PASS":false})
+}
+pub(super) fn ctf05_unavailable() -> Value {
+    json!({"owner_available":false,"construction_first_inverse":null,
+        "unavailable_reason":"initializer has not returned an actual HeatBalanceState owner","counted_as_PASS":false})
+}
+pub(super) fn ctf06_selected(source: &HeatBalanceState) -> Value {
+    json!({"owner_available":true,"construction_first_exponential":source.construction_ctf06_first_exponential.iter()
+        .enumerate().map(|(index,actual)| {
+            let assembly = source.construction_ctf04_first_assembly.iter()
+                .find(|owner|owner.construction_id == actual.construction_id);
+            json!({"state_vector_index":index,"construction_id":actual.construction_id.0,
+                "result":unit_fields::first_exponential(actual,assembly)})
+        }).collect::<Vec<_>>(),
+        "actual_owner_count":source.construction_ctf06_first_exponential.len(),
+        "preprocessing_initial_assembly_or_exponential_reexecuted_by_observer":false,
+        "actual_CTF06_then_CTF05_order_is_producer_owned":true,
+        "only_first_Rust_method_invocation_owned":true,"retry_driver_available":false,
+        "later_Native_method_visits_paired":false,"later_Native_method_visits_counted_as_PASS":false,
+        "Native_whole_solver_flags_unpaired":true,"numerical_PASS_claimed":false})
+}
+pub(super) fn ctf05_selected(source: &HeatBalanceState) -> Value {
+    json!({"owner_available":true,"construction_first_inverse":source.construction_ctf05_first_inverse.iter()
+        .enumerate().map(|(index,actual)| {
+            let assembly = source.construction_ctf04_first_assembly.iter()
+                .find(|owner|owner.construction_id == actual.construction_id);
+            json!({"state_vector_index":index,"construction_id":actual.construction_id.0,
+                "result":unit_fields::first_inverse(actual,assembly)})
+        }).collect::<Vec<_>>(),
+        "actual_owner_count":source.construction_ctf05_first_inverse.len(),
+        "preprocessing_initial_assembly_exponential_or_inverse_reexecuted_by_observer":false,
+        "actual_CTF06_then_CTF05_order_is_producer_owned":true,
+        "inverse_input_is_original_AMat_and_IdenMatrix":true,"AExp_supplied_as_inverse_input":false,
+        "only_first_Rust_method_invocation_owned":true,"retry_driver_available":false,
+        "later_Native_method_visits_paired":false,"later_Native_method_visits_counted_as_PASS":false,
+        "Native_whole_solver_flags_unpaired":true,"numerical_PASS_claimed":false})
+}
+
+'''
+
+ADDITIONAL_APIS = [
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs",
+]
+
+
+def main():
+    assert not (OUT / "manifest.json").exists(), "Held source preparation is immutable"
+    predecessor = {
+        "ctf06_candidate_unit_observer.rs": "crates/ep_run/examples/ctf04_candidate_unit_observer.rs",
+        "unit_fields.rs": "crates/ep_run/examples/ctf04_candidate_unit_support/fields.rs",
+        "ctf06_candidate_production_observer.rs": "crates/ep_run/examples/ctf04_candidate_production_observer.rs",
+        "production_fields.rs": "crates/ep_run/examples/ctf04_candidate_production_support/fields.rs",
+        "production_unit_fields.rs": "crates/ep_run/examples/ctf04_candidate_production_support/unit_fields.rs",
+    }
+    install = {name: path.replace("ctf04_candidate_", "ctf06_candidate_") for name, path in predecessor.items()}
+    sources = {name: namespace((ROOT / path).read_text(encoding="utf-8")) for name, path in predecessor.items()}
+    unit = sources["ctf06_candidate_unit_observer.rs"]
+    unit = once(unit, "use ep_runtime::heat_balance::ctf_initial_owner::initialize_construction_ctf_initial;",
+        "use ep_runtime::heat_balance::ctf_initial_owner::initialize_construction_ctf_initial;\nuse ep_runtime::heat_balance::ctf_first_matrix_owner::initialize_construction_ctf_first_matrix_functions;")
+    unit = once(unit, "        let first_assembly = initialize_construction_ctf_first_assembly(&initial, &preprocessing);",
+        "        let first_assembly = initialize_construction_ctf_first_assembly(&initial, &preprocessing);\n        let first_functions = initialize_construction_ctf_first_matrix_functions(&first_assembly);")
+    unit = once(unit, '            "preprocessing_or_initial_reexecuted_for_assembly_owner":false,',
+        '            "preprocessing_or_initial_reexecuted_for_assembly_owner":false,\n            "CTF06_first_exponential":fields::first_exponential(&first_functions.exponential,Some(&first_assembly)),\n            "CTF05_first_inverse":fields::first_inverse(&first_functions.inverse,Some(&first_assembly)),\n            "actual_Rust_combined_API":"initialize_construction_ctf_first_matrix_functions",\n            "actual_Rust_combined_API_invoked":true,\n            "predecessor_owners_reexecuted_for_method_observation":false,')
+    unit = once(unit, '        "actual_Rust_CTF04_API_invocations":calls,"Rust_retry_driver_available":false,',
+        '        "ctf06_exponential_observation_policy":request["ctf06_exponential_observation_policy"],\n        "ctf05_inverse_observation_policy":request["ctf05_inverse_observation_policy"],\n        "actual_Rust_combined_API_invocations":calls,\n        "actual_Rust_CTF04_API_invocations":calls,"Rust_retry_driver_available":false,')
+    unit = once(unit, '    bindings.extend(rows(&request["all_45_guard_refs"])?.iter().cloned());',
+        '    require(request["actual_scope_amendment_executions"] == admission["actual_scope_amendment_executions"], "both real card check mappings differ")?;\n    for card in ["CTF-05", "CTF-06"] {\n        bindings.push(request["actual_scope_amendment_executions"][card].clone());\n    }\n    bindings.extend(rows(&request["all_45_guard_refs"])?.iter().cloned());')
+    unit = once(unit, '        "actual_scope_amendment":request["actual_scope_amendment"],"actual_scope_amendment_execution":request["actual_scope_amendment_execution"],',
+        '        "actual_scope_amendment":request["actual_scope_amendment"],"actual_scope_amendment_execution":request["actual_scope_amendment_execution"],\n        "actual_scope_amendment_executions":request["actual_scope_amendment_executions"],\n        "actual_scope_amendment_execution_role":request["actual_scope_amendment_execution_role"],')
+    unit = unit.replace('"CTF04_through_CTF10_certified":false', '"CTF05_through_CTF10_certified":false')
+    sources["ctf06_candidate_unit_observer.rs"] = unit
+    fields = sources["unit_fields.rs"]
+    fields = once(fields, "use serde_json::{Value, json};", METHOD_IMPORTS + "use serde_json::{Value, json};")
+    fields = once(fields, "pub(super) const OBSERVER_PATHS", METHOD_FIELDS + "pub(super) const OBSERVER_PATHS")
+    append = ''.join('    "' + path + '",\n' for path in ADDITIONAL_APIS)
+    at = fields.index("];", fields.index("pub(super) const API_PATHS"))
+    fields = fields[:at] + append + fields[at:]
+    sources["unit_fields.rs"] = fields
+    sources["production_unit_fields.rs"] = fields
+    production = sources["ctf06_candidate_production_observer.rs"]
+    production = once(production, '        "selected_CTF04_owners":fields::ctf04_unavailable(),"Native_or_expected_values_read":false});',
+        '        "selected_CTF04_owners":fields::ctf04_unavailable(),\n        "selected_CTF06_owners":fields::ctf06_unavailable(),\n        "selected_CTF05_owners":fields::ctf05_unavailable(),"Native_or_expected_values_read":false});')
+    production = once(production, '            out["selected_CTF04_owners"] = fields::ctf04_selected(&state);',
+        '            out["selected_CTF04_owners"] = fields::ctf04_selected(&state);\n            out["selected_CTF06_owners"] = fields::ctf06_selected(&state);\n            out["selected_CTF05_owners"] = fields::ctf05_selected(&state);')
+    production = once(production, '    let native_cases = rows(&native["model_cases"])?;',
+        '    require(native["actual_scope_amendment_executions"] == admission["actual_scope_amendment_executions"], "both real card check mappings differ")?;\n    for card in ["CTF-05", "CTF-06"] {\n        bindings.push(native["actual_scope_amendment_executions"][card].clone());\n    }\n    let native_cases = rows(&native["model_cases"])?;')
+    production = once(production, '        "ctf04_matrix_observation_policy":native["ctf04_matrix_observation_policy"],',
+        '        "ctf04_matrix_observation_policy":native["ctf04_matrix_observation_policy"],\n        "ctf06_exponential_observation_policy":native["ctf06_exponential_observation_policy"],\n        "ctf05_inverse_observation_policy":native["ctf05_inverse_observation_policy"],\n        "actual_scope_amendment":native["actual_scope_amendment"],\n        "actual_scope_amendment_execution":native["actual_scope_amendment_execution"],\n        "actual_scope_amendment_executions":native["actual_scope_amendment_executions"],\n        "actual_scope_amendment_execution_role":native["actual_scope_amendment_execution_role"],')
+    production = production.replace('"CTF04_through_CTF10_certified":false', '"CTF05_through_CTF10_certified":false')
+    sources["ctf06_candidate_production_observer.rs"] = production
+    prodfields = sources["production_fields.rs"]
+    prodfields = once(prodfields, "pub(super) fn typed(", PRODUCTION_FIELDS + "pub(super) fn typed(")
+    at = prodfields.index("];", prodfields.index("pub(super) const API_PATHS"))
+    sources["production_fields.rs"] = prodfields[:at] + append + prodfields[at:]
+    (OUT / "before").mkdir(exist_ok=True)
+    for name, text in sources.items():
+        raw_before = (ROOT / predecessor[name]).read_bytes()
+        (OUT / "before" / name).write_bytes(raw_before)
+        (OUT / name).write_text(text, encoding="utf-8", newline="\n")
+        diff = ''.join(difflib.unified_diff(raw_before.decode().splitlines(keepends=True),
+            text.splitlines(keepends=True), fromfile=predecessor[name], tofile=install[name]))
+        (OUT / (name + ".from-04.diff")).write_text(diff, encoding="utf-8", newline="\n")
+    assert (OUT / "unit_fields.rs").read_bytes() == (OUT / "production_unit_fields.rs").read_bytes()
+    print(json.dumps({"source_files_written":len(sources),"project_imports_or_targets_executed":False}))
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,10 @@
+--- crates/ep_runtime/src/heat_balance/mod.rs
++++ proposed/crates/ep_runtime/src/heat_balance/mod.rs
+@@ -10,6 +10,7 @@
+ pub mod algorithm;
+ pub mod convection;
+ pub mod ctf;
++pub mod ctf_first_exponential_owner;
+ pub mod ctf_initial_owner;
+ pub(crate) mod id_slot_index;
+ pub mod initialization;

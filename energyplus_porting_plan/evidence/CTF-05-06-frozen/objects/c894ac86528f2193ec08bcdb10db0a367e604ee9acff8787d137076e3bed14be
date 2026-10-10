@@ -1,0 +1,87 @@
+// Pure copies of actual public members and the separately captured private locals.
+#ifndef CTF06_UNIT_FIELDS_HH
+#define CTF06_UNIT_FIELDS_HH
+#include "ctf01_reference_metadata.hh"
+#include "ctf06_observation_fields.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Material.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+
+namespace Ctf01 {
+namespace Observation = EnergyPlus::CTF06Observation;
+inline json snapshot(EnergyPlus::EnergyPlusData const &state, bool ErrorsFound, bool DoCTFErrorReport)
+{
+    json materials = json::array(), constructions = json::array();
+    for (int i = 1; i <= state.dataMaterial->materials.isize(); ++i) {
+        auto const *material = state.dataMaterial->materials(i);
+        require(material != nullptr, "Actual material owner is null");
+        materials.push_back({{"array_index", i}, {"Num", material->Num}, {"Name", material->Name},
+            {"group", static_cast<int>(material->group)}, {"Thickness", scalar(material->Thickness)},
+            {"Conductivity", scalar(material->Conductivity)}, {"Density", scalar(material->Density)},
+            {"SpecHeat", scalar(material->SpecHeat)}, {"Resistance", scalar(material->Resistance)}, {"ROnly", material->ROnly}});
+    }
+    for (int i = 1; i <= state.dataConstruction->Construct.isize(); ++i) {
+        auto const &construction = state.dataConstruction->Construct(i); json layers = json::array();
+        require(construction.TotLayers >= 0 && construction.TotLayers <= EnergyPlus::Construction::MaxLayersInConstruct,
+                "Actual construction active membership is outside admitted capacity");
+        for (int j = 1; j <= construction.TotLayers; ++j) layers.push_back(construction.LayerPoint(j));
+        constructions.push_back({{"array_index", i}, {"Name", construction.Name}, {"TotLayers", construction.TotLayers},
+            {"LayerPoint_active", layers}, {"IsUsedCTF", construction.IsUsedCTF}, {"SourceSinkPresent", construction.SourceSinkPresent},
+            {"SolutionDimensions", construction.SolutionDimensions}, {"SourceAfterLayer", construction.SourceAfterLayer},
+            {"TempAfterLayer", construction.TempAfterLayer}, {"ThicknessPerpend", scalar(construction.ThicknessPerpend)}});
+    }
+    return {{"TimeStepZone", scalar(state.dataGlobal->TimeStepZone)}, {"TimeStepZoneSec", scalar(state.dataGlobal->TimeStepZoneSec)},
+        {"ErrorsFound", ErrorsFound}, {"DoCTFErrorReport", DoCTFErrorReport}, {"materials", materials}, {"constructions", constructions},
+        {"TotalWarningErrors", state.dataErrTracking->TotalWarningErrors}, {"TotalSevereErrors", state.dataErrTracking->TotalSevereErrors},
+        {"CTF_coefficients_or_later_solver_storage_paired", false}};
+}
+inline json checkpoint(Observation::Snapshot const &source, std::size_t actual_count)
+{
+    if (!source.reached) return {{"reached", false}, {"available", false}, {"unavailable_reason", "callback_not_reached"},
+                                 {"actual_phase_callback_count", actual_count}, {"snapshot", nullptr}};
+    json layers = nullptr;
+    if (source.active_prefix_available) {
+        require(source.copied_layer_count <= source.active_prefix.size(), "Observer copied count exceeds its own output capacity");
+        layers = json::array();
+        for (std::size_t i = 0; i < source.copied_layer_count; ++i) {
+            auto const &layer = source.active_prefix[i];
+            layers.push_back({{"dl", scalar_bits(layer.dl.bits)}, {"rk", scalar_bits(layer.rk.bits)},
+                {"rho", scalar_bits(layer.rho.bits)}, {"cp", scalar_bits(layer.cp.bits)},
+                {"lr", scalar_bits(layer.lr.bits)}, {"ResLayer", layer.ResLayer}});
+        }
+    }
+    auto const optional_scalar = [](std::optional<Observation::Binary64Copy> const &value) -> json {
+        return value.has_value() ? scalar_bits(value->bits) : json(nullptr);
+    };
+    return {{"reached", true}, {"available", source.active_prefix_available},
+        {"unavailable_reason", source.active_prefix_available ? json(nullptr) : json("observer_active_prefix_invalid")},
+        {"actual_phase_callback_count", actual_count}, {"snapshot", {
+            {"LayersInConstruct", source.LayersInConstruct}, {"NumResLayers", source.NumResLayers},
+            {"ErrorsFound", source.ErrorsFound}, {"DoCTFErrorReport", source.DoCTFErrorReport},
+            {"active_prefix_available", source.active_prefix_available}, {"copied_layer_count", source.copied_layer_count}, {"active_prefix", layers},
+            {"dyn", optional_scalar(source.dyn)}, {"rs", optional_scalar(source.rs)}, {"cnd", optional_scalar(source.cnd)}}}};
+}
+inline bool observer_failed(Observation::Capture const &capture)
+{
+    return capture.binding_error || capture.identity_mismatch || capture.duplicate_phase ||
+           capture.phase_order_invalid || capture.active_prefix_invalid || matrix_observer_failed(capture) || methods_observer_failed(capture);
+}
+inline json observations(Observation::Capture const &capture)
+{
+    return {{"PostLoad", checkpoint(capture.phases[0], capture.actual_phase_callback_counts[0])},
+        {"PostMerge", checkpoint(capture.phases[1], capture.actual_phase_callback_counts[1])},
+        {"PostConversion", checkpoint(capture.phases[2], capture.actual_phase_callback_counts[2])},
+        {"InitialDiscretization", initial_checkpoint(capture.initial_discretization, capture.actual_phase_callback_counts[3])},
+        {"MatrixAssembly", matrix_observations(capture)},
+        {"Exponential", method_observations(capture.exponential, Observation::MethodKind::Exponential)},
+        {"Inverse", method_observations(capture.inverse, Observation::MethodKind::Inverse)},
+        {"actual_callback_count", capture.actual_callback_count}, {"observer_failure", observer_failed(capture)},
+        {"binding_error", capture.binding_error}, {"identity_mismatch", capture.identity_mismatch},
+        {"duplicate_phase", capture.duplicate_phase}, {"phase_order_invalid", capture.phase_order_invalid},
+        {"active_prefix_invalid", capture.active_prefix_invalid}, {"unused_fixed_array_tail_emitted", false}};
+}
+} // namespace Ctf01
+#endif

@@ -1,0 +1,50 @@
+"""Preserve inverse proposal01 and make test-only error conversion explicit."""
+from pathlib import Path
+import ast, copy, difflib, hashlib, json, shutil
+ROOT=Path(__file__).resolve().parents[4]
+OUT=Path(__file__).resolve().parent
+OLD=ROOT/".runtime/porting/CTF-05/cache-ingress-prep-01"
+assert not (OUT/"manifest.json").exists(), "Held version is immutable"
+
+def ref(path):
+    b=path.read_bytes()
+    return {"path":path.relative_to(ROOT).as_posix(),"sha256":hashlib.sha256(b).hexdigest(),
+            "size_bytes":len(b),"line_count":len(b.splitlines())}
+
+assert ref(OLD/"manifest.json")["sha256"]=="0ade98a552c4e8539dd2d536afb6bb92b28c67e52fe5bc2ed398220eb8d120da"
+m=copy.deepcopy(json.loads((OLD/"manifest.json").read_text(encoding="utf-8")))
+for name in ["before","proposed","new"]:shutil.copytree(OLD/name,OUT/name)
+for p in OLD.glob("*.diff"):(OUT/p.name).write_bytes(p.read_bytes())
+test=OUT/"new/ctf_first_inverse_owner_tests.rs"
+old=test.read_text(encoding="utf-8")
+needle="    }, context)?;"
+assert old.count(needle)==1
+new=old.replace(needle,"    }, context).map_err(|error| std::io::Error::other(format!(\"{error:?}\")))?;",1)
+test.write_text(new,encoding="utf-8",newline="\n")
+patch=OUT/"ctf_first_inverse_owner_tests.rs.new.diff"
+patch.write_text("".join(difflib.unified_diff([],new.splitlines(True),fromfile="/dev/null",
+    tofile="crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner_tests.rs")),encoding="utf-8",newline="\n")
+delta=OUT/"ctf_first_inverse_owner_tests.rs.from-01.diff"
+delta.write_text("".join(difflib.unified_diff(old.splitlines(True),new.splitlines(True),
+    fromfile=ref(OLD/"new/ctf_first_inverse_owner_tests.rs")["path"],tofile=test.relative_to(ROOT).as_posix())),encoding="utf-8",newline="\n")
+oldprefix=OLD.relative_to(ROOT).as_posix()+"/"
+newprefix=OUT.relative_to(ROOT).as_posix()+"/"
+def rebind(v):
+    if isinstance(v,dict):
+        if isinstance(v.get("path"),str) and v["path"].startswith(oldprefix):
+            p=ROOT/(newprefix+v["path"][len(oldprefix):])
+            if p.is_file():v.update(ref(p))
+        for x in v.values():rebind(x)
+    elif isinstance(v,list):
+        for x in v:rebind(x)
+rebind(m)
+readme=(OLD/"README.md").read_text(encoding="utf-8")+"\nFresh02 preserves01 unexecuted. Source self-review found the pure assembly\nshape error has no std::error::Error implementation. Its fixture-only conversion\nto std::io::Error is now explicit before `?`; no owner/API/math/production code\nchanges, no compiler invocation or actual failure is inferred.\n"
+(OUT/"README.md").write_text(readme,encoding="utf-8",newline="\n")
+m["README"]=ref(OUT/"README.md")
+m["preparation_source"]=ref(Path(__file__).resolve())
+m["predecessor_preparation"]=ref(OLD/"manifest.json")
+m["test_error_conversion_from01_diff"]=ref(delta)
+m["only_from01_behavior_change"]="fixture-only explicit error type conversion; owner and all production sources unchanged"
+(OUT/"manifest.json").write_text(json.dumps(m,indent=2)+"\n",encoding="utf-8",newline="\n")
+ast.parse(Path(__file__).read_text(encoding="utf-8"))
+print(json.dumps({"manifest":ref(OUT/"manifest.json"),"module":ref(OUT/"new/ctf_first_inverse_owner.rs"),"tests":ref(test),"delta":ref(delta)}))

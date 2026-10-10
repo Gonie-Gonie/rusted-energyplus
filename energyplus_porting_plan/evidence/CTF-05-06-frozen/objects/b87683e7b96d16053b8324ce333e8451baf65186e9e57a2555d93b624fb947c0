@@ -1,0 +1,94 @@
+# Combined first CTF06 exponential and CTF05 inverse comparison
+
+SOURCE-READY HELD source proposal, unexecuted. These are the same two existing
+unit/production comparer invocations adapted from accepted CTF04. Root supplies
+genuine runtime bindings and executes only after full source review. There is
+no extra SourceQA, launcher, build, freeze, comparison or approval stage.
+
+Own sources are the two lane mains, packet_io.py, method_compare.py and the
+byte-exact method_shape.py copied from final OriginalDataQA06 prep02. Each actual
+lane archives its main and all three executed supports. The final QA02 source
+manifest and all five genuine executed QA lane archives must match. This source
+reuse is structural validation, not an additional executed QA stage.
+
+Both main CLIs retain --approved-source-sha256, --original-data-review,
+--original-data-review-execution, --Rust-build-execution, --Rust-execution,
+--Rust-results and --output-dir. Production additionally retains
+--conversion-ledger and --conversion-execution. File arguments are mandatory
+actual path#SHA256 bindings; the approved source SHA is the executed lane main.
+Output must be a fresh contained CTF06 directory. No future identities are guessed.
+
+Genuine preceding OriginalDataQA0/full stdout/empty stderr, complete Native
+observations, actual freeze six-DAG, strict PE/native/passive/freezer source
+inventories and actual executed source copies are authenticated. Both real scope
+check refs, both current cards and the plan/before/after scope documents remain
+mandatory. The singular execution is exactly the genuine CTF06 check with its
+explicit role; it never stands for both checks or a document writer. Both check
+commands must precede the fresh freeze. No old scope check is relabeled.
+
+Actual Rust Cargo artifact capture, full source snapshot, compiled binary SHA,
+run source snapshot, exact example/manifest/argv, full Rust stdout and empty stderr
+are authenticated. Unit own2/API19 and production own3/API32 path inventories
+match the accepted observer. Their post-format SHA values are runtime supplied
+and must match the actual Cargo source archives. Unit still consumes only the
+original39 models/42 calls; production uses the same ordered fixed15 inputs and
+six genuine input-only conversion proof refs per model. Native outputs, expected
+values, flags, retries and coefficients are never supplied to Rust.
+
+The accepted Comparison.number, DTO/class/bits/error calculation, report and
+inherited owner comparison bodies remain AST-identical. The only metric setup
+addition is nine distinct new method keys. Old preprocessing18 and initial3 stay
+separate handoffs; the old assembly7 metrics move to assembly_handoff_metrics.
+Fresh metrics are CTF06.AExp, CTF06.final_AMat1, CTF06.final_AMato,
+CTF06.final_AMatN, CTF06.AMatRowNormMax, CTF06.fact, CTF06.CheckVal,
+CTF05.AInv and CTF05.final_AMat1. Each preserves its frozen exact zero absolute
+and relative tolerance, class, signed-zero and shape policy. Matrix shape is the
+actual rcmax square. No tolerance, arithmetic evaluator or matrix answer is added.
+
+Every actual Native exponential and inverse invocation, stage, power/square event,
+typed control, return, failure, omitted count and assembly association is validated
+by the exact shared structural reader. Its recomputed record counts must equal
+the genuine DataQA and Native global ledgers. Copy/shape/order/association/identity
+failure, omitted or missing control events, duplicate/gapped ordinals and invalid
+source-return markers cannot be treated as optional observations. All later visits
+remain retained and summarized as unpaired context/noPASS; no arbitrary cap is used.
+
+Only actual first method invocation1 associated with first assembly1 in selected
+no-source1D context is paired. Actual initial619 timestep/history association is
+retained; no initial timestep equals caller timestep assumption is added. Original
+AMat and source-produced IdenMatrix are checked against the same Rust assembly
+handoff and Native method entry. Inverse never consumes AExp. Actual exponential
+return precedes inverse entry in the same bound whole call. Rust inverse public
+invocation is checked against the genuine preceding exponential owner; a prior
+error retains the typed inverse non-invocation and null snapshot.
+
+New selected numeric operands compare actual final method workspace/control
+owners. Actual returned AExp/AInv copies must preserve the copied final owner.
+Every actual first power/square control event and k/l/final_i is compared directly;
+final_i is never interpreted as an event count. Native initialized/scaling workspace
+copies and later visits remain validated context where Rust exposes no matching
+owner. They are not silently labeled cross-engine numeric PASS.
+
+Missing selected owners on one or both sides fail required availability; observed
+required nonfinite values retain class/bits and receive no numerical PASS. Genuine
+whole-source uninvoked/stopped and unselected routes remain explicit unknown/noPASS.
+No Native invocation, phase, zero buffer or return is invented. Partial source stops
+do not imply method returns. Old whole-method flags, later coefficients and retries
+remain unpaired. Missing Rust route records themselves are required failures.
+
+Only scientific Native/Rust observation files and actual Rust stdout use the
+prospectively approved 1GiB physical bound. Metadata JSON remains16MB and source
+files retain64MB bounds. All bound observations are rehashed at final recheck;
+none are truncated, sampled or silently omitted. Source preparation reads no
+scientific observations or binaries. Future actual comparison parses both complete
+operand files, ordinary metadata and any mismatch samples it writes truthfully.
+
+Reports are ctf06-unit-comparison.v1 / ctf06-production-comparison.v1 with selected
+pass/fail statuses for first exponential and inverse. They retain exact direct
+proof refs, actual owner/count ledgers, separate handoffs, nine metrics and bounded
+actual mismatch samples. All whole CTF04/05/06, retries, coefficient/CLI integration
+and gate-completion claims remain false. Raw authored parts of pure/Native/owner
+glue, Base the Rust transport and Header DataQA: this source adaptation does not
+independently certify its author's formulas. Root and another author fully review
+these exact sources before actual use. No targets/imports/engines/builds/Cargo,
+formatter, canonical writes, Git, weather, scientific or binary reads occurred.

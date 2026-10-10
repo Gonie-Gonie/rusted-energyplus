@@ -1,0 +1,106 @@
+use super::*;
+use crate::heat_balance::ctf_initial_owner::CtfInitialUnavailable;
+use crate::heat_balance::surface_manager::ctf_layer_preprocessing::CtfNormalizedLayer;
+use crate::heat_balance::surface_manager::ctf_state_space_assembly::{
+    CtfAssemblyInput, assemble_1d_ctf_state_space,
+};
+
+type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
+
+fn assembly_owner() -> TestResult<ConstructionCtfFirstAssembly> {
+    let layers = [CtfNormalizedLayer {
+        dl: 0.5, rk: 0.25, rho: 1.0, cp: 1.0, lr: 2.0, res_layer: false,
+    }];
+    let context = CtfAssemblyContext {
+        construction_id: ConstructionId(7), route: CtfAssemblyRoute::Assemble,
+        solution_dimensions: 1, source_sink_present: false, node_source: 0, node_user_temp: 0,
+        attempt_ordinal: 1, time_step_zone: 0.25, ctf_time_step: 0.5, num_histories: 2,
+    };
+    let result = assemble_1d_ctf_state_space(CtfAssemblyInput {
+        layers: &layers, nodes: &[6], dx: &[0.1], rcmax: 5,
+    }, context).map_err(|error| std::io::Error::other(format!("{error:?}")))?;
+    Ok(ConstructionCtfFirstAssembly { construction_id: context.construction_id, result: Ok(result) })
+}
+
+fn matrix_mut(owner: &mut ConstructionCtfFirstAssembly)
+    -> TestResult<&mut super::super::surface_manager::ctf_state_space_assembly::CtfStateSpaceAssembly>
+{
+    match owner.result.as_mut().map_err(|reason| *reason)? {
+        CtfAssemblyObservation::Assembled(actual) => Ok(actual),
+        CtfAssemblyObservation::Unavailable(_) => Err(std::io::Error::other("test actual assembly unavailable").into()),
+    }
+}
+
+#[test]
+fn direct_inverse_keeps_actual_context_and_readonly_inputs() -> TestResult {
+    let assembly = assembly_owner()?;
+    let before = assembly.clone();
+    let result = initialize_construction_ctf_first_inverse(&assembly);
+    let actual = result.result?;
+    let CtfAssemblyObservation::Assembled(source) = assembly.result.as_ref().map_err(|reason| *reason)? else {
+        return Err(std::io::Error::other("test selected assembly unavailable").into());
+    };
+    assert_eq!(assembly, before);
+    assert_eq!(result.construction_id, source.context.construction_id);
+    assert_eq!(actual.context, source.context);
+    assert_eq!(actual.inverse.rcmax, source.rcmax);
+    assert_eq!(actual.inverse.a_mat1.len(), source.a_mat.len());
+    assert_eq!(actual.inverse.a_inv.len(), source.iden_matrix.len());
+    assert_ne!(actual.context.time_step_zone.to_bits(), actual.context.ctf_time_step.to_bits());
+    Ok(())
+}
+
+#[test]
+fn actual_unavailable_prerequisites_remain_distinct() {
+    let reason = CtfFirstAssemblyUnavailable::InitialUnavailable(CtfInitialUnavailable::UnusedConstruction);
+    let owner = ConstructionCtfFirstAssembly { construction_id: ConstructionId(4), result: Err(reason) };
+    assert_eq!(initialize_construction_ctf_first_inverse(&owner).result,
+        Err(CtfFirstInverseUnavailable::FirstAssemblyUnavailable(reason)));
+    for route in [CtfAssemblyUnavailable::UnusedConstruction, CtfAssemblyUnavailable::LoadingError,
+        CtfAssemblyUnavailable::AllResistive, CtfAssemblyUnavailable::ReversedConstructionReuse]
+    {
+        let owner = ConstructionCtfFirstAssembly { construction_id: ConstructionId(4),
+            result: Ok(CtfAssemblyObservation::Unavailable(route)) };
+        assert_eq!(initialize_construction_ctf_first_inverse(&owner).result,
+            Err(CtfFirstInverseUnavailable::AssemblyRouteUnavailable(route)));
+    }
+}
+
+#[test]
+fn stale_identity_later_attempt_and_wrong_context_are_rejected() -> TestResult {
+    let mut owner = assembly_owner()?;
+    owner.construction_id = ConstructionId(8);
+    assert_eq!(initialize_construction_ctf_first_inverse(&owner).result,
+        Err(CtfFirstInverseUnavailable::ConstructionIdentityMismatch));
+    owner.construction_id = ConstructionId(7);
+    matrix_mut(&mut owner)?.context.attempt_ordinal = 2;
+    assert_eq!(initialize_construction_ctf_first_inverse(&owner).result,
+        Err(CtfFirstInverseUnavailable::NonFirstAttempt(2)));
+    matrix_mut(&mut owner)?.context.attempt_ordinal = 1;
+    matrix_mut(&mut owner)?.context.node_user_temp = 1;
+    assert_eq!(initialize_construction_ctf_first_inverse(&owner).result,
+        Err(CtfFirstInverseUnavailable::AssemblyContext));
+    Ok(())
+}
+
+#[test]
+fn actual_identity_shape_failure_is_not_reconstructed() -> TestResult {
+    let mut owner = assembly_owner()?;
+    matrix_mut(&mut owner)?.iden_matrix.pop();
+    let before = owner.clone();
+    assert_eq!(initialize_construction_ctf_first_inverse(&owner).result,
+        Err(CtfFirstInverseUnavailable::InverseScope(CtfInverseScopeError::MatrixShape)));
+    assert_eq!(owner, before);
+    Ok(())
+}
+
+#[test]
+fn inverse_nonfinite_arithmetic_is_retained_without_fallback() -> TestResult {
+    let mut owner = assembly_owner()?;
+    matrix_mut(&mut owner)?.a_mat.fill(0.0);
+    let before = owner.clone();
+    let actual = initialize_construction_ctf_first_inverse(&owner).result?;
+    assert!(actual.inverse.a_inv.iter().any(|value| !value.is_finite()));
+    assert_eq!(owner, before);
+    Ok(())
+}

@@ -1,0 +1,506 @@
+{
+  "schema": "ctf05-ctf06-combined-native-observation-readiness.v1",
+  "status": "SOURCE-READY-HELD",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "README": {
+    "path": ".runtime/porting/CTF-05/combined-native-observation-readiness-prep-01/README.md",
+    "sha256": "6d36da5b1ac8cc406d5968efa11c4a379a300ec351dfa254ed9cab55aedcc328",
+    "size_bytes": 8785,
+    "line_count": 122
+  },
+  "source_refs": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+      "size_bytes": 110319,
+      "line_count": 2115
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "sha256": "53a14b2a45860255267e6ebf780a50fc8aefc4ba30ae3df589062601a20f999a",
+      "size_bytes": 24041,
+      "line_count": 383
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobalConstants.hh",
+      "sha256": "611963e974f18a83f81401aaeef2ff5393948d04d33421b1036fbcde35356cb3",
+      "size_bytes": 35280,
+      "line_count": 628
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/api/TypeDefs.h",
+      "sha256": "8fff8cf997e09d396357b0b63762ec7f532490b7ae0d1a3d0395359e627e5a32",
+      "size_bytes": 3809,
+      "line_count": 69
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "sha256": "36756879c587a6248ab8ccfd3ebf6d9ad34572f66ce9c874fc4973b3c070ef5c",
+      "size_bytes": 27600,
+      "line_count": 1330
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "sha256": "9228be3483674ab79ea9faafffb20f5d26eecbd857d32a0c3e3d95e8247233a5",
+      "size_bytes": 22000,
+      "line_count": 1060
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CTF-05.md",
+      "sha256": "07feb3acadd06b6829fe7c2976a196fb859105c39a4c41259c67bdf021a9e9d1",
+      "size_bytes": 2627,
+      "line_count": 70
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CTF-06.md",
+      "sha256": "0946a82d6c904e564dc4d11ddb862ded60a055013f144371dd6637bce83368ab",
+      "size_bytes": 2659,
+      "line_count": 70
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-observer-prep-01/manifest.json",
+      "sha256": "58ce415e5353e12e491815cd243c19f74b2164b694d857ef0da68527c035dbe3",
+      "size_bytes": 13066,
+      "line_count": 344
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-observer-prep-01/ctf04_observer.hh",
+      "sha256": "4c085e27ca9468116a79a58fdd602620cf0b608cd6e30fce2c7cdd78357f315a",
+      "size_bytes": 8597,
+      "line_count": 243
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-observer-prep-01/ctf04_observer.cc",
+      "sha256": "1c96fbf50b1c857564bc5f53b1126a1a520abf46987526b1e1c3634ea0927fb7",
+      "size_bytes": 16100,
+      "line_count": 353
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-observer-prep-01/Construction.ctf04.cc",
+      "sha256": "9aacacbdb506c8460a404e8dd8bc1d8a311e28199a5346463dff81efc31253d8",
+      "size_bytes": 111430,
+      "line_count": 2128
+    },
+    {
+      "path": ".runtime/porting/CTF-05/native-observation-readiness-prep-01/manifest.json",
+      "sha256": "3e759f1eedfa26ace2d2536cd5aa3a711d340f5efe0f195fddac974c62a5eb48",
+      "size_bytes": 11102,
+      "line_count": 295
+    },
+    {
+      "path": ".runtime/porting/CTF-05/native-observation-readiness-prep-01/README.md",
+      "sha256": "6f4650c088204866f4585a912b7a95d56c76e793150fcccd8351df9a6e617127",
+      "size_bytes": 5280,
+      "line_count": 79
+    },
+    {
+      "path": ".runtime/porting/CTF-05/rust-inverse-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+      "sha256": "8d828b9d33c9054a2fc1bafc4ccfc01e892562f5e3689b139d28cbd0f06185b1",
+      "size_bytes": 3646,
+      "line_count": 106
+    },
+    {
+      "path": ".runtime/porting/CTF-06/rust-exponential-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+      "sha256": "0dd184b702ee9b2541b0454b81b6d4750f9bd3fafd387d7ec957d5cbaf6e8680",
+      "size_bytes": 9748,
+      "line_count": 262
+    },
+    {
+      "path": ".runtime/porting/CTF-06/rust-exponential-prep-01/manifest.json",
+      "sha256": "66271239f508e0e9a87b47c04c4a0c875aa2449ed672e5b81777a30bb178c0d2",
+      "size_bytes": 16822,
+      "line_count": 421
+    },
+    {
+      "path": ".runtime/porting/CTF-06/readiness-audit-01/manifest.json",
+      "sha256": "636567db508919f689eec6b785e0362bf34fd68e7e23f7c5f39db9f53da5c535",
+      "size_bytes": 11753,
+      "line_count": 315
+    },
+    {
+      "path": ".runtime/porting/CTF-06/readiness-audit-01/audit.json",
+      "sha256": "dff6319742bc9b52942e77524a04a7c7628e3b7f8096f29102043d6608e6ce83",
+      "size_bytes": 8381,
+      "line_count": 117
+    }
+  ],
+  "primary_source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 163,
+      "end_line": 175,
+      "sha256": "353a669844af4edb17a40c0766fa7befe24c5e2b8d8b1517660e0683f54de42a",
+      "size_bytes": 1109,
+      "purpose": "unused early return and local allocation"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 309,
+      "end_line": 315,
+      "sha256": "c0ef7b215a45debf5cebc018d34c41e15aee19b3bba9b28061d4918508ffe250",
+      "size_bytes": 125,
+      "purpose": "loading-error return"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 405,
+      "end_line": 488,
+      "sha256": "0e1afe7ee76a77ab895896493d489c149d2d0a30c198b7788d52be64ccceaead",
+      "size_bytes": 3900,
+      "purpose": "massive/reversed-construction route before selected discretization"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 601,
+      "end_line": 619,
+      "sha256": "dcc064447f5f4bcf3a66f9b690fcf10a2f0bc29c18dce810e0cb1a1c8da8faee",
+      "size_bytes": 828,
+      "purpose": "actual initial dt/history/selector state"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 638,
+      "end_line": 660,
+      "sha256": "120b65bbbaae943857900edc9981e3dd803308a2e2909559e94f12372ba2d534",
+      "size_bytes": 884,
+      "purpose": "actual identity and matrix allocation once before attempt loop"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 875,
+      "end_line": 894,
+      "sha256": "834de83ff09c5196ebd62bf19899e97b70d885a9b2b28442e87eba528b155b48",
+      "size_bytes": 1236,
+      "purpose": "actual exponential then inverse then Gamma/final call order"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 908,
+      "end_line": 978,
+      "sha256": "da6250e06b80226711152ea5e5a758498299549cd5458d7b02da242c76a7172a",
+      "size_bytes": 5468,
+      "purpose": "retry dt/history and actual fatal/error-break states"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 985,
+      "end_line": 1018,
+      "sha256": "aa72f15cef760f0fc228c55ed4a6cbcbc55538b6fb068dc4f164ac533bf06812",
+      "size_bytes": 1372,
+      "purpose": "unselected all-resistive branch"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1079,
+      "end_line": 1103,
+      "sha256": "827ee8c55bface38c49b866d98c25b83d58877dbcbba8b4579e01ba90e65b9bc",
+      "size_bytes": 580,
+      "purpose": "whole-method matrix cleanup"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1105,
+      "end_line": 1373,
+      "sha256": "e2f3f6b271807011ed343e44549bb90202e4c9bf9e0143cf99a1f01fd3c82bdd",
+      "size_bytes": 13237,
+      "purpose": "full genuine exponential method"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1179,
+      "end_line": 1190,
+      "sha256": "10bfa99d25262907a058c0db8f3e3756e0914d52dde44252b5594e91152b59c2",
+      "size_bytes": 400,
+      "purpose": "actual exponential local allocation and initialization"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1201,
+      "end_line": 1251,
+      "sha256": "2a9092cf8c8313d1a88884e76d516e2a2fc6885ad668e9ece84036ee0fd4bc6f",
+      "size_bytes": 2473,
+      "purpose": "actual norm/scaling/control ownership"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1255,
+      "end_line": 1271,
+      "sha256": "27f473aa7507097e33b85e2d93842c6c84a39707f160cd9eb52765204eb437af",
+      "size_bytes": 804,
+      "purpose": "actual expansion initialization and loop-scoped flag"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1296,
+      "end_line": 1338,
+      "sha256": "445ab2514350ebd3180adb94121a85c65d9e51cd7f3af30bfffc832a9c367c7d",
+      "size_bytes": 2128,
+      "purpose": "actual significance result before sentinel i mutation"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1344,
+      "end_line": 1368,
+      "sha256": "3df7fe45341af7b06aa78be033a55263c30485bca9c1f3a5eeac0b9cfb189103",
+      "size_bytes": 992,
+      "purpose": "actual squaring flag before restore/break"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1370,
+      "end_line": 1373,
+      "sha256": "46b6ff8c8ac88bee81a54f6f222492c373964c566c8098d085cbe48d5e6da430",
+      "size_bytes": 74,
+      "purpose": "exponential private workspace deallocation"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1375,
+      "end_line": 1494,
+      "sha256": "f1c13d8e66759602566fc1b4e2492e896198bd57a1b8e8399f70ea41434f5b01",
+      "size_bytes": 5093,
+      "purpose": "full genuine inverse method"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1401,
+      "end_line": 1407,
+      "sha256": "09360beb39222159feb70afa6bb235b71b3d4fd14e0ff75436ab4280649d6316",
+      "size_bytes": 319,
+      "purpose": "inverse actual local/input-output initialization"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1481,
+      "end_line": 1494,
+      "sha256": "d42479d550d536d35222ac9acea5236b2a8c21bbdfe36f8ed937c29f2186d1f5",
+      "size_bytes": 513,
+      "purpose": "inverse final private workspace before deallocation"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1529,
+      "end_line": 1545,
+      "sha256": "ba074f23ed01be098bf4310eeb3c41b164c142f65c7f2dd20ca60b19f4f0195f",
+      "size_bytes": 838,
+      "purpose": "actual Gamma consumers establish excluded downstream handoff"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "start_line": 304,
+      "end_line": 342,
+      "sha256": "fbcb4d693cf6124c674cc4e4c9673e0319674407efe9d937bc330c14f73c3779",
+      "size_bytes": 2495,
+      "purpose": "actual method fields/declarations"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobalConstants.hh",
+      "start_line": 602,
+      "end_line": 610,
+      "sha256": "c26a8ef59ad7304743d9d93aaddec49134deeb894a8e8248485974928a368c2d",
+      "size_bytes": 814,
+      "purpose": "source rTinyValue epsilon"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/api/TypeDefs.h",
+      "start_line": 48,
+      "end_line": 56,
+      "sha256": "0182f92d878318b23c6bcfd5819cf646aee4814523c8d031faa37b9f3a90e210",
+      "size_bytes": 303,
+      "purpose": "source Real64 double"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "start_line": 89,
+      "end_line": 97,
+      "sha256": "0f2722804f7dc14268d18ac1cf47d38ea5296fcf80d6c9023845c9c78ecfdaa9",
+      "size_bytes": 110,
+      "purpose": "ordered double min"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "start_line": 337,
+      "end_line": 345,
+      "sha256": "fa4ed24f38c68362a29a0adb5267cdd0b5e50d4688715127c65a05e5f18fa7be",
+      "size_bytes": 110,
+      "purpose": "ordered double max"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "start_line": 608,
+      "end_line": 627,
+      "sha256": "1727f748bc0637972234a9a438bd7a6560733de8113c0616d78dcbd432fc3e58",
+      "size_bytes": 389,
+      "purpose": "actual row-first contiguous second index"
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-observer-prep-01/ctf04_observer.hh",
+      "start_line": 174,
+      "end_line": 201,
+      "sha256": "68144923d93081e59964e18d547f14c30c50548fccc287a68a8218fccd3a4ed4",
+      "size_bytes": 1182,
+      "purpose": "old four checkpoints and independent matrix attempt ledger"
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-observer-prep-01/ctf04_observer.cc",
+      "start_line": 75,
+      "end_line": 102,
+      "sha256": "cd89673844d9677aa08b2e10bc50cb7fb8772156a1f79821334eb35f0e024d48",
+      "size_bytes": 663,
+      "purpose": "actual bound Capture lifetime"
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-observer-prep-01/ctf04_observer.cc",
+      "start_line": 234,
+      "end_line": 351,
+      "sha256": "baf4acbde3f314be1429a73bd9c6b056c4912b682a1fd6b6ec94ee23cfd17705",
+      "size_bytes": 6426,
+      "purpose": "actual assembly ordinal/failure ledger and owner copies"
+    },
+    {
+      "path": ".runtime/porting/CTF-06/rust-exponential-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+      "start_line": 39,
+      "end_line": 88,
+      "sha256": "2eb6dad68f85f46482b7b6a3e4f7b9d2f514019201d3a4a26d62eca9f4ef83cb",
+      "size_bytes": 2112,
+      "purpose": "held pure06 actual returned control/workspace owners"
+    }
+  ],
+  "scope": {
+    "exponential_whole_method": [
+      1105,
+      1373
+    ],
+    "inverse_whole_method": [
+      1375,
+      1494
+    ],
+    "existing_CTF04_passive_source_unchanged": true,
+    "native_call_order": [
+      "actual_assembly",
+      "calculateExponentialMatrix:884",
+      "calculateInverseMatrix:887",
+      "calculateGammas:890"
+    ],
+    "same_original_AMat_and_actual_IdenMatrix": true,
+    "exponential_result_is_not_inverse_input": true,
+    "first_selected_actual_assembly_ordinal": 1,
+    "first_method_invocation_ordinal": 1,
+    "later_visits_observed_context_unpaired_noPASS": true,
+    "actual_initial619_and_retry_current_context_distinct": true
+  },
+  "prospective_exponential_boundaries": [
+    {
+      "kind": "entry",
+      "before_original_line": 1179,
+      "local_work_available": false
+    },
+    {
+      "kind": "initialized_inputs",
+      "after_original_line": 1190
+    },
+    {
+      "kind": "scaling_controls",
+      "after_original_line": 1251
+    },
+    {
+      "kind": "power_control",
+      "after_original_line": 1327,
+      "before_original_line": 1333,
+      "actual_fields": [
+        "i",
+        "SigFigLimit"
+      ]
+    },
+    {
+      "kind": "square_control",
+      "after_original_line": 1361,
+      "before_original_line": 1363,
+      "actual_fields": [
+        "isq",
+        "Backup"
+      ]
+    },
+    {
+      "kind": "final_private_workspace",
+      "after_original_line": 1368,
+      "before_original_line": 1370
+    },
+    {
+      "kind": "actual_source_return",
+      "after_original_caller_line": 884
+    }
+  ],
+  "prospective_inverse_boundaries": [
+    {
+      "kind": "entry",
+      "before_original_line": 1404,
+      "local_work_available": false
+    },
+    {
+      "kind": "initialized_inputs",
+      "after_original_line": 1407
+    },
+    {
+      "kind": "final_private_workspace",
+      "after_original_line": 1488,
+      "before_original_line": 1493
+    },
+    {
+      "kind": "actual_source_return",
+      "after_original_caller_line": 887
+    }
+  ],
+  "prospective_distinct_arithmetic_profile_names": {
+    "CTF06": [
+      "AExp",
+      "final_AMat1",
+      "final_AMato",
+      "final_AMatN",
+      "AMatRowNormMax",
+      "fact",
+      "CheckVal"
+    ],
+    "CTF05": [
+      "AInv",
+      "final_AMat1"
+    ]
+  },
+  "prospective_precision": {
+    "frozen": false,
+    "requires_Root_pre_first_capture_decision": true,
+    "proposal_each_arithmetic_atol": 0,
+    "proposal_each_arithmetic_rtol": 0,
+    "exact_class_shape_signed_zero": true,
+    "copied_input_context_bits_exact": true,
+    "integers_boolean_controls_ordinals_order_exact": true,
+    "old_CTF04_7_CTF03_3_CTF01_18_profiles_context_only_unchanged": true
+  },
+  "required_observation_integrity": [
+    "allocated actual square bounds and actual contiguous storage",
+    "actual per-method entry/control/value/return association",
+    "typed binding/order/shape/copy/append failure and omission ledger",
+    "required reached copy failure blocks integrity/release/PASS",
+    "unreached/fatal/exception/OS-unknown distinct without invented outcomes",
+    "no final-i or k derived actual iteration counts"
+  ],
+  "deferred_obligations": [
+    "Root source review before executable observer preparation",
+    "actual pre-output scope/input/source/profile freeze",
+    "actual helper/build/PE/Original/data QA and Rust observations",
+    "real once-before-retry driver and later retry integration",
+    "CTF05 residual and CTF07 Gamma/CTF08 integration"
+  ],
+  "authorship_limits": "Author also authored pure04/05 and first06 ownership glue; source readiness is not independent formula or scientific-output certification.",
+  "preparation_boundary": {
+    "executable_observer_authored": false,
+    "helper_or_serializer_authored": false,
+    "numerical_inputs_or_contract_frozen": false,
+    "target_or_project_imported": false,
+    "build_Cargo_formatter_engine_Git_invoked": false,
+    "canonical_source_written": false,
+    "scientific_weather_or_binary_payloads_read": false,
+    "new_QA_proof_execution_framework": false,
+    "AST_targets_authored_or_imported": 0
+  }
+}

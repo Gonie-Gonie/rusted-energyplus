@@ -1,0 +1,11 @@
+--- .runtime/porting/CTF-05/cache-ingress-prep-01/new/ctf_first_inverse_owner_tests.rs
++++ .runtime/porting/CTF-05/cache-ingress-prep-02/new/ctf_first_inverse_owner_tests.rs
+@@ -18,7 +18,7 @@
+     };
+     let result = assemble_1d_ctf_state_space(CtfAssemblyInput {
+         layers: &layers, nodes: &[6], dx: &[0.1], rcmax: 5,
+-    }, context)?;
++    }, context).map_err(|error| std::io::Error::other(format!("{error:?}")))?;
+     Ok(ConstructionCtfFirstAssembly { construction_id: context.construction_id, result: Ok(result) })
+ }
+ 

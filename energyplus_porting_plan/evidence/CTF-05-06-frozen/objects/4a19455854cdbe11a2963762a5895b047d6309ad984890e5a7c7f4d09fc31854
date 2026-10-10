@@ -1,0 +1,10 @@
+--- crates/ep_runtime/src/heat_balance/surface_manager.rs
++++ crates/ep_runtime/src/heat_balance/surface_manager.rs
+@@ -7,6 +7,7 @@
+ mod construction_cache;
+ pub mod ctf_all_resistive;
+ pub mod ctf_initial_discretization;
++pub mod ctf_inverse_matrix;
+ pub mod ctf_layer_preprocessing;
+ 
+ pub use construction_cache::ConstructionCtfCoefficientSource;

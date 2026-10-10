@@ -1,0 +1,107 @@
+--- crates/ep_run/examples/ctf04_candidate_production_observer.rs
++++ crates/ep_run/examples/ctf06_candidate_production_observer.rs
+@@ -1,11 +1,11 @@
+ //! Actual candidate public fixed-CON loader/compiler/initialization owners only.
+ #[path = "../../ep_runtime/examples/clk02_probe_support/digest.rs"]
+ mod digest;
+-#[path = "ctf04_candidate_production_support/fields.rs"]
++#[path = "ctf06_candidate_production_support/fields.rs"]
+ mod fields;
+ // Exact accepted serializer copy includes unit-only helpers and path constants.
+ #[allow(dead_code)]
+-#[path = "ctf04_candidate_production_support/unit_fields.rs"]
++#[path = "ctf06_candidate_production_support/unit_fields.rs"]
+ mod unit_fields;
+ 
+ use ep_model::SimulationModel;
+@@ -107,7 +107,9 @@
+         "typed_owners":null,"initialized_state_context":null,
+         "selected_CTF01_owners":fields::unavailable(),
+         "selected_CTF03_owners":fields::ctf03_unavailable(),
+-        "selected_CTF04_owners":fields::ctf04_unavailable(),"Native_or_expected_values_read":false});
++        "selected_CTF04_owners":fields::ctf04_unavailable(),
++        "selected_CTF06_owners":fields::ctf06_unavailable(),
++        "selected_CTF05_owners":fields::ctf05_unavailable(),"Native_or_expected_values_read":false});
+     if row["conversion_available"] == false {
+         return Ok(out);
+     }
+@@ -143,6 +145,8 @@
+             out["selected_CTF01_owners"] = fields::selected(&state);
+             out["selected_CTF03_owners"] = fields::ctf03_selected(&state);
+             out["selected_CTF04_owners"] = fields::ctf04_selected(&state);
++            out["selected_CTF06_owners"] = fields::ctf06_selected(&state);
++            out["selected_CTF05_owners"] = fields::ctf05_selected(&state);
+         }
+         Err(error) => {
+             out["initialization"] = json!({"invoked":true,"status":"source-error-returned",
+@@ -212,7 +216,7 @@
+         ],
+     )?;
+     require(
+-        request["schema"] == "ctf04-candidate-production-observer-request.v1"
++        request["schema"] == "ctf06-candidate-production-observer-request.v1"
+             && request["frozen_before_execution"] == true
+             && request["expected_values_supplied"] == false
+             && request["Native_results_supplied"] == false
+@@ -258,9 +262,9 @@
+     let (_, admission_bytes) = bound(&root, &request["native_admission_contract"])?;
+     let admission: Value = serde_json::from_slice(&admission_bytes)?;
+     require(
+-        native["schema"] == "ctf04-production-helper-cases.v1"
+-            && admission["schema"] == "ctf04-production-native-admission-contract.v1"
+-            && native["frozen_before_this_CTF04_helper_execution"] == true
++        native["schema"] == "ctf06-production-helper-cases.v1"
++            && admission["schema"] == "ctf06-production-native-admission-contract.v1"
++            && native["frozen_before_this_CTF06_helper_execution"] == true
+             && native["expected_values_supplied"] == false
+             && native["expected_exits_supplied"] == false
+             && native["scientific_execution_performed"] == false
+@@ -270,7 +274,7 @@
+             && admission["requested_counts"] == native["requested_counts"]
+             && native["requested_counts"] == json!({"model_cases":15,"loader_phase_records":195})
+             && native["fixed_scope"] == request["fixed_scope"],
+-        "actual frozen CTF04 production packet differs",
++        "actual frozen CTF06 production packet differs",
+     )?;
+     let mut bindings = vec![
+         request["fixed_scope"].clone(),
+@@ -287,6 +291,10 @@
+             "scope authority pair differs",
+         )?;
+         bindings.push(native[key].clone());
++    }
++    require(native["actual_scope_amendment_executions"] == admission["actual_scope_amendment_executions"], "both real card check mappings differ")?;
++    for card in ["CTF-05", "CTF-06"] {
++        bindings.push(native["actual_scope_amendment_executions"][card].clone());
+     }
+     let native_cases = rows(&native["model_cases"])?;
+     require(
+@@ -361,12 +369,18 @@
+     println!(
+         "{}",
+         serde_json::to_string_pretty(
+-            &json!({"schema":"ctf04-candidate-production-observer-results.v1",
++            &json!({"schema":"ctf06-candidate-production-observer-results.v1",
+         "actual_request":{"path":request_path,"sha256":digest::sha256(&original)},
+         "native_helper_request":request["native_helper_request"],"native_admission_contract":request["native_admission_contract"],
+         "contracts":admission["contracts"],"projection":admission["projection"],
+         "ctf03_initial_observation_policy":native["ctf03_initial_observation_policy"],
+         "ctf04_matrix_observation_policy":native["ctf04_matrix_observation_policy"],
++        "ctf06_exponential_observation_policy":native["ctf06_exponential_observation_policy"],
++        "ctf05_inverse_observation_policy":native["ctf05_inverse_observation_policy"],
++        "actual_scope_amendment":native["actual_scope_amendment"],
++        "actual_scope_amendment_execution":native["actual_scope_amendment_execution"],
++        "actual_scope_amendment_executions":native["actual_scope_amendment_executions"],
++        "actual_scope_amendment_execution_role":native["actual_scope_amendment_execution_role"],
+         "Rust_retry_driver_available":false,"later_Native_attempts_paired":false,
+         "later_Native_attempts_counted_as_PASS":false,
+         "fixed_scope":request["fixed_scope"],"observer_sources":request["observer_sources"],
+@@ -376,7 +390,7 @@
+         "observations_copied_from_actual_initialized_owner":true,
+         "preprocessing_reexecuted_by_observer":false,
+         "scientific_comparison_performed":false,"numerical_PASS_claimed":false,
+-        "gates_updated":false,"CTF04_through_CTF10_certified":false})
++        "gates_updated":false,"CTF05_through_CTF10_certified":false})
+         )?
+     );
+     Ok(())

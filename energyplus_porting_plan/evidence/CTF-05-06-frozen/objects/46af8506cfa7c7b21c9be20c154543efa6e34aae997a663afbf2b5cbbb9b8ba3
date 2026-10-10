@@ -1,0 +1,83 @@
+# CTF05/06 input freezer source preparation
+
+SOURCE-READY HELD; no freezer invocation, Native build/run or scientific result read.
+This adapts the accepted CTF04 freezer and its 99-line stdlib byte helper.
+The helper changes only its output root from CTF-04 to CTF-06.
+Root's full source read, an other-author peer, and the explicit approved writer SHA
+precede actual freezing. There is no additional executed source-review stage.
+
+## Preserved input and policy scope
+
+Unit model/caller/material/construction/operation rows are copied verbatim from
+the authenticated CTF01 input-only packet: 39 models and 42 declared whole calls.
+Production rows retain all fixed 15 original IDFs, actual loader order (13 phases,
+195 declared phase records), caller bits and all 45 ordered scope guard refs.
+No actual Construct count, reached method count, exit or numerical value is guessed.
+Original source inventories remain 7 unit / 21 production files; prior selected
+ranges are retained and the held combined helper's eight primary ranges are added.
+Each lane admits the exact held eight-source Native inventory including the full
+instrumented Construction TU, observer and shared actual-value serializer.
+
+The inherited preprocessing 18 profiles, initial 3 profiles and assembly 7 profiles
+remain separate and unchanged. Fresh `ctf06_exponential_profiles` has seven entries;
+fresh `ctf05_inverse_profiles` has two. Every fresh profile has float zero atol/rtol,
+exact class/shape and signed-zero bits. Repeated final_AMat1 labels stay in separate
+method namespaces. The immutable held input/projection proposals own both policies.
+
+Selection is actual first assembly ordinal 1 and actual first exponential/inverse
+invocation 1, joined to the same whole call / Construct and initial619 dt/history.
+The source order is assembly728, exponential884, inverse887. There is no assumption
+that initial CTFTimeStep equals caller TimeStepZone. All real later visits/control
+events remain retained, unpaired context with no PASS; no Rust retry driver claim.
+Missing selected owners on one or both sides fail; observer failures and omissions
+remain required integrity failures. This writer generates no scientific arrays,
+expected outcomes, method returns, identity matrices or reconstructed retry state.
+
+## Combined real scope authority
+
+Root supplies one real `ctf05-ctf06-source-scope-amendment.v1` amendment for both
+cards, with exact helper/passive/policy refs, requested counts and pre-output flags.
+Exactly three immutable before-document refs and three actual after-document refs
+bind the plan and both cards. Historical card bytes are compared to before copies;
+they are not required to remain the live card after amendment. Supplied current
+cards and the actual current plan must match the after identities.
+Both real `check_plan.py --check --card CTF-05|CTF-06` recorder refs are mandatory;
+each requires typed exit0, no launch error, source preservation and empty stderr.
+Actual refs are runtime inputs; this preparation invents no future receipts.
+
+Held Native admission currently authenticates the singular direct-ref fields
+`actual_scope_amendment` and `actual_scope_amendment_execution`. The latter remains
+the real CTF-06 check ONLY. Its explicit role says so. Additional top-level fields
+`actual_scope_amendment_executions` (both required checks) and `current_cards`
+carry the complete authority. Request/admission extra top-level fields are allowed;
+their strict contracts2/3 and per-model/caller/member shapes remain unchanged.
+Future OriginalDataQA/comparers must validate both actual checks and document refs,
+not treat the existing singular helper check as a synthetic two-check certificate.
+
+## Root-only actual invocation
+
+Use `python -X utf8 -B <this-directory>/freeze_packet.py` with:
+`--lane unit|production --approved-source-sha256 <actual writer SHA>`
+`--source-manifest <this manifest>#<SHA>`
+`--native-source-manifest <held combined helper manifest>#<SHA>`
+`--current-card-05 energyplus_porting_plan/cards/CTF-05.md#<actual SHA>`
+`--current-card-06 energyplus_porting_plan/cards/CTF-06.md#<actual SHA>`
+`--actual-scope-amendment <real amendment>#<SHA>`
+`--actual-scope-amendment-execution-05 <real check05 receipt>#<SHA>`
+`--actual-scope-amendment-execution-06 <real check06 receipt>#<SHA>`
+`--output-dir <fresh repository-contained CTF-06 directory>`.
+All argument refs require path#SHA; output uses an ordinary contained path.
+The forward DAG is source/tolerances -> request -> cases -> projection -> admission
+-> full-JSON freeze receipt, with `ctf06-` / `ctf06-production-` schemas and fresh
+`frozen_before_this_CTF06_helper_execution:true`. Source refs are rechecked before
+and after writing. Executed own2 and reviewed source copies are retained.
+
+New06 linked Originals carry only prospective-debug-original retention intent.
+Both real files still require verification before actual execution; any later
+removal needs a separate Root-authorized actual retention record. No deletion or
+reinterpretation of earlier live refs occurs here. Metadata stays bounded at 16MB;
+the freezer never reads observation files and does not need their prospective 1GiB
+bound. Scientific execution, numerical PASS, canonical edits and gate updates are false.
+
+Authorship: Header authored prior helper/observer/ingress and this metadata adapter.
+This source/provenance preparation is not independent certification of own physics.

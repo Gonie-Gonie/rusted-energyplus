@@ -1,0 +1,494 @@
+{
+  "schema": "ctf06-exponential-and-ctf05-inverse-projection-source-proposal.v1",
+  "status": "SOURCE-PROPOSAL-not-yet-frozen",
+  "ctf04_matrix_observation_policy": {
+    "protocol": "ctf04-matrix-assembly.v1",
+    "phase": "after_original_Construction_cc728_inside_each_actual_1D_assembly_attempt",
+    "selection": "first_actual_post728_visit_in_selected_no_source_1D_context",
+    "selected_attempt_ordinal": 1,
+    "later_Native_attempts_paired": false,
+    "selected_first_attempt_uses_actual_initial619_dt_and_history": true,
+    "Rust_retry_driver_available": false,
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "matrix_fields": [
+      "AMat",
+      "IdenMatrix",
+      "BMat",
+      "CMat",
+      "DMat"
+    ],
+    "storage_order": "source_i1_outer_i2_inner_row_first",
+    "matrix_shapes": {
+      "AMat": "actual_rcmax_by_rcmax",
+      "IdenMatrix": "actual_rcmax_by_rcmax",
+      "BMat": 3,
+      "CMat": 2,
+      "DMat": 2
+    },
+    "actual_source_produced_identity_required": true,
+    "attempt_identity": "one_based_actual_callback_visit_within_bound_whole_call",
+    "actual_current_retry_state_fields": [
+      "CTFTimeStep",
+      "NumHistories",
+      "TimeStepZone"
+    ],
+    "actual_converted_and_initial_handoff_retained": true,
+    "missing_attempt_or_copy_integrity_failure_is_required_failure": true,
+    "unreached_counted_as_PASS": false,
+    "retry_driver_or_matrix_answers_reconstructed": false
+  },
+  "ctf03_initial_observation_policy": {
+    "protocol": "ctf03-initial-discretization.v1",
+    "phase": "after_original_Construction_cc619_before_matrix_allocation_and_retry",
+    "selection": "actual_initial_callback_reached_and_intact_active_prefix",
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "active_layer_fields": [
+      "Nodes",
+      "dx"
+    ],
+    "integer_fields": [
+      "LayersInConstruct",
+      "NumResLayers",
+      "rcmax",
+      "NodeSource",
+      "NodeUserTemp",
+      "NumHistories"
+    ],
+    "scalar_fields": [
+      "CTFTimeStep",
+      "TimeStepZone"
+    ],
+    "initial_state_distinct_from_whole_return_and_retry_state": true,
+    "PostConversion_layer_handoff_retained": true,
+    "PostConversion_handoff_fields": [
+      "LayersInConstruct",
+      "NumResLayers",
+      "dl",
+      "rk",
+      "rho",
+      "cp",
+      "lr",
+      "ResLayer"
+    ],
+    "capacitance_factors_are_actual_rho_and_cp_not_recomputed_products": true,
+    "required_reached_fields_absent_is_integrity_failure": true,
+    "unreached_counted_as_PASS": false,
+    "branch_or_numeric_answers_reconstructed": false
+  },
+  "ctf03_initial_profiles": [
+    {
+      "variable": "dx",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_LayersInConstruct_active_prefix"
+    },
+    {
+      "variable": "initial_CTFTimeStep",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    },
+    {
+      "variable": "caller_TimeStepZone",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    }
+  ],
+  "inherited_preprocessing_policy": {
+    "path": ".runtime/porting/CTF-01/frozen-packet-01/tolerances.json",
+    "sha256": "29e90047ef65553891106199c83926f62f0cbd1fd371e508e5ede01048e1556b",
+    "size_bytes": 5520
+  },
+  "preprocessing_and_initial_profiles_changed": false,
+  "arithmetic_profiles_by_variable": [
+    {
+      "variable": "AMat",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_rcmax_by_rcmax"
+    },
+    {
+      "variable": "IdenMatrix",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_rcmax_by_rcmax"
+    },
+    {
+      "variable": "BMat",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        3
+      ]
+    },
+    {
+      "variable": "CMat",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        2
+      ]
+    },
+    {
+      "variable": "DMat",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        2
+      ]
+    },
+    {
+      "variable": "assembly_CTFTimeStep",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    },
+    {
+      "variable": "caller_TimeStepZone",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    }
+  ],
+  "selected_owner_identity": [
+    "same case/whole-call/construction index/name and actual original member or IDF input",
+    "actual callback visit ordinal1 within that binding; no inferred timestep-derived attempt identity",
+    "actual SourceSinkPresent=false and SolutionDimensions=1 context; retain other reached context unpaired"
+  ],
+  "actual_handoff_fields": [
+    "dl",
+    "rk",
+    "rho",
+    "cp",
+    "lr",
+    "ResLayer",
+    "Nodes",
+    "dx",
+    "LayersInConstruct",
+    "NumResLayers",
+    "rcmax",
+    "NodeSource",
+    "NodeUserTemp"
+  ],
+  "discrete_exact": [
+    "owner/order/membership/call/attempt association",
+    "actual bounds/counts/shapes/availability/integrity/ordinal coverage",
+    "integer Nodes/counts/selectors/NumHistories",
+    "binary64 class/signedzero/copied input bits"
+  ],
+  "availability": {
+    "reached_required_one_or_both_missing": "FAIL; no numerical PASS",
+    "observer_copy_shape_order_identity_or_append_failure": "required integrity FAIL, never optional absence",
+    "unreached": "explicit unavailable/excluded; zero comparisons and noPASS",
+    "later_source_fatal_exception_or_OS_failure": "retain actual completed captures if structured; separate actual outcome; no invented missing observation or source invocation"
+  },
+  "nonfinite_policy": "retain bits/class/actual availability; required nonfinite numeric operands fail availability, never numerical PASS",
+  "all_actual_Native_attempt_records_retained": true,
+  "later_Native_attempts_are_context_only_noPASS": true,
+  "Native_retry_dt_history_or_attempt_counts_supplied_to_Rust": false,
+  "retry_driver_certified": false,
+  "later_inverse_exponential_Gammas_coefficients_or_surface_handoff_paired": false,
+  "identity_or_matrix_answers_reconstructed": false,
+  "expected_values_supplied": false,
+  "scientific_execution_performed": false,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false,
+  "ctf06_exponential_observation_policy": {
+    "protocol": "ctf06-exponential-method-observation.v1",
+    "actual_method": "ConstructionProps::calculateExponentialMatrix",
+    "actual_caller_line": 884,
+    "actual_method_source_lines": [
+      1105,
+      1373
+    ],
+    "actual_stage_names": [
+      "Entry",
+      "InitializedInputs",
+      "ScalingControls",
+      "PowerControl",
+      "SquareControl",
+      "FinalWorkspace",
+      "SourceReturn"
+    ],
+    "input_matrices": [
+      "AMat",
+      "IdenMatrix"
+    ],
+    "initialized_matrices": [
+      "AMat1",
+      "AMato",
+      "AMatN",
+      "AExp"
+    ],
+    "scaled_matrices": [
+      "AMat1"
+    ],
+    "final_matrices": [
+      "AMat1",
+      "AMato",
+      "AMatN",
+      "AExp"
+    ],
+    "return_matrices": [
+      "AMat",
+      "IdenMatrix",
+      "AExp"
+    ],
+    "scalar_controls": [
+      "AMatRowNormMax",
+      "fact",
+      "CheckVal"
+    ],
+    "integer_controls": [
+      "k",
+      "l",
+      "final_i"
+    ],
+    "actual_power_controls": [
+      "i",
+      "SigFigLimit"
+    ],
+    "actual_square_controls": [
+      "isq",
+      "Backup"
+    ],
+    "scalar_controls_available_only_at_scaling_and_final": true,
+    "final_i_distinct_from_observed_control_event_count": true,
+    "selected_invocation_ordinal": 1,
+    "selected_assembly_ordinal": 1,
+    "selected_first_attempt_uses_actual_initial619_dt_and_history": true,
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "actual_source_produced_identity_required": true,
+    "storage_order": "source_i1_outer_i2_inner_row_first",
+    "invocation_identity": "one_based_actual_entry_visit_within_bound_whole_call",
+    "actual_assembly_association_required": true,
+    "actual_method_return_marker_required_for_return_claim": true,
+    "all_actual_visits_and_control_events_retained": true,
+    "later_Native_attempts_paired": false,
+    "later_Native_attempts_counted_as_PASS": false,
+    "Rust_retry_driver_available": false,
+    "uninvoked_counted_as_PASS": false,
+    "missing_selected_owner_on_one_or_both_sides_is_required_failure": true,
+    "observer_failure_or_omission_is_integrity_failure": true,
+    "method_values_or_identity_or_return_or_retry_state_reconstructed": false
+  },
+  "ctf05_inverse_observation_policy": {
+    "protocol": "ctf05-inverse-method-observation.v1",
+    "actual_method": "ConstructionProps::calculateInverseMatrix",
+    "actual_caller_line": 887,
+    "actual_method_source_lines": [
+      1375,
+      1494
+    ],
+    "actual_stage_names": [
+      "Entry",
+      "InitializedInputs",
+      "ScalingControls",
+      "PowerControl",
+      "SquareControl",
+      "FinalWorkspace",
+      "SourceReturn"
+    ],
+    "input_matrices": [
+      "AMat",
+      "IdenMatrix"
+    ],
+    "initialized_matrices": [
+      "AMat1",
+      "AInv"
+    ],
+    "final_matrices": [
+      "AMat1",
+      "AInv"
+    ],
+    "return_matrices": [
+      "AMat",
+      "IdenMatrix",
+      "AInv"
+    ],
+    "actual_exponential_return_precedes_inverse_entry": true,
+    "inverse_inputs_are_original_AMat_and_IdenMatrix_not_AExp": true,
+    "selected_invocation_ordinal": 1,
+    "selected_assembly_ordinal": 1,
+    "selected_first_attempt_uses_actual_initial619_dt_and_history": true,
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "actual_source_produced_identity_required": true,
+    "storage_order": "source_i1_outer_i2_inner_row_first",
+    "invocation_identity": "one_based_actual_entry_visit_within_bound_whole_call",
+    "actual_assembly_association_required": true,
+    "actual_method_return_marker_required_for_return_claim": true,
+    "all_actual_visits_and_control_events_retained": true,
+    "later_Native_attempts_paired": false,
+    "later_Native_attempts_counted_as_PASS": false,
+    "Rust_retry_driver_available": false,
+    "uninvoked_counted_as_PASS": false,
+    "missing_selected_owner_on_one_or_both_sides_is_required_failure": true,
+    "observer_failure_or_omission_is_integrity_failure": true,
+    "method_values_or_identity_or_return_or_retry_state_reconstructed": false
+  },
+  "linked_original_retention_intent": {
+    "schema": "ctf06-debug-original-retention-intent.v1",
+    "role": "prospective-debug-original",
+    "scope": "new-CTF06-linked-originals-only",
+    "actual_file_identity_required": true,
+    "both_original_and_helper_verified_before_execution": true,
+    "retain_through_PE_validation_and_current_helper_execution": true,
+    "removal_requires_separate_Root_authorized_actual_retention_record": true,
+    "earlier_live_refs_reinterpreted": false,
+    "deletion_performed": false
+  },
+  "ctf06_exponential_profiles": [
+    {
+      "variable": "AExp",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_rcmax_by_rcmax"
+    },
+    {
+      "variable": "final_AMat1",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_rcmax_by_rcmax"
+    },
+    {
+      "variable": "final_AMato",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_rcmax_by_rcmax"
+    },
+    {
+      "variable": "final_AMatN",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_rcmax_by_rcmax"
+    },
+    {
+      "variable": "AMatRowNormMax",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    },
+    {
+      "variable": "fact",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    },
+    {
+      "variable": "CheckVal",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    }
+  ],
+  "ctf05_inverse_profiles": [
+    {
+      "variable": "AInv",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_rcmax_by_rcmax"
+    },
+    {
+      "variable": "final_AMat1",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_rcmax_by_rcmax"
+    }
+  ],
+  "inherited_arithmetic_profiles_role": "unchanged separate CTF04 seven matrix/caller profiles; not06/05 results",
+  "method_selection": {
+    "actual_assembly_ordinal": 1,
+    "actual_exponential_invocation_ordinal": 1,
+    "actual_inverse_invocation_ordinal": 1,
+    "association": "same bound whole call/actual Construct identity + first728 assembly + initial619 actual dt/history",
+    "actual_order": [
+      "assembly728",
+      "exponential884",
+      "inverse887"
+    ],
+    "later_actual_visits": "all retained unpaired context/noPASS",
+    "no_initial_dt_equals_TimeStepZone_assertion": true,
+    "no_Rust_retry_driver_claim": true,
+    "stopped_or_uninvoked": "unavailable/noPASS, real source or OS outcome retained separately"
+  },
+  "serialization": {
+    "complete_records": true,
+    "result_format": "compact JSON plus newline",
+    "record_cap": null,
+    "omitted_only_by_actual_observer_failure": true,
+    "deduplicated": false,
+    "truncation": false,
+    "unreached_values": null,
+    "unused_fixed_slots_emitted": false
+  }
+}

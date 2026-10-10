@@ -1,0 +1,66 @@
+# CTF-05 selected inverse helper source preparation
+
+This held proposal ports the full pinned `calculateInverseMatrix` helper at
+Construction.cc 1375-1494. It is ignored preparation, not a canonical change,
+compiled result, Native observation, card completion or numerical PASS.
+
+The owner borrows the actual CTF-04 row-first AMat and the actual initialized
+IdenMatrix for the same reached assembly attempt. Index `(i1,i2)` is stored at
+`(i1-1)*rcmax+(i2-1)`, matching Objexx Array2 and the held CTF-04 owner. The
+function clones these buffers to AMat1 and AInv, preserving the actual source
+copy operations. It never builds an identity matrix from a guessed dimension.
+
+The forward reduction, last-row division and reverse reduction retain every
+source loop bound, index orientation and multiply-then-subtract operation.
+There is no pivot search, row exchange, singularity test, finite-value guard,
+threshold, generic matrix library or zero fallback. Shape errors are Rust
+owner-admission errors, not invented EnergyPlus method outcomes. Positive
+rcmax and exact square buffer lengths are required before any arithmetic.
+
+The returned owner contains AInv and the final AMat1 workspace immediately
+before Native line 1493 destroys AMat1. AMat and IdenMatrix stay immutable.
+Actual construction/attempt/route metadata remains with the enclosing CTF-04
+assembly owner; this pure helper does not create a retry driver or derive dt.
+Unused, loading-error, all-resistive and reversed-reuse branches have no
+selected AMat owner and must remain unavailable at that enclosing caller.
+
+The genuine source order is exponential at line 884, inverse at line 887,
+then gammas at line 890. Gamma's selected 1D consumer reads AInv at lines
+1538-1539 in the same orientation. This proposal neither implements that
+consumer nor certifies its integration gate. CTF-04 is still a held proposal;
+its module has not been assumed present in the canonical source inventory.
+
+A future Native observation must copy AMat1 before its local deallocation,
+for example after the real final reverse loop and before line 1493. It must
+also copy genuine AMat, IdenMatrix, AInv, rcmax, construction and attempt IDs
+at that actual helper boundary. Whole-construction postreturn reads cannot
+recover these arrays: AMat, AInv and IdenMatrix are deallocated at 1082-1089.
+The CTF-02 public postreturn copier is therefore not an inverse oracle.
+No Native observer or input packet is authored in this preparation.
+
+Seven ordinary focused tests are proposed, unexecuted: an asymmetric exact
+two-by-two inverse with an independent residual check; a three-by-three
+matrix that reaches intermediate reduction rows; the single-row boundary
+and actual identity-copy canary; input bit preservation; signed-zero zero
+pivots; singular nonfinite arithmetic; and explicit shape rejection. The
+nonfinite and deliberately nonidentity canaries test the pure Rust helper
+only. They are not new admitted whole-Native fixtures or coverage claims.
+Literal test answers are not production operands and came from no execution
+or scientific result file. They do not replace future EP element comparisons.
+
+The copied parent source changes only one module declaration. Root must merge
+that declaration with other pending CTF module declarations; the held parent
+copy is based on the current canonical bytes, without silently applying CTF-04.
+No existing source, ID, registration order, input or comparison policy changes.
+
+Before actual differential execution, Root must freeze the real reached-input
+and private-workspace observation contract, matrix shape/class/bits and named
+numeric profiles. This package sets no post-output tolerances and claims no
+future hashes or successful results. The fixed CTF-04 identity/AMat owner and
+Native helper lifetime are source facts; actual branch coverage is pending.
+
+Read-only source checks here verify pinned files, bounded line slices and
+regenerated diffs. No target was imported; Cargo, compiler, formatter, engine
+and Git were not invoked. Scientific results, weather and binaries were not
+opened. Tests were not run. All four CTF-05 gates and its prerequisites remain
+pending; no separate QA framework or execution stage is introduced.

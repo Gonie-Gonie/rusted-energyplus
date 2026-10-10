@@ -1,0 +1,122 @@
+{
+  "schema": "ctf05-ctf06-frozen-input-source-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-05-06-frozen/manifest.json",
+    "sha256": "10718c71e64a6ced148b57bd7ff71581979c380b102949d71a53302d7dcd83e4",
+    "size_bytes": 153173
+  },
+  "actual_combined_source_scope_amendment": {
+    "path": ".runtime/porting/CTF-06/scope-amendment-01/amendment.json",
+    "sha256": "88ac5d66085f22d0d502862a582539bfd82b61fb89abafc652494e05ba7381bd",
+    "size_bytes": 2533
+  },
+  "actual_source_scope_checks": {
+    "CTF-05": {
+      "path": ".runtime/porting/CTF-06/scope-check-05-command-01/receipt.json",
+      "sha256": "952c5bc0f8b5884c11629694065a21f3f2c6f156d91e16f4b01428d869894816",
+      "size_bytes": 3107
+    },
+    "CTF-06": {
+      "path": ".runtime/porting/CTF-06/scope-check-06-command-01/receipt.json",
+      "sha256": "d0dbdadc0e90dcde17d331227db7c19cda8e5640393c9018e56824f5d2ab6156",
+      "size_bytes": 3108
+    }
+  },
+  "lanes": {
+    "unit": {
+      "actual_freeze": {
+        "path": ".runtime/porting/CTF-06/frozen-packet-01/freeze-receipt.json",
+        "sha256": "0fac594f1a432f764a43589f42c17dee58c7fa87614d7b0a09d17e7f182958b1",
+        "size_bytes": 25166
+      },
+      "actual_freeze_execution": {
+        "path": ".runtime/porting/CTF-06/freeze-command-01/receipt.json",
+        "sha256": "d584173df08aaec66f36a46ecc6b7eb635bc47e5d52b9812c55a60a84b5239c9",
+        "size_bytes": 4405
+      },
+      "requested_counts": {
+        "model_cases": 39,
+        "calculateTransferFunction": 42,
+        "total_operations": 42
+      },
+      "contracts": {
+        "source": {
+          "path": ".runtime/porting/CTF-06/frozen-packet-01/source.json",
+          "sha256": "2ec1d9116d8ecc333feaed7ce6f7f5e0a0061411ecbca39e03601962e722e75c",
+          "size_bytes": 17178
+        },
+        "cases": {
+          "path": ".runtime/porting/CTF-06/frozen-packet-01/cases.json",
+          "sha256": "de0e2f1717be878325798eae2e063034e64a6d424c5fe9f47a5c760074e23858",
+          "size_bytes": 9271
+        },
+        "tolerances": {
+          "path": ".runtime/porting/CTF-06/frozen-packet-01/tolerances.json",
+          "sha256": "d58999900c4a95a2e360823441b7f1497343fa547150179719d3186763262b00",
+          "size_bytes": 15439
+        }
+      }
+    },
+    "production": {
+      "actual_freeze": {
+        "path": ".runtime/porting/CTF-06/production-frozen-packet-01/freeze-receipt.json",
+        "sha256": "f63aa3640c94e4a2f5f449e0539aed5f03226907217f21e20546e6e6f5b77c56",
+        "size_bytes": 30675
+      },
+      "actual_freeze_execution": {
+        "path": ".runtime/porting/CTF-06/production-freeze-command-01/receipt.json",
+        "sha256": "b0bd4dd0b3819201b7f2562b708799ec3ecf67aa28c66f6631d915c418e5844f",
+        "size_bytes": 4444
+      },
+      "requested_counts": {
+        "model_cases": 15,
+        "loader_phase_records": 195
+      },
+      "contracts": {
+        "source": {
+          "path": ".runtime/porting/CTF-06/production-frozen-packet-01/source.json",
+          "sha256": "e2959c6da2b9dc566b2b42bbe45ef08e481d3881f629b746fbaac4154e85a46f",
+          "size_bytes": 21725
+        },
+        "cases": {
+          "path": ".runtime/porting/CTF-06/production-frozen-packet-01/cases.json",
+          "sha256": "f99e2f035f09029f30a24f87308528d839028473a80fb3ce2a13574f80f3f6b4",
+          "size_bytes": 9292
+        },
+        "tolerances": {
+          "path": ".runtime/porting/CTF-06/production-frozen-packet-01/tolerances.json",
+          "sha256": "3f600cbb70580e8e378a38e3efc7a98877a801efba9da817a61ea847f499c0e7",
+          "size_bytes": 15461
+        }
+      }
+    }
+  },
+  "fresh_profiles": {
+    "CTF06": 7,
+    "CTF05": 2,
+    "atol": 0.0,
+    "rtol": 0.0,
+    "class_shape_signedzero_exact": true
+  },
+  "inherited_handoff_profiles_remain_separate": {
+    "preprocessing": 18,
+    "initial": 3,
+    "assembly": 7
+  },
+  "all45_literal_input_guards_unchanged": true,
+  "only_first_method1_assembly1_selected": true,
+  "all_later_Native_visits_retained_unpaired_noPASS": true,
+  "genuine_06_then_05_Source_order_required": true,
+  "Rust_candidate_applied": false,
+  "actual_Native05_or06_build_or_engine_performed": false,
+  "numerical_PASS_claimed": false,
+  "complete_CTF05_or_CTF06_claimed": false,
+  "new_debug_originals_prospectively_declared": true,
+  "limits": [
+    "Source scope and actual input freeze only; no numeric or remaining-gate PASS.",
+    "OriginalDataQA must precede fresh unchanged Rust baseline then candidate application.",
+    "Selected archive excludes binary, weather and scientific outputs; not a full replay closure."
+  ],
+  "Root_FULL_and_other_author_FULL_of_executed_freezer_and_Native_contracts_preceded_freeze": true,
+  "held_comparers_FULL_reviewed_before_any_future_execution": true
+}

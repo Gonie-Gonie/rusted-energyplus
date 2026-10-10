@@ -1,0 +1,421 @@
+{
+  "schema": "ctf06-rust-exponential-source-proposal.v1",
+  "status": "SOURCE-READY-HELD-unexecuted",
+  "created_utc": "2026-10-10T13:18:13.948347+00:00",
+  "author": "Raw",
+  "author_limitations": "Author of CTF01 preprocessing and CTF03 initial nodal proposal. This new source implementation is not an independent numerical certificate; Root full read and other-author peer precede any application.",
+  "changes": [
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "before": {
+        "path": ".runtime/porting/CTF-06/rust-exponential-prep-01/before/crates/ep_runtime/src/heat_balance/surface_manager.rs",
+        "sha256": "787dc3a49755352c84af477bbe2c11e09b793e8dcee13181162d5a78b12bec8f",
+        "size_bytes": 5815,
+        "line_count": 168
+      },
+      "proposed": {
+        "path": ".runtime/porting/CTF-06/rust-exponential-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager.rs",
+        "sha256": "bb48eefb1f2c7ad28dabf33401ecc338542efca9543736cda6eb7c58f3636ae1",
+        "size_bytes": 5848,
+        "line_count": 169
+      },
+      "diff": {
+        "path": ".runtime/porting/CTF-06/rust-exponential-prep-01/crates__ep_runtime__src__heat_balance__surface_manager.rs.diff",
+        "sha256": "3e85e21166e827059f5a1aae2e3829241635901d5d0b239db1ed0d6bb2072f15",
+        "size_bytes": 387,
+        "line_count": 10
+      },
+      "change": "additive module declaration"
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+      "before": null,
+      "proposed": {
+        "path": ".runtime/porting/CTF-06/rust-exponential-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+        "sha256": "0dd184b702ee9b2541b0454b81b6d4750f9bd3fafd387d7ec957d5cbaf6e8680",
+        "size_bytes": 9748,
+        "line_count": 262
+      },
+      "diff": {
+        "path": ".runtime/porting/CTF-06/rust-exponential-prep-01/crates__ep_runtime__src__heat_balance__surface_manager__ctf_exponential_matrix.rs.diff",
+        "sha256": "7508f8644a08735c00703586a4c86bbab301ab890514a756834fe18aaaa156a5",
+        "size_bytes": 10123,
+        "line_count": 265
+      },
+      "change": "new source-only owner or tests"
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix/tests.rs",
+      "before": null,
+      "proposed": {
+        "path": ".runtime/porting/CTF-06/rust-exponential-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix/tests.rs",
+        "sha256": "6c0686b3ccc08a088a7a704ac8a2b914798731e0a29ec16b959134840f9d2731",
+        "size_bytes": 5902,
+        "line_count": 152
+      },
+      "diff": {
+        "path": ".runtime/porting/CTF-06/rust-exponential-prep-01/crates__ep_runtime__src__heat_balance__surface_manager__ctf_exponential_matrix__tests.rs.diff",
+        "sha256": "74ab225294d96d1591d3266be56e656a5421f84c41c223dd40b40dc970838ab1",
+        "size_bytes": 6173,
+        "line_count": 155
+      },
+      "change": "new source-only owner or tests"
+    }
+  ],
+  "source_inventory": [
+    {
+      "path": "energyplus_porting_plan/cards/CTF-06.md",
+      "sha256": "0946a82d6c904e564dc4d11ddb862ded60a055013f144371dd6637bce83368ab",
+      "size_bytes": 2659,
+      "line_count": 70
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+      "size_bytes": 110319,
+      "line_count": 2115
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "sha256": "53a14b2a45860255267e6ebf780a50fc8aefc4ba30ae3df589062601a20f999a",
+      "size_bytes": 24041,
+      "line_count": 383
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobalConstants.hh",
+      "sha256": "611963e974f18a83f81401aaeef2ff5393948d04d33421b1036fbcde35356cb3",
+      "size_bytes": 35280,
+      "line_count": 628
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EnergyPlus.hh",
+      "sha256": "e205dc8fe4cd11f23c0cb38757aaea2522c047e22d4416097a79c0d8c6d1f494",
+      "size_bytes": 7439,
+      "line_count": 196
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/api/TypeDefs.h",
+      "sha256": "8fff8cf997e09d396357b0b63762ec7f532490b7ae0d1a3d0395359e627e5a32",
+      "size_bytes": 3809,
+      "line_count": 69
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "sha256": "36756879c587a6248ab8ccfd3ebf6d9ad34572f66ce9c874fc4973b3c070ef5c",
+      "size_bytes": 27600,
+      "line_count": 1330
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "sha256": "9228be3483674ab79ea9faafffb20f5d26eecbd857d32a0c3e3d95e8247233a5",
+      "size_bytes": 22000,
+      "line_count": 1060
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2D.hh",
+      "sha256": "b2a4eab99a6a631083e8598ef1c19ee6e6c6cbe87b6c2ed9a2d2fcff7549afbb",
+      "size_bytes": 25946,
+      "line_count": 1319
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array.hh",
+      "sha256": "1c8e5f14bbdd577f8a6cc56d378308dcb72bf6cbdf0fa051ee9a4eaf7f1b823e",
+      "size_bytes": 57551,
+      "line_count": 2397
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "sha256": "787dc3a49755352c84af477bbe2c11e09b793e8dcee13181162d5a78b12bec8f",
+      "size_bytes": 5815,
+      "line_count": 168
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "sha256": "b79c21fd3126a460c17cd54ec5f66d37e723e0348ac6b6af9e9fedd9e78ea3ec",
+      "size_bytes": 28663,
+      "line_count": 790
+    },
+    {
+      "path": ".runtime/porting/CTF-04/rust-assembly-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "sha256": "e1ccc8e28a042aacb6c970316409d83da763b63560236e65dba5f3fd955aca6d",
+      "size_bytes": 9911,
+      "line_count": 251
+    },
+    {
+      "path": ".runtime/porting/CTF-04/rust-assembly-prep-01/README.md",
+      "sha256": "5dddb00140784853083d5bd987ccbe5e258c0a27c0e1a5da301217667f1595c2",
+      "size_bytes": 5579,
+      "line_count": 93
+    },
+    {
+      "path": ".runtime/porting/CTF-06/readiness-audit-01/manifest.json",
+      "sha256": "636567db508919f689eec6b785e0362bf34fd68e7e23f7c5f39db9f53da5c535",
+      "size_bytes": 11753,
+      "line_count": 315
+    },
+    {
+      "path": ".runtime/porting/CTF-06/readiness-audit-01/audit.json",
+      "sha256": "dff6319742bc9b52942e77524a04a7c7628e3b7f8096f29102043d6608e6ce83",
+      "size_bytes": 8381,
+      "line_count": 117
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "833a9f5bb991874dd972e044949fee695b36b17a857d7603cc0e45921a945b09",
+      "size_bytes": 597,
+      "line_count": 30
+    },
+    {
+      "path": "crates/ep_runtime/src/lib.rs",
+      "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+      "size_bytes": 868,
+      "line_count": 41
+    },
+    {
+      "path": ".runtime/porting/CTF-05/rust-inverse-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+      "sha256": "8d828b9d33c9054a2fc1bafc4ccfc01e892562f5e3689b139d28cbd0f06185b1",
+      "size_bytes": 3646,
+      "line_count": 106
+    }
+  ],
+  "source_ranges": [
+    {
+      "path": "energyplus_porting_plan/cards/CTF-06.md",
+      "first_line": 1,
+      "last_line": 70,
+      "sha256": "0946a82d6c904e564dc4d11ddb862ded60a055013f144371dd6637bce83368ab",
+      "size_bytes": 2659
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 638,
+      "last_line": 659,
+      "sha256": "645b2bd719e18b44ad8878aefb3fb22a338309623763bc14d38cefb43d3efe7a",
+      "size_bytes": 883
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 875,
+      "last_line": 894,
+      "sha256": "834de83ff09c5196ebd62bf19899e97b70d885a9b2b28442e87eba528b155b48",
+      "size_bytes": 1236
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 908,
+      "last_line": 936,
+      "sha256": "d2ae848dcdf26bab27f2f4e226831e041a05ef7fac4c726efffbc5cb795083b0",
+      "size_bytes": 1681
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1105,
+      "last_line": 1177,
+      "sha256": "99dcc2f2936f3ff1fe06edc0fde8c560c7bfe9bf8e62161f279d67cfb84a8ea2",
+      "size_bytes": 4320
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1179,
+      "last_line": 1226,
+      "sha256": "641dd63f1348527fcb9829402abafc8d512a4ed8fefb48b94bdda78c672f28d6",
+      "size_bytes": 1679
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1228,
+      "last_line": 1264,
+      "sha256": "f11a3ad517199704e5f7a2e86c031e1adca725be184094de5455fe6ffe848bed",
+      "size_bytes": 2174
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1268,
+      "last_line": 1297,
+      "sha256": "a14c1de97f361701b724e347e23422670a8aaebba45397be2a3621a5b04e79b7",
+      "size_bytes": 1626
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1299,
+      "last_line": 1337,
+      "sha256": "bed3786c078697988269bd2bf690a4eba0c3a86a639693eed99f3c97257bdf0e",
+      "size_bytes": 2024
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1339,
+      "last_line": 1373,
+      "sha256": "f3e3700e6bc3f31b6f9ab1269d45b81f2e72f66733e99348f23de5a8863483b9",
+      "size_bytes": 1227
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "first_line": 304,
+      "last_line": 342,
+      "sha256": "fbcb4d693cf6124c674cc4e4c9673e0319674407efe9d937bc330c14f73c3779",
+      "size_bytes": 2495
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobalConstants.hh",
+      "first_line": 602,
+      "last_line": 610,
+      "sha256": "c26a8ef59ad7304743d9d93aaddec49134deeb894a8e8248485974928a368c2d",
+      "size_bytes": 814
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EnergyPlus.hh",
+      "first_line": 59,
+      "last_line": 78,
+      "sha256": "c44e6e98b7c4916d758677c15998b9e3557b55b492e0d07654e8a1b25567f6b4",
+      "size_bytes": 674
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EnergyPlus.hh",
+      "first_line": 145,
+      "last_line": 177,
+      "sha256": "4717d6c5479fdc1539b3d00668d72a49307afcfb0ff9b7d0009260e1142895ab",
+      "size_bytes": 844
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/api/TypeDefs.h",
+      "first_line": 48,
+      "last_line": 56,
+      "sha256": "0182f92d878318b23c6bcfd5819cf646aee4814523c8d031faa37b9f3a90e210",
+      "size_bytes": 303
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "first_line": 89,
+      "last_line": 97,
+      "sha256": "0f2722804f7dc14268d18ac1cf47d38ea5296fcf80d6c9023845c9c78ecfdaa9",
+      "size_bytes": 110
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Fmath.hh",
+      "first_line": 337,
+      "last_line": 345,
+      "sha256": "fa4ed24f38c68362a29a0adb5267cdd0b5e50d4688715127c65a05e5f18fa7be",
+      "size_bytes": 110
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "first_line": 354,
+      "last_line": 363,
+      "sha256": "5eeb42d49d481914c17a080813c68e439ab734d0b49bb939872b8aa2e8163a82",
+      "size_bytes": 251
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "first_line": 608,
+      "last_line": 627,
+      "sha256": "1727f748bc0637972234a9a438bd7a6560733de8113c0616d78dcbd432fc3e58",
+      "size_bytes": 389
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2D.hh",
+      "first_line": 391,
+      "last_line": 399,
+      "sha256": "153de6b9f5d77d2ae598b9bb46364ff5bff20f4697f3af54d14332b239cb9783",
+      "size_bytes": 222
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2D.hh",
+      "first_line": 489,
+      "last_line": 497,
+      "sha256": "18e107c0f2c2a7cf9963decc7614a43a61cdb462d0fa5ebc30ecc63bade49dd7",
+      "size_bytes": 102
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array.hh",
+      "first_line": 509,
+      "last_line": 531,
+      "sha256": "e3e48ad8fdaae98ce5003b08600692bf16de943fdfed4c2dff363fa739d94b71",
+      "size_bytes": 457
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array.hh",
+      "first_line": 553,
+      "last_line": 564,
+      "sha256": "1d9c5ed9cf72849293c998f225e2486d8c986cb190d40305be73efb3c96fea15",
+      "size_bytes": 305
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array.hh",
+      "first_line": 646,
+      "last_line": 677,
+      "sha256": "0ee9df8194b404c24643b51081f945b9c45352964799fa9d72743af51d089c62",
+      "size_bytes": 506
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "first_line": 1,
+      "last_line": 33,
+      "sha256": "a3b18ca0ffda83203f4f3a2128a066cf45f8832070a6b811b8cd80395d11c43f",
+      "size_bytes": 1488
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "first_line": 38,
+      "last_line": 68,
+      "sha256": "4919166d8b235af0a49773001256d38a939c9ee09fa16d0ef8b7ddc5cbd0058d",
+      "size_bytes": 1079
+    },
+    {
+      "path": ".runtime/porting/CTF-04/rust-assembly-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "first_line": 29,
+      "last_line": 64,
+      "sha256": "2f155bc728d3cb2f32f9ab9921a824713f93cf7e7fa8ea9f2d6e4bdca095e34c",
+      "size_bytes": 1689
+    },
+    {
+      "path": ".runtime/porting/CTF-04/rust-assembly-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "first_line": 87,
+      "last_line": 118,
+      "sha256": "ea8f417ef136d90e6093d750f62b0b3d48aa130e188cc65dbbe4793968849eb5",
+      "size_bytes": 1237
+    },
+    {
+      "path": ".runtime/porting/CTF-04/rust-assembly-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "first_line": 140,
+      "last_line": 251,
+      "sha256": "ee00cef974bbd28190fac7f5462b2998ed7542290eb47fffe6ea3464508056bb",
+      "size_bytes": 4203
+    },
+    {
+      "path": ".runtime/porting/CTF-04/rust-assembly-prep-01/README.md",
+      "first_line": 1,
+      "last_line": 93,
+      "sha256": "5dddb00140784853083d5bd987ccbe5e258c0a27c0e1a5da301217667f1595c2",
+      "size_bytes": 5579
+    }
+  ],
+  "range_hash_definition": "Concatenated original raw splitlines(keepends=True)[first_line-1:last_line].",
+  "README": {
+    "path": ".runtime/porting/CTF-06/rust-exponential-prep-01/README.md",
+    "sha256": "0003c206ca3d0b4c6ed8bbacf326e19aa4af94d593b7a3d3fca59031ceb7c3c7",
+    "size_bytes": 4008,
+    "line_count": 62
+  },
+  "API": {
+    "function": "calculate_selected_ctf_matrix_exponential",
+    "input": "CtfExponentialInput{rcmax:i32,a_mat:&[f64],iden_matrix:&[f64]} + actual CtfAssemblyContext",
+    "output": "CtfExponentialObservation::Unavailable or Exponential(Box<CtfExponentialMatrix>)",
+    "identity_producer_gap_retained": true,
+    "CTF04_dependency_unapplied": true,
+    "caller_route_and_attempt_not_inferred": true,
+    "no_retry_or_production_wiring": true
+  },
+  "defined_cast_domain": "finite truncated value representable i32, checked k+1; otherwise explicit scope error, no reached owner",
+  "test_functions": 8,
+  "tests_compiled_or_executed": false,
+  "project_imported": false,
+  "scientific_weather_binary_payloads_read": false,
+  "engine_build_Cargo_rustfmt_Git_run": false,
+  "canonical_written": false,
+  "new_numeric_policy_or_inputs_frozen": false,
+  "new_QA_execution_framework": false,
+  "numerical_PASS_or_gate_claimed": false,
+  "held_readiness_audit_unchanged": true,
+  "audit_line_shorthand_correction": "Squaring for-loop starts at 1344, not text shorthand1343; exact pinned source range unchanged."
+}

@@ -1,0 +1,63 @@
+//! Heat-balance compatibility and diagnostic selection APIs.
+
+#![allow(
+    clippy::collapsible_if,
+    clippy::too_many_arguments,
+    clippy::type_complexity
+)]
+
+pub mod air_manager;
+pub mod algorithm;
+pub mod convection;
+pub mod ctf;
+pub mod ctf_first_assembly_owner;
+pub mod ctf_first_exponential_owner;
+pub mod ctf_first_inverse_owner;
+pub mod ctf_first_matrix_owner;
+pub mod ctf_initial_owner;
+pub(crate) mod id_slot_index;
+pub mod initialization;
+pub mod inside_convection;
+pub mod longwave;
+pub mod manager;
+pub mod radiation;
+pub mod reports;
+pub(crate) mod run_period;
+pub mod solar;
+pub mod state;
+pub mod summary;
+pub mod surface_balance;
+pub mod surface_boundary;
+pub(crate) mod surface_loop;
+pub mod surface_manager;
+pub mod surface_weather;
+pub mod timestep;
+pub(crate) mod trace;
+pub(crate) mod warmup;
+pub(crate) mod weather_driver;
+pub mod zone_air_correction;
+pub mod zone_air_initialization;
+pub mod zone_air_initialization_trace;
+pub mod zone_predictor_corrector;
+
+pub use air_manager::*;
+pub use algorithm::*;
+pub use convection::*;
+pub use ctf::*;
+pub use initialization::*;
+pub use inside_convection::*;
+pub use longwave::*;
+pub use manager::*;
+pub use radiation::*;
+pub use reports::*;
+pub use solar::*;
+pub use state::*;
+pub use summary::*;
+pub use surface_balance::*;
+pub use surface_boundary::*;
+pub use surface_manager::*;
+pub use surface_weather::*;
+pub use timestep::*;
+pub use zone_air_correction::*;
+pub use zone_air_initialization::*;
+pub use zone_predictor_corrector::*;
