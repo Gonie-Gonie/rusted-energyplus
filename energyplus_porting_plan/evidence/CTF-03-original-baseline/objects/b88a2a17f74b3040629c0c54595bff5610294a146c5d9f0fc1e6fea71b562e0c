@@ -1,0 +1,27 @@
+# CTF03 current-parent source rebase
+
+SOURCE ONLY, held unapplied/unexecuted. This preserves accepted readiness-audit-01
+and refreshes only the module declaration, current context identities/ranges, and
+metadata. The187-line discretization module and100-line focused test source are
+byte-identical, as are their /dev/null patches. No mathematics, assertions, API or
+defined C++ integer-conversion admission changes. No target/import/build/result/
+binary/formatter/canonical operation is performed.
+
+The before parent is the actual current170-line CTF02 owner. Proposed parent171
+adds only pub mod ctf_initial_discretization; all other bytes remain unchanged.
+Seven context sources changed through the admitted CTF02 implementation. Fresh
+identities/ranges bind current bytes; exact historical identities remain linked
+to archived before copies and accepted old manifest. Native primary sources and
+all other context sources retain their original identities.
+
+The original readiness document is explicitly historical, including its gate
+metadata and earlier missing-timestep/callback inventory. Current CTF02 has a
+real typed-timestep construction-cache caller and all-resistive storage owners.
+This rebase does not add a CTF03 production owner or select massive/nonreverse
+routes for callers. The new pure module retains those explicit preconditions,
+initial-vs-retry distinction, and honest unavailable stops. Current four-phase
+Native observer/helper is a separate source hold, not a result inferred here.
+
+Root and Header already reviewed the identical mathematics/tests. Only this
+source-parent/dependency metadata rebase needs a narrow source review; no new
+proof framework or execution stage is introduced. Root alone applies/runs it.

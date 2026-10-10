@@ -1,0 +1,179 @@
+{
+  "schema": "ctf03-existing-rust-baseline-gap.v1",
+  "created_utc": "2026-10-10T14:53:42.538803+00:00",
+  "actual_Original_unit_data_QA": {
+    "path": ".runtime/porting/CTF-03/original-data-review-01/review.json",
+    "sha256": "e31ccd445894cd56d0210ede576dbc847ea74aa10e3b8a1602975abcfd739d19",
+    "size_bytes": 8427
+  },
+  "actual_Original_production_data_QA": {
+    "path": ".runtime/porting/CTF-03/original-production-data-review-01/review.json",
+    "sha256": "fc952f56c32b809f8494a96a117ff27be3181c1ced76dd2bd21e51dc293da13f",
+    "size_bytes": 50621
+  },
+  "actual_build": {
+    "path": ".runtime/porting/CTF-03/existing-production-build-command-01/receipt.json",
+    "sha256": "a6b6b7abc65afc7166f26ac9396d21e8c4d988ace7dc561af0f72b5de006d745",
+    "size_bytes": 4370
+  },
+  "actual_execution": {
+    "path": ".runtime/porting/CTF-03/existing-production-command-01/receipt.json",
+    "sha256": "094f91b16ecedf8378cda915a079547cf21b3ab4c90ae98893713b2532894028",
+    "size_bytes": 2927
+  },
+  "actual_results": {
+    "path": ".runtime/porting/CTF-03/existing-production-command-01/stdout.log",
+    "sha256": "ff7f851acb2b3a1382a856917c5167db9ca89dfe4799e6deb5cf116eb405d621"
+  },
+  "unchanged_input_only_request": {
+    "path": ".runtime/porting/CTF-03/existing-production-inputs-01/request.json",
+    "sha256": "dc41133a217d8d4d33af39a2fff6f731e42365674fbcbcacfd5c59bda209d1b6",
+    "size_bytes": 34926
+  },
+  "inherited_request": {
+    "path": ".runtime/porting/CTF-02/candidate-production-inputs-01/request.json",
+    "sha256": "dc41133a217d8d4d33af39a2fff6f731e42365674fbcbcacfd5c59bda209d1b6",
+    "size_bytes": 34926
+  },
+  "actual_full_Rust_source_snapshot": {
+    "path": ".runtime/porting/source-objects/e3/e393963443f0bf45c25c0a3a83e2df8a7185024e38664523bcd1ee1e0bdcdde7",
+    "sha256": "e393963443f0bf45c25c0a3a83e2df8a7185024e38664523bcd1ee1e0bdcdde7"
+  },
+  "actual_new_CTF03_source_paths_absent": [
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+    "crates/ep_run/examples/ctf03_candidate_unit_observer.rs",
+    "crates/ep_run/examples/ctf03_candidate_production_observer.rs"
+  ],
+  "model_cases": [
+    {
+      "model_id": "A-24H",
+      "initialization_status": "source-returned",
+      "actual_CTF01_owner_count": 3,
+      "actual_CTF02_owner_count": 3,
+      "CTF03_initial_owner_available": false,
+      "Native_or_expected_values_read": false
+    },
+    {
+      "model_id": "A-72H",
+      "initialization_status": "source-returned",
+      "actual_CTF01_owner_count": 3,
+      "actual_CTF02_owner_count": 3,
+      "CTF03_initial_owner_available": false,
+      "Native_or_expected_values_read": false
+    },
+    {
+      "model_id": "A-ANNUAL",
+      "initialization_status": "source-returned",
+      "actual_CTF01_owner_count": 3,
+      "actual_CTF02_owner_count": 3,
+      "CTF03_initial_owner_available": false,
+      "Native_or_expected_values_read": false
+    },
+    {
+      "model_id": "B-NOLIMIT-24H",
+      "initialization_status": "source-returned",
+      "actual_CTF01_owner_count": 1,
+      "actual_CTF02_owner_count": 1,
+      "CTF03_initial_owner_available": false,
+      "Native_or_expected_values_read": false
+    },
+    {
+      "model_id": "B-NOLIMIT-72H",
+      "initialization_status": "source-returned",
+      "actual_CTF01_owner_count": 1,
+      "actual_CTF02_owner_count": 1,
+      "CTF03_initial_owner_available": false,
+      "Native_or_expected_values_read": false
+    },
+    {
+      "model_id": "B-NOLIMIT-ANNUAL",
+      "initialization_status": "source-returned",
+      "actual_CTF01_owner_count": 1,
+      "actual_CTF02_owner_count": 1,
+      "CTF03_initial_owner_available": false,
+      "Native_or_expected_values_read": false
+    },
+    {
+      "model_id": "B-FLOW-24H",
+      "initialization_status": "source-returned",
+      "actual_CTF01_owner_count": 1,
+      "actual_CTF02_owner_count": 1,
+      "CTF03_initial_owner_available": false,
+      "Native_or_expected_values_read": false
+    },
+    {
+      "model_id": "B-FLOW-72H",
+      "initialization_status": "source-returned",
+      "actual_CTF01_owner_count": 1,
+      "actual_CTF02_owner_count": 1,
+      "CTF03_initial_owner_available": false,
+      "Native_or_expected_values_read": false
+    },
+    {
+      "model_id": "B-FLOW-ANNUAL",
+      "initialization_status": "source-returned",
+      "actual_CTF01_owner_count": 1,
+      "actual_CTF02_owner_count": 1,
+      "CTF03_initial_owner_available": false,
+      "Native_or_expected_values_read": false
+    },
+    {
+      "model_id": "B-CAPACITY-24H",
+      "initialization_status": "source-returned",
+      "actual_CTF01_owner_count": 1,
+      "actual_CTF02_owner_count": 1,
+      "CTF03_initial_owner_available": false,
+      "Native_or_expected_values_read": false
+    },
+    {
+      "model_id": "B-CAPACITY-72H",
+      "initialization_status": "source-returned",
+      "actual_CTF01_owner_count": 1,
+      "actual_CTF02_owner_count": 1,
+      "CTF03_initial_owner_available": false,
+      "Native_or_expected_values_read": false
+    },
+    {
+      "model_id": "B-CAPACITY-ANNUAL",
+      "initialization_status": "source-returned",
+      "actual_CTF01_owner_count": 1,
+      "actual_CTF02_owner_count": 1,
+      "CTF03_initial_owner_available": false,
+      "Native_or_expected_values_read": false
+    },
+    {
+      "model_id": "B-BOTH-24H",
+      "initialization_status": "source-returned",
+      "actual_CTF01_owner_count": 1,
+      "actual_CTF02_owner_count": 1,
+      "CTF03_initial_owner_available": false,
+      "Native_or_expected_values_read": false
+    },
+    {
+      "model_id": "B-BOTH-72H",
+      "initialization_status": "source-returned",
+      "actual_CTF01_owner_count": 1,
+      "actual_CTF02_owner_count": 1,
+      "CTF03_initial_owner_available": false,
+      "Native_or_expected_values_read": false
+    },
+    {
+      "model_id": "B-BOTH-ANNUAL",
+      "initialization_status": "source-returned",
+      "actual_CTF01_owner_count": 1,
+      "actual_CTF02_owner_count": 1,
+      "CTF03_initial_owner_available": false,
+      "Native_or_expected_values_read": false
+    }
+  ],
+  "actual_initialization_returned_models": 15,
+  "actual_CTF01_construction_owner_rows": 21,
+  "actual_CTF02_construction_owner_rows": 21,
+  "CTF03_public_initial_owner_available": false,
+  "gap": "Unchanged committed Rust lacks the CTF03 initial discretization API, cache ledger, and observer fields. No Native initial answers or zero-valued replacements supplied. CTF01/02 actual owners retained as baseline context.",
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "Rust_candidate_applied": false,
+  "gates_updated": false
+}

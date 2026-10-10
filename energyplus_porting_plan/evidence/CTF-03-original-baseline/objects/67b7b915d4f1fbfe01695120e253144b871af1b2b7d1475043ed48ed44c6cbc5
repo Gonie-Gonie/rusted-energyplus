@@ -1,0 +1,61 @@
+{
+  "schema": "ctf03-production-independent-build-PE-review.v1",
+  "status": "pass-exact-retained-PE-runtime-and-actual-build-identity",
+  "observed_utc": "2026-10-10T14:49:47.165891+00:00",
+  "lane": "production",
+  "target": "ctf03_production_helper",
+  "actual_previous_compile_rows": 673,
+  "actual_current_compile_rows": 679,
+  "actual_protected_ref_count": 32,
+  "build": {
+    "path": ".runtime/porting/CTF-03/native-build-01/production/native-build.json",
+    "sha256": "4d017b881da723393f0828c4f24052bdd6382694b01c9ca14c8831c00a1d6096",
+    "size_bytes": 4506
+  },
+  "helper_binary": {
+    "path": ".runtime/porting/CTF-03/native-build-01/production/derivation/derived-helper.exe",
+    "sha256": "e3fa04f1a5f79f31aaff170486a9a20e141cbe05b44f717ed8783f844d817ee4",
+    "size_bytes": 150763870
+  },
+  "linked_original": {
+    "path": ".runtime/ep261-gcc13-o0/Products/ctf03_production_helper.exe",
+    "sha256": "7428bc0b12ab560cca4f8e01706fdd6efb50230c612637e62af0c1d22acb75c0",
+    "size_bytes": 1300164012
+  },
+  "validated_derivative": {
+    "path": ".runtime/porting/CTF-03/native-build-01/production/derivation/receipt.json",
+    "sha256": "a0ebb4efe6753cb5f9c67a4e77af55a54865b90320692bee34e3bacb2b896789",
+    "size_bytes": 12825
+  },
+  "native_pe_source": {
+    "path": "tools/porting/native_pe.py",
+    "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+    "size_bytes": 20217
+  },
+  "executed_reader": {
+    "path": ".runtime/porting/CTF-03/native-build-review-prep-01/review_build.py",
+    "sha256": "df5d445612f3cd76555c42a37efa4994bbcea4fd09eb2ef75c867ac75b6adef0",
+    "size_bytes": 5613
+  },
+  "maps": {
+    "original": {
+      "path": ".runtime/porting/CTF-03/native-production-build-review-01/original-pe.json",
+      "sha256": "32089f92f803202129e9da259237c18854b0155802d47243edfd132de1053a35",
+      "size_bytes": 16047
+    },
+    "derived": {
+      "path": ".runtime/porting/CTF-03/native-production-build-review-01/derived-pe.json",
+      "sha256": "67250c2ffb710ee4e4f7d047dcb0294710ac3a06f1aa0befe050044f3e5d90ec",
+      "size_bytes": 12193
+    },
+    "comparison": {
+      "path": ".runtime/porting/CTF-03/native-production-build-review-01/comparison-pe.json",
+      "sha256": "8ff0610eac83b5e92357b12e3c845cc9f85825c3e85e6b9f45f64ad620eee1d2",
+      "size_bytes": 4820
+    }
+  },
+  "retained_runtime_exact": true,
+  "engine_invoked": false,
+  "scientific_execution_certified": false,
+  "gates_updated": false
+}

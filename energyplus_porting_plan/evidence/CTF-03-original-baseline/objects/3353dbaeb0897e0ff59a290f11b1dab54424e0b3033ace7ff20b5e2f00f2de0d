@@ -1,0 +1,123 @@
+"""Source-only stopped-call repair; never import or execute a comparer."""
+from pathlib import Path
+import ast
+import copy
+import difflib
+import hashlib
+import json
+
+ROOT = Path(__file__).resolve().parents[4]
+OLD = ROOT / ".runtime/porting/CTF-03/comparer-prep-01"
+OUT = Path(__file__).resolve().parent
+EXPECTED_MANIFEST = "80f1dedda6ec4abf3b62c97d006b8486097dcc718d21ed61dd78338bbedeee16"
+
+
+def require(condition, message):
+    if not condition:
+        raise ValueError(message)
+
+
+def ref(path):
+    data = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(),
+            "sha256": hashlib.sha256(data).hexdigest(),
+            "size_bytes": len(data), "line_count": len(data.splitlines())}
+
+
+def replace_once(data, before, after):
+    newline = "\r\n" if b"\r\n" in data else "\n"
+    a = before.replace("\n", newline).encode("utf-8")
+    b = after.replace("\n", newline).encode("utf-8")
+    require(data.count(a) == 1, "Exact single declared source span required")
+    return data.replace(a, b, 1)
+
+
+require(ref(OLD / "manifest.json")["sha256"] == EXPECTED_MANIFEST,
+        "Held predecessor manifest differs")
+manifest = json.loads((OLD / "manifest.json").read_text(encoding="utf-8"))
+for row in manifest["own_sources"]:
+    binding = row["source"]
+    require(ref(ROOT / binding["path"]) == binding, "Held predecessor source differs")
+
+unit_before = '''            context={"is_used_ctf":construction["IsUsedCTF"],"errors_found":left["before"]["ErrorsFound"],
+                     "source_sink_present":construction["SourceSinkPresent"],"solution_dimensions":construction["SolutionDimensions"]}
+'''
+unit_after = '''            context=None
+            if left["actual_source_invoked"]:
+                c.need(isinstance(left.get("before"),dict),"Actual invoked Native before owner required")
+                context={"is_used_ctf":construction["IsUsedCTF"],"errors_found":left["before"]["ErrorsFound"],
+                         "source_sink_present":construction["SourceSinkPresent"],"solution_dimensions":construction["SolutionDimensions"]}
+'''
+production_before = '''            index=operation["actual_construction_index"]
+            c.need(type(index) is int and 1<=index<=len(operation["before"]["snapshot"]["constructions"]),"Actual Native construction identity required")
+            before=operation["before"]["snapshot"];owner=before["constructions"][index-1]
+            context={"is_used_ctf":owner["IsUsedCTF"],"errors_found":before["ErrorsFound"],
+                     "source_sink_present":owner["SourceSinkPresent"],"solution_dimensions":owner["SolutionDimensions"]}
+            c.exact(path+"/"+name+"/state_vector_index",ids.index(cid),row["state_vector_index"])
+            paired=initial_storage(c,path+"/"+name+"/CTF03",operation,row.get("result"),prefixes.get(cid),before["TimeStepZone"],cid,context)
+'''
+production_after = '''            context=None;caller=None
+            if operation["actual_source_invoked"]:
+                observed=operation.get("before")
+                c.need(isinstance(observed,dict) and observed.get("available") is True and
+                       isinstance(observed.get("snapshot"),dict),"Actual invoked Native before snapshot required")
+                before=observed["snapshot"];index=operation["actual_construction_index"]
+                c.need(type(index) is int and 1<=index<=len(before["constructions"]),"Actual Native construction identity required")
+                owner=before["constructions"][index-1]
+                context={"is_used_ctf":owner["IsUsedCTF"],"errors_found":before["ErrorsFound"],
+                         "source_sink_present":owner["SourceSinkPresent"],"solution_dimensions":owner["SolutionDimensions"]}
+                caller=before["TimeStepZone"]
+            c.exact(path+"/"+name+"/state_vector_index",ids.index(cid),row["state_vector_index"])
+            paired=initial_storage(c,path+"/"+name+"/CTF03",operation,row.get("result"),prefixes.get(cid),caller,cid,context)
+'''
+
+(OUT / "before").mkdir(exist_ok=False)
+new_rows = []
+for name in ["compare_unit.py", "compare_production.py", "packet_io.py"]:
+    original = (OLD / name).read_bytes()
+    (OUT / "before" / name).write_bytes(original)
+    proposed = original
+    if name == "compare_unit.py":
+        proposed = replace_once(original, unit_before, unit_after)
+    elif name == "compare_production.py":
+        proposed = replace_once(original, production_before, production_after)
+    (OUT / name).write_bytes(proposed)
+    ast.parse(proposed.decode("utf-8"), filename=name)
+    delta = "".join(difflib.unified_diff(
+        original.decode("utf-8").splitlines(keepends=True),
+        proposed.decode("utf-8").splitlines(keepends=True),
+        fromfile=(OLD / name).relative_to(ROOT).as_posix(),
+        tofile=(OUT / name).relative_to(ROOT).as_posix()))
+    delta_path = OUT / (name + ".from-01.diff")
+    delta_path.write_bytes(delta.encode("utf-8"))
+    new_rows.append({"source": ref(OUT / name), "before": ref(OUT / "before" / name),
+                     "exact_diff": ref(delta_path)})
+
+readme = (OLD / "README.md").read_bytes()
+readme += b'''\r\n## Fresh02 stopped-call repair\r\n\r\nThe held01 sources remain unchanged. Only the two lane callsites that construct\r\nNative initial-owner context changed. The unit path reads actual before.ErrorsFound\r\nonly for an actually invoked Native call. The analogous production path likewise\r\nborrows the before snapshot, actual construction context and caller only for an\r\nactually invoked call. Invoked records still require intact real before owners.\r\n\r\nFor uninvoked calls these local arguments remain None, with no invented Native\r\ncontext or caller. The unchanged initial_storage returns unknown/noPASS before\r\nusing them. Actual Rust Result routes, ID association and state-vector checks\r\nremain independent; all selected availability, profiles, arithmetic and output\r\nprotocols remain unchanged. packet_io.py is byte-identical01.\r\n\r\nFresh02 before/ copies are the exact held01 current sources, and from-01 diffs\r\nare byte-regenerated. The predecessor manifest authenticates the inherited full\r\nCTF02-to-01 source history. Preparation only parses Python AST and hashes bounded\r\nsource metadata; no comparer, project, engine or scientific payload was executed\r\nor read. No new execution stage or canonical edit is introduced.\r\n'''
+(OUT / "README.md").write_bytes(readme)
+updated = copy.deepcopy(manifest)
+updated["own_sources"] = new_rows
+updated["source_preparation_bindings"] += [ref(OLD / "manifest.json"), ref(OLD / "prepare_sources.py")]
+updated["predecessor_manifest"] = ref(OLD / "manifest.json")
+updated["repair_scope"] = {
+    "Native_before_context_read_only_if_actual_source_invoked": True,
+    "production_analogous_snapshot_and_caller_guarded": True,
+    "uninvoked_context_and_caller_fabricated": False,
+    "initial_storage_unchanged": True,
+    "arithmetic_profiles_or_availability_policy_changed": False,
+    "packet_io_byte_identical_to_01": True,
+}
+updated["own_preparation_source"] = ref(Path(__file__).resolve())
+updated["README"] = ref(OUT / "README.md")
+(OUT / "manifest.json").write_text(json.dumps(updated, indent=2) + "\n", encoding="utf-8")
+for name in ["compare_unit.py", "compare_production.py"]:
+    a = ast.parse((OLD / name).read_text(encoding="utf-8"))
+    b = ast.parse((OUT / name).read_text(encoding="utf-8"))
+    aa = {n.name: ast.dump(n, include_attributes=False) for n in a.body if isinstance(n, ast.FunctionDef)}
+    bb = {n.name: ast.dump(n, include_attributes=False) for n in b.body if isinstance(n, ast.FunctionDef)}
+    require(set(aa) == set(bb) and [k for k in aa if aa[k] != bb[k]] == ["compare_initial_models"],
+            "Only declared lane wrapper function may change")
+require((OUT / "packet_io.py").read_bytes() == (OLD / "packet_io.py").read_bytes(),
+        "Inherited IO must remain byte-identical")
+print(json.dumps({"manifest": ref(OUT / "manifest.json"), "own_sources": new_rows}, indent=2))

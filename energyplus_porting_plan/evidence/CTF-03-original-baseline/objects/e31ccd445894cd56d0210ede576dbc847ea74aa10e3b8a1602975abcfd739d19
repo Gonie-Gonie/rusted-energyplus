@@ -1,0 +1,220 @@
+{
+  "schema": "ctf03-independent-original-data-review.v1",
+  "status": "pass-actual-original-data-and-provenance-before-Rust",
+  "started_utc": "2026-10-10T14:51:26.146448+00:00",
+  "finished_utc": "2026-10-10T14:51:26.727801+00:00",
+  "reviewed_results": {
+    "path": ".runtime/porting/CTF-03/native-unit-output-01/ctf03-helper-results.json",
+    "sha256": "08d62a176c21c59029c70b3b118a749a1e3bd29f98973d2718b46e2f3a91bbd2",
+    "size_bytes": 1444205
+  },
+  "reviewed_native_execution": {
+    "path": ".runtime/porting/CTF-03/native-unit-command-01/receipt.json",
+    "sha256": "f3b56cd26b2ea28bf3f41872a76be124164526e52079c97a4614f6cd7a4ed61c",
+    "size_bytes": 3179
+  },
+  "reviewed_request": {
+    "path": ".runtime/porting/CTF-03/frozen-packet-01/helper-request.json",
+    "sha256": "60209985d95028e192b0b9226cd57cd9f4f4d5c1c7fc32a9f5b4a1f96fe389b4",
+    "size_bytes": 104817
+  },
+  "reviewed_native_admission_contract": {
+    "path": ".runtime/porting/CTF-03/frozen-packet-01/native-admission-contract.json",
+    "sha256": "c8ccc280af914db63db0d7022586ef2789933750e30d2d523734421e9959a2e8",
+    "size_bytes": 12826
+  },
+  "reviewed_projection": {
+    "path": ".runtime/porting/CTF-03/frozen-packet-01/projection.json",
+    "sha256": "c405fb0bd7e6b70ba48e0b6f11a18ce80e7eb65cb4c02736e1b038a919fb1201",
+    "size_bytes": 23531
+  },
+  "reviewed_contracts": {
+    "source": {
+      "path": ".runtime/porting/CTF-03/frozen-packet-01/source.json",
+      "sha256": "ba71d21a37ee40b1d95e359e5ea3f6109123fc4ab707e994f54e5d94ec97a269",
+      "size_bytes": 17386
+    },
+    "cases": {
+      "path": ".runtime/porting/CTF-03/frozen-packet-01/cases.json",
+      "sha256": "b388cdeb116e74b91fc3df2671a40f81bd5861f4ed2b7052d00e578fb5799290",
+      "size_bytes": 9270
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CTF-03/frozen-packet-01/tolerances.json",
+      "sha256": "2d8d295429103cc3a8d27e66e783eff0509b5bd88a656d7a796be94100c72037",
+      "size_bytes": 5915
+    }
+  },
+  "reviewed_build": {
+    "path": ".runtime/porting/CTF-03/native-build-01/unit/native-build.json",
+    "sha256": "563a899c0281cd03ac5b4cb3c3aca797a03421f95379fcb37b7dd6bf9295d717",
+    "size_bytes": 4441
+  },
+  "reviewed_build_execution": {
+    "path": ".runtime/porting/CTF-03/native-compile-command-01/receipt.json",
+    "sha256": "3ccce38ed6921e8e773abd699cf9143ce2ed4e8061521d60d7aeecae116add0e",
+    "size_bytes": 2949
+  },
+  "reviewed_build_review": {
+    "path": ".runtime/porting/CTF-03/native-unit-build-review-01/review.json",
+    "sha256": "7bd355ffd9b97afec6a5e3b312dbb8e83912749ce2b3b8e9351b532a6a2f611c",
+    "size_bytes": 2468
+  },
+  "reviewed_build_review_execution": {
+    "path": ".runtime/porting/CTF-03/native-unit-build-review-command-01/receipt.json",
+    "sha256": "120fc1273fef94b2484b1b756709df76e1b3e17381c1a369b715a80b72392bcf",
+    "size_bytes": 2978
+  },
+  "actual_packet_freeze": {
+    "path": ".runtime/porting/CTF-03/frozen-packet-01/freeze-receipt.json",
+    "sha256": "b78f08e1e853626040babf1cf49aaa29a641c9edd9b99e4872266c2c59687d84",
+    "size_bytes": 22033
+  },
+  "actual_packet_freeze_execution": {
+    "path": ".runtime/porting/CTF-03/input-freeze-command-01/receipt.json",
+    "sha256": "b77c661496075c1ae7fcaeed013f53373ab9117b23adf831a99840ec4a9de7cb",
+    "size_bytes": 4540
+  },
+  "actual_native_process_exit_code": 0,
+  "actual_native_launch_error": null,
+  "complete_requested_record_ledger_validated": true,
+  "reviewed_initial_observation_policy": {
+    "protocol": "ctf03-initial-discretization.v1",
+    "phase": "after_original_Construction_cc619_before_matrix_allocation_and_retry",
+    "selection": "actual_initial_callback_reached_and_intact_active_prefix",
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "active_layer_fields": [
+      "Nodes",
+      "dx"
+    ],
+    "integer_fields": [
+      "LayersInConstruct",
+      "NumResLayers",
+      "rcmax",
+      "NodeSource",
+      "NodeUserTemp",
+      "NumHistories"
+    ],
+    "scalar_fields": [
+      "CTFTimeStep",
+      "TimeStepZone"
+    ],
+    "initial_state_distinct_from_whole_return_and_retry_state": true,
+    "PostConversion_layer_handoff_retained": true,
+    "PostConversion_handoff_fields": [
+      "LayersInConstruct",
+      "NumResLayers",
+      "dl",
+      "rk",
+      "rho",
+      "cp",
+      "lr",
+      "ResLayer"
+    ],
+    "capacitance_factors_are_actual_rho_and_cp_not_recomputed_products": true,
+    "required_reached_fields_absent_is_integrity_failure": true,
+    "unreached_counted_as_PASS": false,
+    "branch_or_numeric_answers_reconstructed": false
+  },
+  "reviewed_initial_policy_contract": {
+    "path": ".runtime/porting/CTF-03/frozen-packet-01/tolerances.json",
+    "sha256": "2d8d295429103cc3a8d27e66e783eff0509b5bd88a656d7a796be94100c72037",
+    "size_bytes": 5915
+  },
+  "actual_observation_counts": {
+    "initial_record_count": 42,
+    "initial_reached_phase_records": 25,
+    "initial_unreached_phase_records": 17,
+    "initial_available_owner_count": 25,
+    "initial_unavailable_owner_count": 17,
+    "initial_selected_1D_owner_count": 25,
+    "initial_unselected_context_count": 0,
+    "actual_initial_callback_count": 25,
+    "model_cases": 39,
+    "operation_records": 42,
+    "actual_operation_invocations": 42,
+    "actual_operations_skipped": 0,
+    "actual_phase_callback_count": 131,
+    "unreached_phase_records": 20,
+    "scalar_DTO_visits": 4902,
+    "snapshot_visits": 318,
+    "actual_source_function_counts": {
+      "calculateTransferFunction": 42
+    },
+    "actual_source_status_counts": {
+      "source_returned": 42
+    },
+    "actual_constructor_status_counts": {
+      "source_returned": 39
+    },
+    "actual_initialization_status_counts": {
+      "source_returned": 39
+    },
+    "actual_phase_callback_counts": {
+      "PostLoad": 40,
+      "PostMerge": 33,
+      "PostConversion": 33,
+      "InitialDiscretization": 25
+    }
+  },
+  "actual_method_counts_unknown": false,
+  "observation_integrity_failures": [],
+  "Rust_baseline_released": true,
+  "requested_counts": {
+    "model_cases": 39,
+    "calculateTransferFunction": 42,
+    "total_operations": 42
+  },
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/CTF-03/original-data-review-prep-01/review_unit.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-03/original-data-review-01/000-review_unit.py",
+        "sha256": "f5b3cb3244e6776e67626afe50340e33b5767a247c6ea2445aa398a6a18dc274",
+        "size_bytes": 23069
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-03/original-data-review-prep-01/unit_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-03/original-data-review-01/001-unit_shape.py",
+        "sha256": "bdaa90c3839e98dad327b590ccabb12581d620251fd97a63c1fec6b28aa79a98",
+        "size_bytes": 19080
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-03/original-data-review-prep-01/initial_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-03/original-data-review-01/002-initial_shape.py",
+        "sha256": "112fee27e5d3c145d61bc8d27e6d4cd60ead564ad6a28f3675dd739e941f28c7",
+        "size_bytes": 8505
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-03/original-data-review-prep-01/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-03/original-data-review-01/003-packet_io.py",
+        "sha256": "15b0f4f384b705c160f67d97bfe391fa0ae6de18b1d4d5e014cbce59eaf83960",
+        "size_bytes": 3892
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CTF-03/original-data-review-01/000-review_unit.py",
+    "sha256": "f5b3cb3244e6776e67626afe50340e33b5767a247c6ea2445aa398a6a18dc274",
+    "size_bytes": 23069
+  },
+  "native_binary_payloads_rehashed_or_parsed": false,
+  "build_compile_recorder_authored_build_metadata_claimed": false,
+  "scientific_values_recomputed_or_compared": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "unreached_or_uninvoked_observation_counted_as_PASS": false,
+  "scientific_execution_performed": false,
+  "gates_updated": false,
+  "authorship_limits": "BaselineAudit authored passive03 and earlier CTF01 input/QA glue. This is factual observation/provenance validation, not an independent own-formula certificate; Root and other-author source review are required."
+}

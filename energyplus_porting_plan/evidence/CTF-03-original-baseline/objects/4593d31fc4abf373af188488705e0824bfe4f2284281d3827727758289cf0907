@@ -1,0 +1,100 @@
+use super::*;
+use crate::heat_balance::surface_manager::ctf_layer_preprocessing::{
+    CtfLayerCheckpoint, CtfNormalizedLayer,
+};
+
+fn layer(dl: f64, rho: f64, res_layer: bool) -> CtfNormalizedLayer {
+    CtfNormalizedLayer { dl, rk: 1.0, rho, cp: 1.0, lr: 1.0, res_layer }
+}
+
+fn converted(layers: Vec<CtfNormalizedLayer>, num_res_layers: usize) -> CtfConvertedLayers {
+    CtfConvertedLayers {
+        active: CtfLayerCheckpoint { layers, num_res_layers },
+        dyn_spacing: 0.0,
+        total_resistance: 1.0,
+        conductance: 1.0,
+    }
+}
+
+#[test]
+fn minimum_nodes_are_selected_before_initial_time_step_alignment() -> Result<(), Box<dyn std::error::Error>> {
+    let result = discretize_selected_ctf_1d_initial(&converted(vec![layer(1.0, 1.0, false)], 0), 1.0)?;
+    assert_eq!(result.active.len(), 1);
+    assert_eq!(result.active[0].nodes, 6);
+    assert_eq!(result.rcmax, 5);
+    assert_eq!(result.initial_ctf_time_step_hours.to_bits(), 1.0_f64.to_bits());
+    assert_eq!(result.initial_num_histories, 1);
+    assert_eq!((result.node_source, result.node_user_temp), (0, 0));
+    Ok(())
+}
+
+#[test]
+fn interior_computed_resistance_retains_one_node_and_actual_dl() -> Result<(), Box<dyn std::error::Error>> {
+    let inner_dl = 0.375_f64;
+    let result = discretize_selected_ctf_1d_initial(
+        &converted(vec![layer(1.0, 1.0, false), layer(inner_dl, 1.0, true), layer(1.0, 1.0, false)], 1),
+        1.0,
+    )?;
+    assert_eq!(result.active[1].nodes, 1);
+    assert_eq!(result.active[1].dx.to_bits(), inner_dl.to_bits());
+    assert_eq!(result.rcmax, 12);
+    Ok(())
+}
+
+#[test]
+fn end_resistance_flags_use_the_ordinary_node_selection_branch() -> Result<(), Box<dyn std::error::Error>> {
+    let result = discretize_selected_ctf_1d_initial(
+        &converted(vec![layer(1.0, 1.0, true), layer(1.0, 1.0, false), layer(1.0, 1.0, true)], 2),
+        1.0,
+    )?;
+    assert_eq!(result.active.iter().map(|row| row.nodes).collect::<Vec<_>>(), vec![6, 6, 6]);
+    assert_eq!(result.rcmax, 17);
+    Ok(())
+}
+
+#[test]
+fn capped_nodes_retain_initial_history_alignment_without_a_retry_driver() -> Result<(), Box<dyn std::error::Error>> {
+    let result = discretize_selected_ctf_1d_initial(&converted(vec![layer(1.0, 1000.0, false)], 0), 1.0)?;
+    assert_eq!(result.active[0].nodes, 19);
+    assert_eq!(result.rcmax, 18);
+    assert_eq!(result.initial_num_histories, 3);
+    assert_eq!(result.initial_ctf_time_step_hours.to_bits(), 3.0_f64.to_bits());
+    assert_eq!(result.time_step_zone_hours.to_bits(), 1.0_f64.to_bits());
+    Ok(())
+}
+
+#[test]
+fn all_resistive_route_has_no_selected_initial_owner() {
+    assert_eq!(
+        discretize_selected_ctf_1d_initial(&converted(vec![layer(1.0, 1.0, true)], 1), 1.0),
+        Err(CtfInitialDiscretizationScopeError::AllResistive),
+    );
+}
+
+#[test]
+fn source_integer_conversion_checks_truncation_domain_without_saturation() {
+    assert_eq!(source_i32(-2147483648.75), Some(i32::MIN));
+    assert_eq!(source_i32(2147483647.75), Some(i32::MAX));
+    for value in [-2147483649.0, 2147483648.0, f64::NEG_INFINITY, f64::INFINITY, f64::NAN] {
+        assert_eq!(source_i32(value), None);
+    }
+}
+
+#[test]
+fn undefined_history_conversion_is_explicitly_unavailable() {
+    assert_eq!(
+        discretize_selected_ctf_1d_initial(&converted(vec![layer(1.0, 1.0e12, false)], 0), 1.0),
+        Err(CtfInitialDiscretizationScopeError::UnsupportedHistoryIntegerConversion),
+    );
+}
+
+#[test]
+fn invalid_zone_context_does_not_supply_replacement_time_step() {
+    let inputs = converted(vec![layer(1.0, 1.0, false)], 0);
+    for value in [0.0, -1.0, f64::NAN, f64::INFINITY] {
+        assert_eq!(
+            discretize_selected_ctf_1d_initial(&inputs, value),
+            Err(CtfInitialDiscretizationScopeError::UnsupportedZoneTimeStep),
+        );
+    }
+}

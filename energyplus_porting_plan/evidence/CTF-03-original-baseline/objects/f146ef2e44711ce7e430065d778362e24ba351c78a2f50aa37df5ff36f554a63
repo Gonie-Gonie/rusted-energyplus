@@ -1,0 +1,151 @@
+{
+  "schema": "ctf03-source-readiness-and-initial-owner-proposal.v1",
+  "status": "held-source-only-proposal-unapplied-and-unexecuted",
+  "source_pin": {
+    "version": "26.1.0",
+    "commit": "6f2e40d10250a105b49966baa24d843711e61048"
+  },
+  "card": "CTF-03",
+  "observed_card_gate_metadata": {
+    "plan": {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "31d568da70a398b72366856c9c70c9142e378d5aa4d97bc0e29cb23e32f1768e",
+      "size_bytes": 616272,
+      "line_count": 11668
+    },
+    "cards": {
+      "CTF-01": {
+        "scope_review": "통과",
+        "unit_gate": "통과",
+        "integration_gate": "미확인",
+        "production_gate": "미확인"
+      },
+      "CTF-02": {
+        "scope_review": "미확인",
+        "unit_gate": "미확인",
+        "integration_gate": "미확인",
+        "production_gate": "미확인"
+      },
+      "CTF-03": {
+        "scope_review": "미확인",
+        "unit_gate": "미확인",
+        "integration_gate": "미확인",
+        "production_gate": "미확인"
+      }
+    },
+    "no_gate_updated": true
+  },
+  "scope": {
+    "selected_block": "ConstructionProps::calculateTransferFunction original Construction.cc490-619",
+    "predicates": [
+      "IsUsedCTF true",
+      "loading reached and shared ErrorsFound false at313",
+      "LayersInConstruct > NumResLayers at405",
+      "actual prior-construction reverse scan finds no reusable reverse at417-485",
+      "SourceSinkPresent false",
+      "SolutionDimensions == 1"
+    ],
+    "inputs": "Actual CTF01 post-conversion active dl/rk/rho/cp/ResLayer owners in English units; actual caller TimeStepZone fractional hours.",
+    "outputs": [
+      "active Nodes/dx in merged local-prefix order",
+      "rcmax",
+      "NodeSource/NodeUserTemp zero from genuine no-source helper",
+      "initial CTFTimeStep and NumHistories at619"
+    ],
+    "excluded": [
+      "2D and embedded sources",
+      "matrix assembly/CTF04",
+      "exponential/inverse/gammas/final coefficients/CTF05-10",
+      "retry convergence driver",
+      "reverse coefficient reuse driver",
+      "whole-method or production certification"
+    ],
+    "policy_frozen": false,
+    "actual_inputs_or_outputs_generated": false
+  },
+  "source_order": [
+    "146-161 resets CTF timestep/history/coefficient owners; !IsUsedCTF returns at163 before local arrays.",
+    "194 starts CTFTimeStep from actual TimeStepZone; ErrorsFound at313 returns before merging/conversion.",
+    "405 chooses massive vs all-resistive using active count and calculated NumResLayers, not a substitute heat-capacity heuristic.",
+    "417-483 scans actual earlier Construct array addresses and original TotLayers/LayerPoint identities; used reverse copies final coefficient/timestep/history owners and bypasses initial phase.",
+    "490-522 chooses interior resistive one-node route or sqrt/divide/int/min-max route in original active-prefix order.",
+    "526-535 sums Nodes in order then subtracts one; old MaxTotNodes reduction540-568 is commented out.",
+    "573 calls setNodeSourceAndUserTemp; helper2045-2051 writes both zero then returns for SourceSinkPresent false.",
+    "584-597 resets selected candidate dt to zero, considers only Nodes>=19, uses rho*cp*(dx*dx)/rk and a strict greater-than maximum.",
+    "603-618 uses strict relative discrepancy >0.1; if greater candidate, int(candidate/zone+0.5), then zone*double(histories); else sets zone and history1. If discrepancy test is false, initial reset history0 is retained.",
+    "619 is initial checkpoint; matrices allocate638-655 and whole downstream method remains intact through1103.",
+    "908-936 later retries increment histories and add TimeStepZone without recalculating Nodes/dx. Final returned timestep must not replace initial checkpoint."
+  ],
+  "literal_arithmetic": {
+    "MaxLayersInConstruct": 11,
+    "MinNodes": 6,
+    "MaxCTFTerms": 19,
+    "dxn": "sqrt(2.0 * (rk / rho / cp) * initial TimeStepZone)",
+    "node_estimate": "C++ int(dl/dxn), then source if >19 / else if <6 / else estimate",
+    "dx": "dl / double(Nodes); interior calculated resistance copies dl",
+    "rcmax": "ordered sum(Nodes) - 1 for 1D; no restored commented global cap",
+    "dtn": "rho * cp * (dx * dx) / rk; ObjexxFCL::pow_2 returns x*x",
+    "source_precise_association_preserved": true,
+    "no_defensive_zero_or_normalization": true
+  },
+  "proposed_preoutput_admission": {
+    "status": "Root-approved source scope, future actual input freeze still required",
+    "zone_time_step": "Actual finite positive caller fractional hours; no replacement/default/max(1) inside this API.",
+    "integer_domain": "For each actual C++ int operand, value finite and its truncation toward zero representable in signed32 int. Future Native source asserts signed int digits31.",
+    "undefined_conversion": "Explicit scope stop/unavailable; no Rust saturating cast extension, no zero/node/dt guess.",
+    "source_node_min_max": "The original6/19 selection after a defined int conversion remains unchanged."
+  },
+  "current_rust_owners_and_gaps": {
+    "reusable": "CtfConvertedLayers.active provides genuine merged converted prefix and NumResLayers; construction cache retains construction IDs, original material-layer stack/order and selected surface-derived use.",
+    "absent": [
+      "No Nodes/dx/rcmax or initial timestep/history owner",
+      "No whole-method reverse-reuse driver",
+      "No converged coefficient/retry driver",
+      "No passed CTF TimeStepZone field at existing construction-cache build call"
+    ],
+    "original_identity": "ep_model Construction.layers retains ordered MaterialId associations for actual reverse selection; never infer merged material IDs from normalized prefix positions.",
+    "shared_errors": "Current cache carries selected preprocessing errors only. Later Native solver ErrorsFound can affect following calls; do not inject those Native output flags into Rust or mask their differences.",
+    "current_surface_history": "Existing SurfaceCtfState coefficients/history and steady fallback are context, not substitutes for this missing nodal owner."
+  },
+  "pure_source_proposal": {
+    "new_module_target": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+    "api": "discretize_selected_ctf_1d_initial(&CtfConvertedLayers, time_step_zone_hours:f64) -> Result<CtfInitialDiscretization,CtfInitialDiscretizationScopeError>",
+    "owner": "active Vec<CtfInitialLayerNodes{nodes:i32,dx:f64}>, rcmax:i32, NodeSource/UserTemp:i32, actual zone-hours stamp, initial CTF dt/history.",
+    "only_existing_source_diff": "One additive public module declaration; no cache/runtime/surface/initialization wiring.",
+    "preconditions_not_guessed": "Caller must establish actual used/error/massive/nonreverse/1D/no-source path. API cannot infer reverse from layer values and is not a complete production driver.",
+    "unreached": "No selected owner for unused/loading-error/all-resistive/reverse routes; absent does not mean zero or numerical PASS.",
+    "future_ingress": "After actual source-equivalent branch orchestration exists, build once from borrowed genuine converted owner; expose construction-owned initial checkpoint separately from mutable retry-attempt state.",
+    "CTF04_adapter": "Borrow active layers plus actual nodes/dx/rcmax. Separate attempt context carries dt/history/TimeStepZone; no mathematical re-evaluation of initial nodes on retries.",
+    "tests": "Eight proposed focused tests: minimum, interior and end resistance branches, capped nodes/initial rounding, all-resistive unavailable, exact signed-int truncation admission, undefined history conversion, unavailable zone context. No test executed or Native equivalence claimed."
+  },
+  "native_observation_proposal": {
+    "current_observer": "Immutable CTF01 observer captures only post309/post372/post401; existing returned public owners cannot recover local Nodes/dx or selected initial dt.",
+    "fresh_extension": "A fresh derived-TU version adds output-only callback immediately after original619, before matrices. Original bytes and all whole-method downstream calls remain otherwise identical.",
+    "copy_only": [
+      "actual active Nodes/dx prefixes",
+      "actual rcmax/NodeSource/NodeUserTemp",
+      "actual initial CTFTimeStep/NumHistories",
+      "actual TimeStepZone and bound real state/Construct identity"
+    ],
+    "integrity": "Preserve explicit binding/actual callback count/order/duplicate/prefix integrity and binary64 object-representation copy. No numerical reconstruction or scientific write.",
+    "absence": "Callback not reached on unused/error/all-resistive/reverse/unsupported paths; actual missing checkpoint stays unavailable/no PASS. Do not treat stale/default rcmax as reached evidence.",
+    "not_representative": [
+      "last temporary dxn/dtn",
+      "unused array tails",
+      "later final timestep used as initial timestep",
+      "invented merged MaterialId"
+    ],
+    "source_changed": false
+  },
+  "verification_boundary": {
+    "static_source_and_metadata_only": true,
+    "target_imported": false,
+    "compiler_or_tests_run": false,
+    "scientific_or_weather_payload_read": false,
+    "binary_read_or_hash": false,
+    "canonical_files_written": false,
+    "numeric_profiles_or_case_counts_frozen": false,
+    "new_QA_execution_stage": false,
+    "authorship": "Author of current CTF01 Rust prefix; this proposal is not independent certification of that earlier formula. Root/other-author source review and genuine Original/baseline observations remain required."
+  }
+}

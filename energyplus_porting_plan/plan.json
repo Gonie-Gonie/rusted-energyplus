@@ -9701,6 +9701,11 @@
         "initial_observation_after619_before_matrix_or_retry": true,
         "separate_initial_capture_and_original_three_callbacks": true,
         "CTF01_dependency_completion_and_other_three_gates_pending": true
+      },
+      "actual_Original_and_existing_Rust_baseline": {
+        "path": "energyplus_porting_plan/evidence/CTF-03-original-baseline/summary.json",
+        "sha256": "235dac313ebd08074a7f373a41fab2270c88d3051f932156f7f61043da3a2f4d",
+        "size_bytes": 6469
       }
     },
     {

@@ -1,0 +1,515 @@
+{
+  "schema": "ctf03-candidate-observer-source-inventory.v1",
+  "status": "SOURCE-READY-HELD-unapplied-unexecuted",
+  "own_source_rows": [
+    {
+      "proposed_canonical_path": "crates/ep_run/examples/ctf03_candidate_unit_observer.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-03/candidate-observer-prep-01/ctf03_candidate_unit_observer.rs",
+        "sha256": "93859746027b1a09fe0339b5c388c672930c365affb7a2753a8c0e2a572e06e3",
+        "size_bytes": 14954,
+        "line_count": 200
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-03/candidate-observer-prep-01/before/ctf02_candidate_unit_observer.rs",
+        "sha256": "0eab9e71195f57d2dd2bf416349b21264429c9786dc5597a3bbf467e8d815db2",
+        "size_bytes": 13104,
+        "line_count": 182
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-03/candidate-observer-prep-01/ctf03_candidate_unit_observer.rs.from-CTF02.diff",
+        "sha256": "c2a42382518820182230fcd695a0097fa833a313dc8ba76a741070c61bc7018a",
+        "size_bytes": 12326,
+        "line_count": 159
+      }
+    },
+    {
+      "proposed_canonical_path": "crates/ep_run/examples/ctf03_candidate_unit_support/fields.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-03/candidate-observer-prep-01/unit_fields.rs",
+        "sha256": "b327849bea56a5c4da631b0c83339cd41dca4dfc655fa2595626f6048725c41a",
+        "size_bytes": 8376,
+        "line_count": 132
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-03/candidate-observer-prep-01/before/unit_fields.rs",
+        "sha256": "4f5ec28a6a29110a0503784f0799ce5498ccf5e14e18330347cf5eea79455ca0",
+        "size_bytes": 6178,
+        "line_count": 101
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-03/candidate-observer-prep-01/unit_fields.rs.from-CTF02.diff",
+        "sha256": "b2cbbddd5d9edefdf157a6e576bb278bef24b9c61f2c52fb6cac015e1442cf69",
+        "size_bytes": 6419,
+        "line_count": 100
+      }
+    },
+    {
+      "proposed_canonical_path": "crates/ep_run/examples/ctf03_candidate_production_support/unit_fields.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-03/candidate-observer-prep-01/production_unit_fields.rs",
+        "sha256": "b327849bea56a5c4da631b0c83339cd41dca4dfc655fa2595626f6048725c41a",
+        "size_bytes": 8376,
+        "line_count": 132
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-03/candidate-observer-prep-01/before/production_unit_fields.rs",
+        "sha256": "4f5ec28a6a29110a0503784f0799ce5498ccf5e14e18330347cf5eea79455ca0",
+        "size_bytes": 6178,
+        "line_count": 101
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-03/candidate-observer-prep-01/production_unit_fields.rs.from-CTF02.diff",
+        "sha256": "fdda8e6e4809258b2247907da617d0f6fdc0d93475e248dac36eb63a3c3dca4c",
+        "size_bytes": 6441,
+        "line_count": 100
+      }
+    },
+    {
+      "proposed_canonical_path": "crates/ep_run/examples/ctf03_candidate_production_observer.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-03/candidate-observer-prep-01/ctf03_candidate_production_observer.rs",
+        "sha256": "580f3d949582794ae128759d51188d69aa454e7492b291d0c89e29305f9dd312",
+        "size_bytes": 13666,
+        "line_count": 208
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-03/candidate-observer-prep-01/before/ctf02_candidate_production_observer.rs",
+        "sha256": "6c569199d71df689404ad0613d1b6176b5100cc02116731906d77a2d9b863802",
+        "size_bytes": 13664,
+        "line_count": 208
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-03/candidate-observer-prep-01/ctf03_candidate_production_observer.rs.from-CTF02.diff",
+        "sha256": "761d3744ea468a5997f05552726ce7122f25a96d1debd20dcb1c44c2cfe5f588",
+        "size_bytes": 6254,
+        "line_count": 87
+      }
+    },
+    {
+      "proposed_canonical_path": "crates/ep_run/examples/ctf03_candidate_production_support/fields.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-03/candidate-observer-prep-01/production_fields.rs",
+        "sha256": "c7c42c8da1ad5c5cd8e0bb61e9755ff59ecb9376955b54de9754d913345c81ec",
+        "size_bytes": 9661,
+        "line_count": 140
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-03/candidate-observer-prep-01/before/production_fields.rs",
+        "sha256": "e3928b68e4a523ffbb56e89f561c1d5e92f3c93ac63bd94e45bdf61fff025ef8",
+        "size_bytes": 10301,
+        "line_count": 146
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-03/candidate-observer-prep-01/production_fields.rs.from-CTF02.diff",
+        "sha256": "4a531009deb7d22ef2f15877f6c461dd6199e359bf787ae0600d8d8754c6490c",
+        "size_bytes": 4347,
+        "line_count": 63
+      }
+    }
+  ],
+  "observer_source_counts": {
+    "unit": 2,
+    "production": 3
+  },
+  "API_paths": {
+    "unit": [
+      "crates/ep_run/Cargo.toml",
+      "crates/ep_model/src/lib.rs",
+      "crates/ep_model/src/ids.rs",
+      "crates/ep_runtime/Cargo.toml",
+      "crates/ep_runtime/src/lib.rs",
+      "crates/ep_runtime/src/heat_balance/mod.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+      "crates/ep_model/src/objects/construction.rs",
+      "crates/ep_runtime/examples/clk02_probe_support/digest.rs"
+    ],
+    "production": [
+      "crates/ep_run/Cargo.toml",
+      "crates/ep_raw_model/src/lib.rs",
+      "crates/ep_raw_model/src/idf_order.rs",
+      "crates/ep_compiler/src/lib.rs",
+      "crates/ep_compiler/src/compiler.rs",
+      "crates/ep_model/src/lib.rs",
+      "crates/ep_model/src/model.rs",
+      "crates/ep_model/src/objects/materials.rs",
+      "crates/ep_model/src/objects/construction.rs",
+      "crates/ep_runtime/src/lib.rs",
+      "crates/ep_runtime/src/heat_balance/mod.rs",
+      "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "crates/ep_runtime/src/heat_balance/state.rs",
+      "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "crates/ep_model/src/objects/building.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+      "crates/ep_compiler/src/compiler/surface_space.rs"
+    ]
+  },
+  "API_source_counts": {
+    "unit": 12,
+    "production": 25
+  },
+  "API_source_identities": [
+    {
+      "canonical_path": "crates/ep_run/Cargo.toml",
+      "current_source": {
+        "path": "crates/ep_run/Cargo.toml",
+        "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+        "size_bytes": 524,
+        "line_count": 21
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_model/src/lib.rs",
+      "current_source": {
+        "path": "crates/ep_model/src/lib.rs",
+        "sha256": "2a756532553034fb2b92c892cb2e6f3c147aa129f6dce64b63763f364cb3cee4",
+        "size_bytes": 284,
+        "line_count": 15
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_model/src/ids.rs",
+      "current_source": {
+        "path": "crates/ep_model/src/ids.rs",
+        "sha256": "83b32ebf02684f459cb0a789f498de08b849b94a7072f1f5870663a4b3cca7be",
+        "size_bytes": 2029,
+        "line_count": 61
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/Cargo.toml",
+      "current_source": {
+        "path": "crates/ep_runtime/Cargo.toml",
+        "sha256": "bb81b5793debafd84300ec9905f0cda65ab32d216633543bab375b30a7a379e9",
+        "size_bytes": 327,
+        "line_count": 17
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/lib.rs",
+      "current_source": {
+        "path": "crates/ep_runtime/src/lib.rs",
+        "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+        "size_bytes": 868,
+        "line_count": 41
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "current_source": {
+        "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "45e6f8b9dfc0d7f85bd854a849cc0092c3ee7739fd4895c543aa73a1ea8bce46",
+        "size_bytes": 1344,
+        "line_count": 58
+      },
+      "held_proposed_owner": {
+        "path": ".runtime/porting/CTF-03/cache-ingress-prep-01/proposed/mod.rs",
+        "sha256": "43692d0c2a3024dddf4e8d0c2d8360d5b83a9e4a3e99bec328792ff194ef8240",
+        "size_bytes": 1371,
+        "line_count": 59
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "current_source": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+        "sha256": "99bcee1577e3400ae71dd42ee2e95aa2290413b3114dc0f52d0c79c07967b095",
+        "size_bytes": 5925,
+        "line_count": 170
+      },
+      "held_proposed_owner": {
+        "path": ".runtime/porting/CTF-03/readiness-audit-02/proposed/surface_manager.rs",
+        "sha256": "2a126bf526f6137c00dcd2fe3591881c5955bd27c0eff7a259ba494cf625d9d2",
+        "size_bytes": 5961,
+        "line_count": 171
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "current_source": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+        "sha256": "0cf67532a277ea20c362acdcc97d2e293ee086a8757177e2b8ccb5bb52fb39a7",
+        "size_bytes": 11747,
+        "line_count": 316
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+      "current_source": null,
+      "held_proposed_owner": {
+        "path": ".runtime/porting/CTF-03/readiness-audit-02/new/ctf_initial_discretization.rs",
+        "sha256": "607fdf46ad7a6c5f51d21747169dd88b4c52c211bba587c883ee11e7da85ea9a",
+        "size_bytes": 7182,
+        "line_count": 187
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+      "current_source": null,
+      "held_proposed_owner": {
+        "path": ".runtime/porting/CTF-03/cache-ingress-prep-01/new/ctf_initial_owner.rs",
+        "sha256": "3c4f7a0e5a89e68b40111f2b3cffe13bd5477f955bd3285864010054a32f1348",
+        "size_bytes": 5389,
+        "line_count": 124
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_model/src/objects/construction.rs",
+      "current_source": {
+        "path": "crates/ep_model/src/objects/construction.rs",
+        "sha256": "f1886c8b2f9aede1e661210520b668d52f74d884d9a207de9f0c046e4170f191",
+        "size_bytes": 18134,
+        "line_count": 445
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "current_source": {
+        "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+        "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+        "size_bytes": 3172,
+        "line_count": 75
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_raw_model/src/lib.rs",
+      "current_source": {
+        "path": "crates/ep_raw_model/src/lib.rs",
+        "sha256": "08f4a3bcf27c2f4e2577b534ad505176d0877b46709bb512b71685ebef6fa9a8",
+        "size_bytes": 16493,
+        "line_count": 491
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_raw_model/src/idf_order.rs",
+      "current_source": {
+        "path": "crates/ep_raw_model/src/idf_order.rs",
+        "sha256": "5f2a1984ebc76a51938232ab7002c9c683666cf88d765af8e02dbf126bad7772",
+        "size_bytes": 28468,
+        "line_count": 789
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_compiler/src/lib.rs",
+      "current_source": {
+        "path": "crates/ep_compiler/src/lib.rs",
+        "sha256": "1931ed21f1fae2fe5d7e90bb954f1f91812fec1d1eeb7daf102a6ba0007424fe",
+        "size_bytes": 165,
+        "line_count": 7
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_compiler/src/compiler.rs",
+      "current_source": {
+        "path": "crates/ep_compiler/src/compiler.rs",
+        "sha256": "52498a97e0444c82a91bcf7c362f70608822dc9d2428f1a37e568940c55b97a5",
+        "size_bytes": 771820,
+        "line_count": 19738
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_model/src/model.rs",
+      "current_source": {
+        "path": "crates/ep_model/src/model.rs",
+        "sha256": "8fe75e51f50682d68d185d18613b4e1505093d071cc4db19947ef03756bbbf32",
+        "size_bytes": 92680,
+        "line_count": 2322
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_model/src/objects/materials.rs",
+      "current_source": {
+        "path": "crates/ep_model/src/objects/materials.rs",
+        "sha256": "23d9f6dd7af7ef0aff73f3e4697ece3e5acd58104d2d5e3e1edbc46bfaa71653",
+        "size_bytes": 54627,
+        "line_count": 1205
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "current_source": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+        "sha256": "230a806183db9871b725892e4c413a704d9fb8ee944e94213eca9e0ac5e04e57",
+        "size_bytes": 11491,
+        "line_count": 232
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "current_source": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+        "sha256": "2b3343ff4f3cec29be8cc77bcd4d14a8bbcc78464812ad04b88d22469f7f0dfb",
+        "size_bytes": 4401,
+        "line_count": 118
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "current_source": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+        "sha256": "011b99d4e632e3fb9b3a821bd75013219c04ee890ba57667a113b6833a7a0a49",
+        "size_bytes": 1974,
+        "line_count": 40
+      },
+      "held_proposed_owner": {
+        "path": ".runtime/porting/CTF-03/cache-ingress-prep-01/proposed/state_shell.rs",
+        "sha256": "9c1de487ef0f13d54cdff6c640d13b60e6b47218b97258a842317a3a14425b0b",
+        "size_bytes": 2063,
+        "line_count": 41
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "current_source": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+        "sha256": "062ef1e4cc4f8175b03e3f88daf54bd34387b8c5e3bfc9f9fabe6602ab4dafab",
+        "size_bytes": 17043,
+        "line_count": 443
+      },
+      "held_proposed_owner": {
+        "path": ".runtime/porting/CTF-03/cache-ingress-prep-01/proposed/construction_cache.rs",
+        "sha256": "a352c69a38d798681c911501a65a887bcf41ae6daf542091ef8af0af38ed2dd7",
+        "size_bytes": 17992,
+        "line_count": 463
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "current_source": {
+        "path": "crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "4b1cec732ab81f8f6dc8ebcba70eb043751c3baacfaa5a59d726933fd185564f",
+        "size_bytes": 46440,
+        "line_count": 1016
+      },
+      "held_proposed_owner": {
+        "path": ".runtime/porting/CTF-03/cache-ingress-prep-01/proposed/state.rs",
+        "sha256": "b4d6258ec4bb84889bbccd114bb8b24231aa2aaaf20dbffbd4ca76c982d5d050",
+        "size_bytes": 46643,
+        "line_count": 1019
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "current_source": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+        "sha256": "7506de40b75a45b9c8f2c01c0b5a4f1ffc5f82ebb1861413a04e7c17ebc342e4",
+        "size_bytes": 29922,
+        "line_count": 814
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_model/src/objects/building.rs",
+      "current_source": {
+        "path": "crates/ep_model/src/objects/building.rs",
+        "sha256": "d6a3fbc6b39106f8d0b5195822bfc354e505e557f2b9406409b68aebfb089ef0",
+        "size_bytes": 11621,
+        "line_count": 373
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+      "current_source": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+        "sha256": "8e02f58b2da67416342b15f281cd270f80c1bafcd7600931899aef2f920f2bfc",
+        "size_bytes": 4902,
+        "line_count": 122
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    },
+    {
+      "canonical_path": "crates/ep_compiler/src/compiler/surface_space.rs",
+      "current_source": {
+        "path": "crates/ep_compiler/src/compiler/surface_space.rs",
+        "sha256": "8e7dccc67a68ccb71b9c284f78c83a681a81940998672cf945c9c0e8cfb7a379",
+        "size_bytes": 9708,
+        "line_count": 254
+      },
+      "actual_applied_formatted_identity_required_at_runtime": true
+    }
+  ],
+  "source_preparation_bindings": [
+    {
+      "path": ".runtime/porting/CTF-02/candidate-observer-prep-02/manifest.json",
+      "sha256": "1016d8aa87a9a23ffcbdc60875c994d912bc065ac0960358cf4e1da721afcc44",
+      "size_bytes": 17805,
+      "line_count": 458
+    },
+    {
+      "path": ".runtime/porting/CTF-03/cache-ingress-prep-01/manifest.json",
+      "sha256": "6d4592e2deb2224ddd7dbc02a59c1ccb9fd60ec9f7b29d57efb9a322626f52ec",
+      "size_bytes": 11631,
+      "line_count": 305
+    },
+    {
+      "path": ".runtime/porting/CTF-03/readiness-audit-02/manifest.json",
+      "sha256": "59386b2b05ac12617c1d082cc65cc844678d47b07059abdc3858389ef4a718ee",
+      "size_bytes": 21806,
+      "line_count": 585
+    },
+    {
+      "path": ".runtime/porting/CTF-03/native-helper-prep-01/ctf03_initial_fields.hh",
+      "sha256": "7c51b35aeda525a1f6c7fb5d0a99ccc170f39ddf8c7b10a28b36f15986a42c33",
+      "size_bytes": 3112,
+      "line_count": 49
+    },
+    {
+      "path": ".runtime/porting/CTF-03/original-data-review-prep-01/initial_shape.py",
+      "sha256": "112fee27e5d3c145d61bc8d27e6d4cd60ead564ad6a28f3675dd739e941f28c7",
+      "size_bytes": 8505,
+      "line_count": 119
+    }
+  ],
+  "own_preparation_source": {
+    "path": ".runtime/porting/CTF-03/candidate-observer-prep-01/prepare_sources.py",
+    "sha256": "ed8dc088b33913d5ad0000843a5989473bf34139126121bc01b1d0d375627aae",
+    "size_bytes": 23287,
+    "line_count": 330
+  },
+  "README": {
+    "path": ".runtime/porting/CTF-03/candidate-observer-prep-01/README.md",
+    "sha256": "ba258036c94f470285d9a7d96e8794e057b408b9ce8e895136b4ba2aafff68de",
+    "size_bytes": 3084,
+    "line_count": 47
+  },
+  "scalar_serializer_byte_identical_in_both_lanes": true,
+  "target_imported_or_executed": false,
+  "scientific_or_binary_payloads_read": false,
+  "canonical_sources_written": false,
+  "new_QA_execution_stage": false
+}

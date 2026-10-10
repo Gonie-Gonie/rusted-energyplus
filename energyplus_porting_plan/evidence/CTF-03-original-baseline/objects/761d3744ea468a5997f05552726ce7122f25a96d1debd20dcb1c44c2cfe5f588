@@ -1,0 +1,87 @@
+--- .runtime/porting/CTF-03/candidate-observer-prep-01/before/ctf02_candidate_production_observer.rs
++++ crates/ep_run/examples/ctf03_candidate_production_observer.rs
+@@ -1,11 +1,11 @@
+ //! Actual candidate public fixed-CON loader/compiler/initialization owners only.
+ #[path = "../../ep_runtime/examples/clk02_probe_support/digest.rs"]
+ mod digest;
+-#[path = "ctf02_candidate_production_support/fields.rs"]
++#[path = "ctf03_candidate_production_support/fields.rs"]
+ mod fields;
+ // Exact accepted serializer copy includes unit-only helpers and path constants.
+ #[allow(dead_code)]
+-#[path = "ctf02_candidate_production_support/unit_fields.rs"]
++#[path = "ctf03_candidate_production_support/unit_fields.rs"]
+ mod unit_fields;
+ 
+ use ep_model::SimulationModel;
+@@ -70,7 +70,7 @@
+         "initialization":{"invoked":false,"status":"not-invoked-without-typed-model"},
+         "typed_owners":null,"initialized_state_context":null,
+         "selected_CTF01_owners":fields::unavailable(),
+-        "selected_CTF02_owners":fields::ctf02_unavailable(),"Native_or_expected_values_read":false});
++        "selected_CTF03_owners":fields::ctf03_unavailable(),"Native_or_expected_values_read":false});
+     if row["conversion_available"] == false { return Ok(out); }
+     let (idf, _) = bound(root, &row["input"])?;
+     let (epjson, _) = bound(root, &row["epjson_input"])?;
+@@ -97,7 +97,7 @@
+                 "initial_zone_air_temperature_c":fields::scalar(initial),"external_CTF_rows_supplied":false});
+             out["initialized_state_context"] = fields::state(&state);
+             out["selected_CTF01_owners"] = fields::selected(&state);
+-            out["selected_CTF02_owners"] = fields::ctf02_selected(&state);
++            out["selected_CTF03_owners"] = fields::ctf03_selected(&state);
+         }
+         Err(error) => out["initialization"] = json!({"invoked":true,"status":"source-error-returned",
+             "message":error.to_string(),"initial_zone_air_temperature_c":fields::scalar(initial),
+@@ -124,7 +124,7 @@
+     let request: Value = serde_json::from_slice(&original)?;
+     keys(&request, &["schema","fixed_scope","model_cases","initial_zone_air_temperature_c","observer_sources","native_helper_request","native_admission_contract",
+         "actual_public_API_sources","actual_Cargo_source_capture_must_match","frozen_before_execution","expected_values_supplied","Native_results_supplied"])?;
+-    require(request["schema"] == "ctf02-candidate-production-observer-request.v1" && request["frozen_before_execution"] == true
++    require(request["schema"] == "ctf03-candidate-production-observer-request.v1" && request["frozen_before_execution"] == true
+         && request["expected_values_supplied"] == false && request["Native_results_supplied"] == false
+         && request["actual_Cargo_source_capture_must_match"] == true,
+         "frozen input-only observer request required")?;
+@@ -147,9 +147,9 @@
+     let native: Value = serde_json::from_slice(&native_bytes)?;
+     let (_, admission_bytes) = bound(&root,&request["native_admission_contract"])?;
+     let admission: Value = serde_json::from_slice(&admission_bytes)?;
+-    require(native["schema"] == "ctf02-production-helper-cases.v1"
+-        && admission["schema"] == "ctf02-production-native-admission-contract.v1"
+-        && native["frozen_before_this_CTF02_helper_execution"] == true
++    require(native["schema"] == "ctf03-production-helper-cases.v1"
++        && admission["schema"] == "ctf03-production-native-admission-contract.v1"
++        && native["frozen_before_this_CTF03_helper_execution"] == true
+         && native["expected_values_supplied"] == false && native["expected_exits_supplied"] == false
+         && native["scientific_execution_performed"] == false
+         && admission["helper_request"] == request["native_helper_request"]
+@@ -157,7 +157,7 @@
+         && admission["contracts"]["tolerances"] == native["contracts"]["tolerances"]
+         && admission["requested_counts"] == native["requested_counts"]
+         && native["requested_counts"] == json!({"model_cases":15,"loader_phase_records":195})
+-        && native["fixed_scope"] == request["fixed_scope"], "actual frozen CTF02 production packet differs")?;
++        && native["fixed_scope"] == request["fixed_scope"], "actual frozen CTF03 production packet differs")?;
+     let mut bindings = vec![request["fixed_scope"].clone(),request["native_helper_request"].clone(),
+         request["native_admission_contract"].clone(),admission["projection"].clone()];
+     for key in ["source","tolerances","cases"] { bindings.push(admission["contracts"][key].clone()); }
+@@ -191,11 +191,11 @@
+     observer_pins(&root, &request["observer_sources"])?;
+     source_pins(&root, &request["actual_public_API_sources"], fields::API_PATHS)?;
+     require(std::fs::read(&request_path)? == original, "observer request changed during public calls")?;
+-    println!("{}",serde_json::to_string_pretty(&json!({"schema":"ctf02-candidate-production-observer-results.v1",
++    println!("{}",serde_json::to_string_pretty(&json!({"schema":"ctf03-candidate-production-observer-results.v1",
+         "actual_request":{"path":request_path,"sha256":digest::sha256(&original)},
+         "native_helper_request":request["native_helper_request"],"native_admission_contract":request["native_admission_contract"],
+         "contracts":admission["contracts"],"projection":admission["projection"],
+-        "ctf02_public_observation_policy":native["ctf02_public_observation_policy"],
++        "ctf03_initial_observation_policy":native["ctf03_initial_observation_policy"],
+         "fixed_scope":request["fixed_scope"],"observer_sources":request["observer_sources"],
+         "actual_public_API_sources":request["actual_public_API_sources"],"model_cases":models,
+         "all_bound_inputs_unchanged":true,"same_original_IDF_order_overlay_used":true,
+@@ -203,6 +203,6 @@
+         "observations_copied_from_actual_initialized_owner":true,
+         "preprocessing_reexecuted_by_observer":false,
+         "scientific_comparison_performed":false,"numerical_PASS_claimed":false,
+-        "gates_updated":false,"CTF03_through_CTF10_certified":false}))?);
++        "gates_updated":false,"CTF04_through_CTF10_certified":false}))?);
+     Ok(())
+ }

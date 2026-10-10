@@ -1,0 +1,200 @@
+//! Actual explicit-member preprocessing and source-owned initial CTF03 route; no solver answers.
+#[path = "../../ep_runtime/examples/clk02_probe_support/digest.rs"]
+mod digest;
+#[path = "ctf03_candidate_unit_support/fields.rs"]
+mod fields;
+
+use ep_model::{Construction, ConstructionId, ConstructionKind, MaterialId, NormalizedName};
+use ep_runtime::heat_balance::surface_manager::ctf_layer_preprocessing::{
+    ConstructionCtfLayerPreprocessing, CtfLayerContext, CtfLayerInput, preprocess_ctf_layers,
+};
+use ep_runtime::heat_balance::ctf_initial_owner::initialize_construction_ctf_initial;
+use serde_json::{Value, json};
+use std::collections::{BTreeMap, BTreeSet};
+use std::path::{Path, PathBuf};
+type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+
+fn require(ok: bool, message: &str) -> Result<()> {
+    if ok { Ok(()) } else { Err(message.to_owned().into()) }
+}
+fn text(value: &Value) -> Result<&str> { value.as_str().ok_or_else(|| "typed string required".into()) }
+fn rows(value: &Value) -> Result<&[Value]> {
+    value.as_array().map(Vec::as_slice).ok_or_else(|| "typed array required".into())
+}
+fn flag(value: &Value) -> Result<bool> { value.as_bool().ok_or_else(|| "typed boolean required".into()) }
+fn scalar(value: &Value) -> Result<f64> {
+    let bits = text(&value["bits"])?;
+    require(value.as_object().is_some_and(|object| object.len() == 1) && bits.len() == 16
+        && bits.bytes().all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c)), "literal binary64 DTO required")?;
+    let result = f64::from_bits(u64::from_str_radix(bits,16)?);
+    require(result.is_finite(), "finite frozen literal input required")?;
+    Ok(result)
+}
+fn bound(root: &Path, binding: &Value) -> Result<(PathBuf, Vec<u8>)> {
+    let relative = Path::new(text(&binding["path"])?);
+    require(relative.is_relative(), "relative input/source binding required")?;
+    let path = root.join(relative).canonicalize()?;
+    require(path.starts_with(root) && path != root && path.is_file(), "contained regular input/source required")?;
+    require(std::fs::metadata(&path)?.len() <= 64 * 1024 * 1024, "bounded input/source required")?;
+    let bytes = std::fs::read(&path)?;
+    require(digest::sha256(&bytes) == text(&binding["sha256"])?, "input/source SHA differs")?;
+    for key in ["bytes","size_bytes"] {
+        if let Some(size) = binding.get(key) {
+            require(size.as_u64() == Some(u64::try_from(bytes.len())?), "input/source size differs")?;
+        }
+    }
+    Ok((path,bytes))
+}
+fn source_pins(root: &Path, inventory: &Value) -> Result<()> {
+    require(inventory["schema"] == "ctf03-candidate-unit-runtime-source-bindings.v1"
+        && inventory.as_object().is_some_and(|object| object.len() == 3), "source bindings schema/fields differ")?;
+    for (key, paths) in [("observer_sources",fields::OBSERVER_PATHS),("actual_public_API_sources",fields::API_PATHS)] {
+        let supplied = rows(&inventory[key])?;
+        require(supplied.len() == paths.len(), "source inventory count differs")?;
+        for (binding,path) in supplied.iter().zip(paths) {
+            require(text(&binding["path"])? == *path, "source inventory path/order differs")?;
+            bound(root,binding)?;
+        }
+    }
+    Ok(())
+}
+fn model_case(model: &Value) -> Result<Value> {
+    require(model["lane"] == "explicit-member-unit", "explicit member lane required")?;
+    let mut association = BTreeMap::new(); let mut typed = Vec::new();
+    for (index, material) in rows(&model["materials"])?.iter().enumerate() {
+        let id = text(&material["id"])?;
+        require(association.insert(id, index).is_none(), "duplicate logical material ID")?;
+        typed.push(CtfLayerInput { material_id:MaterialId(u32::try_from(index)?),
+            thickness:scalar(&material["Thickness"])?,conductivity:scalar(&material["Conductivity"])?,
+            density:scalar(&material["Density"])?,specific_heat:scalar(&material["SpecHeat"])?,
+            resistance:scalar(&material["Resistance"])?,resistance_only:flag(&material["ROnly"])? });
+    }
+    let declarations = rows(&model["constructions"])?; let operations = rows(&model["operations"])?;
+    require(declarations.len() == operations.len(), "ordered construction/call ledger differs")?;
+    // These real typed owners carry the explicit lane's original identities/stack,
+    // not a compiler/Material-loader observation or a reconstructed normalized stack.
+    let mut constructions = Vec::new(); let mut used = BTreeSet::new();
+    for (index, declaration) in declarations.iter().enumerate() {
+        let layers = rows(&declaration["layer_material_ids"])?.iter().map(|id| {
+            let index = *association.get(text(id)?).ok_or("undeclared material reference")?;
+            Ok(typed[index].material_id)
+        }).collect::<Result<Vec<_>>>()?;
+        let id = ConstructionId(u32::try_from(index)?);
+        if flag(&declaration["IsUsedCTF"])? { used.insert(id.0); }
+        constructions.push(Construction { id,name:NormalizedName(text(&declaration["Name"])?.to_owned()),
+            kind:ConstructionKind::Opaque,outside_layer:layers.first().copied(),layers,
+            thermochromic_master:None,ground_factor:None,air_boundary:None,complex_fenestration:None,
+            window_equivalent_layer:None,internal_heat_source:None });
+    }
+    let mut selected_errors = flag(&model["caller"]["ErrorsFound"])?;
+    let mut observed = Vec::new();
+    for (index, ((declaration, construction), operation)) in declarations.iter().zip(&constructions).zip(operations).enumerate() {
+        require(operation["kind"] == "calculateTransferFunction" && operation["construction_id"] == declaration["id"],
+            "declared Native call/construction order differs")?;
+        let layers = construction.effective_layers().iter().map(|id| {
+            let index = usize::try_from(id.0)?;
+            typed.get(index).copied().ok_or_else(|| "typed material association absent".into())
+        }).collect::<Result<Vec<_>>>()?;
+        let before = selected_errors;
+        // Actual selected context is supplied separately. The typed stack above
+        // does not fabricate an internal-source declaration for rejected lanes.
+        let context = CtfLayerContext { is_used_ctf:flag(&declaration["IsUsedCTF"])?, errors_found:before,
+            source_sink_present:flag(&declaration["SourceSinkPresent"])?,
+            solution_dimensions:i32::try_from(declaration["SolutionDimensions"].as_i64().ok_or("typed dimensions required")?)? };
+        let result = preprocess_ctf_layers(&layers,context);
+        let preprocessing = ConstructionCtfLayerPreprocessing { construction_id:construction.id,
+            is_used_ctf:context.is_used_ctf,result };
+        let time_step_zone = scalar(&model["caller"]["TimeStepZone"])?;
+        let initial = initialize_construction_ctf_initial(construction,&constructions[..index],&used,
+            &preprocessing,context,time_step_zone);
+        if let Ok(actual) = &preprocessing.result { selected_errors = actual.errors_found; }
+        observed.push(json!({"id":operation["id"],"declared_native_operation_kind":operation["kind"],
+            "logical_construction_id":declaration["id"],"actual_Rust_API":"preprocess_ctf_layers",
+            "actual_source_invoked":true,"selected_ErrorsFound_before":before,
+            "selected_ErrorsFound_after":selected_errors,"actual_layer_material_ids":layers.iter().map(|v|v.material_id.0).collect::<Vec<_>>(),
+            "original_layer_membership":declaration["layer_material_ids"],"result":fields::result(&preprocessing.result),
+            "CTF03_initial":fields::initial(&initial,Some(&preprocessing)),
+            "actual_Rust_CTF03_API":"initialize_construction_ctf_initial","actual_Rust_CTF03_API_invoked":true,
+            "actual_initial_discretization_owner_available":initial.result.is_ok(),
+            "actual_construction_id":construction.id.0,
+            "actual_ordered_prior_construction_ids":constructions[..index].iter().map(|owner|owner.id.0).collect::<Vec<_>>(),
+            "actual_used_construction_ids":used.iter().copied().collect::<Vec<_>>(),
+            "actual_caller_TimeStepZone":fields::scalar(time_step_zone),
+            "preprocessing_reexecuted_for_initial_owner":false,"observer_reverse_classifier_duplicated":false,
+            "Native_whole_method_outcome_or_later_flags_inferred":false}));
+    }
+    Ok(json!({"id":model["id"],"lane":model["lane"],"declared_caller":model["caller"],
+        "materials":rows(&model["materials"])?.iter().zip(&typed).map(|(declared,actual)|json!({
+            "logical_id":declared["id"],"declared_name":declared["Name"],"actual_typed_input":fields::input(actual)
+        })).collect::<Vec<_>>(),"declared_constructions":model["constructions"],"operations":observed,
+        "final_selected_ErrorsFound":selected_errors,"DoCTFErrorReport":fields::unpaired_later_flag(),
+        "explicit_member_input_not_Material_loader_observation":true}))
+}
+fn main() {
+    if let Err(error) = run() { eprintln!("{error}"); std::process::exit(2); }
+}
+fn run() -> Result<()> {
+    let mut args = std::env::args_os().skip(1);
+    let request_path = PathBuf::from(args.next().ok_or("frozen Native request required")?).canonicalize()?;
+    let request_sha = args.next().ok_or("runtime frozen request SHA required")?.into_string().map_err(|_| "UTF-8 request SHA required")?;
+    let admission_path = PathBuf::from(args.next().ok_or("frozen Native admission required")?).canonicalize()?;
+    let admission_sha = args.next().ok_or("runtime frozen admission SHA required")?.into_string().map_err(|_| "UTF-8 admission SHA required")?;
+    let sources_path = PathBuf::from(args.next().ok_or("Root-approved runtime source bindings required")?).canonicalize()?;
+    require(args.next().is_none(), "exactly five input-only arguments required")?;
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).parent().and_then(Path::parent).ok_or("repository root unavailable")?.canonicalize()?;
+    require([&request_path,&admission_path,&sources_path].iter().all(|path|path.starts_with(&root)), "contained metadata paths required")?;
+    for path in [&request_path,&admission_path,&sources_path] {
+        require(path.extension().is_some_and(|suffix|suffix == "json") && std::fs::metadata(path)?.len() <= 1024 * 1024,
+            "bounded JSON input metadata required")?;
+    }
+    let request_bytes = std::fs::read(&request_path)?; let admission_bytes = std::fs::read(&admission_path)?;
+    let sources_bytes = std::fs::read(&sources_path)?;
+    require(digest::sha256(&request_bytes) == request_sha && digest::sha256(&admission_bytes) == admission_sha,
+        "actual frozen 39-model request/admission differs")?;
+    let request: Value = serde_json::from_slice(&request_bytes)?;
+    let admission: Value = serde_json::from_slice(&admission_bytes)?;
+    let sources: Value = serde_json::from_slice(&sources_bytes)?;
+    require(request["schema"] == "ctf03-helper-cases.v1" && admission["schema"] == "ctf03-native-admission-contract.v1"
+        && request["frozen_before_this_CTF03_helper_execution"] == true && request["expected_values_supplied"] == false
+        && request["expected_exits_supplied"] == false && request["scientific_execution_performed"] == false,
+        "unchanged one-way input-only Native packet required")?;
+    let (bound_request,_) = bound(&root,&admission["helper_request"])?;
+    require(bound_request == request_path && admission["contracts"]["source"] == request["contracts"]["source"]
+        && admission["contracts"]["tolerances"] == request["contracts"]["tolerances"]
+        && admission["requested_counts"] == request["requested_counts"], "frozen packet request/contracts/counts differ")?;
+    let mut bindings = vec![admission["helper_request"].clone(),admission["projection"].clone(),request["fixed_scope"].clone()];
+    for key in ["source","tolerances","cases"] { bindings.push(admission["contracts"][key].clone()); }
+    for key in ["actual_scope_amendment","actual_scope_amendment_execution"] {
+        require(admission[key] == request[key], "scope pair differs")?; bindings.push(request[key].clone());
+    }
+    bindings.extend(rows(&request["all_45_guard_refs"])?.iter().cloned());
+    require(rows(&request["all_45_guard_refs"])?.len() == 45, "unchanged 45 input guards required")?;
+    for binding in &bindings { bound(&root,binding)?; }
+    source_pins(&root,&sources)?;
+    let cases = rows(&request["model_cases"])?;
+    let calls = cases.iter().map(|v|rows(&v["operations"]).map(|values|values.len())).collect::<Result<Vec<_>>>()?.into_iter().sum::<usize>();
+    require(cases.len() == 39 && calls == 42 && request["requested_counts"] == json!({
+        "model_cases":cases.len(),"calculateTransferFunction":calls,"total_operations":calls}), "frozen counts differ")?;
+    let models = cases.iter().map(model_case).collect::<Result<Vec<_>>>()?;
+    let initial_calls = models.iter().map(|model| rows(&model["operations"]).map(|operations|
+        operations.iter().filter(|operation|operation["actual_Rust_CTF03_API_invoked"] == true).count()))
+        .collect::<Result<Vec<_>>>()?.into_iter().sum::<usize>();
+    for binding in &bindings { bound(&root,binding)?; }
+    source_pins(&root,&sources)?;
+    require(std::fs::read(&request_path)? == request_bytes && std::fs::read(&admission_path)? == admission_bytes
+        && std::fs::read(&sources_path)? == sources_bytes, "input/source bindings changed during public calls")?;
+    println!("{}",serde_json::to_string_pretty(&json!({"schema":"ctf03-candidate-unit-observer-results.v1",
+        "actual_request":admission["helper_request"],"actual_native_admission":{"path":admission_path,"sha256":digest::sha256(&admission_bytes)},
+        "contracts":admission["contracts"],"projection":admission["projection"],"requested_counts":request["requested_counts"],
+        "fixed_scope":request["fixed_scope"],"all_45_guard_refs":request["all_45_guard_refs"],
+        "actual_scope_amendment":request["actual_scope_amendment"],"actual_scope_amendment_execution":request["actual_scope_amendment_execution"],
+        "runtime_source_bindings":{"path":sources_path,"sha256":digest::sha256(&sources_bytes)},"authenticated_source_inventory":sources,
+        "ctf03_initial_observation_policy":request["ctf03_initial_observation_policy"],
+        "actual_Rust_preprocess_invocations":calls,"actual_Rust_CTF03_API_invocations":initial_calls,
+        "model_cases":models,"all_bound_inputs_and_sources_unchanged":true,
+        "shared_flag_scope":"selected preprocessing ErrorsFound only; no whole Native solver carry injected",
+        "compiled_source_identity_independently_certified":false,"actual_Cargo_source_capture_required":true,
+        "Native_result_or_expected_values_read":false,"scientific_comparison_performed":false,"numerical_PASS_claimed":false,
+        "production_loader_lane_certified":false,"CTF04_through_CTF10_certified":false,"gates_updated":false}))?);
+    Ok(())
+}

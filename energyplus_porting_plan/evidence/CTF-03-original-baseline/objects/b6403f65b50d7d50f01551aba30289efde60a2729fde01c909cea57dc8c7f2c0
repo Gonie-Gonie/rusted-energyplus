@@ -1,0 +1,184 @@
+{
+  "schema": "ctf03-current-parent-source-rebase.v1",
+  "status": "SOURCE-READY-HELD-unapplied-unexecuted",
+  "accepted_historical_preparation": {
+    "path": ".runtime/porting/CTF-03/readiness-audit-01/manifest.json",
+    "sha256": "f1303515e4b65377ac124a3a72b0001a42475f7724c874709da73dbeb4659b9a",
+    "size_bytes": 18835,
+    "line_count": 512
+  },
+  "accepted_historical_readiness": {
+    "path": ".runtime/porting/CTF-03/readiness-audit-01/readiness.json",
+    "sha256": "f146ef2e44711ce7e430065d778362e24ba351c78a2f50aa37df5ff36f554a63",
+    "size_bytes": 9587,
+    "line_count": 151
+  },
+  "historical_metadata_is_not_current_gate_evidence": true,
+  "only_proposed_existing_source_change": "one additive public module declaration against actual CTF02 parent170",
+  "module_and_tests_byte_identical": true,
+  "math_or_test_changes": false,
+  "changed_context_dependency_count": 7,
+  "dependency_changes": [
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "accepted_old": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+        "sha256": "20cfeef6709b59ed4ef66eb863f079edfd7803fc4522e18419429de49fe5a989",
+        "size_bytes": 11736,
+        "line_count": 316
+      },
+      "actual_old_bytes": {
+        "path": ".runtime/porting/CTF-02/rust-all-resistive-prep-01/before/ctf_layer_preprocessing.rs",
+        "sha256": "20cfeef6709b59ed4ef66eb863f079edfd7803fc4522e18419429de49fe5a989",
+        "size_bytes": 11736,
+        "line_count": 316
+      },
+      "current": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+        "sha256": "0cf67532a277ea20c362acdcc97d2e293ee086a8757177e2b8ccb5bb52fb39a7",
+        "size_bytes": 11747,
+        "line_count": 316
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "accepted_old": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+        "sha256": "0683867f8d719af7d317cb1bdb7380bfee83b3bcc4cd446ae114e1dc5aeda252",
+        "size_bytes": 15063,
+        "line_count": 399
+      },
+      "actual_old_bytes": {
+        "path": ".runtime/porting/CTF-02/rust-all-resistive-prep-01/before/construction_cache.rs",
+        "sha256": "0683867f8d719af7d317cb1bdb7380bfee83b3bcc4cd446ae114e1dc5aeda252",
+        "size_bytes": 15063,
+        "line_count": 399
+      },
+      "current": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+        "sha256": "062ef1e4cc4f8175b03e3f88daf54bd34387b8c5e3bfc9f9fabe6602ab4dafab",
+        "size_bytes": 17043,
+        "line_count": 443
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "accepted_old": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+        "sha256": "787dc3a49755352c84af477bbe2c11e09b793e8dcee13181162d5a78b12bec8f",
+        "size_bytes": 5815,
+        "line_count": 168
+      },
+      "actual_old_bytes": {
+        "path": ".runtime/porting/CTF-02/rust-all-resistive-prep-01/before/surface_manager.rs",
+        "sha256": "787dc3a49755352c84af477bbe2c11e09b793e8dcee13181162d5a78b12bec8f",
+        "size_bytes": 5815,
+        "line_count": 168
+      },
+      "current": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+        "sha256": "99bcee1577e3400ae71dd42ee2e95aa2290413b3114dc0f52d0c79c07967b095",
+        "size_bytes": 5925,
+        "line_count": 170
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "accepted_old": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+        "sha256": "ba68a33bd1c42a6b63b3fb317e68017f5c196d6a95eb15a3ea305d265ba4db34",
+        "size_bytes": 11004,
+        "line_count": 220
+      },
+      "actual_old_bytes": {
+        "path": ".runtime/porting/CTF-02/rust-all-resistive-prep-01/before/initialization.rs",
+        "sha256": "ba68a33bd1c42a6b63b3fb317e68017f5c196d6a95eb15a3ea305d265ba4db34",
+        "size_bytes": 11004,
+        "line_count": 220
+      },
+      "current": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+        "sha256": "230a806183db9871b725892e4c413a704d9fb8ee944e94213eca9e0ac5e04e57",
+        "size_bytes": 11491,
+        "line_count": 232
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "accepted_old": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+        "sha256": "a930446e8c4fa6d3c24a493fad544c85d0aa8aedec10b1dd16656813a84ad567",
+        "size_bytes": 1877,
+        "line_count": 39
+      },
+      "actual_old_bytes": {
+        "path": ".runtime/porting/CTF-02/rust-all-resistive-prep-01/before/state_shell.rs",
+        "sha256": "a930446e8c4fa6d3c24a493fad544c85d0aa8aedec10b1dd16656813a84ad567",
+        "size_bytes": 1877,
+        "line_count": 39
+      },
+      "current": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+        "sha256": "011b99d4e632e3fb9b3a821bd75013219c04ee890ba57667a113b6833a7a0a49",
+        "size_bytes": 1974,
+        "line_count": 40
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "accepted_old": {
+        "path": "crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "e04b95dbb47eed514647bfdaf9332b6538e49cbfbb30625e4e02acd50a071448",
+        "size_bytes": 46220,
+        "line_count": 1013
+      },
+      "actual_old_bytes": {
+        "path": ".runtime/porting/CTF-02/rust-all-resistive-prep-01/before/state.rs",
+        "sha256": "e04b95dbb47eed514647bfdaf9332b6538e49cbfbb30625e4e02acd50a071448",
+        "size_bytes": 46220,
+        "line_count": 1013
+      },
+      "current": {
+        "path": "crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "4b1cec732ab81f8f6dc8ebcba70eb043751c3baacfaa5a59d726933fd185564f",
+        "size_bytes": 46440,
+        "line_count": 1016
+      }
+    },
+    {
+      "historical_path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "accepted_old": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+        "sha256": "b79c21fd3126a460c17cd54ec5f66d37e723e0348ac6b6af9e9fedd9e78ea3ec",
+        "size_bytes": 28663,
+        "line_count": 790
+      },
+      "actual_old_bytes": {
+        "path": ".runtime/porting/CTF-02/rust-all-resistive-prep-01/before/ctf.rs",
+        "sha256": "b79c21fd3126a460c17cd54ec5f66d37e723e0348ac6b6af9e9fedd9e78ea3ec",
+        "size_bytes": 28663,
+        "line_count": 790
+      },
+      "current": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+        "sha256": "7506de40b75a45b9c8f2c01c0b5a4f1ffc5f82ebb1861413a04e7c17ebc342e4",
+        "size_bytes": 29922,
+        "line_count": 814
+      }
+    }
+  ],
+  "current_context": [
+    "CTF02 already declares ctf_all_resistive and retains real selected coefficients in construction/cache/state/surface owners.",
+    "Actual construction cache now computes caller zone hours from typed Timestep and passes it to CTF02; historical no-timestep-callsite wording is superseded.",
+    "This rebase adds no CTF03 production cache/state/driver wiring and no reverse-reuse orchestration.",
+    "Accepted initial187L owner still requires actual used/error/massive/nonreverse/1D/no-source caller predicates.",
+    "Actual initial Nodes/dx and initial dt/history remain distinct from retry/final state; defined-i32 conversion scope remains unchanged.",
+    "CTF03 Native four-phase observer/helper exists separately; historical CTF01-only capture wording describes the earlier audit time."
+  ],
+  "target_imported": false,
+  "target_executed": false,
+  "canonical_files_written": false,
+  "scientific_payloads_read": false,
+  "binary_payloads_read": false,
+  "new_QA_execution_stage": false
+}

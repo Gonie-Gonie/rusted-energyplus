@@ -1,0 +1,169 @@
+"""Source-only rebase; no project imports, compiler, runtime or result reads."""
+import datetime
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+OLD = ROOT / ".runtime/porting/CTF-03/readiness-audit-01"
+assert not (OUT / "manifest.json").exists(), "held version is immutable"
+
+def ref(path):
+    data = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(data).hexdigest(),
+            "size_bytes": len(data), "line_count": len(data.splitlines())}
+
+def write_json(path, value):
+    path.write_text(json.dumps(value, indent=2, ensure_ascii=True) + "\n", encoding="utf-8", newline="\n")
+
+old_manifest = json.loads((OLD / "manifest.json").read_text(encoding="utf-8"))
+assert ref(OLD / "manifest.json")["sha256"].startswith("f1303515")
+for row in old_manifest["artifact_inventory"]:
+    assert ref(ROOT / row["path"]) == row
+
+for name in ("new", "before", "proposed"):
+    (OUT / name).mkdir(exist_ok=True)
+for name in ("ctf_initial_discretization.rs", "ctf_initial_discretization_tests.rs"):
+    (OUT / "new" / name).write_bytes((OLD / "new" / name).read_bytes())
+    (OUT / (name + ".new.diff")).write_bytes((OLD / (name + ".new.diff")).read_bytes())
+
+parent_name = "crates/ep_runtime/src/heat_balance/surface_manager.rs"
+parent = ROOT / parent_name
+before = parent.read_bytes()
+assert len(before.splitlines()) == 170
+assert b"pub mod ctf_all_resistive;" in before
+assert b"pub mod ctf_initial_discretization;" not in before
+needle = b"pub mod ctf_layer_preprocessing;"
+assert before.count(needle) == 1
+newline = b"\r\n" if b"\r\n" in before else b"\n"
+after = before.replace(needle, needle + newline + b"pub mod ctf_initial_discretization;")
+(OUT / "before/surface_manager.rs").write_bytes(before)
+(OUT / "proposed/surface_manager.rs").write_bytes(after)
+diff = "".join(difflib.unified_diff(before.decode().splitlines(True), after.decode().splitlines(True),
+    fromfile="a/" + parent_name, tofile="b/" + parent_name))
+(OUT / "surface_manager.rs.diff").write_text(diff, encoding="utf-8", newline="")
+
+current_sources = []
+dependency_changes = []
+historical_sources = {}
+before_ctf02 = ROOT / ".runtime/porting/CTF-02/rust-all-resistive-prep-01/before"
+for row in old_manifest["source_inventory"]:
+    current = ref(ROOT / row["path"])
+    current_sources.append(current)
+    if current != row:
+        archived = before_ctf02 / Path(row["path"]).name
+        assert ref(archived)["sha256"] == row["sha256"], row["path"]
+        historical_sources[row["path"]] = archived
+        dependency_changes.append({"historical_path": row["path"], "accepted_old": row,
+            "actual_old_bytes": ref(archived), "current": current})
+assert len(dependency_changes) == 7
+
+current_ranges = []
+for row in old_manifest["source_ranges"]:
+    name = row["path"]
+    current_lines = (ROOT / name).read_bytes().splitlines(keepends=True)
+    first, last = row["first_line"], row["last_line"]
+    historical_range = dict(row)
+    if name in historical_sources:
+        old_lines = historical_sources[name].read_bytes().splitlines(keepends=True)
+        old_body = b"".join(old_lines[first - 1:last])
+        assert hashlib.sha256(old_body).hexdigest() == row["sha256"]
+        # Preserve unchanged literal blocks before considering shifted endpoints.
+        if b"".join(current_lines[first - 1:last]) != old_body:
+            matcher = difflib.SequenceMatcher(a=old_lines, b=current_lines, autojunk=False)
+            mapping = {oi + z: ni + z for oi, ni, n in matcher.get_matching_blocks() for z in range(n)}
+            assert first - 1 in mapping and last - 1 in mapping
+            first, last = mapping[first - 1] + 1, mapping[last - 1] + 1
+    body = b"".join(current_lines[first - 1:last])
+    fresh = {"path": name, "first_line": first, "last_line": last,
+        "sha256": hashlib.sha256(body).hexdigest(), "size_bytes": len(body)}
+    if fresh != historical_range:
+        fresh["historical_range"] = historical_range
+    current_ranges.append(fresh)
+
+readiness = {
+    "schema": "ctf03-current-parent-source-rebase.v1",
+    "status": "SOURCE-READY-HELD-unapplied-unexecuted",
+    "accepted_historical_preparation": ref(OLD / "manifest.json"),
+    "accepted_historical_readiness": ref(OLD / "readiness.json"),
+    "historical_metadata_is_not_current_gate_evidence": True,
+    "only_proposed_existing_source_change": "one additive public module declaration against actual CTF02 parent170",
+    "module_and_tests_byte_identical": True,
+    "math_or_test_changes": False,
+    "changed_context_dependency_count": len(dependency_changes),
+    "dependency_changes": dependency_changes,
+    "current_context": [
+        "CTF02 already declares ctf_all_resistive and retains real selected coefficients in construction/cache/state/surface owners.",
+        "Actual construction cache now computes caller zone hours from typed Timestep and passes it to CTF02; historical no-timestep-callsite wording is superseded.",
+        "This rebase adds no CTF03 production cache/state/driver wiring and no reverse-reuse orchestration.",
+        "Accepted initial187L owner still requires actual used/error/massive/nonreverse/1D/no-source caller predicates.",
+        "Actual initial Nodes/dx and initial dt/history remain distinct from retry/final state; defined-i32 conversion scope remains unchanged.",
+        "CTF03 Native four-phase observer/helper exists separately; historical CTF01-only capture wording describes the earlier audit time."
+    ],
+    "target_imported": False, "target_executed": False, "canonical_files_written": False,
+    "scientific_payloads_read": False, "binary_payloads_read": False,
+    "new_QA_execution_stage": False
+}
+write_json(OUT / "readiness.json", readiness)
+readme = """# CTF03 current-parent source rebase
+
+SOURCE ONLY, held unapplied/unexecuted. This preserves accepted readiness-audit-01
+and refreshes only the module declaration, current context identities/ranges, and
+metadata. The187-line discretization module and100-line focused test source are
+byte-identical, as are their /dev/null patches. No mathematics, assertions, API or
+defined C++ integer-conversion admission changes. No target/import/build/result/
+binary/formatter/canonical operation is performed.
+
+The before parent is the actual current170-line CTF02 owner. Proposed parent171
+adds only pub mod ctf_initial_discretization; all other bytes remain unchanged.
+Seven context sources changed through the admitted CTF02 implementation. Fresh
+identities/ranges bind current bytes; exact historical identities remain linked
+to archived before copies and accepted old manifest. Native primary sources and
+all other context sources retain their original identities.
+
+The original readiness document is explicitly historical, including its gate
+metadata and earlier missing-timestep/callback inventory. Current CTF02 has a
+real typed-timestep construction-cache caller and all-resistive storage owners.
+This rebase does not add a CTF03 production owner or select massive/nonreverse
+routes for callers. The new pure module retains those explicit preconditions,
+initial-vs-retry distinction, and honest unavailable stops. Current four-phase
+Native observer/helper is a separate source hold, not a result inferred here.
+
+Root and Header already reviewed the identical mathematics/tests. Only this
+source-parent/dependency metadata rebase needs a narrow source review; no new
+proof framework or execution stage is introduced. Root alone applies/runs it.
+"""
+(OUT / "README.md").write_text(readme, encoding="utf-8", newline="\n")
+
+artifacts = ["readiness.json", "README.md", "prepare_rebase.py", "new/ctf_initial_discretization.rs",
+    "new/ctf_initial_discretization_tests.rs", "before/surface_manager.rs", "proposed/surface_manager.rs",
+    "surface_manager.rs.diff", "ctf_initial_discretization.rs.new.diff", "ctf_initial_discretization_tests.rs.new.diff"]
+manifest = {
+    "schema": old_manifest["schema"], "status": old_manifest["status"],
+    "created_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    "accepted_historical_manifest": ref(OLD / "manifest.json"),
+    "artifact_inventory": [ref(OUT / name) for name in artifacts],
+    "source_inventory": current_sources, "source_ranges": current_ranges,
+    "range_hash_definition": old_manifest["range_hash_definition"],
+    "source_count": len(current_sources), "range_count": len(current_ranges),
+    "proposal_changes": [{"target": parent_name, "before": ref(OUT / "before/surface_manager.rs"),
+        "proposed": ref(OUT / "proposed/surface_manager.rs"), "diff": ref(OUT / "surface_manager.rs.diff")}],
+    "proposed_new_modules": [],
+    "executed": False, "canonical_changed": False,
+    "math_and_test_code_changed": False
+}
+for row in old_manifest["proposed_new_modules"]:
+    name = Path(row["source"]["path"]).name
+    fresh = {"target": row["target"], "source": ref(OUT / "new" / name),
+        "new_diff": ref(OUT / (name + ".new.diff")), "accepted_historical_source": row["source"]}
+    assert fresh["source"]["sha256"] == row["source"]["sha256"]
+    manifest["proposed_new_modules"].append(fresh)
+for row in current_sources:
+    assert ref(ROOT / row["path"]) == row
+assert parent.read_bytes() == before
+write_json(OUT / "manifest.json", manifest)
+print(json.dumps({"manifest": ref(OUT / "manifest.json"), "parent_before": ref(OUT / "before/surface_manager.rs"),
+    "parent_proposed": ref(OUT / "proposed/surface_manager.rs"), "parent_diff": ref(OUT / "surface_manager.rs.diff"),
+    "module": manifest["proposed_new_modules"][0]["source"], "tests": manifest["proposed_new_modules"][1]["source"]}))

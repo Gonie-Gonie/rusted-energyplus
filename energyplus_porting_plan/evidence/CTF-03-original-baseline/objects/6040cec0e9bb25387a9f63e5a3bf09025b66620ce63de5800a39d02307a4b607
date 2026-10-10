@@ -1,0 +1,117 @@
+use super::*;
+use crate::heat_balance::surface_manager::ctf_layer_preprocessing::{
+    CtfConvertedLayers, CtfLayerCheckpoint, CtfLayerPreprocessing, CtfNormalizedLayer,
+};
+use ep_model::{ConstructionKind, MaterialId, NormalizedName};
+
+fn construction(id: u32, layers: &[u32]) -> Construction {
+    Construction {
+        id: ConstructionId(id),
+        name: NormalizedName(format!("C{id}")),
+        kind: ConstructionKind::Opaque,
+        outside_layer: layers.first().copied().map(MaterialId),
+        layers: layers.iter().copied().map(MaterialId).collect(),
+        thermochromic_master: None,
+        ground_factor: None,
+        air_boundary: None,
+        complex_fenestration: None,
+        window_equivalent_layer: None,
+        internal_heat_source: None,
+    }
+}
+
+fn context() -> CtfLayerContext {
+    CtfLayerContext {
+        is_used_ctf: true, errors_found: false,
+        source_sink_present: false, solution_dimensions: 1,
+    }
+}
+
+fn preprocessing(construction: &Construction) -> ConstructionCtfLayerPreprocessing {
+    // Literal phase-owner fixture isolates routing. The accepted pure module has
+    // separate arithmetic tests; no Native observation supplies these operands.
+    ConstructionCtfLayerPreprocessing {
+        construction_id: construction.id,
+        is_used_ctf: true,
+        result: Ok(CtfLayerPreprocessing {
+            skipped_unused: false, errors_found: false, issues: Vec::new(),
+            after_load: None, after_merge: None,
+            after_conversion: Some(CtfConvertedLayers {
+                active: CtfLayerCheckpoint {
+                    layers: vec![CtfNormalizedLayer {
+                        dl: 1.0, rk: 1.0, rho: 1.0, cp: 1.0, lr: 1.0, res_layer: false,
+                    }; construction.effective_layers().len()],
+                    num_res_layers: 0,
+                },
+                dyn_spacing: 0.0, total_resistance: 1.0, conductance: 1.0,
+            }),
+        }),
+    }
+}
+
+#[test]
+fn reached_owner_retains_actual_caller_and_existing_converted_input() -> Result<(), Box<dyn std::error::Error>> {
+    let current = construction(7, &[10]);
+    let prior = preprocessing(&current);
+    let before = prior.clone();
+    let dt = 1.0 / 3.0;
+    let result = initialize_construction_ctf_initial(&current, &[], &BTreeSet::new(), &prior, context(), dt);
+    assert_eq!(result.construction_id, current.id);
+    assert_eq!(result.time_step_zone_hours.to_bits(), dt.to_bits());
+    assert_eq!(result.result?.time_step_zone_hours.to_bits(), dt.to_bits());
+    assert_eq!(prior, before);
+    Ok(())
+}
+
+#[test]
+fn unused_and_shared_error_routes_precede_reverse_selection() -> Result<(), Box<dyn std::error::Error>> {
+    let current = construction(7, &[10]);
+    let previous = [construction(2, &[10])];
+    let used = BTreeSet::from([2]);
+    let mut prior = preprocessing(&current);
+    let phases = prior.result.as_mut().map_err(|error| format!("{error:?}"))?;
+    phases.skipped_unused = true;
+    phases.errors_found = true;
+    assert_eq!(initialize_construction_ctf_initial(&current, &previous, &used, &prior, context(), 0.25).result,
+               Err(CtfInitialUnavailable::UnusedConstruction));
+    prior.result.as_mut().map_err(|error| format!("{error:?}"))?.skipped_unused = false;
+    assert_eq!(initialize_construction_ctf_initial(&current, &previous, &used, &prior, context(), 0.25).result,
+               Err(CtfInitialUnavailable::PreprocessingErrorReturn));
+    Ok(())
+}
+
+#[test]
+fn all_resistive_dispatch_precedes_reverse_without_reclassifying_materials() -> Result<(), Box<dyn std::error::Error>> {
+    let current = construction(7, &[10]);
+    let mut prior = preprocessing(&current);
+    prior.result.as_mut().map_err(|error| format!("{error:?}"))?.after_conversion.as_mut()
+        .ok_or("fixture conversion missing")?.active.num_res_layers = 1;
+    assert_eq!(initialize_construction_ctf_initial(&current, &[construction(2, &[10])], &BTreeSet::from([2]), &prior, context(), 0.25).result,
+               Err(CtfInitialUnavailable::AllResistiveBranch));
+    Ok(())
+}
+
+#[test]
+fn reverse_uses_first_used_original_id_stack_in_owner_order() {
+    let current = construction(7, &[10, 20]);
+    let previous = [construction(1, &[20, 10]), construction(2, &[20, 10]), construction(3, &[20, 10])];
+    let result = initialize_construction_ctf_initial(&current, &previous, &BTreeSet::from([2, 3]), &preprocessing(&current), context(), 0.25);
+    assert_eq!(result.result, Err(CtfInitialUnavailable::ReverseConstruction { construction_id: ConstructionId(2) }));
+}
+
+#[test]
+fn equal_converted_values_cannot_make_different_material_ids_reverse() {
+    let current = construction(7, &[10, 20]);
+    let previous = [construction(2, &[40, 30])];
+    let result = initialize_construction_ctf_initial(&current, &previous, &BTreeSet::from([2]), &preprocessing(&current), context(), 0.25);
+    assert!(result.result.is_ok());
+}
+
+#[test]
+fn scope_stop_retains_actual_reason_instead_of_a_default_initial_owner() {
+    let current = construction(7, &[10]);
+    let mut prior = preprocessing(&current);
+    prior.result = Err(CtfLayerScopeError::UnsupportedMaterial(MaterialId(10)));
+    assert_eq!(initialize_construction_ctf_initial(&current, &[], &BTreeSet::new(), &prior, context(), 0.25).result,
+               Err(CtfInitialUnavailable::PreprocessingScope(CtfLayerScopeError::UnsupportedMaterial(MaterialId(10)))));
+}

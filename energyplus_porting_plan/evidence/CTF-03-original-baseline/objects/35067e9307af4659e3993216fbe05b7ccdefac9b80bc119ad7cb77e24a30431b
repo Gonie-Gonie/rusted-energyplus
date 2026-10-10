@@ -1,0 +1,16 @@
+--- .runtime/porting/CTF-03/comparer-prep-01/compare_unit.py
++++ .runtime/porting/CTF-03/comparer-prep-02/compare_unit.py
+@@ -359,8 +359,11 @@
+                    right["observer_reverse_classifier_duplicated"] is False,"Actual same-prefix source-owned route required")
+             c.dto(right["actual_caller_TimeStepZone"])
+             c.exact(path+"/literal_caller_bits",expected["caller"]["TimeStepZone"]["bits"],right["actual_caller_TimeStepZone"]["value_bits"])
+-            context={"is_used_ctf":construction["IsUsedCTF"],"errors_found":left["before"]["ErrorsFound"],
+-                     "source_sink_present":construction["SourceSinkPresent"],"solution_dimensions":construction["SolutionDimensions"]}
++            context=None
++            if left["actual_source_invoked"]:
++                c.need(isinstance(left.get("before"),dict),"Actual invoked Native before owner required")
++                context={"is_used_ctf":construction["IsUsedCTF"],"errors_found":left["before"]["ErrorsFound"],
++                         "source_sink_present":construction["SourceSinkPresent"],"solution_dimensions":construction["SolutionDimensions"]}
+             paired=initial_storage(c,path,left,right.get("CTF03_initial"),right["result"],right["actual_caller_TimeStepZone"],index,context)
+             c.exact(path+"/initial_owner_availability_copy",right["CTF03_initial"]["owner_available"],right["actual_initial_discretization_owner_available"])
+             ledger.append({"model_id":expected["id"],"operation_id":declared["id"],

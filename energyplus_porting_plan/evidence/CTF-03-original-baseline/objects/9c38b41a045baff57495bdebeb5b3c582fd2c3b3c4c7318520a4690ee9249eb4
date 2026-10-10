@@ -1,0 +1,28 @@
+--- .runtime/porting/CTF-03/comparer-prep-01/compare_production.py
++++ .runtime/porting/CTF-03/comparer-prep-02/compare_production.py
+@@ -470,13 +470,19 @@
+             if construction is None or row is None:
+                 c.absence(path+"/"+name+"/CTF03_owner",True,False,True,"required construction-associated initial route row absent")
+                 continue
+-            index=operation["actual_construction_index"]
+-            c.need(type(index) is int and 1<=index<=len(operation["before"]["snapshot"]["constructions"]),"Actual Native construction identity required")
+-            before=operation["before"]["snapshot"];owner=before["constructions"][index-1]
+-            context={"is_used_ctf":owner["IsUsedCTF"],"errors_found":before["ErrorsFound"],
+-                     "source_sink_present":owner["SourceSinkPresent"],"solution_dimensions":owner["SolutionDimensions"]}
++            context=None;caller=None
++            if operation["actual_source_invoked"]:
++                observed=operation.get("before")
++                c.need(isinstance(observed,dict) and observed.get("available") is True and
++                       isinstance(observed.get("snapshot"),dict),"Actual invoked Native before snapshot required")
++                before=observed["snapshot"];index=operation["actual_construction_index"]
++                c.need(type(index) is int and 1<=index<=len(before["constructions"]),"Actual Native construction identity required")
++                owner=before["constructions"][index-1]
++                context={"is_used_ctf":owner["IsUsedCTF"],"errors_found":before["ErrorsFound"],
++                         "source_sink_present":owner["SourceSinkPresent"],"solution_dimensions":owner["SolutionDimensions"]}
++                caller=before["TimeStepZone"]
+             c.exact(path+"/"+name+"/state_vector_index",ids.index(cid),row["state_vector_index"])
+-            paired=initial_storage(c,path+"/"+name+"/CTF03",operation,row.get("result"),prefixes.get(cid),before["TimeStepZone"],cid,context)
++            paired=initial_storage(c,path+"/"+name+"/CTF03",operation,row.get("result"),prefixes.get(cid),caller,cid,context)
+             paired_count+=paired
+         ledger.append({"model_id":path,"actual_construction_Result_count":len(results),"actual_paired_initial_owner_count":paired_count,
+                        "Native_later_solver_flags_and_surface_coefficient_copies_paired":False,"unselected_or_unknown_counted_as_PASS":False})

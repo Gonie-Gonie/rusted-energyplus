@@ -1,0 +1,353 @@
+"""Prepare CTF03 comparer source only; imports no targets or scientific records."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+OLD = ROOT / ".runtime/porting/CTF-02/comparer-prep-01"
+OBS = ROOT / ".runtime/porting/CTF-03/candidate-observer-prep-01"
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return {"path":path.relative_to(ROOT).as_posix(),"sha256":hashlib.sha256(raw).hexdigest(),
+            "size_bytes":len(raw),"line_count":len(raw.splitlines())}
+
+
+def once(source, old, new):
+    if source.count(old) != 1:
+        raise ValueError(("unique literal required", old[:100], source.count(old)))
+    return source.replace(old,new,1)
+
+
+def assignment(source, name):
+    for item in ast.parse(source).body:
+        if isinstance(item,ast.Assign) and any(isinstance(target,ast.Name) and target.id==name for target in item.targets):
+            return ast.literal_eval(item.value)
+    raise ValueError(name)
+
+
+def replace_assignment(source, name, value):
+    lines=source.splitlines(keepends=True)
+    for item in ast.parse(source).body:
+        if isinstance(item,ast.Assign) and any(isinstance(target,ast.Name) and target.id==name for target in item.targets):
+            return ''.join(lines[:item.lineno-1])+name+' = '+repr(value)+'\n'+''.join(lines[item.end_lineno:])
+    raise ValueError(name)
+
+
+INITIAL_STORAGE = r'''def initial_storage(c, path, operation, rust, preprocessing, caller, construction_id, context):
+    """Compare actual copied initial owners; no route or discretization evaluator."""
+    if not isinstance(rust, dict):
+        c.absence(path + "/Rust_route_record", True, False, True, "required actual Rust Result route record absent")
+        return False
+    c.need(rust.get("protocol") == "ctf03-initial-discretization.v1" and
+           type(rust.get("owner_available")) is bool and type(rust.get("selected_initial_operands")) is bool and
+           rust.get("counted_as_PASS") is False and rust.get("initial_state_distinct_from_retry_and_whole_return") is True and
+           rust.get("observer_nodal_or_route_arithmetic_performed") is False and
+           rust.get("Native_whole_method_flags_or_callback_reachability_inferred") is False,
+           "Actual initial Result protocol and honest copy boundary required")
+    available = rust["owner_available"]
+    c.exact(path + "/Rust_Result_selection", available, rust["selected_initial_operands"])
+    c.exact(path + "/construction_id", construction_id, rust.get("construction_id"))
+    c.exact(path + "/same_preprocessing_construction_id", construction_id, rust.get("same_preprocessing_construction_id"))
+    routes = ["PreprocessingScope", "UnusedConstruction", "PreprocessingErrorReturn", "PostConversionUnavailable",
+              "AllResistiveBranch", "ReverseConstruction", "InitialScope"]
+    if available:
+        c.need(rust.get("actual_source_route") == "InitialOwnerReturned" and rust.get("unavailable_reason") is None and
+               rust.get("actual_reverse_construction_id") is None and isinstance(rust.get("snapshot"), dict),
+               "Actual successful initial Result fields required")
+    else:
+        c.need(rust.get("actual_source_route") in routes and isinstance(rust.get("unavailable_reason"),str) and
+               rust["unavailable_reason"] and rust.get("snapshot") is None,
+               "Actual unavailable route must retain reason/null/noPASS")
+        if rust["actual_source_route"] == "ReverseConstruction":
+            c.need(type(rust.get("actual_reverse_construction_id")) is int and rust["actual_reverse_construction_id"] >= 0,
+                   "Actual prior reverse owner ID required; no reverse coefficients inferred")
+        else:
+            c.need(rust.get("actual_reverse_construction_id") is None, "Nonreverse route cannot invent reverse owner")
+    c.need(type(operation.get("actual_source_invoked")) is bool, "Actual Native invocation flag required")
+    if not operation["actual_source_invoked"]:
+        c.need(operation.get("observations") is None, "Uninvoked Native call cannot have invented checkpoints")
+        c.absence(path,False,available,False,"whole source stopped before this call; initial observations unknown/noPASS")
+        return False
+    observed = operation.get("observations")
+    c.need(isinstance(observed,dict) and observed.get("observer_failure") is False,
+           "Actual Native initial observations require an intact source capture")
+    native = observed.get("InitialDiscretization")
+    c.need(isinstance(native,dict) and type(native.get("reached")) is bool and type(native.get("available")) is bool,
+           "Actual Native initial callback record required")
+    for name in ["is_used_ctf", "errors_found", "source_sink_present", "solution_dimensions"]:
+        c.exact(path + "/context/" + name, context[name], rust.get("actual_context",{}).get(name))
+    selected_context = context["source_sink_present"] is False and context["solution_dimensions"] == 1
+    native_available = native["reached"] and native["available"] and selected_context
+    c.exact(path + "/actual_initial_selection", native_available, available)
+    required = native_available or available
+    if not required:
+        c.need(not native["reached"] or not selected_context,
+               "Reached required initial prefix cannot disappear behind optional absence")
+        c.absence(path,False,False,False,"actual initial phase unselected/unreached or explicit Rust unavailable route; no numeric PASS")
+        return False
+    if not native_available or not available:
+        c.absence(path,native_available,available,True,"required selected initial owner missing on one or both sides")
+        return False
+    left, right = native.get("snapshot"),rust.get("snapshot")
+    if not isinstance(left,dict) or not isinstance(right,dict):
+        c.absence(path+"/snapshot",isinstance(left,dict),isinstance(right,dict),True,"required reached initial snapshot absent")
+        return False
+    c.need(rust.get("same_preprocessing_owner_available") is True and
+           rust.get("same_post_conversion_handoff_available") is True and isinstance(preprocessing,dict) and
+           preprocessing.get("status") == "source-returned", "Same actual preceding preprocessing owner required")
+    converted = preprocessing.get("observations",{}).get("PostConversion",{})
+    c.need(converted.get("reached") is True and converted.get("available") is True and
+           isinstance(converted.get("snapshot"),dict), "Selected initial owner needs its actual converted handoff")
+    prefix = converted["snapshot"]
+    for name in ["LayersInConstruct", "NumResLayers", "copied_layer_count", "rcmax", "NodeSource", "NodeUserTemp", "NumHistories"]:
+        a,b=left.get(name),right.get(name)
+        if type(a) is not int or type(b) is not int:
+            c.absence(path+"/"+name,type(a) is int,type(b) is int,True,"required actual initial integer absent")
+        else:
+            c.exact(path+"/"+name,a,b)
+    for name in ["LayersInConstruct", "NumResLayers", "copied_layer_count", "ErrorsFound"]:
+        c.exact(path+"/same_converted_handoff/"+name,prefix.get(name),right.get(name))
+    for name in ["ErrorsFound", "active_prefix_available"]:
+        if type(left.get(name)) is not bool or type(right.get(name)) is not bool:
+            c.absence(path+"/"+name,type(left.get(name)) is bool,type(right.get(name)) is bool,True,"required actual initial flag absent")
+        else:
+            c.exact(path+"/"+name,left[name],right[name])
+    a,b=left.get("active_prefix"),right.get("active_prefix")
+    shape_a=isinstance(a,list) and type(left.get("LayersInConstruct")) is int and 1 <= left["LayersInConstruct"] <= 11 and len(a)==left["LayersInConstruct"]==left.get("copied_layer_count")
+    shape_b=isinstance(b,list) and type(right.get("LayersInConstruct")) is int and 1 <= right["LayersInConstruct"] <= 11 and len(b)==right["LayersInConstruct"]==right.get("copied_layer_count")
+    if not shape_a or not shape_b or len(a)!=len(b):
+        c.absence(path+"/active_prefix_shape",shape_a,shape_b,True,"both exact actual active-prefix shapes required")
+        return False
+    for index,(x,y) in enumerate(zip(a,b)):
+        p=path+"/active_prefix/"+str(index)
+        c.need(isinstance(x,dict) and isinstance(y,dict) and set(x)==set(y)=={"Nodes","dx"},"Actual Nodes/dx row shape required")
+        if type(x.get("Nodes")) is not int or type(y.get("Nodes")) is not int:
+            c.absence(p+"/Nodes",type(x.get("Nodes")) is int,type(y.get("Nodes")) is int,True,"required actual Nodes absent")
+        else: c.exact(p+"/Nodes",x["Nodes"],y["Nodes"])
+        if x.get("dx") is None or y.get("dx") is None:
+            c.absence(p+"/dx",x.get("dx") is not None,y.get("dx") is not None,True,"required actual dx absent")
+        else: c.number(p+"/dx","dx",x["dx"],y["dx"])
+    for key,profile in [("CTFTimeStep","initial_CTFTimeStep"),("TimeStepZone","caller_TimeStepZone")]:
+        if left.get(key) is None or right.get(key) is None:
+            c.absence(path+"/"+key,left.get(key) is not None,right.get(key) is not None,True,"required actual initial scalar absent")
+        else: c.number(path+"/"+key,profile,left[key],right[key])
+    for key in ["TimeStepZone"]:
+        for label,value in [("Native",left.get(key)),("Rust",right.get(key)),("wrapper",rust.get("actual_wrapper_TimeStepZone"))]:
+            if value is None or caller is None:
+                c.absence(path+"/caller/"+label,value is not None,caller is not None,True,"required actual caller copy absent")
+            else:
+                c.dto(value);c.dto(caller);c.exact(path+"/caller/"+label+"/bits",caller["value_bits"],value["value_bits"])
+    return True
+
+
+'''
+
+UNIT_LEDGER = r'''def compare_initial_models(native, rust, request, c):
+    ledger=[]
+    for expected,n,r in zip(request["model_cases"],native["model_cases"],rust["model_cases"]):
+        used=[index for index,row in enumerate(expected["constructions"]) if row["IsUsedCTF"] is True]
+        for index,(declared,construction,left,right) in enumerate(zip(expected["operations"],expected["constructions"],n["operations"],r["operations"])):
+            path=expected["id"]+"/"+declared["id"]+"/CTF03"
+            c.exact(path+"/actual_API","initialize_construction_ctf_initial",right["actual_Rust_CTF03_API"])
+            c.exact(path+"/actual_API_invoked",True,right["actual_Rust_CTF03_API_invoked"])
+            c.exact(path+"/construction_id",index,right["actual_construction_id"])
+            c.exact(path+"/ordered_prior_ids",list(range(index)),right["actual_ordered_prior_construction_ids"])
+            c.exact(path+"/used_ids",used,right["actual_used_construction_ids"])
+            c.need(right["preprocessing_reexecuted_for_initial_owner"] is False and
+                   right["observer_reverse_classifier_duplicated"] is False,"Actual same-prefix source-owned route required")
+            c.dto(right["actual_caller_TimeStepZone"])
+            c.exact(path+"/literal_caller_bits",expected["caller"]["TimeStepZone"]["bits"],right["actual_caller_TimeStepZone"]["value_bits"])
+            context={"is_used_ctf":construction["IsUsedCTF"],"errors_found":left["before"]["ErrorsFound"],
+                     "source_sink_present":construction["SourceSinkPresent"],"solution_dimensions":construction["SolutionDimensions"]}
+            paired=initial_storage(c,path,left,right.get("CTF03_initial"),right["result"],right["actual_caller_TimeStepZone"],index,context)
+            c.exact(path+"/initial_owner_availability_copy",right["CTF03_initial"]["owner_available"],right["actual_initial_discretization_owner_available"])
+            ledger.append({"model_id":expected["id"],"operation_id":declared["id"],
+                "Native_initial_capture":left.get("observations",{}).get("InitialDiscretization") if left.get("observations") else None,
+                "Rust_initial_Result":right.get("CTF03_initial"),"selected_operands_paired":paired,
+                "Native_whole_outcome_context_only":left["call_outcome"],"unselected_or_unknown_counted_as_PASS":False})
+    return ledger
+
+
+'''
+
+PRODUCTION_LEDGER = r'''def compare_initial_models(native, rust, request, c):
+    ledger=[]
+    for expected,left,right in zip(request["model_cases"],native["model_cases"],rust["model_cases"]):
+        path=expected["id"]; selected=right.get("selected_CTF03_owners")
+        if not isinstance(selected,dict) or selected.get("owner_available") is not True:
+            c.absence(path+"/CTF03_initialized_owner",left["loader_ready"],False,True,"required initialized CTF03 Result ledger absent")
+            continue
+        c.need(selected["preprocessing_or_initial_discretization_reexecuted_by_observer"] is False and
+               selected["observer_reverse_classifier_duplicated"] is False and
+               selected["external_CTF_rows_supplied_to_initializer"] is False,"Actual borrowed initial owners only")
+        typed=right["typed_owners"]; constructions=typed["constructions"]; ids=[row["id"] for row in constructions]
+        results=selected["construction_initial"]
+        c.need(isinstance(results,list) and len({row["construction_id"] for row in results})==len(results),"Unique actual initial owner IDs required")
+        c.exact(path+"/CTF03_owner_order",ids,[row["construction_id"] for row in results])
+        c.exact(path+"/CTF03_owner_count",len(results),selected["actual_owner_count"])
+        by_id={row["construction_id"]:row for row in results};by_name=owners(constructions,"name",c)
+        prefixes={row["construction_id"]:row["result"] for row in right["selected_CTF01_owners"]["construction_preprocessing"]}
+        paired_count=0
+        for operation in left["operations"]:
+            name=normalized(operation["actual_construction_Name"],c); construction=by_name.get(name)
+            cid=construction["id"] if construction else None;row=by_id.get(cid)
+            if construction is None or row is None:
+                c.absence(path+"/"+name+"/CTF03_owner",True,False,True,"required construction-associated initial route row absent")
+                continue
+            index=operation["actual_construction_index"]
+            c.need(type(index) is int and 1<=index<=len(operation["before"]["snapshot"]["constructions"]),"Actual Native construction identity required")
+            before=operation["before"]["snapshot"];owner=before["constructions"][index-1]
+            context={"is_used_ctf":owner["IsUsedCTF"],"errors_found":before["ErrorsFound"],
+                     "source_sink_present":owner["SourceSinkPresent"],"solution_dimensions":owner["SolutionDimensions"]}
+            c.exact(path+"/"+name+"/state_vector_index",ids.index(cid),row["state_vector_index"])
+            paired=initial_storage(c,path+"/"+name+"/CTF03",operation,row.get("result"),prefixes.get(cid),before["TimeStepZone"],cid,context)
+            paired_count+=paired
+        ledger.append({"model_id":path,"actual_construction_Result_count":len(results),"actual_paired_initial_owner_count":paired_count,
+                       "Native_later_solver_flags_and_surface_coefficient_copies_paired":False,"unselected_or_unknown_counted_as_PASS":False})
+    return ledger
+
+
+'''
+
+
+def main():
+    if (OUT/'manifest.json').exists():
+        raise ValueError('Held source directory cannot be regenerated')
+    obs=json.loads((OBS/'manifest.json').read_text(encoding='utf-8'))
+    policy_source=ROOT/'.runtime/porting/CTF-03/original-data-review-prep-01/initial_shape.py'
+    policy=assignment(policy_source.read_text(encoding='utf-8'),'POLICY')
+    (OUT/'before').mkdir(parents=True,exist_ok=True)
+    io=(OLD/'packet_io.py').read_text(encoding='utf-8').replace('/CTF-02"','/CTF-03"')
+    (OUT/'packet_io.py').write_text(io,encoding='utf-8',newline='\n')
+    io_sha=hashlib.sha256((OUT/'packet_io.py').read_bytes()).hexdigest()
+    source_rows=[]
+    for lane,name in [('unit','compare_unit.py'),('production','compare_production.py')]:
+        old=(OLD/name).read_text(encoding='utf-8')
+        source=old.replace('ctf02','ctf03').replace('CTF02','CTF03').replace('CTF-02','CTF-03')
+        source=replace_assignment(source,'IO_SHA',io_sha)
+        source=replace_assignment(source,'PUBLIC_VARIABLES',['dx','initial_CTFTimeStep','caller_TimeStepZone'])
+        source=replace_assignment(source,'API_PATHS',obs['API_paths'][lane])
+        source=source.replace('PUBLIC_VARIABLES','INITIAL_VARIABLES')
+        source=once(source,'VARIABLES = INITIAL_VARIABLES\n','VARIABLES = INITIAL_VARIABLES\nINITIAL_POLICY = '+repr(policy)+'\n')
+        source=once(source,'        self.exact(path + "/class", native["value_class"], rust["value_class"])\n        if not (math.isfinite(left) and math.isfinite(right)):',
+                    '        self.exact(path + "/class", native["value_class"], rust["value_class"])\n        self.exact(path + "/bits", native["value_bits"], rust["value_bits"])\n        if not (math.isfinite(left) and math.isfinite(right)):')
+        start=source.index('def preprocessing_selection(');stop=source.index('def packet_policy(',start)
+        source=source[:start]+INITIAL_STORAGE+source[stop:]
+        start=source.index('    same(qa["reviewed_public_policy_contract"]');stop=source.index('    inherited = policy["ctf01_preprocessing_profiles"]',start)
+        source=source[:start]+'''    same(qa["reviewed_initial_policy_contract"],qa["reviewed_contracts"]["tolerances"])
+    initial_policy=qa["reviewed_initial_observation_policy"]
+    m.require(initial_policy == INITIAL_POLICY == request["ctf03_initial_observation_policy"] ==
+              admission["ctf03_initial_observation_policy"] == policy["ctf03_initial_observation_policy"] ==
+              projection["ctf03_initial_observation_policy"], "Exact reviewed source-defined initial policy required")
+    profiles=policy["arithmetic_profiles_by_variable"]
+    m.require([row["variable"] for row in profiles]==INITIAL_VARIABLES and all(
+        type(row["atol"]) is float and type(row["rtol"]) is float and row["atol"]==row["rtol"]==0.0 and
+        row["class_exact"] is True and row["shape_exact"] is True and row["signed_zero_exact"] is True and
+        row["required_shape"]==("actual_LayersInConstruct_active_prefix" if index==0 else "scalar")
+        for index,row in enumerate(profiles)), "Three frozen initial zero/class/shape/signedzero profiles required")
+'''+source[stop:]
+        source=once(source,'    return profiles,inherited,public_policy','    return profiles,inherited,initial_policy')
+        start=source.index('def compare_public_models(');stop=source.index('def run(args):',start)
+        source=source[:start]+(UNIT_LEDGER if lane=='unit' else PRODUCTION_LEDGER)+source[stop:]
+        source=source.replace('public_policy','initial_policy').replace('ctf03_public_observation_policy','ctf03_initial_observation_policy').replace('CTF03_public_observation_policy','CTF03_initial_observation_policy')
+        source=source.replace('public_ledger','initial_ledger').replace('compare_public_models','compare_initial_models')
+        source=source.replace('reviewed_public_observation_policy','reviewed_initial_observation_policy').replace('actual_public_coefficient_ledger','actual_initial_owner_ledger')
+        source=source.replace('pass-selected-all-resistive-coefficients','pass-selected-initial-discretization').replace('fail-selected-all-resistive-coefficients','fail-selected-initial-discretization')
+        source=source.replace('pass-selected-loader-to-all-resistive-coefficients','pass-selected-loader-to-initial-discretization').replace('fail-selected-loader-to-all-resistive-coefficients','fail-selected-loader-to-initial-discretization')
+        source=source.replace('selected_fixed15_all_resistive_PASS_claimed','selected_fixed15_initial_PASS_claimed').replace('CTF03_through_CTF10_certified','CTF04_through_CTF10_certified')
+        if lane=='unit':
+            source=once(source,'            if not n["actual_source_invoked"] or not r["actual_source_invoked"]:\n                c.absence(op, n["actual_source_invoked"], r["actual_source_invoked"], True, "required independent actual invocation unavailable")\n                continue',
+                '            if not n["actual_source_invoked"]:\n                c.need(n.get("observations") is None,"Uninvoked Native whole call cannot invent checkpoints")\n                c.absence(op,False,r["actual_source_invoked"],False,"actual Native whole-source stop leaves this call unknown/noPASS")\n                continue\n            if not r["actual_source_invoked"]:\n                c.absence(op,True,False,True,"required independently invoked Rust preprocessing absent")\n                continue')
+        else:
+            source=once(source,'            if n["actual_source_invoked"] is not True or item is None:\n                c.absence(op + "/invocation_owner", n["actual_source_invoked"] is True, item is not None, True, "actual Native whole invocation or initialized Rust result unavailable"); continue',
+                '            if n["actual_source_invoked"] is not True:\n                c.need(n.get("observations") is None,"Uninvoked Native whole call cannot invent checkpoints")\n                c.absence(op+"/invocation_owner",False,item is not None,False,"actual Native whole-source stop leaves this call unknown/noPASS");continue\n            if item is None:\n                c.absence(op+"/invocation_owner",True,False,True,"required initialized Rust preprocessing owner unavailable");continue')
+        ast.parse(source)
+        (OUT/name).write_text(source,encoding='utf-8',newline='\n')
+    for name in ['compare_unit.py','compare_production.py','packet_io.py']:
+        (OUT/'before'/name).write_bytes((OLD/name).read_bytes())
+        before=(OUT/'before'/name).read_text(encoding='utf-8').splitlines(keepends=True)
+        after=(OUT/name).read_text(encoding='utf-8').splitlines(keepends=True)
+        patch=OUT/(name+'.from-CTF02.diff')
+        patch.write_text(''.join(difflib.unified_diff(before,after,fromfile=ref(OUT/'before'/name)['path'],tofile=ref(OUT/name)['path'])),encoding='utf-8',newline='\n')
+        source_rows.append({'source':ref(OUT/name),'before':ref(OUT/'before'/name),'exact_diff':ref(patch)})
+    readme='''# CTF03 actual initial-state comparers
+
+SOURCE ONLY, held unapplied/unexecuted. Two independent lane readers and the
+accepted bounded stdlib IO fork retain the existing actual-comparison stage.
+No additional framework, SourceQA stage, Native formula evaluator or expected
+array is introduced. Root alone authorizes and executes the real readers.
+
+Unit compares the literal39/42 lane and actual typed material/ConstructionId
+association/prior-prefix/used-ID records. Production compares actual fixed15
+loader/typed/cache initialization owners and registration order, then borrows the
+ordered construction_ctf03_initial result ledger. Their actual CLI/source guards
+retain own2/API12 and own3/API25 inventories, full Cargo SourceSnapshot and actual
+compiler artifact binary identity. Runtime output identities are never guessed.
+
+Fresh Native OriginalDataQA0 must precede each Rust run. Its exact archived reader
+source/recorder0/full stdout/empty stderr/sourceguard, fresh six-DAG/freeze/scope
+pair/Native8/45 input guards and reviewed initial policy are authenticated. Its
+build/PE/actual whole-helper structural release is reused, not a guessed or
+repeated scientific validation. Production authenticates the same15 raw IDFs and
+actual input-only converter/proof ledger before loading real Rust inputs.
+
+Selected fields are actual post-original619 InitialDiscretization captures,
+independent of whole return and later retry state. dx/initial_CTFTimeStep/caller_
+TimeStepZone use the three pre-frozen zero/class/active-shape/signed-zero profiles.
+Nodes, selectors, rcmax, active/resistive counts and initial histories compare as
+exact integers. Scalar DTO bits/class are validated without nodal calculation.
+Inherited preprocessing18 remains unchanged, separate exact copied handoff.
+No caller==initialCTFTimeStep assertion survives the CTF02 adaptation.
+
+Required reached owners/fields missing on either or both sides fail. Actual
+selection disagreements fail. Reached invalid prefix is an integrity error.
+Genuine unused/loading/allR/reverse/unsupported routes retain distinct actual
+Rust Result records and actual Native callback availability; optional genuine
+unreached records produce no numeric comparisons/PASS. An actual uninvoked Native
+whole call after a source stop remains unknown, distinct from Rust's independently
+executed selected API; no constructor/call/checkpoint is fabricated. Durable
+initial captures remain comparable if the same whole call later fails. Native
+whole outcomes/final flags/retry fields and CTF02 surface coefficients stay
+unpaired; selected ErrorsFound differences are retained, never injected/masked.
+
+CLI is unchanged from the accepted two readers: --approved-source-sha256,
+--original-data-review, --original-data-review-execution, --Rust-build-execution,
+--Rust-execution, --Rust-results, --output-dir; production additionally supplies
+--conversion-ledger/--conversion-execution. All reference operands use path#SHA.
+Unit schema ctf03-unit-comparison.v1, status pass/fail-selected-initial-
+discretization; production ctf03-production-comparison.v1, status pass/fail-
+selected-loader-to-initial-discretization. Full JSON stdout and comparison.json
+record actual source archives, metrics, mismatches and unavailable/noPASS rows.
+No whole CTF03/card/SUR integration PASS is inferred from selected equality.
+
+The preparation imports only stdlib and hashes source/input metadata. No project
+import, target/compiler/formatter/engine invocation, scientific/binary payload
+read, Git command or canonical edit occurred. Author wrote earlier pure prefix/
+initial APIs and observers; actual comparison is not an independent certificate
+of those reused formulas. Other-author full source peer remains required.
+'''
+    (OUT/'README.md').write_text(readme,encoding='utf-8',newline='\n')
+    binding_paths=[OLD/'manifest.json',OBS/'manifest.json',ROOT/'.runtime/porting/CTF-03/cache-ingress-prep-01/manifest.json',
+        ROOT/'.runtime/porting/CTF-03/cache-ingress-prep-01/new/ctf_initial_owner.rs',
+        policy_source,ROOT/'.runtime/porting/CTF-03/original-data-review-prep-01/review_unit.py',
+        ROOT/'.runtime/porting/CTF-03/original-data-review-prep-01/review_production.py',
+        ROOT/'.runtime/porting/CTF-03/native-helper-prep-01/ctf03_initial_fields.hh',
+        ROOT/'.runtime/porting/CTF-03/input-writer-prep-01/freeze_packet.py']
+    binding_paths.extend(OBS/row['source']['path'].split('/')[-1] for row in obs['own_source_rows'])
+    manifest={'schema':'ctf03-comparer-source-inventory.v1','status':'SOURCE-READY-HELD-unexecuted',
+        'own_sources':source_rows,'source_preparation_bindings':[ref(p) for p in binding_paths],
+        'runtime_observer_API_paths':obs['API_paths'],'actual_initial_policy':policy,
+        'own_preparation_source':ref(Path(__file__).resolve()),'README':ref(OUT/'README.md'),
+        'target_imported_or_executed':False,'scientific_or_binary_payloads_read':False,'canonical_sources_written':False,
+        'new_QA_execution_stage':False}
+    (OUT/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n',encoding='utf-8',newline='\n')
+    print(json.dumps({'manifest':ref(OUT/'manifest.json'),'sources':[row['source'] for row in source_rows]}))
+
+
+if __name__=='__main__':
+    main()
