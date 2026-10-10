@@ -103,3 +103,10 @@ Only the selected first-assembly unit gate is passed. Fixed6 CLI after this appl
 Fresh actual ep_cli/eplus-rs Cargo build followed selected04 comparisons and quality. A24/A72/B-NOLIMIT/B-FLOW/B-CAPACITY/B-BOTH all ended0 with the same captured source bytes and Cargo binary. Compatibility/partial-deny/full-trace flags, no hours override/oracle comparison, all45 input guards and source-order matches are verified. Fixture-demand-injection is actual null for both A runs and false for four B runs; null is not reinterpreted as a boolean observation.
 
 Evidence: `evidence/CTF-04-production-cli/summary.json`. This verifies actual CLI execution after this application; it does not certify whole CTF coefficient/retry handoff or complete integration/production gates. The earlier selected-unit summary retains its historical pre-CLI flag literally.
+
+
+## Actual two-original retention cleanup
+
+After selected comparisons, all four existing quality checks and actual fixed-six CLI validation, both prospectively declared04 debug originals were removed by separate exact LiteralPath actions: actual2,599,837,555 bytes. Both removal commands and the outer recorder ended0; all36 legacy protected artifacts, both04 derived helpers,631 present core objects and12 registered absent objects were preserved. Earlier Original refs and launchers remain literal historical records.
+
+Evidence: `evidence/CTF-04-retention/summary.json`, with actual pair tombstones and before/after preservation metadata. No registry rewrite, full debug copy, scientific rerun, remaining-gate PASS or debug recovery claim is made. This later actual record supersedes the earlier live-retention state only for these exact two04 originals.

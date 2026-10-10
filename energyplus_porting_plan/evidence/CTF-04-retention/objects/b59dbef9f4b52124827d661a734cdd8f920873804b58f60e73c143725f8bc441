@@ -1,0 +1,218 @@
+--- .runtime/porting/CLK-05/retirement-plan-02/source/common.py
++++ .runtime/porting/CTF-04/retirement-plan-prep-02/common.py
+@@ -1,25 +1,35 @@
+-"""Execution-free byte guards shared by Root's one-target retention tools."""
++"""Byte guards for Root's exact two-original CTF04 retention action."""
+ from __future__ import annotations
+ from datetime import datetime, timezone
+ import hashlib
+ import json
+ from pathlib import Path
++import re
+ import stat
+ 
+ ROOT = Path(__file__).resolve().parents[4]
+-BASE = '.runtime/porting/CLK-05/'
+-POLICY = 'energyplus_porting_plan/evidence/native-helper-retention-policy.json'
+-REGISTRY = '.runtime/porting/CLK-04/retirement-01/registry-retired.json'
+-POLICY_SHA = '782246907999e298e5bcb7e47098c2611b6e5b7d7022163e2bb4005508559379'
+-REGISTRY_SHA = '27523fa971b49989935ba11f51a3afa249c5ffd77b229c0a6314d5edf8c9e378'
++BASE = '.runtime/porting/CTF-04/'
++NAMES = ['common.py', 'proofs.py', 'write_plan.py', 'retire.py']
+ TARGETS = {
+-    'clk05_reference_helper': {
+-        'historical_path': '.runtime/ep261-gcc13-o0/Products/clk05_reference_helper.exe',
+-        'sha256': 'b1e54c8f083b587d689bd97539db0f329a12227b87226c9070bd2065947d9bcc',
+-        'size_bytes': 1296986812,
++    'ctf04_unit_helper': {
++        'historical_path': '.runtime/ep261-gcc13-o0/Products/ctf04_unit_helper.exe',
++        'sha256': '290026e0d0400830764980d5dd21d2d19ea6932ab328b461e3b28753a0fc1aa7',
++        'size_bytes': 1298472674,
++    },
++    'ctf04_production_helper': {
++        'historical_path': '.runtime/ep261-gcc13-o0/Products/ctf04_production_helper.exe',
++        'sha256': '18e56cfecef4f05fa8f5b9853cadb4e9d7fc4afce3644be88bffa60b10c85819',
++        'size_bytes': 1301364881,
+     },
+ }
+-GATES = ('scope_review', 'unit_gate', 'integration_gate', 'production_gate')
++BUILDS = {
++    'unit': {'path': BASE + 'native-build-01/unit/native-build.json',
++             'sha256': 'fb773fe193f071299e4f26c3d9cb956b7c724f2420c8f6589105979cff931263'},
++    'production': {'path': BASE + 'native-build-01/production/native-build.json',
++                   'sha256': '89fa7509735b765fd85d03134ff35e957c661c3c09b5f8099e9bd16dabd76678'},
++}
++BEFORE = {'path': BASE + 'native-build-01/before/preservation.json',
++          'sha256': '28b54abc8b8861d5de3e2895a673304e7ab77faf69e8b3a166f0bb2ced2c8ee7'}
+ SEEN = {}
+ 
+ 
+@@ -38,22 +48,38 @@
+     return stamp
+ 
+ 
+-def exact(left, right):
+-    if type(left) is not type(right):
+-        return False
+-    if type(left) is dict:
+-        return set(left) == set(right) and all(exact(left[key], right[key]) for key in left)
+-    if type(left) is list:
+-        return len(left) == len(right) and all(exact(a, b) for a, b in zip(left, right))
+-    if type(left) is float:
+-        return left.hex() == right.hex()
+-    return left == right
++def raw_path(value):
++    require(isinstance(value, (str, Path)), 'Typed path required')
++    text = str(value)
++    if text.startswith('\\\\?\\'):
++        require(re.match(r'^\\\\\?\\[A-Za-z]:\\', text) is not None, 'Only verbatim drive paths admitted')
++        text = text[4:]
++    require(not text.startswith(('\\\\', '//')), 'UNC and device paths are outside this scope')
++    raw = Path(text)
++    raw = raw if raw.is_absolute() else ROOT / raw
++    require(raw.is_relative_to(ROOT) and raw != ROOT and '..' not in raw.parts, 'Literal contained path required')
++    return raw
++
++
++def path_of(value, exists=True):
++    raw = raw_path(value)
++    current = ROOT
++    for part in raw.relative_to(ROOT).parts:
++        current /= part
++        try:
++            info = current.lstat()
++        except FileNotFoundError:
++            require(not exists, 'Required path is absent: ' + str(value))
++            break
++        require(not getattr(info, 'st_file_attributes', 0) & 0x400 and not stat.S_ISLNK(info.st_mode),
++                'Reparse paths are not admitted: ' + str(value))
++    path = raw.resolve(strict=exists)
++    require(path.is_relative_to(ROOT) and path != ROOT, 'Path escapes repository')
++    return path
+ 
+ 
+ def absent(value):
+-    raw = Path(value)
+-    raw = raw if raw.is_absolute() else ROOT / raw
+-    require(raw.parent.resolve().is_relative_to(ROOT), 'Absence path outside repository')
++    raw = path_of(value, exists=False)
+     try:
+         raw.lstat()
+     except FileNotFoundError:
+@@ -61,32 +87,23 @@
+     return False
+ 
+ 
+-def path_of(value, exists=True):
+-    require(isinstance(value, (str, Path)), 'Typed path required')
+-    raw = Path(value)
+-    raw = raw if raw.is_absolute() else ROOT / raw
+-    path = raw.resolve(strict=exists)
+-    require(path.is_relative_to(ROOT) and path != ROOT, 'Path escapes repository')
++def regular(value):
++    path = path_of(value)
++    require(stat.S_ISREG(path.lstat().st_mode), 'Regular non-reparse file required: ' + str(value))
+     return path
+ 
+ 
+-def regular(value):
+-    raw = Path(value)
+-    raw = raw if raw.is_absolute() else ROOT / raw
+-    info = raw.lstat()
+-    require(stat.S_ISREG(info.st_mode) and not getattr(info, 'st_file_attributes', 0) & 0x400,
+-            'Regular non-reparse file required: ' + str(value))
+-    return path_of(raw)
+-
+-
+-def digest(path):
++def digest(path, algorithm='sha256', prefix=b''):
+     before = path.stat()
++    hasher = hashlib.new(algorithm)
++    hasher.update(prefix)
+     with path.open('rb') as stream:
+-        sha = hashlib.file_digest(stream, 'sha256').hexdigest()
++        for block in iter(lambda: stream.read(1024 * 1024), b''):
++            hasher.update(block)
+     after = path.stat()
+     require((before.st_size, before.st_mtime_ns, before.st_ctime_ns)
+             == (after.st_size, after.st_mtime_ns, after.st_ctime_ns), 'Bytes changed while hashing')
+-    return sha
++    return hasher.hexdigest()
+ 
+ 
+ def ref(value, expected=None, size=None, remember=True):
+@@ -101,13 +118,27 @@
+ 
+ 
+ def bound(value, remember=True):
+-    require(type(value) is dict and set(value) == {'path', 'sha256'}, 'Exact path/hash binding required')
+-    require(ref(value['path'], value['sha256'], remember=remember) == value, 'Literal artifact binding differs')
+-    return dict(value)
++    require(type(value) is dict and {'path', 'sha256'} <= set(value)
++            and set(value) <= {'path', 'sha256', 'size_bytes', 'line_count'}, 'Exact file identity required')
++    result = ref(value['path'], value['sha256'], value.get('size_bytes'), remember)
++    require(result['path'] == value['path'], 'Literal repository-relative file identity required')
++    return result
++
++
++def same(left, right):
++    require(bound(left) == bound(right), 'Actual file identities differ')
++
++
++def pin(value):
++    path, separator, sha = str(value).rpartition('#')
++    require(separator and re.fullmatch(r'[0-9a-f]{64}', sha), 'Required actual path#SHA256 input')
++    return ref(path, sha)
+ 
+ 
+ def read(value, expected=None):
+-    binding = ref(value, expected)
++    binding = bound(value) if type(value) is dict else ref(value, expected)
++    path = regular(binding['path'])
++    require(path.stat().st_size <= 32 * 1024 * 1024, 'Only bounded metadata JSON is parsed')
+     def pairs(rows):
+         out = {}
+         for key, item in rows:
+@@ -116,16 +147,16 @@
+         return out
+     def invalid(token):
+         raise ValueError('Nonstandard JSON token: ' + token)
+-    return json.loads(path_of(binding['path']).read_text(encoding='utf8'), object_pairs_hook=pairs, parse_constant=invalid)
++    return json.loads(path.read_text(encoding='utf8'), object_pairs_hook=pairs, parse_constant=invalid)
+ 
+ 
+-def recorded(value, exit_code=0):
++def recorded(value):
+     item = read(value)
+     require(item['schema'] == 'recorded-porting-command.v1' and type(item['exit_code']) is int
+-            and item['exit_code'] == exit_code and item['launch_error'] is None
++            and item['exit_code'] == 0 and item['launch_error'] is None
+             and item['source_bytes_match_before_and_after'] is True
+             and item['recorder_updates_gates'] is False and item['recorder_supplies_reference_answers'] is False,
+-            'Actual guarded recorded command required')
++            'Actual successful guarded recorded command required')
+     require(Path(item['cwd']).resolve() == ROOT, 'Actual repository cwd required')
+     require(item['repository_before']['head'] == item['repository_after']['head'], 'Recorded HEAD changed')
+     for key in ['stdout', 'stderr', 'source_snapshot']:
+@@ -151,7 +182,18 @@
+ 
+ 
+ def write(output, name, value):
+-    destination = output / name
+-    with destination.open('xb') as stream:
++    with (output / name).open('xb') as stream:
+         stream.write(encoded(value))
+-    return ref(destination)
++    return ref(output / name)
++
++
++def approved_sources(manifest_ref, approved_sha, entry):
++    manifest = read(manifest_ref)
++    require(manifest['schema'] == 'ctf04-two-original-retention-source-proposal.v1', 'Reviewed exact source manifest required')
++    rows = manifest['own_sources']
++    require([Path(row['path']).name for row in rows] == NAMES, 'Exactly four ordered source files required')
++    for name, row in zip(NAMES, rows):
++        require(regular(row['path']) == Path(__file__).parent / name, 'Approved source owner differs')
++        bound(row)
++    require(ref(Path(__file__).parent / entry)['sha256'] == approved_sha, 'Explicit Root-approved executed source SHA differs')
++    return bound(manifest_ref)

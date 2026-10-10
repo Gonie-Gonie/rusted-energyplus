@@ -1,0 +1,80 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime/porting/CTF-04/retirement-plan-prep-02/write_plan.py",
+    "--proof-bindings",
+    ".runtime/porting/CTF-04/retirement-inputs-01/proof-bindings.json#d93a553829bd43d003633d9d9f0e72d486a1e6f8601f42714b11f6b29aad6670",
+    "--source-manifest",
+    ".runtime/porting/CTF-04/retirement-plan-prep-02/manifest.json#7b3ec47be45ff9ead06e2862bc8577c60f37cbbb7e01b10c3d109d1055c419ae",
+    "--approved-source-sha256",
+    "09d963e8011b49d37e8e2ba40291e4791a612b7c424323e34bfd7e3364bf6feb",
+    "--output-dir",
+    ".runtime/porting/CTF-04/retirement-plan-01"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-10T17:04:23.355983+00:00",
+  "finished_utc": "2026-10-10T17:05:56.414882+00:00",
+  "elapsed_seconds": 93.05802990001393,
+  "repository_before": {
+    "head": "4b9a208c5f04f0a42a2cc98c7ec1973d7dd12e7f",
+    "worktree_clean": true,
+    "porcelain_v1_nul_utf8": ""
+  },
+  "repository_after": {
+    "head": "4b9a208c5f04f0a42a2cc98c7ec1973d7dd12e7f",
+    "worktree_clean": true,
+    "porcelain_v1_nul_utf8": ""
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/3a/3acae117724d42c2c9e7495efbec3b94c03c0f93b1e749af2f44fdb32405819d",
+    "sha256": "3acae117724d42c2c9e7495efbec3b94c03c0f93b1e749af2f44fdb32405819d"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CTF-04/retirement-plan-command-01/stdout.log",
+    "sha256": "b030a06597eb1253d210e34e2fd16937ddeafca9f5dbc8947f452aeb90efd54e"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CTF-04/retirement-plan-command-01/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-10T17:05:56.414882+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

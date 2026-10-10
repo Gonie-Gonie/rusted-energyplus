@@ -1,0 +1,28 @@
+--- .runtime/porting/CTF-04/retirement-plan-prep-01/proofs.py
++++ .runtime/porting/CTF-04/retirement-plan-prep-02/proofs.py
+@@ -1,7 +1,7 @@
+ """Authenticate Root-checked selected04 metadata, archive objects and live protection."""
+ from common import *
+ 
+-QUALITY = ['workspace_tests', 'clippy', 'format_check', 'source_quality', 'structure_quality']
++QUALITY = ['focused_assembly_tests', 'workspace_tests', 'clippy', 'format_check']
+ ROLES = ['PE', 'helper', 'DataQA', 'comparison']
+ 
+ 
+@@ -171,7 +171,7 @@
+             if role == 'DataQA':
+                 require(facts['structural_provenance_release_passed'] is True
+                         and facts['numerical_PASS_claimed'] is False, 'Actual structural DataQA0 required')
+-    require(set(pins['quality']) == set(QUALITY), 'All five actual final quality checks required')
++    require(set(pins['quality']) == set(QUALITY), 'All four actual final quality checks required')
+     for role in QUALITY:
+         value = bound(pins['quality'][role])
+         command = recorded(value)
+@@ -179,6 +179,7 @@
+         refs['quality/' + role] = value
+     report, execution, facts = proof_pair(pins['fixed_six_CLI'], 'fixed-six-CLI', started)
+     require(facts['schema'] == 'ctf04-fixed-six-actual-cli-executions.v1'
++            and facts['execution_role'] == 'actual-plan-validation-after-Root-authored-CLI-summary'
+             and facts['all6_exit0_and_source_unchanged'] is True and facts['all45_input_guards_unchanged_after'] is True
+             and type(facts['executions']) is list and len(facts['executions']) == 6,
+             'Actual six production CLI commands and 45 unchanged inputs required')

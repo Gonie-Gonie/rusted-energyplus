@@ -1,0 +1,216 @@
+{
+  "schema": "ctf04-two-original-retention-source-proposal.v1",
+  "status": "source-ready-held-unexecuted",
+  "authorship": "Raw authored exact-pair lifecycle adaptation; Root and another author must review before actual use. Not an independent scientific certificate.",
+  "scope": "Only two genuine prospectively declared CTF04 linked originals. No card/registry mutation or all-four-gates claim.",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/CTF-04/retirement-plan-prep-01/common.py",
+      "sha256": "bfa703a4903ecfaf30d953ad7ff61d286cdbe514b4e0416175b97154e6432d2b",
+      "size_bytes": 7798,
+      "line_count": 199
+    },
+    {
+      "path": ".runtime/porting/CTF-04/retirement-plan-prep-01/proofs.py",
+      "sha256": "d0d2bfb04cb0bd1bc5fcf0808e1df016a9cab478749c752bee87759b939d7e30",
+      "size_bytes": 12082,
+      "line_count": 195
+    },
+    {
+      "path": ".runtime/porting/CTF-04/retirement-plan-prep-01/write_plan.py",
+      "sha256": "09d963e8011b49d37e8e2ba40291e4791a612b7c424323e34bfd7e3364bf6feb",
+      "size_bytes": 5262,
+      "line_count": 91
+    },
+    {
+      "path": ".runtime/porting/CTF-04/retirement-plan-prep-01/retire.py",
+      "sha256": "a40e9910074d6e8bf238ee841b993e6c8ad1683dce12dc3dd3e27aceda900020",
+      "size_bytes": 11036,
+      "line_count": 181
+    }
+  ],
+  "README": {
+    "path": ".runtime/porting/CTF-04/retirement-plan-prep-01/README.md",
+    "sha256": "0149a8b0eac85a45380a5a8c9d04558c06d13b60436f05ca4b2ba5e3c6e2633e",
+    "size_bytes": 8010,
+    "line_count": 43
+  },
+  "predecessor_sources_and_literal_bindings": [
+    {
+      "historical_path": ".runtime/porting/CLK-05/retirement-plan-02/source/common.py",
+      "original": {
+        "path": ".runtime/porting/CLK-05/retirement-plan-02/source/common.py",
+        "sha256": "f2acc8ab3a805cee03eb30b2eda8936c9be004e5babb6255fc0b4f4263bee038",
+        "size_bytes": 5775,
+        "line_count": 157
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-04/retirement-plan-prep-01/before/common.py",
+        "sha256": "f2acc8ab3a805cee03eb30b2eda8936c9be004e5babb6255fc0b4f4263bee038",
+        "size_bytes": 5775,
+        "line_count": 157
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/retirement-plan-02/source/proofs.py",
+      "original": {
+        "path": ".runtime/porting/CLK-05/retirement-plan-02/source/proofs.py",
+        "sha256": "c4764e1b4d0d66df7b256e4fab0601f0fbba18f3cab89fd1e5202a5a36a1f302",
+        "size_bytes": 25461,
+        "line_count": 302
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-04/retirement-plan-prep-01/before/proofs.py",
+        "sha256": "c4764e1b4d0d66df7b256e4fab0601f0fbba18f3cab89fd1e5202a5a36a1f302",
+        "size_bytes": 25461,
+        "line_count": 302
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/retirement-plan-02/source/write_plan.py",
+      "original": {
+        "path": ".runtime/porting/CLK-05/retirement-plan-02/source/write_plan.py",
+        "sha256": "666d84b62f78c723d995098727eefe849616c2cc4265f36408eeb9bef5a2767a",
+        "size_bytes": 8920,
+        "line_count": 133
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-04/retirement-plan-prep-01/before/write_plan.py",
+        "sha256": "666d84b62f78c723d995098727eefe849616c2cc4265f36408eeb9bef5a2767a",
+        "size_bytes": 8920,
+        "line_count": 133
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/retirement-plan-02/source/retire.py",
+      "original": {
+        "path": ".runtime/porting/CLK-05/retirement-plan-02/source/retire.py",
+        "sha256": "33472c7b2bc121daeed9af0a13f9b7c5498a5dd3bd4b4a2e44afe33fcb0bf4ea",
+        "size_bytes": 11648,
+        "line_count": 190
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-04/retirement-plan-prep-01/before/retire.py",
+        "sha256": "33472c7b2bc121daeed9af0a13f9b7c5498a5dd3bd4b4a2e44afe33fcb0bf4ea",
+        "size_bytes": 11648,
+        "line_count": 190
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CLK-05/retirement-plan-02/source/proof-bindings.json",
+      "original": {
+        "path": ".runtime/porting/CLK-05/retirement-plan-02/source/proof-bindings.json",
+        "sha256": "07110f80f75107bfff67e5de03e615bf64aac8914e8f3aaff61fe45a4ed1163a",
+        "size_bytes": 8749,
+        "line_count": 197
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-04/retirement-plan-prep-01/before/proof-bindings.json",
+        "sha256": "07110f80f75107bfff67e5de03e615bf64aac8914e8f3aaff61fe45a4ed1163a",
+        "size_bytes": 8749,
+        "line_count": 197
+      }
+    }
+  ],
+  "exact_predecessor_diffs": [
+    {
+      "path": ".runtime/porting/CTF-04/retirement-plan-prep-01/common.py.from-CLK05.diff",
+      "sha256": "1f5ad9264032fb8a669e3dac6417e35004f086b13b8453b5c3421d14f905c5b6",
+      "size_bytes": 9386,
+      "line_count": 218
+    },
+    {
+      "path": ".runtime/porting/CTF-04/retirement-plan-prep-01/proofs.py.from-CLK05.diff",
+      "sha256": "64b457cd78da8bbc3211797277b66f77f4decd7d0051232bb487aac40eb22c80",
+      "size_bytes": 38091,
+      "line_count": 480
+    },
+    {
+      "path": ".runtime/porting/CTF-04/retirement-plan-prep-01/write_plan.py.from-CLK05.diff",
+      "sha256": "0abc546b6246af091d794a3b7d9fcd44b165469b719f8ba22abb088cbbe222d4",
+      "size_bytes": 11276,
+      "line_count": 161
+    },
+    {
+      "path": ".runtime/porting/CTF-04/retirement-plan-prep-01/retire.py.from-CLK05.diff",
+      "sha256": "dd6352b36d2f8f3f4744bb419e15d6813bed10dd98fcb48be2e53c4b771d2c70",
+      "size_bytes": 14832,
+      "line_count": 217
+    }
+  ],
+  "actual_build_and_preservation_metadata_only_refs": [
+    {
+      "path": ".runtime/porting/CTF-04/native-build-01/unit/native-build.json",
+      "sha256": "fb773fe193f071299e4f26c3d9cb956b7c724f2420c8f6589105979cff931263",
+      "size_bytes": 4977,
+      "line_count": 119
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-build-01/production/native-build.json",
+      "sha256": "89fa7509735b765fd85d03134ff35e957c661c3c09b5f8099e9bd16dabd76678",
+      "size_bytes": 5043,
+      "line_count": 119
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-build-01/before/preservation.json",
+      "sha256": "28b54abc8b8861d5de3e2895a673304e7ab77faf69e8b3a166f0bb2ced2c8ee7",
+      "size_bytes": 162232,
+      "line_count": 3366
+    }
+  ],
+  "unchanged_exact_file_mechanics": [
+    {
+      "file": "write_plan.py",
+      "function": "candidate",
+      "AST_equal_to_CLK05": true
+    },
+    {
+      "file": "retire.py",
+      "function": "ps_quote",
+      "AST_equal_to_CLK05": true
+    },
+    {
+      "file": "retire.py",
+      "function": "removal_script",
+      "AST_equal_to_CLK05": true
+    }
+  ],
+  "Root_supplied_runtime_proof_contract": {
+    "comparison_schemas": [
+      "ctf04-unit-comparison.v1",
+      "ctf04-production-comparison.v1"
+    ],
+    "comparison_statuses": [
+      "pass-selected-first-matrix-assembly",
+      "pass-selected-loader-to-first-matrix-assembly"
+    ],
+    "comparison_count_operand": "comparison.mismatch_count is actual integer zero",
+    "complete_CTF04_PASS_claimed": false,
+    "fixed_six_CLI_schema": "ctf04-fixed-six-actual-cli-executions.v1",
+    "actual_proof_bindings": null,
+    "actual_archive_commit": null,
+    "future_refs_and_values_not_guessed": true,
+    "Root_checked_extraction_authority_disclosed": true
+  },
+  "protection_counts": {
+    "prior_live_refs": 36,
+    "retained04_derivatives": 2,
+    "present_core_objects": 631,
+    "absent_registered_core_paths": 12
+  },
+  "candidate_count": 2,
+  "potential_exact_original_bytes": 2599837555,
+  "source_validation": {
+    "Python_AST_only": true,
+    "generated_diff_equality": true,
+    "predecessor_copy_equality": true,
+    "own_source_line_total": 666
+  },
+  "no_new_SourceQA_execution_stage": true,
+  "shared_legacy_registry_rewritten": false,
+  "deletion_or_move_performed": false,
+  "target_modules_imported_or_executed": false,
+  "scientific_or_weather_payloads_read": false,
+  "executable_or_core_object_bytes_read_or_hashed": false,
+  "canonical_files_Git_builds_engines_tests_or_formatter_touched": false
+}

@@ -1,0 +1,45 @@
+This is a source-only adaptation of the accepted CLK05 exact-file retirement lifecycle. Nothing has been deleted, hashed as an executable, run, imported, or claimed complete by this preparation. Root and another author must fully review these exact sources before any actual invocation. There is no new source-review execution stage.
+
+Only the two fixed CTF04 linked originals are candidates:
+
+| Target | SHA256 | Physical bytes |
+| --- | --- | ---: |
+| `.runtime/ep261-gcc13-o0/Products/ctf04_unit_helper.exe` | `290026e0d0400830764980d5dd21d2d19ea6932ab328b461e3b28753a0fc1aa7` | 1,298,472,674 |
+| `.runtime/ep261-gcc13-o0/Products/ctf04_production_helper.exe` | `18e56cfecef4f05fa8f5b9853cadb4e9d7fc4afce3644be88bffa60b10c85819` | 1,301,364,881 |
+
+These identities and the prospective retention intent come from the genuine two build metadata files, pinned in `common.py`. Potential saving is 2,599,837,555 bytes. The two derived helpers remain live. The authenticated pre04 inventory supplies the 36 legacy protected identities, 631 present core objects and 12 absent registered core paths; all are checked physically before and after each action. No original executable bytes were read during authoring. Physical SHA/size checks occur only in the future authorized actual retention invocation.
+
+The `candidate`, `ps_quote`, and `removal_script` functions preserve the existing exact-file mechanics. Each native PowerShell script checks the exact cwd, Products directory, leaf name, non-reparse status, physical size and SHA immediately before `Remove-Item -LiteralPath`. There is no glob, recursive delete, directory deletion, alternate shell, move, full debug copy, or recovery claim. Python also rejects reparse ancestors. `single_action` keeps the actual command/spawn outcome, stdout/stderr, before/after preservation and accepted removal separately. Failure writes its receipt and attempt state before raising; a second action is not invented after a first failure.
+
+Runtime inputs are mandatory, genuine path#SHA256 bindings. No future hashes are emitted. Root first supplies `ctf04-two-original-retention-proof-bindings.v1` with:
+
+- `scope`: `selected-CTF04-first-matrix-assembly-only`; `Root_approved_for_exact_pair`: true; `future_hashes_guessed`: false; `targets`: the exact ordered pair `ctf04_unit_helper`, `ctf04_production_helper`.
+- `lanes`: exactly `unit` and `production`. Each has `build` (the literal real metadata ref) and exactly `PE`, `helper`, `DataQA`, `comparison` rows.
+- Each proof row contains `report`, `execution`, `Root_semantically_verified`: true, and `Root_checked_metadata`. The latter includes `source_report` normalized to `{path,sha256}`, actual nonempty `schema` and `status`, plus the role facts below. Root must extract and check these facts from the genuine reports before approving the binding SHA. The reader authenticates those report bytes without parsing their scientific payloads. It does not independently rederive report facts from an engine output.
+- PE facts: `original_and_derivative_verified`: true; `linked_original` and `helper_binary` copied exactly from the real build metadata. Helper facts: integer `actual_helper_exit_code`: 0 and `preservation_checks_passed`: true. DataQA facts: `structural_provenance_release_passed`: true and `numerical_PASS_claimed`: false. These are explicitly Root-checked normalized facts, not aliases falsely asserted to exist in every raw report.
+- Comparison facts are actual schema/status, the actual selected lane PASS boolean, `complete_CTF04_PASS_claimed`: false and `comparison.mismatch_count`: integer 0. Unit requires `ctf04-unit-comparison.v1` / `pass-selected-first-matrix-assembly` / `selected_unit_PASS_claimed`; production requires `ctf04-production-comparison.v1` / `pass-selected-loader-to-first-matrix-assembly` / `selected_fixed15_first_assembly_PASS_claimed`. No field metrics are recomputed or newly restricted.
+- `quality`: exactly the four existing checks `focused_assembly_tests`, `workspace_tests`, `clippy`, `format_check`, each the genuine actual successful recorder ref. These bind the actual assembly-tests, workspace-tests, Clippy and format-check commands; no additional quality stage is required.
+- `fixed_six_CLI`: a proof row with actual `ctf04-fixed-six-actual-cli-executions.v1`, `all6_exit0_and_source_unchanged`: true, `all45_input_guards_unchanged_after`: true, and six distinct actual recorder refs in `executions`. The metadata status is Root's real nonempty status. `execution_role` must be `actual-plan-validation-after-Root-authored-CLI-summary`. The proof-row execution binds the genuine `production-cli-plan-check-command-01` metadata validation after Root authored the summary; it is not a summary producer or a six-engine driver. All six distinct child receipts remain the actual scientific executions and are authenticated separately.
+- `committed_archive`: `manifest` ref, `commit` `{raw_body:<ref>,git_object_id:<actual40hex>}`, `trees` of the same raw tree-body identity form, `indexed_files` rows `{path,file:<path/SHA256/size_bytes ref>,git_blob_oid:<actual40hex>}`, and `Root_verified_archive_complete_for_selected_CTF04`: true. Root supplies real uncompressed Git object bodies as ordinary metadata files. The reader checks their type/length-prefixed Git object IDs, root-tree/path associations and each indexed file's exact SHA256/size/Git blob ID without invoking Git. Include the archive manifest in the index. Root checks archive coverage and current committed selection; no fabricated archive success or implicit ancestry claim is made.
+
+All execution refs must be genuine `recorded-porting-command.v1` actual0 with no launch error, unchanged source bytes/HEAD, actual cwd and actual UTC interval. Their stdout/stderr/source-snapshot/recorder archive bytes are authenticated but engine streams are not parsed. These guards do not repeat engines, scientific comparers, Cargo, Git, compilers, strip or PE tools. The Root-approved metadata extraction is an explicit trust boundary rather than an independent scientific certificate.
+
+Root executes the existing generic recorder around the approved plan writer, using fresh output:
+
+```
+python -X utf8 -B .runtime/porting/CTF-04/retirement-plan-prep-02/write_plan.py --proof-bindings ACTUAL_PATH#ACTUAL_SHA --source-manifest .runtime/porting/CTF-04/retirement-plan-prep-02/manifest.json#ACTUAL_MANIFEST_SHA --approved-source-sha256 ACTUAL_WRITE_PLAN_SHA --output-dir .runtime/porting/CTF-04/retirement-plan-01
+```
+
+The plan copies all four executed sources and the exact approved proof-bindings bytes. It emits the inherited compact five-key stdout protocol `{plan,status,targets,deletion_performed:false,registry_admission_performed:false}`. A plan does not authorize deletion.
+
+After Root validates the actual plan0 and current proofs, Root may separately invoke the reviewed action through the same recorder:
+
+```
+python -X utf8 -B .runtime/porting/CTF-04/retirement-plan-prep-02/retire.py --plan ACTUAL_PLAN_PATH#ACTUAL_SHA --plan-execution ACTUAL_PLAN_RECORDER_PATH#ACTUAL_SHA --source-manifest .runtime/porting/CTF-04/retirement-plan-prep-02/manifest.json#ACTUAL_MANIFEST_SHA --approved-source-sha256 ACTUAL_RETIRE_SHA --apply --authorize-targets ctf04_unit_helper ctf04_production_helper --output-dir .runtime/porting/CTF-04/retirement-01
+```
+
+The action requires that exact ordered authorization, current own-source bytes, actual successful plan receipt/full compact stdout, and all prerequisites. Outputs are separate `before-retirement.json`, two actual removal receipts/attempt records, `after-retirement.json` pair tombstones and `retirement.json`. On partial failure only reached records exist; the outer recorder remains failed. No registry version or admission is added. Historical references/registries/launchers remain literal and unchanged. Future builders must deliberately authenticate the separate actual pair tombstones and retained derivatives; old live-original launchers will require relinking or will fail honestly after retirement.
+
+This supports selected04 storage retention only. It does not claim all four CTF04 gates, downstream CTF05-10, a Native driver, a retry, or numerical integration completion. No hashes/maps restore discarded debug bytes, and deterministic relink recovery is not claimed. The intended current source path is the held prep directory; copied source archives are evidence, not silently relocated executables.
+
+Fresh02 preserves held01 and repairs only the four existing quality role names and the explicit fixed-six plan-validation role. The three other executable source files are byte-identical01; the exact01 before copies/deltas and inherited CLK05 source correspondence are bound in the manifest. No action has been executed.

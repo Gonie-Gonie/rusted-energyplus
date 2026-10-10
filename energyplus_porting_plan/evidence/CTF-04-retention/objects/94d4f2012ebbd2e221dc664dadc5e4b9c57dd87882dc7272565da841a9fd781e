@@ -1,0 +1,6 @@
+tree 4b7b72fe6e83c760de23d947e33aa8041a6084ce
+parent e700f4600fb7a71b686c5cc616e3c5f2c112331f
+author Hyeong-Gon Jo <hg221089@gmail.com> 1791651019 +0900
+committer Hyeong-Gon Jo <hg221089@gmail.com> 1791651019 +0900
+
+test(ctf): verify fixed production CLI after first assembly port
