@@ -86,3 +86,7 @@ Same frozen inputs and strict zero profiles: unit numeric248178/discrete1574736,
 Actual Cargo clippy/fmt checks0; focused132 and workspace4748 tests passed with0 failed/ignored. All actual candidate/quality/comparison recorders bind Source761312a84eda41f616c5002808815011dcb6b46fb48c1ee6c1697cbdcb43fe6c. Full scientific bytes, source/commands and real OriginalDataQA baseline are preserved in evidence/CTF-08-unit/{manifest,summary}.json.
 
 Only the selected unit gate passes. Whole retry, final public SI19 stores, SUR/cache connection and integration/production/full-card gates remain pending. Fixed6 CLI and precise Original retirement will be recorded separately.
+
+## Actual fixed six ordinary CLI executions
+
+A-24H, A-72H, B-NOLIMIT-24H, B-FLOW-24H, B-CAPACITY-24H and B-BOTH-24H all exit0 on the same final08 source. Each actual source-order gate matches; hours override is absent and compare_oracle=false. All45 original input/weather/metadata guards remain unchanged. This establishes ordinary run regression evidence only; no numerical or integration/production/full-card PASS is inferred. Evidence: evidence/CTF-08-production-cli/{manifest,summary}.json.

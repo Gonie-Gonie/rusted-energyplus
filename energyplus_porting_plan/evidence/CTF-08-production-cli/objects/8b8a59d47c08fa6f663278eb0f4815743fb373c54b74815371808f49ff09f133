@@ -1,0 +1,80 @@
+{
+  "schema": "ctf08-fixed-six-actual-cli-executions.v1",
+  "input_packet": {
+    "path": ".runtime/porting/CTF-08/production-cli-inputs-01/manifest.json",
+    "sha256": "be386881295e82b7f145aa5e7205ff74f7159944f81fdab9ceb0b2c73e1b3ffe",
+    "size_bytes": 14074
+  },
+  "actual_build": {
+    "path": ".runtime/porting/CTF-08/production-cli-build-command-01/receipt.json",
+    "sha256": "29145f7d5f2a7d2d301d955dd75f6be35f3e3b726f135b0a5e1411a7b7c79dbb",
+    "size_bytes": 4151
+  },
+  "actual_Cargo_binary": {
+    "historical_path": "target/debug/eplus-rs.exe",
+    "sha256": "fc378d9ee4b1b54167daa93a3f4e74088bfae3cee01baf98ce1db81c091f8fd3"
+  },
+  "same_actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/76/761312a84eda41f616c5002808815011dcb6b46fb48c1ee6c1697cbdcb43fe6c",
+    "sha256": "761312a84eda41f616c5002808815011dcb6b46fb48c1ee6c1697cbdcb43fe6c"
+  },
+  "executions": [
+    {
+      "id": "A-24H",
+      "receipt": {
+        "path": ".runtime/porting/CTF-08/production-cli-command-01/A-24H/receipt.json",
+        "sha256": "18b6cff65efbdfaf7247e8491971f40c7e313d8acbdcc1bdeff6930b8f11829a",
+        "size_bytes": 3250
+      }
+    },
+    {
+      "id": "A-72H",
+      "receipt": {
+        "path": ".runtime/porting/CTF-08/production-cli-command-01/A-72H/receipt.json",
+        "sha256": "40b9aad2401a7d4c86bfd0d362789fd1c5e58837df335c294a47ea52b36cd0b2",
+        "size_bytes": 3249
+      }
+    },
+    {
+      "id": "B-NOLIMIT-24H",
+      "receipt": {
+        "path": ".runtime/porting/CTF-08/production-cli-command-01/B-NOLIMIT-24H/receipt.json",
+        "sha256": "04dce61521acb751861868b098d2bc0dbab48a869589a7f641b0ba8a6a2aedf9",
+        "size_bytes": 3280
+      }
+    },
+    {
+      "id": "B-FLOW-24H",
+      "receipt": {
+        "path": ".runtime/porting/CTF-08/production-cli-command-01/B-FLOW-24H/receipt.json",
+        "sha256": "b98bce52d4105da9ce9ff1c528b08f5c78375ddc8fd6f63b44f77d5eeb837f3f",
+        "size_bytes": 3269
+      }
+    },
+    {
+      "id": "B-CAPACITY-24H",
+      "receipt": {
+        "path": ".runtime/porting/CTF-08/production-cli-command-01/B-CAPACITY-24H/receipt.json",
+        "sha256": "5a76a6adea776a922c6e621aa53a7229a40a6e335ae71b54eed2fcc62b4f7d81",
+        "size_bytes": 3285
+      }
+    },
+    {
+      "id": "B-BOTH-24H",
+      "receipt": {
+        "path": ".runtime/porting/CTF-08/production-cli-command-01/B-BOTH-24H/receipt.json",
+        "sha256": "3115c0d6de25259b2b3047268c3d108d870d3c6eda6519544ca6e1fb5ca6918d",
+        "size_bytes": 3269
+      }
+    }
+  ],
+  "all6_exit0_and_source_unchanged": true,
+  "all45_input_guards_unchanged_after": true,
+  "numerical_equivalence_certified": false,
+  "complete_CTF04_PASS_claimed": false,
+  "complete_CTF05_PASS_claimed": false,
+  "complete_CTF06_PASS_claimed": false,
+  "complete_CTF07_PASS_claimed": false,
+  "complete_CTF08_PASS_claimed": false,
+  "downstream_matrix_coefficient_handoff_certified": false
+}

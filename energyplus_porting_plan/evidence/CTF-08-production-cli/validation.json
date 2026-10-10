@@ -1,0 +1,55 @@
+{
+  "schema": "ctf08-fixed-six-cli-plan-validation.v1",
+  "role": "actual-plan-validation-after-Root-authored-CLI-summary",
+  "actual_execution": {
+    "path": ".runtime/porting/CTF-08/production-cli-plan-check-command-01/receipt.json",
+    "sha256": "a58aeb1f1ed9559c5e7895fbb506b2d671385dc10de14bc2d66eda3570f75b91",
+    "size_bytes": 3162
+  },
+  "exit_code": 0,
+  "source_bytes_match_before_and_after": true,
+  "selected_files": [
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-08/production-cli-plan-check-command-01/receipt.json",
+        "sha256": "a58aeb1f1ed9559c5e7895fbb506b2d671385dc10de14bc2d66eda3570f75b91",
+        "size_bytes": 3162
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-08-production-cli/objects/a58aeb1f1ed9559c5e7895fbb506b2d671385dc10de14bc2d66eda3570f75b91",
+        "sha256": "a58aeb1f1ed9559c5e7895fbb506b2d671385dc10de14bc2d66eda3570f75b91",
+        "size_bytes": 3162
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-08/production-cli-plan-check-command-01/stdout.log",
+        "sha256": "35785b0279a5f45d2e755ed8fa103d63f7a3b5ca48258770b22470757b190797",
+        "size_bytes": 659
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-08-production-cli/objects/35785b0279a5f45d2e755ed8fa103d63f7a3b5ca48258770b22470757b190797",
+        "sha256": "35785b0279a5f45d2e755ed8fa103d63f7a3b5ca48258770b22470757b190797",
+        "size_bytes": 659
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-08/production-cli-plan-check-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-08-production-cli/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    }
+  ],
+  "validated_plan": {
+    "path": "energyplus_porting_plan/plan.json",
+    "sha256": "32e531cd83e6b832d652568bd7a177ab2c3098f075d08e4446a6a5295e4716a9",
+    "size_bytes": 689717
+  },
+  "scientific_PASS_produced_by_check_plan": false
+}
