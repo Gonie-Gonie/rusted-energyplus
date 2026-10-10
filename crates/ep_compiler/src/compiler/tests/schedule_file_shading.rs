@@ -210,8 +210,8 @@ fn generated_columns_precede_all_ordinary_schedule_families()
         .as_ref()
         .ok_or_else(|| std::io::Error::other("missing shading schedule"))?;
     assert_eq!(shading.columns[0].id, ScheduleId(0));
-    assert_eq!(model.schedules[0].id, ScheduleId(1));
-    assert_eq!(model.compact_schedules[0].id, ScheduleId(2));
+    assert_eq!(model.schedules[0].id, ScheduleId(2));
+    assert_eq!(model.compact_schedules[0].id, ScheduleId(1));
     assert_eq!(model.file_schedules[0].id, ScheduleId(3));
     assert_eq!(model.year_schedules[0].id, ScheduleId(4));
 

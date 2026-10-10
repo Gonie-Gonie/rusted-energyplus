@@ -7,6 +7,8 @@ mod construction_window_data_file;
 mod construction_window_equivalent_layer;
 mod fenestration_solar_absorbed;
 mod internal_heat_gains;
+mod schedule_compact_source;
+mod schedule_type_limits;
 mod scheduled_surface_gains_check;
 mod space;
 mod surface_computed_geometry;
@@ -669,8 +671,8 @@ impl<'a> Compiler<'a> {
         self.parse_constructions(&mut model);
         self.parse_file_shading_schedule(&mut model);
         self.parse_schedule_type_limits(&mut model);
-        self.parse_schedules(&mut model);
         self.parse_compact_schedules(&mut model);
+        self.parse_schedules(&mut model);
         self.parse_file_schedules(&mut model);
         self.parse_day_hourly_schedules(&mut model);
         self.parse_day_interval_schedules(&mut model);
@@ -697,7 +699,7 @@ impl<'a> Compiler<'a> {
         self.parse_material_heat_and_moisture_transfer_redistributions(&mut model);
         self.parse_material_heat_and_moisture_transfer_diffusions(&mut model);
         self.parse_material_heat_and_moisture_transfer_thermal_conductivities(&mut model);
-        self.validate_scalar_schedule_type_limits(&model);
+        self.validate_schedule_type_limits(&model);
         self.parse_zones(&mut model);
         self.mark_nominal_controlled_zones(&mut model);
         self.parse_zone_lists(&mut model);
@@ -10180,6 +10182,15 @@ impl<'a> Compiler<'a> {
                     "numeric_type",
                     parse_numeric_type,
                 ),
+                unit_type: self
+                    .optional_enum(
+                        "ScheduleTypeLimits",
+                        &name,
+                        &object,
+                        "unit_type",
+                        schedule_type_limits::parse_schedule_unit_type,
+                    )
+                    .unwrap_or(ep_model::ScheduleUnitType::Invalid),
             });
         }
     }
@@ -10480,23 +10491,9 @@ impl<'a> Compiler<'a> {
 
     fn parse_schedules(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("Schedule:Constant") {
-            let schedule_type_limits = match self.optional_string(
-                "Schedule:Constant",
-                &name,
-                &object,
-                "schedule_type_limits_name",
-            ) {
-                Some(type_limits_name) => self.resolve_name(
-                    &model.schedule_type_limit_names,
-                    "Schedule:Constant",
-                    &name,
-                    "schedule_type_limits_name",
-                    &type_limits_name,
-                    "ScheduleTypeLimits",
-                ),
-                None => None,
-            };
-            let schedule_index = file_shading_schedule_column_count(model) + model.schedules.len();
+            let schedule_index = file_shading_schedule_column_count(model)
+                + model.compact_schedules.len()
+                + model.schedules.len();
             let Some(id_value) = self.checked_id("Schedule:Constant", &name, schedule_index) else {
                 continue;
             };
@@ -10506,6 +10503,8 @@ impl<'a> Compiler<'a> {
                 continue;
             }
 
+            let schedule_type_limits =
+                self.selected_schedule_type_limits(model, "Schedule:Constant", &name, &object);
             model.schedules.push(ScheduleConstant {
                 id,
                 name: NormalizedName::new(&name),
@@ -10525,22 +10524,6 @@ impl<'a> Compiler<'a> {
         let minutes_per_timestep =
             schedule_minutes_per_timestep(model.timestep.number_of_timesteps_per_hour);
         for (name, object) in self.objects("Schedule:Compact") {
-            let schedule_type_limits = match self.optional_string(
-                "Schedule:Compact",
-                &name,
-                &object,
-                "schedule_type_limits_name",
-            ) {
-                Some(type_limits_name) => self.resolve_name(
-                    &model.schedule_type_limit_names,
-                    "Schedule:Compact",
-                    &name,
-                    "schedule_type_limits_name",
-                    &type_limits_name,
-                    "ScheduleTypeLimits",
-                ),
-                None => None,
-            };
             let schedule_index = file_shading_schedule_column_count(model)
                 + model.schedules.len()
                 + model.compact_schedules.len();
@@ -10552,6 +10535,8 @@ impl<'a> Compiler<'a> {
                 self.duplicate_name("Schedule:Compact", &name);
                 continue;
             }
+            let schedule_type_limits =
+                self.selected_schedule_type_limits(model, "Schedule:Compact", &name, &object);
             let Some(periods) = self.compact_schedule_periods(&name, &object, minutes_per_timestep)
             else {
                 continue;
@@ -11727,7 +11712,8 @@ impl<'a> Compiler<'a> {
         }
     }
 
-    fn validate_scalar_schedule_type_limits(&mut self, model: &TypedModel) {
+    fn validate_schedule_type_limits(&mut self, model: &TypedModel) {
+        self.validate_compact_schedule_type_limits(model);
         for schedule in &model.schedules {
             self.validate_scalar_schedule_value(
                 model,
@@ -16265,48 +16251,36 @@ impl<'a> Compiler<'a> {
                         );
                     }
 
-                    let Some(until_minute_of_day) = parse_until_minute(text) else {
-                        self.error(
-                            "InvalidScheduleCompactUntil",
-                            "Schedule:Compact",
-                            Some(object_name),
-                            Some("data"),
-                            format!(
-                                "Schedule:Compact/{object_name} has invalid Until directive '{text}'"
-                            ),
-                        );
+                    let Some(until_minute_of_day) = self.compact_schedule_until_minute(
+                        object_name,
+                        text,
+                        profile.profile.interpolation,
+                        minutes_per_timestep,
+                    ) else {
                         continue;
                     };
-                    if profile
-                        .profile
-                        .segments
-                        .last()
-                        .is_some_and(|segment| until_minute_of_day <= segment.until_minute_of_day)
-                    {
-                        self.error(
-                            "InvalidScheduleCompactUntilOrder",
-                            "Schedule:Compact",
-                            Some(object_name),
-                            Some("data"),
-                            format!(
-                                "Schedule:Compact/{object_name} Until times must be strictly increasing; '{text}' is not later than the prior Until time"
-                            ),
-                        );
-                        continue;
-                    }
-                    if profile.profile.interpolation == ScheduleInterpolation::No
-                        && minutes_per_timestep
-                            .is_some_and(|minutes| until_minute_of_day % minutes != 0)
-                    {
-                        self.warning(
-                            "ScheduleCompactUntilNotAlignedToTimestep",
-                            "Schedule:Compact",
-                            Some(object_name),
-                            Some("data"),
-                            format!(
-                                "Schedule:Compact/{object_name} Until minute {until_minute_of_day} is not a multiple of the minutes per zone timestep"
-                            ),
-                        );
+                    if let Some(previous) = profile.profile.segments.last() {
+                        if until_minute_of_day < previous.until_minute_of_day {
+                            self.error(
+                                "InvalidScheduleCompactUntilOrder",
+                                "Schedule:Compact",
+                                Some(object_name),
+                                Some("data"),
+                                format!("Schedule:Compact/{object_name} Until times must not descend; '{text}' is earlier than the prior Until time"),
+                            );
+                            continue;
+                        }
+                        if until_minute_of_day == previous.until_minute_of_day
+                            && until_minute_of_day % 60 == 0
+                        {
+                            self.warning(
+                                "ScheduleCompactZeroTimeInterval",
+                                "Schedule:Compact",
+                                Some(object_name),
+                                Some("data"),
+                                format!("Schedule:Compact/{object_name} has a zero time interval at '{text}'"),
+                            );
+                        }
                     }
                     profile.pending_until_minute_of_day = Some(until_minute_of_day);
                 }
@@ -16403,82 +16377,6 @@ impl<'a> Compiler<'a> {
         Some(periods)
     }
 
-    fn compact_schedule_day_types(
-        &mut self,
-        object_name: &str,
-        directive: &str,
-        assigned_day_types: &mut [bool; 12],
-    ) -> Vec<ScheduleDayType> {
-        let Some((_prefix, body)) = directive.split_once(':') else {
-            return Vec::new();
-        };
-        let tokens = body
-            .split(|character: char| character.is_whitespace() || character == ',')
-            .filter(|token| !token.is_empty())
-            .collect::<Vec<_>>();
-        if tokens.is_empty() {
-            self.error(
-                "InvalidScheduleCompactFor",
-                "Schedule:Compact",
-                Some(object_name),
-                Some("data"),
-                format!("Schedule:Compact/{object_name} For directive has no day types"),
-            );
-        }
-
-        let mut selected_day_types = Vec::new();
-        let mut include_all_other_days = false;
-        for token in tokens {
-            if token.eq_ignore_ascii_case("AllOtherDays") {
-                include_all_other_days = true;
-                continue;
-            }
-
-            let Some(expanded_day_types) = expand_compact_day_type_token(token) else {
-                self.error(
-                    "UnsupportedScheduleCompactDayType",
-                    "Schedule:Compact",
-                    Some(object_name),
-                    Some("data"),
-                    format!(
-                        "Schedule:Compact/{object_name} has unsupported For day type '{token}'"
-                    ),
-                );
-                continue;
-            };
-            for day_type in expanded_day_types {
-                let day_type_index = schedule_day_type_index(day_type);
-                if assigned_day_types[day_type_index] {
-                    self.error(
-                        "DuplicateScheduleCompactDayType",
-                        "Schedule:Compact",
-                        Some(object_name),
-                        Some("data"),
-                        format!(
-                            "Schedule:Compact/{object_name} assigns {} more than once in one Through period",
-                            schedule_day_type_name(day_type)
-                        ),
-                    );
-                    continue;
-                }
-                assigned_day_types[day_type_index] = true;
-                selected_day_types.push(day_type);
-            }
-        }
-
-        if include_all_other_days {
-            for day_type in ALL_SCHEDULE_DAY_TYPES {
-                let day_type_index = schedule_day_type_index(day_type);
-                if !assigned_day_types[day_type_index] {
-                    assigned_day_types[day_type_index] = true;
-                    selected_day_types.push(day_type);
-                }
-            }
-        }
-
-        selected_day_types
-    }
-
     fn finish_compact_schedule_profile(
         &mut self,
         object_name: &str,
@@ -16523,37 +16421,6 @@ impl<'a> Compiler<'a> {
         if let Some(period) = period {
             period.period.day_profiles.push(profile.profile);
         }
-    }
-
-    fn finish_compact_schedule_period(
-        &mut self,
-        object_name: &str,
-        period: CompactSchedulePeriodBuilder,
-        periods: &mut Vec<ScheduleCompactPeriod>,
-    ) {
-        if period.period.day_profiles.is_empty() {
-            self.error(
-                "MissingScheduleCompactFor",
-                "Schedule:Compact",
-                Some(object_name),
-                Some("data"),
-                format!(
-                    "Schedule:Compact/{object_name} Through period requires at least one For profile"
-                ),
-            );
-        }
-        if period.assigned_day_types.iter().any(|assigned| !assigned) {
-            self.error(
-                "IncompleteScheduleCompactDayTypes",
-                "Schedule:Compact",
-                Some(object_name),
-                Some("data"),
-                format!(
-                    "Schedule:Compact/{object_name} must assign all 12 schedule day types in each Through period"
-                ),
-            );
-        }
-        periods.push(period.period);
     }
 
     fn vertex_coordinate(
@@ -16880,50 +16747,6 @@ fn select_week_compact_day_types(
     }
 }
 
-fn expand_compact_day_type_token(token: &str) -> Option<Vec<ScheduleDayType>> {
-    match token.to_ascii_lowercase().as_str() {
-        "alldays" => Some(ALL_SCHEDULE_DAY_TYPES.to_vec()),
-        "weekdays" => Some(vec![
-            ScheduleDayType::Monday,
-            ScheduleDayType::Tuesday,
-            ScheduleDayType::Wednesday,
-            ScheduleDayType::Thursday,
-            ScheduleDayType::Friday,
-        ]),
-        "weekends" => Some(vec![ScheduleDayType::Saturday, ScheduleDayType::Sunday]),
-        "sunday" => Some(vec![ScheduleDayType::Sunday]),
-        "monday" => Some(vec![ScheduleDayType::Monday]),
-        "tuesday" => Some(vec![ScheduleDayType::Tuesday]),
-        "wednesday" => Some(vec![ScheduleDayType::Wednesday]),
-        "thursday" => Some(vec![ScheduleDayType::Thursday]),
-        "friday" => Some(vec![ScheduleDayType::Friday]),
-        "saturday" => Some(vec![ScheduleDayType::Saturday]),
-        "holiday" => Some(vec![ScheduleDayType::Holiday]),
-        "summerdesignday" => Some(vec![ScheduleDayType::SummerDesignDay]),
-        "winterdesignday" => Some(vec![ScheduleDayType::WinterDesignDay]),
-        "customday1" => Some(vec![ScheduleDayType::CustomDay1]),
-        "customday2" => Some(vec![ScheduleDayType::CustomDay2]),
-        _ => None,
-    }
-}
-
-fn schedule_day_type_index(day_type: ScheduleDayType) -> usize {
-    match day_type {
-        ScheduleDayType::Sunday => 0,
-        ScheduleDayType::Monday => 1,
-        ScheduleDayType::Tuesday => 2,
-        ScheduleDayType::Wednesday => 3,
-        ScheduleDayType::Thursday => 4,
-        ScheduleDayType::Friday => 5,
-        ScheduleDayType::Saturday => 6,
-        ScheduleDayType::Holiday => 7,
-        ScheduleDayType::SummerDesignDay => 8,
-        ScheduleDayType::WinterDesignDay => 9,
-        ScheduleDayType::CustomDay1 => 10,
-        ScheduleDayType::CustomDay2 => 11,
-    }
-}
-
 fn schedule_day_type_name(day_type: ScheduleDayType) -> &'static str {
     match day_type {
         ScheduleDayType::Sunday => "Sunday",
@@ -16990,12 +16813,6 @@ fn parse_schedule_time_minute(value: &str) -> Option<u32> {
     } else {
         Some(minute_of_day)
     }
-}
-
-fn parse_until_minute(value: &str) -> Option<u32> {
-    compact_directive(value, "Until")
-        .then(|| parse_schedule_time_minute(value))
-        .flatten()
 }
 
 fn parse_terrain(value: &str) -> Option<Terrain> {
@@ -17628,6 +17445,8 @@ mod tests {
     mod material_property_variable_thermal_conductivity;
     mod material_roof_vegetation;
     mod material_variants;
+    mod schedule_compact_source;
+    mod schedule_compact_type_limits;
     mod schedule_day_interval;
     mod schedule_day_list;
     mod schedule_external_interface;
@@ -18713,7 +18532,7 @@ mod tests {
         };
         let day_types = &model.compact_schedules[0].periods[0].day_profiles[0].day_types;
         assert_eq!(day_types.len(), 12);
-        assert_eq!(day_types[0], ScheduleDayType::Monday);
+        assert_eq!(day_types[0], ScheduleDayType::Sunday);
         for day_type in ALL_SCHEDULE_DAY_TYPES {
             assert!(day_types.contains(&day_type));
         }
@@ -18751,7 +18570,7 @@ mod tests {
         let profiles = &model.compact_schedules[0].periods[0].day_profiles;
         assert_eq!(
             profiles[0].day_types,
-            vec![ScheduleDayType::Saturday, ScheduleDayType::Sunday]
+            vec![ScheduleDayType::Sunday, ScheduleDayType::Saturday]
         );
         assert_eq!(
             profiles[1].day_types,
@@ -19058,7 +18877,8 @@ mod tests {
     }
 
     #[test]
-    fn rejects_schedule_compact_unknown_day_type() -> Result<(), Box<dyn std::error::Error>> {
+    fn accepts_schedule_compact_unknown_text_with_valid_selector()
+    -> Result<(), Box<dyn std::error::Error>> {
         let raw_model = parse_epjson_str(
             r#"{
                 "Schedule:Compact": {
@@ -19075,11 +18895,16 @@ mod tests {
 
         let result = compile_raw_model(&raw_model);
 
-        assert!(result.has_errors());
-        assert!(result.report.diagnostics.iter().any(|diagnostic| {
-            diagnostic.code == "UnsupportedScheduleCompactDayType"
-                && diagnostic.object_name.as_deref() == Some("Unknown Day")
-        }));
+        assert!(!result.has_errors());
+        let model = result.model.ok_or_else(|| {
+            std::io::Error::other("recognized AllOtherDays retains a typed owner")
+        })?;
+        assert_eq!(
+            model.compact_schedules[0].periods[0].day_profiles[0]
+                .day_types
+                .len(),
+            12
+        );
 
         Ok(())
     }

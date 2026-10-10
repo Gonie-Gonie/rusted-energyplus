@@ -1,4 +1,4 @@
-//! Observes existing public parsing, compilation and schedule-consumer owners.
+//! Observes corrected public parsing, compilation and schedule-consumer owners.
 #[path = "sch01_existing_support/consumer.rs"]
 mod consumer;
 #[path = "../../ep_runtime/examples/clk02_probe_support/digest.rs"]
@@ -86,7 +86,7 @@ fn run() -> Result<()> {
     println!(
         "{}",
         serde_json::to_string_pretty(&json!({
-            "schema":"sch01-existing-probe-results.v1",
+            "schema":"sch01-candidate-probe-results.v1","observation_stage":"corrected-candidate",
             "actual_request":{"path":inputs::relative(&root,&request_path)?,
                 "sha256":digest::sha256(&request_bytes)},
             "actual_native_request":wrapper["native_request"],
@@ -99,7 +99,7 @@ fn run() -> Result<()> {
             "actual_rust_function_counts":calls,"actual_rust_status_counts":outcomes,
             "actual_rust_requested_operations_not_invoked":not_invoked,
             "all_bound_inputs_unchanged":true,"existing_default_IDF_overlay_used":true,
-            "compiler_or_runtime_core_modified":false,"Native_partial_graph_reconstructed":false,
+            "compiler_or_runtime_core_modified":true,"Native_partial_graph_reconstructed":false,
             "native_answers_read":false,"expected_answers_read":false,
             "scientific_comparison_performed":false,"numerical_comparison_count":null,
             "numerical_mismatch_count":null,"numerical_PASS_claimed":false,

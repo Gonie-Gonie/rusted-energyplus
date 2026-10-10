@@ -165,8 +165,8 @@ fn resolves_day_week_year_values_wrap_and_february_29_fallback()
         .ok_or_else(|| std::io::Error::other("missing main week payload"))?;
     assert_eq!(main_week.day_schedules, [primary_day_id; 12]);
 
-    assert_eq!(model.schedules[0].id, ScheduleId(0));
-    assert_eq!(model.compact_schedules[0].id, ScheduleId(1));
+    assert_eq!(model.schedules[0].id, ScheduleId(1));
+    assert_eq!(model.compact_schedules[0].id, ScheduleId(0));
     assert_eq!(model.file_schedules[0].id, ScheduleId(2));
     let year = &model.year_schedules[0];
     assert_eq!(year.id, ScheduleId(3));

@@ -916,9 +916,11 @@ fn precompile_compact_schedule_day_profile(
     profile: &ScheduleCompactDayProfile,
     minutes_per_timestep: Option<u32>,
 ) -> CompiledScheduleDayProfile {
-    let minute_values = expand_compact_schedule_minute_values(profile);
-    let (minutes_per_timestep, zone_timestep_values) =
-        reduce_schedule_minute_values(profile.interpolation, &minute_values, minutes_per_timestep);
+    let (minutes_per_timestep, zone_timestep_values) = precompile_schedule_day_values(
+        profile.interpolation,
+        &profile.segments,
+        minutes_per_timestep,
+    );
 
     CompiledScheduleDayProfile {
         day_types: profile.day_types.clone(),
@@ -934,71 +936,7 @@ fn precompile_schedule_day_values(
     segments: &[ScheduleCompactSegment],
     minutes_per_timestep: Option<u32>,
 ) -> (u32, Vec<f64>) {
-    let minute_values = expand_schedule_minute_values(interpolation, segments);
-    reduce_schedule_minute_values(interpolation, &minute_values, minutes_per_timestep)
-}
-
-fn reduce_schedule_minute_values(
-    interpolation: ScheduleInterpolation,
-    minute_values: &[f64],
-    minutes_per_timestep: Option<u32>,
-) -> (u32, Vec<f64>) {
-    minutes_per_timestep.map_or_else(
-        || (0, Vec::new()),
-        |minutes_per_timestep| {
-            let values = minute_values
-                .chunks_exact(minutes_per_timestep as usize)
-                .map(|window| match interpolation {
-                    ScheduleInterpolation::Average => {
-                        window.iter().sum::<f64>() / f64::from(minutes_per_timestep)
-                    }
-                    ScheduleInterpolation::No | ScheduleInterpolation::Linear => {
-                        window.last().copied().unwrap_or(f64::NAN)
-                    }
-                })
-                .collect();
-            (minutes_per_timestep, values)
-        },
-    )
-}
-
-fn expand_compact_schedule_minute_values(profile: &ScheduleCompactDayProfile) -> Vec<f64> {
-    expand_schedule_minute_values(profile.interpolation, &profile.segments)
-}
-
-fn expand_schedule_minute_values(
-    interpolation: ScheduleInterpolation,
-    segments: &[ScheduleCompactSegment],
-) -> Vec<f64> {
-    let mut minute_values = Vec::with_capacity(1440);
-    let mut previous_until_minute = 0_u32;
-    let mut previous_value = None;
-
-    for segment in segments {
-        let until_minute = segment
-            .until_minute_of_day
-            .clamp(previous_until_minute, 1440);
-        let duration_minutes = until_minute - previous_until_minute;
-        if interpolation == ScheduleInterpolation::Linear {
-            if let Some(start_value) = previous_value {
-                let increment = (segment.value - start_value) / f64::from(duration_minutes.max(1));
-                let mut current_value = start_value;
-                for _minute in 1..=duration_minutes {
-                    current_value += increment;
-                    minute_values.push(current_value);
-                }
-            } else {
-                minute_values.resize(until_minute as usize, segment.value);
-            }
-        } else {
-            minute_values.resize(until_minute as usize, segment.value);
-        }
-        previous_until_minute = until_minute;
-        previous_value = Some(segment.value);
-    }
-
-    minute_values.resize(1440, previous_value.unwrap_or(f64::NAN));
-    minute_values
+    ep_model::populate_schedule_day_values(interpolation, segments, minutes_per_timestep)
 }
 
 fn schedule_minutes_per_timestep(timesteps_per_hour: u32) -> Option<u32> {

@@ -9,6 +9,43 @@ pub enum NumericType {
     Discrete,
 }
 
+/// ScheduleTypeLimits unit metadata, matching the pinned Native LimitUnits names.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+#[repr(i8)]
+pub enum ScheduleUnitType {
+    /// Constructor state retained when the source unit field is absent or blank.
+    #[default]
+    Invalid = -1,
+    /// Dimensionless schedule values.
+    Dimensionless = 0,
+    /// Temperature.
+    Temperature = 1,
+    /// Temperature difference.
+    DeltaTemperature = 2,
+    /// Precipitation rate.
+    PrecipitationRate = 3,
+    /// Angle.
+    Angle = 4,
+    /// Convection coefficient.
+    ConvectionCoefficient = 5,
+    /// Activity level.
+    ActivityLevel = 6,
+    /// Velocity.
+    Velocity = 7,
+    /// Capacity.
+    Capacity = 8,
+    /// Power.
+    Power = 9,
+    /// Availability.
+    Availability = 10,
+    /// Percent.
+    Percent = 11,
+    /// Control.
+    Control = 12,
+    /// Mode.
+    Mode = 13,
+}
+
 /// Schedule type limits.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ScheduleTypeLimits {
@@ -22,6 +59,8 @@ pub struct ScheduleTypeLimits {
     pub upper_limit: Option<f64>,
     /// Numeric type.
     pub numeric_type: Option<NumericType>,
+    /// Actual parsed unit metadata; absent or blank declarations retain Invalid.
+    pub unit_type: ScheduleUnitType,
 }
 
 /// Constant schedule.

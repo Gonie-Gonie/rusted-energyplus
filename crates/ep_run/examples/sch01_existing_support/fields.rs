@@ -104,7 +104,7 @@ pub(super) fn model(model: &TypedModel) -> Value {
             "vector_index":index,"id":value.id.0,"name":value.name.0,
             "lower_limit":value.lower_limit.map(scalar),"upper_limit":value.upper_limit.map(scalar),
             "numeric_type":value.numeric_type.map(|kind|format!("{kind:?}")),
-            "unit_type_owner_available":false
+            "unit_type_owner_available":true,"unit_type":format!("{:?}",value.unit_type)
         })).collect::<Vec<_>>(),
         "constant_schedules":model.schedules.iter().enumerate().map(|(index, value)|json!({
             "vector_index":index,"id":value.id.0,"name":value.name.0,

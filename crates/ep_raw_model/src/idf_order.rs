@@ -68,6 +68,20 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         object_type: "BuildingSurface:Detailed",
         name_field_index: 0,
     },
+    // ScheduleManager uses getObjectItem's preserved IDF order within these
+    // families. Cross-family registration order remains the compiler's owner.
+    IdfOrderTarget {
+        object_type: "ScheduleTypeLimits",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Schedule:Constant",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Schedule:Compact",
+        name_field_index: 0,
+    },
 ];
 
 /// Error returned when staged IDF declaration order cannot be recovered safely.
@@ -487,6 +501,30 @@ mod tests {
           CustomDay2;
     "#;
 
+    const SELECTED_SCHEDULE_EPJSON: &str = r#"{
+        "ScheduleTypeLimits": {
+            "A Type": {"lower_limit_value": 0, "upper_limit_value": 1},
+            "Z Type": {"lower_limit_value": 0, "upper_limit_value": 1}
+        },
+        "Schedule:Constant": {
+            "A Constant": {"schedule_type_limits_name": "A Type", "hourly_value": 0},
+            "Z Constant": {"schedule_type_limits_name": "Z Type", "hourly_value": 1}
+        },
+        "Schedule:Compact": {
+            "A Compact": {"schedule_type_limits_name": "A Type"},
+            "Z Compact": {"schedule_type_limits_name": "Z Type"}
+        }
+    }"#;
+
+    const SELECTED_SCHEDULE_IDF: &str = r#"
+        Schedule:Constant,z constant,Z Type,1;
+        ScheduleTypeLimits,z type,0,1,Continuous,Dimensionless;
+        Schedule:Compact,z compact,Z Type,Through:12/31,For:AllDays,Until:24:00,1;
+        Schedule:Compact,a compact,A Type,Through:12/31,For:AllDays,Until:24:00,0;
+        ScheduleTypeLimits,a type,0,1,Continuous,Dimensionless;
+        Schedule:Constant,a constant,A Type,0;
+    "#;
+
     fn ordered_names(model: &crate::RawModel) -> Result<Vec<String>, Box<dyn std::error::Error>> {
         Ok(model
             .ordered_instances("RunPeriodControl:SpecialDays")?
@@ -514,6 +552,58 @@ mod tests {
             ordered_names(&model)?,
             vec!["Alpha Later Custom", "Zulu Earlier Holiday"]
         );
+        Ok(())
+    }
+
+    #[test]
+    fn selected_schedule_families_retain_idf_order_without_changing_direct_epjson()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let staged =
+            parse_epjson_str_with_idf_order(SELECTED_SCHEDULE_EPJSON, SELECTED_SCHEDULE_IDF)?;
+        let direct = parse_epjson_str(SELECTED_SCHEDULE_EPJSON)?;
+
+        for (object_type, earlier, later) in [
+            ("ScheduleTypeLimits", "Z Type", "A Type"),
+            ("Schedule:Constant", "Z Constant", "A Constant"),
+            ("Schedule:Compact", "Z Compact", "A Compact"),
+        ] {
+            let names = |model: &crate::RawModel| -> Result<Vec<String>, IdfOrderError> {
+                Ok(model
+                    .ordered_instances(object_type)?
+                    .into_iter()
+                    .map(|(name, _)| name.0.clone())
+                    .collect())
+            };
+            assert_eq!(names(&staged)?, vec![earlier, later]);
+            assert_eq!(names(&direct)?, vec![later, earlier]);
+            assert!(staged.has_idf_declaration_order(object_type));
+            assert!(!direct.has_idf_declaration_order(object_type));
+        }
+        assert_eq!(staged.objects, direct.objects);
+        Ok(())
+    }
+
+    #[test]
+    fn selected_schedule_overlay_rejects_duplicate_and_unmatched_names_transactionally()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let original = parse_epjson_str(SELECTED_SCHEDULE_EPJSON)?;
+
+        for later in ["a type", "a constant", "a compact"] {
+            let earlier = later.replacen('a', "z", 1);
+            for (replacement, expected_error) in [
+                (earlier.to_uppercase(), "duplicate staged IDF"),
+                (format!("Missing {later}"), "name mismatch"),
+            ] {
+                let mut model = original.clone();
+                let idf = SELECTED_SCHEDULE_IDF.replace(later, &replacement);
+                let error = required_order_error(
+                    apply_idf_declaration_order(&mut model, &idf, IDF_ORDER_TARGETS),
+                    "ambiguous or unmatched schedule names must fail",
+                )?;
+                assert!(error.to_string().contains(expected_error));
+                assert_eq!(model, original);
+            }
+        }
         Ok(())
     }
 
