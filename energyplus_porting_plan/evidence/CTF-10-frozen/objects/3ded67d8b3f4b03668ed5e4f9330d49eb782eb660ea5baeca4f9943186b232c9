@@ -1,0 +1,139 @@
+class PublicFunctionScope
+{
+public:
+    PublicFunctionScope(EnergyPlusData const &, Construction::ConstructionProps const &, bool const &, bool const &) noexcept;
+    ~PublicFunctionScope() noexcept;
+    PublicFunctionScope(PublicFunctionScope const &) = delete;
+    PublicFunctionScope &operator=(PublicFunctionScope const &) = delete;
+private:
+    Capture *capture_ = nullptr;
+    EnergyPlusData const *state_ = nullptr;
+    Construction::ConstructionProps const *construction_ = nullptr;
+    bool const *errors_ = nullptr, *report_ = nullptr;
+    int uncaught_on_entry_ = 0;
+};
+void public_reset(EnergyPlusData const &, Construction::ConstructionProps const &, bool, bool) noexcept;
+void public_reverse_entry(EnergyPlusData const &, Construction::ConstructionProps const &,
+    Construction::ConstructionProps const &actual_provider, bool, bool) noexcept;
+void public_reverse_completed(EnergyPlusData const &, Construction::ConstructionProps const &,
+    Construction::ConstructionProps const &actual_provider, bool, bool) noexcept;
+// A future unit helper calls this only after the actual direct call returned.
+void public_caller_return(Capture &, EnergyPlusData const &, Construction::ConstructionProps const &, bool, bool) noexcept;
+
+enum class InitEvent : std::size_t
+{
+    Entry, ConstructionEntry, ConstructionReturn, PostConstructionAggregate, AfterAllAggregates,
+    ReportLayersEntry, ReportLayersReturn, ScanEntry, ScanReturn, ReportHeaders,
+    ReportTransferEntry, ReportTransferReturn, FinalFatalBoundary, FunctionEnd, ScopeExit
+};
+enum class InitSite : std::size_t { Event, Construction, Diagnostic };
+enum class InitFailureKind : std::size_t { IdentityMismatch, ConstructionNotFound, LedgerAppendException, CopyException, Order, CounterOverflow };
+struct InitFailure
+{
+    InitSite site{};
+    std::size_t actual_site_ordinal = 0;
+    InitFailureKind kind{};
+};
+struct InitEventSnapshot
+{
+    std::size_t actual_event_ordinal = 0;
+    InitEvent event{};
+    bool copy_available = false;
+    int actual_construction_index = 0, actual_cCounter = 0;
+    std::uintptr_t actual_construction_address = 0;
+    bool ErrorsFound = false, DoCTFErrorReport = false;
+    std::optional<bool> InitCTFDoReport;
+    bool SimpleCTFOnly = false, AnyInternalHeatSourceInInput = false;
+    int MaxCTFTerms = 0, actual_Construct_array_size = 0;
+    bool GetReportInput = false, Constructions = false;
+    int actual_predefined_table_entry_count = 0;
+    std::size_t actual_opaque_layer_column_count = 0;
+    Binary64Copy actual_TimeStepZone;
+};
+struct InitConstructionRecord
+{
+    std::size_t actual_call_ordinal = 0;
+    int actual_construction_index = 0;
+    std::uintptr_t actual_construction_address = 0;
+    std::string actual_Name;
+    bool identity_available = false;
+    bool actual_caller_return_reached = false, postaggregate_reached = false;
+    bool scope_exit_reached = false, scope_exited_during_unwind = false;
+    Capture observations;
+};
+struct InitDiagnostic
+{
+    std::size_t actual_diagnostic_ordinal = 0, actual_global_message_index = 0;
+    std::optional<std::size_t> preceding_retained_event_ordinal;
+    std::optional<std::size_t> active_retained_construction_call_ordinal;
+    int actual_level = 0;
+    std::string actual_message;
+    bool copy_available = false;
+};
+struct InitCapture
+{
+    EnergyPlusData const *bound_state = nullptr;
+    bool binding_error = false, integrity_failed = false;
+    bool actual_entry_reached = false, actual_function_end_reached = false;
+    bool scope_exit_reached = false, scope_exited_during_unwind = false;
+    bool actual_caller_return_reached = false;
+    std::size_t actual_event_count = 0, actual_construction_call_count = 0, actual_diagnostic_count = 0;
+    std::size_t event_records_omitted = 0, construction_records_omitted = 0, diagnostic_records_omitted = 0;
+    std::array<std::size_t, 15> actual_event_kind_counts{};
+    std::array<std::size_t, 6> failure_kind_counts{};
+    std::optional<InitFailure> first_failure, last_failure;
+    std::vector<InitEventSnapshot> events;
+    // Stable pointees keep each existing Capture/Binding valid as the ledger grows.
+    std::vector<std::unique_ptr<InitConstructionRecord>> constructions;
+    std::vector<InitDiagnostic> diagnostics;
+};
+class InitBinding
+{
+public:
+    InitBinding(InitCapture &, EnergyPlusData const &) noexcept;
+    ~InitBinding() noexcept;
+    InitBinding(InitBinding const &) = delete;
+    InitBinding &operator=(InitBinding const &) = delete;
+private:
+    InitCapture *capture_ = nullptr;
+    bool active_ = false;
+};
+class InitFunctionScope
+{
+public:
+    InitFunctionScope(EnergyPlusData const &, bool const &, bool const &) noexcept;
+    ~InitFunctionScope() noexcept;
+    InitFunctionScope(InitFunctionScope const &) = delete;
+    InitFunctionScope &operator=(InitFunctionScope const &) = delete;
+private:
+    InitCapture *capture_ = nullptr;
+    EnergyPlusData const *state_ = nullptr;
+    bool const *errors_ = nullptr, *report_ = nullptr;
+    int uncaught_on_entry_ = 0;
+};
+class InitConstructionScope
+{
+public:
+    InitConstructionScope(EnergyPlusData const &, Construction::ConstructionProps const &, bool const &, bool const &) noexcept;
+    ~InitConstructionScope() noexcept;
+    InitConstructionScope(InitConstructionScope const &) = delete;
+    InitConstructionScope &operator=(InitConstructionScope const &) = delete;
+    void source_returned() noexcept;
+    void aggregate_completed() noexcept;
+private:
+    InitCapture *capture_ = nullptr;
+    InitConstructionRecord *record_ = nullptr;
+    EnergyPlusData const *state_ = nullptr;
+    Construction::ConstructionProps const *construction_ = nullptr;
+    bool const *errors_ = nullptr, *report_ = nullptr;
+    int uncaught_on_entry_ = 0;
+    std::optional<Binding> binding_;
+};
+void init_event(InitEvent, EnergyPlusData const &, bool, bool,
+    bool const *assigned_report = nullptr, Construction::ConstructionProps const *actual_construction = nullptr,
+    int actual_cCounter = 0) noexcept;
+// Helper calls these only after actual Init return / successful unchanged message push.
+void init_caller_return(InitCapture &, EnergyPlusData const &) noexcept;
+void init_diagnostic(EnergyPlusData const &, std::size_t actual_global_message_index,
+    int actual_level, std::string const &actual_message) noexcept;
+

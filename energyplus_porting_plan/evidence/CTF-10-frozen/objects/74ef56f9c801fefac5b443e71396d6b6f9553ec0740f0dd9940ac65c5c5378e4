@@ -1,0 +1,63 @@
+{
+  "insertions": [
+    [
+      "        bool DoCTFErrorReport(false);\n",
+      "        CTF10Observation::InitFunctionScope ctf10_init_scope(state, ErrorsFound, DoCTFErrorReport);\n"
+    ],
+    [
+      "            construction.calculateTransferFunction(state, ErrorsFound, DoCTFErrorReport);\n",
+      "            CTF10Observation::InitConstructionScope ctf10_construction_scope(state, construction, ErrorsFound, DoCTFErrorReport);\n",
+      "before"
+    ],
+    [
+      "            construction.calculateTransferFunction(state, ErrorsFound, DoCTFErrorReport);\n",
+      "            ctf10_construction_scope.source_returned();\n"
+    ],
+    [
+      "                state.dataHeatBal->MaxCTFTerms = construction.NumCTFTerms;\n            }\n",
+      "            ctf10_construction_scope.aggregate_completed();\n"
+    ],
+    [
+      "            state.dataHeatBal->SimpleCTFOnly = false;\n        }\n",
+      "        CTF10Observation::init_event(CTF10Observation::InitEvent::AfterAllAggregates, state, ErrorsFound, DoCTFErrorReport);\n"
+    ],
+    [
+      "            construction.reportLayers(state);\n",
+      "            CTF10Observation::init_event(CTF10Observation::InitEvent::ReportLayersEntry, state, ErrorsFound, DoCTFErrorReport, nullptr, &construction);\n",
+      "before"
+    ],
+    [
+      "            construction.reportLayers(state);\n",
+      "            CTF10Observation::init_event(CTF10Observation::InitEvent::ReportLayersReturn, state, ErrorsFound, DoCTFErrorReport, nullptr, &construction);\n"
+    ],
+    [
+      "        General::ScanForReports(state, \"Constructions\", InitCTFDoReport, \"Constructions\");\n",
+      "        CTF10Observation::init_event(CTF10Observation::InitEvent::ScanEntry, state, ErrorsFound, DoCTFErrorReport);\n",
+      "before"
+    ],
+    [
+      "        General::ScanForReports(state, \"Constructions\", InitCTFDoReport, \"Constructions\");\n",
+      "        CTF10Observation::init_event(CTF10Observation::InitEvent::ScanReturn, state, ErrorsFound, DoCTFErrorReport, &InitCTFDoReport);\n"
+    ],
+    [
+      "            print(state.files.eio, \"! <CTF>,Time,Outside,Cross,Inside,Flux (except final one)\\n\");\n",
+      "            CTF10Observation::init_event(CTF10Observation::InitEvent::ReportHeaders, state, ErrorsFound, DoCTFErrorReport, &InitCTFDoReport);\n"
+    ],
+    [
+      "                construction.reportTransferFunction(state, cCounter);\n",
+      "                CTF10Observation::init_event(CTF10Observation::InitEvent::ReportTransferEntry, state, ErrorsFound, DoCTFErrorReport, &InitCTFDoReport, &construction, cCounter);\n",
+      "before"
+    ],
+    [
+      "                construction.reportTransferFunction(state, cCounter);\n",
+      "                CTF10Observation::init_event(CTF10Observation::InitEvent::ReportTransferReturn, state, ErrorsFound, DoCTFErrorReport, &InitCTFDoReport, &construction, cCounter);\n"
+    ],
+    [
+      "            ShowFatalError(state, \"Program terminated for reasons listed (InitConductionTransferFunctions)\");\n",
+      "            CTF10Observation::init_event(CTF10Observation::InitEvent::FinalFatalBoundary, state, ErrorsFound, DoCTFErrorReport, &InitCTFDoReport);\n",
+      "before"
+    ]
+  ],
+  "function_end": "        CTF10Observation::init_event(CTF10Observation::InitEvent::FunctionEnd, state, ErrorsFound, DoCTFErrorReport, &InitCTFDoReport);\n",
+  "include": "#include \"ctf10_observer.hh\"\n"
+}

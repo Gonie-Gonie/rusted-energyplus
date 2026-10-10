@@ -1,0 +1,172 @@
+--- accepted09/ctf09_production_fields.hh
++++ proposed10/ctf10_production_fields.hh
+@@ -1,8 +1,8 @@
+ // Pure copies of actual public members and the separately captured private locals.
+-#ifndef CTF09_PRODUCTION_FIELDS_HH
+-#define CTF09_PRODUCTION_FIELDS_HH
++#ifndef CTF10_PRODUCTION_FIELDS_HH
++#define CTF10_PRODUCTION_FIELDS_HH
+ #include "ctf01_reference_metadata.hh"
+-#include "ctf09_observation_fields.hh"
++#include "ctf10_observation_fields.hh"
+ #include <EnergyPlus/Data/EnergyPlusData.hh>
+ #include <EnergyPlus/DataErrorTracking.hh>
+ #include <EnergyPlus/DataGlobals.hh>
+@@ -11,9 +11,10 @@
+ #include <EnergyPlus/IOFiles.hh>
+ #include <EnergyPlus/Material.hh>
+ #include <EnergyPlus/UtilityRoutines.hh>
++#include <algorithm>
+ 
+ namespace Ctf01 {
+-namespace Observation = EnergyPlus::CTF09Observation;
++namespace Observation = EnergyPlus::CTF10Observation;
+ inline json snapshot(EnergyPlus::EnergyPlusData const &state, bool ErrorsFound, bool DoCTFErrorReport)
+ {
+     json materials = json::array(), constructions = json::array();
+@@ -69,7 +70,7 @@
+ inline bool observer_failed(Observation::Capture const &capture, json const &messages)
+ {
+     return capture.binding_error || capture.identity_mismatch || capture.duplicate_phase ||
+-           capture.phase_order_invalid || capture.active_prefix_invalid || matrix_observer_failed(capture) || methods_observer_failed(capture) || gamma_copy_failed(capture.gamma) || final_coefficient_copy_failed(capture.final_coefficients) || retry_copy_failed(capture.retry_driver) || !retry_diagnostic_join_valid(capture.retry_driver, messages);
++           capture.phase_order_invalid || capture.active_prefix_invalid || matrix_observer_failed(capture) || methods_observer_failed(capture) || gamma_copy_failed(capture.gamma) || final_coefficient_copy_failed(capture.final_coefficients) || retry_copy_failed(capture.retry_driver) || !retry_diagnostic_join_valid(capture.retry_driver, messages) || public_copy_failed(capture.public_storage);
+ }
+ inline json observations(Observation::Capture const &capture, json const &messages)
+ {
+@@ -83,6 +84,7 @@
+         {"Gamma", gamma_observations(capture.gamma)},
+         {"FinalCoefficients", final_coefficient_observations(capture.final_coefficients)},
+         {"RetryDriver", retry_observations(capture.retry_driver, messages)},
++        {"PublicStorage", public_observations(capture.public_storage)},
+         {"actual_callback_count", capture.actual_callback_count}, {"observer_failure", observer_failed(capture, messages)},
+         {"binding_error", capture.binding_error}, {"identity_mismatch", capture.identity_mismatch},
+         {"duplicate_phase", capture.duplicate_phase}, {"phase_order_invalid", capture.phase_order_invalid},
+@@ -120,5 +122,128 @@
+         std::bit_cast<std::uint64_t>(state.dataGlobal->TimeStepZone) == std::bit_cast<std::uint64_t>(input_real(caller.at("TimeStepZone"))) &&
+         std::bit_cast<std::uint64_t>(state.dataGlobal->TimeStepZoneSec) == std::bit_cast<std::uint64_t>(input_real(caller.at("TimeStepZoneSec")));
+ }
++inline char const *init_event_name(Observation::InitEvent event)
++{
++    constexpr std::array<char const *, 15> names{{"Entry", "ConstructionEntry", "ConstructionReturn", "PostConstructionAggregate",
++        "AfterAllAggregates", "ReportLayersEntry", "ReportLayersReturn", "ScanEntry", "ScanReturn", "ReportHeaders",
++        "ReportTransferEntry", "ReportTransferReturn", "FinalFatalBoundary", "FunctionEnd", "ScopeExit"}};
++    return names.at(static_cast<std::size_t>(event));
++}
++inline char const *init_site_name(Observation::InitSite site)
++{
++    constexpr std::array<char const *, 3> names{{"Event", "Construction", "Diagnostic"}};
++    return names.at(static_cast<std::size_t>(site));
++}
++inline char const *init_failure_name(Observation::InitFailureKind kind)
++{
++    constexpr std::array<char const *, 6> names{{"IdentityMismatch", "ConstructionNotFound", "LedgerAppendException", "CopyException", "Order", "CounterOverflow"}};
++    return names.at(static_cast<std::size_t>(kind));
++}
++inline json init_failure_record(std::optional<Observation::InitFailure> const &failure)
++{
++    if (!failure) return nullptr;
++    return {{"site", init_site_name(failure->site)}, {"actual_site_ordinal", failure->actual_site_ordinal},
++        {"kind", init_failure_name(failure->kind)}};
++}
++inline bool init_diagnostic_join_valid(Observation::InitCapture const &source, json const &messages)
++{
++    for (auto const &copy : source.diagnostics) {
++        if (!copy.copy_available || copy.actual_global_message_index >= messages.size()) return false;
++        auto const &message = messages.at(copy.actual_global_message_index);
++        if (message.at("level") != copy.actual_level || message.at("message") != copy.actual_message) return false;
++        if (copy.preceding_retained_event_ordinal && std::none_of(source.events.begin(), source.events.end(),
++                [&](auto const &event) { return event.actual_event_ordinal == *copy.preceding_retained_event_ordinal; })) return false;
++        if (copy.active_retained_construction_call_ordinal && std::none_of(source.constructions.begin(), source.constructions.end(),
++                [&](auto const &call) { return call && call->actual_call_ordinal == *copy.active_retained_construction_call_ordinal; })) return false;
++    }
++    return true;
++}
++inline bool init_copy_failed(Observation::InitCapture const &source, json const &messages)
++{
++    if (source.binding_error || source.integrity_failed || source.event_records_omitted || source.construction_records_omitted ||
++        source.diagnostic_records_omitted || source.actual_event_count != source.events.size() ||
++        source.actual_construction_call_count != source.constructions.size() || source.actual_diagnostic_count != source.diagnostics.size() ||
++        !init_diagnostic_join_valid(source, messages)) return true;
++    for (auto const &event : source.events) if (!event.copy_available) return true;
++    for (auto const &call : source.constructions)
++        if (!call || !call->identity_available || observer_failed(call->observations, messages)) return true;
++    return false;
++}
++inline json init_observations(Observation::InitCapture const &source, json const &messages)
++{
++    json events = json::array(), calls = json::array(), diagnostics = json::array(), failures = json::array();
++    for (auto const &copy : source.events) {
++        json value = nullptr;
++        if (copy.copy_available) value = {{"actual_construction_index", copy.actual_construction_index},
++            {"actual_construction_address", copy.actual_construction_address}, {"actual_cCounter", copy.actual_cCounter},
++            {"ErrorsFound", copy.ErrorsFound}, {"DoCTFErrorReport", copy.DoCTFErrorReport},
++            {"InitCTFDoReport", copy.InitCTFDoReport ? json(*copy.InitCTFDoReport) : json(nullptr)},
++            {"SimpleCTFOnly", copy.SimpleCTFOnly}, {"MaxCTFTerms", copy.MaxCTFTerms},
++            {"AnyInternalHeatSourceInInput", copy.AnyInternalHeatSourceInInput}, {"actual_Construct_array_size", copy.actual_Construct_array_size},
++            {"GetReportInput", copy.GetReportInput}, {"Constructions", copy.Constructions},
++            {"actual_predefined_table_entry_count", copy.actual_predefined_table_entry_count},
++            {"actual_opaque_layer_column_count", copy.actual_opaque_layer_column_count},
++            {"actual_TimeStepZone", scalar_bits(copy.actual_TimeStepZone.bits)}};
++        events.push_back({{"actual_event_ordinal", copy.actual_event_ordinal}, {"event", init_event_name(copy.event)},
++            {"copy_available", copy.copy_available}, {"snapshot", value}, {"counted_as_PASS", false}});
++    }
++    for (auto const &call : source.constructions) {
++        require(call != nullptr, "Retained actual Init call pointer is null");
++        calls.push_back({{"actual_call_ordinal", call->actual_call_ordinal}, {"actual_construction_index", call->actual_construction_index},
++            {"actual_construction_address", call->actual_construction_address},
++            {"actual_Name", call->identity_available ? json(call->actual_Name) : json(nullptr)}, {"identity_available", call->identity_available},
++            {"actual_caller_return_reached", call->actual_caller_return_reached}, {"postaggregate_reached", call->postaggregate_reached},
++            {"scope_exit_reached", call->scope_exit_reached}, {"scope_exited_during_unwind", call->scope_exited_during_unwind},
++            {"observation_owner", "model.operations_same_retained_order_and_actual_call_ordinal"},
++            {"source_exception_type_or_outcome_inferred", false}, {"counted_as_PASS", false}});
++    }
++    for (auto const &copy : source.diagnostics) diagnostics.push_back({{"actual_diagnostic_ordinal", copy.actual_diagnostic_ordinal},
++        {"actual_global_message_index", copy.actual_global_message_index},
++        {"preceding_retained_event_ordinal", copy.preceding_retained_event_ordinal ? json(*copy.preceding_retained_event_ordinal) : json(nullptr)},
++        {"active_retained_construction_call_ordinal", copy.active_retained_construction_call_ordinal ? json(*copy.active_retained_construction_call_ordinal) : json(nullptr)},
++        {"actual_level", copy.actual_level}, {"actual_message", copy.copy_available ? json(copy.actual_message) : json(nullptr)},
++        {"copy_available", copy.copy_available}, {"temporal_association_only", true}, {"causal_branch_inferred", false}});
++    for (std::size_t i = 0; i < source.failure_kind_counts.size(); ++i)
++        failures.push_back({{"kind", init_failure_name(static_cast<Observation::InitFailureKind>(i))}, {"actual_count", source.failure_kind_counts[i]}});
++    return {{"protocol", "ctf10-actual-whole-Init-observation.v1"}, {"binding_error", source.binding_error},
++        {"integrity_failed", source.integrity_failed}, {"Init_copy_integrity_failed", init_copy_failed(source, messages)},
++        {"actual_entry_reached", source.actual_entry_reached}, {"actual_function_end_reached", source.actual_function_end_reached},
++        {"scope_exit_reached", source.scope_exit_reached}, {"scope_exited_during_unwind", source.scope_exited_during_unwind},
++        {"actual_caller_return_reached", source.actual_caller_return_reached}, {"actual_event_count", source.actual_event_count},
++        {"actual_construction_call_count", source.actual_construction_call_count}, {"actual_diagnostic_count", source.actual_diagnostic_count},
++        {"actual_retained_event_count", source.events.size()}, {"actual_retained_construction_call_count", source.constructions.size()},
++        {"actual_retained_diagnostic_count", source.diagnostics.size()}, {"event_records_omitted", source.event_records_omitted},
++        {"construction_records_omitted", source.construction_records_omitted}, {"diagnostic_records_omitted", source.diagnostic_records_omitted},
++        {"actual_event_kind_counts", source.actual_event_kind_counts}, {"failure_kind_counts", failures},
++        {"first_failure", init_failure_record(source.first_failure)}, {"last_failure", init_failure_record(source.last_failure)},
++        {"events", events}, {"construction_records", calls}, {"diagnostics", diagnostics},
++        {"actual_global_diagnostic_join_valid", init_diagnostic_join_valid(source, messages)},
++        {"original_loop_owned_all_calls", true}, {"manual_whole_model_per_call_snapshots_available", false},
++        {"outer_helper_Invoke_owns_exception_outcome", true}, {"whole_building_simulation_certified", false}, {"numerical_PASS_claimed", false}};
++}
++inline json init_operations(Observation::InitCapture const &source, json const &messages)
++{
++    json rows = json::array();
++    for (auto const &call : source.constructions) {
++        require(call != nullptr, "Retained actual Init call pointer is null");
++        json outcome = {{"status", "source_return_not_observed"}, {"source_fatal", nullptr}, {"source_exception", nullptr},
++            {"exception_type", nullptr}, {"exception_message", nullptr}};
++        if (call->actual_caller_return_reached) outcome = {{"status", "source_returned"}, {"source_fatal", false},
++            {"source_exception", false}, {"exception_type", nullptr}, {"exception_message", nullptr}};
++        rows.push_back({{"kind", "calculateTransferFunction"}, {"actual_source_invoked", true},
++            {"actual_Init_call_ordinal", call->actual_call_ordinal}, {"actual_construction_index", call->actual_construction_index},
++            {"actual_construction_address", call->actual_construction_address},
++            {"actual_construction_Name", call->identity_available ? json(call->actual_Name) : json(nullptr)},
++            {"call_outcome", outcome}, {"before", nullptr}, {"after", nullptr},
++            {"manual_full_model_before_after_unavailable", true}, {"observations", observations(call->observations, messages)},
++            {"actual_Init_caller_return_reached", call->actual_caller_return_reached},
++            {"postaggregate_reached", call->postaggregate_reached}, {"scope_exit_reached", call->scope_exit_reached},
++            {"scope_exited_during_unwind", call->scope_exited_during_unwind},
++            {"actual_input_owner_join", "initialized_owners_and_public.before_reset_original_LayerPoint"},
++            {"actual_caller_join", "whole_Init.events.actual_TimeStepZone_and_public_shared_flags"},
++            {"unreturned_call_fatal_or_exception_inferred", false}});
++    }
++    return rows;
++}
+ } // namespace Ctf01
+ #endif

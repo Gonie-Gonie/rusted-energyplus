@@ -1,0 +1,133 @@
+// New public storage is copied at declared bounds; no coefficient evaluation.
+inline json ctf10_public_storage_policy()
+{
+    return json::parse(R"CTF10_POLICY(__CTF10_POLICY_JSON__)CTF10_POLICY");
+}
+inline json ctf10_execution_policy()
+{
+    return {{"protocol", "ctf10-declared-Native-execution-lanes.v1"},
+        {"unit", "existing39_models42_direct_whole_Construction_calls_literal_incoming_flags"},
+        {"unit_whole_Init_and_reports_admitted", false},
+        {"production", "fixed15_genuine13_loader_phases_then_true_whole_Init_once_if_ready"},
+        {"production_manual_Construction_call_loop_performed", false},
+        {"production_per_call_records", "actual_original_Init_loop_checkpoint_and_retained_Capture_only"},
+        {"per_call_missing_return_is_unknown_not_inferred_exception", true},
+        {"outer_actual_Init_invoke_owns_exception_outcome", true},
+        {"manual_whole_model_per_call_before_after_snapshots_available", false},
+        {"actual_Init_shared_flags_from_reached_event_and_public_snapshots_only", true},
+        {"native_public_capacity_guard_or_store_safety_inferred", false},
+        {"numerical_PASS_claimed", false}};
+}
+inline json ctf10_linked_original_retention_intent()
+{
+    return {{"schema", "ctf10-debug-original-retention-intent.v1"}, {"role", "prospective-debug-original"},
+        {"scope", "new-CTF10-linked-originals-only"}, {"actual_file_identity_required", true},
+        {"both_original_and_helper_verified_before_execution", true},
+        {"retain_through_PE_validation_and_current_helper_execution", true},
+        {"removal_requires_separate_Root_authorized_actual_retention_record", true},
+        {"earlier_live_refs_reinterpreted", false}, {"deletion_performed", false}};
+}
+inline char const *public_site_name(MethodObservation::PublicSite site)
+{
+    constexpr std::array<char const *, 6> names{{"FunctionEntry", "Reset", "ReverseEntry", "ReverseCompleted", "ScopeExit", "CallerReturn"}};
+    return names.at(static_cast<std::size_t>(site));
+}
+inline char const *public_failure_name(MethodObservation::PublicFailureKind kind)
+{
+    constexpr std::array<char const *, 6> names{{"IdentityMismatch", "ConstructionNotFound", "CopyException", "Duplicate", "Order", "CounterOverflow"}};
+    return names.at(static_cast<std::size_t>(kind));
+}
+inline json public_failure_record(std::optional<MethodObservation::PublicFailure> const &failure)
+{
+    if (!failure) return nullptr;
+    return {{"site", public_site_name(failure->site)}, {"actual_site_ordinal", failure->actual_site_ordinal},
+        {"kind", public_failure_name(failure->kind)}};
+}
+template<std::size_t Size> json public_bits(std::array<MethodObservation::Binary64Copy, Size> const &source)
+{
+    json values = json::array();
+    for (auto const &value : source) values.push_back(scalar_bits(value.bits));
+    return values;
+}
+inline json public_snapshot(MethodObservation::PublicSnapshot const &source)
+{
+    json value = nullptr;
+    if (source.copy_available) {
+        json layers = nullptr;
+        if (source.original_layer_prefix_available) {
+            require(source.TotLayers >= 0 && static_cast<std::size_t>(source.TotLayers) <= source.original_LayerPoint.size(),
+                "Actual copied original membership exceeds declared capacity");
+            layers = json::array();
+            for (int layer = 0; layer < source.TotLayers; ++layer)
+                layers.push_back(source.original_LayerPoint[static_cast<std::size_t>(layer)]);
+        }
+        value = {{"actual_construction_address", source.actual_construction_address},
+            {"actual_construction_index", source.actual_construction_index}, {"actual_Name", source.actual_Name},
+            {"ErrorsFound", source.ErrorsFound}, {"DoCTFErrorReport", source.DoCTFErrorReport},
+            {"IsUsedCTF", source.IsUsedCTF}, {"SourceSinkPresent", source.SourceSinkPresent},
+            {"SolutionDimensions", source.SolutionDimensions}, {"TotLayers", source.TotLayers},
+            {"original_layer_prefix_available", source.original_layer_prefix_available}, {"original_LayerPoint", layers},
+            {"CTFCross", public_bits(source.CTFCross)}, {"CTFFlux", public_bits(source.CTFFlux)},
+            {"CTFInside", public_bits(source.CTFInside)}, {"CTFOutside", public_bits(source.CTFOutside)},
+            {"CTFSourceIn", public_bits(source.CTFSourceIn)}, {"CTFSourceOut", public_bits(source.CTFSourceOut)},
+            {"CTFTSourceOut", public_bits(source.CTFTSourceOut)}, {"CTFTSourceIn", public_bits(source.CTFTSourceIn)},
+            {"CTFTSourceQ", public_bits(source.CTFTSourceQ)}, {"CTFTUserOut", public_bits(source.CTFTUserOut)},
+            {"CTFTUserIn", public_bits(source.CTFTUserIn)}, {"CTFTUserSource", public_bits(source.CTFTUserSource)},
+            {"CTFTimeStep", scalar_bits(source.CTFTimeStep.bits)}, {"UValue", scalar_bits(source.UValue.bits)},
+            {"NumHistories", source.NumHistories}, {"NumCTFTerms", source.NumCTFTerms}};
+    }
+    return {{"reached", source.reached}, {"copy_available", source.copy_available}, {"snapshot", value},
+        {"unavailable_reason", source.copy_available ? json(nullptr) : json(source.reached ? "actual_copy_failed" : "source_checkpoint_not_reached")}};
+}
+inline json reverse_public_snapshot(MethodObservation::ReversePublicSnapshot const &source)
+{
+    return {{"reached", source.reached}, {"current", public_snapshot(source.current)},
+        {"actual_provider", public_snapshot(source.actual_provider)}, {"reverse_predicate_reconstructed", false}};
+}
+inline bool public_copy_failed(MethodObservation::PublicCapture const &source)
+{
+    if (source.integrity_failed) return true;
+    auto const failed = [](MethodObservation::PublicSnapshot const &copy) {
+        return copy.reached && (!copy.copy_available || !copy.original_layer_prefix_available);
+    };
+    return failed(source.before_reset) || failed(source.after_reset) || failed(source.scope_exit) || failed(source.actual_caller_return) ||
+        failed(source.reverse_entry.current) || failed(source.reverse_entry.actual_provider) ||
+        failed(source.reverse_completed.current) || failed(source.reverse_completed.actual_provider);
+}
+inline json public_observations(MethodObservation::PublicCapture const &source)
+{
+    json sites = json::array(), failures = json::array();
+    for (std::size_t i = 0; i < source.actual_site_counts.size(); ++i)
+        sites.push_back({{"site", public_site_name(static_cast<MethodObservation::PublicSite>(i))}, {"actual_count", source.actual_site_counts[i]}});
+    for (std::size_t i = 0; i < source.failure_kind_counts.size(); ++i)
+        failures.push_back({{"kind", public_failure_name(static_cast<MethodObservation::PublicFailureKind>(i))}, {"actual_count", source.failure_kind_counts[i]}});
+    return {{"protocol", "ctf10-actual-public-storage-observation.v1"}, {"before_reset", public_snapshot(source.before_reset)},
+        {"after_reset", public_snapshot(source.after_reset)}, {"reverse_entry", reverse_public_snapshot(source.reverse_entry)},
+        {"reverse_completed", reverse_public_snapshot(source.reverse_completed)}, {"scope_exit", public_snapshot(source.scope_exit)},
+        {"scope_exited_during_unwind", source.scope_exited_during_unwind}, {"actual_caller_return", public_snapshot(source.actual_caller_return)},
+        {"actual_site_counts", sites}, {"failure_kind_counts", failures}, {"first_failure", public_failure_record(source.first_failure)},
+        {"last_failure", public_failure_record(source.last_failure)}, {"integrity_failed", source.integrity_failed},
+        {"public_copy_integrity_failed", public_copy_failed(source)}, {"declared_fixed_array_count", 12}, {"slots_per_array", 19},
+        {"observer_indices_derived_from_NumCTFTerms", false}, {"whole_Init_or_safe_Source_store_inferred", false},
+        {"numerical_PASS_claimed", false}};
+}
+struct PublicTotals
+{
+    std::size_t actual_whole_call_records = 0;
+    std::array<std::size_t, 6> sites{}, failures{};
+    bool integrity_failed = false;
+};
+inline void add_public_totals(PublicTotals &total, json const &ledger)
+{
+    ++total.actual_whole_call_records;
+    for (std::size_t i = 0; i < total.sites.size(); ++i) {
+        total.sites[i] += ledger.at("actual_site_counts").at(i).at("actual_count").get<std::size_t>();
+        total.failures[i] += ledger.at("failure_kind_counts").at(i).at("actual_count").get<std::size_t>();
+    }
+    total.integrity_failed = total.integrity_failed || ledger.at("public_copy_integrity_failed").get<bool>();
+}
+inline json public_totals(PublicTotals const &total)
+{
+    return {{"actual_whole_call_records", total.actual_whole_call_records}, {"actual_site_counts", total.sites},
+        {"failure_kind_counts", total.failures}, {"public_copy_integrity_failed", total.integrity_failed}, {"numerical_PASS_claimed", false}};
+}

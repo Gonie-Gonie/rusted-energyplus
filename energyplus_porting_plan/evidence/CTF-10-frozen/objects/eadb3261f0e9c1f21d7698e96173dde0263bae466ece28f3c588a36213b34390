@@ -1,0 +1,177 @@
+"""Emit ignored CTF10 transport source only; never import or execute reviewed targets."""
+from pathlib import Path
+import ast
+import difflib
+import hashlib
+import json
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+OLD = ROOT / '.runtime/porting/CTF-09/native-helper-prep-01'
+PASSIVE = ROOT / '.runtime/porting/CTF-10/native-observer-prep-01'
+POLICY = ROOT / '.runtime/porting/CTF-10/readiness-audit-01/profiles.proposed.json'
+NAMES = ['ctf09_observation_fields.hh', 'ctf09_unit_helper.cpp', 'ctf09_unit_fields.hh', 'ctf09_unit_admission.hh',
+         'ctf09_production_helper.cpp', 'ctf09_production_fields.hh', 'ctf09_production_admission.hh', 'ctf09_reference.cmake']
+
+
+def read(path):
+    return path.read_bytes().decode('utf-8')
+
+
+def emit(path, text):
+    path.parent.mkdir(exist_ok=True, parents=True)
+    path.write_bytes(text.encode('utf-8'))
+
+
+def ref(path):
+    data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(data).hexdigest(),
+            'size_bytes': len(data), 'line_count': len(data.splitlines())}
+
+
+def once(text, before, after):
+    assert text.count(before) == 1, (before, text.count(before))
+    return text.replace(before, after, 1)
+
+
+def diff(before, after, left, right):
+    return ''.join(difflib.unified_diff(before.splitlines(True), after.splitlines(True), fromfile=left, tofile=right))
+
+
+def names_only(text):
+    text = text.replace('CTF09Observation', 'CTF10Observation')
+    for name in NAMES:
+        text = text.replace(name, name.replace('ctf09', 'ctf10'))
+    for name in ['CTF09_OBSERVATION_FIELDS_HH', 'CTF09_UNIT_FIELDS_HH', 'CTF09_UNIT_ADMISSION_HH',
+                 'CTF09_PRODUCTION_FIELDS_HH', 'CTF09_PRODUCTION_ADMISSION_HH']:
+        text = text.replace(name, name.replace('CTF09', 'CTF10'))
+    return text.replace('ctf09_observer.hh', 'ctf10_observer.hh').replace('ctf09_observer.cc', 'ctf10_observer.cc').replace('Construction.ctf09.cc', 'Construction.ctf10.cc')
+
+
+def prepare():
+    assert not (OUT / 'manifest.json').exists(), 'Held source already exists'
+    sources = {}
+    for name in NAMES:
+        data = (OLD / name).read_bytes(); (OUT / 'before').mkdir(exist_ok=True)
+        (OUT / 'before' / name).write_bytes(data)
+        sources[name.replace('ctf09', 'ctf10')] = names_only(data.decode('utf-8'))
+    policy = json.loads(read(POLICY))
+    public_add = read(OUT / 'public_serialization_additions.txt').replace('__CTF10_POLICY_JSON__', json.dumps(policy, separators=(',', ':')))
+    sources['ctf10_observation_fields.hh'] = once(sources['ctf10_observation_fields.hh'], '} // namespace Ctf01\n#endif', public_add + '} // namespace Ctf01\n#endif')
+    for lane in ['unit', 'production']:
+        name = 'ctf10_' + lane + '_fields.hh'; source = sources[name]
+        source = once(source, ' || !retry_diagnostic_join_valid(capture.retry_driver, messages);',
+            ' || !retry_diagnostic_join_valid(capture.retry_driver, messages) || public_copy_failed(capture.public_storage);')
+        source = once(source, '{"RetryDriver", retry_observations(capture.retry_driver, messages)},',
+            '{"RetryDriver", retry_observations(capture.retry_driver, messages)},\n        {"PublicStorage", public_observations(capture.public_storage)},')
+        if lane == 'production':
+            source = once(source, '#include <EnergyPlus/UtilityRoutines.hh>\n', '#include <EnergyPlus/UtilityRoutines.hh>\n#include <algorithm>\n')
+            source = once(source, '} // namespace Ctf01\n#endif', read(OUT / 'init_serialization_additions.txt') + '} // namespace Ctf01\n#endif')
+        sources[name] = source
+
+    admission_add = '''    for (auto const *owner : {&request, &admission, &projection, &tolerances}) {
+        require(owner->at("ctf10_public_storage_observation_policy") == ctf10_public_storage_policy(), "Exact prospective public storage policy differs");
+        require(owner->at("ctf10_execution_lane_policy") == ctf10_execution_policy(), "True Init versus direct unit execution scope differs");
+        require(owner->at("ctf10_public_profiles") == ctf10_public_storage_policy().at("arithmetic_profiles_by_variable"), "Six literal public profiles differ");
+    }
+'''
+    for lane in ['unit', 'production']:
+        name = 'ctf10_' + lane + '_admission.hh'; source = sources[name]
+        source = source.replace('"ctf09-', '"ctf10-').replace('std::string("ctf09-', 'std::string("ctf10-')
+        source = source.replace('frozen_before_this_CTF09_helper_execution', 'frozen_before_this_CTF10_helper_execution')
+        source = source.replace('native_source_files").size() == 8', 'native_source_files").size() == 9')
+        source = once(source, '"ctf10_observer.cc", "ctf10_observation_fields.hh"}', '"ctf10_observer.cc", "ctf10_observation_fields.hh", "HeatBalanceManager.ctf10.cc"}')
+        source = source.replace('Exact helper4/metadata1/observer3 sources required', 'Exact helper4/metadata1/observer4 sources required')
+        source = source.replace('== ctf09_linked_original_retention_intent()', '== ctf10_linked_original_retention_intent()').replace('New09 original retention intent differs', 'New10 original retention intent differs')
+        source = once(source, '    auto const &models = request.at("model_cases");', admission_add + '    auto const &models = request.at("model_cases");')
+        sources[name] = source
+
+    for lane in ['unit', 'production']:
+        name = 'ctf10_' + lane + '_helper.cpp'; source = sources[name]
+        source = source.replace('ctf09_' + lane + '_helper', 'ctf10_' + lane + '_helper').replace('CTF-09', 'CTF-10')
+        source = source.replace('"ctf09-helper-results', '"ctf10-helper-results').replace('"ctf09-production-helper-results', '"ctf10-production-helper-results')
+        source = once(source, '            Observation::retry_diagnostic(*state, messages.size() - 1, static_cast<int>(level), message);',
+            '            Observation::retry_diagnostic(*state, messages.size() - 1, static_cast<int>(level), message);\n            Observation::init_diagnostic(*state, messages.size() - 1, static_cast<int>(level), message);')
+        source = source.replace('RetryTotals retry_total;', 'RetryTotals retry_total; PublicTotals public_total;')
+        source = once(source, '                    add_retry_totals(retry_total, operation.at("observations").at("RetryDriver"));',
+            '                    add_retry_totals(retry_total, operation.at("observations").at("RetryDriver"));\n                    add_public_totals(public_total, operation.at("observations").at("PublicStorage"));')
+        source = once(source, '{"actual_retry_observation_counts", retry_totals(retry_total)},',
+            '{"actual_retry_observation_counts", retry_totals(retry_total)},\n            {"actual_public_storage_observation_counts", public_totals(public_total)},\n            {"CTF10_public_storage_observation_policy", ctf10_public_storage_policy()},\n            {"CTF10_execution_lane_policy", ctf10_execution_policy()},')
+        if lane == 'unit':
+            source = once(source, 'outcome = invoke([&] { construction.calculateTransferFunction(*factory.state, ErrorsFound, DoCTFErrorReport); });',
+                'outcome = invoke([&] { construction.calculateTransferFunction(*factory.state, ErrorsFound, DoCTFErrorReport);\n                    Observation::public_caller_return(capture, *factory.state, construction, ErrorsFound, DoCTFErrorReport); });')
+            source = once(source, '{"observer_integrity_failed", observer_integrity_failed}, {"later_CTF_coefficients_or_thermal_results_paired", false}',
+                '{"observer_integrity_failed", observer_integrity_failed}, {"whole_Init_actual_source_invoked", false},\n        {"whole_Init_unavailable_reason", "literal_direct_unit_flags_roughness_and_report_prerequisites_outside_selected_Init_scope"},\n        {"later_CTF_coefficients_or_thermal_results_paired", false}')
+        else:
+            source = once(source, '    void transport(fs::path const &input, fs::path const &output)\n', '''    json observed_without_Init_shared_flags(bool input_errors)
+    {
+        auto copy = observed(input_errors, false, false);
+        if (copy.at("available").get<bool>()) {
+            copy["snapshot"]["ErrorsFound"] = nullptr;
+            copy["snapshot"]["DoCTFErrorReport"] = nullptr;
+            copy["snapshot"]["shared_flags_role"] = "not_copied_here_actual_Init_event_and_public_snapshots_are_authority";
+        }
+        return copy;
+    }
+    void transport(fs::path const &input, fs::path const &output)
+''')
+            start = source.index('    // The loader-owned array is stable now.')
+            end = source.index('    return {{"id", row.at("id")}', start)
+            source = source[:start] + read(OUT / 'production_actual_Init_block.txt') + source[end:]
+            source = once(source, '{"actual_Construct_array_size", count}, {"whole_call_obligation_available", loader_ready}, {"operations", operations},',
+                '{"actual_Construct_array_size", count}, {"whole_call_obligation_available", loader_ready}, {"operations", operations},\n        {"whole_Init", whole_Init}, {"actual_CTF_call_checkpoint_count", actual_calls},\n        {"manual_Construction_call_loop_performed", false}, {"declared_construct_owners", initialized_owners},')
+            source = once(source, '{"final_state", factory.observed(input_errors, ctf_errors, report)},', '{"final_state", factory.observed_without_Init_shared_flags(input_errors)},')
+            source = once(source, 'bool observer_integrity_failed = false; MethodTotals', 'std::size_t actual_init_calls = 0, actual_ctf_calls = 0; json init_statuses = json::object();\n        bool observer_integrity_failed = false; MethodTotals')
+            source = once(source, '            if (!row.at("loader_ready").get<bool>()) ++unavailable;', '''            if (!row.at("loader_ready").get<bool>()) ++unavailable;
+            actual_ctf_calls += row.at("actual_CTF_call_checkpoint_count").get<std::size_t>();
+            auto const &whole = row.at("whole_Init");
+            auto const init_status = whole.at("call_outcome").at("status").get<std::string>();
+            init_statuses[init_status] = (init_statuses.contains(init_status) ? init_statuses.at(init_status).get<std::size_t>() : 0) + 1;
+            if (whole.at("actual_source_invoked").get<bool>()) ++actual_init_calls;''')
+            source = source.replace('std::size_t invoked = 0, skipped = 0, callbacks', 'std::size_t invoked = 0, callbacks').replace('                else ++skipped;\n', '')
+            source = once(source, '        functions["calculateTransferFunction"] = invoked;', '        functions["calculateTransferFunction"] = actual_ctf_calls;\n        functions["HeatBalanceManager::InitConductionTransferFunctions"] = actual_init_calls;')
+            source = once(source, '{"actual_CTF_invocations", invoked}, {"actual_CTF_skipped_construct_rows", skipped},',
+                '{"actual_CTF_invocations", actual_ctf_calls}, {"actual_retained_CTF_call_records", invoked},\n            {"actual_CTF_skipped_construct_rows", nullptr}, {"actual_whole_Init_invocations", actual_init_calls},\n            {"actual_whole_Init_status_counts", init_statuses},\n            {"per_call_status_counts_role", "actual_retained_return_custody_only_outer_Init_owns_exception_outcome"},')
+        sources[name] = source
+
+    cmake = read(OLD / 'ctf09_reference.cmake').replace('CTF09', 'CTF10').replace('ctf09', 'ctf10')
+    cmake = once(cmake, '/CTF-08/native-helper-prep-01/ctf08_reference.cmake', '/CTF-09/native-helper-prep-01/ctf09_reference.cmake')
+    cmake = once(cmake, '"${CTF10_OBSERVER_SOURCE_DIR}/Construction.ctf10.cc"\n',
+        '"${CTF10_OBSERVER_SOURCE_DIR}/Construction.ctf10.cc"\n          "${CTF10_OBSERVER_SOURCE_DIR}/HeatBalanceManager.ctf10.cc"\n')
+    sources['ctf10_reference.cmake'] = cmake
+
+    for name, source in sources.items():
+        emit(OUT / name, source)
+        old = name.replace('ctf10', 'ctf09')
+        emit(OUT / (name + '.from-ctf09.diff'), diff(read(OLD / old), source, 'accepted09/' + old, 'proposed10/' + name))
+    execution_policy = {'protocol': 'ctf10-declared-Native-execution-lanes.v1',
+        'unit': 'existing39_models42_direct_whole_Construction_calls_literal_incoming_flags', 'unit_whole_Init_and_reports_admitted': False,
+        'production': 'fixed15_genuine13_loader_phases_then_true_whole_Init_once_if_ready', 'production_manual_Construction_call_loop_performed': False,
+        'production_per_call_records': 'actual_original_Init_loop_checkpoint_and_retained_Capture_only',
+        'per_call_missing_return_is_unknown_not_inferred_exception': True, 'outer_actual_Init_invoke_owns_exception_outcome': True,
+        'manual_whole_model_per_call_before_after_snapshots_available': False, 'actual_Init_shared_flags_from_reached_event_and_public_snapshots_only': True,
+        'native_public_capacity_guard_or_store_safety_inferred': False, 'numerical_PASS_claimed': False}
+    for name in ['input-policy-proposal.json', 'projection-policy-proposal.json']:
+        old = json.loads(read(OLD / name)); proposed = dict(old)
+        proposed['schema'] = old['schema'].replace('ctf09-retry', 'ctf10-public-storage')
+        proposed['inherited_ctf09_linked_original_retention_intent'] = old['linked_original_retention_intent']
+        proposed['linked_original_retention_intent'] = {'schema': 'ctf10-debug-original-retention-intent.v1', 'role': 'prospective-debug-original',
+            'scope': 'new-CTF10-linked-originals-only', 'actual_file_identity_required': True, 'both_original_and_helper_verified_before_execution': True,
+            'retain_through_PE_validation_and_current_helper_execution': True, 'removal_requires_separate_Root_authorized_actual_retention_record': True,
+            'earlier_live_refs_reinterpreted': False, 'deletion_performed': False}
+        proposed['ctf10_public_storage_observation_policy'] = policy
+        proposed['ctf10_execution_lane_policy'] = execution_policy
+        proposed['ctf10_public_profiles'] = policy['arithmetic_profiles_by_variable']
+        proposed['required_before_first_CTF10_observation'] = ['actual_source_scope_and_real_CTF10_check', 'source_and_policy_full_Root_and_other_author_reviews',
+            'actual_fresh_input_freeze_and_recorded_execution', 'actual_four_TU_both_provider_PE_build_identity', 'both_original_and_derivative_before_execution_verified']
+        if 'prospective_runtime_freeze_flag' in proposed: proposed['prospective_runtime_freeze_flag'] = 'frozen_before_this_CTF10_helper_execution'
+        if 'chronology_disclosure' in proposed: proposed['chronology_disclosure'] = 'Same39/42 and15/195 literal inputs; fresh10 public six/reset policy and direct-unit/true-Init-production split are prospective before first10 capture. All09 and earlier handoffs remain separate literal history; no expected exits/answers.'
+        emit(OUT / 'before' / name, read(OLD / name))
+        emit(OUT / name, json.dumps(proposed, indent=2) + '\n')
+        emit(OUT / (name + '.from-ctf09.diff'), diff(read(OLD / name), read(OUT / name), 'accepted09/' + name, 'proposed10/' + name))
+    ast.parse(read(Path(__file__)))
+    print(json.dumps({'status': 'WIP-source-emitted-not-held', 'sources': [ref(OUT / name) for name in sources]}))
+
+
+if __name__ == '__main__':
+    prepare()

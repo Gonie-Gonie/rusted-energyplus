@@ -1,0 +1,1497 @@
+{
+  "schema": "ctf10-frozen-packet.v1",
+  "status": "frozen-inherited-input-and-fresh-CTF10-public-storage-policy-before-helper",
+  "lane": "unit",
+  "linked_original_retention_intent": {
+    "schema": "ctf10-debug-original-retention-intent.v1",
+    "role": "prospective-debug-original",
+    "scope": "new-CTF10-linked-originals-only",
+    "actual_file_identity_required": true,
+    "both_original_and_helper_verified_before_execution": true,
+    "retain_through_PE_validation_and_current_helper_execution": true,
+    "removal_requires_separate_Root_authorized_actual_retention_record": true,
+    "earlier_live_refs_reinterpreted": false,
+    "deletion_performed": false
+  },
+  "frozen_before_this_CTF10_helper_execution": true,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "scientific_execution_performed": false,
+  "started_utc": "2026-10-10T23:11:14.967627+00:00",
+  "finished_utc": "2026-10-10T23:11:16.200186+00:00",
+  "source_preparation_approval": {
+    "approved_writer_sha256": "08238b07360fb7d082974865fd8108a089f9bacf61d0b8ce972a80bba846342f",
+    "source_manifest": {
+      "path": ".runtime/porting/CTF-10/input-writer-prep-01/manifest.json",
+      "sha256": "839495c10e16c647851f783531e58314746ed70e8c1ac0ff9c15297fd0bad1b2",
+      "size_bytes": 40510
+    },
+    "reviewed_sources": [
+      {
+        "path": ".runtime/porting/CTF-10/input-writer-prep-01/freeze_packet.py",
+        "sha256": "08238b07360fb7d082974865fd8108a089f9bacf61d0b8ce972a80bba846342f",
+        "size_bytes": 66545
+      },
+      {
+        "path": ".runtime/porting/CTF-10/input-writer-prep-01/packet_io.py",
+        "sha256": "bbc97a81a44892b7d9c53765d2ed9b1fccbce5352a9bb2a85ffea86b7b3fa4e8",
+        "size_bytes": 3523
+      }
+    ]
+  },
+  "source_authorities": {
+    "current_cards": {
+      "CTF-10": {
+        "path": "energyplus_porting_plan/cards/CTF-10.md",
+        "sha256": "2f2ca97fbac45796ec8ce18f7fe03285a9d1d1c0b81b09f79c6be45b1f3e7b16",
+        "size_bytes": 5134
+      }
+    },
+    "actual_scope_amendment": {
+      "path": ".runtime/porting/CTF-10/scope-amendment-01/amendment.json",
+      "sha256": "807e1969d45c31544858c71d7e47d700dc2dc9ce63ac659d0a62d0483701543f",
+      "size_bytes": 2273
+    },
+    "actual_scope_amendment_execution": {
+      "path": ".runtime/porting/CTF-10/scope-check-command-01/receipt.json",
+      "sha256": "a2720011e1adf8ca7f9017c894c608e12dad5ce7f901feae08d99b92038db954",
+      "size_bytes": 2873
+    },
+    "actual_scope_amendment_execution_role": "real-CTF-10-check-only",
+    "historical_scope_documents": [
+      {
+        "path": ".runtime/porting/CTF-10/scope-amendment-01/before/plan.json",
+        "sha256": "351d2835d6edcca20146db2dd016d762a06a7aaeb505b92d89c856e99a8e81a8",
+        "size_bytes": 704568
+      },
+      {
+        "path": ".runtime/porting/CTF-10/scope-amendment-01/before/CTF-10.md",
+        "sha256": "35679822416c4e6be6dcd4606f6a88e21375d9eacc532fb2ac5c906581b459cd",
+        "size_bytes": 2888
+      }
+    ],
+    "current_scope_documents": [
+      {
+        "path": "energyplus_porting_plan/plan.json",
+        "sha256": "2ed82a98bdb3075d9f6ef456200e97f61129b319e08d4af300b614853a61fa56",
+        "size_bytes": 718220
+      },
+      {
+        "path": "energyplus_porting_plan/cards/CTF-10.md",
+        "sha256": "2f2ca97fbac45796ec8ce18f7fe03285a9d1d1c0b81b09f79c6be45b1f3e7b16",
+        "size_bytes": 5134
+      }
+    ],
+    "scope_recorder_role": "validated-Root-authored-documents; did-not-author-amendment",
+    "native_source_manifest": {
+      "path": ".runtime/porting/CTF-10/native-helper-prep-01/manifest.json",
+      "sha256": "1aca57d1c46b6d1a0e756deb61328413a071abc74f4bc9e241f35915a2b20b63",
+      "size_bytes": 37974
+    },
+    "passive_observer": {
+      "path": ".runtime/porting/CTF-10/native-observer-prep-01/manifest.json",
+      "sha256": "a2765a61087045ecb400f260740216bcc6b0330e91975a0168eeead09bb7645d",
+      "size_bytes": 22328
+    },
+    "public_storage_policy_source_inventory": {
+      "path": ".runtime/porting/CTF-10/native-helper-prep-01/projection-policy-proposal.json",
+      "sha256": "fb7f4677722703d8083e98311242dc59c787bc08a958f46d4f38f742599c02f1",
+      "size_bytes": 46954
+    },
+    "historical_prior_09_authority": {
+      "prior_09_freeze": {
+        "path": ".runtime/porting/CTF-09/frozen-packet-01/freeze-receipt.json",
+        "sha256": "31dcca2b549a8b0b033b9a9ba8704ef5bcaec6ac097a0248c4b2ec44a9899bbc",
+        "size_bytes": 52273
+      },
+      "prior_09_freeze_execution": {
+        "path": ".runtime/porting/CTF-09/freeze-command-01/receipt.json",
+        "sha256": "48bab445a84309433bce1c96c139b28326707d45e8e55c350539f71b52e770cf",
+        "size_bytes": 4299
+      },
+      "prior_09_writer_manifest": {
+        "path": ".runtime/porting/CTF-09/input-writer-prep-01/manifest.json",
+        "sha256": "4009f6c7c6b3d32bf647113f47d9e0931b6ff79a358fce38ecfa930c2f2881bd",
+        "size_bytes": 37991
+      },
+      "prior_09_source_contract": {
+        "path": ".runtime/porting/CTF-09/frozen-packet-01/source.json",
+        "sha256": "5e7b56260887a90479168d49c04e415d7726928c7a536cb0a9741b29fd121d16",
+        "size_bytes": 51639
+      },
+      "prior_09_selected_primary_ranges": [
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "first_line": 126,
+          "last_line": 144,
+          "sha256": "2b7c87d65021cd233aef40a553edbe42f5596241935cef7146efaf3731981a5b",
+          "size_bytes": 1247,
+          "purpose": "actual caller constants"
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "first_line": 167,
+          "last_line": 199,
+          "sha256": "22092fc3948c1af7038546578a557bb475b35185cc9172d8239c4253e890e2cf",
+          "size_bytes": 2481,
+          "purpose": "unassigned locals/actual members"
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "first_line": 490,
+          "last_line": 619,
+          "sha256": "f6bbe30caf9e842c89fef7850d39e3fb91d1cf03e2c30a2e8cf4da41f3b4076a",
+          "size_bytes": 6450,
+          "purpose": "initial nodal owner"
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "first_line": 633,
+          "last_line": 729,
+          "sha256": "c756cfa68300a1e1f4e7dfd1d88bc383538823c22280d7bd449268269078b1b8",
+          "size_bytes": 5526,
+          "purpose": "once storage/repeated1D assignments"
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "first_line": 875,
+          "last_line": 982,
+          "sha256": "7fcc15ac650ccf35f2591b1633926f8770d17b14130f18b0c80d37db3eb1771f",
+          "size_bytes": 7453,
+          "purpose": "actual helper/caller/diagnostic order"
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "first_line": 1079,
+          "last_line": 1103,
+          "sha256": "827ee8c55bface38c49b866d98c25b83d58877dbcbba8b4579e01ba90e65b9bc",
+          "size_bytes": 580,
+          "purpose": "whole-call cleanup"
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "first_line": 1181,
+          "last_line": 1191,
+          "sha256": "fccf15ab45847f495b1a298950a0bd616d062365c25cf557b91e95f156d5f638",
+          "size_bytes": 309,
+          "purpose": "exponential source AMat localcopy"
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "first_line": 1362,
+          "last_line": 1373,
+          "sha256": "a92250f96d80db766dd800e9a63ce2b5e93fc9ae05fae323930ce6025a25bda5",
+          "size_bytes": 286,
+          "purpose": "Backup AExp and local cleanup"
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "first_line": 1400,
+          "last_line": 1407,
+          "sha256": "c0972a2ca9b8adeb45d1f77d84630878519ddb20687b87a4c3a1b1d84214e8ae",
+          "size_bytes": 366,
+          "purpose": "inverse source AMat localcopy"
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "first_line": 1487,
+          "last_line": 1494,
+          "sha256": "83f830e397de7413225dd081b539f1b56f8627adfe861585bd6671a3e8023ea3",
+          "size_bytes": 197,
+          "purpose": "inverse local cleanup"
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "first_line": 1496,
+          "last_line": 1589,
+          "sha256": "738f643d12eaf6f333ceed15e0fd65db8508f8bfbdefac5f8eb8a76ef19379cb",
+          "size_bytes": 4459,
+          "purpose": "whole Gamma resets/endpoints"
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "first_line": 1591,
+          "last_line": 1906,
+          "sha256": "e1bb975a9b50ae7bdbca34fabd94dc2f1bc23b3e13cf9537f743c4d14d3530ee",
+          "size_bytes": 15474,
+          "purpose": "whole final resets/private owner lifetimes"
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "start_line": 638,
+          "end_line": 660,
+          "sha256": "120b65bbbaae943857900edc9981e3dd803308a2e2909559e94f12372ba2d534",
+          "size_bytes": 884,
+          "purpose": "actual once identity/square/Gamma/history owner allocations"
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "start_line": 875,
+          "end_line": 936,
+          "sha256": "0b9935e2e9a2c7e9bf653f0377fca2d2030400b7d9ffbe21cf03140430d21e88",
+          "size_bytes": 3596,
+          "purpose": "actual exp/inverse/Gamma/final caller order and later convergence/retry custody"
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "start_line": 1079,
+          "end_line": 1103,
+          "sha256": "827ee8c55bface38c49b866d98c25b83d58877dbcbba8b4579e01ba90e65b9bc",
+          "size_bytes": 580,
+          "purpose": "actual whole-call final deallocation and return"
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "start_line": 1591,
+          "end_line": 1638,
+          "sha256": "e324e5baf282e9dcfc64d5e7bbba4314eaca30d5791169f9dabf74d169696790",
+          "size_bytes": 2432,
+          "purpose": "actual final method entry, local initialization boundaries and no stale workspace copy"
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "start_line": 1639,
+          "end_line": 1715,
+          "sha256": "a7dbf8cf2e19fa92a8858fb837c8753603d432e2f1785e9dd0d24de557c6197a",
+          "size_bytes": 3697,
+          "purpose": "actual Gamma mutation/s0 storage/history controls initialized"
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "start_line": 1716,
+          "end_line": 1830,
+          "sha256": "fd1c0ff5a0b5aacac7e4978a928e7ad0976091a84860001fe7b2e7857b52c2e2",
+          "size_bytes": 5634,
+          "purpose": "actual history loop storage and live controls"
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+          "start_line": 1831,
+          "end_line": 1906,
+          "sha256": "a442de75a8c5b39d3e83c8272d9ff83d596926ea3c4d173444595e137470c7c5",
+          "size_bytes": 3711,
+          "purpose": "actual last-history final storage/private workspace cleanup"
+        },
+        {
+          "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+          "start_line": 304,
+          "end_line": 342,
+          "sha256": "fbcb4d693cf6124c674cc4e4c9673e0319674407efe9d937bc330c14f73c3779",
+          "size_bytes": 2495,
+          "purpose": "actual private matrix/history/context member ownership"
+        },
+        {
+          "path": ".runtime/porting/CTF-08/native-observer-prep-01/ctf08_observer.hh",
+          "start_line": 361,
+          "end_line": 480,
+          "sha256": "6ada2b04aff024b65e4cf287603677c488275fdf3d6b53f3095df27791649632",
+          "size_bytes": 4655,
+          "purpose": "actual new independent final-coefficient DTO owner/masks/counts"
+        },
+        {
+          "path": ".runtime/porting/CTF-08/native-observer-prep-01/ctf08_observer.cc",
+          "start_line": 975,
+          "end_line": 1190,
+          "sha256": "4b78acfd631a4a35ca5e8282085972724d81a5523d9f043106e122487d584006",
+          "size_bytes": 11378,
+          "purpose": "actual failure/association/copy/history producer with independent masks"
+        },
+        {
+          "path": ".runtime/porting/CTF-08/native-observer-prep-01/ctf08_observer.cc",
+          "start_line": 1191,
+          "end_line": 1286,
+          "sha256": "bdaee004d91eb73305598f11b0646545b245e2c07e2896959f20480356aecee7",
+          "size_bytes": 6313,
+          "purpose": "actual entry/privatefinal/return lifetimes"
+        }
+      ],
+      "prior_09_scope_amendment": {
+        "path": ".runtime/porting/CTF-09/scope-amendment-01/amendment.json",
+        "sha256": "cf2d45db4be3d1e2d752205f45db1b9796bf6c1a7f7eb6169240e58fe6bb065d",
+        "size_bytes": 2310
+      },
+      "prior_09_scope_check_execution": {
+        "path": ".runtime/porting/CTF-09/scope-check-command-01/receipt.json",
+        "sha256": "4eae4d1ddd57a216feb5dc7fcfcb0c476d2d271666f4af8e348c27cd94cdd7e2",
+        "size_bytes": 3006
+      },
+      "historical_before_document_archives": [
+        {
+          "path": ".runtime/porting/CTF-09/scope-amendment-01/before/plan.json",
+          "sha256": "bede068603f5e8b90d14a401a2728ec68a98307798b947c48fa5079b7de6ddd1",
+          "size_bytes": 689962
+        },
+        {
+          "path": ".runtime/porting/CTF-09/scope-amendment-01/before/CTF-09.md",
+          "sha256": "cb99c4eeec6604420649f960a7b2c1415d23e3a69988ab06e43a5248a8ae1e5b",
+          "size_bytes": 2765
+        }
+      ],
+      "historical_after_document_identities": [
+        {
+          "historical_path": "energyplus_porting_plan/plan.json",
+          "sha256": "0650ecab603a0727bbeb2f8a39f7db0f898d62f52c1fa3b3b5e337caa68d61e5",
+          "size_bytes": 703551
+        },
+        {
+          "historical_path": "energyplus_porting_plan/cards/CTF-09.md",
+          "sha256": "69c4bf5ccef66cd7638ee4648ff912623f6cb8679efbe51421862c058312c679",
+          "size_bytes": 5296
+        }
+      ],
+      "available_prior_frozen_document_archives": [
+        {
+          "historical_path": ".runtime/porting/CTF-09/scope-amendment-01/before/plan.json",
+          "archive": {
+            "path": ".runtime/porting/CTF-09/frozen-packet-01/source-archives/025-plan.json",
+            "sha256": "bede068603f5e8b90d14a401a2728ec68a98307798b947c48fa5079b7de6ddd1",
+            "size_bytes": 689962
+          }
+        },
+        {
+          "historical_path": ".runtime/porting/CTF-09/scope-amendment-01/before/CTF-09.md",
+          "archive": {
+            "path": ".runtime/porting/CTF-09/frozen-packet-01/source-archives/026-CTF-09.md",
+            "sha256": "cb99c4eeec6604420649f960a7b2c1415d23e3a69988ab06e43a5248a8ae1e5b",
+            "size_bytes": 2765
+          }
+        },
+        {
+          "historical_path": "energyplus_porting_plan/plan.json",
+          "archive": {
+            "path": ".runtime/porting/CTF-09/frozen-packet-01/source-archives/027-plan.json",
+            "sha256": "0650ecab603a0727bbeb2f8a39f7db0f898d62f52c1fa3b3b5e337caa68d61e5",
+            "size_bytes": 703551
+          }
+        },
+        {
+          "historical_path": "energyplus_porting_plan/cards/CTF-09.md",
+          "archive": {
+            "path": ".runtime/porting/CTF-09/frozen-packet-01/source-archives/028-CTF-09.md",
+            "sha256": "69c4bf5ccef66cd7638ee4648ff912623f6cb8679efbe51421862c058312c679",
+            "size_bytes": 5296
+          }
+        }
+      ],
+      "historical_prior_08_authority": {
+        "prior_08_freeze": {
+          "path": ".runtime/porting/CTF-08/frozen-packet-01/freeze-receipt.json",
+          "sha256": "c0f5bd9d0d3db82e541b12252ab3d53924309c4c5fa5a1e1ef5a1857448253e5",
+          "size_bytes": 43137
+        },
+        "prior_08_freeze_execution": {
+          "path": ".runtime/porting/CTF-08/freeze-command-01/receipt.json",
+          "sha256": "83928bd84a55658d06ceee8a55d655b4cd4aa570c9a9d2e71d1a7e4fb341f6be",
+          "size_bytes": 4306
+        },
+        "prior_08_writer_manifest": {
+          "path": ".runtime/porting/CTF-08/input-writer-prep-01/manifest.json",
+          "sha256": "3993734262efffcb725b5bd248c4144d2cda69d093653ffc480dc645fd8584dc",
+          "size_bytes": 31720
+        },
+        "prior_08_source_contract": {
+          "path": ".runtime/porting/CTF-08/frozen-packet-01/source.json",
+          "sha256": "ab2b0f27ebf4014b4d3a88514b807413852823cbf10a64a1cd0a13e67c9d82c9",
+          "size_bytes": 35513
+        },
+        "prior_08_selected_primary_ranges": [
+          {
+            "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+            "start_line": 638,
+            "end_line": 660,
+            "sha256": "120b65bbbaae943857900edc9981e3dd803308a2e2909559e94f12372ba2d534",
+            "size_bytes": 884,
+            "purpose": "actual once identity/square/Gamma/history owner allocations"
+          },
+          {
+            "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+            "start_line": 875,
+            "end_line": 936,
+            "sha256": "0b9935e2e9a2c7e9bf653f0377fca2d2030400b7d9ffbe21cf03140430d21e88",
+            "size_bytes": 3596,
+            "purpose": "actual exp/inverse/Gamma/final caller order and later convergence/retry custody"
+          },
+          {
+            "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+            "start_line": 1079,
+            "end_line": 1103,
+            "sha256": "827ee8c55bface38c49b866d98c25b83d58877dbcbba8b4579e01ba90e65b9bc",
+            "size_bytes": 580,
+            "purpose": "actual whole-call final deallocation and return"
+          },
+          {
+            "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+            "start_line": 1591,
+            "end_line": 1638,
+            "sha256": "e324e5baf282e9dcfc64d5e7bbba4314eaca30d5791169f9dabf74d169696790",
+            "size_bytes": 2432,
+            "purpose": "actual final method entry, local initialization boundaries and no stale workspace copy"
+          },
+          {
+            "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+            "start_line": 1639,
+            "end_line": 1715,
+            "sha256": "a7dbf8cf2e19fa92a8858fb837c8753603d432e2f1785e9dd0d24de557c6197a",
+            "size_bytes": 3697,
+            "purpose": "actual Gamma mutation/s0 storage/history controls initialized"
+          },
+          {
+            "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+            "start_line": 1716,
+            "end_line": 1830,
+            "sha256": "fd1c0ff5a0b5aacac7e4978a928e7ad0976091a84860001fe7b2e7857b52c2e2",
+            "size_bytes": 5634,
+            "purpose": "actual history loop storage and live controls"
+          },
+          {
+            "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+            "start_line": 1831,
+            "end_line": 1906,
+            "sha256": "a442de75a8c5b39d3e83c8272d9ff83d596926ea3c4d173444595e137470c7c5",
+            "size_bytes": 3711,
+            "purpose": "actual last-history final storage/private workspace cleanup"
+          },
+          {
+            "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+            "start_line": 304,
+            "end_line": 342,
+            "sha256": "fbcb4d693cf6124c674cc4e4c9673e0319674407efe9d937bc330c14f73c3779",
+            "size_bytes": 2495,
+            "purpose": "actual private matrix/history/context member ownership"
+          },
+          {
+            "path": ".runtime/porting/CTF-08/native-observer-prep-01/ctf08_observer.hh",
+            "start_line": 361,
+            "end_line": 480,
+            "sha256": "6ada2b04aff024b65e4cf287603677c488275fdf3d6b53f3095df27791649632",
+            "size_bytes": 4655,
+            "purpose": "actual new independent final-coefficient DTO owner/masks/counts"
+          },
+          {
+            "path": ".runtime/porting/CTF-08/native-observer-prep-01/ctf08_observer.cc",
+            "start_line": 975,
+            "end_line": 1190,
+            "sha256": "4b78acfd631a4a35ca5e8282085972724d81a5523d9f043106e122487d584006",
+            "size_bytes": 11378,
+            "purpose": "actual failure/association/copy/history producer with independent masks"
+          },
+          {
+            "path": ".runtime/porting/CTF-08/native-observer-prep-01/ctf08_observer.cc",
+            "start_line": 1191,
+            "end_line": 1286,
+            "sha256": "bdaee004d91eb73305598f11b0646545b245e2c07e2896959f20480356aecee7",
+            "size_bytes": 6313,
+            "purpose": "actual entry/privatefinal/return lifetimes"
+          }
+        ],
+        "prior_08_scope_amendment": {
+          "path": ".runtime/porting/CTF-08/scope-amendment-01/amendment.json",
+          "sha256": "2398bd45495e6dd1f0ddfe0131c97520580572a736f26df319d2dff72c09b9a9",
+          "size_bytes": 2077
+        },
+        "prior_08_scope_check_execution": {
+          "path": ".runtime/porting/CTF-08/scope-check-command-01/receipt.json",
+          "sha256": "fd364d0c4da9a89e2d6c0b45ef693dc63e6f0ead48cff3ebbf102aab8c2506c3",
+          "size_bytes": 3006
+        },
+        "historical_before_document_archives": [
+          {
+            "path": ".runtime/porting/CTF-08/scope-amendment-01/before-plan.json",
+            "sha256": "89c48f416714183bdd67236cc1fe5d402ed6ce4d137e7f243f884435564eee83",
+            "size_bytes": 750588
+          },
+          {
+            "path": ".runtime/porting/CTF-08/scope-amendment-01/before-CTF-08.md",
+            "sha256": "6c9297e026ab13700514170dfada762a2551afec73115387bdd7a6904dee3cb1",
+            "size_bytes": 2703
+          }
+        ],
+        "historical_after_document_identities": [
+          {
+            "historical_path": "energyplus_porting_plan/plan.json",
+            "sha256": "a48e6b6f98758769e475d09182bd0acf84b63c61701bcc391aceeaff41afdc31",
+            "size_bytes": 688947
+          },
+          {
+            "historical_path": "energyplus_porting_plan/cards/CTF-08.md",
+            "sha256": "e514fc5065e99b0b9560601338d58e08743d15eb5e02de4e581e7ce4b5e66f93",
+            "size_bytes": 4252
+          }
+        ],
+        "available_prior_frozen_document_archives": [
+          {
+            "historical_path": ".runtime/porting/CTF-08/scope-amendment-01/before-plan.json",
+            "archive": {
+              "path": ".runtime/porting/CTF-08/frozen-packet-01/source-archives/024-before-plan.json",
+              "sha256": "89c48f416714183bdd67236cc1fe5d402ed6ce4d137e7f243f884435564eee83",
+              "size_bytes": 750588
+            }
+          },
+          {
+            "historical_path": ".runtime/porting/CTF-08/scope-amendment-01/before-CTF-08.md",
+            "archive": {
+              "path": ".runtime/porting/CTF-08/frozen-packet-01/source-archives/025-before-CTF-08.md",
+              "sha256": "6c9297e026ab13700514170dfada762a2551afec73115387bdd7a6904dee3cb1",
+              "size_bytes": 2703
+            }
+          },
+          {
+            "historical_path": "energyplus_porting_plan/plan.json",
+            "archive": {
+              "path": ".runtime/porting/CTF-08/frozen-packet-01/source-archives/026-plan.json",
+              "sha256": "a48e6b6f98758769e475d09182bd0acf84b63c61701bcc391aceeaff41afdc31",
+              "size_bytes": 688947
+            }
+          },
+          {
+            "historical_path": "energyplus_porting_plan/cards/CTF-08.md",
+            "archive": {
+              "path": ".runtime/porting/CTF-08/frozen-packet-01/source-archives/027-CTF-08.md",
+              "sha256": "e514fc5065e99b0b9560601338d58e08743d15eb5e02de4e581e7ce4b5e66f93",
+              "size_bytes": 4252
+            }
+          }
+        ],
+        "historical_prior_07_authority": {
+          "prior_07_freeze": {
+            "path": ".runtime/porting/CTF-07/frozen-packet-01/freeze-receipt.json",
+            "sha256": "fb649258ccdfe96fa0bfa6496a8951d0e50821ed6be4c1031fed6ce265382245",
+            "size_bytes": 35050
+          },
+          "prior_07_freeze_execution": {
+            "path": ".runtime/porting/CTF-07/freeze-command-01/receipt.json",
+            "sha256": "3a1d4ad80e33c2aaff7e0911b113af366a4ec6caf45ffd925fabfd45afb5f645",
+            "size_bytes": 4796
+          },
+          "prior_07_writer_manifest": {
+            "path": ".runtime/porting/CTF-07/input-writer-prep-01/manifest.json",
+            "sha256": "7a19067da5f05ec6320179c2eb520132ca8f3cd12ee583012e27002b7aa8ca02",
+            "size_bytes": 22729
+          },
+          "prior_07_source_contract": {
+            "path": ".runtime/porting/CTF-07/frozen-packet-01/source.json",
+            "sha256": "41432649766c1332df9d95c5527d0b081537ab0db5eea56ab15dc61df1fb21e0",
+            "size_bytes": 24430
+          },
+          "prior_07_selected_primary_ranges": [
+            {
+              "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+              "start_line": 638,
+              "end_line": 660,
+              "sha256": "120b65bbbaae943857900edc9981e3dd803308a2e2909559e94f12372ba2d534",
+              "size_bytes": 884,
+              "purpose": "actual source Gamma3-by-rcmax and square matrix allocations"
+            },
+            {
+              "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+              "start_line": 875,
+              "end_line": 894,
+              "sha256": "834de83ff09c5196ebd62bf19899e97b70d885a9b2b28442e87eba528b155b48",
+              "size_bytes": 1236,
+              "purpose": "actual exp884/inverse887/Gamma890 caller order"
+            },
+            {
+              "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+              "start_line": 1496,
+              "end_line": 1530,
+              "sha256": "136082ea855d5c8d1bf4e76d3cf0542bbdec4b39e29f029e64ab474cf7c3fc43",
+              "size_bytes": 1338,
+              "purpose": "actual Gamma entry/input context and ATemp assignment"
+            },
+            {
+              "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+              "start_line": 1531,
+              "end_line": 1553,
+              "sha256": "c48c88e5c515e21c67bea6214f712db33652f6c9182f11768ece1b8088728d88",
+              "size_bytes": 950,
+              "purpose": "actual Gamma1 and ATemp deallocation boundary"
+            },
+            {
+              "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+              "start_line": 1554,
+              "end_line": 1589,
+              "sha256": "5d1f73cd57d45a83d78217eeded1cfa6fa0b947108f6ff17e4d702f5633760e6",
+              "size_bytes": 2171,
+              "purpose": "actual Gamma2 and method close"
+            },
+            {
+              "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+              "start_line": 304,
+              "end_line": 342,
+              "sha256": "fbcb4d693cf6124c674cc4e4c9673e0319674407efe9d937bc330c14f73c3779",
+              "size_bytes": 2495,
+              "purpose": "actual Construction matrix owners/context and method signatures"
+            },
+            {
+              "path": ".runtime/porting/CTF-07/native-observer-prep-02/ctf07_observer.hh",
+              "start_line": 285,
+              "end_line": 359,
+              "sha256": "7ec937f7426dc2d3bd81ac7a09e47925c41627bf2364215eecc7f1cde82a38ba",
+              "size_bytes": 2498,
+              "purpose": "actual independent Gamma stage/matrix/value/invocation/counter DTOs"
+            },
+            {
+              "path": ".runtime/porting/CTF-07/native-observer-prep-02/ctf07_observer.cc",
+              "start_line": 720,
+              "end_line": 974,
+              "sha256": "a38d890f34fc3a5c388d7a1285652ab8c59f300271c540ada87000bef018d937",
+              "size_bytes": 12596,
+              "purpose": "actual independent Gamma copy,association,order,omission and caller-return producer"
+            }
+          ],
+          "prior_07_scope_amendment": {
+            "path": ".runtime/porting/CTF-07/scope-amendment-01/amendment.json",
+            "sha256": "05b73dcc989959b5f1b5b473387b3e498b69bac11173103d2746118c9da80423",
+            "size_bytes": 2098
+          },
+          "prior_07_scope_check_execution": {
+            "path": ".runtime/porting/CTF-07/scope-check-command-01/receipt.json",
+            "sha256": "9f3ebf7081519e9aea26410a1e0a197bfa5af31fe884a1ac074366d811c1cea8",
+            "size_bytes": 2874
+          },
+          "historical_before_document_archives": [
+            {
+              "path": ".runtime/porting/CTF-07/scope-amendment-01/before-plan.json",
+              "sha256": "4d3388b79b2442c4017ad1e2de15fef3279988cb489b552854f5cc4cf7fdcee7",
+              "size_bytes": 674940
+            },
+            {
+              "path": ".runtime/porting/CTF-07/scope-amendment-01/before-CTF-07.md",
+              "sha256": "fd49a0c26a92819161d622c6f73b17398c93b4f2ae3e13da458e860781192fb3",
+              "size_bytes": 2686
+            }
+          ],
+          "historical_after_document_identities": [
+            {
+              "historical_path": "energyplus_porting_plan/plan.json",
+              "sha256": "4410c0eea0a8340dcd1f70c2f43fc21ba1155189d22c9442947473f8351fe66b",
+              "size_bytes": 680228
+            },
+            {
+              "historical_path": "energyplus_porting_plan/cards/CTF-07.md",
+              "sha256": "69b711bd9cf466af052f1374ecad24d89c8a16b4d9b782806a293caaa0bddf8b",
+              "size_bytes": 4515
+            }
+          ],
+          "available_prior_frozen_document_archives": [
+            {
+              "historical_path": ".runtime/porting/CTF-07/scope-amendment-01/before-plan.json",
+              "archive": {
+                "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/022-before-plan.json",
+                "sha256": "4d3388b79b2442c4017ad1e2de15fef3279988cb489b552854f5cc4cf7fdcee7",
+                "size_bytes": 674940
+              }
+            },
+            {
+              "historical_path": ".runtime/porting/CTF-07/scope-amendment-01/before-CTF-07.md",
+              "archive": {
+                "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/023-before-CTF-07.md",
+                "sha256": "fd49a0c26a92819161d622c6f73b17398c93b4f2ae3e13da458e860781192fb3",
+                "size_bytes": 2686
+              }
+            },
+            {
+              "historical_path": "energyplus_porting_plan/plan.json",
+              "archive": {
+                "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/024-plan.json",
+                "sha256": "4410c0eea0a8340dcd1f70c2f43fc21ba1155189d22c9442947473f8351fe66b",
+                "size_bytes": 680228
+              }
+            },
+            {
+              "historical_path": "energyplus_porting_plan/cards/CTF-07.md",
+              "archive": {
+                "path": ".runtime/porting/CTF-07/frozen-packet-01/source-archives/025-CTF-07.md",
+                "sha256": "69b711bd9cf466af052f1374ecad24d89c8a16b4d9b782806a293caaa0bddf8b",
+                "size_bytes": 4515
+              }
+            }
+          ],
+          "historical_prior_05_06_authority": {
+            "prior_06_freeze": {
+              "path": ".runtime/porting/CTF-06/frozen-packet-01/freeze-receipt.json",
+              "sha256": "0fac594f1a432f764a43589f42c17dee58c7fa87614d7b0a09d17e7f182958b1",
+              "size_bytes": 25166
+            },
+            "prior_06_freeze_execution": {
+              "path": ".runtime/porting/CTF-06/freeze-command-01/receipt.json",
+              "sha256": "d584173df08aaec66f36a46ecc6b7eb635bc47e5d52b9812c55a60a84b5239c9",
+              "size_bytes": 4405
+            },
+            "prior_05_06_scope_amendment": {
+              "path": ".runtime/porting/CTF-06/scope-amendment-01/amendment.json",
+              "sha256": "88ac5d66085f22d0d502862a582539bfd82b61fb89abafc652494e05ba7381bd",
+              "size_bytes": 2533
+            },
+            "prior_scope_checks": {
+              "CTF-05": {
+                "path": ".runtime/porting/CTF-06/scope-check-05-command-01/receipt.json",
+                "sha256": "952c5bc0f8b5884c11629694065a21f3f2c6f156d91e16f4b01428d869894816",
+                "size_bytes": 3107
+              },
+              "CTF-06": {
+                "path": ".runtime/porting/CTF-06/scope-check-06-command-01/receipt.json",
+                "sha256": "d0dbdadc0e90dcde17d331227db7c19cda8e5640393c9018e56824f5d2ab6156",
+                "size_bytes": 3108
+              }
+            },
+            "prior_06_writer_manifest": {
+              "path": ".runtime/porting/CTF-06/input-writer-prep-01/manifest.json",
+              "sha256": "5f499a25428d7a4bbdf29df93ed2b10eb749e89d3c7d3a05bc9fed5030fb2bca",
+              "size_bytes": 28566
+            },
+            "prior_06_source_contract": {
+              "path": ".runtime/porting/CTF-06/frozen-packet-01/source.json",
+              "sha256": "2ec1d9116d8ecc333feaed7ce6f7f5e0a0061411ecbca39e03601962e722e75c",
+              "size_bytes": 17178
+            },
+            "prior_06_selected_primary_ranges": [
+              {
+                "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+                "first_line": 59,
+                "last_line": 401,
+                "sha256": "4bb1dbc69381557180378d58b3614fd0524df51d294a9845e3e908ac90968d1c",
+                "size_bytes": 18217
+              },
+              {
+                "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+                "first_line": 405,
+                "last_line": 489,
+                "sha256": "87316e8038ff3ea1ba8500350cddeab26fe64c58eab17efc708f512d2c6e5e2b",
+                "size_bytes": 3901
+              },
+              {
+                "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+                "first_line": 490,
+                "last_line": 619,
+                "sha256": "f6bbe30caf9e842c89fef7850d39e3fb91d1cf03e2c30a2e8cf4da41f3b4076a",
+                "size_bytes": 6450
+              },
+              {
+                "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+                "first_line": 638,
+                "last_line": 648,
+                "sha256": "4b9fcfede15577faa9e30fc89058a3a67e4776939dea28aece1a5cee3bfb369d",
+                "size_bytes": 486
+              },
+              {
+                "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+                "first_line": 657,
+                "last_line": 729,
+                "sha256": "6e8f1b65bb10f8615b5b48f1e53449413e99b5c75e7ac777158b07ec5fb0133e",
+                "size_bytes": 4571
+              },
+              {
+                "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+                "first_line": 877,
+                "last_line": 890,
+                "sha256": "6e29649dbec28af3e25cfd8f03a84fed82e28f9a524202b44007faca5b01ab84",
+                "size_bytes": 862
+              },
+              {
+                "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+                "first_line": 1105,
+                "last_line": 1373,
+                "sha256": "e2f3f6b271807011ed343e44549bb90202e4c9bf9e0143cf99a1f01fd3c82bdd",
+                "size_bytes": 13237
+              },
+              {
+                "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+                "first_line": 1375,
+                "last_line": 1494,
+                "sha256": "f1c13d8e66759602566fc1b4e2492e896198bd57a1b8e8399f70ea41434f5b01",
+                "size_bytes": 5093
+              }
+            ],
+            "historical_before_document_archives": [
+              {
+                "path": ".runtime/porting/CTF-06/scope-amendment-01/before-plan.json",
+                "sha256": "e23dac7d90bbc240f3520a969be588bc31f1f0f546c5f7e4f0a4e6a2196aee97",
+                "size_bytes": 645459
+              },
+              {
+                "path": ".runtime/porting/CTF-06/scope-amendment-01/before-CTF-05.md",
+                "sha256": "07feb3acadd06b6829fe7c2976a196fb859105c39a4c41259c67bdf021a9e9d1",
+                "size_bytes": 2627
+              },
+              {
+                "path": ".runtime/porting/CTF-06/scope-amendment-01/before-CTF-06.md",
+                "sha256": "0946a82d6c904e564dc4d11ddb862ded60a055013f144371dd6637bce83368ab",
+                "size_bytes": 2659
+              }
+            ],
+            "historical_after_document_identities": [
+              {
+                "historical_path": "energyplus_porting_plan/plan.json",
+                "sha256": "06e2b45fe874af1ebf1eab1211a3954ecfd5ce4dfb0fb086814f1754c0267320",
+                "size_bytes": 672068
+              },
+              {
+                "historical_path": "energyplus_porting_plan/cards/CTF-05.md",
+                "sha256": "c303a87b5f7133f6439206066323a788fe3a7ec31593fb0ce48978ce9eea87b2",
+                "size_bytes": 4378
+              },
+              {
+                "historical_path": "energyplus_porting_plan/cards/CTF-06.md",
+                "sha256": "ace8920255ea2b224ce6f9b67bc7fdfe8978406c1d15502abd2ee461944a6b27",
+                "size_bytes": 4571
+              }
+            ],
+            "available_prior_frozen_document_archives": [],
+            "documentary_limit": "Prior after identities retain historical meaning; only available authentic archives are byte-checked, never current07 plan/card replay",
+            "prior06_numerical_PASS_inferred": false
+          },
+          "documentary_limit": "Prior07 after identities retain historical meaning; authentic archived bytes only, never current08 plan/card replay; nested05/06 authority remains literal",
+          "prior07_numerical_PASS_inferred": false
+        },
+        "documentary_limit": "Prior08 after identities retain historical meaning; authenticate archived bytes only, never current09 plan/card replay; nested07/05/06 remains literal",
+        "prior08_numerical_PASS_inferred": false
+      },
+      "documentary_limit": "Prior09 after identities retain historical meaning; authenticate archived bytes only, never current10 plan/card replay; nested08/07/05/06 remains literal",
+      "prior09_numerical_PASS_inferred": false
+    },
+    "inherited_input_only_packet": {
+      "request": {
+        "path": ".runtime/porting/CTF-01/frozen-packet-01/helper-request.json",
+        "sha256": "3fdf7a110a7b68b4c04415fd2de7a7a93d2bccce044a892d9688f604199d4c57",
+        "size_bytes": 103619
+      },
+      "source": {
+        "path": ".runtime/porting/CTF-01/frozen-packet-01/source.json",
+        "sha256": "ec9af3f79dbeff23fd8190429a680c8ece2cc0f0c500f5b20f3845fdb517e1db",
+        "size_bytes": 15120
+      },
+      "tolerances": {
+        "path": ".runtime/porting/CTF-01/frozen-packet-01/tolerances.json",
+        "sha256": "29e90047ef65553891106199c83926f62f0cbd1fd371e508e5ede01048e1556b",
+        "size_bytes": 5520
+      }
+    }
+  },
+  "helper_request": {
+    "path": ".runtime/porting/CTF-10/frozen-packet-01/helper-request.json",
+    "sha256": "3009353f4c26df8340a421ffb22c012d80ad620872949dfb53570674b60cd577",
+    "size_bytes": 159722
+  },
+  "native_admission_contract": {
+    "path": ".runtime/porting/CTF-10/frozen-packet-01/native-admission-contract.json",
+    "sha256": "bf83e961b95e8d01a0adb9d19918101a1e42e000ecdf6f8bdedfbbc49120af60",
+    "size_bytes": 67957
+  },
+  "projection": {
+    "path": ".runtime/porting/CTF-10/frozen-packet-01/projection.json",
+    "sha256": "a16c88da9db889cc6bf2d6a2a3c8d94b5746d719d406422fe2272917394464fe",
+    "size_bytes": 158714
+  },
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/CTF-10/frozen-packet-01/source.json",
+      "sha256": "946dbf09e7111d26800a6687e69b650f7fcf368457a36cf1294bd5956fe72be7",
+      "size_bytes": 70131
+    },
+    "cases": {
+      "path": ".runtime/porting/CTF-10/frozen-packet-01/cases.json",
+      "sha256": "a3649f887e01c136cc008fe85b643609ec68893c72d5c58966e3b888e5f51bd1",
+      "size_bytes": 9271
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CTF-10/frozen-packet-01/tolerances.json",
+      "sha256": "88c0b98a13cc1ec8767c7eaa579060120f8571e5b6634235b36a461a72af3c11",
+      "size_bytes": 42041
+    }
+  },
+  "requested_counts": {
+    "model_cases": 39,
+    "calculateTransferFunction": 42,
+    "total_operations": 42
+  },
+  "fixed_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879",
+    "size_bytes": 15325
+  },
+  "all_45_guard_refs": [
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+      "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+      "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+      "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+      "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
+      "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+      "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+      "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+      "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+      "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+      "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+      "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+      "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+      "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+      "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+      "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+      "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+      "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+      "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+      "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+      "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+      "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+      "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+      "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+      "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+      "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+      "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+      "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+      "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+    },
+    {
+      "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+      "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+    },
+    {
+      "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+      "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4"
+    }
+  ],
+  "executed_writer_sources": [
+    {
+      "historical_path": ".runtime/porting/CTF-10/input-writer-prep-01/freeze_packet.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/000-freeze_packet.py",
+        "sha256": "08238b07360fb7d082974865fd8108a089f9bacf61d0b8ce972a80bba846342f",
+        "size_bytes": 66545
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/input-writer-prep-01/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/001-packet_io.py",
+        "sha256": "bbc97a81a44892b7d9c53765d2ed9b1fccbce5352a9bb2a85ffea86b7b3fa4e8",
+        "size_bytes": 3523
+      }
+    }
+  ],
+  "reviewed_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CTF-10/input-writer-prep-01/freeze_packet.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/000-freeze_packet.py",
+        "sha256": "08238b07360fb7d082974865fd8108a089f9bacf61d0b8ce972a80bba846342f",
+        "size_bytes": 66545
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/input-writer-prep-01/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/001-packet_io.py",
+        "sha256": "bbc97a81a44892b7d9c53765d2ed9b1fccbce5352a9bb2a85ffea86b7b3fa4e8",
+        "size_bytes": 3523
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/native-helper-prep-01/manifest.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/002-manifest.json",
+        "sha256": "1aca57d1c46b6d1a0e756deb61328413a071abc74f4bc9e241f35915a2b20b63",
+        "size_bytes": 37974
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/native-observer-prep-01/manifest.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/003-manifest.json",
+        "sha256": "a2765a61087045ecb400f260740216bcc6b0330e91975a0168eeead09bb7645d",
+        "size_bytes": 22328
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-07/native-helper-prep-01/projection-policy-proposal.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/004-projection-policy-proposal.json",
+        "sha256": "4368c7364c86e1227864a18777d8109d8a31afa0ac0e0411e9559bf7ed6f76d6",
+        "size_bytes": 19186
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-08/native-helper-prep-01/projection-policy-proposal.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/005-projection-policy-proposal.json",
+        "sha256": "7c5ebcba0bc887166a930671080350133317623efe340fd8bea82e1bb5be92d9",
+        "size_bytes": 26108
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-09/native-helper-prep-01/projection-policy-proposal.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/006-projection-policy-proposal.json",
+        "sha256": "233438c166c0aabe0df6a9f6e1600b711bc94fbda21b0bb134074670c43782ef",
+        "size_bytes": 39665
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/readiness-audit-01/profiles.proposed.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/007-profiles.proposed.json",
+        "sha256": "fac618d6eff469730ff3d5ba16762c4e8a08bf50393383647900cec7238c77e8",
+        "size_bytes": 3754
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/native-helper-prep-01/input-policy-proposal.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/008-input-policy-proposal.json",
+        "sha256": "d443fdd6557b2315338381899e0f529090b83cba040433f19cbe533a884186ba",
+        "size_bytes": 39337
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/native-helper-prep-01/projection-policy-proposal.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/009-projection-policy-proposal.json",
+        "sha256": "fb7f4677722703d8083e98311242dc59c787bc08a958f46d4f38f742599c02f1",
+        "size_bytes": 46954
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-01/frozen-packet-01/helper-request.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/010-helper-request.json",
+        "sha256": "3fdf7a110a7b68b4c04415fd2de7a7a93d2bccce044a892d9688f604199d4c57",
+        "size_bytes": 103619
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-01/frozen-packet-01/source.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/011-source.json",
+        "sha256": "ec9af3f79dbeff23fd8190429a680c8ece2cc0f0c500f5b20f3845fdb517e1db",
+        "size_bytes": 15120
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-01/frozen-packet-01/tolerances.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/012-tolerances.json",
+        "sha256": "29e90047ef65553891106199c83926f62f0cbd1fd371e508e5ede01048e1556b",
+        "size_bytes": 5520
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-09/frozen-packet-01/freeze-receipt.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/013-freeze-receipt.json",
+        "sha256": "31dcca2b549a8b0b033b9a9ba8704ef5bcaec6ac097a0248c4b2ec44a9899bbc",
+        "size_bytes": 52273
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-09/freeze-command-01/receipt.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/014-receipt.json",
+        "sha256": "48bab445a84309433bce1c96c139b28326707d45e8e55c350539f71b52e770cf",
+        "size_bytes": 4299
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-09/scope-amendment-01/amendment.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/015-amendment.json",
+        "sha256": "cf2d45db4be3d1e2d752205f45db1b9796bf6c1a7f7eb6169240e58fe6bb065d",
+        "size_bytes": 2310
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-09/scope-check-command-01/receipt.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/016-receipt.json",
+        "sha256": "4eae4d1ddd57a216feb5dc7fcfcb0c476d2d271666f4af8e348c27cd94cdd7e2",
+        "size_bytes": 3006
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-09/input-writer-prep-01/manifest.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/017-manifest.json",
+        "sha256": "4009f6c7c6b3d32bf647113f47d9e0931b6ff79a358fce38ecfa930c2f2881bd",
+        "size_bytes": 37991
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-09/frozen-packet-01/source.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/018-source.json",
+        "sha256": "5e7b56260887a90479168d49c04e415d7726928c7a536cb0a9741b29fd121d16",
+        "size_bytes": 51639
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-09/scope-amendment-01/before/plan.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/019-plan.json",
+        "sha256": "bede068603f5e8b90d14a401a2728ec68a98307798b947c48fa5079b7de6ddd1",
+        "size_bytes": 689962
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-09/scope-amendment-01/before/CTF-09.md",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/020-CTF-09.md",
+        "sha256": "cb99c4eeec6604420649f960a7b2c1415d23e3a69988ab06e43a5248a8ae1e5b",
+        "size_bytes": 2765
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-09/frozen-packet-01/source-archives/025-plan.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/021-025-plan.json",
+        "sha256": "bede068603f5e8b90d14a401a2728ec68a98307798b947c48fa5079b7de6ddd1",
+        "size_bytes": 689962
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-09/frozen-packet-01/source-archives/026-CTF-09.md",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/022-026-CTF-09.md",
+        "sha256": "cb99c4eeec6604420649f960a7b2c1415d23e3a69988ab06e43a5248a8ae1e5b",
+        "size_bytes": 2765
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-09/frozen-packet-01/source-archives/027-plan.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/023-027-plan.json",
+        "sha256": "0650ecab603a0727bbeb2f8a39f7db0f898d62f52c1fa3b3b5e337caa68d61e5",
+        "size_bytes": 703551
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-09/frozen-packet-01/source-archives/028-CTF-09.md",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/024-028-CTF-09.md",
+        "sha256": "69c4bf5ccef66cd7638ee4648ff912623f6cb8679efbe51421862c058312c679",
+        "size_bytes": 5296
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/scope-amendment-01/amendment.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/025-amendment.json",
+        "sha256": "807e1969d45c31544858c71d7e47d700dc2dc9ce63ac659d0a62d0483701543f",
+        "size_bytes": 2273
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/scope-check-command-01/receipt.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/026-receipt.json",
+        "sha256": "a2720011e1adf8ca7f9017c894c608e12dad5ce7f901feae08d99b92038db954",
+        "size_bytes": 2873
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/scope-amendment-01/before/plan.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/027-plan.json",
+        "sha256": "351d2835d6edcca20146db2dd016d762a06a7aaeb505b92d89c856e99a8e81a8",
+        "size_bytes": 704568
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/scope-amendment-01/before/CTF-10.md",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/028-CTF-10.md",
+        "sha256": "35679822416c4e6be6dcd4606f6a88e21375d9eacc532fb2ac5c906581b459cd",
+        "size_bytes": 2888
+      }
+    },
+    {
+      "historical_path": "energyplus_porting_plan/plan.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/029-plan.json",
+        "sha256": "2ed82a98bdb3075d9f6ef456200e97f61129b319e08d4af300b614853a61fa56",
+        "size_bytes": 718220
+      }
+    },
+    {
+      "historical_path": "energyplus_porting_plan/cards/CTF-10.md",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/030-CTF-10.md",
+        "sha256": "2f2ca97fbac45796ec8ce18f7fe03285a9d1d1c0b81b09f79c6be45b1f3e7b16",
+        "size_bytes": 5134
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/031-Construction.cc",
+        "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+        "size_bytes": 110319
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/032-Construction.hh",
+        "sha256": "53a14b2a45860255267e6ebf780a50fc8aefc4ba30ae3df589062601a20f999a",
+        "size_bytes": 24041
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Material.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/033-Material.hh",
+        "sha256": "9f59a6937c224b6e0b50dab42d614e190696ee5bf3684b1b159907e6964f7b38",
+        "size_bytes": 43487
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Material.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/034-Material.cc",
+        "sha256": "6f5bb1801fd401971b2a6152a4f6b53748c68050cc210b7ff5e27e1d520f2a54",
+        "size_bytes": 179008
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataConversions.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/035-DataConversions.hh",
+        "sha256": "5d0064d5f44fa927fc83455a55ab7ab5b5d35f3c31a141dbda5bea0cae829a8e",
+        "size_bytes": 4666
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/036-HeatBalanceManager.cc",
+        "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+        "size_bytes": 371103
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/idd/Energy+.idd.in",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/037-Energy+.idd.in",
+        "sha256": "62c94fef08c6a90f08630c6250a9f19d9dd701f249e2ff631070511ebfba651f",
+        "size_bytes": 4504288
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/native-helper-prep-01/ctf10_unit_helper.cpp",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/038-ctf10_unit_helper.cpp",
+        "sha256": "ea6600580a3e003ba4dd776a31a64dde88eea87034acae2da56d296964685c7f",
+        "size_bytes": 18955
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_metadata.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/039-ctf01_reference_metadata.hh",
+        "sha256": "6332546299553c1c8f4d0de36676067decf6921c7e3e27ebc7bd2d6ca6f0dee9",
+        "size_bytes": 7434
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/native-helper-prep-01/ctf10_unit_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/040-ctf10_unit_fields.hh",
+        "sha256": "495f5239ec47d6cc19564b2451c6c530150b1d46a7a8dc812d49b549a5e760b6",
+        "size_bytes": 6830
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/native-helper-prep-01/ctf10_unit_admission.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/041-ctf10_unit_admission.hh",
+        "sha256": "e7a4cf9147bb771c9122c916b8dc4c3f09cb112c84dad062a7f7fbdb31869ecd",
+        "size_bytes": 20304
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/native-observer-prep-01/Construction.ctf10.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/042-Construction.ctf10.cc",
+        "sha256": "4ece7707081294d7e811e25120b21a38fc1c8cae550efe167e66b8921c02cdf9",
+        "size_bytes": 115831
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/native-observer-prep-01/ctf10_observer.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/043-ctf10_observer.hh",
+        "sha256": "69b7cc08085084c73141d67df79633fbda6184b0a3b32f35c5772b5fae70df9a",
+        "size_bytes": 34893
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/native-observer-prep-01/ctf10_observer.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/044-ctf10_observer.cc",
+        "sha256": "c72aa64f0a07ba540d402b0415789af9c588735b4215ef432179d820b6c6b63d",
+        "size_bytes": 102553
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/native-helper-prep-01/ctf10_observation_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/045-ctf10_observation_fields.hh",
+        "sha256": "352a4e7284d45ebb39bc3ff2889cb986dbd50294a5ebb59b3ed17f677b24d6f8",
+        "size_bytes": 94189
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/native-observer-prep-01/HeatBalanceManager.ctf10.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/frozen-packet-01/source-archives/046-HeatBalanceManager.ctf10.cc",
+        "sha256": "4fda4b942541f2f58bc2bdc730cc9d57e42d37e118acc41f6906f26401bc6211",
+        "size_bytes": 372939
+      }
+    }
+  ],
+  "inherited_CTF01_through_CTF09_freeze_claimed_as_fresh_CTF10_freeze": false,
+  "scientific_operands_evaluated": false,
+  "expected_arrays_or_method_outcomes_generated": false,
+  "numerical_PASS_claimed": false,
+  "canonical_files_updated": false,
+  "gates_updated": false
+}

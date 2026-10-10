@@ -1,0 +1,280 @@
+--- accepted09/input-policy-proposal.json
++++ proposed10/input-policy-proposal.json
+@@ -1,5 +1,5 @@
+ {
+-  "schema": "ctf09-retry-input-policy-source-proposal.v1",
++  "schema": "ctf10-public-storage-input-policy-source-proposal.v1",
+   "status": "SOURCE-PROPOSAL-not-frozen-not-executed",
+   "unit_lane": {
+     "inherited_input_only_request": {
+@@ -258,8 +258,8 @@
+     "admission": "request/projection/contracts/actual08 scope pair/native8/all policies/new08 intent",
+     "receipt": "actual writer/emitted refs only; no admission backref"
+   },
+-  "prospective_runtime_freeze_flag": "frozen_before_this_CTF09_helper_execution",
+-  "chronology_disclosure": "Exact CTF01 literal models and fixed15 persist. Fresh08 private policy/profiles are prospective before first08 capture; all earlier07/06/05/04/03/01 handoffs and histories keep their separate meanings. No expected values or outcomes.",
++  "prospective_runtime_freeze_flag": "frozen_before_this_CTF10_helper_execution",
++  "chronology_disclosure": "Same39/42 and15/195 literal inputs; fresh10 public six/reset policy and direct-unit/true-Init-production split are prospective before first10 capture. All09 and earlier handoffs remain separate literal history; no expected exits/answers.",
+   "pending_actual_refs": [
+     "current09 scope amendment/check",
+     "same-lane prior08 freeze and genuine recorder, if required by Root settled scope",
+@@ -449,9 +449,9 @@
+     "method_values_or_identity_or_return_or_retry_state_reconstructed": false
+   },
+   "linked_original_retention_intent": {
+-    "schema": "ctf09-debug-original-retention-intent.v1",
++    "schema": "ctf10-debug-original-retention-intent.v1",
+     "role": "prospective-debug-original",
+-    "scope": "new-CTF09-linked-originals-only",
++    "scope": "new-CTF10-linked-originals-only",
+     "actual_file_identity_required": true,
+     "both_original_and_helper_verified_before_execution": true,
+     "retain_through_PE_validation_and_current_helper_execution": true,
+@@ -857,5 +857,246 @@
+     "private_sums_unavailable_on_excessive_terms_branch": true,
+     "Native_global_diagnostics_not_equated_to_Rust_call_intents": true,
+     "full_card_or_surface_handoff_certified": false
+-  }
++  },
++  "inherited_ctf09_linked_original_retention_intent": {
++    "schema": "ctf09-debug-original-retention-intent.v1",
++    "role": "prospective-debug-original",
++    "scope": "new-CTF09-linked-originals-only",
++    "actual_file_identity_required": true,
++    "both_original_and_helper_verified_before_execution": true,
++    "retain_through_PE_validation_and_current_helper_execution": true,
++    "removal_requires_separate_Root_authorized_actual_retention_record": true,
++    "earlier_live_refs_reinterpreted": false,
++    "deletion_performed": false
++  },
++  "ctf10_public_storage_observation_policy": {
++    "schema": "ctf10-public-storage-prospective-policy.v1",
++    "status": "SOURCE-PROPOSAL-not-a-runtime-freeze",
++    "selected_scope": "actual_reached_no_source_1D_within_fixed_public_capacity",
++    "arithmetic_profiles_by_variable": [
++      {
++        "variable": "CTFOutside",
++        "atol": 0.0,
++        "rtol": 0.0,
++        "class_exact": true,
++        "shape_exact": true,
++        "signed_zero_exact": true,
++        "required_shape": [
++          19
++        ],
++        "unit": "W/m2-K"
++      },
++      {
++        "variable": "CTFCross",
++        "atol": 0.0,
++        "rtol": 0.0,
++        "class_exact": true,
++        "shape_exact": true,
++        "signed_zero_exact": true,
++        "required_shape": [
++          19
++        ],
++        "unit": "W/m2-K"
++      },
++      {
++        "variable": "CTFInside",
++        "atol": 0.0,
++        "rtol": 0.0,
++        "class_exact": true,
++        "shape_exact": true,
++        "signed_zero_exact": true,
++        "required_shape": [
++          19
++        ],
++        "unit": "W/m2-K"
++      },
++      {
++        "variable": "CTFFlux",
++        "atol": 0.0,
++        "rtol": 0.0,
++        "class_exact": true,
++        "shape_exact": true,
++        "signed_zero_exact": true,
++        "required_shape": [
++          19
++        ],
++        "unit": "dimensionless"
++      },
++      {
++        "variable": "CTFTimeStep",
++        "atol": 0.0,
++        "rtol": 0.0,
++        "class_exact": true,
++        "shape_exact": true,
++        "signed_zero_exact": true,
++        "required_shape": "scalar",
++        "unit": "hours"
++      },
++      {
++        "variable": "UValue",
++        "atol": 0.0,
++        "rtol": 0.0,
++        "class_exact": true,
++        "shape_exact": true,
++        "signed_zero_exact": true,
++        "required_shape": "scalar",
++        "unit": "W/m2-K"
++      }
++    ],
++    "reset_source_arrays": {
++      "names": [
++        "CTFSourceIn",
++        "CTFSourceOut",
++        "CTFTSourceOut",
++        "CTFTSourceIn",
++        "CTFTSourceQ",
++        "CTFTUserOut",
++        "CTFTUserIn",
++        "CTFTUserSource"
++      ],
++      "required_shape": [
++        19
++      ],
++      "required_value_bits": "0000000000000000",
++      "source_QTF_generation_certified": false
++    },
++    "exact_discrete": [
++      "original_construction_ids",
++      "declared_Construct_order",
++      "original_LayerPoint_material_ids",
++      "actual_IsUsedCTF",
++      "actual_reverse_provider_identity_and_precedence",
++      "NumCTFTerms",
++      "NumHistories",
++      "array_lengths",
++      "source_route_and_return_availability",
++      "ErrorsFound",
++      "DoCTFErrorReport",
++      "actual_Init_call_order",
++      "postreturn_aggregate_update_order",
++      "SimpleCTFOnly",
++      "MaxCTFTerms",
++      "AnyInternalHeatSourceInInput",
++      "report_call_availability",
++      "diagnostic_event_identity_and_order"
++    ],
++    "custody_obligations": [
++      "last_private_method_stamp_distinct_from_actual_caller_postcheck_stamp",
++      "current_converted_conductance_for_U_including_reverse",
++      "earlier_actual_public_owner_for_reverse_not_reconstructed_private_coefficients",
++      "all_fixed_19_slots_including_reset_tails",
++      "all_actual_declared_calls_retained_and_unreached_explicit"
++    ],
++    "public_capacity": {
++      "slot_count": 19,
++      "last_valid_index": 18,
++      "inclusive_NumCTFTerms_store_required": true,
++      "out_of_capacity_Rust_interface_unrepresentable": true,
++      "Native_capacity_guard_or_safe_store_outcome_inferred": false,
++      "clamp_or_truncation": false
++    },
++    "source_outcomes": {
++      "fatal_inside_construction_bypasses_stores_and_Init_aggregate": true,
++      "seven_hour_severe_break_does_not_bypass_stores": true,
++      "scope_stop_is_not_Native_fatal": true,
++      "unknown_unreached_or_unrepresentable_counted_as_PASS": false,
++      "nonfinite_required_numeric_PASS_claimed": false
++    },
++    "historical_profiles_modified": false,
++    "expected_values_or_exits_supplied": false,
++    "scientific_execution_performed": false,
++    "numerical_PASS_claimed": false,
++    "gates_updated": false
++  },
++  "ctf10_execution_lane_policy": {
++    "protocol": "ctf10-declared-Native-execution-lanes.v1",
++    "unit": "existing39_models42_direct_whole_Construction_calls_literal_incoming_flags",
++    "unit_whole_Init_and_reports_admitted": false,
++    "production": "fixed15_genuine13_loader_phases_then_true_whole_Init_once_if_ready",
++    "production_manual_Construction_call_loop_performed": false,
++    "production_per_call_records": "actual_original_Init_loop_checkpoint_and_retained_Capture_only",
++    "per_call_missing_return_is_unknown_not_inferred_exception": true,
++    "outer_actual_Init_invoke_owns_exception_outcome": true,
++    "manual_whole_model_per_call_before_after_snapshots_available": false,
++    "actual_Init_shared_flags_from_reached_event_and_public_snapshots_only": true,
++    "native_public_capacity_guard_or_store_safety_inferred": false,
++    "numerical_PASS_claimed": false
++  },
++  "ctf10_public_profiles": [
++    {
++      "variable": "CTFOutside",
++      "atol": 0.0,
++      "rtol": 0.0,
++      "class_exact": true,
++      "shape_exact": true,
++      "signed_zero_exact": true,
++      "required_shape": [
++        19
++      ],
++      "unit": "W/m2-K"
++    },
++    {
++      "variable": "CTFCross",
++      "atol": 0.0,
++      "rtol": 0.0,
++      "class_exact": true,
++      "shape_exact": true,
++      "signed_zero_exact": true,
++      "required_shape": [
++        19
++      ],
++      "unit": "W/m2-K"
++    },
++    {
++      "variable": "CTFInside",
++      "atol": 0.0,
++      "rtol": 0.0,
++      "class_exact": true,
++      "shape_exact": true,
++      "signed_zero_exact": true,
++      "required_shape": [
++        19
++      ],
++      "unit": "W/m2-K"
++    },
++    {
++      "variable": "CTFFlux",
++      "atol": 0.0,
++      "rtol": 0.0,
++      "class_exact": true,
++      "shape_exact": true,
++      "signed_zero_exact": true,
++      "required_shape": [
++        19
++      ],
++      "unit": "dimensionless"
++    },
++    {
++      "variable": "CTFTimeStep",
++      "atol": 0.0,
++      "rtol": 0.0,
++      "class_exact": true,
++      "shape_exact": true,
++      "signed_zero_exact": true,
++      "required_shape": "scalar",
++      "unit": "hours"
++    },
++    {
++      "variable": "UValue",
++      "atol": 0.0,
++      "rtol": 0.0,
++      "class_exact": true,
++      "shape_exact": true,
++      "signed_zero_exact": true,
++      "required_shape": "scalar",
++      "unit": "W/m2-K"
++    }
++  ],
++  "required_before_first_CTF10_observation": [
++    "actual_source_scope_and_real_CTF10_check",
++    "source_and_policy_full_Root_and_other_author_reviews",
++    "actual_fresh_input_freeze_and_recorded_execution",
++    "actual_four_TU_both_provider_PE_build_identity",
++    "both_original_and_derivative_before_execution_verified"
++  ]
+ }

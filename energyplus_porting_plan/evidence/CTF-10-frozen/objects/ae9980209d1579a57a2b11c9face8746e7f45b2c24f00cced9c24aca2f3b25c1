@@ -1,0 +1,177 @@
+"""Bind this source-only ignored proposal; no reviewed-target imports or execution."""
+from pathlib import Path
+import ast
+import difflib
+import hashlib
+import json
+import re
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+OLD = ROOT / ".runtime/porting/CTF-09/native-helper-prep-01"
+PASSIVE = ROOT / ".runtime/porting/CTF-10/native-observer-prep-01"
+NAMES = ["ctf10_observation_fields.hh", "ctf10_unit_helper.cpp", "ctf10_unit_fields.hh", "ctf10_unit_admission.hh",
+         "ctf10_production_helper.cpp", "ctf10_production_fields.hh", "ctf10_production_admission.hh", "ctf10_reference.cmake"]
+
+
+def read(path):
+    return path.read_bytes().decode("utf-8")
+
+
+def ref(path):
+    b = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(b).hexdigest(),
+            "size_bytes": len(b), "line_count": len(b.splitlines())}
+
+
+def byte_range(path, first, last, purpose):
+    b = b"".join(path.read_bytes().splitlines(keepends=True)[first - 1:last])
+    return {"path": path.relative_to(ROOT).as_posix(), "first_line": first, "last_line": last,
+            "sha256": hashlib.sha256(b).hexdigest(), "size_bytes": len(b), "purpose": purpose}
+
+
+def names_only(text):
+    text = text.replace("CTF09Observation", "CTF10Observation")
+    for name in NAMES:
+        text = text.replace(name.replace("ctf10", "ctf09"), name)
+    for name in ["CTF09_OBSERVATION_FIELDS_HH", "CTF09_UNIT_FIELDS_HH", "CTF09_UNIT_ADMISSION_HH",
+                 "CTF09_PRODUCTION_FIELDS_HH", "CTF09_PRODUCTION_ADMISSION_HH"]:
+        text = text.replace(name, name.replace("CTF09", "CTF10"))
+    return text.replace("ctf09_observer.hh", "ctf10_observer.hh").replace("ctf09_observer.cc", "ctf10_observer.cc").replace("Construction.ctf09.cc", "Construction.ctf10.cc")
+
+
+def section(text, start, end):
+    return text[text.index(start):text.index(end, text.index(start))]
+
+
+def verify_descriptor(value):
+    if isinstance(value, dict):
+        if {"path", "sha256", "size_bytes"} <= value.keys():
+            path = ROOT / value["path"]
+            data = path.read_bytes()
+            if "first_line" in value:
+                data = b"".join(data.splitlines(keepends=True)[value["first_line"] - 1:value["last_line"]])
+            assert hashlib.sha256(data).hexdigest() == value["sha256"], value
+            assert len(data) == value["size_bytes"], value
+            if "line_count" in value:
+                assert len(data.splitlines()) == value["line_count"], value
+        for item in value.values():
+            verify_descriptor(item)
+    elif isinstance(value, list):
+        for item in value:
+            verify_descriptor(item)
+
+
+def main():
+    assert not (OUT / "manifest.json").exists(), "Immutable hold already exists"
+    old_manifest = json.loads(read(OLD / "manifest.json"))
+    passive_manifest = json.loads(read(PASSIVE / "manifest.json"))
+    for name in ["manifest.json", "README.md"]:
+        (OUT / "before" / name).write_bytes((OLD / name).read_bytes())
+    sources = []
+    for name in NAMES:
+        source, before = OUT / name, OUT / "before" / name.replace("ctf10", "ctf09")
+        assert before.read_bytes() == (OLD / before.name).read_bytes()
+        expected = "".join(difflib.unified_diff(read(before).splitlines(True), read(source).splitlines(True),
+            fromfile="accepted09/" + before.name, tofile="proposed10/" + name))
+        delta = OUT / (name + ".from-ctf09.diff")
+        assert read(delta) == expected
+        sources.append({"source": ref(source), "accepted09_source": ref(OLD / before.name),
+                        "before_archive": ref(before), "exact_diff": ref(delta)})
+    policy_path = ROOT / ".runtime/porting/CTF-10/readiness-audit-01/profiles.proposed.json"
+    policy = json.loads(read(policy_path))
+    shared = read(OUT / NAMES[0])
+    old_shared = names_only(read(OLD / "ctf09_observation_fields.hh"))
+    closing = "} // namespace Ctf01\n#endif\n"
+    assert shared[:shared.index("// New public storage")] + closing == old_shared
+    actual_policy = json.loads(re.search(r'R"CTF10_POLICY\((.*?)\)CTF10_POLICY"', shared, re.S).group(1))
+    assert actual_policy == policy
+    execution_body = section(shared, "inline json ctf10_execution_policy()", "inline json ctf10_linked_original_retention_intent()")
+    execution = {}
+    for key, raw in re.findall(r'\{"([^"\n]+)", ("[^"\n]*"|true|false)\}', execution_body):
+        execution[key] = json.loads(raw)
+    proposals = []
+    for name in ["input-policy-proposal.json", "projection-policy-proposal.json"]:
+        old, fresh = json.loads(read(OLD / name)), json.loads(read(OUT / name))
+        assert fresh["ctf10_public_storage_observation_policy"] == policy
+        assert fresh["ctf10_public_profiles"] == policy["arithmetic_profiles_by_variable"]
+        assert fresh["ctf10_execution_lane_policy"] == execution
+        changed = {"schema", "linked_original_retention_intent", "prospective_runtime_freeze_flag", "chronology_disclosure"}
+        for key, value in old.items():
+            if key not in changed:
+                assert fresh[key] == value, key
+        assert fresh["inherited_ctf09_linked_original_retention_intent"] == old["linked_original_retention_intent"]
+        assert read(OUT / "before" / name) == read(OLD / name)
+        delta = OUT / (name + ".from-ctf09.diff")
+        expected = "".join(difflib.unified_diff(read(OLD / name).splitlines(True), read(OUT / name).splitlines(True),
+            fromfile="accepted09/" + name, tofile="proposed10/" + name))
+        assert read(delta) == expected
+        proposals.append({"proposal": ref(OUT / name), "before_archive": ref(OUT / "before" / name),
+                          "accepted09_proposal": ref(OLD / name), "exact_diff": ref(delta)})
+    old_unit, unit = read(OLD / "ctf09_unit_helper.cpp"), read(OUT / "ctf10_unit_helper.cpp")
+    old_prod, prod = read(OLD / "ctf09_production_helper.cpp"), read(OUT / "ctf10_production_helper.cpp")
+    assert section(old_unit, "json seed_members", "json model_case") == section(unit, "json seed_members", "json model_case")
+    loader_start = '    factory.phase(lifecycle, "InputProcessor::processInput"'
+    loader_end = '    // '
+    old_loader = section(old_prod, loader_start, "    // The loader-owned array")
+    new_loader = section(prod, loader_start, "    // Genuine whole Init")
+    assert old_loader == new_loader
+    assert prod.count("EnergyPlus::HeatBalanceManager::InitConductionTransferFunctions(*factory.state);") == 1
+    assert "construction.calculateTransferFunction" not in prod
+    assert unit.count("construction.calculateTransferFunction") == 1
+    assert "InitConductionTransferFunctions(" not in unit
+    assert read(OUT / "ctf10_production_fields.hh").endswith(read(OUT / "init_serialization_additions.txt") + closing)
+    native_by_lane = {}
+    for lane in ["unit", "production"]:
+        native_by_lane[lane] = [ref(OUT / ("ctf10_" + lane + "_helper.cpp")),
+            ref(ROOT / ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_metadata.hh"),
+            ref(OUT / ("ctf10_" + lane + "_fields.hh")), ref(OUT / ("ctf10_" + lane + "_admission.hh")),
+            ref(PASSIVE / "Construction.ctf10.cc"), ref(PASSIVE / "ctf10_observer.hh"),
+            ref(PASSIVE / "ctf10_observer.cc"), ref(OUT / "ctf10_observation_fields.hh"), ref(PASSIVE / "HeatBalanceManager.ctf10.cc")]
+        assert len({r["path"].split("/")[-1] for r in native_by_lane[lane]}) == 9
+    ranges = [byte_range(PASSIVE / "ctf10_observer.hh", 529, 577, "actual public snapshot/site/failure owners"),
+              byte_range(PASSIVE / "ctf10_observer.hh", 724, 861, "actual public callback/Init event, ledger, Binding APIs"),
+              byte_range(ROOT / ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.hh", 175, 182, "real whole Init public declaration")]
+    ast.parse(read(Path(__file__)))
+    ast.parse(read(OUT / "prepare_sources.py"))
+    manifest = {"schema": "ctf10-native-helper-source-preparation.v1", "status": "SOURCE-READY-HELD-NOT-EXECUTED",
+        "own_sources": sources, "source_policy_proposals": proposals, "README": ref(OUT / "README.md"),
+        "preparation_sources": [ref(OUT / "prepare_sources.py"), ref(Path(__file__))],
+        "literal_additions": [ref(OUT / name) for name in ["public_serialization_additions.txt", "init_serialization_additions.txt", "production_actual_Init_block.txt"]],
+        "accepted09_helper_manifest": ref(OLD / "manifest.json"), "before_manifest": ref(OUT / "before" / "manifest.json"),
+        "before_README": ref(OUT / "before" / "README.md"), "accepted10_passive_manifest": ref(PASSIVE / "manifest.json"),
+        "accepted_design_manifest": ref(ROOT / ".runtime/porting/CTF-10/native-observation-design-prep-01/manifest.json"),
+        "prospective_policy_authority": ref(policy_path), "native_source_files_by_lane": native_by_lane,
+        "source_inventory": passive_manifest["source_inventory"], "additional_API_ranges": ranges,
+        "runtime_interfaces": {"helper_argc": 5, "unit_result_schema": "ctf10-helper-results.v1",
+            "production_result_schema": "ctf10-production-helper-results.v1", "unit_models": 39, "unit_direct_operations": 42,
+            "fixed_production_models": 15, "production_loader_phases_per_model": 13, "input_guards": 45,
+            "native_source_files_per_lane": 9, "new_translation_units_per_lane": 4,
+            "unit_whole_Init_invoked": False, "production_manual_Construction_loop_performed": False,
+            "production_whole_Init_once_if_loaders_ready": True, "public_protocol": "ctf10-actual-public-storage-observation.v1",
+            "Init_protocol": "ctf10-actual-whole-Init-observation.v1", "compact_complete_JSON": True,
+            "production_operation_before_after": None, "production_operation_count_source": "actual_retained_original_Init_call_records",
+            "production_CTF_invocation_counter_source": "actual_original_Init_construction_checkpoint_counter",
+            "production_unreturned_call_outcome": "source_return_not_observed", "per_call_fatal_or_exception_inferred": False,
+            "outer_Init_Invoke_exception_authority": True, "actual_Init_shared_flags_authority": "reached_Init_events_and_public_snapshots",
+            "full_owner_after_Init_shared_flags": None, "observer_integrity_failure_exit": 2,
+            "required_actual_build_map_providers": ["derived_Construction_text", "derived_HeatBalanceManager_text"],
+            "required_absent_original_archive_providers": ["Construction.cc.obj", "HeatBalanceManager.cc.obj"]},
+        "source_correspondence": {"old09_shared_serializer_prefix_exact_after_names_only": True,
+            "unit_seed_members_body_byte_exact09": True, "production_13_loader_region_byte_exact09": True,
+            "all_old_policy_members_except_declared_schema_intent_chronology_unchanged": True,
+            "new_policy_literal_equals_readiness_authority": True, "new_policy_literal_profiles_and_lane_protocol_equal_both_proposals": True,
+            "source8_policy2_diffs_regenerated": True},
+        "authorship": {"Raw": "new10 passive/transport and portions of earlier pure/caller/driver code",
+            "independent_formula_certificate_claimed": False, "Root_and_other_author_full_source_review_required_before_execution": True},
+        "future_actual_refs": {"current10_scope": None, "current10_check": None, "freeze": None, "build": None,
+            "strict_PE": None, "Original_execution": None, "OriginalDataQA": None, "comparison": None},
+        "canonical_changed": False, "target_import_or_execution_performed": False, "scientific_weather_or_binary_payloads_read": False,
+        "new_QA_or_execution_framework": False, "numerical_PASS_claimed": False, "CTF10_completion_claimed": False}
+    verify_descriptor(manifest)
+    (OUT / "manifest.json").write_bytes((json.dumps(manifest, indent=2) + "\n").encode("utf-8"))
+    print(json.dumps(ref(OUT / "manifest.json")))
+
+
+if __name__ == "__main__":
+    main()

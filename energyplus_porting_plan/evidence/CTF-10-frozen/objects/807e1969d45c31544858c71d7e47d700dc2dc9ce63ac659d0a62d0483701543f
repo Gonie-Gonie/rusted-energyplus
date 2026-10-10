@@ -1,0 +1,66 @@
+{
+  "schema": "ctf10-source-scope-amendment.v1",
+  "draft_only_not_actual_scope_receipt": false,
+  "created_utc": "2026-10-10T23:10:23.753681+00:00",
+  "cards": [
+    "CTF-10"
+  ],
+  "scope_review_passed": true,
+  "all_other_gates_pending": true,
+  "strict_profiles_settled_before_outputs": true,
+  "actual_CTF10_build_or_engine_execution_performed": false,
+  "native_observer": {
+    "path": ".runtime/porting/CTF-10/native-helper-prep-01/manifest.json",
+    "sha256": "1aca57d1c46b6d1a0e756deb61328413a071abc74f4bc9e241f35915a2b20b63",
+    "size_bytes": 37974
+  },
+  "passive_observer": {
+    "path": ".runtime/porting/CTF-10/native-observer-prep-01/manifest.json",
+    "sha256": "a2765a61087045ecb400f260740216bcc6b0330e91975a0168eeead09bb7645d",
+    "size_bytes": 22328
+  },
+  "public_storage_policy_source_inventory": {
+    "path": ".runtime/porting/CTF-10/native-helper-prep-01/projection-policy-proposal.json",
+    "sha256": "fb7f4677722703d8083e98311242dc59c787bc08a958f46d4f38f742599c02f1",
+    "size_bytes": 46954,
+    "line_count": 1550
+  },
+  "requested_counts": {
+    "unit": {
+      "model_cases": 39,
+      "calculateTransferFunction": 42
+    },
+    "production": {
+      "model_cases": 15,
+      "loader_phase_records": 195
+    }
+  },
+  "before_documents": [
+    {
+      "path": ".runtime/porting/CTF-10/scope-amendment-01/before/plan.json",
+      "sha256": "351d2835d6edcca20146db2dd016d762a06a7aaeb505b92d89c856e99a8e81a8",
+      "size_bytes": 704568
+    },
+    {
+      "path": ".runtime/porting/CTF-10/scope-amendment-01/before/CTF-10.md",
+      "sha256": "35679822416c4e6be6dcd4606f6a88e21375d9eacc532fb2ac5c906581b459cd",
+      "size_bytes": 2888
+    }
+  ],
+  "after_documents": [
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "2ed82a98bdb3075d9f6ef456200e97f61129b319e08d4af300b614853a61fa56",
+      "size_bytes": 718220
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CTF-10.md",
+      "sha256": "2f2ca97fbac45796ec8ce18f7fe03285a9d1d1c0b81b09f79c6be45b1f3e7b16",
+      "size_bytes": 5134
+    }
+  ],
+  "recorder_role": "real-CTF-10-check-only",
+  "scope_only_no_numerical_PASS": true,
+  "actual_doc_and_check_refs_supplied_by_Root_later": false,
+  "historical_prior_09_authority_must_remain_archive_only": true
+}

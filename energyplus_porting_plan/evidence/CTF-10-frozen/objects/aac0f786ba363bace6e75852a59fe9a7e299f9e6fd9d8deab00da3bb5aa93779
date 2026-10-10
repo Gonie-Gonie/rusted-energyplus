@@ -1,0 +1,48 @@
+{
+  "schema": "ctf10-ordered-public-init-prospective-scope.v1",
+  "status": "SOURCE-PROPOSAL-not-actual-amendment-or-freeze",
+  "card": "CTF-10",
+  "selected_scope": "actual_no_source_1D_reached_public_storage_within_fixed19_capacity_and_ordered_selected_Init_prefix",
+  "input_lanes_to_freeze_before_outputs": {
+    "unit": "existing39_explicit_member_models42_declared_direct_whole_calls_public_storage_only_not_genuine_loader_or_Init_report_claim",
+    "production": "fixed_CON15_same45_guards_real_public_loader_use_timestep_then_genuine_whole_InitConductionTransferFunctions_once"
+  },
+  "source_ranges": {
+    "Construction_reset_unused_used_timestep": [146, 194],
+    "Construction_loading_error_return": [309, 315],
+    "Construction_original_ID_reverse_provider_and_copy": [405, 485],
+    "Construction_retry_terminal_boundary": [875, 981],
+    "Construction_all_resistive_and_common_public_stores": [985, 1077],
+    "HeatBalanceManager_whole_Init": [6153, 6202],
+    "DataHeatBalance_incoming_global_defaults": [1863, 1875],
+    "General_whole_ScanForReports": [1130, 1469],
+    "UtilityRoutines_whole_ShowFatalError": [759, 794]
+  },
+  "profiles_authority": "byte-exact readiness-audit-01/profiles.proposed.json separate from all older frozen profiles",
+  "numeric_variables": ["CTFOutside", "CTFCross", "CTFInside", "CTFFlux", "CTFTimeStep", "UValue"],
+  "numeric_policy": {"atol": 0.0, "rtol": 0.0, "class_exact": true, "shape_exact": true, "signed_zero_exact": true},
+  "public_shape": {"slot_count": 19, "selected_arrays": 12, "all_slots_retained": true},
+  "discrete_exact": [
+    "actual_original_Construction_ID_and_declared_index", "actual_original_LayerPoint_IDs", "actual_IsUsedCTF",
+    "actual_first_reverse_provider_ID_address_index", "NumCTFTerms", "NumHistories",
+    "shared_ErrorsFound_and_DoCTFErrorReport_per_reached_call", "actual_call_return_aggregate_report_fatal_availability",
+    "actual_incoming_and_postreturn_SimpleCTFOnly_MaxCTFTerms", "actual_AnyInternalHeatSourceInInput_read"
+  ],
+  "representation_boundary": {
+    "within_capacity_inclusive_terms": [0, 18],
+    "Rust_PublicCapacity_is_not_Native_guard_or_outcome": true,
+    "out_of_capacity_Native_outcome_remains_actual_unknown_until_observed": true,
+    "clamp_truncate_or_manufacture_Native_fixture": false
+  },
+  "remaining_integration": [
+    "genuine Native whole Init and reverse/public instrumentation independent source review",
+    "actual public postreturn observation and pre-output freeze/build/QA/comparison",
+    "selected surface adapter and generated cache invalidation plus real timestep/history metadata",
+    "actual report and final fatal backend custody without pretending Rust selected prefix is whole Init"
+  ],
+  "old_profiles_modified": false,
+  "future_runtime_refs_guessed": false,
+  "Native_expected_values_or_outcomes_supplied": false,
+  "gates_updated": false,
+  "numerical_PASS_claimed": false
+}

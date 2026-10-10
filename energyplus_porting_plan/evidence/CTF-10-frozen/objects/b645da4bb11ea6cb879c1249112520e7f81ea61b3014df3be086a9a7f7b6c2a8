@@ -1,0 +1,53 @@
+--- accepted10-02/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
++++ rebased10-03/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
+@@ -3,6 +3,7 @@
+ use super::ctf_all_resistive::{
+     ConstructionCtfAllResistive, CtfAllResistiveUnavailable, generate_all_resistive_ctf,
+ };
++use super::ctf_caller_stability::{CtfCallerDiagnosticNames, CtfCallerSharedFlags};
+ use super::ctf_layer_preprocessing::{
+     ConstructionCtfLayerPreprocessing, CtfLayerContext, material_layer_inputs,
+     preprocess_ctf_layers,
+@@ -22,9 +23,9 @@
+     ConstructionCtfInitialDiscretization, initialize_construction_ctf_initial,
+ };
+ use crate::heat_balance::ctf_retry_initialization::{
+-    ConstructionCtfRetryInitialization, initialize_construction_ctf_retry, skip_construction_ctf_retry,
++    ConstructionCtfRetryInitialization, initialize_construction_ctf_retry,
++    skip_construction_ctf_retry,
+ };
+-use super::ctf_caller_stability::{CtfCallerDiagnosticNames, CtfCallerSharedFlags};
+ use crate::heat_balance::id_slot_index::TypedIdSlotIndex;
+ use ep_model::{
+     Construction, ConstructionId, Material, MaterialId, MaterialSurfaceRoughness,
+@@ -119,7 +120,10 @@
+             .iter()
+             .map(|surface| surface.construction.0)
+             .collect::<BTreeSet<_>>();
+-        let mut shared_flags = CtfCallerSharedFlags { errors_found: false, do_ctf_error_report: false };
++        let mut shared_flags = CtfCallerSharedFlags {
++            errors_found: false,
++            do_ctf_error_report: false,
++        };
+         let mut selected_chain_stop = None;
+         // Fresh ordinary state uses DataHeatBalance.hh SimpleCTFOnly=true/MaxCTFTerms=0.
+         // This is a selected public/aggregate prefix, not report/fatal completion.
+@@ -154,10 +158,15 @@
+                 }
+             }
+             let original_materials = layer_materials(
+-                model, &material_slots, construction, &entry.material_layer_stack,
++                model,
++                &material_slots,
++                construction,
++                &entry.material_layer_stack,
+             )?;
+-            let original_layer_names = original_materials.iter()
+-                .map(|material| material.name.0.as_str()).collect::<Vec<_>>();
++            let original_layer_names = original_materials
++                .iter()
++                .map(|material| material.name.0.as_str())
++                .collect::<Vec<_>>();
+             let names = CtfCallerDiagnosticNames {
+                 construction_name: construction.name.0.as_str(),
+                 original_tot_layers: original_layer_names.len() as i32,

@@ -1,0 +1,72 @@
+--- actual09-final04/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
++++ proposed10/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
+@@ -10,6 +10,7 @@
+ };
+ use super::{ConstructionCacheInvalidationToken, ConstructionThermalData};
+ use crate::RuntimeError;
++use crate::heat_balance::ctf_public_initialization::OrderedCtfPublicInitialization;
+ use crate::heat_balance::ctf::ConstructionCtfCoefficientOverride;
+ use crate::heat_balance::ctf_first_assembly_owner::{
+     ConstructionCtfFirstAssembly, initialize_construction_ctf_first_assembly,
+@@ -67,6 +68,7 @@
+     first_gammas: Vec<ConstructionCtfFirstGammas>,
+     first_private_coefficients: Vec<ConstructionCtfFirstFinalCoefficients>,
+     retry_initializations: Vec<ConstructionCtfRetryInitialization>,
++    public_initialization: Option<OrderedCtfPublicInitialization>,
+     construction_slots: TypedIdSlotIndex,
+     entry_index_by_construction_slot: Vec<Option<usize>>,
+     pub(crate) no_mass_construction_ids: Vec<ConstructionId>,
+@@ -123,8 +125,13 @@
+             do_ctf_error_report: false,
+         };
+         let mut selected_chain_stop = None;
++        // Fresh ordinary state uses DataHeatBalance.hh SimpleCTFOnly=true/MaxCTFTerms=0.
++        // This is a selected public/aggregate prefix, not report/fatal completion.
++        let mut public_initialization = OrderedCtfPublicInitialization::begin(true, 0);
+         for (construction_index, construction) in model.constructions.iter().enumerate() {
+             if !construction.is_ordinary_opaque() {
++                public_initialization.record_excluded(construction_index, construction,
++                    used_ctf_constructions.contains(&construction.id.0));
+                 continue;
+             }
+             let context = CtfLayerContext {
+@@ -186,6 +193,11 @@
+             };
+             shared_flags = retry.flags_on_return;
+             selected_chain_stop = retry.selected_chain_stop;
++            // Borrow the real09 return before moving it. No preprocessor/method replay.
++            public_initialization.record_ordinary(construction_index, construction,
++                &entry.ctf01_layer_preprocessing, initial_discretizations.last()
++                    .filter(|owner| owner.construction_id == construction.id),
++                &entry.ctf02_coefficients, &retry);
+             retry_initializations.push(retry);
+             if entry.heat_capacity_j_per_m2_k.is_some() {
+                 massive_ctf_construction_ids.push(entry.construction_id);
+@@ -203,6 +215,7 @@
+             entries.push(entry);
+         }
+ 
++        public_initialization.finish_declared_loop(model.constructions.len());
+         validate_surface_construction_families(model, &construction_slots)?;
+ 
+         let coefficient_cache_hash = construction_cache_hash(&entries);
+@@ -215,6 +228,7 @@
+             first_gammas,
+             first_private_coefficients,
+             retry_initializations,
++            public_initialization: Some(public_initialization),
+             construction_slots,
+             entry_index_by_construction_slot,
+             no_mass_construction_ids,
+@@ -265,6 +279,11 @@
+     /// Move actual selected storage into the final state without cloning a Box.
+     pub(crate) fn take_retry_initializations(&mut self) -> Vec<ConstructionCtfRetryInitialization> {
+         std::mem::take(&mut self.retry_initializations)
++    }
++
++    /// Move the actual new public/aggregate prefix; legacy surface/cache behavior is separate.
++    pub(crate) fn take_public_initialization(&mut self) -> Option<OrderedCtfPublicInitialization> {
++        self.public_initialization.take()
+     }
+ 
+     pub(crate) fn len(&self) -> usize {

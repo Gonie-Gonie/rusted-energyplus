@@ -1,0 +1,196 @@
+--- /dev/null
++++ crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs
+@@ -0,0 +1,193 @@
++//! Construction.cc 146-161,460-475,1024-1077: no-source public storage only.
++
++use super::ctf_all_resistive::{CtfAllResistiveCoefficients, CTF_COEFFICIENT_SLOTS};
++use super::ctf_final_coefficients::CtfFinalCoefficients;
++use super::ctf_layer_preprocessing::CFU;
++use super::ctf_state_space_assembly::{CtfAssemblyContext, CtfAssemblyRoute};
++
++/// Fixed public arrays, including their untouched reset tails and source arrays.
++/// Availability, source-return outcome, construction identity and Init state are
++/// separate caller owners; this storage alone proves none of those facts.
++#[derive(Clone, Debug, PartialEq)]
++pub struct CtfPublicCoefficientStorage {
++    /// Source CTFOutside, including the current-time coefficient at index zero.
++    pub outside: [f64; CTF_COEFFICIENT_SLOTS],
++    /// Source CTFCross in the same fixed public index order.
++    pub cross: [f64; CTF_COEFFICIENT_SLOTS],
++    /// Source CTFInside, with source unary-negation order retained.
++    pub inside: [f64; CTF_COEFFICIENT_SLOTS],
++    /// Source CTFFlux; index zero remains the actual reset positive zero.
++    pub flux: [f64; CTF_COEFFICIENT_SLOTS],
++    /// Source CTFSourceIn; reset-only under this no-source scope.
++    pub source_in: [f64; CTF_COEFFICIENT_SLOTS],
++    /// Source CTFSourceOut; reset-only under this no-source scope.
++    pub source_out: [f64; CTF_COEFFICIENT_SLOTS],
++    /// Source CTFTSourceOut; reset-only under this no-source scope.
++    pub temperature_source_out: [f64; CTF_COEFFICIENT_SLOTS],
++    /// Source CTFTSourceIn; reset-only under this no-source scope.
++    pub temperature_source_in: [f64; CTF_COEFFICIENT_SLOTS],
++    /// Source CTFTSourceQ; reset-only under this no-source scope.
++    pub temperature_source_q: [f64; CTF_COEFFICIENT_SLOTS],
++    /// Source CTFTUserOut; reset-only under this no-source scope.
++    pub temperature_user_out: [f64; CTF_COEFFICIENT_SLOTS],
++    /// Source CTFTUserIn; reset-only under this no-source scope.
++    pub temperature_user_in: [f64; CTF_COEFFICIENT_SLOTS],
++    /// Source CTFTUserSource; reset-only under this no-source scope.
++    pub temperature_user_source: [f64; CTF_COEFFICIENT_SLOTS],
++    /// Actual construction member after caller checks or reverse reuse.
++    pub ctf_time_step: f64,
++    /// Actual caller/reused count, not recomputed from the timestep.
++    pub num_histories: i32,
++    /// Actual source count; the current coefficient at index zero is excluded.
++    pub num_ctf_terms: i32,
++    /// Current actual conductance times the source CFU, including on reverse reuse.
++    pub u_value: f64,
++}
++
++impl CtfPublicCoefficientStorage {
++    /// Actual positive-zero reset contents; not a generated or available outcome.
++    #[must_use]
++    pub fn reset() -> Self {
++        Self {
++            outside: [0.0; CTF_COEFFICIENT_SLOTS],
++            cross: [0.0; CTF_COEFFICIENT_SLOTS],
++            inside: [0.0; CTF_COEFFICIENT_SLOTS],
++            flux: [0.0; CTF_COEFFICIENT_SLOTS],
++            source_in: [0.0; CTF_COEFFICIENT_SLOTS],
++            source_out: [0.0; CTF_COEFFICIENT_SLOTS],
++            temperature_source_out: [0.0; CTF_COEFFICIENT_SLOTS],
++            temperature_source_in: [0.0; CTF_COEFFICIENT_SLOTS],
++            temperature_source_q: [0.0; CTF_COEFFICIENT_SLOTS],
++            temperature_user_out: [0.0; CTF_COEFFICIENT_SLOTS],
++            temperature_user_in: [0.0; CTF_COEFFICIENT_SLOTS],
++            temperature_user_source: [0.0; CTF_COEFFICIENT_SLOTS],
++            ctf_time_step: 0.0,
++            num_histories: 0,
++            num_ctf_terms: 0,
++            u_value: 0.0,
++        }
++    }
++}
++
++/// Rust representability/scope errors, never reconstructed Native outcomes.
++#[derive(Clone, Copy, Debug, Eq, PartialEq)]
++pub enum CtfPublicStorageUnavailable {
++    /// The selected no-source one-dimensional source route is not represented.
++    UnsupportedScope,
++    /// Private and postcheck stamps have different original identity/visit/caller.
++    ContextAssociation,
++    /// A negative history count cannot index this within-capacity interface.
++    HistoryTermCount(i32),
++    /// Inclusive stores would exceed the fixed public array's index18.
++    PublicCapacity(i32),
++    /// Borrowed private history owners do not have their declared full shapes.
++    PrivateHistoryShape,
++    /// The existing usize all-resistive metadata does not fit Native's i32 owner.
++    CountRepresentation,
++}
++
++fn within_public_capacity(terms: i32) -> Result<usize, CtfPublicStorageUnavailable> {
++    let count = usize::try_from(terms)
++        .map_err(|_| CtfPublicStorageUnavailable::HistoryTermCount(terms))?;
++    if count >= CTF_COEFFICIENT_SLOTS {
++        return Err(CtfPublicStorageUnavailable::PublicCapacity(terms));
++    }
++    Ok(count)
++}
++
++/// Literal common stores from an actual last private owner and actual postcheck
++/// stamp. The caller must establish reached stores; fatal/scope-stop/unreached
++/// paths must not call this function. Severe break is not an exclusion.
++/// No dt/history equivalence, finite-value, R, or stability guard is imposed.
++pub fn store_selected_massive_public_coefficients(
++    private: &CtfFinalCoefficients,
++    postcheck: CtfAssemblyContext,
++    current_conductance: f64,
++) -> Result<CtfPublicCoefficientStorage, CtfPublicStorageUnavailable> {
++    use CtfPublicStorageUnavailable as Error;
++    let method = private.context;
++    for context in [method, postcheck] {
++        if context.route != CtfAssemblyRoute::Assemble || context.source_sink_present
++            || context.solution_dimensions != 1 || context.node_source != 0
++            || context.node_user_temp != 0 || context.attempt_ordinal == 0
++        {
++            return Err(Error::UnsupportedScope);
++        }
++    }
++    if method.construction_id != postcheck.construction_id
++        || method.attempt_ordinal != postcheck.attempt_ordinal
++        || method.time_step_zone.to_bits() != postcheck.time_step_zone.to_bits()
++    {
++        return Err(Error::ContextAssociation);
++    }
++    let terms = within_public_capacity(private.num_ctf_terms)?;
++    let size = usize::try_from(private.rcmax).map_err(|_| Error::PrivateHistoryShape)?;
++    if size == 0 || terms > size || size.checked_mul(12) != Some(private.s.len())
++        || private.e.len() != size
++    {
++        return Err(Error::PrivateHistoryShape);
++    }
++    let mut storage = CtfPublicCoefficientStorage::reset();
++    storage.ctf_time_step = postcheck.ctf_time_step;
++    storage.num_histories = postcheck.num_histories;
++    storage.num_ctf_terms = private.num_ctf_terms;
++    storage.outside[0] = private.s0[0] * CFU;
++    storage.cross[0] = private.s0[1] * CFU;
++    storage.inside[0] = -private.s0[5] * CFU;
++    for history in 1..=terms {
++        storage.outside[history] = private.s[history - 1] * CFU;
++        storage.cross[history] = private.s[size + history - 1] * CFU;
++        storage.inside[history] = -private.s[5 * size + history - 1] * CFU;
++        storage.flux[history] = -private.e[history - 1];
++    }
++    storage.u_value = current_conductance * CFU;
++    Ok(storage)
++}
++
++/// Copy the genuine CTF02 public owner without reevaluating all-resistive math.
++pub fn copy_all_resistive_public_coefficients(
++    actual: &CtfAllResistiveCoefficients,
++) -> Result<CtfPublicCoefficientStorage, CtfPublicStorageUnavailable> {
++    use CtfPublicStorageUnavailable as Error;
++    let terms = i32::try_from(actual.num_ctf_terms).map_err(|_| Error::CountRepresentation)?;
++    within_public_capacity(terms)?;
++    let histories = i32::try_from(actual.num_histories).map_err(|_| Error::CountRepresentation)?;
++    let mut storage = CtfPublicCoefficientStorage::reset();
++    storage.outside = actual.outside;
++    storage.cross = actual.cross;
++    storage.inside = actual.inside;
++    storage.flux = actual.flux;
++    storage.ctf_time_step = actual.ctf_time_step;
++    storage.num_histories = histories;
++    storage.num_ctf_terms = terms;
++    storage.u_value = actual.u_value;
++    Ok(storage)
++}
++
++/// Literal reverse copy from the actual earlier public owner. This does not
++/// select a provider or infer prior success; original IDs/use/order are caller
++/// obligations. Current conductance supplies UValue independently of prior U.
++pub fn copy_reversed_public_coefficients(
++    earlier: &CtfPublicCoefficientStorage,
++    current_conductance: f64,
++) -> Result<CtfPublicCoefficientStorage, CtfPublicStorageUnavailable> {
++    let terms = within_public_capacity(earlier.num_ctf_terms)?;
++    let mut storage = CtfPublicCoefficientStorage::reset();
++    storage.ctf_time_step = earlier.ctf_time_step;
++    storage.num_histories = earlier.num_histories;
++    storage.num_ctf_terms = earlier.num_ctf_terms;
++    for history in 0..=terms {
++        storage.inside[history] = earlier.outside[history];
++        storage.cross[history] = earlier.cross[history];
++        storage.outside[history] = earlier.inside[history];
++        if history != 0 {
++            storage.flux[history] = earlier.flux[history];
++        }
++    }
++    storage.u_value = current_conductance * CFU;
++    Ok(storage)
++}
++
++#[cfg(test)]
++#[path = "ctf_public_storage_tests.rs"]
++mod tests;

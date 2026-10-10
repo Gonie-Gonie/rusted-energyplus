@@ -1,0 +1,18 @@
+[
+  [
+    "void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &ErrorsFound, bool &DoCTFErrorReport)\n{\n",
+    "    CTF10Observation::PublicFunctionScope ctf10_public_scope(state, *this, ErrorsFound, DoCTFErrorReport);\n"
+  ],
+  [
+    "    this->UValue = 0.0;\n",
+    "    CTF10Observation::public_reset(state, *this, ErrorsFound, DoCTFErrorReport);\n"
+  ],
+  [
+    "                if (RevConst) { // Current construction is a reverse of\n",
+    "                    CTF10Observation::public_reverse_entry(state, *this, otherConstruction, ErrorsFound, DoCTFErrorReport);\n"
+  ],
+  [
+    "                    } // ... end of CTF history terms loop.\n",
+    "                    CTF10Observation::public_reverse_completed(state, *this, otherConstruction, ErrorsFound, DoCTFErrorReport);\n"
+  ]
+]

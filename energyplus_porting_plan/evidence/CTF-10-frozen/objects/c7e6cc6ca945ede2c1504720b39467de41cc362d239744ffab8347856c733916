@@ -1,0 +1,318 @@
+--- before/Construction.ctf09.cc
++++ Construction.ctf10.cc
+@@ -53,12 +53,13 @@
+ #include <EnergyPlus/Material.hh>
+ #include <EnergyPlus/OutputReportPredefined.hh>
+ #include <EnergyPlus/UtilityRoutines.hh>
+-#include "ctf09_observer.hh"
++#include "ctf10_observer.hh"
+ 
+ namespace EnergyPlus::Construction {
+ 
+ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &ErrorsFound, bool &DoCTFErrorReport)
+ {
++    CTF10Observation::PublicFunctionScope ctf10_public_scope(state, *this, ErrorsFound, DoCTFErrorReport);
+ 
+     // SUBROUTINE INFORMATION:
+     //       AUTHOR         Russ Taylor
+@@ -160,6 +161,7 @@
+     this->NumHistories = 0;
+     this->NumCTFTerms = 0;
+     this->UValue = 0.0;
++    CTF10Observation::public_reset(state, *this, ErrorsFound, DoCTFErrorReport);
+ 
+     if (!this->IsUsedCTF) {
+         return;
+@@ -308,7 +310,7 @@
+             }
+         } // ... end of resistive layer determination IF-THEN block.
+     } // ... end of layer loop.
+-    EnergyPlus::CTF09Observation::post_load(state, *this, ErrorsFound, DoCTFErrorReport,
++    EnergyPlus::CTF10Observation::post_load(state, *this, ErrorsFound, DoCTFErrorReport,
+         LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer);
+ 
+     // If errors have been found, just return
+@@ -373,7 +375,7 @@
+             }
+         }
+     }
+-    EnergyPlus::CTF09Observation::post_merge(state, *this, ErrorsFound, DoCTFErrorReport,
++    EnergyPlus::CTF10Observation::post_merge(state, *this, ErrorsFound, DoCTFErrorReport,
+         LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer);
+ 
+     // Convert SI units to English.  In theory, conversion to English
+@@ -404,7 +406,7 @@
+     }
+ 
+     cnd = 1.0 / rs; // Conductivity is the inverse of resistivity
+-    EnergyPlus::CTF09Observation::post_conversion(state, *this, ErrorsFound, DoCTFErrorReport,
++    EnergyPlus::CTF10Observation::post_conversion(state, *this, ErrorsFound, DoCTFErrorReport,
+         LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer, dyn, rs, cnd);
+ 
+     bool RevConst = false;
+@@ -460,6 +462,7 @@
+                 }
+ 
+                 if (RevConst) { // Current construction is a reverse of
++                    CTF10Observation::public_reverse_entry(state, *this, otherConstruction, ErrorsFound, DoCTFErrorReport);
+                     // construction Constr.  Thus, CTFs do not need to be re-
+                     // calculated.  Copy CTF info for construction Constr to
+                     // construction ConstrNum.
+@@ -480,6 +483,7 @@
+                         }
+ 
+                     } // ... end of CTF history terms loop.
++                    CTF10Observation::public_reverse_completed(state, *this, otherConstruction, ErrorsFound, DoCTFErrorReport);
+ 
+                     break; // Constr DO loop
+ 
+@@ -624,7 +628,7 @@
+                 }
+             }
+ 
+-            EnergyPlus::CTF09Observation::post_initial_discretization(state, *this, ErrorsFound, DoCTFErrorReport,
++            EnergyPlus::CTF10Observation::post_initial_discretization(state, *this, ErrorsFound, DoCTFErrorReport,
+                 LayersInConstruct, NumResLayers, Nodes, dx, state.dataGlobal->TimeStepZone);
+ 
+             // Calculate the CTFs using the state space method
+@@ -669,7 +673,7 @@
+                 this->BMat(3) = 0.0;
+ 
+                 if (this->SolutionDimensions == 1) {
+-                    CTF09Observation::pre_matrix_assignment(state, *this, ErrorsFound, DoCTFErrorReport,
++                    CTF10Observation::pre_matrix_assignment(state, *this, ErrorsFound, DoCTFErrorReport,
+                         LayersInConstruct, NumResLayers, dl, rk, rho, cp, lr, ResLayer, Nodes, dx,
+                         state.dataGlobal->TimeStepZone, CTFConvrg);
+ 
+@@ -739,7 +743,7 @@
+                     this->CMat(2) = rk(LayersInConstruct) / dx(LayersInConstruct);  // of all other
+                     this->DMat(1) = rk(1) / dx(1);                                  // matrices for the state
+                     this->DMat(2) = -rk(LayersInConstruct) / dx(LayersInConstruct); // space method
+-                    EnergyPlus::CTF09Observation::post_matrix_assembly(state, *this, ErrorsFound, DoCTFErrorReport,
++                    EnergyPlus::CTF10Observation::post_matrix_assembly(state, *this, ErrorsFound, DoCTFErrorReport,
+                                                                        LayersInConstruct, NumResLayers, dl, rk, rho, cp,
+                                                                        lr, ResLayer, Nodes, dx, state.dataGlobal->TimeStepZone);
+ 
+@@ -898,23 +902,23 @@
+ 
+                 //          CALL DisplayNumberAndString(ConstrNum,'Matrix exponential for Construction #')
+                 this->calculateExponentialMatrix(); // Compute exponential of AMat
+-                EnergyPlus::CTF09Observation::method_return(EnergyPlus::CTF09Observation::MethodKind::Exponential,
++                EnergyPlus::CTF10Observation::method_return(EnergyPlus::CTF10Observation::MethodKind::Exponential,
+                     state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone);
+ 
+                 //          CALL DisplayNumberAndString(ConstrNum,'Invert Matrix for Construction #')
+                 this->calculateInverseMatrix(); // Compute inverse of AMat
+-                EnergyPlus::CTF09Observation::method_return(EnergyPlus::CTF09Observation::MethodKind::Inverse,
++                EnergyPlus::CTF10Observation::method_return(EnergyPlus::CTF10Observation::MethodKind::Inverse,
+                     state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone);
+ 
+                 //          CALL DisplayNumberAndString(ConstrNum,'Gamma calculation for Construction #')
+                 this->calculateGammas();
+-                EnergyPlus::CTF09Observation::gamma_return(state, *this, ErrorsFound, DoCTFErrorReport,
++                EnergyPlus::CTF10Observation::gamma_return(state, *this, ErrorsFound, DoCTFErrorReport,
+                     state.dataGlobal->TimeStepZone);
+                 // Compute "gamma"s from AMat, AExp, and AInv
+ 
+                 //          CALL DisplayNumberAndString(ConstrNum,'Compute CTFs for Construction #')
+                 this->calculateFinalCoefficients(); // Compute CTFs
+-                EnergyPlus::CTF09Observation::final_coefficient_return(state, *this, ErrorsFound, DoCTFErrorReport,
++                EnergyPlus::CTF10Observation::final_coefficient_return(state, *this, ErrorsFound, DoCTFErrorReport,
+                     state.dataGlobal->TimeStepZone);
+ 
+                 // Now check to see if the number of transfer functions
+@@ -925,7 +929,7 @@
+                 // loop and the logical CTFConvrg.
+ 
+                 CTFConvrg = true; // Assume solution convergence
+-                CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::DecisionEntry, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);
++                CTF10Observation::retry_caller_event(CTF10Observation::RetryEvent::DecisionEntry, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);
+ 
+                 // If too many terms, then solution did not converge.  Increase the
+                 // number of histories and the time step.  Reset CTFConvrg to continue
+@@ -934,7 +938,7 @@
+                     ++this->NumHistories;
+                     this->CTFTimeStep += state.dataGlobal->TimeStepZone;
+                     CTFConvrg = false;
+-                    CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::ExcessiveTermsUpdate, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);
++                    CTF10Observation::retry_caller_event(CTF10Observation::RetryEvent::ExcessiveTermsUpdate, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);
+                 }
+ 
+                 // If the number of terms is okay, then do a further check on the summation of
+@@ -954,17 +958,17 @@
+                     SumYi = std::abs(SumYi);
+                     SumZi = std::abs(SumZi);
+                     BiggestSum = max(SumXi, SumYi, SumZi);
+-                    CTF09Observation::retry_assigned_sums(state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg, SumXi, SumYi, SumZi, BiggestSum);
++                    CTF10Observation::retry_assigned_sums(state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg, SumXi, SumYi, SumZi, BiggestSum);
+                     if (BiggestSum > 0.0) {
+                         if (((std::abs(SumXi - SumYi) / BiggestSum) > MaxAllowedCTFSumError) ||
+                             ((std::abs(SumZi - SumYi) / BiggestSum) > MaxAllowedCTFSumError)) {
+                             ++this->NumHistories;
+                             this->CTFTimeStep += state.dataGlobal->TimeStepZone;
+                             CTFConvrg = false;
+-                            CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::ImbalanceUpdate, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);
++                            CTF10Observation::retry_caller_event(CTF10Observation::RetryEvent::ImbalanceUpdate, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);
+                         }
+                     } else { // Something terribly wrong--the surface has no CTFs, not even an R-value
+-                        CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::FatalNoCtfs, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);
++                        CTF10Observation::retry_caller_event(CTF10Observation::RetryEvent::FatalNoCtfs, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);
+                         ShowFatalError(state, EnergyPlus::format("Illegal construction definition, no CTFs calculated for {}", this->Name));
+                     }
+                 }
+@@ -975,7 +979,7 @@
+                 // Thus, if the time step reaches a certain point, error out and let the
+                 // user know that something needs to be checked in the input file.
+                 if (this->CTFTimeStep >= MaxAllowedTimeStep) {
+-                    CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::SevereEntry, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);
++                    CTF10Observation::retry_caller_event(CTF10Observation::RetryEvent::SevereEntry, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);
+                     ShowSevereError(state, EnergyPlus::format("CTF calculation convergence problem for Construction=\"{}\".", this->Name));
+                     ShowContinueError(state, "...with Materials (outside layer to inside)");
+                     ShowContinueError(state, EnergyPlus::format("(outside)=\"{}\"", state.dataMaterial->materials(this->LayerPoint(1))->Name));
+@@ -1004,14 +1008,14 @@
+                     ShowContinueError(state, "realistic, the user should contact the EnergyPlus support team.");
+                     DoCTFErrorReport = true;
+                     ErrorsFound = true;
+-                    CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::SevereBreak, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);
++                    CTF10Observation::retry_caller_event(CTF10Observation::RetryEvent::SevereBreak, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);
+                     break;
+                     //            CALL ShowFatalError(state, 'Program terminated for reasons listed (InitConductionTransferFunctions) ')
+                 }
+-                CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::LoopTail, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);
++                CTF10Observation::retry_caller_event(CTF10Observation::RetryEvent::LoopTail, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);
+ 
+             } // ... end of CTF calculation loop.
+-            CTF09Observation::retry_caller_event(CTF09Observation::RetryEvent::LoopExit, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);
++            CTF10Observation::retry_caller_event(CTF10Observation::RetryEvent::LoopExit, state, *this, ErrorsFound, DoCTFErrorReport, state.dataGlobal->TimeStepZone, CTFConvrg);
+ 
+         } // ... end of IF block for non-reversed constructs.
+ 
+@@ -1209,7 +1213,7 @@
+     // the significant figure limit for REAL(r64)
+     // variables reached)
+ 
+-    EnergyPlus::CTF09Observation::method_entry(EnergyPlus::CTF09Observation::MethodKind::Exponential, *this);
++    EnergyPlus::CTF10Observation::method_entry(EnergyPlus::CTF10Observation::MethodKind::Exponential, *this);
+     AMat1.allocate(this->rcmax, this->rcmax);
+     AMato.allocate(this->rcmax, this->rcmax);
+     AMatN.allocate(this->rcmax, this->rcmax);
+@@ -1222,7 +1226,7 @@
+     this->AExp = 0.0;
+     AMato = 0.0;
+     AMatN = 0.0;
+-    EnergyPlus::CTF09Observation::exponential_initialized(*this, AMat1, AMato, AMatN);
++    EnergyPlus::CTF10Observation::exponential_initialized(*this, AMat1, AMato, AMatN);
+ 
+     // Step 1, page 128 (Seem's thesis):  Compute the matrix row norm.
+     // See equation (A.3) which states that the matrix row norm is the
+@@ -1284,7 +1288,7 @@
+ 
+     CheckVal = min(3.0 * AMatRowNormMax + 6.0, 100.0);
+     l = int(CheckVal);
+-    EnergyPlus::CTF09Observation::exponential_scaled(*this, AMat1, AMatRowNormMax, k, fact, CheckVal, l);
++    EnergyPlus::CTF10Observation::exponential_scaled(*this, AMat1, AMatRowNormMax, k, fact, CheckVal, l);
+ 
+     // Step 5, page 128:  Calculate the exponential.  First, add the
+     // linear term to the identity matrix.
+@@ -1361,7 +1365,7 @@
+                 break; // DO loop (anytime SigFigLimit is false, AMat must continue to be raised another power)
+             }
+         }
+-        EnergyPlus::CTF09Observation::exponential_power_control(*this, i, SigFigLimit);
++        EnergyPlus::CTF10Observation::exponential_power_control(*this, i, SigFigLimit);
+ 
+         // Compute next term, only if necessary.  If SigFigLimit is still true,
+         // then all of the new terms being added to AExp are too small to
+@@ -1396,7 +1400,7 @@
+                 }
+             }
+         }
+-        EnergyPlus::CTF09Observation::exponential_square_control(*this, isq, Backup);
++        EnergyPlus::CTF10Observation::exponential_square_control(*this, isq, Backup);
+         // Backup is true when every item of AExp didn't pass the TinyLimit test
+         if (Backup) {
+             this->AExp = AMato;
+@@ -1404,7 +1408,7 @@
+         }
+ 
+     } // ... end of squaring loop and Step 6.
+-    EnergyPlus::CTF09Observation::exponential_final(*this, AMat1, AMato, AMatN, AMatRowNormMax, k, fact, CheckVal, l, i);
++    EnergyPlus::CTF10Observation::exponential_final(*this, AMat1, AMato, AMatN, AMatRowNormMax, k, fact, CheckVal, l, i);
+ 
+     AMat1.deallocate();
+     AMato.deallocate();
+@@ -1440,12 +1444,12 @@
+     Array2D<Real64> AMat1; // Intermediate calculation matrix equivalent at first to AMat
+ 
+     // Subroutine initializations ...
+-    EnergyPlus::CTF09Observation::method_entry(EnergyPlus::CTF09Observation::MethodKind::Inverse, *this);
++    EnergyPlus::CTF10Observation::method_entry(EnergyPlus::CTF10Observation::MethodKind::Inverse, *this);
+     AMat1.allocate(this->rcmax, this->rcmax);
+ 
+     AMat1 = AMat;                  // Set AMat1 = AMat to avoid AMat changes
+     this->AInv = this->IdenMatrix; // Set AInv to Identity Matrix
+-    EnergyPlus::CTF09Observation::inverse_initialized(*this, AMat1);
++    EnergyPlus::CTF10Observation::inverse_initialized(*this, AMat1);
+ 
+     // Use Gaussian elimination to zero all of the elements of AMat left
+     // of the diagonal.
+@@ -1527,7 +1531,7 @@
+             AMat1(ir, irr) = 0.0;
+         }
+     } // ... end of reverse elimination loop.
+-    EnergyPlus::CTF09Observation::inverse_final(*this, AMat1);
++    EnergyPlus::CTF10Observation::inverse_final(*this, AMat1);
+ 
+     // At this point, AMat1 is equal to the identity matrix (I)
+     // and AInv is equal to the inverse of AMat.
+@@ -1537,7 +1541,7 @@
+ 
+ void ConstructionProps::calculateGammas()
+ {
+-    EnergyPlus::CTF09Observation::gamma_entry(*this);
++    EnergyPlus::CTF10Observation::gamma_entry(*this);
+ 
+     // SUBROUTINE INFORMATION:
+     //       AUTHOR         Russ Taylor
+@@ -1571,7 +1575,7 @@
+ 
+     ATemp.allocate(this->rcmax, this->rcmax);
+     ATemp = this->AExp - this->IdenMatrix;
+-    EnergyPlus::CTF09Observation::gamma_ATemp_ready(*this, ATemp);
++    EnergyPlus::CTF10Observation::gamma_ATemp_ready(*this, ATemp);
+     Gamma1 = 0.0;
+ 
+     for (int i = 1; i <= this->rcmax; ++i) {
+@@ -1593,7 +1597,7 @@
+             }
+         }
+     }
+-    EnergyPlus::CTF09Observation::gamma1_final(*this);
++    EnergyPlus::CTF10Observation::gamma1_final(*this);
+ 
+     ATemp.deallocate();
+     // Compute Gamma2 from equation (2.1.13) in Seem's dissertation which
+@@ -1631,12 +1635,12 @@
+             }
+         }
+     }
+-    EnergyPlus::CTF09Observation::gamma2_final(*this);
++    EnergyPlus::CTF10Observation::gamma2_final(*this);
+ }
+ 
+ void ConstructionProps::calculateFinalCoefficients()
+ {
+-    EnergyPlus::CTF09Observation::final_coefficient_entry(*this);
++    EnergyPlus::CTF10Observation::final_coefficient_entry(*this);
+ 
+     // SUBROUTINE INFORMATION:
+     //       AUTHOR         Russ Taylor
+@@ -1947,7 +1951,7 @@
+ 
+     } // ... end of IF block for calculation of last e and S.
+ 
+-    EnergyPlus::CTF09Observation::final_coefficient_private_final(*this, PhiR0, Rnew, Rold, inum, CTFConvrg);
++    EnergyPlus::CTF10Observation::final_coefficient_private_final(*this, PhiR0, Rnew, Rold, inum, CTFConvrg);
+     PhiR0.deallocate();
+     Rnew.deallocate();
+     Rold.deallocate();

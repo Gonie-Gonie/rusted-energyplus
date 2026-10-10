@@ -1,0 +1,64 @@
+--- Original6153-6202
++++ derived-wholeTU-selected-function
+@@ -2,28 +2,37 @@
+     {
+         bool ErrorsFound(false); // Flag for input error condition
+         bool DoCTFErrorReport(false);
++        CTF10Observation::InitFunctionScope ctf10_init_scope(state, ErrorsFound, DoCTFErrorReport);
+         for (auto &construction : state.dataConstruction->Construct) {
++            CTF10Observation::InitConstructionScope ctf10_construction_scope(state, construction, ErrorsFound, DoCTFErrorReport);
+             construction.calculateTransferFunction(state, ErrorsFound, DoCTFErrorReport);
++            ctf10_construction_scope.source_returned();
+             if (construction.NumHistories > 1) {
+                 state.dataHeatBal->SimpleCTFOnly = false;
+             }
+             if (construction.NumCTFTerms > state.dataHeatBal->MaxCTFTerms) {
+                 state.dataHeatBal->MaxCTFTerms = construction.NumCTFTerms;
+             }
++            ctf10_construction_scope.aggregate_completed();
+         }
+         if (state.dataHeatBal->AnyInternalHeatSourceInInput) {
+             state.dataHeatBal->SimpleCTFOnly = false;
+         }
++        CTF10Observation::init_event(CTF10Observation::InitEvent::AfterAllAggregates, state, ErrorsFound, DoCTFErrorReport);
+ 
+         for (auto &construction : state.dataConstruction->Construct) {
+             if (!construction.IsUsedCTF) {
+                 continue;
+             }
++            CTF10Observation::init_event(CTF10Observation::InitEvent::ReportLayersEntry, state, ErrorsFound, DoCTFErrorReport, nullptr, &construction);
+             construction.reportLayers(state);
++            CTF10Observation::init_event(CTF10Observation::InitEvent::ReportLayersReturn, state, ErrorsFound, DoCTFErrorReport, nullptr, &construction);
+         }
+ 
+         bool InitCTFDoReport;
++        CTF10Observation::init_event(CTF10Observation::InitEvent::ScanEntry, state, ErrorsFound, DoCTFErrorReport);
+         General::ScanForReports(state, "Constructions", InitCTFDoReport, "Constructions");
++        CTF10Observation::init_event(CTF10Observation::InitEvent::ScanReturn, state, ErrorsFound, DoCTFErrorReport, &InitCTFDoReport);
+         if (InitCTFDoReport || DoCTFErrorReport) {
+             print(state.files.eio,
+                   "! <Construction CTF>,Construction Name,Index,#Layers,#CTFs,Time Step {{hours}},ThermalConductance "
+@@ -33,6 +42,7 @@
+                   "{{J/kg-K}},ThermalResistance {{m2-K/w}}\n");
+             print(state.files.eio, "! <Material:Air CTF Summary>,Material Name,ThermalResistance {{m2-K/w}}\n");
+             print(state.files.eio, "! <CTF>,Time,Outside,Cross,Inside,Flux (except final one)\n");
++            CTF10Observation::init_event(CTF10Observation::InitEvent::ReportHeaders, state, ErrorsFound, DoCTFErrorReport, &InitCTFDoReport);
+ 
+             int cCounter = 0; // just used to keep construction index in output report
+             for (auto &construction : state.dataConstruction->Construct) {
+@@ -40,11 +50,15 @@
+                 if (!construction.IsUsedCTF) {
+                     continue;
+                 }
++                CTF10Observation::init_event(CTF10Observation::InitEvent::ReportTransferEntry, state, ErrorsFound, DoCTFErrorReport, &InitCTFDoReport, &construction, cCounter);
+                 construction.reportTransferFunction(state, cCounter);
++                CTF10Observation::init_event(CTF10Observation::InitEvent::ReportTransferReturn, state, ErrorsFound, DoCTFErrorReport, &InitCTFDoReport, &construction, cCounter);
+             }
+         }
+ 
+         if (ErrorsFound) {
++            CTF10Observation::init_event(CTF10Observation::InitEvent::FinalFatalBoundary, state, ErrorsFound, DoCTFErrorReport, &InitCTFDoReport);
+             ShowFatalError(state, "Program terminated for reasons listed (InitConductionTransferFunctions)");
+         }
++        CTF10Observation::init_event(CTF10Observation::InitEvent::FunctionEnd, state, ErrorsFound, DoCTFErrorReport, &InitCTFDoReport);
+     }

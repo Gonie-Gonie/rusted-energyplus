@@ -1,0 +1,153 @@
+"""Emit only ignored source proposals and source-identity metadata; never import targets."""
+from pathlib import Path
+import ast
+import difflib
+import hashlib
+import json
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+OLD = ROOT / '.runtime/porting/CTF-09/native-observer-prep-01'
+ORIGINAL = ROOT / '.reference/energyplus-src/26.1.0/src/EnergyPlus'
+
+
+def read(path):
+    return path.read_bytes().decode('utf-8')
+
+
+def emit(name, text):
+    (OUT / name).write_bytes(text.encode('utf-8'))
+
+
+def ref(path):
+    data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(data).hexdigest(),
+            'size_bytes': len(data), 'line_count': len(data.splitlines())}
+
+
+def replace_once(text, before, after):
+    assert text.count(before) == 1, (before, text.count(before))
+    return text.replace(before, after, 1)
+
+
+def diff(before, after, left, right):
+    return ''.join(difflib.unified_diff(before.splitlines(True), after.splitlines(True), fromfile=left, tofile=right))
+
+
+def prepare():
+    assert not (OUT / 'manifest.json').exists(), 'Immutable hold already exists'
+    (OUT / 'before').mkdir(exist_ok=True)
+    old_names = ['Construction.ctf09.cc', 'ctf09_observer.hh', 'ctf09_observer.cc']
+    before = {}
+    for name in old_names:
+        data = (OLD / name).read_bytes(); (OUT / 'before' / name).write_bytes(data)
+        before[name] = data.decode('utf-8')
+    original_hbm = read(ORIGINAL / 'HeatBalanceManager.cc')
+    (OUT / 'before/HeatBalanceManager.cc').write_bytes(original_hbm.encode('utf-8'))
+
+    header = before['ctf09_observer.hh'].replace('CTF09', 'CTF10').replace('ctf09', 'ctf10')
+    header = replace_once(header, '#include <optional>\n', '#include <optional>\n#include <memory>\n')
+    header_add = read(OUT / 'public_init_header_additions.txt')
+    declarations = read(OUT / 'public_init_declarations_additions.txt')
+    header = replace_once(header, 'struct Capture\n', header_add + '\nstruct Capture\n')
+    header = replace_once(header, '    RetryCapture retry_driver;\n', '    RetryCapture retry_driver;\n    PublicCapture public_storage;\n')
+    header = replace_once(header, '} // namespace EnergyPlus::CTF10Observation', declarations + '} // namespace EnergyPlus::CTF10Observation')
+    emit('ctf10_observer.hh', header)
+    restored_header = header.replace(header_add + '\n', '', 1).replace(declarations, '', 1)
+    restored_header = restored_header.replace('#include <memory>\n', '', 1).replace('    PublicCapture public_storage;\n', '', 1)
+    assert restored_header.replace('CTF10', 'CTF09').replace('ctf10', 'ctf09') == before['ctf09_observer.hh']
+
+    impl = before['ctf09_observer.cc'].replace('CTF09', 'CTF10').replace('ctf09', 'ctf10')
+    includes = '#include <EnergyPlus/Data/EnergyPlusData.hh>\n#include <EnergyPlus/DataHeatBalance.hh>\n#include <EnergyPlus/DataGlobals.hh>\n#include <EnergyPlus/General.hh>\n#include <EnergyPlus/OutputReportPredefined.hh>\n#include <exception>\n'
+    impl = replace_once(impl, '#include "ctf10_observer.hh"\n', '#include "ctf10_observer.hh"\n' + includes)
+    impl_add = read(OUT / 'public_init_impl_additions.txt')
+    impl = replace_once(impl, '} // namespace EnergyPlus::CTF10Observation', impl_add + '} // namespace EnergyPlus::CTF10Observation')
+    emit('ctf10_observer.cc', impl)
+    assert impl.replace(includes, '', 1).replace(impl_add, '', 1).replace('CTF10', 'CTF09').replace('ctf10', 'ctf09') == before['ctf09_observer.cc']
+
+    construction = before['Construction.ctf09.cc'].replace('CTF09', 'CTF10').replace('ctf09', 'ctf10')
+    insertions = [
+        ('void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &ErrorsFound, bool &DoCTFErrorReport)\n{\n',
+         '    CTF10Observation::PublicFunctionScope ctf10_public_scope(state, *this, ErrorsFound, DoCTFErrorReport);\n'),
+        ('    this->UValue = 0.0;\n', '    CTF10Observation::public_reset(state, *this, ErrorsFound, DoCTFErrorReport);\n'),
+        ('                if (RevConst) { // Current construction is a reverse of\n',
+         '                    CTF10Observation::public_reverse_entry(state, *this, otherConstruction, ErrorsFound, DoCTFErrorReport);\n'),
+        ('                    } // ... end of CTF history terms loop.\n',
+         '                    CTF10Observation::public_reverse_completed(state, *this, otherConstruction, ErrorsFound, DoCTFErrorReport);\n'),
+    ]
+    for anchor, addition in insertions:
+        construction = replace_once(construction, anchor, anchor + addition)
+    emit('Construction.ctf10.cc', construction)
+    restored = construction
+    for _, addition in insertions: restored = restored.replace(addition, '', 1)
+    assert restored.replace('CTF10', 'CTF09').replace('ctf10', 'ctf09') == before['Construction.ctf09.cc']
+
+    # Scope the additions to the complete original Init function, never replace its body.
+    start = original_hbm.index('    void InitConductionTransferFunctions(EnergyPlusData &state)\n')
+    end = original_hbm.index('\n    }', start) + len('\n    }')
+    original_function = original_hbm[start:end]
+    function = original_function
+    hbm_insertions = [
+        ('        bool DoCTFErrorReport(false);\n', '        CTF10Observation::InitFunctionScope ctf10_init_scope(state, ErrorsFound, DoCTFErrorReport);\n'),
+        ('            construction.calculateTransferFunction(state, ErrorsFound, DoCTFErrorReport);\n',
+         '            CTF10Observation::InitConstructionScope ctf10_construction_scope(state, construction, ErrorsFound, DoCTFErrorReport);\n', 'before'),
+        ('            construction.calculateTransferFunction(state, ErrorsFound, DoCTFErrorReport);\n', '            ctf10_construction_scope.source_returned();\n'),
+        ('                state.dataHeatBal->MaxCTFTerms = construction.NumCTFTerms;\n            }\n', '            ctf10_construction_scope.aggregate_completed();\n'),
+        ('            state.dataHeatBal->SimpleCTFOnly = false;\n        }\n', '        CTF10Observation::init_event(CTF10Observation::InitEvent::AfterAllAggregates, state, ErrorsFound, DoCTFErrorReport);\n'),
+        ('            construction.reportLayers(state);\n', '            CTF10Observation::init_event(CTF10Observation::InitEvent::ReportLayersEntry, state, ErrorsFound, DoCTFErrorReport, nullptr, &construction);\n', 'before'),
+        ('            construction.reportLayers(state);\n', '            CTF10Observation::init_event(CTF10Observation::InitEvent::ReportLayersReturn, state, ErrorsFound, DoCTFErrorReport, nullptr, &construction);\n'),
+        ('        General::ScanForReports(state, "Constructions", InitCTFDoReport, "Constructions");\n', '        CTF10Observation::init_event(CTF10Observation::InitEvent::ScanEntry, state, ErrorsFound, DoCTFErrorReport);\n', 'before'),
+        ('        General::ScanForReports(state, "Constructions", InitCTFDoReport, "Constructions");\n', '        CTF10Observation::init_event(CTF10Observation::InitEvent::ScanReturn, state, ErrorsFound, DoCTFErrorReport, &InitCTFDoReport);\n'),
+        ('            print(state.files.eio, "! <CTF>,Time,Outside,Cross,Inside,Flux (except final one)\\n");\n', '            CTF10Observation::init_event(CTF10Observation::InitEvent::ReportHeaders, state, ErrorsFound, DoCTFErrorReport, &InitCTFDoReport);\n'),
+        ('                construction.reportTransferFunction(state, cCounter);\n', '                CTF10Observation::init_event(CTF10Observation::InitEvent::ReportTransferEntry, state, ErrorsFound, DoCTFErrorReport, &InitCTFDoReport, &construction, cCounter);\n', 'before'),
+        ('                construction.reportTransferFunction(state, cCounter);\n', '                CTF10Observation::init_event(CTF10Observation::InitEvent::ReportTransferReturn, state, ErrorsFound, DoCTFErrorReport, &InitCTFDoReport, &construction, cCounter);\n'),
+        ('            ShowFatalError(state, "Program terminated for reasons listed (InitConductionTransferFunctions)");\n', '            CTF10Observation::init_event(CTF10Observation::InitEvent::FinalFatalBoundary, state, ErrorsFound, DoCTFErrorReport, &InitCTFDoReport);\n', 'before'),
+    ]
+    for row in hbm_insertions:
+        anchor, addition = row[:2]
+        function = replace_once(function, anchor, addition + anchor if len(row) == 3 else anchor + addition)
+    function_end_addition = '        CTF10Observation::init_event(CTF10Observation::InitEvent::FunctionEnd, state, ErrorsFound, DoCTFErrorReport, &InitCTFDoReport);\n'
+    function = function[:-5] + function_end_addition + function[-5:]
+    original_include = '#include <EnergyPlus/HeatBalanceManager.hh>\n'
+    observer_include = '#include "ctf10_observer.hh"\n'
+    hbm = original_hbm[:start] + function + original_hbm[end:]
+    hbm = replace_once(hbm, original_include, original_include + observer_include)
+    emit('HeatBalanceManager.ctf10.cc', hbm)
+    inverse_hbm = function
+    for row in hbm_insertions: inverse_hbm = inverse_hbm.replace(row[1], '', 1)
+    inverse_hbm = inverse_hbm.replace(function_end_addition, '', 1)
+    assert inverse_hbm == original_function
+    assert hbm.replace(observer_include, '', 1).replace(function, original_function, 1) == original_hbm
+
+    source_pairs = [('Construction.ctf09.cc', 'Construction.ctf10.cc'), ('ctf09_observer.hh', 'ctf10_observer.hh'),
+                    ('ctf09_observer.cc', 'ctf10_observer.cc'), ('HeatBalanceManager.cc', 'HeatBalanceManager.ctf10.cc')]
+    for old, new in source_pairs:
+        emit(new + '.diff', diff(read(OUT / 'before' / old), read(OUT / new), 'before/' + old, new))
+    emit('HeatBalanceManager.InitConductionTransferFunctions.diff', diff(original_function + '\n', function + '\n', 'Original6153-6202', 'derived-wholeTU-selected-function'))
+    emit('Construction.public_additions.json', json.dumps(insertions, indent=2) + '\n')
+    emit('HeatBalanceManager.Init_additions.json', json.dumps({'insertions': hbm_insertions, 'function_end': function_end_addition, 'include': observer_include}, indent=2) + '\n')
+    manifest = {'schema': 'ctf10-native-passive-source-preparation.v1', 'status': 'source-only-not-executed',
+        'source_design': ref(ROOT / '.runtime/porting/CTF-10/native-observation-design-prep-01/manifest.json'),
+        'source_inventory': json.loads(read(ROOT / '.runtime/porting/CTF-10/native-observation-design-prep-01/manifest.json'))['source_inventory'],
+        'passive_predecessor': ref(OLD / 'manifest.json'),
+        'own_sources': [ref(OUT / new) for _, new in source_pairs],
+        'before_archives': [ref(OUT / 'before' / old) for old, _ in source_pairs],
+        'exact_diffs': [ref(OUT / (new + '.diff')) for _, new in source_pairs] + [ref(OUT / 'HeatBalanceManager.InitConductionTransferFunctions.diff')],
+        'literal_additions': [ref(OUT / name) for name in ['public_init_header_additions.txt', 'public_init_declarations_additions.txt', 'public_init_impl_additions.txt', 'Construction.public_additions.json', 'HeatBalanceManager.Init_additions.json']],
+        'readme': ref(OUT / 'README.md'), 'preparation_source': ref(Path(__file__).resolve()),
+        'original_Construction': ref(ORIGINAL / 'Construction.cc'), 'original_HeatBalanceManager': ref(ORIGINAL / 'HeatBalanceManager.cc'),
+        'original_HeatBalanceManager_restored_byte_exact': True, 'accepted_CTF09_all_three_restored_byte_exact': True,
+        'unit39_direct_callers_and_incoming_flags_preserved': True, 'unit_whole_Init_or_reports_admitted': False,
+        'production_true_whole_Init_only_after_actual_prerequisites': True,
+        'existing09_counts_and_ledgers_unchanged_after_literal_names_restored': True,
+        'new_public_fixed_declared_arrays': 12, 'new_public_slots_per_array': 19,
+        'future_helper_requires_explicit_actual_caller_return_and_diagnostic_hooks': True,
+        'no_helper_freezer_PE_QA_or_comparer_authored': True,
+        'scientific_comparison_performed': False, 'numerical_PASS_claimed': False, 'canonical_changed': False}
+    ast.parse(read(Path(__file__)))
+    emit('manifest.json', json.dumps(manifest, indent=2) + '\n')
+    print(json.dumps({'manifest': ref(OUT / 'manifest.json'), 'own_sources': manifest['own_sources'], 'diff_lines': sum(len(read(OUT / (new + '.diff')).splitlines()) for _, new in source_pairs)}))
+
+
+if __name__ == '__main__':
+    prepare()

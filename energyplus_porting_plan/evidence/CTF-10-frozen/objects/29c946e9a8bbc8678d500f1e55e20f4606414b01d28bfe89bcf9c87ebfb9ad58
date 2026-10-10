@@ -1,0 +1,40 @@
+--- accepted09/ctf09_unit_fields.hh
++++ proposed10/ctf10_unit_fields.hh
+@@ -1,8 +1,8 @@
+ // Pure copies of actual public members and the separately captured private locals.
+-#ifndef CTF09_UNIT_FIELDS_HH
+-#define CTF09_UNIT_FIELDS_HH
++#ifndef CTF10_UNIT_FIELDS_HH
++#define CTF10_UNIT_FIELDS_HH
+ #include "ctf01_reference_metadata.hh"
+-#include "ctf09_observation_fields.hh"
++#include "ctf10_observation_fields.hh"
+ #include <EnergyPlus/Data/EnergyPlusData.hh>
+ #include <EnergyPlus/DataErrorTracking.hh>
+ #include <EnergyPlus/DataGlobals.hh>
+@@ -11,7 +11,7 @@
+ #include <EnergyPlus/UtilityRoutines.hh>
+ 
+ namespace Ctf01 {
+-namespace Observation = EnergyPlus::CTF09Observation;
++namespace Observation = EnergyPlus::CTF10Observation;
+ inline json snapshot(EnergyPlus::EnergyPlusData const &state, bool ErrorsFound, bool DoCTFErrorReport)
+ {
+     json materials = json::array(), constructions = json::array();
+@@ -67,7 +67,7 @@
+ inline bool observer_failed(Observation::Capture const &capture, json const &messages)
+ {
+     return capture.binding_error || capture.identity_mismatch || capture.duplicate_phase ||
+-           capture.phase_order_invalid || capture.active_prefix_invalid || matrix_observer_failed(capture) || methods_observer_failed(capture) || gamma_copy_failed(capture.gamma) || final_coefficient_copy_failed(capture.final_coefficients) || retry_copy_failed(capture.retry_driver) || !retry_diagnostic_join_valid(capture.retry_driver, messages);
++           capture.phase_order_invalid || capture.active_prefix_invalid || matrix_observer_failed(capture) || methods_observer_failed(capture) || gamma_copy_failed(capture.gamma) || final_coefficient_copy_failed(capture.final_coefficients) || retry_copy_failed(capture.retry_driver) || !retry_diagnostic_join_valid(capture.retry_driver, messages) || public_copy_failed(capture.public_storage);
+ }
+ inline json observations(Observation::Capture const &capture, json const &messages)
+ {
+@@ -81,6 +81,7 @@
+         {"Gamma", gamma_observations(capture.gamma)},
+         {"FinalCoefficients", final_coefficient_observations(capture.final_coefficients)},
+         {"RetryDriver", retry_observations(capture.retry_driver, messages)},
++        {"PublicStorage", public_observations(capture.public_storage)},
+         {"actual_callback_count", capture.actual_callback_count}, {"observer_failure", observer_failed(capture, messages)},
+         {"binding_error", capture.binding_error}, {"identity_mismatch", capture.identity_mismatch},
+         {"duplicate_phase", capture.duplicate_phase}, {"phase_order_invalid", capture.phase_order_invalid},

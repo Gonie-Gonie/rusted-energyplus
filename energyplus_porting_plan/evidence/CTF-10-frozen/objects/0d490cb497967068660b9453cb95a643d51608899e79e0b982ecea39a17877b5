@@ -1,0 +1,45 @@
+// Independent public-storage and whole-initializer custody; no numeric evaluation.
+struct PublicSnapshot
+{
+    bool reached = false;
+    bool copy_available = false;
+    bool original_layer_prefix_available = false;
+    std::uintptr_t actual_construction_address = 0;
+    int actual_construction_index = 0;
+    std::string actual_Name;
+    bool ErrorsFound = false, DoCTFErrorReport = false;
+    bool IsUsedCTF = false, SourceSinkPresent = false;
+    int SolutionDimensions = 0, TotLayers = 0;
+    std::array<int, Construction::MaxLayersInConstruct> original_LayerPoint{};
+    std::array<Binary64Copy, Construction::MaxCTFTerms> CTFCross{}, CTFFlux{}, CTFInside{}, CTFOutside{};
+    std::array<Binary64Copy, Construction::MaxCTFTerms> CTFSourceIn{}, CTFSourceOut{};
+    std::array<Binary64Copy, Construction::MaxCTFTerms> CTFTSourceOut{}, CTFTSourceIn{}, CTFTSourceQ{};
+    std::array<Binary64Copy, Construction::MaxCTFTerms> CTFTUserOut{}, CTFTUserIn{}, CTFTUserSource{};
+    Binary64Copy CTFTimeStep{}, UValue{};
+    int NumHistories = 0, NumCTFTerms = 0;
+};
+
+enum class PublicSite : std::size_t { FunctionEntry, Reset, ReverseEntry, ReverseCompleted, ScopeExit, CallerReturn };
+enum class PublicFailureKind : std::size_t { IdentityMismatch, ConstructionNotFound, CopyException, Duplicate, Order, CounterOverflow };
+struct PublicFailure
+{
+    PublicSite site{};
+    std::size_t actual_site_ordinal = 0;
+    PublicFailureKind kind{};
+};
+struct ReversePublicSnapshot
+{
+    bool reached = false;
+    PublicSnapshot current, actual_provider;
+};
+struct PublicCapture
+{
+    std::array<std::size_t, 6> actual_site_counts{};
+    std::array<std::size_t, 6> failure_kind_counts{};
+    std::optional<PublicFailure> first_failure, last_failure;
+    bool integrity_failed = false;
+    PublicSnapshot before_reset, after_reset, scope_exit, actual_caller_return;
+    ReversePublicSnapshot reverse_entry, reverse_completed;
+    bool scope_exited_during_unwind = false;
+};
+

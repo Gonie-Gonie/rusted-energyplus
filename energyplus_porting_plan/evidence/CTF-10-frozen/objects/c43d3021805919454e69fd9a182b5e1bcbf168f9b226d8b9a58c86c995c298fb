@@ -1,0 +1,29 @@
+    // Genuine whole Init owns the declared loop and its two local shared flags.
+    // The helper never invokes a second manual Construction loop.
+    int const count = factory.state ? factory.state->dataConstruction->Construct.isize() : 0;
+    std::size_t actual_calls = 0;
+    json whole_Init = {{"kind", "HeatBalanceManager::InitConductionTransferFunctions"}, {"actual_source_invoked", false},
+        {"call_outcome", not_invoked(factory.stop_reason)}, {"before", initialized_owners}, {"after", nullptr},
+        {"observations", nullptr}, {"manual_Construction_loop_performed", false}};
+    if (loader_ready) {
+        Observation::InitCapture capture;
+        auto const diagnostic_begin = factory.messages.size();
+        json outcome;
+        {
+            Observation::InitBinding binding(capture, *factory.state);
+            outcome = invoke([&] {
+                EnergyPlus::HeatBalanceManager::InitConductionTransferFunctions(*factory.state);
+                Observation::init_caller_return(capture, *factory.state);
+            });
+        }
+        operations = init_operations(capture, factory.messages);
+        actual_calls = capture.actual_construction_call_count;
+        factory.observer_integrity_failed = factory.observer_integrity_failed || init_copy_failed(capture, factory.messages);
+        whole_Init = {{"kind", "HeatBalanceManager::InitConductionTransferFunctions"}, {"actual_source_invoked", true},
+            {"call_outcome", outcome}, {"before", initialized_owners}, {"after", factory.observed_without_Init_shared_flags(input_errors)},
+            {"diagnostic_message_begin", diagnostic_begin}, {"diagnostic_message_end", factory.messages.size()},
+            {"observations", init_observations(capture, factory.messages)}, {"manual_Construction_loop_performed", false}};
+        if (outcome.at("status") != "source_returned") {
+            factory.stopped = true; factory.stop_reason = outcome.at("status").get<std::string>();
+        }
+    }

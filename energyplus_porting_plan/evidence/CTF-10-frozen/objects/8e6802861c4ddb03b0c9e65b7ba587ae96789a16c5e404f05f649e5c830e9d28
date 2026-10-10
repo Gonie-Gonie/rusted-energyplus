@@ -1,0 +1,93 @@
+--- accepted09/ctf09_unit_helper.cpp
++++ proposed10/ctf10_unit_helper.cpp
+@@ -1,7 +1,7 @@
+ // Genuine whole public Construction calls with separately captured private locals.
+-#include "ctf09_unit_fields.hh"
+-#include "ctf09_unit_admission.hh"
+-#include "ctf09_observation_fields.hh"
++#include "ctf10_unit_fields.hh"
++#include "ctf10_unit_admission.hh"
++#include "ctf10_observation_fields.hh"
+ #include <iostream>
+ #include <map>
+ #include <memory>
+@@ -54,6 +54,7 @@
+         state->dataGlobal->errorCallback = [this](EnergyPlus::Error level, std::string const &message) {
+             messages.push_back({{"level", static_cast<int>(level)}, {"message", message}});
+             Observation::retry_diagnostic(*state, messages.size() - 1, static_cast<int>(level), message);
++            Observation::init_diagnostic(*state, messages.size() - 1, static_cast<int>(level), message);
+         };
+         auto const before = snapshot(*state, ErrorsFound, DoCTFErrorReport);
+         auto const initialized = invoke([&] { state->init_constant_state(*state); });
+@@ -145,7 +146,8 @@
+                 auto &construction = factory.state->dataConstruction->Construct(static_cast<int>(i + 1));
+                 Observation::Binding binding(capture, *factory.state, construction);
+                 // Observer metadata failures do not alter or short-circuit source execution.
+-                outcome = invoke([&] { construction.calculateTransferFunction(*factory.state, ErrorsFound, DoCTFErrorReport); });
++                outcome = invoke([&] { construction.calculateTransferFunction(*factory.state, ErrorsFound, DoCTFErrorReport);
++                    Observation::public_caller_return(capture, *factory.state, construction, ErrorsFound, DoCTFErrorReport); });
+             }
+             observed = observations(capture, factory.messages); observer_integrity_failed = observer_integrity_failed || observer_failed(capture, factory.messages);
+             if (outcome.at("status") != "source_returned") {
+@@ -164,7 +166,9 @@
+         {"before_member_inputs", before_members}, {"after_member_inputs", after_members}, {"actual_input_owner_identity", identity_ledger},
+         {"operations", operations}, {"final_state", factory.state ? snapshot(*factory.state, ErrorsFound, DoCTFErrorReport) : json(nullptr)},
+         {"source_diagnostics", factory.diagnostics(output, row.at("id").get<std::string>())},
+-        {"observer_integrity_failed", observer_integrity_failed}, {"later_CTF_coefficients_or_thermal_results_paired", false}};
++        {"observer_integrity_failed", observer_integrity_failed}, {"whole_Init_actual_source_invoked", false},
++        {"whole_Init_unavailable_reason", "literal_direct_unit_flags_roughness_and_report_prerequisites_outside_selected_Init_scope"},
++        {"later_CTF_coefficients_or_thermal_results_paired", false}};
+ }
+ } // namespace Ctf01
+ 
+@@ -172,14 +176,14 @@
+ {
+     using namespace Ctf01;
+     try {
+-        require(argc == 5, "Usage: ctf09_unit_helper <root> <frozen-request> <native-admission-contract> <fresh-output>");
++        require(argc == 5, "Usage: ctf10_unit_helper <root> <frozen-request> <native-admission-contract> <fresh-output>");
+         auto const root = fs::weakly_canonical(fs::absolute(argv[1]));
+         auto const request_path = fs::absolute(argv[2]), admission_path = fs::absolute(argv[3]), output = fs::absolute(argv[4]);
+-        auto const inside = fs::weakly_canonical(output).lexically_relative(root / ".runtime/porting/CTF-09");
+-        require(!inside.empty() && *inside.begin() != ".." && !fs::exists(output), "Fresh contained CTF-09 output directory required");
++        auto const inside = fs::weakly_canonical(output).lexically_relative(root / ".runtime/porting/CTF-10");
++        require(!inside.empty() && *inside.begin() != ".." && !fs::exists(output), "Fresh contained CTF-10 output directory required");
+         auto const packet = admit(root, request_path, admission_path); fs::create_directories(output);
+         json rows = json::array(), statuses = json::object(); std::size_t invoked = 0, skipped = 0, callback_count = 0, matrix_callbacks = 0, matrix_retained = 0, matrix_omitted = 0;
+-        bool observer_integrity_failed = false; MethodTotals exponential_totals, inverse_totals; GammaTotals gamma_total; FinalCoefficientTotals final_total; RetryTotals retry_total;
++        bool observer_integrity_failed = false; MethodTotals exponential_totals, inverse_totals; GammaTotals gamma_total; FinalCoefficientTotals final_total; RetryTotals retry_total; PublicTotals public_total;
+         for (auto const &row : packet.request.at("model_cases")) rows.push_back(model_case(row, output));
+         for (auto const &row : rows) {
+             observer_integrity_failed = observer_integrity_failed || row.at("observer_integrity_failed").get<bool>();
+@@ -197,6 +201,7 @@
+                     add_gamma_totals(gamma_total, operation.at("observations").at("Gamma"));
+                     add_final_coefficient_totals(final_total, operation.at("observations").at("FinalCoefficients"));
+                     add_retry_totals(retry_total, operation.at("observations").at("RetryDriver"));
++                    add_public_totals(public_total, operation.at("observations").at("PublicStorage"));
+                 } else ++skipped;
+             }
+         }
+@@ -204,7 +209,7 @@
+         require(after.request == packet.request && after.admission == packet.admission && after.contracts == packet.contracts,
+                 "Frozen input/source admission changed during actual calls");
+         int const helper_exit = observer_integrity_failed ? 2 : 0;
+-        json const result = {{"schema", "ctf09-helper-results.v1"}, {"energyplus_commit", packet.request.at("energyplus_commit")},
++        json const result = {{"schema", "ctf10-helper-results.v1"}, {"energyplus_commit", packet.request.at("energyplus_commit")},
+             {"actual_request", file_ref(request_path)}, {"native_admission_contract", file_ref(admission_path)},
+             {"actual_scope_amendment", packet.request.at("actual_scope_amendment")},
+             {"actual_scope_amendment_execution", packet.request.at("actual_scope_amendment_execution")},
+@@ -228,10 +233,13 @@
+             {"actual_gamma_observation_counts", gamma_totals(gamma_total)},
+             {"actual_final_coefficient_observation_counts", final_coefficient_totals(final_total)},
+              {"actual_retry_observation_counts", retry_totals(retry_total)},
++            {"actual_public_storage_observation_counts", public_totals(public_total)},
++            {"CTF10_public_storage_observation_policy", ctf10_public_storage_policy()},
++            {"CTF10_execution_lane_policy", ctf10_execution_policy()},
+             {"actual_matrix_attempt_callback_count", matrix_callbacks}, {"actual_retained_matrix_attempt_count", matrix_retained},
+             {"matrix_attempt_records_omitted", matrix_omitted}, {"complete_matrix_attempt_parity_claimed", false}, {"scientific_comparison_performed", false}, {"numerical_PASS_claimed", false}, {"gates_updated", false},
+             {"Material_loader_or_fixed15_production_certified", false}, {"CTF02_through_CTF10_certified", false}};
+-        write_text(output / "ctf09-helper-results.json", result.dump() + "\n");
++        write_text(output / "ctf10-helper-results.json", result.dump() + "\n");
+         return helper_exit;
+     } catch (std::exception const &error) { std::cerr << error.what() << '\n'; return 1; }
+ }

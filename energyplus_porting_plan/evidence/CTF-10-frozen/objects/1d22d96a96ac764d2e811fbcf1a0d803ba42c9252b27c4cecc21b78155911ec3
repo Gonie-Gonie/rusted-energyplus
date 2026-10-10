@@ -1,0 +1,384 @@
+--- accepted09/freeze_packet.py
++++ proposed10/freeze_packet.py
+@@ -1,4 +1,4 @@
+-"""Freeze inherited literal inputs plus fresh CTF09 retry policy; Root only."""
++"""Freeze inherited literal inputs plus fresh CTF10 public-storage policy; Root only."""
+ import argparse
+ import hashlib
+ import importlib.util
+@@ -6,20 +6,20 @@
+ from datetime import datetime, timezone
+ from pathlib import Path
+ 
+-IO_SHA = "3b92b81a66402fdf9656599428263e65517e6fbbac4ca76e156ceedb99358364"
++IO_SHA = "bbc97a81a44892b7d9c53765d2ed9b1fccbce5352a9bb2a85ffea86b7b3fa4e8"
+ io_path = Path(__file__).resolve().with_name("packet_io.py")
+ if hashlib.sha256(io_path.read_bytes()).hexdigest() != IO_SHA:
+     raise ValueError("Reviewed stdlib packet helper differs")
+-spec = importlib.util.spec_from_file_location("ctf09_packet_io", io_path)
++spec = importlib.util.spec_from_file_location("ctf10_packet_io", io_path)
+ m = importlib.util.module_from_spec(spec)
+ spec.loader.exec_module(m)
+ 
+ COMMIT = "6f2e40d10250a105b49966baa24d843711e61048"
+ ORIGINAL = ".reference/energyplus-src/26.1.0/"
+-NATIVE = {"path": ".runtime/porting/CTF-09/native-helper-prep-01/manifest.json",
+-          "sha256": "b4e15e0986d65b451ba803cb1b6f9a9bc1c8fe8a6caea90ac3c74e581ee4a315"}
+-PASSIVE = {"path": ".runtime/porting/CTF-09/native-observer-prep-01/manifest.json",
+-           "sha256": "4934fe49f601a87e1d41016a03b8e10fba6117a79b65a376b949e68e033dd0bf"}
++NATIVE = {"path": ".runtime/porting/CTF-10/native-helper-prep-01/manifest.json",
++          "sha256": "1aca57d1c46b6d1a0e756deb61328413a071abc74f4bc9e241f35915a2b20b63"}
++PASSIVE = {"path": ".runtime/porting/CTF-10/native-observer-prep-01/manifest.json",
++           "sha256": "a2765a61087045ecb400f260740216bcc6b0330e91975a0168eeead09bb7645d"}
+ INHERITED_POLICY = {"path": ".runtime/porting/CTF-07/native-helper-prep-01/projection-policy-proposal.json",
+                     "sha256": "4368c7364c86e1227864a18777d8109d8a31afa0ac0e0411e9559bf7ed6f76d6"}
+ PRIOR_WRITER = {"path": ".runtime/porting/CTF-07/input-writer-prep-01/manifest.json",
+@@ -28,7 +28,11 @@
+                    "sha256": "3993734262efffcb725b5bd248c4144d2cda69d093653ffc480dc645fd8584dc"}
+ PRIOR_08_POLICY = {"path": ".runtime/porting/CTF-08/native-helper-prep-01/projection-policy-proposal.json",
+                    "sha256": "7c5ebcba0bc887166a930671080350133317623efe340fd8bea82e1bb5be92d9"}
+-FLAGS = {"frozen_before_this_CTF09_helper_execution": True, "expected_values_supplied": False,
++PRIOR_09_WRITER = {"path": ".runtime/porting/CTF-09/input-writer-prep-01/manifest.json",
++                   "sha256": "4009f6c7c6b3d32bf647113f47d9e0931b6ff79a358fce38ecfa930c2f2881bd"}
++PRIOR_09_POLICY = {"path": ".runtime/porting/CTF-09/native-helper-prep-01/projection-policy-proposal.json",
++                   "sha256": "233438c166c0aabe0df6a9f6e1600b711bc94fbda21b0bb134074670c43782ef"}
++FLAGS = {"frozen_before_this_CTF10_helper_execution": True, "expected_values_supplied": False,
+          "expected_exits_supplied": False, "scientific_execution_performed": False}
+ INHERITED = {
+     "unit": {"base": ".runtime/porting/CTF-01/frozen-packet-01/",
+@@ -40,7 +44,7 @@
+                    "source": "89c2629f2789b82ffd4b6d92c552391843eb2d793702116dd73beaae5579e9d3",
+                    "tolerances": "b370c6b8f535cfe161fa553ca4045ef864dc9a1812b7f0c35420ca40545f1b84"},
+ }
+-LINKED_ORIGINAL_RETENTION_INTENT = {'schema': 'ctf09-debug-original-retention-intent.v1', 'role': 'prospective-debug-original', 'scope': 'new-CTF09-linked-originals-only', 'actual_file_identity_required': True, 'both_original_and_helper_verified_before_execution': True, 'retain_through_PE_validation_and_current_helper_execution': True, 'removal_requires_separate_Root_authorized_actual_retention_record': True, 'earlier_live_refs_reinterpreted': False, 'deletion_performed': False}
++LINKED_ORIGINAL_RETENTION_INTENT = {'schema': 'ctf10-debug-original-retention-intent.v1', 'role': 'prospective-debug-original', 'scope': 'new-CTF10-linked-originals-only', 'actual_file_identity_required': True, 'both_original_and_helper_verified_before_execution': True, 'retain_through_PE_validation_and_current_helper_execution': True, 'removal_requires_separate_Root_authorized_actual_retention_record': True, 'earlier_live_refs_reinterpreted': False, 'deletion_performed': False}
+ COUNTS = {"unit": {"model_cases": 39, "calculateTransferFunction": 42},
+           "production": {"model_cases": 15, "loader_phase_records": 195}}
+ 
+@@ -71,32 +75,32 @@
+ 
+ 
+ def scope_authority(args, passive, native_ref, passive_ref, policy_ref):
+-    card = m.argument(args.current_card_09)
+-    m.require(card["path"] == "energyplus_porting_plan/cards/CTF-09.md", "Actual current retry card required")
++    card = m.argument(args.current_card_10)
++    m.require(card["path"] == "energyplus_porting_plan/cards/CTF-10.md", "Actual current public-storage card required")
+     amendment_ref = m.argument(args.actual_scope_amendment)
+     execution_ref = m.argument(args.actual_scope_amendment_execution)
+     amendment = m.load(amendment_ref)
+-    m.require(amendment["schema"] == "ctf09-source-scope-amendment.v1" and
+-              amendment["cards"] == ["CTF-09"] and amendment["scope_review_passed"] is True and
++    m.require(amendment["schema"] == "ctf10-source-scope-amendment.v1" and
++              amendment["cards"] == ["CTF-10"] and amendment["scope_review_passed"] is True and
+               amendment["all_other_gates_pending"] is True and amendment["strict_profiles_settled_before_outputs"] is True and
+-              amendment["actual_CTF09_build_or_engine_execution_performed"] is False,
+-              "Actual pre-output CTF09 source scope authority required")
++              amendment["actual_CTF10_build_or_engine_execution_performed"] is False,
++              "Actual pre-output CTF10 source scope authority required")
+     m.require(m.bind(amendment["native_observer"]) == native_ref and
+               m.bind(amendment["passive_observer"]) == passive_ref and
+-              m.bind(amendment["retry_policy_source_inventory"]) == policy_ref and
+-              amendment["requested_counts"] == COUNTS, "Retry scope source/policy/input count binding differs")
++              m.bind(amendment["public_storage_policy_source_inventory"]) == policy_ref and
++              amendment["requested_counts"] == COUNTS, "Public-storage scope source/policy/input count binding differs")
+     before = [m.bind(row) for row in amendment["before_documents"]]
+     after = [m.bind(row) for row in amendment["after_documents"]]
+     m.require(len(before) == len(after) == 2 and len({row["path"] for row in before}) == 2 and
+               len({row["path"] for row in after}) == 2, "Exact plan/card before and after identities required")
+-    historical = next(row for row in passive["source_dependencies"] if row["path"] == card["path"])
++    historical = next(row["source"] for row in passive["source_inventory"] if row["source"]["path"] == card["path"])
+     m.require(any(row["sha256"] == historical["sha256"] and row["size_bytes"] == historical["size_bytes"]
+                   for row in before) and card in after and m.identity("energyplus_porting_plan/plan.json") in after,
+-              "Historical retry card copy/current amended plan and card correspondence differs")
+-    scope_check(execution_ref, "CTF-09")
+-    return {"current_cards": {"CTF-09": card}, "actual_scope_amendment": amendment_ref,
++              "Historical public-storage card copy/current amended plan and card correspondence differs")
++    scope_check(execution_ref, "CTF-10")
++    return {"current_cards": {"CTF-10": card}, "actual_scope_amendment": amendment_ref,
+             "actual_scope_amendment_execution": execution_ref,
+-            "actual_scope_amendment_execution_role": "real-CTF-09-check-only",
++            "actual_scope_amendment_execution_role": "real-CTF-10-check-only",
+             "historical_scope_documents": before, "current_scope_documents": after,
+             "scope_recorder_role": "validated-Root-authored-documents; did-not-author-amendment"}
+ 
+@@ -221,7 +225,7 @@
+ 
+ 
+ 
+-def prior_authority(args, models, counts, old_policy_ref, started):
++def prior_08_authority(args, models, counts, old_policy_ref, started):
+     prior_ref = m.argument(args.prior_08_freeze)
+     recorder_ref = m.argument(args.prior_08_freeze_execution)
+     prior, recorder = m.load(prior_ref), m.load(recorder_ref)
+@@ -328,12 +332,120 @@
+             "prior08_numerical_PASS_inferred": False}
+ 
+ 
++def prior_09_authority(args, models, counts, old_policy_ref, started):
++    prior_ref = m.argument(args.prior_09_freeze)
++    recorder_ref = m.argument(args.prior_09_freeze_execution)
++    prior, recorder = m.load(prior_ref), m.load(recorder_ref)
++    prefix = "ctf09-" + ("production-" if args.lane == "production" else "")
++    writer_ref = m.bind(PRIOR_09_WRITER)
++    writer_sources = [m.bind(row) for row in m.load(writer_ref)["own_sources"]]
++    m.require(prior["schema"] == prefix + "frozen-packet.v1" and prior["lane"] == args.lane and
++              prior["status"] == "frozen-inherited-input-and-fresh-CTF09-retry-policy-before-helper" and
++              prior["frozen_before_this_CTF09_helper_execution"] is True and prior["requested_counts"] == counts and
++              prior["scientific_operands_evaluated"] is False and prior["numerical_PASS_claimed"] is False and
++              prior["source_preparation_approval"]["approved_writer_sha256"] == writer_sources[0]["sha256"] and
++              m.bind(prior["source_preparation_approval"]["source_manifest"]) == writer_ref,
++              "Authentic prior09 input-only freeze required; no numerical PASS inferred")
++    m.require(recorder["schema"] == "recorded-porting-command.v1" and type(recorder["exit_code"]) is int and
++              recorder["exit_code"] == 0 and recorder["launch_error"] is None and
++              recorder["source_bytes_match_before_and_after"] is True and Path(recorder["cwd"]).resolve() == m.ROOT and
++              recorder["executed_launcher"]["historical_path"] == "tools/porting/record_command.py",
++              "Actual source-preserving prior09 freeze recorder required")
++    command = recorder["command"]
++    m.require(command[:4] == ["python", "-X", "utf8", "-B"] and len(command) == 25 and
++              m.contained(command[4]) == m.contained(writer_sources[0]["path"]), "Actual prior09 writer argv required")
++    options = dict(zip(command[5::2], command[6::2]))
++    m.require(set(options) == {"--lane", "--approved-source-sha256", "--source-manifest", "--native-source-manifest",
++              "--current-card-09", "--actual-scope-amendment", "--actual-scope-amendment-execution",
++              "--prior-08-freeze", "--prior-08-freeze-execution", "--output-dir"} and
++              options["--lane"] == args.lane and options["--approved-source-sha256"] == writer_sources[0]["sha256"] and
++              m.argument(options["--source-manifest"]) == writer_ref and
++              m.contained(options["--output-dir"], existing=False) == m.contained(prior_ref["path"]).parent,
++              "Prior09 recorder input/freeze output association differs")
++    m.bind(recorder["executed_launcher"]["archive"])
++    m.require(m.load(recorder["stdout"]) == prior and m.bind(recorder["stderr"])["size_bytes"] == 0,
++              "Prior09 full freeze stdout/empty stderr required")
++    m.require(datetime.fromisoformat(prior["finished_utc"]) <= datetime.fromisoformat(started),
++              "Prior09 freeze must precede this actual10 freeze")
++    request = m.load(prior["helper_request"])
++    m.require(request["model_cases"] == models and request["requested_counts"] == counts,
++              "Prior09 input model/caller/member/operation rows must remain literal")
++    source_ref = m.bind(prior["contracts"]["source"])
++    source = m.load(source_ref)
++    ranges = source["ctf09_selected_primary_ranges"]
++    for row in ranges:
++        range_guard(m.identity(row["path"]), row)
++    tolerance, policy = m.load(prior["contracts"]["tolerances"]), m.load(m.bind(PRIOR_09_POLICY))
++    for key in ["ctf03_initial_observation_policy", "ctf04_matrix_observation_policy", "ctf03_initial_profiles",
++                "arithmetic_profiles_by_variable", "ctf06_exponential_observation_policy", "ctf05_inverse_observation_policy",
++                "ctf06_exponential_profiles", "ctf05_inverse_profiles", "ctf07_gamma_observation_policy", "ctf07_gamma_profiles",
++                "ctf08_final_coefficient_observation_policy", "ctf08_final_coefficient_profiles",
++                 "ctf09_retry_observation_policy", "ctf09_attempt_selection", "ctf09_retry_profiles",
++                 "ctf09_all_visit_handoff_profile_groups"]:
++        m.require(tolerance[key] == policy[key], "Prior09 frozen inherited policy/profile differs")
++    authority = prior["source_authorities"]
++    m.require(authority == source["source_authorities"], "Prior09 receipt/source authority differs")
++    amendment_ref, check_ref = m.bind(authority["actual_scope_amendment"]), m.bind(authority["actual_scope_amendment_execution"])
++    amendment = m.load(amendment_ref)
++    m.require(m.argument(options["--actual-scope-amendment"]) == amendment_ref and
++              m.argument(options["--actual-scope-amendment-execution"]) == check_ref and
++              m.bind(authority["retry_policy_source_inventory"]) == m.bind(PRIOR_09_POLICY) and
++              m.argument(options["--native-source-manifest"]) == m.bind(authority["native_source_manifest"]),
++              "Separate real prior09 scope/check authority differs")
++    card = authority["current_cards"]["CTF-09"]  # Historical descriptor, never current live after-document.
++    m.require(options["--current-card-09"] == card["path"] + "#" + card["sha256"] and
++              authority["actual_scope_amendment_execution_role"] == "real-CTF-09-check-only" and
++              amendment["schema"] == "ctf09-source-scope-amendment.v1" and amendment["cards"] == ["CTF-09"] and
++              amendment["scope_review_passed"] is True and amendment["all_other_gates_pending"] is True and
++              amendment["strict_profiles_settled_before_outputs"] is True and
++              amendment["actual_CTF09_build_or_engine_execution_performed"] is False and
++              m.bind(amendment["native_observer"]) == m.bind(authority["native_source_manifest"]) and
++              m.bind(amendment["passive_observer"]) == m.bind(authority["passive_observer"]) and
++              m.bind(amendment["retry_policy_source_inventory"]) == m.bind(PRIOR_09_POLICY) and
++              amendment["requested_counts"] == COUNTS, "Historical09 scope/source binding differs")
++    scope_check(check_ref, "CTF-09")
++    before, after = [m.bind(row) for row in amendment["before_documents"]], amendment["after_documents"]
++    m.require(len(before) == len(after) == 2 and len({row["path"] for row in after}) == 2 and
++              {row["path"] for row in after} == {"energyplus_porting_plan/plan.json", "energyplus_porting_plan/cards/CTF-09.md"} and
++              before == authority["historical_scope_documents"] and after == authority["current_scope_documents"] and card in after,
++              "Historical09 plan/card identities differ")
++    archives = []
++    for row in prior["reviewed_source_archives"]:
++        if any(ref["path"] == row["historical_path"] and ref["sha256"] == row["archive"]["sha256"] for ref in before + after):
++            archives.append({"historical_path": row["historical_path"], "archive": m.bind(row["archive"])})
++    m.require(all(any(row["historical_path"] == ref["path"] and row["archive"]["sha256"] == ref["sha256"]
++                      for row in archives) for ref in before + after), "Prior09 frozen document archives required")
++    m.require(len(prior["executed_writer_sources"]) == len(writer_sources) == 2, "Prior09 executed own2 required")
++    for row, source_row in zip(prior["executed_writer_sources"], writer_sources):
++        m.require(row["historical_path"] == source_row["path"] and m.bind(row["archive"])["sha256"] == source_row["sha256"],
++                  "Prior09 executed writer archive differs")
++    nested = authority["historical_prior_08_authority"]
++    m.require(request["historical_prior_08_authority"] == nested and
++              m.argument(options["--prior-08-freeze"]) == m.bind(nested["prior_08_freeze"]) and
++              m.argument(options["--prior-08-freeze-execution"]) == m.bind(nested["prior_08_freeze_execution"]),
++              "Prior09 literal08 ancestry/actual arguments differ")
++    nested_args = argparse.Namespace(lane=args.lane,
++        prior_08_freeze=nested["prior_08_freeze"]["path"] + "#" + nested["prior_08_freeze"]["sha256"],
++        prior_08_freeze_execution=nested["prior_08_freeze_execution"]["path"] + "#" + nested["prior_08_freeze_execution"]["sha256"])
++    m.require(prior_08_authority(nested_args, models, counts, old_policy_ref, started) == nested,
++              "Prior09 nested08 and original05/06 authority must remain exact authenticated literals")
++    return {"prior_09_freeze": prior_ref, "prior_09_freeze_execution": recorder_ref,
++            "prior_09_writer_manifest": writer_ref, "prior_09_source_contract": source_ref,
++            "prior_09_selected_primary_ranges": ranges, "prior_09_scope_amendment": amendment_ref,
++            "prior_09_scope_check_execution": check_ref, "historical_before_document_archives": before,
++            "historical_after_document_identities": [{"historical_path": row["path"], "sha256": row["sha256"],
++                "size_bytes": row["size_bytes"]} for row in after], "available_prior_frozen_document_archives": archives,
++            "historical_prior_08_authority": nested,
++            "documentary_limit": "Prior09 after identities retain historical meaning; authenticate archived bytes only, never current10 plan/card replay; nested08/07/05/06 remains literal",
++            "prior09_numerical_PASS_inferred": False}
++
++
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument("--lane", choices=["unit", "production"], required=True)
+-    for name in ["approved-source-sha256", "source-manifest", "native-source-manifest", "current-card-09",
+-                 "actual-scope-amendment", "actual-scope-amendment-execution", "prior-08-freeze",
+-                 "prior-08-freeze-execution", "output-dir"]:
++    for name in ["approved-source-sha256", "source-manifest", "native-source-manifest", "current-card-10",
++                 "actual-scope-amendment", "actual-scope-amendment-execution", "prior-09-freeze",
++                 "prior-09-freeze-execution", "output-dir"]:
+         parser.add_argument("--" + name, required=True)
+     args = parser.parse_args()
+     started = datetime.now(timezone.utc).isoformat()
+@@ -342,17 +454,17 @@
+     own_ref = m.argument(args.source_manifest)
+     own = m.load(own_ref)
+     own_sources = [m.bind(row) for row in own["own_sources"]]
+-    m.require(own["schema"] == "ctf09-input-writer-source-preparation.v1" and
++    m.require(own["schema"] == "ctf10-input-writer-source-preparation.v1" and
+               own_sources == [writer, m.identity(io_path)], "Exact approved writer/helper identities required")
+     native_ref = m.argument(args.native_source_manifest)
+     m.require(native_ref == m.bind(NATIVE), "Exact held Native source preparation required")
+     native = m.load(native_ref)
+-    m.require(native["schema"] == "ctf09-retry-native-helper-source-preparation.v1" and
+-              native["energyplus_commit"] == COMMIT, "Pinned combined method observer manifest required")
++    m.require(native["schema"] == "ctf10-native-helper-source-preparation.v1", "Pinned combined method observer manifest required")
+     passive_ref = m.bind(PASSIVE)
+     passive = m.load(passive_ref)
+-    m.require(passive["energyplus_commit"] == COMMIT and m.bind(native["passive_observer_manifest"]) == passive_ref, "Held helper/passive source binding differs")
+-    documents = {Path(row["proposal"]["path"]).name: m.bind(row["proposal"]) for row in native["policy_proposals"]}
++    m.require(m.bind(native["accepted10_passive_manifest"]) == passive_ref and
++              passive["original_Construction"]["sha256"] == "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695", "Held helper/passive source binding differs")
++    documents = {Path(row["proposal"]["path"]).name: m.bind(row["proposal"]) for row in native["source_policy_proposals"]}
+     proposed = m.load(documents["input-policy-proposal.json"])
+     projection_policy_ref = documents["projection-policy-proposal.json"]
+     projection_policy = m.load(projection_policy_ref)
+@@ -475,7 +587,7 @@
+     method_policies["ctf08_final_coefficient_observation_policy"] = coefficient_policy
+     method_profiles["ctf08_final_coefficient_profiles"] = coefficient_profiles
+     m.require(proposed["linked_original_retention_intent"] == projection_policy["linked_original_retention_intent"] ==
+-              LINKED_ORIGINAL_RETENTION_INTENT, "Forward-only new09 debug-original retention intent differs")
++              LINKED_ORIGINAL_RETENTION_INTENT, "Forward-only new10 debug-original retention intent differs")
+     retry_policy, retry_selection = projection_policy["ctf09_retry_observation_policy"], projection_policy["ctf09_attempt_selection"]
+     retry_profiles = projection_policy["ctf09_retry_profiles"]
+     m.require(retry_policy == proposed["ctf09_retry_observation_policy"] and
+@@ -502,6 +614,33 @@
+               all(groups[key] == projection_policy[key] for key in groups), "Separate all-visit handoff values must equal frozen inherited profiles")
+     method_policies.update(ctf09_retry_observation_policy=retry_policy, ctf09_attempt_selection=retry_selection)
+     method_profiles.update(ctf09_retry_profiles=retry_profiles, ctf09_all_visit_handoff_profile_groups=groups)
++    prior09_policy_ref = m.bind(PRIOR_09_POLICY)
++    prior09_policy = m.load(prior09_policy_ref)
++    for key in [*method_policies, *method_profiles]:
++        m.require(projection_policy[key] == prior09_policy[key], "All inherited09 and earlier policies/profiles remain literal")
++    public_policy = projection_policy["ctf10_public_storage_observation_policy"]
++    execution_policy = projection_policy["ctf10_execution_lane_policy"]
++    public_profiles = projection_policy["ctf10_public_profiles"]
++    readiness = m.load(m.bind(native["prospective_policy_authority"]))
++    m.require(public_policy == proposed["ctf10_public_storage_observation_policy"] == readiness and
++              execution_policy == proposed["ctf10_execution_lane_policy"] and
++              public_profiles == proposed["ctf10_public_profiles"] == public_policy["arithmetic_profiles_by_variable"],
++              "Exact reviewed public storage and execution-lane source proposals required")
++    m.require(public_policy["selected_scope"] == "actual_reached_no_source_1D_within_fixed_public_capacity" and
++              public_policy["public_capacity"]["slot_count"] == 19 and
++              public_policy["public_capacity"]["clamp_or_truncation"] is False and
++              execution_policy["unit_whole_Init_and_reports_admitted"] is False and
++              execution_policy["production_manual_Construction_call_loop_performed"] is False,
++              "Direct unit versus true Init production scope must remain explicit")
++    public_variables = ["CTFOutside", "CTFCross", "CTFInside", "CTFFlux", "CTFTimeStep", "UValue"]
++    m.require([row["variable"] for row in public_profiles] == public_variables and all(
++        type(row["atol"]) is float and row["atol"] == 0.0 and type(row["rtol"]) is float and row["rtol"] == 0.0 and
++        row["class_exact"] is True and row["shape_exact"] is True and row["signed_zero_exact"] is True and
++        row["required_shape"] == ([19] if index < 4 else "scalar") for index, row in enumerate(public_profiles)),
++        "Six fresh exact public-storage profiles required before observations")
++    method_policies.update(ctf10_public_storage_observation_policy=public_policy, ctf10_execution_lane_policy=execution_policy,
++                           ctf10_public_profiles=public_profiles)
++    method_profiles.update(ctf10_public_profiles=public_profiles)
+     inherited = INHERITED[args.lane]
+     old_refs = {key: m.bind({"path": inherited["base"] + name, "sha256": inherited[key]}) for key, name in
+                 [("request", "helper-request.json"), ("source", "source.json"), ("tolerances", "tolerances.json")]}
+@@ -544,43 +683,47 @@
+     m.require(len(originals) == (7 if args.lane == "unit" else 21), "Genuine inherited Original source inventory differs")
+     for row in old_source.get("primary_source_ranges", []):
+         range_guard(row["source"], row)
+-    for row in native["primary_source_ranges"]:
++    primary_ranges = [row["range"] for row in native["source_inventory"]
++                      if "range" in row and row["source"]["path"].startswith(ORIGINAL)]
++    primary_ranges += [row for row in native["additional_API_ranges"] if row["path"].startswith(ORIGINAL)]
++    for row in primary_ranges:
+         range_guard(m.identity(row["path"]), row)
+-    native_sources = [m.bind(row) for row in native["native_source_inventory_per_lane"][args.lane]]
+-    m.require(len(native_sources) == 8 and len({Path(row["path"]).name for row in native_sources}) == 8,
+-              "Exact lane-specific Native8 identity inventory required")
++    native_sources = [m.bind(row) for row in native["native_source_files_by_lane"][args.lane]]
++    m.require(len(native_sources) == 9 and len({Path(row["path"]).name for row in native_sources}) == 9,
++              "Exact lane-specific Native9 identity inventory required")
+     authority = scope_authority(args, passive, native_ref, passive_ref, projection_policy_ref)
+-    prior = prior_authority(args, models, counts, old_policy_ref, started)
++    prior = prior_09_authority(args, models, counts, old_policy_ref, started)
+     authority.update(native_source_manifest=native_ref, passive_observer=passive_ref,
+-                     retry_policy_source_inventory=projection_policy_ref, historical_prior_08_authority=prior,
++                     public_storage_policy_source_inventory=projection_policy_ref, historical_prior_09_authority=prior,
+                      inherited_input_only_packet=old_refs)
+     output = m.contained(args.output_dir, existing=False)
+-    m.require(output.is_relative_to(m.CTF) and output != m.CTF and not output.exists(), "Fresh CTF09 output required")
++    m.require(output.is_relative_to(m.CTF) and output != m.CTF and not output.exists(), "Fresh CTF10 output required")
+     m.recheck()
+     output.mkdir(parents=True, exist_ok=False)
+     archive_dir = output / "source-archives"
+     archive_dir.mkdir()
+     archives = [m.archive(row, archive_dir, index) for index, row in enumerate(
+-        own_sources + [native_ref, passive_ref, old_policy_ref, m.bind(PRIOR_08_POLICY), *documents.values(), *old_refs.values(),
+-        prior["prior_08_freeze"], prior["prior_08_freeze_execution"], prior["prior_08_scope_amendment"],
+-        prior["prior_08_scope_check_execution"], prior["prior_08_writer_manifest"], prior["prior_08_source_contract"],
++        own_sources + [native_ref, passive_ref, old_policy_ref, m.bind(PRIOR_08_POLICY), prior09_policy_ref, m.bind(native["prospective_policy_authority"]), *documents.values(), *old_refs.values(),
++        prior["prior_09_freeze"], prior["prior_09_freeze_execution"], prior["prior_09_scope_amendment"],
++        prior["prior_09_scope_check_execution"], prior["prior_09_writer_manifest"], prior["prior_09_source_contract"],
+         *prior["historical_before_document_archives"],
+         *[row["archive"] for row in prior["available_prior_frozen_document_archives"]],
+         authority["actual_scope_amendment"], authority["actual_scope_amendment_execution"],
+         *authority["historical_scope_documents"], *authority["current_scope_documents"]] + originals + native_sources)]
+-    prefix = "ctf09-" + ("production-" if args.lane == "production" else "")
++    prefix = "ctf10-" + ("production-" if args.lane == "production" else "")
+     common = {**FLAGS, "linked_original_retention_intent": LINKED_ORIGINAL_RETENTION_INTENT, "energyplus_commit": COMMIT, "fixed_scope": scope_ref, "all_45_guard_refs": guards,
+-              "historical_prior_08_authority": prior,
++              "historical_prior_09_authority": prior,
+               **{key: authority[key] for key in ["actual_scope_amendment", "actual_scope_amendment_execution",
+                   "actual_scope_amendment_execution_role", "current_cards"]}}
+     source = m.emit(output / "source.json", {"schema": prefix + "source-contract.v1", **FLAGS,
+         "energyplus_commit": COMMIT, "source_files": old_source["source_files"],
+         "inherited_primary_source_ranges": old_source.get("primary_source_ranges", []),
+-        "inherited_ctf06_selected_primary_ranges": prior["historical_prior_07_authority"]["historical_prior_05_06_authority"]["prior_06_selected_primary_ranges"],
+-        "inherited_ctf07_selected_primary_ranges": prior["historical_prior_07_authority"]["prior_07_selected_primary_ranges"],
+-        "inherited_ctf08_selected_primary_ranges": prior["prior_08_selected_primary_ranges"],
+-        "ctf09_selected_primary_ranges": native["primary_source_ranges"], "source_authorities": authority,
+-        "selected_source_boundary": "unchanged whole calls; actual initial619 and pre661; all actual no-source 1D visits through caller903-981; unchanged inherited first-only context, no CTF10/public-store claim"})
++        "inherited_ctf06_selected_primary_ranges": prior["historical_prior_08_authority"]["historical_prior_07_authority"]["historical_prior_05_06_authority"]["prior_06_selected_primary_ranges"],
++        "inherited_ctf07_selected_primary_ranges": prior["historical_prior_08_authority"]["historical_prior_07_authority"]["prior_07_selected_primary_ranges"],
++        "inherited_ctf08_selected_primary_ranges": prior["historical_prior_08_authority"]["prior_08_selected_primary_ranges"],
++        "inherited_ctf09_selected_primary_ranges": prior["prior_09_selected_primary_ranges"],
++        "ctf10_selected_primary_ranges": primary_ranges, "source_authorities": authority,
++        "selected_source_boundary": "unit direct whole Construction calls; production true whole Init after13 loaders; actual reset/reverse/public19 and Init events only; inherited09 all-visit and earlier first-only context unchanged; no surface/report equivalence or full card completion claim"})
+     tolerances = m.emit(output / "tolerances.json", {"schema": prefix + "tolerances-contract.v1", **FLAGS,
+         "linked_original_retention_intent": LINKED_ORIGINAL_RETENTION_INTENT, **method_policies, **method_profiles,
+         "ctf03_initial_observation_policy": initial_policy, "ctf04_matrix_observation_policy": matrix_policy, "arithmetic_profiles_by_variable": profiles, "ctf03_initial_profiles": initial_profiles,
+@@ -607,14 +750,14 @@
+         "helper_request": request, "projection": projection, "contracts": contracts, "native_source_files": native_sources,
+         "ctf03_initial_observation_policy": initial_policy, "ctf04_matrix_observation_policy": matrix_policy, **method_policies, "requested_counts": counts, **request_extra})
+     m.recheck()
+-    receipt = {"schema": prefix + "frozen-packet.v1", "status": "frozen-inherited-input-and-fresh-CTF09-retry-policy-before-helper",
++    receipt = {"schema": prefix + "frozen-packet.v1", "status": "frozen-inherited-input-and-fresh-CTF10-public-storage-policy-before-helper",
+         "lane": args.lane, "linked_original_retention_intent": LINKED_ORIGINAL_RETENTION_INTENT, **FLAGS, "started_utc": started, "finished_utc": datetime.now(timezone.utc).isoformat(),
+         "source_preparation_approval": {"approved_writer_sha256": writer["sha256"], "source_manifest": own_ref,
+                                         "reviewed_sources": own_sources}, "source_authorities": authority,
+         "helper_request": request, "native_admission_contract": admission, "projection": projection,
+         "contracts": contracts, "requested_counts": counts, "fixed_scope": scope_ref, "all_45_guard_refs": guards,
+         "executed_writer_sources": archives[:2], "reviewed_source_archives": archives,
+-        "inherited_CTF01_through_CTF08_freeze_claimed_as_fresh_CTF09_freeze": False, "scientific_operands_evaluated": False,
++        "inherited_CTF01_through_CTF09_freeze_claimed_as_fresh_CTF10_freeze": False, "scientific_operands_evaluated": False,
+         "expected_arrays_or_method_outcomes_generated": False, "numerical_PASS_claimed": False,
+         "canonical_files_updated": False, "gates_updated": False}
+     m.emit(output / "freeze-receipt.json", receipt)

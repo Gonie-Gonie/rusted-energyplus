@@ -1,0 +1,30 @@
+--- before/CTF-10.md
++++ prospective/CTF-10.md
+@@ -68,3 +68,27 @@
+ 증거 경로:  
+ 최대오차/RMSE/상태 불일치:  
+ 추가 검토할 helper:  
++
++## Prospective selected CTF10 source scope (not an actual amendment)
++
++Pinned public scope: Construction.cc146-194 reset/use/timestep,309-315 shared
++loading-error return,405-485 original-ID reverse reuse,985-1077 allR/common
++fixed19 public stores; whole HeatBalanceManager.cc6153-6202 Init call/aggregate/
++report/fatal order. Existing CTF01-09 math is reused through real typed owners.
++
++Proposed lanes remain distinct: existing39 explicit-member models42 direct whole
++calls for unit public storage; fixedCON15/45 input guards with genuine public
++loaders/use/timestep and actual whole Init once for production. Direct unit
++caller flags/report prerequisites cannot be claimed as true Init ownership.
++
++Freeze six separate zero atol/rtol profiles (four regular19-slot arrays, actual
++CTFTimeStep and UValue), exact class/shape/signedzero and reset bits for the eight
++source arrays. Original IDs/order/use/reverse provider/flags/counts/Init aggregate
++read and report/fatal availability are exact. All19 slots are retained.
++
++The Rust fixed owner is selected only within representable inclusive count0..18.
++PublicCapacity is an honest Rust limitation, not an inferred Native guard/exit.
++Fatal bypasses stores/aggregate; severe break still reaches stores. Missing,
++unreached, excluded and unrepresentable owners cannot be PASS. Surface activation
++/cache invalidation/history metadata and genuine Native whole-call observations
++remain pending separate reviewed work. No gate or execution outcome is changed.

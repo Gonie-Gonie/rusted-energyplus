@@ -1,0 +1,133 @@
+# CTF10 source boundary and public-storage proposal
+
+This is an unapplied, unformatted, unexecuted source proposal. It makes no CTF10
+gate, numerical comparison, whole-call success, or production certification claim.
+Header authored this design and the standalone copier; Header also authored the
+accepted private08/public08 and selected09 ingress dependencies. Their formulas
+require a separate author's review, not self-certification through this package.
+
+## Exact selected boundary
+
+The card concerns construction-order generation, reverse reuse, and the generated
+construction-ID cache. The pinned source is EnergyPlus 26.1.0 commit
+`6f2e40d10250a105b49966baa24d843711e61048`. Construction.cc 146-165 resets all
+twelve public 19-slot arrays, metadata and UValue before the unused return. A used
+construction assigns caller TimeStepZone at194; shared loading ErrorsFound causes
+the return at313-315. Those are genuine reset/early-return states, not generated
+coefficient successes. CON01's excluded construction/material/source routes stay
+excluded and must have explicit unavailable owners.
+
+For a reached massive no-source 1D route, common stores at1024-1077 consume the
+last actual private s0/s/e and current converted conductance cnd. NumCTFTerms is
+that private method's term count. CTFTimeStep and NumHistories are the caller's
+postcheck members, which can differ from the last method stamp after a severe
+seven-hour break. Unary negation precedes multiplication by the unchanged CFU
+expression. Flux[0] remains its reset positive zero. Source/sink arrays and all
+untouched tails retain their reset bits. No SI resistance sum substitutes cnd.
+
+The all-resistive branch985-1018 is already owned by CTF02. The proposed adapter
+copies that actual owner; it does not recalculate the branch or its coefficients.
+The standalone massive copier does not decide whether stores were reached. Its
+future caller must first establish the actual selected terminal route. Fatal939
+and a typed scope stop cannot invoke it. Severe948-977 reaches the stores even
+with ErrorsFound true; this must not be filtered into an early return.
+
+## Reverse reuse and ordered Init
+
+Reverse selection405-485 occurs only on the massive side of the literal predicate
+LayersInConstruct > NumResLayers. It scans actual earlier Construct elements up to
+the current address. The first equal-length reversed original LayerPoint ID stack
+whose earlier construction IsUsedCTF is true wins. It does not compare normalized
+layers, material values, cache hashes, or numerical coefficient equality. There
+is no separate generic duplicate rule; a palindrome can match this same rule.
+
+Reverse storage460-475 copies earlier public timestep/history/term count, swaps
+inside/outside, copies cross, and copies flux only for indices1..NumCTFTerms.
+Current Flux[0] remains reset. Current UValue still becomes current cnd*CFU at1077;
+it is not copied from the earlier UValue. The earlier public owner must exist even
+when its real earlier call returned a reset/error state. Missing custody is an
+unavailable join, never an invented zero or successful generated owner.
+
+InitConductionTransferFunctions6153-6202 owns one ErrorsFound=false and one
+DoCTFErrorReport=false across all actual Construct elements in declaration order.
+After each whole call returns, it updates SimpleCTFOnly from NumHistories and the
+maximum public NumCTFTerms. Then AnyInternalHeatSourceInInput can clear SimpleCTFOnly.
+Used constructions report layers; ScanForReports and DoCTFErrorReport select the
+coefficient reports; final shared ErrorsFound throws only after these reports.
+A fatal inside a construction bypasses that call's aggregate updates and all
+later Init work. Source-returned, fatal-unwound, and observer failure are distinct.
+
+## Fixed public capacity
+
+Construction.hh declares std::array<Real64,19>; valid indices are0..18. The
+inclusive stores and reverse copies use NumCTFTerms without a capacity check.
+The09 severe break can retain a larger term count before those stores. This is a
+source-derived unchecked-access risk, not an observed crash or a fixture to
+manufacture. No clamp, relaxed profile, or invented Native error resolves it.
+
+The standalone module returns a typed unrepresentable-input result outside its
+within-capacity contract. That result is a Rust interface limitation, not a Native
+branch/outcome. Future observations must retain the actual Native whole outcome
+and any safe fixed-array postreturn copy independently; no return or safe store is
+inferred from a retry LoopExit. Ordinary admitted cases need genuine observations
+before a broader capacity or public-store conclusion.
+
+## Existing owners and required integration
+
+Current canonical08 cache/state are only context. Accepted held09 consumes the
+original first assembly once, retains all actual attempts and the last private
+owner, and distinguishes postcheck metadata, Fatal, SevereBreak, and typed stops.
+No future09 applied-source hash is assumed. Reuse these real owners, original
+construction/material names, selected flags, and declared order. Preprocess once.
+
+Future10 orchestration must publish an ordered construction public-owner vector,
+including exact reset/early-return, generated, reverse-reused, unrepresentable,
+and unreached custody. Reverse chooser should reuse original-ID predicates from
+the03 owner but borrow actual earlier public storage. Actual Init aggregate state
+is a separate owner. Fatal stops later whole calls; shared severe/loading flags
+remain sticky. A Rust scope stop remains distinct from a Native fatal backend.
+
+The current cache's massive fallback is steady SI1/R; its hash includes allR and
+EIO rows but no massive generated public vector. A future selected generated path
+must hand the real construction public owner to the existing surface adapter and
+include all coefficient bits, metadata, ordered identities/use/caller association
+in invalidation. No EIO/fixture/Native answer may enter those operands. Existing
+SurfaceCtfState lacks construction timestep/history metadata; preserving those
+owners is required before a full production connection claim. SUR timing/physics
+and excluded source/QTF generation remain separately unclaimed.
+
+## Genuine Native observation, still to author
+
+Reuse09 whole Construction plus all passive attempt/method ledgers. Extend the
+existing02 public-postreturn copier to all twelve fixed arrays and true metadata;
+read fixed19 slots rather than indexing by an unsafe term count. A real reverse
+provider observation inside455-477 must copy the actual earlier address/index;
+coefficient equality is insufficient provenance.
+
+Existing09 production manually calls each whole method and does not execute
+InitConductionTransferFunctions. A later genuine Init mode must call that actual
+public function once after the same real loaders/use/timestep owners. A minimal
+derived HeatBalanceManager TU can bind each actual construction call and capture
+postreturn public storage and postaggregate state while retaining the whole Init
+body, reporting and fatal flow. Binding must unwind safely. Its archive provider,
+streams/ScanForReports prerequisites, whole-source inverse restoration and passive
+diff need independent review before Root builds. This package implements none of
+that Native instrumentation, helper, freezer, QA, comparer, cache, or driver work.
+
+## Prospective policy and tests
+
+profiles.proposed.json lists separate exact-zero profiles for four regular arrays,
+CTFTimeStep and UValue, plus exact reset bits for the eight source/QTF arrays and
+exact ID/order/count/branch/flag/shape/class/signed-zero
+and source-association obligations. These are proposed before any10 output and do
+not modify earlier profiles. All nineteen slots, including reset tails, are owed
+for a selected reached public owner. Unknown/unreached/unrepresentable rows cannot
+be PASS. Raw Native diagnostics and selected Rust diagnostic intents stay separate.
+
+The new standalone tests cover actual slot18, unrepresentable count19, copied allR
+signed zeros, independent current U on reverse reuse, Flux[0], retained postcheck
+metadata, reset tails, scalar nonfinite behavior and input immutability. Literal
+test operands are unit source cases, not Native observations or production inputs.
+They have not been compiled, formatted, imported or run. No parent declaration or
+canonical source is changed. Every file/range and exact new-file diff is pinned in
+manifest.json; current08 and held09 identities are labeled separately.

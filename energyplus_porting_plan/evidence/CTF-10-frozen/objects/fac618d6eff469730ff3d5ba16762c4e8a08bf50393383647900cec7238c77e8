@@ -1,0 +1,139 @@
+{
+  "schema": "ctf10-public-storage-prospective-policy.v1",
+  "status": "SOURCE-PROPOSAL-not-a-runtime-freeze",
+  "selected_scope": "actual_reached_no_source_1D_within_fixed_public_capacity",
+  "arithmetic_profiles_by_variable": [
+    {
+      "variable": "CTFOutside",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        19
+      ],
+      "unit": "W/m2-K"
+    },
+    {
+      "variable": "CTFCross",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        19
+      ],
+      "unit": "W/m2-K"
+    },
+    {
+      "variable": "CTFInside",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        19
+      ],
+      "unit": "W/m2-K"
+    },
+    {
+      "variable": "CTFFlux",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        19
+      ],
+      "unit": "dimensionless"
+    },
+    {
+      "variable": "CTFTimeStep",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar",
+      "unit": "hours"
+    },
+    {
+      "variable": "UValue",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar",
+      "unit": "W/m2-K"
+    }
+  ],
+  "reset_source_arrays": {
+    "names": [
+      "CTFSourceIn",
+      "CTFSourceOut",
+      "CTFTSourceOut",
+      "CTFTSourceIn",
+      "CTFTSourceQ",
+      "CTFTUserOut",
+      "CTFTUserIn",
+      "CTFTUserSource"
+    ],
+    "required_shape": [
+      19
+    ],
+    "required_value_bits": "0000000000000000",
+    "source_QTF_generation_certified": false
+  },
+  "exact_discrete": [
+    "original_construction_ids",
+    "declared_Construct_order",
+    "original_LayerPoint_material_ids",
+    "actual_IsUsedCTF",
+    "actual_reverse_provider_identity_and_precedence",
+    "NumCTFTerms",
+    "NumHistories",
+    "array_lengths",
+    "source_route_and_return_availability",
+    "ErrorsFound",
+    "DoCTFErrorReport",
+    "actual_Init_call_order",
+    "postreturn_aggregate_update_order",
+    "SimpleCTFOnly",
+    "MaxCTFTerms",
+    "AnyInternalHeatSourceInInput",
+    "report_call_availability",
+    "diagnostic_event_identity_and_order"
+  ],
+  "custody_obligations": [
+    "last_private_method_stamp_distinct_from_actual_caller_postcheck_stamp",
+    "current_converted_conductance_for_U_including_reverse",
+    "earlier_actual_public_owner_for_reverse_not_reconstructed_private_coefficients",
+    "all_fixed_19_slots_including_reset_tails",
+    "all_actual_declared_calls_retained_and_unreached_explicit"
+  ],
+  "public_capacity": {
+    "slot_count": 19,
+    "last_valid_index": 18,
+    "inclusive_NumCTFTerms_store_required": true,
+    "out_of_capacity_Rust_interface_unrepresentable": true,
+    "Native_capacity_guard_or_safe_store_outcome_inferred": false,
+    "clamp_or_truncation": false
+  },
+  "source_outcomes": {
+    "fatal_inside_construction_bypasses_stores_and_Init_aggregate": true,
+    "seven_hour_severe_break_does_not_bypass_stores": true,
+    "scope_stop_is_not_Native_fatal": true,
+    "unknown_unreached_or_unrepresentable_counted_as_PASS": false,
+    "nonfinite_required_numeric_PASS_claimed": false
+  },
+  "historical_profiles_modified": false,
+  "expected_values_or_exits_supplied": false,
+  "scientific_execution_performed": false,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false
+}

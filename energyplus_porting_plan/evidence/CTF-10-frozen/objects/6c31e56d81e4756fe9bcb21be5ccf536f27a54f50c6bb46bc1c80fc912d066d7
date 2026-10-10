@@ -1,0 +1,338 @@
+--- before/ctf09_observer.cc
++++ ctf10_observer.cc
+@@ -1,11 +1,17 @@
+ // Output-only copies; observation allocation exceptions never reach the engine.
+-#include "ctf09_observer.hh"
++#include "ctf10_observer.hh"
++#include <EnergyPlus/Data/EnergyPlusData.hh>
++#include <EnergyPlus/DataHeatBalance.hh>
++#include <EnergyPlus/DataGlobals.hh>
++#include <EnergyPlus/General.hh>
++#include <EnergyPlus/OutputReportPredefined.hh>
++#include <exception>
+ 
+ #include <cstring>
+ #include <initializer_list>
+ #include <limits>
+ 
+-namespace EnergyPlus::CTF09Observation {
++namespace EnergyPlus::CTF10Observation {
+ namespace {
+ 
+ static_assert(sizeof(Real64) == sizeof(std::uint64_t));
+@@ -1585,4 +1591,314 @@
+     catch (...) { retry_failure(*capture, RetrySite::Diagnostic, ordinal, RetryFailureKind::CopyException, &copy.failure_kinds); }
+ }
+ 
+-} // namespace EnergyPlus::CTF09Observation
++namespace {
++thread_local InitCapture *active_init_capture = nullptr;
++thread_local InitConstructionRecord *active_init_construction = nullptr;
++
++int actual_index(EnergyPlusData const &state, Construction::ConstructionProps const &construction) noexcept
++{
++    int index = 0;
++    for (auto const &candidate : state.dataConstruction->Construct) {
++        ++index;
++        if (&candidate == &construction) return index;
++    }
++    return 0;
++}
++void public_failure(PublicCapture &capture, PublicSite site, PublicFailureKind kind) noexcept
++{
++    capture.integrity_failed = true;
++    auto &count = capture.failure_kind_counts[static_cast<std::size_t>(kind)];
++    if (count != std::numeric_limits<std::size_t>::max()) ++count;
++    PublicFailure const failure{site, capture.actual_site_counts[static_cast<std::size_t>(site)], kind};
++    if (!capture.first_failure) capture.first_failure = failure;
++    capture.last_failure = failure;
++}
++bool public_site(PublicCapture &capture, PublicSite site) noexcept
++{
++    auto &count = capture.actual_site_counts[static_cast<std::size_t>(site)];
++    if (count == std::numeric_limits<std::size_t>::max()) {
++        public_failure(capture, site, PublicFailureKind::CounterOverflow); return false;
++    }
++    ++count;
++    if (count != 1) public_failure(capture, site, PublicFailureKind::Duplicate);
++    return true;
++}
++void public_copy(PublicCapture &capture, PublicSite site, PublicSnapshot &copy,
++    EnergyPlusData const &state, Construction::ConstructionProps const &construction,
++    bool ErrorsFound, bool DoCTFErrorReport) noexcept
++{
++    copy.reached = true;
++    copy.actual_construction_address = reinterpret_cast<std::uintptr_t>(&construction);
++    copy.actual_construction_index = actual_index(state, construction);
++    if (copy.actual_construction_index == 0) {
++        public_failure(capture, site, PublicFailureKind::ConstructionNotFound); return;
++    }
++    try {
++        copy.actual_Name = construction.Name;
++        copy.ErrorsFound = ErrorsFound; copy.DoCTFErrorReport = DoCTFErrorReport;
++        copy.IsUsedCTF = construction.IsUsedCTF; copy.SourceSinkPresent = construction.SourceSinkPresent;
++        copy.SolutionDimensions = construction.SolutionDimensions; copy.TotLayers = construction.TotLayers;
++        if (construction.TotLayers >= 0 && construction.TotLayers <= Construction::MaxLayersInConstruct &&
++            covers_prefix(construction.LayerPoint, construction.TotLayers)) {
++            for (int layer = 1; layer <= construction.TotLayers; ++layer)
++                copy.original_LayerPoint[static_cast<std::size_t>(layer - 1)] = construction.LayerPoint(layer);
++            copy.original_layer_prefix_available = true;
++        }
++        // Fixed declared owners only: never index these arrays by NumCTFTerms.
++        for (std::size_t slot = 0; slot < Construction::MaxCTFTerms; ++slot) {
++            copy.CTFCross[slot] = copy_bits(construction.CTFCross[slot]);
++            copy.CTFFlux[slot] = copy_bits(construction.CTFFlux[slot]);
++            copy.CTFInside[slot] = copy_bits(construction.CTFInside[slot]);
++            copy.CTFOutside[slot] = copy_bits(construction.CTFOutside[slot]);
++            copy.CTFSourceIn[slot] = copy_bits(construction.CTFSourceIn[slot]);
++            copy.CTFSourceOut[slot] = copy_bits(construction.CTFSourceOut[slot]);
++            copy.CTFTSourceOut[slot] = copy_bits(construction.CTFTSourceOut[slot]);
++            copy.CTFTSourceIn[slot] = copy_bits(construction.CTFTSourceIn[slot]);
++            copy.CTFTSourceQ[slot] = copy_bits(construction.CTFTSourceQ[slot]);
++            copy.CTFTUserOut[slot] = copy_bits(construction.CTFTUserOut[slot]);
++            copy.CTFTUserIn[slot] = copy_bits(construction.CTFTUserIn[slot]);
++            copy.CTFTUserSource[slot] = copy_bits(construction.CTFTUserSource[slot]);
++        }
++        copy.CTFTimeStep = copy_bits(construction.CTFTimeStep); copy.UValue = copy_bits(construction.UValue);
++        copy.NumHistories = construction.NumHistories; copy.NumCTFTerms = construction.NumCTFTerms;
++        copy.copy_available = true;
++    } catch (...) { public_failure(capture, site, PublicFailureKind::CopyException); }
++}
++Capture *public_bound(EnergyPlusData const &state, Construction::ConstructionProps const &construction, PublicSite site) noexcept
++{
++    auto *capture = active_capture;
++    if (capture == nullptr) return nullptr;
++    public_site(capture->public_storage, site);
++    if (capture->bound_state != &state || capture->bound_construction != &construction) {
++        public_failure(capture->public_storage, site, PublicFailureKind::IdentityMismatch); return nullptr;
++    }
++    return capture;
++}
++void init_failure(InitCapture &capture, InitSite site, std::size_t ordinal, InitFailureKind kind) noexcept
++{
++    capture.integrity_failed = true;
++    auto &count = capture.failure_kind_counts[static_cast<std::size_t>(kind)];
++    if (count != std::numeric_limits<std::size_t>::max()) ++count;
++    InitFailure const failure{site, ordinal, kind};
++    if (!capture.first_failure) capture.first_failure = failure;
++    capture.last_failure = failure;
++}
++bool init_increment(InitCapture &capture, std::size_t &count, InitSite site) noexcept
++{
++    if (count == std::numeric_limits<std::size_t>::max()) {
++        init_failure(capture, site, count, InitFailureKind::CounterOverflow); return false;
++    }
++    ++count; return true;
++}
++} // namespace
++
++PublicFunctionScope::PublicFunctionScope(EnergyPlusData const &state,
++    Construction::ConstructionProps const &construction, bool const &errors, bool const &report) noexcept
++    : capture_(public_bound(state, construction, PublicSite::FunctionEntry)), state_(&state),
++      construction_(&construction), errors_(&errors), report_(&report), uncaught_on_entry_(std::uncaught_exceptions())
++{
++    if (capture_ != nullptr) public_copy(capture_->public_storage, PublicSite::FunctionEntry,
++        capture_->public_storage.before_reset, state, construction, errors, report);
++}
++PublicFunctionScope::~PublicFunctionScope() noexcept
++{
++    if (capture_ == nullptr) return;
++    auto &ledger = capture_->public_storage;
++    public_site(ledger, PublicSite::ScopeExit);
++    ledger.scope_exited_during_unwind = std::uncaught_exceptions() > uncaught_on_entry_;
++    public_copy(ledger, PublicSite::ScopeExit, ledger.scope_exit, *state_, *construction_, *errors_, *report_);
++}
++void public_reset(EnergyPlusData const &state, Construction::ConstructionProps const &construction, bool errors, bool report) noexcept
++{
++    if (auto *capture = public_bound(state, construction, PublicSite::Reset))
++        public_copy(capture->public_storage, PublicSite::Reset, capture->public_storage.after_reset, state, construction, errors, report);
++}
++void public_reverse_entry(EnergyPlusData const &state, Construction::ConstructionProps const &construction,
++    Construction::ConstructionProps const &provider, bool errors, bool report) noexcept
++{
++    if (auto *capture = public_bound(state, construction, PublicSite::ReverseEntry)) {
++        auto &copy = capture->public_storage.reverse_entry; copy.reached = true;
++        public_copy(capture->public_storage, PublicSite::ReverseEntry, copy.current, state, construction, errors, report);
++        public_copy(capture->public_storage, PublicSite::ReverseEntry, copy.actual_provider, state, provider, errors, report);
++    }
++}
++void public_reverse_completed(EnergyPlusData const &state, Construction::ConstructionProps const &construction,
++    Construction::ConstructionProps const &provider, bool errors, bool report) noexcept
++{
++    if (auto *capture = public_bound(state, construction, PublicSite::ReverseCompleted)) {
++        if (!capture->public_storage.reverse_entry.reached)
++            public_failure(capture->public_storage, PublicSite::ReverseCompleted, PublicFailureKind::Order);
++        auto &copy = capture->public_storage.reverse_completed; copy.reached = true;
++        public_copy(capture->public_storage, PublicSite::ReverseCompleted, copy.current, state, construction, errors, report);
++        public_copy(capture->public_storage, PublicSite::ReverseCompleted, copy.actual_provider, state, provider, errors, report);
++    }
++}
++void public_caller_return(Capture &capture, EnergyPlusData const &state,
++    Construction::ConstructionProps const &construction, bool errors, bool report) noexcept
++{
++    public_site(capture.public_storage, PublicSite::CallerReturn);
++    if (capture.bound_state != &state || capture.bound_construction != &construction) {
++        public_failure(capture.public_storage, PublicSite::CallerReturn, PublicFailureKind::IdentityMismatch); return;
++    }
++    if (!capture.public_storage.scope_exit.reached || capture.public_storage.scope_exited_during_unwind)
++        public_failure(capture.public_storage, PublicSite::CallerReturn, PublicFailureKind::Order);
++    public_copy(capture.public_storage, PublicSite::CallerReturn, capture.public_storage.actual_caller_return,
++        state, construction, errors, report);
++}
++
++InitBinding::InitBinding(InitCapture &capture, EnergyPlusData const &state) noexcept : capture_(&capture)
++{
++    if (active_init_capture != nullptr || active_capture != nullptr) { capture.binding_error = true; return; }
++    capture = InitCapture{}; capture.bound_state = &state;
++    active_init_capture = &capture; active_ = true;
++}
++InitBinding::~InitBinding() noexcept
++{
++    if (!active_) return;
++    if (active_init_capture == capture_) {
++        if (active_init_construction != nullptr) capture_->binding_error = true;
++        active_init_capture = nullptr; active_init_construction = nullptr;
++    } else capture_->binding_error = true;
++}
++void init_event(InitEvent event, EnergyPlusData const &state, bool errors, bool report,
++    bool const *assigned_report, Construction::ConstructionProps const *construction, int cCounter) noexcept
++{
++    auto *capture = active_init_capture; if (capture == nullptr) return;
++    if (!init_increment(*capture, capture->actual_event_count, InitSite::Event)) return;
++    auto const ordinal = capture->actual_event_count;
++    if (event == InitEvent::FunctionEnd) capture->actual_function_end_reached = true;
++    init_increment(*capture, capture->actual_event_kind_counts[static_cast<std::size_t>(event)], InitSite::Event);
++    if (capture->bound_state != &state) {
++        init_increment(*capture, capture->event_records_omitted, InitSite::Event);
++        init_failure(*capture, InitSite::Event, ordinal, InitFailureKind::IdentityMismatch); return;
++    }
++    try { capture->events.emplace_back(); }
++    catch (...) {
++        init_increment(*capture, capture->event_records_omitted, InitSite::Event);
++        init_failure(*capture, InitSite::Event, ordinal, InitFailureKind::LedgerAppendException); return;
++    }
++    auto &copy = capture->events.back(); copy.actual_event_ordinal = ordinal; copy.event = event;
++    copy.ErrorsFound = errors; copy.DoCTFErrorReport = report;
++    if (assigned_report != nullptr) copy.InitCTFDoReport = *assigned_report;
++    copy.actual_cCounter = cCounter;
++    if (construction != nullptr) {
++        copy.actual_construction_address = reinterpret_cast<std::uintptr_t>(construction);
++        copy.actual_construction_index = actual_index(state, *construction);
++        if (copy.actual_construction_index == 0) {
++            init_failure(*capture, InitSite::Event, ordinal, InitFailureKind::ConstructionNotFound); return;
++        }
++    }
++    copy.actual_Construct_array_size = state.dataConstruction->Construct.isize();
++    copy.SimpleCTFOnly = state.dataHeatBal->SimpleCTFOnly; copy.MaxCTFTerms = state.dataHeatBal->MaxCTFTerms;
++    copy.AnyInternalHeatSourceInInput = state.dataHeatBal->AnyInternalHeatSourceInInput;
++    copy.GetReportInput = state.dataGeneral->GetReportInput; copy.Constructions = state.dataGeneral->Constructions;
++    copy.actual_predefined_table_entry_count = state.dataOutRptPredefined->numTableEntry;
++    copy.actual_opaque_layer_column_count = state.dataOutRptPredefined->pdchOpqConsLayCol.size();
++    copy.actual_TimeStepZone = copy_bits(state.dataGlobal->TimeStepZone);
++    copy.copy_available = true;
++}
++InitFunctionScope::InitFunctionScope(EnergyPlusData const &state, bool const &errors, bool const &report) noexcept
++    : capture_(active_init_capture), state_(&state), errors_(&errors), report_(&report), uncaught_on_entry_(std::uncaught_exceptions())
++{
++    if (capture_ == nullptr) return;
++    if (capture_->actual_entry_reached) init_failure(*capture_, InitSite::Event, capture_->actual_event_count, InitFailureKind::Order);
++    capture_->actual_entry_reached = true;
++    init_event(InitEvent::Entry, state, errors, report);
++}
++InitFunctionScope::~InitFunctionScope() noexcept
++{
++    if (capture_ == nullptr) return;
++    capture_->scope_exit_reached = true;
++    capture_->scope_exited_during_unwind = std::uncaught_exceptions() > uncaught_on_entry_;
++    init_event(InitEvent::ScopeExit, *state_, *errors_, *report_);
++}
++InitConstructionScope::InitConstructionScope(EnergyPlusData const &state,
++    Construction::ConstructionProps const &construction, bool const &errors, bool const &report) noexcept
++    : capture_(active_init_capture), state_(&state), construction_(&construction), errors_(&errors), report_(&report),
++      uncaught_on_entry_(std::uncaught_exceptions())
++{
++    if (capture_ == nullptr) return;
++    if (!init_increment(*capture_, capture_->actual_construction_call_count, InitSite::Construction)) return;
++    auto const ordinal = capture_->actual_construction_call_count;
++    init_event(InitEvent::ConstructionEntry, state, errors, report, nullptr, &construction);
++    if (capture_->bound_state != &state || active_init_construction != nullptr || active_capture != nullptr) {
++        init_increment(*capture_, capture_->construction_records_omitted, InitSite::Construction);
++        init_failure(*capture_, InitSite::Construction, ordinal, InitFailureKind::IdentityMismatch); return;
++    }
++    try { capture_->constructions.push_back(std::make_unique<InitConstructionRecord>()); }
++    catch (...) {
++        init_increment(*capture_, capture_->construction_records_omitted, InitSite::Construction);
++        init_failure(*capture_, InitSite::Construction, ordinal, InitFailureKind::LedgerAppendException); return;
++    }
++    record_ = capture_->constructions.back().get(); record_->actual_call_ordinal = ordinal;
++    record_->actual_construction_address = reinterpret_cast<std::uintptr_t>(&construction);
++    record_->actual_construction_index = actual_index(state, construction);
++    if (record_->actual_construction_index == 0)
++        init_failure(*capture_, InitSite::Construction, ordinal, InitFailureKind::ConstructionNotFound);
++    try { record_->actual_Name = construction.Name; record_->identity_available = record_->actual_construction_index != 0; }
++    catch (...) { init_failure(*capture_, InitSite::Construction, ordinal, InitFailureKind::CopyException); }
++    binding_.emplace(record_->observations, state, construction);
++    if (!binding_->active()) init_failure(*capture_, InitSite::Construction, ordinal, InitFailureKind::IdentityMismatch);
++    active_init_construction = record_;
++}
++InitConstructionScope::~InitConstructionScope() noexcept
++{
++    if (record_ == nullptr) return;
++    record_->scope_exit_reached = true;
++    record_->scope_exited_during_unwind = std::uncaught_exceptions() > uncaught_on_entry_;
++    binding_.reset();
++    if (active_init_construction == record_) active_init_construction = nullptr;
++    else init_failure(*capture_, InitSite::Construction, record_->actual_call_ordinal, InitFailureKind::IdentityMismatch);
++}
++void InitConstructionScope::source_returned() noexcept
++{
++    if (capture_ == nullptr) return;
++    init_event(InitEvent::ConstructionReturn, *state_, *errors_, *report_, nullptr, construction_);
++    if (record_ == nullptr) return;
++    if (record_->actual_caller_return_reached) init_failure(*capture_, InitSite::Construction, record_->actual_call_ordinal, InitFailureKind::Order);
++    record_->actual_caller_return_reached = true;
++    public_caller_return(record_->observations, *state_, *construction_, *errors_, *report_);
++}
++void InitConstructionScope::aggregate_completed() noexcept
++{
++    if (capture_ == nullptr) return;
++    init_event(InitEvent::PostConstructionAggregate, *state_, *errors_, *report_, nullptr, construction_);
++    if (record_ != nullptr) {
++        if (!record_->actual_caller_return_reached || record_->postaggregate_reached)
++            init_failure(*capture_, InitSite::Construction, record_->actual_call_ordinal, InitFailureKind::Order);
++        record_->postaggregate_reached = true;
++    }
++}
++void init_caller_return(InitCapture &capture, EnergyPlusData const &state) noexcept
++{
++    if (capture.bound_state != &state || !capture.actual_function_end_reached ||
++        !capture.scope_exit_reached || capture.scope_exited_during_unwind || capture.actual_caller_return_reached) {
++        init_failure(capture, InitSite::Event, capture.actual_event_count, InitFailureKind::Order); return;
++    }
++    // Caller owns no references to the now-destroyed local shared flags.
++    capture.actual_caller_return_reached = true;
++}
++void init_diagnostic(EnergyPlusData const &state, std::size_t global_index, int level, std::string const &message) noexcept
++{
++    auto *capture = active_init_capture; if (capture == nullptr) return;
++    if (!init_increment(*capture, capture->actual_diagnostic_count, InitSite::Diagnostic)) return;
++    auto const ordinal = capture->actual_diagnostic_count;
++    if (capture->bound_state != &state) {
++        init_increment(*capture, capture->diagnostic_records_omitted, InitSite::Diagnostic);
++        init_failure(*capture, InitSite::Diagnostic, ordinal, InitFailureKind::IdentityMismatch); return;
++    }
++    try { capture->diagnostics.emplace_back(); }
++    catch (...) {
++        init_increment(*capture, capture->diagnostic_records_omitted, InitSite::Diagnostic);
++        init_failure(*capture, InitSite::Diagnostic, ordinal, InitFailureKind::LedgerAppendException); return;
++    }
++    auto &copy = capture->diagnostics.back(); copy.actual_diagnostic_ordinal = ordinal;
++    copy.actual_global_message_index = global_index; copy.actual_level = level;
++    if (!capture->events.empty() && capture->events.back().actual_event_ordinal == capture->actual_event_count)
++        copy.preceding_retained_event_ordinal = capture->actual_event_count;
++    if (active_init_construction != nullptr) copy.active_retained_construction_call_ordinal = active_init_construction->actual_call_ordinal;
++    try { copy.actual_message = message; copy.copy_available = true; }
++    catch (...) { init_failure(*capture, InitSite::Diagnostic, ordinal, InitFailureKind::CopyException); }
++}
++
++} // namespace EnergyPlus::CTF10Observation

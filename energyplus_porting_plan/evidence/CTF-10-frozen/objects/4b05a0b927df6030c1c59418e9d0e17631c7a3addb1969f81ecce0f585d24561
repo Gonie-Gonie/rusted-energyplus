@@ -1,0 +1,39 @@
+--- accepted10-02/README.md
++++ rebased10-03/README.md
+@@ -52,10 +52,11 @@
+ ## Ordinary ingress and consumer boundary
+ 
+ Five existing-source proposals add two declarations, cache storage/calls, one
+-state field and a move into the state shell. The before authorities are immutable
+-held09 proposals, not assumed future formatted09 bytes. The surface_manager
+-parent is the held caller09 declaration proposal. A later actual09 application
+-requires an explicit source correspondence/rebase before these hunks are applied.
++state field and a move into the state shell. Fresh03 before authorities are the
++five immutable actual09 final04 archives, including surface_manager.rs. Four
++before files are byte-exact the earlier held09 parents; construction_cache.rs
++retains the actual09 formatting. All accepted10 insertions are reapplied exactly.
++The final03-to-final04 observer compiler limit change did not touch these parents.
+ 
+ Cache build records public storage immediately after each real09 return and before
+ moving that return into its vector. It updates the selected aggregate there, not
+@@ -130,3 +131,20 @@
+ all types, variant names, control flow and arithmetic are byte-restorable to01.
+ The other eight Rust proposals, inherited profiles and prospective scope/card are
+ byte-exact01. Held01 is preserved. No formatter, compiler, test or target was run.
++
++## Fresh03 actual09 parent rebase
++
++The actual09 final04 inventory 9cc9af5e supplies the five parent archives. The
++new343/186 and reused193/161 Rust bodies are byte-exact02, as are the four other
++parent proposals, profiles and prospective scope/card. The sole nonempty Rust
++from-02 correspondence diff carries the existing09 cache import placement and
++line wrapping into this proposal; it adds no new public-owner behavior. Removing
++the exact accepted10 insertions from each parent restores its actual09 before.
++The unchanged construction_thermal_data tail is also byte-exact actual09.
++
++Accepted held09 dependencies and readiness contexts remain historical source
++authorities, rather than current formatted API claims. The new actual09 parent
++inventory is authoritative for applying these five changes. Before02, all nine
++from-02 diffs and the prior manifest are retained. Actual09 quality receipts and
++full Cargo snapshots are not read or inferred here. No formatter or target ran;
++Root and another author must review this rebase before application.
