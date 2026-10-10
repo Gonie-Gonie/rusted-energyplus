@@ -1,0 +1,272 @@
+{
+  "schema": "ctf07-first-gammas-owner-source-preparation.v1",
+  "status": "SOURCE-READY-HELD-unapplied-unformatted-unexecuted",
+  "own_source_rows": [
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-07/first-gamma-owner-prep-01/new/ctf_first_gamma_owner.rs",
+        "sha256": "54ca9ca807a02fdf7e8921ba9489b11e8c902b740d4a25c8d705ab98e5345e71",
+        "size_bytes": 7406,
+        "line_count": 155
+      },
+      "canonical_install_path": "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs",
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-07/first-gamma-owner-prep-01/ctf_first_gamma_owner.rs.addition.diff",
+        "sha256": "d449ba83aeed00142a142e3eba18817740a73f7d2f8061e8c598b47732bdd795",
+        "size_bytes": 7657,
+        "line_count": 158
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-07/first-gamma-owner-prep-01/new/ctf_first_gamma_owner_tests.rs",
+        "sha256": "38127b3ce971417bec5d24be565b32acd2babffb77b2a2da8821fe8094fe98de",
+        "size_bytes": 7758,
+        "line_count": 150
+      },
+      "canonical_install_path": "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner_tests.rs",
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-07/first-gamma-owner-prep-01/ctf_first_gamma_owner_tests.rs.addition.diff",
+        "sha256": "d34384cf7c015d46aa8459ed28aba2357f22584c1b10022657c36f8ab1e77a80",
+        "size_bytes": 8010,
+        "line_count": 153
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-07/first-gamma-owner-prep-01/proposed/mod.rs",
+        "sha256": "a5b8504546a56a2c061e05b568e0ee2ace345cd8e8d4706529eac9324ebd24b0",
+        "size_bytes": 1436,
+        "line_count": 61
+      },
+      "canonical_install_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "before_source": {
+        "historical_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+        "archive": {
+          "path": ".runtime/porting/CTF-07/first-gamma-owner-prep-01/before/mod.rs",
+          "sha256": "8f5ba2d3e51b9110f341c84c25809e795fd161e2f38f90e64be977c92e861e35",
+          "size_bytes": 1405,
+          "line_count": 60
+        }
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-07/first-gamma-owner-prep-01/mod.rs.from-current.diff",
+        "sha256": "590444dc4a6d9c3096155747a0925044653788c0e7456f3d2dd4b7e4818722fb",
+        "size_bytes": 296,
+        "line_count": 10
+      }
+    }
+  ],
+  "source_dependencies": [
+    {
+      "path": "energyplus_porting_plan/cards/CTF-07.md",
+      "sha256": "fd49a0c26a92819161d622c6f73b17398c93b4f2ae3e13da458e860781192fb3",
+      "size_bytes": 2686,
+      "line_count": 70
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+      "size_bytes": 110319,
+      "line_count": 2115
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "sha256": "53a14b2a45860255267e6ebf780a50fc8aefc4ba30ae3df589062601a20f999a",
+      "size_bytes": 24041,
+      "line_count": 383
+    },
+    {
+      "path": ".runtime/porting/CTF-07/rust-gamma-prep-02/manifest.json",
+      "sha256": "cf220cd8e8aebaea9b9c5b2c9b53df3240c089bb929ffd6223ba23a38bb2e9eb",
+      "size_bytes": 11442,
+      "line_count": 290
+    },
+    {
+      "path": ".runtime/porting/CTF-07/rust-gamma-prep-02/new/ctf_gamma_matrix.rs",
+      "sha256": "f173d96bf44e94d1e871df210a6d75af32c4fbf7771760504042b95f9e1dc7e0",
+      "size_bytes": 6371,
+      "line_count": 152
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
+      "sha256": "dd8a47daa27abe47f58ae5eef5a6713a657aa1332d5c620d88ba65c7a056d8c2",
+      "size_bytes": 5167,
+      "line_count": 126
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+      "sha256": "0d5b57ec2c0b60111cdc29d94288d38d6abce78a95b4f9bbb155624babe558e5",
+      "size_bytes": 5605,
+      "line_count": 136
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "sha256": "65ec2a19c1721ab3a685a7e24e9b95d67d3ff910fe17976a76405ea32c155c73",
+      "size_bytes": 10624,
+      "line_count": 283
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "sha256": "0cf67532a277ea20c362acdcc97d2e293ee086a8757177e2b8ccb5bb52fb39a7",
+      "size_bytes": 11747,
+      "line_count": 316
+    },
+    {
+      "path": "crates/ep_model/src/ids.rs",
+      "sha256": "83b32ebf02684f459cb0a789f498de08b849b94a7072f1f5870663a4b3cca7be",
+      "size_bytes": 2029,
+      "line_count": 61
+    },
+    {
+      "path": ".runtime/porting/CTF-05/cache-ingress-prep-02/manifest.json",
+      "sha256": "6f8ccd6ec85563e61edf3d1719a4886d3ca077b5e5891698b5507002c5048697",
+      "size_bytes": 12007,
+      "line_count": 315
+    },
+    {
+      "path": ".runtime/porting/CTF-05/cache-ingress-prep-02/new/ctf_first_inverse_owner.rs",
+      "sha256": "5be9b073861decd14e7307de4d9826b898357574b66b30771bb6c31a4286cc67",
+      "size_bytes": 4523,
+      "line_count": 101
+    },
+    {
+      "path": ".runtime/porting/CTF-06/first-exponential-owner-prep-01/manifest.json",
+      "sha256": "bb5f8df81232760315d68e42d9adecb5cee66eda8ec01e97387b0614dab508d0",
+      "size_bytes": 14655,
+      "line_count": 360
+    },
+    {
+      "path": ".runtime/porting/CTF-06/first-exponential-owner-prep-01/new/ctf_first_exponential_owner.rs",
+      "sha256": "08e2c8f7516748e5bd461b8d45961d38d5a286ee09bd5b0f38bd63c14d8173de",
+      "size_bytes": 4138,
+      "line_count": 91
+    },
+    {
+      "path": ".runtime/porting/CTF-06/combined-first-matrix-ingress-prep-01/manifest.json",
+      "sha256": "459c572fe999f61c5cf865859e4ee6379dea4abdea11f57ca07d534920ca9d0d",
+      "size_bytes": 29201,
+      "line_count": 649
+    },
+    {
+      "path": ".runtime/porting/CTF-06/combined-first-matrix-ingress-prep-01/new/ctf_first_matrix_owner.rs",
+      "sha256": "ba4de9476379d4a72bdb628707f0e4426818d5245ff5d71eeebaccbb7a8097ed",
+      "size_bytes": 4118,
+      "line_count": 92
+    },
+    {
+      "path": ".runtime/porting/CTF-06/rust-exponential-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+      "sha256": "0dd184b702ee9b2541b0454b81b6d4750f9bd3fafd387d7ec957d5cbaf6e8680",
+      "size_bytes": 9748,
+      "line_count": 262
+    },
+    {
+      "path": ".runtime/porting/CTF-05/rust-inverse-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+      "sha256": "8d828b9d33c9054a2fc1bafc4ccfc01e892562f5e3689b139d28cbd0f06185b1",
+      "size_bytes": 3646,
+      "line_count": 106
+    }
+  ],
+  "source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1496,
+      "end_line": 1589,
+      "sha256": "738f643d12eaf6f333ceed15e0fd65db8508f8bfbdefac5f8eb8a76ef19379cb",
+      "size_bytes": 4459,
+      "purpose": "whole selected Gamma math and actual operand owners"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 877,
+      "end_line": 897,
+      "sha256": "2a4340df4aa75c26830f60a0bdc0b5de7fda75908b97e0eac1b468c95c62aeac",
+      "size_bytes": 1244,
+      "purpose": "actual exponential884 then inverse887 then Gamma890 order"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 638,
+      "end_line": 654,
+      "sha256": "62164b9bfd947186c8a4435eda5e8fd80786c7f8426fa78c08055859e5282a7e",
+      "size_bytes": 750,
+      "purpose": "actual initialized Iden/B/Gamma owners before downstream calls"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 2045,
+      "end_line": 2069,
+      "sha256": "94559f22af22dcf8b571769f3dbf74cd1a5164054270498f1c899d2c0d5c586c",
+      "size_bytes": 850,
+      "purpose": "actual reset selector helper and no-source return"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "start_line": 304,
+      "end_line": 342,
+      "sha256": "fbcb4d693cf6124c674cc4e4c9673e0319674407efe9d937bc330c14f73c3779",
+      "size_bytes": 2495,
+      "purpose": "actual matrix owners and selected method declaration"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "start_line": 1,
+      "end_line": 145,
+      "sha256": "dcd912ae0ad19c6d9be1f7c4c397afe1e48b7447d5d8ceed6d337bd023bdd7e6",
+      "size_bytes": 6015,
+      "purpose": "actual public assembly/context/owner types"
+    }
+  ],
+  "README": {
+    "path": ".runtime/porting/CTF-07/first-gamma-owner-prep-01/README.md",
+    "sha256": "b8ff766dfc0ecc8d973ca807e7c5149ab77191d38eadcb490b7fec57d55f6092",
+    "size_bytes": 3818,
+    "line_count": 61
+  },
+  "public_API": "initialize_construction_ctf_first_gammas(&ConstructionCtfFirstAssembly, &ConstructionCtfFirstMatrixFunctions) -> ConstructionCtfFirstGammas",
+  "source_contract": {
+    "selected": "actual first assembly ordinal1, one-dimensional/no-source/reset-selectors",
+    "prerequisites": "actual ordered06/05 returns, borrowed without invocation",
+    "Gamma_inputs": [
+      "actual AInv",
+      "actual AExp",
+      "actual original IdenMatrix",
+      "actual compressed BMat3",
+      "actual rcmax/current context"
+    ],
+    "same_context_float_comparison": "binary64 to_bits, including signed zero and unchanged NaN payload",
+    "caller_timestep_equals_CTF_timestep_required": false,
+    "fallback_or_identity_generation": false,
+    "numeric_evaluation_added_outside_held_pure_Gamma": false,
+    "prerequisite_unavailable_and_noninvocation_typed": true
+  },
+  "activation": {
+    "cache_or_state_wiring": false,
+    "driver_or_retry_activation": false,
+    "predecessors_called": false,
+    "actual_same_owner_return_required": true,
+    "current_mod_declaration_only": true,
+    "future_dependency_parent_composition_required": true,
+    "Native_observer_or_policy_authored": false,
+    "future_execution_refs": null
+  },
+  "tests": {
+    "authored": 6,
+    "executed": false,
+    "source_only_literal_Rust_inputs": true,
+    "Native_answers_or_production_fixtures": false
+  },
+  "checks": {
+    "before_current_parent_exact": true,
+    "new_canonical_files_absent": true,
+    "exact_generated_diffs3": true,
+    "source_identity_and_JSON_metadata_only": true,
+    "Rust_import_compile_format_test": false
+  },
+  "authorship_limits": "Earlier Native/helper/ingress and pure Gamma author. Independent full source peer remains required; no own-formula science certification.",
+  "canonical_or_Git_modified": false,
+  "scientific_weather_or_binary_payloads_read": false,
+  "target_imports_or_execution_performed": false,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false
+}

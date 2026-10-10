@@ -1,0 +1,18 @@
+--- a/crates/ep_runtime/src/heat_balance/state.rs
++++ b/crates/ep_runtime/src/heat_balance/state.rs
+@@ -68,6 +68,15 @@
+     /// Actual first CTF04 assembly owners; no retries or final coefficients are inferred.
+     pub construction_ctf04_first_assembly:
+         Vec<super::ctf_first_assembly_owner::ConstructionCtfFirstAssembly>,
++    /// Actual ordered first CTF06 outcomes; no retry/final coefficient state is inferred.
++    pub construction_ctf06_first_exponential:
++        Vec<super::ctf_first_exponential_owner::ConstructionCtfFirstExponential>,
++    /// First CTF05 invocation outcomes, or explicit not-invoked after exponential.
++    pub construction_ctf05_first_inverse:
++        Vec<super::ctf_first_matrix_owner::ConstructionCtfFirstInverseAfterExponential>,
++    /// Actual first CTF07 return or typed prerequisite stop; no final CTF state is inferred.
++    pub construction_ctf07_first_gammas:
++        Vec<super::ctf_first_gamma_owner::ConstructionCtfFirstGammas>,
+     /// Construction coefficient cache build time in seconds.
+     pub construction_cache_build_wall_seconds: f64,
+     /// Number of construction cache entries.

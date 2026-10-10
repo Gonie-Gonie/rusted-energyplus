@@ -1,0 +1,12 @@
+--- accepted01/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
++++ rebased02/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
+@@ -146,7 +146,8 @@
+             );
+             // Same original first assembly: actual06, then05, then public07.
+             // Each actual error/non-invocation owner remains separate.
+-            let first_functions = initialize_construction_ctf_first_matrix_with_gammas(&first_assembly);
++            let first_functions =
++                initialize_construction_ctf_first_matrix_with_gammas(&first_assembly);
+             first_exponentials.push(first_functions.methods.exponential);
+             first_inverses.push(first_functions.methods.inverse);
+             first_gammas.push(first_functions.gammas);

@@ -1,0 +1,127 @@
+"""Emit only ignored comparer sources and metadata; never import reviewed code."""
+import ast
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+OLD = OUT.with_name("comparer-prep-01")
+QA = OUT.with_name("original-data-review-prep-02")
+OLD_SHA = "d1babf7b41154e9a36dfb311417942859cf5e27081c0e6a58175d7677e18556f"
+QA_SHA = "ac978d62718b0d26163b9f7df3408416430cd31e31369ffcffde1c2f4b7eb9dd"
+
+
+def identity(path):
+    data = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(),
+            "sha256": hashlib.sha256(data).hexdigest(),
+            "size_bytes": len(data), "line_count": len(data.splitlines())}
+
+
+def assignment(source, name):
+    for node in ast.parse(source).body:
+        if isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == name for t in node.targets):
+            return node
+    raise ValueError(name)
+
+
+def replace_pin(source, pin):
+    node = assignment(source, "DATAQA_SOURCE_INVENTORY")
+    rows = source.splitlines(True)
+    rows[node.lineno - 1:node.end_lineno] = ["DATAQA_SOURCE_INVENTORY = " + repr(pin) + "\n"]
+    return "".join(rows)
+
+
+def without_pin(source):
+    tree = ast.parse(source)
+    tree.body = [node for node in tree.body if not (isinstance(node, ast.Assign) and any(
+        isinstance(t, ast.Name) and t.id == "DATAQA_SOURCE_INVENTORY" for t in node.targets))]
+    return ast.dump(tree, include_attributes=False)
+
+
+def write(path, text):
+    path.write_text(text, encoding="utf-8", newline="\n")
+
+
+def main():
+    assert not (OUT / "manifest.json").exists()
+    assert identity(OLD / "manifest.json")["sha256"] == OLD_SHA
+    assert identity(QA / "manifest.json")["sha256"] == QA_SHA
+    old = json.loads((OLD / "manifest.json").read_text(encoding="utf-8"))
+    qa = json.loads((QA / "manifest.json").read_text(encoding="utf-8"))
+    qa_rows = {Path(row["path"]).name: row for row in qa["own_sources"]}
+    for row in old["own_sources"] + qa["own_sources"]:
+        assert identity(ROOT / row["path"]) == row
+    for name in ["method_shape.py", "gamma_shape.py"]:
+        assert (OLD / name).read_bytes() == (QA / name).read_bytes()
+    names = [Path(row["path"]).name for row in old["own_sources"]]
+    before = OUT / "before"
+    before.mkdir(exist_ok=True)
+    for name in names + ["README.md", "manifest.json"]:
+        if (before / name).exists():
+            assert (before / name).read_bytes() == (OLD / name).read_bytes()
+        (before / name).write_bytes((OLD / name).read_bytes())
+    pin = identity(QA / "manifest.json")
+    for name in names:
+        prior = (OLD / name).read_bytes()
+        if name in ["compare_unit.py", "compare_production.py"]:
+            source = prior.decode("utf-8")
+            current = replace_pin(source, pin)
+            assert without_pin(current) == without_pin(source)
+            write(OUT / name, current)
+        else:
+            (OUT / name).write_bytes(prior)
+        ast.parse((OUT / name).read_text(encoding="utf-8"))
+    readme = (OLD / "README.md").read_text(encoding="utf-8")
+    readme = readme.replace("Exact predecessor sources, README and manifest are in before/.",
+                            "Exact comparer01 sources, README and manifest are in before/.")
+    readme = readme.replace("held OriginalDataQA07 prep01", "held OriginalDataQA07 prep02")
+    readme += """
+
+## Fresh02 QA source routing rebind
+
+This preserves immutable comparer01 and changes only the two main
+DATAQA_SOURCE_INVENTORY literals to genuine held QA07 prep02 ac978d62.
+That reader repairs the inherited initial.packet current07 protocol keys;
+the comparer does not copy initial_shape or invoke initial.packet. Its six
+actual executed QA source archives are authenticated from the new inventory.
+Method/Gamma structural validators and all five comparer supports are exact01;
+all numeric/availability/profile/owner/selection/transport functions are AST
+identical. No actual QA or comparison outcome is claimed by this source hold.
+Base/Root review of the repaired QA and this narrow rebind precedes execution.
+"""
+    write(OUT / "README.md", readme)
+    diffs = []
+    for name in ["compare_unit.py", "compare_production.py", "README.md"]:
+        path = OUT / (name + ".from-01.diff")
+        write(path, "".join(difflib.unified_diff((before / name).read_text(encoding="utf-8").splitlines(True),
+              (OUT / name).read_text(encoding="utf-8").splitlines(True), fromfile="before/" + name, tofile=name)))
+        diffs.append(identity(path))
+    manifest = copy.deepcopy(old)
+    manifest["own_sources"] = [identity(OUT / name) for name in names]
+    manifest["before_sources"] = [identity(path) for path in sorted(before.iterdir())]
+    manifest["exact_diffs"] = diffs
+    refreshed = []
+    for row in old["source_preparation_bindings"]:
+        if "CTF-07/original-data-review-prep-01/" in row["path"]:
+            row = pin if row["path"].endswith("/manifest.json") else qa_rows[Path(row["path"]).name]
+        refreshed.append(row)
+    manifest["source_preparation_bindings"] = refreshed + [identity(OLD / "manifest.json")]
+    manifest["README"] = identity(OUT / "README.md")
+    manifest["own_preparation_source"] = identity(Path(__file__).resolve())
+    manifest["fresh02_rebind"] = {
+        "predecessor": identity(OLD / "manifest.json"), "current_DataQA": pin,
+        "changed_executable_assignments": ["compare_unit.py:DATAQA_SOURCE_INVENTORY", "compare_production.py:DATAQA_SOURCE_INVENTORY"],
+        "all_other_executable_AST_exact01": True, "five_support_files_byte_exact01": True,
+        "initial_shape_copied_or_initial_packet_invoked_by_comparer": False,
+        "old_hold_preserved": True, "actual_QA_or_comparison_outcome_claimed": False}
+    write(OUT / "manifest.json", json.dumps(manifest, indent=2, ensure_ascii=True) + "\n")
+    print(json.dumps({"manifest": identity(OUT / "manifest.json"), "own_sources": manifest["own_sources"],
+                      "diffs": diffs}, indent=2))
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,119 @@
+--- crates/ep_run/examples/ctf06_candidate_unit_observer.rs
++++ crates/ep_run/examples/ctf07_candidate_unit_observer.rs
+@@ -1,12 +1,12 @@
+ //! Actual explicit-member preprocessing and source-owned initial CTF03 route; no solver answers.
+ #[path = "../../ep_runtime/examples/clk02_probe_support/digest.rs"]
+ mod digest;
+-#[path = "ctf06_candidate_unit_support/fields.rs"]
++#[path = "ctf07_candidate_unit_support/fields.rs"]
+ mod fields;
+ 
+ use ep_model::{Construction, ConstructionId, ConstructionKind, MaterialId, NormalizedName};
+ use ep_runtime::heat_balance::ctf_first_assembly_owner::initialize_construction_ctf_first_assembly;
+-use ep_runtime::heat_balance::ctf_first_matrix_owner::initialize_construction_ctf_first_matrix_functions;
++use ep_runtime::heat_balance::ctf_first_gamma_ingress::initialize_construction_ctf_first_matrix_with_gammas;
+ use ep_runtime::heat_balance::ctf_initial_owner::initialize_construction_ctf_initial;
+ use ep_runtime::heat_balance::surface_manager::ctf_layer_preprocessing::{
+     ConstructionCtfLayerPreprocessing, CtfLayerContext, CtfLayerInput, preprocess_ctf_layers,
+@@ -83,7 +83,7 @@
+ }
+ fn source_pins(root: &Path, inventory: &Value) -> Result<()> {
+     require(
+-        inventory["schema"] == "ctf06-candidate-unit-runtime-source-bindings.v1"
++        inventory["schema"] == "ctf07-candidate-unit-runtime-source-bindings.v1"
+             && inventory
+                 .as_object()
+                 .is_some_and(|object| object.len() == 3),
+@@ -222,7 +222,8 @@
+             time_step_zone,
+         );
+         let first_assembly = initialize_construction_ctf_first_assembly(&initial, &preprocessing);
+-        let first_functions = initialize_construction_ctf_first_matrix_functions(&first_assembly);
++        let first_with_gammas = initialize_construction_ctf_first_matrix_with_gammas(&first_assembly);
++        let first_functions = &first_with_gammas.methods;
+         if let Ok(actual) = &preprocessing.result {
+             selected_errors = actual.errors_found;
+         }
+@@ -237,7 +238,9 @@
+             "preprocessing_or_initial_reexecuted_for_assembly_owner":false,
+             "CTF06_first_exponential":fields::first_exponential(&first_functions.exponential,Some(&first_assembly)),
+             "CTF05_first_inverse":fields::first_inverse(&first_functions.inverse,Some(&first_assembly)),
+-            "actual_Rust_combined_API":"initialize_construction_ctf_first_matrix_functions",
++            "CTF07_first_gammas":fields::first_gammas(&first_with_gammas.gammas,Some(&first_assembly),
++                Some(&first_functions.exponential),Some(&first_functions.inverse)),
++            "actual_Rust_combined_API":"initialize_construction_ctf_first_matrix_with_gammas",
+             "actual_Rust_combined_API_invoked":true,
+             "predecessor_owners_reexecuted_for_method_observation":false,
+             "actual_Rust_CTF03_API":"initialize_construction_ctf_initial","actual_Rust_CTF03_API_invoked":true,
+@@ -319,9 +322,9 @@
+     let admission: Value = serde_json::from_slice(&admission_bytes)?;
+     let sources: Value = serde_json::from_slice(&sources_bytes)?;
+     require(
+-        request["schema"] == "ctf06-helper-cases.v1"
+-            && admission["schema"] == "ctf06-native-admission-contract.v1"
+-            && request["frozen_before_this_CTF06_helper_execution"] == true
++        request["schema"] == "ctf07-helper-cases.v1"
++            && admission["schema"] == "ctf07-native-admission-contract.v1"
++            && request["frozen_before_this_CTF07_helper_execution"] == true
+             && request["expected_values_supplied"] == false
+             && request["expected_exits_supplied"] == false
+             && request["scientific_execution_performed"] == false,
+@@ -348,13 +351,30 @@
+         bindings.push(request[key].clone());
+     }
+     require(
+-        request["actual_scope_amendment_executions"]
+-            == admission["actual_scope_amendment_executions"],
+-        "both real card check mappings differ",
+-    )?;
++        request["actual_scope_amendment_execution_role"]
++            == "real-CTF-07-check-only; prior05/06-authorities-separate"
++            && admission["actual_scope_amendment_execution_role"]
++                == request["actual_scope_amendment_execution_role"]
++            && admission["prior_05_06_authority"] == request["prior_05_06_authority"]
++            && admission["current_cards"] == request["current_cards"],
++        "current07 authority role or separate historical prior05/06 authority differs",
++    )?;
++    bindings.push(request["current_cards"]["CTF-07"].clone());
++    let prior = &request["prior_05_06_authority"];
++    for key in ["prior_06_freeze", "prior_06_freeze_execution", "prior_05_06_scope_amendment",
++        "prior_06_writer_manifest", "prior_06_source_contract"] {
++        bindings.push(prior[key].clone());
++    }
+     for card in ["CTF-05", "CTF-06"] {
+-        bindings.push(request["actual_scope_amendment_executions"][card].clone());
+-    }
++        bindings.push(prior["prior_scope_checks"][card].clone());
++    }
++    for binding in rows(&prior["historical_before_document_archives"])? {
++        bindings.push(binding.clone());
++    }
++    for binding in rows(&prior["available_prior_frozen_document_archives"])? {
++        bindings.push(binding["archive"].clone());
++    }
++    // Historical after-doc identities are documentary, never current07 live bindings.
+     bindings.extend(rows(&request["all_45_guard_refs"])?.iter().cloned());
+     require(
+         rows(&request["all_45_guard_refs"])?.len() == 45,
+@@ -405,18 +425,19 @@
+     )?;
+     println!(
+         "{}",
+-        serde_json::to_string_pretty(&json!({"schema":"ctf06-candidate-unit-observer-results.v1",
++        serde_json::to_string_pretty(&json!({"schema":"ctf07-candidate-unit-observer-results.v1",
+         "actual_request":admission["helper_request"],"actual_native_admission":{"path":admission_path,"sha256":digest::sha256(&admission_bytes)},
+         "contracts":admission["contracts"],"projection":admission["projection"],"requested_counts":request["requested_counts"],
+         "fixed_scope":request["fixed_scope"],"all_45_guard_refs":request["all_45_guard_refs"],
+         "actual_scope_amendment":request["actual_scope_amendment"],"actual_scope_amendment_execution":request["actual_scope_amendment_execution"],
+-        "actual_scope_amendment_executions":request["actual_scope_amendment_executions"],
++        "prior_05_06_authority":request["prior_05_06_authority"],"current_cards":request["current_cards"],
+         "actual_scope_amendment_execution_role":request["actual_scope_amendment_execution_role"],
+         "runtime_source_bindings":{"path":sources_path,"sha256":digest::sha256(&sources_bytes)},"authenticated_source_inventory":sources,
+         "ctf03_initial_observation_policy":request["ctf03_initial_observation_policy"],
+         "ctf04_matrix_observation_policy":request["ctf04_matrix_observation_policy"],
+         "ctf06_exponential_observation_policy":request["ctf06_exponential_observation_policy"],
+         "ctf05_inverse_observation_policy":request["ctf05_inverse_observation_policy"],
++        "ctf07_gamma_observation_policy":request["ctf07_gamma_observation_policy"],
+         "actual_Rust_combined_API_invocations":calls,
+         "actual_Rust_CTF04_API_invocations":calls,"Rust_retry_driver_available":false,
+         "later_Native_attempts_paired":false,"later_Native_attempts_counted_as_PASS":false,

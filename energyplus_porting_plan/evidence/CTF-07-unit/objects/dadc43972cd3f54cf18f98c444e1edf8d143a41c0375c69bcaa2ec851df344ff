@@ -1,0 +1,11 @@
+--- before-02/compare_unit.py
++++ compare_unit.py
+@@ -10,7 +10,7 @@
+ import struct
+ 
+ PREP = Path(__file__).resolve().parent
+-GAMMA_PAIR_SHA = 'd7247e69758553507c48cd92cae83a5f5914a2bc27851eb587206d5ecbc8c346'
++GAMMA_PAIR_SHA = '56f2c6aa8d4c344f955b161cb63fbd2f01214f3b2d4ddbe4be8fc73f60cc7995'
+ GAMMA_SHAPE_SHA = '45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101'
+ GAMMA_VARIABLES = ["CTF07.Gamma1", "CTF07.Gamma2", "CTF07.ATemp"]
+ PAIR_SHA = 'ee4cc345a89526f5fa77442f22daffa592d126e06bb32b4bbbac80b5f32b3c4d'

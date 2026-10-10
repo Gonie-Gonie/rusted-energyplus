@@ -1,0 +1,135 @@
+--- .runtime/porting/CTF-07/rust-gamma-prep-01/manifest.json
++++ .runtime/porting/CTF-07/rust-gamma-prep-02/manifest.json
+@@ -5,14 +5,14 @@
+   "own_source_rows": [
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-07/rust-gamma-prep-01/new/ctf_gamma_matrix.rs",
++        "path": ".runtime/porting/CTF-07/rust-gamma-prep-02/new/ctf_gamma_matrix.rs",
+         "sha256": "f173d96bf44e94d1e871df210a6d75af32c4fbf7771760504042b95f9e1dc7e0",
+         "size_bytes": 6371,
+         "line_count": 152
+       },
+       "canonical_install_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+       "exact_diff": {
+-        "path": ".runtime/porting/CTF-07/rust-gamma-prep-01/ctf_gamma_matrix.rs.addition.diff",
++        "path": ".runtime/porting/CTF-07/rust-gamma-prep-02/ctf_gamma_matrix.rs.addition.diff",
+         "sha256": "f8e2100b18246f1b03d61499babdd67d640169e32ecb139c466b614f9ed26f55",
+         "size_bytes": 6630,
+         "line_count": 155
+@@ -20,14 +20,14 @@
+     },
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-07/rust-gamma-prep-01/new/ctf_gamma_matrix_tests.rs",
++        "path": ".runtime/porting/CTF-07/rust-gamma-prep-02/new/ctf_gamma_matrix_tests.rs",
+         "sha256": "2ad241a1be4b59dc5a476f6ffd1e25b64cc10126efdb32b6f2d90431bdcc25e8",
+         "size_bytes": 6733,
+         "line_count": 146
+       },
+       "canonical_install_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix_tests.rs",
+       "exact_diff": {
+-        "path": ".runtime/porting/CTF-07/rust-gamma-prep-01/ctf_gamma_matrix_tests.rs.addition.diff",
++        "path": ".runtime/porting/CTF-07/rust-gamma-prep-02/ctf_gamma_matrix_tests.rs.addition.diff",
+         "sha256": "b124e353d4486c5ca9903183b7aa56ce0dc343726c44b316787314e6d4724b45",
+         "size_bytes": 6992,
+         "line_count": 149
+@@ -35,7 +35,7 @@
+     },
+     {
+       "source": {
+-        "path": ".runtime/porting/CTF-07/rust-gamma-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager.rs",
++        "path": ".runtime/porting/CTF-07/rust-gamma-prep-02/proposed/crates/ep_runtime/src/heat_balance/surface_manager.rs",
+         "sha256": "4d3d19c49141fc2f8701bf30b156c8596c2e3d11f83419e09a8abf2c90245be4",
+         "size_bytes": 6021,
+         "line_count": 173
+@@ -44,14 +44,14 @@
+       "before_source": {
+         "historical_path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+         "archive": {
+-          "path": ".runtime/porting/CTF-07/rust-gamma-prep-01/before/surface_manager.rs",
++          "path": ".runtime/porting/CTF-07/rust-gamma-prep-02/before/surface_manager.rs",
+           "sha256": "71dbf39a1320d7c6b5fabe57cf11b811fa139919f54fab2551fd5f2ad6591b09",
+           "size_bytes": 5995,
+           "line_count": 172
+         }
+       },
+       "exact_diff": {
+-        "path": ".runtime/porting/CTF-07/rust-gamma-prep-01/surface_manager.rs.from-current.diff",
++        "path": ".runtime/porting/CTF-07/rust-gamma-prep-02/surface_manager.rs.from-current.diff",
+         "sha256": "60f22f9f9c1c128d25d083a7c6fc4b575c3da70f0379e2fa815635b895c1db61",
+         "size_bytes": 320,
+         "line_count": 10
+@@ -168,27 +168,43 @@
+       "purpose": "whole method deallocates Gamma and predecessor workspaces"
+     },
+     {
+-      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+-      "start_line": 490,
+-      "end_line": 504,
+-      "sha256": "8ae1c81f06b50db1fc737519a37e49dc521a095e6609ce5cb51fa9d4541896ff",
+-      "size_bytes": 956,
+-      "purpose": "selected no-source node selectors are actual reset state"
+-    },
+-    {
+       "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+       "start_line": 1,
+       "end_line": 172,
+       "sha256": "71dbf39a1320d7c6b5fabe57cf11b811fa139919f54fab2551fd5f2ad6591b09",
+       "size_bytes": 5995,
+       "purpose": "current04 parent before declaration-only proposal"
++    },
++    {
++      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
++      "start_line": 2045,
++      "end_line": 2069,
++      "sha256": "94559f22af22dcf8b571769f3dbf74cd1a5164054270498f1c899d2c0d5c586c",
++      "size_bytes": 850,
++      "purpose": "whole actual reset helper; no-source early return leaves both selectors0"
++    },
++    {
++      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
++      "start_line": 569,
++      "end_line": 575,
++      "sha256": "c16195c8af8aec504fdcc4c4075c6dd67d1ed3c0b065f0edc8c1de2e5faec54e",
++      "size_bytes": 346,
++      "purpose": "actual reset helper called before initial619 checkpoint"
++    },
++    {
++      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
++      "start_line": 350,
++      "end_line": 357,
++      "sha256": "3768fdf99c3ccb87ae2647d53bec86fd58d57023b07131e47151e964369b51bd",
++      "size_bytes": 308,
++      "purpose": "public direct reset helper declaration"
+     }
+   ],
+   "README": {
+-    "path": ".runtime/porting/CTF-07/rust-gamma-prep-01/README.md",
+-    "sha256": "bff6f6f185584b2c275c3582e9655afcf0e5dff47df0d6339415031752905397",
+-    "size_bytes": 4855,
+-    "line_count": 76
++    "path": ".runtime/porting/CTF-07/rust-gamma-prep-02/README.md",
++    "sha256": "01ebe27a19aeeb9aef0f47016bbc10f75e586544ca3df26b14a72eadaacd701b",
++    "size_bytes": 5174,
++    "line_count": 81
+   },
+   "source_contract": {
+     "whole_original_symbol": "ConstructionProps::calculateGammas",
+@@ -260,5 +276,15 @@
+   "project_imports_or_targets_executed": false,
+   "canonical_or_Git_modified": false,
+   "numerical_PASS_claimed": false,
+-  "gates_updated": false
++  "gates_updated": false,
++  "preserved_predecessor_manifest": {
++    "path": ".runtime/porting/CTF-07/rust-gamma-prep-01/manifest.json",
++    "sha256": "dd306b5e8ef6653833f9d5299216b1e5544a3d63e746dacdc424511e58fe2185",
++    "size_bytes": 10286,
++    "line_count": 264
++  },
++  "fresh02_metadata_only": {
++    "rust_sources_and_source_diffs_byte_exact01": true,
++    "correction": "Replace incorrectly described nodal490-504 range with whole reset2045-2069, caller569-575, declaration350-357; no arithmetic or source body changes."
++  }
+ }

@@ -10748,11 +10748,11 @@
       "excludes": "CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다. 실행 가능 여부를 확인하지 않고 무조건 0으로 대체하지 않는다.",
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/Construction.cc",
       "scope_review": "통과",
-      "unit_gate": "미확인",
+      "unit_gate": "통과",
       "integration_gate": "미확인",
       "production_gate": "미확인",
       "applicability": "A/B",
-      "source_boundary_note": "Source-only scope fixed before any CTF07 helper build/run or scientific output. Preserve original loop/evaluation order and third-row IEEE behavior; no new finite checks or pivots. Real first inverse/exponential ownership is required. Later retries, final coefficient generation, public SI19 stores, cache handoff and complete-card integration/production remain pending.",
+      "source_boundary_note": "Actual selected first Gamma unit and fixed15 loader comparisons passed at Source293f3e45: 180219/4005 numeric, 1130134/30477 discrete, zero mismatches; all three primary maxabs/RMSE zero. Focused110 and workspace4726 tests, clippy and format passed. Later16 unit visits and unavailable105/36 observations remain unpaired/noPASS. Full retry, final coefficients, SI19/cache and complete integration/production gates remain pending.",
       "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
       "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
       "source_ranges_input_only": [
@@ -10865,6 +10865,16 @@
         "removal_requires_separate_Root_authorized_actual_retention_record": true,
         "earlier_live_refs_reinterpreted": false,
         "deletion_performed": false
+      },
+      "actual_Original_and_unchanged_Rust_baseline": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-original-baseline/summary.json",
+        "sha256": "74ba5011c4f56ad100aa1dfb09f5d045cbe8e98183d575a84232145d6ebbdc0d",
+        "size_bytes": 16316
+      },
+      "actual_candidate_unit_and_loader_comparisons": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/summary.json",
+        "sha256": "8d653883bcfeb027926ec29194b63ea6947de647c19f8e83c85adf9a69ae39ba",
+        "size_bytes": 16561
       }
     },
     {

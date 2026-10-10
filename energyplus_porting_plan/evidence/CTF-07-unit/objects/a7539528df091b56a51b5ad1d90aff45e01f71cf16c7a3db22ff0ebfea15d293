@@ -1,0 +1,911 @@
+{
+  "schema": "ctf07-candidate-production-observer-request.v1",
+  "fixed_scope": {
+    "path": "energyplus_porting_plan/contracts/scope.json",
+    "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879",
+    "size_bytes": 15325
+  },
+  "model_cases": [
+    {
+      "id": "A-24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+      },
+      "conversion_available": true,
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/A-24H/input.epJSON",
+        "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578",
+        "size_bytes": 27734
+      },
+      "conversion_unavailable_reason": null,
+      "conversion_proof_bindings": [
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+          "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+          "size_bytes": 76172
+        },
+        {
+          "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+          "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+          "size_bytes": 3146
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/A-24H/conversion.json",
+          "sha256": "edee535e8e7b621962677975eaa1d9ba0f06c915b32b272ce60cee58e2156f4d",
+          "size_bytes": 2684
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/A-24H/input.idf",
+          "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+          "size_bytes": 9275
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/A-24H/stdout.log",
+          "sha256": "6581afbebbfa85b33b9770fe4ee0b70c622f80a7b01e410d958fa01e92033b82",
+          "size_bytes": 63
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/A-24H/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "id": "A-72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+        "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+      },
+      "conversion_available": true,
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/A-72H/input.epJSON",
+        "sha256": "6ee97be079078607a920ccf780e1bdf6c1ae8595581f588442ed842e07a4099c",
+        "size_bytes": 27734
+      },
+      "conversion_unavailable_reason": null,
+      "conversion_proof_bindings": [
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+          "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+          "size_bytes": 76172
+        },
+        {
+          "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+          "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+          "size_bytes": 3146
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/A-72H/conversion.json",
+          "sha256": "ca92580f96d4fca25a3d124b94c293e0d8fedaaa4ff3a6478883f9929bc3f648",
+          "size_bytes": 2684
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/A-72H/input.idf",
+          "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc",
+          "size_bytes": 9275
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/A-72H/stdout.log",
+          "sha256": "6581afbebbfa85b33b9770fe4ee0b70c622f80a7b01e410d958fa01e92033b82",
+          "size_bytes": 63
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/A-72H/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "id": "A-ANNUAL",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+        "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+      },
+      "conversion_available": true,
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/A-ANNUAL/input.epJSON",
+        "sha256": "ca8c4b8a5e61229af8c75603630558c3a13b8306e6fdd677832b5fc1c0f09ea7",
+        "size_bytes": 27736
+      },
+      "conversion_unavailable_reason": null,
+      "conversion_proof_bindings": [
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+          "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+          "size_bytes": 76172
+        },
+        {
+          "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+          "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+          "size_bytes": 3146
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/A-ANNUAL/conversion.json",
+          "sha256": "9f3b0fca78a892e82f2cdff0d4e7b90d489509426732928ddb130f0a64a351ae",
+          "size_bytes": 2717
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/A-ANNUAL/input.idf",
+          "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0",
+          "size_bytes": 9280
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/A-ANNUAL/stdout.log",
+          "sha256": "6581afbebbfa85b33b9770fe4ee0b70c622f80a7b01e410d958fa01e92033b82",
+          "size_bytes": 63
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/A-ANNUAL/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "id": "B-NOLIMIT-24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+        "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+      },
+      "conversion_available": true,
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-24H/input.epJSON",
+        "sha256": "593fccbf425883d9edbaf40e506a6a2bbca6e66cfafe017d6132095a7969e1e3",
+        "size_bytes": 37726
+      },
+      "conversion_unavailable_reason": null,
+      "conversion_proof_bindings": [
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+          "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+          "size_bytes": 76172
+        },
+        {
+          "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+          "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+          "size_bytes": 3146
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-24H/conversion.json",
+          "sha256": "3ee553c15e2152a7d6dc8b49f65317b1ed25fa19a833c081ebbaf59f975ec44b",
+          "size_bytes": 2775
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-24H/input.idf",
+          "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12",
+          "size_bytes": 13025
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-24H/stdout.log",
+          "sha256": "6581afbebbfa85b33b9770fe4ee0b70c622f80a7b01e410d958fa01e92033b82",
+          "size_bytes": 63
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-24H/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "id": "B-NOLIMIT-72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+        "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+      },
+      "conversion_available": true,
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-72H/input.epJSON",
+        "sha256": "21811e29c8e589034f3f46ea33faf1a15054eef2512f37d39f8d3e50539f2e70",
+        "size_bytes": 37726
+      },
+      "conversion_unavailable_reason": null,
+      "conversion_proof_bindings": [
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+          "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+          "size_bytes": 76172
+        },
+        {
+          "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+          "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+          "size_bytes": 3146
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-72H/conversion.json",
+          "sha256": "805cfce78d57f5e0e07cc6cfbf30d398c94861630d58d7348b119fe74e802ccf",
+          "size_bytes": 2775
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-72H/input.idf",
+          "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda",
+          "size_bytes": 13025
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-72H/stdout.log",
+          "sha256": "6581afbebbfa85b33b9770fe4ee0b70c622f80a7b01e410d958fa01e92033b82",
+          "size_bytes": 63
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-72H/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "id": "B-NOLIMIT-ANNUAL",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+        "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+      },
+      "conversion_available": true,
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-ANNUAL/input.epJSON",
+        "sha256": "f8e5ec1be252a7efe7c1e2533d7f47ed8ae131234ca2a2bd6cda069d6f65e369",
+        "size_bytes": 37728
+      },
+      "conversion_unavailable_reason": null,
+      "conversion_proof_bindings": [
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+          "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+          "size_bytes": 76172
+        },
+        {
+          "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+          "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+          "size_bytes": 3146
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-ANNUAL/conversion.json",
+          "sha256": "607a8c799254cda407be30c2c3102a729cdfa9290c14fc2843c718fb251b879b",
+          "size_bytes": 2808
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-ANNUAL/input.idf",
+          "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb",
+          "size_bytes": 13030
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-ANNUAL/stdout.log",
+          "sha256": "6581afbebbfa85b33b9770fe4ee0b70c622f80a7b01e410d958fa01e92033b82",
+          "size_bytes": 63
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-ANNUAL/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "id": "B-FLOW-24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+        "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+      },
+      "conversion_available": true,
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-24H/input.epJSON",
+        "sha256": "5a4d64ae7107fd32fff7234179e920912ef993284443d585a58eff60233cb7f4",
+        "size_bytes": 37842
+      },
+      "conversion_unavailable_reason": null,
+      "conversion_proof_bindings": [
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+          "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+          "size_bytes": 76172
+        },
+        {
+          "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+          "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+          "size_bytes": 3146
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-24H/conversion.json",
+          "sha256": "24e0bcb4a398879af7f25860465464b6d5556ad62903ce4838afc1b00d0f3674",
+          "size_bytes": 2742
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-24H/input.idf",
+          "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced",
+          "size_bytes": 13042
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-24H/stdout.log",
+          "sha256": "6581afbebbfa85b33b9770fe4ee0b70c622f80a7b01e410d958fa01e92033b82",
+          "size_bytes": 63
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-24H/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "id": "B-FLOW-72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+        "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+      },
+      "conversion_available": true,
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-72H/input.epJSON",
+        "sha256": "d01686452f928d9a105ebcfbddd3c1a0dc05d39b6121c034bc28d6bb46f37f00",
+        "size_bytes": 37842
+      },
+      "conversion_unavailable_reason": null,
+      "conversion_proof_bindings": [
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+          "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+          "size_bytes": 76172
+        },
+        {
+          "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+          "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+          "size_bytes": 3146
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-72H/conversion.json",
+          "sha256": "b941112ea03544d6534d731c6e7356b3da1f8eb7477d3fad33becea41fa14de8",
+          "size_bytes": 2742
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-72H/input.idf",
+          "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c",
+          "size_bytes": 13042
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-72H/stdout.log",
+          "sha256": "6581afbebbfa85b33b9770fe4ee0b70c622f80a7b01e410d958fa01e92033b82",
+          "size_bytes": 63
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-72H/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "id": "B-FLOW-ANNUAL",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+        "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+      },
+      "conversion_available": true,
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-ANNUAL/input.epJSON",
+        "sha256": "ea043bc783f6463af56ce98f79957100cb89a0a60be70c52c72a511050bd9143",
+        "size_bytes": 37844
+      },
+      "conversion_unavailable_reason": null,
+      "conversion_proof_bindings": [
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+          "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+          "size_bytes": 76172
+        },
+        {
+          "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+          "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+          "size_bytes": 3146
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-ANNUAL/conversion.json",
+          "sha256": "c7309de9ac5e92ee84ea53b54bdeb61e9ec74464951babe0ea4fb4ed2bed41f0",
+          "size_bytes": 2775
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-ANNUAL/input.idf",
+          "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5",
+          "size_bytes": 13047
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-ANNUAL/stdout.log",
+          "sha256": "6581afbebbfa85b33b9770fe4ee0b70c622f80a7b01e410d958fa01e92033b82",
+          "size_bytes": 63
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-ANNUAL/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "id": "B-CAPACITY-24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+        "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+      },
+      "conversion_available": true,
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-24H/input.epJSON",
+        "sha256": "dc079358dc1cd02b32696db3f5bec6a83baf25f3b20e71ac50d9f83465030817",
+        "size_bytes": 37845
+      },
+      "conversion_unavailable_reason": null,
+      "conversion_proof_bindings": [
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+          "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+          "size_bytes": 76172
+        },
+        {
+          "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+          "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+          "size_bytes": 3146
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-24H/conversion.json",
+          "sha256": "3236a8038b98eb9bdb8aca294d25ca8bbcbc8c6954ad5fea98c2080f155cc40a",
+          "size_bytes": 2786
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-24H/input.idf",
+          "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf",
+          "size_bytes": 13044
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-24H/stdout.log",
+          "sha256": "6581afbebbfa85b33b9770fe4ee0b70c622f80a7b01e410d958fa01e92033b82",
+          "size_bytes": 63
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-24H/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "id": "B-CAPACITY-72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+        "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+      },
+      "conversion_available": true,
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-72H/input.epJSON",
+        "sha256": "d4e03f039aa5c1a481a97d51778be6d4db18ede9acf770c0890d261bb1946d79",
+        "size_bytes": 37845
+      },
+      "conversion_unavailable_reason": null,
+      "conversion_proof_bindings": [
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+          "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+          "size_bytes": 76172
+        },
+        {
+          "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+          "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+          "size_bytes": 3146
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-72H/conversion.json",
+          "sha256": "470728782f29d47fbf2b47e0b63fa4ed2a7094fcf2d6feb40b09ed81dd48e02d",
+          "size_bytes": 2786
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-72H/input.idf",
+          "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001",
+          "size_bytes": 13044
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-72H/stdout.log",
+          "sha256": "6581afbebbfa85b33b9770fe4ee0b70c622f80a7b01e410d958fa01e92033b82",
+          "size_bytes": 63
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-72H/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "id": "B-CAPACITY-ANNUAL",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+        "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+      },
+      "conversion_available": true,
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-ANNUAL/input.epJSON",
+        "sha256": "054977d7688a0fcbe0183f88179b5d557240343f4ffc67bf58556eb95822820c",
+        "size_bytes": 37847
+      },
+      "conversion_unavailable_reason": null,
+      "conversion_proof_bindings": [
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+          "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+          "size_bytes": 76172
+        },
+        {
+          "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+          "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+          "size_bytes": 3146
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-ANNUAL/conversion.json",
+          "sha256": "445d64f53bcf361edb307c06c05d3e95b0cb9e5d9e5a61d02d4f8b600b2f4da5",
+          "size_bytes": 2819
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-ANNUAL/input.idf",
+          "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95",
+          "size_bytes": 13049
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-ANNUAL/stdout.log",
+          "sha256": "6581afbebbfa85b33b9770fe4ee0b70c622f80a7b01e410d958fa01e92033b82",
+          "size_bytes": 63
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-ANNUAL/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "id": "B-BOTH-24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+        "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+      },
+      "conversion_available": true,
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-24H/input.epJSON",
+        "sha256": "aa9d679179f4b93cf4b5dff2f11f2011c101c491c44f1709cdffec5aaa662d9a",
+        "size_bytes": 37971
+      },
+      "conversion_unavailable_reason": null,
+      "conversion_proof_bindings": [
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+          "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+          "size_bytes": 76172
+        },
+        {
+          "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+          "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+          "size_bytes": 3146
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-24H/conversion.json",
+          "sha256": "7a7123c9f7d90e33c35343b4a007b9ca49c79d09dcad92fcc487ecf532d92364",
+          "size_bytes": 2742
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-24H/input.idf",
+          "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea",
+          "size_bytes": 13070
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-24H/stdout.log",
+          "sha256": "6581afbebbfa85b33b9770fe4ee0b70c622f80a7b01e410d958fa01e92033b82",
+          "size_bytes": 63
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-24H/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "id": "B-BOTH-72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+        "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+      },
+      "conversion_available": true,
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-72H/input.epJSON",
+        "sha256": "9b4034052cd58aabe15e7470ed8305a6d97ff11c5a59dc332c271f8a85bf82d0",
+        "size_bytes": 37971
+      },
+      "conversion_unavailable_reason": null,
+      "conversion_proof_bindings": [
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+          "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+          "size_bytes": 76172
+        },
+        {
+          "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+          "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+          "size_bytes": 3146
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-72H/conversion.json",
+          "sha256": "ae5fb503177874316afc5a71ac1ba3c5b37318740fa6f0e7e1466a80cc3764e7",
+          "size_bytes": 2742
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-72H/input.idf",
+          "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506",
+          "size_bytes": 13070
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-72H/stdout.log",
+          "sha256": "6581afbebbfa85b33b9770fe4ee0b70c622f80a7b01e410d958fa01e92033b82",
+          "size_bytes": 63
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-72H/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    },
+    {
+      "id": "B-BOTH-ANNUAL",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+        "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+      },
+      "conversion_available": true,
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-ANNUAL/input.epJSON",
+        "sha256": "9b782c66743f558c7192d22678a915389cc71eeb85414dbcc44ea3c827514a7e",
+        "size_bytes": 37973
+      },
+      "conversion_unavailable_reason": null,
+      "conversion_proof_bindings": [
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+          "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+          "size_bytes": 76172
+        },
+        {
+          "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+          "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+          "size_bytes": 3146
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-ANNUAL/conversion.json",
+          "sha256": "072ced0051d32351ddd185b68874e92281f03b75b90537fafb346ea8a78fab27",
+          "size_bytes": 2775
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-ANNUAL/input.idf",
+          "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d",
+          "size_bytes": 13075
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-ANNUAL/stdout.log",
+          "sha256": "6581afbebbfa85b33b9770fe4ee0b70c622f80a7b01e410d958fa01e92033b82",
+          "size_bytes": 63
+        },
+        {
+          "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-ANNUAL/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      ]
+    }
+  ],
+  "initial_zone_air_temperature_c": {
+    "bits": "4034000000000000"
+  },
+  "observer_sources": [
+    {
+      "path": "crates/ep_run/examples/ctf07_candidate_production_observer.rs",
+      "sha256": "0b3dd9f6499f05b437aee8059a8779da244ddd8d2db04652d545da07339eeb72",
+      "size_bytes": 18132
+    },
+    {
+      "path": "crates/ep_run/examples/ctf07_candidate_production_support/fields.rs",
+      "sha256": "a5c1a4114530252ef56f3498e45fe6e07190b55a52d5152084f621b4e8067ff9",
+      "size_bytes": 16260
+    },
+    {
+      "path": "crates/ep_run/examples/ctf07_candidate_production_support/unit_fields.rs",
+      "sha256": "c44fa9bb2e316aa7840b08f3e3293da00ee98c5b6b4d0b921b4068fea0edb29c",
+      "size_bytes": 28278
+    }
+  ],
+  "actual_public_API_sources": [
+    {
+      "path": "crates/ep_run/Cargo.toml",
+      "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+      "size_bytes": 524
+    },
+    {
+      "path": "crates/ep_raw_model/src/lib.rs",
+      "sha256": "08f4a3bcf27c2f4e2577b534ad505176d0877b46709bb512b71685ebef6fa9a8",
+      "size_bytes": 16493
+    },
+    {
+      "path": "crates/ep_raw_model/src/idf_order.rs",
+      "sha256": "5f2a1984ebc76a51938232ab7002c9c683666cf88d765af8e02dbf126bad7772",
+      "size_bytes": 28468
+    },
+    {
+      "path": "crates/ep_compiler/src/lib.rs",
+      "sha256": "1931ed21f1fae2fe5d7e90bb954f1f91812fec1d1eeb7daf102a6ba0007424fe",
+      "size_bytes": 165
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler.rs",
+      "sha256": "52498a97e0444c82a91bcf7c362f70608822dc9d2428f1a37e568940c55b97a5",
+      "size_bytes": 771820
+    },
+    {
+      "path": "crates/ep_model/src/lib.rs",
+      "sha256": "2a756532553034fb2b92c892cb2e6f3c147aa129f6dce64b63763f364cb3cee4",
+      "size_bytes": 284
+    },
+    {
+      "path": "crates/ep_model/src/model.rs",
+      "sha256": "8fe75e51f50682d68d185d18613b4e1505093d071cc4db19947ef03756bbbf32",
+      "size_bytes": 92680
+    },
+    {
+      "path": "crates/ep_model/src/objects/materials.rs",
+      "sha256": "23d9f6dd7af7ef0aff73f3e4697ece3e5acd58104d2d5e3e1edbc46bfaa71653",
+      "size_bytes": 54627
+    },
+    {
+      "path": "crates/ep_model/src/objects/construction.rs",
+      "sha256": "f1886c8b2f9aede1e661210520b668d52f74d884d9a207de9f0c046e4170f191",
+      "size_bytes": 18134
+    },
+    {
+      "path": "crates/ep_runtime/src/lib.rs",
+      "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+      "size_bytes": 868
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "e4329c6ff62d14fb2caf05c4aad6ba03fd10bbfb7c2426c3603f01e25822c422",
+      "size_bytes": 1571
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "230a806183db9871b725892e4c413a704d9fb8ee944e94213eca9e0ac5e04e57",
+      "size_bytes": 11491
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "sha256": "2b3343ff4f3cec29be8cc77bcd4d14a8bbcc78464812ad04b88d22469f7f0dfb",
+      "size_bytes": 4401
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "sha256": "6176af2a61b999846e885fb603dd2b2fcf2bb57af1e1aaddfc543953f9b4de1a",
+      "size_bytes": 2415
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "sha256": "34893aa5ceda71288a53e229ed07792ddbd3bab5f8400a1ff46f31a03ed26b17",
+      "size_bytes": 6081
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "sha256": "e8c1d67d49a4833ff1b9c8fd6a9d60106a9e051f4550361aed6128ea0c13b534",
+      "size_bytes": 20371
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "f1472c1912e07fbdc39f68a2335c0de590214c9f5f32f521ef9779064005ec5e",
+      "size_bytes": 47493
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "sha256": "7506de40b75a45b9c8f2c01c0b5a4f1ffc5f82ebb1861413a04e7c17ebc342e4",
+      "size_bytes": 29922
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+      "size_bytes": 3172
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "sha256": "0cf67532a277ea20c362acdcc97d2e293ee086a8757177e2b8ccb5bb52fb39a7",
+      "size_bytes": 11747
+    },
+    {
+      "path": "crates/ep_model/src/objects/building.rs",
+      "sha256": "d6a3fbc6b39106f8d0b5195822bfc354e505e557f2b9406409b68aebfb089ef0",
+      "size_bytes": 11621
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+      "sha256": "8e02f58b2da67416342b15f281cd270f80c1bafcd7600931899aef2f920f2bfc",
+      "size_bytes": 4902
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+      "sha256": "9fb5548009e539ba6dfbdc42c592aff3359cdc9901c34ca2dd6c137590fa0bb5",
+      "size_bytes": 7433
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+      "sha256": "0d5b57ec2c0b60111cdc29d94288d38d6abce78a95b4f9bbb155624babe558e5",
+      "size_bytes": 5605
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler/surface_space.rs",
+      "sha256": "8e7dccc67a68ccb71b9c284f78c83a681a81940998672cf945c9c0e8cfb7a379",
+      "size_bytes": 9708
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "sha256": "65ec2a19c1721ab3a685a7e24e9b95d67d3ff910fe17976a76405ea32c155c73",
+      "size_bytes": 10624
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
+      "sha256": "dd8a47daa27abe47f58ae5eef5a6713a657aa1332d5c620d88ba65c7a056d8c2",
+      "size_bytes": 5167
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+      "sha256": "32765ebea79d230319352d39de6fabf099a7c15a3c294456810c58bc1e21cc73",
+      "size_bytes": 9825
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs",
+      "sha256": "a6f1d30c0c8228d943a660f33c6dc853f36001bf0f8e42d0a01d4d918ad01b5b",
+      "size_bytes": 4259
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+      "sha256": "3676c27ee3a0c0f9e2540e1df028c6df4305e14d80b49d65e37a7f6be5d123a8",
+      "size_bytes": 3628
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs",
+      "sha256": "e4e50e38d21ea1b7fa1537a440dbfcdf53c5b876050987b5f247cc6b160f63a4",
+      "size_bytes": 4612
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs",
+      "sha256": "218c2f5ee11581437f48d56a7a1a90e4e7af832d42854e09c8753a8198f859ff",
+      "size_bytes": 4152
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+      "sha256": "ca5097dddf11de2d54f6041fa5fb9390df1762cb0dcfb86668543e35a49dc7d3",
+      "size_bytes": 6499
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs",
+      "sha256": "f90e3b4ab611c3ab1acec463541fcdb0fac31a3204265f09f7b07a9b558c076d",
+      "size_bytes": 7659
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs",
+      "sha256": "08541dd2d6a3e75f5418643dca857155edf33cb083bceb044ff8f19de9842249",
+      "size_bytes": 1812
+    }
+  ],
+  "frozen_before_execution": true,
+  "expected_values_supplied": false,
+  "Native_results_supplied": false,
+  "actual_Cargo_source_capture_must_match": true,
+  "native_helper_request": {
+    "path": ".runtime/porting/CTF-07/production-frozen-packet-01/helper-request.json",
+    "sha256": "4b09b06f10f7b52d5f334b9e87c5570aced8f0a5d025090afd28763ae0042dff",
+    "size_bytes": 37411
+  },
+  "native_admission_contract": {
+    "path": ".runtime/porting/CTF-07/production-frozen-packet-01/native-admission-contract.json",
+    "sha256": "62a477ebeb1cf55869f241f4e99cd668f829c759c87389ff7b7ad4eec1dc39dd",
+    "size_bytes": 27643
+  }
+}

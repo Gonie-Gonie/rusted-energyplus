@@ -1,0 +1,11 @@
+--- .runtime/porting/CTF-07/rust-gamma-prep-01/README.md
++++ .runtime/porting/CTF-07/rust-gamma-prep-02/README.md
+@@ -74,3 +74,8 @@
+ weather or binary payload reads, canonical changes or Git actions occurred.
+ The author wrote earlier Native/helpers/initial ingress; independent full source
+ peer and Root review remain required, not an independent own-formula certificate.
++
++Fresh02 corrects source metadata only: the actual reset helper is Original2045-2069
++with caller573 and declaration356. The initial01 nodal490-504 range had an
++incorrect reset purpose and remains preserved as a historical draft. All three
++Rust proposal bodies/before parent/generated source diffs are byte-identical01.

@@ -1,0 +1,521 @@
+{
+  "schema": "ctf07-actual-selected-first-Gamma-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-07-unit/manifest.json",
+    "sha256": "48b2a8a8fcd04fa1860b8c1ff8706ec6c841a0d30fb1aa11c099431e535fd7ea",
+    "size_bytes": 560545
+  },
+  "prior_actual_Original_and_unchanged_Rust_baseline": {
+    "path": "energyplus_porting_plan/evidence/CTF-07-original-baseline/summary.json",
+    "sha256": "74ba5011c4f56ad100aa1dfb09f5d045cbe8e98183d575a84232145d6ebbdc0d",
+    "size_bytes": 16316
+  },
+  "actual_applied_source": {
+    "path": ".runtime/porting/CTF-07/applied-final-source-02/manifest.json",
+    "sha256": "c67e440187bc3731d667d8bb79970c80ef82f9e37c26eac3dda4fc66c116414b",
+    "size_bytes": 23046
+  },
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/29/293f3e45e5c69f264be9e1becbba233b6a785e44d6880330cdd8301af0133f0e",
+    "sha256": "293f3e45e5c69f264be9e1becbba233b6a785e44d6880330cdd8301af0133f0e"
+  },
+  "actual_Cargo_build": {
+    "path": ".runtime/porting/CTF-07/candidate-build-command-01/receipt.json",
+    "sha256": "1fd55d36cf93482dc3b76c936acbcd3d365f994ff536de01446a27fd19372ac4",
+    "size_bytes": 8046
+  },
+  "actual_unit_execution": {
+    "path": ".runtime/porting/CTF-07/candidate-unit-command-01/receipt.json",
+    "sha256": "dfd2ad1b91dd0ba1ffd20967c979d6ce201dc0252040a0c9db82ca8e4a0eed76",
+    "size_bytes": 5331
+  },
+  "actual_production_execution": {
+    "path": ".runtime/porting/CTF-07/candidate-production-command-01/receipt.json",
+    "sha256": "5a440aebf7b7b836cabbebe5dfd8123ee73a6b3e5867850112f0872755c329f1",
+    "size_bytes": 4997
+  },
+  "actual_unit_comparison": {
+    "path": ".runtime/porting/CTF-07/unit-comparison-02/comparison.json",
+    "sha256": "f176d9dd32adc82fe9b3bca8f1098e28c13a0430e0cc2dfdcb82158e1bf1910b",
+    "size_bytes": 7049427
+  },
+  "actual_unit_comparison_execution": {
+    "path": ".runtime/porting/CTF-07/unit-comparison-command-02/receipt.json",
+    "sha256": "284efa160992cbeac79aaa1a7e383a71963be6481ee88f077ffc5a69351e493b",
+    "size_bytes": 5814
+  },
+  "actual_production_comparison": {
+    "path": ".runtime/porting/CTF-07/production-comparison-02/comparison.json",
+    "sha256": "8c21a07283fdc603872cdffdc795d40d67df52cb832b6ed5c0a9442aa401c39d",
+    "size_bytes": 469235
+  },
+  "actual_production_comparison_execution": {
+    "path": ".runtime/porting/CTF-07/production-comparison-command-02/receipt.json",
+    "sha256": "ce1141faf4b09158e3d8465a303f7f7824907d2e432d86ea7a32c11722903ff8",
+    "size_bytes": 6198
+  },
+  "unit": {
+    "status": "pass-selected-first-Gammas",
+    "numeric_comparisons": 180219,
+    "discrete_comparisons": 1130134,
+    "mismatch_count": 0,
+    "primary_Gamma_metrics": {
+      "CTF07.Gamma1": {
+        "count": 1647,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF07.Gamma2": {
+        "count": 1647,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF07.ATemp": {
+        "count": 19625,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "method_handoff_metrics": {
+      "CTF06.AExp": {
+        "count": 19625,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.final_AMat1": {
+        "count": 19625,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.final_AMato": {
+        "count": 19625,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.final_AMatN": {
+        "count": 19625,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.AMatRowNormMax": {
+        "count": 25,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.fact": {
+        "count": 25,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.CheckVal": {
+        "count": 25,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF05.AInv": {
+        "count": 19625,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF05.final_AMat1": {
+        "count": 19625,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "assembly_handoff_metrics": {
+      "AMat": {
+        "count": 19625,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "IdenMatrix": {
+        "count": 19625,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "BMat": {
+        "count": 75,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CMat": {
+        "count": 50,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "DMat": {
+        "count": 50,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "assembly_CTFTimeStep": {
+        "count": 25,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "caller_TimeStepZone": {
+        "count": 25,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "selected_first_pairs": 25,
+    "actual_Gamma_observation_counts": {
+      "actual_gamma_observation_counts": {
+        "actual_invocation_count": 41,
+        "actual_retained_invocation_count": 41,
+        "actual_stage_callback_counts": [
+          41,
+          41,
+          41,
+          41,
+          41
+        ],
+        "stage_records_omitted": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "failure_event_counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "method_copy_integrity_failed": false,
+        "complete_method_return_parity_claimed": false,
+        "numerical_PASS_claimed": false
+      },
+      "gamma_whole_call_records": 42,
+      "gamma_uninvoked_whole_call_records": 0,
+      "gamma_selected_first_invocation_count": 25,
+      "gamma_later_unpaired_invocation_count": 16,
+      "gamma_actual_return_marker_count": 41
+    },
+    "unavailable_observation_count": 105,
+    "unavailable_counted_as_PASS": false
+  },
+  "fixed15_production": {
+    "status": "pass-selected-loader-to-first-Gammas",
+    "numeric_comparisons": 4005,
+    "discrete_comparisons": 30477,
+    "mismatch_count": 0,
+    "primary_Gamma_metrics": {
+      "CTF07.Gamma1": {
+        "count": 225,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF07.Gamma2": {
+        "count": 225,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF07.ATemp": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "method_handoff_metrics": {
+      "CTF06.AExp": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.final_AMat1": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.final_AMato": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.final_AMatN": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.AMatRowNormMax": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.fact": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF06.CheckVal": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF05.AInv": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CTF05.final_AMat1": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "assembly_handoff_metrics": {
+      "AMat": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "IdenMatrix": {
+        "count": 375,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "BMat": {
+        "count": 45,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "CMat": {
+        "count": 30,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "DMat": {
+        "count": 30,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "assembly_CTFTimeStep": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "caller_TimeStepZone": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "selected_first_pairs": 15,
+    "actual_Gamma_observation_counts": {
+      "actual_gamma_observation_counts": {
+        "actual_invocation_count": 15,
+        "actual_retained_invocation_count": 15,
+        "actual_stage_callback_counts": [
+          15,
+          15,
+          15,
+          15,
+          15
+        ],
+        "stage_records_omitted": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "failure_event_counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "method_copy_integrity_failed": false,
+        "complete_method_return_parity_claimed": false,
+        "numerical_PASS_claimed": false
+      },
+      "gamma_whole_call_records": 21,
+      "gamma_uninvoked_whole_call_records": 0,
+      "gamma_selected_first_invocation_count": 15,
+      "gamma_later_unpaired_invocation_count": 0,
+      "gamma_actual_return_marker_count": 15
+    },
+    "unavailable_observation_count": 36,
+    "unavailable_counted_as_PASS": false
+  },
+  "quality": {
+    "focused_Gamma_tests": {
+      "execution": {
+        "path": ".runtime/porting/CTF-07/gamma-tests-command-02/receipt.json",
+        "sha256": "05ba417c23378243bcca77143bfae5c077f9d019b1da297042ff58218da3cb8b",
+        "size_bytes": 4729
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/29/293f3e45e5c69f264be9e1becbba233b6a785e44d6880330cdd8301af0133f0e",
+        "sha256": "293f3e45e5c69f264be9e1becbba233b6a785e44d6880330cdd8301af0133f0e"
+      },
+      "actual_test_result_totals": {
+        "passed": 110,
+        "failed": 0,
+        "ignored": 0
+      },
+      "actual_test_result_row_count": 1
+    },
+    "workspace_tests": {
+      "execution": {
+        "path": ".runtime/porting/CTF-07/quality-tests-command-02/receipt.json",
+        "sha256": "d47c7f4e0720c9864f570a059f3a80fed581e1aa0ebca03b9cd063ffcb6607c2",
+        "size_bytes": 4719
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/29/293f3e45e5c69f264be9e1becbba233b6a785e44d6880330cdd8301af0133f0e",
+        "sha256": "293f3e45e5c69f264be9e1becbba233b6a785e44d6880330cdd8301af0133f0e"
+      },
+      "actual_test_result_totals": {
+        "passed": 4726,
+        "failed": 0,
+        "ignored": 0
+      },
+      "actual_test_result_row_count": 43
+    },
+    "clippy": {
+      "execution": {
+        "path": ".runtime/porting/CTF-07/quality-clippy-command-02/receipt.json",
+        "sha256": "cc8fcbcf4b77c27dfc7246344c6a9e6e54595d59508c5019f38e47fda2dc137d",
+        "size_bytes": 4759
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/29/293f3e45e5c69f264be9e1becbba233b6a785e44d6880330cdd8301af0133f0e",
+        "sha256": "293f3e45e5c69f264be9e1becbba233b6a785e44d6880330cdd8301af0133f0e"
+      }
+    },
+    "format_check": {
+      "execution": {
+        "path": ".runtime/porting/CTF-07/quality-fmt-command-01/receipt.json",
+        "sha256": "42b0ab53ea0035e0c7efcf014b13a27fc8b6ee824a0540bc621fa7d60d6a9e9f",
+        "size_bytes": 4696
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/29/293f3e45e5c69f264be9e1becbba233b6a785e44d6880330cdd8301af0133f0e",
+        "sha256": "293f3e45e5c69f264be9e1becbba233b6a785e44d6880330cdd8301af0133f0e"
+      }
+    }
+  },
+  "source_review": {
+    "Root_and_other_author_FULL_before_application": true,
+    "Root_and_Header_FULL_formatter_correspondence": true,
+    "Root_and_Header_FULL_scoped_lint_expectation": true,
+    "Root_and_Raw_FULL_diagnostic_label_repair": true,
+    "mathematical_operands_order_changed": false,
+    "frozen_profiles_or_required_absence_rules_changed": false
+  },
+  "preserved_attempts": {
+    "clippy_failure_01": {
+      "path": ".runtime/porting/CTF-07/quality-clippy-command-01/receipt.json",
+      "sha256": "3a9e67ee5cc594b8a82706055516e2c0ab39d7b4c2d8b2629269d7cb506bf917",
+      "size_bytes": 4761
+    },
+    "production_comparer_diagnostic_failure_01": {
+      "path": ".runtime/porting/CTF-07/production-comparison-command-01/receipt.json",
+      "sha256": "1f7a706b5944db3205953accfa632ea5970278d473fc197a0c72c79bf20becd9",
+      "size_bytes": 6198
+    },
+    "prior_unit_comparison_01": {
+      "path": ".runtime/porting/CTF-07/unit-comparison-command-01/receipt.json",
+      "sha256": "7773fc89b3d97ca280681de4b7318d44f54cbaed3ee716c419c0cf3f5a3422ad",
+      "size_bytes": 5814
+    }
+  },
+  "selected_unit_and_fixed15_comparisons_passed": true,
+  "complete_CTF04_PASS_claimed": false,
+  "complete_CTF05_PASS_claimed": false,
+  "complete_CTF06_PASS_claimed": false,
+  "complete_CTF07_PASS_claimed": false,
+  "only_selected_first_massive_nonreversed_1D_no_source_invocations": true,
+  "later_or_unavailable_observations_counted_as_PASS": false,
+  "retry_driver_or_final_coefficient_handoff_certified": false,
+  "fixed6_CLI_evidence_published_here": false,
+  "integration_or_production_gate_PASS_claimed": false,
+  "Originals_retained_pending_separate_actual_retention_record": true,
+  "Root_authored_summary_is_not_a_command_recorder": true,
+  "full_Native_and_Rust_scientific_bytes_roundtrip_preserved": true
+}

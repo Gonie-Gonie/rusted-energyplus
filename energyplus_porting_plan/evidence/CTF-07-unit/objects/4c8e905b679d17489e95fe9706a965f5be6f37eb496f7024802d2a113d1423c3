@@ -1,0 +1,63 @@
+--- .runtime/porting/CTF-06/comparer-prep-01/method_shape.py
++++ .runtime/porting/CTF-07/comparer-prep-01/method_shape.py
+@@ -2,7 +2,7 @@
+ 
+ POLICIES = {'ctf06_exponential_observation_policy': {'protocol': 'ctf06-exponential-method-observation.v1', 'actual_method': 'ConstructionProps::calculateExponentialMatrix', 'actual_caller_line': 884, 'actual_method_source_lines': [1105, 1373], 'actual_stage_names': ['Entry', 'InitializedInputs', 'ScalingControls', 'PowerControl', 'SquareControl', 'FinalWorkspace', 'SourceReturn'], 'input_matrices': ['AMat', 'IdenMatrix'], 'initialized_matrices': ['AMat1', 'AMato', 'AMatN', 'AExp'], 'scaled_matrices': ['AMat1'], 'final_matrices': ['AMat1', 'AMato', 'AMatN', 'AExp'], 'return_matrices': ['AMat', 'IdenMatrix', 'AExp'], 'scalar_controls': ['AMatRowNormMax', 'fact', 'CheckVal'], 'integer_controls': ['k', 'l', 'final_i'], 'actual_power_controls': ['i', 'SigFigLimit'], 'actual_square_controls': ['isq', 'Backup'], 'scalar_controls_available_only_at_scaling_and_final': True, 'final_i_distinct_from_observed_control_event_count': True, 'selected_invocation_ordinal': 1, 'selected_assembly_ordinal': 1, 'selected_first_attempt_uses_actual_initial619_dt_and_history': True, 'required_owner_context': {'SourceSinkPresent': False, 'SolutionDimensions': 1}, 'actual_source_produced_identity_required': True, 'storage_order': 'source_i1_outer_i2_inner_row_first', 'invocation_identity': 'one_based_actual_entry_visit_within_bound_whole_call', 'actual_assembly_association_required': True, 'actual_method_return_marker_required_for_return_claim': True, 'all_actual_visits_and_control_events_retained': True, 'later_Native_attempts_paired': False, 'later_Native_attempts_counted_as_PASS': False, 'Rust_retry_driver_available': False, 'uninvoked_counted_as_PASS': False, 'missing_selected_owner_on_one_or_both_sides_is_required_failure': True, 'observer_failure_or_omission_is_integrity_failure': True, 'method_values_or_identity_or_return_or_retry_state_reconstructed': False}, 'ctf05_inverse_observation_policy': {'protocol': 'ctf05-inverse-method-observation.v1', 'actual_method': 'ConstructionProps::calculateInverseMatrix', 'actual_caller_line': 887, 'actual_method_source_lines': [1375, 1494], 'actual_stage_names': ['Entry', 'InitializedInputs', 'ScalingControls', 'PowerControl', 'SquareControl', 'FinalWorkspace', 'SourceReturn'], 'input_matrices': ['AMat', 'IdenMatrix'], 'initialized_matrices': ['AMat1', 'AInv'], 'final_matrices': ['AMat1', 'AInv'], 'return_matrices': ['AMat', 'IdenMatrix', 'AInv'], 'actual_exponential_return_precedes_inverse_entry': True, 'inverse_inputs_are_original_AMat_and_IdenMatrix_not_AExp': True, 'selected_invocation_ordinal': 1, 'selected_assembly_ordinal': 1, 'selected_first_attempt_uses_actual_initial619_dt_and_history': True, 'required_owner_context': {'SourceSinkPresent': False, 'SolutionDimensions': 1}, 'actual_source_produced_identity_required': True, 'storage_order': 'source_i1_outer_i2_inner_row_first', 'invocation_identity': 'one_based_actual_entry_visit_within_bound_whole_call', 'actual_assembly_association_required': True, 'actual_method_return_marker_required_for_return_claim': True, 'all_actual_visits_and_control_events_retained': True, 'later_Native_attempts_paired': False, 'later_Native_attempts_counted_as_PASS': False, 'Rust_retry_driver_available': False, 'uninvoked_counted_as_PASS': False, 'missing_selected_owner_on_one_or_both_sides_is_required_failure': True, 'observer_failure_or_omission_is_integrity_failure': True, 'method_values_or_identity_or_return_or_retry_state_reconstructed': False}}
+ SELECTION = {'actual_assembly_ordinal': 1, 'actual_exponential_invocation_ordinal': 1, 'actual_inverse_invocation_ordinal': 1, 'association': 'same bound whole call/actual Construct identity + first728 assembly + initial619 actual dt/history', 'actual_order': ['assembly728', 'exponential884', 'inverse887'], 'later_actual_visits': 'all retained unpaired context/noPASS', 'no_initial_dt_equals_TimeStepZone_assertion': True, 'no_Rust_retry_driver_claim': True, 'stopped_or_uninvoked': 'unavailable/noPASS, real source or OS outcome retained separately'}
+-RETENTION_INTENT = {'schema': 'ctf06-debug-original-retention-intent.v1', 'role': 'prospective-debug-original', 'scope': 'new-CTF06-linked-originals-only', 'actual_file_identity_required': True, 'both_original_and_helper_verified_before_execution': True, 'retain_through_PE_validation_and_current_helper_execution': True, 'removal_requires_separate_Root_authorized_actual_retention_record': True, 'earlier_live_refs_reinterpreted': False, 'deletion_performed': False}
++RETENTION_INTENT = {'schema': 'ctf07-debug-original-retention-intent.v1', 'role': 'prospective-debug-original', 'scope': 'new-CTF07-linked-originals-only', 'actual_file_identity_required': True, 'both_original_and_helper_verified_before_execution': True, 'retain_through_PE_validation_and_current_helper_execution': True, 'removal_requires_separate_Root_authorized_actual_retention_record': True, 'earlier_live_refs_reinterpreted': False, 'deletion_performed': False}
+ 
+ STAGES = ["Entry", "InitializedInputs", "ScalingControls", "PowerControl", "SquareControl", "FinalWorkspace", "SourceReturn"]
+ FAILURES = ["IdentityMismatch", "AssociationFailure", "OrderFailure", "MatrixShape", "CopyException", "LedgerAppendException"]
+@@ -26,49 +26,10 @@
+             need(type(row["atol"]) is float and row["atol"] == 0.0 and type(row["rtol"]) is float and row["rtol"] == 0.0 and
+                  row["class_exact"] is True and row["shape_exact"] is True and row["signed_zero_exact"] is True and
+                  row["required_shape"] == shape, "Exact zero/class/shape/signedzero method profile differs")
+-    selection = projection["method_state_pairing_and_availability"]["method_selection"]
++    selection = projection["method_state_pairing_and_availability"]["inherited_method_selection"]
+     need(selection == SELECTION, "Exact first assembly/exponential/inverse source selection required")
+     for owner in [freeze, request, admission, projection, tolerances]:
+-        need(owner["linked_original_retention_intent"] == RETENTION_INTENT, "New06 prospective retention intent differs")
+-
+-
+-def scope(m, same, recorded, freeze, request, admission, projection, passive, frozen_started):
+-    authority = freeze["source_authorities"]
+-    checks = authority["actual_scope_amendment_executions"]
+-    cards = authority["current_cards"]
+-    m.require(set(checks) == set(cards) == {"CTF-05", "CTF-06"} and
+-              authority["actual_scope_amendment_execution_role"] ==
+-              "real-CTF-06-check-only; both-required-checks-in-executions-mapping", "Both real scope checks and singular role required")
+-    same(authority["actual_scope_amendment_execution"], checks["CTF-06"])
+-    amendment = m.load(authority["actual_scope_amendment"])
+-    m.require(amendment["schema"] == "ctf05-ctf06-source-scope-amendment.v1" and amendment["cards"] == ["CTF-05", "CTF-06"] and
+-              amendment["scope_review_passed"] is True and amendment["all_other_gates_pending"] is True and
+-              amendment["strict_profiles_settled_before_outputs"] is True and
+-              amendment["actual_CTF05_or_CTF06_build_or_engine_execution_performed"] is False and
+-              amendment["requested_counts"] == {"unit": {"model_cases": 39, "calculateTransferFunction": 42},
+-                                                "production": {"model_cases": 15, "loader_phase_records": 195}},
+-              "Actual combined pre-output source scope authority differs")
+-    for key, target in [("native_observer", authority["native_source_manifest"]), ("passive_observer", authority["passive_observer"]),
+-                        ("method_policy_source_inventory", authority["method_policy_source_inventory"])]:
+-        same(amendment[key], target); m.bind(target)
+-    before, after = [[m.bind(row) for row in amendment[key]] for key in ["before_documents", "after_documents"]]
+-    m.require(len(before) == len(after) == 3 and len({row["path"] for row in before}) == len({row["path"] for row in after}) == 3 and
+-              before == authority["historical_scope_documents"] and after == authority["current_scope_documents"],
+-              "Exact plan/two-card before and after identities differ")
+-    for name in ["CTF-05", "CTF-06"]:
+-        card = m.bind(cards[name]); m.require(card["path"] == "energyplus_porting_plan/cards/" + name + ".md" and card in after,
+-                                             "Actual amended card identity differs")
+-        historical = next(row for row in passive["source_refs"] if row["path"] == card["path"])
+-        m.require(any(row["sha256"] == historical["sha256"] and row["size_bytes"] == historical["size_bytes"] for row in before),
+-                  "Historical card must match immutable before copy")
+-        command = recorded(checks[name], frozen_started)
+-        m.require(command["command"] == ["python", "-X", "utf8", "-B", "tools/porting/check_plan.py", "--check", "--card", name] and
+-                  m.contained(command["stderr"]["path"]).stat().st_size == 0, "Both real scope command0/empty stderr required")
+-    m.require(m.identity("energyplus_porting_plan/plan.json") in after, "Actual current plan differs from after document")
+-    for owner in [request, admission, projection]:
+-        for key in ["actual_scope_amendment", "actual_scope_amendment_execution", "actual_scope_amendment_executions",
+-                    "actual_scope_amendment_execution_role", "current_cards"]:
+-            m.require(owner[key] == authority[key], "Combined scope provenance differs across packet")
++        need(owner["linked_original_retention_intent"] == RETENTION_INTENT, "New07 prospective retention intent differs")
+ 
+ 
+ def review(operation, owner_snapshot, need, scalar, counts, integrity, label):

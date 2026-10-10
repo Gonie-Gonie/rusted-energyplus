@@ -1,0 +1,264 @@
+{
+  "schema": "ctf07-selected-gamma-source-preparation.v1",
+  "status": "SOURCE-READY-HELD-unapplied-unformatted-unexecuted",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "own_source_rows": [
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-07/rust-gamma-prep-01/new/ctf_gamma_matrix.rs",
+        "sha256": "f173d96bf44e94d1e871df210a6d75af32c4fbf7771760504042b95f9e1dc7e0",
+        "size_bytes": 6371,
+        "line_count": 152
+      },
+      "canonical_install_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-07/rust-gamma-prep-01/ctf_gamma_matrix.rs.addition.diff",
+        "sha256": "f8e2100b18246f1b03d61499babdd67d640169e32ecb139c466b614f9ed26f55",
+        "size_bytes": 6630,
+        "line_count": 155
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-07/rust-gamma-prep-01/new/ctf_gamma_matrix_tests.rs",
+        "sha256": "2ad241a1be4b59dc5a476f6ffd1e25b64cc10126efdb32b6f2d90431bdcc25e8",
+        "size_bytes": 6733,
+        "line_count": 146
+      },
+      "canonical_install_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix_tests.rs",
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-07/rust-gamma-prep-01/ctf_gamma_matrix_tests.rs.addition.diff",
+        "sha256": "b124e353d4486c5ca9903183b7aa56ce0dc343726c44b316787314e6d4724b45",
+        "size_bytes": 6992,
+        "line_count": 149
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-07/rust-gamma-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager.rs",
+        "sha256": "4d3d19c49141fc2f8701bf30b156c8596c2e3d11f83419e09a8abf2c90245be4",
+        "size_bytes": 6021,
+        "line_count": 173
+      },
+      "canonical_install_path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "before_source": {
+        "historical_path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+        "archive": {
+          "path": ".runtime/porting/CTF-07/rust-gamma-prep-01/before/surface_manager.rs",
+          "sha256": "71dbf39a1320d7c6b5fabe57cf11b811fa139919f54fab2551fd5f2ad6591b09",
+          "size_bytes": 5995,
+          "line_count": 172
+        }
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-07/rust-gamma-prep-01/surface_manager.rs.from-current.diff",
+        "sha256": "60f22f9f9c1c128d25d083a7c6fc4b575c3da70f0379e2fa815635b895c1db61",
+        "size_bytes": 320,
+        "line_count": 10
+      }
+    }
+  ],
+  "source_dependencies": [
+    {
+      "path": "energyplus_porting_plan/cards/CTF-07.md",
+      "sha256": "fd49a0c26a92819161d622c6f73b17398c93b4f2ae3e13da458e860781192fb3",
+      "size_bytes": 2686,
+      "line_count": 70
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+      "size_bytes": 110319,
+      "line_count": 2115
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "sha256": "53a14b2a45860255267e6ebf780a50fc8aefc4ba30ae3df589062601a20f999a",
+      "size_bytes": 24041,
+      "line_count": 383
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "sha256": "65ec2a19c1721ab3a685a7e24e9b95d67d3ff910fe17976a76405ea32c155c73",
+      "size_bytes": 10624,
+      "line_count": 283
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "sha256": "0cf67532a277ea20c362acdcc97d2e293ee086a8757177e2b8ccb5bb52fb39a7",
+      "size_bytes": 11747,
+      "line_count": 316
+    },
+    {
+      "path": "crates/ep_model/src/ids.rs",
+      "sha256": "83b32ebf02684f459cb0a789f498de08b849b94a7072f1f5870663a4b3cca7be",
+      "size_bytes": 2029,
+      "line_count": 61
+    },
+    {
+      "path": ".runtime/porting/CTF-06/rust-exponential-prep-01/manifest.json",
+      "sha256": "66271239f508e0e9a87b47c04c4a0c875aa2449ed672e5b81777a30bb178c0d2",
+      "size_bytes": 16822,
+      "line_count": 421
+    },
+    {
+      "path": ".runtime/porting/CTF-06/rust-exponential-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+      "sha256": "0dd184b702ee9b2541b0454b81b6d4750f9bd3fafd387d7ec957d5cbaf6e8680",
+      "size_bytes": 9748,
+      "line_count": 262
+    },
+    {
+      "path": ".runtime/porting/CTF-05/rust-inverse-prep-01/manifest.json",
+      "sha256": "d5933bc4aee59fc022ca94bfc9458edfc3dd0352290ae454ac5db309ac7c810a",
+      "size_bytes": 10789,
+      "line_count": 261
+    },
+    {
+      "path": ".runtime/porting/CTF-05/rust-inverse-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+      "sha256": "8d828b9d33c9054a2fc1bafc4ccfc01e892562f5e3689b139d28cbd0f06185b1",
+      "size_bytes": 3646,
+      "line_count": 106
+    },
+    {
+      "path": ".runtime/porting/CTF-06/combined-first-matrix-ingress-prep-01/manifest.json",
+      "sha256": "459c572fe999f61c5cf865859e4ee6379dea4abdea11f57ca07d534920ca9d0d",
+      "size_bytes": 29201,
+      "line_count": 649
+    }
+  ],
+  "source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1496,
+      "end_line": 1589,
+      "sha256": "738f643d12eaf6f333ceed15e0fd65db8508f8bfbdefac5f8eb8a76ef19379cb",
+      "size_bytes": 4459,
+      "purpose": "whole Gamma method and private workspace lifetime"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "start_line": 304,
+      "end_line": 342,
+      "sha256": "fbcb4d693cf6124c674cc4e4c9673e0319674407efe9d937bc330c14f73c3779",
+      "size_bytes": 2495,
+      "purpose": "actual matrix declarations, B3/Gamma storage and public method"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 638,
+      "end_line": 654,
+      "sha256": "62164b9bfd947186c8a4435eda5e8fd80786c7f8426fa78c08055859e5282a7e",
+      "size_bytes": 750,
+      "purpose": "actual square and Gamma3-by-rcmax allocation/initialization"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 877,
+      "end_line": 897,
+      "sha256": "2a4340df4aa75c26830f60a0bdc0b5de7fda75908b97e0eac1b468c95c62aeac",
+      "size_bytes": 1244,
+      "purpose": "actual exp then inverse then Gamma caller order"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 1079,
+      "end_line": 1103,
+      "sha256": "827ee8c55bface38c49b866d98c25b83d58877dbcbba8b4579e01ba90e65b9bc",
+      "size_bytes": 580,
+      "purpose": "whole method deallocates Gamma and predecessor workspaces"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "start_line": 490,
+      "end_line": 504,
+      "sha256": "8ae1c81f06b50db1fc737519a37e49dc521a095e6609ce5cb51fa9d4541896ff",
+      "size_bytes": 956,
+      "purpose": "selected no-source node selectors are actual reset state"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "start_line": 1,
+      "end_line": 172,
+      "sha256": "71dbf39a1320d7c6b5fabe57cf11b811fa139919f54fab2551fd5f2ad6591b09",
+      "size_bytes": 5995,
+      "purpose": "current04 parent before declaration-only proposal"
+    }
+  ],
+  "README": {
+    "path": ".runtime/porting/CTF-07/rust-gamma-prep-01/README.md",
+    "sha256": "bff6f6f185584b2c275c3582e9655afcf0e5dff47df0d6339415031752905397",
+    "size_bytes": 4855,
+    "line_count": 76
+  },
+  "source_contract": {
+    "whole_original_symbol": "ConstructionProps::calculateGammas",
+    "whole_original_range": [
+      1496,
+      1589
+    ],
+    "selected": "one-dimensional no-source route with actual reset node selectors",
+    "inputs": [
+      "rcmax",
+      "actual AInv",
+      "actual AExp",
+      "actual IdenMatrix",
+      "actual compressed BMat3",
+      "actual CtfAssemblyContext/current CTFTimeStep"
+    ],
+    "unused_AMat_not_accepted": true,
+    "outputs": [
+      "actual ATemp before1553 deallocation",
+      "Gamma1(3,rcmax)",
+      "Gamma2(3,rcmax)",
+      "unchanged context/rcmax"
+    ],
+    "row_first_layout": "(i1-1)*rcmax+(i2-1); Gamma(j,i)=(j-1)*rcmax+(i-1)",
+    "source_loop_order": [
+      "Gamma1 i/is1, row1 thenrow2",
+      "Gamma2 i/j/is1"
+    ],
+    "finite_or_timestep_guard_added": false,
+    "identity_or_prior_method_values_reconstructed": false,
+    "matrix_library_or_transpose_used": false,
+    "source_product_reassociated": false,
+    "Gamma2_third_row_forced_zero": false,
+    "source_errors_distinct_from_native_outcomes": true
+  },
+  "runtime_activation": {
+    "public_or_cache_driver_authored": false,
+    "new_Native_observation_or_policy_authored": false,
+    "actual_build_or_run_refs": null,
+    "genuine_same_attempt_preceding_owner_handoff_required": true,
+    "first_only_future_pairing_requires_explicit_owner": true,
+    "prospective_combined_parent_rebase_required": true,
+    "later_retry_or_CTF08_driver_claimed": false
+  },
+  "tests": {
+    "authored": 8,
+    "executed": false,
+    "inputs": "literal source-derived boundary matrices, never Native answers",
+    "scope": [
+      "boundary subtraction",
+      "asymmetric layout and actual supplied identity",
+      "ordered cancellation",
+      "left-associated overflow",
+      "signedzero and unread B3",
+      "nonfinite zero-dt arithmetic",
+      "unavailable routes",
+      "scope and owner shapes"
+    ]
+  },
+  "checks": {
+    "exact_before_parent": true,
+    "declaration_only_parent_difference": true,
+    "new_canonical_files_absent": true,
+    "generated_diffs3_exact": true,
+    "metadata_JSON_only_no_Rust_target_AST_or_compile": true
+  },
+  "authorship_limits": "Earlier Native observer/helper/ingress author; selected numerical source proposal requires independent Root/other-author full peer; no own-formula certificate",
+  "scientific_weather_or_binary_payloads_read": false,
+  "project_imports_or_targets_executed": false,
+  "canonical_or_Git_modified": false,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false
+}

@@ -1,0 +1,164 @@
+"""Author ignored Source-only comparer proposals using stdlib byte/AST operations."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+OLD = ROOT / ".runtime/porting/CTF-06/comparer-prep-01"
+QA = ROOT / ".runtime/porting/CTF-07/original-data-review-prep-01"
+OBS = ROOT / ".runtime/porting/CTF-07/rust-observer-prep-01"
+
+
+def identity(path):
+    path = Path(path); data = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(data).hexdigest(),
+            "size_bytes": len(data), "line_count": len(data.splitlines())}
+
+
+def literal(source, name):
+    for node in ast.parse(source).body:
+        if isinstance(node, ast.Assign) and any(isinstance(target, ast.Name) and target.id == name for target in node.targets):
+            return ast.literal_eval(node.value)
+    raise ValueError(name)
+
+
+def replace_assignment(source, name, value):
+    rows = source.splitlines(True)
+    for node in ast.parse(source).body:
+        if isinstance(node, ast.Assign) and any(isinstance(target, ast.Name) and target.id == name for target in node.targets):
+            rows[node.lineno-1:node.end_lineno] = [name + " = " + repr(value) + "\n"]
+            return "".join(rows)
+    raise ValueError(name)
+
+
+def function(source, name):
+    rows = source.splitlines(True)
+    node = next(node for node in ast.parse(source).body if isinstance(node, (ast.FunctionDef, ast.ClassDef)) and node.name == name)
+    return "".join(rows[node.lineno-1:node.end_lineno])
+
+
+def replace_once(source, old, new):
+    assert source.count(old) == 1, (old, source.count(old))
+    return source.replace(old, new, 1)
+
+
+def write(path, text):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8", newline="\n")
+
+
+def main():
+    predecessor = json.loads((OLD / "manifest.json").read_text())
+    assert identity(OLD / "manifest.json")["sha256"] == "61491a3e2f71584603ac7165c92bc6925a9e2b11745fb4a162e005a411f5335d"
+    for ref in predecessor["own_sources"]:
+        assert identity(ROOT / ref["path"])["sha256"] == ref["sha256"]
+    before = OUT / "before"; before.mkdir(exist_ok=False)
+    for filename in ["compare_unit.py", "compare_production.py", "packet_io.py", "method_compare.py", "method_shape.py", "README.md", "manifest.json"]:
+        (before / filename).write_bytes((OLD / filename).read_bytes())
+    for filename in ["method_shape.py", "gamma_shape.py"]:
+        (OUT / filename).write_bytes((QA / filename).read_bytes())
+    io = (OLD / "packet_io.py").read_text()
+    write(OUT / "packet_io.py", replace_once(io, '.runtime/porting/CTF-06', '.runtime/porting/CTF-07'))
+    pair = (OLD / "method_compare.py").read_text()
+    pair = replace_once(pair, '"initialize_construction_ctf_first_matrix_functions"', '"initialize_construction_ctf_first_matrix_with_gammas"')
+    write(OUT / "method_compare.py", pair)
+    observer = json.loads((OBS / "manifest.json").read_text())
+    inventories = {"reviewed_native_source_inventory": identity(ROOT / ".runtime/porting/CTF-07/native-helper-prep-01/manifest.json"),
+                   "reviewed_passive_source_inventory": identity(ROOT / ".runtime/porting/CTF-07/native-observer-prep-02/manifest.json"),
+                   "reviewed_freezer_source_inventory": identity(ROOT / ".runtime/porting/CTF-07/input-writer-prep-01/manifest.json"),
+                   "reviewed_PE_source_inventory": identity(ROOT / ".runtime/porting/CTF-07/native-build-review-prep-01/manifest.json")}
+    qa_ref = identity(QA / "manifest.json")
+    for lane in ["unit", "production"]:
+        filename = "compare_" + lane + ".py"
+        source = (OLD / filename).read_text()
+        for name, value in {"PAIR_SHA": identity(OUT / "method_compare.py")["sha256"],
+                            "METHOD_SHA": identity(OUT / "method_shape.py")["sha256"],
+                            "IO_SHA": identity(OUT / "packet_io.py")["sha256"],
+                            "DATAQA_SOURCE_INVENTORY": qa_ref, "SOURCE_INVENTORIES": inventories,
+                            "OBSERVER_PATHS": [row["canonical_install_path"] for row in observer["own_source_rows"] if
+                                ("production" in row["canonical_install_path"]) == (lane == "production")],
+                            "API_PATHS": observer["API_paths"][lane]}.items():
+            source = replace_assignment(source, name, value)
+        retention = literal(source, "RETENTION_INTENT")
+        retention["schema"] = "ctf07-debug-original-retention-intent.v1"
+        retention["scope"] = "new-CTF07-linked-originals-only"
+        source = replace_assignment(source, "RETENTION_INTENT", retention)
+        source = source.replace('for key in VARIABLES + METHOD_VARIABLES}', 'for key in VARIABLES + METHOD_VARIABLES + GAMMA_VARIABLES}')
+        source = source.replace('PREP = Path(__file__).resolve().parent', 'PREP = Path(__file__).resolve().parent\nGAMMA_PAIR_SHA = ' + repr(identity(OUT / "gamma_compare.py")["sha256"]) + '\nGAMMA_SHAPE_SHA = ' + repr(identity(OUT / "gamma_shape.py")["sha256"]) + '\nGAMMA_VARIABLES = ["CTF07.Gamma1", "CTF07.Gamma2", "CTF07.ATemp"]')
+        packet = function(source, "packet_policy")
+        original_packet = packet
+        packet = packet.replace('lane, methods):', 'lane, methods, gamma):')
+        packet = packet.replace('prefix = "ctf06-"', 'prefix = "ctf07-"').replace('frozen_before_this_CTF06_helper_execution', 'frozen_before_this_CTF07_helper_execution')
+        packet = packet.replace('frozen-inherited-input-and-fresh-combined-CTF05-CTF06-policy-before-helper', 'frozen-inherited-input-and-fresh-CTF07-Gamma-policy-before-helper')
+        packet = packet.replace('Genuine input-only combined CTF05/06 request required', 'Genuine input-only CTF07 request with literal prior05/06 authority required')
+        packet = packet.replace('Actual successful fresh combined CTF05/06 freeze/full stdout required', 'Actual successful fresh CTF07 freeze/full stdout required')
+        packet = packet.replace('"initial_shape.py", "method_shape.py", "packet_io.py"', '"initial_shape.py", "method_shape.py", "gamma_shape.py", "packet_io.py"')
+        packet = packet.replace('== 5, "Exact accepted DataQA lane five-source closure required"', '== 6, "Exact accepted DataQA lane six-source closure required"')
+        packet = packet.replace('len(by_owner) == 5', 'len(by_owner) == 6')
+        packet = packet.replace('methods.packet(freeze, request, admission, projection, policy, m.require)',
+            'methods.packet(freeze, request, admission, projection, policy, m.require)\n    gamma.packet(freeze, request, admission, projection, policy, m.require)')
+        packet = packet.replace('methods.scope(m, same, preceding, freeze, request, admission, projection,\n                  m.load(SOURCE_INVENTORIES["reviewed_passive_source_inventory"]), execution["started_utc"])',
+            'gamma.scope(m, same, preceding, freeze, request, admission, projection,\n                m.load(SOURCE_INVENTORIES["reviewed_passive_source_inventory"]), execution["started_utc"], lane)')
+        packet = packet.replace('{"assembly": 1, "exponential": 1, "inverse": 1}', '{"assembly": 1, "exponential": 1, "inverse": 1, "Gamma": 1}')
+        packet = packet.replace('"actual_scope_amendment_executions",\n', '"prior_05_06_authority",\n')
+        packet = packet.replace('Actual DataQA dual scope provenance differs', 'Actual DataQA current07 and historical05/06 provenance differs')
+        packet = packet.replace('    return profiles,inherited,initial_policy,initial_profiles',
+            '    m.require(qa["reviewed_Gamma_observation_policy"] == gamma.POLICY and qa["complete_actual_Gamma_records"] is True,\n              "Actual complete reviewed Gamma ledger and frozen policy required")\n    return profiles,inherited,initial_policy,initial_profiles')
+        assert 'methods.scope' not in packet and 'actual_scope_amendment_executions' not in packet
+        source = replace_once(source, original_packet, packet)
+        run = function(source, "run"); original_run = run
+        for old, new in [('ctf06_unit_io', 'ctf07_unit_io'), ('ctf06_production_io', 'ctf07_production_io'),
+                         ('ctf06_method_pairing', 'ctf07_method_pairing'), ('ctf06_method_structure', 'ctf07_method_structure'),
+                         ('ctf06-independent-original-data-review.v1', 'ctf07-independent-original-data-review.v1'),
+                         ('ctf06-production-independent-original-data-review.v1', 'ctf07-production-independent-original-data-review.v1'),
+                         ('ctf06-helper-results.v1', 'ctf07-helper-results.v1'), ('ctf06-production-helper-results.v1', 'ctf07-production-helper-results.v1'),
+                         ('ctf06-candidate-', 'ctf07-candidate-'), ('ctf06_candidate_', 'ctf07_candidate_'),
+                         ('ctf06-unit-comparison.v1', 'ctf07-unit-comparison.v1'), ('ctf06-production-comparison.v1', 'ctf07-production-comparison.v1'),
+                         ('pass-selected-first-exponential-and-inverse', 'pass-selected-first-Gammas'),
+                         ('fail-selected-first-exponential-and-inverse', 'fail-selected-first-Gammas'),
+                         ('pass-selected-loader-to-first-exponential-and-inverse', 'pass-selected-loader-to-first-Gammas'),
+                         ('fail-selected-loader-to-first-exponential-and-inverse', 'fail-selected-loader-to-first-Gammas')]:
+            run = run.replace(old, new)
+        run = run.replace('    methods = boot("ctf07_method_structure", "method_shape.py", METHOD_SHA)',
+            '    methods = boot("ctf07_method_structure", "method_shape.py", METHOD_SHA)\n    gamma = boot("ctf07_Gamma_structure", "gamma_shape.py", GAMMA_SHAPE_SHA)\n    gamma_pairing = boot("ctf07_Gamma_pairing", "gamma_compare.py", GAMMA_PAIR_SHA)')
+        run = run.replace('"' + lane + '",methods)', '"' + lane + '",methods,gamma)')
+        run = run.replace('for key in ["actual_scope_amendment_executions", "actual_scope_amendment_execution_role"]:',
+            'for key in ["prior_05_06_authority", "actual_scope_amendment_execution_role", "current_cards"]:')
+        run = run.replace('Actual Rust dual-scope provenance differs from Native input-only request',
+            'Actual Rust current07 and separate historical05/06 provenance differs')
+        needle = '    comparison = Comparison(m.require); '
+        assert needle in run
+        run = run.replace(needle, '    m.require(rust["ctf07_gamma_observation_policy"] == native["CTF07_gamma_observation_policy"] == gamma.POLICY,\n              "Actual Gamma source policy differs from frozen packet")\n    comparison = Comparison(m.require)\n    actual_gamma_counts = gamma_pairing.validate_all(comparison,native,qa,methods,gamma)\n    ')
+        if lane == "unit":
+            needle = '    result = comparison.report()'
+            run = run.replace(needle, '    gamma_ledger = gamma_pairing.compare_unit(comparison,native,rust,request,pairing)\n' + needle)
+            run = run.replace('result["assembly_handoff_metrics"] = {key: result["metrics"].pop(key) for key in VARIABLES}',
+                'result["assembly_handoff_metrics"] = {key: result["metrics"].pop(key) for key in VARIABLES}\n    result["method_handoff_metrics"] = {key: result["metrics"].pop(key) for key in METHOD_VARIABLES}')
+        else:
+            run = run.replace('    result = comparison.report();',
+                '    gamma_ledger = gamma_pairing.compare_production(comparison,native,rust,request,pairing,normalized,owners)\n    result = comparison.report();')
+            run = run.replace('for key in VARIABLES}; passed =', 'for key in VARIABLES}; result["method_handoff_metrics"] = {key: result["metrics"].pop(key) for key in METHOD_VARIABLES}; passed =')
+        run = run.replace('PREP / "method_compare.py", PREP / "method_shape.py"]',
+                          'PREP / "method_compare.py", PREP / "method_shape.py", PREP / "gamma_compare.py", PREP / "gamma_shape.py"]')
+        run = run.replace('"frozen_numeric_profiles": {"CTF06": policy["ctf06_exponential_profiles"], "CTF05": policy["ctf05_inverse_profiles"]}',
+            '"frozen_numeric_profiles": {"CTF07": policy["ctf07_gamma_profiles"]}, "inherited_method_handoff_profiles": {"CTF06": policy["ctf06_exponential_profiles"], "CTF05": policy["ctf05_inverse_profiles"]}')
+        run = run.replace('"selected_method_invocation_ordinals":methods.SELECTION,',
+            '"selected_method_invocation_ordinals":gamma.SELECTION,\n               "reviewed_Gamma_observation_policy":gamma.POLICY,"actual_Gamma_owner_ledger":gamma_ledger,"actual_Gamma_observation_counts":actual_gamma_counts,')
+        run = run.replace('"actual_scope_amendment_executions":qa["actual_scope_amendment_executions"]',
+            '"prior_05_06_authority":qa["prior_05_06_authority"]')
+        run = run.replace('"complete_CTF06_PASS_claimed": False', '"complete_CTF06_PASS_claimed": False, "complete_CTF07_PASS_claimed": False')
+        run = run.replace('selected_fixed15_first_matrix_functions_PASS_claimed', 'selected_fixed15_first_Gammas_PASS_claimed')
+        run = run.replace('Raw adapted accepted04 comparers and authored some pure/Native/assembly/inverse glue; Base authored Rust observers and Header factual DataQA.',
+            'Raw adapted accepted06 comparers and authored Native07 observation/helper/freezer and some prior pure06/assembly glue; Base authored Rust observers and Header pure/publicGamma and factual DataQA.')
+        assert '"actual_scope_amendment_executions"' not in run
+        source = replace_once(source, original_run, run)
+        ast.parse(source)
+        write(OUT / filename, source)
+    print("Ignored source proposals written; no reviewed module imported or executed.")
+
+
+if __name__ == "__main__":
+    main()

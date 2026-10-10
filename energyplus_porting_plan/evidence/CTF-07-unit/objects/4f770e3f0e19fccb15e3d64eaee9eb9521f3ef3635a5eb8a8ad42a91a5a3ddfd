@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-07\comparer-prep-02\compare_production.py", line 960, in <module>
+    raise SystemExit(run(parser.parse_args()))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-07\comparer-prep-02\compare_production.py", line 925, in run
+    actual_gamma_counts = gamma_pairing.validate_all(comparison,native,qa,methods,gamma)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-07\comparer-prep-02\gamma_compare.py", line 17, in validate_all
+    label = model["id"] + "/" + operation["id"]
+                                ~~~~~~~~~^^^^^^
+KeyError: 'id'

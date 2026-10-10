@@ -1,0 +1,13 @@
+--- .runtime/porting/CTF-07/applied-source-01/applied/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
++++ crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
+@@ -16,9 +16,7 @@
+ use crate::heat_balance::ctf_first_exponential_owner::ConstructionCtfFirstExponential;
+ use crate::heat_balance::ctf_first_gamma_ingress::initialize_construction_ctf_first_matrix_with_gammas;
+ use crate::heat_balance::ctf_first_gamma_owner::ConstructionCtfFirstGammas;
+-use crate::heat_balance::ctf_first_matrix_owner::{
+-    ConstructionCtfFirstInverseAfterExponential,
+-};
++use crate::heat_balance::ctf_first_matrix_owner::ConstructionCtfFirstInverseAfterExponential;
+ use crate::heat_balance::ctf_initial_owner::{
+     ConstructionCtfInitialDiscretization, initialize_construction_ctf_initial,
+ };

@@ -1,0 +1,11 @@
+--- .runtime/porting/CTF-06/comparer-prep-01/method_compare.py
++++ .runtime/porting/CTF-07/comparer-prep-01/method_compare.py
+@@ -225,7 +225,7 @@
+     for expected, left, right in zip(request["model_cases"], native["model_cases"], rust["model_cases"]):
+         for index, (declared, operation, observed) in enumerate(zip(expected["operations"], left["operations"], right["operations"])):
+             path = expected["id"] + "/" + declared["id"]
+-            c.need(observed.get("actual_Rust_combined_API") == "initialize_construction_ctf_first_matrix_functions" and
++            c.need(observed.get("actual_Rust_combined_API") == "initialize_construction_ctf_first_matrix_with_gammas" and
+                    observed.get("actual_Rust_combined_API_invoked") is True and observed.get("predecessor_owners_reexecuted_for_method_observation") is False,
+                    "Actual same-owner combined API call without predecessor reevaluation required")
+             calls += 1

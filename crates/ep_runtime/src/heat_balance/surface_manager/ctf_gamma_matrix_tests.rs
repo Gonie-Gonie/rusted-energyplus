@@ -1,0 +1,264 @@
+use super::*;
+use ep_model::ConstructionId;
+
+fn context(dt: f64) -> CtfAssemblyContext {
+    CtfAssemblyContext {
+        construction_id: ConstructionId(17),
+        route: CtfAssemblyRoute::Assemble,
+        solution_dimensions: 1,
+        source_sink_present: false,
+        node_source: 0,
+        node_user_temp: 0,
+        attempt_ordinal: 1,
+        time_step_zone: 0.25,
+        ctf_time_step: dt,
+        num_histories: 8,
+    }
+}
+fn reached(input: CtfGammaInput<'_>, caller: CtfAssemblyContext) -> Result<CtfGammaMatrix, String> {
+    match calculate_selected_ctf_gammas(input, caller).map_err(|error| format!("{error:?}"))? {
+        CtfGammaObservation::Gamma(actual) => Ok(*actual),
+        CtfGammaObservation::Unavailable(reason) => {
+            Err(format!("unexpected unavailable: {reason:?}"))
+        }
+    }
+}
+fn bits(values: &[f64]) -> Vec<u64> {
+    values.iter().map(|value| value.to_bits()).collect()
+}
+
+#[test]
+fn single_node_keeps_both_distinct_boundary_subtractions() -> Result<(), String> {
+    let actual = reached(
+        CtfGammaInput {
+            rcmax: 1,
+            a_inv: &[2.0],
+            a_exp: &[3.0],
+            iden_matrix: &[1.0],
+            b_mat: &[2.0, 5.0, 999.0],
+        },
+        context(0.5),
+    )?;
+    assert_eq!(bits(&actual.a_temp), bits(&[2.0]));
+    assert_eq!(bits(&actual.gamma1), bits(&[8.0, 20.0, 0.0]));
+    assert_eq!(bits(&actual.gamma2), bits(&[28.0, 70.0, 0.0]));
+    Ok(())
+}
+
+#[test]
+fn asymmetric_owners_preserve_source_indexing_actual_identity_and_caller() -> Result<(), String> {
+    // The hand-computed two-node sums use columns of AInv and the first/last
+    // ATemp rows. A non-identity supplied owner detects identity substitution.
+    let a_inv = [2.0, 3.0, 5.0, 7.0];
+    let a_exp = [11.0, 13.0, 17.0, 19.0];
+    let iden = [1.0, 2.0, 3.0, 4.0];
+    let b = [2.0, -4.0, 999.0];
+    let before = (bits(&a_inv), bits(&a_exp), bits(&iden), bits(&b));
+    let caller = context(2.0);
+    let actual = reached(
+        CtfGammaInput {
+            rcmax: 2,
+            a_inv: &a_inv,
+            a_exp: &a_exp,
+            iden_matrix: &iden,
+            b_mat: &b,
+        },
+        caller,
+    )?;
+    assert_eq!(actual.context, caller);
+    assert_eq!(actual.rcmax, 2);
+    assert_eq!(bits(&actual.a_temp), bits(&[10.0, 11.0, 14.0, 15.0]));
+    assert_eq!(
+        bits(&actual.gamma1),
+        bits(&[150.0, 214.0, -412.0, -588.0, 0.0, 0.0])
+    );
+    assert_eq!(
+        bits(&actual.gamma2),
+        bits(&[681.0, 968.0, -1862.0, -2648.0, 0.0, 0.0])
+    );
+    assert_eq!((bits(&a_inv), bits(&a_exp), bits(&iden), bits(&b)), before);
+    Ok(())
+}
+
+#[test]
+fn is1_accumulation_order_keeps_cancellation_boundary() -> Result<(), String> {
+    let actual = reached(
+        CtfGammaInput {
+            rcmax: 3,
+            a_inv: &[1.0; 9],
+            a_exp: &[1.0e16, -1.0e16, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            iden_matrix: &[0.0; 9],
+            b_mat: &[1.0, 1.0, 0.0],
+        },
+        context(1.0),
+    )?;
+    // ((0+1e16)-1e16)+1 is1 order gives1; regrouping can give0.
+    assert_eq!(
+        bits(&actual.gamma1),
+        bits(&[1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+    );
+    assert_eq!(bits(&actual.gamma2[..3]), bits(&[2.0, 2.0, 2.0]));
+    Ok(())
+}
+
+#[test]
+fn left_associative_three_factor_product_is_not_regrouped() -> Result<(), String> {
+    let actual = reached(
+        CtfGammaInput {
+            rcmax: 1,
+            a_inv: &[1.0e308],
+            a_exp: &[2.0],
+            iden_matrix: &[0.0],
+            b_mat: &[0.5, 0.5, 0.0],
+        },
+        context(1.0),
+    )?;
+    // (1e308*2)*0.5 overflows. 1e308*(2*0.5) would conceal that.
+    assert_eq!(actual.gamma1[0], f64::INFINITY);
+    assert_eq!(actual.gamma1[1], f64::INFINITY);
+    Ok(())
+}
+
+#[test]
+fn signed_workspace_zero_and_unread_third_forcing_owner_are_preserved() -> Result<(), String> {
+    let actual = reached(
+        CtfGammaInput {
+            rcmax: 1,
+            a_inv: &[1.0],
+            a_exp: &[-0.0],
+            iden_matrix: &[0.0],
+            b_mat: &[1.0, 1.0, f64::NAN],
+        },
+        context(1.0),
+    )?;
+    assert_eq!(actual.a_temp[0].to_bits(), (-0.0_f64).to_bits());
+    assert_eq!(bits(&actual.gamma1), bits(&[0.0, 0.0, 0.0]));
+    assert_eq!(bits(&actual.gamma2), bits(&[-1.0, -1.0, 0.0]));
+    Ok(())
+}
+
+#[test]
+fn zero_timestep_keeps_source_nonfinite_arithmetic_including_third_row() -> Result<(), String> {
+    let actual = reached(
+        CtfGammaInput {
+            rcmax: 1,
+            a_inv: &[1.0],
+            a_exp: &[1.0],
+            iden_matrix: &[1.0],
+            b_mat: &[1.0, 1.0, 0.0],
+        },
+        context(0.0),
+    )?;
+    assert_eq!(bits(&actual.gamma1), bits(&[0.0, 0.0, 0.0]));
+    assert!(actual.gamma2.iter().all(|value| value.is_nan()));
+    assert_eq!(actual.context.ctf_time_step.to_bits(), 0.0_f64.to_bits());
+    Ok(())
+}
+
+#[test]
+fn unavailable_source_routes_return_no_work_buffers() -> Result<(), String> {
+    for route in [
+        CtfAssemblyUnavailable::UnusedConstruction,
+        CtfAssemblyUnavailable::LoadingError,
+        CtfAssemblyUnavailable::AllResistive,
+        CtfAssemblyUnavailable::ReversedConstructionReuse,
+    ] {
+        let mut caller = context(f64::NAN);
+        caller.route = CtfAssemblyRoute::Unavailable(route);
+        let actual = calculate_selected_ctf_gammas(
+            CtfGammaInput {
+                rcmax: 0,
+                a_inv: &[],
+                a_exp: &[],
+                iden_matrix: &[],
+                b_mat: &[],
+            },
+            caller,
+        )
+        .map_err(|error| format!("{error:?}"))?;
+        assert_eq!(actual, CtfGammaObservation::Unavailable(route));
+    }
+    Ok(())
+}
+
+#[test]
+fn unsupported_scope_and_actual_owner_shapes_are_explicit_errors() {
+    let input = CtfGammaInput {
+        rcmax: 1,
+        a_inv: &[1.0],
+        a_exp: &[1.0],
+        iden_matrix: &[1.0],
+        b_mat: &[1.0, 1.0, 0.0],
+    };
+    let mut caller = context(0.25);
+    caller.source_sink_present = true;
+    assert_eq!(
+        calculate_selected_ctf_gammas(input, caller),
+        Err(CtfGammaScopeError::InternalSource)
+    );
+    caller = context(0.25);
+    caller.solution_dimensions = 2;
+    assert_eq!(
+        calculate_selected_ctf_gammas(input, caller),
+        Err(CtfGammaScopeError::UnsupportedDimensions(2))
+    );
+    for selectors in [(1, 0), (0, 1)] {
+        caller = context(0.25);
+        caller.node_source = selectors.0;
+        caller.node_user_temp = selectors.1;
+        assert_eq!(
+            calculate_selected_ctf_gammas(input, caller),
+            Err(CtfGammaScopeError::SourceNodeState)
+        );
+    }
+    caller = context(0.25);
+    caller.attempt_ordinal = 0;
+    assert_eq!(
+        calculate_selected_ctf_gammas(input, caller),
+        Err(CtfGammaScopeError::AttemptOrdinal)
+    );
+    assert_eq!(
+        calculate_selected_ctf_gammas(CtfGammaInput { rcmax: 0, ..input }, context(0.25)),
+        Err(CtfGammaScopeError::Dimension(0))
+    );
+    assert_eq!(
+        calculate_selected_ctf_gammas(
+            CtfGammaInput {
+                a_inv: &[],
+                ..input
+            },
+            context(0.25)
+        ),
+        Err(CtfGammaScopeError::MatrixShape)
+    );
+    assert_eq!(
+        calculate_selected_ctf_gammas(
+            CtfGammaInput {
+                a_exp: &[],
+                ..input
+            },
+            context(0.25)
+        ),
+        Err(CtfGammaScopeError::MatrixShape)
+    );
+    assert_eq!(
+        calculate_selected_ctf_gammas(
+            CtfGammaInput {
+                iden_matrix: &[],
+                ..input
+            },
+            context(0.25)
+        ),
+        Err(CtfGammaScopeError::MatrixShape)
+    );
+    assert_eq!(
+        calculate_selected_ctf_gammas(
+            CtfGammaInput {
+                b_mat: &[],
+                ..input
+            },
+            context(0.25)
+        ),
+        Err(CtfGammaScopeError::ForcingShape)
+    );
+}

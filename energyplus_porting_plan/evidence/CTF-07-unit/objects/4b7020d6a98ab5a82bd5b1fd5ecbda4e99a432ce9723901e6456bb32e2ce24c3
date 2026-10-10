@@ -1,0 +1,115 @@
+--- /dev/null
++++ b/crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress_tests.rs
+@@ -0,0 +1,112 @@
++use super::*;
++use crate::heat_balance::ctf_first_assembly_owner::CtfFirstAssemblyUnavailable;
++use crate::heat_balance::ctf_first_exponential_owner::CtfFirstExponentialUnavailable;
++use crate::heat_balance::ctf_first_gamma_owner::CtfFirstGammasUnavailable;
++use crate::heat_balance::ctf_first_matrix_owner::PriorExponentialUnavailable;
++use crate::heat_balance::ctf_initial_owner::CtfInitialUnavailable;
++use crate::heat_balance::surface_manager::ctf_exponential_matrix::{
++    CtfExponentialObservation, CtfExponentialScopeError,
++};
++use crate::heat_balance::surface_manager::ctf_gamma_matrix::CtfGammaObservation;
++use crate::heat_balance::surface_manager::ctf_layer_preprocessing::CtfNormalizedLayer;
++use crate::heat_balance::surface_manager::ctf_state_space_assembly::{
++    CtfAssemblyContext, CtfAssemblyInput, CtfAssemblyObservation, CtfAssemblyRoute,
++    CtfStateSpaceAssembly, assemble_1d_ctf_state_space,
++};
++use ep_model::ConstructionId;
++
++type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
++
++fn first_assembly() -> TestResult<ConstructionCtfFirstAssembly> {
++    let layers = [CtfNormalizedLayer {
++        dl: 0.5, rk: 0.25, rho: 1.0, cp: 1.0, lr: 2.0, res_layer: false,
++    }];
++    let context = CtfAssemblyContext {
++        construction_id: ConstructionId(7), route: CtfAssemblyRoute::Assemble,
++        solution_dimensions: 1, source_sink_present: false, node_source: 0, node_user_temp: 0,
++        attempt_ordinal: 1, time_step_zone: 0.25, ctf_time_step: 0.5, num_histories: 2,
++    };
++    let observed = assemble_1d_ctf_state_space(CtfAssemblyInput {
++        layers: &layers, nodes: &[6], dx: &[0.1], rcmax: 5,
++    }, context).map_err(|error| std::io::Error::other(format!("{error:?}")))?;
++    Ok(ConstructionCtfFirstAssembly { construction_id: context.construction_id, result: Ok(observed) })
++}
++
++fn assembled(owner: &mut ConstructionCtfFirstAssembly) -> TestResult<&mut CtfStateSpaceAssembly> {
++    match owner.result.as_mut().map_err(|reason| *reason)? {
++        CtfAssemblyObservation::Assembled(actual) => Ok(actual),
++        CtfAssemblyObservation::Unavailable(_) => Err(std::io::Error::other("fixture assembly unavailable").into()),
++    }
++}
++
++#[test]
++fn reached_chain_retains_original_context_and_all_separate_owners() -> TestResult {
++    let assembly = first_assembly()?;
++    let before = assembly.clone();
++    let result = initialize_construction_ctf_first_matrix_with_gammas(&assembly);
++    let CtfExponentialObservation::Exponential(exponential) = result.methods.exponential.result? else {
++        return Err(std::io::Error::other("fixture exponential unavailable").into());
++    };
++    let inverse_call = result.methods.inverse.result?;
++    let inverse = inverse_call.result?;
++    let CtfGammaObservation::Gamma(gammas) = result.gammas.result? else {
++        return Err(std::io::Error::other("fixture Gamma unavailable").into());
++    };
++    assert_eq!(result.methods.exponential.construction_id, ConstructionId(7));
++    assert_eq!(inverse_call.construction_id, ConstructionId(7));
++    assert_eq!(result.gammas.construction_id, ConstructionId(7));
++    assert_eq!(exponential.context, inverse.context);
++    assert_eq!(gammas.context, inverse.context);
++    assert_eq!(result.methods.inverse.assembly_context, Some(gammas.context));
++    assert_eq!(gammas.context.attempt_ordinal, 1);
++    assert_ne!(gammas.context.time_step_zone.to_bits(), gammas.context.ctf_time_step.to_bits());
++    assert_eq!(gammas.a_temp.len(), 25);
++    assert_eq!(gammas.gamma1.len(), 15);
++    assert_eq!(gammas.gamma2.len(), 15);
++    assert_eq!(assembly, before);
++    Ok(())
++}
++
++#[test]
++fn genuine_exponential_error_keeps_inverse_noninvocation_and_gamma_unavailable() -> TestResult {
++    let mut assembly = first_assembly()?;
++    assembled(&mut assembly)?.a_mat.fill(f64::INFINITY);
++    let before = assembly.clone();
++    let result = initialize_construction_ctf_first_matrix_with_gammas(&assembly);
++    let reason = CtfFirstExponentialUnavailable::ExponentialScope(
++        CtfExponentialScopeError::UndefinedScalingExponent,
++    );
++    assert_eq!(result.methods.exponential.result, Err(reason));
++    assert_eq!(result.methods.inverse.result, Err(PriorExponentialUnavailable::Error(reason)));
++    assert_eq!(result.gammas.result, Err(CtfFirstGammasUnavailable::ExponentialUnavailable(reason)));
++    assert_eq!(assembly, before);
++    Ok(())
++}
++
++#[test]
++fn prior_unavailable_constructions_retain_order_ids_and_all_typed_stops() {
++    let reasons = [
++        CtfInitialUnavailable::UnusedConstruction,
++        CtfInitialUnavailable::PreprocessingErrorReturn,
++        CtfInitialUnavailable::AllResistiveBranch,
++        CtfInitialUnavailable::ReverseConstruction { construction_id: ConstructionId(3) },
++    ];
++    let owners = [10_u32, 11, 12, 13].into_iter().zip(reasons)
++        .map(|(id, reason)| ConstructionCtfFirstAssembly {
++            construction_id: ConstructionId(id),
++            result: Err(CtfFirstAssemblyUnavailable::InitialUnavailable(reason)),
++        }).collect::<Vec<_>>();
++    let results = owners.iter().map(initialize_construction_ctf_first_matrix_with_gammas)
++        .collect::<Vec<_>>();
++    for ((id, reason), result) in [10_u32, 11, 12, 13].into_iter().zip(reasons).zip(results) {
++        let first_error = CtfFirstAssemblyUnavailable::InitialUnavailable(reason);
++        let prior = CtfFirstExponentialUnavailable::FirstAssemblyUnavailable(first_error);
++        assert_eq!(result.methods.exponential.construction_id, ConstructionId(id));
++        assert_eq!(result.methods.exponential.result, Err(prior));
++        assert_eq!(result.methods.inverse.construction_id, ConstructionId(id));
++        assert_eq!(result.methods.inverse.assembly_context, None);
++        assert_eq!(result.methods.inverse.result, Err(PriorExponentialUnavailable::Error(prior)));
++        assert_eq!(result.gammas.construction_id, ConstructionId(id));
++        assert_eq!(result.gammas.result, Err(CtfFirstGammasUnavailable::FirstAssemblyUnavailable(first_error)));
++    }
++}

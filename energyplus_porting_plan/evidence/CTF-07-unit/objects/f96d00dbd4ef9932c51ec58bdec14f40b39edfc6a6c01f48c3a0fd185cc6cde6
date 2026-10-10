@@ -1,0 +1,93 @@
+--- crates/ep_run/examples/ctf06_candidate_unit_support/fields.rs
++++ crates/ep_run/examples/ctf07_candidate_unit_support/fields.rs
+@@ -5,7 +5,12 @@
+ use ep_runtime::heat_balance::ctf_first_exponential_owner::{
+     ConstructionCtfFirstExponential, CtfFirstExponentialUnavailable,
+ };
++use ep_runtime::heat_balance::ctf_first_gamma_owner::{
++    ConstructionCtfFirstGammas, CtfFirstGammasUnavailable,
++};
+ use ep_runtime::heat_balance::ctf_first_inverse_owner::CtfFirstInverseUnavailable;
++use ep_runtime::heat_balance::surface_manager::ctf_gamma_matrix::CtfGammaObservation;
++
+ use ep_runtime::heat_balance::ctf_first_matrix_owner::{
+     ConstructionCtfFirstInverseAfterExponential, PriorExponentialUnavailable,
+ };
+@@ -395,9 +400,67 @@
+         "observer_inverse_or_timestep_arithmetic_performed":false,"counted_as_PASS":false})
+ }
+ 
++pub(super) fn first_gammas(
++    source: &ConstructionCtfFirstGammas,
++    assembly: Option<&ConstructionCtfFirstAssembly>,
++    exponential: Option<&ConstructionCtfFirstExponential>,
++    inverse: Option<&ConstructionCtfFirstInverseAfterExponential>,
++) -> Value {
++    let (available, route, reason, snapshot) = match &source.result {
++        Err(reason) => {
++            let route = match reason {
++                CtfFirstGammasUnavailable::FirstAssemblyUnavailable(_) => "FirstAssemblyUnavailable",
++                CtfFirstGammasUnavailable::AssemblyRouteUnavailable(_) => "AssemblyRouteUnavailable",
++                CtfFirstGammasUnavailable::ExponentialUnavailable(_) => "ExponentialUnavailable",
++                CtfFirstGammasUnavailable::ExponentialRouteUnavailable(_) => "ExponentialRouteUnavailable",
++                CtfFirstGammasUnavailable::InverseNotInvoked(_) => "InverseNotInvoked",
++                CtfFirstGammasUnavailable::InverseUnavailable(_) => "InverseUnavailable",
++                CtfFirstGammasUnavailable::ConstructionIdentityMismatch => "ConstructionIdentityMismatch",
++                CtfFirstGammasUnavailable::NotFirstAttempt(_) => "NotFirstAttempt",
++                CtfFirstGammasUnavailable::AssemblyContext => "AssemblyContext",
++                CtfFirstGammasUnavailable::AttemptContextMismatch => "AttemptContextMismatch",
++                CtfFirstGammasUnavailable::DimensionMismatch => "DimensionMismatch",
++                CtfFirstGammasUnavailable::GammaScope(_) => "GammaScope",
++            };
++            (false, route, Some(format!("{reason:?}")), Value::Null)
++        }
++        Ok(CtfGammaObservation::Unavailable(reason)) => (
++            false, "GammaRouteUnavailable", Some(format!("{reason:?}")), Value::Null,
++        ),
++        Ok(CtfGammaObservation::Gamma(actual)) => (
++            true, "FirstGammaReturned", None,
++            json!({"context":attempt_context(&actual.context),"rcmax":actual.rcmax,
++                "matrices":{"ATemp":matrix_values(&actual.a_temp),
++                    "Gamma1":matrix_values(&actual.gamma1),"Gamma2":matrix_values(&actual.gamma2)},
++                "actual_matrix_value_counts":{"ATemp":actual.a_temp.len(),
++                    "Gamma1":actual.gamma1.len(),"Gamma2":actual.gamma2.len()},
++                "actual_matrix_shapes":{"ATemp":[actual.rcmax,actual.rcmax],
++                    "Gamma1":[3,actual.rcmax],"Gamma2":[3,actual.rcmax]},
++                "ATemp_storage_order":"source_i1_outer_i2_inner_row_first",
++                "Gamma_storage_order":"source_j_outer_i_inner_row_first"}),
++        ),
++    };
++    json!({"protocol":"ctf07-first-gammas.v1","construction_id":source.construction_id.0,
++        "owner_available":available,"selected_first_Gamma_operands":available,
++        "actual_source_route":route,"unavailable_reason":reason,"snapshot":snapshot,
++        "actual_public_API":"initialize_construction_ctf_first_gammas",
++        "actual_public_API_invoked":true,
++        "original_first_assembly":original_assembly(assembly),
++        "same_exponential_owner_available":exponential.is_some(),
++        "same_exponential_construction_id":exponential.map(|owner|owner.construction_id.0),
++        "same_inverse_owner_available":inverse.is_some(),
++        "same_inverse_construction_id":inverse.map(|owner|owner.construction_id.0),
++        "same_exponential_result":exponential.map(|owner|format!("{:?}",owner.result.as_ref().map(|_|()))),
++        "same_inverse_public_API_invoked":inverse.map(|owner|owner.result.is_ok()),
++        "only_first_Rust_method_invocation_owned":true,"retry_driver_available":false,
++        "later_Native_method_visits_paired":false,"later_Native_method_visits_counted_as_PASS":false,
++        "Native_stage_callback_or_return_counts_inferred":false,
++        "observer_Gamma_or_workspace_arithmetic_performed":false,"counted_as_PASS":false})
++}
++
+ pub(super) const OBSERVER_PATHS: &[&str] = &[
+-    "crates/ep_run/examples/ctf06_candidate_unit_observer.rs",
+-    "crates/ep_run/examples/ctf06_candidate_unit_support/fields.rs",
++    "crates/ep_run/examples/ctf07_candidate_unit_observer.rs",
++    "crates/ep_run/examples/ctf07_candidate_unit_support/fields.rs",
+ ];
+ // Exact path inventory; approved formatted SHAs are runtime operands and must
+ // also match Root's actual Cargo source capture before results are admitted.
+@@ -421,4 +484,7 @@
+     "crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+     "crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs",
+     "crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs",
++    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
++    "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs",
++    "crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs",
+ ];

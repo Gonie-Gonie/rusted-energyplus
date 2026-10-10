@@ -1,0 +1,19 @@
+    Checking ep_runtime v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_runtime)
+error: the loop variable `index` is used to index `a_temp`
+   --> crates\ep_runtime\src\heat_balance\surface_manager\ctf_gamma_matrix.rs:107:18
+    |
+107 |     for index in 0..size {
+    |                  ^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.96.0/index.html#needless_range_loop
+    = note: `-D clippy::needless-range-loop` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::needless_range_loop)]`
+help: consider using an iterator and enumerate()
+    |
+107 -     for index in 0..size {
+107 +     for (index, <item>) in a_temp.iter_mut().enumerate().take(size) {
+    |
+
+error: could not compile `ep_runtime` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `ep_runtime` (lib test) due to 1 previous error

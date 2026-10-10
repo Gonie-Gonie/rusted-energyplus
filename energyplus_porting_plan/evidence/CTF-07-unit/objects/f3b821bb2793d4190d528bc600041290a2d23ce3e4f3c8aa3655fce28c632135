@@ -1,0 +1,28 @@
+--- .runtime/porting/CTF-07/applied-source-01/applied/crates/ep_run/examples/ctf07_candidate_unit_observer.rs
++++ crates/ep_run/examples/ctf07_candidate_unit_observer.rs
+@@ -222,7 +222,8 @@
+             time_step_zone,
+         );
+         let first_assembly = initialize_construction_ctf_first_assembly(&initial, &preprocessing);
+-        let first_with_gammas = initialize_construction_ctf_first_matrix_with_gammas(&first_assembly);
++        let first_with_gammas =
++            initialize_construction_ctf_first_matrix_with_gammas(&first_assembly);
+         let first_functions = &first_with_gammas.methods;
+         if let Ok(actual) = &preprocessing.result {
+             selected_errors = actual.errors_found;
+@@ -361,8 +362,13 @@
+     )?;
+     bindings.push(request["current_cards"]["CTF-07"].clone());
+     let prior = &request["prior_05_06_authority"];
+-    for key in ["prior_06_freeze", "prior_06_freeze_execution", "prior_05_06_scope_amendment",
+-        "prior_06_writer_manifest", "prior_06_source_contract"] {
++    for key in [
++        "prior_06_freeze",
++        "prior_06_freeze_execution",
++        "prior_05_06_scope_amendment",
++        "prior_06_writer_manifest",
++        "prior_06_source_contract",
++    ] {
+         bindings.push(prior[key].clone());
+     }
+     for card in ["CTF-05", "CTF-06"] {

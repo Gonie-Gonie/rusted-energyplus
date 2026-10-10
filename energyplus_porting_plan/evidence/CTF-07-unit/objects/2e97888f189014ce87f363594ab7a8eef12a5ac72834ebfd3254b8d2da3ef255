@@ -1,0 +1,68 @@
+--- a/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
++++ b/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
+@@ -14,8 +14,10 @@
+     ConstructionCtfFirstAssembly, initialize_construction_ctf_first_assembly,
+ };
+ use crate::heat_balance::ctf_first_exponential_owner::ConstructionCtfFirstExponential;
++use crate::heat_balance::ctf_first_gamma_ingress::initialize_construction_ctf_first_matrix_with_gammas;
++use crate::heat_balance::ctf_first_gamma_owner::ConstructionCtfFirstGammas;
+ use crate::heat_balance::ctf_first_matrix_owner::{
+-    ConstructionCtfFirstInverseAfterExponential, initialize_construction_ctf_first_matrix_functions,
++    ConstructionCtfFirstInverseAfterExponential,
+ };
+ use crate::heat_balance::ctf_initial_owner::{
+     ConstructionCtfInitialDiscretization, initialize_construction_ctf_initial,
+@@ -59,6 +61,7 @@
+     first_assemblies: Vec<ConstructionCtfFirstAssembly>,
+     first_exponentials: Vec<ConstructionCtfFirstExponential>,
+     first_inverses: Vec<ConstructionCtfFirstInverseAfterExponential>,
++    first_gammas: Vec<ConstructionCtfFirstGammas>,
+     construction_slots: TypedIdSlotIndex,
+     entry_index_by_construction_slot: Vec<Option<usize>>,
+     pub(crate) no_mass_construction_ids: Vec<ConstructionId>,
+@@ -87,6 +90,7 @@
+         let mut first_assemblies = Vec::with_capacity(entries.capacity());
+         let mut first_exponentials = Vec::with_capacity(entries.capacity());
+         let mut first_inverses = Vec::with_capacity(entries.capacity());
++        let mut first_gammas = Vec::with_capacity(entries.capacity());
+         let time_step_zone_hours = 1.0 / f64::from(model.timestep.number_of_timesteps_per_hour);
+         let mut no_mass_construction_ids = Vec::new();
+         let mut massive_ctf_construction_ids = Vec::new();
+@@ -140,12 +144,13 @@
+                 &initial,
+                 &entry.ctf01_layer_preprocessing,
+             );
+-            // Same original first assembly: real06 must return before real05.
+-            // The combined owner retains a typed non-invocation on prior failure.
++            // Same original first assembly: actual06, then05, then public07.
++            // Each actual error/non-invocation owner remains separate.
+             let first_functions =
+-                initialize_construction_ctf_first_matrix_functions(&first_assembly);
+-            first_exponentials.push(first_functions.exponential);
+-            first_inverses.push(first_functions.inverse);
++                initialize_construction_ctf_first_matrix_with_gammas(&first_assembly);
++            first_exponentials.push(first_functions.methods.exponential);
++            first_inverses.push(first_functions.methods.inverse);
++            first_gammas.push(first_functions.gammas);
+             first_assemblies.push(first_assembly);
+             initial_discretizations.push(initial);
+             if let Ok(preprocessing) = &entry.ctf01_layer_preprocessing.result {
+@@ -176,6 +181,7 @@
+             first_assemblies,
+             first_exponentials,
+             first_inverses,
++            first_gammas,
+             construction_slots,
+             entry_index_by_construction_slot,
+             no_mass_construction_ids,
+@@ -213,6 +219,10 @@
+ 
+     pub(crate) fn first_inverses(&self) -> Vec<ConstructionCtfFirstInverseAfterExponential> {
+         self.first_inverses.clone()
++    }
++
++    pub(crate) fn first_gammas(&self) -> Vec<ConstructionCtfFirstGammas> {
++        self.first_gammas.clone()
+     }
+ 
+     pub(crate) fn len(&self) -> usize {

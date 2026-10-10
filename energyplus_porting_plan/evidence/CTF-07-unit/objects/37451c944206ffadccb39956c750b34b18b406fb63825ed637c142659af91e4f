@@ -1,0 +1,46 @@
+--- .runtime/porting/CTF-07/applied-source-01/applied/crates/ep_run/examples/ctf07_candidate_unit_support/fields.rs
++++ crates/ep_run/examples/ctf07_candidate_unit_support/fields.rs
+@@ -409,13 +409,21 @@
+     let (available, route, reason, snapshot) = match &source.result {
+         Err(reason) => {
+             let route = match reason {
+-                CtfFirstGammasUnavailable::FirstAssemblyUnavailable(_) => "FirstAssemblyUnavailable",
+-                CtfFirstGammasUnavailable::AssemblyRouteUnavailable(_) => "AssemblyRouteUnavailable",
++                CtfFirstGammasUnavailable::FirstAssemblyUnavailable(_) => {
++                    "FirstAssemblyUnavailable"
++                }
++                CtfFirstGammasUnavailable::AssemblyRouteUnavailable(_) => {
++                    "AssemblyRouteUnavailable"
++                }
+                 CtfFirstGammasUnavailable::ExponentialUnavailable(_) => "ExponentialUnavailable",
+-                CtfFirstGammasUnavailable::ExponentialRouteUnavailable(_) => "ExponentialRouteUnavailable",
++                CtfFirstGammasUnavailable::ExponentialRouteUnavailable(_) => {
++                    "ExponentialRouteUnavailable"
++                }
+                 CtfFirstGammasUnavailable::InverseNotInvoked(_) => "InverseNotInvoked",
+                 CtfFirstGammasUnavailable::InverseUnavailable(_) => "InverseUnavailable",
+-                CtfFirstGammasUnavailable::ConstructionIdentityMismatch => "ConstructionIdentityMismatch",
++                CtfFirstGammasUnavailable::ConstructionIdentityMismatch => {
++                    "ConstructionIdentityMismatch"
++                }
+                 CtfFirstGammasUnavailable::NotFirstAttempt(_) => "NotFirstAttempt",
+                 CtfFirstGammasUnavailable::AssemblyContext => "AssemblyContext",
+                 CtfFirstGammasUnavailable::AttemptContextMismatch => "AttemptContextMismatch",
+@@ -425,10 +433,15 @@
+             (false, route, Some(format!("{reason:?}")), Value::Null)
+         }
+         Ok(CtfGammaObservation::Unavailable(reason)) => (
+-            false, "GammaRouteUnavailable", Some(format!("{reason:?}")), Value::Null,
++            false,
++            "GammaRouteUnavailable",
++            Some(format!("{reason:?}")),
++            Value::Null,
+         ),
+         Ok(CtfGammaObservation::Gamma(actual)) => (
+-            true, "FirstGammaReturned", None,
++            true,
++            "FirstGammaReturned",
++            None,
+             json!({"context":attempt_context(&actual.context),"rcmax":actual.rcmax,
+                 "matrices":{"ATemp":matrix_values(&actual.a_temp),
+                     "Gamma1":matrix_values(&actual.gamma1),"Gamma2":matrix_values(&actual.gamma2)},

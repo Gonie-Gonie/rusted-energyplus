@@ -1,0 +1,61 @@
+# Selected first Gamma public owner - source proposal only
+
+This package adds a public construction-associated owner around the held
+`rust-gamma-prep-02` pure Gamma function. It is unapplied, unformatted and
+unexecuted. Root and another author must read the complete source before any
+future application or execution. No gate or numerical PASS is claimed.
+
+The public API is
+`initialize_construction_ctf_first_gammas(&ConstructionCtfFirstAssembly,
+&ConstructionCtfFirstMatrixFunctions) -> ConstructionCtfFirstGammas`.
+It borrows the actual ordered exponential/inverse return from the existing
+combined first-method API. It does not invoke either prerequisite API.
+
+The wrapper requires the actual original construction ID, first assembly
+ordinal one, selected one-dimensional/no-source route and reset selectors.
+It checks predecessor IDs, dimensions and all actual context fields; both
+floating-point context fields are compared by bits, preserving signed zero
+and any unchanged NaN payload. No caller timestep is inferred from histories,
+and no equality between caller timestep and current CTF timestep is imposed.
+
+One successful call passes actual inverse AInv, exponential AExp, original
+assembly IdenMatrix/BMat and unchanged current context to the pure Gamma API.
+It copies no substitute identity or default arrays. It does not reconstruct
+AMat, exponential, inverse, B, timestep, route or retry state. It introduces
+no finite, conditioning or zero-duration arithmetic guard.
+
+Prerequisite assembly/exponential stops, actual inverse non-invocation and
+invoked-inverse errors remain distinct typed unavailable results with no
+Gamma arrays. Association, unsupported context and shape errors are also
+explicit. A successful result retains the actual pure Gamma observation,
+including ATemp, Gamma1 and Gamma2, not final coefficient or whole-call state.
+
+The existing ordered predecessor API establishes the actual06 then05 calls;
+this proposal adds one07 call only when its supplied returns are available.
+Public Rust structs remain caller-owned: identity/context checks do not prove
+that arbitrarily forged structs came from a particular execution. Future
+production wiring must pass the genuine same-owner return without mutation.
+
+Only `heat_balance/mod.rs` receives a declaration-only proposed change.
+Its current canonical bytes are separately archived. The Gamma pure module
+and its separate `surface_manager.rs` declaration proposal remain immutable
+in held `rust-gamma-prep-02`; they are dependencies, not recopied changes.
+The public05/06/combined modules are still held prospective dependencies.
+Future composition must preserve their reviewed declarations and refresh
+the current parent before applying; this package does not install them.
+
+Six source-focused routing tests are authored, not run: actual borrowed
+prerequisite immutability and output ownership, all source unavailable
+routes, distinct predecessor errors/non-invocation, construction/ordinal and
+signed-zero context mismatch, unsupported source/perpendicular context,
+and unrepaired predecessor dimensions/buffer shape. Their positive fixture
+calls actual Rust assembly and existing combined predecessor APIs on literal
+test inputs. Negative tests mutate typed input owners deliberately. They use
+no Native answers or production fixtures and do not certify source formulas.
+
+No cache/state/driver activation, retry loop, Native source/artifact, operand
+file, observer, policy, tolerance, QA framework or execution stage is added.
+No project/target import, compile, formatter, test, engine or binary/weather/
+scientific result read was performed. Canonical files and Git are untouched.
+The author also authored earlier Native/helper/ingress source, so independent
+peer acceptance is source/protocol review, not self-formula certification.

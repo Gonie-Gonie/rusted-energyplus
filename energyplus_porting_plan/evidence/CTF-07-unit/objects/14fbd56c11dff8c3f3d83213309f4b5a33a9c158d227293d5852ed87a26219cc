@@ -1,0 +1,354 @@
+"""Source text and metadata adaptation only; no project or target imports."""
+from pathlib import Path
+import ast
+import difflib
+import hashlib
+import json
+import re
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+FINAL06 = ROOT / ".runtime/porting/CTF-06/applied-final-source-01"
+GAMMA = ROOT / ".runtime/porting/CTF-07/combined-first-gamma-ingress-prep-01"
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(raw).hexdigest(),
+            "size_bytes": len(raw), "line_count": len(raw.splitlines())}
+
+
+def checked(binding):
+    path = ROOT / binding["path"]
+    actual = ref(path)
+    for key in ("sha256", "size_bytes", "line_count"):
+        if key in binding:
+            assert actual[key] == binding[key], (path, key)
+    return path
+
+
+def once(text, old, new):
+    assert text.count(old) == 1, old
+    return text.replace(old, new, 1)
+
+
+def namespace(text):
+    for old, new in [
+        ("ctf06_candidate_", "ctf07_candidate_"), ("ctf06-candidate-", "ctf07-candidate-"),
+        ("ctf06-helper-cases.v1", "ctf07-helper-cases.v1"),
+        ("ctf06-native-admission-contract.v1", "ctf07-native-admission-contract.v1"),
+        ("ctf06-production-helper-cases.v1", "ctf07-production-helper-cases.v1"),
+        ("ctf06-production-native-admission-contract.v1", "ctf07-production-native-admission-contract.v1"),
+        ("frozen_before_this_CTF06_helper_execution", "frozen_before_this_CTF07_helper_execution"),
+        ("actual frozen CTF06 production packet differs", "actual frozen CTF07 production packet differs"),
+    ]:
+        text = text.replace(old, new)
+    return text
+
+
+ADDITIONAL_APIS = [
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs",
+]
+
+GAMMA_IMPORTS = '''use ep_runtime::heat_balance::ctf_first_gamma_owner::{
+    ConstructionCtfFirstGammas, CtfFirstGammasUnavailable,
+};
+use ep_runtime::heat_balance::ctf_first_inverse_owner::CtfFirstInverseUnavailable;
+use ep_runtime::heat_balance::surface_manager::ctf_gamma_matrix::CtfGammaObservation;
+'''
+
+GAMMA_FIELDS = r'''pub(super) fn first_gammas(
+    source: &ConstructionCtfFirstGammas,
+    assembly: Option<&ConstructionCtfFirstAssembly>,
+    exponential: Option<&ConstructionCtfFirstExponential>,
+    inverse: Option<&ConstructionCtfFirstInverseAfterExponential>,
+) -> Value {
+    let (available, route, reason, snapshot) = match &source.result {
+        Err(reason) => {
+            let route = match reason {
+                CtfFirstGammasUnavailable::FirstAssemblyUnavailable(_) => "FirstAssemblyUnavailable",
+                CtfFirstGammasUnavailable::AssemblyRouteUnavailable(_) => "AssemblyRouteUnavailable",
+                CtfFirstGammasUnavailable::ExponentialUnavailable(_) => "ExponentialUnavailable",
+                CtfFirstGammasUnavailable::ExponentialRouteUnavailable(_) => "ExponentialRouteUnavailable",
+                CtfFirstGammasUnavailable::InverseNotInvoked(_) => "InverseNotInvoked",
+                CtfFirstGammasUnavailable::InverseUnavailable(_) => "InverseUnavailable",
+                CtfFirstGammasUnavailable::ConstructionIdentityMismatch => "ConstructionIdentityMismatch",
+                CtfFirstGammasUnavailable::NotFirstAttempt(_) => "NotFirstAttempt",
+                CtfFirstGammasUnavailable::AssemblyContext => "AssemblyContext",
+                CtfFirstGammasUnavailable::AttemptContextMismatch => "AttemptContextMismatch",
+                CtfFirstGammasUnavailable::DimensionMismatch => "DimensionMismatch",
+                CtfFirstGammasUnavailable::GammaScope(_) => "GammaScope",
+            };
+            (false, route, Some(format!("{reason:?}")), Value::Null)
+        }
+        Ok(CtfGammaObservation::Unavailable(reason)) => (
+            false, "GammaRouteUnavailable", Some(format!("{reason:?}")), Value::Null,
+        ),
+        Ok(CtfGammaObservation::Gamma(actual)) => (
+            true, "FirstGammaReturned", None,
+            json!({"context":attempt_context(&actual.context),"rcmax":actual.rcmax,
+                "matrices":{"ATemp":matrix_values(&actual.a_temp),
+                    "Gamma1":matrix_values(&actual.gamma1),"Gamma2":matrix_values(&actual.gamma2)},
+                "actual_matrix_value_counts":{"ATemp":actual.a_temp.len(),
+                    "Gamma1":actual.gamma1.len(),"Gamma2":actual.gamma2.len()},
+                "actual_matrix_shapes":{"ATemp":[actual.rcmax,actual.rcmax],
+                    "Gamma1":[3,actual.rcmax],"Gamma2":[3,actual.rcmax]},
+                "ATemp_storage_order":"source_i1_outer_i2_inner_row_first",
+                "Gamma_storage_order":"source_j_outer_i_inner_row_first"}),
+        ),
+    };
+    json!({"protocol":"ctf07-first-gammas.v1","construction_id":source.construction_id.0,
+        "owner_available":available,"selected_first_Gamma_operands":available,
+        "actual_source_route":route,"unavailable_reason":reason,"snapshot":snapshot,
+        "actual_public_API":"initialize_construction_ctf_first_gammas",
+        "actual_public_API_invoked":true,
+        "original_first_assembly":original_assembly(assembly),
+        "same_exponential_owner_available":exponential.is_some(),
+        "same_exponential_construction_id":exponential.map(|owner|owner.construction_id.0),
+        "same_inverse_owner_available":inverse.is_some(),
+        "same_inverse_construction_id":inverse.map(|owner|owner.construction_id.0),
+        "same_exponential_result":exponential.map(|owner|format!("{:?}",owner.result.as_ref().map(|_|()))),
+        "same_inverse_public_API_invoked":inverse.map(|owner|owner.result.is_ok()),
+        "only_first_Rust_method_invocation_owned":true,"retry_driver_available":false,
+        "later_Native_method_visits_paired":false,"later_Native_method_visits_counted_as_PASS":false,
+        "Native_stage_callback_or_return_counts_inferred":false,
+        "observer_Gamma_or_workspace_arithmetic_performed":false,"counted_as_PASS":false})
+}
+
+'''
+
+PRODUCTION_FIELDS = r'''pub(super) fn ctf07_unavailable() -> Value {
+    json!({"owner_available":false,"construction_first_gammas":null,
+        "unavailable_reason":"initializer has not returned an actual HeatBalanceState owner","counted_as_PASS":false})
+}
+pub(super) fn ctf07_selected(source: &HeatBalanceState) -> Value {
+    json!({"owner_available":true,"construction_first_gammas":source.construction_ctf07_first_gammas.iter()
+        .enumerate().map(|(index,actual)| {
+            let assembly = source.construction_ctf04_first_assembly.iter()
+                .find(|owner|owner.construction_id == actual.construction_id);
+            let exponential = source.construction_ctf06_first_exponential.iter()
+                .find(|owner|owner.construction_id == actual.construction_id);
+            let inverse = source.construction_ctf05_first_inverse.iter()
+                .find(|owner|owner.construction_id == actual.construction_id);
+            json!({"state_vector_index":index,"construction_id":actual.construction_id.0,
+                "result":unit_fields::first_gammas(actual,assembly,exponential,inverse)})
+        }).collect::<Vec<_>>(),
+        "actual_owner_count":source.construction_ctf07_first_gammas.len(),
+        "predecessor_or_Gamma_owners_reexecuted_by_observer":false,
+        "actual_CTF06_then_CTF05_then_CTF07_order_is_producer_owned":true,
+        "only_first_Rust_method_invocation_owned":true,"retry_driver_available":false,
+        "later_Native_method_visits_paired":false,"later_Native_method_visits_counted_as_PASS":false,
+        "Native_whole_solver_flags_unpaired":true,"numerical_PASS_claimed":false})
+}
+
+'''
+
+
+def scope_block(value):
+    return '''    require(
+        VALUE["actual_scope_amendment_execution_role"]
+            == "real-CTF-07-check-only; prior05/06-authorities-separate"
+            && admission["actual_scope_amendment_execution_role"]
+                == VALUE["actual_scope_amendment_execution_role"]
+            && admission["prior_05_06_authority"] == VALUE["prior_05_06_authority"]
+            && admission["current_cards"] == VALUE["current_cards"],
+        "current07 authority role or separate historical prior05/06 authority differs",
+    )?;
+    bindings.push(VALUE["current_cards"]["CTF-07"].clone());
+    let prior = &VALUE["prior_05_06_authority"];
+    for key in ["prior_06_freeze", "prior_06_freeze_execution", "prior_05_06_scope_amendment",
+        "prior_06_writer_manifest", "prior_06_source_contract"] {
+        bindings.push(prior[key].clone());
+    }
+    for card in ["CTF-05", "CTF-06"] {
+        bindings.push(prior["prior_scope_checks"][card].clone());
+    }
+    for binding in rows(&prior["historical_before_document_archives"])? {
+        bindings.push(binding.clone());
+    }
+    for binding in rows(&prior["available_prior_frozen_document_archives"])? {
+        bindings.push(binding["archive"].clone());
+    }
+    // Historical after-doc identities are documentary, never current07 live bindings.
+'''.replace("VALUE", value)
+
+
+def main():
+    assert not (OUT / "manifest.json").exists(), "Held source preparation is immutable"
+    final_ref = {"path": ".runtime/porting/CTF-06/applied-final-source-01/manifest.json",
+                 "sha256": "b6c03057a795360a8e21b54730315c7df5412dee0929774fa773f628cdbc7655"}
+    final = json.loads(checked(final_ref).read_text(encoding="utf-8"))
+    actual = {row["canonical_path"]: row for row in final["source_files"]}
+    predecessor = {
+        "ctf07_candidate_unit_observer.rs": "crates/ep_run/examples/ctf06_candidate_unit_observer.rs",
+        "unit_fields.rs": "crates/ep_run/examples/ctf06_candidate_unit_support/fields.rs",
+        "ctf07_candidate_production_observer.rs": "crates/ep_run/examples/ctf06_candidate_production_observer.rs",
+        "production_fields.rs": "crates/ep_run/examples/ctf06_candidate_production_support/fields.rs",
+        "production_unit_fields.rs": "crates/ep_run/examples/ctf06_candidate_production_support/unit_fields.rs",
+    }
+    install = {name: path.replace("ctf06_candidate_", "ctf07_candidate_") for name, path in predecessor.items()}
+    sources = {name: namespace(checked(actual[path]["archive"]).read_text(encoding="utf-8"))
+               for name, path in predecessor.items()}
+    unit = sources["ctf07_candidate_unit_observer.rs"]
+    unit = once(unit,
+        "use ep_runtime::heat_balance::ctf_first_matrix_owner::initialize_construction_ctf_first_matrix_functions;",
+        "use ep_runtime::heat_balance::ctf_first_gamma_ingress::initialize_construction_ctf_first_matrix_with_gammas;")
+    unit = once(unit,
+        "        let first_functions = initialize_construction_ctf_first_matrix_functions(&first_assembly);",
+        "        let first_with_gammas = initialize_construction_ctf_first_matrix_with_gammas(&first_assembly);\n"
+        "        let first_functions = &first_with_gammas.methods;")
+    unit = once(unit, '            "actual_Rust_combined_API":"initialize_construction_ctf_first_matrix_functions",',
+        '            "CTF07_first_gammas":fields::first_gammas(&first_with_gammas.gammas,Some(&first_assembly),\n'
+        '                Some(&first_functions.exponential),Some(&first_functions.inverse)),\n'
+        '            "actual_Rust_combined_API":"initialize_construction_ctf_first_matrix_with_gammas",')
+    start = unit.index('    require(\n        request["actual_scope_amendment_executions"]')
+    end = unit.index('    bindings.extend(rows(&request["all_45_guard_refs"])', start)
+    unit = unit[:start] + scope_block("request") + unit[end:]
+    unit = once(unit, '        "actual_scope_amendment_executions":request["actual_scope_amendment_executions"],',
+        '        "prior_05_06_authority":request["prior_05_06_authority"],"current_cards":request["current_cards"],')
+    unit = once(unit, '        "actual_Rust_combined_API_invocations":calls,',
+        '        "ctf07_gamma_observation_policy":request["ctf07_gamma_observation_policy"],\n'
+        '        "actual_Rust_combined_API_invocations":calls,')
+    sources["ctf07_candidate_unit_observer.rs"] = unit
+    fields = sources["unit_fields.rs"]
+    fields = once(fields, "use ep_runtime::heat_balance::ctf_first_inverse_owner::CtfFirstInverseUnavailable;", GAMMA_IMPORTS)
+    fields = once(fields, "pub(super) const OBSERVER_PATHS", GAMMA_FIELDS + "pub(super) const OBSERVER_PATHS")
+    append = ''.join('    "' + path + '",\n' for path in ADDITIONAL_APIS)
+    at = fields.index("];", fields.index("pub(super) const API_PATHS"))
+    fields = fields[:at] + append + fields[at:]
+    sources["unit_fields.rs"] = fields
+    sources["production_unit_fields.rs"] = fields
+    production = sources["ctf07_candidate_production_observer.rs"]
+    production = once(production, '        "selected_CTF05_owners":fields::ctf05_unavailable(),"Native_or_expected_values_read":false});',
+        '        "selected_CTF05_owners":fields::ctf05_unavailable(),\n'
+        '        "selected_CTF07_owners":fields::ctf07_unavailable(),"Native_or_expected_values_read":false});')
+    production = once(production, '            out["selected_CTF05_owners"] = fields::ctf05_selected(&state);',
+        '            out["selected_CTF05_owners"] = fields::ctf05_selected(&state);\n'
+        '            out["selected_CTF07_owners"] = fields::ctf07_selected(&state);')
+    start = production.index('    require(\n        native["actual_scope_amendment_executions"]')
+    end = production.index('    let native_cases = rows(&native["model_cases"])?;', start)
+    production = production[:start] + scope_block("native") + production[end:]
+    production = once(production, '        "actual_scope_amendment_executions":native["actual_scope_amendment_executions"],',
+        '        "prior_05_06_authority":native["prior_05_06_authority"],"current_cards":native["current_cards"],')
+    production = once(production, '        "ctf05_inverse_observation_policy":native["ctf05_inverse_observation_policy"],',
+        '        "ctf05_inverse_observation_policy":native["ctf05_inverse_observation_policy"],\n'
+        '        "ctf07_gamma_observation_policy":native["ctf07_gamma_observation_policy"],')
+    sources["ctf07_candidate_production_observer.rs"] = production
+    prodfields = sources["production_fields.rs"]
+    prodfields = once(prodfields, "pub(super) fn typed(", PRODUCTION_FIELDS + "pub(super) fn typed(")
+    at = prodfields.index("];", prodfields.index("pub(super) const API_PATHS"))
+    sources["production_fields.rs"] = prodfields[:at] + append + prodfields[at:]
+    (OUT / "before").mkdir(exist_ok=True)
+    own_rows = []
+    for name, source in sources.items():
+        raw_before = checked(actual[predecessor[name]]["archive"]).read_bytes()
+        (OUT / "before" / name).write_bytes(raw_before)
+        (OUT / name).write_text(source, encoding="utf-8", newline="\n")
+        diff = ''.join(difflib.unified_diff(raw_before.decode().splitlines(keepends=True),
+            source.splitlines(keepends=True), fromfile=predecessor[name], tofile=install[name]))
+        diff_path = OUT / (name + ".from-formatted06.diff")
+        diff_path.write_text(diff, encoding="utf-8", newline="\n")
+        own_rows.append({"source": ref(OUT / name), "canonical_install_path": install[name],
+            "actual_formatted06_before": {"historical_path": predecessor[name],
+                "archive": ref(OUT / "before" / name), "actual_immutable_source_archive": actual[predecessor[name]]["archive"]},
+            "exact_diff": ref(diff_path)})
+    assert (OUT / "unit_fields.rs").read_bytes() == (OUT / "production_unit_fields.rs").read_bytes()
+    manifest(own_rows, final_ref)
+
+
+def manifest(own_rows, final_ref):
+    def paths(source):
+        start = source.index("pub(super) const API_PATHS")
+        return re.findall(r'"(crates/[^"\n]+)"', source[start:source.index("];", start)])
+    unit_paths = paths((OUT / "unit_fields.rs").read_text(encoding="utf-8"))
+    production_paths = paths((OUT / "production_fields.rs").read_text(encoding="utf-8"))
+    assert len(unit_paths) == len(set(unit_paths)) == 22
+    assert len(production_paths) == len(set(production_paths)) == 35
+    deps = [".runtime/porting/CTF-06/combined-first-matrix-ingress-prep-02/manifest.json",
+        ".runtime/porting/CTF-06/rust-observer-prep-01/manifest.json",
+        ".runtime/porting/CTF-07/combined-first-gamma-ingress-prep-01/manifest.json",
+        ".runtime/porting/CTF-07/rust-gamma-prep-02/manifest.json",
+        ".runtime/porting/CTF-07/first-gamma-owner-prep-01/manifest.json",
+        ".runtime/porting/CTF-07/native-helper-prep-01/manifest.json",
+        ".runtime/porting/CTF-07/input-writer-prep-01/manifest.json"]
+    snapshot_ref = {"path": ".runtime/porting/source-objects/3a/3acae117724d42c2c9e7495efbec3b94c03c0f93b1e749af2f44fdb32405819d",
+        "sha256": "3acae117724d42c2c9e7495efbec3b94c03c0f93b1e749af2f44fdb32405819d"}
+    snapshot = json.loads(checked(snapshot_ref).read_text(encoding="utf-8"))
+    archived04 = {row["historical_path"]: row for row in snapshot["files"]}
+    final06 = json.loads(checked(final_ref).read_text(encoding="utf-8"))
+    archived06 = {row["canonical_path"]: row["archive"] for row in final06["source_files"]}
+    gamma = json.loads((GAMMA / "manifest.json").read_text(encoding="utf-8"))
+    prospective = {row["canonical_path"]: row["proposed"] for row in gamma["changes"] + gamma["new_owners"]}
+    for row in gamma["future_dependency_installations_not_current_compiled_source"]:
+        if row["canonical_path"] in ADDITIONAL_APIS:
+            prospective[row["canonical_path"]] = row["literal_unchanged_held_source"]
+    api = []
+    for canonical in dict.fromkeys(unit_paths + production_paths):
+        row = {"canonical_path": canonical, "runtime_formatted_Cargo_source_capture_required": True}
+        if canonical in prospective:
+            row["prospective_accepted07_source"] = ref(checked(prospective[canonical]))
+        if canonical in archived06:
+            row["actual_formatted06_archive"] = ref(checked(archived06[canonical]))
+        elif canonical in archived04:
+            row["historical_unchanged04_source_archive"] = ref(checked(archived04[canonical]["archive"]))
+        assert len(row) > 2, canonical
+        api.append(row)
+    ranges = []
+    def span(path, start, end, purpose):
+        path = Path(path) if isinstance(path, Path) else ROOT / path
+        raw = b''.join(path.read_bytes().splitlines(keepends=True)[start-1:end])
+        assert len(path.read_bytes().splitlines()) >= end
+        ranges.append({"path": path.relative_to(ROOT).as_posix(), "start_line": start, "end_line": end,
+            "sha256": hashlib.sha256(raw).hexdigest(), "size_bytes": len(raw), "purpose": purpose})
+    original = ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc"
+    for start, end, purpose in [(490,619,"actual initial stamp remains distinct from retry"),
+        (638,648,"actual original identity owner"),(657,729,"actual first assembly input owners"),
+        (877,892,"genuine exponential inverse Gamma order and return boundaries"),
+        (908,936,"later retries remain unpaired"),(1496,1589,"actual selected Gamma workspace and outputs")]:
+        span(original,start,end,purpose)
+    for canonical in [*ADDITIONAL_APIS,
+        "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+        "crates/ep_runtime/src/heat_balance/state.rs", "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs"]:
+        source = checked(prospective[canonical]);span(source,1,len(source.read_bytes().splitlines()),"accepted prospective07 actual-owner producer/route")
+    for canonical in ["crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs",
+        "crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs",
+        "crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs"]:
+        source = checked(archived06[canonical]);span(source,1,len(source.read_bytes().splitlines()),"immutable applied formatted06 predecessor owner")
+    ast.parse(Path(__file__).read_text(encoding="utf-8"))
+    data = {"schema":"ctf07-rust-observer-source-preparation.v1", "status":"SOURCE-READY-HELD-unexecuted",
+        "own_source_rows":own_rows,"observer_source_counts":{"unit":2,"production":3},
+        "API_paths":{"unit":unit_paths,"production":production_paths},
+        "API_source_counts":{"unit":22,"production":35}, "API_source_identities":api,
+        "actual_formatted06_manifest":ref(checked(final_ref)), "historical_unchanged04_snapshot":ref(checked(snapshot_ref)),
+        "literal_accepted_dependency_manifests":[ref(ROOT / path) for path in deps],
+        "own_preparation_source":ref(Path(__file__)), "README":ref(OUT / "README.md"), "source_ranges":ranges,
+        "runtime_interfaces":{"unit_argv":["request_path","request_sha256","admission_path","admission_sha256","runtime_sources_path"],
+            "unit_sources_schema":"ctf07-candidate-unit-runtime-source-bindings.v1",
+            "unit_result_schema":"ctf07-candidate-unit-observer-results.v1",
+            "production_argv":["wrapper_request_path","wrapper_request_sha256"],
+            "production_request_schema":"ctf07-candidate-production-observer-request.v1",
+            "production_result_schema":"ctf07-candidate-production-observer-results.v1"},
+        "new_observation":{"unit_operation_field":"CTF07_first_gammas","production_field":"selected_CTF07_owners",
+            "production_owner":"construction_ctf07_first_gammas", "protocol":"ctf07-first-gammas.v1",
+            "actual_matrices":["ATemp","Gamma1","Gamma2"], "new_scientific_profile_values_authored":False,
+            "same_actual_prior_assembly_and_method_owners_borrowed":True,"Native_values_used_as_Rust_operands":False},
+        "scope_authority":{"current_role":"real-CTF-07-check-only; prior05/06-authorities-separate",
+            "prior_key":"prior_05_06_authority","historical_after_live_doc_bindings_replayed":False},
+        "unchanged_input_counts":{"unit_models":39,"unit_operations":42,"production_models":15,
+            "production_loader_phase_records":195,"fixed_guard_refs":45},
+        "integrity":{"source_before5_exact_formatted06_archives":True,"exact_five_diffs_generated":True,
+            "unit_serializer_and_production_copy_byte_identical":True,"Python_AST_only":True,
+            "required_missing_owners_never_defaulted_or_PASS":True,"runtime_final_formatted_hashes_not_guessed":True},
+        "preparation_boundary":{"project_imports_or_targets_executed":False,"Cargo_tests_builds_formatters_engines_run":False,
+            "scientific_weather_or_binary_payloads_read":False,"mutable_canonical_source_read_or_written":False,
+            "new_QA_framework_or_execution_stage":False,"numerical_PASS_claimed":False,"gates_updated":False},
+        "authorship_limits":"Author wrote predecessor pure05/combined06/07 routing and observer glue; source transport is not independent formula/output certification. Root and other-author full review required before activation."}
+    (OUT / "manifest.json").write_text(json.dumps(data,indent=2,ensure_ascii=False)+"\n",encoding="utf-8",newline="\n")
+    print(json.dumps({"manifest":ref(OUT/"manifest.json"),"source_files_written":len(own_rows),
+        "project_imports_or_targets_executed":False}))
+
+
+if __name__ == "__main__":
+    main()

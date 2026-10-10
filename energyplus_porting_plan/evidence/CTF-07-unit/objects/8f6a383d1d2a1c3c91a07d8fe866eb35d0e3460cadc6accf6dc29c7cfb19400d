@@ -1,0 +1,120 @@
+"""Prepare one ignored lint-only source amendment without project imports."""
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+FINAL = ROOT / ".runtime/porting/CTF-07/applied-final-source-01/manifest.json"
+FINAL_SHA = "344ed7b311e745f4556378655a90fff602cb4a178b44d7d88c927af0ccfe424f"
+OWNER = "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs"
+ATTRIBUTE = '    #[expect(\n        clippy::needless_range_loop,\n        reason = "Preserve the pinned EnergyPlus ATemp update order."\n    )]\n'
+
+
+def identity(path):
+    data = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(),
+            "sha256": hashlib.sha256(data).hexdigest(),
+            "size_bytes": len(data), "line_count": len(data.splitlines())}
+
+
+def write(path, source):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(source, encoding="utf-8", newline="\n")
+
+
+def main():
+    assert not (OUT / "manifest.json").exists()
+    assert identity(FINAL)["sha256"] == FINAL_SHA
+    final = json.loads(FINAL.read_text(encoding="utf-8"))
+    observed_sources = []
+    for row in final["canonical_files"]:
+        current = ROOT / row["canonical_path"]
+        archive = ROOT / row["actual_final_archive"]["path"]
+        assert identity(archive) == row["actual_final_archive"]
+        assert current.read_bytes() == archive.read_bytes()
+        observed_sources.append({"canonical_path": row["canonical_path"],
+                                 "current_source_before": identity(current),
+                                 "actual07_final_archive": row["actual_final_archive"],
+                                 "byte_exact_actual07_final_before": True})
+    before = OUT / "before" / OWNER
+    before.parent.mkdir(parents=True, exist_ok=False)
+    before.write_bytes((ROOT / OWNER).read_bytes())
+    source = before.read_text(encoding="utf-8")
+    target = "    for index in 0..size {\n        a_temp[index] = input.a_exp[index] - input.iden_matrix[index];\n    }"
+    assert source.count(target) == 1
+    proposed = OUT / "proposed" / OWNER
+    changed = source.replace(target, ATTRIBUTE + target, 1)
+    assert changed.replace(ATTRIBUTE, "", 1) == source
+    write(proposed, changed)
+    diff = OUT / "ctf_gamma_matrix.rs.diff"
+    write(diff, "".join(difflib.unified_diff(source.splitlines(True), changed.splitlines(True),
+          fromfile="before/" + OWNER, tofile="proposed/" + OWNER)))
+    readme = """# CTF07 loop-scoped lint amendment
+
+SOURCE-READY HELD, unapplied and unexecuted. This proposal inserts only one
+`#[expect(clippy::needless_range_loop, reason = ...)]` directly on the existing
+flat full ATemp subtraction loop. The reason is `Preserve the pinned EnergyPlus
+ATemp update order.` The loop copies every AExp minus Iden element in its same
+index order; it is not a diagonal-only update. Construction.cc1529-1530 owns the
+full ATemp assignment. Removing this exact attribute restores all original bytes.
+
+The before archive is the real canonical source authenticated against Root's
+immutable actual07 formatted-source authority344ed7b3. All16 canonical sources
+matched its raw final archives during preparation; the other15 are unchanged by
+this proposal. Existing reasoned exact-source allowances in the initial owner
+and discretizer establish the local convention. This narrower expectation is
+scoped to the diagnosed loop, not the module or whole function.
+
+No operand, accumulation, control, array shape, API, owner, profile, test or
+caller changes. Root reported the actual first Clippy failure; its real receipt
+stays preserved. Root must fully review and obtain another-author narrow peer
+before applying. The source identity changes, so the existing focused tests,
+workspace tests, Clippy and format checks must all run on the final source;
+no prior or future quality PASS or actual rerun is claimed here.
+
+Verification uses stdlib source bytes/SHA/size/lines and exact unified diffs.
+No project/reviewed-module import, Cargo/build/test/formatter/engine, scientific
+or weather or binary read, canonical edit or Git action occurs. This is a lint
+amendment to accepted code, not independent numerical/formula certification or
+a new QA/proof stage. All earlier held sources remain immutable.
+"""
+    write(OUT / "README.md", readme)
+    authorities = [identity(FINAL), identity(ROOT / ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc"),
+        identity(ROOT / "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs"),
+        identity(ROOT / "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs")]
+    original = ROOT / ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc"
+    lines = original.read_bytes().splitlines(keepends=True)
+    raw = b"".join(lines[1528:1531])
+    source_range = {"path": original.relative_to(ROOT).as_posix(), "start_line": 1529,
+                    "end_line": 1531, "sha256": hashlib.sha256(raw).hexdigest(),
+                    "size_bytes": len(raw), "purpose": "actual full ATemp allocation/subtraction and Gamma initialization"}
+    manifest = {
+        "schema": "ctf07-loop-scoped-lint-amendment-source-preparation.v1",
+        "status": "SOURCE-READY-HELD-unapplied-unexecuted",
+        "actual07_formatted_source_authority": identity(FINAL),
+        "change": {"canonical_path": OWNER, "before_raw_archive": identity(before),
+                   "proposed": identity(proposed), "exact_diff": identity(diff),
+                   "exact_attribute": ATTRIBUTE,
+                   "attribute_scoped_to": "the existing for index in 0..size full ATemp subtraction loop",
+                   "removing_exact_attribute_restores_all_before_bytes": True,
+                   "loop_operands_body_and_order_unchanged": True},
+        "actual_source_before_inventory": observed_sources,
+        "other15_actual07_sources_unchanged": True,
+        "source_authorities_and_local_lint_conventions": authorities,
+        "selected_Original_source_range": source_range,
+        "required_existing_final_source_quality_roles": ["focused_tests", "workspace_tests", "clippy", "format_check"],
+        "prior_failed_actual_check_preserved_by_Root": True,
+        "quality_or_numerical_results_read_or_PASS_claimed": False,
+        "new_execution_stage_or_framework": False,
+        "README": identity(OUT / "README.md"), "authoring_source": identity(Path(__file__).resolve()),
+        "canonical_files_modified": False, "targets_imported_or_executed": False,
+        "scientific_weather_or_binary_payload_read": False, "Git_invoked": False,
+        "Root_and_other_author_source_review_required_before_apply": True}
+    write(OUT / "manifest.json", json.dumps(manifest, indent=2, ensure_ascii=True) + "\n")
+    print(json.dumps({"manifest": identity(OUT / "manifest.json"), "change": manifest["change"]}, indent=2))
+
+
+if __name__ == "__main__":
+    main()

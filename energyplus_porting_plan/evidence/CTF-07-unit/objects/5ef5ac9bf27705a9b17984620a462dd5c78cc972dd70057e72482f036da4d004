@@ -1,0 +1,118 @@
+--- .runtime/porting/CTF-07/combined-first-gamma-ingress-prep-01/README.md
++++ .runtime/porting/CTF-07/combined-first-gamma-ingress-prep-02/README.md
+@@ -1,68 +1,54 @@
+-# First exponential, inverse, then Gamma: prospective ingress
++# Combined first Gamma ingress rebased onto actual formatted CTF06
+ 
+-SOURCE-READY-HELD proposal only, unapplied, unformatted and unexecuted. Current
+-canonical source remains04. Dependencies are accepted combined06 ingress02
+-55acc4f9, pureGamma02 cf220cd8 and publicGamma01 a476232b. No dependency source
+-body is edited or copied into a replacement implementation.
++SOURCE-READY HELD, source-only. This fresh02 preserves immutable01 and applies
++only its accepted07 increment to five actual formatted06 parent archives from
++`CTF-06/applied-final-source-01/manifest.json` b6c03057. Every before archive is
++also byte-equal to its genuine actual06 SourceSnapshot0c0ef2d binding. Mutable
++canonical sources are neither read nor written. Root alone may apply after
++genuine prerequisite releases, a fresh unchanged baseline and source review.
+ 
+-The new `initialize_construction_ctf_first_matrix_with_gammas` receives one
+-existing `ConstructionCtfFirstAssembly`. It invokes the accepted combined06
+-owner exactly once, then accepted public07 exactly once with that same assembly
+-and the borrowed actual returned method owner. Its output retains the original
+-`ConstructionCtfFirstMatrixFunctions` and a separate `ConstructionCtfFirstGammas`.
+-The accepted combined06 function owns actual exponential-before-inverse order;
+-the accepted public07 function owns prerequisite and context/shape checks before
+-any pure Gamma call. No prerequisite is replayed by the new wrapper.
++Five parent proposals retain the accepted06 declarations, all existing ordered
++cache/state owners, initial/assembly route custody and coefficient/hash bodies.
++The sole difference from accepted01 after-parent bytes is carrying forward the
++actual06 formatted two-line combined-call assignment in construction_cache.rs,
++with only its accepted07 callee name changed. Four other parent after bodies
++are byte-identical01. Five exact actual06-to07 diffs and exact before archives
++are retained; the cache formatting correspondence is separately disclosed.
+ 
+-Native Construction.cc884,887,890 orders exponential, inverse, then Gamma.
+-Gamma receives actual AExp/AInv plus ORIGINAL assembly IdenMatrix/BMat/context.
+-Inverse still receives original AMat/Iden, never AExp. First ordinal1 and initial619
+-context are retained; current CTFTimeStep and caller TimeStepZone remain separate.
+-No array, identity, branch, timestep, retry count or expected value is generated.
++The combined wrapper38 and tests112 remain byte-identical accepted01. Actual
++first06 exponential runs before conditional05 inverse; public07 is invoked
++once on those actual results and the same original first assembly. An actual
++earlier error or non-invocation is preserved by the accepted public owner, with
++no available Gamma fabricated. Inverse still borrows original AMat/Iden, never
++AExp. Gamma borrows actual AExp/AInv and original Iden/BMat. No predecessor is
++re-evaluated, no identity is synthesized and no retry/coefficient driver is added.
+ 
+-The new wrapper's public07 call is a Rust API invocation. On a prerequisite stop,
+-public07 returns its actual typed unavailable error and does not run pure Gamma.
+-This does not claim that Native invoked calculateGammas on the corresponding
+-stopped route. The original06 result and05 invocation/non-invocation ledger remain
+-complete. No successful Gamma owner or Native invocation count is fabricated.
++The new ordered cache first_gammas vector and public state
++construction_ctf07_first_gammas retain real construction IDs and predecessor
++order. Every existing preprocessing/all-resistive/initial/first-assembly/06/05
++owner remains separate. Coefficient generation and cache hash arithmetic are
++byte-identical actual06. Native source order884/887/890 and selected initial619,
++first assembly ordinal1 remain unchanged; later attempts and complete downstream
++coefficient handoff remain unimplemented/unpaired, never PASS by absence.
+ 
+-Only five parent/cache/state files and a new wrapper/test pair are proposed.
+-Each changed parent has an exact current04 before archive and a separate accepted
+-prospective06 before archive, with both exact deltas supplied. Current04 bytes
+-also match their existing actual3acae source snapshot objects. Prospective06 is
+-an accepted held proposal, not a claim of current or compiled source. The14
+-unchanged prerequisite installation sources are explicit held dependencies:
+-the earlier eight pure/public05/06 files, combined06 owner/tests, and four
+-pure/public07 files. Their future canonical paths remain absent at preparation.
++Only four new pure/public07 module/test installations remain future dependencies,
++with exact accepted source refs. The existing eight pure/public05/06 installation
++files and two combined06 owner/test files are already actual06; their formatted
++immutable archives and snapshot rows
++are recorded instead of installing historical unformatted copies. Accepted01
++historical04 before archives and its prospective06 correspondence remain explicit
++historical authorities, without stale current-canonical path/hash claims.
+ 
+-The ordinary cache loop preserves its original construction iteration, used/prior
+-route, preprocessing once, initial03 once and first04 once. It then calls the new
+-wrapper on that actual first04 owner. Existing ordered06 and05 vectors retain the
+-same actual outcomes, and new first_gammas retains one public07 result for each
+-ordinary entry. The existing state-shell clones these records into a distinct
+-`HeatBalanceState.construction_ctf07_first_gammas` field. All earlier error owners,
+-IDs, layer membership and shared preprocessing errors remain intact. Material
+-coefficient generation and the construction-cache hash body are byte-identical
+-to accepted prospective06; no Gamma values enter existing coefficients or hash.
++All current06 source identities come from actual source archives/metadata; no
++future compiled hash or outcome is guessed. Root must bind final formatted07
++source bytes to a genuine future Cargo capture and run before admitting outputs.
++This hold executes no target/import/build/test/format/engine/Git command and reads
++no scientific, weather or binary payload. Python AST/hash/diff checks only operate
++on source and metadata. It introduces no QA, proof or execution framework and
++does not change a tolerance/profile, answer array, Native observation or gate.
+ 
+-Three focused routing tests are authored, not run. They check a real Rust-owned
+-assembly's unchanged context and separate reached output shapes; a genuine06
+-scope error with preserved inverse non-invocation and unavailable Gamma; and
+-ordered unused/error/allR/reverse prerequisite records with unchanged IDs and
+-typed stops. Literal Rust fixtures call accepted Rust functions. No Native answers
+-or production fixtures are used. The Infinity fixture tests Rust error transport
+-only; it is not an admitted whole-Native numerical case or formula certificate.
+-
+-No retry/complete coefficient handoff, CTF08 activation, Native observer/policy,
+-profile change, numeric evaluator or QA/proof/execution framework is introduced.
+-This future initialization owner does not certify downstream coefficient use or
+-whole-card parity. Source ranges bind the complete Gamma method1496-1589, its
+-real890 caller and actual preceding owner interfaces. Root must finish genuine
+-prerequisite QA/baseline/comparison obligations and recheck/rebase actual parents
+-before any future application. No prerequisite is declared satisfied here.
+-
+-No project/target import, compiler, formatter, Cargo, test, engine, Git or canonical
+-write occurred. No scientific, weather or binary payload was read. Source and
+-JSON/hash/diff checks only were used. This author wrote earlier pure04/05 and
+-combined06 plumbing, so independent Root/other-author source review is required;
+-this proposal does not independently certify those formulas or future outputs.
++Author wrote combined06/07 routing, pure05 and predecessor observer glue; source
++correspondence is not independent own-formula/output certification. Root and an
++other-author source reviewer must approve before application. Existing01 remains
++immutable; this fresh02 is the current06 rebase and does not reinterpret any
++historical source snapshot as a new scientific execution.

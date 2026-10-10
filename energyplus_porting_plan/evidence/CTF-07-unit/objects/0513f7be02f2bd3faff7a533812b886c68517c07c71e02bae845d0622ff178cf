@@ -1,0 +1,11 @@
+--- before/compare_production.py
++++ compare_production.py
+@@ -29,7 +29,7 @@
+ MATRIX_FIELDS = ['AMat', 'IdenMatrix', 'BMat', 'CMat', 'DMat']
+ MATRIX_FIXED_SHAPES = {'BMat': 3, 'CMat': 2, 'DMat': 2}
+ FAILURE_KINDS = ['IdentityMismatch', 'OrderFailure', 'ActivePrefixShape', 'MatrixShape', 'CopyException', 'LedgerAppendException']
+-DATAQA_SOURCE_INVENTORY = {'path': '.runtime/porting/CTF-07/original-data-review-prep-01/manifest.json', 'sha256': '1374abf94ca8d1b80ae910b2f364c41f1ad5a8744ef7b4d10a14349d5d33877b', 'size_bytes': 48061, 'line_count': 1210}
++DATAQA_SOURCE_INVENTORY = {'path': '.runtime/porting/CTF-07/original-data-review-prep-02/manifest.json', 'sha256': 'ac978d62718b0d26163b9f7df3408416430cd31e31369ffcffde1c2f4b7eb9dd', 'size_bytes': 49423, 'line_count': 1242}
+ SOURCE_INVENTORIES = {'reviewed_native_source_inventory': {'path': '.runtime/porting/CTF-07/native-helper-prep-01/manifest.json', 'sha256': '67ffbd0ee248b5f5bed72797539af3cbd19dd304b174f15b7131098fecb50c3c', 'size_bytes': 23178, 'line_count': 569}, 'reviewed_passive_source_inventory': {'path': '.runtime/porting/CTF-07/native-observer-prep-02/manifest.json', 'sha256': 'd61910f07155cfe5fcdf165b0178c5b7c0810300b01a073b66a70987cf4e1f06', 'size_bytes': 18141, 'line_count': 451}, 'reviewed_freezer_source_inventory': {'path': '.runtime/porting/CTF-07/input-writer-prep-01/manifest.json', 'sha256': '7a19067da5f05ec6320179c2eb520132ca8f3cd12ee583012e27002b7aa8ca02', 'size_bytes': 22729, 'line_count': 596}, 'reviewed_PE_source_inventory': {'path': '.runtime/porting/CTF-07/native-build-review-prep-01/manifest.json', 'sha256': 'b4d54ebe24bb15753d38d409e1729d2dd371310beacbec6a09b16b338387d816', 'size_bytes': 5443, 'line_count': 145}}
+ 
+ OBSERVER_PATHS = ['crates/ep_run/examples/ctf07_candidate_production_observer.rs', 'crates/ep_run/examples/ctf07_candidate_production_support/fields.rs', 'crates/ep_run/examples/ctf07_candidate_production_support/unit_fields.rs']

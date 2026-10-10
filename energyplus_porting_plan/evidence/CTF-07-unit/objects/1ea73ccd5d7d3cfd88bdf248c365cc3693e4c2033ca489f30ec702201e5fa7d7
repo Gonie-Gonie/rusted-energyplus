@@ -1,0 +1,83 @@
+--- .runtime/porting/CTF-07/applied-source-01/applied/crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs
++++ crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs
+@@ -75,7 +75,9 @@
+     use CtfFirstGammasUnavailable as Unavailable;
+ 
+     let result = (|| {
+-        let observed = assembly.result.as_ref()
++        let observed = assembly
++            .result
++            .as_ref()
+             .map_err(|reason| Unavailable::FirstAssemblyUnavailable(*reason))?;
+         let actual = match observed {
+             CtfAssemblyObservation::Unavailable(reason) => {
+@@ -101,7 +103,10 @@
+         {
+             return Err(Unavailable::AssemblyContext);
+         }
+-        let exponential = methods.exponential.result.as_ref()
++        let exponential = methods
++            .exponential
++            .result
++            .as_ref()
+             .map_err(|reason| Unavailable::ExponentialUnavailable(*reason))?;
+         let exponential = match exponential {
+             CtfExponentialObservation::Unavailable(reason) => {
+@@ -109,16 +114,23 @@
+             }
+             CtfExponentialObservation::Exponential(actual) => actual,
+         };
+-        let invoked_inverse = methods.inverse.result.as_ref()
++        let invoked_inverse = methods
++            .inverse
++            .result
++            .as_ref()
+             .map_err(|reason| Unavailable::InverseNotInvoked(*reason))?;
+         if invoked_inverse.construction_id != assembly.construction_id {
+             return Err(Unavailable::ConstructionIdentityMismatch);
+         }
+-        let inverse = invoked_inverse.result.as_ref()
++        let inverse = invoked_inverse
++            .result
++            .as_ref()
+             .map_err(|reason| Unavailable::InverseUnavailable(*reason))?;
+         if !same_attempt_context(context, exponential.context)
+             || !same_attempt_context(context, inverse.context)
+-            || !methods.inverse.assembly_context
++            || !methods
++                .inverse
++                .assembly_context
+                 .is_some_and(|prior| same_attempt_context(context, prior))
+         {
+             return Err(Unavailable::AttemptContextMismatch);
+@@ -126,15 +138,22 @@
+         if actual.rcmax != exponential.rcmax || actual.rcmax != inverse.inverse.rcmax {
+             return Err(Unavailable::DimensionMismatch);
+         }
+-        calculate_selected_ctf_gammas(CtfGammaInput {
+-            rcmax: actual.rcmax,
+-            a_inv: &inverse.inverse.a_inv,
+-            a_exp: &exponential.a_exp,
+-            iden_matrix: &actual.iden_matrix,
+-            b_mat: &actual.b_mat,
+-        }, context).map_err(Unavailable::GammaScope)
++        calculate_selected_ctf_gammas(
++            CtfGammaInput {
++                rcmax: actual.rcmax,
++                a_inv: &inverse.inverse.a_inv,
++                a_exp: &exponential.a_exp,
++                iden_matrix: &actual.iden_matrix,
++                b_mat: &actual.b_mat,
++            },
++            context,
++        )
++        .map_err(Unavailable::GammaScope)
+     })();
+-    ConstructionCtfFirstGammas { construction_id: assembly.construction_id, result }
++    ConstructionCtfFirstGammas {
++        construction_id: assembly.construction_id,
++        result,
++    }
+ }
+ 
+ fn same_attempt_context(left: CtfAssemblyContext, right: CtfAssemblyContext) -> bool {

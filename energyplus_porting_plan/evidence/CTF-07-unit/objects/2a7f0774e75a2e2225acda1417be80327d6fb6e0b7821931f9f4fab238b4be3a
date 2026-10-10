@@ -1,0 +1,29 @@
+--- before-02/README.md
++++ README.md
+@@ -107,3 +107,26 @@
+ all numeric/availability/profile/owner/selection/transport functions are AST
+ identical. No actual QA or comparison outcome is claimed by this source hold.
+ Base/Root review of the repaired QA and this narrow rebind precedes execution.
++
++## Fresh03 explicit production diagnostic labels
++
++SOURCE ONLY, unexecuted. Root reported a genuine production prepairing KeyError
++for unit-only operation.id. The declared production helper emits actual
++construction_index, not a unit operation ID. No scientific payload was read to
++prepare this repair, and both prior source holds and actual attempts remain
++unchanged.
++
++Shared Gamma validate_all now has keyword-only production=False. Unit diagnostics
++retain operation.id; the production caller explicitly passes production=True and
++uses str(actual_construction_index) for labels. The production missing-Rust-owner
++diagnostic branch uses that same actual index. Both main Gamma-support SHA pins
++are rebound to the changed local helper. These labels are documentary paths only;
++no operation record, count, source order, shape, scalar/profile, selected-first
++association, required-absence rule, comparison or availability logic changes.
++
++The four other support bodies and final DataQA02 inventory ac978d62 are byte-exact
++prep02. All Comparison methods and Gamma pair_operation are AST-identical prep02.
++Before-02 archives hold all seven sources plus README and manifest; exact three
++source deltas and this README delta are supplied for Root/other-author review.
++No generator or new stage is introduced. Root alone may rerun reviewed comparers
++against genuine retained operands; this preparation imports or executes none.

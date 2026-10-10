@@ -1,0 +1,18 @@
+--- .runtime/porting/CTF-07/applied-source-01/applied/crates/ep_run/examples/ctf07_candidate_production_observer.rs
++++ crates/ep_run/examples/ctf07_candidate_production_observer.rs
+@@ -305,8 +305,13 @@
+     )?;
+     bindings.push(native["current_cards"]["CTF-07"].clone());
+     let prior = &native["prior_05_06_authority"];
+-    for key in ["prior_06_freeze", "prior_06_freeze_execution", "prior_05_06_scope_amendment",
+-        "prior_06_writer_manifest", "prior_06_source_contract"] {
++    for key in [
++        "prior_06_freeze",
++        "prior_06_freeze_execution",
++        "prior_05_06_scope_amendment",
++        "prior_06_writer_manifest",
++        "prior_06_source_contract",
++    ] {
+         bindings.push(prior[key].clone());
+     }
+     for card in ["CTF-05", "CTF-06"] {

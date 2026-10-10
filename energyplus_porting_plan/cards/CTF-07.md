@@ -58,8 +58,8 @@ CTF-08 최종 계수에 독립 테스트와 동일 데이터 전달
 
 ## 종료 체크
 
-- [ ] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
+- [x] 원본 범위와 입출력·변경상태 계약 확정
+- [x] 단위시험 통과 및 실제 활성 분기 확인
 - [ ] 상태·시간·호출순서를 포함한 연결시험 통과
 - [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
@@ -95,3 +95,16 @@ Both new linked Originals require actual PE/provider/runtime proof before execut
 any later removal requires a separate actual retention record. Old retention refs
 remain literal. Scope review alone passes; unit/integration/production remain
 pending. Full retry, final coefficients, SI19 stores and surface handoff are pending.
+
+## Actual selected first Gamma validation
+
+- Applied Source `293f3e45e5c69f264be9e1becbba233b6a785e44d6880330cdd8301af0133f0e`; actual Cargo artifacts and execution custody verified.
+- Original unit 25 selected first pairs: 180219 numeric and 1130134 discrete comparisons, zero mismatches.
+- Fixed 15 loader pairs: 4005 numeric and 30477 discrete comparisons, zero mismatches.
+- Gamma1, Gamma2 and ATemp maximum absolute error/RMSE are zero; frozen zero tolerances and exact classes/shapes/signed zero are unchanged.
+- Focused Gamma tests 110 passed; workspace tests 4726 passed; clippy with denied warnings and format check exited zero.
+- Actual initial clippy failure and production comparer diagnostic label failure are preserved. The scoped lint expectation and diagnostic-only repair received independent Source review before execution.
+- [Complete selected evidence](../evidence/CTF-07-unit/summary.json) and [actual plan validation](../evidence/CTF-07-unit/validation.json).
+- Native 16 later unit invocations and unavailable 105 unit/36 production observations remain unpaired/noPASS.
+- Whole retry orchestration, final coefficients, public SI19 stores, cache handoff and complete integration/production gates remain pending.
+- Fixed six ordinary CLI executions and precise two-Original retirement are recorded separately.

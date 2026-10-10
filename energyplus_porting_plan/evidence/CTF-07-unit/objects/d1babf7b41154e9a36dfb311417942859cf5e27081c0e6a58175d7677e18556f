@@ -1,0 +1,1004 @@
+{
+  "schema": "ctf07-comparer-source-preparation.v1",
+  "status": "SOURCE-READY-HELD-unexecuted",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/compare_unit.py",
+      "sha256": "92e28315c461c8f56ceb07851317681fbb96d0ff2b07dc9f091999df88bb47d3",
+      "size_bytes": 76020,
+      "line_count": 834
+    },
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/compare_production.py",
+      "sha256": "0ad1233c6b75f051eb9938f03ff2c26d599e6a72c663a61bfac8e58ec7afe1c2",
+      "size_bytes": 89979,
+      "line_count": 960
+    },
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/packet_io.py",
+      "sha256": "0f0b017ee3222237667c39b75ed8bf6b93f670c56b93a4a6d408273bd6aca87c",
+      "size_bytes": 4723,
+      "line_count": 120
+    },
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/method_compare.py",
+      "sha256": "ee4cc345a89526f5fa77442f22daffa592d126e06bb32b4bbbac80b5f32b3c4d",
+      "size_bytes": 22925,
+      "line_count": 282
+    },
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/method_shape.py",
+      "sha256": "310b9dbb84954c8050e19f6a8a7a377b01f2597d6eb6947ab6e8a42437906454",
+      "size_bytes": 30929,
+      "line_count": 284
+    },
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/gamma_compare.py",
+      "sha256": "d7247e69758553507c48cd92cae83a5f5914a2bc27851eb587206d5ecbc8c346",
+      "size_bytes": 14857,
+      "line_count": 186
+    },
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/gamma_shape.py",
+      "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+      "size_bytes": 34636,
+      "line_count": 316
+    }
+  ],
+  "before_sources": [
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/before/compare_production.py",
+      "sha256": "85156ae7bbdf5f53bbdf585d3a60aec33e5959fbe08e181ee7b6f2efc85eaa73",
+      "size_bytes": 88214,
+      "line_count": 946
+    },
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/before/compare_unit.py",
+      "sha256": "b604795ae6f3fec28ccc51cf3d1521811d8897f8fc0ff084ee695f59172d42fc",
+      "size_bytes": 74266,
+      "line_count": 819
+    },
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/before/manifest.json",
+      "sha256": "61491a3e2f71584603ac7165c92bc6925a9e2b11745fb4a162e005a411f5335d",
+      "size_bytes": 36124,
+      "line_count": 1070
+    },
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/before/method_compare.py",
+      "sha256": "4b36ad3e9a73ccc031d6670f918847ed87f63009b7d40fe06d9a7dadf868ee01",
+      "size_bytes": 22923,
+      "line_count": 282
+    },
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/before/method_shape.py",
+      "sha256": "430d505024a9666edf53612c93b4a95564da67157ad05221098eedf434e7c8fd",
+      "size_bytes": 34346,
+      "line_count": 323
+    },
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/before/packet_io.py",
+      "sha256": "d7a7c4dd8fedd02917762423abb65892d17d180a94580342cbb69ac77acb10ac",
+      "size_bytes": 4723,
+      "line_count": 120
+    },
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/before/README.md",
+      "sha256": "b87683e7b96d16053b8324ce333e8451baf65186e9e57a2555d93b624fb947c0",
+      "size_bytes": 6482,
+      "line_count": 94
+    }
+  ],
+  "exact_diffs": [
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/compare_unit.py.from-CTF06.diff",
+      "sha256": "492f960bdccb077175968645abf3972ec08603a0dd2966eaa4fe31fbc7e7ef6c",
+      "size_bytes": 30588,
+      "line_count": 243
+    },
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/compare_production.py.from-CTF06.diff",
+      "sha256": "b642e68f6ee75bb324ac0b39658c9c031f621149c5e5fa1e90aad110befd827e",
+      "size_bytes": 32849,
+      "line_count": 227
+    },
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/packet_io.py.from-CTF06.diff",
+      "sha256": "e650b029d4810227bbfec9a16bbb7531b21f24db0a29b4def34e616b780a1b21",
+      "size_bytes": 319,
+      "line_count": 11
+    },
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/method_compare.py.from-CTF06.diff",
+      "sha256": "d92db5f2c9866258ed8aec4ac4138418f543ad83711bf874d1a9ad5b0e96d227",
+      "size_bytes": 976,
+      "line_count": 11
+    },
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/method_shape.py.from-CTF06.diff",
+      "sha256": "4c8e905b679d17489e95fe9706a965f5be6f37eb496f7024802d2a113d1423c3",
+      "size_bytes": 9889,
+      "line_count": 63
+    },
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/gamma_compare.py.new.diff",
+      "sha256": "f0108cab13a8b293dee957d980a9e03a5148967e93ffccecb5f6ae26ac37c65d",
+      "size_bytes": 15137,
+      "line_count": 189
+    },
+    {
+      "path": ".runtime/porting/CTF-07/comparer-prep-01/gamma_shape.py.new.diff",
+      "sha256": "9e65b6a820d53db0c6fdff5b34cc4d33da1c1bac3b978166566e4d82719a2949",
+      "size_bytes": 35044,
+      "line_count": 319
+    }
+  ],
+  "source_preparation_bindings": [
+    {
+      "path": ".runtime/porting/CTF-06/comparer-prep-01/manifest.json",
+      "sha256": "61491a3e2f71584603ac7165c92bc6925a9e2b11745fb4a162e005a411f5335d",
+      "size_bytes": 36124,
+      "line_count": 1070
+    },
+    {
+      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/manifest.json",
+      "sha256": "1374abf94ca8d1b80ae910b2f364c41f1ad5a8744ef7b4d10a14349d5d33877b",
+      "size_bytes": 48061,
+      "line_count": 1210
+    },
+    {
+      "path": ".runtime/porting/CTF-07/rust-observer-prep-01/manifest.json",
+      "sha256": "6c42933342062d9fa985134705a252e3acce6eb660726ac0a6d17dfe8a01628c",
+      "size_bytes": 40229,
+      "line_count": 880
+    },
+    {
+      "path": ".runtime/porting/CTF-07/native-helper-prep-01/manifest.json",
+      "sha256": "67ffbd0ee248b5f5bed72797539af3cbd19dd304b174f15b7131098fecb50c3c",
+      "size_bytes": 23178,
+      "line_count": 569
+    },
+    {
+      "path": ".runtime/porting/CTF-07/native-observer-prep-02/manifest.json",
+      "sha256": "d61910f07155cfe5fcdf165b0178c5b7c0810300b01a073b66a70987cf4e1f06",
+      "size_bytes": 18141,
+      "line_count": 451
+    },
+    {
+      "path": ".runtime/porting/CTF-07/input-writer-prep-01/manifest.json",
+      "sha256": "7a19067da5f05ec6320179c2eb520132ca8f3cd12ee583012e27002b7aa8ca02",
+      "size_bytes": 22729,
+      "line_count": 596
+    },
+    {
+      "path": ".runtime/porting/CTF-07/input-writer-prep-01/freeze_packet.py",
+      "sha256": "e06755a97340e7445dcab7f74a2582fcd1be221dc2b43455f481419515ac62e1",
+      "size_bytes": 36002,
+      "line_count": 433
+    },
+    {
+      "path": ".runtime/porting/CTF-07/input-writer-prep-01/packet_io.py",
+      "sha256": "563d59767cb64a880b0be990fbd73e446af6524a6f491c178214294a1ba8f4a8",
+      "size_bytes": 3523,
+      "line_count": 99
+    },
+    {
+      "path": ".runtime/porting/CTF-07/native-build-review-prep-01/manifest.json",
+      "sha256": "b4d54ebe24bb15753d38d409e1729d2dd371310beacbec6a09b16b338387d816",
+      "size_bytes": 5443,
+      "line_count": 145
+    },
+    {
+      "path": ".runtime/porting/CTF-07/native-build-review-prep-01/review_build.py",
+      "sha256": "54b7d43e72ea1d1871520d6408ce088bdcfb71e69bc3f1041355648aef33d6d9",
+      "size_bytes": 6214,
+      "line_count": 109
+    },
+    {
+      "path": ".runtime/porting/CTF-07/rust-gamma-prep-02/manifest.json",
+      "sha256": "cf220cd8e8aebaea9b9c5b2c9b53df3240c089bb929ffd6223ba23a38bb2e9eb",
+      "size_bytes": 11442,
+      "line_count": 290
+    },
+    {
+      "path": ".runtime/porting/CTF-07/first-gamma-owner-prep-01/manifest.json",
+      "sha256": "a476232b84a8c29cdc2ed029440c10b2cf419f13574a0d208f821ad4ab716614",
+      "size_bytes": 10961,
+      "line_count": 272
+    },
+    {
+      "path": ".runtime/porting/CTF-07/combined-first-gamma-ingress-prep-01/manifest.json",
+      "sha256": "1d83f25ecfe6cb7de9e7d15f6882ecbc39c9a91dd2502acf4b9d74adb5f439fb",
+      "size_bytes": 38873,
+      "line_count": 833
+    },
+    {
+      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/review_unit.py",
+      "sha256": "e90502fd9740bb3fb6acacbdf6d17e3209dbb747da9bfddb32fff2d1b5fb586f",
+      "size_bytes": 28142,
+      "line_count": 304
+    },
+    {
+      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/review_production.py",
+      "sha256": "b51a470972c0ccfe3b81b5d7ae653c4b08901d51eb8cfdf2b00db172fd070751",
+      "size_bytes": 30809,
+      "line_count": 326
+    },
+    {
+      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/unit_shape.py",
+      "sha256": "35ea2bddfa2ffdb40f087396c524bec8e40963c3e337f64c916689813c83cd6f",
+      "size_bytes": 19925,
+      "line_count": 232
+    },
+    {
+      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/production_shape.py",
+      "sha256": "7189ba8a44d2666dd1f38d519e51773a4bc06a14531e86e593865d76399185f8",
+      "size_bytes": 21487,
+      "line_count": 247
+    },
+    {
+      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/initial_shape.py",
+      "sha256": "95ddfbdb06ead90e81a8ef0eba527266ea9066bd8bb2463e3f40b0c859cd9da0",
+      "size_bytes": 26612,
+      "line_count": 309
+    },
+    {
+      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/method_shape.py",
+      "sha256": "310b9dbb84954c8050e19f6a8a7a377b01f2597d6eb6947ab6e8a42437906454",
+      "size_bytes": 30929,
+      "line_count": 284
+    },
+    {
+      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/packet_io.py",
+      "sha256": "24acc9eed6a6599f7a6d26021bef4dd2c7a49e4b7faea86cad352bc4d7c3b5bf",
+      "size_bytes": 4665,
+      "line_count": 120
+    },
+    {
+      "path": ".runtime/porting/CTF-07/original-data-review-prep-01/gamma_shape.py",
+      "sha256": "45f993cc4a59066229b42cc3d95b41e23f710bbbe1801bdbacfdf6a232a6b101",
+      "size_bytes": 34636,
+      "line_count": 316
+    },
+    {
+      "path": ".runtime/porting/CTF-07/rust-observer-prep-01/ctf07_candidate_unit_observer.rs",
+      "sha256": "487ec14cf853d6a7e6218d871090fceaf45a016c7b4331d5dbeb696bf216fc83",
+      "size_bytes": 20637,
+      "line_count": 452
+    },
+    {
+      "path": ".runtime/porting/CTF-07/rust-observer-prep-01/unit_fields.rs",
+      "sha256": "eaffeafcf3f69ade26133db162064d7b0f318b16b21bafbdc26b039ed276a3b0",
+      "size_bytes": 28062,
+      "line_count": 490
+    },
+    {
+      "path": ".runtime/porting/CTF-07/rust-observer-prep-01/ctf07_candidate_production_observer.rs",
+      "sha256": "a483cd56c66f4b1b24f272ac667757cdd0bd5e481f57cf5ca0eddfa9ef94cf40",
+      "size_bytes": 18093,
+      "line_count": 421
+    },
+    {
+      "path": ".runtime/porting/CTF-07/rust-observer-prep-01/production_fields.rs",
+      "sha256": "a5c1a4114530252ef56f3498e45fe6e07190b55a52d5152084f621b4e8067ff9",
+      "size_bytes": 16260,
+      "line_count": 238
+    },
+    {
+      "path": ".runtime/porting/CTF-07/rust-observer-prep-01/production_unit_fields.rs",
+      "sha256": "eaffeafcf3f69ade26133db162064d7b0f318b16b21bafbdc26b039ed276a3b0",
+      "size_bytes": 28062,
+      "line_count": 490
+    },
+    {
+      "path": ".runtime/porting/CTF-07/native-helper-prep-01/projection-policy-proposal.json",
+      "sha256": "4368c7364c86e1227864a18777d8109d8a31afa0ac0e0411e9559bf7ed6f76d6",
+      "size_bytes": 19186,
+      "line_count": 626
+    },
+    {
+      "path": ".runtime/porting/CTF-07/native-helper-prep-01/input-policy-proposal.json",
+      "sha256": "8934e39e0d32f4a4e2200243276c9f16cbd4d5a611d846dbc0423125ce90690c",
+      "size_bytes": 20923,
+      "line_count": 555
+    }
+  ],
+  "selected_primary_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 146,
+      "last_line": 175,
+      "sha256": "7525a698a5c3f9f7d64beaed5bacd94f2798fd9904aa1860ff667bdf2b028c65",
+      "size_bytes": 1610
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 307,
+      "last_line": 316,
+      "sha256": "e72b991a881f17dfc1b946cf9efe611827978378c87381f119f7fdbd115b4a37",
+      "size_bytes": 209
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 405,
+      "last_line": 489,
+      "sha256": "87316e8038ff3ea1ba8500350cddeab26fe64c58eab17efc708f512d2c6e5e2b",
+      "size_bytes": 3901
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 490,
+      "last_line": 619,
+      "sha256": "f6bbe30caf9e842c89fef7850d39e3fb91d1cf03e2c30a2e8cf4da41f3b4076a",
+      "size_bytes": 6450
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 638,
+      "last_line": 729,
+      "sha256": "ae07cc5ff16250b2db3de22e53ae31689dd94809e2a795e001815c199ac9d93a",
+      "size_bytes": 5349
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 875,
+      "last_line": 980,
+      "sha256": "a008ec6bc24bf0968029661030b92c083224a7468f38301ec356a29f2154ed14",
+      "size_bytes": 7402
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1079,
+      "last_line": 1103,
+      "sha256": "827ee8c55bface38c49b866d98c25b83d58877dbcbba8b4579e01ba90e65b9bc",
+      "size_bytes": 580
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1177,
+      "last_line": 1190,
+      "sha256": "22fbdbabf14a6af2678b024406d378a68c32c45267aef0eb82c682a0bf5f805a",
+      "size_bytes": 427
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1399,
+      "last_line": 1410,
+      "sha256": "79fa97bff3736518491fafc1e5c1637b1b5adce60102ffd7a918d6148c815ccc",
+      "size_bytes": 465
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "first_line": 67,
+      "last_line": 69,
+      "sha256": "e7388e3e84e7d3ce55bf1ddf20fc8ea63053244b5f02597721ba248f2a668c8c",
+      "size_bytes": 282
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "first_line": 138,
+      "last_line": 145,
+      "sha256": "08fa78c55501638f2b9fa3b20a5876c89fdfd766d508d65361b809884d69e3fe",
+      "size_bytes": 678
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "first_line": 159,
+      "last_line": 188,
+      "sha256": "fe59fe9bdbaf600c42be0f1a8b8f06eca3371846e6e72b1484f2fe211676ef83",
+      "size_bytes": 2587
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "first_line": 260,
+      "last_line": 260,
+      "sha256": "b3d39a2771edc981981be9f49fe45a20c8ba1c67c72b13fcff60857f9dfb1312",
+      "size_bytes": 122
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "first_line": 304,
+      "last_line": 342,
+      "sha256": "fbcb4d693cf6124c674cc4e4c9673e0319674407efe9d937bc330c14f73c3779",
+      "size_bytes": 2495
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array.hh",
+      "first_line": 748,
+      "last_line": 753,
+      "sha256": "f6c8c9be47a705ea76bfab9fdb52a37f1a49b7d3e3d113156b67c91670963917",
+      "size_bytes": 76
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array.hh",
+      "first_line": 812,
+      "last_line": 817,
+      "sha256": "5f3297e5bbb1ddd61de701f31b947aafffe17324b0814fcd8070f0fe8b00028b",
+      "size_bytes": 69
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "first_line": 608,
+      "last_line": 627,
+      "sha256": "1727f748bc0637972234a9a438bd7a6560733de8113c0616d78dcbd432fc3e58",
+      "size_bytes": 389
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "first_line": 859,
+      "last_line": 927,
+      "sha256": "eebaa61277d0d3176c308cde597304ff7983b20a94329ce7c86a6ce579601924",
+      "size_bytes": 759
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2D.hh",
+      "first_line": 516,
+      "last_line": 522,
+      "sha256": "ce0073600743adcfb95c613e58fef50f2670c299fabf925bd10f5680201a256c",
+      "size_bytes": 131
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2D.hh",
+      "first_line": 643,
+      "last_line": 672,
+      "sha256": "70e87f13a042091dd46a3d30176a9e2d54d1d6ac0887473c3e94a6577d3269c9",
+      "size_bytes": 598
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 59,
+      "last_line": 401,
+      "sha256": "4bb1dbc69381557180378d58b3614fd0524df51d294a9845e3e908ac90968d1c",
+      "size_bytes": 18217
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 638,
+      "last_line": 648,
+      "sha256": "4b9fcfede15577faa9e30fc89058a3a67e4776939dea28aece1a5cee3bfb369d",
+      "size_bytes": 486
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 657,
+      "last_line": 729,
+      "sha256": "6e8f1b65bb10f8615b5b48f1e53449413e99b5c75e7ac777158b07ec5fb0133e",
+      "size_bytes": 4571
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 877,
+      "last_line": 890,
+      "sha256": "6e29649dbec28af3e25cfd8f03a84fed82e28f9a524202b44007faca5b01ab84",
+      "size_bytes": 862
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1105,
+      "last_line": 1373,
+      "sha256": "e2f3f6b271807011ed343e44549bb90202e4c9bf9e0143cf99a1f01fd3c82bdd",
+      "size_bytes": 13237
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1375,
+      "last_line": 1494,
+      "sha256": "f1c13d8e66759602566fc1b4e2492e896198bd57a1b8e8399f70ea41434f5b01",
+      "size_bytes": 5093
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 1496,
+      "last_line": 1589,
+      "sha256": "738f643d12eaf6f333ceed15e0fd65db8508f8bfbdefac5f8eb8a76ef19379cb",
+      "size_bytes": 4459
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 877,
+      "last_line": 892,
+      "sha256": "281cc5be2250b76fa37bbd9dceab0b73e1df837a2319a00ac2f2c0c7f3809c57",
+      "size_bytes": 925
+    }
+  ],
+  "runtime_observer_API_paths": {
+    "unit": [
+      "crates/ep_run/Cargo.toml",
+      "crates/ep_model/src/lib.rs",
+      "crates/ep_model/src/ids.rs",
+      "crates/ep_runtime/Cargo.toml",
+      "crates/ep_runtime/src/lib.rs",
+      "crates/ep_runtime/src/heat_balance/mod.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+      "crates/ep_model/src/objects/construction.rs",
+      "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs"
+    ],
+    "production": [
+      "crates/ep_run/Cargo.toml",
+      "crates/ep_raw_model/src/lib.rs",
+      "crates/ep_raw_model/src/idf_order.rs",
+      "crates/ep_compiler/src/lib.rs",
+      "crates/ep_compiler/src/compiler.rs",
+      "crates/ep_model/src/lib.rs",
+      "crates/ep_model/src/model.rs",
+      "crates/ep_model/src/objects/materials.rs",
+      "crates/ep_model/src/objects/construction.rs",
+      "crates/ep_runtime/src/lib.rs",
+      "crates/ep_runtime/src/heat_balance/mod.rs",
+      "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "crates/ep_runtime/src/heat_balance/state.rs",
+      "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "crates/ep_model/src/objects/building.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+      "crates/ep_compiler/src/compiler/surface_space.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs"
+    ]
+  },
+  "runtime_observer_API_counts": {
+    "unit": 22,
+    "production": 35
+  },
+  "runtime_observer_source_counts": {
+    "unit": 2,
+    "production": 3
+  },
+  "Gamma_policy": {
+    "protocol": "ctf07-gamma-method-observation.v1",
+    "actual_method": "ConstructionProps::calculateGammas",
+    "actual_caller_line": 890,
+    "actual_method_source_lines": [
+      1496,
+      1589
+    ],
+    "actual_stage_names": [
+      "Entry",
+      "ATempReady",
+      "Gamma1Final",
+      "Gamma2Final",
+      "SourceReturn"
+    ],
+    "input_matrices": [
+      "AExp",
+      "IdenMatrix",
+      "AInv"
+    ],
+    "actual_input_BMat_shape": [
+      3
+    ],
+    "ATemp_ready_matrices": [
+      "ATemp"
+    ],
+    "Gamma1_final_matrices": [
+      "Gamma1"
+    ],
+    "Gamma2_final_matrices": [
+      "Gamma2"
+    ],
+    "return_matrices": [
+      "Gamma1",
+      "Gamma2"
+    ],
+    "matrix_shapes": {
+      "AExp": "actual_rcmax_by_rcmax",
+      "IdenMatrix": "actual_rcmax_by_rcmax",
+      "AInv": "actual_rcmax_by_rcmax",
+      "ATemp": "actual_rcmax_by_rcmax",
+      "Gamma1": "actual_3_by_rcmax",
+      "Gamma2": "actual_3_by_rcmax"
+    },
+    "actual_caller_source_order": [
+      "exponential884",
+      "inverse887",
+      "Gamma890"
+    ],
+    "actual_matching_exponential_and_inverse_returns_precede_Gamma_entry": true,
+    "actual_Gamma1_observed_before_ATemp_deallocation": true,
+    "actual_ATemp_assignment_observed_not_recomputed": true,
+    "selected_invocation_ordinal": 1,
+    "selected_assembly_ordinal": 1,
+    "selected_first_attempt_uses_actual_initial619_dt_and_history": true,
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "NumOfPerpendNodes_for_unselected_2D_is_context_only": true,
+    "actual_source_produced_identity_required": true,
+    "storage_order": "source_i1_outer_i2_inner_row_first",
+    "invocation_identity": "one_based_actual_entry_visit_within_bound_whole_call",
+    "actual_assembly_association_required": true,
+    "actual_method_return_marker_required_for_return_claim": true,
+    "all_actual_visits_retained": true,
+    "later_Native_attempts_paired": false,
+    "later_Native_attempts_counted_as_PASS": false,
+    "Rust_retry_driver_available": false,
+    "uninvoked_counted_as_PASS": false,
+    "missing_selected_owner_on_one_or_both_sides_is_required_failure": true,
+    "observer_failure_or_omission_is_integrity_failure": true,
+    "Gamma_or_identity_or_return_or_retry_state_reconstructed": false
+  },
+  "Gamma_profiles": [
+    {
+      "variable": "Gamma1",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_3_by_rcmax"
+    },
+    {
+      "variable": "Gamma2",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_3_by_rcmax"
+    },
+    {
+      "variable": "ATemp",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_rcmax_by_rcmax"
+    }
+  ],
+  "inherited_method_profiles": {
+    "CTF06": [
+      {
+        "variable": "AExp",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "class_exact": true,
+        "shape_exact": true,
+        "signed_zero_exact": true,
+        "required_shape": "actual_rcmax_by_rcmax"
+      },
+      {
+        "variable": "final_AMat1",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "class_exact": true,
+        "shape_exact": true,
+        "signed_zero_exact": true,
+        "required_shape": "actual_rcmax_by_rcmax"
+      },
+      {
+        "variable": "final_AMato",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "class_exact": true,
+        "shape_exact": true,
+        "signed_zero_exact": true,
+        "required_shape": "actual_rcmax_by_rcmax"
+      },
+      {
+        "variable": "final_AMatN",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "class_exact": true,
+        "shape_exact": true,
+        "signed_zero_exact": true,
+        "required_shape": "actual_rcmax_by_rcmax"
+      },
+      {
+        "variable": "AMatRowNormMax",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "class_exact": true,
+        "shape_exact": true,
+        "signed_zero_exact": true,
+        "required_shape": "scalar"
+      },
+      {
+        "variable": "fact",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "class_exact": true,
+        "shape_exact": true,
+        "signed_zero_exact": true,
+        "required_shape": "scalar"
+      },
+      {
+        "variable": "CheckVal",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "class_exact": true,
+        "shape_exact": true,
+        "signed_zero_exact": true,
+        "required_shape": "scalar"
+      }
+    ],
+    "CTF05": [
+      {
+        "variable": "AInv",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "class_exact": true,
+        "shape_exact": true,
+        "signed_zero_exact": true,
+        "required_shape": "actual_rcmax_by_rcmax"
+      },
+      {
+        "variable": "final_AMat1",
+        "atol": 0.0,
+        "rtol": 0.0,
+        "class_exact": true,
+        "shape_exact": true,
+        "signed_zero_exact": true,
+        "required_shape": "actual_rcmax_by_rcmax"
+      }
+    ]
+  },
+  "inherited_assembly_profiles": [
+    {
+      "variable": "AMat",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_rcmax_by_rcmax"
+    },
+    {
+      "variable": "IdenMatrix",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_rcmax_by_rcmax"
+    },
+    {
+      "variable": "BMat",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        3
+      ]
+    },
+    {
+      "variable": "CMat",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        2
+      ]
+    },
+    {
+      "variable": "DMat",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        2
+      ]
+    },
+    {
+      "variable": "assembly_CTFTimeStep",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    },
+    {
+      "variable": "caller_TimeStepZone",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    }
+  ],
+  "inherited_initial_profiles": [
+    {
+      "variable": "dx",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_LayersInConstruct_active_prefix"
+    },
+    {
+      "variable": "initial_CTFTimeStep",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    },
+    {
+      "variable": "caller_TimeStepZone",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    }
+  ],
+  "inherited_preprocessing_profile_count": 18,
+  "Gamma_selection": {
+    "actual_assembly_ordinal": 1,
+    "actual_exponential_invocation_ordinal": 1,
+    "actual_inverse_invocation_ordinal": 1,
+    "association": "same bound whole call/actual Construct identity + first728 assembly + initial619 actual dt/history",
+    "actual_order": [
+      "assembly728",
+      "exponential884",
+      "inverse887",
+      "Gamma890"
+    ],
+    "later_actual_visits": "all retained unpaired context/noPASS",
+    "no_initial_dt_equals_TimeStepZone_assertion": true,
+    "no_Rust_retry_driver_claim": true,
+    "stopped_or_uninvoked": "unavailable/noPASS, real source or OS outcome retained separately",
+    "actual_Gamma_invocation_ordinal": 1
+  },
+  "fresh_primary_metric_keys": [
+    "CTF07.Gamma1",
+    "CTF07.Gamma2",
+    "CTF07.ATemp"
+  ],
+  "input_obligations": {
+    "unit": {
+      "model_cases": 39,
+      "operations": 42
+    },
+    "production": {
+      "model_cases": 15,
+      "loader_phase_records": 195
+    },
+    "fixed_guards": 45,
+    "actual_conversion_proofs_per_model": 6
+  },
+  "comparison_source_correspondence": {
+    "unchanged_top_level_functions_AST": {
+      "compare_unit.py": [
+        "compare_models",
+        "initial_storage",
+        "compare_initial_models",
+        "first_assembly_storage",
+        "matrix_count_proof",
+        "compare_matrix_models"
+      ],
+      "compare_production.py": [
+        "normalized",
+        "owners",
+        "required_exact",
+        "copied_scalar",
+        "phases",
+        "compare_models",
+        "initial_storage",
+        "compare_initial_models",
+        "first_assembly_storage",
+        "matrix_count_proof",
+        "compare_matrix_models"
+      ]
+    },
+    "unchanged_Comparison_methods_AST": {
+      "compare_unit.py": [
+        "failure",
+        "exact",
+        "absence",
+        "dto",
+        "number",
+        "handoff",
+        "initial_handoff",
+        "report"
+      ],
+      "compare_production.py": [
+        "failure",
+        "exact",
+        "absence",
+        "dto",
+        "number",
+        "handoff",
+        "initial_handoff",
+        "report"
+      ]
+    },
+    "Comparison_only_metric_initialization_adds_Gamma3": true,
+    "method_pairing_only_combined_API_name_changed": true,
+    "IO_only_CTF_output_root_changed": true
+  },
+  "structural_validators_byte_exact_DataQA07": true,
+  "all_actual_method_Gamma_count_integrity_validation_precedes_Gamma_pairing": true,
+  "same_packet_function_AST_between_lanes": true,
+  "runtime_report_protocol": {
+    "unit_schema": "ctf07-unit-comparison.v1",
+    "production_schema": "ctf07-production-comparison.v1",
+    "unit_statuses": [
+      "pass-selected-first-Gammas",
+      "fail-selected-first-Gammas"
+    ],
+    "production_statuses": [
+      "pass-selected-loader-to-first-Gammas",
+      "fail-selected-loader-to-first-Gammas"
+    ],
+    "primary_metrics": "comparison.metrics",
+    "inherited_method9": "comparison.method_handoff_metrics",
+    "inherited_assembly7": "comparison.assembly_handoff_metrics",
+    "actual_executed_sources_per_lane": 6,
+    "actual_OriginalDataQA_sources_per_lane": 6,
+    "current_scope_role": "real-CTF-07-check-only; prior05/06-authorities-separate",
+    "historical_authority": "prior_05_06_authority; historical after documents are metadata only",
+    "observation_physical_bound_bytes": 1073741824,
+    "metadata_JSON_bound_bytes": 16000000,
+    "source_file_bound_bytes": 64000000,
+    "selected_absence_one_or_both_sides": "required FAIL/noPASS",
+    "required_nonfinite": "actual class/bits retained; no numeric PASS",
+    "later_visits": "all actual visits validated, retained and unpaired/noPASS",
+    "future_refs_or_values_guessed": false
+  },
+  "README": {
+    "path": ".runtime/porting/CTF-07/comparer-prep-01/README.md",
+    "sha256": "eb0a507cba184522b3fff0c8def6191c675c9a92938963118e7da3841a8e2563",
+    "size_bytes": 6614,
+    "line_count": 96
+  },
+  "own_preparation_source": {
+    "path": ".runtime/porting/CTF-07/comparer-prep-01/prepare_sources.py",
+    "sha256": "b8405918468d99ce2ff10f2b2b1940922c2ca4da8b880806ba7439dd092c7d4a",
+    "size_bytes": 13916,
+    "line_count": 164
+  },
+  "source_checks": {
+    "owned_AST_only": true,
+    "exact_diffs_regenerated": true,
+    "source_refs_verified": true,
+    "ranges_verified": true
+  },
+  "reviewed_modules_imported_or_executed": false,
+  "scientific_weather_or_binary_payloads_read": false,
+  "canonical_sources_written": false,
+  "new_QA_execution_stage": false,
+  "numerical_comparisons_performed": false,
+  "gates_updated": false,
+  "authorship_limits": "Raw authored Native07 observation/helper/freezer and some prior pure06/observer glue; Base Rust observer and Header pure/publicGamma/DataQA authorship retained. Not independent own-formula certification. Root and other-author full source peer required before actual execution."
+}

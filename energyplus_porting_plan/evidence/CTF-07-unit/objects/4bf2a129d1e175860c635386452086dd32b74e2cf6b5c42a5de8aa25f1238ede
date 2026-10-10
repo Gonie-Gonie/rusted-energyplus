@@ -1,0 +1,12 @@
+--- a/crates/ep_runtime/src/heat_balance/state.rs
++++ b/crates/ep_runtime/src/heat_balance/state.rs
+@@ -74,6 +74,9 @@
+     /// First CTF05 invocation outcomes, or explicit not-invoked after exponential.
+     pub construction_ctf05_first_inverse:
+         Vec<super::ctf_first_matrix_owner::ConstructionCtfFirstInverseAfterExponential>,
++    /// Actual first CTF07 return or typed prerequisite stop; no final CTF state is inferred.
++    pub construction_ctf07_first_gammas:
++        Vec<super::ctf_first_gamma_owner::ConstructionCtfFirstGammas>,
+     /// Construction coefficient cache build time in seconds.
+     pub construction_cache_build_wall_seconds: f64,
+     /// Number of construction cache entries.

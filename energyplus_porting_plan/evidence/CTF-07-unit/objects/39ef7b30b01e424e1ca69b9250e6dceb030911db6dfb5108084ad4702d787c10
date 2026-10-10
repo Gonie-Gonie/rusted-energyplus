@@ -1,0 +1,13 @@
+--- before/crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs
++++ proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs
+@@ -104,6 +104,10 @@
+     }
+     let at = |i1: usize, i2: usize| (i1 - 1) * n + i2 - 1;
+     let mut a_temp = vec![0.0; size];
++    #[expect(
++        clippy::needless_range_loop,
++        reason = "Preserve the pinned EnergyPlus ATemp update order."
++    )]
+     for index in 0..size {
+         a_temp[index] = input.a_exp[index] - input.iden_matrix[index];
+     }

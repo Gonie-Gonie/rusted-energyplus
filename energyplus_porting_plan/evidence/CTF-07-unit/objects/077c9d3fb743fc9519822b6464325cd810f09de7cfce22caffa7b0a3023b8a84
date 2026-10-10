@@ -1,0 +1,187 @@
+"""Ignored source/metadata rebase only; no project imports or target execution."""
+from pathlib import Path
+import ast
+import difflib
+import hashlib
+import json
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+OLD = ROOT / ".runtime/porting/CTF-07/combined-first-gamma-ingress-prep-01"
+
+
+def ref(path):
+    data = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(data).hexdigest(),
+            "size_bytes": len(data), "line_count": len(data.splitlines())}
+
+
+def checked(binding):
+    path = ROOT / binding["path"]
+    actual = ref(path)
+    for key in ("sha256", "size_bytes", "line_count"):
+        if key in binding:
+            assert actual[key] == binding[key], (path, key)
+    return path
+
+
+def diff_file(before, after, fromfile, tofile, output):
+    text = ''.join(difflib.unified_diff(before.decode().splitlines(keepends=True),
+        after.decode().splitlines(keepends=True), fromfile=fromfile, tofile=tofile))
+    output.write_text(text, encoding="utf-8", newline="\n")
+    return ref(output)
+
+
+def main():
+    assert not (OUT / "manifest.json").exists(), "Held source preparation is immutable"
+    old_ref = {"path": (OLD / "manifest.json").relative_to(ROOT).as_posix(),
+        "sha256":"1d83f25ecfe6cb7de9e7d15f6882ecbc39c9a91dd2502acf4b9d74adb5f439fb"}
+    old = json.loads(checked(old_ref).read_text(encoding="utf-8"))
+    final_ref = {"path":".runtime/porting/CTF-06/applied-final-source-01/manifest.json",
+        "sha256":"b6c03057a795360a8e21b54730315c7df5412dee0929774fa773f628cdbc7655"}
+    final = json.loads(checked(final_ref).read_text(encoding="utf-8"))
+    actual = {row["canonical_path"]:row for row in final["source_files"]}
+    snapshot_ref = {"path":".runtime/porting/source-objects/0c/0c0ef2d51f45f1f3522b3b79e603ffb0fbafbf71ea9a510141444f4eda9e310c",
+        "sha256":"0c0ef2d51f45f1f3522b3b79e603ffb0fbafbf71ea9a510141444f4eda9e310c"}
+    snapshot = json.loads(checked(snapshot_ref).read_text(encoding="utf-8"))
+    assert snapshot["schema"] == "rust-command-source-snapshot.v1" and snapshot["bytes_normalized"] is False
+    compiled = {row["historical_path"]:row for row in snapshot["files"]}
+    changes = []
+    before_parents = {}
+    for previous in old["changes"]:
+        canonical = previous["canonical_path"]
+        before = checked(actual[canonical]["archive"]).read_bytes()
+        assert before == checked(compiled[canonical]["archive"]).read_bytes()
+        assert actual[canonical]["archive"]["sha256"] == compiled[canonical]["archive"]["sha256"]
+        before_path = OUT / "before-actual06" / canonical
+        before_path.parent.mkdir(parents=True, exist_ok=True)
+        before_path.write_bytes(before)
+        before_parents[canonical] = before_path
+        after = checked(previous["proposed"]).read_bytes()
+        old_after = after
+        if canonical.endswith("/construction_cache.rs"):
+            search = b"            let first_functions = initialize_construction_ctf_first_matrix_with_gammas(&first_assembly);"
+            replace = b"            let first_functions =\n                initialize_construction_ctf_first_matrix_with_gammas(&first_assembly);"
+            assert after.count(search) == 1
+            after = after.replace(search, replace, 1)
+            assert after[after.index(b"fn construction_thermal_data("):] == before[before.index(b"fn construction_thermal_data("):]
+        path = OUT / "proposed" / canonical
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(after)
+        exact = diff_file(before, after, "a/"+canonical, "b/"+canonical,
+            OUT / (canonical.replace("/","__") + ".from-actual06.diff"))
+        correspondence = None
+        if after != old_after:
+            correspondence = diff_file(old_after,after,"accepted01/"+canonical,"rebased02/"+canonical,
+                OUT / (canonical.replace("/","__") + ".from-accepted01.diff"))
+        changes.append({"canonical_path":canonical,"proposed":ref(path),
+            "actual_current06":{"historical_path":canonical,"before_archive":ref(before_path),
+                "actual_formatted06_archive":actual[canonical]["archive"],
+                "actual_source_snapshot_binding":compiled[canonical]},
+            "accepted01_after_source":previous["proposed"],
+            "historical04_before_archive":previous["current_CTF04"]["before_archive"],
+            "from_actual06_exact_diff":exact,
+            "formatting_correspondence_from_accepted01":correspondence,
+            "accepted01_body_exact_except_preserved_actual06_assignment_wrap":True})
+    owners = []
+    for previous in old["new_owners"]:
+        canonical = previous["canonical_path"]
+        assert canonical not in compiled
+        source = checked(previous["proposed"]).read_bytes()
+        path = OUT / "new" / Path(canonical).name
+        path.parent.mkdir(exist_ok=True)
+        path.write_bytes(source)
+        exact = diff_file(b"",source,"/dev/null","b/"+canonical,OUT/(path.name+".new.diff"))
+        assert checked(previous["exact_diff"]).read_bytes() == checked(exact).read_bytes()
+        owners.append({"canonical_path":canonical,"current06_snapshot_before":None,
+            "proposed":ref(path),"unchanged_accepted01_source":previous["proposed"],"exact_diff":exact})
+    installations = [row for row in old["future_dependency_installations_not_current_compiled_source"]
+                     if "gamma" in row["canonical_path"]]
+    assert len(installations) == 4
+    for row in installations:
+        assert row["canonical_path"] not in compiled
+        checked(row["literal_unchanged_held_source"])
+    actual_dependencies = []
+    for row in old["future_dependency_installations_not_current_compiled_source"]:
+        canonical = row["canonical_path"]
+        if "gamma" not in canonical:
+            assert canonical in actual
+            archive = actual[canonical]["archive"]
+            assert checked(archive).read_bytes() == checked(compiled[canonical]["archive"]).read_bytes()
+            actual_dependencies.append({"historical_path":canonical,"archive":archive,
+                "actual_source_snapshot_binding":compiled[canonical],"reinstall_historical_unformatted_source":False})
+    assert len(actual_dependencies) == 10
+    inventory = []
+    historical_documents = []
+    for previous in old["current_source_inventory"]:
+        canonical = previous["path"]
+        if canonical.startswith(".reference/"):
+            inventory.append(ref(checked(previous)))
+            continue
+        if canonical.startswith("energyplus_porting_plan/"):
+            historical_documents.append({"historical_path":canonical,
+                "identity_at_accepted01":{key:previous[key] for key in ("sha256","size_bytes","line_count")},
+                "authority":ref(checked(old_ref)),"current_live_document_replayed":False,
+                "document_bytes_revalidated_in_this_rebase":False})
+            continue
+        row = compiled[canonical]
+        checked(row["archive"])
+        inventory.append({"historical_path":canonical,"archive":ref(ROOT/row["archive"]["path"]),
+            "actual_source_snapshot_binding":row})
+    ranges = []
+    for previous in old["source_ranges"]:
+        row = dict(previous)
+        if row["path"].startswith("crates/"):
+            canonical = row["path"]
+            if canonical.endswith("/construction_cache.rs"):
+                prior_change = next(x for x in old["changes"] if x["canonical_path"]==canonical)
+                row["historical_path"] = canonical
+                row["path"] = prior_change["current_CTF04"]["before_archive"]["path"]
+                row["purpose"] = "historical accepted01 current04 context, authenticated archive: " + row["purpose"]
+            else:
+                row["historical_path"] = canonical
+                row["path"] = compiled[canonical]["archive"]["path"]
+        raw = b''.join((ROOT/row["path"]).read_bytes().splitlines(keepends=True)[row["start_line"]-1:row["end_line"]])
+        assert hashlib.sha256(raw).hexdigest() == row["sha256"] and len(raw)==row["size_bytes"]
+        ranges.append(row)
+    for canonical,path in before_parents.items():
+        raw=path.read_bytes()
+        ranges.append({"path":path.relative_to(ROOT).as_posix(),"historical_path":canonical,
+            "start_line":1,"end_line":len(raw.splitlines()),"sha256":hashlib.sha256(raw).hexdigest(),
+            "size_bytes":len(raw),"purpose":"exact actual formatted06 parent before this07-only increment"})
+    ast.parse(Path(__file__).read_text(encoding="utf-8"))
+    data = {"schema":"ctf07-combined-first-gamma-ingress-source-preparation.v1",
+        "status":"SOURCE-READY-HELD-unexecuted","energyplus_commit":old["energyplus_commit"],
+        "current_canonical_stage":"actual06 archive/snapshot identities at preparation; mutable canonical not read",
+        "activation_requires_Root_actual_prerequisite_QA_fresh_baseline_and_strictcomparison":True,
+        "preserved_predecessor_manifest":ref(checked(old_ref)),
+        "actual_formatted06_manifest":ref(checked(final_ref)),"actual_current06_source_snapshot":ref(checked(snapshot_ref)),
+        "changes":changes,"new_owners":owners,"literal_accepted_dependencies":old["literal_accepted_dependencies"],
+        "future_dependency_installations_not_current_compiled_source":installations,
+        "already_actual_formatted06_dependencies_not_reinstalled":actual_dependencies,
+        "current_source_inventory":inventory,"source_ranges":ranges,"README":ref(OUT/"README.md"),
+        "historical01_documentary_identities_not_current_source_bindings":historical_documents,
+        "own_preparation_source":ref(Path(__file__)),"public_API":old["public_API"],
+        "prospective_cache_state_fields":old["prospective_cache_state_fields"],
+        "fresh02_rebase":{"five_before_archives_equal_actual06_and_snapshot":True,
+            "four_parent_after_bodies_byte_identical01":True,"cache_only_preserves_actual06_assignment_wrap":True,
+            "wrapper_and_tests_byte_identical01":True,"coefficient_and_hash_tails_byte_identical_actual06":True,
+            "existing06owners_preserved":True,"existing05_06_dependencies_use_actual_formatted_archives":True},
+        "integrity":{"Python_AST_only":True,"exact_five_parent_diffs_and_two_newfile_diffs_generated":True,
+            "all_current_bindings_use_immutable_archives":True,"future_hashes_or_outcomes_guessed":False},
+        "tests_proposed_not_executed":old["tests_proposed_not_executed"],"numeric_profiles_changed":False,
+        "retry_driver_or_complete_coefficient_handoff_added":False,"new_Native_observation_or_frozen_policy_authored":False,
+        "authorship_limits":old["authorship_limits"],
+        "preparation_boundary":{"mutable_canonical_source_read_or_written":False,"project_imports_or_targets_executed":False,
+            "Cargo_tests_builds_formatters_engines_or_Git_run":False,"scientific_weather_or_binary_payloads_read":False,
+            "new_QA_framework_or_execution_stage":False,"numerical_PASS_claimed":False,"gates_updated":False}}
+    (OUT/"manifest.json").write_text(json.dumps(data,indent=2,ensure_ascii=False)+"\n",encoding="utf-8",newline="\n")
+    diff_file((OLD/"manifest.json").read_bytes(),(OUT/"manifest.json").read_bytes(),
+        (OLD/"manifest.json").relative_to(ROOT).as_posix(),(OUT/"manifest.json").relative_to(ROOT).as_posix(),OUT/"manifest.json.from-01.diff")
+    diff_file((OLD/"README.md").read_bytes(),(OUT/"README.md").read_bytes(),
+        (OLD/"README.md").relative_to(ROOT).as_posix(),(OUT/"README.md").relative_to(ROOT).as_posix(),OUT/"README.md.from-01.diff")
+    print(json.dumps({"manifest":ref(OUT/"manifest.json"),"target_execution":False}))
+
+
+if __name__ == "__main__":
+    main()

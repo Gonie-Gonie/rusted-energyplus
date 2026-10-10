@@ -1,0 +1,81 @@
+# Selected CTF07 Gamma method source proposal
+
+SOURCE-READY HELD; unapplied, unformatted and unexecuted. This is one pure
+selected numerical method plus eight focused unexecuted tests and one proposed
+module declaration. It creates no Native observer, cache/public driver, input
+freezer, QA, comparison or proof stage. Root owns all future application/actions.
+
+## Source and actual operands
+
+Pinned Original ConstructionProps::calculateGammas is complete1496-1589.
+Construction.hh304-342 declares actual AExp/AInv/BMat/Gamma1/Gamma2/Iden owners.
+Original638-654 allocates Gamma1/Gamma2 as3 by rcmax; the enclosing caller invokes
+exponential884, inverse887 and Gamma890 in order. Whole-return1079-1103 destroys
+these work owners. This proposal neither simulates those calls nor certifies
+whole-method completion. It is the selected1D/no-source subset of the full card.
+
+CtfGammaInput borrows actual same-attempt AInv/AExp/IdenMatrix/BMat plus positive
+rcmax. It has no AMat field because the Gamma method does not read AMat. Actual
+CtfAssemblyContext supplies identity/route/selectors/current CTFTimeStep/history
+and caller timestep. The function preserves that context verbatim. It constructs
+no identity, retry state, timestep, numerical inputs or prior method results.
+Native numerical answers are never operands. Same-attempt custody and genuine
+preceding-owner handoff belong to a future separately reviewed public driver.
+
+Unavailable enclosing routes return a typed Unavailable with no work arrays.
+Reached internal-source,2D, nonzero source/user selectors, ordinal0, nonpositive
+dimension or inconsistent owner shapes return explicit scope errors. There is
+no finite/zero-timestep/conditioning guard and no replacement zero fallback.
+The pure API accepts an actual positive attempt ordinal without generating a
+retry; future selected comparisons/driver must explicitly retain first-only
+scope until a genuine retry driver exists.
+
+## Literal selected arithmetic and output layout
+
+ATemp is actual elementwise AExp-actualIden, never a generated identity. Gamma1
+is zero-initialized3 by rcmax, then i outer/is1 inner adds the two source boundary
+products in the original order. Each product remains left-associated
+AInv*ATemp*B. NodeSource0 leaves Gamma1 row3 at source initialized zero and does
+not read BMat3. Gamma2 is independently zero-initialized, then i/j/is1 loops use
+actual Gamma1/CTFTimeStep. Only j1/is1=1 and j2/is1=rcmax subtract their real B
+owner. All other elements, including j3, execute the source division/product.
+Consequently nonfinite/zero-dt arithmetic is retained; Gamma2 row3 is not forced
+zero. No generic matrix operator, transpose, solver, reassociation or tolerance
+is introduced. Square storage is source i1-outer/i2-inner; Gamma is j-outer/i-inner.
+
+The returned CtfGammaMatrix carries actual context,rcmax,Gamma1,Gamma2 and the
+computed private ATemp before Original1553 deallocation. Retaining that workspace
+is an output-only lifetime extension; Gamma2 never reads it. The card requests
+Gamma and changed work state, so this source owner is suitable for a later
+pre-deallocation observation contract. No such Native capture exists or is
+claimed by this package. Later CTF08 coefficient input/handoff stays pending.
+
+## Focused tests and boundaries
+
+Eight tests are authored, never run: scalar double boundary, asymmetric two-node
+layout/actual supplied identity/context/input immutability, ordered cancellation,
+left-associated overflow, signed workspace zero/unread B3, zero-dt NaN behavior,
+all unavailable routes without arrays, and exact scope/shape errors. Expected
+small integer sums are hand-derived from the pinned formulas; there are no
+Native output operands or frozen fixture answers. These tests verify meaningful
+order/domain boundaries and do not establish Native parity or active production.
+
+The before parent is actual current04 surface_manager.rs. Only one module line
+is proposed; existing fields/math/cache owners are untouched. The accepted
+prospective combined05/06 parent has additional declarations and requires a
+fresh exact source rebase before joint application. This held package must not
+be mutated to impersonate future canonical or compiled identities.
+
+Card CTF07 currently has four pending gates. Source hold does not close any.
+Genuine same-input Native observation, pre-output precision/selection policy,
+Rust compilation/unit execution, public/cache/CTF08 ingress and production
+validation remain pending. No future input counts, digests, build or outcome is
+invented. No project imports, execution/tests/format/Cargo/engines, scientific,
+weather or binary payload reads, canonical changes or Git actions occurred.
+The author wrote earlier Native/helpers/initial ingress; independent full source
+peer and Root review remain required, not an independent own-formula certificate.
+
+Fresh02 corrects source metadata only: the actual reset helper is Original2045-2069
+with caller573 and declaration356. The initial01 nodal490-504 range had an
+incorrect reset purpose and remains preserved as a historical draft. All three
+Rust proposal bodies/before parent/generated source diffs are byte-identical01.

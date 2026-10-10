@@ -1,0 +1,28 @@
+# CTF07 loop-scoped lint amendment
+
+SOURCE-READY HELD, unapplied and unexecuted. This proposal inserts only one
+`#[expect(clippy::needless_range_loop, reason = ...)]` directly on the existing
+flat full ATemp subtraction loop. The reason is `Preserve the pinned EnergyPlus
+ATemp update order.` The loop copies every AExp minus Iden element in its same
+index order; it is not a diagonal-only update. Construction.cc1529-1530 owns the
+full ATemp assignment. Removing this exact attribute restores all original bytes.
+
+The before archive is the real canonical source authenticated against Root's
+immutable actual07 formatted-source authority344ed7b3. All16 canonical sources
+matched its raw final archives during preparation; the other15 are unchanged by
+this proposal. Existing reasoned exact-source allowances in the initial owner
+and discretizer establish the local convention. This narrower expectation is
+scoped to the diagnosed loop, not the module or whole function.
+
+No operand, accumulation, control, array shape, API, owner, profile, test or
+caller changes. Root reported the actual first Clippy failure; its real receipt
+stays preserved. Root must fully review and obtain another-author narrow peer
+before applying. The source identity changes, so the existing focused tests,
+workspace tests, Clippy and format checks must all run on the final source;
+no prior or future quality PASS or actual rerun is claimed here.
+
+Verification uses stdlib source bytes/SHA/size/lines and exact unified diffs.
+No project/reviewed-module import, Cargo/build/test/formatter/engine, scientific
+or weather or binary read, canonical edit or Git action occurs. This is a lint
+amendment to accepted code, not independent numerical/formula certification or
+a new QA/proof stage. All earlier held sources remain immutable.

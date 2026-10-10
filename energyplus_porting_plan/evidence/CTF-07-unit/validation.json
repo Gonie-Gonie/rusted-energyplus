@@ -1,0 +1,67 @@
+{
+  "schema": "ctf07-selected-plan-validation.v1",
+  "role": "Actual check-only validates Root-authored selected gate/card metadata; no evidence summary or scientific values are produced",
+  "actual_execution": {
+    "path": ".runtime/porting/CTF-07/unit-evidence-plan-check-command-01/receipt.json",
+    "sha256": "b2e02b01fb10ea9844cb278e8d7ea5f53c2ecd0318a46a9614c40c55800f5291",
+    "size_bytes": 5176
+  },
+  "actual_command": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    "tools/porting/check_plan.py",
+    "--check"
+  ],
+  "exit_code": 0,
+  "source_bytes_match_before_and_after": true,
+  "selected_files": [
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-07/unit-evidence-plan-check-command-01/receipt.json",
+        "sha256": "b2e02b01fb10ea9844cb278e8d7ea5f53c2ecd0318a46a9614c40c55800f5291",
+        "size_bytes": 5176
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/b2e02b01fb10ea9844cb278e8d7ea5f53c2ecd0318a46a9614c40c55800f5291",
+        "sha256": "b2e02b01fb10ea9844cb278e8d7ea5f53c2ecd0318a46a9614c40c55800f5291",
+        "size_bytes": 5176
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-07/unit-evidence-plan-check-command-01/stdout.log",
+        "sha256": "5574235c5fb89a7aab5c2d79f4717bbc6334b5b22e4e11cf32118561a63ce169",
+        "size_bytes": 399
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/5574235c5fb89a7aab5c2d79f4717bbc6334b5b22e4e11cf32118561a63ce169",
+        "sha256": "5574235c5fb89a7aab5c2d79f4717bbc6334b5b22e4e11cf32118561a63ce169",
+        "size_bytes": 399
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-07/unit-evidence-plan-check-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    }
+  ],
+  "validated_plan": {
+    "path": "energyplus_porting_plan/plan.json",
+    "sha256": "ec2ddd29d24508cdb81667ce473b936cf163dc5a5ea5d0561d88b17c9cb3e513",
+    "size_bytes": 680808
+  },
+  "complete_card_counts_unchanged": {
+    "A_completed": 13,
+    "B_completed": 13
+  },
+  "scientific_PASS_produced_by_check_plan": false
+}

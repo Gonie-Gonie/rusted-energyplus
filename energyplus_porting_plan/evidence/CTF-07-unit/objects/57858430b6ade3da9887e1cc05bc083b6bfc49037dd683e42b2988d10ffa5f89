@@ -1,0 +1,13 @@
+--- .runtime/porting/CTF-07/applied-source-01/applied/crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs
++++ crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs
+@@ -132,8 +132,8 @@
+                     // Source j==3 && is1==NodeSource cannot hold when the real
+                     // selector is zero. Keep all genuine j3 division/products,
+                     // including nonfinite outcomes; do not force its row zero.
+-                    gamma2[at(j, i)] += input.a_inv[at(is1, i)]
+-                        * (gamma1[at(j, is1)] / context.ctf_time_step);
++                    gamma2[at(j, i)] +=
++                        input.a_inv[at(is1, i)] * (gamma1[at(j, is1)] / context.ctf_time_step);
+                 }
+             }
+         }

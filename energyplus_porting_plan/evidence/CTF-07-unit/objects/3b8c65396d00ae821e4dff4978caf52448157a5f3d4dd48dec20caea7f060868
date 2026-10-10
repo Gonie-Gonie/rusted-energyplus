@@ -1,0 +1,49 @@
+--- crates/ep_run/examples/ctf06_candidate_production_support/fields.rs
++++ crates/ep_run/examples/ctf07_candidate_production_support/fields.rs
+@@ -105,6 +105,30 @@
+         "preprocessing_initial_assembly_exponential_or_inverse_reexecuted_by_observer":false,
+         "actual_CTF06_then_CTF05_order_is_producer_owned":true,
+         "inverse_input_is_original_AMat_and_IdenMatrix":true,"AExp_supplied_as_inverse_input":false,
++        "only_first_Rust_method_invocation_owned":true,"retry_driver_available":false,
++        "later_Native_method_visits_paired":false,"later_Native_method_visits_counted_as_PASS":false,
++        "Native_whole_solver_flags_unpaired":true,"numerical_PASS_claimed":false})
++}
++
++pub(super) fn ctf07_unavailable() -> Value {
++    json!({"owner_available":false,"construction_first_gammas":null,
++        "unavailable_reason":"initializer has not returned an actual HeatBalanceState owner","counted_as_PASS":false})
++}
++pub(super) fn ctf07_selected(source: &HeatBalanceState) -> Value {
++    json!({"owner_available":true,"construction_first_gammas":source.construction_ctf07_first_gammas.iter()
++        .enumerate().map(|(index,actual)| {
++            let assembly = source.construction_ctf04_first_assembly.iter()
++                .find(|owner|owner.construction_id == actual.construction_id);
++            let exponential = source.construction_ctf06_first_exponential.iter()
++                .find(|owner|owner.construction_id == actual.construction_id);
++            let inverse = source.construction_ctf05_first_inverse.iter()
++                .find(|owner|owner.construction_id == actual.construction_id);
++            json!({"state_vector_index":index,"construction_id":actual.construction_id.0,
++                "result":unit_fields::first_gammas(actual,assembly,exponential,inverse)})
++        }).collect::<Vec<_>>(),
++        "actual_owner_count":source.construction_ctf07_first_gammas.len(),
++        "predecessor_or_Gamma_owners_reexecuted_by_observer":false,
++        "actual_CTF06_then_CTF05_then_CTF07_order_is_producer_owned":true,
+         "only_first_Rust_method_invocation_owned":true,"retry_driver_available":false,
+         "later_Native_method_visits_paired":false,"later_Native_method_visits_counted_as_PASS":false,
+         "Native_whole_solver_flags_unpaired":true,"numerical_PASS_claimed":false})
+@@ -203,9 +227,12 @@
+     "crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+     "crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs",
+     "crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs",
++    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
++    "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs",
++    "crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs",
+ ];
+ pub(super) const OBSERVER_PATHS: &[&str] = &[
+-    "crates/ep_run/examples/ctf06_candidate_production_observer.rs",
+-    "crates/ep_run/examples/ctf06_candidate_production_support/fields.rs",
+-    "crates/ep_run/examples/ctf06_candidate_production_support/unit_fields.rs",
++    "crates/ep_run/examples/ctf07_candidate_production_observer.rs",
++    "crates/ep_run/examples/ctf07_candidate_production_support/fields.rs",
++    "crates/ep_run/examples/ctf07_candidate_production_support/unit_fields.rs",
+ ];
