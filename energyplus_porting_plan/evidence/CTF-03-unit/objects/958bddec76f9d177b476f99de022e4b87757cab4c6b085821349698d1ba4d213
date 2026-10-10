@@ -1,0 +1,73 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\ctf03_candidate_unit_observer.exe",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-03\\frozen-packet-01\\helper-request.json",
+    "60209985d95028e192b0b9226cd57cd9f4f4d5c1c7fc32a9f5b4a1f96fe389b4",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-03\\frozen-packet-01\\native-admission-contract.json",
+    "c8ccc280af914db63db0d7022586ef2789933750e30d2d523734421e9959a2e8",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-03\\candidate-unit-inputs-02\\source-bindings.json"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-10T15:13:00.737476+00:00",
+  "finished_utc": "2026-10-10T15:13:04.904714+00:00",
+  "elapsed_seconds": 4.167448100022739,
+  "repository_before": {
+    "head": "4c916b51f69ad3479046e2928a893c39b88b0216",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/heat_balance/initialization/state_shell.rs\u0000 M crates/ep_runtime/src/heat_balance/mod.rs\u0000 M crates/ep_runtime/src/heat_balance/state.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs\u0000?? crates/ep_run/examples/ctf03_candidate_production_observer.rs\u0000?? crates/ep_run/examples/ctf03_candidate_production_support/\u0000?? crates/ep_run/examples/ctf03_candidate_unit_observer.rs\u0000?? crates/ep_run/examples/ctf03_candidate_unit_support/\u0000?? crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_initial_owner_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization_tests.rs\u0000"
+  },
+  "repository_after": {
+    "head": "4c916b51f69ad3479046e2928a893c39b88b0216",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/heat_balance/initialization/state_shell.rs\u0000 M crates/ep_runtime/src/heat_balance/mod.rs\u0000 M crates/ep_runtime/src/heat_balance/state.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs\u0000?? crates/ep_run/examples/ctf03_candidate_production_observer.rs\u0000?? crates/ep_run/examples/ctf03_candidate_production_support/\u0000?? crates/ep_run/examples/ctf03_candidate_unit_observer.rs\u0000?? crates/ep_run/examples/ctf03_candidate_unit_support/\u0000?? crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_initial_owner_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs\u0000?? crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization_tests.rs\u0000"
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/eb/eb7b5e9050a1f2194e5f18016d06e094934f2d2097463ac938c48834a3afb0c3",
+    "sha256": "eb7b5e9050a1f2194e5f18016d06e094934f2d2097463ac938c48834a3afb0c3"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CTF-03/candidate-unit-command-01/stdout.log",
+    "sha256": "95ded04780824f2fd8d1a22c1c62509168e06ea0e599df1e1c92f514c2c1ff30"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CTF-03/candidate-unit-command-01/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-10T15:13:04.904714+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

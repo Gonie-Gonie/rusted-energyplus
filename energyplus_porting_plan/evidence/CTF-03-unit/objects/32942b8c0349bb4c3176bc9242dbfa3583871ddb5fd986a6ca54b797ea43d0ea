@@ -1,0 +1,3631 @@
+{
+  "schema": "ctf03-production-comparison.v1",
+  "status": "pass-selected-loader-to-initial-discretization",
+  "started_utc": "2026-10-10T15:15:22.737518+00:00",
+  "finished_utc": "2026-10-10T15:15:24.477677+00:00",
+  "reviewed_Original_data_review": {
+    "path": ".runtime/porting/CTF-03/original-production-data-review-01/review.json",
+    "sha256": "fc952f56c32b809f8494a96a117ff27be3181c1ced76dd2bd21e51dc293da13f",
+    "size_bytes": 50621
+  },
+  "reviewed_Original_data_review_execution": {
+    "path": ".runtime/porting/CTF-03/original-production-data-review-command-01/receipt.json",
+    "sha256": "a55220c5c0f4ef4569cd587026d641c64772b1c4c0aadc9262d050cafcc68fc7",
+    "size_bytes": 4393
+  },
+  "reviewed_Native_results": {
+    "path": ".runtime/porting/CTF-03/production-native-output-01/ctf03-production-helper-results.json",
+    "sha256": "f11de212519b0286077f23bd212adca19c8132f72009aae28550af36acb2e476",
+    "size_bytes": 1559632
+  },
+  "reviewed_Native_execution": {
+    "path": ".runtime/porting/CTF-03/production-native-command-01/receipt.json",
+    "sha256": "3fb94bfc49b4f70cbe96754cfd1509d1f8a9c49def381546d66e476754d5dd72",
+    "size_bytes": 3224
+  },
+  "reviewed_request": {
+    "path": ".runtime/porting/CTF-03/production-frozen-packet-01/helper-request.json",
+    "sha256": "3803b782df08efc2358e5075b505fba08fa14378b9bfaa2a0861a36a81be3f06",
+    "size_bytes": 23266
+  },
+  "reviewed_projection": {
+    "path": ".runtime/porting/CTF-03/production-frozen-packet-01/projection.json",
+    "sha256": "59fdba0c47376d1768a874abbac173b3c93cf4477ac38ecf5d9fa59cd05da727",
+    "size_bytes": 23628
+  },
+  "reviewed_contracts": {
+    "source": {
+      "path": ".runtime/porting/CTF-03/production-frozen-packet-01/source.json",
+      "sha256": "f66e8798fb4c7d801b9b70a1b96dca757c732d238a05c02061b9a2694b196c0e",
+      "size_bytes": 21933
+    },
+    "cases": {
+      "path": ".runtime/porting/CTF-03/production-frozen-packet-01/cases.json",
+      "sha256": "244d95c4a9bb48307552bef66d91bc259d2bd56719e9dc1bdea582d272a27b7d",
+      "size_bytes": 9291
+    },
+    "tolerances": {
+      "path": ".runtime/porting/CTF-03/production-frozen-packet-01/tolerances.json",
+      "sha256": "7d43fa173728669450b1077151a6e56632891360030558bdb00b4ecbd300c0d0",
+      "size_bytes": 5937
+    }
+  },
+  "Rust_results": {
+    "path": ".runtime/porting/CTF-03/candidate-production-command-01/stdout.log",
+    "sha256": "b4adfd8ad69d94a6a8bb4c3a3b1d636aed49d30357401136b58f8c372359f8b1",
+    "size_bytes": 610452
+  },
+  "Rust_execution": {
+    "path": ".runtime/porting/CTF-03/candidate-production-command-01/receipt.json",
+    "sha256": "b65f96313b83c7babe8b66a791428230a172eae9d80544f63fa4283dee56b6b7",
+    "size_bytes": 4729
+  },
+  "Rust_build_execution": {
+    "path": ".runtime/porting/CTF-03/candidate-build-command-01/receipt.json",
+    "sha256": "0666cd2725da662e647279bbd15f7b2f8cd209e5b6b6aaa4fbf428bf1479087a",
+    "size_bytes": 7778
+  },
+  "actual_Rust_binary": {
+    "historical_path": "target/debug/examples/ctf03_candidate_production_observer.exe",
+    "sha256": "de05b2b1d0fed7e180372c9d2df5c5479ad3c3b770c21d277cc783ebade733ba"
+  },
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/eb/eb7b5e9050a1f2194e5f18016d06e094934f2d2097463ac938c48834a3afb0c3",
+    "sha256": "eb7b5e9050a1f2194e5f18016d06e094934f2d2097463ac938c48834a3afb0c3"
+  },
+  "actual_Native_observation_counts": {
+    "initial_record_count": 21,
+    "initial_reached_phase_records": 15,
+    "initial_unreached_phase_records": 6,
+    "initial_available_owner_count": 15,
+    "initial_unavailable_owner_count": 6,
+    "initial_selected_1D_owner_count": 15,
+    "initial_unselected_context_count": 0,
+    "actual_initial_callback_count": 15,
+    "model_cases": 15,
+    "loader_phase_records": 195,
+    "operation_records": 21,
+    "actual_CTF_invocations": 21,
+    "actual_CTF_skipped_construct_rows": 0,
+    "loader_unavailable_model_cases": 0,
+    "actual_phase_callback_count": 78,
+    "unreached_phase_records": 0,
+    "scalar_DTO_visits": 2655,
+    "snapshot_visits": 462,
+    "unavailable_snapshot_records": 0,
+    "actual_source_function_counts": {
+      "InputProcessor::processInput": 15,
+      "SimulationManager::PostIPProcessing": 15,
+      "EnergyPlusData::init_constant_state": 15,
+      "EnergyPlusData::init_state": 15,
+      "OutputReportPredefined::SetPredefinedTables": 15,
+      "HeatBalanceManager::SetPreConstructionInputParameters": 15,
+      "OutputProcessor::SetupTimePointers(Zone)": 15,
+      "OutputProcessor::SetupTimePointers(System)": 15,
+      "HeatBalanceManager::GetProjectControlData": 15,
+      "HeatBalanceManager::GetSiteAtmosphereData": 15,
+      "Material::GetMaterialData": 15,
+      "HeatBalanceManager::GetConstructData": 15,
+      "HeatBalanceManager::GetBuildingData": 15,
+      "calculateTransferFunction": 21
+    },
+    "actual_CTF_status_counts": {
+      "source_returned": 21
+    },
+    "actual_loader_status_counts": {
+      "source_returned": 195
+    },
+    "actual_constructor_status_counts": {
+      "source_returned": 15
+    },
+    "actual_phase_callback_counts": {
+      "PostLoad": 21,
+      "PostMerge": 21,
+      "PostConversion": 21,
+      "InitialDiscretization": 15
+    },
+    "unknown_whole_call_obligations_for_unavailable_loaders": 0
+  },
+  "frozen_numeric_profiles": [
+    {
+      "variable": "dx",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "actual_LayersInConstruct_active_prefix"
+    },
+    {
+      "variable": "initial_CTFTimeStep",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    },
+    {
+      "variable": "caller_TimeStepZone",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar"
+    }
+  ],
+  "inherited_preprocessing_handoff_profiles": [
+    {
+      "variable": "PostLoad.dl",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.rk",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.rho",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.cp",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.lr",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.dl",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.rk",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.rho",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.cp",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.lr",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.dl",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.rk",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.rho",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.cp",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.lr",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.dyn",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "scope": "actual one-dimensional assignment only"
+    },
+    {
+      "variable": "PostConversion.rs",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.cnd",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    }
+  ],
+  "reviewed_initial_observation_policy": {
+    "protocol": "ctf03-initial-discretization.v1",
+    "phase": "after_original_Construction_cc619_before_matrix_allocation_and_retry",
+    "selection": "actual_initial_callback_reached_and_intact_active_prefix",
+    "required_owner_context": {
+      "SourceSinkPresent": false,
+      "SolutionDimensions": 1
+    },
+    "active_layer_fields": [
+      "Nodes",
+      "dx"
+    ],
+    "integer_fields": [
+      "LayersInConstruct",
+      "NumResLayers",
+      "rcmax",
+      "NodeSource",
+      "NodeUserTemp",
+      "NumHistories"
+    ],
+    "scalar_fields": [
+      "CTFTimeStep",
+      "TimeStepZone"
+    ],
+    "initial_state_distinct_from_whole_return_and_retry_state": true,
+    "PostConversion_layer_handoff_retained": true,
+    "PostConversion_handoff_fields": [
+      "LayersInConstruct",
+      "NumResLayers",
+      "dl",
+      "rk",
+      "rho",
+      "cp",
+      "lr",
+      "ResLayer"
+    ],
+    "capacitance_factors_are_actual_rho_and_cp_not_recomputed_products": true,
+    "required_reached_fields_absent_is_integrity_failure": true,
+    "unreached_counted_as_PASS": false,
+    "branch_or_numeric_answers_reconstructed": false
+  },
+  "actual_initial_owner_ledger": [
+    {
+      "model_id": "A-24H",
+      "actual_construction_Result_count": 3,
+      "actual_paired_initial_owner_count": 1,
+      "Native_later_solver_flags_and_surface_coefficient_copies_paired": false,
+      "unselected_or_unknown_counted_as_PASS": false
+    },
+    {
+      "model_id": "A-72H",
+      "actual_construction_Result_count": 3,
+      "actual_paired_initial_owner_count": 1,
+      "Native_later_solver_flags_and_surface_coefficient_copies_paired": false,
+      "unselected_or_unknown_counted_as_PASS": false
+    },
+    {
+      "model_id": "A-ANNUAL",
+      "actual_construction_Result_count": 3,
+      "actual_paired_initial_owner_count": 1,
+      "Native_later_solver_flags_and_surface_coefficient_copies_paired": false,
+      "unselected_or_unknown_counted_as_PASS": false
+    },
+    {
+      "model_id": "B-NOLIMIT-24H",
+      "actual_construction_Result_count": 1,
+      "actual_paired_initial_owner_count": 1,
+      "Native_later_solver_flags_and_surface_coefficient_copies_paired": false,
+      "unselected_or_unknown_counted_as_PASS": false
+    },
+    {
+      "model_id": "B-NOLIMIT-72H",
+      "actual_construction_Result_count": 1,
+      "actual_paired_initial_owner_count": 1,
+      "Native_later_solver_flags_and_surface_coefficient_copies_paired": false,
+      "unselected_or_unknown_counted_as_PASS": false
+    },
+    {
+      "model_id": "B-NOLIMIT-ANNUAL",
+      "actual_construction_Result_count": 1,
+      "actual_paired_initial_owner_count": 1,
+      "Native_later_solver_flags_and_surface_coefficient_copies_paired": false,
+      "unselected_or_unknown_counted_as_PASS": false
+    },
+    {
+      "model_id": "B-FLOW-24H",
+      "actual_construction_Result_count": 1,
+      "actual_paired_initial_owner_count": 1,
+      "Native_later_solver_flags_and_surface_coefficient_copies_paired": false,
+      "unselected_or_unknown_counted_as_PASS": false
+    },
+    {
+      "model_id": "B-FLOW-72H",
+      "actual_construction_Result_count": 1,
+      "actual_paired_initial_owner_count": 1,
+      "Native_later_solver_flags_and_surface_coefficient_copies_paired": false,
+      "unselected_or_unknown_counted_as_PASS": false
+    },
+    {
+      "model_id": "B-FLOW-ANNUAL",
+      "actual_construction_Result_count": 1,
+      "actual_paired_initial_owner_count": 1,
+      "Native_later_solver_flags_and_surface_coefficient_copies_paired": false,
+      "unselected_or_unknown_counted_as_PASS": false
+    },
+    {
+      "model_id": "B-CAPACITY-24H",
+      "actual_construction_Result_count": 1,
+      "actual_paired_initial_owner_count": 1,
+      "Native_later_solver_flags_and_surface_coefficient_copies_paired": false,
+      "unselected_or_unknown_counted_as_PASS": false
+    },
+    {
+      "model_id": "B-CAPACITY-72H",
+      "actual_construction_Result_count": 1,
+      "actual_paired_initial_owner_count": 1,
+      "Native_later_solver_flags_and_surface_coefficient_copies_paired": false,
+      "unselected_or_unknown_counted_as_PASS": false
+    },
+    {
+      "model_id": "B-CAPACITY-ANNUAL",
+      "actual_construction_Result_count": 1,
+      "actual_paired_initial_owner_count": 1,
+      "Native_later_solver_flags_and_surface_coefficient_copies_paired": false,
+      "unselected_or_unknown_counted_as_PASS": false
+    },
+    {
+      "model_id": "B-BOTH-24H",
+      "actual_construction_Result_count": 1,
+      "actual_paired_initial_owner_count": 1,
+      "Native_later_solver_flags_and_surface_coefficient_copies_paired": false,
+      "unselected_or_unknown_counted_as_PASS": false
+    },
+    {
+      "model_id": "B-BOTH-72H",
+      "actual_construction_Result_count": 1,
+      "actual_paired_initial_owner_count": 1,
+      "Native_later_solver_flags_and_surface_coefficient_copies_paired": false,
+      "unselected_or_unknown_counted_as_PASS": false
+    },
+    {
+      "model_id": "B-BOTH-ANNUAL",
+      "actual_construction_Result_count": 1,
+      "actual_paired_initial_owner_count": 1,
+      "Native_later_solver_flags_and_surface_coefficient_copies_paired": false,
+      "unselected_or_unknown_counted_as_PASS": false
+    }
+  ],
+  "comparison": {
+    "numeric_comparisons": 45,
+    "discrete_comparisons": 2556,
+    "mismatch_count": 0,
+    "mismatch_categories": {
+      "discrete_comparisons": 2556,
+      "preprocessing_handoff_scalar_copies": 378,
+      "numeric_comparisons": 45
+    },
+    "metrics": {
+      "dx": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "initial_CTFTimeStep": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "caller_TimeStepZone": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "mismatch_samples": [],
+    "mismatch_samples_omitted": 0,
+    "unavailable_observations": [
+      {
+        "path": "A-24H/material/R13LAYER/regular_members",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "NoMass typed owner stores R only; Native default members remain unpaired, actual initialized phases are paired",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "A-24H/material/R31LAYER/regular_members",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "NoMass typed owner stores R only; Native default members remain unpaired, actual initialized phases are paired",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "A-72H/material/R13LAYER/regular_members",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "NoMass typed owner stores R only; Native default members remain unpaired, actual initialized phases are paired",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "A-72H/material/R31LAYER/regular_members",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "NoMass typed owner stores R only; Native default members remain unpaired, actual initialized phases are paired",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "A-ANNUAL/material/R13LAYER/regular_members",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "NoMass typed owner stores R only; Native default members remain unpaired, actual initialized phases are paired",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "A-ANNUAL/material/R31LAYER/regular_members",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "NoMass typed owner stores R only; Native default members remain unpaired, actual initialized phases are paired",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "A-24H/R13WALL/CTF03",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "actual initial phase unselected/unreached or explicit Rust unavailable route; no numeric PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "A-24H/ROOF31/CTF03",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "actual initial phase unselected/unreached or explicit Rust unavailable route; no numeric PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "A-72H/R13WALL/CTF03",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "actual initial phase unselected/unreached or explicit Rust unavailable route; no numeric PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "A-72H/ROOF31/CTF03",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "actual initial phase unselected/unreached or explicit Rust unavailable route; no numeric PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "A-ANNUAL/R13WALL/CTF03",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "actual initial phase unselected/unreached or explicit Rust unavailable route; no numeric PASS",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "A-ANNUAL/ROOF31/CTF03",
+        "Native_available": false,
+        "Rust_available": false,
+        "required": false,
+        "reason": "actual initial phase unselected/unreached or explicit Rust unavailable route; no numeric PASS",
+        "counted_as_PASS": false
+      }
+    ],
+    "unavailable_counted_as_PASS": false
+  },
+  "actual_owner_association_ledger": [
+    {
+      "model_id": "A-24H",
+      "Native_material_ids": [
+        {
+          "Num": 1,
+          "Name": "C5 - 4 IN HW CONCRETE"
+        },
+        {
+          "Num": 2,
+          "Name": "R13LAYER"
+        },
+        {
+          "Num": 3,
+          "Name": "R31LAYER"
+        }
+      ],
+      "Rust_material_ids": [
+        {
+          "id": 0,
+          "name": "C5 - 4 IN HW CONCRETE"
+        },
+        {
+          "id": 1,
+          "name": "R13LAYER"
+        },
+        {
+          "id": 2,
+          "name": "R31LAYER"
+        }
+      ],
+      "Native_constructions": [
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            2
+          ],
+          "Name": "R13WALL",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 1
+        },
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            1
+          ],
+          "Name": "FLOOR",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 2
+        },
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            3
+          ],
+          "Name": "ROOF31",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 3
+        }
+      ],
+      "Rust_constructions": [
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 0,
+              "surface_name": "ZN001:WALL001"
+            },
+            {
+              "surface_id": 1,
+              "surface_name": "ZN001:WALL002"
+            },
+            {
+              "surface_id": 2,
+              "surface_name": "ZN001:WALL003"
+            },
+            {
+              "surface_id": 3,
+              "surface_name": "ZN001:WALL004"
+            }
+          ],
+          "declared_layer_ids": [
+            1
+          ],
+          "effective_layer_ids": [
+            1
+          ],
+          "id": 0,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 0,
+          "name": "R13WALL",
+          "outside_layer_id": 1
+        },
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 4,
+              "surface_name": "ZN001:FLR001"
+            }
+          ],
+          "declared_layer_ids": [
+            0
+          ],
+          "effective_layer_ids": [
+            0
+          ],
+          "id": 1,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 1,
+          "name": "FLOOR",
+          "outside_layer_id": 0
+        },
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 5,
+              "surface_name": "ZN001:ROOF001"
+            }
+          ],
+          "declared_layer_ids": [
+            2
+          ],
+          "effective_layer_ids": [
+            2
+          ],
+          "id": 2,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 2,
+          "name": "ROOF31",
+          "outside_layer_id": 2
+        }
+      ],
+      "Native_surface_associations": [
+        {
+          "array_index": 1,
+          "Name": "ZN001:WALL001",
+          "Construction": 1
+        },
+        {
+          "array_index": 2,
+          "Name": "ZN001:WALL002",
+          "Construction": 1
+        },
+        {
+          "array_index": 3,
+          "Name": "ZN001:WALL003",
+          "Construction": 1
+        },
+        {
+          "array_index": 4,
+          "Name": "ZN001:WALL004",
+          "Construction": 1
+        },
+        {
+          "array_index": 5,
+          "Name": "ZN001:FLR001",
+          "Construction": 2
+        },
+        {
+          "array_index": 6,
+          "Name": "ZN001:ROOF001",
+          "Construction": 3
+        }
+      ],
+      "Rust_surface_associations": [
+        {
+          "construction_id": 0,
+          "id": 0,
+          "model_vector_index": 0,
+          "name": "ZN001:WALL001"
+        },
+        {
+          "construction_id": 0,
+          "id": 1,
+          "model_vector_index": 1,
+          "name": "ZN001:WALL002"
+        },
+        {
+          "construction_id": 0,
+          "id": 2,
+          "model_vector_index": 2,
+          "name": "ZN001:WALL003"
+        },
+        {
+          "construction_id": 0,
+          "id": 3,
+          "model_vector_index": 3,
+          "name": "ZN001:WALL004"
+        },
+        {
+          "construction_id": 1,
+          "id": 4,
+          "model_vector_index": 4,
+          "name": "ZN001:FLR001"
+        },
+        {
+          "construction_id": 2,
+          "id": 5,
+          "model_vector_index": 5,
+          "name": "ZN001:ROOF001"
+        }
+      ],
+      "actual_initialized_preprocessing_owner_count": 3,
+      "Native_whole_outcomes_context_only": [
+        {
+          "index": 1,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        },
+        {
+          "index": 2,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        },
+        {
+          "index": 3,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "A-72H",
+      "Native_material_ids": [
+        {
+          "Num": 1,
+          "Name": "C5 - 4 IN HW CONCRETE"
+        },
+        {
+          "Num": 2,
+          "Name": "R13LAYER"
+        },
+        {
+          "Num": 3,
+          "Name": "R31LAYER"
+        }
+      ],
+      "Rust_material_ids": [
+        {
+          "id": 0,
+          "name": "C5 - 4 IN HW CONCRETE"
+        },
+        {
+          "id": 1,
+          "name": "R13LAYER"
+        },
+        {
+          "id": 2,
+          "name": "R31LAYER"
+        }
+      ],
+      "Native_constructions": [
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            2
+          ],
+          "Name": "R13WALL",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 1
+        },
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            1
+          ],
+          "Name": "FLOOR",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 2
+        },
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            3
+          ],
+          "Name": "ROOF31",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 3
+        }
+      ],
+      "Rust_constructions": [
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 0,
+              "surface_name": "ZN001:WALL001"
+            },
+            {
+              "surface_id": 1,
+              "surface_name": "ZN001:WALL002"
+            },
+            {
+              "surface_id": 2,
+              "surface_name": "ZN001:WALL003"
+            },
+            {
+              "surface_id": 3,
+              "surface_name": "ZN001:WALL004"
+            }
+          ],
+          "declared_layer_ids": [
+            1
+          ],
+          "effective_layer_ids": [
+            1
+          ],
+          "id": 0,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 0,
+          "name": "R13WALL",
+          "outside_layer_id": 1
+        },
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 4,
+              "surface_name": "ZN001:FLR001"
+            }
+          ],
+          "declared_layer_ids": [
+            0
+          ],
+          "effective_layer_ids": [
+            0
+          ],
+          "id": 1,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 1,
+          "name": "FLOOR",
+          "outside_layer_id": 0
+        },
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 5,
+              "surface_name": "ZN001:ROOF001"
+            }
+          ],
+          "declared_layer_ids": [
+            2
+          ],
+          "effective_layer_ids": [
+            2
+          ],
+          "id": 2,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 2,
+          "name": "ROOF31",
+          "outside_layer_id": 2
+        }
+      ],
+      "Native_surface_associations": [
+        {
+          "array_index": 1,
+          "Name": "ZN001:WALL001",
+          "Construction": 1
+        },
+        {
+          "array_index": 2,
+          "Name": "ZN001:WALL002",
+          "Construction": 1
+        },
+        {
+          "array_index": 3,
+          "Name": "ZN001:WALL003",
+          "Construction": 1
+        },
+        {
+          "array_index": 4,
+          "Name": "ZN001:WALL004",
+          "Construction": 1
+        },
+        {
+          "array_index": 5,
+          "Name": "ZN001:FLR001",
+          "Construction": 2
+        },
+        {
+          "array_index": 6,
+          "Name": "ZN001:ROOF001",
+          "Construction": 3
+        }
+      ],
+      "Rust_surface_associations": [
+        {
+          "construction_id": 0,
+          "id": 0,
+          "model_vector_index": 0,
+          "name": "ZN001:WALL001"
+        },
+        {
+          "construction_id": 0,
+          "id": 1,
+          "model_vector_index": 1,
+          "name": "ZN001:WALL002"
+        },
+        {
+          "construction_id": 0,
+          "id": 2,
+          "model_vector_index": 2,
+          "name": "ZN001:WALL003"
+        },
+        {
+          "construction_id": 0,
+          "id": 3,
+          "model_vector_index": 3,
+          "name": "ZN001:WALL004"
+        },
+        {
+          "construction_id": 1,
+          "id": 4,
+          "model_vector_index": 4,
+          "name": "ZN001:FLR001"
+        },
+        {
+          "construction_id": 2,
+          "id": 5,
+          "model_vector_index": 5,
+          "name": "ZN001:ROOF001"
+        }
+      ],
+      "actual_initialized_preprocessing_owner_count": 3,
+      "Native_whole_outcomes_context_only": [
+        {
+          "index": 1,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        },
+        {
+          "index": 2,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        },
+        {
+          "index": 3,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "A-ANNUAL",
+      "Native_material_ids": [
+        {
+          "Num": 1,
+          "Name": "C5 - 4 IN HW CONCRETE"
+        },
+        {
+          "Num": 2,
+          "Name": "R13LAYER"
+        },
+        {
+          "Num": 3,
+          "Name": "R31LAYER"
+        }
+      ],
+      "Rust_material_ids": [
+        {
+          "id": 0,
+          "name": "C5 - 4 IN HW CONCRETE"
+        },
+        {
+          "id": 1,
+          "name": "R13LAYER"
+        },
+        {
+          "id": 2,
+          "name": "R31LAYER"
+        }
+      ],
+      "Native_constructions": [
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            2
+          ],
+          "Name": "R13WALL",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 1
+        },
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            1
+          ],
+          "Name": "FLOOR",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 2
+        },
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            3
+          ],
+          "Name": "ROOF31",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 3
+        }
+      ],
+      "Rust_constructions": [
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 0,
+              "surface_name": "ZN001:WALL001"
+            },
+            {
+              "surface_id": 1,
+              "surface_name": "ZN001:WALL002"
+            },
+            {
+              "surface_id": 2,
+              "surface_name": "ZN001:WALL003"
+            },
+            {
+              "surface_id": 3,
+              "surface_name": "ZN001:WALL004"
+            }
+          ],
+          "declared_layer_ids": [
+            1
+          ],
+          "effective_layer_ids": [
+            1
+          ],
+          "id": 0,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 0,
+          "name": "R13WALL",
+          "outside_layer_id": 1
+        },
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 4,
+              "surface_name": "ZN001:FLR001"
+            }
+          ],
+          "declared_layer_ids": [
+            0
+          ],
+          "effective_layer_ids": [
+            0
+          ],
+          "id": 1,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 1,
+          "name": "FLOOR",
+          "outside_layer_id": 0
+        },
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 5,
+              "surface_name": "ZN001:ROOF001"
+            }
+          ],
+          "declared_layer_ids": [
+            2
+          ],
+          "effective_layer_ids": [
+            2
+          ],
+          "id": 2,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 2,
+          "name": "ROOF31",
+          "outside_layer_id": 2
+        }
+      ],
+      "Native_surface_associations": [
+        {
+          "array_index": 1,
+          "Name": "ZN001:WALL001",
+          "Construction": 1
+        },
+        {
+          "array_index": 2,
+          "Name": "ZN001:WALL002",
+          "Construction": 1
+        },
+        {
+          "array_index": 3,
+          "Name": "ZN001:WALL003",
+          "Construction": 1
+        },
+        {
+          "array_index": 4,
+          "Name": "ZN001:WALL004",
+          "Construction": 1
+        },
+        {
+          "array_index": 5,
+          "Name": "ZN001:FLR001",
+          "Construction": 2
+        },
+        {
+          "array_index": 6,
+          "Name": "ZN001:ROOF001",
+          "Construction": 3
+        }
+      ],
+      "Rust_surface_associations": [
+        {
+          "construction_id": 0,
+          "id": 0,
+          "model_vector_index": 0,
+          "name": "ZN001:WALL001"
+        },
+        {
+          "construction_id": 0,
+          "id": 1,
+          "model_vector_index": 1,
+          "name": "ZN001:WALL002"
+        },
+        {
+          "construction_id": 0,
+          "id": 2,
+          "model_vector_index": 2,
+          "name": "ZN001:WALL003"
+        },
+        {
+          "construction_id": 0,
+          "id": 3,
+          "model_vector_index": 3,
+          "name": "ZN001:WALL004"
+        },
+        {
+          "construction_id": 1,
+          "id": 4,
+          "model_vector_index": 4,
+          "name": "ZN001:FLR001"
+        },
+        {
+          "construction_id": 2,
+          "id": 5,
+          "model_vector_index": 5,
+          "name": "ZN001:ROOF001"
+        }
+      ],
+      "actual_initialized_preprocessing_owner_count": 3,
+      "Native_whole_outcomes_context_only": [
+        {
+          "index": 1,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        },
+        {
+          "index": 2,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        },
+        {
+          "index": 3,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "B-NOLIMIT-24H",
+      "Native_material_ids": [
+        {
+          "Num": 1,
+          "Name": "Mass Layer"
+        }
+      ],
+      "Rust_material_ids": [
+        {
+          "id": 0,
+          "name": "MASS LAYER"
+        }
+      ],
+      "Native_constructions": [
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            1
+          ],
+          "Name": "WALL",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 1
+        }
+      ],
+      "Rust_constructions": [
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 0,
+              "surface_name": "WALL X0"
+            },
+            {
+              "surface_id": 1,
+              "surface_name": "WALL X1"
+            },
+            {
+              "surface_id": 2,
+              "surface_name": "WALL Y0"
+            },
+            {
+              "surface_id": 3,
+              "surface_name": "WALL Y1"
+            },
+            {
+              "surface_id": 4,
+              "surface_name": "FLOOR"
+            },
+            {
+              "surface_id": 5,
+              "surface_name": "ROOF"
+            }
+          ],
+          "declared_layer_ids": [
+            0
+          ],
+          "effective_layer_ids": [
+            0
+          ],
+          "id": 0,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 0,
+          "name": "WALL",
+          "outside_layer_id": 0
+        }
+      ],
+      "Native_surface_associations": [
+        {
+          "array_index": 1,
+          "Name": "WALL X0",
+          "Construction": 1
+        },
+        {
+          "array_index": 2,
+          "Name": "WALL X1",
+          "Construction": 1
+        },
+        {
+          "array_index": 3,
+          "Name": "WALL Y0",
+          "Construction": 1
+        },
+        {
+          "array_index": 4,
+          "Name": "WALL Y1",
+          "Construction": 1
+        },
+        {
+          "array_index": 5,
+          "Name": "FLOOR",
+          "Construction": 1
+        },
+        {
+          "array_index": 6,
+          "Name": "ROOF",
+          "Construction": 1
+        }
+      ],
+      "Rust_surface_associations": [
+        {
+          "construction_id": 0,
+          "id": 0,
+          "model_vector_index": 0,
+          "name": "WALL X0"
+        },
+        {
+          "construction_id": 0,
+          "id": 1,
+          "model_vector_index": 1,
+          "name": "WALL X1"
+        },
+        {
+          "construction_id": 0,
+          "id": 2,
+          "model_vector_index": 2,
+          "name": "WALL Y0"
+        },
+        {
+          "construction_id": 0,
+          "id": 3,
+          "model_vector_index": 3,
+          "name": "WALL Y1"
+        },
+        {
+          "construction_id": 0,
+          "id": 4,
+          "model_vector_index": 4,
+          "name": "FLOOR"
+        },
+        {
+          "construction_id": 0,
+          "id": 5,
+          "model_vector_index": 5,
+          "name": "ROOF"
+        }
+      ],
+      "actual_initialized_preprocessing_owner_count": 1,
+      "Native_whole_outcomes_context_only": [
+        {
+          "index": 1,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "B-NOLIMIT-72H",
+      "Native_material_ids": [
+        {
+          "Num": 1,
+          "Name": "Mass Layer"
+        }
+      ],
+      "Rust_material_ids": [
+        {
+          "id": 0,
+          "name": "MASS LAYER"
+        }
+      ],
+      "Native_constructions": [
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            1
+          ],
+          "Name": "WALL",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 1
+        }
+      ],
+      "Rust_constructions": [
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 0,
+              "surface_name": "WALL X0"
+            },
+            {
+              "surface_id": 1,
+              "surface_name": "WALL X1"
+            },
+            {
+              "surface_id": 2,
+              "surface_name": "WALL Y0"
+            },
+            {
+              "surface_id": 3,
+              "surface_name": "WALL Y1"
+            },
+            {
+              "surface_id": 4,
+              "surface_name": "FLOOR"
+            },
+            {
+              "surface_id": 5,
+              "surface_name": "ROOF"
+            }
+          ],
+          "declared_layer_ids": [
+            0
+          ],
+          "effective_layer_ids": [
+            0
+          ],
+          "id": 0,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 0,
+          "name": "WALL",
+          "outside_layer_id": 0
+        }
+      ],
+      "Native_surface_associations": [
+        {
+          "array_index": 1,
+          "Name": "WALL X0",
+          "Construction": 1
+        },
+        {
+          "array_index": 2,
+          "Name": "WALL X1",
+          "Construction": 1
+        },
+        {
+          "array_index": 3,
+          "Name": "WALL Y0",
+          "Construction": 1
+        },
+        {
+          "array_index": 4,
+          "Name": "WALL Y1",
+          "Construction": 1
+        },
+        {
+          "array_index": 5,
+          "Name": "FLOOR",
+          "Construction": 1
+        },
+        {
+          "array_index": 6,
+          "Name": "ROOF",
+          "Construction": 1
+        }
+      ],
+      "Rust_surface_associations": [
+        {
+          "construction_id": 0,
+          "id": 0,
+          "model_vector_index": 0,
+          "name": "WALL X0"
+        },
+        {
+          "construction_id": 0,
+          "id": 1,
+          "model_vector_index": 1,
+          "name": "WALL X1"
+        },
+        {
+          "construction_id": 0,
+          "id": 2,
+          "model_vector_index": 2,
+          "name": "WALL Y0"
+        },
+        {
+          "construction_id": 0,
+          "id": 3,
+          "model_vector_index": 3,
+          "name": "WALL Y1"
+        },
+        {
+          "construction_id": 0,
+          "id": 4,
+          "model_vector_index": 4,
+          "name": "FLOOR"
+        },
+        {
+          "construction_id": 0,
+          "id": 5,
+          "model_vector_index": 5,
+          "name": "ROOF"
+        }
+      ],
+      "actual_initialized_preprocessing_owner_count": 1,
+      "Native_whole_outcomes_context_only": [
+        {
+          "index": 1,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "B-NOLIMIT-ANNUAL",
+      "Native_material_ids": [
+        {
+          "Num": 1,
+          "Name": "Mass Layer"
+        }
+      ],
+      "Rust_material_ids": [
+        {
+          "id": 0,
+          "name": "MASS LAYER"
+        }
+      ],
+      "Native_constructions": [
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            1
+          ],
+          "Name": "WALL",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 1
+        }
+      ],
+      "Rust_constructions": [
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 0,
+              "surface_name": "WALL X0"
+            },
+            {
+              "surface_id": 1,
+              "surface_name": "WALL X1"
+            },
+            {
+              "surface_id": 2,
+              "surface_name": "WALL Y0"
+            },
+            {
+              "surface_id": 3,
+              "surface_name": "WALL Y1"
+            },
+            {
+              "surface_id": 4,
+              "surface_name": "FLOOR"
+            },
+            {
+              "surface_id": 5,
+              "surface_name": "ROOF"
+            }
+          ],
+          "declared_layer_ids": [
+            0
+          ],
+          "effective_layer_ids": [
+            0
+          ],
+          "id": 0,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 0,
+          "name": "WALL",
+          "outside_layer_id": 0
+        }
+      ],
+      "Native_surface_associations": [
+        {
+          "array_index": 1,
+          "Name": "WALL X0",
+          "Construction": 1
+        },
+        {
+          "array_index": 2,
+          "Name": "WALL X1",
+          "Construction": 1
+        },
+        {
+          "array_index": 3,
+          "Name": "WALL Y0",
+          "Construction": 1
+        },
+        {
+          "array_index": 4,
+          "Name": "WALL Y1",
+          "Construction": 1
+        },
+        {
+          "array_index": 5,
+          "Name": "FLOOR",
+          "Construction": 1
+        },
+        {
+          "array_index": 6,
+          "Name": "ROOF",
+          "Construction": 1
+        }
+      ],
+      "Rust_surface_associations": [
+        {
+          "construction_id": 0,
+          "id": 0,
+          "model_vector_index": 0,
+          "name": "WALL X0"
+        },
+        {
+          "construction_id": 0,
+          "id": 1,
+          "model_vector_index": 1,
+          "name": "WALL X1"
+        },
+        {
+          "construction_id": 0,
+          "id": 2,
+          "model_vector_index": 2,
+          "name": "WALL Y0"
+        },
+        {
+          "construction_id": 0,
+          "id": 3,
+          "model_vector_index": 3,
+          "name": "WALL Y1"
+        },
+        {
+          "construction_id": 0,
+          "id": 4,
+          "model_vector_index": 4,
+          "name": "FLOOR"
+        },
+        {
+          "construction_id": 0,
+          "id": 5,
+          "model_vector_index": 5,
+          "name": "ROOF"
+        }
+      ],
+      "actual_initialized_preprocessing_owner_count": 1,
+      "Native_whole_outcomes_context_only": [
+        {
+          "index": 1,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "B-FLOW-24H",
+      "Native_material_ids": [
+        {
+          "Num": 1,
+          "Name": "Mass Layer"
+        }
+      ],
+      "Rust_material_ids": [
+        {
+          "id": 0,
+          "name": "MASS LAYER"
+        }
+      ],
+      "Native_constructions": [
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            1
+          ],
+          "Name": "WALL",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 1
+        }
+      ],
+      "Rust_constructions": [
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 0,
+              "surface_name": "WALL X0"
+            },
+            {
+              "surface_id": 1,
+              "surface_name": "WALL X1"
+            },
+            {
+              "surface_id": 2,
+              "surface_name": "WALL Y0"
+            },
+            {
+              "surface_id": 3,
+              "surface_name": "WALL Y1"
+            },
+            {
+              "surface_id": 4,
+              "surface_name": "FLOOR"
+            },
+            {
+              "surface_id": 5,
+              "surface_name": "ROOF"
+            }
+          ],
+          "declared_layer_ids": [
+            0
+          ],
+          "effective_layer_ids": [
+            0
+          ],
+          "id": 0,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 0,
+          "name": "WALL",
+          "outside_layer_id": 0
+        }
+      ],
+      "Native_surface_associations": [
+        {
+          "array_index": 1,
+          "Name": "WALL X0",
+          "Construction": 1
+        },
+        {
+          "array_index": 2,
+          "Name": "WALL X1",
+          "Construction": 1
+        },
+        {
+          "array_index": 3,
+          "Name": "WALL Y0",
+          "Construction": 1
+        },
+        {
+          "array_index": 4,
+          "Name": "WALL Y1",
+          "Construction": 1
+        },
+        {
+          "array_index": 5,
+          "Name": "FLOOR",
+          "Construction": 1
+        },
+        {
+          "array_index": 6,
+          "Name": "ROOF",
+          "Construction": 1
+        }
+      ],
+      "Rust_surface_associations": [
+        {
+          "construction_id": 0,
+          "id": 0,
+          "model_vector_index": 0,
+          "name": "WALL X0"
+        },
+        {
+          "construction_id": 0,
+          "id": 1,
+          "model_vector_index": 1,
+          "name": "WALL X1"
+        },
+        {
+          "construction_id": 0,
+          "id": 2,
+          "model_vector_index": 2,
+          "name": "WALL Y0"
+        },
+        {
+          "construction_id": 0,
+          "id": 3,
+          "model_vector_index": 3,
+          "name": "WALL Y1"
+        },
+        {
+          "construction_id": 0,
+          "id": 4,
+          "model_vector_index": 4,
+          "name": "FLOOR"
+        },
+        {
+          "construction_id": 0,
+          "id": 5,
+          "model_vector_index": 5,
+          "name": "ROOF"
+        }
+      ],
+      "actual_initialized_preprocessing_owner_count": 1,
+      "Native_whole_outcomes_context_only": [
+        {
+          "index": 1,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "B-FLOW-72H",
+      "Native_material_ids": [
+        {
+          "Num": 1,
+          "Name": "Mass Layer"
+        }
+      ],
+      "Rust_material_ids": [
+        {
+          "id": 0,
+          "name": "MASS LAYER"
+        }
+      ],
+      "Native_constructions": [
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            1
+          ],
+          "Name": "WALL",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 1
+        }
+      ],
+      "Rust_constructions": [
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 0,
+              "surface_name": "WALL X0"
+            },
+            {
+              "surface_id": 1,
+              "surface_name": "WALL X1"
+            },
+            {
+              "surface_id": 2,
+              "surface_name": "WALL Y0"
+            },
+            {
+              "surface_id": 3,
+              "surface_name": "WALL Y1"
+            },
+            {
+              "surface_id": 4,
+              "surface_name": "FLOOR"
+            },
+            {
+              "surface_id": 5,
+              "surface_name": "ROOF"
+            }
+          ],
+          "declared_layer_ids": [
+            0
+          ],
+          "effective_layer_ids": [
+            0
+          ],
+          "id": 0,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 0,
+          "name": "WALL",
+          "outside_layer_id": 0
+        }
+      ],
+      "Native_surface_associations": [
+        {
+          "array_index": 1,
+          "Name": "WALL X0",
+          "Construction": 1
+        },
+        {
+          "array_index": 2,
+          "Name": "WALL X1",
+          "Construction": 1
+        },
+        {
+          "array_index": 3,
+          "Name": "WALL Y0",
+          "Construction": 1
+        },
+        {
+          "array_index": 4,
+          "Name": "WALL Y1",
+          "Construction": 1
+        },
+        {
+          "array_index": 5,
+          "Name": "FLOOR",
+          "Construction": 1
+        },
+        {
+          "array_index": 6,
+          "Name": "ROOF",
+          "Construction": 1
+        }
+      ],
+      "Rust_surface_associations": [
+        {
+          "construction_id": 0,
+          "id": 0,
+          "model_vector_index": 0,
+          "name": "WALL X0"
+        },
+        {
+          "construction_id": 0,
+          "id": 1,
+          "model_vector_index": 1,
+          "name": "WALL X1"
+        },
+        {
+          "construction_id": 0,
+          "id": 2,
+          "model_vector_index": 2,
+          "name": "WALL Y0"
+        },
+        {
+          "construction_id": 0,
+          "id": 3,
+          "model_vector_index": 3,
+          "name": "WALL Y1"
+        },
+        {
+          "construction_id": 0,
+          "id": 4,
+          "model_vector_index": 4,
+          "name": "FLOOR"
+        },
+        {
+          "construction_id": 0,
+          "id": 5,
+          "model_vector_index": 5,
+          "name": "ROOF"
+        }
+      ],
+      "actual_initialized_preprocessing_owner_count": 1,
+      "Native_whole_outcomes_context_only": [
+        {
+          "index": 1,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "B-FLOW-ANNUAL",
+      "Native_material_ids": [
+        {
+          "Num": 1,
+          "Name": "Mass Layer"
+        }
+      ],
+      "Rust_material_ids": [
+        {
+          "id": 0,
+          "name": "MASS LAYER"
+        }
+      ],
+      "Native_constructions": [
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            1
+          ],
+          "Name": "WALL",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 1
+        }
+      ],
+      "Rust_constructions": [
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 0,
+              "surface_name": "WALL X0"
+            },
+            {
+              "surface_id": 1,
+              "surface_name": "WALL X1"
+            },
+            {
+              "surface_id": 2,
+              "surface_name": "WALL Y0"
+            },
+            {
+              "surface_id": 3,
+              "surface_name": "WALL Y1"
+            },
+            {
+              "surface_id": 4,
+              "surface_name": "FLOOR"
+            },
+            {
+              "surface_id": 5,
+              "surface_name": "ROOF"
+            }
+          ],
+          "declared_layer_ids": [
+            0
+          ],
+          "effective_layer_ids": [
+            0
+          ],
+          "id": 0,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 0,
+          "name": "WALL",
+          "outside_layer_id": 0
+        }
+      ],
+      "Native_surface_associations": [
+        {
+          "array_index": 1,
+          "Name": "WALL X0",
+          "Construction": 1
+        },
+        {
+          "array_index": 2,
+          "Name": "WALL X1",
+          "Construction": 1
+        },
+        {
+          "array_index": 3,
+          "Name": "WALL Y0",
+          "Construction": 1
+        },
+        {
+          "array_index": 4,
+          "Name": "WALL Y1",
+          "Construction": 1
+        },
+        {
+          "array_index": 5,
+          "Name": "FLOOR",
+          "Construction": 1
+        },
+        {
+          "array_index": 6,
+          "Name": "ROOF",
+          "Construction": 1
+        }
+      ],
+      "Rust_surface_associations": [
+        {
+          "construction_id": 0,
+          "id": 0,
+          "model_vector_index": 0,
+          "name": "WALL X0"
+        },
+        {
+          "construction_id": 0,
+          "id": 1,
+          "model_vector_index": 1,
+          "name": "WALL X1"
+        },
+        {
+          "construction_id": 0,
+          "id": 2,
+          "model_vector_index": 2,
+          "name": "WALL Y0"
+        },
+        {
+          "construction_id": 0,
+          "id": 3,
+          "model_vector_index": 3,
+          "name": "WALL Y1"
+        },
+        {
+          "construction_id": 0,
+          "id": 4,
+          "model_vector_index": 4,
+          "name": "FLOOR"
+        },
+        {
+          "construction_id": 0,
+          "id": 5,
+          "model_vector_index": 5,
+          "name": "ROOF"
+        }
+      ],
+      "actual_initialized_preprocessing_owner_count": 1,
+      "Native_whole_outcomes_context_only": [
+        {
+          "index": 1,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "B-CAPACITY-24H",
+      "Native_material_ids": [
+        {
+          "Num": 1,
+          "Name": "Mass Layer"
+        }
+      ],
+      "Rust_material_ids": [
+        {
+          "id": 0,
+          "name": "MASS LAYER"
+        }
+      ],
+      "Native_constructions": [
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            1
+          ],
+          "Name": "WALL",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 1
+        }
+      ],
+      "Rust_constructions": [
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 0,
+              "surface_name": "WALL X0"
+            },
+            {
+              "surface_id": 1,
+              "surface_name": "WALL X1"
+            },
+            {
+              "surface_id": 2,
+              "surface_name": "WALL Y0"
+            },
+            {
+              "surface_id": 3,
+              "surface_name": "WALL Y1"
+            },
+            {
+              "surface_id": 4,
+              "surface_name": "FLOOR"
+            },
+            {
+              "surface_id": 5,
+              "surface_name": "ROOF"
+            }
+          ],
+          "declared_layer_ids": [
+            0
+          ],
+          "effective_layer_ids": [
+            0
+          ],
+          "id": 0,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 0,
+          "name": "WALL",
+          "outside_layer_id": 0
+        }
+      ],
+      "Native_surface_associations": [
+        {
+          "array_index": 1,
+          "Name": "WALL X0",
+          "Construction": 1
+        },
+        {
+          "array_index": 2,
+          "Name": "WALL X1",
+          "Construction": 1
+        },
+        {
+          "array_index": 3,
+          "Name": "WALL Y0",
+          "Construction": 1
+        },
+        {
+          "array_index": 4,
+          "Name": "WALL Y1",
+          "Construction": 1
+        },
+        {
+          "array_index": 5,
+          "Name": "FLOOR",
+          "Construction": 1
+        },
+        {
+          "array_index": 6,
+          "Name": "ROOF",
+          "Construction": 1
+        }
+      ],
+      "Rust_surface_associations": [
+        {
+          "construction_id": 0,
+          "id": 0,
+          "model_vector_index": 0,
+          "name": "WALL X0"
+        },
+        {
+          "construction_id": 0,
+          "id": 1,
+          "model_vector_index": 1,
+          "name": "WALL X1"
+        },
+        {
+          "construction_id": 0,
+          "id": 2,
+          "model_vector_index": 2,
+          "name": "WALL Y0"
+        },
+        {
+          "construction_id": 0,
+          "id": 3,
+          "model_vector_index": 3,
+          "name": "WALL Y1"
+        },
+        {
+          "construction_id": 0,
+          "id": 4,
+          "model_vector_index": 4,
+          "name": "FLOOR"
+        },
+        {
+          "construction_id": 0,
+          "id": 5,
+          "model_vector_index": 5,
+          "name": "ROOF"
+        }
+      ],
+      "actual_initialized_preprocessing_owner_count": 1,
+      "Native_whole_outcomes_context_only": [
+        {
+          "index": 1,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "B-CAPACITY-72H",
+      "Native_material_ids": [
+        {
+          "Num": 1,
+          "Name": "Mass Layer"
+        }
+      ],
+      "Rust_material_ids": [
+        {
+          "id": 0,
+          "name": "MASS LAYER"
+        }
+      ],
+      "Native_constructions": [
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            1
+          ],
+          "Name": "WALL",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 1
+        }
+      ],
+      "Rust_constructions": [
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 0,
+              "surface_name": "WALL X0"
+            },
+            {
+              "surface_id": 1,
+              "surface_name": "WALL X1"
+            },
+            {
+              "surface_id": 2,
+              "surface_name": "WALL Y0"
+            },
+            {
+              "surface_id": 3,
+              "surface_name": "WALL Y1"
+            },
+            {
+              "surface_id": 4,
+              "surface_name": "FLOOR"
+            },
+            {
+              "surface_id": 5,
+              "surface_name": "ROOF"
+            }
+          ],
+          "declared_layer_ids": [
+            0
+          ],
+          "effective_layer_ids": [
+            0
+          ],
+          "id": 0,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 0,
+          "name": "WALL",
+          "outside_layer_id": 0
+        }
+      ],
+      "Native_surface_associations": [
+        {
+          "array_index": 1,
+          "Name": "WALL X0",
+          "Construction": 1
+        },
+        {
+          "array_index": 2,
+          "Name": "WALL X1",
+          "Construction": 1
+        },
+        {
+          "array_index": 3,
+          "Name": "WALL Y0",
+          "Construction": 1
+        },
+        {
+          "array_index": 4,
+          "Name": "WALL Y1",
+          "Construction": 1
+        },
+        {
+          "array_index": 5,
+          "Name": "FLOOR",
+          "Construction": 1
+        },
+        {
+          "array_index": 6,
+          "Name": "ROOF",
+          "Construction": 1
+        }
+      ],
+      "Rust_surface_associations": [
+        {
+          "construction_id": 0,
+          "id": 0,
+          "model_vector_index": 0,
+          "name": "WALL X0"
+        },
+        {
+          "construction_id": 0,
+          "id": 1,
+          "model_vector_index": 1,
+          "name": "WALL X1"
+        },
+        {
+          "construction_id": 0,
+          "id": 2,
+          "model_vector_index": 2,
+          "name": "WALL Y0"
+        },
+        {
+          "construction_id": 0,
+          "id": 3,
+          "model_vector_index": 3,
+          "name": "WALL Y1"
+        },
+        {
+          "construction_id": 0,
+          "id": 4,
+          "model_vector_index": 4,
+          "name": "FLOOR"
+        },
+        {
+          "construction_id": 0,
+          "id": 5,
+          "model_vector_index": 5,
+          "name": "ROOF"
+        }
+      ],
+      "actual_initialized_preprocessing_owner_count": 1,
+      "Native_whole_outcomes_context_only": [
+        {
+          "index": 1,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "B-CAPACITY-ANNUAL",
+      "Native_material_ids": [
+        {
+          "Num": 1,
+          "Name": "Mass Layer"
+        }
+      ],
+      "Rust_material_ids": [
+        {
+          "id": 0,
+          "name": "MASS LAYER"
+        }
+      ],
+      "Native_constructions": [
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            1
+          ],
+          "Name": "WALL",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 1
+        }
+      ],
+      "Rust_constructions": [
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 0,
+              "surface_name": "WALL X0"
+            },
+            {
+              "surface_id": 1,
+              "surface_name": "WALL X1"
+            },
+            {
+              "surface_id": 2,
+              "surface_name": "WALL Y0"
+            },
+            {
+              "surface_id": 3,
+              "surface_name": "WALL Y1"
+            },
+            {
+              "surface_id": 4,
+              "surface_name": "FLOOR"
+            },
+            {
+              "surface_id": 5,
+              "surface_name": "ROOF"
+            }
+          ],
+          "declared_layer_ids": [
+            0
+          ],
+          "effective_layer_ids": [
+            0
+          ],
+          "id": 0,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 0,
+          "name": "WALL",
+          "outside_layer_id": 0
+        }
+      ],
+      "Native_surface_associations": [
+        {
+          "array_index": 1,
+          "Name": "WALL X0",
+          "Construction": 1
+        },
+        {
+          "array_index": 2,
+          "Name": "WALL X1",
+          "Construction": 1
+        },
+        {
+          "array_index": 3,
+          "Name": "WALL Y0",
+          "Construction": 1
+        },
+        {
+          "array_index": 4,
+          "Name": "WALL Y1",
+          "Construction": 1
+        },
+        {
+          "array_index": 5,
+          "Name": "FLOOR",
+          "Construction": 1
+        },
+        {
+          "array_index": 6,
+          "Name": "ROOF",
+          "Construction": 1
+        }
+      ],
+      "Rust_surface_associations": [
+        {
+          "construction_id": 0,
+          "id": 0,
+          "model_vector_index": 0,
+          "name": "WALL X0"
+        },
+        {
+          "construction_id": 0,
+          "id": 1,
+          "model_vector_index": 1,
+          "name": "WALL X1"
+        },
+        {
+          "construction_id": 0,
+          "id": 2,
+          "model_vector_index": 2,
+          "name": "WALL Y0"
+        },
+        {
+          "construction_id": 0,
+          "id": 3,
+          "model_vector_index": 3,
+          "name": "WALL Y1"
+        },
+        {
+          "construction_id": 0,
+          "id": 4,
+          "model_vector_index": 4,
+          "name": "FLOOR"
+        },
+        {
+          "construction_id": 0,
+          "id": 5,
+          "model_vector_index": 5,
+          "name": "ROOF"
+        }
+      ],
+      "actual_initialized_preprocessing_owner_count": 1,
+      "Native_whole_outcomes_context_only": [
+        {
+          "index": 1,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "B-BOTH-24H",
+      "Native_material_ids": [
+        {
+          "Num": 1,
+          "Name": "Mass Layer"
+        }
+      ],
+      "Rust_material_ids": [
+        {
+          "id": 0,
+          "name": "MASS LAYER"
+        }
+      ],
+      "Native_constructions": [
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            1
+          ],
+          "Name": "WALL",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 1
+        }
+      ],
+      "Rust_constructions": [
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 0,
+              "surface_name": "WALL X0"
+            },
+            {
+              "surface_id": 1,
+              "surface_name": "WALL X1"
+            },
+            {
+              "surface_id": 2,
+              "surface_name": "WALL Y0"
+            },
+            {
+              "surface_id": 3,
+              "surface_name": "WALL Y1"
+            },
+            {
+              "surface_id": 4,
+              "surface_name": "FLOOR"
+            },
+            {
+              "surface_id": 5,
+              "surface_name": "ROOF"
+            }
+          ],
+          "declared_layer_ids": [
+            0
+          ],
+          "effective_layer_ids": [
+            0
+          ],
+          "id": 0,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 0,
+          "name": "WALL",
+          "outside_layer_id": 0
+        }
+      ],
+      "Native_surface_associations": [
+        {
+          "array_index": 1,
+          "Name": "WALL X0",
+          "Construction": 1
+        },
+        {
+          "array_index": 2,
+          "Name": "WALL X1",
+          "Construction": 1
+        },
+        {
+          "array_index": 3,
+          "Name": "WALL Y0",
+          "Construction": 1
+        },
+        {
+          "array_index": 4,
+          "Name": "WALL Y1",
+          "Construction": 1
+        },
+        {
+          "array_index": 5,
+          "Name": "FLOOR",
+          "Construction": 1
+        },
+        {
+          "array_index": 6,
+          "Name": "ROOF",
+          "Construction": 1
+        }
+      ],
+      "Rust_surface_associations": [
+        {
+          "construction_id": 0,
+          "id": 0,
+          "model_vector_index": 0,
+          "name": "WALL X0"
+        },
+        {
+          "construction_id": 0,
+          "id": 1,
+          "model_vector_index": 1,
+          "name": "WALL X1"
+        },
+        {
+          "construction_id": 0,
+          "id": 2,
+          "model_vector_index": 2,
+          "name": "WALL Y0"
+        },
+        {
+          "construction_id": 0,
+          "id": 3,
+          "model_vector_index": 3,
+          "name": "WALL Y1"
+        },
+        {
+          "construction_id": 0,
+          "id": 4,
+          "model_vector_index": 4,
+          "name": "FLOOR"
+        },
+        {
+          "construction_id": 0,
+          "id": 5,
+          "model_vector_index": 5,
+          "name": "ROOF"
+        }
+      ],
+      "actual_initialized_preprocessing_owner_count": 1,
+      "Native_whole_outcomes_context_only": [
+        {
+          "index": 1,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "B-BOTH-72H",
+      "Native_material_ids": [
+        {
+          "Num": 1,
+          "Name": "Mass Layer"
+        }
+      ],
+      "Rust_material_ids": [
+        {
+          "id": 0,
+          "name": "MASS LAYER"
+        }
+      ],
+      "Native_constructions": [
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            1
+          ],
+          "Name": "WALL",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 1
+        }
+      ],
+      "Rust_constructions": [
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 0,
+              "surface_name": "WALL X0"
+            },
+            {
+              "surface_id": 1,
+              "surface_name": "WALL X1"
+            },
+            {
+              "surface_id": 2,
+              "surface_name": "WALL Y0"
+            },
+            {
+              "surface_id": 3,
+              "surface_name": "WALL Y1"
+            },
+            {
+              "surface_id": 4,
+              "surface_name": "FLOOR"
+            },
+            {
+              "surface_id": 5,
+              "surface_name": "ROOF"
+            }
+          ],
+          "declared_layer_ids": [
+            0
+          ],
+          "effective_layer_ids": [
+            0
+          ],
+          "id": 0,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 0,
+          "name": "WALL",
+          "outside_layer_id": 0
+        }
+      ],
+      "Native_surface_associations": [
+        {
+          "array_index": 1,
+          "Name": "WALL X0",
+          "Construction": 1
+        },
+        {
+          "array_index": 2,
+          "Name": "WALL X1",
+          "Construction": 1
+        },
+        {
+          "array_index": 3,
+          "Name": "WALL Y0",
+          "Construction": 1
+        },
+        {
+          "array_index": 4,
+          "Name": "WALL Y1",
+          "Construction": 1
+        },
+        {
+          "array_index": 5,
+          "Name": "FLOOR",
+          "Construction": 1
+        },
+        {
+          "array_index": 6,
+          "Name": "ROOF",
+          "Construction": 1
+        }
+      ],
+      "Rust_surface_associations": [
+        {
+          "construction_id": 0,
+          "id": 0,
+          "model_vector_index": 0,
+          "name": "WALL X0"
+        },
+        {
+          "construction_id": 0,
+          "id": 1,
+          "model_vector_index": 1,
+          "name": "WALL X1"
+        },
+        {
+          "construction_id": 0,
+          "id": 2,
+          "model_vector_index": 2,
+          "name": "WALL Y0"
+        },
+        {
+          "construction_id": 0,
+          "id": 3,
+          "model_vector_index": 3,
+          "name": "WALL Y1"
+        },
+        {
+          "construction_id": 0,
+          "id": 4,
+          "model_vector_index": 4,
+          "name": "FLOOR"
+        },
+        {
+          "construction_id": 0,
+          "id": 5,
+          "model_vector_index": 5,
+          "name": "ROOF"
+        }
+      ],
+      "actual_initialized_preprocessing_owner_count": 1,
+      "Native_whole_outcomes_context_only": [
+        {
+          "index": 1,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    },
+    {
+      "model_id": "B-BOTH-ANNUAL",
+      "Native_material_ids": [
+        {
+          "Num": 1,
+          "Name": "Mass Layer"
+        }
+      ],
+      "Rust_material_ids": [
+        {
+          "id": 0,
+          "name": "MASS LAYER"
+        }
+      ],
+      "Native_constructions": [
+        {
+          "IsUsed": true,
+          "IsUsedCTF": true,
+          "LayerPoint_active": [
+            1
+          ],
+          "Name": "WALL",
+          "SolutionDimensions": 1,
+          "SourceAfterLayer": 0,
+          "SourceSinkPresent": false,
+          "TempAfterLayer": 0,
+          "ThicknessPerpend": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "TotLayers": 1,
+          "array_index": 1
+        }
+      ],
+      "Rust_constructions": [
+        {
+          "actual_surface_associations": [
+            {
+              "surface_id": 0,
+              "surface_name": "WALL X0"
+            },
+            {
+              "surface_id": 1,
+              "surface_name": "WALL X1"
+            },
+            {
+              "surface_id": 2,
+              "surface_name": "WALL Y0"
+            },
+            {
+              "surface_id": 3,
+              "surface_name": "WALL Y1"
+            },
+            {
+              "surface_id": 4,
+              "surface_name": "FLOOR"
+            },
+            {
+              "surface_id": 5,
+              "surface_name": "ROOF"
+            }
+          ],
+          "declared_layer_ids": [
+            0
+          ],
+          "effective_layer_ids": [
+            0
+          ],
+          "id": 0,
+          "internal_heat_source_declaration": "None",
+          "kind": "Opaque",
+          "model_vector_index": 0,
+          "name": "WALL",
+          "outside_layer_id": 0
+        }
+      ],
+      "Native_surface_associations": [
+        {
+          "array_index": 1,
+          "Name": "WALL X0",
+          "Construction": 1
+        },
+        {
+          "array_index": 2,
+          "Name": "WALL X1",
+          "Construction": 1
+        },
+        {
+          "array_index": 3,
+          "Name": "WALL Y0",
+          "Construction": 1
+        },
+        {
+          "array_index": 4,
+          "Name": "WALL Y1",
+          "Construction": 1
+        },
+        {
+          "array_index": 5,
+          "Name": "FLOOR",
+          "Construction": 1
+        },
+        {
+          "array_index": 6,
+          "Name": "ROOF",
+          "Construction": 1
+        }
+      ],
+      "Rust_surface_associations": [
+        {
+          "construction_id": 0,
+          "id": 0,
+          "model_vector_index": 0,
+          "name": "WALL X0"
+        },
+        {
+          "construction_id": 0,
+          "id": 1,
+          "model_vector_index": 1,
+          "name": "WALL X1"
+        },
+        {
+          "construction_id": 0,
+          "id": 2,
+          "model_vector_index": 2,
+          "name": "WALL Y0"
+        },
+        {
+          "construction_id": 0,
+          "id": 3,
+          "model_vector_index": 3,
+          "name": "WALL Y1"
+        },
+        {
+          "construction_id": 0,
+          "id": 4,
+          "model_vector_index": 4,
+          "name": "FLOOR"
+        },
+        {
+          "construction_id": 0,
+          "id": 5,
+          "model_vector_index": 5,
+          "name": "ROOF"
+        }
+      ],
+      "actual_initialized_preprocessing_owner_count": 1,
+      "Native_whole_outcomes_context_only": [
+        {
+          "index": 1,
+          "actual_source_invoked": true,
+          "call_outcome": {
+            "exception_message": null,
+            "exception_type": null,
+            "source_exception": false,
+            "source_fatal": false,
+            "status": "source_returned"
+          }
+        }
+      ]
+    }
+  ],
+  "actual_input_conversion_bindings": [
+    {
+      "case_id": "A-24H",
+      "ledger": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+        "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+        "size_bytes": 76172
+      },
+      "execution": {
+        "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+        "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+        "size_bytes": 3146
+      },
+      "child": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/A-24H/conversion.json",
+        "sha256": "edee535e8e7b621962677975eaa1d9ba0f06c915b32b272ce60cee58e2156f4d",
+        "size_bytes": 2684
+      }
+    },
+    {
+      "case_id": "A-72H",
+      "ledger": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+        "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+        "size_bytes": 76172
+      },
+      "execution": {
+        "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+        "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+        "size_bytes": 3146
+      },
+      "child": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/A-72H/conversion.json",
+        "sha256": "ca92580f96d4fca25a3d124b94c293e0d8fedaaa4ff3a6478883f9929bc3f648",
+        "size_bytes": 2684
+      }
+    },
+    {
+      "case_id": "A-ANNUAL",
+      "ledger": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+        "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+        "size_bytes": 76172
+      },
+      "execution": {
+        "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+        "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+        "size_bytes": 3146
+      },
+      "child": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/A-ANNUAL/conversion.json",
+        "sha256": "9f3b0fca78a892e82f2cdff0d4e7b90d489509426732928ddb130f0a64a351ae",
+        "size_bytes": 2717
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-24H",
+      "ledger": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+        "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+        "size_bytes": 76172
+      },
+      "execution": {
+        "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+        "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+        "size_bytes": 3146
+      },
+      "child": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-24H/conversion.json",
+        "sha256": "3ee553c15e2152a7d6dc8b49f65317b1ed25fa19a833c081ebbaf59f975ec44b",
+        "size_bytes": 2775
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-72H",
+      "ledger": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+        "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+        "size_bytes": 76172
+      },
+      "execution": {
+        "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+        "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+        "size_bytes": 3146
+      },
+      "child": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-72H/conversion.json",
+        "sha256": "805cfce78d57f5e0e07cc6cfbf30d398c94861630d58d7348b119fe74e802ccf",
+        "size_bytes": 2775
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-ANNUAL",
+      "ledger": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+        "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+        "size_bytes": 76172
+      },
+      "execution": {
+        "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+        "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+        "size_bytes": 3146
+      },
+      "child": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-ANNUAL/conversion.json",
+        "sha256": "607a8c799254cda407be30c2c3102a729cdfa9290c14fc2843c718fb251b879b",
+        "size_bytes": 2808
+      }
+    },
+    {
+      "case_id": "B-FLOW-24H",
+      "ledger": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+        "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+        "size_bytes": 76172
+      },
+      "execution": {
+        "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+        "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+        "size_bytes": 3146
+      },
+      "child": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-24H/conversion.json",
+        "sha256": "24e0bcb4a398879af7f25860465464b6d5556ad62903ce4838afc1b00d0f3674",
+        "size_bytes": 2742
+      }
+    },
+    {
+      "case_id": "B-FLOW-72H",
+      "ledger": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+        "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+        "size_bytes": 76172
+      },
+      "execution": {
+        "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+        "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+        "size_bytes": 3146
+      },
+      "child": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-72H/conversion.json",
+        "sha256": "b941112ea03544d6534d731c6e7356b3da1f8eb7477d3fad33becea41fa14de8",
+        "size_bytes": 2742
+      }
+    },
+    {
+      "case_id": "B-FLOW-ANNUAL",
+      "ledger": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+        "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+        "size_bytes": 76172
+      },
+      "execution": {
+        "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+        "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+        "size_bytes": 3146
+      },
+      "child": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-ANNUAL/conversion.json",
+        "sha256": "c7309de9ac5e92ee84ea53b54bdeb61e9ec74464951babe0ea4fb4ed2bed41f0",
+        "size_bytes": 2775
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-24H",
+      "ledger": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+        "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+        "size_bytes": 76172
+      },
+      "execution": {
+        "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+        "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+        "size_bytes": 3146
+      },
+      "child": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-24H/conversion.json",
+        "sha256": "3236a8038b98eb9bdb8aca294d25ca8bbcbc8c6954ad5fea98c2080f155cc40a",
+        "size_bytes": 2786
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-72H",
+      "ledger": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+        "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+        "size_bytes": 76172
+      },
+      "execution": {
+        "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+        "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+        "size_bytes": 3146
+      },
+      "child": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-72H/conversion.json",
+        "sha256": "470728782f29d47fbf2b47e0b63fa4ed2a7094fcf2d6feb40b09ed81dd48e02d",
+        "size_bytes": 2786
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-ANNUAL",
+      "ledger": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+        "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+        "size_bytes": 76172
+      },
+      "execution": {
+        "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+        "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+        "size_bytes": 3146
+      },
+      "child": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-ANNUAL/conversion.json",
+        "sha256": "445d64f53bcf361edb307c06c05d3e95b0cb9e5d9e5a61d02d4f8b600b2f4da5",
+        "size_bytes": 2819
+      }
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "ledger": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+        "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+        "size_bytes": 76172
+      },
+      "execution": {
+        "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+        "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+        "size_bytes": 3146
+      },
+      "child": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-24H/conversion.json",
+        "sha256": "7a7123c9f7d90e33c35343b4a007b9ca49c79d09dcad92fcc487ecf532d92364",
+        "size_bytes": 2742
+      }
+    },
+    {
+      "case_id": "B-BOTH-72H",
+      "ledger": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+        "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+        "size_bytes": 76172
+      },
+      "execution": {
+        "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+        "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+        "size_bytes": 3146
+      },
+      "child": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-72H/conversion.json",
+        "sha256": "ae5fb503177874316afc5a71ac1ba3c5b37318740fa6f0e7e1466a80cc3764e7",
+        "size_bytes": 2742
+      }
+    },
+    {
+      "case_id": "B-BOTH-ANNUAL",
+      "ledger": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json",
+        "sha256": "3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367",
+        "size_bytes": 76172
+      },
+      "execution": {
+        "path": ".runtime/porting/SCH-01/conversion-command-01/receipt.json",
+        "sha256": "3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca",
+        "size_bytes": 3146
+      },
+      "child": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-ANNUAL/conversion.json",
+        "sha256": "072ced0051d32351ddd185b68874e92281f03b75b90537fafb346ea8a78fab27",
+        "size_bytes": 2775
+      }
+    }
+  ],
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/CTF-03/comparer-prep-02/compare_production.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-03/production-comparison-01/000-compare_production.py",
+        "sha256": "e22f1c47abca3a7d5192dbbfb2ad9753bbbed045cad051b1a3ca91aee98d6afc",
+        "size_bytes": 55486
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-03/comparer-prep-02/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-03/production-comparison-01/001-packet_io.py",
+        "sha256": "15b0f4f384b705c160f67d97bfe391fa0ae6de18b1d4d5e014cbce59eaf83960",
+        "size_bytes": 3892
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CTF-03/production-comparison-01/000-compare_production.py",
+    "sha256": "e22f1c47abca3a7d5192dbbfb2ad9753bbbed045cad051b1a3ca91aee98d6afc",
+    "size_bytes": 55486
+  },
+  "selected_fixed15_initial_PASS_claimed": true,
+  "complete_CTF03_PASS_claimed": false,
+  "production_CLI6_or_downstream_coefficient_handoff_certified": false,
+  "CTF04_through_CTF10_certified": false,
+  "Native_whole_final_ErrorsFound_DoCTFErrorReport_massive_coefficients_paired": false,
+  "Native_flags_injected_or_missing_required_owners_masked": false,
+  "scientific_engine_or_layer_evaluator_invoked": false,
+  "Rust_binary_payload_rehashed": true,
+  "Native_binary_payloads_read_or_rehashed": false,
+  "gates_updated": false,
+  "authorship_limits": "Raw adapted the accepted Base production comparer and authored preprocessing/observers; Header authored Native/QA glue. Actual comparison is not an independent certificate of reused own formulas."
+}

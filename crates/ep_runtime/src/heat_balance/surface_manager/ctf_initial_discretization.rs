@@ -1,0 +1,201 @@
+//! Selected initial 1D discretization from Construction.cc 490-619.
+//!
+//! Call only after actual unused/error/all-resistive/reverse route selection.
+//! This owner does not run reverse reuse, matrix assembly, or timestep retries.
+
+use super::ctf_layer_preprocessing::CtfConvertedLayers;
+
+const MAX_ACTIVE_LAYERS: usize = 11;
+const MIN_NODES: i32 = 6;
+const MAX_CTF_TERMS: i32 = 19;
+
+/// Actual initial node count and spacing for one converted active layer.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct CtfInitialLayerNodes {
+    /// Source Nodes, including the single interior resistive node.
+    pub nodes: i32,
+    /// Source dx in the converted layer's English length units.
+    pub dx: f64,
+}
+
+/// Reached initial phase before original Construction.cc 620 matrix assembly.
+#[derive(Clone, Debug, PartialEq)]
+pub struct CtfInitialDiscretization {
+    /// Converted active-prefix order; these are not original material IDs.
+    pub active: Vec<CtfInitialLayerNodes>,
+    /// Source sum(Nodes) minus one for the selected one-dimensional route.
+    pub rcmax: i32,
+    /// Actual no-source helper assignment.
+    pub node_source: i32,
+    /// Actual no-source helper assignment.
+    pub node_user_temp: i32,
+    /// Actual caller zone timestep in fractional hours.
+    pub time_step_zone_hours: f64,
+    /// Initial selected timestep; later retry updates are a separate owner.
+    pub initial_ctf_time_step_hours: f64,
+    /// Initial selected history count, including the source's retained zero.
+    pub initial_num_histories: i32,
+}
+
+/// Explicit input/scope stops; none supplies replacement numerical operands.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum CtfInitialDiscretizationScopeError {
+    /// There is no selected active layer prefix.
+    EmptyActivePrefix,
+    /// The original local array capacity would be exceeded.
+    ActivePrefixTooLong {
+        /// Supplied active layer count.
+        actual: usize,
+    },
+    /// NumResLayers cannot exceed the active prefix length.
+    InconsistentResistiveCount {
+        /// Supplied active layer count.
+        active: usize,
+        /// Supplied actual NumResLayers.
+        resistive: usize,
+    },
+    /// The original all-resistive branch does not enter this phase.
+    AllResistive,
+    /// The admitted source caller must supply finite positive fractional hours.
+    UnsupportedZoneTimeStep,
+    /// The actual node estimate has no defined C++ int conversion in scope.
+    UnsupportedNodeIntegerConversion {
+        /// Zero-based index in the converted active prefix.
+        layer_index: usize,
+    },
+    /// The actual history estimate has no defined C++ int conversion in scope.
+    UnsupportedHistoryIntegerConversion,
+}
+
+impl std::fmt::Display for CtfInitialDiscretizationScopeError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            formatter,
+            "selected initial CTF discretization unavailable: {self:?}"
+        )
+    }
+}
+
+impl std::error::Error for CtfInitialDiscretizationScopeError {}
+
+/// Select initial Nodes/dx/rcmax and timestep from actual converted owners.
+///
+/// The caller must establish SourceSinkPresent=false, SolutionDimensions=1,
+/// IsUsedCTF=true, no incoming loading error, and no actual reverse reuse.
+/// Those routes are deliberately not inferred from numerical layer values.
+/// The proposed pre-output admission excludes undefined C++ integer conversions;
+/// this function stops explicitly rather than extending them by saturation.
+#[allow(
+    clippy::manual_clamp,
+    reason = "Preserve pinned Construction.cc 490-619 source branch order."
+)]
+pub fn discretize_selected_ctf_1d_initial(
+    converted: &CtfConvertedLayers,
+    time_step_zone_hours: f64,
+) -> Result<CtfInitialDiscretization, CtfInitialDiscretizationScopeError> {
+    use CtfInitialDiscretizationScopeError as ScopeError;
+
+    let layers = &converted.active.layers;
+    if layers.is_empty() {
+        return Err(ScopeError::EmptyActivePrefix);
+    }
+    if layers.len() > MAX_ACTIVE_LAYERS {
+        return Err(ScopeError::ActivePrefixTooLong {
+            actual: layers.len(),
+        });
+    }
+    if converted.active.num_res_layers > layers.len() {
+        return Err(ScopeError::InconsistentResistiveCount {
+            active: layers.len(),
+            resistive: converted.active.num_res_layers,
+        });
+    }
+    if layers.len() == converted.active.num_res_layers {
+        return Err(ScopeError::AllResistive);
+    }
+    if !time_step_zone_hours.is_finite() || time_step_zone_hours <= 0.0 {
+        return Err(ScopeError::UnsupportedZoneTimeStep);
+    }
+
+    let mut active = Vec::with_capacity(layers.len());
+    for (index, layer) in layers.iter().enumerate() {
+        if layer.res_layer && index > 0 && index + 1 < layers.len() {
+            active.push(CtfInitialLayerNodes {
+                nodes: 1,
+                dx: layer.dl,
+            });
+        } else {
+            let dxn = (2.0 * (layer.rk / layer.rho / layer.cp) * time_step_zone_hours).sqrt();
+            let estimate = source_i32(layer.dl / dxn)
+                .ok_or(ScopeError::UnsupportedNodeIntegerConversion { layer_index: index })?;
+            let nodes = if estimate > MAX_CTF_TERMS {
+                MAX_CTF_TERMS
+            } else if estimate < MIN_NODES {
+                MIN_NODES
+            } else {
+                estimate
+            };
+            active.push(CtfInitialLayerNodes {
+                nodes,
+                dx: layer.dl / f64::from(nodes),
+            });
+        }
+    }
+
+    let mut rcmax = 0;
+    for layer in &active {
+        rcmax += layer.nodes;
+    }
+    rcmax -= 1;
+    // setNodeSourceAndUserTemp clears both owners before its no-source return.
+    let node_source = 0;
+    let node_user_temp = 0;
+
+    let mut initial_ctf_time_step_hours = 0.0;
+    let mut initial_num_histories = 0;
+    for (layer, discretized) in layers.iter().zip(&active) {
+        if discretized.nodes >= MAX_CTF_TERMS {
+            // ObjexxFCL::pow_2 is the literal multiplication dx * dx.
+            let dtn = layer.rho * layer.cp * (discretized.dx * discretized.dx) / layer.rk;
+            if dtn > initial_ctf_time_step_hours {
+                initial_ctf_time_step_hours = dtn;
+            }
+        }
+    }
+    if ((time_step_zone_hours - initial_ctf_time_step_hours) / time_step_zone_hours).abs() > 0.1 {
+        if initial_ctf_time_step_hours > time_step_zone_hours {
+            initial_num_histories =
+                source_i32((initial_ctf_time_step_hours / time_step_zone_hours) + 0.5)
+                    .ok_or(ScopeError::UnsupportedHistoryIntegerConversion)?;
+            initial_ctf_time_step_hours = time_step_zone_hours * f64::from(initial_num_histories);
+        } else {
+            initial_ctf_time_step_hours = time_step_zone_hours;
+            initial_num_histories = 1;
+        }
+    }
+
+    Ok(CtfInitialDiscretization {
+        active,
+        rcmax,
+        node_source,
+        node_user_temp,
+        time_step_zone_hours,
+        initial_ctf_time_step_hours,
+        initial_num_histories,
+    })
+}
+
+fn source_i32(value: f64) -> Option<i32> {
+    if !value.is_finite() {
+        return None;
+    }
+    let truncated = value.trunc();
+    if truncated < f64::from(i32::MIN) || truncated > f64::from(i32::MAX) {
+        return None;
+    }
+    Some(truncated as i32)
+}
+
+#[cfg(test)]
+#[path = "ctf_initial_discretization_tests.rs"]
+mod tests;

@@ -1,0 +1,32 @@
+    Checking ep_runtime v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_runtime)
+error: this boolean expression can be simplified
+   --> crates\ep_runtime\src\heat_balance\ctf_initial_owner.rs:102:12
+    |
+102 |         if !(converted.active.layers.len() > converted.active.num_res_layers) {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `(converted.active.layers.len() <= converted.active.num_res_layers)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.96.0/index.html#nonminimal_bool
+    = note: `-D clippy::nonminimal-bool` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::nonminimal_bool)]`
+
+error: clamp-like pattern without using clamp function
+   --> crates\ep_runtime\src\heat_balance\surface_manager\ctf_initial_discretization.rs:127:25
+    |
+127 |               let nodes = if estimate > MAX_CTF_TERMS {
+    |  _________________________^
+128 | |                 MAX_CTF_TERMS
+129 | |             } else if estimate < MIN_NODES {
+130 | |                 MIN_NODES
+131 | |             } else {
+132 | |                 estimate
+133 | |             };
+    | |_____________^ help: replace with clamp: `estimate.clamp(MIN_NODES, MAX_CTF_TERMS)`
+    |
+    = note: clamp will panic if max < min
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.96.0/index.html#manual_clamp
+    = note: `-D clippy::manual-clamp` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::manual_clamp)]`
+
+error: could not compile `ep_runtime` (lib) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `ep_runtime` (lib test) due to 2 previous errors

@@ -1,0 +1,13 @@
+--- .runtime\porting\CTF-03\lint-amendment-01\before\ctf_initial_owner.rs
++++ crates\ep_runtime\src\heat_balance\ctf_initial_owner.rs
+@@ -63,6 +63,10 @@
+ /// The caller supplies the same context and timestep used for this construction.
+ /// Original material IDs determine reverse eligibility before the pure phase runs.
+ /// This function neither repeats preprocessing nor generates reverse coefficients.
++#[allow(
++    clippy::nonminimal_bool,
++    reason = "Preserve pinned Construction.cc 405 source predicate."
++)]
+ pub fn initialize_construction_ctf_initial(
+     construction: &Construction,
+     previous_constructions: &[Construction],

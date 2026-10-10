@@ -1,0 +1,13 @@
+--- .runtime\porting\CTF-03\lint-amendment-01\before\ctf_initial_discretization.rs
++++ crates\ep_runtime\src\heat_balance\surface_manager\ctf_initial_discretization.rs
+@@ -85,6 +85,10 @@
+ /// Those routes are deliberately not inferred from numerical layer values.
+ /// The proposed pre-output admission excludes undefined C++ integer conversions;
+ /// this function stops explicitly rather than extending them by saturation.
++#[allow(
++    clippy::manual_clamp,
++    reason = "Preserve pinned Construction.cc 490-619 source branch order."
++)]
+ pub fn discretize_selected_ctf_1d_initial(
+     converted: &CtfConvertedLayers,
+     time_step_zone_hours: f64,

@@ -1,0 +1,77 @@
+{
+  "schema": "ctf03-candidate-unit-runtime-source-bindings.v1",
+  "observer_sources": [
+    {
+      "path": "crates/ep_run/examples/ctf03_candidate_unit_observer.rs",
+      "sha256": "17229ddaf0ae5800684c1ef0547c560243269742e81de2efef6311dd2628ac00",
+      "size_bytes": 17130
+    },
+    {
+      "path": "crates/ep_run/examples/ctf03_candidate_unit_support/fields.rs",
+      "sha256": "c3a6abd332f4e7f74c8868975da1e137e9709c919aebf6667b2bd716629004b2",
+      "size_bytes": 8923
+    }
+  ],
+  "actual_public_API_sources": [
+    {
+      "path": "crates/ep_run/Cargo.toml",
+      "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+      "size_bytes": 524
+    },
+    {
+      "path": "crates/ep_model/src/lib.rs",
+      "sha256": "2a756532553034fb2b92c892cb2e6f3c147aa129f6dce64b63763f364cb3cee4",
+      "size_bytes": 284
+    },
+    {
+      "path": "crates/ep_model/src/ids.rs",
+      "sha256": "83b32ebf02684f459cb0a789f498de08b849b94a7072f1f5870663a4b3cca7be",
+      "size_bytes": 2029
+    },
+    {
+      "path": "crates/ep_runtime/Cargo.toml",
+      "sha256": "bb81b5793debafd84300ec9905f0cda65ab32d216633543bab375b30a7a379e9",
+      "size_bytes": 327
+    },
+    {
+      "path": "crates/ep_runtime/src/lib.rs",
+      "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+      "size_bytes": 868
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "43692d0c2a3024dddf4e8d0c2d8360d5b83a9e4a3e99bec328792ff194ef8240",
+      "size_bytes": 1371
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "sha256": "cf81697afc5150582510e8a7585a2e5bd0d94246bcc2d81e179725e987c94adb",
+      "size_bytes": 5961
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "sha256": "0cf67532a277ea20c362acdcc97d2e293ee086a8757177e2b8ccb5bb52fb39a7",
+      "size_bytes": 11747
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+      "sha256": "bbc9af913b0d16d323bfc06c1ff96e99f476a45d467cac40b89975738d715cff",
+      "size_bytes": 7319
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+      "sha256": "e8c061c17247a3bb8ce443ebcd8146a36d6da5841048767d3fdc1828c98821fd",
+      "size_bytes": 5495
+    },
+    {
+      "path": "crates/ep_model/src/objects/construction.rs",
+      "sha256": "f1886c8b2f9aede1e661210520b668d52f74d884d9a207de9f0c046e4170f191",
+      "size_bytes": 18134
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+      "size_bytes": 3172
+    }
+  ]
+}

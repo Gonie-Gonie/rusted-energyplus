@@ -1,0 +1,52 @@
+{
+  "schema": "ctf03-pinned-source-shape-lint-amendment.v1",
+  "observed_utc": "2026-10-10T15:08:49.669945+00:00",
+  "actual_Clippy101_retained": {
+    "path": ".runtime/porting/CTF-03/quality-clippy-command-01/receipt.json",
+    "sha256": "37fe53caac0461df2d5cf4eb34ba3bbd84b092f189fb5e4e452b304c4440dc7e",
+    "size_bytes": 4493
+  },
+  "changes": [
+    {
+      "before": {
+        "path": ".runtime/porting/CTF-03/lint-amendment-01/before/ctf_initial_discretization.rs",
+        "sha256": "bbc9af913b0d16d323bfc06c1ff96e99f476a45d467cac40b89975738d715cff",
+        "size_bytes": 7319
+      },
+      "after": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+        "sha256": "9fb5548009e539ba6dfbdc42c592aff3359cdc9901c34ca2dd6c137590fa0bb5",
+        "size_bytes": 7433
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-03/lint-amendment-01/ctf_initial_discretization.rs.diff",
+        "sha256": "ccd39ac1af45a6b70e8ff2e5a3ae096380886de88640aa2d689105c550fff17a",
+        "size_bytes": 656
+      },
+      "function_only_allowance": "manual_clamp",
+      "function": "discretize_selected_ctf_1d_initial"
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/CTF-03/lint-amendment-01/before/ctf_initial_owner.rs",
+        "sha256": "e8c061c17247a3bb8ce443ebcd8146a36d6da5841048767d3fdc1828c98821fd",
+        "size_bytes": 5495
+      },
+      "after": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+        "sha256": "0d5b57ec2c0b60111cdc29d94288d38d6abce78a95b4f9bbb155624babe558e5",
+        "size_bytes": 5605
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-03/lint-amendment-01/ctf_initial_owner.rs.diff",
+        "sha256": "0c3414412f4b42d546dee92d44e210c09b340b9694555c280e778ce0b2107bfb",
+        "size_bytes": 645
+      },
+      "function_only_allowance": "nonminimal_bool",
+      "function": "initialize_construction_ctf_initial"
+    }
+  ],
+  "Root_and_other_author_narrow_source_peer_accepted_before_edit": true,
+  "mathematical_bodies_tests_and_frozen_policy_changed": false,
+  "reason": "Function-specific lint allowances retain literal pinned source branch order/predicate. No generic clamp or comparison rewrite."
+}

@@ -1,0 +1,19 @@
+
+running 14 tests
+test heat_balance::ctf_initial_owner::tests::all_resistive_dispatch_precedes_reverse_without_reclassifying_materials ... ok
+test heat_balance::ctf_initial_owner::tests::equal_converted_values_cannot_make_different_material_ids_reverse ... ok
+test heat_balance::ctf_initial_owner::tests::reached_owner_retains_actual_caller_and_existing_converted_input ... ok
+test heat_balance::ctf_initial_owner::tests::reverse_uses_first_used_original_id_stack_in_owner_order ... ok
+test heat_balance::ctf_initial_owner::tests::scope_stop_retains_actual_reason_instead_of_a_default_initial_owner ... ok
+test heat_balance::ctf_initial_owner::tests::unused_and_shared_error_routes_precede_reverse_selection ... ok
+test heat_balance::surface_manager::ctf_initial_discretization::tests::all_resistive_route_has_no_selected_initial_owner ... ok
+test heat_balance::surface_manager::ctf_initial_discretization::tests::capped_nodes_retain_initial_history_alignment_without_a_retry_driver ... ok
+test heat_balance::surface_manager::ctf_initial_discretization::tests::end_resistance_flags_use_the_ordinary_node_selection_branch ... ok
+test heat_balance::surface_manager::ctf_initial_discretization::tests::interior_computed_resistance_retains_one_node_and_actual_dl ... ok
+test heat_balance::surface_manager::ctf_initial_discretization::tests::invalid_zone_context_does_not_supply_replacement_time_step ... ok
+test heat_balance::surface_manager::ctf_initial_discretization::tests::minimum_nodes_are_selected_before_initial_time_step_alignment ... ok
+test heat_balance::surface_manager::ctf_initial_discretization::tests::source_integer_conversion_checks_truncation_domain_without_saturation ... ok
+test heat_balance::surface_manager::ctf_initial_discretization::tests::undefined_history_conversion_is_explicitly_unavailable ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 3017 filtered out; finished in 0.01s
+

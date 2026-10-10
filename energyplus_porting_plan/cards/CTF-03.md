@@ -59,7 +59,7 @@ CTF-04 행렬의 차원·경계 인덱스 일치
 ## 종료 체크
 
 - [x] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
+- [x] 단위시험 통과 및 실제 활성 분기 확인
 - [ ] 상태·시간·호출순서를 포함한 연결시험 통과
 - [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
@@ -72,3 +72,11 @@ CTF-04 행렬의 차원·경계 인덱스 일치
 ## Source amendment before CTF-03 outputs (2026-10-10)
 
 Root FULL and other-author source peers accepted the passive initial callback, two whole Native helpers, fresh input writer, strict PE reader and OriginalDataQA sources. The actual initial capture after original619 is separate from the unchanged three preprocessing checkpoints and from later retries908-936. It copies live Nodes/dx and initial scalar/count/selector owners without evaluating them. Unit39/42 and fixed15/195 reuse only literal/input rows; production construction obligations remain dynamic. Three separate dx/initial_CTFTimeStep/caller_TimeStepZone profiles atol=rtol=0, exact class/active-prefix-shape/signedzero. Nodes/counts/selectors/history/IDs/branch/caller inputs exact; inherited18 preprocessing profiles remain unchanged separate context. Required reached absence on either/both sides fails; unselected/unreached/stopped/unknown states never numerical PASS. No tolerance changes after outputs. Actual CTF03 Native build/helper, OriginalDataQA, existing Rust baseline and candidate comparisons have not run. Scope passed; the other three gates and dependent completion remain pending.
+
+## Actual selected initial-discretization milestone (2026-10-11)
+
+Evidence: `evidence/CTF-03-unit/summary.json`. Genuine OriginalDataQA0 in both lanes preceded the unchanged Rust baseline and candidate application. Actual unit39/42 selected25 initial owners: 148 numeric and7644 discrete comparisons; fixed15/195 with21 construction calls selected15:45 numeric and2556 discrete comparisons. All mismatches0; all three frozen zero-tolerance metrics maximum absolute error/RMSE0 and nonfinite errors0. Unavailable context37/12 is retained without PASS. Actual initial Nodes/dx/rcmax/selectors/time/history owners are paired; later Native retry/final owners are not substituted.
+
+Actual `cargo test --locked --workspace --all-targets`:4667 passed/0 failed/0 ignored across37 test binaries. This was before two function-local lint attributes, which preserve the pinned source predicate/branch order without body, test or policy changes. Initial Clippy exit101 and exact amendment are preserved; subsequent workspace all-target Clippy and fmt exit0. Fresh Cargo example build after these checks supplied both actual candidate executions and both actual comparisons (all exit0/source-preserving). Unused bindings01 remain archived; actual bindings02 match the final source bytes.
+
+Selected unit gate passed. CTF01 dependency completion, CTF04 matrix/coefficient handoff, genuine retry/final owners, integration and production gates remain pending. Fixed6 CLI at this source has not yet run; no whole-card or downstream PASS is claimed.
