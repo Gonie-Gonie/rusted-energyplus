@@ -1,0 +1,38 @@
+--- .runtime/porting/CTF-01/original-data-review-prep-01/README.md
++++ .runtime/porting/CTF-01/original-data-review-prep-02/README.md
+@@ -18,18 +18,24 @@
+ `ctf01-native-build.v1`, status `pass-actual-3TU-link-and-preservation`;
+ `helper_binary`, `linked_original`, `native_source_files` (seven ordered rows),
+ `configure_execution`, `compile_execution`, `derivation_execution`,
+-`validated_derivative` (metadata artifact), `counts` with
+-previous661/current664/core_registered643/present631/absent12;
++`validated_derivative` (metadata artifact), flat integer fields
++previous_compile_rows661/current_compile_rows664/core_registered643/core_present631/core_absent12;
+ three actual preservation/provider flags required true.
+ The independent report is `ctf01-independent-build-PE-review.v1`, status
+ `pass-exact-retained-PE-runtime-and-actual-build-identity`, with `build`, the same
+ three binary/derivative bindings, `native_pe_source`, maps{original,derived,
+ comparison}, and `retained_runtime_exact:true`. Actual PE maps provide binary
+ identity and size; the reader never rehashes or parses either binary payload.
++The actual recorded PE reader command and approved source identity are bound to
++the supplied review through its genuine compact stdout {review,status}; the
++stdout is not assumed to contain the full review JSON.
+ 
+ `shape.py` validates constructor/init/whole-call ledgers, actual stop masks,
+ ordered owner identity and snapshot shape, scalar class/bits/decimal consistency,
+ ordered diagnostic spans/log references, and the three actual callback records.
++The actual after-member-input snapshot must retain the frozen literal member
++bits, flags, dimensions, ordered LayerPoint membership and caller timestep bits.
++This checks copied input provenance without evaluating CTF output arithmetic.
+ Only the actual copied active prefix is visited. Reached required operands must
+ exist. Unreached phases and uninvoked calls remain unavailable, with no invented
+ arrays, source outcomes, method counts or PASS. Nonfinite observed scalars retain
+@@ -47,7 +53,7 @@
+ Future Root CLI (all artifact references runtime supplied):
+ 
+ ```text
+-python -X utf8 -B .runtime/porting/CTF-01/original-data-review-prep-01/review_data.py
++python -X utf8 -B .runtime/porting/CTF-01/original-data-review-prep-02/review_data.py
+   --approved-source-sha256 <review_data.py SHA>
+   --native-execution <actual recorder.json#SHA>
+   --results <actual ctf01-helper-results.json#SHA>

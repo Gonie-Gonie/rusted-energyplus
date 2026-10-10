@@ -1,0 +1,445 @@
+//! Typed construction records and source-projected metadata.
+
+use std::sync::Arc;
+
+use crate::{
+    ConstructionId, MaterialId, NormalizedName, ScheduleId, ThermochromicConstructionChildId,
+};
+
+/// Consumer family for an ordered construction layer stack.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ConstructionKind {
+    /// Opaque construction consumed by the existing surface heat-balance path.
+    Opaque,
+    /// Fenestration construction reserved for a dedicated window heat-balance path.
+    Fenestration,
+    /// BSDF complex-fenestration construction reserved for dedicated window paths.
+    ComplexFenestration,
+    /// Equivalent-layer fenestration construction reserved for the ASHWAT window path.
+    WindowEquivalentLayer,
+    /// Zero-layer air boundary reserved for enclosure and interzone mixing paths.
+    AirBoundary,
+}
+
+impl ConstructionKind {
+    /// Stable diagnostic identifier.
+    #[must_use]
+    pub const fn id(self) -> &'static str {
+        match self {
+            Self::Opaque => "opaque",
+            Self::Fenestration => "fenestration",
+            Self::ComplexFenestration => "complex_fenestration",
+            Self::WindowEquivalentLayer => "window_equivalent_layer",
+            Self::AirBoundary => "air_boundary",
+        }
+    }
+}
+
+/// Basis family selected by `Construction:ComplexFenestrationState`.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ComplexFenestrationBasisType {
+    /// Basis emitted by LBNL WINDOW.
+    LbnlWindow,
+    /// User-defined basis input.
+    UserDefined,
+}
+
+/// Symmetry applied to complex-fenestration optical matrices.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ComplexFenestrationBasisSymmetry {
+    /// Full nonsymmetric matrices.
+    None,
+    /// Axisymmetric matrix input.
+    Axisymmetric,
+}
+
+/// Standard selected for complex-window thermal calculations.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum WindowThermalCalculationStandard {
+    /// ISO 15099.
+    Iso15099,
+    /// EN 673 / ISO 10292 declared conditions.
+    En673Declared,
+    /// EN 673 / ISO 10292 design conditions.
+    En673Design,
+}
+
+/// TARCOG thermal-model selector retained from `WindowThermalModel:Params`.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum WindowThermalCalculationModel {
+    /// ISO 15099 model.
+    Iso15099,
+    /// Scaled-cavity-width model.
+    ScaledCavityWidth,
+    /// Convective scalar model without shading-device thickness.
+    ConvectiveScalarNoSdThickness,
+    /// Convective scalar model including shading-device thickness.
+    ConvectiveScalarWithSdThickness,
+}
+
+/// Deflection state retained from `WindowThermalModel:Params`.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum WindowThermalDeflectionModel {
+    /// No pane deflection.
+    NoDeflection,
+    /// Gap widths are supplied by measured-deflection state.
+    MeasuredDeflection,
+    /// Temperature-and-pressure deflection inputs.
+    TemperatureAndPressureInput {
+        /// Pressure threshold for the vacuum model in pascals.
+        vacuum_pressure_limit_pa: f64,
+        /// Window fabrication temperature in degrees Celsius.
+        initial_temperature_c: f64,
+        /// Window fabrication pressure in pascals.
+        initial_pressure_pa: f64,
+    },
+}
+
+/// Source-effective thermal-model descriptor used by one complex construction.
+#[derive(Clone, Debug, PartialEq)]
+pub struct WindowThermalModelParameters {
+    /// Normalized helper-object name.
+    pub name: NormalizedName,
+    /// Calculation standard.
+    pub standard: WindowThermalCalculationStandard,
+    /// TARCOG thermal model.
+    pub thermal_model: WindowThermalCalculationModel,
+    /// Shading-device scalar in the inclusive range `[0, 1]`.
+    pub shading_device_scalar: f64,
+    /// Deflection selection and active dependent inputs.
+    pub deflection_model: WindowThermalDeflectionModel,
+}
+
+/// Immutable row-major `Matrix:TwoDimension` snapshot.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ComplexFenestrationMatrix {
+    /// Original source spelling of the matrix name before input-level normalization.
+    pub source_name: String,
+    /// Source row count.
+    pub rows: u32,
+    /// Source column count.
+    pub columns: u32,
+    /// Effective row-major prefix of `rows * columns` finite values.
+    pub values: Arc<[f64]>,
+}
+
+impl ComplexFenestrationMatrix {
+    /// Returns a zero-based row-major element.
+    #[must_use]
+    pub fn get(&self, row: usize, column: usize) -> Option<f64> {
+        let columns = usize::try_from(self.columns).ok()?;
+        let rows = usize::try_from(self.rows).ok()?;
+        if row >= rows || column >= columns {
+            return None;
+        }
+        self.values
+            .get(row.checked_mul(columns)?.checked_add(column)?)
+            .copied()
+    }
+}
+
+/// Directional absorptance state for one solid complex-window layer.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ComplexFenestrationOpticalLayer {
+    /// Glazing or complex-shade material.
+    pub material: MaterialId,
+    /// One-row front directional absorptance matrix.
+    pub front_absorptance: ComplexFenestrationMatrix,
+    /// One-row back directional absorptance matrix.
+    pub back_absorptance: ComplexFenestrationMatrix,
+}
+
+/// Source-projected metadata for `Construction:ComplexFenestrationState`.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ConstructionComplexFenestrationState {
+    /// Basis family.
+    pub basis_type: ComplexFenestrationBasisType,
+    /// Basis symmetry.
+    pub basis_symmetry: ComplexFenestrationBasisSymmetry,
+    /// Resolved thermal-model helper state.
+    pub thermal_model: WindowThermalModelParameters,
+    /// Basis matrix.
+    pub basis_matrix: ComplexFenestrationMatrix,
+    /// Source-derived number of basis directions.
+    pub basis_length: u32,
+    /// Solar front transmittance matrix.
+    pub solar_front_transmittance: ComplexFenestrationMatrix,
+    /// Solar back reflectance matrix.
+    pub solar_back_reflectance: ComplexFenestrationMatrix,
+    /// Visible front transmittance matrix.
+    pub visible_front_transmittance: ComplexFenestrationMatrix,
+    /// Visible back reflectance matrix (the schema field is named back transmittance).
+    pub visible_back_reflectance: ComplexFenestrationMatrix,
+    /// Solid-layer absorptance descriptors in outside-to-inside order.
+    pub optical_layers: Vec<ComplexFenestrationOpticalLayer>,
+}
+
+/// CTF dimensionality selected by `ConstructionProperty:InternalHeatSource`.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ConstructionInternalHeatSourceDimensions {
+    /// One-dimensional conduction transfer-function calculation.
+    OneDimensional,
+    /// Two-dimensional conduction transfer-function calculation.
+    TwoDimensional,
+}
+
+/// Source-projected metadata attached by `ConstructionProperty:InternalHeatSource`.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ConstructionInternalHeatSource {
+    /// Normalized nonsemantic source-object name retained for diagnostics.
+    pub name: NormalizedName,
+    /// Source location as the source-effective one-based layer count before the source.
+    pub source_after_layer: u32,
+    /// Requested temperature location as a one-based layer count.
+    pub temperature_after_layer: u32,
+    /// Requested one- or two-dimensional CTF calculation.
+    pub ctf_dimensions: ConstructionInternalHeatSourceDimensions,
+    /// Original full spacing between adjacent tubes or resistance wires in meters.
+    pub tube_spacing_m: f64,
+    /// Half-spacing retained by the EnergyPlus construction state in meters.
+    pub half_tube_spacing_m: f64,
+    /// Perpendicular temperature position in the inclusive range `[0, 1]`.
+    pub temperature_location_perpendicular: f64,
+}
+
+/// Source-projected declaration state for `Construction:WindowEquivalentLayer`.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct ConstructionWindowEquivalentLayer {
+    /// Zero-based source-order index within the equivalent-layer construction family.
+    ///
+    /// EnergyPlus stores the corresponding `EQLConsPtr` as a one-based value.
+    pub source_index: u32,
+}
+
+/// Default leaf name searched from EnergyPlus's current working folder.
+pub const DEFAULT_WINDOW5_DATA_FILE_NAME: &str = "Window5DataFile.dat";
+
+/// File selector retained from a `Construction:WindowDataFile` request.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum WindowDataFileSource {
+    /// A missing or blank field selects `Window5DataFile.dat` in the current working folder.
+    DefaultWorkingDirectory,
+    /// Explicit retain-case file name or path supplied by the input object.
+    Explicit(String),
+}
+
+impl WindowDataFileSource {
+    /// Returns the source-effective file name without resolving it against a run directory.
+    #[must_use]
+    pub fn file_name(&self) -> &str {
+        match self {
+            Self::DefaultWorkingDirectory => DEFAULT_WINDOW5_DATA_FILE_NAME,
+            Self::Explicit(file_name) => file_name,
+        }
+    }
+
+    /// Returns whether the source selected the current-working-folder default.
+    #[must_use]
+    pub const fn uses_default_working_directory(&self) -> bool {
+        matches!(self, Self::DefaultWorkingDirectory)
+    }
+}
+
+/// Typed request to synthesize window state from a legacy WINDOW5 data file.
+///
+/// This is deliberately not a [`Construction`] identity. The deferred
+/// `SearchWindow5DataFile` routine can create one or two constructions plus
+/// materials and frame/divider state only after it validates and parses the file.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ConstructionWindowDataFileRequest {
+    /// Zero-based source-order index within the request family.
+    pub source_index: u32,
+    /// Normalized WINDOW5 entry name to search for.
+    pub name: NormalizedName,
+    /// Default or explicit retain-case file selector.
+    pub source: WindowDataFileSource,
+}
+
+/// Schedule source used by a simple-mixing air boundary.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum AirBoundaryMixingSchedule {
+    /// Blank or omitted input selects EnergyPlus's built-in always-on schedule.
+    AlwaysOn,
+    /// Explicit user schedule resolved through the shared schedule namespace.
+    User(ScheduleId),
+}
+
+/// Air-exchange behavior retained for a zero-layer air boundary construction.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum AirBoundaryAirExchange {
+    /// No interzone air exchange is requested by this construction.
+    None,
+    /// Simple scheduled mixing at the source air-changes-per-hour input.
+    SimpleMixing {
+        /// Air changes per hour.
+        air_changes_per_hour: f64,
+        /// Built-in or explicitly named mixing schedule.
+        schedule: AirBoundaryMixingSchedule,
+    },
+}
+
+/// Source-projected metadata for `Construction:AirBoundary`.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ConstructionAirBoundary {
+    /// Requested air-exchange method and its dependent inputs.
+    pub air_exchange: AirBoundaryAirExchange,
+}
+
+/// Source inputs and derived resistance state for a generated F/C-factor construction.
+///
+/// EnergyPlus projects both object families into opaque two-layer constructions. The
+/// dedicated metadata keeps those generated stacks distinguishable from ordinary opaque
+/// constructions while their surface binding and runtime behavior remain deferred.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum ConstructionGroundFactor {
+    /// `Construction:FfactorGroundFloor` source and derived values.
+    FfactorGroundFloor {
+        /// F-factor in W/m-K.
+        f_factor_w_per_m_k: f64,
+        /// Source floor area in m2.
+        area_m2: f64,
+        /// Source exposed perimeter in m.
+        perimeter_exposed_m: f64,
+        /// Effective construction resistance in m2-K/W.
+        effective_thermal_resistance_m2_k_per_w: f64,
+        /// Generated fictitious-insulation resistance in m2-K/W.
+        insulation_thermal_resistance_m2_k_per_w: f64,
+    },
+    /// `Construction:CfactorUndergroundWall` source and derived values.
+    CfactorUndergroundWall {
+        /// C-factor in W/m2-K.
+        c_factor_w_per_m2_k: f64,
+        /// Source wall height in m.
+        height_m: f64,
+        /// Height-derived equivalent soil resistance in m2-K/W.
+        equivalent_soil_thermal_resistance_m2_k_per_w: f64,
+        /// Effective construction resistance in m2-K/W.
+        effective_thermal_resistance_m2_k_per_w: f64,
+        /// Generated fictitious-insulation resistance in m2-K/W.
+        insulation_thermal_resistance_m2_k_per_w: f64,
+    },
+}
+
+/// Thermochromic parent metadata retained on an effective construction stack.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct ConstructionThermochromicMaster {
+    /// Thermochromic glazing-group material replaced by its first typed state.
+    pub parent_material: MaterialId,
+    /// Zero-based construction layer index (EnergyPlus `TCLayerNum` is one-based).
+    pub layer_index: u32,
+    /// Zero-based source glass-layer ordinal (EnergyPlus `TCGlassNum` is one-based).
+    pub glazing_layer_index: u32,
+}
+
+/// Immutable descriptor for the generated children of one thermochromic master construction.
+///
+/// The series is a derived projection, not a public [`Construction`] identity. Its range points
+/// into [`TypedModel::construction_thermochromic_children`](crate::TypedModel::construction_thermochromic_children).
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ConstructionThermochromicSeries {
+    /// Existing construction whose last thermochromic parent supplies the state series.
+    pub master_construction: ConstructionId,
+    /// First-state temperature assigned to the source master construction by EnergyPlus.
+    pub initial_specification_temperature_c: f64,
+    /// Dense ID of the first child in the model's derived child arena.
+    pub first_child: ThermochromicConstructionChildId,
+    /// Number of source-ordered children, including the first state.
+    pub child_count: u32,
+}
+
+/// One immutable thermochromic child-construction projection.
+///
+/// Child IDs are local to the derived arena. They intentionally do not consume the global
+/// [`ConstructionId`] space or participate in the public construction-name namespace.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ConstructionThermochromicChild {
+    /// Dense projection ID in the derived child arena.
+    pub id: ThermochromicConstructionChildId,
+    /// Existing thermochromic master construction.
+    pub master_construction: ConstructionId,
+    /// Zero-based source-order state index within the parent's glazing group.
+    pub state_index: u32,
+    /// Source-style generated name, retained without uniqueness enforcement.
+    pub name: NormalizedName,
+    /// State specification temperature in degrees Celsius.
+    pub specification_temperature_c: f64,
+    /// Effective outside material for this child stack.
+    pub outside_layer: MaterialId,
+    /// Effective outside-to-inside material stack.
+    pub layers: Vec<MaterialId>,
+}
+
+/// Construction resolved to an ordered, effective material layer stack.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Construction {
+    /// Typed ID.
+    pub id: ConstructionId,
+    /// Construction name.
+    pub name: NormalizedName,
+    /// Consumer family for this construction.
+    pub kind: ConstructionKind,
+    /// Effective outside layer material (including first-state TC substitution).
+    ///
+    /// Zero-layer air-boundary constructions have no outside material.
+    pub outside_layer: Option<MaterialId>,
+    /// Ordered material layers from outside to inside.
+    pub layers: Vec<MaterialId>,
+    /// Source-style thermochromic master metadata for the last group parent in the stack.
+    ///
+    /// The effective layer stack contains the parent's first glazing state. Generating
+    /// thermochromic child constructions and selecting states at runtime remain deferred.
+    pub thermochromic_master: Option<ConstructionThermochromicMaster>,
+    /// F/C-factor source and derived state for generated ground constructions.
+    pub ground_factor: Option<ConstructionGroundFactor>,
+    /// Zero-layer air-boundary source state when this is an air boundary.
+    pub air_boundary: Option<ConstructionAirBoundary>,
+    /// BSDF source state when this is a complex-fenestration construction.
+    pub complex_fenestration: Option<ConstructionComplexFenestrationState>,
+    /// Equivalent-layer declaration state when this construction uses that window model.
+    pub window_equivalent_layer: Option<ConstructionWindowEquivalentLayer>,
+    /// Internal heat-source declaration attached to this construction, when present.
+    pub internal_heat_source: Option<ConstructionInternalHeatSource>,
+}
+
+impl Construction {
+    /// Returns whether this is an ordinary opaque construction currently admitted by
+    /// BuildingSurface, reporting, and runtime consumers.
+    #[must_use]
+    pub const fn is_ordinary_opaque(&self) -> bool {
+        matches!(self.kind, ConstructionKind::Opaque) && self.ground_factor.is_none()
+    }
+
+    /// Returns whether this record is a zero-layer air boundary construction.
+    #[must_use]
+    pub const fn is_air_boundary(&self) -> bool {
+        matches!(self.kind, ConstructionKind::AirBoundary)
+    }
+
+    /// Returns whether this record is a BSDF complex-fenestration construction.
+    #[must_use]
+    pub const fn is_complex_fenestration(&self) -> bool {
+        matches!(self.kind, ConstructionKind::ComplexFenestration)
+    }
+
+    /// Returns whether this is a `Construction:WindowEquivalentLayer` record.
+    #[must_use]
+    pub const fn is_window_equivalent_layer(&self) -> bool {
+        matches!(self.kind, ConstructionKind::WindowEquivalentLayer)
+    }
+
+    /// Returns whether an internal heat-source declaration targets this construction.
+    #[must_use]
+    pub const fn has_internal_heat_source(&self) -> bool {
+        self.internal_heat_source.is_some()
+    }
+
+    /// Returns the effective layer stack, retaining the legacy outside-only fallback.
+    #[must_use]
+    pub fn effective_layers(&self) -> &[MaterialId] {
+        if self.layers.is_empty() {
+            self.outside_layer.as_slice()
+        } else {
+            self.layers.as_slice()
+        }
+    }
+}

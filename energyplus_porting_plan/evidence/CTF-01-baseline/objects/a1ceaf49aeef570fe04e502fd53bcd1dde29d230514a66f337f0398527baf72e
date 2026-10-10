@@ -1,0 +1,43 @@
+--- .runtime/porting/CTF-01/original-data-review-prep-01/review_data.py
++++ .runtime/porting/CTF-01/original-data-review-prep-02/review_data.py
+@@ -9,7 +9,8 @@
+ 
+ PREP = Path(__file__).resolve().parent
+ IO_SHA = "c90e5e89728f2c1db21835145ace4de84617346870d7fc29949abcc291deab74"
+-SHAPE_SHA = "045310efff5ea2c8583fa922a1bb9e8acd9d1c0265a83c0386bdf2e620ad5d6d"
++SHAPE_SHA = "630dbe680630ea5e5245d8ad3caee6cba62ebc90383229bc736551bbdc405b22"
++PE_READER_SHA = "407d5aff7e03f982f22e1cb7a6bcd6c76f6b773be61bb0f630a0410d25503a19"
+ 
+ 
+ def boot(name, filename, digest):
+@@ -83,12 +84,12 @@
+                                              "total_operations": calls}, "Requested counts must derive from input arrays")
+     build, peer = m.load(refs["build"]), m.load(refs["build-review"])
+     compile_command = recorded(refs["build-execution"], native["started_utc"])
+-    recorded(refs["build-review-execution"], native["started_utc"])
++    peer_command = recorded(refs["build-review-execution"], native["started_utc"])
+     m.require(build["schema"] == "ctf01-native-build.v1" and build["status"] == "pass-actual-3TU-link-and-preservation", "Actual build identity required")
+     for key in ["all_previous_compile_commands_unchanged", "protected_artifacts_and_present_core_objects_unchanged", "link_provider_verified"]:
+         m.require(build[key] is True, "Actual build preservation/provider evidence required")
+-    for key, expected in {"previous": 661, "current": 664, "core_registered": 643, "present": 631, "absent": 12}.items():
+-        m.require(type(build["counts"][key]) is int and build["counts"][key] == expected, "Actual build cache counts differ")
++    for key, expected in {"previous_compile_rows": 661, "current_compile_rows": 664, "core_registered": 643, "core_present": 631, "core_absent": 12}.items():
++        m.require(type(build[key]) is int and build[key] == expected, "Actual build cache counts differ")
+     same(build["compile_execution"], refs["build-execution"])
+     for key in ["configure_execution", "derivation_execution"]: recorded(build[key], native["started_utc"])
+     m.bind(build["validated_derivative"])
+@@ -96,6 +97,14 @@
+               peer["status"] == "pass-exact-retained-PE-runtime-and-actual-build-identity" and peer["retained_runtime_exact"] is True,
+               "Actual independent build/PE review required")
+     same(peer["build"], refs["build"])
++    peer_reader = m.bind(peer["executed_reader"])
++    m.require(peer_reader["sha256"] == PE_READER_SHA and len(peer_command["command"]) == 5 and
++              Path(peer_command["command"][0]).name.lower() in ["python", "python.exe"] and
++              peer_command["command"][1:4] == ["-X", "utf8", "-B"] and
++              m.contained(peer_command["command"][4]) == m.contained(peer_reader["path"]), "Actual approved PE reader command/source differs")
++    peer_stdout = m.load(peer_command["stdout"])
++    m.require(set(peer_stdout) == {"review", "status"} and peer_stdout["status"] == peer["status"], "Actual PE stdout must be its exact compact two-key summary")
++    same(peer_stdout["review"], refs["build-review"]); m.bind(peer_stdout["review"])
+     for key in ["helper_binary", "linked_original", "validated_derivative"]: same(peer[key], build[key])
+     m.bind(peer["native_pe_source"])
+     maps = {key: m.load(peer["maps"][key]) for key in ["original", "derived", "comparison"]}

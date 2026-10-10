@@ -1,0 +1,33 @@
+--- .runtime/porting/CTF-01/original-data-review-prep-01/shape.py
++++ .runtime/porting/CTF-01/original-data-review-prep-02/shape.py
+@@ -109,6 +109,11 @@
+             need(seeded is not None and identity["literal_member_seeding"] is True and
+                  identity["Material_GetMaterialData_or_construction_loader_invoked"] is False and identity["wrapper_Resistance_calculation"] is False,
+                  "Actual explicit-member owner seeding required")
++            for name in ["TimeStepZone", "TimeStepZoneSec"]:
++                need(seeded[name]["value_bits"] == expected["caller"][name]["bits"], "Actual seeded caller bits differ from frozen literals")
++            for name in ["ErrorsFound", "DoCTFErrorReport"]:
++                need(seeded[name] is expected["caller"][name], "Actual seeded shared caller flag differs")
++            material_indices = {material["id"]: index for index, material in enumerate(expected["materials"], 1)}
+             for family in ["materials", "constructions"]:
+                 need(len(identity[family]) == len(expected[family]) == len(seeded[family]), "Actual seeded owner shape differs")
+                 for index, (declared, observed) in enumerate(zip(expected[family], identity[family]), 1):
+@@ -116,6 +121,18 @@
+                          observed["actual_Name"] == declared["Name"] and seeded[family][index - 1]["Name"] == declared["Name"], "Actual input owner identity/order differs")
+                     if family == "materials":
+                         need(observed["actual_Num"] == index, "Actual material Num differs")
++                        for name in MATERIAL_SCALARS:
++                            need(seeded[family][index - 1][name]["value_bits"] == declared[name]["bits"], "Actual seeded material bits differ from frozen literals")
++                        need(seeded[family][index - 1]["ROnly"] is declared["ROnly"], "Actual seeded ROnly differs")
++                    else:
++                        actual = seeded[family][index - 1]
++                        membership = [material_indices[name] for name in declared["layer_material_ids"]]
++                        need(actual["LayerPoint_active"] == membership and actual["TotLayers"] == len(membership), "Actual seeded construction membership/order differs")
++                        for name in ["IsUsedCTF", "SourceSinkPresent"]:
++                            need(actual[name] is declared[name], "Actual seeded construction flag differs")
++                        for name in ["SolutionDimensions", "SourceAfterLayer", "TempAfterLayer"]:
++                            need(actual[name] == declared[name], "Actual seeded construction integer differs")
++                        need(actual["ThicknessPerpend"]["value_bits"] == declared["ThicknessPerpend"]["bits"], "Actual seeded construction bits differ")
+         else:
+             need(model["actual_input_owner_identity"] is None, "Stopped model has fabricated seeded owner identity")
+         diagnostics = model["source_diagnostics"]

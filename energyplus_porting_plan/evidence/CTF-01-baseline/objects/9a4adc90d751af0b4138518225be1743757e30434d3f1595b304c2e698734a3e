@@ -1,0 +1,198 @@
+{
+  "schema": "ctf01-original-data-review-source-preparation.v1",
+  "status": "SOURCE-READY-held-unexecuted-source",
+  "held_utc": "2026-10-10T11:30:41.901065+00:00",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/CTF-01/original-data-review-prep-02/review_data.py",
+      "sha256": "4bd6a0b318ceab52bcb83e4fa9605c0d5191daf3883c505c4e14266385b18832",
+      "size_bytes": 15496,
+      "line_count": 184
+    },
+    {
+      "path": ".runtime/porting/CTF-01/original-data-review-prep-02/shape.py",
+      "sha256": "630dbe680630ea5e5245d8ad3caee6cba62ebc90383229bc736551bbdc405b22",
+      "size_bytes": 18201,
+      "line_count": 220
+    },
+    {
+      "path": ".runtime/porting/CTF-01/original-data-review-prep-02/packet_io.py",
+      "sha256": "c90e5e89728f2c1db21835145ace4de84617346870d7fc29949abcc291deab74",
+      "size_bytes": 3523,
+      "line_count": 99
+    }
+  ],
+  "README": {
+    "path": ".runtime/porting/CTF-01/original-data-review-prep-02/README.md",
+    "sha256": "e5bd5c9ab5ff53210b148ee08380aa9c6502c960f0ee763da99f5fbf403b0553",
+    "size_bytes": 4752,
+    "line_count": 75
+  },
+  "source_protocol_authorities": [
+    {
+      "path": ".runtime/porting/CTF-01/input-writer-prep-01/manifest.json",
+      "sha256": "8ffae43981d1fdf56d4da14732e3fb5d31c252f1b45366aa4ac593aeb9a65a35",
+      "size_bytes": 17318,
+      "line_count": 431
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-helper-prep-01/manifest.json",
+      "sha256": "9aa3be7157e352d280ac7a5e30ee35e6ee5864f7d85a49c0056d140705d57f59",
+      "size_bytes": 10048,
+      "line_count": 265
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-observer-prep-01/manifest.json",
+      "sha256": "da47576f07da2283ce28ac65452332221e80679c66992fb62e7ea9952701fe26",
+      "size_bytes": 13869,
+      "line_count": 342
+    }
+  ],
+  "Native_source_protocol_files": [
+    {
+      "path": ".runtime/porting/CTF-01/native-observer-prep-01/Construction.ctf01.cc",
+      "sha256": "2201e38989c37c6f9569c605b0b01a0346e166e67768942e47e842900239ecb5",
+      "size_bytes": 110855,
+      "line_count": 2122
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-observer-prep-01/ctf01_observer.hh",
+      "sha256": "2bc6fb8e9c9c7f566967f0ac2b956ad3af34a76d4a22ae24d63a1b37ba7d3f36",
+      "size_bytes": 3936,
+      "line_count": 110
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-observer-prep-01/ctf01_observer.cc",
+      "sha256": "30d95e80d465bde316f2098fa33ad77467f673730b41447f07ce0a54be80bfe9",
+      "size_bytes": 5842,
+      "line_count": 142
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_helper.cpp",
+      "sha256": "3235fbdd246544bc3f01e6588efb1d58a32d769abf35f12bfc9f56b2479a905f",
+      "size_bytes": 15543,
+      "line_count": 214
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_metadata.hh",
+      "sha256": "6332546299553c1c8f4d0de36676067decf6921c7e3e27ebc7bd2d6ca6f0dee9",
+      "size_bytes": 7434,
+      "line_count": 147
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_fields.hh",
+      "sha256": "27fee0c22aa835953928562e5987d86b198d75ed2ed5e2f52fa56b52f291e6f4",
+      "size_bytes": 5777,
+      "line_count": 83
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_admission.hh",
+      "sha256": "b9f640d51d7b7e5b9c5ad0bad18cd4a1daae4e3d3958b9e5cdb032dd4507882e",
+      "size_bytes": 10793,
+      "line_count": 120
+    }
+  ],
+  "recorder_source": {
+    "path": "tools/porting/record_command.py",
+    "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+    "size_bytes": 8125,
+    "line_count": 194
+  },
+  "runtime_protocol": {
+    "CLI": [
+      "--approved-source-sha256",
+      "--native-execution",
+      "--results",
+      "--freeze-receipt",
+      "--freeze-execution",
+      "--build",
+      "--build-execution",
+      "--build-review",
+      "--build-review-execution",
+      "--output-dir"
+    ],
+    "references": "actual runtime path#SHA; actually absent result path has no invented SHA",
+    "review_schema": "ctf01-independent-original-data-review.v1",
+    "successful_status": "pass-actual-original-data-and-provenance-before-Rust",
+    "failed_process_or_integrity_status": "fail-original-process-or-observation-integrity-before-Rust",
+    "stdout": "full exact review JSON",
+    "actual_counts": "derived from complete actual records only; null if no complete result",
+    "helper_exit2": "complete valid source records retained; integrity failure blocks release and returns1",
+    "source_outcomes": "actual constructor/init/whole-return/fatal/exception/not-invoked; OS failure not inferred as source outcome",
+    "required_reached_operand_absence": "integrity failure; unreached remains unavailable/noPASS",
+    "build_metadata_schema": "ctf01-native-build.v1",
+    "build_status": "pass-actual-3TU-link-and-preservation",
+    "build_counts": {
+      "previous_compile_rows": 661,
+      "current_compile_rows": 664,
+      "core_registered": 643,
+      "core_present": 631,
+      "core_absent": 12
+    },
+    "build_PE_metadata_schema": "ctf01-independent-build-PE-review.v1",
+    "build_PE_status": "pass-exact-retained-PE-runtime-and-actual-build-identity",
+    "actual_PE_map_binding_keys": [
+      "original",
+      "derived",
+      "comparison"
+    ],
+    "compile_recorder_authored_build_metadata_claimed": false,
+    "Native_binary_payloads_rehashed_or_parsed": false,
+    "worktree_clean_required": false,
+    "build_PE_stdout": "exact compact {review,status}; review ref authenticates supplied report; recorded -X utf8 -B reader/source identity required",
+    "seeded_input_provenance": "after_member_inputs actual copied scalar bits/ROnly/caller bits/flags/construction dimensions/ordered LayerPoint exactly frozen literals; no CTF output evaluation"
+  },
+  "source_only_checks": {
+    "three_Python_AST_parse_passed": true,
+    "IO_bytes_equal_accepted_writer_helper": true,
+    "shape_pin_in_main": true,
+    "IO_pin_in_main": true,
+    "PE_reader_source_pin_in_main": true,
+    "prior_held_01_preserved": true
+  },
+  "authorship_limits": "Base authored literal input encoding and this factual reader; not independent certification of CTF formulas or the passive algorithm.",
+  "reader_or_dependencies_imported_or_executed": false,
+  "actual_scientific_result_or_binary_payloads_read": false,
+  "project_imports_engines_builds_Git_or_canonical_mutations_performed": false,
+  "numerical_PASS_or_expected_outputs_claimed": false,
+  "future_artifact_hashes_or_source_outcomes_invented": false,
+  "additional_SourceQA_framework_or_proof_stage_required": false,
+  "prior_held_source_manifest": {
+    "path": ".runtime/porting/CTF-01/original-data-review-prep-01/manifest.json",
+    "sha256": "686b25d4347c5b0b8784c6eb4c1b2d01f799f4ffadc065d0ff414708538ff6fa",
+    "size_bytes": 6230,
+    "line_count": 156
+  },
+  "from_01_diffs": [
+    {
+      "path": ".runtime/porting/CTF-01/original-data-review-prep-02/review_data.py.from-01.diff",
+      "sha256": "a1ceaf49aeef570fe04e502fd53bcd1dde29d230514a66f337f0398527baf72e",
+      "size_bytes": 3387,
+      "line_count": 43
+    },
+    {
+      "path": ".runtime/porting/CTF-01/original-data-review-prep-02/shape.py.from-01.diff",
+      "sha256": "1245f2bcf57bab54b6412638760e42f424070f841fd1c0a8f67a90110078f9f4",
+      "size_bytes": 3016,
+      "line_count": 33
+    },
+    {
+      "path": ".runtime/porting/CTF-01/original-data-review-prep-02/README.md.from-01.diff",
+      "sha256": "b2536b9b310703319fff97a762351f7da557652c1e53670dbd982cfe1a138cff",
+      "size_bytes": 2474,
+      "line_count": 38
+    }
+  ],
+  "actual_PE_reader_source": {
+    "path": ".runtime/porting/CTF-01/independent-native-build-review-01/review_build.py",
+    "sha256": "407d5aff7e03f982f22e1cb7a6bcd6c76f6b773be61bb0f630a0410d25503a19",
+    "size_bytes": 4213,
+    "line_count": 84
+  },
+  "source_delta_scope": [
+    "flat actual build fields",
+    "actual compact PE stdout/recorded reader/source linkage",
+    "exact actual copied input provenance; no output evaluator",
+    "README/runtime source inventory and pins"
+  ]
+}

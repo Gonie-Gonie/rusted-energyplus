@@ -58,7 +58,7 @@ CTF-02/03에 전달되는 배열·순서 검증
 
 ## 종료 체크
 
-- [ ] 원본 범위와 입출력·변경상태 계약 확정
+- [x] 원본 범위와 입출력·변경상태 계약 확정
 - [ ] 단위시험 통과 및 실제 활성 분기 확인
 - [ ] 상태·시간·호출순서를 포함한 연결시험 통과
 - [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
@@ -84,3 +84,7 @@ CTF-02/03에 전달되는 배열·순서 검증
 현재 Rust에는 Regular의 저장된 Resistance와 이 세 단계 정규화 배열 owner가 없다. 기존 derived R/C 합계나 최종 계수는 해당 owner의 대체 정답이 아니며 문맥으로만 보존한다. 실제 원본과 기존 구현의 차이를 확인한 뒤 기존 material/compiler/cache 초기화 경로를 보완한다. 나중의 원본 solver 오류 flag·계수와 Rust 전처리의 미소유 상태는 비교되지 않은 문맥으로 남긴다.
 
 생산 검증은 별도다. 기존 CON-01의 고정 입력 15개·입력/기상/메타데이터 해시 45개를 유지하며, 실제 InputProcessor·재료·구성체 loader와 실제 CTF 사용 owner를 관찰해야 한다. 위 멤버 단위 입력은 이를 인증하지 않는다. source/sink·2차원·다른 재료군·0 또는 11 초과 층은 제외한다. 새 실행·수치 비교·네 gate 통과를 이 문서 변경만으로 주장하지 않는다.
+
+## Actual Original and existing Rust baseline
+
+`evidence/CTF-01-baseline/summary.json` preserves genuine Native39/42 and prior Rust fixed15 owner inventories. OriginalDataQA passed before Rust execution: 42 whole source calls returned, 106 callbacks were recorded, and 20 unreached phases remain unavailable. Existing Rust loader/compiler/initialization returned in all15 fixed cases; stored Regular Resistance and the selected preprocessing owners are absent as recorded. The two different lanes are not a numeric comparison. Scope review is complete; unit/integration/production gates remain pending.

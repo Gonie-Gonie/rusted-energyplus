@@ -1,0 +1,64 @@
+{
+  "schema": "ctf01-existing-Rust-owner-gap.v1",
+  "observed_utc": "2026-10-10T11:36:45.553841+00:00",
+  "authorship": "Root actual completed-record inventory; not a numeric comparison between different lanes",
+  "original_data_review": {
+    "path": ".runtime/porting/CTF-01/original-data-review-01/review.json",
+    "sha256": "c6403cc1eddbb607998267984f63710841d9adf7159acc54a892e585f02bd846",
+    "size_bytes": 6220
+  },
+  "original_data_review_execution": {
+    "path": ".runtime/porting/CTF-01/original-data-review-command-01/receipt.json",
+    "sha256": "76390d418f87002cd85d9dba15b852c98ca0c5ea1557d4013f2d268b3fb462a4",
+    "size_bytes": 4237
+  },
+  "Rust_build": {
+    "path": ".runtime/porting/CTF-01/existing-observer-build-command-01/receipt.json",
+    "sha256": "3c27988860def97c9bdb005e93df4453e2c0c2142ea823063ebb730eb60a275c",
+    "size_bytes": 4523
+  },
+  "Rust_execution": {
+    "path": ".runtime/porting/CTF-01/existing-observer-command-01/receipt.json",
+    "sha256": "14d74776a497fcf6f7eb0e0c8676e4c40d11c369d83a47659397014af1fe4fd5",
+    "size_bytes": 3066
+  },
+  "Rust_result": {
+    "path": ".runtime/porting/CTF-01/existing-observer-command-01/stdout.log",
+    "sha256": "ef4e300153fd72e7bf45a6b0c25458d7b723dc792484624b048d33e45e503da9"
+  },
+  "request": {
+    "path": ".runtime/porting/CTF-01/existing-observer-inputs-01/request.json",
+    "sha256": "728b85c6e499bda113d720cd739f09024287487b0d024751884df8f84698f834",
+    "size_bytes": 34667
+  },
+  "compiled_source_snapshot": {
+    "path": ".runtime/porting/source-objects/d2/d2a79700d67e2ed2ad212e0ec3fbc93249438fbae1ec582ff8a3c46a18347113",
+    "sha256": "d2a79700d67e2ed2ad212e0ec3fbc93249438fbae1ec582ff8a3c46a18347113"
+  },
+  "actual_binary": {
+    "historical_path": "target/debug/examples/ctf01_existing_observer.exe",
+    "sha256": "efb9ef674342ebfbdad339b8585598d883be83efd15c1cb0a8e243b316990fe8"
+  },
+  "fixed_scope_cases": 15,
+  "loader_compiler_initialization_returned_cases": 15,
+  "actual_typed_material_rows": 21,
+  "actual_typed_construction_rows": 21,
+  "actual_typed_surface_rows": 90,
+  "missing_selected_owner_cases": {
+    "DoCTFErrorReport": 15,
+    "ErrorsFound": 15,
+    "IsUsedCTF": 15,
+    "PostConversion": 15,
+    "PostLoad": 15,
+    "PostMerge": 15
+  },
+  "missing_stored_Regular_Resistance_rows": 15,
+  "source_capture_exact_for_all_19_API_and_2_observer_files": true,
+  "Native_explicit39_vs_Rust_fixed15_same_input_comparison_claimed": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "legacy_gap_factual_inventory_complete": true,
+  "candidate_implementation_applied": false,
+  "gates_updated": false
+}

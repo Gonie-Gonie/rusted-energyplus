@@ -9278,7 +9278,7 @@
       "companion": "Construction.hh capacity/constructor/actual owners; Material.hh and Material.cc Regular/NoMass storage; DataConversions.hh58-69; HeatBalanceManager.cc6153-6167 actual shared references and call order; SurfaceGeometry.cc9081-9107 actual CTF-use owner.",
       "excludes": "CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다. 실행 가능 여부를 확인하지 않고 무조건 0으로 대체하지 않는다.",
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/Construction.cc",
-      "scope_review": "미확인",
+      "scope_review": "통과",
       "unit_gate": "미확인",
       "integration_gate": "미확인",
       "production_gate": "미확인",
@@ -9356,7 +9356,13 @@
           "sha256": "58fab5204013171fda426a6de850ac2c150100e180813db7c0e40d289f863613",
           "size_bytes": 1465
         },
-        "native_build_and_PE_verified_before_engine": true
+        "native_build_and_PE_verified_before_engine": true,
+        "legacy_missing_owner_inventory_confirmed": true
+      },
+      "actual_original_and_existing_baseline": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/summary.json",
+        "sha256": "3f6f0cf57229e5b98bc26927855e2c3c9661f5295bcc27c73fb6a7ca5038fabe",
+        "size_bytes": 2133
       }
     },
     {

@@ -1,0 +1,64 @@
+{
+  "schema": "ctf01-actual-original-and-existing-baseline-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-01-baseline/manifest.json",
+    "sha256": "d94a31e3818def1f49637f2db26bbd25455d04135914ed4ad6e60fed164fda2a",
+    "size_bytes": 122234
+  },
+  "original_data_review": {
+    "path": ".runtime/porting/CTF-01/original-data-review-01/review.json",
+    "sha256": "c6403cc1eddbb607998267984f63710841d9adf7159acc54a892e585f02bd846",
+    "size_bytes": 6220
+  },
+  "original_data_review_execution": {
+    "path": ".runtime/porting/CTF-01/original-data-review-command-01/receipt.json",
+    "sha256": "76390d418f87002cd85d9dba15b852c98ca0c5ea1557d4013f2d268b3fb462a4",
+    "size_bytes": 4237
+  },
+  "actual_Original_counts": {
+    "model_cases": 39,
+    "operation_records": 42,
+    "actual_operation_invocations": 42,
+    "actual_operations_skipped": 0,
+    "actual_phase_callback_count": 106,
+    "unreached_phase_records": 20,
+    "scalar_DTO_visits": 4754,
+    "snapshot_visits": 318,
+    "actual_source_function_counts": {
+      "calculateTransferFunction": 42
+    },
+    "actual_source_status_counts": {
+      "source_returned": 42
+    },
+    "actual_constructor_status_counts": {
+      "source_returned": 39
+    },
+    "actual_initialization_status_counts": {
+      "source_returned": 39
+    },
+    "actual_phase_callback_counts": {
+      "PostLoad": 40,
+      "PostMerge": 33,
+      "PostConversion": 33
+    }
+  },
+  "actual_existing_Rust_gap": {
+    "path": ".runtime/porting/CTF-01/existing-gap-01/gap.json",
+    "sha256": "8076addd4c6af6cbe9c73fab209a40fa57d67c6a23e343e78e299f3c305419a0",
+    "size_bytes": 2749
+  },
+  "fixed15_all_loader_compiler_initializations_returned": true,
+  "missing_stored_Regular_Resistance_rows": 15,
+  "missing_selected_owner_cases": {
+    "DoCTFErrorReport": 15,
+    "ErrorsFound": 15,
+    "IsUsedCTF": 15,
+    "PostConversion": 15,
+    "PostLoad": 15,
+    "PostMerge": 15
+  },
+  "scope_review_complete": true,
+  "numerical_unit_PASS": false,
+  "integration_PASS": false,
+  "production_PASS": false
+}
