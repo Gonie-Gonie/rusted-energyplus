@@ -1,0 +1,1 @@
+{"comparison": {"path": ".runtime/porting/SYS-02/selected-comparison-01/comparison.json", "sha256": "65cdeeaa5d3cb2f751e2e5a543c92afda29db029e7f3e82052bb3dba9d07e7e6", "size_bytes": 6324}, "status": "pass-selected-methods-only", "exit_code": 0}

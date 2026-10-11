@@ -1,0 +1,74 @@
+    void ReportWarmupConvergence(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda Lawrie
+        //       DATE WRITTEN   October 2011
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 AverageZoneTemp;
+        Real64 AverageZoneLoad;
+        Real64 StdDevZoneTemp;
+        Real64 StdDevZoneLoad;
+
+        if (!state.dataGlobal->WarmupFlag) { // Report out average/std dev
+            // Write Warmup Convervence Information to the initialization output file
+            if (state.dataHeatBalMgr->ReportWarmupConvergenceFirstWarmupWrite && state.dataGlobal->NumOfZones > 0) {
+                constexpr const char *Format_730(
+                    "! <Warmup Convergence Information>,Zone Name,Environment Type/Name,Average Warmup Temperature Difference "
+                    "{{deltaC}},Std Dev Warmup Temperature Difference {{deltaC}},Max Temperature Pass/Fail Convergence,Min "
+                    "Temperature Pass/Fail Convergence,Average Warmup Load Difference {{W}},Std Dev Warmup Load Difference "
+                    "{{W}},Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence\n");
+                print(state.files.eio, Format_730);
+                state.dataHeatBalMgr->ReportWarmupConvergenceFirstWarmupWrite = false;
+            }
+
+            state.dataHeatBalMgr->TempZoneRptStdDev = 0.0;
+            state.dataHeatBalMgr->LoadZoneRptStdDev = 0.0;
+
+            std::string EnvHeader;
+            if (state.dataEnvrn->RunPeriodEnvironment) {
+                EnvHeader = "RunPeriod:";
+            } else {
+                EnvHeader = "SizingPeriod:";
+            }
+
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+                AverageZoneTemp = sum(state.dataHeatBalMgr->TempZoneRpt(ZoneNum, {1, state.dataHeatBalMgr->CountWarmupDayPoints})) /
+                                  double(state.dataHeatBalMgr->CountWarmupDayPoints);
+                for (int Num = 1; Num <= state.dataHeatBalMgr->CountWarmupDayPoints; ++Num) {
+                    if (state.dataHeatBalMgr->MaxLoadZoneRpt(ZoneNum, Num) > 1.e-4) {
+                        state.dataHeatBalMgr->LoadZoneRpt(ZoneNum, Num) /= state.dataHeatBalMgr->MaxLoadZoneRpt(ZoneNum, Num);
+                    } else {
+                        state.dataHeatBalMgr->LoadZoneRpt(ZoneNum, Num) = 0.0;
+                    }
+                }
+                AverageZoneLoad = sum(state.dataHeatBalMgr->LoadZoneRpt(ZoneNum, {1, state.dataHeatBalMgr->CountWarmupDayPoints})) /
+                                  double(state.dataHeatBalMgr->CountWarmupDayPoints);
+                StdDevZoneTemp = 0.0;
+                StdDevZoneLoad = 0.0;
+                for (int Num = 1; Num <= state.dataHeatBalMgr->CountWarmupDayPoints; ++Num) {
+                    state.dataHeatBalMgr->TempZoneRptStdDev(Num) = pow_2(state.dataHeatBalMgr->TempZoneRpt(ZoneNum, Num) - AverageZoneTemp);
+                    state.dataHeatBalMgr->LoadZoneRptStdDev(Num) = pow_2(state.dataHeatBalMgr->LoadZoneRpt(ZoneNum, Num) - AverageZoneLoad);
+                }
+                StdDevZoneTemp = std::sqrt(sum(state.dataHeatBalMgr->TempZoneRptStdDev({1, state.dataHeatBalMgr->CountWarmupDayPoints})) /
+                                           double(state.dataHeatBalMgr->CountWarmupDayPoints));
+                StdDevZoneLoad = std::sqrt(sum(state.dataHeatBalMgr->LoadZoneRptStdDev({1, state.dataHeatBalMgr->CountWarmupDayPoints})) /
+                                           double(state.dataHeatBalMgr->CountWarmupDayPoints));
+
+                constexpr const char *Format_731(" Warmup Convergence Information,{},{},{:.10R},{:.10R},{},{},{:.10R},{:.10R},{},{}\n");
+                print(state.files.eio,
+                      Format_731,
+                      state.dataHeatBal->Zone(ZoneNum).Name,
+                      EnvHeader + ' ' + state.dataEnvrn->EnvironmentName,
+                      AverageZoneTemp,
+                      StdDevZoneTemp,
+                      PassFail(state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(1)),
+                      PassFail(state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(2)),
+                      AverageZoneLoad,
+                      StdDevZoneLoad,
+                      PassFail(state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(3)),
+                      PassFail(state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(4)));
+            }
+        }
+    }

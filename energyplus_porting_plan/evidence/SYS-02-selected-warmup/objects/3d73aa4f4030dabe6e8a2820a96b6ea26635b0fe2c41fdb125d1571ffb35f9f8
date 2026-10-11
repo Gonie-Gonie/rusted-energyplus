@@ -1,0 +1,14 @@
+{
+  "actual_input_after": {
+    "path": ".runtime/porting/SYS-02/selected-observation-01/Native-input.json",
+    "sha256": "34a6d7cd40ff24ae08c04b7be88cbc527c2e4c003d734f7e6b212ed121359637",
+    "size_bytes": 96140
+  },
+  "actual_Native_binary_after": {
+    "path": "D:\\CodexBuild\\rusted-energyplus\\SYS-02\\warmup-native-build-02\\bin\\sys02_warmup_helper.exe",
+    "sha256": "57036f8a97e32dada106206887184eb59aba0551d34f8bcc9c74988ff51a13b4",
+    "size_bytes": 1297322680
+  },
+  "actual_exit_code": 0,
+  "input_bytes_match_source": true
+}

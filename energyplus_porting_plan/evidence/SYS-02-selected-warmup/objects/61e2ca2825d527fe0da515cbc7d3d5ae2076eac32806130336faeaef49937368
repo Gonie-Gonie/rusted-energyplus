@@ -1,0 +1,694 @@
+{
+  "schema": "sys02-warmup-native-source-preparation.v1",
+  "status": "HELD-source-only-unexecuted",
+  "Original_version": "26.1.0",
+  "Original_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "own_sources_and_metadata": [
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/warmup_reference_helper.cpp",
+      "sha256": "49339c0febf2b7c7555ee8b78f8d3f4a6864301b8e8de3b16c8e7cd119428fad",
+      "size_bytes": 15294,
+      "line_count": 276
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/warmup_reference_fields.hh",
+      "sha256": "0a0168b978a9b5acf8f107d1bfa30d8aaa0c9f1db90cb0e03d6f8420811b47d6",
+      "size_bytes": 10338,
+      "line_count": 170
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/warmup_reference.cmake",
+      "sha256": "7ec93f33f3d7adb97a3835eeaba2075046f9b917b056051bc12273dab4877dc9",
+      "size_bytes": 1733,
+      "line_count": 28
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/input-only-cases.proposed.json",
+      "sha256": "34a6d7cd40ff24ae08c04b7be88cbc527c2e4c003d734f7e6b212ed121359637",
+      "size_bytes": 96140,
+      "line_count": 3816
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/input-only-inventory.json",
+      "sha256": "a70eb6bfa6a45da14d2851208fed41b4318f4fa0914f02ff24da291c752d7074",
+      "size_bytes": 67182,
+      "line_count": 1924
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/README.md",
+      "sha256": "d381af2e5b598ecb351ab87cc9eafa33b4d97031a1e82947d9f360195080f94a",
+      "size_bytes": 5502,
+      "line_count": 23
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/author.py",
+      "sha256": "1619c035b7336061fcb28517fbf546428aa85ea855a8ca305755ea55bd2146ab",
+      "size_bytes": 16476,
+      "line_count": 229
+    }
+  ],
+  "reused_patterns_before": [
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_helper.cpp",
+        "sha256": "89fcfc63be7ba3a5c190c828f8167a305695a88aee3f30583dafd196f115ca09",
+        "size_bytes": 14797,
+        "line_count": 241
+      },
+      "archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/before/zon05_reference_helper.cpp",
+        "sha256": "89fcfc63be7ba3a5c190c828f8167a305695a88aee3f30583dafd196f115ca09",
+        "size_bytes": 14797,
+        "line_count": 241
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon01_reference_fields.hh",
+        "sha256": "24e96e01b8c6f5ed445c94dd6f5a486dac5d79c175df62ba55af46bd10ad86f8",
+        "size_bytes": 5146,
+        "line_count": 96
+      },
+      "archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/before/zon01_reference_fields.hh",
+        "sha256": "24e96e01b8c6f5ed445c94dd6f5a486dac5d79c175df62ba55af46bd10ad86f8",
+        "size_bytes": 5146,
+        "line_count": 96
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference.cmake",
+        "sha256": "5ae5067e6d5b0e19ac7cf74275e5b724946df9fb90254061b74e27850c060603",
+        "size_bytes": 1799,
+        "line_count": 28
+      },
+      "archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/before/zon05_reference.cmake",
+        "sha256": "5ae5067e6d5b0e19ac7cf74275e5b724946df9fb90254061b74e27850c060603",
+        "size_bytes": 1799,
+        "line_count": 28
+      }
+    }
+  ],
+  "exact_diffs": [
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/diffs/warmup_reference_helper.cpp.addition.diff",
+      "sha256": "aa8a9911b43e884ff9370680791fb9f1a8e390dc6d5d07ce1bb3ec81faf02137",
+      "size_bytes": 15680,
+      "line_count": 279
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/diffs/warmup_reference_fields.hh.addition.diff",
+      "sha256": "d9c8c6f9dbfe6ac6764ddcb32e0cce63e1b2f687364bfc594ed416874486497f",
+      "size_bytes": 10617,
+      "line_count": 173
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/diffs/warmup_reference.cmake.addition.diff",
+      "sha256": "9384a951169188f08208a250ea87297e77127a9c0c37481d554ef85598390002",
+      "size_bytes": 1865,
+      "line_count": 31
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/diffs/input-only-cases.proposed.json.addition.diff",
+      "sha256": "7319f5a90b869f4ef780a0bcef99cef0b58e459c7331a1d7d3425a412dc29bd7",
+      "size_bytes": 100070,
+      "line_count": 3819
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/diffs/input-only-inventory.json.addition.diff",
+      "sha256": "8733fae499d83012b9e3fe9303688ffc1218b382a1c699e2dc667a999a6ecda8",
+      "size_bytes": 69215,
+      "line_count": 1927
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/diffs/README.md.addition.diff",
+      "sha256": "b4768b51995d3d41a6d2a6e9641498647b8e06ebfac9a84e2959ba281f3c7e24",
+      "size_bytes": 5616,
+      "line_count": 26
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/diffs/author.py.addition.diff",
+      "sha256": "399bee15b93a59b996979bfb59360a928106374e19e54706345b48d3577abacd",
+      "size_bytes": 16797,
+      "line_count": 232
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/diffs/warmup_reference_helper.cpp.from-reused-pattern.diff",
+      "sha256": "cf2cdfd4fd7012f35ca21ada0967de09f6c9948485c0853bccfb7c7ac41fbc1a",
+      "size_bytes": 29783,
+      "line_count": 480
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/diffs/warmup_reference_fields.hh.from-reused-pattern.diff",
+      "sha256": "f16a393f3ae6254177867aef921a0bfa81863ff48b6929486b4795932e83294f",
+      "size_bytes": 13988,
+      "line_count": 215
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/diffs/warmup_reference.cmake.from-reused-pattern.diff",
+      "sha256": "938f3f2d4b102c88a6670b1fc0e5de7d3f6afded68237c859879fc27694f2bba",
+      "size_bytes": 3602,
+      "line_count": 52
+    }
+  ],
+  "Original_whole_sources": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.cc",
+      "sha256": "6416c03de88a2b913d33393e82141b4183b9e446cd93fb7e5c7c9fde22d15f9f",
+      "size_bytes": 60978,
+      "line_count": 1104
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataContaminantBalance.hh",
+      "sha256": "1fbeba16b5a6b3208ea3ee2af4ebee9a1f529e65a84d846060cc4d6b1537aad7",
+      "size_bytes": 17770,
+      "line_count": 305
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.hh",
+      "sha256": "7a4eecf4ababb041db5b2ee8241ea82a839a05e9ab5a7c195cc6a810cd2f08b4",
+      "size_bytes": 16816,
+      "line_count": 234
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataErrorTracking.hh",
+      "sha256": "966cc13df0bd9ff48d9995a390bce9005e141f45e534438591ff96f6614b7f58",
+      "size_bytes": 18669,
+      "line_count": 251
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+      "sha256": "2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25",
+      "size_bytes": 13547,
+      "line_count": 198
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHVACGlobals.hh",
+      "sha256": "881c4467c4ffc32162fd0855d6bb300cc19772dcbd09ec6831d4aeff7352b858",
+      "size_bytes": 24717,
+      "line_count": 556
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.cc",
+      "sha256": "7635486c6051b3ab4d2be69ab3e419ce2cccb5f988bc44fe4ac6d1017bc6ccad",
+      "size_bytes": 54019,
+      "line_count": 1050
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+      "size_bytes": 133816,
+      "line_count": 2059
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataStringGlobals.hh",
+      "sha256": "4e759f8abc3fd65838ea86f00d221eaeff2b779ca21f92c5a80e1ae9bd288bcc",
+      "size_bytes": 7295,
+      "line_count": 161
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+      "sha256": "7eea2e660914574ce9b5b633ac2099d49b09255d6c215b84e47edccbbb5cffae",
+      "size_bytes": 113537,
+      "line_count": 1850
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSystemVariables.hh",
+      "sha256": "b027e65ffab2d18fd08a6df1b905b96bf1159f52651834699c520fca53727669",
+      "size_bytes": 10017,
+      "line_count": 213
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataViewFactorInformation.hh",
+      "sha256": "67d6252bcd2e42917302199840eadda2ad2f75cc23e863c2b57d80d6655b2d53",
+      "size_bytes": 7330,
+      "line_count": 128
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEnergyDemands.cc",
+      "sha256": "bd111315b3d8695df31f722088c9ae08d7369d40f3d445bb96d976d4f9c875b7",
+      "size_bytes": 21954,
+      "line_count": 395
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEnergyDemands.hh",
+      "sha256": "048718252c585868e46f3f0b5bad49a6e2b10835d4eb3efef77008348f7ad3c2",
+      "size_bytes": 12483,
+      "line_count": 191
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EPVector.hh",
+      "sha256": "155ac5aaf6bd6138ad1a397edf68e2c660a6595d94f291bcf671ebc040c335e2",
+      "size_bytes": 11096,
+      "line_count": 357
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+      "size_bytes": 371103,
+      "line_count": 6206
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.hh",
+      "sha256": "2080fdb48dc3a03429f093dfe4f7ce2fffa01519b7783db250410ea8b1bfcd69",
+      "size_bytes": 13588,
+      "line_count": 282
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.cc",
+      "sha256": "cfe62739c6327e692567d6e7fcd6abb5760548dd80d4195fe3c7eade5d33316a",
+      "size_bytes": 22346,
+      "line_count": 552
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh",
+      "sha256": "9605dc5fea21ba3923897ce8a3684b96209bb6c48666b43bccf990754dac9c68",
+      "size_bytes": 32371,
+      "line_count": 842
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SQLiteProcedures.hh",
+      "sha256": "7bf58cf745e82bdccd4fc22bdc54c0b09a530a69555ee4648f0dfba83b3d64bf",
+      "size_bytes": 50039,
+      "line_count": 1037
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+      "sha256": "87bd8b6fac7001e26ffc08f5e3457a3f644098793a2734524c56de946c761ff2",
+      "size_bytes": 81995,
+      "line_count": 1813
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.hh",
+      "sha256": "448687bb00511cb327d4d6a4f3b6d1873e5f2a3082d4975598179b9dac82cbcc",
+      "size_bytes": 53352,
+      "line_count": 947
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "sha256": "38d2ae39f927692ea7266a800c115f62b06d04835d23ecb1cc7983f929169b31",
+      "size_bytes": 25280,
+      "line_count": 449
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.hh",
+      "start_line": 68,
+      "end_line": 85,
+      "sha256": "969d52af46e56de1427862802fad21a0409b93ebbb32e220f6300cf2273298d5",
+      "size_bytes": 1158,
+      "purpose": "actual WarmupConvergence constructor metrics and four pass flags",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/HeatBalanceManager.hh.68-85.txt",
+        "sha256": "969d52af46e56de1427862802fad21a0409b93ebbb32e220f6300cf2273298d5",
+        "size_bytes": 1158,
+        "line_count": 18
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.hh",
+      "start_line": 128,
+      "end_line": 140,
+      "sha256": "ad4fe782059db87b3a20bc83ef2f069b5e75da5448ae4119b406a1141cadd4f8",
+      "size_bytes": 399,
+      "purpose": "public selected API declarations",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/HeatBalanceManager.hh.128-140.txt",
+        "sha256": "ad4fe782059db87b3a20bc83ef2f069b5e75da5448ae4119b406a1141cadd4f8",
+        "size_bytes": 399,
+        "line_count": 13
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.hh",
+      "start_line": 184,
+      "end_line": 227,
+      "sha256": "cd664221a476a266480e29f7b5cc862abc97a3a9fff7624193edd9c70a9167f5",
+      "size_bytes": 2743,
+      "purpose": "all selected manager owners and uninitialized Count declaration",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/HeatBalanceManager.hh.184-227.txt",
+        "sha256": "cd664221a476a266480e29f7b5cc862abc97a3a9fff7624193edd9c70a9167f5",
+        "size_bytes": 2743,
+        "line_count": 44
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "start_line": 2616,
+      "end_line": 2653,
+      "sha256": "bbe6ba9323ae00b7395a6d78a52359a207157762e062e9837b1e9a22e21fba56",
+      "size_bytes": 2166,
+      "purpose": "genuine BeginSim/BeginEnvrn differs from the direct allocation lane",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/HeatBalanceManager.cc.2616-2653.txt",
+        "sha256": "bbe6ba9323ae00b7395a6d78a52359a207157762e062e9837b1e9a22e21fba56",
+        "size_bytes": 2166,
+        "line_count": 38
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "start_line": 2824,
+      "end_line": 2963,
+      "sha256": "99dcbf162ab864cbf011e9ee2ff6ab8b0a6aa23f744ccf87363be7fd88c2a3c4",
+      "size_bytes": 12555,
+      "purpose": "actual allocation and selected initialized/uninitialized warmup owners",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/HeatBalanceManager.cc.2824-2963.txt",
+        "sha256": "99dcbf162ab864cbf011e9ee2ff6ab8b0a6aa23f744ccf87363be7fd88c2a3c4",
+        "size_bytes": 12555,
+        "line_count": 140
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "start_line": 2971,
+      "end_line": 3057,
+      "sha256": "18b7c9199c1a7adf5f18a47fb22ccd8917965d03033e2fd17e29102a0503c089",
+      "size_bytes": 5610,
+      "purpose": "record keeper, rolling owners, report collection and direct siblings",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/HeatBalanceManager.cc.2971-3057.txt",
+        "sha256": "18b7c9199c1a7adf5f18a47fb22ccd8917965d03033e2fd17e29102a0503c089",
+        "size_bytes": 5610,
+        "line_count": 87
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "start_line": 3059,
+      "end_line": 3226,
+      "sha256": "12f0dd0d9cce07ee46a12684452ed1efc7e47ddfd8c9d04e62be60b2b2ffc8ca",
+      "size_bytes": 11832,
+      "purpose": "whole unchanged four-criterion convergence, diagnostics, transfer/reset and min/max flags",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/HeatBalanceManager.cc.3059-3226.txt",
+        "sha256": "12f0dd0d9cce07ee46a12684452ed1efc7e47ddfd8c9d04e62be60b2b2ffc8ca",
+        "size_bytes": 11832,
+        "line_count": 168
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "start_line": 3228,
+      "end_line": 3301,
+      "sha256": "c1ff57d6998b7bd5567b319cd27e9677a2a8d2ac7de066612589c8bf0df1450d",
+      "size_bytes": 4515,
+      "purpose": "whole unchanged report, in-place normalization and shared StdDev scratch",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/HeatBalanceManager.cc.3228-3301.txt",
+        "sha256": "c1ff57d6998b7bd5567b319cd27e9677a2a8d2ac7de066612589c8bf0df1450d",
+        "size_bytes": 4515,
+        "line_count": 74
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "start_line": 3303,
+      "end_line": 3312,
+      "sha256": "c4c8ae35b71564dec40d9dbd515e8fbd11869deef801baffbed01433d2c70cbf",
+      "size_bytes": 644,
+      "purpose": "window sibling excluded by actual empty window list",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/HeatBalanceManager.cc.3303-3312.txt",
+        "sha256": "c4c8ae35b71564dec40d9dbd515e8fbd11869deef801baffbed01433d2c70cbf",
+        "size_bytes": 644,
+        "line_count": 10
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEnergyDemands.hh",
+      "start_line": 83,
+      "end_line": 120,
+      "sha256": "40d132a2e57bb52364c45efe7d010c0ad04788b03d99064a5c4a27b22db6a5ca",
+      "size_bytes": 2913,
+      "purpose": "genuine report owner defaults and public declaration",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/DataZoneEnergyDemands.hh.83-120.txt",
+        "sha256": "40d132a2e57bb52364c45efe7d010c0ad04788b03d99064a5c4a27b22db6a5ca",
+        "size_bytes": 2913,
+        "line_count": 38
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEnergyDemands.cc",
+      "start_line": 323,
+      "end_line": 329,
+      "sha256": "5f05d8503943d57c4954b25ae5936850ff509c220c23b9f58c9562a8bf0588f4",
+      "size_bytes": 392,
+      "purpose": "actual signed load rate/energy writes",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/DataZoneEnergyDemands.cc.323-329.txt",
+        "sha256": "5f05d8503943d57c4954b25ae5936850ff509c220c23b9f58c9562a8bf0588f4",
+        "size_bytes": 392,
+        "line_count": 7
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.cc",
+      "start_line": 1042,
+      "end_line": 1048,
+      "sha256": "42e61d149aa612c3fb0a888038d716263f62b2e39484e4d7e7c6113d02238f4f",
+      "size_bytes": 374,
+      "purpose": "direct allocation helper prerequisite",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/DataHeatBalance.cc.1042-1048.txt",
+        "sha256": "42e61d149aa612c3fb0a888038d716263f62b2e39484e4d7e7c6113d02238f4f",
+        "size_bytes": 374,
+        "line_count": 7
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "start_line": 90,
+      "end_line": 98,
+      "sha256": "33aa37ddb736523a72f0d3d58765287d7861b119ca488baa60837e55585e6301",
+      "size_bytes": 385,
+      "purpose": "actual default max/min days",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/DataHeatBalance.hh.90-98.txt",
+        "sha256": "33aa37ddb736523a72f0d3d58765287d7861b119ca488baa60837e55585e6301",
+        "size_bytes": 385,
+        "line_count": 9
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "start_line": 1807,
+      "end_line": 1833,
+      "sha256": "90de91ba201761cfc8d3c3810b8e53b7377dac47c5ae8194f0fe9bf7d6a029e6",
+      "size_bytes": 2458,
+      "purpose": "actual tolerance/min/max owner declarations",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/DataHeatBalance.hh.1807-1833.txt",
+        "sha256": "90de91ba201761cfc8d3c3810b8e53b7377dac47c5ae8194f0fe9bf7d6a029e6",
+        "size_bytes": 2458,
+        "line_count": 27
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataErrorTracking.hh",
+      "start_line": 205,
+      "end_line": 233,
+      "sha256": "ab8acea7635bada6c9c48562ed55642b60a202ac74e71f81e7ed18e24a1fe55d",
+      "size_bytes": 1616,
+      "purpose": "genuine initialized error owners",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/DataErrorTracking.hh.205-233.txt",
+        "sha256": "ab8acea7635bada6c9c48562ed55642b60a202ac74e71f81e7ed18e24a1fe55d",
+        "size_bytes": 1616,
+        "line_count": 29
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+      "start_line": 796,
+      "end_line": 833,
+      "sha256": "0ba47cb0bf45f8dff7fd1a52e742056685d9cddfa8be219ab15d64815cd78e24",
+      "size_bytes": 1581,
+      "purpose": "genuine severe counters/error/callback",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/UtilityRoutines.cc.796-833.txt",
+        "sha256": "0ba47cb0bf45f8dff7fd1a52e742056685d9cddfa8be219ab15d64815cd78e24",
+        "size_bytes": 1581,
+        "line_count": 38
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+      "start_line": 870,
+      "end_line": 890,
+      "sha256": "7f91a800f0b638518c3e002c9878e0574a18232d6aabfff4188ad41d860f8283",
+      "size_bytes": 806,
+      "purpose": "genuine continue error/optionalSQLite/callback",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/UtilityRoutines.cc.870-890.txt",
+        "sha256": "7f91a800f0b638518c3e002c9878e0574a18232d6aabfff4188ad41d860f8283",
+        "size_bytes": 806,
+        "line_count": 21
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+      "start_line": 1381,
+      "end_line": 1423,
+      "sha256": "42dd3a6e6296c2cb302f3188457bcc9575938e2fbb1f5c45b357931ba841080c",
+      "size_bytes": 1689,
+      "purpose": "actual error header/output selection",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/UtilityRoutines.cc.1381-1423.txt",
+        "sha256": "42dd3a6e6296c2cb302f3188457bcc9575938e2fbb1f5c45b357931ba841080c",
+        "size_bytes": 1689,
+        "line_count": 43
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.cc",
+      "start_line": 247,
+      "end_line": 265,
+      "sha256": "2b6bcfa39e3cf287ff832c6fc86a7242dba2f9bb34558bbaa2d70fefe92cbec3",
+      "size_bytes": 350,
+      "purpose": "real stringstream/output access",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/IOFiles.cc.247-265.txt",
+        "sha256": "2b6bcfa39e3cf287ff832c6fc86a7242dba2f9bb34558bbaa2d70fefe92cbec3",
+        "size_bytes": 350,
+        "line_count": 19
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.cc",
+      "start_line": 579,
+      "end_line": 594,
+      "sha256": "6b2a0d600f417692339a03b6b0a48cd74e8dc4ed6efe319ff34f59e6cf482a50",
+      "size_bytes": 607,
+      "purpose": "genuine constant initialization setup",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/Data__EnergyPlusData.cc.579-594.txt",
+        "sha256": "6b2a0d600f417692339a03b6b0a48cd74e8dc4ed6efe319ff34f59e6cf482a50",
+        "size_bytes": 607,
+        "line_count": 16
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+      "start_line": 75,
+      "end_line": 128,
+      "sha256": "d567673257b4f130592ce7846e9b7b0374590ff7ba590d63678a77d72261fea4",
+      "size_bytes": 4251,
+      "purpose": "actual clock/phase initialized owners",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/DataGlobals.hh.75-128.txt",
+        "sha256": "d567673257b4f130592ce7846e9b7b0374590ff7ba590d63678a77d72261fea4",
+        "size_bytes": 4251,
+        "line_count": 54
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EPVector.hh",
+      "start_line": 88,
+      "end_line": 103,
+      "sha256": "de188f5a5073ae0e83c54b80ca94950db3892642e2e9926e2ed792012693561b",
+      "size_bytes": 342,
+      "purpose": "actual one-based owner access and allocation",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/EPVector.hh.88-103.txt",
+        "sha256": "de188f5a5073ae0e83c54b80ca94950db3892642e2e9926e2ed792012693561b",
+        "size_bytes": 342,
+        "line_count": 16
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "start_line": 100,
+      "end_line": 116,
+      "sha256": "e07c6d9feb0a6ebc3647d0804bb8285acb980954d82cd2f1f8089d213f36fb03",
+      "size_bytes": 1291,
+      "purpose": "actual initialized ZTAV read owner after allocation",
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-native-prep-01/source-ranges/ZoneTempPredictorCorrector.hh.100-116.txt",
+        "sha256": "e07c6d9feb0a6ebc3647d0804bb8285acb980954d82cd2f1f8089d213f36fb03",
+        "size_bytes": 1291,
+        "line_count": 17
+      }
+    }
+  ],
+  "existing_context": [
+    {
+      "path": "energyplus_porting_plan/cards/SYS-02.md",
+      "sha256": "1b63ce11c9a103162c37baa5eb136b411bf53df8b7b153b561efef9e028e4536",
+      "size_bytes": 2880,
+      "line_count": 70
+    },
+    {
+      "path": "energyplus_porting_plan/cards/SYS-03.md",
+      "sha256": "8366cf0c13abf8d47806f73583a5c982d8f9e6bcf5949084cd4ae49e278cd154",
+      "size_bytes": 2954,
+      "line_count": 70
+    },
+    {
+      "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/manifest.json",
+      "sha256": "7b895a5f5be16339919f93b6c8d6861beb34872cc23a8cdaf82fa16e2b7e0c1d",
+      "size_bytes": 41155,
+      "line_count": 962
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/manifest.json",
+      "sha256": "5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1",
+      "size_bytes": 39009,
+      "line_count": 962
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-init-postlude-prep-06/ctf10_init_postlude_fields.hh",
+      "sha256": "8e37e35629e0bac505d837188fc66069816dfb8daa6e5023b6f0d3759a22f8cf",
+      "size_bytes": 7724,
+      "line_count": 97
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-init-postlude-prep-06/ctf10_production_helper.cpp",
+      "sha256": "c0c34d8c20801216e37b4e7a0e9c4f1eeb781617844ce2931551e4b18c7511e7",
+      "size_bytes": 37234,
+      "line_count": 477
+    }
+  ],
+  "runtime_interfaces": {
+    "helper_target": "sys02_warmup_helper",
+    "compiled_translation_units": [
+      "warmup_reference_helper.cpp"
+    ],
+    "same_parent_header": "warmup_reference_fields.hh",
+    "argv": [
+      "actual_helper_executable",
+      "actual_frozen_input_request_path"
+    ],
+    "request_schema": "sys02-warmup-direct-request.v1",
+    "result_schema": "sys02-warmup-direct-results.v1",
+    "CMake_required_variables": [
+      "SYS02_SOURCE_DIR",
+      "SYS02_INHERITED_RECIPE"
+    ],
+    "inherited_recipe_must_be_actual_prior_reviewed_recipe": true,
+    "new_TU_count": 1,
+    "Original_recompiled_or_reimplemented": false,
+    "Source_dependencies_and_input_bytes_must_be_frozen_before_actual_execution": true
+  },
+  "scope": {
+    "direct_allocation_lane_only": true,
+    "full_InitHeatBalance_invoked": false,
+    "warmup_flag_changes_only_at_initial_preparation_or_actual_Original_Check": true,
+    "uninitialized_StdDev_values_not_read": true,
+    "all_allocated_selected_owner_tails_copied_when_initialized": true,
+    "unrelated_Allocate_geometry_fansystem_contaminant_report_owners_paired": false,
+    "ordinary_clock_weather_BeginEnvrn_or_handoff_certified": false,
+    "Rust_result_or_Native_result_used_as_input": false,
+    "comparison_policy_or_expected_answers_supplied": false
+  },
+  "scientific_execution_performed": false,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false,
+  "canonical_Source_or_docs_modified": false
+}

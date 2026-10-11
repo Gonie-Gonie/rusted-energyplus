@@ -1,0 +1,19 @@
+void InputOutputFile::open_as_stringstream()
+{
+    os = std::make_unique<std::stringstream>();
+}
+
+void InputOutputFile::flush()
+{
+    if (os) {
+        os->flush();
+    }
+}
+
+std::string InputOutputFile::get_output()
+{
+    auto *ss = dynamic_cast<std::stringstream *>(os.get());
+    if (ss != nullptr) {
+        return ss->str();
+    }
+    return "";

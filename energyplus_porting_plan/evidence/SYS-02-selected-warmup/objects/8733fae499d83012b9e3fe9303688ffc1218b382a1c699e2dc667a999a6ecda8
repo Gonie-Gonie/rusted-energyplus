@@ -1,0 +1,1927 @@
+--- /dev/null
++++ .runtime/porting/SYS-02/warmup-native-prep-01/input-only-inventory.json
+@@ -0,0 +1,1924 @@
++{
++  "schema": "sys02-warmup-input-only-inventory.v1",
++  "fixed_input": {
++    "path": ".runtime/porting/SYS-02/warmup-native-prep-01/input-only-cases.proposed.json",
++    "sha256": "34a6d7cd40ff24ae08c04b7be88cbc527c2e4c003d734f7e6b212ed121359637",
++    "size_bytes": 96140,
++    "line_count": 3816
++  },
++  "case_count": 25,
++  "cases": [
++    {
++      "case_id": "no-zones",
++      "purpose": "Actual no-zone immediate Check return and zero-zone Report assignment.",
++      "requested_operation_count": 2,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "no-zones-01",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "no-zones-02",
++          "api": "HeatBalanceManager::ReportWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "first-day-zero",
++      "purpose": "Allocate previous-day zero and no-load/zero-temperature four criteria; first Run report collection.",
++      "requested_operation_count": 5,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "first-day-zero-01",
++          "api": "HeatBalanceManager::ReportWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "first-day-zero-02",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "first-day-zero-02",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "first-day-zero-03",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "first-day-zero-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "first-day-zero-04",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "first-day-zero-05",
++          "api": "HeatBalanceManager::ReportWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "minimum-day-hold",
++      "purpose": "Equal input days below/at actual minimum; Check owns WarmupFlag transition.",
++      "requested_operation_count": 6,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "minimum-day-hold-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "minimum-day-hold-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "minimum-day-hold-02",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "minimum-day-hold-03",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "minimum-day-hold-03",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "minimum-day-hold-04",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "minimum-day-hold-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "minimum-day-hold-05",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "minimum-day-hold-06",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "temperature-only",
++      "purpose": "Nonzero temperature with zero load separates absolute-temperature failure from load guard.",
++      "requested_operation_count": 4,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-only-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "temperature-only-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-only-02",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-only-03",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "temperature-only-03",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-only-04",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "active-heat-cool",
++      "purpose": "Both signed sensible loads through genuine report method; second identical day and first Run rolling/report.",
++      "requested_operation_count": 10,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "active-heat-cool-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "active-heat-cool-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "active-heat-cool-02",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "active-heat-cool-02",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "active-heat-cool-03",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "active-heat-cool-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "active-heat-cool-04",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "active-heat-cool-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "active-heat-cool-05",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "active-heat-cool-06",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "active-heat-cool-07",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "active-heat-cool-07",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "active-heat-cool-08",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "active-heat-cool-08",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "active-heat-cool-09",
++          "api": "HeatBalanceManager::ReportWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "active-heat-cool-10",
++          "api": "HeatBalanceManager::ReportWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "guard-below",
++      "purpose": "Prospective literal heat/cool guard or 100 W floor operand; no expected branch/result supplied.",
++      "requested_operation_count": 6,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-below-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-below-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-below-02",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-below-02",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-below-03",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-below-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-below-04",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-below-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-below-05",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-below-06",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "guard-at",
++      "purpose": "Prospective literal heat/cool guard or 100 W floor operand; no expected branch/result supplied.",
++      "requested_operation_count": 6,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-at-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-at-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-at-02",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-at-02",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-at-03",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-at-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-at-04",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-at-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-at-05",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-at-06",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "guard-above",
++      "purpose": "Prospective literal heat/cool guard or 100 W floor operand; no expected branch/result supplied.",
++      "requested_operation_count": 6,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-above-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-above-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-above-02",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-above-02",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-above-03",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-above-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-above-04",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-above-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-above-05",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-above-06",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "guard-floor-below",
++      "purpose": "Prospective literal heat/cool guard or 100 W floor operand; no expected branch/result supplied.",
++      "requested_operation_count": 6,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-floor-below-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-floor-below-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-floor-below-02",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-floor-below-02",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-floor-below-03",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-floor-below-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-floor-below-04",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-floor-below-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-floor-below-05",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-floor-below-06",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "guard-floor-at",
++      "purpose": "Prospective literal heat/cool guard or 100 W floor operand; no expected branch/result supplied.",
++      "requested_operation_count": 6,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-floor-at-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-floor-at-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-floor-at-02",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-floor-at-02",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-floor-at-03",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-floor-at-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-floor-at-04",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-floor-at-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-floor-at-05",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-floor-at-06",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "guard-floor-above",
++      "purpose": "Prospective literal heat/cool guard or 100 W floor operand; no expected branch/result supplied.",
++      "requested_operation_count": 6,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-floor-above-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-floor-above-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-floor-above-02",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-floor-above-02",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-floor-above-03",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-floor-above-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-floor-above-04",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-floor-above-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "guard-floor-above-05",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "guard-floor-above-06",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "temperature-boundary-below",
++      "purpose": "Absolute temperature tolerance with literal adjacent binary64 input; both load owners active.",
++      "requested_operation_count": 6,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-boundary-below-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "temperature-boundary-below-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-boundary-below-02",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "temperature-boundary-below-02",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-boundary-below-03",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-boundary-below-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "temperature-boundary-below-04",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-boundary-below-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "temperature-boundary-below-05",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-boundary-below-06",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "temperature-boundary-at",
++      "purpose": "Absolute temperature tolerance with literal adjacent binary64 input; both load owners active.",
++      "requested_operation_count": 6,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-boundary-at-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "temperature-boundary-at-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-boundary-at-02",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "temperature-boundary-at-02",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-boundary-at-03",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-boundary-at-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "temperature-boundary-at-04",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-boundary-at-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "temperature-boundary-at-05",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-boundary-at-06",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "temperature-boundary-above",
++      "purpose": "Absolute temperature tolerance with literal adjacent binary64 input; both load owners active.",
++      "requested_operation_count": 6,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-boundary-above-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "temperature-boundary-above-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-boundary-above-02",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "temperature-boundary-above-02",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-boundary-above-03",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-boundary-above-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "temperature-boundary-above-04",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-boundary-above-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "temperature-boundary-above-05",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "temperature-boundary-above-06",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "load-boundary-below",
++      "purpose": "Normalized load tolerance boundary from literal daily 300/400 W operands, temperatures zero.",
++      "requested_operation_count": 6,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "load-boundary-below-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "load-boundary-below-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "load-boundary-below-02",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "load-boundary-below-02",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "load-boundary-below-03",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "load-boundary-below-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "load-boundary-below-04",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "load-boundary-below-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "load-boundary-below-05",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "load-boundary-below-06",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "load-boundary-at",
++      "purpose": "Normalized load tolerance boundary from literal daily 300/400 W operands, temperatures zero.",
++      "requested_operation_count": 6,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "load-boundary-at-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "load-boundary-at-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "load-boundary-at-02",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "load-boundary-at-02",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "load-boundary-at-03",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "load-boundary-at-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "load-boundary-at-04",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "load-boundary-at-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "load-boundary-at-05",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "load-boundary-at-06",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "load-boundary-above",
++      "purpose": "Normalized load tolerance boundary from literal daily 300/400 W operands, temperatures zero.",
++      "requested_operation_count": 6,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "load-boundary-above-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "load-boundary-above-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "load-boundary-above-02",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "load-boundary-above-02",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "load-boundary-above-03",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "load-boundary-above-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "load-boundary-above-04",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "load-boundary-above-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "load-boundary-above-05",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "load-boundary-above-06",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "metric-retention-zero",
++      "purpose": "Active first-day metrics then zero-load guard must retain actual metric owners while rewriting pass flags.",
++      "requested_operation_count": 5,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "metric-retention-zero-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "metric-retention-zero-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "metric-retention-zero-02",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "metric-retention-zero-02",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "metric-retention-zero-03",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "metric-retention-zero-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "metric-retention-zero-04",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "metric-retention-zero-05",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "maximum-runperiod",
++      "purpose": "Actual user-max diagnostics, per-zone loop, once warning owner and forced exit; subsequent Check does not reset warning flags.",
++      "requested_operation_count": 9,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "maximum-runperiod-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "maximum-runperiod-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "maximum-runperiod-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "maximum-runperiod-02",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "maximum-runperiod-02",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "maximum-runperiod-02",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "maximum-runperiod-03",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "maximum-runperiod-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "maximum-runperiod-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "maximum-runperiod-04",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "maximum-runperiod-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "maximum-runperiod-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "maximum-runperiod-05",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "maximum-runperiod-06",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "maximum-runperiod-07",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "maximum-runperiod-08",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "maximum-runperiod-08",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "maximum-runperiod-08",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "maximum-runperiod-09",
++          "api": "HeatBalanceManager::ReportWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "maximum-sizing",
++      "purpose": "Actual user-max diagnostics, per-zone loop, once warning owner and forced exit; subsequent Check does not reset warning flags.",
++      "requested_operation_count": 9,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "maximum-sizing-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "maximum-sizing-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "maximum-sizing-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "maximum-sizing-02",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "maximum-sizing-02",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "maximum-sizing-02",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "maximum-sizing-03",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "maximum-sizing-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "maximum-sizing-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "maximum-sizing-04",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "maximum-sizing-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "maximum-sizing-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "maximum-sizing-05",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "maximum-sizing-06",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "maximum-sizing-07",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "maximum-sizing-08",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "maximum-sizing-08",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "maximum-sizing-08",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "maximum-sizing-09",
++          "api": "HeatBalanceManager::ReportWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "default-max-days",
++      "purpose": "Actual default max threshold without user-short-max diagnostic branch; explicit direct clock gap is not ordinary replay.",
++      "requested_operation_count": 4,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "default-max-days-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "default-max-days-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "default-max-days-02",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "default-max-days-03",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "default-max-days-03",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "default-max-days-04",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "two-zones-late-failure",
++      "purpose": "Zone1 passes while Zone2 fails, proving whole ordered convergence loop; retained two-zone report scratch.",
++      "requested_operation_count": 8,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "two-zones-late-failure-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "two-zones-late-failure-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "two-zones-late-failure-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "two-zones-late-failure-02",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "two-zones-late-failure-03",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "two-zones-late-failure-03",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "two-zones-late-failure-03",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "two-zones-late-failure-04",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "two-zones-late-failure-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "two-zones-late-failure-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "two-zones-late-failure-05",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "two-zones-late-failure-06",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "two-zones-late-failure-06",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "two-zones-late-failure-06",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "two-zones-late-failure-07",
++          "api": "HeatBalanceManager::ReportWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "two-zones-late-failure-08",
++          "api": "HeatBalanceManager::ReportWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "sizing-report-suppressed",
++      "purpose": "DoingSizing with DoPureLoadCalc false suppresses first-Run report collection; warmup-guard Report remains safe.",
++      "requested_operation_count": 5,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "sizing-report-suppressed-01",
++          "api": "HeatBalanceManager::ReportWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "sizing-report-suppressed-02",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "sizing-report-suppressed-02",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "sizing-report-suppressed-03",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "sizing-report-suppressed-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "sizing-report-suppressed-04",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "sizing-report-suppressed-05",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "report-zero-load-guard",
++      "purpose": "Actual first-Run two rolling differences with zero MaxLoad; detailed output disabled, summary twice.",
++      "requested_operation_count": 6,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "report-zero-load-guard-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "report-zero-load-guard-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "report-zero-load-guard-02",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "report-zero-load-guard-03",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "report-zero-load-guard-03",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "report-zero-load-guard-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "report-zero-load-guard-04",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "report-zero-load-guard-05",
++          "api": "HeatBalanceManager::ReportWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "report-zero-load-guard-06",
++          "api": "HeatBalanceManager::ReportWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    },
++    {
++      "case_id": "full-report-capacity",
++      "purpose": "All 24 actual first-Run report points in two zones; Count once per point and complete shared scratch tails.",
++      "requested_operation_count": 28,
++      "declared_source_calls": [
++        {
++          "operation_id": "allocate",
++          "api": "HeatBalanceManager::AllocateHeatBalArrays",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-01",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-01",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-02",
++          "api": "HeatBalanceManager::CheckWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-03",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-03",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-03",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-04",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-04",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-05",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-05",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-06",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-06",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-06",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-07",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-07",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-07",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-08",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-08",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-08",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-09",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-09",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-09",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-10",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-10",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-10",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-11",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-11",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-11",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-12",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-12",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-12",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-13",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-13",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-13",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-14",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-14",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-14",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-15",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-15",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-15",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-16",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-16",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-16",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-17",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-17",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-17",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-18",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-18",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-18",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-19",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-19",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-19",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-20",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-20",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-20",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-21",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-21",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-21",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-22",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-22",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-22",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-23",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-23",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-23",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-24",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-24",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-24",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-25",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-25",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-25",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-26",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 1
++        },
++        {
++          "operation_id": "full-report-capacity-26",
++          "api": "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads",
++          "actual_zone_index": 2
++        },
++        {
++          "operation_id": "full-report-capacity-26",
++          "api": "HeatBalanceManager::RecKeepHeatBalance",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-27",
++          "api": "HeatBalanceManager::ReportWarmupConvergence",
++          "actual_zone_index": null
++        },
++        {
++          "operation_id": "full-report-capacity-28",
++          "api": "HeatBalanceManager::ReportWarmupConvergence",
++          "actual_zone_index": null
++        }
++      ]
++    }
++  ],
++  "expected_outcomes_or_numerical_values_supplied": false,
++  "actual_execution_counts_claimed": false
++}

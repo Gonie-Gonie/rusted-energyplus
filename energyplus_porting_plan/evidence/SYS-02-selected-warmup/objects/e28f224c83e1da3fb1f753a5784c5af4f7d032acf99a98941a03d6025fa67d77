@@ -1,0 +1,44 @@
+{
+  "schema": "closed-Native-logical-byte-preserving-compression.v1",
+  "C_free_bytes_before": 550821888,
+  "rows": [
+    {
+      "before": {
+        "path": ".runtime/porting/GEO-03/native-build-02/geo03_reference_helper.exe",
+        "sha256": "0720233f43dc87e205241daa766c7a3199eda37c270030fa18ad1cd33beaad95",
+        "size_bytes": 1297356300
+      },
+      "after": {
+        "path": ".runtime/porting/GEO-03/native-build-02/geo03_reference_helper.exe",
+        "sha256": "0720233f43dc87e205241daa766c7a3199eda37c270030fa18ad1cd33beaad95",
+        "size_bytes": 1297356300
+      },
+      "actual_recorded_command_exit_code": 0,
+      "command_receipt": {
+        "path": ".runtime/porting/SYS-02/closed-native-storage-01/0/receipt.json",
+        "sha256": "af0d4f5052d7b0171871647fda8624876db4ccd4c314c458059150eaa53f4910",
+        "size_bytes": 2859
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/ZON-01/native-build-01/zon01_reference_helper.exe",
+        "sha256": "a7d0612dbb020cc8dd5ea523d7a2576a5c516e1dc7517f0e52d3d6f13c797861",
+        "size_bytes": 1296118832
+      },
+      "after": {
+        "path": ".runtime/porting/ZON-01/native-build-01/zon01_reference_helper.exe",
+        "sha256": "a7d0612dbb020cc8dd5ea523d7a2576a5c516e1dc7517f0e52d3d6f13c797861",
+        "size_bytes": 1296118832
+      },
+      "actual_recorded_command_exit_code": 0,
+      "command_receipt": {
+        "path": ".runtime/porting/SYS-02/closed-native-storage-01/1/receipt.json",
+        "sha256": "24dcd84c4d56f95347a18bf281b9044fb46dc7995f1f8417f670c08ecb7cb2b8",
+        "size_bytes": 2859
+      }
+    }
+  ],
+  "files_deleted_or_moved": false,
+  "C_free_bytes_after": 2627301376
+}

@@ -187,3 +187,5 @@ CTF-10 observer now uses the existing CLI 8 MiB worker stack with strict A/Deny.
 CTF-10 genuine A ordinary history capture completed (578 events, runtime exit0); full comparison retained FAIL (192 paired stages,3,898 required unavailable/unmatched,35,031 mismatches). [Full evidence and remaining issues](evidence/CTF-10-ordinary-history-comparison/summary.json). Card gates remain unchanged.
 
 SYS-03 uncontrolled warmup owner applied in strict ordinary A; focused323/workspace4,947 tests passed. [Source and quality](evidence/SYS-03-warmup-owner/summary.json). Native numerical/handoff parity and report/backend obligations remain pending; gates unchanged.
+
+SYS-02 selected daily warmup methods: genuine Native/Rust25-case comparison matched10,785 input/initial checks and7,383 state comparisons with zero mismatches. [Full evidence](evidence/SYS-02-selected-warmup/summary.json). Rolling/report/backend/producer and ordinary handoff remain pending; gates unchanged.

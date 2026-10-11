@@ -1,0 +1,170 @@
+// Read-only actual warmup owners. No convergence arithmetic is reproduced.
+#ifndef SYS02_WARMUP_REFERENCE_FIELDS_HH
+#define SYS02_WARMUP_REFERENCE_FIELDS_HH
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+#include <nlohmann/json.hpp>
+#include <bit>
+#include <cmath>
+#include <cstdint>
+#include <iomanip>
+#include <sstream>
+
+#if !defined(__MINGW32__) || !defined(_WIN64) || __GNUC__ != 13 || __GNUC_MINOR__ != 2
+#error "Original reference requires the verified GCC13.2 Windows ABI"
+#endif
+#if defined(_GLIBCXX_DEBUG) || defined(__FAST_MATH__) || defined(NDEBUG)
+#error "Reference requires original assertions, nondebug containers and no fast math"
+#endif
+#if !defined(EP_psych_errors) || defined(EP_psych_stats)
+#error "Reference definitions must match the genuine original core"
+#endif
+
+namespace Sys02 {
+using json = nlohmann::json;
+inline std::string bits(double value)
+{
+    std::ostringstream out;
+    out << std::hex << std::setfill('0') << std::setw(16) << std::bit_cast<std::uint64_t>(value);
+    return out.str();
+}
+inline json scalar(double value)
+{
+    char const *kind = std::isnan(value) ? "nan" : std::isinf(value) ? (value > 0 ? "positive_infinity" : "negative_infinity") :
+                       value == 0 ? (std::signbit(value) ? "negative_zero" : "positive_zero") : "finite";
+    return {{"value", std::isfinite(value) ? json(value) : json(nullptr)}, {"value_bits", bits(value)}, {"value_class", kind}};
+}
+template<class Array, class Copy> json array1(Array const &owner, Copy const &copy, bool values_known = true)
+{
+    json rows = json::array();
+    if (owner.allocated() && values_known) {
+        for (int i = owner.l(); i <= owner.u(); ++i) {
+            rows.push_back({{"actual_array_index", i}, {"value", copy(owner(i))}});
+        }
+    }
+    return {{"allocated", owner.allocated()}, {"size", owner.size()},
+            {"lower", owner.allocated() ? json(owner.l()) : json(nullptr)},
+            {"upper", owner.allocated() ? json(owner.u()) : json(nullptr)},
+            {"values_available", values_known}, {"rows", values_known ? rows : json(nullptr)}};
+}
+template<class Array> json array2(Array const &owner)
+{
+    json rows = json::array();
+    if (owner.allocated()) {
+        for (int j = owner.l2(); j <= owner.u2(); ++j) {
+            json columns = json::array();
+            for (int i = owner.l1(); i <= owner.u1(); ++i) {
+                columns.push_back({{"actual_zone_index", i}, {"value", scalar(owner(i, j))}});
+            }
+            rows.push_back({{"actual_point_index", j}, {"zones", columns}});
+        }
+    }
+    return {{"allocated", owner.allocated()}, {"size", owner.size()},
+            {"lower1", owner.allocated() ? json(owner.l1()) : json(nullptr)},
+            {"upper1", owner.allocated() ? json(owner.u1()) : json(nullptr)},
+            {"lower2", owner.allocated() ? json(owner.l2()) : json(nullptr)},
+            {"upper2", owner.allocated() ? json(owner.u2()) : json(nullptr)}, {"rows", rows}};
+}
+inline json backend(EnergyPlus::EnergyPlusData const &state)
+{
+    auto const &e = *state.dataErrTracking;
+    return {{"TotalWarningErrors", e.TotalWarningErrors}, {"TotalSevereErrors", e.TotalSevereErrors},
+            {"TotalWarningErrorsDuringWarmup", e.TotalWarningErrorsDuringWarmup},
+            {"TotalSevereErrorsDuringWarmup", e.TotalSevereErrorsDuringWarmup},
+            {"TotalWarningErrorsDuringSizing", e.TotalWarningErrorsDuringSizing},
+            {"TotalSevereErrorsDuringSizing", e.TotalSevereErrorsDuringSizing},
+            {"LastSevereError", e.LastSevereError}, {"AbortProcessing", e.AbortProcessing},
+            {"MatchCounts", array1(e.MatchCounts, [](int v) -> json { return v; })},
+            {"outputErrorHeader", state.dataUtilityRoutines->outputErrorHeader},
+            {"DoingInputProcessing", state.dataGlobal->DoingInputProcessing},
+            {"printConsoleOutput", state.dataGlobal->printConsoleOutput},
+            {"errorCallback_present", static_cast<bool>(state.dataGlobal->errorCallback)},
+            {"messageCallback_present", static_cast<bool>(state.dataGlobal->messageCallback)},
+            {"fMessagePtr_present", state.dataGlobal->fMessagePtr != nullptr},
+            {"sqlite_present", state.dataSQLiteProcedures->sqlite != nullptr},
+            {"VerStringVar", state.dataStrGlobals->VerStringVar}, {"IDDVerString", state.dataStrGlobals->IDDVerString},
+            {"CurrentDateTime", state.dataStrGlobals->CurrentDateTime}};
+}
+inline json owners(EnergyPlus::EnergyPlusData const &state, bool allocated_returned, bool stddev_known)
+{
+    auto const &h = *state.dataHeatBalMgr;
+    auto const &g = *state.dataGlobal;
+    json arrays = json::object();
+#define WARMUP_ARRAY(name) arrays[#name] = array1(h.name, [](double v) -> json { return scalar(v); });
+    WARMUP_ARRAY(MaxCoolLoadPrevDay) WARMUP_ARRAY(MaxCoolLoadZone)
+    WARMUP_ARRAY(MaxHeatLoadPrevDay) WARMUP_ARRAY(MaxHeatLoadZone)
+    WARMUP_ARRAY(MaxTempPrevDay) WARMUP_ARRAY(MaxTempZone)
+    WARMUP_ARRAY(MinTempPrevDay) WARMUP_ARRAY(MinTempZone)
+    WARMUP_ARRAY(TempZoneSecPrevDay) WARMUP_ARRAY(LoadZoneSecPrevDay)
+    WARMUP_ARRAY(TempZonePrevDay) WARMUP_ARRAY(LoadZonePrevDay)
+    WARMUP_ARRAY(TempZone) WARMUP_ARRAY(LoadZone)
+    WARMUP_ARRAY(WarmupTempDiff) WARMUP_ARRAY(WarmupLoadDiff)
+#undef WARMUP_ARRAY
+    arrays["TempZoneRpt"] = array2(h.TempZoneRpt);
+    arrays["LoadZoneRpt"] = array2(h.LoadZoneRpt);
+    arrays["MaxLoadZoneRpt"] = array2(h.MaxLoadZoneRpt);
+    arrays["TempZoneRptStdDev"] = array1(h.TempZoneRptStdDev, [](double v) -> json { return scalar(v); }, stddev_known);
+    arrays["LoadZoneRptStdDev"] = array1(h.LoadZoneRptStdDev, [](double v) -> json { return scalar(v); }, stddev_known);
+    arrays["WarmupConvergenceValues"] = array1(h.WarmupConvergenceValues, [](auto const &v) -> json {
+        return {{"PassFlag", array1(v.PassFlag, [](int x) -> json { return x; })},
+                {"TestMaxTempValue", scalar(v.TestMaxTempValue)}, {"TestMinTempValue", scalar(v.TestMinTempValue)},
+                {"TestMaxHeatLoadValue", scalar(v.TestMaxHeatLoadValue)}, {"TestMaxCoolLoadValue", scalar(v.TestMaxCoolLoadValue)}};
+    });
+    json zones = json::array();
+    for (int i = 1; i <= g.NumOfZones; ++i) {
+        json hb = nullptr, demand = nullptr;
+        if (allocated_returned) {
+            auto const &d = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(i);
+            hb = scalar(state.dataZoneTempPredictorCorrector->zoneHeatBalance(i).ZTAV);
+            demand = {{"airSysHeatRate", scalar(d.airSysHeatRate)}, {"airSysCoolRate", scalar(d.airSysCoolRate)},
+                      {"airSysHeatEnergy", scalar(d.airSysHeatEnergy)}, {"airSysCoolEnergy", scalar(d.airSysCoolEnergy)}};
+        }
+        zones.push_back({{"actual_zone_index", i}, {"Name", state.dataHeatBal->Zone(i).Name}, {"ZTAV", hb}, {"sensible_report", demand}});
+    }
+    return {{"arrays", arrays}, {"zones", zones},
+            {"CountWarmupDayPoints", allocated_returned ? json(h.CountWarmupDayPoints) : json(nullptr)},
+            {"CountWarmupDayPoints_available", allocated_returned},
+            {"FirstWarmupWrite", h.FirstWarmupWrite}, {"WarmupConvergenceWarning", h.WarmupConvergenceWarning},
+            {"SizingWarmupConvergenceWarning", h.SizingWarmupConvergenceWarning},
+            {"ReportWarmupConvergenceFirstWarmupWrite", h.ReportWarmupConvergenceFirstWarmupWrite},
+            {"clock", {{"WarmupFlag", g.WarmupFlag}, {"DayOfSim", g.DayOfSim}, {"HourOfDay", g.HourOfDay},
+                       {"TimeStep", g.TimeStep}, {"TimeStepsInHour", g.TimeStepsInHour},
+                       {"TimeStepZone", scalar(g.TimeStepZone)}, {"DoingSizing", g.DoingSizing},
+                       {"DoPureLoadCalc", g.DoPureLoadCalc}, {"KickOffSimulation", g.KickOffSimulation}}},
+            {"configuration", {{"TempConvergTol", scalar(state.dataHeatBal->TempConvergTol)},
+                               {"LoadsConvergTol", scalar(state.dataHeatBal->LoadsConvergTol)},
+                               {"MinNumberOfWarmupDays", state.dataHeatBal->MinNumberOfWarmupDays},
+                               {"MaxNumberOfWarmupDays", state.dataHeatBal->MaxNumberOfWarmupDays},
+                               {"NumOfZones", g.NumOfZones}, {"numSpaces", g.numSpaces},
+                               {"RunPeriodEnvironment", state.dataEnvrn->RunPeriodEnvironment},
+                               {"EnvironmentName", state.dataEnvrn->EnvironmentName},
+                               {"ReportDetailedWarmupConvergence", state.dataSysVars->ReportDetailedWarmupConvergence},
+                               {"TimeStepSysSec", scalar(state.dataHVACGlobal->TimeStepSysSec)}}},
+            {"excluded_prerequisites", {{"AnyMovableInsulation", state.dataSurface->AnyMovableInsulation},
+                                        {"AllHTWindowSurfaceList", state.dataSurface->AllHTWindowSurfaceList},
+                                        {"NumOfSolarEnclosures", state.dataViewFactor->NumOfSolarEnclosures},
+                                        {"CO2Simulation", state.dataContaminantBalance->Contaminant.CO2Simulation},
+                                        {"GenericContamSimulation", state.dataContaminantBalance->Contaminant.GenericContamSimulation},
+                                        {"TotThermalReportPers", state.dataWeather->TotThermalReportPers},
+                                        {"TotCO2ReportPers", state.dataWeather->TotCO2ReportPers},
+                                        {"TotVisualReportPers", state.dataWeather->TotVisualReportPers}}},
+            {"backend", backend(state)}};
+}
+} // namespace Sys02
+#endif

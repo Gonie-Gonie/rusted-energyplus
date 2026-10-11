@@ -1,0 +1,38 @@
+    struct ZoneSystemSensibleDemand : ZoneSystemDemandData // Sensible cooling/heating loads to be met (watts)
+    {
+        Real64 OutputRequiredToHeatingSP = 0.0; // Load required to meet heating setpoint (>0 is a heating load) [W] (multiplied)
+        Real64 OutputRequiredToCoolingSP = 0.0; // Load required to meet cooling setpoint (<0 is a cooling load) [W] (multiplied)
+        Real64 RemainingOutputReqToHeatSP =
+            0.0; // Remaining load required to meet heating setpoint with load fractions applied (>0 is a heating load) [W] (multiplied)
+        Real64 RemainingOutputReqToCoolSP =
+            0.0; // Remaining load required to meet cooling setpoint with load fractions applied (<0 is a cooling load) [W] (multiplied)
+        Real64 UnadjRemainingOutputReqToHeatSP =
+            0.0; // Remaining unadjusted load required to meet heating setpoint (>0 is a heating load) [W] (multiplied)
+        Real64 UnadjRemainingOutputReqToCoolSP =
+            0.0; // Remaining unadjusted load required to meet cooling setpoint (<0 is a cooling load) [W] (multiplied)
+        EPVector<Real64> SequencedOutputRequired;            // load required to meet setpoint by sequence [W] (multiplied)
+        EPVector<Real64> SequencedOutputRequiredToHeatingSP; // load required to meet heating setpoint by sequence [W] (multiplied)
+        EPVector<Real64> SequencedOutputRequiredToCoolingSP; // load required to meet cooling setpoint by sequence [W] (multiplied)
+        Real64 predictedRate = 0.0;                          // Predicted sensible load [W] (unmultiplied)
+        Real64 predictedHSPRate = 0.0;                       // Predicted sensible load to heating setpoint [W] (unmultiplied)
+        Real64 predictedCSPRate = 0.0;                       // Predicted sensible load to cooling setpoint [W] (unmultiplied)
+        Real64 airSysHeatRate = 0.0;                         // sensible heating rate [W] (unmultiplied)
+        Real64 airSysCoolRate = 0.0;                         // sensible cooling rate [W] (unmultiplied)
+        Real64 airSysHeatEnergy = 0.0;                       // sensible heating energy [J] (unmultiplied)
+        Real64 airSysCoolEnergy = 0.0;                       // sensible cooling energy [J] (unmultiplied)
+
+        void beginEnvironmentInit() override;
+
+        void setUpOutputVars(EnergyPlusData &state,
+                             std::string_view prefix,
+                             std::string const &name,
+                             bool staged,
+                             bool attachMeters,
+                             int zoneMult,
+                             int listMult) override;
+
+        void reportZoneAirSystemSensibleLoads(EnergyPlusData &state, Real64 SNLoad);
+
+        void reportSensibleLoadsZoneMultiplier(
+            EnergyPlusData &state, int zoneNum, Real64 totalLoad, Real64 loadToHeatingSetPoint, Real64 loadToCoolingSetPoint);
+    };

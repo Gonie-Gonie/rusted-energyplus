@@ -68,3 +68,12 @@ CON-01에서 제외한 입력·분기는 구현 대상에 넣지 않는다. 생�
 증거 경로:  
 최대오차/RMSE/상태 불일치:  
 추가 검토할 helper:  
+
+## Selected warmup unit contract (before observation)
+
+The selected unit pins HeatBalanceManager.cc 2824-2963, 2971-3057 and 3059-3226 and the real Rust private new/record/check_day methods. Its input-only 25-case companion declares ordered Zone associations, ZTAV [C], heat/cool rates [W], actual clocks, minimum/maximum days, temperature tolerance [delta C] and dimensionless load tolerance. Before any endpoint pairing, genuine Native Allocate owners and every pre-RecKeep operand must exactly match the independent Rust constructor/input. Compare all eight retained daily values, four flags, four metrics and WarmupFlag in full call order. No SNLoad producer equations are copied. Report operations and missing rolling/report/backend owners remain explicitly unavailable. The ignored observer, disk-full Native link failure and future selected comparison do not close SYS-02/03 unit, integration or production gates.
+
+## Actual selected daily warmup comparison
+
+Genuine unchanged-core Native calls and the real Rust private methods matched all 25 fixed cases: 10,785 input/initial-owner checks and 7,383 selected comparisons across 343 boundaries, zero mismatches. Native retained all 347 calls; 14 Report operations and all rolling/report/backend/producer/ordinary obligations remain unavailable for this selected lane. Actual Rust Source360ab473 has 3,916 members and 3,914 unrelated files unchanged. fmt/Clippy passed; focused323/workspace4,947 passed with one intentionally ignored observer; its explicit exact invocation passed one test. No whole-card gate changed.
+Evidence: [selected daily methods, complete observations and quality](../evidence/SYS-02-selected-warmup/summary.json) (`d0844e7898420da97f9bcc5f997ee9c00f1313c314a4b39d397a8ba6f2505b23`).

@@ -1,0 +1,123 @@
+"""Retain actual selected warmup observations and quality without gate promotion."""
+import copy
+from collections import Counter
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import re
+import shutil
+import subprocess
+
+ROOT = Path.cwd()
+RAW = ROOT / '.runtime/porting/SYS-02'
+OUT = ROOT / 'energyplus_porting_plan/evidence/SYS-02-selected-warmup'
+
+
+def ref(path):
+    with path.open('rb') as stream:
+        digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': digest, 'size_bytes': path.stat().st_size}
+
+
+def load(path):
+    return json.loads(path.read_bytes())
+
+
+def dump(path, value):
+    path.write_text(json.dumps(value, ensure_ascii=False, allow_nan=False, indent=2) + '\n', encoding='utf8', newline='\n')
+
+
+assert not OUT.exists()
+post_path = RAW / 'selected-observer-applied-01/record.json'
+post = load(post_path)
+assert ref(post_path)['sha256'] == 'ea81a4f6c638f3cfabaae8f165d0f40bc070ac4b6fff09cfbdfaca8bbda9c2f6'
+snapshot = post['source_final']
+assert snapshot['sha256'] == '360ab473f6203cc14df283158630b9060ccaac394839f3099a08a2d48d576c2e'
+assert post['source_file_count'] == 3916 and post['unrelated_source_files_verified_byte_exact'] == 3914
+comparison_path = RAW / 'selected-comparison-01/comparison.json'
+comparison = load(comparison_path)
+assert ref(comparison_path)['sha256'] == '65cdeeaa5d3cb2f751e2e5a543c92afda29db029e7f3e82052bb3dba9d07e7e6'
+assert comparison['status'] == 'pass-selected-methods-only' and comparison['mismatch_count'] == 0
+assert comparison['counts'] == {'input_join_comparisons': 10785, 'selected_endpoint_comparisons': 7383}
+native = load(RAW / 'selected-observation-01/Native-command/stdout.log')
+counts = Counter(call['api'].split('::')[-1] for case in native['cases'] for call in case['actual_calls'])
+assert counts == {'AllocateHeatBalArrays': 25, 'reportZoneAirSystemSensibleLoads': 149, 'RecKeepHeatBalance': 110, 'CheckWarmupConvergence': 49, 'ReportWarmupConvergence': 14}
+explicit = load(RAW / 'selected-observation-01/Rust/cargo-command/receipt.json')
+assert explicit['exit_code'] == 0 and explicit['source_bytes_match_before_and_after'] is True and explicit['source_snapshot'] == snapshot
+assert re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored;', (ROOT / explicit['stdout']['path']).read_text()) == [('1', '0', '0')]
+quality = []
+for role in ['fmt', 'clippy', 'focused', 'workspace']:
+    path = RAW / f'selected-observer-quality-01/{role}-command/receipt.json'
+    value = load(path)
+    assert value['exit_code'] == 0 and value['source_bytes_match_before_and_after'] is True and value['source_snapshot'] == snapshot
+    groups = re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored;', (ROOT / value['stdout']['path']).read_text(encoding='utf8'))
+    totals = [sum(int(row[i]) for row in groups) for i in range(3)]
+    assert totals == ([323, 0, 1] if role == 'focused' else [4947, 0, 1] if role == 'workspace' else [0, 0, 0])
+    quality.append({'role': role, 'execution': ref(path), 'test_totals': totals, 'test_result_groups': len(groups)})
+selected = {Path(__file__).resolve(), ROOT / 'tools/porting/record_command.py', RAW / 'apply-selected-observer-01.py', RAW / 'run-selected-observer-01.py'}
+for name in ['warmup-native-prep-01', 'warmup-native-build-01', 'warmup-native-build-02', 'closed-native-storage-01', 'warmup-selected-observer-prep-01', 'selected-observer-applied-01', 'selected-observer-format-command-01', 'selected-observer-application-command-01', 'selected-observer-quality-01', 'warmup-selected-comparison-prep-01', 'selected-observation-01', 'selected-comparison-01']:
+    selected.update(p for p in (RAW / name).rglob('*') if p.is_file() and '__pycache__' not in p.parts)
+for name in ['source_before', 'source_literal', 'source_final']:
+    selected.add(ROOT / post[name]['path'])
+for row in post['application']:
+    selected.add(ROOT / row['actual_final_archive']['path'])
+    assert ref(ROOT / row['canonical_path']) == row['actual_final']
+large = {RAW / 'selected-observation-01/Native-command/stdout.log', RAW / 'selected-observation-01/Rust/result.json'}
+stored = {}
+for directory in (ROOT / 'energyplus_porting_plan/evidence').glob('*/objects'):
+    for path in directory.iterdir():
+        if path.is_file() and re.fullmatch('[0-9a-f]{64}', path.name):
+            stored.setdefault(path.name, path)
+OUT.mkdir()
+(OUT / 'objects').mkdir()
+(OUT / 'observations').mkdir()
+objects = []
+for path in sorted(selected):
+    original = ref(path)
+    if path in large:
+        target = OUT / 'observations' / (original['sha256'] + '.json.gz')
+        with path.open('rb') as source, target.open('xb') as output:
+            with gzip.GzipFile(filename='', fileobj=output, mode='wb', mtime=0) as compressed:
+                shutil.copyfileobj(source, compressed)
+        with gzip.open(target, 'rb') as decoded:
+            assert hashlib.file_digest(decoded, 'sha256').hexdigest() == original['sha256']
+        objects.append({'original': original, 'stored': ref(target), 'encoding': 'gzip', 'complete_original_bytes_verified': True})
+    else:
+        target = stored.get(original['sha256'], OUT / 'objects' / original['sha256'])
+        if not target.exists():
+            shutil.copyfile(path, target)
+        actual = ref(target)
+        assert actual['sha256'] == original['sha256'] and actual['size_bytes'] == original['size_bytes']
+        stored[original['sha256']] = target
+        objects.append({'original': original, 'stored': actual})
+summary_path = OUT / 'summary.json'
+dump(summary_path, {'schema': 'sys02-actual-selected-warmup-comparison.v1', 'actual_application': ref(post_path), 'Source_snapshot': snapshot,
+    'Source_file_count': 3916, 'unrelated_Source_files_verified_byte_exact': 3914, 'actual_comparison': ref(comparison_path), 'actual_counts': comparison['counts'],
+    'actual_quality': quality, 'selected_objects': objects, 'Native_calls': {'Allocate': 25, 'sensible_report': 149, 'RecKeep': 110, 'Check': 49, 'Report': 14},
+    'selected_daily_methods_only_passed': True, 'actual_cases': 25, 'actual_selected_boundaries': 343, 'mismatches': 0,
+    'unavailable_report_operations': comparison['findings']['unavailable_report_operations'], 'unavailable_owner_families': comparison['findings']['unavailable_owner_families'],
+    'ordinary_Native_handoff_parity_passed': False, 'sensible_producer_equivalence_passed': False, 'rolling_report_backend_passed': False,
+    'whole_SYS02_SYS03_PASS_claimed': False, 'card_gates_updated': False,
+    'remaining_issues': ['Full rolling/report/StdDev/Count/header owners and actual error/EIO/backend effects remain pending.', 'Ordinary warmup-to-RunPeriod parity and controlled demand remain pending.', 'SYS02/SCH03/SUR06 predecessor and whole-card gates remain pending.'],
+    'retained_storage_recovery': 'Failed first Native link remains preserved; only output moved to D for successful unchanged-core link. Two closed historical executables were compressed with identical full logical SHA before/after.'})
+summary = ref(summary_path)
+plan_path = ROOT / 'energyplus_porting_plan/plan.json'
+plan = load(plan_path)
+old_plan = copy.deepcopy(plan)
+task = next(row for row in plan['tasks'] if row['id'] == 'SYS-02')
+field = 'actual_selected_daily_warmup_comparison'
+assert field not in task
+task[field] = summary
+inverse = copy.deepcopy(plan)
+del next(row for row in inverse['tasks'] if row['id'] == 'SYS-02')[field]
+assert inverse == old_plan
+dump(plan_path, plan)
+with (ROOT / 'energyplus_porting_plan/cards/SYS-02.md').open('a', encoding='utf8', newline='\n') as stream:
+    stream.write('\n## Actual selected daily warmup comparison\n\n')
+    stream.write('Genuine unchanged-core Native calls and the real Rust private methods matched all 25 fixed cases: 10,785 input/initial-owner checks and 7,383 selected comparisons across 343 boundaries, zero mismatches. Native retained all 347 calls; 14 Report operations and all rolling/report/backend/producer/ordinary obligations remain unavailable for this selected lane. Actual Rust Source360ab473 has 3,916 members and 3,914 unrelated files unchanged. fmt/Clippy passed; focused323/workspace4,947 passed with one intentionally ignored observer; its explicit exact invocation passed one test. No whole-card gate changed.\n')
+    stream.write(f'Evidence: [selected daily methods, complete observations and quality](../evidence/SYS-02-selected-warmup/summary.json) (`{summary["sha256"]}`).\n')
+with (ROOT / 'energyplus_porting_plan/CHECKLIST.md').open('a', encoding='utf8', newline='\n') as stream:
+    stream.write('\nSYS-02 selected daily warmup methods: genuine Native/Rust25-case comparison matched10,785 input/initial checks and7,383 state comparisons with zero mismatches. [Full evidence](evidence/SYS-02-selected-warmup/summary.json). Rolling/report/backend/producer and ordinary handoff remain pending; gates unchanged.\n')
+assert subprocess.run(['python', '-X', 'utf8', '-B', 'tools/porting/sync_plan_views.py', '--write']).returncode == 0
+print(json.dumps({'summary': summary, 'archived_paths': len(objects), 'gates_changed': False}))

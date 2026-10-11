@@ -1,0 +1,3816 @@
+{
+  "schema": "sys02-warmup-direct-request.v1",
+  "expected_values_supplied": false,
+  "ordinary_production_prestate_supplied": false,
+  "cases": [
+    {
+      "case_id": "no-zones",
+      "purpose": "Actual no-zone immediate Check return and zero-zone Report assignment.",
+      "initial": {
+        "zone_names": [],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 1,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "no-zones-01"
+        },
+        {
+          "operation": "report",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "no-zones-02"
+        }
+      ]
+    },
+    {
+      "case_id": "first-day-zero",
+      "purpose": "Allocate previous-day zero and no-load/zero-temperature four criteria; first Run report collection.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 1,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "report",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "first-day-zero-01"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "first-day-zero-02"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "first-day-zero-03"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "first-day-zero-04"
+        },
+        {
+          "operation": "report",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "first-day-zero-05"
+        }
+      ]
+    },
+    {
+      "case_id": "minimum-day-hold",
+      "purpose": "Equal input days below/at actual minimum; Check owns WarmupFlag transition.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 3,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "minimum-day-hold-01"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "minimum-day-hold-02"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "minimum-day-hold-03"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "minimum-day-hold-04"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 3,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "minimum-day-hold-05"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 3,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "minimum-day-hold-06"
+        }
+      ]
+    },
+    {
+      "case_id": "temperature-only",
+      "purpose": "Nonzero temperature with zero load separates absolute-temperature failure from load guard.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 1,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4034000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "temperature-only-01"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "temperature-only-02"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4034000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "temperature-only-03"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "temperature-only-04"
+        }
+      ]
+    },
+    {
+      "case_id": "active-heat-cool",
+      "purpose": "Both signed sensible loads through genuine report method; second identical day and first Run rolling/report.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 1,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4032000000000000"
+              },
+              "SNLoad": {
+                "bits": "4079000000000000"
+              }
+            }
+          ],
+          "operation_id": "active-heat-cool-01"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4036000000000000"
+              },
+              "SNLoad": {
+                "bits": "c079000000000000"
+              }
+            }
+          ],
+          "operation_id": "active-heat-cool-02"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "active-heat-cool-03"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4032000000000000"
+              },
+              "SNLoad": {
+                "bits": "4079000000000000"
+              }
+            }
+          ],
+          "operation_id": "active-heat-cool-04"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4036000000000000"
+              },
+              "SNLoad": {
+                "bits": "c079000000000000"
+              }
+            }
+          ],
+          "operation_id": "active-heat-cool-05"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "active-heat-cool-06"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4033000000000000"
+              },
+              "SNLoad": {
+                "bits": "4072c00000000000"
+              }
+            }
+          ],
+          "operation_id": "active-heat-cool-07"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4035000000000000"
+              },
+              "SNLoad": {
+                "bits": "c069000000000000"
+              }
+            }
+          ],
+          "operation_id": "active-heat-cool-08"
+        },
+        {
+          "operation": "report",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "active-heat-cool-09"
+        },
+        {
+          "operation": "report",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "active-heat-cool-10"
+        }
+      ]
+    },
+    {
+      "case_id": "guard-below",
+      "purpose": "Prospective literal heat/cool guard or 100 W floor operand; no expected branch/result supplied.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 2,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "3f1a36e2eb1c432c"
+              }
+            }
+          ],
+          "operation_id": "guard-below-01"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "bf1a36e2eb1c432c"
+              }
+            }
+          ],
+          "operation_id": "guard-below-02"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "guard-below-03"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "3f1a36e2eb1c432c"
+              }
+            }
+          ],
+          "operation_id": "guard-below-04"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "bf1a36e2eb1c432c"
+              }
+            }
+          ],
+          "operation_id": "guard-below-05"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "guard-below-06"
+        }
+      ]
+    },
+    {
+      "case_id": "guard-at",
+      "purpose": "Prospective literal heat/cool guard or 100 W floor operand; no expected branch/result supplied.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 2,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "3f1a36e2eb1c432d"
+              }
+            }
+          ],
+          "operation_id": "guard-at-01"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "bf1a36e2eb1c432d"
+              }
+            }
+          ],
+          "operation_id": "guard-at-02"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "guard-at-03"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "3f1a36e2eb1c432d"
+              }
+            }
+          ],
+          "operation_id": "guard-at-04"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "bf1a36e2eb1c432d"
+              }
+            }
+          ],
+          "operation_id": "guard-at-05"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "guard-at-06"
+        }
+      ]
+    },
+    {
+      "case_id": "guard-above",
+      "purpose": "Prospective literal heat/cool guard or 100 W floor operand; no expected branch/result supplied.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 2,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "3f1a36e2eb1c432e"
+              }
+            }
+          ],
+          "operation_id": "guard-above-01"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "bf1a36e2eb1c432e"
+              }
+            }
+          ],
+          "operation_id": "guard-above-02"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "guard-above-03"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "3f1a36e2eb1c432e"
+              }
+            }
+          ],
+          "operation_id": "guard-above-04"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "bf1a36e2eb1c432e"
+              }
+            }
+          ],
+          "operation_id": "guard-above-05"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "guard-above-06"
+        }
+      ]
+    },
+    {
+      "case_id": "guard-floor-below",
+      "purpose": "Prospective literal heat/cool guard or 100 W floor operand; no expected branch/result supplied.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 2,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "4058ffffffffffff"
+              }
+            }
+          ],
+          "operation_id": "guard-floor-below-01"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "c058ffffffffffff"
+              }
+            }
+          ],
+          "operation_id": "guard-floor-below-02"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "guard-floor-below-03"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "4058ffffffffffff"
+              }
+            }
+          ],
+          "operation_id": "guard-floor-below-04"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "c058ffffffffffff"
+              }
+            }
+          ],
+          "operation_id": "guard-floor-below-05"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "guard-floor-below-06"
+        }
+      ]
+    },
+    {
+      "case_id": "guard-floor-at",
+      "purpose": "Prospective literal heat/cool guard or 100 W floor operand; no expected branch/result supplied.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 2,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "4059000000000000"
+              }
+            }
+          ],
+          "operation_id": "guard-floor-at-01"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "c059000000000000"
+              }
+            }
+          ],
+          "operation_id": "guard-floor-at-02"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "guard-floor-at-03"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "4059000000000000"
+              }
+            }
+          ],
+          "operation_id": "guard-floor-at-04"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "c059000000000000"
+              }
+            }
+          ],
+          "operation_id": "guard-floor-at-05"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "guard-floor-at-06"
+        }
+      ]
+    },
+    {
+      "case_id": "guard-floor-above",
+      "purpose": "Prospective literal heat/cool guard or 100 W floor operand; no expected branch/result supplied.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 2,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "4059000000000001"
+              }
+            }
+          ],
+          "operation_id": "guard-floor-above-01"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "c059000000000001"
+              }
+            }
+          ],
+          "operation_id": "guard-floor-above-02"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "guard-floor-above-03"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "4059000000000001"
+              }
+            }
+          ],
+          "operation_id": "guard-floor-above-04"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "c059000000000001"
+              }
+            }
+          ],
+          "operation_id": "guard-floor-above-05"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "guard-floor-above-06"
+        }
+      ]
+    },
+    {
+      "case_id": "temperature-boundary-below",
+      "purpose": "Absolute temperature tolerance with literal adjacent binary64 input; both load owners active.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 1,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "4079000000000000"
+              }
+            }
+          ],
+          "operation_id": "temperature-boundary-below-01"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "c079000000000000"
+              }
+            }
+          ],
+          "operation_id": "temperature-boundary-below-02"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "temperature-boundary-below-03"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "3fcfffffffffffff"
+              },
+              "SNLoad": {
+                "bits": "4079000000000000"
+              }
+            }
+          ],
+          "operation_id": "temperature-boundary-below-04"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "3fcfffffffffffff"
+              },
+              "SNLoad": {
+                "bits": "c079000000000000"
+              }
+            }
+          ],
+          "operation_id": "temperature-boundary-below-05"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "temperature-boundary-below-06"
+        }
+      ]
+    },
+    {
+      "case_id": "temperature-boundary-at",
+      "purpose": "Absolute temperature tolerance with literal adjacent binary64 input; both load owners active.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 1,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "4079000000000000"
+              }
+            }
+          ],
+          "operation_id": "temperature-boundary-at-01"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "c079000000000000"
+              }
+            }
+          ],
+          "operation_id": "temperature-boundary-at-02"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "temperature-boundary-at-03"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "3fd0000000000000"
+              },
+              "SNLoad": {
+                "bits": "4079000000000000"
+              }
+            }
+          ],
+          "operation_id": "temperature-boundary-at-04"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "3fd0000000000000"
+              },
+              "SNLoad": {
+                "bits": "c079000000000000"
+              }
+            }
+          ],
+          "operation_id": "temperature-boundary-at-05"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "temperature-boundary-at-06"
+        }
+      ]
+    },
+    {
+      "case_id": "temperature-boundary-above",
+      "purpose": "Absolute temperature tolerance with literal adjacent binary64 input; both load owners active.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 1,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "4079000000000000"
+              }
+            }
+          ],
+          "operation_id": "temperature-boundary-above-01"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "c079000000000000"
+              }
+            }
+          ],
+          "operation_id": "temperature-boundary-above-02"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "temperature-boundary-above-03"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "3fd0000000000001"
+              },
+              "SNLoad": {
+                "bits": "4079000000000000"
+              }
+            }
+          ],
+          "operation_id": "temperature-boundary-above-04"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "3fd0000000000001"
+              },
+              "SNLoad": {
+                "bits": "c079000000000000"
+              }
+            }
+          ],
+          "operation_id": "temperature-boundary-above-05"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "temperature-boundary-above-06"
+        }
+      ]
+    },
+    {
+      "case_id": "load-boundary-below",
+      "purpose": "Normalized load tolerance boundary from literal daily 300/400 W operands, temperatures zero.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fcfffffffffffff"
+        },
+        "MinNumberOfWarmupDays": 1,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "4072c00000000000"
+              }
+            }
+          ],
+          "operation_id": "load-boundary-below-01"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "c072c00000000000"
+              }
+            }
+          ],
+          "operation_id": "load-boundary-below-02"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "load-boundary-below-03"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "4079000000000000"
+              }
+            }
+          ],
+          "operation_id": "load-boundary-below-04"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "c079000000000000"
+              }
+            }
+          ],
+          "operation_id": "load-boundary-below-05"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "load-boundary-below-06"
+        }
+      ]
+    },
+    {
+      "case_id": "load-boundary-at",
+      "purpose": "Normalized load tolerance boundary from literal daily 300/400 W operands, temperatures zero.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 1,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "4072c00000000000"
+              }
+            }
+          ],
+          "operation_id": "load-boundary-at-01"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "c072c00000000000"
+              }
+            }
+          ],
+          "operation_id": "load-boundary-at-02"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "load-boundary-at-03"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "4079000000000000"
+              }
+            }
+          ],
+          "operation_id": "load-boundary-at-04"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "c079000000000000"
+              }
+            }
+          ],
+          "operation_id": "load-boundary-at-05"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "load-boundary-at-06"
+        }
+      ]
+    },
+    {
+      "case_id": "load-boundary-above",
+      "purpose": "Normalized load tolerance boundary from literal daily 300/400 W operands, temperatures zero.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000001"
+        },
+        "MinNumberOfWarmupDays": 1,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "4072c00000000000"
+              }
+            }
+          ],
+          "operation_id": "load-boundary-above-01"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "c072c00000000000"
+              }
+            }
+          ],
+          "operation_id": "load-boundary-above-02"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "load-boundary-above-03"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "4079000000000000"
+              }
+            }
+          ],
+          "operation_id": "load-boundary-above-04"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "c079000000000000"
+              }
+            }
+          ],
+          "operation_id": "load-boundary-above-05"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "load-boundary-above-06"
+        }
+      ]
+    },
+    {
+      "case_id": "metric-retention-zero",
+      "purpose": "Active first-day metrics then zero-load guard must retain actual metric owners while rewriting pass flags.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 2,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "4079000000000000"
+              }
+            }
+          ],
+          "operation_id": "metric-retention-zero-01"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "c079000000000000"
+              }
+            }
+          ],
+          "operation_id": "metric-retention-zero-02"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "metric-retention-zero-03"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "metric-retention-zero-04"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "metric-retention-zero-05"
+        }
+      ]
+    },
+    {
+      "case_id": "maximum-runperiod",
+      "purpose": "Actual user-max diagnostics, per-zone loop, once warning owner and forced exit; subsequent Check does not reset warning flags.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1",
+          "SYS02-ZONE-2"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 1,
+        "MaxNumberOfWarmupDays": 2,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4034000000000000"
+              },
+              "SNLoad": {
+                "bits": "4079000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "maximum-runperiod-01"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4036000000000000"
+              },
+              "SNLoad": {
+                "bits": "c079000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "maximum-runperiod-02"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "maximum-runperiod-03"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4038000000000000"
+              },
+              "SNLoad": {
+                "bits": "4089000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "maximum-runperiod-04"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "403a000000000000"
+              },
+              "SNLoad": {
+                "bits": "c089000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "maximum-runperiod-05"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "maximum-runperiod-06"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 3,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "maximum-runperiod-07"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4039000000000000"
+              },
+              "SNLoad": {
+                "bits": "407f400000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "maximum-runperiod-08"
+        },
+        {
+          "operation": "report",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "maximum-runperiod-09"
+        }
+      ]
+    },
+    {
+      "case_id": "maximum-sizing",
+      "purpose": "Actual user-max diagnostics, per-zone loop, once warning owner and forced exit; subsequent Check does not reset warning flags.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1",
+          "SYS02-ZONE-2"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 1,
+        "MaxNumberOfWarmupDays": 2,
+        "DoingSizing": true,
+        "DoPureLoadCalc": true,
+        "RunPeriodEnvironment": false,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4034000000000000"
+              },
+              "SNLoad": {
+                "bits": "4079000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "maximum-sizing-01"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4036000000000000"
+              },
+              "SNLoad": {
+                "bits": "c079000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "maximum-sizing-02"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "maximum-sizing-03"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4038000000000000"
+              },
+              "SNLoad": {
+                "bits": "4089000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "maximum-sizing-04"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "403a000000000000"
+              },
+              "SNLoad": {
+                "bits": "c089000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "maximum-sizing-05"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "maximum-sizing-06"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 3,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "maximum-sizing-07"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4039000000000000"
+              },
+              "SNLoad": {
+                "bits": "407f400000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "maximum-sizing-08"
+        },
+        {
+          "operation": "report",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "maximum-sizing-09"
+        }
+      ]
+    },
+    {
+      "case_id": "default-max-days",
+      "purpose": "Actual default max threshold without user-short-max diagnostic branch; explicit direct clock gap is not ordinary replay.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 1,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 24,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4034000000000000"
+              },
+              "SNLoad": {
+                "bits": "4079000000000000"
+              }
+            }
+          ],
+          "operation_id": "default-max-days-01"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 24,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "default-max-days-02"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 25,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "403e000000000000"
+              },
+              "SNLoad": {
+                "bits": "c089000000000000"
+              }
+            }
+          ],
+          "operation_id": "default-max-days-03"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 25,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "default-max-days-04"
+        }
+      ]
+    },
+    {
+      "case_id": "two-zones-late-failure",
+      "purpose": "Zone1 passes while Zone2 fails, proving whole ordered convergence loop; retained two-zone report scratch.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1",
+          "SYS02-ZONE-2"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 1,
+        "MaxNumberOfWarmupDays": 2,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "4034000000000000"
+              },
+              "SNLoad": {
+                "bits": "4079000000000000"
+              }
+            }
+          ],
+          "operation_id": "two-zones-late-failure-01"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "two-zones-late-failure-02"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "403e000000000000"
+              },
+              "SNLoad": {
+                "bits": "c089000000000000"
+              }
+            }
+          ],
+          "operation_id": "two-zones-late-failure-03"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "two-zones-late-failure-04"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "4036000000000000"
+              },
+              "SNLoad": {
+                "bits": "4072c00000000000"
+              }
+            }
+          ],
+          "operation_id": "two-zones-late-failure-05"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "4038000000000000"
+              },
+              "SNLoad": {
+                "bits": "c069000000000000"
+              }
+            }
+          ],
+          "operation_id": "two-zones-late-failure-06"
+        },
+        {
+          "operation": "report",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "two-zones-late-failure-07"
+        },
+        {
+          "operation": "report",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "two-zones-late-failure-08"
+        }
+      ]
+    },
+    {
+      "case_id": "sizing-report-suppressed",
+      "purpose": "DoingSizing with DoPureLoadCalc false suppresses first-Run report collection; warmup-guard Report remains safe.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 1,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": true,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": false,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "report",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "sizing-report-suppressed-01"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "sizing-report-suppressed-02"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "sizing-report-suppressed-03"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "sizing-report-suppressed-04"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 2,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "sizing-report-suppressed-05"
+        }
+      ]
+    },
+    {
+      "case_id": "report-zero-load-guard",
+      "purpose": "Actual first-Run two rolling differences with zero MaxLoad; detailed output disabled, summary twice.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 1,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": false
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "report-zero-load-guard-01"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "report-zero-load-guard-02"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "report-zero-load-guard-03"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "3ff0000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "report-zero-load-guard-04"
+        },
+        {
+          "operation": "report",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "report-zero-load-guard-05"
+        },
+        {
+          "operation": "report",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "report-zero-load-guard-06"
+        }
+      ]
+    },
+    {
+      "case_id": "full-report-capacity",
+      "purpose": "All 24 actual first-Run report points in two zones; Count once per point and complete shared scratch tails.",
+      "initial": {
+        "zone_names": [
+          "SYS02-ZONE-1",
+          "SYS02-ZONE-2"
+        ],
+        "TimeStepsInHour": 1,
+        "TimeStepZone": {
+          "bits": "3ff0000000000000"
+        },
+        "TimeStepSysSec": {
+          "bits": "40ac200000000000"
+        },
+        "TempConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "LoadsConvergTol": {
+          "bits": "3fd0000000000000"
+        },
+        "MinNumberOfWarmupDays": 1,
+        "MaxNumberOfWarmupDays": 25,
+        "DoingSizing": false,
+        "DoPureLoadCalc": false,
+        "RunPeriodEnvironment": true,
+        "EnvironmentName": "SYS02-DIRECT-INPUT",
+        "ReportDetailedWarmupConvergence": true
+      },
+      "operations": [
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-01"
+        },
+        {
+          "operation": "check",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "full-report-capacity-02"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "3fd0000000000000"
+              },
+              "SNLoad": {
+                "bits": "4059000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-03"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 2,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "3fe0000000000000"
+              },
+              "SNLoad": {
+                "bits": "c069000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-04"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 3,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "3fe8000000000000"
+              },
+              "SNLoad": {
+                "bits": "4059000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-05"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 4,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "3ff0000000000000"
+              },
+              "SNLoad": {
+                "bits": "c069000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-06"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 5,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "3ff4000000000000"
+              },
+              "SNLoad": {
+                "bits": "4059000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-07"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 6,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "3ff8000000000000"
+              },
+              "SNLoad": {
+                "bits": "c069000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-08"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 7,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "3ffc000000000000"
+              },
+              "SNLoad": {
+                "bits": "4059000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-09"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 8,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4000000000000000"
+              },
+              "SNLoad": {
+                "bits": "c069000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-10"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 9,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4002000000000000"
+              },
+              "SNLoad": {
+                "bits": "4059000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-11"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 10,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4004000000000000"
+              },
+              "SNLoad": {
+                "bits": "c069000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-12"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 11,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4006000000000000"
+              },
+              "SNLoad": {
+                "bits": "4059000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-13"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 12,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4008000000000000"
+              },
+              "SNLoad": {
+                "bits": "c069000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-14"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 13,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "400a000000000000"
+              },
+              "SNLoad": {
+                "bits": "4059000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-15"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 14,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "400c000000000000"
+              },
+              "SNLoad": {
+                "bits": "c069000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-16"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 15,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "400e000000000000"
+              },
+              "SNLoad": {
+                "bits": "4059000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-17"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 16,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4010000000000000"
+              },
+              "SNLoad": {
+                "bits": "c069000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-18"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 17,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4011000000000000"
+              },
+              "SNLoad": {
+                "bits": "4059000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-19"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 18,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4012000000000000"
+              },
+              "SNLoad": {
+                "bits": "c069000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-20"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 19,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4013000000000000"
+              },
+              "SNLoad": {
+                "bits": "4059000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-21"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 20,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4014000000000000"
+              },
+              "SNLoad": {
+                "bits": "c069000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-22"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 21,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4015000000000000"
+              },
+              "SNLoad": {
+                "bits": "4059000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-23"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 22,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4016000000000000"
+              },
+              "SNLoad": {
+                "bits": "c069000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-24"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 23,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4017000000000000"
+              },
+              "SNLoad": {
+                "bits": "4059000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-25"
+        },
+        {
+          "operation": "record",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 24,
+            "TimeStep": 1
+          },
+          "zone_samples": [
+            {
+              "ZTAV": {
+                "bits": "4018000000000000"
+              },
+              "SNLoad": {
+                "bits": "c069000000000000"
+              }
+            },
+            {
+              "ZTAV": {
+                "bits": "0000000000000000"
+              },
+              "SNLoad": {
+                "bits": "0000000000000000"
+              }
+            }
+          ],
+          "operation_id": "full-report-capacity-26"
+        },
+        {
+          "operation": "report",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "full-report-capacity-27"
+        },
+        {
+          "operation": "report",
+          "clock": {
+            "DayOfSim": 1,
+            "HourOfDay": 1,
+            "TimeStep": 1
+          },
+          "zone_samples": [],
+          "operation_id": "full-report-capacity-28"
+        }
+      ]
+    }
+  ]
+}

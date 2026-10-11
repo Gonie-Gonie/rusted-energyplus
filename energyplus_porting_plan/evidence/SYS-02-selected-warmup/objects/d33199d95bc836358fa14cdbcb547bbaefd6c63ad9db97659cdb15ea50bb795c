@@ -1,0 +1,77 @@
+{
+  "schema": "sys02-direct-warmup-actual-link-inputs.v1",
+  "reviewed_Source_preparation": {
+    "path": ".runtime/porting/SYS-02/warmup-native-prep-01/manifest.json",
+    "sha256": "61e2ca2825d527fe0da515cbc7d3d5ae2076eac32806130336faeaef49937368",
+    "size_bytes": 28473
+  },
+  "frozen_Source_and_input": [
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/warmup_reference_helper.cpp",
+      "sha256": "49339c0febf2b7c7555ee8b78f8d3f4a6864301b8e8de3b16c8e7cd119428fad",
+      "size_bytes": 15294
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/warmup_reference_fields.hh",
+      "sha256": "0a0168b978a9b5acf8f107d1bfa30d8aaa0c9f1db90cb0e03d6f8420811b47d6",
+      "size_bytes": 10338
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/warmup_reference.cmake",
+      "sha256": "7ec93f33f3d7adb97a3835eeaba2075046f9b917b056051bc12273dab4877dc9",
+      "size_bytes": 1733
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-native-prep-01/input-only-cases.proposed.json",
+      "sha256": "34a6d7cd40ff24ae08c04b7be88cbc527c2e4c003d734f7e6b212ed121359637",
+      "size_bytes": 96140
+    }
+  ],
+  "reviewed_build_output_wrapper": {
+    "path": ".runtime/porting/SYS-02/warmup-native-build-01/additive-reference.cmake",
+    "sha256": "a0c9df31421494eb6dbb0a4789b644d7c1098e4f50d0999e7d20f527c716a1f0",
+    "size_bytes": 860
+  },
+  "prior_frozen_build_inputs": {
+    "path": ".runtime/porting/SYS-02/warmup-native-build-01/frozen-build-inputs.json",
+    "sha256": "509d0b784c5b5d68df93cc5467dc0e27b87b6374dd9ea11a8d2e39d2abde7c19",
+    "size_bytes": 2491
+  },
+  "actual_output_recovery": {
+    "path": ".runtime/porting/SYS-02/warmup-native-build-02/frozen-build-inputs.json",
+    "sha256": "4476ec70e0d759f816b16b944dc7a29a0ee5be62d612edc8e9d169082c439fbd",
+    "size_bytes": 2225
+  },
+  "actual_dry_review": {
+    "path": ".runtime/porting/SYS-02/warmup-native-build-02/dry-build-review.json",
+    "sha256": "a7cab3a0c4e82778fdc10456990da2ba044e4d074623bf949cf367dfc4b4a1a8",
+    "size_bytes": 3887
+  },
+  "actual_link_command": {
+    "path": ".runtime/porting/SYS-02/warmup-native-build-02/link-command/receipt.json",
+    "sha256": "9b6b98171291a80505182ab6ef5c5f883708742b74737dff4770c3dbdb5f7d18",
+    "size_bytes": 3039
+  },
+  "official_Source_and_core_check": {
+    "path": ".runtime/porting/SYS-02/warmup-native-build-02/core-after-command/receipt.json",
+    "sha256": "9df3b4269a363acb800a3d8f244f2129a09e7130834170a607abc44227c6bda3",
+    "size_bytes": 2814
+  },
+  "actual_Native_binary": {
+    "path": "D:\\CodexBuild\\rusted-energyplus\\SYS-02\\warmup-native-build-02\\bin\\sys02_warmup_helper.exe",
+    "sha256": "57036f8a97e32dada106206887184eb59aba0551d34f8bcc9c74988ff51a13b4",
+    "size_bytes": 1297322680
+  },
+  "actual_full_link_map": {
+    "path": "D:\\CodexBuild\\rusted-energyplus\\SYS-02\\warmup-native-build-02\\bin\\sys02_warmup_helper.map",
+    "sha256": "09e820fc9aa6f1ae344856bb78dd9ac2c9114d64f7f19867ebb7131196d0c7a2",
+    "size_bytes": 303921485
+  },
+  "selected_link_provider_lines": {
+    "path": ".runtime/porting/SYS-02/warmup-native-build-02/selected-link-providers.txt",
+    "sha256": "fb79f7fe5d91927d960fd19fa5e9c0409f2c5ee6f74202e7aae4c83c7cd6478c",
+    "size_bytes": 8180
+  },
+  "Original_Source_or_core_math_modified": false,
+  "numerical_results_read": false
+}

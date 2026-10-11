@@ -1,0 +1,11 @@
+//! Typed ID newtypes for compiled model entities.
+
+macro_rules! typed_id {
+    ($name:ident) => {
+        #[doc = concat!("Typed ID for ", stringify!($name), ".")]
+        #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+        pub struct $name(pub u32);
+    };
+}
+
+typed_id!(ZoneId);

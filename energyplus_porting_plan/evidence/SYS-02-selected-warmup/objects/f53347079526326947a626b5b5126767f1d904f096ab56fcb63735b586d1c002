@@ -1,0 +1,54 @@
+{
+  "schema": "sys02-selected-warmup-execution-input-custody.v1",
+  "actual_launcher_source": {
+    "path": ".runtime/porting/SYS-02/run-selected-observer-01.py",
+    "sha256": "7cd1403488fac0fbd730b353053150443ec4097888a23ec427ce3085f7adb688",
+    "size_bytes": 2398
+  },
+  "actual_environment_operands": {
+    "SYS02_REFERENCE_INPUT": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SYS-02\\selected-observation-01\\Rust-input.json",
+    "SYS02_REFERENCE_OUTPUT": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SYS-02\\selected-observation-01\\Rust\\result.json"
+  },
+  "actual_input_before": {
+    "path": ".runtime/porting/SYS-02/selected-observation-01/Rust-input.json",
+    "sha256": "0203787f9662128c9600ec801c1cbaa0527ba4080ae3466158f0ad4acfe1d7b5",
+    "size_bytes": 118992
+  },
+  "actual_Cargo_command": [
+    "cargo",
+    "test",
+    "--config",
+    "profile.dev.debug=0",
+    "--config",
+    "profile.test.debug=0",
+    "--config",
+    "build.incremental=false",
+    "--locked",
+    "-p",
+    "ep_runtime",
+    "--lib",
+    "heat_balance::warmup::selected_reference::observe_literal_selected_warmup_methods",
+    "--",
+    "--exact",
+    "--ignored"
+  ],
+  "actual_input_after": {
+    "path": ".runtime/porting/SYS-02/selected-observation-01/Rust-input.json",
+    "sha256": "0203787f9662128c9600ec801c1cbaa0527ba4080ae3466158f0ad4acfe1d7b5",
+    "size_bytes": 118992
+  },
+  "actual_Cargo_execution": {
+    "path": ".runtime/porting/SYS-02/selected-observation-01/Rust/cargo-command/receipt.json",
+    "sha256": "a7a4b0b591072450104a5e0f00714cce9abd71ff89a33d229398c334c445fe0c",
+    "size_bytes": 3303
+  },
+  "actual_output": {
+    "path": ".runtime/porting/SYS-02/selected-observation-01/Rust/result.json",
+    "sha256": "0b004b2da891d6ac69fbede3e9d1f72a2597d0856b07d9beda71537cfa809750",
+    "size_bytes": 1003106
+  },
+  "actual_Cargo_exit_code": 0,
+  "input_bytes_match_before_after": true,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false
+}

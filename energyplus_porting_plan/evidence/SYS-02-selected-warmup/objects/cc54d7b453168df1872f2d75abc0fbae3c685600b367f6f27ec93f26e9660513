@@ -1,0 +1,61 @@
+#[derive(Clone, Debug, PartialEq)]
+pub struct HeatBalanceWarmupZoneConvergence {
+    /// Actual Zone identity in the caller's declared order.
+    pub zone_id: ep_model::ZoneId,
+    /// Actual unmultiplied air-system heating/cooling rates after the report seam.
+    /// None is not an observed zero and cannot be sampled by RecKeep.
+    pub air_system_sensible_rates_w: Option<(f64, f64)>,
+    /// Actual zero-based timestep at which corrector reporting was reached.
+    pub sensible_report_timestep: Option<usize>,
+    /// Current daily MaxHeatLoadZone, MaxCoolLoadZone, MaxTempZone and MinTempZone.
+    pub current: [f64; 4],
+    /// Retained prior-day values in the same order; BeginEnvrn initializes zero.
+    pub previous: [f64; 4],
+    /// Native PassFlag order: max temperature, min temperature, heat, cool; 2=pass.
+    pub pass_flags: [u8; 4],
+    /// Actual corresponding comparison values; no-load guards retain prior metrics.
+    pub test_values: [f64; 4],
+}
+
+/// Retained real per-zone warmup state, separate from MAT/CTF state and summary.
+#[derive(Clone, Debug, PartialEq)]
+pub struct HeatBalanceWarmupConvergenceState {
+    /// Complete admitted Zone owner order; no filtering or zip truncation.
+    pub zones: Vec<HeatBalanceWarmupZoneConvergence>,
+    /// Actual last CheckWarmupConvergence day.
+    pub checked_day: u32,
+    /// Actual convergence-check result, distinct from the maximum-day exit.
+    pub convergence_checks_failed: bool,
+    /// Current selected warmup flag after its actual day-end decision.
+    pub warmup_flag: bool,
+    /// Whether the maximum-day condition forced a nonconverged exit.
+    pub maximum_day_forced_exit: bool,
+    /// Sticky representability failure at the demand-report seam.
+    pub unavailable_reason: Option<&'static str>,
+}
+
+/// Warmup settings for heat-balance diagnostic traces.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct HeatBalanceWarmupOptions {
+    /// Whether to execute a warmup loop before reported samples are recorded.
+    pub enabled: bool,
+    /// Minimum number of repeated warmup days.
+    pub minimum_days: u32,
+    /// Maximum number of repeated warmup days.
+    pub maximum_days: u32,
+    /// Zone end-state convergence tolerance in delta C.
+    pub temperature_convergence_tolerance_delta_c: f64,
+    /// Dimensionless normalized load convergence tolerance; `_w` is retained API spelling.
+    pub loads_convergence_tolerance_w: f64,
+}
+
+impl HeatBalanceWarmupOptions {
+    /// Creates disabled warmup settings.
+    #[must_use]
+    pub const fn disabled() -> Self {
+        Self {
+            enabled: false,
+            minimum_days: 0,
+            maximum_days: 0,
+            temperature_convergence_tolerance_delta_c: 0.0,
+            loads_convergence_tolerance_w: 0.0,

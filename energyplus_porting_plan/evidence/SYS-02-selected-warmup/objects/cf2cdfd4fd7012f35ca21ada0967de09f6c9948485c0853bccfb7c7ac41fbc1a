@@ -1,0 +1,480 @@
+--- .runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_helper.cpp
++++ .runtime/porting/SYS-02/warmup-native-prep-01/warmup_reference_helper.cpp
+@@ -1,239 +1,274 @@
+-// Input-only preparation and the unchanged linked Original correctHumRat member.
+-#include "zon05_reference_fields.hh"
++// Input-only direct calls to unchanged linked Original warmup/report APIs.
++#include "warmup_reference_fields.hh"
+ #include <fstream>
+ #include <initializer_list>
+ #include <iostream>
+ #include <limits>
+ #include <memory>
++#include <optional>
+ #include <set>
+ #include <stdexcept>
+ #include <string>
+ 
+ namespace {
+-using Zon05::json;
++using Sys02::json;
+ void require(bool ok, std::string const &message)
+ {
+     if (!ok) {
+         throw std::runtime_error(message);
+     }
+ }
+-void keys(json const &object, std::initializer_list<char const *> names)
+-{
+-    require(object.is_object() && object.size() == names.size(), "Exact input object shape required");
++void keys(json const &value, std::initializer_list<char const *> names)
++{
++    require(value.is_object() && value.size() == names.size(), "Exact input object shape required");
+     for (char const *name : names) {
+-        require(object.contains(name), std::string("Missing input field: ") + name);
+-    }
+-}
+-double input(json const &value, json const &token)
+-{
+-    require(value.is_number() && !value.is_boolean() && token.is_string(), "Finite scalar and bit string required");
+-    double const number = value.get<double>();
+-    require(std::isfinite(number) && Zon05::bits(number) == token.get<std::string>(), "Independently parsed input bits differ");
++        require(value.contains(name), std::string("Missing input field: ") + name);
++    }
++}
++int integer(json const &value, int minimum, int maximum)
++{
++    require(value.is_number_integer() && !value.is_boolean(), "Integer input required");
++    auto const v = value.get<std::int64_t>();
++    require(v >= minimum && v <= maximum, "Input outside declared source integer domain");
++    return static_cast<int>(v);
++}
++double input(json const &value)
++{
++    keys(value, {"bits"});
++    require(value.at("bits").is_string(), "Literal binary64 input bits required");
++    auto const token = value.at("bits").get<std::string>();
++    require(token.size() == 16 && token.find_first_not_of("0123456789abcdef") == std::string::npos, "Canonical 16-hex input required");
++    auto const number = std::bit_cast<double>(static_cast<std::uint64_t>(std::stoull(token, nullptr, 16)));
++    require(std::isfinite(number), "Finite input-only scalar required");
+     return number;
+ }
+-int integer(json const &value, int minimum)
+-{
+-    require(value.is_number_integer() && !value.is_boolean(), "Integer input required");
+-    auto const number = value.get<std::int64_t>();
+-    require(number >= minimum && number <= std::numeric_limits<int>::max(), "Input outside source int domain");
+-    return static_cast<int>(number);
+-}
+-void seed(EnergyPlus::ZoneTempPredictorCorrector::ZoneHeatBalanceData &zone, json const &fields, json const &tokens)
+-{
+-    require(fields.is_object() && tokens.is_object() && fields.size() == 26 && tokens.size() == 26,
+-            "Complete selected state/source objects required");
+-#define SEED_STATE(name) zone.name = input(fields.at(#name), tokens.at(#name));
+-    ZON05_STATE_SCALARS(SEED_STATE)
+-#undef SEED_STATE
+-#define SEED_ZERO(name) zone.name = input(fields.at(#name), tokens.at(#name)); require(zone.name == 0.0, "Excluded source must be zero: " #name);
+-    ZON05_ZERO_SOURCES(SEED_ZERO)
+-#undef SEED_ZERO
+-#define SEED_ARRAY(name) \
+-    require(fields.at(#name).is_array() && fields.at(#name).size() == 4 && tokens.at(#name).is_array() && tokens.at(#name).size() == 4, "Four actual source history slots required"); \
+-    for (int i = 0; i < 4; ++i) { zone.name[i] = input(fields.at(#name).at(i), tokens.at(#name).at(i)); }
+-    ZON05_W_ARRAYS(SEED_ARRAY)
+-#undef SEED_ARRAY
+-}
+-
+-void prepare(EnergyPlus::EnergyPlusData &state, json const &initial)
+-{
+-    keys(initial, {"zone_name", "IsControlled", "SystemZoneNodeNumber", "Multiplier", "ListMultiplier",
+-                   "Volume", "Volume_bits", "ZoneVolCapMultpMoist", "ZoneVolCapMultpMoist_bits",
+-                   "OutBaroPress", "OutBaroPress_bits", "OutHumRat", "OutHumRat_bits", "TimeStepSysSec", "TimeStepSysSec_bits",
+-                   "TimeStepSys", "TimeStepSys_bits", "TimeStepZone", "TimeStepZone_bits", "zone_fields", "zone_field_bits", "nodes", "inlet_node_ids"});
+-    state.dataGlobal->NumOfZones = 1;
+-    state.dataGlobal->numSpaces = 0;
+-    state.dataGlobal->WarmupFlag = false;
+-    state.dataGlobal->DoingSizing = false;
+-    state.dataHeatBal->doSpaceHeatBalance = false;
+-    state.dataHeatBal->DoLatentSizing = false;
+-    state.dataHeatBal->ZoneAirSolutionAlgo = EnergyPlus::DataHeatBalance::SolutionAlgo::ThirdOrder;
+-    state.dataHeatBal->Zone.allocate(1);
+-    state.dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+-    state.dataZoneEquip->ZoneEquipConfig.allocate(1);
+-    state.dataRoomAir->AirModel.allocate(1);
+-    state.dataRoomAir->AirModel(1).AirModel = EnergyPlus::RoomAir::RoomAirModel::Mixing;
+-    state.dataHeatBalFanSys->SumLatentHTRadSys.dimension(1, 0.0);
+-    state.dataHeatBalFanSys->SumLatentPool.dimension(1, 0.0);
+-    state.afn->multizone_always_simulated = false;
+-    state.afn->AirflowNetworkFanActivated = false;
+-    state.afn->distribution_simulated = false;
+-    state.afn->simulation_control.type = EnergyPlus::AirflowNetwork::ControlType::NoMultizoneOrDistribution;
+-    state.dataDuctLoss->DuctLossSimu = false;
+-    state.dataHybridModel->FlagHybridModel = false;
+-
+-    auto &geometry = state.dataHeatBal->Zone(1);
+-    require(initial.at("zone_name").is_string() && !initial.at("zone_name").get<std::string>().empty(), "Zone name required");
+-    geometry.Name = initial.at("zone_name").get<std::string>();
+-    require(initial.at("IsControlled").is_boolean(), "Controlled-zone flag required");
+-    geometry.IsControlled = initial.at("IsControlled").get<bool>();
+-    geometry.IsReturnPlenum = false;
+-    geometry.IsSupplyPlenum = false;
+-    geometry.leakageParallelPIUNums.clear();
+-    geometry.Multiplier = integer(initial.at("Multiplier"), 1);
+-    geometry.ListMultiplier = integer(initial.at("ListMultiplier"), 1);
+-    require(geometry.Multiplier <= std::numeric_limits<int>::max() / geometry.ListMultiplier,
+-            "Original integer multiplier product must be representable");
+-    geometry.Volume = input(initial.at("Volume"), initial.at("Volume_bits"));
+-    geometry.ZoneVolCapMultpMoist = input(initial.at("ZoneVolCapMultpMoist"), initial.at("ZoneVolCapMultpMoist_bits"));
+-    state.dataEnvrn->OutBaroPress = input(initial.at("OutBaroPress"), initial.at("OutBaroPress_bits"));
+-    state.dataEnvrn->OutHumRat = input(initial.at("OutHumRat"), initial.at("OutHumRat_bits"));
+-    state.dataHVACGlobal->TimeStepSysSec = input(initial.at("TimeStepSysSec"), initial.at("TimeStepSysSec_bits"));
+-    state.dataHVACGlobal->TimeStepSys = input(initial.at("TimeStepSys"), initial.at("TimeStepSys_bits"));
+-    state.dataGlobal->TimeStepZone = input(initial.at("TimeStepZone"), initial.at("TimeStepZone_bits"));
+-    require(geometry.Volume > 0.0 && geometry.ZoneVolCapMultpMoist > 0.0 && state.dataEnvrn->OutBaroPress > 0.0 &&
+-            state.dataHVACGlobal->TimeStepSysSec > 0.0, "Selected physical inputs require positive volume/capacity/pressure/seconds");
+-    seed(state.dataZoneTempPredictorCorrector->zoneHeatBalance(1), initial.at("zone_fields"), initial.at("zone_field_bits"));
+-
+-    auto const &nodes = initial.at("nodes");
+-    auto const &inlets = initial.at("inlet_node_ids");
+-    require(nodes.is_array() && inlets.is_array() && nodes.size() <= static_cast<std::size_t>(std::numeric_limits<int>::max()) &&
+-            inlets.size() <= static_cast<std::size_t>(std::numeric_limits<int>::max()), "Source-sized ordered nodes required");
+-    state.dataLoopNodes->NumOfNodes = static_cast<int>(nodes.size());
+-    if (!nodes.empty()) {
+-        state.dataLoopNodes->Node.allocate(static_cast<int>(nodes.size()));
+-        state.dataLoopNodes->NodeID.allocate(static_cast<int>(nodes.size()));
+-    }
+-    for (std::size_t i = 0; i < nodes.size(); ++i) {
+-        auto const &row = nodes.at(i);
+-        keys(row, {"node_id", "name", "MassFlowRate", "MassFlowRate_bits", "Temp", "Temp_bits", "HumRat", "HumRat_bits", "Enthalpy", "Enthalpy_bits"});
+-        int const id = integer(row.at("node_id"), 1);
+-        require(id == static_cast<int>(i + 1), "Declared allocation order must be contiguous; no sorting or remapping");
+-        require(row.at("name").is_string(), "Declared node name required");
+-        auto &node = state.dataLoopNodes->Node(id);
+-        state.dataLoopNodes->NodeID(id) = row.at("name").get<std::string>();
+-        node.MassFlowRate = input(row.at("MassFlowRate"), row.at("MassFlowRate_bits"));
+-        node.Temp = input(row.at("Temp"), row.at("Temp_bits"));
+-        node.HumRat = input(row.at("HumRat"), row.at("HumRat_bits"));
+-        node.Enthalpy = input(row.at("Enthalpy"), row.at("Enthalpy_bits"));
+-        require(node.MassFlowRate >= 0.0 && node.HumRat >= 0.0, "Selected finite inlet/node state requires nonnegative mass/W");
+-    }
+-    auto &config = state.dataZoneEquip->ZoneEquipConfig(1);
+-    config.ZoneName = geometry.Name;
+-    config.IsControlled = geometry.IsControlled;
+-    config.NumInletNodes = static_cast<int>(inlets.size());
+-    if (!inlets.empty()) {
+-        config.InletNode.allocate(config.NumInletNodes);
+-    }
+-    std::set<int> seen;
+-    for (int i = 1; i <= config.NumInletNodes; ++i) {
+-        int const id = integer(inlets.at(static_cast<std::size_t>(i - 1)), 1);
+-        require(id <= state.dataLoopNodes->NumOfNodes && seen.insert(id).second, "Unique allocated inlet IDs required");
+-        config.InletNode(i) = id;
+-    }
+-    require(geometry.IsControlled || inlets.empty(), "Uncontrolled selected lane must not imply ignored inlet flows");
+-    geometry.SystemZoneNodeNumber = integer(initial.at("SystemZoneNodeNumber"), 0);
+-    require(geometry.SystemZoneNodeNumber <= state.dataLoopNodes->NumOfNodes, "System zone node must be actually allocated");
+-    require(geometry.SystemZoneNodeNumber == 0 || !seen.contains(geometry.SystemZoneNodeNumber), "Unit input nodes and feedback owner must be distinct");
+-    config.ZoneNode = geometry.SystemZoneNodeNumber;
+-}
+-
++bool boolean(json const &value)
++{
++    require(value.is_boolean(), "Literal boolean input required");
++    return value.get<bool>();
++}
++struct ConsoleCapture {
++    std::ostringstream text;
++    std::streambuf *previous = nullptr;
++    ConsoleCapture() : previous(std::cout.rdbuf(text.rdbuf())) {}
++    ~ConsoleCapture() { std::cout.rdbuf(previous); }
++    ConsoleCapture(ConsoleCapture const &) = delete;
++    ConsoleCapture &operator=(ConsoleCapture const &) = delete;
++};
++struct Fixture {
++    ConsoleCapture console_capture;
++    std::unique_ptr<EnergyPlus::EnergyPlusData> state;
++    std::ostringstream *error = nullptr;
++    json callbacks = json::array();
++    bool callback_integrity_failed = false, allocated_returned = false, stddev_known = false, stopped = false;
++    std::size_t actual_calls = 0, callback_count = 0;
++    json calls = json::array();
++    Fixture() : state(std::make_unique<EnergyPlus::EnergyPlusData>())
++    {
++        auto sink = std::make_unique<std::ostringstream>();
++        error = sink.get();
++        state->files.err_stream = std::move(sink);
++        state->files.eio.open_as_stringstream();
++        state->dataGlobal->errorCallback = [this](EnergyPlus::Error level, std::string const &text) noexcept {
++            callback("errorCallback", static_cast<int>(level), text);
++        };
++        state->dataGlobal->messageCallback = [this](std::string const &text) noexcept {
++            callback("messageCallback", std::nullopt, text);
++        };
++        state->init_constant_state(*state);
++    }
++    Fixture(Fixture const &) = delete;
++    Fixture &operator=(Fixture const &) = delete;
++    void callback(char const *kind, std::optional<int> level, std::string const &text) noexcept
++    {
++        if (callback_count == std::numeric_limits<std::size_t>::max()) {
++            callback_integrity_failed = true;
++            return;
++        }
++        ++callback_count;
++        try {
++            callbacks.push_back({{"actual_ordinal", callback_count}, {"kind", kind},
++                                 {"level", level ? json(*level) : json(nullptr)}, {"message", text}});
++        } catch (...) {
++            callback_integrity_failed = true;
++        }
++    }
++    json snapshot()
++    {
++        return {{"owner", Sys02::owners(*state, allocated_returned, stddev_known)},
++                {"error_stream", error->str()}, {"eio", state->files.eio.get_output()}, {"console", console_capture.text.str()},
++                {"callbacks", callbacks}, {"actual_callback_count", callback_count},
++                {"callback_integrity_failed", callback_integrity_failed}};
++    }
++    template<class Call> bool invoke(std::string const &operation_id, char const *api, int zone_id, Call const &call)
++    {
++        auto const before = snapshot();
++        json exception = nullptr;
++        bool returned = false;
++        ++actual_calls;
++        try {
++            call();
++            returned = true;
++        } catch (std::exception const &e) {
++            exception = e.what();
++        } catch (...) {
++            exception = "non-standard Original exception";
++        }
++        stopped = !returned;
++        calls.push_back({{"operation_id", operation_id}, {"actual_call_ordinal", actual_calls}, {"api", api},
++                         {"actual_zone_index", zone_id > 0 ? json(zone_id) : json(nullptr)},
++                         {"actual_source_invoked", true}, {"actual_source_return_observed", returned},
++                         {"source_exception", exception}, {"before", before}, {"after", snapshot()}});
++        return returned;
++    }
++};
++void prepare(Fixture &fixture, json const &v)
++{
++    keys(v, {"zone_names", "TimeStepsInHour", "TimeStepZone", "TimeStepSysSec", "TempConvergTol", "LoadsConvergTol",
++             "MinNumberOfWarmupDays", "MaxNumberOfWarmupDays", "DoingSizing", "DoPureLoadCalc",
++             "RunPeriodEnvironment", "EnvironmentName", "ReportDetailedWarmupConvergence"});
++    auto &s = *fixture.state;
++    auto &g = *s.dataGlobal;
++    auto const &names = v.at("zone_names");
++    require(names.is_array() && names.size() <= static_cast<std::size_t>(std::numeric_limits<int>::max()), "Source-sized zone array required");
++    g.NumOfZones = static_cast<int>(names.size());
++    g.numSpaces = 0;
++    g.TimeStepsInHour = integer(v.at("TimeStepsInHour"), 1, std::numeric_limits<int>::max() / 24);
++    g.TimeStepZone = input(v.at("TimeStepZone"));
++    require(g.TimeStepZone > 0.0, "Positive declared zone-step hours required");
++    g.WarmupFlag = true;
++    g.DayOfSim = 1;
++    g.HourOfDay = 1;
++    g.TimeStep = 1;
++    g.DoingSizing = boolean(v.at("DoingSizing"));
++    g.DoPureLoadCalc = boolean(v.at("DoPureLoadCalc"));
++    s.dataHVACGlobal->TimeStepSysSec = input(v.at("TimeStepSysSec"));
++    require(s.dataHVACGlobal->TimeStepSysSec > 0.0, "Positive sensible-report elapsed seconds required");
++    s.dataHeatBal->TempConvergTol = input(v.at("TempConvergTol"));
++    s.dataHeatBal->LoadsConvergTol = input(v.at("LoadsConvergTol"));
++    require(s.dataHeatBal->TempConvergTol >= 0.0 && s.dataHeatBal->LoadsConvergTol >= 0.0, "Nonnegative actual tolerances required");
++    s.dataHeatBal->MinNumberOfWarmupDays = integer(v.at("MinNumberOfWarmupDays"), 1, std::numeric_limits<int>::max());
++    s.dataHeatBal->MaxNumberOfWarmupDays = integer(v.at("MaxNumberOfWarmupDays"), s.dataHeatBal->MinNumberOfWarmupDays, std::numeric_limits<int>::max());
++    s.dataEnvrn->RunPeriodEnvironment = boolean(v.at("RunPeriodEnvironment"));
++    require(v.at("EnvironmentName").is_string(), "Environment name required");
++    s.dataEnvrn->EnvironmentName = v.at("EnvironmentName").get<std::string>();
++    s.dataSysVars->ReportDetailedWarmupConvergence = boolean(v.at("ReportDetailedWarmupConvergence"));
++    s.dataHeatBal->Zone.allocate(g.NumOfZones);
++    s.dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(names.size());
++    for (int i = 1; i <= g.NumOfZones; ++i) {
++        auto const &name = names.at(static_cast<std::size_t>(i - 1));
++        require(name.is_string() && !name.get<std::string>().empty(), "Zone name required");
++        s.dataHeatBal->Zone(i).Name = name.get<std::string>();
++    }
++    require(!s.dataSurface->AnyMovableInsulation && s.dataSurface->AllHTWindowSurfaceList.empty() &&
++            !s.dataContaminantBalance->Contaminant.CO2Simulation && !s.dataContaminantBalance->Contaminant.GenericContamSimulation &&
++            s.dataViewFactor->NumOfSolarEnclosures == 0 && s.dataWeather->TotThermalReportPers == 0 &&
++            s.dataWeather->TotCO2ReportPers == 0 && s.dataWeather->TotVisualReportPers == 0 &&
++            s.dataSQLiteProcedures->sqlite == nullptr && !g.KickOffSimulation && !g.DoingInputProcessing,
++            "Fresh direct fixture prerequisites differ; no silent substitution");
++    fixture.invoke("allocate", "HeatBalanceManager::AllocateHeatBalArrays", 0, [&] {
++        EnergyPlus::HeatBalanceManager::AllocateHeatBalArrays(s);
++        fixture.allocated_returned = true;
++    });
++}
+ json evaluate(json const &item, bool &any_failure)
+ {
+-    keys(item, {"case_id", "purpose", "admission_lane", "initial", "operations"});
+-    require(item.at("case_id").is_string() && item.at("purpose").is_string(), "Case identity/purpose required");
+-    require(item.at("admission_lane") == "CON-like-direct-member-unit" || item.at("admission_lane") == "unit-only-ordered-inlet-probe",
+-            "Declared direct-member unit lane required");
+-    auto state = std::make_unique<EnergyPlus::EnergyPlusData>();
+-    state->dataPsychrometrics->clear_state();
+-    state->dataPsychCache->clear_state();
+-    state->init_constant_state(*state);
+-    state->files.err_stream = std::make_unique<std::ostringstream>();
+-    json messages = json::array();
+-    state->dataGlobal->errorCallback = [&](EnergyPlus::Error level, std::string const &message) {
+-        messages.push_back({{"message_index", messages.size()}, {"level", static_cast<int>(level)}, {"message", message}});
+-    };
+-    prepare(*state, item.at("initial"));
+-    auto initial = Zon05::snapshot(*state, "after-declared-input-preparation-no-correction-call");
+-    require(item.at("operations").is_array() && !item.at("operations").empty(), "Declared operations required");
+-    json operations = json::array();
++    keys(item, {"case_id", "purpose", "initial", "operations"});
++    require(item.at("case_id").is_string() && item.at("purpose").is_string(), "Case identity and Source purpose required");
++    Fixture fixture;
++    prepare(fixture, item.at("initial"));
++    auto &s = *fixture.state;
++    require(item.at("operations").is_array() && !item.at("operations").empty(), "Complete ordered operations required");
++    json inputs = json::array(), unreached = json::array();
+     std::set<std::string> ids;
+-    std::size_t actual_invocations = 0;
+-    bool source_returned = true;
+-    for (auto const &operation : item.at("operations")) {
+-        keys(operation, {"operation_id", "operation"});
+-        require(operation.at("operation_id").is_string() && ids.insert(operation.at("operation_id").get<std::string>()).second,
+-                "Unique operation IDs required");
+-        require(operation.at("operation") == "correctHumRat", "Only the unchanged selected member is invoked");
+-        auto before = Zon05::snapshot(*state, "before-actual-correctHumRat");
+-        std::size_t const message_begin = messages.size();
+-        json exception = nullptr;
+-        ++actual_invocations;
+-        try {
+-            state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).correctHumRat(*state, 1, 0);
+-        } catch (std::exception const &error) {
+-            source_returned = false;
+-            exception = error.what();
+-            any_failure = true;
+-        }
+-        operations.push_back({{"operation_id", operation.at("operation_id")}, {"operation", "correctHumRat"},
+-                              {"actual_member_invocation_ordinal", actual_invocations}, {"actual_source_invoked", true},
+-                              {"actual_source_return_observed", source_returned}, {"source_exception", exception},
+-                              {"before", before}, {"after", Zon05::snapshot(*state, "after-actual-call-or-caught-exception")},
+-                              {"source_message_begin", message_begin}, {"source_message_end", messages.size()},
+-                              {"history_selection_caller_invoked", false}, {"current_average_or_history_commit_invoked", false},
+-                              {"local_A_B_C_rho_Hg_Wsat_or_guard_decisions_observed", false}});
+-        if (!source_returned) {
+-            break;
+-        }
+-    }
+-    auto const *error_stream = dynamic_cast<std::ostringstream const *>(state->files.err_stream.get());
+-    require(error_stream != nullptr, "Genuine error stream custody lost");
+-    return {{"case_id", item.at("case_id")}, {"purpose", item.at("purpose")}, {"admission_lane", item.at("admission_lane")},
+-            {"input", item}, {"prepared", initial}, {"operations", operations},
+-            {"requested_operation_count", item.at("operations").size()}, {"actual_member_invocation_count", actual_invocations},
+-            {"status", source_returned ? "actual-selected-member-calls-returned" : "actual-source-exception-stopped-sequence"},
+-            {"source_messages", messages}, {"source_error_stream", error_stream->str()},
+-            {"source_warning_backend_paired", false}, {"parser_or_production_admission_claimed", false}};
++    for (auto const &op : item.at("operations")) {
++        keys(op, {"operation_id", "operation", "clock", "zone_samples"});
++        require(op.at("operation_id").is_string() && ids.insert(op.at("operation_id").get<std::string>()).second, "Unique operation IDs required");
++        if (fixture.stopped) {
++            unreached.push_back(op);
++            continue;
++        }
++        auto const id = op.at("operation_id").get<std::string>();
++        auto const kind = op.at("operation").get<std::string>();
++        require(kind == "record" || kind == "check" || kind == "report", "Only declared unchanged public APIs admitted");
++        auto const before_input = fixture.snapshot();
++        auto const &clock = op.at("clock");
++        keys(clock, {"DayOfSim", "HourOfDay", "TimeStep"});
++        s.dataGlobal->DayOfSim = integer(clock.at("DayOfSim"), 1, std::numeric_limits<int>::max());
++        s.dataGlobal->HourOfDay = integer(clock.at("HourOfDay"), 1, 24);
++        s.dataGlobal->TimeStep = integer(clock.at("TimeStep"), 1, s.dataGlobal->TimeStepsInHour);
++        auto const &samples = op.at("zone_samples");
++        require(samples.is_array() && samples.size() == (kind == "record" ? static_cast<std::size_t>(s.dataGlobal->NumOfZones) : 0),
++                "Complete ordered record operands or genuinely empty nonrecord operands required");
++        if (kind == "record") {
++            for (int i = 1; i <= s.dataGlobal->NumOfZones; ++i) {
++                auto const &sample = samples.at(static_cast<std::size_t>(i - 1));
++                keys(sample, {"ZTAV", "SNLoad"});
++                s.dataZoneTempPredictorCorrector->zoneHeatBalance(i).ZTAV = input(sample.at("ZTAV"));
++                (void)input(sample.at("SNLoad"));
++            }
++        }
++        inputs.push_back({{"operation_id", id}, {"literal_input", op}, {"before_declared_input_writes", before_input},
++                          {"after_declared_input_writes", fixture.snapshot()}, {"WarmupFlag_overwritten_by_input", false}});
++        if (kind == "record") {
++            bool const report_point = !s.dataGlobal->WarmupFlag && s.dataGlobal->DayOfSim == 1 &&
++                                      (!s.dataGlobal->DoingSizing || s.dataGlobal->DoPureLoadCalc);
++            require(!report_point || s.dataGlobal->NumOfZones == 0 ||
++                    s.dataHeatBalMgr->CountWarmupDayPoints < s.dataGlobal->TimeStepsInHour * 24, "Full report capacity required; no truncation");
++            for (int i = 1; i <= s.dataGlobal->NumOfZones && !fixture.stopped; ++i) {
++                double const load = input(samples.at(static_cast<std::size_t>(i - 1)).at("SNLoad"));
++                fixture.invoke(id, "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads", i,
++                               [&] { s.dataZoneEnergyDemand->ZoneSysEnergyDemand(i).reportZoneAirSystemSensibleLoads(s, load); });
++            }
++            if (!fixture.stopped) {
++                fixture.invoke(id, "HeatBalanceManager::RecKeepHeatBalance", 0, [&] { EnergyPlus::HeatBalanceManager::RecKeepHeatBalance(s); });
++            }
++        } else if (kind == "check") {
++            fixture.invoke(id, "HeatBalanceManager::CheckWarmupConvergence", 0, [&] { EnergyPlus::HeatBalanceManager::CheckWarmupConvergence(s); });
++        } else {
++            require(s.dataGlobal->WarmupFlag || s.dataGlobal->NumOfZones == 0 || s.dataHeatBalMgr->CountWarmupDayPoints > 0,
++                    "Positive actual report point count required before division; no synthetic points");
++            fixture.invoke(id, "HeatBalanceManager::ReportWarmupConvergence", 0, [&] {
++                fixture.stddev_known = false;
++                EnergyPlus::HeatBalanceManager::ReportWarmupConvergence(s);
++                if (!s.dataGlobal->WarmupFlag) {
++                    fixture.stddev_known = true;
++                }
++            });
++        }
++    }
++    bool const failed = fixture.stopped || fixture.callback_integrity_failed;
++    any_failure = any_failure || failed;
++    return {{"case_id", item.at("case_id")}, {"purpose", item.at("purpose")}, {"literal_input", item},
++            {"declared_input_boundaries", inputs}, {"actual_calls", fixture.calls}, {"unreached_operations", unreached},
++            {"final", fixture.snapshot()}, {"actual_source_call_count", fixture.actual_calls},
++            {"status", failed ? "actual-source-or-observer-integrity-failure" : "actual-selected-public-calls-returned"},
++            {"ordinary_simulation_or_BeginEnvrn_claimed", false}, {"numerical_PASS_claimed", false}};
+ }
+ } // namespace
+-
+ int main(int argc, char const *argv[])
+ {
+     try {
+-        require(argc == 2, "Usage: zon05_unit_helper <input-only-request.json>");
++        require(argc == 2, "Usage: sys02_warmup_helper <literal-input-only-request.json>");
+         std::ifstream stream(argv[1]);
+         require(stream.is_open(), "Cannot open input-only request");
+-        auto request = json::parse(stream);
+-        keys(request, {"schema", "card", "expected_values_supplied", "source_scope", "cases"});
+-        require(request.at("schema") == "zon05-native-unit-request.v1" && request.at("card") == "ZON-05" &&
+-                request.at("expected_values_supplied") == false && request.at("source_scope") == "zone-only-mixed-noOA-noLatent-ThirdOrder-direct-member",
+-                "Unadmitted source request");
+-        require(request.at("cases").is_array() && !request.at("cases").empty(), "Ordered cases required");
+-        bool any_failure = false;
++        auto const request = json::parse(stream);
++        keys(request, {"schema", "expected_values_supplied", "ordinary_production_prestate_supplied", "cases"});
++        require(request.at("schema") == "sys02-warmup-direct-request.v1" && request.at("expected_values_supplied") == false &&
++                request.at("ordinary_production_prestate_supplied") == false, "Unadmitted direct Source request");
++        require(request.at("cases").is_array() && !request.at("cases").empty(), "Ordered fixed input cases required");
+         json cases = json::array();
++        bool failed = false;
+         std::set<std::string> ids;
+         for (auto const &item : request.at("cases")) {
+             require(ids.insert(item.at("case_id").get<std::string>()).second, "Unique case IDs required");
+-            cases.push_back(evaluate(item, any_failure));
+-        }
+-        std::cout << json({{"schema", "zon05-native-unit-results.v1"}, {"cases", cases},
+-                           {"requested_case_count", request.at("cases").size()}, {"recorded_case_count", cases.size()},
+-                           {"status", any_failure ? "actual-source-exception" : "actual-selected-member-calls-returned"},
+-                           {"expected_values_supplied", false}, {"actual_Original_body_modified", false},
+-                           {"humidity_member_was_actually_invoked", true}, {"complete_ZON05_PASS_claimed", false},
+-                           {"production_or_history_integration_certified", false}, {"gates_updated", false}}).dump() << '\n';
+-        return any_failure ? 2 : 0;
++            cases.push_back(evaluate(item, failed));
++        }
++        std::cout << json{{"schema", "sys02-warmup-direct-results.v1"}, {"cases", cases},
++                          {"requested_case_count", request.at("cases").size()}, {"recorded_case_count", cases.size()},
++                          {"expected_values_supplied", false}, {"Original_bodies_modified", false},
++                          {"scientific_PASS_claimed", false}, {"ordinary_handoff_PASS_claimed", false}, {"gates_updated", false}}.dump() << '\n';
++        return failed ? 2 : 0;
+     } catch (std::exception const &error) {
+         std::cerr << error.what() << '\n';
+         return 2;

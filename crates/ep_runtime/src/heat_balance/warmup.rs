@@ -512,3 +512,7 @@ mod tests {
         assert_eq!(owner.zones[0].previous, [0.0, 0.0, 20.0, 20.0]);
     }
 }
+
+#[cfg(test)]
+#[path = "warmup_selected_reference.rs"]
+mod selected_reference;
