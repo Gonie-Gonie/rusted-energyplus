@@ -1,0 +1,53 @@
+"""Seal historical build-alias binding correction only; no publisher or target execution."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+OLD = ROOT / '.runtime/porting/SRC-06/tarp-inside-publication-prep-02'
+OUT = ROOT / '.runtime/porting/SRC-06/tarp-inside-publication-prep-03'
+
+
+def ref(path):
+    data = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(data).hexdigest(), size_bytes=len(data), line_count=len(data.splitlines()))
+
+
+def write(path, data):
+    with path.open('xb') as stream: stream.write(data)
+
+
+assert not OUT.exists() and ref(OLD/'manifest.json')['sha256'] == 'ae8ff031a99ae65ac8784e5046fb56b2f647b12ecf05e8986aa74e560009d20a'
+source = (OLD/'publish.py').read_bytes()
+edits = [(b"native_rows = snapshot_rows(nb['Source_snapshot']); snapshot_rows(nb['build_Source_snapshot'])",b"native_rows = snapshot_rows(nb['Source_snapshot']); build_native_rows = snapshot_rows(nb['build_Source_snapshot'])"),
+         (b"member = native_rows[row['historical_path']]; declared = row['declared_historical_reference']",b"member = build_native_rows[row['historical_path']]; declared = row['declared_historical_reference']")]
+updated = source
+for before, after in edits:
+    assert updated.count(before) == 1
+    updated = updated.replace(before,after)
+inverse = updated
+for before, after in reversed(edits): inverse = inverse.replace(after,before)
+assert inverse == source
+ast.parse(updated)
+functions = lambda data:{n.name:ast.dump(n,include_attributes=False) for n in ast.parse(data).body if isinstance(n,ast.FunctionDef)}
+assert functions(source)==functions(updated)
+readme = (OLD/'README.md').read_text(encoding='utf8').replace('tarp-inside-publication-prep-02/publish.py','tarp-inside-publication-prep-03/publish.py')
+readme += '\nSuccessor03 binds the 3,928 historical Native Source aliases to their actual build_Source_snapshot (D362), while retaining and separately authenticating the full capture Source_snapshot (D34). The sole changed member between those stages is the already documented regression test fixture. Each historical declared SHA/size and authenticated archive must join its real build member; capture receipt guards retain their actual capture snapshot. The closed publisher02 pre-OUT failure is preserved. No Source bytes, science, comparison policy/status rule, storage helper or archive behavior changes.\n'
+OUT.mkdir()
+for name,data in [('publish.py',updated),('README.md',readme.encode()),('publish.before.py',source),('README.before.md',(OLD/'README.md').read_bytes()),('manifest.before.json',(OLD/'manifest.json').read_bytes())]: write(OUT/name,data)
+for before,after,name in [('publish.before.py','publish.py','publish.diff'),('README.before.md','README.md','README.diff')]:
+    delta=''.join(difflib.unified_diff((OUT/before).read_text(encoding='utf8').splitlines(True),(OUT/after).read_text(encoding='utf8').splitlines(True),fromfile=(OLD/after).relative_to(ROOT).as_posix(),tofile=(OUT/after).relative_to(ROOT).as_posix()))
+    write(OUT/name,delta.encode())
+manifest=json.loads((OLD/'manifest.json').read_bytes())
+manifest.update(own_sources=[ref(OUT/'publish.py'),ref(OUT/'README.md')],author=ref(Path(__file__).resolve()),predecessor_Source_preparation=ref(OLD/'manifest.json'),before=ref(OUT/'publish.before.py'),exact_diff=ref(OUT/'publish.diff'),README_before=ref(OUT/'README.before.md'),README_exact_diff=ref(OUT/'README.diff'),metadata_before=ref(OUT/'manifest.before.json'),sole_publisher_Source_change='bind historical Native aliases to actual build Source rows; retain capture Source separately',unchanged_publisher_functions_and_storage=True)
+manifest['runtime_interfaces']=dict(manifest['runtime_interfaces'],argv=['python','-X','utf8','-B',(OUT/'publish.py').relative_to(ROOT).as_posix(),'--packet','PATH#SHA256'])
+manifest['prior_publisher_deltas']=dict(before=json.loads((OLD/'manifest.json').read_bytes())['before'],exact_diff=json.loads((OLD/'manifest.json').read_bytes())['exact_diff'])
+failure=ROOT/'.runtime/porting/SRC-06/tarp-inside-publication-command-01/receipt.json'
+assert ref(failure)['sha256']=='ab612041bc5bd6c6e861803746f49b5137cf7fc2cf0725c732691bfae2fb6652'
+value=json.loads(failure.read_bytes()); assert value['finished_utc'] and value['exit_code']==1 and value['source_bytes_match_before_and_after'] is True
+manifest['actual_failed_publisher02_execution_preserved']=ref(failure)
+manifest['dependencies'] += [ref(OLD/'manifest.json'),ref(failure)]
+write(OUT/'manifest.json',(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n').encode())
+print(json.dumps(dict(manifest=ref(OUT/'manifest.json'),publisher=ref(OUT/'publish.py'),exact_diff=ref(OUT/'publish.diff'),publisher_executed=False)))

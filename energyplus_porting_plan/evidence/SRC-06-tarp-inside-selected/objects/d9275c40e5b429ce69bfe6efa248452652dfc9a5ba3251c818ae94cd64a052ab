@@ -1,0 +1,253 @@
+{
+  "schema": "src06-tarp-inside-native-provider-collection-preparation.v1",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-prep-02/collect_providers.py",
+      "sha256": "325c1ad001e87ae4f704c1a813a1668878a219d2e962b71e1033a675112b5cdf",
+      "size_bytes": 15762,
+      "line_count": 208
+    }
+  ],
+  "author": {
+    "path": ".runtime/porting/SRC-06/seal-native-provider-prep-02.py",
+    "sha256": "f760c7170c3d68ef645b467e9e0daa690baf5c35fd506bfdf059241da6a69c15",
+    "size_bytes": 4493,
+    "line_count": 54
+  },
+  "README": {
+    "path": ".runtime/porting/SRC-06/native-provider-prep-02/README.md",
+    "sha256": "ecf129d1566623ffe3912b47b5182de97e466fbd73cd1785d711966d6eb2c651",
+    "size_bytes": 3768,
+    "line_count": 17
+  },
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-02/manifest.json",
+      "sha256": "ba8de8e1378003bd0f9fa0305a074b838448425503330a47cba01f2b68e31d35",
+      "size_bytes": 23595,
+      "line_count": 606
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-build-prep-01/manifest.json",
+      "sha256": "591e2e26d3f6d0551202cfe6472eaf25fc218ccb6479169cedb29736d6ac7503",
+      "size_bytes": 7407,
+      "line_count": 195
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-build-prep-01/prepare_native.py",
+      "sha256": "d759bb09e8831d984f688b1be0baee320da61e4d8eea5171445c15d3e61be72d",
+      "size_bytes": 12177,
+      "line_count": 160
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-build-prep-01/additive-reference.cmake",
+      "sha256": "cc2f9630474ad1a7ad8a18ce2994a384fabef72a982715cac876af03e8c6ebdf",
+      "size_bytes": 895,
+      "line_count": 14
+    },
+    {
+      "path": "tools/porting/native_pe.py",
+      "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+      "size_bytes": 20217,
+      "line_count": 346
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "size_bytes": 8453,
+      "line_count": 204
+    },
+    {
+      "path": "tools/porting/build_original_reference.py",
+      "sha256": "17e308ce7e5b5c41155ea55a77aff7e2d4542bbd477b34ae8c4a477e9437f692",
+      "size_bytes": 18766,
+      "line_count": 326
+    },
+    {
+      "path": "tools/porting/reference_tools.json",
+      "sha256": "d1fc7e41bfd4597c9f4957871ec3e8d7f987d1a6376243bff93e889826184355",
+      "size_bytes": 1899,
+      "line_count": 41
+    },
+    {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/native-core-build.json",
+      "sha256": "68682bdaaf61e5381084a5d138d07f511e2f431082f1426230be0d3231f9193b",
+      "size_bytes": 5993,
+      "line_count": 131
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-prep-01/manifest.json",
+      "sha256": "d86c578bac3034661256ab8f25ad5c9acae180f1e0bd45e31f62bc5cb450cc34",
+      "size_bytes": 6649,
+      "line_count": 179
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-prep-01/collect_providers.py",
+      "sha256": "ba30490bfd15390cef3ad59ae16cf7e405f2022ce838a2449b47508b0a3fd658",
+      "size_bytes": 15344,
+      "line_count": 204
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-prep-01/README.md",
+      "sha256": "a09a979af0fb7655170e449ffe8cd637115d2a80bbc9812b77a2ab635fc8edec",
+      "size_bytes": 3355,
+      "line_count": 15
+    }
+  ],
+  "before_archives": [
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-prep-02/before/collect_providers.py",
+      "sha256": "ba30490bfd15390cef3ad59ae16cf7e405f2022ce838a2449b47508b0a3fd658",
+      "size_bytes": 15344,
+      "line_count": 204
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-prep-02/before/README.md",
+      "sha256": "a09a979af0fb7655170e449ffe8cd637115d2a80bbc9812b77a2ab635fc8edec",
+      "size_bytes": 3355,
+      "line_count": 15
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-prep-02/before/manifest.json",
+      "sha256": "d86c578bac3034661256ab8f25ad5c9acae180f1e0bd45e31f62bc5cb450cc34",
+      "size_bytes": 6649,
+      "line_count": 179
+    }
+  ],
+  "exact_diffs": [
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/native-provider-prep-01/before/collect-wind-pow-link-evidence-01.py",
+        "sha256": "ad7775e6b36d2014b74fd8e09ce81835cf6c0fd791da82fbcd969e9b051cba96",
+        "size_bytes": 6467,
+        "line_count": 104
+      },
+      "after": {
+        "path": ".runtime/porting/SRC-06/native-provider-prep-01/collect_providers.py",
+        "sha256": "ba30490bfd15390cef3ad59ae16cf7e405f2022ce838a2449b47508b0a3fd658",
+        "size_bytes": 15344,
+        "line_count": 204
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/native-provider-prep-01/collect_providers.py.diff",
+        "sha256": "77406bdbea528dd622ab49b1393f466b86aafe400263c1e5bc768669a46fb2cc",
+        "size_bytes": 21592,
+        "line_count": 292
+      }
+    }
+  ],
+  "selected_source_ranges": [
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+        "sha256": "d381680e08c5c9a9a6b769e906474082d3bdb2c68fdbade631a0905994554b61",
+        "size_bytes": 336899,
+        "line_count": 6629
+      },
+      "start_line": 1907,
+      "end_line": 1975,
+      "purpose": "Complete unchanged Natural/Detailed bodies",
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/source-ranges/ConvectionCoefficients.cc.1907-1975.txt",
+        "sha256": "37df8c70081d05018eef6e7b145852e0811b4564f52fde3aca6e6811fa4ee304",
+        "size_bytes": 3584,
+        "line_count": 69
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.hh",
+        "sha256": "a15faad35aad82250cb34b38574efb1d1331c1f2cd0f33b44d024dbd3ab456bf",
+        "size_bytes": 47387,
+        "line_count": 810
+      },
+      "start_line": 280,
+      "end_line": 286,
+      "purpose": "Actual public direct API declarations",
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/source-ranges/ConvectionCoefficients.hh.280-286.txt",
+        "sha256": "44da30448635d309a085d9d43634ab1be1b102a56f16b192c1527d78a6afe27e",
+        "size_bytes": 501,
+        "line_count": 7
+      }
+    }
+  ],
+  "runtime_interfaces": {
+    "argv_options": [
+      "--frozen-inputs",
+      "--configure-review",
+      "--build-execution",
+      "--output-dir"
+    ],
+    "frozen_schema": "src06-tarp-inside-frozen-configure-inputs.v1",
+    "configure_review_schema": "src06-tarp-inside-configure-dry-review.v1",
+    "build_receipt_schema": "recorded-porting-command.v1",
+    "result_schema": "src06-tarp-inside-actual-linked-provider-and-PE-inventory.v1",
+    "accepted_Native_source_manifest": {
+      "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-02/manifest.json",
+      "sha256": "ba8de8e1378003bd0f9fa0305a074b838448425503330a47cba01f2b68e31d35",
+      "size_bytes": 23595,
+      "line_count": 606
+    },
+    "expected_compile_link_steps": 2,
+    "target": "src06_tarp_inside_helper",
+    "full_current_Source_operand_derived_from_actual_freeze": true,
+    "Root_FULL_provider_acceptance_pending": true,
+    "configure_performed": false,
+    "compile_performed": false,
+    "helper_executed": false,
+    "numerical_results_read": false,
+    "gates_updated": false,
+    "post_build_official_core_check_required": true,
+    "post_build_core_execution_inventory_field": "actual_post_build_core_execution"
+  },
+  "status": "held Source; Root and independent Source peer required before invocation",
+  "predecessor_source_preparation": {
+    "path": ".runtime/porting/SRC-06/native-provider-prep-01/manifest.json",
+    "sha256": "d86c578bac3034661256ab8f25ad5c9acae180f1e0bd45e31f62bc5cb450cc34",
+    "size_bytes": 6649,
+    "line_count": 179
+  },
+  "narrow_exact_diffs": [
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/native-provider-prep-02/before/collect_providers.py",
+        "sha256": "ba30490bfd15390cef3ad59ae16cf7e405f2022ce838a2449b47508b0a3fd658",
+        "size_bytes": 15344,
+        "line_count": 204
+      },
+      "after": {
+        "path": ".runtime/porting/SRC-06/native-provider-prep-02/collect_providers.py",
+        "sha256": "325c1ad001e87ae4f704c1a813a1668878a219d2e962b71e1033a675112b5cdf",
+        "size_bytes": 15762,
+        "line_count": 208
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/native-provider-prep-02/collect_providers.py.diff",
+        "sha256": "cb515e9a89465026461ccdfd3b6516517fc53447ed568aeeb11cb9f4dfeab0a7",
+        "size_bytes": 4954,
+        "line_count": 25
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/native-provider-prep-02/before/README.md",
+        "sha256": "a09a979af0fb7655170e449ffe8cd637115d2a80bbc9812b77a2ab635fc8edec",
+        "size_bytes": 3355,
+        "line_count": 15
+      },
+      "after": {
+        "path": ".runtime/porting/SRC-06/native-provider-prep-02/README.md",
+        "sha256": "ecf129d1566623ffe3912b47b5182de97e466fbd73cd1785d711966d6eb2c651",
+        "size_bytes": 3768,
+        "line_count": 17
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/native-provider-prep-02/README.md.diff",
+        "sha256": "655ba4995c8d64ba5db8bb45edc623fa9fef46b636daa46043312c4c662ac730",
+        "size_bytes": 3629,
+        "line_count": 19
+      }
+    }
+  ]
+}

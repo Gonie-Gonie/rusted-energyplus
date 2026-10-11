@@ -1,0 +1,198 @@
+// Input-only direct calls to unchanged linked Original TARP public APIs.
+#include "tarp_inside_reference_fields.hh"
+#include <fstream>
+#include <initializer_list>
+#include <iostream>
+#include <limits>
+#include <memory>
+#include <optional>
+#include <set>
+#include <stdexcept>
+#include <string>
+
+namespace {
+using Src06::json;
+void require(bool ok, std::string const &message)
+{
+    if (!ok) { throw std::runtime_error(message); }
+}
+void keys(json const &v, std::initializer_list<char const *> names)
+{
+    require(v.is_object() && v.size() == names.size(), "Exact input object shape required");
+    for (char const *name : names) { require(v.contains(name), std::string("Missing input field: ") + name); }
+}
+double input(json const &v, bool diagnostic)
+{
+    keys(v, {"bits"});
+    require(v.at("bits").is_string(), "Literal binary64 input bits required");
+    auto const token = v.at("bits").get<std::string>();
+    require(token.size() == 16 && token.find_first_not_of("0123456789abcdef") == std::string::npos, "Canonical16-hex input required");
+    auto const value = std::bit_cast<double>(static_cast<std::uint64_t>(std::stoull(token, nullptr, 16)));
+    require(diagnostic || std::isfinite(value), "Finite admitted direct operand required");
+    return value;
+}
+struct ConsoleCapture {
+    std::ostringstream text;
+    std::streambuf *previous = nullptr;
+    ConsoleCapture() : previous(std::cout.rdbuf(text.rdbuf())) {}
+    ~ConsoleCapture() { std::cout.rdbuf(previous); }
+    ConsoleCapture(ConsoleCapture const &) = delete;
+    ConsoleCapture &operator=(ConsoleCapture const &) = delete;
+};
+struct Fixture {
+    ConsoleCapture console_capture;
+    std::unique_ptr<EnergyPlus::EnergyPlusData> state;
+    std::ostringstream *error = nullptr;
+    json callbacks = json::array(), calls = json::array();
+    std::size_t callback_count = 0, actual_calls = 0;
+    bool callback_integrity_failed = false, stopped = false, errors_found = false;
+    Fixture() : state(std::make_unique<EnergyPlus::EnergyPlusData>())
+    {
+        auto sink = std::make_unique<std::ostringstream>();
+        error = sink.get();
+        state->files.err_stream = std::move(sink);
+        state->files.eio.open_as_stringstream();
+        state->dataGlobal->errorCallback = [this](EnergyPlus::Error level, std::string const &text) noexcept {
+            callback("errorCallback", static_cast<int>(level), text);
+        };
+        state->dataGlobal->messageCallback = [this](std::string const &text) noexcept {
+            callback("messageCallback", std::nullopt, text);
+        };
+        state->init_constant_state(*state);
+    }
+    Fixture(Fixture const &) = delete;
+    Fixture &operator=(Fixture const &) = delete;
+    void callback(char const *kind, std::optional<int> level, std::string const &text) noexcept
+    {
+        if (callback_count == std::numeric_limits<std::size_t>::max()) {
+            callback_integrity_failed = true;
+            return;
+        }
+        ++callback_count;
+        try {
+            callbacks.push_back({{"actual_ordinal", callback_count}, {"kind", kind},
+                                 {"level", level ? json(*level) : json(nullptr)}, {"message", text}});
+        } catch (...) {
+            callback_integrity_failed = true;
+        }
+    }
+    json snapshot()
+    {
+        return {{"owner", Src06::owners(*state)}, {"ErrorsFound", errors_found},
+                {"error_stream", error->str()}, {"eio", state->files.eio.get_output()}, {"console", console_capture.text.str()},
+                {"callbacks", callbacks}, {"actual_callback_count", callback_count}, {"callback_integrity_failed", callback_integrity_failed}};
+    }
+    template<class Call> void invoke(std::string const &id, char const *api, Call const &call)
+    {
+        auto const before = snapshot();
+        bool returned = false;
+        json exception = nullptr;
+        std::optional<double> returned_scalar;
+        ++actual_calls;
+        try {
+            returned_scalar = call();
+            returned = true;
+        } catch (EnergyPlus::FatalError const &e) {
+            exception = {{"kind", "OriginalFatalError"}, {"message", e.what()}};
+        } catch (std::exception const &e) {
+            exception = {{"kind", "std_exception"}, {"message", e.what()}};
+        } catch (...) {
+            exception = {{"kind", "nonstandard_exception"}, {"message", nullptr}};
+        }
+        json const return_value = returned_scalar ? Src06::scalar(*returned_scalar) : json(nullptr);
+        stopped = !returned;
+        calls.push_back({{"operation_id", id}, {"actual_call_ordinal", actual_calls}, {"api", api},
+                         {"actual_source_invoked", true}, {"actual_source_return_observed", returned},
+                         {"source_exception", exception}, {"actual_return_value", return_value}, {"before", before}, {"after", snapshot()}});
+    }
+};
+void prepare(Fixture &f, json const &v, bool diagnostic)
+{
+    keys(v, {"LowHConvLimit_override", "surfaces"});
+    auto &s = *f.state;
+    if (!v.at("LowHConvLimit_override").is_null()) { s.dataHeatBal->LowHConvLimit = input(v.at("LowHConvLimit_override"), diagnostic); }
+    auto const &rows = v.at("surfaces");
+    require(rows.is_array() && !rows.empty() && rows.size() <= static_cast<std::size_t>(std::numeric_limits<int>::max()), "Full nonempty source-sized surface input required");
+    auto &d = *s.dataSurface;
+    d.TotSurfaces = static_cast<int>(rows.size());
+    d.Surface.allocate(rows.size());
+    s.dataHeatBalSurf->SurfHConvInt.allocate(d.TotSurfaces);
+    std::set<std::string> names;
+    for (int i = 1; i <= d.TotSurfaces; ++i) {
+        auto const &r = rows.at(static_cast<std::size_t>(i - 1));
+        keys(r, {"actual_surface_index", "Name", "CosTilt", "ExtBoundCond", "SurfHConvInt"});
+        require(r.at("actual_surface_index").is_number_integer() && r.at("actual_surface_index").get<std::int64_t>() == i, "Actual contiguous Source index/order required");
+        require(r.at("Name").is_string() && !r.at("Name").get<std::string>().empty() && names.insert(r.at("Name").get<std::string>()).second, "Unique surface names required");
+        auto &surface = d.Surface(i);
+        surface.Name = r.at("Name").get<std::string>();
+        surface.CosTilt = input(r.at("CosTilt"), diagnostic);
+        require(r.at("ExtBoundCond").is_number_integer() && r.at("ExtBoundCond").get<std::int64_t>() == EnergyPlus::DataSurfaces::ExternalEnvironment, "Only declared non-Kiva external boundary admitted");
+        surface.ExtBoundCond = EnergyPlus::DataSurfaces::ExternalEnvironment;
+        s.dataHeatBalSurf->SurfHConvInt(i) = input(r.at("SurfHConvInt"), diagnostic);
+    }
+}
+json evaluate(json const &item, bool &any_failure)
+{
+    keys(item, {"case_id", "purpose", "admission_lane", "initial", "operations"});
+    require(item.at("case_id").is_string() && item.at("purpose").is_string(), "Case identity and Source purpose required");
+    auto const lane = item.at("admission_lane").get<std::string>();
+    require(lane == "finite-direct-operands" || lane == "diagnostic-direct-operands", "Explicit direct-unit admission required");
+    bool const diagnostic = lane == "diagnostic-direct-operands";
+    Fixture f;
+    auto const fresh = f.snapshot();
+    prepare(f, item.at("initial"), diagnostic);
+    auto const prepared = f.snapshot();
+    require(item.at("operations").is_array() && !item.at("operations").empty(), "Full ordered operations required");
+    json unreached = json::array();
+    std::set<std::string> ids;
+    for (auto const &op : item.at("operations")) {
+        keys(op, {"operation_id", "api", "surface_index", "surface_temperature_c", "air_temperature_c", "correlation_cos_tilt"});
+        require(op.at("operation_id").is_string() && ids.insert(op.at("operation_id").get<std::string>()).second, "Unique operation ID required");
+        if (f.stopped) { unreached.push_back(op); continue; }
+        double const ts = input(op.at("surface_temperature_c"), diagnostic);
+        double const ta = input(op.at("air_temperature_c"), diagnostic);
+        auto const id = op.at("operation_id").get<std::string>();
+        auto const api = op.at("api").get<std::string>();
+        if (api == "CalcASHRAETARPNatural") {
+            require(op.at("surface_index").is_null(), "Natural does not consume a surface owner");
+            double const cosine = input(op.at("correlation_cos_tilt"), diagnostic);
+            f.invoke(id, "Convect::CalcASHRAETARPNatural", [&]() -> std::optional<double> {
+                return EnergyPlus::Convect::CalcASHRAETARPNatural(ts, ta, cosine);
+            });
+        } else if (api == "CalcASHRAEDetailedIntConvCoeff") {
+            require(op.at("correlation_cos_tilt").is_null() && op.at("surface_index").is_number_integer(), "Detailed uses actual selected Surface.CosTilt owner only");
+            auto const selected = op.at("surface_index").get<std::int64_t>();
+            require(selected > 0 && selected <= f.state->dataSurface->TotSurfaces, "Actual selected surface index in allocated bounds required");
+            f.invoke(id, "Convect::CalcASHRAEDetailedIntConvCoeff", [&]() -> std::optional<double> {
+                EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(*f.state, static_cast<int>(selected), ts, ta);
+                return std::nullopt;
+            });
+        } else { throw std::runtime_error("Unknown direct API"); }
+    }
+    any_failure = any_failure || f.stopped || f.callback_integrity_failed;
+    return {{"case_id", item.at("case_id")}, {"literal_input", item}, {"fresh_constructor_state", fresh}, {"prepared_state", prepared},
+            {"actual_calls", f.calls}, {"unreached_operations", unreached}, {"final", f.snapshot()}, {"actual_source_call_count", f.actual_calls},
+            {"actual_source_stopped", f.stopped}, {"InitIntConvCoeff_invoked", false}, {"ordinary_production_handoff_verified", false}, {"numerical_PASS_claimed", false}};
+}
+} // namespace
+int main(int argc, char const *argv[])
+{
+    try {
+        require(argc == 2, "Usage: src06_tarp_inside_helper <literal-input-only-request.json>");
+        std::ifstream stream(argv[1]); require(stream.is_open(), "Cannot open input-only request");
+        auto const request = json::parse(stream);
+        keys(request, {"schema", "expected_values_supplied", "ordinary_production_prestate_supplied", "cases"});
+        require(request.at("schema") == "src06-tarp-inside-direct-request.v1" && request.at("expected_values_supplied") == false &&
+                request.at("ordinary_production_prestate_supplied") == false, "Unadmitted Source request");
+        require(request.at("cases").is_array() && !request.at("cases").empty(), "Full ordered input cases required");
+        json cases = json::array(); bool failed = false; std::set<std::string> ids;
+        for (auto const &item : request.at("cases")) {
+            require(item.at("case_id").is_string() && ids.insert(item.at("case_id").get<std::string>()).second, "Unique case ID required");
+            cases.push_back(evaluate(item, failed));
+        }
+        std::cout << json{{"schema", "src06-tarp-inside-direct-results.v1"}, {"cases", cases}, {"requested_case_count", request.at("cases").size()},
+                          {"recorded_case_count", cases.size()}, {"expected_values_supplied", false}, {"Original_bodies_modified", false},
+                          {"scientific_PASS_claimed", false}, {"gates_updated", false}}.dump() << '\n';
+        return failed ? 2 : 0;
+    } catch (std::exception const &error) { std::cerr << error.what() << '\n'; return 2; }
+}

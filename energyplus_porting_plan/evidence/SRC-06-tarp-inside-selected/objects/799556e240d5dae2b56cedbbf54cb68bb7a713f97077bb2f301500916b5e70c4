@@ -1,0 +1,6 @@
+1541191: LOAD CMakeFiles/src06_tarp_inside_helper.dir/56a6ffe24c02b5e1a68a11333bb834d6/.runtime/porting/SRC-06/native-tarp-inside-prep-02/tarp_inside_reference_helper.cpp.obj
+1541192: LOAD Products/libenergypluslib.a
+1541266:  .text          0x000000014000b480    0x4eab0 Products/libenergypluslib.a(ConvectionCoefficients.cc.obj)
+1541279:                 0x000000014001962a                EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)
+1541266:  .text          0x000000014000b480    0x4eab0 Products/libenergypluslib.a(ConvectionCoefficients.cc.obj)
+1541280:                 0x0000000140019757                EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)

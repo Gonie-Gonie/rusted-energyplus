@@ -1,0 +1,268 @@
+--- .runtime/porting/SRC-06/native-build-prep-01/before/configure-wind-pow-native-02.py
++++ .runtime/porting/SRC-06/native-build-prep-01/prepare_native.py
+@@ -1,4 +1,5 @@
+-"""Delegated configure and verbose dry-run only; never compile or execute the probe."""
++"""Root-only SRC06 additive configure and dry-run; never compile or execute the helper."""
++import argparse
+ import difflib
+ import hashlib
+ import json
+@@ -8,129 +9,152 @@
+ import subprocess
+ import sys
+ 
+-ROOT = Path.cwd()
+-RAW = ROOT / '.runtime/porting/SRC-05/wind-pow-native-build-02'
++ROOT = Path(__file__).resolve().parents[4]
++HERE = Path(__file__).resolve().parent
++RAW = ROOT / '.runtime/porting/SRC-06/native-build-01'
+ BUILD = ROOT / '.runtime/ep261-gcc13-o0'
+-PREP = ROOT / '.runtime/porting/SRC-05/wind-pow-isolation-prep-02/manifest.json'
+-CODE = ROOT / '.runtime/porting/SRC-05/wind-pow-isolation-prep-01'
+-OUTPUT = Path('D:/CodexBuild/rusted-energyplus/SRC-05/wind-pow-native-build-02/bin')
+-PREVIOUS = ROOT / '.runtime/porting/SYS-03/round-format-native-build-01/configure-command/receipt.json'
+-INHERITED = PREVIOUS.parent.parent / 'additive-reference.cmake'
++CODE = ROOT / '.runtime/porting/SRC-06/native-tarp-inside-prep-02'
++PREP = CODE / 'manifest.json'
++PRIOR = ROOT / '.runtime/porting/SRC-05/wind-pow-native-build-02'
++OUTPUT = Path('D:/CodexBuild/rusted-energyplus/SRC-06/native-build-01/bin')
+ RECORDER = ROOT / 'tools/porting/record_command.py'
++PINS = {}
+ 
+ 
+-def sha(path):
++def full(path):
+     with path.open('rb') as stream:
+-        return hashlib.file_digest(stream, 'sha256').hexdigest()
++        sha = hashlib.file_digest(stream, 'sha256').hexdigest()
++    return dict(path=path.relative_to(ROOT).as_posix(), sha256=sha, size_bytes=path.stat().st_size)
+ 
+ 
+-def ref(path):
+-    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': sha(path), 'size_bytes': path.stat().st_size}
++def checked(row):
++    path = (ROOT / row['path']).resolve()
++    assert path.is_relative_to(ROOT) and path.is_file()
++    actual = full(path)
++    assert actual['sha256'] == row['sha256']
++    assert all(key not in row or actual['size_bytes'] == row[key] for key in ('size_bytes', 'bytes'))
++    PINS[path] = actual
++    return path
+ 
+ 
+-def read(path):
+-    return json.loads(path.read_bytes())
++def load(row):
++    return json.loads(checked(row).read_bytes())
++
++
++def collect(value):
++    if isinstance(value, dict):
++        if 'path' in value and 'sha256' in value:
++            checked(value)
++        for child in value.values():
++            collect(child)
++    elif isinstance(value, list):
++        for child in value:
++            collect(child)
+ 
+ 
+ def dump(path, value):
+-    path.write_text(json.dumps(value, ensure_ascii=False, allow_nan=False, indent=2) + '\n', encoding='utf8', newline='\n')
++    with path.open('xb') as stream:
++        stream.write((json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode())
+ 
+ 
+-def recorded(command, name):
+-    directory = RAW / name
+-    result = subprocess.run([sys.executable, '-X', 'utf8', '-B', str(RECORDER), '--output-dir', directory.relative_to(ROOT).as_posix(), '--', *command], cwd=ROOT)
+-    receipt = read(directory / 'receipt.json')
+-    assert receipt['command'] == command and receipt['source_snapshot'] == snapshot
+-    assert receipt['exit_code'] == result.returncode == 0 and receipt['launch_error'] is None and receipt['source_bytes_match_before_and_after'] is True
+-    return receipt
++def source_current(snapshot):
++    value = load(snapshot)
++    assert value['schema'] == 'rust-command-source-snapshot.v1' and value['bytes_normalized'] is False
++    rows = {r['historical_path']: r for r in value['files']}
++    paths = set((ROOT / 'crates').rglob('*.rs')) | set((ROOT / 'crates').rglob('Cargo.toml'))
++    paths |= {ROOT / n for n in ('Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml') if (ROOT / n).is_file()}
++    assert len(rows) == len(value['files']) and {p.relative_to(ROOT).as_posix() for p in paths} == set(rows)
++    for name, row in rows.items():
++        checked(row['archive'])
++        checked(dict(path=name, sha256=row['archive']['sha256'], size_bytes=row['size_bytes']))
+ 
+ 
+-assert sha(PREP) == '193ea67ee3d7c2681ca5b799078659934330e28bbfd87afb2a895805f8f58939'
+-assert sha(PREVIOUS) == '1b97a5bfc411bff12b6dd738d2acff68b1abba827e48dc67861db0cccc75d634'
+-assert sha(INHERITED) == 'b3ca1db99a860b37e6c7ed0b4d3244e3c6b88c75ec7c287742ce544a80ee906c'
+-assert sha(RECORDER) == '5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'
+-assert sha(BUILD / 'CMakeCache.txt') == '906e52537398e5a4902c763c5e4073d691e6378467537eb049ae7f7523653205'
+-assert sha(BUILD / 'compile_commands.json') == 'b92821155e5882828ef03824cfc5a2a44d33a1b95c0e049007a184f9162dcb8d'
+-failed_path = ROOT / '.runtime/porting/SRC-05/wind-pow-native-prepare-command-01/receipt.json'
+-assert sha(failed_path) == 'fb1974083d0ca7518366655063237d69a8eacab433351ac6040e0a2ef85fcec7'
+-failed = read(failed_path)
+-assert failed['exit_code'] == 1 and failed['launch_error'] is None and failed['source_bytes_match_before_and_after'] is True
+-assert not (failed_path.parent.parent / 'wind-pow-native-build-01/configure-command').exists()
++def recorded(command, role, snapshot):
++    directory = RAW / role
++    code = subprocess.run([sys.executable, '-X', 'utf8', '-B', str(RECORDER), '--output-dir', directory.relative_to(ROOT).as_posix(), '--', *command], cwd=ROOT).returncode
++    row = full(directory / 'receipt.json'); value = load(row)
++    assert value['command'] == command and value['exit_code'] == code == 0 and value['launch_error'] is None
++    assert value['source_snapshot'] == snapshot and value['source_bytes_match_before_and_after'] is True
++    checked(value['stdout']); checked(value['stderr'])
++    assert checked(value['executed_launcher']['archive']).read_bytes() == RECORDER.read_bytes()
++    return row, value
++
++
++def cache(path):
++    return dict(line.split('=', 1) for line in path.read_text(encoding='utf-8').splitlines() if line and not line.startswith(('#', '//')) and '=' in line)
++
++
++parser = argparse.ArgumentParser(description=__doc__)
++parser.add_argument('--source-snapshot', required=True)
++args = parser.parse_args()
++name, digest = args.source_snapshot.rsplit('#', 1)
++source_path = checked(dict(path=name, sha256=digest))
++snapshot = {key: full(source_path)[key] for key in ('path', 'sha256')}
++source_current(snapshot)
++assert full(PREP)['sha256'] == 'ba8de8e1378003bd0f9fa0305a074b838448425503330a47cba01f2b68e31d35'
++prep = load(full(PREP)); collect(prep)
++assert prep['schema'] == 'src06-tarp-inside-native-source-preparation.v1' and len(prep['compiled_source_files']) == 1
++assert prep['compiled_source_files'][0] == prep['own_sources'][0] and prep['own_sources'][0]['line_count'] == 198
++assert full(RECORDER)['sha256'] == '5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'
++checked(full(RECORDER)); checked(full(Path(__file__).resolve())); checked(full(HERE / 'additive-reference.cmake'))
++previous_ref = dict(path=(PRIOR / 'configure-command/receipt.json').relative_to(ROOT).as_posix(), sha256='d64f770ba75cd57219a8ce56b2e1b1d7d38ea37d0453a599179897779f37c0de')
++previous = load(previous_ref)
++assert previous['exit_code'] == 0 and previous['source_bytes_match_before_and_after'] is True
++review_ref = dict(path=(PRIOR / 'configure-and-dry-review.json').relative_to(ROOT).as_posix(), sha256='2ed9b5e88eff7da68bcdd93eddc31a40ae4e73a844a1f9c3077c2dfbcb1b5f61')
++review = load(review_ref); collect(review); collect(previous)
++assert review['configure_execution']['sha256'] == previous_ref['sha256'] and review['exact_previous_rows_preserved'] is True
++prior_frozen = load(review['frozen_build_inputs']); collect(prior_frozen)
++assert prior_frozen['actual_configure_command'] == previous['command']
++inherited = checked(dict(path=(PRIOR / 'additive-reference.cmake').relative_to(ROOT).as_posix(), sha256='9effcfda1256691e315cef46ff6b085b629fff2ea92016d5fd337c93e975c70f'))
++assert full(BUILD / 'CMakeCache.txt')['sha256'] == review['actual_cache_after']['sha256'] == '905aae86a41e153c3e3dfe758ce57ef7d7074a29ac46cc87cb982544922cc0d3'
++assert full(BUILD / 'compile_commands.json')['sha256'] == review['actual_graph_after']['sha256'] == '741302c60f493dac93cd22f92b6b146b7db4a839f4ba92683082f15606bd201b'
++core_ref = dict(path='.runtime/porting/reference-energyplus-26.1.0/native-core-build.json', sha256='68682bdaaf61e5381084a5d138d07f511e2f431082f1426230be0d3231f9193b')
++core = load(core_ref); collect(core)
++assert core['checks_passed'] is True and core['scientific_source_patches'] is False
++checker = ROOT / 'tools/porting/build_original_reference.py'
++checked(full(checker)); checked(full(ROOT / 'tools/porting/setup_reference_tools.py')); checked(full(ROOT / 'tools/porting/reference_tools.json'))
+ assert not RAW.exists() and not OUTPUT.exists()
+-old_receipt = read(PREVIOUS)
+-assert old_receipt['exit_code'] == 0 and old_receipt['source_bytes_match_before_and_after'] is True
+-post = read(ROOT / '.runtime/porting/SYS-03/round-format-applied-01/record.json')
+-snapshot = post['source_final']
+-assert snapshot['sha256'] == '5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548'
+-source_capture = ROOT / snapshot['path']; assert sha(source_capture) == snapshot['sha256']
+-members = read(source_capture)['files']; assert len(members) == 3922
+-for row in members:
+-    assert sha(ROOT / row['historical_path']) == row['archive']['sha256']
+-
+-# Only literal Source references are traversed; historical binary inspection remains archived evidence.
+-pins = {failed_path: ref(failed_path), ROOT / '.runtime/porting/SRC-05/configure-wind-pow-native-01.py': ref(ROOT / '.runtime/porting/SRC-05/configure-wind-pow-native-01.py'), PREP: ref(PREP), INHERITED: ref(INHERITED), PREVIOUS: ref(PREVIOUS), RECORDER: ref(RECORDER), Path(__file__): ref(Path(__file__))}
+-def collect(value):
+-    if isinstance(value, dict):
+-        if {'path', 'sha256', 'size_bytes'} <= value.keys():
+-            path = ROOT / value['path']; assert path.resolve().is_relative_to(ROOT)
+-            assert sha(path) == value['sha256'] and path.stat().st_size == value['size_bytes']
+-            pins[path] = ref(path)
+-        for item in value.values(): collect(item)
+-    elif isinstance(value, list):
+-        for item in value: collect(item)
+-collect(read(PREP))
+ RAW.mkdir(); OUTPUT.mkdir(parents=True)
+-wrapper = RAW / 'additive-reference.cmake'
+-wrapper.write_text(INHERITED.read_text(encoding='utf8').replace('SOURCE_ROUND_FORMAT', 'SRC05_POW').replace('source_round_format', 'src05_pow').replace('source_round_format_unit_helper', 'src05_wind_pow_helper'), encoding='utf8', newline='\n')
+-# The function-name substitution precedes the actual target-name substitution.
+-wrapper.write_text(wrapper.read_text(encoding='utf8').replace('src05_pow_unit_helper', 'src05_wind_pow_helper'), encoding='utf8', newline='\n')
+-pins[wrapper] = ref(wrapper)
+-for name in ['CMakeCache.txt', 'compile_commands.json', 'build.ninja']:
+-    shutil.copyfile(BUILD / name, RAW / (name + '.before'))
+-before_graph = read(RAW / 'compile_commands.json.before'); assert len(before_graph) == 740
+-previous_command = old_receipt['command']; assert len(previous_command) == 64
+-command = [('-DCMAKE_PROJECT_INCLUDE=' + str(wrapper)) if item.startswith('-DCMAKE_PROJECT_INCLUDE=') else item for item in previous_command]
+-assert sum(a != b for a, b in zip(command, previous_command)) == 1
+-command += ['-DSRC05_POW_SOURCE_DIR=' + str(CODE), '-DSRC05_POW_INHERITED_RECIPE=' + str(INHERITED),
+-    '-DSRC05_POW_REFERENCE_RECIPE=' + str(CODE / 'wind_pow_reference.cmake'), '-DSRC05_POW_OUTPUT_DIR=' + str(OUTPUT)]
++core_before, core_value = recorded([sys.executable, '-X', 'utf8', '-B', 'tools/porting/build_original_reference.py', '--check'], 'core-before-command', snapshot)
++assert b'13534 byte-identical official blobs' in checked(core_value['stdout']).read_bytes()
++wrapper = RAW / 'additive-reference.cmake'; wrapper.write_bytes(checked(full(HERE / 'additive-reference.cmake')).read_bytes()); checked(full(wrapper))
++for item in ('CMakeCache.txt', 'compile_commands.json', 'build.ninja'):
++    shutil.copyfile(BUILD / item, RAW / (item + '.before'))
++before_graph = json.loads((RAW / 'compile_commands.json.before').read_bytes())
++assert len(before_graph) == 741 and review['current_compile_rows'] == 741
++old_command = previous['command']; assert len(old_command) == 68
++command = [('-DCMAKE_PROJECT_INCLUDE=' + str(wrapper)) if v.startswith('-DCMAKE_PROJECT_INCLUDE=') else v for v in old_command]
++assert sum(a != b for a, b in zip(command, old_command)) == 1
++command += ['-DSRC06_SOURCE_DIR=' + str(CODE), '-DSRC06_INHERITED_RECIPE=' + str(inherited), '-DSRC06_REFERENCE_RECIPE=' + str(CODE / 'tarp_inside_reference.cmake'), '-DSRC06_OUTPUT_DIR=' + str(OUTPUT)]
+ assert '-DCMAKE_CXX_FLAGS_RELWITHDEBINFO=-O0 -g -DNDEBUG' in command and '-DCMAKE_CXX_FLAGS=-Wa,-mbig-obj -ffp-contract=off' in command
+-freeze = {'schema': 'src05-wind-pow-diagnostic-frozen-build-inputs.v1', 'retained_failed_preparation': ref(failed_path), 'reviewed_Source_preparation': ref(PREP),
+-    'frozen_Source_and_input': list(pins.values()), 'actual_additive_wrapper': ref(wrapper), 'inherited_actual_wrapper': ref(INHERITED),
+-    'previous_actual_configure_receipt': ref(PREVIOUS), 'previous_configure_command': previous_command, 'actual_configure_command': command,
+-    'Source_snapshot': snapshot, 'actual_cache_before': ref(RAW / 'CMakeCache.txt.before'), 'actual_graph_before': ref(RAW / 'compile_commands.json.before'),
+-    'actual_output_directory': str(OUTPUT), 'diagnostic_results_read': False, 'production_math_changed': False, 'gates_updated': False}
+-dump(RAW / 'frozen-build-inputs.json', freeze)
+-configure = recorded(command, 'configure-command')
+-for name in ['CMakeCache.txt', 'compile_commands.json', 'build.ninja']:
+-    shutil.copyfile(BUILD / name, RAW / (name + '.after'))
+-after_graph = read(RAW / 'compile_commands.json.after')
+-new = [row for row in after_graph if Path(row['file']).resolve() == (CODE / 'wind_pow_reference_helper.cpp').resolve()]
+-assert len(new) == 1 and [row for row in after_graph if row not in new] == before_graph and len(after_graph) == 741
+-assert '-O0 ' in new[0]['command'] and '-ffp-contract=off' in new[0]['command']
+-assert not Path(new[0]['output']).exists() and not (OUTPUT / 'src05_wind_pow_helper.exe').exists()
+-def cache(path):
+-    return dict(line.split('=', 1) for line in path.read_text(encoding='utf8').splitlines() if line and not line.startswith(('#', '//')) and '=' in line)
+-before_cache = cache(RAW / 'CMakeCache.txt.before'); after_cache = cache(RAW / 'CMakeCache.txt.after')
+-changes = {key: [before_cache.get(key), after_cache.get(key)] for key in set(before_cache) | set(after_cache) if before_cache.get(key) != after_cache.get(key)}
+-assert set(changes) == {'CMAKE_PROJECT_INCLUDE:UNINITIALIZED'} | {'SRC05_POW_' + suffix + ':UNINITIALIZED' for suffix in ['SOURCE_DIR', 'INHERITED_RECIPE', 'REFERENCE_RECIPE', 'OUTPUT_DIR']}
+-ninja = command[next(i for i, value in enumerate(command) if value.startswith('-DCMAKE_MAKE_PROGRAM='))].split('=', 1)[1]
+-dry_command = [ninja, '-C', str(BUILD), '-n', '-v', 'src05_wind_pow_helper']
+-dry = recorded(dry_command, 'dry-verbose-command')
+-dry_text = (ROOT / dry['stdout']['path']).read_text(encoding='utf8')
+-steps = [line for line in dry_text.splitlines() if re.match(r'^\[\d+/\d+\]', line)]
++dump(RAW / 'frozen-build-inputs.json', dict(schema='src06-tarp-inside-frozen-configure-inputs.v1', reviewed_Source_preparation=full(PREP), frozen_Source_and_input=list(PINS.values()), Source_snapshot=snapshot, original_core_receipt=core_ref, actual_core_before=core_before, inherited_configure_review=review_ref, inherited_frozen_build_inputs=review['frozen_build_inputs'], previous_actual_configure=previous_ref, previous_configure_command=old_command, actual_configure_command=command, inherited_actual_wrapper=full(inherited), actual_additive_wrapper=full(wrapper), actual_cache_before=full(RAW / 'CMakeCache.txt.before'), actual_graph_before=full(RAW / 'compile_commands.json.before'), actual_build_ninja_before=full(RAW / 'build.ninja.before'), actual_output_directory=str(OUTPUT), compile_performed=False, helper_executed=False, gates_updated=False))
++configure_ref, _ = recorded(command, 'configure-command', snapshot)
++for item in ('CMakeCache.txt', 'compile_commands.json', 'build.ninja'):
++    shutil.copyfile(BUILD / item, RAW / (item + '.after'))
++after_graph = json.loads((RAW / 'compile_commands.json.after').read_bytes())
++new = [row for row in after_graph if Path(row['file']).resolve() == (CODE / 'tarp_inside_reference_helper.cpp').resolve()]
++assert len(new) == 1 and len(after_graph) == 742 and [r for r in after_graph if r not in new] == before_graph
++assert '-O0 ' in new[0]['command'] and '-ffp-contract=off' in new[0]['command'] and '-Werror ' in new[0]['command'] and '-UNDEBUG ' in new[0]['command']
++assert not Path(new[0]['output']).exists() and not (OUTPUT / 'src06_tarp_inside_helper.exe').exists()
++old_cache, new_cache = cache(RAW / 'CMakeCache.txt.before'), cache(RAW / 'CMakeCache.txt.after')
++changes = {k: [old_cache.get(k), new_cache.get(k)] for k in old_cache.keys() | new_cache.keys() if old_cache.get(k) != new_cache.get(k)}
++assert set(changes) == {'CMAKE_PROJECT_INCLUDE:UNINITIALIZED'} | {'SRC06_' + k + ':UNINITIALIZED' for k in ('SOURCE_DIR', 'INHERITED_RECIPE', 'REFERENCE_RECIPE', 'OUTPUT_DIR')}
++ninja = next(v.split('=', 1)[1] for v in command if v.startswith('-DCMAKE_MAKE_PROGRAM='))
++dry_command = [ninja, '-C', str(BUILD), '-n', '-j1', '-v', 'src06_tarp_inside_helper']
++dry_ref, dry = recorded(dry_command, 'dry-verbose-command', snapshot)
++steps = [line for line in checked(dry['stdout']).read_text(encoding='utf-8').splitlines() if re.match(r'^\[\d+/\d+\]', line)]
+ assert len(steps) == 2 and steps[0].startswith('[1/2] ') and steps[1].startswith('[2/2] ')
+-assert '-c ' in steps[0] and 'wind_pow_reference_helper.cpp' in steps[0] and '-O0 ' in steps[0]
+-assert 'src05_wind_pow_helper.exe' in steps[1] and 'Products/libenergypluslib.a' in steps[1]
+-for path, expected in pins.items(): assert ref(path) == expected
+-for name in ['CMakeCache.txt', 'compile_commands.json', 'build.ninja']:
+-    assert sha(BUILD / name) == sha(RAW / (name + '.after'))
+-diff = RAW / 'CMakeCache.diff'
+-diff.write_text(''.join(difflib.unified_diff((RAW / 'CMakeCache.txt.before').read_text(encoding='utf8').splitlines(True), (RAW / 'CMakeCache.txt.after').read_text(encoding='utf8').splitlines(True), fromfile='CMakeCache.txt.before', tofile='CMakeCache.txt.after')), encoding='utf8', newline='\n')
+-dump(RAW / 'configure-and-dry-review.json', {'schema': 'src05-wind-pow-diagnostic-configure-dry-review.v1',
+-    'frozen_build_inputs': ref(RAW / 'frozen-build-inputs.json'), 'configure_execution': ref(RAW / 'configure-command/receipt.json'),
+-    'dry_execution': ref(RAW / 'dry-verbose-command/receipt.json'), 'actual_graph_before': ref(RAW / 'compile_commands.json.before'),
+-    'actual_graph_after': ref(RAW / 'compile_commands.json.after'), 'actual_cache_before': ref(RAW / 'CMakeCache.txt.before'),
+-    'actual_cache_after': ref(RAW / 'CMakeCache.txt.after'), 'actual_cache_diff': ref(diff), 'cache_changes': changes,
+-    'previous_compile_rows': len(before_graph), 'current_compile_rows': len(after_graph), 'exact_previous_rows_preserved': True,
+-    'new_compile_row': new[0], 'dry_steps': steps, 'compile_performed': False, 'helper_executed': False, 'gates_updated': False})
+-print(json.dumps({'review': ref(RAW / 'configure-and-dry-review.json'), 'compile_performed': False, 'helper_executed': False}))
++assert '-c ' in steps[0] and 'tarp_inside_reference_helper.cpp' in steps[0] and '-O0 ' in steps[0]
++assert 'src06_tarp_inside_helper.exe' in steps[1] and 'src06_tarp_inside_helper.map' in steps[1]
++assert steps[1].split('Products/libenergypluslib.a', 1)[1] == review['dry_steps'][1].split('Products/libenergypluslib.a', 1)[1]
++core_after, core_value = recorded([sys.executable, '-X', 'utf8', '-B', 'tools/porting/build_original_reference.py', '--check'], 'core-after-command', snapshot)
++assert b'13534 byte-identical official blobs' in checked(core_value['stdout']).read_bytes()
++source_current(snapshot)
++assert all(full(path) == row for path, row in PINS.items())
++assert not Path(new[0]['output']).exists() and not (OUTPUT / 'src06_tarp_inside_helper.exe').exists()
++for item in ('CMakeCache.txt', 'compile_commands.json', 'build.ninja'):
++    assert full(BUILD / item)['sha256'] == full(RAW / (item + '.after'))['sha256']
++delta = RAW / 'CMakeCache.diff'
++delta.write_bytes(''.join(difflib.unified_diff((RAW / 'CMakeCache.txt.before').read_text().splitlines(True), (RAW / 'CMakeCache.txt.after').read_text().splitlines(True), fromfile='CMakeCache.txt.before', tofile='CMakeCache.txt.after')).encode())
++dump(RAW / 'configure-and-dry-review.json', dict(schema='src06-tarp-inside-configure-dry-review.v1', frozen_build_inputs=full(RAW / 'frozen-build-inputs.json'), configure_execution=configure_ref, dry_execution=dry_ref, actual_core_before=core_before, actual_core_after=core_after, actual_graph_before=full(RAW / 'compile_commands.json.before'), actual_graph_after=full(RAW / 'compile_commands.json.after'), actual_cache_before=full(RAW / 'CMakeCache.txt.before'), actual_cache_after=full(RAW / 'CMakeCache.txt.after'), actual_cache_diff=full(delta), cache_changes=changes, previous_compile_rows=741, current_compile_rows=742, exact_previous_rows_preserved=True, new_compile_row=new[0], dry_steps=steps, exact_prior_core_link_suffix_preserved=True, prospective_compile_command=[ninja, '-C', str(BUILD), '-j1', '-v', 'src06_tarp_inside_helper'], compile_performed=False, helper_executed=False, gates_updated=False))
++print(json.dumps(dict(review=full(RAW / 'configure-and-dry-review.json'), compile_performed=False, helper_executed=False)))

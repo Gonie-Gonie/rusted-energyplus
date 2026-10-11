@@ -1,0 +1,346 @@
+{
+  "schema": "src06-tarp-inside-publication-inputs.v1",
+  "actual_application": {
+    "path": ".runtime/porting/SRC-06/tarp-inside-applied-01/record.json",
+    "sha256": "9673892bf081f39bbd1625601c1c4d50838681d730aa41f48bd34674d72d4679",
+    "size_bytes": 9878
+  },
+  "actual_formatter_acceptance": {
+    "path": ".runtime/porting/SRC-06/tarp-inside-applied-01/Root-and-Header-full-formatter-review.json",
+    "sha256": "c3c1612c6c2c25cf623144e03e4597ad49d380b0f280fd3373882866f1f89437",
+    "size_bytes": 1964
+  },
+  "actual_Native_factual_review": {
+    "path": ".runtime/porting/SRC-06/Header-Native-observation-factual-review-01/review.json",
+    "sha256": "08071631f397d97f373de31d6f5a4647133c9f48e98ff1e02e8b7c243dcfba93",
+    "size_bytes": 14326
+  },
+  "actual_Root_provider_acceptance": {
+    "path": ".runtime/porting/SRC-06/native-provider-review-02/Root-provider-acceptance.json",
+    "sha256": "e009432c91ff0db58662cec5be050d85a06b4d661009d6fd57d552fce385bd34",
+    "size_bytes": 2781
+  },
+  "actual_Header_provider_review": {
+    "path": ".runtime/porting/SRC-06/Header-provider-factual-review-01/review.json",
+    "sha256": "a260a0366cbcecc8482944a83714ce618776d2bef44dc6f1ce8cc22692e6753b",
+    "size_bytes": 4037
+  },
+  "actual_Rust_execution_custody": {
+    "path": ".runtime/porting/SRC-06/selected-main-thread-observation-01/custody.json",
+    "sha256": "c27f928deb4c7349df4181a769c1fa2e85c3374243bb590711cf4b295ad57003",
+    "size_bytes": 1958430
+  },
+  "actual_Rust_launch_execution": {
+    "path": ".runtime/porting/SRC-06/selected-main-thread-driver-command-01/receipt.json",
+    "sha256": "e524abb9c115a153cdc4b671148b798fa2bb561ff30c66d0947af7a78d204a95",
+    "size_bytes": 36959
+  },
+  "actual_comparison": {
+    "path": ".runtime/porting/SRC-06/selected-main-thread-comparison-02/comparison.json",
+    "sha256": "421dc476535c1913306ba8aed05d9c8f9ce96f830c127f1502111300a853aa6f",
+    "size_bytes": 3349
+  },
+  "actual_comparison_execution": {
+    "path": ".runtime/porting/SRC-06/selected-main-thread-comparison-command-02/receipt.json",
+    "sha256": "ba727847d13ea95a403a853d5fb332a20877f05e5bcb243ba18bc4f01fb7c9ad",
+    "size_bytes": 3454
+  },
+  "actual_comparer_preparation": {
+    "path": ".runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-03/manifest.json",
+    "sha256": "563e2732a8ca698b9cd4869afdbc1e7bf694b0d0cf6368b56c390d11f575b497",
+    "size_bytes": 34814
+  },
+  "selected_source_preparations": [
+    {
+      "path": ".runtime/porting/SRC-06/tarp-inside-publication-prep-02/manifest.json",
+      "sha256": "ae8ff031a99ae65ac8784e5046fb56b2f647b12ecf05e8986aa74e560009d20a",
+      "size_bytes": 8919
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-inside-getter-prep-01/manifest.json",
+      "sha256": "7eb308271196d36cbcbf58f17cec8599ddd3c396a84c5c52fcab958933f99963",
+      "size_bytes": 29272
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-02/manifest.json",
+      "sha256": "ba8de8e1378003bd0f9fa0305a074b838448425503330a47cba01f2b68e31d35",
+      "size_bytes": 23595
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-build-prep-01/manifest.json",
+      "sha256": "591e2e26d3f6d0551202cfe6472eaf25fc218ccb6479169cedb29736d6ac7503",
+      "size_bytes": 7407
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-execution-prep-02/manifest.json",
+      "sha256": "e1b7d18250873a83e23fdb1d0da07b504965cc278517dbea30b432db4cdaec2f",
+      "size_bytes": 17057
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-prep-03/manifest.json",
+      "sha256": "d7d9bf82e841326b831cf53f62ad49cc509c2797b9f0d4dc4c754fc7937f1eb7",
+      "size_bytes": 11564
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-inside-selected-rust-prep-01/manifest.json",
+      "sha256": "35323a3e5b40e4eb88073ec3872a1a91575d69f6ecd3d2885a8497a244ff64bf",
+      "size_bytes": 22891
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-02/manifest.json",
+      "sha256": "d31df820c9642467b3bdf474a499dc146307e0b2572c18a2ff6e148adf43a99b",
+      "size_bytes": 34163
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-03/manifest.json",
+      "sha256": "563e2732a8ca698b9cd4869afdbc1e7bf694b0d0cf6368b56c390d11f575b497",
+      "size_bytes": 34814
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-inside-publication-prep-03/manifest.json",
+      "sha256": "281c73067e0e99187c296b5a67a0071d20f3ea7bc751f928ad50124f03bc909e",
+      "size_bytes": 10230
+    }
+  ],
+  "closed_executions": [
+    {
+      "path": ".runtime/porting/SRC-06/native-prepare-command-01/receipt.json",
+      "sha256": "13eb18bda72c624a5d5a7ae334197f264f7ff9679aac094b4faf768657f8f79f",
+      "size_bytes": 5081
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-build-01/core-before-command/receipt.json",
+      "sha256": "5ab5736637542c6480ffc45c1dff59e63e71ad1cd7c191bd57cc0de1b748fa20",
+      "size_bytes": 4971
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-build-01/configure-command/receipt.json",
+      "sha256": "7cfec3798c9991155e367f3257193f6d4745bab5532026c29e1a01af3d3419b7",
+      "size_bytes": 13482
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-build-01/dry-verbose-command/receipt.json",
+      "sha256": "a1c139ca2d08a1ebdba191deb753ce7fcd5d013ce566792b915ea71b5fcfc482",
+      "size_bytes": 5075
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-build-01/compile-command/receipt.json",
+      "sha256": "aceb9ef787996c0f19c27d87dc5d9eaedf31b789fd925780bef626b6babf2751",
+      "size_bytes": 4929
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-build-01/core-after-command/receipt.json",
+      "sha256": "11a6ccd8bb4e2b42727a720cf3a146c1c6ae67404936d0e3546fbd9270496f6b",
+      "size_bytes": 4969
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-collection-command-01/receipt.json",
+      "sha256": "da251753838abe89e3f885d924b449b3a8b762689f0ec216c1c302bc359cbbcb",
+      "size_bytes": 5486
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-collection-command-02/receipt.json",
+      "sha256": "265db7e20efca66660b4d42632d4a36ecd1d50bbd3ce103dbe6215a1d385a110",
+      "size_bytes": 5486
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-review-01/post-build-core-command/receipt.json",
+      "sha256": "3b1fcbbcb2370e436de394f40982348fd1edeb2c32fa0eafe27ae0fd605fba81",
+      "size_bytes": 4999
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-review-01/provider-addr2line-command/receipt.json",
+      "sha256": "9baf158aee44eea7ea1f88bedd4f13d0311ae37893f8f4693d528aa8260bce7e",
+      "size_bytes": 5156
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-review-01/natural-disassembly-command/receipt.json",
+      "sha256": "e3ecf25bd8a880f5ae96d17223e82fbf03b94d3370482d9543cb640e89170795",
+      "size_bytes": 5205
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-review-01/detailed-disassembly-command/receipt.json",
+      "sha256": "ebde4581a94b6427c8c91ddbe1ff5424f705f51dd575d698402b5b2bb2747592",
+      "size_bytes": 5207
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-review-02/post-build-core-command/receipt.json",
+      "sha256": "baed9a66cecccf28dc0cad41765b0ba5ff65164b3855547c1a5d848d3b6230c5",
+      "size_bytes": 4999
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-review-02/provider-addr2line-command/receipt.json",
+      "sha256": "97ea7250ecfe8cf260c3e85b735ea2d45c46f2d579e71511bd51f5dd7469097d",
+      "size_bytes": 5156
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-review-02/natural-disassembly-command/receipt.json",
+      "sha256": "33b9fcb951dfe1cb84c3b77896819cc1f69367725b0d1e12823395b92b1be565",
+      "size_bytes": 5205
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-review-02/detailed-disassembly-command/receipt.json",
+      "sha256": "4b3f23ae65a06fe89c701f2e63a9ae37191ebd958e69800490001d2381f56bf3",
+      "size_bytes": 5207
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-execution-command-01/receipt.json",
+      "sha256": "c05d7329a258ceb8da639e83bc1215a9735689d80160dee90e8ac591b6204942",
+      "size_bytes": 5535
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-observation-01/command/receipt.json",
+      "sha256": "6397d8ade7e04491f261058d6ee4739f37700b5c7bdb6d4a37d34670b9925250",
+      "size_bytes": 5032
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-inside-application-command-01/receipt.json",
+      "sha256": "5aaa26c25968ab7fee7454fbea10cef80baf80573dda0a78acdbf428405415e3",
+      "size_bytes": 2928
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-inside-applied-01/fmt-command/receipt.json",
+      "sha256": "e1811485e0dd26077e3dfb1b5f912ee3c752598bb81fee1597a1cd7f18f1c0c6",
+      "size_bytes": 3088
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-inside-quality-01/fmt-command/receipt.json",
+      "sha256": "6ed9f48d246519cdf57084ca90dc481e8f323224a1387ea254de03bfcab73396",
+      "size_bytes": 3112
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-inside-quality-01/clippy-command/receipt.json",
+      "sha256": "ebeb294da5276638ddb041eccc24dd10687a0581967501c8ba78612e35c41c25",
+      "size_bytes": 3309
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-inside-quality-01/focused-command/receipt.json",
+      "sha256": "6ae44cfdbda3f00bcd9f39a7f365225663bac4a358294928f412cbab9d3f2f87",
+      "size_bytes": 3296
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-inside-quality-01/workspace-command/receipt.json",
+      "sha256": "1e851fbe49e8dc105b36b345b87c9a03c34c8c84456022fc0a60a8b13beb5c41",
+      "size_bytes": 3339
+    },
+    {
+      "path": ".runtime/porting/SRC-06/selected-main-thread-driver-command-01/receipt.json",
+      "sha256": "e524abb9c115a153cdc4b671148b798fa2bb561ff30c66d0947af7a78d204a95",
+      "size_bytes": 36959
+    },
+    {
+      "path": ".runtime/porting/SRC-06/selected-main-thread-observation-01/Cargo-command/receipt.json",
+      "sha256": "3c7bd4379db07d549e56607d0be79d402e75777e311c3a0d0a34fdc4a2ab5047",
+      "size_bytes": 5951
+    },
+    {
+      "path": ".runtime/porting/SRC-06/selected-main-thread-observation-01/command/receipt.json",
+      "sha256": "c8d082e40d44c317da090c4028c70bb97f5deb9b3e21839ac0ea5531ca355dc6",
+      "size_bytes": 67386
+    },
+    {
+      "path": ".runtime/porting/SRC-06/selected-main-thread-comparison-command-01/receipt.json",
+      "sha256": "71bf3153dfc97ac0656a704fe9edad70aca1ff8567bebd0b6e02b89964087615",
+      "size_bytes": 67363
+    },
+    {
+      "path": ".runtime/porting/SRC-06/selected-main-thread-comparison-command-02/receipt.json",
+      "sha256": "ba727847d13ea95a403a853d5fb332a20877f05e5bcb243ba18bc4f01fb7c9ad",
+      "size_bytes": 3454
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-inside-publication-command-01/receipt.json",
+      "sha256": "ab612041bc5bd6c6e861803746f49b5137cf7fc2cf0725c732691bfae2fb6652",
+      "size_bytes": 3321
+    }
+  ],
+  "opaque_lineage": [
+    {
+      "path": ".runtime/porting/SRC-06/selected-main-thread-observation-01/Root-full-main-artifact-review.json",
+      "sha256": "cae74319cca9e4d04039bfcb03598303982eb49e80c5197aa34d5fe6cd12b851",
+      "size_bytes": 1872
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-main-thread-factual-review-01/review.json",
+      "sha256": "1db36cb02450ac4e78ce7a21bc2d86369e97bbb706e27908ca495c327b98a3f7",
+      "size_bytes": 4182
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-02/Root-cumulative-Source-review.json",
+      "sha256": "ab2815c20467be668196c706612cf67580f11bb75482a5fc43d2027fa630a902",
+      "size_bytes": 796
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-03/Root-bounded-Source-review.json",
+      "sha256": "b4ebe57060d48c507007645c1e8609ce5f108df4f5bcee555c35d59eace5be4b",
+      "size_bytes": 680
+    },
+    {
+      "path": ".runtime/porting/SRC-06/selected-main-thread-comparison-01/comparison.json",
+      "sha256": "046445cac163c3f4e8a55468c952db392aa5b52c38f730c41263862b01f520f7",
+      "size_bytes": 1933
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-review-02/Root-full-provider-review.json",
+      "sha256": "54eac6f35e7cd9706ea9b6b25ac5399916d4255f4ddddb379b60f5897285bbb9",
+      "size_bytes": 1371
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-prep-03/Root-full-Source-review.json",
+      "sha256": "10d300e610c779806676b3dd93fae64c82589d40c7fbd1cf529d4f21f956e61e",
+      "size_bytes": 939
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-build-01/Root-full-actual-dry-review.json",
+      "sha256": "0aeb40d3949df8a44f739ef7b083bd59d4dadb53be5d262ec0146c045f8dae23",
+      "size_bytes": 1169
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-02/Root-full-Source-review.json",
+      "sha256": "ebb940601d5bad78e7b806ae5ceaad58c0f681ce70967fde4f7e62125db4de4f",
+      "size_bytes": 507
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-execution-prep-02/Root-full-Source-review.json",
+      "sha256": "34aa93217662c2dfd205adeb1129fe1e2c6a8090f57d8dbe8c57de5dfc8fdbf9",
+      "size_bytes": 949
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-inside-getter-prep-01/Root-full-Source-review.json",
+      "sha256": "23d1b39a0e4878c11e0f753d93705495db79460c6a22b9bf265ae1eab33ea52b",
+      "size_bytes": 1088
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-inside-selected-rust-prep-01/Root-full-Source-review.json",
+      "sha256": "853e6f1c0cb3d3147e4eef55f8752e135a05c306b2bf12362283173f9cfa7f8e",
+      "size_bytes": 668
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-tarp-inside-publication-inputs-01.py",
+      "sha256": "6883de2f0e1f7f24f5cc15ea4975b8bf12113b58b46dbbd765bd783775627464",
+      "size_bytes": 5553
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-selected-comparison-factual-review-01/review.json",
+      "sha256": "02cd9264cc37606b066299d353be93141180a4e73ca4876e624f21bde56da34c",
+      "size_bytes": 3578
+    }
+  ],
+  "prior_evidence": [
+    {
+      "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/summary.json",
+      "sha256": "cc8a0746b6b5143a7b79376270ee66f3aaf860c4c1184e025953fcfef814193f",
+      "size_bytes": 187448
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/SYS-03-round-format/summary.json",
+      "sha256": "0bb2ff7ffaace772c680b90cf3b4a0aed57eb185e941048783e42c83dcae09ab",
+      "size_bytes": 173446
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/SYS-03-ordinary-warmup-report/summary.json",
+      "sha256": "788a2adbc69948d3f1e3220d9889b5331361cf153788e231fb2115d9fa21e01a",
+      "size_bytes": 246549
+    }
+  ]
+}

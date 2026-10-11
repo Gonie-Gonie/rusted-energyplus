@@ -1,0 +1,14 @@
+{
+  "schema": "src06-Native02-Root-full-Source-review.v1",
+  "accepted": true,
+  "Source_preparation": {
+    "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-02/manifest.json",
+    "sha256": "ba8de8e1378003bd0f9fa0305a074b838448425503330a47cba01f2b68e31d35"
+  },
+  "whole_refs_verified": 65,
+  "literal_ranges_verified": 16,
+  "all_13_diffs_regenerated": true,
+  "full_bodies_and_authors_and_all_28_input_cases_read": true,
+  "target_build_or_execution_performed": false,
+  "gates_updated": false
+}

@@ -1,0 +1,87 @@
+
+D:\CodexBuild\rusted-energyplus\SRC-06\native-build-01\bin\src06_tarp_inside_helper.exe:     file format pei-x86-64
+
+
+Disassembly of section .text:
+
+000000014001962a <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)>:
+   14001962a:	55                   	push   %rbp
+   14001962b:	48 89 e5             	mov    %rsp,%rbp
+   14001962e:	48 83 ec 30          	sub    $0x30,%rsp
+   140019632:	f2 0f 11 45 10       	movsd  %xmm0,0x10(%rbp)
+   140019637:	f2 0f 11 4d 18       	movsd  %xmm1,0x18(%rbp)
+   14001963c:	f2 0f 11 55 20       	movsd  %xmm2,0x20(%rbp)
+   140019641:	f2 0f 10 45 10       	movsd  0x10(%rbp),%xmm0
+   140019646:	f2 0f 5c 45 18       	subsd  0x18(%rbp),%xmm0
+   14001964b:	f2 0f 11 45 f8       	movsd  %xmm0,-0x8(%rbp)
+   140019650:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   140019654:	66 0f 2e 45 f8       	ucomisd -0x8(%rbp),%xmm0
+   140019659:	7a 0b                	jp     140019666 <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)+0x3c>
+   14001965b:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   14001965f:	66 0f 2e 45 f8       	ucomisd -0x8(%rbp),%xmm0
+   140019664:	74 16                	je     14001967c <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)+0x52>
+   140019666:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   14001966a:	66 0f 2e 45 20       	ucomisd 0x20(%rbp),%xmm0
+   14001966f:	7a 20                	jp     140019691 <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)+0x67>
+   140019671:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   140019675:	66 0f 2e 45 20       	ucomisd 0x20(%rbp),%xmm0
+   14001967a:	75 15                	jne    140019691 <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)+0x67>
+   14001967c:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+   140019680:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   140019685:	e8 b6 7d c3 01       	call   141c51440 <EnergyPlus::Convect::CalcASHRAEVerticalWall(double)>
+   14001968a:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   14001968f:	eb 6f                	jmp    140019700 <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)+0xd6>
+   140019691:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   140019695:	66 0f 2f 45 f8       	comisd -0x8(%rbp),%xmm0
+   14001969a:	76 0b                	jbe    1400196a7 <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)+0x7d>
+   14001969c:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   1400196a0:	66 0f 2f 45 20       	comisd 0x20(%rbp),%xmm0
+   1400196a5:	77 1e                	ja     1400196c5 <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)+0x9b>
+   1400196a7:	f2 0f 10 45 f8       	movsd  -0x8(%rbp),%xmm0
+   1400196ac:	66 0f ef c9          	pxor   %xmm1,%xmm1
+   1400196b0:	66 0f 2f c1          	comisd %xmm1,%xmm0
+   1400196b4:	76 2d                	jbe    1400196e3 <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)+0xb9>
+   1400196b6:	f2 0f 10 45 20       	movsd  0x20(%rbp),%xmm0
+   1400196bb:	66 0f ef c9          	pxor   %xmm1,%xmm1
+   1400196bf:	66 0f 2f c1          	comisd %xmm1,%xmm0
+   1400196c3:	76 1e                	jbe    1400196e3 <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)+0xb9>
+   1400196c5:	f2 0f 10 45 20       	movsd  0x20(%rbp),%xmm0
+   1400196ca:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+   1400196ce:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   1400196d2:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   1400196d7:	e8 54 7e c3 01       	call   141c51530 <EnergyPlus::Convect::CalcWaltonUnstableHorizontalOrTilt(double, double)>
+   1400196dc:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   1400196e1:	eb 1d                	jmp    140019700 <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)+0xd6>
+   1400196e3:	f2 0f 10 45 20       	movsd  0x20(%rbp),%xmm0
+   1400196e8:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+   1400196ec:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   1400196f0:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   1400196f5:	e8 a6 7d c3 01       	call   141c514a0 <EnergyPlus::Convect::CalcWaltonStableHorizontalOrTilt(double, double)>
+   1400196fa:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   1400196ff:	90                   	nop
+   140019700:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   140019705:	48 83 c4 30          	add    $0x30,%rsp
+   140019709:	5d                   	pop    %rbp
+   14001970a:	c3                   	ret
+   14001970b:	90                   	nop
+
+000000014001970c <EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)::{lambda(double, double, double, double, double)#1}::operator()(double, double, double, double, double) const>:
+   14001970c:	55                   	push   %rbp
+   14001970d:	48 89 e5             	mov    %rsp,%rbp
+   140019710:	48 83 ec 20          	sub    $0x20,%rsp
+   140019714:	48 89 4d 10          	mov    %rcx,0x10(%rbp)
+   140019718:	f2 0f 11 4d 18       	movsd  %xmm1,0x18(%rbp)
+   14001971d:	f2 0f 11 55 20       	movsd  %xmm2,0x20(%rbp)
+   140019722:	f2 0f 11 5d 28       	movsd  %xmm3,0x28(%rbp)
+   140019727:	f2 0f 10 4d 38       	movsd  0x38(%rbp),%xmm1
+   14001972c:	f2 0f 10 45 20       	movsd  0x20(%rbp),%xmm0
+   140019731:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   140019735:	66 0f 28 d1          	movapd %xmm1,%xmm2
+   140019739:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   14001973d:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   140019742:	e8 e3 fe ff ff       	call   14001962a <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)>
+   140019747:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   14001974c:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   140019751:	48 83 c4 20          	add    $0x20,%rsp
+   140019755:	5d                   	pop    %rbp
+   140019756:	c3                   	ret

@@ -1,0 +1,76 @@
+{
+  "schema": "src06-selected-tarp-inside-comparison.v1",
+  "status": "pass-available-finite-selected-API-pairs-only",
+  "actual_custody": {
+    "path": ".runtime/porting/SRC-06/selected-main-thread-observation-01/comparison-custody.json",
+    "sha256": "02bb1cbeb7474b23f88f3cc15719f7e92134c03f813d6616ff3a802a8d84315e"
+  },
+  "actual_prospective_policy": {
+    "path": ".runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-02/policy.json",
+    "sha256": "866248f7fa972ce693b12e291829bd1e904f9c503892f2ff9a912e456ffe787e",
+    "size_bytes": 4805
+  },
+  "findings": {
+    "global_input_and_initial_full_owner_join_passed": true,
+    "endpoint_pairing_performed": true,
+    "actual_case_count": 28,
+    "actual_declared_call_count": 60,
+    "paired_available_boundaries": 60,
+    "actual_Native_exit_code": 0,
+    "Native_source_stopped": false,
+    "selected_source_reachability_complete": true,
+    "Native_capture_Source_snapshot": {
+      "path": ".runtime/porting/source-objects/d3/d34a84b7f0fad57ae1a46799a8b9b8b31247239206556ce342bb4e17287775c4",
+      "sha256": "d34a84b7f0fad57ae1a46799a8b9b8b31247239206556ce342bb4e17287775c4"
+    },
+    "actual_Cargo_Source_snapshot": {
+      "path": ".runtime/porting/source-objects/8a/8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934",
+      "sha256": "8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934"
+    },
+    "Native_original_stdout": {
+      "path": ".runtime/porting/SRC-06/native-observation-01/command/stdout.log",
+      "sha256": "c23d78551d630f391747ef56dbe51bdd3d690a926d1668f8a4db4d8330c9d706"
+    },
+    "Rust_result": {
+      "path": ".runtime/porting/SRC-06/selected-main-thread-observation-01/result.json",
+      "sha256": "72ab82741d85fd3b2c64a9fed6d69d942a53a24ea1152cc1905d55584e21da22",
+      "size_bytes": 289207
+    },
+    "actual_API_correspondence": {
+      "path": ".runtime/porting/SRC-06/tarp-inside-applied-01/actual-API-correspondence.json",
+      "sha256": "1f888d4469d163fc62934034001fb6d0609ff982b42aac00055dc3d6b55f70f3",
+      "size_bytes": 3052
+    }
+  },
+  "counts": {
+    "input_join_comparisons": 1064,
+    "pre_owner_comparisons": 960,
+    "selected_endpoint_comparisons": 988,
+    "point_helper_comparisons": 0
+  },
+  "mismatch_count": 0,
+  "required_unavailable_count": 34,
+  "nonfinite_arithmetic_unavailable_count": 6,
+  "all_mismatches_and_unavailable_rows_retained_uncapped": true,
+  "ledgers": {
+    "mismatches": {
+      "path": ".runtime/porting/SRC-06/selected-main-thread-comparison-02/mismatches.ndjson",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    "unavailable": {
+      "path": ".runtime/porting/SRC-06/selected-main-thread-comparison-02/unavailable.ndjson",
+      "sha256": "2583a7fb46e0916ffe4006c83892f117b6b1817f9048786fab2861c37a06864c",
+      "size_bytes": 8708
+    },
+    "paired-boundaries": {
+      "path": ".runtime/porting/SRC-06/selected-main-thread-comparison-02/paired-boundaries.ndjson",
+      "sha256": "719e59a77a97159027475ce98130f729387a0e3250b82e1c4481b30cce367086",
+      "size_bytes": 13346
+    }
+  },
+  "diagnostic_class_checks_counted_as_numerical_PASS": false,
+  "backend_or_InitIntConvCoeff_cadence_PASS_claimed": false,
+  "whole_SRC06_unit_or_ordinary_handoff_PASS_claimed": false,
+  "gates_updated": false
+}

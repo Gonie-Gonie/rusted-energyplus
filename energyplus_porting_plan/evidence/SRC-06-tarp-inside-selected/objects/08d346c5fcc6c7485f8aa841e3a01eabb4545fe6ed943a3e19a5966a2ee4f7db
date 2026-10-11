@@ -1,0 +1,5 @@
+# SRC-06 fixed-owner getter successor (held Source)
+
+The accepted current composition 669062f7 remains the literal parent. This successor adds only a read-only public getter returning the existing parent lower-limit constant. It copies no default literal and claims no user-configuration support. The complete Natural/Detailed math and five tests remain byte-exact under removal of the getter addition. Three other application rows remain literal parent rows.
+
+Apply the four cumulative rows only after Root review; this package has performed no canonical mutation, formatter, Cargo, Native execution, or numerical validation. The selected standalone observer must call the getter rather than supply a duplicated default.

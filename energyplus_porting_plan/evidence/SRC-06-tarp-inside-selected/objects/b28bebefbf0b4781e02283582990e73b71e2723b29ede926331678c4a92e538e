@@ -1,0 +1,502 @@
+{
+  "schema": "src06-tarp-inside-native-source-preparation.v1",
+  "status": "HELD-Source-only-unexecuted",
+  "Original_version": "26.1.0",
+  "Original_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/tarp_inside_reference_helper.cpp",
+      "sha256": "ae6ae4048761772a84ecbd3d450fdb5d8068ee44c0c8e45d2aa6a072b709aa84",
+      "size_bytes": 11404,
+      "line_count": 196
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/tarp_inside_reference_fields.hh",
+      "sha256": "79aa763bb71a6ca659cc4d74d4301599cab548eca43a3aa529ba1f3a7465926e",
+      "size_bytes": 5002,
+      "line_count": 97
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/tarp_inside_reference.cmake",
+      "sha256": "15c457567d3767af8bd2b622cd649c6f68dfb55046a006011792794f14bd263f",
+      "size_bytes": 1773,
+      "line_count": 28
+    }
+  ],
+  "Native_source_files": [
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/tarp_inside_reference_helper.cpp",
+      "sha256": "ae6ae4048761772a84ecbd3d450fdb5d8068ee44c0c8e45d2aa6a072b709aa84",
+      "size_bytes": 11404,
+      "line_count": 196
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/tarp_inside_reference_fields.hh",
+      "sha256": "79aa763bb71a6ca659cc4d74d4301599cab548eca43a3aa529ba1f3a7465926e",
+      "size_bytes": 5002,
+      "line_count": 97
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/tarp_inside_reference.cmake",
+      "sha256": "15c457567d3767af8bd2b622cd649c6f68dfb55046a006011792794f14bd263f",
+      "size_bytes": 1773,
+      "line_count": 28
+    }
+  ],
+  "compiled_source_files": [
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/tarp_inside_reference_helper.cpp",
+      "sha256": "ae6ae4048761772a84ecbd3d450fdb5d8068ee44c0c8e45d2aa6a072b709aa84",
+      "size_bytes": 11404,
+      "line_count": 196
+    }
+  ],
+  "input_only_request": {
+    "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/input-only-cases.proposed.json",
+    "sha256": "106dcc4583bc6687902db24c325dd15425cc7ffc7cf0e24af44d5628f269d38e",
+    "size_bytes": 56342,
+    "line_count": 2051
+  },
+  "prospective_policy": {
+    "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/observation-policy.proposed.json",
+    "sha256": "3ddbaa2a35e4986cd6c16051bee866ce35d2f7169cacfcc89bb82a49cf68995d",
+    "size_bytes": 1176,
+    "line_count": 38
+  },
+  "README": {
+    "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/README.md",
+    "sha256": "e1224ce73eccb7bb6dd3de7b0e5e65d10c4314fc415365f1985768b318aa2fb0",
+    "size_bytes": 2611,
+    "line_count": 39
+  },
+  "author": {
+    "path": ".runtime/porting/SRC-06/prepare-native-tarp-inside-01.py",
+    "sha256": "1435691f18e6753fe9e85de2aeb3ff4d28e5e516f52090044cd49dbd379cdd7c",
+    "size_bytes": 24998,
+    "line_count": 319
+  },
+  "reused_pattern_before": [
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/surface_environment_reference_helper.cpp",
+        "sha256": "2d3d1f0cbf625e0ad7eb5a2e07a19991bb14b0896efdfa309713f26356728348",
+        "size_bytes": 14207,
+        "line_count": 236
+      },
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/before/surface_environment_reference_helper.cpp",
+        "sha256": "2d3d1f0cbf625e0ad7eb5a2e07a19991bb14b0896efdfa309713f26356728348",
+        "size_bytes": 14207,
+        "line_count": 236
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/surface_environment_reference_fields.hh",
+        "sha256": "3f9da88accc83fc059b89c5f520cae5cc94dfced25f227a69cb903fe287e0b75",
+        "size_bytes": 5849,
+        "line_count": 103
+      },
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/before/surface_environment_reference_fields.hh",
+        "sha256": "3f9da88accc83fc059b89c5f520cae5cc94dfced25f227a69cb903fe287e0b75",
+        "size_bytes": 5849,
+        "line_count": 103
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/surface_environment_reference.cmake",
+        "sha256": "f5e58635049619c1b8eab7c03bbd484dda37ac0f52dd802ddc770f01230efbe9",
+        "size_bytes": 1837,
+        "line_count": 28
+      },
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/before/surface_environment_reference.cmake",
+        "sha256": "f5e58635049619c1b8eab7c03bbd484dda37ac0f52dd802ddc770f01230efbe9",
+        "size_bytes": 1837,
+        "line_count": 28
+      }
+    }
+  ],
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/manifest.json",
+      "sha256": "083338e735fbfc54a279a8c71592211b9ca24baf090cf838a16524d4a68b241c",
+      "size_bytes": 27490,
+      "line_count": 696
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-inside-prep-01/manifest.json",
+      "sha256": "b596e5889a81a2cdd250408d3c38a80522855cab0818d8aa61ccd673d66ab88d",
+      "size_bytes": 23337,
+      "line_count": 586
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CON-01/source-review.md",
+      "sha256": "dcbb071d807968a31265cdfb5a6b98140737120defe11b74b7a50493f2597b6a",
+      "size_bytes": 7072,
+      "line_count": 92
+    }
+  ],
+  "selected_source_ranges": [
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+        "sha256": "d381680e08c5c9a9a6b769e906474082d3bdb2c68fdbade631a0905994554b61",
+        "size_bytes": 336899,
+        "line_count": 6629
+      },
+      "start_line": 1907,
+      "end_line": 1975,
+      "purpose": "Complete unchanged Natural/Detailed bodies",
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/source-ranges/ConvectionCoefficients.cc.1907-1975.txt",
+        "sha256": "37df8c70081d05018eef6e7b145852e0811b4564f52fde3aca6e6811fa4ee304",
+        "size_bytes": 3584,
+        "line_count": 69
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.hh",
+        "sha256": "a15faad35aad82250cb34b38574efb1d1331c1f2cd0f33b44d024dbd3ab456bf",
+        "size_bytes": 47387,
+        "line_count": 810
+      },
+      "start_line": 280,
+      "end_line": 286,
+      "purpose": "Actual public direct API declarations",
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/source-ranges/ConvectionCoefficients.hh.280-286.txt",
+        "sha256": "44da30448635d309a085d9d43634ab1be1b102a56f16b192c1527d78a6afe27e",
+        "size_bytes": 501,
+        "line_count": 7
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.hh",
+        "sha256": "a15faad35aad82250cb34b38574efb1d1331c1f2cd0f33b44d024dbd3ab456bf",
+        "size_bytes": 47387,
+        "line_count": 810
+      },
+      "start_line": 394,
+      "end_line": 460,
+      "purpose": "Three unchanged inline core correlations",
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/source-ranges/ConvectionCoefficients.hh.394-460.txt",
+        "sha256": "4539191d8408b17dfe92e49e34c58a0ec894c0cc2f6ccd90ea8ab8454e3889a7",
+        "size_bytes": 2831,
+        "line_count": 67
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalSurface.hh",
+        "sha256": "ffdf2d16d8b90ab091861614bc02922e2f76889b9e16ee7ee5edc376492729cb",
+        "size_bytes": 19511,
+        "line_count": 257
+      },
+      "start_line": 115,
+      "end_line": 121,
+      "purpose": "Actual Array1D SurfHConvInt owner",
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/source-ranges/DataHeatBalSurface.hh.115-121.txt",
+        "sha256": "96dba5c69184826938a3c32f72131f86254477c272308fe8234096ba1c09fa38",
+        "size_bytes": 670,
+        "line_count": 7
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+        "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+        "size_bytes": 133816,
+        "line_count": 2059
+      },
+      "start_line": 1784,
+      "end_line": 1808,
+      "purpose": "Actual constructor low and unrelated high owner defaults",
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/source-ranges/DataHeatBalance.hh.1784-1808.txt",
+        "sha256": "d864d91b67e459ee038b5640b57d1e5a63034a03b5daeea4fe7eb9f0145ec065",
+        "size_bytes": 2224,
+        "line_count": 25
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+        "sha256": "7eea2e660914574ce9b5b633ac2099d49b09255d6c215b84e47edccbbb5cffae",
+        "size_bytes": 113537,
+        "line_count": 1850
+      },
+      "start_line": 293,
+      "end_line": 300,
+      "purpose": "Actual excluded Kiva boundary and non-Kiva exterior constant",
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/source-ranges/DataSurfaces.hh.293-300.txt",
+        "sha256": "1e516cbe58c63ad5e928b773d5dd349c77499ead268c081b983c12380592aca0",
+        "size_bytes": 273,
+        "line_count": 8
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+        "sha256": "7eea2e660914574ce9b5b633ac2099d49b09255d6c215b84e47edccbbb5cffae",
+        "size_bytes": 113537,
+        "line_count": 1850
+      },
+      "start_line": 738,
+      "end_line": 745,
+      "purpose": "Actual stored cosine owner",
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/source-ranges/DataSurfaces.hh.738-745.txt",
+        "sha256": "50fd633325f3bdf3f2a744b9a1c8302bc671024f9ee8f9c23237fadfc3d5a767",
+        "size_bytes": 708,
+        "line_count": 8
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+        "sha256": "7eea2e660914574ce9b5b633ac2099d49b09255d6c215b84e47edccbbb5cffae",
+        "size_bytes": 113537,
+        "line_count": 1850
+      },
+      "start_line": 762,
+      "end_line": 775,
+      "purpose": "Actual boundary owner",
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/source-ranges/DataSurfaces.hh.762-775.txt",
+        "sha256": "c24e4d7c7c0e6f19cd44d505f45f4f54dd908e4db703946d494603d8f76f9442",
+        "size_bytes": 1395,
+        "line_count": 14
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+        "sha256": "7eea2e660914574ce9b5b633ac2099d49b09255d6c215b84e47edccbbb5cffae",
+        "size_bytes": 113537,
+        "line_count": 1850
+      },
+      "start_line": 1473,
+      "end_line": 1478,
+      "purpose": "Actual total surface owner",
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/source-ranges/DataSurfaces.hh.1473-1478.txt",
+        "sha256": "bd4fd7b3b973f49f762096c3330d74edcbd04ecc52063dea9ed151f359f9470a",
+        "size_bytes": 400,
+        "line_count": 6
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+        "sha256": "7eea2e660914574ce9b5b633ac2099d49b09255d6c215b84e47edccbbb5cffae",
+        "size_bytes": 113537,
+        "line_count": 1850
+      },
+      "start_line": 1813,
+      "end_line": 1817,
+      "purpose": "Actual one-based Surface EPVector owner",
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/source-ranges/DataSurfaces.hh.1813-1817.txt",
+        "sha256": "fcae52bf64dd99d40f36bdb6e938d6f31ba865f3eb866546067a8f608463ffbd",
+        "size_bytes": 214,
+        "line_count": 5
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EPVector.hh",
+        "sha256": "155ac5aaf6bd6138ad1a397edf68e2c660a6595d94f291bcf671ebc040c335e2",
+        "size_bytes": 11096,
+        "line_count": 357
+      },
+      "start_line": 88,
+      "end_line": 103,
+      "purpose": "Actual Source-sized indexed allocation",
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/source-ranges/EPVector.hh.88-103.txt",
+        "sha256": "de188f5a5073ae0e83c54b80ca94950db3892642e2e9926e2ed792012693561b",
+        "size_bytes": 342,
+        "line_count": 16
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.cc",
+        "sha256": "6416c03de88a2b913d33393e82141b4183b9e446cd93fb7e5c7c9fde22d15f9f",
+        "size_bytes": 60978,
+        "line_count": 1104
+      },
+      "start_line": 579,
+      "end_line": 594,
+      "purpose": "Actual constant state initialization",
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/source-ranges/Data__EnergyPlusData.cc.579-594.txt",
+        "sha256": "6b2a0d600f417692339a03b6b0a48cd74e8dc4ed6efe319ff34f59e6cf482a50",
+        "size_bytes": 607,
+        "line_count": 16
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataErrorTracking.hh",
+        "sha256": "966cc13df0bd9ff48d9995a390bce9005e141f45e534438591ff96f6614b7f58",
+        "size_bytes": 18669,
+        "line_count": 251
+      },
+      "start_line": 205,
+      "end_line": 235,
+      "purpose": "Actual error counters and MatchCounts owner",
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/source-ranges/DataErrorTracking.hh.205-235.txt",
+        "sha256": "f311a869922c169aa9489a7a2964b991a85e2cca399d7ad3f7555c00a81ba3d6",
+        "size_bytes": 1695,
+        "line_count": 31
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.hh",
+        "sha256": "e7a3a24bdc834e39564962e6af38cc631b13552109c128bb6da11da9f942a07f",
+        "size_bytes": 33012,
+        "line_count": 717
+      },
+      "start_line": 687,
+      "end_line": 696,
+      "purpose": "Actual retained error header owner",
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/source-ranges/UtilityRoutines.hh.687-696.txt",
+        "sha256": "eac9471aa22b387a98250fe4b34f7a9b8483c19552c294de0bb00bdbc5d86be1",
+        "size_bytes": 282,
+        "line_count": 10
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+        "sha256": "87bd8b6fac7001e26ffc08f5e3457a3f644098793a2734524c56de946c761ff2",
+        "size_bytes": 81995,
+        "line_count": 1813
+      },
+      "start_line": 757,
+      "end_line": 794,
+      "purpose": "Real fatal throw/callback/stream context, not expected outcome",
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/source-ranges/UtilityRoutines.cc.757-794.txt",
+        "sha256": "420b670957c68d8103cf912f1f9628be50f45f1bae63c62a54a03d2577c6f758",
+        "size_bytes": 1679,
+        "line_count": 38
+      }
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+        "sha256": "87bd8b6fac7001e26ffc08f5e3457a3f644098793a2734524c56de946c761ff2",
+        "size_bytes": 81995,
+        "line_count": 1813
+      },
+      "start_line": 1381,
+      "end_line": 1423,
+      "purpose": "Real error header/stream context",
+      "archive": {
+        "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/source-ranges/UtilityRoutines.cc.1381-1423.txt",
+        "sha256": "42dd3a6e6296c2cb302f3188457bcc9575938e2fbb1f5c45b357931ba841080c",
+        "size_bytes": 1689,
+        "line_count": 43
+      }
+    }
+  ],
+  "exact_diffs": [
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/diffs/input-only-cases.proposed.json.addition.diff",
+      "sha256": "f7c39690824b7d00be827e6d1019749f7f8187109b1bf9f0b42aa1625077d19f",
+      "size_bytes": 58486,
+      "line_count": 2054
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/diffs/observation-policy.proposed.json.addition.diff",
+      "sha256": "f8ad4f99f25b88411d4fafe39f759768eeb0253a9628f1e728098390188006f1",
+      "size_bytes": 1309,
+      "line_count": 41
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/diffs/README.md.addition.diff",
+      "sha256": "96a916be7591096dc61ccc908e4c7d313ad7790a699032983b8e575c342c5a12",
+      "size_bytes": 2699,
+      "line_count": 42
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/diffs/tarp_inside_reference.cmake.addition.diff",
+      "sha256": "6046fa927c51eb7e8a17ba4b255c20239352aa26d02d10a6d38975791de666b5",
+      "size_bytes": 1886,
+      "line_count": 31
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/diffs/tarp_inside_reference.cmake.from-reused-pattern.diff",
+      "sha256": "6258794a6c65fda16f83adf95148d50c07cfbfa4dfeb41bd53ee3f09e6025e40",
+      "size_bytes": 3519,
+      "line_count": 51
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/diffs/tarp_inside_reference_fields.hh.addition.diff",
+      "sha256": "86bf062e3dc9db253d3260d9246535b4148b6cd34c3b7b56ac7a4bcc637fd3ea",
+      "size_bytes": 5192,
+      "line_count": 100
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/diffs/tarp_inside_reference_fields.hh.from-reused-pattern.diff",
+      "sha256": "70239108a956553b465e71db6d401561e40f0291f71db22e48c446688416e91d",
+      "size_bytes": 3346,
+      "line_count": 57
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/diffs/tarp_inside_reference_helper.cpp.addition.diff",
+      "sha256": "74e88e6db571aa03dcd9e91d7cf3362b8c93b701cb7213b98aa5ab64b8975f0c",
+      "size_bytes": 11696,
+      "line_count": 199
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/diffs/tarp_inside_reference_helper.cpp.from-reused-pattern.diff",
+      "sha256": "a3a88306454ef336c95c72a0e1da9943fe99960a6dd684a522976f331722ce28",
+      "size_bytes": 17175,
+      "line_count": 246
+    }
+  ],
+  "literal_input_case_count": 28,
+  "literal_input_call_count": 60,
+  "literal_binary64_input_cell_count": 320,
+  "runtime_interfaces": {
+    "target": "src06_tarp_inside_helper",
+    "Native_argc": 2,
+    "request_schema": "src06-tarp-inside-direct-request.v1",
+    "result_schema": "src06-tarp-inside-direct-results.v1",
+    "complete_capture_exit_codes": [
+      0,
+      2
+    ],
+    "captured_stop_never_numerical_PASS": true,
+    "result_authority": "full recorded stdout",
+    "inherited_recipe_operand": "SRC06_INHERITED_RECIPE",
+    "source_directory_operand": "SRC06_SOURCE_DIR"
+  },
+  "core_address_bound_providers_required": [
+    "Convect::CalcASHRAETARPNatural",
+    "Convect::CalcASHRAEDetailedIntConvCoeff"
+  ],
+  "Original_bodies_modified": false,
+  "target_execution_performed": false,
+  "canonical_mutation_performed": false,
+  "Native_result_values_read": false,
+  "expected_values_supplied": false,
+  "full_InitIntConvCoeff_caller_verified": false,
+  "Kiva_window_override_branches_admitted": false,
+  "ordinary_production_handoff_verified": false,
+  "gates_updated": false
+}

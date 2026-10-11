@@ -1,0 +1,149 @@
+--- crates/ep_runtime/src/heat_balance/convection/tarp_inside.rs
++++ crates/ep_runtime/src/heat_balance/convection/tarp_inside.rs
+@@ -0,0 +1,146 @@
++//! Selected non-Kiva ASHRAE TARP natural/detailed inside direct APIs.
++//!
++//! These routines do not choose a zone/space reference temperature or own the
++//! InitIntConvCoeff traversal, algorithm dispatch or surface-iteration cadence.
++
++/// Exact Original branch selected from actual temperature difference and cosine.
++#[derive(Clone, Copy, Debug, Eq, PartialEq)]
++pub enum TarpNaturalConvectionBranch {
++    /// Exact zero temperature difference or exact zero cosine.
++    VerticalWall,
++    /// Temperature difference and cosine have the same strict sign.
++    UnstableHorizontalOrTilt,
++    /// Remaining inputs, including unordered diagnostic comparisons.
++    StableHorizontalOrTilt,
++}
++
++impl TarpNaturalConvectionBranch {
++    /// Source branch name; no Native internal-local observation is implied.
++    #[must_use]
++    pub const fn id(self) -> &'static str {
++        match self {
++            Self::VerticalWall => "vertical-wall",
++            Self::UnstableHorizontalOrTilt => "unstable-horizontal-or-tilt",
++            Self::StableHorizontalOrTilt => "stable-horizontal-or-tilt",
++        }
++    }
++}
++
++fn branch_from_delta(delta_temperature_c: f64, cos_tilt: f64) -> TarpNaturalConvectionBranch {
++    if delta_temperature_c == 0.0 || cos_tilt == 0.0 {
++        TarpNaturalConvectionBranch::VerticalWall
++    } else if (delta_temperature_c < 0.0 && cos_tilt < 0.0)
++        || (delta_temperature_c > 0.0 && cos_tilt > 0.0)
++    {
++        TarpNaturalConvectionBranch::UnstableHorizontalOrTilt
++    } else {
++        TarpNaturalConvectionBranch::StableHorizontalOrTilt
++    }
++}
++
++/// Selected CalcASHRAETARPNatural branch, with no near-zero approximation.
++#[must_use]
++pub fn branch(
++    surface_temperature_c: f64,
++    air_temperature_c: f64,
++    cos_tilt: f64,
++) -> TarpNaturalConvectionBranch {
++    branch_from_delta(surface_temperature_c - air_temperature_c, cos_tilt)
++}
++
++/// Complete CalcASHRAETARPNatural and its three literal inline correlations.
++/// The passed cosine is the actual correlation operand; inside callers negate
++/// the stored outward cosine. No nonfinite fallback or coefficient clamp occurs.
++#[must_use]
++pub fn natural_coefficient_w_per_m2_k(
++    surface_temperature_c: f64,
++    air_temperature_c: f64,
++    cos_tilt: f64,
++) -> f64 {
++    let delta_temperature_c = surface_temperature_c - air_temperature_c;
++    match branch_from_delta(delta_temperature_c, cos_tilt) {
++        TarpNaturalConvectionBranch::VerticalWall => {
++            1.31 * delta_temperature_c.abs().powf(1.0 / 3.0)
++        }
++        TarpNaturalConvectionBranch::UnstableHorizontalOrTilt => {
++            9.482 * delta_temperature_c.abs().powf(1.0 / 3.0) / (7.238 - cos_tilt.abs())
++        }
++        TarpNaturalConvectionBranch::StableHorizontalOrTilt => {
++            1.810 * delta_temperature_c.abs().powf(1.0 / 3.0) / (1.382 + cos_tilt.abs())
++        }
++    }
++}
++
++/// Non-Kiva CalcASHRAEDetailedIntConvCoeff output assignment. LowHConvLimit is
++/// a real caller-owned operand; Original uses a strict less-than assignment,
++/// with no high bound or NaN substitution. Other surface rows are caller-owned.
++#[must_use]
++pub fn detailed_inside_coefficient_w_per_m2_k(
++    surface_temperature_c: f64,
++    air_temperature_c: f64,
++    outward_cos_tilt: f64,
++    low_convection_limit_w_per_m2_k: f64,
++) -> f64 {
++    let mut coefficient = natural_coefficient_w_per_m2_k(
++        surface_temperature_c,
++        air_temperature_c,
++        -outward_cos_tilt,
++    );
++    if coefficient < low_convection_limit_w_per_m2_k {
++        coefficient = low_convection_limit_w_per_m2_k;
++    }
++    coefficient
++}
++
++/// Existing fixed lower-limit scalar owner; this does not read user configuration.
++#[must_use]
++pub fn default_low_convection_limit_w_per_m2_k() -> f64 {
++    super::ENERGYPLUS_LOW_CONVECTION_LIMIT_W_PER_M2_K
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn exact_zero_and_nonzero_neighbors_select_distinct_branches() {
++        for zero in [0.0, -0.0] {
++            assert_eq!(branch(zero, 0.0, 1.0), TarpNaturalConvectionBranch::VerticalWall);
++            assert_eq!(branch(2.0, 0.0, zero), TarpNaturalConvectionBranch::VerticalWall);
++        }
++        assert_eq!(branch(f64::from_bits(1), 0.0, 1.0), TarpNaturalConvectionBranch::UnstableHorizontalOrTilt);
++        assert_eq!(branch(2.0, 0.0, f64::from_bits(1)), TarpNaturalConvectionBranch::UnstableHorizontalOrTilt);
++        assert_eq!(branch(-f64::from_bits(1), 0.0, 1.0), TarpNaturalConvectionBranch::StableHorizontalOrTilt);
++    }
++
++    #[test]
++    fn all_strict_sign_combinations_follow_original_predicates() {
++        assert_eq!(branch(2.0, 0.0, 1.0), TarpNaturalConvectionBranch::UnstableHorizontalOrTilt);
++        assert_eq!(branch(-2.0, 0.0, -1.0), TarpNaturalConvectionBranch::UnstableHorizontalOrTilt);
++        assert_eq!(branch(2.0, 0.0, -1.0), TarpNaturalConvectionBranch::StableHorizontalOrTilt);
++        assert_eq!(branch(-2.0, 0.0, 1.0), TarpNaturalConvectionBranch::StableHorizontalOrTilt);
++    }
++
++    #[test]
++    fn detailed_uses_real_supplied_lower_limit() {
++        let supplied_limit = f64::from_bits(0x401c_0000_0000_0000);
++        assert_eq!(detailed_inside_coefficient_w_per_m2_k(20.0, 20.0, 1.0, supplied_limit).to_bits(), supplied_limit.to_bits());
++        assert_eq!(detailed_inside_coefficient_w_per_m2_k(20.0, 20.0, 1.0, -0.0).to_bits(), 0.0_f64.to_bits());
++    }
++
++    #[test]
++    fn detailed_has_no_invented_upper_cap() {
++        let coefficient = detailed_inside_coefficient_w_per_m2_k(1.0e18, 0.0, -1.0, 0.1);
++        assert!(coefficient.is_finite());
++        assert!(coefficient > 1000.0);
++    }
++
++    #[test]
++    fn unordered_or_infinite_diagnostic_results_are_not_floored() {
++        let nan = f64::from_bits(0x7ff8_0000_0000_1234);
++        assert!(detailed_inside_coefficient_w_per_m2_k(nan, 0.0, -1.0, 0.1).is_nan());
++        assert_eq!(detailed_inside_coefficient_w_per_m2_k(f64::INFINITY, 0.0, -1.0, 0.1), f64::INFINITY);
++        let raw = natural_coefficient_w_per_m2_k(28.0, 20.0, 0.0);
++        assert_eq!(detailed_inside_coefficient_w_per_m2_k(28.0, 20.0, 0.0, nan).to_bits(), raw.to_bits());
++    }
++}

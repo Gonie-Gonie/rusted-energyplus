@@ -1,0 +1,94 @@
+{
+  "schema": "src06-Header-main-thread-factual-review.v1",
+  "actual_custody": {
+    "path": ".runtime/porting/SRC-06/selected-main-thread-observation-01/custody.json",
+    "sha256": "c27f928deb4c7349df4181a769c1fa2e85c3374243bb590711cf4b295ad57003",
+    "size_bytes": 1958430
+  },
+  "actual_outer_execution": {
+    "path": ".runtime/porting/SRC-06/selected-main-thread-driver-command-01/receipt.json",
+    "sha256": "e524abb9c115a153cdc4b671148b798fa2bb561ff30c66d0947af7a78d204a95",
+    "size_bytes": 36959
+  },
+  "Source_preparation": {
+    "path": ".runtime/porting/SRC-06/tarp-inside-selected-rust-prep-01/manifest.json",
+    "sha256": "35323a3e5b40e4eb88073ec3872a1a91575d69f6ecd3d2885a8497a244ff64bf",
+    "size_bytes": 22891
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/8a/8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934",
+    "sha256": "8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934"
+  },
+  "actual_API_correspondence": {
+    "path": ".runtime/porting/SRC-06/tarp-inside-applied-01/actual-API-correspondence.json",
+    "sha256": "1f888d4469d163fc62934034001fb6d0609ff982b42aac00055dc3d6b55f70f3",
+    "size_bytes": 3052
+  },
+  "actual_artifact_proof": {
+    "path": ".runtime/porting/SRC-06/selected-main-thread-observation-01/artifact.json",
+    "sha256": "a463212bb10331348e61e37a1fbaf9fec4123f4ecb5c58d0b055ad3f7a3234e3",
+    "size_bytes": 3156
+  },
+  "actual_build_execution": {
+    "path": ".runtime/porting/SRC-06/selected-main-thread-observation-01/Cargo-command/receipt.json",
+    "sha256": "3c7bd4379db07d549e56607d0be79d402e75777e311c3a0d0a34fdc4a2ab5047",
+    "size_bytes": 5951
+  },
+  "actual_execution": {
+    "path": ".runtime/porting/SRC-06/selected-main-thread-observation-01/command/receipt.json",
+    "sha256": "c8d082e40d44c317da090c4028c70bb97f5deb9b3e21839ac0ea5531ca355dc6",
+    "size_bytes": 67386
+  },
+  "quality_executions": {
+    "fmt_check": {
+      "path": ".runtime/porting/SRC-06/tarp-inside-quality-01/fmt-command/receipt.json",
+      "sha256": "6ed9f48d246519cdf57084ca90dc481e8f323224a1387ea254de03bfcab73396",
+      "size_bytes": 3112
+    },
+    "clippy": {
+      "path": ".runtime/porting/SRC-06/tarp-inside-quality-01/clippy-command/receipt.json",
+      "sha256": "ebeb294da5276638ddb041eccc24dd10687a0581967501c8ba78612e35c41c25",
+      "size_bytes": 3309
+    },
+    "focused": {
+      "path": ".runtime/porting/SRC-06/tarp-inside-quality-01/focused-command/receipt.json",
+      "sha256": "6ae44cfdbda3f00bcd9f39a7f365225663bac4a358294928f412cbab9d3f2f87",
+      "size_bytes": 3296
+    },
+    "workspace": {
+      "path": ".runtime/porting/SRC-06/tarp-inside-quality-01/workspace-command/receipt.json",
+      "sha256": "1e851fbe49e8dc105b36b345b87c9a03c34c8c84456022fc0a60a8b13beb5c41",
+      "size_bytes": 3339
+    }
+  },
+  "actual_binary": {
+    "path": "target/debug/src06_tarp_inside_main.exe",
+    "sha256": "750f4930368574e4c11146b4732d60821d7f80c8cf0ef98cc0ff617d1be014f7",
+    "size_bytes": 29946183
+  },
+  "actual_output_opaque_full_identity": {
+    "path": ".runtime/porting/SRC-06/selected-main-thread-observation-01/result.json",
+    "sha256": "72ab82741d85fd3b2c64a9fed6d69d942a53a24ea1152cc1905d55584e21da22",
+    "size_bytes": 289207
+  },
+  "FULL_factual_custody_accepted": true,
+  "complete_Source_members_current_and_archived": 3929,
+  "frozen_before_rows": 7874,
+  "frozen_after_rows": 7881,
+  "original_frozen_rows_unchanged": true,
+  "actual_Cargo_JSON_independently_extracted": true,
+  "sole_dev_binary_exact_profile_main_manifest_and_argc3": true,
+  "two_API_proposal_archive_formatter_and_current_Source_joins": true,
+  "four_exact_quality_roles_same_Source_before_build": true,
+  "outer_build_inner_chronology_and_real_exit0": true,
+  "distinct_file_identities_hashed": 7889,
+  "descriptor_checks": 23683,
+  "numerical_result_parsed": false,
+  "numerical_PASS_claimed": false,
+  "historical_worker_state_inferred": false,
+  "gates_updated": false,
+  "limitations": [
+    "Factual custody review only; endpoint/result payload remains opaque.",
+    "This does not certify full dispatcher, ordinary convection traversal, or scientific parity."
+  ]
+}

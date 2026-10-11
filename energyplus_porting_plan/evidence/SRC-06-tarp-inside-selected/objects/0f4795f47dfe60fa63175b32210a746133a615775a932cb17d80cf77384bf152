@@ -1,0 +1,68 @@
+"""Source-only fixed-owner getter successor; no canonical or target actions."""
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+PARENT = ROOT / '.runtime/porting/SRC-06/tarp-inside-current-prep-01/manifest.json'
+OUT = ROOT / '.runtime/porting/SRC-06/tarp-inside-getter-prep-01'
+
+
+def ref(path):
+    data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(data).hexdigest(), 'size_bytes': len(data), 'line_count': len(data.splitlines())}
+
+
+def write(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream:
+        stream.write(data)
+    return ref(path)
+
+
+def diff(before, after, left, right):
+    return ''.join(difflib.unified_diff(before.decode().splitlines(True), after.decode().splitlines(True), fromfile=left, tofile=right)).encode()
+
+
+def main():
+    assert ref(PARENT)['sha256'] == '669062f7e8d00dc1c24d2ca100d48bd4697dc98edefdad4ce42db69588bf2d55'
+    parent = json.loads(PARENT.read_bytes())
+    assert not OUT.exists()
+    row = parent['application'][1]
+    before = (ROOT / row['proposal']['path']).read_bytes()
+    marker = b'#[cfg(test)]'
+    addition = b'/// Existing fixed lower-limit scalar owner; this does not read user configuration.\n' + b'#[must_use]\npub fn default_low_convection_limit_w_per_m2_k() -> f64 {\n    super::ENERGYPLUS_LOW_CONVECTION_LIMIT_W_PER_M2_K\n}\n\n'
+    assert before.count(marker) == 1
+    after = before.replace(marker, addition + marker)
+    assert after.replace(addition, b'', 1) == before
+    proposed = write(OUT / 'proposed' / row['canonical_path'], after)
+    before_ref = write(OUT / 'before/tarp_inside.rs', before)
+    narrow = write(OUT / 'diffs/getter.from-current01.diff', diff(before, after, row['proposal']['path'], proposed['path']))
+    full_diff = write(OUT / 'diffs/new-module.diff', diff(b'', after, row['canonical_path'], row['canonical_path']))
+    manifest = copy.deepcopy(parent)
+    manifest['predecessor_source_preparation'] = ref(PARENT)
+    manifest['getter_correspondence'] = {'accepted_parent_literal': row['proposal'], 'before_archive': before_ref, 'exact_getter_delta': narrow,
+        'inverse_restores_all_parent_bytes': True, 'fixed_existing_owner_only': True, 'runtime_user_configuration_default_claimed': False}
+    manifest['application'][1]['proposal'] = proposed
+    manifest['application'][1]['exact_diff'] = full_diff
+    manifest['own_sources'][1] = proposed
+    manifest['SRC06_delta_correspondence'][1]['proposed_bytes_exact_accepted01'] = False
+    manifest['SRC06_delta_correspondence'][1]['accepted_math_body_and_tests_exact_parent'] = True
+    manifest['SRC06_delta_correspondence'][1]['getter_only_delta'] = narrow
+    source = ROOT / '.reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh'
+    lines = source.read_bytes().splitlines(True)
+    literal = b''.join(lines[1789:1790])
+    assert b'LowHConvLimit' in literal and b'0.1' in literal
+    manifest['selected_source_ranges'].append({'source': ref(source), 'start_line': 1790, 'end_line': 1790,
+        'purpose': 'Actual Original fixed LowHConvLimit owner default; getter returns existing Rust constant, never copied literal',
+        'literal_range': write(OUT / 'ranges/DataHeatBalance.hh.1790.txt', literal)})
+    manifest['source_dependencies'].extend([ref(PARENT), ref(Path(__file__))])
+    manifest['README'] = write(OUT / 'README.md', b'# SRC-06 fixed-owner getter successor (held Source)\n\nThe accepted current composition 669062f7 remains the literal parent. This successor adds only a read-only public getter returning the existing parent lower-limit constant. It copies no default literal and claims no user-configuration support. The complete Natural/Detailed math and five tests remain byte-exact under removal of the getter addition. Three other application rows remain literal parent rows.\n\nApply the four cumulative rows only after Root review; this package has performed no canonical mutation, formatter, Cargo, Native execution, or numerical validation. The selected standalone observer must call the getter rather than supply a duplicated default.\n')
+    write(OUT / 'manifest.json', (json.dumps(manifest, indent=2) + '\n').encode())
+    print(json.dumps(ref(OUT / 'manifest.json')))
+
+
+if __name__ == '__main__':
+    main()

@@ -11,7 +11,7 @@
 
 파일: `src/EnergyPlus/ConvectionCoefficients.cc`  
 심벌: `CalcASHRAETARPNatural; CalcASHRAEDetailedIntConvCoeff; InitIntConvCoeff`  
-대상 블록: TARP 수직·안정/불안정 경사 분기와 대상 계수 상·하한. InitIntConvCoeff에서는 해당 선택 경로만.  
+대상 블록: TARP 수직·안정/불안정 경사 분기와 strict 하한 대입. 선택 원본에는 상한 clamp가 없음. InitIntConvCoeff에서는 해당 선택 경로만.
 함께 읽을 선언/호출자: ConvectionCoefficients.hh  
 출처: https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/ConvectionCoefficients.cc
 
@@ -68,3 +68,46 @@ SUR-05에서 EP와 같은 반복 회차에 갱신
 증거 경로:  
 최대오차/RMSE/상태 불일치:  
 추가 검토할 helper:  
+
+## Bounded Source contract (reviewed before application)
+
+`ConvectionCoefficients.cc:1907–1975` and the three inline correlations in
+`ConvectionCoefficients.hh:394–460` are complete direct-unit Source bounds.
+Natural uses one Tsurf−Tamb subtraction, exact DeltaTemp==0 or cosTilt==0,
+then strict same-sign enhanced versus remaining stable expressions. Detailed
+non-Kiva passes negative actual Surface.CosTilt and only applies strict
+Hc<LowHConvLimit assignment. There is no upper clamp, EPS predicate or nonfinite
+floor in these selected bodies; HighHConvLimit is not an operand. Default lower
+limit0.1 is Source-owned at DataHeatBalance.hh1790 and fixed by CON01 admission.
+The direct API takes an explicit actual lower-limit owner for diagnostic cases.
+
+The accepted inside-consumer change borrows initialized geometry.cos_tilt instead of
+recomputing tilt degrees. Exact geometric90 degrees has a stored nonzero cosine;
+it must not be silently changed to the exact-zero vertical branch. Existing tests
+preserve unrelated assertions and add real stored-owner independence checks.
+
+The full selected caller is InitIntConvCoeff141–391: user setup/flags, true
+Zone.spaceIndexes/space HT traversal, spaceHeatBalance.MAT, optional resimulation,
+representative filtering, SetByZone/ASHRAETARP non-window dispatch, lower bound,
+EMS and window tails. Only CON01-admitted non-Kiva/no-window/no-override branch
+is the proposed arithmetic scope; a direct call does not certify this traversal.
+Real entry is HBSM473 and refresh only positive InsideSurfIterations divisible by
+ItersReevalConvCoeff30 at HBSM7944–7946/8824–8826 (DataHeatBalSurface.hh70).
+Current Rust per-iteration/reference-map fallbacks remain a documented caller
+gap and are not asserted equivalent or changed by this held unit proposal.
+
+Native direct inputs/actual calls must be frozen and released before math applies.
+At the proposal stage no tests had been executed and no numerical Native answers
+had been supplied. The actual selected proof is recorded below; gates remain unchanged. Full caller/space-MAT/cadence and SUR05 integration remain pending.
+
+## Actual selected Natural/Detailed math and quality
+
+The unchanged-core Native factual baseline was released before applying the Rust math. The selected public Natural and non-Kiva Detailed APIs were genuinely invoked on 28 literal inputs and 60 ordered calls. All input/initial full-owner joins passed: 1,064 input joins, 960 full pre-owner and 988 endpoint checks, zero mismatches. The 60 paired-call rows include 54 fully finite endpoints that match IEEE bits/class/signed zero exactly, plus six generated nonfinite endpoints checked by class and excluded from numerical PASS. All 34 required-unavailable rows remain explicit: six generated nonfinite observations and 28 Native-only constructor/high-limit/Objexx/backend/prefix contexts. No tolerance or formula was changed to admit a result.
+
+The first comparer stopped before any pairs because Rust's Windows verbatim path spelling differed from Python's resolved spelling. The bounded successor checks filesystem same-file identity against the fully authenticated input; input bytes/size, every literal owner, the original prospective policy02 and all numerical rules are unchanged. The failed comparison and fresh successful comparison remain retained. No target rerun or floating point control change was used for this repair.
+
+Actual Rust Source 8aa752f4 has 3,929 members; 3,926 unrelated members remain byte-exact across application. Formatter review accepted only the import move, line wrapping and optional trailing commas. Four genuine Source-identical checks passed: fmt, Clippy with warnings denied, focused 346/0/2 and workspace 4,973/0/2 (passed/failed/ignored). The actual standalone dev Cargo executable and argc3 execution, Native provider/core/PE audit, complete observations and uncapped ledgers are retained.
+
+The implementation removes the former EPS-zero branch, upper clamp and nonfinite floor from these selected equations, and reads the actual stored cosine. Production integration remains incomplete: InitIntConvCoeff first-call setup/ordered zone-space traversal, retained space MAT and balance reference air, initial/refresh temperature-array distinction, positive completed-iteration cadence30 after radiation, and immediate surface-term updates require the next caller unit. Kiva/windows/EMS and the full ordinary handoff remain outside this selected proof. All four full-card gates, A 14/54 and B 14/64 remain unchanged.
+
+Evidence: [complete selected TARP comparison, application and quality](../evidence/SRC-06-tarp-inside-selected/summary.json).

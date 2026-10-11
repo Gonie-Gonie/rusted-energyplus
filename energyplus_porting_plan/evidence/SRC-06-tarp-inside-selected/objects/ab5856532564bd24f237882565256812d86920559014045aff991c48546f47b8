@@ -1,0 +1,53 @@
+from pathlib import Path
+import ast, difflib, hashlib, json
+
+ROOT = Path.cwd()
+OLD = ROOT / '.runtime/porting/SRC-06/native-tarp-inside-prep-01'
+OUT = ROOT / '.runtime/porting/SRC-06/native-tarp-inside-prep-02'
+assert not (OUT/'manifest.json').exists()
+OUT.mkdir(parents=True, exist_ok=True)
+def ref(path):
+    path = Path(path)
+    data = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(data).hexdigest(), size_bytes=len(data), line_count=len(data.splitlines()))
+def write(path, text):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding='utf-8', newline='\n')
+def delta(a,b,name):
+    return ''.join(difflib.unified_diff(a.splitlines(True),b.splitlines(True),fromfile='a/'+name,tofile='b/'+name))
+m=json.loads((OLD/'manifest.json').read_text(encoding='utf-8'))
+name='tarp_inside_reference_helper.cpp'
+before=(OLD/name).read_text(encoding='utf-8')
+text=before.replace('json exception = nullptr, return_value = nullptr;', 'json exception = nullptr;\n        std::optional<double> returned_scalar;')
+text=text.replace('return_value = call();','returned_scalar = call();')
+text=text.replace('        stopped = !returned;', '        json const return_value = returned_scalar ? Src06::scalar(*returned_scalar) : json(nullptr);\n        stopped = !returned;')
+text=text.replace('[&]() -> json {\n                return Src06::scalar(EnergyPlus::Convect::CalcASHRAETARPNatural(ts, ta, cosine));', '[&]() -> std::optional<double> {\n                return EnergyPlus::Convect::CalcASHRAETARPNatural(ts, ta, cosine);')
+text=text.replace('[&]() -> json {\n                EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff', '[&]() -> std::optional<double> {\n                EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff')
+text=text.replace('                return nullptr;', '                return std::nullopt;')
+assert text != before and 'return_value = call' not in text
+# Full physical same-parent helper/header/recipe; mathematical input/policy exact01.
+for n in ['tarp_inside_reference_helper.cpp','tarp_inside_reference_fields.hh','tarp_inside_reference.cmake']:
+    source=(OLD/n).read_text(encoding='utf-8')
+    write(OUT/n,text if n==name else source)
+    p=OUT/'before'/n;p.parent.mkdir(exist_ok=True);p.write_bytes((OLD/n).read_bytes())
+    write(OUT/'diffs'/(n+'.from01.diff'),delta(source,(OUT/n).read_text(encoding='utf-8'),n))
+newrange=next(r for r in m['selected_source_ranges'] if r['purpose']=='Actual excluded Kiva boundary and non-Kiva exterior constant')
+source=ROOT/newrange['source']['path'];a,b=291,297
+p=OUT/'source-ranges'/'DataSurfaces.hh.291-297.txt';p.parent.mkdir(exist_ok=True)
+p.write_bytes(b''.join(source.read_bytes().splitlines(True)[a-1:b]))
+newrange.update(start_line=a,end_line=b,archive=ref(p))
+for key in ['own_sources','Native_source_files']:
+    m[key]=[ref(OUT/Path(row['path']).name) for row in m[key]]
+m['compiled_source_files']=[ref(OUT/name)]
+readme=(OLD/'README.md').read_text(encoding='utf-8')+'''\nSelf-review successor02 moves scalar DTO copying outside the actual call/return\ntry block. A JSON copy failure cannot be mislabeled as an Original source throw;\nit propagates to incomplete helper output and cannot release numerical custody.\nThe genuine external/Kiva constant range is corrected to DataSurfaces.hh291-297.\nAll cases/policy and header/recipe bytes remain exact01; no arithmetic changed.\n'''
+write(OUT/'README.md',readme)
+for n in ['manifest.json','README.md']:
+    p=OUT/'before'/n;p.write_bytes((OLD/n).read_bytes())
+write(OUT/'diffs'/'README.from01.diff',delta((OLD/'README.md').read_text(encoding='utf-8'),readme,'README.md'))
+m['predecessor_source_preparation']=ref(OLD/'manifest.json')
+m['before_archives']=[dict(original=ref(OLD/n),archive=ref(OUT/'before'/n)) for n in ['manifest.json','README.md','tarp_inside_reference_helper.cpp','tarp_inside_reference_fields.hh','tarp_inside_reference.cmake']]
+m['narrow_exact_diffs']=[ref(p) for p in sorted((OUT/'diffs').iterdir())]
+m['README']=ref(OUT/'README.md');m['author']=ref(__file__)
+ast.parse(Path(__file__).read_text(encoding='utf-8'))
+write(OUT/'manifest.json',json.dumps(m,indent=2)+'\n')
+print(json.dumps(ref(OUT/'manifest.json')))

@@ -1,0 +1,84 @@
+    }
+
+    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        auto const &zone = state.dataHeatBal->Zone(ZoneNum);
+        for (int spaceNum : zone.spaceIndexes) {
+            auto const &thisSpace = state.dataHeatBal->space(spaceNum);
+            Real64 spaceMAT = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT;
+            for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+
+                if (present(ZoneToResimulate)) {
+                    if ((ZoneNum != ZoneToResimulate) && (state.dataSurface->SurfAdjacentZone(SurfNum) != ZoneToResimulate)) {
+                        continue; // skip surfaces that are not associated with this zone
+                    }
+                }
+                auto const &surface = Surface(SurfNum);
+                if (state.dataSurface->UseRepresentativeSurfaceCalculations) {
+                    int repSurfNum = surface.RepresentativeCalcSurfNum;
+                    if (SurfNum != repSurfNum) {
+                        continue;
+                    }
+                }
+
+                HcInt intConvAlgo = state.dataSurface->surfIntConv(SurfNum).model;
+                if (intConvAlgo == HcInt::SetByZone) {
+                    intConvAlgo = zone.IntConvAlgo;
+                }
+
+                switch (intConvAlgo) {
+                case HcInt::Value:
+                case HcInt::Schedule:
+                case HcInt::UserCurve: {
+                    state.dataHeatBalSurf->SurfHConvInt(SurfNum) = SetIntConvCoeff(state, SurfNum);
+                    // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
+                    if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit) {
+                        state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
+                    }
+                } break;
+
+                case HcInt::ASHRAESimple: {
+                    CalcASHRAESimpleIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), spaceMAT);
+                    // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
+                    if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit) {
+                        state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
+                    }
+                } break;
+
+                case HcInt::ASHRAETARP: {
+                    if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) {
+                        CalcASHRAEDetailedIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), spaceMAT);
+                    } else {
+                        CalcISO15099WindowIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), spaceMAT);
+                    }
+
+                    // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
+                    if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit) {
+                        state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
+                    }
+                } break;
+
+                case HcInt::AdaptiveConvectionAlgorithm: {
+                    ManageIntAdaptiveConvAlgo(state, SurfNum);
+                } break;
+
+                case HcInt::CeilingDiffuser:
+                case HcInt::TrombeWall: {
+                    // Already done above and can't be at individual surface
+                } break;
+
+                case HcInt::ASTMC1340: {
+                    CalcASTMC1340ConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), spaceMAT);
+                } break;
+
+                default: {
+                    ShowFatalError(state, "Unhandled convection coefficient algorithm."); // assert?
+                } break;
+                }
+
+                if (state.dataSurface->SurfEMSOverrideIntConvCoef(SurfNum)) {
+                    state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataSurface->SurfEMSValueForIntConvCoef(SurfNum);
+                    if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                        Real64 hConst = state.dataSurface->SurfEMSValueForIntConvCoef(SurfNum);
+                        state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(hConst);
+                    }
+                }

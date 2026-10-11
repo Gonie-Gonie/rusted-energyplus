@@ -1,0 +1,22 @@
+{
+  "schema": "src06-comparer02-Root-cumulative-Source-review.v1",
+  "preparation": {
+    "path": ".runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-02/manifest.json",
+    "sha256": "d31df820c9642467b3bdf474a499dc146307e0b2572c18a2ff6e148adf43a99b",
+    "size_bytes": 34163
+  },
+  "Root_FULL01_and_FULL02_delta_accepted": true,
+  "whole_identities_checked": 86,
+  "literal_ranges_checked": 36,
+  "diffs_regenerated": 5,
+  "changed_functions": [
+    "frozen_rows",
+    "compare"
+  ],
+  "all_preowner_and_retained_cells_exact_including_NaN_payload": true,
+  "current_generated_arithmetic_only_diagnostic_class_unavailable": true,
+  "historical_index_keeps_full_hash_guards": true,
+  "numerical_results_read_for_this_review": false,
+  "target_executed": false,
+  "gates_updated": false
+}

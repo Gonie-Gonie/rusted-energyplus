@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-06\tarp-inside-publication-prep-02\publish.py", line 127, in <module>
+    member = native_rows[row['historical_path']]; declared = row['declared_historical_reference']; assert declared['sha256'] == member['archive']['sha256'] and declared['size_bytes'] == member['size_bytes']; assert checked(row['authenticated_archive'], retain=False).read_bytes() == checked(member['archive'], retain=False).read_bytes()
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

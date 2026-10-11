@@ -667,16 +667,24 @@
 
         let wall_coefficient =
             energyplus_tarp_inside_convection_coefficient_w_per_m2_k(wall, 22.0, 20.0);
-        let expected_wall = 1.31 * delta_term;
+        let expected_wall = 1.810 * delta_term / (1.382 + wall.geometry.cos_tilt.abs());
         assert!((wall_coefficient - expected_wall).abs() < 1.0e-12);
         assert_eq!(
             energyplus_tarp_inside_convection_branch_id(wall, 22.0, 20.0),
-            "vertical-wall"
+            "stable-horizontal-or-tilt"
         );
 
         let zero_delta_coefficient =
             energyplus_tarp_inside_convection_coefficient_w_per_m2_k(floor, 20.0, 20.0);
         assert_eq!(zero_delta_coefficient, 0.1);
+
+        let mut stored_owner = wall.clone();
+        stored_owner.tilt_deg = 0.0;
+        assert_eq!(
+            energyplus_tarp_inside_convection_coefficient_w_per_m2_k(&stored_owner, 22.0, 20.0).to_bits(),
+            wall_coefficient.to_bits()
+        );
+        assert_eq!(energyplus_tarp_inside_convection_branch_id(&stored_owner, 22.0, 20.0), "stable-horizontal-or-tilt");
 
         Ok(())
     }

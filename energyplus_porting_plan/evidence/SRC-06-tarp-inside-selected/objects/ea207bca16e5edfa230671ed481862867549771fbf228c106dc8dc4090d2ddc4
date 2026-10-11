@@ -1,0 +1,90 @@
+"""Source-only copied-owner profile repair and linear historical-source lookup."""
+import ast
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+PARENT = ROOT / '.runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-01'
+OUT = ROOT / '.runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-02'
+
+
+def ref(path):
+    data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(data).hexdigest(), 'size_bytes': len(data), 'line_count': len(data.splitlines())}
+
+
+def write(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream:
+        stream.write(data)
+    return ref(path)
+
+
+def main():
+    assert ref(PARENT / 'manifest.json')['sha256'] == '1269b8dc8be7b52adb6e275550599a1d1bb99e9077ab51376de03a0e1d4fecc4'
+    assert not OUT.exists()
+    manifest = json.loads((PARENT / 'manifest.json').read_bytes())
+    body = (PARENT / 'compare.py').read_text(encoding='utf-8')
+    substitutions = [
+        ("    paths = set()\n    for left, right in zip(before, after):", "    paths = set()\n    resolved_members = {(ROOT / name).resolve(): member for name, member in members.items()}\n    for left, right in zip(before, after):"),
+        ("        member = members.get(left['path'])\n        if member is None:\n            member = next((v for n, v in members.items() if (ROOT / n).resolve() == (ROOT / left['path']).resolve()), None)", "        member = resolved_members.get((ROOT / left['path']).resolve())"),
+        ("prior_n, prior_r, generated, cursor, stopped, unreached = ncase['prepared_state'], rcase['prepared_state'], set(), 0, False, []", "prior_n, prior_r, cursor, stopped, unreached = ncase['prepared_state'], rcase['prepared_state'], 0, False, []"),
+        ("endpoints.append((spec, op, key, ncall, rcall, set(generated)))\n                    if detailed:\n                        generated.add(selected)", "endpoints.append((spec, op, key, ncall, rcall))"),
+        ("for spec, op, key, ncall, rcall, generated in endpoints:", "for spec, op, key, ncall, rcall in endpoints:"),
+        ("pair(left, right, key + '/full-preowner', 'pre_owner_comparisons', generated)", "pair(left, right, key + '/full-preowner', 'pre_owner_comparisons', set())"),
+        ("after_generated = generated | ({op['surface_index'] - 1} if detailed else set())", "after_generated = {op['surface_index'] - 1} if detailed else set()"),
+    ]
+    original = body
+    for old, new in substitutions:
+        assert body.count(old) == 1
+        body = body.replace(old, new)
+    inverse = body
+    for old, new in reversed(substitutions):
+        assert inverse.count(new) == 1
+        inverse = inverse.replace(new, old)
+    assert inverse == original
+    comparer_ref = write(OUT / 'compare.py', body.encode())
+    policy = json.loads((PARENT / 'policy.json').read_bytes())
+    policy['finite_arithmetic']['fields'] = ['Natural.actual_return_value', 'current_returned_Detailed.selected_SurfHConvInt']
+    policy['copy_rules']['all_full_preowners'] = 'exact IEEE bits/class including NaN payloads, regardless of an earlier generating call'
+    policy['copy_rules']['Natural.full_state_and_unselected_rows'] = 'within-engine full exact retention and cross-engine exact IEEE bits/class including retained NaN payloads'
+    policy['copy_rules']['generated_cell_provenance'] = 'current Source route only: current Detailed selected output arithmetic; all preowner and retained/unselected endpoint cells copied exact'
+    policy_ref = write(OUT / 'policy.json', (json.dumps(policy, indent=2) + '\n').encode())
+    readme = (PARENT / 'README.md').read_bytes() + b'''\n## Fresh02 prospective copy-rule correction\n\nThe entire01 Source review carries forward. Full preowners and every retained/unselected endpoint cell now require exact bits/class including NaN payloads, even if an earlier call generated that cell. Only the current returned Detailed selected output and Natural scalar return receive the arithmetic diagnostic class/unavailable rule. This implements the immutable Original copied/retained policy and adds no tolerance or input change. The first01 publication remains immutable.\n\nHistorical frozen-Source matching now resolves an index once instead of scanning all Source members for each artifact; all the same full SHA/size and before/after checks remain. Root-authorized Native outer/sidecar metadata (argv/schema/fullhash refs only) was inspected to confirm the interface; no Native numerical result was read. No Rust result exists for this package. No target, import, canonical change or execution was performed.\n'''
+    readme_ref = write(OUT / 'README.md', readme)
+    rows = [(PARENT / 'compare.py', comparer_ref), (PARENT / 'policy.json', policy_ref), (PARENT / 'README.md', readme_ref)]
+    before, deltas = [], []
+    for i, (old, row) in enumerate(rows, 1):
+        a, b = old.read_bytes(), (ROOT / row['path']).read_bytes()
+        before.append(write(OUT / 'before' / f'{i:02d}.source', a))
+        delta = ''.join(difflib.unified_diff(a.decode().splitlines(True), b.decode().splitlines(True), fromfile=ref(old)['path'], tofile=row['path'])).encode()
+        deltas.append(write(OUT / 'diffs' / f'{i:02d}.diff', delta))
+    before.append(write(OUT / 'before/manifest.json', (PARENT / 'manifest.json').read_bytes()))
+    manifest = copy.deepcopy(manifest)
+    manifest['predecessor_source_preparation'] = ref(PARENT / 'manifest.json')
+    manifest['own_sources'] = [comparer_ref, policy_ref]
+    manifest['README'] = readme_ref
+    manifest['runtime_interfaces']['comparer'] = comparer_ref
+    manifest['runtime_interfaces']['prospective_policy'] = policy_ref
+    manifest['narrow_before_archives'] = before
+    manifest['narrow_exact_diffs'] = deltas
+    manifest['inherited_template_diffs'] = manifest['exact_template_diffs']
+    cumulative = []
+    for i, (template, row) in enumerate(zip(manifest['before_templates'], manifest['own_sources']), 1):
+        a, b = (ROOT / template['path']).read_bytes(), (ROOT / row['path']).read_bytes()
+        delta = ''.join(difflib.unified_diff(a.decode().splitlines(True), b.decode().splitlines(True), fromfile=template['path'], tofile=row['path'])).encode()
+        cumulative.append(write(OUT / 'diffs' / f'cumulative-{i:02d}.diff', delta))
+    manifest['exact_template_diffs'] = cumulative
+    manifest['source_dependencies'] += [ref(PARENT / 'manifest.json'), ref(Path(__file__))]
+    manifest['source_profile_correction_before_numerical_results_read'] = True
+    manifest['historical_Source_lookup_only_performance_change'] = True
+    ast.parse(body); ast.parse(Path(__file__).read_bytes())
+    write(OUT / 'manifest.json', (json.dumps(manifest, indent=2) + '\n').encode())
+    print(json.dumps(ref(OUT / 'manifest.json')))
+
+
+if __name__ == '__main__':
+    main()

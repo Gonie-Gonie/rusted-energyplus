@@ -1,0 +1,131 @@
+{
+  "schema": "native-core-build.v1",
+  "checks_passed": true,
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "completed_utc": "2026-10-07T13:35:26.581486+00:00",
+  "purpose": "Generic source-built C++ reference core; no porting gate update or whole-simulation conformance claim",
+  "configuration": {
+    "build_type": "RelWithDebInfo",
+    "reference_optimization_override": "-O0 -g -DNDEBUG",
+    "source_default_optimized_build_passes": false,
+    "cmake_variables": {
+      "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+      "CMAKE_CXX_FLAGS": "-Wa,-mbig-obj -ffp-contract=off",
+      "CMAKE_CXX_FLAGS_RELWITHDEBINFO": "-O0 -g -DNDEBUG",
+      "CMAKE_C_FLAGS": "",
+      "CMAKE_C_FLAGS_RELWITHDEBINFO": "-O2 -g -DNDEBUG",
+      "CMAKE_C_COMPILER": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/gcc.exe",
+      "CMAKE_CXX_COMPILER": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/g++.exe",
+      "CMAKE_CXX_COMPILER_LAUNCHER": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/ccache.exe",
+      "CMAKE_CXX_STANDARD": null,
+      "FORCE_DEBUG_ARITHM_GCC_OR_CLANG": "OFF",
+      "ENABLE_PCH": "ON",
+      "ENABLE_OPENMP": "OFF",
+      "USE_PSYCH_ERRORS": "ON",
+      "USE_PSYCH_STATS": "OFF",
+      "USE_PSYCH_CACHE": null,
+      "USE_GLYCOL_CACHE": null,
+      "BUILD_TESTING": "OFF",
+      "BUILD_FORTRAN": "OFF",
+      "LINK_WITH_PYTHON": "OFF"
+    },
+    "actual_options": {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/provenance/final-core/actual-options.json",
+      "sha256": "1c08b4f4a8584fcc4ae4e8987c420a3ed409a1fc10a9025a55d4b3f6d43a2b47",
+      "bytes": 14359
+    }
+  },
+  "compiler": {
+    "version": "g++.exe (MinGW-W64 x86_64-ucrt-posix-seh, built by Brecht Sanders) 13.2.0",
+    "abi": "x86_64 Windows MinGW-w64 UCRT POSIX SEH, libstdc++ non-debug containers",
+    "binary": {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/g++.exe",
+      "sha256": "d977abd355b8821f7347de03ed95a5976a2ebe6cd77a025ce8f83c79b77262d3",
+      "bytes": 1713166
+    },
+    "toolchain_publisher_receipt": {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/provenance/winlibs-gcc13-toolchain-receipt.json",
+      "sha256": "ddc475481139ca95fc520c47bb326bd996ac377919d3fb1a634c8baaca334ab9",
+      "bytes": 2249
+    },
+    "object_cache_publisher_receipt": {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/provenance/ccache-tool-receipt.json",
+      "sha256": "80516516db7e97d59edbc3108e33825388e961d9d25f20f94afd01ca079908b7",
+      "bytes": 605
+    }
+  },
+  "source_preservation": {
+    "path": ".runtime/porting/reference-energyplus-26.1.0/provenance/final-core/source-preservation.json",
+    "sha256": "2183bc8d2517413b83143108120241061544478583677d69dfd2504cb92098f2",
+    "bytes": 907
+  },
+  "artifacts": {
+    "core_library": {
+      "path": ".runtime/ep261-gcc13-o0/Products/libenergypluslib.a",
+      "sha256": "32d873007f14c3f8e3c66c6280ebd508c7cb595cea28f4a20f47ac745113a694",
+      "bytes": 1832731010
+    },
+    "api_library": {
+      "path": ".runtime/ep261-gcc13-o0/Products/energyplusapi.dll",
+      "sha256": "1b0146200b27ce5c240a46582626a7c516d9875c1bc2474da81ba7acdcd23f33",
+      "bytes": 1305150896
+    }
+  },
+  "configure": {
+    "receipt": {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/configure-gcc13-relwithdebinfo-o0-short-receipt.json",
+      "sha256": "2dc37056d336f65fab9ede16502519245c3d7a317d699fda01babee7c1e9bf3e",
+      "bytes": 3706
+    },
+    "log": {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/configure-gcc13-relwithdebinfo-o0-short.log",
+      "sha256": "47a494fea147e3beeb0ad144e10f9ff03fbad35ea42d4c1515d42c20920a27f9",
+      "bytes": 4553
+    },
+    "exit_code": 0
+  },
+  "build": {
+    "receipt": {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/build-gcc13-relwithdebinfo-o0-short-energyplusapi-receipt.json",
+      "sha256": "166a13cfed33325faebcf7d667d02d033755c4475c8b1a9387d0feaccf88c690",
+      "bytes": 2671
+    },
+    "log": {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/build-gcc13-relwithdebinfo-o0-short-energyplusapi.log",
+      "sha256": "f602a348a588f1af526cf8de32f9be6a34028ddfdae8472a502f584aacbb9648",
+      "bytes": 75239
+    },
+    "exit_code": 0,
+    "replayable_ninja_commands": {
+      "path": ".runtime/porting/reference-energyplus-26.1.0/provenance/final-core/ninja-energyplusapi-commands.txt",
+      "sha256": "9e3eecb55261c80071db38abac192a38801217826bab54bdd6bc66d308669fa5",
+      "bytes": 3188551
+    }
+  },
+  "smoke": {
+    "path": ".runtime/porting/reference-energyplus-26.1.0/provenance/final-core/api-smoke.json",
+    "sha256": "ef3c37d800eb6e889597b12c561ab4ea42b2d30e002af8de215ee15cf396c508",
+    "bytes": 2247
+  },
+  "build_directory": ".runtime/ep261-gcc13-o0",
+  "structural_path_relocation": {
+    "path": ".runtime/porting/reference-energyplus-26.1.0/provenance/o0-short-path-relocation.json",
+    "sha256": "af2ef55d90370d46daf2214cd8f21bb2f45923cd3534d2dad757389d6269966f",
+    "bytes": 635
+  },
+  "original_source_version_metadata_repair": {
+    "path": ".runtime/porting/reference-energyplus-26.1.0/provenance/archive-vs-upstream-git.json",
+    "sha256": "f0157534a568537743285334f8ea6ae99edced5adcbb0f2a78fa10c82fe20c3f",
+    "bytes": 433
+  },
+  "assertions_enabled": true,
+  "extra_warning_waivers": false,
+  "scientific_source_patches": false,
+  "same_compiler_abi_required_for_private_state": true,
+  "excluded_claims": [
+    "Default optimized upstream Windows build passes",
+    "MSVC private EnergyPlusData ABI interoperability",
+    "Porting card completion",
+    "Whole EnergyPlus physics equivalence"
+  ]
+}

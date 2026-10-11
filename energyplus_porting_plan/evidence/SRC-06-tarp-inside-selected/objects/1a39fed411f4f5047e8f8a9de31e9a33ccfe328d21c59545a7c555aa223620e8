@@ -1,0 +1,12 @@
+--- .runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-02/README.md
++++ .runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-03/README.md
+@@ -19,3 +19,9 @@
+ The entire01 Source review carries forward. Full preowners and every retained/unselected endpoint cell now require exact bits/class including NaN payloads, even if an earlier call generated that cell. Only the current returned Detailed selected output and Natural scalar return receive the arithmetic diagnostic class/unavailable rule. This implements the immutable Original copied/retained policy and adds no tolerance or input change. The first01 publication remains immutable.
+ 
+ Historical frozen-Source matching now resolves an index once instead of scanning all Source members for each artifact; all the same full SHA/size and before/after checks remain. Root-authorized Native outer/sidecar metadata (argv/schema/fullhash refs only) was inspected to confirm the interface; no Native numerical result was read. No Rust result exists for this package. No target, import, canonical change or execution was performed.
++
++## Windows actual input path witness correction03
++
++The first genuine comparison stopped with integrity exit2 before any input joins or endpoint pairs: Rust std::fs::canonicalize emitted the Windows verbatim prefix, while Python Path.resolve retained that spelling. The complete input bytes, SHA, size, before/after freeze and exact argc3 already agree. This fresh Source changes only the result's input-path witness to filesystem samefile identity against the authenticated actual input. Containment, full SHA/size and every literal input/owner join remain required. No arithmetic, tolerance, case, owner rule or output is changed.
++
++The existing prospective policy02 remains the exact original file and SHA bound to the actual Rust launcher, sidecar and Root packet. This comparer explicitly reads that immutable policy path; it does not make a later policy appear to have preceded capture. The actual failed comparison01 and its closed receipt are preserved. Source preparation inspected top-level path/size and flags only, with no numerical endpoints read or recomputed and no target or canonical action.

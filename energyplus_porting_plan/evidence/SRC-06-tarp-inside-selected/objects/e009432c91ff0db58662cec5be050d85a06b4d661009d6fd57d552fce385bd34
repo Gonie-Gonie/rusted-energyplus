@@ -1,0 +1,59 @@
+{
+  "schema": "src06-tarp-inside-Root-provider-acceptance.v1",
+  "accepted": true,
+  "provider_inventory": {
+    "path": ".runtime/porting/SRC-06/native-provider-review-02/linked-provider-and-PE-inventory.json",
+    "sha256": "171fc2e07c1ec1f3256b7cd0cd12614c9dffe8ff5afe734007bcce615500da86",
+    "size_bytes": 26520
+  },
+  "provider_collection_preparation": {
+    "path": ".runtime/porting/SRC-06/native-provider-prep-03/manifest.json",
+    "sha256": "d7d9bf82e841326b831cf53f62ad49cc509c2797b9f0d4dc4c754fc7937f1eb7",
+    "size_bytes": 11564
+  },
+  "actual_evidence_collector": {
+    "path": ".runtime/porting/SRC-06/native-provider-prep-03/collect_providers.py",
+    "sha256": "404280979d6427af1226ce7cd00ffe9c639225c7f9232a21a1312d72b708fefa",
+    "size_bytes": 15817
+  },
+  "both_Original_providers_accepted": true,
+  "full_PE_and_core_proof_accepted": true,
+  "dry_and_actual_compile_link_commands_byte_exact": true,
+  "Root_FULL_actual_provider_review": {
+    "path": ".runtime/porting/SRC-06/native-provider-review-02/Root-full-provider-review.json",
+    "sha256": "54eac6f35e7cd9706ea9b6b25ac5399916d4255f4ddddb379b60f5897285bbb9",
+    "size_bytes": 1371
+  },
+  "helper_executed": false,
+  "numerical_results_read": false,
+  "gates_updated": false,
+  "reviewed_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-02/manifest.json",
+    "sha256": "ba8de8e1378003bd0f9fa0305a074b838448425503330a47cba01f2b68e31d35",
+    "size_bytes": 23595
+  },
+  "actual_Native_binary": {
+    "path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\native-build-01\\bin\\src06_tarp_inside_helper.exe",
+    "sha256": "1bd375ea8d37aa618415516c841eb473c36db15909b411670fefd719370329af",
+    "size_bytes": 1295933809
+  },
+  "actual_full_link_map": {
+    "path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\native-build-01\\bin\\src06_tarp_inside_helper.map",
+    "sha256": "065802c586fb106cb315079b9d5f59d69c354312c1f284d671ad804c3948bc25",
+    "size_bytes": 303279896
+  },
+  "actual_helper_object": {
+    "path": ".runtime/ep261-gcc13-o0/CMakeFiles/src06_tarp_inside_helper.dir/56a6ffe24c02b5e1a68a11333bb834d6/.runtime/porting/SRC-06/native-tarp-inside-prep-02/tarp_inside_reference_helper.cpp.obj",
+    "sha256": "68d8f815151cbb6c684a690768bf04e0996d4c7ce40c6efd1390982fd391eb33",
+    "size_bytes": 13852792
+  },
+  "actual_build_execution": {
+    "path": ".runtime/porting/SRC-06/native-build-01/compile-command/receipt.json",
+    "sha256": "aceb9ef787996c0f19c27d87dc5d9eaedf31b789fd925780bef626b6babf2751",
+    "size_bytes": 4929
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/d3/d362e54d3fda7abd6caa874f3cff9ca05b95b1a27005151182bc16099c201ac8",
+    "sha256": "d362e54d3fda7abd6caa874f3cff9ca05b95b1a27005151182bc16099c201ac8"
+  }
+}

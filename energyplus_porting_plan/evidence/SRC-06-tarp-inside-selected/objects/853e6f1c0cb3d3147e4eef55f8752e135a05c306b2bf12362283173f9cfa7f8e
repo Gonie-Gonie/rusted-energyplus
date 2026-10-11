@@ -1,0 +1,17 @@
+{
+  "schema": "src06-selected-main-Root-Source-review.v1",
+  "Source_preparation": {
+    "path": ".runtime/porting/SRC-06/tarp-inside-selected-rust-prep-01/manifest.json",
+    "sha256": "35323a3e5b40e4eb88073ec3872a1a91575d69f6ecd3d2885a8497a244ff64bf",
+    "size_bytes": 22891
+  },
+  "Root_FULL_Source_review_accepted": true,
+  "independent_Header_FULL_Source_review_accepted": true,
+  "whole_declared_refs_verified": 59,
+  "exact_Source_ranges_verified": 20,
+  "transport_diffs_regenerated": 4,
+  "Cargo_manifest_and_lock_only_root_name_changed": true,
+  "actual_Native_results_read_for_Source_review": false,
+  "targets_executed": false,
+  "gates_updated": false
+}

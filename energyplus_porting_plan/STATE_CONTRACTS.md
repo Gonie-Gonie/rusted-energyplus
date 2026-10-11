@@ -38,3 +38,7 @@ EP struct 전체를 복제하지 않고 아래 데이터의 생산자·소비자
 ## SRC-05 선택 setter와 실행 문맥
 
 표면의 기존 네 상태 배열, 실제 높이·ExtWind·날씨 보정 입력과 원본 쓰기 순서를 유지한다. [별도 main 실행의 선택 setter 비교](evidence/SRC-05-wind-diagnostics-and-main-thread/summary.json)는 실제 argc3/Cargo 산출물과 역사적 Source에 묶여 있다. read-only main/spawn 부동소수점 진단과 과거 실패는 별도 증거이며, 생산 worker의 동등성이나 차이의 원인으로 단정하지 않는다. 실제 ordinary 초기화·온도 검사·후속 소비자 연결은 계속 미확인이다.
+
+## SRC-06 선택 TARP 상태·정밀도 계약
+
+Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 strict 부호 분기를 유지한다. Detailed은 실제 outward cosine의 음수를 전달하며 Hc<LowHConvLimit일 때만 하한을 대입한다. 선택 원본에는 EPS, 상한 clamp, NaN 대체가 없다. [선택 API 비교](evidence/SRC-06-tarp-inside-selected/summary.json)는 입력·초기 상태·모든 pre-owner·유지 셀을 NaN payload까지 비트 그대로 대조한다. 현재 계산된 비정상 endpoint만 class 확인 후 unavailable로 남긴다. 공간 MAT, balance reference snapshot, 초기/반복 표면온도 배열과 갱신 시점은 서로 다른 실제 owner이며 다음 caller 연결에서 보존해야 한다.

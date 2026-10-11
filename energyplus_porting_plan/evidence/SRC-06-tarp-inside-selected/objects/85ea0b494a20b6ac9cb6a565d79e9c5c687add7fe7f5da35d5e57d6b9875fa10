@@ -1,0 +1,156 @@
+//! Literal-input standalone main-thread observation of genuine TARP public APIs.
+use ep_runtime::heat_balance::convection::tarp_inside::{
+    default_low_convection_limit_w_per_m2_k, detailed_inside_coefficient_w_per_m2_k,
+    natural_coefficient_w_per_m2_k,
+};
+use serde_json::{Value, json};
+use std::collections::BTreeSet;
+use std::fs::{self, OpenOptions};
+use std::io::Write;
+
+fn required<'a>(v: &'a Value, name: &str) -> Result<&'a Value, String> {
+    v.get(name).ok_or_else(|| format!("missing literal input field: {name}"))
+}
+fn keys(v: &Value, names: &[&str]) -> Result<(), String> {
+    let fields = v.as_object().ok_or("literal object required")?;
+    if fields.len() != names.len() || names.iter().any(|name| !fields.contains_key(*name)) {
+        return Err("exact literal input object shape required".into());
+    }
+    Ok(())
+}
+fn number(v: &Value, diagnostic: bool) -> Result<f64, String> {
+    keys(v, &["bits"])?;
+    let token = required(v, "bits")?.as_str().ok_or("literal bit string required")?;
+    if token.len() != 16 || !token.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b)) {
+        return Err("canonical16-hex literal input required".into());
+    }
+    let value = f64::from_bits(u64::from_str_radix(token, 16).map_err(|e| e.to_string())?);
+    if !diagnostic && !value.is_finite() {
+        return Err("finite admitted direct operand required".into());
+    }
+    Ok(value)
+}
+fn scalar(v: f64) -> Value {
+    let class = if v.is_nan() { "nan" } else if v == f64::INFINITY { "positive_infinity" }
+        else if v == f64::NEG_INFINITY { "negative_infinity" } else if v == 0.0 {
+            if v.is_sign_negative() { "negative_zero" } else { "positive_zero" }
+        } else { "finite" };
+    json!({"value":if v.is_finite(){Some(v)}else{None},"value_bits":format!("{:016x}",v.to_bits()),"value_class":class})
+}
+struct Row {
+    index: u64,
+    name: String,
+    cosine: f64,
+    boundary: i64,
+    coefficient: f64,
+}
+fn snapshot(low: f64, rows: &[Row], capacity: usize) -> Value {
+    let values: Vec<Value> = rows.iter().enumerate().map(|(i,r)| json!({
+        "Rust_row_index":i,"actual_input_surface_index":r.index,"Name":r.name,"CosTilt":scalar(r.cosine),
+        "ExtBoundCond":r.boundary,"SurfHConvInt":scalar(r.coefficient)})).collect();
+    json!({"owner":{"LowHConvLimit":scalar(low),"rows":values,"actual_Rust_Vec_len":rows.len(),"actual_Rust_Vec_capacity":capacity},
+        "unavailable_Native_owner_families":["EnergyPlusData_constructor_and_high_limit","Objexx_EPVector_allocation_implementation","error_backend_callbacks_and_prefixes"],
+        "unavailable_counted_as_PASS":false})
+}
+fn evaluate(case: &Value) -> Result<Value, String> {
+    keys(case, &["case_id","purpose","admission_lane","initial","operations"])?;
+    let id = required(case, "case_id")?.as_str().ok_or("case ID string required")?;
+    required(case, "purpose")?.as_str().ok_or("Source purpose string required")?;
+    let lane = required(case, "admission_lane")?.as_str().ok_or("explicit direct lane required")?;
+    if !["finite-direct-operands","diagnostic-direct-operands"].contains(&lane) {
+        return Err("unadmitted direct lane".into());
+    }
+    let diagnostic = lane == "diagnostic-direct-operands";
+    // Read the existing fixed scalar owner through the genuine public getter.
+    let mut low = default_low_convection_limit_w_per_m2_k();
+    let actual_default_low = scalar(low);
+    let mut rows: Vec<Row> = Vec::new();
+    let fresh = snapshot(low, &rows, rows.capacity());
+    let initial = required(case, "initial")?;
+    keys(initial, &["LowHConvLimit_override","surfaces"])?;
+    let override_value = required(initial, "LowHConvLimit_override")?;
+    if !override_value.is_null() { low = number(override_value, diagnostic)?; }
+    let input_rows = required(initial, "surfaces")?.as_array().ok_or("ordered surface array required")?;
+    if input_rows.is_empty() { return Err("nonempty full surface input required".into()); }
+    let mut names = BTreeSet::new();
+    for (i,r) in input_rows.iter().enumerate() {
+        keys(r, &["actual_surface_index","Name","CosTilt","ExtBoundCond","SurfHConvInt"])?;
+        let index = required(r, "actual_surface_index")?.as_u64().ok_or("actual surface index required")?;
+        if usize::try_from(index).map_err(|e|e.to_string())? != i + 1 { return Err("contiguous input index/order required".into()); }
+        let name = required(r, "Name")?.as_str().ok_or("surface name required")?;
+        if name.is_empty() || !names.insert(name.to_owned()) { return Err("unique nonempty surface name required".into()); }
+        let boundary = required(r, "ExtBoundCond")?.as_i64().ok_or("integer boundary required")?;
+        if boundary != 0 { return Err("only declared non-Kiva external boundary admitted".into()); }
+        rows.push(Row{index,name:name.to_owned(),cosine:number(required(r,"CosTilt")?,diagnostic)?,boundary,
+            coefficient:number(required(r,"SurfHConvInt")?,diagnostic)?});
+    }
+    let prepared = snapshot(low, &rows, rows.capacity());
+    let operations = required(case, "operations")?.as_array().ok_or("full ordered operations required")?;
+    if operations.is_empty() { return Err("nonempty operations required".into()); }
+    let mut operation_ids = BTreeSet::new();
+    let mut calls = Vec::new();
+    for (i,op) in operations.iter().enumerate() {
+        keys(op, &["operation_id","api","surface_index","surface_temperature_c","air_temperature_c","correlation_cos_tilt"])?;
+        let operation_id = required(op, "operation_id")?.as_str().ok_or("operation ID required")?;
+        if !operation_ids.insert(operation_id.to_owned()) { return Err("unique operation IDs required".into()); }
+        let ts = number(required(op,"surface_temperature_c")?,diagnostic)?;
+        let ta = number(required(op,"air_temperature_c")?,diagnostic)?;
+        let before = snapshot(low, &rows, rows.capacity());
+        let api = required(op,"api")?.as_str().ok_or("explicit API required")?;
+        let (actual_api, returned) = match api {
+            "CalcASHRAETARPNatural" => {
+                if !required(op,"surface_index")?.is_null() { return Err("Natural does not consume a surface owner".into()); }
+                let cosine = number(required(op,"correlation_cos_tilt")?,diagnostic)?;
+                ("tarp_inside::natural_coefficient_w_per_m2_k",Some(natural_coefficient_w_per_m2_k(ts,ta,cosine)))
+            }
+            "CalcASHRAEDetailedIntConvCoeff" => {
+                if !required(op,"correlation_cos_tilt")?.is_null() { return Err("Detailed borrows stored cosine only".into()); }
+                let selected = required(op,"surface_index")?.as_u64().ok_or("actual selected input index required")?;
+                let offset = usize::try_from(selected).map_err(|e|e.to_string())?.checked_sub(1).ok_or("positive selected index required")?;
+                let row = rows.get_mut(offset).ok_or("selected index outside actual rows")?;
+                // Caller assignment of the genuine direct API result; no correlation is reproduced.
+                row.coefficient = detailed_inside_coefficient_w_per_m2_k(ts,ta,row.cosine,low);
+                ("tarp_inside::detailed_inside_coefficient_w_per_m2_k",None)
+            }
+            _ => return Err("unknown direct API".into()),
+        };
+        calls.push(json!({"operation_id":operation_id,"literal_operation":op,"actual_call_ordinal":i+1,"api":actual_api,
+            "actual_source_invoked":true,"actual_source_return_observed":true,"source_exception":Value::Null,
+            "actual_return_value":returned.map(scalar),"before":before,"after":snapshot(low,&rows,rows.capacity()),"counted_as_PASS":false}));
+    }
+    Ok(json!({"case_id":id,"literal_input":case,"actual_fixed_default_getter_invoked":true,"actual_default_low_limit":actual_default_low,
+        "fresh_selected_owner":fresh,"prepared_state":prepared,"actual_calls":calls,"actual_source_call_count":calls.len(),"final":snapshot(low,&rows,rows.capacity()),
+        "InitIntConvCoeff_invoked":false,"ordinary_production_handoff_verified":false,"numerical_PASS_claimed":false}))
+}
+fn run() -> Result<(),String> {
+    let args: Vec<_> = std::env::args_os().collect();
+    if args.len()!=3 { return Err("usage: src06_tarp_inside_main INPUT OUTPUT".into()); }
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../../../").canonicalize().map_err(|e|e.to_string())?;
+    let input = std::path::Path::new(&args[1]).canonicalize().map_err(|e|e.to_string())?;
+    let output = std::path::PathBuf::from(&args[2]);
+    let parent = output.parent().ok_or("fresh output parent required")?.canonicalize().map_err(|e|e.to_string())?;
+    let base = root.join(".runtime/porting/SRC-06");
+    if !input.starts_with(&base) || !parent.starts_with(&base) || output.exists() { return Err("contained input and fresh ignored output required".into()); }
+    let data=fs::read(&input).map_err(|e|e.to_string())?;
+    let request:Value=serde_json::from_slice(&data).map_err(|e|e.to_string())?;
+    keys(&request,&["schema","expected_values_supplied","ordinary_production_prestate_supplied","cases"])?;
+    if required(&request,"schema")? != "src06-tarp-inside-direct-request.v1" || required(&request,"expected_values_supplied")? != false || required(&request,"ordinary_production_prestate_supplied")? != false {
+        return Err("unadmitted input-only direct request".into());
+    }
+    let rows=required(&request,"cases")?.as_array().ok_or("all ordered cases required")?;
+    let mut ids=BTreeSet::new();let mut cases=Vec::new();
+    for row in rows {
+        let id=required(row,"case_id")?.as_str().ok_or("case ID required")?;
+        if !ids.insert(id) { return Err("unique case IDs required".into()); }
+        cases.push(evaluate(row)?);
+    }
+    let value=json!({"schema":"src06-tarp-inside-selected-results.v1","cases":cases,"actual_input_path":input,"actual_input_size_bytes":data.len(),
+        "external_full_input_SHA_and_Source_capture_before_after_required":true,"full_input_SHA_verified_internally":false,"all_declared_operations_retained":true,
+        "Native_results_or_expected_values_read":false,"backend_or_ordinary_manager_PASS_claimed":false,"scientific_PASS_claimed":false,"gates_updated":false});
+    let mut file=OpenOptions::new().write(true).create_new(true).open(&output).map_err(|e|e.to_string())?;
+    serde_json::to_writer(&mut file,&value).map_err(|e|e.to_string())?;file.write_all(b"\n").map_err(|e|e.to_string())?;
+    Ok(())
+}
+fn main() {
+    if let Err(error)=run() { eprintln!("{error}");std::process::exit(2); }
+}

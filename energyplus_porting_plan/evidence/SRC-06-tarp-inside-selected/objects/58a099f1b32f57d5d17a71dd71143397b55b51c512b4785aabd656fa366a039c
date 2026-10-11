@@ -1,0 +1,105 @@
+"""Seal prospective TARP comparison before observing any Native/Rust result values."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+OUT = ROOT / '.runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-01'
+RUST = ROOT / '.runtime/porting/SRC-06/tarp-inside-selected-rust-prep-01/manifest.json'
+NATIVE = ROOT / '.runtime/porting/SRC-06/native-tarp-inside-prep-02/manifest.json'
+GETTER = ROOT / '.runtime/porting/SRC-06/tarp-inside-getter-prep-01/manifest.json'
+DRIVER = ROOT / '.runtime/porting/SRC-06/native-execution-prep-02/manifest.json'
+BASE = ROOT / '.runtime/porting/SRC-05/surface-environment-selected-comparison-prep-05/compare.py'
+
+
+def ref(path):
+    data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(data).hexdigest(), 'size_bytes': len(data), 'line_count': len(data.splitlines())}
+
+
+def write(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream:
+        stream.write(data)
+    return ref(path)
+
+
+def main():
+    assert not (OUT / 'manifest.json').exists()
+    native, rust, driver, math = [json.loads(p.read_bytes()) for p in (NATIVE, RUST, DRIVER, GETTER)]
+    assert ref(RUST)['sha256'] == '35323a3e5b40e4eb88073ec3872a1a91575d69f6ecd3d2885a8497a244ff64bf'
+    body = (OUT / 'compare.py').read_text(encoding='utf-8')
+    previous = "BASE_SHA = '035c67fb643bf8e8e9c5b5e4bbf099381082d49c478bf5b2e598255a8b670b939'"
+    assert body.count(previous) == 1
+    body = body.replace(previous, 'BASE_SHA = ' + repr(ref(BASE)['sha256']))
+    (OUT / 'compare.py').write_text(body, encoding='utf-8', newline='\n')
+    ast.parse(body); ast.parse(Path(__file__).read_bytes())
+    source = json.loads((ROOT / native['input_only_request']['path']).read_bytes())
+    def bits(v):
+        return int(set(v) == {'bits'}) + sum(bits(x) for x in v.values()) if isinstance(v, dict) else sum(bits(x) for x in v) if isinstance(v, list) else 0
+    assert len(source['cases']) == 28 and sum(len(c['operations']) for c in source['cases']) == 60 and bits(source) == 320
+    native_driver = next(row for row in driver['own_sources'] if row['path'].endswith('run_execution.py'))
+    policy = {'schema': 'src06-selected-tarp-inside-comparison-policy.v1',
+        'Native_source_preparation': ref(NATIVE), 'Rust_source_preparation': ref(RUST), 'accepted_math_preparation': ref(GETTER),
+        'Native_execution_driver': native_driver, 'Native_execution_source_preparation': ref(DRIVER),
+        'literal_input_source': native['input_only_request'], 'Original_declared_policy': native['prospective_policy'],
+        'recorder_source': ref(ROOT / 'tools/porting/record_command.py'),
+        'literal_case_count': 28, 'literal_call_count': 60, 'literal_binary64_cell_count': 320,
+        'global_admission': ['Every ordered literal case and full literal operation witness must match.', 'Every complete initial selected owner and actual default getter must join before any selected endpoint pairs.', 'Full Source snapshots, actual two-API formatter correspondence and exact commands/receipts/artifacts must authenticate.'],
+        'finite_arithmetic': {'absolute_tolerance': 0, 'relative_tolerance': 0, 'IEEE_bits_and_class_and_signed_zero_exact': True,
+            'fields': ['Natural.actual_return_value', 'Detailed.selected_SurfHConvInt', 'previously_generated_SurfHConvInt_on_later_preowners'],
+            'no_endpoint_equation_or_expected_values_in_comparer': True},
+        'copy_rules': {'all_input_scalar_owners': 'exact bits/class including NaN payloads', 'Natural.full_state_and_unselected_rows': 'within-engine full exact retention; cross-engine copied cells exact bits/class',
+            'strict_lower_assignment': 'finite copied lower-limit bits exact; infinities have unique class bits; NaN lower cannot satisfy Source strict less-than',
+            'generated_cell_provenance': 'selected indices after actual returned Detailed calls only, never endpoint-value-based selection'},
+        'diagnostic_nonfinite': {'class_required': True, 'mismatched_class_fails': True, 'numerical_PASS_claimed': False,
+            'NaN_generated_payload_parity_claimed': False, 'every_generated_nonfinite_occurrence_retained_required_unavailable': True},
+        'full_structure': ['Native full EPVector/Objexx allocated,size,bounds,index/name order and every actual row', 'Rust actual Vec length/capacity and every caller row',
+            'Every call/invocation/return/exception/unreached operation and before-after continuity', 'Only actual selected Detailed coefficient may change; Natural full owners retained',
+            'Native full constructor/high-limit/backend/callback/prefix owners validated and retained unpaired, never omitted as PASS'],
+        'selected_status': 'available finite selected API pairs only; Source stop/unreached or input/preowner mismatches fail; required diagnostic-class checks never numerical PASS',
+        'uncapped_ledgers': ['mismatches.ndjson', 'unavailable.ndjson', 'paired-boundaries.ndjson'],
+        'full_Native_and_Rust_results_before_comparer_Source_read': False, 'FP_controls_modified': False,
+        'backend_or_InitIntConvCoeff_or_cadence_or_Kiva_or_window_verified': False, 'ordinary_production_handoff_verified': False, 'gates_updated': False}
+    policy_ref = write(OUT / 'policy.json', (json.dumps(policy, indent=2) + '\n').encode())
+    readme = write(OUT / 'README.md', b'''# SRC-06 prospective direct comparison (held Source)
+
+This small adapter reuses the accepted SRC05 exact scalar/receipt/uncapped-ledger primitives. It contains no Natural/Detailed equation, expected result, Native-derived Rust input, tolerance expansion or FP-control write. It was sealed before its author read SRC06 Native or Rust result values. Native execution had completed under Root custody, but its values remained withheld. Existing 28 cases, 60 declared operations and all 320 independent bit inputs remain literal unchanged.
+
+Root supplies --custody PATH#SHA --output-dir FRESH. The packet has exactly schema=src06-tarp-inside-selected-comparison-custody.v1 plus prospective_policy, Native_execution_custody, Native_launch_execution, Rust_execution_custody, Rust_launch_execution references. Every other result/input/build/provider/quality/Source reference derives from authenticated sidecars. prospective_policy is this exact held policy.json. Native stdout is the sole complete Native result; Rust result is the actual argv3 output file. No future receipt, binary, Source hash or count is fabricated.
+
+Native custody requires the reviewed execution02 driver, actual Root outer receipt and inner argc2 receipt, both actual Original address-bound providers/PE/core acceptance, full map/exe/object and frozen source/input/policy/DLL bytes. Historical live canonical Source references authenticate exact capture-snapshot archives after Rust application, without demanding obsolete live bytes. The capture before/after full-hash equality and actual0/2 process outcome remain explicit. The comparer trusts the recorded reviewed driver's full PE/graph/compile proofs and Root acceptance; it rehashes those proof artifacts, and does not implement another PE decoder or rebuild.
+
+Rust custody requires the reviewed standalone main package, actual Root outer receipt and Cargo JSON sole emitted executable, immediate recorder artifact hash, exact dev/locked/offline build argv, exact four role-specific quality commands before that build, exact argc3 input/output and full sameSource before/after custody. The new getter successor is mandatory. Actual formatted API correspondence remains a future Root-supplied reviewed packet, not a guessed identity or silent accepted-literal substitution.
+
+All input/initial full selected-owner joins finish before endpoint comparison. Every Native and Rust call DTO is validated even when an independent Rust call follows a Native stop. Only actual returned operations with a matching full preowner pair. Native stops and complete unreached ledgers prevent selected success. Only the selected Detailed row may mutate; all other within-engine owners, backend and stream prefixes are retained exactly. Generated-row provenance follows returned calls, never observed endpoint values. Every finite arithmetic scalar requires exact IEEE bits, class and signed zero. Copied/retained cells include NaN payload bits; generated nonfinite arithmetic requires equal classes and is always separately retained as required unavailable/no numerical PASS. Actual strict lower-limit assignment is covered by exact finite bits; internal branch locals are unobserved.
+
+Native constructor/high-limit/backend/callback/prefix and Objexx allocation implementation have no Rust parity owner here. Their full Native DTOs remain in authenticated stdout and one explicit required-unavailable context row per case. The full advertised array allocation/bounds/order is validated, without equating Rust Vec capacity to Objexx storage. Nothing claims full InitIntConvCoeff traversal/cadence, space MAT refresh, Kiva/windows, ordinary handoff, backend or whole SRC06 completion. Ledgers are uncapped NDJSON with full SHA/size and comparison.json distinguishes integrity exit2, scientific mismatch/unreached exit1 and available-finite-pairs-only exit0; diagnostic/unpaired rows never become PASS.
+
+No canonical edit, Cargo/build/formatter/helper/comparison execution or numerical-result read occurred in Source preparation. Root and independent full Source peers must accept this package before actual comparison. Existing Native declared policy is retained verbatim and source controls are untouched.
+''')
+    own = [ref(OUT / 'compare.py'), policy_ref]
+    templates = [BASE, ROOT / '.runtime/porting/SRC-05/surface-environment-selected-comparison-prep-05/policy.json']
+    befores, diffs = [], []
+    for i, (template, row) in enumerate(zip(templates, own), 1):
+        before = template.read_bytes(); after = (ROOT / row['path']).read_bytes()
+        befores.append(write(OUT / 'before' / f'{i:02d}.source', before))
+        delta = ''.join(difflib.unified_diff(before.decode().splitlines(True), after.decode().splitlines(True), fromfile=ref(template)['path'], tofile=row['path'])).encode()
+        diffs.append(write(OUT / 'diffs' / f'{i:02d}.diff', delta))
+    manifest = {'schema': 'src06-selected-tarp-inside-comparison-Source-preparation.v1', 'status': 'HELD-Source-only-unexecuted',
+        'runtime_interfaces': {'comparer': own[0], 'prospective_policy': policy_ref, 'CLI': ['--custody', 'path#SHA', '--output-dir', 'fresh'],
+            'packet_schema': 'src06-tarp-inside-selected-comparison-custody.v1', 'report_schema': 'src06-selected-tarp-inside-comparison.v1'},
+        'own_sources': own, 'README': readme, 'before_templates': [ref(p) for p in templates], 'before_archives': befores, 'exact_template_diffs': diffs,
+        'source_dependencies': [ref(RUST), ref(GETTER), ref(NATIVE), ref(DRIVER), native_driver, ref(BASE), ref(ROOT / '.runtime/porting/SRC-05/surface-environment-selected-comparison-prep-05/manifest.json'), ref(Path(__file__))] + rust['own_sources'],
+        'literal_input_source': native['input_only_request'], 'Original_observation_policy': native['prospective_policy'],
+        'selected_source_ranges': math['selected_source_ranges'], 'Native_selected_source_ranges': native['selected_source_ranges'],
+        'Source_sealed_before_result_values_read': True, 'Native_capture_existed_but_values_withheld': True,
+        'Native_results_read': False, 'Rust_results_read': False, 'target_execution_performed': False, 'gates_updated': False}
+    write(OUT / 'manifest.json', (json.dumps(manifest, indent=2) + '\n').encode())
+    print(json.dumps(ref(OUT / 'manifest.json')))
+
+
+if __name__ == '__main__':
+    main()

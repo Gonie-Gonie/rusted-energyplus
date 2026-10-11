@@ -1,0 +1,23 @@
+{
+  "schema": "src06-native-provider-Root-full-static-Source-review.v1",
+  "accepted_preparation": {
+    "path": ".runtime/porting/SRC-06/native-provider-prep-03/manifest.json",
+    "sha256": "d7d9bf82e841326b831cf53f62ad49cc509c2797b9f0d4dc4c754fc7937f1eb7",
+    "size_bytes": 11564
+  },
+  "Root_FULL_204_line_parent_and_complete_narrow_delta_author_templates_read": true,
+  "Header_cumulative_FULL_acceptance_message_received": true,
+  "unique_whole_refs_checked": 39,
+  "exact_diffs_regenerated": 4,
+  "Original_literal_ranges_verified": 2,
+  "all_eight_functions_unchanged": true,
+  "post_build_official_check_required": true,
+  "helper_executed": false,
+  "numerical_results_read": false,
+  "gates_updated": false,
+  "actual_review_Source": {
+    "path": ".runtime/porting/SRC-06/review-native-provider-Source-Root-02.py",
+    "sha256": "ebd3d06b5226887144442815e0ee313474cdd58dd5dee7114b460a6b9ce16550",
+    "size_bytes": 3277
+  }
+}

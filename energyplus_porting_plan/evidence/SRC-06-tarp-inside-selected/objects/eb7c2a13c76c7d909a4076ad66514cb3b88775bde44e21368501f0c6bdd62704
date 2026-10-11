@@ -1,0 +1,48 @@
+"""Seal comparer-authority-only selected publication successor; no target or publisher execution."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+OLD = ROOT / '.runtime/porting/SRC-06/tarp-inside-publication-prep-01'
+OUT = ROOT / '.runtime/porting/SRC-06/tarp-inside-publication-prep-02'
+COMPARER = ROOT / '.runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-03/manifest.json'
+OLD_SHA = 'd31df820c9642467b3bdf474a499dc146307e0b2572c18a2ff6e148adf43a99b'
+NEW_SHA = '563e2732a8ca698b9cd4869afdbc1e7bf694b0d0cf6368b56c390d11f575b497'
+
+
+def ref(path):
+    data = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(data).hexdigest(), size_bytes=len(data), line_count=len(data.splitlines()))
+
+
+def write(path, data):
+    with path.open('xb') as stream: stream.write(data)
+
+
+assert not OUT.exists() and ref(COMPARER)['sha256'] == NEW_SHA
+old_manifest = json.loads((OLD/'manifest.json').read_bytes())
+assert ref(OLD/'manifest.json')['sha256'] == 'b76afb16976c21315358196a32564f8a766ba8fa8cdf2110b66662b70a72e5a5'
+source = (OLD/'publish.py').read_bytes()
+assert source.count(OLD_SHA.encode()) == 1
+updated = source.replace(OLD_SHA.encode(), NEW_SHA.encode())
+assert updated.replace(NEW_SHA.encode(), OLD_SHA.encode()) == source
+assert ast.dump(ast.parse(updated.replace(NEW_SHA.encode(), OLD_SHA.encode())), include_attributes=False) == ast.dump(ast.parse(source), include_attributes=False)
+readme = (OLD/'README.md').read_text(encoding='utf8').replace('tarp-inside-publication-prep-01/publish.py', 'tarp-inside-publication-prep-02/publish.py').replace('comparer d31df820 and its unchanged policy', 'comparer 563e2732 and its unchanged policy02')
+readme += '\nSuccessor02 changes only the approved comparer manifest SHA. The comparer code and policy are resolved independently from its authenticated runtime_interfaces: comparer03 retains the exact policy02 bytes/path used by the real launch. The closed comparison01 Windows path-spelling integrity failure and execution are retained as explicit Source lineage; no result values, case selection, equations, tolerance, publication status rules or archive behavior change. Root supplies the actual fresh comparison and closed receipt as runtime operands.\n'
+OUT.mkdir()
+for name, data in [('publish.py',updated),('README.md',readme.encode()),('publish.before.py',source),('README.before.md',(OLD/'README.md').read_bytes()),('manifest.before.json',(OLD/'manifest.json').read_bytes())]: write(OUT/name,data)
+for before, after, name in [('publish.before.py','publish.py','publish.diff'),('README.before.md','README.md','README.diff')]:
+    delta = ''.join(difflib.unified_diff((OUT/before).read_text(encoding='utf8').splitlines(True),(OUT/after).read_text(encoding='utf8').splitlines(True),fromfile=(OLD/after).relative_to(ROOT).as_posix(),tofile=(OUT/after).relative_to(ROOT).as_posix()))
+    write(OUT/name,delta.encode())
+manifest = dict(old_manifest)
+manifest.update(own_sources=[ref(OUT/'publish.py'),ref(OUT/'README.md')],author=ref(Path(__file__).resolve()),predecessor_Source_preparation=ref(OLD/'manifest.json'),before=ref(OUT/'publish.before.py'),exact_diff=ref(OUT/'publish.diff'),README_before=ref(OUT/'README.before.md'),README_exact_diff=ref(OUT/'README.diff'),metadata_before=ref(OUT/'manifest.before.json'),sole_publisher_Source_change='approved comparer manifest SHA d31df820 to 563e2732',unchanged_publisher_functions_and_storage=True)
+manifest['dependencies'] = [ref(COMPARER) if row['sha256'] == OLD_SHA else row for row in old_manifest['dependencies']]
+for key, name in [('actual_integrity_failure_preserved','.runtime/porting/SRC-06/selected-main-thread-comparison-01/comparison.json'),('actual_integrity_failure_execution_preserved','.runtime/porting/SRC-06/selected-main-thread-comparison-command-01/receipt.json')]:
+    manifest[key] = ref(ROOT/name)
+manifest['runtime_interfaces'] = dict(old_manifest['runtime_interfaces'],argv=['python','-X','utf8','-B',(OUT/'publish.py').relative_to(ROOT).as_posix(),'--packet','PATH#SHA256'])
+manifest['inherited_template_before_and_exact_diff'] = dict(before=old_manifest['before'],exact_diff=old_manifest['exact_diff'],README_before=old_manifest['README_before'],README_exact_diff=old_manifest['README_exact_diff'])
+write(OUT/'manifest.json',(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n').encode())
+print(json.dumps(dict(manifest=ref(OUT/'manifest.json'),publisher=ref(OUT/'publish.py'),exact_diff=ref(OUT/'publish.diff'),targets_executed=False)))

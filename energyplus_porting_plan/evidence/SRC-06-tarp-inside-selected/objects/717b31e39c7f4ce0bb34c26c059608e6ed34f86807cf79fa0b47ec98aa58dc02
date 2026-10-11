@@ -1,0 +1,1 @@
+    int constexpr ItersReevalConvCoeff(30);                  // Number of iterations between inside convection coefficient reevaluations

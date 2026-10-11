@@ -1,0 +1,75 @@
+"""Prepare closed actual selected-evidence operands; never invoke publisher or target."""
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+BASE = '.runtime/porting/SRC-06/'
+
+
+def ref(name):
+    path = ROOT / name
+    data = path.read_bytes()
+    return dict(path=name, sha256=hashlib.sha256(data).hexdigest(), size_bytes=len(data))
+
+
+def src(name):
+    return ref(BASE + name)
+
+
+def closed(name):
+    row = src(name); value = json.loads((ROOT / row['path']).read_bytes())
+    assert value['schema'] == 'recorded-porting-command.v1' and value['finished_utc'] and value['launch_error'] is None
+    assert value['executed_launcher']['archive']['sha256'] == '5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'
+    return row
+
+
+packet = dict(schema='src06-tarp-inside-publication-inputs.v1',
+    actual_application=src('tarp-inside-applied-01/record.json'),
+    actual_formatter_acceptance=src('tarp-inside-applied-01/Root-and-Header-full-formatter-review.json'),
+    actual_Native_factual_review=src('Header-Native-observation-factual-review-01/review.json'),
+    actual_Root_provider_acceptance=src('native-provider-review-02/Root-provider-acceptance.json'),
+    actual_Header_provider_review=src('Header-provider-factual-review-01/review.json'),
+    actual_Rust_execution_custody=src('selected-main-thread-observation-01/custody.json'),
+    actual_Rust_launch_execution=closed('selected-main-thread-driver-command-01/receipt.json'),
+    actual_comparison=src('selected-main-thread-comparison-02/comparison.json'),
+    actual_comparison_execution=closed('selected-main-thread-comparison-command-02/receipt.json'),
+    actual_comparer_preparation=src('tarp-inside-selected-comparison-prep-03/manifest.json'),
+    selected_source_preparations=[src(name+'/manifest.json') for name in (
+        'tarp-inside-publication-prep-02', 'tarp-inside-getter-prep-01', 'native-tarp-inside-prep-02',
+        'native-build-prep-01', 'native-execution-prep-02', 'native-provider-prep-03',
+        'tarp-inside-selected-rust-prep-01', 'tarp-inside-selected-comparison-prep-02',
+        'tarp-inside-selected-comparison-prep-03')],
+    closed_executions=[closed(name+'/receipt.json') for name in (
+        'native-prepare-command-01', 'native-build-01/core-before-command', 'native-build-01/configure-command',
+        'native-build-01/dry-verbose-command', 'native-build-01/compile-command', 'native-build-01/core-after-command',
+        'native-provider-collection-command-01', 'native-provider-collection-command-02',
+        'native-provider-review-01/post-build-core-command', 'native-provider-review-01/provider-addr2line-command',
+        'native-provider-review-01/natural-disassembly-command', 'native-provider-review-01/detailed-disassembly-command',
+        'native-provider-review-02/post-build-core-command', 'native-provider-review-02/provider-addr2line-command',
+        'native-provider-review-02/natural-disassembly-command', 'native-provider-review-02/detailed-disassembly-command',
+        'native-execution-command-01', 'native-observation-01/command', 'tarp-inside-application-command-01',
+        'tarp-inside-applied-01/fmt-command', 'tarp-inside-quality-01/fmt-command', 'tarp-inside-quality-01/clippy-command',
+        'tarp-inside-quality-01/focused-command', 'tarp-inside-quality-01/workspace-command',
+        'selected-main-thread-driver-command-01', 'selected-main-thread-observation-01/Cargo-command',
+        'selected-main-thread-observation-01/command', 'selected-main-thread-comparison-command-01',
+        'selected-main-thread-comparison-command-02')],
+    opaque_lineage=[src(name) for name in (
+        'selected-main-thread-observation-01/Root-full-main-artifact-review.json', 'Header-main-thread-factual-review-01/review.json',
+        'tarp-inside-selected-comparison-prep-02/Root-cumulative-Source-review.json',
+        'tarp-inside-selected-comparison-prep-03/Root-bounded-Source-review.json',
+        'selected-main-thread-comparison-01/comparison.json',
+        'native-provider-review-02/Root-full-provider-review.json', 'native-provider-prep-03/Root-full-Source-review.json',
+        'native-build-01/Root-full-actual-dry-review.json', 'native-tarp-inside-prep-02/Root-full-Source-review.json',
+        'native-execution-prep-02/Root-full-Source-review.json', 'tarp-inside-getter-prep-01/Root-full-Source-review.json',
+        'tarp-inside-selected-rust-prep-01/Root-full-Source-review.json', 'prepare-tarp-inside-publication-inputs-01.py')],
+    prior_evidence=[ref('energyplus_porting_plan/evidence/'+name+'/summary.json') for name in (
+        'SRC-05-surface-environment', 'SYS-03-round-format', 'SYS-03-ordinary-warmup-report')])
+assert packet['actual_application']['sha256'] == '9673892bf081f39bbd1625601c1c4d50838681d730aa41f48bd34674d72d4679'
+assert packet['actual_comparer_preparation']['sha256'] == '563e2732a8ca698b9cd4869afdbc1e7bf694b0d0cf6368b56c390d11f575b497'
+assert packet['actual_Rust_execution_custody']['sha256'] == 'c27f928deb4c7349df4181a769c1fa2e85c3374243bb590711cf4b295ad57003'
+assert packet['actual_comparison_execution']['sha256'] == 'ba727847d13ea95a403a853d5fb332a20877f05e5bcb243ba18bc4f01fb7c9ad'
+path = ROOT / (BASE + 'tarp-inside-publication-inputs-01.json')
+with path.open('x', encoding='utf8', newline='\n') as stream:
+    json.dump(packet, stream, ensure_ascii=False, indent=2); stream.write('\n')
+print(json.dumps(dict(packet=ref(path.relative_to(ROOT).as_posix()),author=src('prepare-tarp-inside-publication-inputs-01.py'),publisher_executed=False)))

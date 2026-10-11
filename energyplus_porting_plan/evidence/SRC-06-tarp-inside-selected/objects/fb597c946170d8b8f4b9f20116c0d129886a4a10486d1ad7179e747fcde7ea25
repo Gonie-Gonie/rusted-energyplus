@@ -1,0 +1,1 @@
+    Real64 LowHConvLimit = 0.1; // Lowest allowed convection coefficient for detailed model

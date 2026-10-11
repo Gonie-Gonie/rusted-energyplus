@@ -1,0 +1,209 @@
+--- .runtime/porting/SRC-05/surface-environment-selected-comparison-prep-05/policy.json
++++ .runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-02/policy.json
+@@ -1,121 +1,101 @@
+ {
+-  "schema": "src05-selected-surface-environment-prospective-comparison-policy.v1",
+-  "frozen_before_numerical_outputs_read": true,
++  "schema": "src06-selected-tarp-inside-comparison-policy.v1",
+   "Native_source_preparation": {
+-    "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/manifest.json",
+-    "sha256": "ca915feec3d44f60bd64d102c9cbcc0cbb0b195ef1e3cc5d1db14785067056fd",
+-    "size_bytes": 32654,
+-    "line_count": 823
++    "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-02/manifest.json",
++    "sha256": "ba8de8e1378003bd0f9fa0305a074b838448425503330a47cba01f2b68e31d35",
++    "size_bytes": 23595,
++    "line_count": 606
+   },
+   "Rust_source_preparation": {
+-    "path": ".runtime/porting/SRC-05/surface-environment-main-thread-prep-02/manifest.json",
+-    "sha256": "84bbd0adc1d0dfbf1240dbf7a45a4e0b916f591057c6c8f1079877f04790e782",
+-    "size_bytes": 25719,
+-    "line_count": 665
++    "path": ".runtime/porting/SRC-06/tarp-inside-selected-rust-prep-01/manifest.json",
++    "sha256": "35323a3e5b40e4eb88073ec3872a1a91575d69f6ecd3d2885a8497a244ff64bf",
++    "size_bytes": 22891,
++    "line_count": 590
++  },
++  "accepted_math_preparation": {
++    "path": ".runtime/porting/SRC-06/tarp-inside-getter-prep-01/manifest.json",
++    "sha256": "7eb308271196d36cbcbf58f17cec8599ddd3c396a84c5c52fcab958933f99963",
++    "size_bytes": 29272,
++    "line_count": 721
++  },
++  "Native_execution_driver": {
++    "path": ".runtime/porting/SRC-06/native-execution-prep-02/run_execution.py",
++    "sha256": "cd803dd2da87b86f08cf37f238cc02cad38e2cd9cebe15524d74e4aa544d060a",
++    "size_bytes": 21319,
++    "line_count": 246
++  },
++  "Native_execution_source_preparation": {
++    "path": ".runtime/porting/SRC-06/native-execution-prep-02/manifest.json",
++    "sha256": "e1b7d18250873a83e23fdb1d0da07b504965cc278517dbea30b432db4cdaec2f",
++    "size_bytes": 17057,
++    "line_count": 448
+   },
+   "literal_input_source": {
+-    "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/input-only-cases.proposed.json",
+-    "sha256": "0191a53ee11a1767a1b35023fcf5a3769e8c9df89c4d297847e3ed9d31cb4c15",
+-    "size_bytes": 80365,
+-    "line_count": 2866
++    "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/input-only-cases.proposed.json",
++    "sha256": "106dcc4583bc6687902db24c325dd15425cc7ffc7cf0e24af44d5628f269d38e",
++    "size_bytes": 56342,
++    "line_count": 2051
+   },
+-  "Native_observation_policy": {
+-    "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/observation-policy.proposed.json",
+-    "sha256": "f9420ff80690a61f9f85f14957a163d65a19cf326c2227770504712e371991b7",
+-    "size_bytes": 1173,
++  "Original_declared_policy": {
++    "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-01/observation-policy.proposed.json",
++    "sha256": "3ddbaa2a35e4986cd6c16051bee866ce35d2f7169cacfcc89bb82a49cf68995d",
++    "size_bytes": 1176,
+     "line_count": 38
+   },
+-  "literal_case_count": 26,
+-  "literal_operation_count": 30,
+-  "input_policy": {
+-    "exact_same_complete_literal_request_bytes": true,
+-    "all_cases_operations_order_and_input_witnesses_required": true,
+-    "all_default_producer_initial_selected_owners_and_literal_weather_join_before_any_endpoint": true,
+-    "every_available_endpoint_requires_full_actual_selected_preowner_join": true,
+-    "Native_unreached_or_throwing_stages_never_paired_or_counted_as_PASS": true,
+-    "Rust_setters_are_independent_probes_not_an_ordinary_manager": true
+-  },
+-  "selected_parameters": [
+-    "SiteTempGradient",
+-    "WeatherFileTempModCoeff",
+-    "SiteWindExp",
+-    "SiteWindBLHeight",
+-    "WeatherFileWindModCoeff"
+-  ],
+-  "selected_weather": [
+-    "OutDryBulbTemp",
+-    "OutWetBulbTemp",
+-    "WindSpeed",
+-    "WindDir"
+-  ],
+-  "full_all_surface_arrays": [
+-    "SurfOutDryBulbTemp",
+-    "SurfOutWetBulbTemp",
+-    "SurfOutWindSpeed",
+-    "SurfOutWindDir"
+-  ],
+-  "exact_discrete_owners": [
+-    "case/op/stage/source-call order",
+-    "actual input surface ID/name/order",
+-    "ExtWind",
+-    "allocation/length/bounds/full-tail completeness within each implementation",
+-    "full source-stop/unreached ledger"
+-  ],
+-  "scalar_policy": {
+-    "complete_scalar_DTO_and_decimal_bits_consistency_required": true,
+-    "absolute_tolerance": 0,
+-    "relative_tolerance": 0,
+-    "IEEE_bits_exact": true,
+-    "value_class_exact": true,
+-    "signed_zero_exact": true,
+-    "arithmetic_endpoint_must_be_finite": true,
+-    "copied_or_retained_nonfinite_owners_keep_exact_payload_bits": true
+-  },
+-  "source_route_cell_profiles": {
+-    "bulbs": "dry/wet are arithmetic iff SiteTempGradient != either signed zero; otherwise raw weather copies; all other cells retained",
+-    "wind_speed": "arithmetic iff exponent nonzero, ExtWind true, not(centroid<=0); zero exponent raw weather copy; exposed centroid<=0 literal +0; NoWind retained",
+-    "wind_direction": "raw literal weather copy on all rows; every other cell retained",
+-    "point_helpers": "pair actual temperature/wind method returns only with reached matching setter cells; NoWind retained rows are never independent wind-point answers"
+-  },
+-  "required_unavailable_families_retained_no_PASS": [
+-    "actual cold check/diagnostic backend/callback/error/EIO/console result",
+-    "actual Native source-fatal stopped and unreached stages/operations",
+-    "fresh Native constructor weather absent from Rust constructor input",
+-    "EPVector/Objexx allocation implementation versus Rust Vec capacity",
+-    "NoWind independently calculated point result where Native setter skips",
+-    "ordinary manager traversal and quartet ownership/handoff"
+-  ],
+-  "Native_process_outcomes": {
+-    "allowed_actual_exit_codes": [
+-      0,
+-      2
+-    ],
+-    "exit2_requires_complete_result_and_actual_OriginalFatalError_source_stop_ledger": true,
+-    "process_exit_never_rewritten": true
+-  },
+-  "ledgers": {
+-    "all_mismatches_unavailable_and_paired_boundaries": "uncapped complete NDJSON",
+-    "first_mismatch_selection_or_sampling": false
+-  },
+-  "selected_status_does_not_complete_whole_SRC05_unit": true,
+-  "whole_SRC05_unit_or_ordinary_manager_PASS_claimed": false,
+-  "gates_updated": false,
+-  "Native_results_read": false,
+-  "Rust_results_read": false,
+   "recorder_source": {
+     "path": "tools/porting/record_command.py",
+     "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+     "size_bytes": 8453,
+     "line_count": 204
+   },
+-  "standalone_main_thread_transport": {
+-    "actual_main_entry_no_thread_spawn": true,
+-    "FP_control_reads_or_writes": false,
+-    "actual_full_current_Source_is_explicit_runtime_operand": true,
+-    "same_quality_build_and_execution_Source_required": true,
+-    "historical_libtest_FAIL_preserved": true,
+-    "historical_thread_controls_or_cause_inferred": false,
+-    "new_main_thread_results_read_before_seal": false,
+-    "prior_Native_and_libtest_results_previously_read_for_factual_QA": true
+-  }
++  "literal_case_count": 28,
++  "literal_call_count": 60,
++  "literal_binary64_cell_count": 320,
++  "global_admission": [
++    "Every ordered literal case and full literal operation witness must match.",
++    "Every complete initial selected owner and actual default getter must join before any selected endpoint pairs.",
++    "Full Source snapshots, actual two-API formatter correspondence and exact commands/receipts/artifacts must authenticate."
++  ],
++  "finite_arithmetic": {
++    "absolute_tolerance": 0,
++    "relative_tolerance": 0,
++    "IEEE_bits_and_class_and_signed_zero_exact": true,
++    "fields": [
++      "Natural.actual_return_value",
++      "current_returned_Detailed.selected_SurfHConvInt"
++    ],
++    "no_endpoint_equation_or_expected_values_in_comparer": true
++  },
++  "copy_rules": {
++    "all_input_scalar_owners": "exact bits/class including NaN payloads",
++    "Natural.full_state_and_unselected_rows": "within-engine full exact retention and cross-engine exact IEEE bits/class including retained NaN payloads",
++    "strict_lower_assignment": "finite copied lower-limit bits exact; infinities have unique class bits; NaN lower cannot satisfy Source strict less-than",
++    "generated_cell_provenance": "current Source route only: current Detailed selected output arithmetic; all preowner and retained/unselected endpoint cells copied exact",
++    "all_full_preowners": "exact IEEE bits/class including NaN payloads, regardless of an earlier generating call"
++  },
++  "diagnostic_nonfinite": {
++    "class_required": true,
++    "mismatched_class_fails": true,
++    "numerical_PASS_claimed": false,
++    "NaN_generated_payload_parity_claimed": false,
++    "every_generated_nonfinite_occurrence_retained_required_unavailable": true
++  },
++  "full_structure": [
++    "Native full EPVector/Objexx allocated,size,bounds,index/name order and every actual row",
++    "Rust actual Vec length/capacity and every caller row",
++    "Every call/invocation/return/exception/unreached operation and before-after continuity",
++    "Only actual selected Detailed coefficient may change; Natural full owners retained",
++    "Native full constructor/high-limit/backend/callback/prefix owners validated and retained unpaired, never omitted as PASS"
++  ],
++  "selected_status": "available finite selected API pairs only; Source stop/unreached or input/preowner mismatches fail; required diagnostic-class checks never numerical PASS",
++  "uncapped_ledgers": [
++    "mismatches.ndjson",
++    "unavailable.ndjson",
++    "paired-boundaries.ndjson"
++  ],
++  "full_Native_and_Rust_results_before_comparer_Source_read": false,
++  "FP_controls_modified": false,
++  "backend_or_InitIntConvCoeff_or_cadence_or_Kiva_or_window_verified": false,
++  "ordinary_production_handoff_verified": false,
++  "gates_updated": false
+ }

@@ -1,0 +1,24 @@
+--- .runtime/porting/SRC-06/tarp-inside-current-prep-01/proposed/crates/ep_runtime/src/heat_balance/convection.rs
++++ crates/ep_runtime/src/heat_balance/convection.rs
+@@ -3,10 +3,6 @@
+ mod geometry_operands;
+ pub mod surface_environment;
+ pub mod tarp_inside;
+-pub(crate) use tarp_inside::{
+-    branch as energyplus_ashrae_tarp_natural_convection_branch,
+-    natural_coefficient_w_per_m2_k as energyplus_ashrae_tarp_natural_convection_w_per_m2_k,
+-};
+ use crate::geometry::production_trace::{self, GeometryConsumer, GeometryOperand};
+ use crate::heat_balance::algorithm::HeatBalanceRuntimeConfig;
+ use crate::heat_balance::state::SurfaceHeatBalanceState;
+@@ -18,6 +14,10 @@
+ pub(crate) use geometry_operands::{
+     energyplus_stored_surface_outdoor_air_temperature_c,
+     energyplus_stored_surface_outside_wind_speed_m_per_s,
++};
++pub(crate) use tarp_inside::{
++    branch as energyplus_ashrae_tarp_natural_convection_branch,
++    natural_coefficient_w_per_m2_k as energyplus_ashrae_tarp_natural_convection_w_per_m2_k,
+ };
+ 
+ /// Current inside convection routine family used by the compatibility lane.

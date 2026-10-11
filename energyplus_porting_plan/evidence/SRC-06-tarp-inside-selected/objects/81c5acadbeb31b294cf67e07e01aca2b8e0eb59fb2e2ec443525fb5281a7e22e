@@ -1,0 +1,16 @@
+--- .runtime/porting/SRC-06/tarp-inside-publication-prep-02/README.md
++++ .runtime/porting/SRC-06/tarp-inside-publication-prep-03/README.md
+@@ -1,6 +1,6 @@
+ # Selected SRC-06 TARP evidence publication
+ 
+-Held Source only. After independent review, Root may invoke `python -X utf8 -B .runtime/porting/SRC-06/tarp-inside-publication-prep-02/publish.py --packet PATH#SHA256`. No project imports, target execution, Source changes, documentation changes or Git operations occur in this publisher.
++Held Source only. After independent review, Root may invoke `python -X utf8 -B .runtime/porting/SRC-06/tarp-inside-publication-prep-03/publish.py --packet PATH#SHA256`. No project imports, target execution, Source changes, documentation changes or Git operations occur in this publisher.
+ 
+ Packet schema: `src06-tarp-inside-publication-inputs.v1`. Ten required full-reference fields are `actual_application`, `actual_formatter_acceptance`, `actual_Native_factual_review`, `actual_Root_provider_acceptance`, `actual_Header_provider_review`, `actual_Rust_execution_custody`, `actual_Rust_launch_execution`, `actual_comparison`, `actual_comparison_execution`, and `actual_comparer_preparation`. Each reference supplies an existing path and SHA256, with optional authenticated size. The Rust sidecar, comparison, outer receipt and their hashes are explicit actual runtime operands; no future identity or result is predicted. Optional reference lists are `selected_source_preparations`, `closed_executions`, `opaque_lineage`, and `prior_evidence`.
+ 
+@@ -13,3 +13,5 @@
+ Finite selected API pairs, nonfinite diagnostic classes and unavailable full context retain their declared distinctions. The publisher does not recompute equations, alter tolerance, count diagnostic classes as numerical PASS, or claim backend, InitIntConvCoeff cadence, ordinary traversal/handoff, full SRC-06 or gate completion. A 14/54 and B 14/64 remain unchanged. Root reviews the actual stored archive before any separate documentation or publication commit.
+ 
+ Successor02 changes only the approved comparer manifest SHA. The comparer code and policy are resolved independently from its authenticated runtime_interfaces: comparer03 retains the exact policy02 bytes/path used by the real launch. The closed comparison01 Windows path-spelling integrity failure and execution are retained as explicit Source lineage; no result values, case selection, equations, tolerance, publication status rules or archive behavior change. Root supplies the actual fresh comparison and closed receipt as runtime operands.
++
++Successor03 binds the 3,928 historical Native Source aliases to their actual build_Source_snapshot (D362), while retaining and separately authenticating the full capture Source_snapshot (D34). The sole changed member between those stages is the already documented regression test fixture. Each historical declared SHA/size and authenticated archive must join its real build member; capture receipt guards retain their actual capture snapshot. The closed publisher02 pre-OUT failure is preserved. No Source bytes, science, comparison policy/status rule, storage helper or archive behavior changes.

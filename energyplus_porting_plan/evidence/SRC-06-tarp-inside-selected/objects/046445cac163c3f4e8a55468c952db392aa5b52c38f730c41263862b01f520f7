@@ -1,0 +1,48 @@
+{
+  "schema": "src06-selected-tarp-inside-comparison.v1",
+  "status": "fail-observation-or-custody-integrity",
+  "actual_custody": {
+    "path": ".runtime/porting/SRC-06/selected-main-thread-observation-01/comparison-custody.json",
+    "sha256": "02bb1cbeb7474b23f88f3cc15719f7e92134c03f813d6616ff3a802a8d84315e"
+  },
+  "actual_prospective_policy": {
+    "path": ".runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-02/policy.json",
+    "sha256": "866248f7fa972ce693b12e291829bd1e904f9c503892f2ff9a912e456ffe787e",
+    "size_bytes": 4805
+  },
+  "findings": {
+    "integrity_failure": "complete Rust input witness differs",
+    "endpoint_pairing_performed": false
+  },
+  "counts": {
+    "input_join_comparisons": 0,
+    "pre_owner_comparisons": 0,
+    "selected_endpoint_comparisons": 0,
+    "point_helper_comparisons": 0
+  },
+  "mismatch_count": 0,
+  "required_unavailable_count": 0,
+  "nonfinite_arithmetic_unavailable_count": 0,
+  "all_mismatches_and_unavailable_rows_retained_uncapped": true,
+  "ledgers": {
+    "mismatches": {
+      "path": ".runtime/porting/SRC-06/selected-main-thread-comparison-01/mismatches.ndjson",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    "unavailable": {
+      "path": ".runtime/porting/SRC-06/selected-main-thread-comparison-01/unavailable.ndjson",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    "paired-boundaries": {
+      "path": ".runtime/porting/SRC-06/selected-main-thread-comparison-01/paired-boundaries.ndjson",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    }
+  },
+  "diagnostic_class_checks_counted_as_numerical_PASS": false,
+  "backend_or_InitIntConvCoeff_cadence_PASS_claimed": false,
+  "whole_SRC06_unit_or_ordinary_handoff_PASS_claimed": false,
+  "gates_updated": false
+}

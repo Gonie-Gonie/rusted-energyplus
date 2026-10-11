@@ -1,0 +1,645 @@
+{
+  "schema": "src06-tarp-inside-actual-linked-provider-and-PE-inventory.v1",
+  "reviewed_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/native-tarp-inside-prep-02/manifest.json",
+    "sha256": "ba8de8e1378003bd0f9fa0305a074b838448425503330a47cba01f2b68e31d35",
+    "size_bytes": 23595
+  },
+  "frozen_build_inputs": {
+    "path": ".runtime/porting/SRC-06/native-build-01/frozen-build-inputs.json",
+    "sha256": "52baf2a4a7df6212bbd21a0df56ee81ef274c0bbe0618cecabeb20deb6cd63ec",
+    "size_bytes": 2008464
+  },
+  "configure_review": {
+    "path": ".runtime/porting/SRC-06/native-build-01/configure-and-dry-review.json",
+    "sha256": "398a694835e18ed7851857312b0e25dd3b8e1d704098686f1a5c44d8213313fd",
+    "size_bytes": 18227
+  },
+  "actual_build_execution": {
+    "path": ".runtime/porting/SRC-06/native-build-01/compile-command/receipt.json",
+    "sha256": "aceb9ef787996c0f19c27d87dc5d9eaedf31b789fd925780bef626b6babf2751",
+    "size_bytes": 4929
+  },
+  "actual_post_build_core_execution": {
+    "path": ".runtime/porting/SRC-06/native-provider-review-02/post-build-core-command/receipt.json",
+    "sha256": "baed9a66cecccf28dc0cad41765b0ba5ff65164b3855547c1a5d848d3b6230c5",
+    "size_bytes": 4999
+  },
+  "actual_build_argv": [
+    ".runtime/reference-tools/ninja-1.13.2/ninja.exe",
+    "-C",
+    ".runtime/ep261-gcc13-o0",
+    "-j1",
+    "-v",
+    "src06_tarp_inside_helper"
+  ],
+  "reviewed_prospective_build_argv": [
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\ninja-1.13.2\\ninja.exe",
+    "-C",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0",
+    "-j1",
+    "-v",
+    "src06_tarp_inside_helper"
+  ],
+  "build_executable_and_directory_resolve_to_reviewed_paths": true,
+  "actual_Ninja_executable": {
+    "path": ".runtime/reference-tools/ninja-1.13.2/ninja.exe",
+    "sha256": "e52a7ad9538d9618c67a0bd777964e2eec8a30f68b810a2f6adce1f2daf847b8",
+    "size_bytes": 603648
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/d3/d362e54d3fda7abd6caa874f3cff9ca05b95b1a27005151182bc16099c201ac8",
+    "sha256": "d362e54d3fda7abd6caa874f3cff9ca05b95b1a27005151182bc16099c201ac8"
+  },
+  "actual_Native_binary": {
+    "path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\native-build-01\\bin\\src06_tarp_inside_helper.exe",
+    "sha256": "1bd375ea8d37aa618415516c841eb473c36db15909b411670fefd719370329af",
+    "size_bytes": 1295933809
+  },
+  "actual_full_link_map": {
+    "path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\native-build-01\\bin\\src06_tarp_inside_helper.map",
+    "sha256": "065802c586fb106cb315079b9d5f59d69c354312c1f284d671ad804c3948bc25",
+    "size_bytes": 303279896
+  },
+  "actual_helper_object": {
+    "path": ".runtime/ep261-gcc13-o0/CMakeFiles/src06_tarp_inside_helper.dir/56a6ffe24c02b5e1a68a11333bb834d6/.runtime/porting/SRC-06/native-tarp-inside-prep-02/tarp_inside_reference_helper.cpp.obj",
+    "sha256": "68d8f815151cbb6c684a690768bf04e0996d4c7ce40c6efd1390982fd391eb33",
+    "size_bytes": 13852792
+  },
+  "selected_provider_map_lines": {
+    "path": ".runtime/porting/SRC-06/native-provider-review-02/address-bound-providers.txt",
+    "sha256": "799556e240d5dae2b56cedbbf54cb68bb7a713f97077bb2f301500916b5e70c4",
+    "size_bytes": 732
+  },
+  "actual_address_bound_providers": [
+    {
+      "symbol": "EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)",
+      "address": "0x000000014001962a",
+      "address_integer": 5368813098,
+      "line_number": 1541279,
+      "literal_line": "                0x000000014001962a                EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)",
+      "owning_text_section": {
+        "section": ".text",
+        "start": 5368755328,
+        "size": 322224,
+        "owner": "Products/libenergypluslib.a(ConvectionCoefficients.cc.obj)",
+        "line_number": 1541266,
+        "literal_line": " .text          0x000000014000b480    0x4eab0 Products/libenergypluslib.a(ConvectionCoefficients.cc.obj)"
+      },
+      "actual_addr2line_function": "EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)",
+      "actual_addr2line_location": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc:1908",
+      "actual_code_extent_end": "0x140019757",
+      "actual_code_extent_rule": "next link-map text symbol in same input text section, otherwise section end",
+      "actual_code_bytes_sha256": "60916d7e612688fc0970ec3aa0facd138a3851fea1992d4ce2364fbcf5cc3eff",
+      "actual_code_bytes_hex": "554889e54883ec30f20f114510f20f114d18f20f115520f20f104510f20f5c4518f20f1145f8660fefc0660f2e45f87a0b660fefc0660f2e45f87416660fefc0660f2e45207a20660fefc0660f2e45207515488b45f866480f6ec0e8b67dc30166480f7ec0eb6f660fefc0660f2f45f8760b660fefc0660f2f4520771ef20f1045f8660fefc9660f2fc1762df20f104520660fefc9660f2fc1761ef20f104520488b45f8660f28c866480f6ec0e8547ec30166480f7ec0eb1df20f104520488b45f8660f28c866480f6ec0e8a67dc30166480f7ec09066480f6ec04883c4305dc390554889e54883ec2048894d10f20f114d18f20f115520f20f115d28f20f104d38f20f104520488b4518660f28d1660f28c866480f6ec0e8e3feffff66480f7ec066480f6ec04883c4205dc3",
+      "actual_code_byte_count": 301,
+      "all_disassembled_rows_equal_actual_PE": true,
+      "actual_disassembly_execution": {
+        "path": ".runtime/porting/SRC-06/native-provider-review-02/natural-disassembly-command/receipt.json",
+        "sha256": "33b9fcb951dfe1cb84c3b77896819cc1f69367725b0d1e12823395b92b1be565",
+        "size_bytes": 5205
+      }
+    },
+    {
+      "symbol": "EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)",
+      "address": "0x0000000140019757",
+      "address_integer": 5368813399,
+      "line_number": 1541280,
+      "literal_line": "                0x0000000140019757                EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)",
+      "owning_text_section": {
+        "section": ".text",
+        "start": 5368755328,
+        "size": 322224,
+        "owner": "Products/libenergypluslib.a(ConvectionCoefficients.cc.obj)",
+        "line_number": 1541266,
+        "literal_line": " .text          0x000000014000b480    0x4eab0 Products/libenergypluslib.a(ConvectionCoefficients.cc.obj)"
+      },
+      "actual_addr2line_function": "EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)",
+      "actual_addr2line_location": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc:1960",
+      "actual_code_extent_end": "0x1400198d7",
+      "actual_code_extent_rule": "next link-map text symbol in same input text section, otherwise section end",
+      "actual_code_bytes_sha256": "d2d239b0a03241cd3f4524279149ded565c266c2506fea7da134437a3700b658",
+      "actual_code_bytes_hex": "55534883ec48488d6c24300f29750048894d30895538f20f115540f20f115d48488b45304805581400004889c1e847960302488d88684a00008b453848984889c2e81391c401488945f8488b45f88b80e003000083f8fa7536488b45304805401400004889c1e84eb40302488d88a0090000488d45384889c2e8ab8522024889c1488d45f74889c2e8846e0100eb5e488b45f8f20f108030030000f30f7e0db6585402660f57c8f20f104548488b4540660f28d1660f28c866480f6ec0e811feffff66480f7ec3488b45304805301100004889c1e8809f0302488d88e00600008b453889c2e82f80ee01488918488b45304805301100004889c1e85a9f0302488d88e00600008b453889c2e80980ee01f20f1030488b45304805481100004889c1e8739f0302f20f104010660f2fc60f97c084c0743e488b45304805481100004889c1e8519f0302f20f107010488b45304805301100004889c1e8fa9e0302488d88e00600008b453889c2e8a97fee01f20f1130900f2875004883c4485b5dc3",
+      "actual_code_byte_count": 384,
+      "all_disassembled_rows_equal_actual_PE": true,
+      "actual_disassembly_execution": {
+        "path": ".runtime/porting/SRC-06/native-provider-review-02/detailed-disassembly-command/receipt.json",
+        "sha256": "4b3f23ae65a06fe89c701f2e63a9ae37191ebd958e69800490001d2381f56bf3",
+        "size_bytes": 5207
+      }
+    }
+  ],
+  "actual_target_and_core_LOAD_rows": [
+    {
+      "line_number": 1541191,
+      "literal_line": "LOAD CMakeFiles/src06_tarp_inside_helper.dir/56a6ffe24c02b5e1a68a11333bb834d6/.runtime/porting/SRC-06/native-tarp-inside-prep-02/tarp_inside_reference_helper.cpp.obj"
+    },
+    {
+      "line_number": 1541192,
+      "literal_line": "LOAD Products/libenergypluslib.a"
+    }
+  ],
+  "actual_PE_reader": {
+    "path": "tools/porting/native_pe.py",
+    "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+    "size_bytes": 20217
+  },
+  "actual_PE": {
+    "sha256": "1bd375ea8d37aa618415516c841eb473c36db15909b411670fefd719370329af",
+    "size_bytes": 1295933809,
+    "pe_offset": 128,
+    "dos_prefix_sha256": "bfdf5e72651b4ec588bd5fc6a9f17e9e0972248146bbacc10478f48d72f29b81",
+    "machine": 34404,
+    "section_count": 20,
+    "timestamp": 1791737639,
+    "symbol_table_offset": 1199804416,
+    "symbol_count": 1541076,
+    "optional_header_size": 240,
+    "coff_characteristics": 38,
+    "complete_header_hex": "4d5a90000300000004000000ffff0000b800000000000000400000000000000000000000000000000000000000000000000000000000000000000000800000000e1fba0e00b409cd21b8014ccd21546869732070726f6772616d2063616e6e6f742062652072756e20696e20444f53206d6f64652e0d0d0a2400000000000000504500006486140027bfcb6a00908347d4831700f00026000b020229003c5202003e380400ce0000251100000010000000000040010000000010000000020000040000000000000005000200000000000020854700060000339e3e4d0300600100002000000000000010000000000000000010000000000000100000000000000000000010000000000000000000000000602f043883000000000000000000000030ee03049e1800000000000000000000103004445a09000000000000000000000000000000000000000000000000002099e403280000000000000000000000000000000000000068762f04c01400000000000000000000000000000000000000000000000000002e74657874000000603a520200100000003c520200060000000000000000000000000000600000602e6461746100000020440100005052020046010000425202000000000000000000000000400000c02e72646174610000e8799a0100a05302007a9a0100885302000000000000000000000000400000402f34000000000000040000000020ee03000200000002ee03000000000000000000000000400000c02e70646174610000049e18000030ee0300a018000004ee03000000000000000000000000400000402e78646174610000fcba270000d0060400bc270000a40604000000000000000000000000400000402e62737300000000c0cc000000902e040000000000000000000000000000000000000000800000c02e696461746100003883000000602f040084000000602e04000000000000000000000000400000c02e435254000000006000000000f02f040002000000e42e04000000000000000000000000400000c02e746c730000000010000000000030040002000000e62e04000000000000000000000000400000c02e72656c6f630000445a090000103004005c090000e82e04000000000000000000000000400000422f3134000000000080a775000070390400a8750000443804000000000000000000000000400000422f323900000000006dee2d3e0020af0400f02d3e00ecad04000000000000000000000000400000422f3431000000000047503b000010dd4200523b0000dcdb42000000000000000000000000400000422f35350000000000e9d55b020070184300d65b02002e1743000000000000000000000000400000422f36370000000000c8a084000050744500a2840000047345000000000000000000000000400000422f38300000000000167082000000f9450072820000a6f745000000000000000000000000400000422f393100000000005941280000807b460042280000187a46000000000000000000000000400000422f3130370000000092d2820000d0a34600d48200005aa246000000000000000000000000400000422f31323300000000d9605e0000b0264700625e00002e2547000000000000000000000000400000420000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "optional_header_hex": "0b020229003c5202003e380400ce0000251100000010000000000040010000000010000000020000040000000000000005000200000000000020854700060000339e3e4d0300600100002000000000000010000000000000000010000000000000100000000000000000000010000000000000000000000000602f043883000000000000000000000030ee03049e1800000000000000000000103004445a09000000000000000000000000000000000000000000000000002099e403280000000000000000000000000000000000000068762f04c0140000000000000000000000000000000000000000000000000000",
+    "entry_rva": 4389,
+    "image_base": 5368709120,
+    "section_alignment": 4096,
+    "file_alignment": 512,
+    "code_size": 38943744,
+    "initialized_data_size": 70794752,
+    "uninitialized_data_size": 52736,
+    "image_size": 1199906816,
+    "header_size": 1536,
+    "checksum": 1295949363,
+    "sections": [
+      {
+        "name": ".text",
+        "rva": 4096,
+        "virtual_size": 38943328,
+        "raw_size": 38943744,
+        "raw_offset": 1536,
+        "characteristics": 1610612832,
+        "debug": false,
+        "raw_sha256": "80ec6e70e4b5caf87f51eac74313c1c259a4b7238d9ab5cf4e08f859c136081d"
+      },
+      {
+        "name": ".data",
+        "rva": 38948864,
+        "virtual_size": 82976,
+        "raw_size": 83456,
+        "raw_offset": 38945280,
+        "characteristics": 3221225536,
+        "debug": false,
+        "raw_sha256": "0106afaed0c9d26b9d275221db6bc2b2c9273901a7c2bb59866b77657a27e07d"
+      },
+      {
+        "name": ".rdata",
+        "rva": 39034880,
+        "virtual_size": 26900968,
+        "raw_size": 26900992,
+        "raw_offset": 39028736,
+        "characteristics": 1073741888,
+        "debug": false,
+        "raw_sha256": "3d3ee16946c26d2a8941064095cca800e09cf9899fd0cb209af17374e307d15a"
+      },
+      {
+        "name": ".eh_frame",
+        "rva": 65937408,
+        "virtual_size": 4,
+        "raw_size": 512,
+        "raw_offset": 65929728,
+        "characteristics": 3221225536,
+        "debug": false,
+        "raw_sha256": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560"
+      },
+      {
+        "name": ".pdata",
+        "rva": 65941504,
+        "virtual_size": 1613316,
+        "raw_size": 1613824,
+        "raw_offset": 65930240,
+        "characteristics": 1073741888,
+        "debug": false,
+        "raw_sha256": "9024fd47ca0931ba6bcfe97583c8afdb58c076944722575a034441a8ab1a1bf8"
+      },
+      {
+        "name": ".xdata",
+        "rva": 67555328,
+        "virtual_size": 2603772,
+        "raw_size": 2604032,
+        "raw_offset": 67544064,
+        "characteristics": 1073741888,
+        "debug": false,
+        "raw_sha256": "af83b08bb877b33c6cda8ff2e528d8cbbf741008adb2ba01f13d2d2e9dbaed22"
+      },
+      {
+        "name": ".bss",
+        "rva": 70160384,
+        "virtual_size": 52416,
+        "raw_size": 0,
+        "raw_offset": 0,
+        "characteristics": 3221225600,
+        "debug": false,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": ".idata",
+        "rva": 70213632,
+        "virtual_size": 33592,
+        "raw_size": 33792,
+        "raw_offset": 70148096,
+        "characteristics": 3221225536,
+        "debug": false,
+        "raw_sha256": "7000a79520b8bb7ea3017f6b517aa74798aaa5e149e18e407909bea9a0d78d45"
+      },
+      {
+        "name": ".CRT",
+        "rva": 70250496,
+        "virtual_size": 96,
+        "raw_size": 512,
+        "raw_offset": 70181888,
+        "characteristics": 3221225536,
+        "debug": false,
+        "raw_sha256": "0d2e7546e15c14fd807fe4b194997f53163ffaffb248925c1bf3fb19e8e80a95"
+      },
+      {
+        "name": ".tls",
+        "rva": 70254592,
+        "virtual_size": 16,
+        "raw_size": 512,
+        "raw_offset": 70182400,
+        "characteristics": 3221225536,
+        "debug": false,
+        "raw_sha256": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560"
+      },
+      {
+        "name": ".reloc",
+        "rva": 70258688,
+        "virtual_size": 612932,
+        "raw_size": 613376,
+        "raw_offset": 70182912,
+        "characteristics": 1107296320,
+        "debug": false,
+        "raw_sha256": "2b75d12efbe96d226894b87d9ff50eeea63c681960d1f28ee7cec828137c05d1"
+      },
+      {
+        "name": ".debug_aranges",
+        "rva": 70873088,
+        "virtual_size": 7710592,
+        "raw_size": 7710720,
+        "raw_offset": 70796288,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "80d18d006586fcfad56f864330cfc3e7ac136ed7f89546d6892c0de8de2b9440"
+      },
+      {
+        "name": ".debug_info",
+        "rva": 78585856,
+        "virtual_size": 1043197549,
+        "raw_size": 1043197952,
+        "raw_offset": 78507008,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "49927ed4eefa8349d7ad1d25b98ac0876cf5f6a69416bad651b338cccabb6577"
+      },
+      {
+        "name": ".debug_abbrev",
+        "rva": 1121783808,
+        "virtual_size": 3887175,
+        "raw_size": 3887616,
+        "raw_offset": 1121704960,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "e944cadf4097a24875e5fc1645b010c9ae458fd1a3d2f59587a4fdae753a75b0"
+      },
+      {
+        "name": ".debug_line",
+        "rva": 1125675008,
+        "virtual_size": 39572969,
+        "raw_size": 39572992,
+        "raw_offset": 1125592576,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "4832a9eca6152f1d4f43861d294a2d31d0e99b60055a3afb5abc68161da5fca5"
+      },
+      {
+        "name": ".debug_frame",
+        "rva": 1165250560,
+        "virtual_size": 8691912,
+        "raw_size": 8692224,
+        "raw_offset": 1165165568,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "e4ab12c7dcfde4e139e239b40f887ef1907938a4092096f81c6ad05f77eb123c"
+      },
+      {
+        "name": ".debug_str",
+        "rva": 1173946368,
+        "virtual_size": 8548374,
+        "raw_size": 8548864,
+        "raw_offset": 1173857792,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "a82844d8a91567ceb8974ea78f7e2eda5193f8ff6abc5b509e6ad76bcc8906da"
+      },
+      {
+        "name": ".debug_line_str",
+        "rva": 1182498816,
+        "virtual_size": 2638169,
+        "raw_size": 2638336,
+        "raw_offset": 1182406656,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "8099aa3e9029b3b369885a161d031a9570a540b05691b7ec07325f625bae026f"
+      },
+      {
+        "name": ".debug_loclists",
+        "rva": 1185140736,
+        "virtual_size": 8573586,
+        "raw_size": 8573952,
+        "raw_offset": 1185044992,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "42f0c1f43beb87bd8cd38fbadbc549e57719b516a9cfac854e95d34515717600"
+      },
+      {
+        "name": ".debug_rnglists",
+        "rva": 1193717760,
+        "virtual_size": 6185177,
+        "raw_size": 6185472,
+        "raw_offset": 1193618944,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "0310420345a0094d8e9cd8f022880ca6ac143af7bb8d8449fcfc20da9561cac5"
+      }
+    ],
+    "data_directories": [
+      {
+        "index": 0,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 1,
+        "rva": 70213632,
+        "size": 33592,
+        "section": ".idata",
+        "section_relative_offset": 0,
+        "payload_sha256": "444f3a98164ea07385b98a2fde08c143d1cc29eddefbd6a9b2aa59cc1d17948a"
+      },
+      {
+        "index": 2,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 3,
+        "rva": 65941504,
+        "size": 1613316,
+        "section": ".pdata",
+        "section_relative_offset": 0,
+        "payload_sha256": "5640bc0233c1674b688265d6e8f0852845e91d28ec306ab2aafa9473bed261a5"
+      },
+      {
+        "index": 4,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 5,
+        "rva": 70258688,
+        "size": 612932,
+        "section": ".reloc",
+        "section_relative_offset": 0,
+        "payload_sha256": "e878b6fd68a8523716c278c4690c5523c765ed22500610a5fe8a22e9b2d3a053"
+      },
+      {
+        "index": 6,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 7,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 8,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 9,
+        "rva": 65313056,
+        "size": 40,
+        "section": ".rdata",
+        "section_relative_offset": 26278176,
+        "payload_sha256": "41280677515521765c47326ca7235a8ae32fb9aa4a5688be93386ecb660f6e1d"
+      },
+      {
+        "index": 10,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 11,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 12,
+        "rva": 70219368,
+        "size": 5312,
+        "section": ".idata",
+        "section_relative_offset": 5736,
+        "payload_sha256": "2a4aaeae1039113eb6483bd6843d074a4fd5fb9c4e75225021de1209c235872f"
+      },
+      {
+        "index": 13,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 14,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 15,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      }
+    ],
+    "runtime_references": {
+      "schema": "native-helper-loader-reference-walk.v1",
+      "scope": "GNU-x64-unbound-imports-unwind-v1-TLS-DIR64",
+      "counts": {
+        "entry": 1,
+        "import_descriptor": 21,
+        "import_dll": 20,
+        "import_lookup": 664,
+        "import_iat": 664,
+        "import_hint": 644,
+        "import_name": 644,
+        "exception_entry": 134443,
+        "runtime_function": 134443,
+        "unwind_header": 134443,
+        "unwind_codes": 134443,
+        "unwind_handler_rva": 13986,
+        "unwind_handler": 13986,
+        "tls_directory": 1,
+        "tls_template": 1,
+        "tls_index": 1,
+        "tls_callback_table": 3,
+        "tls_callback": 2,
+        "relocation_block": 3084,
+        "relocation_entry": 294130,
+        "relocation_slot": 292687,
+        "relocated_image_pointer": 292686,
+        "relocated_image_base_anchor": 1
+      },
+      "target_sections": {
+        "entry": [
+          ".text"
+        ],
+        "import_descriptor": [
+          ".idata"
+        ],
+        "import_dll": [
+          ".idata"
+        ],
+        "import_lookup": [
+          ".idata"
+        ],
+        "import_iat": [
+          ".idata"
+        ],
+        "import_hint": [
+          ".idata"
+        ],
+        "import_name": [
+          ".idata"
+        ],
+        "exception_entry": [
+          ".pdata"
+        ],
+        "runtime_function": [
+          ".text"
+        ],
+        "unwind_header": [
+          ".xdata"
+        ],
+        "unwind_codes": [
+          ".xdata"
+        ],
+        "unwind_handler_rva": [
+          ".xdata"
+        ],
+        "unwind_handler": [
+          ".text"
+        ],
+        "tls_directory": [
+          ".rdata"
+        ],
+        "tls_template": [
+          ".tls"
+        ],
+        "tls_index": [
+          ".bss"
+        ],
+        "tls_callback_table": [
+          ".CRT"
+        ],
+        "tls_callback": [
+          ".text"
+        ],
+        "relocation_block": [
+          ".reloc"
+        ],
+        "relocation_entry": [
+          ".reloc"
+        ],
+        "relocation_slot": [
+          ".CRT",
+          ".data",
+          ".rdata",
+          ".text"
+        ],
+        "relocated_image_pointer": [
+          ".CRT",
+          ".bss",
+          ".data",
+          ".idata",
+          ".rdata",
+          ".text",
+          ".tls"
+        ]
+      },
+      "all_walked_targets_retained": true,
+      "complete_runtime_pointer_walk": false,
+      "opaque_language_specific_handler_records": 13986,
+      "opaque_handler_data_preservation": "Exact full containing-section payload comparison; not interpreted",
+      "disassembly_or_scientific_execution": false
+    }
+  },
+  "actual_addr2line_execution": {
+    "path": ".runtime/porting/SRC-06/native-provider-review-02/provider-addr2line-command/receipt.json",
+    "sha256": "97ea7250ecfe8cf260c3e85b735ea2d45c46f2d579e71511bd51f5dd7469097d",
+    "size_bytes": 5156
+  },
+  "actual_disassembly_executions": [
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-review-02/natural-disassembly-command/receipt.json",
+      "sha256": "33b9fcb951dfe1cb84c3b77896819cc1f69367725b0d1e12823395b92b1be565",
+      "size_bytes": 5205
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-provider-review-02/detailed-disassembly-command/receipt.json",
+      "sha256": "4b3f23ae65a06fe89c701f2e63a9ae37191ebd958e69800490001d2381f56bf3",
+      "size_bytes": 5207
+    }
+  ],
+  "all_disassembled_byte_rows_compared_to_actual_PE": 172,
+  "dry_and_actual_compile_link_commands_byte_exact": true,
+  "current_compile_graph_cache_and_core_preserved": true,
+  "actual_evidence_collector": {
+    "path": ".runtime/porting/SRC-06/native-provider-prep-03/collect_providers.py",
+    "sha256": "404280979d6427af1226ce7cd00ffe9c639225c7f9232a21a1312d72b708fefa",
+    "size_bytes": 15817
+  },
+  "Root_FULL_provider_and_PE_review_pending": true,
+  "helper_executed": false,
+  "numerical_results_read": false,
+  "production_math_changed": false,
+  "gates_updated": false
+}

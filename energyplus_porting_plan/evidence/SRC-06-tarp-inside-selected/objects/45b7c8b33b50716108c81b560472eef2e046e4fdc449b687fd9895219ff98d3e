@@ -1,0 +1,60 @@
+{
+  "schema": "src06-tarp-inside-Header-formatter-correspondence-review.v1",
+  "actual_application": {
+    "path": ".runtime/porting/SRC-06/tarp-inside-applied-01/record.json",
+    "sha256": "9673892bf081f39bbd1625601c1c4d50838681d730aa41f48bd34674d72d4679",
+    "size_bytes": 9878
+  },
+  "accepted_math_preparation": {
+    "path": ".runtime/porting/SRC-06/tarp-inside-getter-prep-01/manifest.json",
+    "sha256": "7eb308271196d36cbcbf58f17cec8599ddd3c396a84c5c52fcab958933f99963",
+    "size_bytes": 29272
+  },
+  "source_before": {
+    "path": ".runtime/porting/source-objects/d3/d34a84b7f0fad57ae1a46799a8b9b8b31247239206556ce342bb4e17287775c4",
+    "sha256": "d34a84b7f0fad57ae1a46799a8b9b8b31247239206556ce342bb4e17287775c4"
+  },
+  "source_literal": {
+    "path": ".runtime/porting/source-objects/72/727af164096c69803ad13d811019d579c63ba9d76edd270248738fccc3c79a82",
+    "sha256": "727af164096c69803ad13d811019d579c63ba9d76edd270248738fccc3c79a82"
+  },
+  "source_final": {
+    "path": ".runtime/porting/source-objects/8a/8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934",
+    "sha256": "8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934"
+  },
+  "actual_formatter_execution": {
+    "path": ".runtime/porting/SRC-06/tarp-inside-applied-01/fmt-command/receipt.json",
+    "sha256": "e1811485e0dd26077e3dfb1b5f912ee3c752598bb81fee1597a1cd7f18f1c0c6",
+    "size_bytes": 3088
+  },
+  "Header_FULL_formatter_correspondence_accepted": true,
+  "verified": {
+    "application_rows": 4,
+    "Rust_rows": 3,
+    "new_Rust_destinations": 1,
+    "snapshot_member_counts": [
+      3928,
+      3929,
+      3929
+    ],
+    "snapshot_archive_descriptor_checks": 11786,
+    "current_final_Source_members": 3929,
+    "unrelated_Source_members_unchanged": 3926,
+    "held_application_rows_exact": true,
+    "semantic_diffs_regenerated": 4,
+    "formatter_diffs_regenerated": 4,
+    "nonempty_formatter_diffs": 2,
+    "formatter_diff_lines_fully_read": 129,
+    "whole_distinct_byte_identities": 7878,
+    "whole_descriptor_checks": 15753
+  },
+  "formatter_findings": "Full two nonempty deltas contain only import/re-export grouping, line wrapping and trailing commas in tests. Detailed call operands/order, strict lower-limit assignment, Natural formulas/branches/getter and all literal test values unchanged. Other two formatter diffs empty.",
+  "review_limits": {
+    "numerical_outputs_read": false,
+    "canonical_mutations_or_targets_executed": false,
+    "scientific_PASS_claimed": false,
+    "ordinary_handoff_verified": false,
+    "gates_updated": false
+  },
+  "review_utc": "2026-10-11T17:45:53.917457+00:00"
+}

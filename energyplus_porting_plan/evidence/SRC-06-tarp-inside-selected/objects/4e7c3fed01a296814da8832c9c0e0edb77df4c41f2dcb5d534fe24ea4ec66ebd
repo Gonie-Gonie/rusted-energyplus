@@ -1,0 +1,925 @@
+--- .runtime/porting/SRC-05/surface-environment-selected-comparison-prep-05/compare.py
++++ .runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-01/compare.py
+@@ -1,500 +1,467 @@
+-"""Root-only selected SRC05 setter comparison; no production equations."""
++"""Root-only fixed-input TARP direct comparison; never implement a correlation."""
+ import argparse
+ import copy
+-import difflib
+-import hashlib
++import importlib.util
+ import json
+-import math
+ from pathlib import Path
+-import struct
+ import sys
+ 
+ ROOT = Path(__file__).resolve().parents[4]
+ HERE = Path(__file__).resolve().parent
+-FILTER = 'heat_balance::convection::surface_environment::selected_reference::observe_literal_surface_environment_setters'
+-CONFIGS = ['--config', 'profile.dev.debug=0', '--config', 'profile.test.debug=0', '--config', 'build.incremental=false']
+-QUALITY_COMMANDS = {
+-    'fmt_check': ['cargo', 'fmt', '--all', '--', '--check'],
+-    'clippy': ['cargo', 'clippy'] + CONFIGS + ['--locked', '--workspace', '--all-targets', '--', '-D', 'warnings'],
+-    'focused': ['cargo', 'test'] + CONFIGS + ['--locked', '-p', 'ep_runtime', '--lib', 'heat_balance::'],
+-    'workspace': ['cargo', 'test'] + CONFIGS + ['--locked', '--workspace'],
++BASE = ROOT / '.runtime/porting/SRC-05/surface-environment-selected-comparison-prep-05/compare.py'
++BASE_SHA = '0ee054e8be751fecf912dd300c0c71285c9a8e979612d05e5478413032931464'
++# The actual template SHA is sealed by the Source author; no target/results are imported.
++C = None
++T = None
++NONFINITE = []
++APIS = {
++    'CalcASHRAETARPNatural': ('Convect::CalcASHRAETARPNatural', 'tarp_inside::natural_coefficient_w_per_m2_k'),
++    'CalcASHRAEDetailedIntConvCoeff': ('Convect::CalcASHRAEDetailedIntConvCoeff', 'tarp_inside::detailed_inside_coefficient_w_per_m2_k'),
+ }
+-PARAMS = ['SiteTempGradient', 'WeatherFileTempModCoeff', 'SiteWindExp', 'SiteWindBLHeight', 'WeatherFileWindModCoeff']
+-WEATHER = ['OutDryBulbTemp', 'OutWetBulbTemp', 'WindSpeed', 'WindDir']
+-ARRAYS = ['SurfOutDryBulbTemp', 'SurfOutWetBulbTemp', 'SurfOutWindSpeed', 'SurfOutWindDir']
+-STAGES = ['bulbs', 'check', 'wind_speed', 'wind_direction']
+-APIS = dict(zip(STAGES, ['DataSurfaces::SetSurfaceOutBulbTempAt', 'DataSurfaces::CheckSurfaceOutBulbTempAt', 'DataSurfaces::SetSurfaceWindSpeedAt', 'DataSurfaces::SetSurfaceWindDirAt']))
+-SEEN, MISMATCHES, UNAVAILABLE, PAIRS = {}, [], [], []
+-COUNTS = {'input_join_comparisons': 0, 'pre_owner_comparisons': 0, 'selected_endpoint_comparisons': 0, 'point_helper_comparisons': 0}
+-ARITHMETIC_UNAVAILABLE = []
+-
+-
+-def need(condition, message):
+-    if not condition:
++
++
++def module(path, name):
++    spec = importlib.util.spec_from_file_location(name, path)
++    value = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(value)
++    return value
++
++
++def need(value, message):
++    if not value:
+         raise ValueError(message)
+ 
+ 
+-def digest(path):
+-    with path.open('rb') as stream:
+-        return hashlib.file_digest(stream, 'sha256').hexdigest()
+-
+-
+-def exact(row, external_binary=False):
+-    path = (ROOT / row['path']).resolve()
+-    allowed = path.is_relative_to(ROOT) or (external_binary and path.is_absolute() and path.drive.upper() == 'D:' and path.suffix.lower() in ('.exe', '.map'))
+-    need(allowed and path.is_file(), 'missing or uncontained artifact: ' + row['path'])
+-    need(digest(path) == row['sha256'], 'artifact SHA differs: ' + row['path'])
+-    if 'size_bytes' in row:
+-        need(type(row['size_bytes']) is int and path.stat().st_size == row['size_bytes'], 'artifact size differs')
+-    SEEN[path] = row['sha256']
+-    return path
+-
+-
+-def unique(pairs):
+-    value = {}
+-    for key, item in pairs:
+-        need(key not in value, 'duplicate JSON member: ' + key)
+-        value[key] = item
+-    return value
+-
+-
+-def load(row):
+-    return json.loads(exact(row).read_text(encoding='utf-8-sig'), object_pairs_hook=unique, parse_constant=lambda x: (_ for _ in ()).throw(ValueError(x)))
+-
+-
+-def ref(path):
+-    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': digest(path), 'size_bytes': path.stat().st_size}
+-
+-
+-def same(left, right, path, phase):
+-    COUNTS[phase] += 1
+-    if type(left) is not type(right) or left != right:
+-        MISMATCHES.append({'phase': phase, 'path': path, 'Native_or_required': left, 'Rust_or_observed': right})
+-
+-
+-def scalar(value):
+-    need(isinstance(value, dict) and set(value) == {'value', 'value_bits', 'value_class'}, 'complete scalar DTO required')
+-    token = value['value_bits']
+-    need(isinstance(token, str) and len(token) == 16 and all(c in '0123456789abcdef' for c in token), 'canonical scalar bits required')
+-    number = struct.unpack('>d', bytes.fromhex(token))[0]
+-    kind = 'nan' if math.isnan(number) else 'positive_infinity' if number == math.inf else 'negative_infinity' if number == -math.inf else ('negative_zero' if token[0] == '8' else 'positive_zero') if number == 0 else 'finite'
+-    need(value['value_class'] == kind, 'scalar class differs from bits')
+-    if math.isfinite(number):
+-        need(type(value['value']) in (int, float) and struct.pack('>d', float(value['value'])).hex() == token, 'decimal scalar differs from bits')
++def keys(value, names):
++    need(isinstance(value, dict) and set(value) == set(names), 'complete exact object shape required: ' + ','.join(names))
++
++
++def identity(a, b):
++    need(C.exact(a, True) == C.exact(b, True) and a['sha256'] == b['sha256'], 'authenticated reference identity differs')
++
++
++def snapshot(row, current=False):
++    value = C.load(row)
++    need(value['schema'] == 'rust-command-source-snapshot.v1' and value['bytes_normalized'] is False, 'literal full Source snapshot required')
++    members = {v['historical_path']: v for v in value['files']}
++    need(len(members) == len(value['files']), 'duplicate historical Source member')
++    for name, entry in members.items():
++        path = C.exact(entry['archive'])
++        need((ROOT / name).resolve().is_relative_to(ROOT) and path.stat().st_size == entry['size_bytes'], 'historical Source member/size differs')
++        if current:
++            C.exact({'path': name, 'sha256': entry['archive']['sha256'], 'size_bytes': entry['size_bytes']})
++    if current:
++        actual = set((ROOT / 'crates').rglob('*.rs')) | set((ROOT / 'crates').rglob('Cargo.toml'))
++        actual |= {ROOT / name for name in ['Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml'] if (ROOT / name).is_file()}
++        need({p.relative_to(ROOT).as_posix() for p in actual} == set(members), 'complete current Source membership differs')
++    return members
++
++
++def frozen_rows(before, after, members):
++    need(len(before) == len(after), 'every frozen artifact after-row required')
++    paths = set()
++    for left, right in zip(before, after):
++        name = str((ROOT / left['path']).resolve())
++        need(name not in paths, 'duplicate frozen artifact')
++        paths.add(name)
++        need(all(right[k] == left[k] for k in ('path', 'sha256', 'size_bytes')) and right.get('available', True) is True, 'frozen before/after full bytes differ')
++        member = members.get(left['path'])
++        if member is None:
++            member = next((v for n, v in members.items() if (ROOT / n).resolve() == (ROOT / left['path']).resolve()), None)
++        if member is not None:
++            need(left['sha256'] == member['archive']['sha256'] and left['size_bytes'] == member['size_bytes'], 'captured historical live Source alias differs')
++            C.exact(member['archive'])
++        else:
++            C.exact(left, True)
++
++
++def option_command(command, script, expected):
++    need(len(command) == 5 + 2 * len(expected) and command[1:3] == ['-X', 'utf8'] and command[3] == '-B', 'actual Python -X utf8 -B launcher required')
++    # Script follows the four interpreter tokens; remaining flags must be exact and unique.
++    need((ROOT / command[4]).resolve() == script, 'actual launcher Source path differs')
++    tokens = command[5:]
++    need(len(tokens) % 2 == 0, 'complete launcher options required')
++    actual = {}
++    for flag, value in zip(tokens[::2], tokens[1::2]):
++        need(flag not in actual, 'duplicate launcher flag')
++        actual[flag] = value
++    need(set(actual) == set(expected), 'exact launcher option set required')
++    for flag, value in expected.items():
++        if isinstance(value, dict):
++            path, sha = actual[flag].rsplit('#', 1)
++            need((ROOT / path).resolve() == C.exact(value) and sha == value['sha256'], 'actual launcher bound operand differs: ' + flag)
++        else:
++            need((ROOT / actual[flag]).resolve() == value, 'actual launcher output directory differs')
++
++
++def native_custody(packet, policy):
++    guard = C.load(packet['Native_execution_custody'])
++    need(guard['schema'] == 'src06-tarp-inside-execution-custody.v1' and guard['all_frozen_artifacts_unchanged'] is True, 'full Native capture custody required')
++    need(all(guard[k] is False for k in ('numerical_results_interpreted', 'FP_controls_modified', 'scientific_PASS_claimed', 'gates_updated')), 'Native custody scope differs')
++    before = C.load(guard['actual_before'])
++    need(before['schema'] == 'src06-tarp-inside-execution-before.v1', 'actual Native before packet required')
++    identity(before['Source_preparation'], policy['Native_source_preparation'])
++    identity(before['reviewed_execution_driver'], policy['Native_execution_driver'])
++    need(before['declared_input_counts'] == {'cases': 28, 'calls': 60, 'binary64_cells': 320} and before['FP_controls_modified'] is False and before['scientific_PASS_claimed'] is False, 'full Native before declaration differs')
++    members = snapshot(before['Source_snapshot'])
++    snapshot(before['build_Source_snapshot'])
++    frozen_rows(before['frozen_artifacts'], guard['frozen_artifacts_after'], members)
++    receipt = C.receipt(guard['actual_command_receipt'], policy['recorder_source'], (0, 2))
++    outer = C.receipt(packet['Native_launch_execution'], policy['recorder_source'], (0, 2))
++    identity(receipt['source_snapshot'], before['Source_snapshot']); identity(outer['source_snapshot'], before['Source_snapshot'])
++    need(guard['actual_target_exit_code'] == guard['actual_recorder_exit_code'] == receipt['exit_code'] == outer['exit_code'] and receipt['command'] == before['actual_argv'], 'actual Native exits/argv differ')
++    need(len(receipt['command']) == 2 and Path(receipt['command'][0]).resolve() == C.exact(before['actual_binary'], True) and Path(receipt['command'][1]).resolve() == C.exact(before['actual_input']), 'Native argc2 actual input/executable differs')
++    for name in ('stdout', 'stderr'):
++        identity(receipt[name], guard['actual_full_output_logs'][name])
++    need(outer['started_utc'] <= receipt['started_utc'] <= receipt['finished_utc'] <= outer['finished_utc'], 'actual Native outer/target chronology differs')
++    option_command(outer['command'], C.exact(policy['Native_execution_driver']), {
++        '--provider-inventory': before['provider_inventory'], '--Root-provider-acceptance': before['Root_provider_acceptance'],
++        '--source-snapshot': before['Source_snapshot'], '--output-dir': C.exact(guard['actual_before']).parent})
++    approval, inventory = C.load(before['Root_provider_acceptance']), C.load(before['provider_inventory'])
++    need(approval['schema'] == 'src06-tarp-inside-Root-provider-acceptance.v1' and approval['accepted'] is True and all(approval[k] is True for k in ('both_Original_providers_accepted', 'full_PE_and_core_proof_accepted', 'dry_and_actual_compile_link_commands_byte_exact')), 'actual Root both-provider/PE/core acceptance required')
++    identity(approval['provider_inventory'], before['provider_inventory'])
++    for key, field in [('actual_Native_binary', 'actual_binary'), ('actual_full_link_map', 'actual_link_map'), ('actual_helper_object', 'actual_helper_object')]:
++        identity(approval[key], inventory[key]); identity(inventory[key], before[field]); C.exact(before[field], True)
++    identity(approval['reviewed_Source_preparation'], policy['Native_source_preparation'])
++    identity(approval['actual_evidence_collector'], inventory['actual_evidence_collector'])
++    provider_preparation = C.load(approval['provider_collection_preparation'])
++    need(provider_preparation['schema'] == 'src06-tarp-inside-native-provider-collection-preparation.v1', 'actual provider collector Source authority required')
++    identity(approval['actual_evidence_collector'], provider_preparation['own_sources'][0])
++    identity(approval['actual_build_execution'], inventory['actual_build_execution'])
++    build = C.receipt(inventory['actual_build_execution'], policy['recorder_source'])
++    identity(build['source_snapshot'], before['build_Source_snapshot'])
++    need(build['finished_utc'] <= receipt['started_utc'], 'actual Native build must precede capture')
++    need(len(before['pinned_runtime_DLLs']) == 3 and {Path(v['path']).name for v in before['pinned_runtime_DLLs']} == {'libgcc_s_seh-1.dll', 'libstdc++-6.dll', 'libwinpthread-1.dll'}, 'complete actual Winlibs DLL set required')
++    for row in before['pinned_runtime_DLLs']:
++        C.exact(row)
++    directory = ROOT / '.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin'
++    need(before['actual_PATH'] == str(directory) + ';' + before['inherited_PATH'], 'actual Windows DLL PATH differs')
++    native = C.load(policy['Native_source_preparation'])
++    identity(before['observation_policy'], native['prospective_policy'])
++    need(C.exact(before['actual_input']).read_bytes() == C.exact(policy['literal_input_source']).read_bytes(), 'complete Native fixed input differs')
++    return before, receipt
++
++
++def rust_custody(packet, policy):
++    global T
++    prep_ref = policy['Rust_source_preparation']
++    prep = C.load(prep_ref)
++    T = module(C.exact(prep['runtime_interfaces']['launcher']), 'src06_reviewed_main_transport')
++    guard = C.load(packet['Rust_execution_custody'])
++    need(guard['schema'] == 'src06-selected-main-thread-execution-custody.v1' and guard['all_frozen_artifacts_unchanged'] is True and guard['actual_exit_code'] == 0, 'actual successful standalone full custody required')
++    identity(guard['Source_preparation'], prep_ref); identity(guard['actual_launcher_source'], prep['runtime_interfaces']['launcher'])
++    need(guard['execution_context'] == 'standalone-main-thread-no-FP-control-writes' and all(guard[k] is False for k in ('historical_libtest_state_inferred', 'numerical_PASS_claimed', 'gates_updated')), 'actual main context differs')
++    before = C.load(guard['actual_before'])
++    need(before['schema'] == 'src06-selected-main-thread-before.v1', 'actual Rust before packet required')
++    identity(before['Source_preparation'], prep_ref); identity(before['policy'], policy['_actual_policy_ref'])
++    identity(before['Source_snapshot'], guard['Source_snapshot']); identity(before['actual_API_correspondence'], guard['actual_API_correspondence'])
++    members = snapshot(guard['Source_snapshot'], True)
++    T.source_correspondence(guard['actual_API_correspondence'], prep_ref, prep, members)
++    need(before['execution_context'] == guard['execution_context'] and before['historical_libtest_state_inferred'] is False, 'before context differs')
++    for row in prep['own_sources']:
++        C.exact(row)
++    need(set(before['quality_executions']) == set(T.QUALITY_COMMANDS) and before['quality_executions'] == guard['quality_executions'], 'four actual quality roles required')
++    build = C.receipt(guard['actual_build_execution'], policy['recorder_source'])
++    actual = C.receipt(guard['actual_execution'], policy['recorder_source'])
++    outer = C.receipt(packet['Rust_launch_execution'], policy['recorder_source'])
++    for receipt in (build, actual, outer):
++        identity(receipt['source_snapshot'], guard['Source_snapshot'])
++    manifest = C.exact(prep['runtime_interfaces']['Cargo_manifest'])
++    command = ['cargo', 'build', '--manifest-path', str(manifest)] + T.CONFIGS + ['--locked', '--offline', '--target-dir', str(ROOT / 'target'), '--message-format=json-render-diagnostics', '--bin', 'src06_tarp_inside_main']
++    need(build['command'] == before['actual_Cargo_command'] == command, 'actual standalone Cargo command differs')
++    for role, row in before['quality_executions'].items():
++        check = C.receipt(row, policy['recorder_source'])
++        identity(check['source_snapshot'], guard['Source_snapshot'])
++        need(check['command'] == T.QUALITY_COMMANDS[role] and check['finished_utc'] <= build['started_utc'], 'actual quality argv/chronology differs')
++    artifact = C.load(guard['actual_artifact_proof'])
++    need(artifact['schema'] == 'src06-selected-main-thread-Cargo-artifact.v1', 'actual Cargo artifact packet required')
++    identity(artifact['Source_preparation'], prep_ref); identity(artifact['Source_snapshot'], guard['Source_snapshot'])
++    identity(artifact['actual_build_execution'], guard['actual_build_execution']); identity(artifact['actual_full_Cargo_JSON'], build['stdout'])
++    messages = [json.loads(v, object_pairs_hook=C.unique) for v in C.exact(build['stdout']).read_text(encoding='utf-8').splitlines() if v]
++    emitted = [v for v in messages if v.get('reason') == 'compiler-artifact' and v.get('executable')]
++    need(len(emitted) == 1, 'sole genuine Cargo-emitted executable required')
++    item = guard['actual_Cargo_emitted_artifact']
++    need(artifact['actual_Cargo_emitted_artifact'] == item and item['cargo_message'] == emitted[0], 'actual emitted executable message differs')
++    target = emitted[0]
++    need(target['target']['name'] == 'src06_tarp_inside_main' and target['target']['kind'] == ['bin'] and Path(target['target']['src_path']).resolve() == manifest.parent / 'src/main.rs' and target['profile']['opt_level'] == '0' and target['profile']['test'] is False, 'actual safe main target differs')
++    binary = C.exact(item['executable'])
++    need(binary.is_relative_to(ROOT / 'target') and Path(target['executable']).resolve() == binary, 'actual emitted binary path differs')
++    capture = build['cargo_compiler_artifacts_capture']
++    need(capture['status'] == 'pass' and len(capture['rows']) == 1 and capture['rows'][0]['cargo_message'] == target and capture['rows'][0]['executable']['sha256'] == item['executable']['sha256'], 'immediate recorder/artifact full SHA differs')
++    for row in (guard['actual_binary_before'], guard['actual_binary_after'], artifact['actual_binary_before']):
++        identity(row, item['executable'])
++    input_ref = before['actual_input_before']
++    identity(guard['actual_input_before'], input_ref); identity(guard['actual_input_after'], input_ref)
++    need(C.exact(input_ref).read_bytes() == C.exact(policy['literal_input_source']).read_bytes(), 'complete Rust fixed input differs')
++    result = C.exact(guard['actual_output'])
++    argv = [str(binary), str(C.exact(input_ref)), str(result)]
++    need(actual['command'] == artifact['actual_argv'] == guard['actual_argv'] == argv and build['finished_utc'] <= actual['started_utc'] and outer['started_utc'] <= build['started_utc'] <= actual['finished_utc'] <= outer['finished_utc'], 'actual argc3/outer chronology differs')
++    flags = outer['command']
++    need(flags[1:4] == ['-X', 'utf8', '-B'] and (ROOT / flags[4]).resolve() == C.exact(prep['runtime_interfaces']['launcher']), 'actual Root standalone launcher differs')
++    tokens = flags[5:]
++    need(len(tokens) == 20 and tokens[::2].count('--quality') == 4, 'exact launcher six options/four quality operands required')
++    ordinary = [v for pair in zip(tokens[::2], tokens[1::2]) if pair[0] != '--quality' for v in pair]
++    option_command(flags[:5] + ordinary, C.exact(prep['runtime_interfaces']['launcher']), {
++        '--source-preparation': prep_ref, '--policy': policy['_actual_policy_ref'], '--input': input_ref,
++        '--source-snapshot': guard['Source_snapshot'], '--source-correspondence': guard['actual_API_correspondence'], '--output-dir': result.parent})
++    quality_tokens = {token.split('=', 1)[0]: token.split('=', 1)[1] for flag, token in zip(tokens[::2], tokens[1::2]) if flag == '--quality'}
++    need(set(quality_tokens) == set(before['quality_executions']), 'four unique actual quality operands required')
++    for role, row in before['quality_executions'].items():
++        name, sha = quality_tokens[role].rsplit('#', 1)
++        need((ROOT / name).resolve() == C.exact(row) and sha == row['sha256'], 'actual launcher quality binding differs')
++    # Sidecar freezes before+artifact+build/execution additions, with the complete initial set retained.
++    after = guard['frozen_artifacts_after']
++    after_map = {row['path']: row for row in after}
++    need(len(after_map) == len(after), 'duplicate Rust frozen after path')
++    frozen_rows(before['frozen_artifacts'], [after_map[v['path']] for v in before['frozen_artifacts']], members)
++    for row in after:
++        C.exact(row)
++    return guard, actual
++
++
++def backend(value):
++    counters = ['TotalWarningErrors', 'TotalSevereErrors', 'TotalWarningErrorsDuringWarmup', 'TotalSevereErrorsDuringWarmup', 'TotalWarningErrorsDuringSizing', 'TotalSevereErrorsDuringSizing']
++    flags = ['AbortProcessing', 'outputErrorHeader', 'DoingInputProcessing', 'printConsoleOutput', 'errorCallback_present', 'messageCallback_present', 'fMessagePtr_present', 'sqlite_present']
++    names = ['LastSevereError', 'VerStringVar', 'IDDVerString', 'CurrentDateTime']
++    keys(value, counters + flags + names + ['MatchCounts'])
++    need(all(type(value[k]) is int and value[k] >= 0 for k in counters) and all(type(value[k]) is bool for k in flags) and all(type(value[k]) is str for k in names), 'complete Native backend scalars required')
++    array(value['MatchCounts'], None, False)
++
++
++def array(value, count, real):
++    keys(value, ['allocated', 'size', 'lower', 'upper', 'values_available', 'rows'])
++    need(type(value['allocated']) is bool and type(value['size']) is int and value['size'] >= 0 and value['values_available'] is True and isinstance(value['rows'], list) and len(value['rows']) == value['size'], 'full allocated array DTO required')
++    if value['allocated']:
++        need(type(value['lower']) is int and type(value['upper']) is int and value['upper'] - value['lower'] + 1 == value['size'], 'actual contiguous full bounds required')
+     else:
+-        need(value['value'] is None, 'nonfinite scalar must retain null decimal')
+-    return token, kind
+-
+-
+-def literal(value):
+-    need(isinstance(value, dict) and set(value) == {'bits'}, 'literal-only bit operand required')
+-    token = value['bits']
+-    need(isinstance(token, str) and len(token) == 16 and all(c in '0123456789abcdef' for c in token), 'canonical input bits required')
+-    number = struct.unpack('>d', bytes.fromhex(token))[0]
+-    return token, 'nan' if math.isnan(number) else 'positive_infinity' if number == math.inf else 'negative_infinity' if number == -math.inf else ('negative_zero' if token[0] == '8' else 'positive_zero') if number == 0 else 'finite'
+-
+-
+-def unavailable(path, reason, details=None):
+-    UNAVAILABLE.append({'path': path, 'reason': reason, 'required_for_whole_unit': True, 'counted_as_PASS': False, 'details': details})
+-
+-
+-def receipt(row, recorder, allowed=(0,)):
+-    value = load(row)
+-    need(value['schema'] == 'recorded-porting-command.v1' and value['exit_code'] in allowed and value['launch_error'] is None, 'actual command outcome unavailable')
+-    need(value['source_bytes_match_before_and_after'] is True and value['recorder_updates_gates'] is False and value['recorder_supplies_reference_answers'] is False, 'actual Source custody failed')
+-    for name in ('stdout', 'stderr', 'source_snapshot'):
+-        exact(value[name])
+-    need(exact(value['executed_launcher']['archive']).read_bytes() == exact(recorder).read_bytes(), 'recorder Source differs')
+-    return value
+-
+-
+-def equal_ref(a, b):
+-    return a['sha256'] == b['sha256'] and a.get('size_bytes') == b.get('size_bytes') and (ROOT / a['path']).resolve() == (ROOT / b['path']).resolve()
+-
+-
+-def custody(packet, policy):
+-    need(packet['schema'] == 'src05-surface-environment-comparison-custody.v1', 'Root literal custody packet required')
+-    for name in ('Native_input', 'Rust_input'):
+-        actual, source = exact(packet[name]), exact(policy['literal_input_source'])
+-        need(actual.read_bytes() == source.read_bytes(), 'full literal request bytes differ')
+-    native_prep, rust_prep = load(policy['Native_source_preparation']), load(policy['Rust_source_preparation'])
+-    n = receipt(packet['Native_execution'], policy['recorder_source'], (0, 2))
+-    r = receipt(packet['Rust_execution'], policy['recorder_source'])
+-    outer = receipt(packet['Rust_launch_execution'], policy['recorder_source'])
+-    build = receipt(packet['Native_build_execution'], policy['recorder_source'])
+-    frozen = load(packet['Native_frozen_build_inputs'])
+-    need(frozen['schema'] == 'src05-direct-setters-frozen-build-inputs.v1' and equal_ref(frozen['reviewed_Source_preparation'], policy['Native_source_preparation']), 'actual Native Source freeze differs')
+-    expected = native_prep['Native_source_files'] + [native_prep['input_only_request'], native_prep['prospective_policy']]
+-    need(len(frozen['frozen_Source_and_input']) == len(expected), 'full Native Source/input freeze required')
+-    for actual, held in zip(frozen['frozen_Source_and_input'], expected):
+-        need(exact(actual).read_bytes() == exact(held).read_bytes(), 'frozen actual Native source/input differs')
+-    need(build['finished_utc'] <= n['started_utc'] and 'src05_surface_environment_helper' in build['command'], 'actual build/capture chronology differs')
+-    native_binary = exact(packet['Native_binary'], True)
+-    need(len(n['command']) == 2 and Path(n['command'][0]).resolve() == native_binary and Path(n['command'][1]).resolve() == exact(packet['Native_input']), 'Native argc2/literal input command differs')
+-    need(exact(n['stdout']) == exact(packet['Native_result']), 'Native result must be complete actual stdout')
+-    proof = load(packet['Native_execution_build_inputs'])
+-    need(proof['schema'] == 'src05-direct-setters-actual-link-inputs.v1' and equal_ref(proof['reviewed_Source_preparation'], policy['Native_source_preparation']), 'actual Native link Source proof differs')
+-    need(proof['frozen_Source_and_input'] == frozen['frozen_Source_and_input'], 'actual linked/frozen full Source/input inventory differs')
+-    need(equal_ref(proof['actual_Native_binary'], packet['Native_binary']) and equal_ref(proof['actual_link_command'], packet['Native_build_execution']), 'actual link/binary receipt join differs')
+-    exact(proof['actual_Native_binary'], True)
+-    exact(proof['actual_full_link_map'], True)
+-    provider_lines = exact(proof['selected_link_provider_lines']).read_text(encoding='utf-8')
+-    need(all(name in provider_lines for name in native_prep['core_address_bound_providers_required']), 'actual selected provider inventory incomplete')
+-    core_check = receipt(proof['official_Source_and_core_check'], policy['recorder_source'])
+-    need(core_check['finished_utc'] <= n['started_utc'], 'official Source/core check must precede Native capture')
+-    need(proof['Original_Source_or_core_math_modified'] is False and packet['Root_FULL_address_bound_provider_and_PE_review_accepted'] is True, 'Root genuine provider/core/PE review required')
+-    main_thread_rust_custody(packet, policy, rust_prep, r, outer)
+-    return n, r
+-
+-
+-def main_thread_rust_custody(packet, policy, prep, r, outer):
+-    need(prep['schema'] == 'src05-selected-main-thread-Source-preparation.v1', 'reviewed standalone Source preparation required')
+-    for row in prep['own_sources']:
+-        exact(row)
+-    basis = load(prep['source_basis'])
+-    history = prep['historical_libtest_failure']
+-    prior = load(history['comparison'])
+-    prior_execution = receipt(history['execution'], policy['recorder_source'], (1,))
+-    need(prior['status'] == 'fail-selected-setters-or-input-join' and prior['all_mismatches_and_unavailable_rows_retained_uncapped'] is True, 'historical libtest FAIL must remain intact')
+-    need(prior['ledgers'] == history['ledgers'] and prior['actual_custody']['sha256'] == history['custody']['sha256'], 'historical comparison/custody differs')
+-    exact(history['custody'])
+-    for row in history['ledgers'].values():
+-        exact(row)
+-    source = packet['actual_Runtime_Source_snapshot']
+-    need(source == r['source_snapshot'] == outer['source_snapshot'], 'actual target/launcher full Source differs')
+-    snap = load(source)
+-    need(snap['schema'] == 'rust-command-source-snapshot.v1' and snap['bytes_normalized'] is False, 'literal full current Source snapshot required')
+-    members = {row['historical_path']: row for row in snap['files']}
+-    need(len(members) == len(snap['files']), 'duplicate current Source member')
+-    paths = set((ROOT / 'crates').rglob('*.rs')) | set((ROOT / 'crates').rglob('Cargo.toml'))
+-    paths |= {ROOT / name for name in ['Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml'] if (ROOT / name).is_file()}
+-    need({p.relative_to(ROOT).as_posix() for p in paths} == set(members), 'actual current full Source membership differs')
+-    for name, row in members.items():
+-        need(exact(row['archive']).stat().st_size == row['size_bytes'], 'actual Source archive size differs')
+-        exact({'path': name, 'sha256': row['archive']['sha256'], 'size_bytes': row['size_bytes']})
+-    need([row['canonical_path'] for row in packet['actual_Rust_observer_sources']] == prep['actual_public_API_source_paths'], 'exact selected public API Source membership required')
+-    for row, held in zip(packet['actual_Rust_observer_sources'], prep['actual_public_API_sources']):
+-        need(exact(row['actual_final_source']).read_bytes() == exact(held).read_bytes() == exact(members[row['canonical_path']]['archive']).read_bytes(), 'compiled actual API differs from reviewed unchanged Source')
+-    build = receipt(packet['Rust_build_execution'], policy['recorder_source'])
+-    manifest = exact(prep['runtime_interfaces']['Cargo_manifest'])
+-    command = ['cargo', 'build', '--manifest-path', str(manifest)] + CONFIGS + ['--locked', '--offline', '--target-dir', str(ROOT / 'target'), '--message-format=json-render-diagnostics', '--bin', 'src05_surface_environment_main']
+-    need(build['command'] == command and build['source_snapshot'] == source, 'actual reviewed standalone Cargo command/Source differs')
+-    need(outer['started_utc'] <= build['started_utc'] <= build['finished_utc'] <= r['started_utc'] <= r['finished_utc'] <= outer['finished_utc'], 'actual Cargo/main outside recorded launcher chronology')
+-    artifact = load(packet['Rust_artifact_proof'])
+-    need(artifact['schema'] == 'src05-selected-main-thread-Cargo-artifact.v1' and equal_ref(artifact['Source_preparation'], policy['Rust_source_preparation']) and artifact['Source_snapshot'] == source and equal_ref(artifact['actual_build_execution'], packet['Rust_build_execution']), 'actual immediate Cargo artifact custody differs')
+-    need(equal_ref(artifact['actual_full_Cargo_JSON'], build['stdout']), 'complete actual Cargo stdout differs')
+-    messages = [json.loads(line) for line in exact(build['stdout']).read_text(encoding='utf-8').splitlines() if line]
+-    emitted = [v for v in messages if v.get('reason') == 'compiler-artifact' and v.get('executable')]
+-    need(len(emitted) == 1, 'sole genuine emitted executable required')
+-    message, recorded_artifact = emitted[0], artifact['actual_Cargo_emitted_artifact']
+-    binary = exact(recorded_artifact['executable'])
+-    need(recorded_artifact['cargo_message'] == message and Path(message['executable']).resolve() == binary and binary.is_relative_to(ROOT / 'target'), 'actual emitted executable differs')
+-    need(message['target']['name'] == 'src05_surface_environment_main' and message['target']['kind'] == ['bin'] and Path(message['target']['src_path']).resolve() == exact(prep['runtime_interfaces']['Rust_main']) and message['profile']['opt_level'] == '0' and message['profile']['test'] is False, 'actual main/dev Source artifact differs')
+-    capture = build['cargo_compiler_artifacts_capture']
+-    need(capture['status'] == 'pass' and len(capture['rows']) == 1 and capture['rows'][0]['cargo_message'] == message and capture['rows'][0]['executable']['sha256'] == recorded_artifact['executable']['sha256'], 'actual recorder/Cargo artifact identity differs')
+-    need(equal_ref(artifact['actual_binary_before'], recorded_artifact['executable']), 'immediate executable identity differs')
+-    argv = [str(binary), str(exact(packet['Rust_input'])), str(exact(packet['Rust_result']))]
+-    need(r['command'] == artifact['actual_argv'] == argv, 'actual main argc3/input/output differs')
+-    launcher = exact(packet['Rust_launch_source'])
+-    need(launcher == exact(prep['runtime_interfaces']['launcher']), 'reviewed standalone launcher required')
+-    need(outer['command'][1:4] == ['-X','utf8','-B'] and Path(outer['command'][4]).resolve() == launcher, 'actual Root launcher command differs')
+-    def option(name):
+-        command = outer['command']
+-        need(command.count(name) == 1, 'one actual launcher operand required: ' + name)
+-        return command[command.index(name) + 1]
+-    for name, row in [('--source-preparation',policy['Rust_source_preparation']),('--policy',packet['prospective_policy']),('--input',packet['Rust_input']),('--source-snapshot',source)]:
+-        path, sha = option(name).rsplit('#',1)
+-        need(Path(path).resolve() == exact(row) and sha == row['sha256'], 'actual launcher operand differs: ' + name)
+-    need(Path(option('--output-dir')).resolve() == exact(packet['Rust_result']).parent, 'actual fresh output directory differs')
+-    sidecar = load(packet['Rust_execution_sidecar'])
+-    need(sidecar['schema'] == 'src05-selected-main-thread-execution-custody.v1' and sidecar['Source_snapshot'] == source and equal_ref(sidecar['Source_preparation'], policy['Rust_source_preparation']), 'actual main-thread sidecar Source differs')
+-    for name, row in [('actual_execution',packet['Rust_execution']),('actual_build_execution',packet['Rust_build_execution']),('actual_artifact_proof',packet['Rust_artifact_proof']),('actual_launcher_source',packet['Rust_launch_source']),('actual_output',packet['Rust_result'])]:
+-        need(equal_ref(sidecar[name],row), 'actual sidecar join differs: ' + name)
+-    need(sidecar['actual_argv'] == argv and sidecar['actual_Cargo_emitted_artifact'] == recorded_artifact and sidecar['actual_exit_code'] == 0 and sidecar['all_frozen_artifacts_unchanged'] is True, 'actual main execution/guards differ')
+-    need(sidecar['execution_context'] == 'standalone-main-thread-no-FP-control-writes' and sidecar['historical_libtest_state_inferred'] is False and sidecar['numerical_PASS_claimed'] is False and sidecar['gates_updated'] is False, 'actual main context declarations differ')
+-    for name in ['actual_input_before','actual_input_after']:
+-        need(exact(sidecar[name]).read_bytes() == exact(packet['Rust_input']).read_bytes(), 'complete actual input before/after differs')
+-    for name in ['actual_binary_before','actual_binary_after']:
+-        need(exact(sidecar[name]) == binary and sidecar[name]['sha256'] == recorded_artifact['executable']['sha256'], 'complete actual executable before/after differs')
+-    before = load(sidecar['actual_before'])
+-    need(before['Source_snapshot'] == source and equal_ref(before['Source_preparation'],policy['Rust_source_preparation']) and equal_ref(before['policy'],packet['prospective_policy']) and before['actual_Cargo_command'] == command, 'pre-build frozen Source/command differs')
+-    need(before['execution_context'] == sidecar['execution_context'] and before['historical_libtest_state_inferred'] is False, 'actual before context differs')
+-    frozen = {row['path']:row for row in before['frozen_artifacts']}
+-    after = {row['path']:row for row in sidecar['frozen_artifacts_after']}
+-    need(len(frozen) == len(before['frozen_artifacts']) and len(after) == len(sidecar['frozen_artifacts_after']) and set(frozen) <= set(after), 'all original frozen artifacts must remain')
+-    for name,row in after.items():
+-        exact(row)
+-        if name in frozen:
+-            need(equal_ref(row,frozen[name]), 'frozen before/after artifact differs')
+-    need(set(packet['quality_executions']) == {'fmt_check','clippy','focused','workspace'} and sidecar['quality_executions'] == before['quality_executions'] == packet['quality_executions'], 'four current quality roles/sidecars differ')
+-    actual_quality_operands = []
+-    for i,value in enumerate(outer['command']):
+-        if value == '--quality':
+-            actual_quality_operands.append(outer['command'][i+1])
+-    need(len(actual_quality_operands) == 4, 'actual four quality operands required')
+-    quality_operand_roles = set()
+-    for value in actual_quality_operands:
+-        role,token = value.split('=',1)
+-        path,sha = token.rsplit('#',1)
+-        need(role in packet['quality_executions'] and role not in quality_operand_roles, 'actual unique quality role required')
+-        row = packet['quality_executions'][role]
+-        need(Path(path).resolve() == exact(row) and sha == row['sha256'], 'actual quality operand differs')
+-        quality_operand_roles.add(role)
+-    for role, row in packet['quality_executions'].items():
+-        q = receipt(row,policy['recorder_source'])
+-        need(q['command'] == QUALITY_COMMANDS[role], 'actual quality command differs: ' + role)
+-        need(q['source_snapshot'] == source and q['finished_utc'] <= build['started_utc'], 'quality/current Source/chronology differs')
+-    need(packet['Root_and_other_author_FULL_standalone_transport_Source_accepted'] is True and packet['Root_FULL_actual_main_entry_and_Cargo_artifact_review_accepted'] is True, 'independent Source/actual main artifact review required')
+-
+-
+-def array_rows(owner, count):
+-    need(type(owner['allocated']) is bool and owner['size'] == count and owner['values_available'] is True and len(owner['rows']) == count, 'full actual array allocation/rows missing')
+-    if owner['allocated']:
+-        need(type(owner['lower']) is int and type(owner['upper']) is int and owner['lower'] == 1 and owner['upper'] == count, 'actual one-based array bounds differ')
++        need(value['size'] == 0 and value['lower'] is None and value['upper'] is None, 'unallocated array bounds differ')
++    if count is not None:
++        need(value['allocated'] is (count > 0) and value['size'] == count and (count == 0 or value['lower'] == 1 and value['upper'] == count), 'selected full 1-based allocation differs')
++    result = []
++    for i, row in enumerate(value['rows']):
++        keys(row, ['actual_array_index', 'value'])
++        need(row['actual_array_index'] == value['lower'] + i, 'full actual array order differs')
++        if real:
++            result.append(C.scalar(row['value']))
++        else:
++            need(type(row['value']) is int, 'integer array value required')
++    return result
++
++
++def owner(value, spec, native, fresh=False):
++    count = 0 if fresh else len(spec['initial']['surfaces'])
++    if native:
++        keys(value, ['owner', 'ErrorsFound', 'error_stream', 'eio', 'console', 'callbacks', 'actual_callback_count', 'callback_integrity_failed'])
++        need(type(value['ErrorsFound']) is bool and all(type(value[k]) is str for k in ('error_stream', 'eio', 'console')) and value['callback_integrity_failed'] is False, 'complete actual Native prefixes/flags required')
++        need(type(value['actual_callback_count']) is int and value['actual_callback_count'] == len(value['callbacks']), 'uncapped callback count required')
++        for i, callback in enumerate(value['callbacks'], 1):
++            keys(callback, ['actual_ordinal', 'kind', 'level', 'message'])
++            need(callback['actual_ordinal'] == i and callback['kind'] in ('errorCallback', 'messageCallback') and type(callback['message']) is str and (type(callback['level']) is int if callback['kind'] == 'errorCallback' else callback['level'] is None), 'complete callback args/order required')
++        data = value['owner']
++        keys(data, ['TotSurfaces', 'Surface', 'LowHConvLimit', 'HighHConvLimit_unread_by_selected_APIs', 'SurfHConvInt', 'backend'])
++        need(type(data['TotSurfaces']) is int and data['TotSurfaces'] == count, 'actual Native total surface owner differs')
++        surface = data['Surface']
++        keys(surface, ['allocated', 'size', 'rows'])
++        need(type(surface['allocated']) is bool and surface['allocated'] is (count > 0) and type(surface['size']) is int and surface['size'] == len(surface['rows']) == count, 'complete Surface allocation differs')
++        coeffs = array(data['SurfHConvInt'], count, True)
++        C.scalar(data['HighHConvLimit_unread_by_selected_APIs']); backend(data['backend'])
++        rows = surface['rows']
+     else:
+-        need(count == 0 and owner['lower'] is None and owner['upper'] is None, 'unallocated nonempty array unavailable')
+-    need([v['actual_array_index'] for v in owner['rows']] == list(range(1, count + 1)), 'array order differs')
+-    return [v['value'] for v in owner['rows']]
+-
+-
+-def selected(snapshot, spec, native):
+-    count = len(spec['initial']['surfaces'])
+-    owner = snapshot['owner']
+-    if native:
+-        need(owner['TotSurfaces'] == count and owner['Surface']['size'] == count and len(owner['Surface']['rows']) == count and type(owner['Surface']['allocated']) is bool, 'full Surface owner unavailable')
+-        arrays = {name: array_rows(owner[name], count) for name in ARRAYS}
+-        rows = [{**r, **{name: arrays[name][i] for name in ARRAYS}} for i, r in enumerate(owner['Surface']['rows'])]
+-        params, weather = {name: owner['environment'][name] for name in PARAMS}, {name: owner['environment'][name] for name in WEATHER}
+-        need(snapshot['callback_integrity_failed'] is False and snapshot['actual_callback_count'] == len(snapshot['callbacks']), 'full callback integrity failed')
+-        need([v['actual_ordinal'] for v in snapshot['callbacks']] == list(range(1, len(snapshot['callbacks']) + 1)), 'callback order omitted')
++        keys(value, ['owner', 'unavailable_Native_owner_families', 'unavailable_counted_as_PASS'])
++        need(value['unavailable_Native_owner_families'] == ['EnergyPlusData_constructor_and_high_limit', 'Objexx_EPVector_allocation_implementation', 'error_backend_callbacks_and_prefixes'] and value['unavailable_counted_as_PASS'] is False, 'explicit Rust unavailable owner families differ')
++        data = value['owner']
++        keys(data, ['LowHConvLimit', 'rows', 'actual_Rust_Vec_len', 'actual_Rust_Vec_capacity'])
++        need(type(data['actual_Rust_Vec_len']) is int and type(data['actual_Rust_Vec_capacity']) is int and data['actual_Rust_Vec_capacity'] >= data['actual_Rust_Vec_len'] == len(data['rows']) == count, 'full actual Rust Vec metadata required')
++        rows, coeffs = data['rows'], []
++    result = []
++    for i, (row, declared) in enumerate(zip(rows, [] if fresh else spec['initial']['surfaces']), 1):
++        keys(row, ['actual_surface_index', 'Name', 'CosTilt', 'ExtBoundCond'] if native else ['Rust_row_index', 'actual_input_surface_index', 'Name', 'CosTilt', 'ExtBoundCond', 'SurfHConvInt'])
++        need(type(row['ExtBoundCond']) is int and type(row['Name']) is str and row['Name'] == declared['Name'] and row['actual_surface_index' if native else 'actual_input_surface_index'] == declared['actual_surface_index'] == i, 'full exact index/name/association required')
++        if not native:
++            need(row['Rust_row_index'] == i - 1, 'actual Rust row index differs')
++            coeffs.append(C.scalar(row['SurfHConvInt']))
++        result.append({'Name': row['Name'], 'index': i, 'CosTilt': C.scalar(row['CosTilt']), 'ExtBoundCond': row['ExtBoundCond'], 'SurfHConvInt': coeffs[i - 1]})
++    return {'LowHConvLimit': C.scalar(data['LowHConvLimit']), 'rows': result}
++
++
++def scalar_pair(a, b, path, phase, arithmetic=False):
++    finite = ('finite', 'positive_zero', 'negative_zero')
++    if arithmetic and (a[1] not in finite or b[1] not in finite):
++        C.same(a[1], b[1], path + '/diagnostic-class', phase)
++        NONFINITE.append(path)
++        C.unavailable(path, 'nonfinite-generated-arithmetic; class-required-no-numerical-PASS', {'Native': a, 'Rust': b})
+     else:
+-        need(owner['actual_Rust_Vec_len'] == count and type(owner['actual_Rust_Vec_capacity']) is int and owner['actual_Rust_Vec_capacity'] >= count and len(owner['rows']) == count, 'full Rust row owner unavailable')
+-        rows, params, weather = owner['rows'], owner['parameters'], owner['weather']
+-        need(snapshot['unavailable_counted_as_PASS'] is False, 'unavailable owner counted as PASS')
+-        need(snapshot['unavailable_Native_owner_families'] == ['cold_check_and_backend', 'constructor_weather_before_literal_write', 'EPVector_and_Objexx_allocation_implementation'], 'full explicit unavailable owner ledger differs')
+-    need(set(params) == set(PARAMS) and (weather is None or set(weather) == set(WEATHER)), 'complete parameters/weather required')
+-    result = []
+-    for i, (row, declared) in enumerate(zip(rows, spec['initial']['surfaces'])):
+-        need(row['actual_surface_index' if native else 'actual_input_surface_index'] == declared['actual_surface_index'] == i + 1 and row['Name'] == declared['Name'], 'actual input identity/order differs')
+-        if not native:
+-            need(row['Rust_row_index'] == i, 'actual Rust row order differs')
+-        need(type(row['ExtWind']) is bool, 'actual exposure bool required')
+-        result.append({name: scalar(row[name]) if name != 'ExtWind' else row[name] for name in ['Centroid_z', 'ExtWind'] + ARRAYS})
+-    return {'parameters': {name: scalar(v) for name, v in params.items()}, 'weather': None if weather is None else {name: scalar(v) for name, v in weather.items()}, 'rows': result}
+-
+-
+-def pair(a, b, path, phase):
+-    same(a['parameters'], b['parameters'], path + '/parameters', phase)
+-    if b['weather'] is not None:
+-        same(a['weather'], b['weather'], path + '/weather', phase)
+-    need(len(a['rows']) == len(b['rows']), 'selected cardinality differs')
+-    for i, (left, right) in enumerate(zip(a['rows'], b['rows']), 1):
+-        for name in left:
+-            same(left[name], right[name], f'{path}/surface{i}/{name}', phase)
+-
+-
+-def arithmetic_cell(stage, owner, index, name):
+-    # Source branch classification only; no endpoint equation or expected value.
+-    zero = ('0000000000000000', '8000000000000000')
+-    if stage == 'bulbs' and name in ARRAYS[:2]:
+-        return owner['parameters']['SiteTempGradient'][0] not in zero
+-    if stage == 'wind_speed' and name == ARRAYS[2]:
+-        return (owner['parameters']['SiteWindExp'][0] not in zero and owner['rows'][index]['ExtWind']
+-                and not (struct.unpack('>d', bytes.fromhex(owner['rows'][index]['Centroid_z'][0]))[0] <= 0.0))
+-    return False
+-
+-
+-def endpoint_scalar(left, right, path, phase, arithmetic):
+-    if arithmetic and (left[1] not in ('finite', 'positive_zero', 'negative_zero') or right[1] not in ('finite', 'positive_zero', 'negative_zero')):
+-        ARITHMETIC_UNAVAILABLE.append(path)
+-        unavailable(path, 'nonfinite-arithmetic-endpoint; no-numerical-PASS', {'Native': left, 'Rust': right})
+-        return
+-    same(left, right, path, phase)
+-
+-
+-def endpoint(a, b, path, stage):
+-    same(a['parameters'], b['parameters'], path + '/parameters', 'selected_endpoint_comparisons')
+-    same(a['weather'], b['weather'], path + '/weather', 'selected_endpoint_comparisons')
++        C.same(a, b, path, phase)
++
++
++def pair(a, b, path, phase, generated):
++    C.same(a['LowHConvLimit'], b['LowHConvLimit'], path + '/LowHConvLimit', phase)
++    need(len(a['rows']) == len(b['rows']), 'full paired owner cardinality differs')
+     for i, (left, right) in enumerate(zip(a['rows'], b['rows'])):
+-        for name in left:
+-            field = f'{path}/surface{i+1}/{name}'
+-            if name == 'ExtWind':
+-                same(left[name], right[name], field, 'selected_endpoint_comparisons')
++        for field in ('Name', 'index', 'CosTilt', 'ExtBoundCond'):
++            C.same(left[field], right[field], f'{path}/surface{i+1}/{field}', phase)
++        scalar_pair(left['SurfHConvInt'], right['SurfHConvInt'], f'{path}/surface{i+1}/SurfHConvInt', phase, i in generated)
++
++
++def unchanged_except_selected(before, after, selected, native):
++    value = copy.deepcopy(before)
++    if selected is not None:
++        if native:
++            value['owner']['SurfHConvInt']['rows'][selected]['value'] = after['owner']['SurfHConvInt']['rows'][selected]['value']
++        else:
++            value['owner']['rows'][selected]['SurfHConvInt'] = after['owner']['rows'][selected]['SurfHConvInt']
++    need(value == after, 'selected API changed an unselected/retained full owner or backend/prefix')
++
++
++def compare(packet, policy):
++    keys(packet, ['schema', 'prospective_policy', 'Native_execution_custody', 'Native_launch_execution', 'Rust_execution_custody', 'Rust_launch_execution'])
++    need(packet['schema'] == 'src06-tarp-inside-selected-comparison-custody.v1', 'actual Root custody packet required')
++    identity(packet['prospective_policy'], policy['_actual_policy_ref'])
++    nbefore, nreceipt = native_custody(packet, policy)
++    rguard, rreceipt = rust_custody(packet, policy)
++    source, native, rust = C.load(policy['literal_input_source']), C.load(nreceipt['stdout']), C.load(rguard['actual_output'])
++    need(native['schema'] == 'src06-tarp-inside-direct-results.v1' and rust['schema'] == 'src06-tarp-inside-selected-results.v1', 'actual results schema differs')
++    need(native['requested_case_count'] == native['recorded_case_count'] == len(native['cases']) == len(rust['cases']) == len(source['cases']) == 28, 'all literal cases required')
++    for result, fields in [(native, ['expected_values_supplied', 'Original_bodies_modified', 'scientific_PASS_claimed', 'gates_updated']), (rust, ['full_input_SHA_verified_internally', 'Native_results_or_expected_values_read', 'backend_or_ordinary_manager_PASS_claimed', 'scientific_PASS_claimed', 'gates_updated'])]:
++        need(all(result[k] is False for k in fields), 'actual scope flags differ')
++    need(rust['external_full_input_SHA_and_Source_capture_before_after_required'] is True and rust['all_declared_operations_retained'] is True and Path(rust['actual_input_path']).resolve() == C.exact(rguard['actual_input_before']) and rust['actual_input_size_bytes'] == C.exact(policy['literal_input_source']).stat().st_size, 'complete Rust input witness differs')
++    endpoints, operation_count, stopped_any = [], 0, False
++    for spec, ncase, rcase in zip(source['cases'], native['cases'], rust['cases']):
++        path = spec['case_id']
++        need(ncase['case_id'] == rcase['case_id'] == path and ncase['literal_input'] == rcase['literal_input'] == spec, 'full literal case witness/order differs')
++        need(all(case[k] is False for case in (ncase, rcase) for k in ('InitIntConvCoeff_invoked', 'ordinary_production_handoff_verified', 'numerical_PASS_claimed')) and rcase['actual_fixed_default_getter_invoked'] is True, 'case scope/default getter differs')
++        fresh_n, fresh_r = owner(ncase['fresh_constructor_state'], spec, True, True), owner(rcase['fresh_selected_owner'], spec, False, True)
++        default = C.scalar(rcase['actual_default_low_limit'])
++        C.same(fresh_n['LowHConvLimit'], default, path + '/actual-default/getter', 'input_join_comparisons')
++        pair(fresh_n, fresh_r, path + '/fresh-selected-owner', 'input_join_comparisons', set())
++        left, right = owner(ncase['prepared_state'], spec, True), owner(rcase['prepared_state'], spec, False)
++        pair(left, right, path + '/prepared', 'input_join_comparisons', set())
++        override = spec['initial']['LowHConvLimit_override']
++        low = fresh_n['LowHConvLimit'] if override is None else C.literal(override)
++        for label, value in [('Native', left), ('Rust', right)]:
++            C.same(low, value['LowHConvLimit'], path + '/literal-low/' + label, 'input_join_comparisons')
++            for i, declared in enumerate(spec['initial']['surfaces']):
++                for field in ('CosTilt', 'SurfHConvInt'):
++                    C.same(C.literal(declared[field]), value['rows'][i][field], f'{path}/literal-{label}/surface{i+1}/{field}', 'input_join_comparisons')
++                C.same(declared['ExtBoundCond'], value['rows'][i]['ExtBoundCond'], f'{path}/literal-{label}/surface{i+1}/boundary', 'input_join_comparisons')
++        calls, rcalls = ncase['actual_calls'], rcase['actual_calls']
++        need(ncase['actual_source_call_count'] == len(calls) and rcase['actual_source_call_count'] == len(rcalls) == len(spec['operations']), 'complete actual call counts required')
++        prior_n, prior_r, generated, cursor, stopped, unreached = ncase['prepared_state'], rcase['prepared_state'], set(), 0, False, []
++        for i, (op, rcall) in enumerate(zip(spec['operations'], rcalls), 1):
++            operation_count += 1
++            key = path + '/' + op['operation_id']
++            need(op['api'] in APIS and rcall['operation_id'] == op['operation_id'] and rcall['literal_operation'] == op and rcall['api'] == APIS[op['api']][1] and rcall['actual_call_ordinal'] == i and rcall['actual_source_invoked'] is True and rcall['actual_source_return_observed'] is True and rcall['source_exception'] is None and rcall['counted_as_PASS'] is False, 'actual Rust call/order/literal inputs differ')
++            for field in ('surface_temperature_c', 'air_temperature_c'):
++                C.literal(op[field])
++            detailed = op['api'] == 'CalcASHRAEDetailedIntConvCoeff'
++            selected = op['surface_index'] - 1 if detailed else None
++            need((op['correlation_cos_tilt'] is None and type(op['surface_index']) is int and 0 <= selected < len(left['rows'])) if detailed else op['surface_index'] is None, 'actual selected/direct argument domain differs')
++            if not detailed:
++                C.literal(op['correlation_cos_tilt']); C.scalar(rcall['actual_return_value'])
+             else:
+-                endpoint_scalar(left[name], right[name], field, 'selected_endpoint_comparisons', arithmetic_cell(stage, a, i, name))
+-
+-
+-def compare(packet, policy):
+-    nreceipt, rreceipt = custody(packet, policy)
+-    source, native, rust = load(packet['Native_input']), load(packet['Native_result']), load(packet['Rust_result'])
+-    need(native['schema'] == 'src05-surface-environment-direct-results.v1' and rust['schema'] == 'src05-surface-environment-selected-results.v1', 'result schema differs')
+-    count = len(source['cases'])
+-    need(native['requested_case_count'] == native['recorded_case_count'] == count == len(native['cases']) == len(rust['cases']) == policy['literal_case_count'], 'all literal cases required')
+-    for result, names in [(native, ['expected_values_supplied', 'Original_bodies_modified', 'scientific_PASS_claimed', 'gates_updated']), (rust, ['full_input_SHA_verified_internally', 'Native_results_or_expected_values_read', 'cold_check_backend_or_ordinary_manager_PASS_claimed', 'scientific_PASS_claimed', 'gates_updated'])]:
+-        need(all(result[name] is False for name in names), 'result scope declaration differs')
+-    need(rust['external_full_input_SHA_and_Source_capture_before_after_required'] is True and rust['all_declared_operations_retained'] is True and Path(rust['actual_input_path']).resolve() == exact(packet['Rust_input']) and rust['actual_input_size_bytes'] == exact(packet['Rust_input']).stat().st_size, 'full Rust input custody differs')
+-    endpoints, any_stopped, operations = [], False, 0
+-    for spec, ncase, rcase in zip(source['cases'], native['cases'], rust['cases']):
+-        key = spec['case_id']
+-        need(ncase['case_id'] == rcase['case_id'] == key and ncase['literal_input'] == rcase['literal_input'] == spec, 'full literal case witness/order differs')
+-        need(ncase['numerical_PASS_claimed'] is False and rcase['numerical_PASS_claimed'] is False and ncase['ordinary_production_handoff_verified'] is False and rcase['ordinary_production_handoff_verified'] is False and rcase['cold_check_or_backend_invoked'] is False, 'case scope differs')
+-        calls = ncase['actual_calls']
+-        need(ncase['actual_source_call_count'] == len(calls) and len(calls) >= 2 and [c['actual_call_ordinal'] for c in calls] == list(range(1, len(calls) + 1)), 'full Native call ledger required')
+-        for call, identity in zip(calls[:2], [('prepare-site-defaults', 'HeatBalanceManager::GetSiteAtmosphereData'), ('prepare-station-defaults', 'Weather::GetWeatherStation')]):
+-            need((call['operation_id'], call['api']) == identity and call['actual_source_invoked'] is True and call['actual_source_return_observed'] is True and call['source_exception'] is None, 'real default producer unavailable')
+-            selected(call['before'], spec, True); selected(call['after'], spec, True)
+-        need(calls[0]['after'] == calls[1]['before'], 'default producer continuity differs')
+-        need(rcase['actual_default_station_constructor_invoked'] is True, 'actual Rust default producer missing')
+-        for name in ['SiteTempGradient', 'WeatherFileTempModCoeff', 'WeatherFileWindModCoeff']:
+-            same(scalar(calls[1]['after']['owner']['environment'][name]), scalar(rcase['actual_default_station_parameters'][name]), key + '/default-producer/' + name, 'input_join_comparisons')
+-        a, b = selected(ncase['prepared_state'], spec, True), selected(rcase['prepared_state'], spec, False)
+-        pair(a, b, key + '/initial', 'input_join_comparisons')
+-        for i, declared in enumerate(spec['initial']['surfaces']):
+-            for name in ['Centroid_z'] + ARRAYS:
+-                same(literal(declared[name]), a['rows'][i][name], f'{key}/literal-initial/surface{i+1}/{name}', 'input_join_comparisons')
+-            same(declared['ExtWind'], a['rows'][i]['ExtWind'], f'{key}/literal-initial/surface{i+1}/ExtWind', 'input_join_comparisons')
+-        for name in ['SiteWindExp', 'SiteWindBLHeight']:
+-            same(literal(spec['initial']['site_parameters'][name]), a['parameters'][name], key + '/literal-initial/' + name, 'input_join_comparisons')
+-        for name in ['SiteTempGradient', 'WeatherFileTempModCoeff', 'WeatherFileWindModCoeff']:
+-            override = spec['initial']['site_parameters'][name + '_override']
+-            required = scalar(calls[1]['after']['owner']['environment'][name]) if override is None else literal(override)
+-            same(required, a['parameters'][name], key + '/literal-override-or-default/' + name, 'input_join_comparisons')
+-        for name, value in spec['initial']['backend_flags'].items():
+-            owner = ncase['prepared_state']['owner']
+-            actual = owner['backend_flags'][name] if name in owner['backend_flags'] else owner['backend'][name]
+-            same(value, actual, key + '/literal-backend-flag/' + name, 'input_join_comparisons')
+-        prior_n, prior_r, cursor, boundary_cursor, stopped = ncase['prepared_state'], rcase['prepared_state'], 2, 0, False
+-        expected_unreached, rust_ordinal = [], 0
+-        need(len(rcase['operations']) == len(spec['operations']), 'full Rust operations required')
+-        for op, rop in zip(spec['operations'], rcase['operations']):
+-            operations += 1
+-            path = key + '/' + op['operation_id']
+-            need(rop['operation_id'] == op['operation_id'] and rop['literal_operation'] == op and rop['independent_setter_probes_not_ordinary_manager'] is True, 'Rust operation identity/input differs')
+-            need(rop['before_declared_weather_writes'] == prior_r, 'Rust operation continuity differs')
+-            changed = copy.deepcopy(prior_r)
+-            changed['owner']['weather'] = rop['after_declared_weather_writes']['owner']['weather']
+-            need(changed == rop['after_declared_weather_writes'], 'undeclared Rust input write')
+-            for name, declared in op['weather'].items():
+-                same(literal(declared), scalar(rop['after_declared_weather_writes']['owner']['weather'][name]), path + '/every-Rust-weather-write/' + name, 'input_join_comparisons')
+-            declared_native = not stopped
+-            if declared_native:
+-                boundary = ncase['declared_weather_boundaries'][boundary_cursor]; boundary_cursor += 1
+-                need(boundary['literal_operation'] == op and boundary['before_declared_weather_writes'] == prior_n, 'Native operation/input continuity differs')
+-                changed = copy.deepcopy(prior_n)
+-                for name in WEATHER:
+-                    changed['owner']['environment'][name] = boundary['after_declared_weather_writes']['owner']['environment'][name]
+-                need(changed == boundary['after_declared_weather_writes'], 'undeclared Native input write')
+-                prior_n = boundary['after_declared_weather_writes']
++                need(rcall['actual_return_value'] is None, 'Detailed void call return differs')
++            need(rcall['before'] == prior_r, 'full Rust call continuity differs')
++            owner(rcall['before'], spec, False); owner(rcall['after'], spec, False)
++            unchanged_except_selected(rcall['before'], rcall['after'], selected, False)
++            if stopped:
++                unreached.append(op)
++                C.unavailable(key, 'Native-operation-unreached; independent-Rust-call-not-paired')
+             else:
+-                expected_unreached.append(op)
+-            prior_r = rop['after_declared_weather_writes']
+-            need(len(rop['calls']) == 4, 'full Rust stage ledger required')
+-            for stage, observed in zip(STAGES, rop['calls']):
+-                invoked = stage != 'check'
+-                if invoked:
+-                    rust_ordinal += 1
+-                need(observed['stage'] == stage and observed['actual_selected_method_invoked'] is invoked and observed['actual_selected_method_return_observed'] is invoked and observed['actual_selected_call_ordinal'] == (rust_ordinal if invoked else None) and observed['before'] == prior_r and observed['counted_as_PASS'] is False, 'actual Rust stage/invocation continuity differs')
+-                selected(observed['before'], spec, False); selected(observed['after'], spec, False)
+-                if not invoked:
+-                    need(observed['before'] == observed['after'], 'unavailable Rust guard changed owners')
+-                point = observed['actual_point_helper_returns']
+-                need(len(point) == (len(spec['initial']['surfaces']) if stage in ('bulbs', 'wind_speed') else 0) and all(v['Rust_row_index'] == i for i, v in enumerate(point)), 'full actual point-method rows required')
+-                point_keys = {'Rust_row_index', 'temperature_at_height_dry', 'temperature_at_height_wet'} if stage == 'bulbs' else {'Rust_row_index', 'wind_speed_at_height'}
+-                need(all(set(v) == point_keys for v in point), 'complete exact point-method DTO required')
+-                for v in point:
+-                    for name in point_keys - {'Rust_row_index'}:
+-                        scalar(v[name])
+-                if stopped:
+-                    if declared_native:
+-                        expected_unreached.append({'operation_id': op['operation_id'], 'unreached_stage': stage})
+-                    unavailable(path + '/' + stage, 'Native-stage-unreached; independent-Rust-probe-not-paired')
++                need(cursor < len(calls), 'Native reached call absent')
++                ncall = calls[cursor]; cursor += 1
++                need(ncall['operation_id'] == op['operation_id'] and ncall['api'] == APIS[op['api']][0] and ncall['actual_call_ordinal'] == cursor and ncall['actual_source_invoked'] is True and ncall['before'] == prior_n, 'actual Native call/order/continuity differs')
++                returned, exception = ncall['actual_source_return_observed'], ncall['source_exception']
++                need(type(returned) is bool and (exception is None if returned else isinstance(exception, dict) and exception.get('kind') == 'OriginalFatalError' and type(exception.get('message')) is str), 'unexpected Native source/callback-integrity exception')
++                owner(ncall['before'], spec, True); owner(ncall['after'], spec, True)
++                if returned:
++                    unchanged_except_selected(ncall['before'], ncall['after'], selected, True)
++                    need(ncall['actual_return_value'] is None, 'Detailed void call return differs') if detailed else C.scalar(ncall['actual_return_value'])
++                    endpoints.append((spec, op, key, ncall, rcall, set(generated)))
++                    if detailed:
++                        generated.add(selected)
+                 else:
+-                    call = calls[cursor]; cursor += 1
+-                    need(call['operation_id'] == op['operation_id'] and call['api'] == APIS[stage] and call['actual_source_invoked'] is True and call['before'] == prior_n, 'actual Native stage/API continuity differs')
+-                    returned = call['actual_source_return_observed']
+-                    need(type(returned) is bool and ((returned and call['source_exception'] is None) or (not returned and call['source_exception']['kind'] == 'OriginalFatalError')), 'unavailable/nonstandard actual Native source outcome')
+-                    for name, declared in op['weather'].items():
+-                        same(literal(declared), scalar(call['before']['owner']['environment'][name]), path + '/literal-weather/' + stage + '/' + name, 'input_join_comparisons')
+-                        same(literal(declared), scalar(observed['before']['owner']['weather'][name]), path + '/Rust-literal-weather/' + stage + '/' + name, 'input_join_comparisons')
+-                    if stage == 'check':
+-                        unavailable(path + '/check', 'Rust-cold-check-and-full-backend-unavailable', {'actual_Native_return_observed': returned, 'source_exception': call['source_exception']})
+-                    elif returned:
+-                        endpoints.append((spec, stage, path + '/' + stage, call, observed))
+-                    else:
+-                        unavailable(path + '/' + stage, 'actual-Native-setter-did-not-return', call['source_exception'])
+-                    selected(call['before'], spec, True); selected(call['after'], spec, True)
+-                    prior_n, stopped = call['after'], not returned
+-                prior_r = observed['after']
+-        need(cursor == len(calls) and boundary_cursor == len(ncase['declared_weather_boundaries']) and expected_unreached == ncase['unreached_operations_or_stages'], 'all Native calls/boundaries/unreached ledger required')
+-        need(prior_n == ncase['final'] and prior_r == rcase['final'] and ncase['actual_source_stopped'] is stopped, 'actual final owner/stop closure differs')
+-        need(rcase['actual_selected_method_call_count'] == rust_ordinal and rcase['actual_point_helper_call_count'] == 3 * len(spec['initial']['surfaces']) * len(spec['operations']), 'actual Rust method call counts differ')
+-        any_stopped = any_stopped or stopped
+-        unavailable(key + '/Native-only-context', 'actual-cold-backend/constructor-weather/allocation-implementation-unpaired')
+-    need(operations == policy['literal_operation_count'] and nreceipt['exit_code'] == (2 if any_stopped else 0), 'actual process exit disagrees with complete helper source-stop ledger')
+-    admitted = not MISMATCHES
+-    for spec, stage, path, call, observed in endpoints:
++                    need(ncall['actual_return_value'] is None, 'failed call invented return value')
++                    C.unavailable(key, 'actual-Native-source-did-not-return', exception)
++                prior_n, stopped = ncall['after'], not returned
++            prior_r = rcall['after']
++        need(cursor == len(calls) and ncase['unreached_operations'] == unreached and ncase['actual_source_stopped'] is stopped and ncase['final'] == prior_n and rcase['final'] == prior_r, 'complete actual call/stop/final closure differs')
++        owner(ncase['final'], spec, True); owner(rcase['final'], spec, False)
++        stopped_any = stopped_any or stopped
++        C.unavailable(path + '/Native-only-full-context', 'constructor/high-limit/Objexx-implementation/backend-callbacks-prefixes-retained-unpaired')
++    need(operation_count == 60 and nreceipt['exit_code'] == (2 if stopped_any else 0), 'actual Native exit/full stop ledger differs')
++    admitted = not C.MISMATCHES
++    for spec, op, key, ncall, rcall, generated in endpoints:
+         if not admitted:
+-            unavailable(path, 'global-input-or-initial-owner-join-failed; endpoint-not-paired')
++            C.unavailable(key, 'global-input-or-initial-full-owner-join-failed; no-endpoint-pairing')
+             continue
+-        a, b = selected(call['before'], spec, True), selected(observed['before'], spec, False)
+-        before_count = len(MISMATCHES)
+-        pair(a, b, path + '/full-preowner', 'pre_owner_comparisons')
+-        if len(MISMATCHES) != before_count:
+-            unavailable(path, 'full-preowner-join-failed; endpoint-not-paired')
++        left, right = owner(ncall['before'], spec, True), owner(rcall['before'], spec, False)
++        before = len(C.MISMATCHES)
++        pair(left, right, key + '/full-preowner', 'pre_owner_comparisons', generated)
++        if len(C.MISMATCHES) != before:
++            C.unavailable(key, 'full-preowner-join-failed; endpoint-not-paired')
+             continue
+-        a, b = selected(call['after'], spec, True), selected(observed['after'], spec, False)
+-        arithmetic_before = len(ARITHMETIC_UNAVAILABLE)
+-        endpoint(a, b, path + '/after', stage)
+-        PAIRS.append({'path': path, 'stage': stage, 'full_preowner_join_passed': True, 'endpoint_compared': True,
+-                      'arithmetic_nonfinite_unavailable_count': len(ARITHMETIC_UNAVAILABLE) - arithmetic_before, 'whole_unit_PASS_claimed': False})
+-        for i, point in enumerate(observed['actual_point_helper_returns']):
+-            names = [('temperature_at_height_dry', 'SurfOutDryBulbTemp'), ('temperature_at_height_wet', 'SurfOutWetBulbTemp')] if stage == 'bulbs' else [('wind_speed_at_height', 'SurfOutWindSpeed')]
+-            skip = stage == 'wind_speed' and a['parameters']['SiteWindExp'][0] not in ('0000000000000000', '8000000000000000') and not a['rows'][i]['ExtWind']
+-            if skip:
+-                unavailable(path + f'/point/surface{i+1}', 'Native-NoWind-row-skipped; independent-point-result-not-paired')
+-                continue
+-            for method, field in names:
+-                endpoint_scalar(a['rows'][i][field], scalar(point[method]), path + f'/point/surface{i+1}/' + method, 'point_helper_comparisons', arithmetic_cell(stage, a, i, field))
+-    return {'input_and_initial_owner_join_passed': admitted, 'endpoint_pairing_performed': admitted, 'actual_case_count': count,
+-            'actual_weather_operation_count': operations, 'paired_available_setter_boundaries': len(PAIRS),
+-            'actual_Native_process_exit_code': nreceipt['exit_code'], 'actual_Native_Source_snapshot': nreceipt['source_snapshot'], 'actual_Cargo_Source_snapshot': rreceipt['source_snapshot']}
++        detailed = op['api'] == 'CalcASHRAEDetailedIntConvCoeff'
++        after_generated = generated | ({op['surface_index'] - 1} if detailed else set())
++        arithmetic_before = len(NONFINITE)
++        pair(owner(ncall['after'], spec, True), owner(rcall['after'], spec, False), key + '/after-full-owner', 'selected_endpoint_comparisons', after_generated)
++        if not detailed:
++            scalar_pair(C.scalar(ncall['actual_return_value']), C.scalar(rcall['actual_return_value']), key + '/actual-return-value', 'selected_endpoint_comparisons', True)
++        C.PAIRS.append({'path': key, 'api': op['api'], 'full_preowner_join_passed': True, 'endpoint_compared': True,
++            'nonfinite_arithmetic_unavailable_count': len(NONFINITE) - arithmetic_before, 'whole_unit_PASS_claimed': False})
++    return {'global_input_and_initial_full_owner_join_passed': admitted, 'endpoint_pairing_performed': admitted,
++        'actual_case_count': 28, 'actual_declared_call_count': operation_count, 'paired_available_boundaries': len(C.PAIRS),
++        'actual_Native_exit_code': nreceipt['exit_code'], 'Native_source_stopped': stopped_any, 'selected_source_reachability_complete': len(endpoints) == operation_count, 'Native_capture_Source_snapshot': nreceipt['source_snapshot'],
++        'actual_Cargo_Source_snapshot': rreceipt['source_snapshot'], 'Native_original_stdout': nreceipt['stdout'],
++        'Rust_result': rguard['actual_output'], 'actual_API_correspondence': rguard['actual_API_correspondence']}
+ 
+ 
+ def main():
++    global C
++    import hashlib
++    need(hashlib.sha256(BASE.read_bytes()).hexdigest() == BASE_SHA, 'accepted comparison primitive Source differs')
++    C = module(BASE, 'accepted_src05_comparison_primitives')
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument('--custody', required=True)
+     parser.add_argument('--output-dir', required=True)
+     args = parser.parse_args()
+     name, sha = args.custody.rsplit('#', 1)
+     packet_ref = {'path': name, 'sha256': sha}
+-    packet, policy_ref = load(packet_ref), ref(HERE / 'policy.json')
+-    policy = load(policy_ref)
+-    need(equal_ref(packet['prospective_policy'], policy_ref), 'fixed prospective policy differs')
++    packet = C.load(packet_ref)
++    policy_ref = C.ref(HERE / 'policy.json')
++    policy = C.load(policy_ref)
++    policy['_actual_policy_ref'] = policy_ref
++    C.exact({'path': BASE.relative_to(ROOT).as_posix(), 'sha256': BASE_SHA})
+     output = (ROOT / args.output_dir).resolve()
+-    need(output.is_relative_to(ROOT / '.runtime/porting/SRC-05') and not output.exists(), 'fresh ignored SRC05 output required')
+-    output.mkdir(parents=True, exist_ok=False)
++    need(output.is_relative_to(ROOT / '.runtime/porting/SRC-06') and not output.exists(), 'fresh ignored SRC06 comparison output required')
++    output.mkdir(parents=True)
+     try:
+         findings = compare(packet, policy)
+-        status = 'pass-available-selected-setters-only' if findings['input_and_initial_owner_join_passed'] and not MISMATCHES and not ARITHMETIC_UNAVAILABLE else 'fail-selected-setters-or-input-join'
+-        code = 0 if status == 'pass-available-selected-setters-only' else 1
++        passed = findings['global_input_and_initial_full_owner_join_passed'] and findings['selected_source_reachability_complete'] and not C.MISMATCHES
++        status = 'pass-available-finite-selected-API-pairs-only' if passed else 'fail-selected-API-or-input-owner-join-or-unreached'
++        code = 0 if passed else 1
+     except (KeyError, TypeError, ValueError, IndexError, OSError) as error:
+         findings, status, code = {'integrity_failure': str(error), 'endpoint_pairing_performed': False}, 'fail-observation-or-custody-integrity', 2
+-    for path, sha in SEEN.items():
+-        need(digest(path) == sha, 'authenticated artifact changed during comparison')
++    for path, sha in C.SEEN.items():
++        need(C.digest(path) == sha, 'authenticated artifact changed during comparison')
++    if T is not None:
++        for path, row in T.SEEN.items():
++            need(T.full(path) == row, 'authenticated runtime API correspondence changed')
+     ledgers = {}
+-    for name, rows in [('mismatches', MISMATCHES), ('unavailable', UNAVAILABLE), ('paired-boundaries', PAIRS)]:
+-        path = output / (name + '.ndjson')
++    for label, rows in [('mismatches', C.MISMATCHES), ('unavailable', C.UNAVAILABLE), ('paired-boundaries', C.PAIRS)]:
++        path = output / (label + '.ndjson')
+         with path.open('x', encoding='utf-8', newline='\n') as stream:
+             for row in rows:
+                 stream.write(json.dumps(row, allow_nan=False) + '\n')
+-        ledgers[name] = ref(path)
+-    report = {'schema': 'src05-selected-surface-environment-comparison.v1', 'status': status, 'actual_custody': packet_ref,
+-        'actual_prospective_policy': policy_ref, 'findings': findings, 'counts': COUNTS, 'mismatch_count': len(MISMATCHES),
+-        'required_unavailable_count': len(UNAVAILABLE), 'nonfinite_arithmetic_unavailable_count': len(ARITHMETIC_UNAVAILABLE), 'all_mismatches_and_unavailable_rows_retained_uncapped': True, 'ledgers': ledgers,
+-        'cold_guard_backend_PASS_claimed': False, 'whole_SRC05_unit_or_ordinary_manager_PASS_claimed': False, 'gates_updated': False}
++        ledgers[label] = C.ref(path)
++    report = {'schema': 'src06-selected-tarp-inside-comparison.v1', 'status': status, 'actual_custody': packet_ref,
++        'actual_prospective_policy': policy_ref, 'findings': findings, 'counts': C.COUNTS, 'mismatch_count': len(C.MISMATCHES),
++        'required_unavailable_count': len(C.UNAVAILABLE), 'nonfinite_arithmetic_unavailable_count': len(NONFINITE),
++        'all_mismatches_and_unavailable_rows_retained_uncapped': True, 'ledgers': ledgers,
++        'diagnostic_class_checks_counted_as_numerical_PASS': False,
++        'backend_or_InitIntConvCoeff_cadence_PASS_claimed': False, 'whole_SRC06_unit_or_ordinary_handoff_PASS_claimed': False, 'gates_updated': False}
+     with (output / 'comparison.json').open('x', encoding='utf-8', newline='\n') as stream:
+         json.dump(report, stream, indent=2, allow_nan=False); stream.write('\n')
+-    print(json.dumps({'comparison': ref(output / 'comparison.json'), 'status': status, 'exit_code': code}))
++    print(json.dumps({'comparison': C.ref(output / 'comparison.json'), 'status': status, 'exit_code': code}))
+     return code
+ 
+ 

@@ -1,0 +1,9 @@
+--- .runtime/porting/SRC-05/surface-environment-main-thread-prep-01/rust/Cargo.toml
++++ .runtime/porting/SRC-06/tarp-inside-selected-rust-prep-01/rust/Cargo.toml
+@@ -1,5 +1,5 @@
+ [package]
+-name = "src05_surface_environment_main"
++name = "src06_tarp_inside_main"
+ version = "0.0.0"
+ edition = "2024"
+ publish = false

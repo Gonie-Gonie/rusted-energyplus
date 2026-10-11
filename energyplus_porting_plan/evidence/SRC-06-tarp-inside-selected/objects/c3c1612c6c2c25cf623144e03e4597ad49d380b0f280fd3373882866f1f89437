@@ -1,0 +1,49 @@
+{
+  "schema": "src06-actual-formatter-Root-review.v1",
+  "actual_application": {
+    "path": ".runtime/porting/SRC-06/tarp-inside-applied-01/record.json",
+    "sha256": "9673892bf081f39bbd1625601c1c4d50838681d730aa41f48bd34674d72d4679",
+    "size_bytes": 9878
+  },
+  "source_final": {
+    "path": ".runtime/porting/source-objects/8a/8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934",
+    "sha256": "8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934"
+  },
+  "Root_FULL_formatter_correspondence_accepted": true,
+  "Header_FULL_formatter_correspondence_accepted": true,
+  "independent_Header_review": {
+    "path": ".runtime/porting/SRC-06/Header-formatter-correspondence-review-01/review.json",
+    "sha256": "45b7c8b33b50716108c81b560472eef2e046e4fdc449b687fd9895219ff98d3e",
+    "size_bytes": 2691
+  },
+  "correspondence_scope": "Fully read import block move, whitespace wraps and optional call/assert trailing commas; every operand, literal, branch and ordering unchanged.",
+  "all_full_archived_snapshot_members_verified": 11786,
+  "current_Source_members": 3929,
+  "unrelated_Source_members_preserved": 3926,
+  "full_formatter_diff_rows": [
+    {
+      "path": "crates/ep_runtime/src/heat_balance/convection.rs",
+      "formatter_diff_lines": 24
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/convection/tarp_inside.rs",
+      "formatter_diff_lines": 105
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests/part03.rs",
+      "formatter_diff_lines": 0
+    },
+    {
+      "path": "energyplus_porting_plan/cards/SRC-06.md",
+      "formatter_diff_lines": 0
+    }
+  ],
+  "genuine_Native_closed_before_application": true,
+  "accepted_math_preparation": {
+    "path": ".runtime/porting/SRC-06/tarp-inside-getter-prep-01/manifest.json",
+    "sha256": "7eb308271196d36cbcbf58f17cec8599ddd3c396a84c5c52fcab958933f99963",
+    "size_bytes": 29272
+  },
+  "numerical_PASS_claimed": false,
+  "gates_updated": false
+}

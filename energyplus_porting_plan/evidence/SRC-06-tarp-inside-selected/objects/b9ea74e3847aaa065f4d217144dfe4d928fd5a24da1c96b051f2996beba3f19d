@@ -1,0 +1,79 @@
+"""Narrow Source-only collector authority/post-core successor; never invoke a helper."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+OLD = ROOT / '.runtime/porting/SRC-06/native-execution-prep-01'
+NEW = ROOT / '.runtime/porting/SRC-06/native-execution-prep-02'
+NEW.mkdir(exist_ok=False); (NEW / 'before').mkdir(); (NEW / 'diffs').mkdir()
+
+
+def ref(path):
+    path = path.resolve(); data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(data).hexdigest(), 'size_bytes': len(data), 'line_count': len(data.splitlines())}
+
+
+def dump(path, value):
+    with path.open('xb') as stream:
+        stream.write((json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode('utf-8'))
+
+
+def replace_once(text, before, after):
+    assert text.count(before) == 1
+    return text.replace(before, after)
+
+
+text = (OLD / 'run_execution.py').read_text(encoding='utf-8')
+text = replace_once(text, "    native, configure_prep, provider_prep = (load(authority_refs[k]) for k in ('Native_preparation', 'configure_preparation', 'provider_preparation'))\n",
+                    "    native, configure_prep, historical_provider_prep = (load(authority_refs[k]) for k in ('Native_preparation', 'configure_preparation', 'provider_preparation'))\n")
+text = replace_once(text, "    same(inventory['actual_evidence_collector'], provider_prep['own_sources'][0])\n",
+                    "    provider_prep = load(approval['provider_collection_preparation'])\n"
+                    "    need(provider_prep['schema'] == 'src06-tarp-inside-native-provider-collection-preparation.v1', 'actual reviewed collector preparation required')\n"
+                    "    same(inventory['actual_evidence_collector'], approval['actual_evidence_collector'])\n"
+                    "    same(approval['actual_evidence_collector'], provider_prep['own_sources'][0])\n")
+text = replace_once(text, "    for value in (native, configure_prep, provider_prep, inventory, approval):\n",
+                    "    for value in (native, configure_prep, historical_provider_prep, provider_prep, inventory, approval):\n")
+text = replace_once(text, "    binary, link_map, obj = (full(bind(inventory[k])) for k in ('actual_Native_binary', 'actual_full_link_map', 'actual_helper_object'))\n",
+                    "    post_core = recorded(inventory['actual_post_build_core_execution'], inventory['Source_snapshot'])\n"
+                    "    need(Path(post_core['command'][0]).resolve() == Path(sys.executable).resolve() and post_core['command'][1:] == ['-X', 'utf8', '-B', 'tools/porting/build_original_reference.py', '--check'], 'actual post-build official checker command required')\n"
+                    "    need(b'13534 byte-identical official blobs' in bind(post_core['stdout']).read_bytes() and build['finished_utc'] <= post_core['started_utc'], 'full post-build official Source/core check and chronology required')\n"
+                    "    binary, link_map, obj = (full(bind(inventory[k])) for k in ('actual_Native_binary', 'actual_full_link_map', 'actual_helper_object'))\n")
+(NEW / 'run_execution.py').write_bytes(text.encode('utf-8')); ast.parse(text)
+readme = (OLD / 'README.md').read_text(encoding='utf-8')
+readme = replace_once(readme, 'native-execution-prep-01/run_execution.py', 'native-execution-prep-02/run_execution.py')
+readme = replace_once(readme, 'provider collector preparation d86c578 and actual successful compile aceb9ef remain pinned.', 'historical provider collector preparation d86c578 and actual successful compile aceb9ef remain pinned. The actual executed collector preparation and Source are authenticated dynamically from Root acceptance, preserving collector01 and any failed attempts as ancestry.')
+readme = replace_once(readme, 'These references must equal the authenticated inventory.', 'The acceptance packet additionally requires exact refs `provider_collection_preparation` and `actual_evidence_collector`; that actual collector must equal both the accepted preparation own Source and inventory actual_evidence_collector. These references must equal the authenticated inventory.')
+readme = replace_once(readme, 'Their complete address-bound code extents must match', 'Their complete address-bound next-symbol code intervals (without claiming exclusive function-body ownership) must match')
+readme += '\nSuccessor02 requires the actual inventory `actual_post_build_core_execution`: a closed same-build-Source standard receipt for the exact Python -X utf8 -B tools/porting/build_original_reference.py --check command, all 13,534 official blobs, and a start after actual compile/link finished. This is required before helper execution. The collector/runtime artifact identities remain factual operands; no future hash is supplied. All input, mathematical and outcome handling code is unchanged from01. No numerical outputs were read while authoring02.\n'
+(NEW / 'README.md').write_bytes(readme.encode('utf-8'))
+before_archives = []; deltas = []
+for name in ('run_execution.py', 'README.md', 'manifest.json'):
+    old = OLD / name; before = NEW / 'before' / name; before.write_bytes(old.read_bytes())
+    before_archives.append({'original': ref(old), 'archive': ref(before)})
+    if name != 'manifest.json':
+        after = NEW / name
+        data = ''.join(difflib.unified_diff(before.read_text(encoding='utf-8').splitlines(keepends=True), after.read_text(encoding='utf-8').splitlines(keepends=True), fromfile=before.relative_to(ROOT).as_posix(), tofile=after.relative_to(ROOT).as_posix()))
+        delta = NEW / 'diffs' / (name + '.from01.diff'); delta.write_bytes(data.encode('utf-8'))
+        deltas.append({'before': ref(before), 'after': ref(after), 'exact_diff': ref(delta)})
+m = json.loads((OLD / 'manifest.json').read_bytes())
+m['own_sources'] = [ref(NEW / 'run_execution.py')]; m['README'] = ref(NEW / 'README.md'); m['author'] = ref(Path(__file__))
+m['predecessor_source_preparation'] = ref(OLD / 'manifest.json')
+m['source_dependencies'].append(ref(OLD / 'manifest.json'))
+m['before_archives'] += before_archives; m['narrow_exact_diffs'] = deltas
+m['runtime_interfaces']['Root_acceptance_reference_keys'] += ['provider_collection_preparation', 'actual_evidence_collector']
+m['runtime_interfaces']['actual_post_build_core_execution_required'] = True
+m['runtime_interfaces']['provider_code_extent_rule'] = 'Actual next map symbol in same input text section, otherwise section end; interval can contain adjacent code, not claimed exclusive function body'
+seen = set()
+def verify(v):
+    if isinstance(v, dict):
+        if 'path' in v and 'sha256' in v:
+            actual = ref(ROOT / v['path']); assert all(actual[k] == v[k] for k in ('sha256', 'size_bytes', 'line_count') if k in v); seen.add(v['path'])
+        for x in v.values(): verify(x)
+    elif isinstance(v, list):
+        for x in v: verify(x)
+verify(m)
+dump(NEW / 'manifest.json', m)
+print(json.dumps({'manifest': ref(NEW / 'manifest.json'), 'own': m['own_sources'], 'narrow_diff_lines': [d['exact_diff']['line_count'] for d in deltas], 'unique_full_refs': len(seen), 'driver_executed': False}))

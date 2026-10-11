@@ -1,0 +1,11 @@
+--- .runtime/porting/SRC-05/surface-environment-main-thread-prep-01/rust/Cargo.lock
++++ .runtime/porting/SRC-06/tarp-inside-selected-rust-prep-01/rust/Cargo.lock
+@@ -86,7 +86,7 @@
+ ]
+ 
+ [[package]]
+-name = "src05_surface_environment_main"
++name = "src06_tarp_inside_main"
+ version = "0.0.0"
+ dependencies = [
+  "ep_model",

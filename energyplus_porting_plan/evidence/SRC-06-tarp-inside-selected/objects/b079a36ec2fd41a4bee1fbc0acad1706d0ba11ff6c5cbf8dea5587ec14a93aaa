@@ -1,0 +1,8 @@
+            }
+
+            if (!state.dataIPShortCut->lNumericFieldBlanks(2)) {
+                state.dataHeatBal->LowHConvLimit = BuildingNumbers(2);
+            }
+            if (!state.dataIPShortCut->lNumericFieldBlanks(3)) {
+                state.dataHeatBal->HighHConvLimit = BuildingNumbers(3);
+            }

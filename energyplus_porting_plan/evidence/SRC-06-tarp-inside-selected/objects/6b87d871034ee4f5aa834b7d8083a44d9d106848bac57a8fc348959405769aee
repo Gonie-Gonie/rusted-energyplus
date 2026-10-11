@@ -1,0 +1,179 @@
+EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc:1908
+EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc:1960
+{"receipt": {"path": ".runtime/porting/SRC-06/native-provider-review-01/provider-addr2line-command/receipt.json", "sha256": "9baf158aee44eea7ea1f88bedd4f13d0311ae37893f8f4693d528aa8260bce7e"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+
+D:\CodexBuild\rusted-energyplus\SRC-06\native-build-01\bin\src06_tarp_inside_helper.exe:     file format pei-x86-64
+
+
+Disassembly of section .text:
+
+000000014001962a <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)>:
+   14001962a:	55                   	push   %rbp
+   14001962b:	48 89 e5             	mov    %rsp,%rbp
+   14001962e:	48 83 ec 30          	sub    $0x30,%rsp
+   140019632:	f2 0f 11 45 10       	movsd  %xmm0,0x10(%rbp)
+   140019637:	f2 0f 11 4d 18       	movsd  %xmm1,0x18(%rbp)
+   14001963c:	f2 0f 11 55 20       	movsd  %xmm2,0x20(%rbp)
+   140019641:	f2 0f 10 45 10       	movsd  0x10(%rbp),%xmm0
+   140019646:	f2 0f 5c 45 18       	subsd  0x18(%rbp),%xmm0
+   14001964b:	f2 0f 11 45 f8       	movsd  %xmm0,-0x8(%rbp)
+   140019650:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   140019654:	66 0f 2e 45 f8       	ucomisd -0x8(%rbp),%xmm0
+   140019659:	7a 0b                	jp     140019666 <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)+0x3c>
+   14001965b:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   14001965f:	66 0f 2e 45 f8       	ucomisd -0x8(%rbp),%xmm0
+   140019664:	74 16                	je     14001967c <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)+0x52>
+   140019666:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   14001966a:	66 0f 2e 45 20       	ucomisd 0x20(%rbp),%xmm0
+   14001966f:	7a 20                	jp     140019691 <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)+0x67>
+   140019671:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   140019675:	66 0f 2e 45 20       	ucomisd 0x20(%rbp),%xmm0
+   14001967a:	75 15                	jne    140019691 <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)+0x67>
+   14001967c:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+   140019680:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   140019685:	e8 b6 7d c3 01       	call   141c51440 <EnergyPlus::Convect::CalcASHRAEVerticalWall(double)>
+   14001968a:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   14001968f:	eb 6f                	jmp    140019700 <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)+0xd6>
+   140019691:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   140019695:	66 0f 2f 45 f8       	comisd -0x8(%rbp),%xmm0
+   14001969a:	76 0b                	jbe    1400196a7 <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)+0x7d>
+   14001969c:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   1400196a0:	66 0f 2f 45 20       	comisd 0x20(%rbp),%xmm0
+   1400196a5:	77 1e                	ja     1400196c5 <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)+0x9b>
+   1400196a7:	f2 0f 10 45 f8       	movsd  -0x8(%rbp),%xmm0
+   1400196ac:	66 0f ef c9          	pxor   %xmm1,%xmm1
+   1400196b0:	66 0f 2f c1          	comisd %xmm1,%xmm0
+   1400196b4:	76 2d                	jbe    1400196e3 <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)+0xb9>
+   1400196b6:	f2 0f 10 45 20       	movsd  0x20(%rbp),%xmm0
+   1400196bb:	66 0f ef c9          	pxor   %xmm1,%xmm1
+   1400196bf:	66 0f 2f c1          	comisd %xmm1,%xmm0
+   1400196c3:	76 1e                	jbe    1400196e3 <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)+0xb9>
+   1400196c5:	f2 0f 10 45 20       	movsd  0x20(%rbp),%xmm0
+   1400196ca:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+   1400196ce:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   1400196d2:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   1400196d7:	e8 54 7e c3 01       	call   141c51530 <EnergyPlus::Convect::CalcWaltonUnstableHorizontalOrTilt(double, double)>
+   1400196dc:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   1400196e1:	eb 1d                	jmp    140019700 <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)+0xd6>
+   1400196e3:	f2 0f 10 45 20       	movsd  0x20(%rbp),%xmm0
+   1400196e8:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+   1400196ec:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   1400196f0:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   1400196f5:	e8 a6 7d c3 01       	call   141c514a0 <EnergyPlus::Convect::CalcWaltonStableHorizontalOrTilt(double, double)>
+   1400196fa:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   1400196ff:	90                   	nop
+   140019700:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   140019705:	48 83 c4 30          	add    $0x30,%rsp
+   140019709:	5d                   	pop    %rbp
+   14001970a:	c3                   	ret
+   14001970b:	90                   	nop
+
+000000014001970c <EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)::{lambda(double, double, double, double, double)#1}::operator()(double, double, double, double, double) const>:
+   14001970c:	55                   	push   %rbp
+   14001970d:	48 89 e5             	mov    %rsp,%rbp
+   140019710:	48 83 ec 20          	sub    $0x20,%rsp
+   140019714:	48 89 4d 10          	mov    %rcx,0x10(%rbp)
+   140019718:	f2 0f 11 4d 18       	movsd  %xmm1,0x18(%rbp)
+   14001971d:	f2 0f 11 55 20       	movsd  %xmm2,0x20(%rbp)
+   140019722:	f2 0f 11 5d 28       	movsd  %xmm3,0x28(%rbp)
+   140019727:	f2 0f 10 4d 38       	movsd  0x38(%rbp),%xmm1
+   14001972c:	f2 0f 10 45 20       	movsd  0x20(%rbp),%xmm0
+   140019731:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   140019735:	66 0f 28 d1          	movapd %xmm1,%xmm2
+   140019739:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   14001973d:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   140019742:	e8 e3 fe ff ff       	call   14001962a <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)>
+   140019747:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   14001974c:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   140019751:	48 83 c4 20          	add    $0x20,%rsp
+   140019755:	5d                   	pop    %rbp
+   140019756:	c3                   	ret
+{"receipt": {"path": ".runtime/porting/SRC-06/native-provider-review-01/natural-disassembly-command/receipt.json", "sha256": "e3ecf25bd8a880f5ae96d17223e82fbf03b94d3370482d9543cb640e89170795"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+       	mov    %rax,%rdx
+   140019798:	e8 13 91 c4 01       	call   141c628b0 <EnergyPlus::EPVector<EnergyPlus::DataSurfaces::SurfaceData>::operator()(unsigned long long)>
+   14001979d:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
+   1400197a1:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+   1400197a5:	8b 80 e0 03 00 00    	mov    0x3e0(%rax),%eax
+   1400197ab:	83 f8 fa             	cmp    $0xfffffffa,%eax
+   1400197ae:	75 36                	jne    1400197e6 <EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)+0x8f>
+   1400197b0:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   1400197b4:	48 05 40 14 00 00    	add    $0x1440,%rax
+   1400197ba:	48 89 c1             	mov    %rax,%rcx
+   1400197bd:	e8 4e b4 03 02       	call   142054c10 <std::unique_ptr<EnergyPlus::SurfaceGeometryData, std::default_delete<EnergyPlus::SurfaceGeometryData> >::operator->() const>
+   1400197c2:	48 8d 88 a0 09 00 00 	lea    0x9a0(%rax),%rcx
+   1400197c9:	48 8d 45 38          	lea    0x38(%rbp),%rax
+   1400197cd:	48 89 c2             	mov    %rax,%rdx
+   1400197d0:	e8 ab 85 22 02       	call   142241d80 <std::map<int, EnergyPlus::HeatBalanceKivaManager::KivaManager::ConvectionAlgorithms, std::less<int>, std::allocator<std::pair<int const, EnergyPlus::HeatBalanceKivaManager::KivaManager::ConvectionAlgorithms> > >::operator[](int const&)>
+   1400197d5:	48 89 c1             	mov    %rax,%rcx
+   1400197d8:	48 8d 45 f7          	lea    -0x9(%rbp),%rax
+   1400197dc:	48 89 c2             	mov    %rax,%rdx
+   1400197df:	e8 84 6e 01 00       	call   140030668 <std::enable_if<std::function<double (double, double, double, double, double)>::_Callable<EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)::{lambda(double, double, double, double, double)#1}, std::enable_if<!std::is_same<std::remove_cv<std::remove_reference<EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)::{lambda(double, double, double, double, double)#1}>::type>::type, std::function<double (double, double, double, double, double)> >::value, std::decay<EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)::{lambda(double, double, double, double, double)#1}> >::type::type, std::__invoke_result<std::enable_if<!std::is_same<std::remove_cv<std::remove_reference<EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)::{lambda(double, double, double, double, double)#1}>::type>::type, std::function<double (double, double, double, double, double)> >::value, std::decay<EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)::{lambda(double, double, double, double, double)#1}> >::type::type&, double, double, double, double, double> >::value, std::function<double (double, double, double, double, double)>&>::type std::function<double (double, double, double, double, double)>::operator=<EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)::{lambda(double, double, double, double, double)#1}>(EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)::{lambda(double, double, double, double, double)#1}&&)>
+   1400197e4:	eb 5e                	jmp    140019844 <EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)+0xed>
+   1400197e6:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+   1400197ea:	f2 0f 10 80 30 03 00 00 	movsd  0x330(%rax),%xmm0
+   1400197f2:	f3 0f 7e 0d b6 58 54 02 	movq   0x25458b6(%rip),%xmm1        # 14255f0b0 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper>::desc+0x158>
+   1400197fa:	66 0f 57 c8          	xorpd  %xmm0,%xmm1
+   1400197fe:	f2 0f 10 45 48       	movsd  0x48(%rbp),%xmm0
+   140019803:	48 8b 45 40          	mov    0x40(%rbp),%rax
+   140019807:	66 0f 28 d1          	movapd %xmm1,%xmm2
+   14001980b:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   14001980f:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   140019814:	e8 11 fe ff ff       	call   14001962a <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)>
+   140019819:	66 48 0f 7e c3       	movq   %xmm0,%rbx
+   14001981e:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   140019822:	48 05 30 11 00 00    	add    $0x1130,%rax
+   140019828:	48 89 c1             	mov    %rax,%rcx
+   14001982b:	e8 80 9f 03 02       	call   1420537b0 <std::unique_ptr<EnergyPlus::HeatBalSurfData, std::default_delete<EnergyPlus::HeatBalSurfData> >::operator->() const>
+   140019830:	48 8d 88 e0 06 00 00 	lea    0x6e0(%rax),%rcx
+   140019837:	8b 45 38             	mov    0x38(%rbp),%eax
+   14001983a:	89 c2                	mov    %eax,%edx
+   14001983c:	e8 2f 80 ee 01       	call   141f01870 <ObjexxFCL::Array1<double>::operator()(int)>
+   140019841:	48 89 18             	mov    %rbx,(%rax)
+   140019844:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   140019848:	48 05 30 11 00 00    	add    $0x1130,%rax
+   14001984e:	48 89 c1             	mov    %rax,%rcx
+   140019851:	e8 5a 9f 03 02       	call   1420537b0 <std::unique_ptr<EnergyPlus::HeatBalSurfData, std::default_delete<EnergyPlus::HeatBalSurfData> >::operator->() const>
+   140019856:	48 8d 88 e0 06 00 00 	lea    0x6e0(%rax),%rcx
+   14001985d:	8b 45 38             	mov    0x38(%rbp),%eax
+   140019860:	89 c2                	mov    %eax,%edx
+   140019862:	e8 09 80 ee 01       	call   141f01870 <ObjexxFCL::Array1<double>::operator()(int)>
+   140019867:	f2 0f 10 30          	movsd  (%rax),%xmm6
+   14001986b:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001986f:	48 05 48 11 00 00    	add    $0x1148,%rax
+   140019875:	48 89 c1             	mov    %rax,%rcx
+   140019878:	e8 73 9f 03 02       	call   1420537f0 <std::unique_ptr<EnergyPlus::HeatBalanceData, std::default_delete<EnergyPlus::HeatBalanceData> >::operator->() const>
+   14001987d:	f2 0f 10 40 10       	movsd  0x10(%rax),%xmm0
+   140019882:	66 0f 2f c6          	comisd %xmm6,%xmm0
+   140019886:	0f 97 c0             	seta   %al
+   140019889:	84 c0                	test   %al,%al
+   14001988b:	74 3e                	je     1400198cb <EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)+0x174>
+   14001988d:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   140019891:	48 05 48 11 00 00    	add    $0x1148,%rax
+   140019897:	48 89 c1             	mov    %rax,%rcx
+   14001989a:	e8 51 9f 03 02       	call   1420537f0 <std::unique_ptr<EnergyPlus::HeatBalanceData, std::default_delete<EnergyPlus::HeatBalanceData> >::operator->() const>
+   14001989f:	f2 0f 10 70 10       	movsd  0x10(%rax),%xmm6
+   1400198a4:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   1400198a8:	48 05 30 11 00 00    	add    $0x1130,%rax
+   1400198ae:	48 89 c1             	mov    %rax,%rcx
+   1400198b1:	e8 fa 9e 03 02       	call   1420537b0 <std::unique_ptr<EnergyPlus::HeatBalSurfData, std::default_delete<EnergyPlus::HeatBalSurfData> >::operator->() const>
+   1400198b6:	48 8d 88 e0 06 00 00 	lea    0x6e0(%rax),%rcx
+   1400198bd:	8b 45 38             	mov    0x38(%rbp),%eax
+   1400198c0:	89 c2                	mov    %eax,%edx
+   1400198c2:	e8 a9 7f ee 01       	call   141f01870 <ObjexxFCL::Array1<double>::operator()(int)>
+   1400198c7:	f2 0f 11 30          	movsd  %xmm6,(%rax)
+   1400198cb:	90                   	nop
+   1400198cc:	0f 28 75 00          	movaps 0x0(%rbp),%xmm6
+   1400198d0:	48 83 c4 48          	add    $0x48,%rsp
+   1400198d4:	5b                   	pop    %rbx
+   1400198d5:	5d                   	pop    %rbp
+   1400198d6:	c3                   	ret
+{"receipt": {"path": ".runtime/porting/SRC-06/native-provider-review-01/detailed-disassembly-command/receipt.json", "sha256": "ebde4581a94b6427c8c91ddbe1ff5424f705f51dd575d698402b5b2bb2747592"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+PASS original source: 13534 byte-identical official blobs
+PASS winlibs-gcc: pinned executable/installation evidence; version query skipped
+PASS cmake: pinned executable/installation evidence; version query skipped
+PASS ninja: pinned executable/installation evidence; version query skipped
+PASS native core: EnergyPlus, Version 26.1.0-6f2e40d102; API0.2; genuine state lifecycle
+PASS explicit O0 reference; default optimized failure remains disclosed; no files written.
+{"receipt": {"path": ".runtime/porting/SRC-06/native-provider-review-01/post-build-core-command/receipt.json", "sha256": "3b1fcbbcb2370e436de394f40982348fd1edeb2c32fa0eafe27ae0fd605fba81"}, "exit_code": 0, "source_bytes_match_before_and_after": true}

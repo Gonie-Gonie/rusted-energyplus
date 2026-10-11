@@ -1,0 +1,208 @@
+"""Root-only read-only SRC06 link/provider collection; never execute the helper."""
+import argparse
+import hashlib
+import json
+import mmap
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+BUILD = ROOT / '.runtime/ep261-gcc13-o0'
+NATIVE = ROOT / '.runtime/porting/SRC-06/native-tarp-inside-prep-02'
+RECORDER = ROOT / 'tools/porting/record_command.py'
+TOOLS = ROOT / '.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin'
+SEEN = {}
+
+
+def ref(path):
+    path = path.resolve()
+    with path.open('rb') as stream:
+        digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+    return dict(path=path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else str(path), sha256=digest, size_bytes=path.stat().st_size)
+
+
+def checked(row):
+    path = (ROOT / row['path']).resolve()
+    assert path.is_relative_to(ROOT) or path.is_relative_to(Path('D:/CodexBuild/rusted-energyplus/SRC-06/native-build-01/bin'))
+    actual = SEEN.get(path)
+    if actual is None:
+        actual = ref(path); SEEN[path] = actual
+    assert actual['sha256'] == row['sha256'] and all(k not in row or row[k] == actual['size_bytes'] for k in ('size_bytes', 'bytes'))
+    return path
+
+
+def load(row):
+    return json.loads(checked(row).read_bytes())
+
+
+def operand(text):
+    name, digest = text.rsplit('#', 1)
+    path = checked(dict(path=name, sha256=digest))
+    return ref(path)
+
+
+def collect(value):
+    if isinstance(value, dict):
+        if 'path' in value and 'sha256' in value:
+            checked(value)
+        for child in value.values(): collect(child)
+    elif isinstance(value, list):
+        for child in value: collect(child)
+
+
+def dump(path, value):
+    with path.open('xb') as stream:
+        stream.write((json.dumps(value, ensure_ascii=False, allow_nan=False, indent=2) + '\n').encode())
+
+
+def receipt(row):
+    value = load(row)
+    assert value['schema'] == 'recorded-porting-command.v1' and value['exit_code'] == 0 and value['launch_error'] is None
+    assert value['source_bytes_match_before_and_after'] is True and value['source_snapshot'] == snapshot
+    checked(value['stdout']); checked(value['stderr'])
+    assert checked(value['executed_launcher']['archive']).read_bytes() == RECORDER.read_bytes()
+    return value
+
+
+def recorded(command, role):
+    directory = output / role
+    code = subprocess.run([sys.executable, '-X', 'utf8', '-B', str(RECORDER), '--output-dir', directory.relative_to(ROOT).as_posix(), '--', *command], cwd=ROOT).returncode
+    row = ref(directory / 'receipt.json'); value = receipt(row)
+    assert value['command'] == command and code == value['exit_code'] and checked(value['stderr']).stat().st_size == 0
+    return row, value
+
+
+parser = argparse.ArgumentParser(description=__doc__)
+for name in ('frozen-inputs', 'configure-review', 'build-execution'):
+    parser.add_argument('--' + name, required=True, help='Closed actual path#SHA256')
+parser.add_argument('--output-dir', required=True, help='Fresh ignored SRC06 directory')
+args = parser.parse_args()
+frozen_ref, review_ref, build_ref = [operand(getattr(args, key)) for key in ('frozen_inputs', 'configure_review', 'build_execution')]
+freeze, review = load(frozen_ref), load(review_ref)
+assert freeze['schema'] == 'src06-tarp-inside-frozen-configure-inputs.v1' and review['schema'] == 'src06-tarp-inside-configure-dry-review.v1'
+assert review['frozen_build_inputs'] == frozen_ref and freeze['reviewed_Source_preparation']['sha256'] == 'ba8de8e1378003bd0f9fa0305a074b838448425503330a47cba01f2b68e31d35'
+assert checked(freeze['reviewed_Source_preparation']) == NATIVE / 'manifest.json'
+snapshot = freeze['Source_snapshot']; collect(freeze); collect(review)
+source = load(snapshot)
+assert source['schema'] == 'rust-command-source-snapshot.v1' and source['bytes_normalized'] is False
+members = {r['historical_path']: r for r in source['files']}
+paths = set((ROOT / 'crates').rglob('*.rs')) | set((ROOT / 'crates').rglob('Cargo.toml'))
+paths |= {ROOT / n for n in ('Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml') if (ROOT / n).is_file()}
+assert len(members) == len(source['files']) and {p.relative_to(ROOT).as_posix() for p in paths} == set(members)
+for name, row in members.items():
+    checked(row['archive']); checked(dict(path=name, sha256=row['archive']['sha256'], size_bytes=row['size_bytes']))
+checked(dict(path='tools/porting/record_command.py', sha256='5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'))
+checked(ref(Path(__file__)))
+pe_source = checked(dict(path='tools/porting/native_pe.py', sha256='afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56'))
+addr2line = checked(dict(path=(TOOLS / 'addr2line.exe').relative_to(ROOT).as_posix(), sha256='2a09b9eb95ea235075831caf186c746c1e4a2c566a2b065f13ce8912df3b5885'))
+objdump = checked(dict(path=(TOOLS / 'objdump.exe').relative_to(ROOT).as_posix(), sha256='0d140222ea3e5bb234a98c602350c1ace10ddaba7638dbb96f3ec9a0d17bfbc1'))
+sys.path.insert(0, str(pe_source.parent))
+import native_pe
+
+configure, dry, build = [receipt(r) for r in (review['configure_execution'], review['dry_execution'], build_ref)]
+assert configure['command'] == freeze['actual_configure_command']
+expected = review['prospective_compile_command']; actual = build['command']
+assert len(expected) == len(actual) == 6 and actual[1] == expected[1] == '-C'
+assert (ROOT / actual[0]).resolve() == Path(expected[0]).resolve() and (ROOT / actual[2]).resolve() == Path(expected[2]).resolve() == BUILD
+assert actual[3:] == expected[3:] == ['-j1', '-v', 'src06_tarp_inside_helper']
+actual_ninja = ref(checked(ref(Path(expected[0]))))
+assert dry['command'] == expected[:3] + ['-n'] + expected[3:]
+assert configure['finished_utc'] <= dry['started_utc'] and dry['finished_utc'] <= build['started_utc']
+assert review['previous_compile_rows'] == 741 and review['current_compile_rows'] == 742 and review['exact_previous_rows_preserved'] is True
+assert review['exact_prior_core_link_suffix_preserved'] is True and review['compile_performed'] is False and review['helper_executed'] is False
+for key in ('actual_core_before', 'actual_core_after'):
+    value = receipt(review[key])
+    assert value['command'][1:] == ['-X', 'utf8', '-B', 'tools/porting/build_original_reference.py', '--check']
+    assert b'13534 byte-identical official blobs' in checked(value['stdout']).read_bytes()
+assert receipt(review['actual_core_after'])['finished_utc'] <= build['started_utc']
+for name, field in [('compile_commands.json', 'actual_graph_after'), ('CMakeCache.txt', 'actual_cache_after')]:
+    checked(dict(path=(BUILD / name).relative_to(ROOT).as_posix(), sha256=review[field]['sha256']))
+checked(dict(path=(BUILD / 'build.ninja').relative_to(ROOT).as_posix(), sha256=ref(checked(frozen_ref).parent / 'build.ninja.after')['sha256']))
+steps = [line for line in checked(build['stdout']).read_text(encoding='utf8').splitlines() if re.match(r'^\[\d+/\d+\]', line)]
+assert len(steps) == 2 and steps == review['dry_steps']
+assert '-O0 ' in steps[0] and '-ffp-contract=off' in steps[0] and 'tarp_inside_reference_helper.cpp' in steps[0]
+assert 'Products/libenergypluslib.a' in steps[1] and 'src06_tarp_inside_helper.exe' in steps[1]
+core = load(freeze['original_core_receipt']); collect(core)
+assert core['checks_passed'] is True and core['scientific_source_patches'] is False
+binary = Path(freeze['actual_output_directory']).resolve() / 'src06_tarp_inside_helper.exe'
+assert binary.parent == Path('D:/CodexBuild/rusted-energyplus/SRC-06/native-build-01/bin')
+link_map = binary.with_suffix('.map')
+object_path = Path(review['new_compile_row']['output'])
+if not object_path.is_absolute(): object_path = Path(review['new_compile_row']['directory']) / object_path
+binary_ref, map_ref, object_ref = [ref(p) for p in (binary, link_map, object_path)]
+for row in (binary_ref, map_ref, object_ref): checked(row)
+output = (ROOT / args.output_dir).resolve()
+assert output.is_relative_to(ROOT / '.runtime/porting/SRC-06') and output != ROOT / '.runtime/porting/SRC-06' and not output.exists()
+output.mkdir(parents=True)
+symbols = ['EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)', 'EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)']
+selected = {name: [] for name in symbols}; all_symbols = []; lines = []; loads = []
+section = pending = None
+section_re = re.compile(r'^\s+(\.text\S*)\s+(0x[0-9a-fA-F]+)\s+(0x[0-9a-fA-F]+)\s+(.+?)\s*$')
+continued_re = re.compile(r'^\s+(0x[0-9a-fA-F]+)\s+(0x[0-9a-fA-F]+)\s+(.+?)\s*$')
+symbol_re = re.compile(r'^\s+(0x[0-9a-fA-F]+)\s+(.+?)\s*$')
+with link_map.open(encoding='utf8', errors='strict') as stream:
+    for number, line in enumerate(stream, 1):
+        text = line.rstrip('\n'); match = section_re.match(text)
+        if match:
+            name, start, size, owner = match.groups()
+            section = dict(section=name, start=int(start, 16), size=int(size, 16), owner=owner, line_number=number, literal_line=text); pending = None
+        elif re.match(r'^\s+\.text\S*\s*$', text):
+            pending = dict(section=text.strip(), name_line=text, name_line_number=number)
+        elif pending and (match := continued_re.match(text)):
+            start, size, owner = match.groups()
+            section = dict(pending, start=int(start, 16), size=int(size, 16), owner=owner, line_number=number, literal_line=text); pending = None
+        if text.startswith('LOAD ') and ('src06_tarp_inside_helper.dir/' in text or text == 'LOAD Products/libenergypluslib.a'):
+            loads.append(dict(line_number=number, literal_line=text)); lines.append(f'{number}: {text}')
+        match = symbol_re.match(text)
+        if match and section and section['start'] <= int(match.group(1), 16) < section['start'] + section['size']:
+            address, name = int(match.group(1), 16), match.group(2)
+            all_symbols.append((address, dict(section)))
+            if name in selected:
+                selected[name].append(dict(symbol=name, address=match.group(1), address_integer=address, line_number=number, literal_line=text, owning_text_section=dict(section)))
+                if 'name_line' in section: lines.append(f"{section['name_line_number']}: {section['name_line']}")
+                lines.extend([f"{section['line_number']}: {section['literal_line']}", f'{number}: {text}'])
+assert all(len(rows) == 1 for rows in selected.values())
+providers = [selected[name][0] for name in symbols]
+assert all(row['owning_text_section']['owner'] == 'Products/libenergypluslib.a(ConvectionCoefficients.cc.obj)' for row in providers)
+assert len(loads) == 2 and sum('src06_tarp_inside_helper.dir/' in row['literal_line'] for row in loads) == 1
+mapping = native_pe.inspect(binary)
+assert mapping['sha256'] == binary_ref['sha256'] and mapping['size_bytes'] == binary_ref['size_bytes']
+address_command = [str(addr2line), '-f', '-C', '-e', str(binary), *[row['address'] for row in providers]]
+address_ref, address_receipt = recorded(address_command, 'provider-addr2line-command')
+resolved = checked(address_receipt['stdout']).read_text(encoding='utf8').splitlines()
+assert len(resolved) == 4
+code_receipts = []; instruction_rows = 0
+with binary.open('rb') as stream, mmap.mmap(stream.fileno(), 0, access=mmap.ACCESS_READ) as payload:
+    for i, row in enumerate(providers):
+        assert resolved[2 * i] == row['symbol']
+        found = re.search(r'[/\\]ConvectionCoefficients\.cc:(\d+)(?: \(discriminator \d+\))?$', resolved[2 * i + 1])
+        assert found and (1907 <= int(found.group(1)) <= 1953 if i == 0 else 1955 <= int(found.group(1)) <= 1975)
+        start = row['address_integer']; owner = row['owning_text_section']
+        end = min([a for a, s in all_symbols if s == owner and a > start] + [owner['start'] + owner['size']])
+        rva = start - mapping['image_base']
+        mapped, = [s for s in mapping['sections'] if not s['debug'] and s['characteristics'] & 0x20000000 and s['rva'] <= rva and rva + end - start <= s['rva'] + s['raw_size']]
+        offset = mapped['raw_offset'] + rva - mapped['rva']; data = payload[offset:offset + end - start]
+        command = [str(objdump), '-d', '-C', '--wide', '--disassemble-zeroes', '--start-address=' + hex(start), '--stop-address=' + hex(end), str(binary)]
+        disassembly_ref, value = recorded(command, ('natural' if i == 0 else 'detailed') + '-disassembly-command')
+        body = checked(value['stdout']).read_text(encoding='utf8'); count = 0; cursor = start
+        for line in body.splitlines():
+            match = re.match(r'^[ \t]*([0-9a-f]+):[ \t]*((?:[0-9a-f]{2}(?:[ \t]+|$))+)', line)
+            if match is None: continue
+            address, actual = int(match.group(1), 16), bytes.fromhex(match.group(2))
+            assert address == cursor and start <= address < address + len(actual) <= end
+            assert data[address - start:address - start + len(actual)] == actual
+            cursor += len(actual); count += 1
+        assert count > 0 and cursor == end
+        instruction_rows += count; code_receipts.append(disassembly_ref)
+        row.update(actual_addr2line_function=resolved[2 * i], actual_addr2line_location=resolved[2 * i + 1], actual_code_extent_end=hex(end), actual_code_extent_rule='next link-map text symbol in same input text section, otherwise section end', actual_code_bytes_sha256=hashlib.sha256(data).hexdigest(), actual_code_bytes_hex=data.hex(), actual_code_byte_count=len(data), all_disassembled_rows_equal_actual_PE=True, actual_disassembly_execution=disassembly_ref)
+selected_path = output / 'address-bound-providers.txt'
+with selected_path.open('x', encoding='utf8', newline='\n') as stream: stream.write('\n'.join(lines) + '\n')
+post_core_ref, post_core = recorded([sys.executable, '-X', 'utf8', '-B', 'tools/porting/build_original_reference.py', '--check'], 'post-build-core-command')
+assert build['finished_utc'] <= post_core['started_utc'] and b'13534 byte-identical official blobs' in checked(post_core['stdout']).read_bytes()
+assert all(ref(path) == row for path, row in SEEN.items())
+assert {p.relative_to(ROOT).as_posix() for p in set((ROOT / 'crates').rglob('*.rs')) | set((ROOT / 'crates').rglob('Cargo.toml')) | {ROOT / n for n in ('Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml') if (ROOT / n).is_file()}} == set(members)
+inventory = dict(schema='src06-tarp-inside-actual-linked-provider-and-PE-inventory.v1', reviewed_Source_preparation=freeze['reviewed_Source_preparation'], frozen_build_inputs=frozen_ref, configure_review=review_ref, actual_build_execution=build_ref, actual_post_build_core_execution=post_core_ref, actual_build_argv=actual, reviewed_prospective_build_argv=expected, build_executable_and_directory_resolve_to_reviewed_paths=True, actual_Ninja_executable=actual_ninja, Source_snapshot=snapshot, actual_Native_binary=binary_ref, actual_full_link_map=map_ref, actual_helper_object=object_ref, selected_provider_map_lines=ref(selected_path), actual_address_bound_providers=providers, actual_target_and_core_LOAD_rows=loads, actual_PE_reader=ref(pe_source), actual_PE=mapping, actual_addr2line_execution=address_ref, actual_disassembly_executions=code_receipts, all_disassembled_byte_rows_compared_to_actual_PE=instruction_rows, dry_and_actual_compile_link_commands_byte_exact=True, current_compile_graph_cache_and_core_preserved=True, actual_evidence_collector=ref(Path(__file__)), Root_FULL_provider_and_PE_review_pending=True, helper_executed=False, numerical_results_read=False, production_math_changed=False, gates_updated=False)
+dump(output / 'linked-provider-and-PE-inventory.json', inventory)
+print(json.dumps(dict(inventory=ref(output / 'linked-provider-and-PE-inventory.json'), helper_executed=False)))

@@ -1,0 +1,10 @@
+        // Every 30 iterations, recalculate the inside convection coefficients in case
+        // there has been a significant drift in the surface temperatures predicted.
+        // This is not fool-proof and it basically means that the outside surface
+        // heat balance is in error (potentially) once HConvIn is re-evaluated.
+        // The choice of 30 is not significant--just want to do this a couple of
+        // times before the iteration limit is hit.
+        if ((state.dataHeatBal->InsideSurfIterations > 0) &&
+            (mod(state.dataHeatBal->InsideSurfIterations, DataHeatBalSurface::ItersReevalConvCoeff) == 0)) {
+            Convect::InitIntConvCoeff(state, state.dataHeatBalSurf->SurfTempIn, ZoneToResimulate);
+        }

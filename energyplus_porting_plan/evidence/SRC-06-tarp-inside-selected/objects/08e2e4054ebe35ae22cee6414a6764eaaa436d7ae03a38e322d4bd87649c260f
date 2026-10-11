@@ -1,0 +1,23 @@
+--- .runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-01/policy.json
++++ .runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-02/policy.json
+@@ -62,16 +62,16 @@
+     "IEEE_bits_and_class_and_signed_zero_exact": true,
+     "fields": [
+       "Natural.actual_return_value",
+-      "Detailed.selected_SurfHConvInt",
+-      "previously_generated_SurfHConvInt_on_later_preowners"
++      "current_returned_Detailed.selected_SurfHConvInt"
+     ],
+     "no_endpoint_equation_or_expected_values_in_comparer": true
+   },
+   "copy_rules": {
+     "all_input_scalar_owners": "exact bits/class including NaN payloads",
+-    "Natural.full_state_and_unselected_rows": "within-engine full exact retention; cross-engine copied cells exact bits/class",
++    "Natural.full_state_and_unselected_rows": "within-engine full exact retention and cross-engine exact IEEE bits/class including retained NaN payloads",
+     "strict_lower_assignment": "finite copied lower-limit bits exact; infinities have unique class bits; NaN lower cannot satisfy Source strict less-than",
+-    "generated_cell_provenance": "selected indices after actual returned Detailed calls only, never endpoint-value-based selection"
++    "generated_cell_provenance": "current Source route only: current Detailed selected output arithmetic; all preowner and retained/unselected endpoint cells copied exact",
++    "all_full_preowners": "exact IEEE bits/class including NaN payloads, regardless of an earlier generating call"
+   },
+   "diagnostic_nonfinite": {
+     "class_required": true,

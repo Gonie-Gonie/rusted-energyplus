@@ -1,0 +1,119 @@
+"""Compose already accepted SRC06 deltas onto actual current Sources; held only."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+OLD = ROOT / '.runtime/porting/SRC-06/tarp-inside-prep-01'
+OUT = ROOT / '.runtime/porting/SRC-06/tarp-inside-current-prep-01'
+assert not OUT.exists(); OUT.mkdir()
+
+
+def ref(path):
+    path = path.resolve(); data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(data).hexdigest(), 'size_bytes': len(data), 'line_count': len(data.splitlines())}
+
+
+def put(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream: stream.write(data)
+
+
+def dump(path, value):
+    put(path, (json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode('utf-8'))
+
+
+old = json.loads((OLD / 'manifest.json').read_bytes())
+assert ref(OLD / 'manifest.json')['sha256'] == 'b596e5889a81a2cdd250408d3c38a80522855cab0818d8aa61ccd673d66ab88d'
+oldrows = {r['canonical_path']: r for r in old['application']}
+staged = {r['canonical_path']: r for r in old['SRC06_staged_deltas']}
+application = []; correspondence = []
+for path, previous in oldrows.items():
+    canonical = ROOT / path; before = canonical.read_bytes() if canonical.is_file() else b''
+    literal = (ROOT / previous['proposal']['path']).read_bytes()
+    if path in staged:
+        parent = (ROOT / staged[path]['parent_archive']['path']).read_bytes()
+        parent_lines, literal_lines = parent.decode('utf-8').splitlines(keepends=True), literal.decode('utf-8').splitlines(keepends=True)
+        composed = before.decode('utf-8'); edits = []
+        for group in difflib.SequenceMatcher(a=parent_lines, b=literal_lines, autojunk=False).get_grouped_opcodes(3):
+            a = ''.join(parent_lines[group[0][1]:group[-1][2]]); b = ''.join(literal_lines[group[0][3]:group[-1][4]])
+            assert composed.count(a) == 1
+            composed = composed.replace(a, b, 1); edits.append((a, b))
+        restored = composed
+        for a, b in reversed(edits):
+            assert restored.count(b) == 1; restored = restored.replace(b, a, 1)
+        assert restored.encode('utf-8') == before
+        proposed = composed.encode('utf-8')
+        correspondence.append({'canonical_path': path, 'accepted_parent_archive': staged[path]['parent_archive'], 'accepted_SRC06_proposal': previous['proposal'],
+                               'accepted_SRC06_only_diff': staged[path]['SRC06_only_diff'], 'exact_literal_hunk_count': len(edits), 'inverse_restores_current_before_bytes': True,
+                               'all_other_current_bytes_retained': True})
+    else:
+        assert previous['new_destination_absent'] and not canonical.exists() or before == (ROOT / previous['before_archive']['path']).read_bytes()
+        proposed = literal
+        correspondence.append({'canonical_path': path, 'accepted_SRC06_proposal': previous['proposal'], 'proposed_bytes_exact_accepted01': True})
+    archive, proposal = OUT / 'before' / path, OUT / 'proposed' / path
+    put(archive, before); put(proposal, proposed)
+    diff = OUT / 'diffs' / (path.replace('/', '__') + '.diff')
+    delta = ''.join(difflib.unified_diff(before.decode('utf-8').splitlines(keepends=True), proposed.decode('utf-8').splitlines(keepends=True), fromfile='a/' + path, tofile='b/' + path))
+    put(diff, delta.encode('utf-8'))
+    application.append({'canonical_path': path, 'actual_before': ref(canonical) if canonical.is_file() else None, 'before_archive': ref(archive),
+                        'proposal': ref(proposal), 'exact_diff': ref(diff), 'new_destination_absent': not canonical.exists()})
+
+historical = []
+def relocate(row):
+    actual = ROOT / row['path']
+    if actual.is_file() and ref(actual)['sha256'] == row['sha256']:
+        return row
+    source = ROOT / '.runtime/porting/source-objects' / row['sha256'][:2] / row['sha256']
+    assert source.is_file() and ref(source)['sha256'] == row['sha256'] and ref(source)['size_bytes'] == row['size_bytes']
+    archive = OUT / 'historical-whole-Source' / (row['sha256'] + '.source')
+    if not archive.exists(): put(archive, source.read_bytes())
+    mapped = ref(archive); historical.append({'historical_source': row, 'actual_content_addressed_archive': ref(source), 'held_whole_archive': mapped})
+    return mapped
+
+ranges = json.loads(json.dumps(old['selected_source_ranges']))
+for row in ranges:
+    original = row['source']; mapped = relocate(original)
+    if mapped != original:
+        row['historical_source'] = original; row['source'] = mapped
+    expected = b''.join((ROOT / row['source']['path']).read_bytes().splitlines(keepends=True)[row['start_line']-1:row['end_line']])
+    assert expected == (ROOT / row['archive']['path']).read_bytes()
+dependencies = [relocate(r) for r in old['source_dependencies']]
+dependencies += [ref(OLD / 'manifest.json'), ref(ROOT / '.runtime/porting/SRC-05/surface-environment-prep-02/manifest.json'),
+                 ref(ROOT / '.runtime/porting/SRC-06/native-tarp-inside-prep-02/manifest.json')]
+readme = '''# SRC-06 current-Source composition02 (held)
+
+This package applies only the already accepted b596e588 SRC06 deltas to the actual current A/SRC05 Sources. No canonical file was written, no formatter/compiler/test/helper was invoked, and no Native result was read. All tests remain unexecuted.
+
+The three literal convection hunks and the one existing cube-test hunk are identical to the accepted SRC06-only parent deltas. Their reverse substitution restores the complete actual current before bytes exactly. Every other current byte, including ordinary warmup/report and existing SRC05 changes, is retained. The new 140-line tarp_inside.rs and the card proposal are byte-exact accepted01. New befores are the actual current canonical files; no obsolete SRC05-before guard is reused.
+
+Natural exact-zero/sign predicates, the three literal correlations, one temperature subtraction, the true outward-cosine operand and Detailed strict lower assignment are unchanged from accepted01. No FP controls, math backend, tolerance, nonfinite fallback, EPS floor or upper clamp is added. Existing outside consumers of the shared natural API will see the same corrected Source body; their full production validation is not claimed here.
+
+The historical state.rs geometry-owner Source range predates the current ordinary A owner additions. Its exact original descriptor is retained under historical_source and mapped to an authenticated complete content-addressed archived Source; the selected range bytes are identical. Other Original/current contexts retain their exact accepted identities. No historical descriptor is silently rebound to current bytes.
+
+The genuine Native baseline and factual release remain mandatory before Root applies mathematical changes. Complete InitIntConvCoeff traversal/space-MAT/reference temperature, actual update cadence, window/override/Kiva paths and ordinary SUR05 integration remain unverified. No gate or numerical PASS is assigned. Application is limited to the four explicit rows; later Root application must recheck every actual-before byte or new destination absence and retain formatter correspondence.
+'''
+put(OUT / 'README.md', readme.encode('utf-8'))
+m = {'schema': old['schema'], 'status': 'held-Source-only-unexecuted', 'Original_commit': old['Original_commit'],
+     'predecessor_source_preparation': ref(OLD / 'manifest.json'), 'composition_parent': {'authority': 'actual current canonical before archives', 'preserve_all_unrelated_current_Source_bytes': True},
+     'application': application, 'SRC06_delta_correspondence': correspondence, 'historical_Source_correspondence': historical,
+     'own_sources': [r['proposal'] for r in application if r['canonical_path'].endswith('.rs')], 'source_dependencies': dependencies,
+     'selected_source_ranges': ranges, 'README': ref(OUT / 'README.md'), 'author': ref(Path(__file__)),
+     'new_tests_authored': old['new_tests_authored'], 'tests_executed': False, 'Native_baseline_required_before_math_application': True,
+     'full_InitIntConvCoeff_caller_verified': False, 'Kiva_window_override_branches_admitted': False,
+     'canonical_mutation_performed': False, 'target_execution_performed': False, 'Native_result_values_read': False, 'gates_updated': False}
+seen = set()
+def verify(v):
+    if isinstance(v, dict):
+        if 'path' in v and 'sha256' in v and v not in [r.get('historical_source') for r in historical]:
+            actual = ref(ROOT / v['path']); assert all(actual[k] == v[k] for k in ('sha256', 'size_bytes', 'line_count') if k in v); seen.add(v['path'])
+        for key,x in v.items():
+            if key != 'historical_source': verify(x)
+    elif isinstance(v, list):
+        for x in v: verify(x)
+verify(m); ast.parse(Path(__file__).read_bytes())
+dump(OUT / 'manifest.json', m)
+print(json.dumps({'manifest': ref(OUT / 'manifest.json'), 'whole_refs': len(seen), 'ranges': len(ranges), 'diff_lines': [r['exact_diff']['line_count'] for r in application],
+                  'application': [{'canonical_path': r['canonical_path'], 'proposal': r['proposal']} for r in application], 'canonical_mutation_performed': False}))

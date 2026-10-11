@@ -1,0 +1,39 @@
+# SRC06 genuine Native TARP direct unit (HELD)
+
+One TU calls unchanged linked Convect::CalcASHRAETARPNatural and non-Kiva
+Convect::CalcASHRAEDetailedIntConvCoeff. It copies no correlation, branch or clamp
+arithmetic. Fresh true EnergyPlusData and init_constant_state precede explicit
+literal Surface.CosTilt/ExtBoundCond and full SurfHConvInt allocation/seeds. Null
+lower-limit override leaves the actual constructor owner untouched. High limit
+is copied as explicitly unread context, never treated as a selected operand.
+
+Every real call retains full before/after array bounds/order/values, all declared
+surface IDs/names/cosines/boundaries and actual lower bound, backend/callback and
+stream prefixes. Natural returns its actual scalar; Detailed's real void return
+is null with separate actual return-observed flag. Repeated calls share the same
+true state, retaining all other rows. No cap, output selection, expected value,
+internal branch-local inference or Native-derived input exists.
+
+Input-only cases cover all strict signs, exact and signed zero, smallest nonzero
+temperature/cosine, tiny nonzero cosine, intermediate tilt, default/supplied low,
+large finite difference without high clamp and repeated selected rows. Explicit
+diagnostic cases retain unordered/infinite/overflow classes and cannot count as
+finite arithmetic PASS. All input bits are prospective literal selections.
+
+This is a getter-free direct public-API unit. It does not invoke processInput,
+InitIntConvCoeff, user algorithm selection, zone/space/MAT traversal, representative
+filter, EMS/window/Kiva tails or actual positive-iteration divisible30 refresh.
+The Rust/card proposal pins those remaining caller obligations separately. No
+unit gate or ordinary production gate is closed by generating this package.
+
+Recipe reuses the established inherited-recipe/root/global-once DEFER convention,
+appending one TU with true energypluslib compile definitions/options/warnings/fp.
+The actual inherited recipe is a future Root operand; no compile graph is guessed
+or modified here. Future build must retain prior registrations/protected files,
+prove both address-bound Original core providers, one helper LOAD, strict PE/debug
+derivation and recorded Source/input/output identity before releasing results.
+
+Native argc2 consumes the exact literal request. Full stdout is sole authority.
+Actual caught stop/callback failure emits retained response with exit2, never PASS;
+uncaught input/observer failure has no complete response and remains unavailable.
+No build, test, formatter, binary read, Native execution or canonical edit occurred.

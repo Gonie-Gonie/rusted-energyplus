@@ -1,0 +1,55 @@
+"""Seal only the instruction-byte local rename; never invoke the collector."""
+import ast
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+import shutil
+
+ROOT = Path(__file__).resolve().parents[3]
+OLD = ROOT / '.runtime/porting/SRC-06/native-provider-prep-02'
+OUT = ROOT / '.runtime/porting/SRC-06/native-provider-prep-03'
+
+
+def ref(path):
+    data = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(data).hexdigest(), size_bytes=len(data), line_count=len(data.splitlines()))
+
+
+def write(path, data):
+    with path.open('xb') as stream: stream.write(data)
+
+
+assert ref(OLD / 'manifest.json')['sha256'] == 'd9275c40e5b429ce69bfe6efa248452652dfc9a5ba3251c818ae94cd64a052ab'
+failure_path = ROOT / '.runtime/porting/SRC-06/native-provider-collection-command-01/receipt.json'
+assert ref(failure_path)['sha256'] == 'da251753838abe89e3f885d924b449b3a8b762689f0ec216c1c302bc359cbbcb'
+failure = json.loads(failure_path.read_bytes())
+assert failure['exit_code'] == 1 and failure['source_bytes_match_before_and_after'] is True
+partial = ROOT / '.runtime/porting/SRC-06/native-provider-review-01/linked-provider-and-PE-inventory.json'
+assert partial.read_bytes() == b''
+OUT.mkdir(); before = OUT / 'before'; before.mkdir()
+for name in ('collect_providers.py', 'README.md', 'manifest.json'): shutil.copyfile(OLD / name, before / name)
+old = (OLD / 'collect_providers.py').read_bytes()
+old_block = b"            address, actual = int(match.group(1), 16), bytes.fromhex(match.group(2))\n            assert address == cursor and start <= address < address + len(actual) <= end\n            assert data[address - start:address - start + len(actual)] == actual\n            cursor += len(actual); count += 1\n"
+new_block = old_block.replace(b'actual', b'instruction_bytes')
+assert old.count(old_block) == 1
+new = old.replace(old_block, new_block)
+assert new.replace(new_block, old_block) == old
+write(OUT / 'collect_providers.py', new)
+readme = (OLD / 'README.md').read_text(encoding='utf8').replace('native-provider-prep-02/collect_providers.py', 'native-provider-prep-03/collect_providers.py')
+readme += '\nSuccessor03 only renames the PE-loop instruction-byte local and its uses to instruction_bytes, preserving actual_build_argv as the actual recorded argv list. The failed02 outer receipt and empty partial inventory remain immutable; all provider/code-byte/core checks and CLI/schema are unchanged. No collector or tool was invoked while authoring.\n'
+write(OUT / 'README.md', readme.encode())
+diffs = []
+for name in ('collect_providers.py', 'README.md'):
+    a, b = before / name, OUT / name
+    path = OUT / (name + '.diff')
+    delta = ''.join(difflib.unified_diff(a.read_text(encoding='utf8').splitlines(True), b.read_text(encoding='utf8').splitlines(True), fromfile=a.relative_to(ROOT).as_posix(), tofile=b.relative_to(ROOT).as_posix()))
+    write(path, delta.encode())
+    diffs.append(dict(before=ref(a), after=ref(b), exact_diff=ref(path)))
+manifest = copy.deepcopy(json.loads((OLD / 'manifest.json').read_bytes()))
+manifest.update(own_sources=[ref(OUT / 'collect_providers.py')], author=ref(Path(__file__)), README=ref(OUT / 'README.md'), predecessor_source_preparation=ref(OLD / 'manifest.json'), before_archives=[ref(before / name) for name in ('collect_providers.py', 'README.md', 'manifest.json')], narrow_exact_diffs=diffs, retained_failed_collection_execution=ref(failure_path), retained_empty_partial_inventory=ref(partial))
+manifest['source_dependencies'] += [ref(OLD / name) for name in ('manifest.json', 'collect_providers.py', 'README.md')] + [ref(failure_path), failure['stdout'], failure['stderr'], ref(partial)]
+ast.parse(new); ast.parse(Path(__file__).read_bytes())
+write(OUT / 'manifest.json', (json.dumps(manifest, ensure_ascii=False, indent=2) + '\n').encode())
+print(json.dumps(ref(OUT / 'manifest.json')))

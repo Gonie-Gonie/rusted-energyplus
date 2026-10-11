@@ -1,0 +1,17 @@
+--- .runtime/porting/SRC-06/native-provider-prep-03/before/README.md
++++ .runtime/porting/SRC-06/native-provider-prep-03/README.md
+@@ -2,7 +2,7 @@
+ 
+ Root must review before invoking this script. Authorship performs no configure, compile, helper invocation, binary inspection or result read. Future execution invokes the approved PE reader, recorded read-only addr2line/objdump tools and official core --check; it never executes the helper or numerical results.
+ 
+-CLI: `python -X utf8 -B .runtime/porting/SRC-06/native-provider-prep-02/collect_providers.py --frozen-inputs <actual-frozen-json>#<SHA> --configure-review <actual-review-json>#<SHA> --build-execution <actual-build-receipt>#<SHA> --output-dir .runtime/porting/SRC-06/<fresh-provider-directory>`.
++CLI: `python -X utf8 -B .runtime/porting/SRC-06/native-provider-prep-03/collect_providers.py --frozen-inputs <actual-frozen-json>#<SHA> --configure-review <actual-review-json>#<SHA> --build-execution <actual-build-receipt>#<SHA> --output-dir .runtime/porting/SRC-06/<fresh-provider-directory>`.
+ 
+ Frozen/review schemas are the exact accepted configure driver591e protocols. Their real Source snapshot is dynamic, with complete current Rust/Cargo/config member and raw/archive byte equality. Accepted Native ba8de8, frozen inputs/Sources, recorder5745, PE reader and GNU13.2 addr2line/objdump bytes are authenticated. All configure/dry/core-before/core-after/build receipts must be closed, zero, same-Source, with their genuine launcher/log references. The two actual compile/link steps must literally equal the retained dry steps; actual build argv keeps its recorded spelling and permits relative versus absolute spelling only for the same resolved Ninja executable and build directory. Its six-argument form, -j1/-v and target tail remain strict.
+ 
+@@ -15,3 +15,5 @@
+ Only fresh selected map lines, three read-only tool receipts/logs and `linked-provider-and-PE-inventory.json` are written. The inventory leaves Root FULL provider/PE acceptance pending and helper_executed/numerical_results_read/production_math_changed/gates_updated false. It does not certify Native numerical answers, branch reachability, full scientific equivalence, or any card gate.
+ 
+ Successor02 changes only byte-row parsing to physical lines with horizontal whitespace, and adds a recorded post-build official --check (including its genuine DLL state lifecycle) before inventory. The new receipt must be actual zero/same-Source and report13,534 official blobs after the actual build. No helper is invoked; all other collection, code-byte and Source conditions remain exact01.
++
++Successor03 only renames the PE-loop instruction-byte local and its uses to instruction_bytes, preserving actual_build_argv as the actual recorded argv list. The failed02 outer receipt and empty partial inventory remain immutable; all provider/code-byte/core checks and CLI/schema are unchanged. No collector or tool was invoked while authoring.

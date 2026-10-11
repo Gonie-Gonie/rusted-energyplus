@@ -1,0 +1,25 @@
+pub(crate) fn heat_balance_inside_convection_coefficients(
+    surfaces: &[SurfaceHeatBalanceState],
+    zone_temperatures: &BTreeMap<ZoneId, f64>,
+    inside_surface_temperature_overrides: Option<&BTreeMap<SurfaceId, f64>>,
+) -> BTreeMap<SurfaceId, f64> {
+    surfaces
+        .iter()
+        .map(|surface| {
+            let inside_face_temperature_c = inside_surface_temperature_overrides
+                .and_then(|temperatures| temperatures.get(&surface.surface_id).copied())
+                .unwrap_or(surface.inside_face_temperature_c);
+            let zone_temperature_c = zone_temperatures
+                .get(&surface.zone_id)
+                .copied()
+                .unwrap_or(surface.inside_face_temperature_c);
+            (
+                surface.surface_id,
+                energyplus_tarp_inside_convection_coefficient_w_per_m2_k(
+                    surface,
+                    inside_face_temperature_c,
+                    zone_temperature_c,
+                ),
+            )
+        })
+        .collect()

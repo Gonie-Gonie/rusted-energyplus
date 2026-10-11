@@ -1,0 +1,198 @@
+"""Root-only actual SRC06 Cargo artifact/main-thread custody; no equations."""
+import argparse
+import difflib
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+SEEN = {}
+CONFIGS = ['--config', 'profile.dev.debug=0', '--config', 'profile.test.debug=0', '--config', 'build.incremental=false']
+QUALITY_COMMANDS = {
+    'fmt_check': ['cargo', 'fmt', '--all', '--', '--check'],
+    'clippy': ['cargo', 'clippy'] + CONFIGS + ['--locked', '--workspace', '--all-targets', '--', '-D', 'warnings'],
+    'focused': ['cargo', 'test'] + CONFIGS + ['--locked', '-p', 'ep_runtime', '--lib', 'heat_balance::'],
+    'workspace': ['cargo', 'test'] + CONFIGS + ['--locked', '--workspace'],
+}
+
+
+def need(value, message):
+    if not value:
+        raise ValueError(message)
+
+
+def full(path):
+    with path.open('rb') as stream:
+        sha = hashlib.file_digest(stream, 'sha256').hexdigest()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': sha, 'size_bytes': path.stat().st_size}
+
+
+def bind(row):
+    path = (ROOT / row['path']).resolve()
+    need(path.is_relative_to(ROOT) and path.is_file(), 'contained artifact required: ' + row['path'])
+    actual = full(path)
+    need(actual['sha256'] == row['sha256'] and ('size_bytes' not in row or actual['size_bytes'] == row['size_bytes']), 'bound bytes differ: ' + row['path'])
+    SEEN[path] = actual
+    return path
+
+
+def operand(token):
+    name, sha = token.rsplit('#', 1)
+    return full(bind({'path': name, 'sha256': sha}))
+
+
+def load(row):
+    return json.loads(bind(row).read_bytes())
+
+
+def dump(path, value):
+    with path.open('x', encoding='utf-8', newline='\n') as stream:
+        json.dump(value, stream, indent=2, allow_nan=False)
+        stream.write('\n')
+
+
+def recorded(row, source, recorder):
+    value = load(row)
+    need(value['schema'] == 'recorded-porting-command.v1' and value['exit_code'] == 0 and value['launch_error'] is None and value['source_bytes_match_before_and_after'] is True, 'closed Source-stable success required')
+    need(value['source_snapshot'] == source and value['recorder_updates_gates'] is False and value['recorder_supplies_reference_answers'] is False, 'actual Source/recorder contract differs')
+    need(bind(value['executed_launcher']['archive']).read_bytes() == bind(recorder).read_bytes(), 'actual recorder differs')
+    bind(value['stdout']); bind(value['stderr'])
+    return value
+
+
+def source_members(source):
+    snapshot = load(source)
+    need(snapshot['schema'] == 'rust-command-source-snapshot.v1' and snapshot['bytes_normalized'] is False, 'complete literal Source snapshot required')
+    members = {row['historical_path']: row for row in snapshot['files']}
+    paths = set((ROOT / 'crates').rglob('*.rs')) | set((ROOT / 'crates').rglob('Cargo.toml'))
+    paths |= {ROOT / name for name in ['Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml'] if (ROOT / name).is_file()}
+    need(len(members) == len(snapshot['files']) and {p.relative_to(ROOT).as_posix() for p in paths} == set(members), 'full current Source membership differs')
+    for name, row in members.items():
+        bind(row['archive'])
+        need(row['size_bytes'] == row['archive']['size_bytes'] if 'size_bytes' in row['archive'] else full(bind(row['archive']))['size_bytes'] == row['size_bytes'], 'Source archive size differs')
+        bind({'path': name, 'sha256': row['archive']['sha256'], 'size_bytes': row['size_bytes']})
+    return members
+
+
+def source_correspondence(row, prep_ref, prep, members):
+    value = load(row)
+    need(value['schema'] == 'src06-tarp-inside-actual-API-correspondence.v1' and bind(value['Source_preparation']) == bind(prep_ref), 'reviewed selected Source correspondence required')
+    need(bind(value['accepted_math_preparation']) == bind(prep['accepted_math_preparation']), 'actual getter successor authority required')
+    math = load(value['accepted_math_preparation'])
+    bind(value['actual_application'])
+    need(value['Root_and_independent_FULL_formatter_correspondence_accepted'] is True, 'actual Root and independent full formatter acceptance required')
+    paths = prep['actual_public_API_source_paths']
+    rows = value['application']
+    need([r['canonical_path'] for r in rows] == paths and len(rows) == 2, 'exact two actual API correspondence rows required')
+    literals = {r['canonical_path']: r['proposal'] for r in math['application']}
+    for entry in rows:
+        name = entry['canonical_path']
+        need(bind(entry['accepted_literal']) == bind(literals[name]), 'accepted getter/math literal differs')
+        before, after = bind(entry['accepted_literal']).read_bytes(), bind(entry['actual_final_archive']).read_bytes()
+        declared = bind(entry['actual_format_diff']).read_bytes()
+        if before == after:
+            need(declared == b'', 'identical formatter endpoints require empty diff')
+        else:
+            lines = declared.decode().splitlines(True)
+            need(len(lines) >= 2 and lines[0].startswith('--- ') and lines[1].startswith('+++ '), 'literal formatter diff labels required')
+            regenerated = ''.join(difflib.unified_diff(before.decode().splitlines(True), after.decode().splitlines(True), fromfile=lines[0][4:].rstrip('\r\n'), tofile=lines[1][4:].rstrip('\r\n'))).encode()
+            need(regenerated == declared, 'full actual formatter delta differs')
+        actual = full(bind(entry['actual_final_archive']))
+        need(members[name]['archive']['sha256'] == actual['sha256'] and members[name]['size_bytes'] == actual['size_bytes'], 'actual compiled Source archive differs')
+        bind({'path': name, 'sha256': actual['sha256'], 'size_bytes': actual['size_bytes']})
+    return value
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['source-preparation', 'policy', 'input', 'source-snapshot', 'source-correspondence', 'output-dir']:
+        parser.add_argument('--' + name, required=True)
+    parser.add_argument('--quality', action='append', required=True, help='role=path#SHA; four genuine current quality receipts')
+    args = parser.parse_args()
+    prep_ref, policy_ref, input_ref, correspondence_ref = [operand(v) for v in [args.source_preparation, args.policy, args.input, args.source_correspondence]]
+    prep, policy = load(prep_ref), load(policy_ref)
+    need(prep['schema'] == 'src06-selected-main-thread-Source-preparation.v1' and bind(policy['Rust_source_preparation']) == bind(prep_ref), 'exact reviewed standalone preparation/policy required')
+    need(bind(prep['runtime_interfaces']['launcher']) == Path(__file__).resolve(), 'reviewed actual launcher required')
+    for row in prep['own_sources']:
+        bind(row)
+    source_full = operand(args.source_snapshot)
+    source = {k: source_full[k] for k in ['path', 'sha256']}
+    members = source_members(source)
+    source_correspondence(correspondence_ref, prep_ref, prep, members)
+    need(bind(input_ref).read_bytes() == bind(policy['literal_input_source']).read_bytes(), 'fixed full literal input differs')
+    recorder = policy['recorder_source']
+    recorder_path = bind(recorder)
+    quality = {}
+    for token in args.quality:
+        role, value = token.split('=', 1)
+        need(role not in quality, 'duplicate quality role')
+        quality[role] = operand(value)
+    need(set(quality) == set(QUALITY_COMMANDS), 'four exact quality roles required')
+    for role, row in quality.items():
+        need(recorded(row, source, recorder)['command'] == QUALITY_COMMANDS[role], 'actual quality command differs: ' + role)
+    output = (ROOT / args.output_dir).resolve()
+    need(output.is_relative_to(ROOT / '.runtime/porting/SRC-06') and not output.exists(), 'fresh ignored output directory required')
+    output.mkdir(parents=True)
+    manifest = bind(prep['runtime_interfaces']['Cargo_manifest'])
+    command = ['cargo', 'build', '--manifest-path', str(manifest)] + CONFIGS + ['--locked', '--offline', '--target-dir', str(ROOT / 'target'), '--message-format=json-render-diagnostics', '--bin', 'src06_tarp_inside_main']
+    before = {'schema': 'src06-selected-main-thread-before.v1', 'Source_preparation': prep_ref, 'policy': policy_ref,
+        'Source_snapshot': source, 'actual_API_correspondence': correspondence_ref, 'quality_executions': quality, 'actual_input_before': full(bind(input_ref)),
+        'actual_Cargo_command': command, 'frozen_artifacts': list(SEEN.values()),
+        'execution_context': 'standalone-main-thread-no-FP-control-writes', 'historical_libtest_state_inferred': False}
+    dump(output / 'before.json', before)
+    prefix = [sys.executable, '-X', 'utf8', '-B', str(recorder_path), '--output-dir']
+    code = subprocess.call(prefix + [str(output / 'Cargo-command'), '--'] + command, cwd=ROOT)
+    build_ref = full(output / 'Cargo-command/receipt.json')
+    if code != 0:
+        dump(output / 'failed-build.json', {'actual_build_execution': build_ref, 'actual_exit_code': code, 'target_executed': False})
+        return code
+    build = recorded(build_ref, source, recorder)
+    for row in quality.values():
+        need(load(row)['finished_utc'] <= build['started_utc'], 'quality must precede actual build')
+    messages = [json.loads(line) for line in bind(build['stdout']).read_text(encoding='utf-8').splitlines() if line]
+    emitted = [v for v in messages if v.get('reason') == 'compiler-artifact' and v.get('executable')]
+    need(len(emitted) == 1, 'sole actual Cargo-emitted executable required')
+    message = emitted[0]
+    need(message['target']['name'] == 'src06_tarp_inside_main' and message['target']['kind'] == ['bin'] and Path(message['target']['src_path']).resolve() == manifest.parent / 'src/main.rs', 'actual standalone entry artifact differs')
+    need(message['profile']['opt_level'] == '0' and message['profile']['test'] is False, 'actual dev binary required')
+    binary = Path(message['executable']).resolve()
+    need(binary.is_relative_to(ROOT / 'target') and binary.suffix.lower() == '.exe', 'actual contained Windows executable required')
+    artifact = {'cargo_message': message, 'executable': full(binary)}
+    capture = build['cargo_compiler_artifacts_capture']
+    need(capture['status'] == 'pass' and len(capture['rows']) == 1 and capture['rows'][0]['cargo_message'] == message and capture['rows'][0]['executable']['sha256'] == artifact['executable']['sha256'], 'recorder and immediate emitted artifact differ')
+    bind(artifact['executable'])
+    result = output / 'result.json'
+    argv = [str(binary), str(bind(input_ref)), str(result)]
+    artifact_proof = {'schema': 'src06-selected-main-thread-Cargo-artifact.v1', 'Source_preparation': prep_ref,
+        'Source_snapshot': source, 'actual_build_execution': build_ref, 'actual_full_Cargo_JSON': build['stdout'],
+        'actual_Cargo_emitted_artifact': artifact, 'actual_argv': argv, 'actual_binary_before': full(binary)}
+    dump(output / 'artifact.json', artifact_proof)
+    bind(full(output / 'before.json')); bind(full(output / 'artifact.json'))
+    for path, row in SEEN.items():
+        need(full(path) == row, 'frozen artifact changed before execution')
+    code = subprocess.call(prefix + [str(output / 'command'), '--'] + argv, cwd=ROOT)
+    execution_ref = full(output / 'command/receipt.json')
+    actual = load(execution_ref)
+    after = [full(path) for path in SEEN]
+    unchanged = all(row == SEEN[path] for row, path in zip(after, SEEN))
+    sidecar = {'schema': 'src06-selected-main-thread-execution-custody.v1', 'actual_before': full(output / 'before.json'),
+        'Source_preparation': prep_ref, 'Source_snapshot': source, 'actual_launcher_source': full(Path(__file__).resolve()),
+        'actual_API_correspondence': correspondence_ref, 'actual_artifact_proof': full(output / 'artifact.json'), 'actual_build_execution': build_ref, 'actual_execution': execution_ref,
+        'actual_Cargo_emitted_artifact': artifact, 'quality_executions': quality, 'actual_argv': argv,
+        'actual_input_before': before['actual_input_before'], 'actual_input_after': full(bind(input_ref)),
+        'actual_binary_before': artifact_proof['actual_binary_before'], 'actual_binary_after': full(binary),
+        'actual_output': full(result) if result.is_file() else None, 'actual_exit_code': actual['exit_code'],
+        'all_frozen_artifacts_unchanged': unchanged, 'frozen_artifacts_after': after,
+        'execution_context': 'standalone-main-thread-no-FP-control-writes', 'historical_libtest_state_inferred': False,
+        'numerical_PASS_claimed': False, 'gates_updated': False}
+    dump(output / 'custody.json', sidecar)
+    source_members(source)
+    need(unchanged and actual['command'] == argv and actual['source_snapshot'] == source and actual['source_bytes_match_before_and_after'] is True and actual['exit_code'] == code, 'actual target custody failed; records retained')
+    print(json.dumps({'custody': full(output / 'custody.json'), 'actual_exit_code': code}))
+    return code
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

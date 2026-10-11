@@ -1,0 +1,57 @@
+--- a/tarp_inside_reference_fields.hh
++++ b/tarp_inside_reference_fields.hh
+@@ -1,8 +1,10 @@
+-// Read-only actual DataSurfaces owners; no setter arithmetic is reproduced.
+-#ifndef SRC05_SURFACE_ENVIRONMENT_REFERENCE_FIELDS_HH
+-#define SRC05_SURFACE_ENVIRONMENT_REFERENCE_FIELDS_HH
++// Read-only actual TARP direct-call owners; no convection arithmetic is reproduced.
++#ifndef SRC06_TARP_INSIDE_REFERENCE_FIELDS_HH
++#define SRC06_TARP_INSIDE_REFERENCE_FIELDS_HH
+ #include <EnergyPlus/Data/EnergyPlusData.hh>
+-#include <EnergyPlus/DataEnvironment.hh>
++#include <EnergyPlus/ConvectionCoefficients.hh>
++#include <EnergyPlus/DataHeatBalance.hh>
++#include <EnergyPlus/DataHeatBalSurface.hh>
+ #include <EnergyPlus/DataErrorTracking.hh>
+ #include <EnergyPlus/DataGlobals.hh>
+ #include <EnergyPlus/DataStringGlobals.hh>
+@@ -30,7 +32,7 @@
+ #error "Reference definitions must match the genuine original core"
+ #endif
+ 
+-namespace Src05 {
++namespace Src06 {
+ using json = nlohmann::json;
+ inline std::string bits(double value)
+ {
+@@ -80,24 +82,16 @@
+ inline json owners(EnergyPlus::EnergyPlusData const &s)
+ {
+     auto const &d = *s.dataSurface;
+-    auto const &e = *s.dataEnvrn;
+     json surfaces = json::array();
+     for (std::size_t i = 1; i <= d.Surface.size(); ++i) {
+         auto const &v = d.Surface(i);
+-        surfaces.push_back({{"actual_surface_index", i}, {"Name", v.Name}, {"Centroid_z", scalar(v.Centroid.z)}, {"ExtWind", v.ExtWind}});
++        surfaces.push_back({{"actual_surface_index", i}, {"Name", v.Name}, {"CosTilt", scalar(v.CosTilt)}, {"ExtBoundCond", v.ExtBoundCond}});
+     }
+     return {{"TotSurfaces", d.TotSurfaces}, {"Surface", {{"allocated", d.Surface.allocated()}, {"size", d.Surface.size()}, {"rows", surfaces}}},
+-            {"SurfOutDryBulbTemp", array1(d.SurfOutDryBulbTemp, [](double v) -> json { return scalar(v); })},
+-            {"SurfOutWetBulbTemp", array1(d.SurfOutWetBulbTemp, [](double v) -> json { return scalar(v); })},
+-            {"SurfOutWindSpeed", array1(d.SurfOutWindSpeed, [](double v) -> json { return scalar(v); })},
+-            {"SurfOutWindDir", array1(d.SurfOutWindDir, [](double v) -> json { return scalar(v); })},
+-            {"environment", {{"SiteTempGradient", scalar(e.SiteTempGradient)}, {"WeatherFileTempModCoeff", scalar(e.WeatherFileTempModCoeff)},
+-                             {"SiteWindExp", scalar(e.SiteWindExp)}, {"SiteWindBLHeight", scalar(e.SiteWindBLHeight)},
+-                             {"WeatherFileWindModCoeff", scalar(e.WeatherFileWindModCoeff)}, {"OutDryBulbTemp", scalar(e.OutDryBulbTemp)},
+-                             {"OutWetBulbTemp", scalar(e.OutWetBulbTemp)}, {"WindSpeed", scalar(e.WindSpeed)}, {"WindDir", scalar(e.WindDir)}}},
+-            {"backend", backend(s)},
+-            {"backend_flags", {{"WarmupFlag", s.dataGlobal->WarmupFlag}, {"DoingSizing", s.dataGlobal->DoingSizing},
+-                               {"KickOffSimulation", s.dataGlobal->KickOffSimulation}}}};
++            {"LowHConvLimit", scalar(s.dataHeatBal->LowHConvLimit)},
++            {"HighHConvLimit_unread_by_selected_APIs", scalar(s.dataHeatBal->HighHConvLimit)},
++            {"SurfHConvInt", array1(s.dataHeatBalSurf->SurfHConvInt, [](double v) -> json { return scalar(v); })},
++            {"backend", backend(s)}};
+ }
+-} // namespace Src05
++} // namespace Src06
+ #endif

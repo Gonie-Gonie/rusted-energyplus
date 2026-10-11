@@ -1,0 +1,37 @@
+--- a/energyplus_porting_plan/cards/SRC-06.md
++++ b/energyplus_porting_plan/cards/SRC-06.md
+@@ -68,3 +68,34 @@
+ 증거 경로:  
+ 최대오차/RMSE/상태 불일치:  
+ 추가 검토할 helper:  
++
++## Bounded Source contract (held, unexecuted)
++
++`ConvectionCoefficients.cc:1907–1975` and the three inline correlations in
++`ConvectionCoefficients.hh:394–460` are complete direct-unit Source bounds.
++Natural uses one Tsurf−Tamb subtraction, exact DeltaTemp==0 or cosTilt==0,
++then strict same-sign enhanced versus remaining stable expressions. Detailed
++non-Kiva passes negative actual Surface.CosTilt and only applies strict
++Hc<LowHConvLimit assignment. There is no upper clamp, EPS predicate or nonfinite
++floor in these selected bodies; HighHConvLimit is not an operand. Default lower
++limit0.1 is Source-owned at DataHeatBalance.hh1790 and fixed by CON01 admission.
++The direct API takes an explicit actual lower-limit owner for diagnostic cases.
++
++Inside consumers now propose borrowing initialized geometry.cos_tilt instead of
++recomputing tilt degrees. Exact geometric90 degrees has a stored nonzero cosine;
++it must not be silently changed to the exact-zero vertical branch. Existing tests
++preserve unrelated assertions and add real stored-owner independence checks.
++
++The full selected caller is InitIntConvCoeff141–391: user setup/flags, true
++Zone.spaceIndexes/space HT traversal, spaceHeatBalance.MAT, optional resimulation,
++representative filtering, SetByZone/ASHRAETARP non-window dispatch, lower bound,
++EMS and window tails. Only CON01-admitted non-Kiva/no-window/no-override branch
++is the proposed arithmetic scope; a direct call does not certify this traversal.
++Real entry is HBSM473 and refresh only positive InsideSurfIterations divisible by
++ItersReevalConvCoeff30 at HBSM7944–7946/8824–8826 (DataHeatBalSurface.hh70).
++Current Rust per-iteration/reference-map fallbacks remain a documented caller
++gap and are not asserted equivalent or changed by this held unit proposal.
++
++Native direct inputs/actual calls must be frozen and released before math applies.
++No tests were executed, no numerical Native answers were supplied, and no gate
++is changed. Full caller/space-MAT/cadence and SUR05 integration remain pending.

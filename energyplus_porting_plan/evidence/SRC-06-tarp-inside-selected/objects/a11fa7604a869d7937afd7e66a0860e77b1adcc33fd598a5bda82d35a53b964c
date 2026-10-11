@@ -1,0 +1,66 @@
+"""Bounded Windows input path identity repair; preserve frozen science policy."""
+import ast
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+PARENT = ROOT / '.runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-02'
+OUT = ROOT / '.runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-03'
+
+
+def ref(path):
+    data = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(data).hexdigest(), size_bytes=len(data), line_count=len(data.splitlines()))
+
+
+def write(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream:
+        stream.write(data)
+    return ref(path)
+
+
+assert ref(PARENT / 'manifest.json')['sha256'] == 'd31df820c9642467b3bdf474a499dc146307e0b2572c18a2ff6e148adf43a99b'
+assert not OUT.exists()
+parent = json.loads((PARENT / 'manifest.json').read_bytes())
+body = (PARENT / 'compare.py').read_text(encoding='utf8')
+substitutions = [("Path(rust['actual_input_path']).resolve() == C.exact(rguard['actual_input_before'])", "Path(rust['actual_input_path']).samefile(C.exact(rguard['actual_input_before']))"), ("policy_ref = C.ref(HERE / 'policy.json')", "policy_ref = C.ref(ROOT / '.runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-02/policy.json')")]
+original = body
+for old, new in substitutions:
+    assert body.count(old) == 1
+    body = body.replace(old, new)
+inverse = body
+for old, new in reversed(substitutions):
+    assert inverse.count(new) == 1
+    inverse = inverse.replace(new, old)
+assert inverse == original
+compare = write(OUT / 'compare.py', body.encode())
+ast.parse(body)
+readme = (PARENT / 'README.md').read_bytes() + b'''\n## Windows actual input path witness correction03\n\nThe first genuine comparison stopped with integrity exit2 before any input joins or endpoint pairs: Rust std::fs::canonicalize emitted the Windows verbatim prefix, while Python Path.resolve retained that spelling. The complete input bytes, SHA, size, before/after freeze and exact argc3 already agree. This fresh Source changes only the result's input-path witness to filesystem samefile identity against the authenticated actual input. Containment, full SHA/size and every literal input/owner join remain required. No arithmetic, tolerance, case, owner rule or output is changed.\n\nThe existing prospective policy02 remains the exact original file and SHA bound to the actual Rust launcher, sidecar and Root packet. This comparer explicitly reads that immutable policy path; it does not make a later policy appear to have preceded capture. The actual failed comparison01 and its closed receipt are preserved. Source preparation inspected top-level path/size and flags only, with no numerical endpoints read or recomputed and no target or canonical action.\n'''
+readme_ref = write(OUT / 'README.md', readme)
+before, deltas = [], []
+for index, (old, new) in enumerate([(PARENT / 'compare.py', compare), (PARENT / 'README.md', readme_ref)], 1):
+    before.append(write(OUT / 'before' / f'{index:02d}.source', old.read_bytes()))
+    delta = ''.join(difflib.unified_diff(old.read_text(encoding='utf8').splitlines(True), (ROOT / new['path']).read_text(encoding='utf8').splitlines(True), fromfile=ref(old)['path'], tofile=new['path'])).encode()
+    deltas.append(write(OUT / 'diffs' / f'{index:02d}.diff', delta))
+manifest = copy.deepcopy(parent)
+manifest['predecessor_source_preparation'] = ref(PARENT / 'manifest.json')
+manifest['own_sources'] = [compare, parent['own_sources'][1]]
+manifest['runtime_interfaces']['comparer'] = compare
+manifest['README'] = readme_ref
+manifest['narrow_before_archives'] = before
+manifest['narrow_exact_diffs'] = deltas
+manifest['source_dependencies'] += [ref(PARENT / 'manifest.json'), ref(Path(__file__))]
+manifest['exact_template_diffs'] = []
+for index, (old, new) in enumerate(zip(manifest['before_templates'], manifest['own_sources']), 1):
+    delta = ''.join(difflib.unified_diff((ROOT / old['path']).read_text(encoding='utf8').splitlines(True), (ROOT / new['path']).read_text(encoding='utf8').splitlines(True), fromfile=old['path'], tofile=new['path'])).encode()
+    manifest['exact_template_diffs'].append(write(OUT / 'diffs' / f'cumulative-{index:02d}.diff', delta))
+manifest['preserved_original_prospective_policy'] = parent['runtime_interfaces']['prospective_policy']
+manifest['actual_integrity_failure_preserved'] = ref(ROOT / '.runtime/porting/SRC-06/selected-main-thread-comparison-01/comparison.json')
+manifest['actual_integrity_failure_execution_preserved'] = ref(ROOT / '.runtime/porting/SRC-06/selected-main-thread-comparison-command-01/receipt.json')
+manifest['Windows_path_witness_only_repair'] = True
+manifest['numerical_endpoint_values_read_for_this_repair'] = False
+print(json.dumps(write(OUT / 'manifest.json', (json.dumps(manifest, indent=2) + '\n').encode())))

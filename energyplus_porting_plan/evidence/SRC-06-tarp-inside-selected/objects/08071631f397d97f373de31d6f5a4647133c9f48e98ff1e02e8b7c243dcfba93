@@ -1,0 +1,363 @@
+{
+  "schema": "src06-tarp-inside-Header-Native-observation-factual-review.v1",
+  "actual_execution_custody": {
+    "path": ".runtime/porting/SRC-06/native-observation-01/custody.json",
+    "sha256": "904d1e101c850320db8fbdfea3bbbbeeee5e1ffa439365388d2e7b01c7061b28",
+    "size_bytes": 2211662
+  },
+  "actual_before": {
+    "path": ".runtime/porting/SRC-06/native-observation-01/before.json",
+    "sha256": "6c7c4b8454a7244c61cbdde16598c9e1f7f7116292f420ac756269c10053cdd4",
+    "size_bytes": 4886916
+  },
+  "actual_Native_execution": {
+    "path": ".runtime/porting/SRC-06/native-observation-01/command/receipt.json",
+    "sha256": "6397d8ade7e04491f261058d6ee4739f37700b5c7bdb6d4a37d34670b9925250",
+    "size_bytes": 5032
+  },
+  "actual_outer_execution": {
+    "path": ".runtime/porting/SRC-06/native-execution-command-01/receipt.json",
+    "sha256": "c05d7329a258ceb8da639e83bc1215a9735689d80160dee90e8ac591b6204942",
+    "size_bytes": 5535
+  },
+  "actual_full_observation": {
+    "path": ".runtime/porting/SRC-06/native-observation-01/command/stdout.log",
+    "sha256": "c23d78551d630f391747ef56dbe51bdd3d690a926d1668f8a4db4d8330c9d706",
+    "size_bytes": 560416
+  },
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/d3/d34a84b7f0fad57ae1a46799a8b9b8b31247239206556ce342bb4e17287775c4",
+    "sha256": "d34a84b7f0fad57ae1a46799a8b9b8b31247239206556ce342bb4e17287775c4",
+    "size_bytes": 1631865
+  },
+  "historical_build_source_snapshot": {
+    "path": ".runtime/porting/source-objects/d3/d362e54d3fda7abd6caa874f3cff9ca05b95b1a27005151182bc16099c201ac8",
+    "sha256": "d362e54d3fda7abd6caa874f3cff9ca05b95b1a27005151182bc16099c201ac8"
+  },
+  "accepted_independent_provider_review": {
+    "path": ".runtime/porting/SRC-06/Header-provider-factual-review-01/review.json",
+    "sha256": "a260a0366cbcecc8482944a83714ce618776d2bef44dc6f1ce8cc22692e6753b",
+    "size_bytes": 4037
+  },
+  "Header_FULL_Native_input_owner_and_custody_factual_review_accepted": true,
+  "frozen_before_after_ref_count": 8132,
+  "distinct_full_hashes": 8142,
+  "descriptor_occurrences": 19945,
+  "Source_member_count": 3928,
+  "historical_Source_aliases_verified": 3928,
+  "input_cases": 28,
+  "literal_binary64_cells": 320,
+  "genuine_source_invocations": 60,
+  "source_returns_observed": 60,
+  "API_counts": {
+    "CalcASHRAETARPNatural": 28,
+    "CalcASHRAEDetailedIntConvCoeff": 32
+  },
+  "admission_lane_counts": {
+    "finite-direct-operands": 22,
+    "diagnostic-direct-operands": 6
+  },
+  "full_owner_snapshots_verified": 204,
+  "scalar_DTO_bits_value_class_integrity_checks": 1492,
+  "diagnostic_scalar_class_counts": {
+    "finite": 1108,
+    "negative_zero": 180,
+    "positive_zero": 189,
+    "nan": 9,
+    "positive_infinity": 6
+  },
+  "all_ordered_literal_cases_and_operations_retained": true,
+  "full_selected_and_unselected_array_rows_retained": true,
+  "constructor_and_input_preparation_joined_without_arithmetic_recalculation": true,
+  "all_diagnostics_callbacks_and_prefixes_retained": true,
+  "all_frozen_input_exe_map_object_DLL_Source_before_after_equal": true,
+  "complete_literal_PATH_sidecar_and_three_DLL_refs_verified": true,
+  "cases": [
+    {
+      "case_id": "normal-positive-enhanced",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "normal-negative-enhanced",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "normal-positive-stable",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "normal-negative-stable",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "same-temperature-default-low",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "positive-zero-delta",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "negative-zero-delta",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "positive-zero-cosine",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "negative-zero-cosine",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "positive-subnormal-delta",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "negative-subnormal-delta",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "tiny-positive-cosine",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "tiny-negative-cosine",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "stored-right-angle-cosine",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "tilted-positive-enhanced",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "tilted-negative-stable",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "tiny-difference-default-low",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "large-difference-no-high-clamp",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "explicit-default-low",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "diagnostic-supplied-low",
+      "admission_lane": "diagnostic-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "diagnostic-negative-zero-low",
+      "admission_lane": "diagnostic-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "diagnostic-unordered-low",
+      "admission_lane": "diagnostic-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "diagnostic-unordered-temperature",
+      "admission_lane": "diagnostic-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "diagnostic-infinite-temperature",
+      "admission_lane": "diagnostic-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "diagnostic-finite-delta-overflow",
+      "admission_lane": "diagnostic-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "repeated-multiple-selected-rows",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 6,
+      "actual_invocations": 6,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "cos-smallest-positive",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    },
+    {
+      "case_id": "cos-smallest-negative",
+      "admission_lane": "finite-direct-operands",
+      "declared_operations": 2,
+      "actual_invocations": 2,
+      "all_source_returns_observed": true,
+      "initial_seed_owner_bits_and_associations_exact": true,
+      "full_before_after_owner_custody_verified": true,
+      "diagnostic_finite_PASS_claim": false
+    }
+  ],
+  "Rust_math_or_results_read": false,
+  "Native_arithmetic_recalculated": false,
+  "Native_results_fed_to_Rust": false,
+  "scientific_PASS_claimed": false,
+  "ordinary_traversal_or_handoff_verified": false,
+  "gates_updated": false
+}

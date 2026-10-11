@@ -1,0 +1,12 @@
+--- .runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-01/README.md
++++ .runtime/porting/SRC-06/tarp-inside-selected-comparison-prep-02/README.md
+@@ -13,3 +13,9 @@
+ Native constructor/high-limit/backend/callback/prefix and Objexx allocation implementation have no Rust parity owner here. Their full Native DTOs remain in authenticated stdout and one explicit required-unavailable context row per case. The full advertised array allocation/bounds/order is validated, without equating Rust Vec capacity to Objexx storage. Nothing claims full InitIntConvCoeff traversal/cadence, space MAT refresh, Kiva/windows, ordinary handoff, backend or whole SRC06 completion. Ledgers are uncapped NDJSON with full SHA/size and comparison.json distinguishes integrity exit2, scientific mismatch/unreached exit1 and available-finite-pairs-only exit0; diagnostic/unpaired rows never become PASS.
+ 
+ No canonical edit, Cargo/build/formatter/helper/comparison execution or numerical-result read occurred in Source preparation. Root and independent full Source peers must accept this package before actual comparison. Existing Native declared policy is retained verbatim and source controls are untouched.
++
++## Fresh02 prospective copy-rule correction
++
++The entire01 Source review carries forward. Full preowners and every retained/unselected endpoint cell now require exact bits/class including NaN payloads, even if an earlier call generated that cell. Only the current returned Detailed selected output and Natural scalar return receive the arithmetic diagnostic class/unavailable rule. This implements the immutable Original copied/retained policy and adds no tolerance or input change. The first01 publication remains immutable.
++
++Historical frozen-Source matching now resolves an index once instead of scanning all Source members for each artifact; all the same full SHA/size and before/after checks remain. Root-authorized Native outer/sidecar metadata (argv/schema/fullhash refs only) was inspected to confirm the interface; no Native numerical result was read. No Rust result exists for this package. No target, import, canonical change or execution was performed.

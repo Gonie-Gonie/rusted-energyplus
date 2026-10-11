@@ -1,0 +1,45 @@
+--- a/tarp_inside_reference_helper.cpp
++++ b/tarp_inside_reference_helper.cpp
+@@ -86,10 +86,11 @@
+     {
+         auto const before = snapshot();
+         bool returned = false;
+-        json exception = nullptr, return_value = nullptr;
++        json exception = nullptr;
++        std::optional<double> returned_scalar;
+         ++actual_calls;
+         try {
+-            return_value = call();
++            returned_scalar = call();
+             returned = true;
+         } catch (EnergyPlus::FatalError const &e) {
+             exception = {{"kind", "OriginalFatalError"}, {"message", e.what()}};
+@@ -98,6 +99,7 @@
+         } catch (...) {
+             exception = {{"kind", "nonstandard_exception"}, {"message", nullptr}};
+         }
++        json const return_value = returned_scalar ? Src06::scalar(*returned_scalar) : json(nullptr);
+         stopped = !returned;
+         calls.push_back({{"operation_id", id}, {"actual_call_ordinal", actual_calls}, {"api", api},
+                          {"actual_source_invoked", true}, {"actual_source_return_observed", returned},
+@@ -154,16 +156,16 @@
+         if (api == "CalcASHRAETARPNatural") {
+             require(op.at("surface_index").is_null(), "Natural does not consume a surface owner");
+             double const cosine = input(op.at("correlation_cos_tilt"), diagnostic);
+-            f.invoke(id, "Convect::CalcASHRAETARPNatural", [&]() -> json {
+-                return Src06::scalar(EnergyPlus::Convect::CalcASHRAETARPNatural(ts, ta, cosine));
++            f.invoke(id, "Convect::CalcASHRAETARPNatural", [&]() -> std::optional<double> {
++                return EnergyPlus::Convect::CalcASHRAETARPNatural(ts, ta, cosine);
+             });
+         } else if (api == "CalcASHRAEDetailedIntConvCoeff") {
+             require(op.at("correlation_cos_tilt").is_null() && op.at("surface_index").is_number_integer(), "Detailed uses actual selected Surface.CosTilt owner only");
+             auto const selected = op.at("surface_index").get<std::int64_t>();
+             require(selected > 0 && selected <= f.state->dataSurface->TotSurfaces, "Actual selected surface index in allocated bounds required");
+-            f.invoke(id, "Convect::CalcASHRAEDetailedIntConvCoeff", [&]() -> json {
++            f.invoke(id, "Convect::CalcASHRAEDetailedIntConvCoeff", [&]() -> std::optional<double> {
+                 EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(*f.state, static_cast<int>(selected), ts, ta);
+-                return nullptr;
++                return std::nullopt;
+             });
+         } else { throw std::runtime_error("Unknown direct API"); }
+     }

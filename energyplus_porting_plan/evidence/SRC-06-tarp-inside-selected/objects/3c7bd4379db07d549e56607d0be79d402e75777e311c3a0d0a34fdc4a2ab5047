@@ -1,0 +1,123 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "cargo",
+    "build",
+    "--manifest-path",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\tarp-inside-selected-rust-prep-01\\rust\\Cargo.toml",
+    "--config",
+    "profile.dev.debug=0",
+    "--config",
+    "profile.test.debug=0",
+    "--config",
+    "build.incremental=false",
+    "--locked",
+    "--offline",
+    "--target-dir",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target",
+    "--message-format=json-render-diagnostics",
+    "--bin",
+    "src06_tarp_inside_main"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-11T17:58:08.124282+00:00",
+  "finished_utc": "2026-10-11T17:58:36.755155+00:00",
+  "elapsed_seconds": 28.630592100002104,
+  "repository_before": {
+    "head": "17e4dbc5b4065fb4b276556159ef96eb635ba70d",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/heat_balance/convection.rs\u0000 M crates/ep_runtime/src/runtime/tests/part03.rs\u0000 M energyplus_porting_plan/CHECKLIST.md\u0000 M energyplus_porting_plan/STATE_CONTRACTS.md\u0000 M energyplus_porting_plan/cards/SRC-05.md\u0000 M energyplus_porting_plan/cards/SRC-06.md\u0000 M energyplus_porting_plan/energyplus_porting_checklist.html\u0000 M energyplus_porting_plan/plan.json\u0000?? crates/ep_runtime/src/heat_balance/convection/tarp_inside.rs\u0000?? energyplus_porting_plan/evidence/SRC-05-wind-diagnostics-and-main-thread/\u0000"
+  },
+  "repository_after": {
+    "head": "17e4dbc5b4065fb4b276556159ef96eb635ba70d",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/heat_balance/convection.rs\u0000 M crates/ep_runtime/src/runtime/tests/part03.rs\u0000 M energyplus_porting_plan/CHECKLIST.md\u0000 M energyplus_porting_plan/STATE_CONTRACTS.md\u0000 M energyplus_porting_plan/cards/SRC-05.md\u0000 M energyplus_porting_plan/cards/SRC-06.md\u0000 M energyplus_porting_plan/energyplus_porting_checklist.html\u0000 M energyplus_porting_plan/plan.json\u0000?? crates/ep_runtime/src/heat_balance/convection/tarp_inside.rs\u0000?? energyplus_porting_plan/evidence/SRC-05-wind-diagnostics-and-main-thread/\u0000"
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/8a/8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934",
+    "sha256": "8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/57/5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/SRC-06/selected-main-thread-observation-01/Cargo-command/stdout.log",
+    "sha256": "d3b736e1cf03c0031257eaf5b1d9249c81a454de0a8bcf8ce4e05f720736d385"
+  },
+  "stderr": {
+    "path": ".runtime/porting/SRC-06/selected-main-thread-observation-01/Cargo-command/stderr.log",
+    "sha256": "48cfff78c6958dc5704efc8b160584ab842c3053dcb8d96acd89e4b2c459804d"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": true,
+    "captured_utc": "2026-10-11T17:58:36.755155+00:00",
+    "status": "pass",
+    "rows": [
+      {
+        "cargo_message": {
+          "reason": "compiler-artifact",
+          "package_id": "path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/SRC-06/tarp-inside-selected-rust-prep-01/rust#src06_tarp_inside_main@0.0.0",
+          "manifest_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\tarp-inside-selected-rust-prep-01\\rust\\Cargo.toml",
+          "target": {
+            "kind": [
+              "bin"
+            ],
+            "crate_types": [
+              "bin"
+            ],
+            "name": "src06_tarp_inside_main",
+            "src_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\tarp-inside-selected-rust-prep-01\\rust\\src\\main.rs",
+            "edition": "2024",
+            "doc": true,
+            "doctest": false,
+            "test": true
+          },
+          "profile": {
+            "opt_level": "0",
+            "debuginfo": 0,
+            "debug_assertions": true,
+            "overflow_checks": true,
+            "test": false
+          },
+          "features": [],
+          "filenames": [
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src06_tarp_inside_main.exe"
+          ],
+          "executable": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src06_tarp_inside_main.exe",
+          "fresh": false
+        },
+        "executable": {
+          "historical_path": "target/debug/src06_tarp_inside_main.exe",
+          "sha256": "750f4930368574e4c11146b4732d60821d7f80c8cf0ef98cc0ff617d1be014f7"
+        }
+      }
+    ],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

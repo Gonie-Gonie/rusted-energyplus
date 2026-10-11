@@ -1,0 +1,14 @@
+                                      // Note that though attached shading surfaces are part of a zone, this
+                                      // value is 0 there to facilitate using them as detached surfaces (more accurate shading.
+        int spaceNum;                 // Space the surface is part of
+        std::string ExtBoundCondName; // Name for the Outside Environment Object
+        int ExtBoundCond;             // For an "interzone" surface, this is the adjacent surface number.
+                                      // for an internal/adiabatic surface this is the current surface number.
+                                      // Otherwise, 0=external environment, -1=ground,
+                                      // -2=other side coefficients (OSC--won't always use CTFs)
+                                      // -3=other side conditions model
+                                      // During input, interim values of UnreconciledZoneSurface ("Surface") and
+                                      // UnenteredAdjacentZoneSurface ("Zone") are used until reconciled.
+        bool ExtSolar;                // True if the "outside" of the surface is exposed to solar
+        bool ExtWind;                 // True if the "outside" of the surface is exposed to wind Heat transfer coefficients
+        bool hasIncSolMultiplier;     // Whether the surface has a incident solar multiplier

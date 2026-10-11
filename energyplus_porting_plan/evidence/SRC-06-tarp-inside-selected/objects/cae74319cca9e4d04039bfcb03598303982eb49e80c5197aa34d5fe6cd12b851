@@ -1,0 +1,42 @@
+{
+  "schema": "src06-actual-main-artifact-Root-review.v1",
+  "actual_sidecar": {
+    "path": ".runtime/porting/SRC-06/selected-main-thread-observation-01/custody.json",
+    "sha256": "c27f928deb4c7349df4181a769c1fa2e85c3374243bb590711cf4b295ad57003",
+    "size_bytes": 1958430
+  },
+  "actual_outer_execution": {
+    "path": ".runtime/porting/SRC-06/selected-main-thread-driver-command-01/receipt.json",
+    "sha256": "e524abb9c115a153cdc4b671148b798fa2bb561ff30c66d0947af7a78d204a95",
+    "size_bytes": 36959
+  },
+  "actual_artifact_proof": {
+    "path": ".runtime/porting/SRC-06/selected-main-thread-observation-01/artifact.json",
+    "sha256": "a463212bb10331348e61e37a1fbaf9fec4123f4ecb5c58d0b055ad3f7a3234e3",
+    "size_bytes": 3156
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/8a/8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934",
+    "sha256": "8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934"
+  },
+  "all_before_after_artifacts_verified": 7881,
+  "full_Source_members_verified": 3929,
+  "distinct_artifact_identities_verified": 7888,
+  "sole_actual_Cargo_emitted_dev_main_artifact_verified": true,
+  "actual_binary": {
+    "path": "target/debug/src06_tarp_inside_main.exe",
+    "sha256": "750f4930368574e4c11146b4732d60821d7f80c8cf0ef98cc0ff617d1be014f7",
+    "size_bytes": 29946183
+  },
+  "actual_argc3_main_execution_closed_0": true,
+  "Root_FULL_actual_main_entry_and_Cargo_artifact_review_accepted": true,
+  "inherited_independent_Source_review": {
+    "path": ".runtime/porting/SRC-06/tarp-inside-selected-rust-prep-01/Root-full-Source-review.json",
+    "sha256": "853e6f1c0cb3d3147e4eef55f8752e135a05c306b2bf12362283173f9cfa7f8e",
+    "size_bytes": 668
+  },
+  "numerical_result_values_read": false,
+  "numerical_PASS_claimed": false,
+  "whole_SRC06_PASS_claimed": false,
+  "gates_updated": false
+}
