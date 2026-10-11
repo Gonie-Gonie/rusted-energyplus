@@ -1,0 +1,99 @@
+"""Seal a metadata-only authorization successor; never import build adapters."""
+import argparse
+import ast
+import copy
+import difflib
+import hashlib
+import json
+import shutil
+from pathlib import Path
+
+p = argparse.ArgumentParser()
+p.add_argument('--native-source-manifest', required=True)
+a = p.parse_args()
+ROOT = Path.cwd().resolve()
+OLD = ROOT / '.runtime/porting/CTF-10/surface-consumer-native-build-prep-01'
+OUT = ROOT / '.runtime/porting/CTF-10/surface-consumer-native-build-prep-02'
+def read(path): return json.loads(path.read_bytes())
+def identity(path):
+    b = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(b).hexdigest(), 'size_bytes': len(b)}
+def describe(path): return {**identity(path), 'line_count': len(path.read_bytes().splitlines())}
+def exact(row):
+    actual = identity(ROOT / row['path'])
+    assert all(actual[key] == row[key] for key in ['path', 'sha256', 'size_bytes'])
+def bound(value):
+    name, expected = value.rsplit('#', 1); path = (ROOT / name).resolve()
+    assert path.is_relative_to(ROOT) and identity(path)['sha256'] == expected
+    return path, read(path)
+def write(path, value):
+    with path.open('x', encoding='utf8', newline='\n') as stream: json.dump(value, stream, indent=2); stream.write('\n')
+
+assert not (OUT / 'manifest.json').exists()
+previous = read(OLD / 'manifest.json')
+assert identity(OLD / 'manifest.json')['sha256'] == 'eb2ec710143f5cadf9b47fdab9390d9180b7e0615e7786b23f3f8e3feffcbb6e'
+native_path, native = bound(a.native_source_manifest)
+assert native_path.parent == ROOT / '.runtime/porting/CTF-10/surface-consumer-native-prep-04'
+assert native['schema'] == 'ctf10-surface-consumer-native-source-preparation.v1'
+old_native_path = ROOT / previous['native_source_manifest']['path']; old_native = read(old_native_path)
+names = {'surface_consumer_main.cpp', 'HeatBalanceSurfaceManager.surface_consumer.cc', 'surface_consumer_observer.cc',
+         'surface_consumer_observer.hh', 'surface_consumer_reference.cmake', 'source-context.json'}
+old_rows = {Path(row['path']).name: row for row in old_native['own_source_and_metadata'] if Path(row['path']).name in names}
+new_rows = {Path(row['path']).name: row for row in native['own_source_and_metadata'] if Path(row['path']).name in names}
+assert old_rows.keys() == new_rows.keys() == names
+for name, row in new_rows.items():
+    exact(row); assert (ROOT / row['path']).resolve() == native_path.parent / name
+    if name != 'surface_consumer_main.cpp': assert (ROOT / old_rows[name]['path']).read_bytes() == (ROOT / row['path']).read_bytes()
+for row in previous['own_sources']:
+    exact(row); ast.parse((ROOT / row['path']).read_bytes(), filename=row['path'])
+failed_path, failed = bound('.runtime/porting/CTF-10/surface-consumer-native-build-01/native-compile-command-01/receipt.json#ed3695284382b9edfc896c40911a6c13de8c7c560d7411a83a68c8045fe21246')
+outer_path, outer = bound('.runtime/porting/CTF-10/surface-consumer-build-launch-command-01/receipt.json#84404a218c90b14cbc74e305328ec78f7e96afd368a65869f40c8d69f3b7692f')
+assert failed['schema'] == outer['schema'] == 'recorded-porting-command.v1'
+assert failed['exit_code'] == 1 and failed['source_bytes_match_before_and_after'] is True
+
+before = OUT / 'before-01'; before.mkdir()
+for name in ['manifest.json', 'README.md']:
+    shutil.copyfile(OLD / name, before / name); assert (OLD / name).read_bytes() == (before / name).read_bytes()
+readme = (OLD / 'README.md').read_text(encoding='utf8') + '''\n## Fresh02 metadata-only Native04 authorization\n\nThis successor authorizes the separately reviewed Native04 source manifest and\nits same-parent six source/context copies. Only the Windows main unused-parameter\nrepair changes producer source; callbacks, math, recipe, context and five-TU\ngraph remain unchanged. The actual first consumer compile failed with exit1\nand Source guard true before an engine was invoked; its inner and outer receipt\nidentities are preserved as failure context, without reading compiler streams.\n\nAll three operational scripts retain their literal accepted01 physical paths\nand hashes. Execute those accepted01 scripts with this fresh02 manifest supplied\nas `--build-source-manifest`; do not copy/rewrite the scripts into02. Their native\nauthorization comes from that manifest field, not a literal Native03 SHA.\nTheir717+5,50 protected,631 core,24 absences and eight addressed-provider guards\nare identical. Existing source diffs/before copies and unchanged generic PE and\nderiver authorities remain literal accepted01. Only current Native references\nand two current Native source-range aliases are rebound to04.\n\nRoot supplies actual frozen-inputs02/scope-amendment02 and literal restore02\nreceipts through the same runtime interface. No future output, receipt or Source\nidentity is invented, and no prior failed receipt is rewritten. The historical\nNative03 and adapter01 authoring sources remain explicit non-executable lineage.\n'''
+(OUT / 'README.md').write_text(readme, encoding='utf8', newline='\n')
+current = copy.deepcopy(previous)
+current['status'] = 'held-source-only-fresh02-metadata-authorization-for-Native04-awaiting-independent-review'
+current['native_source_manifest'] = identity(native_path)
+mapping = {old_native_path.relative_to(ROOT).as_posix(): describe(native_path)}
+mapping.update({old_rows[name]['path']: new_rows[name] for name in names})
+current['source_dependencies'] = [copy.deepcopy(mapping.get(row['path'], row)) for row in previous['source_dependencies']]
+for row in current['read_source_ranges']:
+    if row['path'] in mapping:
+        row['path'] = mapping[row['path']]['path']
+        path = ROOT / row['path']
+        if path.name == 'surface_consumer_main.cpp': row['end_line'] = len(path.read_bytes().splitlines())
+        b = b''.join(path.read_bytes().splitlines(keepends=True)[row['start_line'] - 1:row['end_line']])
+        row['sha256'] = hashlib.sha256(b).hexdigest(); row['size_bytes'] = len(b)
+current['documentation'] = describe(OUT / 'README.md')
+current['authoring_source_metadata_only'] = describe(Path(__file__).resolve())
+current['immutable_predecessor'] = describe(OLD / 'manifest.json')
+current['before_predecessor_manifest'] = describe(before / 'manifest.json')
+current['before_predecessor_documentation'] = describe(before / 'README.md')
+current['historical_Native03_authority'] = describe(old_native_path)
+current['historical_adapter01_authoring_source_not_for_reexecution'] = previous['authoring_source_metadata_only']
+current['actual_failed_compile_context_metadata_only'] = {
+    'inner_compile_execution': identity(failed_path), 'outer_build_launcher_execution': identity(outer_path),
+    'actual_inner_exit_code': failed['exit_code'], 'actual_inner_Source_guard': failed['source_bytes_match_before_and_after'],
+    'no_engine_invocation': 'Root supplied fact: first main TU failed compilation before target execution; no scientific outcome is inferred.',
+    'compiler_stdout_or_stderr_opened_by_author': False}
+current['fresh02_delta'] = {'metadata_only': True, 'all_three_operational_sources_literal_accepted01': True,
+    'all_three_operational_source_diffs_and_before_archives_literal_accepted01': True,
+    'new_Native04_six_named_files_are_same_parent_as_manifest': True,
+    'new_runtime_scope_freeze_restore_output_refs_remain_operands': True,
+    'scientific_guards_or_provider_or_preservation_rules_changed': False}
+diffs = OUT / 'diffs'; diffs.mkdir()
+patch = ''.join(difflib.unified_diff((before / 'README.md').read_text(encoding='utf8').splitlines(keepends=True),
+    (OUT / 'README.md').read_text(encoding='utf8').splitlines(keepends=True), fromfile=(before / 'README.md').relative_to(ROOT).as_posix(), tofile=(OUT / 'README.md').relative_to(ROOT).as_posix()))
+(diffs / 'README.md.from-01.diff').write_text(patch, encoding='utf8', newline='\n')
+current['documentation_from_01_diff'] = describe(diffs / 'README.md.from-01.diff')
+write(OUT / 'manifest.json', current)
+patch = ''.join(difflib.unified_diff((before / 'manifest.json').read_text(encoding='utf8').splitlines(keepends=True),
+    (OUT / 'manifest.json').read_text(encoding='utf8').splitlines(keepends=True), fromfile=(before / 'manifest.json').relative_to(ROOT).as_posix(), tofile=(OUT / 'manifest.json').relative_to(ROOT).as_posix()))
+(diffs / 'manifest.json.from-01.diff').write_text(patch, encoding='utf8', newline='\n')
+print(json.dumps({'manifest': describe(OUT / 'manifest.json'), 'metadata_diff': describe(diffs / 'manifest.json.from-01.diff'),
+    'documentation_diff': describe(diffs / 'README.md.from-01.diff')}, indent=2))

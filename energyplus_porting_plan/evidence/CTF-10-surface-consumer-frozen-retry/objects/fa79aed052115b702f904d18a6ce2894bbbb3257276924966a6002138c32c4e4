@@ -1,0 +1,41 @@
+"""Root supersedes an unexecuted scientific freeze after the exact Windows build repair."""
+import hashlib,json,shutil,subprocess
+from datetime import datetime,timezone
+from pathlib import Path
+ROOT=Path.cwd(); BASE=ROOT/'.runtime/porting/CTF-10'; OUT=BASE/'surface-consumer-scope-amendment-02'
+def read(p): return json.loads(p.read_bytes())
+def sha(p):
+ with p.open('rb') as s: return hashlib.file_digest(s,'sha256').hexdigest()
+def ref(p): return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+def write(p,v): p.write_bytes((json.dumps(v,ensure_ascii=False,indent=2,allow_nan=False)+'\n').encode('utf8'))
+native=BASE/'surface-consumer-native-prep-04/manifest.json'; assert sha(native)=='ab3ce0f37c5649672e4fba4b348322f53e0736ad84aa52c49475696660022391'
+assert not subprocess.check_output(['git','status','--porcelain'])
+assert subprocess.check_output(['git','rev-parse','HEAD'])==subprocess.check_output(['git','rev-parse','@{u}'])
+prior_path=BASE/'surface-consumer-scope-amendment-01/amendment.json'; prior=read(prior_path)
+failure_path=BASE/'surface-consumer-native-build-01/native-compile-command-01/receipt.json'; failure=read(failure_path)
+assert sha(failure_path)=='ed3695284382b9edfc896c40911a6c13de8c7c560d7411a83a68c8045fe21246'
+assert failure['exit_code']==1 and failure['launch_error'] is None and failure['source_bytes_match_before_and_after']
+assert not Path(prior['observation_output_path']).exists() and not Path(prior['forwarded_native_arguments'][5]).exists()
+old_source=BASE/'surface-consumer-native-prep-03'; new_source=native.parent
+for name in ['surface_consumer_observer.cc','surface_consumer_observer.hh','HeatBalanceSurfaceManager.surface_consumer.cc','surface_consumer_reference.cmake','source-context.json','additions.json']:
+ assert (old_source/name).read_bytes()==(new_source/name).read_bytes()
+assert (new_source/'surface_consumer_main.cpp').read_bytes().replace(b'    (void)argc;\n    (void)argv;\n',b'')==(old_source/'surface_consumer_main.cpp').read_bytes()
+documents=[ROOT/row['path'] for row in prior['source_authorities']['current_after_documents']]
+assert all(ref(p)==row for p,row in zip(documents,prior['source_authorities']['current_after_documents']))
+assert not OUT.exists();(OUT/'before').mkdir(parents=True);before=[]
+for p in documents:
+ archive=OUT/'before'/p.name;shutil.copyfile(p,archive);assert archive.read_bytes()==p.read_bytes();before.append({'original':ref(p),'archive':ref(archive)})
+plan=read(documents[0]);task=next(t for t in plan['tasks'] if t['id']=='CTF-10');prospective=task['prospective_ordinary_surface_lifecycle_capture']
+assert prospective['native_source_manifest']==prior['native_source_manifest'] and prospective['actual_capture_available'] is False
+prospective['native_source_manifest']=ref(native)
+prospective['build_only_retry']={'prior_actual_compile_execution':ref(failure_path),'prior_compile_exit_code':1,'engine_execution_occurred':False,'repair':'Only explicit void argc/argv in existing Windows main branch; six other transport/source artifacts byte-exact03; compiler flags, all51 callbacks, science, inputs and resource policy unchanged.'}
+write(documents[0],plan)
+text=documents[1].read_text(encoding='utf8');text+='\nThe first consumer compile stopped before any engine execution on unused Windows main argc/argv under unchanged Werror. Reviewed consumer04 adds only explicit void casts for those two parameters. All51 callbacks, collector, Original HBSM, recipe, inputs and prospective4GiB QA bound remain unchanged. A fresh scope/freeze02 binds this build-only successor and retains the failed attempt; actual engine capture remains pending.\n';documents[1].write_bytes(text.encode('utf8'))
+subprocess.run(['python','-X','utf8','-B','tools/porting/sync_plan_views.py','--write'],check=True)
+scope=dict(prior);scope['created_utc']=datetime.now(timezone.utc).isoformat();scope['native_source_manifest']=ref(native)
+scope['source_authorities']={'current_after_documents':[ref(p) for p in documents],'before_documents':before,'actual_scope_check_role':'real-CTF-10-check-only'}
+scope['build_only_retry']={'superseded_before_engine_scope':ref(prior_path),'superseded_before_engine_freeze':ref(BASE/'surface-consumer-frozen-inputs-01/freeze-receipt.json'),'actual_failed_compile':ref(failure_path),'actual_failed_build_launcher':ref(BASE/'surface-consumer-build-launch-command-01/receipt.json'),'actual_exact_configuration_restore':ref(BASE/'surface-consumer-restore-preservation-02/preservation.json'),'scientific_engine_execution_before_this_retry':False,'input_or_tolerance_or_duration_or_callback_or_math_changed':False}
+for row in scope['all45_fixed_input_guards']:assert ref(ROOT/row['actual']['path'])==row['actual']
+for key in ['fixed_scope','selected_input','selected_weather','selected_metadata','selected_idd']:assert ref(ROOT/scope[key]['path'])==scope[key]
+assert scope['forwarded_native_arguments']==prior['forwarded_native_arguments'] and scope['observation_max_bytes']==4294967296
+write(OUT/'amendment.json',scope);print('Root exact operational successor scope02 prepared',ref(OUT/'amendment.json'),flush=True)

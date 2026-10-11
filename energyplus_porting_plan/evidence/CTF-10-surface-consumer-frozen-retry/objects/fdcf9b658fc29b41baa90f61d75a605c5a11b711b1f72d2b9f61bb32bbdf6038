@@ -1,0 +1,164 @@
+This held SOURCE proposal observes the ordinary complete Native surface lifecycle
+through the unchanged global `::EnergyPlusPgm`. It does not call a shortened InitHB
+or synthetic timestep loop. Root and Base accepted the predecessor lifecycle
+design; the global entry spelling is bound by documentary design02 ccba92e3.
+Nothing here has been configured, compiled, linked, imported or run.
+
+The new main extracts only `--surface-observation-file FRESH.json --`, then forwards
+every remaining real EnergyPlus argument in its original order with argv0 retained.
+The future normal argument shape is actual `-i IDD -w WEATHER -d FRESH_NATIVE_DIR
+ACTUAL_IDF`. Input cases, duration, actual weather/IDD identities and observation
+profiles remain future Root prospective choices. The two design examples are
+existing metadata, not a newly selected capture scope. No weather bytes were read.
+ProcessArgs early exit/abort may bypass final output; that leaves an unavailable
+capture, never an inferred engine return or empty success. The main records an
+actual returned engine exit separately from any outer caught exception class and
+observer transport failure. Source CLI/error/fatal behavior inside the global entry
+is unchanged. The wrapper does not turn a nonreturned engine into a successful run.
+
+The entire 10,119-line pinned HBSM translation unit is copied. Additions are only
+one include, six passive scope objects and output-only callbacks at literal source
+boundaries. The emitter asserts that removing every exact insertion restores all
+698,972 Original bytes. No original expression, predicate, assignment, declaration,
+loop, return, warning, convergence decision or excluded branch is changed.
+The CMake recipe retains the old CTF10 recipe prefix literally and adds one target.
+Its five source units are main, full derived HBSM, collector, Original EnergyPlusPgm
+and Original CommandLineInterface, linked before the genuine static energypluslib.
+Only this target adds ENERGYPLUS_STATIC_API. Actual link/PE proof must demonstrate
+the derived HBSM text provider and exclusion of the Original HBSM archive object;
+likewise actual entry/CLI provider precedence must be checked. No actual provider,
+compile count, binary identity or archive preservation is asserted by this hold.
+
+Every actual procedure invocation/event is retained in callback order, including
+kickoff, warmup, repeated clock values and partial resimulation. Six procedure
+counters and linked live scope ordinals distinguish these visits. A scope-normal-
+exit marker describes destructor timing, separately from a reached real caller
+return after Init/outside/inside/air/final/history/report calls. Unwinding scopes
+are distinct. No source call is fabricated because a later scope or engine returns.
+Actual flags/clock/inside-iteration count accompany each event; no flags, counters,
+temperature, flux, weather, radiation, histories or source controls are seeded.
+
+Copies are field-specific. One actual allocation return captures original surface,
+zone/space order, construction/material-ID associations and all 12 public arrays.
+Each history entry or selected completed update copies all actual term slots of
+four histories plus optional four masters and CurrNumHist. Outer/inner allocation
+and bounds are explicit; absent owners are null, never zeros. No count is clipped
+to a term/capacity or sampled. Per-term initialization copies actual slot2 before
+and after the Original flux assignments: term1 inside flux genuinely reads the old
+outside slot2 before term2 updates it. CTF constants copy source-assigned local
+TH/QH/cross operands and accumulated owners after each real term. No collector
+evaluates sums, interpolations, flux expressions, temperatures or convergence.
+
+Inside CTF copies actual cache/precalculation, per-surface operands immediately
+before Original8913, and only the two assigned temperatures after8933. Source-
+initialized zero owners remain actual values; allocation alone is not a claim
+that a field was assigned by the current stage. Explicit MaxDelTemp/Converged
+locals are supplied only after their real assignments/checks. Generic/partial
+inside routes are distinguishable by real caller returns without invented CTF
+scope records. CON-supported ordinary no-source CTF is the prospective paired
+boundary; excluded algorithms, sources, pools, overrides or geometry need separate
+admission and cannot silently become selected-equivalence evidence here.
+
+History update records real current flux/report assignments, simple hard-copy
+completion, zero-counter scratch, actual counter/SumTime, completed master block,
+and the assigned `sum_steps` only in its true interpolation branch. Scratch is
+null before actual5246–50 allocation; master/counter owners are null when unallocated.
+Reports retain actual inside/outside face flux/W/energy and average/storage values
+before/after source assignments, with actual area and zone-step seconds in custody.
+Global MaxCTFTerms+1 loops, descending shifts and original signs/order are untouched.
+
+Complete events stream as compact JSON instead of keeping the whole run in memory.
+Binary64 scalars contain authoritative value_bits and value_class only, with no
+duplicate decimal value. Classification inspects copied integer bits and does not
+evaluate the floating operand or a scientific expression.
+There is no sampling, record cap, truncation or omission-by-size. Each event is
+completely serialized before writing it. Attempted/retained events, copy failures
+by Copy enum, first/last copy-failed ordinals, stream failure and counter overflow
+are explicit integrity evidence. Any such fault prevents a successful transport;
+a failed stream may leave invalid/incomplete JSON and cannot be released by QA.
+No recovery or complete-result claim is made. Counts are transport observations,
+not convergence, scope completion or scientific PASS. No new execution/QA stage
+or registry is introduced; Root's existing recorder/build/PE/OriginalDataQA and
+future direct scientific reader must authenticate actual artifacts independently.
+
+Header's held public-to-surface binding is prospective Rust context only. It does
+not seed histories, activate a consumer or authenticate independently supplied
+objects retroactively. This proposal provides no Rust lifecycle, numerical parity,
+SUR04/SUR07 integration, CON admission, full Native outcome or card-completion PASS.
+Root+independent full source review, prospective input/policy freeze and all genuine
+runtime provenance are required before any capture. Canonical sources, cards,
+prior held sources, binaries and scientific artifacts were untouched/unread.
+
+
+Fresh02 repairs one pre-build source/API blocker found by Base's FULL01 peer.
+The three catalog loops over actual Surface, Zone and space EPVector owners now
+use the real one-based range `1..isize()`, preserving their allocated checks and
+declared order. Construct is an actual Objexx Array1D and retains its original
+`l()..u()` bounds. The actual EPVector API source and exact56-150 byte range are
+bound in source-context.json. Only these three collector loop bounds change;
+all original HBSM insertions, Source arithmetic, callbacks, stream records,
+fields, main and CMake bytes remain literal01. Complete Source/TU inverse and
+old recipe-prefix checks still apply. This is a Source repair, not an observed
+build result. Prep01 stays immutable and unexecuted. Its original emitter remains
+an explicitly historical source reference and must not be rerun to overwrite01;
+prepare_successor.py is this fresh package's metadata-only authoring source.
+
+
+Fresh03 adds output-only entry custody needed by the pending standalone selected
+history comparison. The entire derived HBSM TU, all51 insertion blocks/additions,
+header, main and CMake remain byte-identical02; no new callback or engine path is
+introduced. The collector adds two actual initialized flags to every event.clock:
+AnyInternalHeatSourceInInput and UpdateThermalHistoriesFirstTimeFlag. Existing
+callbacks consequently retain the real first-time flag before and after allocation.
+
+Only the two already-reached history entry checkpoint events gain
+history_entry_context (protocol ctf10-surface-history-entry-context.v1). It copies
+actual TotSurfaces/NumOfZones, Surface allocation/declared order/current identity,
+AllHT order, complete allocated SurfCurrNumHist, scratch QExt1/QInt1/TempInt1/
+TempExt1/SumTime, four flux report arrays, and actual SurfTempIn/CTF constants/
+outside drybulb arrays. Each array states allocation and actual lower/upper bounds;
+unallocated values/bounds are null. All allocated elements are copied in index
+order with authoritative bits/class; no values or allocation flags are defaulted.
+
+Existing event.owners retains the original AllHT history rows without duplication.
+non_AllHT_history_owners adds every other actual declared Surface row with the
+same four ordinary/four optional master histories and counter copier. Together
+these retain the actual full declared surface layout. Each actual allocated term
+and inner surface bound stays explicit, including absent/moved owners; there is
+no fixed19 clamp. Future shape admission must verify the actual fixed19/full-layout
+owners before pairing the standalone API. No missing allocation is synthesized.
+Array allocation initializes these ordinary fields in Original1416-1530; scratch
+initialization remains only the actual Update5245-5256. Entry before that source
+allocation can truthfully contain unallocated scratch. No unassigned local such
+as sum_steps is read; the existing interpolation checkpoint alone copies it.
+
+The existing event try/catch and attempted/retained/failure-by-Copy counters cover
+the whole added entry copy. A failure omits that actual event and fails custody;
+no cap, sample, recovery or artificial successful event is added. Native entry
+snapshots are later direct-unit operand evidence, never Native answers injected
+into ordinary Rust production. Same-input policy/freeze, exact owner association,
+genuine independent Rust state and OriginalDataQA remain unimplemented prerequisites.
+No history math/lifecycle/integration PASS or actual build result is claimed.
+Prep01/02 remain immutable. prepare_successor.py only authors this ignored source
+and metadata package using the Python standard library; it runs no proposed code.
+
+## Fresh04 Windows build-only repair
+
+Root reported the actual first consumer build stopped on unused `argc` and `argv`
+in the Windows main branch under the unchanged `-Wextra`/`-Werror` options. This
+fresh immutable successor adds only `(void)argc;` and `(void)argv;` immediately
+inside `#ifdef _WIN32`. The real CLI11 `compute_win32_argv()` remains the argument
+producer; the non-Windows branch and every supplied Native option are unchanged.
+No warning option, callback, collector, HBSM arithmetic, source context, recipe,
+checkpoint, output schema or input selection changes. Seven other physical
+artifacts are copied from03; six non-documentary artifacts are byte-exact.
+Removing the two statements restores the exact main03 bytes. Source03 and its
+freeze/build-failure history remain immutable and historical. Root must bind the
+reviewed04 hold into a fresh scope/freeze/build source successor before retrying.
+No target or new compiler run was performed here; future actual receipts are null.
+
+The bounded source-only compiler-interface scan checked the complete small main,
+collector/header, all51 passive addition blocks, unchanged five-TU recipe, the
+Original EnergyPlusPgm signature/Windows/static-API path, CommandLineInterface
+conditionals and inherited warning options. No additional concrete defect was
+identified. This source scan is not a compilation success or whole-source proof.

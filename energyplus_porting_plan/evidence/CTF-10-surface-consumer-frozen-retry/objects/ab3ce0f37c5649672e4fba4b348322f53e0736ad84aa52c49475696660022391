@@ -1,0 +1,664 @@
+{
+  "schema": "ctf10-surface-consumer-native-source-preparation.v1",
+  "status": "held-source-only-unexecuted-Windows-build-repair",
+  "author": "/root/clk02_header_port",
+  "design": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-design-prep-02/manifest.json",
+    "sha256": "ccba92e3f8f1301a11a825e25779a9bc03f95b8eefdb5268ead490dae897734e",
+    "size_bytes": 3281,
+    "line_count": 86
+  },
+  "own_source_and_metadata": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/surface_consumer_observer.hh",
+      "sha256": "1d9befcc41cba45b74d36d27f75836249d9ce20f44173c84a195b446d8f2e7dd",
+      "size_bytes": 2403,
+      "line_count": 66
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/surface_consumer_observer.cc",
+      "sha256": "5d4f23c000efe0e1342553f08a8861e7c310cc4278ebc928cb15ae0bd6be69bc",
+      "size_bytes": 20532,
+      "line_count": 357
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/surface_consumer_main.cpp",
+      "sha256": "181dfc603f18775527763afb89a718b3e91092a74b8692de7ad463653d2e2303",
+      "size_bytes": 2216,
+      "line_count": 55
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/HeatBalanceSurfaceManager.surface_consumer.cc",
+      "sha256": "e37acaa62973ff87aa15dd113ebf77bbc459091a6ff8fc72c9baada1d93c17ce",
+      "size_bytes": 713540,
+      "line_count": 10279
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/surface_consumer_reference.cmake",
+      "sha256": "f4f25bd910c81a494b2b5b023f95abd91097376c9d0664826cad02851e685c67",
+      "size_bytes": 4527,
+      "line_count": 72
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/additions.json",
+      "sha256": "fb155a1ddacd1d3a42f8c1aeef3a55f5d1c0b400b08c30d37517937a2b3459ef",
+      "size_bytes": 24762,
+      "line_count": 308
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/source-context.json",
+      "sha256": "18146002df2b8489f09adc4634b8f75be7bdde8aef89bd0fa027eeeefc8ebb9c",
+      "size_bytes": 26573,
+      "line_count": 663
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/README.md",
+      "sha256": "fdcf9b658fc29b41baa90f61d75a605c5a11b711b1f72d2b9f61bb32bbdf6038",
+      "size_bytes": 11734,
+      "line_count": 164
+    }
+  ],
+  "exact_source_diffs": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/diffs/surface_consumer_observer.hh.diff",
+      "sha256": "94958de5262a2848cd45a6ab1df7c0d78692b59527203ae20e1590bf1b01d4ce",
+      "size_bytes": 2658,
+      "line_count": 69
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/diffs/surface_consumer_observer.cc.diff",
+      "sha256": "b911ca060eed0770846980d3ff1e14bd5cf44fa73ac48c28d57949fc59737f2c",
+      "size_bytes": 21370,
+      "line_count": 360
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/diffs/surface_consumer_main.cpp.diff",
+      "sha256": "bdf0a26dfc0cf14aee6bda68df2ba3ffaccdaed64e56df405822ee145dcb907e",
+      "size_bytes": 2446,
+      "line_count": 58
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/diffs/HeatBalanceSurfaceManager.surface_consumer.cc.diff",
+      "sha256": "53607d759d71b1d53176f7438b069aeb2c0d31adcd0b593637c8842d1a281c32",
+      "size_bytes": 29197,
+      "line_count": 454
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/diffs/surface_consumer_reference.cmake.diff",
+      "sha256": "610085ee8bc000079b7148b0829e08a833efced742b4e1ecb29c26a286504e4f",
+      "size_bytes": 2491,
+      "line_count": 40
+    }
+  ],
+  "source_archives": [
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+        "sha256": "0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c",
+        "size_bytes": 698972,
+        "line_count": 10119
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/before/HeatBalanceSurfaceManager.cc",
+        "sha256": "0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c",
+        "size_bytes": 698972,
+        "line_count": 10119
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/native-helper-prep-01/ctf10_reference.cmake",
+        "sha256": "51eaa70ce28d4c91fb63ad42b72d3ad20c86ce440de3d25bb4986f079ac03f9f",
+        "size_bytes": 2366,
+        "line_count": 38
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/before/ctf10_reference.cmake",
+        "sha256": "51eaa70ce28d4c91fb63ad42b72d3ad20c86ce440de3d25bb4986f079ac03f9f",
+        "size_bytes": 2366,
+        "line_count": 38
+      }
+    }
+  ],
+  "prospective_Rust_adapter": {
+    "path": ".runtime/porting/CTF-10/surface-binding-prep-01/manifest.json",
+    "sha256": "f1c291242acdbeedce392f2db0cb5d41efd28d95e3a53268c825e939655864eb",
+    "size_bytes": 21534,
+    "line_count": 547
+  },
+  "callback_blocks": 51,
+  "whole_Original_HBSM_inverse_byte_exact": true,
+  "old_CTF10_recipe_prefix_byte_exact": true,
+  "observation_transport": "complete compact JSON event array streamed in actual callback order",
+  "scientific_or_binary_or_weather_payloads_read": false,
+  "canonical_or_prior_hold_mutated": false,
+  "build_or_target_or_project_import_performed": false,
+  "selected_inputs_or_duration_or_tolerances_chosen": false,
+  "future_execution_policy_or_actual_refs": null,
+  "integration_PASS_claimed": false,
+  "predecessor_manifest": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/manifest.json",
+    "sha256": "4cfaf1868257599cae0667fe98c3e24952637b00417141325daf98537264a03d",
+    "size_bytes": 12929,
+    "line_count": 312
+  },
+  "historical_source_emitter_not_for_reexecution": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-01/prepare_sources.py",
+    "sha256": "b98a14f39936aa6700f8db40c69368639c142406e4242a242db3a72a2a6f9152",
+    "size_bytes": 13796,
+    "line_count": 203
+  },
+  "before_predecessor_archives": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/before-02/surface_consumer_observer.hh",
+      "sha256": "1d9befcc41cba45b74d36d27f75836249d9ce20f44173c84a195b446d8f2e7dd",
+      "size_bytes": 2403,
+      "line_count": 66
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/before-02/surface_consumer_observer.cc",
+      "sha256": "99b6e3e516f8bb5ac0cff61d5a61f45368ce89acd997c0021d4f1d3a8e6b78ea",
+      "size_bytes": 16904,
+      "line_count": 302
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/before-02/surface_consumer_main.cpp",
+      "sha256": "348f95e60fefa9c4027388b49a47ab25d2ac9fbd7e35e5c66a21895e73ee56d2",
+      "size_bytes": 2184,
+      "line_count": 53
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/before-02/HeatBalanceSurfaceManager.surface_consumer.cc",
+      "sha256": "e37acaa62973ff87aa15dd113ebf77bbc459091a6ff8fc72c9baada1d93c17ce",
+      "size_bytes": 713540,
+      "line_count": 10279
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/before-02/surface_consumer_reference.cmake",
+      "sha256": "f4f25bd910c81a494b2b5b023f95abd91097376c9d0664826cad02851e685c67",
+      "size_bytes": 4527,
+      "line_count": 72
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/before-02/additions.json",
+      "sha256": "fb155a1ddacd1d3a42f8c1aeef3a55f5d1c0b400b08c30d37517937a2b3459ef",
+      "size_bytes": 24762,
+      "line_count": 308
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/before-02/source-context.json",
+      "sha256": "fec7d7338678a3139dfec5bcb9c9f612ec44c3e83317cf164bfa7ffe6ec059c7",
+      "size_bytes": 25087,
+      "line_count": 628
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/before-02/README.md",
+      "sha256": "38f8a200b770f24f6ec3fa4293c3f9bceaa8f4147f2886654b09609d122985df",
+      "size_bytes": 7585,
+      "line_count": 104
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/before-02/manifest.json",
+      "sha256": "172b29b062db7b95554d5fd9aea88477c1f5dede3434547eebf5a84e70382351",
+      "size_bytes": 8843,
+      "line_count": 216
+    }
+  ],
+  "exact_from_predecessor_diffs": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/from-03/surface_consumer_observer.hh.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/from-03/surface_consumer_observer.cc.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/from-03/surface_consumer_main.cpp.diff",
+      "sha256": "f1ecfaf8f74c2d3605776327212151d238f3fc0b8926e5deba698d0eb10d97cd",
+      "size_bytes": 461,
+      "line_count": 11
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/from-03/HeatBalanceSurfaceManager.surface_consumer.cc.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/from-03/surface_consumer_reference.cmake.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/from-03/additions.json.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/from-03/source-context.json.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/from-03/README.md.diff",
+      "sha256": "02517f3e8e5fa40c362d6bc588d9b9f6daa06b39ea313ad1c75aa06d01c15b94",
+      "size_bytes": 1864,
+      "line_count": 27
+    }
+  ],
+  "historical_predecessor_authoring_source": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/prepare_successor.py",
+    "sha256": "e14ccbb61f09a1f33763754f298244dc581625b69ee0f40550e1c88d52aeefc7",
+    "size_bytes": 6562,
+    "line_count": 121
+  },
+  "historical_02_repair_scope": {
+    "only_executable_changes": "three catalog Surface/Zone/space EPVector loop bounds l/u -> 1/isize",
+    "Construct_Array1D_bounds_unchanged": true,
+    "other_four_build_source_bodies_byte_exact_01": true,
+    "Source_API_authority": {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EPVector.hh",
+      "sha256": "155ac5aaf6bd6138ad1a397edf68e2c660a6595d94f291bcf671ebc040c335e2",
+      "size_bytes": 11096,
+      "line_count": 357
+    },
+    "actual_predecessor_compile_or_execution_performed": false,
+    "Root_and_independent_narrow_review_pending": true
+  },
+  "entry_context_augmentation": {
+    "actual_entry_checkpoints": [
+      "history_initialization_entry_owners",
+      "history_update_entry_owners"
+    ],
+    "Original_lines": [
+      2209,
+      5222
+    ],
+    "new_HBSM_callbacks": 0,
+    "new_clock_flags": [
+      "AnyInternalHeatSourceInInput",
+      "UpdateThermalHistoriesFirstTimeFlag"
+    ],
+    "fixed_history_shape_is_observed_not_clamped": true,
+    "AllHT_history_rows_remain_in_existing_owners": true,
+    "other_declared_surface_rows": "history_entry_context.non_AllHT_history_owners",
+    "complete_allocated_scratch_and_report_and_counter_arrays": true,
+    "prospective_standalone_history_owner": {
+      "path": ".runtime/porting/CTF-10/thermal-history-prep-01/manifest.json",
+      "sha256": "343fb38575bdf76f6fc6d671fae06a03422384b9b920dde65c2553acddcf5c83",
+      "size_bytes": 26081,
+      "line_count": 637
+    },
+    "Native_entry_values_are_not_ordinary_Rust_production_inputs": true,
+    "Root_and_independent_Source_review_required_before_capture": true,
+    "four_other_build_source_bodies_and_additions_exact02": true,
+    "collector_inverse_restores02_exactly": true,
+    "counter_and_failure_protocol_unchanged": true
+  },
+  "historical_predecessor_diffs": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/diffs/HeatBalanceSurfaceManager.surface_consumer.cc.diff",
+      "sha256": "324d141b6f53aacc000de170aab6043f58473de688a7ca67139d2b7eb0ce2b8a",
+      "size_bytes": 28646,
+      "line_count": 454
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/diffs/surface_consumer_reference.cmake.diff",
+      "sha256": "c093e5b396613da9ede32b5627aa1dd6d7f65046e95af1d7261b0fb2057c21aa",
+      "size_bytes": 2356,
+      "line_count": 40
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/diffs/surface_consumer_observer.hh.diff",
+      "sha256": "cf5240cc16ea00897b3013b3e77acdb4d1a1c04dbbd611aec727a40a3fcf6741",
+      "size_bytes": 2533,
+      "line_count": 69
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/diffs/surface_consumer_observer.cc.diff",
+      "sha256": "ef0c535f968e5ffc568200476b696bb32b9006ef70de2151cdb50e93c185e8e4",
+      "size_bytes": 20954,
+      "line_count": 360
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/diffs/surface_consumer_main.cpp.diff",
+      "sha256": "b6ee8bee39d859c0cd1d90404b71115fb28e3d2a90fdc1063955ceffe5bd191a",
+      "size_bytes": 2298,
+      "line_count": 56
+    }
+  ],
+  "historical_from_02_diffs": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/from-02/surface_consumer_observer.hh.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/from-02/surface_consumer_observer.cc.diff",
+      "sha256": "0088bbda179d27004770480bae3dec95dfd2f9d99e8e5d9447fa85b1c2ec457a",
+      "size_bytes": 4759,
+      "line_count": 78
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/from-02/surface_consumer_main.cpp.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/from-02/HeatBalanceSurfaceManager.surface_consumer.cc.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/from-02/surface_consumer_reference.cmake.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/from-02/source-context.json.diff",
+      "sha256": "7016f731aac95cbb76fe50d5113b49ac278da6d1d304ff53667b71c83026d804",
+      "size_bytes": 1892,
+      "line_count": 45
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/from-02/README.md.diff",
+      "sha256": "fe12b294f9c2376cb3a3c7e4f75cb87abd20e2243563f6e3b58df7ead7b578da",
+      "size_bytes": 3135,
+      "line_count": 45
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/from-02/additions.json.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    }
+  ],
+  "fresh04_exact_source_and_document_deltas": [
+    {
+      "before": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/before-03/surface_consumer_observer.hh",
+        "sha256": "1d9befcc41cba45b74d36d27f75836249d9ce20f44173c84a195b446d8f2e7dd",
+        "size_bytes": 2403,
+        "line_count": 66
+      },
+      "after": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/surface_consumer_observer.hh",
+        "sha256": "1d9befcc41cba45b74d36d27f75836249d9ce20f44173c84a195b446d8f2e7dd",
+        "size_bytes": 2403,
+        "line_count": 66
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/from-03/surface_consumer_observer.hh.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/before-03/surface_consumer_observer.cc",
+        "sha256": "5d4f23c000efe0e1342553f08a8861e7c310cc4278ebc928cb15ae0bd6be69bc",
+        "size_bytes": 20532,
+        "line_count": 357
+      },
+      "after": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/surface_consumer_observer.cc",
+        "sha256": "5d4f23c000efe0e1342553f08a8861e7c310cc4278ebc928cb15ae0bd6be69bc",
+        "size_bytes": 20532,
+        "line_count": 357
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/from-03/surface_consumer_observer.cc.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/before-03/surface_consumer_main.cpp",
+        "sha256": "348f95e60fefa9c4027388b49a47ab25d2ac9fbd7e35e5c66a21895e73ee56d2",
+        "size_bytes": 2184,
+        "line_count": 53
+      },
+      "after": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/surface_consumer_main.cpp",
+        "sha256": "181dfc603f18775527763afb89a718b3e91092a74b8692de7ad463653d2e2303",
+        "size_bytes": 2216,
+        "line_count": 55
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/from-03/surface_consumer_main.cpp.diff",
+        "sha256": "f1ecfaf8f74c2d3605776327212151d238f3fc0b8926e5deba698d0eb10d97cd",
+        "size_bytes": 461,
+        "line_count": 11
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/before-03/HeatBalanceSurfaceManager.surface_consumer.cc",
+        "sha256": "e37acaa62973ff87aa15dd113ebf77bbc459091a6ff8fc72c9baada1d93c17ce",
+        "size_bytes": 713540,
+        "line_count": 10279
+      },
+      "after": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/HeatBalanceSurfaceManager.surface_consumer.cc",
+        "sha256": "e37acaa62973ff87aa15dd113ebf77bbc459091a6ff8fc72c9baada1d93c17ce",
+        "size_bytes": 713540,
+        "line_count": 10279
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/from-03/HeatBalanceSurfaceManager.surface_consumer.cc.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/before-03/surface_consumer_reference.cmake",
+        "sha256": "f4f25bd910c81a494b2b5b023f95abd91097376c9d0664826cad02851e685c67",
+        "size_bytes": 4527,
+        "line_count": 72
+      },
+      "after": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/surface_consumer_reference.cmake",
+        "sha256": "f4f25bd910c81a494b2b5b023f95abd91097376c9d0664826cad02851e685c67",
+        "size_bytes": 4527,
+        "line_count": 72
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/from-03/surface_consumer_reference.cmake.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/before-03/additions.json",
+        "sha256": "fb155a1ddacd1d3a42f8c1aeef3a55f5d1c0b400b08c30d37517937a2b3459ef",
+        "size_bytes": 24762,
+        "line_count": 308
+      },
+      "after": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/additions.json",
+        "sha256": "fb155a1ddacd1d3a42f8c1aeef3a55f5d1c0b400b08c30d37517937a2b3459ef",
+        "size_bytes": 24762,
+        "line_count": 308
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/from-03/additions.json.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/before-03/source-context.json",
+        "sha256": "18146002df2b8489f09adc4634b8f75be7bdde8aef89bd0fa027eeeefc8ebb9c",
+        "size_bytes": 26573,
+        "line_count": 663
+      },
+      "after": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/source-context.json",
+        "sha256": "18146002df2b8489f09adc4634b8f75be7bdde8aef89bd0fa027eeeefc8ebb9c",
+        "size_bytes": 26573,
+        "line_count": 663
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/from-03/source-context.json.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/before-03/README.md",
+        "sha256": "110e37c8f5e108d172926fe9e127ad8c96450acbaf658ac816459432d6ae3329",
+        "size_bytes": 10334,
+        "line_count": 143
+      },
+      "after": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/README.md",
+        "sha256": "fdcf9b658fc29b41baa90f61d75a605c5a11b711b1f72d2b9f61bb32bbdf6038",
+        "size_bytes": 11734,
+        "line_count": 164
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/from-03/README.md.diff",
+        "sha256": "02517f3e8e5fa40c362d6bc588d9b9f6daa06b39ea313ad1c75aa06d01c15b94",
+        "size_bytes": 1864,
+        "line_count": 27
+      }
+    }
+  ],
+  "before_03_archives": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/before-03/surface_consumer_observer.hh",
+      "sha256": "1d9befcc41cba45b74d36d27f75836249d9ce20f44173c84a195b446d8f2e7dd",
+      "size_bytes": 2403,
+      "line_count": 66
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/before-03/surface_consumer_observer.cc",
+      "sha256": "5d4f23c000efe0e1342553f08a8861e7c310cc4278ebc928cb15ae0bd6be69bc",
+      "size_bytes": 20532,
+      "line_count": 357
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/before-03/surface_consumer_main.cpp",
+      "sha256": "348f95e60fefa9c4027388b49a47ab25d2ac9fbd7e35e5c66a21895e73ee56d2",
+      "size_bytes": 2184,
+      "line_count": 53
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/before-03/HeatBalanceSurfaceManager.surface_consumer.cc",
+      "sha256": "e37acaa62973ff87aa15dd113ebf77bbc459091a6ff8fc72c9baada1d93c17ce",
+      "size_bytes": 713540,
+      "line_count": 10279
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/before-03/surface_consumer_reference.cmake",
+      "sha256": "f4f25bd910c81a494b2b5b023f95abd91097376c9d0664826cad02851e685c67",
+      "size_bytes": 4527,
+      "line_count": 72
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/before-03/additions.json",
+      "sha256": "fb155a1ddacd1d3a42f8c1aeef3a55f5d1c0b400b08c30d37517937a2b3459ef",
+      "size_bytes": 24762,
+      "line_count": 308
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/before-03/source-context.json",
+      "sha256": "18146002df2b8489f09adc4634b8f75be7bdde8aef89bd0fa027eeeefc8ebb9c",
+      "size_bytes": 26573,
+      "line_count": 663
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/before-03/README.md",
+      "sha256": "110e37c8f5e108d172926fe9e127ad8c96450acbaf658ac816459432d6ae3329",
+      "size_bytes": 10334,
+      "line_count": 143
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/before-03/manifest.json",
+      "sha256": "4cfaf1868257599cae0667fe98c3e24952637b00417141325daf98537264a03d",
+      "size_bytes": 12929,
+      "line_count": 312
+    }
+  ],
+  "historical_predecessor_authoring_source03": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/prepare_successor.py",
+    "sha256": "7953c98b3ffb37ed12ca07196c9dfc246e0a0236509e8dc7de72ca80932dc42c",
+    "size_bytes": 14103,
+    "line_count": 212
+  },
+  "fresh04_build_repair": {
+    "Root_reported_actual_previous_build_failure": "unused argc/argv in Windows compute_win32_argv branch under unchanged Werror",
+    "only_executable_delta": "two explicit void casts inside existing _WIN32 branch",
+    "main_inverse_restores_exact03": true,
+    "six_other_non_documentary_physical_artifacts_byte_exact03": true,
+    "all51_passive_callbacks_unchanged": true,
+    "Original_HBSM_inverse_byte_exact": true,
+    "recipe_and_all_compiler_warning_flags_unchanged": true,
+    "genuine_Windows_argument_producer_unchanged": true,
+    "non_Windows_main_path_unchanged": true,
+    "actual_failed_receipt_not_guessed": null,
+    "future_actual_scope_freeze_build_receipts": null,
+    "Root_and_other_author_Source_review_required_before_retry": true
+  },
+  "bounded_source_only_compiler_interface_scan": {
+    "complete_small_sources_and_all51_passive_blocks_checked": true,
+    "unchanged_Original_Pgm_and_CLI_conditional_interfaces_checked": true,
+    "five_TU_sources": [
+      "surface_consumer_main.cpp",
+      "HeatBalanceSurfaceManager.surface_consumer.cc",
+      "surface_consumer_observer.cc",
+      ".reference/energyplus-src/26.1.0/src/EnergyPlus/api/EnergyPlusPgm.cc",
+      ".reference/energyplus-src/26.1.0/src/EnergyPlus/CommandLineInterface.cc"
+    ],
+    "additional_concrete_defects_identified": [],
+    "compiler_success_claimed": false,
+    "source_authorities": [
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/api/EnergyPlusPgm.hh",
+        "sha256": "d4989742b08b97bab933841e33b2361ed514c191495d44a67bcaee940e30443c",
+        "size_bytes": 4342,
+        "line_count": 79
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/api/EnergyPlusAPI.h",
+        "sha256": "d684dfeedc30f7118140a1322cbe437778ab5575dd8d9cd4dce27a038c37221c",
+        "size_bytes": 4230,
+        "line_count": 71
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/cmake/CompilerFlags.cmake",
+        "sha256": "0d9a7c774225c7b6c70ab670e75081e56006ee7fea953686a3463086a41bffde",
+        "size_bytes": 18430,
+        "line_count": 306
+      }
+    ]
+  },
+  "authorship_limits": [
+    "Raw authored accepted consumer03 passive collector and whole-engine caller",
+    "Header authored only the fresh04 two-statement compile repair and metadata/correspondence",
+    "Source-only review does not establish compiler or scientific success"
+  ]
+}

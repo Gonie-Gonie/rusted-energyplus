@@ -1,0 +1,27 @@
+--- .runtime/porting/CTF-10/surface-consumer-native-prep-04/before-03/README.md
++++ .runtime/porting/CTF-10/surface-consumer-native-prep-04/README.md
+@@ -141,3 +141,24 @@
+ No history math/lifecycle/integration PASS or actual build result is claimed.
+ Prep01/02 remain immutable. prepare_successor.py only authors this ignored source
+ and metadata package using the Python standard library; it runs no proposed code.
++
++## Fresh04 Windows build-only repair
++
++Root reported the actual first consumer build stopped on unused `argc` and `argv`
++in the Windows main branch under the unchanged `-Wextra`/`-Werror` options. This
++fresh immutable successor adds only `(void)argc;` and `(void)argv;` immediately
++inside `#ifdef _WIN32`. The real CLI11 `compute_win32_argv()` remains the argument
++producer; the non-Windows branch and every supplied Native option are unchanged.
++No warning option, callback, collector, HBSM arithmetic, source context, recipe,
++checkpoint, output schema or input selection changes. Seven other physical
++artifacts are copied from03; six non-documentary artifacts are byte-exact.
++Removing the two statements restores the exact main03 bytes. Source03 and its
++freeze/build-failure history remain immutable and historical. Root must bind the
++reviewed04 hold into a fresh scope/freeze/build source successor before retrying.
++No target or new compiler run was performed here; future actual receipts are null.
++
++The bounded source-only compiler-interface scan checked the complete small main,
++collector/header, all51 passive addition blocks, unchanged five-TU recipe, the
++Original EnergyPlusPgm signature/Windows/static-API path, CommandLineInterface
++conditionals and inherited warning options. No additional concrete defect was
++identified. This source scan is not a compilation success or whole-source proof.

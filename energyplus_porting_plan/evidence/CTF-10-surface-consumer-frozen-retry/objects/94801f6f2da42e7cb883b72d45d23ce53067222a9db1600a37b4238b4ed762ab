@@ -1,0 +1,17 @@
+-- Using CCACHE
+-- C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/ccache.exe found and enabled
+-- Adding -fdiagnostics-color=always
+-- JsonCpp Version: 1.9.3
+-- Using CCACHE
+-- C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/ccache.exe found and enabled
+-- Module support is disabled.
+-- Version: 8.0.1
+-- Build type: RelWithDebInfo
+-- CXX_STANDARD: 20
+-- Required features: cxx_variadic_templates
+-- Using Win32 for window creation
+-- Configuring done (3.0s)
+-- Generating done (1.1s)
+-- Build files have been written to: C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/ep261-gcc13-o0
+{"receipt": {"path": ".runtime/porting/CTF-10/surface-consumer-restore-configure-command-02/receipt.json", "sha256": "56abd8c9bb6acadd51800574468c3a3138f4b93c0a6124ebbb2048ad296269db"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+Root exact717 configure restored; actual50 protected/631 present core/24 absences unchanged {'path': '.runtime/porting/CTF-10/surface-consumer-restore-preservation-02/preservation.json', 'sha256': '0ab2036b7c01829bd10acfd3e4e738e400003d5b770cc7116d6990618201adbd', 'size_bytes': 331040}

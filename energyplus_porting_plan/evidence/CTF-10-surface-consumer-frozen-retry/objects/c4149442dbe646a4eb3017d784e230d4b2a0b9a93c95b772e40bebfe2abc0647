@@ -1,0 +1,21 @@
+"""Root literal freeze of reviewed scope identities; no engine or science evaluation."""
+import hashlib,json
+from datetime import datetime,timezone
+from pathlib import Path
+ROOT=Path.cwd(); BASE=ROOT/'.runtime/porting/CTF-10'; OUT=BASE/'surface-consumer-frozen-inputs-02'
+def read(p): return json.loads(p.read_bytes())
+def sha(p):
+ with p.open('rb') as s: return hashlib.file_digest(s,'sha256').hexdigest()
+def ref(p): return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+scope_path=BASE/'surface-consumer-scope-amendment-02/amendment.json'; scope=read(scope_path)
+execution_path=BASE/'surface-consumer-scope-check-command-02/receipt.json'; execution=read(execution_path)
+assert execution['exit_code']==0 and execution['launch_error'] is None and execution['source_bytes_match_before_and_after']
+assert execution['command']==['python','-X','utf8','-B','tools/porting/check_plan.py','--check','--card','CTF-10']
+assert scope['schema']=='ctf10-surface-consumer-scope-amendment.v1' and scope['observation_max_bytes']==4294967296
+guards=scope['source_authorities']['current_after_documents']+[scope['native_source_manifest'],scope['fixed_scope'],scope['selected_idd']]+[r['actual'] for r in scope['all45_fixed_input_guards']]
+for r in guards: assert ref(ROOT/r['path'])==r,r['path']
+assert not OUT.exists(); OUT.mkdir()
+freeze=dict(scope); freeze['schema']='ctf10-surface-consumer-input-freeze.v1'; freeze['created_utc']=datetime.now(timezone.utc).isoformat(); freeze['scope_amendment']=ref(scope_path); freeze['scope_execution']=ref(execution_path); freeze['frozen_before_this_surface_consumer_execution']=True
+freeze['executed_literal_writer']=ref(Path(__file__).resolve())
+(OUT/'freeze-receipt.json').write_bytes((json.dumps(freeze,ensure_ascii=False,indent=2,allow_nan=False)+'\n').encode('utf8'))
+print(json.dumps(freeze,ensure_ascii=False,indent=2,allow_nan=False))

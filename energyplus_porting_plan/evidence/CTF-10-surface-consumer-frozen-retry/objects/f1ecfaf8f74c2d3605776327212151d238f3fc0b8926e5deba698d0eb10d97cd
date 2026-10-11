@@ -1,0 +1,11 @@
+--- .runtime/porting/CTF-10/surface-consumer-native-prep-04/before-03/surface_consumer_main.cpp
++++ .runtime/porting/CTF-10/surface-consumer-native-prep-04/surface_consumer_main.cpp
+@@ -13,6 +13,8 @@
+ int main(int argc, char **argv)
+ {
+ #ifdef _WIN32
++    (void)argc;
++    (void)argv;
+     auto const args = CLI::detail::compute_win32_argv();
+ #else
+     std::vector<std::string> const args(argv, std::next(argv, static_cast<std::ptrdiff_t>(argc)));
