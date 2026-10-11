@@ -1,0 +1,243 @@
+"""Exact Source-backed dispatcher owner projection; no convection equations."""
+
+C = None
+FLAGS = ['GetUserSuppliedConvectionCoeffs', 'NodeCheck', 'ActiveSurfaceCheck', 'MyEnvirnFlag', 'FirstRoofSurf']
+READY = ['BeginEnvrnFlag', 'SysSizingCalc', 'ZoneSizingCalc', 'ZoneEquipInputsFilled', 'ZoneEquipSimulatedOnce']
+GLOBALS = ['CubeRootOfOverallBuildingVolume', 'RoofLongAxisOutwardAzimuth']
+INT_GEOMETRY = ['zoneWallHeight', 'zonePerimLength', 'zoneHorizHydrDiam', 'windowWallRatio']
+EXT_GEOMETRY = ['faceArea', 'facePerimeter', 'faceHeight']
+ZONE_REAL = ['CeilingHeight', 'Volume', 'FloorArea', 'MinimumX', 'MaximumX', 'MinimumY', 'MaximumY', 'ExtGrossWallArea', 'ExtWindowArea']
+SURFACE_REAL = ['CosTilt', 'Tilt', 'Azimuth', 'Area', 'GrossArea', 'Width', 'Perimeter']
+COUNTERS = ['TotalWarningErrors', 'TotalSevereErrors', 'TotalWarningErrorsDuringWarmup', 'TotalSevereErrorsDuringWarmup', 'TotalWarningErrorsDuringSizing', 'TotalSevereErrorsDuringSizing']
+BACKEND = COUNTERS + ['LastSevereError', 'AbortProcessing', 'MatchCounts', 'outputErrorHeader', 'DoingInputProcessing', 'printConsoleOutput', 'errorCallback_present', 'messageCallback_present', 'fMessagePtr_present', 'sqlite_present']
+SCAN_BOOL = ['GetReportInput', 'SurfVert', 'SurfDet', 'SurfDetWVert', 'DXFReport', 'DXFWFReport', 'VRMLReport', 'CostInfo', 'ViewFactorInfo', 'Constructions', 'Materials', 'LineRpt', 'VarDict', 'EMSoutput', 'ShowDecayCurvesInEIO', 'OutputEMSActuatorAvailSmall', 'OutputEMSActuatorAvailFull', 'OutputEMSInternalVarsSmall', 'OutputEMSInternalVarsFull', 'OutputEMSErrors', 'OutputFullEMSTrace']
+SCAN_TEXT = ['DXFOption1', 'DXFOption2', 'DXFWFOption1', 'DXFWFOption2', 'VRMLOption1', 'VRMLOption2', 'ViewRptOption1', 'LineRptOption1', 'VarDictOption1', 'VarDictOption2']
+CLASSES = {1: 'Wall', 2: 'Floor', 3: 'Roof'}  # Actual DataSurfaces::SurfaceClass declarations.
+FINITE = ('finite', 'positive_zero', 'negative_zero')
+
+
+def keys(value, expected):
+    C.need(isinstance(value, dict) and set(value) == set(expected), 'complete exact object keys required: ' + str(expected))
+
+
+def validate(value):
+    if isinstance(value, dict):
+        if 'value_bits' in value:
+            C.scalar(value)
+        else:
+            for child in value.values(): validate(child)
+    elif isinstance(value, list):
+        for child in value: validate(child)
+
+
+def normalized(value):
+    if isinstance(value, dict):
+        if 'value_bits' in value:
+            bits, kind = C.scalar(value)
+            return {'bits': bits, 'class': kind}
+        return {k: normalized(v) for k, v in value.items() if k != 'representation'}
+    if isinstance(value, list): return [normalized(v) for v in value]
+    return value
+
+
+def array(value, vector=False, count=None):
+    expected = ['allocated', 'size', 'indexing', 'rows'] if vector else ['allocated', 'size', 'lower', 'upper', 'values_available', 'rows']
+    keys({k: v for k, v in value.items() if k != 'representation'}, expected)
+    C.need(type(value['allocated']) is bool and type(value['size']) is int and value['size'] >= 0 and isinstance(value['rows'], list) and len(value['rows']) == value['size'], 'complete allocated owner rows required')
+    if vector:
+        C.need(value['indexing'] == 'EPVector one-based', 'actual EPVector indexing required')
+        lower = 1
+    else:
+        C.need(value['values_available'] is True, 'actual values unavailable')
+        if value['allocated']:
+            C.need(type(value['lower']) is int and type(value['upper']) is int and value['lower'] == 1 and value['upper'] == value['size'], 'complete actual one-based Objexx bounds required')
+        else:
+            C.need(value['size'] == 0 and value['lower'] is None and value['upper'] is None, 'unallocated actual bounds differ')
+        lower = value['lower'] if value['allocated'] else 1
+    if count is not None: C.need(value['size'] == count, 'complete owner cardinality differs')
+    for i, row in enumerate(value['rows'], lower):
+        keys(row, ['actual_array_index', 'value'])
+        C.need(type(row['actual_array_index']) is int and row['actual_array_index'] == i, 'full owner index/order differs')
+        validate(row['value'])
+    return [row['value'] for row in value['rows']]
+
+
+def empty_family(value, vector):
+    extra = ['nonempty_rows_available', 'indexing'] if vector else ['lower', 'upper', 'values_available']
+    keys({k: v for k, v in value.items() if k != 'representation'}, ['allocated', 'size', 'rows'] + extra)
+    C.need(type(value['allocated']) is bool and type(value['size']) is int and value['size'] == 0 and value['rows'] == [], 'absent-user full allocation domain required')
+    if vector: C.need(value['indexing'] == 'EPVector one-based' and value['nonempty_rows_available'] is False, 'actual empty EPVector shape required')
+    else: C.need(value['values_available'] is True and (value['lower'], value['upper']) == ((1, 0) if value['allocated'] else (None, None)), 'actual empty Objexx bounds required')
+    return normalized(value)
+
+
+def transport(snapshot, native):
+    validate(snapshot)
+    C.need(type(snapshot['actual_callback_count']) is int and snapshot['actual_callback_count'] == len(snapshot['callbacks']), 'uncapped callback ledger required')
+    if native: C.need(snapshot['callback_integrity_failed'] is False, 'Native callback integrity failure')
+    result = {}
+    for field in ['error_stream', 'console', 'eio']:
+        value = snapshot[field]
+        if native:
+            C.need(type(value) is str, 'complete Native stream required')
+            result[field] = value.encode('utf8')
+        else:
+            keys(value, ['size_bytes', 'hex', 'utf8'])
+            C.need(type(value['hex']) is str and len(value['hex']) == value['size_bytes'] * 2, 'complete Rust byte DTO required')
+            raw = bytes.fromhex(value['hex'])
+            C.need(raw.hex() == value['hex'] and type(value['size_bytes']) is int and len(raw) == value['size_bytes'], 'Rust byte DTO size/canonical hex differs')
+            try: text = raw.decode('utf8')
+            except UnicodeDecodeError: text = None
+            C.need(value['utf8'] == text, 'Rust byte DTO UTF8 witness differs')
+            result[field] = raw
+    for i, row in enumerate(snapshot['callbacks'], 1):
+        keys(row, ['actual_ordinal', 'kind', 'level', 'message'])
+        C.need(type(row['actual_ordinal']) is int and row['actual_ordinal'] == i and row['kind'] in ['errorCallback', 'messageCallback'] and type(row['message']) is str and (type(row['level']) is int if row['kind'] == 'errorCallback' else row['level'] is None), 'actual callback argument/order differs')
+    return result
+
+
+def prefix(before, after, native):
+    left, right = transport(before, native), transport(after, native)
+    for field in left: C.need(right[field].startswith(left[field]), 'actual stream prefix was lost')
+    C.need(after['callbacks'][:len(before['callbacks'])] == before['callbacks'], 'actual callback prefix was lost')
+    return {**{k: right[k][len(left[k]):].hex() for k in left}, 'callbacks': [{k: v for k, v in row.items() if k != 'actual_ordinal'} for row in after['callbacks'][len(before['callbacks']):]]}
+
+
+def project(snapshot, spec, native, policy):
+    transport(snapshot, native)
+    d = snapshot['owner']; initial = spec['initial']; ns, nt = len(initial['spaces']), len(initial['surfaces'])
+    common = ['NumOfZones', 'numSpaces', 'TotSurfaces'] + READY + FLAGS + GLOBALS + ['spaceHeatBalance', 'SurfTempIn', 'SurfTempInTmp', 'SurfHConvInt', 'SurfTAirRef', 'SurfTAirRefRpt', 'surfIntConv', 'surfExtConv', 'LowHConvLimit', 'TotUserIntConvModels', 'TotUserExtConvModels', 'hcIntUserCurve', 'hcExtUserCurve', 'userIntConvModels', 'userExtConvModels', 'ZoneEquipConfig_selected_members', 'Scan_cache', 'backend']
+    native_only = ['UseRepresentativeSurfaceCalculations', 'Zone', 'space', 'zoneHeatBalance', 'Surface', 'Construct_TypeIsWindow', 'SurfAdjacentZone', 'SurfEMSOverrideIntConvCoef', 'SurfEMSValueForIntConvCoef', 'HighHConvLimit_unread', 'NumOfNodes', 'Node_selected_members']
+    rust_only = ['ordered_layout', 'typed_zones', 'typed_surfaces', 'zoneHeatBalance_MAT_input_owner', 'Node_allocated_input_owner']
+    keys(d, common + (native_only if native else rust_only))
+    C.need(type(d['NumOfZones']) is int and type(d['numSpaces']) is int and type(d['TotSurfaces']) is int and d['NumOfZones'] == 1 and d['numSpaces'] == ns and d['TotSurfaces'] == nt, 'full selected counts differ')
+    for name in READY + FLAGS: C.need(type(d[name]) is bool, 'actual boolean flag required')
+    for name in ['TotUserIntConvModels', 'TotUserExtConvModels']: C.need(type(d[name]) is int, 'actual user count required')
+    result = {name: d[name] for name in ['NumOfZones', 'numSpaces', 'TotSurfaces'] + READY + FLAGS + ['TotUserIntConvModels', 'TotUserExtConvModels']}
+    for name in GLOBALS + ['LowHConvLimit']: result[name] = normalized(d[name])
+    for name in ['SurfTempIn', 'SurfTempInTmp', 'SurfHConvInt', 'SurfTAirRef', 'SurfTAirRefRpt']:
+        values = array(d[name], count=nt)
+        if name in ['SurfTAirRef', 'SurfTAirRefRpt']: C.need(all(type(v) is int for v in values), 'actual reference-air integer required')
+        else:
+            for v in values: C.scalar(v)
+        result[name] = normalized(d[name])
+    air = array(d['spaceHeatBalance'], True, ns)
+    for row in air:
+        keys(row, ['MAT', 'ZT', 'ZTAV'])
+        for v in row.values(): C.scalar(v)
+    result['spaceHeatBalance'] = normalized(d['spaceHeatBalance'])
+    for name, declared in [('surfIntConv', policy['required_selected_owner_groups']['surface_interior_full14']), ('surfExtConv', policy['required_selected_owner_groups']['surface_exterior_full13'])]:
+        values = array(d[name], True, nt)
+        for row in values:
+            keys(row, declared)
+            for key, v in row.items():
+                if key in INT_GEOMETRY + EXT_GEOMETRY: C.scalar(v)
+                else: C.need(type(v) is bool if key in ['getsRadiantHeat', 'hasActiveInIt'] else type(v) is int, 'actual full convection field type differs')
+        result[name] = normalized(d[name])
+    equipment = array(d['ZoneEquipConfig_selected_members'], count=1)
+    for row in equipment:
+        keys(row, policy['required_selected_owner_groups']['equipment']); C.need(all(type(v) is bool for v in row.values()), 'actual equipment flag required')
+    result['ZoneEquipConfig_selected_members'] = normalized(d['ZoneEquipConfig_selected_members'])
+    for name in ['hcIntUserCurve', 'hcExtUserCurve', 'userIntConvModels', 'userExtConvModels']: result[name] = empty_family(d[name], name.startswith('user'))
+    keys(d['Scan_cache'], SCAN_BOOL + SCAN_TEXT)
+    C.need(all(type(d['Scan_cache'][k]) is bool for k in SCAN_BOOL) and all(type(d['Scan_cache'][k]) is str for k in SCAN_TEXT), 'complete actual Scan31 types required')
+    result['Scan_cache'] = d['Scan_cache']
+    backend = d['backend']; result['backend'] = {k: backend[k] for k in BACKEND}
+    C.need(all(type(backend[k]) is int for k in COUNTERS) and type(backend['LastSevereError']) is str and all(type(backend[k]) is bool for k in BACKEND if k not in COUNTERS + ['LastSevereError', 'MatchCounts']), 'actual backend types differ')
+    matches = array(backend['MatchCounts'], count=20) if native else backend['MatchCounts']
+    C.need(isinstance(matches, list) and len(matches) == 20 and all(type(v) is int for v in matches), 'complete actual ordered20 MatchCounts required')
+    result['backend']['MatchCounts'] = matches
+    if native:
+        zones, spaces = d['Zone'], d['space']
+        for value, count in [(zones, 1), (spaces, ns)]:
+            keys(value, ['allocated', 'size', 'rows'])
+            C.need(value['allocated'] is True and type(value['size']) is int and value['size'] == count == len(value['rows']) and [v['actual_array_index'] for v in value['rows']] == list(range(1, count + 1)), 'actual complete zone/space order differs')
+        z = zones['rows'][0]
+        C.need(type(z['IntConvAlgo']) is int and type(d['UseRepresentativeSurfaceCalculations']) is bool, 'actual algorithm/predicate types differ')
+        typed_zones = [dict(zone_id=z['actual_array_index'], tarp=z['IntConvAlgo'] == 4, **{k: z[k] for k in ZONE_REAL + ['Multiplier', 'ListMultiplier']})]
+        surfaces = array(d['Surface'], True, nt); window = array(d['Construct_TypeIsWindow'], count=1)
+        ems = array(d['SurfEMSOverrideIntConvCoef'], count=nt); array(d['SurfEMSValueForIntConvCoef'], count=nt); array(d['SurfAdjacentZone'], count=nt)
+        C.need(all(type(v) is bool for v in window + ems), 'actual window/EMS predicates required')
+        typed_surfaces = []
+        for i, s in enumerate(surfaces, 1):
+            C.need(all(type(s[k]) is int for k in ['Class', 'Construction', 'Sides', 'Zone', 'spaceNum', 'ExtBoundCond', 'RepresentativeCalcSurfNum']) and s['Class'] in CLASSES and s['Construction'] == 1 and s['Sides'] == 4 and type(s['HeatTransSurf']) is bool, 'normal selected actual geometry domain differs')
+            vertices = array(s['Vertex'], count=s['Sides'])
+            for point in vertices: keys(point, ['x', 'y', 'z'])
+            typed_surfaces.append(dict(surface_id=i, **{'class': CLASSES[s['Class']]}, exterior=s['ExtBoundCond'] == 0, heat_transfer=s['HeatTransSurf'], construction_is_window=window[s['Construction']-1], kiva=s['ExtBoundCond'] == -6, representative_calculations=d['UseRepresentativeSurfaceCalculations'], ems_override=ems[i-1], **{k: s[k] for k in SURFACE_REAL}, Vertex=vertices))
+        groups = [{'zone': 1, 'space': sid, 'surfaces': list(range(spaces['rows'][sid-1]['HTSurfaceFirst'], spaces['rows'][sid-1]['HTSurfaceLast'] + 1))} for sid in z['spaceIndexes']]
+        result['ordered_layout'] = {'zones': [z['actual_array_index']], 'spaces': [[sp['actual_array_index'], sp['zoneNum']] for sp in spaces['rows']], 'surface_associations': [[i, s['Zone'], s['spaceNum']] for i, s in enumerate(surfaces, 1)], 'groups': groups}
+        zone_air = array(d['zoneHeatBalance'], True, 1)
+        result['zoneHeatBalance_MAT_input_owner'] = normalized(zone_air[0]['MAT'])
+        nodes = array(d['Node_selected_members']); result['Node_allocated_input_owner'] = d['Node_selected_members']['allocated']
+        C.need(d['NumOfNodes'] == len(nodes), 'actual full node count differs')
+    else:
+        typed_zones, typed_surfaces = d['typed_zones'], d['typed_surfaces']
+        result['ordered_layout'] = d['ordered_layout']; result['zoneHeatBalance_MAT_input_owner'] = normalized(d['zoneHeatBalance_MAT_input_owner'])
+        C.need(type(d['Node_allocated_input_owner']) is bool, 'actual node input flag required')
+        result['Node_allocated_input_owner'] = d['Node_allocated_input_owner']
+    groups = policy['required_selected_owner_groups']['actual_typed_caller_inputs']
+    C.need(len(typed_zones) == 1 and len(typed_surfaces) == nt, 'complete actual typed input arrays required')
+    for z in typed_zones: keys(z, groups['typed_zones'])
+    for s in typed_surfaces: keys(s, groups['typed_surfaces'])
+    result['typed_zones'], result['typed_surfaces'] = normalized(typed_zones), normalized(typed_surfaces)
+    return result
+
+
+def compare_tree(left, right, path, phase, arithmetic=()):
+    if isinstance(left, dict) and set(left) == {'bits', 'class'}:
+        if path in arithmetic and (left['class'] not in FINITE or not isinstance(right, dict) or right.get('class') not in FINITE):
+            C.same(left['class'], right.get('class') if isinstance(right, dict) else None, path + '/diagnostic-class', phase)
+            C.UNAVAILABLE.append({'path': path, 'reason': 'generated-nonfinite-arithmetic', 'required_for_selected_pair': True, 'counted_as_PASS': False, 'Native': left, 'Rust': right})
+        else: C.same(left, right, path, phase)
+    elif isinstance(left, dict) and isinstance(right, dict):
+        C.same(sorted(left), sorted(right), path + '/keys', phase)
+        for key in sorted(set(left) & set(right)): compare_tree(left[key], right[key], path + '/' + key, phase, arithmetic)
+    elif isinstance(left, list) and isinstance(right, list):
+        C.same(len(left), len(right), path + '/length', phase)
+        for i in range(min(len(left), len(right))): compare_tree(left[i], right[i], path + '/' + str(i), phase, arithmetic)
+    else: C.same(left, right, path, phase)
+
+
+def literal_joins(snapshot, projection, spec, op, native, path):
+    d, initial = snapshot['owner'], spec['initial']
+    expected_layout = {'zones': [1], 'spaces': [[i, 1] for i in range(1, len(initial['spaces'])+1)], 'surface_associations': [[i, 1, s['spaceNum']] for i, s in enumerate(initial['surfaces'], 1)], 'groups': [{'zone': 1, 'space': sid, 'surfaces': list(range(initial['spaces'][sid-1]['HTSurfaceFirst'], initial['spaces'][sid-1]['HTSurfaceLast']+1))} for sid in initial['zone']['spaceIndexes']]}
+    compare_tree(expected_layout, projection['ordered_layout'], path + '/layout', 'input_join_comparisons')
+    expected_zone = {'zone_id': 1, 'tarp': True, **{k: normalized_literal(initial['zone'][k]) for k in ZONE_REAL}, **{k: initial['zone'][k] for k in ['Multiplier', 'ListMultiplier']}}
+    compare_tree([expected_zone], projection['typed_zones'], path + '/typed-zones', 'input_join_comparisons')
+    for i, (literal, actual) in enumerate(zip(initial['surfaces'], projection['typed_surfaces']), 1):
+        expected = {'surface_id': i, 'class': literal['Class'], 'exterior': True, 'heat_transfer': True, 'construction_is_window': False, 'kiva': False, 'representative_calculations': False, 'ems_override': False, **{k: normalized_literal(literal[k]) for k in SURFACE_REAL}, 'Vertex': [{k: normalized_literal(v) for k, v in point.items()} for point in literal['Vertex']]}
+        compare_tree(expected, actual, f'{path}/typed-surface/{i}', 'input_join_comparisons')
+        if native:
+            row = d['Surface']['rows'][i-1]['value']
+            C.same(literal['Name'], row['Name'], f'{path}/Native-name/{i}', 'input_join_comparisons'); C.same(normalized_literal(literal['Height']), normalized(row['Height']), f'{path}/Native-height/{i}', 'input_join_comparisons')
+        C.same({'SetByZone': 2, 'ASHRAETARP': 4}[literal['model']], projection['surfIntConv']['rows'][i-1]['value']['model'], f'{path}/literal-convection-model/{i}', 'input_join_comparisons')
+    values = op if op is not None else {'zone_MAT': initial['zone']['MAT'], 'space_MAT': [s['MAT'] for s in initial['spaces']], 'SurfTempIn': [s['SurfTempIn'] for s in initial['surfaces']], 'SurfTempInTmp': [s['SurfTempInTmp'] for s in initial['surfaces']]}
+    C.same(normalized_literal(values['zone_MAT']), projection['zoneHeatBalance_MAT_input_owner'], path + '/literal-zone-MAT', 'input_join_comparisons')
+    for name, actual in [('space_MAT', projection['spaceHeatBalance']), ('SurfTempIn', projection['SurfTempIn']), ('SurfTempInTmp', projection['SurfTempInTmp'])]:
+        for i, v in enumerate(values[name]): C.same(normalized_literal(v), actual['rows'][i]['value']['MAT'] if name == 'space_MAT' else actual['rows'][i]['value'], f'{path}/literal-{name}/{i}', 'input_join_comparisons')
+    C.same(initial['node_allocated'], projection['Node_allocated_input_owner'], path + '/literal-node-allocated', 'input_join_comparisons')
+    if op is None:
+        elements = initial['zone_equipment_active_elements']
+        C.same({'InWallActiveElement': elements['wall'], 'InCeilingActiveElement': elements['ceiling'], 'InFloorActiveElement': elements['floor']}, projection['ZoneEquipConfig_selected_members']['rows'][0]['value'], path + '/literal-equipment-active-elements', 'input_join_comparisons')
+        for name in ['SurfHConvInt', 'SurfTAirRef', 'SurfTAirRefRpt']:
+            for i, row in enumerate(initial['surfaces']): C.same(normalized_literal(row[name]) if name == 'SurfHConvInt' else row[name], projection[name]['rows'][i]['value'], f'{path}/initial-{name}/{i}', 'input_join_comparisons')
+    else:
+        for name in READY: C.same(op[name], projection[name], path + '/literal-' + name, 'input_join_comparisons')
+
+
+def normalized_literal(value):
+    bits, kind = C.literal(value)
+    C.need(kind in FINITE, 'finite input-only domain required')
+    return {'bits': bits, 'class': kind}
+
+
+def generated_paths(path, before, returned):
+    result = set()
+    if not returned: return result
+    for i in range(before['TotSurfaces']): result.add(f'{path}/SurfHConvInt/rows/{i}/value')
+    if before['GetUserSuppliedConvectionCoeffs']:
+        for name in GLOBALS: result.add(path + '/' + name)
+        for i in range(before['TotSurfaces']):
+            for owner, fields in [('surfIntConv', INT_GEOMETRY), ('surfExtConv', EXT_GEOMETRY)]:
+                for field in fields: result.add(f'{path}/{owner}/rows/{i}/value/{field}')
+    return result

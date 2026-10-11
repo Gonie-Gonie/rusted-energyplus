@@ -1,0 +1,61 @@
+"""Source-only two-test-compilation fixes atop immutable dispatcher02."""
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+BASE = ROOT / '.runtime/porting/SRC-06'
+OLD, NEW = BASE / 'tarp-dispatcher-rust-prep-02', BASE / 'tarp-dispatcher-rust-prep-03'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+
+def write(path, raw):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists():
+        assert path.read_bytes() == raw
+        return ref(path)
+    with path.open('xb') as stream: stream.write(raw)
+    return ref(path)
+
+
+manifest = json.loads((OLD / 'manifest.json').read_bytes())
+changes = {
+    'crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs': (b'use ep_model::{SurfaceId, TypedModel};', b'#[cfg(test)]\nuse ep_model::SurfaceType;\nuse ep_model::{SurfaceId, TypedModel};'),
+    'crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/tests.rs': (b'let mut scan = ReportScanState::default();\n    scan.get_report_input = false; scan.surface_details = true;', b'let mut scan = ReportScanState { get_report_input: false, surface_details: true, ..ReportScanState::default() };'),
+}
+incremental, replaced, sources = [], set(), []
+for original in manifest['application_sources']:
+    if original['canonical_path'] not in changes: continue
+    name = original['canonical_path']; before = (ROOT / original['proposal']['path']).read_bytes()
+    left, right = changes[name]; assert before.count(left) == 1, name
+    after = before.replace(left, right, 1); assert after.replace(right, left, 1) == before
+    oldref = write(NEW / 'before-02' / name, before)
+    newref = write(NEW / 'proposed' / name, after)
+    short = name.replace('/', '__') + '.diff'
+    delta = write(NEW / 'incremental-diffs' / short, ''.join(difflib.unified_diff(before.decode().splitlines(True), after.decode().splitlines(True), fromfile=oldref['path'], tofile=newref['path'])).encode())
+    baseline = b'' if original['new_destination_absent'] else (ROOT / original['before_archive']['path']).read_bytes()
+    full_delta = write(NEW / 'diffs' / short, ''.join(difflib.unified_diff(baseline.decode().splitlines(True), after.decode().splitlines(True), fromfile='/dev/null' if original['new_destination_absent'] else original['before_archive']['path'], tofile=name)).encode())
+    replaced |= {original['proposal']['path'], original['exact_diff']['path']}
+    original.update(proposal=newref, exact_diff=full_delta)
+    incremental.append(dict(before=oldref, proposal=newref, exact_diff=delta)); sources += [oldref, newref, delta, full_delta]
+assert len(incremental) == 2
+old_readme = OLD / 'README.md'
+readme = write(NEW / 'README.md', old_readme.read_bytes() + b'\nSuccessor03 preserves02 and both actual failed quality runs. Only a cfg(test) SurfaceType import and equivalent existing test Scan struct initialization change. The latter retains let mut and all31 default owner values, with the same two explicitly assigned values. No runtime numerical/body/input/policy change occurs. Root will first independently restore only its eight application paths to the exact authenticated00bf parent, preserving all earlier snapshots, apps, formatter records and failed qualities, then use fresh application/quality directories. This hold itself does not restore, delete or apply any canonical file.\n')
+replaced.add(old_readme.relative_to(ROOT).as_posix())
+manifest['own_sources'] = [r for r in manifest['own_sources'] if r['path'] not in replaced] + sources + [readme, ref(Path(__file__))]
+manifest.update(previous_preparation=ref(OLD / 'manifest.json'), incremental_Source_differences=incremental, README=readme, authoring_Source=ref(Path(__file__)), application_before_Source_snapshot=dict(path='.runtime/porting/source-objects/00/00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a', sha256='00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a'), historical_current_Source_descriptor_preserved=True, canonical_restoration_or_mutation_performed=False)
+failure_paths = [BASE / 'tarp-dispatcher-validation-01/failed-build.json', BASE / 'tarp-dispatcher-validation-02/failed-build.json']
+assert all(p.is_file() for p in failure_paths)
+manifest['retained_actual_failed_qualities'] = [ref(p) for p in failure_paths]
+manifest['actual_restoration_provenance'] = ref(BASE / 'dispatcher-owned-restore-01/record.json')
+manifest['application_before_Source_members'] = 3931
+for row in manifest['application_sources']:
+    if not row['new_destination_absent']:
+        assert (ROOT / row['canonical_path']).read_bytes() == (ROOT / row['before_archive']['path']).read_bytes()
+raw = (json.dumps(manifest, ensure_ascii=False, allow_nan=False, indent=2) + '\n').encode()
+print(json.dumps(write(NEW / 'manifest.json', raw)))

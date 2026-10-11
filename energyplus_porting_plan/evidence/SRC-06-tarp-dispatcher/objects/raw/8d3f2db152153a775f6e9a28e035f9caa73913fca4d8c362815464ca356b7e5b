@@ -1,0 +1,104 @@
+{
+  "Source_preparation": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-validation-prep-01/manifest.json",
+    "sha256": "084c0529d0476eff2d33a7920a4db07cc6b0dee0785eefc1be7cf615db70c6ab",
+    "size_bytes": 14307
+  },
+  "actual_application": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-01/record.json",
+    "sha256": "02f1929153ce7f02b8b8b2fc0aca0a4590187f3bb0d9a4481f39ec2477a22d0f",
+    "size_bytes": 27340
+  },
+  "actual_formatter_review": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-01/Root-formatter-acceptance.json",
+    "sha256": "e8e048e22027fbae3158e9fc4d23a39de99e48a2a597e7626d7a0885463a8f7a",
+    "size_bytes": 1599
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/06/062d37e84728f90782e4306db62f52fbc43b3c06d22b2d0a3f1c04c893b75ab1",
+    "sha256": "062d37e84728f90782e4306db62f52fbc43b3c06d22b2d0a3f1c04c893b75ab1"
+  },
+  "Native_baseline_acceptance": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-Native-observation-01/Root-baseline-acceptance.json",
+    "sha256": "7b63de51b46753ef1cbeafc55e7600d063eb29782914d4eacd1acb1605bb51e0",
+    "size_bytes": 1965,
+    "line_count": 40
+  },
+  "scientific_PASS_claimed": false,
+  "ordinary_cadence_activated": false,
+  "gates_updated": false,
+  "quality_commands": {
+    "fmt_check": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "clippy": [
+      "cargo",
+      "clippy",
+      "--config",
+      "profile.dev.debug=0",
+      "--config",
+      "profile.test.debug=0",
+      "--config",
+      "build.incremental=false",
+      "--locked",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "focused": [
+      "cargo",
+      "test",
+      "--config",
+      "profile.dev.debug=0",
+      "--config",
+      "profile.test.debug=0",
+      "--config",
+      "build.incremental=false",
+      "--locked",
+      "-p",
+      "ep_runtime",
+      "--lib",
+      "heat_balance::"
+    ],
+    "workspace": [
+      "cargo",
+      "test",
+      "--config",
+      "profile.dev.debug=0",
+      "--config",
+      "profile.test.debug=0",
+      "--config",
+      "build.incremental=false",
+      "--locked",
+      "--workspace"
+    ]
+  },
+  "build_command": [
+    "cargo",
+    "build",
+    "--config",
+    "profile.dev.debug=0",
+    "--config",
+    "profile.test.debug=0",
+    "--config",
+    "build.incremental=false",
+    "--locked",
+    "-p",
+    "ep_run",
+    "--example",
+    "src06_tarp_dispatcher_main",
+    "--message-format=json-render-diagnostics"
+  ],
+  "frozen_pair_policy": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-validation-01/frozen-pair-policy.json",
+    "sha256": "ff49c35addf3990ff45e46d6be85e16fb71b9ba87b90f6b58416fd0000b27dc4",
+    "size_bytes": 12036
+  },
+  "target_execution_performed": false
+}

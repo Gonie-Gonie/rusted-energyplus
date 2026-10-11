@@ -1,0 +1,155 @@
+"""Seal the bounded ignored Source successor; no project imports or execution."""
+from pathlib import Path
+import ast
+import copy
+import difflib
+import hashlib
+import json
+
+ROOT = Path(__file__).resolve().parents[4]
+BASE = Path(__file__).resolve().parent
+PRIOR = ROOT / '.runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01'
+assert BASE == ROOT / '.runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02'
+assert not (BASE / 'manifest.json').exists()
+
+def digest(data):
+    return hashlib.sha256(data).hexdigest()
+
+def ref(path):
+    data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': digest(data),
+            'size_bytes': len(data), 'line_count': len(data.splitlines())}
+
+def checked(row):
+    data = (ROOT / row['path']).read_bytes()
+    assert digest(data) == row['sha256'] and len(data) == row['size_bytes']
+    if 'line_count' in row:
+        assert len(data.splitlines()) == row['line_count']
+    return data
+
+def write(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    assert not path.exists()
+    path.write_bytes(data)
+    return ref(path)
+
+def delta(before, after, old, new):
+    return ''.join(difflib.unified_diff(before.decode('utf-8').splitlines(keepends=True),
+        after.decode('utf-8').splitlines(keepends=True), fromfile=old, tofile=new)).encode('utf-8')
+
+assert digest((PRIOR / 'manifest.json').read_bytes()) == 'd15dec91565f526c906be5de803db845fae01450e415f0ebfe60685d852312c4'
+parent = json.loads((PRIOR / 'manifest.json').read_bytes())
+assert parent['schema'] == 'src06-tarp-dispatcher-Rust-source-preparation.v1'
+snapshot = json.loads(checked(parent['current_Source_snapshot']))
+paths = set((ROOT / 'crates').rglob('*.rs')) | set((ROOT / 'crates').rglob('Cargo.toml'))
+paths |= {ROOT / p for p in ['Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml'] if (ROOT / p).is_file()}
+assert {p.relative_to(ROOT).as_posix() for p in paths} == {r['historical_path'] for r in snapshot['files']}
+assert len(snapshot['files']) == 3929
+for row in snapshot['files']:
+    data = (ROOT / row['historical_path']).read_bytes()
+    archived = (ROOT / row['archive']['path']).read_bytes()
+    assert data == archived and len(data) == row['size_bytes'] and digest(data) == row['archive']['sha256']
+
+main = 'crates/ep_runtime/src/heat_balance/inside_convection_dispatcher.rs'
+tests = 'crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/tests.rs'
+old_guard = '''        if surface.exterior && surface.tilt <= 45.0 && surface.vertices.iter().enumerate()
+            .any(|(i, p)| *p == surface.vertices[(i + 1) % surface.vertices.len()]) {
+            // Original's edge normalize asserts on an exact zero edge.
+            return Err(InsideConvectionUnavailable::Geometry);
+        }
+'''
+new_guard = '''        if surface.exterior && surface.tilt <= 45.0 && surface.vertices.iter().enumerate()
+            .any(|(i, p)| {
+                let next = surface.vertices[(i + 1) % surface.vertices.len()];
+                let t = std::array::from_fn::<_, 3, _>(|axis| next[axis] - p[axis]);
+                ((t[0] * t[0]) + (t[1] * t[1]) + (t[2] * t[2])).sqrt() == 0.0
+            }) {
+            // Original normalize asserts computed length != 0, including underflow.
+            // A computed +Inf length remains admitted and follows Source IEEE operations.
+            return Err(InsideConvectionUnavailable::Geometry);
+        }
+'''
+new_test = '''
+#[test]
+fn distinct_roof_edge_with_underflowed_length_stops_before_setup() -> Result<(), Box<dyn std::error::Error>> {
+    let layout = layout()?; let mut state = state(&layout)?; let before = state.clone();
+    let mut surfaces = surfaces(); surfaces[0].tilt = 0.0;
+    surfaces[0].vertices = vec![[0.0, 0.0, 3.0], [1.0e-200, 0.0, 3.0], [1.0, 1.0, 3.0], [0.0, 1.0, 3.0]];
+    assert_ne!(surfaces[0].vertices[0], surfaces[0].vertices[1]);
+    let rows = [(SurfaceId(8), 23.0), (SurfaceId(2), 23.0)]; let mut scan = ReportScanState::default();
+    let mut error = error_state(); let mut stream = Vec::new(); let mut console = Vec::new();
+    let mut backend = SourceErrorBackend { state: &mut error, error_stream: Some(&mut stream), console: &mut console,
+        out_unit1: None, out_unit2: None, f_message: None, message_callback: None, error_callback: None, sqlite: None };
+    let result = initialize_inside_convection(&layout, &zones(), &surfaces, NoUserConvectionInput::new([0; 6])?, &mut state,
+        InsideSurfaceTemperatures { owner: InsideSurfaceTemperatureOwner::SurfTempInTmp, rows: &rows }, readiness(), 0.1,
+        &ReportInputs::default(), &mut scan, &mut backend);
+    assert!(matches!(result, Err(InsideConvectionError::Unavailable(InsideConvectionUnavailable::Geometry))));
+    assert_eq!(state, before); assert!(scan.get_report_input);
+    assert!(stream.is_empty() && console.is_empty());
+    Ok(())
+}
+'''
+
+manifest = copy.deepcopy(parent)
+application = []
+incremental = []
+for row in parent['application_sources']:
+    name = row['canonical_path']
+    old = checked(row['proposal'])
+    if row['new_destination_absent']:
+        assert not (ROOT / name).exists()
+        before = b''
+    else:
+        before = checked(row['actual_before'])
+        assert before == checked(row['before_archive'])
+    assert checked(row['exact_diff']) == delta(before, old, name if before else '/dev/null', name)
+    proposed = old
+    if name == main:
+        assert old.count(old_guard.encode()) == 1
+        proposed = old.replace(old_guard.encode(), new_guard.encode())
+        assert proposed.replace(new_guard.encode(), old_guard.encode()) == old
+    elif name == tests:
+        proposed = old + new_test.encode()
+        assert proposed[:-len(new_test.encode())] == old
+    new_row = copy.deepcopy(row)
+    new_row['proposal'] = write(BASE / 'proposed' / name, proposed)
+    new_row['exact_diff'] = write(BASE / 'diffs' / (name.replace('/', '__') + '.diff'),
+        delta(before, proposed, name if before else '/dev/null', name))
+    application.append(new_row)
+    incremental.append({'canonical_path': name, 'before': row['proposal'], 'after': new_row['proposal'],
+        'exact_diff': write(BASE / 'from-01' / (name.replace('/', '__') + '.diff'),
+            delta(old, proposed, 'prep-01/' + name, 'prep-02/' + name))})
+assert len(application) == 6 and sum(r['new_destination_absent'] for r in application) == 4
+assert sum(bool(checked(r['exact_diff'])) for r in incremental) == 2
+
+readme_before = (PRIOR / 'README.md').read_bytes()
+readme = readme_before + b'''
+Successor02 preserves01. Its sole production Source change replaces exact-equal
+roof-edge admission with Original's ordered computed length != 0 requirement;
+distinct finite endpoints can underflow to a zero length. An eighth unexecuted
+test retains the complete pre-setup state/cache/streams on that typed stop.
+No floor, tolerance, EPS, or geometry equation changes. Computed +Inf edge length
+remains admitted because Original asserts nonzero, not finite. Finite geometry
+INPUT admission does not guarantee finite derived static fields: overflow follows
+the actual IEEE operations and remains diagnostic/unverified, never numerical PASS.
+The immutable Native02 preparation changes only complete zero-array observation
+shape; its eight cases/twenty calls/seven hundred literal input bits are unchanged.
+Future DTOs must distinguish Objexx allocated [1,0] bounds from EPVector indexing.
+'''
+readme_ref = write(BASE / 'README.md', readme)
+readme_diff = write(BASE / 'README.diff', delta(readme_before, readme, 'prep-01/README.md', 'prep-02/README.md'))
+seams_ref = write(BASE / 'ordinary-integration-seams.md', (PRIOR / 'ordinary-integration-seams.md').read_bytes())
+native = ROOT / '.runtime/porting/SRC-06/native-tarp-dispatcher-prep-02/manifest.json'
+assert digest(native.read_bytes()) == '954a7779868d3ac65d88c553aab324f5e5e0a88d5d455a3126aecc5012ca3d50'
+manifest['application_sources'] = application
+manifest['previous_preparation'] = ref(PRIOR / 'manifest.json')
+manifest['incremental_Source_differences'] = incremental
+manifest['previous_README'] = ref(PRIOR / 'README.md')
+manifest['README_exact_difference'] = readme_diff
+manifest['dependency_preparations'] = [ref(native), *parent['dependency_preparations']]
+manifest['own_sources'] = [ref(Path(__file__)), readme_ref, seams_ref]
+manifest['runtime_interfaces']['unexecuted_tests'] = 8
+manifest['runtime_interfaces']['derived_static_nonfinite_values'] = 'Source IEEE outcomes retained diagnostic/unverified; no finite-derived or numerical PASS claim.'
+ast.parse(Path(__file__).read_text())
+write(BASE / 'manifest.json', (json.dumps(manifest, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode())
+print(json.dumps(ref(BASE / 'manifest.json')))

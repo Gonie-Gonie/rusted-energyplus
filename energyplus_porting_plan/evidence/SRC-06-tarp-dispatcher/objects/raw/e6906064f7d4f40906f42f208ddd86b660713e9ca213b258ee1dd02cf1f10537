@@ -1,0 +1,11 @@
+--- .runtime/porting/SRC-06/tarp-dispatcher-import-correction-prep-01/before/ctf_surface_lifecycle.rs
++++ crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs
+@@ -20,6 +20,8 @@
+ use super::state::{HeatBalanceState, SurfaceHeatBalanceState};
+ use super::surface_manager::ctf_caller_stability::CtfCallerSharedFlags;
+ use crate::weather::day::ProductionCtfHistoryClock;
++#[cfg(test)]
++use ep_model::SurfaceType;
+ use ep_model::{SurfaceId, TypedModel};
+ 
+ // Exact compiler-owned source witnesses. They are neither an answer digest nor

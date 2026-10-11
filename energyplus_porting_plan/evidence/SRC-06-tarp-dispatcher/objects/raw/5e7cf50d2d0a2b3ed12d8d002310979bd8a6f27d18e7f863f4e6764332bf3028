@@ -1,0 +1,136 @@
+{
+  "schema": "src06-dispatcher-owned-path-restoration.v1",
+  "actual_parent_application": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-01/record.json",
+    "sha256": "02f1929153ce7f02b8b8b2fc0aca0a4590187f3bb0d9a4481f39ec2477a22d0f",
+    "size_bytes": 27340
+  },
+  "source_before_restore": {
+    "path": ".runtime/porting/source-objects/99/994b014957fb54b1c01608f5fc345f70bbac500be0f7b3b673c252f90bbbc7b7",
+    "sha256": "994b014957fb54b1c01608f5fc345f70bbac500be0f7b3b673c252f90bbbc7b7"
+  },
+  "source_after_restore": {
+    "path": ".runtime/porting/source-objects/00/00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a",
+    "sha256": "00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a"
+  },
+  "files": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+      "actual_before_restore": {
+        "path": ".runtime/porting/SRC-06/dispatcher-owned-restore-01/current-0.rs",
+        "sha256": "231a6f27fdf15cd1dc46c47688d494e57922a9c2308a21cbe14fb823d9f68e3b",
+        "size_bytes": 29848
+      },
+      "restore_to": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-01/before/crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+        "sha256": "750b86766ca793afde19d547dfe597200230305468a2e78240f63f75d2de1de0",
+        "size_bytes": 31217
+      },
+      "removed_new_path": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/geometry.rs",
+      "actual_before_restore": {
+        "path": ".runtime/porting/SRC-06/dispatcher-owned-restore-01/current-1.rs",
+        "sha256": "332dd0a24085f0b642ebfe17280dd42717e38ba22201fbe7f8eb66e277491abb",
+        "size_bytes": 7417
+      },
+      "restore_to": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-01/before/crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/geometry.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "removed_new_path": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/tests.rs",
+      "actual_before_restore": {
+        "path": ".runtime/porting/SRC-06/dispatcher-owned-restore-01/current-2.rs",
+        "sha256": "de656d1e48b3aebd276caf5d34bd0cae135883e78b6c879610c313e57e96962f",
+        "size_bytes": 16842
+      },
+      "restore_to": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-01/before/crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/tests.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "removed_new_path": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/inside_convection_dispatcher.rs",
+      "actual_before_restore": {
+        "path": ".runtime/porting/SRC-06/dispatcher-owned-restore-01/current-3.rs",
+        "sha256": "eab0fb8c85754fa3eac412c1c91f951b5158eea4f9e7e5a0e7a94a3c3ed35b96",
+        "size_bytes": 30096
+      },
+      "restore_to": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-01/before/crates/ep_runtime/src/heat_balance/inside_convection_dispatcher.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "removed_new_path": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/inside_convection_layout.rs",
+      "actual_before_restore": {
+        "path": ".runtime/porting/SRC-06/dispatcher-owned-restore-01/current-4.rs",
+        "sha256": "15eabdd0faea06758e8707bcc69f25e224a2727d5332c4c546867430394168ca",
+        "size_bytes": 5943
+      },
+      "restore_to": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-01/before/crates/ep_runtime/src/heat_balance/inside_convection_layout.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "removed_new_path": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "actual_before_restore": {
+        "path": ".runtime/porting/SRC-06/dispatcher-owned-restore-01/current-5.rs",
+        "sha256": "4cf7f90761914657ced2c71856c727f88be4d400fd6bb80c383fe54a0ce107af",
+        "size_bytes": 2294
+      },
+      "restore_to": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-01/before/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "5c374561b23c7420a93e7c84870574bba455144caff4713580855a681948c9a1",
+        "size_bytes": 2222
+      },
+      "removed_new_path": false
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/src06_tarp_dispatcher_main.rs",
+      "actual_before_restore": {
+        "path": ".runtime/porting/SRC-06/dispatcher-owned-restore-01/current-6.rs",
+        "sha256": "e0e12e94d32bc2de4bd5bfd5132814be5dc5925884a010f3821f16d12ed78e12",
+        "size_bytes": 34679
+      },
+      "restore_to": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-01/before/crates/ep_run/examples/src06_tarp_dispatcher_main.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "removed_new_path": true
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/src06_tarp_dispatcher_support/fields.rs",
+      "actual_before_restore": {
+        "path": ".runtime/porting/SRC-06/dispatcher-owned-restore-01/current-7.rs",
+        "sha256": "2d99bcbc5d740b5d7a8072b8e3f72e9e8807f51f6576a5a556cc74e8d0f5e358",
+        "size_bytes": 18164
+      },
+      "restore_to": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-01/before/crates/ep_run/examples/src06_tarp_dispatcher_support/fields.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "removed_new_path": true
+    }
+  ],
+  "complete_current_Source_verified_before_mutation": true,
+  "exact_eight_owned_paths_only": true,
+  "existing_paths_restored": 2,
+  "individually_removed_new_paths": 6,
+  "previous_applications_quality_failures_and_all_archives_preserved": true,
+  "gates_updated": false
+}

@@ -1,0 +1,58 @@
+"""Seal only comparer04 custody authority and finite closed integrity-failure/restore lineage."""
+import ast
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+BASE = ROOT / '.runtime/porting/SRC-06'
+OLD, OUT = BASE / 'tarp-dispatcher-publication-prep-02', BASE / 'tarp-dispatcher-publication-prep-03'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+
+def write(path, raw):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream: stream.write(raw)
+    return ref(path)
+
+
+def body(name, raw):
+    before = write(OUT / 'before' / name, (OLD / name).read_bytes())
+    after = write(OUT / name, raw)
+    diff = write(OUT / (name + '.diff'), ''.join(difflib.unified_diff((OLD / name).read_text(encoding='utf8').splitlines(True), raw.decode().splitlines(True), fromfile=before['path'], tofile=after['path'])).encode())
+    return after, dict(before=before, proposal=after, exact_diff=diff)
+
+
+prior = ref(OLD / 'manifest.json'); assert prior['sha256'] == 'd8aad351cf1b601a0681a96b21dbc1ff9f3f8211a1f9a1f923fd8ef044255383'
+m = copy.deepcopy(json.loads((OLD / 'manifest.json').read_bytes()))
+raw = (OLD / 'publish.py').read_bytes()
+needle = b"('independent_comparer_Source_review', 'comparison_Source_preparation')"
+replacement = b"('independent_comparer_Source_review', 'reviewed_manifest')"
+assert raw.count(needle) == 1
+raw = raw.replace(needle, replacement, 1); ast.parse(raw)
+publisher, diff = body('publish.py', raw)
+doc_text = (OLD / 'README.md').read_text(encoding='utf8').replace('tarp-dispatcher-publication-prep-02/publish.py', 'tarp-dispatcher-publication-prep-03/publish.py')
+doc_text += '\nSource03 binds accepted comparer04, whose sole historical archive optional-size lookup repair preserves all comparison policy/owner/scientific bodies. The new independent Source review uses its actual reviewed_manifest key. Publisher code otherwise remains exact02, including the exact child-converter proof and all strict producer/closed-log guards. Closed comparer01 integrity failure (no scientific joins), its receipt/full logs and all four complete empty gzip ledgers, plus the authentic three-generated-file restoration record/Source/closed receipt/full logs and six immutable before/after archives, are selected explicitly as finite history. No live obsolete generated descriptor is recursively rebound. No future comparison values or outcomes were read or fabricated.\n'
+doc, doc_diff = body('README.md', doc_text.encode())
+comparer = ref(BASE / 'tarp-dispatcher-comparison-prep-04/manifest.json'); assert comparer['sha256'] == '18276af01dbb2df78a64b3fd28be42618a9713c42042b1a85189821c1834b097'
+root_review = ref(BASE / 'tarp-dispatcher-comparison-prep-04/Root-FULL-Source-review-04.json'); assert root_review['sha256'] == 'b443a129d4cdb26f346902f4b871c35ef35c4358022feefca54b9d03e674e635'
+peer_review = ref(BASE / 'Raw-dispatcher-comparison-Source-review-04/review.json'); assert peer_review['sha256'] == '49723d35db950baad9b1b415b3f815db45b50729b630183228a2c6eb1fae404e'
+failure_ref = ref(BASE / 'tarp-dispatcher-comparison-01/comparison.json'); failure = json.loads((ROOT / failure_ref['path']).read_bytes())
+assert failure['status'] == 'fail-observation-or-custody-integrity' and failure['findings']['endpoint_pairing_performed'] is False and not any(failure['counts'].values())
+failure_receipt = ref(BASE / 'tarp-dispatcher-comparison-command-01/receipt.json'); recorded = json.loads((ROOT / failure_receipt['path']).read_bytes()); assert recorded['exit_code'] == 2 and recorded['source_bytes_match_before_and_after'] is True and recorded['finished_utc'] is not None
+restore_ref = ref(BASE / 'dispatcher-build-metadata-restore-01/record.json'); assert restore_ref['sha256'] == '15156d442e24f5ee4a2d60d4f861758ae2492364f0ae812657faa584cdfcee82'
+restore = json.loads((ROOT / restore_ref['path']).read_bytes())
+restore_receipt = ref(BASE / 'dispatcher-build-metadata-restore-command-01/receipt.json'); restored = json.loads((ROOT / restore_receipt['path']).read_bytes()); assert restored['exit_code'] == 0 and restored['source_bytes_match_before_and_after'] is True and restored['finished_utc'] is not None
+extra = [prior, m['Root_comparer_Source_review'], m['independent_comparer_Source_review'], failure_ref, failure_receipt, recorded['stdout'], recorded['stderr'], *failure['ledgers'].values(), restore_ref, restore['restore_Source'], restore_receipt, restored['stdout'], restored['stderr'], *[r[k] for r in restore['files'] for k in ['actual_before_archive', 'restore_to_archive']]]
+m.update(own_sources=[publisher, doc, ref(Path(__file__))], accepted_predecessor=prior, predecessor_own_sources=m['own_sources'], narrow_source_correspondence=dict(before=diff['before'], proposal=publisher, exact_diff=diff['exact_diff']), narrow_README_correspondence=doc_diff, comparer_Source_preparation=comparer, Root_comparer_Source_review=root_review, independent_comparer_Source_review=peer_review, retained_actual_integrity_failure=failure_ref, retained_generated_BUILD_metadata_restoration=restore_ref)
+m['fixed_evidence'] += extra
+m['runtime_interfaces']['publisher'] = publisher
+for row in extra + [comparer, root_review, peer_review]:
+    actual = ref(ROOT / row['path']); assert actual['sha256'] == row['sha256'] and ('size_bytes' not in row or actual['size_bytes'] == row['size_bytes'])
+print(json.dumps(write(OUT / 'manifest.json', (json.dumps(m, ensure_ascii=False, allow_nan=False, indent=2) + '\n').encode())))

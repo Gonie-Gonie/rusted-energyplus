@@ -1,0 +1,155 @@
+"""Freeze ignored observer Source, unchanged inputs and prospective pairing only."""
+from pathlib import Path
+import ast
+import difflib
+import hashlib
+import json
+import re
+
+ROOT = Path(__file__).resolve().parents[4]
+BASE = Path(__file__).resolve().parent
+assert BASE == ROOT / '.runtime/porting/SRC-06/tarp-dispatcher-observer-prep-02'
+assert not (BASE / 'manifest.json').exists()
+
+def digest(data):
+    return hashlib.sha256(data).hexdigest()
+
+def ref(path):
+    data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': digest(data),
+            'size_bytes': len(data), 'line_count': len(data.splitlines())}
+
+def checked(row):
+    data = (ROOT / row['path']).read_bytes()
+    assert digest(data) == row['sha256']
+    if 'size_bytes' in row:
+        assert len(data) == row['size_bytes']
+    return data
+
+def write(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    assert not path.exists()
+    path.write_bytes(data)
+    return ref(path)
+
+def addition(path, data):
+    return ''.join(difflib.unified_diff([], data.decode().splitlines(keepends=True),
+        fromfile='/dev/null', tofile=path)).encode()
+
+native_ref = ref(ROOT / '.runtime/porting/SRC-06/native-tarp-dispatcher-prep-02/manifest.json')
+dispatcher_ref = ref(ROOT / '.runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/manifest.json')
+main_thread_ref = ref(ROOT / '.runtime/porting/SRC-05/ordinary-main-thread-prep-01/manifest.json')
+assert native_ref['sha256'] == '954a7779868d3ac65d88c553aab324f5e5e0a88d5d455a3126aecc5012ca3d50'
+assert dispatcher_ref['sha256'] == '0888b88cd65dff863461bac16b271d967b90c5af6ef43df6e247a025aa325889'
+assert main_thread_ref['sha256'] == '0d1913b429444685d35e4b6683c03ea2deeaefbef61f5cadfda5eb719b0158ea'
+native = json.loads(checked(native_ref))
+dispatcher = json.loads(checked(dispatcher_ref))
+native_input = json.loads(checked(native['input_only_request']))
+assert len(native_input['cases']) == 8 and sum(len(c['operations']) for c in native_input['cases']) == 20
+assert native['literal_binary64_input_cell_count'] == 700
+assert checked(native['literal_IDF']) == native_input['literal_IDF'].encode()
+
+application = []
+for proposal in sorted((BASE / 'proposed').rglob('*.rs')):
+    name = proposal.relative_to(BASE / 'proposed').as_posix()
+    assert not (ROOT / name).exists()
+    application.append({'canonical_path': name, 'new_destination_absent': True, 'proposal': ref(proposal),
+        'exact_diff': write(BASE / 'diffs' / (name.replace('/', '__') + '.diff'), addition(name, proposal.read_bytes()))})
+assert len(application) == 2
+fields_path = next(ROOT / r['proposal']['path'] for r in application if r['canonical_path'].endswith('/fields.rs'))
+fields = fields_path.read_text()
+lists = {}
+for name, count in [('OBSERVER_PATHS', 3), ('API_PATHS', 15)]:
+    body = re.search(rf'const {name}: \[&str; {count}\] = \[(.*?)\];', fields, re.S).group(1)
+    lists[name] = re.findall(r'"([^"]+)"', body)
+    assert len(lists[name]) == count and len(set(lists[name])) == count
+proposal_map = {r['canonical_path']: r['proposal'] for r in dispatcher['application_sources']}
+observer_map = {r['canonical_path']: r['proposal'] for r in application}
+runtime_source_authorities = []
+for name in lists['OBSERVER_PATHS'] + lists['API_PATHS']:
+    authority = observer_map.get(name) or proposal_map.get(name) or ref(ROOT / name)
+    checked(authority)
+    runtime_source_authorities.append({'canonical_path': name, 'reviewed_Source_authority': authority,
+        'actual_formatted_runtime_SHA_required_later': True})
+
+ledger = ref(ROOT / '.runtime/porting/SCH-01/src06-dispatcher-converted-inputs-01/converted-inputs.json')
+conversion = ref(ROOT / '.runtime/porting/SCH-01/src06-dispatcher-converted-inputs-01/SRC06-DISPATCHER-NO-USER/conversion.json')
+receipt = ref(ROOT / '.runtime/porting/SRC-06/dispatcher-input-conversion-command-01/receipt.json')
+assert ledger['sha256'] == '9e15e3116530097ad5c3dc802c655400ba8789b70cc035aaf6437103961180c7'
+assert conversion['sha256'] == '1a9555e3409580e20dd5fe83d7b2394821c625c7bc64add3f211065dbf6ce9ab'
+assert receipt['sha256'] == '9430e71898f102d6c94b22ab5354ef6bb9b84c3305bfd99950e5ae886f69aba1'
+actual_conversion = json.loads(checked(conversion))
+assert actual_conversion['epjson_available'] and actual_conversion['exit_code'] == 0
+assert checked(actual_conversion['source_input']) == checked(actual_conversion['staged_input']) == checked(native['literal_IDF'])
+epjson_ref = ref(ROOT / actual_conversion['available_epjson_input']['path'])
+assert epjson_ref['sha256'] == '571fc4717ef27a73b407960db51475ed876327475377963952200f96f8492633' and epjson_ref['size_bytes'] == 870
+
+ranges = []
+spec = [
+    ('crates/ep_compiler/src/compiler.rs', [(455,457),(660,788)]),
+    ('crates/ep_compiler/src/compiler/valid_simulation_objects.rs', [(22,60)]),
+    ('crates/ep_raw_model/src/lib.rs', [(73,97),(134,180),(369,381)]),
+    ('crates/ep_run/examples/ctf10_candidate_production_support/unit_fields.rs', [(36,54)]),
+    ('crates/ep_run/examples/ctf10_report_scan_unit_observer.rs', [(58,76)]),
+    ('.reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh', [(75,94),(114,145),(177,177)]),
+    ('.reference/energyplus-src/26.1.0/src/EnergyPlus/DataSystemVariables.hh', [(100,105)]),
+    ('.reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.hh', [(687,695)]),
+    ('.reference/energyplus-src/26.1.0/src/EnergyPlus/DataErrorTracking.hh', [(205,234)]),
+]
+for name, spans in spec:
+    path = ROOT / name
+    lines = path.read_bytes().splitlines(keepends=True)
+    for start, end in spans:
+        assert 1 <= start <= end <= len(lines)
+        data = b''.join(lines[start-1:end])
+        ranges.append({'path': name, 'whole_Source': ref(path), 'start_line': start, 'end_line': end,
+            'sha256': digest(data), 'size_bytes': len(data), 'literal_archive': write(BASE / 'ranges' / f'{path.name}.{start}-{end}.literal', data)})
+
+policy = json.loads((BASE / 'prospective-pair-policy.json').read_bytes())
+assert policy['scientific_PASS_claimed'] is False and policy['gates_updated'] is False
+ast.parse(Path(__file__).read_text())
+manifest = {
+    'schema': 'src06-tarp-dispatcher-Rust-observer-source-preparation.v1',
+    'status': 'HELD-Source-only-no-build-or-execution',
+    'application_sources': application,
+    'Source_preparations': {'Native': native_ref, 'dispatcher': dispatcher_ref, 'required_main_thread_and_stack': main_thread_ref},
+    'historical_Source_context': dispatcher['current_Source_snapshot'],
+    'runtime_Source_authorities': runtime_source_authorities,
+    'Source_context_ranges': ranges,
+    'input_only_request': native['input_only_request'], 'literal_IDF': native['literal_IDF'],
+    'actual_input_only_conversion': {'ledger': ledger, 'execution': conversion, 'recorded_command': receipt,
+        'epjson_input': epjson_ref, 'source_input': actual_conversion['source_input'], 'staged_input': actual_conversion['staged_input']},
+    'Native_transport_Source': native['Native_source_files'],
+    'prospective_pair_policy': ref(BASE / 'prospective-pair-policy.json'),
+    'prior_Native_capture_policy_immutable': native['prospective_policy'],
+    'own_sources': [ref(Path(__file__)), ref(BASE / 'README.md')],
+    'runtime_interfaces': {
+        'example': 'src06_tarp_dispatcher_main', 'argc': 4,
+        'argv': ['actual-input-binding.json', 'actual-input-binding-sha256', 'fresh-contained-run-directory'],
+        'binding_schema': 'src06-tarp-dispatcher-Rust-observer-inputs.v1',
+        'binding_keys': ['schema','native_source_preparation','dispatcher_source_preparation','native_request','conversion_ledger','conversion_execution','conversion_command_receipt','runtime_sources','backend_context','pair_policy','expected_values_supplied','Native_results_supplied'],
+        'runtime_source_bindings_schema': 'src06-tarp-dispatcher-runtime-source-bindings.v1',
+        'ordered_observer_source_paths': lists['OBSERVER_PATHS'], 'ordered_public_API_source_paths': lists['API_PATHS'],
+        'result_schema': 'src06-tarp-dispatcher-Rust-observer-results.v1', 'result_authority': 'actual recorded complete stdout',
+        'complete_capture_exit_codes': [0,2], 'runtime_Source_and_Cargo_artifact_proof': 'Root must authenticate actual emitted executable, actual linker/main-thread/stack evidence and full current Source snapshot before execution.',
+        'actual_closed_Native_baseline_before_Rust_execution': 'Required Root-reviewed runtime operand outside observer input; Native scientific results cannot become operands.',
+        'scientific_input_case_count': 8, 'scientific_input_call_count': 20, 'literal_binary64_input_cell_count': 700,
+        'comparison_or_target_execution_performed': False,
+    },
+    'inner_Native_trace_simulated': False, 'Native_result_values_read_during_authorship': False,
+    'target_execution_performed': False, 'canonical_mutation_performed': False,
+    'expected_values_supplied': False, 'scientific_PASS_claimed': False, 'ordinary_production_handoff_verified': False, 'gates_updated': False,
+}
+parent = ROOT / '.runtime/porting/SRC-06/tarp-dispatcher-observer-prep-01'
+manifest['previous_Source_preparation'] = ref(parent / 'manifest.json')
+manifest['authentic_before_manifest'] = write(BASE / 'before' / 'manifest.json', (parent / 'manifest.json').read_bytes())
+manifest['narrow_Source_correspondence'] = []
+for name in ['proposed/crates/ep_run/examples/src06_tarp_dispatcher_main.rs', 'proposed/crates/ep_run/examples/src06_tarp_dispatcher_support/fields.rs', 'prospective-pair-policy.json', 'README.md']:
+    before = write(BASE / 'before' / name, (parent / name).read_bytes())
+    after = ref(BASE / name)
+    delta = ''.join(difflib.unified_diff((parent / name).read_text(encoding='utf8').splitlines(True), (BASE / name).read_text(encoding='utf8').splitlines(True), fromfile=before['path'], tofile=after['path'])).encode('utf8')
+    exact = write(BASE / 'narrow-diffs' / (name.replace('/', '__')+'.diff'), delta)
+    manifest['narrow_Source_correspondence'].append(dict(before=before,proposal=after,exact_diff=exact))
+manifest['Source_only_correction'] = 'Actual borrowed typed zone/surface inputs serialized at every boundary; exact prospective input joins. No formula, request, call order or compiler/backend change.'
+write(BASE / 'manifest.json', (json.dumps(manifest, ensure_ascii=False, indent=2, allow_nan=False)+'\n').encode())
+print(json.dumps(ref(BASE / 'manifest.json')))

@@ -1,0 +1,71 @@
+{
+  "schema": "src06-selected-tarp-dispatcher-comparison.v1",
+  "status": "fail-observation-or-custody-integrity",
+  "actual_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-comparison-prep-03/manifest.json",
+    "sha256": "6b9248a0b4e2fb21df5eb87533aae502f273710e0d42aeb3a24049b10fa2ab94",
+    "size_bytes": 48738
+  },
+  "actual_custody": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-comparison-custody-01.json",
+    "sha256": "e966339e09bf544f07707a65fe75cbc6f08321747e3c082159a267177c7ab1f2"
+  },
+  "actual_prospective_policy": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-observer-prep-02/prospective-pair-policy.json",
+    "sha256": "ff49c35addf3990ff45e46d6be85e16fb71b9ba87b90f6b58416fd0000b27dc4",
+    "size_bytes": 12036,
+    "line_count": 182
+  },
+  "findings": {
+    "integrity_failure": "'size_bytes'",
+    "endpoint_pairing_performed": false
+  },
+  "counts": {
+    "input_join_comparisons": 0,
+    "pre_owner_comparisons": 0,
+    "selected_endpoint_comparisons": 0,
+    "point_helper_comparisons": 0
+  },
+  "mismatch_count": 0,
+  "required_unmatched_count": 0,
+  "required_unavailable_count": 0,
+  "optional_unpaired_count": 0,
+  "all_ledgers_retained_uncapped": true,
+  "ledgers": {
+    "mismatches": {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-comparison-01/mismatches.ndjson.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "size_bytes": 20,
+      "rows": 0,
+      "compression": "gzip",
+      "uncapped": true
+    },
+    "unmatched": {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-comparison-01/unmatched.ndjson.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "size_bytes": 20,
+      "rows": 0,
+      "compression": "gzip",
+      "uncapped": true
+    },
+    "unavailable": {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-comparison-01/unavailable.ndjson.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "size_bytes": 20,
+      "rows": 0,
+      "compression": "gzip",
+      "uncapped": true
+    },
+    "paired-boundaries": {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-comparison-01/paired-boundaries.ndjson.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "size_bytes": 20,
+      "rows": 0,
+      "compression": "gzip",
+      "uncapped": true
+    }
+  },
+  "unavailable_counted_as_PASS": false,
+  "whole_SRC06_or_ordinary_handoff_PASS_claimed": false,
+  "gates_updated": false
+}

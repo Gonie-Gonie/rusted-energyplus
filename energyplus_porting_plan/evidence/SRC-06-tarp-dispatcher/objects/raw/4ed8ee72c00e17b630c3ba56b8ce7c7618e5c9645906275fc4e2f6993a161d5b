@@ -1,0 +1,286 @@
+// Genuine unchanged InitIntConvCoeff, including its first-call dependencies.
+#include "tarp_dispatcher_fields.hh"
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <limits>
+#include <memory>
+#include <optional>
+#include <set>
+
+namespace {
+using Dispatcher::json;
+namespace fs = std::filesystem;
+using Ctf01::require;
+using Ctf01::input_real;
+using ScanUnit::keys;
+std::string read_bytes(fs::path const &path)
+{
+    std::ifstream in(path, std::ios::binary); require(in.is_open(), "Cannot read physical input");
+    std::ostringstream bytes; bytes << in.rdbuf(); require(!in.bad(), "Cannot read complete physical input"); return bytes.str();
+}
+void index(json const &row, int expected)
+{
+    require(row.at("actual_array_index").is_number_integer() && row.at("actual_array_index").get<std::int64_t>() == expected,
+            "Contiguous one-based literal owner index required");
+}
+struct ConsoleCapture {
+    std::ostringstream text;
+    std::streambuf *previous = nullptr;
+    ConsoleCapture() : previous(std::cout.rdbuf(text.rdbuf())) {}
+    ~ConsoleCapture() { std::cout.rdbuf(previous); }
+    ConsoleCapture(ConsoleCapture const &) = delete;
+    ConsoleCapture &operator=(ConsoleCapture const &) = delete;
+};
+struct Fixture {
+    ConsoleCapture console;
+    std::unique_ptr<EnergyPlus::EnergyPlusData> state;
+    std::ostringstream *error = nullptr;
+    json callbacks = json::array(), calls = json::array();
+    std::size_t callback_count = 0, actual_calls = 0;
+    bool callback_integrity_failed = false, stopped = false;
+    Fixture() : state(std::make_unique<EnergyPlus::EnergyPlusData>())
+    {
+        auto sink = std::make_unique<std::ostringstream>(); error = sink.get(); state->files.err_stream = std::move(sink);
+        state->files.eio.open_as_stringstream();
+        state->dataGlobal->errorCallback = [this](EnergyPlus::Error level, std::string const &text) noexcept {
+            callback("errorCallback", static_cast<int>(level), text);
+        };
+        state->dataGlobal->messageCallback = [this](std::string const &text) noexcept { callback("messageCallback", std::nullopt, text); };
+        state->init_constant_state(*state);
+    }
+    Fixture(Fixture const &) = delete;
+    Fixture &operator=(Fixture const &) = delete;
+    void callback(char const *kind, std::optional<int> level, std::string const &text) noexcept
+    {
+        if (callback_count == std::numeric_limits<std::size_t>::max()) { callback_integrity_failed = true; return; }
+        ++callback_count;
+        try {
+            callbacks.push_back({{"actual_ordinal", callback_count}, {"kind", kind},
+                                 {"level", level ? json(*level) : json(nullptr)}, {"message", text}});
+        } catch (...) { callback_integrity_failed = true; }
+    }
+    json snapshot() const
+    {
+        return {{"owner", Dispatcher::owners(*state)}, {"error_stream", error->str()}, {"eio", state->files.eio.get_output()},
+                {"console", console.text.str()}, {"callbacks", callbacks}, {"actual_callback_count", callback_count},
+                {"callback_integrity_failed", callback_integrity_failed}};
+    }
+    template<class Call> void invoke(std::string const &id, char const *api, Call const &call)
+    {
+        auto const before = snapshot(); bool returned = false; json exception = nullptr; ++actual_calls;
+        try { call(); returned = true; }
+        catch (EnergyPlus::FatalError const &e) { exception = {{"kind", "OriginalFatalError"}, {"message", e.what()}}; }
+        catch (std::exception const &e) { exception = {{"kind", "std_exception"}, {"message", e.what()}}; }
+        catch (...) { exception = {{"kind", "nonstandard_exception"}, {"message", nullptr}}; }
+        stopped = !returned;
+        calls.push_back({{"operation_id", id}, {"actual_call_ordinal", actual_calls}, {"api", api}, {"actual_source_invoked", true},
+                         {"actual_source_return_observed", returned}, {"source_exception", exception}, {"before", before}, {"after", snapshot()}});
+    }
+    void transport(fs::path const &input, fs::path const &output)
+    {
+        state->dataStrGlobals->inputFilePath = input; state->dataStrGlobals->outDirPath = output;
+        state->dataStrGlobals->outputPerfLogFilePath = output / "eplusout_perflog.csv";
+        state->files.outputErrFilePath = output / "eplusout.err";
+        state->files.sln.filePath = output / "eplusout.sln"; state->files.dxf.filePath = output / "eplusout.dxf";
+        state->files.sci.filePath = output / "eplusout.sci"; state->files.wrl.filePath = output / "eplusout.wrl";
+        state->files.endFile.filePath = output / "eplusout.end";
+        require(!state->dataGlobal->isEpJSON && state->dataGlobal->preserveIDFOrder &&
+                !state->dataGlobal->outputEpJSONConversion && !state->dataGlobal->outputEpJSONConversionOnly,
+                "Actual raw-IDF preserved-order no-conversion constructor context required");
+    }
+};
+void prepare(Fixture &f, json const &v)
+{
+    keys(v, {"zone", "spaces", "surfaces", "node_allocated", "zone_equipment_active_elements"});
+    auto &s = *f.state; auto &h = *s.dataHeatBal; auto &d = *s.dataSurface;
+    auto const &zone = v.at("zone");
+    keys(zone, {"Name", "spaceIndexes", "MAT", "CeilingHeight", "Volume", "FloorArea", "MinimumX", "MaximumX", "MinimumY", "MaximumY",
+                "ExtGrossWallArea", "ExtWindowArea", "Multiplier", "ListMultiplier"});
+    auto const &spaces = v.at("spaces"); auto const &surfaces = v.at("surfaces");
+    require(spaces.is_array() && !spaces.empty() && spaces.size() <= static_cast<std::size_t>(std::numeric_limits<int>::max()) &&
+            surfaces.is_array() && surfaces.size() <= static_cast<std::size_t>(std::numeric_limits<int>::max()), "Complete Source-sized owners required");
+    s.dataGlobal->NumOfZones = 1; s.dataGlobal->numSpaces = static_cast<int>(spaces.size());
+    h.Zone.allocate(1); h.space.allocate(spaces.size());
+    s.dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
+    s.dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(spaces.size());
+    s.dataZoneEquip->ZoneEquipConfig.allocate(1);
+    s.dataConstruction->Construct.allocate(1);
+    require(!s.dataConstruction->Construct(1).TypeIsWindow, "Genuine default nonwindow construction required");
+    auto &z = h.Zone(1); z.Name = zone.at("Name").get<std::string>();
+    z.IntConvAlgo = EnergyPlus::Convect::HcInt::ASHRAETARP;
+    z.numSpaces = static_cast<int>(spaces.size());
+    auto const &order = zone.at("spaceIndexes");
+    require(order.is_array() && order.size() == spaces.size(), "Complete declared Zone.spaceIndexes required");
+    std::set<int> seen_spaces;
+    for (auto const &entry : order) {
+        require(entry.is_number_integer(), "Integer space association required"); int const n = entry.get<int>();
+        require(n >= 1 && n <= s.dataGlobal->numSpaces && seen_spaces.insert(n).second, "Unique in-bounds space association required");
+        z.spaceIndexes.push_back(n);
+    }
+    s.dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = input_real(zone.at("MAT"));
+#define ZONE_REAL(name) z.name = input_real(zone.at(#name));
+    ZONE_REAL(CeilingHeight) ZONE_REAL(Volume) ZONE_REAL(FloorArea) ZONE_REAL(MinimumX) ZONE_REAL(MaximumX)
+    ZONE_REAL(MinimumY) ZONE_REAL(MaximumY) ZONE_REAL(ExtGrossWallArea) ZONE_REAL(ExtWindowArea)
+#undef ZONE_REAL
+    z.Multiplier = zone.at("Multiplier").get<int>(); z.ListMultiplier = zone.at("ListMultiplier").get<int>();
+    require(z.CeilingHeight > 0 && z.Volume > 0 && z.FloorArea > 0 && z.MaximumX > z.MinimumX && z.MaximumY > z.MinimumY &&
+            z.Multiplier > 0 && z.ListMultiplier > 0 && z.ExtGrossWallArea >= 0 && z.ExtWindowArea == 0,
+            "Positive exogenous geometry/nonwindow static-setup domain required");
+    int const count = static_cast<int>(surfaces.size()); d.TotSurfaces = count;
+    d.Surface.allocate(surfaces.size()); d.surfIntConv.allocate(surfaces.size()); d.surfExtConv.allocate(surfaces.size());
+    s.dataHeatBalSurf->SurfTempIn.allocate(count); s.dataHeatBalSurf->SurfTempInTmp.allocate(count); s.dataHeatBalSurf->SurfHConvInt.allocate(count);
+    d.SurfTAirRef.allocate(count); d.SurfTAirRefRpt.allocate(count); d.SurfAdjacentZone.dimension(count, 0);
+    d.SurfEMSOverrideIntConvCoef.dimension(count, false); d.SurfEMSValueForIntConvCoef.dimension(count, 0.0);
+    std::set<int> membership;
+    for (int i = 1; i <= s.dataGlobal->numSpaces; ++i) {
+        auto const &r = spaces.at(static_cast<std::size_t>(i - 1));
+        keys(r, {"actual_array_index", "Name", "HTSurfaceFirst", "HTSurfaceLast", "MAT"}); index(r, i);
+        auto &sp = h.space(i); sp.Name = r.at("Name").get<std::string>(); sp.zoneNum = 1;
+        sp.HTSurfaceFirst = r.at("HTSurfaceFirst").get<int>(); sp.HTSurfaceLast = r.at("HTSurfaceLast").get<int>();
+        sp.WindowSurfaceFirst = 1; sp.WindowSurfaceLast = 0;
+        require((sp.HTSurfaceFirst == 1 && sp.HTSurfaceLast == 0) ||
+                (sp.HTSurfaceFirst >= 1 && sp.HTSurfaceLast >= sp.HTSurfaceFirst && sp.HTSurfaceLast <= count), "Actual HT inclusive range required");
+        for (int n = sp.HTSurfaceFirst; n <= sp.HTSurfaceLast; ++n) { require(membership.insert(n).second, "Duplicate surface membership"); }
+        s.dataZoneTempPredictorCorrector->spaceHeatBalance(i).MAT = input_real(r.at("MAT"));
+    }
+    require(membership.size() == surfaces.size(), "Every actual surface must have one declared space owner");
+    std::set<std::string> names;
+    for (int i = 1; i <= count; ++i) {
+        auto const &r = surfaces.at(static_cast<std::size_t>(i - 1));
+        keys(r, {"actual_array_index", "Name", "spaceNum", "Class", "model", "CosTilt", "Tilt", "Azimuth", "Area", "GrossArea", "Width", "Height",
+                 "Perimeter", "Vertex", "SurfTempIn", "SurfTempInTmp", "SurfHConvInt", "SurfTAirRef", "SurfTAirRefRpt"}); index(r, i);
+        auto &v = d.Surface(i); v.Name = r.at("Name").get<std::string>();
+        require(!v.Name.empty() && names.insert(v.Name).second, "Unique surface name required");
+        v.Zone = 1; v.spaceNum = r.at("spaceNum").get<int>(); v.Construction = 1; v.RepresentativeCalcSurfNum = i;
+        require(v.spaceNum >= 1 && v.spaceNum <= s.dataGlobal->numSpaces &&
+                i >= h.space(v.spaceNum).HTSurfaceFirst && i <= h.space(v.spaceNum).HTSurfaceLast, "Surface/space association differs");
+        auto const cls = r.at("Class").get<std::string>();
+        require(cls == "Wall" || cls == "Roof" || cls == "Floor", "Normal opaque classes only");
+        v.Class = cls == "Wall" ? EnergyPlus::DataSurfaces::SurfaceClass::Wall : cls == "Roof" ? EnergyPlus::DataSurfaces::SurfaceClass::Roof : EnergyPlus::DataSurfaces::SurfaceClass::Floor;
+        v.OriginalClass = v.Class; v.HeatTransSurf = true; v.ExtBoundCond = EnergyPlus::DataSurfaces::ExternalEnvironment;
+        auto const model = r.at("model").get<std::string>(); require(model == "SetByZone" || model == "ASHRAETARP", "Default/explicit TARP only");
+        if (model == "ASHRAETARP") { d.surfIntConv(i).model = EnergyPlus::Convect::HcInt::ASHRAETARP; }
+#define SURFACE_REAL(name) v.name = input_real(r.at(#name));
+        SURFACE_REAL(CosTilt) SURFACE_REAL(Tilt) SURFACE_REAL(Azimuth) SURFACE_REAL(Area) SURFACE_REAL(GrossArea)
+        SURFACE_REAL(Width) SURFACE_REAL(Height) SURFACE_REAL(Perimeter)
+#undef SURFACE_REAL
+        require(v.CosTilt >= -1 && v.CosTilt <= 1 && v.Tilt >= 0 && v.Tilt <= 180 && v.Azimuth >= 0 && v.Azimuth < 360 &&
+                v.Area > 0 && v.GrossArea > 0 && v.Width > 0 && v.Height > 0 && v.Perimeter > 0, "Finite positive literal geometry domain required");
+        auto const &vertices = r.at("Vertex"); require(vertices.is_array() && vertices.size() == 4, "Four literal vertices required");
+        v.Sides = 4; v.Vertex.allocate(4);
+        for (int j = 1; j <= 4; ++j) {
+            auto const &p = vertices.at(static_cast<std::size_t>(j - 1)); keys(p, {"x", "y", "z"});
+            v.Vertex(j).x = input_real(p.at("x")); v.Vertex(j).y = input_real(p.at("y")); v.Vertex(j).z = input_real(p.at("z"));
+        }
+        s.dataHeatBalSurf->SurfTempIn(i) = input_real(r.at("SurfTempIn"));
+        s.dataHeatBalSurf->SurfTempInTmp(i) = input_real(r.at("SurfTempInTmp"));
+        s.dataHeatBalSurf->SurfHConvInt(i) = input_real(r.at("SurfHConvInt"));
+        d.SurfTAirRef(i) = r.at("SurfTAirRef").get<int>(); d.SurfTAirRefRpt(i) = r.at("SurfTAirRefRpt").get<int>();
+    }
+    require(!d.UseRepresentativeSurfaceCalculations && s.dataConvect->GetUserSuppliedConvectionCoeffs &&
+            s.dataConvect->NodeCheck && s.dataConvect->ActiveSurfaceCheck, "Genuine first-call flags must remain active");
+    auto const &elements = v.at("zone_equipment_active_elements"); keys(elements, {"wall", "ceiling", "floor"});
+    auto &e = s.dataZoneEquip->ZoneEquipConfig(1);
+    e.InWallActiveElement = elements.at("wall").get<bool>(); e.InCeilingActiveElement = elements.at("ceiling").get<bool>();
+    e.InFloorActiveElement = elements.at("floor").get<bool>();
+    if (v.at("node_allocated").get<bool>()) { s.dataLoopNodes->Node.allocate(1); s.dataLoopNodes->NumOfNodes = 1; }
+}
+void write_operations(Fixture &f, json const &op)
+{
+    keys(op, {"operation_id", "temperature_owner", "BeginEnvrnFlag", "SysSizingCalc", "ZoneSizingCalc", "ZoneEquipInputsFilled", "ZoneEquipSimulatedOnce",
+              "zone_MAT", "space_MAT", "SurfTempIn", "SurfTempInTmp"});
+    auto &s = *f.state;
+    s.dataGlobal->BeginEnvrnFlag = op.at("BeginEnvrnFlag").get<bool>(); s.dataGlobal->SysSizingCalc = op.at("SysSizingCalc").get<bool>();
+    s.dataGlobal->ZoneSizingCalc = op.at("ZoneSizingCalc").get<bool>();
+    s.dataZoneEquip->ZoneEquipInputsFilled = op.at("ZoneEquipInputsFilled").get<bool>();
+    s.dataZoneEquip->ZoneEquipSimulatedOnce = op.at("ZoneEquipSimulatedOnce").get<bool>();
+    s.dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = input_real(op.at("zone_MAT"));
+    auto const &mat = op.at("space_MAT"); auto const &ti = op.at("SurfTempIn"); auto const &tmp = op.at("SurfTempInTmp");
+    require(mat.is_array() && mat.size() == s.dataHeatBal->space.size() && ti.is_array() && tmp.is_array() &&
+            ti.size() == s.dataSurface->Surface.size() && tmp.size() == ti.size(), "Full actual input owner writes required");
+    for (std::size_t i = 1; i <= mat.size(); ++i) { s.dataZoneTempPredictorCorrector->spaceHeatBalance(i).MAT = input_real(mat.at(i - 1)); }
+    for (std::size_t i = 1; i <= ti.size(); ++i) {
+        s.dataHeatBalSurf->SurfTempIn(static_cast<int>(i)) = input_real(ti.at(i - 1));
+        s.dataHeatBalSurf->SurfTempInTmp(static_cast<int>(i)) = input_real(tmp.at(i - 1));
+    }
+}
+json evaluate(json const &item, std::string const &idf, fs::path const &directory, bool &failed)
+{
+    keys(item, {"case_id", "purpose", "initial", "operations"}); Ctf01::identifier(item.at("case_id"));
+    require(item.at("purpose").is_string() && item.at("operations").is_array() && !item.at("operations").empty(), "Declared complete operations required");
+    require(fs::create_directory(directory), "Fresh per-case directory required");
+    fs::path const input_path = directory / "literal-input.idf"; Ctf01::write_text(input_path, idf);
+    auto const before_file = Ctf01::file_ref(input_path); require(read_bytes(input_path) == idf, "Physical IDF literal differs");
+    Fixture f; f.transport(input_path, directory); auto const fresh = f.snapshot();
+    f.invoke("process-input", "InputProcessor::processInput", [&] { f.state->dataInputProcessing->inputProcessor->processInput(*f.state); });
+    json absent_counts = json::array(); json prepared = nullptr; json operation_writes = json::array(), unreached = json::array();
+    if (!f.stopped) {
+        for (char const *family : {"SurfaceConvectionAlgorithm:Inside:UserCurve", "SurfaceConvectionAlgorithm:Outside:UserCurve",
+                                  "SurfaceProperty:ConvectionCoefficients:MultipleSurface", "SurfaceProperty:ConvectionCoefficients",
+                                  "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections", "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections"}) {
+            int const count = f.state->dataInputProcessing->inputProcessor->getNumObjectsFound(*f.state, family);
+            absent_counts.push_back({{"actual_validation_getter_ordinal", absent_counts.size() + 1}, {"family", family}, {"actual_count", count}});
+            require(count == 0, "Fixed no-user input domain differs");
+        }
+        prepare(f, item.at("initial")); prepared = f.snapshot();
+    }
+    std::set<std::string> ids;
+    for (auto const &op : item.at("operations")) {
+        Ctf01::identifier(op.at("operation_id")); auto const id = op.at("operation_id").get<std::string>();
+        require(ids.insert(id).second, "Unique operation identity required");
+        if (f.stopped) { unreached.push_back(op); continue; }
+        auto const before_write = f.snapshot(); write_operations(f, op);
+        operation_writes.push_back({{"operation_id", id}, {"literal_input", op}, {"before_declared_writes", before_write}, {"after_declared_writes", f.snapshot()}});
+        auto const which = op.at("temperature_owner").get<std::string>(); require(which == "SurfTempIn" || which == "SurfTempInTmp", "Actual temperature owner selector required");
+        f.invoke(id, "Convect::InitIntConvCoeff", [&] {
+            if (which == "SurfTempIn") { EnergyPlus::Convect::InitIntConvCoeff(*f.state, f.state->dataHeatBalSurf->SurfTempIn); }
+            else { EnergyPlus::Convect::InitIntConvCoeff(*f.state, f.state->dataHeatBalSurf->SurfTempInTmp); }
+        });
+    }
+    auto const final = f.snapshot();
+    // Close genuine owned streams before inventorying all produced files. Retain any disposal transport too.
+    f.state.reset();
+    json const disposal_transport = {{"console", f.console.text.str()}, {"callbacks", f.callbacks},
+                                    {"actual_callback_count", f.callback_count}, {"callback_integrity_failed", f.callback_integrity_failed}};
+    auto const after_file = Ctf01::file_ref(input_path);
+    require(before_file.at("sha256") == after_file.at("sha256") && before_file.at("size_bytes") == after_file.at("size_bytes") && read_bytes(input_path) == idf,
+            "Physical IDF changed during genuine calls");
+    json files = json::array(); for (auto const &entry : fs::recursive_directory_iterator(directory)) {
+        require(!entry.is_symlink(), "Unexpected linked produced file"); if (entry.is_regular_file()) { files.push_back(Ctf01::file_ref(entry.path())); }
+    }
+    failed = failed || f.stopped || f.callback_integrity_failed;
+    return {{"case_id", item.at("case_id")}, {"literal_input", item}, {"physical_IDF_before", before_file}, {"physical_IDF_after", after_file},
+            {"physical_IDF_bytes_unchanged", true}, {"fresh_constructor_state", fresh}, {"actual_no_user_object_counts", absent_counts},
+            {"prepared_literal_owners", prepared}, {"actual_operation_input_writes", operation_writes}, {"actual_calls", f.calls},
+            {"unreached_operations", unreached}, {"final", final}, {"actual_recorded_outer_call_count", f.actual_calls},
+            {"post_owner_disposal_transport", disposal_transport},
+            {"actual_source_stopped", f.stopped}, {"produced_files_full_SHA_inventory", files}, {"inner_surface_visit_trace_available", false},
+            {"ordinary_production_handoff_verified", false}, {"numerical_PASS_claimed", false}};
+}
+} // namespace
+int main(int argc, char const *argv[])
+{
+    try {
+        require(argc == 3, "Usage: src06_tarp_dispatcher_helper <literal-request.json> <fresh-run-directory>");
+        fs::path const input = fs::absolute(argv[1]).lexically_normal(); auto const input_before = Ctf01::file_ref(input);
+        auto const request = json::parse(read_bytes(input));
+        keys(request, {"schema", "expected_values_supplied", "ordinary_production_prestate_supplied", "literal_IDF", "cases"});
+        require(request.at("schema") == "src06-tarp-dispatcher-direct-request.v1" && request.at("expected_values_supplied") == false &&
+                request.at("ordinary_production_prestate_supplied") == false, "Input-only dispatcher request required");
+        require(request.at("literal_IDF").is_string() && request.at("cases").is_array() && !request.at("cases").empty(), "Full literal inputs required");
+        fs::path const output = fs::absolute(argv[2]).lexically_normal(); require(!fs::exists(output) && fs::create_directories(output), "Fresh output root required");
+        json cases = json::array(); bool failed = false; std::set<std::string> ids;
+        for (auto const &item : request.at("cases")) {
+            Ctf01::identifier(item.at("case_id")); auto const id = item.at("case_id").get<std::string>(); require(ids.insert(id).second, "Unique case identity required");
+            cases.push_back(evaluate(item, request.at("literal_IDF").get<std::string>(), output / id, failed));
+        }
+        auto const input_after = Ctf01::file_ref(input);
+        require(input_before.at("sha256") == input_after.at("sha256") && input_before.at("size_bytes") == input_after.at("size_bytes"), "Literal request changed");
+        std::cout << json{{"schema", "src06-tarp-dispatcher-direct-results.v1"}, {"request_before", input_before}, {"request_after", input_after},
+                          {"requested_case_count", request.at("cases").size()}, {"recorded_case_count", cases.size()}, {"cases", cases},
+                          {"Original_bodies_modified", false}, {"inner_surface_visit_trace_available", false},
+                          {"scientific_PASS_claimed", false}, {"gates_updated", false}}.dump() << '\n';
+        return failed ? 2 : 0;
+    } catch (std::exception const &e) { std::cerr << e.what() << '\n'; return 2; }
+}

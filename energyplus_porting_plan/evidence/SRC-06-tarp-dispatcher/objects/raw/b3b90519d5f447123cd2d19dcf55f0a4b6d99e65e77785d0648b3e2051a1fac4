@@ -1,0 +1,127 @@
+{
+  "schema": "src06-tarp-dispatcher-import-actual-application.v1",
+  "correction_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-correction-prep-02/manifest.json",
+    "sha256": "f6d0f14371cbbdb4fd1875c8ceb7d70938692621d92297e261b17dc3b7eb0b5c",
+    "size_bytes": 6417
+  },
+  "parent_application": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-01/record.json",
+    "sha256": "02f1929153ce7f02b8b8b2fc0aca0a4590187f3bb0d9a4481f39ec2477a22d0f",
+    "size_bytes": 27340,
+    "line_count": 531
+  },
+  "parent_formatter_review": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-01/Root-formatter-acceptance.json",
+    "sha256": "e8e048e22027fbae3158e9fc4d23a39de99e48a2a597e7626d7a0885463a8f7a",
+    "size_bytes": 1599,
+    "line_count": 32
+  },
+  "retained_failed_quality": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-validation-01/clippy-command/receipt.json",
+    "sha256": "240f7fac1a5890f32ca6177aaf08faaf5968e778f7b5bcb86e5260f08ab1df48",
+    "size_bytes": 3789,
+    "line_count": 81
+  },
+  "retained_failed_workflow": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-validation-01/failed-build.json",
+    "sha256": "3d07b3c70b16632d9892254f3990546f321522a97edf546598aa51921e378ac1",
+    "size_bytes": 1610,
+    "line_count": 38
+  },
+  "source_before": {
+    "path": ".runtime/porting/source-objects/06/062d37e84728f90782e4306db62f52fbc43b3c06d22b2d0a3f1c04c893b75ab1",
+    "sha256": "062d37e84728f90782e4306db62f52fbc43b3c06d22b2d0a3f1c04c893b75ab1"
+  },
+  "source_literal": {
+    "path": ".runtime/porting/source-objects/99/994b014957fb54b1c01608f5fc345f70bbac500be0f7b3b673c252f90bbbc7b7",
+    "sha256": "994b014957fb54b1c01608f5fc345f70bbac500be0f7b3b673c252f90bbbc7b7"
+  },
+  "source_final": {
+    "path": ".runtime/porting/source-objects/99/994b014957fb54b1c01608f5fc345f70bbac500be0f7b3b673c252f90bbbc7b7",
+    "sha256": "994b014957fb54b1c01608f5fc345f70bbac500be0f7b3b673c252f90bbbc7b7"
+  },
+  "source_file_count": 3937,
+  "unrelated_source_files_verified_byte_exact": 3936,
+  "actual_formatter_execution": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-applied-01/fmt-command/receipt.json",
+    "sha256": "da043b164684014af8ea48a861f6ae3d4474e825e50133917bb6d074a94f964d",
+    "size_bytes": 3573
+  },
+  "application": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+        "sha256": "2a5991e1101f9c39b535eb340991100ad14dae81c45cd7927eaa6c498fa99952",
+        "size_bytes": 29808,
+        "line_count": 734
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-correction-prep-01/before/ctf_surface_lifecycle.rs",
+        "sha256": "2a5991e1101f9c39b535eb340991100ad14dae81c45cd7927eaa6c498fa99952",
+        "size_bytes": 29808,
+        "line_count": 734
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-correction-prep-01/proposal/ctf_surface_lifecycle.rs",
+        "sha256": "231a6f27fdf15cd1dc46c47688d494e57922a9c2308a21cbe14fb823d9f68e3b",
+        "size_bytes": 29848,
+        "line_count": 736
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-correction-prep-01/diffs/ctf_surface_lifecycle.rs.diff",
+        "sha256": "e6906064f7d4f40906f42f208ddd86b660713e9ca213b258ee1dd02cf1f10537",
+        "size_bytes": 539,
+        "line_count": 11
+      },
+      "new_destination_absent": false,
+      "actual_before_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-applied-01/before.rs",
+        "sha256": "2a5991e1101f9c39b535eb340991100ad14dae81c45cd7927eaa6c498fa99952",
+        "size_bytes": 29808
+      },
+      "actual_literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-applied-01/literal.rs",
+        "sha256": "231a6f27fdf15cd1dc46c47688d494e57922a9c2308a21cbe14fb823d9f68e3b",
+        "size_bytes": 29848
+      },
+      "actual_semantic_diff": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-applied-01/semantic.diff",
+        "sha256": "e6906064f7d4f40906f42f208ddd86b660713e9ca213b258ee1dd02cf1f10537",
+        "size_bytes": 539
+      },
+      "actual_final": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+        "sha256": "231a6f27fdf15cd1dc46c47688d494e57922a9c2308a21cbe14fb823d9f68e3b",
+        "size_bytes": 29848
+      },
+      "actual_final_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-applied-01/formatted.rs",
+        "sha256": "231a6f27fdf15cd1dc46c47688d494e57922a9c2308a21cbe14fb823d9f68e3b",
+        "size_bytes": 29848
+      },
+      "actual_formatter_diff": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-applied-01/formatter.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    }
+  ],
+  "runtime_source_bindings": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-applied-01/runtime-source-bindings.json",
+    "sha256": "ab7ff6af70781253bfbc8bf700e6d6a9e76b63f3766f9f28827401e2df668780",
+    "size_bytes": 3533
+  },
+  "Native_baseline_acceptance": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-Native-observation-01/Root-baseline-acceptance.json",
+    "sha256": "7b63de51b46753ef1cbeafc55e7600d063eb29782914d4eacd1acb1605bb51e0",
+    "size_bytes": 1965,
+    "line_count": 40
+  },
+  "formatter_correspondence_review_pending": true,
+  "target_execution_performed": false,
+  "scientific_PASS_claimed": false,
+  "ordinary_cadence_activated": false,
+  "gates_updated": false
+}

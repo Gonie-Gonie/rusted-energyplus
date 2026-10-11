@@ -1,0 +1,537 @@
+{
+  "schema": "src06-tarp-dispatcher-Root-artifact-acceptance.v1",
+  "accepted": true,
+  "Root_FULL_PE_and_Cargo_artifact_accepted": true,
+  "actual_build_record": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-validation-03/record.json",
+    "sha256": "6fd881caaa3deebcb2560abf5e05ca55ddb09cd9fed8327a662d0558fff56c79",
+    "size_bytes": 10141
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/4c/4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce",
+    "sha256": "4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce"
+  },
+  "actual_executable": {
+    "path": "target/debug/examples/src06_tarp_dispatcher_main.exe",
+    "sha256": "e4c8e5ae1a2f190ce936e99c2d767471e7825c695a4fc7624b9c3443d5d1ad00",
+    "size_bytes": 34594331
+  },
+  "actual_Cargo_artifact": {
+    "actual_build_execution": {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-validation-03/dispatcher_build-command/receipt.json",
+      "sha256": "9259e7d1e53952ee73650942ba0ca734b81c978222ee6a9f466d93204e9f9844",
+      "size_bytes": 5409
+    },
+    "actual_full_Cargo_JSON": {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-validation-03/dispatcher_build-command/stdout.log",
+      "sha256": "071fb1530a335b1abda5f642d3afa25acc5f9786a5a11b89ab66ebaaf089e676"
+    },
+    "cargo_message": {
+      "reason": "compiler-artifact",
+      "package_id": "path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/crates/ep_run#0.1.0",
+      "manifest_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\Cargo.toml",
+      "target": {
+        "kind": [
+          "example"
+        ],
+        "crate_types": [
+          "bin"
+        ],
+        "name": "src06_tarp_dispatcher_main",
+        "src_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\examples\\src06_tarp_dispatcher_main.rs",
+        "edition": "2024",
+        "doc": false,
+        "doctest": false,
+        "test": false
+      },
+      "profile": {
+        "opt_level": "0",
+        "debuginfo": 0,
+        "debug_assertions": true,
+        "overflow_checks": true,
+        "test": false
+      },
+      "features": [],
+      "filenames": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\src06_tarp_dispatcher_main.exe"
+      ],
+      "executable": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\src06_tarp_dispatcher_main.exe",
+      "fresh": false
+    },
+    "executable": {
+      "path": "target/debug/examples/src06_tarp_dispatcher_main.exe",
+      "sha256": "e4c8e5ae1a2f190ce936e99c2d767471e7825c695a4fc7624b9c3443d5d1ad00",
+      "size_bytes": 34594331
+    },
+    "PE_inspection": {
+      "actual_binary": {
+        "path": "target/debug/examples/src06_tarp_dispatcher_main.exe",
+        "sha256": "e4c8e5ae1a2f190ce936e99c2d767471e7825c695a4fc7624b9c3443d5d1ad00",
+        "size_bytes": 34594331
+      },
+      "actual_PE_header_bytes": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-validation-03/PE-headers/dispatcher.bin",
+        "sha256": "779c2afff1579af8acb9d3c05164c69bd6caf9252198e0e521171107625e3d76",
+        "size_bytes": 728
+      },
+      "PE_header_file_offset": 128,
+      "machine": 34404,
+      "COFF_characteristics": 550,
+      "entry_point_RVA": 5104,
+      "subsystem": 3,
+      "DLL_characteristics": 352,
+      "stack_reserve_bytes": 8388608,
+      "stack_commit_bytes": 4096,
+      "data_directories": [
+        {
+          "index": 0,
+          "address": 0,
+          "size": 0
+        },
+        {
+          "index": 1,
+          "address": 23113728,
+          "size": 7380
+        },
+        {
+          "index": 2,
+          "address": 0,
+          "size": 0
+        },
+        {
+          "index": 3,
+          "address": 21340160,
+          "size": 719808
+        },
+        {
+          "index": 4,
+          "address": 0,
+          "size": 0
+        },
+        {
+          "index": 5,
+          "address": 23130112,
+          "size": 46024
+        },
+        {
+          "index": 6,
+          "address": 0,
+          "size": 0
+        },
+        {
+          "index": 7,
+          "address": 0,
+          "size": 0
+        },
+        {
+          "index": 8,
+          "address": 0,
+          "size": 0
+        },
+        {
+          "index": 9,
+          "address": 21335904,
+          "size": 40
+        },
+        {
+          "index": 10,
+          "address": 0,
+          "size": 0
+        },
+        {
+          "index": 11,
+          "address": 0,
+          "size": 0
+        },
+        {
+          "index": 12,
+          "address": 23115448,
+          "size": 1560
+        },
+        {
+          "index": 13,
+          "address": 0,
+          "size": 0
+        },
+        {
+          "index": 14,
+          "address": 0,
+          "size": 0
+        },
+        {
+          "index": 15,
+          "address": 0,
+          "size": 0
+        }
+      ],
+      "sections": [
+        {
+          "name_bytes_hex": "2e74657874000000",
+          "virtual_size": 19330832,
+          "virtual_address": 4096,
+          "raw_size": 19331072,
+          "raw_offset": 1024,
+          "characteristics": 1610612768
+        },
+        {
+          "name_bytes_hex": "2e64617461000000",
+          "virtual_size": 3744,
+          "virtual_address": 19337216,
+          "raw_size": 4096,
+          "raw_offset": 19332096,
+          "characteristics": 3221225536
+        },
+        {
+          "name_bytes_hex": "2e72646174610000",
+          "virtual_size": 1995864,
+          "virtual_address": 19341312,
+          "raw_size": 1996288,
+          "raw_offset": 19336192,
+          "characteristics": 1073741888
+        },
+        {
+          "name_bytes_hex": "2e70646174610000",
+          "virtual_size": 719808,
+          "virtual_address": 21340160,
+          "raw_size": 719872,
+          "raw_offset": 21332480,
+          "characteristics": 1073741888
+        },
+        {
+          "name_bytes_hex": "2e78646174610000",
+          "virtual_size": 1045684,
+          "virtual_address": 22061056,
+          "raw_size": 1046016,
+          "raw_offset": 22052352,
+          "characteristics": 1073741888
+        },
+        {
+          "name_bytes_hex": "2e62737300000000",
+          "virtual_size": 576,
+          "virtual_address": 23109632,
+          "raw_size": 0,
+          "raw_offset": 0,
+          "characteristics": 3221225600
+        },
+        {
+          "name_bytes_hex": "2e69646174610000",
+          "virtual_size": 7380,
+          "virtual_address": 23113728,
+          "raw_size": 7680,
+          "raw_offset": 23098368,
+          "characteristics": 3221225536
+        },
+        {
+          "name_bytes_hex": "2e43525400000000",
+          "virtual_size": 104,
+          "virtual_address": 23121920,
+          "raw_size": 512,
+          "raw_offset": 23106048,
+          "characteristics": 3221225536
+        },
+        {
+          "name_bytes_hex": "2e746c7300000000",
+          "virtual_size": 16,
+          "virtual_address": 23126016,
+          "raw_size": 512,
+          "raw_offset": 23106560,
+          "characteristics": 3221225536
+        },
+        {
+          "name_bytes_hex": "2e72656c6f630000",
+          "virtual_size": 46024,
+          "virtual_address": 23130112,
+          "raw_size": 46080,
+          "raw_offset": 23107072,
+          "characteristics": 1107296320
+        }
+      ],
+      "loader_or_security_equivalence_claimed": false,
+      "Root_full_PE_acceptance_required_before_target_execution": true
+    }
+  },
+  "actual_quality_totals": {
+    "focused": {
+      "groups": 1,
+      "passed": 354,
+      "failed": 0,
+      "ignored": 2
+    },
+    "workspace": {
+      "groups": 21,
+      "passed": 4981,
+      "failed": 0,
+      "ignored": 2
+    }
+  },
+  "actual_ignored_tests": {
+    "focused": [
+      {
+        "name": "heat_balance::convection::surface_environment::selected_reference::observe_literal_surface_environment_setters",
+        "actual_line": "test heat_balance::convection::surface_environment::selected_reference::observe_literal_surface_environment_setters ... ignored, Root-only literal input observation with full Source/environment custody"
+      },
+      {
+        "name": "heat_balance::warmup::selected_reference::observe_literal_selected_warmup_methods",
+        "actual_line": "test heat_balance::warmup::selected_reference::observe_literal_selected_warmup_methods ... ignored, Root-only input observation with explicit recorded input/output and Source custody"
+      }
+    ],
+    "workspace": [
+      {
+        "name": "heat_balance::convection::surface_environment::selected_reference::observe_literal_surface_environment_setters",
+        "actual_line": "test heat_balance::convection::surface_environment::selected_reference::observe_literal_surface_environment_setters ... ignored, Root-only literal input observation with full Source/environment custody"
+      },
+      {
+        "name": "heat_balance::warmup::selected_reference::observe_literal_selected_warmup_methods",
+        "actual_line": "test heat_balance::warmup::selected_reference::observe_literal_selected_warmup_methods ... ignored, Root-only input observation with explicit recorded input/output and Source custody"
+      }
+    ]
+  },
+  "ignored_roster_historical_authority": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/record.json",
+    "sha256": "decafdcbfd1fa6118bc27fe513b79cea7143494429064309f487d494a10a9183"
+  },
+  "actual_application": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-02/record.json",
+    "sha256": "a4eedbee038952b9928cefeeebfc83d51510dafe9c8d030ec4ef401a7a06c488",
+    "size_bytes": 27345
+  },
+  "actual_formatter_review": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-02/Root-formatter-acceptance.json",
+    "sha256": "1e93a855803aaa26b5f38be6f09a5c50e96deddbe7ff200dcafc3a37ef617cbf",
+    "size_bytes": 1681
+  },
+  "actual_validation_preparation": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-validation-prep-04/manifest.json",
+    "sha256": "ef1a8587c1cf778be7e588e1e5d788476937567852468df89f5340a90e4bc740",
+    "size_bytes": 16909
+  },
+  "immutable_observer_request_authority": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/manifest.json",
+    "sha256": "0888b88cd65dff863461bac16b271d967b90c5af6ef43df6e247a025aa325889",
+    "size_bytes": 54708,
+    "line_count": 1273
+  },
+  "actual_applied_dispatcher_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/manifest.json",
+    "sha256": "75db177e8d881a7b3edfaccccbcae407f5ba6c2fdbbc09280964d5767087bbd4",
+    "size_bytes": 54623,
+    "line_count": 1280
+  },
+  "Native_baseline_acceptance": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-Native-observation-01/Root-baseline-acceptance.json",
+    "sha256": "7b63de51b46753ef1cbeafc55e7600d063eb29782914d4eacd1acb1605bb51e0",
+    "size_bytes": 1965,
+    "line_count": 40
+  },
+  "frozen_pair_policy": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-validation-03/frozen-pair-policy.json",
+    "sha256": "ff49c35addf3990ff45e46d6be85e16fb71b9ba87b90f6b58416fd0000b27dc4",
+    "size_bytes": 12036
+  },
+  "independent_raw_PE_facts": {
+    "complete_sections": 10,
+    "complete_directories": 16,
+    "actual_entry_in_text": true,
+    "entry_point_RVA": 5104,
+    "stack_reserve_bytes": 8388608,
+    "stack_commit_bytes": 4096,
+    "DOS_header_hex": "4d5a90000300000004000000ffff0000b80000000000000040000000000000000000000000000000000000000000000000000000000000000000000080000000",
+    "COFF_and_signature_hex": "5045000064860a0099facb6a004a6101304e0100f0002602",
+    "optional_header_hex": "0b02022a00f82601004e3a0000040000f013000000100000000000400100000000100000000200000400000000000000050002000000000000b0610100040000ae6a10020300600100008000000000000010000000000000000010000000000000100000000000000000000010000000000000000000000000b06001d41c0000000000000000000000a04501c0fb0a00000000000000000000f06001c8b30000000000000000000000000000000000000000000000000000608f45012800000000000000000000000000000000000000b8b6600118060000000000000000000000000000000000000000000000000000",
+    "complete_40_byte_section_rows_hex": [
+      "2e7465787400000010f726010010000000f826010004000000000000000000000000000020000060",
+      "2e64617461000000a00e0000001027010010000000fc2601000000000000000000000000400000c0",
+      "2e7264617461000058741e000020270100761e00000c270100000000000000000000000040000040",
+      "2e70646174610000c0fb0a0000a0450100fc0a000082450100000000000000000000000040000040",
+      "2e78646174610000b4f40f0000a0500100f60f00007e500100000000000000000000000040000040",
+      "2e627373000000004002000000a060010000000000000000000000000000000000000000800000c0",
+      "2e69646174610000d41c000000b06001001e000000746001000000000000000000000000400000c0",
+      "2e435254000000006800000000d060010002000000926001000000000000000000000000400000c0",
+      "2e746c73000000001000000000e060010002000000946001000000000000000000000000400000c0",
+      "2e72656c6f630000c8b3000000f0600100b400000096600100000000000000000000000040000042"
+    ],
+    "parsed_sections": [
+      {
+        "name_bytes_hex": "2e74657874000000",
+        "virtual_size": 19330832,
+        "virtual_address": 4096,
+        "raw_size": 19331072,
+        "raw_offset": 1024,
+        "characteristics": 1610612768
+      },
+      {
+        "name_bytes_hex": "2e64617461000000",
+        "virtual_size": 3744,
+        "virtual_address": 19337216,
+        "raw_size": 4096,
+        "raw_offset": 19332096,
+        "characteristics": 3221225536
+      },
+      {
+        "name_bytes_hex": "2e72646174610000",
+        "virtual_size": 1995864,
+        "virtual_address": 19341312,
+        "raw_size": 1996288,
+        "raw_offset": 19336192,
+        "characteristics": 1073741888
+      },
+      {
+        "name_bytes_hex": "2e70646174610000",
+        "virtual_size": 719808,
+        "virtual_address": 21340160,
+        "raw_size": 719872,
+        "raw_offset": 21332480,
+        "characteristics": 1073741888
+      },
+      {
+        "name_bytes_hex": "2e78646174610000",
+        "virtual_size": 1045684,
+        "virtual_address": 22061056,
+        "raw_size": 1046016,
+        "raw_offset": 22052352,
+        "characteristics": 1073741888
+      },
+      {
+        "name_bytes_hex": "2e62737300000000",
+        "virtual_size": 576,
+        "virtual_address": 23109632,
+        "raw_size": 0,
+        "raw_offset": 0,
+        "characteristics": 3221225600
+      },
+      {
+        "name_bytes_hex": "2e69646174610000",
+        "virtual_size": 7380,
+        "virtual_address": 23113728,
+        "raw_size": 7680,
+        "raw_offset": 23098368,
+        "characteristics": 3221225536
+      },
+      {
+        "name_bytes_hex": "2e43525400000000",
+        "virtual_size": 104,
+        "virtual_address": 23121920,
+        "raw_size": 512,
+        "raw_offset": 23106048,
+        "characteristics": 3221225536
+      },
+      {
+        "name_bytes_hex": "2e746c7300000000",
+        "virtual_size": 16,
+        "virtual_address": 23126016,
+        "raw_size": 512,
+        "raw_offset": 23106560,
+        "characteristics": 3221225536
+      },
+      {
+        "name_bytes_hex": "2e72656c6f630000",
+        "virtual_size": 46024,
+        "virtual_address": 23130112,
+        "raw_size": 46080,
+        "raw_offset": 23107072,
+        "characteristics": 1107296320
+      }
+    ],
+    "parsed_directories": [
+      {
+        "index": 0,
+        "address": 0,
+        "size": 0
+      },
+      {
+        "index": 1,
+        "address": 23113728,
+        "size": 7380
+      },
+      {
+        "index": 2,
+        "address": 0,
+        "size": 0
+      },
+      {
+        "index": 3,
+        "address": 21340160,
+        "size": 719808
+      },
+      {
+        "index": 4,
+        "address": 0,
+        "size": 0
+      },
+      {
+        "index": 5,
+        "address": 23130112,
+        "size": 46024
+      },
+      {
+        "index": 6,
+        "address": 0,
+        "size": 0
+      },
+      {
+        "index": 7,
+        "address": 0,
+        "size": 0
+      },
+      {
+        "index": 8,
+        "address": 0,
+        "size": 0
+      },
+      {
+        "index": 9,
+        "address": 21335904,
+        "size": 40
+      },
+      {
+        "index": 10,
+        "address": 0,
+        "size": 0
+      },
+      {
+        "index": 11,
+        "address": 0,
+        "size": 0
+      },
+      {
+        "index": 12,
+        "address": 23115448,
+        "size": 1560
+      },
+      {
+        "index": 13,
+        "address": 0,
+        "size": 0
+      },
+      {
+        "index": 14,
+        "address": 0,
+        "size": 0
+      },
+      {
+        "index": 15,
+        "address": 0,
+        "size": 0
+      }
+    ],
+    "actual_PE_header_bytes": {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-validation-03/PE-headers/dispatcher.bin",
+      "sha256": "779c2afff1579af8acb9d3c05164c69bd6caf9252198e0e521171107625e3d76",
+      "size_bytes": 728
+    }
+  },
+  "review_Source": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-artifact-review-prep-01/check.py",
+    "sha256": "348db7c7a0f20d07188b7be53173c3c0fbdc512192924e8d9e42ddebb164449f",
+    "size_bytes": 12170
+  },
+  "review_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-artifact-review-prep-01/manifest.json",
+    "sha256": "bdda12da0b19d3b56e01b6b3da06dfbd13fd7e61b199f84f015113ec4da18dcb",
+    "size_bytes": 6390
+  },
+  "scope": "Actual current full Source/application/formatter/policy, four genuine quality commands, sole Cargo artifact and complete raw x64 PE headers/entry/8MiB stack. No target execution, loader/security equivalence, FP state, scientific parity or ordinary closure.",
+  "target_execution_performed": false,
+  "scientific_PASS_claimed": false,
+  "gates_updated": false
+}

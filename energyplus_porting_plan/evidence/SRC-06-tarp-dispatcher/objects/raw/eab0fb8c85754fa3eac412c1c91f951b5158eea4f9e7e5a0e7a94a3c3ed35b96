@@ -1,0 +1,788 @@
+//! Retained selected InitIntConvCoeff owners and its genuine no-user setup.
+//!
+//! This shared entry does not install ordinary timestep cadence. Callers supply
+//! validated identities, separate space MAT, actual static geometry, readiness,
+//! full named temperature owner and the existing borrowed report/error backend.
+
+mod geometry;
+use super::convection::tarp_inside::detailed_inside_coefficient_w_per_m2_k;
+use super::error_backend::{SourceErrorBackend, SourceErrorBackendFailure};
+use super::inside_convection_layout::{
+    InsideConvectionAssociationUnavailable, InsideConvectionLayout,
+};
+use super::report_scan::{
+    ReportScanDiagnostic, ReportScanFailure, ReportScanState, ReportScanUnavailable,
+    try_scan_for_reports,
+};
+use ep_model::{ReportInputs, SpaceId, SurfaceId, SurfaceType, ZoneId};
+pub use geometry::ConvectionGeometrySummary;
+
+/// A missing or unsupported actual owner; never an invented Native outcome.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum InsideConvectionUnavailable {
+    /// Duplicate/missing/stale zone, space or surface association.
+    Association,
+    /// Static metadata inputs are outside the represented finite geometry domain.
+    Geometry,
+    /// One of the six actual user-convection object counts is nonzero.
+    UserConvectionInput,
+    /// Selected opaque TARP entry cannot represent this actual algorithm/branch.
+    AlgorithmOrSurface,
+    /// Genuine Details reporting was reached; its report writer is not ported here.
+    SurfaceDetailsReport,
+    /// A full temperature owner differs in membership or order from its layout.
+    TemperatureOwner,
+}
+impl std::fmt::Display for InsideConvectionUnavailable {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{self:?}")
+    }
+}
+impl std::error::Error for InsideConvectionUnavailable {}
+impl From<InsideConvectionAssociationUnavailable> for InsideConvectionUnavailable {
+    fn from(_: InsideConvectionAssociationUnavailable) -> Self {
+        Self::Association
+    }
+}
+
+/// Retain actual diagnostic failure causes and reached report-cache prefixes.
+#[derive(Debug)]
+pub enum InsideConvectionError {
+    /// A required selected owner or branch is unavailable.
+    Unavailable(InsideConvectionUnavailable),
+    /// Existing ScanForReports rejected an actual call argument.
+    Scan(ReportScanUnavailable),
+    /// The genuine borrowed backend stopped at this actual diagnostic.
+    Backend(SourceErrorBackendFailure),
+}
+impl From<InsideConvectionUnavailable> for InsideConvectionError {
+    fn from(value: InsideConvectionUnavailable) -> Self {
+        Self::Unavailable(value)
+    }
+}
+impl std::fmt::Display for InsideConvectionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Unavailable(e) => write!(f, "inside convection owner unavailable: {e:?}"),
+            Self::Scan(e) => write!(f, "inside convection report scan unavailable: {e:?}"),
+            Self::Backend(e) => std::fmt::Display::fmt(e, f),
+        }
+    }
+}
+impl std::error::Error for InsideConvectionError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::Backend(e) => Some(e),
+            _ => None,
+        }
+    }
+}
+
+/// Six real InputProcessor getNumObjectsFound results, in literal Source order.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct NoUserConvectionInput {
+    counts: [usize; 6],
+}
+impl NoUserConvectionInput {
+    /// Family names queried by the real no-user admission.
+    pub const FAMILIES: [&'static str; 6] = [
+        "SurfaceConvectionAlgorithm:Inside:UserCurve",
+        "SurfaceConvectionAlgorithm:Outside:UserCurve",
+        "SurfaceProperty:ConvectionCoefficients:MultipleSurface",
+        "SurfaceProperty:ConvectionCoefficients",
+        "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections",
+        "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections",
+    ];
+    /// Admit actual getter results; neither an empty typed model nor absent HVAC
+    /// proves these counts. Raw-input callers must supply all six real counts.
+    pub fn new(counts: [usize; 6]) -> Result<Self, InsideConvectionUnavailable> {
+        if counts != [0; 6] {
+            return Err(InsideConvectionUnavailable::UserConvectionInput);
+        }
+        Ok(Self { counts })
+    }
+    /// The retained admitted input facts, not result flags.
+    #[must_use]
+    pub fn counts(&self) -> [usize; 6] {
+        self.counts
+    }
+}
+
+/// Independently retained selected SpaceHeatBalanceData fields.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct SpaceAirTemperature {
+    /// Actual space identity.
+    pub space_id: SpaceId,
+    /// Actual owning zone.
+    pub zone_id: ZoneId,
+    /// Space MAT read by InitIntConvCoeff, distinct from zone MAT.
+    pub mat: f64,
+    /// Space ZT, not an alias of MAT.
+    pub zt: f64,
+    /// Space ZTAV, not an alias of MAT.
+    pub ztav: f64,
+}
+
+/// Persistent selected space-air owner with strict full-array correspondence.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SpaceAirTemperatures {
+    rows: Vec<SpaceAirTemperature>,
+}
+impl SpaceAirTemperatures {
+    /// Real selected constructor values; not a zone-temperature fallback.
+    #[must_use]
+    pub fn allocate(layout: &InsideConvectionLayout) -> Self {
+        Self {
+            rows: layout
+                .spaces()
+                .iter()
+                .map(|&(space_id, zone_id)| SpaceAirTemperature {
+                    space_id,
+                    zone_id,
+                    mat: 23.0,
+                    zt: 23.0,
+                    ztav: 23.0,
+                })
+                .collect(),
+        }
+    }
+    /// Read the actual persistent selected array, in space array order.
+    #[must_use]
+    pub fn rows(&self) -> &[SpaceAirTemperature] {
+        &self.rows
+    }
+    /// Write independent declared input owners without reconstructing a zone alias.
+    pub fn write_all(
+        &mut self,
+        layout: &InsideConvectionLayout,
+        rows: &[SpaceAirTemperature],
+    ) -> Result<(), InsideConvectionUnavailable> {
+        if rows.len() != layout.spaces().len()
+            || rows
+                .iter()
+                .zip(layout.spaces())
+                .any(|(a, b)| (a.space_id, a.zone_id) != *b)
+        {
+            return Err(InsideConvectionUnavailable::Association);
+        }
+        self.rows.clone_from_slice(rows);
+        Ok(())
+    }
+    /// Genuine selected BeginEnvrn reconstruction, including spaces when space
+    /// simulation is disabled. This does not claim other SpaceHeatBalance fields.
+    pub fn reset_begin_environment(
+        &mut self,
+        layout: &InsideConvectionLayout,
+    ) -> Result<(), InsideConvectionUnavailable> {
+        self.validate(layout)?;
+        for row in &mut self.rows {
+            row.mat = 23.0;
+            row.zt = 23.0;
+            row.ztav = 23.0;
+        }
+        Ok(())
+    }
+    /// Actual disabled-space/sizing selected ZT/MAT copy after zone correction.
+    /// No ZTAV write occurs at Original3843–3847; its previous owner is retained.
+    pub fn copy_zone_after_correction(
+        &mut self,
+        layout: &InsideConvectionLayout,
+        zone_id: ZoneId,
+        zone_zt: f64,
+        zone_mat: f64,
+    ) -> Result<(), InsideConvectionUnavailable> {
+        self.validate(layout)?;
+        if !layout.zones().contains(&zone_id) {
+            return Err(InsideConvectionUnavailable::Association);
+        }
+        for group in layout.groups().iter().filter(|g| g.zone_id == zone_id) {
+            let row = self
+                .rows
+                .iter_mut()
+                .find(|r| r.space_id == group.space_id)
+                .ok_or(InsideConvectionUnavailable::Association)?;
+            row.zt = zone_zt;
+            row.mat = zone_mat;
+        }
+        Ok(())
+    }
+    fn validate(&self, layout: &InsideConvectionLayout) -> Result<(), InsideConvectionUnavailable> {
+        if self.rows.len() != layout.spaces().len()
+            || self
+                .rows
+                .iter()
+                .zip(layout.spaces())
+                .any(|(a, b)| (a.space_id, a.zone_id) != *b)
+        {
+            return Err(InsideConvectionUnavailable::Association);
+        }
+        Ok(())
+    }
+}
+
+/// Selected zone static owners already produced by the actual loader/caller.
+#[derive(Clone, Debug, PartialEq)]
+pub struct InsideConvectionZone {
+    /// Actual zone identity.
+    pub zone_id: ZoneId,
+    /// Actual IntConvAlgo; only TARP is admitted by this selected entry.
+    pub tarp: bool,
+    /// Actual CeilingHeight.
+    pub ceiling_height: f64,
+    /// Actual Volume.
+    pub volume: f64,
+    /// Actual FloorArea.
+    pub floor_area: f64,
+    /// Actual MinimumX/MaximumX/MinimumY/MaximumY.
+    pub xy_bounds: [f64; 4],
+    /// Actual ExtGrossWallArea, not a reconstruction from selected surfaces.
+    pub exterior_gross_wall_area: f64,
+    /// Actual ExtWindowArea; zero is required for this opaque selected branch.
+    pub exterior_window_area: f64,
+    /// Actual Multiplier.
+    pub multiplier: i32,
+    /// Actual ListMultiplier.
+    pub list_multiplier: i32,
+}
+
+/// Actual inside algorithm selection, before SetByZone is resolved.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum InsideConvectionModel {
+    /// Preserve actual surface default; resolve the owning zone at the call.
+    SetByZone,
+    /// Explicit ASHRAETARP assignment.
+    Tarp,
+}
+impl InsideConvectionModel {
+    /// Literal Convect::HcInt enum identity for retained owner observation.
+    #[must_use]
+    pub const fn source_id(self) -> i32 {
+        match self {
+            Self::SetByZone => 2,
+            Self::Tarp => 4,
+        }
+    }
+}
+
+/// Actual selected opaque surface static owners; values are never re-derived
+/// from a temperature view, Native result, or selected coefficient.
+#[derive(Clone, Debug, PartialEq)]
+pub struct InsideConvectionSurface {
+    /// Actual surface ID and independent Zone/spaceNum are in the layout.
+    pub surface_id: SurfaceId,
+    /// Actual base class, including Ceiling represented as Roof for this entry.
+    pub class: SurfaceType,
+    /// Actual exterior-boundary predicate.
+    pub exterior: bool,
+    /// Actual HeatTransSurf predicate.
+    pub heat_transfer: bool,
+    /// Actual construction TypeIsWindow predicate; unsupported if true.
+    pub construction_is_window: bool,
+    /// Actual Kiva boundary predicate; unsupported if true.
+    pub kiva: bool,
+    /// Actual representative calculation predicate; unsupported if true.
+    pub representative_calculations: bool,
+    /// Actual EMS override flag; unsupported if true.
+    pub ems_override: bool,
+    /// Actual CosTilt; passed unchanged to the existing detailed kernel.
+    pub outward_cos_tilt: f64,
+    /// Actual Tilt.
+    pub tilt: f64,
+    /// Actual Azimuth.
+    pub azimuth: f64,
+    /// Actual Area.
+    pub area: f64,
+    /// Actual GrossArea.
+    pub gross_area: f64,
+    /// Actual Width.
+    pub width: f64,
+    /// Actual Perimeter.
+    pub perimeter: f64,
+    /// Actual ordered Vertex array.
+    pub vertices: Vec<[f64; 3]>,
+}
+
+/// Retained selected SurfIntConv/SurfExtConv and SurfHConvInt owners.
+/// Unwritten classification/model-equation members remain independently stored.
+#[derive(Clone, Debug, PartialEq)]
+pub struct InsideConvectionSurfaceState {
+    /// Actual surface identity, in actual surface array order.
+    pub surface_id: SurfaceId,
+    /// Retained model, not overwritten by local SetByZone resolution.
+    pub model: InsideConvectionModel,
+    /// SurfHConvInt, changed only by the reached actual calculation.
+    pub coefficient: f64,
+    /// SurfTAirRef and SurfTAirRefRpt, unchanged by selected TARP.
+    pub reference_air: [i32; 2],
+    /// SurfIntConv zoneWallHeight/zonePerimLength/zoneHorizHydrDiam/windowWallRatio.
+    pub interior_geometry: [f64; 4],
+    /// SurfIntConv windowLocation, retained NotSet in no-window domain.
+    pub window_location: i32,
+    /// SurfIntConv getsRadiantHeat and hasActiveInIt.
+    pub radiant_and_active: [bool; 2],
+    /// Unwritten SurfIntConv convClass/convClassRpt/userModelNum/hcModelEq/hcModelEqRpt/hcUserCurveNum.
+    pub interior_classification: [i32; 6],
+    /// SurfExtConv faceArea/facePerimeter/faceHeight.
+    pub exterior_geometry: [f64; 3],
+    /// Unwritten SurfExtConv convClass/convClassRpt/model/userModelNum/hfModelEq/hfModelEqRpt/hfUserCurveNum/hnModelEq/hnModelEqRpt/hnUserCurveNum.
+    pub exterior_classification: [i32; 10],
+}
+impl InsideConvectionSurfaceState {
+    /// Real selected surfIntConv/surfExtConv defaults plus actual caller HConv/ref.
+    #[must_use]
+    pub fn new(surface_id: SurfaceId, coefficient: f64, reference_air: [i32; 2]) -> Self {
+        Self {
+            surface_id,
+            model: InsideConvectionModel::SetByZone,
+            coefficient,
+            reference_air,
+            interior_geometry: [0.0; 4],
+            window_location: 0,
+            radiant_and_active: [false; 2],
+            interior_classification: [-1, -1, 0, -1, -1, 0],
+            exterior_geometry: [0.0; 3],
+            exterior_classification: [-1, -1, 2, 0, -1, -1, 0, -1, -1, 0],
+        }
+    }
+}
+
+/// No occupied user record is representable in the selected no-user domain.
+#[derive(Clone, Debug, PartialEq)]
+pub enum AbsentUserConvectionRecord {}
+
+/// Persistent genuine first-call/setup flags and all selected mutated owners.
+#[derive(Clone, Debug, PartialEq)]
+pub struct InsideConvectionState {
+    layout: InsideConvectionLayout,
+    /// Separate persistent actual space-air array.
+    pub space_air: SpaceAirTemperatures,
+    /// Actual ordered surface metadata and HConv owners.
+    pub surfaces: Vec<InsideConvectionSurfaceState>,
+    /// GetUserSuppliedConvectionCoeffs, constructor true.
+    pub get_user_input: bool,
+    /// NodeCheck, cleared only when genuine readiness conditions are met.
+    pub node_check: bool,
+    /// ActiveSurfaceCheck, cleared only after the actual radiant setup call.
+    pub active_surface_check: bool,
+    /// MyEnvirnFlag, constructor true; actual BeginEnvrn/reset transition.
+    pub my_environment: bool,
+    /// FirstRoofSurf, untouched by this selected caller.
+    pub first_roof_surface: bool,
+    /// CubeRootOfOverallBuildingVolume.
+    pub cube_root_building_volume: f64,
+    /// RoofLongAxisOutwardAzimuth.
+    pub roof_long_axis_outward_azimuth: f64,
+    /// The four actual allocated zero-length families. None is unallocated.
+    pub user_arrays: [Option<Vec<AbsentUserConvectionRecord>>; 4],
+    /// TotUserIntConvModels and TotUserExtConvModels.
+    pub user_model_counts: [usize; 2],
+    /// Actual ZoneEquipConfig wall/ceiling/floor active-element members.
+    pub active_elements: Vec<(ZoneId, [bool; 3])>,
+}
+impl InsideConvectionState {
+    /// Allocate selected persistent air owners and retain actual surface seeds.
+    pub fn new(
+        layout: &InsideConvectionLayout,
+        surfaces: Vec<InsideConvectionSurfaceState>,
+        active_elements: Vec<(ZoneId, [bool; 3])>,
+    ) -> Result<Self, InsideConvectionUnavailable> {
+        if surfaces.len() != layout.surfaces().len()
+            || surfaces
+                .iter()
+                .zip(layout.surfaces())
+                .any(|(a, b)| a.surface_id != b.surface_id)
+            || active_elements
+                .iter()
+                .map(|r| r.0)
+                .ne(layout.zones().iter().copied())
+        {
+            return Err(InsideConvectionUnavailable::Association);
+        }
+        Ok(Self {
+            layout: layout.clone(),
+            space_air: SpaceAirTemperatures::allocate(layout),
+            surfaces,
+            get_user_input: true,
+            node_check: true,
+            active_surface_check: true,
+            my_environment: true,
+            first_roof_surface: true,
+            cube_root_building_volume: 0.0,
+            roof_long_axis_outward_azimuth: 0.0,
+            user_arrays: std::array::from_fn(|_| None),
+            user_model_counts: [0; 2],
+            active_elements,
+        })
+    }
+}
+
+/// Distinct actual source array chosen by the caller, never a fallback override.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum InsideSurfaceTemperatureOwner {
+    /// Initial InitIntConvCoeff operand.
+    SurfTempInTmp,
+    /// Inside-iteration refresh operand.
+    SurfTempIn,
+}
+/// Full borrowed source temperature array with explicit IDs/order.
+#[derive(Clone, Copy, Debug)]
+pub struct InsideSurfaceTemperatures<'a> {
+    /// Actual source owner identity, retained for caller observation.
+    pub owner: InsideSurfaceTemperatureOwner,
+    /// Every actual surface ID and its current value in surface array order.
+    pub rows: &'a [(SurfaceId, f64)],
+}
+
+/// Actual readiness/phase operands; no condition is inferred from fixture type.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct InsideConvectionReadiness {
+    /// BeginEnvrnFlag.
+    pub begin_environment: bool,
+    /// SysSizingCalc.
+    pub system_sizing: bool,
+    /// ZoneSizingCalc.
+    pub zone_sizing: bool,
+    /// ZoneEquipInputsFilled.
+    pub equipment_inputs_filled: bool,
+    /// allocated(Node), independent of NumOfNodes.
+    pub nodes_allocated: bool,
+    /// ZoneEquipSimulatedOnce.
+    pub equipment_simulated_once: bool,
+}
+
+fn validate(
+    layout: &InsideConvectionLayout,
+    zones: &[InsideConvectionZone],
+    surfaces: &[InsideConvectionSurface],
+    state: &InsideConvectionState,
+    temperatures: InsideSurfaceTemperatures<'_>,
+) -> Result<(), InsideConvectionUnavailable> {
+    state.space_air.validate(layout)?;
+    if state.layout != *layout
+        || zones
+            .iter()
+            .map(|r| r.zone_id)
+            .ne(layout.zones().iter().copied())
+        || state
+            .active_elements
+            .iter()
+            .map(|r| r.0)
+            .ne(layout.zones().iter().copied())
+        || surfaces
+            .iter()
+            .map(|r| r.surface_id)
+            .ne(layout.surfaces().iter().map(|r| r.surface_id))
+        || state
+            .surfaces
+            .iter()
+            .map(|r| r.surface_id)
+            .ne(layout.surfaces().iter().map(|r| r.surface_id))
+    {
+        return Err(InsideConvectionUnavailable::Association);
+    }
+    if temperatures
+        .rows
+        .iter()
+        .map(|r| r.0)
+        .ne(layout.surfaces().iter().map(|r| r.surface_id))
+    {
+        return Err(InsideConvectionUnavailable::TemperatureOwner);
+    }
+    for zone in zones {
+        let [xmin, xmax, ymin, ymax] = zone.xy_bounds;
+        if !zone.tarp {
+            return Err(InsideConvectionUnavailable::AlgorithmOrSurface);
+        }
+        if ![
+            zone.ceiling_height,
+            zone.volume,
+            zone.floor_area,
+            xmin,
+            xmax,
+            ymin,
+            ymax,
+            zone.exterior_gross_wall_area,
+            zone.exterior_window_area,
+        ]
+        .iter()
+        .all(|v| v.is_finite())
+            || zone.ceiling_height <= 0.0
+            || zone.volume <= 0.0
+            || zone.floor_area <= 0.0
+            || xmax <= xmin
+            || ymax <= ymin
+            || zone.multiplier <= 0
+            || zone.list_multiplier <= 0
+            || zone.exterior_gross_wall_area < 0.0
+            || zone.exterior_window_area != 0.0
+        {
+            return Err(InsideConvectionUnavailable::Geometry);
+        }
+    }
+    for surface in surfaces {
+        if !surface.heat_transfer
+            || surface.construction_is_window
+            || surface.kiva
+            || surface.representative_calculations
+            || surface.ems_override
+        {
+            return Err(InsideConvectionUnavailable::AlgorithmOrSurface);
+        }
+        if ![
+            surface.outward_cos_tilt,
+            surface.tilt,
+            surface.azimuth,
+            surface.area,
+            surface.gross_area,
+            surface.width,
+            surface.perimeter,
+        ]
+        .iter()
+        .all(|v| v.is_finite())
+            || !(-1.0..=1.0).contains(&surface.outward_cos_tilt)
+            || !(0.0..=180.0).contains(&surface.tilt)
+            || !(0.0..360.0).contains(&surface.azimuth)
+            || surface.area <= 0.0
+            || surface.gross_area <= 0.0
+            || surface.width <= 0.0
+            || surface.perimeter <= 0.0
+            || surface.vertices.len() < 3
+            || surface.vertices.iter().flatten().any(|v| !v.is_finite())
+        {
+            return Err(InsideConvectionUnavailable::Geometry);
+        }
+        if surface.exterior
+            && surface.tilt <= 45.0
+            && surface.vertices.iter().enumerate().any(|(i, p)| {
+                let next = surface.vertices[(i + 1) % surface.vertices.len()];
+                let t = std::array::from_fn::<_, 3, _>(|axis| next[axis] - p[axis]);
+                ((t[0] * t[0]) + (t[1] * t[1]) + (t[2] * t[2])).sqrt() == 0.0
+            })
+        {
+            // Original normalize asserts computed length != 0, including underflow.
+            // A computed +Inf length remains admitted and follows Source IEEE operations.
+            return Err(InsideConvectionUnavailable::Geometry);
+        }
+    }
+    Ok(())
+}
+
+fn setup_static(
+    layout: &InsideConvectionLayout,
+    zones: &[InsideConvectionZone],
+    surfaces: &[InsideConvectionSurface],
+    state: &mut InsideConvectionState,
+) -> Result<(), InsideConvectionUnavailable> {
+    let mut building_volume = 0.0;
+    for zone in zones {
+        building_volume +=
+            zone.volume * f64::from(zone.multiplier) * f64::from(zone.list_multiplier);
+        let mut perimeter = 0.0;
+        let [xmin, xmax, ymin, ymax] = zone.xy_bounds;
+        let simple_perimeter = 2.0 * (ymax - ymin) + 2.0 * (xmax - xmin);
+        let diameter = if simple_perimeter > 0.0 {
+            4.0 * zone.floor_area / simple_perimeter
+        } else {
+            zone.floor_area.sqrt()
+        };
+        let ratio = if zone.exterior_gross_wall_area > 0.0 {
+            zone.exterior_window_area / zone.exterior_gross_wall_area
+        } else {
+            -999.0
+        };
+        for group in layout.groups().iter().filter(|g| g.zone_id == zone.zone_id) {
+            for id in &group.surfaces {
+                let surface = surfaces
+                    .iter()
+                    .find(|r| r.surface_id == *id)
+                    .ok_or(InsideConvectionUnavailable::Association)?;
+                if surface.exterior && surface.class == SurfaceType::Wall {
+                    perimeter += surface.width;
+                }
+            }
+        }
+        for group in layout.groups().iter().filter(|g| g.zone_id == zone.zone_id) {
+            for id in &group.surfaces {
+                let row = state
+                    .surfaces
+                    .iter_mut()
+                    .find(|r| r.surface_id == *id)
+                    .ok_or(InsideConvectionUnavailable::Association)?;
+                row.interior_geometry = [zone.ceiling_height, perimeter, diameter, ratio];
+            }
+        }
+        // ExtWindowCount is genuinely zero in this admitted opaque domain.
+    }
+    state.cube_root_building_volume = building_volume.powf(1.0 / 3.0);
+    let roof = geometry::roof(surfaces);
+    state.roof_long_axis_outward_azimuth = roof.azimuth;
+    let facades = geometry::facades(surfaces)?;
+    for (surface, row) in surfaces.iter().zip(&mut state.surfaces) {
+        if !surface.exterior || !surface.heat_transfer {
+            continue;
+        }
+        // This distinct extrema loop retains Original's else-if ordering.
+        let mut low = f64::MAX;
+        let mut high = -f64::MAX;
+        for p in &surface.vertices {
+            if p[2] < low {
+                low = p[2];
+            } else if p[2] > high {
+                high = p[2];
+            }
+        }
+        let height = high - low;
+        row.exterior_geometry = if surface.tilt >= 45.0 && surface.tilt < 135.0 {
+            let facade = facades[geometry::compass(surface.azimuth)?];
+            [
+                geometry::source_max(facade.area, surface.gross_area),
+                geometry::source_max(facade.perimeter, surface.perimeter),
+                geometry::source_max(facade.height, height),
+            ]
+        } else if surface.tilt < 45.0 {
+            [
+                geometry::source_max(roof.area, surface.gross_area),
+                geometry::source_max(roof.perimeter, surface.perimeter),
+                geometry::source_max(roof.height, height),
+            ]
+        } else {
+            [surface.gross_area, surface.perimeter, height]
+        };
+    }
+    Ok(())
+}
+
+/// Execute the genuine selected no-user first call, readiness transitions and
+/// opaque TARP traversal. Unsupported branches stop explicitly; success covers
+/// this declared selected domain, never full adaptive/window/user setup.
+pub fn initialize_inside_convection(
+    layout: &InsideConvectionLayout,
+    zones: &[InsideConvectionZone],
+    surfaces: &[InsideConvectionSurface],
+    no_user_input: NoUserConvectionInput,
+    state: &mut InsideConvectionState,
+    temperatures: InsideSurfaceTemperatures<'_>,
+    readiness: InsideConvectionReadiness,
+    actual_low_limit: f64,
+    actual_reports: &ReportInputs,
+    scan: &mut ReportScanState,
+    backend: &mut SourceErrorBackend<'_>,
+) -> Result<(), InsideConvectionError> {
+    validate(layout, zones, surfaces, state, temperatures)?;
+    if no_user_input.counts() != [0; 6] {
+        return Err(InsideConvectionUnavailable::UserConvectionInput.into());
+    }
+    if state.get_user_input {
+        // GetUser: allocate both zero user curves, then reset/count/allocate
+        // both zero surface model arrays, reset counts, and run static setup.
+        state.user_arrays[0] = Some(Vec::new());
+        state.user_arrays[1] = Some(Vec::new());
+        state.user_model_counts = [0; 2];
+        state.user_arrays[2] = Some(Vec::new());
+        state.user_arrays[3] = Some(Vec::new());
+        state.user_model_counts = [0; 2];
+        setup_static(layout, zones, surfaces, state)?;
+        let details = try_scan_for_reports(
+            actual_reports,
+            scan,
+            "Surfaces",
+            Some("Details"),
+            None,
+            None,
+            |diagnostic| match diagnostic {
+                ReportScanDiagnostic::Warning(message) => backend.show_warning_error(&message),
+                ReportScanDiagnostic::Continue(message) => backend.show_continue_error(&message),
+            },
+        )
+        .map_err(|error| match error {
+            ReportScanFailure::Unavailable(value) => InsideConvectionError::Scan(value),
+            ReportScanFailure::Diagnostic(value) => InsideConvectionError::Backend(value),
+        })?;
+        if details {
+            return Err(InsideConvectionUnavailable::SurfaceDetailsReport.into());
+        }
+        state.get_user_input = false;
+    }
+    if state.node_check
+        && !readiness.system_sizing
+        && !readiness.zone_sizing
+        && readiness.equipment_inputs_filled
+        && readiness.nodes_allocated
+    {
+        // Every genuine admitted zone is TARP: the CeilingDiffuser warning
+        // loop makes no writes; do not infer readiness from that fact.
+        state.node_check = false;
+    }
+    if state.active_surface_check
+        && !readiness.system_sizing
+        && !readiness.zone_sizing
+        && readiness.equipment_simulated_once
+    {
+        for (zone, active) in &mut state.active_elements {
+            let mut count = [0; 3];
+            let mut area = [0.0; 3];
+            for group in layout.groups().iter().filter(|g| g.zone_id == *zone) {
+                for id in &group.surfaces {
+                    let index = state
+                        .surfaces
+                        .iter()
+                        .position(|r| r.surface_id == *id)
+                        .ok_or(InsideConvectionUnavailable::Association)?;
+                    if !state.surfaces[index].radiant_and_active[1] {
+                        continue;
+                    }
+                    let kind = match surfaces[index].class {
+                        SurfaceType::Wall => 0,
+                        SurfaceType::Roof | SurfaceType::Ceiling => 1,
+                        SurfaceType::Floor => 2,
+                    };
+                    count[kind] += 1;
+                    area[kind] += surfaces[index].area;
+                }
+            }
+            *active = std::array::from_fn(|i| count[i] > 0 && area[i] > 0.0);
+        }
+        state.active_surface_check = false;
+    }
+    // Both actual surface model alternatives and every admitted zone are TARP;
+    // the BeginEnvrn adaptive search is genuinely false, so Node reset is not reached.
+    if readiness.begin_environment && state.my_environment {
+        state.my_environment = false;
+    }
+    if !readiness.begin_environment {
+        state.my_environment = true;
+    }
+    for group in layout.groups() {
+        let mat = state
+            .space_air
+            .rows
+            .iter()
+            .find(|r| r.space_id == group.space_id)
+            .ok_or(InsideConvectionUnavailable::Association)?
+            .mat;
+        for id in &group.surfaces {
+            let index = state
+                .surfaces
+                .iter()
+                .position(|r| r.surface_id == *id)
+                .ok_or(InsideConvectionUnavailable::Association)?;
+            // SetByZone is a local resolution only: retain the actual model owner.
+            let mut coefficient = detailed_inside_coefficient_w_per_m2_k(
+                temperatures.rows[index].1,
+                mat,
+                surfaces[index].outward_cos_tilt,
+                actual_low_limit,
+            );
+            // The caller's second strict lower-limit check is distinct and retained.
+            if coefficient < actual_low_limit {
+                coefficient = actual_low_limit;
+            }
+            state.surfaces[index].coefficient = coefficient;
+        }
+    }
+    // Actual WindowSurface ranges are empty in this selected opaque domain.
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests;

@@ -1,0 +1,182 @@
+{
+  "schema": "src06-tarp-dispatcher-Rust-prospective-pair-policy.v1",
+  "status": "HELD-Source-only-before-any-Rust-dispatcher-observation",
+  "expected_values_supplied": false,
+  "Native_results_supplied_as_inputs": false,
+  "Native_source_preparation_sha256": "954a7779868d3ac65d88c553aab324f5e5e0a88d5d455a3126aecc5012ca3d50",
+  "Rust_dispatcher_source_preparation_sha256": "0888b88cd65dff863461bac16b271d967b90c5af6ef43df6e247a025aa325889",
+  "unchanged_input_request_sha256": "cb52b8d846b280dcae02b9261eca84e90a742e01051180bca0fac8318487e23d",
+  "literal_IDF_sha256": "f3a89522e94a03bff136879aa64545aaad434437142023dac886bf51d723003a",
+  "input_admission": {
+    "complete_fixed_cases": 8,
+    "complete_fixed_Init_calls": 20,
+    "complete_literal_binary64_cells": 700,
+    "identity": "Full unchanged request bytes and each complete literal_input row must agree before endpoints; preserve every case and operation order and ID.",
+    "physical_IDF": "The actual same 158 bytes must join Native physical IDF before/after, Rust physical IDF before/after, conversion original/staged inputs and preserved IDF parser overlay.",
+    "conversion": "Existing genuine SCH-01 converter ledger, actual command receipt/stdout, child execution and epJSON refs with unchanged Source, exact argv/timing and full SHA/size joins; no engine or answers.",
+    "counts": "All six actual Native InputProcessor getters and all six independently derived Rust RawModel counts must match each family/order/value; Rust does not claim InputProcessor semantics.",
+    "reports": "Rust invokes actual parse_epjson_str_with_idf_order and compile_raw_model once per case. Preserve full compiler diagnostics and actual ReportInputs. Missing typed model is required unavailable, never an empty ReportInputs fallback.",
+    "associations": "Derive the one-zone IDs, every actual space ID, complete Zone.spaceIndexes permutation, each inclusive HT range (including [1,0]), all Surface.Zone/spaceNum and full surface temperature order directly from literal input; exact equality before pairing. No ordinal zip across unmatched IDs.",
+    "active_scope": "Only actual one-zone opaque exterior TARP/SetByZone, no user/override/window/Kiva/representative/resimulation inputs; genuine first-call flags stay true. Explicit caller readiness and independent space MAT determine actual calls.",
+    "precall_writes": "For EVERY operation compare full literal writes and actual Native/Rust after_declared_writes: all phase/readiness flags, zone MAT, every independent space MAT, every SurfTempIn/SurfTempInTmp scalar, actual named temperature selector and all preexisting selected state. Initial selected owners must also agree before the first actual call.",
+    "actual_typed_caller_owners": "Every prepared/write/call/final boundary must copy the actual borrowed typed_zones and typed_surfaces passed to initialize_inside_convection, not only the literal_input echo. Compare exact ordered ZoneId/TARP/ceiling/volume/floor/xy bounds/wall-window areas/multipliers and SurfaceId/class/exterior/HeatTransSurf/window/Kiva/representative/EMS predicates/cos/tilt/azimuth/area/gross/width/perimeter/every ordered vertex against actual Native owners before endpoint admission. Retain and compare these inputs after each call too; any missing owner is required absence."
+  },
+  "matching": {
+    "case": "Exact case_id and complete ordered literal input; duplicate/missing cases are uncapped integrity failures.",
+    "call": "Exact operation_id, declared temperature owner, Native api Convect::InitIntConvCoeff and Rust api initialize_inside_convection; each actual invocation+return/error retained. Native processInput is a separate call, so selected ordinal is Native actual_call_ordinal-1 versus Rust actual_call_ordinal; each full ordered ledger must satisfy its own literal ordinal sequence.",
+    "boundary": [
+      "prepared_literal_owners",
+      "actual_operation_input_writes.before_declared_writes",
+      "actual_operation_input_writes.after_declared_writes",
+      "actual_calls.before",
+      "actual_calls.after",
+      "final"
+    ],
+    "outer_source_custody": "Require actual closed Native providers/PE/core/input/binary-before-after and closed Rust Cargo emitted artifact/full SourceSnapshot/source+input+policy before-after before comparing. No result file may supply runner operands.",
+    "no_inner_trace": "Linked Original exposes no per-surface branch/call trace. Do not synthesize visits or use Rust inferred branches as Native observations."
+  },
+  "exact_copy_rules": {
+    "scalar": "binary64 value_bits and value_class exact, including signed zero; JSON finite value is a consistency witness, not a tolerance comparison",
+    "discrete": "bool/int/string/name/ID/order/length/allocation/presence exact",
+    "absolute_tolerance": 0,
+    "relative_tolerance": 0,
+    "ULP_tolerance": 0,
+    "containers": "Retain complete rows and all tails; reject missing/duplicate IDs, inconsistent dimensions and unavailable values rather than truncate. Rust representation tags are transport metadata and never Native fields.",
+    "Objexx_empty_user_curves": "Native actual allocated=false => lower/upper null and size0; Rust None. Native actual allocated=true => lower1 upper0 size0 rows[]; Rust Some(empty). Both actual Native bounds must be checked explicitly; no blanket Vec-to-Objexx indexing equivalence.",
+    "EPVector_empty_user_models": "Native actual allocated flag,size0,rows[],indexing EPVector one-based; Rust None/Some(empty) distinct. Do not invent Objexx bounds for EPVector.",
+    "selected_array_transport": "Rust Vec owners retain complete explicit Source ID/order; compare Native EPVector or Objexx metadata against declared selected allocation operation and complete rows. Native absent/unavailable rows never become Rust empty success."
+  },
+  "required_selected_owner_groups": {
+    "flags": [
+      "GetUserSuppliedConvectionCoeffs",
+      "NodeCheck",
+      "ActiveSurfaceCheck",
+      "MyEnvirnFlag",
+      "FirstRoofSurf"
+    ],
+    "counts_and_allocations": [
+      "TotUserIntConvModels",
+      "TotUserExtConvModels",
+      "hcIntUserCurve",
+      "hcExtUserCurve",
+      "userIntConvModels",
+      "userExtConvModels"
+    ],
+    "space_temperature": "Every spaceHeatBalance row actual MAT/ZT/ZTAV and identity; actual zoneHeatBalance(1).MAT maps to Rust zoneHeatBalance_MAT_input_owner. Zone ZT/ZTAV and other fields are explicitly outside selected owners.",
+    "full_temperature_and_reference_arrays": [
+      "SurfTempIn",
+      "SurfTempInTmp",
+      "SurfHConvInt",
+      "SurfTAirRef",
+      "SurfTAirRefRpt",
+      "LowHConvLimit"
+    ],
+    "surface_interior_full14": [
+      "convClass",
+      "convClassRpt",
+      "model",
+      "userModelNum",
+      "hcModelEq",
+      "hcModelEqRpt",
+      "hcUserCurveNum",
+      "zoneWallHeight",
+      "zonePerimLength",
+      "zoneHorizHydrDiam",
+      "windowWallRatio",
+      "windowLocation",
+      "getsRadiantHeat",
+      "hasActiveInIt"
+    ],
+    "surface_exterior_full13": [
+      "convClass",
+      "convClassRpt",
+      "model",
+      "userModelNum",
+      "hfModelEq",
+      "hfModelEqRpt",
+      "hfUserCurveNum",
+      "hnModelEq",
+      "hnModelEqRpt",
+      "hnUserCurveNum",
+      "faceArea",
+      "facePerimeter",
+      "faceHeight"
+    ],
+    "static_global": [
+      "CubeRootOfOverallBuildingVolume",
+      "RoofLongAxisOutwardAzimuth"
+    ],
+    "equipment": [
+      "InWallActiveElement",
+      "InCeilingActiveElement",
+      "InFloorActiveElement"
+    ],
+    "Scan": "All31 actual Scan_cache bool/string fields; real first-call query and complete later retained cache, with no seeded no-report outcome.",
+    "backend": "All six severity counters, LastSevereError, AbortProcessing, all20 MatchCounts, outputErrorHeader, DoingInputProcessing, printConsoleOutput, actual callback/fMessage/sqlite presence; Native MatchCounts Objexx rows map to Rust complete20-value array. Version/IDD/current-time strings remain explicitly unpaired.",
+    "call_transport": "Validate actual after stream/callback prefixes extend before; compare complete newly reached byte/message delta per selected call, retaining actual global ordinals and proving every delta ordinal. Native input-process/disposal prefix remains captured/unpaired. No cap. Rust error/console/eio byte DTOs decode to exact bytes before comparison.",
+    "actual_typed_caller_inputs": {
+      "typed_zones": [
+        "zone_id",
+        "tarp",
+        "CeilingHeight",
+        "Volume",
+        "FloorArea",
+        "MinimumX",
+        "MaximumX",
+        "MinimumY",
+        "MaximumY",
+        "ExtGrossWallArea",
+        "ExtWindowArea",
+        "Multiplier",
+        "ListMultiplier"
+      ],
+      "typed_surfaces": [
+        "surface_id",
+        "class",
+        "exterior",
+        "heat_transfer",
+        "construction_is_window",
+        "kiva",
+        "representative_calculations",
+        "ems_override",
+        "CosTilt",
+        "Tilt",
+        "Azimuth",
+        "Area",
+        "GrossArea",
+        "Width",
+        "Perimeter",
+        "Vertex"
+      ],
+      "Native_mapping": "Native Zone IntConvAlgo must be actual ASHRAETARP for Rust tarp=true; Surface Class uses exact Source enum mapping. Full layout carries actual Zone/spaceNum/HT order. No unsupported predicate or missing owner is defaulted."
+    }
+  },
+  "arithmetic_scope": {
+    "coefficient": "Every genuinely returned selected SurfHConvInt endpoint, exact finite bits; initial/precall HConv is an exact copy owner.",
+    "static_metadata": "Explicitly prospective additional selected setup pairing: written Int/Ext geometry4+3 for EVERY surface and two actual static global scalars. Initial and unmodified fields are copy owners; computed fields are exact finite arithmetic. This extends the historical Native-capture-only unpaired metadata policy without changing its immutable file or claiming prior PASS.",
+    "generated_nonfinite": "Finite inputs do not guarantee finite derived static fields. Preserve each actual nonfinite class/bits as diagnostic/unavailable, never numerical PASS. Required selected arithmetic unavailable precludes selected paired PASS; do not add floors/tolerances or substitute a finite value.",
+    "negative_controls": "Tiny distinct roof edge whose actual squared length underflows to0 is typed unavailable before Rust setup; Original normalize assertion domain is not represented as successful parity. Infinite computed edge length follows actual Source IEEE operations, with generated nonfinite outcomes diagnostic only."
+  },
+  "full_unavailable_ledger_required": [
+    "Native fresh EnergyPlusData constructor and InputProcessor processInput semantics",
+    "actual inner per-surface Native invocation/branch trace",
+    "upstream parsed geometry/MAT/correction producers and ordinary cadence/clock/handoff",
+    "Native zone/space/surface/node/global members outside exact selected groups",
+    "Details/advanced geometry report writer and all user/adaptive/window/Kiva/representative/EMS/resimulation/radiant physics",
+    "Native version/IDD/current-time strings and input-processing/disposal-only transport",
+    "Native Zone/space/surface names and Surface.Height are literal input context but absent from actual selected Rust typed geometry owners; no synthesized typed owner or pairing claim."
+  ],
+  "result_contract": {
+    "every_selected_mismatch_retained": true,
+    "every_unmatched_or_unavailable_retained": true,
+    "required_absence_counts_as_failure": true,
+    "unavailable_counted_as_PASS": false,
+    "selected_paired_PASS_only_if": "all required input/custody/owner joins represented, all reached required endpoints available and finite, no unmatched/required absence and zero selected mismatches",
+    "copied_setup_owner_match_is_coefficient_PASS": false,
+    "whole_dispatcher_or_SRC06_or_ordinary_PASS": false,
+    "gates_updated": false
+  },
+  "scientific_PASS_claimed": false,
+  "ordinary_production_handoff_verified": false,
+  "gates_updated": false
+}

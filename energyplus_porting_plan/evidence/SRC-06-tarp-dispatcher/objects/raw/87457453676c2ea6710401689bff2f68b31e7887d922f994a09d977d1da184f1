@@ -1,0 +1,21 @@
+{
+  "schema": "src06-tarp-dispatcher-comparison-Source-review.v1",
+  "reviewer_role": "Root",
+  "accepted": true,
+  "Source_preparation": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-comparison-prep-02/manifest.json",
+    "sha256": "8f461b24c749403e2c2f442072d24d03b0afa8a5200e4263451ba38da7e7aa08",
+    "size_bytes": 49094
+  },
+  "complete_runtime_main252_owners243_custody174_and_README_policy_authors_read": true,
+  "authenticated_unique_files": 113,
+  "physical_ranges_verified": 44,
+  "runtime_files_and_pairing_policy_byte_exact_parent01": true,
+  "only_validation_and_import_correction_authority_updated": true,
+  "full_eight_case700_input_admission_and_all_20_calls_preserved": true,
+  "all_ledgers_uncapped_and_nonfinite_unavailable": true,
+  "Native_or_Rust_numerical_results_read": false,
+  "targets_executed": false,
+  "canonical_mutation_performed": false,
+  "gates_updated": false
+}

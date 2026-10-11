@@ -1,0 +1,24 @@
+{
+  "schema": "src06-dispatcher-comparison-Source-peer-review.v1",
+  "accepted": true,
+  "reviewed_manifest": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-comparison-prep-04/manifest.json",
+    "sha256": "18276af01dbb2df78a64b3fd28be42618a9713c42042b1a85189821c1834b097",
+    "size_bytes": 53055
+  },
+  "narrow_cumulative_FULL_Source_accepted": true,
+  "complete_new_native_context_author_73_and_README_read": true,
+  "whole_reference_identities_verified": 123,
+  "literal_ranges_verified": 44,
+  "narrow_diffs_regenerated": 2,
+  "author_and_custody_AST_parsed": true,
+  "one_line_inverse_restores_original_custody": true,
+  "all_other_custody_functions_and_comparer_owner_policy_byte_exact": true,
+  "actual_optional_archive_size_resolved_only_after_full_SHA_bind": true,
+  "findings": [],
+  "authorship_limit": "Raw authored inherited comparer/custody/owner primitives; independent review covers Header one-line optional-metadata repair and authentic Source/manifest packaging, without independent certification of inherited scientific rules.",
+  "target_or_comparison_executed": false,
+  "Native_or_Rust_numeric_output_read": false,
+  "canonical_mutation_performed": false,
+  "gates_updated": false
+}

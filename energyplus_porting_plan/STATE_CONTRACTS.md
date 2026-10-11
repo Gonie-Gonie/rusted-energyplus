@@ -48,3 +48,7 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 ## CTF-10 실제 main 실행의 이력 비교
 
 [동일 A-24H 입력의 전체 비교](evidence/CTF-10-main-thread-history-comparison/summary.json)는 1,340개 대응 단계의 불일치 235,456개와 필수 미확인·미대응 경계 2,754개를 FAIL로 보존한다. 최초 대응 차이는 이력 갱신 전 입력 SurfTempIn에 이미 존재한다. Warmup 횟수·실제 시계·배열 소유자·초기화·반복 호출 시점을 각각 검증해야 하며, 입력 경계의 차이를 특정 생산자의 원인이나 갱신 식의 실패로 단정하지 않는다. 실제 상태와 호출 순서의 동등성 및 전체 게이트는 계속 미확인이다.
+
+## SRC-06 선택 dispatcher의 지속 상태
+
+[실제 선택 초기화 비교](evidence/SRC-06-tarp-dispatcher/summary.json)는 공간별 MAT/ZT/ZTAV를 별개로 보존하고, 비활성 space correction에서 MAT/ZT만 복사한다. 첫 호출·정적 형상·Scan·backend 상태와 실제 zone-space 순서, 명시한 SurfTempInTmp 또는 SurfTempIn을 함께 대조했다. 입력과 전체 pre-owner가 먼저 일치해야 endpoint를 판정하며, 선택 범위 밖264개 문맥은 PASS에 포함하지 않는다. 일반 실행에서의 형상 생산·환경 reset·공기 상태 갱신·두 온도 배열·복사 후 완료 반복30회마다 갱신·즉시 열수지 항 갱신은 아직 별도로 연결하고 검증해야 한다.

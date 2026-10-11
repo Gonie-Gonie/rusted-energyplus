@@ -1,0 +1,136 @@
+--- .runtime/porting/SRC-06/tarp-dispatcher-applied-01/literal/crates/ep_runtime/src/heat_balance/inside_convection_layout.rs
++++ crates/ep_runtime/src/heat_balance/inside_convection_layout.rs
+@@ -49,8 +49,12 @@
+     ) -> Result<Self, InsideConvectionAssociationUnavailable> {
+         let zone_set = zones.iter().copied().collect::<BTreeSet<_>>();
+         let space_set = spaces.iter().map(|r| r.0).collect::<BTreeSet<_>>();
+-        let surface_set = surfaces.iter().map(|r| r.surface_id).collect::<BTreeSet<_>>();
+-        if zone_set.len() != zones.len() || space_set.len() != spaces.len()
++        let surface_set = surfaces
++            .iter()
++            .map(|r| r.surface_id)
++            .collect::<BTreeSet<_>>();
++        if zone_set.len() != zones.len()
++            || space_set.len() != spaces.len()
+             || surface_set.len() != surfaces.len()
+             || spaces.iter().any(|r| !zone_set.contains(&r.1))
+         {
+@@ -60,18 +64,25 @@
+         let mut visited_surfaces = BTreeSet::new();
+         let mut previous_zone_index = 0;
+         for group in &groups {
+-            let zi = zones.iter().position(|id| *id == group.zone_id)
++            let zi = zones
++                .iter()
++                .position(|id| *id == group.zone_id)
+                 .ok_or(InsideConvectionAssociationUnavailable)?;
+-            if zi < previous_zone_index || !spaces.contains(&(group.space_id, group.zone_id))
++            if zi < previous_zone_index
++                || !spaces.contains(&(group.space_id, group.zone_id))
+                 || !visited_spaces.insert(group.space_id)
+             {
+                 return Err(InsideConvectionAssociationUnavailable);
+             }
+             previous_zone_index = zi;
+             for &id in &group.surfaces {
+-                if !visited_surfaces.insert(id) || !surfaces.contains(&InsideConvectionAssociation {
+-                    surface_id: id, zone_id: group.zone_id, space_id: group.space_id,
+-                }) {
++                if !visited_surfaces.insert(id)
++                    || !surfaces.contains(&InsideConvectionAssociation {
++                        surface_id: id,
++                        zone_id: group.zone_id,
++                        space_id: group.space_id,
++                    })
++                {
+                     return Err(InsideConvectionAssociationUnavailable);
+                 }
+             }
+@@ -79,43 +90,74 @@
+         if visited_spaces != space_set || visited_surfaces != surface_set {
+             return Err(InsideConvectionAssociationUnavailable);
+         }
+-        Ok(Self { zones, spaces, surfaces, groups })
++        Ok(Self {
++            zones,
++            spaces,
++            surfaces,
++            groups,
++        })
+     }
+ 
+     /// Use the actual typed Zone.spaces order and Native opaque base-class order.
+-    pub fn from_typed_model(model: &TypedModel) -> Result<Self, InsideConvectionAssociationUnavailable> {
++    pub fn from_typed_model(
++        model: &TypedModel,
++    ) -> Result<Self, InsideConvectionAssociationUnavailable> {
+         let mut groups = Vec::new();
+         for zone in &model.zones {
+             for &space_id in &zone.spaces {
+                 let mut ids = Vec::new();
+                 for class in [SurfaceType::Wall, SurfaceType::Floor, SurfaceType::Roof] {
+                     for surface in &model.surfaces {
+-                        if surface.space == space_id && (surface.surface_type == class
+-                            || (class == SurfaceType::Roof && surface.surface_type == SurfaceType::Ceiling)) {
++                        if surface.space == space_id
++                            && (surface.surface_type == class
++                                || (class == SurfaceType::Roof
++                                    && surface.surface_type == SurfaceType::Ceiling))
++                        {
+                             ids.push(surface.id);
+                         }
+                     }
+                 }
+-                groups.push(InsideConvectionGroup { zone_id: zone.id, space_id, surfaces: ids });
++                groups.push(InsideConvectionGroup {
++                    zone_id: zone.id,
++                    space_id,
++                    surfaces: ids,
++                });
+             }
+         }
+-        Self::new(model.zones.iter().map(|r| r.id).collect(),
++        Self::new(
++            model.zones.iter().map(|r| r.id).collect(),
+             model.spaces.iter().map(|r| (r.id, r.zone)).collect(),
+-            model.surfaces.iter().map(|r| InsideConvectionAssociation {
+-                surface_id: r.id, zone_id: r.zone, space_id: r.space,
+-            }).collect(), groups)
++            model
++                .surfaces
++                .iter()
++                .map(|r| InsideConvectionAssociation {
++                    surface_id: r.id,
++                    zone_id: r.zone,
++                    space_id: r.space,
++                })
++                .collect(),
++            groups,
++        )
+     }
+ 
+     /// Actual zone array IDs, including zones with no spaces.
+     #[must_use]
+-    pub fn zones(&self) -> &[ZoneId] { &self.zones }
++    pub fn zones(&self) -> &[ZoneId] {
++        &self.zones
++    }
+     /// Actual space array IDs and owning zones.
+     #[must_use]
+-    pub fn spaces(&self) -> &[(SpaceId, ZoneId)] { &self.spaces }
++    pub fn spaces(&self) -> &[(SpaceId, ZoneId)] {
++        &self.spaces
++    }
+     /// Actual surface array IDs and associations.
+     #[must_use]
+-    pub fn surfaces(&self) -> &[InsideConvectionAssociation] { &self.surfaces }
++    pub fn surfaces(&self) -> &[InsideConvectionAssociation] {
++        &self.surfaces
++    }
+     /// Real Zone.spaceIndexes followed by the heat-transfer traversal.
+     #[must_use]
+-    pub fn groups(&self) -> &[InsideConvectionGroup] { &self.groups }
++    pub fn groups(&self) -> &[InsideConvectionGroup] {
++        &self.groups
++    }
+ }

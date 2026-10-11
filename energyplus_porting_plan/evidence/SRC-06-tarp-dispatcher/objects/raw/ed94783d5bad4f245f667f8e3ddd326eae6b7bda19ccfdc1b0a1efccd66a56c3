@@ -1,0 +1,19 @@
+    Checking ep_runtime v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_runtime)
+error: field assignment outside of initializer for an instance created with Default::default()
+   --> crates\ep_runtime\src\heat_balance\inside_convection_dispatcher\tests.rs:360:5
+    |
+360 |     scan.get_report_input = false;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+note: consider initializing the variable with `heat_balance::report_scan::ReportScanState { get_report_input: false, surface_details: true, ..Default::default() }` and removing relevant reassignments
+   --> crates\ep_runtime\src\heat_balance\inside_convection_dispatcher\tests.rs:359:5
+    |
+359 |     let mut scan = ReportScanState::default();
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.96.0/index.html#field_reassign_with_default
+    = note: `-D clippy::field-reassign-with-default` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::field_reassign_with_default)]`
+
+    Checking ep_run v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_run)
+    Checking ep_cli v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_cli)
+error: could not compile `ep_runtime` (lib test) due to 1 previous error

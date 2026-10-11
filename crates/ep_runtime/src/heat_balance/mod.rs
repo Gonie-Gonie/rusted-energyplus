@@ -37,6 +37,8 @@ pub mod error_backend;
 pub(crate) mod id_slot_index;
 pub mod initialization;
 pub mod inside_convection;
+pub mod inside_convection_dispatcher;
+pub mod inside_convection_layout;
 pub mod longwave;
 pub mod manager;
 pub mod predefined_tables;

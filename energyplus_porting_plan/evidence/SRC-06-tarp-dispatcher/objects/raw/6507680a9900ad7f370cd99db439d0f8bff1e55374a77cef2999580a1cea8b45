@@ -1,0 +1,10 @@
+        int zoneOABalanceIndex = 0;       // Index to ZoneAirBalance for this zone, if any
+
+        // Spaces
+        EPVector<int> spaceIndexes; // Indexes to spaces in this zone
+        int numSpaces = 0;          // Number of spaces in this zone
+
+        // Default Constructor
+        ZoneData() : Centroid(0.0, 0.0, 0.0)
+        {
+        }

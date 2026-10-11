@@ -1,0 +1,155 @@
+{
+  "schema": "src06-tarp-dispatcher-import-correction-Source-preparation.v1",
+  "status": "HELD-Source-only-unexecuted",
+  "parent_validation_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-validation-prep-01/manifest.json",
+    "sha256": "084c0529d0476eff2d33a7920a4db07cc6b0dee0785eefc1be7cf615db70c6ab",
+    "size_bytes": 14307,
+    "line_count": 383
+  },
+  "parent_application": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-01/record.json",
+    "sha256": "02f1929153ce7f02b8b8b2fc0aca0a4590187f3bb0d9a4481f39ec2477a22d0f",
+    "size_bytes": 27340,
+    "line_count": 531
+  },
+  "parent_formatter_review": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-01/Root-formatter-acceptance.json",
+    "sha256": "e8e048e22027fbae3158e9fc4d23a39de99e48a2a597e7626d7a0885463a8f7a",
+    "size_bytes": 1599,
+    "line_count": 32
+  },
+  "source_before": {
+    "path": ".runtime/porting/source-objects/06/062d37e84728f90782e4306db62f52fbc43b3c06d22b2d0a3f1c04c893b75ab1",
+    "sha256": "062d37e84728f90782e4306db62f52fbc43b3c06d22b2d0a3f1c04c893b75ab1"
+  },
+  "retained_failed_quality": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-validation-01/clippy-command/receipt.json",
+    "sha256": "240f7fac1a5890f32ca6177aaf08faaf5968e778f7b5bcb86e5260f08ab1df48",
+    "size_bytes": 3789,
+    "line_count": 81
+  },
+  "retained_failed_workflow": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-validation-01/failed-build.json",
+    "sha256": "3d07b3c70b16632d9892254f3990546f321522a97edf546598aa51921e378ac1",
+    "size_bytes": 1610,
+    "line_count": 38
+  },
+  "shared_custody_Source": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-03/apply.py",
+    "sha256": "f156146347a42f0f9ee0d13a6e180ab82773c7a9387c5200e85f464b95ba21c5",
+    "size_bytes": 10854,
+    "line_count": 179
+  },
+  "recorder_Source": {
+    "path": "tools/porting/record_command.py",
+    "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+    "size_bytes": 8453,
+    "line_count": 204
+  },
+  "application": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+        "sha256": "2a5991e1101f9c39b535eb340991100ad14dae81c45cd7927eaa6c498fa99952",
+        "size_bytes": 29808,
+        "line_count": 734
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-correction-prep-01/before/ctf_surface_lifecycle.rs",
+        "sha256": "2a5991e1101f9c39b535eb340991100ad14dae81c45cd7927eaa6c498fa99952",
+        "size_bytes": 29808,
+        "line_count": 734
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-correction-prep-01/proposal/ctf_surface_lifecycle.rs",
+        "sha256": "231a6f27fdf15cd1dc46c47688d494e57922a9c2308a21cbe14fb823d9f68e3b",
+        "size_bytes": 29848,
+        "line_count": 736
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-correction-prep-01/diffs/ctf_surface_lifecycle.rs.diff",
+        "sha256": "e6906064f7d4f40906f42f208ddd86b660713e9ca213b258ee1dd02cf1f10537",
+        "size_bytes": 539,
+        "line_count": 11
+      },
+      "new_destination_absent": false
+    }
+  ],
+  "own_sources": [
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-correction-prep-02/apply.py",
+      "sha256": "4e9daa2cbed1ddcfead300fe1ed5eee1887fd1a8cc65cd31473bad64f75519a4",
+      "size_bytes": 7250
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-correction-prep-01/before/ctf_surface_lifecycle.rs",
+      "sha256": "2a5991e1101f9c39b535eb340991100ad14dae81c45cd7927eaa6c498fa99952",
+      "size_bytes": 29808,
+      "line_count": 734
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-correction-prep-01/proposal/ctf_surface_lifecycle.rs",
+      "sha256": "231a6f27fdf15cd1dc46c47688d494e57922a9c2308a21cbe14fb823d9f68e3b",
+      "size_bytes": 29848,
+      "line_count": 736
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-correction-prep-01/diffs/ctf_surface_lifecycle.rs.diff",
+      "sha256": "e6906064f7d4f40906f42f208ddd86b660713e9ca213b258ee1dd02cf1f10537",
+      "size_bytes": 539,
+      "line_count": 11
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-correction-prep-02/README.md",
+      "sha256": "67706c48334966cbb6ede015c0efa10cb242beb59e091a1b2381af8ffb244436",
+      "size_bytes": 1278
+    }
+  ],
+  "author_Source": {
+    "path": ".runtime/porting/SRC-06/prepare-dispatcher-import-recovery-02.py",
+    "sha256": "122b0a02dc3de673e17624c9784cb40fbcef9e3c1e3d7b18124a1f734cfaccda",
+    "size_bytes": 4899
+  },
+  "runtime_interfaces": {
+    "apply": {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-correction-prep-02/apply.py",
+      "sha256": "4e9daa2cbed1ddcfead300fe1ed5eee1887fd1a8cc65cd31473bad64f75519a4",
+      "size_bytes": 7250
+    },
+    "CLI": [
+      "--source-preparation",
+      "--output-dir"
+    ],
+    "actual_record_schema": "src06-tarp-dispatcher-import-actual-application.v1",
+    "formatter_review_schema": "src06-tarp-dispatcher-actual-formatter-review.v1"
+  },
+  "canonical_mutation_performed": false,
+  "numerical_results_read": false,
+  "gates_updated": false,
+  "parent_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-correction-prep-01/manifest.json",
+    "sha256": "a2258d4edde80effc5f4d877eff4e5370d2d0e3a8f4b5530e94e7bf61c7aa380",
+    "size_bytes": 5502
+  },
+  "source_correspondence": [
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-correction-prep-02/before/apply.py",
+        "sha256": "c2e56dcd0a70f18c56ff9a75bc08541734aae4a72b77ebff9b95699082e202a6",
+        "size_bytes": 7218
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-correction-prep-02/apply.py",
+        "sha256": "4e9daa2cbed1ddcfead300fe1ed5eee1887fd1a8cc65cd31473bad64f75519a4",
+        "size_bytes": 7250
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-import-correction-prep-02/diffs/apply.py.diff",
+        "sha256": "612a12279311e6bae00da6968a012d203861257423097ed5381f3a4f37f40e83",
+        "size_bytes": 1268
+      }
+    }
+  ]
+}

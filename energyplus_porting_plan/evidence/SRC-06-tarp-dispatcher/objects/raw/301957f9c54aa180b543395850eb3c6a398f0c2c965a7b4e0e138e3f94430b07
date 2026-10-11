@@ -1,0 +1,63 @@
+
+struct ConvectionCoefficientsData : BaseGlobalStruct
+{
+
+    bool GetUserSuppliedConvectionCoeffs = true;  // Get user input first call for Init
+    Real64 CubeRootOfOverallBuildingVolume = 0.0; // building meta data. cube root of the volume of all the zones
+    Real64 RoofLongAxisOutwardAzimuth = 0.0;      // roof surfaces meta data. outward normal azimuth for longest roof edge
+
+    int BMMixedAssistedWallErrorIDX1 = 0;
+    int BMMixedAssistedWallErrorIDX2 = 0;
+    int BMMixedOpposingWallErrorIDX1 = 0;
+    int BMMixedOpposingWallErrorIDX2 = 0;
+    int BMMixedStableFloorErrorIDX1 = 0;
+    int BMMixedStableFloorErrorIDX2 = 0;
+    int BMMixedUnstableFloorErrorIDX1 = 0;
+    int BMMixedUnstableFloorErrorIDX2 = 0;
+    int BMMixedStableCeilingErrorIDX1 = 0;
+    int BMMixedStableCeilingErrorIDX2 = 0;
+    int BMMixedUnstableCeilingErrorIDX1 = 0;
+    int BMMixedUnstableCeilingErrorIDX2 = 0;
+    int AHUnstableHorizontalErrorIDX = 0;
+    int AHStableHorizontalErrorIDX = 0;
+    int AHVerticalWallErrorIDX = 0;
+    int CalcFohannoPolidoriVerticalWallErrorIDX = 0;
+    int CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX1 = 0;
+    int CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX2 = 0;
+    int CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX1 = 0;
+    int CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX2 = 0;
+    int CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX = 0;
+    int CalcSparrowWindwardErrorIDX = 0;
+    int CalcSparrowLeewardErrorIDX = 0;
+    int CalcBlockenWindwardErrorIDX = 0;
+    int CalcClearRoofErrorIDX = 0;
+    int CalcMitchellErrorIDX = 0;
+
+    // move random statistics so they can be reset for unit tests
+    bool NodeCheck = true;
+    bool ActiveSurfaceCheck = true;
+    bool MyEnvirnFlag = true;
+    bool FirstRoofSurf = true;
+
+    // Object Data
+    Convect::IntAdaptiveConvAlgo intAdaptiveConvAlgo; // stores rules for Hc model equations
+    Convect::ExtAdaptiveConvAlgo extAdaptiveConvAlgo;
+    Array1D<Convect::HcIntUserCurve> hcIntUserCurve;
+    Array1D<Convect::HcExtUserCurve> hcExtUserCurve;
+
+    void init_constant_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
+    void clear_state() override
+    {
+        new (this) ConvectionCoefficientsData();
+    }
+};
+
+} // namespace EnergyPlus
+

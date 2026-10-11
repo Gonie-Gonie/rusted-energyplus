@@ -1,0 +1,6 @@
+    // now get user directed overrides at the surface level.
+    state.dataSurface->TotUserIntConvModels = 0;
+    state.dataSurface->TotUserExtConvModels = 0;
+    CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients:MultipleSurface";
+    int Count = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    for (int Loop = 1; Loop <= Count; ++Loop) {

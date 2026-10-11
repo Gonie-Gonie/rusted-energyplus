@@ -1,0 +1,36 @@
+"""Restore three generated metadata files to the captured Native dispatcher graph."""
+from pathlib import Path
+import hashlib, json, shutil
+ROOT=Path(__file__).resolve().parents[3]
+B=ROOT/'.runtime/porting/SRC-06'
+def ref(p):
+    with p.open('rb') as f:h=hashlib.file_digest(f,'sha256').hexdigest()
+    return dict(path=p.relative_to(ROOT).as_posix(),sha256=h,size_bytes=p.stat().st_size)
+p=B/'ordinary-geometry-native-build-01/configure-and-dry-review.json'
+assert ref(p)['sha256']=='45578aae0a2051c9300dec822252b120d8944bcd0dd418f9945cf2578b52b0e6'
+review=json.loads(p.read_bytes())
+before=json.loads((B/'tarp-dispatcher-Native-observation-01/before.json').read_bytes())
+frozen={r['path']:r for r in before['frozen_artifacts']}
+out=B/'dispatcher-build-metadata-restore-01';assert not out.exists()
+items=[]
+for name in ['CMakeCache.txt','compile_commands.json','build.ninja']:
+    live=ROOT/'.runtime/ep261-gcc13-o0'/name
+    old=B/'ordinary-geometry-native-build-01'/(name+'.before')
+    new=B/'ordinary-geometry-native-build-01'/(name+'.after')
+    assert live.resolve().is_relative_to((ROOT/'.runtime/ep261-gcc13-o0').resolve())
+    assert ref(live)['sha256']==ref(new)['sha256']
+    expected=frozen[live.relative_to(ROOT).as_posix()]
+    assert ref(old)['sha256']==expected['sha256'] and old.stat().st_size==expected['size_bytes']
+    items.append(dict(actual_before=ref(live),actual_before_archive=ref(new),restore_to_archive=ref(old),expected=expected))
+assert len(items)==3
+out.mkdir()
+for row in items:
+    live=ROOT/row['actual_before']['path'];old=ROOT/row['restore_to_archive']['path']
+    assert ref(live)==row['actual_before']
+    shutil.copyfile(old,live)
+    row['actual_after']=ref(live)
+    assert row['actual_after']==row['expected']
+record=dict(schema='src06-dispatcher-generated-build-metadata-restoration.v1',files=items,restored_files=3,restore_Source=ref(Path(__file__)),geometry_configure_review=ref(p),geometry744_graph_retained_as_actual_history=True,geometry_failed_compile_receipt=ref(B/'ordinary-geometry-compile-command-01/receipt.json'),Original_scientific_Source_or_binary_changed=False,Rust_Source_changed=False,policy_changed=False,scientific_PASS_claimed=False,gates_updated=False)
+q=out/'record.json'
+with q.open('xb') as f:f.write((json.dumps(record,indent=2)+'\n').encode())
+print(json.dumps(ref(q)))

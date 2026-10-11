@@ -1,0 +1,69 @@
+Real64 CalcASHRAETARPNatural(Real64 const Tsurf, Real64 const Tamb, Real64 const cosTilt)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Rick Strand
+    //       DATE WRITTEN   August 2000
+
+    // PURPOSE OF THIS FUNCTION:
+    // This subroutine calculates the convection coefficient for a surface.
+
+    // NOTE:
+    // Because surface tilts are given with respect to the outward normal, applications for interior
+    // surfaces should use a negative cos(Tilt).
+
+    // METHODOLOGY EMPLOYED:
+    // The algorithm for convection coefficients is taken directly from the TARP Reference Manual.
+    // ASHRAE Handbook of Fundamentals 2001, p. 3.12, Table 5 gives equations for natural convection
+    // heat transfer coefficients in the turbulent range for large, vertical plates and for large,
+    // horizontal plates facing upward when heated (or downward when cooled).  A note in the text
+    // also gives an approximation for large, horizontal places facing downward when heated (or
+    // upward when cooled) recommending that it should be half of the facing upward value.
+    // TARP then adds a curve fit as a function of the cosine of the tilt angle to provide intermediate
+    // values between vertical and horizontal.  The curve fit values at the extremes match the ASHRAE
+    // values very well.
+
+    // REFERENCES:
+    // 1.  Walton, G. N. 1983. Thermal Analysis Research Program (TARP) Reference Manual,
+    //     NBSSIR 83-2655, National Bureau of Standards, "Surface Inside Heat Balances", pp 79-80.
+    // 2.  ASHRAE Handbook of Fundamentals 2001, p. 3.12, Table 5.
+
+    Real64 DeltaTemp = Tsurf - Tamb;
+
+    // Set HConvIn using the proper correlation based on DeltaTemp and Surface (Cosine Tilt)
+
+    if ((DeltaTemp == 0.0) || (cosTilt == 0.0)) { // Vertical Surface
+
+        return CalcASHRAEVerticalWall(DeltaTemp);
+    }
+    if (((DeltaTemp < 0.0) && (cosTilt < 0.0)) || ((DeltaTemp > 0.0) && (cosTilt > 0.0))) { // Enhanced Convection
+
+        return CalcWaltonUnstableHorizontalOrTilt(DeltaTemp, cosTilt);
+
+    } // (((DeltaTemp > 0.0) && (cosTilt < 0.0)) || ((DeltaTemp < 0.0) && (cosTilt > 0.0))) // Reduced Convection
+
+    return CalcWaltonStableHorizontalOrTilt(DeltaTemp, cosTilt);
+
+    // ...end of IF-THEN block to set HConvIn
+}
+
+void CalcASHRAEDetailedIntConvCoeff(EnergyPlusData &state,
+                                    int const SurfNum,                  // surface number for which coefficients are being calculated
+                                    Real64 const SurfaceTemperature,    // Temperature of surface for evaluation of HcIn
+                                    Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
+)
+{
+    auto const &surface = state.dataSurface->Surface(SurfNum);
+    if (surface.ExtBoundCond == DataSurfaces::KivaFoundation) {
+        state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
+            return CalcASHRAETARPNatural(Tsurf, Tamb, cosTilt);
+        };
+    } else {
+        state.dataHeatBalSurf->SurfHConvInt(SurfNum) = CalcASHRAETARPNatural(
+            SurfaceTemperature, ZoneMeanAirTemperature, -surface.CosTilt); // negative CosTilt because CosTilt is relative to exterior
+    }
+
+    // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
+    if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit) {
+        state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
+    }
+}

@@ -1,0 +1,4 @@
+Version,26.1;
+Timestep,4;
+Building,DISPATCHER UNIT INPUT,0,Suburbs,0.04,0.4,FullExterior,25,6;
+GlobalGeometryRules,UpperLeftCorner,CounterClockWise,Relative;

@@ -1,0 +1,62 @@
+{
+  "schema": "src06-tarp-dispatcher-Rust-Source-review.v1",
+  "reviewer_role": "Header",
+  "accepted": true,
+  "narrow_successor_FULL_review_accepted": true,
+  "reviewed_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/manifest.json",
+    "sha256": "75db177e8d881a7b3edfaccccbcae407f5ba6c2fdbbc09280964d5767087bbd4",
+    "size_bytes": 54623,
+    "line_count": 1280
+  },
+  "previous_preparation": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/manifest.json",
+    "sha256": "0888b88cd65dff863461bac16b271d967b90c5af6ef43df6e247a025aa325889",
+    "size_bytes": 54708,
+    "line_count": 1273
+  },
+  "actual_restoration_provenance": {
+    "path": ".runtime/porting/SRC-06/dispatcher-owned-restore-01/record.json",
+    "sha256": "5e7cf50d2d0a2b3ed12d8d002310979bd8a6f27d18e7f863f4e6764332bf3028",
+    "size_bytes": 6265,
+    "line_count": 136
+  },
+  "application_before_Source_snapshot": {
+    "path": ".runtime/porting/source-objects/00/00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a",
+    "sha256": "00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a"
+  },
+  "inherited_cumulative_02_FULL_scientific_Source_review_accepted": true,
+  "actual_failed_qualities_preserved": [
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-validation-01/failed-build.json",
+      "sha256": "3d07b3c70b16632d9892254f3990546f321522a97edf546598aa51921e378ac1",
+      "size_bytes": 1610,
+      "line_count": 38
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-validation-02/failed-build.json",
+      "sha256": "93f316710817f22ddf33bc720898c83a820f14b05911071436f46fcd24dee67a",
+      "size_bytes": 1623,
+      "line_count": 38
+    }
+  ],
+  "verification": {
+    "unique_full_references": 4036,
+    "inherited_literal_ranges": 41,
+    "application_rows": 6,
+    "cumulative_diffs_regenerated": 6,
+    "incremental_diffs_regenerated": 2,
+    "current_before_Source_members": 3931,
+    "unchanged_application_rows": 4,
+    "author_AST_valid": true
+  },
+  "findings": [
+    "Only cfg(test) SurfaceType import restores the inherited test scope.",
+    "The mutable Scan struct initializer retains the same two explicit values and all 31 pure Default fields; later mutable borrow remains valid.",
+    "All numerical production bodies, request inputs, policy and operation order are unchanged from reviewed02."
+  ],
+  "scientific_comparison_performed": false,
+  "targets_executed": false,
+  "canonical_changes_performed": false,
+  "gates_updated": false
+}

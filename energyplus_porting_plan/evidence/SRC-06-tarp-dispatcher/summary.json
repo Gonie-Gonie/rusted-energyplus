@@ -1,0 +1,320 @@
+{
+  "schema": "src06-tarp-dispatcher-evidence.v1",
+  "status": "pass-available-finite-selected-dispatcher-owners-only",
+  "actual_packet": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-publication-inputs-01.json",
+    "sha256": "a4ec5c6681334fcbbabb0d1c74b3afafe1939fcdcce7b80e99afd70d1c55e10b",
+    "size_bytes": 2185
+  },
+  "actual_comparison": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-comparison-02/comparison.json",
+    "sha256": "e7a7e258afcd81a5b3b04d6081daeea0748a0bdd5cd0946bae20cd7ca0b3141a",
+    "size_bytes": 4336
+  },
+  "actual_execution": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-comparison-command-02/receipt.json",
+    "sha256": "a76abb9c4de52652c993177a24b63a27b50b43da6aca111353c3e1c6df98d3d6",
+    "size_bytes": 4052
+  },
+  "actual_Source_snapshot": {
+    "path": ".runtime/porting/source-objects/4c/4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce",
+    "sha256": "4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce"
+  },
+  "actual_test_totals": {
+    "focused": {
+      "groups": 1,
+      "passed": 354,
+      "failed": 0,
+      "ignored": 2
+    },
+    "workspace": {
+      "groups": 21,
+      "passed": 4981,
+      "failed": 0,
+      "ignored": 2
+    }
+  },
+  "actual_comparison_counts": {
+    "counts": {
+      "input_join_comparisons": 24033,
+      "pre_owner_comparisons": 8963,
+      "selected_endpoint_comparisons": 9083,
+      "point_helper_comparisons": 0
+    },
+    "mismatch_count": 0,
+    "required_unmatched_count": 0,
+    "required_unavailable_count": 0,
+    "optional_unpaired_count": 264
+  },
+  "actual_findings": {
+    "global_input_and_initial_full_owner_join_passed": true,
+    "actual_case_count": 8,
+    "literal_binary64_input_cells": 700,
+    "actual_calls": {
+      "Native_processInput": 8,
+      "Native_Init": 20,
+      "Rust_Init": 20
+    },
+    "actual_Native_exit_code": 0,
+    "actual_Rust_exit_code": 0,
+    "actual_test_totals": {
+      "focused": {
+        "groups": 1,
+        "passed": 354,
+        "failed": 0,
+        "ignored": 2
+      },
+      "workspace": {
+        "groups": 21,
+        "passed": 4981,
+        "failed": 0,
+        "ignored": 2
+      }
+    },
+    "Native_capture_Source_snapshot": {
+      "path": ".runtime/porting/source-objects/8a/8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934",
+      "sha256": "8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934"
+    },
+    "Rust_capture_Source_snapshot": {
+      "path": ".runtime/porting/source-objects/4c/4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce",
+      "sha256": "4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce"
+    },
+    "actual_Native_stdout": {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-Native-observation-01/command/stdout.log",
+      "sha256": "131f31fbb3fcbbea264c79a8cc50dea11e0f0ea4e7ce8423a43aa32945e2b318"
+    },
+    "actual_Rust_stdout": {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-Rust-observation-01/command/stdout.log",
+      "sha256": "dce25ec6387704414817c3a19945ad0490f1aeb305d7019c04f0f46a437fd60c"
+    },
+    "actual_Native_baseline_acceptance": {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-Native-observation-01/Root-baseline-acceptance.json",
+      "sha256": "7b63de51b46753ef1cbeafc55e7600d063eb29782914d4eacd1acb1605bb51e0",
+      "size_bytes": 1965
+    },
+    "selected_source_reachability_complete": true
+  },
+  "full_gzip_ledgers": {
+    "mismatches": {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-comparison-02/mismatches.ndjson.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "size_bytes": 20,
+      "rows": 0,
+      "compression": "gzip",
+      "uncapped": true
+    },
+    "unmatched": {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-comparison-02/unmatched.ndjson.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "size_bytes": 20,
+      "rows": 0,
+      "compression": "gzip",
+      "uncapped": true
+    },
+    "unavailable": {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-comparison-02/unavailable.ndjson.gz",
+      "sha256": "aa83c07d178132662c31af1646da80fb96aaa0447e6e8b96ad5077533b6a2fa8",
+      "size_bytes": 24723,
+      "rows": 264,
+      "compression": "gzip",
+      "uncapped": true
+    },
+    "paired-boundaries": {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-comparison-02/paired-boundaries.ndjson.gz",
+      "sha256": "10a8fdcaae66e81cb4fc8048422a6be379070eac7eb919a5653c74be5d479257",
+      "size_bytes": 320,
+      "rows": 20,
+      "compression": "gzip",
+      "uncapped": true
+    }
+  },
+  "independent_decoded_ledger_facts": {
+    "mismatches": {
+      "rows": 0,
+      "decoded_bytes": 0,
+      "decoded_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "unmatched": {
+      "rows": 0,
+      "decoded_bytes": 0,
+      "decoded_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "unavailable": {
+      "rows": 264,
+      "decoded_bytes": 1053121,
+      "decoded_sha256": "c65b4a186a4e77cf8c6f8e4a42bd508e5ee041a95cf2d3a625a00625afd03188"
+    },
+    "paired-boundaries": {
+      "rows": 20,
+      "decoded_bytes": 3971,
+      "decoded_sha256": "dad04ea39d5a2ad507547fc35d167284734ef466a28592dbd815d80c2f33336a"
+    }
+  },
+  "Native_baseline_acceptance": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-Native-observation-01/Root-baseline-acceptance.json",
+    "sha256": "7b63de51b46753ef1cbeafc55e7600d063eb29782914d4eacd1acb1605bb51e0",
+    "size_bytes": 1965,
+    "line_count": 40
+  },
+  "selected_archive": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-tarp-dispatcher/manifest.json",
+    "sha256": "469250c1ea282408c15d358582670cd642580c44ec5c3f970a83a638877b7431",
+    "size_bytes": 346535
+  },
+  "provenance_only": [
+    {
+      "artifact": {
+        "path": ".runtime/porting/source-objects/4c/4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce",
+        "sha256": "4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce"
+      },
+      "reason": "actual-current-whole-Source-snapshot-metadata-only",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": true
+    },
+    {
+      "artifact": {
+        "path": ".runtime/porting/source-objects/00/00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a",
+        "sha256": "00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a"
+      },
+      "reason": "actual-current-eight-path-application:whole-Source-snapshot-metadata-only",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": true
+    },
+    {
+      "artifact": {
+        "path": ".runtime/porting/source-objects/c4/c4f40a9eac03bf0f03eae15f11b399824ed54762da2383410ff531b159c955c2",
+        "sha256": "c4f40a9eac03bf0f03eae15f11b399824ed54762da2383410ff531b159c955c2"
+      },
+      "reason": "actual-current-eight-path-application:whole-Source-snapshot-metadata-only",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": true
+    },
+    {
+      "artifact": {
+        "path": ".runtime/porting/source-objects/4c/4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce",
+        "sha256": "4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce"
+      },
+      "reason": "actual-current-eight-path-application:whole-Source-snapshot-metadata-only",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": true
+    },
+    {
+      "artifact": {
+        "path": "target/debug/examples/src06_tarp_dispatcher_main.exe",
+        "sha256": "e4c8e5ae1a2f190ce936e99c2d767471e7825c695a4fc7624b9c3443d5d1ad00",
+        "size_bytes": 34594331
+      },
+      "reason": "actual-accepted-Rust-PE-binary-hash-only",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": false
+    },
+    {
+      "artifact": {
+        "path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\native-dispatcher-build-01\\bin\\src06_tarp_dispatcher_helper.exe",
+        "sha256": "4550934b071349910ea00cedc8679a9d06bc76400d10e8ffee49d5ad97b38916",
+        "size_bytes": 1299166301
+      },
+      "reason": "actual-Native-provider-actual_Native_binary-hash-only",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": false
+    },
+    {
+      "artifact": {
+        "path": "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\native-dispatcher-build-01\\bin\\src06_tarp_dispatcher_helper.map",
+        "sha256": "a295fbd7616d05d52f5d586a45bd56ddea2c1d23a2b03b0a8ea5715bac7fdad8",
+        "size_bytes": 305718156
+      },
+      "reason": "actual-Native-provider-actual_full_link_map-hash-only",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": false
+    },
+    {
+      "artifact": {
+        "path": ".runtime/ep261-gcc13-o0/CMakeFiles/src06_tarp_dispatcher_helper.dir/56a6ffe24c02b5e1a68a11333bb834d6/.runtime/porting/SRC-06/native-tarp-dispatcher-prep-02/tarp_dispatcher_helper.cpp.obj",
+        "sha256": "01236ac954c80980b01a8ed8292025ce87525892e085973883101bdc161fbdbc",
+        "size_bytes": 19717392
+      },
+      "reason": "actual-Native-provider-actual_helper_object-hash-only",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": false
+    },
+    {
+      "artifact": {
+        "path": ".runtime/porting/source-objects/06/062d37e84728f90782e4306db62f52fbc43b3c06d22b2d0a3f1c04c893b75ab1",
+        "sha256": "062d37e84728f90782e4306db62f52fbc43b3c06d22b2d0a3f1c04c893b75ab1"
+      },
+      "reason": "historical-failed-whole-Source-metadata-only",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": true
+    },
+    {
+      "artifact": {
+        "path": ".runtime/porting/source-objects/99/994b014957fb54b1c01608f5fc345f70bbac500be0f7b3b673c252f90bbbc7b7",
+        "sha256": "994b014957fb54b1c01608f5fc345f70bbac500be0f7b3b673c252f90bbbc7b7"
+      },
+      "reason": "historical-failed-whole-Source-metadata-only",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": true
+    },
+    {
+      "artifact": {
+        "path": ".runtime/porting/source-objects/00/00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a",
+        "sha256": "00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a"
+      },
+      "reason": "retained-original-eight-path-application:whole-Source-snapshot-metadata-only",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": true
+    },
+    {
+      "artifact": {
+        "path": ".runtime/porting/source-objects/56/5689ffccfa0df3824186af9574d93dc56faffaa553e311c7a053f0f5bef6b021",
+        "sha256": "5689ffccfa0df3824186af9574d93dc56faffaa553e311c7a053f0f5bef6b021"
+      },
+      "reason": "retained-original-eight-path-application:whole-Source-snapshot-metadata-only",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": true
+    },
+    {
+      "artifact": {
+        "path": ".runtime/porting/source-objects/06/062d37e84728f90782e4306db62f52fbc43b3c06d22b2d0a3f1c04c893b75ab1",
+        "sha256": "062d37e84728f90782e4306db62f52fbc43b3c06d22b2d0a3f1c04c893b75ab1"
+      },
+      "reason": "retained-original-eight-path-application:whole-Source-snapshot-metadata-only",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": true
+    },
+    {
+      "artifact": {
+        "path": ".runtime/porting/source-objects/06/062d37e84728f90782e4306db62f52fbc43b3c06d22b2d0a3f1c04c893b75ab1",
+        "sha256": "062d37e84728f90782e4306db62f52fbc43b3c06d22b2d0a3f1c04c893b75ab1"
+      },
+      "reason": "retained-import-only-application:whole-Source-snapshot-metadata-only",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": true
+    },
+    {
+      "artifact": {
+        "path": ".runtime/porting/source-objects/99/994b014957fb54b1c01608f5fc345f70bbac500be0f7b3b673c252f90bbbc7b7",
+        "sha256": "994b014957fb54b1c01608f5fc345f70bbac500be0f7b3b673c252f90bbbc7b7"
+      },
+      "reason": "retained-import-only-application:whole-Source-snapshot-metadata-only",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": true
+    },
+    {
+      "artifact": {
+        "path": ".runtime/porting/source-objects/99/994b014957fb54b1c01608f5fc345f70bbac500be0f7b3b673c252f90bbbc7b7",
+        "sha256": "994b014957fb54b1c01608f5fc345f70bbac500be0f7b3b673c252f90bbbc7b7"
+      },
+      "reason": "retained-import-only-application:whole-Source-snapshot-metadata-only",
+      "payload_published": false,
+      "current_payload_rehashed_by_publisher": true
+    }
+  ],
+  "selected_closure_transitively_replayable": false,
+  "event_or_endpoint_or_gzip_ledger_values_parsed_by_publisher": false,
+  "scientific_outcome_copied_from_actual_comparer": true,
+  "publisher_storage_success_is_not_scientific_PASS": true,
+  "whole_SRC06_or_ordinary_PASS_claimed": false,
+  "gates_updated": false
+}

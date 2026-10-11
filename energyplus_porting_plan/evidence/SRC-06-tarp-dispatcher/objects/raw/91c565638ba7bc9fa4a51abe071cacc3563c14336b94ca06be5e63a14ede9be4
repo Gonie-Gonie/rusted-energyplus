@@ -1,0 +1,70 @@
+--- crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs
++++ crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs
+@@ -20,8 +20,7 @@
+ use super::state::{HeatBalanceState, SurfaceHeatBalanceState};
+ use super::surface_manager::ctf_caller_stability::CtfCallerSharedFlags;
+ use crate::weather::day::ProductionCtfHistoryClock;
+-use ep_model::{SurfaceId, SurfaceType, TypedModel};
+-use std::collections::BTreeSet;
++use ep_model::{SurfaceId, TypedModel};
+ 
+ // Exact compiler-owned source witnesses. They are neither an answer digest nor
+ // runtime filesystem reads, and are automatically the actual compiled bytes.
+@@ -100,6 +99,7 @@
+     ("binding", include_str!("ctf_surface_binding.rs")),
+     ("history", include_str!("ctf_thermal_history.rs")),
+     ("lifecycle", include_str!("ctf_surface_lifecycle.rs")),
++    ("inside_convection_layout", include_str!("inside_convection_layout.rs")),
+     ("surface_copy", include_str!("ctf.rs")),
+     ("initializer", include_str!("initialization.rs")),
+     (
+@@ -173,46 +173,9 @@
+ fn ordinary_orders(
+     model: &TypedModel,
+ ) -> Result<Vec<Vec<SurfaceId>>, CtfSurfaceLifecycleUnavailable> {
+-    let mut zones = BTreeSet::new();
+-    let mut spaces = BTreeSet::new();
+-    let mut selected = BTreeSet::new();
+-    let mut groups = Vec::new();
+-    for zone in &model.zones {
+-        if !zones.insert(zone.id) {
+-            return Err(CtfSurfaceLifecycleUnavailable::Association);
+-        }
+-        for &space_id in &zone.spaces {
+-            let space = model
+-                .spaces
+-                .iter()
+-                .find(|value| value.id == space_id)
+-                .ok_or(CtfSurfaceLifecycleUnavailable::Association)?;
+-            if space.zone != zone.id || !spaces.insert(space_id) {
+-                return Err(CtfSurfaceLifecycleUnavailable::Association);
+-            }
+-            let mut group = Vec::new();
+-            // Native base-class order; original input order within each class.
+-            for class in [SurfaceType::Wall, SurfaceType::Floor, SurfaceType::Roof] {
+-                for surface in &model.surfaces {
+-                    let same_class = surface.surface_type == class
+-                        || (class == SurfaceType::Roof
+-                            && surface.surface_type == SurfaceType::Ceiling);
+-                    if surface.space != space_id || !same_class {
+-                        continue;
+-                    }
+-                    if surface.zone != zone.id || !selected.insert(surface.id) {
+-                        return Err(CtfSurfaceLifecycleUnavailable::Association);
+-                    }
+-                    group.push(surface.id);
+-                }
+-            }
+-            groups.push(group);
+-        }
+-    }
+-    if spaces.len() != model.spaces.len() || selected.len() != model.surfaces.len() {
+-        return Err(CtfSurfaceLifecycleUnavailable::Association);
+-    }
+-    Ok(groups)
++    let layout = super::inside_convection_layout::InsideConvectionLayout::from_typed_model(model)
++        .map_err(|_| CtfSurfaceLifecycleUnavailable::Association)?;
++    Ok(layout.groups().iter().map(|group| group.surfaces.clone()).collect())
+ }
+ 
+ // Borrow-only observation packs keep the private hook interface bounded.

@@ -1,0 +1,12 @@
+	// Normalize to a Length
+	Vector3 &
+	normalize( Tc tar_length = T( 1 ) )
+	{
+		T const cur_length( length() );
+		assert( cur_length != T ( 0 ) );
+		T const dilation( tar_length / cur_length );
+		x *= dilation;
+		y *= dilation;
+		z *= dilation;
+		return *this;
+	}

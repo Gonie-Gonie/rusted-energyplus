@@ -1,0 +1,12 @@
+        Real64 W5FileGlazingSysWidth = 0.0;                  // Glass width for construction from Window5 data file (m)
+        Real64 W5FileGlazingSysHeight = 0.0;                 // Glass height for construction form Window5 data file (m)
+        Real64 SummerSHGC = 0.0;                             // Calculated ASHRAE SHGC for summer conditions
+        Real64 VisTransNorm = 0.0;                           // The normal visible transmittance
+        Real64 SolTransNorm = 0.0;                           // the normal solar transmittance
+        bool SourceSinkPresent = false;                      // .TRUE. if there is a source/sink within this construction
+        bool TypeIsWindow = false;                           // True if a window construction, false otherwise
+        bool WindowTypeBSDF = false;                         // True for complex window, false otherwise
+        bool TypeIsEcoRoof = false;                          // -- true for construction with ecoRoof outside, the flag
+        //-- is turned on when the outside layer is of type EcoRoof
+        bool TypeIsIRT = false;          // -- true for construction with IRT material
+        bool TypeIsCfactorWall = false;  // -- true for construction with Construction:CfactorUndergroundWall

@@ -12469,7 +12469,7 @@
       "title": "TARP 실내 대류",
       "source": "ConvectionCoefficients.cc",
       "symbols": "CalcASHRAETARPNatural; CalcASHRAEDetailedIntConvCoeff; InitIntConvCoeff",
-      "block": "TARP 수직·안정/불안정 경사 분기와 대상 계수 상·하한. InitIntConvCoeff에서는 해당 선택 경로만.",
+      "block": "TARP 수직·안정/불안정 경사 분기와 strict 하한 대입. 선택 원본에는 상한 clamp가 없음. InitIntConvCoeff에서는 해당 선택 경로만.",
       "dependencies": [
         "GEO-02",
         "PSY-01"
@@ -12496,6 +12496,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-tarp-inside-selected/summary.json",
         "sha256": "a19980169767ee8c4a7b1888dc16afab2eab3d5d2af04a094d95178ec2b30c87",
         "size_bytes": 243082
+      },
+      "actual_selected_dispatcher_comparison": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-tarp-dispatcher/summary.json",
+        "sha256": "e06573e5cdd079c328b7dd27019c362d8496c9f2629064500ae7a5557101d808",
+        "size_bytes": 13029
       }
     },
     {

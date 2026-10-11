@@ -1,0 +1,36 @@
+{
+  "schema": "src06-tarp-dispatcher-Root-aggregate-factual-review.v1",
+  "Root_full_factual_review": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-Native-observation-01/Root-factual-review-01.json",
+    "sha256": "8074e757f834e03a59bcaab9ff0555ad5850e022134ca1d873098e60387099d2",
+    "size_bytes": 1487
+  },
+  "Root_complete_initial_and_operation_input_review": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-Native-observation-01/Root-complete-input-review-02.json",
+    "sha256": "fb6f59c91103a6bb9f623ef8f936426a1b3f217fe214996c2f76e52ea7c3aef8",
+    "size_bytes": 1461
+  },
+  "independent_FULL_factual_review": {
+    "path": ".runtime/porting/SRC-06/Header-dispatcher-Native-factual-review-01/review.json",
+    "sha256": "356bb3dc66606ac59f82e6bdb11cfeef854bb237ed29b5389e44c9af28ce6fc0",
+    "size_bytes": 4558
+  },
+  "actual_Native_execution": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-Native-observation-01/command/receipt.json",
+    "sha256": "21a91c79ad55a5627af97470a9b27bc07069f90b9ca80fe0ac078cba54457557",
+    "size_bytes": 3121
+  },
+  "actual_custody": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-Native-observation-01/custody.json",
+    "sha256": "ae74aa7c3453744bafb430d0c9abbc90874888cf012020ae640e58881dccbb67",
+    "size_bytes": 2251485
+  },
+  "accepted": true,
+  "binary64_input_cells": 700,
+  "cases": 8,
+  "returned_outer_calls": 28,
+  "Init_calls": 20,
+  "numerical_comparison_performed": false,
+  "inner_surface_trace_available": false,
+  "gates_updated": false
+}

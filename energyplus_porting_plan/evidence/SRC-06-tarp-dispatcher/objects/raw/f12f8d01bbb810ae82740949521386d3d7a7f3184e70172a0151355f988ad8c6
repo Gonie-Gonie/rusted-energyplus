@@ -1,0 +1,33 @@
+{
+  "schema": "src06-dispatcher-Rust-Root-cumulative-Source-review.v3",
+  "reviewed_manifest": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/manifest.json",
+    "sha256": "75db177e8d881a7b3edfaccccbcae407f5ba6c2fdbbc09280964d5767087bbd4",
+    "size_bytes": 54623
+  },
+  "accepted": true,
+  "Root_FULL_Source_accepted": true,
+  "parent_FULL_Source_review": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/Root-FULL-Source-review-02.json",
+  "unique_full_byte_identities": 4035,
+  "exact_Original_ranges": 41,
+  "cumulative_diffs": 6,
+  "incremental_diffs": 2,
+  "four_other_proposals_byte_exact_parent": true,
+  "current_before_Source_members": 3931,
+  "actual_restoration_provenance": {
+    "path": ".runtime/porting/SRC-06/dispatcher-owned-restore-01/record.json",
+    "sha256": "5e7cf50d2d0a2b3ed12d8d002310979bd8a6f27d18e7f863f4e6764332bf3028",
+    "size_bytes": 6265,
+    "line_count": 136
+  },
+  "both_actual_failed_quality_records_preserved": true,
+  "cfg_test_import_only": true,
+  "equivalent_mutable_Scan_initializer_31_Default_fields_reviewed": true,
+  "production_numerical_bodies_inputs_policy_unchanged": true,
+  "author_61_lines_FULL_read": true,
+  "genuine_Native_baseline_required_before_application": true,
+  "ordinary_cadence_activated": false,
+  "targets_executed": false,
+  "scientific_results_read": false,
+  "gates_updated": false
+}

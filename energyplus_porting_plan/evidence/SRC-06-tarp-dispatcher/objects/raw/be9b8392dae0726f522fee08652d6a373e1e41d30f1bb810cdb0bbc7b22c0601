@@ -1,0 +1,12 @@
+--- .runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/before-02/crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/tests.rs
++++ .runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/proposed/crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/tests.rs
+@@ -114,8 +114,7 @@
+ 
+ #[test]
+ fn reached_details_unavailable_retains_static_and_scan_prefix() -> Result<(), Box<dyn std::error::Error>> {
+-    let layout = layout()?; let mut state = state(&layout)?; let mut scan = ReportScanState::default();
+-    scan.get_report_input = false; scan.surface_details = true;
++    let layout = layout()?; let mut state = state(&layout)?; let mut scan = ReportScanState { get_report_input: false, surface_details: true, ..ReportScanState::default() };
+     let rows = [(SurfaceId(8), 23.0), (SurfaceId(2), 23.0)];
+     let result = run(&layout, &mut state, InsideSurfaceTemperatures { owner: InsideSurfaceTemperatureOwner::SurfTempInTmp, rows: &rows },
+         readiness(), 0.1, &ReportInputs::default(), &mut scan);

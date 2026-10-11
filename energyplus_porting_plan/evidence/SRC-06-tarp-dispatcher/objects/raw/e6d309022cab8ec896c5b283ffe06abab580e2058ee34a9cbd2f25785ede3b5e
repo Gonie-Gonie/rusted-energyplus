@@ -1,0 +1,21 @@
+	// Size by IndexRange
+	bool
+	size_real( IR const & I )
+	{
+		I_.assign( I );
+		shift_only_set( I_.l() );
+		return resize( size_of( I_ ) );
+	}
+
+	// Dimension by IndexRange
+	void
+	dimension_real( IR const & I )
+	{
+		if ( size_real( I ) ) {
+			initialize();
+		} else {
+#if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
+			assign();
+#endif
+		}
+	}

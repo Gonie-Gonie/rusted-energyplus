@@ -1,0 +1,44 @@
+    CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections";
+    Count = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    if (Count == 1) {
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 CurrentModuleObject,
+                                                                 1,
+                                                                 ipsc->cAlphaArgs,
+                                                                 NumAlphas,
+                                                                 ipsc->rNumericArgs,
+                                                                 NumNumbers,
+                                                                 Status,
+                                                                 ipsc->lNumericFieldBlanks,
+                                                                 ipsc->lAlphaFieldBlanks,
+                                                                 ipsc->cAlphaFieldNames,
+                                                                 ipsc->cNumericFieldNames);
+
+        // state.dataConvect->ExtAdaptiveConvAlgo.Name = ipsc->cAlphaArgs(1); // not used by E+, unique object
+        ErrorObjectHeader eoh{RoutineName, CurrentModuleObject, ipsc->cAlphaArgs(1)};
+        auto &extAlgo = state.dataConvect->extAdaptiveConvAlgo;
+
+        for (int iOutConvClass = 0, i = 2; i < (int)ExtConvClass::Num && i <= NumAlphas; ++iOutConvClass, i += 2) {
+
+            extAlgo.extConvClass2EqNums[iOutConvClass] = static_cast<HcExt>(getEnumValue(HcExtNamesUC, ipsc->cAlphaArgs(i)));
+
+            if (extAlgo.extConvClass2EqNums[iOutConvClass] == HcExt::Invalid) {
+                ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(i), ipsc->cAlphaArgs(i));
+                ErrorsFound = true;
+
+            } else if (extAlgo.extConvClass2EqNums[iOutConvClass] == HcExt::UserCurve) {
+                extAlgo.extConvClass2UserCurveNums[iOutConvClass] = Util::FindItemInList(ipsc->cAlphaArgs(i + 1), state.dataConvect->hcExtUserCurve);
+                if (extAlgo.extConvClass2UserCurveNums[iOutConvClass] == 0) {
+                    ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(i + 1), ipsc->cAlphaArgs(i + 1));
+                    ErrorsFound = true;
+                }
+            }
+        } // for (iOutConvClass)
+    } // if (Count == 1)
+
+    if (ErrorsFound) {
+        ShowFatalError(state, EnergyPlus::format("{}Errors found getting input.  Program termination.", RoutineName));
+    }
+
+    SetupAdaptiveConvStaticMetaData(state);
+}

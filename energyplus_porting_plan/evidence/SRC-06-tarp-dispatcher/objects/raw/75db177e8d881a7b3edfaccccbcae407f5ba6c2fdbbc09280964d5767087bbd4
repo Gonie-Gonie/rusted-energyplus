@@ -1,0 +1,1280 @@
+{
+  "schema": "src06-tarp-dispatcher-Rust-source-preparation.v1",
+  "status": "HELD-Source-only-unexecuted",
+  "Original_version": "26.1.0",
+  "Original_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "current_Source_snapshot": {
+    "path": ".runtime/porting/source-objects/8a/8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934",
+    "sha256": "8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934",
+    "size_bytes": 1632224,
+    "line_count": 31439
+  },
+  "current_Source_members": 3929,
+  "application_sources": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+      "new_destination_absent": false,
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/proposed/crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+        "sha256": "af8c995f3ceee8c6f4b776e531a2ce2c284eed4a74d9fb459009d4637eba876a",
+        "size_bytes": 29789,
+        "line_count": 729
+      },
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+        "sha256": "750b86766ca793afde19d547dfe597200230305468a2e78240f63f75d2de1de0",
+        "size_bytes": 31217,
+        "line_count": 764
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/before/crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+        "sha256": "750b86766ca793afde19d547dfe597200230305468a2e78240f63f75d2de1de0",
+        "size_bytes": 31217,
+        "line_count": 764
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/diffs/crates__ep_runtime__src__heat_balance__ctf_surface_lifecycle.rs.diff",
+        "sha256": "0403ac740891efe554eb638fa88af8ceefd841702e7f6dd651bcda1ee2490dd5",
+        "size_bytes": 3361,
+        "line_count": 72
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/geometry.rs",
+      "new_destination_absent": true,
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/proposed/crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/geometry.rs",
+        "sha256": "16db5ada72c2750b8c3a736500c1eb980cc0473ce4c359fc29755eec43a4d0fa",
+        "size_bytes": 6574,
+        "line_count": 142
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/diffs/crates__ep_runtime__src__heat_balance__inside_convection_dispatcher__geometry.rs.diff",
+        "sha256": "0ec2a68d940d3112ab9f48aeadc94982ff3de69337f3171112c69f3118c4b3fb",
+        "size_bytes": 6828,
+        "line_count": 145
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/tests.rs",
+      "new_destination_absent": true,
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/proposed/crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/tests.rs",
+        "sha256": "140d893160e56447ade4600940f81d7ac23b6ce2f01b8ae527175d292768f0bc",
+        "size_bytes": 13692,
+        "line_count": 191
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/diffs/crates__ep_runtime__src__heat_balance__inside_convection_dispatcher__tests.rs.diff",
+        "sha256": "bb41e375d35baf18b64fdf0d4c012e7beba141e16aea0411281d798ac9032e38",
+        "size_bytes": 13992,
+        "line_count": 194
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/inside_convection_dispatcher.rs",
+      "new_destination_absent": true,
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/proposed/crates/ep_runtime/src/heat_balance/inside_convection_dispatcher.rs",
+        "sha256": "fdca530460d8b167f7b23a328a316eedc7c34b3e66dfd2e62a5a268f2736e4df",
+        "size_bytes": 26978,
+        "line_count": 514
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/diffs/crates__ep_runtime__src__heat_balance__inside_convection_dispatcher.rs.diff",
+        "sha256": "c951e71ea04873d758dc38e48799f4b11b905233568e1626bbb26408f095952b",
+        "size_bytes": 27595,
+        "line_count": 517
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/inside_convection_layout.rs",
+      "new_destination_absent": true,
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/proposed/crates/ep_runtime/src/heat_balance/inside_convection_layout.rs",
+        "sha256": "837f460d7b88c7aee8c80a6824f4f634a30de14e3722affe61281d7c5bb005ce",
+        "size_bytes": 5310,
+        "line_count": 121
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/diffs/crates__ep_runtime__src__heat_balance__inside_convection_layout.rs.diff",
+        "sha256": "555d91e944a814a3affc9939c02312dc0c0e83e48110a3536e952fad9ed96558",
+        "size_bytes": 5530,
+        "line_count": 124
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "new_destination_absent": false,
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/proposed/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "4cf7f90761914657ced2c71856c727f88be4d400fd6bb80c383fe54a0ce107af",
+        "size_bytes": 2294,
+        "line_count": 88
+      },
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "5c374561b23c7420a93e7c84870574bba455144caff4713580855a681948c9a1",
+        "size_bytes": 2222,
+        "line_count": 86
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/before/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "5c374561b23c7420a93e7c84870574bba455144caff4713580855a681948c9a1",
+        "size_bytes": 2222,
+        "line_count": 86
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/diffs/crates__ep_runtime__src__heat_balance__mod.rs.diff",
+        "sha256": "35416b208a56d7c06acc61f0d6923b0a9b085a7ce16d9e3bb03f73287673417b",
+        "size_bytes": 333,
+        "line_count": 11
+      }
+    }
+  ],
+  "Original_helper_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+      "start_line": 141,
+      "end_line": 391,
+      "sha256": "33ed5400df105176fe1789c17d5aa3cb43d739d008a03842525d5274b97de6c5",
+      "size_bytes": 13178,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/ConvectionCoefficients.cc.141-391.literal",
+        "sha256": "33ed5400df105176fe1789c17d5aa3cb43d739d008a03842525d5274b97de6c5",
+        "size_bytes": 13178,
+        "line_count": 251
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+        "sha256": "d381680e08c5c9a9a6b769e906474082d3bdb2c68fdbade631a0905994554b61",
+        "size_bytes": 336899,
+        "line_count": 6629
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+      "start_line": 733,
+      "end_line": 768,
+      "sha256": "597aa7ecdd59e934b351fdd22fead2f6dfd05075cfe7404183946871884fa032",
+      "size_bytes": 1513,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/ConvectionCoefficients.cc.733-768.literal",
+        "sha256": "597aa7ecdd59e934b351fdd22fead2f6dfd05075cfe7404183946871884fa032",
+        "size_bytes": 1513,
+        "line_count": 36
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+        "sha256": "d381680e08c5c9a9a6b769e906474082d3bdb2c68fdbade631a0905994554b61",
+        "size_bytes": 336899,
+        "line_count": 6629
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+      "start_line": 857,
+      "end_line": 866,
+      "sha256": "7d0ebdc1c3401b361183e4d23ab6d8e21c5e93b6376c0db7ad1f5ddd2ed758b1",
+      "size_bytes": 808,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/ConvectionCoefficients.cc.857-866.literal",
+        "sha256": "7d0ebdc1c3401b361183e4d23ab6d8e21c5e93b6376c0db7ad1f5ddd2ed758b1",
+        "size_bytes": 808,
+        "line_count": 10
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+        "sha256": "d381680e08c5c9a9a6b769e906474082d3bdb2c68fdbade631a0905994554b61",
+        "size_bytes": 336899,
+        "line_count": 6629
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+      "start_line": 938,
+      "end_line": 943,
+      "sha256": "82603da12480d883384351a1d3f8f7c2ff9790af0316d9103b6f4c415b18069a",
+      "size_bytes": 398,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/ConvectionCoefficients.cc.938-943.literal",
+        "sha256": "82603da12480d883384351a1d3f8f7c2ff9790af0316d9103b6f4c415b18069a",
+        "size_bytes": 398,
+        "line_count": 6
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+        "sha256": "d381680e08c5c9a9a6b769e906474082d3bdb2c68fdbade631a0905994554b61",
+        "size_bytes": 336899,
+        "line_count": 6629
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+      "start_line": 978,
+      "end_line": 980,
+      "sha256": "6ae9bce3be6c20b06c6c2f7c7e69b2b273c20fd45be661f768bb13998bcb877d",
+      "size_bytes": 219,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/ConvectionCoefficients.cc.978-980.literal",
+        "sha256": "6ae9bce3be6c20b06c6c2f7c7e69b2b273c20fd45be661f768bb13998bcb877d",
+        "size_bytes": 219,
+        "line_count": 3
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+        "sha256": "d381680e08c5c9a9a6b769e906474082d3bdb2c68fdbade631a0905994554b61",
+        "size_bytes": 336899,
+        "line_count": 6629
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+      "start_line": 1016,
+      "end_line": 1025,
+      "sha256": "d493ee110b8ad0de7f3757721cf4f94309c15477d7c5226df0a8c6ecb4936255",
+      "size_bytes": 556,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/ConvectionCoefficients.cc.1016-1025.literal",
+        "sha256": "d493ee110b8ad0de7f3757721cf4f94309c15477d7c5226df0a8c6ecb4936255",
+        "size_bytes": 556,
+        "line_count": 10
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+        "sha256": "d381680e08c5c9a9a6b769e906474082d3bdb2c68fdbade631a0905994554b61",
+        "size_bytes": 336899,
+        "line_count": 6629
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+      "start_line": 1553,
+      "end_line": 1598,
+      "sha256": "69986ff2e5756fe1d6306e53c9c418f6a0d2037f7f407216de9c5f7d403eecb6",
+      "size_bytes": 2767,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/ConvectionCoefficients.cc.1553-1598.literal",
+        "sha256": "69986ff2e5756fe1d6306e53c9c418f6a0d2037f7f407216de9c5f7d403eecb6",
+        "size_bytes": 2767,
+        "line_count": 46
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+        "sha256": "d381680e08c5c9a9a6b769e906474082d3bdb2c68fdbade631a0905994554b61",
+        "size_bytes": 336899,
+        "line_count": 6629
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+      "start_line": 1629,
+      "end_line": 1672,
+      "sha256": "550f58263a7eef92ca913ae5fee07db564ae72da2e83684034fe8b32831feed6",
+      "size_bytes": 2673,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/ConvectionCoefficients.cc.1629-1672.literal",
+        "sha256": "550f58263a7eef92ca913ae5fee07db564ae72da2e83684034fe8b32831feed6",
+        "size_bytes": 2673,
+        "line_count": 44
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+        "sha256": "d381680e08c5c9a9a6b769e906474082d3bdb2c68fdbade631a0905994554b61",
+        "size_bytes": 336899,
+        "line_count": 6629
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+      "start_line": 1955,
+      "end_line": 1975,
+      "sha256": "8a8f6b729de07853dba81d90700c0df5a22532f77cc7dac83cbaef27830d91a1",
+      "size_bytes": 1308,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/ConvectionCoefficients.cc.1955-1975.literal",
+        "sha256": "8a8f6b729de07853dba81d90700c0df5a22532f77cc7dac83cbaef27830d91a1",
+        "size_bytes": 1308,
+        "line_count": 21
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+        "sha256": "d381680e08c5c9a9a6b769e906474082d3bdb2c68fdbade631a0905994554b61",
+        "size_bytes": 336899,
+        "line_count": 6629
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+      "start_line": 2800,
+      "end_line": 3099,
+      "sha256": "845d379c3484a8b875889e39a9ca132f54172d57c7a77617cfd8eb7a9bcb89a2",
+      "size_bytes": 14335,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/ConvectionCoefficients.cc.2800-3099.literal",
+        "sha256": "845d379c3484a8b875889e39a9ca132f54172d57c7a77617cfd8eb7a9bcb89a2",
+        "size_bytes": 14335,
+        "line_count": 300
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+        "sha256": "d381680e08c5c9a9a6b769e906474082d3bdb2c68fdbade631a0905994554b61",
+        "size_bytes": 336899,
+        "line_count": 6629
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+      "start_line": 3101,
+      "end_line": 3149,
+      "sha256": "86f9421081369b40bbd97e47ec91e17f9d92d6b7e9d8159722d47d02f1f984d8",
+      "size_bytes": 2265,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/ConvectionCoefficients.cc.3101-3149.literal",
+        "sha256": "86f9421081369b40bbd97e47ec91e17f9d92d6b7e9d8159722d47d02f1f984d8",
+        "size_bytes": 2265,
+        "line_count": 49
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.cc",
+        "sha256": "d381680e08c5c9a9a6b769e906474082d3bdb2c68fdbade631a0905994554b61",
+        "size_bytes": 336899,
+        "line_count": 6629
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.hh",
+      "start_line": 748,
+      "end_line": 792,
+      "sha256": "f1721147f9c8c5f8818e379bf630a380928d36a30f9872accfd3f9f58752851c",
+      "size_bytes": 2044,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/ConvectionCoefficients.hh.748-792.literal",
+        "sha256": "f1721147f9c8c5f8818e379bf630a380928d36a30f9872accfd3f9f58752851c",
+        "size_bytes": 2044,
+        "line_count": 45
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionCoefficients.hh",
+        "sha256": "a15faad35aad82250cb34b38574efb1d1331c1f2cd0f33b44d024dbd3ab456bf",
+        "size_bytes": 47387,
+        "line_count": 810
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionConstants.hh",
+      "start_line": 62,
+      "end_line": 77,
+      "sha256": "8d56b2175ffde475819e0b45b09a0340021e08ca2a0610f925089f47b4a36c45",
+      "size_bytes": 268,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/ConvectionConstants.hh.62-77.literal",
+        "sha256": "8d56b2175ffde475819e0b45b09a0340021e08ca2a0610f925089f47b4a36c45",
+        "size_bytes": 268,
+        "line_count": 16
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionConstants.hh",
+        "sha256": "c66c69839ec46bcedb083d887f74f17c77e9c4eb34bde99f6720ef2829f6c8d7",
+        "size_bytes": 29096,
+        "line_count": 581
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionConstants.hh",
+      "start_line": 235,
+      "end_line": 248,
+      "sha256": "02db2a7d55bd83f8d3ba827aea11a0cbddb85243e48036247056210aa10a94fb",
+      "size_bytes": 280,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/ConvectionConstants.hh.235-248.literal",
+        "sha256": "02db2a7d55bd83f8d3ba827aea11a0cbddb85243e48036247056210aa10a94fb",
+        "size_bytes": 280,
+        "line_count": 14
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionConstants.hh",
+        "sha256": "c66c69839ec46bcedb083d887f74f17c77e9c4eb34bde99f6720ef2829f6c8d7",
+        "size_bytes": 29096,
+        "line_count": 581
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionConstants.hh",
+      "start_line": 430,
+      "end_line": 450,
+      "sha256": "c590435f8173b11ecf85dd6c9f7d5761e59d56a4bb95e34cc629e5a0687268ca",
+      "size_bytes": 892,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/ConvectionConstants.hh.430-450.literal",
+        "sha256": "c590435f8173b11ecf85dd6c9f7d5761e59d56a4bb95e34cc629e5a0687268ca",
+        "size_bytes": 892,
+        "line_count": 21
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ConvectionConstants.hh",
+        "sha256": "c66c69839ec46bcedb083d887f74f17c77e9c4eb34bde99f6720ef2829f6c8d7",
+        "size_bytes": 29096,
+        "line_count": 581
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+      "start_line": 12754,
+      "end_line": 12843,
+      "sha256": "d6a263e25ff5f2a48cf30445012ac0194d04b7f6eddc34963aee0ee8e63050e9",
+      "size_bytes": 3934,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/SurfaceGeometry.cc.12754-12843.literal",
+        "sha256": "d6a263e25ff5f2a48cf30445012ac0194d04b7f6eddc34963aee0ee8e63050e9",
+        "size_bytes": 3934,
+        "line_count": 90
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+        "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1",
+        "size_bytes": 941682,
+        "line_count": 15690
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+      "start_line": 15576,
+      "end_line": 15686,
+      "sha256": "f2f427352fb76b5b3187623798a63bcd050edd94ab5efe856037c97e9aa67847",
+      "size_bytes": 4775,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/SurfaceGeometry.cc.15576-15686.literal",
+        "sha256": "f2f427352fb76b5b3187623798a63bcd050edd94ab5efe856037c97e9aa67847",
+        "size_bytes": 4775,
+        "line_count": 111
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+        "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1",
+        "size_bytes": 941682,
+        "line_count": 15690
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.hh",
+      "start_line": 244,
+      "end_line": 261,
+      "sha256": "7d306d8ced806e238b4e6ee1fc9bf85e2204591e644238cb8e8cde6ed0abfa95",
+      "size_bytes": 787,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/SurfaceGeometry.hh.244-261.literal",
+        "sha256": "7d306d8ced806e238b4e6ee1fc9bf85e2204591e644238cb8e8cde6ed0abfa95",
+        "size_bytes": 787,
+        "line_count": 18
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.hh",
+        "sha256": "359720562a1122716bf842f23a54a9967d6bdaeea2e5c31638b8002e31f7160e",
+        "size_bytes": 30479,
+        "line_count": 562
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataVectorTypes.hh",
+      "start_line": 76,
+      "end_line": 96,
+      "sha256": "612b616ad486bc27147a1b7bc9abf521d3a4597e5a5f67508013ee4c4ac09e34",
+      "size_bytes": 712,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/DataVectorTypes.hh.76-96.literal",
+        "sha256": "612b616ad486bc27147a1b7bc9abf521d3a4597e5a5f67508013ee4c4ac09e34",
+        "size_bytes": 712,
+        "line_count": 21
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataVectorTypes.hh",
+        "sha256": "a04e92db8abe94a09101ece79e8f5329e066da836f19ad1cf5cecba299d5978d",
+        "size_bytes": 18862,
+        "line_count": 626
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+      "start_line": 104,
+      "end_line": 127,
+      "sha256": "5b28b51bc4e119e48c14ba454847482707c344ad69c4ba750ed1ce729d69bffd",
+      "size_bytes": 889,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/DataSurfaces.hh.104-127.literal",
+        "sha256": "5b28b51bc4e119e48c14ba454847482707c344ad69c4ba750ed1ce729d69bffd",
+        "size_bytes": 889,
+        "line_count": 24
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+        "sha256": "7eea2e660914574ce9b5b633ac2099d49b09255d6c215b84e47edccbbb5cffae",
+        "size_bytes": 113537,
+        "line_count": 1850
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+      "start_line": 1394,
+      "end_line": 1440,
+      "sha256": "02e56e1f45fdd227e1b90aa7ceabc3d707dfaf7154bd7bd696691dc8ddb3562a",
+      "size_bytes": 1945,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/DataSurfaces.hh.1394-1440.literal",
+        "sha256": "02e56e1f45fdd227e1b90aa7ceabc3d707dfaf7154bd7bd696691dc8ddb3562a",
+        "size_bytes": 1945,
+        "line_count": 47
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+        "sha256": "7eea2e660914574ce9b5b633ac2099d49b09255d6c215b84e47edccbbb5cffae",
+        "size_bytes": 113537,
+        "line_count": 1850
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.cc",
+      "start_line": 820,
+      "end_line": 840,
+      "sha256": "0ef4740bf6c54c277a0623decfa42b45b3a7495c94e835079de0bbb635f283ab",
+      "size_bytes": 619,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/DataSurfaces.cc.820-840.literal",
+        "sha256": "0ef4740bf6c54c277a0623decfa42b45b3a7495c94e835079de0bbb635f283ab",
+        "size_bytes": 619,
+        "line_count": 21
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.cc",
+        "sha256": "c80eaefe852c5deebdb5f6eab35a58b0d7500d887218cbcdeaacb8573e4044ff",
+        "size_bytes": 36404,
+        "line_count": 840
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobalConstants.hh",
+      "start_line": 582,
+      "end_line": 582,
+      "sha256": "ad32e0910d60803eca6dece3905ca59ff1a859e29616904b367e41636661037f",
+      "size_bytes": 80,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/DataGlobalConstants.hh.582-582.literal",
+        "sha256": "ad32e0910d60803eca6dece3905ca59ff1a859e29616904b367e41636661037f",
+        "size_bytes": 80,
+        "line_count": 1
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobalConstants.hh",
+        "sha256": "611963e974f18a83f81401aaeef2ff5393948d04d33421b1036fbcde35356cb3",
+        "size_bytes": 35280,
+        "line_count": 628
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobalConstants.hh",
+      "start_line": 607,
+      "end_line": 607,
+      "sha256": "e956a8fa0112e2c50b0f4e379fd408a16d182fcfc38034f92b8f5adf59cfc19a",
+      "size_bytes": 118,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/DataGlobalConstants.hh.607-607.literal",
+        "sha256": "e956a8fa0112e2c50b0f4e379fd408a16d182fcfc38034f92b8f5adf59cfc19a",
+        "size_bytes": 118,
+        "line_count": 1
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobalConstants.hh",
+        "sha256": "611963e974f18a83f81401aaeef2ff5393948d04d33421b1036fbcde35356cb3",
+        "size_bytes": 35280,
+        "line_count": 628
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "start_line": 430,
+      "end_line": 430,
+      "sha256": "18d9f73272ddfba634e33afd7eaa0e56db6e31839f8492b0904c83db0daac08d",
+      "size_bytes": 89,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/DataHeatBalance.hh.430-430.literal",
+        "sha256": "18d9f73272ddfba634e33afd7eaa0e56db6e31839f8492b0904c83db0daac08d",
+        "size_bytes": 89,
+        "line_count": 1
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+        "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+        "size_bytes": 133816,
+        "line_count": 2059
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "start_line": 1835,
+      "end_line": 1837,
+      "sha256": "50a679668a21176f989a0e4dc09e8681abb75e03ddd91af1fdb01b13c9284207",
+      "size_bytes": 270,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/DataHeatBalance.hh.1835-1837.literal",
+        "sha256": "50a679668a21176f989a0e4dc09e8681abb75e03ddd91af1fdb01b13c9284207",
+        "size_bytes": 270,
+        "line_count": 3
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+        "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+        "size_bytes": 133816,
+        "line_count": 2059
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+      "start_line": 101,
+      "end_line": 112,
+      "sha256": "730e4946109cef5bdc2bef144ba13a0aca59ed32ec631541cf2b375d35aa3b0e",
+      "size_bytes": 960,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/ZoneTempPredictorCorrector.hh.101-112.literal",
+        "sha256": "730e4946109cef5bdc2bef144ba13a0aca59ed32ec631541cf2b375d35aa3b0e",
+        "size_bytes": 960,
+        "line_count": 12
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.hh",
+        "sha256": "38d2ae39f927692ea7266a800c115f62b06d04835d23ecb1cc7983f929169b31",
+        "size_bytes": 25280,
+        "line_count": 449
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 470,
+      "end_line": 475,
+      "sha256": "de8247ea51431e2fac09a3fa5b8f940aafb7c30ba8a1f40f639f6e7023edb6d2",
+      "size_bytes": 322,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/HeatBalanceSurfaceManager.cc.470-475.literal",
+        "sha256": "de8247ea51431e2fac09a3fa5b8f940aafb7c30ba8a1f40f639f6e7023edb6d2",
+        "size_bytes": 322,
+        "line_count": 6
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+        "sha256": "0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c",
+        "size_bytes": 698972,
+        "line_count": 10119
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 2231,
+      "end_line": 2261,
+      "sha256": "155333e29ca4325f8ef87d391234e0b73e08dc5c8f8928e7e71b6d54a5180fe5",
+      "size_bytes": 2300,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/HeatBalanceSurfaceManager.cc.2231-2261.literal",
+        "sha256": "155333e29ca4325f8ef87d391234e0b73e08dc5c8f8928e7e71b6d54a5180fe5",
+        "size_bytes": 2300,
+        "line_count": 31
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+        "sha256": "0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c",
+        "size_bytes": 698972,
+        "line_count": 10119
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 8820,
+      "end_line": 8862,
+      "sha256": "dfb8389f84e1f7ce9202926d0eab722697cd813ab3b51fda7a596953360ab76f",
+      "size_bytes": 3226,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/HeatBalanceSurfaceManager.cc.8820-8862.literal",
+        "sha256": "dfb8389f84e1f7ce9202926d0eab722697cd813ab3b51fda7a596953360ab76f",
+        "size_bytes": 3226,
+        "line_count": 43
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+        "sha256": "0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c",
+        "size_bytes": 698972,
+        "line_count": 10119
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "start_line": 3817,
+      "end_line": 3860,
+      "sha256": "e5e211a91915b50715902e000ad6032147755cb4e02cca6fb6608d02fa7ea1f8",
+      "size_bytes": 2774,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/ZoneTempPredictorCorrector.cc.3817-3860.literal",
+        "sha256": "e5e211a91915b50715902e000ad6032147755cb4e02cca6fb6608d02fa7ea1f8",
+        "size_bytes": 2774,
+        "line_count": 44
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+        "sha256": "9b0aff100fff104dcf9268b46328c1bda5452a28894a6ecb1385bb63ef975ab6",
+        "size_bytes": 404705,
+        "line_count": 7244
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EPVector.hh",
+      "start_line": 98,
+      "end_line": 133,
+      "sha256": "cc3a0f052146fc3022ec295faf2a682cda21bc4e59f2a3027aef42f9e4ea7fd8",
+      "size_bytes": 718,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/EPVector.hh.98-133.literal",
+        "sha256": "cc3a0f052146fc3022ec295faf2a682cda21bc4e59f2a3027aef42f9e4ea7fd8",
+        "size_bytes": 718,
+        "line_count": 36
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EPVector.hh",
+        "sha256": "155ac5aaf6bd6138ad1a397edf68e2c660a6595d94f291bcf671ebc040c335e2",
+        "size_bytes": 11096,
+        "line_count": 357
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array.hh",
+      "start_line": 746,
+      "end_line": 754,
+      "sha256": "c3beb9d13886166625b5bde23da20ce2d7f10b1ecd795689bb33dfae393ed56e",
+      "size_bytes": 81,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/Array.hh.746-754.literal",
+        "sha256": "c3beb9d13886166625b5bde23da20ce2d7f10b1ecd795689bb33dfae393ed56e",
+        "size_bytes": 81,
+        "line_count": 9
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array.hh",
+        "sha256": "1c8e5f14bbdd577f8a6cc56d378308dcb72bf6cbdf0fa051ee9a4eaf7f1b823e",
+        "size_bytes": 57551,
+        "line_count": 2397
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array.hh",
+      "start_line": 1544,
+      "end_line": 1563,
+      "sha256": "3f8865a1f695bbfb855602acb58dce57de9593fa7a5b413a0dd6bd41b9fdeee7",
+      "size_bytes": 627,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/Array.hh.1544-1563.literal",
+        "sha256": "3f8865a1f695bbfb855602acb58dce57de9593fa7a5b413a0dd6bd41b9fdeee7",
+        "size_bytes": 627,
+        "line_count": 20
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array.hh",
+        "sha256": "1c8e5f14bbdd577f8a6cc56d378308dcb72bf6cbdf0fa051ee9a4eaf7f1b823e",
+        "size_bytes": 57551,
+        "line_count": 2397
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array1D.hh",
+      "start_line": 929,
+      "end_line": 936,
+      "sha256": "611469c41072fb7068353b2b9c873ec05ee5d987a8b4dbfe0f46fad7705978eb",
+      "size_bytes": 111,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/Array1D.hh.929-936.literal",
+        "sha256": "611469c41072fb7068353b2b9c873ec05ee5d987a8b4dbfe0f46fad7705978eb",
+        "size_bytes": 111,
+        "line_count": 8
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array1D.hh",
+        "sha256": "071a06b62da9ab4aefe4ad0fbfa2bfd07b48a484b2ef346188885db5db2e6e83",
+        "size_bytes": 55083,
+        "line_count": 2509
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array1D.hh",
+      "start_line": 1419,
+      "end_line": 1439,
+      "sha256": "e6d309022cab8ec896c5b283ffe06abab580e2058ee34a9cbd2f25785ede3b5e",
+      "size_bytes": 366,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/Array1D.hh.1419-1439.literal",
+        "sha256": "e6d309022cab8ec896c5b283ffe06abab580e2058ee34a9cbd2f25785ede3b5e",
+        "size_bytes": 366,
+        "line_count": 21
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array1D.hh",
+        "sha256": "071a06b62da9ab4aefe4ad0fbfa2bfd07b48a484b2ef346188885db5db2e6e83",
+        "size_bytes": 55083,
+        "line_count": 2509
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/IndexRange.hh",
+      "start_line": 48,
+      "end_line": 74,
+      "sha256": "b96ecf0c09924f51ee7f6554d00e43015e70dd5e08ba89da25ab9256a55b2534",
+      "size_bytes": 406,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/IndexRange.hh.48-74.literal",
+        "sha256": "b96ecf0c09924f51ee7f6554d00e43015e70dd5e08ba89da25ab9256a55b2534",
+        "size_bytes": 406,
+        "line_count": 27
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/IndexRange.hh",
+        "sha256": "a39ae1b7a080804adde332e26437cdfa63c4a657755b449264e0ed62915d6c26",
+        "size_bytes": 10584,
+        "line_count": 623
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/AlignedAllocator.hh",
+      "start_line": 54,
+      "end_line": 80,
+      "sha256": "7d053c727498335f99a71bd5baffd4c56b9fd8039cc6293a9adbd9e5966f750d",
+      "size_bytes": 903,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/AlignedAllocator.hh.54-80.literal",
+        "sha256": "7d053c727498335f99a71bd5baffd4c56b9fd8039cc6293a9adbd9e5966f750d",
+        "size_bytes": 903,
+        "line_count": 27
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/AlignedAllocator.hh",
+        "sha256": "159c8d4e7685adfff8a871f8b55bb600cbc7f4bfcbe56309564e98d9493739f6",
+        "size_bytes": 2187,
+        "line_count": 88
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+      "start_line": 589,
+      "end_line": 602,
+      "sha256": "a963a51c1ce06eeb44f34d7ea95de33caa5ade1994725408a65635b5a04d2cad",
+      "size_bytes": 191,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/Vector3.hh.589-602.literal",
+        "sha256": "a963a51c1ce06eeb44f34d7ea95de33caa5ade1994725408a65635b5a04d2cad",
+        "size_bytes": 191,
+        "line_count": 14
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+        "sha256": "c29f615d16c616171f35cf13191c5d7917aecddbdad85b83653477e35dccfc98",
+        "size_bytes": 40149,
+        "line_count": 1931
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+      "start_line": 768,
+      "end_line": 781,
+      "sha256": "f3b089493a1de650e8d5ba9cdaf25f0b589e692877ea5eba52ee253550f424b3",
+      "size_bytes": 322,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/Vector3.hh.768-781.literal",
+        "sha256": "f3b089493a1de650e8d5ba9cdaf25f0b589e692877ea5eba52ee253550f424b3",
+        "size_bytes": 322,
+        "line_count": 14
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+        "sha256": "c29f615d16c616171f35cf13191c5d7917aecddbdad85b83653477e35dccfc98",
+        "size_bytes": 40149,
+        "line_count": 1931
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+      "start_line": 1741,
+      "end_line": 1750,
+      "sha256": "a6236c4d774f294bd299f9d8ce867ddffc9375e167852113c51c0de453f14f25",
+      "size_bytes": 238,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/ranges/Vector3.hh.1741-1750.literal",
+        "sha256": "a6236c4d774f294bd299f9d8ce867ddffc9375e167852113c51c0de453f14f25",
+        "size_bytes": 238,
+        "line_count": 10
+      },
+      "whole_source": {
+        "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Vector3.hh",
+        "sha256": "c29f615d16c616171f35cf13191c5d7917aecddbdad85b83653477e35dccfc98",
+        "size_bytes": 40149,
+        "line_count": 1931
+      }
+    }
+  ],
+  "current_Source_witnesses": [
+    {
+      "path": "crates/ep_runtime/src/heat_balance/convection.rs",
+      "sha256": "bfc43336d0e5849fb9860d34bb166f8067b686b47e82f7f64e6e5345e67a60cf",
+      "size_bytes": 11180,
+      "line_count": 337
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/convection/tarp_inside.rs",
+      "sha256": "2432a716fe5fb79e17bebbda4d1444e4b9d068cd4d6244d2863a1fcbbb5fb620",
+      "size_bytes": 6513,
+      "line_count": 182
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "9c710020d660cd25babb843b92ab16c136def1d917f64bd7e880c7cb0406fbd5",
+      "size_bytes": 52097,
+      "line_count": 1106
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "b6208ebf67b541b9db74bfff0aeaa49e079c0711abed3820c8eb669840c5f98d",
+      "size_bytes": 14135,
+      "line_count": 289
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "sha256": "97745e320b9ea3c5d85e5d2ed691f85452d594aadb43cdade624fe38e00f59af",
+      "size_bytes": 2970,
+      "line_count": 54
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/air_manager.rs",
+      "sha256": "54c1f4ea221db9ffa2d5b3b2fe66bbfcb36c895988c868d91e62640ba02ed4ec",
+      "size_bytes": 7735,
+      "line_count": 198
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/zone_air_initialization.rs",
+      "sha256": "56b94253ec63ba83b4393f0d46974f3d65b294bb8c17694be2030ef849c8957b",
+      "size_bytes": 11003,
+      "line_count": 290
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/zone_air_correction.rs",
+      "sha256": "c592565704ca4e48aee4dac703cbfe19b8190ca8fda40c7521e3c265be7da99b",
+      "size_bytes": 18474,
+      "line_count": 443
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_loop.rs",
+      "sha256": "098dd593cc2986cb4f3eb8e7f079282c02b291088805c6daa83bfabc07f8ca10",
+      "size_bytes": 20263,
+      "line_count": 428
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/timestep.rs",
+      "sha256": "c839fa3fa3ef0b719fc94ecfd2507a391d803857dba60db92469309d75061ba0",
+      "size_bytes": 42545,
+      "line_count": 879
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/inside_convection.rs",
+      "sha256": "6234bb1f520636c687af0a53213b05ee9e6bfbac93d6a4025d3fea33be023b7b",
+      "size_bytes": 7985,
+      "line_count": 219
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/report_scan.rs",
+      "sha256": "4d18fc4720bef47c02d4cdeb64c8e3bc4712018f27f63ee2af1e77d46f64ae41",
+      "size_bytes": 19302,
+      "line_count": 551
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/error_backend.rs",
+      "sha256": "d9806884275aead705154e0f9cbe5fd14300246cd424a78276dcb77775aad908",
+      "size_bytes": 16927,
+      "line_count": 435
+    },
+    {
+      "path": "crates/ep_runtime/src/geometry/source_geometry.rs",
+      "sha256": "c42d7c9afa4f09e700abca21c237631e51494b59206a9f54acbcf1d9ddc1d7ed",
+      "size_bytes": 11235,
+      "line_count": 334
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "be5cd4478dfda6cc05b677c17deb980724c92ae62f226ebeafe80a95f3d35034",
+      "size_bytes": 11456,
+      "line_count": 260
+    },
+    {
+      "path": "crates/ep_model/src/objects/building.rs",
+      "sha256": "d6a3fbc6b39106f8d0b5195822bfc354e505e557f2b9406409b68aebfb089ef0",
+      "size_bytes": 11621,
+      "line_count": 373
+    },
+    {
+      "path": "crates/ep_model/src/objects/surfaces.rs",
+      "sha256": "54569b984efd25320447a8eecb94f351037ab6b63a5cfb31d0af1ecc225a1755",
+      "size_bytes": 6656,
+      "line_count": 197
+    },
+    {
+      "path": "crates/ep_model/src/report_inputs.rs",
+      "sha256": "a04b9a90f4f66e6425d120292ec869b0230cd097b3ad99d3bbf570e97f69c835",
+      "size_bytes": 4808,
+      "line_count": 127
+    },
+    {
+      "path": "crates/ep_run/src/porting_scope.rs",
+      "sha256": "66665f9026988f91a7455b0f18d8f32048572a46f8e8d8765e7d05263fcc7eeb",
+      "size_bytes": 17114,
+      "line_count": 458
+    },
+    {
+      "path": "crates/ep_run/src/pipeline.rs",
+      "sha256": "ecd47bfbeb38b4d27a881dccb9d0ac8650c4d4095bf6b3d3db315ff53065c60c",
+      "size_bytes": 823026,
+      "line_count": 14626
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "size_bytes": 8453,
+      "line_count": 204
+    }
+  ],
+  "dependency_preparations": [
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-dispatcher-prep-02/manifest.json",
+      "sha256": "954a7779868d3ac65d88c553aab324f5e5e0a88d5d455a3126aecc5012ca3d50",
+      "size_bytes": 58722,
+      "line_count": 1486
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-tarp-dispatcher-prep-01/manifest.json",
+      "sha256": "bde6fde556f907b930416942cd28f4a05aeabc3b42fa148ebad290700b5444c1",
+      "size_bytes": 52092,
+      "line_count": 1321
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-inside-getter-prep-01/manifest.json",
+      "sha256": "7eb308271196d36cbcbf58f17cec8599ddd3c396a84c5c52fcab958933f99963",
+      "size_bytes": 29272,
+      "line_count": 721
+    }
+  ],
+  "own_sources": [
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/seal.py",
+      "sha256": "7ae38d6ee0ae62922850bc4cff1e0400c8a053bc25462f0768fd6c625e84337f",
+      "size_bytes": 8733,
+      "line_count": 155
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/ordinary-integration-seams.md",
+      "sha256": "1f5108d799e8c9580ab9a619688943e18b561af191b464400c18cd099dd27433",
+      "size_bytes": 3918,
+      "line_count": 54
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/before-02/crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+      "sha256": "425b4f6a80670afc9f807a906bc3a5e2db3c9e041183b89c62fb36af95dd0810",
+      "size_bytes": 29749,
+      "line_count": 727
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/proposed/crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+      "sha256": "af8c995f3ceee8c6f4b776e531a2ce2c284eed4a74d9fb459009d4637eba876a",
+      "size_bytes": 29789,
+      "line_count": 729
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/incremental-diffs/crates__ep_runtime__src__heat_balance__ctf_surface_lifecycle.rs.diff",
+      "sha256": "796dbdc770d4d0bbfa32c5e9a0d36c776c7c715f62b76e091ffbf4fd9014dcb1",
+      "size_bytes": 626,
+      "line_count": 11
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/diffs/crates__ep_runtime__src__heat_balance__ctf_surface_lifecycle.rs.diff",
+      "sha256": "0403ac740891efe554eb638fa88af8ceefd841702e7f6dd651bcda1ee2490dd5",
+      "size_bytes": 3361,
+      "line_count": 72
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/before-02/crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/tests.rs",
+      "sha256": "960864afb27c149046a0893b7d957e0b047203aa2047c16c9b652eac7dbabbd6",
+      "size_bytes": 13686,
+      "line_count": 192
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/proposed/crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/tests.rs",
+      "sha256": "140d893160e56447ade4600940f81d7ac23b6ce2f01b8ae527175d292768f0bc",
+      "size_bytes": 13692,
+      "line_count": 191
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/incremental-diffs/crates__ep_runtime__src__heat_balance__inside_convection_dispatcher__tests.rs.diff",
+      "sha256": "be9b8392dae0726f522fee08652d6a373e1e41d30f1bb810cdb0bbc7b22c0601",
+      "size_bytes": 1030,
+      "line_count": 12
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/diffs/crates__ep_runtime__src__heat_balance__inside_convection_dispatcher__tests.rs.diff",
+      "sha256": "bb41e375d35baf18b64fdf0d4c012e7beba141e16aea0411281d798ac9032e38",
+      "size_bytes": 13992,
+      "line_count": 194
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/README.md",
+      "sha256": "d0fc1b9169dbc5685a5c79373821c597382bdd29586a08845042fbf014667b40",
+      "size_bytes": 4952,
+      "line_count": 66
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-dispatcher-rust-03.py",
+      "sha256": "e8b5b42d3a4ea7870496d043e4f1a921ce25a0bb017754197cc2fb528c69cea7",
+      "size_bytes": 4946,
+      "line_count": 61
+    }
+  ],
+  "runtime_interfaces": {
+    "layout": "InsideConvectionLayout::{new,from_typed_model}; ordered real IDs and complete associations",
+    "entry": "initialize_inside_convection(layout,zones,surfaces,no_user_input,state,full_named_temperatures,readiness,actual_low_limit,actual_reports,scan,backend)",
+    "persistent_space_owners": [
+      "MAT",
+      "ZT",
+      "ZTAV"
+    ],
+    "source_model_ids": {
+      "SetByZone": 2,
+      "ASHRAETARP": 4
+    },
+    "required_no_user_family_order": [
+      "SurfaceConvectionAlgorithm:Inside:UserCurve",
+      "SurfaceConvectionAlgorithm:Outside:UserCurve",
+      "SurfaceProperty:ConvectionCoefficients:MultipleSurface",
+      "SurfaceProperty:ConvectionCoefficients",
+      "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections",
+      "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections"
+    ],
+    "surface_temperature_owners": [
+      "SurfTempInTmp",
+      "SurfTempIn"
+    ],
+    "unexecuted_tests": 8,
+    "ordinary_cadence_activated": false,
+    "genuine_Native_dispatcher_baseline_before_application": "Required explicit reviewed actual capture operand; no future identity is invented.",
+    "card_contract_before_application": "Root must record this bounded caller/setup scope before application.",
+    "typed_unavailable_branches": [
+      "Details/advanced geometry EIO",
+      "user convection",
+      "non-TARP",
+      "windows",
+      "Kiva",
+      "representative calculations",
+      "EMS overrides",
+      "nonrepresented/degenerate static geometry"
+    ],
+    "derived_static_nonfinite_values": "Source IEEE outcomes retained diagnostic/unverified; no finite-derived or numerical PASS claim."
+  },
+  "scientific_PASS_claimed": false,
+  "ordinary_handoff_verified": false,
+  "gates_updated": false,
+  "previous_preparation": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/manifest.json",
+    "sha256": "0888b88cd65dff863461bac16b271d967b90c5af6ef43df6e247a025aa325889",
+    "size_bytes": 54708,
+    "line_count": 1273
+  },
+  "incremental_Source_differences": [
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/before-02/crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+        "sha256": "425b4f6a80670afc9f807a906bc3a5e2db3c9e041183b89c62fb36af95dd0810",
+        "size_bytes": 29749,
+        "line_count": 727
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/proposed/crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+        "sha256": "af8c995f3ceee8c6f4b776e531a2ce2c284eed4a74d9fb459009d4637eba876a",
+        "size_bytes": 29789,
+        "line_count": 729
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/incremental-diffs/crates__ep_runtime__src__heat_balance__ctf_surface_lifecycle.rs.diff",
+        "sha256": "796dbdc770d4d0bbfa32c5e9a0d36c776c7c715f62b76e091ffbf4fd9014dcb1",
+        "size_bytes": 626,
+        "line_count": 11
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/before-02/crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/tests.rs",
+        "sha256": "960864afb27c149046a0893b7d957e0b047203aa2047c16c9b652eac7dbabbd6",
+        "size_bytes": 13686,
+        "line_count": 192
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/proposed/crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/tests.rs",
+        "sha256": "140d893160e56447ade4600940f81d7ac23b6ce2f01b8ae527175d292768f0bc",
+        "size_bytes": 13692,
+        "line_count": 191
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/incremental-diffs/crates__ep_runtime__src__heat_balance__inside_convection_dispatcher__tests.rs.diff",
+        "sha256": "be9b8392dae0726f522fee08652d6a373e1e41d30f1bb810cdb0bbc7b22c0601",
+        "size_bytes": 1030,
+        "line_count": 12
+      }
+    }
+  ],
+  "previous_README": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-01/README.md",
+    "sha256": "05663853b8b8e3370a45276fbcb720391bcc759bedf617a0de9e4755f654b282",
+    "size_bytes": 3434,
+    "line_count": 52
+  },
+  "README_exact_difference": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/README.diff",
+    "sha256": "cf02e6bb42d08589cc5820509161de3350a7e7b97e0392bd891c503e4a295627",
+    "size_bytes": 1194,
+    "line_count": 18
+  },
+  "README": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-03/README.md",
+    "sha256": "d0fc1b9169dbc5685a5c79373821c597382bdd29586a08845042fbf014667b40",
+    "size_bytes": 4952,
+    "line_count": 66
+  },
+  "authoring_Source": {
+    "path": ".runtime/porting/SRC-06/prepare-dispatcher-rust-03.py",
+    "sha256": "e8b5b42d3a4ea7870496d043e4f1a921ce25a0bb017754197cc2fb528c69cea7",
+    "size_bytes": 4946,
+    "line_count": 61
+  },
+  "application_before_Source_snapshot": {
+    "path": ".runtime/porting/source-objects/00/00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a",
+    "sha256": "00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a"
+  },
+  "historical_current_Source_descriptor_preserved": true,
+  "canonical_restoration_or_mutation_performed": false,
+  "retained_actual_failed_qualities": [
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-validation-01/failed-build.json",
+      "sha256": "3d07b3c70b16632d9892254f3990546f321522a97edf546598aa51921e378ac1",
+      "size_bytes": 1610,
+      "line_count": 38
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-validation-02/failed-build.json",
+      "sha256": "93f316710817f22ddf33bc720898c83a820f14b05911071436f46fcd24dee67a",
+      "size_bytes": 1623,
+      "line_count": 38
+    }
+  ],
+  "actual_restoration_provenance": {
+    "path": ".runtime/porting/SRC-06/dispatcher-owned-restore-01/record.json",
+    "sha256": "5e7cf50d2d0a2b3ed12d8d002310979bd8a6f27d18e7f863f4e6764332bf3028",
+    "size_bytes": 6265,
+    "line_count": 136
+  },
+  "application_before_Source_members": 3931
+}

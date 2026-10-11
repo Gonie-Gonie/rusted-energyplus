@@ -1,0 +1,174 @@
+"""Authenticate reviewed dispatcher runtime artifacts; no target execution."""
+import importlib.util
+import json
+from pathlib import Path
+import re
+
+C = None
+ROOT = Path(__file__).resolve().parents[4]
+MODULES = []
+FINAL_GUARDS = []
+
+
+def module(row, name):
+    path = C.exact(row)
+    spec = importlib.util.spec_from_file_location(name, path)
+    value = importlib.util.module_from_spec(spec); spec.loader.exec_module(value)
+    MODULES.append(value)
+    return value
+
+
+def same(a, b):
+    C.need((ROOT / a['path']).resolve() == (ROOT / b['path']).resolve() and a['sha256'] == b['sha256'] and all(a[k] == b[k] for k in ['size_bytes'] if k in a and k in b), 'exact artifact identity differs')
+
+
+def command(receipt_ref, recorder, source, argv=None, allowed=(0,)):
+    value = C.receipt(receipt_ref, recorder, allowed)
+    same(value['source_snapshot'], source)
+    C.need(value['finished_utc'] is not None and value['started_utc'] <= value['finished_utc'], 'closed actual command required')
+    if argv is not None: C.need(value['command'] == argv, 'actual reviewed command differs')
+    return value
+
+
+def native(prep, packet):
+    same(packet['Native_baseline_acceptance'], prep['Native_baseline_acceptance'])
+    release = C.load(packet['Native_baseline_acceptance'])
+    C.need(release['schema'] == 'src06-tarp-dispatcher-Root-factual-baseline-acceptance.v1' and release['accepted'] is True and release['complete_input_owner_prefix_and_custody_review_accepted'] is True, 'genuine Native release required')
+    N = module(prep['Native_execution_Source'], 'reviewed_dispatcher_Native_custody')
+    custody = C.load(release['actual_custody']); before = C.load(custody['actual_before'])
+    C.need(custody['schema'] == 'src06-tarp-dispatcher-execution-custody.v1' and before['schema'] == 'src06-tarp-dispatcher-execution-before.v1', 'actual Native custody schemas differ')
+    same(before['Source_preparation'], prep['Native_Source_preparation']); same(before['reviewed_execution_driver'], prep['Native_execution_Source'])
+    same(before['Source_snapshot'], release['Source_snapshot']); same(custody['actual_command_receipt'], release['actual_Native_execution'])
+    same(before['Root_provider_acceptance'], release['actual_provider_acceptance'])
+    C.need(custody['all_frozen_artifacts_unchanged'] is True and all(custody[k] is False for k in ['numerical_results_interpreted', 'FP_controls_modified', 'scientific_PASS_claimed', 'gates_updated']), 'Native frozen custody/scope differs')
+    source = N.snapshot_members(before['Source_snapshot'], False)
+    aliases = {p: row['archive'] for p, row in source.items()}
+    inherited = before['inherited_historical_BUILD_Source_aliases']
+    for row in inherited:
+        N.bind(row['actual_archive'])
+        C.need(row['historical']['sha256'] == row['actual_archive']['sha256'] and row['historical']['size_bytes'] == N.full(N.bind(row['actual_archive']))['size_bytes'], 'declared historical BUILD alias differs')
+    frozen = before['frozen_artifacts']; after = custody['frozen_artifacts_after']
+    C.need(all(r.get('available') is True for r in after) and frozen == [{k: r[k] for k in ['path', 'sha256', 'size_bytes']} for r in after] and len({(ROOT / r['path']).resolve() for r in frozen}) == len(frozen), 'complete before/after frozen Native pathset differs')
+    for row in frozen:
+        path = (ROOT / row['path']).resolve()
+        if path in aliases:
+            archive = aliases[path]
+            C.need(row['sha256'] == archive['sha256'] and row['size_bytes'] == N.full(N.bind(archive))['size_bytes'], 'explicit historical execution Source alias differs')
+        else: N.bind(row)
+    inventory, approval = C.load(before['provider_inventory']), C.load(before['Root_provider_acceptance'])
+    C.need(approval['schema'] == 'src06-tarp-dispatcher-Root-provider-acceptance.v1' and approval['accepted'] is True and all(approval[k] is True for k in ['all_ten_Original_providers_accepted', 'full_PE_and_core_proof_accepted', 'dry_and_actual_compile_link_commands_byte_exact']), 'all ten real Original providers/full PE/core acceptance required')
+    same(approval['provider_inventory'], before['provider_inventory']); same(inventory['reviewed_Source_preparation'], prep['Native_Source_preparation'])
+    for key, before_key in [('actual_Native_binary', 'actual_binary'), ('actual_full_link_map', 'actual_link_map'), ('actual_helper_object', 'actual_helper_object')]:
+        same(approval[key], inventory[key]); same(inventory[key], before[before_key]); N.bind(inventory[key])
+    C.need(len(inventory['actual_address_bound_providers']) == 10 and inventory['dry_and_actual_compile_link_commands_byte_exact'] is True and inventory['current_compile_graph_cache_and_core_preserved'] is True, 'complete address-bound providers/preservation required')
+    contract = C.load(inventory['provider_contract']); actual_prep = C.load(prep['Native_Source_preparation'])
+    C.need([r['declared_provider'] for r in contract['providers']] == actual_prep['core_address_bound_providers_required'] and [r['symbol'] for r in inventory['actual_address_bound_providers']] == [r['symbol'] for r in contract['providers']], 'exact ten provider contract required')
+    for key in ['provider_collection_preparation', 'actual_evidence_collector']: same(approval[key], inventory[key] if key in inventory else approval[key]); N.bind(approval[key])
+    for key in ['factual_review', 'independent_FULL_factual_review', 'release_Source']: C.exact(release[key])
+    n = command(release['actual_Native_execution'], prep['recorder_Source'], release['Source_snapshot'], before['actual_argv'], (0, 2))
+    C.need(len(n['command']) == 3 and Path(n['command'][0]).resolve() == N.bind(before['actual_binary']) and Path(n['command'][1]).resolve() == N.bind(before['actual_input']), 'genuine Native argc3/input differs')
+    C.need(n['exit_code'] == custody['actual_recorder_exit_code'] == custody['actual_target_exit_code'], 'Native actual outcome differs')
+    for name in ['stdout', 'stderr']: same(custody['actual_full_output_logs'][name], n[name]); C.exact(custody['actual_full_output_logs'][name])
+    C.need(before['declared_input_counts'] == {'cases': 8, 'Init_calls': 20, 'processInput_calls': 8, 'binary64_cells': 700, 'physical_IDF_bytes': 158}, 'frozen complete input contract differs')
+    same(before['actual_input'], prep['input_only_request']); same(before['literal_IDF'], prep['literal_IDF'])
+    for row in before['pinned_runtime_DLLs']: N.bind(row)
+    wind_before = C.load(before['authorities']['wind_before'])
+    C.need(before['pinned_runtime_DLLs'] == wind_before['pinned_runtime_DLLs'] and before['actual_PATH'] == str(ROOT / '.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin') + ';' + before['inherited_PATH'], 'authentic Native DLL/PATH context differs')
+    for row in custody['produced_case_files_full_SHA_inventory']: C.exact(row)
+    C.need(C.exact(n['stderr']).stat().st_size == 0, 'unexpected Native outer stderr')
+    return n, before, release
+
+
+def conversion(binding, recorder, literal_idf):
+    ledger, child = C.load(binding['conversion_ledger']), C.load(binding['conversion_execution'])
+    actual = C.receipt(binding['conversion_command_receipt'], recorder)
+    C.need(ledger['schema'] == 'sch01-converted-inputs.v1' and ledger['case_count'] == ledger['available_converted_input_count'] == 1 and ledger['unavailable_converted_input_count'] == 0 and all(ledger[k] is False for k in ['scientific_execution_performed', 'Native_scientific_outputs_used_as_inputs', 'expected_values_supplied']), 'genuine complete input conversion required')
+    C.need(child['schema'] == 'sch01-input-conversion-command.v1' and child['case_id'] == 'SRC06-DISPATCHER-NO-USER' and child['exit_code'] == 0 and child['launch_error'] is None and child['epjson_available'] is True and child['original_and_staged_IDF_preserved'] is True and all(child[k] is False for k in ['numerical_engine_executed', 'Native_scientific_outputs_used_as_inputs', 'expected_answers_supplied']), 'actual converter child failed or supplied answers')
+    C.need(C.load(actual['stdout']) == ledger, 'actual converter stdout/ledger differs')
+    argv = ['python', '-X', 'utf8', '-B', '.runtime/porting/SCH-01/input-prep-02/convert_inputs.py', '--approved-source-sha256', '82f27c8327d2409bb3bcba727044ebe6a36641ed8d7c404e08dd4bc92c990dbb', '--input-cases', ledger['input_cases']['path'] + '#' + ledger['input_cases']['sha256'], '--converter', ledger['converter']['path'] + '#' + ledger['converter']['sha256'], '--output-dir', '.runtime/porting/SCH-01/src06-dispatcher-converted-inputs-01']
+    C.need(actual['command'] == argv and ledger['converter'] == child['converter'], 'actual input-only converter argv differs')
+    C.exact(ledger['converter']); C.exact(ledger['input_cases'])
+    times = [actual['started_utc'], ledger['started_utc'], child['started_utc'], child['finished_utc'], ledger['finished_utc'], actual['finished_utc']]
+    C.need(all(v.endswith('+00:00') for v in times) and times == sorted(times), 'actual conversion chronology differs')
+    entry = ledger['conversions'][0]
+    same(entry['actual_conversion_execution'], binding['conversion_execution']); same(entry['epjson_input'], child['available_epjson_input']); same(entry['input'], child['source_input'])
+    C.need(len(child['command']) == 2 and Path(child['command'][0]).resolve() == C.exact(ledger['converter']) and child['command'][1] == 'input.idf' and (ROOT / child['cwd'] / 'input.idf').resolve() == C.exact(child['staged_input']), 'actual converter child argv/cwd differs')
+    for key in ['source_input', 'staged_input']: C.need(C.exact(child[key]).read_bytes() == C.exact(literal_idf).read_bytes(), 'complete converter original/staged physical IDF differs')
+    for row in child['actual_output_inventory']: C.exact(row)
+    for row in ledger['executed_runner_sources']: C.exact(row['archive'])
+    C.exact(child['available_epjson_input']); C.exact(child['stdout']); C.exact(child['stderr'])
+
+
+def rust(prep, packet, native_receipt):
+    workflow_prep = C.load(prep['validation_Source_preparation'])
+    A = module(workflow_prep['shared_custody_Source'], 'reviewed_dispatcher_application_custody')
+    V = module(workflow_prep['CLI_validation_Source'], 'reviewed_dispatcher_quality_PE')
+    W = module(workflow_prep['runtime_interfaces']['workflow'], 'reviewed_dispatcher_validation')
+    guard = C.load(packet['Rust_execution_custody'])
+    C.need(guard['schema'] == 'src06-tarp-dispatcher-actual-Rust-capture-custody.v1' and guard['target_execution_performed'] is True and guard['comparison_performed'] is False, 'actual Rust capture custody required')
+    same(guard['Source_preparation'], prep['validation_Source_preparation']); same(guard['Native_baseline_acceptance'], prep['Native_baseline_acceptance'])
+    app, source, fmt, observer = W.application(A, workflow_prep, guard['actual_application'], guard['actual_formatter_review'], guard['Source_snapshot'])
+    same(observer['prospective_pair_policy'], prep['prospective_policy']); same(observer['input_only_request'], prep['input_only_request'])
+    build = C.load(guard['actual_build_record']); approval = C.load(guard['actual_Root_artifact_acceptance'])
+    C.need(build['schema'] == 'src06-tarp-dispatcher-actual-quality-and-artifact.v1' and approval['schema'] == 'src06-tarp-dispatcher-Root-artifact-acceptance.v1' and approval['Root_FULL_PE_and_Cargo_artifact_accepted'] is True, 'actual Rust build/PE acceptance required')
+    for key in ['Source_preparation', 'actual_application', 'actual_formatter_review', 'Source_snapshot', 'Native_baseline_acceptance']: same(build[key], guard[key])
+    same(approval['actual_build_record'], guard['actual_build_record']); same(approval['Source_snapshot'], source)
+    C.need(set(build['quality_executions']) == set(V.QUALITY), 'four distinct quality roles required')
+    totals = {}
+    for role, argv in V.QUALITY.items():
+        q = command(build['quality_executions'][role], prep['recorder_Source'], source, argv)
+        C.need(fmt['finished_utc'] <= q['started_utc'], 'fresh quality must follow actual formatter')
+        if role in ['focused', 'workspace']:
+            groups = [tuple(map(int, r)) for r in re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored;', C.exact(q['stdout']).read_text(encoding='utf8'))]
+            C.need(groups and all(row[1] == 0 for row in groups), 'complete actual passing test summaries required')
+            totals[role] = dict(groups=len(groups), passed=sum(v[0] for v in groups), failed=sum(v[1] for v in groups), ignored=sum(v[2] for v in groups))
+    C.need(totals == build['actual_test_totals'], 'reported actual test totals differ')
+    artifact = build['actual_Cargo_artifact']
+    execution = command(artifact['actual_build_execution'], prep['recorder_Source'], source, workflow_prep['runtime_interfaces']['actual_Cargo_build_command'])
+    same(artifact['actual_full_Cargo_JSON'], execution['stdout'])
+    messages = [json.loads(line, object_pairs_hook=C.unique) for line in C.exact(execution['stdout']).read_text(encoding='utf8').splitlines() if line]
+    emitted = [v for v in messages if v.get('reason') == 'compiler-artifact' and v.get('executable')]
+    C.need(emitted == [artifact['cargo_message']] and any(v.get('reason') == 'build-finished' and v.get('success') is True for v in messages), 'sole actual Cargo-emitted artifact required')
+    message = emitted[0]; capture = execution['cargo_compiler_artifacts_capture']
+    C.need(message['target']['name'] == 'src06_tarp_dispatcher_main' and message['target']['kind'] == ['example'] and Path(message['target']['src_path']).resolve() == ROOT / 'crates/ep_run/examples/src06_tarp_dispatcher_main.rs' and message['profile']['opt_level'] == '0' and message['profile']['test'] is False, 'actual Cargo target/profile differs')
+    C.need(capture['status'] == 'pass' and len(capture['rows']) == 1 and capture['rows'][0]['cargo_message'] == message and capture['rows'][0]['executable']['sha256'] == artifact['executable']['sha256'], 'immediate actual artifact capture differs')
+    C.need(Path(message['executable']).resolve() == C.exact(artifact['executable']), 'actual emitted executable path differs')
+    same(approval['actual_executable'], artifact['executable']); same(artifact['PE_inspection']['actual_binary'], artifact['executable'])
+    C.need(artifact['PE_inspection']['stack_reserve_bytes'] == 8388608, 'actual main-thread stack reserve required')
+    C.exact(artifact['PE_inspection']['actual_PE_header_bytes'])
+    C.need(build['runtime_source_bindings'] == app['runtime_source_bindings'], 'actual runtime Source packet differs')
+    C.need(C.exact(build['pair_policy']).read_bytes() == C.exact(build['frozen_pair_policy']).read_bytes() == C.exact(prep['prospective_policy']).read_bytes(), 'before-run prospective policy bytes differ')
+    binding = C.load(guard['input_binding']); protocol = observer['runtime_interfaces']
+    C.need(set(binding) == set(protocol['binding_keys']) and binding['schema'] == protocol['binding_schema'] and binding['expected_values_supplied'] is False and binding['Native_results_supplied'] is False and binding['backend_context'] == workflow_prep['authored_unpaired_backend_context'], 'literal-only binding protocol differs')
+    for key, expected in [('native_source_preparation', prep['Native_Source_preparation']), ('dispatcher_source_preparation', workflow_prep['dispatcher_Source_preparation']), ('native_request', prep['input_only_request']), ('runtime_sources', app['runtime_source_bindings']), ('pair_policy', prep['prospective_policy'])]: same(binding[key], expected)
+    for key, role in [('conversion_ledger', 'ledger'), ('conversion_execution', 'execution'), ('conversion_command_receipt', 'recorded_command')]: same(binding[key], observer['actual_input_only_conversion'][role])
+    conversion(binding, prep['recorder_Source'], prep['literal_IDF'])
+    actual = command(guard['actual_execution'], prep['recorder_Source'], source, allowed=(0, 2))
+    argv = actual['command']; C.need(len(argv) == 4 and Path(argv[0]).resolve() == C.exact(artifact['executable']) and Path(argv[1]).resolve() == C.exact(guard['input_binding']) and argv[2] == guard['input_binding']['sha256'] and Path(argv[3]).resolve() == C.exact(guard['input_binding']).parent / 'cases', 'actual Rust argc4/complete binding differs')
+    C.need(actual['exit_code'] == guard['actual_exit_code'], 'Rust actual process outcome differs')
+    same(actual['stdout'], guard['actual_complete_stdout']); same(actual['stderr'], guard['actual_complete_stderr']); same(guard['actual_executable_after'], artifact['executable'])
+    C.need(C.exact(actual['stderr']).stat().st_size == 0, 'unexpected Rust outer stderr')
+    for row in guard['actual_case_files']: C.exact(row)
+    C.need(native_receipt['finished_utc'] <= fmt['started_utc'] and all(C.load(row)['finished_utc'] <= execution['started_utc'] for row in build['quality_executions'].values()) and execution['finished_utc'] <= actual['started_utc'], 'Native/application/quality/build/capture chronology differs')
+    outer = command(packet['Rust_launch_execution'], prep['recorder_Source'], source, allowed=(0, 2))
+    C.need(outer['exit_code'] == actual['exit_code'] and outer['started_utc'] <= actual['started_utc'] <= actual['finished_utc'] <= outer['finished_utc'], 'actual outer capture chronology/outcome differs')
+    C.need(outer['command'][1:5] == ['-X', 'utf8', '-B', str(C.exact(workflow_prep['runtime_interfaces']['workflow']))] or outer['command'][1:5] == ['-X', 'utf8', '-B', workflow_prep['runtime_interfaces']['workflow']['path']], 'actual reviewed workflow launcher required')
+    C.need(len(outer['command']) == 20 and outer['command'][5] == 'execute', 'exact actual execute workflow argc required')
+    options = dict(zip(outer['command'][6::2], outer['command'][7::2]))
+    expected_options = {'--source-preparation': prep['validation_Source_preparation'], '--application': guard['actual_application'], '--formatter-review': guard['actual_formatter_review'], '--Source-snapshot': source, '--build-record': guard['actual_build_record'], '--artifact-review': guard['actual_Root_artifact_acceptance']}
+    C.need(set(options) == set(expected_options) | {'--output-dir'} and (ROOT / options['--output-dir']).resolve() == C.exact(guard['input_binding']).parent, 'complete actual outer execute operands differ')
+    for key, row in expected_options.items():
+        name, sha = options[key].rsplit('#', 1); same({'path': name, 'sha256': sha}, row)
+    for role in ['Root_Rust_factual_review', 'independent_Rust_factual_review']:
+        review = C.load(packet[role])
+        C.need(review['schema'] == 'src06-tarp-dispatcher-Rust-factual-review.v1' and review['accepted'] is True, 'both full factual Rust reviews required')
+        for k, expected in [('actual_custody', packet['Rust_execution_custody']), ('actual_execution', guard['actual_execution']), ('Source_snapshot', source)]: same(review[k], expected)
+    FINAL_GUARDS.append(lambda: W.application(A, workflow_prep, guard['actual_application'], guard['actual_formatter_review'], source))
+    return actual, guard, binding, totals
+
+
+def recheck():
+    for guard in FINAL_GUARDS: guard()
+    for mod in MODULES:
+        for path, row in getattr(mod, 'FROZEN', {}).items():
+            C.need(mod.full(path) == row, 'Native frozen artifact changed during comparison')

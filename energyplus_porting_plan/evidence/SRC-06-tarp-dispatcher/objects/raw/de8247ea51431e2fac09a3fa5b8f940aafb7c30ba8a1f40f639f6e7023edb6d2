@@ -1,0 +1,6 @@
+    if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) {
+        DisplayString(state, "Initializing Interior Convection Coefficients");
+    }
+    Convect::InitIntConvCoeff(state, state.dataHeatBalSurf->SurfTempInTmp);
+
+    if (state.dataGlobal->BeginSimFlag) { // Now's the time to report surfaces, if desired

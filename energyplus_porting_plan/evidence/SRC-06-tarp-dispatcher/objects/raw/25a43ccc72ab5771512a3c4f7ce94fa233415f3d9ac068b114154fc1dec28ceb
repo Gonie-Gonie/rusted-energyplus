@@ -1,0 +1,8 @@
+    DataHeatBalance::ZonePreDefRepType BuildingPreDefRep;
+    EPVector<DataHeatBalance::SpaceZoneSimData> ZoneIntGain;
+    EPVector<DataHeatBalance::SpaceZoneSimData> spaceIntGain;
+    EPVector<DataHeatBalance::SpaceIntGainDeviceData> spaceIntGainDevices;
+    EPVector<DataHeatBalance::SpaceData> space;
+    EPVector<DataHeatBalance::SpaceListData> spaceList;
+    EPVector<DataHeatBalance::ZoneData> Zone;
+    EPVector<DataHeatBalance::ZoneResilience> Resilience;

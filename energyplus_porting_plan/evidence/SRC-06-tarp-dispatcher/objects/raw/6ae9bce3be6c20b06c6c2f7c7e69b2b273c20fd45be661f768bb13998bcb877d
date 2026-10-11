@@ -1,0 +1,3 @@
+    CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients";
+    Count = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+    for (int Loop = 1; Loop <= Count; ++Loop) {

@@ -1,0 +1,137 @@
+"""Read-only dispatcher quality/Cargo/raw-PE review; no executable is launched."""
+import argparse
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import re
+import struct
+
+ROOT = Path(__file__).resolve().parents[4]
+VALIDATION = {'path': '.runtime/porting/SRC-06/tarp-dispatcher-validation-prep-04/manifest.json', 'sha256': 'ef1a8587c1cf778be7e588e1e5d788476937567852468df89f5340a90e4bc740'}
+SHARED = {'path': '.runtime/porting/SRC-05/ordinary-main-thread-application-prep-03/apply.py', 'sha256': 'f156146347a42f0f9ee0d13a6e180ab82773c7a9387c5200e85f464b95ba21c5'}
+PRIOR = {'path': '.runtime/porting/SRC-05/ordinary-main-thread-validation-01/record.json', 'sha256': 'decafdcbfd1fa6118bc27fe513b79cea7143494429064309f487d494a10a9183'}
+
+
+def module(path, name):
+    spec = importlib.util.spec_from_file_location(name, path)
+    value = importlib.util.module_from_spec(spec); spec.loader.exec_module(value)
+    return value
+
+
+def ignored(text):
+    return [{'name': m.group(1), 'actual_line': m.group(0)} for m in re.finditer(r'^test (\S+) \.\.\. ignored(?:,.*)?$', text, re.MULTILINE)]
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--build-record', required=True)
+    parser.add_argument('--output')
+    args = parser.parse_args()
+    helper = ROOT / SHARED['path']
+    assert hashlib.sha256(helper.read_bytes()).hexdigest() == SHARED['sha256']
+    A = module(helper, 'reviewed_dispatcher_shared_custody')
+    assert A.ROOT == ROOT
+    held_ref = A.ref(Path(__file__).with_name('manifest.json')); held = A.load(held_ref)
+    assert held['schema'] == 'src06-tarp-dispatcher-artifact-review-Source-preparation.v1'
+    assert A.bind(held['runtime_interfaces']['checker']) == Path(__file__).resolve()
+    for row in held['own_sources']: A.bind(row)
+    prep = A.load(VALIDATION)
+    assert A.bind(prep['shared_custody_Source']) == A.bind(SHARED)
+    V = module(A.bind(prep['CLI_validation_Source']), 'reviewed_dispatcher_quality_authority')
+    W = module(A.bind(prep['runtime_interfaces']['workflow']), 'reviewed_dispatcher_validation')
+    build_ref = A.operand(args.build_record); build = A.load(build_ref)
+    assert build['schema'] == 'src06-tarp-dispatcher-actual-quality-and-artifact.v1'
+    assert A.bind(build['Source_preparation']) == A.bind(VALIDATION)
+    assert build['target_execution_performed'] is False and build['scientific_PASS_claimed'] is False and build['gates_updated'] is False
+    app, source, fmt, observer = W.application(A, prep, build['actual_application'], build['actual_formatter_review'], build['Source_snapshot'])
+    assert A.bind(app['dispatcher_Source_preparation']) == A.bind(prep['actual_applied_dispatcher_Source_preparation'])
+    assert prep['dispatcher_Source_preparation']['sha256'] == '0888b88cd65dff863461bac16b271d967b90c5af6ef43df6e247a025aa325889'
+    assert build['runtime_source_bindings'] == app['runtime_source_bindings']
+    assert A.bind(build['Native_baseline_acceptance']) == A.bind(prep['Native_baseline_acceptance'])
+    assert A.bind(build['pair_policy']).read_bytes() == A.bind(build['frozen_pair_policy']).read_bytes() == A.bind(observer['prospective_pair_policy']).read_bytes()
+    assert build['pair_policy']['sha256'] == 'ff49c35addf3990ff45e46d6be85e16fb71b9ba87b90f6b58416fd0000b27dc4'
+    prior = A.load(PRIOR)
+    expected_ignored = {}
+    for role in ['focused', 'workspace']:
+        old = A.recorded(prior['quality_executions'][role], prior['Source_snapshot'], V.QUALITY[role])
+        roster = ignored(A.bind(old['stdout']).read_text(encoding='utf8'))
+        assert roster == prior['actual_test_totals'][role]['actual_ignored_tests'] and len(roster) == 2
+        expected_ignored[role] = sorted(row['name'] for row in roster)
+    assert expected_ignored['focused'] == expected_ignored['workspace']
+    assert set(build['quality_executions']) == set(V.QUALITY)
+    totals, rosters, quality = {}, {}, {}
+    for role, argv in V.QUALITY.items():
+        q = A.recorded(build['quality_executions'][role], source, argv)
+        assert q['finished_utc'] is not None and fmt['finished_utc'] <= q['started_utc'] <= q['finished_utc']
+        quality[role] = q
+        if role in ['focused', 'workspace']:
+            text = A.bind(q['stdout']).read_text(encoding='utf8')
+            groups = [tuple(map(int, row)) for row in re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored;', text)]
+            roster = ignored(text)
+            assert groups and all(row[1] == 0 for row in groups)
+            assert sorted(row['name'] for row in roster) == expected_ignored[role] and sum(row[2] for row in groups) == len(roster) == 2
+            totals[role] = dict(groups=len(groups), passed=sum(row[0] for row in groups), failed=sum(row[1] for row in groups), ignored=sum(row[2] for row in groups))
+            rosters[role] = roster
+    assert totals == build['actual_test_totals']
+    artifact = build['actual_Cargo_artifact']
+    actual = A.recorded(artifact['actual_build_execution'], source, prep['runtime_interfaces']['actual_Cargo_build_command'])
+    assert actual['finished_utc'] is not None and actual['started_utc'] <= actual['finished_utc']
+    assert all(row['finished_utc'] <= actual['started_utc'] for row in quality.values())
+    assert A.bind(actual['stdout']) == A.bind(artifact['actual_full_Cargo_JSON'])
+    messages = [json.loads(line) for line in A.bind(actual['stdout']).read_bytes().splitlines() if line]
+    emitted = [row for row in messages if row.get('reason') == 'compiler-artifact' and row.get('executable')]
+    assert emitted == [artifact['cargo_message']] and any(row.get('reason') == 'build-finished' and row.get('success') is True for row in messages)
+    message = emitted[0]
+    assert message['target']['name'] == 'src06_tarp_dispatcher_main' and message['target']['kind'] == ['example']
+    assert Path(message['target']['src_path']).resolve() == ROOT / 'crates/ep_run/examples/src06_tarp_dispatcher_main.rs'
+    assert message['package_id'].startswith(((ROOT / 'crates/ep_run').as_uri(), 'path+' + (ROOT / 'crates/ep_run').as_uri()))
+    assert message['profile']['test'] is False and message['profile']['opt_level'] == '0' and message['profile']['debuginfo'] == 0
+    captured = actual['cargo_compiler_artifacts_capture']
+    assert captured['status'] == 'pass' and len(captured['rows']) == 1 and captured['rows'][0]['cargo_message'] == message
+    binary = A.bind(artifact['executable']); before = A.ref(binary)
+    assert binary.is_relative_to(ROOT / 'target') and binary.suffix.lower() == '.exe' and Path(message['executable']).resolve() == binary
+    assert captured['rows'][0]['executable']['sha256'] == before['sha256'] and (ROOT / captured['rows'][0]['executable']['historical_path']).resolve() == binary
+    report = artifact['PE_inspection']; assert A.bind(report['actual_binary']) == binary
+    with binary.open('rb') as stream:
+        dos = stream.read(64); assert len(dos) == 64 and dos[:2] == b'MZ'
+        offset = struct.unpack_from('<I', dos, 60)[0]; assert 64 <= offset <= before['size_bytes'] - 24
+        stream.seek(offset); coff = stream.read(24); assert len(coff) == 24 and coff[:4] == b'PE\0\0'
+        machine, count = struct.unpack_from('<HH', coff, 4)
+        optional_size, characteristics = struct.unpack_from('<HH', coff, 20)
+        assert machine == 0x8664 and count > 0 and optional_size >= 240 and offset + 24 + optional_size + count * 40 <= before['size_bytes']
+        optional = stream.read(optional_size); section_bytes = stream.read(count * 40)
+    assert len(optional) == optional_size and struct.unpack_from('<H', optional)[0] == 0x20b and len(section_bytes) == count * 40
+    assert dos + coff + optional + section_bytes == A.bind(report['actual_PE_header_bytes']).read_bytes()
+    assert offset == report['PE_header_file_offset'] and machine == report['machine'] and characteristics == report['COFF_characteristics']
+    reserve, commit = struct.unpack_from('<QQ', optional, 72)
+    assert reserve == report['stack_reserve_bytes'] == 8388608 and commit == report['stack_commit_bytes'] == 4096
+    entry = struct.unpack_from('<I', optional, 16)[0]
+    assert entry == report['entry_point_RVA'] and struct.unpack_from('<H', optional, 68)[0] == report['subsystem'] and struct.unpack_from('<H', optional, 70)[0] == report['DLL_characteristics']
+    assert struct.unpack_from('<I', optional, 108)[0] == 16
+    directories = [dict(index=i, address=struct.unpack_from('<I', optional, 112+i*8)[0], size=struct.unpack_from('<I', optional, 116+i*8)[0]) for i in range(16)]
+    assert directories == report['data_directories'] and directories[4]['address'] + directories[4]['size'] <= before['size_bytes']
+    sections = []
+    for i in range(count):
+        row = section_bytes[40*i:40*(i+1)]
+        virtual_size, rva, raw_size, raw_offset = struct.unpack_from('<IIII', row, 8)
+        sections.append(dict(name_bytes_hex=row[:8].hex(), virtual_size=virtual_size, virtual_address=rva, raw_size=raw_size, raw_offset=raw_offset, characteristics=struct.unpack_from('<I', row, 36)[0]))
+    assert sections == report['sections'] and all(row['raw_offset'] + row['raw_size'] <= before['size_bytes'] for row in sections)
+    text_sections = [row for row in sections if bytes.fromhex(row['name_bytes_hex']).rstrip(b'\0') == b'.text']
+    assert len(text_sections) == 1 and text_sections[0]['characteristics'] & 0x20000000
+    assert text_sections[0]['virtual_address'] <= entry < text_sections[0]['virtual_address'] + max(text_sections[0]['virtual_size'], text_sections[0]['raw_size'])
+    assert A.ref(binary) == before
+    W.application(A, prep, build['actual_application'], build['actual_formatter_review'], source)
+    for role, argv in V.QUALITY.items(): A.recorded(build['quality_executions'][role], source, argv)
+    A.recorded(artifact['actual_build_execution'], source, prep['runtime_interfaces']['actual_Cargo_build_command'])
+    A.load(build_ref); A.load(VALIDATION); A.bind(artifact['executable']); A.bind(report['actual_PE_header_bytes'])
+    for row in held['own_sources']: A.bind(row)
+    facts = dict(complete_sections=count, complete_directories=16, actual_entry_in_text=True, entry_point_RVA=entry, stack_reserve_bytes=reserve, stack_commit_bytes=commit, DOS_header_hex=dos.hex(), COFF_and_signature_hex=coff.hex(), optional_header_hex=optional.hex(), complete_40_byte_section_rows_hex=[section_bytes[i*40:(i+1)*40].hex() for i in range(count)], parsed_sections=sections, parsed_directories=directories, actual_PE_header_bytes=report['actual_PE_header_bytes'])
+    record = dict(schema='src06-tarp-dispatcher-Root-artifact-acceptance.v1', accepted=True, Root_FULL_PE_and_Cargo_artifact_accepted=True, actual_build_record=build_ref, Source_snapshot=source, actual_executable=artifact['executable'], actual_Cargo_artifact=artifact, actual_quality_totals=totals, actual_ignored_tests=rosters, ignored_roster_historical_authority=PRIOR, actual_application=build['actual_application'], actual_formatter_review=build['actual_formatter_review'], actual_validation_preparation=A.ref(A.bind(VALIDATION)), immutable_observer_request_authority=prep['dispatcher_Source_preparation'], actual_applied_dispatcher_Source_preparation=prep['actual_applied_dispatcher_Source_preparation'], Native_baseline_acceptance=build['Native_baseline_acceptance'], frozen_pair_policy=build['frozen_pair_policy'], independent_raw_PE_facts=facts, review_Source=A.ref(Path(__file__).resolve()), review_Source_preparation=held_ref, scope='Actual current full Source/application/formatter/policy, four genuine quality commands, sole Cargo artifact and complete raw x64 PE headers/entry/8MiB stack. No target execution, loader/security equivalence, FP state, scientific parity or ordinary closure.', target_execution_performed=False, scientific_PASS_claimed=False, gates_updated=False)
+    out = (ROOT / args.output).resolve() if args.output else A.bind(build_ref).parent / 'Root-artifact-acceptance.json'
+    assert out.is_relative_to(ROOT / '.runtime/porting/SRC-06') and not out.exists()
+    print(json.dumps(A.dump(out, record)))
+
+
+if __name__ == '__main__':
+    main()

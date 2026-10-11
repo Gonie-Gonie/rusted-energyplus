@@ -1,0 +1,145 @@
+--- /dev/null
++++ crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/geometry.rs
+@@ -0,0 +1,142 @@
++//! Literal selected roof/edge and facade metadata operations.
++
++use super::{InsideConvectionSurface, InsideConvectionUnavailable};
++
++/// Actual SurfaceGeometry::GeoSummary constructor and written members.
++#[derive(Clone, Copy, Debug, Default, PartialEq)]
++pub struct ConvectionGeometrySummary {
++    /// Sum of surface areas.
++    pub area: f64,
++    /// Perimeter after the actual roof edge operations, or facade envelope.
++    pub perimeter: f64,
++    /// Area-weighted roof height, or facade envelope height.
++    pub height: f64,
++    /// Area-weighted roof azimuth.
++    pub azimuth: f64,
++    /// Area-weighted roof tilt.
++    pub tilt: f64,
++    /// Maximum Z, constructor zero for empty facades.
++    pub z_max: f64,
++    /// Minimum Z, constructor zero for empty facades.
++    pub z_min: f64,
++    /// Maximum Y.
++    pub y_max: f64,
++    /// Minimum Y.
++    pub y_min: f64,
++    /// Maximum X.
++    pub x_max: f64,
++    /// Minimum X.
++    pub x_min: f64,
++}
++
++fn near(a: [f64; 3], b: [f64; 3]) -> bool {
++    (a[0] - b[0]).abs() < 0.01 && (a[1] - b[1]).abs() < 0.01 && (a[2] - b[2]).abs() < 0.01
++}
++fn distance(a: [f64; 3], b: [f64; 3]) -> f64 {
++    ((a[0] - b[0]).powf(2.0) + (a[1] - b[1]).powf(2.0) + (a[2] - b[2]).powf(2.0)).sqrt()
++}
++#[derive(Clone, Copy)]
++struct Edge { start: [f64; 3], end: [f64; 3], count: usize }
++impl Edge {
++    fn same(&self, other: &Self) -> bool {
++        (near(self.start, other.start) && near(self.end, other.end))
++            || (near(self.start, other.end) && near(self.end, other.start))
++    }
++    fn contains(&self, p: [f64; 3]) -> bool {
++        if near(self.start, p) || near(self.end, p) { return false; }
++        let mut t = std::array::from_fn::<_, 3, _>(|i| self.end[i] - self.start[i]);
++        let length = ((t[0] * t[0]) + (t[1] * t[1]) + (t[2] * t[2])).sqrt();
++        let dilation = 1.0 / length;
++        for value in &mut t { *value *= dilation; }
++        let other = std::array::from_fn::<_, 3, _>(|i| p[i] - self.start[i]);
++        let cross = [(t[1] * other[2]) - (t[2] * other[1]),
++            (t[2] * other[0]) - (t[0] * other[2]), (t[0] * other[1]) - (t[1] * other[0])];
++        let off_line = ((cross[0] * cross[0]) + (cross[1] * cross[1]) + (cross[2] * cross[2])).sqrt();
++        off_line < 0.01 && (distance(self.start, self.end)
++            - (distance(self.start, p) + distance(p, self.end))).abs() < 0.01
++    }
++}
++
++pub(super) fn roof(surfaces: &[InsideConvectionSurface]) -> ConvectionGeometrySummary {
++    let mut value = ConvectionGeometrySummary::default();
++    let mut vertices = Vec::new();
++    let mut edges: Vec<Edge> = Vec::new();
++    for surface in surfaces {
++        if !surface.exterior || !surface.heat_transfer || surface.tilt > 45.0 { continue; }
++        let (low, high) = z_bounds(&surface.vertices);
++        value.height += (high - low) * surface.area;
++        value.tilt += surface.tilt * surface.area;
++        value.azimuth += surface.azimuth * surface.area;
++        value.area += surface.area;
++        for (i, &vertex) in surface.vertices.iter().enumerate() {
++            if !vertices.iter().any(|&p| near(vertex, p)) { vertices.push(vertex); }
++            let edge = Edge { start: vertex, end: surface.vertices[(i + 1) % surface.vertices.len()], count: 1 };
++            if let Some(found) = edges.iter_mut().find(|e| e.same(&edge)) { found.count += 1; }
++            else { edges.push(edge); }
++        }
++    }
++    if value.area > 0.0 {
++        value.height /= value.area; value.tilt /= value.area; value.azimuth /= value.area;
++    } else { value.height = 0.0; value.tilt = 0.0; value.azimuth = 0.0; }
++    edges.retain(|e| e.count != 2);
++    loop {
++        let mut split = None;
++        'edges: for (i, edge) in edges.iter().enumerate() {
++            for &p in &vertices {
++                if edge.contains(p) { split = Some((i, p)); break 'edges; }
++            }
++        }
++        let Some((i, p)) = split else { break; };
++        let end = edges[i].end;
++        edges[i].end = p;
++        // EdgeOfSurf's new split edge count is overwritten by the recount.
++        edges.push(Edge { start: p, end, count: 0 });
++    }
++    for i in 0..edges.len() {
++        edges[i].count = edges.iter().filter(|e| e.same(&edges[i])).count();
++    }
++    edges.retain(|e| e.count != 2);
++    for edge in &edges { value.perimeter += distance(edge.start, edge.end); }
++    value
++}
++
++pub(super) fn z_bounds(vertices: &[[f64; 3]]) -> (f64, f64) {
++    let mut low = vertices[0][2]; let mut high = low;
++    for p in &vertices[1..] { if p[2] < low { low = p[2]; } if p[2] > high { high = p[2]; } }
++    (low, high)
++}
++pub(super) fn compass(azimuth: f64) -> Result<usize, InsideConvectionUnavailable> {
++    if !(0.0..360.0).contains(&azimuth) { return Err(InsideConvectionUnavailable::Geometry); }
++    for (i, (low, high)) in [(337.5, 22.5), (22.5, 67.5), (67.5, 112.5), (112.5, 157.5),
++        (157.5, 202.5), (202.5, 247.5), (247.5, 292.5), (292.5, 337.5)].into_iter().enumerate() {
++        if (low > high && (azimuth >= low || azimuth < high)) || (azimuth >= low && azimuth < high) { return Ok(i); }
++    }
++    Err(InsideConvectionUnavailable::Geometry)
++}
++// std::max/min keep the first operand on equality and unordered comparison.
++pub(super) fn source_max(a: f64, b: f64) -> f64 { if a < b { b } else { a } }
++pub(super) fn source_min(a: f64, b: f64) -> f64 { if b < a { b } else { a } }
++
++pub(super) fn facades(surfaces: &[InsideConvectionSurface]) -> Result<[ConvectionGeometrySummary; 8], InsideConvectionUnavailable> {
++    let mut values = [ConvectionGeometrySummary::default(); 8];
++    for surface in surfaces {
++        if !surface.exterior || !surface.heat_transfer || surface.tilt < 45.0 || surface.tilt >= 135.0 { continue; }
++        let face = &mut values[compass(surface.azimuth)?];
++        let mut low = [f64::MAX; 3]; let mut high = [-f64::MAX; 3];
++        for p in &surface.vertices { for i in 0..3 {
++            if p[i] < low[i] { low[i] = p[i]; } else if p[i] > high[i] { high[i] = p[i]; }
++        } }
++        face.area += surface.area;
++        face.z_max = source_max(high[2], face.z_max); face.z_min = source_min(low[2], face.z_min);
++        face.y_max = source_max(high[1], face.y_max); face.y_min = source_min(low[1], face.y_min);
++        face.x_max = source_max(high[0], face.x_max); face.x_min = source_min(low[0], face.x_min);
++    }
++    for face in &mut values {
++        let dx = face.x_max - face.x_min;
++        let dy = face.y_max - face.y_min;
++        face.perimeter = 2.0 * ((dx * dx) + (dy * dy)).sqrt()
++            + 2.0 * (face.z_max - face.z_min);
++        face.height = face.z_max - face.z_min;
++    }
++    Ok(values)
++}
