@@ -1,0 +1,42 @@
+{
+  "schema": "rad01-selected-unit-gate-adjudication.v1",
+  "created_utc": "2026-10-11T02:22:33.532031+00:00",
+  "actual_unit_evidence": {
+    "path": "energyplus_porting_plan/evidence/RAD-01-unit/summary.json",
+    "sha256": "c9d8cd152e0924a2bd79d4625a165238b054cc3b40f48f41d9f513e6c99845ee",
+    "size_bytes": 5614
+  },
+  "actual_obligation_audit": {
+    "path": ".runtime/porting/RAD-01/obligation-audit-prep-01/manifest.json",
+    "sha256": "5496993d0b3b2ba1b0c4a9a3a74ea7721cf1e08168f1ccbde4d719538e3386e5",
+    "size_bytes": 25623
+  },
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/RAD-01-unit-gate/manifest.json",
+    "sha256": "d5583179c56dc1dbd037fd417083d8331b111eb7e271c8ca397034ebcaca6075",
+    "size_bytes": 1186
+  },
+  "Root_and_Base_FULL_obligation_review_accepted": true,
+  "selected_scope": "finite declared opaque registries, complete Original CalcApproximateViewFactors1406-1519; fixed21 cases",
+  "unit_gate": "통과",
+  "numeric_comparisons": 378,
+  "discrete_comparisons": 2115,
+  "mismatch_count": 0,
+  "maximum_absolute_error": 0.0,
+  "RMSE": 0.0,
+  "warning_records_exact": 11,
+  "scope_complete_required_numeric_case_missing": false,
+  "integration_gate": "미확인",
+  "production_gate": "미확인",
+  "remaining": [
+    "actual GEO02 ordered enclosure geometry and rawF/ZoneArea/warning ownership",
+    "actual rawF-to-RAD02 association, corrected solar F reuse and radiant ScriptF order",
+    "persistent production initialization owner and invalidation timing"
+  ],
+  "ordinary_fixed6_CLI_evidence": {
+    "path": "energyplus_porting_plan/evidence/RAD-01-production-cli/summary.json",
+    "sha256": "f5e5bd75cef1a6424a459817b1b80f4541c94a702fe20a0ef788161b799a46bb",
+    "size_bytes": 4751
+  },
+  "complete_card_PASS_claimed": false
+}

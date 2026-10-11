@@ -1,0 +1,59 @@
+# RAD-01 remaining obligations — source-only audit
+
+This immutable audit finds no missing required direct-function numerical unit case within the frozen finite opaque 21-case boundary. It does not change a gate. Root must join the accepted source/protocol reviews to the actual OriginalQA, candidate, strict comparison and quality receipts before deciding the unit gate. The full card still requires genuine initialization and downstream ownership evidence.
+
+The audit read source, input-only JSON and contracts. It did not read scientific result files, run a target, calculate expected answers, amend the plan/card, or tune a policy. The current plan is only hashed and projected into selected task fields; embedded evidence bodies are excluded. Root's supplied statement that the actual 21 comparisons returned and matched is not independently remeasured here.
+
+## Declared unit boundary
+
+The exact whole Original is `CalcApproximateViewFactors`, `HeatBalanceIntRadExchange.cc:1406–1519`, with declaration 109–116. Native admission requires finite supplied area/azimuth/tilt, actual unique one-based registry positions, a complete ordered SPtr permutation, and Wall/Floor/Roof/Ceiling classes. Ceiling deliberately maps to Native Roof. IntMass, other excluded classes and nonfinite supplied values are outside this contract. Native empty arrays and Rust-only association/representation errors are unpaired.
+
+The 21 frozen input-only records cover the required source decisions:
+
+| Required behavior | Frozen cases |
+|---|---|
+| Equal and asymmetric areas; directed F(j,i) axes | `positive-below-epsilon`; `asymmetric-areas` |
+| Strict azimuth >10 and <350, no wrap normalization | `azimuth-at10`, `azimuth-above10`, `azimuth-at350`, `azimuth-below350`, `azimuth-360` |
+| Strict tilt >10 | `tilt-at10`, `tilt-above10` |
+| Self and floor-to-floor exclusion; floor-to-roof visibility | `floor-floor-roof`, plus every matrix diagonal |
+| Positive division below epsilon | `positive-below-epsilon` |
+| Zero/negative seen area and ordered warning/continue association | `nonpositive-diagnostic`, excluded-angle cases, `one-direct-surface-diagnostic` |
+| Caller pointer order and accumulation order | `accumulation-registry-order`, `accumulation-pointer-permutation` |
+| Selected Ceiling class mapping | `declared-ceiling-maps-Native-roof` |
+| Six declared CON membership/name templates | `CON-template-*`, explicitly supplied geometry rather than parsed production geometry |
+
+There are 15 direct diagnostic/boundary records and six templates. The ordinary equal-area obligation is represented by the two equal positive areas in the tiny-positive case; it need not become a new required case merely because its magnitude is small. The frozen profile already compares every ZoneArea/F scalar, shape, value class and signed zero, plus copied inputs/IDs/order and typed warning identity/order. This is completion of the declared case obligations, not exhaustive proof over every finite f64 value, matrix size, or excluded Native input.
+
+The helper calls the unchanged whole Original once per declared case with real allocated state and arrays. It observes ZoneArea before deallocation and all F entries, returns/partial observations and genuine diagnostics. The Rust public API retains ordered IDs, ZoneArea, F and typed warnings through the same shared kernel used by the legacy interface. No additional mathematical subhelper, history update or timestep transition is hidden in this direct routine.
+
+The three Rust-only API checks (zone mismatch, duplicate ID, empty input) remain contract tests. They cannot count as paired Native failure cases. Global diagnostic backend delivery/index equality is separately unpaired; the required typed warning/continue identity and order are part of the direct comparison. No new unit test, tolerance change or input replacement is needed to repair a known omission in the admitted direct unit scope.
+
+## Concrete integration gap
+
+Native solar initialization constructs `EnclSolInfo.SurfacePtr` in actual space/surface order, excludes air boundaries, assigns actual surface indices, and copies Area/Azimuth/Tilt at 840–914. It bypasses the raw helper for one surface (916–921), considers user inputs, invokes raw CalcApprox at 942–948, then passes the same Area and in-place F owner to FixViewFactors at 963–974. `DataViewFactorInformation.hh:64–96` declares F as destination row/source column.
+
+Native radiant initialization selects representative surfaces, accumulates nonrepresentative areas and preserves reporting order at 496–574. For the ordinary no-user/no-shelf route with existing solar F, it copies the already corrected solar matrix at 610–614. Otherwise raw CalcApprox630 and Fix645 run on the same radiant owner, followed by CalcScriptF660. A correct trace must retain which route actually occurred; it must not require a second raw helper call on the ordinary solar-reuse route.
+
+GEO-02 certifies the selected geometry producers and their geometric outputs. Its contract does not establish these enclosure memberships, SurfacePtr ordering, representative grouping, aggregate areas, solar/radiant reuse or the raw-to-corrected matrix handoff. The six RAD unit templates deliberately supply geometry independently of GetSurfaceData, so they do not close that producer connection.
+
+Current Rust ordinary initialization produces geometry at `initialization.rs:104–116`, and `HeatBalanceSurfaceIndexes` groups actual surface positions by zone at `state.rs:139–203`. It has no retained solar/radiant enclosure raw/corrected owner. The new identity-bearing public RAD API is called by its unit example/tests only. The ordinary compatibility algorithm selects the ScriptF flat-access path; the surface iteration calls the legacy probe, rebuilding approximate/corrected/ScriptF matrices and dropping raw ZoneArea/warning ownership. Reuse of the correct shared arithmetic does not establish initialized caller timing or downstream ownership.
+
+The minimum remaining integration work is concrete:
+
+1. Retain a selected initialized enclosure owner with actual enclosure/zone and ordered SurfaceIds, actual geometry bits and class mapping. Keep raw approximate F/ZoneArea/warnings distinct from the corrected F owner. Record source-owned solar/radiant route and bypass/reuse availability rather than infer it from equal matrices.
+2. At the actual RAD-02 call boundary, verify that it borrows exactly the prior raw F and Area in the same destination/source axis order. Preserve output correction separately. RAD-02 mathematics and convergence/diagnostics need their own card evidence; they are not a missing subroutine inside RAD-01's direct unit.
+3. Connect the retained corrected owner to the actual RAD-03/inside-exchange consumer. Prove the ordinary runtime uses the real initialized owner and preserves rebuild/invalidation timing instead of silently recomputing a detached matrix per surface iteration.
+
+## Concrete production proof still needed
+
+Use unchanged admitted CON IDFs through normal Native input/geometry/enclosure initialization and the real Rust compiler/ordinary initialization. Observe actual ordered producer fields and owner IDs immediately before raw CalcApprox, raw return before Fix, Fix input/return, and the actual radiant reuse or recalculation route. Pair the equivalent Rust owners without supplying Native geometry/matrices/warnings as Rust production operands.
+
+The existing surface-consumer collector03 captures surface catalogs and HBSM history checkpoints, but does not capture EnclSolInfo/EnclRadInfo arrays, raw/corrected F or CalcApprox/Fix invocation association. It cannot substitute for this trace. Its author confirmed that limitation without a new scan; the audit also pins its source manifest as documentary context only.
+
+The next smallest source unit is therefore a typed selected enclosure-initialization/ownership adapter, coupled to passive captures at the existing real initialization boundaries. It can reuse the accepted approximate kernel and GEO-02 producer. It must keep RAD-02's pending correction proof and RAD-03/RAD-04 exchange proof explicit. The existing RAD whole-TU observation pattern and ordinary full-engine caller can be adapted; a second manually seeded production geometry fixture cannot supply the missing evidence.
+
+Production obligations also include actual no-injection/source custody, unchanged input/geometry identities, actual reached/absent/stop semantics, and verified prerequisites. A fixed-six CLI regression can show regressions and ordinary execution, but its success alone cannot prove these internal ownership joins. No gate is promoted by this audit.
+
+## Review limits
+
+Header authored the RAD observer/comparer transport and reviewed the Native/freezer/QA source; this audit is not an independent scientific certificate for those artifacts. The accepted approximate mathematical port was independently authored and reviewed. All future implementation, Native capture and gate adjudication remain separate, reviewed work.

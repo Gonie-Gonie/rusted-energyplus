@@ -21,8 +21,7 @@
 
 heat_balance/radiation.rs
 
-현재 Rust 기준 커밋: `d7b516627f421259012f3e61bc28cca831452468`. 위 경로는 재사용·확인할 위치이며
-이 카드의 새 검증이 통과했다는 의미가 아니다.
+구현 커밋: `7356431a3fb0243af2b8c6427817ccda84c7050f`. 같은 입력의 원본·Rust 단위 비교 및 품질 검사를 통과했다.
 
 ## 입력 계약
 
@@ -56,37 +55,19 @@ RAD-02의 행렬 인덱스와 행/열 의미 보존
 
 원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.
 
-## 종료 체크
+## 검증 상태
 
-- [ ] 원본 범위와 입출력·변경상태 계약 확정
-- [ ] 단위시험 통과 및 실제 활성 분기 확인
+- [x] 원본 범위와 입출력·변경상태 계약 확정
+- [x] 단위시험 통과 및 실제 활성 분기 확인
 - [ ] 상태·시간·호출순서를 포함한 연결시험 통과
 - [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
-구현 커밋:  
-시험 명령:  
-증거 경로:  
-최대오차/RMSE/상태 불일치:  
-추가 검토할 helper:  
+원본 전체 함수 1406–1519행과 선언 109–116행을 기준으로, 명시한 유한 불투명 geometry 21개를 검증했다. 면적 누적 순서, 엄격한 방위·경사 경계, 바닥 간 제외, 양수 면적의 나눗셈, F(j,i) 축 의미와 경고 후 계속 진행을 보존한다. ZoneArea와 F는 각각 atol=0, rtol=0이며 값 분류·배열 모양·부호 있는 0을 비교한다. 입력 비트·식별자·순서도 정확히 비교한다.
 
-## Actual pre-output direct-unit source scope
+원본과 Rust가 모두 21회 반환했다. 수치 378개와 이산 항목 2115개에서 불일치 0, 최대 절대오차와 RMSE 0이다. 경고 11개의 식별자·개수·순서도 일치했다. 미관찰 항목을 통과로 계산하지 않았다. Native 전역 진단 백엔드의 문구는 별도 미검증 항목이다.
 
-Selected direct-unit CalcApproximateViewFactors scope is the complete pinned function1406-1519, its actual declaration109-116 and direct warning helpers. Inputs are21 explicitly declared opaque geometry registries with actual Native1-based indices and independent Rust opaque IDs; six CON name/class templates do not represent observed production geometry or GetSurfaceData order. Preserve strict visibility10/350/tilt10 predicates, Native ordered ZoneArea accumulation, warning/continue identity and order, positive-area division, F(j,i) row-first layout and source outcomes. ZoneArea/F use separate exact zero atol/rtol profiles with class, shape and signed-zero equality; copied input bits/identities/order are exact. Reached required owner absence or an unreturned required function cannot pass. Scope excludes geometry derivation, initialized enclosures, FixViewFactors, ScriptF, radiation exchange and all full-engine integration/production claims. Genuine Native capture and OriginalDataQA precede applying the held Rust arithmetic repair. No unit or full-card PASS follows from source review, build or direct fixtures alone.
+fmt·Clippy 통과, 열수지 203개 및 workspace 4808개 테스트 통과. 고정한 일반 CLI 6종도 모두 exit0과 실제 source-order 검사를 통과했다. 입력·날씨·메타데이터 45개 해시는 유지됐다.
 
-Root and Raw completed FULL cumulative reviews of the held Rust proposal03 and Native helper489a7caa, including all21 input-only cases and the variable profiles. The passive fork contains only four additions and independently restores the whole pinned Original TU exactly. Scope review passes; unit, integration and production gates remain unconfirmed. The three Rust-only invalid-association/empty cases have no Native pair and cannot count as scientific coverage. Actual build/provider/PE provenance, OriginalDataQA, same-input Rust comparison and real runtime connection remain pending.
+남은 연결 범위는 GEO-02가 실제 생성한 enclosure 표면 순서와 raw ZoneArea/F/경고 소유권, RAD-02 보정 행렬과의 축·소유권 연결, 보정된 solar F 재사용 및 radiant ScriptF 호출 순서, 생산 초기화 상태의 지속·무효화 시점이다. 일반 CLI 성공만으로 이 항목들을 통과 처리하지 않는다.
 
-## Native helper compile repair before numerical execution
-
-The first actual build stopped at two misleading-indentation diagnostics in transport helper statements under unchanged -Werror. No helper or scientific command ran. Fresh Native02 changes only those statement layouts; all Original arithmetic, passive observations, literal21 inputs and exact profiles remain unchanged. The first failed build and its receipts are preserved. An exact recorded replay of the previous CTF10 configure restored the actual717-row baseline before this new freeze/build attempt. Root and Raw source reviews cover the narrow Native02 repair. Full gates remain pending.
-
-## Actual selected direct-unit comparison
-
-All21 genuine Original calls and21 actual Rust public API calls returned complete owners on the same frozen inputs. ZoneArea71/F307 numerical comparisons and2115 discrete comparisons have mismatch0; maximum absolute error and RMSE are0 for both exact profiles. All11 warning records match identity, count and source order. No unavailable observation receives PASS. Native global diagnostic backend/text remains unpaired context.
-
-Actual fmt/Clippy exit0; focused heat-balance203 and workspace4808 tests passed. Candidate and quality executions bind raw Source688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27 (3868 files). The shared kernel now preserves positive areas below EPSILON and the literal source division predicate. The first candidate launcher preflight had an incorrect factual QA field name and stopped before any target/recorder; corrected02 executed the actual stages. Evidence: evidence/RAD-01-unit/{manifest,summary}.json.
-
-Selected declared geometry does not establish initialized production enclosures or the GEO-02/RAD-02/RAD-03 integration handoff. Full unit/integration/production gates remain pending; ordinary fixed6 CLI regression is next.
-
-## Actual fixed six ordinary CLI executions
-
-A-24H, A-72H, B-NOLIMIT-24H, B-FLOW-24H, B-CAPACITY-24H and B-BOTH-24H all exit0 on the same final RAD01 source. Each actual source-order gate matches; hours override is absent and compare_oracle=false. All45 original input/weather/metadata guards remain unchanged. This establishes ordinary run regression evidence only; no numerical or integration/production/full-card PASS is inferred. Evidence: evidence/RAD-01-production-cli/{manifest,summary}.json.
+증거: `evidence/RAD-01-unit/summary.json`, `evidence/RAD-01-production-cli/summary.json`, `evidence/RAD-01-unit-gate/summary.json`. 과거 빌드 실패와 재현 기록은 기존 증거에 보존되어 있다.

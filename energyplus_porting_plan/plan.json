@@ -12122,7 +12122,7 @@
       "excludes": "CON-01에서 제외한 입력·분기는 구현 대상에 넣지 않는다. 생략 분기가 실행되지 않는다는 근거를 남긴다.",
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/HeatBalanceIntRadExchange.cc",
       "scope_review": "통과",
-      "unit_gate": "미확인",
+      "unit_gate": "통과",
       "integration_gate": "미확인",
       "production_gate": "미확인",
       "applicability": "A/B",
@@ -12347,6 +12347,11 @@
         "path": "energyplus_porting_plan/evidence/RAD-01-production-cli/summary.json",
         "sha256": "f5e5bd75cef1a6424a459817b1b80f4541c94a702fe20a0ef788161b799a46bb",
         "size_bytes": 4751
+      },
+      "actual_unit_gate_adjudication": {
+        "path": "energyplus_porting_plan/evidence/RAD-01-unit-gate/summary.json",
+        "sha256": "da0f1cb2698c05579999d6f164ef531bd003fbd46b79f5c54aa4ceff5e217f3f",
+        "size_bytes": 1784
       }
     },
     {

@@ -1,0 +1,30 @@
+{
+  "schema": "rad01-unit-obligation-review-selected-evidence.v1",
+  "selected_files": [
+    {
+      "original": {
+        "path": ".runtime/porting/RAD-01/obligation-audit-prep-01/manifest.json",
+        "sha256": "5496993d0b3b2ba1b0c4a9a3a74ea7721cf1e08168f1ccbde4d719538e3386e5",
+        "size_bytes": 25623
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/RAD-01-unit-gate/objects/5496993d0b3b2ba1b0c4a9a3a74ea7721cf1e08168f1ccbde4d719538e3386e5",
+        "sha256": "5496993d0b3b2ba1b0c4a9a3a74ea7721cf1e08168f1ccbde4d719538e3386e5",
+        "size_bytes": 25623
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/RAD-01/obligation-audit-prep-01/README.md",
+        "sha256": "e562d9c71cde39e8606d07202122ef71e067b5d5f9ea33f6e21a9b68e42ab2dd",
+        "size_bytes": 9065
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/RAD-01-unit-gate/objects/e562d9c71cde39e8606d07202122ef71e067b5d5f9ea33f6e21a9b68e42ab2dd",
+        "sha256": "e562d9c71cde39e8606d07202122ef71e067b5d5f9ea33f6e21a9b68e42ab2dd",
+        "size_bytes": 9065
+      }
+    }
+  ],
+  "selected_archive_is_transitive_replay_closure": false
+}
