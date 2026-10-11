@@ -1,0 +1,92 @@
+# RAD-01 existing Native build adapters: SOURCE ONLY
+
+This held proposal adapts the three existing CTF10 Root operational scripts.
+It configures and compiles one genuine three-TU direct-unit target, invokes the
+existing authenticated debug-derivative tool, and authors actual build and
+preservation metadata. It does not invoke the scientific helper. Root and an
+other-author source reviewer must accept this hold before any execution.
+
+The immutable Native source authority is `native-helper-prep-01/manifest.json`
+489a7caa4086722bb5057cfc8489803b21ce7723f881ffcbe54252d604e86618.
+The accepted recipe includes unchanged CTF10 and its inherited recipes. The
+actual prior configure argv supplies every inherited `-D` operand; the adapter
+replaces only `CMAKE_PROJECT_INCLUDE` and appends `RAD01_SOURCE_DIR`. The actual
+prior compile argv retains its options and replaces only the requested targets
+with `rad01_unit_helper`. No core or historical target is selected for rebuild.
+
+Root supplies genuine `path#sha256` operands. Paths below describe argument roles,
+not future artifacts or outcomes. Every output directory must be fresh.
+
+1. Run `python -X utf8 -B <held>/run-native-build.py` with `--freeze-receipt`,
+   `--freeze-execution`, `--prior-final-preservation`, `--prior-retirement`,
+   `--prior-retirement-execution`, `--prior-configure-execution`,
+   `--prior-compile-execution`, `--prior-native-build`,
+   `--native-source-manifest`, and `--output-dir`.
+2. Run `python -X utf8 -B <held>/derive-and-describe-native-build.py` with
+   `--before-preservation <actual-before-json>#<actual-SHA>`,
+   `--prior-derivation-execution <actual-CTF10-unit-derive-recorder>#<actual-SHA>`
+   and the same `--output-dir`.
+3. Run `python -X utf8 -B <held>/complete-native-build-metadata.py` with the same
+   `--before-preservation` and `--output-dir`.
+
+Each script accepts optional `--root`; execution requires the actual repository.
+The nested configure, compile and derivative commands use the existing
+`record_command.py`, require real exit0, no launch error and source guard true.
+The freeze recorder stdout must equal the authenticated full freeze receipt.
+Current scope document bytes must match its actual after-document refs. The
+adapter has no new Git-clean approval condition; actual scope docs can be dirty.
+
+Immediate before authority is the actual CTF10 exact-pair after-retirement record,
+authenticated together with retirement and its real recorder. Its actual schema
+is `ctf10-exact-pair-after-retirement.v1`; the five earlier absence fields contain
+literal path lists. The adapter authenticates each earlier retirement and its
+tombstone, checks list equality, and retains all twelve old Original absences.
+It does not reinterpret or rewrite any legacy registry or retirement record.
+
+Actual CTF10 metadata currently describes 46 prior protected artifacts plus two
+retained derivatives, 631 present and 12 absent registered core objects, and 717
+compile rows. Scripts derive protected counts and prior compile rows from actual
+supplied metadata; no future protected inventory or SourceSnapshot is invented.
+Core registration remains the source-approved 643/631/12 contract. Before hashes
+are explicitly reused from the immediately preceding actual CTF10 final guard;
+current existence/size and absences are checked. Root must establish there was no
+intervening protected/core byte mutation. Completion freshly hashes all retained
+protected/core payloads during genuine Root execution; none were read here.
+
+The source recipe requires exactly three new compile rows and preservation of
+every old row in relative order. Actual verbose Ninja compiler commands must be
+exactly the three new RAD TUs, with all three source paths represented. This
+records observed command exclusion, together with fresh unchanged-object guards;
+it makes no unobservable claim about compiler internals. The CMake include chain
+and old compile options remain unchanged. No historical Source identity is
+relabelled as the future actual recorder SourceSnapshot.
+
+The map parser reuses CTF10's corrected latest-`.text` section mechanism. It
+requires the actual CalcApproximateViewFactors signature (three const Array1D
+references followed by by-value Array2A and the integer pointer array), its symbol
+address inside the derived whole-TU object section, three target LOADs before the
+core archive, and zero original core HeatBalanceIntRadExchange object hits.
+
+Output is `rad01-native-build.v1`, status
+`pass-actual-3TU-link-and-preservation`, target `rad01_unit_helper`, with actual
+six-source inventory, configure/compile/derivation refs, derivative receipt,
+actual preservation/map/compile correspondence and typed dynamic counts.
+The separate Raw-authored strict PE reader consumes this build. No RAD retention
+intent, deletion, numerical PASS, full-engine production geometry claim, new QA
+stage or framework is authored. Actual failures remain failed recorded commands;
+fresh recovery operands and directories require Root review.
+
+All three original CTF10 sources are copied under `before/`; exact unified diffs
+and source/range identities are in the manifest. This proposal was read, hashed,
+diffed and parsed with stdlib AST only. No reviewed script was imported or run;
+no compiler, formatter, engine, Git, scientific/weather/binary/core payload read,
+canonical edit, or gate update occurred. The author also authored the RAD helper
+and pure proposal; this preparation does not independently certify that math.
+
+Fresh02 preserves immutable01. Completion now emits helper_binary as an actual
+path/SHA256/size_bytes ref after verifying the accepted derivative SHA, matching
+the existing strict PE and OriginalDataQA binary-map identity contract. No size
+or future result is assumed. Other two operational source bodies are exact01;
+no arithmetic, compile, provider, preservation or execution criterion changed.
+Current source dependencies bind reviewed freezer02; the inspected freezer01
+context remains explicitly historical. Actual freeze operands stay runtime refs.

@@ -1,0 +1,11 @@
+--- .runtime/porting/RAD-01/native-build-prep-01/complete-native-build-metadata.py
++++ .runtime/porting/RAD-01/native-build-prep-02/complete-native-build-metadata.py
+@@ -55,7 +55,7 @@
+ assert derivative['original_before'] == derivative['original_after'] and derivative['original_before']['historical_path'] == original['path']
+ assert all(derivative['original_before'][key] == original[key] for key in ['sha256', 'size_bytes'])
+ assert derivative['accepted_derivative'] == derivative['observed_derivative']
+-helper = {key: derivative['accepted_derivative'][key] for key in ['path', 'sha256']}; assert sha(contained(helper['path'])) == helper['sha256']
++helper = ref(contained(derivative['accepted_derivative']['path'])); assert helper['sha256'] == derivative['accepted_derivative']['sha256']
+ link_map = directory / 'rad01_unit_helper.map'; hits = []; loads = []; core_load = None; core_hits = 0; section = None
+ symbol = 'EnergyPlus::HeatBalanceIntRadExchange::CalcApproximateViewFactors(EnergyPlus::EnergyPlusData&, int, ObjexxFCL::Array1D<double> const&, ObjexxFCL::Array1D<double> const&, ObjexxFCL::Array1D<double> const&, ObjexxFCL::Array2A<double>, ObjexxFCL::Array1D<int> const&)'
+ with link_map.open('r', encoding='utf8', errors='strict') as stream:

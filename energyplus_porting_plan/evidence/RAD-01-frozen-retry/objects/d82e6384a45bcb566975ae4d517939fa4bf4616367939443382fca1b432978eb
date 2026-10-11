@@ -1,0 +1,8 @@
+﻿import hashlib,json,os,subprocess
+from pathlib import Path
+r=Path.cwd(); prior=r/'.runtime/porting/CTF-10/native-configure-command-01/receipt.json'; b=prior.read_bytes(); assert hashlib.sha256(b).hexdigest()=='aee2f78c24eca55faa824f2670602816aed06644de802cb113878052375ef2f5'
+v=json.loads(b); assert v['exit_code']==0 and v['source_bytes_match_before_and_after']; command=v['command']; assert not any(x.startswith('-DRAD01_SOURCE_DIR=') for x in command)
+env=dict(os.environ); env['PATH']=str(r/'.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin')+os.pathsep+env['PATH']
+result=subprocess.run(['python','-X','utf8','-B','tools/porting/record_command.py','--output-dir','.runtime/porting/RAD-01/restore-prior-configure-command-01','--',*command],check=True,env=env)
+p=r/'.runtime/ep261-gcc13-o0/compile_commands.json'; rows=json.loads(p.read_bytes()); assert len(rows)==717
+print('Prior exact configure restored actual compile row inventory to717; no compile or scientific command issued.')

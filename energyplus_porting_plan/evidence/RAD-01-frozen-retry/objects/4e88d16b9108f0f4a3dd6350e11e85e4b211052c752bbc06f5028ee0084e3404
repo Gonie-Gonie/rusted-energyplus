@@ -1,0 +1,22 @@
+--- .runtime/porting/RAD-01/input-writer-prep-03/before-02/freeze_packet.py
++++ .runtime/porting/RAD-01/input-writer-prep-03/freeze_packet.py
+@@ -16,8 +16,8 @@
+ spec.loader.exec_module(m)
+ 
+ COMMIT = "6f2e40d10250a105b49966baa24d843711e61048"
+-NATIVE = {"path": ".runtime/porting/RAD-01/native-helper-prep-01/manifest.json",
+-          "sha256": "489a7caa4086722bb5057cfc8489803b21ce7723f881ffcbe54252d604e86618"}
++NATIVE = {"path": ".runtime/porting/RAD-01/native-helper-prep-02/manifest.json",
++          "sha256": "b4e10bd483af44f6f5d0b6f5fa13051d106d6d672d1ec0af1b79bbf5d5986b89"}
+ NATIVE_NAMES = ["rad01_helper.cpp", "rad01_metadata.hh", "rad01_admission.hh",
+                 "rad01_observer.hh", "rad01_observer.cc", "HeatBalanceIntRadExchange.rad01.cc"]
+ FLAGS = {"frozen_before_this_RAD01_helper_execution": True,
+@@ -106,7 +106,7 @@
+     inventory = {"native_helper": native_ref, "input_fixture": fixture_ref, "observation_policy": policy_ref, "input_writer": own_ref}
+     m.require(amendment["schema"] == "rad01-source-scope-amendment.v1" and amendment["cards"] == ["RAD-01"] and
+               amendment["rad_policy_source_inventory"] == inventory and amendment["strict_profiles_settled_before_outputs"] is True and
+-              amendment["all_other_gates_pending"] is True and amendment["actual_RAD01_build_or_engine_execution_performed"] is False and
++              amendment["all_other_gates_pending"] is True and amendment["actual_RAD01_successful_build_or_engine_execution_performed"] is False and
+               amendment["requested_counts"] == counts, "Actual pre-output scope authority required")
+     before = [m.bind(row) for row in amendment["before_documents"]]
+     after = [m.bind(row) for row in amendment["after_documents"]]

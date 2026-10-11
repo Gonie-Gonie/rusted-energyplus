@@ -1,0 +1,61 @@
+"""Root launches actual10 native configure/build with the genuine prior final guard."""
+import hashlib
+import json
+import os
+import shutil
+import subprocess
+from datetime import datetime,timezone
+from pathlib import Path
+
+ROOT=Path.cwd();BASE=ROOT/'.runtime/porting/CTF-10';PRIOR=ROOT/'.runtime/porting/CTF-09'
+def read(p):return json.loads(p.read_bytes())
+def sha(p):
+ with p.open('rb') as s:return hashlib.file_digest(s,'sha256').hexdigest()
+def ref(p):return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+def write(p,v):p.write_bytes((json.dumps(v,indent=2)+'\n').encode('utf8'))
+assert not subprocess.check_output(['git','status','--porcelain'])
+assert subprocess.check_output(['git','rev-parse','HEAD'])==subprocess.check_output(['git','rev-parse','@{u}'])
+assert not (BASE/'native-build-01').exists()
+for prefix in ['','production-']:
+ freeze=read(BASE/f'{prefix}frozen-packet-01/freeze-receipt.json');r=read(BASE/f'{prefix}freeze-command-01/receipt.json')
+ assert r['exit_code']==0 and r['source_bytes_match_before_and_after'] and freeze['numerical_PASS_claimed'] is False
+ for p in freeze['source_authorities']['current_scope_documents']:assert ref(ROOT/p['path'])==p
+final_path=PRIOR/'retirement-01/after-retirement.json';final=read(final_path);kept=final['protected_after']
+retired=read(PRIOR/'retirement-01/retirement.json');retire_command=read(PRIOR/'retirement-command-01/receipt.json')
+assert retired['status']=='pass-precise-pair-removal-and-retained-artifact-guards' and retire_command['exit_code']==0
+assert [kept[k] for k in ['legacy_count','retained_derivative_count','core_present_count','core_absent_count']]==[44,2,631,12]
+protected=kept['legacy_protected']+kept['retained_CTF09_derivatives']
+for p in protected+kept['present_core_objects']:
+ actual=ROOT/p['path'];assert actual.is_file() and actual.stat().st_size==p['size_bytes']
+for p in kept['absent_registered_object_paths']:assert not (ROOT/p).exists()
+for row in final['entries']:assert not (ROOT/row['original_link']['historical_path']).exists()
+before=BASE/'native-build-01/before';before.mkdir(parents=True)
+compile_live=ROOT/'.runtime/ep261-gcc13-o0/compile_commands.json';compile_copy=before/'compile_commands.json'
+shutil.copyfile(compile_live,compile_copy);old_rows=read(compile_copy);assert len(old_rows)==709
+write(before/'preservation.json',{'schema':'ctf10-actual-before-build-preservation.v1',
+ 'observed_utc':datetime.now(timezone.utc).isoformat(),'protected_refs':protected,
+ 'present_objects':kept['present_core_objects'],'absent_registered_object_paths':kept['absent_registered_object_paths'],
+ 'core_registered':643,'previous_compile_rows':709,'compile_commands':ref(compile_copy),
+ 'all_previously_protected_refs_and_present_core_objects_match':True,
+ 'fresh_hash_authority':'Genuine immediately preceding09 final retirement guard; Root performed no intervening protected/core path mutation. Current existence/size and all absences rechecked here; SHA values are explicitly reused from that real fresh guard, not newly computed in this metadata author.',
+ 'actual_prior_CTF09_pair_retirement':ref(PRIOR/'retirement-01/retirement.json'),
+ 'actual_prior_CTF09_pair_retirement_execution':ref(PRIOR/'retirement-command-01/receipt.json'),
+ 'actual_prior_CTF09_final_preservation':ref(final_path),
+ 'actual_CTF10_configure_compile_or_engine_performed':False,
+ 'CTF04_CTF06_CTF07_CTF08_CTF09_originals_absent_and_derivatives_now_explicitly_protected':True,
+ 'legacy_registry_rewritten':False})
+native=read(BASE/'native-helper-prep-01/manifest.json')
+for lane in ['unit','production']:
+ for r in native['native_source_files_by_lane'][lane]:
+  p=ROOT/r['path'];assert sha(p)==r['sha256'] and p.stat().st_size==r['size_bytes']
+configure=read(PRIOR/'native-configure-command-01/receipt.json')['command']
+configure=[('-DCMAKE_PROJECT_INCLUDE='+str(BASE/'native-helper-prep-01/ctf10_reference.cmake')) if a.startswith('-DCMAKE_PROJECT_INCLUDE=') else a for a in configure]
+configure+=['-DCTF10_SOURCE_DIR='+str(BASE/'native-helper-prep-01'),'-DCTF10_OBSERVER_SOURCE_DIR='+str(BASE/'native-observer-prep-01')]
+compile=read(PRIOR/'native-compile-command-01/receipt.json')['command']
+compile=[a.replace('ctf09_unit_helper','ctf10_unit_helper').replace('ctf09_production_helper','ctf10_production_helper') for a in compile]
+env=dict(os.environ);env['PATH']=str(ROOT/'.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin')+os.pathsep+env['PATH']
+for name,command in [('native-configure-command-01',configure),('native-compile-command-01',compile)]:
+ print('Root actual10 starting',name,flush=True)
+ subprocess.run(['python','-X','utf8','-B','tools/porting/record_command.py','--output-dir',(BASE/name).relative_to(ROOT).as_posix(),'--',*command],check=True,env=env)
+ r=read(BASE/name/'receipt.json');assert r['exit_code']==0 and r['source_bytes_match_before_and_after'] and r['launch_error'] is None
+ print('Root actual10 completed',name,ref(BASE/name/'receipt.json'),flush=True)

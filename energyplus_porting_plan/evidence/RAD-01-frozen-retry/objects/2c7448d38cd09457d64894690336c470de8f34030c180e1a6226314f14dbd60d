@@ -1,0 +1,14 @@
+--- .runtime/porting/RAD-01/native-build-prep-01/README.md
++++ .runtime/porting/RAD-01/native-build-prep-02/README.md
+@@ -82,3 +82,11 @@
+ no compiler, formatter, engine, Git, scientific/weather/binary/core payload read,
+ canonical edit, or gate update occurred. The author also authored the RAD helper
+ and pure proposal; this preparation does not independently certify that math.
++
++Fresh02 preserves immutable01. Completion now emits helper_binary as an actual
++path/SHA256/size_bytes ref after verifying the accepted derivative SHA, matching
++the existing strict PE and OriginalDataQA binary-map identity contract. No size
++or future result is assumed. Other two operational source bodies are exact01;
++no arithmetic, compile, provider, preservation or execution criterion changed.
++Current source dependencies bind reviewed freezer02; the inspected freezer01
++context remains explicitly historical. Actual freeze operands stay runtime refs.

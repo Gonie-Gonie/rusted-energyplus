@@ -1,0 +1,92 @@
+"""Root derives actual binaries and authors actual preservation/build metadata."""
+import hashlib
+import json
+import os
+import shutil
+import subprocess
+from datetime import datetime,timezone
+from pathlib import Path
+
+ROOT=Path.cwd();BASE=ROOT/'.runtime/porting/CTF-10';PRIOR=ROOT/'.runtime/porting/CTF-09'
+def read(p):return json.loads(p.read_bytes())
+def sha(p):
+ with p.open('rb') as s:return hashlib.file_digest(s,'sha256').hexdigest()
+def ref(p):return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+def write(p,v):p.write_bytes((json.dumps(v,indent=2)+'\n').encode('utf8'))
+before=read(BASE/'native-build-01/before/preservation.json');after_dir=BASE/'native-build-01/after';copy=after_dir/'compile_commands.json'
+assert sha(ROOT/'.runtime/ep261-gcc13-o0/compile_commands.json')==sha(copy)
+for name in ['native-compile-command-01','native-unit-derive-command-01','native-production-derive-command-01']:
+ r=read(BASE/name/'receipt.json');assert r['exit_code']==0 and r['source_bytes_match_before_and_after'] and r['launch_error'] is None
+originals={lane:ref(ROOT/f'.runtime/ep261-gcc13-o0/Products/ctf10_{lane}_helper.exe') for lane in ['unit','production']}
+for key in ['protected_refs','present_objects']:
+ for row in before[key]:assert ref(ROOT/row['path'])==row
+for p in before['absent_registered_object_paths']:assert not (ROOT/p).exists()
+write(BASE/'native-build-01/map-parser-correction.json',{
+ 'schema':'ctf10-Root-actual-map-parser-correction.v1',
+ 'actual_configure_compile_and_both_derivations_already_succeeded':True,
+ 'prior_Root_operational_script':ref(BASE/'derive-and-describe-native-build.py'),
+ 'prior_Root_metadata_assertion':'incorrect immediate-previous-line section assumption; HBM has many symbols in one actual .text object section',
+ 'correction':'track latest actual .text section and prove actual symbol address lies within that object section; both core-provider exclusions and target LOAD ordering remain mandatory',
+ 'scientific_Source_or_targets_modified':False,'actual_executions_overwritten_or_retried':False})
+native=read(BASE/'native-helper-prep-01/manifest.json')
+for lane in ['unit','production']:
+ target=f'ctf10_{lane}_helper';directory=BASE/f'native-build-01/{lane}'
+ derivative=read(directory/'derivation/receipt.json')
+ assert derivative['status']=='pass-exact-retained-runtime-sections-and-directories'
+ assert derivative['original_before']==derivative['original_after']
+ assert derivative['original_before']['historical_path']==originals[lane]['path']
+ assert all(derivative['original_before'][key]==originals[lane][key] for key in ['sha256','size_bytes'])
+ assert derivative['accepted_derivative']==derivative['observed_derivative']
+ link_map=ROOT/f'.runtime/ep261-gcc13-o0/{target}.map'
+ hits=[];hbm_hits=[];loads=[];core_load=None;core_construction_hits=0;core_hbm_hits=0;previous='';text_section=None
+ hbm_symbol='EnergyPlus::HeatBalanceManager::InitConductionTransferFunctions(EnergyPlus::EnergyPlusData&)'
+ symbol='EnergyPlus::Construction::ConstructionProps::calculateTransferFunction(EnergyPlus::EnergyPlusData&, bool&, bool&)'
+ with link_map.open('r',encoding='utf8',errors='strict') as stream:
+  for line_number,line in enumerate(stream,1):
+   if line.startswith(' .text '):text_section=(line_number,line)
+   if line.lstrip().startswith('0x') and line.strip().endswith(symbol):
+    assert text_section is not None and 'Construction.ctf10.cc.obj' in text_section[1]
+    fields=text_section[1].split();address=int(line.split()[0],16);assert int(fields[1],16)<=address<int(fields[1],16)+int(fields[2],16)
+    hits.append({'symbol_line':line_number,'symbol':line.rstrip('\n'),
+                 'section_provider':{'line':text_section[0],'text':text_section[1].rstrip('\n')}})
+   if line.lstrip().startswith('0x') and line.strip().endswith(hbm_symbol):
+    assert text_section is not None and 'HeatBalanceManager.ctf10.cc.obj' in text_section[1]
+    fields=text_section[1].split();address=int(line.split()[0],16);assert int(fields[1],16)<=address<int(fields[1],16)+int(fields[2],16)
+    hbm_hits.append({'symbol_line':line_number,'symbol':line.rstrip('\n'),
+                 'section_provider':{'line':text_section[0],'text':text_section[1].rstrip('\n')}})
+   if line.startswith('LOAD '):
+    if f'CMakeFiles/{target}.dir/' in line:loads.append(line_number)
+    if line.strip()=='LOAD Products/libenergypluslib.a':core_load=line_number
+   if 'libenergypluslib.a(Construction.cc.obj)' in line:core_construction_hits+=1
+   if 'libenergypluslib.a(HeatBalanceManager.cc.obj)' in line:core_hbm_hits+=1
+   previous=line
+ assert len(hits)==1 and len(hbm_hits)==1 and len(loads)==4 and core_load is not None and max(loads)<core_load and core_construction_hits==0 and core_hbm_hits==0
+ after={'schema':'ctf10-native-preservation-after.v1','observed_utc':datetime.now(timezone.utc).isoformat(),
+  'protected_refs':before['protected_refs'],'core_registered':643,'present_objects':before['present_objects'],
+  'absent_registered_object_paths':before['absent_registered_object_paths'],'all_protected_refs_unchanged':True,
+  'all_present_core_objects_unchanged':True,'absent_registered_objects_still_absent':True,
+  'previous_compile_rows':709,'current_compile_rows':717,'all_previous_compile_commands_unchanged':True,
+  'link_map':ref(link_map),'derived_provider':hits[0],'target_objects_before_core_archive':4,
+  'selected_core_Construction_object_hits':0,'selected_core_HeatBalanceManager_object_hits':0,
+  'derived_HeatBalanceManager_provider':hbm_hits[0],'linked_original':originals[lane],
+  'actual_before_preservation':ref(BASE/'native-build-01/before/preservation.json'),
+  'actual_after_compile_commands':ref(copy)}
+ write(directory/'preservation-after.json',after)
+ prefix='ctf10' if lane=='unit' else 'ctf10-production'
+ intent=read(BASE/('frozen-packet-01' if lane=='unit' else 'production-frozen-packet-01')/'freeze-receipt.json')['linked_original_retention_intent']
+ helper={k:derivative['accepted_derivative'][k] for k in ['path','sha256']}
+ build={'schema':prefix+'-native-build.v1','target':target,'status':'pass-actual-4TU-link-and-preservation',
+  'authorship':'Root assembled real configure/compile/derive and map records. Before SHA inventory explicitly reuses genuine immediately preceding09 final retirement guard with no intervening protected/core mutation. Root freshly hashed all46 protected artifacts and631 core objects after build;12 absences unchanged. All709 previous compile rows literal in relative order,8 actual new rows. No engine or scientific claim.',
+  'observed_utc':datetime.now(timezone.utc).isoformat(),'helper_binary':helper,'linked_original':originals[lane],
+  'linked_original_retention_intent':intent,'native_source_files':native['native_source_files_by_lane'][lane],
+  'configure_execution':ref(BASE/'native-configure-command-01/receipt.json'),
+  'compile_execution':ref(BASE/'native-compile-command-01/receipt.json'),
+  'derivation_execution':ref(BASE/(f'native-{lane}-derive-command-'+'01')/'receipt.json'),
+  'validated_derivative':ref(directory/'derivation/receipt.json'),'preservation':ref(directory/'preservation-after.json'),
+  'core_before_check':read(PRIOR/f'native-build-01/{lane}/native-build.json')['core_before_check'],
+  'previous_compile_rows':709,'current_compile_rows':717,'core_registered':643,'core_present':631,'core_absent':12,
+  'all_previous_compile_commands_unchanged':True,'protected_artifacts_and_present_core_objects_unchanged':True,
+  'link_provider_verified':True,'scientific_execution_certified':False,'gates_updated':False,'protected_ref_count':46}
+ build['Root_metadata_map_parser_correction']=ref(BASE/'native-build-01/map-parser-correction.json')
+ write(directory/'native-build.json',build)
+ print('actual10 native build metadata',lane,ref(directory/'native-build.json'),flush=True)

@@ -1,0 +1,34 @@
+{
+  "schema": "rad01-cases-contract.v1",
+  "frozen_before_this_RAD01_helper_execution": true,
+  "frozen_before_numerical_execution": true,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "scientific_execution_performed": false,
+  "full_engine_production_geometry_supplied": false,
+  "helper_request": {
+    "path": ".runtime/porting/RAD-01/frozen-packet-02/helper-request.json",
+    "sha256": "a614ee77cd37acb35d8e1f6a44930130eb1214efdd3189da5f05e150235c957c",
+    "size_bytes": 36373
+  },
+  "source": {
+    "path": ".runtime/porting/RAD-01/frozen-packet-02/source.json",
+    "sha256": "a24be68e2ed62eb9d9f3f9dfbe282927c669e62ff786f9b1b51ae9ad0e9c27ca",
+    "size_bytes": 12909
+  },
+  "tolerances": {
+    "path": ".runtime/porting/RAD-01/frozen-packet-02/tolerances.json",
+    "sha256": "3e477ed896353f1eaaefd8d4cd287bf9b0af11053fe7291386631503c1bd085c",
+    "size_bytes": 1323
+  },
+  "requested_counts": {
+    "model_cases": 21,
+    "CalcApproximateViewFactors": 21
+  },
+  "literal_input_fixture": {
+    "path": ".runtime/porting/RAD-01/native-helper-prep-01/input-fixture-proposal.json",
+    "sha256": "5bf064f4f61f7e271f6f5a1306855c3e986d942cf859faf152ab5e6d5e4146f7",
+    "size_bytes": 38084
+  },
+  "CON_membership_templates_are_declared_unit_geometry_only": true
+}

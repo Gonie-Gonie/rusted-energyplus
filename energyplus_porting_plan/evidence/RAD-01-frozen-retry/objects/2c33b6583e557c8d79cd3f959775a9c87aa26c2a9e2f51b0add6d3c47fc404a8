@@ -1,0 +1,102 @@
+"""Root records the accepted RAD01 direct-unit scope before Native outputs."""
+import hashlib
+import json
+import shutil
+import subprocess
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path.cwd()
+BASE = ROOT / '.runtime/porting/RAD-01'
+HELD = BASE / 'native-helper-prep-02'
+OUT = BASE / 'scope-amendment-02'
+
+def read(p): return json.loads(p.read_bytes())
+def ref(p): return {'path': p.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(p.read_bytes()).hexdigest(), 'size_bytes': p.stat().st_size}
+def write(p, value): p.write_bytes((json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode('utf8'))
+
+assert not subprocess.check_output(['git', 'status', '--porcelain'])
+assert subprocess.check_output(['git', 'rev-parse', 'HEAD']) == subprocess.check_output(['git', 'rev-parse', '@{u}'])
+assert not OUT.exists() and not (BASE / 'native-build-02').exists() and not (BASE / 'frozen-packet-02').exists()
+assert len(sys.argv) == 4
+assert ref(HELD / 'manifest.json')['sha256'] == sys.argv[3]
+native = read(HELD / 'manifest.json')
+policy_path = ROOT / native['observation_policy_proposal']['path']
+inputs_path = ROOT / native['input_fixture_proposal']['path']
+policy = read(policy_path)
+inputs = read(inputs_path)
+assert len(sys.argv) == 4
+writer_path = ROOT / sys.argv[1]
+assert ref(writer_path)['sha256'] == sys.argv[2]
+writer = read(writer_path)
+assert writer['schema'] == 'rad01-input-writer-source-preparation.v1'
+assert not inputs['frozen'] and not inputs['expected_values_supplied'] and not inputs['expected_exits_supplied']
+assert len(inputs['model_cases']) == 21 and inputs['proposed_counts']['CalcApproximateViewFactors'] == 21
+for row in native['own_sources']:
+    assert ref(ROOT / row['path']) == {k: row[k] for k in ['path', 'sha256', 'size_bytes']}
+plan_path = ROOT / 'energyplus_porting_plan/plan.json'
+card_path = ROOT / 'energyplus_porting_plan/cards/RAD-01.md'
+plan = read(plan_path)
+task = next(t for t in plan['tasks'] if t['id'] == 'RAD-01')
+assert task['scope_review'] == '\ud1b5\uacfc'
+assert all(task[k] == '\ubbf8\ud655\uc778' for k in ['unit_gate', 'integration_gate', 'production_gate'])
+(OUT / 'before').mkdir(parents=True)
+before = []
+for p in [plan_path, card_path]:
+    dest = OUT / 'before' / p.name
+    shutil.copyfile(p, dest)
+    before.append(ref(dest))
+note = ('Selected direct-unit CalcApproximateViewFactors scope is the complete pinned function1406-1519, '
+        'its actual declaration109-116 and direct warning helpers. Inputs are21 explicitly declared opaque '
+        'geometry registries with actual Native1-based indices and independent Rust opaque IDs; six CON '
+        'name/class templates do not represent observed production geometry or GetSurfaceData order. '
+        'Preserve strict visibility10/350/tilt10 predicates, Native ordered ZoneArea accumulation, '
+        'warning/continue identity and order, positive-area division, F(j,i) row-first layout and source outcomes. '
+        'ZoneArea/F use separate exact zero atol/rtol profiles with class, shape and signed-zero equality; '
+        'copied input bits/identities/order are exact. Reached required owner absence or an unreturned required '
+        'function cannot pass. Scope excludes geometry derivation, initialized enclosures, FixViewFactors, '
+        'ScriptF, radiation exchange and all full-engine integration/production claims. Genuine Native '
+        'capture and OriginalDataQA precede applying the held Rust arithmetic repair. No unit or full-card '
+        'PASS follows from source review, build or direct fixtures alone.')
+task.update(scope_review='\ud1b5\uacfc', source_ranges_input_only=native['read_source_ranges'],
+            rad_policy_source_inventory=ref(policy_path),
+            rad_native_source_inventory=ref(HELD / 'manifest.json'),
+            prospective_exact_arithmetic_profiles=policy['arithmetic_profiles_by_variable'],
+            prospective_direct_unit_counts=inputs['proposed_counts'],
+            fixed_CON_real_production_geometry_unavailable=True,
+            source_boundary_note=task['source_boundary_note'] + '\n\n' + note)
+write(plan_path, plan)
+text = card_path.read_text(encoding='utf8')
+text += ('\n## Native helper compile repair before numerical execution\n\n'
+         'The first actual build stopped at two misleading-indentation diagnostics in transport '
+         'helper statements under unchanged -Werror. No helper or scientific command ran. '
+         'Fresh Native02 changes only those statement layouts; all Original arithmetic, passive '
+         'observations, literal21 inputs and exact profiles remain unchanged. The first failed '
+         'build and its receipts are preserved. An exact recorded replay of the previous CTF10 '
+         'configure restored the actual717-row baseline before this new freeze/build attempt. '
+         'Root and Raw source reviews cover the narrow Native02 repair. Full gates remain pending.\n')
+card_path.write_bytes(text.encode('utf8'))
+amendment = {'schema': 'rad01-source-scope-amendment.v1', 'draft_only_not_actual_scope_receipt': False,
+             'created_utc': datetime.now(timezone.utc).isoformat(), 'cards': ['RAD-01'],
+             'scope_review_passed': True, 'all_other_gates_pending': True,
+             'strict_profiles_settled_before_outputs': True,
+             'actual_RAD01_build_or_engine_execution_performed': True,
+             'actual_RAD01_successful_build_or_engine_execution_performed': False,
+             'actual_RAD01_scientific_execution_performed': False,
+             'prior_failed_build_execution': ref(BASE / 'native-build-launch-command-01/receipt.json'),
+             'prior_failed_compile_execution': ref(BASE / 'native-build-01/native-compile-command-01/receipt.json'),
+             'actual_restore_previous_configure': ref(BASE / 'restore-prior-configure-command-01/receipt.json'),
+             'native_observer': ref(HELD / 'manifest.json'),
+             'rad_policy_source_inventory': {'native_helper': ref(HELD / 'manifest.json'),
+                 'input_fixture': ref(inputs_path),
+                 'observation_policy': ref(policy_path),
+                 'input_writer': ref(writer_path)},
+             'input_only_fixture_source_inventory': ref(inputs_path),
+             'requested_counts': inputs['proposed_counts'],
+             'before_documents': before, 'after_documents': [ref(plan_path), ref(card_path)],
+             'recorder_role': 'real-RAD-01-check-only', 'scope_only_no_numerical_PASS': True,
+             'actual_doc_and_check_refs_supplied_by_Root_later': False,
+             'fixed_CON_real_production_geometry_unavailable': True}
+write(OUT / 'amendment.json', amendment)
+print('Root actual pre-output RAD01 retry scope amendment', ref(OUT / 'amendment.json'), flush=True)

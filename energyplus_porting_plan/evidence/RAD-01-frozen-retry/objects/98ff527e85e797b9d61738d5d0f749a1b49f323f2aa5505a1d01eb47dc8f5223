@@ -1,0 +1,168 @@
+--- .runtime/porting/CTF-10/derive-and-describe-native-build.py
++++ .runtime/porting/RAD-01/native-build-prep-02/derive-and-describe-native-build.py
+@@ -1,105 +1,67 @@
+-"""Root derives actual binaries and authors actual preservation/build metadata."""
++"""Root-only existing derivative mechanism and actual RAD01 compile correspondence."""
++import argparse
+ import hashlib
+ import json
+ import os
++import re
+ import shutil
+ import subprocess
+-from datetime import datetime,timezone
+ from pathlib import Path
+ 
+-ROOT=Path.cwd();BASE=ROOT/'.runtime/porting/CTF-10';PRIOR=ROOT/'.runtime/porting/CTF-09'
+-def read(p):return json.loads(p.read_bytes())
+-def sha(p):
+- with p.open('rb') as s:return hashlib.file_digest(s,'sha256').hexdigest()
+-def ref(p):return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+-def write(p,v):p.write_bytes((json.dumps(v,indent=2)+'\n').encode('utf8'))
+-compile=read(BASE/'native-compile-command-01/receipt.json')
+-assert compile['exit_code']==0 and compile['source_bytes_match_before_and_after'] and compile['launch_error'] is None
+-before=read(BASE/'native-build-01/before/preservation.json');after_dir=BASE/'native-build-01/after';assert not after_dir.exists();after_dir.mkdir()
+-current=ROOT/'.runtime/ep261-gcc13-o0/compile_commands.json';copy=after_dir/'compile_commands.json';shutil.copyfile(current,copy);assert sha(current)==sha(copy)
+-old=read(ROOT/before['compile_commands']['path']);new=read(copy)
+-added=[r for r in new if '/CTF-10/' in r['file'].replace('\\','/')]
+-remaining=[r for r in new if r not in added]
+-assert len(old)==709 and len(new)==717 and len(added)==8 and remaining==old
+-assert not (BASE/'native-build-01/unit/derivation').exists()
+-assert not (BASE/'native-build-01/production/derivation').exists()
+-for lane in ['unit','production']:(BASE/f'native-build-01/{lane}').mkdir(exist_ok=True)
+-write(after_dir/'compile-row-correspondence.json',{'schema':'ctf10-actual-compile-row-correspondence.v1',
+- 'before':before['compile_commands'],'after':ref(copy),'previous_rows':709,'current_rows':717,
+- 'all709_prior_rows_byte_identical_in_relative_order':True,'new_rows':added})
+-env=dict(os.environ);env['PATH']=str(ROOT/'.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin')+os.pathsep+env['PATH']
+-originals={}
+-for lane in ['unit','production']:
+- p=ROOT/f'.runtime/ep261-gcc13-o0/Products/ctf10_{lane}_helper.exe';originals[lane]=ref(p)
+- prior_build=read(PRIOR/f'native-build-01/{lane}/native-build.json')
+- args=read(ROOT/prior_build['derivation_execution']['path'])['command']
+- args=[s.replace('ctf09_'+lane+'_helper.exe','ctf10_'+lane+'_helper.exe').replace('CTF-09/native-build-01','CTF-10/native-build-01') for s in args]
+- args[args.index('--original-sha256')+1]=originals[lane]['sha256']
+- number='01'
+- recorder=BASE/f'native-{lane}-derive-command-{number}'
+- print('actual10 Original identity',lane,originals[lane],flush=True)
+- subprocess.run(['python','-X','utf8','-B','tools/porting/record_command.py','--output-dir',recorder.relative_to(ROOT).as_posix(),'--',*args],check=True,env=env)
+- r=read(recorder/'receipt.json');assert r['exit_code']==0 and r['source_bytes_match_before_and_after']
+-for label,key in [('protected','protected_refs'),('core','present_objects')]:
+- for index,row in enumerate(before[key]):
+-  p=ROOT/row['path'];assert p.is_file() and p.stat().st_size==row['size_bytes'] and sha(p)==row['sha256'],row['path']
+- print('actual10 fresh after-build hash guard',label,len(before[key]),flush=True)
+-for p in before['absent_registered_object_paths']:assert not (ROOT/p).exists()
+-native=read(BASE/'native-helper-prep-01/manifest.json')
+-for lane in ['unit','production']:
+- target=f'ctf10_{lane}_helper';directory=BASE/f'native-build-01/{lane}'
+- derivative=read(directory/'derivation/receipt.json')
+- assert derivative['status']=='pass-exact-retained-runtime-sections-and-directories'
+- assert derivative['original_before']==derivative['original_after']
+- assert derivative['original_before']['historical_path']==originals[lane]['path']
+- assert all(derivative['original_before'][key]==originals[lane][key] for key in ['sha256','size_bytes'])
+- assert derivative['accepted_derivative']==derivative['observed_derivative']
+- link_map=ROOT/f'.runtime/ep261-gcc13-o0/{target}.map'
+- hits=[];hbm_hits=[];loads=[];core_load=None;core_construction_hits=0;core_hbm_hits=0;previous=''
+- hbm_symbol='EnergyPlus::HeatBalanceManager::InitConductionTransferFunctions(EnergyPlus::EnergyPlusData&)'
+- symbol='EnergyPlus::Construction::ConstructionProps::calculateTransferFunction(EnergyPlus::EnergyPlusData&, bool&, bool&)'
+- with link_map.open('r',encoding='utf8',errors='strict') as stream:
+-  for line_number,line in enumerate(stream,1):
+-   if line.lstrip().startswith('0x') and line.strip().endswith(symbol):
+-    assert 'Construction.ctf10.cc.obj' in previous and previous.startswith(' .text')
+-    hits.append({'symbol_line':line_number,'symbol':line.rstrip('\n'),
+-                 'section_provider':{'line':line_number-1,'text':previous.rstrip('\n')}})
+-   if line.lstrip().startswith('0x') and line.strip().endswith(hbm_symbol):
+-    assert 'HeatBalanceManager.ctf10.cc.obj' in previous and previous.startswith(' .text')
+-    hbm_hits.append({'symbol_line':line_number,'symbol':line.rstrip('\n'),
+-                 'section_provider':{'line':line_number-1,'text':previous.rstrip('\n')}})
+-   if line.startswith('LOAD '):
+-    if f'CMakeFiles/{target}.dir/' in line:loads.append(line_number)
+-    if line.strip()=='LOAD Products/libenergypluslib.a':core_load=line_number
+-   if 'libenergypluslib.a(Construction.cc.obj)' in line:core_construction_hits+=1
+-   if 'libenergypluslib.a(HeatBalanceManager.cc.obj)' in line:core_hbm_hits+=1
+-   previous=line
+- assert len(hits)==1 and len(hbm_hits)==1 and len(loads)==4 and core_load is not None and max(loads)<core_load and core_construction_hits==0 and core_hbm_hits==0
+- after={'schema':'ctf10-native-preservation-after.v1','observed_utc':datetime.now(timezone.utc).isoformat(),
+-  'protected_refs':before['protected_refs'],'core_registered':643,'present_objects':before['present_objects'],
+-  'absent_registered_object_paths':before['absent_registered_object_paths'],'all_protected_refs_unchanged':True,
+-  'all_present_core_objects_unchanged':True,'absent_registered_objects_still_absent':True,
+-  'previous_compile_rows':709,'current_compile_rows':717,'all_previous_compile_commands_unchanged':True,
+-  'link_map':ref(link_map),'derived_provider':hits[0],'target_objects_before_core_archive':4,
+-  'selected_core_Construction_object_hits':0,'selected_core_HeatBalanceManager_object_hits':0,
+-  'derived_HeatBalanceManager_provider':hbm_hits[0],'linked_original':originals[lane],
+-  'actual_before_preservation':ref(BASE/'native-build-01/before/preservation.json'),
+-  'actual_after_compile_commands':ref(copy)}
+- write(directory/'preservation-after.json',after)
+- prefix='ctf10' if lane=='unit' else 'ctf10-production'
+- intent=read(BASE/('frozen-packet-01' if lane=='unit' else 'production-frozen-packet-01')/'freeze-receipt.json')['linked_original_retention_intent']
+- helper={k:derivative['accepted_derivative'][k] for k in ['path','sha256']}
+- build={'schema':prefix+'-native-build.v1','target':target,'status':'pass-actual-4TU-link-and-preservation',
+-  'authorship':'Root assembled real configure/compile/derive and map records. Before SHA inventory explicitly reuses genuine immediately preceding09 final retirement guard with no intervening protected/core mutation. Root freshly hashed all46 protected artifacts and631 core objects after build;12 absences unchanged. All709 previous compile rows literal in relative order,8 actual new rows. No engine or scientific claim.',
+-  'observed_utc':datetime.now(timezone.utc).isoformat(),'helper_binary':helper,'linked_original':originals[lane],
+-  'linked_original_retention_intent':intent,'native_source_files':native['native_source_files_by_lane'][lane],
+-  'configure_execution':ref(BASE/'native-configure-command-01/receipt.json'),
+-  'compile_execution':ref(BASE/'native-compile-command-01/receipt.json'),
+-  'derivation_execution':ref(BASE/(f'native-{lane}-derive-command-'+'01')/'receipt.json'),
+-  'validated_derivative':ref(directory/'derivation/receipt.json'),'preservation':ref(directory/'preservation-after.json'),
+-  'core_before_check':read(PRIOR/f'native-build-01/{lane}/native-build.json')['core_before_check'],
+-  'previous_compile_rows':709,'current_compile_rows':717,'core_registered':643,'core_present':631,'core_absent':12,
+-  'all_previous_compile_commands_unchanged':True,'protected_artifacts_and_present_core_objects_unchanged':True,
+-  'link_provider_verified':True,'scientific_execution_certified':False,'gates_updated':False,'protected_ref_count':46}
+- write(directory/'native-build.json',build)
+- print('actual10 native build metadata',lane,ref(directory/'native-build.json'),flush=True)
++p = argparse.ArgumentParser(); p.add_argument('--root', type=Path, default=Path.cwd())
++p.add_argument('--before-preservation', required=True); p.add_argument('--prior-derivation-execution', required=True)
++p.add_argument('--output-dir', required=True); a = p.parse_args(); ROOT = a.root.resolve()
++def contained(value):
++    path = (ROOT / value).resolve(); assert path.is_relative_to(ROOT) and path != ROOT; return path
++def read(path): return json.loads(path.read_bytes())
++def sha(path):
++    with path.open('rb') as stream: return hashlib.file_digest(stream, 'sha256').hexdigest()
++def ref(path): return {'path': path.relative_to(ROOT).as_posix(), 'sha256': sha(path), 'size_bytes': path.stat().st_size}
++def bound(value):
++    path, expected = value.rsplit('#', 1); path = contained(path); assert sha(path) == expected; return path, read(path)
++def write(path, value):
++    with path.open('x', encoding='utf8', newline='\n') as stream: json.dump(value, stream, indent=2); stream.write('\n')
++def good(receipt):
++    assert receipt['schema'] == 'recorded-porting-command.v1' and receipt['exit_code'] == 0
++    assert receipt['source_bytes_match_before_and_after'] and receipt['launch_error'] is None
++
++OUT = contained(a.output_dir); before_path, before = bound(a.before_preservation)
++assert before_path == OUT / 'before/preservation.json'
++compile_path = OUT / 'native-compile-command-01/receipt.json'; compile = read(compile_path); good(compile)
++native_path = contained(before['native_source_manifest']['path']); assert sha(native_path) == before['native_source_manifest']['sha256']; native = read(native_path)
++sources = [contained(row['path']) for row in native['native_source_files'] if Path(row['path']).suffix == '.cpp' or Path(row['path']).suffix == '.cc']
++assert len(sources) == 3
++directory = contained(before['build_directory']); after = OUT / 'after'; assert not after.exists(); after.mkdir()
++live = directory / 'compile_commands.json'; copy = after / 'compile_commands.json'; shutil.copyfile(live, copy); assert sha(live) == sha(copy)
++old_path = contained(before['compile_commands']['path']); assert sha(old_path) == before['compile_commands']['sha256']
++old, new = read(old_path), read(copy)
++def row_source(row): return (Path(row['directory']) / row['file']).resolve()
++added = [row for row in new if row_source(row) in sources]; remaining = [row for row in new if row_source(row) not in sources]
++assert len(old) == before['previous_compile_rows'] and len(new) == len(old) + 3
++assert len(added) == 3 and {row_source(row) for row in added} == set(sources) and remaining == old
++stdout = contained(compile['stdout']['path']); assert sha(stdout) == compile['stdout']['sha256']
++compiled = [line for line in stdout.read_text(encoding='utf8').splitlines() if re.match(r'^\[\d+/\d+\] ', line) and ' -c ' in line]
++assert len(compiled) == 3
++compiled_sources = []
++for line in compiled:
++    normalized = line.replace('\\', '/').casefold()
++    assert 'cmakefiles/rad01_unit_helper.dir/' in normalized
++    matched = [source for source in sources if source.as_posix().casefold() in normalized]
++    assert len(matched) == 1; compiled_sources += matched
++assert set(compiled_sources) == set(sources)
++write(after / 'compile-row-correspondence.json', {'schema': 'rad01-actual-compile-row-correspondence.v1',
++    'before': before['compile_commands'], 'after': ref(copy), 'previous_rows': len(old), 'current_rows': len(new),
++    'all_prior_rows_unchanged_in_relative_order': True, 'new_rows': added, 'actual_compile_stdout': compile['stdout'],
++    'actual_three_new_TU_compile_commands': compiled, 'no_prior_core_source_compile_command_observed': True})
++prior_path, prior = bound(a.prior_derivation_execution); good(prior)
++original = directory / 'Products/rad01_unit_helper.exe'; original_ref = ref(original)
++args = prior['command'][:]
++assert args[:5] == ['python', '-X', 'utf8', '-B', 'tools/porting/derive_native_helper.py']
++derivation = OUT / 'derivation'; assert not derivation.exists()
++for flag, value in [('--original', original.relative_to(ROOT).as_posix()), ('--original-sha256', original_ref['sha256']), ('--output-dir', derivation.relative_to(ROOT).as_posix())]:
++    args[args.index(flag) + 1] = value
++env = dict(os.environ); env['PATH'] = str(ROOT / '.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin') + os.pathsep + env['PATH']
++subprocess.run(['python', '-X', 'utf8', '-B', 'tools/porting/record_command.py', '--output-dir', (OUT / 'native-unit-derive-command-01').relative_to(ROOT).as_posix(), '--', *args], cwd=ROOT, check=True, env=env)
++good(read(OUT / 'native-unit-derive-command-01/receipt.json'))
++write(after / 'derivation-command-authority.json', {'schema': 'rad01-actual-derivation-command-authority.v1', 'prior_derivation_execution': ref(prior_path), 'linked_original': original_ref, 'scientific_execution_performed': False})
++print(json.dumps({'compile_correspondence': ref(after / 'compile-row-correspondence.json'), 'derivation_execution': ref(OUT / 'native-unit-derive-command-01/receipt.json')}), flush=True)

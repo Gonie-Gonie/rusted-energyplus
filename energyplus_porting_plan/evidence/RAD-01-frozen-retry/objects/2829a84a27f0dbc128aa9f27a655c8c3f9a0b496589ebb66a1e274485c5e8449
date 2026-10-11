@@ -1,0 +1,67 @@
+"""Root-only existing derivative mechanism and actual RAD01 compile correspondence."""
+import argparse
+import hashlib
+import json
+import os
+import re
+import shutil
+import subprocess
+from pathlib import Path
+
+p = argparse.ArgumentParser(); p.add_argument('--root', type=Path, default=Path.cwd())
+p.add_argument('--before-preservation', required=True); p.add_argument('--prior-derivation-execution', required=True)
+p.add_argument('--output-dir', required=True); a = p.parse_args(); ROOT = a.root.resolve()
+def contained(value):
+    path = (ROOT / value).resolve(); assert path.is_relative_to(ROOT) and path != ROOT; return path
+def read(path): return json.loads(path.read_bytes())
+def sha(path):
+    with path.open('rb') as stream: return hashlib.file_digest(stream, 'sha256').hexdigest()
+def ref(path): return {'path': path.relative_to(ROOT).as_posix(), 'sha256': sha(path), 'size_bytes': path.stat().st_size}
+def bound(value):
+    path, expected = value.rsplit('#', 1); path = contained(path); assert sha(path) == expected; return path, read(path)
+def write(path, value):
+    with path.open('x', encoding='utf8', newline='\n') as stream: json.dump(value, stream, indent=2); stream.write('\n')
+def good(receipt):
+    assert receipt['schema'] == 'recorded-porting-command.v1' and receipt['exit_code'] == 0
+    assert receipt['source_bytes_match_before_and_after'] and receipt['launch_error'] is None
+
+OUT = contained(a.output_dir); before_path, before = bound(a.before_preservation)
+assert before_path == OUT / 'before/preservation.json'
+compile_path = OUT / 'native-compile-command-01/receipt.json'; compile = read(compile_path); good(compile)
+native_path = contained(before['native_source_manifest']['path']); assert sha(native_path) == before['native_source_manifest']['sha256']; native = read(native_path)
+sources = [contained(row['path']) for row in native['native_source_files'] if Path(row['path']).suffix == '.cpp' or Path(row['path']).suffix == '.cc']
+assert len(sources) == 3
+directory = contained(before['build_directory']); after = OUT / 'after'; assert not after.exists(); after.mkdir()
+live = directory / 'compile_commands.json'; copy = after / 'compile_commands.json'; shutil.copyfile(live, copy); assert sha(live) == sha(copy)
+old_path = contained(before['compile_commands']['path']); assert sha(old_path) == before['compile_commands']['sha256']
+old, new = read(old_path), read(copy)
+def row_source(row): return (Path(row['directory']) / row['file']).resolve()
+added = [row for row in new if row_source(row) in sources]; remaining = [row for row in new if row_source(row) not in sources]
+assert len(old) == before['previous_compile_rows'] and len(new) == len(old) + 3
+assert len(added) == 3 and {row_source(row) for row in added} == set(sources) and remaining == old
+stdout = contained(compile['stdout']['path']); assert sha(stdout) == compile['stdout']['sha256']
+compiled = [line for line in stdout.read_text(encoding='utf8').splitlines() if re.match(r'^\[\d+/\d+\] ', line) and ' -c ' in line]
+assert len(compiled) == 3
+compiled_sources = []
+for line in compiled:
+    normalized = line.replace('\\', '/').casefold()
+    assert 'cmakefiles/rad01_unit_helper.dir/' in normalized
+    matched = [source for source in sources if source.as_posix().casefold() in normalized]
+    assert len(matched) == 1; compiled_sources += matched
+assert set(compiled_sources) == set(sources)
+write(after / 'compile-row-correspondence.json', {'schema': 'rad01-actual-compile-row-correspondence.v1',
+    'before': before['compile_commands'], 'after': ref(copy), 'previous_rows': len(old), 'current_rows': len(new),
+    'all_prior_rows_unchanged_in_relative_order': True, 'new_rows': added, 'actual_compile_stdout': compile['stdout'],
+    'actual_three_new_TU_compile_commands': compiled, 'no_prior_core_source_compile_command_observed': True})
+prior_path, prior = bound(a.prior_derivation_execution); good(prior)
+original = directory / 'Products/rad01_unit_helper.exe'; original_ref = ref(original)
+args = prior['command'][:]
+assert args[:5] == ['python', '-X', 'utf8', '-B', 'tools/porting/derive_native_helper.py']
+derivation = OUT / 'derivation'; assert not derivation.exists()
+for flag, value in [('--original', original.relative_to(ROOT).as_posix()), ('--original-sha256', original_ref['sha256']), ('--output-dir', derivation.relative_to(ROOT).as_posix())]:
+    args[args.index(flag) + 1] = value
+env = dict(os.environ); env['PATH'] = str(ROOT / '.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin') + os.pathsep + env['PATH']
+subprocess.run(['python', '-X', 'utf8', '-B', 'tools/porting/record_command.py', '--output-dir', (OUT / 'native-unit-derive-command-01').relative_to(ROOT).as_posix(), '--', *args], cwd=ROOT, check=True, env=env)
+good(read(OUT / 'native-unit-derive-command-01/receipt.json'))
+write(after / 'derivation-command-authority.json', {'schema': 'rad01-actual-derivation-command-authority.v1', 'prior_derivation_execution': ref(prior_path), 'linked_original': original_ref, 'scientific_execution_performed': False})
+print(json.dumps({'compile_correspondence': ref(after / 'compile-row-correspondence.json'), 'derivation_execution': ref(OUT / 'native-unit-derive-command-01/receipt.json')}), flush=True)

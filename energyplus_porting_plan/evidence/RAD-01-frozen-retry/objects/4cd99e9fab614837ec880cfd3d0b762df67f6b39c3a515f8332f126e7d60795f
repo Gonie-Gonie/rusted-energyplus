@@ -1,0 +1,14 @@
+--- .runtime/porting/RAD-01/native-helper-prep-01/rad01_reference.cmake
++++ .runtime/porting/RAD-01/native-helper-prep-02/rad01_reference.cmake
+@@ -17,8 +17,9 @@
+       list(FILTER _rad01_defs EXCLUDE REGEX "-NOTFOUND$")
+       list(REMOVE_DUPLICATES _rad01_defs)
+       add_executable(rad01_unit_helper "${RAD01_SOURCE_DIR}/rad01_helper.cpp"
+-        "${RAD01_SOURCE_DIR}/HeatBalanceIntRadExchange.rad01.cc" "${RAD01_SOURCE_DIR}/rad01_observer.cc")
+-      target_include_directories(rad01_unit_helper PRIVATE "$<TARGET_PROPERTY:energypluslib,INCLUDE_DIRECTORIES>" "${RAD01_SOURCE_DIR}")
++        "${CLK03_REPOSITORY_ROOT}/.runtime/porting/RAD-01/native-helper-prep-01/HeatBalanceIntRadExchange.rad01.cc"
++        "${CLK03_REPOSITORY_ROOT}/.runtime/porting/RAD-01/native-helper-prep-01/rad01_observer.cc")
++      target_include_directories(rad01_unit_helper PRIVATE "$<TARGET_PROPERTY:energypluslib,INCLUDE_DIRECTORIES>" "${CLK03_REPOSITORY_ROOT}/.runtime/porting/RAD-01/native-helper-prep-01")
+       target_compile_definitions(rad01_unit_helper PRIVATE ${_rad01_defs})
+       target_link_libraries(rad01_unit_helper PRIVATE energypluslib project_options project_fp_options project_warnings bcrypt)
+       target_compile_features(rad01_unit_helper PRIVATE cxx_std_20)

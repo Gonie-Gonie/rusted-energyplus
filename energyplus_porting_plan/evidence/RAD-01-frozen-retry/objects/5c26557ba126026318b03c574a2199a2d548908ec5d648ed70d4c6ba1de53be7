@@ -1,0 +1,174 @@
+--- .runtime/porting/CTF-10/run-native-build.py
++++ .runtime/porting/RAD-01/native-build-prep-02/run-native-build.py
+@@ -1,61 +1,117 @@
+-"""Root launches actual10 native configure/build with the genuine prior final guard."""
++"""Root-only RAD01 configure/build adapter; no scientific helper invocation."""
++import argparse
+ import hashlib
+ import json
+ import os
+ import shutil
+ import subprocess
+-from datetime import datetime,timezone
++from datetime import datetime, timezone
+ from pathlib import Path
+ 
+-ROOT=Path.cwd();BASE=ROOT/'.runtime/porting/CTF-10';PRIOR=ROOT/'.runtime/porting/CTF-09'
+-def read(p):return json.loads(p.read_bytes())
+-def sha(p):
+- with p.open('rb') as s:return hashlib.file_digest(s,'sha256').hexdigest()
+-def ref(p):return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+-def write(p,v):p.write_bytes((json.dumps(v,indent=2)+'\n').encode('utf8'))
+-assert not subprocess.check_output(['git','status','--porcelain'])
+-assert subprocess.check_output(['git','rev-parse','HEAD'])==subprocess.check_output(['git','rev-parse','@{u}'])
+-assert not (BASE/'native-build-01').exists()
+-for prefix in ['','production-']:
+- freeze=read(BASE/f'{prefix}frozen-packet-01/freeze-receipt.json');r=read(BASE/f'{prefix}freeze-command-01/receipt.json')
+- assert r['exit_code']==0 and r['source_bytes_match_before_and_after'] and freeze['numerical_PASS_claimed'] is False
+- for p in freeze['source_authorities']['current_scope_documents']:assert ref(ROOT/p['path'])==p
+-final_path=PRIOR/'retirement-01/after-retirement.json';final=read(final_path);kept=final['protected_after']
+-retired=read(PRIOR/'retirement-01/retirement.json');retire_command=read(PRIOR/'retirement-command-01/receipt.json')
+-assert retired['status']=='pass-precise-pair-removal-and-retained-artifact-guards' and retire_command['exit_code']==0
+-assert [kept[k] for k in ['legacy_count','retained_derivative_count','core_present_count','core_absent_count']]==[44,2,631,12]
+-protected=kept['legacy_protected']+kept['retained_CTF09_derivatives']
+-for p in protected+kept['present_core_objects']:
+- actual=ROOT/p['path'];assert actual.is_file() and actual.stat().st_size==p['size_bytes']
+-for p in kept['absent_registered_object_paths']:assert not (ROOT/p).exists()
+-for row in final['entries']:assert not (ROOT/row['original_link']['historical_path']).exists()
+-before=BASE/'native-build-01/before';before.mkdir(parents=True)
+-compile_live=ROOT/'.runtime/ep261-gcc13-o0/compile_commands.json';compile_copy=before/'compile_commands.json'
+-shutil.copyfile(compile_live,compile_copy);old_rows=read(compile_copy);assert len(old_rows)==709
+-write(before/'preservation.json',{'schema':'ctf10-actual-before-build-preservation.v1',
+- 'observed_utc':datetime.now(timezone.utc).isoformat(),'protected_refs':protected,
+- 'present_objects':kept['present_core_objects'],'absent_registered_object_paths':kept['absent_registered_object_paths'],
+- 'core_registered':643,'previous_compile_rows':709,'compile_commands':ref(compile_copy),
+- 'all_previously_protected_refs_and_present_core_objects_match':True,
+- 'fresh_hash_authority':'Genuine immediately preceding09 final retirement guard; Root performed no intervening protected/core path mutation. Current existence/size and all absences rechecked here; SHA values are explicitly reused from that real fresh guard, not newly computed in this metadata author.',
+- 'actual_prior_CTF09_pair_retirement':ref(PRIOR/'retirement-01/retirement.json'),
+- 'actual_prior_CTF09_pair_retirement_execution':ref(PRIOR/'retirement-command-01/receipt.json'),
+- 'actual_prior_CTF09_final_preservation':ref(final_path),
+- 'actual_CTF10_configure_compile_or_engine_performed':False,
+- 'CTF04_CTF06_CTF07_CTF08_CTF09_originals_absent_and_derivatives_now_explicitly_protected':True,
+- 'legacy_registry_rewritten':False})
+-native=read(BASE/'native-helper-prep-01/manifest.json')
+-for lane in ['unit','production']:
+- for r in native['native_source_files_by_lane'][lane]:
+-  p=ROOT/r['path'];assert sha(p)==r['sha256'] and p.stat().st_size==r['size_bytes']
+-configure=read(PRIOR/'native-configure-command-01/receipt.json')['command']
+-configure=[('-DCMAKE_PROJECT_INCLUDE='+str(BASE/'native-helper-prep-01/ctf10_reference.cmake')) if a.startswith('-DCMAKE_PROJECT_INCLUDE=') else a for a in configure]
+-configure+=['-DCTF10_SOURCE_DIR='+str(BASE/'native-helper-prep-01'),'-DCTF10_OBSERVER_SOURCE_DIR='+str(BASE/'native-observer-prep-01')]
+-compile=read(PRIOR/'native-compile-command-01/receipt.json')['command']
+-compile=[a.replace('ctf09_unit_helper','ctf10_unit_helper').replace('ctf09_production_helper','ctf10_production_helper') for a in compile]
+-env=dict(os.environ);env['PATH']=str(ROOT/'.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin')+os.pathsep+env['PATH']
+-for name,command in [('native-configure-command-01',configure),('native-compile-command-01',compile)]:
+- print('Root actual10 starting',name,flush=True)
+- subprocess.run(['python','-X','utf8','-B','tools/porting/record_command.py','--output-dir',(BASE/name).relative_to(ROOT).as_posix(),'--',*command],check=True,env=env)
+- r=read(BASE/name/'receipt.json');assert r['exit_code']==0 and r['source_bytes_match_before_and_after'] and r['launch_error'] is None
+- print('Root actual10 completed',name,ref(BASE/name/'receipt.json'),flush=True)
++p = argparse.ArgumentParser()
++p.add_argument('--root', type=Path, default=Path.cwd())
++for name in ['freeze-receipt', 'freeze-execution', 'prior-final-preservation',
++             'prior-retirement', 'prior-retirement-execution', 'prior-configure-execution',
++             'prior-compile-execution', 'prior-native-build', 'native-source-manifest']:
++    p.add_argument('--' + name, required=True)
++p.add_argument('--output-dir', required=True)
++a = p.parse_args()
++ROOT = a.root.resolve()
++def contained(value):
++    path = (ROOT / value).resolve()
++    assert path.is_relative_to(ROOT) and path != ROOT
++    return path
++def read(path): return json.loads(path.read_bytes())
++def sha(path):
++    with path.open('rb') as stream: return hashlib.file_digest(stream, 'sha256').hexdigest()
++def ref(path): return {'path': path.relative_to(ROOT).as_posix(), 'sha256': sha(path), 'size_bytes': path.stat().st_size}
++def bound(value):
++    path, expected = value.rsplit('#', 1); path = contained(path)
++    assert sha(path) == expected
++    return path, read(path)
++def bound_ref(row):
++    path = contained(row['path']); assert sha(path) == row['sha256']
++    if 'size_bytes' in row: assert path.stat().st_size == row['size_bytes']
++    return path, read(path)
++def write(path, value):
++    with path.open('x', encoding='utf8', newline='\n') as stream: json.dump(value, stream, indent=2); stream.write('\n')
++def good(receipt):
++    assert receipt['schema'] == 'recorded-porting-command.v1'
++    assert receipt['exit_code'] == 0 and receipt['source_bytes_match_before_and_after'] and receipt['launch_error'] is None
++
++OUT = contained(a.output_dir); assert not OUT.exists()
++freeze_path, freeze = bound(a.freeze_receipt); freeze_execution_path, freeze_execution = bound(a.freeze_execution)
++good(freeze_execution)
++assert freeze['schema'] == 'rad01-frozen-packet.v1' and freeze['status'] == 'frozen-literal-input-and-policy-before-numerical-execution'
++assert freeze['numerical_PASS_claimed'] is False
++_, freeze_stdout = bound_ref(freeze_execution['stdout']); assert freeze_stdout == freeze
++assert freeze['source_authorities']['actual_scope_check_role'] == 'real-RAD-01-check-only'
++for row in freeze['source_authorities']['current_after_documents']:
++    actual = ref(contained(row['path'])); assert all(actual[k] == row[k] for k in ['path', 'sha256', 'size_bytes'])
++final_path, final = bound(a.prior_final_preservation)
++retirement_path, retirement = bound(a.prior_retirement)
++retirement_execution_path, retirement_execution = bound(a.prior_retirement_execution); good(retirement_execution)
++assert final['schema'] == 'ctf10-exact-pair-after-retirement.v1'
++assert retirement['schema'] == 'ctf10-two-original-native-helper-retirement.v1'
++assert retirement['status'] == 'pass-precise-pair-removal-and-retained-artifact-guards'
++assert bound_ref(retirement['actual_pair_tombstone_record'])[0] == final_path
++kept = final['protected_after']; protected = kept['legacy_protected'] + kept['retained_CTF10_derivatives']
++assert all(type(kept[key]) is int for key in ['legacy_count', 'retained_derivative_count', 'core_present_count', 'core_absent_count'])
++assert len(kept['legacy_protected']) == kept['legacy_count'] and len(kept['retained_CTF10_derivatives']) == kept['retained_derivative_count']
++assert len(kept['present_core_objects']) == kept['core_present_count'] == 631
++assert len(kept['absent_registered_object_paths']) == kept['core_absent_count'] == 12
++prior_absences = []
++for card in ['04', '06', '07', '08', '09']:
++    row = kept['literal_prior_pair_retirements'][f'actual_prior_CTF{card}_pair_retirement']
++    _, prior_retirement = bound_ref(row)
++    _, tombstone = bound_ref(prior_retirement['actual_pair_tombstone_record'])
++    paths = [entry['original_link']['historical_path'] for entry in tombstone['entries']]
++    assert len(paths) == 2 and kept[f'previously_retired_CTF{card}_original_paths_still_absent'] == paths
++    prior_absences += paths
++prior_absences += [entry['original_link']['historical_path'] for entry in final['entries']]
++assert len(prior_absences) == len(set(prior_absences)) == 12
++for path in kept['absent_registered_object_paths'] + prior_absences: assert not contained(path).exists()
++for row in protected + kept['present_core_objects']:
++    path = contained(row['path']); assert path.is_file() and path.stat().st_size == row['size_bytes']
++prior_build_path, prior_build = bound(a.prior_native_build)
++assert prior_build['schema'] == 'ctf10-native-build.v1' and prior_build['target'] == 'ctf10_unit_helper'
++assert prior_build['status'] == 'pass-actual-4TU-link-and-preservation'
++assert [prior_build[key] for key in ['core_registered', 'core_present', 'core_absent']] == [643, 631, 12]
++assert type(prior_build['current_compile_rows']) is int
++native_path, native = bound(a.native_source_manifest)
++assert native['schema'] == 'rad01-native-direct-unit-source-preparation.v1' and len(native['native_source_files']) == 6
++for row in native['native_source_files']:
++    actual = ref(contained(row['path'])); assert all(actual[k] == row[k] for k in ['path', 'sha256', 'size_bytes'])
++configure_path, configure_receipt = bound(a.prior_configure_execution); good(configure_receipt)
++compile_path, compile_receipt = bound(a.prior_compile_execution); good(compile_receipt)
++configure = configure_receipt['command'][:]
++assert sum(s.startswith('-DCMAKE_PROJECT_INCLUDE=') for s in configure) == 1
++source = native_path.parent; recipe = source / 'rad01_reference.cmake'
++recipe_refs = [row for row in native['own_sources'] if contained(row['path']) == recipe]
++assert len(recipe_refs) == 1 and ref(recipe) == {key: recipe_refs[0][key] for key in ['path', 'sha256', 'size_bytes']}
++configure = ['-DCMAKE_PROJECT_INCLUDE=' + str(recipe) if s.startswith('-DCMAKE_PROJECT_INCLUDE=') else s for s in configure]
++assert not any(s.startswith('-DRAD01_SOURCE_DIR=') for s in configure)
++configure.append('-DRAD01_SOURCE_DIR=' + str(source))
++assert any(s.startswith('-DCTF10_SOURCE_DIR=') for s in configure) and any(s.startswith('-DCTF10_OBSERVER_SOURCE_DIR=') for s in configure)
++compile = compile_receipt['command'][:]; at = compile.index('--target'); end = next((i for i in range(at + 1, len(compile)) if compile[i].startswith('--')), len(compile))
++compile[at + 1:end] = ['rad01_unit_helper']
++assert '--verbose' in compile
++build_dir = contained(compile[compile.index('--build') + 1])
++before = OUT / 'before'; before.mkdir(parents=True)
++live = build_dir / 'compile_commands.json'; copy = before / 'compile_commands.json'; shutil.copyfile(live, copy); assert sha(live) == sha(copy)
++rows = read(copy); assert len(rows) == prior_build['current_compile_rows']
++write(before / 'preservation.json', {'schema': 'rad01-actual-before-build-preservation.v1', 'observed_utc': datetime.now(timezone.utc).isoformat(),
++    'protected_refs': protected, 'protected_ref_count': len(protected), 'present_objects': kept['present_core_objects'],
++    'absent_registered_object_paths': kept['absent_registered_object_paths'], 'prior_original_absent_paths': prior_absences,
++    'core_registered': kept['core_present_count'] + kept['core_absent_count'], 'previous_compile_rows': len(rows), 'compile_commands': ref(copy),
++    'actual_prior_final_preservation': ref(final_path), 'actual_prior_retirement': ref(retirement_path), 'actual_prior_retirement_execution': ref(retirement_execution_path),
++    'fresh_hash_authority': 'Immediately preceding actual CTF10 final retirement guard; existence/size and all absences rechecked here. Before SHAs are explicitly reused; Root must establish no intervening protected/core mutation.',
++    'freeze_receipt': ref(freeze_path), 'freeze_execution': ref(freeze_execution_path), 'native_source_manifest': ref(native_path),
++    'prior_native_build': ref(prior_build_path), 'prior_configure_execution': ref(configure_path), 'prior_compile_execution': ref(compile_path),
++    'build_directory': build_dir.relative_to(ROOT).as_posix(), 'core_before_check': prior_build['core_before_check'],
++    'legacy_registry_rewritten': False, 'scientific_execution_performed': False})
++env = dict(os.environ); env['PATH'] = str(ROOT / '.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin') + os.pathsep + env['PATH']
++for name, command in [('native-configure-command-01', configure), ('native-compile-command-01', compile)]:
++    subprocess.run(['python', '-X', 'utf8', '-B', 'tools/porting/record_command.py', '--output-dir', (OUT / name).relative_to(ROOT).as_posix(), '--', *command], cwd=ROOT, check=True, env=env)
++    receipt = read(OUT / name / 'receipt.json'); good(receipt)
++    print(json.dumps({'execution': ref(OUT / name / 'receipt.json')}), flush=True)

@@ -1,0 +1,366 @@
+--- .runtime/porting/RAD-01/input-writer-prep-03/before/freeze_packet.py
++++ .runtime/porting/RAD-01/input-writer-prep-03/freeze_packet.py
+@@ -1,4 +1,4 @@
+-"""Freeze literal CTF member inputs and a one-way contract DAG; Root execution only."""
++"""Freeze literal RAD direct-unit inputs and the existing one-way contract DAG; Root only."""
+ import argparse
+ import hashlib
+ import importlib.util
+@@ -7,231 +7,154 @@
+ from datetime import datetime, timezone
+ from pathlib import Path
+ 
+-IO_SHA = "c90e5e89728f2c1db21835145ace4de84617346870d7fc29949abcc291deab74"
++IO_SHA = "d038fcddb3319eb0494e059ffdd5453355ceff2494872c96c5d60c2492d623c9"
+ io_path = Path(__file__).resolve().with_name("packet_io.py")
+ if hashlib.sha256(io_path.read_bytes()).hexdigest() != IO_SHA:
+     raise ValueError("Reviewed stdlib input/source helper differs")
+-spec = importlib.util.spec_from_file_location("ctf01_packet_io", io_path)
++spec = importlib.util.spec_from_file_location("rad01_packet_io", io_path)
+ m = importlib.util.module_from_spec(spec)
+ spec.loader.exec_module(m)
+ 
+ COMMIT = "6f2e40d10250a105b49966baa24d843711e61048"
+-DESIGN = {"path": ".runtime/porting/CTF-01/input-design-prep-01/manifest.json",
+-          "sha256": "28016195bc72bff53ab5140abfb6dca43fb0f82c117f04f824acf07a1a53583f"}
+-OBSERVER = {"path": ".runtime/porting/CTF-01/native-observer-prep-01/manifest.json",
+-            "sha256": "da47576f07da2283ce28ac65452332221e80679c66992fb62e7ea9952701fe26"}
+-SCOPE = {"path": "energyplus_porting_plan/contracts/scope.json",
+-         "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879"}
+-ORIGINAL_PREFIX = ".reference/energyplus-src/26.1.0/"
+-FLAGS = {"frozen_before_numerical_execution": True, "expected_values_supplied": False,
+-         "expected_exits_supplied": False, "scientific_execution_performed": False}
+-NATIVE_NAMES = {"Construction.ctf01.cc", "ctf01_observer.hh", "ctf01_observer.cc",
+-                "ctf01_reference_helper.cpp", "ctf01_reference_metadata.hh",
+-                "ctf01_reference_fields.hh", "ctf01_reference_admission.hh"}
++NATIVE = {"path": ".runtime/porting/RAD-01/native-helper-prep-02/manifest.json",
++          "sha256": "b4e10bd483af44f6f5d0b6f5fa13051d106d6d672d1ec0af1b79bbf5d5986b89"}
++NATIVE_NAMES = ["rad01_helper.cpp", "rad01_metadata.hh", "rad01_admission.hh",
++                "rad01_observer.hh", "rad01_observer.cc", "HeatBalanceIntRadExchange.rad01.cc"]
++FLAGS = {"frozen_before_this_RAD01_helper_execution": True,
++         "frozen_before_numerical_execution": True, "expected_values_supplied": False,
++         "expected_exits_supplied": False, "scientific_execution_performed": False,
++         "full_engine_production_geometry_supplied": False}
+ 
+ 
+-def identifier(value):
+-    m.require(isinstance(value, str) and re.fullmatch("[A-Za-z0-9_-]{1,80}", value),
+-              "Bounded literal identifier required")
+-    return value
+-
+-
+-def expand(matrix):
+-    literals = {row["id"]: row["bits"] for row in matrix["scalar_literals"]}
+-    m.require(len(literals) == len(matrix["scalar_literals"]), "Duplicate scalar literal ID")
+-    for bits in literals.values():
+-        m.require(re.fullmatch("[0-9a-f]{16}", bits) and (int(bits, 16) >> 52) & 2047 != 2047,
+-                  "Literal finite binary64 input required")
+-
+-    def scalar(name):
+-        return {"bits": literals[name]}
+-
+-    seeds = matrix["material_member_seeds"]
+-    seed_ids = [identifier(row["id"]) for row in seeds]
+-    m.require(len(set(seed_ids)) == len(seed_ids), "Duplicate material seed ID")
+-    models = []
+-    for row in matrix["model_cases"]:
+-        used = {name for call in row["construction_calls"] for name in call["layer_material_ids"]}
+-        m.require(used <= set(seed_ids), "Unknown literal material membership")
+-        materials = []
+-        # Subset only; the original seed-registry order determines actual owner order.
+-        for seed in seeds:
+-            if seed["id"] not in used:
+-                continue
+-            m.require(seed["group_member"] == "Regular" and
+-                      seed["provenance"] == "explicit-member-input-not-loader-output", "Explicit member lane required")
+-            members = seed["members"]
+-            m.require(type(members["ROnly"]) is bool, "Typed ROnly input required")
+-            materials.append({"id": seed["id"], "Name": seed["id"],
+-                              **{key: scalar(members[key]) for key in
+-                                 ["Thickness", "Conductivity", "Density", "SpecHeat", "Resistance"]},
+-                              "ROnly": members["ROnly"]})
+-        common = matrix["common_construction_inputs"]
+-        constructions, operations = [], []
+-        for call in row["construction_calls"]:
+-            name = identifier(call["id"])
+-            m.require(type(call["IsUsedCTF"]) is bool and 1 <= len(call["layer_material_ids"]) <= 11,
+-                      "Literal selected construction members required")
+-            constructions.append({"id": name, "Name": name, "IsUsedCTF": call["IsUsedCTF"],
+-                                  **{key: common[key] for key in ["SourceSinkPresent", "SolutionDimensions",
+-                                                                "SourceAfterLayer", "TempAfterLayer"]},
+-                                  "ThicknessPerpend": scalar(common["ThicknessPerpend"]),
+-                                  "layer_material_ids": list(call["layer_material_ids"])})
+-            operations.append({"id": name, "kind": "calculateTransferFunction", "construction_id": name})
+-        m.require(row["lane"] == "explicit-member-unit" and materials and constructions,
+-                  "Nonempty explicit member model required")
+-        m.require(len({call["id"] for call in constructions}) == len(constructions), "Duplicate construction ID")
+-        for key in ["initial_ErrorsFound", "initial_DoCTFErrorReport"]:
+-            m.require(type(row[key]) is bool, "Typed shared initial flag required")
+-        caller = {key: scalar(matrix["common_caller_inputs"][key]) for key in ["TimeStepZone", "TimeStepZoneSec"]}
+-        caller.update(ErrorsFound=row["initial_ErrorsFound"], DoCTFErrorReport=row["initial_DoCTFErrorReport"])
+-        models.append({"id": identifier(row["id"]), "lane": row["lane"], "caller": caller,
+-                       "materials": materials, "constructions": constructions, "operations": operations})
+-    m.require(len({row["id"] for row in models}) == len(models), "Duplicate model ID")
+-    calls = sum(len(row["operations"]) for row in models)
+-    counts = {"model_cases": len(models), "calculateTransferFunction": calls, "total_operations": calls}
+-    m.require({"model_cases": len(models), "calculateTransferFunction_calls": calls} ==
+-              matrix["proposed_array_derived_counts"], "Literal matrix counts differ")
++def validate_inputs(fixture, policy):
++    m.require(fixture["schema"] == "rad01-input-fixture-proposal.v1" and
++              fixture["frozen"] is False and fixture["scientific_execution_performed"] is False and
++              fixture["expected_values_supplied"] is False and fixture["expected_exits_supplied"] is False and
++              fixture["full_engine_production_geometry_unavailable"] is True, "Literal input-only proposal required")
++    zero = {"atol": 0.0, "rtol": 0.0, "value_class_exact": True,
++            "signed_zero_exact": True, "shape_exact": True}
++    m.require(policy == {"scope": "direct-declared-geometry-CalcApproximateViewFactors-only",
++              "arithmetic_profiles_by_variable": {"ZoneArea": zero, "F": zero},
++              "copied_input_bits_and_owner_ids_exact": True, "warning_identity_and_order_exact": True,
++              "required_reached_owner_absence_fails": True, "unreached_owner_counted_as_PASS": False,
++              "row_first_F_destination_source_layout": True,
++              "full_engine_geometry_or_RAD02_RAD03_claimed": False}, "Exact pre-output policy required")
++    for profile in policy["arithmetic_profiles_by_variable"].values():
++        m.require(type(profile["atol"]) is float and type(profile["rtol"]) is float, "Float zero profiles required")
++    models = fixture["model_cases"]
++    m.require(len(models) == 21 and len({row["id"] for row in models}) == len(models), "Exact21 literal models required")
++    for row in models:
++        m.require(set(row) == {"id", "lane", "context", "surface_registry", "surface_order"} and
++                  re.fullmatch("[A-Za-z0-9_-]{1,80}", row["id"]) and row["lane"] in
++                  ["declared-geometry-unit", "CON-membership-template-declared-geometry-unit"], "Direct-unit record differs")
++        context = row["context"]
++        m.require(set(context) == {"enclosure_index", "zone_id", "native_zone_index", "zone_name"} and
++                  type(context["native_zone_index"]) is int and context["native_zone_index"] == 1, "Actual declared Zone1 owner required")
++        for key in ["enclosure_index", "zone_id"]:
++            m.require(type(context[key]) is int and 0 <= context[key] <= 0xffffffff, "Opaque u32 association required")
++        surfaces = row["surface_registry"]
++        m.require(1 <= len(surfaces) <= 1024, "Explicit direct Native input domain required")
++        ids, names = [], []
++        for index, surface in enumerate(surfaces, 1):
++            m.require(set(surface) == {"native_surface_index", "surface_id", "name", "surface_type", "area_m2", "azimuth_deg", "tilt_deg"} and
++                      type(surface["native_surface_index"]) is int and surface["native_surface_index"] == index and
++                      type(surface["surface_id"]) is int and 0 <= surface["surface_id"] <= 0xffffffff and
++                      surface["surface_type"] in ["Wall", "Floor", "Roof", "Ceiling"], "Actual registry order/class differs")
++            ids.append(surface["surface_id"]); names.append(surface["name"])
++            for key in ["area_m2", "azimuth_deg", "tilt_deg"]:
++                scalar = surface[key]
++                m.require(set(scalar) == {"bits"} and re.fullmatch("[0-9a-f]{16}", scalar["bits"]) and
++                          (int(scalar["bits"], 16) >> 52) & 2047 != 2047, "Finite literal bits required; no geometry evaluation")
++        for name in names + [context["zone_name"]]:
++            m.require(isinstance(name, str) and 1 <= len(name) <= 200 and all(32 <= ord(c) < 127 for c in name), "Bounded ASCII name required")
++        m.require(len(set(ids)) == len(ids) and len(set(names)) == len(names) and
++                  len(row["surface_order"]) == len(ids) and all(type(x) is int for x in row["surface_order"]) and
++                  sorted(row["surface_order"]) == sorted(ids), "Literal complete unique SPtr permutation required")
++    counts = {"model_cases": len(models), "CalcApproximateViewFactors": len(models)}
++    m.require(counts == fixture["proposed_counts"], "Counts must derive from literal arrays")
+     return models, counts
+ 
+ 
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+-    for name in ["approved-source-sha256", "source-manifest", "native-source-manifest", "current-card",
+-                 "actual-scope-amendment", "actual-scope-amendment-execution", "output-dir"]:
++    for name in ["approved-source-sha256", "source-manifest", "current-card", "actual-scope-amendment",
++                 "actual-scope-amendment-execution", "output-dir"]:
+         parser.add_argument("--" + name, required=True)
+-    args = parser.parse_args()
+-    started = datetime.now(timezone.utc).isoformat()
++    args = parser.parse_args(); started = datetime.now(timezone.utc).isoformat()
+     writer = m.identity(__file__)
+-    m.require(writer["sha256"] == args.approved_source_sha256, "Explicit reviewed writer SHA256 differs")
+-    own_manifest_ref = m.argument(args.source_manifest)
+-    own_manifest = m.load(own_manifest_ref)
+-    m.require(own_manifest["schema"] == "ctf01-input-writer-source-preparation.v1", "Reviewed writer manifest required")
+-    own_sources = [m.bind(row) for row in own_manifest["own_sources"]]
+-    m.require(own_sources == [writer, m.identity(io_path)], "Approved writer/source-helper inventory differs")
+-    design_ref, observer_ref = m.bind(DESIGN), m.bind(OBSERVER)
+-    design, observer = m.load(design_ref), m.load(observer_ref)
+-    m.require(design["schema"] == "ctf01-input-projection-source-proposal.v1" and
+-              design["status"] == "SOURCE-READY-held-unexecuted-proposal", "Held design identity required")
+-    documents = {Path(row["path"]).name: m.bind(row) for row in design["documents"]}
+-    matrix, proposed_projection, policy = [m.load(documents[name]) for name in
+-                                          ["case-matrix.json", "projection.json", "numeric-policy.json"]]
+-    models, counts = expand(matrix)
+-    profiles = policy["arithmetic_profiles_by_variable"]
+-    expected = [phase + "." + field for phase in ["PostLoad", "PostMerge", "PostConversion"]
+-                for field in ["dl", "rk", "rho", "cp", "lr"]] + ["PostConversion." + key for key in ["dyn", "rs", "cnd"]]
+-    m.require([row["variable"] for row in profiles] == expected, "Exact eighteen named profiles required")
+-    m.require(all(type(row["atol"]) is float and row["atol"] == 0.0 and type(row["rtol"]) is float and
+-                  row["rtol"] == 0.0 and row["class_exact"] is True and row["shape_exact"] is True
+-                  for row in profiles), "Root pre-output zero tolerances/class/shape must remain exact")
+-    copied = policy["copied_input_and_owner_profile"]
+-    m.require(copied["binary64_class_exact"] is True and copied["binary64_bits_exact"] is True,
+-              "Copied input member bits/class must remain exact")
+-    source_files, source_bindings = [], []
+-    for row in design["primary_source_identities"]:
+-        if row["path"].startswith(ORIGINAL_PREFIX):
+-            ref = m.bind(row)
+-            source_bindings.append(ref)
+-            source_files.append({**ref, "path": row["path"][len(ORIGINAL_PREFIX):]})
+-    for row in design["primary_source_ranges"]:
+-        raw = m.contained(m.bind(row["source"])["path"]).read_bytes().splitlines(keepends=True)
+-        selected = b"".join(raw[row["start_line"] - 1:row["end_line"]])
+-        m.require(hashlib.sha256(selected).hexdigest() == row["range_sha256"] and
+-                  len(selected) == row["range_size_bytes"], "Pinned primary source range differs")
+-    native_manifest_ref = m.argument(args.native_source_manifest)
+-    native_manifest = m.load(native_manifest_ref)
+-    m.require(native_manifest["schema"] == "ctf01-native-helper-source-preparation.v1" and
+-              native_manifest["energyplus_commit"] == COMMIT, "Reviewed Native helper source manifest required")
+-    native_sources = [m.bind(row) for row in native_manifest["runtime_protocol"]["native_source_files"]]
+-    m.require(len(native_sources) == 7 and {Path(row["path"]).name for row in native_sources} == NATIVE_NAMES,
+-              "Exact seven Native source files required")
+-    passive = [m.bind(row) for row in observer["sources"]]
+-    m.require(native_sources[:3] == passive, "Held passive observer identity/order differs")
+-    scope_ref = m.bind(SCOPE)
+-    scope = m.load(scope_ref)
+-    guards = [ref for row in scope["cases"] for key in ["input", "weather", "metadata"] for ref in [row[key]]]
+-    m.require(len(scope["cases"]) == 15 and len(guards) == 45 and scope["energyplus"]["commit"] == COMMIT,
+-              "Fixed ordered CON15/45 source/input authority required")
+-    for row in guards:
+-        m.bind(row)  # Hash only: no IDF/weather/metadata numerical parsing.
++    m.require(writer["sha256"] == args.approved_source_sha256 and Path.cwd().resolve() == m.ROOT, "Reviewed writer/cwd required")
++    own_ref = m.argument(args.source_manifest); own = m.load(own_ref)
++    m.require(own["schema"] == "rad01-input-writer-source-preparation.v1", "Reviewed writer preparation required")
++    own_sources = [m.bind(row) for row in own["own_sources"]]
++    m.require(own_sources == [writer, m.identity(io_path)], "Exact two writer sources required")
++    native_ref = m.bind(NATIVE); native = m.load(native_ref)
++    m.require(native["schema"] == "rad01-native-direct-unit-source-preparation.v1" and native["energyplus_commit"] == COMMIT,
++              "Exact reviewed Native direct-unit preparation required")
++    fixture_ref = m.bind(native["input_fixture_proposal"]); policy_ref = m.bind(native["observation_policy_proposal"])
++    fixture, policy = m.load(fixture_ref), m.load(policy_ref)
++    models, counts = validate_inputs(fixture, policy)
++    native_sources = [m.bind(row) for row in native["native_source_files"]]
++    m.require([Path(row["path"]).name for row in native_sources] == NATIVE_NAMES, "Exact six Native source identities/order required")
++    original_sources = [m.bind(row) for row in native["source_dependencies"] if row["path"].startswith(".reference/energyplus-src/26.1.0/")]
++    for row in native["read_source_ranges"]:
++        raw = b"".join(m.contained(row["path"]).read_bytes().splitlines(keepends=True)[row["start_line"] - 1:row["end_line"]])
++        m.require(hashlib.sha256(raw).hexdigest() == row["sha256"] and len(raw) == row["size_bytes"], "Actual pinned source range differs")
+     card_ref = m.argument(args.current_card)
+-    m.require(card_ref["path"] == "energyplus_porting_plan/cards/CTF-01.md", "Explicit actual current CTF card required")
+-    amendment_ref = m.argument(args.actual_scope_amendment)
+-    execution_ref = m.argument(args.actual_scope_amendment_execution)
+-    amendment = m.load(amendment_ref)
+-    m.require(amendment["schema"] == "ctf01-source-scope-amendment.v1" and
+-              amendment["strict_profiles_settled_before_outputs"] is True and amendment["all_four_gates_pending"] is True and
+-              amendment["actual_CTF_build_or_engine_execution_performed"] is False, "Actual pre-output scope amendment required")
+-    for key, expected_ref in [("input_design", design_ref), ("native_observer", observer_ref),
+-                              ("native_helper", native_manifest_ref)]:
+-        m.require(m.bind(amendment[key]) == expected_ref, "Scope authority source binding differs")
+-    before_documents = [m.bind(row) for row in amendment["before_documents"]]
+-    after_documents = [m.bind(row) for row in amendment["after_documents"]]
+-    historical_card = next(row for row in design["primary_source_identities"] if row["path"] == card_ref["path"])
+-    m.require(any(row["sha256"] == historical_card["sha256"] for row in before_documents) and
+-              card_ref in after_documents, "Historical design card archive/current scope card correspondence differs")
+-    m.require(amendment["requested_counts"] == {key: counts[key] for key in ["model_cases", "calculateTransferFunction"]},
+-              "Actual scope literal-array count differs")
+-    execution = m.load(execution_ref)
+-    m.require(type(execution["exit_code"]) is int and execution["exit_code"] == 0 and
+-              execution["launch_error"] is None and execution["source_bytes_match_before_and_after"] is True,
+-              "Actual successful source-preserving scope amendment recorder required")
+-    m.require(execution["command"] == ["python", "-X", "utf8", "-B", "tools/porting/check_plan.py", "--check", "--card", "CTF-01"],
+-              "Actual recorded scope document validation command required; it did not author the amendment")
+-    for key in ["stdout", "stderr"]:
+-        m.bind(execution[key])
++    m.require(card_ref["path"] == "energyplus_porting_plan/cards/RAD-01.md", "Actual current RAD01 card required")
++    amendment_ref = m.argument(args.actual_scope_amendment); amendment = m.load(amendment_ref)
++    execution_ref = m.argument(args.actual_scope_amendment_execution); execution = m.load(execution_ref)
++    inventory = {"native_helper": native_ref, "input_fixture": fixture_ref, "observation_policy": policy_ref, "input_writer": own_ref}
++    m.require(amendment["schema"] == "rad01-source-scope-amendment.v1" and amendment["cards"] == ["RAD-01"] and
++              amendment["rad_policy_source_inventory"] == inventory and amendment["strict_profiles_settled_before_outputs"] is True and
++              amendment["all_other_gates_pending"] is True and amendment["actual_RAD01_successful_build_or_engine_execution_performed"] is False and
++              amendment["requested_counts"] == counts, "Actual pre-output scope authority required")
++    before = [m.bind(row) for row in amendment["before_documents"]]
++    after = [m.bind(row) for row in amendment["after_documents"]]
++    m.require(card_ref in after, "True current card must be an actual after-document")
++    m.require(execution["schema"] == "recorded-porting-command.v1" and type(execution["exit_code"]) is int and
++              execution["exit_code"] == 0 and execution["launch_error"] is None and execution["source_bytes_match_before_and_after"] is True and
++              Path(execution["cwd"]).resolve() == m.ROOT and execution["command"] ==
++              ["python", "-X", "utf8", "-B", "tools/porting/check_plan.py", "--check", "--card", "RAD-01"], "Actual scope check0 recorder required")
++    for key in ["stdout", "stderr"]: m.bind(execution[key])
++    m.require(execution["executed_launcher"]["historical_path"] == "tools/porting/record_command.py", "Real recorder source required")
++    m.bind(execution["executed_launcher"]["archive"])
+     output = m.contained(args.output_dir, existing=False)
+-    m.require(output.is_relative_to(m.CTF) and output != m.CTF and not output.exists(), "Fresh contained output directory required")
++    m.require(output.is_relative_to(m.BASE) and output != m.BASE and not output.exists(), "Fresh contained RAD packet directory required")
++    m.recheck(); output.mkdir(parents=True, exist_ok=False)
++    archive_dir = output / "source-archives"; archive_dir.mkdir()
++    sources = own_sources + [native_ref, fixture_ref, policy_ref, own_ref] + original_sources + native_sources + after
++    archives = [m.archive(row, archive_dir, index) for index, row in enumerate(sources)]
++    authority = {"native_helper_source_manifest": native_ref, "input_fixture_proposal": fixture_ref, "observation_policy_proposal": policy_ref,
++                 "writer_source_manifest": own_ref, "current_card": card_ref, "actual_scope_amendment": amendment_ref,
++                 "actual_scope_amendment_execution": execution_ref, "actual_scope_check_role": "real-RAD-01-check-only",
++                 "historical_before_documents": before, "current_after_documents": after,
++                 "scope_recorder_role": "validated-already-Root-authored-documents; did-not-author-amendment"}
++    source = m.emit(output / "source.json", {"schema": "rad01-source-contract.v1", **FLAGS, "energyplus_commit": COMMIT,
++        "source_files": original_sources, "primary_source_ranges": native["read_source_ranges"], "source_authorities": authority})
++    tolerances = m.emit(output / "tolerances.json", {"schema": "rad01-tolerances-contract.v1", **FLAGS,
++        "observation_policy": policy, "source_proposal": policy_ref})
++    common = {**FLAGS, "energyplus_commit": COMMIT, "actual_scope_amendment": amendment_ref,
++              "actual_scope_amendment_execution": execution_ref, "observation_policy": policy}
++    request = m.emit(output / "helper-request.json", {"schema": "rad01-helper-cases.v1", **common,
++        "contracts": {"source": source, "tolerances": tolerances}, "model_cases": models, "requested_counts": counts})
++    cases = m.emit(output / "cases.json", {"schema": "rad01-cases-contract.v1", **FLAGS, "helper_request": request,
++        "source": source, "tolerances": tolerances, "requested_counts": counts, "literal_input_fixture": fixture_ref,
++        "CON_membership_templates_are_declared_unit_geometry_only": True})
++    contracts = {"source": source, "cases": cases, "tolerances": tolerances}
++    projection = m.emit(output / "projection.json", {"schema": "rad01-observation-projection.v1", **common,
++        "helper_request": request, "contracts": contracts, "source_authorities": authority, "scientific_values_compared_or_PASS_claimed": False})
++    admission = m.emit(output / "native-admission-contract.json", {"schema": "rad01-native-admission-contract.v1", **common,
++        "helper_request": request, "projection": projection, "contracts": contracts, "native_source_files": native_sources, "requested_counts": counts})
+     m.recheck()
+-    output.mkdir(parents=True, exist_ok=False)
+-    archive_dir = output / "source-archives"
+-    archive_dir.mkdir()
+-    archived_sources = [m.archive(row, archive_dir, index) for index, row in enumerate(
+-        own_sources + list(documents.values()) + source_bindings + native_sources)]
+-    authority = {"design_manifest": design_ref, "native_observer_source_manifest": observer_ref,
+-                 "native_helper_source_manifest": native_manifest_ref, "current_card": card_ref,
+-                 "actual_scope_amendment": amendment_ref, "actual_scope_amendment_execution": execution_ref,
+-                 "historical_scope_documents": before_documents,
+-                 "scope_recorder_role": "validated-already-Root-authored-documents; did-not-author-amendment"}
+-    source = m.emit(output / "source.json", {"schema": "ctf01-source-contract.v1", **FLAGS,
+-        "energyplus_commit": COMMIT, "source_files": source_files, "primary_source_ranges": design["primary_source_ranges"],
+-        "source_authorities": authority, "historical_design_source_identities": design["primary_source_identities"],
+-        "historical_design_card_and_Rust_rows_asserted_current": False})
+-    tolerances = m.emit(output / "tolerances.json", {**policy, "schema": "ctf01-tolerances-contract.v1", **FLAGS,
+-        "status": "Root-reviewed-zero-tolerances-frozen-before-first-numerical-execution", "source_proposal": documents["numeric-policy.json"]})
+-    common = {**FLAGS, "energyplus_commit": COMMIT, "fixed_scope": scope_ref, "all_45_guard_refs": guards,
+-              "actual_scope_amendment": amendment_ref, "actual_scope_amendment_execution": execution_ref}
+-    observation_policy = {key: proposed_projection[key] for key in
+-                          ["selected_source", "required_observed_fields_when_phase_reached", "pairing", "availability", "excluded"]}
+-    observation_policy["production_fixed15_real_loader_lane"] = "separate-required-pending; not certified by this explicit-member packet"
+-    request = m.emit(output / "helper-request.json", {"schema": "ctf01-helper-cases.v1", **common,
+-        "contracts": {"source": source, "tolerances": tolerances}, "observation_policy": observation_policy,
+-        "model_cases": models, "requested_counts": counts})
+-    cases = m.emit(output / "cases.json", {"schema": "ctf01-cases-contract.v1", **FLAGS, "helper_request": request,
+-        "source": source, "tolerances": tolerances, "fixed_CON_scope": scope_ref, "all_45_guard_refs": guards,
+-        "requested_counts": counts, "literal_case_matrix": documents["case-matrix.json"],
+-        "material_order": "referenced subset in original seed-registry order; no sorting",
+-        "construction_operation_and_layer_order": "literal declaration order unchanged"})
+-    contracts = {"source": source, "cases": cases, "tolerances": tolerances}
+-    projection = m.emit(output / "projection.json", {"schema": "ctf01-observation-projection.v1", **common,
+-        "helper_request": request, "contracts": contracts, "native_observation_policy": observation_policy,
+-        "source_authorities": authority, "numeric_policy": tolerances, "scientific_values_compared_or_PASS_claimed": False})
+-    admission = m.emit(output / "native-admission-contract.json", {"schema": "ctf01-native-admission-contract.v1", **common,
+-        "helper_request": request, "projection": projection, "contracts": contracts,
+-        "native_source_files": native_sources, "requested_counts": counts})
+-    m.recheck()
+-    receipt = {"schema": "ctf01-frozen-packet.v1", "status": "frozen-literal-input-and-policy-before-numerical-execution",
+-        "started_utc": started, "finished_utc": datetime.now(timezone.utc).isoformat(), **FLAGS,
+-        "source_preparation_approval": {"approved_writer_sha256": writer["sha256"], "source_manifest": own_manifest_ref,
+-                                        "reviewed_sources": own_sources}, "source_authorities": authority,
++    receipt = {"schema": "rad01-frozen-packet.v1", "status": "frozen-literal-input-and-policy-before-numerical-execution", **FLAGS,
++        "started_utc": started, "finished_utc": datetime.now(timezone.utc).isoformat(), "source_authorities": authority,
++        "source_preparation_approval": {"approved_writer_sha256": writer["sha256"], "source_manifest": own_ref, "reviewed_sources": own_sources},
+         "helper_request": request, "native_admission_contract": admission, "projection": projection, "contracts": contracts,
+-        "requested_counts": counts, "fixed_scope": scope_ref, "all_45_guard_refs": guards,
+-        "executed_writer_sources": archived_sources[:2], "reviewed_source_archives": archived_sources,
++        "requested_counts": counts, "executed_writer_sources": archives[:2], "reviewed_source_archives": archives,
+         "scope_execution_exit_zero_source_guard_verified": True, "scientific_operands_evaluated": False,
+         "expected_arrays_or_method_outcomes_generated": False, "numerical_PASS_claimed": False,
+-        "canonical_files_updated": False, "gates_updated": False, "production_fixed15_loader_lane_certified": False}
+-    m.emit(output / "freeze-receipt.json", receipt)
+-    m.recheck()
++        "canonical_files_updated": False, "gates_updated": False, "production_geometry_certified": False}
++    m.emit(output / "freeze-receipt.json", receipt); m.recheck()
+     print(json.dumps(receipt, ensure_ascii=False, allow_nan=False, indent=2))
+ 
+ 

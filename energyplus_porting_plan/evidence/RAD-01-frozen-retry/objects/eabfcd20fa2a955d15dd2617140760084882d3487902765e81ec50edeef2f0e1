@@ -1,0 +1,43 @@
+"""Root's one-off invocation of the accepted existing Native build stages."""
+import hashlib
+import json
+import subprocess
+from pathlib import Path
+
+ROOT = Path.cwd()
+BASE = ROOT / '.runtime/porting/RAD-01'
+PRIOR = ROOT / '.runtime/porting/CTF-10'
+PREP = BASE / 'native-build-prep-02'
+OUT = BASE / 'native-build-01'
+def read(p): return json.loads(p.read_bytes())
+def arg(p): return p.relative_to(ROOT).as_posix() + '#' + hashlib.sha256(p.read_bytes()).hexdigest()
+assert not subprocess.check_output(['git', 'status', '--porcelain'])
+assert subprocess.check_output(['git', 'rev-parse', 'HEAD']) == subprocess.check_output(['git', 'rev-parse', '@{u}'])
+MANIFEST = BASE / 'native-build-prep-03/manifest.json'
+assert arg(MANIFEST).endswith('#724269235eba312ae0a6948f1c94a1a9af319df301eb3e8ffbdc68a8b9bbdbbf')
+for row in read(MANIFEST)['own_sources']:
+    assert hashlib.sha256((ROOT / row['path']).read_bytes()).hexdigest() == row['sha256']
+old_build_path = PRIOR / 'native-build-01/unit/native-build.json'
+old_build = read(old_build_path)
+freeze_path = BASE / 'frozen-packet-01/freeze-receipt.json'
+assert read(BASE / 'freeze-command-01/receipt.json')['exit_code'] == 0
+storage = read(PRIOR / 'protected-original-storage-compression-01/record.json')
+assert storage['all4_bytes_and_paths_unchanged'] and not storage['file_deleted_or_moved']
+options = {'freeze-receipt': freeze_path, 'freeze-execution': BASE / 'freeze-command-01/receipt.json',
+    'prior-final-preservation': PRIOR / 'retirement-01/after-retirement.json',
+    'prior-retirement': PRIOR / 'retirement-01/retirement.json',
+    'prior-retirement-execution': PRIOR / 'retirement-command-01/receipt.json',
+    'prior-configure-execution': ROOT / old_build['configure_execution']['path'],
+    'prior-compile-execution': ROOT / old_build['compile_execution']['path'],
+    'prior-native-build': old_build_path, 'native-source-manifest': BASE / 'native-helper-prep-01/manifest.json'}
+command = ['python', '-X', 'utf8', '-B', (PREP / 'run-native-build.py').relative_to(ROOT).as_posix()]
+for name, path in options.items(): command += ['--' + name, arg(path)]
+command += ['--output-dir', OUT.relative_to(ROOT).as_posix()]
+subprocess.run(command, check=True)
+before = OUT / 'before/preservation.json'
+subprocess.run(['python', '-X', 'utf8', '-B', (PREP / 'derive-and-describe-native-build.py').relative_to(ROOT).as_posix(),
+    '--before-preservation', arg(before), '--prior-derivation-execution', arg(ROOT / old_build['derivation_execution']['path']),
+    '--output-dir', OUT.relative_to(ROOT).as_posix()], check=True)
+subprocess.run(['python', '-X', 'utf8', '-B', (PREP / 'complete-native-build-metadata.py').relative_to(ROOT).as_posix(),
+    '--before-preservation', arg(before), '--output-dir', OUT.relative_to(ROOT).as_posix()], check=True)
+print('Root actual RAD01 Native build stages completed', arg(OUT / 'native-build.json'), flush=True)

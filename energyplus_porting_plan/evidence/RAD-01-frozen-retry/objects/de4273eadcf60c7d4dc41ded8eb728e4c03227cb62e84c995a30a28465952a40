@@ -1,0 +1,30 @@
+--- .runtime/porting/RAD-01/native-helper-prep-01/rad01_helper.cpp
++++ .runtime/porting/RAD-01/native-helper-prep-02/rad01_helper.cpp
+@@ -23,12 +23,25 @@
+ }
+ json bits(std::optional<std::vector<std::uint64_t>> const &values)
+ {
+-    if (!values) return nullptr; json rows = json::array(); for (auto value : *values) rows.push_back(scalar_bits(value)); return rows;
++    if (!values) {
++        return nullptr;
++    }
++    json rows = json::array();
++    for (auto value : *values) {
++        rows.push_back(scalar_bits(value));
++    }
++    return rows;
+ }
+ EnergyPlus::DataSurfaces::SurfaceClass surface_class(std::string const &name)
+ {
+     using Class = EnergyPlus::DataSurfaces::SurfaceClass;
+-    if (name == "Wall") return Class::Wall; if (name == "Floor") return Class::Floor; return Class::Roof;
++    if (name == "Wall") {
++        return Class::Wall;
++    }
++    if (name == "Floor") {
++        return Class::Floor;
++    }
++    return Class::Roof;
+ }
+ json model_case(json const &row, fs::path const &output)
+ {

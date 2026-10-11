@@ -1,0 +1,94 @@
+"""Root-only actual RAD01 link-provider and unchanged-artifact metadata author."""
+import argparse
+import hashlib
+import json
+import re
+from datetime import datetime, timezone
+from pathlib import Path
+
+p = argparse.ArgumentParser(); p.add_argument('--root', type=Path, default=Path.cwd())
+p.add_argument('--before-preservation', required=True); p.add_argument('--output-dir', required=True)
+a = p.parse_args(); ROOT = a.root.resolve()
+def contained(value):
+    path = (ROOT / value).resolve(); assert path.is_relative_to(ROOT) and path != ROOT; return path
+def read(path): return json.loads(path.read_bytes())
+def sha(path):
+    with path.open('rb') as stream: return hashlib.file_digest(stream, 'sha256').hexdigest()
+def ref(path): return {'path': path.relative_to(ROOT).as_posix(), 'sha256': sha(path), 'size_bytes': path.stat().st_size}
+def bound(value):
+    path, expected = value.rsplit('#', 1); path = contained(path); assert sha(path) == expected; return path, read(path)
+def write(path, value):
+    with path.open('x', encoding='utf8', newline='\n') as stream: json.dump(value, stream, indent=2); stream.write('\n')
+def good(receipt):
+    assert receipt['schema'] == 'recorded-porting-command.v1' and receipt['exit_code'] == 0
+    assert receipt['source_bytes_match_before_and_after'] and receipt['launch_error'] is None
+
+OUT = contained(a.output_dir); before_path, before = bound(a.before_preservation); assert before_path == OUT / 'before/preservation.json'
+receipts = {name: read(OUT / name / 'receipt.json') for name in ['native-configure-command-01', 'native-compile-command-01', 'native-unit-derive-command-01']}
+for receipt in receipts.values(): good(receipt)
+assert receipts['native-configure-command-01']['source_snapshot'] == receipts['native-compile-command-01']['source_snapshot'] == receipts['native-unit-derive-command-01']['source_snapshot']
+directory = contained(before['build_directory']); copy = OUT / 'after/compile_commands.json'; correspondence = read(OUT / 'after/compile-row-correspondence.json')
+assert ref(copy) == correspondence['after'] and sha(directory / 'compile_commands.json') == sha(copy)
+old_path = contained(before['compile_commands']['path']); assert sha(old_path) == before['compile_commands']['sha256']
+native_path = contained(before['native_source_manifest']['path']); assert sha(native_path) == before['native_source_manifest']['sha256']; native = read(native_path)
+for row in native['native_source_files']:
+    actual = ref(contained(row['path'])); assert all(actual[k] == row[k] for k in ['path', 'sha256', 'size_bytes'])
+sources = {contained(row['path']) for row in native['native_source_files'] if Path(row['path']).suffix in ['.cc', '.cpp']}
+old, new = read(old_path), read(copy); added = [row for row in new if (Path(row['directory']) / row['file']).resolve() in sources]
+assert len(sources) == len(added) == 3 and [row for row in new if row not in added] == old and len(new) == len(old) + 3
+assert correspondence['new_rows'] == added and correspondence['no_prior_core_source_compile_command_observed'] is True
+assert correspondence['actual_compile_stdout'] == receipts['native-compile-command-01']['stdout']
+stdout = contained(correspondence['actual_compile_stdout']['path']); assert sha(stdout) == correspondence['actual_compile_stdout']['sha256']
+compiled = [line for line in stdout.read_text(encoding='utf8').splitlines() if re.match(r'^\[\d+/\d+\] ', line) and ' -c ' in line]
+assert compiled == correspondence['actual_three_new_TU_compile_commands'] and len(compiled) == 3
+for line in compiled:
+    normalized = line.replace('\\', '/').casefold()
+    assert 'cmakefiles/rad01_unit_helper.dir/' in normalized and sum(source.as_posix().casefold() in normalized for source in sources) == 1
+for key in ['protected_refs', 'present_objects']:
+    for row in before[key]: assert ref(contained(row['path'])) == row
+for path in before['absent_registered_object_paths'] + before['prior_original_absent_paths']: assert not contained(path).exists()
+assert before['core_registered'] == len(before['present_objects']) + len(before['absent_registered_object_paths']) == 643
+assert len(before['present_objects']) == 631 and len(before['absent_registered_object_paths']) == 12
+assert len(before['protected_refs']) == before['protected_ref_count'] > 0
+original = ref(directory / 'Products/rad01_unit_helper.exe'); derivative_path = OUT / 'derivation/receipt.json'; derivative = read(derivative_path)
+assert derivative['status'] == 'pass-exact-retained-runtime-sections-and-directories'
+assert derivative['original_before'] == derivative['original_after'] and derivative['original_before']['historical_path'] == original['path']
+assert all(derivative['original_before'][key] == original[key] for key in ['sha256', 'size_bytes'])
+assert derivative['accepted_derivative'] == derivative['observed_derivative']
+helper = {key: derivative['accepted_derivative'][key] for key in ['path', 'sha256']}; assert sha(contained(helper['path'])) == helper['sha256']
+link_map = directory / 'rad01_unit_helper.map'; hits = []; loads = []; core_load = None; core_hits = 0; section = None
+symbol = 'EnergyPlus::HeatBalanceIntRadExchange::CalcApproximateViewFactors(EnergyPlus::EnergyPlusData&, int, ObjexxFCL::Array1D<double> const&, ObjexxFCL::Array1D<double> const&, ObjexxFCL::Array1D<double> const&, ObjexxFCL::Array2A<double>, ObjexxFCL::Array1D<int> const&)'
+with link_map.open('r', encoding='utf8', errors='strict') as stream:
+    for number, line in enumerate(stream, 1):
+        if line.startswith(' .text '): section = (number, line)
+        if line.lstrip().startswith('0x') and line.strip().endswith(symbol):
+            assert section is not None and 'HeatBalanceIntRadExchange.rad01.cc.obj' in section[1]
+            fields = section[1].split(); address = int(line.split()[0], 16); assert int(fields[1], 16) <= address < int(fields[1], 16) + int(fields[2], 16)
+            hits.append({'symbol_line': number, 'symbol': line.rstrip('\n'), 'section_provider': {'line': section[0], 'text': section[1].rstrip('\n')}})
+        if line.startswith('LOAD '):
+            if 'CMakeFiles/rad01_unit_helper.dir/' in line: loads.append(number)
+            if line.strip() == 'LOAD Products/libenergypluslib.a': core_load = number
+        if 'libenergypluslib.a(HeatBalanceIntRadExchange.cc.obj)' in line: core_hits += 1
+assert len(hits) == 1 and len(loads) == 3 and core_load is not None and max(loads) < core_load and core_hits == 0
+after = {'schema': 'rad01-native-preservation-after.v1', 'observed_utc': datetime.now(timezone.utc).isoformat(),
+    'protected_refs': before['protected_refs'], 'protected_ref_count': len(before['protected_refs']), 'core_registered': 643,
+    'present_objects': before['present_objects'], 'absent_registered_object_paths': before['absent_registered_object_paths'],
+    'prior_original_absent_paths': before['prior_original_absent_paths'], 'all_protected_refs_unchanged': True,
+    'all_present_core_objects_unchanged': True, 'absent_registered_objects_still_absent': True, 'prior_originals_still_absent': True,
+    'previous_compile_rows': len(old), 'current_compile_rows': len(new), 'all_previous_compile_commands_unchanged': True,
+    'no_prior_core_source_compile_command_observed': True, 'actual_compile_correspondence': ref(OUT / 'after/compile-row-correspondence.json'),
+    'link_map': ref(link_map), 'derived_provider': hits[0], 'target_objects_before_core_archive': 3,
+    'selected_core_HeatBalanceIntRadExchange_object_hits': core_hits, 'linked_original': original,
+    'actual_before_preservation': ref(before_path), 'actual_after_compile_commands': ref(copy)}
+write(OUT / 'preservation-after.json', after)
+build = {'schema': 'rad01-native-build.v1', 'target': 'rad01_unit_helper', 'status': 'pass-actual-3TU-link-and-preservation',
+    'authorship': 'Root assembled genuine recorded configure/compile/derivation, actual map provider and fresh protected/core hashes. Before SHAs explicitly reuse the immediate CTF10 retirement guard. No engine/scientific claim.',
+    'observed_utc': datetime.now(timezone.utc).isoformat(), 'helper_binary': helper, 'linked_original': original,
+    'native_source_files': native['native_source_files'], 'configure_execution': ref(OUT / 'native-configure-command-01/receipt.json'),
+    'compile_execution': ref(OUT / 'native-compile-command-01/receipt.json'), 'derivation_execution': ref(OUT / 'native-unit-derive-command-01/receipt.json'),
+    'validated_derivative': ref(derivative_path), 'preservation': ref(OUT / 'preservation-after.json'), 'core_before_check': before['core_before_check'],
+    'previous_compile_rows': len(old), 'current_compile_rows': len(new), 'core_registered': 643, 'core_present': 631, 'core_absent': 12,
+    'all_previous_compile_commands_unchanged': True, 'protected_artifacts_and_present_core_objects_unchanged': True,
+    'link_provider_verified': True, 'protected_ref_count': len(before['protected_refs']), 'scientific_execution_certified': False, 'gates_updated': False}
+write(OUT / 'native-build.json', build)
+print(json.dumps({'build': ref(OUT / 'native-build.json')}), flush=True)

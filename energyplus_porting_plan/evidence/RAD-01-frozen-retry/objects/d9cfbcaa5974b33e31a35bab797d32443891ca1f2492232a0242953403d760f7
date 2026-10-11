@@ -1,0 +1,536 @@
+{
+  "schema": "rad01-native-build-source-preparation.v1",
+  "card": "RAD-01",
+  "status": "held-source-only-awaiting-Root-and-other-author-full-review",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/RAD-01/native-build-prep-01/run-native-build.py",
+      "sha256": "e0a74bb4fddab61db7a61959860aa7905fe6b764e3bfd417fcc0e9f950c7ee73",
+      "size_bytes": 8845,
+      "line_count": 117
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-build-prep-01/derive-and-describe-native-build.py",
+      "sha256": "2829a84a27f0dbc128aa9f27a655c8c3f9a0b496589ebb66a1e274485c5e8449",
+      "size_bytes": 5231,
+      "line_count": 67
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-build-prep-01/complete-native-build-metadata.py",
+      "sha256": "bcfee0f024a736dc70f1519c85f0092f00b7d1e2e19d30bc0e49e1bb502e9fec",
+      "size_bytes": 9119,
+      "line_count": 94
+    }
+  ],
+  "before_archives": [
+    {
+      "historical_path": ".runtime/porting/CTF-10/run-native-build.py",
+      "archive": {
+        "path": ".runtime/porting/RAD-01/native-build-prep-01/before/run-native-build.py",
+        "sha256": "76d1c9ec54238d4618f3b639eeeb2283d914abc0f17de868ffe9f3086238015e",
+        "size_bytes": 5009,
+        "line_count": 61
+      },
+      "archive_bytes_equal_original": true
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/derive-and-describe-native-build.py",
+      "archive": {
+        "path": ".runtime/porting/RAD-01/native-build-prep-01/before/derive-and-describe-native-build.py",
+        "sha256": "3e440752e82e4ace2cb11514f3a70bf60dd1be79d4808888a4b9bfdc217ac538",
+        "size_bytes": 8558,
+        "line_count": 105
+      },
+      "archive_bytes_equal_original": true
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/complete-native-build-metadata.py",
+      "archive": {
+        "path": ".runtime/porting/RAD-01/native-build-prep-01/before/complete-native-build-metadata.py",
+        "sha256": "ab81855493e413b88d889fb501bc51ca55d6cb46eab3d6d80bb032b6685e7444",
+        "size_bytes": 7844,
+        "line_count": 92
+      },
+      "archive_bytes_equal_original": true
+    }
+  ],
+  "predecessor_operational_sources": [
+    {
+      "path": ".runtime/porting/CTF-10/run-native-build.py",
+      "sha256": "76d1c9ec54238d4618f3b639eeeb2283d914abc0f17de868ffe9f3086238015e",
+      "size_bytes": 5009,
+      "line_count": 61
+    },
+    {
+      "path": ".runtime/porting/CTF-10/derive-and-describe-native-build.py",
+      "sha256": "3e440752e82e4ace2cb11514f3a70bf60dd1be79d4808888a4b9bfdc217ac538",
+      "size_bytes": 8558,
+      "line_count": 105
+    },
+    {
+      "path": ".runtime/porting/CTF-10/complete-native-build-metadata.py",
+      "sha256": "ab81855493e413b88d889fb501bc51ca55d6cb46eab3d6d80bb032b6685e7444",
+      "size_bytes": 7844,
+      "line_count": 92
+    }
+  ],
+  "exact_diffs": [
+    {
+      "before": {
+        "path": ".runtime/porting/RAD-01/native-build-prep-01/before/run-native-build.py",
+        "sha256": "76d1c9ec54238d4618f3b639eeeb2283d914abc0f17de868ffe9f3086238015e",
+        "size_bytes": 5009,
+        "line_count": 61
+      },
+      "after": {
+        "path": ".runtime/porting/RAD-01/native-build-prep-01/run-native-build.py",
+        "sha256": "e0a74bb4fddab61db7a61959860aa7905fe6b764e3bfd417fcc0e9f950c7ee73",
+        "size_bytes": 8845,
+        "line_count": 117
+      },
+      "diff": {
+        "path": ".runtime/porting/RAD-01/native-build-prep-01/diffs/run-native-build.py.diff",
+        "sha256": "e003959d150d7c868870eee9b0ae03212bb56cc1169dbc8613e4a684074fff6a",
+        "size_bytes": 14066,
+        "line_count": 174
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/RAD-01/native-build-prep-01/before/derive-and-describe-native-build.py",
+        "sha256": "3e440752e82e4ace2cb11514f3a70bf60dd1be79d4808888a4b9bfdc217ac538",
+        "size_bytes": 8558,
+        "line_count": 105
+      },
+      "after": {
+        "path": ".runtime/porting/RAD-01/native-build-prep-01/derive-and-describe-native-build.py",
+        "sha256": "2829a84a27f0dbc128aa9f27a655c8c3f9a0b496589ebb66a1e274485c5e8449",
+        "size_bytes": 5231,
+        "line_count": 67
+      },
+      "diff": {
+        "path": ".runtime/porting/RAD-01/native-build-prep-01/diffs/derive-and-describe-native-build.py.diff",
+        "sha256": "b84aafea64d25ad6467da24e3532660c772f1cb6138587ec43edc2ab537e0a27",
+        "size_bytes": 14027,
+        "line_count": 168
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/RAD-01/native-build-prep-01/before/complete-native-build-metadata.py",
+        "sha256": "ab81855493e413b88d889fb501bc51ca55d6cb46eab3d6d80bb032b6685e7444",
+        "size_bytes": 7844,
+        "line_count": 92
+      },
+      "after": {
+        "path": ".runtime/porting/RAD-01/native-build-prep-01/complete-native-build-metadata.py",
+        "sha256": "bcfee0f024a736dc70f1519c85f0092f00b7d1e2e19d30bc0e49e1bb502e9fec",
+        "size_bytes": 9119,
+        "line_count": 94
+      },
+      "diff": {
+        "path": ".runtime/porting/RAD-01/native-build-prep-01/diffs/complete-native-build-metadata.py.diff",
+        "sha256": "4d6278b6f81e8f1a8744f0c99cce39d7475e1a5cc4cc2657111131df2757e7b7",
+        "size_bytes": 17255,
+        "line_count": 185
+      }
+    }
+  ],
+  "documentation": {
+    "path": ".runtime/porting/RAD-01/native-build-prep-01/README.md",
+    "sha256": "54eab7b2ba9337daba52793ce81bd81e5a592c5aa648fbf3ec13671b1d80514f",
+    "size_bytes": 5502,
+    "line_count": 84
+  },
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/manifest.json",
+      "sha256": "489a7caa4086722bb5057cfc8489803b21ce7723f881ffcbe54252d604e86618",
+      "size_bytes": 21959,
+      "line_count": 545
+    },
+    {
+      "path": ".runtime/porting/RAD-01/input-writer-prep-01/manifest.json",
+      "sha256": "f50da6f903922cd1abc98e63a52f095aa3033551e67512b86aa6fafe25301f73",
+      "size_bytes": 18150,
+      "line_count": 464
+    },
+    {
+      "path": ".runtime/porting/RAD-01/input-writer-prep-01/freeze_packet.py",
+      "sha256": "a08359742e34fc2382ce554bde97232b22e1195151d5df0e31d53389dd7986ce",
+      "size_bytes": 13401,
+      "line_count": 162
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.cc",
+      "sha256": "36e3f002a5298dc4d52b9eb4697a4b07f9d9dc7c25e2434a059dcbd06eeeb3b3",
+      "size_bytes": 120027,
+      "line_count": 2118
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.hh",
+      "sha256": "ef4fd977481582cc4ada7b140b97782af7a7945010bf3e36b440e7a6b0c3e3e5",
+      "size_bytes": 11786,
+      "line_count": 208
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "size_bytes": 8125,
+      "line_count": 194
+    },
+    {
+      "path": "tools/porting/derive_native_helper.py",
+      "sha256": "3b39cc4562943692e43e11e4d2d7e1bc70f84a58e09c0fea28c0b85b8e905dcf",
+      "size_bytes": 12713,
+      "line_count": 241
+    },
+    {
+      "path": "tools/porting/native_pe.py",
+      "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+      "size_bytes": 20217,
+      "line_count": 346
+    }
+  ],
+  "inherited_recipe_sources": [
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_reference.cmake",
+      "sha256": "91bdacdbd4b3a3198356564c91d04096501c8fe6c4a83a118448d4b74b96e1d0",
+      "size_bytes": 1845,
+      "line_count": 29
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-helper-prep-01/ctf10_reference.cmake",
+      "sha256": "51eaa70ce28d4c91fb63ad42b72d3ad20c86ce440de3d25bb4986f079ac03f9f",
+      "size_bytes": 2366,
+      "line_count": 38
+    },
+    {
+      "path": ".runtime/porting/CTF-09/native-helper-prep-01/ctf09_reference.cmake",
+      "sha256": "671f2fe052386fc9b1ae2ff923e3d96bbb512021fa9c851dcc61e45024678391",
+      "size_bytes": 2297,
+      "line_count": 37
+    },
+    {
+      "path": ".runtime/porting/CTF-08/native-helper-prep-01/ctf08_reference.cmake",
+      "sha256": "ce35a66bc863e4c56961c6a628df8ece8b966fc0a2c89f4db0875c2e156d4659",
+      "size_bytes": 2297,
+      "line_count": 37
+    },
+    {
+      "path": ".runtime/porting/CTF-07/native-helper-prep-01/ctf07_reference.cmake",
+      "sha256": "3340f70174a3c90653e56a11581cf3f295c8c90b1ba3e9a51d1e657f84ca25c8",
+      "size_bytes": 2297,
+      "line_count": 37
+    },
+    {
+      "path": ".runtime/porting/CTF-06/native-helper-prep-01/ctf06_reference.cmake",
+      "sha256": "c0a41733e1aa01716f2d93131f27efc9559d60565b9e3b8c81555ce3491c83f1",
+      "size_bytes": 2297,
+      "line_count": 37
+    },
+    {
+      "path": ".runtime/porting/CTF-04/native-helper-prep-01/ctf04_reference.cmake",
+      "sha256": "9ae728e892c0d5ad13c1343df3ad300ff60ae8b1beec84539d7417cb84d73315",
+      "size_bytes": 2297,
+      "line_count": 37
+    },
+    {
+      "path": ".runtime/porting/CTF-03/native-helper-prep-01/ctf03_reference.cmake",
+      "sha256": "a218b2a8545b2726a2f0df963387cf334280477652eecc191e9abc160ee91ca0",
+      "size_bytes": 2299,
+      "line_count": 37
+    },
+    {
+      "path": ".runtime/porting/CTF-02/native-observer-prep-01/ctf02_reference.cmake",
+      "sha256": "5b3f177075f959802c999f2423a9818ce82acf8c1c5149703b54cd3c0769413f",
+      "size_bytes": 2302,
+      "line_count": 37
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-production-prep-02/ctf01_production.cmake",
+      "sha256": "e08eb161676abef6aaa30c7417439015dc0766b9bf9a567c7cdcfc699c36d479",
+      "size_bytes": 2142,
+      "line_count": 32
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference.cmake",
+      "sha256": "8ab75b9120bdab5d8302f14a47b242de8c3c22a0077a91f091c6690c9b762669",
+      "size_bytes": 2255,
+      "line_count": 34
+    },
+    {
+      "path": ".runtime/porting/SCH-01/builder-prep-05/sch01_reference.cmake",
+      "sha256": "cafea9db4714d3d20700f8039a3f522725294dc03e6e5f52f7443ec8c8cbe097",
+      "size_bytes": 1700,
+      "line_count": 27
+    },
+    {
+      "path": ".runtime/porting/CLK-06/builder-prep-01/clk06_reference.cmake",
+      "sha256": "797d17b962e77cbe7e72cddfe1132808166a7ed607dc7c78dc0c0b34cec5c7cf",
+      "size_bytes": 1790,
+      "line_count": 27
+    },
+    {
+      "path": ".runtime/porting/CLK-05/builder-prep-02/clk05_reference.cmake",
+      "sha256": "f9996c5507d8104abf7e0109e0c785383fc88df6d1d901513575b84ca4f14a08",
+      "size_bytes": 1731,
+      "line_count": 27
+    },
+    {
+      "path": ".runtime/porting/CLK-04/native-builder-prep-03/clk04_reference.cmake",
+      "sha256": "60fd233cf5a8f7e383b2a7b1620e111b33e2ba04918fb5f471f290f0afa9709b",
+      "size_bytes": 1745,
+      "line_count": 27
+    },
+    {
+      "path": ".runtime/porting/CLK-03/production-native-prep-01/clk03_production_reference.cmake",
+      "sha256": "65c62ddb332f67fd7b7a75e909311dfc2973c4fbc7c003827ed135108ecc6ecd",
+      "size_bytes": 1979,
+      "line_count": 29
+    },
+    {
+      "path": "tools/porting/clk03_reference.cmake",
+      "sha256": "2bd95d8d6fcdf19b0b2e0930f9ecd99c0b935b0b7f68c7f0766d1c1e900f65a6",
+      "size_bytes": 2001,
+      "line_count": 33
+    },
+    {
+      "path": "tools/porting/clk02_reference.cmake",
+      "sha256": "d3e9342f35ef9be3aa180effad190d3147ae8706e1fbe5ec7f82bef242ec11d5",
+      "size_bytes": 1775,
+      "line_count": 29
+    },
+    {
+      "path": "tools/porting/zon01_reference.cmake",
+      "sha256": "64cbd5a57412e3ab135d71e03f1f24d42a37d6639ee8dbdfc2e2f9c54516aad1",
+      "size_bytes": 2321,
+      "line_count": 36
+    },
+    {
+      "path": "tools/porting/geo03_reference.cmake",
+      "sha256": "ef7525c213f195f06b698ebce437a8bfd4eec11aeb2a04a3ecae748bbaf8429a",
+      "size_bytes": 2612,
+      "line_count": 39
+    },
+    {
+      "path": "tools/porting/geo02_reference.cmake",
+      "sha256": "230d7c077b2c69b3afd7c3c3d303976b3996a01f65b3d8dcad5adbdd848d67b6",
+      "size_bytes": 2199,
+      "line_count": 33
+    },
+    {
+      "path": "tools/porting/geo01_reference.cmake",
+      "sha256": "ca0259365dcac908f24753aed09f87c8e2dab289dd0230e73e6e26fe10c3888d",
+      "size_bytes": 1756,
+      "line_count": 28
+    },
+    {
+      "path": "tools/porting/psy02_reference.cmake",
+      "sha256": "632f7d68618bfc67487b46d3501a7260255013e6e0572a925517a2b4f0bfe490",
+      "size_bytes": 1990,
+      "line_count": 34
+    },
+    {
+      "path": "tools/porting/clk01_reference.cmake",
+      "sha256": "fe8bed175b8befaadd2f784a4c1433eec4b30ef1f850ccb20ee6f273148cbc0f",
+      "size_bytes": 1179,
+      "line_count": 22
+    },
+    {
+      "path": "tools/porting/psy02_reachability.cmake",
+      "sha256": "95478908e704b89dd6d3180d19add7bc19e0987cb33cacf621ad2d0e49db28f8",
+      "size_bytes": 1819,
+      "line_count": 31
+    }
+  ],
+  "actual_prior_metadata_authorities": [
+    {
+      "path": ".runtime/porting/CTF-10/retirement-01/after-retirement.json",
+      "sha256": "dd6de8e9ad7f6246909391ecea53ee8f66202266b233c53ad0aaa22c0aad89cf",
+      "size_bytes": 176671,
+      "line_count": 3529
+    },
+    {
+      "path": ".runtime/porting/CTF-10/retirement-01/retirement.json",
+      "sha256": "a8cac203eab531845f22b6f1e4e358d0d5416c6b4a43730cf64a42114d23636b",
+      "size_bytes": 179224,
+      "line_count": 3589
+    },
+    {
+      "path": ".runtime/porting/CTF-10/retirement-command-01/receipt.json",
+      "sha256": "d25815234c2994055bf4c99d183792e6c0fef6bbbd0d5a396766f0cde178b783",
+      "size_bytes": 3403,
+      "line_count": 86
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-build-01/unit/native-build.json",
+      "sha256": "3386067708a51ede6b05a1f0700b92b76b565df76bc0d05d63d28e6cf627902b",
+      "size_bytes": 5619,
+      "line_count": 129
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-configure-command-01/receipt.json",
+      "sha256": "aee2f78c24eca55faa824f2670602816aed06644de802cb113878052375ef2f5",
+      "size_bytes": 7383,
+      "line_count": 113
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-compile-command-01/receipt.json",
+      "sha256": "59d136a34f15bec3ca1b4cd95888d8d70a0487511457f466f83dcfc6dcf32d45",
+      "size_bytes": 2949,
+      "line_count": 76
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-unit-derive-command-01/receipt.json",
+      "sha256": "d72a57d6fc9de98eb14620d2d789ac5e9b63e5b7ea07a7e4ea1677354860a562",
+      "size_bytes": 3210,
+      "line_count": 84
+    },
+    {
+      "path": ".runtime/porting/CTF-04/retirement-01/retirement.json",
+      "sha256": "6584ed20247a17155071d25a262554ac0147e605fe72af177edca19b7a6e6fa8",
+      "size_bytes": 173181,
+      "line_count": 3467
+    },
+    {
+      "path": ".runtime/porting/CTF-04/retirement-01/after-retirement.json",
+      "sha256": "a2eaf84aeeb98fccd33a9603d38619fb7ccf76ec5b25b6536eaf4bddbfd7b940",
+      "size_bytes": 170934,
+      "line_count": 3415
+    },
+    {
+      "path": ".runtime/porting/CTF-06/retirement-01/retirement.json",
+      "sha256": "2b18e58ced4ba8f90a3cb7cd12c626ef3d5c17d80553ad99421952b8f8f8da95",
+      "size_bytes": 174361,
+      "line_count": 3491
+    },
+    {
+      "path": ".runtime/porting/CTF-06/retirement-01/after-retirement.json",
+      "sha256": "1d00f35841a1856cc46a33bdabd438c9fd91deda3f32bf421d983cf3ddc5df13",
+      "size_bytes": 172027,
+      "line_count": 3437
+    },
+    {
+      "path": ".runtime/porting/CTF-07/retirement-01/retirement.json",
+      "sha256": "d6a34e7287e694a31f3313cefa0e67cd66d8fe36b3fd2b307292855302806e58",
+      "size_bytes": 175561,
+      "line_count": 3516
+    },
+    {
+      "path": ".runtime/porting/CTF-07/retirement-01/after-retirement.json",
+      "sha256": "cc28a6a9de338f382d47aabe1f79d20f66aa096d52fc5732a36542286f74f837",
+      "size_bytes": 173194,
+      "line_count": 3461
+    },
+    {
+      "path": ".runtime/porting/CTF-08/retirement-01/retirement.json",
+      "sha256": "1601a0fcc296ecfd73ce8ffaf59c14401dff88e8beb207fe0234edfd643b11c9",
+      "size_bytes": 176930,
+      "line_count": 3543
+    },
+    {
+      "path": ".runtime/porting/CTF-08/retirement-01/after-retirement.json",
+      "sha256": "e2186e553b194dc1c52b2991519d382e06c0735c45228c26a8cc90167c06e5b9",
+      "size_bytes": 174457,
+      "line_count": 3485
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retirement-01/retirement.json",
+      "sha256": "fe2ee8e1b118cde93b9f88e0fb1210b15b2bf56ae18fb6445901d298e12456c3",
+      "size_bytes": 178077,
+      "line_count": 3566
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retirement-01/after-retirement.json",
+      "sha256": "fd680817de74642ad979d89443f41b21a8a6875e2c3014804ae6054bbdfa300a",
+      "size_bytes": 175564,
+      "line_count": 3507
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.cc",
+      "start_line": 1406,
+      "end_line": 1519,
+      "sha256": "a1a29a01e53f10bc25fdfa3c2e3fefdd5007fd1c8c962f826a88771ccfb6e51b",
+      "size_bytes": 6927,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "genuine selected function and exact by-value Array2A signature"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.hh",
+      "start_line": 109,
+      "end_line": 116,
+      "sha256": "8aaf46c8e20a39ecd7c2a9f8585f6d6265129eef08d9c82cadbef43d5d678b62",
+      "size_bytes": 733,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "public Original function signature"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/complete-native-build-metadata.py",
+      "start_line": 40,
+      "end_line": 63,
+      "sha256": "19f59e9bca266150527fbde7e5560bbcea13c90b38d136f3e246d03887eb6b20",
+      "size_bytes": 2047,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "accepted corrected latest .text provider and original core exclusions"
+    },
+    {
+      "path": "tools/porting/derive_native_helper.py",
+      "start_line": 136,
+      "end_line": 237,
+      "sha256": "95c464c099c3660b4efbabb61e2c7d74bbe5e3806ce8d6874372db7ec8274520",
+      "size_bytes": 6910,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "existing authenticated derivative argument and actual receipt protocol"
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_reference.cmake",
+      "start_line": 1,
+      "end_line": 29,
+      "sha256": "91bdacdbd4b3a3198356564c91d04096501c8fe6c4a83a118448d4b74b96e1d0",
+      "size_bytes": 1845,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "one new3TU target and unchanged CTF10 inclusion"
+    }
+  ],
+  "runtime_protocol": {
+    "arguments_are_actual_runtime_path_SHA_operands": true,
+    "root_only_actual_configuration_compile_derivation_and_artifact_hashing": true,
+    "build_schema": "rad01-native-build.v1",
+    "build_status": "pass-actual-3TU-link-and-preservation",
+    "target": "rad01_unit_helper",
+    "native_source_count": 6,
+    "new_compile_rows_required_by_source_recipe": 3,
+    "previous_rows_and_protected_count_from_actual_before_metadata": true,
+    "core_registered_present_absent": [
+      643,
+      631,
+      12
+    ],
+    "actual_prior_metadata_current_counts": {
+      "protected": 48,
+      "compile_rows": 717,
+      "earlier_retired_original_absences": 12
+    },
+    "future_counts_or_SourceSnapshot_outcomes_invented": false,
+    "configure_preserves_all_actual_prior_flags_except_project_include_and_added_RAD01_SOURCE_DIR": true,
+    "compile_preserves_actual_prior_options_except_target_list": true,
+    "actual_verbose_command_compile_exclusion_and_fresh_core_payload_guards_required": true,
+    "original_core_provider_hits_required": 0,
+    "scientific_helper_invoked": false,
+    "RAD_retention_intent_or_removal_authored": false
+  },
+  "authorship_limits": [
+    "Author also authored RAD pure and Native helper; no independent self-formula certification.",
+    "Before guard hashes reuse actual immediately preceding10 retirement authority with explicitly Root-established no intervening protected/core mutation.",
+    "Metadata scripts author observed facts from actual records; compile recorder does not claim to author Root metadata."
+  ],
+  "actual_execution_performed": false,
+  "imports_builds_tests_engines_or_formatters_invoked": false,
+  "scientific_results_weather_binary_or_core_payloads_read": false,
+  "canonical_or_Git_mutation_performed": false,
+  "gate_PASS_claimed": false,
+  "new_QA_or_execution_framework_authored": false
+}

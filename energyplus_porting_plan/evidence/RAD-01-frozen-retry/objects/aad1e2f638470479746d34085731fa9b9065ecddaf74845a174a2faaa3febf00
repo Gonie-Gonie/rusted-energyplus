@@ -1,0 +1,11 @@
+--- .runtime/porting/RAD-01/native-build-prep-02/README.md
++++ .runtime/porting/RAD-01/native-build-prep-03/README.md
+@@ -90,3 +90,8 @@
+ no arithmetic, compile, provider, preservation or execution criterion changed.
+ Current source dependencies bind reviewed freezer02; the inspected freezer01
+ context remains explicitly historical. Actual freeze operands stay runtime refs.
++
++Fresh03 is metadata-only. historical_freezer_source_context restores genuine
++freezer01 f50da6f9/a0835974; current dependencies stay reviewed02 fac0f91e/f472.
++All executable source paths, bytes, before archives and exact source diffs remain
++literal02. The metadata-only successor does not require copying or running code.

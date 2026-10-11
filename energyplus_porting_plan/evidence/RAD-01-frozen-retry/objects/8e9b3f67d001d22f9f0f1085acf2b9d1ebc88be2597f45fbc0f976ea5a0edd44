@@ -1,0 +1,83 @@
+--- .runtime/porting/RAD-01/native-helper-prep-01/README.md
++++ .runtime/porting/RAD-01/native-helper-prep-02/README.md
+@@ -1,53 +1,31 @@
+-# RAD-01 genuine Native direct-unit source proposal
++# RAD01 Native helper02: minimal compile warning repair
+ 
+-This immutable source package proposes one `rad01_unit_helper` executable. It calls the complete pinned EnergyPlus `CalcApproximateViewFactors` once per declared input model. It contains no execution, frozen packet, observed output, expected array, classifier, comparer, gate update, or Rust installation. Root and another author must review it before any build or capture. Root must settle the card/scope amendment, actual pre-output freeze, build preservation/provider/PE evidence, and genuine OriginalDataQA before Rust numerical execution or application.
++Preserve immutable helper01 and Root's failed actual compile receipt. Root reported
++-Werror=misleading-indentation at original helper lines26 and31, before any
++scientific helper invocation. This Source-only successor expands those two
++same-line conditional sequences into braces and separate statements. Operands,
++call order, return values, class fallback, bits/class serialization, captures,
++input fixtures, policies, admission, output schema and compiler flags are unchanged.
+ 
+-## Original function and passive boundary
++The new helper source is local to02. All other five admitted Native source entries
++retain their exact original01 paths and bytes. The reviewed02 recipe compiles the
++new helper through RAD01_SOURCE_DIR and explicitly borrows the original01 observer
++and derived whole TU; its header search path is the unchanged01 source directory.
++That directory remains immutable. Target name, three TUs, original CTF10 inclusion,
++core/archive dependencies, definitions, language level, map and link flags stay
++literal01. Only source-directory custody changes; no warning is disabled.
+ 
+-`HeatBalanceIntRadExchange.rad01.cc` is the entire Original TU, retaining its license. Only four additions are made: one include, one callback after the unchanged warning and continuation calls complete, one after the first area-sum loop, and one after the completed F loop before `ZoneArea.deallocate()`. `passive-additions.json` declares each exact added block and anchor. Removing those additions restores the complete Original bytes. No Original arithmetic, condition, loop, order, helper call, allocation, branch, or deallocation changes.
++The manifest retains exact21 fixture/policy refs and unchanged Original passive
++restoration. Helper01 remains the historical source authority; helper02 must be
++reviewed by Root and another author and genuinely refrozen with fresh approved
++source identities before a retry. A real prior configure restore/recovery and
++actual compile rows, objects, streams, provider and preservation remain Root
++operands/facts. This proposal invents no actual build/refreeze result or hashes.
+ 
+-The original whole function is lines1406–1519. The warning marker follows original1480, `ZoneArea` is copied after original1482, and F after original1516 while both private/public owners remain alive. The callbacks borrow the actual source state and arrays, copy exact binary64 bits and actual SPtr order, and return `noexcept`. F is copied by original row index first, then contiguous column index: native `F(j,i)` appears at zero-based offset `(j-1)*N+(i-1)`. No transposition or identity/array reconstruction occurs.
+-
+-The original first loop performs ordered `ZoneArea(i) += A(j)`. Its warning predicate is `ZoneArea(i) <= 0.0`. The second loop starts with the original `F = 0.0` and only assigns a visible pair when `ZoneArea(i) > 0.0`. The passive code does not evaluate either visibility or these predicates. Original `ShowWarningError`, `ShowContinueError`, `EnergyPlus::format`, and their original helpers resolve through the unchanged core archive.
+-
+-## Real direct input owners
+-
+-Each case creates a fresh actual `EnergyPlusData`. Its constructor already owns the required Global/HeatBalance/Surface/ErrorTracking/SQLite/StringGlobals/UtilityRoutines objects; ErrorTracking's constructor allocates MatchCounts and initializes counters. This direct function requires no `processInput`, geometry loader, `init_constant_state`, simulation phase, timestep, material, or construction owner. None is called or claimed.
+-
+-The helper allocates the actual Surface and Zone `EPVector` owners and actual Objexx `A`, `Azimuth`, `Tilt`, `SPtr`, and F arrays. It sets only the declared unit Surface Name/Zone/Class/Area/Azimuth/Tilt and Zone Name. Actual EPVector indices are explicit one-based registry fields. Declared opaque Rust SurfaceId/ZoneId and enclosure index remain separately visible association metadata; there is no fixed `RustID+1` claim. All actual input arrays and copied state fields are serialized before the call.
+-
+-`surface_order` is a complete unique permutation of declared opaque Surface IDs. Actual SPtr values come from the declared registry's real Native indices. The helper preserves both registry and pointer order. Classes admitted are Wall, Floor, Roof and Ceiling; Ceiling maps to actual Native Roof because Native SurfaceClass has no Ceiling member. Native IntMass is not selected by this CON-domain proposal. Rust-only invalid association and empty-input tests remain unpaired and are not counted as Native PASS. The Native direct-unit admission is N=1..1024; that is an explicit transport domain, not an Original guard or a full-engine membership promise.
+-
+-## Warning and availability custody
+-
+-The actual original `errorCallback` receives actual Error level/message tuples in order. A real `ostringstream` is installed as `files.err_stream`; original ShowErrorMessage writes it. The callback catches its own copy failures, preserving Original behavior while recording failure and omitted-record counts. The after-warning passive marker copies actual i, SPtr(i), Name/Zone/Zone Name and the already computed seen-area bits. Its diagnostic end ordinal associates the actual preceding stream, without synthesizing warning messages or re-evaluating the warning condition. The actual TotalWarningErrors owner is also copied.
+-
+-Capture failures are typed in this stable order: Binding, DuplicateOrOrder, ShapeOrAssociation, AllocationOrCopy. Counters record actual callback visits before copy attempts. Missing reached ZoneArea/F/SPtr, duplicates, bad ordering/shape/association, allocation/copy failure or omitted warning/diagnostic records make observation integrity fail and helper exit2. Unreached arrays are null, never zero-filled. A returned whole function requires exactly one area and one matrix callback and actual copied owners. Warning count is dynamic, with no event cap, filtering or sampling.
+-
+-Constructor, member-seed and genuine source-call outcomes are separate. Fatal, standard exception, nonstandard exception and non-invocation remain explicit. A complete structured ledger may exist with a source stop; it is not numerical PASS. OS/spawn/malformed/partial-result cases remain recorder/OriginalDataQA responsibilities; this source never invents their counts. No callback claims a whole-engine outcome.
+-
+-## Input-only fixture proposal
+-
+-`input-fixture-proposal.json` contains21 prospective declared-input models, not a frozen packet. They cover asymmetric areas and pointer orientation; strict azimuth10/350 and tilt10 boundaries plus360; floor/floor/roof classification; positive area below epsilon; direct nonpositive-area diagnostics; ordered accumulation and an independent SPtr permutation; valid Ceiling mapping; and a one-surface direct warning case. These are independent scalar inputs only, with no expected ZoneArea/F/warning decisions or exit values.
+-
+-Six models use the actual fixed-CON case IDs and input Name/Class membership templates: A-24H, A-72H and the four B limit variants. Their geometry operands and opaque IDs are explicitly declared unit literals. Their registry order is a declared IDF Name/Class template order, not the real Native GetSurfaceData registration/enclosure order. In particular B's real Native surface registration can differ. No vertices are converted to area/angles, no genuine enclosure is observed, and these six models do not establish fixed-CON production geometry, full-engine production or integration equivalence. Input source descriptors are copied from the existing fixed scope; the proposal's authoring did not hash weather or scientific payloads. All production geometry remains unavailable until a separately reviewed genuine producer path.
+-
+-The seven accepted Rust focused tests remain source dependencies. Their invalid Zone/duplicate/empty cases are Rust-domain checks only; the Native packet cannot manufacture those as valid Original outcomes. The two accumulation fixtures keep one real registry and vary only SPtr order, so the comparison can verify pointer custody rather than sort operands.
+-
+-## Future runtime contract (not emitted here)
+-
+-The existing four-operand helper convention is retained: `<root> <frozen-request> <native-admission-contract> <fresh-output-dir>`. Frozen request schema is `rad01-helper-cases.v1`, admission `rad01-native-admission-contract.v1`, projection `rad01-observation-projection.v1`, and output `rad01-helper-results.v1`. Each input case has exactly `{id,lane,context,surface_registry,surface_order}`; context is `{enclosure_index,zone_id,native_zone_index,zone_name}`. Registry rows are `{native_surface_index,surface_id,name,surface_type,area_m2,azimuth_deg,tilt_deg}`. Numeric input DTO is exactly `{bits:<16 lowercase hex>}` with finite declared values. Output numerical DTO is `{value,value_bits,value_class}`, retaining nonfinite classes and signed zero.
+-
+-Request/admission require `frozen_before_this_RAD01_helper_execution:true`, expected values/exits false, scientific execution false and full-engine production geometry supplied false. Both carry identical actual scope amendment/check refs and literal observation policy. Request contracts contain source/tolerances; admission contains source/cases/tolerances and binds helper_request/projection. Contracts are `rad01-{source,cases,tolerances}-contract.v1`, with the same fresh frozen flag. Source contract contains repository-relative original source refs and pinned commit. Its full Original TU path/SHA is mandatory. Cases binds the request/source/tolerances DAG. Projection binds request/contracts/policy. Actual scope/check identities are future Root operands; no digest or outcome is guessed here.
+-
+-Native source inventory has exactly6 direct refs: main, metadata, admission, observer header, observer implementation, derived whole TU. The CMake recipe is a separate reviewed source. Requested counts are derived from actual input rows, `{model_cases,CalcApproximateViewFactors}`. The helper re-authenticates all input/source bindings after the calls. Source stop counts come from actual retained call outcomes, not fixture labels.
+-
+-`observation-policy-proposal.json` and the C++ literal policy agree: two new zero-atol/rtol profiles for ZoneArea and F, exact value class/signed zero/shape, exact copied input bits and owner IDs, exact warning identity/order, reached absence failure and no unavailable PASS. These profiles precede any output; no tolerance tuning or coefficient substitution is proposed. Warning text is retained as actual Native context; Rust structured warning identities are the selected pairing boundary. Full formatted logging/utility counters and full-engine diagnostics remain separate unless later explicitly admitted.
+-
+-## Existing build mechanism and pending evidence
+-
+-`rad01_reference.cmake` includes the unchanged accepted CTF10 recipe and appends one target with3 TUs: main, derived whole HeatBalanceIntRadExchange, observer. It copies the genuine core definitions/includes and existing project options, floating-point options, warnings and bcrypt linkage. The full derived TU precedes the unchanged static core archive. Old targets/options/sources are not rewritten. Future actual link-map evidence must show the derived HeatBalanceIntRadExchange provider and zero selection of the original core HeatBalanceIntRadExchange object; source order alone is not a provider proof.
+-
+-The metadata utility is the accepted CTF01 byte-authentication/binary64 DTO source with only RAD namespace/guard/comment substitutions. GCC13.2 Windows ABI/assertion/no-fast-math/core-definition checks remain literal. No Original class ABI, virtual layout or core source edits are introduced. Actual prior/current compile rows, protected files/core inventories, binary identities, derivation/PE reports and command receipts remain future measured Root inputs. No future count or SHA is invented. The expected recipe adds three compile rows, not an assertion that any compilation occurred.
+-
+-Source review is not scientific certification. Base authored the pure RAD selected owner and this Native transport, so it does not independently certify its own future outputs or formulas. Root and another author must fully review the source, then Root alone may authorize actual scope/freeze/build/Original capture/QA and later Rust work. All RAD gates remain pending.
++Only helper and recipe are new executable source bodies. Their before01 archives
++and exact narrow/cumulative diffs are supplied. Other five Native bodies and all
++unchanged diffs are referenced directly from immutable01. No reviewed code was
++imported or executed, no compiler/formatter/helper/Git was run, no result/weather/
++binary/core payload was read, and no canonical source, policy, fixture or gate was
++changed. The author also authored helper01 and RAD pure math; independent review
++certifies this small Source repair, not its own future scientific outputs.

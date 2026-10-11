@@ -1,0 +1,129 @@
+"""Author narrow reviewed Source successors only; never import/run proposed stages."""
+import ast
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd().resolve()
+BASE = ROOT / '.runtime/porting/RAD-01'
+NATIVE_PATH = BASE / 'native-helper-prep-02/manifest.json'
+NATIVE_SHA = 'b4e10bd483af44f6f5d0b6f5fa13051d106d6d672d1ec0af1b79bbf5d5986b89'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(raw).hexdigest(),
+            'size_bytes': len(raw), 'line_count': len(raw.splitlines())}
+
+
+def delta(before, after, destination):
+    raw = ''.join(difflib.unified_diff(before.read_text(encoding='utf-8').splitlines(True),
+        after.read_text(encoding='utf-8').splitlines(True), fromfile=ref(before)['path'], tofile=ref(after)['path']))
+    destination.write_bytes(raw.encode('utf-8'))
+    return ref(destination)
+
+
+assert ref(NATIVE_PATH)['sha256'] == NATIVE_SHA
+native = json.loads(NATIVE_PATH.read_bytes())
+native_old_path = BASE / 'native-helper-prep-01/manifest.json'
+native_old = json.loads(native_old_path.read_bytes())
+native_changes = {native_old_path.relative_to(ROOT).as_posix(): ref(NATIVE_PATH)}
+for before, after in zip(native_old['own_sources'], native['own_sources']):
+    if before != after:
+        native_changes[before['path']] = after
+
+
+def author(kind, names, replacements, extra_changes, disclosure):
+    old = BASE / (kind + '-prep-02')
+    out = BASE / (kind + '-prep-03')
+    out.mkdir(exist_ok=True)
+    before = out / 'before'
+    previous = out / 'before-02'
+    before.mkdir(exist_ok=False)
+    previous.mkdir(exist_ok=False)
+    old_manifest = json.loads((old / 'manifest.json').read_bytes())
+    for name in names:
+        (before / name).write_bytes((old / 'before' / name).read_bytes())
+        (previous / name).write_bytes((old / name).read_bytes())
+        raw = (old / name).read_bytes()
+        if name == names[0]:
+            for original, proposed in replacements:
+                assert raw.count(original) == 1, original
+                raw = raw.replace(original, proposed)
+        (out / name).write_bytes(raw)
+        ast.parse(raw.decode('utf-8'))
+    for name in ['manifest.json', 'README.md']:
+        (previous / name).write_bytes((old / name).read_bytes())
+    readme = (old / 'README.md').read_bytes() + ('\n' + disclosure + '\n').encode('utf-8')
+    (out / 'README.md').write_bytes(readme)
+    m = copy.deepcopy(old_manifest)
+    m['own_sources'] = [ref(out / name) for name in names]
+    m['authoring_source'] = ref(Path(__file__).resolve())
+    m['readme'] = ref(out / 'README.md')
+    m['before_sources'] = [ref(before / name) for name in names]
+    m['exact_diffs'] = [delta(before / name, out / name, out / (name + '.diff')) for name in names]
+    changes = {**native_changes, **extra_changes}
+    m['historical_dependencies_superseded_by_03'] = [row for row in m['source_dependencies'] if row['path'] in changes]
+    m['source_dependencies'] = [copy.deepcopy(changes.get(row['path'], row)) for row in m['source_dependencies']]
+    # The two helper ranges retain the same semantic regions after the reviewed13-line reflow.
+    for row in m['read_source_ranges']:
+        if row['path'] == '.runtime/porting/RAD-01/native-helper-prep-01/rad01_helper.cpp':
+            original = copy.deepcopy(row)
+            m.setdefault('historical_helper_ranges_before_03', []).append(original)
+            row['path'] = native['native_source_files'][0]['path']
+            if row['start_line'] == 16:
+                assert row['end_line'] == 108
+                row['end_line'] = 121
+            else:
+                assert (row['start_line'], row['end_line']) == (111, 140)
+                row['start_line'], row['end_line'] = 124, 153
+            raw = b''.join((ROOT / row['path']).read_bytes().splitlines(True)[row['start_line'] - 1:row['end_line']])
+            row['sha256'], row['size_bytes'] = hashlib.sha256(raw).hexdigest(), len(raw)
+    m['predecessor_02'] = ref(old / 'manifest.json')
+    m['before_02'] = [ref(previous / name) for name in [*names, 'manifest.json', 'README.md']]
+    m['from_02_diffs'] = [delta(previous / name, out / name, out / (name + '.from-02.diff')) for name in [*names, 'README.md']]
+    m['successor_change'] = disclosure
+    m['runtime_protocol']['scope_successful_build_or_engine_flag'] = 'actual_RAD01_successful_build_or_engine_execution_performed'
+    m['runtime_protocol']['failed_build_attempt_is_historical_context_not_scientific_execution'] = True
+    (out / 'manifest.json').write_bytes((json.dumps(m, indent=2) + '\n').encode('utf-8'))
+    return out, m
+
+
+old_native_pin = b'".runtime/porting/RAD-01/native-helper-prep-01/manifest.json"'
+new_native_pin = b'".runtime/porting/RAD-01/native-helper-prep-02/manifest.json"'
+old_native_sha = b'489a7caa4086722bb5057cfc8489803b21ce7723f881ffcbe54252d604e86618'
+new_native_sha = NATIVE_SHA.encode('ascii')
+old_guard = b'actual_RAD01_build_or_engine_execution_performed'
+new_guard = b'actual_RAD01_successful_build_or_engine_execution_performed'
+common_replacements = [(old_native_pin, new_native_pin), (old_native_sha, new_native_sha), (old_guard, new_guard)]
+freezer_disclosure = (
+    'Fresh03 binds reviewed Native02, whose helper only reflows two conditional sequences and whose recipe '
+    'borrows the unchanged01 observer/TU/header owners. The amendment guard now requires '
+    '`actual_RAD01_successful_build_or_engine_execution_performed:false`; the genuine failed build attempt '
+    'and restore receipts are historical Root scope context, never a claim that no attempt occurred. '
+    'No scientific helper has been invoked by this preparation. IO, all21 literal inputs, profiles, '
+    'warning/identity rules, source checks and seven-file DAG are unchanged. Held01/02 and their actual '
+    'records remain literal. Future Root scope/check/refreeze/build refs are required, never invented here.')
+writer_out, writer = author('input-writer', ['freeze_packet.py', 'packet_io.py'], common_replacements, {}, freezer_disclosure)
+old_writer = BASE / 'input-writer-prep-02'
+writer_changes = {(old_writer / 'manifest.json').relative_to(ROOT).as_posix(): ref(writer_out / 'manifest.json')}
+for name in ['freeze_packet.py', 'packet_io.py']:
+    writer_changes[(old_writer / name).relative_to(ROOT).as_posix()] = ref(writer_out / name)
+qa_replacements = [*common_replacements,
+    (b'".runtime/porting/RAD-01/input-writer-prep-02/manifest.json"', b'".runtime/porting/RAD-01/input-writer-prep-03/manifest.json"'),
+    (b'fac0f91eebebab8edd5a9feb58bd30ca9281932c04fef291274524eba9b6810c', ref(writer_out / 'manifest.json')['sha256'].encode('ascii'))]
+qa_disclosure = (
+    'Fresh03 only rebinds reviewed Native02 and freezer03 and requires the same truthful prospective '
+    '`actual_RAD01_successful_build_or_engine_execution_performed:false` scope key. Genuine failed build '
+    'and restore attempts stay historical Root documentary context; no Native scientific outcome is inferred. '
+    'Shape and IO are byte-identical02. All recorder, int0 predecessor, native OS-launch unknown, source/archive, '
+    '21-input, warning, partial-owner, PE binary-size/provider, ordering, integrity and release criteria are '
+    'unchanged. Helper range metadata follows its reviewed13-line reflow; old ranges remain historical. '
+    'Held01/02 and every actual failed receipt remain preserved. This preparation invokes no proposed stage.')
+qa_out, qa = author('original-data-review', ['review_data.py', 'shape.py', 'packet_io.py'], qa_replacements,
+    writer_changes, qa_disclosure)
+print(json.dumps({'writer_manifest': ref(writer_out / 'manifest.json'), 'writer_sources': writer['own_sources'],
+    'writer_narrow_diffs': writer['from_02_diffs'], 'QA_manifest': ref(qa_out / 'manifest.json'),
+    'QA_sources': qa['own_sources'], 'QA_narrow_diffs': qa['from_02_diffs']}))

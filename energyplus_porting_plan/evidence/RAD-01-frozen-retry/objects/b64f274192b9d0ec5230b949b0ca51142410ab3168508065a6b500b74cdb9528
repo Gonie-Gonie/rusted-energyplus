@@ -1,0 +1,31 @@
+# RAD01 Native helper02: minimal compile warning repair
+
+Preserve immutable helper01 and Root's failed actual compile receipt. Root reported
+-Werror=misleading-indentation at original helper lines26 and31, before any
+scientific helper invocation. This Source-only successor expands those two
+same-line conditional sequences into braces and separate statements. Operands,
+call order, return values, class fallback, bits/class serialization, captures,
+input fixtures, policies, admission, output schema and compiler flags are unchanged.
+
+The new helper source is local to02. All other five admitted Native source entries
+retain their exact original01 paths and bytes. The reviewed02 recipe compiles the
+new helper through RAD01_SOURCE_DIR and explicitly borrows the original01 observer
+and derived whole TU; its header search path is the unchanged01 source directory.
+That directory remains immutable. Target name, three TUs, original CTF10 inclusion,
+core/archive dependencies, definitions, language level, map and link flags stay
+literal01. Only source-directory custody changes; no warning is disabled.
+
+The manifest retains exact21 fixture/policy refs and unchanged Original passive
+restoration. Helper01 remains the historical source authority; helper02 must be
+reviewed by Root and another author and genuinely refrozen with fresh approved
+source identities before a retry. A real prior configure restore/recovery and
+actual compile rows, objects, streams, provider and preservation remain Root
+operands/facts. This proposal invents no actual build/refreeze result or hashes.
+
+Only helper and recipe are new executable source bodies. Their before01 archives
+and exact narrow/cumulative diffs are supplied. Other five Native bodies and all
+unchanged diffs are referenced directly from immutable01. No reviewed code was
+imported or executed, no compiler/formatter/helper/Git was run, no result/weather/
+binary/core payload was read, and no canonical source, policy, fixture or gate was
+changed. The author also authored helper01 and RAD pure math; independent review
+certifies this small Source repair, not its own future scientific outputs.

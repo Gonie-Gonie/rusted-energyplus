@@ -1,0 +1,87 @@
+--- .runtime/porting/RAD-01/native-build-prep-02/manifest.json
++++ .runtime/porting/RAD-01/native-build-prep-03/manifest.json
+@@ -1,7 +1,7 @@
+ {
+   "schema": "rad01-native-build-source-preparation.v1",
+   "card": "RAD-01",
+-  "status": "held-source-only-fresh02-actual-helper-size-identity-awaiting-review",
++  "status": "held-source-only-fresh03-historical-freezer-context-correction-awaiting-review",
+   "own_sources": [
+     {
+       "path": ".runtime/porting/RAD-01/native-build-prep-02/run-native-build.py",
+@@ -137,10 +137,10 @@
+     }
+   ],
+   "documentation": {
+-    "path": ".runtime/porting/RAD-01/native-build-prep-02/README.md",
+-    "sha256": "dcda6c0b6316287e581f88cfe7ffe3149740ce2b2ca72e0d0a4e2c3ea2670dc6",
+-    "size_bytes": 6058,
+-    "line_count": 92
++    "path": ".runtime/porting/RAD-01/native-build-prep-03/README.md",
++    "sha256": "32265cf18b13f718ce04845994576d1526528807aee6a039187476812552278a",
++    "size_bytes": 6380,
++    "line_count": 97
+   },
+   "source_dependencies": [
+     {
+@@ -637,15 +637,15 @@
+   },
+   "historical_freezer_source_context": [
+     {
+-      "path": ".runtime/porting/RAD-01/input-writer-prep-02/manifest.json",
+-      "sha256": "fac0f91eebebab8edd5a9feb58bd30ca9281932c04fef291274524eba9b6810c",
+-      "size_bytes": 20173,
+-      "line_count": 517
+-    },
+-    {
+-      "path": ".runtime/porting/RAD-01/input-writer-prep-02/freeze_packet.py",
+-      "sha256": "f4727575c348bd4a5eb5128b67eafc5b823fb56ee0726ab0e826641bee0c04f2",
+-      "size_bytes": 13402,
++      "path": ".runtime/porting/RAD-01/input-writer-prep-01/manifest.json",
++      "sha256": "f50da6f903922cd1abc98e63a52f095aa3033551e67512b86aa6fafe25301f73",
++      "size_bytes": 18150,
++      "line_count": 464
++    },
++    {
++      "path": ".runtime/porting/RAD-01/input-writer-prep-01/freeze_packet.py",
++      "sha256": "a08359742e34fc2382ce554bde97232b22e1195151d5df0e31d53389dd7986ce",
++      "size_bytes": 13401,
+       "line_count": 162
+     }
+   ],
+@@ -666,5 +666,35 @@
+     "sha256": "2c7448d38cd09457d64894690336c470de8f34030c180e1a6226314f14dbd60d",
+     "size_bytes": 945,
+     "line_count": 14
++  },
++  "immutable_predecessor_02": {
++    "path": ".runtime/porting/RAD-01/native-build-prep-02/manifest.json",
++    "sha256": "32fea0f69a8cbb6c01d4d80198237c56ec09dcaa4590fb379e7559c9631fa5f2",
++    "size_bytes": 26006,
++    "line_count": 670
++  },
++  "before_predecessor_02_manifest": {
++    "path": ".runtime/porting/RAD-01/native-build-prep-03/before-02/manifest.json",
++    "sha256": "32fea0f69a8cbb6c01d4d80198237c56ec09dcaa4590fb379e7559c9631fa5f2",
++    "size_bytes": 26006,
++    "line_count": 670
++  },
++  "before_predecessor_02_documentation": {
++    "path": ".runtime/porting/RAD-01/native-build-prep-03/before-02/README.md",
++    "sha256": "dcda6c0b6316287e581f88cfe7ffe3149740ce2b2ca72e0d0a4e2c3ea2670dc6",
++    "size_bytes": 6058,
++    "line_count": 92
++  },
++  "fresh03_delta": {
++    "metadata_only": true,
++    "corrected_key": "historical_freezer_source_context",
++    "genuine_historical_freezer_01_restored_current_dependencies_remain_02": true,
++    "all_three_operational_sources_and_exact_source_diffs_literal_02": true
++  },
++  "documentation_from_02_diff": {
++    "path": ".runtime/porting/RAD-01/native-build-prep-03/diffs/README.md.from-02.diff",
++    "sha256": "aad1e2f638470479746d34085731fa9b9065ecddaf74845a174a2faaa3febf00",
++    "size_bytes": 703,
++    "line_count": 11
+   }
+ }
