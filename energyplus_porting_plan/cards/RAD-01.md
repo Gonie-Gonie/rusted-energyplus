@@ -86,3 +86,7 @@ All21 genuine Original calls and21 actual Rust public API calls returned complet
 Actual fmt/Clippy exit0; focused heat-balance203 and workspace4808 tests passed. Candidate and quality executions bind raw Source688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27 (3868 files). The shared kernel now preserves positive areas below EPSILON and the literal source division predicate. The first candidate launcher preflight had an incorrect factual QA field name and stopped before any target/recorder; corrected02 executed the actual stages. Evidence: evidence/RAD-01-unit/{manifest,summary}.json.
 
 Selected declared geometry does not establish initialized production enclosures or the GEO-02/RAD-02/RAD-03 integration handoff. Full unit/integration/production gates remain pending; ordinary fixed6 CLI regression is next.
+
+## Actual fixed six ordinary CLI executions
+
+A-24H, A-72H, B-NOLIMIT-24H, B-FLOW-24H, B-CAPACITY-24H and B-BOTH-24H all exit0 on the same final RAD01 source. Each actual source-order gate matches; hours override is absent and compare_oracle=false. All45 original input/weather/metadata guards remain unchanged. This establishes ordinary run regression evidence only; no numerical or integration/production/full-card PASS is inferred. Evidence: evidence/RAD-01-production-cli/{manifest,summary}.json.

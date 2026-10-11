@@ -1,0 +1,65 @@
+"""Root reuses established fixed6 ordinary CLI commands, with genuine artifacts and guards."""
+import datetime
+import hashlib
+import json
+import subprocess
+from pathlib import Path
+ROOT=Path.cwd(); BASE=ROOT/'.runtime/porting/RAD-01'; PRIOR=ROOT/'.runtime/porting/CTF-10'
+def read(p): return json.loads(p.read_bytes())
+def sha(p):
+    with p.open('rb') as s: return hashlib.file_digest(s,'sha256').hexdigest()
+def ref(p): return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+def write(p,m): p.write_bytes((json.dumps(m,indent=2,allow_nan=False)+'\n').encode('utf8'))
+selected=read(ROOT/'energyplus_porting_plan/evidence/RAD-01-unit/summary.json')
+assert selected['selected_declared_geometry_unit_comparison_passed']
+assert not subprocess.check_output(['git','status','--porcelain'])
+assert subprocess.check_output(['git','rev-parse','HEAD'])==subprocess.check_output(['git','rev-parse','@{u}'])
+source=selected['actual_source_snapshot']; inputs=BASE/'production-cli-inputs-01'; inputs.mkdir()
+prior_packet=PRIOR/'production-cli-inputs-01/manifest.json'; packet=read(prior_packet)
+packet['schema']='rad01-fixed-six-cli-inputs-before-execution.v1'
+packet['created_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat()
+packet['prior_input_only_packet']=ref(prior_packet)
+guards=[packet['fixed_scope']]+[r['actual'] for r in packet['all45_fixed_input_guards']]
+assert len(guards)==46
+def verify_guards():
+    for r in guards: assert ref(ROOT/r['path'])==r,r['path']
+verify_guards(); write(inputs/'manifest.json',packet)
+logs=BASE/'production-cli-launch-inputs-01'; logs.mkdir()
+def record(name,args):
+    print('Root actual RAD01 CLI starting',name,flush=True)
+    with (logs/(name.replace('/','__')+'.orchestration.log')).open('xb') as s:
+        subprocess.run(['python','-X','utf8','-B','tools/porting/record_command.py','--output-dir',
+            (BASE/name).relative_to(ROOT).as_posix(),'--',*args],check=True,stdout=s,stderr=subprocess.STDOUT)
+    r=read(BASE/name/'receipt.json')
+    assert r['exit_code']==0 and r['launch_error'] is None and r['source_bytes_match_before_and_after']
+    assert r['source_snapshot']==source
+    print('Root actual RAD01 CLI completed',name,ref(BASE/name/'receipt.json'),flush=True)
+    return r
+build=record('production-cli-build-command-01',['cargo','build','--locked','--config','profile.dev.debug=0',
+    '--config','profile.test.debug=0','--config','build.incremental=false','-p','ep_cli','--bin','eplus-rs',
+    '--message-format=json-render-diagnostics'])
+rows=[r for r in build['cargo_compiler_artifacts_capture']['rows'] if r['cargo_message']['target']['name']=='eplus-rs' and 'bin' in r['cargo_message']['target']['kind']]
+assert len(rows)==1; artifact=rows[0]['executable']; binary=ROOT/artifact['historical_path']
+assert sha(binary)==artifact['sha256']
+executions=[]
+for case in packet['actual_execution_order']:
+    old=read(PRIOR/f'production-cli-command-01/{case}/receipt.json')['command']
+    args=list(old); args[0]=str(binary)
+    index=args.index('--output-dir')+1
+    assert 'CTF-10' in args[index]
+    args[index]=args[index].replace('CTF-10','RAD-01')
+    assert not Path(args[index]).exists()
+    record(f'production-cli-command-01/{case}',args)
+    assert sha(binary)==artifact['sha256']; verify_guards()
+    result=read(BASE/f'production-cli-output-01/{case}/run-summary.json')
+    assert result['status']=='success' and result['exit_code']==0 and result['source_order_gate']['matches'] is True
+    assert result['config']['compare_oracle'] is False and result['config']['hours'] is None
+    executions.append({'id':case,'receipt':ref(BASE/f'production-cli-command-01/{case}/receipt.json')})
+assert len(executions)==6
+write(inputs/'execution-summary.json',{'schema':'rad01-fixed-six-actual-cli-executions.v1',
+    'input_packet':ref(inputs/'manifest.json'),'actual_build':ref(BASE/'production-cli-build-command-01/receipt.json'),
+    'actual_Cargo_binary':artifact,'same_actual_source_snapshot':source,'executions':executions,
+    'all6_exit0_and_source_unchanged':True,'all45_input_guards_unchanged_after':True,
+    'numerical_equivalence_certified':False,'complete_RAD01_PASS_claimed':False,
+    'production_geometry_and_radiation_handoff_certified':False})
+print('Actual RAD01 CLI6 complete0; no numerical or full-card certificate',flush=True)

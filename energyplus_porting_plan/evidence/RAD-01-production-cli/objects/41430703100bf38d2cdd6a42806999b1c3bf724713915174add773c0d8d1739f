@@ -1,0 +1,39 @@
+{
+  "schema": "root-protected-original-transparent-compression.v1",
+  "created_utc": "2026-10-11T01:28:32.529406+00:00",
+  "actual_before_authority": {
+    "path": ".runtime/porting/RAD-01/native-build-02/native-build.json",
+    "sha256": "3bf6a649c4ee2c67a4d9ae0c6a01c4fef1f987243685fdb205f46289cef62fed",
+    "size_bytes": 3989
+  },
+  "operation": "NTFS compact.exe /C /EXE:LZX /Q exact1 retained RAD Original",
+  "files": [
+    {
+      "file_before": {
+        "path": ".runtime/ep261-gcc13-o0/Products/rad01_unit_helper.exe",
+        "sha256": "bdc4f8dcb73f40ba5f64153d2ba0d191d7df47c12004e0f271031a8c336b7707",
+        "size_bytes": 1299982430
+      },
+      "file_after": {
+        "path": ".runtime/ep261-gcc13-o0/Products/rad01_unit_helper.exe",
+        "sha256": "bdc4f8dcb73f40ba5f64153d2ba0d191d7df47c12004e0f271031a8c336b7707",
+        "size_bytes": 1299982430
+      },
+      "compact_exit_code": 0,
+      "command_log": {
+        "path": ".runtime/porting/RAD-01/protected-original-storage-compression-01/rad01_unit_helper.exe.log",
+        "sha256": "86c9713efffcf625907857176e47efcbf4abe277ba3e4f57393aae1dd98c70d6",
+        "size_bytes": 269
+      },
+      "bytes_and_path_unchanged": true
+    }
+  ],
+  "observed_free_bytes_before": 4725309440,
+  "observed_free_bytes_after": 5447024640,
+  "physical_free_change_is_observation_not_exclusive_attribution": true,
+  "all1_bytes_and_paths_unchanged": true,
+  "file_deleted_or_moved": false,
+  "scientific_values_recomputed": false,
+  "original_executable_executed": false,
+  "gates_updated": false
+}

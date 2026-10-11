@@ -1,0 +1,8 @@
+Arbitrary Run
+  status: success
+  support_status: supported-compatibility
+  run_result_state: supported_compatibility_run
+  output_dir: C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\RAD-01\production-cli-output-01\B-BOTH-24H
+  run_summary: C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\RAD-01\production-cli-output-01\B-BOTH-24H\run-summary.json
+  diagnostics: C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\RAD-01\production-cli-output-01\B-BOTH-24H\diagnostics.json
+  support_report: C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\RAD-01\production-cli-output-01\B-BOTH-24H\support-report.md

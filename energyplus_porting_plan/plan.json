@@ -12314,6 +12314,11 @@
         "path": "energyplus_porting_plan/evidence/RAD-01-unit/summary.json",
         "sha256": "c9d8cd152e0924a2bd79d4625a165238b054cc3b40f48f41d9f513e6c99845ee",
         "size_bytes": 5614
+      },
+      "actual_fixed6_production_cli": {
+        "path": "energyplus_porting_plan/evidence/RAD-01-production-cli/summary.json",
+        "sha256": "f5e5bd75cef1a6424a459817b1b80f4541c94a702fe20a0ef788161b799a46bb",
+        "size_bytes": 4751
       }
     },
     {

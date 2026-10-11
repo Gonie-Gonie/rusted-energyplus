@@ -1,0 +1,127 @@
+{
+  "schema": "rad01-fixed-six-cli-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/RAD-01-production-cli/manifest.json",
+    "sha256": "c3abf1f775850a86e36f30ea8efc44d7d1d58b791d2449b538fa666eb6951c7d",
+    "size_bytes": 20031
+  },
+  "selected_approximate_view_factor_comparison": {
+    "path": "energyplus_porting_plan/evidence/RAD-01-unit/summary.json",
+    "sha256": "c9d8cd152e0924a2bd79d4625a165238b054cc3b40f48f41d9f513e6c99845ee",
+    "size_bytes": 5614
+  },
+  "actual_executions": {
+    "path": ".runtime/porting/RAD-01/production-cli-inputs-01/execution-summary.json",
+    "sha256": "8fb4ce83b5e202fbdd76ee89d0d973ef5b3d5f0d006c2bb5b839a723bfc883fd",
+    "size_bytes": 2768
+  },
+  "same_actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/68/688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27",
+    "sha256": "688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27"
+  },
+  "runs": [
+    {
+      "id": "A-24H",
+      "run_summary": {
+        "path": ".runtime/porting/RAD-01/production-cli-output-01/A-24H/run-summary.json",
+        "sha256": "2c966d0a43852f60aa4b9a67f942b66d31e86680f6b08fe810364dda52961b87",
+        "size_bytes": 28690
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": null
+    },
+    {
+      "id": "A-72H",
+      "run_summary": {
+        "path": ".runtime/porting/RAD-01/production-cli-output-01/A-72H/run-summary.json",
+        "sha256": "7bb1d61d971603c512f43628032849d4e252c064daeedde8a9807701fa5e1bec",
+        "size_bytes": 28690
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": null
+    },
+    {
+      "id": "B-NOLIMIT-24H",
+      "run_summary": {
+        "path": ".runtime/porting/RAD-01/production-cli-output-01/B-NOLIMIT-24H/run-summary.json",
+        "sha256": "7c34c5559b8df343ce7a310dff1b79fe7f76f3e34f3173d383c68ad3a062c981",
+        "size_bytes": 1498421
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": false
+    },
+    {
+      "id": "B-FLOW-24H",
+      "run_summary": {
+        "path": ".runtime/porting/RAD-01/production-cli-output-01/B-FLOW-24H/run-summary.json",
+        "sha256": "4c7d179d59baf8389a0a0cf54190f45c3abab01a6ee4496242f9b86835d59910",
+        "size_bytes": 1498308
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": false
+    },
+    {
+      "id": "B-CAPACITY-24H",
+      "run_summary": {
+        "path": ".runtime/porting/RAD-01/production-cli-output-01/B-CAPACITY-24H/run-summary.json",
+        "sha256": "7c5b0d858efb5fd582359b00f03d7f6146383c152f5d34d4cb6c24b071b5ede6",
+        "size_bytes": 1498242
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": false
+    },
+    {
+      "id": "B-BOTH-24H",
+      "run_summary": {
+        "path": ".runtime/porting/RAD-01/production-cli-output-01/B-BOTH-24H/run-summary.json",
+        "sha256": "696efef85de0a97eaece8fb658480be2a2a2e52ba7fd76bd9d4a9ad835dcd121",
+        "size_bytes": 1498713
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": false
+    }
+  ],
+  "all45_input_guards_unchanged_after": true,
+  "actual_CLI_build_used": {
+    "path": ".runtime/porting/RAD-01/production-cli-build-command-01/receipt.json",
+    "sha256": "6b1b599a997343b792d02d728f5a07b2050bc8ef035fd193bd0608d2aa357f5a",
+    "size_bytes": 4284
+  },
+  "numerical_equivalence_certified": false,
+  "complete_RAD01_PASS_claimed": false,
+  "integration_and_production_gates_remain_pending": true,
+  "retained_Original_transparent_storage_maintenance": {
+    "path": ".runtime/porting/RAD-01/protected-original-storage-compression-01/record.json",
+    "sha256": "41430703100bf38d2cdd6a42806999b1c3bf724713915174add773c0d8d1739f",
+    "size_bytes": 1562
+  },
+  "storage_maintenance_execution": {
+    "path": ".runtime/porting/RAD-01/protected-original-storage-command-01/receipt.json",
+    "sha256": "26730fe7c270fcf46fcc50017dab227a1dacbaa3b2f08d90b7f7f1021c493f65",
+    "size_bytes": 2706
+  }
+}

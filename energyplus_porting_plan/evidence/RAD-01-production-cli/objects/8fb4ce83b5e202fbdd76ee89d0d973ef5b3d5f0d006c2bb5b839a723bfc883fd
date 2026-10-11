@@ -1,0 +1,76 @@
+{
+  "schema": "rad01-fixed-six-actual-cli-executions.v1",
+  "input_packet": {
+    "path": ".runtime/porting/RAD-01/production-cli-inputs-01/manifest.json",
+    "sha256": "4f755f9c214a825ea6888612f2be6d4ece69518ba81f7585c575296a4a4934cc",
+    "size_bytes": 14074
+  },
+  "actual_build": {
+    "path": ".runtime/porting/RAD-01/production-cli-build-command-01/receipt.json",
+    "sha256": "6b1b599a997343b792d02d728f5a07b2050bc8ef035fd193bd0608d2aa357f5a",
+    "size_bytes": 4284
+  },
+  "actual_Cargo_binary": {
+    "historical_path": "target/debug/eplus-rs.exe",
+    "sha256": "549710593cceddca2fedb19f436b04ce1b406c790d15e07788189f5773055e8c"
+  },
+  "same_actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/68/688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27",
+    "sha256": "688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27"
+  },
+  "executions": [
+    {
+      "id": "A-24H",
+      "receipt": {
+        "path": ".runtime/porting/RAD-01/production-cli-command-01/A-24H/receipt.json",
+        "sha256": "4e087869b58d802da9c2c9faa49d4bb64e1ed3722a50467d8162d8b87e528c30",
+        "size_bytes": 3249
+      }
+    },
+    {
+      "id": "A-72H",
+      "receipt": {
+        "path": ".runtime/porting/RAD-01/production-cli-command-01/A-72H/receipt.json",
+        "sha256": "1b1620e97c95715a714fed8d47aaffa97cc0e468bdfdc25fb73620a42551743d",
+        "size_bytes": 3249
+      }
+    },
+    {
+      "id": "B-NOLIMIT-24H",
+      "receipt": {
+        "path": ".runtime/porting/RAD-01/production-cli-command-01/B-NOLIMIT-24H/receipt.json",
+        "sha256": "8981a08e462ac7e56bf6329ec30c4b44bd476299c6063901fee2a589d55dbf60",
+        "size_bytes": 3281
+      }
+    },
+    {
+      "id": "B-FLOW-24H",
+      "receipt": {
+        "path": ".runtime/porting/RAD-01/production-cli-command-01/B-FLOW-24H/receipt.json",
+        "sha256": "f0b90a56d8242a584183d688ace255bc9e9efe85b74b60e7af4e18f1a7458c72",
+        "size_bytes": 3269
+      }
+    },
+    {
+      "id": "B-CAPACITY-24H",
+      "receipt": {
+        "path": ".runtime/porting/RAD-01/production-cli-command-01/B-CAPACITY-24H/receipt.json",
+        "sha256": "1b8115b26925d1bffd4e75d9650c073da7ace88976aafcf8cbc68a5e8c6df961",
+        "size_bytes": 3286
+      }
+    },
+    {
+      "id": "B-BOTH-24H",
+      "receipt": {
+        "path": ".runtime/porting/RAD-01/production-cli-command-01/B-BOTH-24H/receipt.json",
+        "sha256": "473fb42730ef9a9ab41ab4209d79467b7739d3c38f8138fe282cb86028f95614",
+        "size_bytes": 3270
+      }
+    }
+  ],
+  "all6_exit0_and_source_unchanged": true,
+  "all45_input_guards_unchanged_after": true,
+  "numerical_equivalence_certified": false,
+  "complete_RAD01_PASS_claimed": false,
+  "production_geometry_and_radiation_handoff_certified": false
+}
