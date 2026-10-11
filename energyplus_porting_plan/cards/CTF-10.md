@@ -73,11 +73,11 @@ Selected final/history update occurs once after the existing CorrectStep air tai
 Prepared caller clock validation/commit, duplicate-commit rejection, generation freshness/invalidation and typed stop propagation remain distinct.
 Truly empty global0 layout permits empty-array operations only; nonempty global0 and unsupported branches retain typed stops.
 
-Current final03: `.runtime/porting/CTF-10/production-activation-applied-final-source-03/manifest.json`, SHA `2626c66ee2fe7171cfc8102b694324959cd7b6c2121087a160c3136ee112cafb`.
-Actual SourceSnapshot: `8f448858790b56e3ff7ed97109aea23be1c936ad8e94bd3c4999c016a92c7216`.
+Activation milestone final03: `.runtime/porting/CTF-10/production-activation-applied-final-source-03/manifest.json`, SHA `2626c66ee2fe7171cfc8102b694324959cd7b6c2121087a160c3136ee112cafb`.
+Activation SourceSnapshot: `8f448858790b56e3ff7ed97109aea23be1c936ad8e94bd3c4999c016a92c7216`.
 Root-confirmed quality02: fmt0, Clippy0, focused245 PASS and workspace4851 PASS/21 groups, all on that same SourceSnapshot.
 
-Current retained same-input replay02 matches all2029 input/API/endpoint/normal-exit/parent-return joins and available cases.
+Activation retained same-input replay02 matches all2029 input/API/endpoint/normal-exit/parent-return joins and available cases.
 Comparison SHA `bd01b399e5a7588d94fef91726173d5ea8f6ae52dbe9b475cfa84ad5ac887de5`; numeric973854/exact5671425, mismatch0.
 All13 observed owner profiles have maxAbs/l2 zero. Four master profiles remain unobserved and receive no PASS. Native was not replayed.
 This confirms the direct API replay and current source quality; it does not establish persistent ordinary Rust/Native numerical equivalence.
@@ -88,6 +88,14 @@ Ordinary A-24H/A-72H/B-NOLIMIT-24H/B-FLOW-24H/B-CAPACITY-24H/B-BOTH-24H all exit
 All45 input/weather/metadata guards, compatibility/partial-deny/trace-full and original ordinary arguments were retained; no hours override, oracle or Native answers were supplied.
 The [current activation evidence](../evidence/CTF-10-production-activation/summary.json) retains all six actual receipts, current quality and complete direct replay with the failure-to-fix lineage.
 These ordinary runs establish regression success; persistent ordinary Rust/Native numerical equivalence remains pending.
+
+## Report input and Scan implementation
+
+The ordinary compiler now preserves all five report input families, unnamed IDF declaration order, physical alpha counts and exact default/blank/case facts.
+General's first-scan flags/options/EMS effects, retained cache and optional queries are implemented in source order. Unknown surface-list tokens retain the EMPTY warning path.
+The [report-input and Scan evidence](../evidence/CTF-10-report-input-scan/summary.json) records fmt/Clippy0, focused250 and workspace4859 PASS, including all eight new regression tests, on SourceSnapshot `95197194b3c81732677230e3699d3522f03e3890077688d85907745ebf57a723`.
+Same-input genuine Native getter/cache/query comparison remains pending. The scan is not yet called by the ordinary whole-Init postlude; predefined/EIO reporting and final fatal backend composition remain pending.
+This milestone promotes no card gate; the earlier activation replay and ordinary CLI results retain their own recorded source identity.
 
 ## Retained failure-to-fix lineage
 

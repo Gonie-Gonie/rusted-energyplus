@@ -32,6 +32,7 @@ pub mod inside_convection;
 pub mod longwave;
 pub mod manager;
 pub mod radiation;
+pub mod report_scan;
 pub mod reports;
 pub(crate) mod run_period;
 pub mod solar;

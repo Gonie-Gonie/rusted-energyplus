@@ -1,0 +1,68 @@
+"""Root archives the tested report-input/Scan unit and updates its pending plan."""
+import hashlib,json,re,shutil
+from pathlib import Path
+ROOT=Path.cwd().resolve();BASE=ROOT/'.runtime/porting/CTF-10';OUT=ROOT/'energyplus_porting_plan/evidence/CTF-10-report-input-scan'
+SOURCE='95197194b3c81732677230e3699d3522f03e3890077688d85907745ebf57a723'
+def read(p):return json.loads(p.read_bytes())
+def sha(p):
+ with p.open('rb')as s:return hashlib.file_digest(s,'sha256').hexdigest()
+def ref(p):return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+def exact(row):
+ p=(ROOT/row['path']).resolve();assert p.is_relative_to(ROOT)and sha(p)==row['sha256'];return p
+def write(p,v):p.write_bytes((json.dumps(v,ensure_ascii=False,indent=2,allow_nan=False)+'\n').encode())
+accepted=BASE/'report-input-scan-applied-01/accepted.json';assert sha(accepted)=='98bd31df09d2b4697592be1adc1e0978cfd9a384771f0bf850e39ab60d2da3ae'
+a=read(accepted);assert a['Root_and_other_author_FULL_Source_and_formatter_correspondence_accepted']is True
+for row in a['actual_sources']:assert (ROOT/row['canonical_path']).read_bytes()==exact(row['actual_final_source']).read_bytes()
+settings=['--config','profile.dev.debug=0','--config','profile.test.debug=0','--config','build.incremental=false','--locked']
+commands={'fmt-check':['cargo','fmt','--all','--','--check'],'clippy':['cargo','clippy',*settings,'--workspace','--all-targets','--','-D','warnings'],'focused':['cargo','test',*settings,'-p','ep_runtime','--lib','heat_balance::'],'workspace':['cargo','test',*settings,'--workspace']}
+quality={};pattern=re.compile(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored;')
+for role,command in commands.items():
+ p=BASE/f'report-input-scan-{role}-command-01/receipt.json';r=read(p)
+ assert r['command']==command and r['exit_code']==0 and r['launch_error']is None and r['source_bytes_match_before_and_after']is True and r['source_snapshot']['sha256']==SOURCE
+ groups=[tuple(map(int,m))for m in pattern.findall(exact(r['stdout']).read_text(encoding='utf8'))]
+ quality[role]={'actual_execution':ref(p),'exit_code':0,'test_groups':len(groups),'passed':sum(m[0]for m in groups),'failed':sum(m[1]for m in groups),'ignored':sum(m[2]for m in groups)}
+assert quality['focused']['passed']==250 and quality['workspace']['passed']==4859 and quality['workspace']['test_groups']==21
+workspace=read(BASE/'report-input-scan-workspace-command-01/receipt.json');text=exact(workspace['stdout']).read_text(encoding='utf8')
+tests=['actual_a_report_requests_keep_native_default_and_blank_owners','idf_unnamed_order_and_explicit_blank_second_alpha_survive','twelve_unnamed_reports_keep_actual_idf_count_order_and_field_counts','first_scan_reads_real_a_families_then_later_queries_reuse_cache','unknown_surface_list_token_uses_native_map_empty_warning_not_invalid','materials_only_second_alpha_count_and_optional_refs_remain_distinct','last_ordered_options_and_ems_assignments_replace_earlier_values','missing_surfaces_key_is_typed_unavailable_after_real_first_cache_read']
+assert all(len(re.findall(r'^test .*::'+name+r' \.\.\. ok$',text,re.M))==1 for name in tests)
+assert not OUT.exists();(OUT/'objects').mkdir(parents=True);rows=[];seen=set()
+def store(p,role):
+ p=p.resolve();assert p.is_relative_to(ROOT)and p.suffix.lower()not in ['.exe','.dll','.rlib','.epw'];original=ref(p);key=(original['path'],original['sha256'])
+ if key in seen:return
+ seen.add(key);dest=OUT/'objects'/original['sha256']
+ if not dest.exists():shutil.copyfile(p,dest)
+ assert dest.read_bytes()==p.read_bytes();rows.append({'role':role,'original':original,'stored':ref(dest)})
+def command(name,role):
+ p=BASE/name/'receipt.json';r=read(p);assert r['exit_code']==0 and r['launch_error']is None
+ for q in [p,exact(r['stdout']),exact(r['stderr']),exact(r['source_snapshot']),exact(r['executed_launcher']['archive'])]:store(q,role)
+for name in ['report-input-scan-prep-01','report-input-scan-applied-01','report-input-prerequisite-build-storage-01']:
+ for p in sorted((BASE/name).rglob('*')):
+  if p.is_file():store(p,'reviewed-source-application-or-storage/'+name)
+for role in commands:command(f'report-input-scan-{role}-command-01','actual-quality/'+role)
+for name in ['report-input-scan-apply-command-01','report-input-scan-format-command-01','report-input-prerequisite-build-storage-command-01']:command(name,'actual-source-application-or-storage')
+for name in ['apply-report-input-scan-01.py','compress-report-input-prerequisite-build-cache-01.py']:store(BASE/name,'executed-Root-source')
+store(Path(__file__).resolve(),'executed-Root-finalization-source')
+plan=ROOT/'energyplus_porting_plan/plan.json';card=ROOT/'energyplus_porting_plan/cards/CTF-10.md';checklist=ROOT/'energyplus_porting_plan/CHECKLIST.md'
+for p in [plan,card,checklist]:store(p,'documentation-before-report-input-milestone')
+write(OUT/'manifest.json',{'schema':'ctf10-selected-report-input-scan-implementation-evidence.v1','selected_files':rows,'actual_accepted_source':ref(accepted),'actual_quality':quality,'actual_source_snapshot':workspace['source_snapshot'],'selected_archive_is_transitive_replay_closure':False,'whole_Init_ordinary_postlude_activated':False,'Native_equivalence_certified':False,'gates_updated':False})
+summary={'schema':'ctf10-report-input-scan-implementation-milestone.v1','card':'CTF-10','status':'report input and Scan cache implementation tested; Native comparison and whole postlude pending','selected_evidence_manifest':ref(OUT/'manifest.json'),'actual_source_snapshot':workspace['source_snapshot'],'actual_accepted_source':ref(accepted),'actual_quality':quality,'additional_focused_tests':tests,
+ 'implementation':['Preserve five real report object families through RawModel and the ordinary compiler.','Recover generated unnamed IDF identities, within-family declaration order and actual physical alpha counts; retain direct epJSON ordering.','Retain default/blank/case facts and dictionary/drawing/EMS defaults independently of NumAlphas.','Port all-family first scan, retained flags/options/EMS effects and repeated optional queries in General source order.','Deliver actual warning/continue arguments synchronously; preserve unknown-map EMPTY behavior and explicit unavailable missing Surfaces key.'],
+ 'remaining':['Same-input genuine Native report-input/getter/cache/query comparison.','Actual reportLayers/predefined-table/EIO owners and whole Init final fatal/error backend composition before surface allocation.','Ordinary Rust/Native persistent-history numerical integration and card prerequisites.'],
+ 'actual_Native_execution_performed_for_this_milestone':False,'warning_fatal_backend_certified':False,'whole_Init_ordinary_postlude_activated':False,'unit_gate_promoted':False,'integration_gate_promoted':False,'production_gate_promoted':False,'complete_CTF10_PASS_claimed':False,'gates_updated':False}
+write(OUT/'summary.json',summary)
+p=read(plan);task=next(t for t in p['tasks']if t['id']=='CTF-10');assert 'actual_report_input_scan_implementation'not in task;task['actual_report_input_scan_implementation']=ref(OUT/'summary.json');write(plan,p)
+text=card.read_text(encoding='utf8').replace('Current final03:','Activation milestone final03:').replace('Actual SourceSnapshot:','Activation SourceSnapshot:').replace('Current retained same-input replay02','Activation retained same-input replay02')
+anchor='## Retained failure-to-fix lineage\n';assert text.count(anchor)==1
+section='''## Report input and Scan implementation
+
+The ordinary compiler now preserves all five report input families, unnamed IDF declaration order, physical alpha counts and exact default/blank/case facts.
+General's first-scan flags/options/EMS effects, retained cache and optional queries are implemented in source order. Unknown surface-list tokens retain the EMPTY warning path.
+The [report-input and Scan evidence](../evidence/CTF-10-report-input-scan/summary.json) records fmt/Clippy0, focused250 and workspace4859 PASS, including all eight new regression tests, on SourceSnapshot `95197194b3c81732677230e3699d3522f03e3890077688d85907745ebf57a723`.
+Same-input genuine Native getter/cache/query comparison remains pending. The scan is not yet called by the ordinary whole-Init postlude; predefined/EIO reporting and final fatal backend composition remain pending.
+This milestone promotes no card gate; the earlier activation replay and ordinary CLI results retain their own recorded source identity.
+
+'''
+card.write_bytes(text.replace(anchor,section+anchor).encode())
+text=checklist.read_text(encoding='utf8');old='전체 Init 보고·최종 오류 처리와 일반 실행의 Native 수치 동등성은 미완료이며 완료 체크는 유지한다.';assert text.count(old)==1
+text=text.replace(old,'보고 요청 입력·Scan 캐시 구현도 추가 회귀시험 8개를 포함한 전체 4,859개 시험을 통과했다. [Scan 증거](evidence/CTF-10-report-input-scan/summary.json)의 Native 비교, 전체 Init 보고·최종 오류 처리와 일반 실행의 Native 수치 동등성은 미완료이며 완료 체크는 유지한다.')
+checklist.write_bytes(text.encode());print('Root report-input/Scan actual evidence and pending plan updated',ref(OUT/'summary.json'),flush=True)

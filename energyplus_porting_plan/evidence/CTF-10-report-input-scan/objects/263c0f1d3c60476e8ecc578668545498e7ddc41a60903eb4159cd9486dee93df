@@ -1,0 +1,26 @@
+--- .runtime/porting/CTF-10/report-input-scan-prep-01/proposed/crates/ep_model/src/report_inputs.rs
++++ crates/ep_model/src/report_inputs.rs
+@@ -52,7 +52,11 @@
+     /// Exact field label used by ScanForReports' surface-list warning.
+     #[must_use]
+     pub fn report_type_field_name(&self) -> &'static str {
+-        if self.is_epjson { "report_type" } else { "Report Type" }
++        if self.is_epjson {
++            "report_type"
++        } else {
++            "Report Type"
++        }
+     }
+ }
+ 
+@@ -67,6 +71,9 @@
+ 
+ impl Default for ReportInputs {
+     fn default() -> Self {
+-        Self { objects: Vec::new(), legacy_variable_dictionary_sections: -1 }
++        Self {
++            objects: Vec::new(),
++            legacy_variable_dictionary_sections: -1,
++        }
+     }
+ }

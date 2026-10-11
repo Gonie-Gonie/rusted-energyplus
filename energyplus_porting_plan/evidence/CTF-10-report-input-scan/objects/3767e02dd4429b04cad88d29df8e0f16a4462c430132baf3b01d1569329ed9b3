@@ -1,0 +1,291 @@
+{
+  "schema": "ctf10-report-input-schema-source-context.v1",
+  "source": {
+    "path": ".runtime/energyplus/26.1.0/Energy+.schema.epJSON",
+    "sha256": "60b24d904e6fa553f773b38037a8a09730e6da1538647df552cd77db8d6704a9",
+    "size_bytes": 10568550,
+    "line_count": 207189
+  },
+  "projection_kind": "literal selected schema fields; input metadata only",
+  "object_families": [
+    {
+      "object_type": "Output:Surfaces:List",
+      "has_name_field": false,
+      "min_fields": 0,
+      "legacy_idd": {
+        "field_info": {
+          "report_type": {
+            "field_name": "Report Type",
+            "field_type": "a"
+          },
+          "report_specifications": {
+            "field_name": "Report Specifications",
+            "field_type": "a"
+          }
+        },
+        "fields": [
+          "report_type",
+          "report_specifications"
+        ],
+        "alphas": {
+          "fields": [
+            "report_type",
+            "report_specifications"
+          ]
+        },
+        "numerics": {
+          "fields": []
+        }
+      },
+      "properties": {
+        "report_type": {
+          "type": "string",
+          "enum": [
+            "CostInfo",
+            "DecayCurvesFromComponentLoadsSummary",
+            "Details",
+            "DetailsWithVertices",
+            "Lines",
+            "Vertices",
+            "ViewFactorInfo"
+          ]
+        },
+        "report_specifications": {
+          "type": "string",
+          "note": "(IDF, only for Output:Surfaces:List, Lines report -- will print transformed coordinates in IDF style)",
+          "enum": [
+            "IDF"
+          ]
+        }
+      }
+    },
+    {
+      "object_type": "Output:Surfaces:Drawing",
+      "has_name_field": false,
+      "min_fields": 0,
+      "legacy_idd": {
+        "field_info": {
+          "report_type": {
+            "field_name": "Report Type",
+            "field_type": "a"
+          },
+          "report_specifications_1": {
+            "field_name": "Report Specifications 1",
+            "field_type": "a"
+          },
+          "report_specifications_2": {
+            "field_name": "Report Specifications 2",
+            "field_type": "a"
+          }
+        },
+        "fields": [
+          "report_type",
+          "report_specifications_1",
+          "report_specifications_2"
+        ],
+        "alphas": {
+          "fields": [
+            "report_type",
+            "report_specifications_1",
+            "report_specifications_2"
+          ]
+        },
+        "numerics": {
+          "fields": []
+        }
+      },
+      "properties": {
+        "report_type": {
+          "type": "string",
+          "enum": [
+            "DXF",
+            "DXF:WireFrame",
+            "VRML"
+          ]
+        },
+        "report_specifications_1": {
+          "type": "string",
+          "enum": [
+            "",
+            "RegularPolyline",
+            "ThickPolyline",
+            "Triangulate3DFace"
+          ],
+          "default": "Triangulate3DFace",
+          "note": "Triangulate3DFace (default), ThickPolyline, RegularPolyline apply to DXF This field is ignored for DXF:WireFrame and VRML"
+        },
+        "report_specifications_2": {
+          "type": "string",
+          "note": "Use ColorScheme Name for DXF reports",
+          "data_type": "object_list",
+          "object_list": [
+            "ColorSchemes"
+          ]
+        }
+      }
+    },
+    {
+      "object_type": "Output:VariableDictionary",
+      "has_name_field": false,
+      "min_fields": 1.0,
+      "legacy_idd": {
+        "field_info": {
+          "key_field": {
+            "field_name": "Key Field",
+            "field_type": "a"
+          },
+          "sort_option": {
+            "field_name": "Sort Option",
+            "field_type": "a"
+          }
+        },
+        "fields": [
+          "key_field",
+          "sort_option"
+        ],
+        "alphas": {
+          "fields": [
+            "key_field",
+            "sort_option"
+          ]
+        },
+        "numerics": {
+          "fields": []
+        }
+      },
+      "properties": {
+        "key_field": {
+          "type": "string",
+          "enum": [
+            "",
+            "IDF",
+            "regular"
+          ],
+          "default": "regular"
+        },
+        "sort_option": {
+          "type": "string",
+          "enum": [
+            "Name",
+            "Unsorted"
+          ]
+        }
+      }
+    },
+    {
+      "object_type": "Output:Constructions",
+      "has_name_field": false,
+      "min_fields": 0,
+      "legacy_idd": {
+        "field_info": {
+          "details_type_1": {
+            "field_name": "Details Type 1",
+            "field_type": "a"
+          },
+          "details_type_2": {
+            "field_name": "Details Type 2",
+            "field_type": "a"
+          }
+        },
+        "fields": [
+          "details_type_1",
+          "details_type_2"
+        ],
+        "alphas": {
+          "fields": [
+            "details_type_1",
+            "details_type_2"
+          ]
+        },
+        "numerics": {
+          "fields": []
+        }
+      },
+      "properties": {
+        "details_type_1": {
+          "type": "string",
+          "enum": [
+            "Constructions",
+            "Materials"
+          ]
+        },
+        "details_type_2": {
+          "type": "string",
+          "enum": [
+            "Constructions",
+            "Materials"
+          ]
+        }
+      }
+    },
+    {
+      "object_type": "Output:EnergyManagementSystem",
+      "has_name_field": false,
+      "min_fields": 0,
+      "legacy_idd": {
+        "field_info": {
+          "actuator_availability_dictionary_reporting": {
+            "field_name": "Actuator Availability Dictionary Reporting",
+            "field_type": "a"
+          },
+          "internal_variable_availability_dictionary_reporting": {
+            "field_name": "Internal Variable Availability Dictionary Reporting",
+            "field_type": "a"
+          },
+          "ems_runtime_language_debug_output_level": {
+            "field_name": "EMS Runtime Language Debug Output Level",
+            "field_type": "a"
+          }
+        },
+        "fields": [
+          "actuator_availability_dictionary_reporting",
+          "internal_variable_availability_dictionary_reporting",
+          "ems_runtime_language_debug_output_level"
+        ],
+        "alphas": {
+          "fields": [
+            "actuator_availability_dictionary_reporting",
+            "internal_variable_availability_dictionary_reporting",
+            "ems_runtime_language_debug_output_level"
+          ]
+        },
+        "numerics": {
+          "fields": []
+        }
+      },
+      "properties": {
+        "actuator_availability_dictionary_reporting": {
+          "type": "string",
+          "enum": [
+            "",
+            "None",
+            "NotByUniqueKeyNames",
+            "Verbose"
+          ],
+          "default": "None"
+        },
+        "internal_variable_availability_dictionary_reporting": {
+          "type": "string",
+          "enum": [
+            "",
+            "None",
+            "NotByUniqueKeyNames",
+            "Verbose"
+          ],
+          "default": "None"
+        },
+        "ems_runtime_language_debug_output_level": {
+          "type": "string",
+          "enum": [
+            "",
+            "ErrorsOnly",
+            "None",
+            "Verbose"
+          ],
+          "default": "None"
+        }
+      }
+    }
+  ],
+  "runtime_outcomes_included": false
+}

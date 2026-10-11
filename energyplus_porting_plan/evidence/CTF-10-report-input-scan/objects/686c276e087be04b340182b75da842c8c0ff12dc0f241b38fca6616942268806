@@ -1,0 +1,72 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime/porting/CTF-10/apply-report-input-scan-01.py"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-11T05:53:03.960823+00:00",
+  "finished_utc": "2026-10-11T05:53:23.076649+00:00",
+  "elapsed_seconds": 19.116268600017065,
+  "repository_before": {
+    "head": "be8dd2d434e2fbdccddf0a8ea7f1f87e5a1f63ed",
+    "worktree_clean": true,
+    "porcelain_v1_nul_utf8": ""
+  },
+  "repository_after": {
+    "head": "be8dd2d434e2fbdccddf0a8ea7f1f87e5a1f63ed",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_compiler/src/compiler.rs\u0000 M crates/ep_model/src/lib.rs\u0000 M crates/ep_model/src/model.rs\u0000 M crates/ep_raw_model/src/idf_order.rs\u0000 M crates/ep_runtime/src/heat_balance/mod.rs\u0000?? crates/ep_compiler/src/compiler/report_inputs.rs\u0000?? crates/ep_model/src/report_inputs.rs\u0000?? crates/ep_runtime/src/heat_balance/report_scan.rs\u0000"
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/8f/8f448858790b56e3ff7ed97109aea23be1c936ad8e94bd3c4999c016a92c7216",
+    "sha256": "8f448858790b56e3ff7ed97109aea23be1c936ad8e94bd3c4999c016a92c7216"
+  },
+  "source_bytes_match_before_and_after": false,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CTF-10/report-input-scan-apply-command-01/stdout.log",
+    "sha256": "424218359f60bd8b709429115f390e13d0eba2de4f7ab1ecee6894ade1111271"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CTF-10/report-input-scan-apply-command-01/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-11T05:53:23.076649+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

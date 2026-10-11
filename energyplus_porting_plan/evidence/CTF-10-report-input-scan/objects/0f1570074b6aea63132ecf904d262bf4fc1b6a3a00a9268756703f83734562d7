@@ -1,0 +1,560 @@
+{
+  "schema": "ctf10-report-input-scan-source-preparation.v1",
+  "status": "SOURCE-READY HELD - implementation unit 1, no execution or ordinary activation",
+  "held_immutable": true,
+  "author": "Header",
+  "authorship_limit": "Author of selected CTF public/lifecycle owners; this proposal is not independent scientific or whole-Init certification.",
+  "ep_version": "26.1.0",
+  "ep_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "prior_bounded_audit": {
+    "path": ".runtime/porting/CTF-10/whole-init-postlude-audit-prep-01/manifest.json",
+    "sha256": "4c973f1d1b5f71408645d0cb73cfef4489977c5b7aa40508a58d336af8ba1a65",
+    "size_bytes": 18226,
+    "line_count": 481
+  },
+  "own_sources": [
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/proposed/crates/ep_compiler/src/compiler/report_inputs.rs",
+        "sha256": "52afa544b7fd4201a1317d4f339ce930b7982035dd5991dfaf77a3c0c6e2d7b6",
+        "size_bytes": 6565,
+        "line_count": 118
+      },
+      "target": "crates/ep_compiler/src/compiler/report_inputs.rs",
+      "before": null,
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/diffs/crates__ep_compiler__src__compiler__report_inputs.rs.diff",
+        "sha256": "bb0508fb5d8fc9db7940dd9afd8cd3edc39cdbe9811550e0fb427de002626353",
+        "size_bytes": 6770,
+        "line_count": 121
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/proposed/crates/ep_compiler/src/compiler.rs",
+        "sha256": "90c40535d6393e8cd6def34b498bc88d43509ff2efa1bc51e0ba5fada0e62825",
+        "size_bytes": 772042,
+        "line_count": 19745
+      },
+      "target": "crates/ep_compiler/src/compiler.rs",
+      "before": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/before/crates/ep_compiler/src/compiler.rs",
+        "sha256": "52498a97e0444c82a91bcf7c362f70608822dc9d2428f1a37e568940c55b97a5",
+        "size_bytes": 771820,
+        "line_count": 19738
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/diffs/crates__ep_compiler__src__compiler.rs.diff",
+        "sha256": "20876d5fa51b01800027337e063f9bd54455cd7971fe974134c6f3d2262873f0",
+        "size_bytes": 996,
+        "line_count": 30
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/proposed/crates/ep_model/src/lib.rs",
+        "sha256": "dd2fa6189146f9eb03adc913f79901b056f5e6fdb095089bcf1828cb50fb12b1",
+        "size_bytes": 329,
+        "line_count": 17
+      },
+      "target": "crates/ep_model/src/lib.rs",
+      "before": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/before/crates/ep_model/src/lib.rs",
+        "sha256": "2a756532553034fb2b92c892cb2e6f3c147aa129f6dce64b63763f364cb3cee4",
+        "size_bytes": 284,
+        "line_count": 15
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/diffs/crates__ep_model__src__lib.rs.diff",
+        "sha256": "45adc46a3421576033805082201fd2b4472fe79a1112e8759812a6ccc080ab6c",
+        "size_bytes": 363,
+        "line_count": 17
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/proposed/crates/ep_model/src/model.rs",
+        "sha256": "0f76bbf0675145f8da3b56f711ced71e25bcbdafc0160f60b386978fe3be8db4",
+        "size_bytes": 92905,
+        "line_count": 2326
+      },
+      "target": "crates/ep_model/src/model.rs",
+      "before": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/before/crates/ep_model/src/model.rs",
+        "sha256": "8fe75e51f50682d68d185d18613b4e1505093d071cc4db19947ef03756bbbf32",
+        "size_bytes": 92680,
+        "line_count": 2322
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/diffs/crates__ep_model__src__model.rs.diff",
+        "sha256": "fe24ba3d3be8d22146b4899826f60a12e8a3d38674d82d574b9dc4ab948f7989",
+        "size_bytes": 1098,
+        "line_count": 27
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/proposed/crates/ep_model/src/report_inputs.rs",
+        "sha256": "832e827990ae552500ca17ce5fb4366471596411d3ca9f3bf8a9a04d4dfe1b5e",
+        "size_bytes": 2773,
+        "line_count": 72
+      },
+      "target": "crates/ep_model/src/report_inputs.rs",
+      "before": null,
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/diffs/crates__ep_model__src__report_inputs.rs.diff",
+        "sha256": "722a213e91cbe59035e928b7f59177c9f2e425479a6f0c474b2f106b357cc901",
+        "size_bytes": 2919,
+        "line_count": 75
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/proposed/crates/ep_raw_model/src/idf_order.rs",
+        "sha256": "e9fd5eb108f048fc62f96c4b090433ed7e13ab0e5f27d6ceee7a318c53ffb028",
+        "size_bytes": 31640,
+        "line_count": 852
+      },
+      "target": "crates/ep_raw_model/src/idf_order.rs",
+      "before": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/before/crates/ep_raw_model/src/idf_order.rs",
+        "sha256": "5f2a1984ebc76a51938232ab7002c9c683666cf88d765af8e02dbf126bad7772",
+        "size_bytes": 28468,
+        "line_count": 789
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/diffs/crates__ep_raw_model__src__idf_order.rs.diff",
+        "sha256": "03905ed469aac66fc615e85f6bc84dc265a883ec56d5847b997d509b3b039c7c",
+        "size_bytes": 5429,
+        "line_count": 140
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/proposed/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "90637d7ba5a12a857c84c4cca3d6a3d7cd62dedb1216cc99b7ea8e1d7991b4cd",
+        "size_bytes": 1926,
+        "line_count": 76
+      },
+      "target": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "before": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/before/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "f9d8ac68da094b48c7b555ac4bc0e903485d605289c8bc26fc4a9660c93a70a8",
+        "size_bytes": 1905,
+        "line_count": 75
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/diffs/crates__ep_runtime__src__heat_balance__mod.rs.diff",
+        "sha256": "4e5042ef39e6b224701ba471491f75311f5f940c8a4e8ae534df922c48a0a3dd",
+        "size_bytes": 252,
+        "line_count": 10
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/proposed/crates/ep_runtime/src/heat_balance/report_scan.rs",
+        "sha256": "7f9a3a93018e2c78f485bf39de5c23b8869e8c5cdd632166b314f50a77a8976b",
+        "size_bytes": 14475,
+        "line_count": 283
+      },
+      "target": "crates/ep_runtime/src/heat_balance/report_scan.rs",
+      "before": null,
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/diffs/crates__ep_runtime__src__heat_balance__report_scan.rs.diff",
+        "sha256": "43ed0eb744c2e5df742ebe278ebcac954aa5bb242acf5fb3e82211618a97e8df",
+        "size_bytes": 14846,
+        "line_count": 286
+      }
+    }
+  ],
+  "source_context": {
+    "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/source-context.json",
+    "sha256": "3767e02dd4429b04cad88d29df8e0f16a4462c430132baf3b01d1569329ed9b3",
+    "size_bytes": 7442,
+    "line_count": 291
+  },
+  "readme": {
+    "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/README.md",
+    "sha256": "97bc312a46190d21e07f228625246af6da6b2d8dfabd7536c638c85ccfeb6e64",
+    "size_bytes": 5007,
+    "line_count": 77
+  },
+  "source_authorities": [
+    {
+      "path": "C:/Users/GonieGonie/Downloads/PORTING_INSTRUCTIONS.md",
+      "sha256": "0dcdbfadcc6a662c8d17488cb19f936064a103410fe25c59fbac245ccb9c686f",
+      "size_bytes": 2085,
+      "line_count": 14
+    },
+    {
+      "path": "energyplus_porting_plan/README.md",
+      "sha256": "020744ae54cd094eeb8fe66cb0405c00603bfc7e4000e322792abb551bcc7ddf",
+      "size_bytes": 5308,
+      "line_count": 81
+    },
+    {
+      "path": "energyplus_porting_plan/STATE_CONTRACTS.md",
+      "sha256": "bc2110e8915856c56f1e0bc4a8e3c4557ada93bff2bcde85506f94d40a031eba",
+      "size_bytes": 2890,
+      "line_count": 32
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CTF-10.md",
+      "sha256": "52e2dbceade2cd4ac930a42ca0a064c975e8db8f10988b922365be610fd40a54",
+      "size_bytes": 13611,
+      "line_count": 142
+    },
+    {
+      "path": "crates/ep_raw_model/src/lib.rs",
+      "sha256": "08f4a3bcf27c2f4e2577b534ad505176d0877b46709bb512b71685ebef6fa9a8",
+      "size_bytes": 16493,
+      "line_count": 491
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "833a9f5bb991874dd972e044949fee695b36b17a857d7603cc0e45921a945b09",
+      "size_bytes": 597,
+      "line_count": 30
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-observer-prep-01/manifest.json",
+      "sha256": "a2765a61087045ecb400f260740216bcc6b0330e91975a0168eeead09bb7645d",
+      "size_bytes": 22328,
+      "line_count": 591
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-helper-prep-01/manifest.json",
+      "sha256": "1aca57d1c46b6d1a0e756deb61328413a071abc74f4bc9e241f35915a2b20b63",
+      "size_bytes": 37974,
+      "line_count": 971
+    }
+  ],
+  "source_ranges": [
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/General.cc",
+        "sha256": "7ffbd1fe67b1d9806c169c6cd40e08a039a1c8692a93622137f07200cea02658",
+        "size_bytes": 66243,
+        "line_count": 1577
+      },
+      "first_line": 89,
+      "last_line": 151,
+      "range_sha256": "a9291deb63926a70585d98ade58200d6639bfe5e8206a16f2079f582fd2ac2ec",
+      "range_size_bytes": 1398,
+      "purpose": "complete report request/type/key enum strings"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/General.cc",
+        "sha256": "7ffbd1fe67b1d9806c169c6cd40e08a039a1c8692a93622137f07200cea02658",
+        "size_bytes": 66243,
+        "line_count": 1577
+      },
+      "first_line": 1130,
+      "last_line": 1469,
+      "range_sha256": "dd854e449424fb4d1b1bf1ddc719712ae631b1042b3cc081a6eb66401897b021",
+      "range_size_bytes": 18398,
+      "purpose": "whole ScanForReports cache and request source"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/General.hh",
+        "sha256": "d7dcfac7390ef66dfee198739e1886110c494dd54ef953d204bad78d710eb021",
+        "size_bytes": 17396,
+        "line_count": 376
+      },
+      "first_line": 332,
+      "last_line": 373,
+      "range_sha256": "a5587814f8748869fc7dbe8455b564a859151eaa007250a64cb2f64ac6c935c8",
+      "range_size_bytes": 1048,
+      "purpose": "General cache defaults"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+        "sha256": "2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25",
+        "size_bytes": 13547,
+        "line_count": 198
+      },
+      "first_line": 155,
+      "last_line": 165,
+      "range_sha256": "16fb1110447eef0662fec1637fe1772326ecbe808c75670f8894acbb46aaa080",
+      "range_size_bytes": 1388,
+      "purpose": "ShowDecayCurvesInEIO default"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataRuntimeLanguage.hh",
+        "sha256": "23956875a5223d1302fed2f0006b92b5ffd82ef5391de339f898d6ddf3839316",
+        "size_bytes": 43065,
+        "line_count": 878
+      },
+      "first_line": 777,
+      "last_line": 792,
+      "range_sha256": "c65e2876a9aa748d439eb5e34249d3b29f7635fe03fbf0f568ee819d26e1aa75",
+      "range_size_bytes": 1344,
+      "purpose": "EMS report companion defaults"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+        "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+        "size_bytes": 122929,
+        "line_count": 2450
+      },
+      "first_line": 487,
+      "last_line": 503,
+      "range_sha256": "407cdfd9cdb0e1e7795ca363bcad2842ae2715e8407dfe600d262fefb023ce07",
+      "range_size_bytes": 685,
+      "purpose": "legacy section count and absent sentinel"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+        "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+        "size_bytes": 122929,
+        "line_count": 2450
+      },
+      "first_line": 543,
+      "last_line": 565,
+      "range_sha256": "87faffffa868cd1959755ed3213b59faeb1906ebd1440f044442db59fc53dc9d",
+      "range_size_bytes": 813,
+      "purpose": "string defaults and case"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+        "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+        "size_bytes": 122929,
+        "line_count": 2450
+      },
+      "first_line": 726,
+      "last_line": 884,
+      "range_sha256": "b8e571ba9b6def555554c4887cc6562a45ca9d50dc24e840b48e1fca9e36a159",
+      "range_size_bytes": 6881,
+      "purpose": "whole alpha value/default/max-field processing"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+        "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+        "size_bytes": 122929,
+        "line_count": 2450
+      },
+      "first_line": 932,
+      "last_line": 1066,
+      "range_sha256": "45e33db8989fc846725483ee6d4c08078eeb3f8b315a47da5085fbc87f995929",
+      "range_size_bytes": 5639,
+      "purpose": "getObjectItem caller and array/field assignments"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+        "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+        "size_bytes": 122929,
+        "line_count": 2450
+      },
+      "first_line": 1216,
+      "last_line": 1260,
+      "range_sha256": "a20d58092c88cf336e020a20ae6a592b181fedf3ad2d827ef9bdea2ec46d9175",
+      "range_size_bytes": 1490,
+      "purpose": "getJSONObjNum input order"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/IdfParser.cc",
+        "sha256": "fdbab72d01cbce4d33ef06fecc4a57eddd17a9c8c30fb82e64a91ff92df38a78",
+        "size_bytes": 30215,
+        "line_count": 819
+      },
+      "first_line": 207,
+      "last_line": 306,
+      "range_sha256": "d7a093c3ab36c34a0914ec768a9f187acbef6f1bb1fcd9f3f8a2c24b48051abc",
+      "range_size_bytes": 4022,
+      "purpose": "whole parse_idf generated unnamed identities"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/IdfParser.cc",
+        "sha256": "fdbab72d01cbce4d33ef06fecc4a57eddd17a9c8c30fb82e64a91ff92df38a78",
+        "size_bytes": 30215,
+        "line_count": 819
+      },
+      "first_line": 308,
+      "last_line": 420,
+      "range_sha256": "6e1c46fc0f43f12a5700068e4029b0c7af4751119c246369e9eb29379ff93b4e",
+      "range_size_bytes": 5246,
+      "purpose": "actual physical and minimum-field metadata"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+        "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+        "size_bytes": 371103,
+        "line_count": 6206
+      },
+      "first_line": 6153,
+      "last_line": 6202,
+      "range_sha256": "6b12beadd771a49eb085143ddd5b4132746d7ba03158642d4f2919ea177ac306",
+      "range_size_bytes": 2411,
+      "purpose": "whole Init report postlude caller"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/idd/Energy+.idd.in",
+        "sha256": "62c94fef08c6a90f08630c6250a9f19d9dd701f249e2ff631070511ebfba651f",
+        "size_bytes": 4504288,
+        "line_count": 109473
+      },
+      "first_line": 104119,
+      "last_line": 104225,
+      "range_sha256": "b423a4f3b3089fbaf27ddec4ce59d9be4a6436986f06c96aebff3b0f1dd464d9",
+      "range_size_bytes": 3479,
+      "purpose": "five family IDD declarations/defaults"
+    },
+    {
+      "source": {
+        "path": "crates/ep_raw_model/src/lib.rs",
+        "sha256": "08f4a3bcf27c2f4e2577b534ad505176d0877b46709bb512b71685ebef6fa9a8",
+        "size_bytes": 16493,
+        "line_count": 491
+      },
+      "first_line": 112,
+      "last_line": 169,
+      "range_sha256": "b63c26b4e12d64870e80a9beed0e7f152d26039467674e7e360115161e4958e7",
+      "range_size_bytes": 2635,
+      "purpose": "existing effective input order owner"
+    },
+    {
+      "source": {
+        "path": "crates/ep_raw_model/src/lib.rs",
+        "sha256": "08f4a3bcf27c2f4e2577b534ad505176d0877b46709bb512b71685ebef6fa9a8",
+        "size_bytes": 16493,
+        "line_count": 491
+      },
+      "first_line": 306,
+      "last_line": 317,
+      "range_sha256": "c8f03c489f815053e9ebc0ac7ef5cdfa9e0858c481907adaeb3574b12abcb390",
+      "range_size_bytes": 437,
+      "purpose": "staged IDF overlay caller"
+    },
+    {
+      "source": {
+        "path": "crates/ep_raw_model/src/lib.rs",
+        "sha256": "08f4a3bcf27c2f4e2577b534ad505176d0877b46709bb512b71685ebef6fa9a8",
+        "size_bytes": 16493,
+        "line_count": 491
+      },
+      "first_line": 363,
+      "last_line": 374,
+      "range_sha256": "24b163c8b33b47eb070132fae67b65839dfb6a80b5247511624688a84d483057",
+      "range_size_bytes": 388,
+      "purpose": "direct parser and overlay API"
+    },
+    {
+      "source": {
+        "path": "crates/ep_compiler/src/compiler.rs",
+        "sha256": "52498a97e0444c82a91bcf7c362f70608822dc9d2428f1a37e568940c55b97a5",
+        "size_bytes": 771820,
+        "line_count": 19738
+      },
+      "first_line": 14836,
+      "last_line": 14854,
+      "range_sha256": "1f4ecb8dcfdfb18eff97cabf00622e5a49801fbfea38af2f0ea2a26fa51628bb",
+      "range_size_bytes": 608,
+      "purpose": "existing compiler ordered cloned objects"
+    },
+    {
+      "source": {
+        "path": "crates/ep_compiler/src/compiler.rs",
+        "sha256": "52498a97e0444c82a91bcf7c362f70608822dc9d2428f1a37e568940c55b97a5",
+        "size_bytes": 771820,
+        "line_count": 19738
+      },
+      "first_line": 16533,
+      "last_line": 16546,
+      "range_sha256": "bedfbd1fc7798d32211e6ee88df0553ed37475e2456e4ff6f41971fc1410c3d9",
+      "range_size_bytes": 489,
+      "purpose": "existing default ledger"
+    },
+    {
+      "source": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+        "size_bytes": 9275,
+        "line_count": 680
+      },
+      "first_line": 328,
+      "last_line": 338,
+      "range_sha256": "9d60be9c06f0eb24560a951433dae9c90c9d119325f6b37dc66e3a9ceb8916dd",
+      "range_size_bytes": 172,
+      "purpose": "input-only actual A report requests"
+    },
+    {
+      "source": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+        "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12",
+        "size_bytes": 13025,
+        "line_count": 894
+      },
+      "first_line": 352,
+      "last_line": 358,
+      "range_sha256": "aedb922c4d42598119c11768870e865976738c8f86f29a2d2f2e18cdaa377a4e",
+      "range_size_bytes": 87,
+      "purpose": "input-only actual B dictionary request"
+    }
+  ],
+  "current_before_contract": {
+    "parents": 5,
+    "new_destinations_absent": 3,
+    "all_before_archives_byte_equal_current_at_seal": true,
+    "rebase_required_if_before_changes": true
+  },
+  "prepared_tests": {
+    "additional_focused_tests": 8,
+    "executed": false,
+    "groups": [
+      "compiler actual A requests/defaults",
+      "compiler IDF unnamed order and second blank count",
+      "raw twelve unnamed report order and field-count retention",
+      "runtime first-scan all-family/cache reuse",
+      "runtime unknown map EMPTY warning",
+      "runtime Materials/NumAlphas/optional references",
+      "runtime legacy/last options/EMS reset",
+      "runtime missing Surfaces key typed boundary"
+    ]
+  },
+  "runtime_interfaces": {
+    "input_owner": "ep_model::ReportInputs in TypedModel.report_inputs",
+    "compiler_producer": "Compiler::parse_report_inputs in actual compile path",
+    "cache_owner": "ep_runtime::heat_balance::report_scan::ReportScanState",
+    "function": "scan_for_reports(input, state, report_name, report_key, option1, option2, diagnostic) -> Result<bool, ReportScanUnavailable>",
+    "diagnostic_authority": "synchronous actual warning/continue call arguments only; backend not certified",
+    "first_scan_order": [
+      "Output:Surfaces:List",
+      "Output:Surfaces:Drawing",
+      "Report Variable Dictionary",
+      "Output:VariableDictionary",
+      "Output:Constructions",
+      "Output:EnergyManagementSystem"
+    ]
+  },
+  "scope_limits": {
+    "ordinary_postlude_activated": false,
+    "predefined_tables_or_EIO_report_implemented": false,
+    "full_warning_or_fatal_backend_implemented": false,
+    "generic_InputProcessor_or_unused_input_ledger_complete": false,
+    "whole_Init_or_CTF10_PASS_claimed": false,
+    "future_RuntimeSourceSnapshot": null,
+    "future_execution_receipt": null,
+    "future_Native_observation": null
+  },
+  "source_only_checks": {
+    "exact_unified_diffs": 8,
+    "literal_existing_named_record_body_restored": true,
+    "added_test_count": 8,
+    "no_project_source_imported_or_executed": true,
+    "no_targets_formatter_Cargo_Git_or_canonical_mutation": true,
+    "no_scientific_output_binary_or_weather_payload_read": true
+  }
+}

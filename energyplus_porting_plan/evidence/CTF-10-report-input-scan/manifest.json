@@ -1,0 +1,1095 @@
+{
+  "schema": "ctf10-selected-report-input-scan-implementation-evidence.v1",
+  "selected_files": [
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/before/crates/ep_compiler/src/compiler.rs",
+        "sha256": "52498a97e0444c82a91bcf7c362f70608822dc9d2428f1a37e568940c55b97a5",
+        "size_bytes": 771820
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/52498a97e0444c82a91bcf7c362f70608822dc9d2428f1a37e568940c55b97a5",
+        "sha256": "52498a97e0444c82a91bcf7c362f70608822dc9d2428f1a37e568940c55b97a5",
+        "size_bytes": 771820
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/before/crates/ep_model/src/lib.rs",
+        "sha256": "2a756532553034fb2b92c892cb2e6f3c147aa129f6dce64b63763f364cb3cee4",
+        "size_bytes": 284
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/2a756532553034fb2b92c892cb2e6f3c147aa129f6dce64b63763f364cb3cee4",
+        "sha256": "2a756532553034fb2b92c892cb2e6f3c147aa129f6dce64b63763f364cb3cee4",
+        "size_bytes": 284
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/before/crates/ep_model/src/model.rs",
+        "sha256": "8fe75e51f50682d68d185d18613b4e1505093d071cc4db19947ef03756bbbf32",
+        "size_bytes": 92680
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/8fe75e51f50682d68d185d18613b4e1505093d071cc4db19947ef03756bbbf32",
+        "sha256": "8fe75e51f50682d68d185d18613b4e1505093d071cc4db19947ef03756bbbf32",
+        "size_bytes": 92680
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/before/crates/ep_raw_model/src/idf_order.rs",
+        "sha256": "5f2a1984ebc76a51938232ab7002c9c683666cf88d765af8e02dbf126bad7772",
+        "size_bytes": 28468
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/5f2a1984ebc76a51938232ab7002c9c683666cf88d765af8e02dbf126bad7772",
+        "sha256": "5f2a1984ebc76a51938232ab7002c9c683666cf88d765af8e02dbf126bad7772",
+        "size_bytes": 28468
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/before/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "f9d8ac68da094b48c7b555ac4bc0e903485d605289c8bc26fc4a9660c93a70a8",
+        "size_bytes": 1905
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/f9d8ac68da094b48c7b555ac4bc0e903485d605289c8bc26fc4a9660c93a70a8",
+        "sha256": "f9d8ac68da094b48c7b555ac4bc0e903485d605289c8bc26fc4a9660c93a70a8",
+        "size_bytes": 1905
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/diffs/crates__ep_compiler__src__compiler.rs.diff",
+        "sha256": "20876d5fa51b01800027337e063f9bd54455cd7971fe974134c6f3d2262873f0",
+        "size_bytes": 996
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/20876d5fa51b01800027337e063f9bd54455cd7971fe974134c6f3d2262873f0",
+        "sha256": "20876d5fa51b01800027337e063f9bd54455cd7971fe974134c6f3d2262873f0",
+        "size_bytes": 996
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/diffs/crates__ep_compiler__src__compiler__report_inputs.rs.diff",
+        "sha256": "bb0508fb5d8fc9db7940dd9afd8cd3edc39cdbe9811550e0fb427de002626353",
+        "size_bytes": 6770
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/bb0508fb5d8fc9db7940dd9afd8cd3edc39cdbe9811550e0fb427de002626353",
+        "sha256": "bb0508fb5d8fc9db7940dd9afd8cd3edc39cdbe9811550e0fb427de002626353",
+        "size_bytes": 6770
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/diffs/crates__ep_model__src__lib.rs.diff",
+        "sha256": "45adc46a3421576033805082201fd2b4472fe79a1112e8759812a6ccc080ab6c",
+        "size_bytes": 363
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/45adc46a3421576033805082201fd2b4472fe79a1112e8759812a6ccc080ab6c",
+        "sha256": "45adc46a3421576033805082201fd2b4472fe79a1112e8759812a6ccc080ab6c",
+        "size_bytes": 363
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/diffs/crates__ep_model__src__model.rs.diff",
+        "sha256": "fe24ba3d3be8d22146b4899826f60a12e8a3d38674d82d574b9dc4ab948f7989",
+        "size_bytes": 1098
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/fe24ba3d3be8d22146b4899826f60a12e8a3d38674d82d574b9dc4ab948f7989",
+        "sha256": "fe24ba3d3be8d22146b4899826f60a12e8a3d38674d82d574b9dc4ab948f7989",
+        "size_bytes": 1098
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/diffs/crates__ep_model__src__report_inputs.rs.diff",
+        "sha256": "722a213e91cbe59035e928b7f59177c9f2e425479a6f0c474b2f106b357cc901",
+        "size_bytes": 2919
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/722a213e91cbe59035e928b7f59177c9f2e425479a6f0c474b2f106b357cc901",
+        "sha256": "722a213e91cbe59035e928b7f59177c9f2e425479a6f0c474b2f106b357cc901",
+        "size_bytes": 2919
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/diffs/crates__ep_raw_model__src__idf_order.rs.diff",
+        "sha256": "03905ed469aac66fc615e85f6bc84dc265a883ec56d5847b997d509b3b039c7c",
+        "size_bytes": 5429
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/03905ed469aac66fc615e85f6bc84dc265a883ec56d5847b997d509b3b039c7c",
+        "sha256": "03905ed469aac66fc615e85f6bc84dc265a883ec56d5847b997d509b3b039c7c",
+        "size_bytes": 5429
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/diffs/crates__ep_runtime__src__heat_balance__mod.rs.diff",
+        "sha256": "4e5042ef39e6b224701ba471491f75311f5f940c8a4e8ae534df922c48a0a3dd",
+        "size_bytes": 252
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/4e5042ef39e6b224701ba471491f75311f5f940c8a4e8ae534df922c48a0a3dd",
+        "sha256": "4e5042ef39e6b224701ba471491f75311f5f940c8a4e8ae534df922c48a0a3dd",
+        "size_bytes": 252
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/diffs/crates__ep_runtime__src__heat_balance__report_scan.rs.diff",
+        "sha256": "43ed0eb744c2e5df742ebe278ebcac954aa5bb242acf5fb3e82211618a97e8df",
+        "size_bytes": 14846
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/43ed0eb744c2e5df742ebe278ebcac954aa5bb242acf5fb3e82211618a97e8df",
+        "sha256": "43ed0eb744c2e5df742ebe278ebcac954aa5bb242acf5fb3e82211618a97e8df",
+        "size_bytes": 14846
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/manifest.json",
+        "sha256": "0f1570074b6aea63132ecf904d262bf4fc1b6a3a00a9268756703f83734562d7",
+        "size_bytes": 21938
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/0f1570074b6aea63132ecf904d262bf4fc1b6a3a00a9268756703f83734562d7",
+        "sha256": "0f1570074b6aea63132ecf904d262bf4fc1b6a3a00a9268756703f83734562d7",
+        "size_bytes": 21938
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/proposed/crates/ep_compiler/src/compiler/report_inputs.rs",
+        "sha256": "52afa544b7fd4201a1317d4f339ce930b7982035dd5991dfaf77a3c0c6e2d7b6",
+        "size_bytes": 6565
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/52afa544b7fd4201a1317d4f339ce930b7982035dd5991dfaf77a3c0c6e2d7b6",
+        "sha256": "52afa544b7fd4201a1317d4f339ce930b7982035dd5991dfaf77a3c0c6e2d7b6",
+        "size_bytes": 6565
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/proposed/crates/ep_compiler/src/compiler.rs",
+        "sha256": "90c40535d6393e8cd6def34b498bc88d43509ff2efa1bc51e0ba5fada0e62825",
+        "size_bytes": 772042
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/90c40535d6393e8cd6def34b498bc88d43509ff2efa1bc51e0ba5fada0e62825",
+        "sha256": "90c40535d6393e8cd6def34b498bc88d43509ff2efa1bc51e0ba5fada0e62825",
+        "size_bytes": 772042
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/proposed/crates/ep_model/src/lib.rs",
+        "sha256": "dd2fa6189146f9eb03adc913f79901b056f5e6fdb095089bcf1828cb50fb12b1",
+        "size_bytes": 329
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/dd2fa6189146f9eb03adc913f79901b056f5e6fdb095089bcf1828cb50fb12b1",
+        "sha256": "dd2fa6189146f9eb03adc913f79901b056f5e6fdb095089bcf1828cb50fb12b1",
+        "size_bytes": 329
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/proposed/crates/ep_model/src/model.rs",
+        "sha256": "0f76bbf0675145f8da3b56f711ced71e25bcbdafc0160f60b386978fe3be8db4",
+        "size_bytes": 92905
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/0f76bbf0675145f8da3b56f711ced71e25bcbdafc0160f60b386978fe3be8db4",
+        "sha256": "0f76bbf0675145f8da3b56f711ced71e25bcbdafc0160f60b386978fe3be8db4",
+        "size_bytes": 92905
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/proposed/crates/ep_model/src/report_inputs.rs",
+        "sha256": "832e827990ae552500ca17ce5fb4366471596411d3ca9f3bf8a9a04d4dfe1b5e",
+        "size_bytes": 2773
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/832e827990ae552500ca17ce5fb4366471596411d3ca9f3bf8a9a04d4dfe1b5e",
+        "sha256": "832e827990ae552500ca17ce5fb4366471596411d3ca9f3bf8a9a04d4dfe1b5e",
+        "size_bytes": 2773
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/proposed/crates/ep_raw_model/src/idf_order.rs",
+        "sha256": "e9fd5eb108f048fc62f96c4b090433ed7e13ab0e5f27d6ceee7a318c53ffb028",
+        "size_bytes": 31640
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/e9fd5eb108f048fc62f96c4b090433ed7e13ab0e5f27d6ceee7a318c53ffb028",
+        "sha256": "e9fd5eb108f048fc62f96c4b090433ed7e13ab0e5f27d6ceee7a318c53ffb028",
+        "size_bytes": 31640
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/proposed/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "90637d7ba5a12a857c84c4cca3d6a3d7cd62dedb1216cc99b7ea8e1d7991b4cd",
+        "size_bytes": 1926
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/90637d7ba5a12a857c84c4cca3d6a3d7cd62dedb1216cc99b7ea8e1d7991b4cd",
+        "sha256": "90637d7ba5a12a857c84c4cca3d6a3d7cd62dedb1216cc99b7ea8e1d7991b4cd",
+        "size_bytes": 1926
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/proposed/crates/ep_runtime/src/heat_balance/report_scan.rs",
+        "sha256": "7f9a3a93018e2c78f485bf39de5c23b8869e8c5cdd632166b314f50a77a8976b",
+        "size_bytes": 14475
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/7f9a3a93018e2c78f485bf39de5c23b8869e8c5cdd632166b314f50a77a8976b",
+        "sha256": "7f9a3a93018e2c78f485bf39de5c23b8869e8c5cdd632166b314f50a77a8976b",
+        "size_bytes": 14475
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/README.md",
+        "sha256": "97bc312a46190d21e07f228625246af6da6b2d8dfabd7536c638c85ccfeb6e64",
+        "size_bytes": 5007
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/97bc312a46190d21e07f228625246af6da6b2d8dfabd7536c638c85ccfeb6e64",
+        "sha256": "97bc312a46190d21e07f228625246af6da6b2d8dfabd7536c638c85ccfeb6e64",
+        "size_bytes": 5007
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-prep-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/source-context.json",
+        "sha256": "3767e02dd4429b04cad88d29df8e0f16a4462c430132baf3b01d1569329ed9b3",
+        "size_bytes": 7442
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/3767e02dd4429b04cad88d29df8e0f16a4462c430132baf3b01d1569329ed9b3",
+        "sha256": "3767e02dd4429b04cad88d29df8e0f16a4462c430132baf3b01d1569329ed9b3",
+        "size_bytes": 7442
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-applied-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/accepted.json",
+        "sha256": "98bd31df09d2b4697592be1adc1e0978cfd9a384771f0bf850e39ab60d2da3ae",
+        "size_bytes": 8854
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/98bd31df09d2b4697592be1adc1e0978cfd9a384771f0bf850e39ab60d2da3ae",
+        "sha256": "98bd31df09d2b4697592be1adc1e0978cfd9a384771f0bf850e39ab60d2da3ae",
+        "size_bytes": 8854
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-applied-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/final/00-report_inputs.rs",
+        "sha256": "ceabfc0a545b5f226e8ada9970c41481092d0cfb514cacb6c29f2306a969c744",
+        "size_bytes": 8254
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/ceabfc0a545b5f226e8ada9970c41481092d0cfb514cacb6c29f2306a969c744",
+        "sha256": "ceabfc0a545b5f226e8ada9970c41481092d0cfb514cacb6c29f2306a969c744",
+        "size_bytes": 8254
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-applied-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/final/01-compiler.rs",
+        "sha256": "90c40535d6393e8cd6def34b498bc88d43509ff2efa1bc51e0ba5fada0e62825",
+        "size_bytes": 772042
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/90c40535d6393e8cd6def34b498bc88d43509ff2efa1bc51e0ba5fada0e62825",
+        "sha256": "90c40535d6393e8cd6def34b498bc88d43509ff2efa1bc51e0ba5fada0e62825",
+        "size_bytes": 772042
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-applied-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/final/02-lib.rs",
+        "sha256": "dd2fa6189146f9eb03adc913f79901b056f5e6fdb095089bcf1828cb50fb12b1",
+        "size_bytes": 329
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/dd2fa6189146f9eb03adc913f79901b056f5e6fdb095089bcf1828cb50fb12b1",
+        "sha256": "dd2fa6189146f9eb03adc913f79901b056f5e6fdb095089bcf1828cb50fb12b1",
+        "size_bytes": 329
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-applied-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/final/03-model.rs",
+        "sha256": "0f76bbf0675145f8da3b56f711ced71e25bcbdafc0160f60b386978fe3be8db4",
+        "size_bytes": 92905
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/0f76bbf0675145f8da3b56f711ced71e25bcbdafc0160f60b386978fe3be8db4",
+        "sha256": "0f76bbf0675145f8da3b56f711ced71e25bcbdafc0160f60b386978fe3be8db4",
+        "size_bytes": 92905
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-applied-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/final/04-report_inputs.rs",
+        "sha256": "42b11d92394443df14f46e0e7d609281a102f79d56659eb7923087ffff7dbb04",
+        "size_bytes": 2846
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/42b11d92394443df14f46e0e7d609281a102f79d56659eb7923087ffff7dbb04",
+        "sha256": "42b11d92394443df14f46e0e7d609281a102f79d56659eb7923087ffff7dbb04",
+        "size_bytes": 2846
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-applied-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/final/05-idf_order.rs",
+        "sha256": "ed6f7148f8e956a1a27eed0d24b351a26204c395158dcf32e039a764713b1e42",
+        "size_bytes": 32076
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/ed6f7148f8e956a1a27eed0d24b351a26204c395158dcf32e039a764713b1e42",
+        "sha256": "ed6f7148f8e956a1a27eed0d24b351a26204c395158dcf32e039a764713b1e42",
+        "size_bytes": 32076
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-applied-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/final/06-mod.rs",
+        "sha256": "705e5c6008317973c5498fc15ddd372b357ac295c0a718c4c8260afb113e5182",
+        "size_bytes": 1926
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/705e5c6008317973c5498fc15ddd372b357ac295c0a718c4c8260afb113e5182",
+        "sha256": "705e5c6008317973c5498fc15ddd372b357ac295c0a718c4c8260afb113e5182",
+        "size_bytes": 1926
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-applied-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/final/07-report_scan.rs",
+        "sha256": "f718395d9ee88fb2aa2399bfd3835b9575f9cf1fac44ff6a3ebd7fc1b77cb322",
+        "size_bytes": 17811
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/f718395d9ee88fb2aa2399bfd3835b9575f9cf1fac44ff6a3ebd7fc1b77cb322",
+        "sha256": "f718395d9ee88fb2aa2399bfd3835b9575f9cf1fac44ff6a3ebd7fc1b77cb322",
+        "size_bytes": 17811
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-applied-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/format-diffs/00.diff",
+        "sha256": "15e49e3c63fb220883bd0cf5fdde72bea9ff4322c8c4061173eaeefcbb6978f3",
+        "size_bytes": 9083
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/15e49e3c63fb220883bd0cf5fdde72bea9ff4322c8c4061173eaeefcbb6978f3",
+        "sha256": "15e49e3c63fb220883bd0cf5fdde72bea9ff4322c8c4061173eaeefcbb6978f3",
+        "size_bytes": 9083
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-applied-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/format-diffs/01.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-applied-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/format-diffs/02.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-applied-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/format-diffs/03.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-applied-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/format-diffs/04.diff",
+        "sha256": "263c0f1d3c60476e8ecc578668545498e7ddc41a60903eb4159cd9486dee93df",
+        "size_bytes": 787
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/263c0f1d3c60476e8ecc578668545498e7ddc41a60903eb4159cd9486dee93df",
+        "sha256": "263c0f1d3c60476e8ecc578668545498e7ddc41a60903eb4159cd9486dee93df",
+        "size_bytes": 787
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-applied-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/format-diffs/05.diff",
+        "sha256": "581620ab3407237bef0c731a99b2ae33dea591461e3875927a16b75ae666cb48",
+        "size_bytes": 5286
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/581620ab3407237bef0c731a99b2ae33dea591461e3875927a16b75ae666cb48",
+        "sha256": "581620ab3407237bef0c731a99b2ae33dea591461e3875927a16b75ae666cb48",
+        "size_bytes": 5286
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-applied-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/format-diffs/06.diff",
+        "sha256": "4d0c3eacd97b5c92c0226f2eaaab9fb9712eeff6117e3123c1046aced500fc7f",
+        "size_bytes": 348
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/4d0c3eacd97b5c92c0226f2eaaab9fb9712eeff6117e3123c1046aced500fc7f",
+        "sha256": "4d0c3eacd97b5c92c0226f2eaaab9fb9712eeff6117e3123c1046aced500fc7f",
+        "size_bytes": 348
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-applied-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/format-diffs/07.diff",
+        "sha256": "a6d99893b94849582e63b351fd5ec2ac8e7f05691340c410926abc3d89b4c7e9",
+        "size_bytes": 21392
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/a6d99893b94849582e63b351fd5ec2ac8e7f05691340c410926abc3d89b4c7e9",
+        "sha256": "a6d99893b94849582e63b351fd5ec2ac8e7f05691340c410926abc3d89b4c7e9",
+        "size_bytes": 21392
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-scan-applied-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/record.json",
+        "sha256": "f7f6c3b52aca53ae456a25629563ea8f7ac3256d6eef3a25644a08f75a123e61",
+        "size_bytes": 9109
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/f7f6c3b52aca53ae456a25629563ea8f7ac3256d6eef3a25644a08f75a123e61",
+        "sha256": "f7f6c3b52aca53ae456a25629563ea8f7ac3256d6eef3a25644a08f75a123e61",
+        "size_bytes": 9109
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-prerequisite-build-storage-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-prerequisite-build-storage-01/ep_runtime-66fb47c0a0c3f9ea.exe.log",
+        "sha256": "2429a07d7bef1e121235e764a4a43b8f3869884c7289b64055a1f2e07cef5bf1",
+        "size_bytes": 251
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/2429a07d7bef1e121235e764a4a43b8f3869884c7289b64055a1f2e07cef5bf1",
+        "sha256": "2429a07d7bef1e121235e764a4a43b8f3869884c7289b64055a1f2e07cef5bf1",
+        "size_bytes": 251
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-prerequisite-build-storage-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-prerequisite-build-storage-01/ep_runtime-e0c54ff24afbb601.exe.log",
+        "sha256": "673f464964eecbc61345d54f2393dfabc9bec858f1f43a87b9c37870b16252ba",
+        "size_bytes": 251
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/673f464964eecbc61345d54f2393dfabc9bec858f1f43a87b9c37870b16252ba",
+        "sha256": "673f464964eecbc61345d54f2393dfabc9bec858f1f43a87b9c37870b16252ba",
+        "size_bytes": 251
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-prerequisite-build-storage-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-prerequisite-build-storage-01/ep_runtime-f5a9aea3364ab9b8.exe.log",
+        "sha256": "0d7a4f8000334c3f9b4d090b4852e5e11273346068d92344bac5bc005bc2d48f",
+        "size_bytes": 251
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/0d7a4f8000334c3f9b4d090b4852e5e11273346068d92344bac5bc005bc2d48f",
+        "sha256": "0d7a4f8000334c3f9b4d090b4852e5e11273346068d92344bac5bc005bc2d48f",
+        "size_bytes": 251
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-prerequisite-build-storage-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-prerequisite-build-storage-01/eplus_rs-dfdce69381af6960.exe.log",
+        "sha256": "32622ff7bfb05c23c01ece4004098391f5270c47db0a607c55c1ee8861e42af0",
+        "size_bytes": 251
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/32622ff7bfb05c23c01ece4004098391f5270c47db0a607c55c1ee8861e42af0",
+        "sha256": "32622ff7bfb05c23c01ece4004098391f5270c47db0a607c55c1ee8861e42af0",
+        "size_bytes": 251
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-prerequisite-build-storage-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-prerequisite-build-storage-01/libep_runtime-07bf30ac84350275.rlib.log",
+        "sha256": "80deaebcf9b363893b511f6f3b522ac6d950b06fa40bded23e49815732791bfb",
+        "size_bytes": 251
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/80deaebcf9b363893b511f6f3b522ac6d950b06fa40bded23e49815732791bfb",
+        "sha256": "80deaebcf9b363893b511f6f3b522ac6d950b06fa40bded23e49815732791bfb",
+        "size_bytes": 251
+      }
+    },
+    {
+      "role": "reviewed-source-application-or-storage/report-input-prerequisite-build-storage-01",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-prerequisite-build-storage-01/record.json",
+        "sha256": "3066328b7bdda71cd163c867cfb8458ace0038bb69c983426852c35d58143013",
+        "size_bytes": 4223
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/3066328b7bdda71cd163c867cfb8458ace0038bb69c983426852c35d58143013",
+        "sha256": "3066328b7bdda71cd163c867cfb8458ace0038bb69c983426852c35d58143013",
+        "size_bytes": 4223
+      }
+    },
+    {
+      "role": "actual-quality/fmt-check",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-fmt-check-command-01/receipt.json",
+        "sha256": "988f2a9db466b52740c13b0fab3744140ba82fb8299d854053eb5fdcd69b1dff",
+        "size_bytes": 3404
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/988f2a9db466b52740c13b0fab3744140ba82fb8299d854053eb5fdcd69b1dff",
+        "sha256": "988f2a9db466b52740c13b0fab3744140ba82fb8299d854053eb5fdcd69b1dff",
+        "size_bytes": 3404
+      }
+    },
+    {
+      "role": "actual-quality/fmt-check",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-fmt-check-command-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "role": "actual-quality/fmt-check",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-fmt-check-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "role": "actual-quality/fmt-check",
+      "original": {
+        "path": ".runtime/porting/source-objects/95/95197194b3c81732677230e3699d3522f03e3890077688d85907745ebf57a723",
+        "sha256": "95197194b3c81732677230e3699d3522f03e3890077688d85907745ebf57a723",
+        "size_bytes": 1615649
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/95197194b3c81732677230e3699d3522f03e3890077688d85907745ebf57a723",
+        "sha256": "95197194b3c81732677230e3699d3522f03e3890077688d85907745ebf57a723",
+        "size_bytes": 1615649
+      }
+    },
+    {
+      "role": "actual-quality/fmt-check",
+      "original": {
+        "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+        "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+        "size_bytes": 8125
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+        "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+        "size_bytes": 8125
+      }
+    },
+    {
+      "role": "actual-quality/clippy",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-clippy-command-01/receipt.json",
+        "sha256": "76ad70cb2fc42a626b1cb26ea54a0f60e924e32c4ba37a350fc42f86227f633f",
+        "size_bytes": 3589
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/76ad70cb2fc42a626b1cb26ea54a0f60e924e32c4ba37a350fc42f86227f633f",
+        "sha256": "76ad70cb2fc42a626b1cb26ea54a0f60e924e32c4ba37a350fc42f86227f633f",
+        "size_bytes": 3589
+      }
+    },
+    {
+      "role": "actual-quality/clippy",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-clippy-command-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "role": "actual-quality/clippy",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-clippy-command-01/stderr.log",
+        "sha256": "8b1e162f356299e12104cd5fd605b68ef3e4095444f4b9f5aa4c458873d888c3",
+        "size_bytes": 683
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/8b1e162f356299e12104cd5fd605b68ef3e4095444f4b9f5aa4c458873d888c3",
+        "sha256": "8b1e162f356299e12104cd5fd605b68ef3e4095444f4b9f5aa4c458873d888c3",
+        "size_bytes": 683
+      }
+    },
+    {
+      "role": "actual-quality/focused",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-focused-command-01/receipt.json",
+        "sha256": "461376ff9db17529ac267997dd084c12b71f11004a4a80f92e99833685a1b1a4",
+        "size_bytes": 3577
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/461376ff9db17529ac267997dd084c12b71f11004a4a80f92e99833685a1b1a4",
+        "sha256": "461376ff9db17529ac267997dd084c12b71f11004a4a80f92e99833685a1b1a4",
+        "size_bytes": 3577
+      }
+    },
+    {
+      "role": "actual-quality/focused",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-focused-command-01/stdout.log",
+        "sha256": "c2cca4b3cf4a5c2a0912fe90f62980b6a4f0296cab1c8f0e271b47f51028018b",
+        "size_bytes": 32464
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/c2cca4b3cf4a5c2a0912fe90f62980b6a4f0296cab1c8f0e271b47f51028018b",
+        "sha256": "c2cca4b3cf4a5c2a0912fe90f62980b6a4f0296cab1c8f0e271b47f51028018b",
+        "size_bytes": 32464
+      }
+    },
+    {
+      "role": "actual-quality/focused",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-focused-command-01/stderr.log",
+        "sha256": "2723219feedd31d779587491366c6ac6772fdaf0816e3df89e75cb03da3f827b",
+        "size_bytes": 356
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/2723219feedd31d779587491366c6ac6772fdaf0816e3df89e75cb03da3f827b",
+        "sha256": "2723219feedd31d779587491366c6ac6772fdaf0816e3df89e75cb03da3f827b",
+        "size_bytes": 356
+      }
+    },
+    {
+      "role": "actual-quality/workspace",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-workspace-command-01/receipt.json",
+        "sha256": "18f15f8e55c68763202aebe7509ebdc02f2f9294c385bd4f892188bce2c1f299",
+        "size_bytes": 3537
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/18f15f8e55c68763202aebe7509ebdc02f2f9294c385bd4f892188bce2c1f299",
+        "sha256": "18f15f8e55c68763202aebe7509ebdc02f2f9294c385bd4f892188bce2c1f299",
+        "size_bytes": 3537
+      }
+    },
+    {
+      "role": "actual-quality/workspace",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-workspace-command-01/stdout.log",
+        "sha256": "2d7058a5bd319508e7926cbeaa761cf6cdf3ab5fbe23d810b3604b198c242646",
+        "size_bytes": 747485
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/2d7058a5bd319508e7926cbeaa761cf6cdf3ab5fbe23d810b3604b198c242646",
+        "sha256": "2d7058a5bd319508e7926cbeaa761cf6cdf3ab5fbe23d810b3604b198c242646",
+        "size_bytes": 747485
+      }
+    },
+    {
+      "role": "actual-quality/workspace",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-workspace-command-01/stderr.log",
+        "sha256": "9c7aefc9028f5085f6d3414d3885025c30d015cd933380ff640141afd1b3040a",
+        "size_bytes": 2099
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/9c7aefc9028f5085f6d3414d3885025c30d015cd933380ff640141afd1b3040a",
+        "sha256": "9c7aefc9028f5085f6d3414d3885025c30d015cd933380ff640141afd1b3040a",
+        "size_bytes": 2099
+      }
+    },
+    {
+      "role": "actual-source-application-or-storage",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-apply-command-01/receipt.json",
+        "sha256": "686c276e087be04b340182b75da842c8c0ff12dc0f241b38fca6616942268806",
+        "size_bytes": 3072
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/686c276e087be04b340182b75da842c8c0ff12dc0f241b38fca6616942268806",
+        "sha256": "686c276e087be04b340182b75da842c8c0ff12dc0f241b38fca6616942268806",
+        "size_bytes": 3072
+      }
+    },
+    {
+      "role": "actual-source-application-or-storage",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-apply-command-01/stdout.log",
+        "sha256": "424218359f60bd8b709429115f390e13d0eba2de4f7ab1ecee6894ade1111271",
+        "size_bytes": 481
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/424218359f60bd8b709429115f390e13d0eba2de4f7ab1ecee6894ade1111271",
+        "sha256": "424218359f60bd8b709429115f390e13d0eba2de4f7ab1ecee6894ade1111271",
+        "size_bytes": 481
+      }
+    },
+    {
+      "role": "actual-source-application-or-storage",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-apply-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "role": "actual-source-application-or-storage",
+      "original": {
+        "path": ".runtime/porting/source-objects/8f/8f448858790b56e3ff7ed97109aea23be1c936ad8e94bd3c4999c016a92c7216",
+        "sha256": "8f448858790b56e3ff7ed97109aea23be1c936ad8e94bd3c4999c016a92c7216",
+        "size_bytes": 1614618
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/8f448858790b56e3ff7ed97109aea23be1c936ad8e94bd3c4999c016a92c7216",
+        "sha256": "8f448858790b56e3ff7ed97109aea23be1c936ad8e94bd3c4999c016a92c7216",
+        "size_bytes": 1614618
+      }
+    },
+    {
+      "role": "actual-source-application-or-storage",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-format-command-01/receipt.json",
+        "sha256": "d4bae09cc844e40e6ef477cecd037afcf90b35fa1e425431c07a079c62c10990",
+        "size_bytes": 3374
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/d4bae09cc844e40e6ef477cecd037afcf90b35fa1e425431c07a079c62c10990",
+        "sha256": "d4bae09cc844e40e6ef477cecd037afcf90b35fa1e425431c07a079c62c10990",
+        "size_bytes": 3374
+      }
+    },
+    {
+      "role": "actual-source-application-or-storage",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-format-command-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "role": "actual-source-application-or-storage",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-format-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "role": "actual-source-application-or-storage",
+      "original": {
+        "path": ".runtime/porting/source-objects/8f/8f9a760998caf2767e14425aac91e737877629435259376a5287ee3d4d35e3e1",
+        "sha256": "8f9a760998caf2767e14425aac91e737877629435259376a5287ee3d4d35e3e1",
+        "size_bytes": 1615649
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/8f9a760998caf2767e14425aac91e737877629435259376a5287ee3d4d35e3e1",
+        "sha256": "8f9a760998caf2767e14425aac91e737877629435259376a5287ee3d4d35e3e1",
+        "size_bytes": 1615649
+      }
+    },
+    {
+      "role": "actual-source-application-or-storage",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-prerequisite-build-storage-command-01/receipt.json",
+        "sha256": "8d541306320929e63301a2fc66541c37fed0df1aa918cc6da94a9f36ba22419b",
+        "size_bytes": 7473
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/8d541306320929e63301a2fc66541c37fed0df1aa918cc6da94a9f36ba22419b",
+        "sha256": "8d541306320929e63301a2fc66541c37fed0df1aa918cc6da94a9f36ba22419b",
+        "size_bytes": 7473
+      }
+    },
+    {
+      "role": "actual-source-application-or-storage",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-prerequisite-build-storage-command-01/stdout.log",
+        "sha256": "f546d7d2588f88f015212c85cfbbedbeaa0c398ddc516e0da19e58138d41015b",
+        "size_bytes": 462
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/f546d7d2588f88f015212c85cfbbedbeaa0c398ddc516e0da19e58138d41015b",
+        "sha256": "f546d7d2588f88f015212c85cfbbedbeaa0c398ddc516e0da19e58138d41015b",
+        "size_bytes": 462
+      }
+    },
+    {
+      "role": "actual-source-application-or-storage",
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-input-prerequisite-build-storage-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "role": "executed-Root-source",
+      "original": {
+        "path": ".runtime/porting/CTF-10/apply-report-input-scan-01.py",
+        "sha256": "e03da0ed8301272d972d91889c01d6ed9e561edefd134d5555bc7fa832d42759",
+        "size_bytes": 3147
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/e03da0ed8301272d972d91889c01d6ed9e561edefd134d5555bc7fa832d42759",
+        "sha256": "e03da0ed8301272d972d91889c01d6ed9e561edefd134d5555bc7fa832d42759",
+        "size_bytes": 3147
+      }
+    },
+    {
+      "role": "executed-Root-source",
+      "original": {
+        "path": ".runtime/porting/CTF-10/compress-report-input-prerequisite-build-cache-01.py",
+        "sha256": "5d6ddc5b4ad9b2934130e0aa068e5124d1e96642f1adb76b7f6d18f1d2a1b0fe",
+        "size_bytes": 1853
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/5d6ddc5b4ad9b2934130e0aa068e5124d1e96642f1adb76b7f6d18f1d2a1b0fe",
+        "sha256": "5d6ddc5b4ad9b2934130e0aa068e5124d1e96642f1adb76b7f6d18f1d2a1b0fe",
+        "size_bytes": 1853
+      }
+    },
+    {
+      "role": "executed-Root-finalization-source",
+      "original": {
+        "path": ".runtime/porting/CTF-10/finalize-report-input-scan-01.py",
+        "sha256": "15347b7089cbfca83bc320ac702684a7a66dbf0a8fe97510780934c9613c3ee2",
+        "size_bytes": 9243
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/15347b7089cbfca83bc320ac702684a7a66dbf0a8fe97510780934c9613c3ee2",
+        "sha256": "15347b7089cbfca83bc320ac702684a7a66dbf0a8fe97510780934c9613c3ee2",
+        "size_bytes": 9243
+      }
+    },
+    {
+      "role": "documentation-before-report-input-milestone",
+      "original": {
+        "path": "energyplus_porting_plan/plan.json",
+        "sha256": "415bcfb1b1fda854848c62b574e8354278821a785625495e0059ebbd048e788c",
+        "size_bytes": 779800
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/415bcfb1b1fda854848c62b574e8354278821a785625495e0059ebbd048e788c",
+        "sha256": "415bcfb1b1fda854848c62b574e8354278821a785625495e0059ebbd048e788c",
+        "size_bytes": 779800
+      }
+    },
+    {
+      "role": "documentation-before-report-input-milestone",
+      "original": {
+        "path": "energyplus_porting_plan/cards/CTF-10.md",
+        "sha256": "263d7c37615b971392a01253342a4e07fe35e08d9c3157fcdf6b33ca09d2fab0",
+        "size_bytes": 10396
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/263d7c37615b971392a01253342a4e07fe35e08d9c3157fcdf6b33ca09d2fab0",
+        "sha256": "263d7c37615b971392a01253342a4e07fe35e08d9c3157fcdf6b33ca09d2fab0",
+        "size_bytes": 10396
+      }
+    },
+    {
+      "role": "documentation-before-report-input-milestone",
+      "original": {
+        "path": "energyplus_porting_plan/CHECKLIST.md",
+        "sha256": "48ff5965e7627a07fe88e1064cf39fa3153c7a0134ebf3da15e50c430224bb90",
+        "size_bytes": 16639
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/objects/48ff5965e7627a07fe88e1064cf39fa3153c7a0134ebf3da15e50c430224bb90",
+        "sha256": "48ff5965e7627a07fe88e1064cf39fa3153c7a0134ebf3da15e50c430224bb90",
+        "size_bytes": 16639
+      }
+    }
+  ],
+  "actual_accepted_source": {
+    "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/accepted.json",
+    "sha256": "98bd31df09d2b4697592be1adc1e0978cfd9a384771f0bf850e39ab60d2da3ae",
+    "size_bytes": 8854
+  },
+  "actual_quality": {
+    "fmt-check": {
+      "actual_execution": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-fmt-check-command-01/receipt.json",
+        "sha256": "988f2a9db466b52740c13b0fab3744140ba82fb8299d854053eb5fdcd69b1dff",
+        "size_bytes": 3404
+      },
+      "exit_code": 0,
+      "test_groups": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0
+    },
+    "clippy": {
+      "actual_execution": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-clippy-command-01/receipt.json",
+        "sha256": "76ad70cb2fc42a626b1cb26ea54a0f60e924e32c4ba37a350fc42f86227f633f",
+        "size_bytes": 3589
+      },
+      "exit_code": 0,
+      "test_groups": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0
+    },
+    "focused": {
+      "actual_execution": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-focused-command-01/receipt.json",
+        "sha256": "461376ff9db17529ac267997dd084c12b71f11004a4a80f92e99833685a1b1a4",
+        "size_bytes": 3577
+      },
+      "exit_code": 0,
+      "test_groups": 1,
+      "passed": 250,
+      "failed": 0,
+      "ignored": 0
+    },
+    "workspace": {
+      "actual_execution": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-workspace-command-01/receipt.json",
+        "sha256": "18f15f8e55c68763202aebe7509ebdc02f2f9294c385bd4f892188bce2c1f299",
+        "size_bytes": 3537
+      },
+      "exit_code": 0,
+      "test_groups": 21,
+      "passed": 4859,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/95/95197194b3c81732677230e3699d3522f03e3890077688d85907745ebf57a723",
+    "sha256": "95197194b3c81732677230e3699d3522f03e3890077688d85907745ebf57a723"
+  },
+  "selected_archive_is_transitive_replay_closure": false,
+  "whole_Init_ordinary_postlude_activated": false,
+  "Native_equivalence_certified": false,
+  "gates_updated": false
+}

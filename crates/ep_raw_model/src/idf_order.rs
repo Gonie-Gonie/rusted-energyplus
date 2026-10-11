@@ -1,7 +1,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::{Display, Formatter};
 
-use crate::RawModel;
+use crate::{FieldName, RawModel, RawValue};
 
 /// One IDF object type whose declaration order must survive epJSON conversion.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -9,6 +9,7 @@ pub struct IdfOrderTarget {
     /// Canonical EnergyPlus object type.
     pub object_type: &'static str,
     /// Zero-based data-field index containing the required object name.
+    /// The five Source-defined unnamed report families use IdfParser-generated names.
     pub name_field_index: usize,
 }
 
@@ -18,6 +19,27 @@ pub struct IdfOrderTarget {
 /// explicit identity and converter edge-case evidence. Other position-sensitive
 /// families require the same evidence before joining the fail-closed overlay.
 pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
+    // IdfParser.cc277-301 generates these unnamed keys from the per-type count.
+    IdfOrderTarget {
+        object_type: "Output:Surfaces:List",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Output:Surfaces:Drawing",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Output:VariableDictionary",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Output:Constructions",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Output:EnergyManagementSystem",
+        name_field_index: 0,
+    },
     IdfOrderTarget {
         object_type: "RunPeriodControl:SpecialDays",
         name_field_index: 0,
@@ -109,6 +131,7 @@ impl std::error::Error for IdfOrderError {}
 #[derive(Clone, Debug, Eq, PartialEq)]
 struct ScannedObject {
     idf_order: u32,
+    max_fields: usize,
     name: String,
     line: usize,
     column: usize,
@@ -126,6 +149,7 @@ pub fn apply_idf_declaration_order(
     validate_targets(targets)?;
     let scanned = scan_target_objects(idf, targets)?;
     let mut overlay = BTreeMap::new();
+    let mut report_field_counts = Vec::new();
 
     for target in targets {
         let idf_objects = scanned.get(target.object_type).ok_or_else(|| {
@@ -227,12 +251,31 @@ pub fn apply_idf_declaration_order(
                     actual_type.0, actual_name.0
                 )));
             }
+            if unnamed_report_type(target.object_type) {
+                report_field_counts.push((
+                    actual_type.clone(),
+                    actual_name.clone(),
+                    idf_object.max_fields,
+                ));
+            }
             ordered_names.push(actual_name);
         }
 
         overlay.insert(actual_type.clone(), ordered_names);
     }
 
+    // Apply only after every type/name/count has been reconciled successfully.
+    for (object_type, name, max_fields) in report_field_counts {
+        let object = model
+            .objects
+            .get_mut(&object_type)
+            .and_then(|objects| objects.get_mut(&name))
+            .ok_or_else(|| IdfOrderError::new("reconciled report input disappeared"))?;
+        object.fields.insert(
+            FieldName("idf_max_fields".to_string()),
+            RawValue::Number(max_fields.to_string()),
+        );
+    }
     model.idf_declaration_order = overlay;
     Ok(())
 }
@@ -368,6 +411,17 @@ fn scan_target_objects(
     Ok(scanned)
 }
 
+fn unnamed_report_type(object_type: &str) -> bool {
+    matches!(
+        object_type,
+        "Output:Surfaces:List"
+            | "Output:Surfaces:Drawing"
+            | "Output:VariableDictionary"
+            | "Output:Constructions"
+            | "Output:EnergyManagementSystem"
+    )
+}
+
 fn record_object(
     fields: &[String],
     (line, column): (usize, usize),
@@ -392,6 +446,22 @@ fn record_object(
     else {
         return Ok(());
     };
+    if unnamed_report_type(target.object_type) {
+        let bucket = scanned.get_mut(target.object_type).ok_or_else(|| {
+            IdfOrderError::new(format!(
+                "internal IDF order recovery error: missing target bucket for {}",
+                target.object_type
+            ))
+        })?;
+        bucket.push(ScannedObject {
+            idf_order,
+            max_fields: fields.len() - 1,
+            name: format!("{} {}", target.object_type, bucket.len() + 1),
+            line,
+            column,
+        });
+        return Ok(());
+    }
     let field_index = target.name_field_index.checked_add(1).ok_or_else(|| {
         IdfOrderError::new(format!(
             "IDF declaration-order target {} has an invalid name-field index",
@@ -419,6 +489,7 @@ fn record_object(
     })?;
     bucket.push(ScannedObject {
         idf_order,
+        max_fields: fields.len() - 1,
         name: name.clone(),
         line,
         column,
@@ -784,6 +855,35 @@ mod tests {
             "unexpected comma must fail",
         )?;
         assert!(error.to_string().contains("unexpected comma"));
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod unnamed_report_order_tests {
+    use crate::{FieldName, RawValue, parse_epjson_str_with_idf_order};
+
+    #[test]
+    fn twelve_unnamed_reports_keep_actual_idf_count_order_and_field_counts()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let objects = (1..=12)
+            .map(|index| {
+                format!("\"Output:Constructions {index}\":{{\"details_type_1\":\"Materials\"}}")
+            })
+            .collect::<Vec<_>>()
+            .join(",");
+        let epjson = format!("{{\"Output:Constructions\":{{{objects}}}}}");
+        let idf = "Output:Constructions, Materials;".repeat(12);
+        let raw = parse_epjson_str_with_idf_order(&epjson, &idf)?;
+        let rows = raw.ordered_instances("Output:Constructions")?;
+        assert_eq!(rows.len(), 12);
+        for (index, (name, object)) in rows.iter().enumerate() {
+            assert_eq!(name.0, format!("Output:Constructions {}", index + 1));
+            assert_eq!(
+                object.fields.get(&FieldName("idf_max_fields".to_string())),
+                Some(&RawValue::Number("1".to_string()))
+            );
+        }
         Ok(())
     }
 }

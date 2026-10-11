@@ -1,0 +1,43 @@
+"""Root archives actual plan validation, verifies indexed bytes and commits Scan unit1."""
+import hashlib,io,json,shutil,subprocess,sys
+from pathlib import Path
+ROOT=Path.cwd().resolve();BASE=ROOT/'.runtime/porting/CTF-10';OUT=ROOT/'energyplus_porting_plan/evidence/CTF-10-report-input-scan'
+def read(p):return json.loads(p.read_bytes())
+def sha(p):
+ with p.open('rb')as s:return hashlib.file_digest(s,'sha256').hexdigest()
+def ref(p):return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+assert len(sys.argv)==2
+command=BASE/'report-input-scan-plan-check-command-01/receipt.json';assert sha(command)==sys.argv[1];r=read(command)
+assert r['command']==['python','-X','utf8','-B','tools/porting/check_plan.py','--check']and r['exit_code']==0 and r['launch_error']is None and r['source_bytes_match_before_and_after']is True
+assert r['source_snapshot']['sha256']=='95197194b3c81732677230e3699d3522f03e3890077688d85907745ebf57a723'
+snapshot=ROOT/r['source_snapshot']['path'];assert sha(snapshot)==r['source_snapshot']['sha256'];captured=read(snapshot)
+for row in captured['files']:assert sha(ROOT/row['historical_path'])==row['archive']['sha256']
+accepted=BASE/'report-input-scan-applied-01/accepted.json';assert sha(accepted)=='98bd31df09d2b4697592be1adc1e0978cfd9a384771f0bf850e39ab60d2da3ae'
+sources=[row['canonical_path']for row in read(accepted)['actual_sources']]
+docs=['energyplus_porting_plan/'+p for p in ['plan.json','cards/CTF-10.md','CHECKLIST.md','energyplus_porting_checklist.html']]
+prefix=OUT.relative_to(ROOT).as_posix()+'/'
+def staged():return set(subprocess.check_output(['git','diff','--cached','--name-only','--no-renames','-z']).decode().split('\0')[:-1])
+def allowed(p):return p in sources or p in docs or p.startswith(prefix)
+assert all(allowed(p)for p in staged());assert not(OUT/'validation.json').exists();rows=[]
+files=[command,*[ROOT/r[k]['path']for k in ['stdout','stderr','source_snapshot']],Path(__file__).resolve()]
+q=BASE/'report-input-scan-finalize-command-01/receipt.json';f=read(q);assert f['exit_code']==0 and f['source_bytes_match_before_and_after']and f['source_snapshot']==r['source_snapshot']
+files += [q,*[ROOT/f[k]['path']for k in ['stdout','stderr']]]
+for p in files:
+ original=ref(p);dest=OUT/'objects'/original['sha256']
+ if not dest.exists():shutil.copyfile(p,dest)
+ assert dest.read_bytes()==p.read_bytes();rows.append({'original':original,'stored':ref(dest)})
+validation={'schema':'ctf10-actual-report-input-scan-plan-validation.v1','actual_execution':ref(command),'source_snapshot':r['source_snapshot'],'selected_files':rows,'validated_documents':[ref(ROOT/p)for p in docs],'scientific_PASS_produced_by_check_plan':False}
+(OUT/'validation.json').write_bytes((json.dumps(validation,indent=2)+'\n').encode())
+subprocess.run(['git','diff','--check'],check=True);subprocess.run(['git','add','--',*sources,*docs,OUT.relative_to(ROOT).as_posix()],check=True)
+changed=staged();assert all(allowed(p)for p in changed)
+names=sorted(changed|set(sources)|set(docs)|{p.relative_to(ROOT).as_posix()for p in OUT.rglob('*')if p.is_file()})
+stream=io.BytesIO(subprocess.check_output(['git','cat-file','--batch'],input=('\n'.join(':'+p for p in names)+'\n').encode()))
+for name in names:
+ header=stream.readline().decode().strip().split();assert len(header)==3 and header[1]=='blob'
+ body=stream.read(int(header[2]));assert stream.read(1)==b'\n'and body==(ROOT/name).read_bytes()
+ assert hashlib.sha1(b'blob '+str(len(body)).encode()+b'\0'+body).hexdigest()==header[0]and hashlib.sha256(body).hexdigest()==sha(ROOT/name)
+assert stream.read()==b''
+print('Root verified',len(names),'complete indexed files including all report-input evidence and current sources',flush=True)
+subprocess.run(['git','commit','--quiet','-m','feat(ctf): preserve report requests and scan cache'],check=True)
+assert not subprocess.check_output(['git','status','--porcelain'])
+print('Root committed clean report-input milestone',subprocess.check_output(['git','rev-parse','HEAD']).decode().strip(),flush=True)

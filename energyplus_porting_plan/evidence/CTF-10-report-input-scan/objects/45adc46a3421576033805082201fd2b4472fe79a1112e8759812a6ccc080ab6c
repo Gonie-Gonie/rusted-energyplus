@@ -1,0 +1,17 @@
+--- a/crates/ep_model/src/lib.rs
++++ b/crates/ep_model/src/lib.rs
+@@ -4,6 +4,7 @@
+ mod model;
+ mod names;
+ mod objects;
++mod report_inputs;
+ mod schedule_day_values;
+ mod units;
+ 
+@@ -11,5 +12,6 @@
+ pub use model::*;
+ pub use names::*;
+ pub use objects::*;
++pub use report_inputs::*;
+ pub use schedule_day_values::populate_schedule_day_values;
+ pub use units::*;

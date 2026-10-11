@@ -1,0 +1,99 @@
+{
+  "schema": "ctf10-report-input-scan-implementation-milestone.v1",
+  "card": "CTF-10",
+  "status": "report input and Scan cache implementation tested; Native comparison and whole postlude pending",
+  "selected_evidence_manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/manifest.json",
+    "sha256": "12e5019a11282b0e4a1f1046505a380065021f0ad3449d8eb5fd74a59380bacd",
+    "size_bytes": 50797
+  },
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/95/95197194b3c81732677230e3699d3522f03e3890077688d85907745ebf57a723",
+    "sha256": "95197194b3c81732677230e3699d3522f03e3890077688d85907745ebf57a723"
+  },
+  "actual_accepted_source": {
+    "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/accepted.json",
+    "sha256": "98bd31df09d2b4697592be1adc1e0978cfd9a384771f0bf850e39ab60d2da3ae",
+    "size_bytes": 8854
+  },
+  "actual_quality": {
+    "fmt-check": {
+      "actual_execution": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-fmt-check-command-01/receipt.json",
+        "sha256": "988f2a9db466b52740c13b0fab3744140ba82fb8299d854053eb5fdcd69b1dff",
+        "size_bytes": 3404
+      },
+      "exit_code": 0,
+      "test_groups": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0
+    },
+    "clippy": {
+      "actual_execution": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-clippy-command-01/receipt.json",
+        "sha256": "76ad70cb2fc42a626b1cb26ea54a0f60e924e32c4ba37a350fc42f86227f633f",
+        "size_bytes": 3589
+      },
+      "exit_code": 0,
+      "test_groups": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0
+    },
+    "focused": {
+      "actual_execution": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-focused-command-01/receipt.json",
+        "sha256": "461376ff9db17529ac267997dd084c12b71f11004a4a80f92e99833685a1b1a4",
+        "size_bytes": 3577
+      },
+      "exit_code": 0,
+      "test_groups": 1,
+      "passed": 250,
+      "failed": 0,
+      "ignored": 0
+    },
+    "workspace": {
+      "actual_execution": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-workspace-command-01/receipt.json",
+        "sha256": "18f15f8e55c68763202aebe7509ebdc02f2f9294c385bd4f892188bce2c1f299",
+        "size_bytes": 3537
+      },
+      "exit_code": 0,
+      "test_groups": 21,
+      "passed": 4859,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "additional_focused_tests": [
+    "actual_a_report_requests_keep_native_default_and_blank_owners",
+    "idf_unnamed_order_and_explicit_blank_second_alpha_survive",
+    "twelve_unnamed_reports_keep_actual_idf_count_order_and_field_counts",
+    "first_scan_reads_real_a_families_then_later_queries_reuse_cache",
+    "unknown_surface_list_token_uses_native_map_empty_warning_not_invalid",
+    "materials_only_second_alpha_count_and_optional_refs_remain_distinct",
+    "last_ordered_options_and_ems_assignments_replace_earlier_values",
+    "missing_surfaces_key_is_typed_unavailable_after_real_first_cache_read"
+  ],
+  "implementation": [
+    "Preserve five real report object families through RawModel and the ordinary compiler.",
+    "Recover generated unnamed IDF identities, within-family declaration order and actual physical alpha counts; retain direct epJSON ordering.",
+    "Retain default/blank/case facts and dictionary/drawing/EMS defaults independently of NumAlphas.",
+    "Port all-family first scan, retained flags/options/EMS effects and repeated optional queries in General source order.",
+    "Deliver actual warning/continue arguments synchronously; preserve unknown-map EMPTY behavior and explicit unavailable missing Surfaces key."
+  ],
+  "remaining": [
+    "Same-input genuine Native report-input/getter/cache/query comparison.",
+    "Actual reportLayers/predefined-table/EIO owners and whole Init final fatal/error backend composition before surface allocation.",
+    "Ordinary Rust/Native persistent-history numerical integration and card prerequisites."
+  ],
+  "actual_Native_execution_performed_for_this_milestone": false,
+  "warning_fatal_backend_certified": false,
+  "whole_Init_ordinary_postlude_activated": false,
+  "unit_gate_promoted": false,
+  "integration_gate_promoted": false,
+  "production_gate_promoted": false,
+  "complete_CTF10_PASS_claimed": false,
+  "gates_updated": false
+}

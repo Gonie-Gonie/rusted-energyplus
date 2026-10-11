@@ -46,6 +46,8 @@ pub struct TypedModel {
     pub timestep: TimestepConfig,
     /// Global surface convection algorithm settings.
     pub surface_convection_algorithms: SurfaceConvectionAlgorithms,
+    /// Actual input-only report requests read by General::ScanForReports.
+    pub report_inputs: crate::ReportInputs,
     /// Run periods.
     pub run_periods: Vec<RunPeriod>,
     /// Run period names.
@@ -298,6 +300,7 @@ impl Default for TypedModel {
             global_geometry_rules: None,
             timestep: TimestepConfig::default(),
             surface_convection_algorithms: SurfaceConvectionAlgorithms::default(),
+            report_inputs: crate::ReportInputs::default(),
             run_periods: Vec::new(),
             run_period_names: NameMap::default(),
             run_period_special_days: Vec::new(),
@@ -541,6 +544,7 @@ impl TypedModel {
             + self.fenestration_solar_absorbed_requests.len()
             + self.surface_vapor_coefficients.len()
             + self.window_frame_and_dividers.len()
+            + self.report_inputs.objects.len()
     }
 }
 

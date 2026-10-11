@@ -7,6 +7,7 @@ mod construction_window_data_file;
 mod construction_window_equivalent_layer;
 mod fenestration_solar_absorbed;
 mod internal_heat_gains;
+mod report_inputs;
 mod schedule_compact_source;
 mod schedule_type_limits;
 mod scheduled_surface_gains_check;
@@ -489,6 +490,11 @@ pub fn compile_coverage(raw_model: &RawModel) -> Vec<ObjectCoverage> {
 }
 
 const TYPED_OBJECT_TYPES: &[&str] = &[
+    "Output:Surfaces:List",
+    "Output:Surfaces:Drawing",
+    "Output:VariableDictionary",
+    "Output:Constructions",
+    "Output:EnergyManagementSystem",
     "Version",
     "Building",
     "GlobalGeometryRules",
@@ -665,6 +671,7 @@ impl<'a> Compiler<'a> {
         self.parse_run_period_special_days(&mut model);
         self.parse_run_period_daylight_saving_time(&mut model);
         self.parse_site_location(&mut model);
+        self.parse_report_inputs(&mut model);
         self.parse_glazing_spectral_data(&mut model);
         self.parse_materials(&mut model);
         self.parse_window_frame_and_dividers(&mut model);
