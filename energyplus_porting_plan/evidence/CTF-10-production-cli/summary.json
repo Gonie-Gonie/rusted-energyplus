@@ -1,0 +1,123 @@
+{
+  "schema": "ctf10-fixed-six-cli-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-production-cli/manifest.json",
+    "sha256": "d1b5a94e1c5ae3fcc9312e2e86b7adeadba15150ad139a0a3f945fa50d4f0ee6",
+    "size_bytes": 16340
+  },
+  "selected_public_storage_comparison": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-unit/summary.json",
+    "sha256": "bee1e3dd25be7fcff7944b3166da9cc7d651968132ff3e2c337df9091547cdb9",
+    "size_bytes": 95897
+  },
+  "actual_executions": {
+    "path": ".runtime/porting/CTF-10/production-cli-inputs-01/execution-summary.json",
+    "sha256": "c8d1110bf16d815729994ae5ae15a29b9cf604023099bb9ca66764fcab1ed8cf",
+    "size_bytes": 3004
+  },
+  "same_actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/88/88274ea251bca6736a28e09cc6474ae7c837655a04e972942638b603f82799fb",
+    "sha256": "88274ea251bca6736a28e09cc6474ae7c837655a04e972942638b603f82799fb"
+  },
+  "runs": [
+    {
+      "id": "A-24H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-10/production-cli-output-01/A-24H/run-summary.json",
+        "sha256": "70a639986682d59bfaed294e9289179277f8d3932700e210039c977fb1aea4fa",
+        "size_bytes": 28692
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": null
+    },
+    {
+      "id": "A-72H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-10/production-cli-output-01/A-72H/run-summary.json",
+        "sha256": "b2bdeb1f1b1d9e995c7be6dc79441485908f803d90ebc60cfabaa6d3f53d2461",
+        "size_bytes": 28690
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": null
+    },
+    {
+      "id": "B-NOLIMIT-24H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-10/production-cli-output-01/B-NOLIMIT-24H/run-summary.json",
+        "sha256": "7878a500ea09341f5cc5bdfd28d7b1907367c105ffcd44e722e20eeec9a07fb2",
+        "size_bytes": 1498418
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": false
+    },
+    {
+      "id": "B-FLOW-24H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-10/production-cli-output-01/B-FLOW-24H/run-summary.json",
+        "sha256": "fed3c30dc67e6bc4cadfebac57675a20ba3b0feb1e142a3a66780fd1c30dd5b8",
+        "size_bytes": 1498308
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": false
+    },
+    {
+      "id": "B-CAPACITY-24H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-10/production-cli-output-01/B-CAPACITY-24H/run-summary.json",
+        "sha256": "03d3bc14b95d5d8716eca82db2257dbeb6ffb8e276457e0fdc1d75730be0c1ad",
+        "size_bytes": 1498240
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": false
+    },
+    {
+      "id": "B-BOTH-24H",
+      "run_summary": {
+        "path": ".runtime/porting/CTF-10/production-cli-output-01/B-BOTH-24H/run-summary.json",
+        "sha256": "c69f0ca2b80b28506d55f28d189260bcd8a806c3fd32e58f2899af9167e491fa",
+        "size_bytes": 1498715
+      },
+      "status": "success",
+      "actual_exit_code": 0,
+      "source_order_matches": true,
+      "compare_oracle": false,
+      "hours_override": null,
+      "fixture_demand_injection_used": false
+    }
+  ],
+  "all45_input_guards_unchanged_after": true,
+  "actual_CLI_build_used": {
+    "path": ".runtime/porting/CTF-10/production-cli-build-command-01/receipt.json",
+    "sha256": "a98b8a47facf3ed11ba83cf03953f03a51cc5e90354e5c0631b33cb8b3d87083",
+    "size_bytes": 4284
+  },
+  "numerical_equivalence_certified": false,
+  "complete_CTF04_PASS_claimed": false,
+  "complete_CTF05_PASS_claimed": false,
+  "complete_CTF06_PASS_claimed": false,
+  "complete_CTF07_PASS_claimed": false,
+  "complete_CTF08_PASS_claimed": false,
+  "complete_CTF09_PASS_claimed": false,
+  "complete_CTF10_PASS_claimed": false,
+  "integration_and_production_gates_remain_pending": true
+}

@@ -104,3 +104,7 @@ Unit numeric948290/discrete3874496; fixed15 loader numeric8988/discrete57532; al
 Actual Clippy/fmt checks0; focused177 and workspace4797 tests passed with0 failed. Candidate/quality/comparison recorders bind Source88274ea251bca6736a28e09cc6474ae7c837655a04e972942638b603f82799fb. The first actual Clippy test clone warning is preserved; the accepted correction uses a borrowed one-element slice. Held comparer01 was never executed; fresh02 corrects the shared-error stage to genuine PostLoad for used constructions. Profiles, scientific arithmetic and required absence rules remain unchanged. Full actual observations and command/source identities are retained in evidence/CTF-10-unit/{manifest,summary}.json.
 
 Selected public storage verification does not complete the unit gate: generated-cache invalidation remains pending. Surface/history activation, whole Init reporting/final-fatal backend and integration/production/full-card gates remain pending. Fixed6 ordinary CLI and precise Original retirement will be recorded separately.
+
+## Actual fixed six ordinary CLI executions
+
+A-24H, A-72H, B-NOLIMIT-24H, B-FLOW-24H, B-CAPACITY-24H and B-BOTH-24H all exit0 on the same final10 source. Each actual source-order gate matches; hours override is absent and compare_oracle=false. All45 original input/weather/metadata guards remain unchanged. This establishes ordinary run regression evidence only; no numerical or integration/production/full-card PASS is inferred. Evidence: evidence/CTF-10-production-cli/{manifest,summary}.json.
