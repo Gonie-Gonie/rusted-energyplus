@@ -12263,6 +12263,11 @@
         "size_bytes": 3616
       },
       "actual_selected_Init_postlude_owner_comparison": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-init-postlude-preparation-comparison/summary.json",
+        "sha256": "2ab1b77789385dc7a650648b39d15b98e5bdb22d866b071bbdbe882a90124465",
+        "size_bytes": 69600
+      },
+      "prior_failed_selected_Init_postlude_owner_comparison": {
         "path": "energyplus_porting_plan/evidence/CTF-10-init-postlude-comparison/summary.json",
         "sha256": "167ea315b51dca7db6de633c5b1db4524d716e0f6318d70cf9797f91495e0857",
         "size_bytes": 271237

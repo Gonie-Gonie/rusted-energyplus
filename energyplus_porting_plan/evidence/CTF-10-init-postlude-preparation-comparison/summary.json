@@ -1,0 +1,1551 @@
+{
+  "schema": "ctf10-Init-postlude-actual-selected-comparison-milestone.v1",
+  "card": "CTF-10",
+  "status": "pass-selected-paired-Init-owner-fields",
+  "selected_paired_owner_fields_passed": true,
+  "selected_evidence_manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-init-postlude-preparation-comparison/manifest.json",
+    "sha256": "ef8a02ab01f4858e5239ab96dd3abb66097f0ff7a4d245144c6f735be1408574",
+    "size_bytes": 678971
+  },
+  "accepted_current_Source": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-init-postlude-preparation-comparison/accepted.json",
+    "sha256": "5115584bb77a8f46a07a24c2b8df79409d7b24417416f63cbb0cacb59e0b9e03",
+    "size_bytes": 73713
+  },
+  "actual_Native_completion": {
+    "path": ".runtime/porting/CTF-10/native-init-postlude-workflow-05/completion.json",
+    "sha256": "6b1292ef726c7a9d980f5fc548119a992c33e95ffb499bb3107733bf99b5412f",
+    "size_bytes": 845
+  },
+  "actual_OriginalDataQA": {
+    "path": ".runtime/porting/CTF-10/native-init-postlude-workflow-05/qa/review.json",
+    "sha256": "1010cbc10317320409c34bd48de7c69c5d05234768544f7e307eb105df3480ba",
+    "size_bytes": 97172
+  },
+  "actual_Native_observation_counts": {
+    "production_cases": 15,
+    "direct_cases": 6,
+    "actual_Init_calls": 21,
+    "Init_events": 296,
+    "actual_Construction_calls": 27,
+    "Init_diagnostics": 6,
+    "postlude_partitions": 84,
+    "backend_callbacks": 23,
+    "returned_Init_calls": 19,
+    "fatal_Init_calls": 2,
+    "exception_Init_calls": 0,
+    "uninvoked_Init_calls": 0,
+    "additional_actual_files": [],
+    "actual_outcomes": [
+      {
+        "case_id": "direct-unused-reset",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        }
+      },
+      {
+        "case_id": "direct-resistive-report",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        }
+      },
+      {
+        "case_id": "direct-zero-resistance-input",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": "Program terminated for reasons listed (InitConductionTransferFunctions)",
+          "exception_type": "N10EnergyPlus10FatalErrorE",
+          "source_exception": false,
+          "source_fatal": true,
+          "status": "source_fatal"
+        }
+      },
+      {
+        "case_id": "direct-thick-material-input",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": "Program terminated for reasons listed (InitConductionTransferFunctions)",
+          "exception_type": "N10EnergyPlus10FatalErrorE",
+          "source_exception": false,
+          "source_fatal": true,
+          "status": "source_fatal"
+        }
+      },
+      {
+        "case_id": "direct-repeat-registry",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        }
+      },
+      {
+        "case_id": "direct-pre-scanned-cache",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        }
+      },
+      {
+        "case_id": "A-24H",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        }
+      },
+      {
+        "case_id": "A-72H",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        }
+      },
+      {
+        "case_id": "A-ANNUAL",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        }
+      },
+      {
+        "case_id": "B-NOLIMIT-24H",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        }
+      },
+      {
+        "case_id": "B-NOLIMIT-72H",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        }
+      },
+      {
+        "case_id": "B-NOLIMIT-ANNUAL",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        }
+      },
+      {
+        "case_id": "B-FLOW-24H",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        }
+      },
+      {
+        "case_id": "B-FLOW-72H",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        }
+      },
+      {
+        "case_id": "B-FLOW-ANNUAL",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        }
+      },
+      {
+        "case_id": "B-CAPACITY-24H",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        }
+      },
+      {
+        "case_id": "B-CAPACITY-72H",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        }
+      },
+      {
+        "case_id": "B-CAPACITY-ANNUAL",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        }
+      },
+      {
+        "case_id": "B-BOTH-24H",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        }
+      },
+      {
+        "case_id": "B-BOTH-72H",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        }
+      },
+      {
+        "case_id": "B-BOTH-ANNUAL",
+        "actual_source_invoked": true,
+        "actual_outcome": {
+          "exception_message": null,
+          "exception_type": null,
+          "source_exception": false,
+          "source_fatal": false,
+          "status": "source_returned"
+        }
+      }
+    ]
+  },
+  "actual_quality": {
+    "fmt-check": {
+      "execution": {
+        "path": ".runtime/porting/CTF-10/init-postlude-historical-card-quality-01/fmt-check-command/receipt.json",
+        "sha256": "0d4164b402cb545fbed18474a0874e2d2f8065681eaa13fef4dbb698c9fea8dd",
+        "size_bytes": 4268
+      },
+      "actual_exit_code": 0,
+      "test_groups": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0
+    },
+    "clippy": {
+      "execution": {
+        "path": ".runtime/porting/CTF-10/init-postlude-historical-card-quality-01/clippy-command/receipt.json",
+        "sha256": "5627e7fdaac0fae16495127b7d5eed0a968d35bf09c103edf3705845fb2d5a85",
+        "size_bytes": 4454
+      },
+      "actual_exit_code": 0,
+      "test_groups": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0
+    },
+    "focused": {
+      "execution": {
+        "path": ".runtime/porting/CTF-10/init-postlude-historical-card-quality-01/focused-command/receipt.json",
+        "sha256": "37aebb17e415dd13c89260fb6233b805edb5f1db4a68c9df6499d9dfccbe924b",
+        "size_bytes": 4440
+      },
+      "actual_exit_code": 0,
+      "test_groups": 1,
+      "passed": 312,
+      "failed": 0,
+      "ignored": 0
+    },
+    "workspace": {
+      "execution": {
+        "path": ".runtime/porting/CTF-10/init-postlude-historical-card-quality-01/workspace-command/receipt.json",
+        "sha256": "529582548b44bad6eda424a9f16ad13f4298610f6decb60b3e7710e32655b7cf",
+        "size_bytes": 4400
+      },
+      "actual_exit_code": 0,
+      "test_groups": 21,
+      "passed": 4932,
+      "failed": 0,
+      "ignored": 0
+    },
+    "supplementary-direct-observer-tests": {
+      "execution": {
+        "path": ".runtime/porting/CTF-10/init-postlude-historical-card-quality-01/supplementary-direct-observer-tests-command/receipt.json",
+        "sha256": "2db829d9e41e7a49f3c24187cc449184d69998fd7bc8e67d5de1f939470d18c0",
+        "size_bytes": 4529
+      },
+      "actual_exit_code": 0,
+      "test_groups": 1,
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "actual_Source_snapshot": {
+    "path": ".runtime/porting/source-objects/d1/d1bb9bcbc3e3f6ac155346203b3ef0629fad2343ccfec952289709835a7aaecb",
+    "sha256": "d1bb9bcbc3e3f6ac155346203b3ef0629fad2343ccfec952289709835a7aaecb"
+  },
+  "actual_candidate_workflow": {
+    "path": ".runtime/porting/CTF-10/init-postlude-historical-card-candidates-01/workflow.json",
+    "sha256": "38906b0d49f4ad8230f9a0fde6f24c6523936e310fe96c01c5089106a3b1c906",
+    "size_bytes": 4242
+  },
+  "actual_comparison": {
+    "path": ".runtime/porting/CTF-10/init-postlude-preparation-comparison-01/comparison.json",
+    "sha256": "1c5876d0e7ec9ed1d3be3b99b0bf2b2be061ce45c2becae0c278685af326fd84",
+    "size_bytes": 72488
+  },
+  "actual_case_counts": {
+    "model_cases": 15,
+    "direct_unit_cases": 6
+  },
+  "comparison": {
+    "numeric_comparisons": 2106,
+    "discrete_comparisons": 696389,
+    "mismatch_count": 0,
+    "mismatch_categories": {
+      "discrete_comparisons": 696389,
+      "numeric_comparisons": 2106
+    },
+    "complete_mismatch_ledger": [],
+    "mismatch_records_dropped": 0,
+    "unavailable_observations": [
+      {
+        "path": "direct_unit_cases/direct-unused-reset/BeforeRegistry/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-unused-reset/AfterRegistry/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-unused-reset/BeforeInit/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-unused-reset/BeforeInit/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-unused-reset/AfterInitReturn/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-unused-reset/AfterInitReturn/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-unused-reset/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-resistive-report/BeforeRegistry/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-resistive-report/AfterRegistry/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-resistive-report/BeforeInit/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-resistive-report/BeforeInit/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-resistive-report/AfterInitReturn/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-resistive-report/AfterInitReturn/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-resistive-report/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-zero-resistance-input/BeforeRegistry/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-zero-resistance-input/AfterRegistry/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-zero-resistance-input/BeforeInit/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-zero-resistance-input/BeforeInit/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-zero-resistance-input/AfterInitOuterCatch/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-zero-resistance-input/AfterInitOuterCatch/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-zero-resistance-input/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-thick-material-input/BeforeRegistry/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-thick-material-input/AfterRegistry/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-thick-material-input/BeforeInit/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-thick-material-input/BeforeInit/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-thick-material-input/AfterInitOuterCatch/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-thick-material-input/AfterInitOuterCatch/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-thick-material-input/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-repeat-registry/BeforeRegistry/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-repeat-registry/AfterRegistry/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-repeat-registry/BeforeInit/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-repeat-registry/BeforeInit/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-repeat-registry/AfterInitReturn/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-repeat-registry/AfterInitReturn/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-repeat-registry/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-pre-scanned-cache/BeforeRegistry/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-pre-scanned-cache/AfterRegistry/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-pre-scanned-cache/BeforeInit/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-pre-scanned-cache/BeforeInit/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-pre-scanned-cache/AfterInitReturn/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-pre-scanned-cache/AfterInitReturn/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "direct_unit_cases/direct-pre-scanned-cache/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/A-24H/BeforeRegistry_to_actual_Rust_caller_before_producer/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/A-24H/BeforeInit_caller_stage",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native registry and thirteen loaders precede BeforeInit; Rust before_initializer precedes its genuine registry/cache producer. No equivalent intermediate Rust caller snapshot is retained",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/A-24H/production_streams",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Full Native loader/preparation/EIO/error/console bytes retained; no invented BeforeInit prefix or header stripping",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/A-24H/AfterInitReturn/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/A-24H/AfterInitReturn/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/A-24H/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/A-72H/BeforeRegistry_to_actual_Rust_caller_before_producer/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/A-72H/BeforeInit_caller_stage",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native registry and thirteen loaders precede BeforeInit; Rust before_initializer precedes its genuine registry/cache producer. No equivalent intermediate Rust caller snapshot is retained",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/A-72H/production_streams",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Full Native loader/preparation/EIO/error/console bytes retained; no invented BeforeInit prefix or header stripping",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/A-72H/AfterInitReturn/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/A-72H/AfterInitReturn/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/A-72H/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/A-ANNUAL/BeforeRegistry_to_actual_Rust_caller_before_producer/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/A-ANNUAL/BeforeInit_caller_stage",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native registry and thirteen loaders precede BeforeInit; Rust before_initializer precedes its genuine registry/cache producer. No equivalent intermediate Rust caller snapshot is retained",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/A-ANNUAL/production_streams",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Full Native loader/preparation/EIO/error/console bytes retained; no invented BeforeInit prefix or header stripping",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/A-ANNUAL/AfterInitReturn/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/A-ANNUAL/AfterInitReturn/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/A-ANNUAL/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-NOLIMIT-24H/BeforeRegistry_to_actual_Rust_caller_before_producer/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-NOLIMIT-24H/BeforeInit_caller_stage",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native registry and thirteen loaders precede BeforeInit; Rust before_initializer precedes its genuine registry/cache producer. No equivalent intermediate Rust caller snapshot is retained",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-NOLIMIT-24H/production_streams",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Full Native loader/preparation/EIO/error/console bytes retained; no invented BeforeInit prefix or header stripping",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-NOLIMIT-24H/AfterInitReturn/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-NOLIMIT-24H/AfterInitReturn/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-NOLIMIT-24H/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-NOLIMIT-72H/BeforeRegistry_to_actual_Rust_caller_before_producer/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-NOLIMIT-72H/BeforeInit_caller_stage",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native registry and thirteen loaders precede BeforeInit; Rust before_initializer precedes its genuine registry/cache producer. No equivalent intermediate Rust caller snapshot is retained",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-NOLIMIT-72H/production_streams",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Full Native loader/preparation/EIO/error/console bytes retained; no invented BeforeInit prefix or header stripping",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-NOLIMIT-72H/AfterInitReturn/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-NOLIMIT-72H/AfterInitReturn/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-NOLIMIT-72H/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-NOLIMIT-ANNUAL/BeforeRegistry_to_actual_Rust_caller_before_producer/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-NOLIMIT-ANNUAL/BeforeInit_caller_stage",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native registry and thirteen loaders precede BeforeInit; Rust before_initializer precedes its genuine registry/cache producer. No equivalent intermediate Rust caller snapshot is retained",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-NOLIMIT-ANNUAL/production_streams",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Full Native loader/preparation/EIO/error/console bytes retained; no invented BeforeInit prefix or header stripping",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-NOLIMIT-ANNUAL/AfterInitReturn/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-NOLIMIT-ANNUAL/AfterInitReturn/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-NOLIMIT-ANNUAL/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-FLOW-24H/BeforeRegistry_to_actual_Rust_caller_before_producer/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-FLOW-24H/BeforeInit_caller_stage",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native registry and thirteen loaders precede BeforeInit; Rust before_initializer precedes its genuine registry/cache producer. No equivalent intermediate Rust caller snapshot is retained",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-FLOW-24H/production_streams",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Full Native loader/preparation/EIO/error/console bytes retained; no invented BeforeInit prefix or header stripping",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-FLOW-24H/AfterInitReturn/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-FLOW-24H/AfterInitReturn/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-FLOW-24H/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-FLOW-72H/BeforeRegistry_to_actual_Rust_caller_before_producer/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-FLOW-72H/BeforeInit_caller_stage",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native registry and thirteen loaders precede BeforeInit; Rust before_initializer precedes its genuine registry/cache producer. No equivalent intermediate Rust caller snapshot is retained",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-FLOW-72H/production_streams",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Full Native loader/preparation/EIO/error/console bytes retained; no invented BeforeInit prefix or header stripping",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-FLOW-72H/AfterInitReturn/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-FLOW-72H/AfterInitReturn/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-FLOW-72H/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-FLOW-ANNUAL/BeforeRegistry_to_actual_Rust_caller_before_producer/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-FLOW-ANNUAL/BeforeInit_caller_stage",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native registry and thirteen loaders precede BeforeInit; Rust before_initializer precedes its genuine registry/cache producer. No equivalent intermediate Rust caller snapshot is retained",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-FLOW-ANNUAL/production_streams",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Full Native loader/preparation/EIO/error/console bytes retained; no invented BeforeInit prefix or header stripping",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-FLOW-ANNUAL/AfterInitReturn/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-FLOW-ANNUAL/AfterInitReturn/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-FLOW-ANNUAL/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-CAPACITY-24H/BeforeRegistry_to_actual_Rust_caller_before_producer/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-CAPACITY-24H/BeforeInit_caller_stage",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native registry and thirteen loaders precede BeforeInit; Rust before_initializer precedes its genuine registry/cache producer. No equivalent intermediate Rust caller snapshot is retained",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-CAPACITY-24H/production_streams",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Full Native loader/preparation/EIO/error/console bytes retained; no invented BeforeInit prefix or header stripping",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-CAPACITY-24H/AfterInitReturn/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-CAPACITY-24H/AfterInitReturn/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-CAPACITY-24H/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-CAPACITY-72H/BeforeRegistry_to_actual_Rust_caller_before_producer/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-CAPACITY-72H/BeforeInit_caller_stage",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native registry and thirteen loaders precede BeforeInit; Rust before_initializer precedes its genuine registry/cache producer. No equivalent intermediate Rust caller snapshot is retained",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-CAPACITY-72H/production_streams",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Full Native loader/preparation/EIO/error/console bytes retained; no invented BeforeInit prefix or header stripping",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-CAPACITY-72H/AfterInitReturn/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-CAPACITY-72H/AfterInitReturn/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-CAPACITY-72H/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-CAPACITY-ANNUAL/BeforeRegistry_to_actual_Rust_caller_before_producer/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-CAPACITY-ANNUAL/BeforeInit_caller_stage",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native registry and thirteen loaders precede BeforeInit; Rust before_initializer precedes its genuine registry/cache producer. No equivalent intermediate Rust caller snapshot is retained",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-CAPACITY-ANNUAL/production_streams",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Full Native loader/preparation/EIO/error/console bytes retained; no invented BeforeInit prefix or header stripping",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-CAPACITY-ANNUAL/AfterInitReturn/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-CAPACITY-ANNUAL/AfterInitReturn/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-CAPACITY-ANNUAL/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-BOTH-24H/BeforeRegistry_to_actual_Rust_caller_before_producer/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-BOTH-24H/BeforeInit_caller_stage",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native registry and thirteen loaders precede BeforeInit; Rust before_initializer precedes its genuine registry/cache producer. No equivalent intermediate Rust caller snapshot is retained",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-BOTH-24H/production_streams",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Full Native loader/preparation/EIO/error/console bytes retained; no invented BeforeInit prefix or header stripping",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-BOTH-24H/AfterInitReturn/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-BOTH-24H/AfterInitReturn/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-BOTH-24H/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-BOTH-72H/BeforeRegistry_to_actual_Rust_caller_before_producer/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-BOTH-72H/BeforeInit_caller_stage",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native registry and thirteen loaders precede BeforeInit; Rust before_initializer precedes its genuine registry/cache producer. No equivalent intermediate Rust caller snapshot is retained",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-BOTH-72H/production_streams",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Full Native loader/preparation/EIO/error/console bytes retained; no invented BeforeInit prefix or header stripping",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-BOTH-72H/AfterInitReturn/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-BOTH-72H/AfterInitReturn/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-BOTH-72H/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-BOTH-ANNUAL/BeforeRegistry_to_actual_Rust_caller_before_producer/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-BOTH-ANNUAL/BeforeInit_caller_stage",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native registry and thirteen loaders precede BeforeInit; Rust before_initializer precedes its genuine registry/cache producer. No equivalent intermediate Rust caller snapshot is retained",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-BOTH-ANNUAL/production_streams",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Full Native loader/preparation/EIO/error/console bytes retained; no invented BeforeInit prefix or header stripping",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-BOTH-ANNUAL/AfterInitReturn/reports/Native_registry_context",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Twenty-two real totals, component-size/shadow arrays and their counts are captured Native context outside the selected Init/report suffix; no Rust owner is invented",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-BOTH-ANNUAL/AfterInitReturn/backend/caller_headers_optional_context",
+        "Native_available": true,
+        "Rust_available": true,
+        "required": false,
+        "reason": "Native version/IDD/date strings and production callbacks are actual different caller inputs; DeveloperFlag Native owner was not copied",
+        "counted_as_PASS": false
+      },
+      {
+        "path": "model_cases/B-BOTH-ANNUAL/other_whole_Init_owners",
+        "Native_available": true,
+        "Rust_available": false,
+        "required": false,
+        "reason": "Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas",
+        "counted_as_PASS": false
+      }
+    ],
+    "unavailable_counted_as_PASS": false
+  },
+  "arithmetic_profile_authority": [
+    {
+      "variable": "CTFOutside",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        19
+      ],
+      "unit": "W/m2-K"
+    },
+    {
+      "variable": "CTFCross",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        19
+      ],
+      "unit": "W/m2-K"
+    },
+    {
+      "variable": "CTFInside",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        19
+      ],
+      "unit": "W/m2-K"
+    },
+    {
+      "variable": "CTFFlux",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": [
+        19
+      ],
+      "unit": "dimensionless"
+    },
+    {
+      "variable": "CTFTimeStep",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar",
+      "unit": "hours"
+    },
+    {
+      "variable": "UValue",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "signed_zero_exact": true,
+      "required_shape": "scalar",
+      "unit": "W/m2-K"
+    }
+  ],
+  "failed_Native04_archive": {
+    "path": ".runtime/porting/CTF-10/native-init-postlude-failed04-linked-archive-01/archive.json",
+    "sha256": "bc641ecefa6581a721245e30afeff41df3ab394203c86bc8d6ae362a687b4a20",
+    "size_bytes": 247315
+  },
+  "failed_Clippy08_and_actual_correction_preserved": true,
+  "prior_failed_selected_comparison_preserved": {
+    "path": ".runtime/porting/CTF-10/init-postlude-comparison-01/comparison.json",
+    "sha256": "28d20856ffab0ade2697227f3ff147d98e67b3344bdfba06f2202f65cea7a1d7",
+    "size_bytes": 267444
+  },
+  "immutable_prior_object_authority": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-init-postlude-comparison/manifest.json",
+    "sha256": "9b5e5ad248d148ab98805620e4d1838ffebeb998d82ab45db264d5c926cc1336",
+    "size_bytes": 491486
+  },
+  "actual_reused_object_count": 262,
+  "semantic_correction_preparations": [
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-direct-preparation-correction-prep-03/manifest.json",
+      "sha256": "53da67db2b04ce71d7600d0cec9871eecfcbfd9aa4d4ea11898c56f2c5b59cd9",
+      "size_bytes": 30266
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-production-preparation-fix-prep-01/manifest.json",
+      "sha256": "7f84ff32d25390e4b86ea06f78ab50397dfa780ba4b64e1c15b4ad5407c54c32",
+      "size_bytes": 65947
+    }
+  ],
+  "actual_semantic_correction_inventory": {
+    "path": ".runtime/porting/CTF-10/init-postlude-historical-card-applied-source-01/record.json",
+    "sha256": "bf65eed05832aa23ef0d684c5687e9e811d3d090917c4cc6799c26dcfeb57e13",
+    "size_bytes": 80878
+  },
+  "actual_post_application_correction_workflow_preparation": {
+    "path": ".runtime/porting/CTF-10/init-postlude-post-application-correction-prep-02/manifest.json",
+    "sha256": "62d21579cbe09937d73dc24c857f3c36ecf1b8193bac33eaa203fc089b25dbc8",
+    "size_bytes": 13977
+  },
+  "actual_post_application_correction_preparation": {
+    "path": ".runtime/porting/CTF-10/init-postlude-production-historical-card-fix-prep-01/manifest.json",
+    "sha256": "83b70e2673a9c305a2a8fc2974c32091a0d45a1d5680f49546b8ec68c1ce7662",
+    "size_bytes": 10361
+  },
+  "prior_failed_candidate_workflow": {
+    "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-candidates-01/workflow.json",
+    "sha256": "6ecb4681ef2c072f8636660014ac1680f8f72d27be413366c7505fe773a03321",
+    "size_bytes": 4213
+  },
+  "historical_Native_and_current_Rust_Source_identities_are_distinct": true,
+  "prior_evidence_replayed": false,
+  "whole_Init_equivalence_claimed": false,
+  "ordinary_persistent_integration_PASS_claimed": false,
+  "complete_CTF10_PASS_claimed": false,
+  "card_gates_promoted": false,
+  "A_and_B_gate_counts_changed": false,
+  "gates_updated": false
+}

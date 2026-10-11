@@ -1,0 +1,19 @@
+--- .runtime/porting/CTF-10/init-postlude-comparison-prep-04/before03/compare.py
++++ .runtime/porting/CTF-10/init-postlude-comparison-prep-04/compare.py
+@@ -6,7 +6,7 @@
+ from pathlib import Path
+ 
+ PREP=Path(__file__).resolve().parent
+-COMMON_SHA='0f82e057f8966c1ca332b48ec8df6eb0550f02ad1bf9836de1325a91c3d9f6e2'
++COMMON_SHA='a30171f74ee3c148142623dd83d750e10f8cb9ee72c306e2cd1651f195547687'
+ MAX_BYTES=4294967296
+ 
+ 
+@@ -198,6 +198,7 @@
+         actual_original_data_review=qa_ref,actual_original_data_review_execution=qe_ref,actual_Native_results=result,actual_Native_frozen_input=qa['actual_frozen_input'],
+         actual_candidate_bindings={lane:dict(request=v[0]['request'],build_execution=v[0]['build-execution'],execution=v[0]['execution'],result=v[4],executable=v[5],source_snapshot=v[2]['source_snapshot']) for lane,v in candidates.items()},
+         actual_formatted_inventory=current['inventory'],actual_quality=current['quality'],actual_correction_workflow_preparation=current['correction_workflow'],actual_runtime_source_bindings=current['runtime_source_bindings'],
++        actual_post_application_correction_workflow_preparation=current['post_application']['workflow'],actual_post_application_correction_preparation=current['post_application']['preparation'],actual_post_application_correction_custody=current['post_application']['custody'],
+         frozen_historical_document_archive_correspondence=manifest['frozen_document_archive_correspondence'],
+         policy=freeze['observation_policy'],arithmetic_profile_authority=native_request['ctf10_public_profiles'],
+         required_missing_counted_as_PASS=False,whole_Init_equivalence_claimed=False,ordinary_production_integration_PASS_claimed=False,complete_CTF10_PASS_claimed=False,gates_updated=False)

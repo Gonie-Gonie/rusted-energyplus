@@ -43,10 +43,13 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
     ctf_coefficients: &[ConstructionCtfCoefficientOverride],
     schedule_cache: &ScheduleSeriesCache,
     mut operations: Option<&mut InternalGainSchedulePhaseOperations>,
-    initialization: Option<
+    mut initialization: Option<
         &mut crate::heat_balance::ctf_initialization_context::CtfInitializationContext<'_>,
     >,
 ) -> Result<HeatBalanceState, RuntimeError> {
+    if let Some(actual) = initialization.as_deref_mut() {
+        actual.prepare_report_input_cache(&model.typed.report_inputs)?;
+    }
     let ctf_coefficients_by_construction = construction_ctf_coefficients_by_name(ctf_coefficients);
     let mut zones = Vec::with_capacity(model.typed.zones.len());
     for zone in &model.typed.zones {
@@ -115,6 +118,12 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
         .collect::<Result<Vec<_>, _>>()?;
     let mut construction_thermal_data = if let Some(actual) = initialization {
         actual.prepare_registry(&model.typed)?;
+        crate::heat_balance::ctf_geometry_reports::report_ordinary_surface_nominal_u(
+            &model.typed,
+            &actual.reports.registry,
+            &mut actual.reports.table,
+        )
+        .map_err(crate::heat_balance::ctf_initialization_context::CtfInitializationError::Owner)?;
         ConstructionThermalDataCache::build_with_initialization_context(
             &model.typed,
             &ctf_coefficients_by_construction,

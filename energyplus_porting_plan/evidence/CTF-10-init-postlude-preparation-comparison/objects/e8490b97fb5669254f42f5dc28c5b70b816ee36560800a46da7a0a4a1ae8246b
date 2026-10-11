@@ -1,0 +1,146 @@
+"""Source-only bytes/diffs inventory; never imports or executes proposed Rust."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+BASE = ROOT / '.runtime/porting/CTF-10/init-postlude-production-preparation-fix-prep-01'
+assert not (BASE / 'manifest.json').exists()
+
+def ref(path):
+    path = Path(path)
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(),
+                size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+def read(path):
+    return json.loads(Path(path).read_bytes())
+
+def typed(path, start, end, purpose):
+    path = ROOT / path
+    lines = path.read_bytes().splitlines(keepends=True)
+    assert 1 <= start <= end <= len(lines)
+    raw = b''.join(lines[start - 1:end])
+    return dict(path=path.relative_to(ROOT).as_posix(), first_line=start, last_line=end,
+                sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw), purpose=purpose)
+
+RUNTIME = 'crates/ep_runtime/src/heat_balance/'
+paths = [RUNTIME + name for name in ['ctf_reports.rs', 'ctf_initialization_context.rs',
+         'initialization.rs', 'mod.rs', 'ctf_geometry_reports.rs', 'ctf_geometry_reports_tests.rs']]
+paths += ['crates/ep_run/examples/ctf10_init_postlude_candidate_production_observer.rs',
+          'crates/ep_run/examples/ctf10_init_postlude_support/fields.rs']
+(BASE / 'diffs').mkdir()
+application = []
+for name in paths:
+    destination = ROOT / name
+    proposal = BASE / 'proposed' / Path(name).name
+    before = BASE / 'before' / Path(name).name
+    is_new = not before.exists()
+    assert proposal.is_file()
+    assert not destination.exists() if is_new else destination.read_bytes() == before.read_bytes()
+    previous = b'' if is_new else before.read_bytes()
+    change = ''.join(difflib.unified_diff(previous.decode('utf-8').splitlines(keepends=True),
+                    proposal.read_text(encoding='utf-8').splitlines(keepends=True),
+                    fromfile='/dev/null' if is_new else name,
+                    tofile=proposal.relative_to(ROOT).as_posix()))
+    diff = BASE / 'diffs' / (Path(name).name + '.diff')
+    diff.write_text(change, encoding='utf-8', newline='\n')
+    row = dict(canonical_path=name, proposal=ref(proposal), exact_diff=ref(diff), absent=is_new)
+    if not is_new:
+        row.update(actual_before=ref(destination), before_archive=ref(before))
+    application.append(row)
+
+prior = ROOT / '.runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/manifest.json'
+interfaces = read(prior)['runtime_interfaces']
+interfaces['ordered_public_API_source_paths'].insert(
+    interfaces['ordered_public_API_source_paths'].index(RUNTIME + 'ctf_initialization_context.rs') + 1,
+    RUNTIME + 'ctf_geometry_reports.rs')
+interfaces.update(public_API_source_count=59, observer_source_count=4,
+                  selected_report_input_preparation_before_observer_snapshot=True,
+                  Native_direct_six_units_executed=False,
+                  numerical_comparison_performed=False)
+assert len(interfaces['ordered_public_API_source_paths']) == 59
+assert len(set(interfaces['ordered_public_API_source_paths'])) == 59
+assert len(interfaces['ordered_observer_source_paths']) == 4
+source_inventory = []
+by_path = {row['canonical_path']: row for row in application}
+for name in interfaces['ordered_observer_source_paths'] + interfaces['ordered_public_API_source_paths']:
+    row = dict(canonical_path=name)
+    proposal = by_path.get(name)
+    if proposal:
+        row['proposal_after_application'] = proposal['proposal']
+        if not proposal['absent']:
+            row['historical_current_before_archive'] = proposal['before_archive']
+        else:
+            row['new_destination_absent'] = True
+    else:
+        row['current_source_context'] = ref(ROOT / name)
+    source_inventory.append(row)
+
+native = '.reference/energyplus-src/26.1.0/src/EnergyPlus/'
+selections = [
+    (native+'Data/EnergyPlusData.cc',840,856,'Genuine init_state once guard and GetProjectData then EMS ordering'),
+    (native+'EMSManager.cc',211,245,'Actual no-EMS query and requested-report warning suffix'),
+    (native+'Material.cc',198,226,'Regular actual Resistance and NominalR common assignment'),
+    (native+'Material.cc',275,309,'NoMass input resistance and NominalR assignment'),
+    (native+'HeatBalanceManager.cc',1390,1397,'NominalR and NominalU actual positive-zero allocation'),
+    (native+'HeatBalanceManager.cc',1497,1513,'Ordered outside-to-inside NominalR addition'),
+    (native+'HeatBalanceManager.cc',1777,1797,'Actual NominalU reciprocal and zero-input load failure'),
+    (native+'DataHeatBalance.cc',893,982,'Complete ComputeNominalUwithConvCoeffs selected arithmetic and films'),
+    (native+'SurfaceGeometry.cc',641,669,'Actual full surface report-order predefined U-film rows'),
+    (native+'SurfaceGeometry.cc',1423,1530,'Actual Zone/Space/class ordering and report-order publication'),
+    (native+'SurfaceGeometry.cc',1779,1802,'Adiabatic named self resolves to current surface ID'),
+    (native+'SurfaceGeometry.cc',3914,3927,'Ceiling actual Roof class mapping'),
+    (native+'SurfaceGeometry.cc',4019,4028,'Outdoors and Adiabatic raw boundary owners'),
+    (native+'OutputReportPredefined.cc',1766,1835,'Complete real PreDefTableEntry assignments and selected fixed formatting'),
+    (native+'OutputReportPredefined.cc',1837,1875,'Existing string overload common assignments'),
+    (native+'OutputReportPredefined.cc',1928,1973,'Actual incrementTableEntry allocation/count/growth'),
+    ('crates/ep_compiler/src/compiler/surface_space.rs',199,243,'Existing genuine represented surface registration/report order'),
+    ('crates/ep_compiler/src/compiler.rs',4197,4229,'Typed Regular loader resistance producer'),
+    ('crates/ep_model/src/objects/materials.rs',191,220,'Actual typed Regular/NoMass stored loader primitives'),
+    ('crates/ep_model/src/objects/surfaces.rs',72,107,'Actual represented surface class/boundary domain'),
+    ('crates/ep_runtime/src/heat_balance/ctf_reports_format.rs',1,29,'Accepted fmt8 fixed formatter reused, without duplicate equations'),
+    ('crates/ep_runtime/src/heat_balance/report_scan.rs',159,181,'Existing fallible first-cache and warning boundary'),
+    ('crates/ep_runtime/src/heat_balance/report_scan.rs',252,277,'Actual EMS input and first-cache completion writes'),
+]
+whole_paths = list(dict.fromkeys(row[0] for row in selections))
+whole_paths += ['energyplus_porting_plan/contracts/scope.json',
+               'crates/ep_runtime/src/heat_balance/error_backend.rs',
+               'crates/ep_runtime/src/error.rs',
+               'crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs',
+               'crates/ep_runtime/src/heat_balance/predefined_tables.rs',
+               'crates/ep_runtime/src/heat_balance/predefined_tables_catalog.rs',
+               'crates/ep_model/src/objects/building.rs']
+ast.parse(Path(__file__).read_text(encoding='utf-8'))
+metadata = dict(
+    schema='ctf10-Init-postlude-production-preparation-correction-source.v1',
+    status='SOURCE-READY-HELD-NOT-EXECUTED',
+    application=application, application_sources=application,
+    own_sources=[row['proposal'] for row in application] + [ref(BASE/'README.md'), ref(Path(__file__))],
+    source_context=dict(whole_sources=[ref(ROOT / name) for name in dict.fromkeys(whole_paths)],
+                        selected_source_ranges=[typed(*row) for row in selections]),
+    runtime_interfaces=interfaces, runtime_source_inventory=source_inventory,
+    inherited_production_observer_source_authority=ref(prior),
+    unchanged_comparer=ref(ROOT/'.runtime/porting/CTF-10/init-postlude-comparison-prep-02/manifest.json'),
+    unchanged_Native_source=ref(ROOT/'.runtime/porting/CTF-10/native-init-postlude-prep-06/manifest.json'),
+    unchanged_observation_policy=ref(ROOT/'.runtime/porting/CTF-10/native-init-postlude-workflow-prep-02/policy.proposed.json'),
+    diagnostic_failed_comparison_authority=ref(ROOT/'.runtime/porting/CTF-10/init-postlude-comparison-01/comparison.json'),
+    diagnosis=dict(discrete_mismatches=829, production_mismatches=762,
+                   production_first_scan_mismatches=54, production_table_prefix_mismatches=708,
+                   Header_separate_direct_mismatches=67, complete_ledger_preserved=True,
+                   observed_Native_values_used_as_production_inputs_or_test_expectations=False),
+    authored_tests=dict(count=6, executed=False, Native_numeric_certificate=False),
+    scope=dict(materials=['Regular','NoMass'], boundaries=['Outdoors','Adiabatic'],
+               represented_surface_classes=['Wall','Floor','Roof','Ceiling mapped to Roof'],
+               active_EMS_API_external_HVAC=False, first_scan_repeated_if_already_scanned=False,
+               values_requiring_exponential_or_nonfinite_predefined_format_unavailable=True),
+    current_canonical_changed=False, targets_or_imports_or_tests_executed=False,
+    scientific_PASS_claimed=False, integration_PASS_claimed=False, gates_updated=False,
+    future_application_or_quality_or_candidate_or_comparison=None,
+    authorship='Raw authored the original Native transport/comparer and this Source-only production correction after authorized failure diagnosis; independent Source peer and actual future execution remain required.')
+(BASE/'manifest.json').write_text(json.dumps(metadata, indent=2, ensure_ascii=False)+'\n',encoding='utf-8',newline='\n')
+print(json.dumps(dict(manifest=ref(BASE/'manifest.json'), application_files=len(application),
+                     new_destinations=sum(row['absent'] for row in application),
+                     test_count=metadata['authored_tests']['count'])))

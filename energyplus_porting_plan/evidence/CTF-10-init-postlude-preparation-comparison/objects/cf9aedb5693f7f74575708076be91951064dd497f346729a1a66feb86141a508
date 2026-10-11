@@ -1,0 +1,14 @@
+--- .runtime/porting/CTF-10/init-postlude-prerequisite-applied-source-01/literal/crates__ep_runtime__src__heat_balance__ctf_reports.rs
++++ crates/ep_runtime/src/heat_balance/ctf_reports.rs
+@@ -184,7 +184,10 @@
+         self.string_entry(column, object, &text)?;
+         let index = usize::try_from(self.num_table_entry - 1)
+             .map_err(|_| CtfReportUnavailable::TableOwner)?;
+-        let entry = self.entries.as_mut().and_then(|rows| rows.get_mut(index))
++        let entry = self
++            .entries
++            .as_mut()
++            .and_then(|rows| rows.get_mut(index))
+             .ok_or(CtfReportUnavailable::TableOwner)?;
+         entry.original_real_entry = value;
+         entry.significant_digits = 3;

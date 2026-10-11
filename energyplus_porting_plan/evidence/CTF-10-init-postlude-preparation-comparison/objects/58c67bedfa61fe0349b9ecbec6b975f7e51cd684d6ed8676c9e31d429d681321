@@ -1,0 +1,50 @@
+"""Seal literal optional-unavailable policy consistency; no finalizer execution."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd().resolve()
+BASE = ROOT / '.runtime/porting/CTF-10'
+OLD = BASE / 'init-postlude-finalization-prep-05'
+OUT = BASE / 'init-postlude-finalization-prep-06'
+
+def ref(p):
+    b = p.read_bytes()
+    return dict(path=p.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(b).hexdigest(), size_bytes=len(b))
+
+def write(p, value):
+    p.write_text(json.dumps(value, indent=2) + '\n', encoding='utf8', newline='\n')
+
+assert ref(OLD / 'manifest.json')['sha256'] == 'e1394c298b1932663d535c204405b5964a900fff31f79a06f453f7770865d753'
+old = (OLD / 'finalize.py').read_text()
+needle = "assert not passed or paired['unavailable_observations'] == []\n"
+replacement = "assert all(row['counted_as_PASS'] is False and type(row['required']) is bool for row in paired['unavailable_observations'])\nassert not passed or all(row['required'] is False for row in paired['unavailable_observations'])\n"
+assert old.count(needle) == 1
+source = old.replace(needle, replacement); ast.parse(source)
+(OUT / 'finalize.py').write_text(source, encoding='utf8', newline='\n')
+(OUT / 'before').mkdir()
+for name in ['finalize.py', 'README.md', 'manifest.json']:
+    (OUT / 'before' / name).write_bytes((OLD / name).read_bytes())
+(OUT / 'source.diff').write_text(''.join(difflib.unified_diff(old.splitlines(True), source.splitlines(True), fromfile=(OLD / 'finalize.py').relative_to(ROOT).as_posix(), tofile=(OUT / 'finalize.py').relative_to(ROOT).as_posix())), encoding='utf8', newline='\n')
+readme = (OLD / 'README.md').read_text() + '''
+
+## Optional unavailable owners remain explicit
+
+The existing comparer records required absence as a mismatch, and separately
+records optional unpaired owners with required:false/countedasPASS:false. This
+successor requires every unavailable record to retain its noPASS marker and
+boolean required classification. Selected paired success requires every such
+record to be optional; it does not require an empty optional ledger. The full
+ledger is preserved unchanged. Mismatch/status/exit conditions and required
+absence failures remain literal05, with no new pair, tolerance or gate promotion.
+This correction is Source-reasoned from unchanged Comparison.absence and
+pair_owners.unpaired; no future comparison result or numerical body was read.
+'''
+(OUT / 'README.md').write_text(readme, encoding='utf8', newline='\n')
+(OUT / 'README.diff').write_text(''.join(difflib.unified_diff((OLD / 'README.md').read_text().splitlines(True), readme.splitlines(True), fromfile=(OLD / 'README.md').relative_to(ROOT).as_posix(), tofile=(OUT / 'README.md').relative_to(ROOT).as_posix())), encoding='utf8', newline='\n')
+manifest = json.loads((OLD / 'manifest.json').read_bytes())
+manifest.update(own_sources=[ref(OUT / n) for n in ['finalize.py', 'README.md', 'seal_source.py']], predecessor_manifest=ref(OLD / 'manifest.json'), before=[ref(OUT / 'before' / n) for n in ['finalize.py', 'README.md', 'manifest.json']], source_diffs=[ref(OUT / n) for n in ['source.diff', 'README.diff']], source_diff=ref(OUT / 'source.diff'), README_diff=ref(OUT / 'README.diff'), README=ref(OUT / 'README.md'), authoring_source=ref(OUT / 'seal_source.py'), optional_unavailable_policy_source_context=[ref(BASE / 'init-postlude-comparison-prep-04' / n) for n in ['comparison.py', 'pair_owners.py']], selected_paired_success_requires_no_required_unavailability=True, every_unavailable_noPASS_marker_required=True, complete_optional_unavailable_ledger_preserved=True)
+write(OUT / 'manifest.json', manifest)
+print(json.dumps(dict(manifest=ref(OUT / 'manifest.json'), source=ref(OUT / 'finalize.py'), source_lines=len(source.splitlines()))))

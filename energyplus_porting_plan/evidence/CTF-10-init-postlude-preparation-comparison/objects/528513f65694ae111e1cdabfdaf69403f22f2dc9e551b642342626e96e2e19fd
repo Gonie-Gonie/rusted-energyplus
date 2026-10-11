@@ -1,0 +1,110 @@
+--- .runtime/porting/CTF-10/init-postlude-comparison-prep-04/before03/custody.py
++++ .runtime/porting/CTF-10/init-postlude-comparison-prep-04/custody.py
+@@ -90,12 +90,70 @@
+         m.require(all(actual[key]==historical[key] for key in ['sha256','size_bytes']), 'Frozen historical document bytes differ')
+ 
+ 
++def post_application_sources(m, inventory, manifest):
++    """Retain both exact correction stages; never inspect any numerical result."""
++    prep_ref=manifest['post_application_workflow_preparation'];prep=m.load(prep_ref)
++    m.require(prep['schema']=='ctf10-Init-postlude-post-application-correction-source.v1', 'Exact reviewed one-file post-application workflow required')
++    executor=m.bind(prep['workflow_source']);parent=m.load(prep['accepted_parent_inventory']);authority=prep['reviewed_post_application_preparation'];held_manifest=m.load(authority)
++    same(m,inventory['post_application_parent_inventory'],prep['accepted_parent_inventory']);same(m,inventory['post_application_workflow_source_manifest'],prep_ref);same(m,inventory['actual_post_application_Root_source'],executor)
++    same(m,prep['reused_quality_source_preparation'],manifest['correction_workflow_preparation']);same(m,prep['reused_quality_executor'],inventory['actual_correction_Root_source'])
++    m.require(len(inventory['post_application_corrections'])==len(held_manifest['application'])==1 and held_manifest['application']==held_manifest['application_sources'], 'Exactly one declared reviewed post-application correction required')
++    row=inventory['post_application_corrections'][0];held=held_manifest['application'][0];name=row['canonical_path']
++    m.require(name==held['canonical_path']==prep['only_correction_path'] and name=='crates/ep_run/examples/ctf10_init_postlude_candidate_production_observer.rs' and held['absent'] is False, 'Only the genuine production observer documentary binding may change')
++    m.require(set(row)=={'canonical_path','source_preparation','reviewed_source_authority','held_before_archive','held_exact_diff','new_destination_absent','actual_before_archive','actual_corrected_literal','actual_semantic_correction_diff','actual_final_source','actual_correction_formatter_diff'} and row['new_destination_absent'] is False, 'Exact existing one-row correction custody required')
++    same(m,row['source_preparation'],authority)
++    m.require(row['reviewed_source_authority']==held['proposal'] and row['held_before_archive']==held['before_archive'] and row['held_exact_diff']==held['exact_diff'], 'Post-application held Source authority differs')
++    def raw(ref):
++        m.bind(ref);return m.contained(ref['path']).read_bytes()
++    def diff(left,right,a,b):
++        return ''.join(difflib.unified_diff(a.decode('utf8').splitlines(True),b.decode('utf8').splitlines(True),fromfile=left,tofile=right)).encode('utf8')
++    prior=raw(row['actual_before_archive']);literal=raw(row['actual_corrected_literal']);final=raw(row['actual_final_source'])
++    m.require(prior==raw(held['before_archive']) and held['actual_before']['path']==name and held['actual_before']['sha256']==hashlib.sha256(prior).hexdigest() and held['actual_before']['size_bytes']==len(prior) and literal==raw(held['proposal']), 'Post-application historical before/literal Source bytes differ')
++    declared=raw(held['exact_diff']);labels=declared.decode('utf8').splitlines()
++    m.require(len(labels)>=2 and labels[0].startswith('--- ') and labels[1].startswith('+++ ') and diff(labels[0][4:],labels[1][4:],prior,literal)==declared, 'Post-application held semantic delta differs')
++    m.require(diff(name,name,prior,literal)==raw(row['actual_semantic_correction_diff']) and diff(row['actual_corrected_literal']['path'],name,literal,final)==raw(row['actual_correction_formatter_diff']), 'Separate post-application semantic/formatter deltas differ')
++    m.require(final==raw(dict(path=name,sha256=row['actual_final_source']['sha256'],size_bytes=len(final))), 'Latest post-application canonical/archive bytes differ')
++    wanted=json.loads(json.dumps(parent))
++    for group in ['actual_sources','correction_application_sources']:
++        old_rows=[v for v in parent[group] if v['canonical_path']==name];new_rows=[v for v in wanted[group] if v['canonical_path']==name]
++        m.require(len(old_rows)==len(new_rows)==1 and prior==raw(old_rows[0]['actual_final_source']) and 'initial_correction_actual_final_source' not in old_rows[0], 'Exact untouched first-correction final authority required')
++        new_rows[0]['initial_correction_actual_final_source']=old_rows[0]['actual_final_source'];new_rows[0]['actual_final_source']=row['actual_final_source']
++    for key in ['post_application_before_Source_snapshot','retained_preflight_failure','retained_failed_candidate_workflow','retained_failed_candidate_outer_execution']:
++        expected=prep['held_before_Source_snapshot'] if key=='post_application_before_Source_snapshot' else prep[key]
++        same(m,inventory[key],expected);m.bind(expected)
++    failed=recorded(m,prep['retained_preflight_failure'],allowed=(2,));outer=recorded(m,prep['retained_failed_candidate_outer_execution'],allowed=(2,));workflow=m.load(prep['retained_failed_candidate_workflow'])
++    m.require(full(m,failed['stdout'])['size_bytes']==0 and failed['source_snapshot']==outer['source_snapshot']==prep['held_before_Source_snapshot'] and workflow['accepted_formatted_inventory']==prep['accepted_parent_inventory'] and workflow['actual_Source_snapshot']==prep['held_before_Source_snapshot'] and workflow['actual_candidate_commands_returned_zero'] is False and workflow['Native_results_read'] is False and workflow['numerical_PASS_claimed'] is False and workflow['gates_updated'] is False, 'Honest retained empty-stdout production preflight failure required')
++    m.require([v['lane'] for v in workflow['actual_candidate_executions']]==['production','direct'] and workflow['actual_candidate_executions'][0]['execution']==prep['retained_preflight_failure'] and workflow['actual_candidate_executions'][0]['actual_exit_code']==2 and workflow['actual_candidate_executions'][1]['actual_exit_code']==0, 'Retained failed candidate invocation ledger differs')
++    literal_record=m.load(inventory['post_application_literal_correction']);pending={key:value for key,value in row.items() if key not in ['actual_final_source','actual_correction_formatter_diff']}
++    m.require(literal_record==dict(schema='ctf10-Init-postlude-actual-post-application-correction.v1',accepted_parent_inventory=prep['accepted_parent_inventory'],actual_sources=[pending],source_correction_is_formatter_only=False,scientific_PASS_claimed=False,gates_updated=False), 'Separate one-file literal semantic correction record differs')
++    fmt=m.load(inventory['actual_post_application_format_execution'])
++    m.require(fmt['schema']=='recorded-porting-command.v1' and fmt['exit_code']==0 and fmt['launch_error'] is None and fmt['source_bytes_match_before_and_after'] is False and Path(fmt['cwd']).resolve()==m.ROOT and fmt['command']==['cargo','fmt','--all'], 'Actual intended post-application formatter mutation required')
++    for key in ['stdout','stderr','source_snapshot']:m.bind(fmt[key])
++    m.bind(fmt['executed_launcher']['archive']);m.require(fmt['executed_launcher']['historical_path']=='tools/porting/record_command.py' and fmt['executed_launcher']['archive']['sha256']=='5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba','Actual post-application formatter recorder differs');before(m,failed,fmt)
++    for lane,paths in prep['runtime_paths'].items():
++        old_packet=m.load(parent['runtime_source_bindings'][lane]);new_packet=m.load(inventory['runtime_source_bindings'][lane]);expected=json.loads(json.dumps(old_packet))
++        m.require(set(new_packet)=={'schema','observer_sources','actual_public_API_sources'} and new_packet['schema']==paths['schema'], 'Exact latest runtime packet schema required')
++        for key in ['observer_sources','actual_public_API_sources']:
++            m.require([v['path'] for v in new_packet[key]]==paths[key], 'Post-application runtime Source membership/order differs')
++            for v in expected[key]:
++                if v['path']==name:v.update(sha256=row['actual_final_source']['sha256'],size_bytes=row['actual_final_source']['size_bytes'])
++            for v in new_packet[key]:m.bind(v)
++        m.require(new_packet==expected, 'Runtime bindings changed outside the one-file correction')
++    updates={key:inventory[key] for key in ['post_application_parent_inventory','post_application_corrections','post_application_workflow_source_manifest','actual_post_application_Root_source','actual_post_application_format_execution','post_application_before_Source_snapshot','retained_preflight_failure','retained_failed_candidate_workflow','retained_failed_candidate_outer_execution','post_application_literal_correction','runtime_source_bindings']}
++    wanted.update(**updates,formatter_correspondence_review_pending=True,source_correction_review_pending=True,quality_execution_performed=False)
++    m.require(inventory==wanted, 'Inventory changed outside explicit one-file post-application lineage')
++    normalized=dict(inventory);normalized['actual_sources']=parent['actual_sources'];normalized['correction_application_sources']=parent['correction_application_sources']
++    custody={key:inventory[key] for key in ['post_application_parent_inventory','actual_post_application_Root_source','actual_post_application_format_execution','post_application_before_Source_snapshot','retained_preflight_failure','post_application_corrections']}
++    return normalized,dict(workflow=prep_ref,preparation=authority,custody=custody,formatter=fmt,latest={name:row['actual_final_source']})
++
++
+ def corrected_sources(m, args, manifest):
+     """Authenticate only actual correction/quality/runtime custody, no result owners."""
+     prep_ref=manifest['correction_workflow_preparation'];prep=m.load(prep_ref)
+     m.require(prep['schema']=='ctf10-Init-postlude-prerequisite-correction-workflow-source.v1', 'Reviewed prerequisite correction workflow required')
+     executor=m.bind(prep['workflow_source']);inventory_ref=m.argument(args.formatted_inventory);quality_ref=m.argument(args.quality)
+     inventory=m.load(inventory_ref);quality=m.load(quality_ref);parent=m.load(prep['accepted_parent_inventory'])
++    inventory,post=post_application_sources(m,inventory,manifest)
+     m.require(inventory['schema']=='ctf10-Init-postlude-actual-formatted-source-inventory.v1' and inventory['original_literal_and_formatter_ancestry_retained'] is True and inventory['original_batch_Root_source_retained'] is True, 'Original literal and formatter ancestry must remain explicit')
+     same(m,inventory['correction_workflow_source_manifest'],prep_ref);same(m,inventory['accepted_parent_inventory'],prep['accepted_parent_inventory'])
+     same(m,inventory['actual_correction_Root_source'],executor)
+@@ -121,7 +179,7 @@
+         held_delta=raw(held['exact_diff']);labels=held_delta.decode('utf8').splitlines()
+         m.require(len(labels)>=2 and diff(labels[0][4:],labels[1][4:],prior,literal)==held_delta,'Held semantic Source delta differs')
+         m.require(diff(name,name,prior,literal)==raw(row['actual_semantic_correction_diff']),'Actual semantic correction delta differs')
+-        final=raw(row['actual_final_source']);m.require(final==raw(dict(path=name,sha256=row['actual_final_source']['sha256'],size_bytes=len(final))),'Canonical/final Source bytes differ')
++        final=raw(row['actual_final_source']);effective=post['latest'].get(name,row['actual_final_source']);m.require(raw(effective)==raw(dict(path=name,sha256=effective['sha256'],size_bytes=effective['size_bytes'])),'Canonical/latest final Source bytes differ')
+         m.require(diff(row['actual_corrected_literal']['path'],name,literal,final)==raw(row['actual_correction_formatter_diff']),'Actual correction formatter delta differs')
+     originals=inventory['actual_sources'];old=parent['actual_sources'];by_name={row['canonical_path']:row for row in rows}
+     literal_refs=[row['semantic_correction_application'] for row in originals if row['canonical_path'] in by_name]
+@@ -131,7 +189,7 @@
+         wanted=dict(prior);name=row['canonical_path']
+         if name in by_name:wanted.update(actual_final_source=by_name[name]['actual_final_source'],semantic_correction_application=literal_ref)
+         m.require(row==wanted,'Original applied Source ancestry changed outside explicit correction');raw(row['actual_literal_source']);raw(row['formatter_correspondence_diff'])
+-        raw(row['actual_final_source']);raw(dict(path=name,sha256=row['actual_final_source']['sha256'],size_bytes=row['actual_final_source']['size_bytes']))
++        raw(row['actual_final_source']);effective=post['latest'].get(name,row['actual_final_source']);raw(dict(path=name,sha256=effective['sha256'],size_bytes=effective['size_bytes']))
+     m.require(inventory['additional_applied_sources']==[row for row in rows if row['canonical_path'] not in {old_row['canonical_path'] for old_row in old}], 'Exact additional correction rows required')
+     literal_record=m.load(literal_ref);m.require(literal_record['schema']=='ctf10-Init-postlude-actual-prerequisite-corrections.v1' and literal_record['source_correction_is_formatter_only'] is False,'Semantic correction record cannot masquerade as formatting')
+     same(m,literal_record['accepted_parent_inventory'],prep['accepted_parent_inventory'])
+@@ -144,7 +202,7 @@
+     config=['--config','profile.dev.debug=0','--config','profile.test.debug=0','--config','build.incremental=false']
+     commands=[('fmt-check',['cargo','fmt','--all','--','--check']),('clippy',['cargo','clippy',*config,'--locked','--workspace','--all-targets','--','-D','warnings']),('focused',['cargo','test',*config,'--locked','-p','ep_runtime','--lib','heat_balance::']),('workspace',['cargo','test',*config,'--locked','--workspace']),('supplementary-direct-observer-tests',['cargo','test',*config,'--locked','-p','ep_run','--example','ctf10_init_postlude_candidate_direct_observer'])]
+     actual=quality['actual_commands']+[quality['supplementary_direct_observer_tests']];m.require(len(quality['actual_commands'])==4 and len(actual)==5,'Four standard plus actual direct-example quality receipts required')
+-    last=fmt
++    before(m,fmt,post['formatter']);last=post['formatter']
+     for row,(role,command) in zip(actual,commands,strict=True):
+         value=recorded(m,row['execution']);before(m,last,value);last=value
+         m.require(row['role']==role and row['actual_exit_code']==value['exit_code']==0 and value['command']==command,'Actual quality role/argv/exit differs')
+@@ -157,6 +215,6 @@
+             m.require([row['path'] for row in packet[key]]==paths[key]==interface[interface_key],'Corrected own/API path order differs')
+             for row in packet[key]:m.bind(row)
+         bindings[lane]=packet
+-    return dict(inventory=inventory_ref,quality=quality_ref,source_snapshot=quality['Source_snapshot'],runtime_source_bindings=inventory['runtime_source_bindings'],bindings=bindings,last_quality=last,correction_workflow=prep_ref)
+-
+-
++    return dict(inventory=inventory_ref,quality=quality_ref,source_snapshot=quality['Source_snapshot'],runtime_source_bindings=inventory['runtime_source_bindings'],bindings=bindings,last_quality=last,correction_workflow=prep_ref,post_application=post)
++
++

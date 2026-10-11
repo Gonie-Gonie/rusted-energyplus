@@ -1,0 +1,92 @@
+{
+  "schema": "ctf10-Init-postlude-actual-candidate-execution-workflow.v1",
+  "source_preparation": {
+    "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-05/manifest.json",
+    "sha256": "b9f13f31fde8262818d18ebe8d79fe6ac90ee6665980f76ea1d9e7a48b20193c",
+    "size_bytes": 22226
+  },
+  "accepted_formatted_inventory": {
+    "path": ".runtime/porting/CTF-10/init-postlude-historical-card-applied-source-01/record.json",
+    "sha256": "bf65eed05832aa23ef0d684c5687e9e811d3d090917c4cc6799c26dcfeb57e13",
+    "size_bytes": 80878
+  },
+  "actual_quality": {
+    "path": ".runtime/porting/CTF-10/init-postlude-historical-card-quality-01/quality.json",
+    "sha256": "78b2526c28e94352d0f15a6ed139f183e02bbba11123c9882bd94cc1108bd254",
+    "size_bytes": 4046
+  },
+  "actual_Source_snapshot": {
+    "path": ".runtime/porting/source-objects/d1/d1bb9bcbc3e3f6ac155346203b3ef0629fad2343ccfec952289709835a7aaecb",
+    "sha256": "d1bb9bcbc3e3f6ac155346203b3ef0629fad2343ccfec952289709835a7aaecb"
+  },
+  "actual_native_freeze": {
+    "path": ".runtime/porting/CTF-10/native-init-postlude-workflow-05/freeze.json",
+    "sha256": "34baef3ec4dbaba77eab1c4f9c459417668ad97fb81142d838bce019a1cb34fb",
+    "size_bytes": 44649
+  },
+  "production_projection_execution": {
+    "path": ".runtime/porting/CTF-10/init-postlude-historical-card-input-projection-command-02/receipt.json",
+    "sha256": "47877064169d83ad9f4413c2ac7850a77127d8ee1c9f543307cc15e780cfb00b",
+    "size_bytes": 4736
+  },
+  "direct_input_writer_execution": {
+    "path": ".runtime/porting/CTF-10/init-postlude-historical-card-candidates-01/direct-input-writer-command-01/receipt.json",
+    "sha256": "27d37daa80b812938a076c4329de05f30417229e928508292ebf81438d4a7055",
+    "size_bytes": 5847
+  },
+  "direct_input_custody": {
+    "path": ".runtime/porting/CTF-10/init-postlude-historical-card-candidates-01/direct-inputs/input-custody.json",
+    "sha256": "763235d554ea2c6547f8d6fe1cb3120f82e4275f230af9bc3dda9b1fce64fdd6",
+    "size_bytes": 2598
+  },
+  "actual_build": {
+    "path": ".runtime/porting/CTF-10/init-postlude-historical-card-candidates-01/candidate-build-command-01/receipt.json",
+    "sha256": "ecc8227b7559e8a52f02cd41e0e295ddde70e5d4c6ce3c9c09b4cdf36e64099d",
+    "size_bytes": 7948
+  },
+  "actual_candidate_executions": [
+    {
+      "lane": "production",
+      "request": {
+        "path": ".runtime/porting/CTF-10/init-postlude-historical-card-input-projection-01/production-request.json",
+        "sha256": "21bce6d4c7dce09ae8171f261c82601ba5d5e7e1514fdde3870d95864c6532c1",
+        "size_bytes": 42414
+      },
+      "emitted_artifact": {
+        "historical_path": "target/debug/examples/ctf10_init_postlude_candidate_production_observer.exe",
+        "sha256": "aaea1ee2b33a022f442a42223df6ce1d67e6819e308e1ade7345824de215f322"
+      },
+      "execution": {
+        "path": ".runtime/porting/CTF-10/init-postlude-historical-card-candidates-01/production-candidate-command-01/receipt.json",
+        "sha256": "b199a58f5f5aaddab51115834e9bb8c186ce76cb8f9dc2235add92d6ee76320a",
+        "size_bytes": 4630
+      },
+      "actual_exit_code": 0
+    },
+    {
+      "lane": "direct",
+      "request": {
+        "path": ".runtime/porting/CTF-10/init-postlude-historical-card-candidates-01/direct-inputs/direct-request.json",
+        "sha256": "99963e78c69166abdac8acb544e16872553562e09be118c14880be88cbd0f0db",
+        "size_bytes": 14139
+      },
+      "emitted_artifact": {
+        "historical_path": "target/debug/examples/ctf10_init_postlude_candidate_direct_observer.exe",
+        "sha256": "4997fbfe570313c6c9e2faebcb9f3b8ed9e8367f4b7f0920c2ce8cb780e6fffd"
+      },
+      "execution": {
+        "path": ".runtime/porting/CTF-10/init-postlude-historical-card-candidates-01/direct-candidate-command-01/receipt.json",
+        "sha256": "f403139fab88137a289da9b58a1f776a5678bcb06f5d637fa810457d6a03f9df",
+        "size_bytes": 4623
+      },
+      "actual_exit_code": 0
+    }
+  ],
+  "actual_candidate_commands_returned_zero": true,
+  "all_bound_inputs_and_sources_unchanged": true,
+  "Native_results_read": false,
+  "scientific_comparison_performed": false,
+  "numerical_PASS_claimed": false,
+  "whole_Init_parity_claimed": false,
+  "gates_updated": false
+}

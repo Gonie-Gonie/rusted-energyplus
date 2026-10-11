@@ -1,0 +1,58 @@
+{
+  "schema": "ctf10-Init-postlude-direct-input-custody.v1",
+  "source_preparation": {
+    "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-05/manifest.json",
+    "sha256": "b9f13f31fde8262818d18ebe8d79fe6ac90ee6665980f76ea1d9e7a48b20193c",
+    "size_bytes": 22226
+  },
+  "accepted_formatted_inventory": {
+    "path": ".runtime/porting/CTF-10/init-postlude-historical-card-applied-source-01/record.json",
+    "sha256": "bf65eed05832aa23ef0d684c5687e9e811d3d090917c4cc6799c26dcfeb57e13",
+    "size_bytes": 80878
+  },
+  "actual_quality": {
+    "path": ".runtime/porting/CTF-10/init-postlude-historical-card-quality-01/quality.json",
+    "sha256": "78b2526c28e94352d0f15a6ed139f183e02bbba11123c9882bd94cc1108bd254",
+    "size_bytes": 4046
+  },
+  "actual_Source_snapshot": {
+    "path": ".runtime/porting/source-objects/d1/d1bb9bcbc3e3f6ac155346203b3ef0629fad2343ccfec952289709835a7aaecb",
+    "sha256": "d1bb9bcbc3e3f6ac155346203b3ef0629fad2343ccfec952289709835a7aaecb"
+  },
+  "actual_runtime_sources": {
+    "path": ".runtime/porting/CTF-10/init-postlude-historical-card-applied-source-01/direct-runtime-sources.json",
+    "sha256": "7667f1b1fc9e00061d9bf3ce99cceba1fa526c2dc2d3cb947888ac198cc583b1",
+    "size_bytes": 12299
+  },
+  "actual_native_freeze": {
+    "path": ".runtime/porting/CTF-10/native-init-postlude-workflow-05/freeze.json",
+    "sha256": "34baef3ec4dbaba77eab1c4f9c459417668ad97fb81142d838bce019a1cb34fb",
+    "size_bytes": 44649
+  },
+  "report_conversion_proof_bindings": [
+    {
+      "path": ".runtime/porting/SCH-01/ctf10-direct-report-converted-inputs-01/converted-inputs.json",
+      "sha256": "69538d17dd458e0f968bfbd274bc29dce80cebc951ff3c0aeadf3e66d7e83c91",
+      "size_bytes": 2844
+    },
+    {
+      "path": ".runtime/porting/SCH-01/ctf10-direct-report-converted-inputs-01/CTF10-DIRECT-REPORT/conversion.json",
+      "sha256": "3d2553e460642ba4057d8c7021f8fe006cb765233fbbc5a8ca7e5d668703f8d8",
+      "size_bytes": 3030
+    },
+    {
+      "path": ".runtime/porting/CTF-10/direct-report-input-conversion-command-01/receipt.json",
+      "sha256": "3f55e9fd83c85d072ca42e2c866fe8ff9b7baf9069f9632999598c9daa754ebd",
+      "size_bytes": 3227
+    }
+  ],
+  "request": {
+    "path": ".runtime/porting/CTF-10/init-postlude-historical-card-candidates-01/direct-inputs/direct-request.json",
+    "sha256": "99963e78c69166abdac8acb544e16872553562e09be118c14880be88cbd0f0db",
+    "size_bytes": 14139
+  },
+  "Native_results_or_expected_values_read": false,
+  "scientific_execution_performed": false,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false
+}

@@ -107,11 +107,39 @@ These results establish the ordinary connection, regression behavior and selecte
 
 ## Actual Init postlude reference comparison
 
-The [current selected Init comparison evidence](../evidence/CTF-10-init-postlude-comparison/summary.json) records a failed comparison over the frozen15 model and6 direct-state cases: numeric2106/discrete696389 comparisons, with829 discrete mismatches retained in the complete ledger. The132 optional unpaired observations receive no PASS. This is a failing reference comparison, not selected-owner equivalence.
+The [current selected Init comparison evidence](../evidence/CTF-10-init-postlude-preparation-comparison/summary.json) records 2106 numerical and 696389 discrete comparisons across the same frozen15 model and6 direct-state cases, with0 mismatches and no dropped records. All132 optional unpaired observations remain explicit and receive no PASS. Selected paired owner fields pass; whole-Init equivalence and persistent ordinary integration remain unconfirmed.
 
-Current fmt/Clippy0, focused306 and workspace4926 PASS/21 groups share SourceSnapshot `7222438fc3281d590c1fc044121314464c3c965150d9e1b03eef2a5e9f79cab9`. Both candidate executions returned0; their process success does not override the comparison failure. Genuine Native capture and current Rust retain their distinct Source identities.
+Corrections retain the genuine project Timestep/report preparation, early EMS Scan before registry allocation, ordered NominalR/NominalU film arithmetic, and real geometry predefined-table entries in Source order. Direct state preparation uses actual compiled inputs. The observer's historical card reference joins the authentic archived document. The [prior failed comparison](../evidence/CTF-10-init-postlude-comparison/summary.json) retains all829 original mismatches; the later production preflight and empty-diff validation failures remain in the new evidence lineage.
 
-Native04 failure/archive custody and Clippy08 failure/corrected-Source ancestry remain recorded. Direct initialization preparation and production predecessor-owner corrections are pending. Selected scope exclusions, unavailable owners, authored header differences and unpaired optional backends receive no PASS. Complete whole-Init equivalence and persistent ordinary numerical/history integration remain unconfirmed; no card gate is promoted.
+Pinned EP26.1 Source ranges: Data/EnergyPlusData.cc840–857; EMSManager.cc208–247; SimulationManager.cc622–705,801–944,1359–1507; Material.cc198–226,275–309; HeatBalanceManager.cc1390–1397,1497–1513,1777–1797; DataHeatBalance.cc893–982; SurfaceGeometry.cc641–669,1423–1530; OutputReportPredefined.cc1766–1835,1928–1973. The archived correction preparations retain the complete direct helpers, owner/default witnesses and exact deltas.
+
+Changed Rust files:
+
+- `crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs`
+- `crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs`
+- `crates/ep_run/examples/ctf10_init_postlude_direct_support/compile_report_inputs.rs`
+- `crates/ep_runtime/src/heat_balance/ctf_reports.rs`
+- `crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs`
+- `crates/ep_runtime/src/heat_balance/initialization.rs`
+- `crates/ep_runtime/src/heat_balance/mod.rs`
+- `crates/ep_runtime/src/heat_balance/ctf_geometry_reports.rs`
+- `crates/ep_runtime/src/heat_balance/ctf_geometry_reports_tests.rs`
+- `crates/ep_run/examples/ctf10_init_postlude_candidate_production_observer.rs`
+- `crates/ep_run/examples/ctf10_init_postlude_support/fields.rs`
+
+Original literal corrections and separate actual formatter deltas remain archived.
+
+Actual fmt/Clippy0, focused312, workspace4932 PASS/21 groups, and direct-observer4 PASS share SourceSnapshot `d1bb9bcbc3e3f6ac155346203b3ef0629fad2343ccfec952289709835a7aaecb`. Both candidate executions returned0. Actual quality commands:
+
+```text
+cargo fmt --all -- --check
+cargo clippy --config profile.dev.debug=0 --config profile.test.debug=0 --config build.incremental=false --locked --workspace --all-targets -- -D warnings
+cargo test --config profile.dev.debug=0 --config profile.test.debug=0 --config build.incremental=false --locked -p ep_runtime --lib heat_balance::
+cargo test --config profile.dev.debug=0 --config profile.test.debug=0 --config build.incremental=false --locked --workspace
+cargo test --config profile.dev.debug=0 --config profile.test.debug=0 --config build.incremental=false --locked -p ep_run --example ctf10_init_postlude_candidate_direct_observer
+```
+
+The unchanged frozen arithmetic profiles and required-absence rules govern the comparison. Native04 and Clippy08 failures remain recorded. Selected scope exclusions, unavailable owners, different caller header inputs and optional backends receive no PASS. Complete CTF-10 gates, ordinary persistent history/warmup handoff and the predecessor integration chain remain unconfirmed; no card gate is promoted.
 
 ## Complete registry, producer diagnostics and Init postlude
 
@@ -127,7 +155,7 @@ The [selected Scan comparison evidence](../evidence/CTF-10-report-scan-compariso
 
 Actual compiler names, construction layers, retained predefined string entries and borrowed EIO output are implemented. Source warning/continue/fatal output, counters, optional callbacks and SQLite adapter boundaries retain their real order and output prefix on failure.
 The [report output/backend evidence](../evidence/CTF-10-report-output/summary.json) records fmt/Clippy0, focused270 and workspace4880 PASS with21 added tests. The observer compilation failure and exact correction are retained. Concurrent recorder publication passed eight-process regression.
-At that report-output milestone, Native Scan/getter and numeric-format byte comparisons, full registry/severe producer plumbing and ordinary whole-Init composition were pending. Their later selected Scan/F/G, registry and ordinary-connection results are recorded above; the current Init owner comparison failed. No card gate is promoted.
+At that report-output milestone, Native Scan/getter and numeric-format byte comparisons, full registry/severe producer plumbing and ordinary whole-Init composition were pending. Their later selected Scan/F/G, registry and ordinary-connection results are recorded above. The corrected selected Init owner comparison now passes; whole-Init equivalence remains unconfirmed. No card gate is promoted.
 
 ## Retained failure-to-fix lineage
 

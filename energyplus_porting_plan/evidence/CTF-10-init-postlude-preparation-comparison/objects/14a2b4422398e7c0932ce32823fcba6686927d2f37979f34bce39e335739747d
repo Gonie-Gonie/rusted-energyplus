@@ -1,0 +1,190 @@
+{
+  "schema": "ctf10-Init-postlude-failed-milestone-documents-source.v1",
+  "status": "HELD-SOURCE-ONLY-UNEXECUTED",
+  "workflow_source": {
+    "path": ".runtime/porting/CTF-10/init-postlude-documents-prep-01/update_documents.py",
+    "sha256": "9661e51a0393fd137297732d9117242f523bc5e2f07cd5b53208fc629d2602e9",
+    "size_bytes": 5625,
+    "line_count": 78
+  },
+  "actual_summary": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-init-postlude-comparison/summary.json",
+    "sha256": "167ea315b51dca7db6de633c5b1db4524d716e0f6318d70cf9797f91495e0857",
+    "size_bytes": 271237
+  },
+  "documents": [
+    {
+      "canonical_path": "energyplus_porting_plan/plan.json",
+      "actual_before": {
+        "path": "energyplus_porting_plan/plan.json",
+        "sha256": "9660fa144f922cb2bc04c383f5a22510ab62bd584c5ccf0d839bac002353219f",
+        "size_bytes": 781128,
+        "line_count": 15011
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-documents-prep-01/before/plan.json",
+        "sha256": "9660fa144f922cb2bc04c383f5a22510ab62bd584c5ccf0d839bac002353219f",
+        "size_bytes": 781128,
+        "line_count": 15011
+      },
+      "proposal": {
+        "path": ".runtime/porting/CTF-10/init-postlude-documents-prep-01/proposed/plan.json",
+        "sha256": "8bd5f5252ca3beabe2a05736eeb95ea639fa9bca2162ffa1cdda253f48b16a08",
+        "size_bytes": 781407,
+        "line_count": 15016
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-documents-prep-01/diffs/plan.json.diff",
+        "sha256": "8ed04a22624455057199f3b97adc4e1cb7b32509371320c7552a9bf3d1954148",
+        "size_bytes": 662,
+        "line_count": 14
+      }
+    },
+    {
+      "canonical_path": "energyplus_porting_plan/cards/CTF-10.md",
+      "actual_before": {
+        "path": "energyplus_porting_plan/cards/CTF-10.md",
+        "sha256": "02f7ae2e17fecccd3b04c83a19548139bf233510184ee47704b599a2a28a548d",
+        "size_bytes": 15106,
+        "line_count": 141
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-documents-prep-01/before/cards/CTF-10.md",
+        "sha256": "02f7ae2e17fecccd3b04c83a19548139bf233510184ee47704b599a2a28a548d",
+        "size_bytes": 15106,
+        "line_count": 141
+      },
+      "proposal": {
+        "path": ".runtime/porting/CTF-10/init-postlude-documents-prep-01/proposed/cards/CTF-10.md",
+        "sha256": "c595334aa6391f050dc54b958cb95ad92ce9b0dd42bae3cb04a4e3b7371970da",
+        "size_bytes": 16511,
+        "line_count": 149
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-documents-prep-01/diffs/cards__CTF-10.md.diff",
+        "sha256": "f9632475e1428fe9bfac41057a1670d0af2cd47af58d08930a530ce75e788ea0",
+        "size_bytes": 3288,
+        "line_count": 26
+      }
+    },
+    {
+      "canonical_path": "energyplus_porting_plan/CHECKLIST.md",
+      "actual_before": {
+        "path": "energyplus_porting_plan/CHECKLIST.md",
+        "sha256": "b6adb8011964f38c8a6bfb84d804a4bd4a7a83f312cc3b8643e04bd77c248a4a",
+        "size_bytes": 16648,
+        "line_count": 179
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-documents-prep-01/before/CHECKLIST.md",
+        "sha256": "b6adb8011964f38c8a6bfb84d804a4bd4a7a83f312cc3b8643e04bd77c248a4a",
+        "size_bytes": 16648,
+        "line_count": 179
+      },
+      "proposal": {
+        "path": ".runtime/porting/CTF-10/init-postlude-documents-prep-01/proposed/CHECKLIST.md",
+        "sha256": "051c4ac580dab493b62ad7ad373a199d21c8ffabc82464d45bf76782d71628a5",
+        "size_bytes": 16777,
+        "line_count": 179
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-documents-prep-01/diffs/CHECKLIST.md.diff",
+        "sha256": "203f14987265c1bde471e3694cb3b7cc4cf4f1c87ad9692a89f883d84f6d930e",
+        "size_bytes": 1148,
+        "line_count": 11
+      }
+    },
+    {
+      "canonical_path": "energyplus_porting_plan/energyplus_porting_checklist.html",
+      "actual_before": {
+        "path": "energyplus_porting_plan/energyplus_porting_checklist.html",
+        "sha256": "0f55ca7dad9bf5b6a917d32fbbba4d173f8e31098d3428b3039e2f48ce8174e5",
+        "size_bytes": 628530,
+        "line_count": 172
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-documents-prep-01/before/energyplus_porting_checklist.html",
+        "sha256": "0f55ca7dad9bf5b6a917d32fbbba4d173f8e31098d3428b3039e2f48ce8174e5",
+        "size_bytes": 628530,
+        "line_count": 172
+      },
+      "proposal": {
+        "path": ".runtime/porting/CTF-10/init-postlude-documents-prep-01/proposed/energyplus_porting_checklist.html",
+        "sha256": "523f31e6bf2e96a4972c7efd1b4f7d643c93032022c1e1444d22bf366d30f26d",
+        "size_bytes": 628771,
+        "line_count": 172
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-documents-prep-01/diffs/energyplus_porting_checklist.html.diff",
+        "sha256": "39399dc6110d299595f27660ee6617981b8b34c6160cf2d74af5c10dd18ebbd6",
+        "size_bytes": 1228991,
+        "line_count": 11
+      }
+    }
+  ],
+  "source_template": {
+    "path": ".runtime/porting/CTF-10/update-ordinary-initialization-documents-01.py",
+    "sha256": "592d725313a4d31d84f11dcdd6e2fff655f841c09e83b6e67b9e40d91e7c1aaa",
+    "size_bytes": 5101,
+    "line_count": 37
+  },
+  "template_archive": {
+    "path": ".runtime/porting/CTF-10/init-postlude-documents-prep-01/before-template/update-ordinary-initialization-documents-01.py",
+    "sha256": "592d725313a4d31d84f11dcdd6e2fff655f841c09e83b6e67b9e40d91e7c1aaa",
+    "size_bytes": 5101,
+    "line_count": 37
+  },
+  "source_delta": {
+    "path": ".runtime/porting/CTF-10/init-postlude-documents-prep-01/diffs/update_documents.py.diff",
+    "sha256": "f0de704c95dcbe2c97175f4ee3cbf6736180c8580cb73c4a2378e3c6ed2fbdc0",
+    "size_bytes": 10988,
+    "line_count": 117
+  },
+  "source_dependencies": [
+    {
+      "path": "tools/porting/sync_plan_views.py",
+      "sha256": "64cd404807bf70b1c7495fa4b37e6a98f9cf3f7d46f9dd3646e02945a65aab3a",
+      "size_bytes": 3986,
+      "line_count": 99
+    },
+    {
+      "path": "tools/porting/check_plan.py",
+      "sha256": "ec1df8718fd23cc135e97e28220e2377dcf48fe960c611dbc25976039629208d",
+      "size_bytes": 23809,
+      "line_count": 456
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-01/manifest.json",
+      "sha256": "79dafb2e1eac541967170ce0e426e76ea074fa3724182ec8aa7fdf7b9ea0257a",
+      "size_bytes": 9959,
+      "line_count": 260
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-01/finalize.py",
+      "sha256": "18e044228668299314a3e3a7d1703c2d401bc8fa1e7fe80878e5922fbe4419db",
+      "size_bytes": 20020,
+      "line_count": 162
+    }
+  ],
+  "audit": {
+    "path": ".runtime/porting/CTF-10/init-postlude-documents-prep-01/audit.json",
+    "sha256": "da72cc7c4f64b956ef1726a55ed03e399f29f86dfd871dcf637fa6d4bcbab99a",
+    "size_bytes": 809,
+    "line_count": 27
+  },
+  "README": {
+    "path": ".runtime/porting/CTF-10/init-postlude-documents-prep-01/README.md",
+    "sha256": "231b847926d4f3ec5c1dc5b017b81367cef43df07548f7e7ed1b0854e3908c89",
+    "size_bytes": 2094,
+    "line_count": 33
+  },
+  "author_source": {
+    "path": ".runtime/porting/CTF-10/init-postlude-documents-prep-01/seal_sources.py",
+    "sha256": "426daee7ec263f5e16123e8bccc14372aa8765a2aee8fefd2febe66ffac16796",
+    "size_bytes": 8083,
+    "line_count": 74
+  },
+  "canonical_documents_mutated": false,
+  "workflow_executed": false,
+  "gates_updated": false
+}

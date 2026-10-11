@@ -141,6 +141,49 @@ pub struct CtfInitializationContext<'a> {
 }
 
 impl CtfInitializationContext<'_> {
+    /// Run the first report-cache query reached by ordinary no-EMS init_state.
+    /// A genuinely already-scanned cache is retained without replaying its query
+    /// or diagnostics; it is not relabelled as a newly reached preparation.
+    pub fn prepare_report_input_cache(
+        &mut self,
+        input: &ep_model::ReportInputs,
+    ) -> Result<(), CtfInitializationError> {
+        use super::report_scan::{ReportScanDiagnostic, ReportScanFailure, try_scan_for_reports};
+        if !self.reports.scan.get_report_input {
+            return Ok(());
+        }
+        let requested = try_scan_for_reports(
+            input,
+            &mut self.reports.scan,
+            "EnergyManagementSystem",
+            None,
+            None,
+            None,
+            |diagnostic| match diagnostic {
+                ReportScanDiagnostic::Warning(message) => self.backend.show_warning_error(&message),
+                ReportScanDiagnostic::Continue(message) => {
+                    self.backend.show_continue_error(&message)
+                }
+            },
+        )
+        .map_err(|error| {
+            CtfInitializationError::Postlude(match error {
+                ReportScanFailure::Unavailable(value) => CtfInitPostludeError::Scan(value),
+                ReportScanFailure::Diagnostic(value) => CtfInitPostludeError::Backend(value),
+            })
+        })?;
+        // CON's ordinary caller excludes EMS/API/external-HVAC producers. This
+        // is the actual no-EMS requested-report warning suffix, not an EMS flag
+        // inferred from the existence of Output:EnergyManagementSystem itself.
+        if requested {
+            self.backend.show_warning_error("CheckIFAnyEMS: No EnergyManagementSystem has been set up in the input file but output is requested.")
+                .map_err(|error| CtfInitializationError::Postlude(CtfInitPostludeError::Backend(error)))?;
+            self.backend.show_continue_error("No EDD file will be produced. Refer to EMS Application Guide and/or InputOutput Reference to set up your EnergyManagementSystem.")
+                .map_err(|error| CtfInitializationError::Postlude(CtfInitPostludeError::Backend(error)))?;
+        }
+        Ok(())
+    }
+
     pub(crate) fn prepare_registry(
         &mut self,
         model: &TypedModel,

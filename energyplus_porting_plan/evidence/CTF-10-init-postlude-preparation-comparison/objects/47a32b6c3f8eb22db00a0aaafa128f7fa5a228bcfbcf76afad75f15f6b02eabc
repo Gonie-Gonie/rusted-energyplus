@@ -1,0 +1,207 @@
+--- /dev/null
++++ .runtime/porting/CTF-10/init-postlude-production-preparation-fix-prep-01/proposed/ctf_geometry_reports_tests.rs
+@@ -0,0 +1,204 @@
++use super::*;
++use crate::heat_balance::ctf_initialization_context::{CtfInitializationContext, CtfInitializationReports};
++use crate::heat_balance::error_backend::{SourceErrorBackend, SourceErrorState, SourceErrorTracking};
++use ep_model::{
++    AutoOrNumber, Construction, ConstructionId, ConstructionKind, Material, MaterialId,
++    MaterialSurfaceRoughness, NoMassMaterial, NormalizedName, OpaqueSurfaceProperties, Point3,
++    Space, SpaceId, SpaceOrigin, SpaceTypeId, SunExposure, SurfaceId, WindExposure, Zone, ZoneId,
++};
++
++fn model() -> TypedModel {
++    let mut model = TypedModel::default();
++    model.materials.push(Material {
++        id: MaterialId(5), name: NormalizedName::new("M5"),
++        definition: MaterialDefinition::NoMass(NoMassMaterial {
++            roughness: MaterialSurfaceRoughness::MediumRough,
++            thermal_resistance_m2_k_per_w: 2.0, surface: OpaqueSurfaceProperties::default(),
++        }),
++    });
++    model.constructions.push(Construction {
++        id: ConstructionId(30), name: NormalizedName::new("C30"),
++        kind: ConstructionKind::Opaque, outside_layer: Some(MaterialId(5)), layers: vec![MaterialId(5)],
++        thermochromic_master: None, ground_factor: None, air_boundary: None,
++        complex_fenestration: None, window_equivalent_layer: None, internal_heat_source: None,
++    });
++    model.zones.push(Zone {
++        id: ZoneId(9), name: NormalizedName::new("Z9"), direction_of_relative_north_deg: 0.0,
++        origin: Point3 { x_m: 0.0, y_m: 0.0, z_m: 0.0 }, zone_type: 1, multiplier: 1,
++        list_multiplier: 1, list_group: None, ceiling_height: AutoOrNumber::Value(1.0),
++        volume: AutoOrNumber::Value(1.0), floor_area: AutoOrNumber::Value(1.0),
++        inside_convection_algorithm: ep_model::ZoneConvectionAlgorithm::Inherited(ep_model::InsideSurfaceConvectionAlgorithm::Tarp),
++        outside_convection_algorithm: ep_model::ZoneConvectionAlgorithm::Inherited(ep_model::OutsideSurfaceConvectionAlgorithm::Doe2),
++        is_part_of_total_floor_area: true, is_nominal_controlled: false, linked_outdoor_air_node: None,
++        spaces: vec![SpaceId(3)],
++    });
++    model.spaces.push(Space {
++        id: SpaceId(3), name: NormalizedName::new("S3"), zone: ZoneId(9),
++        ceiling_height: AutoOrNumber::AutoCalculate, volume: AutoOrNumber::AutoCalculate,
++        floor_area: AutoOrNumber::AutoCalculate, space_type: NormalizedName::new("GENERAL"),
++        space_type_id: SpaceTypeId(0), tags: Vec::new(), origin: SpaceOrigin::Authored,
++    });
++    model.surfaces.push(Surface {
++        id: SurfaceId(500), name: NormalizedName::new("W500"), surface_type: SurfaceType::Wall,
++        construction: ConstructionId(30), zone: ZoneId(9), space: SpaceId(3),
++        outside_boundary_condition: OutsideBoundaryCondition::Outdoors,
++        outside_boundary_condition_object: None, sun_exposure: SunExposure::NoSun,
++        wind_exposure: WindExposure::NoWind, view_factor_to_ground: AutoOrNumber::Value(0.0),
++        vertices: Vec::new(), computed_geometry: None,
++    });
++    model
++}
++
++fn registry() -> Result<PredefinedRegistry, CtfReportUnavailable> {
++    let mut owner = PredefinedRegistry::default();
++    owner.set_predefined_tables(false, false)?;
++    Ok(owner)
++}
++
++#[test]
++fn actual_space_class_order_and_existing_full_table_are_retained() -> Result<(), CtfReportUnavailable> {
++    let mut model = model();
++    let mut second_space = model.spaces[0].clone();
++    second_space.id = SpaceId(4);
++    model.spaces.push(second_space);
++    model.zones[0].spaces.push(SpaceId(4));
++    let mut floor = model.surfaces[0].clone();
++    floor.id = SurfaceId(501); floor.name = NormalizedName::new("F501"); floor.surface_type = SurfaceType::Floor;
++    let mut second_wall = model.surfaces[0].clone();
++    second_wall.id = SurfaceId(502); second_wall.name = NormalizedName::new("W502"); second_wall.space = SpaceId(4);
++    // Input Vec order is deliberately different from native registration/report order.
++    model.surfaces.insert(0, floor);
++    model.surfaces.insert(0, second_wall);
++    let mut table = PredefinedStringTable::default();
++    table.string_entry(91, "retained", "prefix")?;
++    let rows = table.entries.as_mut().ok_or(CtfReportUnavailable::TableOwner)?;
++    rows[1].sub_table_index = 55; rows[1].unique_object_name = 56;
++    rows[99].sub_table_index = 123; rows[99].original_real_entry = -0.0;
++    let tail = rows[99].clone();
++    let prefix = rows[0].clone();
++    report_ordinary_surface_nominal_u(&model, &registry()?, &mut table)?;
++    let rows = table.entries.as_ref().ok_or(CtfReportUnavailable::TableOwner)?;
++    assert_eq!((table.num_table_entry, table.size_table_entry, rows.len()), (4, 100, 100));
++    assert_eq!(rows[0], prefix);
++    assert_eq!((rows[1].sub_table_index, rows[1].unique_object_name), (55, 56));
++    assert_eq!((&*rows[1].object_name, &*rows[2].object_name, &*rows[3].object_name), ("W500", "F501", "W502"));
++    assert_eq!(rows[99], tail);
++    assert_eq!(rows[99].original_real_entry.to_bits(), (-0.0_f64).to_bits());
++    Ok(())
++}
++
++#[test]
++fn source_class_and_adiabatic_films_use_real_columns() -> Result<(), CtfReportUnavailable> {
++    let mut model = model();
++    let mut floor = model.surfaces[0].clone(); floor.surface_type = SurfaceType::Floor;
++    let mut roof = model.surfaces[0].clone(); roof.surface_type = SurfaceType::Roof;
++    let mut ceiling = roof.clone(); ceiling.surface_type = SurfaceType::Ceiling;
++    let wall_u = film_u(&model, &model.surfaces[0])?.1;
++    assert!(film_u(&model, &roof)?.1 > wall_u);
++    assert!(wall_u > film_u(&model, &floor)?.1);
++    assert_eq!(film_u(&model, &ceiling)?.1.to_bits(), film_u(&model, &roof)?.1.to_bits());
++    model.surfaces[0].outside_boundary_condition = OutsideBoundaryCondition::Adiabatic;
++    let interior_u = film_u(&model, &model.surfaces[0])?.1;
++    assert!(interior_u < wall_u);
++    let registry = registry()?;
++    let mut table = PredefinedStringTable::default();
++    report_ordinary_surface_nominal_u(&model, &registry, &mut table)?;
++    let rows = table.entries.as_ref().ok_or(CtfReportUnavailable::TableOwner)?;
++    assert_eq!(rows[0].index_column, registry.named_indices["pdchIntOpUfactFilm"]);
++    assert_eq!(rows[0].original_real_entry.to_bits(), interior_u.to_bits());
++    assert_eq!((rows[0].significant_digits, rows[0].original_entry_is_real), (3, true));
++    assert_eq!((rows[0].sub_table_index, rows[0].unique_object_name), (0, 0));
++    Ok(())
++}
++
++#[test]
++fn genuine_loader_resistance_and_zero_nominal_u_are_not_replaced() -> Result<(), CtfReportUnavailable> {
++    let mut model = model();
++    let MaterialDefinition::NoMass(mut value) = model.materials[0].definition else { return Err(CtfReportUnavailable::Association); };
++    model.materials[0].definition = MaterialDefinition::Regular(ep_model::RegularMaterial {
++        roughness: value.roughness, thickness_m: 0.25, conductivity_w_per_m_k: 1.0,
++        density_kg_per_m3: 1000.0, specific_heat_j_per_kg_k: 1000.0,
++        thermal_resistance_m2_k_per_w: value.thermal_resistance_m2_k_per_w, surface: value.surface,
++    });
++    // Stored loader NominalR is an independent owner; it is not recomputed here
++    // from deliberately different direct-test thickness/conductivity operands.
++    assert_eq!(nominal_u(&model, &model.surfaces[0])?, 0.5);
++    value.thermal_resistance_m2_k_per_w = 0.0;
++    model.materials[0].definition = MaterialDefinition::NoMass(value);
++    let mut table = PredefinedStringTable::default();
++    report_ordinary_surface_nominal_u(&model, &registry()?, &mut table)?;
++    let rows = table.entries.as_ref().ok_or(CtfReportUnavailable::TableOwner)?;
++    assert_eq!(rows[0].original_real_entry.to_bits(), 0.0_f64.to_bits());
++    assert_eq!(rows[0].char_entry, "      0.000");
++    Ok(())
++}
++
++#[test]
++fn unused_unsupported_definition_is_unread_but_used_one_stops_at_actual_prefix() -> Result<(), CtfReportUnavailable> {
++    let mut model = model();
++    model.materials.push(Material { id: MaterialId(8), name: NormalizedName::new("UNREAD"),
++        definition: MaterialDefinition::InfraredTransparent(ep_model::InfraredTransparentMaterial) });
++    let mut table = PredefinedStringTable::default();
++    report_ordinary_surface_nominal_u(&model, &registry()?, &mut table)?;
++    assert_eq!(table.num_table_entry, 1);
++    let mut second = model.surfaces[0].clone(); second.id = SurfaceId(501); second.name = NormalizedName::new("LATER");
++    second.construction = ConstructionId(31); model.surfaces.push(second);
++    let mut construction = model.constructions[0].clone(); construction.id = ConstructionId(31);
++    construction.layers = vec![MaterialId(8)]; model.constructions.push(construction);
++    let mut table = PredefinedStringTable::default();
++    assert_eq!(report_ordinary_surface_nominal_u(&model, &registry()?, &mut table), Err(CtfReportUnavailable::Material(MaterialId(8))));
++    assert_eq!(table.num_table_entry, 1);
++    Ok(())
++}
++
++#[test]
++fn unsupported_boundary_or_unregistered_surface_is_not_silently_dropped() -> Result<(), CtfReportUnavailable> {
++    let mut model = model();
++    model.surfaces[0].outside_boundary_condition = OutsideBoundaryCondition::Ground;
++    assert_eq!(report_ordinary_surface_nominal_u(&model, &registry()?, &mut PredefinedStringTable::default()),
++        Err(CtfReportUnavailable::SurfaceBoundary(SurfaceId(500))));
++    model.surfaces[0].space = SpaceId(99);
++    assert_eq!(report_ordinary_surface_nominal_u(&model, &registry()?, &mut PredefinedStringTable::default()),
++        Err(CtfReportUnavailable::Association));
++    Ok(())
++}
++
++#[test]
++fn early_report_scan_is_shared_and_prescanned_owner_is_not_replayed() -> Result<(), String> {
++    use ep_model::{ReportInputObject, ReportInputObjectType, ReportInputs};
++    let input = ReportInputs { objects: vec![ReportInputObject {
++        object_name: "authored report input".into(), object_type: ReportInputObjectType::Constructions,
++        alphas: ["CONSTRUCTIONS".into(), String::new(), String::new()], alpha_blank: [false, true, true],
++        default_applied: [false; 3], num_alphas: 1, is_epjson: true,
++    }], legacy_variable_dictionary_sections: -1 };
++    let mut reports = CtfInitializationReports::default();
++    let mut state = SourceErrorState {
++        output_error_header: true, version_string: "authored test version".into(),
++        idd_version_string: "authored test IDD".into(), doing_input_processing: false,
++        print_console_output: false, kickoff_simulation: false, developer_flag: false,
++        warmup_flag: false, doing_sizing: false,
++        tracking: SourceErrorTracking {
++            match_counts: [0; 20], abort_processing: false, total_severe_errors: 0,
++            total_severe_errors_during_warmup: 0, total_severe_errors_during_sizing: 0,
++            last_severe_error: String::new(), total_warning_errors: 0,
++            total_warning_errors_during_warmup: 0, total_warning_errors_during_sizing: 0,
++        },
++    };
++    let mut eio = Vec::new(); let mut console = Vec::new(); let mut error = Vec::new();
++    let mut context = CtfInitializationContext {
++        reports: &mut reports, eio: &mut eio,
++        backend: SourceErrorBackend { state: &mut state, error_stream: Some(&mut error), console: &mut console,
++            out_unit1: None, out_unit2: None, f_message: None, message_callback: None, error_callback: None, sqlite: None },
++    };
++    context.prepare_report_input_cache(&input).map_err(|error| error.to_string())?;
++    assert!(!context.reports.scan.get_report_input);
++    assert!(context.reports.scan.constructions);
++    assert!(context.reports.registry.reports.is_none());
++    let reached = context.reports.scan.clone();
++    // A separately supplied prescanned owner remains authoritative. Repeating
++    // ordinary preparation cannot reread changed input or invent a new query.
++    context.prepare_report_input_cache(&ReportInputs::default()).map_err(|error| error.to_string())?;
++    assert_eq!(context.reports.scan, reached);
++    assert_eq!(context.backend.state.tracking.total_warning_errors, 0);
++    Ok(())
++}

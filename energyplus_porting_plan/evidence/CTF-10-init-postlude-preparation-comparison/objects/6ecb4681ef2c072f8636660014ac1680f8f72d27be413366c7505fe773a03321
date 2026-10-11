@@ -1,0 +1,92 @@
+{
+  "schema": "ctf10-Init-postlude-actual-candidate-execution-workflow.v1",
+  "source_preparation": {
+    "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-03/manifest.json",
+    "sha256": "656dcbc020682a93b2ec90805a938508682a6f1556734b04661e5380c7af2731",
+    "size_bytes": 20529
+  },
+  "accepted_formatted_inventory": {
+    "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-applied-source-01/record.json",
+    "sha256": "501460a4fae98574446e9633bd2926c84da83c4e1f997b8258f9dd4e81818dbd",
+    "size_bytes": 74703
+  },
+  "actual_quality": {
+    "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-quality-01/quality.json",
+    "sha256": "4ec6eafe830c4c2c3610be38f85d78217168d7174a1a5ab362c612f73527cdc6",
+    "size_bytes": 4028
+  },
+  "actual_Source_snapshot": {
+    "path": ".runtime/porting/source-objects/24/24884cba8138747a5d699cd8754ffce8b1c95c41e224fc4c88ab3060637353f8",
+    "sha256": "24884cba8138747a5d699cd8754ffce8b1c95c41e224fc4c88ab3060637353f8"
+  },
+  "actual_native_freeze": {
+    "path": ".runtime/porting/CTF-10/native-init-postlude-workflow-05/freeze.json",
+    "sha256": "34baef3ec4dbaba77eab1c4f9c459417668ad97fb81142d838bce019a1cb34fb",
+    "size_bytes": 44649
+  },
+  "production_projection_execution": {
+    "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-input-projection-command-02/receipt.json",
+    "sha256": "08299b2f623b9d76b6724b797a60b24c07471a62fd1f673b48e4df866745dc97",
+    "size_bytes": 4724
+  },
+  "direct_input_writer_execution": {
+    "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-candidates-01/direct-input-writer-command-01/receipt.json",
+    "sha256": "5f01925f6b2850e766d5c24b5b791879dd14b95942a473b06bb4f7bfb3cbbea2",
+    "size_bytes": 5831
+  },
+  "direct_input_custody": {
+    "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-candidates-01/direct-inputs/input-custody.json",
+    "sha256": "a41e311bdb89f27e295d4b97bbf37d2e4ed3d33ff6a6d795cfae956dfda781b8",
+    "size_bytes": 2586
+  },
+  "actual_build": {
+    "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-candidates-01/candidate-build-command-01/receipt.json",
+    "sha256": "311c53efaf73141dcf3e4538a731269a7f6ad296d828859e8d8deafdac49a1b6",
+    "size_bytes": 7942
+  },
+  "actual_candidate_executions": [
+    {
+      "lane": "production",
+      "request": {
+        "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-input-projection-02/production-request.json",
+        "sha256": "6dc2013e199449103839b390d3a0269bd721bb7d70b32f072d2a4f80a537542f",
+        "size_bytes": 42414
+      },
+      "emitted_artifact": {
+        "historical_path": "target/debug/examples/ctf10_init_postlude_candidate_production_observer.exe",
+        "sha256": "4a5a301a27f5e3c3925000a01b6a5ce35876b1f0470cbc096209f8853c9d24de"
+      },
+      "execution": {
+        "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-candidates-01/production-candidate-command-01/receipt.json",
+        "sha256": "e3a8b556747765dbb55e6c0f4255404f77b1679b103dbd4fb84b00d7e3854e1d",
+        "size_bytes": 4621
+      },
+      "actual_exit_code": 2
+    },
+    {
+      "lane": "direct",
+      "request": {
+        "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-candidates-01/direct-inputs/direct-request.json",
+        "sha256": "99963e78c69166abdac8acb544e16872553562e09be118c14880be88cbd0f0db",
+        "size_bytes": 14139
+      },
+      "emitted_artifact": {
+        "historical_path": "target/debug/examples/ctf10_init_postlude_candidate_direct_observer.exe",
+        "sha256": "4997fbfe570313c6c9e2faebcb9f3b8ed9e8367f4b7f0920c2ce8cb780e6fffd"
+      },
+      "execution": {
+        "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-candidates-01/direct-candidate-command-01/receipt.json",
+        "sha256": "460702e4c0f4520e55e874ddf05a2b493173d917a6b7073b917e7300db275d7c",
+        "size_bytes": 4614
+      },
+      "actual_exit_code": 0
+    }
+  ],
+  "actual_candidate_commands_returned_zero": false,
+  "all_bound_inputs_and_sources_unchanged": true,
+  "Native_results_read": false,
+  "scientific_comparison_performed": false,
+  "numerical_PASS_claimed": false,
+  "whole_Init_parity_claimed": false,
+  "gates_updated": false
+}

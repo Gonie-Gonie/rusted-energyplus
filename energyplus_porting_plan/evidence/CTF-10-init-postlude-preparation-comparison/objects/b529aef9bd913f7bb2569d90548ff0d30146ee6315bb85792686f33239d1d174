@@ -1,0 +1,1 @@
+{"workflow": {"path": ".runtime/porting/CTF-10/init-postlude-historical-card-candidates-01/workflow.json", "sha256": "38906b0d49f4ad8230f9a0fde6f24c6523936e310fe96c01c5089106a3b1c906", "size_bytes": 4242}, "actual_candidate_exit_codes": [0, 0], "numerical_PASS_claimed": false}

@@ -1,0 +1,91 @@
+{
+  "schema": "ctf10-Init-postlude-actual-quality.v1",
+  "accepted_formatted_inventory": {
+    "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-applied-source-01/record.json",
+    "sha256": "501460a4fae98574446e9633bd2926c84da83c4e1f997b8258f9dd4e81818dbd",
+    "size_bytes": 74703
+  },
+  "actual_commands": [
+    {
+      "role": "fmt-check",
+      "execution": {
+        "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-quality-01/fmt-check-command/receipt.json",
+        "sha256": "af14a1dbf8ec4db4b62ffa3e8946290eb05518cc9c3531ccb7ac8609096ecfb2",
+        "size_bytes": 4261
+      },
+      "actual_exit_code": 0,
+      "actual_Source_snapshot": {
+        "path": ".runtime/porting/source-objects/24/24884cba8138747a5d699cd8754ffce8b1c95c41e224fc4c88ab3060637353f8",
+        "sha256": "24884cba8138747a5d699cd8754ffce8b1c95c41e224fc4c88ab3060637353f8"
+      }
+    },
+    {
+      "role": "clippy",
+      "execution": {
+        "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-quality-01/clippy-command/receipt.json",
+        "sha256": "6817fdece5dd4020f1cc503189f17e608113f4a4187ab15e24c1a7dfc5106900",
+        "size_bytes": 4447
+      },
+      "actual_exit_code": 0,
+      "actual_Source_snapshot": {
+        "path": ".runtime/porting/source-objects/24/24884cba8138747a5d699cd8754ffce8b1c95c41e224fc4c88ab3060637353f8",
+        "sha256": "24884cba8138747a5d699cd8754ffce8b1c95c41e224fc4c88ab3060637353f8"
+      }
+    },
+    {
+      "role": "focused",
+      "execution": {
+        "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-quality-01/focused-command/receipt.json",
+        "sha256": "ff1460400a9583c7d78698dd75386155f778d60103e7e44e8a0aae0baa69417c",
+        "size_bytes": 4434
+      },
+      "actual_exit_code": 0,
+      "actual_Source_snapshot": {
+        "path": ".runtime/porting/source-objects/24/24884cba8138747a5d699cd8754ffce8b1c95c41e224fc4c88ab3060637353f8",
+        "sha256": "24884cba8138747a5d699cd8754ffce8b1c95c41e224fc4c88ab3060637353f8"
+      }
+    },
+    {
+      "role": "workspace",
+      "execution": {
+        "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-quality-01/workspace-command/receipt.json",
+        "sha256": "0351dfe106677a06fbd2117f686de1a1ecf4dbdbc9b8207cb1a9f05b4c9d805f",
+        "size_bytes": 4395
+      },
+      "actual_exit_code": 0,
+      "actual_Source_snapshot": {
+        "path": ".runtime/porting/source-objects/24/24884cba8138747a5d699cd8754ffce8b1c95c41e224fc4c88ab3060637353f8",
+        "sha256": "24884cba8138747a5d699cd8754ffce8b1c95c41e224fc4c88ab3060637353f8"
+      }
+    }
+  ],
+  "supplementary_direct_observer_tests": {
+    "role": "supplementary-direct-observer-tests",
+    "execution": {
+      "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-quality-01/supplementary-direct-observer-tests-command/receipt.json",
+      "sha256": "61f5da194960ba359e9090c0c0c606f026702aeb06ec8a3ca0548c02db6c7e41",
+      "size_bytes": 4522
+    },
+    "actual_exit_code": 0,
+    "actual_Source_snapshot": {
+      "path": ".runtime/porting/source-objects/24/24884cba8138747a5d699cd8754ffce8b1c95c41e224fc4c88ab3060637353f8",
+      "sha256": "24884cba8138747a5d699cd8754ffce8b1c95c41e224fc4c88ab3060637353f8"
+    }
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/24/24884cba8138747a5d699cd8754ffce8b1c95c41e224fc4c88ab3060637353f8",
+    "sha256": "24884cba8138747a5d699cd8754ffce8b1c95c41e224fc4c88ab3060637353f8"
+  },
+  "actual_Root_source": {
+    "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-correction-workflow-prep-01/run_corrections.py",
+    "sha256": "854c3a5f4354f0782f1951a4358f10613a38de224b6966c9f4bf2e465e8904d7",
+    "size_bytes": 17485
+  },
+  "quality_source_preparation": {
+    "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-correction-workflow-prep-01/manifest.json",
+    "sha256": "a0e28a8a7caa9f60dd69191d5d9df5665c99aaf053c4eba4ee1f880400aea33b",
+    "size_bytes": 16197
+  },
+  "numerical_or_CTF10_PASS_claimed": false,
+  "gates_updated": false
+}

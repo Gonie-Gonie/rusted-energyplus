@@ -1,0 +1,229 @@
+"""Root-only input transport; no Native results or expected endpoints are inputs."""
+import argparse
+from datetime import datetime
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd().resolve()
+BASE = ROOT / '.runtime/porting/CTF-10'
+RECORDER = ROOT / 'tools/porting/record_command.py'
+RECORDER_SHA = '5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'
+DIRECT = {'path': '.runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-03/manifest.json', 'sha256': 'd5f9f845b12181b681efda876eb3150672e3d7b8b69cb0e02f7fc175243cba7c'}
+ORIGINAL_PRODUCTION = {'path': '.runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/manifest.json', 'sha256': 'b089d724b65467e72564176038001e6567e51861a924cc0bcd9f94848fe19c5c'}
+PRODUCTION = {'path': '.runtime/porting/CTF-10/init-postlude-production-preparation-fix-prep-01/manifest.json', 'sha256': '7f84ff32d25390e4b86ea06f78ab50397dfa780ba4b64e1c15b4ad5407c54c32'}
+CORRECTIONS = {'path': '.runtime/porting/CTF-10/init-postlude-prerequisite-correction-workflow-prep-01/manifest.json', 'sha256': 'a0e28a8a7caa9f60dd69191d5d9df5665c99aaf053c4eba4ee1f880400aea33b'}
+CORE = {'path': '.runtime/porting/CTF-10/init-postlude-direct-state-prep-01/manifest.json', 'sha256': 'f4d6b158e2cdf57cb59858f5ed83772302697ce50ce2b2649eafe915f5a00ef2'}
+BATCH = {'path': '.runtime/porting/CTF-10/init-postlude-batch-application-prep-02/manifest.json', 'sha256': '78df43f1062153abd64726ca7a96ddb8740406d08114076c331d1a20ce498b1f'}
+NATIVE = {'path': '.runtime/porting/CTF-10/native-init-postlude-prep-06/manifest.json', 'sha256': '9a664b1a4ac99b8b6b00813aaa43a59bb61bab24b3752ebaf06d22324d29160b'}
+POST = {'path': '.runtime/porting/CTF-10/init-postlude-post-application-correction-prep-02/manifest.json', 'sha256': '62d21579cbe09937d73dc24c857f3c36ecf1b8193bac33eaa203fc089b25dbc8'}
+CONFIG = ['--config', 'profile.dev.debug=0', '--config', 'profile.test.debug=0', '--config', 'build.incremental=false']
+QUALITY = [('fmt-check', ['cargo', 'fmt', '--all', '--', '--check']),
+           ('clippy', ['cargo', 'clippy', *CONFIG, '--locked', '--workspace', '--all-targets', '--', '-D', 'warnings']),
+           ('focused', ['cargo', 'test', *CONFIG, '--locked', '-p', 'ep_runtime', '--lib', 'heat_balance::']),
+           ('workspace', ['cargo', 'test', *CONFIG, '--locked', '--workspace'])]
+GUARDS = {}
+
+def need(ok, message):
+    if not ok: raise ValueError(message)
+
+def path(name):
+    p = (ROOT / name).resolve(); need(p.is_relative_to(ROOT) and p != ROOT, 'Contained repository path required'); return p
+
+def sha(p):
+    with p.open('rb') as stream: return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+def ref(p): return dict(path=p.relative_to(ROOT).as_posix(), sha256=sha(p), size_bytes=p.stat().st_size)
+def pin(r): return r['path'] + '#' + r['sha256']
+def same(a, b): return path(a['path']) == path(b['path']) and a['sha256'] == b['sha256']
+
+def exact(r):
+    p = path(r['path']); need(p.is_file() and sha(p) == r['sha256'], 'Exact SHA differs: ' + r['path'])
+    need('size_bytes' not in r or type(r['size_bytes']) is int and p.stat().st_size == r['size_bytes'], 'Provided size differs')
+    current = ref(p); need(current['path'] not in GUARDS or GUARDS[current['path']] == current, 'Conflicting identity')
+    GUARDS[current['path']] = current; return p
+
+def operand(value):
+    n, h = value.rsplit('#', 1); return ref(exact(dict(path=n, sha256=h)))
+
+def pairs(rows):
+    value = {}
+    for key, item in rows: need(key not in value, 'Duplicate JSON key'); value[key] = item
+    return value
+
+def read(r): return json.loads(exact(r).read_bytes(), object_pairs_hook=pairs, parse_constant=lambda v: need(False, 'Nonfinite JSON token: ' + v))
+
+def write(p, value):
+    with p.open('x', encoding='utf8', newline='\n') as stream: json.dump(value, stream, indent=2, allow_nan=False); stream.write('\n')
+
+def unchanged():
+    for row in list(GUARDS.values()): exact(row)
+
+def receipt(r, allowed=(0,), *, preserved=True):
+    v = read(r); need(v['schema'] == 'recorded-porting-command.v1' and type(v['exit_code']) is int and v['exit_code'] in allowed and v['launch_error'] is None and Path(v['cwd']).resolve() == ROOT and (not preserved or v['source_bytes_match_before_and_after'] is True), 'Actual successful/preserved recorded command required')
+    for key in ['stdout', 'stderr', 'source_snapshot']: exact(v[key])
+    need(v['executed_launcher']['historical_path'] == 'tools/porting/record_command.py' and v['executed_launcher']['archive']['sha256'] == RECORDER_SHA, 'Current recorder identity required'); exact(v['executed_launcher']['archive'])
+    need(datetime.fromisoformat(v['started_utc']) <= datetime.fromisoformat(v['finished_utc']), 'Actual command timestamps differ'); return v
+
+def source_matches(r):
+    v = read(r); need(v['schema'] == 'rust-command-source-snapshot.v1' and v['bytes_normalized'] is False, 'Full raw Source snapshot required')
+    paths = set((ROOT / 'crates').rglob('*.rs')) | set((ROOT / 'crates').rglob('Cargo.toml'))
+    paths.update(ROOT / n for n in ['Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml'] if (ROOT / n).is_file())
+    files = {row['historical_path']: row for row in v['files']}
+    need(len(files) == len(v['files']) and set(files) == {p.relative_to(ROOT).as_posix() for p in paths}, 'Full Source membership differs')
+    for n, row in files.items():
+        exact(row['archive']); exact(dict(path=n, sha256=row['archive']['sha256'], size_bytes=row['size_bytes']))
+    return files
+
+def post_application_sources(inventory):
+    """Retain initial eleven formatter endpoints; authenticate the one later card fix."""
+    prep = read(POST); parent = read(prep['accepted_parent_inventory'])
+    need(prep['schema'] == 'ctf10-Init-postlude-post-application-correction-source.v1' and same(inventory['post_application_workflow_source_manifest'], POST) and same(inventory['post_application_parent_inventory'], prep['accepted_parent_inventory']) and inventory['actual_post_application_Root_source'] == prep['workflow_source'], 'Reviewed one-file post-application authority required')
+    exact(prep['workflow_source']); exact(prep['held_before_Source_snapshot'])
+    need(inventory['post_application_before_Source_snapshot'] == prep['held_before_Source_snapshot'] and inventory['retained_preflight_failure'] == prep['retained_preflight_failure'] and inventory['retained_failed_candidate_workflow'] == prep['retained_failed_candidate_workflow'] and inventory['retained_failed_candidate_outer_execution'] == prep['retained_failed_candidate_outer_execution'], 'Retained post-application failure/Source ancestry differs')
+    failure = receipt(inventory['retained_preflight_failure'], (2,)); failed = read(inventory['retained_failed_candidate_workflow']); outer = receipt(inventory['retained_failed_candidate_outer_execution'], (2,))
+    need(failure['source_snapshot'] == outer['source_snapshot'] == prep['held_before_Source_snapshot'] and exact(failure['stdout']).stat().st_size == 0 and len(failure['command']) == 3 and failed['actual_Source_snapshot'] == prep['held_before_Source_snapshot'] and failed['accepted_formatted_inventory'] == prep['accepted_parent_inventory'] and failed['actual_candidate_commands_returned_zero'] is False and failed['numerical_PASS_claimed'] is False, 'Genuine retained empty-output production preflight failure required')
+    need([row['lane'] for row in failed['actual_candidate_executions']] == ['production', 'direct'] and failed['actual_candidate_executions'][0]['execution'] == prep['retained_preflight_failure'] and failed['actual_candidate_executions'][0]['actual_exit_code'] == 2 and failed['actual_candidate_executions'][1]['actual_exit_code'] == 0, 'Retained separate production/direct statuses differ')
+    authority = prep['reviewed_post_application_preparation']; held = read(authority)
+    need(held['application'] == held['application_sources'] and len(held['application']) == len(inventory['post_application_corrections']) == 1, 'One reviewed documentary correction required')
+    proposal = held['application'][0]; row = inventory['post_application_corrections'][0]; name = row['canonical_path']
+    need(name == prep['only_correction_path'] == proposal['canonical_path'] and same(row['source_preparation'], authority) and row['reviewed_source_authority'] == proposal['proposal'] and row['held_before_archive'] == proposal['before_archive'] and row['held_exact_diff'] == proposal['exact_diff'] and proposal['absent'] is False and row['new_destination_absent'] is False, 'Exact existing one-file held correction custody required')
+    before = exact(row['actual_before_archive']).read_bytes(); literal = exact(row['actual_corrected_literal']).read_bytes(); final = exact(row['actual_final_source']).read_bytes()
+    need(before == exact(proposal['before_archive']).read_bytes() and literal == exact(proposal['proposal']).read_bytes() and path(name).read_bytes() == final, 'Actual post-application before/literal/current final differs')
+    held_diff = exact(proposal['exact_diff']).read_bytes(); labels = held_diff.decode('utf8').splitlines()
+    need(held_diff == source_delta(before, literal, labels[0][4:], labels[1][4:]) and exact(row['actual_semantic_correction_diff']).read_bytes() == source_delta(before, literal, name, name) and exact(row['actual_correction_formatter_diff']).read_bytes() == source_delta(literal, final, row['actual_corrected_literal']['path'], name), 'Separate post-application semantic/formatter deltas differ')
+    record = read(inventory['post_application_literal_correction']); literal_row = {k: v for k, v in row.items() if k not in ['actual_final_source', 'actual_correction_formatter_diff']}
+    need(record['schema'] == 'ctf10-Init-postlude-actual-post-application-correction.v1' and record['accepted_parent_inventory'] == prep['accepted_parent_inventory'] and record['actual_sources'] == [literal_row] and record['source_correction_is_formatter_only'] is False and record['scientific_PASS_claimed'] is False and record['gates_updated'] is False, 'One explicit semantic post-application record required')
+    normalized = dict(inventory)
+    for group in ['actual_sources', 'correction_application_sources']:
+        rows = [dict(value) for value in inventory[group]]; old = {value['canonical_path']: value for value in parent[group]}; touched = 0
+        for value in rows:
+            if value['canonical_path'] == name:
+                initial = value.pop('initial_correction_actual_final_source'); need(initial == old[name]['actual_final_source'] and exact(initial).read_bytes() == before and value['actual_final_source'] == row['actual_final_source'], 'Initial formatter endpoint must remain exact and separate from latest final')
+                value['actual_final_source'] = initial; touched += 1
+        need(touched == 1 and rows == parent[group], 'Prior complete ordered Source ancestry changed beyond explicit post correction'); normalized[group] = rows
+    need(inventory['additional_applied_sources'] == parent['additional_applied_sources'] and parent['correction_workflow_source_manifest'] == inventory['correction_workflow_source_manifest'] and parent['actual_correction_Root_source'] == inventory['actual_correction_Root_source'], 'Initial correction/additional-member authority changed')
+    formatter = receipt(inventory['actual_post_application_format_execution'], preserved=False)
+    need(formatter['command'] == ['cargo', 'fmt', '--all'] and datetime.fromisoformat(failure['finished_utc']) <= datetime.fromisoformat(formatter['started_utc']), 'Actual post formatter must follow genuine preflight failure')
+    return normalized, {name: row['actual_final_source']}, formatter
+
+def current_sources(inventory_ref, quality_ref):
+    inventory = read(inventory_ref); quality = read(quality_ref); batch = read(BATCH); corrections = read(CORRECTIONS)
+    need(inventory['schema'] == 'ctf10-Init-postlude-actual-formatted-source-inventory.v1' and same(inventory['workflow_source_manifest'], BATCH) and inventory['actual_Root_source'] == batch['workflow_source'], 'Original reviewed batch authority required')
+    need(same(inventory['accepted_parent_inventory'], corrections['accepted_parent_inventory']) and same(inventory['correction_workflow_source_manifest'], CORRECTIONS) and inventory['actual_correction_Root_source'] == corrections['workflow_source'], 'Explicit reviewed semantic correction authority required')
+    inventory, latest, post_formatter = post_application_sources(inventory)
+    parent = read(inventory['accepted_parent_inventory'])
+    preparations = [ORIGINAL_PRODUCTION, CORE, DIRECT]; groups = [read(r) for r in preparations]
+    expected = {}
+    for i, group in enumerate(groups):
+        for row in group['application_sources'] if i else group['own_sources']:
+            expected[row['canonical_path']] = (preparations[i], row['proposed_source'] if i == 1 else row['proposal'])
+    need(len(expected) == 12 and len(inventory['actual_sources']) == len(parent['actual_sources']) == 12 and {row['canonical_path'] for row in inventory['actual_sources']} == set(expected), 'Original twelve applied Source paths required')
+    held = {}
+    for preparation in corrections['reviewed_correction_preparations']:
+        for row in read(preparation)['application']:
+            need(row['canonical_path'] not in held, 'Disjoint semantic corrections required'); held[row['canonical_path']] = (preparation, row)
+    actual = inventory['correction_application_sources']
+    need(inventory['semantic_correction_preparations'] == corrections['reviewed_correction_preparations'] and inventory['semantic_correction_before_Source_snapshot'] == corrections['held_before_Source_snapshot'] and inventory['retained_failed_comparison'] == corrections['retained_failed_comparison'] and inventory['retained_failed_comparison_execution'] == corrections['retained_failed_comparison_execution'], 'Retained correction ancestry differs')
+    need(len(held) == len(actual) == 11 and [row['canonical_path'] for row in actual] == corrections['ordered_correction_paths'], 'Exact eleven ordered semantic corrections required')
+    by_path = {}
+    for row in actual:
+        name = row['canonical_path']; preparation, proposal = held[name]; new = proposal.get('new_destination_absent', proposal.get('absent', False))
+        need(same(row['source_preparation'], preparation) and row['reviewed_source_authority'] == proposal['proposal'] and row['held_exact_diff'] == proposal['exact_diff'] and row['held_before_archive'] == proposal.get('before_archive') and row['new_destination_absent'] is new, 'Actual semantic correction/held authority differs')
+        before = b'' if new else exact(row['actual_before_archive']).read_bytes(); literal = exact(row['actual_corrected_literal']).read_bytes(); final = exact(row['actual_final_source']).read_bytes()
+        need((new and row['actual_before_archive'] is None) or (not new and before == exact(row['held_before_archive']).read_bytes()), 'Actual corrected before owner differs')
+        need(literal == exact(proposal['proposal']).read_bytes() and path(name).read_bytes() == exact(latest.get(name, row['actual_final_source'])).read_bytes(), 'Actual corrected literal/latest final Source differs')
+        held_diff = exact(row['held_exact_diff']).read_bytes(); labels = held_diff.decode('utf8').splitlines()
+        need(held_diff == source_delta(before, literal, labels[0][4:], labels[1][4:]) and exact(row['actual_semantic_correction_diff']).read_bytes() == source_delta(before, literal, name, name), 'Semantic correction diff differs')
+        need(exact(row['actual_correction_formatter_diff']).read_bytes() == source_delta(literal, final, row['actual_corrected_literal']['path'], name), 'Distinct correction formatter diff differs'); by_path[name] = row
+    need(sum(row['new_destination_absent'] for row in actual) == 2 and inventory['additional_applied_sources'] == [row for row in actual if row['canonical_path'] not in expected], 'Two new members/additional actual Source ledger differs')
+    originals = {row['canonical_path']: row for row in parent['actual_sources']}; application_refs = []
+    for row in inventory['actual_sources']:
+        name = row['canonical_path']; preparation, proposal = expected[name]; prior = originals[name]
+        need(same(row['source_preparation'], preparation) and row['reviewed_source_authority'] == proposal and exact(row['actual_literal_source']).read_bytes() == exact(proposal).read_bytes(), 'Original literal/proposal authority differs')
+        anticipated = dict(prior)
+        if name in by_path:
+            anticipated.update(actual_final_source=by_path[name]['actual_final_source'], semantic_correction_application=row['semantic_correction_application']); application_refs.append(row['semantic_correction_application'])
+        need(row == anticipated and path(name).read_bytes() == exact(latest.get(name, row['actual_final_source'])).read_bytes(), 'Retained original ancestry/latest final Source differs'); exact(row['formatter_correspondence_diff'])
+        if row['actual_before_archive'] is not None: exact(row['actual_before_archive'])
+    need(application_refs and all(r == application_refs[0] for r in application_refs), 'One genuine semantic application document required')
+    application = read(application_refs[0]); literal_rows = [{k: v for k, v in row.items() if k not in ['actual_final_source', 'actual_correction_formatter_diff']} for row in actual]
+    need(application['schema'] == 'ctf10-Init-postlude-actual-prerequisite-corrections.v1' and application['accepted_parent_inventory'] == inventory['accepted_parent_inventory'] and application['actual_sources'] == literal_rows and application['source_correction_is_formatter_only'] is False and application['scientific_PASS_claimed'] is False and application['gates_updated'] is False, 'Actual semantic application is distinct from original formatter ancestry')
+    formatter = receipt(inventory['actual_correction_format_execution'], preserved=False); need(formatter['command'] == ['cargo', 'fmt', '--all'], 'Actual correction formatter command required')
+    need(quality['schema'] == 'ctf10-Init-postlude-actual-quality.v1' and same(quality['accepted_formatted_inventory'], inventory_ref) and same(quality['quality_source_preparation'], CORRECTIONS) and quality['actual_Root_source'] == corrections['workflow_source'] and quality['numerical_or_CTF10_PASS_claimed'] is False and quality['gates_updated'] is False, 'Actual corrected quality authority/inventory join required')
+    need(len(quality['actual_commands']) == 4, 'Four actual standard quality commands required'); snapshot = quality['Source_snapshot']; last = datetime.fromisoformat(post_formatter['finished_utc'])
+    need(datetime.fromisoformat(formatter['finished_utc']) <= datetime.fromisoformat(post_formatter['started_utc']), 'Post formatter must follow initial formatter')
+    supplementary = quality['supplementary_direct_observer_tests']
+    commands = list(zip(quality['actual_commands'], QUALITY)) + [(supplementary, ('supplementary-direct-observer-tests', ['cargo', 'test', *CONFIG, '--locked', '-p', 'ep_run', '--example', 'ctf10_init_postlude_candidate_direct_observer']))]
+    for row, (role, command) in commands:
+        v = receipt(row['execution']); need(row['role'] == role and row['actual_exit_code'] == 0 and v['command'] == command and row['actual_Source_snapshot'] == v['source_snapshot'] == snapshot, 'Actual quality argv/snapshot differs')
+        if last is not None: need(last <= datetime.fromisoformat(v['started_utc']), 'Quality command order differs')
+        last = datetime.fromisoformat(v['finished_utc'])
+    files = source_matches(snapshot); bindings = {}
+    for lane, group in [('production', read(PRODUCTION)), ('direct', groups[2])]:
+        packet = read(inventory['runtime_source_bindings'][lane]); api = group['runtime_interfaces']
+        need(set(packet) == {'schema', 'observer_sources', 'actual_public_API_sources'} and packet['schema'] == (api['runtime_source_bindings_schema'] if lane == 'direct' else 'ctf10-Init-postlude-production-runtime-source-bindings.v1'), 'Exact runtime Source packet required')
+        for key, names in [('observer_sources', api['ordered_observer_source_paths']), ('actual_public_API_sources', api['ordered_public_API_source_paths'])]:
+            need([r['path'] for r in packet[key]] == names, 'Ordered own/API Source paths differ')
+            for r in packet[key]:
+                exact(r); need(files[r['path']]['archive']['sha256'] == r['sha256'] and files[r['path']]['size_bytes'] == r['size_bytes'], 'Own/API Source missing from full actual snapshot')
+        bindings[lane] = packet
+    return inventory, quality, bindings, last
+
+def source_delta(before, after, left, right):
+    import difflib
+    return ''.join(difflib.unified_diff(before.decode('utf8').splitlines(True), after.decode('utf8').splitlines(True), fromfile=left, tofile=right)).encode('utf8')
+
+def frozen_direct(freeze_ref):
+    freeze = read(freeze_ref); need(freeze['schema'] == 'ctf10-native-Init-postlude-frozen-inputs.v1' and freeze['frozen_before_this_execution'] is True and same(freeze['native_source_manifest'], NATIVE) and freeze['declared_model_cases'] == 15 and freeze['declared_direct_cases'] == 6, 'Frozen Native06 fixed15/direct6 required')
+    for k in ['expected_values_supplied', 'expected_exits_supplied', 'scientific_execution_performed', 'numerical_PASS_claimed', 'gates_updated']: need(freeze[k] is False, 'No Native results/outcomes/PASS may be supplied')
+    exact(freeze['native_source_manifest']); native = read(NATIVE); direct = read(freeze['direct_unit_request']); admission = read(freeze['native_admission_contract'])
+    need(direct['schema'] == 'ctf10-Init-postlude-direct-unit-request.v1' and admission['schema'] == 'ctf10-production-native-admission-contract.v1' and admission['direct_unit_request'] == freeze['direct_unit_request'] and admission['helper_request'] == freeze['helper_request'] and admission['projection'] == freeze['projection'] and admission['contracts'] == freeze['contracts'], 'Frozen direct/admission joins differ')
+    need(admission['actual_scope_amendment_execution_role'] == 'real-CTF-10-Init-postlude-check-only' and admission['native_source_files'] == native['native_source_files'] and len(admission['native_source_files']) == 12, 'Current scope role/twelve Native Sources differ')
+    for k in ['frozen_before_this_helper_execution', 'expected_values_supplied', 'expected_exits_supplied', 'scientific_execution_performed']: need(direct[k] is (k == 'frozen_before_this_helper_execution'), 'Literal direct input-only flags differ')
+    literal = read(direct['literal_case_source']); declared = next(r['source'] for r in native['own_sources'] if Path(r['source']['path']).name == 'direct-unit-cases.proposed.json')
+    need(direct['literal_case_source'] == declared and literal['schema'] == 'ctf10-Init-postlude-direct-unit-cases-proposed.v1' and direct['cases'] == literal['cases'] and len(direct['cases']) == 6 and literal['expected_values_supplied'] is False and literal['expected_exits_supplied'] is False, 'Six unchanged literal direct inputs required')
+    need(exact(direct['input']).read_bytes() == exact(literal['literal_IDF_source']).read_bytes(), 'Literal direct IDF differs')
+    for r in admission['native_source_files'] + list(freeze['contracts'].values()) + [freeze['projection'], freeze['observation_policy'], freeze['helper_request']]: exact(r)
+    return freeze, direct
+
+def conversion(ledger_ref, execution_ref, direct):
+    ledger = read(ledger_ref); execution = receipt(execution_ref)
+    need(ledger['schema'] == 'sch01-converted-inputs.v1' and ledger['case_count'] == ledger['available_converted_input_count'] == 1 and ledger['unavailable_converted_input_count'] == 0 and len(ledger['conversions']) == 1, 'One complete real input conversion required')
+    for k in ['scientific_execution_performed', 'Native_scientific_outputs_used_as_inputs', 'expected_values_supplied', 'expected_exits_supplied', 'final_scientific_packet_frozen', 'gates_updated']: need(ledger[k] is False, 'Input-only conversion scope differs')
+    row = ledger['conversions'][0]; proof_ref = row['actual_conversion_execution']; proof = read(proof_ref)
+    need(row['case_id'] == proof['case_id'] == 'CTF10-DIRECT-REPORT' and row['available'] is True and row['status'] == 'actual-converted-input-available' and row['unavailable_reason'] is None, 'Actual conversion availability differs')
+    need(proof['schema'] == 'sch01-input-conversion-command.v1' and proof['exit_code'] == 0 and proof['launch_error'] is None and proof['epjson_available'] is True and proof['unavailable_reason'] is None and proof['original_and_staged_IDF_preserved'] is True, 'Successful input-only converter record required')
+    for k in ['numerical_engine_executed', 'Native_scientific_outputs_used_as_inputs', 'expected_answers_supplied']: need(proof[k] is False, 'Conversion must supply no scientific answers')
+    need(row['input'] == proof['source_input'] and row['epjson_input'] == proof['available_epjson_input'] and proof['converter'] == ledger['converter'] and proof['converter']['path'] == '.runtime/energyplus/26.1.0/ConvertInputFormat.exe' and proof['command'] == [str(path(proof['converter']['path'])), 'input.idf'] and path(proof['cwd']) == path(proof['staged_input']['path']).parent, 'Actual conversion path/caller join differs')
+    for r in [proof['source_input'], proof['staged_input']]: need(r['sha256'] == direct['input']['sha256'] and r['size_bytes'] == direct['input']['size_bytes'], 'Original/staged frozen IDF differs'); exact(r)
+    exact(row['epjson_input']); exact(ledger['input_cases'])
+    sources = [('.runtime/porting/SCH-01/input-prep-02/convert_inputs.py', '82f27c8327d2409bb3bcba727044ebe6a36641ed8d7c404e08dd4bc92c990dbb'), ('.runtime/porting/SCH-01/input-prep-02/input_common.py', 'b38466a0dd8851935d0ef28c079220d7c48f2c05506926d1ad4e7fb463f6de77')]
+    need(len(ledger['executed_runner_sources']) == 2, 'Both actual converter Sources required')
+    for r, (n, h) in zip(ledger['executed_runner_sources'], sources): need(r['historical_path'] == n and r['archive']['sha256'] == h, 'Executed converter Source differs'); exact(r['archive'])
+    expected = ['-X', 'utf8', '-B', sources[0][0], '--approved-source-sha256', sources[0][1], '--input-cases', pin(ledger['input_cases']), '--converter', pin(ledger['converter']), '--output-dir', path(ledger_ref['path']).parent.relative_to(ROOT).as_posix()]
+    need(execution['command'][1:] == expected and read(execution['stdout']) == ledger, 'Direct recorded conversion stdout/argv differs')
+    return row['epjson_input'], [ledger_ref, proof_ref, execution_ref]
+
+def check_self(args, current):
+    need(sha(RECORDER) == RECORDER_SHA and sha(current) == args.approved_source_sha256, 'Reviewed workflow/current recorder Source required')
+    prep_ref = operand(args.source_manifest); prep = read(prep_ref)
+    need(len(prep['own_sources']) == 2 and any(same(r, ref(current)) for r in prep['own_sources']), 'Approved same-parent workflow Source required')
+    for r in prep['own_sources']: need(exact(r).parent == current.parent, 'Both workflow Sources must share approved directory')
+    return prep_ref
+
+def arguments(parser):
+    for n in ['approved-source-sha256', 'source-manifest', 'native-freeze', 'formatted-inventory', 'quality', 'conversion-ledger', 'conversion-execution', 'output-dir']: parser.add_argument('--' + n, required=True)
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__); arguments(parser); args = parser.parse_args(); prep_ref = check_self(args, Path(__file__).resolve())
+    inv_ref, quality_ref, freeze_ref = operand(args.formatted_inventory), operand(args.quality), operand(args.native_freeze)
+    inventory, quality, bindings, _ = current_sources(inv_ref, quality_ref); freeze, direct = frozen_direct(freeze_ref)
+    epjson, proofs = conversion(operand(args.conversion_ledger), operand(args.conversion_execution), direct)
+    api = read(DIRECT)['runtime_interfaces']; request = dict(schema=api['request_schema'], direct_unit_request=freeze['direct_unit_request'], native_admission_contract=freeze['native_admission_contract'], native_frozen_packet=freeze_ref, report_input_epjson=epjson, report_conversion_proof_bindings=proofs, observer_sources=bindings['direct']['observer_sources'], actual_public_API_sources=bindings['direct']['actual_public_API_sources'], actual_Cargo_source_capture_must_match=True, frozen_before_execution=True, expected_values_supplied=False, Native_results_supplied=False)
+    need(list(request) == api['ordered_request_keys'], 'Exact twelve request keys required'); out = path(args.output_dir); need(out.is_relative_to(BASE) and not out.exists(), 'Fresh contained CTF10 output required'); unchanged(); out.mkdir()
+    write(out / 'direct-request.json', request)
+    write(out / 'input-custody.json', dict(schema='ctf10-Init-postlude-direct-input-custody.v1', source_preparation=prep_ref, accepted_formatted_inventory=inv_ref, actual_quality=quality_ref, actual_Source_snapshot=quality['Source_snapshot'], actual_runtime_sources=inventory['runtime_source_bindings']['direct'], actual_native_freeze=freeze_ref, report_conversion_proof_bindings=proofs, request=ref(out / 'direct-request.json'), Native_results_or_expected_values_read=False, scientific_execution_performed=False, numerical_PASS_claimed=False, gates_updated=False))
+    unchanged(); print(json.dumps(dict(request=ref(out / 'direct-request.json'), input_custody=ref(out / 'input-custody.json'), numerical_PASS_claimed=False)), flush=True)
+
+if __name__ == '__main__': main()

@@ -1,0 +1,85 @@
+--- crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs
++++ crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs
+@@ -98,7 +98,7 @@
+ fn direct_case(root: &Path, row: &Value, idf: &Value, epjson: &Value) -> Result<Value> {
+     let mut out = json!({"id":row["id"],"lane":"explicit-direct-state-Rust-Init-unit","actual_input_row":row,
+         "actual_raw_input":idf,"actual_report_epjson":epjson,"loader":null,"compiler":null,
+-        "typed_report_inputs":null,"initial_registry":null,"setup_calls":[],
++        "typed_report_inputs":null,"preparation":null,"initial_registry":null,"setup_calls":[],
+         "direct_initializer_invoked":false,"direct_initializer_invocation_count":0,
+         "caller_before_initializer":null,"caller_after_return_or_error":null,
+         "direct_state_before_initializer":null,"direct_state_after_return_or_error":null,
+@@ -115,20 +115,34 @@
+             return Ok(out);
+         }
+     };
+-    let (inputs, report) = compile_report_inputs::compile_direct_report_inputs(&raw);
+-    out["compiler"] = json!({"invoked":true,"model_available":inputs.is_some(),"raw_object_count":report.raw_object_count,
++    let (prepared, report) = compile_report_inputs::compile_direct_report_inputs(&raw);
++    out["compiler"] = json!({"invoked":true,"model_available":prepared.is_some(),"raw_object_count":report.raw_object_count,
+         "typed_object_count":report.typed_object_count,"completed_stages":format!("{:?}",report.completed_stages),
+         "ordered_diagnostics":format!("{:?}",report.diagnostics),"defaults_applied":format!("{:?}",report.defaults_applied),
+-        "only_ReportInputs_moved_out":true,"typed_simulation_geometry_or_timestep_used":false});
+-    let Some(inputs) = inputs else {
++        "only_ReportInputs_moved_out":false,"typed_simulation_geometry_or_timestep_used":true,"typed_simulation_geometry_used":false,"actual_compiled_Timestep_retained_for_GetProjectData":true});
++    let Some(prepared) = prepared else {
+         out["initialization"] =
+             json!({"invoked":false,"status":"unavailable-genuine-report-input-compilation"});
+         return Ok(out);
+     };
+-    out["typed_report_inputs"] = fields::typed_report_inputs(&inputs);
++    compile_report_inputs::admit_project_defaults(&raw, &prepared)?;
++    let inputs = &prepared.reports;
++    out["typed_report_inputs"] = fields::typed_report_inputs(inputs);
+     let mut caller = fields::Caller::new();
++    let preparation_before = caller.snapshot();
++    match caller.prepare(&prepared) {
++        Ok(assigned) => out["preparation"] = json!({"invoked":true,"status":"source-returned",
++            "source_order":["SimulationManager::OpenOutputFiles","SimulationManager::GetProjectData","EMSManager::CheckIfAnyEMS -> ScanForReports(EnergyManagementSystem)"],
++            "actual_TimeStepsInHour":prepared.time_steps_in_hour,"actual_TimeStepZone":fields::scalar(prepared.time_step_zone()),
++            "assigned_EMS_report":assigned,"caller_before":preparation_before,"caller_after":caller.snapshot()}),
++        Err(error) => {
++            out["preparation"] = json!({"invoked":true,"status":"source-error-returned","error":fields::setup_error(&error),
++                "caller_before":preparation_before,"caller_after":caller.snapshot()});
++            return Ok(out);
++        }
++    }
+     let registry_before = caller.snapshot();
+-    match caller.setup("SetPredefinedTables", &inputs) {
++    match caller.setup("SetPredefinedTables", inputs) {
+         Ok(assigned) => {
+             out["initial_registry"] = json!({"invoked":true,"status":"source-returned","assigned_report":assigned,
+             "caller_before":registry_before,"caller_after":caller.snapshot()})
+@@ -163,7 +177,7 @@
+         solution_dimensions: 1,
+         absorptance: [0.0; 4],
+         outside_roughness: MaterialSurfaceRoughness::MediumRough,
+-        time_step_zone: 0.0,
++        time_step_zone: prepared.time_step_zone(),
+         any_internal_heat_source_in_input: false,
+     };
+     let mut state = CtfDirectInitializationState::new(true, 0);
+@@ -171,12 +185,12 @@
+         "SourceSinkPresent":input.source_sink_present,"SolutionDimensions":input.solution_dimensions,
+         "absorptance":input.absorptance.map(fields::scalar),"OutsideRoughness":"MediumRough",
+         "actual_global_TimeStepZone":fields::scalar(input.time_step_zone),"AnyInternalHeatSourceInInput":input.any_internal_heat_source_in_input,
+-        "constructor_defaults_not_compiled_Timestep_used":true,"production_Rust_ID_equivalence_claimed":false});
++        "constructor_defaults_not_compiled_Timestep_used":false,"actual_GetProjectData_Timestep_used":true,"production_Rust_ID_equivalence_claimed":false});
+     let mut setup = Vec::new();
+     for action in rows(&row["setup_calls"])? {
+         let action = text(action)?;
+         let before = caller.snapshot();
+-        match caller.setup(action,&inputs) {
++        match caller.setup(action,inputs) {
+             Ok(assigned)=>setup.push(json!({"action":action,"actual_source_invoked":true,"status":"source-returned","assigned_report":assigned,
+                 "caller_before":before,"caller_after":caller.snapshot()})),
+             Err(error)=>{
+@@ -191,7 +205,7 @@
+     out["direct_state_before_initializer"] = fields::direct_state(&state);
+     out["direct_initializer_invoked"] = json!(true);
+     out["direct_initializer_invocation_count"] = json!(1);
+-    let actual = caller.initialize(&input, &inputs, &mut state);
++    let actual = caller.initialize(&input, inputs, &mut state);
+     out["initialization"] = match actual {
+         Ok(()) => json!({"invoked":true,"status":"source-returned","error":null}),
+         Err(error) => {

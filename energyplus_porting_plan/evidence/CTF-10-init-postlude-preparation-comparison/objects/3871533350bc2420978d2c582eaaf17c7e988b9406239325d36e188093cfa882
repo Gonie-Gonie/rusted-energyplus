@@ -1,0 +1,82 @@
+"""Seal one documentary admission repair; no project/observer execution."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT=Path.cwd().resolve();OUT=Path(__file__).resolve().parent;BASE=OUT.parent
+CANONICAL='crates/ep_run/examples/ctf10_init_postlude_candidate_production_observer.rs'
+
+def ref(p):
+    p=Path(p);p=p if p.is_absolute() else ROOT/p;body=p.read_bytes()
+    return dict(path=p.relative_to(ROOT).as_posix(),sha256=hashlib.sha256(body).hexdigest(),size_bytes=len(body),line_count=len(body.splitlines()))
+
+def put(p,body):
+    with p.open('xb') as stream:stream.write(body)
+
+before=(ROOT/CANONICAL).read_bytes();assert ref(CANONICAL)['sha256']=='a9fccd0b721aabcd8ee503a20de0b0678c7e6f325bd569ae2f0758b4c23b6c47'
+docs=BASE/'init-postlude-documents-prep-01/manifest.json';assert ref(docs)['sha256']=='14a2b4422398e7c0932ce32823fcba6686927d2f37979f34bce39e335739747d'
+archive=BASE/'init-postlude-documents-prep-01/before/cards/CTF-10.md';assert ref(archive)['sha256']=='02f7ae2e17fecccd3b04c83a19548139bf233510184ee47704b599a2a28a548d' and archive.stat().st_size==15106
+old='    bindings.push(native["current_cards"]["CTF-10"].clone());'
+new='''    // Native capture predates the truthful failure publication; retain its exact card bytes.
+    let documentary_source = json!({
+        "path": ".runtime/porting/CTF-10/init-postlude-documents-prep-01/manifest.json",
+        "sha256": "14a2b4422398e7c0932ce32823fcba6686927d2f37979f34bce39e335739747d",
+        "size_bytes": 7657
+    });
+    let (_, documentary_bytes) = bound(&root, &documentary_source)?;
+    let documentary: Value = serde_json::from_slice(&documentary_bytes)?;
+    require(
+        documentary["schema"] == "ctf10-Init-postlude-failed-milestone-documents-source.v1",
+        "exact historical document preparation required",
+    )?;
+    let historical_card = &native["current_cards"]["CTF-10"];
+    let card = rows(&documentary["documents"])?
+        .iter()
+        .find(|row| row["canonical_path"] == historical_card["path"])
+        .ok_or("declared frozen card lacks authentic before archive")?;
+    for key in ["path", "sha256", "size_bytes"] {
+        require(
+            card["actual_before"][key] == historical_card[key],
+            "declared frozen historical card identity differs",
+        )?;
+    }
+    let card_archive = card["before_archive"].clone();
+    require(
+        card_archive["path"] == ".runtime/porting/CTF-10/init-postlude-documents-prep-01/before/cards/CTF-10.md"
+            && card_archive["sha256"] == historical_card["sha256"]
+            && card_archive["size_bytes"] == historical_card["size_bytes"],
+        "authentic archived frozen card bytes required",
+    )?;
+    bindings.push(documentary_source);
+    bindings.push(card_archive);'''
+body=before.decode('utf8');assert body.count(old)==1;body=body.replace(old,new);assert body.replace(new,old).encode()==before
+(OUT/'before').mkdir();put(OUT/'before/ctf10_init_postlude_candidate_production_observer.rs',before)
+proposal=OUT/'ctf10_init_postlude_candidate_production_observer.rs';put(proposal,body.encode())
+delta=''.join(difflib.unified_diff(before.decode().splitlines(True),body.splitlines(True),fromfile=CANONICAL,tofile=CANONICAL)).encode();put(OUT/'source.diff',delta)
+put(OUT/'README.md',b'''# Production frozen-card documentary custody repair
+
+The corrected candidate stopped before emitting any result: its inherited Native
+current_cards binding demanded the live CTF-10 card retain capture-time bytes.
+The honest failed-comparison publication changed that live card. This one-file
+held repair replaces only that documentary live binding with the exact immutable
+docs-prep01 authority and authentic pre-publication card archive. The declared
+Native historical path/SHA/size must equal the authority's actual_before identity;
+the literal archive path/SHA/size is independently authenticated and rechecked
+before and after every selected model call through the existing bindings ledger.
+
+The Native current_cards contract and emitted current_cards metadata remain
+unchanged. No model, conversion, weather, input, policy, arithmetic, public/report
+owner, phase, comparison or required-absence rule changes. Request/results schemas,
+twelve request keys and production own4/API59 paths remain unchanged. The original
+failed candidate and all prior Source/correction lineage must remain retained.
+Root alone may apply, format, rerun same-Source quality and build a fresh candidate.
+No observer/project import, target, canonical, Git or numerical payload read was
+performed to prepare this hold. No future result or Source identity is predicted.
+''')
+production=BASE/'init-postlude-production-preparation-fix-prep-01/manifest.json';interfaces=json.loads(production.read_bytes())['runtime_interfaces']
+row=dict(canonical_path=CANONICAL,actual_before=ref(CANONICAL),before_archive=ref(OUT/'before/ctf10_init_postlude_candidate_production_observer.rs'),proposal=ref(proposal),exact_diff=ref(OUT/'source.diff'),absent=False)
+manifest=dict(schema='ctf10-Init-postlude-production-historical-card-fix-source.v1',status='SOURCE-READY-HELD-NOT-EXECUTED',application=[row],application_sources=[row],own_sources=[ref(proposal),ref(OUT/'README.md'),ref(Path(__file__))],reviewed_production_preparation=ref(production),reviewed_correction_workflow_preparation=ref(BASE/'init-postlude-prerequisite-correction-workflow-prep-01/manifest.json'),historical_document_preparation=ref(docs),authentic_frozen_card_archive=ref(archive),runtime_interfaces=interfaces,inverse_exact=True,only_historical_documentary_binding_replaced=True,numerical_or_source_owner_bodies_unchanged=True,request_or_results_protocol_changed=False,canonical_or_Git_mutated=False,project_or_observer_execution_performed=False,new_numerical_payload_read=False,gates_updated=False)
+ast.parse(Path(__file__).read_bytes());put(OUT/'manifest.json',(json.dumps(manifest,indent=2)+'\n').encode())
+print(json.dumps(dict(manifest=ref(OUT/'manifest.json'),proposal=ref(proposal),delta=ref(OUT/'source.diff'))))

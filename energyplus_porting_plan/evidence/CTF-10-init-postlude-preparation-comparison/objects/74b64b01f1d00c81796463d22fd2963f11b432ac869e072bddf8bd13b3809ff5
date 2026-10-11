@@ -1,0 +1,11 @@
+--- .runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-04/write_request.py
++++ .runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-05/write_request.py
+@@ -16,7 +16,7 @@
+ CORE = {'path': '.runtime/porting/CTF-10/init-postlude-direct-state-prep-01/manifest.json', 'sha256': 'f4d6b158e2cdf57cb59858f5ed83772302697ce50ce2b2649eafe915f5a00ef2'}
+ BATCH = {'path': '.runtime/porting/CTF-10/init-postlude-batch-application-prep-02/manifest.json', 'sha256': '78df43f1062153abd64726ca7a96ddb8740406d08114076c331d1a20ce498b1f'}
+ NATIVE = {'path': '.runtime/porting/CTF-10/native-init-postlude-prep-06/manifest.json', 'sha256': '9a664b1a4ac99b8b6b00813aaa43a59bb61bab24b3752ebaf06d22324d29160b'}
+-POST = {'path': '.runtime/porting/CTF-10/init-postlude-post-application-correction-prep-01/manifest.json', 'sha256': 'eba6f68630a9a9485dde8057c194dbc5d5b46648eedc54731e68f10629f560c6'}
++POST = {'path': '.runtime/porting/CTF-10/init-postlude-post-application-correction-prep-02/manifest.json', 'sha256': '62d21579cbe09937d73dc24c857f3c36ecf1b8193bac33eaa203fc089b25dbc8'}
+ CONFIG = ['--config', 'profile.dev.debug=0', '--config', 'profile.test.debug=0', '--config', 'build.incremental=false']
+ QUALITY = [('fmt-check', ['cargo', 'fmt', '--all', '--', '--check']),
+            ('clippy', ['cargo', 'clippy', *CONFIG, '--locked', '--workspace', '--all-targets', '--', '-D', 'warnings']),

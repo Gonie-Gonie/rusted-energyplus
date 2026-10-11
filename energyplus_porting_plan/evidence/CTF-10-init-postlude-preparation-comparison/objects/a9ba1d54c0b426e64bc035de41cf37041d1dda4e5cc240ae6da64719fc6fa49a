@@ -1,0 +1,329 @@
+{
+  "schema": "ctf10-Init-postlude-finalization-source-preparation.v1",
+  "status": "SOURCE-READY-HELD-NOT-EXECUTED",
+  "held_immutable": true,
+  "own_sources": [
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-06/finalize.py",
+      "sha256": "f273fcabc06c838dac81c23c87c8648f0e8d7812635c5bbdf00c35cb74590373",
+      "size_bytes": 34296
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-06/README.md",
+      "sha256": "f45ac963ddbcbdd365372be052153299bfe382459c5e10fc2644d9ab869c79a5",
+      "size_bytes": 6950
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-06/seal_source.py",
+      "sha256": "58c67bedfa61fe0349b9ecbec6b975f7e51cd684d6ed8676c9e31d429d681321",
+      "size_bytes": 3781
+    }
+  ],
+  "previous_source_preparation": {
+    "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-02/manifest.json",
+    "sha256": "460267c8edafbb57d27ed363bc7457117704b37d1b373b75b05fc7255bdd7d16",
+    "size_bytes": 6915,
+    "line_count": 180
+  },
+  "before_02": [
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-03/before-02/finalize.py",
+      "sha256": "6534202c483a34ab5f66c6c2760678c8bcf1bf1f93aee76444568d4e651f5d24",
+      "size_bytes": 25075,
+      "line_count": 199
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-03/before-02/README.md",
+      "sha256": "1f81882bf507e2e6a174b8bf3b093e5edb9da55f299e2a65097745ecf2780172",
+      "size_bytes": 3945,
+      "line_count": 13
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-03/before-02/manifest.json",
+      "sha256": "460267c8edafbb57d27ed363bc7457117704b37d1b373b75b05fc7255bdd7d16",
+      "size_bytes": 6915,
+      "line_count": 180
+    }
+  ],
+  "source_diff": {
+    "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-06/source.diff",
+    "sha256": "54888f557f793fbbac7c8d24b48d0068a8d20b29015aef846389d51e614c213a",
+    "size_bytes": 1434
+  },
+  "README_diff": {
+    "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-06/README.diff",
+    "sha256": "18e8a5795ba4e4d46a31d554c431fde6b92a2257dfe9b57f9e451d82e9915625",
+    "size_bytes": 1164
+  },
+  "README": {
+    "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-06/README.md",
+    "sha256": "f45ac963ddbcbdd365372be052153299bfe382459c5e10fc2644d9ab869c79a5",
+    "size_bytes": 6950
+  },
+  "authoring_source": {
+    "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-06/seal_source.py",
+    "sha256": "58c67bedfa61fe0349b9ecbec6b975f7e51cd684d6ed8676c9e31d429d681321",
+    "size_bytes": 3781
+  },
+  "comparer03_protocol_context": [
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-comparison-prep-03/manifest.json",
+      "sha256": "aebad18114727a868f4bb373572386d3401c747c57811a74e8f8cdeac7308b60",
+      "size_bytes": 62515,
+      "line_count": 1513
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-comparison-prep-03/compare.py",
+      "sha256": "210868c39fcd7a91f9f7bee427247dd97c77c669a15df35d30c45857d80a58ed",
+      "size_bytes": 21731,
+      "line_count": 213
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-comparison-prep-03/custody.py",
+      "sha256": "0f82e057f8966c1ca332b48ec8df6eb0550f02ad1bf9836de1325a91c3d9f6e2",
+      "size_bytes": 14169,
+      "line_count": 162
+    }
+  ],
+  "inherited_protocol_context": [
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-comparison-prep-02/compare.py",
+      "sha256": "0a0c21720698c239af9dd6bbdb19d9163383354cc37f88379adda9dd4a79c097",
+      "size_bytes": 21142,
+      "line_count": 209
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-comparison-prep-02/comparison.py",
+      "sha256": "1604b0b9966c635d952b4fed0a278c7334acad9e64b7a9d6f0e26acfd94e4964",
+      "size_bytes": 2169,
+      "line_count": 43
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-comparison-prep-02/packet_io.py",
+      "sha256": "ce1e2f98e975c5fb7d250af9c2503c9cd15aa86422d249ed807253d87cba13cf",
+      "size_bytes": 3893,
+      "line_count": 105
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-02/run_candidates.py",
+      "sha256": "b70c35b6b53a563c0b2668f1cabe6cae5ed26dda4affef6dfb5c00e404321527",
+      "size_bytes": 8785,
+      "line_count": 64
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-02/write_request.py",
+      "sha256": "fa975bc88d34e98a8994f060b756d0ff98601c714f7bbc6903d8aa1115a80087",
+      "size_bytes": 17291,
+      "line_count": 159
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-batch-application-prep-02/run_batch.py",
+      "sha256": "3af51976cf0917c9b112cf8c7a6cb4def07aee4608fa9e4e17d7f23f31dc0b6c",
+      "size_bytes": 15633,
+      "line_count": 140
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-clippy-correction-prep-01/run_correction.py",
+      "sha256": "ee4cd1dd53fc53a149d333e9e2fd0367dfd85e9eccd090bb4a1c999252d17aa1",
+      "size_bytes": 10245,
+      "line_count": 106
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "size_bytes": 8453,
+      "line_count": 204
+    }
+  ],
+  "runtime_interfaces": {
+    "argv": [
+      "--approved-source-sha256",
+      "--inputs"
+    ],
+    "inputs": "actual path#SHA operand",
+    "input_packet_schema": "ctf10-Init-postlude-finalization-inputs.v1",
+    "required_packet_keys": [
+      "schema",
+      "native_completion",
+      "original_data_review",
+      "original_data_review_execution",
+      "formatted_inventory",
+      "source_correction",
+      "quality",
+      "candidate_workflow",
+      "comparison",
+      "comparison_execution",
+      "failed_native_workflow",
+      "failed_artifact_archive",
+      "source_preparations",
+      "recorded_outer_receipts",
+      "retained_lineage",
+      "prior_evidence",
+      "quality_source_preparation",
+      "prior_selected_evidence_manifest",
+      "prior_selected_evidence_summary"
+    ],
+    "output_directory": "energyplus_porting_plan/evidence/CTF-10-init-postlude-preparation-comparison",
+    "comparison_allowed_actual_exit_codes": [
+      0,
+      1
+    ],
+    "candidate_allowed_actual_exit_codes": [
+      0,
+      2
+    ],
+    "canonical_or_documents_modified": false,
+    "generic_framework_added": false,
+    "binary_payloads_archived": false,
+    "selected_archive_is_transitive_replay_closure": false,
+    "prior_large_observation_trace_rearchived": false,
+    "fixed_future_test_totals": false,
+    "whole_Init_or_persistent_integration_or_CTF10_gates_promoted": false,
+    "standard_quality_commands": 4,
+    "supplementary_direct_observer_tests_required": true,
+    "future_execution_identities_are_runtime_operands": true,
+    "identical_stored_objects_reused_from_authenticated_prior_archive": true,
+    "executed_comparer_declared_options": 13,
+    "added_comparer_operands": [
+      "formatted-inventory",
+      "quality"
+    ],
+    "frozen_document_live_rebinding_performed": false
+  },
+  "Source_only_checks": {
+    "AST_valid": true,
+    "project_import_execution_or_target_calls_performed": false,
+    "canonical_Git_or_scientific_payload_reads_performed": false
+  },
+  "authorship_limit": "Base authored candidate workflow/direct observer ancestry and this evidence adapter. Independent Source peer must review receipt/archive/status custody; no numerical or gate certificate is supplied.",
+  "predecessor_manifest": {
+    "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-05/manifest.json",
+    "sha256": "e1394c298b1932663d535c204405b5964a900fff31f79a06f453f7770865d753",
+    "size_bytes": 12468
+  },
+  "before": [
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-06/before/finalize.py",
+      "sha256": "31ff0875f1bf1395f996d500f93719f455ed6b5943f57d1d7efe86056b15ca98",
+      "size_bytes": 34137
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-06/before/README.md",
+      "sha256": "5cea65050b0c55020a0a08e50409c4d2d9dff6910a46a7897ea1dc27998eec7c",
+      "size_bytes": 6204
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-06/before/manifest.json",
+      "sha256": "e1394c298b1932663d535c204405b5964a900fff31f79a06f453f7770865d753",
+      "size_bytes": 12468
+    }
+  ],
+  "source_diffs": [
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-06/source.diff",
+      "sha256": "54888f557f793fbbac7c8d24b48d0068a8d20b29015aef846389d51e614c213a",
+      "size_bytes": 1434
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-06/README.diff",
+      "sha256": "18e8a5795ba4e4d46a31d554c431fde6b92a2257dfe9b57f9e451d82e9915625",
+      "size_bytes": 1164
+    }
+  ],
+  "reviewed_post_application_workflow_preparation": {
+    "path": ".runtime/porting/CTF-10/init-postlude-post-application-correction-prep-02/manifest.json",
+    "sha256": "62d21579cbe09937d73dc24c857f3c36ecf1b8193bac33eaa203fc089b25dbc8",
+    "size_bytes": 13977
+  },
+  "reviewed_historical_card_correction_preparation": {
+    "path": ".runtime/porting/CTF-10/init-postlude-production-historical-card-fix-prep-01/manifest.json",
+    "sha256": "83b70e2673a9c305a2a8fc2974c32091a0d45a1d5680f49546b8ec68c1ce7662",
+    "size_bytes": 10361
+  },
+  "postfix_schema": "one separate post_application_corrections row; original initial_correction_actual_final_source retained in two touched rows",
+  "scientific_pairing_or_status_logic_changed": false,
+  "historical03_context": {
+    "source_diff": {
+      "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-03/diffs/finalize.from-02.diff",
+      "sha256": "0e7f6f61828853f5dcff0c9b116ae25cbf6ffd436e0a76f3d5fa146258c50ed0",
+      "size_bytes": 3189,
+      "line_count": 20
+    },
+    "README_diff": {
+      "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-03/diffs/README.from-02.diff",
+      "sha256": "912e90ea85d7f32b7fcb3fba690dba8521c4537ebbd5d39591ce956123f8a0d6",
+      "size_bytes": 2358,
+      "line_count": 8
+    },
+    "README": {
+      "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-03/README.md",
+      "sha256": "1f33b522d7b174c9f17aeff59224cf859f87bd11389f445a445d1257f8a62d4d",
+      "size_bytes": 4698,
+      "line_count": 15
+    },
+    "authoring_source": {
+      "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-03/seal_sources.py",
+      "sha256": "1b12e0838a89dadf5e671b8657178fd8cfc2616d7205cc979e06ad41bbce7308",
+      "size_bytes": 6072,
+      "line_count": 51
+    },
+    "comparer03_protocol_context": [
+      {
+        "path": ".runtime/porting/CTF-10/init-postlude-comparison-prep-03/manifest.json",
+        "sha256": "aebad18114727a868f4bb373572386d3401c747c57811a74e8f8cdeac7308b60",
+        "size_bytes": 62515,
+        "line_count": 1513
+      },
+      {
+        "path": ".runtime/porting/CTF-10/init-postlude-comparison-prep-03/compare.py",
+        "sha256": "210868c39fcd7a91f9f7bee427247dd97c77c669a15df35d30c45857d80a58ed",
+        "size_bytes": 21731,
+        "line_count": 213
+      },
+      {
+        "path": ".runtime/porting/CTF-10/init-postlude-comparison-prep-03/custody.py",
+        "sha256": "0f82e057f8966c1ca332b48ec8df6eb0550f02ad1bf9836de1325a91c3d9f6e2",
+        "size_bytes": 14169,
+        "line_count": 162
+      }
+    ]
+  },
+  "comparer04_protocol_context": [
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-comparison-prep-04/manifest.json",
+      "sha256": "37f676998c095b41346f70356f6c4e8c0709b4cfbfb0687f11fd5803d182ef7f",
+      "size_bytes": 72597
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-comparison-prep-04/compare.py",
+      "sha256": "986a53f51f5267ae5b9915a9b11a6a4f1d872bec7223968f052b821a89032907",
+      "size_bytes": 22008
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-comparison-prep-04/custody.py",
+      "sha256": "a30171f74ee3c148142623dd83d750e10f8cb9ee72c306e2cd1651f195547687",
+      "size_bytes": 23793
+    }
+  ],
+  "retained_failed_apply_execution": {
+    "path": ".runtime/porting/CTF-10/init-postlude-historical-card-apply-command-01/receipt.json",
+    "sha256": "e766452cc95a0b523c305a7654299f079df893171535c9d6f1bf6f81e0f0db68",
+    "size_bytes": 4722
+  },
+  "empty_formatter_diff_requires_complete_byte_equality": true,
+  "optional_unavailable_policy_source_context": [
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-comparison-prep-04/comparison.py",
+      "sha256": "1604b0b9966c635d952b4fed0a278c7334acad9e64b7a9d6f0e26acfd94e4964",
+      "size_bytes": 2169
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-comparison-prep-04/pair_owners.py",
+      "sha256": "70398fb6622da1c1ab9a783964e9248ae30b9c70e5a52d470c0955b662ea9145",
+      "size_bytes": 14982
+    }
+  ],
+  "selected_paired_success_requires_no_required_unavailability": true,
+  "every_unavailable_noPASS_marker_required": true,
+  "complete_optional_unavailable_ledger_preserved": true
+}

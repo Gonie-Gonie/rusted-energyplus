@@ -24,6 +24,8 @@ pub enum CtfReportUnavailable {
     Material(MaterialId),
     /// A genuine source loader name has not been retained for this owner.
     LoaderNameUnavailable,
+    /// Actual surface boundary is outside the ordinary Outdoors/Adiabatic report port.
+    SurfaceBoundary(ep_model::SurfaceId),
     /// Public count cannot index the fixed19 owner; no clipping is performed.
     PublicCapacity(i32),
     /// Source's declared output counter cannot be represented as i32.
@@ -158,6 +160,38 @@ impl PredefinedStringTable {
         entry.char_entry = text.to_string();
         entry.object_name = object.to_string();
         entry.index_column = column;
+        Ok(())
+    }
+
+    /// Selected real PreDefTableEntry with three decimal places and fixed notation.
+    /// Ordinary positive film coefficients bound this caller's U below 1e8.
+    /// Other formatting branches are explicitly unavailable, never approximated.
+    pub(crate) fn fixed_real_entry_3(
+        &mut self,
+        column: i32,
+        object: &str,
+        value: f64,
+    ) -> Result<(), CtfReportUnavailable> {
+        if !value.is_finite() || value.abs() >= 1e8 {
+            return Err(CtfReportUnavailable::DecimalRepresentation);
+        }
+        let mut text = formatting::fixed(value, 11, 3);
+        if text.len() > 12 {
+            text = "  Too Big".to_string();
+        }
+        // The shared string overload performs the exact increment/allocation and
+        // common charEntry/objectName/indexColumn writes without clearing tails.
+        self.string_entry(column, object, &text)?;
+        let index = usize::try_from(self.num_table_entry - 1)
+            .map_err(|_| CtfReportUnavailable::TableOwner)?;
+        let entry = self
+            .entries
+            .as_mut()
+            .and_then(|rows| rows.get_mut(index))
+            .ok_or(CtfReportUnavailable::TableOwner)?;
+        entry.original_real_entry = value;
+        entry.significant_digits = 3;
+        entry.original_entry_is_real = true;
         Ok(())
     }
 }

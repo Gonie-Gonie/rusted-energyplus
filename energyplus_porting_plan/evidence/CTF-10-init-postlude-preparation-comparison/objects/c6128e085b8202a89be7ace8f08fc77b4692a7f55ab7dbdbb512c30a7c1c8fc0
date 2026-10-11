@@ -1,0 +1,21 @@
+# Direct preparation narrow Source successor03
+
+Cumulative01/02 was FULL reviewed by Root and Base. This fresh successor makes
+only two changes: the genuine timestep-divisor admission uses
+`!60_u32.is_multiple_of(input.time_steps_in_hour)` under the unchanged preceding
+range guard, and the existing compiler metadata key
+`typed_simulation_geometry_or_timestep_used` is retained truthfully as `true`.
+The separate geometry-false and actual-timestep-true keys remain unchanged.
+
+The divisor guard still short-circuits before a zero/out-of-range operand; it
+admits exactly the same declared inputs. No calculation, literal request, policy,
+caller preparation order, coefficient, EIO formatter or diagnostic changed.
+Fields are byte-exact02, and the two changed sources restore02 under the exact
+declared inverse. All four proposed tests remain unexecuted and byte-unchanged.
+
+The three application rows bind actual current canonical bytes at the Root-
+reported clean commit8f910751, authentic before archives, fresh proposals and
+cumulative diffs. Narrow from02 archives/diffs separately retain the reviewed
+predecessor. Own-source paths remain disjoint from Raw's production correction.
+Native capture is reused. No canonical/Git mutation, project import, formatter,
+target/test/engine execution, expected-answer injection or PASS claim occurred.

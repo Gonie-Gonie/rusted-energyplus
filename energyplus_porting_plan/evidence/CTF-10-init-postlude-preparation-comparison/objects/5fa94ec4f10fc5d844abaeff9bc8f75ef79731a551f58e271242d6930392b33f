@@ -1,0 +1,64 @@
+"""Seal only input-transport Source; never import/run the projector."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd().resolve()
+OUT = Path(__file__).resolve().parent
+BASE = OUT.parent
+
+def ref(p):
+    body = p.read_bytes()
+    return dict(path=p.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(body).hexdigest(), size_bytes=len(body))
+
+def put(p, body):
+    with p.open('xb') as stream: stream.write(body)
+
+old = BASE / 'init-postlude-input-projector-prep-04'
+assert ref(old / 'manifest.json')['sha256'] == '31f9703ba303be8cbef7a4cae8ba1970b0d116dccc0d0b4dca5c1aade35af970'
+production = BASE / 'init-postlude-production-preparation-fix-prep-01/manifest.json'
+correction = BASE / 'init-postlude-prerequisite-correction-workflow-prep-01/manifest.json'
+assert ref(production)['sha256'] == '7f84ff32d25390e4b86ea06f78ab50397dfa780ba4b64e1c15b4ad5407c54c32'
+assert ref(correction)['sha256'] == 'a0e28a8a7caa9f60dd69191d5d9df5665c99aaf053c4eba4ee1f880400aea33b'
+before = (old / 'project-inputs.py').read_bytes()
+body = before.decode('utf8')
+replacements = [
+    ("OBSERVER = {'path': '.runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/manifest.json', 'sha256': 'b089d724b65467e72564176038001e6567e51861a924cc0bcd9f94848fe19c5c'}", "OBSERVER = " + repr(ref(production)) + "\nCORRECTION = " + repr(ref(correction))),
+    ("observer = read(OBSERVER)", "observer = read(OBSERVER); correction = read(CORRECTION)"),
+    ("interfaces = observer['runtime_interfaces']", "interfaces = observer['runtime_interfaces']\nneed(correction['schema'] == 'ctf10-Init-postlude-prerequisite-correction-workflow-source.v1' and correction['runtime_path_authorities']['production'] == OBSERVER and OBSERVER in correction['reviewed_correction_preparations'], 'Exact reviewed production correction authority required')\nexact(correction['workflow_source'])\nneed(correction['runtime_paths']['production'] == dict(schema=runtime['schema'], observer_sources=interfaces['ordered_observer_source_paths'], actual_public_API_sources=interfaces['ordered_public_API_source_paths']), 'Reviewed correction and producer runtime paths differ')"),
+    ('own4/API58', 'own4/API59'),
+    ("len(runtime['actual_public_API_sources']) == 58", "len(runtime['actual_public_API_sources']) == 59"),
+    ("'reviewed_observer_source_preparation': OBSERVER", "'reviewed_observer_source_preparation': OBSERVER, 'reviewed_correction_workflow_preparation': CORRECTION"),
+]
+for left, right in replacements:
+    assert body.count(left) == 1, left
+    body = body.replace(left, right)
+raw = body.encode('utf8')
+inverse = body
+for left, right in reversed(replacements): inverse = inverse.replace(right, left)
+assert inverse.encode('utf8') == before
+ast.parse(raw)
+(OUT / 'before04').mkdir()
+for name in ['project-inputs.py', 'manifest.json', 'README.md']: put(OUT / 'before04' / name, (old / name).read_bytes())
+put(OUT / 'project-inputs.py', raw)
+put(OUT / 'project-inputs.diff', ''.join(difflib.unified_diff(before.decode('utf8').splitlines(True), body.splitlines(True), fromfile=(old / 'project-inputs.py').relative_to(ROOT).as_posix(), tofile=(OUT / 'project-inputs.py').relative_to(ROOT).as_posix())).encode('utf8'))
+put(OUT / 'README.md', b'''# Projector05: corrected production source custody
+
+This held successor binds the independently reviewed production preparation
+7f84ff32 and correction workflow a0e28a8a. The actual runtime packet must retain
+that workflow's exact ordered own4/API59 paths, and every supplied Source byte
+identity is authenticated. The existing three positional operands are unchanged:
+Native freeze path#SHA, production runtime packet path#SHA, fresh output directory.
+The candidate workflow separately authenticates the actual formatted inventory,
+five quality receipts and full Cargo Source snapshot before invoking this projector.
+
+Only the observer authority, exact API count/path guard and correction authority
+metadata change. The twelve request fields, all fifteen original inputs/conversion
+proofs, literal direct six, Native06 source and result-free transport stay unchanged.
+No numerical payload, candidate, engine, Cargo, canonical or Git action is used.
+''')
+manifest = dict(schema='ctf10-Init-postlude-input-projector-source-preparation.v5', status='SOURCE-READY-HELD-NOT-EXECUTED', parent_reviewed_preparation=ref(old / 'manifest.json'), source=ref(OUT / 'project-inputs.py'), before_source=ref(OUT / 'before04/project-inputs.py'), before_manifest=ref(OUT / 'before04/manifest.json'), before_README=ref(OUT / 'before04/README.md'), exact_diff=ref(OUT / 'project-inputs.diff'), README=ref(OUT / 'README.md'), reviewed_production_preparation=ref(production), reviewed_correction_workflow_preparation=ref(correction), native_source_preparation=ref(BASE / 'native-init-postlude-prep-06/manifest.json'), authoring_source=ref(Path(__file__)), inverse_exact=True, unchanged_request_keys=12, unchanged_model_cases=15, unchanged_direct_cases=6, actual_own_source_count=4, actual_API_source_count=59, execution_performed=False, canonical_mutation=False, numerical_PASS_claimed=False, gates_updated=False)
+put(OUT / 'manifest.json', (json.dumps(manifest, indent=2) + '\n').encode())
+print(json.dumps(dict(manifest=ref(OUT / 'manifest.json'), source=ref(OUT / 'project-inputs.py'))))

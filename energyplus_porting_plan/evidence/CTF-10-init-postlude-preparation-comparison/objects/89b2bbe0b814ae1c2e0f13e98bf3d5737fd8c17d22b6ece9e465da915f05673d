@@ -1,0 +1,55 @@
+{
+  "schema": "ctf10-Init-postlude-actual-post-application-correction.v1",
+  "accepted_parent_inventory": {
+    "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-applied-source-01/record.json",
+    "sha256": "501460a4fae98574446e9633bd2926c84da83c4e1f997b8258f9dd4e81818dbd",
+    "size_bytes": 74703
+  },
+  "actual_sources": [
+    {
+      "canonical_path": "crates/ep_run/examples/ctf10_init_postlude_candidate_production_observer.rs",
+      "source_preparation": {
+        "path": ".runtime/porting/CTF-10/init-postlude-production-historical-card-fix-prep-01/manifest.json",
+        "sha256": "83b70e2673a9c305a2a8fc2974c32091a0d45a1d5680f49546b8ec68c1ce7662",
+        "size_bytes": 10361
+      },
+      "reviewed_source_authority": {
+        "path": ".runtime/porting/CTF-10/init-postlude-production-historical-card-fix-prep-01/ctf10_init_postlude_candidate_production_observer.rs",
+        "sha256": "c03938890409859ca23c6dd7ae2e577c7f9473d40f99af5256ae3c88bf8103ff",
+        "size_bytes": 27420,
+        "line_count": 606
+      },
+      "held_before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-production-historical-card-fix-prep-01/before/ctf10_init_postlude_candidate_production_observer.rs",
+        "sha256": "a9fccd0b721aabcd8ee503a20de0b0678c7e6f325bd569ae2f0758b4c23b6c47",
+        "size_bytes": 25884,
+        "line_count": 575
+      },
+      "held_exact_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-production-historical-card-fix-prep-01/source.diff",
+        "sha256": "84602e0379b75fd01a500094c722b1f2ecc130a763ad295ae863323b7d058288",
+        "size_bytes": 2145,
+        "line_count": 42
+      },
+      "new_destination_absent": false,
+      "actual_before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-historical-card-applied-source-01/before/crates__ep_run__examples__ctf10_init_postlude_candidate_production_observer.rs",
+        "sha256": "a9fccd0b721aabcd8ee503a20de0b0678c7e6f325bd569ae2f0758b4c23b6c47",
+        "size_bytes": 25884
+      },
+      "actual_corrected_literal": {
+        "path": ".runtime/porting/CTF-10/init-postlude-historical-card-applied-source-01/literal/crates__ep_run__examples__ctf10_init_postlude_candidate_production_observer.rs",
+        "sha256": "c03938890409859ca23c6dd7ae2e577c7f9473d40f99af5256ae3c88bf8103ff",
+        "size_bytes": 27420
+      },
+      "actual_semantic_correction_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-historical-card-applied-source-01/source-diffs/crates__ep_run__examples__ctf10_init_postlude_candidate_production_observer.rs.diff",
+        "sha256": "84602e0379b75fd01a500094c722b1f2ecc130a763ad295ae863323b7d058288",
+        "size_bytes": 2145
+      }
+    }
+  ],
+  "source_correction_is_formatter_only": false,
+  "scientific_PASS_claimed": false,
+  "gates_updated": false
+}

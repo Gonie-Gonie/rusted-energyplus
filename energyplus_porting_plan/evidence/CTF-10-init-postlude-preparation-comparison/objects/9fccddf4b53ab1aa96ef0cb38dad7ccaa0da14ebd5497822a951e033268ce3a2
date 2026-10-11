@@ -1,0 +1,46 @@
+--- crates/ep_run/examples/ctf10_init_postlude_support/fields.rs
++++ crates/ep_run/examples/ctf10_init_postlude_support/fields.rs
+@@ -25,6 +25,7 @@
+         "crates/ep_compiler/src/compiler/report_inputs.rs",
+         "crates/ep_runtime/src/error.rs",
+         "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
++        "crates/ep_runtime/src/heat_balance/ctf_geometry_reports.rs",
+         "crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs",
+         "crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+         "crates/ep_runtime/src/heat_balance/ctf_reports_format.rs",
+@@ -164,12 +165,8 @@
+             "prefixes":{"error":bytes(&self.error),"console":bytes(&self.console),"eio":bytes(&self.eio)},
+             "actual_Rust_caller_owner_copied":true,"Native_intermediate_checkpoint_inferred":false})
+     }
+-    pub(super) fn initialize(
+-        &mut self,
+-        model: &SimulationModel,
+-        initial: f64,
+-    ) -> Result<HeatBalanceState, RuntimeError> {
+-        let mut context = CtfInitializationContext {
++    fn context(&mut self) -> CtfInitializationContext<'_> {
++        CtfInitializationContext {
+             reports: &mut self.reports,
+             eio: &mut self.eio,
+             backend: SourceErrorBackend {
+@@ -183,8 +180,18 @@
+                 error_callback: None,
+                 sqlite: None,
+             },
+-        };
+-        initialize_heat_balance_state_with_initialization_context(model, initial, &mut context)
++        }
++    }
++    pub(super) fn prepare(&mut self, model: &TypedModel) -> Result<(), RuntimeError> {
++        self.context().prepare_report_input_cache(&model.report_inputs)?;
++        Ok(())
++    }
++    pub(super) fn initialize(
++        &mut self,
++        model: &SimulationModel,
++        initial: f64,
++    ) -> Result<HeatBalanceState, RuntimeError> {
++        initialize_heat_balance_state_with_initialization_context(model, initial, &mut self.context())
+     }
+ }
+ pub(super) fn typed_report_inputs(model: &TypedModel) -> Value {

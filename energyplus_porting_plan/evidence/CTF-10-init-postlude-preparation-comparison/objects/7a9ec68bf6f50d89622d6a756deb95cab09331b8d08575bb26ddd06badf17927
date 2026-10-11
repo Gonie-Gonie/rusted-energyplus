@@ -1,0 +1,245 @@
+--- .runtime/porting/CTF-10/init-postlude-batch-application-prep-02/run_batch.py
++++ .runtime/porting/CTF-10/init-postlude-prerequisite-correction-workflow-prep-01/run_corrections.py
+@@ -1,5 +1,6 @@
+-"""Root-only one-batch application, then separately reviewed formatter/quality08."""
++"""Root-only literal prerequisite corrections, then independently reviewed quality."""
+ import argparse
++from datetime import datetime
+ import difflib
+ import hashlib
+ import json
+@@ -16,12 +17,13 @@
+            ('clippy', ['cargo', 'clippy', *CONFIG, '--locked', '--workspace', '--all-targets', '--', '-D', 'warnings']),
+            ('focused', ['cargo', 'test', *CONFIG, '--locked', '-p', 'ep_runtime', '--lib', 'heat_balance::']),
+            ('workspace', ['cargo', 'test', *CONFIG, '--locked', '--workspace'])]
++EXAMPLE_TEST = ['cargo', 'test', *CONFIG, '--locked', '-p', 'ep_run', '--example', 'ctf10_init_postlude_candidate_direct_observer']
+ 
+ def need(ok, message):
+     if not ok: raise ValueError(message)
+ 
+ def sha(p):
+-    with p.open('rb') as s: return hashlib.file_digest(s, 'sha256').hexdigest()
++    with p.open('rb') as stream: return hashlib.file_digest(stream, 'sha256').hexdigest()
+ 
+ def path(name):
+     p = (ROOT / name).resolve(); need(p.is_relative_to(ROOT) and p != ROOT, 'Contained repository path required'); return p
+@@ -29,112 +31,132 @@
+ def ref(p): return dict(path=p.relative_to(ROOT).as_posix(), sha256=sha(p), size_bytes=p.stat().st_size)
+ 
+ def exact(r):
+-    p = path(r['path']); need(sha(p) == r['sha256'] and ('size_bytes' not in r or p.stat().st_size == r['size_bytes']), 'Exact file identity differs: ' + r['path']); return p
++    p = path(r['path']); need(p.is_file() and sha(p) == r['sha256'] and ('size_bytes' not in r or type(r['size_bytes']) is int and p.stat().st_size == r['size_bytes']), 'Exact identity differs: ' + r['path']); return p
+ 
+-def operand(v):
+-    n, h = v.rsplit('#', 1); return ref(exact(dict(path=n, sha256=h)))
++def operand(value):
++    name, digest = value.rsplit('#', 1); return ref(exact(dict(path=name, sha256=digest)))
+ 
+-def read(p): return json.loads(p.read_bytes())
++def pairs(rows):
++    out = {}
++    for key, value in rows: need(key not in out, 'Duplicate JSON key'); out[key] = value
++    return out
++
++def load(r): return json.loads(exact(r).read_bytes(), object_pairs_hook=pairs, parse_constant=lambda value: need(False, 'Nonfinite JSON token: ' + value))
+ 
+ def write(p, value):
+-    with p.open('x', encoding='utf8', newline='\n') as s: json.dump(value, s, indent=2, allow_nan=False); s.write('\n')
++    with p.open('x', encoding='utf8', newline='\n') as stream: json.dump(value, stream, indent=2, allow_nan=False); stream.write('\n')
++
++def delta(before, after, left, right):
++    return ''.join(difflib.unified_diff(before.decode('utf8').splitlines(True), after.decode('utf8').splitlines(True), fromfile=left, tofile=right)).encode('utf8')
+ 
+ def receipt(r, *, preserved=True):
+-    v = read(exact(r)); need(v['schema'] == 'recorded-porting-command.v1' and type(v['exit_code']) is int and v['launch_error'] is None and Path(v['cwd']).resolve() == ROOT, 'Genuine recorded command required')
++    v = load(r); need(v['schema'] == 'recorded-porting-command.v1' and type(v['exit_code']) is int and v['launch_error'] is None and Path(v['cwd']).resolve() == ROOT, 'Genuine recorded command required')
+     need(not preserved or v['source_bytes_match_before_and_after'] is True, 'Actual Source preservation required')
+-    for k in ['stdout', 'stderr', 'source_snapshot']: exact(v[k])
+-    need(v['executed_launcher']['historical_path'] == 'tools/porting/record_command.py' and sha(exact(v['executed_launcher']['archive'])) == RECORDER_SHA, 'Current reviewed recorder required'); return v
++    for key in ['stdout', 'stderr', 'source_snapshot']: exact(v[key])
++    need(v['executed_launcher']['historical_path'] == 'tools/porting/record_command.py' and sha(exact(v['executed_launcher']['archive'])) == RECORDER_SHA, 'Current reviewed recorder required')
++    need(datetime.fromisoformat(v['started_utc']) <= datetime.fromisoformat(v['finished_utc']), 'Actual command timestamps differ'); return v
++
++def source_files():
++    files = set((ROOT / 'crates').rglob('*.rs')) | set((ROOT / 'crates').rglob('Cargo.toml'))
++    files.update(ROOT / name for name in ['Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml'] if (ROOT / name).is_file())
++    return {p.relative_to(ROOT).as_posix(): p for p in files}
+ 
+ def source_matches(r):
+-    v = read(exact(r)); need(v['schema'] == 'rust-command-source-snapshot.v1' and v['bytes_normalized'] is False, 'Actual complete raw Rust Source snapshot required')
+-    paths = set((ROOT / 'crates').rglob('*.rs')) | set((ROOT / 'crates').rglob('Cargo.toml'))
+-    paths.update(ROOT / n for n in ['Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml'] if (ROOT / n).is_file())
+-    need({p.relative_to(ROOT).as_posix() for p in paths} == {r['historical_path'] for r in v['files']} and len(v['files']) == len(paths), 'Full actual Source membership differs')
+-    for row in v['files']: need(sha(path(row['historical_path'])) == row['archive']['sha256'] and path(row['historical_path']).stat().st_size == row['size_bytes'], 'Current Source differs from captured Source')
+-
+-def native_custody(r, prep):
+-    c = read(exact(r)); need(c['schema'] == 'ctf10-native-Init-postlude-completion.v1' and c['Original_capture_custody_released'] is True and c['numerical_PASS_claimed'] is False and c['gates_updated'] is False, 'Actual released whole-Init capture required')
+-    w = read(exact(c['workflow'])); q = read(exact(c['OriginalDataQA'])); qv = receipt(c['OriginalDataQA_execution']); ev = receipt(w['native_execution'])
+-    workflow_source = prep['reviewed_native_workflow_source']; wm = read(exact(workflow_source)); runner = wm['own_sources'][0]
+-    need(w['schema'] == 'ctf10-native-Init-postlude-workflow.v1' and w['workflow_source_manifest'] == workflow_source and w['native_source_manifest'] == prep['reviewed_native_source'] and q['reviewed_source_manifest'] == workflow_source and q['executed_reader_sources'] == wm['own_sources'], 'Actual reviewed Native workflow/reader Source binding differs')
+-    need(q['schema'] == 'ctf10-native-Init-postlude-independent-original-data-review.v1' and q['status'] == 'pass-actual-Init-postlude-custody-before-Rust' and q['Original_capture_custody_released'] is True and q['observation_integrity_failures'] == [] and q['numerical_PASS_claimed'] is False, 'Complete factual QA release required')
+-    need(q['actual_workflow'] == c['workflow'] and q['actual_native_execution'] == w['native_execution'] and q['actual_frozen_input'] == w['freeze'], 'Actual QA/capture/freeze join differs')
+-    expected = ['-X', 'utf8', '-B', str(exact(runner)), 'qa', '--approved-runner-sha256', runner['sha256'], '--source-manifest', workflow_source['path'] + '#' + workflow_source['sha256'], '--native-workflow', c['workflow']['path'] + '#' + c['workflow']['sha256'], '--output-dir', str(exact(c['OriginalDataQA']).parent)]
+-    need(qv['exit_code'] == 0 and ev['exit_code'] == 0 and qv['command'][1:] == expected and read(exact(qv['stdout'])) == q and qv['source_snapshot'] == ev['source_snapshot'] == prep['held_before_Source_snapshot'], 'Actual successful Source-preserving QA/capture receipts required')
+-    source_matches(qv['source_snapshot']); return c, qv
+-
+-def plan(prep, direct_ref):
+-    refs = prep['reviewed_fixed_source_preparations'] + [direct_ref]; groups = [read(exact(r)) for r in refs]
+-    rows = [groups[0]['own_sources'], groups[1]['application_sources'], groups[2]['application_sources']]
+-    need([len(r) for r in rows] == [4, 5, 3], 'Exact4+5+3 reviewed Source bodies required')
+-    planned = []
+-    for i, group in enumerate(rows):
+-        for row in group:
+-            n = row['canonical_path']; proposal = row['proposed_source'] if i == 1 else row['proposal']; before = row['actual_before_archive'] if i == 1 else row['before_archive']; new = row['new_canonical_destination_absent'] if i == 1 else row['new_destination_absent']
+-            body = exact(proposal).read_bytes(); old = exact(before).read_bytes() if before else b''; target = path(n)
+-            need((new is True and not target.exists() and old == b'') or (new is not True and target.is_file() and target.read_bytes() == old), 'Exact current before/absence differs: ' + n)
+-            delta = exact(row['exact_diff']).read_bytes().decode('utf8'); labels = delta.splitlines()
+-            need(len(labels) >= 2 and labels[0].startswith('--- ') and labels[1].startswith('+++ '), 'Exact declared Source diff required')
+-            actual = ''.join(difflib.unified_diff(old.decode('utf8').splitlines(True), body.decode('utf8').splitlines(True), fromfile=labels[0][4:], tofile=labels[1][4:], n=3))
+-            need(actual == delta, 'Regenerated held Source diff differs: ' + n)
+-            planned.append(dict(canonical_path=n, source_preparation=refs[i], proposal=proposal, before=before, body=body, new_destination=new is True))
+-    need(len({r['canonical_path'] for r in planned}) == 12 and [r['canonical_path'] for r in planned[:9]] == prep['fixed_application_paths'], 'No duplicate or substituted application paths allowed')
+-    d = groups[2]['runtime_interfaces']; need(d['ordered_observer_source_paths'] == prep['direct_observer_paths'] and d['ordered_public_API_source_paths'] == groups[0]['runtime_interfaces']['ordered_public_API_source_paths'] + ['crates/ep_runtime/src/heat_balance/ctf_direct_initialization.rs'], 'Exact direct3/API59 ordered Source inventory required')
+-    need(d['runtime_source_bindings_schema'] == 'ctf10-Init-postlude-direct-runtime-source-bindings.v1', 'Reviewed direct runtime binding schema required'); return planned, refs, groups
++    snapshot = load(r); files = source_files()
++    need(snapshot['schema'] == 'rust-command-source-snapshot.v1' and snapshot['bytes_normalized'] is False and len(snapshot['files']) == len(files) and {row['historical_path'] for row in snapshot['files']} == set(files), 'Full raw Source membership differs')
++    for row in snapshot['files']:
++        exact(row['archive']); need(sha(files[row['historical_path']]) == row['archive']['sha256'] and files[row['historical_path']].stat().st_size == row['size_bytes'], 'Current Source differs from actual snapshot')
++    return snapshot
+ 
+ def invoke(out, role, command, *, preserved=True):
+-    directory = out / (role + '-command-08'); result = subprocess.run([sys.executable, '-X', 'utf8', '-B', str(RECORDER), '--output-dir', str(directory.relative_to(ROOT)), '--', *command], stdout=subprocess.DEVNULL, check=False)
+-    r = ref(directory / 'receipt.json'); v = receipt(r, preserved=preserved); need(v['command'] == command and result.returncode == v['exit_code'], 'Actual recorded argv/exit differs'); return r, v
++    directory = out / (role + '-command'); need(not directory.exists(), 'Fresh recorded command required')
++    result = subprocess.run([sys.executable, '-X', 'utf8', '-B', str(RECORDER), '--output-dir', str(directory.relative_to(ROOT)), '--', *command], cwd=ROOT, stdout=subprocess.DEVNULL, check=False)
++    r = ref(directory / 'receipt.json'); v = receipt(r, preserved=preserved)
++    need(v['command'] == command and result.returncode == v['exit_code'], 'Actual argv/exit differs'); return r, v
++
++def application_plan(prep, supplied):
++    need(supplied == prep['reviewed_correction_preparations'], 'Exact Root-approved correction manifests required')
++    planned = []
++    for authority in supplied:
++        manifest = load(authority)
++        for row in manifest['application']:
++            name = row['canonical_path']; target = path(name); new = row.get('new_destination_absent', row.get('absent', False))
++            proposal = row['proposal']; body = exact(proposal).read_bytes(); before_ref = row.get('before_archive', row.get('actual_before_archive')); before = b'' if new else exact(before_ref).read_bytes()
++            need(name.startswith('crates/') and name.endswith('.rs') and type(new) is bool, 'Only reviewed Rust application paths required')
++            if new: need(not target.exists() and before_ref is None, 'Fresh new Rust destination required')
++            else:
++                need(target.is_file() and target.read_bytes() == before, 'Exact current before archive differs: ' + name)
++                if 'actual_before' in row: need(exact(row['actual_before']).read_bytes() == before, 'Held actual before differs')
++            declared = exact(row['exact_diff']).read_bytes(); labels = declared.decode('utf8').splitlines()
++            need(len(labels) >= 2 and labels[0].startswith('--- ') and labels[1].startswith('+++ ') and delta(before, body, labels[0][4:], labels[1][4:]) == declared, 'Held literal correction diff differs')
++            planned.append(dict(canonical_path=name, source_preparation=authority, reviewed_source_authority=proposal, held_before_archive=before_ref, held_exact_diff=row['exact_diff'], new_destination_absent=new, body=body, before=before))
++    need(len(planned) == 11 and len({row['canonical_path'] for row in planned}) == 11 and sum(row['new_destination_absent'] for row in planned) == 2, 'Exact disjoint eleven corrections/two new members required')
++    need([row['canonical_path'] for row in planned] == prep['ordered_correction_paths'], 'Reviewed correction path/order differs'); return planned
+ 
+ def apply(args, out, prep, prep_ref):
+-    completion_ref = operand(args.native_completion); completion, qa = native_custody(completion_ref, prep); direct_ref = operand(args.direct_observer_source)
+-    need(direct_ref == prep['reviewed_direct_observer_source'], 'Exact reviewed direct observer02 Source manifest required')
+-    need(subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT) == b'' and subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT) == subprocess.check_output(['git', 'rev-parse', '@{upstream}'], cwd=ROOT), 'Clean published current worktree required before application')
+-    planned, parents, groups = plan(prep, direct_ref)
+-    for n in ['before', 'literal', 'formatted', 'formatter-diffs']: (out / n).mkdir()
++    parent_ref = prep['accepted_parent_inventory']; parent = load(parent_ref)
++    need(parent['schema'] == 'ctf10-Init-postlude-actual-formatted-source-inventory.v1' and len(parent['actual_sources']) == 12 and len({row['canonical_path'] for row in parent['actual_sources']}) == 12, 'Original twelve-source ancestry required')
++    for row in parent['actual_sources']: need(path(row['canonical_path']).read_bytes() == exact(row['actual_final_source']).read_bytes(), 'Current initial-source archive differs')
++    snapshot = source_matches(prep['held_before_Source_snapshot'])
++    need(subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT) == b'' and subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT).decode().strip() == prep['published_before_commit'] and subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT) == subprocess.check_output(['git', 'rev-parse', '@{upstream}'], cwd=ROOT), 'Clean exact published before commit required')
++    failed = load(prep['retained_failed_comparison']); execution = receipt(prep['retained_failed_comparison_execution'])
++    need(failed['schema'] == 'ctf10-Init-postlude-same-input-owner-comparison.v1' and failed['status'] == 'fail-selected-paired-Init-owner-fields' and failed['selected_paired_owner_fields_passed'] is False and failed['gates_updated'] is False and execution['exit_code'] == 1 and execution['source_snapshot'] == prep['held_before_Source_snapshot'], 'Genuine failed same-Source reference comparison required')
++    completion = load(prep['released_Native_completion']); qa = load(prep['released_Native_QA']); qa_execution = receipt(completion['OriginalDataQA_execution'])
++    need(completion['OriginalDataQA'] == prep['released_Native_QA'] and completion['Original_capture_custody_released'] is True and completion['numerical_PASS_claimed'] is False and completion['gates_updated'] is False and qa['status'] == 'pass-actual-Init-postlude-custody-before-Rust' and qa['Original_capture_custody_released'] is True and qa['observation_integrity_failures'] == [] and qa['numerical_PASS_claimed'] is False and qa_execution['exit_code'] == 0, 'Retained factual Original release required')
++    supplied = [operand(args.direct_correction_source), operand(args.production_correction_source)]; planned = application_plan(prep, supplied)
++    for directory in ['before', 'literal', 'formatted', 'source-diffs', 'formatter-diffs']: (out / directory).mkdir()
+     rows = []
+     for row in planned:
+-        n = row['canonical_path']; target = path(n); name = n.replace('/', '__'); prior = None
+-        if target.exists(): prior_path = out / 'before' / name; prior_path.write_bytes(target.read_bytes()); prior = ref(prior_path)
+-        literal = out / 'literal' / name; literal.write_bytes(row['body']); target.parent.mkdir(parents=True, exist_ok=True); target.write_bytes(row['body'])
+-        rows.append(dict(canonical_path=n, source_preparation=row['source_preparation'], reviewed_source_authority=row['proposal'], actual_before_archive=prior, actual_literal_source=ref(literal)))
+-    write(out / 'literal-application.json', dict(schema='ctf10-Init-postlude-actual-literal-application.v1', actual_sources=rows, source_preparations=parents, actual_Native_completion=completion_ref, prior_ordinary_application=prep['prior_ordinary_application'], scientific_PASS_claimed=False, gates_updated=False))
+-    fmt_ref, fmt = invoke(out, 'format', ['cargo', 'fmt', '--all'], preserved=False); need(fmt['exit_code'] == 0, 'Actual formatter failed; retain literal application and receipt')
++        name = row['canonical_path']; flat = name.replace('/', '__'); prior = None
++        if not row['new_destination_absent']: p = out / 'before' / flat; p.write_bytes(row['before']); prior = ref(p)
++        p = out / 'literal' / flat; p.write_bytes(row['body']); d = out / 'source-diffs' / (flat + '.diff'); d.write_bytes(delta(row['before'], row['body'], name, name))
++        rows.append({key: row[key] for key in ['canonical_path', 'source_preparation', 'reviewed_source_authority', 'held_before_archive', 'held_exact_diff', 'new_destination_absent']} | dict(actual_before_archive=prior, actual_corrected_literal=ref(p), actual_semantic_correction_diff=ref(d)))
++    write(out / 'literal-corrections.json', dict(schema='ctf10-Init-postlude-actual-prerequisite-corrections.v1', accepted_parent_inventory=parent_ref, actual_sources=rows, source_correction_is_formatter_only=False, scientific_PASS_claimed=False, gates_updated=False))
++    for row in planned: target = path(row['canonical_path']); target.parent.mkdir(parents=True, exist_ok=True); target.write_bytes(row['body'])
++    fmt_ref, fmt = invoke(out, 'format', ['cargo', 'fmt', '--all'], preserved=False); need(fmt['exit_code'] == 0, 'Actual formatter failed; retain literal/failure artifacts')
++    allowed = {row['canonical_path'] for row in planned}; new = {row['canonical_path'] for row in planned if row['new_destination_absent']}; files = source_files()
++    need(set(files) == {row['historical_path'] for row in snapshot['files']} | new, 'Only two approved new Source members may be added')
++    for row in snapshot['files']:
++        if row['historical_path'] not in allowed: need(sha(files[row['historical_path']]) == row['archive']['sha256'] and files[row['historical_path']].stat().st_size == row['size_bytes'], 'Formatter changed unrelated full Source member')
++    tracked = set(subprocess.check_output(['git', 'diff', '--name-only', '-z'], cwd=ROOT).decode().split('\0')[:-1]); untracked = set(subprocess.check_output(['git', 'ls-files', '--others', '--exclude-standard', '-z'], cwd=ROOT).decode().split('\0')[:-1])
++    need(tracked <= allowed and untracked == new, 'Unexpected canonical application/formatter path')
++    old_rows = {row['canonical_path']: row for row in parent['actual_sources']}
+     for row in rows:
+-        n = row['canonical_path']; name = n.replace('/', '__'); final = path(n).read_bytes(); archive = out / 'formatted' / name; archive.write_bytes(final); literal = exact(row['actual_literal_source']); delta = out / 'formatter-diffs' / (name + '.diff')
+-        delta.write_bytes(''.join(difflib.unified_diff(literal.read_bytes().decode().splitlines(True), final.decode().splitlines(True), fromfile=literal.relative_to(ROOT).as_posix(), tofile=n, n=3)).encode())
+-        row.update(actual_final_source=ref(archive), formatter_correspondence_diff=ref(delta))
+-    tracked = set(subprocess.check_output(['git', 'diff', '--name-only', '-z'], cwd=ROOT).decode().split('\0')[:-1]); new = set(subprocess.check_output(['git', 'ls-files', '--others', '--exclude-standard', '-z'], cwd=ROOT).decode().split('\0')[:-1])
+-    need(tracked <= {r['canonical_path'] for r in planned} and new == {r['canonical_path'] for r in planned if r['new_destination']}, 'Formatter/application changed an unapproved canonical path')
++        name = row['canonical_path']; flat = name.replace('/', '__'); final = path(name).read_bytes(); p = out / 'formatted' / flat; p.write_bytes(final); d = out / 'formatter-diffs' / (flat + '.diff'); d.write_bytes(delta(exact(row['actual_corrected_literal']).read_bytes(), final, row['actual_corrected_literal']['path'], name))
++        row.update(actual_final_source=ref(p), actual_correction_formatter_diff=ref(d))
++        if name in old_rows: old_rows[name].update(actual_final_source=ref(p), semantic_correction_application=ref(out / 'literal-corrections.json'))
+     bindings = {}
+-    for lane, i, schema in [('production', 0, 'ctf10-Init-postlude-production-runtime-source-bindings.v1'), ('direct', 2, 'ctf10-Init-postlude-direct-runtime-source-bindings.v1')]:
+-        api = groups[i]['runtime_interfaces']; packet = dict(schema=schema, observer_sources=[ref(path(n)) for n in api['ordered_observer_source_paths']], actual_public_API_sources=[ref(path(n)) for n in api['ordered_public_API_source_paths']]); p = out / (lane + '-runtime-sources.json'); write(p, packet); bindings[lane] = ref(p)
+-    record = dict(schema='ctf10-Init-postlude-actual-formatted-source-inventory.v1', actual_sources=rows, source_preparations=parents, actual_Native_completion=completion_ref, actual_Native_QA=completion['OriginalDataQA'], before_Source_snapshot=qa['source_snapshot'], actual_format_execution=fmt_ref, literal_application=ref(out / 'literal-application.json'), workflow_source_manifest=prep_ref, actual_Root_source=ref(Path(__file__).resolve()), runtime_source_bindings=bindings, prior_ordinary_application=prep['prior_ordinary_application'], inherited_correction_lineage=prep['inherited_correction_lineage'], formatter_correspondence_review_pending=True, quality_execution_performed=False, scientific_PASS_claimed=False, gates_updated=False)
+-    write(out / 'record.json', record); print(json.dumps(dict(record=ref(out / 'record.json'), actual_sources=len(rows), formatter_review_required_before_quality=True)), flush=True)
++    for lane, paths in prep['runtime_paths'].items():
++        packet = dict(schema=paths['schema'], observer_sources=[ref(path(name)) for name in paths['observer_sources']], actual_public_API_sources=[ref(path(name)) for name in paths['actual_public_API_sources']]); p = out / (lane + '-runtime-sources.json'); write(p, packet); bindings[lane] = ref(p)
++    parent.update(accepted_parent_inventory=parent_ref, runtime_source_bindings=bindings, correction_application_sources=rows, additional_applied_sources=[row for row in rows if row['canonical_path'] not in old_rows], correction_workflow_source_manifest=prep_ref, actual_correction_Root_source=ref(Path(__file__).resolve()), actual_correction_format_execution=fmt_ref, semantic_correction_preparations=supplied, semantic_correction_before_Source_snapshot=prep['held_before_Source_snapshot'], retained_failed_comparison=prep['retained_failed_comparison'], retained_failed_comparison_execution=prep['retained_failed_comparison_execution'], original_literal_and_formatter_ancestry_retained=True, original_batch_Root_source_retained=True, formatter_correspondence_review_pending=True, source_correction_review_pending=True, quality_execution_performed=False)
++    write(out / 'record.json', parent); print(json.dumps(dict(record=ref(out / 'record.json'), correction_paths=len(rows), independent_Source_and_formatter_review_required=True)), flush=True)
+ 
+-def quality(args, out, prep_ref):
+-    accepted = operand(args.accepted_formatted_inventory); record = read(exact(accepted)); need(record['schema'] == 'ctf10-Init-postlude-actual-formatted-source-inventory.v1' and record['workflow_source_manifest'] == prep_ref and len(record['actual_sources']) == 12, 'Exact reviewed formatted application required')
+-    for row in record['actual_sources']: need(path(row['canonical_path']).read_bytes() == exact(row['actual_final_source']).read_bytes(), 'Canonical formatted Source differs before quality')
+-    for r in record['runtime_source_bindings'].values():
+-        packet = read(exact(r))
+-        for source in packet['observer_sources'] + packet['actual_public_API_sources']: exact(source)
+-    actual = []; snapshot = None
+-    for role, command in QUALITY:
+-        r, v = invoke(out, role, command); actual.append(dict(role=role, execution=r, actual_exit_code=v['exit_code'], actual_Source_snapshot=v['source_snapshot']))
+-        write(out / (role + '-result.json'), actual[-1]); print(json.dumps(actual[-1]), flush=True)
+-        need(v['exit_code'] == 0, 'Actual quality failed; no remaining command or source correction is attempted')
++def quality(args, out, prep, prep_ref):
++    accepted = operand(args.accepted_formatted_inventory); record = load(accepted)
++    need(record['schema'] == 'ctf10-Init-postlude-actual-formatted-source-inventory.v1' and record['correction_workflow_source_manifest'] == prep_ref and record['actual_correction_Root_source'] == ref(Path(__file__).resolve()) and len(record['actual_sources']) == 12 and len(record['correction_application_sources']) == 11, 'Explicit reviewed semantic correction inventory required')
++    rows = record['actual_sources'] + record['correction_application_sources']
++    for row in rows: need(path(row['canonical_path']).read_bytes() == exact(row['actual_final_source']).read_bytes(), 'Canonical/final Source differs before quality')
++    for lane, paths in prep['runtime_paths'].items():
++        packet = load(record['runtime_source_bindings'][lane]); need(packet['schema'] == paths['schema'], 'Runtime Source schema differs')
++        for key in ['observer_sources', 'actual_public_API_sources']:
++            need([row['path'] for row in packet[key]] == paths[key], 'Ordered runtime own/API paths differ')
++            for row in packet[key]: exact(row)
++    actual = []; snapshot = None; last = None
++    for role, command in QUALITY + [('supplementary-direct-observer-tests', EXAMPLE_TEST)]:
++        r, v = invoke(out, role, command); row = dict(role=role, execution=r, actual_exit_code=v['exit_code'], actual_Source_snapshot=v['source_snapshot']); write(out / (role + '-result.json'), row); print(json.dumps(row), flush=True)
++        need(v['exit_code'] == 0, 'Actual quality failed; remaining commands are not executed')
+         if snapshot is None: snapshot = v['source_snapshot']
+-        need(v['source_snapshot'] == snapshot, 'All four actual quality Source snapshots must match')
+-        source_matches(snapshot)
+-    write(out / 'quality.json', dict(schema='ctf10-Init-postlude-actual-quality.v1', accepted_formatted_inventory=accepted, actual_commands=actual, Source_snapshot=snapshot, actual_Root_source=ref(Path(__file__).resolve()), numerical_or_CTF10_PASS_claimed=False, gates_updated=False))
+-    print(json.dumps(dict(quality=ref(out / 'quality.json'), actual_commands=len(actual))), flush=True)
++        need(v['source_snapshot'] == snapshot and (last is None or last <= datetime.fromisoformat(v['started_utc'])), 'All actual quality commands must retain one Source in order'); last = datetime.fromisoformat(v['finished_utc']); source_matches(snapshot)
++        actual.append(row)
++    write(out / 'quality.json', dict(schema='ctf10-Init-postlude-actual-quality.v1', accepted_formatted_inventory=accepted, actual_commands=actual[:4], supplementary_direct_observer_tests=actual[4], Source_snapshot=snapshot, actual_Root_source=ref(Path(__file__).resolve()), quality_source_preparation=prep_ref, numerical_or_CTF10_PASS_claimed=False, gates_updated=False))
++    print(json.dumps(dict(quality=ref(out / 'quality.json'), actual_commands=4, supplementary_direct_observer_tests_recorded=True)), flush=True)
+ 
+ if __name__ == '__main__':
+-    p = argparse.ArgumentParser(description=__doc__); p.add_argument('phase', choices=['apply', 'quality'])
+-    for n in ['approved-source-sha256', 'source-manifest', 'output-dir']: p.add_argument('--' + n, required=True)
+-    for n in ['native-completion', 'direct-observer-source', 'accepted-formatted-inventory']: p.add_argument('--' + n)
+-    args = p.parse_args(); need(sha(Path(__file__).resolve()) == args.approved_source_sha256 and sha(RECORDER) == RECORDER_SHA, 'Reviewed workflow and current recorder Source required')
+-    prep_ref = operand(args.source_manifest); prep = read(exact(prep_ref)); need(ref(Path(__file__).resolve()) == prep['workflow_source'], 'Actual workflow must belong to approved manifest')
+-    need((args.phase == 'apply' and args.native_completion and args.direct_observer_source and args.accepted_formatted_inventory is None) or (args.phase == 'quality' and args.accepted_formatted_inventory and args.native_completion is None and args.direct_observer_source is None), 'Exact apply or reviewed quality operands required')
++    parser = argparse.ArgumentParser(description=__doc__); parser.add_argument('phase', choices=['apply', 'quality'])
++    for name in ['approved-source-sha256', 'source-manifest', 'output-dir']: parser.add_argument('--' + name, required=True)
++    for name in ['direct-correction-source', 'production-correction-source', 'accepted-formatted-inventory']: parser.add_argument('--' + name)
++    args = parser.parse_args(); need(sha(Path(__file__).resolve()) == args.approved_source_sha256 and sha(RECORDER) == RECORDER_SHA, 'Approved executor/current recorder Source required')
++    prep_ref = operand(args.source_manifest); prep = load(prep_ref); need(prep['workflow_source'] == ref(Path(__file__).resolve()) and exact(prep_ref).parent == Path(__file__).resolve().parent, 'Exact own workflow preparation required')
++    need((args.phase == 'apply' and args.direct_correction_source and args.production_correction_source and args.accepted_formatted_inventory is None) or (args.phase == 'quality' and args.accepted_formatted_inventory and args.direct_correction_source is None and args.production_correction_source is None), 'Exact apply or accepted-quality operands required')
+     out = path(args.output_dir); need(out.is_relative_to(BASE) and not out.exists(), 'Fresh CTF10 output directory required'); out.mkdir()
+-    apply(args, out, prep, prep_ref) if args.phase == 'apply' else quality(args, out, prep_ref)
++    apply(args, out, prep, prep_ref) if args.phase == 'apply' else quality(args, out, prep, prep_ref)

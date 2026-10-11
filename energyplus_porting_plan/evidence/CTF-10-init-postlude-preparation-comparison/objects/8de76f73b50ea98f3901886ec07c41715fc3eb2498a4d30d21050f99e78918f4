@@ -1,0 +1,17 @@
+--- .runtime/porting/CTF-10/init-postlude-prerequisite-applied-source-01/literal/crates__ep_run__examples__ctf10_init_postlude_candidate_direct_observer.rs
++++ crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs
+@@ -131,10 +131,12 @@
+     let mut caller = fields::Caller::new();
+     let preparation_before = caller.snapshot();
+     match caller.prepare(&prepared) {
+-        Ok(assigned) => out["preparation"] = json!({"invoked":true,"status":"source-returned",
++        Ok(assigned) => {
++            out["preparation"] = json!({"invoked":true,"status":"source-returned",
+             "source_order":["SimulationManager::OpenOutputFiles","SimulationManager::GetProjectData","EMSManager::CheckIfAnyEMS -> ScanForReports(EnergyManagementSystem)"],
+             "actual_TimeStepsInHour":prepared.time_steps_in_hour,"actual_TimeStepZone":fields::scalar(prepared.time_step_zone()),
+-            "assigned_EMS_report":assigned,"caller_before":preparation_before,"caller_after":caller.snapshot()}),
++            "assigned_EMS_report":assigned,"caller_before":preparation_before,"caller_after":caller.snapshot()})
++        }
+         Err(error) => {
+             out["preparation"] = json!({"invoked":true,"status":"source-error-returned","error":fields::setup_error(&error),
+                 "caller_before":preparation_before,"caller_after":caller.snapshot()});

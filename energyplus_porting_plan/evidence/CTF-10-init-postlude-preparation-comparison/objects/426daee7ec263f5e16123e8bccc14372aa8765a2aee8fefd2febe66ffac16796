@@ -1,0 +1,74 @@
+"""Author only literal ignored-runtime documents and Source descriptors."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+import re
+import shutil
+
+ROOT = Path.cwd().resolve()
+HERE = ROOT / '.runtime/porting/CTF-10/init-postlude-documents-prep-01'
+def ref(path):
+    data = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(data).hexdigest(), size_bytes=len(data), line_count=len(data.splitlines()))
+def write(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream: stream.write(data)
+def dump(path, value): write(path, (json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False)+'\n').encode('utf8'))
+names = ['plan.json','cards/CTF-10.md','CHECKLIST.md','energyplus_porting_checklist.html']
+canonical = ROOT / 'energyplus_porting_plan'
+before = {name: (canonical/name).read_bytes() for name in names}
+texts = {name: data.decode('utf8') for name,data in before.items()}
+summary_path = canonical / 'evidence/CTF-10-init-postlude-comparison/summary.json'
+summary = ref(summary_path); summary.pop('line_count')
+assert summary == dict(path='energyplus_porting_plan/evidence/CTF-10-init-postlude-comparison/summary.json', sha256='167ea315b51dca7db6de633c5b1db4524d716e0f6318d70cf9797f91495e0857', size_bytes=271237)
+plan = json.loads(texts['plan.json']); task = next(t for t in plan['tasks'] if t['id']=='CTF-10')
+assert 'actual_selected_Init_postlude_owner_comparison' not in task
+task['actual_selected_Init_postlude_owner_comparison'] = summary
+proposed = {'plan.json': (json.dumps(plan,ensure_ascii=False,indent=2,allow_nan=False)+'\n')}
+card = texts['cards/CTF-10.md']; anchor = '## Complete registry, producer diagnostics and Init postlude\n'
+assert card.count(anchor)==1
+section = '''## Actual Init postlude reference comparison
+
+The [current selected Init comparison evidence](../evidence/CTF-10-init-postlude-comparison/summary.json) records a failed comparison over the frozen15 model and6 direct-state cases: numeric2106/discrete696389 comparisons, with829 discrete mismatches retained in the complete ledger. The132 optional unpaired observations receive no PASS. This is a failing reference comparison, not selected-owner equivalence.
+
+Current fmt/Clippy0, focused306 and workspace4926 PASS/21 groups share SourceSnapshot `7222438fc3281d590c1fc044121314464c3c965150d9e1b03eef2a5e9f79cab9`. Both candidate executions returned0; their process success does not override the comparison failure. Genuine Native capture and current Rust retain their distinct Source identities.
+
+Native04 failure/archive custody and Clippy08 failure/corrected-Source ancestry remain recorded. Direct initialization preparation and production predecessor-owner corrections are pending. Selected scope exclusions, unavailable owners, authored header differences and unpaired optional backends receive no PASS. Complete whole-Init equivalence and persistent ordinary numerical/history integration remain unconfirmed; no card gate is promoted.
+
+'''
+card = card.replace(anchor, section+anchor)
+old = 'Native Scan/getter and numeric-format byte comparisons, full registry/severe producer plumbing and ordinary whole-Init composition remain pending. No card gate is promoted.'
+new = 'At that report-output milestone, Native Scan/getter and numeric-format byte comparisons, full registry/severe producer plumbing and ordinary whole-Init composition were pending. Their later selected Scan/F/G, registry and ordinary-connection results are recorded above; the current Init owner comparison failed. No card gate is promoted.'
+assert card.count(old)==1; proposed['cards/CTF-10.md'] = card.replace(old,new)
+checklist = texts['CHECKLIST.md']; old_notes = [line for line in checklist.splitlines() if line.startswith('CTF-10 일반 A/B 초기화에 보고서·오류 출력 경로를 연결했습니다.')]
+assert len(old_notes)==1
+note = 'CTF-10의 [현재 Init 비교 증거](evidence/CTF-10-init-postlude-comparison/summary.json)는 기존 15개 모델·6개 직접 상태 사례에서 불일치 829개를 기록했습니다. 전체 4,926개 테스트와 두 후보 실행은 성공했지만 비교는 실패했으며, 선택 소유자 동등성·원본 전체 초기화·지속 실행 통합을 통과로 표시하지 않습니다. 기존 일반 6개 CLI와 Scan/F/G 성공 증거는 각 기록의 Source에 유지되며 A14/54·B14/64 완료 수는 변하지 않습니다.'
+proposed['CHECKLIST.md'] = checklist.replace(old_notes[0],note)
+pattern = re.compile(r'(<script id="plan" type="application/json">)(.*?)(</script>)',re.S)
+html = texts['energyplus_porting_checklist.html']; assert len(pattern.findall(html))==1 and json.loads(pattern.search(html)[2])==json.loads(texts['plan.json'])
+payload = json.dumps(plan,ensure_ascii=False).replace('<','\\u003c').replace('&','\\u0026')
+proposed['energyplus_porting_checklist.html'] = pattern.sub(lambda m:m[1]+payload+m[3],html)
+table = lambda text:[line for line in text.splitlines() if line.startswith('|')]
+assert len(table(checklist))==86 and table(checklist)==table(proposed['CHECKLIST.md'])
+assert table(texts['cards/CTF-10.md'])==table(proposed['cards/CTF-10.md'])
+assert texts['cards/CTF-10.md'].splitlines()[:8]==proposed['cards/CTF-10.md'].splitlines()[:8]
+assert pattern.sub(r'\1\3',html)==pattern.sub(r'\1\3',proposed['energyplus_porting_checklist.html'])
+rows=[]
+for name in names:
+    current=canonical/name; archived=HERE/'before'/name; proposal=HERE/'proposed'/name; delta=HERE/'diffs'/(name.replace('/','__')+'.diff')
+    write(archived,before[name]); write(proposal,proposed[name].encode('utf8'))
+    difference=''.join(difflib.unified_diff(texts[name].splitlines(keepends=True),proposed[name].splitlines(keepends=True),fromfile=current.relative_to(ROOT).as_posix(),tofile=proposal.relative_to(ROOT).as_posix()))
+    write(delta,difference.encode('utf8')); assert current.read_bytes()==archived.read_bytes()
+    rows.append(dict(canonical_path=current.relative_to(ROOT).as_posix(),actual_before=ref(current),before_archive=ref(archived),proposal=ref(proposal),exact_diff=ref(delta)))
+old_writer=ROOT/'.runtime/porting/CTF-10/update-ordinary-initialization-documents-01.py'; template=HERE/'before-template/update-ordinary-initialization-documents-01.py'
+write(template,old_writer.read_bytes())
+workflow=HERE/'update_documents.py'; ast.parse(workflow.read_bytes())
+delta=HERE/'diffs/update_documents.py.diff'
+write(delta,''.join(difflib.unified_diff(template.read_text(encoding='utf8').splitlines(keepends=True),workflow.read_text(encoding='utf8').splitlines(keepends=True),fromfile=old_writer.relative_to(ROOT).as_posix(),tofile=workflow.relative_to(ROOT).as_posix())).encode('utf8'))
+audit=dict(schema='ctf10-Init-postlude-failed-milestone-document-audit.v1',checklist_table_lines=86,card_rows=64,ordered_table_lines_unchanged=True,all_plan_fields_except_one_actual_evidence_reference_unchanged=True,gate_counts={'A':[14,54],'B':[14,64]},historical_report_output_pending_sentence_qualified=True,actual_summary=summary,actual_comparison_status='fail-selected-paired-Init-owner-fields',future_results_or_hashes_supplied=False,canonical_documents_mutated=False,gates_updated=False)
+dump(HERE/'audit.json',audit)
+manifest=dict(schema='ctf10-Init-postlude-failed-milestone-documents-source.v1',status='HELD-SOURCE-ONLY-UNEXECUTED',workflow_source=ref(workflow),actual_summary=summary,documents=rows,source_template=ref(old_writer),template_archive=ref(template),source_delta=ref(delta),source_dependencies=[ref(ROOT/'tools/porting/sync_plan_views.py'),ref(ROOT/'tools/porting/check_plan.py'),ref(ROOT/'.runtime/porting/CTF-10/init-postlude-finalization-prep-01/manifest.json'),ref(ROOT/'.runtime/porting/CTF-10/init-postlude-finalization-prep-01/finalize.py')],audit=ref(HERE/'audit.json'),README=ref(HERE/'README.md'),author_source=ref(Path(__file__).resolve()),canonical_documents_mutated=False,workflow_executed=False,gates_updated=False)
+dump(HERE/'manifest.json',manifest)
+print(json.dumps(ref(HERE/'manifest.json')))

@@ -147,11 +147,23 @@ fn model_case(root: &Path, row: &Value, initial: f64) -> Result<Value> {
     out["typed_report_inputs"] = postlude_fields::typed_report_inputs(&typed);
     let simulation = SimulationModel::from_typed(typed);
     let mut caller = postlude_fields::Caller::new(&simulation.typed.version.to_string());
+    let preparation = caller.prepare(&simulation.typed);
     let before = caller.snapshot();
+    if let Err(error) = preparation {
+        out["selected_Init_postlude"] = json!({
+            "protocol":"ctf10-actual-Rust-Init-postlude-observation.v1",
+            "ordinary_initializer_invoked":false,"ordinary_initializer_invocation_count":0,
+            "caller_before_initializer":before,"caller_after_return_or_error":caller.snapshot(),
+            "input_report_cache_preparation":{"invoked":true,"status":"source-error-returned"},
+            "public_owner":postlude_fields::unavailable("report-cache preparation stopped before ordinary initializer"),
+            "error":postlude_fields::error(&error),"numerical_comparison_performed":false,"counted_as_PASS":false});
+        return Ok(out);
+    }
     let actual = caller.initialize(&simulation, initial);
     out["selected_Init_postlude"] = json!({
         "protocol":"ctf10-actual-Rust-Init-postlude-observation.v1",
         "ordinary_initializer_invoked":true,"ordinary_initializer_invocation_count":1,
+        "input_report_cache_preparation":{"invoked":true,"status":"source-returned"},
         "caller_before_initializer":before,"caller_after_return_or_error":caller.snapshot(),
         "public_owner":postlude_fields::unavailable("actual State/public owner not yet returned"),
         "error":null,"Native_intermediate_registry_or_Init_snapshots_inferred":false,
@@ -337,7 +349,39 @@ fn run() -> Result<()> {
             && admission["current_cards"] == native["current_cards"],
         "current10 authority or separate historical prior09 authority differs",
     )?;
-    bindings.push(native["current_cards"]["CTF-10"].clone());
+    // Native capture predates the truthful failure publication; retain its exact card bytes.
+    let documentary_source = json!({
+        "path": ".runtime/porting/CTF-10/init-postlude-documents-prep-01/manifest.json",
+        "sha256": "14a2b4422398e7c0932ce32823fcba6686927d2f37979f34bce39e335739747d",
+        "size_bytes": 7657
+    });
+    let (_, documentary_bytes) = bound(&root, &documentary_source)?;
+    let documentary: Value = serde_json::from_slice(&documentary_bytes)?;
+    require(
+        documentary["schema"] == "ctf10-Init-postlude-failed-milestone-documents-source.v1",
+        "exact historical document preparation required",
+    )?;
+    let historical_card = &native["current_cards"]["CTF-10"];
+    let card = rows(&documentary["documents"])?
+        .iter()
+        .find(|row| row["canonical_path"] == historical_card["path"])
+        .ok_or("declared frozen card lacks authentic before archive")?;
+    for key in ["path", "sha256", "size_bytes"] {
+        require(
+            card["actual_before"][key] == historical_card[key],
+            "declared frozen historical card identity differs",
+        )?;
+    }
+    let card_archive = card["before_archive"].clone();
+    require(
+        card_archive["path"]
+            == ".runtime/porting/CTF-10/init-postlude-documents-prep-01/before/cards/CTF-10.md"
+            && card_archive["sha256"] == historical_card["sha256"]
+            && card_archive["size_bytes"] == historical_card["size_bytes"],
+        "authentic archived frozen card bytes required",
+    )?;
+    bindings.push(documentary_source);
+    bindings.push(card_archive);
     for key in [
         "ctf10_public_storage_observation_policy",
         "ctf10_execution_lane_policy",

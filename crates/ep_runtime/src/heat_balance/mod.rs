@@ -20,6 +20,7 @@ pub mod ctf_first_gamma_ingress;
 pub mod ctf_first_gamma_owner;
 pub mod ctf_first_inverse_owner;
 pub mod ctf_first_matrix_owner;
+pub mod ctf_geometry_reports;
 pub mod ctf_init_postlude;
 pub mod ctf_initial_owner;
 pub mod ctf_initialization_context;

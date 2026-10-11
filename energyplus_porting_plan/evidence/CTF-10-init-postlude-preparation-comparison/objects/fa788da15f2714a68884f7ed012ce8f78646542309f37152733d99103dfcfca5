@@ -1,0 +1,17 @@
+--- .runtime/porting/CTF-10/init-postlude-post-application-correction-prep-01/README.md
++++ .runtime/porting/CTF-10/init-postlude-post-application-correction-prep-02/README.md
+@@ -28,3 +28,14 @@
+ quality commands plus the direct example tests. Its actual854c/a0e authority is
+ unchanged and truthful. All five timestamps must follow the new post-format
+ receipt in downstream custody. No outcomes, test totals or future hashes exist.
++
++
++## Empty exact formatter delta repair
++
++The recorded first applicator stopped during parent-diff preflight with exit1,
++Source preserved, before creating an output directory or writing Rust. This
++successor changes only check_diff: an empty declared diff succeeds only when
++the complete before and after byte buffers are equal. Nonempty label/diff checks,
++one-file action, prior lineage, full3910 guard and reused quality are unchanged.
++The failed first receipt is retained as metadata, with all01 Source preserved.
++Root must use a fresh apply command/output directory. No execution occurred here.

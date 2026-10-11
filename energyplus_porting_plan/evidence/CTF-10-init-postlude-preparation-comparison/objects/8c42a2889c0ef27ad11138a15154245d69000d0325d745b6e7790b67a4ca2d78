@@ -1,0 +1,69 @@
+{
+  "schema": "ctf10-Init-postlude-input-projector-source-preparation.v5",
+  "status": "SOURCE-READY-HELD-NOT-EXECUTED",
+  "parent_reviewed_preparation": {
+    "path": ".runtime/porting/CTF-10/init-postlude-input-projector-prep-04/manifest.json",
+    "sha256": "31f9703ba303be8cbef7a4cae8ba1970b0d116dccc0d0b4dca5c1aade35af970",
+    "size_bytes": 1865
+  },
+  "source": {
+    "path": ".runtime/porting/CTF-10/init-postlude-input-projector-prep-05/project-inputs.py",
+    "sha256": "53e00f86ffb30132ad0b5044dfb0aaa0f162e1963f98a862a89200564486798d",
+    "size_bytes": 11271
+  },
+  "before_source": {
+    "path": ".runtime/porting/CTF-10/init-postlude-input-projector-prep-05/before04/project-inputs.py",
+    "sha256": "a2255c10cebd9e81620f63d77935a1456361335628b4fa29dfed812dad1b8ed7",
+    "size_bytes": 10336
+  },
+  "before_manifest": {
+    "path": ".runtime/porting/CTF-10/init-postlude-input-projector-prep-05/before04/manifest.json",
+    "sha256": "31f9703ba303be8cbef7a4cae8ba1970b0d116dccc0d0b4dca5c1aade35af970",
+    "size_bytes": 1865
+  },
+  "before_README": {
+    "path": ".runtime/porting/CTF-10/init-postlude-input-projector-prep-05/before04/README.md",
+    "sha256": "ba0da07381be886ef471fa5347e1a164e2007d060d89ce14a8a73fcd208d9d2a",
+    "size_bytes": 433
+  },
+  "exact_diff": {
+    "path": ".runtime/porting/CTF-10/init-postlude-input-projector-prep-05/project-inputs.diff",
+    "sha256": "24f0e0db48dd09d7bae9f6d7cb29d915370faafe787847c027f25e6a10c659b1",
+    "size_bytes": 6759
+  },
+  "README": {
+    "path": ".runtime/porting/CTF-10/init-postlude-input-projector-prep-05/README.md",
+    "sha256": "8e845596e6cdbdaf9e7197d7d985bdfd1d8a199ecb28643538f07a98adff1ce8",
+    "size_bytes": 950
+  },
+  "reviewed_production_preparation": {
+    "path": ".runtime/porting/CTF-10/init-postlude-production-preparation-fix-prep-01/manifest.json",
+    "sha256": "7f84ff32d25390e4b86ea06f78ab50397dfa780ba4b64e1c15b4ad5407c54c32",
+    "size_bytes": 65947
+  },
+  "reviewed_correction_workflow_preparation": {
+    "path": ".runtime/porting/CTF-10/init-postlude-prerequisite-correction-workflow-prep-01/manifest.json",
+    "sha256": "a0e28a8a7caa9f60dd69191d5d9df5665c99aaf053c4eba4ee1f880400aea33b",
+    "size_bytes": 16197
+  },
+  "native_source_preparation": {
+    "path": ".runtime/porting/CTF-10/native-init-postlude-prep-06/manifest.json",
+    "sha256": "9a664b1a4ac99b8b6b00813aaa43a59bb61bab24b3752ebaf06d22324d29160b",
+    "size_bytes": 40324
+  },
+  "authoring_source": {
+    "path": ".runtime/porting/CTF-10/init-postlude-input-projector-prep-05/prepare_sources.py",
+    "sha256": "5fa94ec4f10fc5d844abaeff9bc8f75ef79731a551f58e271242d6930392b33f",
+    "size_bytes": 5321
+  },
+  "inverse_exact": true,
+  "unchanged_request_keys": 12,
+  "unchanged_model_cases": 15,
+  "unchanged_direct_cases": 6,
+  "actual_own_source_count": 4,
+  "actual_API_source_count": 59,
+  "execution_performed": false,
+  "canonical_mutation": false,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false
+}

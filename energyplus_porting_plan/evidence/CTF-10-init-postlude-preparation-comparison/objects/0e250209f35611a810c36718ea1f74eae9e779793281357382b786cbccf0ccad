@@ -1,0 +1,124 @@
+--- crates/ep_runtime/src/heat_balance/ctf_geometry_reports.rs
++++ crates/ep_runtime/src/heat_balance/ctf_geometry_reports.rs
+@@ -0,0 +1,121 @@
++//! Selected ordinary SurfaceGeometry predefined U-value entries before CTF Init.
++//!
++//! This uses genuine typed loader primitives and real registry columns. It does
++//! not consume CTF coefficients, Native answers, or a reconstructed report prefix.
++
++use super::ctf_reports::{CtfReportUnavailable, PredefinedStringTable};
++use super::predefined_tables::PredefinedRegistry;
++use ep_model::{MaterialDefinition, OutsideBoundaryCondition, Surface, SurfaceType, TypedModel};
++
++fn class_index(kind: SurfaceType) -> usize {
++    match kind {
++        SurfaceType::Wall => 0,
++        SurfaceType::Floor => 1,
++        SurfaceType::Roof | SurfaceType::Ceiling => 2,
++    }
++}
++
++fn inside_film(kind: SurfaceType) -> f64 {
++    match kind {
++        SurfaceType::Wall => 0.1197548,
++        SurfaceType::Floor => 0.1620212,
++        SurfaceType::Roof | SurfaceType::Ceiling => 0.1074271,
++    }
++}
++
++fn nominal_u(model: &TypedModel, surface: &Surface) -> Result<f64, CtfReportUnavailable> {
++    let mut matches = model.constructions.iter().filter(|row| row.id == surface.construction);
++    let construction = matches.next().ok_or(CtfReportUnavailable::Association)?;
++    if matches.next().is_some() {
++        return Err(CtfReportUnavailable::Association);
++    }
++    if !construction.is_ordinary_opaque() || construction.has_internal_heat_source() {
++        return Err(CtfReportUnavailable::UnsupportedConstruction);
++    }
++    let mut nominal_r = 0.0;
++    for id in construction.effective_layers() {
++        let mut matches = model.materials.iter().filter(|row| row.id == *id);
++        let material = matches.next().ok_or(CtfReportUnavailable::Material(*id))?;
++        if matches.next().is_some() {
++            return Err(CtfReportUnavailable::Association);
++        }
++        // GetMaterialData assigns Regular Resistance and NominalR together.
++        // NoMass's NominalR is the actual input resistance. No total-R shortcut
++        // may reorder the GetConstructData additions or remove its reciprocal.
++        nominal_r += match material.definition {
++            MaterialDefinition::Regular(value) => value.thermal_resistance_m2_k_per_w,
++            MaterialDefinition::NoMass(value) => value.thermal_resistance_m2_k_per_w,
++            _ => return Err(CtfReportUnavailable::Material(*id)),
++        };
++    }
++    Ok(if nominal_r != 0.0 { 1.0 / nominal_r } else { 0.0 })
++}
++
++fn film_u(model: &TypedModel, surface: &Surface) -> Result<(bool, f64), CtfReportUnavailable> {
++    let inside = inside_film(surface.surface_type);
++    let (exterior, outside) = match surface.outside_boundary_condition {
++        OutsideBoundaryCondition::Outdoors => (true, 0.0299387),
++        // Native resolves Adiabatic to this surface's own ID before reporting.
++        OutsideBoundaryCondition::Adiabatic => (false, inside),
++        _ => return Err(CtfReportUnavailable::SurfaceBoundary(surface.id)),
++    };
++    let nominal = nominal_u(model, surface)?;
++    let value = if nominal > 0.0 {
++        1.0 / (inside + (1.0 / nominal) + outside)
++    } else {
++        nominal
++    };
++    Ok((exterior, value))
++}
++
++/// Append the ordinary opaque GetSurfaceData film-U entries in real report order.
++///
++/// The bounded model represents Wall/Floor/Roof/Ceiling only. Native's report
++/// order is Zone, actual Space membership, then base class, retaining source
++/// order within each class. Unrepresented boundaries/materials stop at the
++/// reached row; completed entries and all allocated unused slots are retained.
++pub fn report_ordinary_surface_nominal_u(
++    model: &TypedModel,
++    registry: &PredefinedRegistry,
++    table: &mut PredefinedStringTable,
++) -> Result<(), CtfReportUnavailable> {
++    let mut ordered = Vec::with_capacity(model.surfaces.len());
++    for zone in &model.zones {
++        for space_id in &zone.spaces {
++            let mut matches = model.spaces.iter().filter(|space| space.id == *space_id);
++            let space = matches.next().ok_or(CtfReportUnavailable::Association)?;
++            if matches.next().is_some() || space.zone != zone.id {
++                return Err(CtfReportUnavailable::Association);
++            }
++            for class in 0..3 {
++                for surface in model.surfaces.iter().filter(|surface| {
++                    surface.zone == zone.id && surface.space == *space_id
++                        && class_index(surface.surface_type) == class
++                }) {
++                    if ordered.iter().any(|prior: &&Surface| prior.id == surface.id) {
++                        return Err(CtfReportUnavailable::Association);
++                    }
++                    ordered.push(surface);
++                }
++            }
++        }
++    }
++    // Never silently discard an actual owner outside the represented traversal.
++    if ordered.len() != model.surfaces.len() {
++        return Err(CtfReportUnavailable::Association);
++    }
++    for surface in ordered {
++        let (exterior, value) = film_u(model, surface)?;
++        let key = if exterior { "pdchOpUfactFilm" } else { "pdchIntOpUfactFilm" };
++        let column = *registry.named_indices.get(key).ok_or(CtfReportUnavailable::TableOwner)?;
++        if column <= 0 || column > registry.column_count {
++            return Err(CtfReportUnavailable::TableOwner);
++        }
++        table.fixed_real_entry_3(column, &surface.name.0, value)?;
++    }
++    Ok(())
++}
++
++#[cfg(test)]
++#[path = "ctf_geometry_reports_tests.rs"]
++mod tests;
