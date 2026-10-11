@@ -1,0 +1,102 @@
+# CTF10 public storage to surface binding: source proposal
+
+This package proposes one standalone public module and seven focused contractual
+tests. It adds only a module declaration to the existing heat-balance parent.
+No cache, initializer, surface solver, weather, history or reporting path calls it.
+Sources and tests have not been imported, compiled, formatted or executed.
+
+## Actual owner handoff
+
+`capture_public_ctf_surface_generation(model, initialization, context)` borrows
+the actual `TypedModel` and actual `OrderedCtfPublicInitialization`. The caller
+must supply the producer's real caller inputs, incoming shared flags/aggregates,
+and producer revision identity from the same generation. Capture never invents
+that identity or derives a timestep from coefficients. It is a transport API,
+not retroactive authentication of independently supplied objects. A future
+ordinary producer integration must own this handoff immediately after generation.
+
+`CtfPublicSurfaceGeneration::bind_surface(SurfaceId)` follows the actual surface's
+`ConstructionId` to the actual declared public row. IDs need not be dense and
+surface order need not match construction order. It checks row index, original
+material IDs and actual used-construction membership at capture. Reverse storage
+retains the already selected provider; binding checks its earlier declaration,
+ID/use/returned owner and reversed original stack. It never reselects a provider
+from numerical layers or computes/copies reverse coefficients.
+
+The binding borrows all twelve public arrays, all nineteen slots of each, actual
+NumCTFTerms, NumHistories, CTFTimeStep and UValue without arithmetic. Reset,
+severe, unavailable, selected fatal/scope/capacity stop, incomplete prefix,
+shared ErrorsFound, duplicate IDs and unsupported families/boundaries are typed
+unavailable. These are adapter scope/representability decisions, not new Native
+guards or reconstructed process outcomes. Whole-Init reports/final fatal/backend
+completion remain unproved even when this selected binding returns.
+
+## Exact generation key
+
+The key uses structured exact equality, not an aggregate R/C digest. Its private
+fields retain actual producer revision, compiled timestep count and supplied
+caller timestep bits; incoming ErrorsFound/DoCTFErrorReport, SimpleCTFOnly and
+MaxCTFTerms; actual EMS/override flags; every material in original registry order
+with ID/name/family, roughness, thickness/k/rho/cp/stored resistance and all three
+absorptance bits; every declared construction in original order with ID/name,
+raw outside layer, raw layers and effective original stack; every surface's
+ordered ID/construction/boundary binding; every public row's ID/index/original
+stack/use/invocation/entry-return flags/route or typed error; all twelve arrays'
+bits/counts/timestep/U; and actual selected aggregate/stop/completion owners.
+
+Only plain ordinary opaque no-source Construction plus Regular/NoMass materials
+and Outdoors/Adiabatic bindings are admitted. Unsupported construction options
+and material families fail explicitly; no unsupported payload is silently omitted
+from a successful key. EIO rows and old legacy R/C fallback do not generate this
+selected public owner and are not substituted. Roughness/absorptance and raw
+registry/order details are conservative extra invalidation dependencies.
+
+The key is for selected coefficient generation and identity binding. It is NOT
+a weather/environment/geometry/history key. Geometry/weather changes still need
+their own real environment transition and history reinitialization contract.
+This proposal creates no history values, so it cannot authorize reusing old
+histories after those inputs change. A future mutable cache must compare the full
+key and rebind/reinitialize at the real lifecycle boundary; current cache hash
+and self-comparison token behavior are not changed here.
+
+## Uninitialized history contract
+
+The returned contract retains all four Native fixed19 history capacities, active
+coefficient slots0..NumCTFTerms, actual construction history count and timestep,
+actual zone timestep/U, and GLOBAL selected Init aggregate. It states the exact
+Native allocation predicate `!SimpleCTFOnly || AnyEnergyManagementSystemInModel`
+and update predicate `SimpleCTFOnly && !AnyConstrOverridesInModel` as requirements,
+without allocating values or executing either branch. Dynamic controls are outside
+this selected CON-01 adapter. A required public/global count outside0..18 or
+nonpositive NumHistories is an unsupported history contract, not a Native clamp.
+
+Native history arrays use term1 for current and term2 for first past value;
+coefficient current index0 is distinct. Later initialization must preserve real
+SurfInitialTemp=23.0 separately from the user zone-air seed (currently20 in the
+candidate observer), and source per-surface environment owners. In particular,
+inside flux term1 reads the then-existing outside flux term2 before the source
+term2 assignment; a uniform fill is not equivalent. Simple shifting uses GLOBAL
+MaxCTFTerms+1, not local Vec length. Master/counter/SumTime and literal interpolation
+remain entirely pending. Raw separately owns genuine normal Native lifecycle
+observation preparation; no results from it are operands here.
+
+## Source validation and limits
+
+The seven unexecuted tests use actual typed all-resistive preprocessing/initial/
+first-assembly/retry/public APIs for the basic owner fixture. Explicit later
+mutations exercise only binding/key contracts: non-dense identities, all12 tails,
+signed zero/NaN payload preservation, stored Regular resistance and ordered input
+changes, caller/revision inputs, reverse-provider custody, separate dt/history/
+global master requirements, and required missing/error/severe/capacity/unsupported
+cases. They do not supply expected Native coefficients or certify massive output.
+
+Prospective copy validation is exact class/shape/bits (all12x19 and metadata);
+there is no arithmetic tolerance or new science gate in this adapter. Future
+consumer arithmetic, environment initialization, history advancement, weather,
+inside/outside balance and reporting must have their own pre-output scope and
+genuine same-input Native observations. No CTF10 full gate or surface handoff
+PASS is claimed. Plan/card and all earlier immutable holds remain unchanged.
+
+Header authored the prior public/storage and assembly/ingress sources. This new
+proposal requires Root and another author's full source review; self-read is
+source/API preparation, not independent formula certification.

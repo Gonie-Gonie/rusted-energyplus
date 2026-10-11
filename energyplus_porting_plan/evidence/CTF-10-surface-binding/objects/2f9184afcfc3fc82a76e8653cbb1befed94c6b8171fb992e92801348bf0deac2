@@ -1,0 +1,27 @@
+{
+  "schema": "ctf10-standalone-binding-test-mut-repair-proposal.v1",
+  "before": {
+    "path": ".runtime/porting/CTF-10/surface-binding-test-mut-repair-prep-01/before.rs",
+    "sha256": "ea52ca2bacbf2814a7786a308c95502d5d14f4f423b884eb9db070c6b79dd0a8",
+    "size_bytes": 16382
+  },
+  "proposed": {
+    "path": ".runtime/porting/CTF-10/surface-binding-test-mut-repair-prep-01/new.rs",
+    "sha256": "ad67150be196d8f0dbc653ea5d2ae7808af34d553be71caa33451229b78819bb",
+    "size_bytes": 16378
+  },
+  "exact_diff": {
+    "path": ".runtime/porting/CTF-10/surface-binding-test-mut-repair-prep-01/exact.diff",
+    "sha256": "224bd1a30fac3ba7035bc0a11927a7d065fcc8950584cafc25b6d39569a29a1a",
+    "size_bytes": 433
+  },
+  "actual_failed_clippy_preserved": {
+    "path": ".runtime/porting/CTF-10/surface-binding-clippy-command-01/receipt.json",
+    "sha256": "5d578302e5537ccea35a1a4ba8bc74980722634fcb9ead6c9660b2e275fe7fe6",
+    "size_bytes": 3223
+  },
+  "change": "remove unused test local binding mut only; all mutable element borrows/assertions/inputs/production unchanged",
+  "Root_FULL_narrow_change_accepted": true,
+  "other_author_review_pending": true,
+  "canonical_applied": false
+}

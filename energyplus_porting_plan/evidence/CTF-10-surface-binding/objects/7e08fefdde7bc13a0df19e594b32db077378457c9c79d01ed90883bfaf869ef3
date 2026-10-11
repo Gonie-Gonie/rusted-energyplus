@@ -1,0 +1,10 @@
+--- crates/ep_runtime/src/heat_balance/mod.rs
++++ crates/ep_runtime/src/heat_balance/mod.rs
+@@ -20,6 +20,7 @@
+ pub mod ctf_first_matrix_owner;
+ pub mod ctf_initial_owner;
+ pub mod ctf_public_initialization;
++pub mod ctf_surface_binding;
+ pub mod ctf_retry_driver;
+ pub mod ctf_retry_initialization;
+ pub(crate) mod id_slot_index;

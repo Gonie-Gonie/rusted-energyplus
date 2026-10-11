@@ -1,0 +1,64 @@
+{
+  "schema": "ctf10-actual-standalone-surface-binding-application.v1",
+  "accepted_source_manifest": {
+    "path": ".runtime/porting/CTF-10/surface-binding-prep-01/manifest.json",
+    "sha256": "f1c291242acdbeedce392f2db0cb5d41efd28d95e3a53268c825e939655864eb",
+    "size_bytes": 21534
+  },
+  "Root_and_Raw_FULL_literal_sources_accepted": true,
+  "actual_sources": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_surface_binding.rs",
+      "accepted_held_source": {
+        "path": ".runtime/porting/CTF-10/surface-binding-prep-01/new/ctf_surface_binding.rs",
+        "sha256": "ddc34553f04ccb0376b62568fe82b4b5da5024172326c1f563e7a7a20db32ee9",
+        "size_bytes": 19172,
+        "line_count": 344
+      },
+      "actual_before_archive": null,
+      "actual_literal_archive": {
+        "path": ".runtime/porting/CTF-10/surface-binding-applied-01/ctf_surface_binding.rs",
+        "sha256": "ddc34553f04ccb0376b62568fe82b4b5da5024172326c1f563e7a7a20db32ee9",
+        "size_bytes": 19172
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_surface_binding_tests.rs",
+      "accepted_held_source": {
+        "path": ".runtime/porting/CTF-10/surface-binding-prep-01/new/ctf_surface_binding_tests.rs",
+        "sha256": "2f5b483188bd4d6cbde6c23e5ae22dca01f48c4dc1c79adb34f814733f9551e8",
+        "size_bytes": 14089,
+        "line_count": 214
+      },
+      "actual_before_archive": null,
+      "actual_literal_archive": {
+        "path": ".runtime/porting/CTF-10/surface-binding-applied-01/ctf_surface_binding_tests.rs",
+        "sha256": "2f5b483188bd4d6cbde6c23e5ae22dca01f48c4dc1c79adb34f814733f9551e8",
+        "size_bytes": 14089
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "accepted_held_source": {
+        "path": ".runtime/porting/CTF-10/surface-binding-prep-01/proposed/heat_balance_mod.rs",
+        "sha256": "d2cc5e60eadbaeb07242822ff5e96bea9d57546a06a29f5f11704d93e7e56672",
+        "size_bytes": 1785,
+        "line_count": 71
+      },
+      "actual_before_archive": {
+        "path": ".runtime/porting/CTF-10/surface-binding-prep-01/before/heat_balance_mod.rs",
+        "sha256": "ef9e101fedc4d920327a55551e4403e3ee72739b319c7d1c0523dd2d8b6bbc38",
+        "size_bytes": 1756,
+        "line_count": 70
+      },
+      "actual_literal_archive": {
+        "path": ".runtime/porting/CTF-10/surface-binding-applied-01/mod.rs",
+        "sha256": "d2cc5e60eadbaeb07242822ff5e96bea9d57546a06a29f5f11704d93e7e56672",
+        "size_bytes": 1785
+      }
+    }
+  ],
+  "runtime_activation_performed": false,
+  "gates_updated": false,
+  "numeric_arithmetic_or_history_seed_added": false
+}

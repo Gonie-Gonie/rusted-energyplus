@@ -1,0 +1,136 @@
+{
+  "schema": "ctf10-actual-standalone-binding-source-after-test-mut-repair.v1",
+  "accepted_literal_application": {
+    "path": ".runtime/porting/CTF-10/surface-binding-applied-01/manifest.json",
+    "sha256": "840a0270788408d43f2a66c383de815945e62ae91b0aea8fa223e815fd53b76a",
+    "size_bytes": 2696
+  },
+  "actual_formatter_execution": {
+    "path": ".runtime/porting/CTF-10/surface-binding-format-command-01/receipt.json",
+    "sha256": "e598704cae367b889eab47c3e73913d9e3af5be7372bef4c7a555569b10041e1",
+    "size_bytes": 3007
+  },
+  "actual_sources": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_surface_binding.rs",
+      "accepted_held_source": {
+        "path": ".runtime/porting/CTF-10/surface-binding-prep-01/new/ctf_surface_binding.rs",
+        "sha256": "ddc34553f04ccb0376b62568fe82b4b5da5024172326c1f563e7a7a20db32ee9",
+        "size_bytes": 19172,
+        "line_count": 344
+      },
+      "actual_before_archive": null,
+      "actual_literal_archive": {
+        "path": ".runtime/porting/CTF-10/surface-binding-applied-01/ctf_surface_binding.rs",
+        "sha256": "ddc34553f04ccb0376b62568fe82b4b5da5024172326c1f563e7a7a20db32ee9",
+        "size_bytes": 19172
+      },
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-02/ctf_surface_binding.rs",
+        "sha256": "7fdb79ef079026e3bf884854f9f8f068ab7d527815fe484782338b56584c7de3",
+        "size_bytes": 21616
+      },
+      "format_correspondence_diff": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-01/ctf_surface_binding.rs.format.diff",
+        "sha256": "9fccdad5dac2d2f7fe6799795ab80a8153104105cc48b606190257660c9379ab",
+        "size_bytes": 20904
+      },
+      "format_correspondence_final_source": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-01/ctf_surface_binding.rs",
+        "sha256": "7fdb79ef079026e3bf884854f9f8f068ab7d527815fe484782338b56584c7de3",
+        "size_bytes": 21616
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_surface_binding_tests.rs",
+      "accepted_held_source": {
+        "path": ".runtime/porting/CTF-10/surface-binding-prep-01/new/ctf_surface_binding_tests.rs",
+        "sha256": "2f5b483188bd4d6cbde6c23e5ae22dca01f48c4dc1c79adb34f814733f9551e8",
+        "size_bytes": 14089,
+        "line_count": 214
+      },
+      "actual_before_archive": null,
+      "actual_literal_archive": {
+        "path": ".runtime/porting/CTF-10/surface-binding-applied-01/ctf_surface_binding_tests.rs",
+        "sha256": "2f5b483188bd4d6cbde6c23e5ae22dca01f48c4dc1c79adb34f814733f9551e8",
+        "size_bytes": 14089
+      },
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-02/ctf_surface_binding_tests.rs",
+        "sha256": "ad67150be196d8f0dbc653ea5d2ae7808af34d553be71caa33451229b78819bb",
+        "size_bytes": 16378
+      },
+      "format_correspondence_diff": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-01/ctf_surface_binding_tests.rs.format.diff",
+        "sha256": "897d6ddc0a8e94e45a6b3df941e08ca7ed61a091f5a513b713967e8b5393b7f8",
+        "size_bytes": 25735
+      },
+      "format_correspondence_final_source": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-01/ctf_surface_binding_tests.rs",
+        "sha256": "ea52ca2bacbf2814a7786a308c95502d5d14f4f423b884eb9db070c6b79dd0a8",
+        "size_bytes": 16382
+      },
+      "post_formatter_accepted_test_binding_repair": {
+        "path": ".runtime/porting/CTF-10/surface-binding-test-mut-repair-prep-01/manifest.json",
+        "sha256": "2f9184afcfc3fc82a76e8653cbb1befed94c6b8171fb992e92801348bf0deac2",
+        "size_bytes": 1187
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "accepted_held_source": {
+        "path": ".runtime/porting/CTF-10/surface-binding-prep-01/proposed/heat_balance_mod.rs",
+        "sha256": "d2cc5e60eadbaeb07242822ff5e96bea9d57546a06a29f5f11704d93e7e56672",
+        "size_bytes": 1785,
+        "line_count": 71
+      },
+      "actual_before_archive": {
+        "path": ".runtime/porting/CTF-10/surface-binding-prep-01/before/heat_balance_mod.rs",
+        "sha256": "ef9e101fedc4d920327a55551e4403e3ee72739b319c7d1c0523dd2d8b6bbc38",
+        "size_bytes": 1756,
+        "line_count": 70
+      },
+      "actual_literal_archive": {
+        "path": ".runtime/porting/CTF-10/surface-binding-applied-01/mod.rs",
+        "sha256": "d2cc5e60eadbaeb07242822ff5e96bea9d57546a06a29f5f11704d93e7e56672",
+        "size_bytes": 1785
+      },
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-02/mod.rs",
+        "sha256": "5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+        "size_bytes": 1785
+      },
+      "format_correspondence_diff": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-01/mod.rs.format.diff",
+        "sha256": "07679586e8e69c55311cd296b1fa546a2c52c03478a9bec48071d5660c93967f",
+        "size_bytes": 450
+      },
+      "format_correspondence_final_source": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-01/mod.rs",
+        "sha256": "5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+        "size_bytes": 1785
+      }
+    }
+  ],
+  "Root_and_Raw_FULL_literal_sources_accepted": true,
+  "Root_and_Raw_FULL_formatter_correspondence_accepted": true,
+  "actual_formatter_correspondence_FULL_review_pending": false,
+  "runtime_surface_history_activation_performed": false,
+  "gates_updated": false,
+  "prior_actual_formatted_source_manifest": {
+    "path": ".runtime/porting/CTF-10/surface-binding-final-source-01/manifest.json",
+    "sha256": "ed25ee85045887a71b85f7af720d5dda1d9cb9c2e242b371ad797d5fd2754756",
+    "size_bytes": 4565
+  },
+  "accepted_test_binding_repair": {
+    "path": ".runtime/porting/CTF-10/surface-binding-test-mut-repair-prep-01/manifest.json",
+    "sha256": "2f9184afcfc3fc82a76e8653cbb1befed94c6b8171fb992e92801348bf0deac2",
+    "size_bytes": 1187
+  },
+  "Root_and_Raw_FULL_test_binding_repair_accepted": true,
+  "actual_failed_Clippy01_preserved": {
+    "path": ".runtime/porting/CTF-10/surface-binding-clippy-command-01/receipt.json",
+    "sha256": "5d578302e5537ccea35a1a4ba8bc74980722634fcb9ead6c9660b2e275fe7fe6",
+    "size_bytes": 3223
+  }
+}

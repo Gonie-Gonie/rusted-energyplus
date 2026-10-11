@@ -1,0 +1,344 @@
+//! Borrowed public CTF storage and uninitialized surface-history contracts.
+//!
+//! This adapter does not seed histories, advance time, run surface balances, or
+//! certify the unimplemented whole-Init reporting/fatal/environment lifecycle.
+
+use super::ctf_public_initialization::{
+    CtfPublicInitAggregate, CtfPublicInitStop, CtfPublicInitializationUnavailable,
+    CtfPublicReturnRoute, OrderedCtfPublicInitialization,
+};
+use super::surface_manager::ctf_all_resistive::CTF_COEFFICIENT_SLOTS;
+use super::surface_manager::ctf_caller_stability::CtfCallerSharedFlags;
+use super::surface_manager::ctf_public_storage::CtfPublicCoefficientStorage;
+use ep_model::{
+    ConstructionId, MaterialDefinition, MaterialId, MaterialSurfaceRoughness,
+    OutsideBoundaryCondition, SurfaceId, TypedModel,
+};
+use std::collections::BTreeSet;
+
+/// Actual producer/caller inputs, supplied by its ordinary initialization owner.
+/// No revision, timestep, flag or incoming aggregate is inferred from coefficients.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct CtfSurfaceGenerationContext {
+    /// Actual producer-source revision identity; never a Native answer digest.
+    pub producer_revision: [u8; 32],
+    /// Actual TimeStepZone supplied to preprocessing/initial/retry generation.
+    pub time_step_zone_hours: f64,
+    /// Shared flags before the first declared construction's preprocessing.
+    pub initial_flags: CtfCallerSharedFlags,
+    /// Incoming actual SimpleCTFOnly, including on a repeated initialization.
+    pub initial_simple_ctf_only: bool,
+    /// Incoming actual MaxCTFTerms; not reconstructed from returned storage.
+    pub initial_max_ctf_terms: i32,
+    /// Actual global allocation flag at the surface lifecycle boundary.
+    pub any_ems_in_model: bool,
+    /// Actual global history-update override flag at that boundary.
+    pub any_construction_overrides: bool,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+struct MaterialKey {
+    id: MaterialId,
+    name: String,
+    roughness: MaterialSurfaceRoughness,
+    resistance_only: bool,
+    // thickness, k, rho, cp, stored R, thermal/solar/visible absorptance.
+    bits: [u64; 8],
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+struct StorageKey {
+    arrays: [[u64; CTF_COEFFICIENT_SLOTS]; 12],
+    timestep: u64,
+    histories: i32,
+    terms: i32,
+    u_value: u64,
+}
+
+impl From<&CtfPublicCoefficientStorage> for StorageKey {
+    fn from(value: &CtfPublicCoefficientStorage) -> Self {
+        Self {
+            arrays: [
+                value.outside.map(f64::to_bits), value.cross.map(f64::to_bits),
+                value.inside.map(f64::to_bits), value.flux.map(f64::to_bits),
+                value.source_in.map(f64::to_bits), value.source_out.map(f64::to_bits),
+                value.temperature_source_out.map(f64::to_bits),
+                value.temperature_source_in.map(f64::to_bits),
+                value.temperature_source_q.map(f64::to_bits),
+                value.temperature_user_out.map(f64::to_bits),
+                value.temperature_user_in.map(f64::to_bits),
+                value.temperature_user_source.map(f64::to_bits),
+            ],
+            timestep: value.ctf_time_step.to_bits(), histories: value.num_histories,
+            terms: value.num_ctf_terms, u_value: value.u_value.to_bits(),
+        }
+    }
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+struct PublicKey {
+    id: ConstructionId,
+    declared_index: usize,
+    layers: Vec<MaterialId>,
+    used: bool,
+    invoked: bool,
+    entry: Option<CtfCallerSharedFlags>,
+    returned: Option<CtfCallerSharedFlags>,
+    result: Result<(CtfPublicReturnRoute, StorageKey), CtfPublicInitializationUnavailable>,
+}
+
+/// Exact equality key, not a lossy aggregate R/C hash or an environment key.
+/// Private fields prevent callers from dropping inputs before comparing keys.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct CtfSurfaceGenerationKey {
+    revision: [u8; 32],
+    timestep_count: u32,
+    timestep_bits: u64,
+    initial_flags: CtfCallerSharedFlags,
+    initial_aggregate: (bool, i32),
+    dynamic_flags: (bool, bool),
+    materials: Vec<MaterialKey>,
+    // Full declared order, raw outside_layer/layers and effective original stack.
+    constructions: Vec<(ConstructionId, String, Option<MaterialId>, Vec<MaterialId>, Vec<MaterialId>)>,
+    // These are coefficient-use/binding inputs, not weather/geometry histories.
+    surfaces: Vec<(SurfaceId, ConstructionId, OutsideBoundaryCondition)>,
+    public: Vec<PublicKey>,
+    aggregate: CtfPublicInitAggregate,
+    stop: Option<CtfPublicInitStop>,
+    completed: bool,
+}
+
+/// Binding/representability exclusions, never substitutes for Native diagnostics.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum CtfSurfaceBindingUnavailable {
+    /// Original material identities must be unique.
+    DuplicateMaterial(MaterialId),
+    /// Original construction identities must be unique.
+    DuplicateConstruction(ConstructionId),
+    /// Actual surface identities must be unique.
+    DuplicateSurface(SurfaceId),
+    /// A declared original layer lacks its actual material owner.
+    MissingMaterial(MaterialId),
+    /// A surface references a missing actual construction owner.
+    MissingConstruction(ConstructionId),
+    /// The requested actual surface identity is absent.
+    MissingSurface(SurfaceId),
+    /// Only plain ordinary opaque no-source constructions are supported here.
+    UnsupportedConstruction(ConstructionId),
+    /// Only genuine Regular and NoMass member inputs are supported here.
+    UnsupportedMaterial(MaterialId),
+    /// Only the CON-01 Outdoors/Adiabatic surface boundary subset is bound.
+    UnsupportedBoundary(SurfaceId),
+    /// EMS/construction overrides need a separate real dynamic-owner lifecycle.
+    DynamicControls,
+    /// Actual declared index/ID/layers/use association is inconsistent.
+    Association,
+    /// Selected Init stopped; no aggregate/report completion is inferred.
+    SelectedStop(CtfPublicInitStop),
+    /// A complete selected declared-call owner is missing.
+    IncompleteDeclaredLoop,
+    /// The actual public suffix did not provide storage.
+    PublicOwner(CtfPublicInitializationUnavailable),
+    /// Reset returns are retained observations, not consumable generated storage.
+    ResetReturn(CtfPublicReturnRoute),
+    /// A genuine severe return does not establish runtime consumer readiness.
+    SevereReturn,
+    /// Returned shared error flags prevent selected surface binding.
+    SharedErrors,
+    /// Original reverse-provider custody is absent/inconsistent.
+    ReverseProvider(ConstructionId),
+    /// Actual public term/history counts exceed this represented history contract.
+    HistoryShape,
+}
+
+/// Exact borrowed generation; immutable borrows prohibit in-place stale reuse.
+/// Capture transports actual producer inputs/outputs supplied by the caller. It
+/// cannot retroactively authenticate that independently supplied objects were
+/// produced together; ordinary producer integration must own that handoff.
+#[derive(Debug)]
+pub struct CtfPublicSurfaceGeneration<'a> {
+    model: &'a TypedModel,
+    initialization: &'a OrderedCtfPublicInitialization,
+    context: CtfSurfaceGenerationContext,
+    key: CtfSurfaceGenerationKey,
+}
+
+/// Capture complete selected ordinary generation dependencies and returned bits.
+/// No material resistance, coefficient, timestep/history ratio or aggregate is
+/// recomputed. Unsupported families are explicit; no EIO/fallback substitution.
+pub fn capture_public_ctf_surface_generation<'a>(
+    model: &'a TypedModel,
+    initialization: &'a OrderedCtfPublicInitialization,
+    context: CtfSurfaceGenerationContext,
+) -> Result<CtfPublicSurfaceGeneration<'a>, CtfSurfaceBindingUnavailable> {
+    use CtfSurfaceBindingUnavailable as Error;
+    if context.any_ems_in_model || context.any_construction_overrides {
+        return Err(Error::DynamicControls);
+    }
+    let mut material_ids = BTreeSet::new();
+    let mut materials = Vec::with_capacity(model.materials.len());
+    for material in &model.materials {
+        if !material_ids.insert(material.id) { return Err(Error::DuplicateMaterial(material.id)); }
+        let (roughness, resistance_only, members, surface) = match material.definition {
+            MaterialDefinition::Regular(value) => (value.roughness, false, [
+                value.thickness_m, value.conductivity_w_per_m_k, value.density_kg_per_m3,
+                value.specific_heat_j_per_kg_k, value.thermal_resistance_m2_k_per_w,
+            ], value.surface),
+            MaterialDefinition::NoMass(value) => (value.roughness, true,
+                [0.0, 0.0, 0.0, 0.0, value.thermal_resistance_m2_k_per_w], value.surface),
+            _ => return Err(Error::UnsupportedMaterial(material.id)),
+        };
+        materials.push(MaterialKey { id: material.id, name: material.name.0.clone(), roughness,
+            resistance_only, bits: [members[0].to_bits(), members[1].to_bits(), members[2].to_bits(),
+                members[3].to_bits(), members[4].to_bits(), surface.thermal_absorptance.to_bits(),
+                surface.solar_absorptance.to_bits(), surface.visible_absorptance.to_bits()] });
+    }
+    let mut construction_ids = BTreeSet::new();
+    let mut constructions = Vec::with_capacity(model.constructions.len());
+    for construction in &model.constructions {
+        if !construction_ids.insert(construction.id) { return Err(Error::DuplicateConstruction(construction.id)); }
+        if !construction.is_ordinary_opaque() || construction.has_internal_heat_source()
+            || construction.thermochromic_master.is_some() || construction.air_boundary.is_some()
+            || construction.complex_fenestration.is_some() || construction.window_equivalent_layer.is_some()
+        { return Err(Error::UnsupportedConstruction(construction.id)); }
+        for material in construction.effective_layers() {
+            if !material_ids.contains(material) { return Err(Error::MissingMaterial(*material)); }
+        }
+        constructions.push((construction.id, construction.name.0.clone(), construction.outside_layer,
+            construction.layers.clone(), construction.effective_layers().to_vec()));
+    }
+    let mut surface_ids = BTreeSet::new();
+    let mut used = BTreeSet::new();
+    let mut surfaces = Vec::with_capacity(model.surfaces.len());
+    for surface in &model.surfaces {
+        if !surface_ids.insert(surface.id) { return Err(Error::DuplicateSurface(surface.id)); }
+        if !construction_ids.contains(&surface.construction) { return Err(Error::MissingConstruction(surface.construction)); }
+        if !matches!(surface.outside_boundary_condition, OutsideBoundaryCondition::Outdoors | OutsideBoundaryCondition::Adiabatic)
+        { return Err(Error::UnsupportedBoundary(surface.id)); }
+        used.insert(surface.construction);
+        surfaces.push((surface.id, surface.construction, surface.outside_boundary_condition));
+    }
+    if initialization.constructions.len() != model.constructions.len() { return Err(Error::Association); }
+    let mut public = Vec::with_capacity(initialization.constructions.len());
+    for (index, (row, construction)) in initialization.constructions.iter().zip(&model.constructions).enumerate() {
+        if row.declared_index != index || row.construction_id != construction.id
+            || row.original_material_ids != construction.effective_layers()
+            || row.is_used_ctf != used.contains(&construction.id)
+        { return Err(Error::Association); }
+        public.push(PublicKey { id: row.construction_id, declared_index: row.declared_index,
+            layers: row.original_material_ids.clone(), used: row.is_used_ctf,
+            invoked: row.public_initializer_invoked, entry: row.retry_flags_on_entry,
+            returned: row.retry_flags_on_return,
+            result: row.result.as_ref().map(|value| (value.route, StorageKey::from(&value.storage))).map_err(|value| *value) });
+    }
+    let key = CtfSurfaceGenerationKey { revision: context.producer_revision,
+        timestep_count: model.timestep.number_of_timesteps_per_hour,
+        timestep_bits: context.time_step_zone_hours.to_bits(), initial_flags: context.initial_flags,
+        initial_aggregate: (context.initial_simple_ctf_only, context.initial_max_ctf_terms),
+        dynamic_flags: (context.any_ems_in_model, context.any_construction_overrides),
+        materials, constructions, surfaces, public,
+        aggregate: initialization.aggregate_after_returned_calls,
+        stop: initialization.selected_stop, completed: initialization.selected_declared_loop_completed };
+    Ok(CtfPublicSurfaceGeneration { model, initialization, context, key })
+}
+
+/// History ownership requirements only. No temperature/flux/history counter is
+/// initialized; actual environment and surface lifecycle must produce those.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct CtfSurfaceHistoryContract {
+    /// All four ordinary temperature/flux owners have this fixed capacity.
+    pub fixed_history_slots: usize,
+    /// Source coefficient slots0..NumCTFTerms, including the current coefficient.
+    pub active_coefficient_slots: usize,
+    /// Actual NumCTFTerms; no count is inferred from coefficient tails.
+    pub num_ctf_terms: i32,
+    /// Actual NumHistories; no dt ratio or rounding is substituted.
+    pub num_histories: i32,
+    /// Actual public CTFTimeStep, which may differ from TimeStepZone.
+    pub ctf_time_step_hours: f64,
+    /// Actual zone caller timestep, retained independently.
+    pub time_step_zone_hours: f64,
+    /// Actual public UValue, not reconstructed as1/R.
+    pub u_value_w_per_m2_k: f64,
+    /// Actual selected Init aggregate used by allocation/fast-history branches.
+    pub aggregate: CtfPublicInitAggregate,
+    /// Native1466 master/counter allocation predicate, copied as a requirement.
+    pub master_histories_required: bool,
+    /// Native5332 simple-shift predicate, not an executed history update.
+    pub simple_history_shift_selected: bool,
+}
+
+/// Actual surface binding with borrowed coefficients and no fabricated histories.
+#[derive(Debug)]
+pub struct CtfSurfaceCoefficientBinding<'a> {
+    /// Actual surface identity, not a dense vector index.
+    pub surface_id: SurfaceId,
+    /// Actual selected construction identity.
+    pub construction_id: ConstructionId,
+    /// Original declaration position retained separately from the typed ID.
+    pub declared_construction_index: usize,
+    /// Actual returned source route and original reverse-provider identity.
+    pub route: CtfPublicReturnRoute,
+    /// All twelve arrays/all19 slots plus true metadata, borrowed unchanged.
+    pub coefficients: &'a CtfPublicCoefficientStorage,
+    /// Uninitialized history requirements, not a ready surface state.
+    pub history: CtfSurfaceHistoryContract,
+}
+
+impl<'a> CtfPublicSurfaceGeneration<'a> {
+    /// Full exact key suitable for comparison with another actual generation.
+    #[must_use]
+    pub fn key(&self) -> &CtfSurfaceGenerationKey { &self.key }
+
+    /// Join one actual surface ID through its actual construction ID. This does
+    /// not activate the existing SurfaceCtfState or certify Native lifecycle.
+    pub fn bind_surface(&self, surface_id: SurfaceId) -> Result<CtfSurfaceCoefficientBinding<'a>, CtfSurfaceBindingUnavailable> {
+        use CtfSurfaceBindingUnavailable as Error;
+        if let Some(stop) = self.initialization.selected_stop { return Err(Error::SelectedStop(stop)); }
+        if !self.initialization.selected_declared_loop_completed { return Err(Error::IncompleteDeclaredLoop); }
+        if self.initialization.aggregate_after_returned_calls.returned_constructions != self.initialization.constructions.len()
+            || self.initialization.constructions.iter().any(|value| !value.public_initializer_invoked)
+        { return Err(Error::IncompleteDeclaredLoop); }
+        for value in &self.initialization.constructions {
+            value.result.as_ref().map_err(|reason| Error::PublicOwner(*reason))?;
+            if value.retry_flags_on_return.is_none_or(|flags| flags.errors_found) { return Err(Error::SharedErrors); }
+        }
+        let surface = self.model.surfaces.iter().find(|value| value.id == surface_id).ok_or(Error::MissingSurface(surface_id))?;
+        let row = self.initialization.constructions.iter().find(|value| value.construction_id == surface.construction).ok_or(Error::MissingConstruction(surface.construction))?;
+        if !row.public_initializer_invoked || !row.is_used_ctf { return Err(Error::Association); }
+        let returned = row.result.as_ref().map_err(|value| Error::PublicOwner(*value))?;
+        match returned.route {
+            CtfPublicReturnRoute::UnusedReset | CtfPublicReturnRoute::LoadingErrorReset => return Err(Error::ResetReturn(returned.route)),
+            CtfPublicReturnRoute::MassiveSevereBreak => return Err(Error::SevereReturn),
+            CtfPublicReturnRoute::Reversed { construction_id, declared_index } => {
+                let provider = self.initialization.constructions.get(declared_index)
+                    .filter(|value| declared_index < row.declared_index && value.construction_id == construction_id
+                        && value.is_used_ctf && value.public_initializer_invoked && value.result.is_ok()
+                        && row.original_material_ids.iter().eq(value.original_material_ids.iter().rev()))
+                    .ok_or(Error::ReverseProvider(construction_id))?;
+                if provider.retry_flags_on_return.is_none_or(|value| value.errors_found) { return Err(Error::SharedErrors); }
+            }
+            CtfPublicReturnRoute::AllResistive | CtfPublicReturnRoute::MassiveConverged => {}
+        }
+        if row.retry_flags_on_return.is_none_or(|value| value.errors_found) { return Err(Error::SharedErrors); }
+        let storage = &returned.storage;
+        let terms = usize::try_from(storage.num_ctf_terms).map_err(|_| Error::HistoryShape)?;
+        let aggregate = self.initialization.aggregate_after_returned_calls;
+        if terms >= CTF_COEFFICIENT_SLOTS || storage.num_histories < 1
+            || aggregate.max_ctf_terms < storage.num_ctf_terms
+            || usize::try_from(aggregate.max_ctf_terms).map_err(|_| Error::HistoryShape)? >= CTF_COEFFICIENT_SLOTS
+        { return Err(Error::HistoryShape); }
+        Ok(CtfSurfaceCoefficientBinding { surface_id, construction_id: surface.construction,
+            declared_construction_index: row.declared_index, route: returned.route, coefficients: storage,
+            history: CtfSurfaceHistoryContract { fixed_history_slots: CTF_COEFFICIENT_SLOTS,
+                active_coefficient_slots: terms + 1, num_ctf_terms: storage.num_ctf_terms,
+                num_histories: storage.num_histories, ctf_time_step_hours: storage.ctf_time_step,
+                time_step_zone_hours: self.context.time_step_zone_hours, u_value_w_per_m2_k: storage.u_value,
+                aggregate, master_histories_required: !aggregate.simple_ctf_only || self.context.any_ems_in_model,
+                simple_history_shift_selected: aggregate.simple_ctf_only && !self.context.any_construction_overrides } })
+    }
+}
+
+#[cfg(test)]
+#[path = "ctf_surface_binding_tests.rs"]
+mod tests;

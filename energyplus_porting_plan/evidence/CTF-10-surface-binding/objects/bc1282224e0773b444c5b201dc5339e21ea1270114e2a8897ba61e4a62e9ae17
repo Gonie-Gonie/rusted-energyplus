@@ -1,0 +1,39 @@
+# Standalone public-storage binding application inventory
+
+SOURCE ONLY. Root and Raw have fully accepted immutable surface-binding-prep-01 f1c29124. This inventory adds no executable proposal, arithmetic, reexport, runtime caller or validation stage. Root requested application only after the actual precise10 Original retirement and Source88274 guard complete; this package neither records nor assumes that future condition.
+
+## Exact minimal application
+
+Apply exactly the three accepted rows in manifest.application_files: add ctf_surface_binding.rs, add its contractual test source, and replace heat_balance/mod.rs with the held proposed parent. Both new paths are currently absent. The current parent is exactly the held immutable before bytes. Removing the sole `pub mod ctf_surface_binding;` line from the proposed parent restores current parent bytes. No wildcard replacement or adjacent owner edits are required.
+
+The public path is heat_balance::ctf_surface_binding. Existing public items are CtfSurfaceGenerationContext, CtfSurfaceGenerationKey, CtfSurfaceBindingUnavailable, CtfPublicSurfaceGeneration, capture_public_ctf_surface_generation, CtfSurfaceHistoryContract and CtfSurfaceCoefficientBinding, with generation.key()/bind_surface(). There is no glob pub-use or root reexport. The two new bodies and parent are copied byte-exact from the accepted package; later Root formatting has its own exact correspondence duty.
+
+All three current producer owner dependencies (public initialization, fixed19 public storage and construction cache) match their immutable accepted binding descriptors and actual final02 Source14 inventory7b1dbbec. The three application before conditions are separately recorded: two absences and one exact current parent identity. No canonical file has been added or changed by this preparation.
+
+## Milestone wording for Root after actual application
+
+Accepted standalone public-storage binding is available as a public module. It borrows the actual ordered public owner and actual typed surface/construction identities, retains all12x19 coefficient bits/counts/timestep/U, and exposes an exact complete generation key plus an uninitialized history contract. It has no ordinary runtime, cache, environment/history, weather, surface solver or reporting caller. Its seven contractual tests are source proposals until Root executes them. No cache-invalidation, surface-consumer or whole CTF10 gate PASS follows from source acceptance or application.
+
+This paragraph is prospective documentation only: it does not claim application, formatting, test execution or quality success happened. CTF10 unit/integration/production gates remain pending. Current selected public-storage evidence is a separate milestone and is not replayed or numerically inspected here.
+
+## Remaining actual handoff gaps
+
+1. construction_cache.rs103-222 produces the selected public prefix once; 293-296 later moves it into state_shell.rs31-32. No generation key is captured between those operations. initialization.rs100-103 creates a token from the same fresh legacy hash then compares it back to itself. This is not an invalidation test across two input generations.
+2. construction_cache.rs541-582 hashes old R/C, old source rows and selected02 arrays. It does not cover full actual10 12x19/flags/routes/counts/global aggregate or complete material/caller/revision dependencies. The new structured key does cover those selected generation operands but is not yet retained at the actual producer or compared during rebuild/reuse.
+3. initialization.rs117-140 still selects legacy EIO rows, selected02 all-resistive or steady fallback. It does not bind state.construction_ctf10_public_initialization to a SurfaceId. SurfaceCtfState285-316 lacks fixed19/current-vs-past/global-history/count/timestep/U/master/counter ownership; advancing ctf.rs766-810 pushes local vectors every zone step. Replacing that initializer alone would activate massive coefficients against unproved history semantics.
+4. Native HBSM1455-1480 allocates four fixed19 arrays and optional masters/counters using the global SimpleCTFOnly/EMS predicate. BeginEnvrn2329-2357 uses actual23.0/zero, independent of user air seed20. Its2381-2398 outer term loop sets each outside flux before reading then-current outside flux slot2 for inside flux; uniform flux fill changes term1. Master initialization2413-2434 and actual per-surface outside environment values are still prerequisites.
+5. Native simple shifting5332-5355 uses GLOBAL MaxCTFTerms+1/current1-to-past2, not a local coefficient-vector length. General5418-5493 uses actual CurrNumHist/NumHistories, SumTime and CTFTimeStep, with master boundaries or exact interpolation. Initial counts/dt must be copied from actual public storage; no caller/CTF dt equality, integer ratio, default history or Native result may be substituted.
+
+## Next bounded source unit
+
+Prepare producer-owned selected-generation key retention and explicit comparison across actual generations, without routing any new coefficients into SurfaceCtfState. Capture the accepted transport on the same model/public owner immediately after finish_declared_loop and before take_public_initialization. Retain an owned clone of key() plus actual association metadata, then move it with the actual public owner. Do not store a self-referential borrowed generation inside the cache.
+
+Its producer context must come from the real generation: actual TimeStepZone and incoming flags/aggregates already exist at cache build; actual EMS/override scope and producer revision identity need an explicit owned input contract. Current ordinary APIs do not supply the revision token. An explicit opt-in context parameter/typed unavailable route is required rather than inventing zero, copying a Native token or retroactively blessing unrelated objects. Keep the legacy hash and legacy/EIO fallback semantics separate while selected full-key retention is added.
+
+Focused later-executable contract tests should construct two genuine selected generations and change one actual dependency at a time: Regular stored resistance/individual layer properties preserving aggregate R/C; caller timestep; original material/construction order; surface construction ID; one full19 tail/signedzero bit; route/provider/flags/global aggregate; producer revision. Compare retained full keys, require stale selected binding unavailable, and cover stop/missing/unsupported owner paths. Such tests establish candidate ownership/invalidation behavior, not Native mathematical equivalence. There is no new proof or QA stage.
+
+A subsequent separately reviewed fixed19 environment/history owner can copy exact binding coefficients and implement the Native initialization/advance order using actual environment operands. Raw separately owns normal whole-engine lifecycle observation design ef2f5606. Genuine same-input Native observations and frozen consumer profiles must precede activation; neither this inventory nor the key-only next unit seeds histories, activates massive surfaces or resolves reports/AnyInternal/fatal broader gates.
+
+## Source custody
+
+The manifest binds accepted source/diffs, current before identities, the three producer owners, bounded current call sites and pinned Native consumer ranges. Only source/metadata bytes, exact diffs, absence checks and hashes were read. No target modules or source helpers were imported/executed; no Cargo, formatter, engine, recorder, Git, binary, scientific/weather payload or canonical mutation occurred. Header authored public/storage and binding; accepted Root/Raw peer reviews remain explicit and are not independent formula certification.

@@ -11820,6 +11820,11 @@
         "path": "energyplus_porting_plan/evidence/CTF-10-retention/summary.json",
         "sha256": "86212d2d177c6142311b99676bf87b6f8978aa0286d485b5112b082994ebce4f",
         "size_bytes": 2608
+      },
+      "actual_standalone_surface_binding": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/summary.json",
+        "sha256": "3b877b647c21ce4856258114e60515271c0d161ac2715dc77cb14610fa973a59",
+        "size_bytes": 2599
       }
     },
     {

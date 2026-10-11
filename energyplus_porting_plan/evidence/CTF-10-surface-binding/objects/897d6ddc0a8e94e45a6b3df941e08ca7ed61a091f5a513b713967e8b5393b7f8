@@ -1,0 +1,532 @@
+--- .runtime/porting/CTF-10/surface-binding-applied-01/ctf_surface_binding_tests.rs
++++ .runtime/porting/CTF-10/surface-binding-final-source-01/ctf_surface_binding_tests.rs
+@@ -2,87 +2,184 @@
+ use crate::heat_balance::ctf_first_assembly_owner::initialize_construction_ctf_first_assembly;
+ use crate::heat_balance::ctf_initial_owner::initialize_construction_ctf_initial;
+ use crate::heat_balance::ctf_retry_initialization::initialize_construction_ctf_retry;
+-use crate::heat_balance::surface_manager::ctf_all_resistive::{ConstructionCtfAllResistive, generate_all_resistive_ctf};
++use crate::heat_balance::surface_manager::ctf_all_resistive::{
++    ConstructionCtfAllResistive, generate_all_resistive_ctf,
++};
+ use crate::heat_balance::surface_manager::ctf_caller_stability::CtfCallerDiagnosticNames;
+-use crate::heat_balance::surface_manager::ctf_layer_preprocessing::{ConstructionCtfLayerPreprocessing, CtfLayerContext, material_layer_inputs, preprocess_ctf_layers};
+-use ep_model::{AutoOrNumber, Construction, ConstructionKind, Material, NoMassMaterial,
+-    NormalizedName, OpaqueSurfaceProperties, SpaceId, SunExposure, Surface, SurfaceType, WindExposure, ZoneId};
++use crate::heat_balance::surface_manager::ctf_layer_preprocessing::{
++    ConstructionCtfLayerPreprocessing, CtfLayerContext, material_layer_inputs,
++    preprocess_ctf_layers,
++};
++use ep_model::{
++    AutoOrNumber, Construction, ConstructionKind, Material, NoMassMaterial, NormalizedName,
++    OpaqueSurfaceProperties, SpaceId, SunExposure, Surface, SurfaceType, WindExposure, ZoneId,
++};
+ 
+ type TestResult<T = ()> = Result<T, String>;
+ 
+ fn context() -> CtfSurfaceGenerationContext {
+-    CtfSurfaceGenerationContext { producer_revision: [1; 32], time_step_zone_hours: 0.25,
+-        initial_flags: CtfCallerSharedFlags { errors_found: false, do_ctf_error_report: false },
+-        initial_simple_ctf_only: true, initial_max_ctf_terms: 0,
+-        any_ems_in_model: false, any_construction_overrides: false }
++    CtfSurfaceGenerationContext {
++        producer_revision: [1; 32],
++        time_step_zone_hours: 0.25,
++        initial_flags: CtfCallerSharedFlags {
++            errors_found: false,
++            do_ctf_error_report: false,
++        },
++        initial_simple_ctf_only: true,
++        initial_max_ctf_terms: 0,
++        any_ems_in_model: false,
++        any_construction_overrides: false,
++    }
+ }
+ 
+ fn construction(id: u32, layers: &[u32]) -> Construction {
+-    Construction { id: ConstructionId(id), name: NormalizedName(format!("C{id}")),
+-        kind: ConstructionKind::Opaque, outside_layer: layers.first().copied().map(MaterialId),
+-        layers: layers.iter().copied().map(MaterialId).collect(), thermochromic_master: None,
+-        ground_factor: None, air_boundary: None, complex_fenestration: None,
+-        window_equivalent_layer: None, internal_heat_source: None }
++    Construction {
++        id: ConstructionId(id),
++        name: NormalizedName(format!("C{id}")),
++        kind: ConstructionKind::Opaque,
++        outside_layer: layers.first().copied().map(MaterialId),
++        layers: layers.iter().copied().map(MaterialId).collect(),
++        thermochromic_master: None,
++        ground_factor: None,
++        air_boundary: None,
++        complex_fenestration: None,
++        window_equivalent_layer: None,
++        internal_heat_source: None,
++    }
+ }
+ 
+ fn surface(id: u32, construction: u32) -> Surface {
+-    Surface { id: SurfaceId(id), name: NormalizedName(format!("S{id}")),
+-        surface_type: SurfaceType::Wall, construction: ConstructionId(construction),
+-        zone: ZoneId(9), space: SpaceId(3), outside_boundary_condition: OutsideBoundaryCondition::Outdoors,
+-        outside_boundary_condition_object: None, sun_exposure: SunExposure::SunExposed,
+-        wind_exposure: WindExposure::WindExposed, view_factor_to_ground: AutoOrNumber::AutoCalculate,
+-        vertices: Vec::new(), computed_geometry: None }
++    Surface {
++        id: SurfaceId(id),
++        name: NormalizedName(format!("S{id}")),
++        surface_type: SurfaceType::Wall,
++        construction: ConstructionId(construction),
++        zone: ZoneId(9),
++        space: SpaceId(3),
++        outside_boundary_condition: OutsideBoundaryCondition::Outdoors,
++        outside_boundary_condition_object: None,
++        sun_exposure: SunExposure::SunExposed,
++        wind_exposure: WindExposure::WindExposed,
++        view_factor_to_ground: AutoOrNumber::AutoCalculate,
++        vertices: Vec::new(),
++        computed_geometry: None,
++    }
+ }
+ 
+ fn fixture() -> TestResult<(TypedModel, OrderedCtfPublicInitialization)> {
+-    let materials = [2_u32, 91].into_iter().map(|id| Material {
+-        id: MaterialId(id), name: NormalizedName(format!("M{id}")),
+-        definition: MaterialDefinition::NoMass(NoMassMaterial { roughness: MaterialSurfaceRoughness::Smooth,
+-            thermal_resistance_m2_k_per_w: 0.25, surface: OpaqueSurfaceProperties::default() }),
+-    }).collect();
+-    let model = TypedModel { timestep: ep_model::TimestepConfig { number_of_timesteps_per_hour: 4 },
+-        materials, constructions: vec![construction(40, &[2, 91]), construction(8, &[91, 2])],
+-        surfaces: vec![surface(500, 8), surface(3, 40)], ..TypedModel::default() };
++    let materials = [2_u32, 91]
++        .into_iter()
++        .map(|id| Material {
++            id: MaterialId(id),
++            name: NormalizedName(format!("M{id}")),
++            definition: MaterialDefinition::NoMass(NoMassMaterial {
++                roughness: MaterialSurfaceRoughness::Smooth,
++                thermal_resistance_m2_k_per_w: 0.25,
++                surface: OpaqueSurfaceProperties::default(),
++            }),
++        })
++        .collect();
++    let model = TypedModel {
++        timestep: ep_model::TimestepConfig {
++            number_of_timesteps_per_hour: 4,
++        },
++        materials,
++        constructions: vec![construction(40, &[2, 91]), construction(8, &[91, 2])],
++        surfaces: vec![surface(500, 8), surface(3, 40)],
++        ..TypedModel::default()
++    };
+     let used = BTreeSet::from([40_u32, 8]);
+     let mut flags = context().initial_flags;
+     let mut public = OrderedCtfPublicInitialization::begin(true, 0);
+     for (index, current) in model.constructions.iter().enumerate() {
+-        let actual_materials = current.effective_layers().iter().map(|id| {
+-            model.materials.iter().find(|value| value.id == *id).ok_or_else(|| format!("missing {id:?}"))
+-        }).collect::<TestResult<Vec<_>>>()?;
+-        let inputs = material_layer_inputs(&actual_materials).map_err(|value| format!("inputs {value:?}"))?;
+-        let layer_context = CtfLayerContext { is_used_ctf: true, errors_found: flags.errors_found,
+-            source_sink_present: false, solution_dimensions: 1 };
+-        let phases = preprocess_ctf_layers(&inputs, layer_context).map_err(|value| format!("phases {value:?}"))?;
++        let actual_materials = current
++            .effective_layers()
++            .iter()
++            .map(|id| {
++                model
++                    .materials
++                    .iter()
++                    .find(|value| value.id == *id)
++                    .ok_or_else(|| format!("missing {id:?}"))
++            })
++            .collect::<TestResult<Vec<_>>>()?;
++        let inputs = material_layer_inputs(&actual_materials)
++            .map_err(|value| format!("inputs {value:?}"))?;
++        let layer_context = CtfLayerContext {
++            is_used_ctf: true,
++            errors_found: flags.errors_found,
++            source_sink_present: false,
++            solution_dimensions: 1,
++        };
++        let phases = preprocess_ctf_layers(&inputs, layer_context)
++            .map_err(|value| format!("phases {value:?}"))?;
+         flags.errors_found = phases.errors_found;
+-        let all_resistive = ConstructionCtfAllResistive { construction_id: current.id,
+-            result: generate_all_resistive_ctf(&phases, context().time_step_zone_hours) };
+-        let preprocessing = ConstructionCtfLayerPreprocessing { construction_id: current.id,
+-            is_used_ctf: true, result: Ok(phases) };
+-        let initial = initialize_construction_ctf_initial(current, &model.constructions[..index], &used,
+-            &preprocessing, layer_context, context().time_step_zone_hours);
++        let all_resistive = ConstructionCtfAllResistive {
++            construction_id: current.id,
++            result: generate_all_resistive_ctf(&phases, context().time_step_zone_hours),
++        };
++        let preprocessing = ConstructionCtfLayerPreprocessing {
++            construction_id: current.id,
++            is_used_ctf: true,
++            result: Ok(phases),
++        };
++        let initial = initialize_construction_ctf_initial(
++            current,
++            &model.constructions[..index],
++            &used,
++            &preprocessing,
++            layer_context,
++            context().time_step_zone_hours,
++        );
+         let first = initialize_construction_ctf_first_assembly(&initial, &preprocessing);
+-        let names = actual_materials.iter().map(|value| value.name.0.as_str()).collect::<Vec<_>>();
+-        let retry = initialize_construction_ctf_retry(first, flags, CtfCallerDiagnosticNames {
+-            construction_name: current.name.0.as_str(), original_tot_layers: i32::try_from(names.len()).map_err(|value| value.to_string())?,
+-            original_layer_material_names: &names });
++        let names = actual_materials
++            .iter()
++            .map(|value| value.name.0.as_str())
++            .collect::<Vec<_>>();
++        let retry = initialize_construction_ctf_retry(
++            first,
++            flags,
++            CtfCallerDiagnosticNames {
++                construction_name: current.name.0.as_str(),
++                original_tot_layers: i32::try_from(names.len())
++                    .map_err(|value| value.to_string())?,
++                original_layer_material_names: &names,
++            },
++        );
+         flags = retry.flags_on_return;
+-        public.record_ordinary(index, current, &preprocessing, Some(&initial), &all_resistive, &retry);
++        public.record_ordinary(
++            index,
++            current,
++            &preprocessing,
++            Some(&initial),
++            &all_resistive,
++            &retry,
++        );
+     }
+     public.finish_declared_loop(model.constructions.len());
+     Ok((model, public))
+ }
+ 
+-fn capture<'a>(model: &'a TypedModel, public: &'a OrderedCtfPublicInitialization) -> TestResult<CtfPublicSurfaceGeneration<'a>> {
+-    capture_public_ctf_surface_generation(model, public, context()).map_err(|value| format!("capture {value:?}"))
++fn capture<'a>(
++    model: &'a TypedModel,
++    public: &'a OrderedCtfPublicInitialization,
++) -> TestResult<CtfPublicSurfaceGeneration<'a>> {
++    capture_public_ctf_surface_generation(model, public, context())
++        .map_err(|value| format!("capture {value:?}"))
+ }
+ 
+ #[test]
+ fn actual_non_dense_surface_and_construction_ids_select_the_borrowed_owner() -> TestResult {
+     let (model, public) = fixture()?;
+     let generation = capture(&model, &public)?;
+-    let bound = generation.bind_surface(SurfaceId(500)).map_err(|value| format!("bind {value:?}"))?;
+-    let actual = &public.constructions[1].result.as_ref().map_err(|value| format!("return {value:?}"))?.storage;
++    let bound = generation
++        .bind_surface(SurfaceId(500))
++        .map_err(|value| format!("bind {value:?}"))?;
++    let actual = &public.constructions[1]
++        .result
++        .as_ref()
++        .map_err(|value| format!("return {value:?}"))?
++        .storage;
+     assert_eq!(bound.construction_id, ConstructionId(8));
+     assert_eq!(bound.declared_construction_index, 1);
+     assert!(std::ptr::eq(bound.coefficients, actual));
+@@ -99,22 +196,48 @@
+     let before = capture(&model, &public)?.key().clone();
+     for selected in 0..12 {
+         let mut changed = public.clone();
+-        let storage = &mut changed.constructions[1].result.as_mut().map_err(|value| format!("return {value:?}"))?.storage;
+-        let mut arrays = [&mut storage.outside, &mut storage.cross, &mut storage.inside, &mut storage.flux,
+-            &mut storage.source_in, &mut storage.source_out, &mut storage.temperature_source_out,
+-            &mut storage.temperature_source_in, &mut storage.temperature_source_q,
+-            &mut storage.temperature_user_out, &mut storage.temperature_user_in, &mut storage.temperature_user_source];
++        let storage = &mut changed.constructions[1]
++            .result
++            .as_mut()
++            .map_err(|value| format!("return {value:?}"))?
++            .storage;
++        let mut arrays = [
++            &mut storage.outside,
++            &mut storage.cross,
++            &mut storage.inside,
++            &mut storage.flux,
++            &mut storage.source_in,
++            &mut storage.source_out,
++            &mut storage.temperature_source_out,
++            &mut storage.temperature_source_in,
++            &mut storage.temperature_source_q,
++            &mut storage.temperature_user_out,
++            &mut storage.temperature_user_in,
++            &mut storage.temperature_user_source,
++        ];
+         arrays[selected][18] = -0.0;
+         assert_ne!(before, *capture(&model, &changed)?.key());
+     }
+-    let storage = &mut public.constructions[1].result.as_mut().map_err(|value| format!("return {value:?}"))?.storage;
++    let storage = &mut public.constructions[1]
++        .result
++        .as_mut()
++        .map_err(|value| format!("return {value:?}"))?
++        .storage;
+     storage.temperature_user_source[18] = -0.0;
+     storage.outside[18] = f64::from_bits(0x7ff8_0000_0000_0042);
+     let generation = capture(&model, &public)?;
+     assert_ne!(before, *generation.key());
+-    let bound = generation.bind_surface(SurfaceId(500)).map_err(|value| format!("bind {value:?}"))?;
+-    assert_eq!(bound.coefficients.temperature_user_source[18].to_bits(), (-0.0_f64).to_bits());
+-    assert_eq!(bound.coefficients.outside[18].to_bits(), 0x7ff8_0000_0000_0042);
++    let bound = generation
++        .bind_surface(SurfaceId(500))
++        .map_err(|value| format!("bind {value:?}"))?;
++    assert_eq!(
++        bound.coefficients.temperature_user_source[18].to_bits(),
++        (-0.0_f64).to_bits()
++    );
++    assert_eq!(
++        bound.coefficients.outside[18].to_bits(),
++        0x7ff8_0000_0000_0042
++    );
+     assert_eq!(generation.key(), capture(&model, &public)?.key());
+     Ok(())
+ }
+@@ -125,13 +248,19 @@
+     let original = capture(&model, &public)?.key().clone();
+     // Contract-only input mutation; capture never regenerates or authenticates coefficients.
+     model.materials[0].definition = MaterialDefinition::Regular(ep_model::RegularMaterial {
+-        roughness: MaterialSurfaceRoughness::Smooth, thickness_m: 0.2,
+-        conductivity_w_per_m_k: 0.8, density_kg_per_m3: 800.0, specific_heat_j_per_kg_k: 900.0,
+-        thermal_resistance_m2_k_per_w: 0.25, surface: OpaqueSurfaceProperties::default() });
++        roughness: MaterialSurfaceRoughness::Smooth,
++        thickness_m: 0.2,
++        conductivity_w_per_m_k: 0.8,
++        density_kg_per_m3: 800.0,
++        specific_heat_j_per_kg_k: 900.0,
++        thermal_resistance_m2_k_per_w: 0.25,
++        surface: OpaqueSurfaceProperties::default(),
++    });
+     let regular = capture(&model, &public)?.key().clone();
+     assert_ne!(original, regular);
+     if let MaterialDefinition::Regular(value) = &mut model.materials[0].definition {
+-        value.thermal_resistance_m2_k_per_w = f64::from_bits(value.thermal_resistance_m2_k_per_w.to_bits() + 1);
++        value.thermal_resistance_m2_k_per_w =
++            f64::from_bits(value.thermal_resistance_m2_k_per_w.to_bits() + 1);
+     }
+     assert_ne!(regular, *capture(&model, &public)?.key());
+     let before_order = capture(&model, &public)?.key().clone();
+@@ -140,12 +269,33 @@
+     let before_count = capture(&model, &public)?.key().clone();
+     model.timestep.number_of_timesteps_per_hour = 6;
+     assert_ne!(before_count, *capture(&model, &public)?.key());
+-    for changed in [CtfSurfaceGenerationContext { producer_revision: [2; 32], ..context() },
+-        CtfSurfaceGenerationContext { time_step_zone_hours: -0.0, ..context() },
+-        CtfSurfaceGenerationContext { initial_max_ctf_terms: 2, ..context() },
+-        CtfSurfaceGenerationContext { initial_flags: CtfCallerSharedFlags { errors_found: false, do_ctf_error_report: true }, ..context() }] {
+-        assert_ne!(capture(&model, &public)?.key(), capture_public_ctf_surface_generation(&model, &public, changed)
+-            .map_err(|value| format!("changed {value:?}"))?.key());
++    for changed in [
++        CtfSurfaceGenerationContext {
++            producer_revision: [2; 32],
++            ..context()
++        },
++        CtfSurfaceGenerationContext {
++            time_step_zone_hours: -0.0,
++            ..context()
++        },
++        CtfSurfaceGenerationContext {
++            initial_max_ctf_terms: 2,
++            ..context()
++        },
++        CtfSurfaceGenerationContext {
++            initial_flags: CtfCallerSharedFlags {
++                errors_found: false,
++                do_ctf_error_report: true,
++            },
++            ..context()
++        },
++    ] {
++        assert_ne!(
++            capture(&model, &public)?.key(),
++            capture_public_ctf_surface_generation(&model, &public, changed)
++                .map_err(|value| format!("changed {value:?}"))?
++                .key()
++        );
+     }
+     Ok(())
+ }
+@@ -153,12 +303,33 @@
+ #[test]
+ fn original_reverse_provider_custody_is_checked_without_numeric_reselection() -> TestResult {
+     let (model, mut public) = fixture()?;
+-    public.constructions[1].result.as_mut().map_err(|value| format!("return {value:?}"))?.route =
+-        CtfPublicReturnRoute::Reversed { construction_id: ConstructionId(40), declared_index: 0 };
+-    assert!(capture(&model, &public)?.bind_surface(SurfaceId(500)).is_ok());
+-    public.constructions[1].result.as_mut().map_err(|value| format!("return {value:?}"))?.route =
+-        CtfPublicReturnRoute::Reversed { construction_id: ConstructionId(40), declared_index: 1 };
+-    assert_eq!(capture(&model, &public)?.bind_surface(SurfaceId(500)).err(), Some(CtfSurfaceBindingUnavailable::ReverseProvider(ConstructionId(40))));
++    public.constructions[1]
++        .result
++        .as_mut()
++        .map_err(|value| format!("return {value:?}"))?
++        .route = CtfPublicReturnRoute::Reversed {
++        construction_id: ConstructionId(40),
++        declared_index: 0,
++    };
++    assert!(
++        capture(&model, &public)?
++            .bind_surface(SurfaceId(500))
++            .is_ok()
++    );
++    public.constructions[1]
++        .result
++        .as_mut()
++        .map_err(|value| format!("return {value:?}"))?
++        .route = CtfPublicReturnRoute::Reversed {
++        construction_id: ConstructionId(40),
++        declared_index: 1,
++    };
++    assert_eq!(
++        capture(&model, &public)?.bind_surface(SurfaceId(500)).err(),
++        Some(CtfSurfaceBindingUnavailable::ReverseProvider(
++            ConstructionId(40)
++        ))
++    );
+     Ok(())
+ }
+ 
+@@ -167,14 +338,28 @@
+     let (model, mut public) = fixture()?;
+     public.aggregate_after_returned_calls.simple_ctf_only = false;
+     public.aggregate_after_returned_calls.max_ctf_terms = 18;
+-    let storage = &mut public.constructions[1].result.as_mut().map_err(|value| format!("return {value:?}"))?.storage;
+-    storage.num_ctf_terms = 18; storage.num_histories = 3; storage.ctf_time_step = 0.75;
++    let storage = &mut public.constructions[1]
++        .result
++        .as_mut()
++        .map_err(|value| format!("return {value:?}"))?
++        .storage;
++    storage.num_ctf_terms = 18;
++    storage.num_histories = 3;
++    storage.ctf_time_step = 0.75;
+     let generation = capture(&model, &public)?;
+-    let bound = generation.bind_surface(SurfaceId(500)).map_err(|value| format!("bind {value:?}"))?;
++    let bound = generation
++        .bind_surface(SurfaceId(500))
++        .map_err(|value| format!("bind {value:?}"))?;
+     assert_eq!(bound.history.active_coefficient_slots, 19);
+     assert_eq!(bound.history.num_histories, 3);
+-    assert_eq!(bound.history.ctf_time_step_hours.to_bits(), 0.75_f64.to_bits());
+-    assert_eq!(bound.history.time_step_zone_hours.to_bits(), 0.25_f64.to_bits());
++    assert_eq!(
++        bound.history.ctf_time_step_hours.to_bits(),
++        0.75_f64.to_bits()
++    );
++    assert_eq!(
++        bound.history.time_step_zone_hours.to_bits(),
++        0.25_f64.to_bits()
++    );
+     assert!(bound.history.master_histories_required);
+     assert!(!bound.history.simple_history_shift_selected);
+     Ok(())
+@@ -184,21 +369,65 @@
+ fn incomplete_error_severe_capacity_and_unsupported_paths_never_bind() -> TestResult {
+     let (mut model, mut public) = fixture()?;
+     public.selected_declared_loop_completed = false;
+-    assert_eq!(capture(&model, &public)?.bind_surface(SurfaceId(500)).err(), Some(CtfSurfaceBindingUnavailable::IncompleteDeclaredLoop));
++    assert_eq!(
++        capture(&model, &public)?.bind_surface(SurfaceId(500)).err(),
++        Some(CtfSurfaceBindingUnavailable::IncompleteDeclaredLoop)
++    );
+     public.selected_declared_loop_completed = true;
+-    public.constructions[0].retry_flags_on_return.as_mut().ok_or("missing flags")?.errors_found = true;
+-    assert_eq!(capture(&model, &public)?.bind_surface(SurfaceId(500)).err(), Some(CtfSurfaceBindingUnavailable::SharedErrors));
+-    public.constructions[0].retry_flags_on_return.as_mut().ok_or("missing flags")?.errors_found = false;
+-    public.constructions[1].result.as_mut().map_err(|value| format!("return {value:?}"))?.route = CtfPublicReturnRoute::MassiveSevereBreak;
+-    assert_eq!(capture(&model, &public)?.bind_surface(SurfaceId(500)).err(), Some(CtfSurfaceBindingUnavailable::SevereReturn));
+-    public.constructions[1].result.as_mut().map_err(|value| format!("return {value:?}"))?.route = CtfPublicReturnRoute::AllResistive;
+-    public.constructions[1].result.as_mut().map_err(|value| format!("return {value:?}"))?.storage.num_ctf_terms = 19;
+-    assert_eq!(capture(&model, &public)?.bind_surface(SurfaceId(500)).err(), Some(CtfSurfaceBindingUnavailable::HistoryShape));
++    public.constructions[0]
++        .retry_flags_on_return
++        .as_mut()
++        .ok_or("missing flags")?
++        .errors_found = true;
++    assert_eq!(
++        capture(&model, &public)?.bind_surface(SurfaceId(500)).err(),
++        Some(CtfSurfaceBindingUnavailable::SharedErrors)
++    );
++    public.constructions[0]
++        .retry_flags_on_return
++        .as_mut()
++        .ok_or("missing flags")?
++        .errors_found = false;
++    public.constructions[1]
++        .result
++        .as_mut()
++        .map_err(|value| format!("return {value:?}"))?
++        .route = CtfPublicReturnRoute::MassiveSevereBreak;
++    assert_eq!(
++        capture(&model, &public)?.bind_surface(SurfaceId(500)).err(),
++        Some(CtfSurfaceBindingUnavailable::SevereReturn)
++    );
++    public.constructions[1]
++        .result
++        .as_mut()
++        .map_err(|value| format!("return {value:?}"))?
++        .route = CtfPublicReturnRoute::AllResistive;
++    public.constructions[1]
++        .result
++        .as_mut()
++        .map_err(|value| format!("return {value:?}"))?
++        .storage
++        .num_ctf_terms = 19;
++    assert_eq!(
++        capture(&model, &public)?.bind_surface(SurfaceId(500)).err(),
++        Some(CtfSurfaceBindingUnavailable::HistoryShape)
++    );
+     model.surfaces[0].outside_boundary_condition = OutsideBoundaryCondition::Ground;
+-    assert_eq!(capture_public_ctf_surface_generation(&model, &public, context()).err(), Some(CtfSurfaceBindingUnavailable::UnsupportedBoundary(SurfaceId(500))));
++    assert_eq!(
++        capture_public_ctf_surface_generation(&model, &public, context()).err(),
++        Some(CtfSurfaceBindingUnavailable::UnsupportedBoundary(
++            SurfaceId(500)
++        ))
++    );
+     model.surfaces[0].outside_boundary_condition = OutsideBoundaryCondition::Outdoors;
+-    let dynamic = CtfSurfaceGenerationContext { any_construction_overrides: true, ..context() };
+-    assert_eq!(capture_public_ctf_surface_generation(&model, &public, dynamic).err(), Some(CtfSurfaceBindingUnavailable::DynamicControls));
++    let dynamic = CtfSurfaceGenerationContext {
++        any_construction_overrides: true,
++        ..context()
++    };
++    assert_eq!(
++        capture_public_ctf_surface_generation(&model, &public, dynamic).err(),
++        Some(CtfSurfaceBindingUnavailable::DynamicControls)
++    );
+     Ok(())
+ }
+ 
+@@ -206,9 +435,17 @@
+ fn duplicate_ids_and_changed_original_association_are_explicit_errors() -> TestResult {
+     let (mut model, mut public) = fixture()?;
+     model.surfaces.push(model.surfaces[0].clone());
+-    assert_eq!(capture_public_ctf_surface_generation(&model, &public, context()).err(), Some(CtfSurfaceBindingUnavailable::DuplicateSurface(SurfaceId(500))));
++    assert_eq!(
++        capture_public_ctf_surface_generation(&model, &public, context()).err(),
++        Some(CtfSurfaceBindingUnavailable::DuplicateSurface(SurfaceId(
++            500
++        )))
++    );
+     model.surfaces.pop();
+     public.constructions[1].original_material_ids.reverse();
+-    assert_eq!(capture_public_ctf_surface_generation(&model, &public, context()).err(), Some(CtfSurfaceBindingUnavailable::Association));
+-    Ok(())
+-}
++    assert_eq!(
++        capture_public_ctf_surface_generation(&model, &public, context()).err(),
++        Some(CtfSurfaceBindingUnavailable::Association)
++    );
++    Ok(())
++}

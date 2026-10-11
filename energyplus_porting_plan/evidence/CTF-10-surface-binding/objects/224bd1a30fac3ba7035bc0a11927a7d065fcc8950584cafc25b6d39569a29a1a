@@ -1,0 +1,11 @@
+--- .runtime/porting/CTF-10/surface-binding-test-mut-repair-prep-01/before.rs
++++ .runtime/porting/CTF-10/surface-binding-test-mut-repair-prep-01/new.rs
+@@ -201,7 +201,7 @@
+             .as_mut()
+             .map_err(|value| format!("return {value:?}"))?
+             .storage;
+-        let mut arrays = [
++        let arrays = [
+             &mut storage.outside,
+             &mut storage.cross,
+             &mut storage.inside,

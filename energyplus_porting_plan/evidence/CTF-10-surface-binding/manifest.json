@@ -1,0 +1,608 @@
+{
+  "schema": "ctf10-standalone-surface-binding-selected-evidence.v1",
+  "created_utc": "2026-10-11T00:28:22.768394+00:00",
+  "selected_files": [
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-application-prep-01/manifest.json",
+        "sha256": "13643321a08f863f6147762464c0b48543c6ec3d962f4cc4197a0e63aba917d6",
+        "size_bytes": 13174
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/13643321a08f863f6147762464c0b48543c6ec3d962f4cc4197a0e63aba917d6",
+        "sha256": "13643321a08f863f6147762464c0b48543c6ec3d962f4cc4197a0e63aba917d6",
+        "size_bytes": 13174
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-application-prep-01/README.md",
+        "sha256": "bc1282224e0773b444c5b201dc5339e21ea1270114e2a8897ba61e4a62e9ae17",
+        "size_bytes": 7664
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/bc1282224e0773b444c5b201dc5339e21ea1270114e2a8897ba61e4a62e9ae17",
+        "sha256": "bc1282224e0773b444c5b201dc5339e21ea1270114e2a8897ba61e4a62e9ae17",
+        "size_bytes": 7664
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-applied-01/ctf_surface_binding.rs",
+        "sha256": "ddc34553f04ccb0376b62568fe82b4b5da5024172326c1f563e7a7a20db32ee9",
+        "size_bytes": 19172
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/ddc34553f04ccb0376b62568fe82b4b5da5024172326c1f563e7a7a20db32ee9",
+        "sha256": "ddc34553f04ccb0376b62568fe82b4b5da5024172326c1f563e7a7a20db32ee9",
+        "size_bytes": 19172
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-applied-01/ctf_surface_binding_tests.rs",
+        "sha256": "2f5b483188bd4d6cbde6c23e5ae22dca01f48c4dc1c79adb34f814733f9551e8",
+        "size_bytes": 14089
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/2f5b483188bd4d6cbde6c23e5ae22dca01f48c4dc1c79adb34f814733f9551e8",
+        "sha256": "2f5b483188bd4d6cbde6c23e5ae22dca01f48c4dc1c79adb34f814733f9551e8",
+        "size_bytes": 14089
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-applied-01/manifest.json",
+        "sha256": "840a0270788408d43f2a66c383de815945e62ae91b0aea8fa223e815fd53b76a",
+        "size_bytes": 2696
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/840a0270788408d43f2a66c383de815945e62ae91b0aea8fa223e815fd53b76a",
+        "sha256": "840a0270788408d43f2a66c383de815945e62ae91b0aea8fa223e815fd53b76a",
+        "size_bytes": 2696
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-applied-01/mod.rs",
+        "sha256": "d2cc5e60eadbaeb07242822ff5e96bea9d57546a06a29f5f11704d93e7e56672",
+        "size_bytes": 1785
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/d2cc5e60eadbaeb07242822ff5e96bea9d57546a06a29f5f11704d93e7e56672",
+        "sha256": "d2cc5e60eadbaeb07242822ff5e96bea9d57546a06a29f5f11704d93e7e56672",
+        "size_bytes": 1785
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-clippy-command-01/receipt.json",
+        "sha256": "5d578302e5537ccea35a1a4ba8bc74980722634fcb9ead6c9660b2e275fe7fe6",
+        "size_bytes": 3223
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/5d578302e5537ccea35a1a4ba8bc74980722634fcb9ead6c9660b2e275fe7fe6",
+        "sha256": "5d578302e5537ccea35a1a4ba8bc74980722634fcb9ead6c9660b2e275fe7fe6",
+        "size_bytes": 3223
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-clippy-command-01/stderr.log",
+        "sha256": "98bb88214fb952c1ff6c4f5a29902d97fc06d0c21d57e7ba934c5f85a76f6471",
+        "size_bytes": 752
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/98bb88214fb952c1ff6c4f5a29902d97fc06d0c21d57e7ba934c5f85a76f6471",
+        "sha256": "98bb88214fb952c1ff6c4f5a29902d97fc06d0c21d57e7ba934c5f85a76f6471",
+        "size_bytes": 752
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-clippy-command-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-clippy-command-02/receipt.json",
+        "sha256": "212e836993fe15381cdcd4b0395c168c8ba99e89740eaf33535ca0baadda66d4",
+        "size_bytes": 3221
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/212e836993fe15381cdcd4b0395c168c8ba99e89740eaf33535ca0baadda66d4",
+        "sha256": "212e836993fe15381cdcd4b0395c168c8ba99e89740eaf33535ca0baadda66d4",
+        "size_bytes": 3221
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-clippy-command-02/stderr.log",
+        "sha256": "ce1cf739bc0199bb3ff2c83bda33deb639efb458f3b8190adf97c702fc7af980",
+        "size_bytes": 167
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-unit/objects/ce1cf739bc0199bb3ff2c83bda33deb639efb458f3b8190adf97c702fc7af980",
+        "sha256": "ce1cf739bc0199bb3ff2c83bda33deb639efb458f3b8190adf97c702fc7af980",
+        "size_bytes": 167
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-clippy-command-02/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-coefficient-tests-command-01/receipt.json",
+        "sha256": "d5e46cb26b772f4f58046589f1e620dd409161edceab76a44666867a425a5dd6",
+        "size_bytes": 3219
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/d5e46cb26b772f4f58046589f1e620dd409161edceab76a44666867a425a5dd6",
+        "sha256": "d5e46cb26b772f4f58046589f1e620dd409161edceab76a44666867a425a5dd6",
+        "size_bytes": 3219
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-coefficient-tests-command-01/stderr.log",
+        "sha256": "815ddf3518f430dde4c23f0224973a7e17bc7ce77cf044d8a5b603f986b265ac",
+        "size_bytes": 254
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/815ddf3518f430dde4c23f0224973a7e17bc7ce77cf044d8a5b603f986b265ac",
+        "sha256": "815ddf3518f430dde4c23f0224973a7e17bc7ce77cf044d8a5b603f986b265ac",
+        "size_bytes": 254
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-coefficient-tests-command-01/stdout.log",
+        "sha256": "b487002974978e0c2e91d8d0f834ab9d232f93d1abb3b1c3cd8e89310cbb7a76",
+        "size_bytes": 23403
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/b487002974978e0c2e91d8d0f834ab9d232f93d1abb3b1c3cd8e89310cbb7a76",
+        "sha256": "b487002974978e0c2e91d8d0f834ab9d232f93d1abb3b1c3cd8e89310cbb7a76",
+        "size_bytes": 23403
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-01/ctf_surface_binding.rs",
+        "sha256": "7fdb79ef079026e3bf884854f9f8f068ab7d527815fe484782338b56584c7de3",
+        "size_bytes": 21616
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/7fdb79ef079026e3bf884854f9f8f068ab7d527815fe484782338b56584c7de3",
+        "sha256": "7fdb79ef079026e3bf884854f9f8f068ab7d527815fe484782338b56584c7de3",
+        "size_bytes": 21616
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-01/ctf_surface_binding.rs.format.diff",
+        "sha256": "9fccdad5dac2d2f7fe6799795ab80a8153104105cc48b606190257660c9379ab",
+        "size_bytes": 20904
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/9fccdad5dac2d2f7fe6799795ab80a8153104105cc48b606190257660c9379ab",
+        "sha256": "9fccdad5dac2d2f7fe6799795ab80a8153104105cc48b606190257660c9379ab",
+        "size_bytes": 20904
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-01/ctf_surface_binding_tests.rs",
+        "sha256": "ea52ca2bacbf2814a7786a308c95502d5d14f4f423b884eb9db070c6b79dd0a8",
+        "size_bytes": 16382
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/ea52ca2bacbf2814a7786a308c95502d5d14f4f423b884eb9db070c6b79dd0a8",
+        "sha256": "ea52ca2bacbf2814a7786a308c95502d5d14f4f423b884eb9db070c6b79dd0a8",
+        "size_bytes": 16382
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-01/ctf_surface_binding_tests.rs.format.diff",
+        "sha256": "897d6ddc0a8e94e45a6b3df941e08ca7ed61a091f5a513b713967e8b5393b7f8",
+        "size_bytes": 25735
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/897d6ddc0a8e94e45a6b3df941e08ca7ed61a091f5a513b713967e8b5393b7f8",
+        "sha256": "897d6ddc0a8e94e45a6b3df941e08ca7ed61a091f5a513b713967e8b5393b7f8",
+        "size_bytes": 25735
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-01/manifest.before-review.json",
+        "sha256": "806a1fa02845a35361e800d50c0edca803db5139bd945a604bfed4ede76b4685",
+        "size_bytes": 4565
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/806a1fa02845a35361e800d50c0edca803db5139bd945a604bfed4ede76b4685",
+        "sha256": "806a1fa02845a35361e800d50c0edca803db5139bd945a604bfed4ede76b4685",
+        "size_bytes": 4565
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-01/manifest.json",
+        "sha256": "ed25ee85045887a71b85f7af720d5dda1d9cb9c2e242b371ad797d5fd2754756",
+        "size_bytes": 4565
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/ed25ee85045887a71b85f7af720d5dda1d9cb9c2e242b371ad797d5fd2754756",
+        "sha256": "ed25ee85045887a71b85f7af720d5dda1d9cb9c2e242b371ad797d5fd2754756",
+        "size_bytes": 4565
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-01/mod.rs",
+        "sha256": "5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+        "size_bytes": 1785
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+        "sha256": "5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+        "size_bytes": 1785
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-01/mod.rs.format.diff",
+        "sha256": "07679586e8e69c55311cd296b1fa546a2c52c03478a9bec48071d5660c93967f",
+        "size_bytes": 450
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/07679586e8e69c55311cd296b1fa546a2c52c03478a9bec48071d5660c93967f",
+        "sha256": "07679586e8e69c55311cd296b1fa546a2c52c03478a9bec48071d5660c93967f",
+        "size_bytes": 450
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-02/ctf_surface_binding.rs",
+        "sha256": "7fdb79ef079026e3bf884854f9f8f068ab7d527815fe484782338b56584c7de3",
+        "size_bytes": 21616
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/7fdb79ef079026e3bf884854f9f8f068ab7d527815fe484782338b56584c7de3",
+        "sha256": "7fdb79ef079026e3bf884854f9f8f068ab7d527815fe484782338b56584c7de3",
+        "size_bytes": 21616
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-02/ctf_surface_binding_tests.rs",
+        "sha256": "ad67150be196d8f0dbc653ea5d2ae7808af34d553be71caa33451229b78819bb",
+        "size_bytes": 16378
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/ad67150be196d8f0dbc653ea5d2ae7808af34d553be71caa33451229b78819bb",
+        "sha256": "ad67150be196d8f0dbc653ea5d2ae7808af34d553be71caa33451229b78819bb",
+        "size_bytes": 16378
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-02/manifest.json",
+        "sha256": "64ae0449fee33ffa909969c05c315bca3df06f5d5940d3bd1a0d0ecb7af4fd2f",
+        "size_bytes": 6415
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/64ae0449fee33ffa909969c05c315bca3df06f5d5940d3bd1a0d0ecb7af4fd2f",
+        "sha256": "64ae0449fee33ffa909969c05c315bca3df06f5d5940d3bd1a0d0ecb7af4fd2f",
+        "size_bytes": 6415
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-final-source-02/mod.rs",
+        "sha256": "5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+        "size_bytes": 1785
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+        "sha256": "5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+        "size_bytes": 1785
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-fmt-check-command-01/receipt.json",
+        "sha256": "54889cfbebb1824f018261e15f25d2c88ac9388f022694425d6d1f32cce7cee8",
+        "size_bytes": 3036
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/54889cfbebb1824f018261e15f25d2c88ac9388f022694425d6d1f32cce7cee8",
+        "sha256": "54889cfbebb1824f018261e15f25d2c88ac9388f022694425d6d1f32cce7cee8",
+        "size_bytes": 3036
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-fmt-check-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-fmt-check-command-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-format-command-01/receipt.json",
+        "sha256": "e598704cae367b889eab47c3e73913d9e3af5be7372bef4c7a555569b10041e1",
+        "size_bytes": 3007
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/e598704cae367b889eab47c3e73913d9e3af5be7372bef4c7a555569b10041e1",
+        "sha256": "e598704cae367b889eab47c3e73913d9e3af5be7372bef4c7a555569b10041e1",
+        "size_bytes": 3007
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-format-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-format-command-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-prep-01/before/heat_balance_mod.rs",
+        "sha256": "ef9e101fedc4d920327a55551e4403e3ee72739b319c7d1c0523dd2d8b6bbc38",
+        "size_bytes": 1756
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-frozen/objects/ef9e101fedc4d920327a55551e4403e3ee72739b319c7d1c0523dd2d8b6bbc38",
+        "sha256": "ef9e101fedc4d920327a55551e4403e3ee72739b319c7d1c0523dd2d8b6bbc38",
+        "size_bytes": 1756
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-prep-01/diffs/ctf_surface_binding.diff",
+        "sha256": "358bc877c99c4e8036eba987e9d4ac28cd317b60d040b9615766587e45357596",
+        "size_bytes": 19610
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/358bc877c99c4e8036eba987e9d4ac28cd317b60d040b9615766587e45357596",
+        "sha256": "358bc877c99c4e8036eba987e9d4ac28cd317b60d040b9615766587e45357596",
+        "size_bytes": 19610
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-prep-01/diffs/ctf_surface_binding_tests.diff",
+        "sha256": "203f527399b33e5b4df25dc7433b5e86bf8ebfe1fad29b9cdd099b215720da45",
+        "size_bytes": 14403
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/203f527399b33e5b4df25dc7433b5e86bf8ebfe1fad29b9cdd099b215720da45",
+        "sha256": "203f527399b33e5b4df25dc7433b5e86bf8ebfe1fad29b9cdd099b215720da45",
+        "size_bytes": 14403
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-prep-01/diffs/heat_balance_mod.diff",
+        "sha256": "7e08fefdde7bc13a0df19e594b32db077378457c9c79d01ed90883bfaf869ef3",
+        "size_bytes": 330
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/7e08fefdde7bc13a0df19e594b32db077378457c9c79d01ed90883bfaf869ef3",
+        "sha256": "7e08fefdde7bc13a0df19e594b32db077378457c9c79d01ed90883bfaf869ef3",
+        "size_bytes": 330
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-prep-01/manifest.json",
+        "sha256": "f1c291242acdbeedce392f2db0cb5d41efd28d95e3a53268c825e939655864eb",
+        "size_bytes": 21534
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/f1c291242acdbeedce392f2db0cb5d41efd28d95e3a53268c825e939655864eb",
+        "sha256": "f1c291242acdbeedce392f2db0cb5d41efd28d95e3a53268c825e939655864eb",
+        "size_bytes": 21534
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-prep-01/new/ctf_surface_binding.rs",
+        "sha256": "ddc34553f04ccb0376b62568fe82b4b5da5024172326c1f563e7a7a20db32ee9",
+        "size_bytes": 19172
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/ddc34553f04ccb0376b62568fe82b4b5da5024172326c1f563e7a7a20db32ee9",
+        "sha256": "ddc34553f04ccb0376b62568fe82b4b5da5024172326c1f563e7a7a20db32ee9",
+        "size_bytes": 19172
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-prep-01/new/ctf_surface_binding_tests.rs",
+        "sha256": "2f5b483188bd4d6cbde6c23e5ae22dca01f48c4dc1c79adb34f814733f9551e8",
+        "size_bytes": 14089
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/2f5b483188bd4d6cbde6c23e5ae22dca01f48c4dc1c79adb34f814733f9551e8",
+        "sha256": "2f5b483188bd4d6cbde6c23e5ae22dca01f48c4dc1c79adb34f814733f9551e8",
+        "size_bytes": 14089
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-prep-01/proposed/heat_balance_mod.rs",
+        "sha256": "d2cc5e60eadbaeb07242822ff5e96bea9d57546a06a29f5f11704d93e7e56672",
+        "size_bytes": 1785
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/d2cc5e60eadbaeb07242822ff5e96bea9d57546a06a29f5f11704d93e7e56672",
+        "sha256": "d2cc5e60eadbaeb07242822ff5e96bea9d57546a06a29f5f11704d93e7e56672",
+        "size_bytes": 1785
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-prep-01/README.md",
+        "sha256": "a4590d2161a05987281e96bfa3b5cb7dfa0494df70a6b320644af0ec971b727f",
+        "size_bytes": 6548
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/a4590d2161a05987281e96bfa3b5cb7dfa0494df70a6b320644af0ec971b727f",
+        "sha256": "a4590d2161a05987281e96bfa3b5cb7dfa0494df70a6b320644af0ec971b727f",
+        "size_bytes": 6548
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-test-mut-repair-prep-01/before.rs",
+        "sha256": "ea52ca2bacbf2814a7786a308c95502d5d14f4f423b884eb9db070c6b79dd0a8",
+        "size_bytes": 16382
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/ea52ca2bacbf2814a7786a308c95502d5d14f4f423b884eb9db070c6b79dd0a8",
+        "sha256": "ea52ca2bacbf2814a7786a308c95502d5d14f4f423b884eb9db070c6b79dd0a8",
+        "size_bytes": 16382
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-test-mut-repair-prep-01/exact.diff",
+        "sha256": "224bd1a30fac3ba7035bc0a11927a7d065fcc8950584cafc25b6d39569a29a1a",
+        "size_bytes": 433
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/224bd1a30fac3ba7035bc0a11927a7d065fcc8950584cafc25b6d39569a29a1a",
+        "sha256": "224bd1a30fac3ba7035bc0a11927a7d065fcc8950584cafc25b6d39569a29a1a",
+        "size_bytes": 433
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-test-mut-repair-prep-01/manifest.json",
+        "sha256": "2f9184afcfc3fc82a76e8653cbb1befed94c6b8171fb992e92801348bf0deac2",
+        "size_bytes": 1187
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/2f9184afcfc3fc82a76e8653cbb1befed94c6b8171fb992e92801348bf0deac2",
+        "sha256": "2f9184afcfc3fc82a76e8653cbb1befed94c6b8171fb992e92801348bf0deac2",
+        "size_bytes": 1187
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-test-mut-repair-prep-01/new.rs",
+        "sha256": "ad67150be196d8f0dbc653ea5d2ae7808af34d553be71caa33451229b78819bb",
+        "size_bytes": 16378
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/ad67150be196d8f0dbc653ea5d2ae7808af34d553be71caa33451229b78819bb",
+        "sha256": "ad67150be196d8f0dbc653ea5d2ae7808af34d553be71caa33451229b78819bb",
+        "size_bytes": 16378
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-workspace-tests-command-01/receipt.json",
+        "sha256": "99c5863f314a190f69ae6c185018cdd0483c3438e1cbad7bd51c54130092cd97",
+        "size_bytes": 3202
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/99c5863f314a190f69ae6c185018cdd0483c3438e1cbad7bd51c54130092cd97",
+        "sha256": "99c5863f314a190f69ae6c185018cdd0483c3438e1cbad7bd51c54130092cd97",
+        "size_bytes": 3202
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-workspace-tests-command-01/stderr.log",
+        "sha256": "e9baf3eb25a82a679417acde956a22e521bd56afd789ee3ebdcd45691cd7210f",
+        "size_bytes": 6321
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/e9baf3eb25a82a679417acde956a22e521bd56afd789ee3ebdcd45691cd7210f",
+        "sha256": "e9baf3eb25a82a679417acde956a22e521bd56afd789ee3ebdcd45691cd7210f",
+        "size_bytes": 6321
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-binding-workspace-tests-command-01/stdout.log",
+        "sha256": "616a9d9496b4b5fbce1aaf029e51ed1ada12a3b330a5b66d811c81d91a83a890",
+        "size_bytes": 743814
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/616a9d9496b4b5fbce1aaf029e51ed1ada12a3b330a5b66d811c81d91a83a890",
+        "sha256": "616a9d9496b4b5fbce1aaf029e51ed1ada12a3b330a5b66d811c81d91a83a890",
+        "size_bytes": 743814
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/de/deea859175d62ba0dbfb5728477061f993f886057ef556f5158e99ef7b136f53",
+        "sha256": "deea859175d62ba0dbfb5728477061f993f886057ef556f5158e99ef7b136f53",
+        "size_bytes": 1609198
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/objects/deea859175d62ba0dbfb5728477061f993f886057ef556f5158e99ef7b136f53",
+        "sha256": "deea859175d62ba0dbfb5728477061f993f886057ef556f5158e99ef7b136f53",
+        "size_bytes": 1609198
+      }
+    }
+  ],
+  "new_unique_raw_objects": 35,
+  "selected_archive_is_transitive_replay_closure": false
+}

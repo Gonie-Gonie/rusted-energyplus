@@ -1,0 +1,62 @@
+{
+  "schema": "ctf10-actual-standalone-surface-binding-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-surface-binding/manifest.json",
+    "sha256": "39d3a8bd5ff979782e3be141b02b62db8597728caf19467c16330f6596082c11",
+    "size_bytes": 26952
+  },
+  "actual_source_inventory": {
+    "path": ".runtime/porting/CTF-10/surface-binding-final-source-02/manifest.json",
+    "sha256": "64ae0449fee33ffa909969c05c315bca3df06f5d5940d3bd1a0d0ecb7af4fd2f",
+    "size_bytes": 6415
+  },
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/de/deea859175d62ba0dbfb5728477061f993f886057ef556f5158e99ef7b136f53",
+    "sha256": "deea859175d62ba0dbfb5728477061f993f886057ef556f5158e99ef7b136f53"
+  },
+  "quality": {
+    "clippy": {
+      "execution": {
+        "path": ".runtime/porting/CTF-10/surface-binding-clippy-command-02/receipt.json",
+        "sha256": "212e836993fe15381cdcd4b0395c168c8ba99e89740eaf33535ca0baadda66d4",
+        "size_bytes": 3221
+      },
+      "exit_code": 0
+    },
+    "coefficient-tests": {
+      "execution": {
+        "path": ".runtime/porting/CTF-10/surface-binding-coefficient-tests-command-01/receipt.json",
+        "sha256": "d5e46cb26b772f4f58046589f1e620dd409161edceab76a44666867a425a5dd6",
+        "size_bytes": 3219
+      },
+      "exit_code": 0,
+      "actual_passed_test_count": 184
+    },
+    "workspace-tests": {
+      "execution": {
+        "path": ".runtime/porting/CTF-10/surface-binding-workspace-tests-command-01/receipt.json",
+        "sha256": "99c5863f314a190f69ae6c185018cdd0483c3438e1cbad7bd51c54130092cd97",
+        "size_bytes": 3202
+      },
+      "exit_code": 0,
+      "actual_passed_test_count": 4804
+    },
+    "fmt-check": {
+      "execution": {
+        "path": ".runtime/porting/CTF-10/surface-binding-fmt-check-command-01/receipt.json",
+        "sha256": "54889cfbebb1824f018261e15f25d2c88ac9388f022694425d6d1f32cce7cee8",
+        "size_bytes": 3036
+      },
+      "exit_code": 0
+    }
+  },
+  "scope": "standalone typed surface/construction binding, exact full generation key and history requirements only",
+  "actual_standalone_binding_applied_and_quality_passed": true,
+  "Root_and_Raw_FULL_source_and_formatter_review_accepted": true,
+  "runtime_surface_or_cache_activation_performed": false,
+  "history_values_seeded_or_advanced": false,
+  "Native_surface_consumer_comparison_performed": false,
+  "prior_public_storage_scientific_comparisons_repeated": false,
+  "cache_invalidation_at_actual_runtime_producer_certified": false,
+  "whole_CTF10_unit_integration_or_production_gate_updated": false
+}
