@@ -1,0 +1,21 @@
+{
+  "schema": "src05-ordinary-main-execution-Root-FULL-Source-review.v2",
+  "reviewed_manifest": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-execution-prep-02/manifest.json",
+    "sha256": "fdf54127104e19ee741ab989643260f1b87bcef3268b8f89894148441159904e",
+    "size_bytes": 16701
+  },
+  "complete_descriptor_checks": 127,
+  "unique_full_identities": 72,
+  "literal_ranges": 10,
+  "exact_adaptation_and_metadata_diffs": 2,
+  "driver166_README19_author70_successor41_FULL_read": true,
+  "all45_input_guards_and_selected_five_literal_original_request_refs_accepted": true,
+  "actual_Cargo_quality_PE_Source_custody_and_command_shapes_reviewed": true,
+  "fresh_D_output_and_uncapped_allfiles_capture_SHA_footer_custody_accepted": true,
+  "two_historical_Source_aliases_explicitly_bound": true,
+  "Root_FULL_Source_accepted": true,
+  "target_execution_performed": false,
+  "event_values_parsed": false,
+  "gates_updated": false
+}

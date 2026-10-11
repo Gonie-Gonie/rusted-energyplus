@@ -1,0 +1,25 @@
+"""Preserve prior closed packet and bind the accepted successor Source reviews."""
+import hashlib
+import json
+from pathlib import Path
+ROOT=Path.cwd(); BASE=ROOT/'.runtime/porting/SRC-05'
+def ref(path,sha=None):
+    raw=path.read_bytes(); actual=hashlib.sha256(raw).hexdigest()
+    assert sha is None or sha==actual
+    return dict(path=path.relative_to(ROOT).as_posix(),sha256=actual,size_bytes=len(raw))
+prior=ref(BASE/'ordinary-main-publication-inputs-Root-01.json','56c9b17aa7e06e27e9d5bac1218955ed184c1e66679e36cf16ed67aa1b38c048')
+packet=json.loads((ROOT/prior['path']).read_bytes())
+for key in ('actual_validation','Root_PE_acceptance','actual_execution_custody','actual_execution_outer_receipt','Root_factual_review','Header_factual_review'):
+    declared=packet[key]; assert ref(ROOT/declared['path'])==declared
+packet['closed_executions'].append(ref(BASE/'ordinary-main-publication-command-01/receipt.json','a0fbe3f1e84cf4a741be2b60278ea91c70e2d08c63957a60ef5b2bad3119f381'))
+packet['opaque_lineage'] += [prior]+[ref(BASE/name) for name in (
+ 'ordinary-main-publication-prep-03/Root-FULL-Source-review-03.json',
+ 'Header-ordinary-main-publication-Source-review-03/review.json',
+ 'ordinary-main-publication-prep-04/Root-FULL-Source-review-04.json',
+ 'Header-ordinary-main-publication-Source-review-04/review.json',
+ 'review-publication-Root-04.py',
+ 'ordinary-main-publication-bounded-selection-check-04.json',
+)] + [ref(Path(__file__))]
+out=BASE/'ordinary-main-publication-inputs-Root-02.json'
+with out.open('x',encoding='utf8',newline='\n') as stream: json.dump(packet,stream,indent=2); stream.write('\n')
+print(json.dumps(ref(out)))

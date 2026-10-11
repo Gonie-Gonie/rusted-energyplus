@@ -1,0 +1,436 @@
+{
+  "schema": "src05-ordinary-main-production-execution-custody.v1",
+  "actual_before": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-production-command-01/before.json",
+    "sha256": "2bcaf164c4481a95c54be52c1a6f59a1079b5f37085fb32c5122544800aeac51",
+    "size_bytes": 23816
+  },
+  "Source_preparation": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-execution-prep-02/manifest.json",
+    "sha256": "fdf54127104e19ee741ab989643260f1b87bcef3268b8f89894148441159904e",
+    "size_bytes": 16701
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/00/00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a",
+    "sha256": "00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a"
+  },
+  "actual_validation": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/record.json",
+    "sha256": "decafdcbfd1fa6118bc27fe513b79cea7143494429064309f487d494a10a9183",
+    "size_bytes": 18325
+  },
+  "Root_PE_acceptance": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/Root-PE-acceptance.json",
+    "sha256": "3d0d825ec5732bae6ecabc639dc9ca6d6eebfd54598f1c2af40579cae96e707f",
+    "size_bytes": 4514
+  },
+  "actual_executions": {
+    "CLI": {
+      "actual_execution": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-production-command-01/CLI-command/receipt.json",
+        "sha256": "aa30e7a025261fbedeaa1bd5c39b1f1b00b69d3050bdeaec2172bce594c28d89",
+        "size_bytes": 3660
+      },
+      "actual_exit_code": 0
+    },
+    "ordinary_observer": {
+      "actual_execution": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-production-command-01/ordinary_observer-command/receipt.json",
+        "sha256": "6727b83b747c38a734e5ccafa4aacb3e7d6f4c5b5bc200c1e8a3c8c3c73a3a24",
+        "size_bytes": 3650
+      },
+      "actual_exit_code": 0
+    }
+  },
+  "actual_commands": {
+    "CLI": [
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+      "run",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-24H\\input.idf",
+      "--weather",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+      "--output-dir",
+      "D:\\CodexBuild\\rusted-energyplus\\SRC-05\\ordinary-main-production-01\\CLI",
+      "--mode",
+      "compatibility",
+      "--partial",
+      "deny",
+      "--trace-level",
+      "full",
+      "--porting-scope",
+      "a"
+    ],
+    "ordinary_observer": [
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\ctf10_ordinary_history_observer.exe",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-24H\\input.idf",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+      "D:\\CodexBuild\\rusted-energyplus\\SRC-05\\ordinary-main-production-01\\observer",
+      "D:\\CodexBuild\\rusted-energyplus\\SRC-05\\ordinary-main-production-01\\capture\\events.ndjson"
+    ]
+  },
+  "data_output_root": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01",
+  "actual_D_free_bytes_after": 188480053248,
+  "actual_output_files": [
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/capture/events.ndjson",
+      "sha256": "08de12c7339f42837416c0dbdd0389b7d29f83bdc09cac6beefa8003d18b182c",
+      "size_bytes": 581361739
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/clk02-weather-production-trace.json",
+      "sha256": "a5dd1eebc207a0a4cfeda7a45ebc1bf26b3c5ab5bda62ce4660cefc8f23a177d",
+      "size_bytes": 92107
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/clk03-weather-day-production-trace.json",
+      "sha256": "00b6813e98e61946595616e0280493d3bbf2b7678c38c8efaa18cfebc2e695e8",
+      "size_bytes": 734858632
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/clk06_sky_transport_trace.json",
+      "sha256": "40295a11a5c80335c18e701e0273d4cb58ddb7b194efc4bbfded9215659539c1",
+      "size_bytes": 7380727
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/clock-calls.json",
+      "sha256": "e3822268d3cfe821d02e9b7d283e24b5a2a04c20cb9ed47fbebaaab6494d0ace",
+      "size_bytes": 27056
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/compiled-geometry.json",
+      "sha256": "7b05d49909569eb993a099f03b4bf281287f7388c441a963d0607ceefbfa4fca",
+      "size_bytes": 19332
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/diagnostics.json",
+      "sha256": "9b40cfcb07e096f4709276e6b74eae69303b8b9a1fbb26f1bcb9d3624fdb0dad",
+      "size_bytes": 6151
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/eplusrs.ctf.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/eplusrs.ctf.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/eplusrs.eio",
+      "sha256": "4b982a0a046068022fb30cb4c6b73274fa79d51bb9c253ac8248cb88fd970db0",
+      "size_bytes": 2488
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/eplusrs.err",
+      "sha256": "e77b2b6e8e5961f7448109b3fac13ded1562a209f9e54e4ed8474ed3e82bbbb4",
+      "size_bytes": 2052
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/geo02-geometry-operands.json",
+      "sha256": "7a365ec857ebcbb2d74c0b17b8c1b8e1f225ddae1308b076db3bc9ed97f6fe2a",
+      "size_bytes": 1022536
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/geo02-geometry.json",
+      "sha256": "61d91d7c4706a5a310faaa42eae362c75d9eaee4e62149e26c60e7dbad7432cf",
+      "size_bytes": 17702
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/geo03-zone-volume.json",
+      "sha256": "2851789c14f97fda896a6275eb90bc508993ab8fa698c244ce69a9a89f3ef438",
+      "size_bytes": 11227
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/geometry-consumers.json",
+      "sha256": "df1a57ddaa757ef2cf8f873c2e9ba78bda074f760ea5b433bb2a3339f4f22af0",
+      "size_bytes": 19853
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/input/converted.epJSON",
+      "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578",
+      "size_bytes": 27734
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/input/input-hashes.json",
+      "sha256": "9555a7b294c825f57fccef40c4d2f209fffe92901f5ee46c04f96363eddc3ce5",
+      "size_bytes": 634
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/input/original.epJSON",
+      "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578",
+      "size_bytes": 27734
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/input/original.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+      "size_bytes": 9275
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/logs/command.log",
+      "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e",
+      "size_bytes": 65
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/logs/source-order-stage-state-snapshots.json",
+      "sha256": "84cdd70365ae0a9e5a6590b13d634a0e1cc57d0d8201d5537efc30788d063577",
+      "size_bytes": 9007
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/model/execution-plan.json",
+      "sha256": "7ca632ab84962388293d7c1f2f7935bb7e5d5f2d3c344146d2ee63714d38c519",
+      "size_bytes": 33097
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/model/graph-summary.json",
+      "sha256": "67ed25272e9de0e3bfad94c62ca5789a95c68aeece7312901856c6f3d888e781",
+      "size_bytes": 479
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/model/raw-model-summary.json",
+      "sha256": "8b3bfeee8d273d8df8253c032bd89f254ec0c8e255a2652385aec7465a38f948",
+      "size_bytes": 969
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/model/typed-model-summary.json",
+      "sha256": "ebecdec210bf20e9e8ce1595b40635d3fda27a1c2ce38c2b97bec2c811666190",
+      "size_bytes": 4522
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/porting_scope.json",
+      "sha256": "3bde9bc4442dd10d074958fa0fe084b29d3a24490fa53236641540c14cc10435",
+      "size_bytes": 14519
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/psy02-calls.json",
+      "sha256": "90e300244d7d64fe48f1f93441f8399406ae2d16d8b1f508a96aeedd6348e17e",
+      "size_bytes": 2173795
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/psychrometrics-calls.json",
+      "sha256": "2c54df215b9d3f95043b17962ea10b8120c70d3f9d26ba9697d2aff1d1ec13ad",
+      "size_bytes": 894530
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/reports/compatibility-boundary.md",
+      "sha256": "9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294",
+      "size_bytes": 690
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/reports/run-report.md",
+      "sha256": "92b58c86372bae541c321fd267cdf9d1b07d18ed2fe2e91c3c9f4fc7d1acea34",
+      "size_bytes": 546
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/results/meters.csv",
+      "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b",
+      "size_bytes": 40
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/results/result-store.json",
+      "sha256": "04fc5865439522b15e495384fe05365e32711299e17cb0b0f134000bff1e4cbf",
+      "size_bytes": 147620
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/results/selected-outputs.csv",
+      "sha256": "c4ee2f4b0c267c86aef43e37f0e7c95d2cf3dcc7f7924558dbbb61d116ffdc80",
+      "size_bytes": 28911
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/run-summary.json",
+      "sha256": "f8b3405980a17a00686f15d15b33154e1df691120ba3d3466800c15906cdfb64",
+      "size_bytes": 27591
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/sch01_compiled_schedules.json",
+      "sha256": "baee00016dafad648f22ce45852d09f80927133959d6b44167b45c28561c1e5b",
+      "size_bytes": 4888
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/sch01_schedule_cache_trace.json",
+      "sha256": "24b53562a6118cf56bc46ca7096815bd18e2bfa8fcf7a61fa557399acdae8ad8",
+      "size_bytes": 2156
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/support-assessment.json",
+      "sha256": "41a447ca7470198c737ff892e742cd5eb032aa3db3b2357d2736080c816f2050",
+      "size_bytes": 13934
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/support-report.md",
+      "sha256": "89a2dd25ac78d98bfcb9b2e1bf854bcbba38c0ad1439d83c93283133ab9c3d14",
+      "size_bytes": 3960
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/CLI/zon01-initialization.json",
+      "sha256": "11c7968a61c3331501e1c42719beb6dfa283e6f6d630733d7a944dc265117816",
+      "size_bytes": 20569
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/diagnostics.json",
+      "sha256": "455f741f9c28fd9c6ebbca310425016cfa4ac14815c5e155d7c5f5f0c88a346c",
+      "size_bytes": 6151
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/eplusrs.ctf.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/eplusrs.ctf.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/eplusrs.eio",
+      "sha256": "4b982a0a046068022fb30cb4c6b73274fa79d51bb9c253ac8248cb88fd970db0",
+      "size_bytes": 2488
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/eplusrs.err",
+      "sha256": "2ceed3f931fef550d00bd4b6a8eccc0f014cd08b8c9dff59443e20db9719d47a",
+      "size_bytes": 2052
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/input/converted.epJSON",
+      "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578",
+      "size_bytes": 27734
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/input/input-hashes.json",
+      "sha256": "32abcad24c6fbea4d93a72a91cb5f1dd9a5018f8296341b94488ad0aede63b3f",
+      "size_bytes": 644
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/input/original.epJSON",
+      "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578",
+      "size_bytes": 27734
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/input/original.idf",
+      "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+      "size_bytes": 9275
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/logs/command.log",
+      "sha256": "ab1baf58880ef29a366c754f9e2ad3b248b3e747326d0f6da8e4ed08ecb0b86e",
+      "size_bytes": 65
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/model/execution-plan.json",
+      "sha256": "f7b7c707e9168b7e5bb6c613b2758f3d8bab812b3a58f5361de0ed4573010519",
+      "size_bytes": 25366
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/model/graph-summary.json",
+      "sha256": "67ed25272e9de0e3bfad94c62ca5789a95c68aeece7312901856c6f3d888e781",
+      "size_bytes": 479
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/model/raw-model-summary.json",
+      "sha256": "8b3bfeee8d273d8df8253c032bd89f254ec0c8e255a2652385aec7465a38f948",
+      "size_bytes": 969
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/model/typed-model-summary.json",
+      "sha256": "ebecdec210bf20e9e8ce1595b40635d3fda27a1c2ce38c2b97bec2c811666190",
+      "size_bytes": 4522
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/porting_scope.json",
+      "sha256": "3bde9bc4442dd10d074958fa0fe084b29d3a24490fa53236641540c14cc10435",
+      "size_bytes": 14519
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/reports/compatibility-boundary.md",
+      "sha256": "9d7e9deb0eb3981a44bf6946bade0395780c7c614bf7daaadef88d51f5e20294",
+      "size_bytes": 690
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/reports/run-report.md",
+      "sha256": "92b58c86372bae541c321fd267cdf9d1b07d18ed2fe2e91c3c9f4fc7d1acea34",
+      "size_bytes": 546
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/results/meters.csv",
+      "sha256": "071dca92435543c1e2124809b34cc0fcdf6e2311f79d937f77b8c32d0639e95b",
+      "size_bytes": 40
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/results/result-store.json",
+      "sha256": "04fc5865439522b15e495384fe05365e32711299e17cb0b0f134000bff1e4cbf",
+      "size_bytes": 147620
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/results/selected-outputs.csv",
+      "sha256": "c4ee2f4b0c267c86aef43e37f0e7c95d2cf3dcc7f7924558dbbb61d116ffdc80",
+      "size_bytes": 28911
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/run-summary.json",
+      "sha256": "50b02624453a383bc4bfd4d452fa670105bde684563a157c4ab6d1b73d3b4e99",
+      "size_bytes": 27705
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/support-assessment.json",
+      "sha256": "75326e9caeb7bccdad29e3db583140e4051e96b66c6b7772fde5d42269953ad3",
+      "size_bytes": 13933
+    },
+    {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/observer/support-report.md",
+      "sha256": "89a2dd25ac78d98bfcb9b2e1bf854bcbba38c0ad1439d83c93283133ab9c3d14",
+      "size_bytes": 3960
+    }
+  ],
+  "actual_capture_custody": {
+    "actual_file": {
+      "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/capture/events.ndjson",
+      "sha256": "08de12c7339f42837416c0dbdd0389b7d29f83bdc09cac6beefa8003d18b182c",
+      "size_bytes": 581361739
+    },
+    "physical_line_count": 4037,
+    "actual_header": {
+      "Native_fields_unavailable": [
+        "environment_id",
+        "environment_name",
+        "KickOffSimulation",
+        "calendar_year",
+        "calendar_month",
+        "calendar_day"
+      ],
+      "Native_prestate_replayed": false,
+      "absent_lifecycle_is_not_observed_or_assumed_reached": true,
+      "all_instrumented_lifecycle_visits_without_caps_or_filters": true,
+      "counted_as_PASS": false,
+      "expected_endpoints_read": false,
+      "record_type": "header",
+      "schema": "ctf10-persistent-ordinary-history-stream.v1"
+    },
+    "actual_footer": {
+      "actual_Rust_generation_count": 1,
+      "actual_observed_event_count": 4034,
+      "actual_runtime_exit_code": 0,
+      "actual_runtime_message": "arbitrary run completed",
+      "actual_written_event_count": 4034,
+      "boundary_reachability_verified": false,
+      "capture_complete": true,
+      "counted_as_PASS": false,
+      "integration_PASS_claimed": false,
+      "numerical_comparison_performed": false,
+      "record_type": "summary",
+      "schema": "ctf10-persistent-ordinary-history-stream.v1"
+    },
+    "capture_complete": true,
+    "failure": null,
+    "event_values_parsed_or_filtered": false,
+    "nonfinite_or_unavailable_values_assessed": false
+  },
+  "all_frozen_artifacts_rehashed_unchanged": true,
+  "full_current_Source_members_verified": 3931,
+  "actual_processes_both_exit_zero": true,
+  "boundary_reachability_verified": false,
+  "floating_point_controls_written": false,
+  "numerical_comparison_performed": false,
+  "whole_ordinary_or_integration_PASS_claimed": false,
+  "gates_updated": false
+}

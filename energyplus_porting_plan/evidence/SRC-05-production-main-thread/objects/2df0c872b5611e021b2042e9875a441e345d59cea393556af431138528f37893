@@ -1,0 +1,83 @@
+"""Independently read actual Cargo executables and release only their PE custody."""
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import re
+import struct
+
+ROOT = Path.cwd()
+BASE = ROOT / '.runtime/porting/SRC-05'
+apply_path = BASE / 'ordinary-main-thread-application-prep-03/apply.py'
+assert hashlib.sha256(apply_path.read_bytes()).hexdigest() == 'f156146347a42f0f9ee0d13a6e180ab82773c7a9387c5200e85f464b95ba21c5'
+spec = importlib.util.spec_from_file_location('accepted_apply', apply_path)
+A = importlib.util.module_from_spec(spec); spec.loader.exec_module(A)
+validation_ref = A.ref(BASE / 'ordinary-main-thread-validation-01/record.json')
+assert validation_ref['sha256'] == 'decafdcbfd1fa6118bc27fe513b79cea7143494429064309f487d494a10a9183'
+v = A.load(validation_ref)
+assert v['schema'] == 'src05-ordinary-main-thread-actual-quality-and-artifacts.v1'
+assert v['Source_snapshot']['sha256'] == '00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a'
+outer_ref = A.ref(BASE / 'ordinary-main-thread-validation-command-01/receipt.json')
+outer = A.load(outer_ref)
+assert outer['exit_code'] == 0 and outer['launch_error'] is None and outer['source_bytes_match_before_and_after'] is True
+assert outer['source_snapshot'] == v['Source_snapshot']
+prep = A.load(v['Source_preparation'])
+assert v['Source_preparation']['sha256'] == 'e67df8b315cde068743aea3c542b30257e7156cc50588732a0c83d363877c5de'
+assert set(v['quality_executions']) == {'fmt_check','clippy','focused','workspace'}
+before = A.load(A.ref(BASE / 'ordinary-main-thread-validation-01/before.json'))
+for role, receipt in v['quality_executions'].items():
+    q = A.recorded(receipt, v['Source_snapshot'], before['quality_commands'][role])
+    if role in ['focused', 'workspace']:
+        text = A.bind(q['stdout']).read_text(encoding='utf8')
+        groups = [tuple(map(int,row)) for row in re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored;', text)]
+        actual = v['actual_test_totals'][role]
+        assert actual['groups'] == len(groups) and actual['passed'] == sum(row[0] for row in groups) and actual['failed'] == sum(row[1] for row in groups) == 0 and actual['ignored'] == sum(row[2] for row in groups) == 2
+assert set(v['actual_Cargo_artifacts']) == {'CLI', 'ordinary_observer'}
+pe_facts = {}
+binary_refs = {}
+for role, artifact in v['actual_Cargo_artifacts'].items():
+    build = A.recorded(artifact['actual_build_execution'], v['Source_snapshot'], before['build_commands'][role])
+    messages = [json.loads(line) for line in A.bind(artifact['actual_full_Cargo_JSON']).read_bytes().splitlines()]
+    emitted = [row for row in messages if row.get('reason') == 'compiler-artifact' and row.get('executable')]
+    assert emitted == [artifact['cargo_message']]
+    assert build['stdout'] == artifact['actual_full_Cargo_JSON'] and any(row.get('reason') == 'build-finished' and row.get('success') is True for row in messages)
+    message = emitted[0]
+    assert message['profile']['test'] is False and message['profile']['opt_level'] == '0' and message['profile']['debuginfo'] == 0
+    captured = build['cargo_compiler_artifacts_capture']
+    assert captured['status'] == 'pass' and len(captured['rows']) == 1 and captured['rows'][0]['cargo_message'] == message
+    binary = A.bind(artifact['executable'])
+    assert Path(message['executable']).resolve() == binary.resolve()
+    assert captured['rows'][0]['executable']['sha256'] == artifact['executable']['sha256']
+    report = artifact['PE_inspection']
+    assert report['actual_binary'] == artifact['executable']
+    with binary.open('rb') as stream:
+        dos = stream.read(64); offset = int.from_bytes(dos[60:64], 'little')
+        assert dos[:2] == b'MZ' and 64 <= offset < artifact['executable']['size_bytes']
+        stream.seek(offset); coff = stream.read(24)
+        assert coff[:4] == b'PE\0\0'
+        machine, count = struct.unpack_from('<HH', coff, 4)
+        optional_size, characteristics = struct.unpack_from('<HH', coff, 20)
+        optional = stream.read(optional_size); section_bytes = stream.read(count * 40)
+    assert machine == report['machine'] == 0x8664 and struct.unpack_from('<H',optional)[0] == 0x20b
+    assert len(section_bytes) == count * 40 and dos+coff+optional+section_bytes == A.bind(report['actual_PE_header_bytes']).read_bytes()
+    assert offset == report['PE_header_file_offset'] and characteristics == report['COFF_characteristics']
+    reserve, commit = struct.unpack_from('<QQ', optional, 72)
+    assert reserve == report['stack_reserve_bytes'] == 8388608 and commit == report['stack_commit_bytes'] and 0 < commit <= reserve
+    entry = struct.unpack_from('<I', optional, 16)[0]
+    assert entry == report['entry_point_RVA'] and struct.unpack_from('<H', optional, 68)[0] == report['subsystem'] and struct.unpack_from('<H', optional, 70)[0] == report['DLL_characteristics']
+    directories = [dict(index=i,address=struct.unpack_from('<I',optional,112+i*8)[0],size=struct.unpack_from('<I',optional,116+i*8)[0]) for i in range(struct.unpack_from('<I',optional,108)[0])]
+    assert directories == report['data_directories'] and len(directories) >= 16
+    sections = []
+    for i in range(count):
+        row = section_bytes[40*i:40*(i+1)]
+        virtual_size, rva, raw_size, raw_offset = struct.unpack_from('<IIII',row,8)
+        sections.append(dict(name_bytes_hex=row[:8].hex(), virtual_size=virtual_size, virtual_address=rva, raw_size=raw_size, raw_offset=raw_offset, characteristics=struct.unpack_from('<I',row,36)[0]))
+    assert sections == report['sections'] and all(r['raw_offset']+r['raw_size'] <= artifact['executable']['size_bytes'] for r in sections)
+    assert any(r['virtual_address'] <= entry < r['virtual_address']+max(r['virtual_size'],r['raw_size']) and r['characteristics'] & 0x20000000 for r in sections)
+    assert directories[4]['address']+directories[4]['size'] <= artifact['executable']['size_bytes']
+    assert A.ref(binary) == artifact['executable']
+    pe_facts[role] = dict(PE_headers=report['actual_PE_header_bytes'], complete_sections=count, complete_directories=len(directories), entry_point_RVA=entry, actual_entry_in_executable_section=True, stack_reserve_bytes=reserve, stack_commit_bytes=commit)
+    binary_refs[role] = artifact['executable']
+for row in binary_refs.values(): A.bind(row)
+record = dict(schema='src05-ordinary-main-thread-Root-PE-acceptance.v1', accepted=True, both_actual_PE_stack_and_entry_evidence_accepted=True, actual_validation=validation_ref, actual_validation_outer=outer_ref, Source_snapshot=v['Source_snapshot'], actual_Cargo_artifacts=binary_refs, independent_raw_PE_facts=pe_facts, actual_quality_totals=v['actual_test_totals'], review_Source=A.ref(Path(__file__).resolve()), scope='Actual Cargo Source/artifact, unchanged-Source four quality checks, x64 PE entry/header and 8MiB stack reserve. No runtime FP observation, loader/security equivalence, scientific parity or gate promotion.', target_execution_performed=False, gates_updated=False)
+print(json.dumps(A.dump(BASE / 'ordinary-main-thread-validation-01/Root-PE-acceptance.json', record)))

@@ -12451,6 +12451,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-05-wind-diagnostics-and-main-thread/summary.json",
         "sha256": "1d889d2628491567e676f64e2bc0fe6f7e05258fe0702f3a5c89136507f17411",
         "size_bytes": 239879
+      },
+      "actual_production_main_thread": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-production-main-thread/summary.json",
+        "sha256": "db4da22bc0c16e38ba6e799e26b47e56b7a41e9ba65ef533e68e7d87aa6b69d6",
+        "size_bytes": 441884
       }
     },
     {

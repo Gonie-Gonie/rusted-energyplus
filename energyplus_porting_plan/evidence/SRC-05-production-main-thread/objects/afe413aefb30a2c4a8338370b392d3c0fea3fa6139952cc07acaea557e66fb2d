@@ -1,0 +1,181 @@
+"""Author held dispatcher provider/execution adaptations; no target or tools run."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+BASE = ROOT / '.runtime/porting/SRC-06'
+OUT = BASE / 'native-dispatcher-observation-prep-01'
+NATIVE = BASE / 'native-tarp-dispatcher-prep-02/manifest.json'
+CONFIGURE = BASE / 'native-dispatcher-build-prep-02/manifest.json'
+OLD_COLLECTOR = BASE / 'native-provider-prep-03/collect_providers.py'
+OLD_DRIVER = BASE / 'native-execution-prep-02/run_execution.py'
+
+
+def ref(path):
+    data = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(data).hexdigest(), size_bytes=len(data), line_count=len(data.splitlines()))
+
+
+def replace(source, old, new):
+    assert source.count(old) == 1, old
+    return source.replace(old, new, 1)
+
+
+assert ref(NATIVE)['sha256'] == '954a7779868d3ac65d88c553aab324f5e5e0a88d5d455a3126aecc5012ca3d50'
+assert ref(CONFIGURE)['sha256'] == 'c54db349f9a874f87850d8c86e8abec9dda44cf34e8758162e91200eca2253ec'
+native = json.loads(NATIVE.read_bytes())
+string = 'std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >'
+specs = [
+    ('init', 'Convect::InitIntConvCoeff', 'EnergyPlus::Convect::InitIntConvCoeff(EnergyPlus::EnergyPlusData&, ObjexxFCL::Array1D<double> const&, ObjexxFCL::Optional<int const>)', 'ConvectionCoefficients.cc', 141, 391),
+    ('user', 'Convect::GetUserConvCoeffs', 'EnergyPlus::Convect::GetUserConvCoeffs(EnergyPlus::EnergyPlusData&)', 'ConvectionCoefficients.cc', 733, 1672),
+    ('static', 'Convect::SetupAdaptiveConvStaticMetaData', 'EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)', 'ConvectionCoefficients.cc', 2800, 3099),
+    ('radiant', 'Convect::SetupAdaptiveConvRadiantSurfaceData', 'EnergyPlus::Convect::SetupAdaptiveConvRadiantSurfaceData(EnergyPlus::EnergyPlusData&)', 'ConvectionCoefficients.cc', 3101, 3149),
+    ('roof', 'SurfaceGeometry::GetGeoSummaryRoof', 'EnergyPlus::SurfaceGeometry::GetGeoSummaryRoof(EnergyPlus::EnergyPlusData const&, EnergyPlus::SurfaceGeometry::GeoSummary&)', 'SurfaceGeometry.cc', 15576, 15686),
+    ('scan', 'General::ScanForReports', f'EnergyPlus::General::ScanForReports(EnergyPlus::EnergyPlusData&, {string} const&, bool&, ObjexxFCL::Optional<{string} const>, ObjexxFCL::Optional<{string} >, ObjexxFCL::Optional<{string} >)', 'General.cc', 1130, 1469),
+    ('input', 'InputProcessor::processInput', 'EnergyPlus::InputProcessor::processInput(EnergyPlus::EnergyPlusData&)', 'InputProcessing/InputProcessor.cc', 259, 323),
+    ('count', 'InputProcessor::getNumObjectsFound', 'EnergyPlus::InputProcessor::getNumObjectsFound(EnergyPlus::EnergyPlusData&, std::basic_string_view<char, std::char_traits<char> >)', 'InputProcessing/InputProcessor.cc', 505, 541),
+    ('detailed', 'Convect::CalcASHRAEDetailedIntConvCoeff', 'EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)', 'ConvectionCoefficients.cc', 1955, 1975),
+    ('natural', 'Convect::CalcASHRAETARPNatural', 'EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)', 'ConvectionCoefficients.cc', 1907, 1953),
+]
+assert [v[1] for v in specs] == native['core_address_bound_providers_required']
+contract = dict(schema='src06-tarp-dispatcher-provider-contract.v1', providers=[dict(role=role, declared_provider=declared, symbol=symbol, core_owner='Products/libenergypluslib.a(' + Path(file).name + '.obj)', Original_relative_source=file, start_line=start, end_line=end) for role, declared, symbol, file, start, end in specs], code_extent_rule='next link-map text symbol in same input text section, otherwise section end; interval can include adjacent code and is not claimed an exclusive function body', expected_values_supplied=False)
+contract_bytes = (json.dumps(contract, indent=2) + '\n').encode()
+contract_sha = hashlib.sha256(contract_bytes).hexdigest()
+
+historical_collector = '''def historical_configure(freeze):
+    # Only these explicitly named aliases belong to the inherited D362 build.
+    previous = load(freeze['inherited_frozen_build_inputs'])
+    old_source = load(previous['Source_snapshot'])
+    assert old_source['schema'] == 'rust-command-source-snapshot.v1' and old_source['bytes_normalized'] is False
+    rows = {r['historical_path']: r for r in old_source['files']}
+    assert len(rows) == len(old_source['files']) == 3928
+    aliases = []
+    for row in previous['frozen_Source_and_input']:
+        if row['path'] in rows:
+            old = rows[row['path']]
+            assert row['sha256'] == old['archive']['sha256'] and row['size_bytes'] == old['size_bytes']
+            checked(old['archive']); aliases.append(dict(historical=row, actual_archive=old['archive']))
+        else:
+            checked(row)
+    assert len(aliases) == len(rows) and {r['historical']['path'] for r in aliases} == set(rows)
+    assert freeze['inherited_historical_BUILD_Source_aliases'] == aliases
+    collect({k: v for k, v in previous.items() if k != 'frozen_Source_and_input'})
+    collect({k: v for k, v in freeze.items() if k != 'inherited_historical_BUILD_Source_aliases'})
+    return aliases
+
+
+'''
+collector = OLD_COLLECTOR.read_text()
+for old, new in [
+    ('SRC06 link/provider', 'SRC06 dispatcher link/provider'),
+    ('native-tarp-inside-prep-02', 'native-tarp-dispatcher-prep-02'),
+    ('D:/CodexBuild/rusted-energyplus/SRC-06/native-build-01/bin', 'D:/CodexBuild/rusted-energyplus/SRC-06/native-dispatcher-build-01/bin'),
+    ('src06-tarp-inside-frozen-configure-inputs.v1', 'src06-tarp-dispatcher-frozen-configure-inputs.v1'),
+    ('src06-tarp-inside-configure-dry-review.v1', 'src06-tarp-dispatcher-configure-dry-review.v1'),
+    ('ba8de8e1378003bd0f9fa0305a074b838448425503330a47cba01f2b68e31d35', '954a7779868d3ac65d88c553aab324f5e5e0a88d5d455a3126aecc5012ca3d50'),
+    ('src06_tarp_inside_helper', 'src06_tarp_dispatcher_helper'),
+    ('tarp_inside_reference_helper.cpp', 'tarp_dispatcher_helper.cpp'),
+    ('src06-tarp-inside-actual-linked-provider-and-PE-inventory.v1', 'src06-tarp-dispatcher-actual-linked-provider-and-PE-inventory.v1'),
+]:
+    assert old in collector, old
+    collector = collector.replace(old, new)
+collector = replace(collector, 'def dump(path, value):', historical_collector + 'def dump(path, value):')
+collector = replace(collector, "snapshot = freeze['Source_snapshot']; collect(freeze); collect(review)", "snapshot = freeze['Source_snapshot']; historical_aliases = historical_configure(freeze); collect(review)\nconfigure_prep_ref = dict(path='.runtime/porting/SRC-06/native-dispatcher-build-prep-02/manifest.json', sha256='c54db349f9a874f87850d8c86e8abec9dda44cf34e8758162e91200eca2253ec')\nconfigure_prep = load(configure_prep_ref); collect(configure_prep)\nassert configure_prep['schema'] == 'src06-tarp-dispatcher-configure-Source-preparation.v1'\nassert any(all(row[k] == configure_prep['own_sources'][0][k] for k in ('path', 'sha256', 'size_bytes')) for row in freeze['frozen_Source_and_input'])\ncontract_ref = dict(path=(Path(__file__).resolve().parent / 'provider-contract.json').relative_to(ROOT).as_posix(), sha256='" + contract_sha + "')\ncontract = load(contract_ref)\nassert contract['schema'] == 'src06-tarp-dispatcher-provider-contract.v1' and len(contract['providers']) == 10\nassert [r['declared_provider'] for r in contract['providers']] == load(freeze['reviewed_Source_preparation'])['core_address_bound_providers_required']")
+collector = replace(collector, "assert review['previous_compile_rows'] == 741 and review['current_compile_rows'] == 742", "assert review['previous_compile_rows'] == 742 and review['current_compile_rows'] == 743")
+collector = replace(collector, "assert review['exact_prior_core_link_suffix_preserved'] is True", "assert review['declared_SHA_transport_link_token'] == '-lbcrypt' and review['declared_SHA_transport_immediately_after_core'] is True and review['exact_prior_core_link_suffix_preserved_after_declared_SHA_transport'] is True")
+collector = replace(collector, "symbols = ['EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)', 'EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)']", "symbols = [r['symbol'] for r in contract['providers']]")
+collector = replace(collector, "assert all(row['owning_text_section']['owner'] == 'Products/libenergypluslib.a(ConvectionCoefficients.cc.obj)' for row in providers)", "assert all(row['owning_text_section']['owner'] == spec['core_owner'] for row, spec in zip(providers, contract['providers']))")
+collector = replace(collector, 'assert len(resolved) == 4', 'assert len(resolved) == 2 * len(providers)')
+collector = replace(collector, "        found = re.search(r'[/\\\\]ConvectionCoefficients\\.cc:(\\d+)(?: \\(discriminator \\d+\\))?$', resolved[2 * i + 1])\n        assert found and (1907 <= int(found.group(1)) <= 1953 if i == 0 else 1955 <= int(found.group(1)) <= 1975)", "        spec = contract['providers'][i]\n        location = resolved[2 * i + 1].replace('\\\\', '/')\n        found = re.search('/' + re.escape(spec['Original_relative_source']) + r':(\\d+)(?: \\(discriminator \\d+\\))?$', location)\n        assert found and spec['start_line'] <= int(found.group(1)) <= spec['end_line']")
+collector = replace(collector, "('natural' if i == 0 else 'detailed') + '-disassembly-command'", "spec['role'] + '-disassembly-command'")
+collector = replace(collector, "frozen_build_inputs=frozen_ref, configure_review=review_ref,", "frozen_build_inputs=frozen_ref, configure_review=review_ref, configure_preparation=configure_prep_ref, provider_contract=ref(checked(contract_ref)), authenticated_inherited_historical_BUILD_Source_aliases=historical_aliases,")
+
+driver = OLD_DRIVER.read_text()
+for old, new in [
+    ('SRC06 Native execution custody', 'SRC06 dispatcher Native execution custody'),
+    ('native-tarp-inside-prep-02', 'native-tarp-dispatcher-prep-02'),
+    ('ba8de8e1378003bd0f9fa0305a074b838448425503330a47cba01f2b68e31d35', '954a7779868d3ac65d88c553aab324f5e5e0a88d5d455a3126aecc5012ca3d50'),
+    ('native-build-prep-01/manifest.json', 'native-dispatcher-build-prep-02/manifest.json'),
+    ('591e2e26d3f6d0551202cfe6472eaf25fc218ccb6479169cedb29736d6ac7503', 'c54db349f9a874f87850d8c86e8abec9dda44cf34e8758162e91200eca2253ec'),
+    ('D:/CodexBuild/rusted-energyplus/SRC-06/native-build-01/bin', 'D:/CodexBuild/rusted-energyplus/SRC-06/native-dispatcher-build-01/bin'),
+    ('src06-tarp-inside-', 'src06-tarp-dispatcher-'),
+    ('src06_tarp_inside_helper', 'src06_tarp_dispatcher_helper'),
+    ('both_Original_providers_accepted', 'all_ten_Original_providers_accepted'),
+]:
+    assert old in driver, old
+    driver = driver.replace(old, new)
+driver = replace(driver, "    'provider_preparation': ('.runtime/porting/SRC-06/native-provider-prep-01/manifest.json', 'd86c578bac3034661256ab8f25ad5c9acae180f1e0bd45e31f62bc5cb450cc34'),\n    'actual_build': ('.runtime/porting/SRC-06/native-build-01/compile-command/receipt.json', 'aceb9ef787996c0f19c27d87dc5d9eaedf31b789fd925780bef626b6babf2751'),\n", '')
+driver = replace(driver, "SYMBOLS = ['EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)',\n           'EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)']\n", '')
+driver = replace(driver, 'HISTORICAL_ALIASES = {}', '')
+start = driver.index('def collect(value, historical=None):')
+end = driver.index('def source_paths():', start)
+driver = driver[:start] + '''def collect(value):
+    if isinstance(value, dict):
+        if 'path' in value and 'sha256' in value:
+            bind(value)
+        for child in value.values(): collect(child)
+    elif isinstance(value, list):
+        for child in value: collect(child)
+
+
+''' + historical_collector.replace('checked(', 'bind(').replace('assert ', 'assert ') + driver[end:]
+driver = replace(driver, "    native, configure_prep, historical_provider_prep = (load(authority_refs[k]) for k in ('Native_preparation', 'configure_preparation', 'provider_preparation'))", "    native, configure_prep = (load(authority_refs[k]) for k in ('Native_preparation', 'configure_preparation'))")
+driver = replace(driver, "    same(inventory['actual_build_execution'], authority_refs['actual_build'])\n", '')
+driver = replace(driver, "    need(provider_prep['schema'] == 'src06-tarp-dispatcher-native-provider-collection-preparation.v1', 'actual reviewed collector preparation required')", "    need(provider_prep['schema'] == 'src06-tarp-dispatcher-observation-source-preparation.v1', 'actual reviewed collector preparation required')\n    same(inventory['configure_preparation'], authority_refs['configure_preparation'])\n    same(full(Path(__file__)), provider_prep['own_sources'][1])\n    same(inventory['provider_contract'], provider_prep['own_sources'][2])\n    contract = load(inventory['provider_contract'])\n    need(contract['schema'] == 'src06-tarp-dispatcher-provider-contract.v1' and len(contract['providers']) == 10, 'complete declared provider contract required')\n    need([r['declared_provider'] for r in contract['providers']] == native['core_address_bound_providers_required'], 'all declared Original providers required')\n    symbols = [r['symbol'] for r in contract['providers']]")
+driver = replace(driver, "    for value in (native, configure_prep, historical_provider_prep, provider_prep, inventory, approval):\n        collect(value, historical)", "    for value in (native, configure_prep, provider_prep, approval): collect(value)\n    collect({k: v for k, v in inventory.items() if k != 'authenticated_inherited_historical_BUILD_Source_aliases'})")
+driver = replace(driver, "    collect(freeze, historical); collect(review, historical)", "    historical_aliases = historical_configure(freeze); collect(review)\n    need(inventory['authenticated_inherited_historical_BUILD_Source_aliases'] == historical_aliases, 'inherited D362 Source archive mapping differs')\n    need(any(all(row[k] == configure_prep['own_sources'][0][k] for k in ('path', 'sha256', 'size_bytes')) for row in freeze['frozen_Source_and_input']), 'actual configure Source not frozen')")
+driver = replace(driver, "review['previous_compile_rows'] == 741 and review['current_compile_rows'] == 742 and review['exact_previous_rows_preserved'] is True and review['exact_prior_core_link_suffix_preserved'] is True", "review['previous_compile_rows'] == 742 and review['current_compile_rows'] == 743 and review['exact_previous_rows_preserved'] is True and review['declared_SHA_transport_link_token'] == '-lbcrypt' and review['declared_SHA_transport_immediately_after_core'] is True and review['exact_prior_core_link_suffix_preserved_after_declared_SHA_transport'] is True")
+driver = replace(driver, "collect(core, historical)", "collect(core)")
+driver = replace(driver, "[v['symbol'] for v in providers] == SYMBOLS and len(inventory['actual_disassembly_executions']) == 2, 'both unique Natural and Detailed providers required'", "[v['symbol'] for v in providers] == symbols and len(inventory['actual_disassembly_executions']) == 10, 'all ten unique Original providers required'")
+driver = replace(driver, "            need(provider['owning_text_section']['owner'] == 'Products/libenergypluslib.a(ConvectionCoefficients.cc.obj)' and provider['actual_addr2line_function'] == SYMBOLS[i]", "            spec = contract['providers'][i]\n            need(provider['owning_text_section']['owner'] == spec['core_owner'] and provider['actual_addr2line_function'] == symbols[i]")
+driver = replace(driver, "            match = re.search(r'[/\\\\]ConvectionCoefficients\\.cc:(\\d+)(?: \\(discriminator \\d+\\))?$', provider['actual_addr2line_location'])\n            need(match is not None and (1907 <= int(match[1]) <= 1953 if i == 0 else 1955 <= int(match[1]) <= 1975), 'actual Original Source location differs')", "            match = re.search('/' + re.escape(spec['Original_relative_source']) + r':(\\d+)(?: \\(discriminator \\d+\\))?$', provider['actual_addr2line_location'].replace('\\\\', '/'))\n            need(match is not None and spec['start_line'] <= int(match[1]) <= spec['end_line'], 'actual Original Source location differs')")
+driver = replace(driver, "input_ref, policy_ref = full(bind(native['input_only_request'])), full(bind(native['prospective_policy']))", "input_ref, policy_ref, idf_ref = (full(bind(native[k])) for k in ('input_only_request', 'prospective_policy', 'literal_IDF'))")
+driver = replace(driver, "len(request['cases']) == native['literal_input_case_count'] == 28 and sum(len(c['operations']) for c in request['cases']) == native['literal_input_call_count'] == 60 and bit_count(request) == native['literal_binary64_input_cell_count'] == 320", "len(request['cases']) == native['literal_input_case_count'] == 8 and sum(len(c['operations']) for c in request['cases']) == native['literal_dispatcher_call_count'] == 20 and bit_count(request) == native['literal_binary64_input_cell_count'] == 700")
+driver = replace(driver, "native['runtime_interfaces']['Native_argc'] == 2", "native['runtime_interfaces']['Native_argc'] == 3")
+driver = replace(driver, "policy['schema'] == 'src06-tarp-dispatcher-observation-policy.v1'", "policy['schema'] == 'src06-tarp-dispatcher-prospective-observation-policy.v1'")
+driver = replace(driver, "'both Original bodies and full PE/core/dry proof must be accepted'", "'all ten Original providers and full PE/core/dry proof must be accepted'")
+driver = replace(driver, "    wind_before, wind_guard =", "    need(request['literal_IDF'].encode('utf8') == bind(idf_ref).read_bytes() and idf_ref['size_bytes'] == 158, 'exact physical IDF literal required')\n    wind_before, wind_guard =")
+driver = replace(driver, "    argv = [str(bind(binary)), str(bind(input_ref))]", "    case_runs = output / 'case-runs'\n    need(not case_runs.exists(), 'fresh per-case physical-IDF run root required')\n    argv = [str(bind(binary)), str(bind(input_ref)), str(case_runs)]")
+driver = replace(driver, "'historical_Source_aliases': list(HISTORICAL_ALIASES.values())", "'inherited_historical_BUILD_Source_aliases': historical_aliases")
+driver = replace(driver, "'actual_input': input_ref, 'observation_policy': policy_ref,", "'actual_input': input_ref, 'literal_IDF': idf_ref, 'observation_policy': policy_ref,")
+driver = replace(driver, "'declared_input_counts': {'cases': 28, 'calls': 60, 'binary64_cells': 320}", "'declared_input_counts': {'cases': 8, 'Init_calls': 20, 'processInput_calls': 8, 'binary64_cells': 700, 'physical_IDF_bytes': 158}")
+driver = replace(driver, "    guard = {'schema':", "    produced_files = [full(p) for p in sorted(case_runs.rglob('*')) if p.is_file()] if case_runs.is_dir() else []\n    guard = {'schema':")
+driver = replace(driver, "'all_frozen_artifacts_unchanged': unchanged,", "'all_frozen_artifacts_unchanged': unchanged, 'produced_case_files_full_SHA_inventory': produced_files,")
+
+# This author is re-runnable only while these unexecuted Source proposals are
+# being completed before the immutable marker is sent for independent review.
+OUT.mkdir(exist_ok=True)
+(OUT / 'before').mkdir(exist_ok=True)
+(OUT / 'diffs').mkdir(exist_ok=True)
+(OUT / 'provider-contract.json').write_bytes(contract_bytes)
+source_rows = []
+for name, source, previous in [('collect_providers.py', collector, OLD_COLLECTOR), ('run_execution.py', driver, OLD_DRIVER)]:
+    ast.parse(source)
+    (OUT / name).write_bytes(source.encode())
+    (OUT / 'before' / name).write_bytes(previous.read_bytes())
+    delta = ''.join(difflib.unified_diff(previous.read_text().splitlines(True), source.splitlines(True), fromfile='before/' + name, tofile=name))
+    (OUT / 'diffs' / (name + '.diff')).write_bytes(delta.encode())
+    source_rows.append(dict(before=ref(OUT / 'before' / name), proposal=ref(OUT / name), exact_diff=ref(OUT / 'diffs' / (name + '.diff'))))
+readme = '''# Held genuine SRC06 dispatcher observation transport
+
+This Source-only adaptation reuses the accepted direct-SRC06 provider collector03 and execution driver02. Authorship performs no configure, compile, PE/tool invocation, helper execution or scientific result read. Root and an independent FULL Source peer must accept it before use.
+
+Collector CLI: `python -X utf8 -B .runtime/porting/SRC-06/native-dispatcher-observation-prep-01/collect_providers.py --frozen-inputs <closed dispatcher frozen JSON>#<SHA> --configure-review <closed dispatcher dry review>#<SHA> --build-execution <closed actual compile receipt>#<SHA> --output-dir .runtime/porting/SRC-06/<fresh provider directory>`.
+
+The collector binds Native02 and configure02, the complete actual current Source snapshot, all742 inherited rows plus one dispatcher registration, all76 actual configure arguments, two exact dry/actual compile-link steps, official13,534-blob checks and the unchanged full core. The sole declared link delta is one direct BCrypt SHA-transport token immediately after the core; the complete scientific suffix is otherwise literal. It performs only recorded read-only addr2line/objdump/official-check commands and full PE reads. Ten unique public providers are required in the Source-declared order, with genuine core owners, exact Original locations, literal map lines, contiguous PE bytes and full interval disassembly. Map-derived intervals can include adjacent code and are not claimed exclusive function bodies or execution traces.
+
+Inherited D362 build aliases are separate from current Source: their exact3928 historical names/hashes/sizes must resolve to the genuine preserved snapshot archives and equal the explicit frozen mapping. Neither helper recursively treats those historical canonical names as current. The new build snapshot is independently checked against the complete current Rust/Cargo/config membership and every archived/current byte.
+
+Execution CLI: `python -X utf8 -B .runtime/porting/SRC-06/native-dispatcher-observation-prep-01/run_execution.py --provider-inventory <actual inventory>#<SHA> --Root-provider-acceptance <actual acceptance>#<SHA> --source-snapshot <actual current snapshot>#<SHA> --output-dir .runtime/porting/SRC-06/<fresh capture directory>`.
+
+Root acceptance schema is `src06-tarp-dispatcher-Root-provider-acceptance.v1`; it binds provider_inventory, reviewed_Source_preparation, actual_Native_binary, actual_full_link_map, actual_helper_object, actual_build_execution, Source_snapshot, provider_collection_preparation and actual_evidence_collector. True guards are accepted, all_ten_Original_providers_accepted, full_PE_and_core_proof_accepted and dry_and_actual_compile_link_commands_byte_exact. Provider preparation must be this reviewed manifest: own_sources0 is collector,1 driver,2 provider contract. No future receipt, Source, binary or provider hash is invented here.
+
+The driver authenticates the actual closed configure/dry/build/post-core receipts and ten provider bytes again, then freezes complete inputs/policy/Source/binary/map/object/tool/DLL/actual PATH before calling genuine Native argc3. The third argument is a fresh case-runs root; all8 independent physical-IDF processInput calls,20 Init calls,700 bit cells and exact158-byte literal IDF remain unchanged. It copies the proven three Winlibs DLL/PATH convention from the authentic wind capture. Every frozen artifact and complete current Source membership is rehashed afterward, and all produced per-case files receive full SHA/size inventory. Actual full stdout/stderr and exit0/2 are retained. Exit2 alone never certifies complete JSON, prefix integrity or scientific success; later factual QA must establish those facts. No payload interpretation, FP control writes, formula changes, expected values, ordinary handoff or gates are supplied.
+'''
+(OUT / 'README.md').write_bytes(readme.encode())
+manifest = dict(schema='src06-tarp-dispatcher-observation-source-preparation.v1', status='HELD Source-only; Root and independent FULL peer required before invocation', own_sources=[ref(OUT / n) for n in ['collect_providers.py', 'run_execution.py', 'provider-contract.json']], README=ref(OUT / 'README.md'), author=ref(Path(__file__)), source_dependencies=[ref(p) for p in [NATIVE, CONFIGURE, BASE / 'native-provider-prep-03/manifest.json', OLD_COLLECTOR, BASE / 'native-execution-prep-02/manifest.json', OLD_DRIVER, ROOT / 'tools/porting/record_command.py', ROOT / 'tools/porting/native_pe.py', ROOT / 'tools/porting/build_original_reference.py']], literal_input=native['input_only_request'], literal_IDF=native['literal_IDF'], prospective_policy=native['prospective_policy'], before_archives=[dict(original=ref(p), archive=ref(OUT / 'before' / n)) for n, p in [('collect_providers.py', OLD_COLLECTOR), ('run_execution.py', OLD_DRIVER)]], exact_diffs=source_rows, selected_source_ranges=native['selected_source_ranges'], runtime_interfaces=dict(collector_options=['--frozen-inputs', '--configure-review', '--build-execution', '--output-dir'], execution_options=['--provider-inventory', '--Root-provider-acceptance', '--source-snapshot', '--output-dir'], provider_inventory_schema='src06-tarp-dispatcher-actual-linked-provider-and-PE-inventory.v1', Root_acceptance_schema='src06-tarp-dispatcher-Root-provider-acceptance.v1', Root_acceptance_reference_keys=['provider_inventory','reviewed_Source_preparation','actual_Native_binary','actual_full_link_map','actual_helper_object','actual_build_execution','Source_snapshot','provider_collection_preparation','actual_evidence_collector'], Root_acceptance_required_true=['accepted','all_ten_Original_providers_accepted','full_PE_and_core_proof_accepted','dry_and_actual_compile_link_commands_byte_exact'], before_schema='src06-tarp-dispatcher-execution-before.v1', custody_schema='src06-tarp-dispatcher-execution-custody.v1', Native_argc=3, declared_cases=8, declared_Init_calls=20, declared_processInput_calls=8, declared_binary64_cells=700, literal_IDF_bytes=158, current_Source_snapshot_is_explicit_runtime_operand=True, historical_D362_aliases_require_explicit_archive_mapping=True, result_values_interpreted=False), target_execution_performed=False, canonical_mutation_performed=False, FP_controls_modified=False, scientific_PASS_claimed=False, gates_updated=False)
+(OUT / 'manifest.json').write_bytes((json.dumps(manifest, indent=2) + '\n').encode())
+print(json.dumps(ref(OUT / 'manifest.json')))

@@ -1,0 +1,411 @@
+--- .runtime/porting/SRC-05/ordinary-main-execution-prep-01/before/run_execution.py
++++ .runtime/porting/SRC-05/ordinary-main-execution-prep-01/run_execution.py
+@@ -1,268 +1,166 @@
+-"""Root-only SRC06 dispatcher Native execution custody; never interpret numerical results."""
++"""Root-only actual main-thread A24 CLI and observer custody; no comparison."""
+ import argparse
+ import hashlib
++import importlib.util
+ import json
+-import mmap
+ import os
+ from pathlib import Path
+-import re
++import shutil
+ import subprocess
+ import sys
+ 
+ ROOT = Path(__file__).resolve().parents[4]
+-RECORDER = ROOT / 'tools/porting/record_command.py'
+-RECORDER_SHA = '5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'
+-AUTHORITIES = {
+-    'Native_preparation': ('.runtime/porting/SRC-06/native-tarp-dispatcher-prep-02/manifest.json', '954a7779868d3ac65d88c553aab324f5e5e0a88d5d455a3126aecc5012ca3d50'),
+-    'configure_preparation': ('.runtime/porting/SRC-06/native-dispatcher-build-prep-02/manifest.json', 'c54db349f9a874f87850d8c86e8abec9dda44cf34e8758162e91200eca2253ec'),
+-    'wind_before': ('.runtime/porting/SRC-05/wind-pow-Native-observation-01/before.json', 'e08153decf4e33385573db05ebc8fe002da4f03c605235b75106f93707ac0acf'),
+-    'wind_custody': ('.runtime/porting/SRC-05/wind-pow-Native-observation-01/custody.json', '856783eb0f4831f2adf66a7b11078cc02f2e5c5f8910d6bbf49c51c6a2569681'),
+-}
+-EXTERNAL = Path('D:/CodexBuild/rusted-energyplus/SRC-06/native-dispatcher-build-01/bin')
+-FROZEN = {}
++APPLICATION_PREP = {'path': '.runtime/porting/SRC-05/ordinary-main-thread-application-prep-03/manifest.json', 'sha256': 'e67df8b315cde068743aea3c542b30257e7156cc50588732a0c83d363877c5de'}
++DATA = Path('D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01').resolve()
+ 
+ 
+-
+-def need(condition, message):
+-    if not condition:
+-        raise ValueError(message)
++def physical_ref(path):
++    with path.open('rb') as stream:
++        sha = hashlib.file_digest(stream, 'sha256').hexdigest()
++    return {'path': path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else path.as_posix(), 'sha256': sha, 'size_bytes': path.stat().st_size}
+ 
+ 
+-def full(path):
+-    path = path.resolve()
+-    with path.open('rb') as stream:
+-        sha = hashlib.file_digest(stream, 'sha256').hexdigest()
+-    return {'path': path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else str(path),
+-            'sha256': sha, 'size_bytes': path.stat().st_size}
+-
+-
+-def bind(row):
++def module(row, name):
+     path = (ROOT / row['path']).resolve()
+-    need((path.is_relative_to(ROOT) or path.is_relative_to(EXTERNAL)) and path.is_file(), 'missing or out-of-scope artifact: ' + row['path'])
+-    actual = FROZEN.get(path)
+-    if actual is None:
+-        actual = full(path)
+-    need(actual['sha256'] == row['sha256'] and all(row[k] == actual['size_bytes'] for k in ('size_bytes', 'bytes') if k in row), 'bound bytes differ: ' + row['path'])
+-    FROZEN[path] = actual
+-    return path
+-
+-
+-def operand(token):
+-    name, sha = token.rsplit('#', 1)
+-    return full(bind({'path': name, 'sha256': sha}))
+-
+-
+-def load(row):
+-    return json.loads(bind(row).read_bytes())
+-
+-
+-def same(a, b):
+-    need(bind(a) == bind(b), 'artifact paths differ')
+-
+-
+-def collect(value):
+-    if isinstance(value, dict):
+-        if 'path' in value and 'sha256' in value:
+-            bind(value)
+-        for child in value.values(): collect(child)
+-    elif isinstance(value, list):
+-        for child in value: collect(child)
+-
+-
+-def historical_configure(freeze):
+-    # Only these explicitly named aliases belong to the inherited D362 build.
+-    previous = load(freeze['inherited_frozen_build_inputs'])
+-    old_source = load(previous['Source_snapshot'])
+-    assert old_source['schema'] == 'rust-command-source-snapshot.v1' and old_source['bytes_normalized'] is False
+-    rows = {r['historical_path']: r for r in old_source['files']}
+-    assert len(rows) == len(old_source['files']) == 3928
+-    aliases = []
+-    for row in previous['frozen_Source_and_input']:
+-        if row['path'] in rows:
+-            old = rows[row['path']]
+-            assert row['sha256'] == old['archive']['sha256'] and row['size_bytes'] == old['size_bytes']
+-            bind(old['archive']); aliases.append(dict(historical=row, actual_archive=old['archive']))
+-        else:
+-            bind(row)
+-    assert len(aliases) == len(rows) and {r['historical']['path'] for r in aliases} == set(rows)
+-    assert freeze['inherited_historical_BUILD_Source_aliases'] == aliases
+-    collect({k: v for k, v in previous.items() if k != 'frozen_Source_and_input'})
+-    collect({k: v for k, v in freeze.items() if k != 'inherited_historical_BUILD_Source_aliases'})
+-    return aliases
+-
+-
+-def source_paths():
+-    paths = set((ROOT / 'crates').rglob('*.rs')) | set((ROOT / 'crates').rglob('Cargo.toml'))
+-    return paths | {ROOT / n for n in ('Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml') if (ROOT / n).is_file()}
+-
+-
+-def snapshot_members(row, current):
+-    value = load(row)
+-    need(value['schema'] == 'rust-command-source-snapshot.v1' and value['bytes_normalized'] is False, 'literal complete Source snapshot required')
+-    members = {(ROOT / v['historical_path']).resolve(): v for v in value['files']}
+-    need(len(members) == len(value['files']) and all(p.is_relative_to(ROOT) for p in members), 'duplicate or escaped Source member')
+-    for path, member in members.items():
+-        bind(member['archive'])
+-        need(full(bind(member['archive']))['size_bytes'] == member['size_bytes'], 'Source archive size differs')
+-        if current:
+-            bind({'path': str(path), 'sha256': member['archive']['sha256'], 'size_bytes': member['size_bytes']})
+-    if current:
+-        need(set(members) == source_paths(), 'full current Source membership differs')
+-    return members
+-
+-
+-def recorded(row, source):
+-    value = load(row)
+-    need(value['schema'] == 'recorded-porting-command.v1' and value['exit_code'] == 0 and value['launch_error'] is None and value['source_bytes_match_before_and_after'] is True, 'closed successful guarded provenance command required')
+-    same(value['source_snapshot'], source)
+-    need(bind(value['executed_launcher']['archive']) == bind({'path': '.runtime/porting/source-objects/57/' + RECORDER_SHA, 'sha256': RECORDER_SHA}), 'authentic recorder required')
+-    bind(value['stdout']); bind(value['stderr'])
+-    need(value['finished_utc'] is not None, 'closed command required')
++    if not path.is_relative_to(ROOT) or physical_ref(path)['sha256'] != row['sha256']:
++        raise ValueError('reviewed runtime Source differs')
++    spec = importlib.util.spec_from_file_location(name, path)
++    value = importlib.util.module_from_spec(spec); spec.loader.exec_module(value)
+     return value
+ 
+ 
+-def write(path, value):
+-    with path.open('xb') as stream:
+-        stream.write((json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode('utf-8'))
++def capture_custody(path, actual_exit):
++    if not path.is_file():
++        return {'actual_file': None, 'capture_complete': False, 'failure': 'actual stream absent', 'actual_header': None, 'actual_footer': None}
++    sha = hashlib.sha256(); first = last = None; lines = 0
++    with path.open('rb') as stream:
++        for line in stream:
++            sha.update(line); lines += 1
++            if first is None:
++                first = line
++            last = line
++    result = {'actual_file': {'path': path.as_posix(), 'sha256': sha.hexdigest(), 'size_bytes': path.stat().st_size}, 'physical_line_count': lines, 'actual_header': None, 'actual_footer': None, 'capture_complete': False, 'failure': None, 'event_values_parsed_or_filtered': False, 'nonfinite_or_unavailable_values_assessed': False}
++    try:
++        header, footer = json.loads(first), json.loads(last)
++        result['actual_header'], result['actual_footer'] = header, footer
++        valid = header['schema'] == footer['schema'] == 'ctf10-persistent-ordinary-history-stream.v1' and header['record_type'] == 'header' and footer['record_type'] == 'summary'
++        valid = valid and footer['capture_complete'] is True and footer['actual_runtime_exit_code'] == actual_exit and header['counted_as_PASS'] is False and footer['counted_as_PASS'] is False
++        valid = valid and type(footer['actual_observed_event_count']) is int and type(footer['actual_written_event_count']) is int and type(footer['actual_Rust_generation_count']) is int
++        valid = valid and footer['actual_observed_event_count'] == footer['actual_written_event_count'] and lines == 2 + footer['actual_written_event_count'] + footer['actual_Rust_generation_count']
++        result['capture_complete'] = valid
++        if not valid:
++            result['failure'] = 'actual header/footer/count custody differs; no reachability or numerical result inferred'
++    except (TypeError, ValueError, KeyError) as error:
++        result['failure'] = 'actual header/footer unavailable or malformed: ' + str(error)
++    return result
+ 
+ 
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+-    for name in ('provider-inventory', 'Root-provider-acceptance', 'source-snapshot', 'output-dir'):
++    for name in ['source-preparation', 'validation', 'Root-PE-acceptance', 'output-dir']:
+         parser.add_argument('--' + name, required=True)
+     args = parser.parse_args()
+-    inventory_ref, approval_ref, execution_source = (operand(v) for v in (args.provider_inventory, args.Root_provider_acceptance, args.source_snapshot))
+-    authority_refs = {k: full(bind({'path': p, 'sha256': s})) for k, (p, s) in AUTHORITIES.items()}
+-    native, configure_prep = (load(authority_refs[k]) for k in ('Native_preparation', 'configure_preparation'))
+-    inventory, approval = load(inventory_ref), load(approval_ref)
+-    need(inventory['schema'] == 'src06-tarp-dispatcher-actual-linked-provider-and-PE-inventory.v1', 'actual SRC06 provider inventory required')
+-    need(approval['schema'] == 'src06-tarp-dispatcher-Root-provider-acceptance.v1' and approval['accepted'] is True, 'actual Root provider acceptance required')
+-    same(approval['provider_inventory'], inventory_ref)
+-    for key in ('reviewed_Source_preparation', 'actual_Native_binary', 'actual_full_link_map', 'actual_helper_object', 'actual_build_execution', 'Source_snapshot'):
+-        same(approval[key], inventory[key])
+-    need(all(approval[k] is True for k in ('all_ten_Original_providers_accepted', 'full_PE_and_core_proof_accepted', 'dry_and_actual_compile_link_commands_byte_exact')), 'all ten Original providers and full PE/core/dry proof must be accepted')
+-    same(inventory['reviewed_Source_preparation'], authority_refs['Native_preparation'])
+-    provider_prep = load(approval['provider_collection_preparation'])
+-    need(provider_prep['schema'] == 'src06-tarp-dispatcher-observation-source-preparation.v1', 'actual reviewed collector preparation required')
+-    same(inventory['configure_preparation'], authority_refs['configure_preparation'])
+-    same(full(Path(__file__)), provider_prep['own_sources'][1])
+-    same(inventory['provider_contract'], provider_prep['own_sources'][2])
+-    contract = load(inventory['provider_contract'])
+-    need(contract['schema'] == 'src06-tarp-dispatcher-provider-contract.v1' and len(contract['providers']) == 10, 'complete declared provider contract required')
+-    need([r['declared_provider'] for r in contract['providers']] == native['core_address_bound_providers_required'], 'all declared Original providers required')
+-    symbols = [r['symbol'] for r in contract['providers']]
+-    same(inventory['actual_evidence_collector'], approval['actual_evidence_collector'])
+-    same(approval['actual_evidence_collector'], provider_prep['own_sources'][0])
+-    historical = snapshot_members(inventory['Source_snapshot'], False)
+-    current = snapshot_members(execution_source, True)
+-    for value in (native, configure_prep, provider_prep, approval): collect(value)
+-    collect({k: v for k, v in inventory.items() if k != 'authenticated_inherited_historical_BUILD_Source_aliases'})
+-    freeze, review = load(inventory['frozen_build_inputs']), load(inventory['configure_review'])
+-    need(freeze['schema'] == 'src06-tarp-dispatcher-frozen-configure-inputs.v1' and review['schema'] == 'src06-tarp-dispatcher-configure-dry-review.v1', 'actual frozen build and dry review required')
+-    same(review['frozen_build_inputs'], inventory['frozen_build_inputs']); same(freeze['Source_snapshot'], inventory['Source_snapshot'])
+-    same(freeze['reviewed_Source_preparation'], authority_refs['Native_preparation'])
+-    historical_aliases = historical_configure(freeze); collect(review)
+-    need(inventory['authenticated_inherited_historical_BUILD_Source_aliases'] == historical_aliases, 'inherited D362 Source archive mapping differs')
+-    need(any(all(row[k] == configure_prep['own_sources'][0][k] for k in ('path', 'sha256', 'size_bytes')) for row in freeze['frozen_Source_and_input']), 'actual configure Source not frozen')
+-    build = recorded(inventory['actual_build_execution'], inventory['Source_snapshot'])
+-    configure = recorded(review['configure_execution'], inventory['Source_snapshot'])
+-    dry = recorded(review['dry_execution'], inventory['Source_snapshot'])
+-    need(configure['command'] == freeze['actual_configure_command'] and build['command'] == inventory['actual_build_argv'], 'actual configure/build argv differs')
+-    expected = review['prospective_compile_command']
+-    need(expected == inventory['reviewed_prospective_build_argv'] and len(expected) == len(build['command']) == 6 and build['command'][1] == expected[1] == '-C', 'actual selected build command required')
+-    need((ROOT / build['command'][0]).resolve() == Path(expected[0]).resolve() and (ROOT / build['command'][2]).resolve() == Path(expected[2]).resolve() and build['command'][3:] == expected[3:] == ['-j1', '-v', 'src06_tarp_dispatcher_helper'], 'actual build paths/options differ')
+-    need(dry['command'] == expected[:3] + ['-n'] + expected[3:] and configure['finished_utc'] <= dry['started_utc'] <= dry['finished_utc'] <= build['started_utc'], 'dry/build custody chronology differs')
+-    steps = [s for s in bind(build['stdout']).read_text(encoding='utf-8').splitlines() if re.match(r'^\[\d+/\d+\]', s)]
+-    need(len(steps) == 2 and steps == review['dry_steps'], 'full dry and actual compile/link steps differ')
+-    need(review['previous_compile_rows'] == 742 and review['current_compile_rows'] == 743 and review['exact_previous_rows_preserved'] is True and review['declared_SHA_transport_link_token'] == '-lbcrypt' and review['declared_SHA_transport_immediately_after_core'] is True and review['exact_prior_core_link_suffix_preserved_after_declared_SHA_transport'] is True, 'inherited graph/core link preservation differs')
+-    need(inventory['dry_and_actual_compile_link_commands_byte_exact'] is True and inventory['current_compile_graph_cache_and_core_preserved'] is True, 'provider preservation proof required')
+-    need(all(inventory[k] is False for k in ('helper_executed', 'numerical_results_read', 'production_math_changed', 'gates_updated')), 'pre-execution factual provider inventory required')
+-    for name, key in (('compile_commands.json', 'actual_graph_after'), ('CMakeCache.txt', 'actual_cache_after')):
+-        bind({'path': '.runtime/ep261-gcc13-o0/' + name, 'sha256': review[key]['sha256'], 'size_bytes': review[key]['size_bytes']})
+-    ninja_archive = full(bind(inventory['frozen_build_inputs']).parent / 'build.ninja.after')
+-    bind(ninja_archive); bind({'path': '.runtime/ep261-gcc13-o0/build.ninja', 'sha256': ninja_archive['sha256'], 'size_bytes': ninja_archive['size_bytes']})
+-    core = load(freeze['original_core_receipt']); collect(core)
+-    need(core['checks_passed'] is True and core['scientific_source_patches'] is False, 'unchanged genuine Original core required')
+-    for key in ('actual_core_before', 'actual_core_after'):
+-        check = recorded(review[key], inventory['Source_snapshot'])
+-        need(check['command'][1:] == ['-X', 'utf8', '-B', 'tools/porting/build_original_reference.py', '--check'] and b'13534 byte-identical official blobs' in bind(check['stdout']).read_bytes(), 'full official Source/core check required')
+-    post_core = recorded(inventory['actual_post_build_core_execution'], inventory['Source_snapshot'])
+-    need(Path(post_core['command'][0]).resolve() == Path(sys.executable).resolve() and post_core['command'][1:] == ['-X', 'utf8', '-B', 'tools/porting/build_original_reference.py', '--check'], 'actual post-build official checker command required')
+-    need(b'13534 byte-identical official blobs' in bind(post_core['stdout']).read_bytes() and build['finished_utc'] <= post_core['started_utc'], 'full post-build official Source/core check and chronology required')
+-    binary, link_map, obj = (full(bind(inventory[k])) for k in ('actual_Native_binary', 'actual_full_link_map', 'actual_helper_object'))
+-    need(bind(binary) == EXTERNAL / 'src06_tarp_dispatcher_helper.exe' and bind(link_map) == bind(binary).with_suffix('.map'), 'actual SRC06 output paths differ')
+-    object_path = Path(review['new_compile_row']['output'])
+-    if not object_path.is_absolute():
+-        object_path = Path(review['new_compile_row']['directory']) / object_path
+-    need(bind(obj) == object_path.resolve(), 'actual selected helper object differs')
+-    providers = inventory['actual_address_bound_providers']
+-    need([v['symbol'] for v in providers] == symbols and len(inventory['actual_disassembly_executions']) == 10, 'all ten unique Original providers required')
+-    mapping = inventory['actual_PE']
+-    need(mapping['sha256'] == binary['sha256'] and mapping['size_bytes'] == binary['size_bytes'], 'actual full PE identity differs')
+-    with bind(binary).open('rb') as stream, mmap.mmap(stream.fileno(), 0, access=mmap.ACCESS_READ) as payload:
+-        for i, provider in enumerate(providers):
+-            spec = contract['providers'][i]
+-            need(provider['owning_text_section']['owner'] == spec['core_owner'] and provider['actual_addr2line_function'] == symbols[i] and provider['all_disassembled_rows_equal_actual_PE'] is True, 'genuine Original provider/PE bytes required')
+-            match = re.search('/' + re.escape(spec['Original_relative_source']) + r':(\d+)(?: \(discriminator \d+\))?$', provider['actual_addr2line_location'].replace('\\', '/'))
+-            need(match is not None and spec['start_line'] <= int(match[1]) <= spec['end_line'], 'actual Original Source location differs')
+-            rva, size = provider['address_integer'] - mapping['image_base'], provider['actual_code_byte_count']
+-            need(int(provider['actual_code_extent_end'], 16) - provider['address_integer'] == size, 'complete actual code extent required')
+-            sections = [s for s in mapping['sections'] if not s['debug'] and s['characteristics'] & 0x20000000 and s['rva'] <= rva and rva + size <= s['rva'] + s['raw_size']]
+-            need(size > 0 and len(sections) == 1, 'unique executable PE extent required')
+-            section = sections[0]; offset = section['raw_offset'] + rva - section['rva']; data = payload[offset:offset + size]
+-            need(data.hex() == provider['actual_code_bytes_hex'] and hashlib.sha256(data).hexdigest() == provider['actual_code_bytes_sha256'], 'address-bound code bytes differ')
+-            same(provider['actual_disassembly_execution'], inventory['actual_disassembly_executions'][i])
+-            recorded(provider['actual_disassembly_execution'], inventory['Source_snapshot'])
+-    recorded(inventory['actual_addr2line_execution'], inventory['Source_snapshot'])
+-    loads = inventory['actual_target_and_core_LOAD_rows']
+-    need(len(loads) == 2 and sum(v['literal_line'] == 'LOAD Products/libenergypluslib.a' for v in loads) == 1 and sum('src06_tarp_dispatcher_helper.dir/' in v['literal_line'] for v in loads) == 1, 'selected target and genuine core LOAD custody required')
+-    input_ref, policy_ref, idf_ref = (full(bind(native[k])) for k in ('input_only_request', 'prospective_policy', 'literal_IDF'))
+-    request, policy = load(input_ref), load(policy_ref)
+-    def bit_count(value):
+-        return (int(set(value) == {'bits'}) + sum(bit_count(v) for v in value.values())) if isinstance(value, dict) else sum(bit_count(v) for v in value) if isinstance(value, list) else 0
+-    need(request['schema'] == 'src06-tarp-dispatcher-direct-request.v1' and request['expected_values_supplied'] is False and request['ordinary_production_prestate_supplied'] is False, 'literal independent direct input required')
+-    need(len(request['cases']) == native['literal_input_case_count'] == 8 and sum(len(c['operations']) for c in request['cases']) == native['literal_dispatcher_call_count'] == 20 and bit_count(request) == native['literal_binary64_input_cell_count'] == 700, 'complete fixed input declarations required')
+-    need(policy['schema'] == 'src06-tarp-dispatcher-prospective-observation-policy.v1' and policy['ordinary_production_handoff_verified'] is False and policy['gates_updated'] is False and native['runtime_interfaces']['Native_argc'] == 3, 'unchanged prospective policy and actual argc required')
+-    need(request['literal_IDF'].encode('utf8') == bind(idf_ref).read_bytes() and idf_ref['size_bytes'] == 158, 'exact physical IDF literal required')
+-    wind_before, wind_guard = (load(authority_refs[k]) for k in ('wind_before', 'wind_custody'))
+-    same(wind_guard['actual_before'], authority_refs['wind_before'])
+-    need(wind_before['implementation'] == 'Native' and wind_guard['all_frozen_artifacts_unchanged'] is True and wind_guard['actual_target_exit_code'] == wind_guard['actual_recorder_exit_code'] == 0, 'authentic closed wind environment provenance required')
+-    wind_receipt = recorded(wind_guard['actual_command_receipt'], wind_before['Source_snapshot'])
+-    need(wind_receipt['command'] == wind_before['actual_argv'], 'actual wind provenance command differs')
+-    dlls = [full(bind(row)) for row in wind_before['pinned_runtime_DLLs']]
+-    directory = ROOT / '.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin'
+-    need(len(dlls) == 3 and {Path(v['path']).name for v in dlls} == {'libgcc_s_seh-1.dll', 'libstdc++-6.dll', 'libwinpthread-1.dll'} and all(bind(v).parent == directory for v in dlls), 'authentic complete Winlibs DLL set required')
+-    need(wind_before['actual_PATH'] == str(directory) + os.pathsep + wind_before['inherited_PATH'], 'actual wind PATH prefix differs')
+-    environment = os.environ.copy(); inherited_path = environment.get('PATH', ''); environment['PATH'] = str(directory) + os.pathsep + inherited_path
+-    bind({'path': str(RECORDER), 'sha256': RECORDER_SHA}); bind(full(Path(__file__)))
+-    output = (ROOT / args.output_dir).resolve()
+-    need(output.is_relative_to(ROOT / '.runtime/porting/SRC-06') and output != ROOT / '.runtime/porting/SRC-06' and not output.exists(), 'fresh ignored SRC06 capture directory required')
+-    output.mkdir(parents=True, exist_ok=False)
+-    case_runs = output / 'case-runs'
+-    need(not case_runs.exists(), 'fresh per-case physical-IDF run root required')
+-    argv = [str(bind(binary)), str(bind(input_ref)), str(case_runs)]
+-    before = {'schema': 'src06-tarp-dispatcher-execution-before.v1', 'provider_inventory': inventory_ref, 'Root_provider_acceptance': approval_ref,
+-              'Source_preparation': authority_refs['Native_preparation'], 'build_Source_snapshot': inventory['Source_snapshot'], 'Source_snapshot': execution_source,
+-              'actual_binary': binary, 'actual_link_map': link_map, 'actual_helper_object': obj, 'actual_input': input_ref, 'literal_IDF': idf_ref, 'observation_policy': policy_ref,
+-              'reviewed_execution_driver': full(Path(__file__)), 'authorities': authority_refs, 'inherited_historical_BUILD_Source_aliases': historical_aliases,
+-              'inherited_PATH': inherited_path, 'actual_PATH': environment['PATH'], 'pinned_runtime_DLLs': dlls, 'actual_argv': argv,
+-              'declared_input_counts': {'cases': 8, 'Init_calls': 20, 'processInput_calls': 8, 'binary64_cells': 700, 'physical_IDF_bytes': 158}, 'frozen_artifacts': list(FROZEN.values()), 'FP_controls_modified': False, 'scientific_PASS_claimed': False}
+-    write(output / 'before.json', before)
+-    result = subprocess.run([sys.executable, '-X', 'utf8', '-B', str(RECORDER), '--output-dir', str(output / 'command'), '--', *argv], cwd=ROOT, env=environment)
+-    receipt_path = output / 'command/receipt.json'; value = json.loads(receipt_path.read_bytes()) if receipt_path.is_file() else None
+-    after = [{**full(p), 'available': True} if p.is_file() else {'path': row['path'], 'available': False} for p, row in FROZEN.items()]
+-    unchanged = source_paths() == set(current) and all(row.get('available') and {k: row[k] for k in ('path', 'sha256', 'size_bytes')} == old for row, old in zip(after, FROZEN.values()))
+-    logs = {k: full(ROOT / value[k]['path']) for k in ('stdout', 'stderr')} if value else None
+-    produced_files = [full(p) for p in sorted(case_runs.rglob('*')) if p.is_file()] if case_runs.is_dir() else []
+-    guard = {'schema': 'src06-tarp-dispatcher-execution-custody.v1', 'actual_before': full(output / 'before.json'), 'actual_command_receipt': full(receipt_path) if value else None,
+-             'actual_recorder_exit_code': result.returncode, 'actual_target_exit_code': value['exit_code'] if value else None, 'actual_full_output_logs': logs,
+-             'all_frozen_artifacts_unchanged': unchanged, 'produced_case_files_full_SHA_inventory': produced_files, 'frozen_artifacts_after': after, 'numerical_results_interpreted': False, 'FP_controls_modified': False, 'scientific_PASS_claimed': False, 'gates_updated': False}
+-    write(output / 'custody.json', guard)
+-    need(unchanged and value is not None and value['schema'] == 'recorded-porting-command.v1' and value['launch_error'] is None and value['source_bytes_match_before_and_after'] is True and value['source_snapshot']['sha256'] == execution_source['sha256'] and value['command'] == argv and value['exit_code'] == result.returncode and result.returncode in (0, 2), 'actual capture custody failed; all records retained')
+-    need(all(logs[k]['sha256'] == value[k]['sha256'] for k in logs), 'actual output log bytes differ from receipt')
+-    print(json.dumps({'custody': full(output / 'custody.json'), 'actual_exit_code': result.returncode, 'scientific_PASS_claimed': False}))
+-    return result.returncode
++    name, sha = args.source_preparation.rsplit('#', 1)
++    own_path = (ROOT / name).resolve()
++    if not own_path.is_relative_to(ROOT) or physical_ref(own_path)['sha256'] != sha:
++        raise ValueError('reviewed execution preparation differs')
++    own = json.loads(own_path.read_bytes())
++    if own['schema'] != 'src05-ordinary-main-production-execution-Source-preparation.v1':
++        raise ValueError('reviewed execution preparation schema differs')
++    application_path = ROOT / APPLICATION_PREP['path']
++    if physical_ref(application_path)['sha256'] != APPLICATION_PREP['sha256']:
++        raise ValueError('accepted application preparation differs before import')
++    application_prep = json.loads(application_path.read_bytes())
++    A = module(application_prep['runtime_interfaces']['apply'], 'accepted_apply')
++    A.preparation(APPLICATION_PREP['path'] + '#' + APPLICATION_PREP['sha256'])
++    V = module(application_prep['runtime_interfaces']['validate'], 'accepted_validate')
++    for row in own['own_sources']:
++        A.bind(row)
++    A.need(A.bind(own['runtime_interfaces']['driver']) == Path(__file__).resolve() and A.bind(own['accepted_application_preparation']) == A.bind(APPLICATION_PREP), 'actual execution driver/authority differs')
++    own_ref, validation_ref, acceptance_ref = A.operand(args.source_preparation), A.operand(args.validation), A.operand(args.Root_PE_acceptance)
++    validation, acceptance = A.load(validation_ref), A.load(acceptance_ref)
++    A.need(validation['schema'] == 'src05-ordinary-main-thread-actual-quality-and-artifacts.v1' and A.bind(validation['Source_preparation']) == A.bind(APPLICATION_PREP) and validation['target_execution_performed'] is False and validation['gates_updated'] is False, 'actual reviewed validation required')
++    source = validation['Source_snapshot']
++    A.need(source == own['required_Source_snapshot'] and A.bind(validation['actual_application']) == A.bind(own['actual_application']), 'actual post-application Source/application differs')
++    A.need(len(A.members(source, current=True)) == 3931, 'fresh full3931 Source required')
++    A.need(acceptance['schema'] == 'src05-ordinary-main-thread-Root-PE-acceptance.v1' and acceptance['accepted'] is True and acceptance['both_actual_PE_stack_and_entry_evidence_accepted'] is True and A.bind(acceptance['actual_validation']) == A.bind(validation_ref) and acceptance['Source_snapshot'] == source, 'Root actual PE acceptance required')
++    artifacts = validation['actual_Cargo_artifacts']
++    A.need(set(artifacts) == set(V.BUILDS) == set(acceptance['actual_Cargo_artifacts']), 'exact two actual Cargo artifact roles required')
++    quality = validation['quality_executions']
++    A.need(set(quality) == set(V.QUALITY), 'four actual quality roles required')
++    frozen = [own_ref, validation_ref, acceptance_ref, APPLICATION_PREP, own['prior_actual_CLI_command'], own['prior_actual_observer_command']] + own['own_sources'] + application_prep['own_sources']
++    for role, row in quality.items():
++        actual = A.recorded(row, source, V.QUALITY[role]); frozen += [row, actual['stdout'], actual['stderr']]
++    for role, artifact in artifacts.items():
++        expected = V.BUILDS[role]
++        command = ['cargo', 'build'] + V.CONFIGS + ['--locked', '-p', expected['package'], expected['selector'], expected['target'], '--message-format=json-render-diagnostics']
++        actual = A.recorded(artifact['actual_build_execution'], source, command)
++        messages = [json.loads(line) for line in A.bind(actual['stdout']).read_text(encoding='utf-8').splitlines() if line]
++        emitted = [v for v in messages if v.get('reason') == 'compiler-artifact' and v.get('executable')]
++        A.need(len(emitted) == 1 and emitted[0] == artifact['cargo_message'] and emitted[0]['target']['name'] == expected['target'] and emitted[0]['target']['kind'] == expected['kind'] and Path(emitted[0]['target']['src_path']).resolve() == ROOT / expected['source'], 'actual emitted target/source differs')
++        A.need(Path(emitted[0]['executable']).resolve() == A.bind(artifact['executable']) == A.bind(acceptance['actual_Cargo_artifacts'][role]), 'actual accepted executable differs')
++        A.need(artifact['PE_inspection']['actual_binary'] == artifact['executable'] and artifact['PE_inspection']['stack_reserve_bytes'] == 8388608, 'actual accepted PE stack witness differs')
++        A.bind(artifact['PE_inspection']['actual_PE_header_bytes'])
++        captured = actual['cargo_compiler_artifacts_capture']
++        A.need(captured['status'] == 'pass' and len(captured['rows']) == 1 and captured['rows'][0]['cargo_message'] == emitted[0] and captured['rows'][0]['executable']['sha256'] == artifact['executable']['sha256'], 'actual Cargo immediate capture differs')
++        A.need(all(A.load(r)['finished_utc'] <= actual['started_utc'] for r in quality.values()), 'actual quality must precede actual build')
++        frozen += [artifact['actual_build_execution'], actual['stdout'], actual['stderr'], artifact['executable'], artifact['PE_inspection']['actual_PE_header_bytes']]
++    A.load(validation['actual_application']); A.load(validation['actual_formatter_review'])
++    frozen += [validation['actual_application'], validation['actual_formatter_review'], source]
++    contract_ref = own['input_only_contract']; contract = A.load(contract_ref)
++    A.need(contract['schema'] == 'src05-ordinary-main-production-input-only-contract.v1' and contract['selected_case_id'] == 'A-24H' and len(contract['all45_fixed_input_guards']) == 45, 'exact fixed A24 input contract required')
++    A.need(contract['selected_input']['path'] == 'energyplus_porting_plan/cases/A-24H/input.idf' and contract['selected_weather']['path'] == '.runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw', 'fixed input/weather paths differ')
++    frozen += [contract_ref] + [r['actual'] for r in contract['all45_fixed_input_guards']]
++    frozen += [contract[k] for k in ['selected_input', 'selected_weather', 'selected_metadata', 'selected_idd', 'fixed_scope']]
++    for row in frozen:
++        A.bind(row)
++    input_path, weather = A.bind(contract['selected_input']), A.bind(contract['selected_weather'])
++    cli_old = A.load(own['prior_actual_CLI_command']); observer_old = A.load(own['prior_actual_observer_command'])
++    A.need(cli_old['command'][1:] == ['run', str(input_path), '--weather', str(weather), '--output-dir', cli_old['command'][6], '--mode', 'compatibility', '--partial', 'deny', '--trace-level', 'full', '--porting-scope', 'a'], 'authentic prior CLI command shape differs')
++    A.need(len(observer_old['command']) == 5 and observer_old['command'][1:3] == [str(input_path), str(weather)], 'authentic prior observer argc4 shape differs')
++    out = (ROOT / args.output_dir).resolve()
++    A.need(out.is_relative_to(ROOT / '.runtime/porting/SRC-05') and not out.exists() and not DATA.exists(), 'fresh ignored metadata and fresh fixed D output required')
++    free = shutil.disk_usage(Path('D:/')).free
++    A.need(free >= 40 * 1024 ** 3, 'at least40GiB actual D free space required before producer')
++    out.mkdir(parents=True); DATA.mkdir(parents=True)
++    capture_dir = DATA / 'capture'; capture_dir.mkdir()
++    capture = capture_dir / 'events.ndjson'
++    commands = {
++        'CLI': [str(A.bind(artifacts['CLI']['executable'])), 'run', str(input_path), '--weather', str(weather), '--output-dir', str(DATA / 'CLI'), '--mode', 'compatibility', '--partial', 'deny', '--trace-level', 'full', '--porting-scope', 'a'],
++        'ordinary_observer': [str(A.bind(artifacts['ordinary_observer']['executable'])), str(input_path), str(weather), str(DATA / 'observer'), str(capture)],
++    }
++    before = {'schema': 'src05-ordinary-main-production-before.v1', 'Source_preparation': own_ref, 'actual_validation': validation_ref, 'Root_PE_acceptance': acceptance_ref, 'Source_snapshot': source, 'input_only_contract': contract_ref, 'actual_commands': commands, 'data_output_root': DATA.as_posix(), 'actual_D_free_bytes_before': free, 'frozen_artifacts': frozen, 'actual_inherited_environment_selected': {k: os.environ.get(k) for k in ['PATH', 'RUST_MIN_STACK', 'RUSTFLAGS', 'CARGO_ENCODED_RUSTFLAGS', 'RUSTUP_TOOLCHAIN']}, 'floating_point_controls_written': False, 'numerical_comparison_performed': False}
++    before_ref = A.dump(out / 'before.json', before)
++    prefix = [sys.executable, '-X', 'utf8', '-B', str(A.bind(A.RECORDER)), '--output-dir']
++    executions = {}; failure_code = 0
++    for role, command in commands.items():
++        A.members(source, current=True)
++        for row in frozen:
++            A.bind(row)
++        code = subprocess.call(prefix + [str(out / (role + '-command')), '--'] + command, cwd=ROOT)
++        receipt_ref = A.ref(out / (role + '-command') / 'receipt.json'); actual = A.load(receipt_ref)
++        A.need(actual['schema'] == 'recorded-porting-command.v1' and actual['command'] == command and actual['source_snapshot'] == source and actual['exit_code'] == code and actual['launch_error'] is None and actual['source_bytes_match_before_and_after'] is True, 'actual process/Source custody differs; failed artifacts retained')
++        A.need(A.bind(actual['executed_launcher']['archive']).read_bytes() == A.bind(A.RECORDER).read_bytes(), 'actual process recorder differs')
++        A.bind(actual['stdout']); A.bind(actual['stderr'])
++        executions[role] = {'actual_execution': receipt_ref, 'actual_exit_code': code}
++        if code != 0 and failure_code == 0:
++            failure_code = code
++        A.members(source, current=True)
++        for row in frozen:
++            A.bind(row)
++    captured = capture_custody(capture, executions['ordinary_observer']['actual_exit_code'])
++    files = []
++    for path in sorted(DATA.rglob('*')):
++        if path.is_file():
++            A.need(path.resolve().is_relative_to(DATA), 'actual produced file must remain within fixed D output')
++            files.append(captured['actual_file'] if path == capture and captured['actual_file'] is not None else physical_ref(path))
++    for row in frozen:
++        A.bind(row)
++    A.members(source, current=True)
++    record = {'schema': 'src05-ordinary-main-production-execution-custody.v1', 'actual_before': before_ref, 'Source_preparation': own_ref, 'Source_snapshot': source, 'actual_validation': validation_ref, 'Root_PE_acceptance': acceptance_ref, 'actual_executions': executions, 'actual_commands': commands, 'data_output_root': DATA.as_posix(), 'actual_D_free_bytes_after': shutil.disk_usage(Path('D:/')).free, 'actual_output_files': files, 'actual_capture_custody': captured, 'all_frozen_artifacts_rehashed_unchanged': True, 'full_current_Source_members_verified': 3931, 'actual_processes_both_exit_zero': all(v['actual_exit_code'] == 0 for v in executions.values()), 'boundary_reachability_verified': False, 'floating_point_controls_written': False, 'numerical_comparison_performed': False, 'whole_ordinary_or_integration_PASS_claimed': False, 'gates_updated': False}
++    print(json.dumps({'custody': A.dump(out / 'custody.json', record)}))
++    return failure_code if failure_code else (0 if captured['capture_complete'] else 2)
+ 
+ 
+ if __name__ == '__main__':
+-    sys.exit(main())
++    raise SystemExit(main())

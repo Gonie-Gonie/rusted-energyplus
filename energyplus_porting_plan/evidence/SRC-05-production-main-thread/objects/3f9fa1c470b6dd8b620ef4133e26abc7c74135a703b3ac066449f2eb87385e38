@@ -1,0 +1,28 @@
+--- .runtime/porting/SRC-06/native-tarp-dispatcher-prep-02/before/tarp_dispatcher_fields.hh
++++ .runtime/porting/SRC-06/native-tarp-dispatcher-prep-02/tarp_dispatcher_fields.hh
+@@ -35,11 +35,11 @@
+             {"hnUserCurveNum", v.hnUserCurveNum}, {"faceArea", scalar(v.faceArea)},
+             {"facePerimeter", scalar(v.facePerimeter)}, {"faceHeight", scalar(v.faceHeight)}};
+ }
+-template<class Array> json empty_family(Array const &owner)
++template<class Array> json empty_vector_family(Array const &owner)
+ {
+     // Only the absent-user domain is admitted. No nonempty unread row is disguised as captured.
+     return {{"allocated", owner.allocated()}, {"size", owner.size()}, {"rows", owner.size() == 0 ? json::array() : json(nullptr)},
+-            {"nonempty_rows_available", false}};
++            {"nonempty_rows_available", false}, {"indexing", "EPVector one-based"}};
+ }
+ inline json owners(EnergyPlus::EnergyPlusData const &s)
+ {
+@@ -105,8 +105,9 @@
+             {"CubeRootOfOverallBuildingVolume", scalar(c.CubeRootOfOverallBuildingVolume)},
+             {"RoofLongAxisOutwardAzimuth", scalar(c.RoofLongAxisOutwardAzimuth)},
+             {"TotUserIntConvModels", d.TotUserIntConvModels}, {"TotUserExtConvModels", d.TotUserExtConvModels},
+-            {"userIntConvModels", empty_family(d.userIntConvModels)}, {"userExtConvModels", empty_family(d.userExtConvModels)},
+-            {"hcIntUserCurve", empty_family(c.hcIntUserCurve)}, {"hcExtUserCurve", empty_family(c.hcExtUserCurve)},
++            {"userIntConvModels", empty_vector_family(d.userIntConvModels)}, {"userExtConvModels", empty_vector_family(d.userExtConvModels)},
++            {"hcIntUserCurve", Src06::array1(c.hcIntUserCurve, [](auto const &) -> json { return nullptr; }, c.hcIntUserCurve.size() == 0)},
++            {"hcExtUserCurve", Src06::array1(c.hcExtUserCurve, [](auto const &) -> json { return nullptr; }, c.hcExtUserCurve.size() == 0)},
+             {"NumOfNodes", s.dataLoopNodes->NumOfNodes},
+             {"Node_selected_members", Src06::array1(s.dataLoopNodes->Node, [](auto const &v) -> json {
+                 return {{"Temp", scalar(v.Temp)}, {"MassFlowRate", scalar(v.MassFlowRate)}};

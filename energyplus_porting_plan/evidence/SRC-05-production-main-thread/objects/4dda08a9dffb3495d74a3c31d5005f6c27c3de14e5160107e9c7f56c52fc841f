@@ -1,0 +1,166 @@
+{
+  "schema": "src05-ordinary-main-thread-actual-formatter-review.v1",
+  "actual_application": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/record.json",
+    "sha256": "b979f8ce4ab5b78ef3a71157917f9e24260ac18a4d7d6b0ae3ceda2d5b7c8afe",
+    "size_bytes": 12502
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/00/00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a",
+    "sha256": "00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a"
+  },
+  "Header_FULL_formatter_correspondence_accepted": true,
+  "independent_FULL_formatter_correspondence_accepted": true,
+  "review_scope": "Actual four-path application and formatter correspondence, complete Source archives/current closure. Header authored the underlying implementation; independent implementation Source acceptance was by Raw/Root.",
+  "accepted_Source_workflow_review": {
+    "path": ".runtime/porting/SRC-05/Header-ordinary-main-thread-application-Source-review-03/review.json",
+    "sha256": "2475c211ec4e103d86a29fa4f1fc407032ac65767f9ac68ff9d28a49af6700d9",
+    "size_bytes": 3145
+  },
+  "actual_application_outer_execution": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-command-01/receipt.json",
+    "sha256": "9fc1906033a3984a2a21e337746241e5bdc2a2dd383cc19904440d5d6ff2eec3",
+    "size_bytes": 3460
+  },
+  "actual_formatter_execution": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/fmt-command/receipt.json",
+    "sha256": "f4cc595b6982bdee58ecae28827e32da74b2514347a767ffb20f74c6c471c4cf",
+    "size_bytes": 3069
+  },
+  "Native_baseline_acceptance": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-Native-observation-01/Root-baseline-acceptance.json",
+    "sha256": "7b63de51b46753ef1cbeafc55e7600d063eb29782914d4eacd1acb1605bb51e0",
+    "size_bytes": 1965
+  },
+  "source_before": {
+    "path": ".runtime/porting/source-objects/8a/8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934",
+    "sha256": "8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934"
+  },
+  "source_literal": {
+    "path": ".runtime/porting/source-objects/00/00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a",
+    "sha256": "00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a"
+  },
+  "source_final": {
+    "path": ".runtime/porting/source-objects/00/00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a",
+    "sha256": "00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a"
+  },
+  "checks": {
+    "all_four_application_rows_match_reviewed_held_literal_authority": true,
+    "all_four_semantic_diffs_exactly_regenerated": true,
+    "all_four_formatter_diffs_empty": true,
+    "all_four_canonical_and_literal_and_final_archive_bytes_equal": true,
+    "full_before_Source_members": 3929,
+    "full_literal_and_final_Source_members": 3931,
+    "unrelated_prior_Source_members_byte_exact": 3927,
+    "two_new_paths_absent_in_before_snapshot": true,
+    "current_full_Source_membership_and_all_archive_bytes_authenticated": true,
+    "Native_factual_release_precedes_application_formatter": true,
+    "actual_fmt_zero_and_stable_literal_Source_guard": true,
+    "actual_outer_zero_and_expected_changed_Source_guard": true,
+    "full_ref_checks": 11853
+  },
+  "application": [
+    {
+      "canonical_path": "crates/ep_cli/src/main.rs",
+      "actual_literal": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/literal/crates/ep_cli/src/main.rs",
+        "sha256": "0e1ce6b4cccd1d1bf0a66e205b576cc5f4e4a47c91071480397e17d7ae72bb92",
+        "size_bytes": 1031295
+      },
+      "actual_final": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/formatted/crates/ep_cli/src/main.rs",
+        "sha256": "0e1ce6b4cccd1d1bf0a66e205b576cc5f4e4a47c91071480397e17d7ae72bb92",
+        "size_bytes": 1031295
+      },
+      "semantic_diff": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/semantic-diffs/crates__ep_cli__src__main.rs.diff",
+        "sha256": "f935d067a848e93bcba5a6c2b48bcb186a7806ee14492171dec419579efc39fc",
+        "size_bytes": 1347
+      },
+      "formatter_diff": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/formatter-diffs/crates__ep_cli__src__main.rs.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "literal_proposal_and_final_byte_exact": true
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/ctf10_ordinary_history_observer.rs",
+      "actual_literal": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/literal/crates/ep_run/examples/ctf10_ordinary_history_observer.rs",
+        "sha256": "7ec961e8e48fb06f874a52a9b9b4ca38bb9ced3d087c17359253b0fe50e75cd4",
+        "size_bytes": 3402
+      },
+      "actual_final": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/formatted/crates/ep_run/examples/ctf10_ordinary_history_observer.rs",
+        "sha256": "7ec961e8e48fb06f874a52a9b9b4ca38bb9ced3d087c17359253b0fe50e75cd4",
+        "size_bytes": 3402
+      },
+      "semantic_diff": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/semantic-diffs/crates__ep_run__examples__ctf10_ordinary_history_observer.rs.diff",
+        "sha256": "69d167d5f6ba2028f3be8cedf0c8c1dcae23e182e23c509488c0ad9c8a62c839",
+        "size_bytes": 918
+      },
+      "formatter_diff": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/formatter-diffs/crates__ep_run__examples__ctf10_ordinary_history_observer.rs.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "literal_proposal_and_final_byte_exact": true
+    },
+    {
+      "canonical_path": "crates/ep_cli/build.rs",
+      "actual_literal": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/literal/crates/ep_cli/build.rs",
+        "sha256": "d48244e07cbe1af23eb4f2f9f2d37c47c01a72e3aa4a25bfb1dc85a3690e32cd",
+        "size_bytes": 566
+      },
+      "actual_final": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/formatted/crates/ep_cli/build.rs",
+        "sha256": "d48244e07cbe1af23eb4f2f9f2d37c47c01a72e3aa4a25bfb1dc85a3690e32cd",
+        "size_bytes": 566
+      },
+      "semantic_diff": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/semantic-diffs/crates__ep_cli__build.rs.diff",
+        "sha256": "1b0559104fe1d7c6d8fc6d3df88d114223ee990acdf0019948d2c0527b6d262f",
+        "size_bytes": 653
+      },
+      "formatter_diff": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/formatter-diffs/crates__ep_cli__build.rs.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "literal_proposal_and_final_byte_exact": true
+    },
+    {
+      "canonical_path": "crates/ep_run/build.rs",
+      "actual_literal": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/literal/crates/ep_run/build.rs",
+        "sha256": "ad1f28743616a99965858eaee5b8cfa4c489483fd74af22f8e2a69cd97008357",
+        "size_bytes": 562
+      },
+      "actual_final": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/formatted/crates/ep_run/build.rs",
+        "sha256": "ad1f28743616a99965858eaee5b8cfa4c489483fd74af22f8e2a69cd97008357",
+        "size_bytes": 562
+      },
+      "semantic_diff": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/semantic-diffs/crates__ep_run__build.rs.diff",
+        "sha256": "5479a4ae381282f273f591de27c3827970c753b6e5420338f158369ce5940d0b",
+        "size_bytes": 649
+      },
+      "formatter_diff": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/formatter-diffs/crates__ep_run__build.rs.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "literal_proposal_and_final_byte_exact": true
+    }
+  ],
+  "limitations": [
+    "This is an actual application/format correspondence certificate; genuine quality, Cargo-emitted artifacts, PE stack reservation, real CLI/observer execution and numerical comparison remain required.",
+    "No gate promotion, numerical parity or historical floating-point cause is inferred."
+  ],
+  "canonical_mutated_by_reviewer": false,
+  "target_executed_by_reviewer": false
+}

@@ -106,6 +106,36 @@ The independent standalone Rust main and genuine Native setters matched the avai
 
 Separate read-only floating point diagnostics retain all 25 cases in main and spawned lanes: 29 intermediate/result differences, 662 stage-control field differences and four lane-control differences. Native and Rust main lanes had no result differences; the spawned lane had 29. Actual x87 control words were 0x037f for Native main/spawn and Rust main, and 0x027f for Rust spawn. Both linked pow providers use the observed x87 helper family. These observations establish neither causation nor the historical libtest worker controls. No floating point controls, formula, tolerance or production execution path were changed for this result. The previous three-mismatch comparison and all diagnostics remain retained.
 
-The production CLI and ordinary observer still use a worker. Standalone selected parity does not prove that path, the cold guard/error backend, retained ordinary four-array setter/check sequence, SRC-07/08 handoff or whole SRC-05. All four gates remain pending; A 14/54 and B 14/64 are unchanged.
+At that historical capture, the production CLI and ordinary observer used a worker. Standalone selected parity did not prove that path, the cold guard/error backend, retained ordinary four-array setter/check sequence, SRC-07/08 handoff or whole SRC-05. All four gates remain pending; A 14/54 and B 14/64 are unchanged.
 
 Evidence: [complete selected observations, diagnostics, custody and historical failure](../evidence/SRC-05-wind-diagnostics-and-main-thread/summary.json).
+
+## Actual Windows production main entry and closed ordinary capture
+
+Windows CLI and ordinary observer now call their unchanged run bodies on main.
+Non-Windows worker behavior is preserved. Target-specific build scripts reserve
+8 MiB for the Windows main stack without writing floating point controls.
+Actual Cargo-emitted CLI and observer binaries were independently checked as
+x64 PE32+ with an 8,388,608-byte stack reserve and a 4,096-byte commit.
+
+Actual Source 00bfa56d has 3,931 members: four reviewed changed Rust paths,
+two additions and 3,927 byte-identical unrelated members. Formatting introduced
+no extra delta. fmt and Clippy passed; focused tests passed 346 and workspace
+tests passed 4,973, with zero failures and the same two intentionally ignored
+Root-only observation tests. These checks preceded both actual Cargo builds.
+
+The unchanged A-24H IDF/weather CLI invocation and separate ordinary observer
+both exited 0, with unchanged Source, binaries and all 45 fixed input guards.
+All 62 output files (1,328,614,270 bytes) were fully hashed independently. The
+uncapped NDJSON closed with 4,034 written events, one Rust generation and 4,037
+physical lines. Complete ordinary outputs remain on D; published evidence
+retains their full hashes, sizes and IO completion metadata. This capture has
+not been numerically compared and does not certify boundary reachability.
+
+The genuine Native no-user TARP first/repeated-call baseline closed before this
+Rust application. This prerequisite and all actual application, quality, Cargo,
+PE, process and independent factual reviews are retained in the
+[production-entry evidence](../evidence/SRC-05-production-main-thread/summary.json).
+The cold guard/error backend, retained ordinary four-array setter/check sequence,
+SRC-07/08 handoff and complete ordinary comparison remain pending. No card gate
+or A/B completion count changes.

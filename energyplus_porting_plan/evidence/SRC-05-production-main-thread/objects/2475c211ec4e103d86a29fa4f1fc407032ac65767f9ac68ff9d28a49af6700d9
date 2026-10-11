@@ -1,0 +1,67 @@
+{
+  "schema": "src05-ordinary-main-thread-application-Header-Source-review.v1",
+  "accepted": true,
+  "review_scope": "Independent FULL cumulative application01+02 execution and provenance glue, plus documentation-only03. Header authored the underlying four-path main-thread implementation and does not independently certify that own implementation.",
+  "Source_preparation": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-03/manifest.json",
+    "sha256": "e67df8b315cde068743aea3c542b30257e7156cc50588732a0c83d363877c5de",
+    "size_bytes": 19243
+  },
+  "FULL_prior_Source_preparation": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-02/manifest.json",
+    "sha256": "05a6076cfc96a820444334f7da5a3905a26ba98c890995e420fe2b377e689aea",
+    "size_bytes": 19246
+  },
+  "FULL_reviewed_sources": [
+    {
+      "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-03/apply.py",
+      "sha256": "f156146347a42f0f9ee0d13a6e180ab82773c7a9387c5200e85f464b95ba21c5",
+      "size_bytes": 10854,
+      "line_count": 179
+    },
+    {
+      "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-03/validate.py",
+      "sha256": "e1f58c9d464933a0af9e03790251ee08eea20b2fd3675ebc00f78ae5ac27fb2b",
+      "size_bytes": 14022,
+      "line_count": 150
+    },
+    {
+      "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-03/README.md",
+      "sha256": "587520004ac613d6331842731b585e9ee4439ea92a51085a2f055c610ac43333",
+      "size_bytes": 5116,
+      "line_count": 29
+    },
+    {
+      "path": ".runtime/porting/SRC-05/prepare-ordinary-main-thread-application-03.py",
+      "sha256": "835f7ce756edf6ba9e9dab6852dedb240ac7c5ccde23835128f3823b75d405b0",
+      "size_bytes": 3140,
+      "line_count": 51
+    }
+  ],
+  "checks": {
+    "FULL_apply179_validate150_and_authors_read": true,
+    "FULL_02_unique_whole_refs": 49,
+    "FULL_02_descriptor_occurrences": 59,
+    "current03_unique_whole_refs": 49,
+    "current03_descriptor_occurrences": 59,
+    "literal_ranges": 10,
+    "regenerated_cumulative_and_narrow_diffs": 5,
+    "Python_AST_valid": true,
+    "apply_and_validate_literal_exact02": true,
+    "README_inverse_exact02_except_two_command_paths": true,
+    "runtime_interfaces_match_documented03_executables": true,
+    "actual_existing_ignored_roster_exact_two_Source_names": true,
+    "genuine_Native_release_required_before_apply": true,
+    "formatter_review_required_before_quality_and_build": true,
+    "four_exact_quality_argv_and_two_CargoJSON_artifact_roles": true,
+    "read_only_actual_PE_stack_reserve8388608_and_complete_binary_hash_guards": true
+  },
+  "limitations": [
+    "No produced script imported or executed. No target/build/helper/canonical mutation.",
+    "No numerical parity, historical causal conclusion, or gate promotion. Actual application/formatter/quality/Cargo/PE proof remains required."
+  ],
+  "concrete_findings": [
+    "Prior01 zero-ignored guard corrected by02 with exact actual two-test roster.",
+    "Prior02 stale README executable paths corrected by03; both executable bodies remain exact02."
+  ]
+}

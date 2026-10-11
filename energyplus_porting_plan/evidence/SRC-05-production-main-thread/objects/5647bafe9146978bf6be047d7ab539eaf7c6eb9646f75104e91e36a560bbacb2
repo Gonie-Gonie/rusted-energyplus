@@ -1,0 +1,8 @@
+    bool isAlmostEqual3dPt(DataVectorTypes::Vector v1, DataVectorTypes::Vector v2)
+    {
+        // J. Glazer - March 2017
+
+        return ((std::abs(v1.x - v2.x) < Constant::OneCentimeter) && (std::abs(v1.y - v2.y) < Constant::OneCentimeter) &&
+                (std::abs(v1.z - v2.z) < Constant::OneCentimeter));
+    }
+

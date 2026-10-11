@@ -1,0 +1,19 @@
+--- .runtime/porting/SRC-05/ordinary-main-thread-application-prep-02/before-01/validate.py
++++ .runtime/porting/SRC-05/ordinary-main-thread-application-prep-02/validate.py
+@@ -114,9 +114,13 @@
+         if role in QUALITY:
+             quality[role] = receipt_ref
+             if role in ['focused', 'workspace']:
+-                rows = [tuple(map(int, r)) for r in re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored;', A.bind(actual['stdout']).read_text(encoding='utf-8'))]
+-                A.need(rows and all(failed == ignored == 0 for _, failed, ignored in rows), 'actual test groups must report zero failed/ignored')
+-                totals[role] = {'groups': len(rows), 'passed': sum(r[0] for r in rows), 'failed': 0, 'ignored': 0}
++                stdout = A.bind(actual['stdout']).read_text(encoding='utf-8')
++                rows = [tuple(map(int, r)) for r in re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored;', stdout)]
++                ignored = [{'name': m.group(1), 'actual_line': m.group(0)} for m in re.finditer(r'^test (\S+) \.\.\. ignored(?:,.*)?$', stdout, re.MULTILINE)]
++                expected_ignored = ['heat_balance::convection::surface_environment::selected_reference::observe_literal_surface_environment_setters', 'heat_balance::warmup::selected_reference::observe_literal_selected_warmup_methods']
++                A.need(rows and all(failed == 0 for _, failed, _ in rows), 'actual test groups must report zero failed')
++                A.need(sorted(r['name'] for r in ignored) == expected_ignored and sum(r[2] for r in rows) == len(ignored), 'exact existing Root-only ignored roster/count required')
++                totals[role] = {'groups': len(rows), 'passed': sum(r[0] for r in rows), 'failed': sum(r[1] for r in rows), 'ignored': sum(r[2] for r in rows), 'actual_ignored_tests': ignored}
+             continue
+         A.need(all(A.load(r)['finished_utc'] <= actual['started_utc'] for r in quality.values()) and set(quality) == set(QUALITY), 'four closed quality commands must precede build')
+         messages = [json.loads(line) for line in A.bind(actual['stdout']).read_text(encoding='utf-8').splitlines() if line]

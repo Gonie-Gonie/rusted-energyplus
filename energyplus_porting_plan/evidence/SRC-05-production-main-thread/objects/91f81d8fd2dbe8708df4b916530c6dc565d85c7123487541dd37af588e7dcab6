@@ -1,0 +1,18 @@
+{
+  "schema": "src05-ordinary-main-thread-Root-application-Source-review.v3",
+  "reviewed_manifest": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-03/manifest.json",
+    "sha256": "e67df8b315cde068743aea3c542b30257e7156cc50588732a0c83d363877c5de",
+    "size_bytes": 19243
+  },
+  "parent_FULL_review": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-02/Root-FULL-Source-review-02.json",
+  "complete_descriptor_checks": 78,
+  "unique_full_identities": 49,
+  "regenerated_diffs": 5,
+  "only_README_two_invocation_paths_changed": true,
+  "applier_and_validator_byte_exact_FULL_accepted_parent": true,
+  "author53_FULL_read": true,
+  "Root_FULL_Source_accepted": true,
+  "target_executions": false,
+  "canonical_changes": false
+}

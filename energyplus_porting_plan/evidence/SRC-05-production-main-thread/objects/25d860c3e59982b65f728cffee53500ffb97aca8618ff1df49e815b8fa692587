@@ -1,0 +1,101 @@
+
+D:\CodexBuild\rusted-energyplus\SRC-06\native-dispatcher-build-01\bin\src06_tarp_dispatcher_helper.exe:     file format pei-x86-64
+
+
+Disassembly of section .text:
+
+000000014001ee97 <EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)>:
+   14001ee97:	55                   	push   %rbp
+   14001ee98:	53                   	push   %rbx
+   14001ee99:	48 83 ec 48          	sub    $0x48,%rsp
+   14001ee9d:	48 8d 6c 24 30       	lea    0x30(%rsp),%rbp
+   14001eea2:	0f 29 75 00          	movaps %xmm6,0x0(%rbp)
+   14001eea6:	48 89 4d 30          	mov    %rcx,0x30(%rbp)
+   14001eeaa:	89 55 38             	mov    %edx,0x38(%rbp)
+   14001eead:	f2 0f 11 55 40       	movsd  %xmm2,0x40(%rbp)
+   14001eeb2:	f2 0f 11 5d 48       	movsd  %xmm3,0x48(%rbp)
+   14001eeb7:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001eebb:	48 05 58 14 00 00    	add    $0x1458,%rax
+   14001eec1:	48 89 c1             	mov    %rax,%rcx
+   14001eec4:	e8 77 b4 05 02       	call   14207a340 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   14001eec9:	48 8d 88 68 4a 00 00 	lea    0x4a68(%rax),%rcx
+   14001eed0:	8b 45 38             	mov    0x38(%rbp),%eax
+   14001eed3:	48 98                	cltq
+   14001eed5:	48 89 c2             	mov    %rax,%rdx
+   14001eed8:	e8 93 54 c5 01       	call   141c74370 <EnergyPlus::EPVector<EnergyPlus::DataSurfaces::SurfaceData>::operator()(unsigned long long)>
+   14001eedd:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
+   14001eee1:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+   14001eee5:	8b 80 e0 03 00 00    	mov    0x3e0(%rax),%eax
+   14001eeeb:	83 f8 fa             	cmp    $0xfffffffa,%eax
+   14001eeee:	75 36                	jne    14001ef26 <EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)+0x8f>
+   14001eef0:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001eef4:	48 05 40 14 00 00    	add    $0x1440,%rax
+   14001eefa:	48 89 c1             	mov    %rax,%rcx
+   14001eefd:	e8 ce d2 05 02       	call   14207c1d0 <std::unique_ptr<EnergyPlus::SurfaceGeometryData, std::default_delete<EnergyPlus::SurfaceGeometryData> >::operator->() const>
+   14001ef02:	48 8d 88 a0 09 00 00 	lea    0x9a0(%rax),%rcx
+   14001ef09:	48 8d 45 38          	lea    0x38(%rbp),%rax
+   14001ef0d:	48 89 c2             	mov    %rax,%rdx
+   14001ef10:	e8 9b c5 24 02       	call   14226b4b0 <std::map<int, EnergyPlus::HeatBalanceKivaManager::KivaManager::ConvectionAlgorithms, std::less<int>, std::allocator<std::pair<int const, EnergyPlus::HeatBalanceKivaManager::KivaManager::ConvectionAlgorithms> > >::operator[](int const&)>
+   14001ef15:	48 89 c1             	mov    %rax,%rcx
+   14001ef18:	48 8d 45 f7          	lea    -0x9(%rbp),%rax
+   14001ef1c:	48 89 c2             	mov    %rax,%rdx
+   14001ef1f:	e8 84 6e 01 00       	call   140035da8 <std::enable_if<std::function<double (double, double, double, double, double)>::_Callable<EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)::{lambda(double, double, double, double, double)#1}, std::enable_if<!std::is_same<std::remove_cv<std::remove_reference<EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)::{lambda(double, double, double, double, double)#1}>::type>::type, std::function<double (double, double, double, double, double)> >::value, std::decay<EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)::{lambda(double, double, double, double, double)#1}> >::type::type, std::__invoke_result<std::enable_if<!std::is_same<std::remove_cv<std::remove_reference<EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)::{lambda(double, double, double, double, double)#1}>::type>::type, std::function<double (double, double, double, double, double)> >::value, std::decay<EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)::{lambda(double, double, double, double, double)#1}> >::type::type&, double, double, double, double, double> >::value, std::function<double (double, double, double, double, double)>&>::type std::function<double (double, double, double, double, double)>::operator=<EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)::{lambda(double, double, double, double, double)#1}>(EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)::{lambda(double, double, double, double, double)#1}&&)>
+   14001ef24:	eb 5e                	jmp    14001ef84 <EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)+0xed>
+   14001ef26:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+   14001ef2a:	f2 0f 10 80 30 03 00 00 	movsd  0x330(%rax),%xmm0
+   14001ef32:	f3 0f 7e 0d 56 fe 56 02 	movq   0x256fe56(%rip),%xmm1        # 14258ed90 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper>::desc+0x158>
+   14001ef3a:	66 0f 57 c8          	xorpd  %xmm0,%xmm1
+   14001ef3e:	f2 0f 10 45 48       	movsd  0x48(%rbp),%xmm0
+   14001ef43:	48 8b 45 40          	mov    0x40(%rbp),%rax
+   14001ef47:	66 0f 28 d1          	movapd %xmm1,%xmm2
+   14001ef4b:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   14001ef4f:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   14001ef54:	e8 11 fe ff ff       	call   14001ed6a <EnergyPlus::Convect::CalcASHRAETARPNatural(double, double, double)>
+   14001ef59:	66 48 0f 7e c3       	movq   %xmm0,%rbx
+   14001ef5e:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001ef62:	48 05 30 11 00 00    	add    $0x1130,%rax
+   14001ef68:	48 89 c1             	mov    %rax,%rcx
+   14001ef6b:	e8 b0 bd 05 02       	call   14207ad20 <std::unique_ptr<EnergyPlus::HeatBalSurfData, std::default_delete<EnergyPlus::HeatBalSurfData> >::operator->() const>
+   14001ef70:	48 8d 88 e0 06 00 00 	lea    0x6e0(%rax),%rcx
+   14001ef77:	8b 45 38             	mov    0x38(%rbp),%eax
+   14001ef7a:	89 c2                	mov    %eax,%edx
+   14001ef7c:	e8 ef 8a f0 01       	call   141f27a70 <ObjexxFCL::Array1<double>::operator()(int)>
+   14001ef81:	48 89 18             	mov    %rbx,(%rax)
+   14001ef84:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001ef88:	48 05 30 11 00 00    	add    $0x1130,%rax
+   14001ef8e:	48 89 c1             	mov    %rax,%rcx
+   14001ef91:	e8 8a bd 05 02       	call   14207ad20 <std::unique_ptr<EnergyPlus::HeatBalSurfData, std::default_delete<EnergyPlus::HeatBalSurfData> >::operator->() const>
+   14001ef96:	48 8d 88 e0 06 00 00 	lea    0x6e0(%rax),%rcx
+   14001ef9d:	8b 45 38             	mov    0x38(%rbp),%eax
+   14001efa0:	89 c2                	mov    %eax,%edx
+   14001efa2:	e8 c9 8a f0 01       	call   141f27a70 <ObjexxFCL::Array1<double>::operator()(int)>
+   14001efa7:	f2 0f 10 30          	movsd  (%rax),%xmm6
+   14001efab:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001efaf:	48 05 48 11 00 00    	add    $0x1148,%rax
+   14001efb5:	48 89 c1             	mov    %rax,%rcx
+   14001efb8:	e8 f3 bd 05 02       	call   14207adb0 <std::unique_ptr<EnergyPlus::HeatBalanceData, std::default_delete<EnergyPlus::HeatBalanceData> >::operator->() const>
+   14001efbd:	f2 0f 10 40 10       	movsd  0x10(%rax),%xmm0
+   14001efc2:	66 0f 2f c6          	comisd %xmm6,%xmm0
+   14001efc6:	0f 97 c0             	seta   %al
+   14001efc9:	84 c0                	test   %al,%al
+   14001efcb:	74 3e                	je     14001f00b <EnergyPlus::Convect::CalcASHRAEDetailedIntConvCoeff(EnergyPlus::EnergyPlusData&, int, double, double)+0x174>
+   14001efcd:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001efd1:	48 05 48 11 00 00    	add    $0x1148,%rax
+   14001efd7:	48 89 c1             	mov    %rax,%rcx
+   14001efda:	e8 d1 bd 05 02       	call   14207adb0 <std::unique_ptr<EnergyPlus::HeatBalanceData, std::default_delete<EnergyPlus::HeatBalanceData> >::operator->() const>
+   14001efdf:	f2 0f 10 70 10       	movsd  0x10(%rax),%xmm6
+   14001efe4:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001efe8:	48 05 30 11 00 00    	add    $0x1130,%rax
+   14001efee:	48 89 c1             	mov    %rax,%rcx
+   14001eff1:	e8 2a bd 05 02       	call   14207ad20 <std::unique_ptr<EnergyPlus::HeatBalSurfData, std::default_delete<EnergyPlus::HeatBalSurfData> >::operator->() const>
+   14001eff6:	48 8d 88 e0 06 00 00 	lea    0x6e0(%rax),%rcx
+   14001effd:	8b 45 38             	mov    0x38(%rbp),%eax
+   14001f000:	89 c2                	mov    %eax,%edx
+   14001f002:	e8 69 8a f0 01       	call   141f27a70 <ObjexxFCL::Array1<double>::operator()(int)>
+   14001f007:	f2 0f 11 30          	movsd  %xmm6,(%rax)
+   14001f00b:	90                   	nop
+   14001f00c:	0f 28 75 00          	movaps 0x0(%rbp),%xmm6
+   14001f010:	48 83 c4 48          	add    $0x48,%rsp
+   14001f014:	5b                   	pop    %rbx
+   14001f015:	5d                   	pop    %rbp
+   14001f016:	c3                   	ret

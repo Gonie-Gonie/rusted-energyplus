@@ -1,0 +1,7 @@
+--- /dev/null
++++ .runtime/porting/SRC-06/native-tarp-dispatcher-prep-01/literal-no-user.idf
+@@ -0,0 +1,4 @@
++Version,26.1;
++Timestep,4;
++Building,DISPATCHER UNIT INPUT,0,Suburbs,0.04,0.4,FullExterior,25,6;
++GlobalGeometryRules,UpperLeftCorner,CounterClockWise,Relative;

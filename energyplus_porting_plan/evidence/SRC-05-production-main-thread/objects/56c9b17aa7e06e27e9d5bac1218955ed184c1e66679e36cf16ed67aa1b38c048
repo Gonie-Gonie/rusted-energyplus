@@ -1,0 +1,67 @@
+{
+  "schema": "src05-production-main-thread-publication-inputs.v1",
+  "actual_validation": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/record.json",
+    "sha256": "decafdcbfd1fa6118bc27fe513b79cea7143494429064309f487d494a10a9183",
+    "size_bytes": 18325
+  },
+  "Root_PE_acceptance": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/Root-PE-acceptance.json",
+    "sha256": "3d0d825ec5732bae6ecabc639dc9ca6d6eebfd54598f1c2af40579cae96e707f",
+    "size_bytes": 4514
+  },
+  "actual_execution_custody": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-production-command-01/custody.json",
+    "sha256": "2df8976583a72a80225d6efb908ef33ee5e8fa87f2dac78fd7e6229ea26c0306",
+    "size_bytes": 19866
+  },
+  "actual_execution_outer_receipt": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-production-outer-command-01/receipt.json",
+    "sha256": "7e3860c8631fc25e4eb286b7d590466db5dc62b98861695dc7820678dc936d46",
+    "size_bytes": 3757
+  },
+  "Root_factual_review": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-production-command-01/Root-factual-review.json",
+    "sha256": "727eb71650b4d5a14981e256fbcf15a4d9550ac9708ef062a7da6ab44a136c75",
+    "size_bytes": 2299
+  },
+  "Header_factual_review": {
+    "path": ".runtime/porting/SRC-05/Header-ordinary-main-production-factual-review-01/review.json",
+    "sha256": "dcbb4714030b6971cf880293617e50433831f911ea7a46f27dbdbcb67cf79ac0",
+    "size_bytes": 4865
+  },
+  "closed_executions": [
+    {
+      "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-command-01/receipt.json",
+      "sha256": "9fc1906033a3984a2a21e337746241e5bdc2a2dd383cc19904440d5d6ff2eec3",
+      "size_bytes": 3460
+    }
+  ],
+  "opaque_lineage": [
+    {
+      "path": ".runtime/porting/SRC-05/ordinary-main-publication-prep-02/Root-FULL-Source-review-02.json",
+      "sha256": "ab52e6ed880c4cf15b813795422b2454a240336259ec11b4d946812824985eba",
+      "size_bytes": 1178
+    },
+    {
+      "path": ".runtime/porting/SRC-05/Header-ordinary-main-publication-Source-review-02/review.json",
+      "sha256": "6225ae8b2ea7d387fa35ebd517bf355c5adce23bc3f73f2755fae7ddd8b816cd",
+      "size_bytes": 2568
+    },
+    {
+      "path": ".runtime/porting/SRC-05/review-publication-Root-02.py",
+      "sha256": "5fc98976a95d815dbc86cb071d95e6fc0c54c2f8baf84f2c0ffeb7773dbdd853",
+      "size_bytes": 3757
+    },
+    {
+      "path": ".runtime/porting/SRC-05/old-debug-test-executable-move-01.json",
+      "sha256": "f5a48ff280a2a2ca2e6c75989c26ccf46cc3ff36131d51050e4a08e198948579",
+      "size_bytes": 7395
+    },
+    {
+      "path": ".runtime/porting/SRC-05/seal-production-publication-inputs-Root-01.py",
+      "sha256": "389d37b020a3587477f0058d3b2e05c67b733bd02b99f14d9f226a4c6326edb0",
+      "size_bytes": 2217
+    }
+  ]
+}

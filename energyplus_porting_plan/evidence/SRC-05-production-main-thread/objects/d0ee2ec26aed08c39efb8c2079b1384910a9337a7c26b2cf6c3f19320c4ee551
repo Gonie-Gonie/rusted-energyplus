@@ -1,0 +1,102 @@
+{
+  "schema": "src06-tarp-dispatcher-configure-dry-review.v1",
+  "frozen_build_inputs": {
+    "path": ".runtime/porting/SRC-06/native-dispatcher-build-01/frozen-build-inputs.json",
+    "sha256": "6b0a644ec716abac0a6bba6c3c1bafd80e3e2b82b9de259de758b3f1054ea0d1",
+    "size_bytes": 4126099
+  },
+  "configure_execution": {
+    "path": ".runtime/porting/SRC-06/native-dispatcher-build-01/configure-command/receipt.json",
+    "sha256": "b3f2f7c26a52ac7d5b17662adcf5063133ca3ac761b16b544603ffca180408dd",
+    "size_bytes": 11947
+  },
+  "dry_execution": {
+    "path": ".runtime/porting/SRC-06/native-dispatcher-build-01/dry-verbose-command/receipt.json",
+    "sha256": "2c53e48f7e412936431467c353ea90a991bf8753cd292f867f10e2fc2d62e986",
+    "size_bytes": 2907
+  },
+  "actual_core_before": {
+    "path": ".runtime/porting/SRC-06/native-dispatcher-build-01/core-before-command/receipt.json",
+    "sha256": "6d149268f8febfd484e9e6a5144157f7423fc01109f5734b4e42a325b2fc4842",
+    "size_bytes": 2798
+  },
+  "actual_core_after": {
+    "path": ".runtime/porting/SRC-06/native-dispatcher-build-01/core-after-command/receipt.json",
+    "sha256": "4dc4459df16d62de6b60b43d14c9ad86a292cc96686ed444a924e2d3a5e2dc0b",
+    "size_bytes": 2797
+  },
+  "actual_graph_before": {
+    "path": ".runtime/porting/SRC-06/native-dispatcher-build-01/compile_commands.json.before",
+    "sha256": "697cb8914c8a50331e26b2599e778eb3800af3586d0a28d7180d390509294032",
+    "size_bytes": 3972734
+  },
+  "actual_graph_after": {
+    "path": ".runtime/porting/SRC-06/native-dispatcher-build-01/compile_commands.json.after",
+    "sha256": "273a71380a031cadc5b2936f9f6e4310d62caacf01c820642175b3eb31d3377a",
+    "size_bytes": 3979187
+  },
+  "actual_cache_before": {
+    "path": ".runtime/porting/SRC-06/native-dispatcher-build-01/CMakeCache.txt.before",
+    "sha256": "e1358b349918be68af7cdb9af6954bf9c783575c8935ce54082a6969d9b89496",
+    "size_bytes": 64148
+  },
+  "actual_cache_after": {
+    "path": ".runtime/porting/SRC-06/native-dispatcher-build-01/CMakeCache.txt.after",
+    "sha256": "ff0f7a23cb3dadc09599fdba3b89d3976640db42733017384d8bc7914838a986",
+    "size_bytes": 65130
+  },
+  "actual_cache_diff": {
+    "path": ".runtime/porting/SRC-06/native-dispatcher-build-01/CMakeCache.diff",
+    "sha256": "f8dc6ce5d021775903402d6687208cbe6f9bc98a01000c85cc3bdef51a9fbe5f",
+    "size_bytes": 2078
+  },
+  "cache_changes": {
+    "SRC06_DISPATCHER_OUTPUT_DIR:UNINITIALIZED": [
+      null,
+      "D:\\CodexBuild\\rusted-energyplus\\SRC-06\\native-dispatcher-build-01\\bin"
+    ],
+    "SRC06_DISPATCHER_REFERENCE_RECIPE:UNINITIALIZED": [
+      null,
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\native-tarp-dispatcher-prep-02\\tarp_dispatcher.cmake"
+    ],
+    "CMAKE_PROJECT_INCLUDE:UNINITIALIZED": [
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\native-build-01\\additive-reference.cmake",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\native-dispatcher-build-01\\additive-reference.cmake"
+    ],
+    "SRC06_DISPATCHER_INHERITED_RECIPE:UNINITIALIZED": [
+      null,
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\native-build-01\\additive-reference.cmake"
+    ],
+    "SRC06_DISPATCHER_SOURCE_DIR:UNINITIALIZED": [
+      null,
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\native-tarp-dispatcher-prep-02"
+    ]
+  },
+  "previous_compile_rows": 742,
+  "current_compile_rows": 743,
+  "exact_previous_rows_preserved": true,
+  "new_compile_row": {
+    "directory": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/ep261-gcc13-o0",
+    "command": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\g++.exe -DEP_cache_GlycolSpecificHeat -DEP_psych_errors -DFMT_LOCALE -DJSON_USE_IMPLICIT_CONVERSIONS=1 -DOBJEXXFCL_ALIGN=64 -DXML_STATIC -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/idd -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/btwxt/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/re2 -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/doj -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/nlohmann -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fast_float -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/valijson -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/CLI -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/Windows-CalcEngine/src/Chromogenics/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/Windows-CalcEngine/src/Common/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/Windows-CalcEngine/src/Gases/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/Windows-CalcEngine/src/MultiLayerOptics/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/Windows-CalcEngine/src/SingleLayerOptics/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/Windows-CalcEngine/src/SpectralAveraging/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/Windows-CalcEngine/src/Tarcog/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/Windows-CalcEngine/src/Viewer/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/ssc -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/penumbra/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/kiva/src -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/ep261-gcc13-o0/third_party/kiva/src/libkiva -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/kiva/src/libkiva -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/kiva/vendor/boost-1.88.0 -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/kiva/vendor/eigen -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/btwxt/vendor/courierr/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/AirflowNetwork/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/ssc/jsoncpp/src/lib_json/../../include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/ep261-gcc13-o0/third_party/ssc/jsoncpp/include/json -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/libtk205/include/libtk205 -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/libtk205/vendor/btwxt/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/SRC-06/native-tarp-dispatcher-prep-02 -isystem C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/SQLite -isystem C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/Expat -isystem C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/Expat/lib -isystem C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/eigen -isystem C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/kiva/vendor/boost-1.61.0 -isystem C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/nlohmann -Wa,-mbig-obj -ffp-contract=off -O0 -g -DNDEBUG -std=c++20 -fvisibility=hidden -pipe -Werror -UNDEBUG -fdiagnostics-color=always -Wno-deprecated-declarations -Wpedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-deprecated-copy -Wno-attributes -Wno-delete-non-virtual-dtor -Wno-missing-braces -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-maybe-uninitialized -Wno-aggressive-loop-optimizations -Wno-dangling-reference -Wno-array-bounds -Wno-stringop-overflow -o CMakeFiles\\src06_tarp_dispatcher_helper.dir\\56a6ffe24c02b5e1a68a11333bb834d6\\.runtime\\porting\\SRC-06\\native-tarp-dispatcher-prep-02\\tarp_dispatcher_helper.cpp.obj -c C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\native-tarp-dispatcher-prep-02\\tarp_dispatcher_helper.cpp",
+    "file": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/SRC-06/native-tarp-dispatcher-prep-02/tarp_dispatcher_helper.cpp",
+    "output": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/ep261-gcc13-o0/CMakeFiles/src06_tarp_dispatcher_helper.dir/56a6ffe24c02b5e1a68a11333bb834d6/.runtime/porting/SRC-06/native-tarp-dispatcher-prep-02/tarp_dispatcher_helper.cpp.obj"
+  },
+  "dry_steps": [
+    "[1/2] C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\ccache.exe C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\g++.exe -DEP_cache_GlycolSpecificHeat -DEP_psych_errors -DFMT_LOCALE -DJSON_USE_IMPLICIT_CONVERSIONS=1 -DOBJEXXFCL_ALIGN=64 -DXML_STATIC -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/idd -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/btwxt/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/re2 -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/doj -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/nlohmann -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fast_float -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/valijson -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/CLI -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/Windows-CalcEngine/src/Chromogenics/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/Windows-CalcEngine/src/Common/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/Windows-CalcEngine/src/Gases/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/Windows-CalcEngine/src/MultiLayerOptics/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/Windows-CalcEngine/src/SingleLayerOptics/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/Windows-CalcEngine/src/SpectralAveraging/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/Windows-CalcEngine/src/Tarcog/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/Windows-CalcEngine/src/Viewer/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/ssc -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/penumbra/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/kiva/src -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/ep261-gcc13-o0/third_party/kiva/src/libkiva -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/kiva/src/libkiva -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/kiva/vendor/boost-1.88.0 -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/kiva/vendor/eigen -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/btwxt/vendor/courierr/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/AirflowNetwork/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/ssc/jsoncpp/src/lib_json/../../include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/ep261-gcc13-o0/third_party/ssc/jsoncpp/include/json -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/libtk205/include/libtk205 -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/libtk205/vendor/btwxt/include -IC:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/SRC-06/native-tarp-dispatcher-prep-02 -isystem C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/SQLite -isystem C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/Expat -isystem C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/Expat/lib -isystem C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/eigen -isystem C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/kiva/vendor/boost-1.61.0 -isystem C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/nlohmann -Wa,-mbig-obj -ffp-contract=off -O0 -g -DNDEBUG -std=c++20 -fvisibility=hidden -pipe -Werror -UNDEBUG -fdiagnostics-color=always -Wno-deprecated-declarations -Wpedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-deprecated-copy -Wno-attributes -Wno-delete-non-virtual-dtor -Wno-missing-braces -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-maybe-uninitialized -Wno-aggressive-loop-optimizations -Wno-dangling-reference -Wno-array-bounds -Wno-stringop-overflow -MD -MT CMakeFiles/src06_tarp_dispatcher_helper.dir/56a6ffe24c02b5e1a68a11333bb834d6/.runtime/porting/SRC-06/native-tarp-dispatcher-prep-02/tarp_dispatcher_helper.cpp.obj -MF CMakeFiles\\src06_tarp_dispatcher_helper.dir\\56a6ffe24c02b5e1a68a11333bb834d6\\.runtime\\porting\\SRC-06\\native-tarp-dispatcher-prep-02\\tarp_dispatcher_helper.cpp.obj.d -o CMakeFiles/src06_tarp_dispatcher_helper.dir/56a6ffe24c02b5e1a68a11333bb834d6/.runtime/porting/SRC-06/native-tarp-dispatcher-prep-02/tarp_dispatcher_helper.cpp.obj -c C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/SRC-06/native-tarp-dispatcher-prep-02/tarp_dispatcher_helper.cpp",
+    "[2/2] C:\\WINDOWS\\system32\\cmd.exe /C \"cd . && C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\g++.exe -Wa,-mbig-obj -ffp-contract=off -O0 -g -DNDEBUG -Wl,-Map,D:\\CodexBuild\\rusted-energyplus\\SRC-06\\native-dispatcher-build-01\\bin/src06_tarp_dispatcher_helper.map -pthread CMakeFiles/src06_tarp_dispatcher_helper.dir/56a6ffe24c02b5e1a68a11333bb834d6/.runtime/porting/SRC-06/native-tarp-dispatcher-prep-02/tarp_dispatcher_helper.cpp.obj -o D:\\CodexBuild\\rusted-energyplus\\SRC-06\\native-dispatcher-build-01\\bin\\src06_tarp_dispatcher_helper.exe -Wl,--out-implib,Products\\libsrc06_tarp_dispatcher_helper.dll.a -Wl,--major-image-version,0,--minor-image-version,0  Products/libenergypluslib.a  -lbcrypt  Products/libembedded_epjson_source.a  Products/libobjexx.a  Products/libsqlite.a  Products/libbcvtb.a  -lwsock32  Products/libepfmiimport.a  Products/libepexpat.a  Products/libminiziplib.a  Products/libre2.a  Products/libDElight.a  third_party/kiva/libkiva.a  Products/libWindows-CalcEngine.a  Products/libairflownetworklib.a  Products/libbtwxt.a  Products/ssc.a  Products/shared.a  Products/splinter.a  Products/libjsoncpp.a  Products/liblibtk205.a  Products/libpenumbra.a  Products/libfmt.a  Products/libglad.a  Products/libglfw3.a  Products/libtess2.a  -lShlwapi  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 && cd .\""
+  ],
+  "declared_SHA_transport_link_token": "-lbcrypt",
+  "declared_SHA_transport_immediately_after_core": true,
+  "exact_prior_core_link_suffix_preserved_after_declared_SHA_transport": true,
+  "prospective_compile_command": [
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\ninja-1.13.2\\ninja.exe",
+    "-C",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0",
+    "-j1",
+    "-v",
+    "src06_tarp_dispatcher_helper"
+  ],
+  "compile_performed": false,
+  "helper_executed": false,
+  "gates_updated": false
+}

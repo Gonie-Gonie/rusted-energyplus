@@ -1,0 +1,246 @@
+--- .runtime/porting/SRC-05/ordinary-main-thread-application-prep-01/before/apply.py
++++ .runtime/porting/SRC-05/ordinary-main-thread-application-prep-01/apply.py
+@@ -1,4 +1,5 @@
+-"""Apply four reviewed SRC06 rows after genuine Native factual release; record formatting."""
++"""Root-only guarded four-path application; no CLI/observer execution."""
++import argparse
+ import difflib
+ import hashlib
+ import importlib.util
+@@ -7,76 +8,172 @@
+ import subprocess
+ import sys
+ 
+-ROOT = Path.cwd()
+-BASE = ROOT / '.runtime/porting/SRC-06'
+-OUT = BASE / 'tarp-inside-applied-01'
++ROOT = Path(__file__).resolve().parents[4]
++PREP = {'path': '.runtime/porting/SRC-05/ordinary-main-thread-prep-01/manifest.json', 'sha256': '0d1913b429444685d35e4b6683c03ea2deeaefbef61f5cadfda5eb719b0158ea'}
++RECORDER = {'path': 'tools/porting/record_command.py', 'sha256': '5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'}
++BEFORE = {'path': '.runtime/porting/source-objects/8a/8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934', 'sha256': '8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934'}
++PATHS = ['crates/ep_cli/src/main.rs', 'crates/ep_run/examples/ctf10_ordinary_history_observer.rs', 'crates/ep_cli/build.rs', 'crates/ep_run/build.rs']
++
++
++def need(value, message):
++    if not value:
++        raise ValueError(message)
++
+ 
+ def ref(path):
+-    data = path.read_bytes()
+-    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(data).hexdigest(), size_bytes=len(data))
++    with path.open('rb') as stream:
++        sha = hashlib.file_digest(stream, 'sha256').hexdigest()
++    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': sha, 'size_bytes': path.stat().st_size}
+ 
+-def checked(row):
+-    path = ROOT / row['path']
+-    assert ref(path)['sha256'] == row['sha256'] and ('size_bytes' not in row or path.stat().st_size == row['size_bytes'])
++
++def bind(row):
++    path = (ROOT / row['path']).resolve()
++    need(path.is_relative_to(ROOT) and path.is_file(), 'contained file required: ' + row['path'])
++    actual = ref(path)
++    need(actual['sha256'] == row['sha256'] and ('size_bytes' not in row or actual['size_bytes'] == row['size_bytes']), 'bound bytes differ: ' + row['path'])
+     return path
+ 
+-def load(row): return json.loads(checked(row).read_bytes())
++
++def operand(token):
++    name, sha = token.rsplit('#', 1)
++    return ref(bind({'path': name, 'sha256': sha}))
++
++
++def load(row):
++    return json.loads(bind(row).read_bytes())
++
++
+ def write(path, data):
+     path.parent.mkdir(parents=True, exist_ok=True)
+-    with path.open('xb') as stream: stream.write(data)
++    with path.open('xb') as stream:
++        stream.write(data)
+     return ref(path)
+ 
+-spec = importlib.util.spec_from_file_location('record_command', ROOT/'tools/porting/record_command.py')
+-recorder = importlib.util.module_from_spec(spec); spec.loader.exec_module(recorder)
+-assert ref(ROOT/'tools/porting/record_command.py')['sha256'] == '5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'
+-prep_ref = ref(BASE/'tarp-inside-getter-prep-01/manifest.json')
+-assert prep_ref['sha256'] == '7eb308271196d36cbcbf58f17cec8599ddd3c396a84c5c52fcab958933f99963'
+-prep = load(prep_ref)
+-root_review_ref = ref(BASE/'tarp-inside-getter-prep-01/Root-full-Source-review.json')
+-review = load(root_review_ref)
+-assert review['Root_FULL_Source_review_accepted'] and review['independent_Header_cumulative_Source_review_accepted']
+-baseline = load(review['genuine_Native_factual_baseline_released_before_math_application'])
+-assert baseline['Header_FULL_Native_input_owner_and_custody_factual_review_accepted'] and baseline['genuine_source_invocations'] == 60
+-actual_native = load(baseline['actual_Native_execution'])
+-assert actual_native['exit_code'] == 0 and actual_native['source_bytes_match_before_and_after']
+-assert not OUT.exists()
+-source_before = recorder.source_snapshot()
+-assert source_before['sha256'] == 'd34a84b7f0fad57ae1a46799a8b9b8b31247239206556ce342bb4e17287775c4'
+-for row in prep['application']:
+-    canonical = ROOT / row['canonical_path']
+-    checked(row['before_archive']); checked(row['proposal']); checked(row['exact_diff'])
+-    if row['actual_before'] is None: assert not canonical.exists()
+-    else: assert checked(row['actual_before']).read_bytes() == checked(row['before_archive']).read_bytes()
+-OUT.mkdir()
+-for row in prep['application']:
+-    canonical = ROOT / row['canonical_path']
+-    canonical.parent.mkdir(parents=True, exist_ok=True)
+-    canonical.write_bytes(checked(row['proposal']).read_bytes())
+-source_literal = recorder.source_snapshot()
+-result = subprocess.run([sys.executable, '-X','utf8','-B',str(ROOT/'tools/porting/record_command.py'),'--output-dir',str(OUT/'fmt-command'),'--','cargo','fmt','--all'],cwd=ROOT)
+-assert result.returncode == 0
+-fmt_ref = ref(OUT/'fmt-command/receipt.json')
+-fmt = load(fmt_ref)
+-source_final = recorder.source_snapshot()
+-assert fmt['source_snapshot'] == source_literal and fmt['exit_code'] == 0
+-rows = []
+-for row in prep['application']:
+-    canonical = ROOT / row['canonical_path']; proposal = checked(row['proposal'])
+-    final_archive = write(OUT/'formatted'/row['canonical_path'],canonical.read_bytes())
+-    delta = ''.join(difflib.unified_diff(proposal.read_text(encoding='utf8').splitlines(True),canonical.read_text(encoding='utf8').splitlines(True),fromfile=row['proposal']['path'],tofile=row['canonical_path']))
+-    diff_ref = write(OUT/'diffs'/(row['canonical_path'].replace('/','__')+'.formatter.diff'),delta.encode('utf8'))
+-    rows.append(dict(**row, actual_final=ref(canonical),actual_final_archive=final_archive,actual_formatter_diff=diff_ref))
+-old = {r['historical_path']:r for r in load(source_before)['files']}
+-new = {r['historical_path']:r for r in load(source_final)['files']}
+-allowed = {r['canonical_path'] for r in rows if r['canonical_path'].endswith('.rs')}
+-assert len(old) == 3928 and len(new) == 3929
+-assert set(new)-set(old) == {r['canonical_path'] for r in rows if r['new_destination_absent']}
+-unchanged = [name for name in old if name not in allowed]
+-assert len(unchanged) == 3926 and all(old[name] == new[name] for name in unchanged)
+-record = dict(schema='src06-tarp-inside-actual-application.v1',accepted_math_preparation=prep_ref,Root_full_Source_review=root_review_ref,
+-    genuine_Native_factual_baseline_before_application=review['genuine_Native_factual_baseline_released_before_math_application'],
+-    source_before=source_before,source_literal=source_literal,source_final=source_final,actual_formatter_execution=fmt_ref,
+-    unchanged_unrelated_Source_members=3926,application=rows,formatter_correspondence_review_pending=True,
+-    numerical_PASS_claimed=False,ordinary_traversal_or_handoff_verified=False,gates_updated=False)
+-record_ref=write(OUT/'record.json',(json.dumps(record,ensure_ascii=False,allow_nan=False,indent=2)+'\n').encode('utf8'))
+-print(json.dumps(dict(record=record_ref,source_final=source_final,unrelated=3926)))
++
++def dump(path, value):
++    return write(path, (json.dumps(value, ensure_ascii=False, allow_nan=False, indent=2) + '\n').encode('utf-8'))
++
++
++def diff(before, after, left, right):
++    return ''.join(difflib.unified_diff(before.decode('utf-8').splitlines(True), after.decode('utf-8').splitlines(True), fromfile=left, tofile=right)).encode('utf-8')
++
++
++def check_diff(before, after, declared):
++    raw = bind(declared).read_bytes()
++    if before == after:
++        need(raw == b'', 'identical endpoints require empty delta')
++    else:
++        lines = raw.decode('utf-8').splitlines(True)
++        need(len(lines) >= 2 and lines[0].startswith('--- ') and lines[1].startswith('+++ '), 'two declared diff labels required')
++        need(diff(before, after, lines[0][4:].rstrip('\r\n'), lines[1][4:].rstrip('\r\n')) == raw, 'regenerated delta differs')
++
++
++def members(source, current=False):
++    value = load(source)
++    need(value['schema'] == 'rust-command-source-snapshot.v1' and value['bytes_normalized'] is False, 'literal full Source snapshot required')
++    rows = {r['historical_path']: r for r in value['files']}
++    need(len(rows) == len(value['files']), 'duplicate Source membership')
++    for name, row in rows.items():
++        need(bind(row['archive']).stat().st_size == row['size_bytes'], 'Source archive size differs')
++        if current:
++            bind({'path': name, 'sha256': row['archive']['sha256'], 'size_bytes': row['size_bytes']})
++    if current:
++        paths = set((ROOT / 'crates').rglob('*.rs')) | set((ROOT / 'crates').rglob('Cargo.toml'))
++        paths |= {ROOT / n for n in ['Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml'] if (ROOT / n).is_file()}
++        need(set(rows) == {p.relative_to(ROOT).as_posix() for p in paths}, 'current full Source membership differs')
++    return rows
++
++
++def preparation(token):
++    row = operand(token)
++    value = load(row)
++    need(value['schema'] == 'src05-ordinary-main-thread-application-Source-preparation.v1', 'reviewed application preparation required')
++    need(bind(value['accepted_main_thread_preparation']) == bind(PREP) and value['source_before'] == BEFORE, 'fixed Source authorities differ')
++    for own in value['own_sources']:
++        bind(own)
++    need(bind(value['runtime_interfaces']['apply']) == Path(__file__).resolve(), 'actual applier Source differs')
++    return row, value
++
++
++def recorded(row, source, command, stable=True):
++    value = load(row)
++    need(value['schema'] == 'recorded-porting-command.v1' and value['command'] == command and value['source_snapshot'] == source, 'actual command/Source differs')
++    need(value['exit_code'] == 0 and value['launch_error'] is None and value['source_bytes_match_before_and_after'] is stable, 'actual command outcome/Source guard differs')
++    need(value['recorder_updates_gates'] is False and value['recorder_supplies_reference_answers'] is False, 'recorder contract differs')
++    need(bind(value['executed_launcher']['archive']).read_bytes() == bind(RECORDER).read_bytes(), 'actual recorder differs')
++    bind(value['stdout']); bind(value['stderr'])
++    return value
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    for name in ['source-preparation', 'Native-baseline-acceptance', 'output-dir']:
++        parser.add_argument('--' + name, required=True)
++    args = parser.parse_args()
++    own_ref, own = preparation(args.source_preparation)
++    prep = load(PREP)
++    need([r['canonical_path'] for r in prep['application']] == PATHS, 'exact four application paths required')
++    baseline_ref = operand(args.Native_baseline_acceptance)
++    baseline = load(baseline_ref)
++    need(baseline['schema'] == 'src06-tarp-dispatcher-Root-factual-baseline-acceptance.v1' and baseline['accepted'] is True and baseline['complete_input_owner_prefix_and_custody_review_accepted'] is True, 'released genuine Native caller baseline required')
++    load(baseline['factual_review'])
++    native = load(baseline['actual_Native_execution'])
++    need(native['schema'] == 'recorded-porting-command.v1' and native['exit_code'] in [0, 2] and native['launch_error'] is None and native['source_bytes_match_before_and_after'] is True and native['source_snapshot'] == BEFORE, 'genuine Source-stable Native capture required')
++    need(bind(native['executed_launcher']['archive']).read_bytes() == bind(RECORDER).read_bytes(), 'Native recorder differs')
++    bind(native['stdout']); bind(native['stderr'])
++    old = members(BEFORE, current=True)
++    need(len(old) == 3929, 'exact prior full Source count required')
++    for row in prep['application']:
++        path = ROOT / row['canonical_path']
++        before, proposal = bind(row['before_archive']).read_bytes(), bind(row['proposal']).read_bytes()
++        check_diff(before, proposal, row['exact_diff'])
++        if row['new_destination_absent']:
++            need(row['actual_before'] is None and before == b'' and not path.exists(), 'new destination must actually be absent')
++        else:
++            need(bind(row['actual_before']).read_bytes() == before, 'current before differs from authentic held archive')
++    out = (ROOT / args.output_dir).resolve()
++    need(out.is_relative_to(ROOT / '.runtime/porting/SRC-05') and not out.exists(), 'fresh ignored output directory required')
++    recorder_path = bind(RECORDER)
++    spec = importlib.util.spec_from_file_location('authentic_recorder', recorder_path)
++    recorder = importlib.util.module_from_spec(spec); spec.loader.exec_module(recorder)
++    need(recorder.source_snapshot() == BEFORE, 'exact current8aa snapshot required immediately before apply')
++    out.mkdir(parents=True)
++    dump(out / 'before.json', {'Source_preparation': own_ref, 'accepted_main_thread_preparation': PREP, 'Native_baseline_acceptance': baseline_ref, 'source_before': BEFORE})
++    actual_rows = []
++    for row in prep['application']:
++        name = row['canonical_path']
++        before_archive = write(out / 'before' / name, bind(row['before_archive']).read_bytes())
++        literal = write(out / 'literal' / name, bind(row['proposal']).read_bytes())
++        semantic = write(out / 'semantic-diffs' / (name.replace('/', '__') + '.diff'), bind(row['exact_diff']).read_bytes())
++        actual_rows.append(dict(row, actual_before_archive=before_archive, actual_literal_archive=literal, actual_semantic_diff=semantic))
++    for row in actual_rows:
++        path = ROOT / row['canonical_path']
++        path.parent.mkdir(parents=True, exist_ok=True)
++        path.write_bytes(bind(row['actual_literal_archive']).read_bytes())
++    source_literal = recorder.source_snapshot()
++    literal_members = members(source_literal, current=True)
++    added = set(PATHS[-2:])
++    unrelated = set(old) - set(PATHS)
++    need(len(literal_members) == 3931 and set(literal_members) == set(old) | added and len(unrelated) == 3927 and all(old[n] == literal_members[n] for n in unrelated), 'only four literal paths/new two may change')
++    command = ['cargo', 'fmt', '--all']
++    code = subprocess.call([sys.executable, '-X', 'utf8', '-B', str(recorder_path), '--output-dir', str(out / 'fmt-command'), '--'] + command, cwd=ROOT)
++    need(code == 0, 'formatter failed; literal application and receipt retained')
++    source_final = recorder.source_snapshot()
++    fmt_ref = ref(out / 'fmt-command/receipt.json')
++    fmt = recorded(fmt_ref, source_literal, command, stable=source_literal == source_final)
++    need(native['finished_utc'] <= fmt['started_utc'], 'genuine Native capture must precede formatting/application completion')
++    final_members = members(source_final, current=True)
++    need(set(final_members) == set(literal_members) and all(old[n] == final_members[n] for n in unrelated), 'formatter changed unrelated Source or membership')
++    for row in actual_rows:
++        name = row['canonical_path']; final = (ROOT / name).read_bytes()
++        row['actual_final'] = ref(ROOT / name)
++        row['actual_final_archive'] = write(out / 'formatted' / name, final)
++        row['actual_formatter_diff'] = write(out / 'formatter-diffs' / (name.replace('/', '__') + '.diff'), diff(bind(row['actual_literal_archive']).read_bytes(), final, row['actual_literal_archive']['path'], name))
++    preparation(args.source_preparation); load(baseline_ref)
++    record = {'schema': 'src05-ordinary-main-thread-actual-application.v1', 'Source_preparation': own_ref, 'accepted_main_thread_preparation': PREP, 'Native_baseline_acceptance': baseline_ref, 'source_before': BEFORE, 'source_literal': source_literal, 'source_final': source_final, 'source_file_count': 3931, 'unrelated_source_files_verified_byte_exact': 3927, 'actual_formatter_execution': fmt_ref, 'application': actual_rows, 'formatter_correspondence_review_pending': True, 'target_execution_performed': False, 'numerical_PASS_claimed': False, 'gates_updated': False}
++    print(json.dumps({'record': dump(out / 'record.json', record), 'source_final': source_final}))
++    return 0
++
++
++if __name__ == '__main__':
++    raise SystemExit(main())

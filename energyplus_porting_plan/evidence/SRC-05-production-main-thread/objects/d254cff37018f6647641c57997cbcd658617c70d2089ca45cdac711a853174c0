@@ -1,0 +1,31 @@
+{
+  "schema": "src05-ordinary-main-thread-independent-Source-review.v1",
+  "Source_preparation": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/manifest.json",
+    "sha256": "0d1913b429444685d35e4b6683c03ea2deeaefbef61f5cadfda5eb719b0158ea",
+    "size_bytes": 20071
+  },
+  "reviewer": "Raw independent peer; not author of the four-path change",
+  "FULL_changed_Source_and_caller_entry_review_accepted": true,
+  "independent_FULL_Source_review_accepted": true,
+  "evidence": {
+    "full_descriptor_occurrences": 58,
+    "unique_whole_files": 50,
+    "exact_application_diff_regenerations": 4,
+    "literal_Source_ranges": 8,
+    "before_current_old_paths": 2,
+    "new_destinations_absent": 2,
+    "full_proposed_new_build_scripts_read": 2,
+    "existing_run_bodies_and_nonWindows_worker_bytes_retained": true,
+    "supported_Windows_main_entry_and_actual_Cargo_target_specific_linker_scope_reviewed": true,
+    "actual_main_stack_reserve_declared_bytes": 8388608
+  },
+  "limitations": {
+    "new_workflow_not_executed": true,
+    "actual_PE_quality_CLI_and_observer_reruns_still_required": true,
+    "floating_point_controls_written": false,
+    "historical_FP_cause_or_production_equivalence_claimed": false,
+    "numerical_values_used_for_Source_change": false,
+    "gates_updated": false
+  }
+}

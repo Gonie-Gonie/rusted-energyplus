@@ -1,0 +1,41 @@
+"""Correct two historical Source range aliases only; execute no driver."""
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+OLD = ROOT / '.runtime/porting/SRC-05/ordinary-main-execution-prep-01'
+OUT = ROOT / '.runtime/porting/SRC-05/ordinary-main-execution-prep-02'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(raw).hexdigest(), 'size_bytes': len(raw), 'line_count': len(raw.splitlines())}
+
+
+assert not OUT.exists()
+OUT.mkdir()
+prior = ref(OLD / 'manifest.json')
+assert prior['sha256'] == '6fd20718df7db37d95832eedf0ddc66d9a5a880c3162fe39198acbc045bffb1d'
+manifest = copy.deepcopy(json.loads((OLD / 'manifest.json').read_bytes()))
+manifest['prior_Source_preparation'] = prior
+aliases = []
+for row in manifest['Source_ranges']:
+    if row['source']['path'] in ['crates/ep_cli/src/main.rs', 'crates/ep_run/examples/ctf10_ordinary_history_observer.rs']:
+        historical = copy.deepcopy(row['source'])
+        archive = ROOT / '.runtime/porting/SRC-05/ordinary-main-thread-prep-01/before' / historical['path']
+        assert ref(archive)['sha256'] == historical['sha256'] and ref(archive)['size_bytes'] == historical['size_bytes']
+        row['historical_source'] = historical; row['source'] = ref(archive)
+        aliases.append({'historical_source': historical, 'actual_preserved_archive': ref(archive)})
+assert len(aliases) == 2
+manifest['historical_Source_range_aliases'] = aliases
+manifest['own_sources'].append(ref(Path(__file__).resolve()))
+raw = (json.dumps(manifest, ensure_ascii=False, allow_nan=False, indent=2) + '\n').encode()
+with (OUT / 'manifest.json').open('xb') as stream:
+    stream.write(raw)
+delta = ''.join(difflib.unified_diff((OLD / 'manifest.json').read_bytes().decode().splitlines(True), raw.decode().splitlines(True), fromfile=prior['path'], tofile=ref(OUT / 'manifest.json')['path'])).encode()
+with (OUT / 'metadata.diff').open('xb') as stream:
+    stream.write(delta)
+print(json.dumps({'manifest': ref(OUT / 'manifest.json'), 'exact_metadata_diff': ref(OUT / 'metadata.diff'), 'runtime_bodies_byte_exact01': True, 'Source_only': True}))

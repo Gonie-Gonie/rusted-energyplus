@@ -1,0 +1,67 @@
+{
+  "schema": "sch01-converted-inputs.v1",
+  "started_utc": "2026-10-11T18:53:48.794540+00:00",
+  "finished_utc": "2026-10-11T18:53:49.111683+00:00",
+  "input_cases": {
+    "path": ".runtime/porting/SRC-06/dispatcher-input-conversion-prep-01/input-cases.json",
+    "sha256": "c905ea59d96bf32c20bea41a2af505e1e516d1a80b7c6402e30e90555e780e90"
+  },
+  "converter": {
+    "path": ".runtime/energyplus/26.1.0/ConvertInputFormat.exe",
+    "sha256": "04f1327fef7148118ea1d79d9e990fb2447b9731e9c1b28a9a8276b840d7cbfe"
+  },
+  "conversion_recipe": "actual ConvertInputFormat.exe input.idf in each fresh case directory, matching ep_run::oracle input-only route",
+  "conversions": [
+    {
+      "case_id": "SRC06-DISPATCHER-NO-USER",
+      "input": {
+        "path": ".runtime/porting/SRC-06/native-tarp-dispatcher-prep-01/literal-no-user.idf",
+        "sha256": "f3a89522e94a03bff136879aa64545aaad434437142023dac886bf51d723003a",
+        "size_bytes": 158
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/src06-dispatcher-converted-inputs-01/SRC06-DISPATCHER-NO-USER/input.epJSON",
+        "sha256": "571fc4717ef27a73b407960db51475ed876327475377963952200f96f8492633",
+        "size_bytes": 870
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/src06-dispatcher-converted-inputs-01/SRC06-DISPATCHER-NO-USER/conversion.json",
+        "sha256": "1a9555e3409580e20dd5fe83d7b2394821c625c7bc64add3f211065dbf6ce9ab",
+        "size_bytes": 3049
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    }
+  ],
+  "case_count": 1,
+  "available_converted_input_count": 1,
+  "unavailable_converted_input_count": 0,
+  "executed_runner_sources": [
+    {
+      "historical_path": ".runtime/porting/SCH-01/input-prep-02/convert_inputs.py",
+      "archive": {
+        "path": ".runtime/porting/SCH-01/src06-dispatcher-converted-inputs-01/sources/convert_inputs.py",
+        "sha256": "82f27c8327d2409bb3bcba727044ebe6a36641ed8d7c404e08dd4bc92c990dbb",
+        "size_bytes": 7727
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/SCH-01/input-prep-02/input_common.py",
+      "archive": {
+        "path": ".runtime/porting/SCH-01/src06-dispatcher-converted-inputs-01/sources/input_common.py",
+        "sha256": "b38466a0dd8851935d0ef28c079220d7c48f2c05506926d1ad4e7fb463f6de77",
+        "size_bytes": 2765
+      }
+    }
+  ],
+  "scientific_execution_performed": false,
+  "Native_scientific_outputs_used_as_inputs": false,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "failed_conversions_counted_as_PASS": false,
+  "outer_zero_means_factual_input_conversion_ledger_complete": true,
+  "all_conversions_successful_claimed": true,
+  "final_scientific_packet_frozen": false,
+  "gates_updated": false
+}

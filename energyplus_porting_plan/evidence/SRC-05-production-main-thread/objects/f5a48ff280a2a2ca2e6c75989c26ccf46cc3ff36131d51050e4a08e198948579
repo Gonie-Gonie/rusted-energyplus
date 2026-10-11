@@ -1,0 +1,93 @@
+﻿{
+    "schema":  "rebuildable-old-test-executable-archive.v1",
+    "files":  [
+                  {
+                      "source":  "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\arbitrary_run-ad20ea0fe483e9c9.exe",
+                      "destination":  "D:\\CodexBuild\\rusted-energyplus\\cleanup\\old-debug-test-executables-20261012\\arbitrary_run-ad20ea0fe483e9c9.exe",
+                      "sha256":  "4af113ee7be8d9cad54dd3c68f148bf349e815f9974a6594c92d3962fdbe6d6c",
+                      "size_bytes":  575789204
+                  },
+                  {
+                      "source":  "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\arbitrary_run-d9725998c35ae1cb.exe",
+                      "destination":  "D:\\CodexBuild\\rusted-energyplus\\cleanup\\old-debug-test-executables-20261012\\arbitrary_run-d9725998c35ae1cb.exe",
+                      "sha256":  "a814fc42bbe4dbc00f71d2b2a2f9511ec45bd239947483f0ad4afb40b07eff53",
+                      "size_bytes":  581848058
+                  },
+                  {
+                      "source":  "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\arbitrary_run_direct_zone_coupled-d357ef3edf47281b.exe",
+                      "destination":  "D:\\CodexBuild\\rusted-energyplus\\cleanup\\old-debug-test-executables-20261012\\arbitrary_run_direct_zone_coupled-d357ef3edf47281b.exe",
+                      "sha256":  "14732db480303bed9e6bd37e5d412196ccbd16c410038bde1c3c2e2b987a001b",
+                      "size_bytes":  583656844
+                  },
+                  {
+                      "source":  "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\arbitrary_run_exit_codes-b3b9e3905cc90629.exe",
+                      "destination":  "D:\\CodexBuild\\rusted-energyplus\\cleanup\\old-debug-test-executables-20261012\\arbitrary_run_exit_codes-b3b9e3905cc90629.exe",
+                      "sha256":  "22e26d028d7d9c824193a47f1a283fd20d1f45ee9dcb75bd62aa27a52016e551",
+                      "size_bytes":  568792276
+                  },
+                  {
+                      "source":  "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\arbitrary_run_exit_codes-d7e4c1741b1fd661.exe",
+                      "destination":  "D:\\CodexBuild\\rusted-energyplus\\cleanup\\old-debug-test-executables-20261012\\arbitrary_run_exit_codes-d7e4c1741b1fd661.exe",
+                      "sha256":  "5ac98303a3cb24d660bd04dca9dbbae80bca94c9fa006acebcc74bfcc35c6c90",
+                      "size_bytes":  581456393
+                  },
+                  {
+                      "source":  "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\arbitrary_run_ideal_loads-dd485b1133f18062.exe",
+                      "destination":  "D:\\CodexBuild\\rusted-energyplus\\cleanup\\old-debug-test-executables-20261012\\arbitrary_run_ideal_loads-dd485b1133f18062.exe",
+                      "sha256":  "9ba430be6a27a98a7ec1c7c451636527eb6dff179b6f86e21b54a5d1ea9e5cb6",
+                      "size_bytes":  599531633
+                  },
+                  {
+                      "source":  "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\eplus_rs-591b04cd3fa3a5b1.exe",
+                      "destination":  "D:\\CodexBuild\\rusted-energyplus\\cleanup\\old-debug-test-executables-20261012\\eplus_rs-591b04cd3fa3a5b1.exe",
+                      "sha256":  "619d7ca80395203fd55fd2960a792b13517b9a9881847c0d443423cd95c54287",
+                      "size_bytes":  612592027
+                  },
+                  {
+                      "source":  "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\eplus_rs-5d435c28fb58030b.exe",
+                      "destination":  "D:\\CodexBuild\\rusted-energyplus\\cleanup\\old-debug-test-executables-20261012\\eplus_rs-5d435c28fb58030b.exe",
+                      "sha256":  "fc378d9ee4b1b54167daa93a3f4e74088bfae3cee01baf98ce1db81c091f8fd3",
+                      "size_bytes":  614531211
+                  },
+                  {
+                      "source":  "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\eplus_rs-dfdce69381af6960.exe",
+                      "destination":  "D:\\CodexBuild\\rusted-energyplus\\cleanup\\old-debug-test-executables-20261012\\eplus_rs-dfdce69381af6960.exe",
+                      "sha256":  "d5f3b0d4a90ffbed51bf170bc9ea7cb6388517f0c3adb0002fdbb3d479978992",
+                      "size_bytes":  627265759
+                  },
+                  {
+                      "source":  "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\ep_run-019a2c94a2e9c96f.exe",
+                      "destination":  "D:\\CodexBuild\\rusted-energyplus\\cleanup\\old-debug-test-executables-20261012\\ep_run-019a2c94a2e9c96f.exe",
+                      "sha256":  "80dd2dbc3ec6132477239cc76821c5c622b6151fa947c63ac0f5bca437f175ad",
+                      "size_bytes":  595575028
+                  },
+                  {
+                      "source":  "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\ep_run-6a2e6fab1b844b6c.exe",
+                      "destination":  "D:\\CodexBuild\\rusted-energyplus\\cleanup\\old-debug-test-executables-20261012\\ep_run-6a2e6fab1b844b6c.exe",
+                      "sha256":  "da8c652343348b818dc427cd50d45e0e23f19f923318c76dad12ccf3d590b4f8",
+                      "size_bytes":  598073413
+                  },
+                  {
+                      "source":  "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\ep_runtime-66fb47c0a0c3f9ea.exe",
+                      "destination":  "D:\\CodexBuild\\rusted-energyplus\\cleanup\\old-debug-test-executables-20261012\\ep_runtime-66fb47c0a0c3f9ea.exe",
+                      "sha256":  "0474a359df8845008fbcb9bfd8836fef2bdaeab2dbeeeba3b261e5b6efb6dee2",
+                      "size_bytes":  641477121
+                  },
+                  {
+                      "source":  "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\ep_runtime-e0c54ff24afbb601.exe",
+                      "destination":  "D:\\CodexBuild\\rusted-energyplus\\cleanup\\old-debug-test-executables-20261012\\ep_runtime-e0c54ff24afbb601.exe",
+                      "sha256":  "1fb4a32147e16de62f09d8bf9efec87b3d309575174d192b0e61d1ebba2808b3",
+                      "size_bytes":  627983605
+                  },
+                  {
+                      "source":  "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\ep_runtime-f5a9aea3364ab9b8.exe",
+                      "destination":  "D:\\CodexBuild\\rusted-energyplus\\cleanup\\old-debug-test-executables-20261012\\ep_runtime-f5a9aea3364ab9b8.exe",
+                      "sha256":  "2a205036f2f8ac4853d7658c469e2ee22187182780ba169ea06de9d43ff531f1",
+                      "size_bytes":  644846957
+                  }
+              ],
+    "actual_C_free_bytes_before":  511705088,
+    "actual_C_free_bytes_after":  5175263232,
+    "current_CLI_and_observer_preserved":  true,
+    "recursive_deletion_performed":  false
+}

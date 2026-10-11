@@ -1,0 +1,63 @@
+"""Seal bounded current-proof selection; preserve prior metadata without historical recursion."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+OLD = ROOT / '.runtime/porting/SRC-05/ordinary-main-publication-prep-03'
+OUT = ROOT / '.runtime/porting/SRC-05/ordinary-main-publication-prep-04'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+
+assert not OUT.exists() and ref(OLD / 'manifest.json')['sha256'] == 'f1677f7ebb2bfe82070e36f9c70a52cff32f44e70d356b56a432397c82775201'
+OUT.mkdir(); (OUT / 'before-03').mkdir()
+for name in ('publish.py', 'README.md', 'manifest.json'): (OUT / 'before-03' / name).write_bytes((OLD / name).read_bytes())
+manifest = json.loads((OLD / 'manifest.json').read_bytes())
+additional = [
+    ('.runtime/porting/SCH-01/src06-dispatcher-converted-inputs-01/converted-inputs.json', 'Prior input-only conversion ledger for the separate future Rust dispatcher unit, not this ordinary CLI input or Native physical-IDF capture.'),
+    ('.runtime/porting/SCH-01/src06-dispatcher-converted-inputs-01/SRC06-DISPATCHER-NO-USER/conversion.json', 'Closed prior converter metadata; its product logs are not standard recorder sibling logs and are not selected for this CLI unit.'),
+    ('.runtime/porting/SRC-06/native-build-01/configure-and-dry-review.json', 'Inherited earlier direct-helper build review; current dispatcher configure/dry/build/core/provider proofs remain independently selected.'),
+    ('.runtime/porting/SRC-06/native-build-01/frozen-build-inputs.json', 'Inherited earlier direct-helper frozen metadata; not a fresh transitive archive of all prior helper sources.'),
+    ('.runtime/porting/reference-energyplus-26.1.0/native-core-build.json', 'Existing genuine core authority retained in full; current core-check receipts and ten address-bound provider proofs remain independently selected, without copying the entire old core source/build closure.'),
+    ('.runtime/porting/SRC-06/native-provider-prep-03/manifest.json', 'Historical collector template preparation; actual current dispatcher collector Source and all produced current provider evidence remain independently selected.'),
+    ('.runtime/porting/SRC-06/native-execution-prep-02/manifest.json', 'Historical execution template preparation; actual current dispatcher driver Source, before/custody/receipts/logs and factual reviews remain independently selected.'),
+    ('.runtime/porting/CTF-10/ordinary-history-invocation-03/request.json', 'Historical input/command authority retained in full; the actual current 45 guards and five selected input metadata references are authenticated independently.'),
+]
+execution = json.loads((ROOT / '.runtime/porting/SRC-05/ordinary-main-execution-prep-02/manifest.json').read_bytes())
+for key in ('prior_actual_CLI_command', 'prior_actual_observer_command'):
+    declared = execution[key]; observed = ref(ROOT / declared['path'])
+    assert all(declared[k] == observed[k] for k in ('path', 'sha256', 'size_bytes'))
+    additional.append((declared['path'], 'Historical command-shape authority retained as complete metadata; current process receipts and logs still require the current genuine recorder and exact Source guards.'))
+for name, reason in additional: manifest['opaque_recursive_JSON_references'].append(dict(reference=ref(ROOT / name), opaque_reason=reason))
+assert len({row['reference']['path'] for row in manifest['opaque_recursive_JSON_references']}) == len(manifest['opaque_recursive_JSON_references']) == 26
+text = (OLD / 'publish.py').read_text(encoding='utf8')
+anchor = "SKIP_KEYS = {'files', 'frozen_artifacts',"
+assert text.count(anchor) == 1
+text = text.replace(anchor, "SKIP_KEYS = {'files', 'frozen_Source_and_input', 'frozen_artifacts',")
+(OUT / 'publish.py').write_text(text, encoding='utf8', newline='\n')
+readme = (OLD / 'README.md').read_text(encoding='utf8').replace('ordinary-main-publication-prep-03/publish.py', 'ordinary-main-publication-prep-04/publish.py')
+readme += '\nSuccessor 04 completes the finite current-proof archival scope. Ten additional exact metadata boundaries retain the prior conversion ledger/receipt, inherited direct-helper configure/freeze, genuine core authority, historical collector/execution templates, and prior ordinary request/two command authorities. The complete current Native frozen-build JSON remains selected, while its `frozen_Source_and_input` array is treated like the already excluded `files`/`frozen_artifacts` arrays: descriptors remain intact, without recursively archiving all old module sources. Current dispatcher preparation/source ranges, configure/dry/compile/post-core/provider/PE evidence, Native before/custody/receipt/stdout and both factual reviews remain strict independently selected proof. All current application, quality, Cargo, CLI/observer and factual checks are unchanged. No producer or payload validation is replaced by an opaque boundary; mandatory loads remain strict and standard selected logs still require exact closed sibling recorder receipts.\n'
+(OUT / 'README.md').write_text(readme, encoding='utf8', newline='\n')
+narrow = []
+for name in ('publish.py', 'README.md'):
+    before = OUT / 'before-03' / name; after = OUT / name
+    delta = ''.join(difflib.unified_diff(before.read_text(encoding='utf8').splitlines(True), after.read_text(encoding='utf8').splitlines(True), fromfile='before-03/' + name, tofile=name))
+    target = OUT / (name + '.diff'); target.write_text(delta, encoding='utf8', newline='\n')
+    narrow.append(dict(before=ref(before), proposal=ref(after), exact_diff=ref(target)))
+functions = lambda path: {node.name: ast.dump(node, include_attributes=False) for node in ast.parse(path.read_bytes()).body if isinstance(node, ast.FunctionDef)}
+assert functions(OLD / 'publish.py') == functions(OUT / 'publish.py')
+manifest['own_sources'] = [ref(OUT / name) for name in ('publish.py', 'README.md')] + [ref(Path(__file__))]
+manifest['prior_Source_preparation'] = ref(OLD / 'manifest.json'); manifest['preserved_prior_manifest'] = ref(OUT / 'before-03/manifest.json')
+manifest['narrow_source_correspondence'] = narrow
+manifest['fixed_evidence'] += [ref(OLD / 'manifest.json')]
+manifest['runtime_interfaces']['publisher'] = ref(OUT / 'publish.py')
+manifest['selected_scope']['frozen_Source_and_input_array_descriptors_retained_without_transitive_source_expansion'] = True
+ast.parse(Path(__file__).read_bytes())
+(OUT / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, allow_nan=False, indent=2) + '\n', encoding='utf8', newline='\n')
+print(json.dumps(ref(OUT / 'manifest.json')))

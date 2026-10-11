@@ -1,0 +1,52 @@
+"""Review the narrow finite historical-JSON boundary; never run the publisher."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+ROOT=Path.cwd();BASE=ROOT/'.runtime/porting/SRC-05';HERE=BASE/'ordinary-main-publication-prep-03'
+seen=set();checks=0
+def ref(path):
+    raw=path.read_bytes();return dict(path=path.relative_to(ROOT).as_posix(),sha256=hashlib.sha256(raw).hexdigest(),size_bytes=len(raw))
+def checked(row):
+    global checks
+    raw=(ROOT/row['path']).read_bytes()
+    assert hashlib.sha256(raw).hexdigest()==row['sha256']
+    assert 'size_bytes' not in row or len(raw)==row['size_bytes']
+    assert 'line_count' not in row or len(raw.splitlines())==row['line_count']
+    seen.add((row['path'],row['sha256']));checks+=1;return raw
+def collect(value):
+    if isinstance(value,dict):
+        if {'path','sha256'}<=value.keys() and 'start_line' not in value:checked(value)
+        for key,child in value.items():
+            if key!='historical_source':collect(child)
+    elif isinstance(value,list):
+        for child in value:collect(child)
+manifest=ref(HERE/'manifest.json')
+assert manifest['sha256']=='f1677f7ebb2bfe82070e36f9c70a52cff32f44e70d356b56a432397c82775201'
+m=json.loads((HERE/'manifest.json').read_bytes());collect(m)
+prior=json.loads(checked(m['prior_Source_preparation']))
+for row in m['narrow_source_correspondence']:
+    actual=checked(row['exact_diff']);lines=actual.decode().splitlines(True)
+    assert ''.join(difflib.unified_diff(checked(row['before']).decode().splitlines(True),checked(row['proposal']).decode().splitlines(True),fromfile=lines[0][4:].rstrip('\r\n'),tofile=lines[1][4:].rstrip('\r\n'))).encode()==actual
+functions=lambda tree:{node.name:ast.dump(node,include_attributes=False) for node in tree.body if isinstance(node,ast.FunctionDef)}
+old,new=[functions(ast.parse(checked(x['own_sources'][0]))) for x in (prior,m)]
+assert old.keys()==new.keys() and {key for key in old if old[key]!=new[key]}=={'walk'}
+main=json.loads((BASE/'ordinary-main-thread-prep-01/manifest.json').read_bytes())
+expected={item['source']['path']:item['source'] for item in main['source_dependencies'] if item.get('role')=='accepted_historical_diagnostic_or_build_provenance_not_proposed_execution' and item['source']['path'].endswith('.json')}
+native=json.loads((ROOT/'.runtime/porting/SRC-06/native-tarp-dispatcher-prep-02/manifest.json').read_bytes())
+for key in ('reused_direct_Source_preparation','historical_Source_rationale'):expected[native[key]['path']]=native[key]
+boundaries={row['reference']['path']:row for row in m['opaque_recursive_JSON_references']}
+assert len(boundaries)==len(m['opaque_recursive_JSON_references'])==16
+assert len(set(boundaries)-set(expected))==4
+for name,row in boundaries.items():
+    if name in expected:assert row['reference']==expected[name]
+    else:assert checked(row['reference'])==b'' and ('/before/' in name or name=='.runtime/porting/SRC-06/native-provider-review-01/linked-provider-and-PE-inventory.json')
+    assert row['opaque_reason']
+for row in m['own_sources']:
+    if row['path'].endswith('.py'):ast.parse(checked(row))
+failed=json.loads(checked(m['retained_failed_publication_execution']))
+assert failed['exit_code']==1 and failed['source_bytes_match_before_and_after'] is True
+report=dict(schema='src05-production-publication-Root-narrow-Source-review.v1',Source_preparation=manifest,accepted=True,FULL_prior_review=ref(BASE/'ordinary-main-publication-prep-02/Root-FULL-Source-review-02.json'),all_narrow_diff_README21_author84_read=True,complete_descriptor_checks=checks,unique_identities=len(seen),exact_narrow_diffs=2,finite_exact_opaque_boundaries=16,all_other_functions_AST_exact02=True,mandatory_actual_custody_loads_unchanged=True,closed_log_guard_retained=True,prior_failed_publication_preserved=True,no_publisher_or_target_execution=True,scientific_values_read=False,gates_updated=False,review_Source=ref(Path(__file__)))
+with (HERE/'Root-FULL-Source-review-03.json').open('x',encoding='utf8',newline='\n') as stream:json.dump(report,stream,indent=2);stream.write('\n')
+print(json.dumps(ref(HERE/'Root-FULL-Source-review-03.json')))

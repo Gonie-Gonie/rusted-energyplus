@@ -1,0 +1,166 @@
+"""Root-only actual main-thread A24 CLI and observer custody; no comparison."""
+import argparse
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+APPLICATION_PREP = {'path': '.runtime/porting/SRC-05/ordinary-main-thread-application-prep-03/manifest.json', 'sha256': 'e67df8b315cde068743aea3c542b30257e7156cc50588732a0c83d363877c5de'}
+DATA = Path('D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01').resolve()
+
+
+def physical_ref(path):
+    with path.open('rb') as stream:
+        sha = hashlib.file_digest(stream, 'sha256').hexdigest()
+    return {'path': path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else path.as_posix(), 'sha256': sha, 'size_bytes': path.stat().st_size}
+
+
+def module(row, name):
+    path = (ROOT / row['path']).resolve()
+    if not path.is_relative_to(ROOT) or physical_ref(path)['sha256'] != row['sha256']:
+        raise ValueError('reviewed runtime Source differs')
+    spec = importlib.util.spec_from_file_location(name, path)
+    value = importlib.util.module_from_spec(spec); spec.loader.exec_module(value)
+    return value
+
+
+def capture_custody(path, actual_exit):
+    if not path.is_file():
+        return {'actual_file': None, 'capture_complete': False, 'failure': 'actual stream absent', 'actual_header': None, 'actual_footer': None}
+    sha = hashlib.sha256(); first = last = None; lines = 0
+    with path.open('rb') as stream:
+        for line in stream:
+            sha.update(line); lines += 1
+            if first is None:
+                first = line
+            last = line
+    result = {'actual_file': {'path': path.as_posix(), 'sha256': sha.hexdigest(), 'size_bytes': path.stat().st_size}, 'physical_line_count': lines, 'actual_header': None, 'actual_footer': None, 'capture_complete': False, 'failure': None, 'event_values_parsed_or_filtered': False, 'nonfinite_or_unavailable_values_assessed': False}
+    try:
+        header, footer = json.loads(first), json.loads(last)
+        result['actual_header'], result['actual_footer'] = header, footer
+        valid = header['schema'] == footer['schema'] == 'ctf10-persistent-ordinary-history-stream.v1' and header['record_type'] == 'header' and footer['record_type'] == 'summary'
+        valid = valid and footer['capture_complete'] is True and footer['actual_runtime_exit_code'] == actual_exit and header['counted_as_PASS'] is False and footer['counted_as_PASS'] is False
+        valid = valid and type(footer['actual_observed_event_count']) is int and type(footer['actual_written_event_count']) is int and type(footer['actual_Rust_generation_count']) is int
+        valid = valid and footer['actual_observed_event_count'] == footer['actual_written_event_count'] and lines == 2 + footer['actual_written_event_count'] + footer['actual_Rust_generation_count']
+        result['capture_complete'] = valid
+        if not valid:
+            result['failure'] = 'actual header/footer/count custody differs; no reachability or numerical result inferred'
+    except (TypeError, ValueError, KeyError) as error:
+        result['failure'] = 'actual header/footer unavailable or malformed: ' + str(error)
+    return result
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['source-preparation', 'validation', 'Root-PE-acceptance', 'output-dir']:
+        parser.add_argument('--' + name, required=True)
+    args = parser.parse_args()
+    name, sha = args.source_preparation.rsplit('#', 1)
+    own_path = (ROOT / name).resolve()
+    if not own_path.is_relative_to(ROOT) or physical_ref(own_path)['sha256'] != sha:
+        raise ValueError('reviewed execution preparation differs')
+    own = json.loads(own_path.read_bytes())
+    if own['schema'] != 'src05-ordinary-main-production-execution-Source-preparation.v1':
+        raise ValueError('reviewed execution preparation schema differs')
+    application_path = ROOT / APPLICATION_PREP['path']
+    if physical_ref(application_path)['sha256'] != APPLICATION_PREP['sha256']:
+        raise ValueError('accepted application preparation differs before import')
+    application_prep = json.loads(application_path.read_bytes())
+    A = module(application_prep['runtime_interfaces']['apply'], 'accepted_apply')
+    A.preparation(APPLICATION_PREP['path'] + '#' + APPLICATION_PREP['sha256'])
+    V = module(application_prep['runtime_interfaces']['validate'], 'accepted_validate')
+    for row in own['own_sources']:
+        A.bind(row)
+    A.need(A.bind(own['runtime_interfaces']['driver']) == Path(__file__).resolve() and A.bind(own['accepted_application_preparation']) == A.bind(APPLICATION_PREP), 'actual execution driver/authority differs')
+    own_ref, validation_ref, acceptance_ref = A.operand(args.source_preparation), A.operand(args.validation), A.operand(args.Root_PE_acceptance)
+    validation, acceptance = A.load(validation_ref), A.load(acceptance_ref)
+    A.need(validation['schema'] == 'src05-ordinary-main-thread-actual-quality-and-artifacts.v1' and A.bind(validation['Source_preparation']) == A.bind(APPLICATION_PREP) and validation['target_execution_performed'] is False and validation['gates_updated'] is False, 'actual reviewed validation required')
+    source = validation['Source_snapshot']
+    A.need(source == own['required_Source_snapshot'] and A.bind(validation['actual_application']) == A.bind(own['actual_application']), 'actual post-application Source/application differs')
+    A.need(len(A.members(source, current=True)) == 3931, 'fresh full3931 Source required')
+    A.need(acceptance['schema'] == 'src05-ordinary-main-thread-Root-PE-acceptance.v1' and acceptance['accepted'] is True and acceptance['both_actual_PE_stack_and_entry_evidence_accepted'] is True and A.bind(acceptance['actual_validation']) == A.bind(validation_ref) and acceptance['Source_snapshot'] == source, 'Root actual PE acceptance required')
+    artifacts = validation['actual_Cargo_artifacts']
+    A.need(set(artifacts) == set(V.BUILDS) == set(acceptance['actual_Cargo_artifacts']), 'exact two actual Cargo artifact roles required')
+    quality = validation['quality_executions']
+    A.need(set(quality) == set(V.QUALITY), 'four actual quality roles required')
+    frozen = [own_ref, validation_ref, acceptance_ref, APPLICATION_PREP, own['prior_actual_CLI_command'], own['prior_actual_observer_command']] + own['own_sources'] + application_prep['own_sources']
+    for role, row in quality.items():
+        actual = A.recorded(row, source, V.QUALITY[role]); frozen += [row, actual['stdout'], actual['stderr']]
+    for role, artifact in artifacts.items():
+        expected = V.BUILDS[role]
+        command = ['cargo', 'build'] + V.CONFIGS + ['--locked', '-p', expected['package'], expected['selector'], expected['target'], '--message-format=json-render-diagnostics']
+        actual = A.recorded(artifact['actual_build_execution'], source, command)
+        messages = [json.loads(line) for line in A.bind(actual['stdout']).read_text(encoding='utf-8').splitlines() if line]
+        emitted = [v for v in messages if v.get('reason') == 'compiler-artifact' and v.get('executable')]
+        A.need(len(emitted) == 1 and emitted[0] == artifact['cargo_message'] and emitted[0]['target']['name'] == expected['target'] and emitted[0]['target']['kind'] == expected['kind'] and Path(emitted[0]['target']['src_path']).resolve() == ROOT / expected['source'], 'actual emitted target/source differs')
+        A.need(Path(emitted[0]['executable']).resolve() == A.bind(artifact['executable']) == A.bind(acceptance['actual_Cargo_artifacts'][role]), 'actual accepted executable differs')
+        A.need(artifact['PE_inspection']['actual_binary'] == artifact['executable'] and artifact['PE_inspection']['stack_reserve_bytes'] == 8388608, 'actual accepted PE stack witness differs')
+        A.bind(artifact['PE_inspection']['actual_PE_header_bytes'])
+        captured = actual['cargo_compiler_artifacts_capture']
+        A.need(captured['status'] == 'pass' and len(captured['rows']) == 1 and captured['rows'][0]['cargo_message'] == emitted[0] and captured['rows'][0]['executable']['sha256'] == artifact['executable']['sha256'], 'actual Cargo immediate capture differs')
+        A.need(all(A.load(r)['finished_utc'] <= actual['started_utc'] for r in quality.values()), 'actual quality must precede actual build')
+        frozen += [artifact['actual_build_execution'], actual['stdout'], actual['stderr'], artifact['executable'], artifact['PE_inspection']['actual_PE_header_bytes']]
+    A.load(validation['actual_application']); A.load(validation['actual_formatter_review'])
+    frozen += [validation['actual_application'], validation['actual_formatter_review'], source]
+    contract_ref = own['input_only_contract']; contract = A.load(contract_ref)
+    A.need(contract['schema'] == 'src05-ordinary-main-production-input-only-contract.v1' and contract['selected_case_id'] == 'A-24H' and len(contract['all45_fixed_input_guards']) == 45, 'exact fixed A24 input contract required')
+    A.need(contract['selected_input']['path'] == 'energyplus_porting_plan/cases/A-24H/input.idf' and contract['selected_weather']['path'] == '.runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw', 'fixed input/weather paths differ')
+    frozen += [contract_ref] + [r['actual'] for r in contract['all45_fixed_input_guards']]
+    frozen += [contract[k] for k in ['selected_input', 'selected_weather', 'selected_metadata', 'selected_idd', 'fixed_scope']]
+    for row in frozen:
+        A.bind(row)
+    input_path, weather = A.bind(contract['selected_input']), A.bind(contract['selected_weather'])
+    cli_old = A.load(own['prior_actual_CLI_command']); observer_old = A.load(own['prior_actual_observer_command'])
+    A.need(cli_old['command'][1:] == ['run', str(input_path), '--weather', str(weather), '--output-dir', cli_old['command'][6], '--mode', 'compatibility', '--partial', 'deny', '--trace-level', 'full', '--porting-scope', 'a'], 'authentic prior CLI command shape differs')
+    A.need(len(observer_old['command']) == 5 and observer_old['command'][1:3] == [str(input_path), str(weather)], 'authentic prior observer argc4 shape differs')
+    out = (ROOT / args.output_dir).resolve()
+    A.need(out.is_relative_to(ROOT / '.runtime/porting/SRC-05') and not out.exists() and not DATA.exists(), 'fresh ignored metadata and fresh fixed D output required')
+    free = shutil.disk_usage(Path('D:/')).free
+    A.need(free >= 40 * 1024 ** 3, 'at least40GiB actual D free space required before producer')
+    out.mkdir(parents=True); DATA.mkdir(parents=True)
+    capture_dir = DATA / 'capture'; capture_dir.mkdir()
+    capture = capture_dir / 'events.ndjson'
+    commands = {
+        'CLI': [str(A.bind(artifacts['CLI']['executable'])), 'run', str(input_path), '--weather', str(weather), '--output-dir', str(DATA / 'CLI'), '--mode', 'compatibility', '--partial', 'deny', '--trace-level', 'full', '--porting-scope', 'a'],
+        'ordinary_observer': [str(A.bind(artifacts['ordinary_observer']['executable'])), str(input_path), str(weather), str(DATA / 'observer'), str(capture)],
+    }
+    before = {'schema': 'src05-ordinary-main-production-before.v1', 'Source_preparation': own_ref, 'actual_validation': validation_ref, 'Root_PE_acceptance': acceptance_ref, 'Source_snapshot': source, 'input_only_contract': contract_ref, 'actual_commands': commands, 'data_output_root': DATA.as_posix(), 'actual_D_free_bytes_before': free, 'frozen_artifacts': frozen, 'actual_inherited_environment_selected': {k: os.environ.get(k) for k in ['PATH', 'RUST_MIN_STACK', 'RUSTFLAGS', 'CARGO_ENCODED_RUSTFLAGS', 'RUSTUP_TOOLCHAIN']}, 'floating_point_controls_written': False, 'numerical_comparison_performed': False}
+    before_ref = A.dump(out / 'before.json', before)
+    prefix = [sys.executable, '-X', 'utf8', '-B', str(A.bind(A.RECORDER)), '--output-dir']
+    executions = {}; failure_code = 0
+    for role, command in commands.items():
+        A.members(source, current=True)
+        for row in frozen:
+            A.bind(row)
+        code = subprocess.call(prefix + [str(out / (role + '-command')), '--'] + command, cwd=ROOT)
+        receipt_ref = A.ref(out / (role + '-command') / 'receipt.json'); actual = A.load(receipt_ref)
+        A.need(actual['schema'] == 'recorded-porting-command.v1' and actual['command'] == command and actual['source_snapshot'] == source and actual['exit_code'] == code and actual['launch_error'] is None and actual['source_bytes_match_before_and_after'] is True, 'actual process/Source custody differs; failed artifacts retained')
+        A.need(A.bind(actual['executed_launcher']['archive']).read_bytes() == A.bind(A.RECORDER).read_bytes(), 'actual process recorder differs')
+        A.bind(actual['stdout']); A.bind(actual['stderr'])
+        executions[role] = {'actual_execution': receipt_ref, 'actual_exit_code': code}
+        if code != 0 and failure_code == 0:
+            failure_code = code
+        A.members(source, current=True)
+        for row in frozen:
+            A.bind(row)
+    captured = capture_custody(capture, executions['ordinary_observer']['actual_exit_code'])
+    files = []
+    for path in sorted(DATA.rglob('*')):
+        if path.is_file():
+            A.need(path.resolve().is_relative_to(DATA), 'actual produced file must remain within fixed D output')
+            files.append(captured['actual_file'] if path == capture and captured['actual_file'] is not None else physical_ref(path))
+    for row in frozen:
+        A.bind(row)
+    A.members(source, current=True)
+    record = {'schema': 'src05-ordinary-main-production-execution-custody.v1', 'actual_before': before_ref, 'Source_preparation': own_ref, 'Source_snapshot': source, 'actual_validation': validation_ref, 'Root_PE_acceptance': acceptance_ref, 'actual_executions': executions, 'actual_commands': commands, 'data_output_root': DATA.as_posix(), 'actual_D_free_bytes_after': shutil.disk_usage(Path('D:/')).free, 'actual_output_files': files, 'actual_capture_custody': captured, 'all_frozen_artifacts_rehashed_unchanged': True, 'full_current_Source_members_verified': 3931, 'actual_processes_both_exit_zero': all(v['actual_exit_code'] == 0 for v in executions.values()), 'boundary_reachability_verified': False, 'floating_point_controls_written': False, 'numerical_comparison_performed': False, 'whole_ordinary_or_integration_PASS_claimed': False, 'gates_updated': False}
+    print(json.dumps({'custody': A.dump(out / 'custody.json', record)}))
+    return failure_code if failure_code else (0 if captured['capture_complete'] else 2)
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

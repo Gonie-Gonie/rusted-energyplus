@@ -1,0 +1,11 @@
+--- before-03/publish.py
++++ publish.py
+@@ -15,7 +15,7 @@
+ RECORDER_SHA = '5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'
+ EXCLUDED = {'.exe', '.dll', '.obj', '.a', '.lib', '.map', '.epw', '.pdb'}
+ CHANGED = {'crates/ep_cli/src/main.rs', 'crates/ep_cli/build.rs', 'crates/ep_run/build.rs', 'crates/ep_run/examples/ctf10_ordinary_history_observer.rs'}
+-SKIP_KEYS = {'files', 'frozen_artifacts', 'frozen_artifacts_after', 'inherited_historical_BUILD_Source_aliases', 'authenticated_inherited_historical_BUILD_Source_aliases', 'historical_source', 'actual_before', 'cargo_message', 'selected_objects'}
++SKIP_KEYS = {'files', 'frozen_Source_and_input', 'frozen_artifacts', 'frozen_artifacts_after', 'inherited_historical_BUILD_Source_aliases', 'authenticated_inherited_historical_BUILD_Source_aliases', 'historical_source', 'actual_before', 'cargo_message', 'selected_objects'}
+ SELECTED, VERIFIED, PARSED, ALIASES, SNAPSHOTS = {}, {}, set(), {}, {}
+ OPAQUE_RECURSIVE_JSON = {}
+ 

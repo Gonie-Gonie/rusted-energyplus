@@ -1,0 +1,8 @@
+Arbitrary Run
+  status: success
+  support_status: supported-compatibility
+  run_result_state: supported_compatibility_run
+  output_dir: D:\CodexBuild\rusted-energyplus\SRC-05\ordinary-main-production-01\CLI
+  run_summary: D:\CodexBuild\rusted-energyplus\SRC-05\ordinary-main-production-01\CLI\run-summary.json
+  diagnostics: D:\CodexBuild\rusted-energyplus\SRC-05\ordinary-main-production-01\CLI\diagnostics.json
+  support_report: D:\CodexBuild\rusted-energyplus\SRC-05\ordinary-main-production-01\CLI\support-report.md

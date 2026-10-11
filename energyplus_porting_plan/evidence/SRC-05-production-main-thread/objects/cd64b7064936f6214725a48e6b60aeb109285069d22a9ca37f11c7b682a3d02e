@@ -1,0 +1,31 @@
+{
+  "schema": "src05-production-publication-Root-narrow-Source-review.v1",
+  "Source_preparation": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-publication-prep-04/manifest.json",
+    "sha256": "2351bb1e90018001e56ca569a7a97edb75131cf31d699bd13a74d9dc79a93d3d",
+    "size_bytes": 33001
+  },
+  "accepted": true,
+  "FULL_prior_review": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-publication-prep-03/Root-FULL-Source-review-03.json",
+    "sha256": "15f2889b5de2ff0797424875384ec0d4fc17037fbf6f2cc5cc6071cf673f0a09",
+    "size_bytes": 1223
+  },
+  "all_narrow_diff_README23_author63_read": true,
+  "complete_descriptor_checks": 109,
+  "unique_identities": 88,
+  "exact_narrow_diffs": 2,
+  "finite_exact_opaque_boundaries": 26,
+  "sole_code_change_frozen_Source_and_input_array_exclusion": true,
+  "all_function_bytes_unchanged": true,
+  "mandatory_current_producer_loads_and_closed_log_guard_unchanged": true,
+  "prior_failed_publication_exit_1_preserved": true,
+  "no_publisher_or_target_execution": true,
+  "scientific_values_read": false,
+  "gates_updated": false,
+  "review_Source": {
+    "path": ".runtime/porting/SRC-05/review-publication-Root-04.py",
+    "sha256": "a0c62efee493507a6c263604ebba7ef904022d9776e13757e4dd0c67a634b44d",
+    "size_bytes": 4310
+  }
+}

@@ -1,0 +1,15 @@
+--- before-01/README.md
++++ README.md
+@@ -1,8 +1,10 @@
+-# Production main-thread evidence publisher — held Source
++# Production main-thread evidence publisher - held Source
+ 
+-Root runs `python -X utf8 -B .runtime/porting/SRC-05/ordinary-main-publication-prep-01/publish.py --packet <actual-packet-path>#<actual-SHA256>` only after independent Source acceptance and both actual production processes have closed. This preparation performs no publication, canonical edit, build, target execution, or Git action.
++Root runs `python -X utf8 -B .runtime/porting/SRC-05/ordinary-main-publication-prep-02/publish.py --packet <actual-packet-path>#<actual-SHA256>` only after independent Source acceptance and both actual production processes have closed. This preparation performs no publication, canonical edit, build, target execution, or Git action.
+ 
+ The actual packet schema is `src05-production-main-thread-publication-inputs.v1`. Its mandatory full-reference keys are `actual_validation`, `Root_PE_acceptance`, `actual_execution_custody`, `actual_execution_outer_receipt`, `Root_factual_review`, and `Header_factual_review`. Optional `closed_executions` contains genuine completed standard recorder receipts; optional `opaque_lineage` contains exact small Source/proof objects. Neither list may contain an active publication directory or its unfinished logs. The publisher selects explicit references, never scans active publication directories.
++
++Successor 02 preserves the complete 01 hold and adds a selection guard for every `stdout.log` or `stderr.log`, including opaque or recursive operands. Its actual sibling `receipt.json` must exist, declare a finished genuine standard recorder command, and bind that exact resolved log path and full SHA256 (and declared size when present). The observed full size is retained and rechecked. This prevents this publisher's own still-active recorder log from being archived before its final output is written. All other publisher logic is literal 01.
+ 
+ Both factual reviews use `src05-ordinary-main-production-factual-review.v1`, distinct `reviewer_role` values `Root` and `Header`, and exact `actual_custody`, `actual_validation`, `Source_snapshot` references. They require `full_process_input_Source_output_and_capture_custody_review_accepted:true`, `scientific_comparison_performed:false`, `whole_ordinary_PASS_claimed:false`, and `gates_updated:false`. Additional actual review details are retained. No prospective outcome, numerical result, or count is supplied here.
+ 

@@ -1,0 +1,29 @@
+{
+  "schema": "src05-production-main-thread-publication-Source-review.v1",
+  "reviewer_role": "Header",
+  "accepted": true,
+  "Source_preparation": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-publication-prep-04/manifest.json",
+    "sha256": "2351bb1e90018001e56ca569a7a97edb75131cf31d699bd13a74d9dc79a93d3d",
+    "size_bytes": 33001
+  },
+  "prior_cumulative_review": {
+    "path": ".runtime/porting/SRC-05/Header-ordinary-main-publication-Source-review-03/review.json",
+    "sha256": "1b61ffcb117049f6f8baf2f9eeb737ae56335f13b30aa8bbcf52276c8b8816a3",
+    "size_bytes": 1369
+  },
+  "unique_whole_descriptor_identities": 86,
+  "descriptor_checks": 137,
+  "Source_ranges_verified": 10,
+  "exact_diffs_regenerated": 4,
+  "all_function_ASTs_unchanged": true,
+  "sole_code_change": "frozen_Source_and_input recursive descriptor-array exclusion; full containing metadata retained",
+  "opaque_recursive_JSON_boundaries": 26,
+  "new_explicit_historical_boundaries": 10,
+  "mandatory_producer_JSON_schema_closed_logs_and_store_checks_unchanged": true,
+  "current_Native_dispatcher_configure_compile_core_provider_PE_factual_proofs_not_opaque": true,
+  "no_numeric_payloads_read": true,
+  "publisher_executed": false,
+  "canonical_mutated": false,
+  "gates_updated": false
+}

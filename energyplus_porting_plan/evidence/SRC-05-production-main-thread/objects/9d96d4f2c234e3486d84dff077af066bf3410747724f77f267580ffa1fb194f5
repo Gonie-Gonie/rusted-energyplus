@@ -1,0 +1,39 @@
+--- before/prepare_native.py
++++ prepare_native.py
+@@ -13,7 +13,7 @@
+ HERE = Path(__file__).resolve().parent
+ RAW = ROOT / '.runtime/porting/SRC-06/native-dispatcher-build-01'
+ BUILD = ROOT / '.runtime/ep261-gcc13-o0'
+-CODE = ROOT / '.runtime/porting/SRC-06/native-tarp-dispatcher-prep-01'
++CODE = ROOT / '.runtime/porting/SRC-06/native-tarp-dispatcher-prep-02'
+ PREP = CODE / 'manifest.json'
+ PRIOR = ROOT / '.runtime/porting/SRC-06/native-build-01'
+ OUTPUT = Path('D:/CodexBuild/rusted-energyplus/SRC-06/native-dispatcher-build-01/bin')
+@@ -111,7 +111,7 @@
+ source_path = checked(dict(path=name, sha256=digest))
+ snapshot = {key: full(source_path)[key] for key in ('path', 'sha256')}
+ source_current(snapshot)
+-assert full(PREP)['sha256'] == 'bde6fde556f907b930416942cd28f4a05aeabc3b42fa148ebad290700b5444c1'
++assert full(PREP)['sha256'] == '954a7779868d3ac65d88c553aab324f5e5e0a88d5d455a3126aecc5012ca3d50'
+ prep = load(full(PREP)); collect(prep)
+ assert prep['schema'] == 'src06-tarp-dispatcher-Native-source-preparation.v1' and len(prep['compiled_source_files']) == 1
+ assert prep['compiled_source_files'][0] == prep['own_sources'][0] and prep['own_sources'][0]['line_count'] == 286
+@@ -166,7 +166,10 @@
+ assert len(steps) == 2 and steps[0].startswith('[1/2] ') and steps[1].startswith('[2/2] ')
+ assert '-c ' in steps[0] and 'tarp_dispatcher_helper.cpp' in steps[0] and '-O0 ' in steps[0]
+ assert 'src06_tarp_dispatcher_helper.exe' in steps[1] and 'src06_tarp_dispatcher_helper.map' in steps[1]
+-assert steps[1].split('Products/libenergypluslib.a', 1)[1] == review['dry_steps'][1].split('Products/libenergypluslib.a', 1)[1]
++link_suffix = steps[1].split('Products/libenergypluslib.a', 1)[1]
++prior_link_suffix = review['dry_steps'][1].split('Products/libenergypluslib.a', 1)[1]
++assert link_suffix.split().count('-lbcrypt') == 1
++assert link_suffix == '  -lbcrypt' + prior_link_suffix
+ core_after, core_value = recorded([sys.executable, '-X', 'utf8', '-B', 'tools/porting/build_original_reference.py', '--check'], 'core-after-command', snapshot)
+ assert b'13534 byte-identical official blobs' in checked(core_value['stdout']).read_bytes()
+ source_current(snapshot)
+@@ -176,5 +179,5 @@
+     assert full(BUILD / item)['sha256'] == full(RAW / (item + '.after'))['sha256']
+ delta = RAW / 'CMakeCache.diff'
+ delta.write_bytes(''.join(difflib.unified_diff((RAW / 'CMakeCache.txt.before').read_text().splitlines(True), (RAW / 'CMakeCache.txt.after').read_text().splitlines(True), fromfile='CMakeCache.txt.before', tofile='CMakeCache.txt.after')).encode())
+-dump(RAW / 'configure-and-dry-review.json', dict(schema='src06-tarp-dispatcher-configure-dry-review.v1', frozen_build_inputs=full(RAW / 'frozen-build-inputs.json'), configure_execution=configure_ref, dry_execution=dry_ref, actual_core_before=core_before, actual_core_after=core_after, actual_graph_before=full(RAW / 'compile_commands.json.before'), actual_graph_after=full(RAW / 'compile_commands.json.after'), actual_cache_before=full(RAW / 'CMakeCache.txt.before'), actual_cache_after=full(RAW / 'CMakeCache.txt.after'), actual_cache_diff=full(delta), cache_changes=changes, previous_compile_rows=742, current_compile_rows=743, exact_previous_rows_preserved=True, new_compile_row=new[0], dry_steps=steps, exact_prior_core_link_suffix_preserved=True, prospective_compile_command=[ninja, '-C', str(BUILD), '-j1', '-v', 'src06_tarp_dispatcher_helper'], compile_performed=False, helper_executed=False, gates_updated=False))
++dump(RAW / 'configure-and-dry-review.json', dict(schema='src06-tarp-dispatcher-configure-dry-review.v1', frozen_build_inputs=full(RAW / 'frozen-build-inputs.json'), configure_execution=configure_ref, dry_execution=dry_ref, actual_core_before=core_before, actual_core_after=core_after, actual_graph_before=full(RAW / 'compile_commands.json.before'), actual_graph_after=full(RAW / 'compile_commands.json.after'), actual_cache_before=full(RAW / 'CMakeCache.txt.before'), actual_cache_after=full(RAW / 'CMakeCache.txt.after'), actual_cache_diff=full(delta), cache_changes=changes, previous_compile_rows=742, current_compile_rows=743, exact_previous_rows_preserved=True, new_compile_row=new[0], dry_steps=steps, declared_SHA_transport_link_token='-lbcrypt', declared_SHA_transport_immediately_after_core=True, exact_prior_core_link_suffix_preserved_after_declared_SHA_transport=True, prospective_compile_command=[ninja, '-C', str(BUILD), '-j1', '-v', 'src06_tarp_dispatcher_helper'], compile_performed=False, helper_executed=False, gates_updated=False))
+ print(json.dumps(dict(review=full(RAW / 'configure-and-dry-review.json'), compile_performed=False, helper_executed=False)))

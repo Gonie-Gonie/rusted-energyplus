@@ -1,0 +1,502 @@
+{
+  "schema": "src05-ordinary-main-thread-source-preparation.v1",
+  "status": "HELD_SOURCE_ONLY",
+  "application": [
+    {
+      "canonical_path": "crates/ep_cli/src/main.rs",
+      "new_destination_absent": false,
+      "actual_before": {
+        "path": "crates/ep_cli/src/main.rs",
+        "sha256": "14fd8adbcbe9e9218069586172ca4a54c70bb21035f42701421914bae038892f",
+        "size_bytes": 1031029,
+        "line_count": 24862
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/before/crates/ep_cli/src/main.rs",
+        "sha256": "14fd8adbcbe9e9218069586172ca4a54c70bb21035f42701421914bae038892f",
+        "size_bytes": 1031029,
+        "line_count": 24862
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/proposed/crates/ep_cli/src/main.rs",
+        "sha256": "0e1ce6b4cccd1d1bf0a66e205b576cc5f4e4a47c91071480397e17d7ae72bb92",
+        "size_bytes": 1031295,
+        "line_count": 24866
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/diffs/crates/ep_cli/src/main.rs.diff",
+        "sha256": "f935d067a848e93bcba5a6c2b48bcb186a7806ee14492171dec419579efc39fc",
+        "size_bytes": 1347
+      }
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/ctf10_ordinary_history_observer.rs",
+      "new_destination_absent": false,
+      "actual_before": {
+        "path": "crates/ep_run/examples/ctf10_ordinary_history_observer.rs",
+        "sha256": "1e5da52f570cfb9d8e6b3b7d8614c8989f9233e5759160b1a8802c0cdf8ee170",
+        "size_bytes": 2998,
+        "line_count": 82
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/before/crates/ep_run/examples/ctf10_ordinary_history_observer.rs",
+        "sha256": "1e5da52f570cfb9d8e6b3b7d8614c8989f9233e5759160b1a8802c0cdf8ee170",
+        "size_bytes": 2998,
+        "line_count": 82
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/proposed/crates/ep_run/examples/ctf10_ordinary_history_observer.rs",
+        "sha256": "7ec961e8e48fb06f874a52a9b9b4ca38bb9ced3d087c17359253b0fe50e75cd4",
+        "size_bytes": 3402,
+        "line_count": 92
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/diffs/crates/ep_run/examples/ctf10_ordinary_history_observer.rs.diff",
+        "sha256": "69d167d5f6ba2028f3be8cedf0c8c1dcae23e182e23c509488c0ad9c8a62c839",
+        "size_bytes": 918
+      }
+    },
+    {
+      "canonical_path": "crates/ep_cli/build.rs",
+      "new_destination_absent": true,
+      "actual_before": null,
+      "before_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/before/crates/ep_cli/build.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/proposed/crates/ep_cli/build.rs",
+        "sha256": "d48244e07cbe1af23eb4f2f9f2d37c47c01a72e3aa4a25bfb1dc85a3690e32cd",
+        "size_bytes": 566,
+        "line_count": 12
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/diffs/crates/ep_cli/build.rs.diff",
+        "sha256": "1b0559104fe1d7c6d8fc6d3df88d114223ee990acdf0019948d2c0527b6d262f",
+        "size_bytes": 653
+      }
+    },
+    {
+      "canonical_path": "crates/ep_run/build.rs",
+      "new_destination_absent": true,
+      "actual_before": null,
+      "before_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/before/crates/ep_run/build.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/proposed/crates/ep_run/build.rs",
+        "sha256": "ad1f28743616a99965858eaee5b8cfa4c489483fd74af22f8e2a69cd97008357",
+        "size_bytes": 562,
+        "line_count": 12
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/diffs/crates/ep_run/build.rs.diff",
+        "sha256": "5479a4ae381282f273f591de27c3827970c753b6e5420338f158369ce5940d0b",
+        "size_bytes": 649
+      }
+    }
+  ],
+  "own_sources": [
+    {
+      "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/proposed/crates/ep_cli/src/main.rs",
+      "sha256": "0e1ce6b4cccd1d1bf0a66e205b576cc5f4e4a47c91071480397e17d7ae72bb92",
+      "size_bytes": 1031295,
+      "line_count": 24866
+    },
+    {
+      "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/proposed/crates/ep_run/examples/ctf10_ordinary_history_observer.rs",
+      "sha256": "7ec961e8e48fb06f874a52a9b9b4ca38bb9ced3d087c17359253b0fe50e75cd4",
+      "size_bytes": 3402,
+      "line_count": 92
+    },
+    {
+      "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/proposed/crates/ep_cli/build.rs",
+      "sha256": "d48244e07cbe1af23eb4f2f9f2d37c47c01a72e3aa4a25bfb1dc85a3690e32cd",
+      "size_bytes": 566,
+      "line_count": 12
+    },
+    {
+      "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/proposed/crates/ep_run/build.rs",
+      "sha256": "ad1f28743616a99965858eaee5b8cfa4c489483fd74af22f8e2a69cd97008357",
+      "size_bytes": 562,
+      "line_count": 12
+    },
+    {
+      "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/README.md",
+      "sha256": "dad90a28d3934bc9f4ff3e15337b21580403e3bfd791a99e544a1a4cc0580acc",
+      "size_bytes": 2386,
+      "line_count": 28
+    },
+    {
+      "path": ".runtime/porting/SRC-05/prepare-ordinary-main-thread-01.py",
+      "sha256": "3986a5485a63fe55cbb6d1a8ecf7efae31b532f5cc947d23261c228292ce42cd",
+      "size_bytes": 12259,
+      "line_count": 191
+    }
+  ],
+  "source_dependencies": [
+    {
+      "role": "current_build_Source",
+      "source": {
+        "path": "Cargo.toml",
+        "sha256": "833a9f5bb991874dd972e044949fee695b36b17a857d7603cc0e45921a945b09",
+        "size_bytes": 597,
+        "line_count": 30
+      }
+    },
+    {
+      "role": "current_build_Source",
+      "source": {
+        "path": "Cargo.lock",
+        "sha256": "ebddfe56e3c0d242b920814be6c69b97c2f81bb99909dcbb27b75fead358df3a",
+        "size_bytes": 5543
+      }
+    },
+    {
+      "role": "current_build_Source",
+      "source": {
+        "path": "rust-toolchain.toml",
+        "sha256": "46329056a5a30ccfaab7df1dc7728f98398913aa959296697d037bdd0f050c61",
+        "size_bytes": 108,
+        "line_count": 4
+      }
+    },
+    {
+      "role": "current_build_Source",
+      "source": {
+        "path": ".cargo/config.toml",
+        "sha256": "499acd94a2b47c922ffc59abfd4f2643bcaf78857f7d35524cca98e62ab95c92",
+        "size_bytes": 241,
+        "line_count": 5
+      }
+    },
+    {
+      "role": "current_build_Source",
+      "source": {
+        "path": "crates/ep_cli/Cargo.toml",
+        "sha256": "04c6b5cd8a3809451d4ea973213b8bbbf8c08c70ff12f22875014652f910947a",
+        "size_bytes": 569,
+        "line_count": 24
+      }
+    },
+    {
+      "role": "current_build_Source",
+      "source": {
+        "path": "crates/ep_run/Cargo.toml",
+        "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+        "size_bytes": 524,
+        "line_count": 21
+      }
+    },
+    {
+      "role": "installed_local_toolchain_identity_not_new_build_execution",
+      "source": {
+        "path": "C:/Users/GonieGonie/.rustup/toolchains/1.96.0-x86_64-pc-windows-gnu/bin/rustc.exe",
+        "sha256": "07024ed18c6776f7b79757efa7a4c0fb0df2f03ca48b1efc4f4ce67a1576dcfa",
+        "size_bytes": 45239
+      }
+    },
+    {
+      "role": "installed_local_toolchain_identity_not_new_build_execution",
+      "source": {
+        "path": "C:/Users/GonieGonie/.rustup/toolchains/1.96.0-x86_64-pc-windows-gnu/bin/cargo.exe",
+        "sha256": "6336511b942041c0024ae6ee2edc0b08dc6bd9273258161ca89c3dea8e05e93e",
+        "size_bytes": 59115534
+      }
+    },
+    {
+      "role": "installed_local_toolchain_identity_not_new_build_execution",
+      "source": {
+        "path": "C:/Users/GonieGonie/.rustup/toolchains/1.96.0-x86_64-pc-windows-gnu/lib/rustlib/multirust-config.toml",
+        "sha256": "af8be46fbbe03b5d06586cf6c4363d61b5a7c2713561e9623ff4d730546c789e",
+        "size_bytes": 800,
+        "line_count": 46
+      }
+    },
+    {
+      "role": "installed_local_toolchain_identity_not_new_build_execution",
+      "source": {
+        "path": "C:/Users/GonieGonie/.rustup/toolchains/1.96.0-x86_64-pc-windows-gnu/lib/rustlib/multirust-channel-manifest.toml",
+        "sha256": "05f944dcb8056d866baef94e971ecad5804e6e52ac88518cbbb2c20d06461624",
+        "size_bytes": 986127,
+        "line_count": 32993
+      }
+    },
+    {
+      "role": "accepted_historical_diagnostic_or_build_provenance_not_proposed_execution",
+      "source": {
+        "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-02/manifest.json",
+        "sha256": "193ea67ee3d7c2681ca5b799078659934330e28bbfd87afb2a895805f8f58939",
+        "size_bytes": 38345
+      }
+    },
+    {
+      "role": "accepted_historical_diagnostic_or_build_provenance_not_proposed_execution",
+      "source": {
+        "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-03/manifest.json",
+        "sha256": "f981be1c461227a9152ded3288bf14cd0e007cbd6ab0ba74ac91674b36acc4a2",
+        "size_bytes": 45607
+      }
+    },
+    {
+      "role": "accepted_historical_diagnostic_or_build_provenance_not_proposed_execution",
+      "source": {
+        "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-03/rust/src/main.rs",
+        "sha256": "e6552e18f1d9249b5e9388651a646653a8d0d9decd25106a4933b1128d4ba710",
+        "size_bytes": 6755,
+        "line_count": 116
+      }
+    },
+    {
+      "role": "accepted_historical_diagnostic_or_build_provenance_not_proposed_execution",
+      "source": {
+        "path": ".runtime/porting/SRC-05/wind-pow-Rust-build-02/Cargo-command/receipt.json",
+        "sha256": "56550fe1c86f75fb5ff6da5b198513b254f696d4e05e789d1e292fed73797f46",
+        "size_bytes": 3268
+      }
+    },
+    {
+      "role": "accepted_historical_diagnostic_or_build_provenance_not_proposed_execution",
+      "source": {
+        "path": ".runtime/porting/SRC-05/wind-pow-Rust-build-02/frozen-build-inputs.json",
+        "sha256": "bf0f3915f3ca30d3b1318f08b23b39cc15b0a5ef2e8cb8aec322c16a412ebddd",
+        "size_bytes": 28889
+      }
+    },
+    {
+      "role": "accepted_historical_diagnostic_or_build_provenance_not_proposed_execution",
+      "source": {
+        "path": ".runtime/porting/SRC-05/wind-pow-Rust-build-02/actual-Cargo-artifact-custody.json",
+        "sha256": "ddca801407252a0d47bb68b5bb9c1d9a02b097b8e20e0e9276509014301dcaf7",
+        "size_bytes": 3536
+      }
+    },
+    {
+      "role": "accepted_historical_diagnostic_or_build_provenance_not_proposed_execution",
+      "source": {
+        "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/inventory.json",
+        "sha256": "62a0fb7adf97950cfe2c3371c378412cd3d9966947babd575b56800eac22911f",
+        "size_bytes": 46468
+      }
+    },
+    {
+      "role": "accepted_historical_diagnostic_or_build_provenance_not_proposed_execution",
+      "source": {
+        "path": ".runtime/porting/SRC-05/wind-pow-independent-diagnostic-comparison-01/Root-full-ledger-review.json",
+        "sha256": "57f58620f878c3be3472a986b4cf98591b4c4221444751ef3ef504fdb446ca5c",
+        "size_bytes": 964
+      }
+    },
+    {
+      "role": "accepted_historical_diagnostic_or_build_provenance_not_proposed_execution",
+      "source": {
+        "path": ".runtime/porting/SRC-05/wind-pow-independent-diagnostic-comparison-01/comparison.json",
+        "sha256": "0675fa1939d9b6231b9ed241053fd8a2017becc78f2bdf9b9ff328da4a597f8c",
+        "size_bytes": 713080
+      }
+    },
+    {
+      "role": "accepted_historical_diagnostic_or_build_provenance_not_proposed_execution",
+      "source": {
+        "path": ".runtime/porting/SRC-05/wind-pow-Rust-independent-factual-review-01/review.json",
+        "sha256": "30440d02192abe74569e94fc17795789eab7865cb19a5ab1e914f0ab2be5534a",
+        "size_bytes": 12837
+      }
+    },
+    {
+      "role": "accepted_historical_diagnostic_or_build_provenance_not_proposed_execution",
+      "source": {
+        "path": ".runtime/porting/SRC-05/wind-pow-Native-independent-factual-review-01/review.json",
+        "sha256": "a5ac7bef83a6d43418d0676c253fdc66a5cb400286e3b4cc678fb36b8d9e7a3d",
+        "size_bytes": 4506
+      }
+    }
+  ],
+  "Source_ranges": [
+    {
+      "source": {
+        "path": "crates/ep_cli/src/main.rs",
+        "sha256": "14fd8adbcbe9e9218069586172ca4a54c70bb21035f42701421914bae038892f",
+        "size_bytes": 1031029,
+        "line_count": 24862
+      },
+      "start_line": 148,
+      "end_line": 208,
+      "sha256": "56ffa779e2a13daf0b890ad423f7cc0c4dfb7b35487033a86a13f5d78429fc04",
+      "size_bytes": 4014,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/Source-ranges/01.txt",
+        "sha256": "56ffa779e2a13daf0b890ad423f7cc0c4dfb7b35487033a86a13f5d78429fc04",
+        "size_bytes": 4014
+      },
+      "purpose": "actual CLI worker entry and unchanged dispatch boundary"
+    },
+    {
+      "source": {
+        "path": "crates/ep_run/examples/ctf10_ordinary_history_observer.rs",
+        "sha256": "1e5da52f570cfb9d8e6b3b7d8614c8989f9233e5759160b1a8802c0cdf8ee170",
+        "size_bytes": 2998,
+        "line_count": 82
+      },
+      "start_line": 10,
+      "end_line": 82,
+      "sha256": "3f3119d34d0a73ded534c0d0792d3e01fecc7c7d9295b48f039dcf55c6889809",
+      "size_bytes": 2555,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/Source-ranges/02.txt",
+        "sha256": "3f3119d34d0a73ded534c0d0792d3e01fecc7c7d9295b48f039dcf55c6889809",
+        "size_bytes": 2555
+      },
+      "purpose": "actual ordinary run, TLS sink, and worker entry"
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-03/rust/src/main.rs",
+        "sha256": "e6552e18f1d9249b5e9388651a646653a8d0d9decd25106a4933b1128d4ba710",
+        "size_bytes": 6755,
+        "line_count": 116
+      },
+      "start_line": 33,
+      "end_line": 46,
+      "sha256": "07adcdc7157c7146a3de421a0c3c7a7c20ab5e7a6212a3e48da079ec9843d07b",
+      "size_bytes": 786,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/Source-ranges/03.txt",
+        "sha256": "07adcdc7157c7146a3de421a0c3c7a7c20ab5e7a6212a3e48da079ec9843d07b",
+        "size_bytes": 786
+      },
+      "purpose": "read-only diagnostic controls"
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-03/rust/src/main.rs",
+        "sha256": "e6552e18f1d9249b5e9388651a646653a8d0d9decd25106a4933b1128d4ba710",
+        "size_bytes": 6755,
+        "line_count": 116
+      },
+      "start_line": 92,
+      "end_line": 116,
+      "sha256": "b02148a4cc2ccf1ba148f3184352def9d36bcde01c48487e5e519514bc1fcb11",
+      "size_bytes": 1718,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/Source-ranges/04.txt",
+        "sha256": "b02148a4cc2ccf1ba148f3184352def9d36bcde01c48487e5e519514bc1fcb11",
+        "size_bytes": 1718
+      },
+      "purpose": "actual diagnostic main and spawn lanes"
+    },
+    {
+      "source": {
+        "path": "C:/Users/GonieGonie/.rustup/toolchains/1.96.0-x86_64-pc-windows-gnu/lib/rustlib/src/rust/library/std/src/sys/thread/windows.rs",
+        "sha256": "d39dac5c2c0b286df1dbbaa2055fb4832e833dd8d456503feeba3ef3ae79b586",
+        "size_bytes": 5535,
+        "line_count": 155
+      },
+      "start_line": 18,
+      "end_line": 65,
+      "sha256": "5864e10a3cc21d48995c210d114743f347ce774a1b814760867438dba2915b97",
+      "size_bytes": 2020,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/Source-ranges/05.txt",
+        "sha256": "5864e10a3cc21d48995c210d114743f347ce774a1b814760867438dba2915b97",
+        "size_bytes": 2020
+      },
+      "purpose": "actual Windows worker reservation and overflow guarantee"
+    },
+    {
+      "source": {
+        "path": "C:/Users/GonieGonie/.rustup/toolchains/1.96.0-x86_64-pc-windows-gnu/lib/rustlib/src/rust/library/std/src/sys/pal/windows/stack_overflow.rs",
+        "sha256": "32995beb3683e62b2f9af3d1cac5e3317541baa038d39320bd67c43bce83c9dc",
+        "size_bytes": 1761,
+        "line_count": 41
+      },
+      "start_line": 1,
+      "end_line": 41,
+      "sha256": "32995beb3683e62b2f9af3d1cac5e3317541baa038d39320bd67c43bce83c9dc",
+      "size_bytes": 1761,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/Source-ranges/06.txt",
+        "sha256": "32995beb3683e62b2f9af3d1cac5e3317541baa038d39320bd67c43bce83c9dc",
+        "size_bytes": 1761
+      },
+      "purpose": "actual main overflow handler and emergency stack guarantee"
+    },
+    {
+      "source": {
+        "path": "C:/Users/GonieGonie/.rustup/toolchains/1.96.0-x86_64-pc-windows-gnu/lib/rustlib/src/rust/library/std/src/sys/pal/windows/mod.rs",
+        "sha256": "b561d7e9cb6028a08cb36b53ebcc313f2be0ad64de864da889dfea88f1f1d7b6",
+        "size_bytes": 10850,
+        "line_count": 296
+      },
+      "start_line": 46,
+      "end_line": 59,
+      "sha256": "bdcf6b4647650761d7ba86c85f2af6eb5ae63c0b8ef491737370d74ccf0f388d",
+      "size_bytes": 515,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/Source-ranges/07.txt",
+        "sha256": "bdcf6b4647650761d7ba86c85f2af6eb5ae63c0b8ef491737370d74ccf0f388d",
+        "size_bytes": 515
+      },
+      "purpose": "actual std Windows initialization calls overflow setup"
+    },
+    {
+      "source": {
+        "path": "C:/Users/GonieGonie/.rustup/toolchains/1.96.0-x86_64-pc-windows-gnu/lib/rustlib/src/rust/library/std/src/rt.rs",
+        "sha256": "f435576c645fb30eaca560e819c2a113b556452d79c0303f49ffd4487018c01f",
+        "size_bytes": 7538,
+        "line_count": 211
+      },
+      "start_line": 90,
+      "end_line": 122,
+      "sha256": "6ad69319dd9508c64324043c526a8d9badb41550829dca1d5207c5e4cc43d6a1",
+      "size_bytes": 1569,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/Source-ranges/08.txt",
+        "sha256": "6ad69319dd9508c64324043c526a8d9badb41550829dca1d5207c5e4cc43d6a1",
+        "size_bytes": 1569
+      },
+      "purpose": "runtime initialization before main"
+    }
+  ],
+  "current_Source_snapshot_context": {
+    "path": ".runtime/porting/source-objects/8a/8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934",
+    "sha256": "8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934",
+    "size_bytes": 1632224
+  },
+  "runtime_contract": {
+    "supported_direct_main_targets": [
+      "windows-gnu",
+      "windows-msvc"
+    ],
+    "main_stack_reserve_bytes": 8388608,
+    "stack_commit_override": null,
+    "other_targets_keep_existing_worker": true,
+    "run_bodies_byte_unchanged": true,
+    "floating_point_controls_written": false,
+    "canonical_mutated": false,
+    "new_build_or_target_execution": false,
+    "historical_cause_claimed": false,
+    "production_PASS_claimed": false,
+    "gates_updated": false,
+    "actual_PE_and_quality_and_CLI_and_observer_rerun_required": true
+  },
+  "external_primary_documentation": [
+    {
+      "url": "https://doc.rust-lang.org/cargo/reference/build-scripts.html",
+      "scope": "autodetection, target variables, named-bin and examples linker directives"
+    },
+    {
+      "url": "https://sourceware.org/binutils/docs/ld/Options.html",
+      "scope": "compiler driver -Wl and PE --stack reserve bytes"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/cpp/build/reference/stack-stack-allocations?view=msvc-170",
+      "scope": "MSVC /STACK reserve bytes with commit omitted"
+    }
+  ]
+}

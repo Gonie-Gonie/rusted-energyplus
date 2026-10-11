@@ -1,0 +1,306 @@
+"""Publish closed main-thread CLI evidence; retain large ordinary payloads externally."""
+import argparse
+import difflib
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import re
+import shutil
+
+ROOT = Path.cwd().resolve()
+OUT = ROOT / 'energyplus_porting_plan/evidence/SRC-05-production-main-thread'
+DATA = Path('D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01').resolve()
+PREPARATION = Path(__file__).with_name('manifest.json')
+RECORDER_SHA = '5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'
+EXCLUDED = {'.exe', '.dll', '.obj', '.a', '.lib', '.map', '.epw', '.pdb'}
+CHANGED = {'crates/ep_cli/src/main.rs', 'crates/ep_cli/build.rs', 'crates/ep_run/build.rs', 'crates/ep_run/examples/ctf10_ordinary_history_observer.rs'}
+SKIP_KEYS = {'files', 'frozen_Source_and_input', 'frozen_artifacts', 'frozen_artifacts_after', 'inherited_historical_BUILD_Source_aliases', 'authenticated_inherited_historical_BUILD_Source_aliases', 'historical_source', 'actual_before', 'cargo_message', 'selected_objects'}
+SELECTED, VERIFIED, PARSED, ALIASES, SNAPSHOTS = {}, {}, set(), {}, {}
+OPAQUE_RECURSIVE_JSON = {}
+
+
+def ref(path):
+    path = path.resolve()
+    with path.open('rb') as stream: digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+    return dict(path=path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else path.as_posix(), sha256=digest, size_bytes=path.stat().st_size)
+
+
+def same(left, right):
+    assert left['path'] == right['path'] and left['sha256'] == right['sha256']
+    if 'size_bytes' in left and 'size_bytes' in right: assert left['size_bytes'] == right['size_bytes']
+
+
+def checked(row, retain=True):
+    path = (ROOT / row['path']).resolve()
+    assert path.is_relative_to(ROOT), row['path']
+    actual = ref(path)
+    assert actual['sha256'] == row['sha256'] and ('size_bytes' not in row or actual['size_bytes'] == row['size_bytes']), row['path']
+    VERIFIED[path] = actual
+    if retain:
+        assert path.suffix.lower() not in EXCLUDED
+        if path.name in ('stdout.log', 'stderr.log'):
+            closed_path = path.with_name('receipt.json')
+            assert closed_path.is_file(), 'Unfinished command log cannot be published: ' + str(path)
+            closed = json.loads(closed_path.read_bytes())
+            assert closed['schema'] == 'recorded-porting-command.v1' and closed['finished_utc'] and closed['launch_error'] is None
+            assert closed['executed_launcher']['archive']['sha256'] == RECORDER_SHA
+            declared = closed['stdout' if path.name == 'stdout.log' else 'stderr']
+            assert (ROOT / declared['path']).resolve() == path and declared['sha256'] == actual['sha256']
+            assert declared.get('size_bytes', actual['size_bytes']) == actual['size_bytes']
+            checked(ref(closed_path)); checked(closed['executed_launcher']['archive'])
+        SELECTED[path] = actual
+    return path
+
+
+def load(row):
+    return json.loads(checked(row).read_bytes())
+
+
+def operand(value):
+    path, digest = value.rsplit('#', 1)
+    return ref(checked(dict(path=path, sha256=digest)))
+
+
+def snapshot(row, current=False):
+    path = checked(row)
+    if path not in SNAPSHOTS:
+        value = json.loads(path.read_bytes())
+        assert value['schema'] == 'rust-command-source-snapshot.v1' and value['bytes_normalized'] is False
+        rows = {item['historical_path']: item for item in value['files']}
+        assert len(rows) == len(value['files'])
+        for item in rows.values(): assert checked(item['archive'], False).stat().st_size == item['size_bytes']
+        SNAPSHOTS[path] = rows
+    rows = SNAPSHOTS[path]
+    if current:
+        assert len(rows) == 3931
+        for name, item in rows.items():
+            checked(dict(path=name, sha256=item['archive']['sha256'], size_bytes=item['size_bytes']), name in CHANGED)
+        actual_paths = {path.relative_to(ROOT).as_posix() for path in (ROOT / 'crates').rglob('*.rs')}
+        actual_paths |= {path.relative_to(ROOT).as_posix() for path in (ROOT / 'crates').rglob('Cargo.toml')}
+        actual_paths |= {name for name in ('Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml') if (ROOT / name).is_file()}
+        assert actual_paths == set(rows)
+    return rows
+
+
+def receipt(row, source=None, code=None):
+    value = load(row)
+    assert value['schema'] == 'recorded-porting-command.v1' and value['finished_utc'] and value['launch_error'] is None
+    assert value['executed_launcher']['archive']['sha256'] == RECORDER_SHA
+    for key in ('stdout', 'stderr'): checked(value[key])
+    checked(value['executed_launcher']['archive']); snapshot(value['source_snapshot'])
+    if source is not None:
+        same(value['source_snapshot'], source); assert value['source_bytes_match_before_and_after'] is True
+    if code is not None: assert value['exit_code'] == code
+    return value
+
+
+def walk(value):
+    """Selected proof closure; historical Source aliases and omitted payloads stay explicit."""
+    if isinstance(value, list):
+        for child in value: walk(child)
+    elif isinstance(value, dict):
+        if {'start_line', 'end_line', 'literal_archive'} <= value.keys():
+            literal = checked(value['literal_archive']).read_bytes()
+            assert hashlib.sha256(literal).hexdigest() == value['sha256'] and len(literal) == value['size_bytes']
+            source = value.get('source')
+            if source is not None:
+                alias = ALIASES.get((source['path'], source['sha256']), source)
+                path = checked(alias, alias['path'].endswith(tuple(CHANGED))) if not Path(alias['path']).is_absolute() else Path(alias['path'])
+                actual = ref(path); assert actual['sha256'] == alias['sha256'] and actual['size_bytes'] == alias['size_bytes']
+                lines = path.read_bytes().splitlines(True)
+                assert b''.join(lines[value['start_line'] - 1:value['end_line']]) == literal
+            return
+        if {'path', 'sha256'} <= value.keys():
+            name = value['path']; path = Path(name)
+            if path.is_absolute() or path.suffix.lower() in EXCLUDED: return
+            alias = ALIASES.get((name, value['sha256']))
+            if alias is not None: checked(alias); return
+            if path.suffix == '.rs' and not name.endswith(tuple(CHANGED)): return
+            if name.startswith('crates/'):
+                if name in CHANGED: checked(value)
+                return
+            if name.startswith('.runtime/porting/source-objects/'):
+                if name.rsplit('/', 1)[-1] == value['sha256']:
+                    # Snapshot descriptors are handled explicitly; raw unrelated sources are not selected.
+                    return
+            if not name.startswith(('.runtime/porting/', '.reference/', 'tools/porting/', 'energyplus_porting_plan/evidence/')): return
+            actual = checked(value)
+            opaque = OPAQUE_RECURSIVE_JSON.get(name)
+            if opaque is not None:
+                same(ref(actual), opaque['reference']); return
+            if actual.suffix == '.json' and actual not in PARSED:
+                PARSED.add(actual); body = json.loads(actual.read_bytes())
+                if body.get('schema') == 'recorded-porting-command.v1': receipt(value)
+                walk(body)
+            return
+        for key, child in value.items():
+            if key not in SKIP_KEYS: walk(child)
+
+
+def diff(before, after, declared, old_label, new_label):
+    expected = ''.join(difflib.unified_diff(before.decode('utf8').splitlines(True), after.decode('utf8').splitlines(True), fromfile=old_label, tofile=new_label)).encode('utf8')
+    assert checked(declared).read_bytes() == expected
+
+
+def external(row, base=DATA):
+    path = Path(row['path']).resolve()
+    assert path.is_relative_to(base) and path.is_file()
+    actual = ref(path)
+    same(actual, row)
+    assert actual['size_bytes'] == row['size_bytes']
+    return dict(actual_full_file=actual, storage_available_at_publication=True, payload_published=False, encoding='unmodified-external-file')
+
+
+def store():
+    prior = {}
+    for directory in (ROOT / 'energyplus_porting_plan/evidence').glob('*/objects'):
+        for path in directory.iterdir():
+            if path.is_file() and re.fullmatch('[0-9a-f]{64}', path.name): prior.setdefault(path.name, path)
+    OUT.mkdir(); (OUT / 'objects').mkdir(); (OUT / 'observations').mkdir()
+    objects = []
+    for path, original in sorted(SELECTED.items()):
+        assert ref(path) == original
+        if original['size_bytes'] >= 512 * 1024:
+            matches = sorted((ROOT / 'energyplus_porting_plan/evidence').glob('*/observations/' + original['sha256'] + '.json.gz'))
+            target = matches[0] if matches else OUT / 'observations' / (original['sha256'] + '.json.gz')
+            if not matches:
+                with path.open('rb') as source, target.open('xb') as output:
+                    with gzip.GzipFile(filename='', fileobj=output, mode='wb', mtime=0) as compressed: shutil.copyfileobj(source, compressed)
+            digest = hashlib.sha256(); size = 0
+            with gzip.open(target, 'rb') as stream:
+                for chunk in iter(lambda: stream.read(1024 * 1024), b''): digest.update(chunk); size += len(chunk)
+            assert digest.hexdigest() == original['sha256'] and size == original['size_bytes']
+            objects.append(dict(original=original, stored=ref(target), encoding='gzip', complete_original_bytes_verified=True, reused=bool(matches)))
+        else:
+            target = prior.get(original['sha256'], OUT / 'objects' / original['sha256'])
+            if not target.exists(): shutil.copyfile(path, target)
+            actual = ref(target); assert actual['sha256'] == original['sha256'] and actual['size_bytes'] == original['size_bytes']
+            prior[original['sha256']] = target
+            objects.append(dict(original=original, stored=actual, encoding='raw', complete_original_bytes_verified=True, reused=not target.is_relative_to(OUT)))
+    return objects
+
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--packet', required=True, help='Closed actual Root operands path#SHA256')
+args = parser.parse_args()
+packet_ref = operand(args.packet); packet = load(packet_ref); preparation = json.loads(PREPARATION.read_bytes())
+OPAQUE_RECURSIVE_JSON = {row['reference']['path']: row for row in preparation['opaque_recursive_JSON_references']}
+assert len(OPAQUE_RECURSIVE_JSON) == len(preparation['opaque_recursive_JSON_references'])
+assert packet['schema'] == 'src05-production-main-thread-publication-inputs.v1' and not OUT.exists()
+assert ref(Path(__file__)) == {key: preparation['runtime_interfaces']['publisher'][key] for key in ('path', 'sha256', 'size_bytes')}
+validation = load(packet['actual_validation']); pe = load(packet['Root_PE_acceptance'])
+assert validation['schema'] == 'src05-ordinary-main-thread-actual-quality-and-artifacts.v1'
+assert pe['schema'] == 'src05-ordinary-main-thread-Root-PE-acceptance.v1' and pe['accepted'] is True and pe['both_actual_PE_stack_and_entry_evidence_accepted'] is True
+same(pe['actual_validation'], packet['actual_validation']); source = validation['Source_snapshot']; same(pe['Source_snapshot'], source)
+application = load(validation['actual_application']); approved = load(application['accepted_main_thread_preparation'])
+same(validation['actual_application'], preparation['required_application']); same(source, preparation['required_Source_snapshot'])
+assert application['schema'] == 'src05-ordinary-main-thread-actual-application.v1'
+assert application['source_file_count'] == 3931 and application['unrelated_source_files_verified_byte_exact'] == 3927
+same(application['source_final'], source); old = snapshot(application['source_before']); literal_rows = snapshot(application['source_literal']); final = snapshot(source, True)
+assert len(old) == 3929 and set(final) - set(old) == {'crates/ep_cli/build.rs', 'crates/ep_run/build.rs'} and not set(old) - set(final)
+assert {row['canonical_path'] for row in application['application']} == CHANGED and len(application['application']) == 4
+for row in application['application']:
+    name = row['canonical_path']; held, = [item for item in approved['application'] if item['canonical_path'] == name]
+    for key in ('canonical_path', 'new_destination_absent', 'actual_before', 'before_archive', 'proposal', 'exact_diff'): assert row[key] == held[key]
+    if row['actual_before'] is not None:
+        ALIASES[(name, row['actual_before']['sha256'])] = row['actual_before_archive']
+        assert old[name]['archive']['sha256'] == row['actual_before']['sha256']
+    else: assert name not in old and row['new_destination_absent'] is True
+    before = checked(row['actual_before_archive']).read_bytes(); proposal = checked(row['proposal']).read_bytes()
+    actual_literal = checked(row['actual_literal_archive']).read_bytes(); formatted = checked(row['actual_final_archive']).read_bytes()
+    assert before == checked(row['before_archive']).read_bytes() and actual_literal == proposal and formatted == checked(row['actual_final']).read_bytes()
+    assert literal_rows[name]['archive']['sha256'] == row['actual_literal_archive']['sha256'] and final[name]['archive']['sha256'] == row['actual_final']['sha256']
+    diff(before, proposal, row['exact_diff'], 'a/' + name, 'b/' + name); diff(before, actual_literal, row['actual_semantic_diff'], 'a/' + name, 'b/' + name); diff(actual_literal, formatted, row['actual_formatter_diff'], 'a/' + name, 'b/' + name)
+    for key in ('archive',): checked(final[name][key])
+for name in set(old) - CHANGED: assert old[name]['archive']['sha256'] == final[name]['archive']['sha256'] == literal_rows[name]['archive']['sha256']
+formatter = load(validation['actual_formatter_review'])
+assert formatter['schema'] == 'src05-ordinary-main-thread-actual-formatter-review.v1' and formatter['Root_FULL_formatter_correspondence_accepted'] is True and formatter['independent_FULL_formatter_correspondence_accepted'] is True
+same(formatter['actual_application'], validation['actual_application']); same(formatter['Source_snapshot'], source)
+quality = []; configs = ['--config', 'profile.dev.debug=0', '--config', 'profile.test.debug=0', '--config', 'build.incremental=false']
+commands = dict(fmt_check=['cargo', 'fmt', '--all', '--', '--check'], clippy=['cargo', 'clippy', *configs, '--locked', '--workspace', '--all-targets', '--', '-D', 'warnings'], focused=['cargo', 'test', *configs, '--locked', '-p', 'ep_runtime', '--lib', 'heat_balance::'], workspace=['cargo', 'test', *configs, '--locked', '--workspace'])
+assert list(validation['quality_executions']) == list(commands)
+for role, row in validation['quality_executions'].items():
+    value = receipt(row, source, 0); assert value['command'] == commands[role]
+    text = checked(value['stdout']).read_text(encoding='utf8'); groups = re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored;', text)
+    totals = dict(groups=len(groups), passed=sum(int(g[0]) for g in groups), failed=sum(int(g[1]) for g in groups), ignored=sum(int(g[2]) for g in groups))
+    assert totals['failed'] == 0
+    if role in ('focused', 'workspace'):
+        declared = validation['actual_test_totals'][role]; assert all(totals[key] == declared[key] for key in totals)
+        assert [line for line in text.splitlines() if line.startswith('test ') and ' ... ignored' in line] == [item['actual_line'] for item in declared['actual_ignored_tests']]
+    quality.append(dict(role=role, actual_execution=row, actual_totals=totals))
+builds = {}
+for role, artifact in validation['actual_Cargo_artifacts'].items():
+    assert role in ('CLI', 'ordinary_observer'); build = receipt(artifact['actual_build_execution'], source, 0)
+    package, option, target = ('ep_cli', '--bin', 'eplus-rs') if role == 'CLI' else ('ep_run', '--example', 'ctf10_ordinary_history_observer')
+    assert build['command'] == ['cargo', 'build', *configs, '--locked', '-p', package, option, target, '--message-format=json-render-diagnostics']
+    same(build['stdout'], artifact['actual_full_Cargo_JSON']); messages = [json.loads(line) for line in checked(artifact['actual_full_Cargo_JSON']).read_bytes().splitlines()]
+    assert [item for item in messages if item.get('reason') == 'compiler-artifact' and item.get('target', {}).get('name') == target and item.get('executable')] == [artifact['cargo_message']]
+    assert Path(artifact['cargo_message']['executable']).resolve() == checked(artifact['executable'], False)
+    same(pe['actual_Cargo_artifacts'][role], artifact['executable']); same(artifact['PE_inspection']['actual_binary'], artifact['executable'])
+    assert artifact['PE_inspection']['stack_reserve_bytes'] == 8388608; checked(artifact['PE_inspection']['actual_PE_header_bytes'])
+    assert all(receipt(row, source, 0)['finished_utc'] <= build['started_utc'] for row in validation['quality_executions'].values())
+    builds[role] = build
+assert set(builds) == {'CLI', 'ordinary_observer'}
+custody = load(packet['actual_execution_custody']); before = load(custody['actual_before'])
+assert custody['schema'] == 'src05-ordinary-main-production-execution-custody.v1' and before['schema'] == 'src05-ordinary-main-production-before.v1'
+same(custody['actual_validation'], packet['actual_validation']); same(custody['Root_PE_acceptance'], packet['Root_PE_acceptance']); same(custody['Source_snapshot'], source)
+same(before['Source_snapshot'], source); same(before['actual_validation'], packet['actual_validation']); same(before['Root_PE_acceptance'], packet['Root_PE_acceptance'])
+same(custody['Source_preparation'], preparation['accepted_execution_preparation']); same(before['Source_preparation'], custody['Source_preparation'])
+assert custody['all_frozen_artifacts_rehashed_unchanged'] is True and custody['full_current_Source_members_verified'] == 3931
+assert Path(custody['data_output_root']).resolve() == DATA and before['actual_D_free_bytes_before'] >= 40 * 1024**3
+contract = load(before['input_only_contract']); guards = contract['all45_fixed_input_guards']; assert len(guards) == 45
+assert contract['schema'] == 'src05-ordinary-main-production-input-only-contract.v1' and contract['selected_case_id'] == 'A-24H'
+assert contract['selected_input']['path'] == 'energyplus_porting_plan/cases/A-24H/input.idf' and contract['selected_weather']['path'] == '.runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw'
+for row in guards: checked(row['actual'], False)
+for key in ('selected_input', 'selected_weather', 'selected_metadata', 'selected_idd', 'fixed_scope'): checked(contract[key], False)
+input_path, weather = str(checked(contract['selected_input'], False)), str(checked(contract['selected_weather'], False))
+expected_commands = dict(CLI=[str(checked(validation['actual_Cargo_artifacts']['CLI']['executable'], False)), 'run', input_path, '--weather', weather, '--output-dir', str(DATA / 'CLI'), '--mode', 'compatibility', '--partial', 'deny', '--trace-level', 'full', '--porting-scope', 'a'], ordinary_observer=[str(checked(validation['actual_Cargo_artifacts']['ordinary_observer']['executable'], False)), input_path, weather, str(DATA / 'observer'), str(DATA / 'capture/events.ndjson')])
+assert custody['actual_commands'] == expected_commands
+actual_exits = {}
+for role, row in custody['actual_executions'].items():
+    executed = receipt(row['actual_execution'], source); actual_exits[role] = executed['exit_code']; assert row['actual_exit_code'] == executed['exit_code']
+    assert executed['command'] == custody['actual_commands'][role] == before['actual_commands'][role]
+    assert Path(executed['command'][0]).resolve() == checked(validation['actual_Cargo_artifacts'][role]['executable'], False)
+    assert builds[role]['finished_utc'] <= executed['started_utc']
+assert set(actual_exits) == {'CLI', 'ordinary_observer'} and custody['actual_processes_both_exit_zero'] == all(code == 0 for code in actual_exits.values())
+outer = receipt(packet['actual_execution_outer_receipt'], source)
+driver = load(preparation['accepted_execution_preparation'])['runtime_interfaces']['driver']; checked(driver)
+assert len(outer['command']) == 13 and outer['command'][1:4] == ['-X', 'utf8', '-B'] and Path(outer['command'][4]).resolve() == checked(driver)
+for index, flag, row in ((5, '--source-preparation', custody['Source_preparation']), (7, '--validation', packet['actual_validation']), (9, '--Root-PE-acceptance', packet['Root_PE_acceptance'])):
+    assert outer['command'][index] == flag; same(operand(outer['command'][index + 1]), row)
+assert outer['command'][11] == '--output-dir' and (ROOT / outer['command'][12]).resolve() == checked(packet['actual_execution_custody']).parent
+assert all(receipt(row['actual_execution'], source)['finished_utc'] <= outer['finished_utc'] for row in custody['actual_executions'].values())
+for key in ('floating_point_controls_written', 'numerical_comparison_performed', 'whole_ordinary_or_integration_PASS_claimed', 'gates_updated'): assert custody[key] is False
+outputs = custody['actual_output_files']; assert len({item['path'] for item in outputs}) == len(outputs)
+actual_paths = {path.resolve() for path in DATA.rglob('*') if path.is_file()}; assert actual_paths == {Path(item['path']).resolve() for item in outputs}
+external_payloads = [external(item) for item in outputs]
+capture = custody['actual_capture_custody']; capture_ref = capture['actual_file']
+if capture_ref is not None: assert capture_ref in outputs and capture['event_values_parsed_or_filtered'] is False
+expected_outer_exit = next((code for code in actual_exits.values() if code != 0), 0 if capture['capture_complete'] else 2)
+assert outer['exit_code'] == expected_outer_exit
+for role, key in (('Root', 'Root_factual_review'), ('Header', 'Header_factual_review')):
+    factual = load(packet[key]); assert factual['schema'] == 'src05-ordinary-main-production-factual-review.v1' and factual['reviewer_role'] == role
+    same(factual['actual_custody'], packet['actual_execution_custody']); same(factual['actual_validation'], packet['actual_validation']); same(factual['Source_snapshot'], source)
+    assert factual['full_process_input_Source_output_and_capture_custody_review_accepted'] is True
+    for field in ('scientific_comparison_performed', 'whole_ordinary_PASS_claimed', 'gates_updated'): assert factual[field] is False
+    walk(factual)
+baseline = load(application['Native_baseline_acceptance'])
+same(application['Native_baseline_acceptance'], preparation['required_Native_baseline_acceptance'])
+assert baseline['schema'] == 'src06-tarp-dispatcher-Root-factual-baseline-acceptance.v1' and baseline['accepted'] is True and baseline['complete_input_owner_prefix_and_custody_review_accepted'] is True
+same(baseline['Source_snapshot'], application['source_before']); native_custody = load(baseline['actual_custody'])
+native_before = load(native_custody['actual_before']); same(native_before['Source_snapshot'], application['source_before'])
+assert native_custody['all_frozen_artifacts_unchanged'] is True and native_custody['scientific_PASS_claimed'] is False
+receipt(baseline['actual_Native_execution'], application['source_before'], 0)
+for seed in preparation['fixed_evidence']: walk(seed)
+for value in (packet, validation, pe, application, approved, formatter, custody, before, baseline, native_custody, native_before): walk(value)
+for row in packet.get('closed_executions', []): receipt(row)
+for row in packet.get('opaque_lineage', []): checked(row)
+for row in preparation['opaque_recursive_JSON_references']: checked(row['reference'])
+checked(ref(Path(__file__))); checked(ref(PREPARATION))
+objects = store()
+assert all(ref(path) == row for path, row in VERIFIED.items())
+for item in external_payloads: assert external(item['actual_full_file']) == item
+summary = dict(schema='src05-actual-production-main-thread-evidence.v1', actual_publication_packet=packet_ref, actual_validation=packet['actual_validation'], Root_PE_acceptance=packet['Root_PE_acceptance'], actual_execution_custody=packet['actual_execution_custody'], actual_execution_outer_receipt=packet['actual_execution_outer_receipt'], Root_factual_review=packet['Root_factual_review'], Header_factual_review=packet['Header_factual_review'], Source_before=application['source_before'], Source_snapshot=source, actual_changed_Source_rows=application['application'], actual_quality=quality, actual_Cargo_artifacts=validation['actual_Cargo_artifacts'], actual_process_exit_codes=actual_exits, actual_processes_both_exit_zero=custody['actual_processes_both_exit_zero'], actual_capture_custody=capture, actual_external_payloads=external_payloads, Native_baseline_acceptance=application['Native_baseline_acceptance'], selected_objects=objects, selected_historical_Source_aliases=[dict(historical_path=key[0], historical_sha256=key[1], actual_preserved_archive=value) for key, value in sorted(ALIASES.items())], opaque_lineage=packet.get('opaque_lineage', []), selected_opaque_recursive_JSON_references=preparation['opaque_recursive_JSON_references'], selected_closure_transitively_replayable=False, full_Source_snapshots_authenticated=True, unrelated_Rust_Source_payloads_published=False, ordinary_payloads_published=False, current_external_payloads_fully_rehashed=True, binary_or_weather_payloads_published=False, historical_FP_state_inferred=False, floating_point_controls_written=False, scientific_comparison_performed=False, whole_ordinary_PASS_claimed=False, gates_updated=False, docs_updated=False)
+with (OUT / 'summary.json').open('x', encoding='utf8', newline='\n') as stream: json.dump(summary, stream, ensure_ascii=False, allow_nan=False, indent=2); stream.write('\n')
+print(json.dumps(dict(summary=ref(OUT / 'summary.json'), selected_objects=len(objects), actual_process_exit_codes=actual_exits, external_payloads=len(external_payloads), ordinary_payloads_published=False, gates_updated=False, docs_updated=False)))

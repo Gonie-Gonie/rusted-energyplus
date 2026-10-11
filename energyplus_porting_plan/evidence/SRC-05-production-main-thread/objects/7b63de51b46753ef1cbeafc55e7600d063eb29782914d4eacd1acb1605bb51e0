@@ -1,0 +1,40 @@
+{
+  "schema": "src06-tarp-dispatcher-Root-factual-baseline-acceptance.v1",
+  "accepted": true,
+  "complete_input_owner_prefix_and_custody_review_accepted": true,
+  "actual_Native_execution": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-Native-observation-01/command/receipt.json",
+    "sha256": "21a91c79ad55a5627af97470a9b27bc07069f90b9ca80fe0ac078cba54457557",
+    "size_bytes": 3121
+  },
+  "factual_review": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-Native-observation-01/Root-aggregate-factual-review.json",
+    "sha256": "0f7d92ccfaa3bc8ea3079087ca36cbaf25693f65c60eda6799791721d8b71fb7",
+    "size_bytes": 1531
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/8a/8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934",
+    "sha256": "8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934"
+  },
+  "actual_custody": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-Native-observation-01/custody.json",
+    "sha256": "ae74aa7c3453744bafb430d0c9abbc90874888cf012020ae640e58881dccbb67",
+    "size_bytes": 2251485
+  },
+  "actual_provider_acceptance": {
+    "path": ".runtime/porting/SRC-06/native-dispatcher-provider-review-01/Root-provider-acceptance.json",
+    "sha256": "dfd493092045b5649bfe97add24c568f6a52f828cbea9d82945b5b998b247a0f",
+    "size_bytes": 2881
+  },
+  "independent_FULL_factual_review": {
+    "path": ".runtime/porting/SRC-06/Header-dispatcher-Native-factual-review-01/review.json",
+    "sha256": "356bb3dc66606ac59f82e6bdb11cfeef854bb237ed29b5389e44c9af28ce6fc0",
+    "size_bytes": 4558
+  },
+  "release_Source": {
+    "path": ".runtime/porting/SRC-06/seal-Native-baseline-Root-01.py",
+    "sha256": "dc0e36290add2c41857eb6b713d482e9b612dfcf295576c2f940118ef1e2dfc3",
+    "size_bytes": 3416
+  },
+  "scope": "Genuine input, owners, prefix, flags, streams, files and executable custody baseline. No Rust numerical result, whole-port PASS, inner trace or gate promotion."
+}

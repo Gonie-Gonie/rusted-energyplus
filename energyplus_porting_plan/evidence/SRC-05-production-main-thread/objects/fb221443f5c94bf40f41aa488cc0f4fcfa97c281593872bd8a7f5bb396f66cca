@@ -1,0 +1,31 @@
+{
+  "schema": "src05-ordinary-main-thread-actual-formatter-review.v1",
+  "actual_application": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/record.json",
+    "sha256": "b979f8ce4ab5b78ef3a71157917f9e24260ac18a4d7d6b0ae3ceda2d5b7c8afe",
+    "size_bytes": 12502
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/00/00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a",
+    "sha256": "00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a"
+  },
+  "Root_FULL_formatter_correspondence_accepted": true,
+  "independent_FULL_formatter_correspondence_accepted": true,
+  "Root_factual_review": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/Root-actual-formatter-factual-review.json",
+    "sha256": "27c0f3801049eec797d327eb9df3c0eec9afd14bf067da0c3b8d047e4b81c617",
+    "size_bytes": 1425
+  },
+  "independent_factual_review": {
+    "path": ".runtime/porting/SRC-05/Header-ordinary-main-thread-actual-formatter-review-01/review.json",
+    "sha256": "4dda08a9dffb3495d74a3c31d5005f6c27c3de14e5160107e9c7f56c52fc841f",
+    "size_bytes": 8542
+  },
+  "review_Source": {
+    "path": ".runtime/porting/SRC-05/seal-formatter-Root-01.py",
+    "sha256": "aa4411c495bf397688923f49c9855a5b9a1d0924f7de7d49cce839e46e5cafad",
+    "size_bytes": 1715
+  },
+  "scientific_PASS_claimed": false,
+  "gates_updated": false
+}

@@ -1,0 +1,3049 @@
+--- /dev/null
++++ .runtime/porting/SRC-06/native-tarp-dispatcher-prep-01/input-only-cases.json
+@@ -0,0 +1,3046 @@
++{
++  "schema": "src06-tarp-dispatcher-direct-request.v1",
++  "expected_values_supplied": false,
++  "ordinary_production_prestate_supplied": false,
++  "literal_IDF": "Version,26.1;\nTimestep,4;\nBuilding,DISPATCHER UNIT INPUT,0,Suburbs,0.04,0.4,FullExterior,25,6;\nGlobalGeometryRules,UpperLeftCorner,CounterClockWise,Relative;\n",
++  "cases": [
++    {
++      "case_id": "first-repeat-environment",
++      "purpose": "Real first GetUser/static/report setup, repeat call and environment flag reset; no manager cadence claim",
++      "initial": {
++        "zone": {
++          "Name": "One-Zone",
++          "spaceIndexes": [
++            1
++          ],
++          "MAT": {
++            "bits": "4034000000000000"
++          },
++          "CeilingHeight": {
++            "bits": "4008000000000000"
++          },
++          "Volume": {
++            "bits": "4048000000000000"
++          },
++          "FloorArea": {
++            "bits": "4030000000000000"
++          },
++          "MinimumX": {
++            "bits": "0000000000000000"
++          },
++          "MaximumX": {
++            "bits": "4010000000000000"
++          },
++          "MinimumY": {
++            "bits": "0000000000000000"
++          },
++          "MaximumY": {
++            "bits": "4010000000000000"
++          },
++          "ExtGrossWallArea": {
++            "bits": "4048000000000000"
++          },
++          "ExtWindowArea": {
++            "bits": "0000000000000000"
++          },
++          "Multiplier": 1,
++          "ListMultiplier": 1
++        },
++        "spaces": [
++          {
++            "actual_array_index": 1,
++            "Name": "Space-1",
++            "HTSurfaceFirst": 1,
++            "HTSurfaceLast": 6,
++            "MAT": {
++              "bits": "4032000000000000"
++            }
++          }
++        ],
++        "surfaces": [
++          {
++            "actual_array_index": 1,
++            "Name": "Surface-1",
++            "spaceNum": 1,
++            "Class": "Wall",
++            "model": "SetByZone",
++            "CosTilt": {
++              "bits": "0000000000000000"
++            },
++            "Tilt": {
++              "bits": "4056800000000000"
++            },
++            "Azimuth": {
++              "bits": "0000000000000000"
++            },
++            "Area": {
++              "bits": "4028000000000000"
++            },
++            "GrossArea": {
++              "bits": "4028000000000000"
++            },
++            "Width": {
++              "bits": "4010000000000000"
++            },
++            "Height": {
++              "bits": "4008000000000000"
++            },
++            "Perimeter": {
++              "bits": "402c000000000000"
++            },
++            "Vertex": [
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              }
++            ],
++            "SurfTempIn": {
++              "bits": "4038000000000000"
++            },
++            "SurfTempInTmp": {
++              "bits": "4036000000000000"
++            },
++            "SurfHConvInt": {
++              "bits": "401d000000000000"
++            },
++            "SurfTAirRef": 0,
++            "SurfTAirRefRpt": 1
++          },
++          {
++            "actual_array_index": 2,
++            "Name": "Surface-2",
++            "spaceNum": 1,
++            "Class": "Wall",
++            "model": "SetByZone",
++            "CosTilt": {
++              "bits": "0000000000000000"
++            },
++            "Tilt": {
++              "bits": "4056800000000000"
++            },
++            "Azimuth": {
++              "bits": "4046800000000000"
++            },
++            "Area": {
++              "bits": "4028000000000000"
++            },
++            "GrossArea": {
++              "bits": "4028000000000000"
++            },
++            "Width": {
++              "bits": "4010000000000000"
++            },
++            "Height": {
++              "bits": "4008000000000000"
++            },
++            "Perimeter": {
++              "bits": "402c000000000000"
++            },
++            "Vertex": [
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              }
++            ],
++            "SurfTempIn": {
++              "bits": "4038000000000000"
++            },
++            "SurfTempInTmp": {
++              "bits": "4036000000000000"
++            },
++            "SurfHConvInt": {
++              "bits": "401d000000000000"
++            },
++            "SurfTAirRef": 0,
++            "SurfTAirRefRpt": 1
++          },
++          {
++            "actual_array_index": 3,
++            "Name": "Surface-3",
++            "spaceNum": 1,
++            "Class": "Wall",
++            "model": "SetByZone",
++            "CosTilt": {
++              "bits": "0000000000000000"
++            },
++            "Tilt": {
++              "bits": "4056800000000000"
++            },
++            "Azimuth": {
++              "bits": "4056800000000000"
++            },
++            "Area": {
++              "bits": "4028000000000000"
++            },
++            "GrossArea": {
++              "bits": "4028000000000000"
++            },
++            "Width": {
++              "bits": "4010000000000000"
++            },
++            "Height": {
++              "bits": "4008000000000000"
++            },
++            "Perimeter": {
++              "bits": "402c000000000000"
++            },
++            "Vertex": [
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              }
++            ],
++            "SurfTempIn": {
++              "bits": "4038000000000000"
++            },
++            "SurfTempInTmp": {
++              "bits": "4036000000000000"
++            },
++            "SurfHConvInt": {
++              "bits": "401d000000000000"
++            },
++            "SurfTAirRef": 0,
++            "SurfTAirRefRpt": 1
++          },
++          {
++            "actual_array_index": 4,
++            "Name": "Surface-4",
++            "spaceNum": 1,
++            "Class": "Wall",
++            "model": "SetByZone",
++            "CosTilt": {
++              "bits": "0000000000000000"
++            },
++            "Tilt": {
++              "bits": "4056800000000000"
++            },
++            "Azimuth": {
++              "bits": "4060e00000000000"
++            },
++            "Area": {
++              "bits": "4028000000000000"
++            },
++            "GrossArea": {
++              "bits": "4028000000000000"
++            },
++            "Width": {
++              "bits": "4010000000000000"
++            },
++            "Height": {
++              "bits": "4008000000000000"
++            },
++            "Perimeter": {
++              "bits": "402c000000000000"
++            },
++            "Vertex": [
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              }
++            ],
++            "SurfTempIn": {
++              "bits": "4038000000000000"
++            },
++            "SurfTempInTmp": {
++              "bits": "4036000000000000"
++            },
++            "SurfHConvInt": {
++              "bits": "401d000000000000"
++            },
++            "SurfTAirRef": 0,
++            "SurfTAirRefRpt": 1
++          },
++          {
++            "actual_array_index": 5,
++            "Name": "Surface-5",
++            "spaceNum": 1,
++            "Class": "Roof",
++            "model": "SetByZone",
++            "CosTilt": {
++              "bits": "3ff0000000000000"
++            },
++            "Tilt": {
++              "bits": "0000000000000000"
++            },
++            "Azimuth": {
++              "bits": "4066800000000000"
++            },
++            "Area": {
++              "bits": "4030000000000000"
++            },
++            "GrossArea": {
++              "bits": "4030000000000000"
++            },
++            "Width": {
++              "bits": "4010000000000000"
++            },
++            "Height": {
++              "bits": "4008000000000000"
++            },
++            "Perimeter": {
++              "bits": "4030000000000000"
++            },
++            "Vertex": [
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "4010000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "4010000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              }
++            ],
++            "SurfTempIn": {
++              "bits": "4038000000000000"
++            },
++            "SurfTempInTmp": {
++              "bits": "4036000000000000"
++            },
++            "SurfHConvInt": {
++              "bits": "401d000000000000"
++            },
++            "SurfTAirRef": 0,
++            "SurfTAirRefRpt": 1
++          },
++          {
++            "actual_array_index": 6,
++            "Name": "Surface-6",
++            "spaceNum": 1,
++            "Class": "Floor",
++            "model": "SetByZone",
++            "CosTilt": {
++              "bits": "bff0000000000000"
++            },
++            "Tilt": {
++              "bits": "4066800000000000"
++            },
++            "Azimuth": {
++              "bits": "406c200000000000"
++            },
++            "Area": {
++              "bits": "4030000000000000"
++            },
++            "GrossArea": {
++              "bits": "4030000000000000"
++            },
++            "Width": {
++              "bits": "4010000000000000"
++            },
++            "Height": {
++              "bits": "4008000000000000"
++            },
++            "Perimeter": {
++              "bits": "4030000000000000"
++            },
++            "Vertex": [
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "4010000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "4010000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              }
++            ],
++            "SurfTempIn": {
++              "bits": "4038000000000000"
++            },
++            "SurfTempInTmp": {
++              "bits": "4036000000000000"
++            },
++            "SurfHConvInt": {
++              "bits": "401d000000000000"
++            },
++            "SurfTAirRef": 0,
++            "SurfTAirRefRpt": 1
++          }
++        ],
++        "node_allocated": false,
++        "zone_equipment_active_elements": {
++          "wall": false,
++          "ceiling": false,
++          "floor": false
++        }
++      },
++      "operations": [
++        {
++          "operation_id": "call-1",
++          "temperature_owner": "SurfTempInTmp",
++          "BeginEnvrnFlag": true,
++          "SysSizingCalc": false,
++          "ZoneSizingCalc": false,
++          "ZoneEquipInputsFilled": false,
++          "ZoneEquipSimulatedOnce": false,
++          "zone_MAT": {
++            "bits": "4034000000000000"
++          },
++          "space_MAT": [
++            {
++              "bits": "4032000000000000"
++            }
++          ],
++          "SurfTempIn": [
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            }
++          ],
++          "SurfTempInTmp": [
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            }
++          ]
++        },
++        {
++          "operation_id": "call-2",
++          "temperature_owner": "SurfTempIn",
++          "BeginEnvrnFlag": false,
++          "SysSizingCalc": false,
++          "ZoneSizingCalc": false,
++          "ZoneEquipInputsFilled": false,
++          "ZoneEquipSimulatedOnce": false,
++          "zone_MAT": {
++            "bits": "4034000000000000"
++          },
++          "space_MAT": [
++            {
++              "bits": "4032000000000000"
++            }
++          ],
++          "SurfTempIn": [
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            }
++          ],
++          "SurfTempInTmp": [
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            }
++          ]
++        },
++        {
++          "operation_id": "call-3",
++          "temperature_owner": "SurfTempInTmp",
++          "BeginEnvrnFlag": true,
++          "SysSizingCalc": false,
++          "ZoneSizingCalc": false,
++          "ZoneEquipInputsFilled": false,
++          "ZoneEquipSimulatedOnce": false,
++          "zone_MAT": {
++            "bits": "4034000000000000"
++          },
++          "space_MAT": [
++            {
++              "bits": "4032000000000000"
++            }
++          ],
++          "SurfTempIn": [
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            }
++          ],
++          "SurfTempInTmp": [
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            }
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "reverse-space-order",
++      "purpose": "One Zone traverses actual spaceIndexes [2,1]; space MAT18/26 differs from zone MAT20",
++      "initial": {
++        "zone": {
++          "Name": "One-Zone",
++          "spaceIndexes": [
++            2,
++            1
++          ],
++          "MAT": {
++            "bits": "4034000000000000"
++          },
++          "CeilingHeight": {
++            "bits": "4008000000000000"
++          },
++          "Volume": {
++            "bits": "4048000000000000"
++          },
++          "FloorArea": {
++            "bits": "4030000000000000"
++          },
++          "MinimumX": {
++            "bits": "0000000000000000"
++          },
++          "MaximumX": {
++            "bits": "4010000000000000"
++          },
++          "MinimumY": {
++            "bits": "0000000000000000"
++          },
++          "MaximumY": {
++            "bits": "4010000000000000"
++          },
++          "ExtGrossWallArea": {
++            "bits": "4048000000000000"
++          },
++          "ExtWindowArea": {
++            "bits": "0000000000000000"
++          },
++          "Multiplier": 1,
++          "ListMultiplier": 1
++        },
++        "spaces": [
++          {
++            "actual_array_index": 1,
++            "Name": "Space-1",
++            "HTSurfaceFirst": 1,
++            "HTSurfaceLast": 2,
++            "MAT": {
++              "bits": "4032000000000000"
++            }
++          },
++          {
++            "actual_array_index": 2,
++            "Name": "Space-2",
++            "HTSurfaceFirst": 3,
++            "HTSurfaceLast": 4,
++            "MAT": {
++              "bits": "403a000000000000"
++            }
++          }
++        ],
++        "surfaces": [
++          {
++            "actual_array_index": 1,
++            "Name": "Surface-1",
++            "spaceNum": 1,
++            "Class": "Wall",
++            "model": "SetByZone",
++            "CosTilt": {
++              "bits": "0000000000000000"
++            },
++            "Tilt": {
++              "bits": "4056800000000000"
++            },
++            "Azimuth": {
++              "bits": "0000000000000000"
++            },
++            "Area": {
++              "bits": "4028000000000000"
++            },
++            "GrossArea": {
++              "bits": "4028000000000000"
++            },
++            "Width": {
++              "bits": "4010000000000000"
++            },
++            "Height": {
++              "bits": "4008000000000000"
++            },
++            "Perimeter": {
++              "bits": "402c000000000000"
++            },
++            "Vertex": [
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              }
++            ],
++            "SurfTempIn": {
++              "bits": "4038000000000000"
++            },
++            "SurfTempInTmp": {
++              "bits": "4036000000000000"
++            },
++            "SurfHConvInt": {
++              "bits": "401d000000000000"
++            },
++            "SurfTAirRef": 0,
++            "SurfTAirRefRpt": 1
++          },
++          {
++            "actual_array_index": 2,
++            "Name": "Surface-2",
++            "spaceNum": 1,
++            "Class": "Wall",
++            "model": "SetByZone",
++            "CosTilt": {
++              "bits": "0000000000000000"
++            },
++            "Tilt": {
++              "bits": "4056800000000000"
++            },
++            "Azimuth": {
++              "bits": "4046800000000000"
++            },
++            "Area": {
++              "bits": "4028000000000000"
++            },
++            "GrossArea": {
++              "bits": "4028000000000000"
++            },
++            "Width": {
++              "bits": "4010000000000000"
++            },
++            "Height": {
++              "bits": "4008000000000000"
++            },
++            "Perimeter": {
++              "bits": "402c000000000000"
++            },
++            "Vertex": [
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              }
++            ],
++            "SurfTempIn": {
++              "bits": "4038000000000000"
++            },
++            "SurfTempInTmp": {
++              "bits": "4036000000000000"
++            },
++            "SurfHConvInt": {
++              "bits": "401d000000000000"
++            },
++            "SurfTAirRef": 0,
++            "SurfTAirRefRpt": 1
++          },
++          {
++            "actual_array_index": 3,
++            "Name": "Surface-3",
++            "spaceNum": 2,
++            "Class": "Wall",
++            "model": "SetByZone",
++            "CosTilt": {
++              "bits": "3fe0000000000000"
++            },
++            "Tilt": {
++              "bits": "404e000000000000"
++            },
++            "Azimuth": {
++              "bits": "4056800000000000"
++            },
++            "Area": {
++              "bits": "4028000000000000"
++            },
++            "GrossArea": {
++              "bits": "4028000000000000"
++            },
++            "Width": {
++              "bits": "4010000000000000"
++            },
++            "Height": {
++              "bits": "4008000000000000"
++            },
++            "Perimeter": {
++              "bits": "402c000000000000"
++            },
++            "Vertex": [
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              }
++            ],
++            "SurfTempIn": {
++              "bits": "4038000000000000"
++            },
++            "SurfTempInTmp": {
++              "bits": "4036000000000000"
++            },
++            "SurfHConvInt": {
++              "bits": "401d000000000000"
++            },
++            "SurfTAirRef": 0,
++            "SurfTAirRefRpt": 1
++          },
++          {
++            "actual_array_index": 4,
++            "Name": "Surface-4",
++            "spaceNum": 2,
++            "Class": "Wall",
++            "model": "SetByZone",
++            "CosTilt": {
++              "bits": "bfe0000000000000"
++            },
++            "Tilt": {
++              "bits": "405e000000000000"
++            },
++            "Azimuth": {
++              "bits": "4060e00000000000"
++            },
++            "Area": {
++              "bits": "4028000000000000"
++            },
++            "GrossArea": {
++              "bits": "4028000000000000"
++            },
++            "Width": {
++              "bits": "4010000000000000"
++            },
++            "Height": {
++              "bits": "4008000000000000"
++            },
++            "Perimeter": {
++              "bits": "402c000000000000"
++            },
++            "Vertex": [
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              }
++            ],
++            "SurfTempIn": {
++              "bits": "4038000000000000"
++            },
++            "SurfTempInTmp": {
++              "bits": "4036000000000000"
++            },
++            "SurfHConvInt": {
++              "bits": "401d000000000000"
++            },
++            "SurfTAirRef": 0,
++            "SurfTAirRefRpt": 1
++          }
++        ],
++        "node_allocated": false,
++        "zone_equipment_active_elements": {
++          "wall": false,
++          "ceiling": false,
++          "floor": false
++        }
++      },
++      "operations": [
++        {
++          "operation_id": "call-1",
++          "temperature_owner": "SurfTempInTmp",
++          "BeginEnvrnFlag": true,
++          "SysSizingCalc": false,
++          "ZoneSizingCalc": false,
++          "ZoneEquipInputsFilled": false,
++          "ZoneEquipSimulatedOnce": false,
++          "zone_MAT": {
++            "bits": "4034000000000000"
++          },
++          "space_MAT": [
++            {
++              "bits": "4032000000000000"
++            },
++            {
++              "bits": "403a000000000000"
++            }
++          ],
++          "SurfTempIn": [
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            }
++          ],
++          "SurfTempInTmp": [
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            }
++          ]
++        },
++        {
++          "operation_id": "call-2",
++          "temperature_owner": "SurfTempIn",
++          "BeginEnvrnFlag": true,
++          "SysSizingCalc": false,
++          "ZoneSizingCalc": false,
++          "ZoneEquipInputsFilled": false,
++          "ZoneEquipSimulatedOnce": false,
++          "zone_MAT": {
++            "bits": "4034000000000000"
++          },
++          "space_MAT": [
++            {
++              "bits": "4032000000000000"
++            },
++            {
++              "bits": "403a000000000000"
++            }
++          ],
++          "SurfTempIn": [
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            }
++          ],
++          "SurfTempInTmp": [
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            }
++          ]
++        },
++        {
++          "operation_id": "call-3",
++          "temperature_owner": "SurfTempInTmp",
++          "BeginEnvrnFlag": false,
++          "SysSizingCalc": false,
++          "ZoneSizingCalc": false,
++          "ZoneEquipInputsFilled": false,
++          "ZoneEquipSimulatedOnce": false,
++          "zone_MAT": {
++            "bits": "403e000000000000"
++          },
++          "space_MAT": [
++            {
++              "bits": "4032000000000000"
++            },
++            {
++              "bits": "403a000000000000"
++            }
++          ],
++          "SurfTempIn": [
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            }
++          ],
++          "SurfTempInTmp": [
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            }
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "signed-zero-cosine",
++      "purpose": "Both stored signed-zero cosine owners, retained reference-air flags and nonzero incoming coefficients",
++      "initial": {
++        "zone": {
++          "Name": "One-Zone",
++          "spaceIndexes": [
++            1
++          ],
++          "MAT": {
++            "bits": "4034000000000000"
++          },
++          "CeilingHeight": {
++            "bits": "4008000000000000"
++          },
++          "Volume": {
++            "bits": "4048000000000000"
++          },
++          "FloorArea": {
++            "bits": "4030000000000000"
++          },
++          "MinimumX": {
++            "bits": "0000000000000000"
++          },
++          "MaximumX": {
++            "bits": "4010000000000000"
++          },
++          "MinimumY": {
++            "bits": "0000000000000000"
++          },
++          "MaximumY": {
++            "bits": "4010000000000000"
++          },
++          "ExtGrossWallArea": {
++            "bits": "4048000000000000"
++          },
++          "ExtWindowArea": {
++            "bits": "0000000000000000"
++          },
++          "Multiplier": 1,
++          "ListMultiplier": 1
++        },
++        "spaces": [
++          {
++            "actual_array_index": 1,
++            "Name": "Space-1",
++            "HTSurfaceFirst": 1,
++            "HTSurfaceLast": 2,
++            "MAT": {
++              "bits": "4032000000000000"
++            }
++          }
++        ],
++        "surfaces": [
++          {
++            "actual_array_index": 1,
++            "Name": "Surface-1",
++            "spaceNum": 1,
++            "Class": "Wall",
++            "model": "SetByZone",
++            "CosTilt": {
++              "bits": "0000000000000000"
++            },
++            "Tilt": {
++              "bits": "4056800000000000"
++            },
++            "Azimuth": {
++              "bits": "0000000000000000"
++            },
++            "Area": {
++              "bits": "4028000000000000"
++            },
++            "GrossArea": {
++              "bits": "4028000000000000"
++            },
++            "Width": {
++              "bits": "4010000000000000"
++            },
++            "Height": {
++              "bits": "4008000000000000"
++            },
++            "Perimeter": {
++              "bits": "402c000000000000"
++            },
++            "Vertex": [
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              }
++            ],
++            "SurfTempIn": {
++              "bits": "4038000000000000"
++            },
++            "SurfTempInTmp": {
++              "bits": "4036000000000000"
++            },
++            "SurfHConvInt": {
++              "bits": "401d000000000000"
++            },
++            "SurfTAirRef": 0,
++            "SurfTAirRefRpt": 1
++          },
++          {
++            "actual_array_index": 2,
++            "Name": "Surface-2",
++            "spaceNum": 1,
++            "Class": "Wall",
++            "model": "SetByZone",
++            "CosTilt": {
++              "bits": "8000000000000000"
++            },
++            "Tilt": {
++              "bits": "4056800000000000"
++            },
++            "Azimuth": {
++              "bits": "4046800000000000"
++            },
++            "Area": {
++              "bits": "4028000000000000"
++            },
++            "GrossArea": {
++              "bits": "4028000000000000"
++            },
++            "Width": {
++              "bits": "4010000000000000"
++            },
++            "Height": {
++              "bits": "4008000000000000"
++            },
++            "Perimeter": {
++              "bits": "402c000000000000"
++            },
++            "Vertex": [
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              }
++            ],
++            "SurfTempIn": {
++              "bits": "4038000000000000"
++            },
++            "SurfTempInTmp": {
++              "bits": "4036000000000000"
++            },
++            "SurfHConvInt": {
++              "bits": "401d000000000000"
++            },
++            "SurfTAirRef": 0,
++            "SurfTAirRefRpt": 1
++          }
++        ],
++        "node_allocated": false,
++        "zone_equipment_active_elements": {
++          "wall": false,
++          "ceiling": false,
++          "floor": false
++        }
++      },
++      "operations": [
++        {
++          "operation_id": "call-1",
++          "temperature_owner": "SurfTempInTmp",
++          "BeginEnvrnFlag": true,
++          "SysSizingCalc": false,
++          "ZoneSizingCalc": false,
++          "ZoneEquipInputsFilled": false,
++          "ZoneEquipSimulatedOnce": false,
++          "zone_MAT": {
++            "bits": "4034000000000000"
++          },
++          "space_MAT": [
++            {
++              "bits": "4032000000000000"
++            }
++          ],
++          "SurfTempIn": [
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            }
++          ],
++          "SurfTempInTmp": [
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            }
++          ]
++        },
++        {
++          "operation_id": "call-2",
++          "temperature_owner": "SurfTempIn",
++          "BeginEnvrnFlag": true,
++          "SysSizingCalc": false,
++          "ZoneSizingCalc": false,
++          "ZoneEquipInputsFilled": false,
++          "ZoneEquipSimulatedOnce": false,
++          "zone_MAT": {
++            "bits": "4034000000000000"
++          },
++          "space_MAT": [
++            {
++              "bits": "4032000000000000"
++            }
++          ],
++          "SurfTempIn": [
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            }
++          ],
++          "SurfTempInTmp": [
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            }
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "zero-delta-default-lower",
++      "purpose": "Equal actual space MAT and temperature operand, genuine default LowHConvLimit constructor owner",
++      "initial": {
++        "zone": {
++          "Name": "One-Zone",
++          "spaceIndexes": [
++            1
++          ],
++          "MAT": {
++            "bits": "4034000000000000"
++          },
++          "CeilingHeight": {
++            "bits": "4008000000000000"
++          },
++          "Volume": {
++            "bits": "4048000000000000"
++          },
++          "FloorArea": {
++            "bits": "4030000000000000"
++          },
++          "MinimumX": {
++            "bits": "0000000000000000"
++          },
++          "MaximumX": {
++            "bits": "4010000000000000"
++          },
++          "MinimumY": {
++            "bits": "0000000000000000"
++          },
++          "MaximumY": {
++            "bits": "4010000000000000"
++          },
++          "ExtGrossWallArea": {
++            "bits": "4048000000000000"
++          },
++          "ExtWindowArea": {
++            "bits": "0000000000000000"
++          },
++          "Multiplier": 1,
++          "ListMultiplier": 1
++        },
++        "spaces": [
++          {
++            "actual_array_index": 1,
++            "Name": "Space-1",
++            "HTSurfaceFirst": 1,
++            "HTSurfaceLast": 2,
++            "MAT": {
++              "bits": "4032000000000000"
++            }
++          }
++        ],
++        "surfaces": [
++          {
++            "actual_array_index": 1,
++            "Name": "Surface-1",
++            "spaceNum": 1,
++            "Class": "Wall",
++            "model": "SetByZone",
++            "CosTilt": {
++              "bits": "0000000000000000"
++            },
++            "Tilt": {
++              "bits": "4056800000000000"
++            },
++            "Azimuth": {
++              "bits": "0000000000000000"
++            },
++            "Area": {
++              "bits": "4028000000000000"
++            },
++            "GrossArea": {
++              "bits": "4028000000000000"
++            },
++            "Width": {
++              "bits": "4010000000000000"
++            },
++            "Height": {
++              "bits": "4008000000000000"
++            },
++            "Perimeter": {
++              "bits": "402c000000000000"
++            },
++            "Vertex": [
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              }
++            ],
++            "SurfTempIn": {
++              "bits": "4032000000000000"
++            },
++            "SurfTempInTmp": {
++              "bits": "4032000000000000"
++            },
++            "SurfHConvInt": {
++              "bits": "401d000000000000"
++            },
++            "SurfTAirRef": 0,
++            "SurfTAirRefRpt": 1
++          },
++          {
++            "actual_array_index": 2,
++            "Name": "Surface-2",
++            "spaceNum": 1,
++            "Class": "Roof",
++            "model": "SetByZone",
++            "CosTilt": {
++              "bits": "3ff0000000000000"
++            },
++            "Tilt": {
++              "bits": "0000000000000000"
++            },
++            "Azimuth": {
++              "bits": "4046800000000000"
++            },
++            "Area": {
++              "bits": "4030000000000000"
++            },
++            "GrossArea": {
++              "bits": "4030000000000000"
++            },
++            "Width": {
++              "bits": "4010000000000000"
++            },
++            "Height": {
++              "bits": "4008000000000000"
++            },
++            "Perimeter": {
++              "bits": "4030000000000000"
++            },
++            "Vertex": [
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "4010000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "4010000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              }
++            ],
++            "SurfTempIn": {
++              "bits": "4032000000000000"
++            },
++            "SurfTempInTmp": {
++              "bits": "4032000000000000"
++            },
++            "SurfHConvInt": {
++              "bits": "401d000000000000"
++            },
++            "SurfTAirRef": 0,
++            "SurfTAirRefRpt": 1
++          }
++        ],
++        "node_allocated": false,
++        "zone_equipment_active_elements": {
++          "wall": false,
++          "ceiling": false,
++          "floor": false
++        }
++      },
++      "operations": [
++        {
++          "operation_id": "call-1",
++          "temperature_owner": "SurfTempInTmp",
++          "BeginEnvrnFlag": true,
++          "SysSizingCalc": false,
++          "ZoneSizingCalc": false,
++          "ZoneEquipInputsFilled": false,
++          "ZoneEquipSimulatedOnce": false,
++          "zone_MAT": {
++            "bits": "4034000000000000"
++          },
++          "space_MAT": [
++            {
++              "bits": "4032000000000000"
++            }
++          ],
++          "SurfTempIn": [
++            {
++              "bits": "4032000000000000"
++            },
++            {
++              "bits": "4032000000000000"
++            }
++          ],
++          "SurfTempInTmp": [
++            {
++              "bits": "4032000000000000"
++            },
++            {
++              "bits": "4032000000000000"
++            }
++          ]
++        },
++        {
++          "operation_id": "call-2",
++          "temperature_owner": "SurfTempInTmp",
++          "BeginEnvrnFlag": false,
++          "SysSizingCalc": false,
++          "ZoneSizingCalc": false,
++          "ZoneEquipInputsFilled": false,
++          "ZoneEquipSimulatedOnce": false,
++          "zone_MAT": {
++            "bits": "4034000000000000"
++          },
++          "space_MAT": [
++            {
++              "bits": "4032000000000000"
++            }
++          ],
++          "SurfTempIn": [
++            {
++              "bits": "4032000000000000"
++            },
++            {
++              "bits": "4032000000000000"
++            }
++          ],
++          "SurfTempInTmp": [
++            {
++              "bits": "4032000000000000"
++            },
++            {
++              "bits": "4032000000000000"
++            }
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "small-delta-two-sided",
++      "purpose": "Small nonzero and opposite signed deltas with exact selected temp-array identity",
++      "initial": {
++        "zone": {
++          "Name": "One-Zone",
++          "spaceIndexes": [
++            1
++          ],
++          "MAT": {
++            "bits": "4034000000000000"
++          },
++          "CeilingHeight": {
++            "bits": "4008000000000000"
++          },
++          "Volume": {
++            "bits": "4048000000000000"
++          },
++          "FloorArea": {
++            "bits": "4030000000000000"
++          },
++          "MinimumX": {
++            "bits": "0000000000000000"
++          },
++          "MaximumX": {
++            "bits": "4010000000000000"
++          },
++          "MinimumY": {
++            "bits": "0000000000000000"
++          },
++          "MaximumY": {
++            "bits": "4010000000000000"
++          },
++          "ExtGrossWallArea": {
++            "bits": "4048000000000000"
++          },
++          "ExtWindowArea": {
++            "bits": "0000000000000000"
++          },
++          "Multiplier": 1,
++          "ListMultiplier": 1
++        },
++        "spaces": [
++          {
++            "actual_array_index": 1,
++            "Name": "Space-1",
++            "HTSurfaceFirst": 1,
++            "HTSurfaceLast": 2,
++            "MAT": {
++              "bits": "4032000000000000"
++            }
++          }
++        ],
++        "surfaces": [
++          {
++            "actual_array_index": 1,
++            "Name": "Surface-1",
++            "spaceNum": 1,
++            "Class": "Wall",
++            "model": "SetByZone",
++            "CosTilt": {
++              "bits": "3fe0000000000000"
++            },
++            "Tilt": {
++              "bits": "404e000000000000"
++            },
++            "Azimuth": {
++              "bits": "0000000000000000"
++            },
++            "Area": {
++              "bits": "4028000000000000"
++            },
++            "GrossArea": {
++              "bits": "4028000000000000"
++            },
++            "Width": {
++              "bits": "4010000000000000"
++            },
++            "Height": {
++              "bits": "4008000000000000"
++            },
++            "Perimeter": {
++              "bits": "402c000000000000"
++            },
++            "Vertex": [
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              }
++            ],
++            "SurfTempIn": {
++              "bits": "403e000000000000"
++            },
++            "SurfTempInTmp": {
++              "bits": "4032000010000000"
++            },
++            "SurfHConvInt": {
++              "bits": "401d000000000000"
++            },
++            "SurfTAirRef": 0,
++            "SurfTAirRefRpt": 1
++          },
++          {
++            "actual_array_index": 2,
++            "Name": "Surface-2",
++            "spaceNum": 1,
++            "Class": "Wall",
++            "model": "SetByZone",
++            "CosTilt": {
++              "bits": "bfe0000000000000"
++            },
++            "Tilt": {
++              "bits": "405e000000000000"
++            },
++            "Azimuth": {
++              "bits": "4046800000000000"
++            },
++            "Area": {
++              "bits": "4028000000000000"
++            },
++            "GrossArea": {
++              "bits": "4028000000000000"
++            },
++            "Width": {
++              "bits": "4010000000000000"
++            },
++            "Height": {
++              "bits": "4008000000000000"
++            },
++            "Perimeter": {
++              "bits": "402c000000000000"
++            },
++            "Vertex": [
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              }
++            ],
++            "SurfTempIn": {
++              "bits": "4014000000000000"
++            },
++            "SurfTempInTmp": {
++              "bits": "4031fffff0000000"
++            },
++            "SurfHConvInt": {
++              "bits": "401d000000000000"
++            },
++            "SurfTAirRef": 0,
++            "SurfTAirRefRpt": 1
++          }
++        ],
++        "node_allocated": false,
++        "zone_equipment_active_elements": {
++          "wall": false,
++          "ceiling": false,
++          "floor": false
++        }
++      },
++      "operations": [
++        {
++          "operation_id": "call-1",
++          "temperature_owner": "SurfTempInTmp",
++          "BeginEnvrnFlag": true,
++          "SysSizingCalc": false,
++          "ZoneSizingCalc": false,
++          "ZoneEquipInputsFilled": false,
++          "ZoneEquipSimulatedOnce": false,
++          "zone_MAT": {
++            "bits": "4034000000000000"
++          },
++          "space_MAT": [
++            {
++              "bits": "4032000000000000"
++            }
++          ],
++          "SurfTempIn": [
++            {
++              "bits": "403e000000000000"
++            },
++            {
++              "bits": "4014000000000000"
++            }
++          ],
++          "SurfTempInTmp": [
++            {
++              "bits": "4032000010000000"
++            },
++            {
++              "bits": "4031fffff0000000"
++            }
++          ]
++        },
++        {
++          "operation_id": "call-2",
++          "temperature_owner": "SurfTempIn",
++          "BeginEnvrnFlag": true,
++          "SysSizingCalc": false,
++          "ZoneSizingCalc": false,
++          "ZoneEquipInputsFilled": false,
++          "ZoneEquipSimulatedOnce": false,
++          "zone_MAT": {
++            "bits": "4034000000000000"
++          },
++          "space_MAT": [
++            {
++              "bits": "4032000000000000"
++            }
++          ],
++          "SurfTempIn": [
++            {
++              "bits": "403e000000000000"
++            },
++            {
++              "bits": "4014000000000000"
++            }
++          ],
++          "SurfTempInTmp": [
++            {
++              "bits": "4032000010000000"
++            },
++            {
++              "bits": "4031fffff0000000"
++            }
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "readiness-transitions",
++      "purpose": "NodeCheck and ActiveSurfaceCheck remain genuine until actual declared readiness; inactive surfaces overwrite stale equipment markers",
++      "initial": {
++        "zone": {
++          "Name": "One-Zone",
++          "spaceIndexes": [
++            1
++          ],
++          "MAT": {
++            "bits": "4034000000000000"
++          },
++          "CeilingHeight": {
++            "bits": "4008000000000000"
++          },
++          "Volume": {
++            "bits": "4048000000000000"
++          },
++          "FloorArea": {
++            "bits": "4030000000000000"
++          },
++          "MinimumX": {
++            "bits": "0000000000000000"
++          },
++          "MaximumX": {
++            "bits": "4010000000000000"
++          },
++          "MinimumY": {
++            "bits": "0000000000000000"
++          },
++          "MaximumY": {
++            "bits": "4010000000000000"
++          },
++          "ExtGrossWallArea": {
++            "bits": "4048000000000000"
++          },
++          "ExtWindowArea": {
++            "bits": "0000000000000000"
++          },
++          "Multiplier": 1,
++          "ListMultiplier": 1
++        },
++        "spaces": [
++          {
++            "actual_array_index": 1,
++            "Name": "Space-1",
++            "HTSurfaceFirst": 1,
++            "HTSurfaceLast": 2,
++            "MAT": {
++              "bits": "4032000000000000"
++            }
++          }
++        ],
++        "surfaces": [
++          {
++            "actual_array_index": 1,
++            "Name": "Surface-1",
++            "spaceNum": 1,
++            "Class": "Wall",
++            "model": "SetByZone",
++            "CosTilt": {
++              "bits": "0000000000000000"
++            },
++            "Tilt": {
++              "bits": "4056800000000000"
++            },
++            "Azimuth": {
++              "bits": "0000000000000000"
++            },
++            "Area": {
++              "bits": "4028000000000000"
++            },
++            "GrossArea": {
++              "bits": "4028000000000000"
++            },
++            "Width": {
++              "bits": "4010000000000000"
++            },
++            "Height": {
++              "bits": "4008000000000000"
++            },
++            "Perimeter": {
++              "bits": "402c000000000000"
++            },
++            "Vertex": [
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              }
++            ],
++            "SurfTempIn": {
++              "bits": "4038000000000000"
++            },
++            "SurfTempInTmp": {
++              "bits": "4036000000000000"
++            },
++            "SurfHConvInt": {
++              "bits": "401d000000000000"
++            },
++            "SurfTAirRef": 0,
++            "SurfTAirRefRpt": 1
++          },
++          {
++            "actual_array_index": 2,
++            "Name": "Surface-2",
++            "spaceNum": 1,
++            "Class": "Wall",
++            "model": "SetByZone",
++            "CosTilt": {
++              "bits": "0000000000000000"
++            },
++            "Tilt": {
++              "bits": "4056800000000000"
++            },
++            "Azimuth": {
++              "bits": "4046800000000000"
++            },
++            "Area": {
++              "bits": "4028000000000000"
++            },
++            "GrossArea": {
++              "bits": "4028000000000000"
++            },
++            "Width": {
++              "bits": "4010000000000000"
++            },
++            "Height": {
++              "bits": "4008000000000000"
++            },
++            "Perimeter": {
++              "bits": "402c000000000000"
++            },
++            "Vertex": [
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              }
++            ],
++            "SurfTempIn": {
++              "bits": "4038000000000000"
++            },
++            "SurfTempInTmp": {
++              "bits": "4036000000000000"
++            },
++            "SurfHConvInt": {
++              "bits": "401d000000000000"
++            },
++            "SurfTAirRef": 0,
++            "SurfTAirRefRpt": 1
++          }
++        ],
++        "node_allocated": true,
++        "zone_equipment_active_elements": {
++          "wall": true,
++          "ceiling": true,
++          "floor": true
++        }
++      },
++      "operations": [
++        {
++          "operation_id": "call-1",
++          "temperature_owner": "SurfTempInTmp",
++          "BeginEnvrnFlag": true,
++          "SysSizingCalc": true,
++          "ZoneSizingCalc": false,
++          "ZoneEquipInputsFilled": false,
++          "ZoneEquipSimulatedOnce": false,
++          "zone_MAT": {
++            "bits": "4034000000000000"
++          },
++          "space_MAT": [
++            {
++              "bits": "4032000000000000"
++            }
++          ],
++          "SurfTempIn": [
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            }
++          ],
++          "SurfTempInTmp": [
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            }
++          ]
++        },
++        {
++          "operation_id": "call-2",
++          "temperature_owner": "SurfTempInTmp",
++          "BeginEnvrnFlag": true,
++          "SysSizingCalc": false,
++          "ZoneSizingCalc": false,
++          "ZoneEquipInputsFilled": true,
++          "ZoneEquipSimulatedOnce": false,
++          "zone_MAT": {
++            "bits": "4034000000000000"
++          },
++          "space_MAT": [
++            {
++              "bits": "4032000000000000"
++            }
++          ],
++          "SurfTempIn": [
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            }
++          ],
++          "SurfTempInTmp": [
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            }
++          ]
++        },
++        {
++          "operation_id": "call-3",
++          "temperature_owner": "SurfTempInTmp",
++          "BeginEnvrnFlag": true,
++          "SysSizingCalc": false,
++          "ZoneSizingCalc": false,
++          "ZoneEquipInputsFilled": true,
++          "ZoneEquipSimulatedOnce": true,
++          "zone_MAT": {
++            "bits": "4034000000000000"
++          },
++          "space_MAT": [
++            {
++              "bits": "4032000000000000"
++            }
++          ],
++          "SurfTempIn": [
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            }
++          ],
++          "SurfTempInTmp": [
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            }
++          ]
++        },
++        {
++          "operation_id": "call-4",
++          "temperature_owner": "SurfTempInTmp",
++          "BeginEnvrnFlag": false,
++          "SysSizingCalc": false,
++          "ZoneSizingCalc": false,
++          "ZoneEquipInputsFilled": true,
++          "ZoneEquipSimulatedOnce": true,
++          "zone_MAT": {
++            "bits": "4034000000000000"
++          },
++          "space_MAT": [
++            {
++              "bits": "4032000000000000"
++            }
++          ],
++          "SurfTempIn": [
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            }
++          ],
++          "SurfTempInTmp": [
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            }
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "empty-HT-range",
++      "purpose": "Positive zone geometry with genuine empty space HT range; first-call setup still executes",
++      "initial": {
++        "zone": {
++          "Name": "One-Zone",
++          "spaceIndexes": [
++            1
++          ],
++          "MAT": {
++            "bits": "4034000000000000"
++          },
++          "CeilingHeight": {
++            "bits": "4008000000000000"
++          },
++          "Volume": {
++            "bits": "4048000000000000"
++          },
++          "FloorArea": {
++            "bits": "4030000000000000"
++          },
++          "MinimumX": {
++            "bits": "0000000000000000"
++          },
++          "MaximumX": {
++            "bits": "4010000000000000"
++          },
++          "MinimumY": {
++            "bits": "0000000000000000"
++          },
++          "MaximumY": {
++            "bits": "4010000000000000"
++          },
++          "ExtGrossWallArea": {
++            "bits": "4048000000000000"
++          },
++          "ExtWindowArea": {
++            "bits": "0000000000000000"
++          },
++          "Multiplier": 1,
++          "ListMultiplier": 1
++        },
++        "spaces": [
++          {
++            "actual_array_index": 1,
++            "Name": "Space-1",
++            "HTSurfaceFirst": 1,
++            "HTSurfaceLast": 0,
++            "MAT": {
++              "bits": "4032000000000000"
++            }
++          }
++        ],
++        "surfaces": [],
++        "node_allocated": false,
++        "zone_equipment_active_elements": {
++          "wall": false,
++          "ceiling": false,
++          "floor": false
++        }
++      },
++      "operations": [
++        {
++          "operation_id": "call-1",
++          "temperature_owner": "SurfTempInTmp",
++          "BeginEnvrnFlag": true,
++          "SysSizingCalc": false,
++          "ZoneSizingCalc": false,
++          "ZoneEquipInputsFilled": false,
++          "ZoneEquipSimulatedOnce": false,
++          "zone_MAT": {
++            "bits": "4034000000000000"
++          },
++          "space_MAT": [
++            {
++              "bits": "4032000000000000"
++            }
++          ],
++          "SurfTempIn": [],
++          "SurfTempInTmp": []
++        },
++        {
++          "operation_id": "call-2",
++          "temperature_owner": "SurfTempInTmp",
++          "BeginEnvrnFlag": false,
++          "SysSizingCalc": false,
++          "ZoneSizingCalc": false,
++          "ZoneEquipInputsFilled": false,
++          "ZoneEquipSimulatedOnce": true,
++          "zone_MAT": {
++            "bits": "4034000000000000"
++          },
++          "space_MAT": [
++            {
++              "bits": "4032000000000000"
++            }
++          ],
++          "SurfTempIn": [],
++          "SurfTempInTmp": []
++        }
++      ]
++    },
++    {
++      "case_id": "explicit-and-zone-TARP",
++      "purpose": "Actual explicit surface ASHRAETARP and genuine SetByZone resolution in the same nonwindow owner",
++      "initial": {
++        "zone": {
++          "Name": "One-Zone",
++          "spaceIndexes": [
++            1
++          ],
++          "MAT": {
++            "bits": "4034000000000000"
++          },
++          "CeilingHeight": {
++            "bits": "4008000000000000"
++          },
++          "Volume": {
++            "bits": "4048000000000000"
++          },
++          "FloorArea": {
++            "bits": "4030000000000000"
++          },
++          "MinimumX": {
++            "bits": "0000000000000000"
++          },
++          "MaximumX": {
++            "bits": "4010000000000000"
++          },
++          "MinimumY": {
++            "bits": "0000000000000000"
++          },
++          "MaximumY": {
++            "bits": "4010000000000000"
++          },
++          "ExtGrossWallArea": {
++            "bits": "4048000000000000"
++          },
++          "ExtWindowArea": {
++            "bits": "0000000000000000"
++          },
++          "Multiplier": 1,
++          "ListMultiplier": 1
++        },
++        "spaces": [
++          {
++            "actual_array_index": 1,
++            "Name": "Space-1",
++            "HTSurfaceFirst": 1,
++            "HTSurfaceLast": 2,
++            "MAT": {
++              "bits": "4032000000000000"
++            }
++          }
++        ],
++        "surfaces": [
++          {
++            "actual_array_index": 1,
++            "Name": "Surface-1",
++            "spaceNum": 1,
++            "Class": "Wall",
++            "model": "ASHRAETARP",
++            "CosTilt": {
++              "bits": "0000000000000000"
++            },
++            "Tilt": {
++              "bits": "4056800000000000"
++            },
++            "Azimuth": {
++              "bits": "0000000000000000"
++            },
++            "Area": {
++              "bits": "4028000000000000"
++            },
++            "GrossArea": {
++              "bits": "4028000000000000"
++            },
++            "Width": {
++              "bits": "4010000000000000"
++            },
++            "Height": {
++              "bits": "4008000000000000"
++            },
++            "Perimeter": {
++              "bits": "402c000000000000"
++            },
++            "Vertex": [
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "4008000000000000"
++                }
++              }
++            ],
++            "SurfTempIn": {
++              "bits": "4038000000000000"
++            },
++            "SurfTempInTmp": {
++              "bits": "4036000000000000"
++            },
++            "SurfHConvInt": {
++              "bits": "401d000000000000"
++            },
++            "SurfTAirRef": 0,
++            "SurfTAirRefRpt": 1
++          },
++          {
++            "actual_array_index": 2,
++            "Name": "Surface-2",
++            "spaceNum": 1,
++            "Class": "Floor",
++            "model": "SetByZone",
++            "CosTilt": {
++              "bits": "bff0000000000000"
++            },
++            "Tilt": {
++              "bits": "4066800000000000"
++            },
++            "Azimuth": {
++              "bits": "4046800000000000"
++            },
++            "Area": {
++              "bits": "4030000000000000"
++            },
++            "GrossArea": {
++              "bits": "4030000000000000"
++            },
++            "Width": {
++              "bits": "4010000000000000"
++            },
++            "Height": {
++              "bits": "4008000000000000"
++            },
++            "Perimeter": {
++              "bits": "4030000000000000"
++            },
++            "Vertex": [
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "0000000000000000"
++                },
++                "y": {
++                  "bits": "4010000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "4010000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              },
++              {
++                "x": {
++                  "bits": "4010000000000000"
++                },
++                "y": {
++                  "bits": "0000000000000000"
++                },
++                "z": {
++                  "bits": "0000000000000000"
++                }
++              }
++            ],
++            "SurfTempIn": {
++              "bits": "4038000000000000"
++            },
++            "SurfTempInTmp": {
++              "bits": "4036000000000000"
++            },
++            "SurfHConvInt": {
++              "bits": "401d000000000000"
++            },
++            "SurfTAirRef": 0,
++            "SurfTAirRefRpt": 1
++          }
++        ],
++        "node_allocated": false,
++        "zone_equipment_active_elements": {
++          "wall": false,
++          "ceiling": false,
++          "floor": false
++        }
++      },
++      "operations": [
++        {
++          "operation_id": "call-1",
++          "temperature_owner": "SurfTempInTmp",
++          "BeginEnvrnFlag": true,
++          "SysSizingCalc": false,
++          "ZoneSizingCalc": false,
++          "ZoneEquipInputsFilled": false,
++          "ZoneEquipSimulatedOnce": false,
++          "zone_MAT": {
++            "bits": "4034000000000000"
++          },
++          "space_MAT": [
++            {
++              "bits": "4032000000000000"
++            }
++          ],
++          "SurfTempIn": [
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            }
++          ],
++          "SurfTempInTmp": [
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            }
++          ]
++        },
++        {
++          "operation_id": "call-2",
++          "temperature_owner": "SurfTempIn",
++          "BeginEnvrnFlag": false,
++          "SysSizingCalc": false,
++          "ZoneSizingCalc": false,
++          "ZoneEquipInputsFilled": false,
++          "ZoneEquipSimulatedOnce": false,
++          "zone_MAT": {
++            "bits": "4034000000000000"
++          },
++          "space_MAT": [
++            {
++              "bits": "4032000000000000"
++            }
++          ],
++          "SurfTempIn": [
++            {
++              "bits": "4038000000000000"
++            },
++            {
++              "bits": "4038000000000000"
++            }
++          ],
++          "SurfTempInTmp": [
++            {
++              "bits": "4036000000000000"
++            },
++            {
++              "bits": "4036000000000000"
++            }
++          ]
++        }
++      ]
++    }
++  ]
++}

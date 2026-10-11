@@ -1,0 +1,553 @@
+{
+  "schema": "src05-ordinary-main-thread-actual-quality-and-artifacts.v1",
+  "Source_preparation": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-03/manifest.json",
+    "sha256": "e67df8b315cde068743aea3c542b30257e7156cc50588732a0c83d363877c5de",
+    "size_bytes": 19243
+  },
+  "actual_application": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/record.json",
+    "sha256": "b979f8ce4ab5b78ef3a71157917f9e24260ac18a4d7d6b0ae3ceda2d5b7c8afe",
+    "size_bytes": 12502
+  },
+  "actual_formatter_review": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-applied-01/Root-formatter-acceptance.json",
+    "sha256": "fb221443f5c94bf40f41aa488cc0f4fcfa97c281593872bd8a7f5bb396f66cca",
+    "size_bytes": 1391
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/00/00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a",
+    "sha256": "00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a"
+  },
+  "quality_executions": {
+    "fmt_check": {
+      "path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/fmt_check-command/receipt.json",
+      "sha256": "3ab0d9a69fc969c23e7b479e9df2908a0bd19ba19c7335036770af6098136162",
+      "size_bytes": 3111
+    },
+    "clippy": {
+      "path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/clippy-command/receipt.json",
+      "sha256": "b0bedd7e294ac7e0c2c59702d39396d806dcd8c66ad384ea80b283a4b43d7b89",
+      "size_bytes": 3298
+    },
+    "focused": {
+      "path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/focused-command/receipt.json",
+      "sha256": "dfb9e4ad96b6c3eb1a5a70788a0ea3b06e23a21810534cf27677a33d88c1b497",
+      "size_bytes": 3285
+    },
+    "workspace": {
+      "path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/workspace-command/receipt.json",
+      "sha256": "f5fb0d86800358017afe15e544af120b207e2d708c3ce6c7bb88536c47099280",
+      "size_bytes": 3245
+    }
+  },
+  "actual_test_totals": {
+    "focused": {
+      "groups": 1,
+      "passed": 346,
+      "failed": 0,
+      "ignored": 2,
+      "actual_ignored_tests": [
+        {
+          "name": "heat_balance::convection::surface_environment::selected_reference::observe_literal_surface_environment_setters",
+          "actual_line": "test heat_balance::convection::surface_environment::selected_reference::observe_literal_surface_environment_setters ... ignored, Root-only literal input observation with full Source/environment custody"
+        },
+        {
+          "name": "heat_balance::warmup::selected_reference::observe_literal_selected_warmup_methods",
+          "actual_line": "test heat_balance::warmup::selected_reference::observe_literal_selected_warmup_methods ... ignored, Root-only input observation with explicit recorded input/output and Source custody"
+        }
+      ]
+    },
+    "workspace": {
+      "groups": 21,
+      "passed": 4973,
+      "failed": 0,
+      "ignored": 2,
+      "actual_ignored_tests": [
+        {
+          "name": "heat_balance::convection::surface_environment::selected_reference::observe_literal_surface_environment_setters",
+          "actual_line": "test heat_balance::convection::surface_environment::selected_reference::observe_literal_surface_environment_setters ... ignored, Root-only literal input observation with full Source/environment custody"
+        },
+        {
+          "name": "heat_balance::warmup::selected_reference::observe_literal_selected_warmup_methods",
+          "actual_line": "test heat_balance::warmup::selected_reference::observe_literal_selected_warmup_methods ... ignored, Root-only input observation with explicit recorded input/output and Source custody"
+        }
+      ]
+    }
+  },
+  "actual_Cargo_artifacts": {
+    "CLI": {
+      "actual_build_execution": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/CLI-command/receipt.json",
+        "sha256": "dba673b9bc9345f5856fc0a088040155288b0ca8e6affb317ddf988801284778",
+        "size_bytes": 4737
+      },
+      "actual_full_Cargo_JSON": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/CLI-command/stdout.log",
+        "sha256": "e44a05f2d9293dd9e9949b5e0d197b38d5f2f0ed5cc639c0ccd6313676b42f8e"
+      },
+      "cargo_message": {
+        "reason": "compiler-artifact",
+        "package_id": "path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/crates/ep_cli#0.1.0",
+        "manifest_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_cli\\Cargo.toml",
+        "target": {
+          "kind": [
+            "bin"
+          ],
+          "crate_types": [
+            "bin"
+          ],
+          "name": "eplus-rs",
+          "src_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_cli\\src\\main.rs",
+          "edition": "2024",
+          "doc": true,
+          "doctest": false,
+          "test": true
+        },
+        "profile": {
+          "opt_level": "0",
+          "debuginfo": 0,
+          "debug_assertions": true,
+          "overflow_checks": true,
+          "test": false
+        },
+        "features": [],
+        "filenames": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe"
+        ],
+        "executable": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+        "fresh": false
+      },
+      "executable": {
+        "path": "target/debug/eplus-rs.exe",
+        "sha256": "c316eafa5fddd85920f727183485f09742053f29f9fa8ba330dca06efbbaefda",
+        "size_bytes": 58995316
+      },
+      "PE_inspection": {
+        "actual_binary": {
+          "path": "target/debug/eplus-rs.exe",
+          "sha256": "c316eafa5fddd85920f727183485f09742053f29f9fa8ba330dca06efbbaefda",
+          "size_bytes": 58995316
+        },
+        "actual_PE_header_bytes": {
+          "path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/PE-headers/CLI.bin",
+          "sha256": "a39a35f14a4fb9278dc1f000ba7a756e03aeb83674202f09f11b713928cbe0fb",
+          "size_bytes": 728
+        },
+        "PE_header_file_offset": 128,
+        "machine": 34404,
+        "COFF_characteristics": 550,
+        "entry_point_RVA": 5104,
+        "subsystem": 3,
+        "DLL_characteristics": 352,
+        "stack_reserve_bytes": 8388608,
+        "stack_commit_bytes": 4096,
+        "data_directories": [
+          {
+            "index": 0,
+            "address": 0,
+            "size": 0
+          },
+          {
+            "index": 1,
+            "address": 42156032,
+            "size": 7432
+          },
+          {
+            "index": 2,
+            "address": 0,
+            "size": 0
+          },
+          {
+            "index": 3,
+            "address": 38789120,
+            "size": 1116408
+          },
+          {
+            "index": 4,
+            "address": 0,
+            "size": 0
+          },
+          {
+            "index": 5,
+            "address": 42172416,
+            "size": 67812
+          },
+          {
+            "index": 6,
+            "address": 0,
+            "size": 0
+          },
+          {
+            "index": 7,
+            "address": 0,
+            "size": 0
+          },
+          {
+            "index": 8,
+            "address": 0,
+            "size": 0
+          },
+          {
+            "index": 9,
+            "address": 38786240,
+            "size": 40
+          },
+          {
+            "index": 10,
+            "address": 0,
+            "size": 0
+          },
+          {
+            "index": 11,
+            "address": 0,
+            "size": 0
+          },
+          {
+            "index": 12,
+            "address": 42157768,
+            "size": 1576
+          },
+          {
+            "index": 13,
+            "address": 0,
+            "size": 0
+          },
+          {
+            "index": 14,
+            "address": 0,
+            "size": 0
+          },
+          {
+            "index": 15,
+            "address": 0,
+            "size": 0
+          }
+        ],
+        "sections": [
+          {
+            "name_bytes_hex": "2e74657874000000",
+            "virtual_size": 34840032,
+            "virtual_address": 4096,
+            "raw_size": 34840064,
+            "raw_offset": 1024,
+            "characteristics": 1610612768
+          },
+          {
+            "name_bytes_hex": "2e64617461000000",
+            "virtual_size": 3744,
+            "virtual_address": 34844672,
+            "raw_size": 4096,
+            "raw_offset": 34841088,
+            "characteristics": 3221225536
+          },
+          {
+            "name_bytes_hex": "2e72646174610000",
+            "virtual_size": 3938744,
+            "virtual_address": 34848768,
+            "raw_size": 3938816,
+            "raw_offset": 34845184,
+            "characteristics": 1073741888
+          },
+          {
+            "name_bytes_hex": "2e70646174610000",
+            "virtual_size": 1116408,
+            "virtual_address": 38789120,
+            "raw_size": 1116672,
+            "raw_offset": 38784000,
+            "characteristics": 1073741888
+          },
+          {
+            "name_bytes_hex": "2e78646174610000",
+            "virtual_size": 2241420,
+            "virtual_address": 39907328,
+            "raw_size": 2241536,
+            "raw_offset": 39900672,
+            "characteristics": 1073741888
+          },
+          {
+            "name_bytes_hex": "2e62737300000000",
+            "virtual_size": 576,
+            "virtual_address": 42151936,
+            "raw_size": 0,
+            "raw_offset": 0,
+            "characteristics": 3221225600
+          },
+          {
+            "name_bytes_hex": "2e69646174610000",
+            "virtual_size": 7432,
+            "virtual_address": 42156032,
+            "raw_size": 7680,
+            "raw_offset": 42142208,
+            "characteristics": 3221225536
+          },
+          {
+            "name_bytes_hex": "2e43525400000000",
+            "virtual_size": 104,
+            "virtual_address": 42164224,
+            "raw_size": 512,
+            "raw_offset": 42149888,
+            "characteristics": 3221225536
+          },
+          {
+            "name_bytes_hex": "2e746c7300000000",
+            "virtual_size": 16,
+            "virtual_address": 42168320,
+            "raw_size": 512,
+            "raw_offset": 42150400,
+            "characteristics": 3221225536
+          },
+          {
+            "name_bytes_hex": "2e72656c6f630000",
+            "virtual_size": 67812,
+            "virtual_address": 42172416,
+            "raw_size": 68096,
+            "raw_offset": 42150912,
+            "characteristics": 1107296320
+          }
+        ],
+        "loader_or_security_equivalence_claimed": false,
+        "Root_full_PE_acceptance_required_before_target_execution": true
+      }
+    },
+    "ordinary_observer": {
+      "actual_build_execution": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/ordinary_observer-command/receipt.json",
+        "sha256": "ecaaa7d00321e483416dc221a4946e7caa76463c863dc7231df2ac390f3c0367",
+        "size_bytes": 4950
+      },
+      "actual_full_Cargo_JSON": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/ordinary_observer-command/stdout.log",
+        "sha256": "44fe5d27c6d6c0f0d7cf497b3c7e57457f46cac574c218268e02d96ef9af3c01"
+      },
+      "cargo_message": {
+        "reason": "compiler-artifact",
+        "package_id": "path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/crates/ep_run#0.1.0",
+        "manifest_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\Cargo.toml",
+        "target": {
+          "kind": [
+            "example"
+          ],
+          "crate_types": [
+            "bin"
+          ],
+          "name": "ctf10_ordinary_history_observer",
+          "src_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\examples\\ctf10_ordinary_history_observer.rs",
+          "edition": "2024",
+          "doc": false,
+          "doctest": false,
+          "test": false
+        },
+        "profile": {
+          "opt_level": "0",
+          "debuginfo": 0,
+          "debug_assertions": true,
+          "overflow_checks": true,
+          "test": false
+        },
+        "features": [],
+        "filenames": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\ctf10_ordinary_history_observer.exe"
+        ],
+        "executable": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\ctf10_ordinary_history_observer.exe",
+        "fresh": false
+      },
+      "executable": {
+        "path": "target/debug/examples/ctf10_ordinary_history_observer.exe",
+        "sha256": "5352fce380c9d48cc6c958bc8be7ceab464a7e20bcd4be6fc811933d1c1b9cb5",
+        "size_bytes": 51953347
+      },
+      "PE_inspection": {
+        "actual_binary": {
+          "path": "target/debug/examples/ctf10_ordinary_history_observer.exe",
+          "sha256": "5352fce380c9d48cc6c958bc8be7ceab464a7e20bcd4be6fc811933d1c1b9cb5",
+          "size_bytes": 51953347
+        },
+        "actual_PE_header_bytes": {
+          "path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/PE-headers/ordinary_observer.bin",
+          "sha256": "8ddac411474da4b2eeca8843cb8118013f4345baf5dd79ad35f94e5b4640c849",
+          "size_bytes": 728
+        },
+        "PE_header_file_offset": 128,
+        "machine": 34404,
+        "COFF_characteristics": 550,
+        "entry_point_RVA": 5104,
+        "subsystem": 3,
+        "DLL_characteristics": 352,
+        "stack_reserve_bytes": 8388608,
+        "stack_commit_bytes": 4096,
+        "data_directories": [
+          {
+            "index": 0,
+            "address": 0,
+            "size": 0
+          },
+          {
+            "index": 1,
+            "address": 37236736,
+            "size": 7380
+          },
+          {
+            "index": 2,
+            "address": 0,
+            "size": 0
+          },
+          {
+            "index": 3,
+            "address": 34365440,
+            "size": 964272
+          },
+          {
+            "index": 4,
+            "address": 0,
+            "size": 0
+          },
+          {
+            "index": 5,
+            "address": 37253120,
+            "size": 63800
+          },
+          {
+            "index": 6,
+            "address": 0,
+            "size": 0
+          },
+          {
+            "index": 7,
+            "address": 0,
+            "size": 0
+          },
+          {
+            "index": 8,
+            "address": 0,
+            "size": 0
+          },
+          {
+            "index": 9,
+            "address": 34362816,
+            "size": 40
+          },
+          {
+            "index": 10,
+            "address": 0,
+            "size": 0
+          },
+          {
+            "index": 11,
+            "address": 0,
+            "size": 0
+          },
+          {
+            "index": 12,
+            "address": 37238456,
+            "size": 1560
+          },
+          {
+            "index": 13,
+            "address": 0,
+            "size": 0
+          },
+          {
+            "index": 14,
+            "address": 0,
+            "size": 0
+          },
+          {
+            "index": 15,
+            "address": 0,
+            "size": 0
+          }
+        ],
+        "sections": [
+          {
+            "name_bytes_hex": "2e74657874000000",
+            "virtual_size": 30699840,
+            "virtual_address": 4096,
+            "raw_size": 30700032,
+            "raw_offset": 1024,
+            "characteristics": 1610612768
+          },
+          {
+            "name_bytes_hex": "2e64617461000000",
+            "virtual_size": 3744,
+            "virtual_address": 30707712,
+            "raw_size": 4096,
+            "raw_offset": 30701056,
+            "characteristics": 3221225536
+          },
+          {
+            "name_bytes_hex": "2e72646174610000",
+            "virtual_size": 3652280,
+            "virtual_address": 30711808,
+            "raw_size": 3652608,
+            "raw_offset": 30705152,
+            "characteristics": 1073741888
+          },
+          {
+            "name_bytes_hex": "2e70646174610000",
+            "virtual_size": 964272,
+            "virtual_address": 34365440,
+            "raw_size": 964608,
+            "raw_offset": 34357760,
+            "characteristics": 1073741888
+          },
+          {
+            "name_bytes_hex": "2e78646174610000",
+            "virtual_size": 1897260,
+            "virtual_address": 35332096,
+            "raw_size": 1897472,
+            "raw_offset": 35322368,
+            "characteristics": 1073741888
+          },
+          {
+            "name_bytes_hex": "2e62737300000000",
+            "virtual_size": 576,
+            "virtual_address": 37232640,
+            "raw_size": 0,
+            "raw_offset": 0,
+            "characteristics": 3221225600
+          },
+          {
+            "name_bytes_hex": "2e69646174610000",
+            "virtual_size": 7380,
+            "virtual_address": 37236736,
+            "raw_size": 7680,
+            "raw_offset": 37219840,
+            "characteristics": 3221225536
+          },
+          {
+            "name_bytes_hex": "2e43525400000000",
+            "virtual_size": 104,
+            "virtual_address": 37244928,
+            "raw_size": 512,
+            "raw_offset": 37227520,
+            "characteristics": 3221225536
+          },
+          {
+            "name_bytes_hex": "2e746c7300000000",
+            "virtual_size": 16,
+            "virtual_address": 37249024,
+            "raw_size": 512,
+            "raw_offset": 37228032,
+            "characteristics": 3221225536
+          },
+          {
+            "name_bytes_hex": "2e72656c6f630000",
+            "virtual_size": 63800,
+            "virtual_address": 37253120,
+            "raw_size": 64000,
+            "raw_offset": 37228544,
+            "characteristics": 1107296320
+          }
+        ],
+        "loader_or_security_equivalence_claimed": false,
+        "Root_full_PE_acceptance_required_before_target_execution": true
+      }
+    }
+  },
+  "all_emitted_executables_rehashed_after_both_builds": true,
+  "target_execution_performed": false,
+  "Root_full_PE_acceptance_required_before_target_execution": true,
+  "production_or_numerical_PASS_claimed": false,
+  "gates_updated": false
+}

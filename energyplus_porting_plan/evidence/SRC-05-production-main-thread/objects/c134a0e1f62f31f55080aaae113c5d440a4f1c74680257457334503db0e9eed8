@@ -1,0 +1,32 @@
+--- CMakeCache.txt.before
++++ CMakeCache.txt.after
+@@ -281,7 +281,7 @@
+ 
+ //CMake language file(s) to include as last step of project command
+ // calls for code injection without source modification.
+-CMAKE_PROJECT_INCLUDE:UNINITIALIZED=C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SYS-03\round-format-native-build-01\additive-reference.cmake
++CMAKE_PROJECT_INCLUDE:UNINITIALIZED=C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\wind-pow-native-build-02\additive-reference.cmake
+ 
+ //Value Computed by CMake
+ CMAKE_PROJECT_NAME:STATIC=EnergyPlus
+@@ -774,6 +774,20 @@
+ 
+ //No help, variable specified on the command line.
+ SRC05_OUTPUT_DIR:UNINITIALIZED=D:\CodexBuild\rusted-energyplus\SRC-05\native-build-02\bin
++
++//No help, variable specified on the command line.
++SRC05_POW_INHERITED_RECIPE:UNINITIALIZED=C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SYS-03\round-format-native-build-01\additive-reference.cmake
++
++//No help, variable specified on the command line.
++SRC05_POW_OUTPUT_DIR:UNINITIALIZED=D:\CodexBuild\rusted-energyplus\SRC-05\wind-pow-native-build-02\bin
++
++//No help, variable specified on the command line.
++SRC05_POW_REFERENCE_RECIPE:UNINITIALIZED=C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\wind-pow-isolation-prep-01\wind_pow_reference.cmake
++
++//Top-level source directory for the named project. Created by
++// the project() command with the given <PROJECT-NAME>; useful
++// when add_subdirectory is used to connect several projects.
++SRC05_POW_SOURCE_DIR:UNINITIALIZED=C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\wind-pow-isolation-prep-01
+ 
+ //No help, variable specified on the command line.
+ SRC05_REFERENCE_RECIPE:UNINITIALIZED=C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\native-surface-environment-prep-02\surface_environment_reference.cmake

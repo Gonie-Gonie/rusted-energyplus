@@ -1,0 +1,25 @@
+"""Bind genuine closed actual references for the reviewed publisher."""
+import hashlib
+import json
+from pathlib import Path
+ROOT = Path.cwd()
+BASE = ROOT/'.runtime/porting/SRC-05'
+def ref(name, expected=None):
+    path=ROOT/name; raw=path.read_bytes(); sha=hashlib.sha256(raw).hexdigest()
+    assert expected is None or sha==expected
+    return dict(path=name,sha256=sha,size_bytes=len(raw))
+packet = dict(schema='src05-production-main-thread-publication-inputs.v1')
+for key,name,sha in [
+ ('actual_validation','ordinary-main-thread-validation-01/record.json','decafdcbfd1fa6118bc27fe513b79cea7143494429064309f487d494a10a9183'),
+ ('Root_PE_acceptance','ordinary-main-thread-validation-01/Root-PE-acceptance.json','3d0d825ec5732bae6ecabc639dc9ca6d6eebfd54598f1c2af40579cae96e707f'),
+ ('actual_execution_custody','ordinary-main-production-command-01/custody.json','2df8976583a72a80225d6efb908ef33ee5e8fa87f2dac78fd7e6229ea26c0306'),
+ ('actual_execution_outer_receipt','ordinary-main-production-outer-command-01/receipt.json','7e3860c8631fc25e4eb286b7d590466db5dc62b98861695dc7820678dc936d46'),
+ ('Root_factual_review','ordinary-main-production-command-01/Root-factual-review.json','727eb71650b4d5a14981e256fbcf15a4d9550ac9708ef062a7da6ab44a136c75'),
+ ('Header_factual_review','Header-ordinary-main-production-factual-review-01/review.json','dcbb4714030b6971cf880293617e50433831f911ea7a46f27dbdbcb67cf79ac0')]:
+    packet[key]=ref('.runtime/porting/SRC-05/'+name,sha)
+packet['closed_executions']=[ref('.runtime/porting/SRC-05/ordinary-main-thread-application-command-01/receipt.json','9fc1906033a3984a2a21e337746241e5bdc2a2dd383cc19904440d5d6ff2eec3')]
+packet['opaque_lineage']=[ref('.runtime/porting/SRC-05/'+name) for name in ['ordinary-main-publication-prep-02/Root-FULL-Source-review-02.json','Header-ordinary-main-publication-Source-review-02/review.json','review-publication-Root-02.py','old-debug-test-executable-move-01.json']]+[ref(Path(__file__).relative_to(ROOT).as_posix())]
+path=BASE/'ordinary-main-publication-inputs-Root-01.json'
+with path.open('x',encoding='utf8',newline='\n') as stream:
+    json.dump(packet,stream,indent=2);stream.write('\n')
+print(json.dumps(ref(path.relative_to(ROOT).as_posix())))

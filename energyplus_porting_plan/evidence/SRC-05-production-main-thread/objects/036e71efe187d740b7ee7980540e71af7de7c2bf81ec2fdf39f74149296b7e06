@@ -1,0 +1,66 @@
+"""Review completed main process/file custody without reading scientific events."""
+import argparse
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+BASE = ROOT / '.runtime/porting/SRC-05'
+DATA = Path('D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01').resolve()
+apply_path = BASE/'ordinary-main-thread-application-prep-03/apply.py'
+assert hashlib.sha256(apply_path.read_bytes()).hexdigest() == 'f156146347a42f0f9ee0d13a6e180ab82773c7a9387c5200e85f464b95ba21c5'
+spec = importlib.util.spec_from_file_location('reviewed_apply',apply_path)
+A = importlib.util.module_from_spec(spec);spec.loader.exec_module(A)
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--custody',required=True)
+parser.add_argument('--outer',required=True)
+args = parser.parse_args()
+custody_ref,outer_ref = A.operand(args.custody),A.operand(args.outer)
+c,outer = A.load(custody_ref),A.load(outer_ref)
+assert c['schema'] == 'src05-ordinary-main-production-execution-custody.v1'
+assert outer['exit_code'] == 0 and outer['launch_error'] is None and outer['source_bytes_match_before_and_after'] is True
+source = c['Source_snapshot']
+assert source == outer['source_snapshot'] and source['sha256'] == '00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a'
+assert len(A.members(source,current=True)) == 3931
+assert c['actual_validation']['sha256'] == 'decafdcbfd1fa6118bc27fe513b79cea7143494429064309f487d494a10a9183'
+assert c['Root_PE_acceptance']['sha256'] == '3d0d825ec5732bae6ecabc639dc9ca6d6eebfd54598f1c2af40579cae96e707f'
+v,pe = A.load(c['actual_validation']),A.load(c['Root_PE_acceptance'])
+before = A.load(c['actual_before'])
+assert before['Source_snapshot'] == source and before['actual_commands'] == c['actual_commands'] and before['data_output_root'] == c['data_output_root'] == DATA.as_posix()
+assert before['actual_D_free_bytes_before'] >= 40*1024**3
+for row in before['frozen_artifacts']:A.bind(row)
+assert c['all_frozen_artifacts_rehashed_unchanged'] and c['actual_processes_both_exit_zero']
+assert set(c['actual_executions']) == set(v['actual_Cargo_artifacts']) == {'CLI','ordinary_observer'}
+receipts = {}
+for role,row in c['actual_executions'].items():
+    actual = A.recorded(row['actual_execution'],source,c['actual_commands'][role])
+    assert row['actual_exit_code'] == 0 and Path(actual['command'][0]).resolve() == A.bind(v['actual_Cargo_artifacts'][role]['executable']).resolve()
+    assert pe['actual_Cargo_artifacts'][role] == v['actual_Cargo_artifacts'][role]['executable']
+    assert outer['started_utc'] <= actual['started_utc'] <= actual['finished_utc'] <= outer['finished_utc']
+    receipts[role] = actual
+assert receipts['CLI']['finished_utc'] <= receipts['ordinary_observer']['started_utc']
+expected_files = {Path(row['path']).resolve():row for row in c['actual_output_files']}
+assert len(expected_files) == len(c['actual_output_files'])
+actual_files = {path.resolve() for path in DATA.rglob('*') if path.is_file()}
+assert actual_files == set(expected_files)
+for path,row in expected_files.items():
+    assert path.is_relative_to(DATA)
+    with path.open('rb') as stream:sha = hashlib.file_digest(stream,'sha256').hexdigest()
+    assert sha == row['sha256'] and path.stat().st_size == row['size_bytes']
+capture = c['actual_capture_custody'];path = DATA/'capture/events.ndjson'
+sha = hashlib.sha256();first = last = None;line_count = 0
+with path.open('rb') as stream:
+    for line in stream:
+        sha.update(line);line_count += 1
+        if first is None:first = line
+        last = line
+header,footer = json.loads(first),json.loads(last)
+assert header == capture['actual_header'] and footer == capture['actual_footer']
+assert capture['actual_file'] == expected_files[path.resolve()] and sha.hexdigest() == capture['actual_file']['sha256']
+assert line_count == capture['physical_line_count'] == 2+footer['actual_written_event_count']+footer['actual_Rust_generation_count']
+assert footer['actual_observed_event_count'] == footer['actual_written_event_count'] and footer['actual_runtime_exit_code'] == 0
+assert capture['capture_complete'] and footer['capture_complete'] and not footer['counted_as_PASS'] and not header['counted_as_PASS']
+assert all(c[key] is False for key in ['boundary_reachability_verified','floating_point_controls_written','numerical_comparison_performed','whole_ordinary_or_integration_PASS_claimed','gates_updated'])
+report = dict(schema='src05-ordinary-main-production-factual-review.v1',reviewer_role='Root',actual_custody=custody_ref,actual_validation=c['actual_validation'],Source_snapshot=source,actual_outer_execution=outer_ref,full_process_input_Source_output_and_capture_custody_review_accepted=True,closed_actual_processes=2,full_current_Source_members=3931,full_frozen_artifact_checks=len(before['frozen_artifacts']),all_output_files=len(expected_files),all_output_bytes=sum(row['size_bytes'] for row in expected_files.values()),actual_capture_lines=line_count,actual_footer=footer,external_complete_data_output_root=DATA.as_posix(),external_payload_committed=False,review_Source=A.ref(Path(__file__).resolve()),scientific_event_values_read=False,scientific_comparison_performed=False,whole_ordinary_PASS_claimed=False,gates_updated=False)
+print(json.dumps(A.dump(BASE/'ordinary-main-production-command-01/Root-factual-review.json',report)))

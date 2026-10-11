@@ -1,0 +1,10 @@
+{
+  "schema": "src06-dispatcher-Header-current-Source-guard.v1",
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/8a/8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934",
+    "sha256": "8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934"
+  },
+  "members": 3929,
+  "full_current_membership_and_archive_bytes_accepted": true,
+  "canonical_mutation": false
+}

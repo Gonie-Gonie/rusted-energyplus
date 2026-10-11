@@ -1,0 +1,5 @@
+#[test]
+#[ignore = "Root-only literal input observation with full Source/environment custody"]
+fn observe_literal_surface_environment_setters() -> Result<(), String> {
+    observe()
+}

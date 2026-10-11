@@ -1,0 +1,105 @@
+{
+  "schema": "src05-ordinary-main-production-factual-review.v1",
+  "reviewer_role": "Header",
+  "accepted": true,
+  "reviewed_utc": "2026-10-11T19:38:20.522163+00:00",
+  "actual_custody": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-production-command-01/custody.json",
+    "sha256": "2df8976583a72a80225d6efb908ef33ee5e8fa87f2dac78fd7e6229ea26c0306",
+    "size_bytes": 19866
+  },
+  "actual_validation": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/record.json",
+    "sha256": "decafdcbfd1fa6118bc27fe513b79cea7143494429064309f487d494a10a9183",
+    "size_bytes": 18325
+  },
+  "actual_outer_execution": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-production-outer-command-01/receipt.json",
+    "sha256": "7e3860c8631fc25e4eb286b7d590466db5dc62b98861695dc7820678dc936d46",
+    "size_bytes": 3757
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/00/00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a",
+    "sha256": "00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a"
+  },
+  "full_process_input_Source_output_and_capture_custody_review_accepted": true,
+  "actual_processes_both_exit_zero": true,
+  "complete_input_contract_guards": 45,
+  "full_current_and_archive_Source_members": 3931,
+  "actual_output_file_count": 62,
+  "full_output_bytes_hashed": 1328614270,
+  "full_NDJSON": {
+    "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/capture/events.ndjson",
+    "sha256": "08de12c7339f42837416c0dbdd0389b7d29f83bdc09cac6beefa8003d18b182c",
+    "size_bytes": 581361739
+  },
+  "actual_capture_header": {
+    "Native_fields_unavailable": [
+      "environment_id",
+      "environment_name",
+      "KickOffSimulation",
+      "calendar_year",
+      "calendar_month",
+      "calendar_day"
+    ],
+    "Native_prestate_replayed": false,
+    "absent_lifecycle_is_not_observed_or_assumed_reached": true,
+    "all_instrumented_lifecycle_visits_without_caps_or_filters": true,
+    "counted_as_PASS": false,
+    "expected_endpoints_read": false,
+    "record_type": "header",
+    "schema": "ctf10-persistent-ordinary-history-stream.v1"
+  },
+  "actual_capture_footer": {
+    "actual_Rust_generation_count": 1,
+    "actual_observed_event_count": 4034,
+    "actual_runtime_exit_code": 0,
+    "actual_runtime_message": "arbitrary run completed",
+    "actual_written_event_count": 4034,
+    "boundary_reachability_verified": false,
+    "capture_complete": true,
+    "counted_as_PASS": false,
+    "integration_PASS_claimed": false,
+    "numerical_comparison_performed": false,
+    "record_type": "summary",
+    "schema": "ctf10-persistent-ordinary-history-stream.v1"
+  },
+  "actual_physical_line_count": 4037,
+  "actual_commands": {
+    "CLI": [
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe",
+      "run",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-24H\\input.idf",
+      "--weather",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+      "--output-dir",
+      "D:\\CodexBuild\\rusted-energyplus\\SRC-05\\ordinary-main-production-01\\CLI",
+      "--mode",
+      "compatibility",
+      "--partial",
+      "deny",
+      "--trace-level",
+      "full",
+      "--porting-scope",
+      "a"
+    ],
+    "ordinary_observer": [
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\ctf10_ordinary_history_observer.exe",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-24H\\input.idf",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+      "D:\\CodexBuild\\rusted-energyplus\\SRC-05\\ordinary-main-production-01\\observer",
+      "D:\\CodexBuild\\rusted-energyplus\\SRC-05\\ordinary-main-production-01\\capture\\events.ndjson"
+    ]
+  },
+  "frozen_artifact_descriptor_count": 91,
+  "independent_validation_review": {
+    "path": ".runtime/porting/SRC-05/Header-ordinary-main-validation-factual-review-01/review.json",
+    "sha256": "355b6767a4190b275f2d15bf48baaf632b9d6cc1ae96e3b9b927d4712a27283a"
+  },
+  "scientific_comparison_performed": false,
+  "whole_ordinary_PASS_claimed": false,
+  "gates_updated": false,
+  "boundary_reachability_or_event_values_assessed": false,
+  "no_target_execution_or_control_write_by_reviewer": true,
+  "limitations": "Source/artifact/process/input/full-byte output and IO-completion custody only. Header authored main-thread implementation; no scientific, historical cause, loader/security, ordinary parity or gate certificate."
+}

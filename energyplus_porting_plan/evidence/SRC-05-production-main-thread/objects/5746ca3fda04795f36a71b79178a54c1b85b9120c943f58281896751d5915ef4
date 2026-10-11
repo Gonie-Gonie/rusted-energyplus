@@ -1,0 +1,29 @@
+# Windows main-thread application and validation — held Source only
+
+This applies the four literal rows from accepted main-thread preparation `0d1913b4…`, then validates their actual formatted Source and emitted Windows executables. It does not execute either executable, change floating-point controls, compare scientific results, or update gates. The existing run bodies and all other Rust Source must remain byte exact. Root must release the genuine Native dispatcher baseline before application.
+
+Run the applier only after Root and the independent peer accept this preparation:
+
+```text
+python -X utf8 -B .runtime/porting/SRC-05/ordinary-main-thread-application-prep-01/apply.py --source-preparation <this-manifest-path>#<accepted-SHA> --Native-baseline-acceptance <actual-Root-baseline-acceptance-path>#<actual-SHA> --output-dir .runtime/porting/SRC-05/ordinary-main-thread-applied-01
+```
+
+The baseline acceptance schema is `src06-tarp-dispatcher-Root-factual-baseline-acceptance.v1`, with `accepted:true`, `complete_input_owner_prefix_and_custody_review_accepted:true`, and authentic `actual_Native_execution` / `factual_review` references. The actual recorded Native process must have exit 0 or 2, a true Source guard, and the exact existing 8aa full Source. Its numerical values are not consumed by these scripts.
+
+The applier checks all 3,929 current Source members, both absent new destinations, all four authentic before/proposal/diff objects, and the full held before snapshot. Before changing any canonical file, it archives all four before/literal/diff objects. It installs only the four reviewed literals, runs recorded `cargo fmt --all`, and retains full before/literal/final snapshots plus every semantic and formatter delta. The final inventory must contain 3,931 members, with exactly the two new build scripts and 3,927 unrelated prior members byte exact. The intentional formatter receipt may have a false Source guard only when its literal and final snapshots actually differ. Root and the independent peer must read all four actual formatter deltas.
+
+Then supply the actual review and application identities:
+
+```text
+python -X utf8 -B .runtime/porting/SRC-05/ordinary-main-thread-application-prep-01/validate.py --source-preparation <this-manifest-path>#<accepted-SHA> --application <actual-record-path>#<actual-SHA> --formatter-review <actual-review-path>#<actual-SHA> --output-dir .runtime/porting/SRC-05/ordinary-main-thread-validation-01
+```
+
+The review schema is `src05-ordinary-main-thread-actual-formatter-review.v1`, with `actual_application`, `Source_snapshot` equal to the application's `source_final`, `Root_FULL_formatter_correspondence_accepted:true`, and `independent_FULL_formatter_correspondence_accepted:true`. Validation reauthenticates the complete literal/current closure, every held row and regenerated delta. Its four quality roles bind exact argv: fmt check, workspace/all-target Clippy with warnings denied, the `ep_runtime` heat-balance library subset, and workspace tests. All use the existing debug=0 / incremental=false configs where applicable and `--locked`. Actual group/test totals are derived from complete routine stdout; no future counts are supplied.
+
+After all four closed same-Source successes, two separately recorded `cargo build` commands select exactly `ep_cli --bin eplus-rs` and `ep_run --example ctf10_ordinary_history_observer`, with Cargo JSON and the same configs. Each sole emitted executable is bound immediately to its actual package/target/source, full stdout, recorder capture, raw SHA and size. Both executable identities are rechecked after both builds. There is no executable copying, target-directory cleanup, or large debug build.
+
+The read-only PE inspection retains the actual DOS/COFF/optional/section-table bytes, offset, full executable SHA/size, all data directories and section rows. It requires x64 PE32+ and stack reserve 8,388,608 bytes, with the actual positive commit retained. Entry point, subsystem, DLL/COFF characteristics and security directory are recorded. This is a stack/header check; Root must accept actual PE evidence before real CLI/observer invocation. It does not claim previous-binary security/loader equivalence or production numerical parity.
+
+The two genuine prior Source templates are copied byte exactly under `before/`; both complete adaptation deltas are retained. The authentic recorder is fixed at `5745ad98…`. All runtime operands are actual recorded path/SHA references. No future result, receipt, Source hash or test total is invented. Failures leave their actual command receipts and artifacts in the fresh ignored output directory and stop validation.
+
+The narrow second preparation preserves both existing Root-only ignored observation tests. Full routine stdout must contain exactly their two Source-owned test names; every failed count must be zero, and aggregate ignored counts must equal the retained full ignored rows. Actual passed/group totals remain derived. The first preparation is preserved unexecuted; its zero-ignored guard was a Source review defect, not a test result.

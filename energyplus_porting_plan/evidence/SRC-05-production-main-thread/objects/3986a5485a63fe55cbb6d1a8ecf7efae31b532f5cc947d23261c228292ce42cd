@@ -1,0 +1,191 @@
+"""Prepare ignored Sources only; never apply, compile, or execute a target."""
+from pathlib import Path
+import ast
+import difflib
+import hashlib
+import json
+
+ROOT = Path(__file__).resolve().parents[3]
+OUT = ROOT / '.runtime/porting/SRC-05/ordinary-main-thread-prep-01'
+TOOLCHAIN = Path('C:/Users/GonieGonie/.rustup/toolchains/1.96.0-x86_64-pc-windows-gnu')
+
+
+def ref(path):
+    path = Path(path).resolve()
+    data = path.read_bytes()
+    try:
+        name = path.relative_to(ROOT).as_posix()
+    except ValueError:
+        name = path.as_posix()
+    result = {'path': name, 'sha256': hashlib.sha256(data).hexdigest(), 'size_bytes': len(data)}
+    if path.suffix in {'.rs', '.py', '.toml', '.md'}:
+        result['line_count'] = len(data.splitlines())
+    return result
+
+
+def write(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(data)
+    return ref(path)
+
+
+def delta(before, after, name):
+    return ''.join(difflib.unified_diff(before.decode().splitlines(True), after.decode().splitlines(True),
+                                        fromfile='a/' + name, tofile='b/' + name)).encode()
+
+
+assert not OUT.exists(), 'fresh preparation required'
+names = ['crates/ep_cli/src/main.rs', 'crates/ep_run/examples/ctf10_ordinary_history_observer.rs',
+         'crates/ep_cli/build.rs', 'crates/ep_run/build.rs']
+assert all((ROOT / p).is_file() for p in names[:2])
+assert all(not (ROOT / p).exists() for p in names[2:])
+before = [(ROOT / p).read_bytes() if (ROOT / p).exists() else b'' for p in names]
+supported = 'all(target_os = "windows", any(target_env = "gnu", target_env = "msvc"))'
+legacy_cfg = '#[cfg(not(' + supported + '))]\n'
+direct_cfg = '#[cfg(' + supported + ')]\n'
+
+cli = before[0].decode()
+old_constant = 'const CLI_RUNTIME_STACK_SIZE_BYTES: usize = 8 * 1024 * 1024;'
+assert cli.count(old_constant) == 1
+cli = cli.replace(old_constant, legacy_cfg + old_constant)
+old_cli_start = '''    // The source-order runtime retains large, value-shaped evidence aggregates. Run the CLI on a
+    // consistently sized stack instead of relying on the platform-specific main-thread default.
+    let exit_code = match std::thread::Builder::new()'''
+new_cli_start = '''    // Windows GNU/MSVC reserve the main stack in build.rs; retain the native main thread.
+    ''' + direct_cfg + '''    let exit_code = run(&args);
+    // Other targets retain the existing worker stack and panic propagation.
+    ''' + legacy_cfg + '''    let exit_code = match std::thread::Builder::new()'''
+assert cli.count(old_cli_start) == 1
+cli = cli.replace(old_cli_start, new_cli_start)
+assert cli.replace(new_cli_start, old_cli_start).replace(legacy_cfg + old_constant, old_constant).encode() == before[0]
+
+observer = before[1].decode()
+old_observer_start = '''    // Match the existing CLI worker stack; keep the sink and runtime on one thread.
+    let exit_code = match std::thread::Builder::new()'''
+new_observer_start = '''    // Windows GNU/MSVC reserve the main stack in build.rs; construct the sink on main.
+    ''' + direct_cfg + '''    let exit_code = match run() {
+        Ok(code) => code,
+        Err(error) => {
+            eprintln!("{error}");
+            2
+        }
+    };
+    // Other targets retain the existing worker stack and panic propagation.
+    ''' + legacy_cfg + '''    let exit_code = match std::thread::Builder::new()'''
+assert observer.count(old_observer_start) == 1
+observer = observer.replace(old_observer_start, new_observer_start)
+assert observer.replace(new_observer_start, old_observer_start).encode() == before[1]
+
+build_template = '''//! Reserve the Windows main-thread stack without changing floating-point controls.
+fn main() {
+    println!("cargo::rerun-if-changed=build.rs");
+    let target_os = std::env::var("CARGO_CFG_TARGET_OS").ok();
+    let target_env = std::env::var("CARGO_CFG_TARGET_ENV").ok();
+    let link_arg = match (target_os.as_deref(), target_env.as_deref()) {
+        (Some("windows"), Some("gnu")) => "-Wl,--stack,8388608",
+        (Some("windows"), Some("msvc")) => "/STACK:8388608",
+        _ => return,
+    };
+    println!("DIRECTIVE={link_arg}");
+}
+'''
+proposed = [cli.encode(), observer.encode(),
+            build_template.replace('DIRECTIVE', 'cargo::rustc-link-arg-bin=eplus-rs').encode(),
+            build_template.replace('DIRECTIVE', 'cargo::rustc-link-arg-examples').encode()]
+rows = []
+for name, old, new in zip(names, before, proposed):
+    row = {'canonical_path': name, 'new_destination_absent': not (ROOT / name).exists(),
+           'actual_before': ref(ROOT / name) if (ROOT / name).exists() else None,
+           'before_archive': write(OUT / 'before' / name, old),
+           'proposal': write(OUT / 'proposed' / name, new),
+           'exact_diff': write(OUT / 'diffs' / (name + '.diff'), delta(old, new, name))}
+    rows.append(row)
+
+readme = '''# Held ordinary Windows main-thread entry
+
+This Source-only proposal changes four paths. The actual CLI is `crates/ep_cli/src/main.rs`; the
+ordinary history observer is the existing `ep_run` example. Their current `run` bodies, inputs,
+solver policies, formulas, outputs, process exit codes, and passive TLS sink construction stay exact.
+On Windows GNU/MSVC the existing bodies run on the real main thread. A package-local auto-detected
+`build.rs` reserves 8,388,608 bytes in the PE stack header: GNU compiler-driver `-Wl,--stack,8388608`
+or MSVC `/STACK:8388608`. Neither flag supplies a commit value or disables stack probes/guards.
+The CLI flag targets only `eplus-rs`; Cargo's available examples directive applies to all `ep_run`
+examples. Library/test linker flags and `.cargo/config.toml` remain unchanged. Other targets keep
+the exact existing 8 MiB worker, join, panic-resume, and spawn-error path. Windows panics unwind
+naturally on main; Rust's installed Windows runtime still installs its overflow handler and main
+emergency stack guarantee before main. Thread name/backtrace context necessarily becomes main.
+
+The accepted diagnostic observed main/spawn control and endpoint differences for its own binaries.
+It does not prove historical production controls or causation. This proposal performs no FP-control
+writes and supplies no Native answers. It has not been formatted, built, applied, or executed.
+Before acceptance of behavior, build genuine Cargo artifacts, inspect each emitted PE stack reserve
+and security/commit fields, run the required same-Source quality commands, and rerun the real CLI and
+ordinary observer with unchanged authentic inputs and full output custody. No production PASS or
+gate promotion is claimed. Current and historical Source/proof dependencies are explicitly labeled.
+
+Primary build contract references: [Cargo build scripts](https://doc.rust-lang.org/cargo/reference/build-scripts.html),
+[GNU ld options](https://sourceware.org/binutils/docs/ld/Options.html), and
+[MSVC STACK](https://learn.microsoft.com/en-us/cpp/build/reference/stack-stack-allocations?view=msvc-170).
+Cargo detects package-root build.rs without a manifest edit. Target selection reads Cargo's target
+environment variables, not build-script host cfg; Cargo-provided target variables do not use
+rerun-if-env-changed. This hold adds no dependencies or lock-file changes.
+'''
+readme_ref = write(OUT / 'README.md', readme.encode())
+
+dependencies = []
+for name in ['Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml',
+             'crates/ep_cli/Cargo.toml', 'crates/ep_run/Cargo.toml']:
+    dependencies.append({'role': 'current_build_Source', 'source': ref(ROOT / name)})
+for name in ['bin/rustc.exe', 'bin/cargo.exe', 'lib/rustlib/multirust-config.toml',
+             'lib/rustlib/multirust-channel-manifest.toml']:
+    dependencies.append({'role': 'installed_local_toolchain_identity_not_new_build_execution', 'source': ref(TOOLCHAIN / name)})
+for name in ['wind-pow-isolation-prep-02/manifest.json', 'wind-pow-isolation-prep-03/manifest.json',
+             'wind-pow-isolation-prep-03/rust/src/main.rs', 'wind-pow-Rust-build-02/Cargo-command/receipt.json',
+             'wind-pow-Rust-build-02/frozen-build-inputs.json', 'wind-pow-Rust-build-02/actual-Cargo-artifact-custody.json',
+             'wind-pow-Rust-provider-review-01/inventory.json',
+             'wind-pow-independent-diagnostic-comparison-01/Root-full-ledger-review.json',
+             'wind-pow-independent-diagnostic-comparison-01/comparison.json',
+             'wind-pow-Rust-independent-factual-review-01/review.json',
+             'wind-pow-Native-independent-factual-review-01/review.json']:
+    dependencies.append({'role': 'accepted_historical_diagnostic_or_build_provenance_not_proposed_execution',
+                         'source': ref(ROOT / '.runtime/porting/SRC-05' / name)})
+
+range_specs = [
+    (ROOT / names[0], 148, 208, 'actual CLI worker entry and unchanged dispatch boundary'),
+    (ROOT / names[1], 10, 82, 'actual ordinary run, TLS sink, and worker entry'),
+    (ROOT / '.runtime/porting/SRC-05/wind-pow-isolation-prep-03/rust/src/main.rs', 33, 46, 'read-only diagnostic controls'),
+    (ROOT / '.runtime/porting/SRC-05/wind-pow-isolation-prep-03/rust/src/main.rs', 92, 116, 'actual diagnostic main and spawn lanes'),
+    (TOOLCHAIN / 'lib/rustlib/src/rust/library/std/src/sys/thread/windows.rs', 18, 65, 'actual Windows worker reservation and overflow guarantee'),
+    (TOOLCHAIN / 'lib/rustlib/src/rust/library/std/src/sys/pal/windows/stack_overflow.rs', 1, 41, 'actual main overflow handler and emergency stack guarantee'),
+    (TOOLCHAIN / 'lib/rustlib/src/rust/library/std/src/sys/pal/windows/mod.rs', 46, 59, 'actual std Windows initialization calls overflow setup'),
+    (TOOLCHAIN / 'lib/rustlib/src/rust/library/std/src/rt.rs', 90, 122, 'runtime initialization before main'),
+]
+ranges = []
+for index, (path, start, end, purpose) in enumerate(range_specs):
+    lines = path.read_bytes().splitlines(True)
+    assert 1 <= start <= end <= len(lines)
+    data = b''.join(lines[start - 1:end])
+    ranges.append({'source': ref(path), 'start_line': start, 'end_line': end,
+                   'sha256': hashlib.sha256(data).hexdigest(), 'size_bytes': len(data),
+                   'literal_archive': write(OUT / 'Source-ranges' / f'{index + 1:02d}.txt', data), 'purpose': purpose})
+
+ast.parse(Path(__file__).read_text())
+manifest = {'schema': 'src05-ordinary-main-thread-source-preparation.v1', 'status': 'HELD_SOURCE_ONLY',
+            'application': rows, 'own_sources': [row['proposal'] for row in rows] + [readme_ref, ref(__file__)],
+            'source_dependencies': dependencies, 'Source_ranges': ranges,
+            'current_Source_snapshot_context': ref(ROOT / '.runtime/porting/source-objects/8a/8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934'),
+            'runtime_contract': {'supported_direct_main_targets': ['windows-gnu', 'windows-msvc'],
+                                 'main_stack_reserve_bytes': 8388608, 'stack_commit_override': None,
+                                 'other_targets_keep_existing_worker': True, 'run_bodies_byte_unchanged': True,
+                                 'floating_point_controls_written': False, 'canonical_mutated': False,
+                                 'new_build_or_target_execution': False, 'historical_cause_claimed': False,
+                                 'production_PASS_claimed': False, 'gates_updated': False,
+                                 'actual_PE_and_quality_and_CLI_and_observer_rerun_required': True},
+            'external_primary_documentation': [
+                {'url': 'https://doc.rust-lang.org/cargo/reference/build-scripts.html', 'scope': 'autodetection, target variables, named-bin and examples linker directives'},
+                {'url': 'https://sourceware.org/binutils/docs/ld/Options.html', 'scope': 'compiler driver -Wl and PE --stack reserve bytes'},
+                {'url': 'https://learn.microsoft.com/en-us/cpp/build/reference/stack-stack-allocations?view=msvc-170', 'scope': 'MSVC /STACK reserve bytes with commit omitted'}]}
+write(OUT / 'manifest.json', (json.dumps(manifest, indent=2) + '\n').encode())
+assert all((ROOT / p).read_bytes() == old for p, old in zip(names[:2], before[:2]))
+assert all(not (ROOT / p).exists() for p in names[2:])
+print(json.dumps(ref(OUT / 'manifest.json')))

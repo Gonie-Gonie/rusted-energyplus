@@ -1,0 +1,18 @@
+{
+  "schema": "src05-publication-bounded-selection-read-only-check.v1",
+  "preparation": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-publication-prep-04/manifest.json",
+    "sha256": "2351bb1e90018001e56ca569a7a97edb75131cf31d699bd13a74d9dc79a93d3d",
+    "size_bytes": 33001
+  },
+  "selected_count": 548,
+  "parsed_JSON_count": 121,
+  "verified_count": 4487,
+  "findings": [],
+  "exact_declared_opaque_JSON_boundary_count": 26,
+  "provisional_boundaries_supplied": false,
+  "publisher_main_executed": false,
+  "store_executed": false,
+  "target_executed": false,
+  "canonical_mutations_performed": false
+}

@@ -1,0 +1,25 @@
+fn run() -> Result<()> {
+    let args: Vec<String> = std::env::args().collect();
+    require(args.len() == 3, "usage: src05_wind_pow_probe <input-only.json> <actual SHA256>")?;
+    let bytes = std::fs::read(&args[1]).map_err(|v| v.to_string())?;
+    require(digest::sha256(&bytes) == args[2], "full input SHA differs")?;
+    let request: Value = serde_json::from_slice(&bytes).map_err(|v| v.to_string())?;
+    keys(&request, &["schema","expected_values_supplied","diagnostic_only","cases"])?;
+    require(request["schema"] == "src05-wind-pow-diagnostic-request.v1" && request["expected_values_supplied"] == false && request["diagnostic_only"] == true, "unadmitted request")?;
+    let cases = request["cases"].as_array().ok_or("ordered cases required")?;
+    require(!cases.is_empty(), "literal cases required")?;
+    let mut ids = BTreeSet::new();
+    for row in cases { require(ids.insert(row["case_id"].as_str().ok_or("case ID required")?), "duplicate case ID")?; }
+    let main_lane = lane(&request, "main_thread")?;
+    let worker_request = request.clone();
+    let worker_lane = std::thread::spawn(move || lane(&worker_request, "std_thread_spawn"))
+        .join().map_err(|_| "worker panicked".to_owned())??;
+    println!("{}", json!({"schema":"src05-wind-pow-diagnostic-results.v1","implementation":"Rust",
+        "actual_input_SHA256":args[2],"lanes":[main_lane,worker_lane],"expected_values_supplied":false,
+        "floating_point_controls_written":false,"historical_execution_controls_observed":false,
+        "scientific_PASS_claimed":false,"production_math_changed":false,"gates_updated":false}));
+    Ok(())
+}
+fn main() {
+    if let Err(error) = run() { eprintln!("{error}"); std::process::exit(2); }
+}

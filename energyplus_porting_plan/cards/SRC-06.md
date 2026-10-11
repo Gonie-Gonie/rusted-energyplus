@@ -111,3 +111,37 @@ Actual Rust Source 8aa752f4 has 3,929 members; 3,926 unrelated members remain by
 The implementation removes the former EPS-zero branch, upper clamp and nonfinite floor from these selected equations, and reads the actual stored cosine. Production integration remains incomplete: InitIntConvCoeff first-call setup/ordered zone-space traversal, retained space MAT and balance reference air, initial/refresh temperature-array distinction, positive completed-iteration cadence30 after radiation, and immediate surface-term updates require the next caller unit. Kiva/windows/EMS and the full ordinary handoff remain outside this selected proof. All four full-card gates, A 14/54 and B 14/64 remain unchanged.
 
 Evidence: [complete selected TARP comparison, application and quality](../evidence/SRC-06-tarp-inside-selected/summary.json).
+
+## Next bounded caller/setup contract (before Rust application)
+
+The next unit covers the actual no-user first call of InitIntConvCoeff141–391,
+GetUserConvCoeffs733–1672, unconditional static setup2800–3099 and inactive
+radiant readiness3101–3149, with genuine ScanForReports1130–1469 and roof
+geometry15576–15686. It admits only explicit six-family zero input counts,
+opaque TARP surfaces, exact complete zone/space/surface associations, positive
+literal static geometry and actual readiness flags. Missing/unsupported owners
+stop explicitly. Source normalization's computed zero roof-edge length is also
+unavailable, including underflow from distinct finite endpoints.
+
+Persistent owners retain separate space MAT/ZT/ZTAV, true constructor/setup
+flags, actual zero user-family allocation state, Int/Ext geometry and unchanged
+classification/reference-air fields. The caller borrows a complete named
+SurfTempInTmp or SurfTempIn array, reads MAT once per actual ordered space and
+reuses Detailed plus the caller's second strict lower-limit check. The selected
+space reset/correction-copy methods are explicit; ZTAV is not overwritten by
+the selected disabled-space correction copy. Details/advanced geometry EIO
+stops after the genuine static/Scan prefix; backend failures retain their cause.
+
+Before applying Rust, the unchanged Native helper must actually process the
+frozen physical no-user IDF and capture first/repeat/environment/readiness,
+reverse-space-order, signed-zero, zero/small delta, empty-HT and explicit/default
+TARP cases. Source, input, core, linked providers, full output and all owners
+must be authenticated before pairing. Finite coefficient endpoints require
+exact binary64 equality; generated nonfinite fields remain diagnostic/unavailable.
+Static/Scan/backend observations follow a separately frozen prospective scope.
+No inner Native callback trace or ordinary geometry/MAT producer is inferred.
+
+This unit does not activate the ordinary surface manager. Actual geometry/raw
+input binding, independent temperature-array production, reset/correction hooks,
+post-radiation completed-iteration cadence30, immediate balance-term refresh and
+ordinary handoff remain required. No new full-card or A/B gate is complete.

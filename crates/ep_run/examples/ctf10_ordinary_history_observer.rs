@@ -58,7 +58,17 @@ fn run() -> Result<i32, Box<dyn Error>> {
     Ok(code)
 }
 fn main() {
-    // Match the existing CLI worker stack; keep the sink and runtime on one thread.
+    // Windows GNU/MSVC reserve the main stack in build.rs; construct the sink on main.
+    #[cfg(all(target_os = "windows", any(target_env = "gnu", target_env = "msvc")))]
+    let exit_code = match run() {
+        Ok(code) => code,
+        Err(error) => {
+            eprintln!("{error}");
+            2
+        }
+    };
+    // Other targets retain the existing worker stack and panic propagation.
+    #[cfg(not(all(target_os = "windows", any(target_env = "gnu", target_env = "msvc"))))]
     let exit_code = match std::thread::Builder::new()
         .name("ctf10-ordinary-history-observer".to_string())
         .stack_size(8 * 1024 * 1024)

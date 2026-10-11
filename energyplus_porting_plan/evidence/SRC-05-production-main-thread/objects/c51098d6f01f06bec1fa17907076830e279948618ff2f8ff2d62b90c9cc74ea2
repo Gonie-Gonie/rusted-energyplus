@@ -1,0 +1,170 @@
+
+D:/CodexBuild/rusted-energyplus/SRC-05/wind-pow-native-build-02/bin/src05_wind_pow_helper.exe:     file format pei-x86-64
+
+
+Disassembly of section .text:
+
+000000014001ae13 <EnergyPlus::DataSurfaces::SetSurfaceWindSpeedAt(EnergyPlus::EnergyPlusData&)>:
+   14001ae13:	55                   	push   %rbp
+   14001ae14:	48 83 ec 60          	sub    $0x60,%rsp
+   14001ae18:	48 8d 6c 24 40       	lea    0x40(%rsp),%rbp
+   14001ae1d:	0f 29 75 00          	movaps %xmm6,0x0(%rbp)
+   14001ae21:	0f 29 7d 10          	movaps %xmm7,0x10(%rbp)
+   14001ae25:	48 89 4d 30          	mov    %rcx,0x30(%rbp)
+   14001ae29:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001ae2d:	48 05 e8 0f 00 00    	add    $0xfe8,%rax
+   14001ae33:	48 89 c1             	mov    %rax,%rcx
+   14001ae36:	e8 55 04 03 02       	call   14204b290 <std::unique_ptr<EnergyPlus::EnvironmentData, std::default_delete<EnergyPlus::EnvironmentData> >::operator->() const>
+   14001ae3b:	f2 0f 10 b0 80 01 00 	movsd  0x180(%rax),%xmm6
+   14001ae42:	00 
+   14001ae43:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001ae47:	48 05 e8 0f 00 00    	add    $0xfe8,%rax
+   14001ae4d:	48 89 c1             	mov    %rax,%rcx
+   14001ae50:	e8 3b 04 03 02       	call   14204b290 <std::unique_ptr<EnergyPlus::EnvironmentData, std::default_delete<EnergyPlus::EnvironmentData> >::operator->() const>
+   14001ae55:	f2 0f 10 80 28 03 00 	movsd  0x328(%rax),%xmm0
+   14001ae5c:	00 
+   14001ae5d:	f2 0f 59 f0          	mulsd  %xmm0,%xmm6
+   14001ae61:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001ae65:	48 05 e8 0f 00 00    	add    $0xfe8,%rax
+   14001ae6b:	48 89 c1             	mov    %rax,%rcx
+   14001ae6e:	e8 1d 04 03 02       	call   14204b290 <std::unique_ptr<EnergyPlus::EnvironmentData, std::default_delete<EnergyPlus::EnvironmentData> >::operator->() const>
+   14001ae73:	f2 0f 10 80 38 03 00 	movsd  0x338(%rax),%xmm0
+   14001ae7a:	00 
+   14001ae7b:	f3 0f 7e 0d 1d d9 54 	movq   0x254d91d(%rip),%xmm1        # 1425687a0 <std::__detail::__destructible_impl<__gnu_cxx::__normal_iterator<double*, std::vector<double, std::allocator<double> > > >+0x94>
+   14001ae82:	02 
+   14001ae83:	66 0f 28 f8          	movapd %xmm0,%xmm7
+   14001ae87:	66 0f 57 f9          	xorpd  %xmm1,%xmm7
+   14001ae8b:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001ae8f:	48 05 e8 0f 00 00    	add    $0xfe8,%rax
+   14001ae95:	48 89 c1             	mov    %rax,%rcx
+   14001ae98:	e8 f3 03 03 02       	call   14204b290 <std::unique_ptr<EnergyPlus::EnvironmentData, std::default_delete<EnergyPlus::EnvironmentData> >::operator->() const>
+   14001ae9d:	48 8b 80 40 03 00 00 	mov    0x340(%rax),%rax
+   14001aea4:	66 0f 28 cf          	movapd %xmm7,%xmm1
+   14001aea8:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   14001aead:	e8 84 df a9 01       	call   141ab8e36 <pow>
+   14001aeb2:	f2 0f 59 c6          	mulsd  %xmm6,%xmm0
+   14001aeb6:	f2 0f 11 45 f0       	movsd  %xmm0,-0x10(%rbp)
+   14001aebb:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001aebf:	48 05 e8 0f 00 00    	add    $0xfe8,%rax
+   14001aec5:	48 89 c1             	mov    %rax,%rcx
+   14001aec8:	e8 c3 03 03 02       	call   14204b290 <std::unique_ptr<EnergyPlus::EnvironmentData, std::default_delete<EnergyPlus::EnvironmentData> >::operator->() const>
+   14001aecd:	f2 0f 10 80 38 03 00 	movsd  0x338(%rax),%xmm0
+   14001aed4:	00 
+   14001aed5:	66 0f ef c9          	pxor   %xmm1,%xmm1
+   14001aed9:	66 0f 2e c1          	ucomisd %xmm1,%xmm0
+   14001aedd:	0f 9b c0             	setnp  %al
+   14001aee0:	ba 00 00 00 00       	mov    $0x0,%edx
+   14001aee5:	66 0f ef c9          	pxor   %xmm1,%xmm1
+   14001aee9:	66 0f 2e c1          	ucomisd %xmm1,%xmm0
+   14001aeed:	0f 45 c2             	cmovne %edx,%eax
+   14001aef0:	84 c0                	test   %al,%al
+   14001aef2:	74 72                	je     14001af66 <EnergyPlus::DataSurfaces::SetSurfaceWindSpeedAt(EnergyPlus::EnergyPlusData&)+0x153>
+   14001aef4:	c7 45 fc 01 00 00 00 	movl   $0x1,-0x4(%rbp)
+   14001aefb:	eb 45                	jmp    14001af42 <EnergyPlus::DataSurfaces::SetSurfaceWindSpeedAt(EnergyPlus::EnergyPlusData&)+0x12f>
+   14001aefd:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001af01:	48 05 e8 0f 00 00    	add    $0xfe8,%rax
+   14001af07:	48 89 c1             	mov    %rax,%rcx
+   14001af0a:	e8 81 03 03 02       	call   14204b290 <std::unique_ptr<EnergyPlus::EnvironmentData, std::default_delete<EnergyPlus::EnvironmentData> >::operator->() const>
+   14001af0f:	f2 0f 10 b0 80 01 00 	movsd  0x180(%rax),%xmm6
+   14001af16:	00 
+   14001af17:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001af1b:	48 05 58 14 00 00    	add    $0x1458,%rax
+   14001af21:	48 89 c1             	mov    %rax,%rcx
+   14001af24:	e8 87 fa 02 02       	call   14204a9b0 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   14001af29:	48 8d 88 38 05 00 00 	lea    0x538(%rax),%rcx
+   14001af30:	8b 45 fc             	mov    -0x4(%rbp),%eax
+   14001af33:	89 c2                	mov    %eax,%edx
+   14001af35:	e8 e6 e5 ed 01       	call   141ef9520 <ObjexxFCL::Array1<double>::operator()(int)>
+   14001af3a:	f2 0f 11 30          	movsd  %xmm6,(%rax)
+   14001af3e:	83 45 fc 01          	addl   $0x1,-0x4(%rbp)
+   14001af42:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001af46:	48 05 58 14 00 00    	add    $0x1458,%rax
+   14001af4c:	48 89 c1             	mov    %rax,%rcx
+   14001af4f:	e8 5c fa 02 02       	call   14204a9b0 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   14001af54:	8b 40 08             	mov    0x8(%rax),%eax
+   14001af57:	39 45 fc             	cmp    %eax,-0x4(%rbp)
+   14001af5a:	0f 9e c0             	setle  %al
+   14001af5d:	84 c0                	test   %al,%al
+   14001af5f:	75 9c                	jne    14001aefd <EnergyPlus::DataSurfaces::SetSurfaceWindSpeedAt(EnergyPlus::EnergyPlusData&)+0xea>
+   14001af61:	e9 3b 01 00 00       	jmp    14001b0a1 <EnergyPlus::DataSurfaces::SetSurfaceWindSpeedAt(EnergyPlus::EnergyPlusData&)+0x28e>
+   14001af66:	c7 45 f8 01 00 00 00 	movl   $0x1,-0x8(%rbp)
+   14001af6d:	e9 0c 01 00 00       	jmp    14001b07e <EnergyPlus::DataSurfaces::SetSurfaceWindSpeedAt(EnergyPlus::EnergyPlusData&)+0x26b>
+   14001af72:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001af76:	48 05 58 14 00 00    	add    $0x1458,%rax
+   14001af7c:	48 89 c1             	mov    %rax,%rcx
+   14001af7f:	e8 2c fa 02 02       	call   14204a9b0 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   14001af84:	48 8d 88 68 4a 00 00 	lea    0x4a68(%rax),%rcx
+   14001af8b:	8b 45 f8             	mov    -0x8(%rbp),%eax
+   14001af8e:	48 98                	cltq
+   14001af90:	48 89 c2             	mov    %rax,%rdx
+   14001af93:	e8 88 40 c4 01       	call   141c5f020 <EnergyPlus::EPVector<EnergyPlus::DataSurfaces::SurfaceData>::operator()(unsigned long long)>
+   14001af98:	0f b6 80 e5 03 00 00 	movzbl 0x3e5(%rax),%eax
+   14001af9f:	83 f0 01             	xor    $0x1,%eax
+   14001afa2:	84 c0                	test   %al,%al
+   14001afa4:	0f 85 cf 00 00 00    	jne    14001b079 <EnergyPlus::DataSurfaces::SetSurfaceWindSpeedAt(EnergyPlus::EnergyPlusData&)+0x266>
+   14001afaa:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001afae:	48 05 58 14 00 00    	add    $0x1458,%rax
+   14001afb4:	48 89 c1             	mov    %rax,%rcx
+   14001afb7:	e8 f4 f9 02 02       	call   14204a9b0 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   14001afbc:	48 8d 88 68 4a 00 00 	lea    0x4a68(%rax),%rcx
+   14001afc3:	8b 45 f8             	mov    -0x8(%rbp),%eax
+   14001afc6:	48 98                	cltq
+   14001afc8:	48 89 c2             	mov    %rax,%rdx
+   14001afcb:	e8 50 40 c4 01       	call   141c5f020 <EnergyPlus::EPVector<EnergyPlus::DataSurfaces::SurfaceData>::operator()(unsigned long long)>
+   14001afd0:	f2 0f 10 80 80 02 00 	movsd  0x280(%rax),%xmm0
+   14001afd7:	00 
+   14001afd8:	f2 0f 11 45 e8       	movsd  %xmm0,-0x18(%rbp)
+   14001afdd:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   14001afe1:	66 0f 2f 45 e8       	comisd -0x18(%rbp),%xmm0
+   14001afe6:	72 2d                	jb     14001b015 <EnergyPlus::DataSurfaces::SetSurfaceWindSpeedAt(EnergyPlus::EnergyPlusData&)+0x202>
+   14001afe8:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001afec:	48 05 58 14 00 00    	add    $0x1458,%rax
+   14001aff2:	48 89 c1             	mov    %rax,%rcx
+   14001aff5:	e8 b6 f9 02 02       	call   14204a9b0 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   14001affa:	48 8d 88 38 05 00 00 	lea    0x538(%rax),%rcx
+   14001b001:	8b 45 f8             	mov    -0x8(%rbp),%eax
+   14001b004:	89 c2                	mov    %eax,%edx
+   14001b006:	e8 15 e5 ed 01       	call   141ef9520 <ObjexxFCL::Array1<double>::operator()(int)>
+   14001b00b:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   14001b00f:	f2 0f 11 00          	movsd  %xmm0,(%rax)
+   14001b013:	eb 65                	jmp    14001b07a <EnergyPlus::DataSurfaces::SetSurfaceWindSpeedAt(EnergyPlus::EnergyPlusData&)+0x267>
+   14001b015:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001b019:	48 05 e8 0f 00 00    	add    $0xfe8,%rax
+   14001b01f:	48 89 c1             	mov    %rax,%rcx
+   14001b022:	e8 69 02 03 02       	call   14204b290 <std::unique_ptr<EnergyPlus::EnvironmentData, std::default_delete<EnergyPlus::EnvironmentData> >::operator->() const>
+   14001b027:	f2 0f 10 80 38 03 00 	movsd  0x338(%rax),%xmm0
+   14001b02e:	00 
+   14001b02f:	48 8b 45 e8          	mov    -0x18(%rbp),%rax
+   14001b033:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   14001b037:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   14001b03c:	e8 f5 dd a9 01       	call   141ab8e36 <pow>
+   14001b041:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   14001b046:	66 48 0f 6e f0       	movq   %rax,%xmm6
+   14001b04b:	f2 0f 59 75 f0       	mulsd  -0x10(%rbp),%xmm6
+   14001b050:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001b054:	48 05 58 14 00 00    	add    $0x1458,%rax
+   14001b05a:	48 89 c1             	mov    %rax,%rcx
+   14001b05d:	e8 4e f9 02 02       	call   14204a9b0 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   14001b062:	48 8d 88 38 05 00 00 	lea    0x538(%rax),%rcx
+   14001b069:	8b 45 f8             	mov    -0x8(%rbp),%eax
+   14001b06c:	89 c2                	mov    %eax,%edx
+   14001b06e:	e8 ad e4 ed 01       	call   141ef9520 <ObjexxFCL::Array1<double>::operator()(int)>
+   14001b073:	f2 0f 11 30          	movsd  %xmm6,(%rax)
+   14001b077:	eb 01                	jmp    14001b07a <EnergyPlus::DataSurfaces::SetSurfaceWindSpeedAt(EnergyPlus::EnergyPlusData&)+0x267>
+   14001b079:	90                   	nop
+   14001b07a:	83 45 f8 01          	addl   $0x1,-0x8(%rbp)
+   14001b07e:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14001b082:	48 05 58 14 00 00    	add    $0x1458,%rax
+   14001b088:	48 89 c1             	mov    %rax,%rcx
+   14001b08b:	e8 20 f9 02 02       	call   14204a9b0 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   14001b090:	8b 40 08             	mov    0x8(%rax),%eax
+   14001b093:	39 45 f8             	cmp    %eax,-0x8(%rbp)
+   14001b096:	0f 9e c0             	setle  %al
+   14001b099:	84 c0                	test   %al,%al
+   14001b09b:	0f 85 d1 fe ff ff    	jne    14001af72 <EnergyPlus::DataSurfaces::SetSurfaceWindSpeedAt(EnergyPlus::EnergyPlusData&)+0x15f>
+   14001b0a1:	90                   	nop
+   14001b0a2:	0f 28 75 00          	movaps 0x0(%rbp),%xmm6
+   14001b0a6:	0f 28 7d 10          	movaps 0x10(%rbp),%xmm7
+   14001b0aa:	48 83 c4 60          	add    $0x60,%rsp
+   14001b0ae:	5d                   	pop    %rbp
+   14001b0af:	c3                   	ret

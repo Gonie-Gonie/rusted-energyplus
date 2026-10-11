@@ -1,0 +1,1275 @@
+
+D:\CodexBuild\rusted-energyplus\SRC-06\native-dispatcher-build-01\bin\src06_tarp_dispatcher_helper.exe:     file format pei-x86-64
+
+
+Disassembly of section .text:
+
+000000014002281c <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)>:
+   14002281c:	55                   	push   %rbp
+   14002281d:	41 57                	push   %r15
+   14002281f:	41 56                	push   %r14
+   140022821:	41 55                	push   %r13
+   140022823:	41 54                	push   %r12
+   140022825:	57                   	push   %rdi
+   140022826:	56                   	push   %rsi
+   140022827:	53                   	push   %rbx
+   140022828:	48 81 ec 98 06 00 00 	sub    $0x698,%rsp
+   14002282f:	48 8d ac 24 80 00 00 00 	lea    0x80(%rsp),%rbp
+   140022837:	0f 29 b5 00 06 00 00 	movaps %xmm6,0x600(%rbp)
+   14002283e:	48 89 8d 60 06 00 00 	mov    %rcx,0x660(%rbp)
+   140022845:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   140022849:	f2 0f 11 85 f0 05 00 00 	movsd  %xmm0,0x5f0(%rbp)
+   140022851:	c7 85 ec 05 00 00 01 00 00 00 	movl   $0x1,0x5ec(%rbp)
+   14002285b:	e9 36 08 00 00       	jmp    140023096 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x87a>
+   140022860:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140022867:	48 05 48 11 00 00    	add    $0x1148,%rax
+   14002286d:	48 89 c1             	mov    %rax,%rcx
+   140022870:	e8 3b 85 05 02       	call   14207adb0 <std::unique_ptr<EnergyPlus::HeatBalanceData, std::default_delete<EnergyPlus::HeatBalanceData> >::operator->() const>
+   140022875:	48 8d 88 88 22 00 00 	lea    0x2288(%rax),%rcx
+   14002287c:	8b 85 ec 05 00 00    	mov    0x5ec(%rbp),%eax
+   140022882:	48 98                	cltq
+   140022884:	48 89 c2             	mov    %rax,%rdx
+   140022887:	e8 94 9a c5 01       	call   141c7c320 <EnergyPlus::EPVector<EnergyPlus::DataHeatBalance::ZoneData>::operator()(unsigned long long)>
+   14002288c:	48 89 85 98 04 00 00 	mov    %rax,0x498(%rbp)
+   140022893:	48 8b 85 98 04 00 00 	mov    0x498(%rbp),%rax
+   14002289a:	f2 0f 10 48 28       	movsd  0x28(%rax),%xmm1
+   14002289f:	48 8b 85 98 04 00 00 	mov    0x498(%rbp),%rax
+   1400228a6:	8b 40 64             	mov    0x64(%rax),%eax
+   1400228a9:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   1400228ad:	f2 0f 2a c0          	cvtsi2sd %eax,%xmm0
+   1400228b1:	f2 0f 59 c8          	mulsd  %xmm0,%xmm1
+   1400228b5:	48 8b 85 98 04 00 00 	mov    0x498(%rbp),%rax
+   1400228bc:	8b 40 68             	mov    0x68(%rax),%eax
+   1400228bf:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   1400228c3:	f2 0f 2a c0          	cvtsi2sd %eax,%xmm0
+   1400228c7:	f2 0f 59 c1          	mulsd  %xmm1,%xmm0
+   1400228cb:	f2 0f 10 8d f0 05 00 00 	movsd  0x5f0(%rbp),%xmm1
+   1400228d3:	f2 0f 58 c1          	addsd  %xmm1,%xmm0
+   1400228d7:	f2 0f 11 85 f0 05 00 00 	movsd  %xmm0,0x5f0(%rbp)
+   1400228df:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   1400228e3:	f2 0f 11 85 e0 05 00 00 	movsd  %xmm0,0x5e0(%rbp)
+   1400228eb:	c7 85 dc 05 00 00 00 00 00 00 	movl   $0x0,0x5dc(%rbp)
+   1400228f5:	c7 85 d8 05 00 00 00 00 00 00 	movl   $0x0,0x5d8(%rbp)
+   1400228ff:	48 8b 85 98 04 00 00 	mov    0x498(%rbp),%rax
+   140022906:	f2 0f 10 80 80 01 00 00 	movsd  0x180(%rax),%xmm0
+   14002290e:	48 8b 85 98 04 00 00 	mov    0x498(%rbp),%rax
+   140022915:	f2 0f 10 88 78 01 00 00 	movsd  0x178(%rax),%xmm1
+   14002291d:	f2 0f 5c c1          	subsd  %xmm1,%xmm0
+   140022921:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   140022925:	f2 0f 58 c8          	addsd  %xmm0,%xmm1
+   140022929:	48 8b 85 98 04 00 00 	mov    0x498(%rbp),%rax
+   140022930:	f2 0f 10 80 70 01 00 00 	movsd  0x170(%rax),%xmm0
+   140022938:	48 8b 85 98 04 00 00 	mov    0x498(%rbp),%rax
+   14002293f:	f2 0f 10 90 68 01 00 00 	movsd  0x168(%rax),%xmm2
+   140022947:	f2 0f 5c c2          	subsd  %xmm2,%xmm0
+   14002294b:	f2 0f 58 c0          	addsd  %xmm0,%xmm0
+   14002294f:	f2 0f 58 c1          	addsd  %xmm1,%xmm0
+   140022953:	f2 0f 11 85 90 04 00 00 	movsd  %xmm0,0x490(%rbp)
+   14002295b:	f2 0f 10 85 90 04 00 00 	movsd  0x490(%rbp),%xmm0
+   140022963:	66 0f ef c9          	pxor   %xmm1,%xmm1
+   140022967:	66 0f 2f c1          	comisd %xmm1,%xmm0
+   14002296b:	76 2a                	jbe    140022997 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x17b>
+   14002296d:	48 8b 85 98 04 00 00 	mov    0x498(%rbp),%rax
+   140022974:	f2 0f 10 48 50       	movsd  0x50(%rax),%xmm1
+   140022979:	f2 0f 10 05 27 c6 56 02 	movsd  0x256c627(%rip),%xmm0        # 14258efa8 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper>::desc+0x370>
+   140022981:	f2 0f 59 c1          	mulsd  %xmm1,%xmm0
+   140022985:	f2 0f 5e 85 90 04 00 00 	divsd  0x490(%rbp),%xmm0
+   14002298d:	f2 0f 11 85 f8 05 00 00 	movsd  %xmm0,0x5f8(%rbp)
+   140022995:	eb 37                	jmp    1400229ce <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x1b2>
+   140022997:	48 8b 85 98 04 00 00 	mov    0x498(%rbp),%rax
+   14002299e:	f2 0f 10 40 50       	movsd  0x50(%rax),%xmm0
+   1400229a3:	66 0f ef c9          	pxor   %xmm1,%xmm1
+   1400229a7:	66 0f 2f c1          	comisd %xmm1,%xmm0
+   1400229ab:	76 21                	jbe    1400229ce <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x1b2>
+   1400229ad:	48 8b 85 98 04 00 00 	mov    0x498(%rbp),%rax
+   1400229b4:	48 8b 40 50          	mov    0x50(%rax),%rax
+   1400229b8:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   1400229bd:	e8 fe 93 a9 01       	call   141abbdc0 <sqrt>
+   1400229c2:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   1400229c7:	48 89 85 f8 05 00 00 	mov    %rax,0x5f8(%rbp)
+   1400229ce:	48 8b 85 98 04 00 00 	mov    0x498(%rbp),%rax
+   1400229d5:	f2 0f 10 40 30       	movsd  0x30(%rax),%xmm0
+   1400229da:	66 0f ef c9          	pxor   %xmm1,%xmm1
+   1400229de:	66 0f 2f c1          	comisd %xmm1,%xmm0
+   1400229e2:	76 21                	jbe    140022a05 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x1e9>
+   1400229e4:	48 8b 85 98 04 00 00 	mov    0x498(%rbp),%rax
+   1400229eb:	f2 0f 10 80 c8 00 00 00 	movsd  0xc8(%rax),%xmm0
+   1400229f3:	48 8b 85 98 04 00 00 	mov    0x498(%rbp),%rax
+   1400229fa:	f2 0f 10 48 30       	movsd  0x30(%rax),%xmm1
+   1400229ff:	f2 0f 5e c1          	divsd  %xmm1,%xmm0
+   140022a03:	eb 08                	jmp    140022a0d <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x1f1>
+   140022a05:	f2 0f 10 05 a3 c5 56 02 	movsd  0x256c5a3(%rip),%xmm0        # 14258efb0 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper>::desc+0x378>
+   140022a0d:	f2 0f 11 85 88 04 00 00 	movsd  %xmm0,0x488(%rbp)
+   140022a15:	48 8b 85 98 04 00 00 	mov    0x498(%rbp),%rax
+   140022a1c:	48 05 a8 03 00 00    	add    $0x3a8,%rax
+   140022a22:	48 89 85 80 04 00 00 	mov    %rax,0x480(%rbp)
+   140022a29:	48 8b 85 80 04 00 00 	mov    0x480(%rbp),%rax
+   140022a30:	48 89 c1             	mov    %rax,%rcx
+   140022a33:	e8 28 ba 0a 02       	call   1420ce460 <std::vector<int, std::allocator<int> >::begin() const>
+   140022a38:	48 89 45 78          	mov    %rax,0x78(%rbp)
+   140022a3c:	48 8b 85 80 04 00 00 	mov    0x480(%rbp),%rax
+   140022a43:	48 89 c1             	mov    %rax,%rcx
+   140022a46:	e8 85 b9 0a 02       	call   1420ce3d0 <std::vector<int, std::allocator<int> >::end() const>
+   140022a4b:	48 89 45 70          	mov    %rax,0x70(%rbp)
+   140022a4f:	e9 32 01 00 00       	jmp    140022b86 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x36a>
+   140022a54:	48 8d 45 78          	lea    0x78(%rbp),%rax
+   140022a58:	48 89 c1             	mov    %rax,%rcx
+   140022a5b:	e8 e0 81 04 02       	call   14206ac40 <__gnu_cxx::__normal_iterator<int const*, std::vector<int, std::allocator<int> > >::operator*() const>
+   140022a60:	8b 00                	mov    (%rax),%eax
+   140022a62:	89 85 24 04 00 00    	mov    %eax,0x424(%rbp)
+   140022a68:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140022a6f:	48 05 48 11 00 00    	add    $0x1148,%rax
+   140022a75:	48 89 c1             	mov    %rax,%rcx
+   140022a78:	e8 33 83 05 02       	call   14207adb0 <std::unique_ptr<EnergyPlus::HeatBalanceData, std::default_delete<EnergyPlus::HeatBalanceData> >::operator->() const>
+   140022a7d:	48 8d 88 48 22 00 00 	lea    0x2248(%rax),%rcx
+   140022a84:	8b 85 24 04 00 00    	mov    0x424(%rbp),%eax
+   140022a8a:	48 98                	cltq
+   140022a8c:	48 89 c2             	mov    %rax,%rdx
+   140022a8f:	e8 2c 9b c5 01       	call   141c7c5c0 <EnergyPlus::EPVector<EnergyPlus::DataHeatBalance::SpaceData>::operator()(unsigned long long)>
+   140022a94:	48 89 85 18 04 00 00 	mov    %rax,0x418(%rbp)
+   140022a9b:	48 8b 85 18 04 00 00 	mov    0x418(%rbp),%rax
+   140022aa2:	8b 80 40 01 00 00    	mov    0x140(%rax),%eax
+   140022aa8:	89 85 d4 05 00 00    	mov    %eax,0x5d4(%rbp)
+   140022aae:	e9 ae 00 00 00       	jmp    140022b61 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x345>
+   140022ab3:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140022aba:	48 05 58 14 00 00    	add    $0x1458,%rax
+   140022ac0:	48 89 c1             	mov    %rax,%rcx
+   140022ac3:	e8 78 78 05 02       	call   14207a340 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   140022ac8:	48 8d 88 68 4a 00 00 	lea    0x4a68(%rax),%rcx
+   140022acf:	8b 85 d4 05 00 00    	mov    0x5d4(%rbp),%eax
+   140022ad5:	48 98                	cltq
+   140022ad7:	48 89 c2             	mov    %rax,%rdx
+   140022ada:	e8 91 18 c5 01       	call   141c74370 <EnergyPlus::EPVector<EnergyPlus::DataSurfaces::SurfaceData>::operator()(unsigned long long)>
+   140022adf:	48 89 85 10 04 00 00 	mov    %rax,0x410(%rbp)
+   140022ae6:	48 8b 85 10 04 00 00 	mov    0x410(%rbp),%rax
+   140022aed:	8b 80 e0 03 00 00    	mov    0x3e0(%rax),%eax
+   140022af3:	85 c0                	test   %eax,%eax
+   140022af5:	75 62                	jne    140022b59 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x33d>
+   140022af7:	48 8b 85 10 04 00 00 	mov    0x410(%rbp),%rax
+   140022afe:	8b 40 44             	mov    0x44(%rax),%eax
+   140022b01:	83 f8 01             	cmp    $0x1,%eax
+   140022b04:	75 2c                	jne    140022b32 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x316>
+   140022b06:	48 8b 85 10 04 00 00 	mov    0x410(%rbp),%rax
+   140022b0d:	f2 0f 10 80 98 00 00 00 	movsd  0x98(%rax),%xmm0
+   140022b15:	f2 0f 10 8d e0 05 00 00 	movsd  0x5e0(%rbp),%xmm1
+   140022b1d:	f2 0f 58 c1          	addsd  %xmm1,%xmm0
+   140022b21:	f2 0f 11 85 e0 05 00 00 	movsd  %xmm0,0x5e0(%rbp)
+   140022b29:	83 85 dc 05 00 00 01 	addl   $0x1,0x5dc(%rbp)
+   140022b30:	eb 28                	jmp    140022b5a <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x33e>
+   140022b32:	48 8b 85 10 04 00 00 	mov    0x410(%rbp),%rax
+   140022b39:	8b 40 44             	mov    0x44(%rax),%eax
+   140022b3c:	83 f8 07             	cmp    $0x7,%eax
+   140022b3f:	74 0f                	je     140022b50 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x334>
+   140022b41:	48 8b 85 10 04 00 00 	mov    0x410(%rbp),%rax
+   140022b48:	8b 40 44             	mov    0x44(%rax),%eax
+   140022b4b:	83 f8 08             	cmp    $0x8,%eax
+   140022b4e:	75 0a                	jne    140022b5a <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x33e>
+   140022b50:	83 85 d8 05 00 00 01 	addl   $0x1,0x5d8(%rbp)
+   140022b57:	eb 01                	jmp    140022b5a <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x33e>
+   140022b59:	90                   	nop
+   140022b5a:	83 85 d4 05 00 00 01 	addl   $0x1,0x5d4(%rbp)
+   140022b61:	48 8b 85 18 04 00 00 	mov    0x418(%rbp),%rax
+   140022b68:	8b 80 44 01 00 00    	mov    0x144(%rax),%eax
+   140022b6e:	39 85 d4 05 00 00    	cmp    %eax,0x5d4(%rbp)
+   140022b74:	0f 8e 39 ff ff ff    	jle    140022ab3 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x297>
+   140022b7a:	48 8d 45 78          	lea    0x78(%rbp),%rax
+   140022b7e:	48 89 c1             	mov    %rax,%rcx
+   140022b81:	e8 6a 61 f8 01       	call   141fa8cf0 <__gnu_cxx::__normal_iterator<int const*, std::vector<int, std::allocator<int> > >::operator++()>
+   140022b86:	48 8d 55 70          	lea    0x70(%rbp),%rdx
+   140022b8a:	48 8d 45 78          	lea    0x78(%rbp),%rax
+   140022b8e:	48 89 c1             	mov    %rax,%rcx
+   140022b91:	e8 6a 3f f9 01       	call   141fb6b00 <bool __gnu_cxx::operator==<int const*, std::vector<int, std::allocator<int> > >(__gnu_cxx::__normal_iterator<int const*, std::vector<int, std::allocator<int> > > const&, __gnu_cxx::__normal_iterator<int const*, std::vector<int, std::allocator<int> > > const&)>
+   140022b96:	83 f0 01             	xor    $0x1,%eax
+   140022b99:	84 c0                	test   %al,%al
+   140022b9b:	0f 85 b3 fe ff ff    	jne    140022a54 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x238>
+   140022ba1:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140022ba8:	48 05 48 11 00 00    	add    $0x1148,%rax
+   140022bae:	48 89 c1             	mov    %rax,%rcx
+   140022bb1:	e8 fa 81 05 02       	call   14207adb0 <std::unique_ptr<EnergyPlus::HeatBalanceData, std::default_delete<EnergyPlus::HeatBalanceData> >::operator->() const>
+   140022bb6:	48 8d 88 88 22 00 00 	lea    0x2288(%rax),%rcx
+   140022bbd:	8b 85 ec 05 00 00    	mov    0x5ec(%rbp),%eax
+   140022bc3:	48 98                	cltq
+   140022bc5:	48 89 c2             	mov    %rax,%rdx
+   140022bc8:	e8 53 97 c5 01       	call   141c7c320 <EnergyPlus::EPVector<EnergyPlus::DataHeatBalance::ZoneData>::operator()(unsigned long long)>
+   140022bcd:	48 05 a8 03 00 00    	add    $0x3a8,%rax
+   140022bd3:	48 89 85 78 04 00 00 	mov    %rax,0x478(%rbp)
+   140022bda:	48 8b 85 78 04 00 00 	mov    0x478(%rbp),%rax
+   140022be1:	48 89 c1             	mov    %rax,%rcx
+   140022be4:	e8 d7 c0 32 02       	call   14234ecc0 <std::vector<int, std::allocator<int> >::begin()>
+   140022be9:	48 89 45 68          	mov    %rax,0x68(%rbp)
+   140022bed:	48 8b 85 78 04 00 00 	mov    0x478(%rbp),%rax
+   140022bf4:	48 89 c1             	mov    %rax,%rcx
+   140022bf7:	e8 14 c0 32 02       	call   14234ec10 <std::vector<int, std::allocator<int> >::end()>
+   140022bfc:	48 89 45 60          	mov    %rax,0x60(%rbp)
+   140022c00:	e9 12 01 00 00       	jmp    140022d17 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x4fb>
+   140022c05:	48 8d 45 68          	lea    0x68(%rbp),%rax
+   140022c09:	48 89 c1             	mov    %rax,%rcx
+   140022c0c:	e8 df ff 04 02       	call   142072bf0 <__gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > >::operator*() const>
+   140022c11:	8b 00                	mov    (%rax),%eax
+   140022c13:	89 85 3c 04 00 00    	mov    %eax,0x43c(%rbp)
+   140022c19:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140022c20:	48 05 48 11 00 00    	add    $0x1148,%rax
+   140022c26:	48 89 c1             	mov    %rax,%rcx
+   140022c29:	e8 82 81 05 02       	call   14207adb0 <std::unique_ptr<EnergyPlus::HeatBalanceData, std::default_delete<EnergyPlus::HeatBalanceData> >::operator->() const>
+   140022c2e:	48 8d 88 48 22 00 00 	lea    0x2248(%rax),%rcx
+   140022c35:	8b 85 3c 04 00 00    	mov    0x43c(%rbp),%eax
+   140022c3b:	48 98                	cltq
+   140022c3d:	48 89 c2             	mov    %rax,%rdx
+   140022c40:	e8 7b 99 c5 01       	call   141c7c5c0 <EnergyPlus::EPVector<EnergyPlus::DataHeatBalance::SpaceData>::operator()(unsigned long long)>
+   140022c45:	48 89 85 30 04 00 00 	mov    %rax,0x430(%rbp)
+   140022c4c:	48 8b 85 30 04 00 00 	mov    0x430(%rbp),%rax
+   140022c53:	8b 80 40 01 00 00    	mov    0x140(%rax),%eax
+   140022c59:	89 85 d0 05 00 00    	mov    %eax,0x5d0(%rbp)
+   140022c5f:	e9 8e 00 00 00       	jmp    140022cf2 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x4d6>
+   140022c64:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140022c6b:	48 05 58 14 00 00    	add    $0x1458,%rax
+   140022c71:	48 89 c1             	mov    %rax,%rcx
+   140022c74:	e8 c7 76 05 02       	call   14207a340 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   140022c79:	48 8d 88 88 17 00 00 	lea    0x1788(%rax),%rcx
+   140022c80:	8b 85 d0 05 00 00    	mov    0x5d0(%rbp),%eax
+   140022c86:	48 98                	cltq
+   140022c88:	48 89 c2             	mov    %rax,%rdx
+   140022c8b:	e8 70 15 c5 01       	call   141c74200 <EnergyPlus::EPVector<EnergyPlus::DataSurfaces::SurfIntConv>::operator()(unsigned long long)>
+   140022c90:	48 89 85 28 04 00 00 	mov    %rax,0x428(%rbp)
+   140022c97:	48 8b 85 98 04 00 00 	mov    0x498(%rbp),%rax
+   140022c9e:	f2 0f 10 40 20       	movsd  0x20(%rax),%xmm0
+   140022ca3:	48 8b 85 28 04 00 00 	mov    0x428(%rbp),%rax
+   140022caa:	f2 0f 11 40 20       	movsd  %xmm0,0x20(%rax)
+   140022caf:	48 8b 85 28 04 00 00 	mov    0x428(%rbp),%rax
+   140022cb6:	f2 0f 10 85 e0 05 00 00 	movsd  0x5e0(%rbp),%xmm0
+   140022cbe:	f2 0f 11 40 28       	movsd  %xmm0,0x28(%rax)
+   140022cc3:	48 8b 85 28 04 00 00 	mov    0x428(%rbp),%rax
+   140022cca:	f2 0f 10 85 f8 05 00 00 	movsd  0x5f8(%rbp),%xmm0
+   140022cd2:	f2 0f 11 40 30       	movsd  %xmm0,0x30(%rax)
+   140022cd7:	48 8b 85 28 04 00 00 	mov    0x428(%rbp),%rax
+   140022cde:	f2 0f 10 85 88 04 00 00 	movsd  0x488(%rbp),%xmm0
+   140022ce6:	f2 0f 11 40 38       	movsd  %xmm0,0x38(%rax)
+   140022ceb:	83 85 d0 05 00 00 01 	addl   $0x1,0x5d0(%rbp)
+   140022cf2:	48 8b 85 30 04 00 00 	mov    0x430(%rbp),%rax
+   140022cf9:	8b 80 44 01 00 00    	mov    0x144(%rax),%eax
+   140022cff:	39 85 d0 05 00 00    	cmp    %eax,0x5d0(%rbp)
+   140022d05:	0f 8e 59 ff ff ff    	jle    140022c64 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x448>
+   140022d0b:	48 8d 45 68          	lea    0x68(%rbp),%rax
+   140022d0f:	48 89 c1             	mov    %rax,%rcx
+   140022d12:	e8 89 ca f8 01       	call   141faf7a0 <__gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > >::operator++()>
+   140022d17:	48 8d 55 60          	lea    0x60(%rbp),%rdx
+   140022d1b:	48 8d 45 68          	lea    0x68(%rbp),%rax
+   140022d1f:	48 89 c1             	mov    %rax,%rcx
+   140022d22:	e8 d9 7d f9 01       	call   141fbab00 <bool __gnu_cxx::operator==<int*, std::vector<int, std::allocator<int> > >(__gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > > const&, __gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > > const&)>
+   140022d27:	83 f0 01             	xor    $0x1,%eax
+   140022d2a:	84 c0                	test   %al,%al
+   140022d2c:	0f 85 d3 fe ff ff    	jne    140022c05 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x3e9>
+   140022d32:	83 bd d8 05 00 00 00 	cmpl   $0x0,0x5d8(%rbp)
+   140022d39:	0f 8e 50 03 00 00    	jle    14002308f <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x873>
+   140022d3f:	83 bd dc 05 00 00 00 	cmpl   $0x0,0x5dc(%rbp)
+   140022d46:	0f 8e 43 03 00 00    	jle    14002308f <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x873>
+   140022d4c:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140022d53:	48 05 48 11 00 00    	add    $0x1148,%rax
+   140022d59:	48 89 c1             	mov    %rax,%rcx
+   140022d5c:	e8 4f 80 05 02       	call   14207adb0 <std::unique_ptr<EnergyPlus::HeatBalanceData, std::default_delete<EnergyPlus::HeatBalanceData> >::operator->() const>
+   140022d61:	48 8d 88 88 22 00 00 	lea    0x2288(%rax),%rcx
+   140022d68:	8b 85 ec 05 00 00    	mov    0x5ec(%rbp),%eax
+   140022d6e:	48 98                	cltq
+   140022d70:	48 89 c2             	mov    %rax,%rdx
+   140022d73:	e8 a8 95 c5 01       	call   141c7c320 <EnergyPlus::EPVector<EnergyPlus::DataHeatBalance::ZoneData>::operator()(unsigned long long)>
+   140022d78:	48 05 a8 03 00 00    	add    $0x3a8,%rax
+   140022d7e:	48 89 85 70 04 00 00 	mov    %rax,0x470(%rbp)
+   140022d85:	48 8b 85 70 04 00 00 	mov    0x470(%rbp),%rax
+   140022d8c:	48 89 c1             	mov    %rax,%rcx
+   140022d8f:	e8 2c bf 32 02       	call   14234ecc0 <std::vector<int, std::allocator<int> >::begin()>
+   140022d94:	48 89 45 58          	mov    %rax,0x58(%rbp)
+   140022d98:	48 8b 85 70 04 00 00 	mov    0x470(%rbp),%rax
+   140022d9f:	48 89 c1             	mov    %rax,%rcx
+   140022da2:	e8 69 be 32 02       	call   14234ec10 <std::vector<int, std::allocator<int> >::end()>
+   140022da7:	48 89 45 50          	mov    %rax,0x50(%rbp)
+   140022dab:	e9 c4 02 00 00       	jmp    140023074 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x858>
+   140022db0:	48 8d 45 58          	lea    0x58(%rbp),%rax
+   140022db4:	48 89 c1             	mov    %rax,%rcx
+   140022db7:	e8 34 fe 04 02       	call   142072bf0 <__gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > >::operator*() const>
+   140022dbc:	8b 00                	mov    (%rax),%eax
+   140022dbe:	89 85 6c 04 00 00    	mov    %eax,0x46c(%rbp)
+   140022dc4:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140022dcb:	48 05 48 11 00 00    	add    $0x1148,%rax
+   140022dd1:	48 89 c1             	mov    %rax,%rcx
+   140022dd4:	e8 d7 7f 05 02       	call   14207adb0 <std::unique_ptr<EnergyPlus::HeatBalanceData, std::default_delete<EnergyPlus::HeatBalanceData> >::operator->() const>
+   140022dd9:	48 8d 88 48 22 00 00 	lea    0x2248(%rax),%rcx
+   140022de0:	8b 85 6c 04 00 00    	mov    0x46c(%rbp),%eax
+   140022de6:	48 98                	cltq
+   140022de8:	48 89 c2             	mov    %rax,%rdx
+   140022deb:	e8 d0 97 c5 01       	call   141c7c5c0 <EnergyPlus::EPVector<EnergyPlus::DataHeatBalance::SpaceData>::operator()(unsigned long long)>
+   140022df0:	48 89 85 60 04 00 00 	mov    %rax,0x460(%rbp)
+   140022df7:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   140022dfe:	8b 80 40 01 00 00    	mov    0x140(%rax),%eax
+   140022e04:	89 85 cc 05 00 00    	mov    %eax,0x5cc(%rbp)
+   140022e0a:	e9 40 02 00 00       	jmp    14002304f <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x833>
+   140022e0f:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140022e16:	48 05 58 14 00 00    	add    $0x1458,%rax
+   140022e1c:	48 89 c1             	mov    %rax,%rcx
+   140022e1f:	e8 1c 75 05 02       	call   14207a340 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   140022e24:	48 8d 88 68 4a 00 00 	lea    0x4a68(%rax),%rcx
+   140022e2b:	8b 85 cc 05 00 00    	mov    0x5cc(%rbp),%eax
+   140022e31:	48 98                	cltq
+   140022e33:	48 89 c2             	mov    %rax,%rdx
+   140022e36:	e8 35 15 c5 01       	call   141c74370 <EnergyPlus::EPVector<EnergyPlus::DataSurfaces::SurfaceData>::operator()(unsigned long long)>
+   140022e3b:	48 89 85 58 04 00 00 	mov    %rax,0x458(%rbp)
+   140022e42:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140022e49:	48 05 58 14 00 00    	add    $0x1458,%rax
+   140022e4f:	48 89 c1             	mov    %rax,%rcx
+   140022e52:	e8 e9 74 05 02       	call   14207a340 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   140022e57:	48 8d 88 88 17 00 00 	lea    0x1788(%rax),%rcx
+   140022e5e:	8b 85 cc 05 00 00    	mov    0x5cc(%rbp),%eax
+   140022e64:	48 98                	cltq
+   140022e66:	48 89 c2             	mov    %rax,%rdx
+   140022e69:	e8 92 13 c5 01       	call   141c74200 <EnergyPlus::EPVector<EnergyPlus::DataSurfaces::SurfIntConv>::operator()(unsigned long long)>
+   140022e6e:	48 89 85 50 04 00 00 	mov    %rax,0x450(%rbp)
+   140022e75:	48 8b 85 58 04 00 00 	mov    0x458(%rbp),%rax
+   140022e7c:	8b 80 e0 03 00 00    	mov    0x3e0(%rax),%eax
+   140022e82:	85 c0                	test   %eax,%eax
+   140022e84:	0f 85 b7 01 00 00    	jne    140023041 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x825>
+   140022e8a:	48 8b 85 58 04 00 00 	mov    0x458(%rbp),%rax
+   140022e91:	8b 40 44             	mov    0x44(%rax),%eax
+   140022e94:	83 f8 07             	cmp    $0x7,%eax
+   140022e97:	74 13                	je     140022eac <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x690>
+   140022e99:	48 8b 85 58 04 00 00 	mov    0x458(%rbp),%rax
+   140022ea0:	8b 40 44             	mov    0x44(%rax),%eax
+   140022ea3:	83 f8 08             	cmp    $0x8,%eax
+   140022ea6:	0f 85 3c 01 00 00    	jne    140022fe8 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x7cc>
+   140022eac:	48 8b 85 50 04 00 00 	mov    0x450(%rbp),%rax
+   140022eb3:	f2 0f 10 48 38       	movsd  0x38(%rax),%xmm1
+   140022eb8:	f2 0f 10 05 f0 bf 56 02 	movsd  0x256bff0(%rip),%xmm0        # 14258eeb0 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper>::desc+0x278>
+   140022ec0:	66 0f 2f c1          	comisd %xmm1,%xmm0
+   140022ec4:	76 3c                	jbe    140022f02 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x6e6>
+   140022ec6:	48 8b 85 58 04 00 00 	mov    0x458(%rbp),%rax
+   140022ecd:	f2 0f 10 88 80 02 00 00 	movsd  0x280(%rax),%xmm1
+   140022ed5:	48 8b 85 98 04 00 00 	mov    0x498(%rbp),%rax
+   140022edc:	f2 0f 10 80 60 01 00 00 	movsd  0x160(%rax),%xmm0
+   140022ee4:	66 0f 2f c1          	comisd %xmm1,%xmm0
+   140022ee8:	76 07                	jbe    140022ef1 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x6d5>
+   140022eea:	ba 01 00 00 00       	mov    $0x1,%edx
+   140022eef:	eb 05                	jmp    140022ef6 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x6da>
+   140022ef1:	ba 02 00 00 00       	mov    $0x2,%edx
+   140022ef6:	48 8b 85 50 04 00 00 	mov    0x450(%rbp),%rax
+   140022efd:	89 50 40             	mov    %edx,0x40(%rax)
+   140022f00:	eb 0e                	jmp    140022f10 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x6f4>
+   140022f02:	48 8b 85 50 04 00 00 	mov    0x450(%rbp),%rax
+   140022f09:	c7 40 40 05 00 00 00 	movl   $0x5,0x40(%rax)
+   140022f10:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140022f17:	48 05 58 14 00 00    	add    $0x1458,%rax
+   140022f1d:	48 89 c1             	mov    %rax,%rcx
+   140022f20:	e8 1b 74 05 02       	call   14207a340 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   140022f25:	48 8d 88 68 4a 00 00 	lea    0x4a68(%rax),%rcx
+   140022f2c:	48 8b 85 58 04 00 00 	mov    0x458(%rbp),%rax
+   140022f33:	8b 80 90 03 00 00    	mov    0x390(%rax),%eax
+   140022f39:	48 98                	cltq
+   140022f3b:	48 89 c2             	mov    %rax,%rdx
+   140022f3e:	e8 2d 14 c5 01       	call   141c74370 <EnergyPlus::EPVector<EnergyPlus::DataSurfaces::SurfaceData>::operator()(unsigned long long)>
+   140022f43:	48 89 85 48 04 00 00 	mov    %rax,0x448(%rbp)
+   140022f4a:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140022f51:	48 05 58 14 00 00    	add    $0x1458,%rax
+   140022f57:	48 89 c1             	mov    %rax,%rcx
+   140022f5a:	e8 e1 73 05 02       	call   14207a340 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   140022f5f:	48 8d 88 88 17 00 00 	lea    0x1788(%rax),%rcx
+   140022f66:	48 8b 85 58 04 00 00 	mov    0x458(%rbp),%rax
+   140022f6d:	8b 80 90 03 00 00    	mov    0x390(%rax),%eax
+   140022f73:	48 98                	cltq
+   140022f75:	48 89 c2             	mov    %rax,%rdx
+   140022f78:	e8 83 12 c5 01       	call   141c74200 <EnergyPlus::EPVector<EnergyPlus::DataSurfaces::SurfIntConv>::operator()(unsigned long long)>
+   140022f7d:	48 89 85 40 04 00 00 	mov    %rax,0x440(%rbp)
+   140022f84:	48 8b 85 48 04 00 00 	mov    0x448(%rbp),%rax
+   140022f8b:	8b 80 e0 03 00 00    	mov    0x3e0(%rax),%eax
+   140022f91:	85 c0                	test   %eax,%eax
+   140022f93:	0f 85 ab 00 00 00    	jne    140023044 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x828>
+   140022f99:	48 8b 85 48 04 00 00 	mov    0x448(%rbp),%rax
+   140022fa0:	8b 40 44             	mov    0x44(%rax),%eax
+   140022fa3:	83 f8 01             	cmp    $0x1,%eax
+   140022fa6:	0f 85 9b 00 00 00    	jne    140023047 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x82b>
+   140022fac:	48 8b 85 48 04 00 00 	mov    0x448(%rbp),%rax
+   140022fb3:	f2 0f 10 88 80 02 00 00 	movsd  0x280(%rax),%xmm1
+   140022fbb:	48 8b 85 58 04 00 00 	mov    0x458(%rbp),%rax
+   140022fc2:	f2 0f 10 80 80 02 00 00 	movsd  0x280(%rax),%xmm0
+   140022fca:	66 0f 2f c1          	comisd %xmm1,%xmm0
+   140022fce:	76 07                	jbe    140022fd7 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x7bb>
+   140022fd0:	ba 03 00 00 00       	mov    $0x3,%edx
+   140022fd5:	eb 05                	jmp    140022fdc <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x7c0>
+   140022fd7:	ba 04 00 00 00       	mov    $0x4,%edx
+   140022fdc:	48 8b 85 40 04 00 00 	mov    0x440(%rbp),%rax
+   140022fe3:	89 50 40             	mov    %edx,0x40(%rax)
+   140022fe6:	eb 60                	jmp    140023048 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x82c>
+   140022fe8:	48 8b 85 58 04 00 00 	mov    0x458(%rbp),%rax
+   140022fef:	8b 40 44             	mov    0x44(%rax),%eax
+   140022ff2:	83 f8 01             	cmp    $0x1,%eax
+   140022ff5:	75 51                	jne    140023048 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x82c>
+   140022ff7:	48 8b 85 50 04 00 00 	mov    0x450(%rbp),%rax
+   140022ffe:	8b 40 40             	mov    0x40(%rax),%eax
+   140023001:	85 c0                	test   %eax,%eax
+   140023003:	75 43                	jne    140023048 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x82c>
+   140023005:	48 8b 85 58 04 00 00 	mov    0x458(%rbp),%rax
+   14002300c:	f2 0f 10 88 80 02 00 00 	movsd  0x280(%rax),%xmm1
+   140023014:	48 8b 85 98 04 00 00 	mov    0x498(%rbp),%rax
+   14002301b:	f2 0f 10 80 60 01 00 00 	movsd  0x160(%rax),%xmm0
+   140023023:	66 0f 2f c1          	comisd %xmm1,%xmm0
+   140023027:	76 07                	jbe    140023030 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x814>
+   140023029:	ba 03 00 00 00       	mov    $0x3,%edx
+   14002302e:	eb 05                	jmp    140023035 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x819>
+   140023030:	ba 04 00 00 00       	mov    $0x4,%edx
+   140023035:	48 8b 85 50 04 00 00 	mov    0x450(%rbp),%rax
+   14002303c:	89 50 40             	mov    %edx,0x40(%rax)
+   14002303f:	eb 07                	jmp    140023048 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x82c>
+   140023041:	90                   	nop
+   140023042:	eb 04                	jmp    140023048 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x82c>
+   140023044:	90                   	nop
+   140023045:	eb 01                	jmp    140023048 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x82c>
+   140023047:	90                   	nop
+   140023048:	83 85 cc 05 00 00 01 	addl   $0x1,0x5cc(%rbp)
+   14002304f:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   140023056:	8b 80 44 01 00 00    	mov    0x144(%rax),%eax
+   14002305c:	39 85 cc 05 00 00    	cmp    %eax,0x5cc(%rbp)
+   140023062:	0f 8e a7 fd ff ff    	jle    140022e0f <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x5f3>
+   140023068:	48 8d 45 58          	lea    0x58(%rbp),%rax
+   14002306c:	48 89 c1             	mov    %rax,%rcx
+   14002306f:	e8 2c c7 f8 01       	call   141faf7a0 <__gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > >::operator++()>
+   140023074:	48 8d 55 50          	lea    0x50(%rbp),%rdx
+   140023078:	48 8d 45 58          	lea    0x58(%rbp),%rax
+   14002307c:	48 89 c1             	mov    %rax,%rcx
+   14002307f:	e8 7c 7a f9 01       	call   141fbab00 <bool __gnu_cxx::operator==<int*, std::vector<int, std::allocator<int> > >(__gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > > const&, __gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > > const&)>
+   140023084:	83 f0 01             	xor    $0x1,%eax
+   140023087:	84 c0                	test   %al,%al
+   140023089:	0f 85 21 fd ff ff    	jne    140022db0 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x594>
+   14002308f:	83 85 ec 05 00 00 01 	addl   $0x1,0x5ec(%rbp)
+   140023096:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   14002309d:	48 05 10 0f 00 00    	add    $0xf10,%rax
+   1400230a3:	48 89 c1             	mov    %rax,%rcx
+   1400230a6:	e8 d5 6d 05 02       	call   142079e80 <std::unique_ptr<EnergyPlus::DataGlobal, std::default_delete<EnergyPlus::DataGlobal> >::operator->() const>
+   1400230ab:	8b 80 bc 00 00 00    	mov    0xbc(%rax),%eax
+   1400230b1:	39 85 ec 05 00 00    	cmp    %eax,0x5ec(%rbp)
+   1400230b7:	0f 9e c0             	setle  %al
+   1400230ba:	84 c0                	test   %al,%al
+   1400230bc:	0f 85 9e f7 ff ff    	jne    140022860 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x44>
+   1400230c2:	f2 0f 10 05 ce bb 56 02 	movsd  0x256bbce(%rip),%xmm0        # 14258ec98 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper>::desc+0x60>
+   1400230ca:	48 8b 85 f0 05 00 00 	mov    0x5f0(%rbp),%rax
+   1400230d1:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   1400230d5:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   1400230da:	e8 d7 ed a9 01       	call   141ac1eb6 <pow>
+   1400230df:	66 48 0f 7e c3       	movq   %xmm0,%rbx
+   1400230e4:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   1400230eb:	48 05 b8 0e 00 00    	add    $0xeb8,%rax
+   1400230f1:	48 89 c1             	mov    %rax,%rcx
+   1400230f4:	e8 e7 a5 05 02       	call   14207d6e0 <std::unique_ptr<EnergyPlus::ConvectionCoefficientsData, std::default_delete<EnergyPlus::ConvectionCoefficientsData> >::operator->() const>
+   1400230f9:	48 89 58 10          	mov    %rbx,0x10(%rax)
+   1400230fd:	48 8d 95 40 03 00 00 	lea    0x340(%rbp),%rdx
+   140023104:	b8 00 00 00 00       	mov    $0x0,%eax
+   140023109:	b9 0b 00 00 00       	mov    $0xb,%ecx
+   14002310e:	48 89 d7             	mov    %rdx,%rdi
+   140023111:	f3 48 ab             	rep stos %rax,%es:(%rdi)
+   140023114:	48 8d 95 40 03 00 00 	lea    0x340(%rbp),%rdx
+   14002311b:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140023122:	48 89 c1             	mov    %rax,%rcx
+   140023125:	e8 a8 d8 49 00       	call   1404c09d2 <EnergyPlus::SurfaceGeometry::GetGeoSummaryRoof(EnergyPlus::EnergyPlusData const&, EnergyPlus::SurfaceGeometry::GeoSummary&)>
+   14002312a:	f2 0f 10 b5 58 03 00 00 	movsd  0x358(%rbp),%xmm6
+   140023132:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140023139:	48 05 b8 0e 00 00    	add    $0xeb8,%rax
+   14002313f:	48 89 c1             	mov    %rax,%rcx
+   140023142:	e8 99 a5 05 02       	call   14207d6e0 <std::unique_ptr<EnergyPlus::ConvectionCoefficientsData, std::default_delete<EnergyPlus::ConvectionCoefficientsData> >::operator->() const>
+   140023147:	f2 0f 11 70 18       	movsd  %xmm6,0x18(%rax)
+   14002314c:	48 8d 95 80 00 00 00 	lea    0x80(%rbp),%rdx
+   140023153:	b8 00 00 00 00       	mov    $0x0,%eax
+   140023158:	b9 58 00 00 00       	mov    $0x58,%ecx
+   14002315d:	48 89 d7             	mov    %rdx,%rdi
+   140023160:	f3 48 ab             	rep stos %rax,%es:(%rdi)
+   140023163:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   14002316a:	48 05 58 14 00 00    	add    $0x1458,%rax
+   140023170:	48 89 c1             	mov    %rax,%rcx
+   140023173:	e8 c8 71 05 02       	call   14207a340 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   140023178:	48 05 68 4a 00 00    	add    $0x4a68,%rax
+   14002317e:	48 89 85 58 05 00 00 	mov    %rax,0x558(%rbp)
+   140023185:	48 8b 85 58 05 00 00 	mov    0x558(%rbp),%rax
+   14002318c:	48 89 c1             	mov    %rax,%rcx
+   14002318f:	e8 2c fc 27 02       	call   1422a2dc0 <std::vector<EnergyPlus::DataSurfaces::SurfaceData, std::allocator<EnergyPlus::DataSurfaces::SurfaceData> >::begin()>
+   140023194:	48 89 45 48          	mov    %rax,0x48(%rbp)
+   140023198:	48 8b 85 58 05 00 00 	mov    0x558(%rbp),%rax
+   14002319f:	48 89 c1             	mov    %rax,%rcx
+   1400231a2:	e8 e9 fb 27 02       	call   1422a2d90 <std::vector<EnergyPlus::DataSurfaces::SurfaceData, std::allocator<EnergyPlus::DataSurfaces::SurfaceData> >::end()>
+   1400231a7:	48 89 45 40          	mov    %rax,0x40(%rbp)
+   1400231ab:	e9 f3 03 00 00       	jmp    1400235a3 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xd87>
+   1400231b0:	48 8d 45 48          	lea    0x48(%rbp),%rax
+   1400231b4:	48 89 c1             	mov    %rax,%rcx
+   1400231b7:	e8 f4 84 04 02       	call   14206b6b0 <__gnu_cxx::__normal_iterator<EnergyPlus::DataSurfaces::SurfaceData*, std::vector<EnergyPlus::DataSurfaces::SurfaceData, std::allocator<EnergyPlus::DataSurfaces::SurfaceData> > >::operator*() const>
+   1400231bc:	48 89 85 c8 04 00 00 	mov    %rax,0x4c8(%rbp)
+   1400231c3:	48 8b 85 c8 04 00 00 	mov    0x4c8(%rbp),%rax
+   1400231ca:	8b 80 e0 03 00 00    	mov    0x3e0(%rax),%eax
+   1400231d0:	85 c0                	test   %eax,%eax
+   1400231d2:	0f 85 b8 03 00 00    	jne    140023590 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xd74>
+   1400231d8:	48 8b 85 c8 04 00 00 	mov    0x4c8(%rbp),%rax
+   1400231df:	0f b6 80 50 03 00 00 	movzbl 0x350(%rax),%eax
+   1400231e6:	83 f0 01             	xor    $0x1,%eax
+   1400231e9:	84 c0                	test   %al,%al
+   1400231eb:	0f 85 a2 03 00 00    	jne    140023593 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xd77>
+   1400231f1:	48 8b 85 c8 04 00 00 	mov    0x4c8(%rbp),%rax
+   1400231f8:	f2 0f 10 88 90 00 00 00 	movsd  0x90(%rax),%xmm1
+   140023200:	f2 0f 10 05 e0 bb 56 02 	movsd  0x256bbe0(%rip),%xmm0        # 14258ede8 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper>::desc+0x1b0>
+   140023208:	66 0f 2f c1          	comisd %xmm1,%xmm0
+   14002320c:	0f 87 84 03 00 00    	ja     140023596 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xd7a>
+   140023212:	48 8b 85 c8 04 00 00 	mov    0x4c8(%rbp),%rax
+   140023219:	f2 0f 10 80 90 00 00 00 	movsd  0x90(%rax),%xmm0
+   140023221:	66 0f 2f 05 d7 bb 56 02 	comisd 0x256bbd7(%rip),%xmm0        # 14258ee00 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper>::desc+0x1c8>
+   140023229:	0f 83 67 03 00 00    	jae    140023596 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xd7a>
+   14002322f:	48 8b 85 c8 04 00 00 	mov    0x4c8(%rbp),%rax
+   140023236:	48 8b 40 78          	mov    0x78(%rax),%rax
+   14002323a:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   14002323f:	e8 93 32 07 00       	call   1400964d7 <EnergyPlus::DataSurfaces::AzimuthToCompass8(double)>
+   140023244:	89 85 c4 04 00 00    	mov    %eax,0x4c4(%rbp)
+   14002324a:	f2 0f 10 05 16 ba 56 02 	movsd  0x256ba16(%rip),%xmm0        # 14258ec68 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper>::desc+0x30>
+   140023252:	f2 0f 11 85 c0 05 00 00 	movsd  %xmm0,0x5c0(%rbp)
+   14002325a:	f2 0f 10 05 1e ba 56 02 	movsd  0x256ba1e(%rip),%xmm0        # 14258ec80 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper>::desc+0x48>
+   140023262:	f2 0f 11 85 b8 05 00 00 	movsd  %xmm0,0x5b8(%rbp)
+   14002326a:	f2 0f 10 05 f6 b9 56 02 	movsd  0x256b9f6(%rip),%xmm0        # 14258ec68 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper>::desc+0x30>
+   140023272:	f2 0f 11 85 b0 05 00 00 	movsd  %xmm0,0x5b0(%rbp)
+   14002327a:	f2 0f 10 05 fe b9 56 02 	movsd  0x256b9fe(%rip),%xmm0        # 14258ec80 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper>::desc+0x48>
+   140023282:	f2 0f 11 85 a8 05 00 00 	movsd  %xmm0,0x5a8(%rbp)
+   14002328a:	f2 0f 10 05 d6 b9 56 02 	movsd  0x256b9d6(%rip),%xmm0        # 14258ec68 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper>::desc+0x30>
+   140023292:	f2 0f 11 85 a0 05 00 00 	movsd  %xmm0,0x5a0(%rbp)
+   14002329a:	f2 0f 10 05 de b9 56 02 	movsd  0x256b9de(%rip),%xmm0        # 14258ec80 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper>::desc+0x48>
+   1400232a2:	f2 0f 11 85 98 05 00 00 	movsd  %xmm0,0x598(%rbp)
+   1400232aa:	48 8b 85 c8 04 00 00 	mov    0x4c8(%rbp),%rax
+   1400232b1:	48 05 20 02 00 00    	add    $0x220,%rax
+   1400232b7:	48 89 85 b8 04 00 00 	mov    %rax,0x4b8(%rbp)
+   1400232be:	48 8b 85 b8 04 00 00 	mov    0x4b8(%rbp),%rax
+   1400232c5:	48 89 c1             	mov    %rax,%rcx
+   1400232c8:	e8 c3 bb fe 01       	call   14200ee90 <ObjexxFCL::Array<ObjexxFCL::Vector3<double> >::begin() const>
+   1400232cd:	48 89 85 90 05 00 00 	mov    %rax,0x590(%rbp)
+   1400232d4:	48 8b 85 b8 04 00 00 	mov    0x4b8(%rbp),%rax
+   1400232db:	48 89 c1             	mov    %rax,%rcx
+   1400232de:	e8 3d bb fe 01       	call   14200ee20 <ObjexxFCL::Array<ObjexxFCL::Vector3<double> >::end() const>
+   1400232e3:	48 89 85 b0 04 00 00 	mov    %rax,0x4b0(%rbp)
+   1400232ea:	e9 20 01 00 00       	jmp    14002340f <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xbf3>
+   1400232ef:	48 8b 85 90 05 00 00 	mov    0x590(%rbp),%rax
+   1400232f6:	48 89 85 a0 04 00 00 	mov    %rax,0x4a0(%rbp)
+   1400232fd:	48 8b 85 a0 04 00 00 	mov    0x4a0(%rbp),%rax
+   140023304:	f2 0f 10 08          	movsd  (%rax),%xmm1
+   140023308:	f2 0f 10 85 c0 05 00 00 	movsd  0x5c0(%rbp),%xmm0
+   140023310:	66 0f 2f c1          	comisd %xmm1,%xmm0
+   140023314:	76 15                	jbe    14002332b <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xb0f>
+   140023316:	48 8b 85 a0 04 00 00 	mov    0x4a0(%rbp),%rax
+   14002331d:	f2 0f 10 00          	movsd  (%rax),%xmm0
+   140023321:	f2 0f 11 85 c0 05 00 00 	movsd  %xmm0,0x5c0(%rbp)
+   140023329:	eb 28                	jmp    140023353 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xb37>
+   14002332b:	48 8b 85 a0 04 00 00 	mov    0x4a0(%rbp),%rax
+   140023332:	f2 0f 10 00          	movsd  (%rax),%xmm0
+   140023336:	66 0f 2f 85 b8 05 00 00 	comisd 0x5b8(%rbp),%xmm0
+   14002333e:	76 13                	jbe    140023353 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xb37>
+   140023340:	48 8b 85 a0 04 00 00 	mov    0x4a0(%rbp),%rax
+   140023347:	f2 0f 10 00          	movsd  (%rax),%xmm0
+   14002334b:	f2 0f 11 85 b8 05 00 00 	movsd  %xmm0,0x5b8(%rbp)
+   140023353:	48 8b 85 a0 04 00 00 	mov    0x4a0(%rbp),%rax
+   14002335a:	f2 0f 10 48 08       	movsd  0x8(%rax),%xmm1
+   14002335f:	f2 0f 10 85 b0 05 00 00 	movsd  0x5b0(%rbp),%xmm0
+   140023367:	66 0f 2f c1          	comisd %xmm1,%xmm0
+   14002336b:	76 16                	jbe    140023383 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xb67>
+   14002336d:	48 8b 85 a0 04 00 00 	mov    0x4a0(%rbp),%rax
+   140023374:	f2 0f 10 40 08       	movsd  0x8(%rax),%xmm0
+   140023379:	f2 0f 11 85 b0 05 00 00 	movsd  %xmm0,0x5b0(%rbp)
+   140023381:	eb 2a                	jmp    1400233ad <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xb91>
+   140023383:	48 8b 85 a0 04 00 00 	mov    0x4a0(%rbp),%rax
+   14002338a:	f2 0f 10 40 08       	movsd  0x8(%rax),%xmm0
+   14002338f:	66 0f 2f 85 a8 05 00 00 	comisd 0x5a8(%rbp),%xmm0
+   140023397:	76 14                	jbe    1400233ad <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xb91>
+   140023399:	48 8b 85 a0 04 00 00 	mov    0x4a0(%rbp),%rax
+   1400233a0:	f2 0f 10 40 08       	movsd  0x8(%rax),%xmm0
+   1400233a5:	f2 0f 11 85 a8 05 00 00 	movsd  %xmm0,0x5a8(%rbp)
+   1400233ad:	48 8b 85 a0 04 00 00 	mov    0x4a0(%rbp),%rax
+   1400233b4:	f2 0f 10 48 10       	movsd  0x10(%rax),%xmm1
+   1400233b9:	f2 0f 10 85 a0 05 00 00 	movsd  0x5a0(%rbp),%xmm0
+   1400233c1:	66 0f 2f c1          	comisd %xmm1,%xmm0
+   1400233c5:	76 16                	jbe    1400233dd <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xbc1>
+   1400233c7:	48 8b 85 a0 04 00 00 	mov    0x4a0(%rbp),%rax
+   1400233ce:	f2 0f 10 40 10       	movsd  0x10(%rax),%xmm0
+   1400233d3:	f2 0f 11 85 a0 05 00 00 	movsd  %xmm0,0x5a0(%rbp)
+   1400233db:	eb 2a                	jmp    140023407 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xbeb>
+   1400233dd:	48 8b 85 a0 04 00 00 	mov    0x4a0(%rbp),%rax
+   1400233e4:	f2 0f 10 40 10       	movsd  0x10(%rax),%xmm0
+   1400233e9:	66 0f 2f 85 98 05 00 00 	comisd 0x598(%rbp),%xmm0
+   1400233f1:	76 14                	jbe    140023407 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xbeb>
+   1400233f3:	48 8b 85 a0 04 00 00 	mov    0x4a0(%rbp),%rax
+   1400233fa:	f2 0f 10 40 10       	movsd  0x10(%rax),%xmm0
+   1400233ff:	f2 0f 11 85 98 05 00 00 	movsd  %xmm0,0x598(%rbp)
+   140023407:	48 83 85 90 05 00 00 18 	addq   $0x18,0x590(%rbp)
+   14002340f:	48 8b 85 90 05 00 00 	mov    0x590(%rbp),%rax
+   140023416:	48 3b 85 b0 04 00 00 	cmp    0x4b0(%rbp),%rax
+   14002341d:	0f 85 cc fe ff ff    	jne    1400232ef <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xad3>
+   140023423:	8b 85 c4 04 00 00    	mov    0x4c4(%rbp),%eax
+   140023429:	48 63 d0             	movslq %eax,%rdx
+   14002342c:	48 8d 85 80 00 00 00 	lea    0x80(%rbp),%rax
+   140023433:	48 89 c1             	mov    %rax,%rcx
+   140023436:	e8 75 95 25 02       	call   14227c9b0 <std::array<EnergyPlus::SurfaceGeometry::GeoSummary, 8ull>::operator[](unsigned long long)>
+   14002343b:	48 89 85 a8 04 00 00 	mov    %rax,0x4a8(%rbp)
+   140023442:	48 8b 85 a8 04 00 00 	mov    0x4a8(%rbp),%rax
+   140023449:	f2 0f 10 08          	movsd  (%rax),%xmm1
+   14002344d:	48 8b 85 c8 04 00 00 	mov    0x4c8(%rbp),%rax
+   140023454:	f2 0f 10 40 58       	movsd  0x58(%rax),%xmm0
+   140023459:	f2 0f 58 c1          	addsd  %xmm1,%xmm0
+   14002345d:	48 8b 85 a8 04 00 00 	mov    0x4a8(%rbp),%rax
+   140023464:	f2 0f 11 00          	movsd  %xmm0,(%rax)
+   140023468:	48 8b 85 a8 04 00 00 	mov    0x4a8(%rbp),%rax
+   14002346f:	f2 0f 10 40 28       	movsd  0x28(%rax),%xmm0
+   140023474:	48 8b 85 98 05 00 00 	mov    0x598(%rbp),%rax
+   14002347b:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   14002347f:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   140023484:	e8 87 60 e3 01       	call   141e59510 <ObjexxFCL::max(double, double)>
+   140023489:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   14002348e:	48 8b 95 a8 04 00 00 	mov    0x4a8(%rbp),%rdx
+   140023495:	48 89 42 28          	mov    %rax,0x28(%rdx)
+   140023499:	48 8b 85 a8 04 00 00 	mov    0x4a8(%rbp),%rax
+   1400234a0:	f2 0f 10 40 30       	movsd  0x30(%rax),%xmm0
+   1400234a5:	48 8b 85 a0 05 00 00 	mov    0x5a0(%rbp),%rax
+   1400234ac:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   1400234b0:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   1400234b5:	e8 06 66 e3 01       	call   141e59ac0 <ObjexxFCL::min(double, double)>
+   1400234ba:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   1400234bf:	48 8b 95 a8 04 00 00 	mov    0x4a8(%rbp),%rdx
+   1400234c6:	48 89 42 30          	mov    %rax,0x30(%rdx)
+   1400234ca:	48 8b 85 a8 04 00 00 	mov    0x4a8(%rbp),%rax
+   1400234d1:	f2 0f 10 40 38       	movsd  0x38(%rax),%xmm0
+   1400234d6:	48 8b 85 a8 05 00 00 	mov    0x5a8(%rbp),%rax
+   1400234dd:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   1400234e1:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   1400234e6:	e8 25 60 e3 01       	call   141e59510 <ObjexxFCL::max(double, double)>
+   1400234eb:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   1400234f0:	48 8b 95 a8 04 00 00 	mov    0x4a8(%rbp),%rdx
+   1400234f7:	48 89 42 38          	mov    %rax,0x38(%rdx)
+   1400234fb:	48 8b 85 a8 04 00 00 	mov    0x4a8(%rbp),%rax
+   140023502:	f2 0f 10 40 40       	movsd  0x40(%rax),%xmm0
+   140023507:	48 8b 85 b0 05 00 00 	mov    0x5b0(%rbp),%rax
+   14002350e:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   140023512:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   140023517:	e8 a4 65 e3 01       	call   141e59ac0 <ObjexxFCL::min(double, double)>
+   14002351c:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   140023521:	48 8b 95 a8 04 00 00 	mov    0x4a8(%rbp),%rdx
+   140023528:	48 89 42 40          	mov    %rax,0x40(%rdx)
+   14002352c:	48 8b 85 a8 04 00 00 	mov    0x4a8(%rbp),%rax
+   140023533:	f2 0f 10 40 48       	movsd  0x48(%rax),%xmm0
+   140023538:	48 8b 85 b8 05 00 00 	mov    0x5b8(%rbp),%rax
+   14002353f:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   140023543:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   140023548:	e8 c3 5f e3 01       	call   141e59510 <ObjexxFCL::max(double, double)>
+   14002354d:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   140023552:	48 8b 95 a8 04 00 00 	mov    0x4a8(%rbp),%rdx
+   140023559:	48 89 42 48          	mov    %rax,0x48(%rdx)
+   14002355d:	48 8b 85 a8 04 00 00 	mov    0x4a8(%rbp),%rax
+   140023564:	f2 0f 10 40 50       	movsd  0x50(%rax),%xmm0
+   140023569:	48 8b 85 c0 05 00 00 	mov    0x5c0(%rbp),%rax
+   140023570:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   140023574:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   140023579:	e8 42 65 e3 01       	call   141e59ac0 <ObjexxFCL::min(double, double)>
+   14002357e:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   140023583:	48 8b 95 a8 04 00 00 	mov    0x4a8(%rbp),%rdx
+   14002358a:	48 89 42 50          	mov    %rax,0x50(%rdx)
+   14002358e:	eb 07                	jmp    140023597 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xd7b>
+   140023590:	90                   	nop
+   140023591:	eb 04                	jmp    140023597 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xd7b>
+   140023593:	90                   	nop
+   140023594:	eb 01                	jmp    140023597 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xd7b>
+   140023596:	90                   	nop
+   140023597:	48 8d 45 48          	lea    0x48(%rbp),%rax
+   14002359b:	48 89 c1             	mov    %rax,%rcx
+   14002359e:	e8 1d 60 f8 01       	call   141fa95c0 <__gnu_cxx::__normal_iterator<EnergyPlus::DataSurfaces::SurfaceData*, std::vector<EnergyPlus::DataSurfaces::SurfaceData, std::allocator<EnergyPlus::DataSurfaces::SurfaceData> > >::operator++()>
+   1400235a3:	48 8d 55 40          	lea    0x40(%rbp),%rdx
+   1400235a7:	48 8d 45 48          	lea    0x48(%rbp),%rax
+   1400235ab:	48 89 c1             	mov    %rax,%rcx
+   1400235ae:	e8 cd 3a f9 01       	call   141fb7080 <bool __gnu_cxx::operator==<EnergyPlus::DataSurfaces::SurfaceData*, std::vector<EnergyPlus::DataSurfaces::SurfaceData, std::allocator<EnergyPlus::DataSurfaces::SurfaceData> > >(__gnu_cxx::__normal_iterator<EnergyPlus::DataSurfaces::SurfaceData*, std::vector<EnergyPlus::DataSurfaces::SurfaceData, std::allocator<EnergyPlus::DataSurfaces::SurfaceData> > > const&, __gnu_cxx::__normal_iterator<EnergyPlus::DataSurfaces::SurfaceData*, std::vector<EnergyPlus::DataSurfaces::SurfaceData, std::allocator<EnergyPlus::DataSurfaces::SurfaceData> > > const&)>
+   1400235b3:	83 f0 01             	xor    $0x1,%eax
+   1400235b6:	84 c0                	test   %al,%al
+   1400235b8:	0f 85 f2 fb ff ff    	jne    1400231b0 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x994>
+   1400235be:	48 8d 85 80 00 00 00 	lea    0x80(%rbp),%rax
+   1400235c5:	48 89 85 50 05 00 00 	mov    %rax,0x550(%rbp)
+   1400235cc:	48 8b 85 50 05 00 00 	mov    0x550(%rbp),%rax
+   1400235d3:	48 89 c1             	mov    %rax,%rcx
+   1400235d6:	e8 b5 93 25 02       	call   14227c990 <std::array<EnergyPlus::SurfaceGeometry::GeoSummary, 8ull>::begin()>
+   1400235db:	48 89 85 88 05 00 00 	mov    %rax,0x588(%rbp)
+   1400235e2:	48 8b 85 50 05 00 00 	mov    0x550(%rbp),%rax
+   1400235e9:	48 89 c1             	mov    %rax,%rcx
+   1400235ec:	e8 6f 93 25 02       	call   14227c960 <std::array<EnergyPlus::SurfaceGeometry::GeoSummary, 8ull>::end()>
+   1400235f1:	48 89 85 48 05 00 00 	mov    %rax,0x548(%rbp)
+   1400235f8:	e9 e3 00 00 00       	jmp    1400236e0 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xec4>
+   1400235fd:	48 8b 85 88 05 00 00 	mov    0x588(%rbp),%rax
+   140023604:	48 89 85 d0 04 00 00 	mov    %rax,0x4d0(%rbp)
+   14002360b:	48 8b 85 d0 04 00 00 	mov    0x4d0(%rbp),%rax
+   140023612:	f2 0f 10 40 48       	movsd  0x48(%rax),%xmm0
+   140023617:	48 8b 85 d0 04 00 00 	mov    0x4d0(%rbp),%rax
+   14002361e:	f2 0f 10 48 50       	movsd  0x50(%rax),%xmm1
+   140023623:	f2 0f 5c c1          	subsd  %xmm1,%xmm0
+   140023627:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   14002362c:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   140023631:	e8 ca c7 ed 01       	call   141effe00 <double ObjexxFCL::pow_2<double, void>(double)>
+   140023636:	66 0f 28 f0          	movapd %xmm0,%xmm6
+   14002363a:	48 8b 85 d0 04 00 00 	mov    0x4d0(%rbp),%rax
+   140023641:	f2 0f 10 40 38       	movsd  0x38(%rax),%xmm0
+   140023646:	48 8b 85 d0 04 00 00 	mov    0x4d0(%rbp),%rax
+   14002364d:	f2 0f 10 48 40       	movsd  0x40(%rax),%xmm1
+   140023652:	f2 0f 5c c1          	subsd  %xmm1,%xmm0
+   140023656:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   14002365b:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   140023660:	e8 9b c7 ed 01       	call   141effe00 <double ObjexxFCL::pow_2<double, void>(double)>
+   140023665:	f2 0f 58 f0          	addsd  %xmm0,%xmm6
+   140023669:	66 48 0f 7e f0       	movq   %xmm6,%rax
+   14002366e:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   140023673:	e8 48 87 a9 01       	call   141abbdc0 <sqrt>
+   140023678:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   14002367c:	f2 0f 58 c8          	addsd  %xmm0,%xmm1
+   140023680:	48 8b 85 d0 04 00 00 	mov    0x4d0(%rbp),%rax
+   140023687:	f2 0f 10 40 28       	movsd  0x28(%rax),%xmm0
+   14002368c:	48 8b 85 d0 04 00 00 	mov    0x4d0(%rbp),%rax
+   140023693:	f2 0f 10 50 30       	movsd  0x30(%rax),%xmm2
+   140023698:	f2 0f 5c c2          	subsd  %xmm2,%xmm0
+   14002369c:	f2 0f 58 c0          	addsd  %xmm0,%xmm0
+   1400236a0:	f2 0f 58 c1          	addsd  %xmm1,%xmm0
+   1400236a4:	48 8b 85 d0 04 00 00 	mov    0x4d0(%rbp),%rax
+   1400236ab:	f2 0f 11 40 08       	movsd  %xmm0,0x8(%rax)
+   1400236b0:	48 8b 85 d0 04 00 00 	mov    0x4d0(%rbp),%rax
+   1400236b7:	f2 0f 10 40 28       	movsd  0x28(%rax),%xmm0
+   1400236bc:	48 8b 85 d0 04 00 00 	mov    0x4d0(%rbp),%rax
+   1400236c3:	f2 0f 10 48 30       	movsd  0x30(%rax),%xmm1
+   1400236c8:	f2 0f 5c c1          	subsd  %xmm1,%xmm0
+   1400236cc:	48 8b 85 d0 04 00 00 	mov    0x4d0(%rbp),%rax
+   1400236d3:	f2 0f 11 40 10       	movsd  %xmm0,0x10(%rax)
+   1400236d8:	48 83 85 88 05 00 00 58 	addq   $0x58,0x588(%rbp)
+   1400236e0:	48 8b 85 88 05 00 00 	mov    0x588(%rbp),%rax
+   1400236e7:	48 3b 85 48 05 00 00 	cmp    0x548(%rbp),%rax
+   1400236ee:	0f 85 09 ff ff ff    	jne    1400235fd <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xde1>
+   1400236f4:	c7 85 84 05 00 00 01 00 00 00 	movl   $0x1,0x584(%rbp)
+   1400236fe:	e9 c1 03 00 00       	jmp    140023ac4 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x12a8>
+   140023703:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   14002370a:	48 05 58 14 00 00    	add    $0x1458,%rax
+   140023710:	48 89 c1             	mov    %rax,%rcx
+   140023713:	e8 28 6c 05 02       	call   14207a340 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   140023718:	48 8d 88 68 4a 00 00 	lea    0x4a68(%rax),%rcx
+   14002371f:	8b 85 84 05 00 00    	mov    0x584(%rbp),%eax
+   140023725:	48 98                	cltq
+   140023727:	48 89 c2             	mov    %rax,%rdx
+   14002372a:	e8 41 0c c5 01       	call   141c74370 <EnergyPlus::EPVector<EnergyPlus::DataSurfaces::SurfaceData>::operator()(unsigned long long)>
+   14002372f:	48 89 85 10 05 00 00 	mov    %rax,0x510(%rbp)
+   140023736:	48 8b 85 10 05 00 00 	mov    0x510(%rbp),%rax
+   14002373d:	8b 80 e0 03 00 00    	mov    0x3e0(%rax),%eax
+   140023743:	85 c0                	test   %eax,%eax
+   140023745:	0f 85 6e 03 00 00    	jne    140023ab9 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x129d>
+   14002374b:	48 8b 85 10 05 00 00 	mov    0x510(%rbp),%rax
+   140023752:	0f b6 80 50 03 00 00 	movzbl 0x350(%rax),%eax
+   140023759:	83 f0 01             	xor    $0x1,%eax
+   14002375c:	84 c0                	test   %al,%al
+   14002375e:	0f 85 58 03 00 00    	jne    140023abc <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x12a0>
+   140023764:	f2 0f 10 05 fc b4 56 02 	movsd  0x256b4fc(%rip),%xmm0        # 14258ec68 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper>::desc+0x30>
+   14002376c:	f2 0f 11 85 78 05 00 00 	movsd  %xmm0,0x578(%rbp)
+   140023774:	f2 0f 10 05 04 b5 56 02 	movsd  0x256b504(%rip),%xmm0        # 14258ec80 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper>::desc+0x48>
+   14002377c:	f2 0f 11 85 70 05 00 00 	movsd  %xmm0,0x570(%rbp)
+   140023784:	48 8b 85 10 05 00 00 	mov    0x510(%rbp),%rax
+   14002378b:	48 05 20 02 00 00    	add    $0x220,%rax
+   140023791:	48 89 85 08 05 00 00 	mov    %rax,0x508(%rbp)
+   140023798:	48 8b 85 08 05 00 00 	mov    0x508(%rbp),%rax
+   14002379f:	48 89 c1             	mov    %rax,%rcx
+   1400237a2:	e8 e9 b6 fe 01       	call   14200ee90 <ObjexxFCL::Array<ObjexxFCL::Vector3<double> >::begin() const>
+   1400237a7:	48 89 85 68 05 00 00 	mov    %rax,0x568(%rbp)
+   1400237ae:	48 8b 85 08 05 00 00 	mov    0x508(%rbp),%rax
+   1400237b5:	48 89 c1             	mov    %rax,%rcx
+   1400237b8:	e8 63 b6 fe 01       	call   14200ee20 <ObjexxFCL::Array<ObjexxFCL::Vector3<double> >::end() const>
+   1400237bd:	48 89 85 00 05 00 00 	mov    %rax,0x500(%rbp)
+   1400237c4:	eb 70                	jmp    140023836 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x101a>
+   1400237c6:	48 8b 85 68 05 00 00 	mov    0x568(%rbp),%rax
+   1400237cd:	48 89 85 d8 04 00 00 	mov    %rax,0x4d8(%rbp)
+   1400237d4:	48 8b 85 d8 04 00 00 	mov    0x4d8(%rbp),%rax
+   1400237db:	f2 0f 10 48 10       	movsd  0x10(%rax),%xmm1
+   1400237e0:	f2 0f 10 85 78 05 00 00 	movsd  0x578(%rbp),%xmm0
+   1400237e8:	66 0f 2f c1          	comisd %xmm1,%xmm0
+   1400237ec:	76 16                	jbe    140023804 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xfe8>
+   1400237ee:	48 8b 85 d8 04 00 00 	mov    0x4d8(%rbp),%rax
+   1400237f5:	f2 0f 10 40 10       	movsd  0x10(%rax),%xmm0
+   1400237fa:	f2 0f 11 85 78 05 00 00 	movsd  %xmm0,0x578(%rbp)
+   140023802:	eb 2a                	jmp    14002382e <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x1012>
+   140023804:	48 8b 85 d8 04 00 00 	mov    0x4d8(%rbp),%rax
+   14002380b:	f2 0f 10 40 10       	movsd  0x10(%rax),%xmm0
+   140023810:	66 0f 2f 85 70 05 00 00 	comisd 0x570(%rbp),%xmm0
+   140023818:	76 14                	jbe    14002382e <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x1012>
+   14002381a:	48 8b 85 d8 04 00 00 	mov    0x4d8(%rbp),%rax
+   140023821:	f2 0f 10 40 10       	movsd  0x10(%rax),%xmm0
+   140023826:	f2 0f 11 85 70 05 00 00 	movsd  %xmm0,0x570(%rbp)
+   14002382e:	48 83 85 68 05 00 00 18 	addq   $0x18,0x568(%rbp)
+   140023836:	48 8b 85 68 05 00 00 	mov    0x568(%rbp),%rax
+   14002383d:	48 3b 85 00 05 00 00 	cmp    0x500(%rbp),%rax
+   140023844:	75 80                	jne    1400237c6 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xfaa>
+   140023846:	f2 0f 10 85 70 05 00 00 	movsd  0x570(%rbp),%xmm0
+   14002384e:	f2 0f 5c 85 78 05 00 00 	subsd  0x578(%rbp),%xmm0
+   140023856:	f2 0f 11 85 f8 04 00 00 	movsd  %xmm0,0x4f8(%rbp)
+   14002385e:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140023865:	48 05 58 14 00 00    	add    $0x1458,%rax
+   14002386b:	48 89 c1             	mov    %rax,%rcx
+   14002386e:	e8 cd 6a 05 02       	call   14207a340 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   140023873:	48 8d 88 a8 17 00 00 	lea    0x17a8(%rax),%rcx
+   14002387a:	8b 85 84 05 00 00    	mov    0x584(%rbp),%eax
+   140023880:	48 98                	cltq
+   140023882:	48 89 c2             	mov    %rax,%rdx
+   140023885:	e8 f6 07 c5 01       	call   141c74080 <EnergyPlus::EPVector<EnergyPlus::DataSurfaces::SurfExtConv>::operator()(unsigned long long)>
+   14002388a:	48 89 85 f0 04 00 00 	mov    %rax,0x4f0(%rbp)
+   140023891:	48 8b 85 10 05 00 00 	mov    0x510(%rbp),%rax
+   140023898:	f2 0f 10 80 90 00 00 00 	movsd  0x90(%rax),%xmm0
+   1400238a0:	66 0f 2f 05 40 b5 56 02 	comisd 0x256b540(%rip),%xmm0        # 14258ede8 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper>::desc+0x1b0>
+   1400238a8:	0f 82 fa 00 00 00    	jb     1400239a8 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x118c>
+   1400238ae:	48 8b 85 10 05 00 00 	mov    0x510(%rbp),%rax
+   1400238b5:	f2 0f 10 88 90 00 00 00 	movsd  0x90(%rax),%xmm1
+   1400238bd:	f2 0f 10 05 3b b5 56 02 	movsd  0x256b53b(%rip),%xmm0        # 14258ee00 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper>::desc+0x1c8>
+   1400238c5:	66 0f 2f c1          	comisd %xmm1,%xmm0
+   1400238c9:	0f 86 d9 00 00 00    	jbe    1400239a8 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x118c>
+   1400238cf:	48 8b 85 10 05 00 00 	mov    0x510(%rbp),%rax
+   1400238d6:	48 8b 40 78          	mov    0x78(%rax),%rax
+   1400238da:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   1400238df:	e8 f3 2b 07 00       	call   1400964d7 <EnergyPlus::DataSurfaces::AzimuthToCompass8(double)>
+   1400238e4:	89 85 ec 04 00 00    	mov    %eax,0x4ec(%rbp)
+   1400238ea:	8b 85 ec 04 00 00    	mov    0x4ec(%rbp),%eax
+   1400238f0:	48 63 d0             	movslq %eax,%rdx
+   1400238f3:	48 8d 85 80 00 00 00 	lea    0x80(%rbp),%rax
+   1400238fa:	48 89 c1             	mov    %rax,%rcx
+   1400238fd:	e8 ae 90 25 02       	call   14227c9b0 <std::array<EnergyPlus::SurfaceGeometry::GeoSummary, 8ull>::operator[](unsigned long long)>
+   140023902:	48 89 85 e0 04 00 00 	mov    %rax,0x4e0(%rbp)
+   140023909:	48 8b 85 10 05 00 00 	mov    0x510(%rbp),%rax
+   140023910:	f2 0f 10 40 60       	movsd  0x60(%rax),%xmm0
+   140023915:	48 8b 85 e0 04 00 00 	mov    0x4e0(%rbp),%rax
+   14002391c:	48 8b 00             	mov    (%rax),%rax
+   14002391f:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   140023923:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   140023928:	e8 e3 5b e3 01       	call   141e59510 <ObjexxFCL::max(double, double)>
+   14002392d:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   140023932:	48 8b 95 f0 04 00 00 	mov    0x4f0(%rbp),%rdx
+   140023939:	48 89 42 28          	mov    %rax,0x28(%rdx)
+   14002393d:	48 8b 85 10 05 00 00 	mov    0x510(%rbp),%rax
+   140023944:	f2 0f 10 40 70       	movsd  0x70(%rax),%xmm0
+   140023949:	48 8b 85 e0 04 00 00 	mov    0x4e0(%rbp),%rax
+   140023950:	48 8b 40 08          	mov    0x8(%rax),%rax
+   140023954:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   140023958:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   14002395d:	e8 ae 5b e3 01       	call   141e59510 <ObjexxFCL::max(double, double)>
+   140023962:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   140023967:	48 8b 95 f0 04 00 00 	mov    0x4f0(%rbp),%rdx
+   14002396e:	48 89 42 30          	mov    %rax,0x30(%rdx)
+   140023972:	48 8b 85 e0 04 00 00 	mov    0x4e0(%rbp),%rax
+   140023979:	48 8b 40 10          	mov    0x10(%rax),%rax
+   14002397d:	f2 0f 10 85 f8 04 00 00 	movsd  0x4f8(%rbp),%xmm0
+   140023985:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   140023989:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   14002398e:	e8 7d 5b e3 01       	call   141e59510 <ObjexxFCL::max(double, double)>
+   140023993:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   140023998:	48 8b 95 f0 04 00 00 	mov    0x4f0(%rbp),%rdx
+   14002399f:	48 89 42 38          	mov    %rax,0x38(%rdx)
+   1400239a3:	e9 15 01 00 00       	jmp    140023abd <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x12a1>
+   1400239a8:	48 8b 85 10 05 00 00 	mov    0x510(%rbp),%rax
+   1400239af:	f2 0f 10 88 90 00 00 00 	movsd  0x90(%rax),%xmm1
+   1400239b7:	f2 0f 10 05 29 b4 56 02 	movsd  0x256b429(%rip),%xmm0        # 14258ede8 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper>::desc+0x1b0>
+   1400239bf:	66 0f 2f c1          	comisd %xmm1,%xmm0
+   1400239c3:	0f 86 91 00 00 00    	jbe    140023a5a <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x123e>
+   1400239c9:	48 8b 85 10 05 00 00 	mov    0x510(%rbp),%rax
+   1400239d0:	f2 0f 10 40 60       	movsd  0x60(%rax),%xmm0
+   1400239d5:	48 8b 85 40 03 00 00 	mov    0x340(%rbp),%rax
+   1400239dc:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   1400239e0:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   1400239e5:	e8 26 5b e3 01       	call   141e59510 <ObjexxFCL::max(double, double)>
+   1400239ea:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   1400239ef:	48 8b 95 f0 04 00 00 	mov    0x4f0(%rbp),%rdx
+   1400239f6:	48 89 42 28          	mov    %rax,0x28(%rdx)
+   1400239fa:	48 8b 85 10 05 00 00 	mov    0x510(%rbp),%rax
+   140023a01:	f2 0f 10 40 70       	movsd  0x70(%rax),%xmm0
+   140023a06:	48 8b 85 48 03 00 00 	mov    0x348(%rbp),%rax
+   140023a0d:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   140023a11:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   140023a16:	e8 f5 5a e3 01       	call   141e59510 <ObjexxFCL::max(double, double)>
+   140023a1b:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   140023a20:	48 8b 95 f0 04 00 00 	mov    0x4f0(%rbp),%rdx
+   140023a27:	48 89 42 30          	mov    %rax,0x30(%rdx)
+   140023a2b:	48 8b 85 50 03 00 00 	mov    0x350(%rbp),%rax
+   140023a32:	f2 0f 10 85 f8 04 00 00 	movsd  0x4f8(%rbp),%xmm0
+   140023a3a:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   140023a3e:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   140023a43:	e8 c8 5a e3 01       	call   141e59510 <ObjexxFCL::max(double, double)>
+   140023a48:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   140023a4d:	48 8b 95 f0 04 00 00 	mov    0x4f0(%rbp),%rdx
+   140023a54:	48 89 42 38          	mov    %rax,0x38(%rdx)
+   140023a58:	eb 63                	jmp    140023abd <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x12a1>
+   140023a5a:	48 8b 85 10 05 00 00 	mov    0x510(%rbp),%rax
+   140023a61:	f2 0f 10 80 90 00 00 00 	movsd  0x90(%rax),%xmm0
+   140023a69:	66 0f 2f 05 8f b3 56 02 	comisd 0x256b38f(%rip),%xmm0        # 14258ee00 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper, (anonymous namespace)::DoubleWrapper>::desc+0x1c8>
+   140023a71:	72 4a                	jb     140023abd <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x12a1>
+   140023a73:	48 8b 85 10 05 00 00 	mov    0x510(%rbp),%rax
+   140023a7a:	f2 0f 10 40 60       	movsd  0x60(%rax),%xmm0
+   140023a7f:	48 8b 85 f0 04 00 00 	mov    0x4f0(%rbp),%rax
+   140023a86:	f2 0f 11 40 28       	movsd  %xmm0,0x28(%rax)
+   140023a8b:	48 8b 85 10 05 00 00 	mov    0x510(%rbp),%rax
+   140023a92:	f2 0f 10 40 70       	movsd  0x70(%rax),%xmm0
+   140023a97:	48 8b 85 f0 04 00 00 	mov    0x4f0(%rbp),%rax
+   140023a9e:	f2 0f 11 40 30       	movsd  %xmm0,0x30(%rax)
+   140023aa3:	48 8b 85 f0 04 00 00 	mov    0x4f0(%rbp),%rax
+   140023aaa:	f2 0f 10 85 f8 04 00 00 	movsd  0x4f8(%rbp),%xmm0
+   140023ab2:	f2 0f 11 40 38       	movsd  %xmm0,0x38(%rax)
+   140023ab7:	eb 04                	jmp    140023abd <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x12a1>
+   140023ab9:	90                   	nop
+   140023aba:	eb 01                	jmp    140023abd <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x12a1>
+   140023abc:	90                   	nop
+   140023abd:	83 85 84 05 00 00 01 	addl   $0x1,0x584(%rbp)
+   140023ac4:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140023acb:	48 05 58 14 00 00    	add    $0x1458,%rax
+   140023ad1:	48 89 c1             	mov    %rax,%rcx
+   140023ad4:	e8 67 68 05 02       	call   14207a340 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   140023ad9:	8b 40 08             	mov    0x8(%rax),%eax
+   140023adc:	39 85 84 05 00 00    	cmp    %eax,0x584(%rbp)
+   140023ae2:	0f 9e c0             	setle  %al
+   140023ae5:	84 c0                	test   %al,%al
+   140023ae7:	0f 85 16 fc ff ff    	jne    140023703 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0xee7>
+   140023aed:	48 8d 85 a0 03 00 00 	lea    0x3a0(%rbp),%rax
+   140023af4:	44 89 e2             	mov    %r12d,%edx
+   140023af7:	48 89 c1             	mov    %rax,%rcx
+   140023afa:	e8 d1 c1 f7 01       	call   141f9fcd0 <ObjexxFCL::Optional<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::Optional(ObjexxFCL::Omit)>
+   140023aff:	48 8d 85 b0 03 00 00 	lea    0x3b0(%rbp),%rax
+   140023b06:	89 f2                	mov    %esi,%edx
+   140023b08:	48 89 c1             	mov    %rax,%rcx
+   140023b0b:	e8 c0 c1 f7 01       	call   141f9fcd0 <ObjexxFCL::Optional<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::Optional(ObjexxFCL::Omit)>
+   140023b10:	48 8d 85 c0 03 00 00 	lea    0x3c0(%rbp),%rax
+   140023b17:	48 8d 15 72 58 56 02 	lea    0x2565872(%rip),%rdx        # 142589390 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)::Format_8801+0x10>
+   140023b1e:	48 89 c1             	mov    %rax,%rcx
+   140023b21:	e8 1a aa f7 01       	call   141f9e540 <ObjexxFCL::Optional<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const>::Optional<char [8], void>(char const (&) [8])>
+   140023b26:	48 8d 85 f7 03 00 00 	lea    0x3f7(%rbp),%rax
+   140023b2d:	48 89 85 08 04 00 00 	mov    %rax,0x408(%rbp)
+   140023b34:	90                   	nop
+   140023b35:	90                   	nop
+   140023b36:	48 8d 95 f7 03 00 00 	lea    0x3f7(%rbp),%rdx
+   140023b3d:	48 8d 85 d0 03 00 00 	lea    0x3d0(%rbp),%rax
+   140023b44:	49 89 d0             	mov    %rdx,%r8
+   140023b47:	48 8d 15 4a 58 56 02 	lea    0x256584a(%rip),%rdx        # 142589398 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)::Format_8801+0x18>
+   140023b4e:	48 89 c1             	mov    %rax,%rcx
+   140023b51:	e8 ba 38 33 02       	call   142357410 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&)>
+   140023b56:	4c 8d 8d c0 03 00 00 	lea    0x3c0(%rbp),%r9
+   140023b5d:	4c 8d 85 9f 03 00 00 	lea    0x39f(%rbp),%r8
+   140023b64:	48 8d 95 d0 03 00 00 	lea    0x3d0(%rbp),%rdx
+   140023b6b:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140023b72:	48 8d 8d a0 03 00 00 	lea    0x3a0(%rbp),%rcx
+   140023b79:	48 89 4c 24 28       	mov    %rcx,0x28(%rsp)
+   140023b7e:	48 8d 8d b0 03 00 00 	lea    0x3b0(%rbp),%rcx
+   140023b85:	48 89 4c 24 20       	mov    %rcx,0x20(%rsp)
+   140023b8a:	48 89 c1             	mov    %rax,%rcx
+   140023b8d:	e8 25 c1 0b 00       	call   1400dfcb7 <EnergyPlus::General::ScanForReports(EnergyPlus::EnergyPlusData&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, bool&, ObjexxFCL::Optional<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const>, ObjexxFCL::Optional<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, ObjexxFCL::Optional<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >)>
+   140023b92:	48 8d 85 d0 03 00 00 	lea    0x3d0(%rbp),%rax
+   140023b99:	48 89 c1             	mov    %rax,%rcx
+   140023b9c:	e8 2f 3a 33 02       	call   1423575d0 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string()>
+   140023ba1:	90                   	nop
+   140023ba2:	48 8d 85 c0 03 00 00 	lea    0x3c0(%rbp),%rax
+   140023ba9:	48 89 c1             	mov    %rax,%rcx
+   140023bac:	e8 3f ab f7 01       	call   141f9e6f0 <ObjexxFCL::Optional<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const>::~Optional()>
+   140023bb1:	48 8d 85 b0 03 00 00 	lea    0x3b0(%rbp),%rax
+   140023bb8:	48 89 c1             	mov    %rax,%rcx
+   140023bbb:	e8 a0 c1 f7 01       	call   141f9fd60 <ObjexxFCL::Optional<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::~Optional()>
+   140023bc0:	48 8d 85 a0 03 00 00 	lea    0x3a0(%rbp),%rax
+   140023bc7:	48 89 c1             	mov    %rax,%rcx
+   140023bca:	e8 91 c1 f7 01       	call   141f9fd60 <ObjexxFCL::Optional<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::~Optional()>
+   140023bcf:	0f b6 85 9f 03 00 00 	movzbl 0x39f(%rbp),%eax
+   140023bd6:	84 c0                	test   %al,%al
+   140023bd8:	0f 84 7a 05 00 00    	je     140024158 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x193c>
+   140023bde:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140023be5:	48 8d 48 70          	lea    0x70(%rax),%rcx
+   140023be9:	48 8b 05 30 55 56 02 	mov    0x2565530(%rip),%rax        # 142589120 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)::Format_900>
+   140023bf0:	48 8b 15 31 55 56 02 	mov    0x2565531(%rip),%rdx        # 142589128 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)::Format_900+0x8>
+   140023bf7:	48 89 45 10          	mov    %rax,0x10(%rbp)
+   140023bfb:	48 89 55 18          	mov    %rdx,0x18(%rbp)
+   140023bff:	48 8d 45 10          	lea    0x10(%rbp),%rax
+   140023c03:	48 89 c2             	mov    %rax,%rdx
+   140023c06:	e8 c5 5c bd 01       	call   141bf98d0 <void EnergyPlus::print<(EnergyPlus::FormatSyntax)0>(EnergyPlus::InputOutputFile&, std::basic_string_view<char, std::char_traits<char> >)>
+   140023c0b:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140023c12:	48 05 58 14 00 00    	add    $0x1458,%rax
+   140023c18:	48 89 c1             	mov    %rax,%rcx
+   140023c1b:	e8 20 67 05 02       	call   14207a340 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   140023c20:	48 05 e8 02 00 00    	add    $0x2e8,%rax
+   140023c26:	48 89 85 40 05 00 00 	mov    %rax,0x540(%rbp)
+   140023c2d:	48 8b 85 40 05 00 00 	mov    0x540(%rbp),%rax
+   140023c34:	48 89 c1             	mov    %rax,%rcx
+   140023c37:	e8 84 b0 32 02       	call   14234ecc0 <std::vector<int, std::allocator<int> >::begin()>
+   140023c3c:	48 89 45 38          	mov    %rax,0x38(%rbp)
+   140023c40:	48 8b 85 40 05 00 00 	mov    0x540(%rbp),%rax
+   140023c47:	48 89 c1             	mov    %rax,%rcx
+   140023c4a:	e8 c1 af 32 02       	call   14234ec10 <std::vector<int, std::allocator<int> >::end()>
+   140023c4f:	48 89 45 30          	mov    %rax,0x30(%rbp)
+   140023c53:	e9 72 02 00 00       	jmp    140023eca <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x16ae>
+   140023c58:	48 8d 45 38          	lea    0x38(%rbp),%rax
+   140023c5c:	48 89 c1             	mov    %rax,%rcx
+   140023c5f:	e8 8c ef 04 02       	call   142072bf0 <__gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > >::operator*() const>
+   140023c64:	8b 00                	mov    (%rax),%eax
+   140023c66:	89 85 34 05 00 00    	mov    %eax,0x534(%rbp)
+   140023c6c:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140023c73:	48 05 58 14 00 00    	add    $0x1458,%rax
+   140023c79:	48 89 c1             	mov    %rax,%rcx
+   140023c7c:	e8 bf 66 05 02       	call   14207a340 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   140023c81:	48 8d 88 68 4a 00 00 	lea    0x4a68(%rax),%rcx
+   140023c88:	8b 85 34 05 00 00    	mov    0x534(%rbp),%eax
+   140023c8e:	48 98                	cltq
+   140023c90:	48 89 c2             	mov    %rax,%rdx
+   140023c93:	e8 d8 06 c5 01       	call   141c74370 <EnergyPlus::EPVector<EnergyPlus::DataSurfaces::SurfaceData>::operator()(unsigned long long)>
+   140023c98:	48 89 85 28 05 00 00 	mov    %rax,0x528(%rbp)
+   140023c9f:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140023ca6:	48 05 58 14 00 00    	add    $0x1458,%rax
+   140023cac:	48 89 c1             	mov    %rax,%rcx
+   140023caf:	e8 8c 66 05 02       	call   14207a340 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   140023cb4:	48 8d 88 a8 17 00 00 	lea    0x17a8(%rax),%rcx
+   140023cbb:	8b 85 34 05 00 00    	mov    0x534(%rbp),%eax
+   140023cc1:	48 98                	cltq
+   140023cc3:	48 89 c2             	mov    %rax,%rdx
+   140023cc6:	e8 b5 03 c5 01       	call   141c74080 <EnergyPlus::EPVector<EnergyPlus::DataSurfaces::SurfExtConv>::operator()(unsigned long long)>
+   140023ccb:	48 89 85 20 05 00 00 	mov    %rax,0x520(%rbp)
+   140023cd2:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140023cd9:	48 05 58 14 00 00    	add    $0x1458,%rax
+   140023cdf:	48 89 c1             	mov    %rax,%rcx
+   140023ce2:	e8 59 66 05 02       	call   14207a340 <std::unique_ptr<EnergyPlus::SurfacesData, std::default_delete<EnergyPlus::SurfacesData> >::operator->() const>
+   140023ce7:	48 8d 88 88 17 00 00 	lea    0x1788(%rax),%rcx
+   140023cee:	8b 85 34 05 00 00    	mov    0x534(%rbp),%eax
+   140023cf4:	48 98                	cltq
+   140023cf6:	48 89 c2             	mov    %rax,%rdx
+   140023cf9:	e8 02 05 c5 01       	call   141c74200 <EnergyPlus::EPVector<EnergyPlus::DataSurfaces::SurfIntConv>::operator()(unsigned long long)>
+   140023cfe:	48 89 85 18 05 00 00 	mov    %rax,0x518(%rbp)
+   140023d05:	48 8b 85 28 05 00 00 	mov    0x528(%rbp),%rax
+   140023d0c:	0f b6 80 50 03 00 00 	movzbl 0x350(%rax),%eax
+   140023d13:	83 f0 01             	xor    $0x1,%eax
+   140023d16:	84 c0                	test   %al,%al
+   140023d18:	0f 85 9f 01 00 00    	jne    140023ebd <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x16a1>
+   140023d1e:	48 8b 85 20 05 00 00 	mov    0x520(%rbp),%rax
+   140023d25:	8b 40 0c             	mov    0xc(%rax),%eax
+   140023d28:	89 45 2c             	mov    %eax,0x2c(%rbp)
+   140023d2b:	8b 45 2c             	mov    0x2c(%rbp),%eax
+   140023d2e:	85 c0                	test   %eax,%eax
+   140023d30:	75 25                	jne    140023d57 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x153b>
+   140023d32:	48 8b 85 20 05 00 00 	mov    0x520(%rbp),%rax
+   140023d39:	8b 40 08             	mov    0x8(%rax),%eax
+   140023d3c:	48 98                	cltq
+   140023d3e:	48 89 c2             	mov    %rax,%rdx
+   140023d41:	48 8d 05 98 60 55 02 	lea    0x2556098(%rip),%rax        # 142579de0 <EnergyPlus::Convect::HcExtReportVals>
+   140023d48:	48 89 c1             	mov    %rax,%rcx
+   140023d4b:	e8 f0 97 07 02       	call   14209d540 <std::array<int, 36ull>::operator[](unsigned long long) const>
+   140023d50:	8b 00                	mov    (%rax),%eax
+   140023d52:	f7 d8                	neg    %eax
+   140023d54:	89 45 2c             	mov    %eax,0x2c(%rbp)
+   140023d57:	48 8b 85 18 05 00 00 	mov    0x518(%rbp),%rax
+   140023d5e:	8b 40 0c             	mov    0xc(%rax),%eax
+   140023d61:	89 45 28             	mov    %eax,0x28(%rbp)
+   140023d64:	8b 45 28             	mov    0x28(%rbp),%eax
+   140023d67:	85 c0                	test   %eax,%eax
+   140023d69:	75 25                	jne    140023d90 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x1574>
+   140023d6b:	48 8b 85 18 05 00 00 	mov    0x518(%rbp),%rax
+   140023d72:	8b 40 08             	mov    0x8(%rax),%eax
+   140023d75:	48 98                	cltq
+   140023d77:	48 89 c2             	mov    %rax,%rdx
+   140023d7a:	48 8d 05 7f 59 55 02 	lea    0x255597f(%rip),%rax        # 142579700 <EnergyPlus::Convect::HcIntReportVals>
+   140023d81:	48 89 c1             	mov    %rax,%rcx
+   140023d84:	e8 47 98 07 02       	call   14209d5d0 <std::array<int, 40ull>::operator[](unsigned long long) const>
+   140023d89:	8b 00                	mov    (%rax),%eax
+   140023d8b:	f7 d8                	neg    %eax
+   140023d8d:	89 45 28             	mov    %eax,0x28(%rbp)
+   140023d90:	48 8b 85 18 05 00 00 	mov    0x518(%rbp),%rax
+   140023d97:	0f b6 40 45          	movzbl 0x45(%rax),%eax
+   140023d9b:	84 c0                	test   %al,%al
+   140023d9d:	74 09                	je     140023da8 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x158c>
+   140023d9f:	48 8d 05 3d 65 55 02 	lea    0x255653d(%rip),%rax        # 14257a2e3 <EnergyPlus::Util::MonthNamesUC+0xc3>
+   140023da6:	eb 07                	jmp    140023daf <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x1593>
+   140023da8:	48 8d 05 31 65 55 02 	lea    0x2556531(%rip),%rax        # 14257a2e0 <EnergyPlus::Util::MonthNamesUC+0xc0>
+   140023daf:	48 89 85 f8 03 00 00 	mov    %rax,0x3f8(%rbp)
+   140023db6:	48 8b 85 18 05 00 00 	mov    0x518(%rbp),%rax
+   140023dbd:	0f b6 40 44          	movzbl 0x44(%rax),%eax
+   140023dc1:	84 c0                	test   %al,%al
+   140023dc3:	74 09                	je     140023dce <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x15b2>
+   140023dc5:	48 8d 05 17 65 55 02 	lea    0x2556517(%rip),%rax        # 14257a2e3 <EnergyPlus::Util::MonthNamesUC+0xc3>
+   140023dcc:	eb 07                	jmp    140023dd5 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x15b9>
+   140023dce:	48 8d 05 0b 65 55 02 	lea    0x255650b(%rip),%rax        # 14257a2e0 <EnergyPlus::Util::MonthNamesUC+0xc0>
+   140023dd5:	48 89 85 00 04 00 00 	mov    %rax,0x400(%rbp)
+   140023ddc:	48 8b 85 18 05 00 00 	mov    0x518(%rbp),%rax
+   140023de3:	4c 8d 60 40          	lea    0x40(%rax),%r12
+   140023de7:	48 8b 85 18 05 00 00 	mov    0x518(%rbp),%rax
+   140023dee:	48 8d 78 38          	lea    0x38(%rax),%rdi
+   140023df2:	48 8b 85 18 05 00 00 	mov    0x518(%rbp),%rax
+   140023df9:	48 8d 70 30          	lea    0x30(%rax),%rsi
+   140023dfd:	48 8b 85 18 05 00 00 	mov    0x518(%rbp),%rax
+   140023e04:	48 8d 58 28          	lea    0x28(%rax),%rbx
+   140023e08:	48 8b 85 18 05 00 00 	mov    0x518(%rbp),%rax
+   140023e0f:	4c 8d 58 20          	lea    0x20(%rax),%r11
+   140023e13:	48 8b 85 20 05 00 00 	mov    0x520(%rbp),%rax
+   140023e1a:	4c 8d 50 38          	lea    0x38(%rax),%r10
+   140023e1e:	48 8b 85 20 05 00 00 	mov    0x520(%rbp),%rax
+   140023e25:	4c 8d 48 30          	lea    0x30(%rax),%r9
+   140023e29:	48 8b 85 20 05 00 00 	mov    0x520(%rbp),%rax
+   140023e30:	4c 8d 40 28          	lea    0x28(%rax),%r8
+   140023e34:	4c 8b ad 28 05 00 00 	mov    0x528(%rbp),%r13
+   140023e3b:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140023e42:	48 8d 48 70          	lea    0x70(%rax),%rcx
+   140023e46:	48 8b 05 53 53 56 02 	mov    0x2565353(%rip),%rax        # 1425891a0 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)::Format_901>
+   140023e4d:	48 8b 15 54 53 56 02 	mov    0x2565354(%rip),%rdx        # 1425891a8 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)::Format_901+0x8>
+   140023e54:	48 89 45 10          	mov    %rax,0x10(%rbp)
+   140023e58:	48 89 55 18          	mov    %rdx,0x18(%rbp)
+   140023e5c:	4c 8d 75 2c          	lea    0x2c(%rbp),%r14
+   140023e60:	48 8d 45 10          	lea    0x10(%rbp),%rax
+   140023e64:	48 8d 95 f8 03 00 00 	lea    0x3f8(%rbp),%rdx
+   140023e6b:	48 89 54 24 70       	mov    %rdx,0x70(%rsp)
+   140023e70:	48 8d 95 00 04 00 00 	lea    0x400(%rbp),%rdx
+   140023e77:	48 89 54 24 68       	mov    %rdx,0x68(%rsp)
+   140023e7c:	4c 89 64 24 60       	mov    %r12,0x60(%rsp)
+   140023e81:	48 89 7c 24 58       	mov    %rdi,0x58(%rsp)
+   140023e86:	48 89 74 24 50       	mov    %rsi,0x50(%rsp)
+   140023e8b:	48 89 5c 24 48       	mov    %rbx,0x48(%rsp)
+   140023e90:	4c 89 5c 24 40       	mov    %r11,0x40(%rsp)
+   140023e95:	48 8d 55 28          	lea    0x28(%rbp),%rdx
+   140023e99:	48 89 54 24 38       	mov    %rdx,0x38(%rsp)
+   140023e9e:	4c 89 54 24 30       	mov    %r10,0x30(%rsp)
+   140023ea3:	4c 89 4c 24 28       	mov    %r9,0x28(%rsp)
+   140023ea8:	4c 89 44 24 20       	mov    %r8,0x20(%rsp)
+   140023ead:	4d 89 f1             	mov    %r14,%r9
+   140023eb0:	4d 89 e8             	mov    %r13,%r8
+   140023eb3:	48 89 c2             	mov    %rax,%rdx
+   140023eb6:	e8 e5 cc bd 01       	call   141c00ba0 <void EnergyPlus::print<(EnergyPlus::FormatSyntax)0, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, int&, double const&, double const&, double const&, int&, double const&, double const&, double const&, double const&, EnergyPlus::Convect::IntConvWinLoc const&, char const*, char const*>(EnergyPlus::InputOutputFile&, std::basic_string_view<char, std::char_traits<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, int&, double const&, double const&, double const&, int&, double const&, double const&, double const&, double const&, EnergyPlus::Convect::IntConvWinLoc const&, char const*&&, char const*&&)>
+   140023ebb:	eb 01                	jmp    140023ebe <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x16a2>
+   140023ebd:	90                   	nop
+   140023ebe:	48 8d 45 38          	lea    0x38(%rbp),%rax
+   140023ec2:	48 89 c1             	mov    %rax,%rcx
+   140023ec5:	e8 d6 b8 f8 01       	call   141faf7a0 <__gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > >::operator++()>
+   140023eca:	48 8d 55 30          	lea    0x30(%rbp),%rdx
+   140023ece:	48 8d 45 38          	lea    0x38(%rbp),%rax
+   140023ed2:	48 89 c1             	mov    %rax,%rcx
+   140023ed5:	e8 26 6c f9 01       	call   141fbab00 <bool __gnu_cxx::operator==<int*, std::vector<int, std::allocator<int> > >(__gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > > const&, __gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > > const&)>
+   140023eda:	83 f0 01             	xor    $0x1,%eax
+   140023edd:	84 c0                	test   %al,%al
+   140023edf:	0f 85 73 fd ff ff    	jne    140023c58 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x143c>
+   140023ee5:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140023eec:	48 05 10 0f 00 00    	add    $0xf10,%rax
+   140023ef2:	48 89 c1             	mov    %rax,%rcx
+   140023ef5:	e8 86 5f 05 02       	call   142079e80 <std::unique_ptr<EnergyPlus::DataGlobal, std::default_delete<EnergyPlus::DataGlobal> >::operator->() const>
+   140023efa:	0f b6 80 09 01 00 00 	movzbl 0x109(%rax),%eax
+   140023f01:	84 c0                	test   %al,%al
+   140023f03:	0f 84 4f 02 00 00    	je     140024158 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x193c>
+   140023f09:	c7 85 64 05 00 00 00 00 00 00 	movl   $0x0,0x564(%rbp)
+   140023f13:	e9 3d 01 00 00       	jmp    140024055 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x1839>
+   140023f18:	8b 85 64 05 00 00    	mov    0x564(%rbp),%eax
+   140023f1e:	48 98                	cltq
+   140023f20:	48 89 c2             	mov    %rax,%rdx
+   140023f23:	48 8d 05 56 69 55 02 	lea    0x2556956(%rip),%rax        # 14257a880 <EnergyPlus::DataSurfaces::compass8Names>
+   140023f2a:	48 89 c1             	mov    %rax,%rcx
+   140023f2d:	e8 fe 8a 07 02       	call   14209ca30 <std::array<std::basic_string_view<char, std::char_traits<char> >, 8ull>::operator[](unsigned long long) const>
+   140023f32:	49 89 c0             	mov    %rax,%r8
+   140023f35:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140023f3c:	48 8d 48 70          	lea    0x70(%rax),%rcx
+   140023f40:	48 8b 05 d9 52 56 02 	mov    0x25652d9(%rip),%rax        # 142589220 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)::Format_8000>
+   140023f47:	48 8b 15 da 52 56 02 	mov    0x25652da(%rip),%rdx        # 142589228 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)::Format_8000+0x8>
+   140023f4e:	48 89 45 10          	mov    %rax,0x10(%rbp)
+   140023f52:	48 89 55 18          	mov    %rdx,0x18(%rbp)
+   140023f56:	48 8d 45 10          	lea    0x10(%rbp),%rax
+   140023f5a:	48 89 c2             	mov    %rax,%rdx
+   140023f5d:	e8 2e d4 bd 01       	call   141c01390 <void EnergyPlus::print<(EnergyPlus::FormatSyntax)0, std::basic_string_view<char, std::char_traits<char> > const&>(EnergyPlus::InputOutputFile&, std::basic_string_view<char, std::char_traits<char> >, std::basic_string_view<char, std::char_traits<char> > const&)>
+   140023f62:	8b 85 64 05 00 00    	mov    0x564(%rbp),%eax
+   140023f68:	48 63 d0             	movslq %eax,%rdx
+   140023f6b:	48 8d 85 80 00 00 00 	lea    0x80(%rbp),%rax
+   140023f72:	48 89 c1             	mov    %rax,%rcx
+   140023f75:	e8 36 8a 25 02       	call   14227c9b0 <std::array<EnergyPlus::SurfaceGeometry::GeoSummary, 8ull>::operator[](unsigned long long)>
+   140023f7a:	48 89 85 38 05 00 00 	mov    %rax,0x538(%rbp)
+   140023f81:	48 8b 85 38 05 00 00 	mov    0x538(%rbp),%rax
+   140023f88:	4c 8d 78 28          	lea    0x28(%rax),%r15
+   140023f8c:	48 8b 85 38 05 00 00 	mov    0x538(%rbp),%rax
+   140023f93:	4c 8d 70 30          	lea    0x30(%rax),%r14
+   140023f97:	48 8b 85 38 05 00 00 	mov    0x538(%rbp),%rax
+   140023f9e:	4c 8d 68 38          	lea    0x38(%rax),%r13
+   140023fa2:	48 8b 85 38 05 00 00 	mov    0x538(%rbp),%rax
+   140023fa9:	4c 8d 60 40          	lea    0x40(%rax),%r12
+   140023fad:	48 8b 85 38 05 00 00 	mov    0x538(%rbp),%rax
+   140023fb4:	48 8d 78 48          	lea    0x48(%rax),%rdi
+   140023fb8:	48 8b 85 38 05 00 00 	mov    0x538(%rbp),%rax
+   140023fbf:	48 8d 70 50          	lea    0x50(%rax),%rsi
+   140023fc3:	48 8b 85 38 05 00 00 	mov    0x538(%rbp),%rax
+   140023fca:	48 8d 58 10          	lea    0x10(%rax),%rbx
+   140023fce:	48 8b 85 38 05 00 00 	mov    0x538(%rbp),%rax
+   140023fd5:	48 83 c0 08          	add    $0x8,%rax
+   140023fd9:	48 89 45 08          	mov    %rax,0x8(%rbp)
+   140023fdd:	8b 85 64 05 00 00    	mov    0x564(%rbp),%eax
+   140023fe3:	48 98                	cltq
+   140023fe5:	48 89 c2             	mov    %rax,%rdx
+   140023fe8:	48 8d 05 91 68 55 02 	lea    0x2556891(%rip),%rax        # 14257a880 <EnergyPlus::DataSurfaces::compass8Names>
+   140023fef:	48 89 c1             	mov    %rax,%rcx
+   140023ff2:	e8 39 8a 07 02       	call   14209ca30 <std::array<std::basic_string_view<char, std::char_traits<char> >, 8ull>::operator[](unsigned long long) const>
+   140023ff7:	49 89 c0             	mov    %rax,%r8
+   140023ffa:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140024001:	48 8d 48 70          	lea    0x70(%rax),%rcx
+   140024005:	48 8b 05 94 52 56 02 	mov    0x2565294(%rip),%rax        # 1425892a0 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)::Format_8001>
+   14002400c:	48 8b 15 95 52 56 02 	mov    0x2565295(%rip),%rdx        # 1425892a8 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)::Format_8001+0x8>
+   140024013:	48 89 45 10          	mov    %rax,0x10(%rbp)
+   140024017:	48 89 55 18          	mov    %rdx,0x18(%rbp)
+   14002401b:	48 8d 45 10          	lea    0x10(%rbp),%rax
+   14002401f:	4c 89 7c 24 50       	mov    %r15,0x50(%rsp)
+   140024024:	4c 89 74 24 48       	mov    %r14,0x48(%rsp)
+   140024029:	4c 89 6c 24 40       	mov    %r13,0x40(%rsp)
+   14002402e:	4c 89 64 24 38       	mov    %r12,0x38(%rsp)
+   140024033:	48 89 7c 24 30       	mov    %rdi,0x30(%rsp)
+   140024038:	48 89 74 24 28       	mov    %rsi,0x28(%rsp)
+   14002403d:	48 89 5c 24 20       	mov    %rbx,0x20(%rsp)
+   140024042:	4c 8b 4d 08          	mov    0x8(%rbp),%r9
+   140024046:	48 89 c2             	mov    %rax,%rdx
+   140024049:	e8 d2 d4 bd 01       	call   141c01520 <void EnergyPlus::print<(EnergyPlus::FormatSyntax)0, std::basic_string_view<char, std::char_traits<char> > const&, double const&, double const&, double const&, double const&, double const&, double const&, double const&, double const&>(EnergyPlus::InputOutputFile&, std::basic_string_view<char, std::char_traits<char> >, std::basic_string_view<char, std::char_traits<char> > const&, double const&, double const&, double const&, double const&, double const&, double const&, double const&, double const&)>
+   14002404e:	83 85 64 05 00 00 01 	addl   $0x1,0x564(%rbp)
+   140024055:	83 bd 64 05 00 00 07 	cmpl   $0x7,0x564(%rbp)
+   14002405c:	0f 8e b6 fe ff ff    	jle    140023f18 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x16fc>
+   140024062:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140024069:	48 8d 48 70          	lea    0x70(%rax),%rcx
+   14002406d:	48 8b 05 ac 52 56 02 	mov    0x25652ac(%rip),%rax        # 142589320 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)::Format_8800>
+   140024074:	48 8b 15 ad 52 56 02 	mov    0x25652ad(%rip),%rdx        # 142589328 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)::Format_8800+0x8>
+   14002407b:	48 89 45 10          	mov    %rax,0x10(%rbp)
+   14002407f:	48 89 55 18          	mov    %rdx,0x18(%rbp)
+   140024083:	48 8d 45 10          	lea    0x10(%rbp),%rax
+   140024087:	48 89 c2             	mov    %rax,%rdx
+   14002408a:	e8 41 58 bd 01       	call   141bf98d0 <void EnergyPlus::print<(EnergyPlus::FormatSyntax)0>(EnergyPlus::InputOutputFile&, std::basic_string_view<char, std::char_traits<char> >)>
+   14002408f:	48 8b 85 60 06 00 00 	mov    0x660(%rbp),%rax
+   140024096:	48 8d 48 70          	lea    0x70(%rax),%rcx
+   14002409a:	48 8b 05 df 52 56 02 	mov    0x25652df(%rip),%rax        # 142589380 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)::Format_8801>
+   1400240a1:	48 8b 15 e0 52 56 02 	mov    0x25652e0(%rip),%rdx        # 142589388 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)::Format_8801+0x8>
+   1400240a8:	48 89 45 10          	mov    %rax,0x10(%rbp)
+   1400240ac:	48 89 55 18          	mov    %rdx,0x18(%rbp)
+   1400240b0:	48 8d 85 40 03 00 00 	lea    0x340(%rbp),%rax
+   1400240b7:	4c 8d 48 08          	lea    0x8(%rax),%r9
+   1400240bb:	4c 8d 85 40 03 00 00 	lea    0x340(%rbp),%r8
+   1400240c2:	48 8d 45 10          	lea    0x10(%rbp),%rax
+   1400240c6:	48 8d 95 40 03 00 00 	lea    0x340(%rbp),%rdx
+   1400240cd:	48 83 c2 18          	add    $0x18,%rdx
+   1400240d1:	48 89 54 24 30       	mov    %rdx,0x30(%rsp)
+   1400240d6:	48 8d 95 40 03 00 00 	lea    0x340(%rbp),%rdx
+   1400240dd:	48 83 c2 20          	add    $0x20,%rdx
+   1400240e1:	48 89 54 24 28       	mov    %rdx,0x28(%rsp)
+   1400240e6:	48 8d 95 40 03 00 00 	lea    0x340(%rbp),%rdx
+   1400240ed:	48 83 c2 10          	add    $0x10,%rdx
+   1400240f1:	48 89 54 24 20       	mov    %rdx,0x20(%rsp)
+   1400240f6:	48 89 c2             	mov    %rax,%rdx
+   1400240f9:	e8 a2 29 be 01       	call   141c06aa0 <void EnergyPlus::print<(EnergyPlus::FormatSyntax)0, double&, double&, double&, double&, double&>(EnergyPlus::InputOutputFile&, std::basic_string_view<char, std::char_traits<char> >, double&, double&, double&, double&, double&)>
+   1400240fe:	eb 58                	jmp    140024158 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x193c>
+   140024100:	48 89 c3             	mov    %rax,%rbx
+   140024103:	48 8d 85 d0 03 00 00 	lea    0x3d0(%rbp),%rax
+   14002410a:	48 89 c1             	mov    %rax,%rcx
+   14002410d:	e8 be 34 33 02       	call   1423575d0 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string()>
+   140024112:	48 89 d8             	mov    %rbx,%rax
+   140024115:	eb 00                	jmp    140024117 <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x18fb>
+   140024117:	90                   	nop
+   140024118:	48 89 c3             	mov    %rax,%rbx
+   14002411b:	48 8d 85 c0 03 00 00 	lea    0x3c0(%rbp),%rax
+   140024122:	48 89 c1             	mov    %rax,%rcx
+   140024125:	e8 c6 a5 f7 01       	call   141f9e6f0 <ObjexxFCL::Optional<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const>::~Optional()>
+   14002412a:	eb 03                	jmp    14002412f <EnergyPlus::Convect::SetupAdaptiveConvStaticMetaData(EnergyPlus::EnergyPlusData&)+0x1913>
+   14002412c:	48 89 c3             	mov    %rax,%rbx
+   14002412f:	48 8d 85 b0 03 00 00 	lea    0x3b0(%rbp),%rax
+   140024136:	48 89 c1             	mov    %rax,%rcx
+   140024139:	e8 22 bc f7 01       	call   141f9fd60 <ObjexxFCL::Optional<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::~Optional()>
+   14002413e:	48 8d 85 a0 03 00 00 	lea    0x3a0(%rbp),%rax
+   140024145:	48 89 c1             	mov    %rax,%rcx
+   140024148:	e8 13 bc f7 01       	call   141f9fd60 <ObjexxFCL::Optional<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::~Optional()>
+   14002414d:	48 89 d8             	mov    %rbx,%rax
+   140024150:	48 89 c1             	mov    %rax,%rcx
+   140024153:	e8 d0 61 a9 01       	call   141aba328 <_Unwind_Resume>
+   140024158:	90                   	nop
+   140024159:	0f 28 b5 00 06 00 00 	movaps 0x600(%rbp),%xmm6
+   140024160:	48 81 c4 98 06 00 00 	add    $0x698,%rsp
+   140024167:	5b                   	pop    %rbx
+   140024168:	5e                   	pop    %rsi
+   140024169:	5f                   	pop    %rdi
+   14002416a:	41 5c                	pop    %r12
+   14002416c:	41 5d                	pop    %r13
+   14002416e:	41 5e                	pop    %r14
+   140024170:	41 5f                	pop    %r15
+   140024172:	5d                   	pop    %rbp
+   140024173:	c3                   	ret

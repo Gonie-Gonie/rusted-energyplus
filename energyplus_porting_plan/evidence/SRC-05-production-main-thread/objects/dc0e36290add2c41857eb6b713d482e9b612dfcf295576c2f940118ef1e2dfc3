@@ -1,0 +1,40 @@
+"""Release only the fully reviewed actual Native dispatcher baseline."""
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+BASE = ROOT / '.runtime/porting/SRC-06'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw))
+
+
+def load(name, expected=None):
+    path = BASE / name
+    row = ref(path)
+    assert expected is None or row['sha256'] == expected
+    return row, json.loads(path.read_bytes())
+
+
+root1, a = load('tarp-dispatcher-Native-observation-01/Root-factual-review-01.json', '8074e757f834e03a59bcaab9ff0555ad5850e022134ca1d873098e60387099d2')
+root2, b = load('tarp-dispatcher-Native-observation-01/Root-complete-input-review-02.json')
+peer, c = load('Header-dispatcher-Native-factual-review-01/review.json', '356bb3dc66606ac59f82e6bdb11cfeef854bb237ed29b5389e44c9af28ce6fc0')
+native, n = load('tarp-dispatcher-Native-observation-01/command/receipt.json', '21a91c79ad55a5627af97470a9b27bc07069f90b9ca80fe0ac078cba54457557')
+custody, _ = load('tarp-dispatcher-Native-observation-01/custody.json', 'ae74aa7c3453744bafb430d0c9abbc90874888cf012020ae640e58881dccbb67')
+provider, _ = load('native-dispatcher-provider-review-01/Root-provider-acceptance.json', 'dfd493092045b5649bfe97add24c568f6a52f828cbea9d82945b5b998b247a0f')
+assert n['exit_code'] == 0 and n['launch_error'] is None and n['source_bytes_match_before_and_after'] is True
+assert c['Header_FULL_Native_factual_custody_accepted'] and c['baseline_released_for_reviewed_Rust_application']
+assert c['total_literal_binary64_cells_joined'] == 700 and c['returned_outer_calls'] == 28 and c['Init_calls'] == 20
+assert c['actual_target_execution'] == native and c['actual_custody'] == custody
+assert c['Source_snapshot']['sha256'] == n['source_snapshot']['sha256'] == '8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934'
+out = BASE / 'tarp-dispatcher-Native-observation-01'
+aggregate = dict(schema='src06-tarp-dispatcher-Root-aggregate-factual-review.v1', Root_full_factual_review=root1, Root_complete_initial_and_operation_input_review=root2, independent_FULL_factual_review=peer, actual_Native_execution=native, actual_custody=custody, accepted=True, binary64_input_cells=700, cases=8, returned_outer_calls=28, Init_calls=20, numerical_comparison_performed=False, inner_surface_trace_available=False, gates_updated=False)
+with (out / 'Root-aggregate-factual-review.json').open('x', encoding='utf8', newline='\n') as stream:
+    json.dump(aggregate, stream, indent=2); stream.write('\n')
+release = dict(schema='src06-tarp-dispatcher-Root-factual-baseline-acceptance.v1', accepted=True, complete_input_owner_prefix_and_custody_review_accepted=True, actual_Native_execution=native, factual_review=ref(out / 'Root-aggregate-factual-review.json'), Source_snapshot=n['source_snapshot'], actual_custody=custody, actual_provider_acceptance=provider, independent_FULL_factual_review=peer, release_Source=ref(Path(__file__).resolve()), scope='Genuine input, owners, prefix, flags, streams, files and executable custody baseline. No Rust numerical result, whole-port PASS, inner trace or gate promotion.')
+with (out / 'Root-baseline-acceptance.json').open('x', encoding='utf8', newline='\n') as stream:
+    json.dump(release, stream, indent=2); stream.write('\n')
+print(json.dumps(ref(out / 'Root-baseline-acceptance.json')))

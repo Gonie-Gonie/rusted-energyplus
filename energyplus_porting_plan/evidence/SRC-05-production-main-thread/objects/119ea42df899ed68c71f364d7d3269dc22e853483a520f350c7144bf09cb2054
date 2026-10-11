@@ -1,0 +1,55 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\ordinary-main-publication-prep-02\publish.py", line 281, in <module>
+    walk(factual)
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\ordinary-main-publication-prep-02\publish.py", line 134, in walk
+    if key not in SKIP_KEYS: walk(child)
+                             ^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\ordinary-main-publication-prep-02\publish.py", line 131, in walk
+    walk(body)
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\ordinary-main-publication-prep-02\publish.py", line 134, in walk
+    if key not in SKIP_KEYS: walk(child)
+                             ^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\ordinary-main-publication-prep-02\publish.py", line 131, in walk
+    walk(body)
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\ordinary-main-publication-prep-02\publish.py", line 134, in walk
+    if key not in SKIP_KEYS: walk(child)
+                             ^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\ordinary-main-publication-prep-02\publish.py", line 131, in walk
+    walk(body)
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\ordinary-main-publication-prep-02\publish.py", line 134, in walk
+    if key not in SKIP_KEYS: walk(child)
+                             ^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\ordinary-main-publication-prep-02\publish.py", line 131, in walk
+    walk(body)
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\ordinary-main-publication-prep-02\publish.py", line 134, in walk
+    if key not in SKIP_KEYS: walk(child)
+                             ^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\ordinary-main-publication-prep-02\publish.py", line 100, in walk
+    for child in value: walk(child)
+                        ^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\ordinary-main-publication-prep-02\publish.py", line 134, in walk
+    if key not in SKIP_KEYS: walk(child)
+                             ^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\ordinary-main-publication-prep-02\publish.py", line 131, in walk
+    walk(body)
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\ordinary-main-publication-prep-02\publish.py", line 134, in walk
+    if key not in SKIP_KEYS: walk(child)
+                             ^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\ordinary-main-publication-prep-02\publish.py", line 100, in walk
+    for child in value: walk(child)
+                        ^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\ordinary-main-publication-prep-02\publish.py", line 134, in walk
+    if key not in SKIP_KEYS: walk(child)
+                             ^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\ordinary-main-publication-prep-02\publish.py", line 129, in walk
+    PARSED.add(actual); body = json.loads(actual.read_bytes())
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\AppData\Local\Programs\Python\Python312\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\AppData\Local\Programs\Python\Python312\Lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\AppData\Local\Programs\Python\Python312\Lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)

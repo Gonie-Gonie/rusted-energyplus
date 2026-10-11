@@ -1,0 +1,75 @@
+"""Author a held configure-only successor; do not configure or compile."""
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+BASE = ROOT / '.runtime/porting/SRC-06'
+OUT = BASE / 'native-dispatcher-build-prep-01'
+OLD = BASE / 'native-build-prep-01'
+assert hashlib.sha256((OLD / 'prepare_native.py').read_bytes()).hexdigest() == 'd759bb09e8831d984f688b1be0baee320da61e4d8eea5171445c15d3e61be72d'
+OUT.mkdir(exist_ok=False)
+(OUT / 'before').mkdir()
+
+
+def change(text, old, new):
+    assert text.count(old) == 1, old
+    return text.replace(old, new, 1)
+
+
+source = (OLD / 'prepare_native.py').read_text(encoding='utf8')
+source = change(source, "RAW = ROOT / '.runtime/porting/SRC-06/native-build-01'", "RAW = ROOT / '.runtime/porting/SRC-06/native-dispatcher-build-01'")
+source = change(source, "CODE = ROOT / '.runtime/porting/SRC-06/native-tarp-inside-prep-02'", "CODE = ROOT / '.runtime/porting/SRC-06/native-tarp-dispatcher-prep-01'")
+source = change(source, "PRIOR = ROOT / '.runtime/porting/SRC-05/wind-pow-native-build-02'", "PRIOR = ROOT / '.runtime/porting/SRC-06/native-build-01'")
+source = change(source, "OUTPUT = Path('D:/CodexBuild/rusted-energyplus/SRC-06/native-build-01/bin')", "OUTPUT = Path('D:/CodexBuild/rusted-energyplus/SRC-06/native-dispatcher-build-01/bin')")
+source = change(source, "'ba8de8e1378003bd0f9fa0305a074b838448425503330a47cba01f2b68e31d35'", "'bde6fde556f907b930416942cd28f4a05aeabc3b42fa148ebad290700b5444c1'")
+source = change(source, "'src06-tarp-inside-native-source-preparation.v1'", "'src06-tarp-dispatcher-Native-source-preparation.v1'")
+source = change(source, "prep['own_sources'][0]['line_count'] == 198", "prep['own_sources'][0]['line_count'] == 286")
+for old, new in [
+    ('d64f770ba75cd57219a8ce56b2e1b1d7d38ea37d0453a599179897779f37c0de', '7cfec3798c9991155e367f3257193f6d4745bab5532026c29e1a01af3d3419b7'),
+    ('2ed9b5e88eff7da68bcdd93eddc31a40ae4e73a844a1f9c3077c2dfbcb1b5f61', '398a694835e18ed7851857312b0e25dd3b8e1d704098686f1a5c44d8213313fd'),
+    ('9effcfda1256691e315cef46ff6b085b629fff2ea92016d5fd337c93e975c70f', 'cc2f9630474ad1a7ad8a18ce2994a384fabef72a982715cac876af03e8c6ebdf'),
+    ('905aae86a41e153c3e3dfe758ce57ef7d7074a29ac46cc87cb982544922cc0d3', 'e1358b349918be68af7cdb9af6954bf9c783575c8935ce54082a6969d9b89496'),
+    ('741302c60f493dac93cd22f92b6b146b7db4a839f4ba92683082f15606bd201b', '697cb8914c8a50331e26b2599e778eb3800af3586d0a28d7180d390509294032'),
+]:
+    source = change(source, old, new)
+historical = '''def historical_configure(frozen):
+    # These aliases belong to the actual inherited BUILD Source, not current Rust.
+    snapshot = load(frozen['Source_snapshot'])
+    assert snapshot['schema'] == 'rust-command-source-snapshot.v1' and snapshot['bytes_normalized'] is False
+    rows = {r['historical_path']: r for r in snapshot['files']}
+    assert len(rows) == len(snapshot['files']) == 3928
+    aliases = []
+    for row in frozen['frozen_Source_and_input']:
+        if row['path'] in rows:
+            archived = rows[row['path']]
+            assert row['sha256'] == archived['archive']['sha256'] and row['size_bytes'] == archived['size_bytes']
+            checked(archived['archive'])
+            aliases.append(dict(historical=row, actual_archive=archived['archive']))
+        else:
+            checked(row)
+    assert len(aliases) == len(rows) and {r['historical']['path'] for r in aliases} == set(rows)
+    collect({k: v for k, v in frozen.items() if k != 'frozen_Source_and_input'})
+    return aliases
+
+
+'''
+source = change(source, 'def dump(path, value):', historical + 'def dump(path, value):')
+source = change(source, "prior_frozen = load(review['frozen_build_inputs']); collect(prior_frozen)", "prior_frozen = load(review['frozen_build_inputs']); historical_aliases = historical_configure(prior_frozen)")
+source = change(source, "assert len(before_graph) == 741 and review['current_compile_rows'] == 741", "assert len(before_graph) == 742 and review['current_compile_rows'] == 742")
+source = change(source, "old_command = previous['command']; assert len(old_command) == 68", "old_command = previous['command']; assert len(old_command) == 72")
+source = change(source, "command += ['-DSRC06_SOURCE_DIR=' + str(CODE), '-DSRC06_INHERITED_RECIPE=' + str(inherited), '-DSRC06_REFERENCE_RECIPE=' + str(CODE / 'tarp_inside_reference.cmake'), '-DSRC06_OUTPUT_DIR=' + str(OUTPUT)]", "command += ['-DSRC06_DISPATCHER_SOURCE_DIR=' + str(CODE), '-DSRC06_DISPATCHER_INHERITED_RECIPE=' + str(inherited), '-DSRC06_DISPATCHER_REFERENCE_RECIPE=' + str(CODE / 'tarp_dispatcher.cmake'), '-DSRC06_DISPATCHER_OUTPUT_DIR=' + str(OUTPUT)]")
+source = change(source, 'inherited_frozen_build_inputs=review[\'frozen_build_inputs\'],', "inherited_frozen_build_inputs=review['frozen_build_inputs'], inherited_historical_BUILD_Source_aliases=historical_aliases,")
+source = change(source, 'len(after_graph) == 742', 'len(after_graph) == 743')
+source = change(source, "{'SRC06_' + k + ':UNINITIALIZED'", "{'SRC06_DISPATCHER_' + k + ':UNINITIALIZED'")
+source = change(source, 'previous_compile_rows=741, current_compile_rows=742', 'previous_compile_rows=742, current_compile_rows=743')
+source = source.replace('tarp_inside_reference_helper.cpp', 'tarp_dispatcher_helper.cpp').replace('src06_tarp_inside_helper', 'src06_tarp_dispatcher_helper').replace('src06-tarp-inside-frozen-configure-inputs.v1', 'src06-tarp-dispatcher-frozen-configure-inputs.v1').replace('src06-tarp-inside-configure-dry-review.v1', 'src06-tarp-dispatcher-configure-dry-review.v1')
+wrapper = (OLD / 'additive-reference.cmake').read_text(encoding='utf8').replace('SRC06_REFERENCE_RECIPE', 'SRC06_DISPATCHER_REFERENCE_RECIPE').replace('SRC06_OUTPUT_DIR', 'SRC06_DISPATCHER_OUTPUT_DIR').replace('src06_place_reference', 'src06_place_dispatcher_reference').replace('src06_tarp_inside_helper', 'src06_tarp_dispatcher_helper')
+for name, data in [('prepare_native.py', source), ('additive-reference.cmake', wrapper)]:
+    original = (OLD / name).read_bytes()
+    (OUT / 'before' / name).write_bytes(original)
+    (OUT / name).write_bytes(data.encode('utf8'))
+    diff = ''.join(difflib.unified_diff(original.decode('utf8').splitlines(True), data.splitlines(True), fromfile='before/' + name, tofile=name))
+    (OUT / (name + '.diff')).write_bytes(diff.encode('utf8'))
+print(json.dumps(dict(held_configure_only=True, files=[str(OUT / name) for name in ['prepare_native.py', 'additive-reference.cmake']], targets_executed=False)))

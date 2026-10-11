@@ -1,0 +1,8 @@
+--- before/README.md
++++ README.md
+@@ -9,3 +9,5 @@
+ Independent Raw Source review found one prospective guard blocker: the new caller uses the existing BCrypt SHA helper, but the old direct caller has no `-lbcrypt`. Requiring an entirely identical suffix after `Products/libenergypluslib.a` would reject the legitimate declared transport-only library. Root will preserve this01 and author02 with exactly one `-lbcrypt` immediately after the core and the complete old suffix otherwise byte-exact;02 will also bind the reviewed Native02 curve-shape successor. No configure was attempted.
+ 
+ All eight inherited Python functions are AST-exact. Only the explicit historical_configure helper is new, plus bounded top-level custody/identity/path/count substitutions. Both before templates equal their genuine parent files and both adaptation diffs regenerate exactly. Actual target paths use the inherited compile-command directory/output metadata; the prior actual CMake output is absolute. RuntimeRoot review still precedes any compile.
++
++The bounded02 resolves the prospective01 guard blocker: it selects Native02, requires exactly one direct `-lbcrypt` immediately after the core, and preserves the full prior suffix byte-for-byte after removing only that declared token. All nine Python functions and every remaining guard are AST-exact. This preparation remains unexecuted and requires final independent Source review.

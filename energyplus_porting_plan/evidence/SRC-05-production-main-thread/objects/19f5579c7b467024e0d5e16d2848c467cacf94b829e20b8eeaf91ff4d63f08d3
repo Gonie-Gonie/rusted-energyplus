@@ -1,0 +1,237 @@
+{"receipt": {"path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/fmt_check-command/receipt.json", "sha256": "3ab0d9a69fc969c23e7b479e9df2908a0bd19ba19c7335036770af6098136162"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+   Compiling ep_run v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_run)
+   Compiling ep_cli v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_cli)
+    Finished `dev` profile [unoptimized] target(s) in 27.92s
+{"receipt": {"path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/clippy-command/receipt.json", "sha256": "b0bedd7e294ac7e0c2c59702d39396d806dcd8c66ad384ea80b283a4b43d7b89"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+int_is_real_pre_band_storage_after_the_single_b3_reset ... ok
+test heat_balance::surface_manager::ctf_state_space_assembly::reassignment_tests::interior_resistance_reuses_the_stored_prefix_and_both_adjacent_interfaces ... ok
+test heat_balance::surface_manager::ctf_state_space_assembly::reassignment_tests::later_reassignment_preserves_the_original_checkpoint_bits_and_context ... ok
+test heat_balance::surface_manager::ctf_state_space_assembly::reassignment_tests::malformed_persistent_storage_or_nodal_shape_is_rejected_without_mutation ... ok
+test heat_balance::surface_manager::ctf_state_space_assembly::reassignment_tests::repeat_preserves_storage_off_band_and_identity_but_rewrites_only_source_assignments ... ok
+test heat_balance::surface_manager::ctf_state_space_assembly::reassignment_tests::static_association_and_exact_next_ordinal_fail_before_any_write ... ok
+test heat_balance::surface_manager::ctf_state_space_assembly::tests::ieee_arithmetic_class_is_returned_in_the_actual_owner ... ok
+test heat_balance::surface_manager::ctf_state_space_assembly::tests::one_node_interior_resistance_advances_two_consecutive_interfaces ... ok
+test heat_balance::surface_manager::ctf_state_space_assembly::tests::out_of_scope_and_misaligned_owners_fail_without_a_matrix ... ok
+test heat_balance::surface_manager::ctf_state_space_assembly::tests::retry_metadata_never_replaces_or_recomputes_the_nodal_owner ... ok
+test heat_balance::surface_manager::ctf_state_space_assembly::tests::single_layer_keeps_source_orientation_boundary_mass_and_compressed_shapes ... ok
+test heat_balance::surface_manager::ctf_state_space_assembly::tests::two_mass_layers_use_half_capacitances_and_keep_literal_stack_direction ... ok
+test heat_balance::surface_manager::ctf_state_space_assembly::tests::unavailable_routes_have_no_synthetic_matrix_or_input_access ... ok
+test heat_balance::warmup::ordinary::tests::begin_environment_preserves_header_warning_and_scratch_owners ... ok
+test heat_balance::warmup::report::tests::actual_record_count_tail_last_zone_scratch_and_repeated_report ... ok
+test heat_balance::warmup::ordinary::tests::maximum_day_diagnostics_once_flag_zone_order_and_reset_before_global_severe ... ok
+test heat_balance::warmup::report::tests::actual_sizing_day_and_load_threshold_guards ... ok
+test heat_balance::warmup::report::tests::allocation_availability_and_zero_zone_report ... ok
+test heat_balance::warmup::ordinary::tests::reached_diagnostic_sink_failure_stops_before_zone_reset_and_preserves_cause ... ok
+test heat_balance::warmup::report::tests::detailed_sink_failure_retains_current_zone_writes_prefix_and_error_source ... ok
+test heat_balance::warmup::report::tests::report_sink_failure_retains_normalization_and_complete_header ... ok
+test heat_balance::warmup::rolling_tests::record_shifts_full_rolling_history_and_daily_reset_preserves_bits ... ok
+test heat_balance::warmup::rolling_tests::two_zone_records_and_real_day_check_keep_independent_rolling_owners ... ok
+test heat_balance::warmup::selected_reference::observe_literal_selected_warmup_methods ... ignored, Root-only input observation with explicit recorded input/output and Source custody
+test heat_balance::warmup::tests::all_four_tests_are_per_zone_and_loads_are_normalized ... ok
+test heat_balance::warmup::tests::begin_environment_previous_zeros_allow_real_first_day_check ... ok
+test heat_balance::warmup::tests::earlier_zone_failure_does_not_skip_later_zone_check_or_reset ... ok
+test heat_balance::warmup::tests::forced_maximum_exit_is_not_convergence ... ok
+test heat_balance::warmup::tests::hundred_watt_floor_mutates_then_is_retained ... ok
+test heat_balance::warmup::tests::small_load_guard_retains_comparison_metric_and_uses_strict_greater_than ... ok
+test heat_balance::zone_air_initialization::tests::custom_temperature_inputs_remain_distinct_from_working_and_fourth_slots ... ok
+test heat_balance::zone_air_initialization::tests::persistent_guard_skips_then_rearms_without_overwriting_retained_inputs ... ok
+test heat_balance::zone_air_initialization_trace::tests::copies_supplied_bits_fourth_slot_and_actual_scope_without_reconstructing_owner ... ok
+test heat_balance::zone_air_initialization_trace::tests::disabled_nested_unwinding_and_zero_index_entry_filter_preserve_execution ... ok
+test heat_balance::zone_humidity_correction::tests::declared_inlet_order_and_nonfeedback_node_owners_are_retained ... ok
+test heat_balance::zone_humidity_correction::tests::feedback_write_is_independent_of_controlled_inlet_branch ... ok
+test heat_balance::zone_humidity_correction::tests::negative_density_backend_is_explicitly_unavailable_before_member_writes ... ok
+test heat_balance::zone_humidity_correction::tests::ordered_lower_then_saturation_guards_remain_distinct ... ok
+test heat_balance::zone_humidity_correction::tests::passed_psychrometric_instance_and_original_working_owner_persist_across_calls ... ok
+test heat_balance::zone_humidity_correction::tests::rejects_scope_and_int_product_before_state_node_or_cache_mutation ... ok
+test heat_balance::zone_humidity_correction::tests::retains_full_four_slot_current_average_and_temperature_owners ... ok
+test heat_balance::zone_humidity_correction::tests::selected_stored_solution_has_no_helper_humidity_floor ... ok
+test heat_balance::zone_predictor_corrector::predicted_system_load::tests::accepts_signed_source_load_correction_range_and_rejects_outside_values ... ok
+test heat_balance::zone_predictor_corrector::predicted_system_load::tests::accepts_zero_dependent_load_and_rejects_invalid_multiplier_state ... ok
+test heat_balance::zone_predictor_corrector::predicted_system_load::tests::applies_correction_then_zone_multiplier_product ... ok
+test heat_balance::zone_predictor_corrector::predicted_system_load::tests::assembled_predictor_terms_feed_the_bounded_dual_setpoint_kernel ... ok
+test heat_balance::zone_predictor_corrector::predicted_system_load::tests::assembles_source_order_predictor_terms_with_lagged_load ... ok
+test heat_balance::zone_predictor_corrector::predicted_system_load::tests::clamps_deadband_setpoint_to_both_bounds ... ok
+test heat_balance::zone_predictor_corrector::predicted_system_load::tests::lagged_system_dependent_load_changes_only_independent_predictor_terms ... ok
+test heat_balance::zone_predictor_corrector::predicted_system_load::tests::matches_energyplus_dual_setpoint_cooling_fixture ... ok
+test heat_balance::zone_predictor_corrector::predicted_system_load::tests::matches_energyplus_dual_setpoint_heating_fixture ... ok
+test heat_balance::zone_predictor_corrector::predicted_system_load::tests::predictor_term_assembly_rejects_invalid_inputs_and_overflow ... ok
+test heat_balance::zone_predictor_corrector::predicted_system_load::tests::rejects_inverted_setpoints_before_reading_scaling_inputs ... ok
+test heat_balance::zone_predictor_corrector::predicted_system_load::tests::rejects_nonfinite_intermediate_or_scaled_results ... ok
+test heat_balance::zone_predictor_corrector::predicted_system_load::tests::rejects_nonfinite_used_inputs_but_reads_node_temperature_only_in_deadband ... ok
+test heat_balance::zone_predictor_corrector::predicted_system_load::tests::state_backed_producer_composes_predictor_load_and_demand_once ... ok
+test heat_balance::zone_predictor_corrector::predicted_system_load::tests::state_backed_producer_preserves_cooling_deadband_and_zero_thresholds ... ok
+test heat_balance::zone_predictor_corrector::predicted_system_load::tests::state_backed_producer_reads_only_the_active_temperature_history ... ok
+test heat_balance::zone_predictor_corrector::predicted_system_load::tests::state_backed_producer_wraps_stage_errors_without_mutating_state ... ok
+test heat_balance::zone_predictor_corrector::predicted_system_load::tests::treats_both_zero_boundaries_as_deadband ... ok
+test heat_balance::ctf_retry_driver::tests::frozen_active_prefix_11_reaches_natural_retries_and_fresh_gamma_owners ... ok
+
+test result: ok. 346 passed; 0 failed; 2 ignored; 0 measured; 2982 filtered out; finished in 4.14s
+
+    Finished `test` profile [unoptimized] target(s) in 0.32s
+     Running unittests src\lib.rs (target\debug\deps\ep_runtime-880f77a2e9883822.exe)
+{"receipt": {"path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/focused-command/receipt.json", "sha256": "dfb9e4ad96b6c3eb1a5a70788a0ea3b06e23a21810534cf27677a33d88c1b497"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+ng_samples_across_day_boundary ... ok
+test weather::day::tests::hour_access_preserves_other_intervals_and_has_native_slot_order ... ok
+test weather::day::tests::source_constructor_defaults_and_allocation_are_distinct ... ok
+test weather::day::tests::whole_owner_copy_retains_unallocated_and_reallocated_shapes ... ok
+test weather::day::tests::whole_day_transport_preserves_every_slot_and_unowned_canary ... ok
+test weather::raw::cursor_tests::failing_hour_retains_prior_writes_and_only_clears_one_timestep ... ok
+test weather::raw::cursor_tests::first_day_search_starts_at_current_cursor_and_ignores_raw_year ... ok
+test weather::raw::cursor_tests::get_next_style_reopen_skips_without_reprocessing_shared_header ... ok
+test weather::raw::cursor_tests::missing_start_permits_one_rewind_then_source_fatal_with_actual_counts ... ok
+test weather::raw::cursor_tests::next_day_rewinds_only_when_declared_period_is_full_year ... ok
+test weather::raw::cursor_tests::selected_day_interprets_only_decoy_first_rows_and_reinterprets_match ... ok
+test weather::raw::cursor_tests::skip_header_checks_eof_before_matching_data_periods ... ok
+test weather::raw::cursor_tests::source_backspace_after_day_is_one_record_not_one_day ... ok
+test weather::raw::cursor_tests::truncated_decoy_uses_retained_last_line_for_date_only_fatal ... ok
+test weather::raw::input_tests::backspace_matches_source_cursor_one_and_closed_owner_edges ... ok
+test weather::raw::input_tests::closing_discards_stream_flags_and_opening_restarts_without_resetting_attempts ... ok
+test weather::raw::input_tests::read_result_update_retains_data_but_observes_actual_failed_read ... ok
+test weather::raw::input_tests::rewind_and_backspace_use_actual_bytes_and_retain_read_attempts ... ok
+test weather::tests::accepts_energyplus_month_weekday_order_and_case ... ok
+test weather::tests::matches_energyplus_calendar_header_prefix_case_and_whitespace ... ok
+test weather::tests::parses_data_period_continuation_lines_before_weather_rows ... ok
+test weather::tests::parses_epw_holidays_in_header_order ... ok
+test weather::tests::parses_fixed_month_day_daylight_saving_period ... ok
+test weather::tests::parses_leap_year_observed_yes_and_no ... ok
+test weather::tests::parses_multiple_data_periods_and_inherits_missing_end_year ... ok
+test weather::tests::parses_nth_and_last_weekday_daylight_saving_rules ... ok
+test weather::tests::record_parser_remains_compatible_with_minimal_synthetic_headers ... ok
+test weather::tests::rejects_a_single_zero_daylight_saving_endpoint ... ok
+test weather::tests::rejects_empty_leap_year_observed_value ... ok
+test weather::tests::rejects_invalid_data_period_header_values ... ok
+test weather::tests::rejects_invalid_daylight_saving_date_rules ... ok
+test weather::tests::rejects_invalid_or_incomplete_epw_holiday_fields ... ok
+test weather::tests::rejects_missing_calendar_header ... ok
+test weather::tests::rejects_missing_daylight_saving_endpoint_fields ... ok
+test weather::tests::rejects_missing_leap_year_observed_field ... ok
+test weather::tests::rich_parser_rejects_interior_blank_data_rows_while_legacy_record_parser_skips_them ... ok
+test weather::tests::uses_first_non_whitespace_character_for_leap_year_policy ... ok
+test weather::tests::zero_dst_endpoints_disable_the_epw_period ... ok
+test weather::weather_environment::tests::full_cycle_rewind_requires_one_complete_data_period ... ok
+test weather::weather_environment::tests::last_environment_day_does_not_require_or_prefetch_another_source_day ... ok
+test weather::weather_environment::tests::rejects_a_filtered_source_day_cycle_instead_of_looping ... ok
+test weather::tests::record_loader_preserves_record_only_api_results ... ok
+test weather::weather_environment::tests::rejects_an_empty_public_weather_axis_without_panicking ... ok
+test weather::weather_environment::tests::rejects_missing_literal_february_29_start_record ... ok
+test weather::weather_environment::tests::rejects_subhourly_epw_rows_and_malformed_source_days ... ok
+test weather::weather_environment::tests::requires_one_data_period_to_cover_both_endpoints ... ok
+test weather::weather_environment::tests::selects_nonactual_cross_year_source_days_in_order ... ok
+test weather::weather_environment::tests::selects_nonactual_start_offset_and_materializes_day_buffers ... ok
+test weather::weather_environment::tests::selected_stream_resets_first_hour_seed_and_carries_previous_day_hour_24 ... ok
+test weather::weather_environment::tests::skips_raw_february_29_only_after_literal_start_search ... ok
+test zone_equipment::tests::zone_equipment_dispatch_validation_accepts_single_equipment_path ... ok
+test zone_equipment::tests::zone_equipment_dispatch_validation_marks_multiple_equipment_diagnostic_only ... ok
+test zone_equipment::tests::zone_equipment_dispatch_validation_rejects_sequence_ambiguity ... ok
+test zone_equipment::tests::zone_equipment_dispatch_validation_rejects_supply_node_outside_zone_inlet_list ... ok
+test zone_equipment::tests::zone_sys_energy_demand_preserves_source_field_sign_conventions ... ok
+test runtime::tests::ordinary_a_records_warmup_and_every_run_step_reports_only_complete_first_day ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp410::cp410_validation_rejects_true_default_execution_and_non_direct_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp411::cp411_copies_the_cp410_humidity_ratio_on_active_routes_and_skips_inactive_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp410::cp410_skips_the_untyped_default_after_every_retained_cp409_outcome ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp411::cp411_validation_rejects_changed_assignment_lineage_and_non_direct_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp402::cp402_executes_public_routes_with_raw_greater_than_or_equal_comparison ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp412::cp412_uses_cp411_temperature_and_current_pressure_only_on_active_routes ... ok
+test ideal_loads::coupled_runtime::tests::live_coupling_uses_weather_pressure_for_supply_saturation ... ok
+test ideal_loads::coupled_runtime::tests::exact_model_runs_one_source_threshold_coupling_per_fixed_timestep ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp412::cp412_validation_rejects_changed_assignment_lineage_and_non_direct_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp413::cp413_validation_rejects_changed_operand_lineage_and_non_direct_routes ... ok
+test ideal_loads::coupled_runtime::tests::cp347_direct_coupled_runtime_completes_none_case_after_g_f_l_and_skips_unit_off ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp413::cp413_reads_cp412_saturation_and_recursively_retained_cp411_original_only_when_active ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_weather_day::b_live_weather_reaches_hourly_reports_without_warmup ... ok
+
+test result: ok. 3328 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 77.68s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Compiling ep_run v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_run)
+   Compiling ep_cli v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_cli)
+    Finished `test` profile [unoptimized] target(s) in 34.52s
+     Running unittests src\main.rs (target\debug\deps\eplus_rs-bbe58aae30b506ba.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_compare-a9c45e5b3381a65a.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_compiler-2267ba82fbc5af26.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_conformance-b0e181263c2404bb.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_model-7586f88ea75fa6e4.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_oracle-2789f432948718ca.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_raw_model-370e175284b468c1.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_run-3b9f53f192e71312.exe)
+     Running tests\arbitrary_run.rs (target\debug\deps\arbitrary_run-5aa11ad88b8efcf1.exe)
+     Running tests\arbitrary_run_direct_zone_coupled.rs (target\debug\deps\arbitrary_run_direct_zone_coupled-0df546cfc4fd0059.exe)
+     Running tests\arbitrary_run_exit_codes.rs (target\debug\deps\arbitrary_run_exit_codes-e1231cfefa604466.exe)
+     Running tests\arbitrary_run_ideal_loads.rs (target\debug\deps\arbitrary_run_ideal_loads-eabfbbee9461b8ef.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_runtime-0bbf2dbab5936b8c.exe)
+   Doc-tests ep_compare
+   Doc-tests ep_compiler
+   Doc-tests ep_conformance
+   Doc-tests ep_model
+   Doc-tests ep_oracle
+   Doc-tests ep_raw_model
+   Doc-tests ep_run
+   Doc-tests ep_runtime
+{"receipt": {"path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/workspace-command/receipt.json", "sha256": "f5fb0d86800358017afe15e544af120b207e2d708c3ce6c7bb88536c47099280"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+_id":"registry+https://github.com/rust-lang/crates.io-index#serde@1.0.228","manifest_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\serde-1.0.228\\Cargo.toml","target":{"kind":["lib"],"crate_types":["lib"],"name":"serde","src_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\serde-1.0.228\\src\\lib.rs","edition":"2021","doc":true,"doctest":true,"test":true},"profile":{"opt_level":"0","debuginfo":0,"debug_assertions":true,"overflow_checks":true,"test":false},"features":["default","derive","serde_derive","std"],"filenames":["C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libserde-ca0bb5d33bfd2315.rlib","C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libserde-ca0bb5d33bfd2315.rmeta"],"executable":null,"fresh":true}
+{"reason":"compiler-artifact","package_id":"path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/crates/ep_compiler#0.1.0","manifest_path":"C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_compiler\\Cargo.toml","target":{"kind":["lib"],"crate_types":["lib"],"name":"ep_compiler","src_path":"C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_compiler\\src\\lib.rs","edition":"2024","doc":true,"doctest":true,"test":true},"profile":{"opt_level":"0","debuginfo":0,"debug_assertions":true,"overflow_checks":true,"test":false},"features":[],"filenames":["C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libep_compiler-99238be9f57e78db.rlib","C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libep_compiler-99238be9f57e78db.rmeta"],"executable":null,"fresh":true}
+{"reason":"compiler-artifact","package_id":"registry+https://github.com/rust-lang/crates.io-index#toml_datetime@0.6.11","manifest_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\toml_datetime-0.6.11\\Cargo.toml","target":{"kind":["lib"],"crate_types":["lib"],"name":"toml_datetime","src_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\toml_datetime-0.6.11\\src\\lib.rs","edition":"2021","doc":true,"doctest":true,"test":true},"profile":{"opt_level":"0","debuginfo":0,"debug_assertions":true,"overflow_checks":true,"test":false},"features":["serde"],"filenames":["C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libtoml_datetime-81b36b0020816acd.rlib","C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libtoml_datetime-81b36b0020816acd.rmeta"],"executable":null,"fresh":true}
+{"reason":"compiler-artifact","package_id":"registry+https://github.com/rust-lang/crates.io-index#serde_spanned@0.6.9","manifest_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\serde_spanned-0.6.9\\Cargo.toml","target":{"kind":["lib"],"crate_types":["lib"],"name":"serde_spanned","src_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\serde_spanned-0.6.9\\src\\lib.rs","edition":"2021","doc":true,"doctest":true,"test":true},"profile":{"opt_level":"0","debuginfo":0,"debug_assertions":true,"overflow_checks":true,"test":false},"features":["serde"],"filenames":["C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libserde_spanned-30f3c143aa175dbc.rlib","C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libserde_spanned-30f3c143aa175dbc.rmeta"],"executable":null,"fresh":true}
+{"reason":"compiler-artifact","package_id":"registry+https://github.com/rust-lang/crates.io-index#toml_edit@0.22.27","manifest_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\toml_edit-0.22.27\\Cargo.toml","target":{"kind":["lib"],"crate_types":["lib"],"name":"toml_edit","src_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\toml_edit-0.22.27\\src\\lib.rs","edition":"2021","doc":true,"doctest":true,"test":true},"profile":{"opt_level":"0","debuginfo":0,"debug_assertions":true,"overflow_checks":true,"test":false},"features":["display","parse","serde"],"filenames":["C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libtoml_edit-6ee9062f9db5ef66.rlib","C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libtoml_edit-6ee9062f9db5ef66.rmeta"],"executable":null,"fresh":true}
+{"reason":"compiler-artifact","package_id":"registry+https://github.com/rust-lang/crates.io-index#toml@0.8.23","manifest_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\toml-0.8.23\\Cargo.toml","target":{"kind":["lib"],"crate_types":["lib"],"name":"toml","src_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\toml-0.8.23\\src\\lib.rs","edition":"2021","doc":true,"doctest":true,"test":true},"profile":{"opt_level":"0","debuginfo":0,"debug_assertions":true,"overflow_checks":true,"test":false},"features":["default","display","parse"],"filenames":["C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libtoml-5e44e4f8994a155c.rlib","C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libtoml-5e44e4f8994a155c.rmeta"],"executable":null,"fresh":true}
+{"reason":"compiler-artifact","package_id":"path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/crates/ep_conformance#0.1.0","manifest_path":"C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_conformance\\Cargo.toml","target":{"kind":["lib"],"crate_types":["lib"],"name":"ep_conformance","src_path":"C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_conformance\\src\\lib.rs","edition":"2024","doc":true,"doctest":true,"test":true},"profile":{"opt_level":"0","debuginfo":0,"debug_assertions":true,"overflow_checks":true,"test":false},"features":[],"filenames":["C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libep_conformance-1507ee459dd19844.rlib","C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libep_conformance-1507ee459dd19844.rmeta"],"executable":null,"fresh":true}
+{"reason":"compiler-artifact","package_id":"path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/crates/ep_run#0.1.0","manifest_path":"C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\Cargo.toml","target":{"kind":["lib"],"crate_types":["lib"],"name":"ep_run","src_path":"C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\src\\lib.rs","edition":"2024","doc":true,"doctest":true,"test":true},"profile":{"opt_level":"0","debuginfo":0,"debug_assertions":true,"overflow_checks":true,"test":false},"features":[],"filenames":["C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libep_run-d5a7693b599003f3.rlib","C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libep_run-d5a7693b599003f3.rmeta"],"executable":null,"fresh":false}
+{"reason":"compiler-artifact","package_id":"path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/crates/ep_cli#0.1.0","manifest_path":"C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_cli\\Cargo.toml","target":{"kind":["bin"],"crate_types":["bin"],"name":"eplus-rs","src_path":"C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_cli\\src\\main.rs","edition":"2024","doc":true,"doctest":false,"test":true},"profile":{"opt_level":"0","debuginfo":0,"debug_assertions":true,"overflow_checks":true,"test":false},"features":[],"filenames":["C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe"],"executable":"C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe","fresh":false}
+{"reason":"build-finished","success":true}
+   Compiling ep_run v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_run)
+   Compiling ep_cli v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_cli)
+    Finished `dev` profile [unoptimized] target(s) in 20.87s
+{"receipt": {"path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/CLI-command/receipt.json", "sha256": "dba673b9bc9345f5856fc0a088040155288b0ca8e6affb317ddf988801284778"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+rates.io-1949cf8c6b5b557f\\serde_derive-1.0.228\\Cargo.toml","target":{"kind":["proc-macro"],"crate_types":["proc-macro"],"name":"serde_derive","src_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\serde_derive-1.0.228\\src\\lib.rs","edition":"2021","doc":true,"doctest":true,"test":true},"profile":{"opt_level":"0","debuginfo":0,"debug_assertions":true,"overflow_checks":true,"test":false},"features":["default"],"filenames":["C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\serde_derive-928e1cc028bf071f.dll","C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libserde_derive-928e1cc028bf071f.dll.a"],"executable":null,"fresh":true}
+{"reason":"compiler-artifact","package_id":"path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/crates/ep_compiler#0.1.0","manifest_path":"C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_compiler\\Cargo.toml","target":{"kind":["lib"],"crate_types":["lib"],"name":"ep_compiler","src_path":"C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_compiler\\src\\lib.rs","edition":"2024","doc":true,"doctest":true,"test":true},"profile":{"opt_level":"0","debuginfo":0,"debug_assertions":true,"overflow_checks":true,"test":false},"features":[],"filenames":["C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libep_compiler-99238be9f57e78db.rlib","C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libep_compiler-99238be9f57e78db.rmeta"],"executable":null,"fresh":true}
+{"reason":"compiler-artifact","package_id":"registry+https://github.com/rust-lang/crates.io-index#serde@1.0.228","manifest_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\serde-1.0.228\\Cargo.toml","target":{"kind":["lib"],"crate_types":["lib"],"name":"serde","src_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\serde-1.0.228\\src\\lib.rs","edition":"2021","doc":true,"doctest":true,"test":true},"profile":{"opt_level":"0","debuginfo":0,"debug_assertions":true,"overflow_checks":true,"test":false},"features":["default","derive","serde_derive","std"],"filenames":["C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libserde-ca0bb5d33bfd2315.rlib","C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libserde-ca0bb5d33bfd2315.rmeta"],"executable":null,"fresh":true}
+{"reason":"compiler-artifact","package_id":"registry+https://github.com/rust-lang/crates.io-index#toml_datetime@0.6.11","manifest_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\toml_datetime-0.6.11\\Cargo.toml","target":{"kind":["lib"],"crate_types":["lib"],"name":"toml_datetime","src_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\toml_datetime-0.6.11\\src\\lib.rs","edition":"2021","doc":true,"doctest":true,"test":true},"profile":{"opt_level":"0","debuginfo":0,"debug_assertions":true,"overflow_checks":true,"test":false},"features":["serde"],"filenames":["C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libtoml_datetime-81b36b0020816acd.rlib","C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libtoml_datetime-81b36b0020816acd.rmeta"],"executable":null,"fresh":true}
+{"reason":"compiler-artifact","package_id":"registry+https://github.com/rust-lang/crates.io-index#serde_spanned@0.6.9","manifest_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\serde_spanned-0.6.9\\Cargo.toml","target":{"kind":["lib"],"crate_types":["lib"],"name":"serde_spanned","src_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\serde_spanned-0.6.9\\src\\lib.rs","edition":"2021","doc":true,"doctest":true,"test":true},"profile":{"opt_level":"0","debuginfo":0,"debug_assertions":true,"overflow_checks":true,"test":false},"features":["serde"],"filenames":["C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libserde_spanned-30f3c143aa175dbc.rlib","C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libserde_spanned-30f3c143aa175dbc.rmeta"],"executable":null,"fresh":true}
+{"reason":"compiler-artifact","package_id":"registry+https://github.com/rust-lang/crates.io-index#toml_edit@0.22.27","manifest_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\toml_edit-0.22.27\\Cargo.toml","target":{"kind":["lib"],"crate_types":["lib"],"name":"toml_edit","src_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\toml_edit-0.22.27\\src\\lib.rs","edition":"2021","doc":true,"doctest":true,"test":true},"profile":{"opt_level":"0","debuginfo":0,"debug_assertions":true,"overflow_checks":true,"test":false},"features":["display","parse","serde"],"filenames":["C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libtoml_edit-6ee9062f9db5ef66.rlib","C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libtoml_edit-6ee9062f9db5ef66.rmeta"],"executable":null,"fresh":true}
+{"reason":"compiler-artifact","package_id":"registry+https://github.com/rust-lang/crates.io-index#toml@0.8.23","manifest_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\toml-0.8.23\\Cargo.toml","target":{"kind":["lib"],"crate_types":["lib"],"name":"toml","src_path":"C:\\Users\\GonieGonie\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\toml-0.8.23\\src\\lib.rs","edition":"2021","doc":true,"doctest":true,"test":true},"profile":{"opt_level":"0","debuginfo":0,"debug_assertions":true,"overflow_checks":true,"test":false},"features":["default","display","parse"],"filenames":["C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libtoml-5e44e4f8994a155c.rlib","C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libtoml-5e44e4f8994a155c.rmeta"],"executable":null,"fresh":true}
+{"reason":"compiler-artifact","package_id":"path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/crates/ep_run#0.1.0","manifest_path":"C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\Cargo.toml","target":{"kind":["lib"],"crate_types":["lib"],"name":"ep_run","src_path":"C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\src\\lib.rs","edition":"2024","doc":true,"doctest":true,"test":true},"profile":{"opt_level":"0","debuginfo":0,"debug_assertions":true,"overflow_checks":true,"test":false},"features":[],"filenames":["C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libep_run-d5a7693b599003f3.rlib","C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libep_run-d5a7693b599003f3.rmeta"],"executable":null,"fresh":true}
+{"reason":"compiler-artifact","package_id":"path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/crates/ep_run#0.1.0","manifest_path":"C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\Cargo.toml","target":{"kind":["example"],"crate_types":["bin"],"name":"ctf10_ordinary_history_observer","src_path":"C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\examples\\ctf10_ordinary_history_observer.rs","edition":"2024","doc":false,"doctest":false,"test":false},"profile":{"opt_level":"0","debuginfo":0,"debug_assertions":true,"overflow_checks":true,"test":false},"features":[],"filenames":["C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\ctf10_ordinary_history_observer.exe"],"executable":"C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\ctf10_ordinary_history_observer.exe","fresh":false}
+{"reason":"build-finished","success":true}
+   Compiling ep_run v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_run)
+    Finished `dev` profile [unoptimized] target(s) in 2.32s
+{"receipt": {"path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/ordinary_observer-command/receipt.json", "sha256": "ecaaa7d00321e483416dc221a4946e7caa76463c863dc7231df2ac390f3c0367"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+{"record": {"path": ".runtime/porting/SRC-05/ordinary-main-thread-validation-01/record.json", "sha256": "decafdcbfd1fa6118bc27fe513b79cea7143494429064309f487d494a10a9183", "size_bytes": 18325}, "Source_snapshot": {"path": ".runtime/porting/source-objects/00/00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a", "sha256": "00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a"}}

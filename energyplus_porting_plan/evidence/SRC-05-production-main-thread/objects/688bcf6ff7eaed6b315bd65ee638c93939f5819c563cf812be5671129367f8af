@@ -1,0 +1,71 @@
+"""Seal ignored Source-only publisher preparation; never run the publisher."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+import shutil
+
+ROOT = Path.cwd()
+OUT = ROOT / '.runtime/porting/SRC-05/ordinary-main-publication-prep-01'
+TEMPLATE = ROOT / '.runtime/porting/SRC-05/wind-diagnostics-publication-prep-01/publish.py'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+
+def record(name):
+    return ref(ROOT / name)
+
+
+assert not (OUT / 'manifest.json').exists()
+(OUT / 'before').mkdir(); shutil.copyfile(TEMPLATE, OUT / 'before/publish.py')
+differences = []
+for before, proposed, name in [(OUT / 'before/publish.py', OUT / 'publish.py', 'publish.py'), (None, OUT / 'README.md', 'README.md')]:
+    old = before.read_text(encoding='utf8') if before else ''
+    new = proposed.read_text(encoding='utf8')
+    delta = ''.join(difflib.unified_diff(old.splitlines(True), new.splitlines(True), fromfile='before/' + name, tofile=name))
+    path = OUT / (name + '.diff'); path.write_text(delta, encoding='utf8', newline='\n')
+    differences.append(dict(before=ref(before) if before else None, proposal=ref(proposed), exact_diff=ref(path)))
+fixed_paths = [
+    '.runtime/porting/SRC-05/ordinary-main-thread-prep-01/manifest.json',
+    '.runtime/porting/SRC-05/ordinary-main-thread-prep-01/Root-FULL-Source-review-01.json',
+    '.runtime/porting/SRC-05/ordinary-main-thread-Source-peer-review-01/review.json',
+    '.runtime/porting/SRC-05/ordinary-main-thread-application-prep-01/manifest.json',
+    '.runtime/porting/SRC-05/ordinary-main-thread-application-prep-02/manifest.json',
+    '.runtime/porting/SRC-05/ordinary-main-thread-application-prep-02/Root-FULL-Source-review-02.json',
+    '.runtime/porting/SRC-05/ordinary-main-thread-application-prep-03/manifest.json',
+    '.runtime/porting/SRC-05/ordinary-main-thread-application-prep-03/Root-FULL-Source-review-03.json',
+    '.runtime/porting/SRC-05/Header-ordinary-main-thread-application-Source-review-03/review.json',
+    '.runtime/porting/SRC-05/Header-ordinary-main-thread-actual-formatter-review-01/review.json',
+    '.runtime/porting/SRC-05/ordinary-main-execution-prep-01/manifest.json',
+    '.runtime/porting/SRC-05/ordinary-main-execution-prep-02/manifest.json',
+    '.runtime/porting/SRC-05/ordinary-main-execution-prep-02/Root-FULL-Source-review-02.json',
+    '.runtime/porting/SRC-05/Header-ordinary-main-execution-Source-review-02/review.json',
+    '.runtime/porting/SRC-05/Header-ordinary-main-validation-factual-review-01/review.json',
+    '.runtime/porting/SRC-05/ordinary-main-thread-validation-01/CLI-artifact.json',
+    '.runtime/porting/SRC-05/ordinary-main-thread-validation-01/ordinary_observer-artifact.json',
+    '.runtime/porting/SRC-05/ordinary-main-thread-validation-01/before.json',
+    '.runtime/porting/SRC-05/ordinary-main-thread-validation-command-01/receipt.json',
+    'tools/porting/record_command.py',
+]
+execution = json.loads((ROOT / fixed_paths[11]).read_bytes())
+manifest = dict(schema='src05-production-main-thread-publication-Source-preparation.v1', status='HELD_SOURCE_ONLY',
+    own_sources=[ref(OUT / name) for name in ('publish.py', 'README.md')] + [ref(Path(__file__))],
+    authentic_before_source=dict(actual_template=ref(TEMPLATE), actual_before_archive=ref(OUT / 'before/publish.py')),
+    source_correspondence=differences, fixed_evidence=[record(name) for name in fixed_paths],
+    required_application=record('.runtime/porting/SRC-05/ordinary-main-thread-applied-01/record.json'),
+    required_Source_snapshot=execution['required_Source_snapshot'], accepted_execution_preparation=record(fixed_paths[11]),
+    required_Native_baseline_acceptance=record('.runtime/porting/SRC-06/tarp-dispatcher-Native-observation-01/Root-baseline-acceptance.json'),
+    Source_ranges=execution['Source_ranges'],
+    runtime_interfaces=dict(publisher=ref(OUT / 'publish.py'), options=['--packet'], packet_schema='src05-production-main-thread-publication-inputs.v1',
+        mandatory_packet_refs=['actual_validation', 'Root_PE_acceptance', 'actual_execution_custody', 'actual_execution_outer_receipt', 'Root_factual_review', 'Header_factual_review'],
+        factual_review_schema='src05-ordinary-main-production-factual-review.v1', summary_schema='src05-actual-production-main-thread-evidence.v1'),
+    selected_scope=dict(changed_Rust_sources_only=4, full_current_Source_members=3931, Source_archives_authenticated_but_unrelated_payloads_excluded=True,
+        full_external_files_required_at_publication=True, external_payloads_published=False, numerical_values_parsed=False,
+        target_execution_performed=False, canonical_mutated=False, docs_updated=False, gates_updated=False))
+ast.parse((OUT / 'publish.py').read_bytes()); ast.parse(Path(__file__).read_bytes())
+(OUT / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, allow_nan=False, indent=2) + '\n', encoding='utf8', newline='\n')
+print(json.dumps(ref(OUT / 'manifest.json')))

@@ -1,0 +1,84 @@
+"""Seal explicit opaque historical JSON boundaries; no publication or target action."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+OLD = ROOT / '.runtime/porting/SRC-05/ordinary-main-publication-prep-02'
+OUT = ROOT / '.runtime/porting/SRC-05/ordinary-main-publication-prep-03'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+
+assert not OUT.exists()
+assert ref(OLD / 'manifest.json')['sha256'] == 'e91db61dd7cfd78ef06628652f7a23c324799753070cb417f8d6511b900a4d37'
+OUT.mkdir(); (OUT / 'before-02').mkdir()
+for name in ('publish.py', 'README.md', 'manifest.json'): (OUT / 'before-02' / name).write_bytes((OLD / name).read_bytes())
+manifest = json.loads((OLD / 'manifest.json').read_bytes())
+main = json.loads((ROOT / '.runtime/porting/SRC-05/ordinary-main-thread-prep-01/manifest.json').read_bytes())
+boundaries = []
+for item in main['source_dependencies']:
+    if item.get('role') == 'accepted_historical_diagnostic_or_build_provenance_not_proposed_execution' and item['source']['path'].endswith('.json'):
+        declared = item['source']; observed = ref(ROOT / declared['path'])
+        assert all(observed[key] == declared[key] for key in ('path', 'sha256', 'size_bytes'))
+        boundaries.append(dict(reference=declared, opaque_reason='Previously accepted diagnostic context; retain complete metadata bytes, without expanding unrelated historical dependency graphs.'))
+native = json.loads((ROOT / '.runtime/porting/SRC-06/native-tarp-dispatcher-prep-02/manifest.json').read_bytes())
+for key in ('reused_direct_Source_preparation', 'historical_Source_rationale'):
+    declared = native[key]; observed = ref(ROOT / declared['path'])
+    assert all(observed[k] == declared[k] for k in ('path', 'sha256', 'size_bytes'))
+    boundaries.append(dict(reference=declared, opaque_reason='Accepted prior direct-helper or caller-design metadata; current dispatcher sources, ranges, build/provider proofs and factual acceptance are retained independently.'))
+for name, reason in (
+    ('.runtime/porting/SRC-05/wind-pow-isolation-prep-01/before/input-only.json', 'Authentic empty before archive for a new input-only JSON file.'),
+    ('.runtime/porting/SRC-05/wind-pow-isolation-prep-01/before/prospective-policy.json', 'Authentic empty before archive for a new policy JSON file.'),
+    ('.runtime/porting/SRC-05/wind-pow-isolation-prep-01/before/provider-evidence/audit.json', 'Authentic empty before archive for a new provider audit JSON file.'),
+    ('.runtime/porting/SRC-06/native-provider-review-01/linked-provider-and-PE-inventory.json', 'Retained empty inventory from a failed historical provider collector; not the accepted current dispatcher inventory.'),
+):
+    observed = ref(ROOT / name)
+    assert observed['sha256'] == 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' and observed['size_bytes'] == 0
+    boundaries.append(dict(reference=observed, opaque_reason=reason))
+assert len({row['reference']['path'] for row in boundaries}) == len(boundaries)
+text = (OLD / 'publish.py').read_text(encoding='utf8')
+text = text.replace('SELECTED, VERIFIED, PARSED, ALIASES, SNAPSHOTS = {}, {}, set(), {}, {}', 'SELECTED, VERIFIED, PARSED, ALIASES, SNAPSHOTS = {}, {}, set(), {}, {}\nOPAQUE_RECURSIVE_JSON = {}')
+anchor = "            actual = checked(value)\n            if actual.suffix == '.json' and actual not in PARSED:"
+replacement = "            actual = checked(value)\n            opaque = OPAQUE_RECURSIVE_JSON.get(name)\n            if opaque is not None:\n                same(ref(actual), opaque['reference']); return\n            if actual.suffix == '.json' and actual not in PARSED:"
+assert text.count(anchor) == 1; text = text.replace(anchor, replacement)
+anchor = "packet_ref = operand(args.packet); packet = load(packet_ref); preparation = json.loads(PREPARATION.read_bytes())"
+replacement = anchor + "\nOPAQUE_RECURSIVE_JSON = {row['reference']['path']: row for row in preparation['opaque_recursive_JSON_references']}\nassert len(OPAQUE_RECURSIVE_JSON) == len(preparation['opaque_recursive_JSON_references'])"
+assert text.count(anchor) == 1; text = text.replace(anchor, replacement)
+anchor = "for row in packet.get('opaque_lineage', []): checked(row)"
+assert text.count(anchor) == 1; text = text.replace(anchor, anchor + "\nfor row in preparation['opaque_recursive_JSON_references']: checked(row['reference'])")
+anchor = "opaque_lineage=packet.get('opaque_lineage', []), selected_closure_transitively_replayable=False"
+assert text.count(anchor) == 1; text = text.replace(anchor, "opaque_lineage=packet.get('opaque_lineage', []), selected_opaque_recursive_JSON_references=preparation['opaque_recursive_JSON_references'], selected_closure_transitively_replayable=False")
+(OUT / 'publish.py').write_text(text, encoding='utf8', newline='\n')
+readme = (OLD / 'README.md').read_text(encoding='utf8').replace('ordinary-main-publication-prep-02/publish.py', 'ordinary-main-publication-prep-03/publish.py')
+readme += '\nSuccessor 03 preserves 01/02 and the failed closed publication attempt. Mandatory packet/application/quality/Cargo/process/Native provider/factual metadata still uses strict JSON loads and exact schema checks. Recursive selection has a finite manifest-declared path/SHA256/size boundary list: the explicitly historical diagnostic JSON references already declared by the accepted main-thread preparation, the reused prior direct-helper/caller-design metadata, three authentic empty new-file before archives, and the empty failed historical provider inventory. Each complete opaque object is fully hashed, selected and rechecked; its reason is copied into the summary. These objects are not parsed recursively. This bounds unrelated old dependency history without accepting malformed required metadata, rebinding historical paths to current files, or claiming a transitive Source closure. The accepted current dispatcher inventory remains mandatory strict metadata.\n'
+(OUT / 'README.md').write_text(readme, encoding='utf8', newline='\n')
+narrow = []
+for name in ('publish.py', 'README.md'):
+    before = OUT / 'before-02' / name; after = OUT / name
+    delta = ''.join(difflib.unified_diff(before.read_text(encoding='utf8').splitlines(True), after.read_text(encoding='utf8').splitlines(True), fromfile='before-02/' + name, tofile=name))
+    target = OUT / (name + '.diff'); target.write_text(delta, encoding='utf8', newline='\n')
+    narrow.append(dict(before=ref(before), proposal=ref(after), exact_diff=ref(target)))
+old_functions = {node.name: ast.dump(node, include_attributes=False) for node in ast.parse((OLD / 'publish.py').read_bytes()).body if isinstance(node, ast.FunctionDef)}
+new_functions = {node.name: ast.dump(node, include_attributes=False) for node in ast.parse((OUT / 'publish.py').read_bytes()).body if isinstance(node, ast.FunctionDef)}
+assert old_functions.keys() == new_functions.keys() and {key for key in old_functions if old_functions[key] != new_functions[key]} == {'walk'}
+failed = ref(ROOT / '.runtime/porting/SRC-05/ordinary-main-publication-command-01/receipt.json')
+assert failed['sha256'] == 'a0fbe3f1e84cf4a741be2b60278ea91c70e2d08c63957a60ef5b2bad3119f381'
+failure = json.loads((ROOT / failed['path']).read_bytes()); assert failure['exit_code'] == 1 and failure['source_bytes_match_before_and_after'] is True and failure['finished_utc']
+manifest['own_sources'] = [ref(OUT / name) for name in ('publish.py', 'README.md')] + [ref(Path(__file__))]
+manifest['prior_Source_preparation'] = ref(OLD / 'manifest.json')
+manifest['preserved_prior_manifest'] = ref(OUT / 'before-02/manifest.json')
+manifest['narrow_source_correspondence'] = narrow
+manifest['opaque_recursive_JSON_references'] = boundaries
+manifest['retained_failed_publication_execution'] = failed
+manifest['fixed_evidence'] += [ref(OLD / 'manifest.json'), failed]
+manifest['runtime_interfaces']['publisher'] = ref(OUT / 'publish.py')
+manifest['selected_scope']['historical_recursive_JSON_boundaries_explicit_and_complete_bytes_retained'] = True
+ast.parse(Path(__file__).read_bytes())
+(OUT / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, allow_nan=False, indent=2) + '\n', encoding='utf8', newline='\n')
+print(json.dumps(ref(OUT / 'manifest.json')))

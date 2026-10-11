@@ -1,0 +1,39 @@
+{
+  "schema": "src05-ordinary-main-execution-Header-Source-review.v1",
+  "accepted": true,
+  "Source_preparation": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-execution-prep-02/manifest.json",
+    "sha256": "fdf54127104e19ee741ab989643260f1b87bcef3268b8f89894148441159904e",
+    "size_bytes": 16701
+  },
+  "reviewed_driver": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-execution-prep-01/run_execution.py",
+    "sha256": "b1d905d3cf6d433fb9776ca3e13b3b2b4ee98c4eabd779a3b2cfc3d39a55ae16",
+    "size_bytes": 14665,
+    "line_count": 166
+  },
+  "review_scope": "FULL driver166/README19/input-only contract444/authors70+41 and cumulative transport adaptation with metadata-only historical Source range repair02.",
+  "checks": {
+    "unique_whole_refs_including_input_contract_and_command_custody": 76,
+    "descriptor_occurrences": 105,
+    "literal_ranges": 10,
+    "exact_runtime_adaptation_and_metadata_diffs_regenerated": 2,
+    "Python_AST_valid": true,
+    "runtime_driver_and_contract_literal01": true,
+    "two_historical_ranges_resolve_only_exact_authentic_before_archives": true,
+    "all45_fixed_input_guard_rows_exact_original_request": true,
+    "selected_IDF_weather_metadata_IDD_scope_exact_original_request": true,
+    "prior_successful_CLI_compatibility_deny_fulltrace_scopeA_argv_exact": true,
+    "prior_successful_observer_four_operand_argv_exact": true,
+    "dynamic_actual_quality_CargoJSON_and_Root_PE_acceptance_required": true,
+    "two_recorded_actual_main_processes_full_Source_and_frozen_files_before_after": true,
+    "fresh_D_output_at_least40GiB_no_deletion_compression_or_filter": true,
+    "complete_file_hashes_and_uncapped_NDJSON_header_footer_IO_custody_only": true,
+    "actual_failures_and_missing_incomplete_captures_retained": true
+  },
+  "limitations": [
+    "Header authored the underlying main-thread source implementation; this independently reviews the new execution/custody glue only.",
+    "No script imported/executed, target/canonical action or production result read by this review.",
+    "Actual quality/Cargo/PE must receive factual review before execution. No numerical parity, reachability, floating-point cause or gate promotion follows from IO completion."
+  ]
+}

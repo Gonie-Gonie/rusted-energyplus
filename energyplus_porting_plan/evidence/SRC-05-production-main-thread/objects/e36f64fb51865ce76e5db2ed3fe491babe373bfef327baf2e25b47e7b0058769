@@ -1,0 +1,11 @@
+    int IterLimitExceededNum1 = 0;
+    int IterLimitErrIndex1 = 0;
+    int IterLimitExceededNum2 = 0;
+    int IterLimitErrIndex2 = 0;
+
+    EPVector<ZoneTempPredictorCorrector::ZoneHeatBalanceData> zoneHeatBalance;
+    EPVector<ZoneTempPredictorCorrector::SpaceHeatBalanceData> spaceHeatBalance;
+
+    void init_constant_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }

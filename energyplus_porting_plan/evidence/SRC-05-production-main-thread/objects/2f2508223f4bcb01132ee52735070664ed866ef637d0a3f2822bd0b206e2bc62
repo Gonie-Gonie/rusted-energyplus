@@ -1,0 +1,160 @@
+
+D:/CodexBuild/rusted-energyplus/SRC-05/wind-pow-native-build-02/bin/src05_wind_pow_helper.exe:     file format pei-x86-64
+
+
+Disassembly of section .text:
+
+0000000141abf1e0 <exp2l>:
+   141abf1e0:	db 2a                	fldt   (%rdx)
+   141abf1e2:	d9 e5                	fxam
+   141abf1e4:	9b df e0             	fstsw  %ax
+   141abf1e7:	b6 45                	mov    $0x45,%dh
+   141abf1e9:	20 e6                	and    %ah,%dh
+   141abf1eb:	80 fe 05             	cmp    $0x5,%dh
+   141abf1ee:	74 3f                	je     141abf22f <exp2l+0x4f>
+   141abf1f0:	d9 c0                	fld    %st(0)
+   141abf1f2:	48 83 ec 08          	sub    $0x8,%rsp
+   141abf1f6:	d9 7c 24 04          	fnstcw 0x4(%rsp)
+   141abf1fa:	0f b7 44 24 04       	movzwl 0x4(%rsp),%eax
+   141abf1ff:	80 cc 0c             	or     $0xc,%ah
+   141abf202:	66 89 04 24          	mov    %ax,(%rsp)
+   141abf206:	d9 2c 24             	fldcw  (%rsp)
+   141abf209:	d9 fc                	frndint
+   141abf20b:	d9 6c 24 04          	fldcw  0x4(%rsp)
+   141abf20f:	48 83 c4 08          	add    $0x8,%rsp
+   141abf213:	dc e9                	fsubr  %st,%st(1)
+   141abf215:	d9 c9                	fxch   %st(1)
+   141abf217:	d9 f0                	f2xm1
+   141abf219:	d9 e8                	fld1
+   141abf21b:	de c1                	faddp  %st,%st(1)
+   141abf21d:	d9 fd                	fscale
+   141abf21f:	dd d9                	fstp   %st(1)
+   141abf221:	48 89 c8             	mov    %rcx,%rax
+   141abf224:	48 c7 41 08 00 00 00 	movq   $0x0,0x8(%rcx)
+   141abf22b:	00 
+   141abf22c:	db 39                	fstpt  (%rcx)
+   141abf22e:	c3                   	ret
+   141abf22f:	a9 00 02 00 00       	test   $0x200,%eax
+   141abf234:	74 04                	je     141abf23a <exp2l+0x5a>
+   141abf236:	dd d8                	fstp   %st(0)
+   141abf238:	d9 ee                	fldz
+   141abf23a:	48 89 c8             	mov    %rcx,%rax
+   141abf23d:	48 c7 41 08 00 00 00 	movq   $0x0,0x8(%rcx)
+   141abf244:	00 
+   141abf245:	db 39                	fstpt  (%rcx)
+   141abf247:	c3                   	ret
+   141abf248:	90                   	nop
+   141abf249:	90                   	nop
+   141abf24a:	90                   	nop
+   141abf24b:	90                   	nop
+   141abf24c:	90                   	nop
+   141abf24d:	90                   	nop
+   141abf24e:	90                   	nop
+   141abf24f:	90                   	nop
+
+0000000141abf250 <one>:
+   141abf250:	00 00                	add    %al,(%rax)
+   141abf252:	00 00                	add    %al,(%rax)
+   141abf254:	00 00                	add    %al,(%rax)
+   141abf256:	f0 3f                	lock (bad)
+
+0000000141abf258 <limit>:
+   141abf258:	8f c2                	pop    %rdx
+   141abf25a:	f5                   	cmc
+   141abf25b:	28 5c 8f d2          	sub    %bl,-0x2e(%rdi,%rcx,4)
+   141abf25f:	3f                   	(bad)
+
+0000000141abf260 <__logl_internal>:
+   141abf260:	d9 ed                	fldln2
+   141abf262:	db 2a                	fldt   (%rdx)
+   141abf264:	d9 c0                	fld    %st(0)
+   141abf266:	dc 25 e4 ff ff ff    	fsubl  -0x1c(%rip)        # 141abf250 <one>
+   141abf26c:	d9 c0                	fld    %st(0)
+   141abf26e:	d9 e1                	fabs
+   141abf270:	dc 1d e2 ff ff ff    	fcompl -0x1e(%rip)        # 141abf258 <limit>
+   141abf276:	df e0                	fnstsw %ax
+   141abf278:	80 e4 45             	and    $0x45,%ah
+   141abf27b:	74 12                	je     141abf28f <__logl_internal+0x2f>
+   141abf27d:	dd d9                	fstp   %st(1)
+   141abf27f:	d9 f9                	fyl2xp1
+   141abf281:	48 89 c8             	mov    %rcx,%rax
+   141abf284:	48 c7 41 08 00 00 00 	movq   $0x0,0x8(%rcx)
+   141abf28b:	00 
+   141abf28c:	db 39                	fstpt  (%rcx)
+   141abf28e:	c3                   	ret
+   141abf28f:	dd d8                	fstp   %st(0)
+   141abf291:	d9 f1                	fyl2x
+   141abf293:	48 89 c8             	mov    %rcx,%rax
+   141abf296:	48 c7 41 08 00 00 00 	movq   $0x0,0x8(%rcx)
+   141abf29d:	00 
+   141abf29e:	db 39                	fstpt  (%rcx)
+   141abf2a0:	c3                   	ret
+   141abf2a1:	90                   	nop
+   141abf2a2:	90                   	nop
+   141abf2a3:	90                   	nop
+   141abf2a4:	90                   	nop
+   141abf2a5:	90                   	nop
+   141abf2a6:	90                   	nop
+   141abf2a7:	90                   	nop
+   141abf2a8:	90                   	nop
+   141abf2a9:	90                   	nop
+   141abf2aa:	90                   	nop
+   141abf2ab:	90                   	nop
+   141abf2ac:	90                   	nop
+   141abf2ad:	90                   	nop
+   141abf2ae:	90                   	nop
+   141abf2af:	90                   	nop
+
+0000000141abf2b0 <one>:
+   141abf2b0:	00 00                	add    %al,(%rax)
+   141abf2b2:	00 00                	add    %al,(%rax)
+   141abf2b4:	00 00                	add    %al,(%rax)
+   141abf2b6:	f0 3f                	lock (bad)
+
+0000000141abf2b8 <limit>:
+   141abf2b8:	8f c2                	pop    %rdx
+   141abf2ba:	f5                   	cmc
+   141abf2bb:	28 5c 8f d2          	sub    %bl,-0x2e(%rdi,%rcx,4)
+   141abf2bf:	3f                   	(bad)
+
+0000000141abf2c0 <log2l>:
+   141abf2c0:	dd 05 ea ff ff ff    	fldl   -0x16(%rip)        # 141abf2b0 <one>
+   141abf2c6:	db 2a                	fldt   (%rdx)
+   141abf2c8:	d9 e5                	fxam
+   141abf2ca:	df e0                	fnstsw %ax
+   141abf2cc:	d9 c0                	fld    %st(0)
+   141abf2ce:	9e                   	sahf
+   141abf2cf:	72 37                	jb     141abf308 <log2l+0x48>
+   141abf2d1:	d8 e2                	fsub   %st(2),%st
+   141abf2d3:	d9 c0                	fld    %st(0)
+   141abf2d5:	d9 e1                	fabs
+   141abf2d7:	dc 1d db ff ff ff    	fcompl -0x25(%rip)        # 141abf2b8 <limit>
+   141abf2dd:	df e0                	fnstsw %ax
+   141abf2df:	80 e4 45             	and    $0x45,%ah
+   141abf2e2:	74 12                	je     141abf2f6 <log2l+0x36>
+   141abf2e4:	dd d9                	fstp   %st(1)
+   141abf2e6:	d9 f9                	fyl2xp1
+   141abf2e8:	48 89 c8             	mov    %rcx,%rax
+   141abf2eb:	48 c7 41 08 00 00 00 	movq   $0x0,0x8(%rcx)
+   141abf2f2:	00 
+   141abf2f3:	db 39                	fstpt  (%rcx)
+   141abf2f5:	c3                   	ret
+   141abf2f6:	dd d8                	fstp   %st(0)
+   141abf2f8:	d9 f1                	fyl2x
+   141abf2fa:	48 89 c8             	mov    %rcx,%rax
+   141abf2fd:	48 c7 41 08 00 00 00 	movq   $0x0,0x8(%rcx)
+   141abf304:	00 
+   141abf305:	db 39                	fstpt  (%rcx)
+   141abf307:	c3                   	ret
+   141abf308:	7a c7                	jp     141abf2d1 <log2l+0x11>
+   141abf30a:	dd d9                	fstp   %st(1)
+   141abf30c:	dd d9                	fstp   %st(1)
+   141abf30e:	48 89 c8             	mov    %rcx,%rax
+   141abf311:	48 c7 41 08 00 00 00 	movq   $0x0,0x8(%rcx)
+   141abf318:	00 
+   141abf319:	db 39                	fstpt  (%rcx)
+   141abf31b:	c3                   	ret
+   141abf31c:	90                   	nop
+   141abf31d:	90                   	nop
+   141abf31e:	90                   	nop
+   141abf31f:	90                   	nop

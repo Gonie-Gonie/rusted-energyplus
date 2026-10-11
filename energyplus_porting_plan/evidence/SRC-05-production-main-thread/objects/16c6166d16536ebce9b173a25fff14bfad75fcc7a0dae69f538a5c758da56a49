@@ -1,0 +1,84 @@
+"""Seal ignored Root-only application/validation Source; execute no proposals."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+OUT = ROOT / '.runtime/porting/SRC-05/ordinary-main-thread-application-prep-01'
+SOURCE_PREP = ROOT / '.runtime/porting/SRC-05/ordinary-main-thread-prep-01/manifest.json'
+SOURCE_SHA = '0d1913b429444685d35e4b6683c03ea2deeaefbef61f5cadfda5eb719b0158ea'
+BEFORE = ROOT / '.runtime/porting/source-objects/8a/8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934'
+TEMPLATES = [('apply.py', '.runtime/porting/SRC-06/apply-tarp-inside-Root-01.py'), ('validate.py', '.runtime/porting/SRC-06/tarp-inside-selected-rust-prep-01/run_main_thread.py')]
+
+
+def ref(path):
+    raw = path.read_bytes()
+    value = {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(raw).hexdigest(), 'size_bytes': len(raw)}
+    if path.suffix in ['.py', '.md', '.toml', '.rs', '.diff']:
+        value['line_count'] = len(raw.splitlines())
+    return value
+
+
+def write(path, raw):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream:
+        stream.write(raw)
+    return ref(path)
+
+
+def bind(row):
+    path = ROOT / row['path']
+    raw = path.read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == row['sha256'] and ('size_bytes' not in row or len(raw) == row['size_bytes'])
+    return path
+
+
+assert not (OUT / 'manifest.json').exists()
+assert ref(SOURCE_PREP)['sha256'] == SOURCE_SHA
+source = json.loads(SOURCE_PREP.read_bytes())
+snapshot = json.loads(BEFORE.read_bytes())
+assert ref(BEFORE)['sha256'] == BEFORE.name and len(snapshot['files']) == 3929
+for row in snapshot['files']:
+    assert ref(bind(row['archive']))['sha256'] == ref(ROOT / row['historical_path'])['sha256']
+    assert (ROOT / row['historical_path']).stat().st_size == row['size_bytes']
+before_sources, correspondence = [], []
+for name, template_name in TEMPLATES:
+    template, proposed = ROOT / template_name, OUT / name
+    ast.parse(template.read_text(encoding='utf-8')); ast.parse(proposed.read_text(encoding='utf-8'))
+    archived = write(OUT / 'before' / name, template.read_bytes())
+    delta = ''.join(difflib.unified_diff(template.read_bytes().decode().splitlines(True), proposed.read_bytes().decode().splitlines(True), fromfile=archived['path'], tofile=ref(proposed)['path'])).encode('utf-8')
+    difference = write(OUT / 'diffs' / (name + '.diff'), delta)
+    before_sources.append({'actual_template': ref(template), 'authentic_before_archive': archived})
+    correspondence.append({'before': archived, 'proposal': ref(proposed), 'exact_diff': difference})
+for row in source['application']:
+    before, after = bind(row['before_archive']).read_bytes(), bind(row['proposal']).read_bytes()
+    declared = bind(row['exact_diff']).read_bytes().decode().splitlines(True)
+    assert ''.join(difflib.unified_diff(before.decode().splitlines(True), after.decode().splitlines(True), fromfile=declared[0][4:].rstrip('\r\n'), tofile=declared[1][4:].rstrip('\r\n'))).encode() == bind(row['exact_diff']).read_bytes()
+    if row['new_destination_absent']:
+        assert not (ROOT / row['canonical_path']).exists() and before == b''
+    else:
+        assert bind(row['actual_before']).read_bytes() == before
+for row in source['Source_ranges']:
+    raw = bind(row['source']).read_bytes().splitlines(True)
+    selected = b''.join(raw[row['start_line'] - 1:row['end_line']])
+    assert selected == bind(row['literal_archive']).read_bytes() and hashlib.sha256(selected).hexdigest() == row['sha256']
+own = [ref(OUT / name) for name in ['apply.py', 'validate.py', 'README.md']] + [ref(Path(__file__).resolve())]
+manifest = {
+    'schema': 'src05-ordinary-main-thread-application-Source-preparation.v1', 'status': 'HELD_SOURCE_ONLY',
+    'accepted_main_thread_preparation': ref(SOURCE_PREP), 'source_before': {'path': ref(BEFORE)['path'], 'sha256': ref(BEFORE)['sha256']},
+    'own_sources': own, 'authentic_before_sources': before_sources, 'source_correspondence': correspondence,
+    'source_dependencies': [ref(ROOT / p) for p in ['tools/porting/record_command.py', 'Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml', 'crates/ep_cli/Cargo.toml', 'crates/ep_run/Cargo.toml']],
+    'Source_ranges': source['Source_ranges'],
+    'runtime_interfaces': {'apply': ref(OUT / 'apply.py'), 'validate': ref(OUT / 'validate.py'),
+        'application_schema': 'src05-ordinary-main-thread-actual-application.v1',
+        'Native_baseline_acceptance_schema': 'src06-tarp-dispatcher-Root-factual-baseline-acceptance.v1',
+        'formatter_review_schema': 'src05-ordinary-main-thread-actual-formatter-review.v1',
+        'validation_schema': 'src05-ordinary-main-thread-actual-quality-and-artifacts.v1',
+        'apply_options': ['--source-preparation', '--Native-baseline-acceptance', '--output-dir'],
+        'validate_options': ['--source-preparation', '--application', '--formatter-review', '--output-dir']},
+    'declared_scope': {'prior_Source_members': 3929, 'final_Source_members': 3931, 'unrelated_prior_members_byte_exact': 3927, 'application_paths': [r['canonical_path'] for r in source['application']], 'quality_roles': ['fmt_check', 'clippy', 'focused', 'workspace'], 'Cargo_build_roles': ['CLI', 'ordinary_observer'], 'target_execution_performed': False, 'canonical_mutated': False, 'numerical_results_read': False, 'floating_point_controls_written': False, 'gates_updated': False},
+}
+result = write(OUT / 'manifest.json', (json.dumps(manifest, ensure_ascii=False, allow_nan=False, indent=2) + '\n').encode())
+print(json.dumps({'manifest': result, 'own_lines': {r['path']: r.get('line_count') for r in own}, 'Source_only': True}))

@@ -1,0 +1,355 @@
+{
+  "schema": "src05-ordinary-main-thread-application-Source-preparation.v1",
+  "status": "HELD_SOURCE_ONLY",
+  "accepted_main_thread_preparation": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/manifest.json",
+    "sha256": "0d1913b429444685d35e4b6683c03ea2deeaefbef61f5cadfda5eb719b0158ea",
+    "size_bytes": 20071
+  },
+  "source_before": {
+    "path": ".runtime/porting/source-objects/8a/8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934",
+    "sha256": "8aa752f4b95a86a2f49f243447fa8ea905761c37bea9d30b614c150df3a61934"
+  },
+  "own_sources": [
+    {
+      "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-01/apply.py",
+      "sha256": "f156146347a42f0f9ee0d13a6e180ab82773c7a9387c5200e85f464b95ba21c5",
+      "size_bytes": 10854,
+      "line_count": 179
+    },
+    {
+      "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-01/validate.py",
+      "sha256": "a6e2ef83325d77e2c372d72e24391c070dcd767fdd056ee0fc78ffdc84decc77",
+      "size_bytes": 13363,
+      "line_count": 146
+    },
+    {
+      "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-01/README.md",
+      "sha256": "1fa2aa83926c6684e9012c84cdf0d2ae9d4f18d8ef626931413315ee475f81f6",
+      "size_bytes": 4683,
+      "line_count": 27
+    },
+    {
+      "path": ".runtime/porting/SRC-05/prepare-ordinary-main-thread-application-01.py",
+      "sha256": "16c6166d16536ebce9b173a25fff14bfad75fcc7a0dae69f538a5c758da56a49",
+      "size_bytes": 5748,
+      "line_count": 84
+    }
+  ],
+  "authentic_before_sources": [
+    {
+      "actual_template": {
+        "path": ".runtime/porting/SRC-06/apply-tarp-inside-Root-01.py",
+        "sha256": "3dddfd92357baf1ee3b406f3088603e4203246f269fc529d6d14f743a6f43f60",
+        "size_bytes": 5112,
+        "line_count": 82
+      },
+      "authentic_before_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-01/before/apply.py",
+        "sha256": "3dddfd92357baf1ee3b406f3088603e4203246f269fc529d6d14f743a6f43f60",
+        "size_bytes": 5112,
+        "line_count": 82
+      }
+    },
+    {
+      "actual_template": {
+        "path": ".runtime/porting/SRC-06/tarp-inside-selected-rust-prep-01/run_main_thread.py",
+        "sha256": "1256809dd6f82eea00f7691cadb7ded8db322b4fcfa7ea5e1901a93451bd3d43",
+        "size_bytes": 13050,
+        "line_count": 198
+      },
+      "authentic_before_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-01/before/validate.py",
+        "sha256": "1256809dd6f82eea00f7691cadb7ded8db322b4fcfa7ea5e1901a93451bd3d43",
+        "size_bytes": 13050,
+        "line_count": 198
+      }
+    }
+  ],
+  "source_correspondence": [
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-01/before/apply.py",
+        "sha256": "3dddfd92357baf1ee3b406f3088603e4203246f269fc529d6d14f743a6f43f60",
+        "size_bytes": 5112,
+        "line_count": 82
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-01/apply.py",
+        "sha256": "f156146347a42f0f9ee0d13a6e180ab82773c7a9387c5200e85f464b95ba21c5",
+        "size_bytes": 10854,
+        "line_count": 179
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-01/diffs/apply.py.diff",
+        "sha256": "378cf7f2f9fa327f32072ffe8e93e3f69257c99013f5a53819633a9c12e10adf",
+        "size_bytes": 16120,
+        "line_count": 246
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-01/before/validate.py",
+        "sha256": "1256809dd6f82eea00f7691cadb7ded8db322b4fcfa7ea5e1901a93451bd3d43",
+        "size_bytes": 13050,
+        "line_count": 198
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-01/validate.py",
+        "sha256": "a6e2ef83325d77e2c372d72e24391c070dcd767fdd056ee0fc78ffdc84decc77",
+        "size_bytes": 13363,
+        "line_count": 146
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-01/diffs/validate.py.diff",
+        "sha256": "7f6de72847f5124d69860953b0ac70679bc12cebcb40883e8b32674e75cb1348",
+        "size_bytes": 26048,
+        "line_count": 320
+      }
+    }
+  ],
+  "source_dependencies": [
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "size_bytes": 8453,
+      "line_count": 204
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "833a9f5bb991874dd972e044949fee695b36b17a857d7603cc0e45921a945b09",
+      "size_bytes": 597,
+      "line_count": 30
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "ebddfe56e3c0d242b920814be6c69b97c2f81bb99909dcbb27b75fead358df3a",
+      "size_bytes": 5543
+    },
+    {
+      "path": "rust-toolchain.toml",
+      "sha256": "46329056a5a30ccfaab7df1dc7728f98398913aa959296697d037bdd0f050c61",
+      "size_bytes": 108,
+      "line_count": 4
+    },
+    {
+      "path": ".cargo/config.toml",
+      "sha256": "499acd94a2b47c922ffc59abfd4f2643bcaf78857f7d35524cca98e62ab95c92",
+      "size_bytes": 241,
+      "line_count": 5
+    },
+    {
+      "path": "crates/ep_cli/Cargo.toml",
+      "sha256": "04c6b5cd8a3809451d4ea973213b8bbbf8c08c70ff12f22875014652f910947a",
+      "size_bytes": 569,
+      "line_count": 24
+    },
+    {
+      "path": "crates/ep_run/Cargo.toml",
+      "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+      "size_bytes": 524,
+      "line_count": 21
+    }
+  ],
+  "Source_ranges": [
+    {
+      "source": {
+        "path": "crates/ep_cli/src/main.rs",
+        "sha256": "14fd8adbcbe9e9218069586172ca4a54c70bb21035f42701421914bae038892f",
+        "size_bytes": 1031029,
+        "line_count": 24862
+      },
+      "start_line": 148,
+      "end_line": 208,
+      "sha256": "56ffa779e2a13daf0b890ad423f7cc0c4dfb7b35487033a86a13f5d78429fc04",
+      "size_bytes": 4014,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/Source-ranges/01.txt",
+        "sha256": "56ffa779e2a13daf0b890ad423f7cc0c4dfb7b35487033a86a13f5d78429fc04",
+        "size_bytes": 4014
+      },
+      "purpose": "actual CLI worker entry and unchanged dispatch boundary"
+    },
+    {
+      "source": {
+        "path": "crates/ep_run/examples/ctf10_ordinary_history_observer.rs",
+        "sha256": "1e5da52f570cfb9d8e6b3b7d8614c8989f9233e5759160b1a8802c0cdf8ee170",
+        "size_bytes": 2998,
+        "line_count": 82
+      },
+      "start_line": 10,
+      "end_line": 82,
+      "sha256": "3f3119d34d0a73ded534c0d0792d3e01fecc7c7d9295b48f039dcf55c6889809",
+      "size_bytes": 2555,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/Source-ranges/02.txt",
+        "sha256": "3f3119d34d0a73ded534c0d0792d3e01fecc7c7d9295b48f039dcf55c6889809",
+        "size_bytes": 2555
+      },
+      "purpose": "actual ordinary run, TLS sink, and worker entry"
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-03/rust/src/main.rs",
+        "sha256": "e6552e18f1d9249b5e9388651a646653a8d0d9decd25106a4933b1128d4ba710",
+        "size_bytes": 6755,
+        "line_count": 116
+      },
+      "start_line": 33,
+      "end_line": 46,
+      "sha256": "07adcdc7157c7146a3de421a0c3c7a7c20ab5e7a6212a3e48da079ec9843d07b",
+      "size_bytes": 786,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/Source-ranges/03.txt",
+        "sha256": "07adcdc7157c7146a3de421a0c3c7a7c20ab5e7a6212a3e48da079ec9843d07b",
+        "size_bytes": 786
+      },
+      "purpose": "read-only diagnostic controls"
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-03/rust/src/main.rs",
+        "sha256": "e6552e18f1d9249b5e9388651a646653a8d0d9decd25106a4933b1128d4ba710",
+        "size_bytes": 6755,
+        "line_count": 116
+      },
+      "start_line": 92,
+      "end_line": 116,
+      "sha256": "b02148a4cc2ccf1ba148f3184352def9d36bcde01c48487e5e519514bc1fcb11",
+      "size_bytes": 1718,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/Source-ranges/04.txt",
+        "sha256": "b02148a4cc2ccf1ba148f3184352def9d36bcde01c48487e5e519514bc1fcb11",
+        "size_bytes": 1718
+      },
+      "purpose": "actual diagnostic main and spawn lanes"
+    },
+    {
+      "source": {
+        "path": "C:/Users/GonieGonie/.rustup/toolchains/1.96.0-x86_64-pc-windows-gnu/lib/rustlib/src/rust/library/std/src/sys/thread/windows.rs",
+        "sha256": "d39dac5c2c0b286df1dbbaa2055fb4832e833dd8d456503feeba3ef3ae79b586",
+        "size_bytes": 5535,
+        "line_count": 155
+      },
+      "start_line": 18,
+      "end_line": 65,
+      "sha256": "5864e10a3cc21d48995c210d114743f347ce774a1b814760867438dba2915b97",
+      "size_bytes": 2020,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/Source-ranges/05.txt",
+        "sha256": "5864e10a3cc21d48995c210d114743f347ce774a1b814760867438dba2915b97",
+        "size_bytes": 2020
+      },
+      "purpose": "actual Windows worker reservation and overflow guarantee"
+    },
+    {
+      "source": {
+        "path": "C:/Users/GonieGonie/.rustup/toolchains/1.96.0-x86_64-pc-windows-gnu/lib/rustlib/src/rust/library/std/src/sys/pal/windows/stack_overflow.rs",
+        "sha256": "32995beb3683e62b2f9af3d1cac5e3317541baa038d39320bd67c43bce83c9dc",
+        "size_bytes": 1761,
+        "line_count": 41
+      },
+      "start_line": 1,
+      "end_line": 41,
+      "sha256": "32995beb3683e62b2f9af3d1cac5e3317541baa038d39320bd67c43bce83c9dc",
+      "size_bytes": 1761,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/Source-ranges/06.txt",
+        "sha256": "32995beb3683e62b2f9af3d1cac5e3317541baa038d39320bd67c43bce83c9dc",
+        "size_bytes": 1761
+      },
+      "purpose": "actual main overflow handler and emergency stack guarantee"
+    },
+    {
+      "source": {
+        "path": "C:/Users/GonieGonie/.rustup/toolchains/1.96.0-x86_64-pc-windows-gnu/lib/rustlib/src/rust/library/std/src/sys/pal/windows/mod.rs",
+        "sha256": "b561d7e9cb6028a08cb36b53ebcc313f2be0ad64de864da889dfea88f1f1d7b6",
+        "size_bytes": 10850,
+        "line_count": 296
+      },
+      "start_line": 46,
+      "end_line": 59,
+      "sha256": "bdcf6b4647650761d7ba86c85f2af6eb5ae63c0b8ef491737370d74ccf0f388d",
+      "size_bytes": 515,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/Source-ranges/07.txt",
+        "sha256": "bdcf6b4647650761d7ba86c85f2af6eb5ae63c0b8ef491737370d74ccf0f388d",
+        "size_bytes": 515
+      },
+      "purpose": "actual std Windows initialization calls overflow setup"
+    },
+    {
+      "source": {
+        "path": "C:/Users/GonieGonie/.rustup/toolchains/1.96.0-x86_64-pc-windows-gnu/lib/rustlib/src/rust/library/std/src/rt.rs",
+        "sha256": "f435576c645fb30eaca560e819c2a113b556452d79c0303f49ffd4487018c01f",
+        "size_bytes": 7538,
+        "line_count": 211
+      },
+      "start_line": 90,
+      "end_line": 122,
+      "sha256": "6ad69319dd9508c64324043c526a8d9badb41550829dca1d5207c5e4cc43d6a1",
+      "size_bytes": 1569,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-05/ordinary-main-thread-prep-01/Source-ranges/08.txt",
+        "sha256": "6ad69319dd9508c64324043c526a8d9badb41550829dca1d5207c5e4cc43d6a1",
+        "size_bytes": 1569
+      },
+      "purpose": "runtime initialization before main"
+    }
+  ],
+  "runtime_interfaces": {
+    "apply": {
+      "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-01/apply.py",
+      "sha256": "f156146347a42f0f9ee0d13a6e180ab82773c7a9387c5200e85f464b95ba21c5",
+      "size_bytes": 10854,
+      "line_count": 179
+    },
+    "validate": {
+      "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-01/validate.py",
+      "sha256": "a6e2ef83325d77e2c372d72e24391c070dcd767fdd056ee0fc78ffdc84decc77",
+      "size_bytes": 13363,
+      "line_count": 146
+    },
+    "application_schema": "src05-ordinary-main-thread-actual-application.v1",
+    "Native_baseline_acceptance_schema": "src06-tarp-dispatcher-Root-factual-baseline-acceptance.v1",
+    "formatter_review_schema": "src05-ordinary-main-thread-actual-formatter-review.v1",
+    "validation_schema": "src05-ordinary-main-thread-actual-quality-and-artifacts.v1",
+    "apply_options": [
+      "--source-preparation",
+      "--Native-baseline-acceptance",
+      "--output-dir"
+    ],
+    "validate_options": [
+      "--source-preparation",
+      "--application",
+      "--formatter-review",
+      "--output-dir"
+    ]
+  },
+  "declared_scope": {
+    "prior_Source_members": 3929,
+    "final_Source_members": 3931,
+    "unrelated_prior_members_byte_exact": 3927,
+    "application_paths": [
+      "crates/ep_cli/src/main.rs",
+      "crates/ep_run/examples/ctf10_ordinary_history_observer.rs",
+      "crates/ep_cli/build.rs",
+      "crates/ep_run/build.rs"
+    ],
+    "quality_roles": [
+      "fmt_check",
+      "clippy",
+      "focused",
+      "workspace"
+    ],
+    "Cargo_build_roles": [
+      "CLI",
+      "ordinary_observer"
+    ],
+    "target_execution_performed": false,
+    "canonical_mutated": false,
+    "numerical_results_read": false,
+    "floating_point_controls_written": false,
+    "gates_updated": false
+  }
+}

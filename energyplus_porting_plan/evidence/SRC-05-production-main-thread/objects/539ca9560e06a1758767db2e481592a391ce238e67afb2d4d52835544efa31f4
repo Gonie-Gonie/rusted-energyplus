@@ -1,0 +1,8 @@
+--- .runtime/porting/SRC-05/ordinary-main-thread-application-prep-02/before-01/README.md
++++ .runtime/porting/SRC-05/ordinary-main-thread-application-prep-02/README.md
+@@ -25,3 +25,5 @@
+ The read-only PE inspection retains the actual DOS/COFF/optional/section-table bytes, offset, full executable SHA/size, all data directories and section rows. It requires x64 PE32+ and stack reserve 8,388,608 bytes, with the actual positive commit retained. Entry point, subsystem, DLL/COFF characteristics and security directory are recorded. This is a stack/header check; Root must accept actual PE evidence before real CLI/observer invocation. It does not claim previous-binary security/loader equivalence or production numerical parity.
+ 
+ The two genuine prior Source templates are copied byte exactly under `before/`; both complete adaptation deltas are retained. The authentic recorder is fixed at `5745ad98…`. All runtime operands are actual recorded path/SHA references. No future result, receipt, Source hash or test total is invented. Failures leave their actual command receipts and artifacts in the fresh ignored output directory and stop validation.
++
++The narrow second preparation preserves both existing Root-only ignored observation tests. Full routine stdout must contain exactly their two Source-owned test names; every failed count must be zero, and aggregate ignored counts must equal the retained full ignored rows. Actual passed/group totals remain derived. The first preparation is preserved unexecuted; its zero-ignored guard was a Source review defect, not a test result.
