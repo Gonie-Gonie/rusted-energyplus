@@ -1,0 +1,5 @@
+Held Source-only correction of the observer caller, after genuine exit4 before runtime.
+
+Prior fixed A CLI uses --partial deny and --porting-scope a. The observer omitted only the existing strict scope entry; changing PartialRunPolicy would neither match prior invocation nor repair the Raw coverage gate. The three changed Rust lines add PortingScope, import run_bounded_porting and call that same public entry once with A. All configuration/input/sink/math/serialization/policy bytes remain identical by exact inverse.
+
+The genuine pipeline still stages/parses/compiles original IDF/weather. Existing CON-01 A admission rejects broader objects/settings and validates ThirdOrder/Mixing/weather before runtime. No coverage exemption is added here. Card wording identifies the actual scope and retains initial failure. Root must review/apply separately, archive the semantic delta honestly, then run the same four quality commands and actual CargoJSON build before a fresh uncapped capture. No tests/execution/canonical edits by this author.

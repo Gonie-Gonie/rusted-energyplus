@@ -1,0 +1,28 @@
+        json event{{"event_ordinal", ordinal}, {"checkpoint", checkpoint}, {"copy_kind", static_cast<unsigned>(kind)}, {"clock", clock(state)},
+                   {"procedure", current_scope ? json(procedure_name(current_scope->procedure)) : json(nullptr)},
+                   {"invocation_ordinal", current_scope ? json(current_scope->ordinal) : json(nullptr)},
+                   {"parent_procedure", current_scope && current_scope->parent ? json(procedure_name(current_scope->parent->procedure)) : json(nullptr)},
+                   {"parent_invocation_ordinal", current_scope && current_scope->parent ? json(current_scope->parent->ordinal) : json(nullptr)},
+                   {"locals", json::object()}, {"owners", nullptr}, {"counted_as_PASS", false}};
+        for (auto const &r : reals) event["locals"][r.name] = scalar(r.value);
+        for (auto const &i : integers) event["locals"][i.name] = i.value;
+        if (kind == Copy::Catalog) event["owners"] = catalog(state);
+        else if (kind != Copy::None) {
+            if (surface != 0) event["owners"] = surface_copy(state, kind, surface, term);
+            else {
+                event["owners"] = json::array();
+                for (int index : state.dataSurface->AllHTSurfaceList)
+                    event["owners"].push_back(surface_copy(state, kind, index, term));
+            }
+        }
+        if (std::strcmp(checkpoint, "history_initialization_entry_owners") == 0 ||
+            std::strcmp(checkpoint, "history_update_entry_owners") == 0)
+            event["history_entry_context"] = history_entry_context(state);
+        if (std::strcmp(checkpoint, "history_selected_initialization_input") == 0 ||
+            std::strcmp(checkpoint, "history_selected_initialization_complete") == 0 ||
+            std::strcmp(checkpoint, "history_selected_master_update_complete") == 0 ||
+            std::strcmp(checkpoint, "simple_history_hard_copy_complete") == 0)
+            event["history_boundary_context"] = history_entry_context(state);
+        if (std::strcmp(checkpoint, "history_selected_initialization_input") == 0 ||
+            std::strcmp(checkpoint, "history_update_entry_owners") == 0)
+            event["current_history_catalog"] = catalog(state, true);

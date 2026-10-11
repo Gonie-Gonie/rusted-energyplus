@@ -1,0 +1,65 @@
+import difflib
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT = Path.cwd()
+spec = importlib.util.spec_from_file_location('recorder', ROOT / 'tools/porting/record_command.py')
+rec = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(rec)
+OUT = ROOT / '.runtime/porting/SUR-04/inside-consumer-applied-01'
+
+def checked(ref):
+    data = (ROOT / ref['path']).read_bytes()
+    assert hashlib.sha256(data).hexdigest() == ref['sha256'], ref['path']
+    if 'size_bytes' in ref:
+        assert len(data) == ref['size_bytes'], ref['path']
+    return data
+
+def load(path, digest):
+    data = checked({'path': path, 'sha256': digest})
+    return json.loads(data)
+
+def rows(snapshot):
+    return {r['historical_path']: r['archive']['sha256'] for r in json.loads(checked(snapshot))['files']}
+
+assert not OUT.exists()
+card = load('.runtime/porting/SUR-04/scope-card-amendment-01/manifest.json', 'f0c5efeb7d691c180843a114e9ee7d7b1d3d62ee1f0f904a2c2f79ddd5f1ab8f')
+prep = load('.runtime/porting/SUR-04/inside-consumer-prep-01/manifest.json', 'bf62eaf5931251bc0f1888ae82d66de1872215688b2610cdf7861e853632f4ae')
+applications = [card, *prep['application_sources']]
+for row in applications:
+    assert checked(row['actual_before']) == checked(row['before_archive'])
+    checked(row['proposal'])
+    checked(row['exact_diff'])
+before = rec.source_snapshot()
+OUT.mkdir()
+# The input contract supplement precedes its implementation.
+for row in applications:
+    (ROOT / row['canonical_path']).write_bytes(checked(row['proposal']))
+literal = rec.source_snapshot()
+fmt_dir = '.runtime/porting/SUR-04/inside-consumer-format-command-01'
+code = subprocess.run([sys.executable, 'tools/porting/record_command.py', '--output-dir', fmt_dir, '--', 'cargo', 'fmt', '--all'], cwd=ROOT).returncode
+assert code == 0
+final = rec.source_snapshot()
+fmt = json.loads((ROOT / fmt_dir / 'receipt.json').read_text(encoding='utf8'))
+assert fmt['source_snapshot'] == literal
+before_rows, final_rows = rows(before), rows(final)
+assert before_rows.keys() == final_rows.keys()
+changed = {r['canonical_path'] for r in prep['application_sources']}
+assert all(before_rows[p] == final_rows[p] for p in before_rows.keys() - changed)
+applied = []
+for index, row in enumerate(prep['application_sources']):
+    proposal = checked(row['proposal'])
+    path = ROOT / row['canonical_path']
+    data = path.read_bytes()
+    delta = ''.join(difflib.unified_diff(proposal.decode('utf8').splitlines(keepends=True), data.decode('utf8').splitlines(keepends=True), fromfile=row['proposal']['path'], tofile=row['canonical_path'])).encode('utf8')
+    diffpath = OUT / f'formatter-{index + 1}.diff'
+    diffpath.write_bytes(delta)
+    applied.append({**row, 'actual_final': {**rec.ref(path), 'size_bytes': len(data)}, 'actual_formatter_diff': {**rec.ref(diffpath), 'size_bytes': len(delta)}, 'actual_final_archive': rec.store_bytes(data)})
+record = {'schema': 'sur04-actual-literal-application.v1', 'card_supplement': card, 'implementation_preparation': rec.ref(ROOT / '.runtime/porting/SUR-04/inside-consumer-prep-01/manifest.json'), 'source_before': before, 'source_literal': literal, 'source_final': final, 'source_file_count': len(final_rows), 'unrelated_source_files_verified_byte_exact': len(final_rows) - len(changed), 'actual_format_receipt': rec.ref(ROOT / fmt_dir / 'receipt.json'), 'application': applied, 'numerical_comparison_performed': False, 'gates_updated': False}
+record_path = OUT / 'record.json'
+record_path.write_bytes(rec.json_bytes(record))
+print(json.dumps({'record': rec.ref(record_path), 'final_source': final, 'unrelated_files': record['unrelated_source_files_verified_byte_exact']}))

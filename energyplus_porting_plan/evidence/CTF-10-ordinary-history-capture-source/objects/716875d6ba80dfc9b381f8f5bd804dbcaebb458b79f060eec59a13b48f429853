@@ -1,0 +1,75 @@
+{
+  "schema": "ctf10-ordinary-history-actual-quality.v1",
+  "actual_commands": [
+    {
+      "role": "fmt-check",
+      "execution": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-quality-01/fmt-check-command/receipt.json",
+        "sha256": "cf2630dab363c4d1325927af2708ed473f6eb7539a7ca761eeb323fb421e9c3b"
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/c3/c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7",
+        "sha256": "c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7"
+      },
+      "test_totals": [
+        0,
+        0,
+        0
+      ],
+      "test_result_groups": 0
+    },
+    {
+      "role": "clippy",
+      "execution": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-quality-01/clippy-command/receipt.json",
+        "sha256": "8cc69d170c2d4c3c857fdf98b0b4080fcb04bfdeba05f88aea84cbf62a9e0e67"
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/c3/c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7",
+        "sha256": "c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7"
+      },
+      "test_totals": [
+        0,
+        0,
+        0
+      ],
+      "test_result_groups": 0
+    },
+    {
+      "role": "focused",
+      "execution": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-quality-01/focused-command/receipt.json",
+        "sha256": "109785553f75195c5c7afe2c1d1b7582e68f99f8bb6999c89bafc3725018953b"
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/c3/c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7",
+        "sha256": "c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7"
+      },
+      "test_totals": [
+        316,
+        0,
+        0
+      ],
+      "test_result_groups": 1
+    },
+    {
+      "role": "workspace",
+      "execution": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-quality-01/workspace-command/receipt.json",
+        "sha256": "0351bed24130b7b83beefb2a8049ac6f9e2c65c65eced3e3a374cee71ee25c98"
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/c3/c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7",
+        "sha256": "c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7"
+      },
+      "test_totals": [
+        4940,
+        0,
+        0
+      ],
+      "test_result_groups": 21
+    }
+  ],
+  "numerical_comparison_performed": false,
+  "gates_updated": false
+}

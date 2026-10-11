@@ -1,0 +1,132 @@
+pub struct CtfSurfaceLifecycle {
+    generation_key: CtfSurfaceGenerationKey,
+    generation_context: CtfSurfaceGenerationContext,
+    heat_transfer_groups: Vec<Vec<SurfaceId>>,
+    opaque_groups: Vec<Vec<SurfaceId>>,
+    all_heat_transfer_surfaces: Vec<SurfaceId>,
+    history: CtfThermalHistoryState,
+    initialized: bool,
+    current_clock: Option<ProductionCtfHistoryClock>,
+    last_committed_clock: Option<ProductionCtfHistoryClock>,
+    failure: Option<CtfSurfaceLifecycleUnavailable>,
+}
+
+fn allocated_arrays(count: usize) -> CtfThermalHistoryArrays {
+    CtfThermalHistoryArrays {
+        inside_temperature: std::array::from_fn(|_| vec![0.0; count]),
+        outside_temperature: std::array::from_fn(|_| vec![0.0; count]),
+        inside_flux: std::array::from_fn(|_| vec![0.0; count]),
+        outside_flux: std::array::from_fn(|_| vec![0.0; count]),
+    }
+}
+
+fn ordinary_orders(
+    model: &TypedModel,
+) -> Result<Vec<Vec<SurfaceId>>, CtfSurfaceLifecycleUnavailable> {
+    let mut zones = BTreeSet::new();
+    let mut spaces = BTreeSet::new();
+    let mut selected = BTreeSet::new();
+    let mut groups = Vec::new();
+    for zone in &model.zones {
+        if !zones.insert(zone.id) {
+            return Err(CtfSurfaceLifecycleUnavailable::Association);
+        }
+        for &space_id in &zone.spaces {
+            let space = model
+                .spaces
+                .iter()
+                .find(|value| value.id == space_id)
+                .ok_or(CtfSurfaceLifecycleUnavailable::Association)?;
+            if space.zone != zone.id || !spaces.insert(space_id) {
+                return Err(CtfSurfaceLifecycleUnavailable::Association);
+            }
+            let mut group = Vec::new();
+            // Native base-class order; original input order within each class.
+            for class in [SurfaceType::Wall, SurfaceType::Floor, SurfaceType::Roof] {
+                for surface in &model.surfaces {
+                    let same_class = surface.surface_type == class
+                        || (class == SurfaceType::Roof
+                            && surface.surface_type == SurfaceType::Ceiling);
+                    if surface.space != space_id || !same_class {
+                        continue;
+                    }
+                    if surface.zone != zone.id || !selected.insert(surface.id) {
+                        return Err(CtfSurfaceLifecycleUnavailable::Association);
+                    }
+                    group.push(surface.id);
+                }
+            }
+            groups.push(group);
+        }
+    }
+    if spaces.len() != model.spaces.len() || selected.len() != model.surfaces.len() {
+        return Err(CtfSurfaceLifecycleUnavailable::Association);
+    }
+    Ok(groups)
+}
+
+impl CtfSurfaceLifecycle {
+    pub(crate) fn allocate(
+        model: &TypedModel,
+        public: &OrderedCtfPublicInitialization,
+        context: CtfSurfaceGenerationContext,
+    ) -> Result<Self, CtfSurfaceLifecycleUnavailable> {
+        let generation = capture_public_ctf_surface_generation(model, public, context)?;
+        for surface in &model.surfaces {
+            generation.bind_surface(surface.id)?;
+        }
+        let groups = ordinary_orders(model)?;
+        let all = groups.iter().flatten().copied().collect::<Vec<_>>();
+        let count = model.surfaces.len();
+        let aggregate = public.aggregate_after_returned_calls;
+        let masters = if !aggregate.simple_ctf_only || context.any_ems_in_model {
+            Some(CtfThermalHistoryMasters {
+                arrays: allocated_arrays(count),
+                current_num_histories: vec![0; count],
+            })
+        } else {
+            None
+        };
+        Ok(Self {
+            generation_key: generation.key().clone(),
+            generation_context: context,
+            heat_transfer_groups: groups.clone(),
+            opaque_groups: groups,
+            all_heat_transfer_surfaces: all,
+            history: CtfThermalHistoryState {
+                surface_ids: model.surfaces.iter().map(|value| value.id).collect(),
+                normal: allocated_arrays(count),
+                masters,
+                scratch: None,
+                update_first_time: true,
+                flux_reports: CtfThermalHistoryFluxReports {
+                    inside_conduction: vec![0.0; count],
+                    inside_flux: vec![0.0; count],
+                    outside_flux: vec![0.0; count],
+                    outside_conduction: vec![0.0; count],
+                },
+            },
+            initialized: false,
+            current_clock: None,
+            last_committed_clock: None,
+            failure: None,
+        })
+    }
+
+    /// Actual allocated owners; an uninitialized allocation is not initialized history.
+    #[must_use]
+    pub fn history(&self) -> &CtfThermalHistoryState {
+        &self.history
+    }
+
+    /// Complete original primitive/public/source equality key captured by the producer.
+    #[must_use]
+    pub fn generation_key(&self) -> &CtfSurfaceGenerationKey {
+        &self.generation_key
+    }
+
+    /// The first actual unavailable boundary, retained without steady fallback.
+    #[must_use]
+    pub fn failure(&self) -> Option<CtfSurfaceLifecycleUnavailable> {
+        self.failure
+    }

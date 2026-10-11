@@ -177,3 +177,9 @@ CTF-10의 [현재 Init 비교 증거](evidence/CTF-10-init-postlude-preparation-
 | [ ] | [SYS-04](cards/SYS-04.md) | 요청 출력과 meter의 수치 집계 | `OutputProcessor.cc` · `UpdateDataandReport` | SUR-07, SYS-01; B: HVAC-07 |
 | [ ] | [SYS-05](cards/SYS-05.md) | 비공조 1존 수직 통합시험 | `HeatBalanceSurfaceManager.cc` · `ManageSurfaceHeatBalance` | SYS-03, SYS-04, CTF-10 |
 | [ ] | [SYS-06](cards/SYS-06.md) | 직결 IdealLoads 수직 통합시험 | `PurchasedAirManager.cc` · `SimPurchasedAir` | SYS-05, HVAC-07, HVAC-08 |
+
+CTF/SUR Source 진행: 원본 순서의 내부면 식과 이력 관측을 적용했다. fmt/Clippy, 관련316개·전체4,940개 시험 통과(실패·무시0). [실제 적용·검증 기록](evidence/CTF-10-ordinary-history-capture-source/summary.json). Native 경계 수치 비교와 남은 게이트는 미확인이다.
+
+CTF-10 관측 예제를 기존 A 범위 진입 함수에 연결했습니다. Deny와 입력·계산·비교 정책을 유지했고, 관련316개/전체4,940개 테스트가 통과했습니다. [실제 보정·검증 기록](evidence/CTF-10-ordinary-history-capture-source/scoped-caller-and-quality.json). 일반 실행의 이력 도달·수치 비교는 아직 미확인입니다.
+
+CTF-10 observer now uses the existing CLI 8 MiB worker stack with strict A/Deny. Focused316/workspace4,940 tests passed with zero failed/ignored. [Actual entry and quality](evidence/CTF-10-ordinary-history-capture-source/entry-and-quality.json). Ordinary reachability and numerical comparison remain unverified.

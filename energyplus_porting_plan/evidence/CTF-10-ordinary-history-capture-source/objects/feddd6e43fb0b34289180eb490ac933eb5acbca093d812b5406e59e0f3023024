@@ -1,0 +1,23 @@
+--- .runtime/porting/SUR-04/inside-consumer-prep-01/proposed/ctf.rs
++++ crates/ep_runtime/src/heat_balance/ctf.rs
+@@ -282,8 +282,7 @@
+         + terms.q_radiant_hvac_w_per_m2
+         + (afn_duct_radiant_energy_j_per_m2 / input.zone_timestep_seconds);
+     let temp_div = 1.0
+-        / (surface.ctf.inside_0_w_per_m2_k
+-            - is_adiabatic_flag * surface.ctf.cross_0_w_per_m2_k
++        / (surface.ctf.inside_0_w_per_m2_k - is_adiabatic_flag * surface.ctf.cross_0_w_per_m2_k
+             + is_operating_pool * pool_heat_transfer_coefficient_w_per_m2_k
+             + is_not_operating_pool * input.inside_convection_coefficient_w_per_m2_k
+             + ENERGYPLUS_INSIDE_SURFACE_ITER_DAMP_W_PER_M2_K);
+@@ -293,9 +292,7 @@
+         + is_operating_pool * surface.ctf.const_in_part_w_per_m2
+         + is_operating_pool * pool_numerator_w_per_m2
+         + ENERGYPLUS_INSIDE_SURFACE_ITER_DAMP_W_PER_M2_K * input.previous_inside_face_temperature_c
+-        + is_not_adiabatic_flag
+-            * surface.ctf.cross_0_w_per_m2_k
+-            * outside_face_temperature_c)
++        + is_not_adiabatic_flag * surface.ctf.cross_0_w_per_m2_k * outside_face_temperature_c)
+         * temp_div
+ }
+ 

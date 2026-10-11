@@ -1,0 +1,23 @@
+pub(super) fn scalar(value: f64) -> Value {
+    let bits = value.to_bits();
+    let magnitude = bits & 0x7fff_ffff_ffff_ffff;
+    let negative = bits >> 63 != 0;
+    let class = if magnitude > 0x7ff0_0000_0000_0000 {
+        "nan"
+    } else if magnitude == 0x7ff0_0000_0000_0000 {
+        if negative {
+            "negative_infinity"
+        } else {
+            "positive_infinity"
+        }
+    } else if magnitude == 0 {
+        if negative {
+            "negative_zero"
+        } else {
+            "positive_zero"
+        }
+    } else {
+        "finite"
+    };
+    json!({"value_bits": format!("{bits:016x}"), "value_class": class})
+}

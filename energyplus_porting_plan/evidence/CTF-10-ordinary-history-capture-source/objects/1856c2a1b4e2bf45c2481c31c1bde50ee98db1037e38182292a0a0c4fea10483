@@ -1,0 +1,33 @@
+/// Surface CTF coefficients and history constants.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SurfaceCtfState {
+    /// Actual public NumCTFTerms in the ordinary route; None for legacy diagnostics.
+    pub public_num_ctf_terms: Option<i32>,
+    /// CTF outside/X coefficient at time zero in W/m2-K.
+    pub outside_0_w_per_m2_k: f64,
+    /// CTF cross/Y coefficient at time zero in W/m2-K.
+    pub cross_0_w_per_m2_k: f64,
+    /// CTF inside/Z coefficient at time zero in W/m2-K.
+    pub inside_0_w_per_m2_k: f64,
+    /// CTF flux coefficient at time zero when the EIO row provides one.
+    pub flux_0: Option<f64>,
+    /// Inside CTF history constant part in W/m2.
+    pub const_in_part_w_per_m2: f64,
+    /// Outside CTF history constant part in W/m2.
+    pub const_out_part_w_per_m2: f64,
+    /// CTF outside/X history coefficients in W/m2-K.
+    pub outside_history_w_per_m2_k: Vec<f64>,
+    /// CTF cross/Y history coefficients in W/m2-K.
+    pub cross_history_w_per_m2_k: Vec<f64>,
+    /// CTF inside/Z history coefficients in W/m2-K.
+    pub inside_history_w_per_m2_k: Vec<f64>,
+    /// CTF flux history coefficients.
+    pub flux_history: Vec<f64>,
+    /// Previous outside face temperature history in C.
+    pub outside_temperature_history_c: Vec<f64>,
+    /// Previous inside face temperature history in C.
+    pub inside_temperature_history_c: Vec<f64>,
+    /// Previous outside conduction flux history in W/m2.
+    pub outside_flux_history_w_per_m2: Vec<f64>,
+    /// Previous inside conduction flux history in W/m2.
+    pub inside_flux_history_w_per_m2: Vec<f64>,

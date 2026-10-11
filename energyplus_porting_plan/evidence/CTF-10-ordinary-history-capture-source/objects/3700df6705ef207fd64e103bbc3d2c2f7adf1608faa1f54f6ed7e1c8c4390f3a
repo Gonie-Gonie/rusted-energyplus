@@ -1,0 +1,119 @@
+{
+  "schema": "ctf10-observer-entry-actual-application.v1",
+  "parent_application": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-scoped-caller-applied-01/record.json",
+    "sha256": "04f32278f458c1b4f9ee27c7adf34cc8b616affe9c8964fe77159c353a6e39c6",
+    "size_bytes": 3568,
+    "line_count": 77
+  },
+  "correction_preparation": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-stack-correction-prep-01/manifest.json",
+    "sha256": "65d3bf659df6a51419858343496107b89e5b8c3a41d12e2b2e5f5705e5a24bcc"
+  },
+  "source_before": {
+    "path": ".runtime/porting/source-objects/a0/a0d63dbd95735e9fd1f6288be64576dfc61f0f9f5131a8ec4a2598ef7051ca8c",
+    "sha256": "a0d63dbd95735e9fd1f6288be64576dfc61f0f9f5131a8ec4a2598ef7051ca8c"
+  },
+  "source_literal": {
+    "path": ".runtime/porting/source-objects/2c/2c5bdb417b164cfcd3af9cebcac61261aec2dcac600478481eab4ebdf012c9ca",
+    "sha256": "2c5bdb417b164cfcd3af9cebcac61261aec2dcac600478481eab4ebdf012c9ca"
+  },
+  "source_final": {
+    "path": ".runtime/porting/source-objects/e2/e2dd7f51e2eda2899f028f281cbbb9d9d58690486754cc44c44c383101adf255",
+    "sha256": "e2dd7f51e2eda2899f028f281cbbb9d9d58690486754cc44c44c383101adf255"
+  },
+  "source_file_count": 3915,
+  "unrelated_source_files_verified_byte_exact": 3913,
+  "actual_format_receipt": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-entry-format-command-01/receipt.json",
+    "sha256": "4d8dba5edc9c19b32545162d00097cb8ddd012d0e73231b8c4e8a8ad3ffd9e60"
+  },
+  "application": [
+    {
+      "canonical_path": "crates/ep_run/examples/ctf10_ordinary_history_observer.rs",
+      "actual_before": {
+        "path": "crates/ep_run/examples/ctf10_ordinary_history_observer.rs",
+        "sha256": "bbcfaf6b1a986745ec52fa812c05021866fd49941a41792f67a62a78c404fd9a",
+        "size_bytes": 2438,
+        "line_count": 68
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-stack-correction-prep-01/ctf10_ordinary_history_observer.rs.before",
+        "sha256": "bbcfaf6b1a986745ec52fa812c05021866fd49941a41792f67a62a78c404fd9a",
+        "size_bytes": 2438,
+        "line_count": 68
+      },
+      "proposal": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-stack-correction-prep-01/ctf10_ordinary_history_observer.rs",
+        "sha256": "66c21ce7517d70707aae7525ab159aca74c0ff777b14067130ff44052c526df4",
+        "size_bytes": 3002,
+        "line_count": 83
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-stack-correction-prep-01/ctf10_ordinary_history_observer.rs.diff",
+        "sha256": "37427b7d7f84515a245f1fdba262dda341f68d77eaf00a72ee9b86c5976c8798",
+        "size_bytes": 1130,
+        "line_count": 34
+      },
+      "new_destination_absent": false,
+      "actual_final": {
+        "path": "crates/ep_run/examples/ctf10_ordinary_history_observer.rs",
+        "sha256": "1e5da52f570cfb9d8e6b3b7d8614c8989f9233e5759160b1a8802c0cdf8ee170",
+        "size_bytes": 2998
+      },
+      "actual_formatter_diff": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-entry-applied-01/formatter-1.diff",
+        "sha256": "634859ac4ba818d7282168e95338e0db2b69045d5a5e899f968bf11ad48d28cc",
+        "size_bytes": 432
+      },
+      "actual_final_archive": {
+        "path": ".runtime/porting/source-objects/1e/1e5da52f570cfb9d8e6b3b7d8614c8989f9233e5759160b1a8802c0cdf8ee170",
+        "sha256": "1e5da52f570cfb9d8e6b3b7d8614c8989f9233e5759160b1a8802c0cdf8ee170"
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_history_capture_fixture.rs",
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_history_capture_fixture.rs",
+        "sha256": "5f3c59944b182b61942f238bc28c3b7be630e2ef4cbfd6b3f718da6d314fcf95",
+        "size_bytes": 4906,
+        "line_count": 141
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-stack-correction-prep-01/ctf_history_capture_fixture.rs.before",
+        "sha256": "5f3c59944b182b61942f238bc28c3b7be630e2ef4cbfd6b3f718da6d314fcf95",
+        "size_bytes": 4906,
+        "line_count": 141
+      },
+      "proposal": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-stack-correction-prep-01/ctf_history_capture_fixture.rs",
+        "sha256": "0e9085fc3e31d0140209686ea5615afd842f24ac028b184154322911c5c301cd",
+        "size_bytes": 4905,
+        "line_count": 140
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-stack-correction-prep-01/ctf_history_capture_fixture.rs.diff",
+        "sha256": "73540a0169ea4c67d782e305df43cb3d5d45d2660f5f3ff7ff6f1f1c47deb93a",
+        "size_bytes": 251,
+        "line_count": 7
+      },
+      "new_destination_absent": false,
+      "actual_final": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_history_capture_fixture.rs",
+        "sha256": "0e9085fc3e31d0140209686ea5615afd842f24ac028b184154322911c5c301cd",
+        "size_bytes": 4905
+      },
+      "actual_formatter_diff": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-entry-applied-01/formatter-2.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_final_archive": {
+        "path": ".runtime/porting/source-objects/0e/0e9085fc3e31d0140209686ea5615afd842f24ac028b184154322911c5c301cd",
+        "sha256": "0e9085fc3e31d0140209686ea5615afd842f24ac028b184154322911c5c301cd"
+      }
+    }
+  ],
+  "numerical_comparison_performed": false,
+  "gates_updated": false
+}

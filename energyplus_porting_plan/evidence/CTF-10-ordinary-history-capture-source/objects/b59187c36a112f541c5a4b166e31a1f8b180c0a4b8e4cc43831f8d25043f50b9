@@ -1,0 +1,212 @@
+--- crates/ep_run/examples/ctf10_ordinary_history_support/fields.rs
++++ crates/ep_run/examples/ctf10_ordinary_history_support/fields.rs.proposed
+@@ -0,0 +1,209 @@
++//! Full actual borrowed-owner serialization; no selected math or expected state.
++use ep_runtime::heat_balance::ctf_history_capture::CtfHistoryObservation;
++use ep_runtime::heat_balance::ctf_surface_binding::{CtfSurfaceGenerationContext, CtfSurfaceGenerationKey, CtfSurfaceProducerRevision};
++use ep_runtime::heat_balance::ctf_thermal_history::{CtfThermalHistoryArrays, CtfThermalHistoryContext, CtfThermalHistoryState};
++use ep_runtime::weather::day::{ProductionCtfHistoryClock, WeatherDayPhase};
++use serde_json::{Value, json};
++use std::io::{self, Write};
++
++// Exact scalar and public-storage functions are inserted from accepted sources
++// by the Source-only author, with literal source-range custody in the manifest.
++pub(super) fn scalar(value: f64) -> Value {
++    let bits = value.to_bits();
++    let magnitude = bits & 0x7fff_ffff_ffff_ffff;
++    let negative = bits >> 63 != 0;
++    let class = if magnitude > 0x7ff0_0000_0000_0000 {
++        "nan"
++    } else if magnitude == 0x7ff0_0000_0000_0000 {
++        if negative {
++            "negative_infinity"
++        } else {
++            "positive_infinity"
++        }
++    } else if magnitude == 0 {
++        if negative {
++            "negative_zero"
++        } else {
++            "positive_zero"
++        }
++    } else {
++        "finite"
++    };
++    json!({"value_bits": format!("{bits:016x}"), "value_class": class})
++}
++pub(super) fn public_storage(
++    source: &ep_runtime::heat_balance::surface_manager::ctf_public_storage::CtfPublicCoefficientStorage,
++) -> Value {
++    let values = |source: &[f64]| source.iter().copied().map(scalar).collect::<Vec<_>>();
++    json!({"CTFOutside":values(&source.outside),"CTFCross":values(&source.cross),
++        "CTFInside":values(&source.inside),"CTFFlux":values(&source.flux),
++        "CTFSourceIn":values(&source.source_in),"CTFSourceOut":values(&source.source_out),
++        "CTFTSourceOut":values(&source.temperature_source_out),"CTFTSourceIn":values(&source.temperature_source_in),
++        "CTFTSourceQ":values(&source.temperature_source_q),"CTFTUserOut":values(&source.temperature_user_out),
++        "CTFTUserIn":values(&source.temperature_user_in),"CTFTUserSource":values(&source.temperature_user_source),
++        "CTFTimeStep":scalar(source.ctf_time_step),"UValue":scalar(source.u_value),
++        "NumHistories":source.num_histories,"NumCTFTerms":source.num_ctf_terms,
++        "fixed_array_count":12,"actual_slots_per_array":source.outside.len(),
++        "coefficients_recomputed_by_observer":false,"counted_as_PASS":false})
++}
++
++fn vector(values: &[f64]) -> Value {
++    json!({"owner_present":true,"rust_vector_length":values.len(),
++        "values":values.iter().copied().map(scalar).collect::<Vec<_>>()})
++}
++fn matrix(values: &[Vec<f64>;19]) -> Value {
++    json!({"owner_present":true,"term_rows":values.len(),"row_index_domain":"Rust zero-based; row0 is selected history term1",
++        "rows":values.iter().enumerate().map(|(index,row)|json!({"rust_row_index":index,"vector":vector(row)})).collect::<Vec<_>>()})
++}
++fn arrays(owner: &CtfThermalHistoryArrays) -> Value {
++    json!({"inside_temperature":matrix(&owner.inside_temperature),"outside_temperature":matrix(&owner.outside_temperature),
++        "inside_flux":matrix(&owner.inside_flux),"outside_flux":matrix(&owner.outside_flux)})
++}
++fn history(owner: &CtfThermalHistoryState) -> Value {
++    json!({"surface_ids":owner.surface_ids.iter().map(|id|id.0).collect::<Vec<_>>(),
++        "normal":arrays(&owner.normal),
++        "masters":{"allocated":owner.masters.is_some(),"value":owner.masters.as_ref().map(|v|json!({
++            "arrays":arrays(&v.arrays),"current_num_histories":{"owner_present":true,"rust_vector_length":v.current_num_histories.len(),"values":v.current_num_histories}}))},
++        "scratch":{"allocated":owner.scratch.is_some(),"value":owner.scratch.as_ref().map(|v|json!({
++            "outside_flux_first":vector(&v.outside_flux_first),"inside_flux_first":vector(&v.inside_flux_first),
++            "inside_temperature_first":vector(&v.inside_temperature_first),"outside_temperature_first":vector(&v.outside_temperature_first),"sum_time":vector(&v.sum_time)}))},
++        "update_first_time":owner.update_first_time,
++        "flux_reports":{"inside_conduction":vector(&owner.flux_reports.inside_conduction),"inside_flux":vector(&owner.flux_reports.inside_flux),
++            "outside_flux":vector(&owner.flux_reports.outside_flux),"outside_conduction":vector(&owner.flux_reports.outside_conduction)},
++        "units":{"temperature":"C","history_flux":"W/m2","scratch_sum_time":"hours","conduction_report":"W","flux_report":"W/m2"},
++        "Native_Objexx_allocation_bounds_available":false})
++}
++fn clock(value: ProductionCtfHistoryClock) -> Value {
++    let phase = match value.phase {
++        WeatherDayPhase::Warmup { day } => json!({"kind":"Warmup","day":day}),
++        WeatherDayPhase::Run { day } => json!({"kind":"Run","day":day}),
++    };
++    json!({"phase":phase,"record_index":value.record_index,"begin_simulation":value.begin_simulation,
++        "begin_environment":value.begin_environment,"day_of_sim":value.day_of_sim,"hour_of_day":value.hour_of_day,
++        "time_step":value.time_step,"sim_time_steps":value.sim_time_steps,
++        "time_step_zone_hours":scalar(value.time_step_zone),"time_step_zone_seconds":scalar(value.time_step_zone_seconds)})
++}
++fn generation_context(value: CtfSurfaceGenerationContext) -> Value {
++    let revision = match value.producer_revision {
++        CtfSurfaceProducerRevision::Explicit(bytes) => json!({"kind":"Explicit","identity_bytes":bytes}),
++        CtfSurfaceProducerRevision::Compiled(sources) => json!({"kind":"Compiled","actual_source_witnesses":sources.iter().map(|(name,text)|json!({"name":name,"compiled_source":text})).collect::<Vec<_>>()}),
++    };
++    json!({"producer_revision":revision,"time_step_zone_hours":scalar(value.time_step_zone_hours),
++        "initial_flags":{"errors_found":value.initial_flags.errors_found,"do_ctf_error_report":value.initial_flags.do_ctf_error_report},
++        "initial_simple_ctf_only":value.initial_simple_ctf_only,"initial_max_ctf_terms":value.initial_max_ctf_terms,
++        "any_ems_in_model":value.any_ems_in_model,"any_construction_overrides":value.any_construction_overrides})
++}
++fn groups(values: &[Vec<ep_model::SurfaceId>]) -> Value {
++    json!(values.iter().map(|v|v.iter().map(|id|id.0).collect::<Vec<_>>()).collect::<Vec<_>>())
++}
++fn context(value: CtfThermalHistoryContext<'_>) -> Value {
++    json!({"simple_ctf_only":value.simple_ctf_only,"any_ems_in_model":value.any_ems_in_model,
++        "any_construction_overrides":value.any_construction_overrides,"any_internal_heat_source":value.any_internal_heat_source,
++        "global_max_ctf_terms":value.global_max_ctf_terms,"time_step_zone_hours":scalar(value.time_step_zone_hours),
++        "heat_transfer_groups":groups(value.heat_transfer_groups),"opaque_groups":groups(value.opaque_groups),
++        "all_heat_transfer_surfaces":value.all_heat_transfer_surfaces.iter().map(|id|id.0).collect::<Vec<_>>()})
++}
++fn model_catalog(model: &ep_model::TypedModel) -> Value {
++    json!({"identity_domain":"actual Rust IDs; no Native ID equality inferred",
++        "zones":model.zones.iter().map(|v|json!({"id":v.id.0,"name":v.name.0,"spaces":v.spaces.iter().map(|id|id.0).collect::<Vec<_>>()})).collect::<Vec<_>>(),
++        "spaces":model.spaces.iter().map(|v|json!({"id":v.id.0,"name":v.name.0,"zone_id":v.zone.0})).collect::<Vec<_>>(),
++        "surfaces":model.surfaces.iter().map(|v|json!({"id":v.id.0,"name":v.name.0,"zone_id":v.zone.0,"space_id":v.space.0,
++            "construction_id":v.construction.0,"surface_type":format!("{:?}",v.surface_type),
++            "outside_boundary":format!("{:?}",v.outside_boundary_condition),"outside_boundary_object":v.outside_boundary_condition_object.as_ref().map(|name|name.0.as_str()),
++            "vertices":v.vertices.iter().map(|p|json!([scalar(p.x_m),scalar(p.y_m),scalar(p.z_m)])).collect::<Vec<_>>()})).collect::<Vec<_>>(),
++        "constructions":model.constructions.iter().map(|v|json!({"id":v.id.0,"name":v.name.0,"kind":format!("{:?}",v.kind),
++            "outside_layer":v.outside_layer.map(|id|id.0),"layers":v.layers.iter().map(|id|id.0).collect::<Vec<_>>()})).collect::<Vec<_>>()})
++}
++fn public(owner: &ep_runtime::heat_balance::ctf_public_initialization::OrderedCtfPublicInitialization) -> Value {
++    json!({"constructions":owner.constructions.iter().map(|v|json!({"construction_id":v.construction_id.0,"declared_index":v.declared_index,
++        "original_material_ids":v.original_material_ids.iter().map(|id|id.0).collect::<Vec<_>>(),"is_used_ctf":v.is_used_ctf,
++        "public_initializer_invoked":v.public_initializer_invoked,"storage":v.result.as_ref().ok().map(|returned|public_storage(&returned.storage)),
++        "route":v.result.as_ref().ok().map(|returned|format!("{:?}",returned.route)),"unavailable":v.result.as_ref().err().map(|e|format!("{e:?}")),
++        "retry_flags_on_entry":v.retry_flags_on_entry.map(|f|json!({"errors_found":f.errors_found,"do_ctf_error_report":f.do_ctf_error_report})),
++        "retry_flags_on_return":v.retry_flags_on_return.map(|f|json!({"errors_found":f.errors_found,"do_ctf_error_report":f.do_ctf_error_report})),
++        "unused_reset_flags":v.unused_reset_flags.map(|f|json!({"errors_found":f.errors_found,"do_ctf_error_report":f.do_ctf_error_report}))})).collect::<Vec<_>>(),
++        "aggregate_after_returned_calls":{"simple_ctf_only":owner.aggregate_after_returned_calls.simple_ctf_only,"max_ctf_terms":owner.aggregate_after_returned_calls.max_ctf_terms,
++            "returned_constructions":owner.aggregate_after_returned_calls.returned_constructions},"selected_stop":owner.selected_stop.map(|v|format!("{v:?}")),
++        "selected_declared_loop_completed":owner.selected_declared_loop_completed,"final_shared_flags":owner.final_shared_flags.map(|f|json!({"errors_found":f.errors_found,"do_ctf_error_report":f.do_ctf_error_report}))})
++}
++fn consumer(v: &ep_runtime::heat_balance::SurfaceHeatBalanceState) -> Value {
++    let c = &v.ctf;
++    json!({"surface_id":v.surface_id.0,"surface_name":v.surface_name,"zone_id":v.zone_id.0,"construction_id":v.construction_id.0,"construction_name":v.construction_name,
++        "area_m2":scalar(v.area_m2),"outside_boundary":format!("{:?}",v.outside_boundary_condition),
++        "inside_face_temperature_c":scalar(v.inside_face_temperature_c),"outside_face_temperature_c":scalar(v.outside_face_temperature_c),
++        "inside_ctf_outside_temperature_c":scalar(v.inside_ctf_outside_temperature_c),"inside_reference_air_temperature_c":scalar(v.inside_reference_air_temperature_c),
++        "inside_convection_coefficient_w_per_m2_k":scalar(v.inside_convection_coefficient_w_per_m2_k),
++        "inside_convection_input_inside_face_temperature_c":scalar(v.inside_convection_input_inside_face_temperature_c),
++        "inside_convection_input_reference_air_temperature_c":scalar(v.inside_convection_input_reference_air_temperature_c),
++        "inside_radiant_internal_gain_w_per_m2":scalar(v.inside_radiant_internal_gain_w_per_m2),"inside_shortwave_absorbed_w_per_m2":scalar(v.inside_shortwave_absorbed_w_per_m2),
++        "inside_additional_heat_source_w_per_m2":scalar(v.inside_additional_heat_source_w_per_m2),"inside_radiant_hvac_w_per_m2":scalar(v.inside_radiant_hvac_w_per_m2),
++        "inside_net_longwave_w_per_m2":scalar(v.inside_net_longwave_w_per_m2),"heat_gain_to_zone_w":scalar(v.heat_gain_to_zone_w),
++        "ctf":{"public_num_ctf_terms":c.public_num_ctf_terms,"outside_0":scalar(c.outside_0_w_per_m2_k),"cross_0":scalar(c.cross_0_w_per_m2_k),"inside_0":scalar(c.inside_0_w_per_m2_k),"flux_0":c.flux_0.map(scalar),
++            "const_in_part":scalar(c.const_in_part_w_per_m2),"const_out_part":scalar(c.const_out_part_w_per_m2),
++            "outside_history_coefficients":vector(&c.outside_history_w_per_m2_k),"cross_history_coefficients":vector(&c.cross_history_w_per_m2_k),
++            "inside_history_coefficients":vector(&c.inside_history_w_per_m2_k),"flux_history_coefficients":vector(&c.flux_history),
++            "outside_temperature_history":vector(&c.outside_temperature_history_c),"inside_temperature_history":vector(&c.inside_temperature_history_c),
++            "outside_flux_history":vector(&c.outside_flux_history_w_per_m2),"inside_flux_history":vector(&c.inside_flux_history_w_per_m2)}})
++}
++
++pub(super) struct Stream<W> {
++    writer: W,
++    keys: Vec<CtfSurfaceGenerationKey>,
++    observed: usize,
++    written: usize,
++    error: Option<io::Error>,
++}
++impl<W: Write> Stream<W> {
++    pub(super) fn new(writer: W) -> Self {
++        let mut value = Self { writer, keys:Vec::new(), observed:0, written:0, error:None };
++        value.write(&json!({"schema":"ctf10-persistent-ordinary-history-stream.v1","record_type":"header",
++            "Native_fields_unavailable":["environment_id","environment_name","KickOffSimulation","calendar_year","calendar_month","calendar_day"],
++            "expected_endpoints_read":false,"Native_prestate_replayed":false,"all_instrumented_lifecycle_visits_without_caps_or_filters":true,"absent_lifecycle_is_not_observed_or_assumed_reached":true,"counted_as_PASS":false}));
++        value
++    }
++    fn write(&mut self, value: &Value) {
++        if self.error.is_some() { return; }
++        let result = serde_json::to_writer(&mut self.writer, value).map_err(io::Error::other)
++            .and_then(|()| self.writer.write_all(b"\n"));
++        if let Err(error) = result { self.error = Some(error); }
++    }
++    pub(super) fn record(&mut self, event: CtfHistoryObservation<'_>) {
++        self.observed += 1;
++        if self.error.is_some() { return; }
++        let generation = match self.keys.iter().position(|key| key == event.owner.generation_key) {
++            Some(index) => index + 1,
++            None => {
++                self.keys.push(event.owner.generation_key.clone());
++                let id = self.keys.len();
++                self.write(&json!({"schema":"ctf10-persistent-ordinary-generation.v1","record_type":"generation",
++                    "rust_local_generation_id":id,"identity_contract":"exact producer-retained Rust key Eq; no Native equality asserted",
++                    "context":generation_context(event.owner.generation_context),"counted_as_PASS":false}));
++                id
++            }
++        };
++        self.write(&json!({"schema":"ctf10-persistent-ordinary-history-event.v1","record_type":"event","boundary":format!("{:?}",event.boundary),
++            "rust_local_generation_id":generation,"caller_clock":event.caller_clock.map(clock),"begin_timestep_seconds_argument":event.begin_timestep_seconds_argument.map(scalar),"outdoor_dry_bulb_c":scalar(event.outdoor_dry_bulb_c),
++            "owner":{"initialized":event.owner.initialized,"current_clock":event.owner.current_clock.map(clock),"last_committed_clock":event.owner.last_committed_clock.map(clock),
++                "failure":event.owner.failure.map(|v|format!("{v:?}")),"history":history(event.owner.history),
++                "heat_transfer_groups":groups(event.owner.heat_transfer_groups),"opaque_groups":groups(event.owner.opaque_groups),
++                "all_heat_transfer_surfaces":event.owner.all_heat_transfer_surfaces.iter().map(|id|id.0).collect::<Vec<_>>()},
++            "public":event.public.map(public),"model_catalog":model_catalog(event.model),
++            "consumer_surfaces":event.consumer_surfaces.iter().map(consumer).collect::<Vec<_>>(),
++            "selected_inputs":event.selected_inputs.map(|values|values.iter().map(|v|json!({"surface_id":v.surface_id.0,"construction_id":v.construction_id.0,
++                "public_owner_construction_id":v.public_owner_construction_id.0,"coefficients":public_storage(v.coefficients),
++                "algorithm":format!("{:?}",v.algorithm),"ordinary_opaque":v.ordinary_opaque,"source_sink_present":v.source_sink_present,
++                "outside_boundary":format!("{:?}",v.outside_boundary),"outside_dry_bulb":scalar(v.outside_dry_bulb),"area":scalar(v.area),
++                "inside_surface_temperature":scalar(v.inside_surface_temperature),"inside_constant":scalar(v.inside_constant),"outside_constant":scalar(v.outside_constant)})).collect::<Vec<_>>()),
++            "selected_context":event.selected_context.map(context),"update_route":event.update_route.map(|v|format!("{v:?}")),"error":event.error.map(|v|format!("{v:?}")),"counted_as_PASS":false}));
++        if self.error.is_none() { self.written += 1; }
++    }
++    pub(super) fn finish(&mut self, actual_runtime_exit_code: i32, actual_message: &str) -> io::Result<()> {
++        self.write(&json!({"schema":"ctf10-persistent-ordinary-history-stream.v1","record_type":"summary",
++            "actual_runtime_exit_code":actual_runtime_exit_code,"actual_runtime_message":actual_message,
++            "actual_observed_event_count":self.observed,"actual_written_event_count":self.written,
++            "actual_Rust_generation_count":self.keys.len(),"capture_complete":self.error.is_none() && self.observed==self.written,
++            "boundary_reachability_verified":false,"numerical_comparison_performed":false,"integration_PASS_claimed":false,"counted_as_PASS":false}));
++        if let Some(error) = self.error.take() { return Err(error); }
++        self.writer.flush()
++    }
++}

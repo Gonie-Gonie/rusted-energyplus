@@ -1,0 +1,7 @@
+--- .runtime/porting/CTF-10/ordinary-history-stack-correction-prep-01/ctf_history_capture_fixture.rs.before
++++ crates/ep_runtime/src/heat_balance/ctf_history_capture_fixture.rs
+@@ -138,4 +138,3 @@
+         time_step_zone_seconds: 1200.0,
+     }
+ }
+-

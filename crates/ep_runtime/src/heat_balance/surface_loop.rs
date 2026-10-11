@@ -409,7 +409,7 @@ pub(crate) fn run_surface_balance_passes(
                         reference_air_temperature_c: zone_temperature_c,
                         inside_convection_coefficient_w_per_m2_k,
                         previous_inside_face_temperature_c,
-                        net_inside_source_w_per_m2,
+                        zone_timestep_seconds: input.timestep_seconds,
                     },
                     inside_ctf_outside_temperature_c,
                 );

@@ -1,0 +1,45 @@
+/// Top-level arbitrary-run configuration.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct RunConfig {
+    /// User-provided IDF or epJSON input path.
+    pub input_path: PathBuf,
+    /// User-provided EPW weather path.
+    pub weather_path: Option<PathBuf>,
+    /// Output directory root.
+    pub output_dir: PathBuf,
+    /// Requested run mode.
+    pub mode: RunMode,
+    /// Diagnostic/ad-hoc partial runtime policy.
+    pub partial_policy: PartialRunPolicy,
+    /// Requested output format.
+    pub output_format: RunOutputFormat,
+    /// Replace an existing non-empty output directory.
+    pub overwrite: bool,
+    /// Keep intermediate input/model artifacts.
+    pub keep_intermediate: bool,
+    /// Trace verbosity.
+    pub trace_level: TraceLevel,
+    /// Explicit surface/node trace targets.
+    pub trace_selection: TraceSelection,
+    /// Promote warning diagnostics to a failing exit.
+    pub fail_on_warning: bool,
+    /// Stop after import/compile/support assessment.
+    pub dry_run: bool,
+    /// Generate an EnergyPlus oracle baseline under `output/oracle`.
+    pub oracle_baseline: bool,
+    /// Compare Rust result artifacts with the EnergyPlus oracle baseline.
+    pub compare_oracle: bool,
+    /// Print the run summary JSON to stdout.
+    pub json_stdout: bool,
+    /// Optional EnergyPlus oracle root override.
+    pub oracle_root: Option<PathBuf>,
+    /// Optional hourly sample-count override for smoke/debug runs.
+    pub hours: Option<usize>,
+}
+
+/// EnergyPlus-like arbitrary-run exit code contract.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum RunExitCode {
+    /// Completed successfully.
+    Success,
+    /// CLI arguments were invalid.

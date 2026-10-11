@@ -1,0 +1,35 @@
+pub struct TypedModel {
+    /// Model version.
+    pub version: Version,
+    /// Building settings.
+    pub building: Option<Building>,
+    /// Global surface geometry input rules, when declared.
+    pub global_geometry_rules: Option<GlobalGeometryRules>,
+    /// Zone timestep config.
+    pub timestep: TimestepConfig,
+    /// Global surface convection algorithm settings.
+    pub surface_convection_algorithms: SurfaceConvectionAlgorithms,
+    /// Actual input-only report requests read by General::ScanForReports.
+    pub report_inputs: crate::ReportInputs,
+    /// Source loader spelling for selected construction/material reporting.
+    pub ctf_report_names: crate::CtfReportNames,
+    /// Actual first SimulationControl sizing input used by predefined registration.
+    pub predefined_table_sizing: crate::PredefinedTableSizing,
+    /// Run periods.
+    pub run_periods: Vec<RunPeriod>,
+    /// Run period names.
+    pub run_period_names: NameMap<RunPeriodId>,
+    /// Input-file holidays and other special schedule days.
+    pub run_period_special_days: Vec<RunPeriodSpecialDay>,
+    /// Run-period special-day names.
+    pub run_period_special_day_names: NameMap<RunPeriodSpecialDayId>,
+    /// Unique input-file daylight-saving period, when declared.
+    pub run_period_daylight_saving_time: Option<RunPeriodDaylightSavingTime>,
+    /// Site location.
+    pub site: Option<SiteLocation>,
+    /// Standalone glazing spectral datasets.
+    pub glazing_spectral_data: Vec<GlazingSpectralData>,
+    /// Glazing spectral dataset names in their separate namespace.
+    pub glazing_spectral_data_names: NameMap<GlazingSpectralDataId>,
+    /// Materials.
+    pub materials: Vec<Material>,

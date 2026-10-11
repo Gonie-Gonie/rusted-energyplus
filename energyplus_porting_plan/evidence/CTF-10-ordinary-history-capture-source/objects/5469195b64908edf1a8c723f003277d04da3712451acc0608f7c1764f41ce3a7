@@ -1,0 +1,42 @@
+    if kind.starts_with("Output:") || kind.starts_with("OutputControl:") {
+        return true;
+    }
+    matches!(
+        kind,
+        "Version"
+            | "SimulationControl"
+            | "Building"
+            | "Timestep"
+            | "RunPeriod"
+            | "Site:Location"
+            | "SizingPeriod:DesignDay"
+            | "Exterior:Lights"
+            | "GlobalGeometryRules"
+            | "HeatBalanceAlgorithm"
+            | "ZoneAirHeatBalanceAlgorithm"
+            | "SurfaceConvectionAlgorithm:Inside"
+            | "SurfaceConvectionAlgorithm:Outside"
+            | "RoomAirModelType"
+            | "Material"
+            | "Material:NoMass"
+            | "Construction"
+            | "Zone"
+            | "BuildingSurface:Detailed"
+            | "OtherEquipment"
+            | "ScheduleTypeLimits"
+            | "Schedule:Constant"
+            | "Schedule:Compact"
+            | "RunPeriodControl:DaylightSavingTime"
+            | "RunPeriodControl:SpecialDays"
+    ) || (scope == PortingScope::B
+        && matches!(
+            kind,
+            "ZoneControl:Thermostat"
+                | "ThermostatSetpoint:DualSetpoint"
+                | "ZoneHVAC:EquipmentConnections"
+                | "ZoneHVAC:EquipmentList"
+                | "ZoneHVAC:IdealLoadsAirSystem"
+                | "NodeList"
+        ))
+}
+

@@ -175,3 +175,36 @@ Reviewed Source, exact before/diff, application/formatter and genuine failure re
 Whole Init reportLayers/ScanForReports and final-fatal backend custody cannot be replaced by the selected Init prefix.
 Unobserved general/master history arithmetic, CON-01-excluded surface/material families and unavailable/excluded paths have no PASS.
 Existing evidence stays immutable. Source activation, quality, direct replay and ordinary CLI success alone do not promote the three gates or complete CTF-10.
+
+## Prospective persistent ordinary history capture contract
+
+This passive capture observes one genuine CON-01 A-admitted ordinary run through the existing run_bounded_porting(&config, PortingScope::A) entry used by fixed A CLI --porting-scope a; PartialRunPolicy::Deny remains unchanged; it does not replay Native pre-state or change solver inputs, calls, Result, commit order or existing gate status.
+Input is the unchanged selected Native05 A-24H IDF/weather with all45 fixed-input guards; the actual Rust caller supplies phase/day/hour/substep, independent begin-step seconds and owned weather clock. Missing Native environment/calendar/KickOff fields remain explicitly unpaired.
+The Original manager calls outside then inside balance, ManageAirHeatBalance, UpdateFinalSurfaceHeatBalance and conditional UpdateThermalHistories in that order (HeatBalanceSurfaceManager.cc163-189).
+The Rust lifecycle observes Begin entry/return/failure, immediately before/after selected initialization, immediately before/after selected history update, before successful clock release, and Commit return/failure. Initialization return precedes lagged-copy/current-clock installation; update return precedes lagged-copy; accepted history commit precedes timestep-index advancement.
+Borrowed owners include the exact producer generation key/context, full19-slot normal histories for every allocated column, actual optional masters/counters and scratch5, report4, flags, current/last clocks, independent HT/opaque/AllHT traversal, public12x19 coefficients and ordered model/Surface->Construction/Zone/Space associations.
+The observer also records actual current/lagged surface consumer views and selected input/context/route/error. No Native owner or ordinal is used to construct a Rust owner or identity.
+The optional runtime sink serializes only in the example lane, streams every event without a sample cap, and retains partial output plus genuine caller/IO failure. Disabled capture performs no serialization or growing-ledger allocation.
+Full owner allocation/shape/IDs/order and copied bits remain exact; any arithmetic pairing uses only the separately frozen Source policy. A stream footer proves transport completion only, not branch reachability or numerical equivalence.
+Required missing, stopped, ambiguous, unsupported or unavailable events cannot PASS; Native-only context and unobserved branches retain explicit availability status.
+Source proposal: `.runtime/porting/CTF-10/ordinary-history-capture-prep-01/manifest.json` (`0754e521a9bbc6eac7a26aa96bc5865626343a9df011cce21a6e984c09ae879e`).
+Future actual application/formatter review, same-Source fmt/Clippy/focused/workspace checks, Cargo-emitted artifact custody, uncapped ordinary execution and independent persistent pairing remain separate required evidence.
+
+## Applied Source and regression verification
+
+Actual Source `c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7` has3,915 files. fmt/Clippy passed; focused316 and workspace4,940 tests passed with zero failed/ignored. Four authored SUR04 IEEE regressions and four real-owner capture tests do not substitute for Native endpoints. Ordinary execution, complete persistent boundary comparison and pending dependency/gate certification remain open.
+Evidence: [summary](../evidence/CTF-10-ordinary-history-capture-source/summary.json) (`b88c5cebab7f153b402ae2320a043bcabd78426d5b0b3ed8669c6208f991a70c`).
+
+Initial unscoped observer execution returned4 before runtime on unsupported Raw ZoneAirHeatBalanceAlgorithm, with no lifecycle events. Its actual receipt/diagnostics remain preserved at `.runtime/porting/CTF-10/ordinary-history-invocation-01/ordinary-execution-command/receipt.json`; this is an admission failure, not CTF numerical evidence.
+
+## Applied A caller correction
+
+Actual Source `a0d63dbd95735e9fd1f6288be64576dfc61f0f9f5131a8ec4a2598ef7051ca8c` keeps3,915 files;3,914 unrelated files are byte-exact. The example now uses the existing strict A ordinary entry with Deny. fmt/Clippy and focused316/workspace4,940 tests passed (zero failed/ignored), followed by the actual CargoJSON example build. The initial unscoped exit4/zero-event attempt remains preserved. Ordinary lifecycle reachability and numerical comparison remain unverified; no card gates changed.
+Evidence: [scoped caller and quality](../evidence/CTF-10-ordinary-history-capture-source/scoped-caller-and-quality.json) (`5f4065edfeae47e64eb7f169b0d744076d7ee7ff355f9d73efac070a7a749526`).
+
+Scoped observer attempt02 terminated with Windows stack overflow (0xC00000FD) before any stream record; its retained0B stream has no completion footer. The passive example requires the same explicit8 MiB worker stack as the existing successfulCLI, with the sink and ordinary runtime on that worker. Inputs, Deny and numerical policy remain unchanged. Ordinary reachability and comparison remain unverified; no gates change. The failed receipt remains `.runtime/porting/CTF-10/ordinary-history-invocation-02/ordinary-execution-command/receipt.json`.
+
+## Applied observer stack correction
+
+Actual Source `e2dd7f51e2eda2899f028f281cbbb9d9d58690486754cc44c44c383101adf255` keeps3,915 files;3,913 unrelated files are byte-exact. The example now uses the existing CLI 8 MiB worker stack with strict A/Deny. fmt/Clippy and focused316/workspace4,940 tests passed (zero failed/ignored), followed by the actual CargoJSON example build. Both the initial unscoped exit4/zero-event attempt and scoped Windows stack-overflow attempt remain preserved; the latter has an empty stream and no completion footer. Ordinary lifecycle reachability and numerical comparison remain unverified; no card gates changed.
+Evidence: [observer entry and quality](../evidence/CTF-10-ordinary-history-capture-source/entry-and-quality.json) (`ab5badeb6adf939b0ddbd303956ba6fa8d4ef18157ec045837dd62aa88fb647b`).

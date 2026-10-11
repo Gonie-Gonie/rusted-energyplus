@@ -1,0 +1,33 @@
+fn advance_heat_balance_state_one_timestep_source_order_path<PredictorHook, Output, Error>(
+    model: &TypedModel,
+    schedule_cache: Option<&ScheduleSeriesCache>,
+    mut schedule_operations: Option<&mut InternalGainSchedulePhaseOperations>,
+    state: &mut HeatBalanceState,
+    input: HeatBalanceStepInput,
+    weather_context: Option<HeatBalanceWeatherContext<'_>>,
+    runtime_config: HeatBalanceRuntimeConfig,
+    surface_iteration_count: u32,
+    inside_hconv_reevaluation_interval: Option<u32>,
+    surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
+    explicit_history_clock: Option<crate::weather::day::ProductionCtfHistoryClock>,
+    predictor_hook: PredictorHook,
+) -> Result<Output, Error>
+where
+    PredictorHook: FnOnce(&mut HeatBalanceState) -> Result<Output, Error>,
+    Error: From<super::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable>,
+{
+    let history_clock = match weather_context.and_then(|context| context.owned) {
+        // Production keeps its genuine owner authoritative, even if unavailable.
+        Some(context) => context.ctf_history_clock,
+        None => explicit_history_clock.or_else(|| state.ctf_history_caller_clock.pending()),
+    };
+    super::ctf_surface_lifecycle::begin_step(
+        model,
+        state,
+        history_clock,
+        input.outdoor_dry_bulb_c,
+        input.timestep_seconds,
+    )
+    .map_err(Error::from)?;
+    // Observe the actual state consumed by either solver before any history push.
+    super::zone_air_initialization_trace::record_timestep_entry(state);

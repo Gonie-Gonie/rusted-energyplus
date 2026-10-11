@@ -1,0 +1,60 @@
+import difflib
+import importlib.util
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT = Path.cwd()
+spec = importlib.util.spec_from_file_location('recorder', ROOT / 'tools/porting/record_command.py')
+rec = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(rec)
+OUT = ROOT / '.runtime/porting/CTF-10/ordinary-history-scoped-caller-applied-01'
+
+def checked(ref):
+    path = ROOT / ref['path']
+    assert rec.sha(path) == ref['sha256'], ref['path']
+    data = path.read_bytes()
+    assert 'size_bytes' not in ref or len(data) == ref['size_bytes']
+    return data
+
+def rows(ref):
+    return {r['historical_path']: r['archive']['sha256'] for r in json.loads(checked(ref))['files']}
+
+prep_ref = {'path': '.runtime/porting/CTF-10/ordinary-history-scope-correction-prep-01/manifest.json', 'sha256': 'dd02a82e2cd03b2f822a57ac20fb66c4aba9d2d9f4d019c1f795a708d6dd2adc'}
+prep = json.loads(checked(prep_ref))
+parent_ref = prep['actual_original_application']
+parent = json.loads(checked(parent_ref))
+assert not OUT.exists() and len(prep['application']) == 1
+for row in [prep['card_amendment'], *prep['application']]:
+    assert checked(row['actual_before']) == checked(row['before_archive'])
+    checked(row['proposal'])
+    checked(row['exact_diff'])
+before = rec.source_snapshot()
+assert before == parent['source_final']
+OUT.mkdir()
+# The reviewed card supplement precedes the one caller implementation change.
+for row in [prep['card_amendment'], *prep['application']]:
+    (ROOT / row['canonical_path']).write_bytes(checked(row['proposal']))
+literal = rec.source_snapshot()
+fmt_dir = '.runtime/porting/CTF-10/ordinary-history-scoped-caller-format-command-01'
+assert subprocess.run([sys.executable, '-X', 'utf8', '-B', 'tools/porting/record_command.py', '--output-dir', fmt_dir, '--', 'cargo', 'fmt', '--all'], cwd=ROOT).returncode == 0
+final = rec.source_snapshot()
+fmt_ref = rec.ref(ROOT / fmt_dir / 'receipt.json')
+assert json.loads(checked(fmt_ref))['source_snapshot'] == literal
+before_rows, final_rows = rows(before), rows(final)
+changed = {r['canonical_path'] for r in prep['application']}
+assert before_rows.keys() == final_rows.keys()
+assert all(before_rows[p] == final_rows[p] for p in before_rows.keys() - changed)
+applied = []
+for row in prep['application']:
+    path = ROOT / row['canonical_path']
+    data = path.read_bytes()
+    delta = ''.join(difflib.unified_diff(checked(row['proposal']).decode('utf8').splitlines(keepends=True), data.decode('utf8').splitlines(keepends=True), fromfile=row['proposal']['path'], tofile=row['canonical_path'])).encode('utf8')
+    diffpath = OUT / 'formatter-1.diff'
+    diffpath.write_bytes(delta)
+    applied.append({**row, 'new_destination_absent': False, 'actual_final': {**rec.ref(path), 'size_bytes': len(data)}, 'actual_formatter_diff': {**rec.ref(diffpath), 'size_bytes': len(delta)}, 'actual_final_archive': rec.store_bytes(data)})
+record = {'schema': 'ctf10-scoped-caller-actual-application.v1', 'parent_application': parent_ref, 'correction_preparation': prep_ref, 'source_before': before, 'source_literal': literal, 'source_final': final, 'source_file_count': len(final_rows), 'unrelated_source_files_verified_byte_exact': len(before_rows.keys() - changed), 'actual_format_receipt': fmt_ref, 'application': applied, 'numerical_comparison_performed': False, 'gates_updated': False}
+record_path = OUT / 'record.json'
+record_path.write_bytes(rec.json_bytes(record))
+print(json.dumps({'record': rec.ref(record_path), 'final_source': final, 'unrelated_files': record['unrelated_source_files_verified_byte_exact']}))

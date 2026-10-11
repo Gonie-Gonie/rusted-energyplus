@@ -1,0 +1,22 @@
+--- crates/ep_run/examples/ctf10_ordinary_history_observer.rs
++++ crates/ep_run/examples/ctf10_ordinary_history_observer.rs
+@@ -2,8 +2,8 @@
+ #[path = "ctf10_ordinary_history_support/fields.rs"]
+ mod fields;
+ use ep_run::{
+-    PartialRunPolicy, RunConfig, RunMode, RunOutputFormat, TraceLevel, TraceSelection,
+-    run_arbitrary_idf,
++    PartialRunPolicy, PortingScope, RunConfig, RunMode, RunOutputFormat, TraceLevel, TraceSelection,
++    run_bounded_porting,
+ };
+ use ep_runtime::heat_balance::ctf_history_capture::with_sink;
+ use std::{cell::RefCell, error::Error, fs::OpenOptions, io::BufWriter, path::PathBuf, rc::Rc};
+@@ -43,7 +43,7 @@
+     let actual = with_sink(
+         true,
+         move |event| sink.borrow_mut().record(event),
+-        || run_arbitrary_idf(&config),
++        || run_bounded_porting(&config, PortingScope::A),
+     );
+     let (code, message) = match &actual {
+         Ok(value) => (value.exit_code.code(), value.message.as_str()),

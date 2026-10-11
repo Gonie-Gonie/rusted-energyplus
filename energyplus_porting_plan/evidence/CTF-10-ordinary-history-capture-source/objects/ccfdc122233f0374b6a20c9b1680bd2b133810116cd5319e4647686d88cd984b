@@ -1,0 +1,716 @@
+{
+  "schema": "ctf10-ordinary-history-capture-source-context.v1",
+  "read_whole_sources": [
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+      "sha256": "74de5eadbbde6f1f9d52f63d728704c06039465fe15b518033b5fcbb8e8f5dd8",
+      "size_bytes": 26856,
+      "line_count": 630
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "ea7ac0182a334905bc41076b77bd944ef77388b2f3fd30b0981e2bb22d7ae5dc",
+      "size_bytes": 2157,
+      "line_count": 84
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle_tests.rs",
+      "sha256": "242cbcde426f22768e625035052b20d853da20d04df73e35a323708055ed2406",
+      "size_bytes": 20417,
+      "line_count": 615
+    },
+    {
+      "path": "crates/ep_run/examples/ctf10_thermal_history_unit_support/fields.rs",
+      "sha256": "e075c79affd2e8c1782a83583a7c262332fb8dc7c5cf214599f7e7dfaad6ac3a",
+      "size_bytes": 25593,
+      "line_count": 674
+    },
+    {
+      "path": "crates/ep_run/examples/ctf10_candidate_unit_support/fields.rs",
+      "sha256": "6d2d9a111da360943cc35f881bbfc7afc9fe8ef5af68461c2b2f07c1acf6788e",
+      "size_bytes": 37889,
+      "line_count": 685
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_thermal_history.rs",
+      "sha256": "7dfaeb87ca080c7f9bca89ff87865e5859a4d21858d9e37a15b74d1911bc9709",
+      "size_bytes": 27756,
+      "line_count": 600
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_surface_binding.rs",
+      "sha256": "2ed31ba34987a2398fe4f3aa730b9c012494f87a293b5ffb2e0e380bfaaf93d3",
+      "size_bytes": 25794,
+      "line_count": 632
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "e4a903ad226410b9f84530e675d6dbfafa528212c2bf10a5e5686de2df2e383e",
+      "size_bytes": 49041,
+      "line_count": 1050
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/timestep.rs",
+      "sha256": "0f6be50452528c8bc87cc5920f10a742f6c6bed8281b72b8b2186955aefbc81a",
+      "size_bytes": 42306,
+      "line_count": 876
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/zone_air_initialization_trace.rs",
+      "sha256": "6e9aac0fc4e273ae14579bf7eb856529188f4197ed3303c252fd41ad4a299c0a",
+      "size_bytes": 10102,
+      "line_count": 246
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/production.rs",
+      "sha256": "164a84212d2244d43844e449b6d4b1bdf510d37de417364b8d2cb5e778cae2b6",
+      "size_bytes": 17212,
+      "line_count": 399
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "6f32927b566977f5f98756b8b8bd7134c80398d5edf4035fa6466f9c4c6e5a51",
+      "size_bytes": 21564,
+      "line_count": 502
+    },
+    {
+      "path": "crates/ep_run/src/config.rs",
+      "sha256": "42ca83287164eafe575c190b3d8328503ea14455c40cbb7293b27cd1b5c7622d",
+      "size_bytes": 9057,
+      "line_count": 290
+    },
+    {
+      "path": "crates/ep_run/src/pipeline.rs",
+      "sha256": "a12f7e5bec9dc1df72007568a84a2b8a149822ceff58d3974652e099e8a667b3",
+      "size_bytes": 822206,
+      "line_count": 14613
+    },
+    {
+      "path": "crates/ep_run/src/lib.rs",
+      "sha256": "46aa4eb3d6dbcf7a2ee013a5146ee2c5fd0f01d780aa41ac23f5a37099156aff",
+      "size_bytes": 1021,
+      "line_count": 39
+    },
+    {
+      "path": "crates/ep_model/src/model.rs",
+      "sha256": "334ae93fc3cdd32580f1e49349ecbe07fb1dab83809e371c16b4ac5fadd20ba7",
+      "size_bytes": 93321,
+      "line_count": 2332
+    },
+    {
+      "path": "crates/ep_model/src/objects/building.rs",
+      "sha256": "d6a3fbc6b39106f8d0b5195822bfc354e505e557f2b9406409b68aebfb089ef0",
+      "size_bytes": 11621,
+      "line_count": 373
+    },
+    {
+      "path": "crates/ep_model/src/objects/surfaces.rs",
+      "sha256": "54569b984efd25320447a8eecb94f351037ab6b63a5cfb31d0af1ecc225a1755",
+      "size_bytes": 6656,
+      "line_count": 197
+    },
+    {
+      "path": "crates/ep_model/src/objects/construction.rs",
+      "sha256": "f1886c8b2f9aede1e661210520b668d52f74d884d9a207de9f0c046e4170f191",
+      "size_bytes": 18134,
+      "line_count": 445
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "833a9f5bb991874dd972e044949fee695b36b17a857d7603cc0e45921a945b09",
+      "size_bytes": 597,
+      "line_count": 30
+    },
+    {
+      "path": "crates/ep_runtime/Cargo.toml",
+      "sha256": "bb81b5793debafd84300ec9905f0cda65ab32d216633543bab375b30a7a379e9",
+      "size_bytes": 327,
+      "line_count": 17
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/manifest.json",
+      "sha256": "8eac3eb0ec2a28c91db06e5c9d02ab0611090b68095183569df58b8198a8a94c",
+      "size_bytes": 31280,
+      "line_count": 754
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/source-context.json",
+      "sha256": "3686810d9ad18411322bbbe0f7ed23e19b67a1c93f3551b33b4b3de1496dbd8d",
+      "size_bytes": 12921,
+      "line_count": 319
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_observer.hh",
+      "sha256": "1d9befcc41cba45b74d36d27f75836249d9ce20f44173c84a195b446d8f2e7dd",
+      "size_bytes": 2403,
+      "line_count": 66
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_observer.cc",
+      "sha256": "7a966b5b17b63eb6541ffc3d318851c940134ee67bec76e14f1180ad391b883a",
+      "size_bytes": 22282,
+      "line_count": 384
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/HeatBalanceSurfaceManager.surface_consumer.cc",
+      "sha256": "51daf3db085dfe9d0c73a044ff74cc63fc38c68f169cfcb2d45f676f5d3a2060",
+      "size_bytes": 714386,
+      "line_count": 10288
+    }
+  ],
+  "selected_ranges": [
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+        "sha256": "74de5eadbbde6f1f9d52f63d728704c06039465fe15b518033b5fcbb8e8f5dd8",
+        "size_bytes": 26856,
+        "line_count": 630
+      },
+      "first_line": 148,
+      "last_line": 279,
+      "sha256": "421fd765998fc08b1145439fc7a58302e541955b523758d70ad6eaa9420135d9",
+      "size_bytes": 5236,
+      "purpose": "Exact private retained owner, genuine allocation and borrowed existing getters",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/01.txt",
+        "sha256": "421fd765998fc08b1145439fc7a58302e541955b523758d70ad6eaa9420135d9",
+        "size_bytes": 5236,
+        "line_count": 132
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+        "sha256": "74de5eadbbde6f1f9d52f63d728704c06039465fe15b518033b5fcbb8e8f5dd8",
+        "size_bytes": 26856,
+        "line_count": 630
+      },
+      "first_line": 439,
+      "last_line": 630,
+      "sha256": "3f6a5d8244e583a1dabd6d1a9ecf7db4a5c022b749c8ea08e46039d4d7d0c3b7",
+      "size_bytes": 8286,
+      "purpose": "Actual begin/commit arithmetic/caller wrappers and error retention before passive hooks",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/02.txt",
+        "sha256": "3f6a5d8244e583a1dabd6d1a9ecf7db4a5c022b749c8ea08e46039d4d7d0c3b7",
+        "size_bytes": 8286,
+        "line_count": 192
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_thermal_history.rs",
+        "sha256": "7dfaeb87ca080c7f9bca89ff87865e5859a4d21858d9e37a15b74d1911bc9709",
+        "size_bytes": 27756,
+        "line_count": 600
+      },
+      "first_line": 13,
+      "last_line": 200,
+      "sha256": "5572d3ba1c1ad8ad9c4d536c2675d06a572551750181827b80ed02098ab660e0",
+      "size_bytes": 8040,
+      "purpose": "Actual full19 normal/master/counter/scratch/report and selected input/context/update route types",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/03.txt",
+        "sha256": "5572d3ba1c1ad8ad9c4d536c2675d06a572551750181827b80ed02098ab660e0",
+        "size_bytes": 8040,
+        "line_count": 188
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "e4a903ad226410b9f84530e675d6dbfafa528212c2bf10a5e5686de2df2e383e",
+        "size_bytes": 49041,
+        "line_count": 1050
+      },
+      "first_line": 290,
+      "last_line": 322,
+      "sha256": "1856c2a1b4e2bf45c2481c31c1bde50ee98db1037e38182292a0a0c4fea10483",
+      "size_bytes": 1581,
+      "purpose": "Complete active consumer CTF storage owner",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/04.txt",
+        "sha256": "1856c2a1b4e2bf45c2481c31c1bde50ee98db1037e38182292a0a0c4fea10483",
+        "size_bytes": 1581,
+        "line_count": 33
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "e4a903ad226410b9f84530e675d6dbfafa528212c2bf10a5e5686de2df2e383e",
+        "size_bytes": 49041,
+        "line_count": 1050
+      },
+      "first_line": 383,
+      "last_line": 466,
+      "sha256": "1d646f0eb03303c9712218b3f5e86b3ea473e99b3a88e3d9954ffaa48450e232",
+      "size_bytes": 4368,
+      "purpose": "Actual surface association/current/five-gain/convection/report consumers",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/05.txt",
+        "sha256": "1d646f0eb03303c9712218b3f5e86b3ea473e99b3a88e3d9954ffaa48450e232",
+        "size_bytes": 4368,
+        "line_count": 84
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_surface_binding.rs",
+        "sha256": "2ed31ba34987a2398fe4f3aa730b9c012494f87a293b5ffb2e0e380bfaaf93d3",
+        "size_bytes": 25794,
+        "line_count": 632
+      },
+      "first_line": 20,
+      "last_line": 48,
+      "sha256": "a4f200b0e3545ece70fd93e64a2ba548ea1da564939016f5da1864d92f93f5af",
+      "size_bytes": 1415,
+      "purpose": "Exact compiled/explicit producer revision and caller-owned generation context",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/06.txt",
+        "sha256": "a4f200b0e3545ece70fd93e64a2ba548ea1da564939016f5da1864d92f93f5af",
+        "size_bytes": 1415,
+        "line_count": 29
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/weather_day/production.rs",
+        "sha256": "164a84212d2244d43844e449b6d4b1bdf510d37de417364b8d2cb5e778cae2b6",
+        "size_bytes": 17212,
+        "line_count": 399
+      },
+      "first_line": 14,
+      "last_line": 79,
+      "sha256": "fa3ca7a2b47e743416a68239aee3b4a1c3a66c61b0ba48c4aa6f54bce563beb9",
+      "size_bytes": 2404,
+      "purpose": "Actual Warmup/Run phase and independently retained caller clock",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/07.txt",
+        "sha256": "fa3ca7a2b47e743416a68239aee3b4a1c3a66c61b0ba48c4aa6f54bce563beb9",
+        "size_bytes": 2404,
+        "line_count": 66
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/weather_day/lifecycle.rs",
+        "sha256": "6f32927b566977f5f98756b8b8bd7134c80398d5edf4035fa6466f9c4c6e5a51",
+        "size_bytes": 21564,
+        "line_count": 502
+      },
+      "first_line": 396,
+      "last_line": 414,
+      "sha256": "d0dcdd5a2f831b90cc042eb4785e96765f7ab6a4c353a4d14370e65842d4a8c2",
+      "size_bytes": 852,
+      "purpose": "Real production phase-to-DayOfSim and begin-flag ownership",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/08.txt",
+        "sha256": "d0dcdd5a2f831b90cc042eb4785e96765f7ab6a4c353a4d14370e65842d4a8c2",
+        "size_bytes": 852,
+        "line_count": 19
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/timestep.rs",
+        "sha256": "0f6be50452528c8bc87cc5920f10a742f6c6bed8281b72b8b2186955aefbc81a",
+        "size_bytes": 42306,
+        "line_count": 876
+      },
+      "first_line": 249,
+      "last_line": 281,
+      "sha256": "5cd55e327840fd87976aed8001cd697efbc33b8c95b475b35df61ee10cf622f0",
+      "size_bytes": 1562,
+      "purpose": "True production weather clock authority and existing begin call before solver",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/09.txt",
+        "sha256": "5cd55e327840fd87976aed8001cd697efbc33b8c95b475b35df61ee10cf622f0",
+        "size_bytes": 1562,
+        "line_count": 33
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/timestep.rs",
+        "sha256": "0f6be50452528c8bc87cc5920f10a742f6c6bed8281b72b8b2186955aefbc81a",
+        "size_bytes": 42306,
+        "line_count": 876
+      },
+      "first_line": 731,
+      "last_line": 805,
+      "sha256": "d912c92a300a6a09d81a96454c735c4217cd496b9a17c14959a74c26f931ed1c",
+      "size_bytes": 3926,
+      "purpose": "Actual final/history selected commit closure and consumer handoff",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/10.txt",
+        "sha256": "d912c92a300a6a09d81a96454c735c4217cd496b9a17c14959a74c26f931ed1c",
+        "size_bytes": 3926,
+        "line_count": 75
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/timestep.rs",
+        "sha256": "0f6be50452528c8bc87cc5920f10a742f6c6bed8281b72b8b2186955aefbc81a",
+        "size_bytes": 42306,
+        "line_count": 876
+      },
+      "first_line": 859,
+      "last_line": 875,
+      "sha256": "dce07ba42a06f43a0d174ccd6bb2f1224c6be1f35f6fbd4f18401171fa01223c",
+      "size_bytes": 783,
+      "purpose": "Selected history after CorrectStep and before timestep increment",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/11.txt",
+        "sha256": "dce07ba42a06f43a0d174ccd6bb2f1224c6be1f35f6fbd4f18401171fa01223c",
+        "size_bytes": 783,
+        "line_count": 17
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_run/src/config.rs",
+        "sha256": "42ca83287164eafe575c190b3d8328503ea14455c40cbb7293b27cd1b5c7622d",
+        "size_bytes": 9057,
+        "line_count": 290
+      },
+      "first_line": 196,
+      "last_line": 240,
+      "sha256": "b4737ebcfe00756f3155eca5d6dfa3aec2c1ed6534285d9138b60df07f8fa40a",
+      "size_bytes": 1678,
+      "purpose": "Existing RunConfig, no new runtime/solver path",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/12.txt",
+        "sha256": "b4737ebcfe00756f3155eca5d6dfa3aec2c1ed6534285d9138b60df07f8fa40a",
+        "size_bytes": 1678,
+        "line_count": 45
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_run/src/pipeline.rs",
+        "sha256": "a12f7e5bec9dc1df72007568a84a2b8a149822ceff58d3974652e099e8a667b3",
+        "size_bytes": 822206,
+        "line_count": 14613
+      },
+      "first_line": 323,
+      "last_line": 367,
+      "sha256": "843b8f395fae77871f2dc44269eabf4a7af85857bba60ca0922016bdf456297a",
+      "size_bytes": 1186,
+      "purpose": "Actual ordinary caller Result/exit ownership",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/13.txt",
+        "sha256": "843b8f395fae77871f2dc44269eabf4a7af85857bba60ca0922016bdf456297a",
+        "size_bytes": 1186,
+        "line_count": 45
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_run/src/pipeline.rs",
+        "sha256": "a12f7e5bec9dc1df72007568a84a2b8a149822ceff58d3974652e099e8a667b3",
+        "size_bytes": 822206,
+        "line_count": 14613
+      },
+      "first_line": 882,
+      "last_line": 902,
+      "sha256": "5acb1d2dec6af591603046cd1156015fc3be0df4108f47a52ffca21be7f3ffe2",
+      "size_bytes": 813,
+      "purpose": "Existing genuine ordinary run entry invoked once",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/14.txt",
+        "sha256": "5acb1d2dec6af591603046cd1156015fc3be0df4108f47a52ffca21be7f3ffe2",
+        "size_bytes": 813,
+        "line_count": 21
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_run/examples/ctf10_thermal_history_unit_support/fields.rs",
+        "sha256": "e075c79affd2e8c1782a83583a7c262332fb8dc7c5cf214599f7e7dfaad6ac3a",
+        "size_bytes": 25593,
+        "line_count": 674
+      },
+      "first_line": 56,
+      "last_line": 78,
+      "sha256": "e1d462cfab61c2260a5e67f2675d110414c0e8228d2830efd728b1155a0379ec",
+      "size_bytes": 642,
+      "purpose": "Literal full binary64 scalar DTO reuse",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/15.txt",
+        "sha256": "e1d462cfab61c2260a5e67f2675d110414c0e8228d2830efd728b1155a0379ec",
+        "size_bytes": 642,
+        "line_count": 23
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_run/examples/ctf10_candidate_unit_support/fields.rs",
+        "sha256": "6d2d9a111da360943cc35f881bbfc7afc9fe8ef5af68461c2b2f07c1acf6788e",
+        "size_bytes": 37889,
+        "line_count": 685
+      },
+      "first_line": 627,
+      "last_line": 640,
+      "sha256": "36f287e13cbb85a4b0236e23a758885d2104b2d6fcdcff189f2487d4202b37fb",
+      "size_bytes": 1149,
+      "purpose": "Literal full12 fixed19 coefficient serializer reuse",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/16.txt",
+        "sha256": "36f287e13cbb85a4b0236e23a758885d2104b2d6fcdcff189f2487d4202b37fb",
+        "size_bytes": 1149,
+        "line_count": 14
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle_tests.rs",
+        "sha256": "242cbcde426f22768e625035052b20d853da20d04df73e35a323708055ed2406",
+        "size_bytes": 20417,
+        "line_count": 615
+      },
+      "first_line": 1,
+      "last_line": 139,
+      "sha256": "78d0feb2f8eb772a2a74756609df9763ce93dfe659dc787ef935bacb990d05c3",
+      "size_bytes": 4829,
+      "purpose": "Literal genuine ordinary initializer input fixture prefix before first test",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/17.txt",
+        "sha256": "78d0feb2f8eb772a2a74756609df9763ce93dfe659dc787ef935bacb990d05c3",
+        "size_bytes": 4829,
+        "line_count": 139
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_model/src/model.rs",
+        "sha256": "334ae93fc3cdd32580f1e49349ecbe07fb1dab83809e371c16b4ac5fadd20ba7",
+        "size_bytes": 93321,
+        "line_count": 2332
+      },
+      "first_line": 38,
+      "last_line": 72,
+      "sha256": "e81b9e559a44b485dd53300409960039bc16ec6d6da3dae6f8b0af5ae34b9915",
+      "size_bytes": 1690,
+      "purpose": "Existing TypedModel report/timestep/material owner types",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/18.txt",
+        "sha256": "e81b9e559a44b485dd53300409960039bc16ec6d6da3dae6f8b0af5ae34b9915",
+        "size_bytes": 1690,
+        "line_count": 35
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_model/src/objects/building.rs",
+        "sha256": "d6a3fbc6b39106f8d0b5195822bfc354e505e557f2b9406409b68aebfb089ef0",
+        "size_bytes": 11621,
+        "line_count": 373
+      },
+      "first_line": 250,
+      "last_line": 361,
+      "sha256": "12987945ea82b67c157cd4f296240cf35554b9cad9a3be9f27b7650dbdb609d0",
+      "size_bytes": 3859,
+      "purpose": "Real ordered Zone/Space identity and membership owners",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/19.txt",
+        "sha256": "12987945ea82b67c157cd4f296240cf35554b9cad9a3be9f27b7650dbdb609d0",
+        "size_bytes": 3859,
+        "line_count": 112
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_model/src/objects/surfaces.rs",
+        "sha256": "54569b984efd25320447a8eecb94f351037ab6b63a5cfb31d0af1ecc225a1755",
+        "size_bytes": 6656,
+        "line_count": 197
+      },
+      "first_line": 167,
+      "last_line": 197,
+      "sha256": "c98ad7dcc4192d4fbbb773a098fc8e048be2fa2bebd47dbb24aa98ab1e1ae3aa",
+      "size_bytes": 1154,
+      "purpose": "Real surface construction/Zone/Space/boundary/vertex input owner",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/20.txt",
+        "sha256": "c98ad7dcc4192d4fbbb773a098fc8e048be2fa2bebd47dbb24aa98ab1e1ae3aa",
+        "size_bytes": 1154,
+        "line_count": 31
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_model/src/objects/construction.rs",
+        "sha256": "f1886c8b2f9aede1e661210520b668d52f74d884d9a207de9f0c046e4170f191",
+        "size_bytes": 18134,
+        "line_count": 445
+      },
+      "first_line": 374,
+      "last_line": 403,
+      "sha256": "46ad1a5f995af92559a21f1c81cc44577fbc0f8f95700932855ce98a72a2400b",
+      "size_bytes": 1595,
+      "purpose": "Actual construction layer identity owner",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/21.txt",
+        "sha256": "46ad1a5f995af92559a21f1c81cc44577fbc0f8f95700932855ce98a72a2400b",
+        "size_bytes": 1595,
+        "line_count": 30
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_observer.cc",
+        "sha256": "7a966b5b17b63eb6541ffc3d318851c940134ee67bec76e14f1180ad391b883a",
+        "size_bytes": 22282,
+        "line_count": 384
+      },
+      "first_line": 97,
+      "last_line": 182,
+      "sha256": "b3ad3b84c0a22687a12a0f51cb0b1aca505b3c1a648f25b496d08b05ffa25636",
+      "size_bytes": 5709,
+      "purpose": "Existing authentic Native clocks/full construction/current catalog, not Rust inputs",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/22.txt",
+        "sha256": "b3ad3b84c0a22687a12a0f51cb0b1aca505b3c1a648f25b496d08b05ffa25636",
+        "size_bytes": 5709,
+        "line_count": 86
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_observer.cc",
+        "sha256": "7a966b5b17b63eb6541ffc3d318851c940134ee67bec76e14f1180ad391b883a",
+        "size_bytes": 22282,
+        "line_count": 384
+      },
+      "first_line": 255,
+      "last_line": 290,
+      "sha256": "e8bf84eaf87cd221a3c63321dfc1fb23d13f3de639dcf7f9de14721d86a92dde",
+      "size_bytes": 2582,
+      "purpose": "Existing authentic Native full history boundary owner copies",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/23.txt",
+        "sha256": "e8bf84eaf87cd221a3c63321dfc1fb23d13f3de639dcf7f9de14721d86a92dde",
+        "size_bytes": 2582,
+        "line_count": 36
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_observer.cc",
+        "sha256": "7a966b5b17b63eb6541ffc3d318851c940134ee67bec76e14f1180ad391b883a",
+        "size_bytes": 22282,
+        "line_count": 384
+      },
+      "first_line": 321,
+      "last_line": 348,
+      "sha256": "15a79408377a2ae6c7fa0693aa847f12c41d86d8462be7d8717d13aaf955120d",
+      "size_bytes": 2234,
+      "purpose": "Existing Native procedure/invocation/parent and selected boundary copy association",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/24.txt",
+        "sha256": "15a79408377a2ae6c7fa0693aa847f12c41d86d8462be7d8717d13aaf955120d",
+        "size_bytes": 2234,
+        "line_count": 28
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/HeatBalanceSurfaceManager.surface_consumer.cc",
+        "sha256": "51daf3db085dfe9d0c73a044ff74cc63fc38c68f169cfcb2d45f676f5d3a2060",
+        "size_bytes": 714386,
+        "line_count": 10288
+      },
+      "first_line": 2378,
+      "last_line": 2410,
+      "sha256": "0ae999acac05e617b5cc1aa68e6f73e7a355ff66f7c387d9d3cd0835c2b038a0",
+      "size_bytes": 2204,
+      "purpose": "Existing actual selected Init input checkpoint",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/25.txt",
+        "sha256": "0ae999acac05e617b5cc1aa68e6f73e7a355ff66f7c387d9d3cd0835c2b038a0",
+        "size_bytes": 2204,
+        "line_count": 33
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/HeatBalanceSurfaceManager.surface_consumer.cc",
+        "sha256": "51daf3db085dfe9d0c73a044ff74cc63fc38c68f169cfcb2d45f676f5d3a2060",
+        "size_bytes": 714386,
+        "line_count": 10288
+      },
+      "first_line": 2497,
+      "last_line": 2517,
+      "sha256": "67aea4539e9c0a3e3ab576e01642f59bf44ea21f92f358a5362bbece7a006de0",
+      "size_bytes": 1412,
+      "purpose": "Existing actual selected Init returned checkpoint",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/26.txt",
+        "sha256": "67aea4539e9c0a3e3ab576e01642f59bf44ea21f92f358a5362bbece7a006de0",
+        "size_bytes": 1412,
+        "line_count": 21
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/HeatBalanceSurfaceManager.surface_consumer.cc",
+        "sha256": "51daf3db085dfe9d0c73a044ff74cc63fc38c68f169cfcb2d45f676f5d3a2060",
+        "size_bytes": 714386,
+        "line_count": 10288
+      },
+      "first_line": 5299,
+      "last_line": 5310,
+      "sha256": "e2640b0ace183adbfc21e1ca4d43862f411f7e00f31d314d5ab0a6416ed090b2",
+      "size_bytes": 636,
+      "purpose": "Existing actual Update entry checkpoint",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/27.txt",
+        "sha256": "e2640b0ace183adbfc21e1ca4d43862f411f7e00f31d314d5ab0a6416ed090b2",
+        "size_bytes": 636,
+        "line_count": 12
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/HeatBalanceSurfaceManager.surface_consumer.cc",
+        "sha256": "51daf3db085dfe9d0c73a044ff74cc63fc38c68f169cfcb2d45f676f5d3a2060",
+        "size_bytes": 714386,
+        "line_count": 10288
+      },
+      "first_line": 5441,
+      "last_line": 5458,
+      "sha256": "33173c81622b47a99b64679ec8e253f5a1fe7c24a15562e23400e8034e724aa7",
+      "size_bytes": 1396,
+      "purpose": "Existing actual simple hard-copy endpoint",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/28.txt",
+        "sha256": "33173c81622b47a99b64679ec8e253f5a1fe7c24a15562e23400e8034e724aa7",
+        "size_bytes": 1396,
+        "line_count": 18
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/HeatBalanceSurfaceManager.surface_consumer.cc",
+        "sha256": "51daf3db085dfe9d0c73a044ff74cc63fc38c68f169cfcb2d45f676f5d3a2060",
+        "size_bytes": 714386,
+        "line_count": 10288
+      },
+      "first_line": 5606,
+      "last_line": 5617,
+      "sha256": "1f4b1e014bfbdb78e9d39eb171c84da94e58fe56c3abe993536f91624fd96287",
+      "size_bytes": 670,
+      "purpose": "Existing actual master selected endpoint",
+      "range_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/ranges/29.txt",
+        "sha256": "1f4b1e014bfbdb78e9d39eb171c84da94e58fe56c3abe993536f91624fd96287",
+        "size_bytes": 670,
+        "line_count": 12
+      }
+    }
+  ],
+  "scientific_payloads_read": false,
+  "Native_expected_states_used_as_inputs": false
+}

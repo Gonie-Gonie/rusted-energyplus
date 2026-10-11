@@ -1,0 +1,18 @@
+        // Reuse the pointers of the last term arrays for the second term arrays
+        state.dataHeatBalSurf->SurfInsideTempHist(2) = std::move(insideTemp);
+        state.dataHeatBalSurf->SurfOutsideTempHist(2) = std::move(outsideTemp);
+        state.dataHeatBalSurf->SurfInsideFluxHist(2) = std::move(insideFlux);
+        state.dataHeatBalSurf->SurfOutsideFluxHist(2) = std::move(outsideFlux);
+        // Hard copy the values of the the 1st term to the 2nd (copying data instead of pointers to protect the 1st term arrays used in run time)
+        state.dataHeatBalSurf->SurfInsideTempHist(2) = state.dataHeatBalSurf->SurfInsideTempHist(1);
+        state.dataHeatBalSurf->SurfOutsideTempHist(2) = state.dataHeatBalSurf->SurfOutsideTempHist(1);
+        state.dataHeatBalSurf->SurfInsideFluxHist(2) = state.dataHeatBalSurf->SurfInsideFluxHist(1);
+        state.dataHeatBalSurf->SurfOutsideFluxHist(2) = state.dataHeatBalSurf->SurfOutsideFluxHist(1);
+// SURFACE_OBSERVER_BEGIN simple_history_hard_copy_complete
+    ::SurfaceConsumerObservation::record(state, "simple_history_hard_copy_complete", ::SurfaceConsumerObservation::Copy::Histories, 0, 0, {}, {});
+// SURFACE_OBSERVER_END simple_history_hard_copy_complete
+        return;
+    }
+
+    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+        for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {

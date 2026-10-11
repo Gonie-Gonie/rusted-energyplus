@@ -1,0 +1,86 @@
+json clock(EnergyPlus::EnergyPlusData const &state)
+{
+    auto const &g = *state.dataGlobal;
+    auto const &e = *state.dataEnvrn;
+    auto const &h = *state.dataHeatBal;
+    return {{"state_address", reinterpret_cast<std::uintptr_t>(&state)},
+        {"environment_index", e.CurEnvirNum}, {"environment_name", e.EnvironmentName},
+        {"CalendarYear", g.CalendarYear}, {"Month", e.Month}, {"DayOfMonth", e.DayOfMonth},
+        {"DayOfSim", g.DayOfSim}, {"HourOfDay", g.HourOfDay}, {"TimeStep", g.TimeStep},
+        {"TimeStepZone", scalar(g.TimeStepZone)}, {"TimeStepZoneSec", scalar(g.TimeStepZoneSec)},
+        {"KickOffSimulation", g.KickOffSimulation}, {"WarmupFlag", g.WarmupFlag},
+        {"BeginSimFlag", g.BeginSimFlag}, {"BeginEnvrnFlag", g.BeginEnvrnFlag},
+        {"BeginDayFlag", g.BeginDayFlag}, {"BeginHourFlag", g.BeginHourFlag},
+        {"BeginTimeStepFlag", g.BeginTimeStepFlag}, {"ZoneSizingCalc", g.ZoneSizingCalc},
+        {"AllCTF", h.AllCTF}, {"AnyCTF", h.AnyCTF}, {"SimpleCTFOnly", h.SimpleCTFOnly},
+        {"MaxCTFTerms", h.MaxCTFTerms}, {"InsideSurfIterations", h.InsideSurfIterations},
+        {"AnyInternalHeatSourceInInput", h.AnyInternalHeatSourceInInput},
+        {"UpdateThermalHistoriesFirstTimeFlag", state.dataHeatBalSurfMgr->UpdateThermalHistoriesFirstTimeFlag},
+        {"AnyEMS", g.AnyEnergyManagementSystemInModel},
+        {"AnyConstrOverrides", g.AnyConstrOverridesInModel},
+        {"AnySurfPropOverrides", g.AnySurfPropOverridesInModel}};
+}
+template<class Construction> json construction_copy(int i, Construction const &c)
+{
+    json row{{"index", i}, {"Name", c.Name}, {"TotLayers", c.TotLayers}, {"LayerPoint", json::array()},
+        {"IsUsedCTF", c.IsUsedCTF}, {"SourceSinkPresent", c.SourceSinkPresent},
+        {"SolutionDimensions", c.SolutionDimensions}, {"NumCTFTerms", c.NumCTFTerms},
+        {"NumHistories", c.NumHistories}, {"CTFTimeStep", scalar(c.CTFTimeStep)}, {"UValue", scalar(c.UValue)}};
+    for (int j = c.LayerPoint.l(); j <= c.LayerPoint.u(); ++j) row["LayerPoint"].push_back(c.LayerPoint(j));
+    auto copy_fixed = [&](char const *name, auto const &values) {
+        row[name] = json::array();
+        for (auto const value : values) row[name].push_back(scalar(value));
+    };
+    copy_fixed("CTFOutside", c.CTFOutside); copy_fixed("CTFCross", c.CTFCross);
+    copy_fixed("CTFInside", c.CTFInside); copy_fixed("CTFFlux", c.CTFFlux);
+    copy_fixed("CTFSourceIn", c.CTFSourceIn); copy_fixed("CTFSourceOut", c.CTFSourceOut);
+    copy_fixed("CTFTSourceOut", c.CTFTSourceOut); copy_fixed("CTFTSourceIn", c.CTFTSourceIn);
+    copy_fixed("CTFTSourceQ", c.CTFTSourceQ); copy_fixed("CTFTUserOut", c.CTFTUserOut);
+    copy_fixed("CTFTUserIn", c.CTFTUserIn); copy_fixed("CTFTUserSource", c.CTFTUserSource);
+    return row;
+}
+json catalog(EnergyPlus::EnergyPlusData const &state, bool current_history_only = false)
+{
+    json out{{"surfaces", json::array()}, {"constructions", json::array()},
+             {"zones", json::array()}, {"spaces", json::array()},
+             {"AllHTSurfaceList", state.dataSurface->AllHTSurfaceList}};
+    auto const &surfaces = state.dataSurface->Surface;
+    if (surfaces.allocated()) for (int i = 1; i <= surfaces.isize(); ++i) {
+        auto const &s = surfaces(i);
+        out["surfaces"].push_back({{"index", i}, {"Name", s.Name}, {"Construction", s.Construction},
+            {"Class", static_cast<int>(s.Class)}, {"OriginalClass", static_cast<int>(s.OriginalClass)},
+            {"HeatTransferAlgorithm", static_cast<int>(s.HeatTransferAlgorithm)},
+            {"Zone", s.Zone}, {"Space", s.spaceNum}, {"ExtBoundCond", s.ExtBoundCond},
+            {"Area", scalar(s.Area)}});
+    }
+    auto const &constructions = state.dataConstruction->Construct;
+    if (current_history_only) {
+        // Actual AllHT order and first current Construction encounter, without eligibility filtering.
+        std::vector<int> seen;
+        for (int const surface_index : state.dataSurface->AllHTSurfaceList) {
+            if (!surfaces.allocated() || surface_index < 1 || surface_index > surfaces.isize())
+                throw std::runtime_error("Current history catalog surface owner unavailable");
+            int const construction_index = surfaces(surface_index).Construction;
+            if (std::find(seen.begin(), seen.end(), construction_index) != seen.end()) continue;
+            if (!constructions.allocated() || !constructions.contains(construction_index))
+                throw std::runtime_error("Current history catalog Construction owner unavailable");
+            out["constructions"].push_back(construction_copy(construction_index, constructions(construction_index)));
+            seen.push_back(construction_index);
+        }
+    } else if (constructions.allocated()) for (int i = constructions.l(); i <= constructions.u(); ++i) {
+        out["constructions"].push_back(construction_copy(i, constructions(i)));
+    }
+    auto const &zones = state.dataHeatBal->Zone;
+    if (zones.allocated()) for (int i = 1; i <= zones.isize(); ++i)
+        out["zones"].push_back({{"index", i}, {"Name", zones(i).Name}, {"spaceIndexes", zones(i).spaceIndexes}});
+    auto const &spaces = state.dataHeatBal->space;
+    if (spaces.allocated()) for (int i = 1; i <= spaces.isize(); ++i) {
+        auto const &s = spaces(i);
+        out["spaces"].push_back({{"index", i}, {"Name", s.Name}, {"HTSurfaceFirst", s.HTSurfaceFirst},
+            {"HTSurfaceLast", s.HTSurfaceLast}, {"OpaqOrIntMassSurfaceFirst", s.OpaqOrIntMassSurfaceFirst},
+            {"OpaqOrIntMassSurfaceLast", s.OpaqOrIntMassSurfaceLast}});
+    }
+    return out;
+}
+json surface_copy(EnergyPlus::EnergyPlusData const &state, Copy kind, int surface, int term)
+{

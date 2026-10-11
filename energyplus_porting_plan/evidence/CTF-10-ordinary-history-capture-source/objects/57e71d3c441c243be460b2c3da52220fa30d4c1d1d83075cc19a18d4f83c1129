@@ -1,0 +1,48 @@
+{
+  "schema": "ctf09-card-current-plan-consistency.v1",
+  "status": "SOURCE-READY-HELD-NOT-APPLIED",
+  "canonical_path": "energyplus_porting_plan/cards/CTF-09.md",
+  "actual_before": {
+    "path": "energyplus_porting_plan/cards/CTF-09.md",
+    "sha256": "af772f019aa227baaf6dcc32f7ca81b4300806e5a44d4a93a4651d120858f716",
+    "size_bytes": 7889,
+    "line_count": 100
+  },
+  "before_archive": {
+    "path": ".runtime/porting/CTF-09/scope-card-consistency-01/before.md",
+    "sha256": "af772f019aa227baaf6dcc32f7ca81b4300806e5a44d4a93a4651d120858f716",
+    "size_bytes": 7889,
+    "line_count": 100
+  },
+  "proposal": {
+    "path": ".runtime/porting/CTF-09/scope-card-consistency-01/proposed.md",
+    "sha256": "8cc3629a694f62b3c801d6acbf74c7568ec01a2520365a856d0d9e652b7c8bf6",
+    "size_bytes": 7889,
+    "line_count": 100
+  },
+  "exact_diff": {
+    "path": ".runtime/porting/CTF-09/scope-card-consistency-01/exact.diff",
+    "sha256": "20388f462720af6e429c193fa705802b1afbf2935d0ef49f0440850724b59a47",
+    "size_bytes": 1103,
+    "line_count": 20
+  },
+  "current_plan": {
+    "path": "energyplus_porting_plan/plan.json",
+    "sha256": "c5cfd2c5ca780c90764b4c53c019f49ffd130575b43004e4acae386bc550bf3f",
+    "size_bytes": 781703,
+    "line_count": 15021
+  },
+  "plan_gate_values_unchanged": {
+    "scope_review": "통과",
+    "unit_gate": "통과",
+    "integration_gate": "미확인",
+    "production_gate": "미확인"
+  },
+  "changes": [
+    "Scope checkbox mirrors already-passed current plan scope_review; no gate promotion.",
+    "Pending-amendment heading qualified as historical pre-execution text; original policy and evidence paragraphs remain literal."
+  ],
+  "scientific_results_read": false,
+  "evidence_scope_widened": false,
+  "canonical_applied": false
+}

@@ -1,0 +1,130 @@
+"""Seal literal Source proposals and exact custody; no project import or execution."""
+from pathlib import Path
+import ast,difflib,hashlib,json
+ROOT=Path.cwd(); OUT=Path(__file__).resolve().parent; PROPOSED=OUT/'proposed'
+def rel(p): return p.resolve().relative_to(ROOT.resolve()).as_posix()
+def ref(p):
+ p=Path(p); d=p.read_bytes(); return {'path':rel(p),'sha256':hashlib.sha256(d).hexdigest(),'size_bytes':len(d),'line_count':len(d.splitlines())}
+def write(p,d):
+ p.parent.mkdir(parents=True,exist_ok=True); p.write_bytes(d if isinstance(d,bytes) else d.encode('utf8'))
+def dump(p,v): write(p,json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+def diff(a,b,left,right): return ''.join(difflib.unified_diff(a.decode('utf8').splitlines(True),b.decode('utf8').splitlines(True),fromfile=left,tofile=right)).encode('utf8')
+paths=[
+ 'crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs',
+ 'crates/ep_runtime/src/heat_balance/mod.rs',
+ 'crates/ep_runtime/src/heat_balance/ctf_history_capture.rs',
+ 'crates/ep_runtime/src/heat_balance/ctf_history_capture_tests.rs',
+ 'crates/ep_runtime/src/heat_balance/ctf_history_capture_fixture.rs',
+ 'crates/ep_run/examples/ctf10_ordinary_history_observer.rs',
+ 'crates/ep_run/examples/ctf10_ordinary_history_support/fields.rs',
+]
+assert not (OUT/'manifest.json').exists(),'Held manifest must never be overwritten'
+application=[]
+for index,path in enumerate(paths):
+ target=ROOT/path; proposal=PROPOSED/path; assert proposal.is_file()
+ before=target.read_bytes() if index<2 else b''
+ if index>=2: assert not target.exists(),path
+ archive=OUT/'before'/path; write(archive,before)
+ dpath=OUT/'diffs'/(path+'.diff'); delta=diff(before,proposal.read_bytes(),path,path+'.proposed');write(dpath,delta)
+ row={'canonical_path':path,'actual_before':ref(target) if index<2 else None,
+      'new_destination_absent':index>=2,'before_archive':ref(archive),'proposal':ref(proposal),'exact_diff':ref(dpath)}
+ application.append(row)
+# Complete inverse: only passive hooks plus binding the existing actual return.
+a=(PROPOSED/paths[0]).read_text(encoding='utf8'); before=(ROOT/paths[0]).read_text(encoding='utf8')
+a=a.replace('use super::ctf_history_capture::{self as capture, CtfHistoryBoundary as Boundary, CtfHistoryObservation, CtfHistoryOwnerView};\n','',1)
+start=a.index('// Borrow-only observation packs');end=a.index('impl CtfSurfaceLifecycle {',start);a=a[:start]+a[end:]
+start=a.index("    fn observe<'a>(");end=a.index("    fn inputs<'a>(",start);a=a[:start]+a[end:]
+a=''.join(line for line in a.splitlines(True) if 'self.observe(' not in line and 'lifecycle.observe(' not in line)
+a=a.replace('        let route = update_selected_ctf_thermal_histories(&mut self.history, &inputs, context)?;', '        update_selected_ctf_thermal_histories(&mut self.history, &inputs, context)?;',1)
+a=a.replace('    let clock = lifecycle.current_clock;\n','',1)
+assert a==before,'Lifecycle inverse changed existing math/call/store/error order'
+assert before.encode()==(ROOT/paths[0]).read_bytes(),'Declare any newline transformation explicitly'
+mod=(PROPOSED/paths[1]).read_bytes().replace(b'pub mod ctf_history_capture;\n',b'',1)
+assert mod==(ROOT/paths[1]).read_bytes(),'Module inverse is not literal'
+fields=(PROPOSED/paths[-1]).read_text(encoding='utf8')
+scalar_path='crates/ep_run/examples/ctf10_thermal_history_unit_support/fields.rs'
+storage_path='crates/ep_run/examples/ctf10_candidate_unit_support/fields.rs'
+scalar=(ROOT/scalar_path).read_text(encoding='utf8'); scalar=scalar[scalar.index('pub(super) fn scalar('):scalar.index('\nfn real(',scalar.index('pub(super) fn scalar('))]
+storage=(ROOT/storage_path).read_text(encoding='utf8');storage=storage[storage.index('pub(super) fn public_storage('):storage.index('\npub(super) fn public_unavailable(',storage.index('pub(super) fn public_storage('))]
+assert scalar in fields and storage in fields,'Literal accepted helper reuse differs'
+fixture_path='crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle_tests.rs'
+fixture=(PROPOSED/paths[4]).read_text(encoding='utf8').replace('use crate::heat_balance::state::HeatBalanceState;\n','',1).replace('use ep_model::SurfaceType;\n','',1)
+assert fixture==(ROOT/fixture_path).read_text(encoding='utf8').split('#[test]',1)[0]
+assert 'panic!(' not in (PROPOSED/paths[3]).read_text(encoding='utf8')
+assert 'serde_json' not in (PROPOSED/paths[2]).read_text(encoding='utf8')
+native='.runtime/porting/CTF-10/surface-consumer-native-prep-05/'
+dependencies=[paths[0],paths[1],fixture_path,scalar_path,storage_path,
+ 'crates/ep_runtime/src/heat_balance/ctf_thermal_history.rs','crates/ep_runtime/src/heat_balance/ctf_surface_binding.rs',
+ 'crates/ep_runtime/src/heat_balance/state.rs','crates/ep_runtime/src/heat_balance/timestep.rs',
+ 'crates/ep_runtime/src/heat_balance/zone_air_initialization_trace.rs',
+ 'crates/ep_runtime/src/weather_day/production.rs','crates/ep_runtime/src/weather_day/lifecycle.rs',
+ 'crates/ep_run/src/config.rs','crates/ep_run/src/pipeline.rs','crates/ep_run/src/lib.rs',
+ 'crates/ep_model/src/model.rs','crates/ep_model/src/objects/building.rs',
+ 'crates/ep_model/src/objects/surfaces.rs','crates/ep_model/src/objects/construction.rs',
+ 'Cargo.toml','crates/ep_runtime/Cargo.toml',
+ native+'manifest.json',native+'source-context.json',native+'surface_consumer_observer.hh',
+ native+'surface_consumer_observer.cc',native+'HeatBalanceSurfaceManager.surface_consumer.cc']
+ranges=[]
+def ran(path,first,last,purpose):
+ lines=(ROOT/path).read_bytes().splitlines(True);assert 1<=first<=last<=len(lines),(path,first,last,len(lines))
+ d=b''.join(lines[first-1:last]); out=OUT/'ranges'/f'{len(ranges)+1:02d}.txt';write(out,d)
+ ranges.append({'source':ref(ROOT/path),'first_line':first,'last_line':last,
+                'sha256':hashlib.sha256(d).hexdigest(),'size_bytes':len(d),'purpose':purpose,'range_archive':ref(out)})
+ran(paths[0],148,279,'Exact private retained owner, genuine allocation and borrowed existing getters')
+ran(paths[0],439,630,'Actual begin/commit arithmetic/caller wrappers and error retention before passive hooks')
+ran('crates/ep_runtime/src/heat_balance/ctf_thermal_history.rs',13,200,'Actual full19 normal/master/counter/scratch/report and selected input/context/update route types')
+ran('crates/ep_runtime/src/heat_balance/state.rs',290,322,'Complete active consumer CTF storage owner')
+ran('crates/ep_runtime/src/heat_balance/state.rs',383,466,'Actual surface association/current/five-gain/convection/report consumers')
+ran('crates/ep_runtime/src/heat_balance/ctf_surface_binding.rs',20,48,'Exact compiled/explicit producer revision and caller-owned generation context')
+ran('crates/ep_runtime/src/weather_day/production.rs',14,79,'Actual Warmup/Run phase and independently retained caller clock')
+ran('crates/ep_runtime/src/weather_day/lifecycle.rs',396,414,'Real production phase-to-DayOfSim and begin-flag ownership')
+ran('crates/ep_runtime/src/heat_balance/timestep.rs',249,281,'True production weather clock authority and existing begin call before solver')
+ran('crates/ep_runtime/src/heat_balance/timestep.rs',731,805,'Actual final/history selected commit closure and consumer handoff')
+ran('crates/ep_runtime/src/heat_balance/timestep.rs',859,875,'Selected history after CorrectStep and before timestep increment')
+ran('crates/ep_run/src/config.rs',196,240,'Existing RunConfig, no new runtime/solver path')
+ran('crates/ep_run/src/pipeline.rs',323,367,'Actual ordinary caller Result/exit ownership')
+ran('crates/ep_run/src/pipeline.rs',882,902,'Existing genuine ordinary run entry invoked once')
+ran(scalar_path,56,78,'Literal full binary64 scalar DTO reuse')
+ran(storage_path,627,640,'Literal full12 fixed19 coefficient serializer reuse')
+ran(fixture_path,1,len(fixture.splitlines()),'Literal genuine ordinary initializer input fixture prefix before first test')
+ran('crates/ep_model/src/model.rs',38,72,'Existing TypedModel report/timestep/material owner types')
+ran('crates/ep_model/src/objects/building.rs',250,361,'Real ordered Zone/Space identity and membership owners')
+ran('crates/ep_model/src/objects/surfaces.rs',167,197,'Real surface construction/Zone/Space/boundary/vertex input owner')
+ran('crates/ep_model/src/objects/construction.rs',374,403,'Actual construction layer identity owner')
+ran(native+'surface_consumer_observer.cc',97,182,'Existing authentic Native clocks/full construction/current catalog, not Rust inputs')
+ran(native+'surface_consumer_observer.cc',255,290,'Existing authentic Native full history boundary owner copies')
+ran(native+'surface_consumer_observer.cc',321,348,'Existing Native procedure/invocation/parent and selected boundary copy association')
+for first,last,purpose in [(2378,2410,'Existing actual selected Init input checkpoint'),(2497,2517,'Existing actual selected Init returned checkpoint'),(5299,5310,'Existing actual Update entry checkpoint'),(5441,5458,'Existing actual simple hard-copy endpoint'),(5606,5617,'Existing actual master selected endpoint')]:
+ ran(native+'HeatBalanceSurfaceManager.surface_consumer.cc',first,last,purpose)
+context={'schema':'ctf10-ordinary-history-capture-source-context.v1','read_whole_sources':[ref(ROOT/p) for p in dependencies],
+ 'selected_ranges':ranges,'scientific_payloads_read':False,'Native_expected_states_used_as_inputs':False}
+dump(OUT/'source-context.json',context)
+manifest={'schema':'ctf10-ordinary-history-capture-source-preparation.v1','status':'held-source-only-not-applied-or-executed',
+ 'application':application,'own_sources':[ref(PROPOSED/p) for p in paths],
+ 'source_context':ref(OUT/'source-context.json'),'README':ref(OUT/'README.md'),
+ 'Source_authoring':[ref(OUT/name) for name in ['prepare_sources.py','refine_sources.py','refine_begin_context.py','seal_sources.py']],
+ 'exact_correspondence':{'existing_lifecycle_body_inverse_literal':True,'module_inverse_literal':True,
+   'scalar_function_literal_reuse':True,'public_storage_function_literal_reuse':True,'genuine_fixture_prefix_literal_reuse_except_two_imports':True,
+   'new_dependency':False,'ctf_rs_or_surface_loop_edited':False,'two_existing_five_new_paths':True},
+ 'runtime_interfaces':{'example':'ctf10_ordinary_history_observer','positional_arguments':['input','weather','fresh_run_output_dir','fresh_capture_ndjson'],
+   'boundary_names':['BeginEntry','InitializationInput','InitializationReturned','BeginReturned','BeginFailed','HistoryUpdateInput','HistoryUpdateReturned','HistoryCommitBeforeClockRelease','CommitReturned','CommitFailed'],
+   'stream_schema':'ctf10-persistent-ordinary-history-stream.v1','generation_schema':'ctf10-persistent-ordinary-generation.v1','event_schema':'ctf10-persistent-ordinary-history-event.v1',
+   'actual_Cargo_source_capture_and_emitted_artifact_required_before_execution':True,'actual_input_weather_guard_required_before_execution':True},
+ 'proposed_test_count':4,'tests_executed':False,'canonical_applied':False,'Native_or_Rust_scientific_outputs_read':False,
+ 'future_actual_application':None,'future_formatter':None,'future_quality':None,'future_Cargo_artifact':None,'future_capture':None,
+ 'integration_PASS_claimed':False,'numeric_comparison_performed':False}
+# Authenticate every recorded whole/range descriptor before final immutable seal.
+def verify(value):
+ if isinstance(value,dict):
+  if {'path','sha256','size_bytes'}<=value.keys():
+   d=(ROOT/value['path']).read_bytes();assert hashlib.sha256(d).hexdigest()==value['sha256'] and len(d)==value['size_bytes']
+  for v in value.values():verify(v)
+ elif isinstance(value,list):
+  for v in value:verify(v)
+verify(manifest);verify(context)
+for row in application:
+ assert (ROOT/row['exact_diff']['path']).read_bytes()==diff((ROOT/row['before_archive']['path']).read_bytes(),(ROOT/row['proposal']['path']).read_bytes(),row['canonical_path'],row['canonical_path']+'.proposed')
+for name in ['prepare_sources.py','refine_sources.py','refine_begin_context.py','seal_sources.py']:
+ ast.parse((OUT/name).read_text(encoding='utf-8-sig'))
+dump(OUT/'manifest.json',manifest)
+print(json.dumps({'manifest':ref(OUT/'manifest.json'),'application_paths':len(application),'whole_dependencies':len(dependencies),'literal_ranges':len(ranges),'proposal_lines':sum(r['proposal']['line_count'] for r in application),'delta_lines':sum(r['exact_diff']['line_count'] for r in application)}))

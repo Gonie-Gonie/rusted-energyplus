@@ -1,0 +1,56 @@
+# Support Assessment
+
+status: unsupported
+run_result_state: run_blocked
+run_result_label: Cannot run
+runtime_class: none
+runtime_selection_note: support assessment blocked Rust execution before runtime
+mode: compatibility
+partial_policy: deny
+capability_registry: specs/capabilities.toml
+capability_registry_loaded: true
+conformance_claim: false
+
+## Top Blocked Reasons
+
+- ZoneAirHeatBalanceAlgorithm (1): object type is preserved in RawModel but lacks a runtime support declaration
+- UnsupportedObject [ZoneAirHeatBalanceAlgorithm]: ZoneAirHeatBalanceAlgorithm is outside the current arbitrary-run runtime subset
+
+Detailed support assessment data is recorded in support-assessment.json.
+
+## Unsupported Objects
+
+| object_type | count | note |
+| --- | ---: | --- |
+| ZoneAirHeatBalanceAlgorithm | 1 | object type is preserved in RawModel but lacks a runtime support declaration |
+
+## Ignored Raw-Only Objects
+
+| object_type | count | note |
+| --- | ---: | --- |
+| Exterior:Lights | 1 | Preserved for diagnostics or staging when inactive for the current runtime subset. |
+| HeatBalanceAlgorithm | 1 | Preserved for diagnostics or staging when inactive for the current runtime subset. |
+| Output:Diagnostics | 1 | Reporting requests can be exported or reported unsupported without changing simulation semantics. |
+| Output:Meter:MeterFileOnly | 3 | Reporting requests can be exported or reported unsupported without changing simulation semantics. |
+| Output:Table:SummaryReports | 1 | Reporting requests can be exported or reported unsupported without changing simulation semantics. |
+| Output:Variable | 55 | Reporting requests can be exported or reported unsupported without changing simulation semantics. |
+| OutputControl:Table:Style | 1 | Reporting requests can be exported or reported unsupported without changing simulation semantics. |
+| SimulationControl | 1 | Preserved for diagnostics or staging when inactive for the current runtime subset. |
+| SizingPeriod:DesignDay | 2 | Preserved for diagnostics or staging when inactive for the current runtime subset. |
+
+## Diagnostic Summary
+
+| severity | code | stage | blocking | message |
+| --- | --- | --- | --- | --- |
+| warning | UnsupportedObjectIgnored | support | false | Exterior:Lights is preserved in RawModel and ignored by partial rule inactive_or_unused_raw_objects |
+| warning | UnsupportedObjectIgnored | support | false | HeatBalanceAlgorithm is preserved in RawModel and ignored by partial rule inactive_or_unused_raw_objects |
+| warning | UnsupportedObjectIgnored | support | false | Output:Diagnostics is preserved in RawModel and ignored by partial rule ignored_reporting_objects |
+| warning | UnsupportedObjectIgnored | support | false | Output:Meter:MeterFileOnly is preserved in RawModel and ignored by partial rule ignored_reporting_objects |
+| warning | UnsupportedObjectIgnored | support | false | Output:Table:SummaryReports is preserved in RawModel and ignored by partial rule ignored_reporting_objects |
+| warning | UnsupportedObjectIgnored | support | false | Output:Variable is preserved in RawModel and ignored by partial rule ignored_reporting_objects |
+| warning | UnsupportedObjectIgnored | support | false | OutputControl:Table:Style is preserved in RawModel and ignored by partial rule ignored_reporting_objects |
+| warning | UnsupportedObjectIgnored | support | false | SimulationControl is preserved in RawModel and ignored by partial rule inactive_or_unused_raw_objects |
+| warning | UnsupportedObjectIgnored | support | false | SizingPeriod:DesignDay is preserved in RawModel and ignored by partial rule inactive_or_unused_raw_objects |
+| error | UnsupportedObject | support | true | ZoneAirHeatBalanceAlgorithm is outside the current arbitrary-run runtime subset |
+
+_4 more diagnostic(s) are available in support-assessment.json and diagnostics.json._

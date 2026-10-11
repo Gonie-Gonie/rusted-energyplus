@@ -1,0 +1,113 @@
+﻿# Optional persistent ordinary CTF history capture — Source proposal 01
+
+This is a held Source-only proposal. It has not been installed, formatted, built,
+run, compared, or used to change a gate. Canonical Rust/docs and Native inputs,
+policies, captures, binaries and results are untouched.
+
+## Scope and actual ownership
+
+The existing ordinary initializer produces the real public coefficients and
+persistent `CtfSurfaceLifecycle`. The existing ordinary timestep calls its begin
+and commit once at the existing locations. This proposal adds passive borrowed
+observations around those real operations; it does not replay Native prestate,
+initialize a second owner, compute coefficients, change solver operands, or add
+another simulation pipeline. Base's SUR04 arithmetic proposal is disjoint.
+
+Runtime changes are one new public capture module, its declaration, and additive
+hooks in `ctf_surface_lifecycle.rs`. The ep_run example owns JSON/streaming and
+uses the existing `run_arbitrary_idf` once with ordinary compatibility settings.
+No dependency is added. Runtime has no JSON adapter and no growing event ledger.
+
+## Exact boundaries
+
+| Rust event | Actual seam | Clock facts |
+| --- | --- | --- |
+| BeginEntry | Before begin-wrapper checks/stores | passed caller clock; independent actual timestep argument |
+| InitializationInput | After existing report reset, before selected Init | passed clock; current owner clock still absent |
+| InitializationReturned | After selected Init, before initialized/current/lagged stores | same passed clock; no accepted-current inference |
+| BeginReturned / BeginFailed | After real wrapper Result and sticky-error store | caller/current/last remain separate |
+| HistoryUpdateInput | After actual current temperature synchronization, before selected update | accepted current clock passed directly |
+| HistoryUpdateReturned | After actual selected update, before lagged copies | actual returned SimpleShift or MasterHistories route |
+| HistoryCommitBeforeClockRelease | After lagged copies and last-committed store | current clock still owned; last committed already updated |
+| CommitReturned / CommitFailed | After real wrapper Result and sticky-error store | saved actual commit clock; successful return has current absent |
+
+The independent begin timestep argument is present only at BeginEntry and its
+wrapper return/failure. Selected-function and commit events have null in that
+field; their actual caller clock retains its own hours/seconds. A missing clock,
+public owner, stale generation, consumer mismatch or failed history operation
+remains the real typed failure. A missing lifecycle emits no fabricated visit.
+
+## Stream contract and field map
+
+The example takes four positional arguments: input, weather, fresh run output
+directory, and a fresh NDJSON path. It preserves default ordinary calculation and
+output behavior; trace is Off, no hour override, no oracle/Native invocation.
+The stream file is create-new. Each record is one JSON line without a sample cap.
+Schemas are `ctf10-persistent-ordinary-history-stream.v1` (header/summary),
+`ctf10-persistent-ordinary-generation.v1`, and
+`ctf10-persistent-ordinary-history-event.v1`.
+
+Every event has boundary, rust_local_generation_id, caller_clock,
+begin_timestep_seconds_argument, outdoor_dry_bulb_c, owner, public,
+model_catalog, consumer_surfaces, selected_inputs, selected_context,
+update_route, error, and counted_as_PASS:false. Owner retains initialized,
+current_clock, last_committed_clock, first failure, full history, actual HT/opaque
+groups and separate AllHT order. Selected inputs/context are borrowed only at
+the real selected-function boundaries, never reconstructed at later events.
+
+History includes actual surface layout and all four normal arrays, every19 row
+and every column; optional masters with all four arrays and counter; optional
+five scratch arrays; update_first_time; and four report arrays. Rust allocation
+presence and full vector lengths are explicit. Native Objexx lower/upper bounds
+are unavailable here and are never invented. Temperature units are C, history
+and scratch flux W/m2, conduction reports W, flux reports W/m2, SumTime hours.
+Every f64 uses the existing literal scalar class/16-hex-bit serializer.
+
+Public rows retain construction/order/material associations, all12 fixed19
+arrays/counts/dt/U, aggregate, final flags and typed unavailable/stop facts.
+Model catalog retains all Zone/Space/surface/construction rows in actual input
+order and raw Rust IDs/names/layers/vertices/boundaries. Consumer rows retain
+current/lagged CTF storage, exact active coefficient views, constants, current
+surface/reference/convection inputs, actual five inside gain slots and stored
+heat_gain_to_zone_w. This is boundary custody, not a per-iteration SUR04 trace.
+
+The generation key remains a borrowed exact typed runtime owner. The example
+assigns a Rust-local ID only by actual key Eq, cloning once per distinct key in
+the observer. It emits genuine producer context and complete compiled source
+witnesses once per generation. It does not expose a guessed digest or assert
+Native key/ID equality. Clocks retain actual phase Warmup{day}/Run{day}, record
+index, begin flags, day/hour/substep, SimTimeSteps and hours/seconds bits.
+Native environment ID/name, KickOff and calendar fields are explicitly absent.
+
+## Optional sink and failure behavior
+
+Disabled capture returns before boxing a sink and constructs no observation,
+owner clone, JSON tree or event collection in the solver. Active callbacks borrow
+immutable owners synchronously. The callback must be passive/non-reentrant.
+Nested and unwinding guards restore the previous sink. A callback panic follows
+normal Rust unwind semantics; this is not claimed as a recoverable solver error.
+
+The example retains its first stream I/O error and counts later callbacks without
+writing/serializing more records. It never substitutes a solver Result. After
+the actual ordinary caller returns, observer failure returns a failing observer
+exit and preserves the partial file. Summary capture_complete describes I/O
+completion only; boundary reachability and numerical comparison remain false.
+Zero events, absent owners, missing footer, failed/unreturned calls and unmatched
+branches cannot establish coverage or PASS.
+
+## Proposed verification and future admission
+
+Four unexecuted tests use the genuine existing ordinary input fixture and actual
+initializer: captured vs uncaptured two distinct successful clocks/owners; real
+MissingCallerClock retention without commit; disabled sink and20002 uncapped
+failure events; nested/unwinding restoration. The fixture prefix, scalar helper
+and public-storage helper are literal accepted Source reuse with checked ranges.
+
+Root must review/install the exact mapping, inspect actual formatter deltas, run
+quality, capture full Cargo SourceSnapshot/artifact provenance and guard actual
+input/weather identities before any run. No future receipts or hashes are bound
+here. Pairing policy must be settled before outputs: exact named/associated
+surface identities and actual phase/day/hour/substep; duplicate shared keys are
+ambiguous failures, never ordinal/occurrence joins or normalized warmup phases.
+Native stage/scope/parent-return custody stays independent. Selected direct
+history parity does not certify this future persistent ordinary handoff.

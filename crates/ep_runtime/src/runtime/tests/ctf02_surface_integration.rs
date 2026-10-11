@@ -133,11 +133,12 @@ fn ctf02_generated_surface_owner_drives_inside_boundary_and_damping_operands()
         .ok_or_else(|| std::io::Error::other("ordinary surface owner absent"))?
         .clone();
     assert_eq!(surface.ctf.outside_history_w_per_m2_k.len(), 1);
+    surface.inside_additional_heat_source_w_per_m2 = 3.0;
     let input = CtfInsideFaceBalanceInput {
         reference_air_temperature_c: 21.0,
         inside_convection_coefficient_w_per_m2_k: 2.0,
         previous_inside_face_temperature_c: 19.0,
-        net_inside_source_w_per_m2: 3.0,
+        zone_timestep_seconds: 3600.0,
     };
     surface.outside_boundary_condition = OutsideBoundaryCondition::Outdoors;
     surface.outside_face_temperature_c = 5.0;
@@ -236,5 +237,94 @@ fn ctf02_generated_surface_owner_retains_report_signs_phase_and_history_commit()
         coefficients_before.inside_history_w_per_m2_k
     );
     assert_eq!(surface.ctf.flux_history, coefficients_before.flux_history);
+    Ok(())
+}
+
+// Authored IEEE counterexamples for the pinned Source expression, not Native answers.
+fn sur04_inside_expression_surface()
+-> Result<crate::heat_balance::state::SurfaceHeatBalanceState, Box<dyn std::error::Error>> {
+    let model = SimulationModel::from_typed(cube_model());
+    let state = initialize_heat_balance_state(&model, 20.0)?;
+    let mut surface = state
+        .surfaces
+        .first()
+        .ok_or_else(|| std::io::Error::other("ordinary surface owner absent"))?
+        .clone();
+    surface.outside_boundary_condition = OutsideBoundaryCondition::Outdoors;
+    surface.outside_face_temperature_c = 0.0;
+    surface.inside_face_temperature_c = 19.0;
+    surface.ctf.inside_0_w_per_m2_k = 2.0;
+    surface.ctf.cross_0_w_per_m2_k = 0.0;
+    surface.ctf.const_in_part_w_per_m2 = 5.0;
+    surface.inside_radiant_internal_gain_w_per_m2 = 0.0;
+    surface.inside_shortwave_absorbed_w_per_m2 = 0.0;
+    surface.inside_additional_heat_source_w_per_m2 = 0.0;
+    surface.inside_radiant_hvac_w_per_m2 = 0.0;
+    surface.inside_net_longwave_w_per_m2 = 0.0;
+    Ok(surface)
+}
+
+fn sur04_inside_expression_input() -> CtfInsideFaceBalanceInput {
+    CtfInsideFaceBalanceInput {
+        reference_air_temperature_c: 0.0,
+        inside_convection_coefficient_w_per_m2_k: 0.0,
+        previous_inside_face_temperature_c: 0.0,
+        zone_timestep_seconds: 3600.0,
+    }
+}
+
+#[test]
+fn sur04_inside_expression_multiplies_the_stored_reciprocal()
+-> Result<(), Box<dyn std::error::Error>> {
+    let surface = sur04_inside_expression_surface()?;
+    let result = energyplus_ctf_inside_face_temperature_c(&surface, sur04_inside_expression_input());
+    // 5 * binary64(1 / 7) is one ULP below binary64(5 / 7).
+    assert_eq!(result.to_bits(), 0x3fe6_db6d_b6db_6db6);
+    assert_ne!(result.to_bits(), (5.0_f64 / 7.0).to_bits());
+    Ok(())
+}
+
+#[test]
+fn sur04_inside_expression_keeps_gain_order_and_adds_net_longwave_after_temp_term()
+-> Result<(), Box<dyn std::error::Error>> {
+    let mut surface = sur04_inside_expression_surface()?;
+    surface.ctf.const_in_part_w_per_m2 = 9_007_199_254_740_992.0;
+    surface.inside_radiant_internal_gain_w_per_m2 = 1.0;
+    surface.inside_shortwave_absorbed_w_per_m2 = -9_007_199_254_740_992.0;
+    surface.inside_net_longwave_w_per_m2 = 1.0;
+    let input = sur04_inside_expression_input();
+    let result = energyplus_ctf_inside_face_temperature_c(&surface, input);
+    // (2^53 + 1) rounds before the shortwave cancellation; net LW remains active.
+    assert_eq!(result.to_bits(), 0x3fc2_4924_9249_2492);
+    surface.inside_net_longwave_w_per_m2 = 2.0;
+    let changed = energyplus_ctf_inside_face_temperature_c(&surface, input);
+    assert_eq!(changed.to_bits(), 0x3fd2_4924_9249_2492);
+    Ok(())
+}
+
+#[test]
+fn sur04_inside_expression_does_not_replace_a_zero_denominator_with_previous_temperature()
+-> Result<(), Box<dyn std::error::Error>> {
+    let mut surface = sur04_inside_expression_surface()?;
+    surface.ctf.inside_0_w_per_m2_k = -5.0;
+    let result = energyplus_ctf_inside_face_temperature_c(&surface, sur04_inside_expression_input());
+    assert!(result.is_infinite() && result.is_sign_positive());
+    assert_ne!(result.to_bits(), surface.inside_face_temperature_c.to_bits());
+    Ok(())
+}
+
+#[test]
+fn sur04_inside_expression_retains_the_zone_seconds_operand_even_with_no_afn()
+-> Result<(), Box<dyn std::error::Error>> {
+    let surface = sur04_inside_expression_surface()?;
+    let result = energyplus_ctf_inside_face_temperature_c(
+        &surface,
+        CtfInsideFaceBalanceInput {
+            zone_timestep_seconds: 0.0,
+            ..sur04_inside_expression_input()
+        },
+    );
+    // This authored invalid-clock boundary is outside ordinary admission; 0 / 0 stays NaN.
+    assert!(result.is_nan());
     Ok(())
 }

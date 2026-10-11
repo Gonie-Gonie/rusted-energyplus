@@ -1,0 +1,45 @@
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct RunOutcome {
+    /// Process exit-code contract selected by the pipeline.
+    pub exit_code: RunExitCode,
+    /// Output directory.
+    pub output_dir: PathBuf,
+    /// Run summary JSON path.
+    pub run_summary_path: PathBuf,
+    /// Support assessment status.
+    pub support_status: SupportStatus,
+    /// User-facing run result state.
+    pub run_result_state: RunResultState,
+    /// Optional message for CLI display.
+    pub message: String,
+}
+
+/// Error returned before a complete run summary can be written.
+#[derive(Debug)]
+pub struct RunError {
+    /// Process exit-code contract.
+    pub exit_code: RunExitCode,
+    /// Error message.
+    pub message: String,
+}
+
+impl RunError {
+    fn new(exit_code: RunExitCode, message: impl Into<String>) -> Self {
+        Self {
+            exit_code,
+            message: message.into(),
+        }
+    }
+}
+
+impl Display for RunError {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(formatter, "{}", self.message)
+    }
+}
+
+impl std::error::Error for RunError {}
+
+#[derive(Clone, Debug, PartialEq, Serialize)]
+struct PhaseTiming {
+    name: String,

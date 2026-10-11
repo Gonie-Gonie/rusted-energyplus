@@ -17,6 +17,24 @@
 
 파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.
 
+Selected Source pins for the inside expression: HBSM8674-8742 (cached flags and
+actual coefficient/outside/source/pool/reference-air inputs),8775-8802 (ordered
+TempTerm and reciprocal),8805-8820 (previous iteration and radiation update),
+8846-8858 (convection reevaluation),8913-8923 (final numerator times reciprocal).
+The exact whole/range SHA and byte sizes are retained in the reviewed SUR-04
+inside-consumer Source preparation; these pins do not certify Native parity.
+
+The input contract additionally retains actual zone timestep seconds (TimeStepZoneSec),
+read by the no-AFN zero-energy division. The five distinct real surface gain owners
+are internal radiant, shortwave absorbed, additional source, HVAC radiant and net LW;
+they must not be aggregated before the pinned expression order. The selected domain
+requires no pool, internal construction source, AFN or movable insulation, with the
+excluded-family flags/operands matching the declared positive-zero prerequisites.
+Those are Source-domain prerequisites only: actual flags, scalar classes/bits, finite
+active operands, timestep and call/owner associations require later retained evidence.
+Degenerate/nonfinite or unavailable inputs receive no numerical PASS. All four gates
+remain unconfirmed until their separately required actual evidence is complete.
+
 ## 재사용 후보
 
 heat_balance/ctf.rs; surface_balance.rs
@@ -68,3 +86,8 @@ SUR-05가 호출하는 반복 kernel로 연결
 증거 경로:  
 최대오차/RMSE/상태 불일치:  
 추가 검토할 helper:  
+
+## Applied Source and regression verification
+
+Actual Source `c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7` has3,915 files. fmt/Clippy passed; focused316 and workspace4,940 tests passed with zero failed/ignored. Four authored SUR04 IEEE regressions and four real-owner capture tests do not substitute for Native endpoints. Ordinary execution, complete persistent boundary comparison and pending dependency/gate certification remain open.
+Evidence: [summary](../evidence/CTF-10-ordinary-history-capture-source/summary.json) (`b88c5cebab7f153b402ae2320a043bcabd78426d5b0b3ed8669c6208f991a70c`).

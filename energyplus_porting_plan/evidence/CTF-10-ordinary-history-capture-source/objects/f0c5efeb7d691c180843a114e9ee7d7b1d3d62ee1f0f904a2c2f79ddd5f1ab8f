@@ -1,0 +1,38 @@
+{
+  "schema": "sur04-selected-input-source-card-supplement.v1",
+  "status": "SOURCE-READY-HELD-NOT-APPLIED",
+  "canonical_path": "energyplus_porting_plan/cards/SUR-04.md",
+  "actual_before": {
+    "path": "energyplus_porting_plan/cards/SUR-04.md",
+    "sha256": "2600037f7f93de77879788f5c69763a9d769d7dbafd366293c3aa7992b9becca",
+    "size_bytes": 2801,
+    "line_count": 70
+  },
+  "before_archive": {
+    "path": ".runtime/porting/SUR-04/scope-card-amendment-01/before.md",
+    "sha256": "2600037f7f93de77879788f5c69763a9d769d7dbafd366293c3aa7992b9becca",
+    "size_bytes": 2801,
+    "line_count": 70
+  },
+  "proposal": {
+    "path": ".runtime/porting/SUR-04/scope-card-amendment-01/proposed.md",
+    "sha256": "2b47e692e1e43008832060025cfad9ec75edf2ea055984429930b6048090039d",
+    "size_bytes": 4123,
+    "line_count": 88
+  },
+  "exact_diff": {
+    "path": ".runtime/porting/SUR-04/scope-card-amendment-01/exact.diff",
+    "sha256": "26966848fdccca072b9f8d054edf8eaa1dfa9cb0bdaa13c185e90e3c328c421a",
+    "size_bytes": 1910,
+    "line_count": 27
+  },
+  "reviewed_implementation_source_preparation": {
+    "path": ".runtime/porting/SUR-04/inside-consumer-prep-01/manifest.json",
+    "sha256": "bf62eaf5931251bc0f1888ae82d66de1872215688b2610cdf7861e853632f4ae",
+    "size_bytes": 18793,
+    "line_count": 494
+  },
+  "scope_expanded": false,
+  "gates_updated": false,
+  "actual_Native_eligibility_claimed": false
+}

@@ -1,0 +1,169 @@
+{
+  "schema": "ctf10-ordinary-history-scope-correction-source-preparation.v1",
+  "status": "held-source-only-not-applied",
+  "application": [
+    {
+      "canonical_path": "crates/ep_run/examples/ctf10_ordinary_history_observer.rs",
+      "actual_before": {
+        "path": "crates/ep_run/examples/ctf10_ordinary_history_observer.rs",
+        "sha256": "e4772462d2fbd994358819f62063f22278680fe78ca2748f8b94f845dc395cfd",
+        "size_bytes": 2403,
+        "line_count": 68
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-scope-correction-prep-01/ctf10_ordinary_history_observer.rs.before",
+        "sha256": "e4772462d2fbd994358819f62063f22278680fe78ca2748f8b94f845dc395cfd",
+        "size_bytes": 2403,
+        "line_count": 68
+      },
+      "proposal": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-scope-correction-prep-01/ctf10_ordinary_history_observer.rs",
+        "sha256": "63112155919fb89466cf161d0a6f567c62762ce1e26fce70d9813ac622e1c58d",
+        "size_bytes": 2438,
+        "line_count": 68
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-scope-correction-prep-01/ctf10_ordinary_history_observer.rs.diff",
+        "sha256": "f398a9e5be384395946704df50406d2b201d5ad00691052d6ab615855e1f5a7d",
+        "size_bytes": 986,
+        "line_count": 22
+      }
+    }
+  ],
+  "card_amendment": {
+    "canonical_path": "energyplus_porting_plan/cards/CTF-10.md",
+    "actual_before": {
+      "path": "energyplus_porting_plan/cards/CTF-10.md",
+      "sha256": "29bf2c6414cfd0dd8d72ddd15b3c759abe203bcff574bea29f86b3ae5d6786f3",
+      "size_bytes": 22268,
+      "line_count": 196
+    },
+    "before_archive": {
+      "path": ".runtime/porting/CTF-10/ordinary-history-scope-correction-prep-01/CTF-10.md.before",
+      "sha256": "29bf2c6414cfd0dd8d72ddd15b3c759abe203bcff574bea29f86b3ae5d6786f3",
+      "size_bytes": 22268,
+      "line_count": 196
+    },
+    "proposal": {
+      "path": ".runtime/porting/CTF-10/ordinary-history-scope-correction-prep-01/CTF-10.md",
+      "sha256": "ac9f333b4518dab29fb6d59eb9de9cf2f19a48fbd86cb9621be34af421a9707f",
+      "size_bytes": 22782,
+      "line_count": 198
+    },
+    "exact_diff": {
+      "path": ".runtime/porting/CTF-10/ordinary-history-scope-correction-prep-01/CTF-10.md.diff",
+      "sha256": "364ae31ceef4b5c97b81dd6631f8a492499dfbe028f0934da6f9e718fcd8a4aa",
+      "size_bytes": 2506,
+      "line_count": 17
+    }
+  },
+  "README": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-scope-correction-prep-01/README.md",
+    "sha256": "2203faa5e03fba6e3745dfe51766a24efdb8abf3de5f5a6a0bf814587d9ce5ed",
+    "size_bytes": 1046,
+    "line_count": 5
+  },
+  "accepted_exporter_preparation": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/manifest.json",
+    "sha256": "0754e521a9bbc6eac7a26aa96bc5865626343a9df011cce21a6e984c09ae879e",
+    "size_bytes": 13471,
+    "line_count": 306
+  },
+  "actual_original_application": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-capture-applied-01/record.json",
+    "sha256": "3501c1e1d70d75bd03f742f4e906fc52484e7807e8584614572068775ddda88f",
+    "size_bytes": 14745,
+    "line_count": 302
+  },
+  "authentic_prior_A_CLI_execution": {
+    "path": ".runtime/porting/CTF-10/ordinary-init-smoke-command-01/A-24H/receipt.json",
+    "sha256": "f25aa8ab6b0b320d887681d692c867213ed2dd9647831536046bd5fe230bf633",
+    "size_bytes": 5908,
+    "line_count": 82
+  },
+  "retained_failed_ordinary_execution": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-invocation-01/ordinary-execution-command/receipt.json",
+    "sha256": "a6b7bf9725890e5d9c0e1a7949faac7aca6c278237cbbf98461272898cf95446",
+    "size_bytes": 4908,
+    "line_count": 72
+  },
+  "read_actual_admission_metadata": [
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-history-invocation-01/ordinary-output/support-assessment.json",
+      "sha256": "c76e3be1589546feca215109df6089f51d872587754283b0bc6b35139ac0caa3",
+      "size_bytes": 13222,
+      "line_count": 418
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-history-invocation-01/ordinary-output/diagnostics.json",
+      "sha256": "b1e7f998e96fcc1c4f7bc4315238540bd72137b55e0dd0329d1758b48f4a4e7b",
+      "size_bytes": 6571,
+      "line_count": 214
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-history-invocation-01/ordinary-output/run-summary.json",
+      "sha256": "3414df60370764f12b3b527fe6b5d89283284eaa7c9608fef9fbcad160ae06d8",
+      "size_bytes": 7968,
+      "line_count": 135
+    }
+  ],
+  "Source_ranges": [
+    {
+      "source": {
+        "path": "crates/ep_run/src/pipeline.rs",
+        "sha256": "a12f7e5bec9dc1df72007568a84a2b8a149822ceff58d3974652e099e8a667b3",
+        "size_bytes": 822206,
+        "line_count": 14613
+      },
+      "first_line": 883,
+      "last_line": 895,
+      "archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-scope-correction-prep-01/pipeline.883-895.txt",
+        "sha256": "63c1284368134d29f4cc1de3c4c9c955403342a5afb201dd2fe7dca36c8e60b8",
+        "size_bytes": 548,
+        "line_count": 13
+      },
+      "purpose": "same ordinary public scoped entry"
+    },
+    {
+      "source": {
+        "path": "crates/ep_run/src/pipeline.rs",
+        "sha256": "a12f7e5bec9dc1df72007568a84a2b8a149822ceff58d3974652e099e8a667b3",
+        "size_bytes": 822206,
+        "line_count": 14613
+      },
+      "first_line": 1144,
+      "last_line": 1161,
+      "archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-scope-correction-prep-01/pipeline.1144-1161.txt",
+        "sha256": "c80069c77655bf07d62e57018dc62b18f84171a208e2363bd4e39993965d73c3",
+        "size_bytes": 669,
+        "line_count": 18
+      },
+      "purpose": "existing bounded coverage handling"
+    },
+    {
+      "source": {
+        "path": "crates/ep_run/src/porting_scope.rs",
+        "sha256": "66665f9026988f91a7455b0f18d8f32048572a46f8e8d8765e7d05263fcc7eeb",
+        "size_bytes": 17114,
+        "line_count": 458
+      },
+      "first_line": 159,
+      "last_line": 200,
+      "archive": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-scope-correction-prep-01/porting_scope.159-200.txt",
+        "sha256": "5469195b64908edf1a8c723f003277d04da3712451acc0608f7c1764f41ce3a7",
+        "size_bytes": 1336,
+        "line_count": 42
+      },
+      "purpose": "actual A object admission"
+    }
+  ],
+  "canonical_mutation": false,
+  "targets_executed": false,
+  "numeric_values_used": false,
+  "policy_changed": false,
+  "input_changed": false,
+  "solver_changed": false
+}

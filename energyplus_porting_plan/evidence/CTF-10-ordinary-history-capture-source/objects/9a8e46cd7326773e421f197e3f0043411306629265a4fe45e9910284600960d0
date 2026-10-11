@@ -1,0 +1,210 @@
+--- .runtime/porting/CTF-10/ordinary-history-capture-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs
++++ crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs
+@@ -3,7 +3,9 @@
+ //! This owner reuses the accepted construction/binding/history algorithms. It
+ //! does not supply Native observations, diagnostic overrides or a second solver.
+ 
+-use super::ctf_history_capture::{self as capture, CtfHistoryBoundary as Boundary, CtfHistoryObservation, CtfHistoryOwnerView};
++use super::ctf_history_capture::{
++    self as capture, CtfHistoryBoundary as Boundary, CtfHistoryObservation, CtfHistoryOwnerView,
++};
+ use super::ctf_public_initialization::OrderedCtfPublicInitialization;
+ use super::ctf_surface_binding::{
+     CtfSurfaceBindingUnavailable, CtfSurfaceGenerationContext, CtfSurfaceGenerationKey,
+@@ -214,8 +216,16 @@
+ }
+ 
+ // Borrow-only observation packs keep the private hook interface bounded.
+-type CaptureOwners<'a> = (&'a TypedModel, Option<&'a OrderedCtfPublicInitialization>, &'a [SurfaceHeatBalanceState]);
+-type CaptureSelected<'a> = (Option<&'a [CtfThermalHistorySurface<'a>]>, Option<CtfThermalHistoryContext<'a>>, Option<super::ctf_thermal_history::CtfThermalHistoryUpdateRoute>);
++type CaptureOwners<'a> = (
++    &'a TypedModel,
++    Option<&'a OrderedCtfPublicInitialization>,
++    &'a [SurfaceHeatBalanceState],
++);
++type CaptureSelected<'a> = (
++    Option<&'a [CtfThermalHistorySurface<'a>]>,
++    Option<CtfThermalHistoryContext<'a>>,
++    Option<super::ctf_thermal_history::CtfThermalHistoryUpdateRoute>,
++);
+ 
+ impl CtfSurfaceLifecycle {
+     pub(crate) fn allocate(
+@@ -284,24 +294,43 @@
+     }
+ 
+     fn observe<'a>(
+-        &'a self, boundary: Boundary,
++        &'a self,
++        boundary: Boundary,
+         (model, public, surfaces): CaptureOwners<'a>,
+-        (clock, begin_timestep_seconds_argument, outdoor): (Option<ProductionCtfHistoryClock>, Option<f64>, f64),
++        (clock, begin_timestep_seconds_argument, outdoor): (
++            Option<ProductionCtfHistoryClock>,
++            Option<f64>,
++            f64,
++        ),
+         (inputs, context, route): CaptureSelected<'a>,
+         error: Option<CtfSurfaceLifecycleUnavailable>,
+     ) {
+-        if !capture::is_active() { return; }
++        if !capture::is_active() {
++            return;
++        }
+         capture::record(CtfHistoryObservation {
+-            boundary, model, public, consumer_surfaces: surfaces, caller_clock: clock,
++            boundary,
++            model,
++            public,
++            consumer_surfaces: surfaces,
++            caller_clock: clock,
+             begin_timestep_seconds_argument,
+-            outdoor_dry_bulb_c: outdoor, selected_inputs: inputs, selected_context: context,
+-            update_route: route, error,
++            outdoor_dry_bulb_c: outdoor,
++            selected_inputs: inputs,
++            selected_context: context,
++            update_route: route,
++            error,
+             owner: CtfHistoryOwnerView {
+-                generation_key: &self.generation_key, generation_context: self.generation_context,
+-                history: &self.history, heat_transfer_groups: &self.heat_transfer_groups,
+-                opaque_groups: &self.opaque_groups, all_heat_transfer_surfaces: &self.all_heat_transfer_surfaces,
+-                initialized: self.initialized, current_clock: self.current_clock,
+-                last_committed_clock: self.last_committed_clock, failure: self.failure,
++                generation_key: &self.generation_key,
++                generation_context: self.generation_context,
++                history: &self.history,
++                heat_transfer_groups: &self.heat_transfer_groups,
++                opaque_groups: &self.opaque_groups,
++                all_heat_transfer_surfaces: &self.all_heat_transfer_surfaces,
++                initialized: self.initialized,
++                current_clock: self.current_clock,
++                last_committed_clock: self.last_committed_clock,
++                failure: self.failure,
+             },
+         });
+     }
+@@ -511,9 +540,21 @@
+             self.history.flux_reports.inside_flux.fill(0.0);
+             self.history.flux_reports.outside_flux.fill(0.0);
+             self.history.flux_reports.outside_conduction.fill(0.0);
+-            self.observe(Boundary::InitializationInput, (model, Some(public), surfaces), (Some(clock), None, outdoor), (Some(&inputs), Some(context), None), None);
++            self.observe(
++                Boundary::InitializationInput,
++                (model, Some(public), surfaces),
++                (Some(clock), None, outdoor),
++                (Some(&inputs), Some(context), None),
++                None,
++            );
+             initialize_selected_ctf_thermal_histories(&mut self.history, &inputs, context)?;
+-            self.observe(Boundary::InitializationReturned, (model, Some(public), surfaces), (Some(clock), None, outdoor), (Some(&inputs), Some(context), None), None);
++            self.observe(
++                Boundary::InitializationReturned,
++                (model, Some(public), surfaces),
++                (Some(clock), None, outdoor),
++                (Some(&inputs), Some(context), None),
++                None,
++            );
+             self.initialized = true;
+             for (index, &id) in self.history.surface_ids.iter().enumerate() {
+                 let surface = surfaces
+@@ -577,12 +618,30 @@
+             opaque_groups: &self.opaque_groups,
+             all_heat_transfer_surfaces: &self.all_heat_transfer_surfaces,
+         };
+-        self.observe(Boundary::HistoryUpdateInput, (model, Some(public), surfaces), (Some(clock), None, outdoor), (Some(&inputs), Some(context), None), None);
++        self.observe(
++            Boundary::HistoryUpdateInput,
++            (model, Some(public), surfaces),
++            (Some(clock), None, outdoor),
++            (Some(&inputs), Some(context), None),
++            None,
++        );
+         let route = update_selected_ctf_thermal_histories(&mut self.history, &inputs, context)?;
+-        self.observe(Boundary::HistoryUpdateReturned, (model, Some(public), surfaces), (Some(clock), None, outdoor), (Some(&inputs), Some(context), Some(route)), None);
++        self.observe(
++            Boundary::HistoryUpdateReturned,
++            (model, Some(public), surfaces),
++            (Some(clock), None, outdoor),
++            (Some(&inputs), Some(context), Some(route)),
++            None,
++        );
+         self.copy_lagged_views(surfaces)?;
+         self.last_committed_clock = Some(clock);
+-        self.observe(Boundary::HistoryCommitBeforeClockRelease, (model, Some(public), surfaces), (Some(clock), None, outdoor), (None, None, Some(route)), None);
++        self.observe(
++            Boundary::HistoryCommitBeforeClockRelease,
++            (model, Some(public), surfaces),
++            (Some(clock), None, outdoor),
++            (None, None, Some(route)),
++            None,
++        );
+         self.current_clock = None;
+         Ok(())
+     }
+@@ -613,7 +672,17 @@
+     let Some(lifecycle) = state.ctf_surface_lifecycle.as_mut() else {
+         return Ok(());
+     };
+-    lifecycle.observe(Boundary::BeginEntry, (model, state.construction_ctf10_public_initialization.as_ref(), &state.surfaces), (clock, Some(timestep_seconds), outdoor), (None, None, None), None);
++    lifecycle.observe(
++        Boundary::BeginEntry,
++        (
++            model,
++            state.construction_ctf10_public_initialization.as_ref(),
++            &state.surfaces,
++        ),
++        (clock, Some(timestep_seconds), outdoor),
++        (None, None, None),
++        None,
++    );
+     let result = match (&state.construction_ctf10_public_initialization, clock) {
+         (Some(public), Some(clock))
+             if clock.time_step_zone_seconds.to_bits() == timestep_seconds.to_bits() =>
+@@ -627,7 +696,21 @@
+     if let Err(error) = result {
+         lifecycle.failure.get_or_insert(error);
+     }
+-    lifecycle.observe(if result.is_ok() { Boundary::BeginReturned } else { Boundary::BeginFailed }, (model, state.construction_ctf10_public_initialization.as_ref(), &state.surfaces), (clock, Some(timestep_seconds), outdoor), (None, None, None), result.err());
++    lifecycle.observe(
++        if result.is_ok() {
++            Boundary::BeginReturned
++        } else {
++            Boundary::BeginFailed
++        },
++        (
++            model,
++            state.construction_ctf10_public_initialization.as_ref(),
++            &state.surfaces,
++        ),
++        (clock, Some(timestep_seconds), outdoor),
++        (None, None, None),
++        result.err(),
++    );
+     result
+ }
+ 
+@@ -647,7 +730,21 @@
+     if let Err(error) = result {
+         lifecycle.failure.get_or_insert(error);
+     }
+-    lifecycle.observe(if result.is_ok() { Boundary::CommitReturned } else { Boundary::CommitFailed }, (model, state.construction_ctf10_public_initialization.as_ref(), &state.surfaces), (clock, None, outdoor), (None, None, None), result.err());
++    lifecycle.observe(
++        if result.is_ok() {
++            Boundary::CommitReturned
++        } else {
++            Boundary::CommitFailed
++        },
++        (
++            model,
++            state.construction_ctf10_public_initialization.as_ref(),
++            &state.surfaces,
++        ),
++        (clock, None, outdoor),
++        (None, None, None),
++        result.err(),
++    );
+     result
+ }
+ 

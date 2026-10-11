@@ -1,0 +1,21 @@
+/// Runs an arbitrary IDF/epJSON through the Rust support gate and optional oracle comparison.
+pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
+    run_with_optional_porting_scope(config, None)
+}
+
+/// Runs the ordinary Rust pipeline with a strict, opt-in CON-01 input boundary.
+///
+/// Writes `porting_scope.json` before graph/runtime construction. Admission does
+/// not certify any physical calculation or promote conformance claims.
+pub fn run_bounded_porting(
+    config: &RunConfig,
+    scope: crate::PortingScope,
+) -> Result<RunOutcome, RunError> {
+    run_with_optional_porting_scope(config, Some(scope))
+}
+
+fn run_with_optional_porting_scope(
+    config: &RunConfig,
+    scope: Option<crate::PortingScope>,
+) -> Result<RunOutcome, RunError> {
+    let schedule_scope = scope

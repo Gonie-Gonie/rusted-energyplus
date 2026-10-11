@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-10\publish-ordinary-history-source-01.py", line 117, in <module>
+    assert inverse == before_plan
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

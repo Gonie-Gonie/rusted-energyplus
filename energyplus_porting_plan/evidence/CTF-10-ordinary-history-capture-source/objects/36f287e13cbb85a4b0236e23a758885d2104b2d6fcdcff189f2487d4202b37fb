@@ -1,0 +1,14 @@
+pub(super) fn public_storage(
+    source: &ep_runtime::heat_balance::surface_manager::ctf_public_storage::CtfPublicCoefficientStorage,
+) -> Value {
+    let values = |source: &[f64]| source.iter().copied().map(scalar).collect::<Vec<_>>();
+    json!({"CTFOutside":values(&source.outside),"CTFCross":values(&source.cross),
+        "CTFInside":values(&source.inside),"CTFFlux":values(&source.flux),
+        "CTFSourceIn":values(&source.source_in),"CTFSourceOut":values(&source.source_out),
+        "CTFTSourceOut":values(&source.temperature_source_out),"CTFTSourceIn":values(&source.temperature_source_in),
+        "CTFTSourceQ":values(&source.temperature_source_q),"CTFTUserOut":values(&source.temperature_user_out),
+        "CTFTUserIn":values(&source.temperature_user_in),"CTFTUserSource":values(&source.temperature_user_source),
+        "CTFTimeStep":scalar(source.ctf_time_step),"UValue":scalar(source.u_value),
+        "NumHistories":source.num_histories,"NumCTFTerms":source.num_ctf_terms,
+        "fixed_array_count":12,"actual_slots_per_array":source.outside.len(),
+        "coefficients_recomputed_by_observer":false,"counted_as_PASS":false})

@@ -1,0 +1,34 @@
+--- .runtime/porting/CTF-10/ordinary-history-stack-correction-prep-01/ctf10_ordinary_history_observer.rs.before
++++ crates/ep_run/examples/ctf10_ordinary_history_observer.rs
+@@ -58,11 +58,26 @@
+     Ok(code)
+ }
+ fn main() {
+-    match run() {
+-        Ok(code) => std::process::exit(code),
++    // Match the existing CLI worker stack; keep the sink and runtime on one thread.
++    let exit_code = match std::thread::Builder::new()
++        .name("ctf10-ordinary-history-observer".to_string())
++        .stack_size(8 * 1024 * 1024)
++        .spawn(|| match run() {
++            Ok(code) => code,
++            Err(error) => {
++                eprintln!("{error}");
++                2
++            }
++        })
++    {
++        Ok(worker) => match worker.join() {
++            Ok(code) => code,
++            Err(payload) => std::panic::resume_unwind(payload),
++        },
+         Err(error) => {
+-            eprintln!("{error}");
+-            std::process::exit(2);
++            eprintln!("failed to start ordinary history observer worker: {error}");
++            2
+         }
+-    }
++    };
++    std::process::exit(exit_code);
+ }

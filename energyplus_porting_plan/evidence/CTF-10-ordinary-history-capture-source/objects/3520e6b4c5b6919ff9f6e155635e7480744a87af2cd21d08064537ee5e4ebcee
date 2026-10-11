@@ -1,0 +1,20 @@
+fn main() {
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    // The source-order runtime retains large, value-shaped evidence aggregates. Run the CLI on a
+    // consistently sized stack instead of relying on the platform-specific main-thread default.
+    let exit_code = match std::thread::Builder::new()
+        .name("eplus-rs-cli".to_string())
+        .stack_size(CLI_RUNTIME_STACK_SIZE_BYTES)
+        .spawn(move || run(&args))
+    {
+        Ok(worker) => match worker.join() {
+            Ok(exit_code) => exit_code,
+            Err(payload) => std::panic::resume_unwind(payload),
+        },
+        Err(error) => {
+            eprintln!("failed to start eplus-rs CLI worker: {error}");
+            1
+        }
+    };
+    std::process::exit(exit_code);
+}

@@ -1,0 +1,118 @@
+{
+  "schema": "ctf10-ordinary-history-invocation-source-preparation.v1",
+  "status": "held-source-only-not-executed",
+  "writer": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-invocation-prep-01/write_request.py",
+    "sha256": "82bdee870278fb1ad64aeda2aad78a84b808fcaad58bb40477923ac8fff20f50",
+    "size_bytes": 11039,
+    "line_count": 183
+  },
+  "README": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-invocation-prep-01/README.md",
+    "sha256": "fecbd9dfbf5369f44e5938b5dd9fb68b6b69b695c1f523f27078c1bfdb629639",
+    "size_bytes": 2989,
+    "line_count": 44
+  },
+  "before": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-invocation-prep-01/write_request.before.py",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size_bytes": 0,
+    "line_count": 0
+  },
+  "exact_diff": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-invocation-prep-01/write_request.py.diff",
+    "sha256": "f7660c4994136c7911c3261728aaf57f4f521fa7e2ac3bdafcb3b9aca505a18f",
+    "size_bytes": 11521,
+    "line_count": 186
+  },
+  "exporter_source_preparation": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/manifest.json",
+    "sha256": "0754e521a9bbc6eac7a26aa96bc5865626343a9df011cce21a6e984c09ae879e",
+    "size_bytes": 13471,
+    "line_count": 306
+  },
+  "pairing_policy_preparation": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-pairing-policy-prep-02/manifest.json",
+    "sha256": "5e59c6e3e73d840e982f79fee676033919c353e3ce4b35295385349ea9b31031",
+    "size_bytes": 37520,
+    "line_count": 859
+  },
+  "read_Source_refs": [
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "size_bytes": 8453,
+      "line_count": 204
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-02/freeze-inputs.py",
+      "sha256": "37c3f6787f8860e3870b3bbc71b6a7eb3848a55b655962605981a818d953f63a",
+      "size_bytes": 2574,
+      "line_count": 25
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/review_data.py",
+      "sha256": "522fa42b31dcfe4b490b3779785bf1fef2cb953ca50aab21501ebf0838abb3f4",
+      "size_bytes": 24559,
+      "line_count": 320
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/proposed/crates/ep_run/examples/ctf10_ordinary_history_observer.rs",
+      "sha256": "4b1d56237abe73710f8d6964c767b041b200e6688eed2d3f0b01be10423a2e59",
+      "size_bytes": 2179,
+      "line_count": 40
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-history-capture-prep-01/proposed/crates/ep_run/examples/ctf10_ordinary_history_support/fields.rs",
+      "sha256": "3a57b948a26212bc4e02f81487ba3a1f48cba96dbffeec231f989e41c3813b49",
+      "size_bytes": 17235,
+      "line_count": 209
+    }
+  ],
+  "read_input_metadata_refs": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-frozen-inputs-01/freeze-receipt.json",
+      "sha256": "08c035ab7a675b3f7e715e20c599bf1488aa65bc3a189287ba68e5bb5a31239f",
+      "size_bytes": 20598,
+      "line_count": 577
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-freeze-command-01/receipt.json",
+      "sha256": "4eefd9a6280c54795473e7beee0e711f52c985b746a90ba0698a0df400b14a21",
+      "size_bytes": 3047,
+      "line_count": 72
+    },
+    {
+      "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+      "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb",
+      "size_bytes": 18360,
+      "line_count": 718
+    }
+  ],
+  "recorder_artifact_Source_range": {
+    "source": {
+      "path": "tools/porting/record_command.py",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "size_bytes": 8453,
+      "line_count": 204
+    },
+    "first_line": 118,
+    "last_line": 141,
+    "archive": {
+      "path": ".runtime/porting/CTF-10/ordinary-history-invocation-prep-01/record_command.118-141.py",
+      "sha256": "007e9436846dfcef9bd1a02e450e5dafb3c15735fb44a50d16942cbb0bed7e4f",
+      "size_bytes": 1236,
+      "line_count": 24
+    }
+  },
+  "runtime_interface": {
+    "schema": "ctf10-persistent-ordinary-history-invocation-request.v1",
+    "observer_argc_excluding_executable": 4,
+    "request_and_policy_frozen_by_actual_writer_recorder": true,
+    "actual_receipts_are_external_operands": true
+  },
+  "canonical_mutation": false,
+  "targets_executed": false,
+  "Native_or_Rust_scientific_outputs_read": false,
+  "numerical_PASS_claimed": false
+}

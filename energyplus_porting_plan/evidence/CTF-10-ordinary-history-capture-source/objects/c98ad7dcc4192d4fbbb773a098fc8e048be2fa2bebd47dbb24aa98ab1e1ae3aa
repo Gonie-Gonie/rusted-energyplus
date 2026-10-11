@@ -1,0 +1,31 @@
+pub struct Surface {
+    /// Typed ID.
+    pub id: SurfaceId,
+    /// Surface name.
+    pub name: NormalizedName,
+    /// Surface type.
+    pub surface_type: SurfaceType,
+    /// Resolved construction ID.
+    pub construction: ConstructionId,
+    /// Resolved zone ID.
+    pub zone: ZoneId,
+    /// Final Space assignment after the bounded `CreateMissingSpaces` pass.
+    pub space: SpaceId,
+    /// Outside boundary condition.
+    pub outside_boundary_condition: OutsideBoundaryCondition,
+    /// Optional outside boundary condition object name.
+    pub outside_boundary_condition_object: Option<NormalizedName>,
+    /// Sun exposure.
+    pub sun_exposure: SunExposure,
+    /// Wind exposure.
+    pub wind_exposure: WindExposure,
+    /// View factor to ground.
+    pub view_factor_to_ground: AutoOrNumber,
+    /// Surface vertices.
+    pub vertices: Vec<Point3>,
+    /// Bounded source-order computed geometry, when the surface is admitted.
+    ///
+    /// This derived attachment is not a typed input object and does not change
+    /// object identity, object counts, or model-graph edges.
+    pub computed_geometry: Option<SurfaceComputedGeometry>,
+}

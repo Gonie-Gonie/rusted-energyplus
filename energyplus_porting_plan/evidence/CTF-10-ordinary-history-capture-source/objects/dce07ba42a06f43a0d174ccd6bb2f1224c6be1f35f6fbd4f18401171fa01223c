@@ -1,0 +1,17 @@
+    if state.ctf_surface_lifecycle.is_some() {
+        finish_surface_histories(state)?;
+    }
+    state.last_inside_surface_iteration_count = interleaved_surface_zone_balance_result
+        .as_ref()
+        .map(|result| result.inside_surface_iteration_count)
+        .unwrap_or_else(|| surface_iteration_count.max(1));
+    state.last_inside_surface_iteration_max_delta_c = interleaved_surface_zone_balance_result
+        .as_ref()
+        .map(|result| result.max_inside_surface_delta_c)
+        .unwrap_or(f64::NAN);
+    state.last_inside_surface_iteration_max_delta_surface_name =
+        interleaved_surface_zone_balance_result
+            .as_ref()
+            .and_then(|result| result.max_delta_surface_name.clone());
+    state.timestep_index += 1;
+    Ok(predictor_output)

@@ -1,0 +1,168 @@
+{
+  "schema": "ctf10-ordinary-history-source-and-quality.v1",
+  "parent_git_commit": "fd592de75ab151a88cf35cd39171e452db2afe8f",
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/c3/c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7",
+    "sha256": "c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7"
+  },
+  "Source_file_count": 3915,
+  "source_reconstruction": "Parent Git source plus archived final changed files; raw path/hash snapshots and literal/formatter diffs retain both application steps.",
+  "changed_Rust_files": [
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "sha256": "7a288192f513fa19fdeb85692efadc3e546183607b5388ae2c2be7acd55bc25c",
+      "size_bytes": 32953
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_loop.rs",
+      "sha256": "098dd593cc2986cb4f3eb8e7f079282c02b291088805c6daa83bfabc07f8ca10",
+      "size_bytes": 20263
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests/part04.rs",
+      "sha256": "a7604fe5d9f99e761db26da060529da9c33a8daabcfd3a40df636ed55eb0a8e1",
+      "size_bytes": 33031
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests/ctf02_surface_integration.rs",
+      "sha256": "e9f894544d47291e5ec1497da6d3512fed02346fd1e5c80b37f2118904109211",
+      "size_bytes": 13423
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+      "sha256": "750b86766ca793afde19d547dfe597200230305468a2e78240f63f75d2de1de0",
+      "size_bytes": 31217
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "3c5a7c342486ec96928659a3bb980be06caf5bf111506541bc2ee9b4b9f7cc8d",
+      "size_bytes": 2186
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_history_capture.rs",
+      "sha256": "1f50e42f3d73c12b548b010914c51b4ac36309823b02f2498810ec8e2c952d27",
+      "size_bytes": 6098
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_history_capture_tests.rs",
+      "sha256": "0c7e31778507b5f5856e590cc702d96e6fa09f8bb3a2e11064672ddec408d95f",
+      "size_bytes": 7242
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_history_capture_fixture.rs",
+      "sha256": "5f3c59944b182b61942f238bc28c3b7be630e2ef4cbfd6b3f718da6d314fcf95",
+      "size_bytes": 4906
+    },
+    {
+      "path": "crates/ep_run/examples/ctf10_ordinary_history_observer.rs",
+      "sha256": "e4772462d2fbd994358819f62063f22278680fe78ca2748f8b94f845dc395cfd",
+      "size_bytes": 2403
+    },
+    {
+      "path": "crates/ep_run/examples/ctf10_ordinary_history_support/fields.rs",
+      "sha256": "220517f7882df69ac7df9d0c79c0f2cb35ac8bb34ae7e361b11ffffae95aafed",
+      "size_bytes": 17622
+    }
+  ],
+  "SUR04_actual_application": {
+    "path": ".runtime/porting/SUR-04/inside-consumer-applied-01/record.json",
+    "sha256": "5b555a3e334e02593950314058390b8d0deacecf4869b0cc813cf60babb79f98",
+    "size_bytes": 10268
+  },
+  "persistent_capture_actual_application": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-capture-applied-01/record.json",
+    "sha256": "3501c1e1d70d75bd03f742f4e906fc52484e7807e8584614572068775ddda88f",
+    "size_bytes": 14745
+  },
+  "actual_quality": {
+    "schema": "ctf10-ordinary-history-actual-quality.v1",
+    "actual_commands": [
+      {
+        "role": "fmt-check",
+        "execution": {
+          "path": ".runtime/porting/CTF-10/ordinary-history-quality-01/fmt-check-command/receipt.json",
+          "sha256": "cf2630dab363c4d1325927af2708ed473f6eb7539a7ca761eeb323fb421e9c3b"
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/c3/c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7",
+          "sha256": "c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7"
+        },
+        "test_totals": [
+          0,
+          0,
+          0
+        ],
+        "test_result_groups": 0
+      },
+      {
+        "role": "clippy",
+        "execution": {
+          "path": ".runtime/porting/CTF-10/ordinary-history-quality-01/clippy-command/receipt.json",
+          "sha256": "8cc69d170c2d4c3c857fdf98b0b4080fcb04bfdeba05f88aea84cbf62a9e0e67"
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/c3/c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7",
+          "sha256": "c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7"
+        },
+        "test_totals": [
+          0,
+          0,
+          0
+        ],
+        "test_result_groups": 0
+      },
+      {
+        "role": "focused",
+        "execution": {
+          "path": ".runtime/porting/CTF-10/ordinary-history-quality-01/focused-command/receipt.json",
+          "sha256": "109785553f75195c5c7afe2c1d1b7582e68f99f8bb6999c89bafc3725018953b"
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/c3/c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7",
+          "sha256": "c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7"
+        },
+        "test_totals": [
+          316,
+          0,
+          0
+        ],
+        "test_result_groups": 1
+      },
+      {
+        "role": "workspace",
+        "execution": {
+          "path": ".runtime/porting/CTF-10/ordinary-history-quality-01/workspace-command/receipt.json",
+          "sha256": "0351bed24130b7b83beefb2a8049ac6f9e2c65c65eced3e3a374cee71ee25c98"
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/c3/c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7",
+          "sha256": "c3151a006de7251964fdfe2c203f6563a88dd71b992310aac0d2602a340e30e7"
+        },
+        "test_totals": [
+          4940,
+          0,
+          0
+        ],
+        "test_result_groups": 21
+      }
+    ],
+    "numerical_comparison_performed": false,
+    "gates_updated": false
+  },
+  "actual_Cargo_build": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-build-command-01/receipt.json",
+    "sha256": "768445653c4e09c7620c6432c68bcca5ca7d16663239a75319ec8e8ebf8fbd5c",
+    "size_bytes": 6059
+  },
+  "archive_manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-ordinary-history-capture-source/manifest.json",
+    "sha256": "49486c285f904b890900d42c4aa1f7f9905d00875303b9b27c0e2c86c7bdcc30",
+    "size_bytes": 100708
+  },
+  "source_changes": "Source-ordered SUR04 inside terms/reciprocal and genuine borrowed persistent lifecycle capture; unchanged ordinary solver/call/commit ordering.",
+  "test_scope": "Four authored IEEE expression regressions and four capture/lifecycle tests; these are not Native reference endpoints.",
+  "numerical_comparison_performed_on_this_Source": false,
+  "ordinary_capture_or_reachability_certified": false,
+  "card_gates_updated": false,
+  "remaining": "Actual ordinary capture, complete available Native/Rust boundary pairing and outstanding card dependencies/gates."
+}

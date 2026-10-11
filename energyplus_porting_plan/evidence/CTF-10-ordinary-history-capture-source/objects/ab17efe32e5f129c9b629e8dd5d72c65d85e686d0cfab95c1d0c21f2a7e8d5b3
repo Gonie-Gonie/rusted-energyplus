@@ -1,0 +1,139 @@
+--- .runtime/porting/CTF-10/ordinary-history-capture-prep-01/proposed/crates/ep_run/examples/ctf10_ordinary_history_support/fields.rs
++++ crates/ep_run/examples/ctf10_ordinary_history_support/fields.rs
+@@ -1,7 +1,11 @@
+ //! Full actual borrowed-owner serialization; no selected math or expected state.
+ use ep_runtime::heat_balance::ctf_history_capture::CtfHistoryObservation;
+-use ep_runtime::heat_balance::ctf_surface_binding::{CtfSurfaceGenerationContext, CtfSurfaceGenerationKey, CtfSurfaceProducerRevision};
+-use ep_runtime::heat_balance::ctf_thermal_history::{CtfThermalHistoryArrays, CtfThermalHistoryContext, CtfThermalHistoryState};
++use ep_runtime::heat_balance::ctf_surface_binding::{
++    CtfSurfaceGenerationContext, CtfSurfaceGenerationKey, CtfSurfaceProducerRevision,
++};
++use ep_runtime::heat_balance::ctf_thermal_history::{
++    CtfThermalHistoryArrays, CtfThermalHistoryContext, CtfThermalHistoryState,
++};
+ use ep_runtime::weather::day::{ProductionCtfHistoryClock, WeatherDayPhase};
+ use serde_json::{Value, json};
+ use std::io::{self, Write};
+@@ -51,7 +55,7 @@
+     json!({"owner_present":true,"rust_vector_length":values.len(),
+         "values":values.iter().copied().map(scalar).collect::<Vec<_>>()})
+ }
+-fn matrix(values: &[Vec<f64>;19]) -> Value {
++fn matrix(values: &[Vec<f64>; 19]) -> Value {
+     json!({"owner_present":true,"term_rows":values.len(),"row_index_domain":"Rust zero-based; row0 is selected history term1",
+         "rows":values.iter().enumerate().map(|(index,row)|json!({"rust_row_index":index,"vector":vector(row)})).collect::<Vec<_>>()})
+ }
+@@ -85,8 +89,12 @@
+ }
+ fn generation_context(value: CtfSurfaceGenerationContext) -> Value {
+     let revision = match value.producer_revision {
+-        CtfSurfaceProducerRevision::Explicit(bytes) => json!({"kind":"Explicit","identity_bytes":bytes}),
+-        CtfSurfaceProducerRevision::Compiled(sources) => json!({"kind":"Compiled","actual_source_witnesses":sources.iter().map(|(name,text)|json!({"name":name,"compiled_source":text})).collect::<Vec<_>>()}),
++        CtfSurfaceProducerRevision::Explicit(bytes) => {
++            json!({"kind":"Explicit","identity_bytes":bytes})
++        }
++        CtfSurfaceProducerRevision::Compiled(sources) => {
++            json!({"kind":"Compiled","actual_source_witnesses":sources.iter().map(|(name,text)|json!({"name":name,"compiled_source":text})).collect::<Vec<_>>()})
++        }
+     };
+     json!({"producer_revision":revision,"time_step_zone_hours":scalar(value.time_step_zone_hours),
+         "initial_flags":{"errors_found":value.initial_flags.errors_found,"do_ctf_error_report":value.initial_flags.do_ctf_error_report},
+@@ -94,7 +102,12 @@
+         "any_ems_in_model":value.any_ems_in_model,"any_construction_overrides":value.any_construction_overrides})
+ }
+ fn groups(values: &[Vec<ep_model::SurfaceId>]) -> Value {
+-    json!(values.iter().map(|v|v.iter().map(|id|id.0).collect::<Vec<_>>()).collect::<Vec<_>>())
++    json!(
++        values
++            .iter()
++            .map(|v| v.iter().map(|id| id.0).collect::<Vec<_>>())
++            .collect::<Vec<_>>()
++    )
+ }
+ fn context(value: CtfThermalHistoryContext<'_>) -> Value {
+     json!({"simple_ctf_only":value.simple_ctf_only,"any_ems_in_model":value.any_ems_in_model,
+@@ -114,7 +127,9 @@
+         "constructions":model.constructions.iter().map(|v|json!({"id":v.id.0,"name":v.name.0,"kind":format!("{:?}",v.kind),
+             "outside_layer":v.outside_layer.map(|id|id.0),"layers":v.layers.iter().map(|id|id.0).collect::<Vec<_>>()})).collect::<Vec<_>>()})
+ }
+-fn public(owner: &ep_runtime::heat_balance::ctf_public_initialization::OrderedCtfPublicInitialization) -> Value {
++fn public(
++    owner: &ep_runtime::heat_balance::ctf_public_initialization::OrderedCtfPublicInitialization,
++) -> Value {
+     json!({"constructions":owner.constructions.iter().map(|v|json!({"construction_id":v.construction_id.0,"declared_index":v.declared_index,
+         "original_material_ids":v.original_material_ids.iter().map(|id|id.0).collect::<Vec<_>>(),"is_used_ctf":v.is_used_ctf,
+         "public_initializer_invoked":v.public_initializer_invoked,"storage":v.result.as_ref().ok().map(|returned|public_storage(&returned.storage)),
+@@ -155,22 +170,39 @@
+ }
+ impl<W: Write> Stream<W> {
+     pub(super) fn new(writer: W) -> Self {
+-        let mut value = Self { writer, keys:Vec::new(), observed:0, written:0, error:None };
++        let mut value = Self {
++            writer,
++            keys: Vec::new(),
++            observed: 0,
++            written: 0,
++            error: None,
++        };
+         value.write(&json!({"schema":"ctf10-persistent-ordinary-history-stream.v1","record_type":"header",
+             "Native_fields_unavailable":["environment_id","environment_name","KickOffSimulation","calendar_year","calendar_month","calendar_day"],
+             "expected_endpoints_read":false,"Native_prestate_replayed":false,"all_instrumented_lifecycle_visits_without_caps_or_filters":true,"absent_lifecycle_is_not_observed_or_assumed_reached":true,"counted_as_PASS":false}));
+         value
+     }
+     fn write(&mut self, value: &Value) {
+-        if self.error.is_some() { return; }
+-        let result = serde_json::to_writer(&mut self.writer, value).map_err(io::Error::other)
++        if self.error.is_some() {
++            return;
++        }
++        let result = serde_json::to_writer(&mut self.writer, value)
++            .map_err(io::Error::other)
+             .and_then(|()| self.writer.write_all(b"\n"));
+-        if let Err(error) = result { self.error = Some(error); }
++        if let Err(error) = result {
++            self.error = Some(error);
++        }
+     }
+     pub(super) fn record(&mut self, event: CtfHistoryObservation<'_>) {
+         self.observed += 1;
+-        if self.error.is_some() { return; }
+-        let generation = match self.keys.iter().position(|key| key == event.owner.generation_key) {
++        if self.error.is_some() {
++            return;
++        }
++        let generation = match self
++            .keys
++            .iter()
++            .position(|key| key == event.owner.generation_key)
++        {
+             Some(index) => index + 1,
+             None => {
+                 self.keys.push(event.owner.generation_key.clone());
+@@ -195,15 +227,23 @@
+                 "outside_boundary":format!("{:?}",v.outside_boundary),"outside_dry_bulb":scalar(v.outside_dry_bulb),"area":scalar(v.area),
+                 "inside_surface_temperature":scalar(v.inside_surface_temperature),"inside_constant":scalar(v.inside_constant),"outside_constant":scalar(v.outside_constant)})).collect::<Vec<_>>()),
+             "selected_context":event.selected_context.map(context),"update_route":event.update_route.map(|v|format!("{v:?}")),"error":event.error.map(|v|format!("{v:?}")),"counted_as_PASS":false}));
+-        if self.error.is_none() { self.written += 1; }
+-    }
+-    pub(super) fn finish(&mut self, actual_runtime_exit_code: i32, actual_message: &str) -> io::Result<()> {
++        if self.error.is_none() {
++            self.written += 1;
++        }
++    }
++    pub(super) fn finish(
++        &mut self,
++        actual_runtime_exit_code: i32,
++        actual_message: &str,
++    ) -> io::Result<()> {
+         self.write(&json!({"schema":"ctf10-persistent-ordinary-history-stream.v1","record_type":"summary",
+             "actual_runtime_exit_code":actual_runtime_exit_code,"actual_runtime_message":actual_message,
+             "actual_observed_event_count":self.observed,"actual_written_event_count":self.written,
+             "actual_Rust_generation_count":self.keys.len(),"capture_complete":self.error.is_none() && self.observed==self.written,
+             "boundary_reachability_verified":false,"numerical_comparison_performed":false,"integration_PASS_claimed":false,"counted_as_PASS":false}));
+-        if let Some(error) = self.error.take() { return Err(error); }
++        if let Some(error) = self.error.take() {
++            return Err(error);
++        }
+         self.writer.flush()
+     }
+ }
