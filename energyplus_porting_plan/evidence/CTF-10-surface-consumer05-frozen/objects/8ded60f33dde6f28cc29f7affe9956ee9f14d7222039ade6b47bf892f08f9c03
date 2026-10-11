@@ -1,0 +1,18 @@
+# Consumer05 direct freezer02: exact policy bytes
+
+This source-only successor changes only two writer lines. It parses the held
+policy for the same schema guard, writes the actual Source bytes unchanged,
+and verifies the output SHA/size against the scope Source ref. The fixed policy
+values, all runtime paths, Source refs, guards, schemas and factual criteria
+are unchanged. No target, canonical, Git, recorder or reviewed import was run.
+
+Scope remains the exact immutable workflow01 prepare-scope.py. Policy remains
+the exact immutable workflow01 thermal-history-unit-policy.json. The fresh
+writer02 is invoked directly by Root under the actual recorder; QA05 receives
+its actual path#SHA through --literal-freeze-writer. Both scope and freeze retain
+the same thermal_history_direct_unit_policy_source; the emitted freeze policy
+now has identical SHA/size to that Source, with its distinct actual output path.
+
+01 remains authentic and unexecuted. Root FULL and Raw narrow Source peer must
+precede any actual scope/freeze action. No future receipt, snapshot, outcome or
+branch count is supplied.

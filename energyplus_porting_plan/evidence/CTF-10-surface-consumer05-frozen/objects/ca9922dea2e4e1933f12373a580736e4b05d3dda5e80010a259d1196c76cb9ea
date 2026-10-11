@@ -11858,46 +11858,6 @@
         "path": "energyplus_porting_plan/evidence/CTF-10-surface-consumer-original-baseline/summary.json",
         "sha256": "d6b6a51df4bad9d38a0345b03e8387b099a979e6d3dd70fde84899d8b6f443cb",
         "size_bytes": 12957
-      },
-      "prospective_ordinary_surface_history_boundary_capture": {
-        "native_source_manifest": {
-          "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/manifest.json",
-          "sha256": "8eac3eb0ec2a28c91db06e5c9d02ab0611090b68095183569df58b8198a8a94c",
-          "size_bytes": 31280
-        },
-        "reviewed_Source_preparations": {
-          "native": {
-            "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/manifest.json",
-            "sha256": "8eac3eb0ec2a28c91db06e5c9d02ab0611090b68095183569df58b8198a8a94c",
-            "size_bytes": 31280
-          },
-          "build": {
-            "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/manifest.json",
-            "sha256": "b845f22a1ac9cac06b39d1a884a00dff7500b5cfc9e5b7431834a288691f61e1",
-            "size_bytes": 26578
-          },
-          "PE": {
-            "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-review-prep-02/manifest.json",
-            "sha256": "029f2cffd8dfdcb8776723eff7fa858e2b7157accc9ab45b7e50fa0b0ff24bb0",
-            "size_bytes": 6393
-          },
-          "OriginalQA": {
-            "path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/manifest.json",
-            "sha256": "a27641042054dea917f17cbbf2f710e765496cfd7f3445f81bfcd35498b2a1a0",
-            "size_bytes": 48595
-          }
-        },
-        "selected_case_id": "A-24H",
-        "thermal_history_direct_unit_policy_source": {
-          "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/thermal-history-unit-policy.json",
-          "sha256": "e26264adfab95edc104b29f8ac0d9259192b6a5e4e32963505f1dd93eb6cfd9d",
-          "size_bytes": 3961
-        },
-        "scope": "Output-only consumer05 augmentation of the ordinary full engine: actual selected history initialization input/completion and master-update completion, full allocated history/scratch/report context at those sites and simple completion, and current first-referenced Construction catalog. All existing51 sites remain; no branch is forced or inferred.",
-        "observation_max_bytes": 4294967296,
-        "actual_capture_available": false,
-        "thermal_history_Rust_arithmetic_applied": false,
-        "full_card_gates_updated": false
       }
     },
     {

@@ -1,0 +1,19 @@
+--- .runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/before-01/run-native-build.py
++++ .runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/run-native-build.py
+@@ -61,12 +61,15 @@
+          'surface_consumer_observer.cc', 'surface_consumer_observer.hh', 'surface_consumer_reference.cmake', 'source-context.json']
+ for name in names: exact_file(own[name]); assert contained(own[name]['path']) == source / name
+ _, context = bound_ref(own['source-context.json'])
+-context_refs = {row['path']: row for row in context['sources']}
++assert context['schema'] == 'ctf10-surface-consumer05-source-context.v1'
++context_refs = {row['path']: row for row in context['direct_sources']}
+ originals = ['.reference/energyplus-src/26.1.0/src/EnergyPlus/api/EnergyPlusPgm.cc',
+              '.reference/energyplus-src/26.1.0/src/EnergyPlus/CommandLineInterface.cc']
+ for name in originals: exact_file(context_refs[name])
+ compiled_sources = [own[name] for name in names[:3]] + [context_refs[name] for name in originals]
+ native_sources = compiled_sources + [own[name] for name in names[3:5]]
++assert len(compiled_sources) == 5 and compiled_sources == native['compiled_source_files']
++assert len(native_sources) == 7 and native_sources == native['native_source_files']
+ recipe = source / 'surface_consumer_reference.cmake'
+ old_recipe = contained('.runtime/porting/CTF-10/native-helper-prep-01/ctf10_reference.cmake')
+ assert recipe.read_bytes().startswith(old_recipe.read_bytes())

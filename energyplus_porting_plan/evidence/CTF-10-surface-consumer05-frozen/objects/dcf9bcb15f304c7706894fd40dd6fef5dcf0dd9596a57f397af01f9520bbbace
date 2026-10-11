@@ -1,0 +1,154 @@
+--- .runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/before/event_shape.py
++++ .runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/event_shape.py
+@@ -47,7 +47,7 @@
+             name, kind = match.groups()
+             need(kind in COPIES and name not in result, "Unique actual source checkpoint required")
+             result[name] = COPIES.index(kind)
+-    need(len(result) == 45, "Held source checkpoint inventory differs")
++    need(len(result) == 48, "Held source checkpoint inventory differs")
+     return result
+ 
+ 
+@@ -60,6 +60,8 @@
+         self.stack, self.catalog, self.state_address = [], None, None
+         self.entry_contexts, self.unallocated_owners, self.null_scalar_copies = 0, 0, 0
+         self.entry_allocations = {}
++        self.boundary_contexts, self.current_catalogs = 0, 0
++        self.history_stages, self.history_branches = {}, {"simple": 0, "master": 0}
+ 
+     def integer(self, value, minimum=None):
+         self.need(type(value) is int and (minimum is None or value >= minimum), "Actual typed integer required")
+@@ -133,14 +135,15 @@
+             else:
+                 scalar(row[key], n)
+ 
+-    def catalog_copy(self, value):
++    def catalog_copy(self, value, current=False):
+         n = self.need
+         n(type(value) is dict and set(value) == {"surfaces", "constructions", "zones", "spaces", "AllHTSurfaceList"},
+           "Complete actual identity catalog required")
+         for family in ["surfaces", "constructions", "zones", "spaces"]:
+             n(type(value[family]) is list, "Actual catalog array required")
+             for index, row in enumerate(value[family], 1):
+-                n(type(row) is dict and row["index"] == index and type(row["Name"]) is str,
++                n(type(row) is dict and type(row["index"]) is int and row["index"] >= 1 and
++                  (current and family == "constructions" or row["index"] == index) and type(row["Name"]) is str,
+                   "Actual declared catalog identity/order differs")
+         surfaces, constructions = value["surfaces"], value["constructions"]
+         for row in surfaces:
+@@ -163,10 +166,19 @@
+                     scalar(item, n)
+         ht = value["AllHTSurfaceList"]
+         n(type(ht) is list and len(ht) == len(set(ht)), "Actual complete AllHT order required")
++        construction_ids = [row["index"] for row in constructions]
++        n(len(construction_ids) == len(set(construction_ids)), "Unique actual Construction IDs required")
++        referenced = []
+         for index in ht:
+             self.integer(index, 1)
+-            n(index <= len(surfaces) and 1 <= surfaces[index - 1]["Construction"] <= len(constructions),
++            n(index <= len(surfaces) and surfaces[index - 1]["Construction"] in construction_ids,
+               "Actual HT surface/construction association differs")
++            owner = surfaces[index - 1]["Construction"]
++            if owner not in referenced:
++                referenced.append(owner)
++        if current:
++            n(construction_ids == referenced, "Actual first referenced Construction encounter order differs")
++            self.current_catalogs += 1
+         for row in value["zones"]:
+             n(type(row["spaceIndexes"]) is list, "Actual Zone-space order required")
+             for index in row["spaceIndexes"]:
+@@ -228,6 +240,48 @@
+             rows.append({"allocation": allocation, "actual_entry_count": 1})
+         self.entry_contexts += 1
+ 
++    def boundary_context(self, context, owners, checkpoint, clock):
++        n = self.need
++        n(type(context) is dict and set(context) == {"protocol", "TotSurfaces", "NumOfZones", "Surface_allocated",
++          "AllHTSurfaceList", "allocated_surfaces", "non_AllHT_history_owners", "SurfCurrNumHist", "scratch", "flux_reports", "surface_operands"},
++          "Complete actual boundary context fields required")
++        self.entry_context(context, owners, checkpoint, clock)
++        counters = context["SurfCurrNumHist"]
++        values = {row["index"]: row["value"] for row in counters["values"]} if counters["allocated"] else {}
++        for row in owners + context["non_AllHT_history_owners"]:
++            n(row["SurfCurrNumHist"] == values.get(row["surface_index"]), "Independent same-owner counter copies differ")
++        self.boundary_contexts += 1
++
++    def history_boundary(self, checkpoint, procedure, invocation):
++        n = self.need
++        key = (procedure, invocation)
++        previous = self.history_stages.get(key)
++        if checkpoint == "history_initialization_entry_owners":
++            n(procedure == "InitThermalAndFluxHistories" and previous is None, "Actual initialization entry association differs")
++            self.history_stages[key] = "entry"
++        elif checkpoint == "history_selected_initialization_input":
++            n(procedure == "InitThermalAndFluxHistories" and previous == "entry", "Actual initialization input order differs")
++            self.history_stages[key] = "input"
++        elif checkpoint == "history_selected_initialization_complete":
++            n(procedure == "InitThermalAndFluxHistories" and previous == "input", "Actual selected initialization completion order differs")
++            self.history_stages[key] = "selected-complete"
++        elif checkpoint == "history_initialization_final_owners":
++            n(procedure == "InitThermalAndFluxHistories" and previous == "selected-complete", "Actual final initialization owner order differs")
++            self.history_stages[key] = "final"
++        elif checkpoint == "history_update_entry_owners":
++            n(procedure == "UpdateThermalHistories" and previous is None, "Actual update entry association differs")
++            self.history_stages[key] = "entry"
++        elif checkpoint in ["simple_history_hard_copy_complete", "history_selected_master_update_complete"]:
++            n(procedure == "UpdateThermalHistories" and previous == "entry", "Actual exclusive reached update boundary/order differs")
++            branch = "simple" if checkpoint == "simple_history_hard_copy_complete" else "master"
++            self.history_stages[key] = branch
++            self.history_branches[branch] += 1
++        elif checkpoint == "scope_normal_exit" and procedure in ["InitThermalAndFluxHistories", "UpdateThermalHistories"]:
++            n(previous == "final" if procedure == "InitThermalAndFluxHistories" else previous in ["simple", "master"],
++              "Actual normal return lacks its retained history boundary")
++        if checkpoint in ["scope_normal_exit", "scope_unwinding"]:
++            self.history_stages.pop(key, None)
++
+     def visit(self, event):
+         n = self.need
+         self.integer(event["event_ordinal"], 1)
+@@ -268,6 +322,10 @@
+         for key, value in event["locals"].items():
+             n(type(key) is str, "Actual local name required")
+             self.integer(value) if type(value) is int else scalar(value, n)
++        current = checkpoint in ["history_selected_initialization_input", "history_update_entry_owners"]
++        n(("current_history_catalog" in event) == current, "Actual current catalog availability differs")
++        if current:
++            self.catalog_copy(event["current_history_catalog"], current=True)
+         owners = event["owners"]
+         if kind == 0:
+             n(owners is None, "No-copy source event must retain null owner")
+@@ -287,6 +345,13 @@
+         if entry:
+             n(type(owners) is list, "Actual full history entry rows required")
+             self.entry_context(event["history_entry_context"], owners, checkpoint, clock)
++        boundary = checkpoint in ["history_selected_initialization_input", "history_selected_initialization_complete",
++                                  "history_selected_master_update_complete", "simple_history_hard_copy_complete"]
++        n(("history_boundary_context" in event) == boundary, "Actual boundary-context availability differs")
++        if boundary:
++            n(type(owners) is list, "Actual full boundary history rows required")
++            self.boundary_context(event["history_boundary_context"], owners, checkpoint, clock)
++        self.history_boundary(checkpoint, procedure, invocation)
+         if checkpoint in ["scope_normal_exit", "scope_unwinding"]:
+             self.stack.pop()
+ 
+@@ -324,13 +389,18 @@
+               "Actual complete procedure/scope/ordinal ledger differs")
+         required = ["actual_surface_allocation_return", "history_initialization_entry_owners",
+                     "history_initialization_final_owners", "history_update_entry_owners",
++                    "history_selected_initialization_input", "history_selected_initialization_complete",
+                     "actual_InitThermalAndFluxHistories_return", "actual_UpdateThermalHistories_return",
+                     "actual_ReportSurfaceHeatBalance_return"]
+         available = all(self.checkpoint_counts.get(key, 0) > 0 for key in required) and all(calls)
+         return {"actual_retained_events": self.events, "actual_attempted_events": summary["attempted_events"],
+                 "actual_omitted_events": omitted, "actual_procedure_calls": dict(zip(PROCEDURES, calls)),
+                 "actual_checkpoint_counts": self.checkpoint_counts, "actual_copy_kind_counts": self.copy_counts,
+-                "actual_history_entry_contexts": self.entry_contexts, "actual_unallocated_owner_copies": self.unallocated_owners,
+-                "actual_history_entry_allocation_witness_counts": self.entry_allocations,
++                "actual_history_entry_contexts": self.entry_contexts - self.boundary_contexts,
++                "actual_history_boundary_contexts": self.boundary_contexts, "actual_current_history_catalogs": self.current_catalogs,
++                "actual_history_update_boundary_visits": self.history_branches,
++                "unreached_history_branches_counted_as_PASS": False, "actual_unallocated_owner_copies": self.unallocated_owners,
++                "actual_history_entry_allocation_witness_counts": {key: value for key, value in self.entry_allocations.items() if key in ["history_initialization_entry_owners", "history_update_entry_owners"]},
++                "actual_history_boundary_allocation_witness_counts": {key: value for key, value in self.entry_allocations.items() if key not in ["history_initialization_entry_owners", "history_update_entry_owners"]},
+                 "actual_null_scalar_copies": self.null_scalar_copies, "copy_or_stream_integrity_failed": integrity,
+                 "required_lifecycle_owners_reached": available}

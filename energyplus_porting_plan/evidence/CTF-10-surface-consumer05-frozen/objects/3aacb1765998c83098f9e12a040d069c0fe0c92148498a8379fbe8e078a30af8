@@ -1,0 +1,26 @@
+--- .runtime/porting/CTF-10/surface-consumer-native-prep-04/additions.json
++++ .runtime/porting/CTF-10/surface-consumer-native-prep-05/additions.json
+@@ -304,5 +304,23 @@
+     "tag": "conduction_reports_after_storage_assignments",
+     "source_anchor": "                }\n",
+     "insertion": "// SURFACE_OBSERVER_BEGIN conduction_reports_after_storage_assignments\n    ::SurfaceConsumerObservation::record(state, \"conduction_reports_after_storage_assignments\", ::SurfaceConsumerObservation::Copy::Reports, surfNum, 0, {}, {});\n// SURFACE_OBSERVER_END conduction_reports_after_storage_assignments\n"
++  },
++  {
++    "after_original_line": 2322,
++    "tag": "history_selected_initialization_input",
++    "source_anchor": "\n",
++    "insertion": "// SURFACE_OBSERVER_BEGIN history_selected_initialization_input\n    ::SurfaceConsumerObservation::record(state, \"history_selected_initialization_input\", ::SurfaceConsumerObservation::Copy::Histories, 0, 0, {}, {});\n// SURFACE_OBSERVER_END history_selected_initialization_input\n"
++  },
++  {
++    "after_original_line": 2436,
++    "tag": "history_selected_initialization_complete",
++    "source_anchor": "    }\n",
++    "insertion": "// SURFACE_OBSERVER_BEGIN history_selected_initialization_complete\n    ::SurfaceConsumerObservation::record(state, \"history_selected_initialization_complete\", ::SurfaceConsumerObservation::Copy::Histories, 0, 0, {}, {});\n// SURFACE_OBSERVER_END history_selected_initialization_complete\n"
++  },
++  {
++    "after_original_line": 5496,
++    "tag": "history_selected_master_update_complete",
++    "source_anchor": "    } // ...end of loop over all (heat transfer) surfaces\n",
++    "insertion": "// SURFACE_OBSERVER_BEGIN history_selected_master_update_complete\n    ::SurfaceConsumerObservation::record(state, \"history_selected_master_update_complete\", ::SurfaceConsumerObservation::Copy::Histories, 0, 0, {}, {});\n// SURFACE_OBSERVER_END history_selected_master_update_complete\n"
+   }
+ ]

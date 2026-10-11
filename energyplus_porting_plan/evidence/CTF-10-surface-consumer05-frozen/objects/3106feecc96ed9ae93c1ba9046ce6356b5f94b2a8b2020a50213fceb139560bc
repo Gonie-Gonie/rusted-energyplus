@@ -1,0 +1,54 @@
+"""Root publishes the actual input-only Consumer05 packet before any engine run."""
+import hashlib,json,shutil
+from datetime import datetime,timezone
+from pathlib import Path
+ROOT=Path.cwd();BASE=ROOT/'.runtime/porting/CTF-10';OUT=ROOT/'energyplus_porting_plan/evidence/CTF-10-surface-consumer05-frozen'
+def read(p):return json.loads(p.read_bytes())
+def sha(p):
+ with p.open('rb')as s:return hashlib.file_digest(s,'sha256').hexdigest()
+def ref(p):return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+def write(p,v):p.write_bytes((json.dumps(v,ensure_ascii=False,indent=2,allow_nan=False)+'\n').encode('utf8'))
+freeze_path=BASE/'surface-consumer05-frozen-inputs-01/freeze-receipt.json';freeze=read(freeze_path)
+assert freeze['frozen_before_this_surface_consumer_execution'] and freeze['scientific_execution_performed']is False
+assert not Path(freeze['observation_output_path']).exists()
+for row in freeze['source_authorities']['current_after_documents']:assert ref(ROOT/row['path'])==row
+restored=read(BASE/'surface-consumer05-restore-preservation-01/preservation.json')
+assert restored['all54_and631_fresh_hashes_unchanged'] and restored['literal_prior717_rows_equal']
+assert restored['actual_compile_rows_after']==717 and restored['protected_ref_count']==54
+executions={};snapshot=None
+commands=['surface-consumer05-restore-command-01','surface-consumer05-restore-configure-command-01','surface-consumer05-scope-prepare-command-01','surface-consumer05-scope-check-command-01','surface-consumer05-freeze-command-01']
+for name in commands:
+ p=BASE/name/'receipt.json';r=read(p);assert r['exit_code']==0 and r['launch_error']is None and r['source_bytes_match_before_and_after']
+ if snapshot is None:snapshot=r['source_snapshot']
+ assert r['source_snapshot']==snapshot;executions[name]=ref(p)
+assert read(ROOT/read(BASE/'surface-consumer05-freeze-command-01/receipt.json')['stdout']['path'])==freeze
+assert freeze['native_source_manifest']==ref(BASE/'surface-consumer-native-prep-05/manifest.json')
+assert not OUT.exists();(OUT/'objects').mkdir(parents=True)
+known={}
+for p in (ROOT/'energyplus_porting_plan/evidence').glob('*/manifest.json'):
+ for row in read(p).get('selected_files',[]):
+  if 'stored'in row:known.setdefault(row['stored']['sha256'],row['stored'])
+paths=set()
+directories=['surface-consumer-native-prep-05','surface-consumer05-native-build-prep-02','surface-consumer05-native-build-review-prep-02','surface-consumer05-original-data-review-prep-01','surface-consumer05-root-workflow-prep-01','surface-consumer05-root-workflow-prep-02','surface-consumer05-root-orchestration-prep-01','surface-consumer05-scope-amendment-01','surface-consumer05-frozen-inputs-01','surface-consumer05-restore-preservation-01',*commands,'surface-consumer-observation-storage-command-01','surface-consumer-observation-storage-compression-01']
+for name in directories:
+ directory=BASE/name;assert directory.is_dir(),name
+ for p in directory.rglob('*'):
+  if p.is_file() and '__pycache__'not in p.parts:paths.add(p)
+ for p in directory.rglob('receipt.json'):
+  r=read(p)
+  if 'source_snapshot'in r:paths.add(ROOT/r['source_snapshot']['path'])
+  if 'executed_launcher'in r:paths.add(ROOT/r['executed_launcher']['archive']['path'])
+for row in freeze['source_authorities']['current_after_documents']:paths.add(ROOT/row['path'])
+for name in ['surface-consumer05-native-build-review-prep-02','surface-consumer05-root-workflow-prep-01','surface-consumer05-root-orchestration-prep-01']:
+ for row in read(BASE/name/'manifest.json')['own_sources']:paths.add(ROOT/row['path'])
+for name in ['restore-configure-before-surface-consumer05-01.py','publish-surface-consumer05-freeze-01.py','compress-retained-observation-01.py']:paths.add(BASE/name)
+paths.add(BASE/'production-cli-inputs-01/manifest.json')
+rows=[];new=[]
+for p in sorted(paths):
+ r=ref(p);assert r['size_bytes']<16000000 and p.suffix.lower()not in ['.exe','.dll','.a','.obj','.map','.epw']
+ if r['sha256']not in known:
+  dest=OUT/'objects'/r['sha256'];shutil.copyfile(p,dest);known[r['sha256']]=ref(dest);new.append(ref(dest))
+ stored=known[r['sha256']];assert p.read_bytes()==(ROOT/stored['path']).read_bytes();rows.append({'original':r,'stored':stored})
+write(OUT/'manifest.json',{'schema':'ctf10-surface-consumer05-source-and-input-freeze-selected-evidence.v1','created_utc':datetime.now(timezone.utc).isoformat(),'selected_files':rows,'compressed_scientific_observations':[],'new_unique_raw_objects':len(new),'new_unique_raw_object_bytes':sum(r['size_bytes']for r in new),'binary_payloads_archived':False,'scientific_observations_archived':False,'selected_archive_is_transitive_replay_closure':False})
+write(OUT/'summary.json',{'schema':'ctf10-surface-consumer05-before-output-freeze-summary.v1','manifest':ref(OUT/'manifest.json'),'actual_scope_amendment':ref(BASE/'surface-consumer05-scope-amendment-01/amendment.json'),'actual_input_freeze':ref(freeze_path),'actual_executions':executions,'actual_source_snapshot':snapshot,'actual_restoration_preservation':ref(BASE/'surface-consumer05-restore-preservation-01/preservation.json'),'native_source_manifest':ref(BASE/'surface-consumer-native-prep-05/manifest.json'),'build_adapter_Source_manifest':ref(BASE/'surface-consumer05-native-build-prep-02/manifest.json'),'PE_adapter_Source_manifest':ref(BASE/'surface-consumer05-native-build-review-prep-02/manifest.json'),'OriginalDataQA_Source_manifest':ref(BASE/'surface-consumer05-original-data-review-prep-01/manifest.json'),'Root_and_other_author_cumulative_FULL_native_build_PE_QA_Source_accepted':True,'selected_case_id':'A-24H','all45_input_guards_preserved':True,'observation_max_bytes':4294967296,'bound_applies_to_full_file_QA_only_no_producer_truncation':True,'all_initialization_kickoff_warmup_weather_calls_retained':True,'actual_surface_consumer05_build_available':False,'actual_consumer05_capture_or_OriginalDataQA_available':False,'scientific_PASS_claimed':False,'thermal_history_Rust_arithmetic_applied':False,'Native_trace_used_as_ordinary_Rust_production_input':False,'full_card_gates_updated':False})
+print('Root input-only Consumer05 packet published',len(rows),'selected',len(new),'new objects',ref(OUT/'summary.json'),flush=True)

@@ -1,0 +1,399 @@
+{
+  "schema": "ctf10-surface-consumer05-root-orchestration-source-preparation.v1",
+  "status": "held-source-only-unexecuted-awaiting-Root-and-independent-FULL-review",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-orchestration-prep-01/run-actual-surface-consumer05-build.py",
+      "sha256": "6e4ebfb01d86151a98f996be5591b4757a3bd7757ad4f6963c450ffd22e7fdc5",
+      "size_bytes": 5257,
+      "line_count": 53
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-orchestration-prep-01/run-original-surface-consumer05-stages.py",
+      "sha256": "5f201111db9edac9f5fe1aa169ff32dfceea548b880e176948e2148c7a674460",
+      "size_bytes": 9669,
+      "line_count": 91
+    }
+  ],
+  "before_sources": [
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/run-actual-surface-consumer-build-02.py",
+        "sha256": "940dd0d9e523913c8cbf866940691289f01d3ae6152cae5533cef67ce9d8d97d",
+        "size_bytes": 3432,
+        "line_count": 31
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-root-orchestration-prep-01/before/run-actual-surface-consumer-build-02.py",
+        "sha256": "940dd0d9e523913c8cbf866940691289f01d3ae6152cae5533cef67ce9d8d97d",
+        "size_bytes": 3432,
+        "line_count": 31
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/run-original-surface-consumer-stages-01.py",
+        "sha256": "3f541dfce170e95865e1f5898ce8ba4267d94bf74d6e35ffeddafd70c5293aec",
+        "size_bytes": 6152,
+        "line_count": 56
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-root-orchestration-prep-01/before/run-original-surface-consumer-stages-01.py",
+        "sha256": "3f541dfce170e95865e1f5898ce8ba4267d94bf74d6e35ffeddafd70c5293aec",
+        "size_bytes": 6152,
+        "line_count": 56
+      }
+    }
+  ],
+  "exact_diffs": [
+    {
+      "before": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-root-orchestration-prep-01/before/run-actual-surface-consumer-build-02.py",
+        "sha256": "940dd0d9e523913c8cbf866940691289f01d3ae6152cae5533cef67ce9d8d97d",
+        "size_bytes": 3432,
+        "line_count": 31
+      },
+      "after": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-root-orchestration-prep-01/run-actual-surface-consumer05-build.py",
+        "sha256": "6e4ebfb01d86151a98f996be5591b4757a3bd7757ad4f6963c450ffd22e7fdc5",
+        "size_bytes": 5257,
+        "line_count": 53
+      },
+      "diff": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-root-orchestration-prep-01/diffs/run-actual-surface-consumer05-build.py.diff",
+        "sha256": "84baa750857459b7e45541a741994dcd8f1eda53e0d48f78f1d731b5bdc168a3",
+        "size_bytes": 6729,
+        "line_count": 64
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-root-orchestration-prep-01/before/run-original-surface-consumer-stages-01.py",
+        "sha256": "3f541dfce170e95865e1f5898ce8ba4267d94bf74d6e35ffeddafd70c5293aec",
+        "size_bytes": 6152,
+        "line_count": 56
+      },
+      "after": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-root-orchestration-prep-01/run-original-surface-consumer05-stages.py",
+        "sha256": "5f201111db9edac9f5fe1aa169ff32dfceea548b880e176948e2148c7a674460",
+        "size_bytes": 9669,
+        "line_count": 91
+      },
+      "diff": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-root-orchestration-prep-01/diffs/run-original-surface-consumer05-stages.py.diff",
+        "sha256": "17d7c617c4aeb1d6acc75af856d7f88a9e84d5191e3c56566c1162ad6204869b",
+        "size_bytes": 12390,
+        "line_count": 115
+      }
+    }
+  ],
+  "documentation": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-root-orchestration-prep-01/README.md",
+    "sha256": "4b201dc58c68d0d088a665fd49398fca4010aa4755ecbbd5836a3e2930db1fe7",
+    "size_bytes": 3553,
+    "line_count": 60
+  },
+  "authoring_sources": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-orchestration-prep-01/prepare_sources.py",
+      "sha256": "a8fef8e45a7281ce7f2faed3f68908b15a0e38db8131093d8df34b26ed7789ad",
+      "size_bytes": 14020,
+      "line_count": 125
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-orchestration-prep-01/seal_metadata.py",
+      "sha256": "955c7b1a66436d8f0dd0ec723c4be1f6739c34c841edee0c5ca2e4a26a6968cd",
+      "size_bytes": 7057,
+      "line_count": 100
+    }
+  ],
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/manifest.json",
+      "sha256": "8eac3eb0ec2a28c91db06e5c9d02ab0611090b68095183569df58b8198a8a94c",
+      "size_bytes": 31280,
+      "line_count": 754
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/source-context.json",
+      "sha256": "3686810d9ad18411322bbbe0f7ed23e19b67a1c93f3551b33b4b3de1496dbd8d",
+      "size_bytes": 12921,
+      "line_count": 319
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/manifest.json",
+      "sha256": "b845f22a1ac9cac06b39d1a884a00dff7500b5cfc9e5b7431834a288691f61e1",
+      "size_bytes": 26578,
+      "line_count": 660
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/run-native-build.py",
+      "sha256": "49b38594d8585e88d9c2a18198fd0c85674de871ebea9640657c2f38f0748a48",
+      "size_bytes": 21143,
+      "line_count": 248
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/derive-and-describe-native-build.py",
+      "sha256": "225f0a3f34c75872c40e4fa5f5126e1da7b81cc14ddd94caa7582473f1cf3201",
+      "size_bytes": 6882,
+      "line_count": 81
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/complete-native-build-metadata.py",
+      "sha256": "851a79c6a958642bb43317f9714c45f82951c9d8c8b7288490dd786f184a3668",
+      "size_bytes": 12645,
+      "line_count": 126
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-review-prep-02/manifest.json",
+      "sha256": "029f2cffd8dfdcb8776723eff7fa858e2b7157accc9ab45b7e50fa0b0ff24bb0",
+      "size_bytes": 6393,
+      "line_count": 167
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-review-prep-01/review_build.py",
+      "sha256": "ee3a3da643b733fba90280797eecd620d4e0c269bb1e4a1a220a321e73d28fc2",
+      "size_bytes": 6963,
+      "line_count": 123
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/manifest.json",
+      "sha256": "a27641042054dea917f17cbbf2f710e765496cfd7f3445f81bfcd35498b2a1a0",
+      "size_bytes": 48595,
+      "line_count": 1193
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/review_data.py",
+      "sha256": "522fa42b31dcfe4b490b3779785bf1fef2cb953ca50aab21501ebf0838abb3f4",
+      "size_bytes": 24559,
+      "line_count": 320
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/event_shape.py",
+      "sha256": "15f49e7646649b8701d889962cb6756b5260fb2262551c2b299a446d8bdc9b17",
+      "size_bytes": 28204,
+      "line_count": 406
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/stream_events.py",
+      "sha256": "8e7f05196fe567c052352d4d0fe501eb02a0f8e5a623c20f7dcd3db669f6bab8",
+      "size_bytes": 2385,
+      "line_count": 69
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/packet_io.py",
+      "sha256": "7c91d59d774d4e3cc9141cc9f40d0ae9abdb736385f17bb2b9afcf295222a27d",
+      "size_bytes": 4673,
+      "line_count": 120
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-02/manifest.json",
+      "sha256": "179b5d010719c9a34a9e5868a11a7c7f888d1636be7aa896ad5e798b7aa19d14",
+      "size_bytes": 4159,
+      "line_count": 100
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-02/freeze-inputs.py",
+      "sha256": "37c3f6787f8860e3870b3bbc71b6a7eb3848a55b655962605981a818d953f63a",
+      "size_bytes": 2574,
+      "line_count": 25
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/prepare-scope.py",
+      "sha256": "0560f73fe214a17d41adf623ae6221735ecd5e1c8b0de5dd8bce8741bc19c5fa",
+      "size_bytes": 5557,
+      "line_count": 52
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/thermal-history-unit-policy.json",
+      "sha256": "e26264adfab95edc104b29f8ac0d9259192b6a5e4e32963505f1dd93eb6cfd9d",
+      "size_bytes": 3961,
+      "line_count": 55
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "size_bytes": 8125,
+      "line_count": 194
+    }
+  ],
+  "inspected_actual_identity_metadata_only": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-restore-configure-command-01/receipt.json",
+      "sha256": "6ce813c775af5da0bdac33ef26a041d0ff13885b58845077a5937efdd5823419",
+      "size_bytes": 7423,
+      "line_count": 113
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-restore-preservation-01/preservation.json",
+      "sha256": "fdc72b849b7afdae50fd53c3fbeae8098f9f73400b4b0b60f4b7d039329ebe1a",
+      "size_bytes": 333199,
+      "line_count": 6934
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-build-02/native-build.json",
+      "sha256": "9c81ac5f733edd260ff62871d87cb7e1e56059bb4b200e22ee2d094998c7b41c",
+      "size_bytes": 7781,
+      "line_count": 179
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-build-01/native-build.json",
+      "sha256": "5384861acb91c1be5ca312db3efd9bd01ad76eed412ee834a991baec9d64eb79",
+      "size_bytes": 5910,
+      "line_count": 140
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-build-02/native-build.json",
+      "sha256": "3bf6a649c4ee2c67a4d9ae0c6a01c4fef1f987243685fdb205f46289cef62fed",
+      "size_bytes": 3989,
+      "line_count": 96
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-orchestration-prep-01/before/run-actual-surface-consumer-build-02.py",
+      "start_line": 1,
+      "end_line": 31,
+      "sha256": "940dd0d9e523913c8cbf866940691289f01d3ae6152cae5533cef67ce9d8d97d",
+      "size_bytes": 3432,
+      "purpose": "exact actual prior build orchestration"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-orchestration-prep-01/before/run-original-surface-consumer-stages-01.py",
+      "start_line": 1,
+      "end_line": 56,
+      "sha256": "3f541dfce170e95865e1f5898ce8ba4267d94bf74d6e35ffeddafd70c5293aec",
+      "size_bytes": 6152,
+      "purpose": "exact actual prior PE/engine/QA orchestration"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/run-native-build.py",
+      "start_line": 11,
+      "end_line": 23,
+      "sha256": "1bb3e790d3632cf19d8e9baf3f7ed6cbe4524704c4a106f6848d764bca76dc0e",
+      "size_bytes": 756,
+      "purpose": "accepted exact child build CLI"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/run-native-build.py",
+      "start_line": 53,
+      "end_line": 115,
+      "sha256": "112be25cbf15fa7ef5281367f3bc6e607ed96f16854e4ad2567c34fc794b2715",
+      "size_bytes": 4905,
+      "purpose": "Native05 inventories and scope/freeze admission"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/run-native-build.py",
+      "start_line": 197,
+      "end_line": 248,
+      "sha256": "f0b7df020667a359bd6eb55422e90e947b0fde75bb7b8244c2502f091150084f",
+      "size_bytes": 6085,
+      "purpose": "actual restore/caller SourceSnapshot and child execution"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/derive-and-describe-native-build.py",
+      "start_line": 11,
+      "end_line": 35,
+      "sha256": "96d47732d6df0745969ad891ecd525ea6cb6134f4d12273ed85b6f3f322a6906",
+      "size_bytes": 2003,
+      "purpose": "actual derivation CLI and preservation Source"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/complete-native-build-metadata.py",
+      "start_line": 101,
+      "end_line": 126,
+      "sha256": "74f04e2c08896d08c77d6e7e3389cc84aed78e1b5c8d5dd0eabb722beb168a2b",
+      "size_bytes": 3454,
+      "purpose": "actual completed build DTO keys"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-review-prep-01/review_build.py",
+      "start_line": 9,
+      "end_line": 15,
+      "sha256": "e1b235eef17c04291170dbab5230bec51d77d903aa213683fdfa4e1fa141ebb8",
+      "size_bytes": 323,
+      "purpose": "actual strict PE CLI"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/review_data.py",
+      "start_line": 107,
+      "end_line": 168,
+      "sha256": "a7a918190228b3199558213aa96e41abc544a6982cb56dde0cf28e7c0b13b0c0",
+      "size_bytes": 5061,
+      "purpose": "literal writer, actual freeze and ordinary arguments"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/review_data.py",
+      "start_line": 170,
+      "end_line": 220,
+      "sha256": "9a69f6654c972edce251f375c75432e9db4b157febb4dd5ec26cf9d539a6dfab",
+      "size_bytes": 4522,
+      "purpose": "actual build/PE and SourceSnapshot custody"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/review_data.py",
+      "start_line": 315,
+      "end_line": 320,
+      "sha256": "7eabfd61811297f39342121ac06c3874d210efa2219fbe0f5fa749f97fbb3f88",
+      "size_bytes": 446,
+      "purpose": "exact QA CLI with literal-freeze-writer"
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "start_line": 136,
+      "end_line": 155,
+      "sha256": "a8916423307b8d5d82ff3b4f3e7d16e70dfdaf530d010d6fd95e9af933a8861b",
+      "size_bytes": 1006,
+      "purpose": "existing recorder CLI and fresh parent-directory creation"
+    }
+  ],
+  "runtime_contract": {
+    "identity_arguments": "contained repository path#sha256; no prospective digest fabricated",
+    "build_flags": [
+      "freeze-receipt",
+      "freeze-execution",
+      "scope-amendment",
+      "scope-execution",
+      "restore-configure-execution",
+      "restore-preservation",
+      "source-snapshot",
+      "consumer04-native-build",
+      "zon-native-build",
+      "output-dir"
+    ],
+    "stage_flags": [
+      "build",
+      "freeze-receipt",
+      "freeze-execution",
+      "literal-freeze-writer",
+      "source-snapshot",
+      "loader-environment",
+      "output-dir"
+    ],
+    "output_directories": "fresh contained CTF-10 runtime operands; approved QA fixes native output01 only",
+    "child_schemas_and_commands_unchanged": true,
+    "expected_registration_recipe_only": {
+      "prior": 717,
+      "old04_registered": 5,
+      "new05_registered": 5,
+      "actual_fresh_compile_required": 5
+    },
+    "expected_preservation_contract_only": {
+      "protected": 54,
+      "present_core": 631,
+      "registered_absent": 12,
+      "prior_original_absent": 12
+    },
+    "future_current_SourceSnapshot_and_scope_freeze_receipts": "Root runtime operands only"
+  },
+  "verification": {
+    "own_AST_only": 2,
+    "exact_before_copies": 2,
+    "exact_generated_diffs": 2,
+    "workflow_or_target_import_execution": false,
+    "canonical_or_Git_changed": false,
+    "binary_core_weather_IDF_or_scientific_payload_read_or_hashed": false,
+    "future_hash_count_outcome_or_PASS_invented": false
+  },
+  "authorship_limits": "Base adapted existing Root wrappers; child build adapters and prior math authorship are disclosed. Source orchestration review is not a scientific certificate."
+}

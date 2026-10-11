@@ -1,0 +1,139 @@
+"""Source-only adaptation: byte copies and literal edits, no reviewed module imports."""
+import ast
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+OLD = HERE.parent / "surface-consumer-original-data-review-prep-02"
+
+def put(name, data):
+    path = HERE / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists():
+        if name in ["review_data.py", "event_shape.py"]:
+            path.write_bytes(data)
+        else:
+            assert path.read_bytes() == data
+        return
+    with path.open("xb") as handle:
+        handle.write(data)
+
+def replace(text, before, after):
+    assert text.count(before) == 1, before
+    return text.replace(before, after)
+
+for name in ["review_data.py", "event_shape.py", "stream_events.py", "packet_io.py", "README.md", "manifest.json"]:
+    put("before/" + name, (OLD / name).read_bytes())
+for name in ["stream_events.py", "packet_io.py"]:
+    put(name, (OLD / name).read_bytes())
+
+main = (OLD / "review_data.py").read_text(encoding="utf-8")
+main = replace(main, 'SHAPE_SHA = "0c0ab15c3d065263154f5b784d8354b49f250f5d9deae3d2b66a26160b717128"', 'SHAPE_SHA = "SHAPE_DIGEST_PENDING"')
+main = replace(main, '".runtime/porting/CTF-10/surface-consumer-native-build-review-prep-01/manifest.json"', '".runtime/porting/CTF-10/surface-consumer05-native-build-review-prep-02/manifest.json"')
+main = replace(main, '"a1a37dcd134bc4b04ae3fa03f48b55faf63938df9a1839e7f377ed509f5d301b"', '"029f2cffd8dfdcb8776723eff7fa858e2b7157accc9ab45b7e50fa0b0ff24bb0"')
+main = replace(main, 'PE_READER_SHA = "2dc1c55ac42ae046ffc5ad5401a8b0c56859556817d2d1bed92082bd02b5a3da"', 'PE_READER_SHA = "ee3a3da643b733fba90280797eecd620d4e0c269bb1e4a1a220a321e73d28fc2"')
+main = replace(main, '    same(build_prep["native_source_manifest"], native_ref)',
+    '    same(build_prep["native_source_manifest"], native_ref)\n    same(pe_prep["new_build_source_preparation"], build_source_ref)')
+main = replace(main, 'context_sources = {row["path"]: m.bind(row) for row in context["sources"]}',
+    'm.require(context["schema"] == "ctf10-surface-consumer05-source-context.v1", "Exact Native05 source context required")\n    context_sources = {row["path"]: m.bind(row) for row in context["direct_sources"]}')
+main = replace(main, '    additions = m.load(native_own["additions.json"])',
+    '    m.require([m.bind(row) for row in native_prep["compiled_source_files"]] == compiled and\n              [m.bind(row) for row in native_prep["native_source_files"]] == native_sources,\n              "Exact source-owned Native05 compiled/native inventories differ")\n    additions = m.load(native_own["additions.json"])')
+for before, after in [
+    ('ctf10-surface-consumer-original-data-source-preparation.v1', 'ctf10-surface-consumer05-original-data-source-preparation.v1'),
+    ('ctf10-surface-consumer-native-build-source-preparation.v1', 'ctf10-surface-consumer05-native-build-source-preparation.v1'),
+    ('surface-consumer-native-output-01', 'surface-consumer05-native-output-01'),
+    ('ctf10-surface-consumer-native-build.v1', 'ctf10-surface-consumer05-native-build.v1'),
+    ('build["target"] == "surface_consumer_helper"', 'build["target"] == "surface_consumer_helper05"'),
+    ('ctf10-surface-consumer-independent-build-PE-review.v1', 'ctf10-surface-consumer05-independent-build-PE-review.v1'),
+    ('ctf10-surface-consumer-independent-original-data-review.v1', 'ctf10-surface-consumer05-independent-original-data-review.v1'),
+]:
+    main = replace(main, before, after)
+main = replace(main, '    m.require(literal_writer["path"] == ".runtime/porting/CTF-10/freeze-surface-consumer-inputs-02.py",\n              "Actual Root literal-freeze source owner differs")',
+    '    approved_writer = m.argument(args.literal_freeze_writer)\n    same(literal_writer, approved_writer)')
+main = replace(main, 'build["current_compile_rows"] == build["previous_compile_rows"] + 5 and',
+    'build["previous_compile_rows"] == 717 and build["current_compile_rows"] == 727 and\n              [build[key] for key in ["inherited_consumer04_registration_count", "new_consumer05_registration_count", "actual_fresh_compiled_TU_count"]] == [5, 5, 5] and\n              build["no_consumer04_compile_command_observed"] is True and')
+main = replace(main, 'type(build["protected_ref_count"]) is int and build["protected_ref_count"] > 0',
+    'type(build["protected_ref_count"]) is int and build["protected_ref_count"] == 54')
+main = replace(main, '"actual_packet_freeze": refs["freeze-receipt"], "actual_packet_freeze_execution": refs["freeze-execution"],',
+    '"actual_packet_freeze": refs["freeze-receipt"], "actual_packet_freeze_execution": refs["freeze-execution"],\n        "reviewed_literal_freeze_writer": approved_writer, "reviewed_native_source_preparation": native_ref,')
+main = replace(main, '"authorship_limits": "Raw authored consumer passive transport and this custody reader; no independent numerical or formula certificate."',
+    '"authorship_limits": "Header adapted Raw accepted consumer factual QA; Raw authored passive05. Source custody review is not an independent formula or numerical certificate."')
+main = replace(main, '"build-review", "build-review-execution", "output-dir"]:',
+    '"build-review", "build-review-execution", "literal-freeze-writer", "output-dir"]:')
+
+shape = (OLD / "event_shape.py").read_text(encoding="utf-8")
+shape = replace(shape, 'need(len(result) == 45,', 'need(len(result) == 48,')
+shape = replace(shape, '        self.entry_allocations = {}',
+    '        self.entry_allocations = {}\n        self.boundary_contexts, self.current_catalogs = 0, 0\n        self.history_stages, self.history_branches = {}, {"simple": 0, "master": 0}')
+shape = replace(shape, '    def catalog_copy(self, value):', '    def catalog_copy(self, value, current=False):')
+shape = replace(shape, 'n(type(row) is dict and row["index"] == index and type(row["Name"]) is str,',
+    'n(type(row) is dict and type(row["index"]) is int and row["index"] >= 1 and\n                  (current and family == "constructions" or row["index"] == index) and type(row["Name"]) is str,')
+shape = replace(shape, '        for index in ht:\n',
+    '        construction_ids = [row["index"] for row in constructions]\n        n(len(construction_ids) == len(set(construction_ids)), "Unique actual Construction IDs required")\n        referenced = []\n        for index in ht:\n')
+shape = replace(shape, 'n(index <= len(surfaces) and 1 <= surfaces[index - 1]["Construction"] <= len(constructions),',
+    'n(index <= len(surfaces) and surfaces[index - 1]["Construction"] in construction_ids,')
+shape = replace(shape, '              "Actual HT surface/construction association differs")',
+    '              "Actual HT surface/construction association differs")\n            owner = surfaces[index - 1]["Construction"]\n            if owner not in referenced:\n                referenced.append(owner)\n        if current:\n            n(construction_ids == referenced, "Actual first referenced Construction encounter order differs")\n            self.current_catalogs += 1')
+
+addition = '''    def boundary_context(self, context, owners, checkpoint, clock):
+        n = self.need
+        n(type(context) is dict and set(context) == {"protocol", "TotSurfaces", "NumOfZones", "Surface_allocated",
+          "AllHTSurfaceList", "allocated_surfaces", "non_AllHT_history_owners", "SurfCurrNumHist", "scratch", "flux_reports", "surface_operands"},
+          "Complete actual boundary context fields required")
+        self.entry_context(context, owners, checkpoint, clock)
+        counters = context["SurfCurrNumHist"]
+        values = {row["index"]: row["value"] for row in counters["values"]} if counters["allocated"] else {}
+        for row in owners + context["non_AllHT_history_owners"]:
+            n(row["SurfCurrNumHist"] == values.get(row["surface_index"]), "Independent same-owner counter copies differ")
+        self.boundary_contexts += 1
+
+    def history_boundary(self, checkpoint, procedure, invocation):
+        n = self.need
+        key = (procedure, invocation)
+        previous = self.history_stages.get(key)
+        if checkpoint == "history_initialization_entry_owners":
+            n(procedure == "InitThermalAndFluxHistories" and previous is None, "Actual initialization entry association differs")
+            self.history_stages[key] = "entry"
+        elif checkpoint == "history_selected_initialization_input":
+            n(procedure == "InitThermalAndFluxHistories" and previous == "entry", "Actual initialization input order differs")
+            self.history_stages[key] = "input"
+        elif checkpoint == "history_selected_initialization_complete":
+            n(procedure == "InitThermalAndFluxHistories" and previous == "input", "Actual selected initialization completion order differs")
+            self.history_stages[key] = "selected-complete"
+        elif checkpoint == "history_initialization_final_owners":
+            n(procedure == "InitThermalAndFluxHistories" and previous == "selected-complete", "Actual final initialization owner order differs")
+            self.history_stages[key] = "final"
+        elif checkpoint == "history_update_entry_owners":
+            n(procedure == "UpdateThermalHistories" and previous is None, "Actual update entry association differs")
+            self.history_stages[key] = "entry"
+        elif checkpoint in ["simple_history_hard_copy_complete", "history_selected_master_update_complete"]:
+            n(procedure == "UpdateThermalHistories" and previous == "entry", "Actual exclusive reached update boundary/order differs")
+            branch = "simple" if checkpoint == "simple_history_hard_copy_complete" else "master"
+            self.history_stages[key] = branch
+            self.history_branches[branch] += 1
+        elif checkpoint == "scope_normal_exit" and procedure in ["InitThermalAndFluxHistories", "UpdateThermalHistories"]:
+            n(previous == "final" if procedure == "InitThermalAndFluxHistories" else previous in ["simple", "master"],
+              "Actual normal return lacks its retained history boundary")
+        if checkpoint in ["scope_normal_exit", "scope_unwinding"]:
+            self.history_stages.pop(key, None)
+
+'''
+shape = replace(shape, '    def visit(self, event):\n', addition + '    def visit(self, event):\n')
+shape = replace(shape, '        owners = event["owners"]\n',
+    '        current = checkpoint in ["history_selected_initialization_input", "history_update_entry_owners"]\n        n(("current_history_catalog" in event) == current, "Actual current catalog availability differs")\n        if current:\n            self.catalog_copy(event["current_history_catalog"], current=True)\n        owners = event["owners"]\n')
+shape = replace(shape, '        if checkpoint in ["scope_normal_exit", "scope_unwinding"]:\n            self.stack.pop()',
+    '        boundary = checkpoint in ["history_selected_initialization_input", "history_selected_initialization_complete",\n                                  "history_selected_master_update_complete", "simple_history_hard_copy_complete"]\n        n(("history_boundary_context" in event) == boundary, "Actual boundary-context availability differs")\n        if boundary:\n            n(type(owners) is list, "Actual full boundary history rows required")\n            self.boundary_context(event["history_boundary_context"], owners, checkpoint, clock)\n        self.history_boundary(checkpoint, procedure, invocation)\n        if checkpoint in ["scope_normal_exit", "scope_unwinding"]:\n            self.stack.pop()')
+shape = replace(shape, '"history_initialization_final_owners", "history_update_entry_owners",',
+    '"history_initialization_final_owners", "history_update_entry_owners",\n                    "history_selected_initialization_input", "history_selected_initialization_complete",')
+shape = replace(shape, '"actual_history_entry_contexts": self.entry_contexts,',
+    '"actual_history_entry_contexts": self.entry_contexts - self.boundary_contexts,\n                "actual_history_boundary_contexts": self.boundary_contexts, "actual_current_history_catalogs": self.current_catalogs,\n                "actual_history_update_boundary_visits": self.history_branches,\n                "unreached_history_branches_counted_as_PASS": False,')
+shape = replace(shape, '"actual_history_entry_allocation_witness_counts": self.entry_allocations,',
+    '"actual_history_entry_allocation_witness_counts": {key: value for key, value in self.entry_allocations.items() if key in ["history_initialization_entry_owners", "history_update_entry_owners"]},\n                "actual_history_boundary_allocation_witness_counts": {key: value for key, value in self.entry_allocations.items() if key not in ["history_initialization_entry_owners", "history_update_entry_owners"]},')
+
+import hashlib
+shape_bytes = shape.encode("utf-8")
+main = replace(main, "SHAPE_DIGEST_PENDING", hashlib.sha256(shape_bytes).hexdigest())
+put("event_shape.py", shape_bytes)
+put("review_data.py", main.encode("utf-8"))
+for name in ["review_data.py", "event_shape.py", "stream_events.py", "packet_io.py"]:
+    ast.parse((HERE / name).read_text(encoding="utf-8"))
+print("Prepared Source-only four bodies; no reviewed source imported or executed.")

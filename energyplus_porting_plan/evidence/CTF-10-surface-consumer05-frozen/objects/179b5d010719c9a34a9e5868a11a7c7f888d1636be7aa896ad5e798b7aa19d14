@@ -1,0 +1,100 @@
+{
+  "schema": "ctf10-surface-consumer05-Root-scope-freezer-source-preparation.v1",
+  "status": "held-source-only-narrow-verbatim-policy-copy-awaiting-Root-and-peer",
+  "immutable_predecessor": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/manifest.json",
+    "sha256": "d60037072b06af64969382e189abc71807730c25dc51a794a539b9bb23535a52",
+    "size_bytes": 11251,
+    "line_count": 271
+  },
+  "own_sources": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/prepare-scope.py",
+      "sha256": "0560f73fe214a17d41adf623ae6221735ecd5e1c8b0de5dd8bce8741bc19c5fa",
+      "size_bytes": 5557,
+      "line_count": 52
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-02/freeze-inputs.py",
+      "sha256": "37c3f6787f8860e3870b3bbc71b6a7eb3848a55b655962605981a818d953f63a",
+      "size_bytes": 2574,
+      "line_count": 25
+    }
+  ],
+  "input_only_policy": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/thermal-history-unit-policy.json",
+    "sha256": "e26264adfab95edc104b29f8ac0d9259192b6a5e4e32963505f1dd93eb6cfd9d",
+    "size_bytes": 3961,
+    "line_count": 55
+  },
+  "documentation": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-02/README.md",
+    "sha256": "8ded60f33dde6f28cc29f7affe9956ee9f14d7222039ade6b47bf892f08f9c03",
+    "size_bytes": 1099,
+    "line_count": 18
+  },
+  "before_archives": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-02/before-01/freeze-inputs.py",
+      "sha256": "f23ea04c58d8033a726e5c23255d559a3921c2182ff25469ed8170da46f7d891",
+      "size_bytes": 2421,
+      "line_count": 25
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-02/before-01/manifest.json",
+      "sha256": "d60037072b06af64969382e189abc71807730c25dc51a794a539b9bb23535a52",
+      "size_bytes": 11251,
+      "line_count": 271
+    }
+  ],
+  "exact_diffs": [
+    {
+      "before": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-02/before-01/freeze-inputs.py",
+        "sha256": "f23ea04c58d8033a726e5c23255d559a3921c2182ff25469ed8170da46f7d891",
+        "size_bytes": 2421,
+        "line_count": 25
+      },
+      "after": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-02/freeze-inputs.py",
+        "sha256": "37c3f6787f8860e3870b3bbc71b6a7eb3848a55b655962605981a818d953f63a",
+        "size_bytes": 2574,
+        "line_count": 25
+      },
+      "diff": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-02/freeze-inputs.py.from-01.diff",
+        "sha256": "6c2755003ed42fe5140e8706ba31c2e1b005ff39d45ffffc221c79aa720ff2f1",
+        "size_bytes": 1822,
+        "line_count": 13
+      }
+    }
+  ],
+  "runtime_interfaces": {
+    "scope_source_borrowed_exact01": {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/prepare-scope.py",
+      "sha256": "0560f73fe214a17d41adf623ae6221735ecd5e1c8b0de5dd8bce8741bc19c5fa",
+      "size_bytes": 5557,
+      "line_count": 52
+    },
+    "direct_literal_freezer_command": [
+      "python",
+      "-X",
+      "utf8",
+      "-B",
+      ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-02/freeze-inputs.py"
+    ],
+    "QA05_literal_writer_operand": "--literal-freeze-writer .runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-02/freeze-inputs.py#37c3f6787f8860e3870b3bbc71b6a7eb3848a55b655962605981a818d953f63a",
+    "scope_and_freeze_policy_Source_field": "thermal_history_direct_unit_policy_source",
+    "freeze_policy_ref_field": "thermal_history_direct_unit_policy",
+    "generated_policy_Source_SHA_and_size_exact": true,
+    "all_paths_guards_schemas_profiles_and_criteria_unchanged": true,
+    "future_SourceSnapshot_receipts_binary_identities_counts_or_outcomes": null
+  },
+  "source_only_checks": {
+    "AST_only": true,
+    "inverse01_exact": true,
+    "policy_and_scope_byte_exact01": true,
+    "target_import_recorders_or_canonical_Git_actions": false,
+    "scientific_weather_or_binary_payloads_read": false
+  }
+}

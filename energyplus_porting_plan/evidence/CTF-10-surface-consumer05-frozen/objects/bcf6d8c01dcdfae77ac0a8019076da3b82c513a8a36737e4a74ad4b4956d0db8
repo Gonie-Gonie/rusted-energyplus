@@ -1,0 +1,212 @@
+--- .runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/before/README.md
++++ .runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/README.md
+@@ -1,124 +1,98 @@
+-# Whole-engine surface-consumer factual OriginalDataQA Source hold
++# Consumer05 factual OriginalDataQA: held Source proposal
+ 
+-SOURCE-ONLY, unexecuted. This adapts the established CTF10/RAD independent
+-Original-data reader, contained packet IO, actual recorder/provenance and PE stages.
+-It creates no scientific runner, equations, comparison or replacement engine.
+-The accepted consumer03 whole-HBSM transport is the source ancestry. A reviewed
+-format-only producer successor may be supplied by Root's actual current freeze:
+-the Native preparation is bound identically through scope, freeze, build preparation
+-and actual build; no future source hash or successful build is guessed here.
+-The initial failed Windows compilation remains separate, never an engine attempt.
++This adapts the FULL accepted consumer QA02 four-file stage. It does not run
++the reader, engine, target, imported reviewed code, formatter or any Rust
++history function. Old04 captures and every earlier hold remain untouched.
++Header authored this adaptation; Raw authored the passive05 producer and the
++accepted predecessor QA. Independent Root and Raw FULL reviews are required.
++This is source/transport custody work, not a formula or numerical certificate.
+ 
+-## Actual runtime operands
++The producer is immutable Native05 8eac3eb0. The genuine five-TU build and
++independent PE use their separately reviewed consumer05 fresh02 source packages
++b845f22a and029f2cff. Both
++actual binaries, provider maps and preservation are authenticated through
++their existing strict stages. QA does not read or hash a Native binary payload.
++The current recipe registers restored717 plus retained04five plus new05five,
++727 total, with exactly five fresh05 compilations and no04 rebuild. Actual54
++protected artifacts,631 present core and24 total absences remain required.
++No future binary, execution, source snapshot or outcome identity is supplied.
+ 
+-Use the existing recorded Python reader stage:
+-`python -X utf8 -B review_data.py --approved-source-sha256 <actual-mainSHA>
+---source-manifest <this-held-manifest#SHA> --native-execution <actual-receipt#SHA>
+---results <actual-observation-path#SHA> --freeze-receipt <actual-freeze#SHA>
+---freeze-execution <actual-freeze-recorder#SHA> --build <actual-build#SHA>
+---build-execution <actual-compile-recorder#SHA> --build-review <actual-PE-review#SHA>
+---build-review-execution <actual-PE-recorder#SHA> --output-dir <fresh-separate-dir>`.
+-`--results` may omit SHA only when no observation exists; existing admitted files
+-require their genuine SHA. All identities are runtime supplied, not placeholders
+-interpreted as outcomes. OS launch failure/nonzero/missing/truncated/copied failure
+-cannot release custody. Four own reader sources are authenticated and archived.
++The input remains ordinary A-24H with the exact45 fixed input guards, actual
++IDD and seven forwarded ordinary arguments. The helper command is argc11,
++and its real EnergyPlusPgm argv has eight strings. No fixture, shortened run,
++sampling, event cap, physics answer or expected branch outcome is introduced.
++Fresh output is exclusively surface-consumer05-native-output-01/A-24H and
++the adjacent A-24H.observation.json. Scope and freeze keep the existing schemas
++ctf10-surface-consumer-scope-amendment.v1 and
++ctf10-surface-consumer-input-freeze.v1, with the actual fresh05 Native identity.
+ 
+-The selected scope/freeze schemas are
+-ctf10-surface-consumer-scope-amendment.v1 and
+-ctf10-surface-consumer-input-freeze.v1. The real selected check0 and FULL literal
+-freeze stdout must bind current three documents, fixed CON scope, all45 immutable
+-input guards, unchanged A-24H IDF/weather, actual IDD and the frozen observation
+-resource bound. The actual Root literal writer descriptor/command is authenticated.
+-Root supplies those actual objects after FULL peer; this package does not author
+-or invoke their scope, freeze, configure, build or capture.
++The old eleven required options remain; one explicit operand is added:
++--literal-freeze-writer path#sha256. Root supplies the actual approved writer
++source identity when it exists. It must equal freeze.executed_literal_writer
++and the actual recorded invocation. There is no guessed future filename/SHA,
++wrapper interpreter, synthesized receipt or new execution stage. Current
++plan/card/checklist refs come only from genuine current scope/freeze authority.
+ 
+-The helper's actual argc11 is checked against its binary identity and frozen
+-`--surface-observation-file <absolute-file> --` plus seven forwarded ordinary
+-arguments: `-i IDD -w weather -d native-output A24-IDF`. The observation header must
+-retain precisely eight genuine engine argv entries, including the same helper.
+-Only the frozen ordinary run is admitted: no -D/-a/-r or duration override.
+-Output locations remain surface-consumer-native-output-01/A-24H and sibling
+-A-24H.observation.json. No earlier CTF Original launcher is invoked.
++Native05 source-context.json has direct_sources, not the historical sources
++key. QA binds that exact list and reconstructs own3 plus original Pgm/CLI.
++It requires literal equality with Native05 compiled_source_files5 and
++native_source_files7, then with the actual build inventory. The authentic old
++source-context and every prior numbered package remain historical ancestry.
++The approved PE metadata02 also directly binds the actual build preparation
++to the reviewed fresh02 inventory; an older build01 interface cannot substitute.
+ 
+-## Complete streamed custody and actual availability
++The unchanged stream reader visits every complete event in the fixed producer
++JSON envelope. The unchanged IO preserves64,000,000-byte source/ref guards,
++16,000,000-byte metadata parsing and4GiB full observation physical bound.
++Ordinary output files receive complete streaming hashes only, never scientific
++parsing or a size cap. Overflow, malformed/truncated JSON, omitted copies,
++stream/counter failure, OS launch uncertainty, source stop or missing required
++return cannot release capture custody. Unknown event counts remain null.
+ 
+-The source-selected prospective observation_max_bytes is4294967296 (4 GiB),
+-independent of any observed output. The full regular-file stat and streamed SHA
+-are checked before and after factual review. Excess is a retained failure with
+-unknown event counts, never a reviewed prefix or reason to shorten the run.
+-The producer has no record cap/sampling. This reader visits every event.
++All old checkpoints, parent/invocation stack, actual clock flags, binary64
++bits/classes,19 history slots, optional masters, scratch/report/counter copies
++and transport omission/failure ledgers retain their accepted validation.
++The source checkpoint inventory grows45 to48, adding only the actual sites:
+ 
+-The inherited IO loads bounded metadata at exactly16,000,000 bytes; its ordinary
+-source/receipt hashing guard remains64,000,000 bytes. Only observations use4GiB.
+-Existing readers used whole json.loads, so the only streaming adaptation is the
+-fixed producer envelope {schema,actual_native_arguments,events,summary}, using
+-stdlib JSONDecoder. UTF-8 chunks are transport buffers, not event limits. A full
+-individual event may span any number of chunks up to the total file bound.
+-Duplicate object keys, raw nonfinite JSON, missing delimiters, trailing bytes,
+-truncation or a missing summary fail; no generic JSON parser is introduced.
++- after2322: history_selected_initialization_input;
++- after2436: history_selected_initialization_complete;
++- after5496: history_selected_master_update_complete.
+ 
+-Every retained ordinal, actual six-procedure scope/parent/call ledger, Copy enum,
+-source-selected checkpoint, actual full clock/flags/assigned-local type and owner
+-inventory is checked. Whole identity catalogs preserve declaration/ID/Zone/Space/
+-AllHT orders and construction public12x19 storage. Actual19 term-major ordinary
+-and optional master histories retain full allocated surface layouts; absent owners
+-remain null. Entry context includes all allocated and non-AllHT rows, five scratch
+-owners/counter, four flux reports and independent surface operands. Allocation
+-witness counts remain separate, including legitimate initial unallocated scratch;
+-no absent array becomes zeros and no selected caller flag is inferred.
++Those three and actual simple_history_hard_copy_complete after5354 carry full
++history_boundary_context with the same allocated-owner DTO as the entry
++context. Full normal/master histories retain original surface IDs and all19
++slots. Complete scratch5/report4/surface operand4/counter arrays retain exact
++allocation, bounds, indices and copied IEEE class/bits, including null owners.
++Independent duplicate counter copies must agree; no counter is calculated.
+ 
+-Only source-derived bit layout/class, dimensions/associations and integer counters
+-are inspected. No history/constant/flux/interpolation/temperature formula, expected
+-array or branch ratio is evaluated. Actual slot2-before-term1 copies and subsequent
+-term events remain as captured, never converted to a uniform fill.
++Actual initialization entry, selected input, selected completion, final owner
++and normal return are joined within their genuine invocation in source order.
++Each normally returned Update invocation must have exactly one reached simple
++or master completion boundary. Unwinding may retain a true partial prefix.
++No master branch is required to occur globally and no source predicate, ratio,
++temperature, flux, sum_steps or physical convergence is recomputed. A branch
++with zero actual visits remains unobserved context, never a numerical PASS.
+ 
+-Attempted/retained counts, typed copy/stream failures, omissions and actual engine
+-return/unwind availability are reconciled. Any integrity fault, required lifecycle
+-owner not reached or actual exit disagreement fails. Malformed traces preserve the
+-supplied argument and actual receipt with unknown complete counts; there is no
+-partial PASS. Required lifecycle presence is an availability check, not a proof
+-that every source branch or scientific result is correct.
++At after2322 and actual Update entry5222, current_history_catalog copies the
++full current Surface/Zone/Space order and the complete referenced Construction
++owners in first AllHT encounter order. Construction IDs may be sparse. QA
++validates their actual IDs/order and every12-by19 public array/count/dt/U copy;
++it never replaces them with the allocation-time catalog or a dense ID guess.
+ 
+-All ordinary engine output files are inventoried by complete streaming SHA/size
+-without parsing their scientific contents or imposing an extra file-size cap.
+-Their inventory/bytes, all input/source refs and the observation are rechecked.
+-The actual full Rust SourceSnapshot members/archives must remain unchanged from
+-scope/freeze through build/PE/capture. Genuine compiled Native7/5TU source inventory,
+-strict PE original/derivative maps, actual binary SHA/size and source preparation
+-bindings are independently joined; QA never reopens executable payloads.
++The report schema is
++ctf10-surface-consumer05-independent-original-data-review.v1. Existing success
++and failure statuses remain pass-actual-full-event-custody-before-Rust and
++fail-process-event-custody-or-required-availability-before-Rust. New actual
++count fields distinguish boundary contexts, current catalogs, simple/master
++visits and boundary allocation witnesses from the old entry-only counts.
++Only actual full event custody can be released. The report always retains
++history_direct_unit_execution_authorized:false, numerical_PASS_claimed:false,
++unreached_or_unallocated_owners_counted_as_PASS:false and all integration/full
++card claims false. Root must separately authorize actual same-input history
++mathematical pairing after genuine capture and this factual QA.
+ 
+-## Report boundary
+-
+-Report schema ctf10-surface-consumer-independent-original-data-review.v1 has status
+-pass-actual-full-event-custody-before-Rust or
+-fail-process-event-custody-or-required-availability-before-Rust.
+-It emits full report JSON to recorder stdout and archives own4/Native7/currentdocs3.
+-`Original_capture_custody_released` requires full structural custody, reached required
+-ordinary owners and actual exit0; it is not a numerical release or gate update.
+-`history_direct_unit_execution_authorized` remains false: future selected operand
+-mapping, same-input direct-history request, fixed numerical policy and execution
+-must receive separate Root/peer review using these genuine retained entry owners.
+-Numerical counts remain null; numerical/full-lifecycle/integration/card PASS false.
+-
+-Raw authored this reader and the passive consumer transport; this is no independent
+-formula certificate. Root plus another author's FULL Source review precede invocation.
+-No project imports, target runs, actual outputs, binaries/weather reads, canonical
+-edits or Git changes occurred during preparation; immutable predecessor holds remain.
+-
+-
+-## Fresh02 exact active Root writer binding
+-
+-The sole executable correction pins the actual immutable Root retry writer
+-`freeze-surface-consumer-inputs-02.py` in place of the predecessor filename.
+-The writer remains an exact required owner, not a generic filename allowance.
+-Root's failed first compile and unchanged-input retry are separate actual receipts;
+-this preparation supplies no successful build, engine, freeze or QA outcome.
+-
+-All four reader sources are copied under this fresh02 directory. The three
+-supports are byte-identical01; the main inverse replacement restores01 exactly.
+-Full before01 source/document archives, narrow deltas and regenerated cumulative
+-source diffs are retained. Native/build source revisions remain authenticated by
+-the same runtime scope/freeze/build equalities, including the independently
+-reviewed Native04/build02 when Root supplies those real references.
+-All shape/class/counter/absence/source/4-GiB and no-numerical-release rules remain
+-unchanged. Immutable01 remains the FULL predecessor review authority.
++Exact before6 archives and four source plus README diffs are retained. Stdlib
++author scripts only copy bytes, perform literal substitutions, derive ranges
++and diffs, hash Source/metadata and parse ASTs. No target, reviewed-source
++import, scientific output, binary/core/weather payload or canonical/Git
++mutation occurred during preparation.

@@ -1,0 +1,100 @@
+"""Stdlib Source-only manifest seal. Never imports or executes workflow code."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+OUT = Path(__file__).resolve().parent
+BASE = ROOT / '.runtime/porting/CTF-10'
+assert not (OUT/'manifest.json').exists()
+
+def ref(path):
+    path = ROOT/path if not isinstance(path,Path) else path
+    data=path.read_bytes()
+    return {'path':path.relative_to(ROOT).as_posix(),'sha256':hashlib.sha256(data).hexdigest(),
+            'size_bytes':len(data),'line_count':len(data.splitlines())}
+
+def primary(path,start,end,purpose):
+    lines=(ROOT/path).read_bytes().splitlines(keepends=True)
+    assert 1<=start<=end<=len(lines)
+    data=b''.join(lines[start-1:end])
+    return {'path':path,'start_line':start,'end_line':end,'sha256':hashlib.sha256(data).hexdigest(),
+            'size_bytes':len(data),'purpose':purpose}
+
+own=[OUT/name for name in ['run-actual-surface-consumer05-build.py','run-original-surface-consumer05-stages.py']]
+for path in own:ast.parse(path.read_bytes())
+before=[OUT/'before'/name for name in ['run-actual-surface-consumer-build-02.py','run-original-surface-consumer-stages-01.py']]
+diffs=[]
+for old,new in zip(before,own):
+    assert old.read_bytes()==(BASE/old.name).read_bytes()
+    expected=''.join(difflib.unified_diff(old.read_text(encoding='utf8').splitlines(True),new.read_text(encoding='utf8').splitlines(True),fromfile=old.relative_to(ROOT).as_posix(),tofile=new.relative_to(ROOT).as_posix())).encode('utf8')
+    delta=OUT/'diffs'/f'{new.name}.diff';assert delta.read_bytes()==expected
+    diffs.append({'before':ref(old),'after':ref(new),'diff':ref(delta)})
+
+dependencies=[
+ '.runtime/porting/CTF-10/surface-consumer-native-prep-05/manifest.json',
+ '.runtime/porting/CTF-10/surface-consumer-native-prep-05/source-context.json',
+ '.runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/manifest.json',
+ '.runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/run-native-build.py',
+ '.runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/derive-and-describe-native-build.py',
+ '.runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/complete-native-build-metadata.py',
+ '.runtime/porting/CTF-10/surface-consumer05-native-build-review-prep-02/manifest.json',
+ '.runtime/porting/CTF-10/surface-consumer05-native-build-review-prep-01/review_build.py',
+ '.runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/manifest.json',
+ '.runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/review_data.py',
+ '.runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/event_shape.py',
+ '.runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/stream_events.py',
+ '.runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/packet_io.py',
+ '.runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-02/manifest.json',
+ '.runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-02/freeze-inputs.py',
+ '.runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/prepare-scope.py',
+ '.runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/thermal-history-unit-policy.json',
+ 'tools/porting/record_command.py']
+historical_metadata=[
+ '.runtime/porting/CTF-10/surface-consumer05-restore-configure-command-01/receipt.json',
+ '.runtime/porting/CTF-10/surface-consumer05-restore-preservation-01/preservation.json',
+ '.runtime/porting/CTF-10/surface-consumer-native-build-02/native-build.json',
+ '.runtime/porting/ZON-05/native-build-01/native-build.json',
+ '.runtime/porting/RAD-01/native-build-02/native-build.json']
+ranges=[
+ primary(before[0].relative_to(ROOT).as_posix(),1,len(before[0].read_bytes().splitlines()),'exact actual prior build orchestration'),
+ primary(before[1].relative_to(ROOT).as_posix(),1,len(before[1].read_bytes().splitlines()),'exact actual prior PE/engine/QA orchestration'),
+ primary(dependencies[3],11,23,'accepted exact child build CLI'),
+ primary(dependencies[3],53,115,'Native05 inventories and scope/freeze admission'),
+ primary(dependencies[3],197,248,'actual restore/caller SourceSnapshot and child execution'),
+ primary(dependencies[4],11,35,'actual derivation CLI and preservation Source'),
+ primary(dependencies[5],101,126,'actual completed build DTO keys'),
+ primary(dependencies[7],9,15,'actual strict PE CLI'),
+ primary(dependencies[9],107,168,'literal writer, actual freeze and ordinary arguments'),
+ primary(dependencies[9],170,220,'actual build/PE and SourceSnapshot custody'),
+ primary(dependencies[9],315,320,'exact QA CLI with literal-freeze-writer'),
+ primary('tools/porting/record_command.py',136,155,'existing recorder CLI and fresh parent-directory creation')]
+manifest={
+ 'schema':'ctf10-surface-consumer05-root-orchestration-source-preparation.v1',
+ 'status':'held-source-only-unexecuted-awaiting-Root-and-independent-FULL-review',
+ 'own_sources':[ref(p)for p in own],
+ 'before_sources':[{'original':ref(BASE/p.name),'archive':ref(p)}for p in before],
+ 'exact_diffs':diffs,'documentation':ref(OUT/'README.md'),
+ 'authoring_sources':[ref(OUT/'prepare_sources.py'),ref(OUT/'seal_metadata.py')],
+ 'source_dependencies':[ref(p)for p in dependencies],
+ 'inspected_actual_identity_metadata_only':[ref(p)for p in historical_metadata],
+ 'read_source_ranges':ranges,
+ 'runtime_contract':{
+  'identity_arguments':'contained repository path#sha256; no prospective digest fabricated',
+  'build_flags':['freeze-receipt','freeze-execution','scope-amendment','scope-execution','restore-configure-execution','restore-preservation','source-snapshot','consumer04-native-build','zon-native-build','output-dir'],
+  'stage_flags':['build','freeze-receipt','freeze-execution','literal-freeze-writer','source-snapshot','loader-environment','output-dir'],
+  'output_directories':'fresh contained CTF-10 runtime operands; approved QA fixes native output01 only',
+  'child_schemas_and_commands_unchanged':True,
+  'expected_registration_recipe_only':{'prior':717,'old04_registered':5,'new05_registered':5,'actual_fresh_compile_required':5},
+  'expected_preservation_contract_only':{'protected':54,'present_core':631,'registered_absent':12,'prior_original_absent':12},
+  'future_current_SourceSnapshot_and_scope_freeze_receipts':'Root runtime operands only'},
+ 'verification':{'own_AST_only':2,'exact_before_copies':2,'exact_generated_diffs':2,
+  'workflow_or_target_import_execution':False,'canonical_or_Git_changed':False,
+  'binary_core_weather_IDF_or_scientific_payload_read_or_hashed':False,
+  'future_hash_count_outcome_or_PASS_invented':False},
+ 'authorship_limits':'Base adapted existing Root wrappers; child build adapters and prior math authorship are disclosed. Source orchestration review is not a scientific certificate.'}
+(OUT/'manifest.json').write_bytes((json.dumps(manifest,indent=2,ensure_ascii=False,allow_nan=False)+'\n').encode('utf8'))
+print(ref(OUT/'manifest.json'))
+print({'own_lines':[ref(p)['line_count']for p in own],'diff_lines':[row['diff']['line_count']for row in diffs]})

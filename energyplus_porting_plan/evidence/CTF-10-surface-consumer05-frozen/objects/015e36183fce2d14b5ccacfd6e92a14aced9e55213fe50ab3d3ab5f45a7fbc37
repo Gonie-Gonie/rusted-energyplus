@@ -1,0 +1,101 @@
+--- .runtime/porting/CTF-10/surface-consumer-native-prep-04/surface_consumer_observer.cc
++++ .runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_observer.cc
+@@ -10,12 +10,15 @@
+ #include <EnergyPlus/DataSurfaces.hh>
+ #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+ #include <nlohmann/json.hpp>
++#include <algorithm>
+ #include <cstring>
+ #include <exception>
+ #include <limits>
+ #include <ostream>
++#include <stdexcept>
+ #include <string>
+ #include <utility>
++#include <vector>
+ 
+ namespace SurfaceConsumerObservation {
+ namespace {
+@@ -113,7 +116,26 @@
+         {"AnyConstrOverrides", g.AnyConstrOverridesInModel},
+         {"AnySurfPropOverrides", g.AnySurfPropOverridesInModel}};
+ }
+-json catalog(EnergyPlus::EnergyPlusData const &state)
++template<class Construction> json construction_copy(int i, Construction const &c)
++{
++    json row{{"index", i}, {"Name", c.Name}, {"TotLayers", c.TotLayers}, {"LayerPoint", json::array()},
++        {"IsUsedCTF", c.IsUsedCTF}, {"SourceSinkPresent", c.SourceSinkPresent},
++        {"SolutionDimensions", c.SolutionDimensions}, {"NumCTFTerms", c.NumCTFTerms},
++        {"NumHistories", c.NumHistories}, {"CTFTimeStep", scalar(c.CTFTimeStep)}, {"UValue", scalar(c.UValue)}};
++    for (int j = c.LayerPoint.l(); j <= c.LayerPoint.u(); ++j) row["LayerPoint"].push_back(c.LayerPoint(j));
++    auto copy_fixed = [&](char const *name, auto const &values) {
++        row[name] = json::array();
++        for (auto const value : values) row[name].push_back(scalar(value));
++    };
++    copy_fixed("CTFOutside", c.CTFOutside); copy_fixed("CTFCross", c.CTFCross);
++    copy_fixed("CTFInside", c.CTFInside); copy_fixed("CTFFlux", c.CTFFlux);
++    copy_fixed("CTFSourceIn", c.CTFSourceIn); copy_fixed("CTFSourceOut", c.CTFSourceOut);
++    copy_fixed("CTFTSourceOut", c.CTFTSourceOut); copy_fixed("CTFTSourceIn", c.CTFTSourceIn);
++    copy_fixed("CTFTSourceQ", c.CTFTSourceQ); copy_fixed("CTFTUserOut", c.CTFTUserOut);
++    copy_fixed("CTFTUserIn", c.CTFTUserIn); copy_fixed("CTFTUserSource", c.CTFTUserSource);
++    return row;
++}
++json catalog(EnergyPlus::EnergyPlusData const &state, bool current_history_only = false)
+ {
+     json out{{"surfaces", json::array()}, {"constructions", json::array()},
+              {"zones", json::array()}, {"spaces", json::array()},
+@@ -128,24 +150,21 @@
+             {"Area", scalar(s.Area)}});
+     }
+     auto const &constructions = state.dataConstruction->Construct;
+-    if (constructions.allocated()) for (int i = constructions.l(); i <= constructions.u(); ++i) {
+-        auto const &c = constructions(i);
+-        json row{{"index", i}, {"Name", c.Name}, {"TotLayers", c.TotLayers}, {"LayerPoint", json::array()},
+-            {"IsUsedCTF", c.IsUsedCTF}, {"SourceSinkPresent", c.SourceSinkPresent},
+-            {"SolutionDimensions", c.SolutionDimensions}, {"NumCTFTerms", c.NumCTFTerms},
+-            {"NumHistories", c.NumHistories}, {"CTFTimeStep", scalar(c.CTFTimeStep)}, {"UValue", scalar(c.UValue)}};
+-        for (int j = c.LayerPoint.l(); j <= c.LayerPoint.u(); ++j) row["LayerPoint"].push_back(c.LayerPoint(j));
+-        auto copy_fixed = [&](char const *name, auto const &values) {
+-            row[name] = json::array();
+-            for (auto const value : values) row[name].push_back(scalar(value));
+-        };
+-        copy_fixed("CTFOutside", c.CTFOutside); copy_fixed("CTFCross", c.CTFCross);
+-        copy_fixed("CTFInside", c.CTFInside); copy_fixed("CTFFlux", c.CTFFlux);
+-        copy_fixed("CTFSourceIn", c.CTFSourceIn); copy_fixed("CTFSourceOut", c.CTFSourceOut);
+-        copy_fixed("CTFTSourceOut", c.CTFTSourceOut); copy_fixed("CTFTSourceIn", c.CTFTSourceIn);
+-        copy_fixed("CTFTSourceQ", c.CTFTSourceQ); copy_fixed("CTFTUserOut", c.CTFTUserOut);
+-        copy_fixed("CTFTUserIn", c.CTFTUserIn); copy_fixed("CTFTUserSource", c.CTFTUserSource);
+-        out["constructions"].push_back(std::move(row));
++    if (current_history_only) {
++        // Actual AllHT order and first current Construction encounter, without eligibility filtering.
++        std::vector<int> seen;
++        for (int const surface_index : state.dataSurface->AllHTSurfaceList) {
++            if (!surfaces.allocated() || surface_index < 1 || surface_index > surfaces.isize())
++                throw std::runtime_error("Current history catalog surface owner unavailable");
++            int const construction_index = surfaces(surface_index).Construction;
++            if (std::find(seen.begin(), seen.end(), construction_index) != seen.end()) continue;
++            if (!constructions.allocated() || !constructions.contains(construction_index))
++                throw std::runtime_error("Current history catalog Construction owner unavailable");
++            out["constructions"].push_back(construction_copy(construction_index, constructions(construction_index)));
++            seen.push_back(construction_index);
++        }
++    } else if (constructions.allocated()) for (int i = constructions.l(); i <= constructions.u(); ++i) {
++        out["constructions"].push_back(construction_copy(i, constructions(i)));
+     }
+     auto const &zones = state.dataHeatBal->Zone;
+     if (zones.allocated()) for (int i = 1; i <= zones.isize(); ++i)
+@@ -319,6 +338,14 @@
+         if (std::strcmp(checkpoint, "history_initialization_entry_owners") == 0 ||
+             std::strcmp(checkpoint, "history_update_entry_owners") == 0)
+             event["history_entry_context"] = history_entry_context(state);
++        if (std::strcmp(checkpoint, "history_selected_initialization_input") == 0 ||
++            std::strcmp(checkpoint, "history_selected_initialization_complete") == 0 ||
++            std::strcmp(checkpoint, "history_selected_master_update_complete") == 0 ||
++            std::strcmp(checkpoint, "simple_history_hard_copy_complete") == 0)
++            event["history_boundary_context"] = history_entry_context(state);
++        if (std::strcmp(checkpoint, "history_selected_initialization_input") == 0 ||
++            std::strcmp(checkpoint, "history_update_entry_owners") == 0)
++            event["current_history_catalog"] = catalog(state, true);
+         auto const bytes = event.dump(); // Complete one event before touching the stream.
+         if (!active->first_event) active->output << ',';
+         active->output << bytes;

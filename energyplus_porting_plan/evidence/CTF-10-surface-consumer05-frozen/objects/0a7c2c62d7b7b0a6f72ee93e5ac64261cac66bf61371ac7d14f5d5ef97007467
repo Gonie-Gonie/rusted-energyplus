@@ -1,0 +1,21 @@
+--- .runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/before-01/README.md
++++ .runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/README.md
+@@ -84,3 +84,18 @@
+ this operational adaptation and the earlier build stages; Header/Root must
+ review before any actual command. No canonical/Git mutation, target import,
+ scientific observation, weather or binary/core payload read occurred.
++
++
++Fresh02 repairs the concrete pre-execution Native05 context interface: its
++source-context schema uses direct_sources, not the inherited04 sources key.
++The runner now requires that exact05 schema/key and compares the assembled
++five compiled/seven Native ordered descriptors to the genuine explicit05
++manifest ledgers. No fallback or inferred Source owner is added. These exact
++ledgers were independently checked from held Native05 Source metadata only.
++All54/core/absence,717+5+5/727, actual05-only compile, eight providers and real
++runtime restore/scope/freeze contracts remain unchanged. Derive and complete
++bodies are copied byte-exact01 into02 because the runner requires its three
++approved scripts in the same physical directory.01 is preserved unexecuted;
++no configure/build/engine was performed with the incorrect interface.
++The PE body remains byte-exact01; its separate metadata02 only binds this
++fresh build preparation. Historical author01 is not a current generator.

@@ -1,0 +1,245 @@
+"""Root-only existing configure/build adaptation; never invoke the surface engine."""
+import argparse
+import hashlib
+import json
+import os
+import shutil
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+
+p = argparse.ArgumentParser()
+p.add_argument('--root', type=Path, default=Path.cwd())
+for name in ['freeze-receipt', 'freeze-execution', 'scope-amendment', 'scope-execution',
+             'fixed-input-guards-source', 'prior-final-preservation', 'prior-retirement',
+             'prior-retirement-execution', 'prior-configure-execution', 'prior-compile-execution',
+             'restore-configure-execution', 'prior-native-build', 'rad-native-build',
+             'native-source-manifest', 'build-source-manifest', 'consumer04-native-build', 'zon-native-build']:
+    p.add_argument('--' + name, required=True)
+p.add_argument('--output-dir', required=True)
+a = p.parse_args()
+ROOT = a.root.resolve()
+def contained(value):
+    path = (ROOT / value).resolve()
+    assert path.is_relative_to(ROOT) and path != ROOT
+    return path
+def read(path): return json.loads(path.read_bytes())
+def sha(path):
+    with path.open('rb') as stream: return hashlib.file_digest(stream, 'sha256').hexdigest()
+def ref(path): return {'path': path.relative_to(ROOT).as_posix(), 'sha256': sha(path), 'size_bytes': path.stat().st_size}
+def bound(value):
+    path, expected = value.rsplit('#', 1); path = contained(path)
+    assert sha(path) == expected
+    return path, read(path)
+def bound_ref(row):
+    path = contained(row['path']); assert sha(path) == row['sha256']
+    if 'size_bytes' in row: assert path.stat().st_size == row['size_bytes']
+    return path, read(path)
+def exact_file(row):
+    actual = ref(contained(row['path']))
+    assert all(actual[key] == row[key] for key in ['path', 'sha256', 'size_bytes'])
+def write(path, value):
+    with path.open('x', encoding='utf8', newline='\n') as stream: json.dump(value, stream, indent=2); stream.write('\n')
+def good(receipt):
+    assert receipt['schema'] == 'recorded-porting-command.v1'
+    assert receipt['exit_code'] == 0 and receipt['source_bytes_match_before_and_after'] and receipt['launch_error'] is None
+
+OUT = contained(a.output_dir); assert not OUT.exists()
+prep_path, prep = bound(a.build_source_manifest)
+assert prep['schema'] == 'ctf10-surface-consumer05-native-build-source-preparation.v1'
+assert {contained(row['path']) for row in prep['own_sources']} == {Path(__file__).resolve().parent / name for name in
+    ['run-native-build.py', 'derive-and-describe-native-build.py', 'complete-native-build-metadata.py']}
+for row in prep['own_sources']: exact_file(row)
+for row in prep['inherited_recipe_sources']: exact_file(row)
+for row in prep['mechanism_sources']: exact_file(row)
+native_path, native = bound(a.native_source_manifest)
+assert native['schema'] == 'ctf10-surface-consumer-native-source-preparation.v1'
+assert ref(native_path) == prep['native_source_manifest']
+source = native_path.parent
+own = {Path(row['path']).name: row for row in native['own_source_and_metadata']}
+names = ['surface_consumer_main.cpp', 'HeatBalanceSurfaceManager.surface_consumer.cc',
+         'surface_consumer_observer.cc', 'surface_consumer_observer.hh', 'surface_consumer_reference.cmake', 'source-context.json']
+for name in names: exact_file(own[name]); assert contained(own[name]['path']) == source / name
+_, context = bound_ref(own['source-context.json'])
+context_refs = {row['path']: row for row in context['sources']}
+originals = ['.reference/energyplus-src/26.1.0/src/EnergyPlus/api/EnergyPlusPgm.cc',
+             '.reference/energyplus-src/26.1.0/src/EnergyPlus/CommandLineInterface.cc']
+for name in originals: exact_file(context_refs[name])
+compiled_sources = [own[name] for name in names[:3]] + [context_refs[name] for name in originals]
+native_sources = compiled_sources + [own[name] for name in names[3:5]]
+recipe = source / 'surface_consumer_reference.cmake'
+old_recipe = contained('.runtime/porting/CTF-10/native-helper-prep-01/ctf10_reference.cmake')
+assert recipe.read_bytes().startswith(old_recipe.read_bytes())
+
+freeze_path, freeze = bound(a.freeze_receipt); freeze_execution_path, freeze_execution = bound(a.freeze_execution); good(freeze_execution)
+scope_path, scope = bound(a.scope_amendment); scope_execution_path, scope_execution = bound(a.scope_execution); good(scope_execution)
+_, freeze_stdout = bound_ref(freeze_execution['stdout']); assert freeze_stdout == freeze
+scope_command = scope_execution['command']; at = scope_command.index('tools/porting/check_plan.py')
+assert scope_command[at + 1:] == ['--check', '--card', 'CTF-10']
+assert freeze['schema'] == 'ctf10-surface-consumer-input-freeze.v1'
+assert scope['schema'] == 'ctf10-surface-consumer-scope-amendment.v1'
+assert freeze['scope_amendment'] == ref(scope_path) and freeze['scope_execution'] == ref(scope_execution_path)
+assert freeze['frozen_before_this_surface_consumer_execution'] is True
+guards_path, guards_source = bound(a.fixed_input_guards_source)
+assert ref(guards_path) == prep['fixed_input_guards_source']
+guards = guards_source['all45_fixed_input_guards']; assert len(guards) == 45
+for record in [scope, freeze]:
+    assert record['native_source_manifest'] == ref(native_path)
+    assert record['fixed_scope'] == guards_source['fixed_scope'] and record['all45_fixed_input_guards'] == guards
+    assert record['selected_case_id'] == 'A-24H'
+    assert type(record['observation_max_bytes']) is int and record['observation_max_bytes'] == 4294967296
+    assert all(record[key] is False for key in ['scientific_execution_performed', 'expected_values_supplied', 'integration_PASS_claimed', 'full_card_gates_updated'])
+    documents = record['source_authorities']['current_after_documents']; assert len(documents) == 3
+    assert [row['path'] for row in documents] == prep['current_after_document_paths']
+    for row in documents: exact_file(row)
+    for kind, key in [('input', 'selected_input'), ('weather', 'selected_weather')]:
+        matches = [row['actual'] for row in guards if row['case_id'] == 'A-24H' and row['kind'] == kind]
+        assert len(matches) == 1 and record[key] == matches[0]
+assert freeze['source_authorities'] == scope['source_authorities']
+exact_file(freeze['fixed_scope'])
+for row in guards: exact_file(row['actual'])
+exact_file(freeze['selected_idd']); assert Path(freeze['selected_idd']['path']).name == 'Energy+.idd'
+native_args = freeze['forwarded_native_arguments']
+assert type(native_args) is list and len(native_args) == 7 and all(type(value) is str for value in native_args)
+assert native_args[::2][:3] == ['-i', '-w', '-d']
+for index, row in [(1, freeze['selected_idd']), (3, freeze['selected_weather']), (6, freeze['selected_input'])]:
+    assert Path(native_args[index]).is_absolute() and contained(native_args[index]) == contained(row['path'])
+assert Path(native_args[5]).is_absolute() and contained(native_args[5]).is_relative_to(contained('.runtime/porting/CTF-10'))
+observation_path = freeze['observation_output_path']
+assert type(observation_path) is str and Path(observation_path).is_absolute()
+assert contained(observation_path).is_relative_to(contained('.runtime/porting/CTF-10')) and not contained(observation_path).exists()
+assert contained(observation_path) != contained(native_args[5])
+
+final_path, final = bound(a.prior_final_preservation)
+retirement_path, retirement = bound(a.prior_retirement)
+retirement_execution_path, retirement_execution = bound(a.prior_retirement_execution); good(retirement_execution)
+assert final['schema'] == 'ctf10-exact-pair-after-retirement.v1'
+assert retirement['schema'] == 'ctf10-two-original-native-helper-retirement.v1'
+assert retirement['status'] == 'pass-precise-pair-removal-and-retained-artifact-guards'
+assert bound_ref(retirement['actual_pair_tombstone_record'])[0] == final_path
+kept = final['protected_after']; protected48 = kept['legacy_protected'] + kept['retained_CTF10_derivatives']
+assert all(type(kept[key]) is int for key in ['legacy_count', 'retained_derivative_count', 'core_present_count', 'core_absent_count'])
+assert len(kept['legacy_protected']) == kept['legacy_count'] == 46 and len(kept['retained_CTF10_derivatives']) == kept['retained_derivative_count'] == 2
+assert len(kept['present_core_objects']) == kept['core_present_count'] == 631
+assert len(kept['absent_registered_object_paths']) == kept['core_absent_count'] == 12
+prior_absences = []
+for card in ['04', '06', '07', '08', '09']:
+    _, prior_retirement = bound_ref(kept['literal_prior_pair_retirements'][f'actual_prior_CTF{card}_pair_retirement'])
+    _, tombstone = bound_ref(prior_retirement['actual_pair_tombstone_record'])
+    paths = [entry['original_link']['historical_path'] for entry in tombstone['entries']]
+    assert len(paths) == 2 and kept[f'previously_retired_CTF{card}_original_paths_still_absent'] == paths
+    prior_absences += paths
+prior_absences += [entry['original_link']['historical_path'] for entry in final['entries']]
+assert len(prior_absences) == len(set(prior_absences)) == 12
+prior_build_path, prior_build = bound(a.prior_native_build)
+assert prior_build['schema'] == 'ctf10-native-build.v1' and prior_build['target'] == 'ctf10_unit_helper'
+assert prior_build['status'] == 'pass-actual-4TU-link-and-preservation' and prior_build['current_compile_rows'] == 717
+assert [prior_build[key] for key in ['core_registered', 'core_present', 'core_absent']] == [643, 631, 12]
+_, prior_preservation = bound_ref(prior_build['preservation'])
+prior_commands_path, prior_rows = bound_ref(prior_preservation['actual_after_compile_commands']); assert len(prior_rows) == 717
+rad_path, rad = bound(a.rad_native_build)
+assert ref(rad_path) == prep['actual_RAD_build_identity_metadata']
+assert rad['schema'] == 'rad01-native-build.v1' and rad['target'] == 'rad01_unit_helper' and rad['status'] == 'pass-actual-3TU-link-and-preservation'
+_, rad_preservation = bound_ref(rad['preservation'])
+assert rad_preservation['protected_refs'] == protected48 and rad_preservation['present_objects'] == kept['present_core_objects']
+assert rad_preservation['absent_registered_object_paths'] == kept['absent_registered_object_paths'] and rad_preservation['prior_original_absent_paths'] == prior_absences
+assert [rad[key] for key in ['previous_compile_rows', 'current_compile_rows', 'protected_ref_count']] == [717, 720, 48]
+_, rad_derivative = bound_ref(rad['validated_derivative'])
+assert rad_derivative['status'] == 'pass-exact-retained-runtime-sections-and-directories'
+assert rad_derivative['original_before'] == rad_derivative['original_after']
+assert rad_derivative['accepted_derivative'] == rad_derivative['observed_derivative']
+assert rad_derivative['original_before']['historical_path'] == rad['linked_original']['path']
+assert all(rad_derivative['original_before'][key] == rad['linked_original'][key] for key in ['sha256', 'size_bytes'])
+assert all(rad_derivative['accepted_derivative'][key] == rad['helper_binary'][key] for key in ['path', 'sha256', 'size_bytes'])
+protected50 = protected48 + [rad['linked_original'], rad['helper_binary']]
+consumer_path, consumer = bound(a.consumer04_native_build)
+assert ref(consumer_path) == prep['actual_consumer04_build_identity_metadata']
+assert consumer['schema'] == 'ctf10-surface-consumer-native-build.v1' and consumer['target'] == 'surface_consumer_helper'
+assert consumer['status'] == 'pass-actual-5TU-link-and-preservation'
+assert [consumer[key] for key in ['previous_compile_rows', 'current_compile_rows', 'protected_ref_count']] == [717, 722, 50]
+_, consumer_preservation = bound_ref(consumer['preservation'])
+assert consumer_preservation['protected_refs'] == protected50 and consumer_preservation['present_objects'] == kept['present_core_objects']
+assert consumer_preservation['absent_registered_object_paths'] == kept['absent_registered_object_paths'] and consumer_preservation['prior_original_absent_paths'] == prior_absences
+consumer_rows_path, consumer_rows = bound_ref(consumer_preservation['actual_after_compile_commands'])
+old_source_path, old_native = bound_ref(consumer['native_source_manifest'])
+assert consumer['native_source_manifest'] == prep['retained_consumer04_native_source_manifest']
+old_source = old_source_path.parent
+old_native_by_name = {Path(row['path']).name: row for row in old_native['own_source_and_metadata']}
+for name in names:
+    exact_file(old_native_by_name[name]); assert contained(old_native_by_name[name]['path']) == old_source / name
+for row in consumer['native_source_files']: exact_file(row)
+assert recipe.read_bytes().startswith((old_source / 'surface_consumer_reference.cmake').read_bytes())
+_, consumer_before = bound_ref(consumer_preservation['actual_before_preservation'])
+old_build_dir = contained(consumer_before['build_directory'])
+def inherited_row(row): return (Path(row['directory']) / row['output']).resolve().is_relative_to(old_build_dir / 'CMakeFiles/surface_consumer_helper.dir')
+inherited = [row for row in consumer_rows if inherited_row(row)]
+assert len(consumer_rows) == 722 and len(inherited) == 5 and [row for row in consumer_rows if not inherited_row(row)] == prior_rows
+assert len({row['output'] for row in inherited}) == 5
+assert {(Path(row['directory']) / row['file']).resolve() for row in inherited} == {contained(row['path']) for row in consumer['compiled_source_files']}
+_, consumer_derivative = bound_ref(consumer['validated_derivative'])
+assert consumer_derivative['status'] == 'pass-exact-retained-runtime-sections-and-directories'
+assert consumer_derivative['original_before'] == consumer_derivative['original_after']
+assert consumer_derivative['accepted_derivative'] == consumer_derivative['observed_derivative']
+assert consumer_derivative['original_before']['historical_path'] == consumer['linked_original']['path']
+assert all(consumer_derivative['original_before'][key] == consumer['linked_original'][key] for key in ['sha256', 'size_bytes'])
+assert all(consumer_derivative['accepted_derivative'][key] == consumer['helper_binary'][key] for key in ['path', 'sha256', 'size_bytes'])
+protected52 = protected50 + [consumer['linked_original'], consumer['helper_binary']]
+zon_path, zon = bound(a.zon_native_build)
+assert ref(zon_path) == prep['actual_ZON_build_identity_metadata']
+assert zon['schema'] == 'zon05-native-build.v1' and zon['target'] == 'zon05_unit_helper' and zon['status'] == 'pass-actual-1TU-link-and-preservation'
+assert [zon[key] for key in ['previous_compile_rows', 'current_compile_rows', 'protected_ref_count']] == [717, 721, 52]
+assert zon['actual_consumer_native_build'] == ref(consumer_path) and zon['actual_RAD_build_identity_metadata'] == ref(rad_path)
+_, zon_preservation = bound_ref(zon['preservation'])
+assert zon_preservation['protected_refs'] == protected52 and zon_preservation['present_objects'] == kept['present_core_objects']
+assert zon_preservation['absent_registered_object_paths'] == kept['absent_registered_object_paths'] and zon_preservation['prior_original_absent_paths'] == prior_absences
+_, zon_derivative = bound_ref(zon['validated_derivative'])
+assert zon_derivative['status'] == 'pass-exact-retained-runtime-sections-and-directories'
+assert zon_derivative['original_before'] == zon_derivative['original_after'] and zon_derivative['accepted_derivative'] == zon_derivative['observed_derivative']
+assert zon_derivative['original_before']['historical_path'] == zon['linked_original']['path']
+assert all(zon_derivative['original_before'][key] == zon['linked_original'][key] for key in ['sha256', 'size_bytes'])
+assert all(zon_derivative['accepted_derivative'][key] == zon['helper_binary'][key] for key in ['path', 'sha256', 'size_bytes'])
+protected = protected52 + [zon['linked_original'], zon['helper_binary']]
+assert len(protected) == len({row['path'] for row in protected}) == 54
+for path in kept['absent_registered_object_paths'] + prior_absences: assert not contained(path).exists()
+for row in protected + kept['present_core_objects']: exact_file(row)
+
+configure_path, configure_receipt = bound(a.prior_configure_execution); good(configure_receipt)
+compile_path, compile_receipt = bound(a.prior_compile_execution); good(compile_receipt)
+restore_path, restore = bound(a.restore_configure_execution); good(restore)
+assert restore['command'] == configure_receipt['command'] and restore['source_snapshot'] == freeze_execution['source_snapshot'] == scope_execution['source_snapshot']
+configure = configure_receipt['command'][:]
+assert sum(s.startswith('-DCMAKE_PROJECT_INCLUDE=') for s in configure) == 1
+assert next(s for s in configure if s.startswith('-DCMAKE_PROJECT_INCLUDE=')) == '-DCMAKE_PROJECT_INCLUDE=' + str(old_recipe)
+configure = ['-DCMAKE_PROJECT_INCLUDE=' + str(recipe) if s.startswith('-DCMAKE_PROJECT_INCLUDE=') else s for s in configure]
+assert not any(s.startswith('-DSURFACE_CONSUMER_SOURCE_DIR=') or s.startswith('-DSURFACE_CONSUMER05_SOURCE_DIR=') or s.startswith('-DRAD01_SOURCE_DIR=') for s in configure)
+configure.append('-DSURFACE_CONSUMER_SOURCE_DIR=' + str(old_source))
+configure.append('-DSURFACE_CONSUMER05_SOURCE_DIR=' + str(source))
+assert any(s.startswith('-DCTF10_SOURCE_DIR=') for s in configure) and any(s.startswith('-DCTF10_OBSERVER_SOURCE_DIR=') for s in configure)
+compile = compile_receipt['command'][:]; at = compile.index('--target'); end = next((i for i in range(at + 1, len(compile)) if compile[i].startswith('--')), len(compile))
+compile[at + 1:end] = ['surface_consumer_helper05']; assert '--verbose' in compile and compile[compile.index('--parallel') + 1] == '1'
+build_dir = contained(compile[compile.index('--build') + 1]); assert contained(configure[configure.index('-B') + 1]) == build_dir
+assert build_dir == old_build_dir
+live = build_dir / 'compile_commands.json'; assert read(live) == prior_rows and sha(live) == sha(prior_commands_path)
+before = OUT / 'before'; before.mkdir(parents=True)
+copy = before / 'compile_commands.json'; shutil.copyfile(live, copy); assert sha(live) == sha(copy)
+write(before / 'preservation.json', {'schema': 'ctf10-surface-consumer05-actual-before-build-preservation.v1', 'observed_utc': datetime.now(timezone.utc).isoformat(),
+    'protected_refs': protected, 'protected_ref_count': len(protected), 'present_objects': kept['present_core_objects'],
+    'absent_registered_object_paths': kept['absent_registered_object_paths'], 'prior_original_absent_paths': prior_absences,
+    'core_registered': 643, 'previous_compile_rows': len(prior_rows), 'compile_commands': ref(copy),
+    'actual_prior_final_preservation': ref(final_path), 'actual_prior_retirement': ref(retirement_path), 'actual_prior_retirement_execution': ref(retirement_execution_path),
+    'actual_RAD_build_identity_metadata': ref(rad_path), 'actual_consumer04_build_identity_metadata': ref(consumer_path),
+    'actual_ZON_build_identity_metadata': ref(zon_path), 'inherited_consumer04_compile_commands': ref(consumer_rows_path),
+    'inherited_consumer04_rows': inherited, 'retained_consumer04_native_source_manifest': ref(old_source_path), 'actual_restore_configure_execution': ref(restore_path), 'restored_compile_commands_authority': ref(prior_commands_path),
+    'fresh_hash_authority': 'All54 protected and631 core payloads freshly hashed by this Root-only preflight after actual exact717 configuration restore; no registry rewritten.',
+    'freeze_receipt': ref(freeze_path), 'freeze_execution': ref(freeze_execution_path), 'scope_amendment': ref(scope_path), 'scope_execution': ref(scope_execution_path),
+    'forwarded_native_arguments': native_args, 'observation_output_path': observation_path, 'selected_idd': freeze['selected_idd'],
+    'fixed_input_guards_source': ref(guards_path), 'native_source_manifest': ref(native_path), 'build_source_manifest': ref(prep_path),
+    'native_source_files': native_sources, 'compiled_source_files': compiled_sources, 'source_context': own['source-context.json'],
+    'prior_native_build': ref(prior_build_path), 'prior_configure_execution': ref(configure_path), 'prior_compile_execution': ref(compile_path),
+    'build_directory': build_dir.relative_to(ROOT).as_posix(), 'core_before_check': prior_build['core_before_check'], 'source_snapshot': restore['source_snapshot'],
+    'legacy_registry_rewritten': False, 'scientific_execution_performed': False})
+env = dict(os.environ); env['PATH'] = str(ROOT / '.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin') + os.pathsep + env['PATH']
+for name, command in [('native-configure-command-01', configure), ('native-compile-command-01', compile)]:
+    subprocess.run(['python', '-X', 'utf8', '-B', 'tools/porting/record_command.py', '--output-dir', (OUT / name).relative_to(ROOT).as_posix(), '--', *command], cwd=ROOT, check=True, env=env)
+    receipt = read(OUT / name / 'receipt.json'); good(receipt); assert receipt['source_snapshot'] == restore['source_snapshot']
+    print(json.dumps({'execution': ref(OUT / name / 'receipt.json')}), flush=True)

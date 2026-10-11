@@ -1,0 +1,135 @@
+"""Source-only interface repair; no build/target/import or scientific reads."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+HERE = Path(__file__).resolve().parent
+OLD = HERE.with_name('surface-consumer05-native-build-prep-01')
+PE = HERE.with_name('surface-consumer05-native-build-review-prep-02')
+OLD_PE = HERE.with_name('surface-consumer05-native-build-review-prep-01')
+
+def ref(path):
+    data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(data).hexdigest(), 'size_bytes': len(data), 'line_count': len(data.splitlines())}
+def put(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream: stream.write(data)
+def dump(value): return (json.dumps(value, indent=2) + '\n').encode('utf-8')
+def pair(before, after, delta):
+    data = ''.join(difflib.unified_diff(before.read_text(encoding='utf-8').splitlines(True), after.read_text(encoding='utf-8').splitlines(True),
+                    fromfile=ref(before)['path'], tofile=ref(after)['path'])).encode('utf-8')
+    put(delta, data)
+    return {'before': ref(before), 'after': ref(after), 'diff': ref(delta)}
+
+old = json.loads((OLD / 'manifest.json').read_bytes())
+assert ref(OLD / 'manifest.json')['sha256'] == '7ca5be5097ab05bd8dd9f65797954017a0cb3d49ac885802b25528bd749ee6cd'
+old_pe = json.loads((OLD_PE / 'manifest.json').read_bytes())
+assert ref(OLD_PE / 'manifest.json')['sha256'] == '7ac7c0f8007b34078c8a02a985b046932954870b928bff4a6d74101da7cf0ff0'
+names = ['run-native-build.py', 'derive-and-describe-native-build.py', 'complete-native-build-metadata.py']
+diffs = []
+before_token = "context_refs = {row['path']: row for row in context['sources']}"
+after_token = "assert context['schema'] == 'ctf10-surface-consumer05-source-context.v1'\ncontext_refs = {row['path']: row for row in context['direct_sources']}"
+before_ledger = "native_sources = compiled_sources + [own[name] for name in names[3:5]]"
+after_ledger = before_ledger + "\nassert len(compiled_sources) == 5 and compiled_sources == native['compiled_source_files']\nassert len(native_sources) == 7 and native_sources == native['native_source_files']"
+for name in names:
+    data = (OLD / name).read_bytes()
+    put(HERE / 'before-01' / name, data)
+    if name == names[0]:
+        value = data.decode('utf-8')
+        assert value.count(before_token) == value.count(before_ledger) == 1
+        value = value.replace(before_token, after_token).replace(before_ledger, after_ledger)
+        assert value.replace(after_token, before_token).replace(after_ledger, before_ledger).encode('utf-8') == data
+        data = value.encode('utf-8')
+    put(HERE / name, data)
+    ast.parse(data.decode('utf-8'))
+    diffs.append(pair(HERE / 'before-01' / name, HERE / name, HERE / 'diffs' / (name + '.from-01.diff')))
+for name in ['manifest.json', 'README.md']: put(HERE / 'before-01' / name, (OLD / name).read_bytes())
+doc = (OLD / 'README.md').read_bytes() + b'''
+
+Fresh02 repairs the concrete pre-execution Native05 context interface: its
+source-context schema uses direct_sources, not the inherited04 sources key.
+The runner now requires that exact05 schema/key and compares the assembled
+five compiled/seven Native ordered descriptors to the genuine explicit05
+manifest ledgers. No fallback or inferred Source owner is added. These exact
+ledgers were independently checked from held Native05 Source metadata only.
+All54/core/absence,717+5+5/727, actual05-only compile, eight providers and real
+runtime restore/scope/freeze contracts remain unchanged. Derive and complete
+bodies are copied byte-exact01 into02 because the runner requires its three
+approved scripts in the same physical directory.01 is preserved unexecuted;
+no configure/build/engine was performed with the incorrect interface.
+The PE body remains byte-exact01; its separate metadata02 only binds this
+fresh build preparation. Historical author01 is not a current generator.
+'''
+put(HERE / 'README.md', doc)
+new = json.loads(json.dumps(old))
+new['status'] = 'held-source-only-fresh02-Native05-direct-sources-interface-repair-awaiting-independent-review'
+new['own_sources'] = [ref(HERE / name) for name in names]
+new['documentation'] = ref(HERE / 'README.md')
+new['authoring_sources'] = [ref(Path(__file__))]
+new['historical_authoring_sources_not_for_reexecution'] = old['authoring_sources']
+new['immutable_predecessor'] = ref(OLD / 'manifest.json')
+new['before_predecessor_manifest'] = ref(HERE / 'before-01/manifest.json')
+new['before_predecessor_documentation'] = ref(HERE / 'before-01/README.md')
+new['before_archives'] = [ref(HERE / 'before-01' / name) for name in names]
+new['historical_build01_correspondence'] = old['exact_diffs']
+new['exact_diffs'] = diffs
+new['fresh02_delta'] = {'actual_context_schema': 'ctf10-surface-consumer05-source-context.v1', 'actual_context_key': 'direct_sources',
+    'explicit_Native05_compiled5_native7_source_ledgers_exact': True, 'derive_and_complete_byte_exact01': True,
+    'all_operational_guards_math_and_generic_mechanisms_unchanged': True, 'no01_configuration_or_target_execution_performed': True}
+put(HERE / 'manifest.json', dump(new))
+meta_diffs = [pair(HERE / 'before-01' / name, HERE / name, HERE / 'diffs' / (name + '.from-01.diff')) for name in ['manifest.json', 'README.md']]
+for name in ['manifest.json', 'README.md']: put(PE / 'before-01' / name, (OLD_PE / name).read_bytes())
+pe_doc = (OLD_PE / 'README.md').read_bytes() + b'''
+
+Metadata02 binds the fresh02 build interface repair. Its approved PE reader
+body remains at the immutable01 path with the same SHA; all PE, provider,
+registration, protection and output contracts are literally01. No reader,
+build, import, binary or scientific execution occurred during this repair.
+'''
+put(PE / 'README.md', pe_doc)
+pe_new = json.loads(json.dumps(old_pe))
+pe_new['new_build_source_preparation'] = ref(HERE / 'manifest.json')
+pe_new['documentation'] = ref(PE / 'README.md')
+pe_new['immutable_predecessor'] = ref(OLD_PE / 'manifest.json')
+pe_new['before_predecessor_manifest'] = ref(PE / 'before-01/manifest.json')
+pe_new['before_predecessor_documentation'] = ref(PE / 'before-01/README.md')
+pe_new['authoring_sources'] = [ref(Path(__file__))]
+pe_new['historical_authoring_sources_not_for_reexecution'] = old_pe['authoring_sources']
+pe_new['metadata_only_fresh02'] = {'reader_body_and_all_operational_contracts_byte_exact01': True, 'build_preparation_binding_only': True}
+put(PE / 'manifest.json', dump(pe_new))
+pe_diffs = [pair(PE / 'before-01' / name, PE / name, PE / 'diffs' / (name + '.from-01.diff')) for name in ['manifest.json', 'README.md']]
+native = json.loads((ROOT / old['native_source_manifest']['path']).read_bytes())
+ctx = json.loads((ROOT / native['source_context']['path']).read_bytes())
+assert ctx['schema'] == new['fresh02_delta']['actual_context_schema']
+context_refs = {row['path']: row for row in ctx['direct_sources']}
+own = {Path(row['path']).name: row for row in native['own_source_and_metadata']}
+compiled = [own[name] for name in ['surface_consumer_main.cpp','HeatBalanceSurfaceManager.surface_consumer.cc','surface_consumer_observer.cc']] + [context_refs[path] for path in ['.reference/energyplus-src/26.1.0/src/EnergyPlus/api/EnergyPlusPgm.cc','.reference/energyplus-src/26.1.0/src/EnergyPlus/CommandLineInterface.cc']]
+assert compiled == native['compiled_source_files'] and compiled + [own[name] for name in ['surface_consumer_observer.hh','surface_consumer_reference.cmake']] == native['native_source_files']
+ast.parse(Path(__file__).read_text(encoding='utf-8'))
+seen, count = set(), 0
+def walk(value):
+    global count
+    if isinstance(value,list):
+        for item in value: walk(item)
+    elif isinstance(value,dict):
+        if 'path' in value and 'sha256' in value:
+            if 'start_line' in value:
+                data = b''.join((ROOT / value['path']).read_bytes().splitlines(True)[value['start_line']-1:value['end_line']])
+                assert hashlib.sha256(data).hexdigest() == value['sha256'] and len(data) == value['size_bytes']; count += 1
+            else:
+                key = (value['path'],value['sha256'])
+                if key not in seen:
+                    assert not value['path'].lower().endswith(('.exe','.obj','.idf','.epw'))
+                    actual = ref(ROOT / value['path']); seen.add(key)
+                    for field in ['sha256','size_bytes','line_count']:
+                        if field in value: assert value[field] == actual[field], (key,field)
+        for item in value.values(): walk(item)
+walk(new); walk(pe_new)
+assert new['own_sources'][1]['sha256'] == old['own_sources'][1]['sha256'] and new['own_sources'][2]['sha256'] == old['own_sources'][2]['sha256']
+assert pe_new['own_sources'] == old_pe['own_sources'] and pe_new['exact_diffs'] == old_pe['exact_diffs']
+print(json.dumps({'build':ref(HERE / 'manifest.json'), 'PE_metadata':ref(PE / 'manifest.json'), 'own3':new['own_sources'],
+    'whole_refs':len(seen),'typed_ranges':count,'source_deltas':[row['diff'] for row in diffs],
+    'metadata_diffs':[row['diff'] for row in meta_diffs + pe_diffs]},indent=2))

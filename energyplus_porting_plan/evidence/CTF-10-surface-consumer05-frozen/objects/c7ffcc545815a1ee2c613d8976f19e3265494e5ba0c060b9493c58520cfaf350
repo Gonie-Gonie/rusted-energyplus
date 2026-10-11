@@ -1,0 +1,326 @@
+[
+  {
+    "after_original_line": 126,
+    "tag": "include",
+    "source_anchor": "\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN include\n#include \"surface_consumer_observer.hh\"\n// SURFACE_OBSERVER_END include\n"
+  },
+  {
+    "after_original_line": 146,
+    "tag": "scope_Manage",
+    "source_anchor": "{\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN scope_Manage\n    ::SurfaceConsumerObservation::Scope surface_observation_scope(state, ::SurfaceConsumerObservation::Procedure::Manage);\n// SURFACE_OBSERVER_END scope_Manage\n"
+  },
+  {
+    "after_original_line": 273,
+    "tag": "scope_Initialize",
+    "source_anchor": "{\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN scope_Initialize\n    ::SurfaceConsumerObservation::Scope surface_observation_scope(state, ::SurfaceConsumerObservation::Procedure::Initialize);\n// SURFACE_OBSERVER_END scope_Initialize\n"
+  },
+  {
+    "after_original_line": 2209,
+    "tag": "scope_InitializeHistories",
+    "source_anchor": "{\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN scope_InitializeHistories\n    ::SurfaceConsumerObservation::Scope surface_observation_scope(state, ::SurfaceConsumerObservation::Procedure::InitializeHistories);\n// SURFACE_OBSERVER_END scope_InitializeHistories\n"
+  },
+  {
+    "after_original_line": 5222,
+    "tag": "scope_UpdateHistories",
+    "source_anchor": "{\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN scope_UpdateHistories\n    ::SurfaceConsumerObservation::Scope surface_observation_scope(state, ::SurfaceConsumerObservation::Procedure::UpdateHistories);\n// SURFACE_OBSERVER_END scope_UpdateHistories\n"
+  },
+  {
+    "after_original_line": 8663,
+    "tag": "scope_InsideCTF",
+    "source_anchor": "{\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN scope_InsideCTF\n    ::SurfaceConsumerObservation::Scope surface_observation_scope(state, ::SurfaceConsumerObservation::Procedure::InsideCTF);\n// SURFACE_OBSERVER_END scope_InsideCTF\n"
+  },
+  {
+    "after_original_line": 6606,
+    "tag": "scope_Report",
+    "source_anchor": "{\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN scope_Report\n    ::SurfaceConsumerObservation::Scope surface_observation_scope(state, ::SurfaceConsumerObservation::Procedure::Report);\n// SURFACE_OBSERVER_END scope_Report\n"
+  },
+  {
+    "after_original_line": 161,
+    "tag": "actual_InitSurfaceHeatBalance_return",
+    "source_anchor": "    InitSurfaceHeatBalance(state); // Initialize all heat balance related parameters\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN actual_InitSurfaceHeatBalance_return\n    ::SurfaceConsumerObservation::record(state, \"actual_InitSurfaceHeatBalance_return\", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});\n// SURFACE_OBSERVER_END actual_InitSurfaceHeatBalance_return\n"
+  },
+  {
+    "after_original_line": 168,
+    "tag": "actual_outside_surface_return",
+    "source_anchor": "    CalcHeatBalanceOutsideSurf(state);\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN actual_outside_surface_return\n    ::SurfaceConsumerObservation::record(state, \"actual_outside_surface_return\", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});\n// SURFACE_OBSERVER_END actual_outside_surface_return\n"
+  },
+  {
+    "after_original_line": 172,
+    "tag": "actual_inside_surface_return",
+    "source_anchor": "    CalcHeatBalanceInsideSurf(state);\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN actual_inside_surface_return\n    ::SurfaceConsumerObservation::record(state, \"actual_inside_surface_return\", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});\n// SURFACE_OBSERVER_END actual_inside_surface_return\n"
+  },
+  {
+    "after_original_line": 179,
+    "tag": "actual_air_heat_balance_return",
+    "source_anchor": "    HeatBalanceAirManager::ManageAirHeatBalance(state);\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN actual_air_heat_balance_return\n    ::SurfaceConsumerObservation::record(state, \"actual_air_heat_balance_return\", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});\n// SURFACE_OBSERVER_END actual_air_heat_balance_return\n"
+  },
+  {
+    "after_original_line": 184,
+    "tag": "actual_final_surface_update_return",
+    "source_anchor": "    UpdateFinalSurfaceHeatBalance(state);\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN actual_final_surface_update_return\n    ::SurfaceConsumerObservation::record(state, \"actual_final_surface_update_return\", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});\n// SURFACE_OBSERVER_END actual_final_surface_update_return\n"
+  },
+  {
+    "after_original_line": 188,
+    "tag": "actual_UpdateThermalHistories_return",
+    "source_anchor": "        UpdateThermalHistories(state); // Update the thermal histories\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN actual_UpdateThermalHistories_return\n    ::SurfaceConsumerObservation::record(state, \"actual_UpdateThermalHistories_return\", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});\n// SURFACE_OBSERVER_END actual_UpdateThermalHistories_return\n"
+  },
+  {
+    "after_original_line": 210,
+    "tag": "actual_ReportSurfaceHeatBalance_return",
+    "source_anchor": "    ReportSurfaceHeatBalance(state);\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN actual_ReportSurfaceHeatBalance_return\n    ::SurfaceConsumerObservation::record(state, \"actual_ReportSurfaceHeatBalance_return\", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});\n// SURFACE_OBSERVER_END actual_ReportSurfaceHeatBalance_return\n"
+  },
+  {
+    "after_original_line": 311,
+    "tag": "actual_surface_bulb_setter_return",
+    "source_anchor": "    DataSurfaces::SetSurfaceOutBulbTempAt(state);\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN actual_surface_bulb_setter_return\n    ::SurfaceConsumerObservation::record(state, \"actual_surface_bulb_setter_return\", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});\n// SURFACE_OBSERVER_END actual_surface_bulb_setter_return\n"
+  },
+  {
+    "after_original_line": 315,
+    "tag": "actual_surface_wind_setters_return",
+    "source_anchor": "    DataSurfaces::SetSurfaceWindDirAt(state);\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN actual_surface_wind_setters_return\n    ::SurfaceConsumerObservation::record(state, \"actual_surface_wind_setters_return\", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});\n// SURFACE_OBSERVER_END actual_surface_wind_setters_return\n"
+  },
+  {
+    "after_original_line": 347,
+    "tag": "effective_surface_environment",
+    "source_anchor": "\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN effective_surface_environment\n    ::SurfaceConsumerObservation::record(state, \"effective_surface_environment\", ::SurfaceConsumerObservation::Copy::Environment, 0, 0, {}, {});\n// SURFACE_OBSERVER_END effective_surface_environment\n"
+  },
+  {
+    "after_original_line": 350,
+    "tag": "actual_surface_allocation_return",
+    "source_anchor": "        AllocateSurfaceHeatBalArrays(state); // Allocate the Module Arrays before any inits take place\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN actual_surface_allocation_return\n    ::SurfaceConsumerObservation::record(state, \"actual_surface_allocation_return\", ::SurfaceConsumerObservation::Copy::Catalog, 0, 0, {}, {});\n// SURFACE_OBSERVER_END actual_surface_allocation_return\n"
+  },
+  {
+    "after_original_line": 383,
+    "tag": "actual_InitThermalAndFluxHistories_return",
+    "source_anchor": "        InitThermalAndFluxHistories(state); // Set initial temperature and flux histories\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN actual_InitThermalAndFluxHistories_return\n    ::SurfaceConsumerObservation::record(state, \"actual_InitThermalAndFluxHistories_return\", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});\n// SURFACE_OBSERVER_END actual_InitThermalAndFluxHistories_return\n"
+  },
+  {
+    "after_original_line": 2209,
+    "tag": "history_initialization_entry_owners",
+    "source_anchor": "{\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN history_initialization_entry_owners\n    ::SurfaceConsumerObservation::record(state, \"history_initialization_entry_owners\", ::SurfaceConsumerObservation::Copy::Histories, 0, 0, {}, {});\n// SURFACE_OBSERVER_END history_initialization_entry_owners\n"
+  },
+  {
+    "after_original_line": 2446,
+    "tag": "history_initialization_final_owners",
+    "source_anchor": "    }\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN history_initialization_final_owners\n    ::SurfaceConsumerObservation::record(state, \"history_initialization_final_owners\", ::SurfaceConsumerObservation::Copy::Histories, 0, 0, {}, {});\n// SURFACE_OBSERVER_END history_initialization_final_owners\n"
+  },
+  {
+    "after_original_line": 2394,
+    "tag": "history_initialization_before_flux",
+    "source_anchor": "            // Initialize the flux histories\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN history_initialization_before_flux\n    ::SurfaceConsumerObservation::record(state, \"history_initialization_before_flux\", ::SurfaceConsumerObservation::Copy::HistoryTerm, SurfNum, CTFTermNum, {}, {});\n// SURFACE_OBSERVER_END history_initialization_before_flux\n"
+  },
+  {
+    "after_original_line": 2398,
+    "tag": "history_initialization_after_flux",
+    "source_anchor": "            state.dataHeatBalSurf->SurfInsideFluxHist(CTFTermNum)(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(2)(SurfNum);\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN history_initialization_after_flux\n    ::SurfaceConsumerObservation::record(state, \"history_initialization_after_flux\", ::SurfaceConsumerObservation::Copy::HistoryTerm, SurfNum, CTFTermNum, {}, {});\n// SURFACE_OBSERVER_END history_initialization_after_flux\n"
+  },
+  {
+    "after_original_line": 504,
+    "tag": "constant_before_reset",
+    "source_anchor": "                auto const &construct = state.dataConstruction->Construct(ConstrNum);\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN constant_before_reset\n    ::SurfaceConsumerObservation::record(state, \"constant_before_reset\", ::SurfaceConsumerObservation::Copy::Constants, SurfNum, 0, {}, {});\n// SURFACE_OBSERVER_END constant_before_reset\n"
+  },
+  {
+    "after_original_line": 506,
+    "tag": "constant_after_reset",
+    "source_anchor": "                state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) = 0.0;\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN constant_after_reset\n    ::SurfaceConsumerObservation::record(state, \"constant_after_reset\", ::SurfaceConsumerObservation::Copy::Constants, SurfNum, 0, {}, {});\n// SURFACE_OBSERVER_END constant_after_reset\n"
+  },
+  {
+    "after_original_line": 507,
+    "tag": "constant_skipped_num_terms_le_one",
+    "source_anchor": "                if (construct.NumCTFTerms <= 1) {\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN constant_skipped_num_terms_le_one\n    ::SurfaceConsumerObservation::record(state, \"constant_skipped_num_terms_le_one\", ::SurfaceConsumerObservation::Copy::None, SurfNum, 0, {}, {{\"SurfNum\", SurfNum}, {\"NumCTFTerms\", construct.NumCTFTerms}});\n// SURFACE_OBSERVER_END constant_skipped_num_terms_le_one\n"
+  },
+  {
+    "after_original_line": 532,
+    "tag": "constant_after_each_ordered_term",
+    "source_anchor": "                        construct.CTFOutside[Term] * TH11 - ctf_cross * TH12 + construct.CTFFlux[Term] * QH11;\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN constant_after_each_ordered_term\n    ::SurfaceConsumerObservation::record(state, \"constant_after_each_ordered_term\", ::SurfaceConsumerObservation::Copy::Constants, SurfNum, Term, {{\"ctf_cross\", ctf_cross}, {\"TH11\", TH11}, {\"TH12\", TH12}, {\"QH11\", QH11}, {\"QH12\", QH12}}, {{\"Term\", Term}, {\"ConstrNum\", ConstrNum}});\n// SURFACE_OBSERVER_END constant_after_each_ordered_term\n"
+  },
+  {
+    "after_original_line": 8725,
+    "tag": "inside_ctf_cache_assigned",
+    "source_anchor": "                state.dataHeatBalSurf->SurfTempOutHist(surfNum) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(surfNum);\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN inside_ctf_cache_assigned\n    ::SurfaceConsumerObservation::record(state, \"inside_ctf_cache_assigned\", ::SurfaceConsumerObservation::Copy::Cache, surfNum, 0, {}, {});\n// SURFACE_OBSERVER_END inside_ctf_cache_assigned\n"
+  },
+  {
+    "after_original_line": 8663,
+    "tag": "inside_ctf_actual_caller_bounds",
+    "source_anchor": "{\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN inside_ctf_actual_caller_bounds\n    ::SurfaceConsumerObservation::record(state, \"inside_ctf_actual_caller_bounds\", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {{\"FirstZone\", FirstZone}, {\"LastZone\", LastZone}, {\"ZoneToResimulate_present\", static_cast<int>(ZoneToResimulate.present())}, {\"IZSurfs_size\", static_cast<std::int64_t>(IZSurfs.size())}});\n// SURFACE_OBSERVER_END inside_ctf_actual_caller_bounds\n"
+  },
+  {
+    "after_original_line": 8663,
+    "tag": "inside_ctf_actual_optional_input",
+    "source_anchor": "{\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN inside_ctf_actual_optional_input\n    if (ZoneToResimulate.present()) {\n        ::SurfaceConsumerObservation::record(state, \"inside_ctf_actual_resimulation_zone\", ::SurfaceConsumerObservation::Copy::None,\n            0, 0, {}, {{\"ZoneToResimulate\", ZoneToResimulate()}});\n    }\n    for (int const id : IZSurfs) {\n        ::SurfaceConsumerObservation::record(state, \"inside_ctf_actual_interzone_input\", ::SurfaceConsumerObservation::Copy::None,\n            0, 0, {}, {{\"actual_surface_index\", id}});\n    }\n// SURFACE_OBSERVER_END inside_ctf_actual_optional_input\n"
+  },
+  {
+    "after_original_line": 8800,
+    "tag": "inside_ctf_precalculation_assigned",
+    "source_anchor": "                     iterDampConstant);\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN inside_ctf_precalculation_assigned\n    ::SurfaceConsumerObservation::record(state, \"inside_ctf_precalculation_assigned\", ::SurfaceConsumerObservation::Copy::Inside, surfNum, 0, {{\"iterDampConstant\", iterDampConstant}, {\"timeStepZoneSeconds\", timeStepZoneSeconds}}, {});\n// SURFACE_OBSERVER_END inside_ctf_precalculation_assigned\n"
+  },
+  {
+    "after_original_line": 8912,
+    "tag": "inside_ctf_before_temperature_assignment",
+    "source_anchor": "                    // Calculate the current inside surface temperature\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN inside_ctf_before_temperature_assignment\n    ::SurfaceConsumerObservation::record(state, \"inside_ctf_before_temperature_assignment\", ::SurfaceConsumerObservation::Copy::Inside, surfNum, 0, {{\"iterDampConstant\", iterDampConstant}}, {});\n// SURFACE_OBSERVER_END inside_ctf_before_temperature_assignment\n"
+  },
+  {
+    "after_original_line": 8933,
+    "tag": "inside_ctf_after_temperature_assignment",
+    "source_anchor": "                    state.dataHeatBalSurf->SurfTempIn(surfNum) = state.dataHeatBalSurf->SurfTempInTmp(surfNum);\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN inside_ctf_after_temperature_assignment\n    ::SurfaceConsumerObservation::record(state, \"inside_ctf_after_temperature_assignment\", ::SurfaceConsumerObservation::Copy::InsideResult, surfNum, 0, {}, {});\n// SURFACE_OBSERVER_END inside_ctf_after_temperature_assignment\n"
+  },
+  {
+    "after_original_line": 9174,
+    "tag": "inside_ctf_current_temperature_history_assigned",
+    "source_anchor": "                    state.dataHeatBalSurf->SurfTempOut(surfNum) = TH11;                                                  // For reporting\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN inside_ctf_current_temperature_history_assigned\n    ::SurfaceConsumerObservation::record(state, \"inside_ctf_current_temperature_history_assigned\", ::SurfaceConsumerObservation::Copy::None, 0, 0, {{\"TH11\", TH11}, {\"TH12\", TH12}}, {{\"surfNum\", surfNum}});\n// SURFACE_OBSERVER_END inside_ctf_current_temperature_history_assigned\n"
+  },
+  {
+    "after_original_line": 9247,
+    "tag": "inside_ctf_convergence_checks_reached",
+    "source_anchor": "        }\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN inside_ctf_convergence_checks_reached\n    ::SurfaceConsumerObservation::record(state, \"inside_ctf_convergence_checks_reached\", ::SurfaceConsumerObservation::Copy::None, 0, 0, {{\"MaxDelTemp\", MaxDelTemp}}, {{\"Converged\", static_cast<int>(Converged)}});\n// SURFACE_OBSERVER_END inside_ctf_convergence_checks_reached\n"
+  },
+  {
+    "after_original_line": 9270,
+    "tag": "inside_ctf_max_iteration_break_reached",
+    "source_anchor": "            }\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN inside_ctf_max_iteration_break_reached\n    ::SurfaceConsumerObservation::record(state, \"inside_ctf_max_iteration_break_reached\", ::SurfaceConsumerObservation::Copy::None, 0, 0, {{\"MaxDelTemp\", MaxDelTemp}}, {{\"Converged\", static_cast<int>(Converged)}});\n// SURFACE_OBSERVER_END inside_ctf_max_iteration_break_reached\n"
+  },
+  {
+    "after_original_line": 9274,
+    "tag": "inside_ctf_loop_exited",
+    "source_anchor": "    } // ...end of main inside heat balance iteration loop (ends when Converged)\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN inside_ctf_loop_exited\n    ::SurfaceConsumerObservation::record(state, \"inside_ctf_loop_exited\", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {{\"Converged\", static_cast<int>(Converged)}});\n// SURFACE_OBSERVER_END inside_ctf_loop_exited\n"
+  },
+  {
+    "after_original_line": 5222,
+    "tag": "history_update_entry_owners",
+    "source_anchor": "{\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN history_update_entry_owners\n    ::SurfaceConsumerObservation::record(state, \"history_update_entry_owners\", ::SurfaceConsumerObservation::Copy::Histories, 0, 0, {}, {});\n// SURFACE_OBSERVER_END history_update_entry_owners\n"
+  },
+  {
+    "after_original_line": 5256,
+    "tag": "actual_history_scratch_allocation_return",
+    "source_anchor": "        state.dataHeatBalSurfMgr->UpdateThermalHistoriesFirstTimeFlag = false;\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN actual_history_scratch_allocation_return\n    ::SurfaceConsumerObservation::record(state, \"actual_history_scratch_allocation_return\", ::SurfaceConsumerObservation::Copy::Scratch, 0, 0, {}, {});\n// SURFACE_OBSERVER_END actual_history_scratch_allocation_return\n"
+  },
+  {
+    "after_original_line": 5276,
+    "tag": "history_flux_skipped_zero_terms",
+    "source_anchor": "                if (construct.NumCTFTerms == 0) {\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN history_flux_skipped_zero_terms\n    ::SurfaceConsumerObservation::record(state, \"history_flux_skipped_zero_terms\", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {{\"SurfNum\", SurfNum}, {\"ConstrNum\", ConstrNum}, {\"NumCTFTerms\", construct.NumCTFTerms}});\n// SURFACE_OBSERVER_END history_flux_skipped_zero_terms\n"
+  },
+  {
+    "after_original_line": 5300,
+    "tag": "history_actual_inside_flux_assigned",
+    "source_anchor": "                state.dataHeatBalSurf->SurfInsideFluxHist(1)(SurfNum) = SurfInsideFluxHistCurr;\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN history_actual_inside_flux_assigned\n    ::SurfaceConsumerObservation::record(state, \"history_actual_inside_flux_assigned\", ::SurfaceConsumerObservation::Copy::Flux, SurfNum, 0, {{\"SurfInsideFluxHistCurr\", SurfInsideFluxHistCurr}, {\"SurfOutsideTempCurr\", SurfOutsideTempCurr}}, {});\n// SURFACE_OBSERVER_END history_actual_inside_flux_assigned\n"
+  },
+  {
+    "after_original_line": 5327,
+    "tag": "history_actual_outside_flux_and_report_assigned",
+    "source_anchor": "                state.dataHeatBalSurf->SurfOpaqOutFaceCond(SurfNum) = surface.Area * state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(SurfNum);\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN history_actual_outside_flux_and_report_assigned\n    ::SurfaceConsumerObservation::record(state, \"history_actual_outside_flux_and_report_assigned\", ::SurfaceConsumerObservation::Copy::Flux, SurfNum, 0, {}, {});\n// SURFACE_OBSERVER_END history_actual_outside_flux_and_report_assigned\n"
+  },
+  {
+    "after_original_line": 5354,
+    "tag": "simple_history_hard_copy_complete",
+    "source_anchor": "        state.dataHeatBalSurf->SurfOutsideFluxHist(2) = state.dataHeatBalSurf->SurfOutsideFluxHist(1);\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN simple_history_hard_copy_complete\n    ::SurfaceConsumerObservation::record(state, \"simple_history_hard_copy_complete\", ::SurfaceConsumerObservation::Copy::Histories, 0, 0, {}, {});\n// SURFACE_OBSERVER_END simple_history_hard_copy_complete\n"
+  },
+  {
+    "after_original_line": 5374,
+    "tag": "master_history_begin_block_scratch_assigned",
+    "source_anchor": "                    state.dataHeatBalSurfMgr->QInt1(SurfNum) = state.dataHeatBalSurf->SurfInsideFluxHist(1)(SurfNum);\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN master_history_begin_block_scratch_assigned\n    ::SurfaceConsumerObservation::record(state, \"master_history_begin_block_scratch_assigned\", ::SurfaceConsumerObservation::Copy::Scratch, SurfNum, 0, {}, {});\n// SURFACE_OBSERVER_END master_history_begin_block_scratch_assigned\n"
+  },
+  {
+    "after_original_line": 5422,
+    "tag": "master_history_counter_and_sumtime_assigned",
+    "source_anchor": "                state.dataHeatBalSurfMgr->SumTime(SurfNum) = double(state.dataHeatBalSurf->SurfCurrNumHist(SurfNum)) * state.dataGlobal->TimeStepZone;\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN master_history_counter_and_sumtime_assigned\n    ::SurfaceConsumerObservation::record(state, \"master_history_counter_and_sumtime_assigned\", ::SurfaceConsumerObservation::Copy::Scratch, SurfNum, 0, {}, {});\n// SURFACE_OBSERVER_END master_history_counter_and_sumtime_assigned\n"
+  },
+  {
+    "after_original_line": 5457,
+    "tag": "master_history_completed_block",
+    "source_anchor": "                    state.dataHeatBalSurf->SurfInsideFluxHist(2)(SurfNum) = state.dataHeatBalSurf->SurfInsideFluxHistMaster(2)(SurfNum);\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN master_history_completed_block\n    ::SurfaceConsumerObservation::record(state, \"master_history_completed_block\", ::SurfaceConsumerObservation::Copy::HistorySurface, SurfNum, 0, {}, {});\n// SURFACE_OBSERVER_END master_history_completed_block\n"
+  },
+  {
+    "after_original_line": 5459,
+    "tag": "master_history_interpolation_fraction_assigned",
+    "source_anchor": "                    Real64 const sum_steps(state.dataHeatBalSurfMgr->SumTime(SurfNum) / construct.CTFTimeStep);\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN master_history_interpolation_fraction_assigned\n    ::SurfaceConsumerObservation::record(state, \"master_history_interpolation_fraction_assigned\", ::SurfaceConsumerObservation::Copy::Scratch, SurfNum, 0, {{\"sum_steps\", sum_steps}}, {});\n// SURFACE_OBSERVER_END master_history_interpolation_fraction_assigned\n"
+  },
+  {
+    "after_original_line": 5492,
+    "tag": "master_history_interpolation_complete",
+    "source_anchor": "                        (state.dataHeatBalSurf->SurfInsideFluxHistMaster(2)(SurfNum) - state.dataHeatBalSurfMgr->QInt1(SurfNum)) * sum_steps;\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN master_history_interpolation_complete\n    ::SurfaceConsumerObservation::record(state, \"master_history_interpolation_complete\", ::SurfaceConsumerObservation::Copy::HistorySurface, SurfNum, 0, {{\"sum_steps\", sum_steps}}, {});\n// SURFACE_OBSERVER_END master_history_interpolation_complete\n"
+  },
+  {
+    "after_original_line": 6744,
+    "tag": "opaque_conduction_report_loop_reached",
+    "source_anchor": "    // Opaque heat transfer surfaces\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN opaque_conduction_report_loop_reached\n    ::SurfaceConsumerObservation::record(state, \"opaque_conduction_report_loop_reached\", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});\n// SURFACE_OBSERVER_END opaque_conduction_report_loop_reached\n"
+  },
+  {
+    "after_original_line": 6770,
+    "tag": "conduction_reports_before_face_assignments",
+    "source_anchor": "                // inside face conduction updates\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN conduction_reports_before_face_assignments\n    ::SurfaceConsumerObservation::record(state, \"conduction_reports_before_face_assignments\", ::SurfaceConsumerObservation::Copy::Reports, surfNum, 0, {}, {});\n// SURFACE_OBSERVER_END conduction_reports_before_face_assignments\n"
+  },
+  {
+    "after_original_line": 6824,
+    "tag": "conduction_reports_after_storage_assignments",
+    "source_anchor": "                }\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN conduction_reports_after_storage_assignments\n    ::SurfaceConsumerObservation::record(state, \"conduction_reports_after_storage_assignments\", ::SurfaceConsumerObservation::Copy::Reports, surfNum, 0, {}, {});\n// SURFACE_OBSERVER_END conduction_reports_after_storage_assignments\n"
+  },
+  {
+    "after_original_line": 2322,
+    "tag": "history_selected_initialization_input",
+    "source_anchor": "\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN history_selected_initialization_input\n    ::SurfaceConsumerObservation::record(state, \"history_selected_initialization_input\", ::SurfaceConsumerObservation::Copy::Histories, 0, 0, {}, {});\n// SURFACE_OBSERVER_END history_selected_initialization_input\n"
+  },
+  {
+    "after_original_line": 2436,
+    "tag": "history_selected_initialization_complete",
+    "source_anchor": "    }\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN history_selected_initialization_complete\n    ::SurfaceConsumerObservation::record(state, \"history_selected_initialization_complete\", ::SurfaceConsumerObservation::Copy::Histories, 0, 0, {}, {});\n// SURFACE_OBSERVER_END history_selected_initialization_complete\n"
+  },
+  {
+    "after_original_line": 5496,
+    "tag": "history_selected_master_update_complete",
+    "source_anchor": "    } // ...end of loop over all (heat transfer) surfaces\n",
+    "insertion": "// SURFACE_OBSERVER_BEGIN history_selected_master_update_complete\n    ::SurfaceConsumerObservation::record(state, \"history_selected_master_update_complete\", ::SurfaceConsumerObservation::Copy::Histories, 0, 0, {}, {});\n// SURFACE_OBSERVER_END history_selected_master_update_complete\n"
+  }
+]

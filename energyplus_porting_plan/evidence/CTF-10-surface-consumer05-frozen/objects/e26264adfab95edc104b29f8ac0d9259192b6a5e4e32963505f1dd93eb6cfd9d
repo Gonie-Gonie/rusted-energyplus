@@ -1,0 +1,55 @@
+{
+  "schema": "ctf10-selected-thermal-history-direct-unit-policy.v1",
+  "scope": "Same-input selected standalone thermal-history API only; actual Native05 capture and factual QA precede separately authorized Rust application/execution.",
+  "endpoint_pairs": [
+    {"procedure": "InitThermalAndFluxHistories", "input": "history_selected_initialization_input", "selected_complete": ["history_selected_initialization_complete"]},
+    {"procedure": "UpdateThermalHistories", "input": "history_update_entry_owners", "selected_complete": ["simple_history_hard_copy_complete", "history_selected_master_update_complete"]}
+  ],
+  "require_same_actual_state_procedure_invocation_and_normal_return": true,
+  "eligible_actual_visits": "All retained visits admitted by the exact selected API; no sampling, forced branch or dropped unsupported member.",
+  "real_profiles_by_owner": {
+    "SurfInsideTempHist": {"unit": "C", "atol": 0.0, "rtol": 0.0},
+    "SurfOutsideTempHist": {"unit": "C", "atol": 0.0, "rtol": 0.0},
+    "SurfInsideFluxHist": {"unit": "W/m2", "atol": 0.0, "rtol": 0.0},
+    "SurfOutsideFluxHist": {"unit": "W/m2", "atol": 0.0, "rtol": 0.0},
+    "SurfInsideTempHistMaster": {"unit": "C", "atol": 0.0, "rtol": 0.0},
+    "SurfOutsideTempHistMaster": {"unit": "C", "atol": 0.0, "rtol": 0.0},
+    "SurfInsideFluxHistMaster": {"unit": "W/m2", "atol": 0.0, "rtol": 0.0},
+    "SurfOutsideFluxHistMaster": {"unit": "W/m2", "atol": 0.0, "rtol": 0.0},
+    "QExt1": {"unit": "W/m2", "atol": 0.0, "rtol": 0.0},
+    "QInt1": {"unit": "W/m2", "atol": 0.0, "rtol": 0.0},
+    "TempInt1": {"unit": "C", "atol": 0.0, "rtol": 0.0},
+    "TempExt1": {"unit": "C", "atol": 0.0, "rtol": 0.0},
+    "SumTime": {"unit": "h", "atol": 0.0, "rtol": 0.0},
+    "SurfOpaqInsFaceCond": {"unit": "W", "atol": 0.0, "rtol": 0.0},
+    "SurfOpaqInsFaceCondFlux": {"unit": "W/m2", "atol": 0.0, "rtol": 0.0},
+    "SurfOpaqOutFaceCond": {"unit": "W", "atol": 0.0, "rtol": 0.0},
+    "SurfOpaqOutFaceCondFlux": {"unit": "W/m2", "atol": 0.0, "rtol": 0.0}
+  },
+  "arithmetic_class_and_signed_zero_exact": true,
+  "arithmetic_NaN_payload_equivalence_claimed": false,
+  "copied_and_untouched_values_require_exact_bits_including_NaN_payloads": true,
+  "complete_state_contract": {
+    "normal": "All four actual19 term-major rows and every allocated surface column, including non-AllHT columns.",
+    "masters": "All four optional actual19-row arrays and exact allocation/null availability.",
+    "counter": "Actual optional full SurfCurrNumHist integer array, exact values and indices.",
+    "scratch": "All five actual optional arrays, exact allocation/bounds and every surface column.",
+    "reports": "All four actual conduction/report arrays, complete allocated surface layout.",
+    "first_time_flag": "Actual UpdateThermalHistoriesFirstTimeFlag, exact before and selected-complete values."
+  },
+  "input_custody": {
+    "identity_shape_traversal_clock_flags_counters_allocation": "exact",
+    "current_construction_coefficients": "All12 fixed19 arrays/counts/CTFTimeStep/UValue; exact copied bits, IDs and first-reference encounter order; no conversion or reconstruction.",
+    "surface_operands": "Actual area[m2], SurfTempIn[C], SurfCTFConstInPart/OutPart[W/m2], SurfOutDryBulbTemp[C].",
+    "time_step": "Actual TimeStepZone[h] and retained TimeStepZoneSec[s] clock; no inferred ratio or counter.",
+    "Native_default_temperature": "Pinned SurfInitialTemp23 C is a source constant, distinct from the20 C air fixture.",
+    "Native_expected_endpoint_supplied_to_Rust_candidate": false
+  },
+  "required_eligible_missing_stopped_or_unavailable_can_PASS": false,
+  "unreached_or_excluded_branch_can_PASS": false,
+  "predicted_result_counts_or_branch_counts": null,
+  "history_direct_unit_execution_authorized_by_capture_or_freeze_alone": false,
+  "ordinary_Rust_runtime_integration_PASS_claimed": false,
+  "unobserved_general_master_branch_PASS_claimed": false,
+  "full_card_PASS_claimed": false
+}

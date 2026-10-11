@@ -1,0 +1,32 @@
+--- .runtime/porting/CTF-10/surface-consumer-native-prep-04/HeatBalanceSurfaceManager.surface_consumer.cc
++++ .runtime/porting/CTF-10/surface-consumer-native-prep-05/HeatBalanceSurfaceManager.surface_consumer.cc
+@@ -2383,6 +2383,9 @@
+         }
+     } // end of Zone
+ 
++// SURFACE_OBSERVER_BEGIN history_selected_initialization_input
++    ::SurfaceConsumerObservation::record(state, "history_selected_initialization_input", ::SurfaceConsumerObservation::Copy::Histories, 0, 0, {}, {});
++// SURFACE_OBSERVER_END history_selected_initialization_input
+     // "Bulk" initializations of temperature arrays with dimensions (TotSurface,MaxCTFTerms,2)
+     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+         for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+@@ -2503,6 +2506,9 @@
+             }
+         }
+     }
++// SURFACE_OBSERVER_BEGIN history_selected_initialization_complete
++    ::SurfaceConsumerObservation::record(state, "history_selected_initialization_complete", ::SurfaceConsumerObservation::Copy::Histories, 0, 0, {}, {});
++// SURFACE_OBSERVER_END history_selected_initialization_complete
+ 
+     if (state.dataSurface->TotOSCM >= 1) {
+         for (int OSCMnum = 1; OSCMnum <= state.dataSurface->TotOSCM; ++OSCMnum) {
+@@ -5602,6 +5608,9 @@
+             }
+         }
+     } // ...end of loop over all (heat transfer) surfaces
++// SURFACE_OBSERVER_BEGIN history_selected_master_update_complete
++    ::SurfaceConsumerObservation::record(state, "history_selected_master_update_complete", ::SurfaceConsumerObservation::Copy::Histories, 0, 0, {}, {});
++// SURFACE_OBSERVER_END history_selected_master_update_complete
+ 
+     if (state.dataHeatBal->AnyInternalHeatSourceInInput) {
+         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {

@@ -1,0 +1,271 @@
+{
+  "schema": "ctf10-surface-consumer05-Root-scope-freezer-source-preparation.v1",
+  "status": "held-source-only-unexecuted-awaiting-Root-FULL-review",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/prepare-scope.py",
+      "sha256": "0560f73fe214a17d41adf623ae6221735ecd5e1c8b0de5dd8bce8741bc19c5fa",
+      "size_bytes": 5557,
+      "line_count": 52
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/freeze-inputs.py",
+      "sha256": "f23ea04c58d8033a726e5c23255d559a3921c2182ff25469ed8170da46f7d891",
+      "size_bytes": 2421,
+      "line_count": 25
+    }
+  ],
+  "input_only_policy": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/thermal-history-unit-policy.json",
+    "sha256": "e26264adfab95edc104b29f8ac0d9259192b6a5e4e32963505f1dd93eb6cfd9d",
+    "size_bytes": 3961,
+    "line_count": 55
+  },
+  "documentation": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/README.md",
+    "sha256": "74c55eb12fda793e112d87716d3136c3be8f24951961d286624a3ec4541c6e3a",
+    "size_bytes": 3386,
+    "line_count": 50
+  },
+  "exact_diffs": [
+    {
+      "before": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/before/prepare-surface-consumer-scope-02.py",
+        "sha256": "fa79aed052115b702f904d18a6ce2894bbbb3257276924966a6002138c32c4e4",
+        "size_bytes": 5145,
+        "line_count": 41
+      },
+      "after": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/prepare-scope.py",
+        "sha256": "0560f73fe214a17d41adf623ae6221735ecd5e1c8b0de5dd8bce8741bc19c5fa",
+        "size_bytes": 5557,
+        "line_count": 52
+      },
+      "diff": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/diffs/prepare-scope.py.diff",
+        "sha256": "05988c5e5924b5653e5e63757d16a5371aec47676e6fa185a764868ecea2162e",
+        "size_bytes": 9680,
+        "line_count": 80
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/before/freeze-surface-consumer-inputs-02.py",
+        "sha256": "c4149442dbe646a4eb3017d784e230d4b2a0b9a93c95b772e40bebfe2abc0647",
+        "size_bytes": 1908,
+        "line_count": 21
+      },
+      "after": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/freeze-inputs.py",
+        "sha256": "f23ea04c58d8033a726e5c23255d559a3921c2182ff25469ed8170da46f7d891",
+        "size_bytes": 2421,
+        "line_count": 25
+      },
+      "diff": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/diffs/freeze-inputs.py.diff",
+        "sha256": "7b6de387049d34ad56e7d3e80193abdc76929255589477d1e5572a5157eb344b",
+        "size_bytes": 3252,
+        "line_count": 33
+      }
+    }
+  ],
+  "new_policy_addition": {
+    "before_absent": true,
+    "after": {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/thermal-history-unit-policy.json",
+      "sha256": "e26264adfab95edc104b29f8ac0d9259192b6a5e4e32963505f1dd93eb6cfd9d",
+      "size_bytes": 3961,
+      "line_count": 55
+    },
+    "diff": {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/diffs/thermal-history-unit-policy.json.diff",
+      "sha256": "5e4dc0783c9a083585a6502f1e5af3717e460bf28551b5a9f10e0e137d70d5da",
+      "size_bytes": 4149,
+      "line_count": 58
+    }
+  },
+  "read_Source_refs": [
+    {
+      "path": ".runtime/porting/CTF-10/prepare-surface-consumer-scope-02.py",
+      "sha256": "fa79aed052115b702f904d18a6ce2894bbbb3257276924966a6002138c32c4e4",
+      "size_bytes": 5145,
+      "line_count": 41
+    },
+    {
+      "path": ".runtime/porting/CTF-10/freeze-surface-consumer-inputs-02.py",
+      "sha256": "c4149442dbe646a4eb3017d784e230d4b2a0b9a93c95b772e40bebfe2abc0647",
+      "size_bytes": 1908,
+      "line_count": 21
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-scope-amendment-02/amendment.json",
+      "sha256": "56c82fde93bb4bd0fc90e318e654aabf586a93175a3cc08228c36cad698aff3a",
+      "size_bytes": 19535,
+      "line_count": 553
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/manifest.json",
+      "sha256": "8eac3eb0ec2a28c91db06e5c9d02ab0611090b68095183569df58b8198a8a94c",
+      "size_bytes": 31280,
+      "line_count": 754
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/manifest.json",
+      "sha256": "b845f22a1ac9cac06b39d1a884a00dff7500b5cfc9e5b7431834a288691f61e1",
+      "size_bytes": 26578,
+      "line_count": 660
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-review-prep-02/manifest.json",
+      "sha256": "029f2cffd8dfdcb8776723eff7fa858e2b7157accc9ab45b7e50fa0b0ff24bb0",
+      "size_bytes": 6393,
+      "line_count": 167
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/manifest.json",
+      "sha256": "a27641042054dea917f17cbbf2f710e765496cfd7f3445f81bfcd35498b2a1a0",
+      "size_bytes": 48595,
+      "line_count": 1193
+    },
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-prep-01/new/ctf_thermal_history.rs",
+      "sha256": "e14aaf27dda04b2105dfb2a00b056d7bc7d934105593bf1692817bc31ca641f6",
+      "size_bytes": 26022,
+      "line_count": 483
+    },
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-observation-readiness-prep-01/README.md",
+      "sha256": "a740ccea321007111e396c9955dbb70df86516c385e7f109cc61acf66eebde15",
+      "size_bytes": 6010,
+      "line_count": 93
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_observer.cc",
+      "sha256": "7a966b5b17b63eb6541ffc3d318851c940134ee67bec76e14f1180ad391b883a",
+      "size_bytes": 22282,
+      "line_count": 384
+    }
+  ],
+  "unit_and_boundary_Source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalSurface.hh",
+      "start_line": 94,
+      "end_line": 109,
+      "sha256": "a84d30ff98d2b0cefd81aa399440dbcf206fd8c5850acfe28dae0c9f0562e2a6",
+      "size_bytes": 1193,
+      "purpose": "constant flux and current surface temperature operands"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalSurface.hh",
+      "start_line": 156,
+      "end_line": 170,
+      "sha256": "618a36f7fff96270bf34076f1623a0c7a49973ac0e201bd7cd80123ee3662064",
+      "size_bytes": 1544,
+      "purpose": "actual W and W/m2 report declarations"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalSurface.hh",
+      "start_line": 209,
+      "end_line": 220,
+      "sha256": "c14a314875c13eb6f2fed8c235a0e6bac8c11ca6118e7e7ccde8b74d0c76fb56",
+      "size_bytes": 1175,
+      "purpose": "normal/master history declarations"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.hh",
+      "start_line": 222,
+      "end_line": 241,
+      "sha256": "4fafee9e6dc478dca6820d4c2a828918b9ff5782ee7c2a7f27f9b2d9561e9bc9",
+      "size_bytes": 1164,
+      "purpose": "scratch and first-time owners"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+      "start_line": 109,
+      "end_line": 115,
+      "sha256": "3c7004ff5ffeb5ee662d0c7147dd4911d2c137fbc4c71313440e641188218846",
+      "size_bytes": 541,
+      "purpose": "actual fractional-hour zone timestep"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+      "start_line": 710,
+      "end_line": 714,
+      "sha256": "8525fbf79b0976700e9cc00e77f536c0947b7ddc7bae0778ae068135c9e262d1",
+      "size_bytes": 480,
+      "purpose": "actual m2 surface area"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+      "start_line": 1537,
+      "end_line": 1541,
+      "sha256": "cb3043e13a50b8475d6f94a0f79dde8f8c9cd096f99237eac8700bb165a5d090",
+      "size_bytes": 359,
+      "purpose": "actual C outside dry-bulb"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 2381,
+      "end_line": 2436,
+      "sha256": "1f3aed1625a8954e5dce56e36b2d60c6688674b1e820736e46a7bbadd4dee4e2",
+      "size_bytes": 4241,
+      "purpose": "literal initialization history and UValue flux assignment"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 5245,
+      "end_line": 5355,
+      "sha256": "08264a55d35d117083fe78d8404ee824239f0fb9b384b86a04eee99b6a42a5c8",
+      "size_bytes": 8920,
+      "purpose": "literal scratch/flux/report/simple selected endpoint"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "start_line": 5358,
+      "end_line": 5497,
+      "sha256": "bbf7a50426096bd94d6c2d4767e446de3d041f233870a4b3ab6ae19e51fe5ae3",
+      "size_bytes": 11363,
+      "purpose": "literal general counters/hour SumTime and master selected endpoint"
+    }
+  ],
+  "runtime_current_document_paths": [
+    "energyplus_porting_plan/plan.json",
+    "energyplus_porting_plan/cards/CTF-10.md",
+    "energyplus_porting_plan/energyplus_porting_checklist.html"
+  ],
+  "Root_supplied_starting_document_revision_context_only": "1cf319ff",
+  "runtime_paths": {
+    "scope": ".runtime/porting/CTF-10/surface-consumer05-scope-amendment-01/amendment.json",
+    "scope_check": ".runtime/porting/CTF-10/surface-consumer05-scope-check-command-01/receipt.json",
+    "freeze": ".runtime/porting/CTF-10/surface-consumer05-frozen-inputs-01/freeze-receipt.json",
+    "observation": ".runtime/porting/CTF-10/surface-consumer05-native-output-01/A-24H.observation.json",
+    "output": ".runtime/porting/CTF-10/surface-consumer05-native-output-01/A-24H"
+  },
+  "runtime_interfaces": {
+    "scope_schema": "ctf10-surface-consumer-scope-amendment.v1",
+    "freeze_schema": "ctf10-surface-consumer-input-freeze.v1",
+    "scope_check_role": "real-CTF-10-check-only",
+    "direct_literal_freezer_command": [
+      "python",
+      "-X",
+      "utf8",
+      "-B",
+      ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/freeze-inputs.py"
+    ],
+    "QA05_literal_writer_operand": "--literal-freeze-writer .runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/freeze-inputs.py#f23ea04c58d8033a726e5c23255d559a3921c2182ff25469ed8170da46f7d891",
+    "freeze_policy_ref_field": "thermal_history_direct_unit_policy",
+    "scope_and_freeze_policy_Source_field": "thermal_history_direct_unit_policy_source",
+    "sync_plan_views_invocations": 1,
+    "future_SourceSnapshot_receipts_binary_identities_counts_or_outcomes": null
+  },
+  "Source_only_verification": {
+    "AST_own2_and_before2_only": true,
+    "unchanged_input_guards": 45,
+    "helper_ordinary_forwarded_arguments": 7,
+    "observation_max_bytes": 4294967296,
+    "new_QA_framework": false,
+    "canonical_Git_recorder_target_engine_or_reviewed_import_performed": false,
+    "scientific_weather_or_binary_payload_read": false,
+    "gate_edit_or_numerical_PASS_claimed": false
+  }
+}

@@ -1,0 +1,12 @@
+--- .runtime/porting/CTF-10/surface-consumer05-native-build-review-prep-02/before-01/README.md
++++ .runtime/porting/CTF-10/surface-consumer05-native-build-review-prep-02/README.md
+@@ -22,3 +22,9 @@
+ are retained. No reader/target/import/PE/binary execution occurred during
+ preparation. Root alone supplies actual future build/output identities after
+ Source review. No scientific result, integration PASS or gate update is claimed.
++
++
++Metadata02 binds the fresh02 build interface repair. Its approved PE reader
++body remains at the immutable01 path with the same SHA; all PE, provider,
++registration, protection and output contracts are literally01. No reader,
++build, import, binary or scientific execution occurred during this repair.

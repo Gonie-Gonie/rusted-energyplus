@@ -1,0 +1,53 @@
+"""Root runs the FULL reviewed existing five-TU build stages, without an engine."""
+import argparse,hashlib,json,subprocess
+from pathlib import Path
+ROOT=Path.cwd().resolve(); BASE=ROOT/'.runtime/porting/CTF-10'; PREP=BASE/'surface-consumer05-native-build-prep-02'; OPS=PREP
+def read(p): return json.loads(p.read_bytes())
+def arg(p): return p.relative_to(ROOT).as_posix()+'#'+hashlib.sha256(p.read_bytes()).hexdigest()
+def ref(p): return {'path':p.relative_to(ROOT).as_posix(),'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'size_bytes':p.stat().st_size}
+def operand(value):
+ path,digest=value.rsplit('#',1); p=(ROOT/path).resolve()
+ assert p.is_relative_to(ROOT) and p!=ROOT and arg(p).endswith('#'+digest)
+ return p
+parser=argparse.ArgumentParser(description=__doc__)
+for name in ['freeze-receipt','freeze-execution','scope-amendment','scope-execution','restore-configure-execution','restore-preservation','source-snapshot','consumer04-native-build','zon-native-build']:
+ parser.add_argument('--'+name,required=True)
+parser.add_argument('--output-dir',required=True)
+args=parser.parse_args()
+OUT=(ROOT/args.output_dir).resolve(); assert OUT.is_relative_to(BASE) and OUT!=BASE and not OUT.exists()
+runtime={name:operand(getattr(args,name.replace('-','_'))) for name in ['freeze-receipt','freeze-execution','scope-amendment','scope-execution','restore-configure-execution','restore-preservation','source-snapshot','consumer04-native-build','zon-native-build']}
+snapshot={key:ref(runtime['source-snapshot'])[key] for key in ['path','sha256']}
+assert read(runtime['source-snapshot'])['schema']=='rust-command-source-snapshot.v1'
+for name in ['freeze-execution','scope-execution','restore-configure-execution']:
+ receipt=read(runtime[name]); assert receipt['exit_code']==0 and receipt['launch_error']is None and receipt['source_bytes_match_before_and_after'] and receipt['source_snapshot']==snapshot
+assert not subprocess.check_output(['git','status','--porcelain'])
+assert subprocess.check_output(['git','rev-parse','HEAD'])==subprocess.check_output(['git','rev-parse','@{u}'])
+manifest=PREP/'manifest.json'; assert arg(manifest).endswith('#b845f22a1ac9cac06b39d1a884a00dff7500b5cfc9e5b7431834a288691f61e1')
+native=BASE/'surface-consumer-native-prep-05/manifest.json'; assert arg(native).endswith('#8eac3eb0ec2a28c91db06e5c9d02ab0611090b68095183569df58b8198a8a94c')
+for row in read(manifest)['own_sources']: assert arg(ROOT/row['path']).endswith('#'+row['sha256'])
+restore_path=runtime['restore-configure-execution']; restore=read(restore_path)
+assert restore['exit_code']==0 and restore['source_bytes_match_before_and_after']
+preservation=read(runtime['restore-preservation'])
+assert preservation['schema']=='ctf10-surface-consumer05-exact-restore-preservation.v1'
+assert preservation['all54_and631_fresh_hashes_unchanged'] and preservation['literal_prior717_rows_equal']
+assert preservation['protected_ref_count']==54 and preservation['core_present_count']==631
+assert preservation['actual_compile_rows_after']==717 and preservation['actual_exact_prior_configure_execution']==ref(restore_path)
+assert preservation['actual_consumer_native_build']==ref(runtime['consumer04-native-build']) and preservation['actual_ZON_native_build']==ref(runtime['zon-native-build'])
+assert len(read(ROOT/'.runtime/ep261-gcc13-o0/compile_commands.json'))==717
+old_path=BASE/'native-build-01/unit/native-build.json'; old=read(old_path)
+options={'build-source-manifest':manifest,'native-source-manifest':native,
+ 'freeze-receipt':runtime['freeze-receipt'],'freeze-execution':runtime['freeze-execution'],
+ 'scope-amendment':runtime['scope-amendment'],'scope-execution':runtime['scope-execution'],
+ 'fixed-input-guards-source':BASE/'production-cli-inputs-01/manifest.json','prior-final-preservation':BASE/'retirement-01/after-retirement.json',
+ 'prior-retirement':BASE/'retirement-01/retirement.json','prior-retirement-execution':BASE/'retirement-command-01/receipt.json',
+ 'prior-native-build':old_path,'rad-native-build':ROOT/'.runtime/porting/RAD-01/native-build-02/native-build.json',
+ 'consumer04-native-build':runtime['consumer04-native-build'],'zon-native-build':runtime['zon-native-build'],
+ 'prior-configure-execution':ROOT/old['configure_execution']['path'],'prior-compile-execution':ROOT/old['compile_execution']['path'],'restore-configure-execution':restore_path}
+command=['python','-X','utf8','-B',(OPS/'run-native-build.py').relative_to(ROOT).as_posix()]
+for name,path in options.items(): command+=['--'+name,arg(path)]
+command+=['--output-dir',OUT.relative_to(ROOT).as_posix()]
+subprocess.run(command,check=True)
+before=OUT/'before/preservation.json'
+subprocess.run(['python','-X','utf8','-B',(OPS/'derive-and-describe-native-build.py').relative_to(ROOT).as_posix(),'--before-preservation',arg(before),'--prior-derivation-execution',arg(ROOT/old['derivation_execution']['path']),'--output-dir',OUT.relative_to(ROOT).as_posix()],check=True)
+subprocess.run(['python','-X','utf8','-B',(OPS/'complete-native-build-metadata.py').relative_to(ROOT).as_posix(),'--before-preservation',arg(before),'--output-dir',OUT.relative_to(ROOT).as_posix()],check=True)
+print('Root actual full-reviewed surface consumer05 build completed',arg(OUT/'native-build.json'),flush=True)

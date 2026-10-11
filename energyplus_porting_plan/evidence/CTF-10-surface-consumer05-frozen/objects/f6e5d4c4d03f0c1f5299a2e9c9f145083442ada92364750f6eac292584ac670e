@@ -1,0 +1,106 @@
+# Source-only additional targets; preserve current helpers and original archive.
+if(NOT DEFINED CLK03_REPOSITORY_ROOT OR NOT DEFINED CTF10_SOURCE_DIR OR NOT DEFINED CTF10_OBSERVER_SOURCE_DIR)
+  message(FATAL_ERROR "CTF10 requires explicit repository/source/inherited observer directories")
+endif()
+include("${CLK03_REPOSITORY_ROOT}/.runtime/porting/CTF-09/native-helper-prep-01/ctf09_reference.cmake")
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+  get_property(_ctf10_scheduled GLOBAL PROPERTY CTF10_REFERENCE_SCHEDULED)
+  if(NOT _ctf10_scheduled)
+    set_property(GLOBAL PROPERTY CTF10_REFERENCE_SCHEDULED TRUE)
+    function(ctf10_add_reference)
+      if(NOT TARGET energypluslib)
+        message(FATAL_ERROR "CTF10 requires the unchanged genuine core archive")
+      endif()
+      get_target_property(_ctf10_defs energypluslib COMPILE_DEFINITIONS)
+      get_directory_property(_ctf10_dir_defs DIRECTORY "${CMAKE_SOURCE_DIR}/src/EnergyPlus" COMPILE_DEFINITIONS)
+      list(APPEND _ctf10_defs ${_ctf10_dir_defs})
+      list(FILTER _ctf10_defs EXCLUDE REGEX "-NOTFOUND$")
+      list(REMOVE_DUPLICATES _ctf10_defs)
+      foreach(_ctf10_lane IN ITEMS unit production)
+        set(_ctf10_target "ctf10_${_ctf10_lane}_helper")
+        add_executable(${_ctf10_target}
+          "${CTF10_SOURCE_DIR}/ctf10_${_ctf10_lane}_helper.cpp"
+          "${CTF10_OBSERVER_SOURCE_DIR}/Construction.ctf10.cc"
+          "${CTF10_OBSERVER_SOURCE_DIR}/HeatBalanceManager.ctf10.cc"
+          "${CTF10_OBSERVER_SOURCE_DIR}/ctf10_observer.cc")
+        target_include_directories(${_ctf10_target} PRIVATE "$<TARGET_PROPERTY:energypluslib,INCLUDE_DIRECTORIES>"
+          "${CTF10_SOURCE_DIR}" "${CTF10_OBSERVER_SOURCE_DIR}"
+          "${CLK03_REPOSITORY_ROOT}/.runtime/porting/CTF-01/native-helper-prep-01"
+          "${CLK03_REPOSITORY_ROOT}/.runtime/porting/CTF-01/native-production-prep-02")
+        target_compile_definitions(${_ctf10_target} PRIVATE ${_ctf10_defs})
+        target_link_libraries(${_ctf10_target} PRIVATE energypluslib project_options project_fp_options project_warnings bcrypt)
+        target_compile_features(${_ctf10_target} PRIVATE cxx_std_20)
+        target_link_options(${_ctf10_target} PRIVATE "-Wl,-Map,${CMAKE_CURRENT_BINARY_DIR}/${_ctf10_target}.map")
+      endforeach()
+    endfunction()
+    cmake_language(DEFER CALL ctf10_add_reference)
+  endif()
+endif()
+
+# New source-only normal-engine surface capture; all CTF10 targets above unchanged.
+if(NOT DEFINED SURFACE_CONSUMER_SOURCE_DIR)
+  message(FATAL_ERROR "Surface consumer requires explicit reviewed source directory")
+endif()
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+  get_property(_surface_consumer_scheduled GLOBAL PROPERTY SURFACE_CONSUMER_SCHEDULED)
+  if(NOT _surface_consumer_scheduled)
+    set_property(GLOBAL PROPERTY SURFACE_CONSUMER_SCHEDULED TRUE)
+    function(surface_consumer_add_reference)
+      if(NOT TARGET energypluslib)
+        message(FATAL_ERROR "Surface consumer requires genuine unchanged energypluslib")
+      endif()
+      get_target_property(_surface_consumer_defs energypluslib COMPILE_DEFINITIONS)
+      get_directory_property(_surface_consumer_dir_defs DIRECTORY "${CMAKE_SOURCE_DIR}/src/EnergyPlus" COMPILE_DEFINITIONS)
+      list(APPEND _surface_consumer_defs ${_surface_consumer_dir_defs})
+      list(FILTER _surface_consumer_defs EXCLUDE REGEX "-NOTFOUND$")
+      list(REMOVE_DUPLICATES _surface_consumer_defs)
+      add_executable(surface_consumer_helper
+        "${SURFACE_CONSUMER_SOURCE_DIR}/surface_consumer_main.cpp"
+        "${SURFACE_CONSUMER_SOURCE_DIR}/HeatBalanceSurfaceManager.surface_consumer.cc"
+        "${SURFACE_CONSUMER_SOURCE_DIR}/surface_consumer_observer.cc"
+        "${CMAKE_SOURCE_DIR}/src/EnergyPlus/api/EnergyPlusPgm.cc"
+        "${CMAKE_SOURCE_DIR}/src/EnergyPlus/CommandLineInterface.cc")
+      target_include_directories(surface_consumer_helper PRIVATE
+        "$<TARGET_PROPERTY:energypluslib,INCLUDE_DIRECTORIES>" "${SURFACE_CONSUMER_SOURCE_DIR}")
+      target_compile_definitions(surface_consumer_helper PRIVATE ${_surface_consumer_defs} ENERGYPLUS_STATIC_API)
+      target_link_libraries(surface_consumer_helper PRIVATE energypluslib project_options project_fp_options project_warnings bcrypt)
+      target_compile_features(surface_consumer_helper PRIVATE cxx_std_20)
+      target_link_options(surface_consumer_helper PRIVATE "-Wl,-Map,${CMAKE_CURRENT_BINARY_DIR}/surface_consumer_helper.map")
+    endfunction()
+    cmake_language(DEFER CALL surface_consumer_add_reference)
+  endif()
+endif()
+
+# Native05 additive history boundaries; retained04 target and paths above remain unchanged.
+if(NOT DEFINED SURFACE_CONSUMER05_SOURCE_DIR)
+  message(FATAL_ERROR "Surface consumer05 requires explicit reviewed source directory")
+endif()
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+  get_property(_surface_consumer05_scheduled GLOBAL PROPERTY SURFACE_CONSUMER05_SCHEDULED)
+  if(NOT _surface_consumer05_scheduled)
+    set_property(GLOBAL PROPERTY SURFACE_CONSUMER05_SCHEDULED TRUE)
+    function(surface_consumer05_add_reference)
+      if(NOT TARGET energypluslib)
+        message(FATAL_ERROR "Surface consumer05 requires genuine unchanged energypluslib")
+      endif()
+      get_target_property(_surface_consumer05_defs energypluslib COMPILE_DEFINITIONS)
+      get_directory_property(_surface_consumer05_dir_defs DIRECTORY "${CMAKE_SOURCE_DIR}/src/EnergyPlus" COMPILE_DEFINITIONS)
+      list(APPEND _surface_consumer05_defs ${_surface_consumer05_dir_defs})
+      list(FILTER _surface_consumer05_defs EXCLUDE REGEX "-NOTFOUND$")
+      list(REMOVE_DUPLICATES _surface_consumer05_defs)
+      add_executable(surface_consumer_helper05
+        "${SURFACE_CONSUMER05_SOURCE_DIR}/surface_consumer_main.cpp"
+        "${SURFACE_CONSUMER05_SOURCE_DIR}/HeatBalanceSurfaceManager.surface_consumer.cc"
+        "${SURFACE_CONSUMER05_SOURCE_DIR}/surface_consumer_observer.cc"
+        "${CMAKE_SOURCE_DIR}/src/EnergyPlus/api/EnergyPlusPgm.cc"
+        "${CMAKE_SOURCE_DIR}/src/EnergyPlus/CommandLineInterface.cc")
+      target_include_directories(surface_consumer_helper05 PRIVATE
+        "$<TARGET_PROPERTY:energypluslib,INCLUDE_DIRECTORIES>" "${SURFACE_CONSUMER05_SOURCE_DIR}")
+      target_compile_definitions(surface_consumer_helper05 PRIVATE ${_surface_consumer05_defs} ENERGYPLUS_STATIC_API)
+      target_link_libraries(surface_consumer_helper05 PRIVATE energypluslib project_options project_fp_options project_warnings bcrypt)
+      target_compile_features(surface_consumer_helper05 PRIVATE cxx_std_20)
+      target_link_options(surface_consumer_helper05 PRIVATE "-Wl,-Map,${CMAKE_CURRENT_BINARY_DIR}/surface_consumer_helper05.map")
+    endfunction()
+    cmake_language(DEFER CALL surface_consumer05_add_reference)
+  endif()
+endif()

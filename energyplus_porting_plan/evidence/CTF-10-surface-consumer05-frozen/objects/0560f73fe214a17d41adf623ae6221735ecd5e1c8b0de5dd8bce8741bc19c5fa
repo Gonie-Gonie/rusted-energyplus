@@ -1,0 +1,52 @@
+"""Root prospective consumer05 history-boundary scope; no engine or numerical evaluation."""
+import hashlib,json,shutil,subprocess
+from datetime import datetime,timezone
+from pathlib import Path
+ROOT=Path.cwd(); BASE=ROOT/'.runtime/porting/CTF-10'; OUT=BASE/'surface-consumer05-scope-amendment-01'
+
+def read(p): return json.loads(p.read_bytes())
+def sha(p):
+ with p.open('rb') as s: return hashlib.file_digest(s,'sha256').hexdigest()
+def ref(p): return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+def write(p,v): p.write_bytes((json.dumps(v,ensure_ascii=False,indent=2,allow_nan=False)+'\n').encode('utf8'))
+approved={}
+for key,relative,digest in [
+ ('native','surface-consumer-native-prep-05/manifest.json','8eac3eb0ec2a28c91db06e5c9d02ab0611090b68095183569df58b8198a8a94c'),
+ ('build','surface-consumer05-native-build-prep-02/manifest.json','b845f22a1ac9cac06b39d1a884a00dff7500b5cfc9e5b7431834a288691f61e1'),
+ ('PE','surface-consumer05-native-build-review-prep-02/manifest.json','029f2cffd8dfdcb8776723eff7fa858e2b7157accc9ab45b7e50fa0b0ff24bb0'),
+ ('OriginalQA','surface-consumer05-original-data-review-prep-01/manifest.json','a27641042054dea917f17cbbf2f710e765496cfd7f3445f81bfcd35498b2a1a0')]:
+ path=BASE/relative;assert sha(path)==digest;approved[key]=ref(path)
+policy_path=Path(__file__).resolve().parent/'thermal-history-unit-policy.json'; policy=read(policy_path)
+assert policy['schema']=='ctf10-selected-thermal-history-direct-unit-policy.v1'
+assert not subprocess.check_output(['git','status','--porcelain'])
+assert subprocess.check_output(['git','rev-parse','HEAD'])==subprocess.check_output(['git','rev-parse','@{u}'])
+prior_path=BASE/'surface-consumer-scope-amendment-02/amendment.json'; prior=read(prior_path)
+assert prior['schema']=='ctf10-surface-consumer-scope-amendment.v1'
+documents=[ROOT/relative for relative in ['energyplus_porting_plan/plan.json','energyplus_porting_plan/cards/CTF-10.md','energyplus_porting_plan/energyplus_porting_checklist.html']]
+output=BASE/'surface-consumer05-native-output-01'
+assert not output.exists() and not OUT.exists();(OUT/'before').mkdir(parents=True);before=[]
+for p in documents:
+ archive=OUT/'before'/p.name;shutil.copyfile(p,archive);assert archive.read_bytes()==p.read_bytes();before.append({'original':ref(p),'archive':ref(archive)})
+plan=read(documents[0]);task=next(t for t in plan['tasks'] if t['id']=='CTF-10')
+assert 'prospective_ordinary_surface_history_boundary_capture' not in task
+gates={key:task[key] for key in ['scope_review','unit_gate','integration_gate','production_gate']}
+task['prospective_ordinary_surface_history_boundary_capture']={
+ 'native_source_manifest':approved['native'],'reviewed_Source_preparations':approved,'selected_case_id':'A-24H',
+ 'thermal_history_direct_unit_policy_source':ref(policy_path),
+ 'scope':'Output-only consumer05 augmentation of the ordinary full engine: actual selected history initialization input/completion and master-update completion, full allocated history/scratch/report context at those sites and simple completion, and current first-referenced Construction catalog. All existing51 sites remain; no branch is forced or inferred.',
+ 'observation_max_bytes':4294967296,'actual_capture_available':False,'thermal_history_Rust_arithmetic_applied':False,'full_card_gates_updated':False}
+assert all(task[key]==value for key,value in gates.items());write(documents[0],plan)
+text=documents[1].read_text(encoding='utf8');text+='\nProspective consumer05 adds three actual history-boundary checkpoints and full allocated context/current referenced Construction ownership to the reviewed ordinary engine capture. Existing consumer04 evidence and all gates remain unchanged. The same A-24H input,45 guards, ordinary duration,7 forwarded arguments and4GiB factual QA bound remain; no general branch is forced, no mathematical answers or Rust history execution are supplied. Fresh consumer05 scope/freeze/build/PE/OriginalQA must precede any later history mathematical pairing.\n';documents[1].write_bytes(text.encode('utf8'))
+subprocess.run(['python','-X','utf8','-B','tools/porting/sync_plan_views.py','--write'],check=True)
+scope=dict(prior);scope.pop('build_only_retry',None);scope['created_utc']=datetime.now(timezone.utc).isoformat();scope['native_source_manifest']=approved['native']
+scope['reviewed_consumer05_Source_preparations']=approved
+scope['thermal_history_direct_unit_policy_source']=ref(policy_path)
+scope['historical_prior_consumer04_scope']=ref(prior_path)
+scope['source_authorities']={'current_after_documents':[ref(p) for p in documents],'before_documents':before,'actual_scope_check_role':'real-CTF-10-check-only'}
+scope['forwarded_native_arguments']=list(prior['forwarded_native_arguments']);scope['forwarded_native_arguments'][5]=str(output/'A-24H')
+scope['observation_output_path']=str(output/'A-24H.observation.json')
+for row in scope['all45_fixed_input_guards']:assert ref(ROOT/row['actual']['path'])==row['actual']
+for key in ['fixed_scope','selected_input','selected_weather','selected_metadata','selected_idd']:assert ref(ROOT/scope[key]['path'])==scope[key]
+assert len(scope['all45_fixed_input_guards'])==45 and scope['selected_case_id']=='A-24H' and scope['observation_max_bytes']==4294967296
+assert len(scope['forwarded_native_arguments'])==7 and all(scope['forwarded_native_arguments'][i]==prior['forwarded_native_arguments'][i] for i in [0,1,2,3,4,6])
+write(OUT/'amendment.json',scope);print('Root prospective consumer05 scope prepared',ref(OUT/'amendment.json'),flush=True)

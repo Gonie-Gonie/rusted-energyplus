@@ -1,0 +1,317 @@
+--- .runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/before-01/manifest.json
++++ .runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/manifest.json
+@@ -1,44 +1,38 @@
+ {
+   "schema": "ctf10-surface-consumer05-native-build-source-preparation.v1",
+-  "status": "held-source-only-unexecuted-awaiting-Root-and-independent-FULL-review",
++  "status": "held-source-only-fresh02-Native05-direct-sources-interface-repair-awaiting-independent-review",
+   "own_sources": [
+     {
+-      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/run-native-build.py",
+-      "sha256": "1595bc1513eb3db6c9e12df4ee23d3a7a461c1775fff3bb36ea7b8b2feef0d74",
+-      "size_bytes": 20889,
+-      "line_count": 245
+-    },
+-    {
+-      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/derive-and-describe-native-build.py",
++      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/run-native-build.py",
++      "sha256": "49b38594d8585e88d9c2a18198fd0c85674de871ebea9640657c2f38f0748a48",
++      "size_bytes": 21143,
++      "line_count": 248
++    },
++    {
++      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/derive-and-describe-native-build.py",
+       "sha256": "225f0a3f34c75872c40e4fa5f5126e1da7b81cc14ddd94caa7582473f1cf3201",
+       "size_bytes": 6882,
+       "line_count": 81
+     },
+     {
+-      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/complete-native-build-metadata.py",
++      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/complete-native-build-metadata.py",
+       "sha256": "851a79c6a958642bb43317f9714c45f82951c9d8c8b7288490dd786f184a3668",
+       "size_bytes": 12645,
+       "line_count": 126
+     }
+   ],
+   "documentation": {
+-    "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/README.md",
+-    "sha256": "34e58b6afe4deb56d90ddba734aec30d0b35d77a292e9ec91d3ed4ff93d0b010",
+-    "size_bytes": 5608,
+-    "line_count": 86
++    "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/README.md",
++    "sha256": "db25319626ad1e649b4266063d19032b3cdaeb0197979f1284757da67cf8be64",
++    "size_bytes": 6588,
++    "line_count": 101
+   },
+   "authoring_sources": [
+     {
+-      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/prepare_sources.py",
+-      "sha256": "41f5a6ff98437acf7c5f7b5664bf5ffa2c0e3a01a76bd8c4b46df211d59bcc83",
+-      "size_bytes": 13517,
+-      "line_count": 121
+-    },
+-    {
+-      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/prepare_metadata.py",
+-      "sha256": "ea651fa2a788b2378ba700fcebe41a8ff5356854a230d580dbac7c4db22c7757",
+-      "size_bytes": 9594,
+-      "line_count": 113
++      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/prepare_successor.py",
++      "sha256": "decef8dfa93981ffa3621e99b55b0c4d2d5e075eb2e3000ac0eafe3ec606064d",
++      "size_bytes": 9186,
++      "line_count": 135
+     }
+   ],
+   "accepted_predecessor": {
+@@ -49,95 +43,83 @@
+   },
+   "before_archives": [
+     {
+-      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/before/accepted-prep02-manifest.json",
+-      "sha256": "a585f8bb507a5d046cc726f0da0dc80775abe4a9cee38d151921c9051619b230",
+-      "size_bytes": 27329,
+-      "line_count": 687
+-    },
+-    {
+-      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/before/accepted-prep02-README.md",
+-      "sha256": "e85e0500d83e06f6950650a5275108d76e970162fd136d4302c83ab36e43e9ef",
+-      "size_bytes": 8899,
+-      "line_count": 145
+-    },
+-    {
+-      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/before/complete-native-build-metadata.py",
+-      "sha256": "727164ddecedf3ddf368f5f79d0c782264d8115307e178e1936e4f68d7995cdb",
+-      "size_bytes": 11393,
+-      "line_count": 117
+-    },
+-    {
+-      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/before/derive-and-describe-native-build.py",
+-      "sha256": "f281e0b3be896de4e90b1028d3c986d17cacde5ad34766b22f8b632ee3f59533",
+-      "size_bytes": 6199,
+-      "line_count": 76
+-    },
+-    {
+-      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/before/run-native-build.py",
+-      "sha256": "92059a8cd3874570dda3fff9f6a6da89945dd161541ebaff6335c911f8608d44",
+-      "size_bytes": 15749,
+-      "line_count": 194
++      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/before-01/run-native-build.py",
++      "sha256": "1595bc1513eb3db6c9e12df4ee23d3a7a461c1775fff3bb36ea7b8b2feef0d74",
++      "size_bytes": 20889,
++      "line_count": 245
++    },
++    {
++      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/before-01/derive-and-describe-native-build.py",
++      "sha256": "225f0a3f34c75872c40e4fa5f5126e1da7b81cc14ddd94caa7582473f1cf3201",
++      "size_bytes": 6882,
++      "line_count": 81
++    },
++    {
++      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/before-01/complete-native-build-metadata.py",
++      "sha256": "851a79c6a958642bb43317f9714c45f82951c9d8c8b7288490dd786f184a3668",
++      "size_bytes": 12645,
++      "line_count": 126
+     }
+   ],
+   "exact_diffs": [
+     {
+       "before": {
+-        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/before/run-native-build.py",
+-        "sha256": "92059a8cd3874570dda3fff9f6a6da89945dd161541ebaff6335c911f8608d44",
+-        "size_bytes": 15749,
+-        "line_count": 194
+-      },
+-      "after": {
+-        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/run-native-build.py",
++        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/before-01/run-native-build.py",
+         "sha256": "1595bc1513eb3db6c9e12df4ee23d3a7a461c1775fff3bb36ea7b8b2feef0d74",
+         "size_bytes": 20889,
+         "line_count": 245
+       },
++      "after": {
++        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/run-native-build.py",
++        "sha256": "49b38594d8585e88d9c2a18198fd0c85674de871ebea9640657c2f38f0748a48",
++        "size_bytes": 21143,
++        "line_count": 248
++      },
+       "diff": {
+-        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/diffs/run-native-build.py.diff",
+-        "sha256": "7329e80b1b9502cd1397a20437525918e46b5348e0876b4bb0c53b3d39c889f8",
+-        "size_bytes": 11055,
+-        "line_count": 111
++        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/diffs/run-native-build.py.from-01.diff",
++        "sha256": "e88d10fc49d9f04bd4fb5d26dfede8ca5bbfb6015f7947127efe01dd96edf2f6",
++        "size_bytes": 1488,
++        "line_count": 19
+       }
+     },
+     {
+       "before": {
+-        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/before/derive-and-describe-native-build.py",
+-        "sha256": "f281e0b3be896de4e90b1028d3c986d17cacde5ad34766b22f8b632ee3f59533",
+-        "size_bytes": 6199,
+-        "line_count": 76
+-      },
+-      "after": {
+-        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/derive-and-describe-native-build.py",
++        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/before-01/derive-and-describe-native-build.py",
+         "sha256": "225f0a3f34c75872c40e4fa5f5126e1da7b81cc14ddd94caa7582473f1cf3201",
+         "size_bytes": 6882,
+         "line_count": 81
+       },
++      "after": {
++        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/derive-and-describe-native-build.py",
++        "sha256": "225f0a3f34c75872c40e4fa5f5126e1da7b81cc14ddd94caa7582473f1cf3201",
++        "size_bytes": 6882,
++        "line_count": 81
++      },
+       "diff": {
+-        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/diffs/derive-and-describe-native-build.py.diff",
+-        "sha256": "5ed5f08825fd20b5676a5009f5ec6656c96142f1d4ad3381f90623172971363c",
+-        "size_bytes": 5845,
+-        "line_count": 60
++        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/diffs/derive-and-describe-native-build.py.from-01.diff",
++        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++        "size_bytes": 0,
++        "line_count": 0
+       }
+     },
+     {
+       "before": {
+-        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/before/complete-native-build-metadata.py",
+-        "sha256": "727164ddecedf3ddf368f5f79d0c782264d8115307e178e1936e4f68d7995cdb",
+-        "size_bytes": 11393,
+-        "line_count": 117
+-      },
+-      "after": {
+-        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/complete-native-build-metadata.py",
++        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/before-01/complete-native-build-metadata.py",
+         "sha256": "851a79c6a958642bb43317f9714c45f82951c9d8c8b7288490dd786f184a3668",
+         "size_bytes": 12645,
+         "line_count": 126
+       },
++      "after": {
++        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/complete-native-build-metadata.py",
++        "sha256": "851a79c6a958642bb43317f9714c45f82951c9d8c8b7288490dd786f184a3668",
++        "size_bytes": 12645,
++        "line_count": 126
++      },
+       "diff": {
+-        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/diffs/complete-native-build-metadata.py.diff",
+-        "sha256": "8ea168342b530dbff0add1fbd1a6ec7245783bfe968ec165209c154673850666",
+-        "size_bytes": 10951,
+-        "line_count": 98
++        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/diffs/complete-native-build-metadata.py.from-01.diff",
++        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
++        "size_bytes": 0,
++        "line_count": 0
+       }
+     }
+   ],
+@@ -572,5 +554,107 @@
+     "binary_core_weather_or_scientific_payload_read_or_hashed": false,
+     "canonical_or_Git_changed": false,
+     "future_receipts_hashes_or_PASS_invented": false
++  },
++  "historical_authoring_sources_not_for_reexecution": [
++    {
++      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/prepare_sources.py",
++      "sha256": "41f5a6ff98437acf7c5f7b5664bf5ffa2c0e3a01a76bd8c4b46df211d59bcc83",
++      "size_bytes": 13517,
++      "line_count": 121
++    },
++    {
++      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/prepare_metadata.py",
++      "sha256": "ea651fa2a788b2378ba700fcebe41a8ff5356854a230d580dbac7c4db22c7757",
++      "size_bytes": 9594,
++      "line_count": 113
++    }
++  ],
++  "immutable_predecessor": {
++    "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/manifest.json",
++    "sha256": "7ca5be5097ab05bd8dd9f65797954017a0cb3d49ac885802b25528bd749ee6cd",
++    "size_bytes": 22897,
++    "line_count": 576
++  },
++  "before_predecessor_manifest": {
++    "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/before-01/manifest.json",
++    "sha256": "7ca5be5097ab05bd8dd9f65797954017a0cb3d49ac885802b25528bd749ee6cd",
++    "size_bytes": 22897,
++    "line_count": 576
++  },
++  "before_predecessor_documentation": {
++    "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/before-01/README.md",
++    "sha256": "34e58b6afe4deb56d90ddba734aec30d0b35d77a292e9ec91d3ed4ff93d0b010",
++    "size_bytes": 5608,
++    "line_count": 86
++  },
++  "historical_build01_correspondence": [
++    {
++      "before": {
++        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/before/run-native-build.py",
++        "sha256": "92059a8cd3874570dda3fff9f6a6da89945dd161541ebaff6335c911f8608d44",
++        "size_bytes": 15749,
++        "line_count": 194
++      },
++      "after": {
++        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/run-native-build.py",
++        "sha256": "1595bc1513eb3db6c9e12df4ee23d3a7a461c1775fff3bb36ea7b8b2feef0d74",
++        "size_bytes": 20889,
++        "line_count": 245
++      },
++      "diff": {
++        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/diffs/run-native-build.py.diff",
++        "sha256": "7329e80b1b9502cd1397a20437525918e46b5348e0876b4bb0c53b3d39c889f8",
++        "size_bytes": 11055,
++        "line_count": 111
++      }
++    },
++    {
++      "before": {
++        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/before/derive-and-describe-native-build.py",
++        "sha256": "f281e0b3be896de4e90b1028d3c986d17cacde5ad34766b22f8b632ee3f59533",
++        "size_bytes": 6199,
++        "line_count": 76
++      },
++      "after": {
++        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/derive-and-describe-native-build.py",
++        "sha256": "225f0a3f34c75872c40e4fa5f5126e1da7b81cc14ddd94caa7582473f1cf3201",
++        "size_bytes": 6882,
++        "line_count": 81
++      },
++      "diff": {
++        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/diffs/derive-and-describe-native-build.py.diff",
++        "sha256": "5ed5f08825fd20b5676a5009f5ec6656c96142f1d4ad3381f90623172971363c",
++        "size_bytes": 5845,
++        "line_count": 60
++      }
++    },
++    {
++      "before": {
++        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/before/complete-native-build-metadata.py",
++        "sha256": "727164ddecedf3ddf368f5f79d0c782264d8115307e178e1936e4f68d7995cdb",
++        "size_bytes": 11393,
++        "line_count": 117
++      },
++      "after": {
++        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/complete-native-build-metadata.py",
++        "sha256": "851a79c6a958642bb43317f9714c45f82951c9d8c8b7288490dd786f184a3668",
++        "size_bytes": 12645,
++        "line_count": 126
++      },
++      "diff": {
++        "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-01/diffs/complete-native-build-metadata.py.diff",
++        "sha256": "8ea168342b530dbff0add1fbd1a6ec7245783bfe968ec165209c154673850666",
++        "size_bytes": 10951,
++        "line_count": 98
++      }
++    }
++  ],
++  "fresh02_delta": {
++    "actual_context_schema": "ctf10-surface-consumer05-source-context.v1",
++    "actual_context_key": "direct_sources",
++    "explicit_Native05_compiled5_native7_source_ledgers_exact": true,
++    "derive_and_complete_byte_exact01": true,
++    "all_operational_guards_math_and_generic_mechanisms_unchanged": true,
++    "no01_configuration_or_target_execution_performed": true
+   }
+ }

@@ -1,0 +1,70 @@
+# Native05 additive history boundaries: Source only
+
+This immutable proposal follows accepted thermal-history readiness01124804 and
+accepted Native04 ab3ce0f3. It has not been compiled, imported or executed. Root
+and another author must complete full source review before any later stage.
+Native04 files, target, products, existing freezes and actual evidence are untouched.
+
+The new target is surface_consumer_helper05, with its own Original product
+Products/surface_consumer_helper05.exe and map. The complete Native04 recipe is
+the literal prefix; the appended five-TU target uses SURFACE_CONSUMER05_SOURCE_DIR.
+Root must separately supply the retained04 SURFACE_CONSUMER_SOURCE_DIR and all
+existing CTF source variables. The old target does not point at new05 files.
+Header/main are byte-identical04, including the reviewed Windows argument fix.
+The real global ::EnergyPlusPgm call, forwarded CLI, compact complete streamed
+event schema, all clocks/counters/copy failures/omissions/normal-exit/unwind and
+outer outcome meanings remain unchanged. No duration override, event cap, sample,
+new engine path or backend result is introduced. The schema remains
+ctf10-surface-consumer-native-observation.v1, distinguished by actual Source and
+target bindings plus the additive fields below.
+
+Exactly three passive calls are added to the complete pinned HBSM TU:
+after Original2322 history_selected_initialization_input, after2436
+history_selected_initialization_complete, and after5496
+history_selected_master_update_complete. Each copies Histories in actual AllHT
+order. All51 old insertion records and their source blocks remain literal.
+Removing the three new blocks restores04 byte-for-byte; removing all54 restores
+the complete pinned Original HBSM byte-for-byte, with no arithmetic/control edit.
+
+history_boundary_context at these three new points and existing
+simple_history_hard_copy_complete5354 reuses the exact history_entry_context
+copier/protocol. Unchanged event.owners retains AllHT normal/master histories;
+the context copies all other allocated surfaces, full term bounds/nulls, complete
+counter/scratch5/report4/operand4 vectors and actual allocated surface layout.
+Actual clocks retain timestep/global flags and UpdateFirstTime. No selected-term
+clamp, reconstructed slot2, uniform fill or synthetic scratch is supplied.
+
+current_history_catalog is added only at new2322 and existing5222. It copies
+the full actual surface/Zone/space traversal metadata and Construction owners
+in actual AllHTSurfaceList first-encounter order of current Surface.Construction.
+There is no eligibility filter or numeric sorting. All12 actual fixed19 arrays,
+NumCTFTerms/NumHistories/CTFTimeStep/U and source selectors are copied. The former
+catalog's Construction copier is extracted verbatim into one shared private
+function; default old catalog traversal and copied operands remain unchanged.
+Invalid actual references throw only inside the existing observer try/catch,
+recording the existing typed Copy failure/ordinal; no engine branch is changed.
+
+Input and endpoint association requires actual state address, procedure and
+invocation/parent ordinals, clock and ordered event custody. Endpoint Construction
+IDs must join the current input catalog. Selected completion is not a whole
+return: actual scope_normal_exit and relevant caller return remain required.
+Unwind, missing owner/endpoint, copy/stream/counter failure or omission cannot PASS.
+Simple and master paths remain separate; no route or successful count is predicted.
+
+Future direct thermal-history scope is ordinary opaque CTF/EMPD, no internal
+source, Outdoors/Adiabatic, with actual equal HT/opaque/AllHT membership. Unsupported
+members may not be dropped to create a selected subset. Native surface indices
+are not silently cast into typed production Rust IDs. No Rust math is executed,
+no Native answer is supplied to production Rust, and no numerical tolerance or
+policy is frozen by this package. Same-input direct projection/comparison remains
+a separately reviewed future use after genuine full capture and factual QA.
+
+All actual future scope/freeze/build/PE/OriginalQA operands and protected counts
+remain Root's inputs. No executable QA/build adapter is authored here. Source
+before archives, exact04 deltas, pristine Original archive, additions and source
+context accompany the stdlib-only authoring source. Source hashes/ranges/diffs,
+old-block correspondence, whole inverse and CMake prefix were checked only.
+No target/import/build/test/formatter, scientific/weather/binary read, canonical
+or Git action, numerical/integration PASS or card gate change occurred.
+The author wrote earlier passive transports and pending humidity Rust math;
+this is owner custody/source correspondence, not independent scientific proof.

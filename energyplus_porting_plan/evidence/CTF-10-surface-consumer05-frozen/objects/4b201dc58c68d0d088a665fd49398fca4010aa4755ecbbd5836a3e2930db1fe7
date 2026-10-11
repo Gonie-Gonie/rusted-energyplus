@@ -1,0 +1,60 @@
+# Consumer05 Root orchestration Source proposal
+
+Two unexecuted scripts minimally adapt the actual consumer04 Root build and
+Original-stage launchers. The exact old bytes are in `before/`, with generated
+unified diffs. This package adds no engine, evaluator, recorder, QA or PE reader.
+
+`run-actual-surface-consumer05-build.py` invokes the three accepted build02
+scripts from their common physical parent: configure/compile, derivative, then
+complete actual metadata. It selects Native05 and forwards both additional
+identity operands `--consumer04-native-build` and `--zon-native-build`.
+The accepted child runner owns fresh54/core631 preservation,24 absences,
+literal717 equality, old04 five registrations and new05 five compilations,
+eight address-bound providers and727 final registrations. The wrapper preserves
+the prior Git-clean/upstream checks and checks the genuine restore metadata.
+
+Build CLI: all following input options take a contained repository `path#sha256`:
+
+- `--freeze-receipt`, `--freeze-execution`
+- `--scope-amendment`, `--scope-execution`
+- `--restore-configure-execution`, `--restore-preservation`
+- `--source-snapshot`
+- `--consumer04-native-build`, `--zon-native-build`
+
+`--output-dir` is a fresh contained CTF-10 build directory, supplied by Root.
+The prior CTF10 build/retirement, actual RAD build and fixed45 guard source
+retain the same existing paths. They are authenticated by accepted build02;
+future scope/freeze/restore/SourceSnapshot identities are runtime operands.
+
+`run-original-surface-consumer05-stages.py` reuses strict PE, loader preparation,
+the unchanged ordinary full engine and the accepted factual streamed QA.
+It pins reviewed PE02 metadata (the reader body remains in PE01) and QA05.
+Its inputs are contained repository `path#sha256` operands:
+
+- `--build`, `--freeze-receipt`, `--freeze-execution`
+- `--literal-freeze-writer`, `--source-snapshot`, `--loader-environment`
+
+`--output-dir` is a fresh contained CTF-10 stage directory. Existing recorders
+create children for PE, the real Native process and factual QA; review outputs
+and loader before/after metadata live in separate children. The runtime loader
+operand supplies the established actual DLL identity inventory, freshly checked
+by the launcher. It does not claim observed loaded-module identities.
+
+The SourceSnapshot operand must agree with actual scope/freeze, build and PE
+receipts before engine invocation. The exact literal writer operand is passed
+to QA's mandatory option. The frozen direct-history policy is checked as an
+exact bytecopy of its reviewed Source authority. It supplies no expected values.
+Only the unchanged seven ordinary arguments `-i IDD -w weather -d output IDF`
+are forwarded. QA05's fixed fresh `surface-consumer05-native-output-01/A-24H`
+and adjacent observation path remain literal; no duration/branch flag is added.
+
+A real Native failure is retained and still submitted to factual QA; no source
+return, event count or scientific PASS is inferred. The existing full-file and
+stream validation governs release. This workflow never authorizes a history
+Rust calculation, expected-output comparison or integration/card gate.
+
+Preparation verification is stdlib AST/hash/diff inspection only. Neither
+workflow, child adapter, engine, import, Git command, Cargo command nor target
+has run during authoring. No binary/core/weather/IDF/scientific payload was read
+or hashed; only Source and permitted identity metadata were inspected. Root
+and an independent author must review these Source bytes before execution.

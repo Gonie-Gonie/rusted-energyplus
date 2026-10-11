@@ -1,0 +1,294 @@
+"""Source-only Native05 emitter and literal correspondence inventory. No target imports."""
+import ast
+import difflib
+import hashlib
+import json
+import re
+from pathlib import Path
+
+ROOT = Path.cwd().resolve()
+OUT = ROOT / '.runtime/porting/CTF-10/surface-consumer-native-prep-05'
+OLD = ROOT / '.runtime/porting/CTF-10/surface-consumer-native-prep-04'
+PLAN = ROOT / '.runtime/porting/CTF-10/thermal-history-observation-readiness-prep-01'
+NATIVE = ROOT / '.reference/energyplus-src/26.1.0/src/EnergyPlus'
+
+def ref(path):
+    b = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(b).hexdigest(),
+            'size_bytes': len(b), 'line_count': len(b.splitlines())}
+
+def put(name, text):
+    p = OUT / name
+    p.parent.mkdir(parents=True, exist_ok=True)
+    with p.open('x', encoding='utf-8', newline='\n') as stream: stream.write(text)
+    return p
+
+def copy(name, source):
+    p = OUT / name
+    p.parent.mkdir(parents=True, exist_ok=True)
+    with p.open('xb') as stream: stream.write(source.read_bytes())
+    return p
+
+def store(name, value): return put(name, json.dumps(value, indent=2) + '\n')
+
+assert ref(OLD / 'manifest.json')['sha256'] == 'ab3ce0f37c5649672e4fba4b348322f53e0736ad84aa52c49475696660022391'
+assert ref(PLAN / 'manifest.json')['sha256'] == '01124804d787c3454d80e3f8c506fc81b0465c132d21f99bfbd010047fdf19a4'
+old_manifest = json.loads((OLD / 'manifest.json').read_bytes())
+plan_manifest = json.loads((PLAN / 'manifest.json').read_bytes())
+plan = json.loads((PLAN / 'consumer05-augmentation-plan.json').read_bytes())
+for row in old_manifest['own_source_and_metadata']:
+    assert all(ref(ROOT / row['path'])[k] == row[k] for k in ['path', 'sha256', 'size_bytes'])
+names = ['surface_consumer_observer.hh', 'surface_consumer_observer.cc', 'surface_consumer_main.cpp',
+         'HeatBalanceSurfaceManager.surface_consumer.cc', 'surface_consumer_reference.cmake',
+         'additions.json', 'source-context.json', 'README.md']
+for name in names + ['manifest.json']: copy('before-04/' + name, OLD / name)
+original_path = NATIVE / 'HeatBalanceSurfaceManager.cc'
+original = original_path.read_bytes()
+assert hashlib.sha256(original).hexdigest() == '0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c'
+copy('before/HeatBalanceSurfaceManager.cc', original_path)
+lines = original.decode('utf-8').splitlines(keepends=True)
+old_additions = json.loads((OLD / 'additions.json').read_bytes())
+assert len(old_additions) == 51
+new_additions = []
+for item in plan['new_passive_calls']:
+    line, tag = item['after_original_line'], item['checkpoint']
+    assert item['copy_kind'] == 'Histories'
+    insertion = ('// SURFACE_OBSERVER_BEGIN ' + tag + '\n'
+        '    ::SurfaceConsumerObservation::record(state, "' + tag + '", '
+        '::SurfaceConsumerObservation::Copy::Histories, 0, 0, {}, {});\n'
+        '// SURFACE_OBSERVER_END ' + tag + '\n')
+    new_additions.append({'after_original_line': line, 'tag': tag,
+                         'source_anchor': lines[line - 1], 'insertion': insertion})
+additions = old_additions + new_additions
+by_line = {}
+for item in additions:
+    assert lines[item['after_original_line'] - 1] == item['source_anchor']
+    by_line.setdefault(item['after_original_line'], []).append(item['insertion'])
+derived = ''.join(line + ''.join(by_line.get(index, [])) for index, line in enumerate(lines, 1))
+block = r'// SURFACE_OBSERVER_BEGIN ([^\n]+)\n.*?// SURFACE_OBSERVER_END \1\n'
+assert re.sub(block, '', derived, flags=re.S).encode('utf-8') == original
+old_derived = (OLD / 'HeatBalanceSurfaceManager.surface_consumer.cc').read_text(encoding='utf-8')
+assert re.sub(block, '', old_derived, flags=re.S).encode('utf-8') == original
+restore04 = derived
+for item in new_additions:
+    assert restore04.count(item['insertion']) == 1
+    restore04 = restore04.replace(item['insertion'], '')
+assert restore04 == old_derived
+put('HeatBalanceSurfaceManager.surface_consumer.cc', derived)
+store('additions.json', additions)
+for name in ['surface_consumer_observer.hh', 'surface_consumer_main.cpp']: copy(name, OLD / name)
+
+# Extract the existing Construction copier literally; default catalog behavior stays unchanged.
+collector = (OLD / 'surface_consumer_observer.cc').read_text(encoding='utf-8')
+start = collector.index('        auto const &c = constructions(i);\n')
+end = collector.index('        out["constructions"].push_back(std::move(row));\n', start)
+body = collector[start:end].replace('        auto const &c = constructions(i);\n', '', 1)
+body = ''.join(line[4:] if line.startswith('    ') else line for line in body.splitlines(keepends=True))
+construction_copy = ('template<class Construction> json construction_copy(int i, Construction const &c)\n{\n'
+                     + body + '    return row;\n}\n')
+old_loop_body = collector[start:end + len('        out["constructions"].push_back(std::move(row));\n')]
+new_loop_body = '        out["constructions"].push_back(construction_copy(i, constructions(i)));\n'
+collector = collector[:start] + collector[start:].replace(old_loop_body, new_loop_body, 1)
+collector = collector.replace('json catalog(EnergyPlus::EnergyPlusData const &state)\n',
+    construction_copy + 'json catalog(EnergyPlus::EnergyPlusData const &state, bool current_history_only = false)\n', 1)
+old_loop = ('    if (constructions.allocated()) for (int i = constructions.l(); i <= constructions.u(); ++i) {\n'
+            + new_loop_body + '    }\n')
+new_loop = '''    if (current_history_only) {
+        // Actual AllHT order and first current Construction encounter, without eligibility filtering.
+        std::vector<int> seen;
+        for (int const surface_index : state.dataSurface->AllHTSurfaceList) {
+            if (!surfaces.allocated() || surface_index < 1 || surface_index > surfaces.isize())
+                throw std::runtime_error("Current history catalog surface owner unavailable");
+            int const construction_index = surfaces(surface_index).Construction;
+            if (std::find(seen.begin(), seen.end(), construction_index) != seen.end()) continue;
+            if (!constructions.allocated() || !constructions.contains(construction_index))
+                throw std::runtime_error("Current history catalog Construction owner unavailable");
+            out["constructions"].push_back(construction_copy(construction_index, constructions(construction_index)));
+            seen.push_back(construction_index);
+        }
+    } else if (constructions.allocated()) for (int i = constructions.l(); i <= constructions.u(); ++i) {
+        out["constructions"].push_back(construction_copy(i, constructions(i)));
+    }
+'''
+assert collector.count(old_loop) == 1
+collector = collector.replace(old_loop, new_loop, 1)
+collector = collector.replace('#include <cstring>\n', '#include <algorithm>\n#include <cstring>\n', 1)
+collector = collector.replace('#include <string>\n', '#include <stdexcept>\n#include <string>\n', 1)
+collector = collector.replace('#include <utility>\n', '#include <utility>\n#include <vector>\n', 1)
+payload = '''        if (std::strcmp(checkpoint, "history_selected_initialization_input") == 0 ||
+            std::strcmp(checkpoint, "history_selected_initialization_complete") == 0 ||
+            std::strcmp(checkpoint, "history_selected_master_update_complete") == 0 ||
+            std::strcmp(checkpoint, "simple_history_hard_copy_complete") == 0)
+            event["history_boundary_context"] = history_entry_context(state);
+        if (std::strcmp(checkpoint, "history_selected_initialization_input") == 0 ||
+            std::strcmp(checkpoint, "history_update_entry_owners") == 0)
+            event["current_history_catalog"] = catalog(state, true);
+'''
+assert collector.count('        auto const bytes = event.dump();') == 1
+collector = collector.replace('        auto const bytes = event.dump();', payload + '        auto const bytes = event.dump();', 1)
+put('surface_consumer_observer.cc', collector)
+
+# Keep the complete old recipe prefix literal, adding an independently named target only.
+recipe = (OLD / 'surface_consumer_reference.cmake').read_text(encoding='utf-8')
+added_recipe = '''
+# Native05 additive history boundaries; retained04 target and paths above remain unchanged.
+if(NOT DEFINED SURFACE_CONSUMER05_SOURCE_DIR)
+  message(FATAL_ERROR "Surface consumer05 requires explicit reviewed source directory")
+endif()
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+  get_property(_surface_consumer05_scheduled GLOBAL PROPERTY SURFACE_CONSUMER05_SCHEDULED)
+  if(NOT _surface_consumer05_scheduled)
+    set_property(GLOBAL PROPERTY SURFACE_CONSUMER05_SCHEDULED TRUE)
+    function(surface_consumer05_add_reference)
+      if(NOT TARGET energypluslib)
+        message(FATAL_ERROR "Surface consumer05 requires genuine unchanged energypluslib")
+      endif()
+      get_target_property(_surface_consumer05_defs energypluslib COMPILE_DEFINITIONS)
+      get_directory_property(_surface_consumer05_dir_defs DIRECTORY "${CMAKE_SOURCE_DIR}/src/EnergyPlus" COMPILE_DEFINITIONS)
+      list(APPEND _surface_consumer05_defs ${_surface_consumer05_dir_defs})
+      list(FILTER _surface_consumer05_defs EXCLUDE REGEX "-NOTFOUND$")
+      list(REMOVE_DUPLICATES _surface_consumer05_defs)
+      add_executable(surface_consumer_helper05
+        "${SURFACE_CONSUMER05_SOURCE_DIR}/surface_consumer_main.cpp"
+        "${SURFACE_CONSUMER05_SOURCE_DIR}/HeatBalanceSurfaceManager.surface_consumer.cc"
+        "${SURFACE_CONSUMER05_SOURCE_DIR}/surface_consumer_observer.cc"
+        "${CMAKE_SOURCE_DIR}/src/EnergyPlus/api/EnergyPlusPgm.cc"
+        "${CMAKE_SOURCE_DIR}/src/EnergyPlus/CommandLineInterface.cc")
+      target_include_directories(surface_consumer_helper05 PRIVATE
+        "$<TARGET_PROPERTY:energypluslib,INCLUDE_DIRECTORIES>" "${SURFACE_CONSUMER05_SOURCE_DIR}")
+      target_compile_definitions(surface_consumer_helper05 PRIVATE ${_surface_consumer05_defs} ENERGYPLUS_STATIC_API)
+      target_link_libraries(surface_consumer_helper05 PRIVATE energypluslib project_options project_fp_options project_warnings bcrypt)
+      target_compile_features(surface_consumer_helper05 PRIVATE cxx_std_20)
+      target_link_options(surface_consumer_helper05 PRIVATE "-Wl,-Map,${CMAKE_CURRENT_BINARY_DIR}/surface_consumer_helper05.map")
+    endfunction()
+    cmake_language(DEFER CALL surface_consumer05_add_reference)
+  endif()
+endif()
+'''
+put('surface_consumer_reference.cmake', recipe + added_recipe)
+
+context = {'schema': 'ctf10-surface-consumer05-source-context.v1',
+    'predecessor_source_context': ref(OLD / 'source-context.json'),
+    'reviewed_history_boundary_plan': ref(PLAN / 'manifest.json'),
+    'literal_plan': ref(PLAN / 'consumer05-augmentation-plan.json'),
+    'read_source_ranges': plan_manifest['read_source_ranges'],
+    'direct_sources': [ref(NATIVE / 'EPVector.hh'), ref(NATIVE / 'api/EnergyPlusPgm.cc'),
+                       ref(NATIVE / 'CommandLineInterface.cc')],
+    'catalog_copy': 'Actual EPVector1..isize Surface/Zone/space and Array1D Construct.contains; no engine writes.',
+    'whole_Original_read_claimed': False, 'scientific_payload_read': False}
+store('source-context.json', context)
+put('README.md', '''# Native05 additive history boundaries: Source only
+
+This immutable proposal follows accepted thermal-history readiness01124804 and
+accepted Native04 ab3ce0f3. It has not been compiled, imported or executed. Root
+and another author must complete full source review before any later stage.
+Native04 files, target, products, existing freezes and actual evidence are untouched.
+
+The new target is surface_consumer_helper05, with its own Original product
+Products/surface_consumer_helper05.exe and map. The complete Native04 recipe is
+the literal prefix; the appended five-TU target uses SURFACE_CONSUMER05_SOURCE_DIR.
+Root must separately supply the retained04 SURFACE_CONSUMER_SOURCE_DIR and all
+existing CTF source variables. The old target does not point at new05 files.
+Header/main are byte-identical04, including the reviewed Windows argument fix.
+The real global ::EnergyPlusPgm call, forwarded CLI, compact complete streamed
+event schema, all clocks/counters/copy failures/omissions/normal-exit/unwind and
+outer outcome meanings remain unchanged. No duration override, event cap, sample,
+new engine path or backend result is introduced. The schema remains
+ctf10-surface-consumer-native-observation.v1, distinguished by actual Source and
+target bindings plus the additive fields below.
+
+Exactly three passive calls are added to the complete pinned HBSM TU:
+after Original2322 history_selected_initialization_input, after2436
+history_selected_initialization_complete, and after5496
+history_selected_master_update_complete. Each copies Histories in actual AllHT
+order. All51 old insertion records and their source blocks remain literal.
+Removing the three new blocks restores04 byte-for-byte; removing all54 restores
+the complete pinned Original HBSM byte-for-byte, with no arithmetic/control edit.
+
+history_boundary_context at these three new points and existing
+simple_history_hard_copy_complete5354 reuses the exact history_entry_context
+copier/protocol. Unchanged event.owners retains AllHT normal/master histories;
+the context copies all other allocated surfaces, full term bounds/nulls, complete
+counter/scratch5/report4/operand4 vectors and actual allocated surface layout.
+Actual clocks retain timestep/global flags and UpdateFirstTime. No selected-term
+clamp, reconstructed slot2, uniform fill or synthetic scratch is supplied.
+
+current_history_catalog is added only at new2322 and existing5222. It copies
+the full actual surface/Zone/space traversal metadata and Construction owners
+in actual AllHTSurfaceList first-encounter order of current Surface.Construction.
+There is no eligibility filter or numeric sorting. All12 actual fixed19 arrays,
+NumCTFTerms/NumHistories/CTFTimeStep/U and source selectors are copied. The former
+catalog's Construction copier is extracted verbatim into one shared private
+function; default old catalog traversal and copied operands remain unchanged.
+Invalid actual references throw only inside the existing observer try/catch,
+recording the existing typed Copy failure/ordinal; no engine branch is changed.
+
+Input and endpoint association requires actual state address, procedure and
+invocation/parent ordinals, clock and ordered event custody. Endpoint Construction
+IDs must join the current input catalog. Selected completion is not a whole
+return: actual scope_normal_exit and relevant caller return remain required.
+Unwind, missing owner/endpoint, copy/stream/counter failure or omission cannot PASS.
+Simple and master paths remain separate; no route or successful count is predicted.
+
+Future direct thermal-history scope is ordinary opaque CTF/EMPD, no internal
+source, Outdoors/Adiabatic, with actual equal HT/opaque/AllHT membership. Unsupported
+members may not be dropped to create a selected subset. Native surface indices
+are not silently cast into typed production Rust IDs. No Rust math is executed,
+no Native answer is supplied to production Rust, and no numerical tolerance or
+policy is frozen by this package. Same-input direct projection/comparison remains
+a separately reviewed future use after genuine full capture and factual QA.
+
+All actual future scope/freeze/build/PE/OriginalQA operands and protected counts
+remain Root's inputs. No executable QA/build adapter is authored here. Source
+before archives, exact04 deltas, pristine Original archive, additions and source
+context accompany the stdlib-only authoring source. Source hashes/ranges/diffs,
+old-block correspondence, whole inverse and CMake prefix were checked only.
+No target/import/build/test/formatter, scientific/weather/binary read, canonical
+or Git action, numerical/integration PASS or card gate change occurred.
+The author wrote earlier passive transports and pending humidity Rust math;
+this is owner custody/source correspondence, not independent scientific proof.
+''')
+diffs = []
+for name in names:
+    before, after = OLD / name, OUT / name
+    text = ''.join(difflib.unified_diff(before.read_text(encoding='utf-8').splitlines(True),
+        after.read_text(encoding='utf-8').splitlines(True), fromfile=before.relative_to(ROOT).as_posix(),
+        tofile=after.relative_to(ROOT).as_posix()))
+    d = put('from-04/' + name + '.diff', text)
+    diffs.append({'before': ref(OUT / 'before-04' / name), 'historical_before_path': before.relative_to(ROOT).as_posix(),
+                  'after': ref(after), 'diff': ref(d)})
+original_diff = put('diffs/HeatBalanceSurfaceManager.original-to-05.diff', ''.join(difflib.unified_diff(
+    original.decode('utf-8').splitlines(True), derived.splitlines(True),
+    fromfile=original_path.relative_to(ROOT).as_posix(), tofile=(OUT / 'HeatBalanceSurfaceManager.surface_consumer.cc').relative_to(ROOT).as_posix())))
+compiled = [ref(OUT / name) for name in ['surface_consumer_main.cpp', 'HeatBalanceSurfaceManager.surface_consumer.cc', 'surface_consumer_observer.cc']]
+compiled += [ref(NATIVE / 'api/EnergyPlusPgm.cc'), ref(NATIVE / 'CommandLineInterface.cc')]
+manifest = {'schema': 'ctf10-surface-consumer-native-source-preparation.v1',
+    'status': 'held-source-only-unexecuted-additive-history-boundaries', 'author': '/root/clk02_raw_port',
+    'predecessor_manifest': ref(OLD / 'manifest.json'), 'reviewed_augmentation_plan': ref(PLAN / 'manifest.json'),
+    'own_source_and_metadata': [ref(OUT / name) for name in names],
+    'authoring_source': ref(OUT / 'prepare_sources.py'),
+    'before_predecessor_archives': [ref(OUT / 'before-04' / name) for name in names + ['manifest.json']],
+    'source_archives': [{'original': ref(original_path), 'archive': ref(OUT / 'before/HeatBalanceSurfaceManager.cc')}],
+    'exact_from_04_diffs': diffs, 'whole_Original_to_05_diff': ref(original_diff),
+    'compiled_source_files': compiled,
+    'native_source_files': compiled + [ref(OUT / 'surface_consumer_observer.hh'), ref(OUT / 'surface_consumer_reference.cmake')],
+    'source_context': ref(OUT / 'source-context.json'),
+    'read_source_ranges': plan_manifest['read_source_ranges'],
+    'runtime_interfaces': {'target': 'surface_consumer_helper05', 'compiled_TU_count': 5, 'native_source_count': 7,
+        'added_source_variable': 'SURFACE_CONSUMER05_SOURCE_DIR', 'retained04_source_variable': 'SURFACE_CONSUMER_SOURCE_DIR',
+        'observation_schema': 'ctf10-surface-consumer-native-observation.v1', 'whole_entry_main_byte_exact04': True,
+        'new_boundary_field': 'history_boundary_context', 'new_input_catalog_field': 'current_history_catalog',
+        'normal_return_required_independently': True, 'output_format_and_complete_stream_unchanged': True},
+    'source_correspondence': {'old_insertion_records_literal_prefix': 51, 'total_insertion_records': 54,
+        'new_calls': plan['new_passive_calls'], 'existing_payload_extensions': plan['extend_existing_payload_only'],
+        'new_blocks_removed_restores04_byte_exact': True, 'whole_Original_HBSM_inverse_byte_exact': True,
+        'entire04_recipe_literal_prefix': True, 'main_and_header_byte_exact04': True,
+        'history_entry_context_copier_byte_exact04': True, 'default_catalog_owner_operands_unchanged': True,
+        'old_record_capture_counters_failures_scope_and_finish_byte_exact_except_additive_payload': True},
+    'future_execution_policy_or_actual_refs': None, 'numeric_policy_frozen': False,
+    'scientific_or_binary_or_weather_payloads_read': False, 'canonical_or_prior_hold_mutated': False,
+    'build_or_target_or_project_import_performed': False, 'executable_QA_or_build_adapters_authored': False,
+    'integration_PASS_claimed': False, 'card_gate_change': False}
+ast.parse((OUT / 'prepare_sources.py').read_text(encoding='utf-8'))
+store('manifest.json', manifest)
+print(json.dumps({'manifest': ref(OUT / 'manifest.json'), 'own_files': len(names), 'old_blocks': 51, 'new_blocks': 3}))
