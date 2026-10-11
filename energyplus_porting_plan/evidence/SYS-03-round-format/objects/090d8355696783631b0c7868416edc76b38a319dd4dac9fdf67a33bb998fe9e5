@@ -1,0 +1,44 @@
+template <typename Char, typename OutputIt, typename T,
+          FMT_ENABLE_IF(std::is_floating_point<T>::value)>
+auto write(OutputIt out, T value, basic_format_specs<Char> specs,
+           locale_ref loc = {}) -> OutputIt {
+  if (const_check(!is_supported_floating_point(value))) return out;
+  float_specs fspecs = parse_float_type_spec(specs);
+  fspecs.sign = specs.sign;
+  if (std::signbit(value)) {  // value < 0 is false for NaN so use signbit.
+    fspecs.sign = sign::minus;
+    value = -value;
+  } else if (fspecs.sign == sign::minus) {
+    fspecs.sign = sign::none;
+  }
+
+  if (!std::isfinite(value))
+    return write_nonfinite(out, std::isinf(value), specs, fspecs);
+
+  if (specs.align == align::numeric && fspecs.sign) {
+    auto it = reserve(out, 1);
+    *it++ = static_cast<Char>(data::signs[fspecs.sign]);
+    out = base_iterator(out, it);
+    fspecs.sign = sign::none;
+    if (specs.width != 0) --specs.width;
+  }
+
+  memory_buffer buffer;
+  if (fspecs.format == float_format::hex) {
+    if (fspecs.sign) buffer.push_back(data::signs[fspecs.sign]);
+    snprintf_float(promote_float(value), specs.precision, fspecs, buffer);
+    return write_bytes<align::right>(out, {buffer.data(), buffer.size()},
+                                     specs);
+  }
+  int precision = specs.precision >= 0 || !specs.type ? specs.precision : 6;
+  if (fspecs.format == float_format::exp) {
+    if (precision == max_value<int>())
+      FMT_THROW(format_error("number is too big"));
+    else
+      ++precision;
+  }
+  if (const_check(std::is_same<T, float>())) fspecs.binary32 = true;
+  fspecs.use_grisu = is_fast_float<T>();
+  int exp = format_float(promote_float(value), precision, fspecs, buffer);
+  fspecs.precision = precision;
+  auto fp = big_decimal_fp{buffer.data(), static_cast<int>(buffer.size()), exp};

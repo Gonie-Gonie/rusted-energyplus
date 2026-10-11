@@ -1,0 +1,217 @@
+"""Root-only actual R text comparison; no invocation, equations or expected text."""
+import argparse
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+PREP = ROOT / '.runtime/porting/SYS-03/round-format-prep-01/manifest.json'
+PREP_SHA = 'a14b80e8cf025727b8f18edbb0c47a7636420e992248aa249ff6542997f0e98a'
+RECORDER = ROOT / 'tools/porting/record_command.py'
+RECORDER_SHA = '5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'
+EXAMPLE = 'source_round_format_unit_observer'
+SEEN = {}
+
+
+def need(ok, message):
+    if not ok: raise ValueError(message)
+
+
+def sha(file):
+    with file.open('rb') as stream: return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def exact(row, binary=False):
+    file = (ROOT / row['path']).resolve()
+    need(file.is_relative_to(ROOT) or (binary and file.drive.upper() == 'D:' and file.suffix.lower() in ('.exe', '.map')), 'Uncontained artifact')
+    need(file.is_file() and sha(file) == row['sha256'], 'Actual artifact SHA differs: ' + row['path'])
+    if 'size_bytes' in row: need(type(row['size_bytes']) is int and file.stat().st_size == row['size_bytes'], 'Actual artifact size differs')
+    SEEN[file] = row['sha256']
+    return file
+
+
+def ref(file):
+    return dict(path=file.relative_to(ROOT).as_posix(), sha256=sha(file), size_bytes=file.stat().st_size)
+
+
+def unique(rows):
+    value = {}
+    for key, item in rows:
+        need(key not in value, 'Duplicate JSON key: ' + key); value[key] = item
+    return value
+
+
+def read(file):
+    return json.loads(file.read_text(encoding='utf-8-sig'), object_pairs_hook=unique,
+                      parse_constant=lambda value: (_ for _ in ()).throw(ValueError('Nonfinite JSON token: ' + value)))
+
+
+def load(row): return read(exact(row))
+
+
+def receipt(row, allowed=(0,)):
+    value = load(row)
+    need(value['schema'] == 'recorded-porting-command.v1' and type(value['exit_code']) is int and value['exit_code'] in allowed and value['launch_error'] is None, 'Actual recorded command unavailable')
+    need(Path(value['cwd']).resolve() == ROOT and value['source_bytes_match_before_and_after'] is True and value['recorder_updates_gates'] is False and value['recorder_supplies_reference_answers'] is False, 'Actual command Source custody differs')
+    for name in ('stdout', 'stderr', 'source_snapshot'): exact(value[name])
+    need(value['executed_launcher']['historical_path'] == 'tools/porting/record_command.py' and sha(exact(value['executed_launcher']['archive'])) == RECORDER_SHA, 'Actual reviewed recorder differs')
+    return value
+
+
+def snapshot(row):
+    value = load(row)
+    need(value['schema'] == 'rust-command-source-snapshot.v1' and value['bytes_normalized'] is False, 'Full literal Source capture required')
+    members = {item['historical_path']: item for item in value['files']}
+    need(len(members) == len(value['files']), 'Duplicate captured Source path')
+    for item in members.values(): need(exact(item['archive']).stat().st_size == item['size_bytes'], 'Full Source archive size differs')
+    return members
+
+
+def same_bytes(a, b, binary=False):
+    left, right = exact(a, binary), exact(b, binary)
+    need(a['sha256'] == b['sha256'] and left.stat().st_size == right.stat().st_size, 'Full byte identity differs')
+
+
+def custody(packet, preparation):
+    need(packet['schema'] == 'source-round-format-comparison-custody.v1', 'Actual Root custody packet required')
+    same_bytes(packet['reviewed_Source_preparation'], ref(PREP))
+    for name in ('Native_input', 'Rust_input'): same_bytes(packet[name], preparation['input_only_fixture'])
+    same_bytes(packet['observation_policy'], preparation['prospective_policy'])
+    frozen = load(packet['Native_frozen_build_inputs'])
+    need(frozen['schema'] == 'source-round-format-frozen-build-inputs.v1', 'Actual Native build freeze required')
+    same_bytes(frozen['reviewed_Source_preparation'], ref(PREP))
+    expected = [ref(PREP.parent / name) for name in ('round_unit_helper.cpp', 'round_unit_reference.cmake')] + [preparation['input_only_fixture'], preparation['prospective_policy']]
+    need(len(frozen['frozen_Native_Source_and_input']) == len(expected), 'Complete Native Source/input freeze required')
+    for actual, held in zip(frozen['frozen_Native_Source_and_input'], expected): same_bytes(actual, held)
+    configure = receipt(packet['Native_configure_execution']); link = receipt(packet['Native_build_execution'])
+    need(configure['command'] == frozen['actual_configure_command'] and configure['finished_utc'] <= link['started_utc'], 'Actual frozen configure/build chronology differs')
+    need('source_round_format_unit_helper' in link['command'], 'Actual R target build required')
+    proof = load(packet['Native_execution_build_inputs'])
+    need(proof['schema'] == 'source-round-format-actual-link-inputs.v1', 'Actual R link proof required')
+    same_bytes(proof['reviewed_Source_preparation'], ref(PREP))
+    need(proof['frozen_Native_Source_and_input'] == frozen['frozen_Native_Source_and_input'], 'Linked full Source/input differs')
+    same_bytes(proof['actual_link_command'], packet['Native_build_execution'])
+    for name in ('actual_additive_wrapper', 'inherited_actual_wrapper'):
+        same_bytes(proof[name], frozen[name])
+    wrapper = exact(frozen['actual_additive_wrapper']).read_text(encoding='utf-8')
+    recipe = exact(expected[1]).read_text(encoding='utf-8')
+    need('SOURCE_ROUND_FORMAT_REFERENCE_RECIPE' in wrapper and 'include("${SOURCE_ROUND_FORMAT_INHERITED_RECIPE}")' in recipe, 'Actual inherited/R recipe registration unavailable')
+    need('-DSOURCE_ROUND_FORMAT_INHERITED_RECIPE=' + str(exact(frozen['inherited_actual_wrapper'])) in configure['command'], 'Actual inherited recipe operand differs')
+    need('-DSOURCE_ROUND_FORMAT_REFERENCE_RECIPE=' + str(exact(expected[1])) in configure['command'] and '-DSOURCE_ROUND_FORMAT_SOURCE_DIR=' + str(PREP.parent) in configure['command'] and '-DCMAKE_PROJECT_INCLUDE=' + str(exact(frozen['actual_additive_wrapper'])) in configure['command'], 'Actual reviewed recipe/source wrapper operands differ')
+    binary = exact(proof['actual_Native_binary'], True); exact(proof['actual_full_link_map'], True)
+    core = receipt(proof['official_Source_and_core_check'])
+    need(packet['Root_FULL_inline_R_provider_and_PE_review_accepted'] is True and len(packet['Native_provider_and_PE_evidence']) > 0, 'Actual inline R header/provider/PE review required')
+    for row in packet['Native_provider_and_PE_evidence']: exact(row)
+    native = receipt(packet['Native_execution'], (0, 2))
+    need(native['command'] == [str(binary), str(exact(packet['Native_input']))] and link['finished_utc'] <= native['started_utc'] and core['finished_utc'] <= native['started_utc'], 'Actual Native argc2/build custody differs')
+    build = receipt(packet['Rust_build_execution']); rust = receipt(packet['Rust_execution'], (0, 2))
+    command = build['command']
+    need(command[:2] == ['cargo', 'build'] and '--locked' in command and command[command.index('-p') + 1] == 'ep_run' and command[command.index('--example') + 1] == EXAMPLE and '--message-format=json-render-diagnostics' in command, 'Actual CargoJSON example build required')
+    capture = build['cargo_compiler_artifacts_capture']
+    artifacts = [item for item in capture['rows'] if item['cargo_message']['target']['name'] == EXAMPLE and item['cargo_message']['target']['kind'] == ['example']]
+    need(capture['status'] == 'pass' and len(artifacts) == 1, 'One actual Cargo-emitted example required')
+    emitted = artifacts[0]; executable = exact(dict(path=emitted['executable']['historical_path'], sha256=emitted['executable']['sha256']))
+    messages = [json.loads(line, object_pairs_hook=unique) for line in exact(build['stdout']).read_text(encoding='utf-8').splitlines()]
+    need(emitted['cargo_message'] in messages and Path(emitted['cargo_message']['executable']).resolve() == executable, 'Actual full Cargo stdout/artifact differs')
+    need(rust['command'] == [str(executable), str(exact(packet['Rust_input'])), packet['Rust_input']['sha256']] and build['finished_utc'] <= rust['started_utc'], 'Actual Rust argc3/build custody differs')
+    need(build['source_snapshot'] == rust['source_snapshot'] and native['finished_utc'] <= rust['started_utc'], 'Original-first/same Rust Source chronology differs')
+    members = snapshot(build['source_snapshot'])
+    rows = packet['actual_Rust_sources']
+    need([item['canonical_path'] for item in rows] == [item['canonical_path'] for item in preparation['application']], 'All five reviewed Rust Source rows required')
+    for actual, held in zip(rows, preparation['application']):
+        same_bytes(actual['actual_literal_source'], held['proposal'])
+        same_bytes(actual['actual_final_source'], members[actual['canonical_path']]['archive'])
+        before, after = exact(actual['actual_literal_source']).read_bytes(), exact(actual['actual_final_source']).read_bytes()
+        text = exact(actual['formatter_correspondence_diff']).read_text(encoding='utf-8'); lines = text.splitlines()
+        need((not text and before == after) or (len(lines) >= 2 and lines[0].startswith('--- ') and lines[1].startswith('+++ ') and text == ''.join(difflib.unified_diff(before.decode('utf-8').splitlines(True), after.decode('utf-8').splitlines(True), fromfile=lines[0][4:], tofile=lines[1][4:]))), 'Actual formatter correspondence differs')
+    need(packet['Root_and_other_author_FULL_formatter_correspondence_accepted'] is True, 'Actual full formatter correspondence review required')
+    for role, execution, supplied, program in [('Native', native, packet['Native_input'], proof['actual_Native_binary']), ('Rust', rust, packet['Rust_input'], dict(path=executable.relative_to(ROOT).as_posix(), sha256=sha(executable)))]:
+        guard = load(packet[role + '_execution_custody'])
+        need(guard['schema'] == 'source-round-format-execution-custody.v1' and guard['execution_role'] == role, 'Actual full file guard required')
+        same_bytes(guard['actual_command_receipt'], packet[role + '_execution'])
+        need(guard['input_bytes_match_before_after'] is True and guard['binary_bytes_match_before_after'] is True, 'Actual input/exe changed during execution')
+        for suffix in ('before', 'after'):
+            same_bytes(guard['actual_input_' + suffix], supplied)
+            same_bytes(guard['actual_binary_' + suffix], program, role == 'Native')
+    return native, rust
+
+
+def owners(result, request, candidate):
+    top = {'schema', 'rows', 'expected_values_supplied', 'full_report_or_backend_equivalence_claimed'} | ({'actual_input_SHA256', 'unavailable_count', 'formatter_PASS_claimed'} if candidate else {'helper_PASS_claimed'})
+    need(type(result) is dict and set(result) == top and result['schema'] == 'source-round-format-unit-' + ('candidate' if candidate else 'native') + '-results.v1', 'Complete actual result schema required')
+    need(result['expected_values_supplied'] is False and result['full_report_or_backend_equivalence_claimed'] is False and result['formatter_PASS_claimed' if candidate else 'helper_PASS_claimed'] is False, 'Actual result claims differ')
+    need(type(result['rows']) is list and len(result['rows']) == len(request['values']), 'Every declared owner required')
+    calls = []; failures = []; expected_unavailable = []; typed_count = 0
+    for supplied, row in zip(request['values'], result['rows']):
+        need(type(row) is dict and set(row) == {'case_id', 'value_bits', 'observations'} and row['case_id'] == supplied['case_id'] and row['value_bits'] == supplied['value_bits'], 'Actual owner/input identity or order differs')
+        need(type(row['observations']) is list and len(row['observations']) == len(request['formats']), 'Every format observation required')
+        for pattern, call in zip(request['formats'], row['observations']):
+            keys = {'format', 'actual_value_bits_before_call', 'actual_source_invoked', 'outcome', 'text', 'unavailable'} | (set() if candidate else {'exception_type', 'exception_message'})
+            need(type(call) is dict and set(call) == keys and call['format'] == pattern and call['actual_value_bits_before_call'] == supplied['value_bits'] and type(call['actual_source_invoked']) is bool, 'Complete actual call/format/input witness required')
+            domain = supplied['value_bits'] == '7ff0000000000000'
+            if domain:
+                need(call['actual_source_invoked'] is False and call['outcome'] == 'source_domain_unavailable' and call['text'] is None and call['unavailable'] == 'UndefinedLog10Conversion' and (candidate or call['exception_type'] is None and call['exception_message'] is None), 'Positive infinity must remain uninvoked/unavailable')
+                expected_unavailable.append(dict(case_id=row['case_id'], format=pattern, counted_as_PASS=False, actual_call=call))
+            else:
+                returned = call['actual_source_invoked'] is True and call['outcome'] == 'source_returned' and type(call['text']) is str and call['unavailable'] is None and (candidate or call['exception_type'] is None and call['exception_message'] is None)
+                if not returned: failures.append(dict(case_id=row['case_id'], format=pattern, actual_call=call, counted_as_PASS=False))
+                if candidate and call['outcome'] == 'typed_unavailable': typed_count += 1
+            calls.append(call)
+    if candidate: need(type(result['unavailable_count']) is int and result['unavailable_count'] == len(expected_unavailable) + typed_count, 'Actual unavailable counter differs')
+    need(len(calls) == 620 and len(expected_unavailable) == 5, 'Complete 620 declarations/five domain exclusions required')
+    return calls, failures, expected_unavailable
+
+
+def run(args, output):
+    need(sha(PREP) == PREP_SHA and sha(RECORDER) == RECORDER_SHA, 'Reviewed Source authority differs')
+    preparation = read(PREP); packet = load(args.custody)
+    own = {Path(item['path']).name: item for item in preparation['own_sources']}
+    preparation['input_only_fixture'] = own['input-only-cases.proposed.json']
+    preparation['prospective_policy'] = own['prospective-policy.json']
+    for row in preparation['own_sources']: exact(row)
+    for row in preparation['read_Source_context']:
+        if row['path'].startswith('.reference/'): exact(row)
+    policy = load(preparation['prospective_policy'])
+    need(policy['schema'] == 'source-round-format-prospective-policy.v1' and policy['no_tolerances_expected_text_or_result_lookup'] is True, 'Literal prospective policy required')
+    native, rust = custody(packet, preparation)
+    request = load(preparation['input_only_fixture'])
+    need(set(request) == {'schema', 'card', 'expected_values_supplied', 'values', 'formats'} and request['schema'] == 'source-round-format-unit-request.v1' and request['card'] == 'SYS-03' and request['expected_values_supplied'] is False, 'Exact input-only declaration required')
+    need(len(request['values']) == 124 and request['formats'] == ['{:.0R}', '{:.2R}', '{:.3R}', '{:.4R}', '{:.10R}'] and len({row['case_id'] for row in request['values']}) == 124, 'All declared identities/formats required')
+    n, nf, nu = owners(load(native['stdout']), request, False)
+    candidate = load(rust['stdout']); r, rf, ru = owners(candidate, request, True)
+    need(candidate['actual_input_SHA256'] == packet['Rust_input']['sha256'], 'Actual candidate input SHA differs')
+    need(native['exit_code'] == (2 if nf else 0) and rust['exit_code'] == (2 if rf else 0), 'Actual process exit/call outcomes disagree')
+    mismatches = [dict(lane='Native', **row) for row in nf] + [dict(lane='Rust', **row) for row in rf]; pairs = []
+    failed_keys = {(row['case_id'], row['format']) for row in nf + rf}
+    for index, (left, right) in enumerate(zip(n, r)):
+        supplied = request['values'][index // 5]; pattern = request['formats'][index % 5]
+        if supplied['value_bits'] == '7ff0000000000000': continue
+        matched = type(left['text']) is str and type(right['text']) is str and left['text'].encode('utf-8') == right['text'].encode('utf-8')
+        row = dict(case_id=supplied['case_id'], value_bits=supplied['value_bits'], format=pattern, Native=left, Rust=right, text_bytes_equal=matched, counted_as_PASS=matched and (supplied['case_id'], pattern) not in failed_keys)
+        pairs.append(row)
+        if not matched: mismatches.append(row)
+    passed = not mismatches and native['exit_code'] == rust['exit_code'] == 0 and all(row['counted_as_PASS'] for row in pairs)
+    for file, expected in SEEN.items(): need(sha(file) == expected, 'Retained artifact changed during comparison: ' + str(file))
+    result = dict(schema='source-round-format-exact-text-comparison.v1', status='pass-selected-615-available-exact-texts' if passed else 'fail-required-format-texts', selected_available_exact_text_comparison_passed=passed, actual_custody=args.custody, reviewed_Source_preparation=ref(PREP), prospective_policy=preparation['prospective_policy'], literal_input_source=preparation['input_only_fixture'], Native_full_stdout=native['stdout'], Rust_full_stdout=rust['stdout'], declared_observations=620, required_nonexcluded_observations=len(pairs), actual_returned_pairs=sum(left['outcome'] == right['outcome'] == 'source_returned' and (row['case_id'], row['format']) not in failed_keys for row in pairs for left, right in [(row['Native'],row['Rust'])]), exact_text_pairs=pairs, mismatches=mismatches, mismatch_count=len(mismatches), explicit_unavailable={'Native':nu,'Rust':ru}, unavailable_counted_as_PASS=False, floating_exception_environment_and_NaN_payload_after_nextafter_unpaired=True, numeric_profiles=[], whole_declared_unit_PASS_claimed=False, full_report_or_backend_equivalence_claimed=False, ordinary_integration_PASS_claimed=False, gates_updated=False)
+    write(output / 'comparison.json', result)
+    return 0 if passed else 1
+
+
+def write(file, value):
+    with file.open('xb') as stream: stream.write((json.dumps(value, indent=2, ensure_ascii=False, allow_nan=False) + '\n').encode('utf-8'))
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--custody', required=True, help='Actual Root custody JSON path#SHA256')
+    parser.add_argument('--approved-comparer-sha256', required=True)
+    parser.add_argument('--output-dir', required=True)
+    args = parser.parse_args(); name, digest = args.custody.rsplit('#', 1); args.custody = dict(path=name, sha256=digest)
+    need(sha(Path(__file__).resolve()) == args.approved_comparer_sha256, 'Reviewed comparer Source required')
+    output = (ROOT / args.output_dir).resolve()
+    need(output.is_relative_to(ROOT / '.runtime/porting/SYS-03') and not output.exists(), 'Fresh contained output directory required'); output.mkdir()
+    try: code = run(args, output)
+    except Exception as error:
+        write(output / 'comparison-failure.json', dict(schema='source-round-format-comparison-transport-failure.v1', failure_type=type(error).__name__, failure=str(error), actual_custody=args.custody, selected_available_exact_text_comparison_passed=False, whole_declared_unit_PASS_claimed=False, gates_updated=False)); code = 2
+    raise SystemExit(code)

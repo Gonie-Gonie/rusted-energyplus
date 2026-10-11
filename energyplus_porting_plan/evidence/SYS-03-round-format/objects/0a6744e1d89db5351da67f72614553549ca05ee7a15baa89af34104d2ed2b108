@@ -1,0 +1,25 @@
+"""Source-only archive/diff/metadata preparation; no target import or results."""
+from pathlib import Path
+import ast, difflib, hashlib, json
+ROOT=Path.cwd();OUT=ROOT/'.runtime/porting/SYS-03/round-format-comparison-prep-01';PREP=ROOT/'.runtime/porting/SYS-03/round-format-prep-01'
+assert not (OUT/'manifest.json').exists()
+def ref(p):
+    b=p.read_bytes();return dict(path=p.relative_to(ROOT).as_posix(),sha256=hashlib.sha256(b).hexdigest(),size_bytes=len(b),line_count=len(b.splitlines()))
+def write(p,s):p.parent.mkdir(parents=True,exist_ok=True);p.write_text(s,encoding='utf-8',newline='\n')
+def delta(a,b,n):return ''.join(difflib.unified_diff(a.splitlines(True),b.splitlines(True),fromfile='a/'+n,tofile='b/compare.py'))
+source=OUT/'compare.py';text=source.read_text(encoding='utf-8');ast.parse(text);ast.parse(Path(__file__).read_text(encoding='utf-8'))
+templates=[ROOT/'.runtime/porting/CTF-10/report-format-workflow-prep-02/run_format_workflow.py',ROOT/'.runtime/porting/SRC-05/surface-environment-selected-comparison-prep-02/compare.py']
+archives=[];diffs=[]
+for tag,p in zip(('FG-workflow02','SRC05-comparer02'),templates):
+    before=OUT/'before'/(tag+'.py');before.parent.mkdir(parents=True,exist_ok=True);before.write_bytes(p.read_bytes())
+    d=OUT/'diffs'/(tag+'.to-R-comparer.diff');write(d,delta(p.read_text(encoding='utf-8'),text,p.name));archives.append(dict(original=ref(p),archive=ref(before)));diffs.append(ref(d))
+prep=json.loads((PREP/'manifest.json').read_text(encoding='utf-8'));assert ref(PREP/'manifest.json')['sha256']=='a14b80e8cf025727b8f18edbb0c47a7636420e992248aa249ff6542997f0e98a'
+own={Path(r['path']).name:r for r in prep['own_sources']};req=json.loads((ROOT/own['input-only-cases.proposed.json']['path']).read_text(encoding='utf-8'))
+assert len(req['values'])==124 and len(req['formats'])==5 and sum(r['value_bits']=='7ff0000000000000' for r in req['values'])==1
+extra=[]
+for p,start,end,purpose in [(source,70,140,'Actual Native/Rust custody and compiled formatter correspondence'),(ROOT/'tools/porting/record_command.py',117,140,'Actual Cargo compiler-artifact capture'),(ROOT/'tools/porting/record_command.py',173,204,'Actual Source/log/outcome receipt')]:
+    b=b''.join(p.read_bytes().splitlines(True)[start-1:end]);a=OUT/'source-ranges'/(p.name+'.'+str(start)+'-'+str(end)+'.txt');a.parent.mkdir(parents=True,exist_ok=True);a.write_bytes(b)
+    extra.append(dict(path=p.relative_to(ROOT).as_posix(),start_line=start,end_line=end,purpose=purpose,sha256=hashlib.sha256(b).hexdigest(),size_bytes=len(b),literal_archive=ref(a)))
+manifest=dict(schema='source-round-format-comparison-Source-preparation.v1',status='HELD-Source-only-unexecuted',own_sources=[ref(source)],README=ref(OUT/'README.md'),author=ref(Path(__file__)),reviewed_formatter_preparation=ref(PREP/'manifest.json'),literal_input_source=own['input-only-cases.proposed.json'],prospective_policy=own['prospective-policy.json'],authentic_template_befores=archives,cumulative_actual_template_diffs=diffs,read_Source_context=[ref(ROOT/'tools/porting/record_command.py')]+prep['own_sources'][:9],read_Source_ranges=prep['read_Source_ranges']+extra,runtime_interfaces=dict(custody_schema='source-round-format-comparison-custody.v1',Native_link_schema='source-round-format-actual-link-inputs.v1',execution_custody_schema='source-round-format-execution-custody.v1',comparison_schema='source-round-format-exact-text-comparison.v1',Native_argv_count=2,Rust_argv_count=3,declared_observations=620,positive_infinity_uninvoked_observations=5,required_nonexcluded_observations=615,CLI_options=['--custody','--approved-comparer-sha256','--output-dir']),scientific_execution_performed=False,Native_or_Rust_R_outputs_read=False,canonical_Source_changed=False,expected_values_supplied=False,whole_declared_unit_PASS_claimed=False,ordinary_integration_PASS_claimed=False,gates_updated=False)
+write(OUT/'manifest.json',json.dumps(manifest,indent=2)+'\n')
+print(json.dumps(ref(OUT/'manifest.json')));print(json.dumps(ref(source)))

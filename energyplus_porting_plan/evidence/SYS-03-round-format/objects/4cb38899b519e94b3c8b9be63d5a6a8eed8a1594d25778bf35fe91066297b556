@@ -1,0 +1,60 @@
+"""Root actual Cargo-emitted R observer with full input/executable byte custody."""
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT = Path.cwd()
+BASE = ROOT / '.runtime/porting/SYS-03/round-format-observation-02'
+spec = importlib.util.spec_from_file_location('rec', ROOT / 'tools/porting/record_command.py')
+rec = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(rec)
+
+
+def full(path):
+    return {**rec.ref(path), 'size_bytes': path.stat().st_size}
+
+
+def write(path, value):
+    with path.open('xb') as stream:
+        stream.write(rec.json_bytes(value))
+
+
+def command(directory, argv):
+    result = subprocess.run([sys.executable, '-X', 'utf8', '-B', 'tools/porting/record_command.py', '--output-dir', directory, '--', *argv], cwd=ROOT)
+    receipt_path = ROOT / directory / 'receipt.json'
+    receipt = json.loads(receipt_path.read_bytes())
+    assert receipt['source_bytes_match_before_and_after'] is True
+    assert receipt['source_snapshot']['sha256'] == '5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548'
+    return result.returncode, receipt_path, receipt
+
+
+for name in ('fmt', 'clippy', 'focused', 'workspace'):
+    quality = json.loads((ROOT / f'.runtime/porting/SYS-03/round-format-quality-01/{name}-command/receipt.json').read_bytes())
+    assert quality['exit_code'] == 0 and quality['source_bytes_match_before_and_after'] is True
+    assert quality['source_snapshot']['sha256'] == '5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548'
+assert rec.sha(BASE / 'Rust-input.json') == '0aea2faeb87c38a88323804614efad87f4693b39c91dd500846fc5f0fa0b7600'
+assert not (BASE / 'Rust-execution.before.json').exists()
+configs = ['--config', 'profile.dev.debug=0', '--config', 'profile.test.debug=0', '--config', 'build.incremental=false']
+code, build_path, build = command('.runtime/porting/SYS-03/round-format-observation-02/Rust-build-command', ['cargo', 'build', *configs, '--locked', '-p', 'ep_run', '--example', 'source_round_format_unit_observer', '--message-format=json-render-diagnostics'])
+assert code == 0 and build['exit_code'] == 0
+capture = build['cargo_compiler_artifacts_capture']
+assert capture['status'] == 'pass'
+rows = [row for row in capture['rows'] if row['cargo_message']['target']['name'] == 'source_round_format_unit_observer' and row['cargo_message']['target']['kind'] == ['example']]
+assert len(rows) == 1
+emitted = rows[0]
+executable = ROOT / emitted['executable']['historical_path']
+assert rec.sha(executable) == emitted['executable']['sha256']
+assert Path(emitted['cargo_message']['executable']).resolve() == executable.resolve()
+input_path = BASE / 'Rust-input.json'
+before_input, before_binary = full(input_path), full(executable)
+write(BASE / 'Rust-execution.before.json', dict(schema='source-round-format-execution-before.v1', execution_role='Rust', actual_input_before=before_input, actual_binary_before=before_binary, actual_Cargo_build=full(build_path), numerical_results_read=False))
+code, execution_path, execution = command('.runtime/porting/SYS-03/round-format-observation-02/Rust-command', [str(executable), str(input_path), before_input['sha256']])
+after_input, after_binary = full(input_path), full(executable)
+guard = dict(schema='source-round-format-execution-custody.v1', execution_role='Rust', actual_command_receipt=full(execution_path), actual_input_before=before_input, actual_binary_before=before_binary, actual_input_after=after_input, actual_binary_after=after_binary, input_bytes_match_before_after=before_input == after_input, binary_bytes_match_before_after=before_binary == after_binary, numerical_PASS_claimed=False)
+write(BASE / 'Rust-execution.custody.json', guard)
+assert guard['input_bytes_match_before_after'] and guard['binary_bytes_match_before_after']
+assert execution['exit_code'] in (0, 2)
+print(json.dumps(dict(actual_build=full(build_path), actual_execution=full(execution_path), actual_guard=full(BASE / 'Rust-execution.custody.json'), actual_exit_code=execution['exit_code'])))

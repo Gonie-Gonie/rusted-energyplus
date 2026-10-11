@@ -193,3 +193,5 @@ SYS-02 selected daily warmup methods: genuine Native/Rust25-case comparison matc
 SYS-02 selected daily and six rolling warmup methods: genuine Native/Rust25-case comparison matched10,953 input/initial checks and10,023 state comparisons with zero mismatches. [Full evidence](evidence/SYS-02-rolling-warmup/summary.json). Report/backend/producer and ordinary handoff remain pending; gates unchanged.
 
 SRC-05 actual selected surface environment comparison: fail-selected-setters-or-input-join, 26 cases/30 weather operations, 3 mismatches; complete required-unavailable ledgers retained. [Full evidence](evidence/SRC-05-surface-environment/summary.json). Cold guard/backend/ordinary handoff and whole-card gates remain pending; gates unchanged.
+
+SYS-03 R prerequisite actual status: pass-selected-615-available-exact-texts, 124 values/615 required text pairs, 0 mismatches; five positive-infinity rows per lane explicitly unavailable. [Full evidence](evidence/SYS-03-round-format/summary.json). Full report/backend/ordinary warmup and whole-card gates remain pending; gates unchanged.

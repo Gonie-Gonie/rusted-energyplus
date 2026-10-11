@@ -1,0 +1,54 @@
+  static_assert(!std::is_same<T, float>::value, "");
+  FMT_ASSERT(value >= 0, "value is negative");
+
+  const bool fixed = specs.format == float_format::fixed;
+  if (value <= 0) {  // <= instead of == to silence a warning.
+    if (precision <= 0 || !fixed) {
+      buf.push_back('0');
+      return 0;
+    }
+    buf.try_resize(to_unsigned(precision));
+    std::uninitialized_fill_n(buf.data(), precision, '0');
+    return -precision;
+  }
+
+  if (!specs.use_grisu) return snprintf_float(value, precision, specs, buf);
+
+  if (precision < 0) {
+    // Use Dragonbox for the shortest format.
+    if (specs.binary32) {
+      auto dec = dragonbox::to_decimal(static_cast<float>(value));
+      write<char>(buffer_appender<char>(buf), dec.significand);
+      return dec.exponent;
+    }
+    auto dec = dragonbox::to_decimal(static_cast<double>(value));
+    write<char>(buffer_appender<char>(buf), dec.significand);
+    return dec.exponent;
+  }
+
+  // Use Grisu + Dragon4 for the given precision:
+  // https://www.cs.tufts.edu/~nr/cs257/archive/florian-loitsch/printf.pdf.
+  int exp = 0;
+  const int min_exp = -60;  // alpha in Grisu.
+  int cached_exp10 = 0;     // K in Grisu.
+  fp normalized = normalize(fp(value));
+  const auto cached_pow = get_cached_power(
+      min_exp - (normalized.e + fp::significand_size), cached_exp10);
+  normalized = normalized * cached_pow;
+  // Limit precision to the maximum possible number of significant digits in an
+  // IEEE754 double because we don't need to generate zeros.
+  const int max_double_digits = 767;
+  if (precision > max_double_digits) precision = max_double_digits;
+  fixed_handler handler{buf.data(), 0, precision, -cached_exp10, fixed};
+  if (grisu_gen_digits(normalized, 1, exp, handler) == digits::error) {
+    exp += handler.size - cached_exp10 - 1;
+    fallback_format(value, handler.precision, specs.binary32, buf, exp);
+  } else {
+    exp += handler.exp10;
+    buf.try_resize(to_unsigned(handler.size));
+  }
+  if (!fixed && !specs.showpoint) {
+    // Remove trailing zeros.
+    auto num_digits = buf.size();
+    while (num_digits > 0 && buf[num_digits - 1] == '0') {
+      --num_digits;

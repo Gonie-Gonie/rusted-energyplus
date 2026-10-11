@@ -1,0 +1,26 @@
+--- .runtime/porting/SYS-03/round-format-prep-01/proposed/crates/ep_runtime/src/heat_balance/source_round_format.rs
++++ crates/ep_runtime/src/heat_balance/source_round_format.rs
+@@ -36,7 +36,12 @@
+     if value.is_nan() {
+         // fmt8 write_nonfinite reads signbit even for NaN. Preserve the later
+         // literal zero_pad_exponent operation on this text too.
+-        return Ok(if value.is_sign_negative() { "-NAN" } else { "NAN" }.into());
++        return Ok(if value.is_sign_negative() {
++            "-NAN"
++        } else {
++            "NAN"
++        }
++        .into());
+     }
+     let text = format!("{value:.precision$E}");
+     let (mantissa, exponent) = text
+@@ -70,7 +75,8 @@
+             let digits10 = value.log10() as i32;
+             let precision_i32 = i32::try_from(precision)
+                 .map_err(|_| SourceRoundFormatUnavailable::ExponentFormat)?;
+-            let total = digits10.checked_add(precision_i32)
++            let total = digits10
++                .checked_add(precision_i32)
+                 .ok_or(SourceRoundFormatUnavailable::ExponentFormat)?;
+             if total >= 17 {
+                 return Ok(format!("{}.", fixed(value, 0)));

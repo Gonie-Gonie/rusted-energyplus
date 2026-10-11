@@ -1,0 +1,32 @@
+{
+  "schema": "source-round-format-Root-full-Source-correspondence-review.v1",
+  "actual_application": {
+    "path": ".runtime/porting/SYS-03/round-format-applied-01/record.json",
+    "sha256": "cb235f65732ec822cb160693ac6ee8fce0d5373cd84659743b2fb26abe0dfa01",
+    "size_bytes": 11256
+  },
+  "source_before": {
+    "path": ".runtime/porting/source-objects/37/371ee432d89384311dbe6c07f0d3beb8cb99cba51ab69d14a71b7a63ce0df6ea",
+    "sha256": "371ee432d89384311dbe6c07f0d3beb8cb99cba51ab69d14a71b7a63ce0df6ea"
+  },
+  "source_literal": {
+    "path": ".runtime/porting/source-objects/5a/5a33b69e451865c39cc8fbd804271be9b6835b6bcff4951e2d40f65daddfa32e",
+    "sha256": "5a33b69e451865c39cc8fbd804271be9b6835b6bcff4951e2d40f65daddfa32e"
+  },
+  "source_final": {
+    "path": ".runtime/porting/source-objects/56/5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548",
+    "sha256": "5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548"
+  },
+  "all_literal_proposals_match_reviewed_Source": true,
+  "all_five_semantic_and_formatter_diffs_regenerated": true,
+  "Root_FULL_nonempty_formatter_diff_review_accepted": true,
+  "other_author_FULL_correspondence_review_accepted": true,
+  "captured_source_members_before": 3919,
+  "captured_source_members_after": 3922,
+  "unrelated_source_members_byte_exact": 3917,
+  "all_three_snapshots_full_archive_hashes_verified": true,
+  "all_current_source_members_full_hashes_verified": true,
+  "card_contract_written_before_math_matches_reviewed_append": true,
+  "scientific_parity_PASS_claimed": false,
+  "gates_updated": false
+}

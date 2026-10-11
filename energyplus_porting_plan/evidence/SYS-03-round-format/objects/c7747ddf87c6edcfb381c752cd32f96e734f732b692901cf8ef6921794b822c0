@@ -1,0 +1,32 @@
+{
+  "schema": "source-round-format-execution-custody.v1",
+  "execution_role": "Rust",
+  "actual_command_receipt": {
+    "path": ".runtime/porting/SYS-03/round-format-observation-02/Rust-command/receipt.json",
+    "sha256": "6813651902738f5a31ffc35aa244d86378d1f4904d1c88a8c4b709dbbef371bd",
+    "size_bytes": 3696
+  },
+  "actual_input_before": {
+    "path": ".runtime/porting/SYS-03/round-format-observation-02/Rust-input.json",
+    "sha256": "0aea2faeb87c38a88323804614efad87f4693b39c91dd500846fc5f0fa0b7600",
+    "size_bytes": 12394
+  },
+  "actual_binary_before": {
+    "path": "target/debug/examples/source_round_format_unit_observer.exe",
+    "sha256": "ac6776e977345ca65a9c1220ef3f2fddf8f0d02f8dbb31414dc8ae16fa6ca045",
+    "size_bytes": 2123547
+  },
+  "actual_input_after": {
+    "path": ".runtime/porting/SYS-03/round-format-observation-02/Rust-input.json",
+    "sha256": "0aea2faeb87c38a88323804614efad87f4693b39c91dd500846fc5f0fa0b7600",
+    "size_bytes": 12394
+  },
+  "actual_binary_after": {
+    "path": "target/debug/examples/source_round_format_unit_observer.exe",
+    "sha256": "ac6776e977345ca65a9c1220ef3f2fddf8f0d02f8dbb31414dc8ae16fa6ca045",
+    "size_bytes": 2123547
+  },
+  "input_bytes_match_before_after": true,
+  "binary_bytes_match_before_after": true,
+  "numerical_PASS_claimed": false
+}

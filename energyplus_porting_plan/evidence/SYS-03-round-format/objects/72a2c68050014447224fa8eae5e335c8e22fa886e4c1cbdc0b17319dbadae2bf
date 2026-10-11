@@ -1,0 +1,3 @@
+Updated energyplus_porting_plan\energyplus_porting_checklist.html
+PASS: checklist and embedded HTML plan match validated gate metadata.
+{"summary": {"path": "energyplus_porting_plan/evidence/SYS-03-round-format/summary.json", "sha256": "f87d57a30c1d710a703cd168e5a5fdbfff2df15ee4f7e95170e4fe491424d1e4", "size_bytes": 96095}, "archived_paths": 161, "actual_status": "pass-selected-615-available-exact-texts", "gates_changed": false}

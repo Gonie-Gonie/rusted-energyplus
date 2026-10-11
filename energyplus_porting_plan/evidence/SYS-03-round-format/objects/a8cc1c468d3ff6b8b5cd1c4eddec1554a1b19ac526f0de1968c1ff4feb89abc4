@@ -1,0 +1,12 @@
+{
+  "actual_input_before": {
+    "path": ".runtime/porting/SYS-03/round-format-observation-01/Native-input.json",
+    "sha256": "0aea2faeb87c38a88323804614efad87f4693b39c91dd500846fc5f0fa0b7600",
+    "size_bytes": 12394
+  },
+  "actual_binary_before": {
+    "path": "D:\\CodexBuild\\rusted-energyplus\\SYS-03\\round-format-native-build-01\\bin\\source_round_format_unit_helper.exe",
+    "sha256": "e8d59c8ae4f152b5230e662ee2474451e68ba5e0126c0dc909d3e8095f1be969",
+    "size_bytes": 1244728855
+  }
+}

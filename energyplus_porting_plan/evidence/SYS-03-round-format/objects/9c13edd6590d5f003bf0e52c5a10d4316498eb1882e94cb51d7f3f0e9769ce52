@@ -1,0 +1,10 @@
+--- crates/ep_runtime/src/heat_balance/mod.rs
++++ .runtime/porting/SYS-03/round-format-prep-01/proposed/crates/ep_runtime/src/heat_balance/mod.rs
+@@ -45,6 +45,7 @@
+ pub mod reports;
+ pub(crate) mod run_period;
+ pub mod solar;
++pub(crate) mod source_round_format;
+ pub mod state;
+ pub mod summary;
+ pub mod surface_balance;

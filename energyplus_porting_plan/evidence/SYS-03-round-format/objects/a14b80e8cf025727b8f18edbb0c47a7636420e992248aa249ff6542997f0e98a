@@ -1,0 +1,527 @@
+{
+  "schema": "source-round-format-Source-preparation.v1",
+  "status": "HELD-Source-only-unexecuted",
+  "application": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/source_round_format.rs",
+      "actual_before": null,
+      "before_archive": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/before/crates/ep_runtime/src/heat_balance/source_round_format.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "new_destination_absent": true,
+      "proposal": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/proposed/crates/ep_runtime/src/heat_balance/source_round_format.rs",
+        "sha256": "983fcb8a67a9a29803aad0d404c1fd660ac12a64579f9a74d027d72c369cfa40",
+        "size_bytes": 3506,
+        "line_count": 93
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/diffs/crates__ep_runtime__src__heat_balance__source_round_format.rs.diff",
+        "sha256": "b73454a766aa74e0fea55e9804419b1e9cafb0aeaba3a2bedec7adff1448b03e",
+        "size_bytes": 3746,
+        "line_count": 96
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/source_round_format_tests.rs",
+      "actual_before": null,
+      "before_archive": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/before/crates/ep_runtime/src/heat_balance/source_round_format_tests.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "new_destination_absent": true,
+      "proposal": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/proposed/crates/ep_runtime/src/heat_balance/source_round_format_tests.rs",
+        "sha256": "cc1e161398572444e63a5358caab7b57a506fbf7cda291c4548428b71e9af9df",
+        "size_bytes": 1925,
+        "line_count": 43
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/diffs/crates__ep_runtime__src__heat_balance__source_round_format_tests.rs.diff",
+        "sha256": "1fc0ae29ecccee60137a2d4675ed3f4612797eab019b88a80774f897620851d8",
+        "size_bytes": 2121,
+        "line_count": 46
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "3c5a7c342486ec96928659a3bb980be06caf5bf111506541bc2ee9b4b9f7cc8d",
+        "size_bytes": 2186,
+        "line_count": 85
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/before/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "3c5a7c342486ec96928659a3bb980be06caf5bf111506541bc2ee9b4b9f7cc8d",
+        "size_bytes": 2186,
+        "line_count": 85
+      },
+      "new_destination_absent": false,
+      "proposal": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/proposed/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "5c374561b23c7420a93e7c84870574bba455144caff4713580855a681948c9a1",
+        "size_bytes": 2222,
+        "line_count": 86
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/diffs/crates__ep_runtime__src__heat_balance__mod.rs.diff",
+        "sha256": "9c13edd6590d5f003bf0e52c5a10d4316498eb1882e94cb51d7f3f0e9769ce52",
+        "size_bytes": 323,
+        "line_count": 10
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+        "sha256": "25db310ed83eaf2bdf97f1189700aa985935101d1c5ae12397a42e50e116c1c3",
+        "size_bytes": 7238,
+        "line_count": 187
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/before/crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+        "sha256": "25db310ed83eaf2bdf97f1189700aa985935101d1c5ae12397a42e50e116c1c3",
+        "size_bytes": 7238,
+        "line_count": 187
+      },
+      "new_destination_absent": false,
+      "proposal": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+        "sha256": "8fb4782c0a1443f31d928974a0977045e7d7ebd52154ff5ebc00e21bf9116652",
+        "size_bytes": 5764,
+        "line_count": 145
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/diffs/crates__ep_runtime__src__heat_balance__ctf_source_diagnostics.rs.diff",
+        "sha256": "6cba4fff631f9d73691c9f10d10428cc12ee74270e248f23bbd2c28855a79a20",
+        "size_bytes": 3041,
+        "line_count": 75
+      }
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/source_round_format_unit_observer.rs",
+      "actual_before": null,
+      "before_archive": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/before/crates/ep_run/examples/source_round_format_unit_observer.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "new_destination_absent": true,
+      "proposal": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/proposed/crates/ep_run/examples/source_round_format_unit_observer.rs",
+        "sha256": "4e5f0818f1686ff986ceff7cc41068c7f4e205496b6c271dbe2c7deec44ab629",
+        "size_bytes": 4553,
+        "line_count": 108
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/diffs/crates__ep_run__examples__source_round_format_unit_observer.rs.diff",
+        "sha256": "8bd37404b3b1c34b29b6ca23b186241f130c217d1adc3abc64d75a5ff0762f96",
+        "size_bytes": 4811,
+        "line_count": 111
+      }
+    }
+  ],
+  "own_sources": [
+    {
+      "path": ".runtime/porting/SYS-03/round-format-prep-01/proposed/crates/ep_runtime/src/heat_balance/source_round_format.rs",
+      "sha256": "983fcb8a67a9a29803aad0d404c1fd660ac12a64579f9a74d027d72c369cfa40",
+      "size_bytes": 3506,
+      "line_count": 93
+    },
+    {
+      "path": ".runtime/porting/SYS-03/round-format-prep-01/proposed/crates/ep_runtime/src/heat_balance/source_round_format_tests.rs",
+      "sha256": "cc1e161398572444e63a5358caab7b57a506fbf7cda291c4548428b71e9af9df",
+      "size_bytes": 1925,
+      "line_count": 43
+    },
+    {
+      "path": ".runtime/porting/SYS-03/round-format-prep-01/proposed/crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "5c374561b23c7420a93e7c84870574bba455144caff4713580855a681948c9a1",
+      "size_bytes": 2222,
+      "line_count": 86
+    },
+    {
+      "path": ".runtime/porting/SYS-03/round-format-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+      "sha256": "8fb4782c0a1443f31d928974a0977045e7d7ebd52154ff5ebc00e21bf9116652",
+      "size_bytes": 5764,
+      "line_count": 145
+    },
+    {
+      "path": ".runtime/porting/SYS-03/round-format-prep-01/proposed/crates/ep_run/examples/source_round_format_unit_observer.rs",
+      "sha256": "4e5f0818f1686ff986ceff7cc41068c7f4e205496b6c271dbe2c7deec44ab629",
+      "size_bytes": 4553,
+      "line_count": 108
+    },
+    {
+      "path": ".runtime/porting/SYS-03/round-format-prep-01/round_unit_helper.cpp",
+      "sha256": "4d40f9def58127e7cb9aa789c39d77b1c4836124950f7038bda41b08834a2f16",
+      "size_bytes": 5293,
+      "line_count": 95
+    },
+    {
+      "path": ".runtime/porting/SYS-03/round-format-prep-01/round_unit_reference.cmake",
+      "sha256": "38387d0417d550c7ab583e01a7ab09c183ed80ec2b517e0aa6cf79a360cab478",
+      "size_bytes": 2154,
+      "line_count": 28
+    },
+    {
+      "path": ".runtime/porting/SYS-03/round-format-prep-01/input-only-cases.proposed.json",
+      "sha256": "0aea2faeb87c38a88323804614efad87f4693b39c91dd500846fc5f0fa0b7600",
+      "size_bytes": 12394,
+      "line_count": 510
+    },
+    {
+      "path": ".runtime/porting/SYS-03/round-format-prep-01/prospective-policy.json",
+      "sha256": "860ee62a8c4c3d4e7ee01bc651a1aeaccecd8658d20898fadc4d906ff1063fbe",
+      "size_bytes": 1267,
+      "line_count": 29
+    },
+    {
+      "path": ".runtime/porting/SYS-03/round-format-prep-01/README.md",
+      "sha256": "f6499fa3f883b75226fb2650f053301eb0169d0e173c705d669a79e727999436",
+      "size_bytes": 3506,
+      "line_count": 15
+    },
+    {
+      "path": ".runtime/porting/SYS-03/prepare-round-format-01.py",
+      "sha256": "f0e2c0ded88398f78bb90f6a4dbf20cfe606ce9df1904e3ea8e5f5923546edb1",
+      "size_bytes": 19230,
+      "line_count": 244
+    }
+  ],
+  "authentic_template_befores": [
+    {
+      "path": ".runtime/porting/SYS-03/round-format-prep-01/before/format_unit_helper.cpp",
+      "sha256": "108d7223ea500dcc158ae29498970ab9842bee15db4ba904665fa2229dd0e28b",
+      "size_bytes": 4597,
+      "line_count": 82
+    },
+    {
+      "path": ".runtime/porting/SYS-03/round-format-prep-01/before/format_unit_reference.cmake",
+      "sha256": "820cef1f54a4c6414703659266bc002cfd4ecbba573852e4f77dd879a7492570",
+      "size_bytes": 2118,
+      "line_count": 28
+    },
+    {
+      "path": ".runtime/porting/SYS-03/round-format-prep-01/before/ctf10_report_format_unit_observer.rs",
+      "sha256": "c2c57750cf987bfb6cd5b392d9b93098e067a3ba2706bd0fd2f21c0d0c422481",
+      "size_bytes": 4521,
+      "line_count": 120
+    }
+  ],
+  "transport_template_diffs": [
+    {
+      "path": ".runtime/porting/SYS-03/round-format-prep-01/diffs/round_unit_helper.cpp.diff",
+      "sha256": "80bb99f2e9e19c7a8aee77eb51301add1bff4ab13aa5cb1554b5d063c9f30eef",
+      "size_bytes": 3923,
+      "line_count": 60
+    },
+    {
+      "path": ".runtime/porting/SYS-03/round-format-prep-01/diffs/round_unit_reference.cmake.diff",
+      "sha256": "74aac3e0854f5974154312cc4eb573ab518500148e31b9f7ff64743ec5f48ae8",
+      "size_bytes": 4357,
+      "line_count": 52
+    },
+    {
+      "path": ".runtime/porting/SYS-03/round-format-prep-01/diffs/observer.from-FG.diff",
+      "sha256": "51cd74ead0848a533231fa55001b74f634010106f71e21f05daa541f62869e5d",
+      "size_bytes": 4090,
+      "line_count": 84
+    }
+  ],
+  "read_Source_context": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh",
+      "sha256": "9605dc5fea21ba3923897ce8a3684b96209bb6c48666b43bccf990754dac9c68",
+      "size_bytes": 32371,
+      "line_count": 842
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/format.h",
+      "sha256": "28dd03616cceae87101844c2aa64bdba02686ff64b298721bf1d214ed89f2b0f",
+      "size_bytes": 108325,
+      "line_count": 2946
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/format-inl.h",
+      "sha256": "a53d81626a355ce9277d15d7a0f9f5a64e6b45625af8c2975632b4c0e34e8a23",
+      "size_bytes": 104779,
+      "line_count": 2637
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+      "size_bytes": 371103,
+      "line_count": 6206
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.cc",
+      "sha256": "7c73d349c92e3f6bee981d6b5400870b4640136728f1226b00e0c1fa13ba3121",
+      "size_bytes": 12552,
+      "line_count": 283
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+      "sha256": "25db310ed83eaf2bdf97f1189700aa985935101d1c5ae12397a42e50e116c1c3",
+      "size_bytes": 7238,
+      "line_count": 187
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-native-prep-01/format_unit_helper.cpp",
+      "sha256": "108d7223ea500dcc158ae29498970ab9842bee15db4ba904665fa2229dd0e28b",
+      "size_bytes": 4597,
+      "line_count": 82
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-native-prep-01/format_unit_reference.cmake",
+      "sha256": "820cef1f54a4c6414703659266bc002cfd4ecbba573852e4f77dd879a7492570",
+      "size_bytes": 2118,
+      "line_count": 28
+    },
+    {
+      "path": "crates/ep_run/examples/ctf10_report_format_unit_observer.rs",
+      "sha256": "c2c57750cf987bfb6cd5b392d9b93098e067a3ba2706bd0fd2f21c0d0c422481",
+      "size_bytes": 4521,
+      "line_count": 120
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_source_diagnostics_tests.rs",
+      "sha256": "19bd07a2589d7825fb26d38331ed8894003d6bbeb98923ffdfdd78e298947f43",
+      "size_bytes": 6124,
+      "line_count": 188
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+      "size_bytes": 3172,
+      "line_count": 75
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_reports_format.rs",
+      "sha256": "d8aa1aa88e3000a4be37f6179c3c6829b7ff534d16efded123d91ab5045c0151",
+      "size_bytes": 2813,
+      "line_count": 83
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "size_bytes": 8453,
+      "line_count": 204
+    }
+  ],
+  "read_Source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh",
+      "start_line": 117,
+      "end_line": 140,
+      "purpose": "threshold and literal exponent padding",
+      "sha256": "8e7647aad22eab97dd9f31f31c07a9f77eed5d4aa815fb5769edee48c34c0c62",
+      "size_bytes": 824,
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/source-ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__IOFiles.hh.117-140.txt",
+        "sha256": "8e7647aad22eab97dd9f31f31c07a9f77eed5d4aa815fb5769edee48c34c0c62",
+        "size_bytes": 824,
+        "line_count": 24
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh",
+      "start_line": 247,
+      "end_line": 305,
+      "purpose": "whole nextafter and R branch",
+      "sha256": "07b0a0adcb7ccd1d1e37aa0b6b3042cdf653fc80ad1a827ac7e304fed9a4fedd",
+      "size_bytes": 2718,
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/source-ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__IOFiles.hh.247-305.txt",
+        "sha256": "07b0a0adcb7ccd1d1e37aa0b6b3042cdf653fc80ad1a827ac7e304fed9a4fedd",
+        "size_bytes": 2718,
+        "line_count": 59
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh",
+      "start_line": 734,
+      "end_line": 786,
+      "purpose": "actual Fortran wrapper dispatch",
+      "sha256": "7143ae983c58185f8c1fe5c1edbde67245ab5cd7baa778a6cd591425f0da0b6c",
+      "size_bytes": 2503,
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/source-ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__IOFiles.hh.734-786.txt",
+        "sha256": "7143ae983c58185f8c1fe5c1edbde67245ab5cd7baa778a6cd591425f0da0b6c",
+        "size_bytes": 2503,
+        "line_count": 53
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/format.h",
+      "start_line": 1664,
+      "end_line": 1678,
+      "purpose": "actual signed nonfinite text",
+      "sha256": "09adebe35938a9f6735e04020a77808074e12df371ab634b72ee27fd7efad341",
+      "size_bytes": 754,
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/source-ranges/.reference__energyplus-src__26.1.0__third_party__fmt-8.0.1__include__fmt__format.h.1664-1678.txt",
+        "sha256": "09adebe35938a9f6735e04020a77808074e12df371ab634b72ee27fd7efad341",
+        "size_bytes": 754,
+        "line_count": 15
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/format.h",
+      "start_line": 1780,
+      "end_line": 1829,
+      "purpose": "actual minimum exponent digits",
+      "sha256": "b16092006e5737ca25711d80a5227f973cd3dfe08bd8fa854079a89c19233dea",
+      "size_bytes": 2326,
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/source-ranges/.reference__energyplus-src__26.1.0__third_party__fmt-8.0.1__include__fmt__format.h.1780-1829.txt",
+        "sha256": "b16092006e5737ca25711d80a5227f973cd3dfe08bd8fa854079a89c19233dea",
+        "size_bytes": 2326,
+        "line_count": 50
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/format.h",
+      "start_line": 1886,
+      "end_line": 1929,
+      "purpose": "floating sign and nonfinite dispatch",
+      "sha256": "090d8355696783631b0c7868416edc76b38a319dd4dac9fdf67a33bb998fe9e5",
+      "size_bytes": 1803,
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/source-ranges/.reference__energyplus-src__26.1.0__third_party__fmt-8.0.1__include__fmt__format.h.1886-1929.txt",
+        "sha256": "090d8355696783631b0c7868416edc76b38a319dd4dac9fdf67a33bb998fe9e5",
+        "size_bytes": 1803,
+        "line_count": 44
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/format-inl.h",
+      "start_line": 2268,
+      "end_line": 2350,
+      "purpose": "fixed/exponential rounding and carry fallback",
+      "sha256": "71fb3f8785ab2824fec4b279e079acfc601a419e6077d0fbe937b5c6f9a4ee3e",
+      "size_bytes": 2582,
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/source-ranges/.reference__energyplus-src__26.1.0__third_party__fmt-8.0.1__include__fmt__format-inl.h.2268-2350.txt",
+        "sha256": "71fb3f8785ab2824fec4b279e079acfc601a419e6077d0fbe937b5c6f9a4ee3e",
+        "size_bytes": 2582,
+        "line_count": 83
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/format-inl.h",
+      "start_line": 2351,
+      "end_line": 2404,
+      "purpose": "finite formatting primitive",
+      "sha256": "dada3c8576c001782d3b8d330ffe25fe8f17b672a1626a9b0127b5bb947ba84f",
+      "size_bytes": 2132,
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/source-ranges/.reference__energyplus-src__26.1.0__third_party__fmt-8.0.1__include__fmt__format-inl.h.2351-2404.txt",
+        "sha256": "dada3c8576c001782d3b8d330ffe25fe8f17b672a1626a9b0127b5bb947ba84f",
+        "size_bytes": 2132,
+        "line_count": 54
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "start_line": 3020,
+      "end_line": 3042,
+      "purpose": "actual detailed .10R caller",
+      "sha256": "3004536858f1cda0145dc6a98c906d268a205974ad5393c7dcab0936b55a28bd",
+      "size_bytes": 1656,
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/source-ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__HeatBalanceManager.cc.3020-3042.txt",
+        "sha256": "3004536858f1cda0145dc6a98c906d268a205974ad5393c7dcab0936b55a28bd",
+        "size_bytes": 1656,
+        "line_count": 23
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "start_line": 3150,
+      "end_line": 3182,
+      "purpose": "actual maxday .2R/.4R callers",
+      "sha256": "fc39e371f2da67a32dbbbccbc0c44178d250966a36ed65b8d0550d89c87735b2",
+      "size_bytes": 2665,
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/source-ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__HeatBalanceManager.cc.3150-3182.txt",
+        "sha256": "fc39e371f2da67a32dbbbccbc0c44178d250966a36ed65b8d0550d89c87735b2",
+        "size_bytes": 2665,
+        "line_count": 33
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "start_line": 3278,
+      "end_line": 3293,
+      "purpose": "actual summary .10R caller",
+      "sha256": "0f1aeb05a937d039cf35f88f8e8f76f93409e62ce99bb027a496f9f69d1d44de",
+      "size_bytes": 1293,
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/source-ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__HeatBalanceManager.cc.3278-3293.txt",
+        "sha256": "0f1aeb05a937d039cf35f88f8e8f76f93409e62ce99bb027a496f9f69d1d44de",
+        "size_bytes": 1293,
+        "line_count": 16
+      }
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.cc",
+      "start_line": 230,
+      "end_line": 248,
+      "purpose": "actual cold-guard .0R diagnostic operands",
+      "sha256": "1ee46ce382b182a7d3bd7c065b83abf0fcd9f8632d20248992482aad5fd001c1",
+      "size_bytes": 928,
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/source-ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__DataEnvironment.cc.230-248.txt",
+        "sha256": "1ee46ce382b182a7d3bd7c065b83abf0fcd9f8632d20248992482aad5fd001c1",
+        "size_bytes": 928,
+        "line_count": 19
+      }
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+      "start_line": 58,
+      "end_line": 113,
+      "purpose": "existing .3R body extracted into shared owner",
+      "sha256": "46b8754c8bd4cb62225ee7f152f8cbaef33de0399c17840ad50216f2d62a1800",
+      "size_bytes": 2116,
+      "literal_archive": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/source-ranges/crates__ep_runtime__src__heat_balance__ctf_source_diagnostics.rs.58-113.txt",
+        "sha256": "46b8754c8bd4cb62225ee7f152f8cbaef33de0399c17840ad50216f2d62a1800",
+        "size_bytes": 2116,
+        "line_count": 56
+      }
+    }
+  ],
+  "runtime_interfaces": {
+    "Rust_internal_API": "source_round_format::round(f64, usize) -> Result<String, SourceRoundFormatUnavailable>",
+    "selected_precisions": [
+      0,
+      2,
+      3,
+      4,
+      10
+    ],
+    "Native_target": "source_round_format_unit_helper",
+    "Native_argv_count": 2,
+    "Rust_example": "source_round_format_unit_observer",
+    "Rust_argv_count": 3,
+    "input_schema": "source-round-format-unit-request.v1",
+    "Native_result_schema": "source-round-format-unit-native-results.v1",
+    "Rust_result_schema": "source-round-format-unit-candidate-results.v1",
+    "declared_input_rows": 124,
+    "declared_calls": 620
+  },
+  "scientific_execution_performed": false,
+  "Native_or_Rust_outputs_read": false,
+  "canonical_Source_changed": false,
+  "expected_values_supplied": false,
+  "gates_updated": false
+}

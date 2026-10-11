@@ -1,0 +1,499 @@
+{
+  "schema": "source-round-format-actual-linked-PE-inventory.v1",
+  "actual_Native_binary": {
+    "path": "D:\\CodexBuild\\rusted-energyplus\\SYS-03\\round-format-native-build-01\\bin\\source_round_format_unit_helper.exe",
+    "sha256": "e8d59c8ae4f152b5230e662ee2474451e68ba5e0126c0dc909d3e8095f1be969",
+    "size_bytes": 1244728855
+  },
+  "actual_full_link_map": {
+    "path": "D:\\CodexBuild\\rusted-energyplus\\SYS-03\\round-format-native-build-01\\bin\\source_round_format_unit_helper.map",
+    "sha256": "8dc209342ef299230fd27df46b56b3c770fb566af4433357ea5d92845f9f533a",
+    "size_bytes": 276943223
+  },
+  "actual_PE": {
+    "sha256": "e8d59c8ae4f152b5230e662ee2474451e68ba5e0126c0dc909d3e8095f1be969",
+    "size_bytes": 1244728855,
+    "pe_offset": 128,
+    "dos_prefix_sha256": "bfdf5e72651b4ec588bd5fc6a9f17e9e0972248146bbacc10478f48d72f29b81",
+    "machine": 34404,
+    "section_count": 20,
+    "timestamp": 1791731037,
+    "symbol_table_offset": 1161472000,
+    "symbol_count": 1344962,
+    "optional_header_size": 240,
+    "coff_characteristics": 38,
+    "complete_header_hex": "4d5a90000300000004000000ffff0000b800000000000000400000000000000000000000000000000000000000000000000000000000000000000000800000000e1fba0e00b409cd21b8014ccd21546869732070726f6772616d2063616e6e6f742062652072756e20696e20444f53206d6f64652e0d0d0a240000000000000050450000648614005da5cb6a00a83a45c2851400f00026000b02022900e63c02009e150400ca00002511000000100000000000400100000000100000000200000400000000000000050002000000000000303c4500060000618e314a0300600100002000000000000010000000000000000010000000000000100000000000000000000010000000000000000000000000400d048082000000000000000000000020d30350311500000000000000000000f00d0488f40800000000000000000000000000000000000000000000000000e0dccc03280000000000000000000000000000000000000058560d04b01400000000000000000000000000000000000000000000000000002e7465787400000070e43c020010000000e63c0200060000000000000000000000000000600000602e646174610000000038010000003d020038010000ec3c02000000000000000000000000400000c02e72646174610000f8c9940100403e0200ca940100243e02000000000000000000000000400000402f34000000000000040000000010d3030002000000eed203000000000000000000000000400000c02e70646174610000503115000020d3030032150000f0d203000000000000000000000000400000402e786461746100004c0224000060e803000424000022e803000000000000000000000000400000402e6273730000000040c9000000700c040000000000000000000000000000000000000000800000c02e696461746100008082000000400d040084000000260c04000000000000000000000000400000c02e435254000000006000000000d00d040002000000aa0c04000000000000000000000000400000c02e746c73000000001000000000e00d040002000000ac0c04000000000000000000000000400000c02e72656c6f63000088f4080000f00d0400f6080000ae0c04000000000000000000000000400000422f31340000000000704d6d0000f01604004e6d0000a41504000000000000000000000000400000422f32390000000000c7cf413c0040840400d0413c00f28204000000000000000000000000400000422f3431000000000044023b000010c64000043b0000c2c440000000000000000000000000400000422f35350000000000a1dd44020020014100de440200c6ff40000000000000000000000000400000422f3637000000000098007200000046430002720000a44443000000000000000000000000400000422f383000000000002f5480000010b8430056800000a6b643000000000000000000000000400000422f39310000000000c4ba27000070384400bc270000fc3644000000000000000000000000400000422f3130370000000092d282000030604400d4820000b85e44000000000000000000000000400000422f31323300000000401b59000010e344001c5900008ce144000000000000000000000000400000420000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "optional_header_hex": "0b02022900e63c02009e150400ca00002511000000100000000000400100000000100000000200000400000000000000050002000000000000303c4500060000618e314a0300600100002000000000000010000000000000000010000000000000100000000000000000000010000000000000000000000000400d048082000000000000000000000020d30350311500000000000000000000f00d0488f40800000000000000000000000000000000000000000000000000e0dccc03280000000000000000000000000000000000000058560d04b0140000000000000000000000000000000000000000000000000000",
+    "entry_rva": 4389,
+    "image_base": 5368709120,
+    "section_alignment": 4096,
+    "file_alignment": 512,
+    "code_size": 37545472,
+    "initialized_data_size": 68525568,
+    "uninitialized_data_size": 51712,
+    "image_size": 1161572352,
+    "header_size": 1536,
+    "checksum": 1244761697,
+    "sections": [
+      {
+        "name": ".text",
+        "rva": 4096,
+        "virtual_size": 37545072,
+        "raw_size": 37545472,
+        "raw_offset": 1536,
+        "characteristics": 1610612832,
+        "debug": false,
+        "raw_sha256": "b1b9d50bf41b25497865f6e8881dde86feaa07f55a287902be57b77d21016b76"
+      },
+      {
+        "name": ".data",
+        "rva": 37552128,
+        "virtual_size": 79872,
+        "raw_size": 79872,
+        "raw_offset": 37547008,
+        "characteristics": 3221225536,
+        "debug": false,
+        "raw_sha256": "8f0c429286e633883e54d50ea5830d790fcaad978c9e0606b1a80bf7bb465f39"
+      },
+      {
+        "name": ".rdata",
+        "rva": 37634048,
+        "virtual_size": 26528248,
+        "raw_size": 26528256,
+        "raw_offset": 37626880,
+        "characteristics": 1073741888,
+        "debug": false,
+        "raw_sha256": "577939677dc989cb680d7aa8ca85a575bc2de11b3c38ec17bb3bee074f59caca"
+      },
+      {
+        "name": ".eh_frame",
+        "rva": 64163840,
+        "virtual_size": 4,
+        "raw_size": 512,
+        "raw_offset": 64155136,
+        "characteristics": 3221225536,
+        "debug": false,
+        "raw_sha256": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560"
+      },
+      {
+        "name": ".pdata",
+        "rva": 64167936,
+        "virtual_size": 1388880,
+        "raw_size": 1389056,
+        "raw_offset": 64155648,
+        "characteristics": 1073741888,
+        "debug": false,
+        "raw_sha256": "7db7ff524a6d1ec2eb41d7dcf9a33cb163eac684ad11def302bf0abb014c9220"
+      },
+      {
+        "name": ".xdata",
+        "rva": 65560576,
+        "virtual_size": 2359884,
+        "raw_size": 2360320,
+        "raw_offset": 65544704,
+        "characteristics": 1073741888,
+        "debug": false,
+        "raw_sha256": "a553c09ace269a4d00d4fd2366ca4669ed5d080428a79c46393ee75ae86a9453"
+      },
+      {
+        "name": ".bss",
+        "rva": 67923968,
+        "virtual_size": 51520,
+        "raw_size": 0,
+        "raw_offset": 0,
+        "characteristics": 3221225600,
+        "debug": false,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": ".idata",
+        "rva": 67977216,
+        "virtual_size": 33408,
+        "raw_size": 33792,
+        "raw_offset": 67905024,
+        "characteristics": 3221225536,
+        "debug": false,
+        "raw_sha256": "8baf0005945fccd4aa005669fdc672ad7333a0dbcbc7b3afdc451d079e408de6"
+      },
+      {
+        "name": ".CRT",
+        "rva": 68014080,
+        "virtual_size": 96,
+        "raw_size": 512,
+        "raw_offset": 67938816,
+        "characteristics": 3221225536,
+        "debug": false,
+        "raw_sha256": "5aa6f92b1edf0150635f4007a73cb8a29cc301a148671859d141be3528ca9b95"
+      },
+      {
+        "name": ".tls",
+        "rva": 68018176,
+        "virtual_size": 16,
+        "raw_size": 512,
+        "raw_offset": 67939328,
+        "characteristics": 3221225536,
+        "debug": false,
+        "raw_sha256": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560"
+      },
+      {
+        "name": ".reloc",
+        "rva": 68022272,
+        "virtual_size": 586888,
+        "raw_size": 587264,
+        "raw_offset": 67939840,
+        "characteristics": 1107296320,
+        "debug": false,
+        "raw_sha256": "49e909a1f5619b32218a5a607d4a5cd55c84479d3ef0d47fe46abe27c777cc0a"
+      },
+      {
+        "name": ".debug_aranges",
+        "rva": 68612096,
+        "virtual_size": 7163248,
+        "raw_size": 7163392,
+        "raw_offset": 68527104,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "85fd78f13ea0ff9d872e5ed4fecf4f617f3b872a475ab9b92dc9a843093dddcc"
+      },
+      {
+        "name": ".debug_info",
+        "rva": 75776000,
+        "virtual_size": 1010945991,
+        "raw_size": 1010946048,
+        "raw_offset": 75690496,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "e838ea2311f1e65322edf0147e8d8f2adebfa40e0b03b99c3890bed6212cb1ad"
+      },
+      {
+        "name": ".debug_abbrev",
+        "rva": 1086722048,
+        "virtual_size": 3867204,
+        "raw_size": 3867648,
+        "raw_offset": 1086636544,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "51e2d4dd58a29a0035da79c02326709f2843094d46806cd58e214ce36a471967"
+      },
+      {
+        "name": ".debug_line",
+        "rva": 1090592768,
+        "virtual_size": 38067617,
+        "raw_size": 38067712,
+        "raw_offset": 1090504192,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "a9c4fc0f19da70caf531e5f762520a4a34d52bb0a0c2cf861f1ad4cdc193571c"
+      },
+      {
+        "name": ".debug_frame",
+        "rva": 1128660992,
+        "virtual_size": 7471256,
+        "raw_size": 7471616,
+        "raw_offset": 1128571904,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "ce37842cd2b8970b005a5df572c57bfa1d97d4889b962ce99bf860e926a87ca7"
+      },
+      {
+        "name": ".debug_str",
+        "rva": 1136136192,
+        "virtual_size": 8410159,
+        "raw_size": 8410624,
+        "raw_offset": 1136043520,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "a9896b150c74b061faeb458494e96346803734135dea80551cb4fafa33a6d821"
+      },
+      {
+        "name": ".debug_line_str",
+        "rva": 1144549376,
+        "virtual_size": 2603716,
+        "raw_size": 2604032,
+        "raw_offset": 1144454144,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "a6d4e5fb3079d17472b2b0ed9fba2bb7a612e1200208ed7c563730035466b816"
+      },
+      {
+        "name": ".debug_loclists",
+        "rva": 1147154432,
+        "virtual_size": 8573586,
+        "raw_size": 8573952,
+        "raw_offset": 1147058176,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "3537eacbc0dd4c77b7a3af9d2466ece0b83379f3e8f91d9de848d404c16a8c61"
+      },
+      {
+        "name": ".debug_rnglists",
+        "rva": 1155731456,
+        "virtual_size": 5839680,
+        "raw_size": 5839872,
+        "raw_offset": 1155632128,
+        "characteristics": 1107296320,
+        "debug": true,
+        "raw_sha256": "66a84cdc01f37521f65ebcafbed8dbbb77bbc7d12d37fa5711e931fe21a882d8"
+      }
+    ],
+    "data_directories": [
+      {
+        "index": 0,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 1,
+        "rva": 67977216,
+        "size": 33408,
+        "section": ".idata",
+        "section_relative_offset": 0,
+        "payload_sha256": "3747a4c4770672d21c61c4ffd8109ca1f666f69a766b23e8ce9eee73ba4fc68e"
+      },
+      {
+        "index": 2,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 3,
+        "rva": 64167936,
+        "size": 1388880,
+        "section": ".pdata",
+        "section_relative_offset": 0,
+        "payload_sha256": "db126be1616a6b43de19a45e80362da8119c002d1efb404a3fbd1979ee75d1d1"
+      },
+      {
+        "index": 4,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 5,
+        "rva": 68022272,
+        "size": 586888,
+        "section": ".reloc",
+        "section_relative_offset": 0,
+        "payload_sha256": "af4334531f85ce770a6c0b0cc1e7d9ef1df134ed1a87a293a0fb3036b4a6d4e5"
+      },
+      {
+        "index": 6,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 7,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 8,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 9,
+        "rva": 63757536,
+        "size": 40,
+        "section": ".rdata",
+        "section_relative_offset": 26123488,
+        "payload_sha256": "720b44d55667fbf4ef5159c32e1b6f65fba795bf6473b23e2d68afd3c49cfcef"
+      },
+      {
+        "index": 10,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 11,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 12,
+        "rva": 67982936,
+        "size": 5296,
+        "section": ".idata",
+        "section_relative_offset": 5720,
+        "payload_sha256": "09d2eb12b84294731c7d747d0a16e49446429be203feef3a658faae0d908af2f"
+      },
+      {
+        "index": 13,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 14,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 15,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      }
+    ],
+    "runtime_references": {
+      "schema": "native-helper-loader-reference-walk.v1",
+      "scope": "GNU-x64-unbound-imports-unwind-v1-TLS-DIR64",
+      "counts": {
+        "entry": 1,
+        "import_descriptor": 21,
+        "import_dll": 20,
+        "import_lookup": 662,
+        "import_iat": 662,
+        "import_hint": 642,
+        "import_name": 642,
+        "exception_entry": 115740,
+        "runtime_function": 115740,
+        "unwind_header": 115740,
+        "unwind_codes": 115740,
+        "unwind_handler_rva": 12714,
+        "unwind_handler": 12714,
+        "tls_directory": 1,
+        "tls_template": 1,
+        "tls_index": 1,
+        "tls_callback_table": 3,
+        "tls_callback": 2,
+        "relocation_block": 3027,
+        "relocation_entry": 281336,
+        "relocation_slot": 279889,
+        "relocated_image_pointer": 279888,
+        "relocated_image_base_anchor": 1
+      },
+      "target_sections": {
+        "entry": [
+          ".text"
+        ],
+        "import_descriptor": [
+          ".idata"
+        ],
+        "import_dll": [
+          ".idata"
+        ],
+        "import_lookup": [
+          ".idata"
+        ],
+        "import_iat": [
+          ".idata"
+        ],
+        "import_hint": [
+          ".idata"
+        ],
+        "import_name": [
+          ".idata"
+        ],
+        "exception_entry": [
+          ".pdata"
+        ],
+        "runtime_function": [
+          ".text"
+        ],
+        "unwind_header": [
+          ".xdata"
+        ],
+        "unwind_codes": [
+          ".xdata"
+        ],
+        "unwind_handler_rva": [
+          ".xdata"
+        ],
+        "unwind_handler": [
+          ".text"
+        ],
+        "tls_directory": [
+          ".rdata"
+        ],
+        "tls_template": [
+          ".tls"
+        ],
+        "tls_index": [
+          ".bss"
+        ],
+        "tls_callback_table": [
+          ".CRT"
+        ],
+        "tls_callback": [
+          ".text"
+        ],
+        "relocation_block": [
+          ".reloc"
+        ],
+        "relocation_entry": [
+          ".reloc"
+        ],
+        "relocation_slot": [
+          ".CRT",
+          ".data",
+          ".rdata",
+          ".text"
+        ],
+        "relocated_image_pointer": [
+          ".CRT",
+          ".bss",
+          ".data",
+          ".idata",
+          ".rdata",
+          ".text",
+          ".tls"
+        ]
+      },
+      "all_walked_targets_retained": true,
+      "complete_runtime_pointer_walk": false,
+      "opaque_language_specific_handler_records": 12714,
+      "opaque_handler_data_preservation": "Exact full containing-section payload comparison; not interpreted",
+      "disassembly_or_scientific_execution": false
+    }
+  },
+  "actual_Original_IOFiles_header": {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh",
+    "sha256": "9605dc5fea21ba3923897ce8a3684b96209bb6c48666b43bccf990754dac9c68",
+    "size_bytes": 32371
+  },
+  "actual_Original_IOFiles_core_object": {
+    "path": ".runtime/ep261-gcc13-o0/src/EnergyPlus/CMakeFiles/energypluslib.dir/IOFiles.cc.obj",
+    "sha256": "f148f9e15bef491d24a074d646249da4d254affeacffd4c9e04a0f487272227e",
+    "size_bytes": 9200738
+  },
+  "actual_original_core_library": {
+    "path": ".runtime/ep261-gcc13-o0/Products/libenergypluslib.a",
+    "sha256": "32d873007f14c3f8e3c66c6280ebd508c7cb595cea28f4a20f47ac745113a694",
+    "size_bytes": 1832731010
+  },
+  "Original_Source_or_core_math_modified": false,
+  "inline_R_provider_address_review_pending": true,
+  "scientific_execution_performed": false
+}

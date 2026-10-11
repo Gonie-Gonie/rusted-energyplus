@@ -1,0 +1,199 @@
+--- .runtime/porting/SRC-05/publish-surface-environment-01.py
++++ .runtime/porting/SYS-03/publish-round-format-01.py
+@@ -1,4 +1,5 @@
+-"""Retain actual selected surface environment evidence without whole-unit gate promotion."""
++"""Retain an actual bounded R text comparison without whole-card gate promotion."""
++import argparse
+ import copy
+ import gzip
+ import hashlib
+@@ -9,8 +10,8 @@
+ import subprocess
+ 
+ ROOT = Path.cwd()
+-RAW = ROOT / '.runtime/porting/SRC-05'
+-OUT = ROOT / 'energyplus_porting_plan/evidence/SRC-05-surface-environment'
++RAW = ROOT / '.runtime/porting/SYS-03'
++OUT = ROOT / 'energyplus_porting_plan/evidence/SYS-03-round-format'
+ 
+ 
+ def ref(path):
+@@ -30,71 +31,82 @@
+     return path
+ 
+ 
++def operand(text):
++    name, digest = text.rsplit('#', 1)
++    return checked({'path': name, 'sha256': digest})
++
++
+ def dump(path, value):
+     path.write_text(json.dumps(value, ensure_ascii=False, allow_nan=False, indent=2) + '\n', encoding='utf8', newline='\n')
+ 
+ 
++parser = argparse.ArgumentParser(description=__doc__)
++parser.add_argument('--comparison', required=True, help='Closed actual comparison JSON path#SHA256')
++parser.add_argument('--comparison-execution', required=True, help='Closed recorded comparison receipt path#SHA256')
++args = parser.parse_args()
+ assert not OUT.exists()
+-post_path = RAW / 'observer-lint-applied-01/record.json'
+-post = load(post_path)
+-assert ref(post_path)['sha256'] == '2a2e4e5c33e8b55ca9e6af88955c62a63298937e2aa1d0e15dfa8fa35318b9f7'
+-assert post['source_preparation']['sha256'] == 'cff45c9a0db7972cf59243c53e68d58532fbc068fd4294f6e6c6acd530eecc75'
+-checked(post['prior_actual_application']); checked(post['retained_failed_quality'])
++post_path = RAW / 'round-format-applied-01/record.json'; post = load(post_path)
++assert ref(post_path)['sha256'] == 'cb235f65732ec822cb160693ac6ee8fce0d5373cd84659743b2fb26abe0dfa01'
++assert post['source_preparation']['sha256'] == 'a14b80e8cf025727b8f18edbb0c47a7636420e992248aa249ff6542997f0e98a'
+ snapshot = post['source_final']
+-assert snapshot['sha256'] == '371ee432d89384311dbe6c07f0d3beb8cb99cba51ab69d14a71b7a63ce0df6ea'
+-assert post['source_file_count'] == 3919 and post['unrelated_source_files_verified_byte_exact'] == 3918
+-comparison_path = RAW / 'selected-comparison-02/comparison.json'
+-comparison = load(comparison_path)
+-assert ref(comparison_path)['sha256'] == '627f2760a0ebb40532124fc3f504f6e3376bbb1064a1db5974d5a23192a1e640'
+-execution_path = RAW / 'selected-comparison-command-02/receipt.json'
+-execution = load(execution_path)
+-assert ref(execution_path)['sha256'] == 'a1a76910fe8eb9ee1c1297ef6b2ab6e06232214ca644b279051ae5646df02656'
++assert snapshot['sha256'] == '5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548'
++assert post['source_file_count'] == 3922 and post['unrelated_source_files_verified_byte_exact'] == 3917
++comparison_path = operand(args.comparison); comparison = load(comparison_path)
++execution_path = operand(args.comparison_execution); execution = load(execution_path)
++assert comparison_path.parent.parent == RAW and comparison_path.parent.name.startswith('round-format-')
+ assert execution['launch_error'] is None and execution['source_bytes_match_before_and_after'] is True and execution['source_snapshot'] == snapshot
+-statuses = {'pass-available-selected-setters-only': 0, 'fail-selected-setters-or-input-join': 1, 'fail-observation-or-custody-integrity': 2}
+-assert comparison['schema'] == 'src05-selected-surface-environment-comparison.v1' and execution['exit_code'] == statuses[comparison['status']]
+-assert execution['command'] == ['python', '-X', 'utf8', '-B', '.runtime/porting/SRC-05/surface-environment-selected-comparison-prep-03/compare.py', '--custody', comparison['actual_custody']['path'] + '#' + comparison['actual_custody']['sha256'], '--output-dir', '.runtime/porting/SRC-05/selected-comparison-02']
+-assert str(checked(comparison['actual_prospective_policy'])) == str(RAW / 'surface-environment-selected-comparison-prep-03/policy.json')
+-assert comparison['cold_guard_backend_PASS_claimed'] is False and comparison['whole_SRC05_unit_or_ordinary_manager_PASS_claimed'] is False and comparison['gates_updated'] is False
+-assert comparison['all_mismatches_and_unavailable_rows_retained_uncapped'] is True
+-printed = load(checked(execution['stdout']))
+-assert printed['comparison'] == ref(comparison_path) and printed['status'] == comparison['status'] and printed['exit_code'] == execution['exit_code']
+-packet = load(checked(comparison['actual_custody']))
+-assert packet['schema'] == 'src05-surface-environment-comparison-custody.v1'
+-for key in ['Native_input', 'Rust_input', 'Native_result', 'Rust_result', 'Native_execution', 'Rust_execution', 'Rust_launch_execution', 'Rust_execution_sidecar']:
++statuses = {'pass-selected-615-available-exact-texts': 0, 'fail-required-format-texts': 1}
++assert comparison['schema'] == 'source-round-format-exact-text-comparison.v1' and execution['exit_code'] == statuses[comparison['status']]
++command = execution['command']; assert len(command) == 11 and command[:4] == ['python', '-X', 'utf8', '-B']
++script = (ROOT / command[4]).resolve()
++assert script == RAW / 'round-format-comparison-prep-01/compare.py' and ref(script)['sha256'] == 'b699dba053006031c23389aae573160d0abdb5aaf2c42e7ad021fbd1adbe37c5'
++options = dict(zip(command[5::2], command[6::2])); assert set(options) == {'--custody', '--approved-comparer-sha256', '--output-dir'}
++assert options['--approved-comparer-sha256'] == ref(script)['sha256'] and operand(options['--custody']) == checked(comparison['actual_custody'])
++assert (ROOT / options['--output-dir']).resolve() == comparison_path.parent
++assert comparison['declared_observations'] == 620 and comparison['required_nonexcluded_observations'] == 615 and len(comparison['exact_text_pairs']) == 615
++assert comparison['unavailable_counted_as_PASS'] is False and all(len(comparison['explicit_unavailable'][role]) == 5 for role in ['Native', 'Rust'])
++assert comparison['floating_exception_environment_and_NaN_payload_after_nextafter_unpaired'] is True and comparison['numeric_profiles'] == []
++assert comparison['whole_declared_unit_PASS_claimed'] is False and comparison['full_report_or_backend_equivalence_claimed'] is False and comparison['ordinary_integration_PASS_claimed'] is False and comparison['gates_updated'] is False
++passed = comparison['status'] == 'pass-selected-615-available-exact-texts'
++assert comparison['selected_available_exact_text_comparison_passed'] is passed and comparison['mismatch_count'] == len(comparison['mismatches'])
++assert not passed or comparison['mismatch_count'] == 0 and comparison['actual_returned_pairs'] == 615 and all(row['counted_as_PASS'] for row in comparison['exact_text_pairs'])
++checked(execution['stdout']); checked(execution['stderr'])
++packet_path = checked(comparison['actual_custody']); packet = load(packet_path)
++assert packet['schema'] == 'source-round-format-comparison-custody.v1'
++for key in ['reviewed_Source_preparation', 'Native_input', 'Rust_input', 'Native_frozen_build_inputs', 'Native_configure_execution', 'Native_build_execution', 'Native_execution_build_inputs', 'Native_execution', 'Native_execution_custody', 'Rust_build_execution', 'Rust_execution', 'Rust_execution_custody']:
+     checked(packet[key])
+-assert packet['Native_input']['sha256'] == packet['Rust_input']['sha256'] == '0191a53ee11a1767a1b35023fcf5a3769e8c9df89c4d297847e3ed9d31cb4c15'
+-request = load(checked(packet['Native_input']))
+-cases = len(request['cases']); weather_operations = sum(len(row['operations']) for row in request['cases'])
+-assert cases == 26 and weather_operations == 30
+-for row in comparison['ledgers'].values(): checked(row)
+-explicit = load(checked(packet['Rust_execution']))
+-assert explicit['exit_code'] == 0 and explicit['source_bytes_match_before_and_after'] is True and explicit['source_snapshot'] == snapshot
+-assert re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored;', checked(explicit['stdout']).read_text(encoding='utf8')) == [('1', '0', '0')]
++assert packet['Native_input']['sha256'] == packet['Rust_input']['sha256'] == comparison['literal_input_source']['sha256']
++assert packet['Root_FULL_inline_R_provider_and_PE_review_accepted'] is True and packet['Root_and_other_author_FULL_formatter_correspondence_accepted'] is True
++baseline_path = checked(post['genuine_Native_baseline_before_application']); baseline = load(baseline_path)
++assert baseline['schema'] == 'source-round-format-Root-Native-baseline-review.v1' and baseline['genuine_Native_baseline_before_canonical_Rust_application'] is True
++assert baseline['actual_value_rows'] == 124 and baseline['actual_invoked_calls'] == 615 and baseline['explicit_uninvoked_positive_infinity_rows'] == 5
++for row in post['application']: assert ref(ROOT / row['canonical_path']) == row['actual_final']
++source_review_path = RAW / 'round-format-Root-full-Source-review-01.json'
++assert ref(source_review_path)['sha256'] == '55cc2c547183e648cbec7faa9632e97916d85d8f54c1c574cd7f837354aafd61'
++source_review = load(source_review_path)
++assert source_review['actual_application']['sha256'] == ref(post_path)['sha256'] and source_review['source_final'] == snapshot
++assert source_review['Root_FULL_nonempty_formatter_diff_review_accepted'] is True and source_review['other_author_FULL_correspondence_review_accepted'] is True
+ quality = []
+-for role, key in [('fmt', 'fmt_check'), ('clippy', 'clippy'), ('focused', 'focused'), ('workspace', 'workspace')]:
+-    path = checked(packet['quality_executions'][key]); value = load(path)
+-    assert value['exit_code'] == 0 and value['source_bytes_match_before_and_after'] is True and value['source_snapshot'] == snapshot
++for role in ['fmt', 'clippy', 'focused', 'workspace']:
++    path = RAW / f'round-format-quality-01/{role}-command/receipt.json'; value = load(path)
++    assert value['exit_code'] == 0 and value['launch_error'] is None and value['source_bytes_match_before_and_after'] is True and value['source_snapshot'] == snapshot
+     groups = re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored;', checked(value['stdout']).read_text(encoding='utf8'))
+     totals = [sum(int(row[i]) for row in groups) for i in range(3)]
+-    assert totals == ([329, 0, 2] if role == 'focused' else [4953, 0, 2] if role == 'workspace' else [0, 0, 0])
+-    quality.append({'role': role, 'execution': ref(path), 'test_totals': totals, 'test_result_groups': len(groups)})
+-failed_comparison = load(RAW / 'selected-comparison-01/comparison.json')
+-failed_execution = load(RAW / 'selected-comparison-command-01/receipt.json')
+-assert failed_comparison['status'] == 'fail-observation-or-custody-integrity' and failed_execution['exit_code'] == 2
+-assert failed_comparison['findings']['endpoint_pairing_performed'] is False
+-selected = {Path(__file__).resolve(), RAW / 'publish-surface-environment-01.diff', ROOT / 'tools/porting/record_command.py', RAW / 'apply-surface-environment-01.py', RAW / 'apply-observer-lint-01.py', RAW / 'run-selected-observer-01.py'}
+-prefixes = ['surface-environment-prep-', 'native-surface-environment-prep-', 'surface-environment-selected-comparison-prep-', 'native-build-', 'native-factual-review-', 'surface-environment-applied-', 'surface-environment-format-command-', 'surface-environment-application-command-', 'observer-lint-applied-', 'observer-lint-format-command-', 'observer-lint-application-command-', 'surface-environment-quality-', 'selected-observation-', 'selected-comparison-', 'selected-comparison-command-']
++    assert totals[1] == 0 and (totals[0] > 0 if role in ['focused', 'workspace'] else not groups)
++    checked(value['stderr']); quality.append({'role': role, 'execution': ref(path), 'test_totals': totals, 'test_result_groups': len(groups)})
++selected = {Path(__file__).resolve(), RAW / 'publish-round-format-01.diff', ROOT / 'tools/porting/record_command.py', comparison_path, execution_path, packet_path, source_review_path}
+ for directory in RAW.iterdir():
+-    if directory.is_dir() and any(directory.name.startswith(prefix) for prefix in prefixes):
++    if directory.is_dir() and directory.name.startswith('round-format-'):
+         selected.update(p for p in directory.rglob('*') if p.is_file() and '__pycache__' not in p.parts)
+-selected.update(p for p in RAW.glob('*.py') if p.is_file())
+-first = load(checked(post['prior_actual_application']))
+-for record in [first, post]:
+-    for name in ['source_before', 'source_literal', 'source_final']: selected.add(checked(record[name]))
+-    for row in record['application']: selected.add(checked(row['actual_final_archive']))
+-for row in post['application']: assert ref(ROOT / row['canonical_path']) == row['actual_final']
+-large = {checked(packet['Native_result'])}
+-large.update(p for p in selected if p.name == 'result.json' and p.parent.name == 'Rust' and p.parent.parent.name.startswith('selected-observation-'))
++selected.update(p for p in RAW.glob('*round*.py') if p.is_file())
++for name in ['source_before', 'source_literal', 'source_final']: selected.add(checked(post[name]))
++for row in post['application']: selected.add(checked(row['actual_final_archive']))
++large = {checked(comparison['Native_full_stdout']), checked(comparison['Rust_full_stdout'])}
++for directory in RAW.glob('round-format-observation-*'):
++    selected.update(p for p in directory.rglob('stdout.log') if p.is_file())
++for path in selected:
++    if path.name == 'stdout.log' and path.stat().st_size > 65536 and 'round-format-observation-' in path.as_posix(): large.add(path)
++selected.update(large)
+ stored = {}
+ for directory in (ROOT / 'energyplus_porting_plan/evidence').glob('*/objects'):
+     for path in directory.iterdir():
+@@ -119,28 +131,25 @@
+         if not target.exists(): shutil.copyfile(path, target)
+         actual = ref(target); assert actual['sha256'] == original['sha256'] and actual['size_bytes'] == original['size_bytes']
+         stored[original['sha256']] = target; objects.append({'original': original, 'stored': actual})
+-passed = comparison['status'] == 'pass-available-selected-setters-only'
+ summary_path = OUT / 'summary.json'
+-dump(summary_path, {'schema': 'src05-actual-selected-surface-environment-comparison.v1', 'actual_application': ref(post_path), 'original_application': post['prior_actual_application'], 'Source_snapshot': snapshot,
+-    'Source_file_count': 3919, 'unrelated_Source_files_verified_byte_exact': 3918, 'actual_comparison': ref(comparison_path), 'actual_comparison_execution': ref(execution_path), 'actual_status': comparison['status'],
+-    'actual_counts': comparison['counts'], 'actual_quality': quality, 'actual_cases': cases, 'actual_weather_operations': weather_operations, 'selected_objects': objects,
+-    'available_selected_setters_only_passed': passed, 'mismatches': comparison['mismatch_count'], 'required_unavailable_count': comparison['required_unavailable_count'],
+-    'nonfinite_arithmetic_unavailable_count': comparison['nonfinite_arithmetic_unavailable_count'], 'actual_findings': comparison['findings'], 'full_uncapped_ledgers': comparison['ledgers'],
+-    'failed_prior_comparison': ref(RAW / 'selected-comparison-01/comparison.json'), 'failed_prior_execution': ref(RAW / 'selected-comparison-command-01/receipt.json'),
+-    'cold_guard_backend_passed': False, 'whole_SRC05_unit_or_ordinary_manager_PASS_claimed': False, 'card_gates_updated': False,
+-    'remaining_issues': ['The three actual selected comparison mismatches remain unresolved; this publication does not claim selected setter PASS.', 'Cold guard and its real diagnostic/backend/error/console effects remain unavailable in Rust.', 'Native-stopped/unreached stages and skipped NoWind point returns remain explicit unpaired observations.', 'Ordinary manager handoff, station/site input caller and whole-card gates remain pending.'],
+-    'retained_attempts': 'Failed first Native compile, failed first Clippy and first comparison argv-spelling integrity failure remain preserved. The second Rust invocation uses the same literal inputs and methods with the exact reviewed Windows path spelling; no scientific policy changed.'})
++dump(summary_path, {'schema': 'sys03-actual-selected-R-format-comparison.v1', 'actual_application': ref(post_path), 'Source_snapshot': snapshot,
++    'Source_file_count': 3922, 'unrelated_Source_files_verified_byte_exact': 3917, 'actual_comparison': ref(comparison_path), 'actual_comparison_execution': ref(execution_path), 'actual_status': comparison['status'],
++    'actual_quality': quality, 'selected_objects': objects, 'actual_cases': 124, 'declared_observations': 620, 'required_available_texts': 615, 'actual_returned_pairs': comparison['actual_returned_pairs'],
++    'selected_available_exact_texts_only_passed': passed, 'mismatches': comparison['mismatch_count'], 'explicit_unavailable': comparison['explicit_unavailable'], 'unavailable_counted_as_PASS': False,
++    'whole_declared_unit_PASS_claimed': False, 'full_report_or_backend_equivalence_claimed': False, 'ordinary_integration_PASS_claimed': False, 'card_gates_updated': False,
++    'remaining_issues': ['The five positive-infinity rows remain explicitly uninvoked/unavailable in each lane.', 'Floating exception environment and NaN payload after nextafter remain unpaired.', 'Full report/backend, ordinary warmup handoff and whole-card gates remain pending.'],
++    'retained_attempts': 'Earlier Native provider proof and missing-DLL invocation attempts, subsequent runtime-path correction, current Source correspondence, all quality commands and full comparison observations are retained without deleting failure lineage.'})
+ summary = ref(summary_path)
+ plan_path = ROOT / 'energyplus_porting_plan/plan.json'; plan = load(plan_path); old_plan = copy.deepcopy(plan)
+-task = next(row for row in plan['tasks'] if row['id'] == 'SRC-05'); field = 'actual_selected_surface_environment_comparison'; assert field not in task
+-task[field] = summary; inverse = copy.deepcopy(plan); del next(row for row in inverse['tasks'] if row['id'] == 'SRC-05')[field]; assert inverse == old_plan
++task = next(row for row in plan['tasks'] if row['id'] == 'SYS-03'); field = 'actual_selected_R_format_comparison'; assert field not in task
++task[field] = summary; inverse = copy.deepcopy(plan); del next(row for row in inverse['tasks'] if row['id'] == 'SYS-03')[field]; assert inverse == old_plan
+ dump(plan_path, plan)
+-counts = comparison['counts']; outcome = 'passed the available selected setter scope' if passed else 'did not pass the selected scope'
+-with (ROOT / 'energyplus_porting_plan/cards/SRC-05.md').open('a', encoding='utf8', newline='\n') as stream:
+-    stream.write('\n## Actual selected surface environment comparison\n\n')
+-    stream.write(f'Genuine unchanged-core Native calls and actual Rust selected setters {outcome} on {cases} literal cases and {weather_operations} weather operations. Actual status: {comparison["status"]}; input joins {counts["input_join_comparisons"]:,}, full pre-owner checks {counts["pre_owner_comparisons"]:,}, selected endpoint checks {counts["selected_endpoint_comparisons"]:,}, point-helper checks {counts["point_helper_comparisons"]:,}; mismatches {comparison["mismatch_count"]:,}. Required-unavailable observations {comparison["required_unavailable_count"]:,} and nonfinite arithmetic exclusions {comparison["nonfinite_arithmetic_unavailable_count"]:,} are retained without PASS. Rust Source371ee432 has 3,919 members; its one-row predicate repair left 3,918 unrelated files unchanged. fmt/Clippy passed; focused329/workspace4,953 passed with two intentionally ignored observers, and the explicit SRC05 invocation passed one test. Both attempted comparison chains, complete observations and all ledgers are retained. Cold guard/backend, Native-unreached/skipped observations, ordinary manager handoff and whole-card gates remain pending. No gate changed.\n')
+-    stream.write(f'Evidence: [selected setters, complete observations and quality](../evidence/SRC-05-surface-environment/summary.json) ({summary["sha256"]}).\n')
++totals = {row['role']: row['test_totals'] for row in quality}; outcome = 'passed the selected available exact-text scope' if passed else 'did not pass the selected exact-text scope'
++with (ROOT / 'energyplus_porting_plan/cards/SYS-03.md').open('a', encoding='utf8', newline='\n') as stream:
++    stream.write('\n## Actual bounded Original R format comparison\n\n')
++    stream.write(f'Genuine unchanged-core Original R formatting and the actual Rust formatter {outcome}: 124 literal binary64 values, 620 declarations and 615 required nonexcluded text pairs; actual returned pairs {comparison["actual_returned_pairs"]}, mismatches {comparison["mismatch_count"]}. The five positive-infinity rows in each lane remain explicitly uninvoked/unavailable and are not PASS. All precisions0/2/3/4/10, full input/executable/custody proofs, provider/loader attempts and complete observations are retained. Actual Source5660999c has3,922 members and3,917 unrelated files unchanged. fmt/Clippy passed; focused{totals["focused"][0]:,}/workspace{totals["workspace"][0]:,} passed, zero failed, with actual ignored counts{totals["focused"][2]}/{totals["workspace"][2]}. Floating exception state/NaN payload, full report/backend, ordinary warmup handoff and whole-card gates remain pending; no gate changed.\n')
++    stream.write(f'Evidence: [selected exact texts, full observations and quality](../evidence/SYS-03-round-format/summary.json) ({summary["sha256"]}).\n')
+ with (ROOT / 'energyplus_porting_plan/CHECKLIST.md').open('a', encoding='utf8', newline='\n') as stream:
+-    stream.write(f'\nSRC-05 actual selected surface environment comparison: {comparison["status"]}, {cases} cases/{weather_operations} weather operations, {comparison["mismatch_count"]:,} mismatches; complete required-unavailable ledgers retained. [Full evidence](evidence/SRC-05-surface-environment/summary.json). Cold guard/backend/ordinary handoff and whole-card gates remain pending; gates unchanged.\n')
++    stream.write(f'\nSYS-03 R prerequisite actual status: {comparison["status"]}, 124 values/615 required text pairs, {comparison["mismatch_count"]} mismatches; five positive-infinity rows per lane explicitly unavailable. [Full evidence](evidence/SYS-03-round-format/summary.json). Full report/backend/ordinary warmup and whole-card gates remain pending; gates unchanged.\n')
+ assert subprocess.run(['python', '-X', 'utf8', '-B', 'tools/porting/sync_plan_views.py', '--write']).returncode == 0
+ print(json.dumps({'summary': summary, 'archived_paths': len(objects), 'actual_status': comparison['status'], 'gates_changed': False}))

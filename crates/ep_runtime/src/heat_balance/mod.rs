@@ -45,6 +45,7 @@ pub mod report_scan;
 pub mod reports;
 pub(crate) mod run_period;
 pub mod solar;
+pub(crate) mod source_round_format;
 pub mod state;
 pub mod summary;
 pub mod surface_balance;

@@ -1,0 +1,220 @@
+"""Root-only original-first F/G workflow; no canonical install or gate update."""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+
+ROOT = Path.cwd().resolve()
+BASE = ROOT / ".runtime/porting/CTF-10"
+BUILD = ROOT / ".runtime/ep261-gcc13-o0"
+PREP = BASE / "report-format-native-prep-01"
+TARGET = "ctf10_report_format_unit_helper"
+OBSERVER = "ctf10_report_format_unit_observer"
+RECORDER = ROOT / "tools/porting/record_command.py"
+DERIVE = ROOT / "tools/porting/derive_native_helper.py"
+HELD_SHA = "fe4a1f53686e3f9c8e2729f8170e1356f3eb306dee53ec998ffdb17c41e07d6a"
+
+
+def need(ok, message):
+    if not ok: raise ValueError(message)
+
+
+def sha(path):
+    with path.open("rb") as stream: return hashlib.file_digest(stream, "sha256").hexdigest()
+
+
+def path(name):
+    result = (ROOT / name).resolve()
+    need(result.is_relative_to(ROOT) and result != ROOT, "Contained repository path required")
+    return result
+
+
+def ref(file):
+    return {"path": file.relative_to(ROOT).as_posix(), "sha256": sha(file), "size_bytes": file.stat().st_size}
+
+
+def exact(row):
+    file = path(row["path"])
+    need(sha(file) == row["sha256"] and ("size_bytes" not in row or (type(row["size_bytes"]) is int and file.stat().st_size == row["size_bytes"])), "Actual file identity differs")
+    return file
+
+
+def operand(text):
+    name, digest = text.rsplit("#", 1)
+    return ref(exact({"path": name, "sha256": digest}))
+
+
+def pairs(rows):
+    result = {}
+    for key, value in rows:
+        need(key not in result, "Duplicate JSON key")
+        result[key] = value
+    return result
+
+
+def read(file):
+    return json.loads(file.read_bytes(), object_pairs_hook=pairs, parse_constant=lambda value: need(False, "Nonfinite JSON token"))
+
+
+def write(file, value):
+    with file.open("xb") as stream: stream.write((json.dumps(value, indent=2, allow_nan=False) + "\n").encode())
+
+
+def recorded(row, allowed=(0,)):
+    value = read(exact(row))
+    need(value["schema"] == "recorded-porting-command.v1" and type(value["exit_code"]) is int and value["exit_code"] in allowed and value["launch_error"] is None and value["source_bytes_match_before_and_after"] is True and Path(value["cwd"]).resolve() == ROOT, "Successful genuine source-preserving recorder required")
+    for key in ["stdout", "stderr", "source_snapshot"]: exact(value[key])
+    need(value["executed_launcher"]["historical_path"] == "tools/porting/record_command.py" and sha(exact(value["executed_launcher"]["archive"])) == sha(RECORDER), "Actual reviewed recorder archive differs")
+    return value
+
+
+def execute(output, name, command, allowed=(0,)):
+    directory = output / name
+    subprocess.run([sys.executable, "-X", "utf8", "-B", str(RECORDER), "--output-dir", str(directory), "--", *command], env=ENV, stdout=subprocess.DEVNULL, check=False)
+    row = ref(directory / "receipt.json"); value = recorded(row, allowed)
+    need(value["command"] == command, "Actual recorded command differs")
+    print(json.dumps({"stage": name, "receipt": row, "exit_code": value["exit_code"]}), flush=True)
+    return row, value
+
+
+def guards(preservation, scan):
+    protected = preservation["protected_refs"] + [scan["linked_original"], scan["helper_binary"]]
+    need(len(protected) == 58 and len(preservation["present_objects"]) == 631 and len(preservation["absent_paths"]) == 24, "Actual prior protected/core/absence ledger differs")
+    for row in protected + preservation["present_objects"]: exact(row)
+    for name in preservation["absent_paths"]: need(not path(name).exists(), "Protected absent Original/object recreated")
+    return protected
+
+
+def owners(result, request, candidate=False):
+    schema = "ctf10-report-format-unit-" + ("candidate" if candidate else "native") + "-results.v1"
+    top = {"schema", "rows", "expected_values_supplied", "full_report_or_backend_equivalence_claimed"} | ({"actual_input_SHA256", "unavailable_count", "formatter_PASS_claimed"} if candidate else {"helper_PASS_claimed"})
+    need(type(result) is dict and set(result) == top and result["schema"] == schema and result["expected_values_supplied"] is False and result["full_report_or_backend_equivalence_claimed"] is False and result["formatter_PASS_claimed" if candidate else "helper_PASS_claimed"] is False, "Actual bounded result schema/claims differ")
+    need(type(result["rows"]) is list and len(result["rows"]) == 76, "All 76 required owners retained")
+    actual = []; failures = []
+    for supplied, row in zip(request["values"], result["rows"]):
+        need(type(row) is dict and set(row) == {"case_id", "value_bits", "observations"} and row["case_id"] == supplied["case_id"] and row["value_bits"] == supplied["value_bits"] and type(row["observations"]) is list and len(row["observations"]) == 8, "Required identity/order/shape differs")
+        for pattern, call in zip(request["formats"], row["observations"]):
+            keys = {"format", "actual_value_bits_before_call", "actual_source_invoked", "outcome", "text"} | ({"unavailable"} if candidate else {"exception_type", "exception_message"})
+            need(type(call) is dict and set(call) == keys and call["format"] == pattern and call["actual_value_bits_before_call"] == supplied["value_bits"] and call["actual_source_invoked"] is True, "Every required actual invocation/type/format/bit owner retained")
+            returned = call["outcome"] == "source_returned" and type(call["text"]) is str and (call["unavailable"] is None if candidate else call["exception_type"] is None and call["exception_message"] is None)
+            if not returned: failures.append({"case_id": row["case_id"], "format": pattern, "actual_call": call})
+            actual.append(call)
+    if candidate: need(type(result["unavailable_count"]) is int and result["unavailable_count"] == len(failures), "Actual unavailable counter differs")
+    return actual, failures
+
+
+def native(args, output, preparation):
+    scan_ref = operand(args.scan_build); scan = read(exact(scan_ref))
+    need(scan["schema"] == "ctf10-report-scan-unit-native-build.v1" and scan["status"] == "pass-actual-one-TU-and-core-provider" and scan["current_compile_rows"] == 732, "Genuine completed current Scan build required")
+    preservation = read(exact(scan["preservation"])); protected = guards(preservation, scan)
+    for key in ["configure_execution", "dry_build_execution", "compile_execution", "derivation_execution"]: recorded(scan[key])
+    source = exact(preparation["runtime_interfaces"]["Native_source_files"][0]); recipe = output / "additive-reference.cmake"
+    recipe.write_text('include("${CLK03_REPOSITORY_ROOT}/.runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_reference.cmake")\ninclude("${CLK03_REPOSITORY_ROOT}/.runtime/porting/CTF-10/report-format-native-prep-01/format_unit_reference.cmake")\n', encoding="utf8", newline="\n")
+    for name, key in [("request.json", "input_only_fixture"), ("policy.json", "prospective_policy")]: shutil.copyfile(exact(preparation[key]), output / name)
+    request = read(output / "request.json")
+    need(len(request["values"]) == 76 and len(request["formats"]) == 8 and request["expected_values_supplied"] is False, "Literal input-only declaration differs")
+    write(output / "freeze.json", {"schema": "ctf10-report-format-unit-frozen-inputs.v1", "native_source_manifest": ref(PREP / "manifest.json"), "request": ref(output / "request.json"), "policy": ref(output / "policy.json"), "actual_runner_source": ref(output / "runner.py"), "expected_values_supplied": False, "scientific_execution_performed": False, "frozen_before_this_execution": True, "gates_updated": False})
+    before = read(BUILD / "compile_commands.json"); need(len(before) == 732, "Actual current732 graph required"); write(output / "compile-before.json", before)
+    command = recorded(scan["configure_execution"])["command"].copy()
+    command = ["-DCMAKE_PROJECT_INCLUDE=" + str(recipe) if item.startswith("-DCMAKE_PROJECT_INCLUDE=") else item for item in command]
+    command += ["-DREPORT_FORMAT_SOURCE_DIR=" + str(source.parent)]
+    configure, _ = execute(output, "configure", command)
+    after = read(BUILD / "compile_commands.json"); added = [row for row in after if row not in before]
+    need(len(after) == 733 and len(added) == 1 and all(row in after for row in before) and Path(added[0]["file"]).resolve() == source and "CMakeFiles/" + TARGET + ".dir/" in added[0]["command"].replace("\\", "/"), "Retain every732 registration and add only genuine format TU")
+    write(output / "compile-after.json", after)
+    ninja = ROOT / ".runtime/reference-tools/ninja-1.13.2/ninja.exe"
+    dry, value = execute(output, "dry-build", [str(ninja), "-C", str(BUILD), "-n", "-v", "Products/" + TARGET + ".exe"])
+    text = exact(value["stdout"]).read_text(encoding="utf8").replace("\\", "/")
+    need(text.count(" -c ") == 1 and str(source).replace("\\", "/") in text and "energypluslib.dir" not in text and "surface_consumer_helper" not in text, "Only actual format TU may compile")
+    compile_ref, _ = execute(output, "compile", [command[0], "--build", str(BUILD), "--target", TARGET, "--parallel", "1", "--verbose"])
+    guards(preservation, scan); original = BUILD / ("Products/" + TARGET + ".exe"); link_map = BUILD / (TARGET + ".map")
+    loads = []; core_loads = []
+    with link_map.open(encoding="utf8") as stream:
+        for number, line in enumerate(stream, 1):
+            if line.startswith("LOAD ") and "CMakeFiles/" + TARGET + ".dir/" in line: loads.append({"line": number, "text": line.rstrip()})
+            if line.strip() == "LOAD Products/libenergypluslib.a": core_loads.append(number)
+    need(len(loads) == len(core_loads) == 1 and "format_unit_helper.cpp.obj" in loads[0]["text"] and loads[0]["line"] < core_loads[0], "Actual single target LOAD before unchanged core archive required")
+    derive_command = recorded(scan["derivation_execution"])["command"].copy()
+    need(derive_command[4] == "tools/porting/derive_native_helper.py", "Existing standard PE derivative driver required")
+    for flag, value in [("--original", original.relative_to(ROOT).as_posix()), ("--original-sha256", sha(original)), ("--output-dir", (output / "derivation").relative_to(ROOT).as_posix())]: derive_command[derive_command.index(flag) + 1] = value
+    derive_ref, _ = execute(output, "derive", derive_command)
+    derived = read(output / "derivation/receipt.json")
+    need(derived["status"] == "pass-exact-retained-runtime-sections-and-directories" and all(derived[key] is True for key in ["original_bytes_unchanged", "source_bytes_match_before_and_after", "accepted_derivative_bytes_unchanged"]) and derived["original_before"] == derived["original_after"] and derived["original_before"]["sha256"] == sha(original) and derived["accepted_derivative"] == derived["observed_derivative"], "Actual both-PE/runtime derivative preservation required")
+    helper = exact(derived["accepted_derivative"])
+    format_refs = [ref(original), ref(helper), ref(link_map)]
+    execution, value = execute(output, "native-execution", [str(helper), str(output / "request.json")], (0, 2))
+    _, failures = owners(read(exact(value["stdout"])), request)
+    released = value["exit_code"] == 0 and not failures
+    guards(preservation, scan)
+    for row in format_refs: exact(row)
+    for row in preparation["runtime_interfaces"]["Native_source_files"]: exact(row)
+    for row in preparation["before_archives"][:4]: exact(row["original"])
+    need((output / "request.json").read_bytes() == exact(preparation["input_only_fixture"]).read_bytes() and (output / "policy.json").read_bytes() == exact(preparation["prospective_policy"]).read_bytes(), "Frozen literal request/policy changed")
+    write(output / "native.json", {"schema": "ctf10-report-format-native-workflow.v1", "Original_capture_custody_released": released, "freeze": ref(output / "freeze.json"), "scan_build": scan_ref, "protected_refs": protected, "core_refs": preservation["present_objects"], "absent_paths": preservation["absent_paths"], "configure": configure, "dry_build": dry, "compile": compile_ref, "derive": derive_ref, "derivative": ref(output / "derivation/receipt.json"), "linked_original": ref(original), "helper_binary": ref(helper), "link_map": ref(link_map), "actual_target_LOAD": loads, "core_LOAD": core_loads, "native_execution": execution, "native_results": value["stdout"], "required_calls": 608, "actual_required_call_failures": failures, "numerical_PASS_claimed": False, "gates_updated": False})
+    return 0 if released else 1
+
+
+def candidate(args, output, preparation):
+    native_ref = operand(args.native_workflow); prior = read(exact(native_ref))
+    need(prior["schema"] == "ctf10-report-format-native-workflow.v1" and prior["Original_capture_custody_released"] is True, "Original-first complete custody release required")
+    freeze = read(exact(prior["freeze"])); request_path = exact(freeze["request"]); request = read(request_path)
+    need(freeze["native_source_manifest"] == ref(PREP / "manifest.json") and sha(exact(freeze["actual_runner_source"])) == sha(Path(__file__).resolve()), "Actual Original workflow Source differs")
+    for key in ["configure", "dry_build", "compile", "derive"]: recorded(prior[key])
+    for row in prior["protected_refs"] + prior["core_refs"]: exact(row)
+    for name in prior["absent_paths"]: need(not path(name).exists(), "Protected absent Original/object recreated")
+    need(request_path.read_bytes() == exact(preparation["input_only_fixture"]).read_bytes() and exact(freeze["policy"]).read_bytes() == exact(preparation["prospective_policy"]).read_bytes(), "Same frozen literal inputs/policy required")
+    original_command = recorded(prior["native_execution"]); exact(prior["native_results"])
+    for key in ["linked_original", "helper_binary", "link_map", "derivative"]: exact(prior[key])
+    need(original_command["command"] == [str(exact(prior["helper_binary"])), str(request_path)] and original_command["stdout"] == prior["native_results"], "Actual Native argc2/result custody differs")
+    observer_ref, format_ref = operand(args.observer_source), operand(args.format_source)
+    need(exact(observer_ref) == ROOT / ("crates/ep_run/examples/" + OBSERVER + ".rs") and exact(format_ref) == ROOT / "crates/ep_runtime/src/heat_balance/ctf_reports_format.rs", "Root-reviewed current canonical observer/formatter operands required")
+    cargo_ref, cargo = execute(output, "cargo", ["cargo", "build", "-p", "ep_run", "--example", OBSERVER, "--message-format=json-render-diagnostics", "--config", "profile.dev.debug=0", "--config", "build.incremental=false"])
+    snapshot = read(exact(cargo["source_snapshot"])); rows = {row["historical_path"]: row for row in snapshot["files"]}
+    current = {p.relative_to(ROOT).as_posix() for p in (ROOT / "crates").rglob("*.rs")} | {p.relative_to(ROOT).as_posix() for p in (ROOT / "crates").rglob("Cargo.toml")} | {name for name in ["Cargo.toml", "Cargo.lock", "rust-toolchain.toml", ".cargo/config.toml"] if (ROOT / name).is_file()}
+    need(set(rows) == current, "Actual complete current Cargo Source closure differs")
+    for name, row in rows.items(): need(sha(exact(row["archive"])) == sha(path(name)) and row["size_bytes"] == path(name).stat().st_size, "Cargo current/archive Source differs")
+    for row in [observer_ref, format_ref]: need(rows[row["path"]]["archive"]["sha256"] == row["sha256"], "Reviewed actual source absent from Cargo snapshot")
+    capture = cargo["cargo_compiler_artifacts_capture"]
+    artifacts = [row for row in capture["rows"] if row["cargo_message"]["target"]["name"] == OBSERVER and row["cargo_message"]["target"]["kind"] == ["example"]]
+    need(capture["status"] == "pass" and len(artifacts) == 1, "Actual Cargo emitted observer artifact required")
+    emitted = artifacts[0]; binary = exact({"path": emitted["executable"]["historical_path"], "sha256": emitted["executable"]["sha256"]})
+    messages = [json.loads(line) for line in exact(cargo["stdout"]).read_text(encoding="utf8").splitlines()]
+    need(emitted["cargo_message"] in messages and Path(emitted["cargo_message"]["executable"]).resolve() == binary, "Compiler artifact/fullstdout executable differs")
+    execution, value = execute(output, "rust-execution", [str(binary), str(request_path), sha(request_path)], (0, 2))
+    need(value["source_snapshot"] == cargo["source_snapshot"], "Actual Cargo/execution Source snapshots differ")
+    original, native_failures = owners(read(exact(prior["native_results"])), request)
+    result = read(exact(value["stdout"])); actual, rust_failures = owners(result, request, True)
+    need(result["actual_input_SHA256"] == sha(request_path), "Candidate actual input hash differs")
+    mismatches = [*native_failures, *rust_failures]
+    for index, (left, right) in enumerate(zip(original, actual)):
+        if type(left["text"]) is not str or type(right["text"]) is not str or left["text"].encode("utf8") != right["text"].encode("utf8"): mismatches.append({"call_ordinal": index + 1, "Native": left, "Rust": right})
+    passed = value["exit_code"] == 0 and not mismatches
+    for row in prior["protected_refs"] + prior["core_refs"]: exact(row)
+    for name in prior["absent_paths"]: need(not path(name).exists(), "Protected absent Original/object recreated")
+    exact(freeze["request"]); exact(freeze["policy"]); exact(observer_ref); exact(format_ref)
+    for key in ["linked_original", "helper_binary", "link_map", "derivative"]: exact(prior[key])
+    write(output / "mismatches.json", mismatches)
+    write(output / "comparison.json", {"schema": "ctf10-report-format-unit-comparison.v1", "status": "pass-exact-608-required-texts" if passed else "fail-required-format-texts", "selected_format_unit_comparison_passed": passed, "native_workflow": native_ref, "frozen_input": freeze["request"], "policy": freeze["policy"], "actual_observer_source": observer_ref, "actual_formatter_source": format_ref, "cargo": cargo_ref, "rust_execution": execution, "actual_rust_results": value["stdout"], "required_calls": 608, "mismatch_count": len(mismatches), "mismatches": ref(output / "mismatches.json"), "numeric_profiles": [], "full_report_or_backend_equivalence_claimed": False, "gates_updated": False})
+    return 0 if passed else 1
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("phase", choices=["native", "candidate"])
+    for name in ["approved-runner-sha256", "output-dir"]: parser.add_argument("--" + name, required=True)
+    for name in ["scan-build", "native-workflow", "observer-source", "format-source"]: parser.add_argument("--" + name)
+    args = parser.parse_args()
+    need(sha(Path(__file__).resolve()) == args.approved_runner_sha256 and sha(PREP / "manifest.json") == HELD_SHA, "Root-reviewed runner/held source required")
+    preparation = read(PREP / "manifest.json")
+    for row in preparation["own_sources"]: exact(row["source"])
+    for row in preparation["before_archives"][:4]: exact(row["original"])
+    need(sha(BASE / "surface-consumer-native-prep-05/surface_consumer_reference.cmake") == "f6e5d4c4d03f0c1f5299a2e9c9f145083442ada92364750f6eac292584ac670e" and sha(BASE / "report-input-scan-native-prep-01/scan_unit_reference.cmake") == "76796e8cb4e6aa59a0d8cd2acbf243f9052c3c435713c5b7b168452fe0655d9d", "Accepted additive registration sources differ")
+    need(sha(RECORDER) == "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba" and sha(DERIVE) == "3b39cc4562943692e43e11e4d2d7e1bc70f84a58e09c0fea28c0b85b8e905dcf", "Reviewed recorder/PE derivative Source differs")
+    output = path(args.output_dir); need(output.is_relative_to(BASE) and not output.exists(), "Fresh CTF10 output directory required"); output.mkdir()
+    shutil.copyfile(Path(__file__).resolve(), output / "runner.py")
+    ENV = dict(os.environ); ENV["PATH"] = str(ROOT / ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin") + os.pathsep + ENV["PATH"]
+    raise SystemExit(native(args, output, preparation) if args.phase == "native" else candidate(args, output, preparation))

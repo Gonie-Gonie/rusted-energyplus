@@ -1,0 +1,189 @@
+{
+  "schema": "source-round-format-comparison-custody.v1",
+  "reviewed_Source_preparation": {
+    "path": ".runtime/porting/SYS-03/round-format-prep-01/manifest.json",
+    "sha256": "a14b80e8cf025727b8f18edbb0c47a7636420e992248aa249ff6542997f0e98a",
+    "size_bytes": 22561
+  },
+  "Native_input": {
+    "path": ".runtime/porting/SYS-03/round-format-observation-02/Native-input.json",
+    "sha256": "0aea2faeb87c38a88323804614efad87f4693b39c91dd500846fc5f0fa0b7600",
+    "size_bytes": 12394
+  },
+  "Rust_input": {
+    "path": ".runtime/porting/SYS-03/round-format-observation-02/Rust-input.json",
+    "sha256": "0aea2faeb87c38a88323804614efad87f4693b39c91dd500846fc5f0fa0b7600",
+    "size_bytes": 12394
+  },
+  "observation_policy": {
+    "path": ".runtime/porting/SYS-03/round-format-prep-01/prospective-policy.json",
+    "sha256": "860ee62a8c4c3d4e7ee01bc651a1aeaccecd8658d20898fadc4d906ff1063fbe",
+    "size_bytes": 1267
+  },
+  "Native_frozen_build_inputs": {
+    "path": ".runtime/porting/SYS-03/round-format-native-build-01/frozen-build-inputs.json",
+    "sha256": "38c0bf3bc81b67de37f3897a4f559626501d892fbe464479ee91f86d4fcbabb2",
+    "size_bytes": 16811
+  },
+  "Native_configure_execution": {
+    "path": ".runtime/porting/SYS-03/round-format-native-build-01/configure-command/receipt.json",
+    "sha256": "1b97a5bfc411bff12b6dd738d2acff68b1abba827e48dc67861db0cccc75d634",
+    "size_bytes": 10811
+  },
+  "Native_build_execution": {
+    "path": ".runtime/porting/SYS-03/round-format-native-build-01/compile-command/receipt.json",
+    "sha256": "68598b5b9d3eef2a33a322949d3b6c5347941a4d288940c6f44d57e1780e9e63",
+    "size_bytes": 3535
+  },
+  "Native_execution_build_inputs": {
+    "path": ".runtime/porting/SYS-03/round-format-native-build-01/execution-build-inputs-02.json",
+    "sha256": "6511ea108dd972b441162ce88d52987deb2d87adec0a219cd6546269a9246cb0",
+    "size_bytes": 3805
+  },
+  "Native_execution": {
+    "path": ".runtime/porting/SYS-03/round-format-observation-02/Native-command/receipt.json",
+    "sha256": "7d5c3b093388ac7706226e9cc1fab50f339db19322b132f7f3a19559af9f5f98",
+    "size_bytes": 3539
+  },
+  "Rust_build_execution": {
+    "path": ".runtime/porting/SYS-03/round-format-observation-02/Rust-build-command/receipt.json",
+    "sha256": "cd788690d7d22dbd096d5168387e003984a16fca5b3912b6a05af510a0986216",
+    "size_bytes": 5261
+  },
+  "Rust_execution": {
+    "path": ".runtime/porting/SYS-03/round-format-observation-02/Rust-command/receipt.json",
+    "sha256": "6813651902738f5a31ffc35aa244d86378d1f4904d1c88a8c4b709dbbef371bd",
+    "size_bytes": 3696
+  },
+  "Native_execution_custody": {
+    "path": ".runtime/porting/SYS-03/round-format-observation-02/Native-execution.custody.json",
+    "sha256": "64c0bcf58914b868ad0c51ca247c765bdc30333b0b5ec7c93f75fa2b1fda4452",
+    "size_bytes": 5003
+  },
+  "Rust_execution_custody": {
+    "path": ".runtime/porting/SYS-03/round-format-observation-02/Rust-execution.custody.json",
+    "sha256": "c7747ddf87c6edcfb381c752cd32f96e734f732b692901cf8ef6921794b822c0",
+    "size_bytes": 1312
+  },
+  "actual_Rust_sources": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/source_round_format.rs",
+      "actual_literal_source": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/proposed/crates/ep_runtime/src/heat_balance/source_round_format.rs",
+        "sha256": "983fcb8a67a9a29803aad0d404c1fd660ac12a64579f9a74d027d72c369cfa40",
+        "size_bytes": 3506,
+        "line_count": 93
+      },
+      "actual_final_source": {
+        "path": ".runtime/porting/source-objects/fd/fd508c48c5ca298b1d5d9105dccf29f5c7d577f4a49a7a0ac22554545080e289",
+        "sha256": "fd508c48c5ca298b1d5d9105dccf29f5c7d577f4a49a7a0ac22554545080e289"
+      },
+      "formatter_correspondence_diff": {
+        "path": ".runtime/porting/SYS-03/round-format-applied-01/formatter-1.diff",
+        "sha256": "afeccdb3928311f6db145f617708319585f38963bf53d70e8ed43f599b7f7bbd",
+        "size_bytes": 1186
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/source_round_format_tests.rs",
+      "actual_literal_source": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/proposed/crates/ep_runtime/src/heat_balance/source_round_format_tests.rs",
+        "sha256": "cc1e161398572444e63a5358caab7b57a506fbf7cda291c4548428b71e9af9df",
+        "size_bytes": 1925,
+        "line_count": 43
+      },
+      "actual_final_source": {
+        "path": ".runtime/porting/source-objects/f9/f9e4d71efbecf3f9f5c66cdc48c610d11ea822102697b0569bbf912a092473a0",
+        "sha256": "f9e4d71efbecf3f9f5c66cdc48c610d11ea822102697b0569bbf912a092473a0"
+      },
+      "formatter_correspondence_diff": {
+        "path": ".runtime/porting/SYS-03/round-format-applied-01/formatter-2.diff",
+        "sha256": "150d27364a65eb237c255b1b8a938ca208dd716b88c4f23a478c91d018f06f56",
+        "size_bytes": 2072
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "actual_literal_source": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/proposed/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "5c374561b23c7420a93e7c84870574bba455144caff4713580855a681948c9a1",
+        "size_bytes": 2222,
+        "line_count": 86
+      },
+      "actual_final_source": {
+        "path": ".runtime/porting/source-objects/5c/5c374561b23c7420a93e7c84870574bba455144caff4713580855a681948c9a1",
+        "sha256": "5c374561b23c7420a93e7c84870574bba455144caff4713580855a681948c9a1"
+      },
+      "formatter_correspondence_diff": {
+        "path": ".runtime/porting/SYS-03/round-format-applied-01/formatter-3.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+      "actual_literal_source": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+        "sha256": "8fb4782c0a1443f31d928974a0977045e7d7ebd52154ff5ebc00e21bf9116652",
+        "size_bytes": 5764,
+        "line_count": 145
+      },
+      "actual_final_source": {
+        "path": ".runtime/porting/source-objects/8f/8fb4782c0a1443f31d928974a0977045e7d7ebd52154ff5ebc00e21bf9116652",
+        "sha256": "8fb4782c0a1443f31d928974a0977045e7d7ebd52154ff5ebc00e21bf9116652"
+      },
+      "formatter_correspondence_diff": {
+        "path": ".runtime/porting/SYS-03/round-format-applied-01/formatter-4.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/source_round_format_unit_observer.rs",
+      "actual_literal_source": {
+        "path": ".runtime/porting/SYS-03/round-format-prep-01/proposed/crates/ep_run/examples/source_round_format_unit_observer.rs",
+        "sha256": "4e5f0818f1686ff986ceff7cc41068c7f4e205496b6c271dbe2c7deec44ab629",
+        "size_bytes": 4553,
+        "line_count": 108
+      },
+      "actual_final_source": {
+        "path": ".runtime/porting/source-objects/d0/d03f1a88b531fe55ce23432c44224fa8a73df34b99641d9f2aece718e07878f6",
+        "sha256": "d03f1a88b531fe55ce23432c44224fa8a73df34b99641d9f2aece718e07878f6"
+      },
+      "formatter_correspondence_diff": {
+        "path": ".runtime/porting/SYS-03/round-format-applied-01/formatter-5.diff",
+        "sha256": "e1bb1c1d970243e0aa95391198bb96da33dc0dafe113b1af2caec834483f175d",
+        "size_bytes": 1756
+      }
+    }
+  ],
+  "Native_provider_and_PE_evidence": [
+    {
+      "path": ".runtime/porting/SYS-03/round-format-native-build-01/linked-PE-inventory.json",
+      "sha256": "b4c09aca70b8355fe281645cc82918bbbf67aea1912b333bf92224bd92ccee00",
+      "size_bytes": 17983
+    },
+    {
+      "path": ".runtime/porting/SYS-03/round-format-native-build-01/address-bound-inline-R-providers-02.json",
+      "sha256": "4f2db9e0364e942a9f575d12c75d8af61171d024b5aed253a212ee03b2c64ada",
+      "size_bytes": 5243
+    },
+    {
+      "path": ".runtime/porting/SYS-03/round-format-native-build-01/addr2line-command-02/receipt.json",
+      "sha256": "baeb27fb4fdf466d4d5695414c1f18ea42d2ddc3ebbf15f1714dddcea80d87e9",
+      "size_bytes": 3797
+    },
+    {
+      "path": ".runtime/porting/SYS-03/round-format-native-build-01/inline-formatter-disassembly-command/receipt.json",
+      "sha256": "89e907a368b4377ab5d90694bc67c5e5fa0eef4949edaffb84c0af229ad7657b",
+      "size_bytes": 3670
+    },
+    {
+      "path": ".runtime/porting/SYS-03/round-format-native-build-01/nm-core-object-command/receipt.json",
+      "sha256": "bf79425f49f6031b4793f166574613650a5a91316109bc69fe384f26898c068c",
+      "size_bytes": 3604
+    }
+  ],
+  "Root_FULL_inline_R_provider_and_PE_review_accepted": true,
+  "Root_and_other_author_FULL_formatter_correspondence_accepted": true
+}

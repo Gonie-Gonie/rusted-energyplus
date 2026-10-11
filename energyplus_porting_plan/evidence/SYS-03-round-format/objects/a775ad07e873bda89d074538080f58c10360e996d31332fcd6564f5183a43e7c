@@ -1,0 +1,43 @@
+{
+  "schema": "source-round-format-Root-full-factual-result-review.v1",
+  "actual_comparison": {
+    "path": ".runtime/porting/SYS-03/round-format-comparison-01/comparison.json",
+    "sha256": "0901b96a03a2ce1c4bbf55f635d94d5fdac44965aefa2380e2ca8cf573ea158b",
+    "size_bytes": 507099
+  },
+  "actual_Native_receipt": {
+    "path": ".runtime/porting/SYS-03/round-format-observation-02/Native-command/receipt.json",
+    "sha256": "7d5c3b093388ac7706226e9cc1fab50f339db19322b132f7f3a19559af9f5f98",
+    "size_bytes": 3539
+  },
+  "actual_Rust_build": {
+    "path": ".runtime/porting/SYS-03/round-format-observation-02/Rust-build-command/receipt.json",
+    "sha256": "cd788690d7d22dbd096d5168387e003984a16fca5b3912b6a05af510a0986216",
+    "size_bytes": 5261
+  },
+  "actual_Rust_receipt": {
+    "path": ".runtime/porting/SYS-03/round-format-observation-02/Rust-command/receipt.json",
+    "sha256": "6813651902738f5a31ffc35aa244d86378d1f4904d1c88a8c4b709dbbef371bd",
+    "size_bytes": 3696
+  },
+  "Native_custody": {
+    "path": ".runtime/porting/SYS-03/round-format-observation-02/Native-execution.custody.json",
+    "sha256": "64c0bcf58914b868ad0c51ca247c765bdc30333b0b5ec7c93f75fa2b1fda4452",
+    "size_bytes": 5003
+  },
+  "Rust_custody": {
+    "path": ".runtime/porting/SYS-03/round-format-observation-02/Rust-execution.custody.json",
+    "sha256": "c7747ddf87c6edcfb381c752cd32f96e734f732b692901cf8ef6921794b822c0",
+    "size_bytes": 1312
+  },
+  "full_input_rows_verified": 124,
+  "full_declared_format_observations_verified": 620,
+  "full_returned_string_pairs_byte_equal": 615,
+  "complete_text_bytes_per_lane": 24245,
+  "explicit_uninvoked_positive_infinity_per_lane": 5,
+  "all615report_rows_equal_actual_full_results": true,
+  "all_input_and_execution_chronology_verified": true,
+  "independent_direct_DTO_and_UTF8_verification_without_reference_math": true,
+  "unavailable_counted_as_PASS": false,
+  "whole_report_backend_ordinary_or_gate_PASS_claimed": false
+}

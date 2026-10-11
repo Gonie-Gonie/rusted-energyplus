@@ -1,0 +1,12 @@
+--- a/energyplus_porting_plan/cards/SYS-03.md
++++ b/energyplus_porting_plan/cards/SYS-03.md
+@@ -87,3 +87,9 @@
+ 
+ Actual Source8fc2a29b retains3,915 files with3,902 unrelated files byte-exact. The strict ordinary A caller now enables model warmup; actual uncontrolled sensible reports feed all-zone four-criterion convergence and the final accepted EndDay hands weather globals through Day0. fmt/Clippy passed; focused323/workspace4,947 tests passed, zero failed/ignored. Native same-input numerical comparison and ordinary handoff parity remain unverified. Full rolling/report/EIO/diagnostic effects and controlled demand remain pending; no card gates changed.
+ Evidence: [actual application and quality](../evidence/SYS-03-warmup-owner/summary.json) (`3922d1a4dae0c8f190903bc6c8e3d2833ef2fb36a8c20158fdbbeb396c509e71`).
++
++## Bounded Original R formatter prerequisite
++
++Before extending actual warmup report and diagnostic effects, port only the Original IOFiles.hh R formatting branch and its directly invoked helpers: lines117-140,247-305 and734-786 at the pinned26.1.0 revision. All relevant fmt caller ranges and input contracts are retained in the reviewed Source preparation. Inputs are actual IEEE binary64 values and explicit precision; output is the exact UTF-8 string or an explicit unavailable domain. Preserve operation order, strict fixed-output threshold, sign/zero behavior, three fixed versus one exponential nextafter steps, positive large-number conversion/truncation and minimum three-digit exponent padding. Do not rescale decimals, substitute expected strings, change F/G formatting or weaken comparisons.
++
++The prospective124 input values and five formats declare620 observations. Positive infinity reaches Original undefined log10-to-int conversion; its five rows must remain explicitly uninvoked/unavailable in both lanes. All other615 rows require genuine Original formatting and exact text comparison. Record full input/executable bytes before and after each invocation, actual linked inline header/provider provenance, actual Cargo-emitted binary, all five literal-to-formatted Source correspondences and complete outputs. Native executes before applying the Rust formatter. This helper prerequisite does not claim complete report/backend, warmup handoff, whole-card or production gates; those retain their existing pending status.

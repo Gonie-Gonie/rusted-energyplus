@@ -1,0 +1,244 @@
+"""Prepare held Source only: shared selected R formatter and genuine observations."""
+from pathlib import Path
+import ast
+import difflib
+import hashlib
+import json
+import math
+import struct
+
+ROOT = Path(__file__).resolve().parents[3]
+OUT = ROOT / '.runtime/porting/SYS-03/round-format-prep-01'
+assert not (OUT / 'manifest.json').exists()
+
+
+def ref(path):
+    data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(data).hexdigest(),
+            'size_bytes': len(data), 'line_count': len(data.splitlines())}
+
+
+def put(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(data if isinstance(data, bytes) else data.encode('utf8'))
+    return ref(path)
+
+
+def one(text, before, after):
+    assert text.count(before) == 1
+    return text.replace(before, after)
+
+
+def delta(path, before, after, old_label, new_label):
+    value = ''.join(difflib.unified_diff(before.decode('utf8').splitlines(True), after.decode('utf8').splitlines(True), fromfile=old_label, tofile=new_label))
+    return put(path, value)
+
+
+application = []
+
+
+def proposed(name, data=None):
+    canonical = ROOT / name
+    before = canonical.read_bytes() if canonical.exists() else b''
+    archive = put(OUT / 'before' / name, before)
+    target = OUT / 'proposed' / name
+    proposal = put(target, data) if data is not None else ref(target)
+    diff = delta(OUT / 'diffs' / (name.replace('/', '__') + '.diff'), before, target.read_bytes(), name if canonical.exists() else '/dev/null', proposal['path'])
+    row = {'canonical_path': name, 'actual_before': ref(canonical) if canonical.exists() else None,
+           'before_archive': archive, 'new_destination_absent': not canonical.exists(), 'proposal': proposal, 'exact_diff': diff}
+    application.append(row)
+
+
+module = 'crates/ep_runtime/src/heat_balance/source_round_format.rs'
+tests = 'crates/ep_runtime/src/heat_balance/source_round_format_tests.rs'
+proposed(module)
+proposed(tests)
+parent = 'crates/ep_runtime/src/heat_balance/mod.rs'
+text = (ROOT / parent).read_text(encoding='utf8')
+text = one(text, 'pub mod solar;\n', 'pub mod solar;\npub(crate) mod source_round_format;\n')
+proposed(parent, text)
+diagnostics = 'crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs'
+old = (ROOT / diagnostics).read_text(encoding='utf8')
+start = old.index('// IOFiles.hh249-259 nextafter')
+end = old.index('\nfn layer_name', start)
+wrapper = '''#[cfg(test)]
+use super::source_round_format::source_next_float;
+
+// Preserve the actual .3R caller and its existing public error variants.
+fn source_round_three(value: f64) -> Result<String, CtfSourceDiagnosticUnavailable> {
+    super::source_round_format::round(value, 3).map_err(|error| match error {
+        super::source_round_format::SourceRoundFormatUnavailable::ExponentFormat => {
+            CtfSourceDiagnosticUnavailable::ExponentFormat
+        }
+        super::source_round_format::SourceRoundFormatUnavailable::UndefinedLog10Conversion => {
+            CtfSourceDiagnosticUnavailable::UndefinedLog10Conversion
+        }
+    })
+}
+'''
+proposed(diagnostics, old[:start] + wrapper + old[end:])
+
+# Genuine Native wrapper: reuse only the accepted bits/input/record transport.
+native_before = ROOT / '.runtime/porting/CTF-10/report-format-native-prep-01/format_unit_helper.cpp'
+cpp = native_before.read_text(encoding='utf8')
+cpp = cpp.replace('IOFiles F/G formatting', 'IOFiles selected R formatting').replace('ctf10_report_format_unit_helper', 'source_round_format_helper')
+cpp = cpp.replace('ctf10-report-format-unit-request.v1', 'source-round-format-unit-request.v1').replace('ctf10-report-format-unit-native-results.v1', 'source-round-format-unit-native-results.v1')
+cpp = cpp.replace('"CTF-10"', '"SYS-03"').replace('#include <cstdint>', '#include <cstdint>\n#include <cmath>')
+cpp = one(cpp, 'std::array<std::string, 8> const formats{"{:8.3F}", "{:8.4F}", "{:14.3F}", "{:11.3F}", "{:13.3F}", "{:15.4G}", "{:12.4G}", "{:20.8G}"};',
+          'std::array<std::string, 5> const formats{"{:.0R}", "{:.2R}", "{:.3R}", "{:.4R}", "{:.10R}"};')
+cpp = cpp.replace('Exact eight Source report formats required', 'Exact five selected Source R formats required')
+cpp = one(cpp, '                try {\n                    record["text"]', '''                record["unavailable"] = nullptr;
+                // The positive-infinity log10-to-int conversion is undefined in
+                // Original R. Never invoke that domain or fabricate its text.
+                if (std::isinf(value) && !std::signbit(value)) {
+                    record["actual_source_invoked"] = false;
+                    record["text"] = nullptr;
+                    record["outcome"] = "source_domain_unavailable";
+                    record["unavailable"] = "UndefinedLog10Conversion";
+                    record["exception_type"] = nullptr; record["exception_message"] = nullptr;
+                    observations.push_back(record);
+                    continue;
+                }
+                try {
+                    record["text"]''')
+native_ref = put(OUT / 'round_unit_helper.cpp', cpp)
+native_archive = put(OUT / 'before/format_unit_helper.cpp', native_before.read_bytes())
+native_diff = delta(OUT / 'diffs/round_unit_helper.cpp.diff', native_before.read_bytes(), (OUT / 'round_unit_helper.cpp').read_bytes(), native_archive['path'], native_ref['path'])
+
+recipe_before = ROOT / '.runtime/porting/CTF-10/report-format-native-prep-01/format_unit_reference.cmake'
+recipe = recipe_before.read_text(encoding='utf8')
+recipe = recipe.replace('direct IOFiles F/G format TU; retain the reviewed Scan registration chain.', 'direct selected R format TU; retain the explicit actual inherited registration chain.')
+recipe = recipe.replace('REPORT_FORMAT', 'SOURCE_ROUND_FORMAT').replace('ctf10_report_format', 'source_round_format').replace('format_unit_helper.cpp', 'round_unit_helper.cpp')
+recipe = one(recipe, 'if(NOT DEFINED CLK03_REPOSITORY_ROOT OR NOT DEFINED SOURCE_ROUND_FORMAT_SOURCE_DIR)', 'if(NOT DEFINED CLK03_REPOSITORY_ROOT OR NOT DEFINED SOURCE_ROUND_FORMAT_SOURCE_DIR OR NOT DEFINED SOURCE_ROUND_FORMAT_INHERITED_RECIPE)')
+recipe = one(recipe, 'include("${CLK03_REPOSITORY_ROOT}/.runtime/porting/CTF-10/report-input-scan-native-prep-01/scan_unit_reference.cmake")', 'include("${SOURCE_ROUND_FORMAT_INHERITED_RECIPE}")')
+recipe_ref = put(OUT / 'round_unit_reference.cmake', recipe)
+recipe_archive = put(OUT / 'before/format_unit_reference.cmake', recipe_before.read_bytes())
+recipe_diff = delta(OUT / 'diffs/round_unit_reference.cmake.diff', recipe_before.read_bytes(), (OUT / 'round_unit_reference.cmake').read_bytes(), recipe_archive['path'], recipe_ref['path'])
+
+# Rust observes the exact proposed shared module; no duplicated R arithmetic.
+observer_before = ROOT / 'crates/ep_run/examples/ctf10_report_format_unit_observer.rs'
+rs = observer_before.read_text(encoding='utf8')
+rs = one(rs, 'use ep_runtime::heat_balance::ctf_reports::CtfReportUnavailable;\n', '')
+rs = rs.replace('ctf_reports_format.rs', 'source_round_format.rs').replace('ctf10_report_format_unit_observer', 'source_round_format_unit_observer')
+rs = rs.replace('ctf10-report-format-unit-request.v1', 'source-round-format-unit-request.v1').replace('ctf10-report-format-unit-candidate-results.v1', 'source-round-format-unit-candidate-results.v1').replace('"CTF-10"', '"SYS-03"')
+begin = rs.index('    let formats = [')
+finish = rs.index('    let inputs =', begin)
+rs = rs[:begin] + '''    let formats = [("{:.0R}", 0), ("{:.2R}", 2), ("{:.3R}", 3), ("{:.4R}", 4), ("{:.10R}", 10)];
+    require(request["formats"] == json!(formats.map(|(pattern, _)| pattern)), "exact Source R formats required")?;
+''' + rs[finish:]
+begin = rs.index('        for (pattern, width, precision, general) in formats {')
+finish = rs.index('            let record = match result {', begin)
+rs = rs[:begin] + '''        for (pattern, precision) in formats {
+            if value == f64::INFINITY {
+                observations.push(json!({"format":pattern,"actual_value_bits_before_call":format!("{:016x}",value.to_bits()),"actual_source_invoked":false,"outcome":"source_domain_unavailable","text":null,"unavailable":"UndefinedLog10Conversion"}));
+                unavailable += 1;
+                continue;
+            }
+            let result = formatting::round(value, precision);
+''' + rs[finish:]
+rs = rs.replace('Ok(if unavailable == 0 { 0 } else { 2 })', 'Ok(if rows.iter().any(|row| row["observations"].as_array().is_some_and(|items| items.iter().any(|item| item["outcome"] == "typed_unavailable"))) { 2 } else { 0 })')
+# rows are borrowed by json!, not moved; format text declares no parity itself.
+proposed('crates/ep_run/examples/source_round_format_unit_observer.rs', rs)
+observer_archive = put(OUT / 'before/ctf10_report_format_unit_observer.rs', observer_before.read_bytes())
+observer_delta = delta(OUT / 'diffs/observer.from-FG.diff', observer_before.read_bytes(), rs.encode('utf8'), observer_archive['path'], application[-1]['proposal']['path'])
+
+# Independently chosen fixed inputs only; no formatter or Native output evaluated.
+values = []
+seen_bits = set()
+
+
+def value(label, bits):
+    token = f'{bits:016x}'
+    if token not in seen_bits:
+        values.append({'case_id': label, 'value_bits': token})
+        seen_bits.add(token)
+
+
+for label, bits in [('positive-zero', 0), ('negative-zero', 1 << 63), ('minimum-subnormal', 1),
+                    ('maximum-subnormal', 0x000fffffffffffff), ('minimum-normal', 0x0010000000000000),
+                    ('maximum-finite', 0x7fefffffffffffff), ('positive-infinity-domain-unavailable', 0x7ff0000000000000),
+                    ('negative-infinity', 0xfff0000000000000), ('positive-qNaN', 0x7ff8000000001234),
+                    ('negative-qNaN', 0xfff8000000001234), ('positive-sNaN', 0x7ff0000000001234),
+                    ('negative-sNaN', 0xfff0000000001234)]:
+    value(label, bits)
+    if 0 < bits < 0x7ff0000000000000:
+        value('negative-' + label, bits | (1 << 63))
+for label, number in [('fixed-threshold', float.fromhex('0x1.9999999999999p-4')), ('source-large-positive-cutoff', 100000.),
+                      ('half', 2.5), ('fixed-tie-3', 1.2345), ('small-tie', .00012345),
+                      ('carry', 9.9995), ('small-carry', .0999995)]:
+    raw = struct.unpack('>Q', struct.pack('>d', number))[0]
+    for shift in [-1, 0, 1]:
+        for sign in [0, 1 << 63]:
+            value(label + f'-ulp{shift:+d}-sign{bool(sign)}', (raw + shift) | sign)
+for power in [6, 7, 12, 13, 14, 15, 16, 17, 18, 100, 308]:
+    raw = struct.unpack('>Q', struct.pack('>d', 10. ** power))[0]
+    for shift in [-1, 0, 1]:
+        for sign in [0, 1 << 63]:
+            value(f'power10-{power}-ulp{shift:+d}-sign{bool(sign)}', (raw + shift) | sign)
+request = {'schema': 'source-round-format-unit-request.v1', 'card': 'SYS-03', 'expected_values_supplied': False,
+           'values': values, 'formats': ['{:.0R}', '{:.2R}', '{:.3R}', '{:.4R}', '{:.10R}']}
+input_ref = put(OUT / 'input-only-cases.proposed.json', json.dumps(request, indent=2) + '\n')
+
+policy = {'schema': 'source-round-format-prospective-policy.v1', 'input_source': input_ref,
+          'all_declared_rows_patterns_and_input_bits_required': True, 'full_returned_text_byte_exact': True,
+          'missing_stopped_exception_or_unexpected_unavailable_cannot_PASS': True,
+          'positive_infinity': {'source_invoked': False, 'status': 'source_domain_unavailable', 'reason': 'UndefinedLog10Conversion', 'counted_as_PASS': False},
+          'signed_NaN_literal_padding_is_Source_inference_pending_actual_Native': True,
+          'required_actual_custody': ['recorded Native build/argc2 execution/full stdout', 'recorded Cargo example build/emitted artifact/argc3 execution/full stdout', 'full before-after input and actual Source snapshots', 'Root and independent Source/formatter correspondence review'],
+          'floating_exception_environment_and_NaN_payload_after_nextafter_unpaired': True,
+          'no_tolerances_expected_text_or_result_lookup': True, 'whole_warmup_report_backend_or_cold_guard_PASS_claimed': False, 'gates_updated': False}
+policy_ref = put(OUT / 'prospective-policy.json', json.dumps(policy, indent=2) + '\n')
+
+context = []
+ranges = []
+specs = [
+ ('.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh', [(117,140,'threshold and literal exponent padding'),(247,305,'whole nextafter and R branch'),(734,786,'actual Fortran wrapper dispatch')]),
+ ('.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/format.h', [(1664,1678,'actual signed nonfinite text'),(1780,1829,'actual minimum exponent digits'),(1886,1929,'floating sign and nonfinite dispatch')]),
+ ('.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/format-inl.h', [(2268,2350,'fixed/exponential rounding and carry fallback'),(2351,2404,'finite formatting primitive')]),
+ ('.reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc', [(3020,3042,'actual detailed .10R caller'),(3150,3182,'actual maxday .2R/.4R callers'),(3278,3293,'actual summary .10R caller')]),
+ ('.reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.cc', [(230,248,'actual cold-guard .0R diagnostic operands')]),
+ ('crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs', [(58,113,'existing .3R body extracted into shared owner')]),
+]
+for name, selected in specs:
+    path = ROOT / name
+    context.append(ref(path))
+    lines = path.read_bytes().splitlines(True)
+    for first, last, purpose in selected:
+        assert last <= len(lines)
+        data = b''.join(lines[first-1:last])
+        arc = put(OUT / 'source-ranges' / (name.replace('/','__') + f'.{first}-{last}.txt'), data)
+        ranges.append({'path': name, 'start_line': first, 'end_line': last, 'purpose': purpose,
+                       'sha256': arc['sha256'], 'size_bytes': len(data), 'literal_archive': arc})
+for path in [native_before, recipe_before, observer_before, ROOT/'crates/ep_runtime/src/heat_balance/ctf_source_diagnostics_tests.rs', ROOT/'crates/ep_runtime/examples/clk02_probe_support/digest.rs', ROOT/'crates/ep_runtime/src/heat_balance/ctf_reports_format.rs', ROOT/'tools/porting/record_command.py']:
+    context.append(ref(path))
+
+readme = '''Held Source only. No Native/candidate/helper/build/test was executed, no observation/expected text was read, and canonical Sources/docs/Git/gates remain unchanged.
+
+The shared internal source_round_format::round(value, precision) implements the actual no-width R branch used by .0R/.2R/.3R/.4R/.10R. Existing selected CTF .3R diagnostics delegate to it with their existing public error variants; F/G remains unchanged. Preserve the literal threshold, positive-only >100000 log10 branch, max_digits10=17, original zero canonicalization, three nextafter nudges for ordinary fixed output, one for exponential, and the actual string-position exponent padding. Rust's existing standard fixed/exponential primitives produce the digits without decimal rescaling or custom decimal approximation. Native byte verification is required before any equivalence claim.
+
+Positive infinity reaches an undefined C++ log10-to-int conversion. Both observer lanes explicitly do not invoke this domain, retain its input and unavailable row, and never count it as PASS. Negative infinity follows actual nextafter toward lowest finite. NaN sign and literal padding follow fmt8 and IOFiles Source; the predicted negative text is not an observed endpoint. FP exception flags and post-nextafter NaN payload are not owned by this selected text scope.
+
+Five exact patterns and independently chosen IEEE inputs include signed zeros/NaNs/infinities, extreme normals/subnormals, threshold and cutoff neighbours, ties/carries, and positive log10+precision transitions with negative counterparts. The input contains no expected answers. Proposed contract tests cover actual branch and string operations; they remain unexecuted.
+
+Root application mapping contains exactly the shared module, its tests, heat_balance/mod.rs, existing CTF diagnostic wrapper, and new ep_run example. Full actual-before archives and semantic diffs are separate from any later actual formatter deltas. No future Source snapshot or outcome hash is supplied.
+
+Native Source is one TU that calls genuine EnergyPlus::format, linked to unchanged energypluslib. Recipe requires explicit CLK03_REPOSITORY_ROOT, SOURCE_ROUND_FORMAT_SOURCE_DIR and SOURCE_ROUND_FORMAT_INHERITED_RECIPE; Root must pass the actual current additive recipe, preserve its whole graph and existing targets, and verify only one new TU+link before build. The inherited recipe is never guessed here. Deferred registration uses the established top-project/global-once guard.
+
+Recorded Native execution argv: [actual helper artifact, exact input-only request path]. Recorded Rust example argv: [actual Cargo-emitted source_round_format_unit_observer artifact, same exact input-only request path, actual full input SHA]. The Rust observer literal-includes the shared formatter Source and existing digest transport. Root owns actual build/source/artifact/custody review and comparison. The prospective policy requires every declared row/pattern/input bit, complete stdout, and exact returned UTF-8 text, with all stopped/missing/unexpected unavailable outcomes failing. A complete capture may return0 while retaining the explicitly excluded +Inf domain; completion is not scientific PASS.
+
+No new runner or simulation pipeline is added. This selected formatting prerequisite does not complete warmup diagnostics/reporting/backend or SRC05 cold-check call integration. Genuine numerical/text observations, unchanged Source quality and later exact caller/backend verification remain Root prerequisites.
+'''
+readme_ref = put(OUT/'README.md', readme)
+own = [r['proposal'] for r in application] + [native_ref,recipe_ref,input_ref,policy_ref,readme_ref,ref(Path(__file__))]
+manifest = {'schema':'source-round-format-Source-preparation.v1','status':'HELD-Source-only-unexecuted',
+            'application':application,'own_sources':own,'authentic_template_befores':[native_archive,recipe_archive,observer_archive],
+            'transport_template_diffs':[native_diff,recipe_diff,observer_delta], 'read_Source_context':context,'read_Source_ranges':ranges,
+            'runtime_interfaces':{'Rust_internal_API':'source_round_format::round(f64, usize) -> Result<String, SourceRoundFormatUnavailable>',
+              'selected_precisions':[0,2,3,4,10], 'Native_target':'source_round_format_unit_helper',
+              'Native_argv_count':2,'Rust_example':'source_round_format_unit_observer','Rust_argv_count':3,
+              'input_schema':request['schema'],'Native_result_schema':'source-round-format-unit-native-results.v1',
+              'Rust_result_schema':'source-round-format-unit-candidate-results.v1','declared_input_rows':len(values),'declared_calls':len(values)*5},
+            'scientific_execution_performed':False,'Native_or_Rust_outputs_read':False,'canonical_Source_changed':False,
+            'expected_values_supplied':False,'gates_updated':False}
+ast.parse(Path(__file__).read_text())
+print(json.dumps(put(OUT/'manifest.json', json.dumps(manifest,indent=2)+'\n')))

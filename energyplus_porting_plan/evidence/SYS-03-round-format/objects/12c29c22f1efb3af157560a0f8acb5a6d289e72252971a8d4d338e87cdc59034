@@ -1,0 +1,908 @@
+
+D:\CodexBuild\rusted-energyplus\SYS-03\round-format-native-build-01\bin\source_round_format_unit_helper.exe:     file format pei-x86-64
+
+
+Disassembly of section .text:
+
+000000014000ab7e <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)>:
+format<fmt::v8::basic_format_context<fmt::v8::appender, char> >():
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:247
+   14000ab7e:	55                   	push   %rbp
+   14000ab7f:	41 56                	push   %r14
+   14000ab81:	41 55                	push   %r13
+   14000ab83:	41 54                	push   %r12
+   14000ab85:	57                   	push   %rdi
+   14000ab86:	56                   	push   %rsi
+   14000ab87:	53                   	push   %rbx
+   14000ab88:	48 81 ec a0 04 00 00 	sub    $0x4a0,%rsp
+   14000ab8f:	48 8d ac 24 80 00 00 	lea    0x80(%rsp),%rbp
+   14000ab96:	00 
+   14000ab97:	48 89 8d 60 04 00 00 	mov    %rcx,0x460(%rbp)
+   14000ab9e:	48 89 95 68 04 00 00 	mov    %rdx,0x468(%rbp)
+   14000aba5:	4c 89 85 70 04 00 00 	mov    %r8,0x470(%rbp)
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:262
+   14000abac:	48 8b 85 68 04 00 00 	mov    0x468(%rbp),%rax
+   14000abb3:	48 89 c1             	mov    %rax,%rcx
+   14000abb6:	e8 93 9c ff ff       	call   14000484e <(anonymous namespace)::DoubleWrapper::operator double() const>
+   14000abbb:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   14000abc0:	48 89 85 30 01 00 00 	mov    %rax,0x130(%rbp)
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:264
+   14000abc7:	48 8b 95 70 04 00 00 	mov    0x470(%rbp),%rdx
+   14000abce:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   14000abd5:	48 89 c1             	mov    %rax,%rcx
+   14000abd8:	e8 e7 12 00 00       	call   14000bec4 <void fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::handle_specs<fmt::v8::basic_format_context<fmt::v8::appender, char> >(fmt::v8::basic_format_context<fmt::v8::appender, char>&)>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:265
+   14000abdd:	c7 85 2c 01 00 00 00 	movl   $0x0,0x12c(%rbp)
+   14000abe4:	00 00 00 
+   14000abe7:	c7 85 2c 01 00 00 0a 	movl   $0xa,0x12c(%rbp)
+   14000abee:	00 00 00 
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:266
+   14000abf1:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   14000abf8:	0f b6 40 0c          	movzbl 0xc(%rax),%eax
+   14000abfc:	83 e0 0f             	and    $0xf,%eax
+   14000abff:	0f b6 d0             	movzbl %al,%edx
+   14000ac02:	48 8d 85 2c 01 00 00 	lea    0x12c(%rbp),%rax
+   14000ac09:	48 89 c1             	mov    %rax,%rcx
+   14000ac0c:	e8 3b 13 00 00       	call   14000bf4c <fmt::v8::detail::specs_checker<fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::null_handler>::on_align(fmt::v8::align::type)>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:267
+   14000ac11:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   14000ac18:	0f b6 40 0c          	movzbl 0xc(%rax),%eax
+   14000ac1c:	83 e0 70             	and    $0x70,%eax
+   14000ac1f:	84 c0                	test   %al,%al
+   14000ac21:	74 23                	je     14000ac46 <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0xc8>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:268
+   14000ac23:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   14000ac2a:	0f b6 40 0c          	movzbl 0xc(%rax),%eax
+   14000ac2e:	c0 e8 04             	shr    $0x4,%al
+   14000ac31:	83 e0 07             	and    $0x7,%eax
+   14000ac34:	0f b6 d0             	movzbl %al,%edx
+   14000ac37:	48 8d 85 2c 01 00 00 	lea    0x12c(%rbp),%rax
+   14000ac3e:	48 89 c1             	mov    %rax,%rcx
+   14000ac41:	e8 30 13 00 00       	call   14000bf76 <fmt::v8::detail::specs_checker<fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::null_handler>::on_sign(fmt::v8::sign::type)>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:270
+   14000ac46:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   14000ac4d:	0f b6 40 10          	movzbl 0x10(%rax),%eax
+   14000ac51:	83 e0 01             	and    $0x1,%eax
+   14000ac54:	84 c0                	test   %al,%al
+   14000ac56:	74 0f                	je     14000ac67 <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0xe9>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:271
+   14000ac58:	48 8d 85 2c 01 00 00 	lea    0x12c(%rbp),%rax
+   14000ac5f:	48 89 c1             	mov    %rax,%rcx
+   14000ac62:	e8 63 13 00 00       	call   14000bfca <fmt::v8::detail::specs_checker<fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::null_handler>::on_hash()>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:273
+   14000ac67:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   14000ac6e:	8b 40 04             	mov    0x4(%rax),%eax
+   14000ac71:	85 c0                	test   %eax,%eax
+   14000ac73:	78 0f                	js     14000ac84 <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0x106>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:274
+   14000ac75:	48 8d 85 2c 01 00 00 	lea    0x12c(%rbp),%rax
+   14000ac7c:	48 89 c1             	mov    %rax,%rcx
+   14000ac7f:	e8 62 13 00 00       	call   14000bfe6 <fmt::v8::detail::specs_checker<fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::null_handler>::end_precision()>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:277
+   14000ac84:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   14000ac8b:	0f b6 40 08          	movzbl 0x8(%rax),%eax
+   14000ac8f:	3c 52                	cmp    $0x52,%al
+   14000ac91:	0f 85 e9 06 00 00    	jne    14000b380 <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0x802>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:279
+   14000ac97:	48 8b 85 30 01 00 00 	mov    0x130(%rbp),%rax
+   14000ac9e:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   14000aca3:	e8 e9 9b ff ff       	call   140004891 <fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::should_be_fixed_output(double)>
+   14000aca8:	88 85 07 04 00 00    	mov    %al,0x407(%rbp)
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:281
+   14000acae:	80 bd 07 04 00 00 00 	cmpb   $0x0,0x407(%rbp)
+   14000acb5:	0f 84 0b 05 00 00    	je     14000b1c6 <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0x648>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:282
+   14000acbb:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   14000acc2:	c6 40 08 46          	movb   $0x46,0x8(%rax)
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:284
+   14000acc6:	f2 0f 10 85 30 01 00 	movsd  0x130(%rbp),%xmm0
+   14000accd:	00 
+   14000acce:	66 0f 2f 05 da 2c 3e 	comisd 0x23e2cda(%rip),%xmm0        # 1423ed9b0 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, (anonymous namespace)::DoubleWrapper>::desc+0x98>
+   14000acd5:	02 
+   14000acd6:	0f 86 65 02 00 00    	jbe    14000af41 <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0x3c3>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:285
+   14000acdc:	48 8b 85 30 01 00 00 	mov    0x130(%rbp),%rax
+   14000ace3:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   14000ace8:	e8 cb 5e aa 01       	call   141ab0bb8 <log10>
+   14000aced:	f2 0f 2c c0          	cvttsd2si %xmm0,%eax
+   14000acf1:	89 85 00 04 00 00    	mov    %eax,0x400(%rbp)
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:288
+   14000acf7:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   14000acfe:	8b 50 04             	mov    0x4(%rax),%edx
+   14000ad01:	8b 85 00 04 00 00    	mov    0x400(%rbp),%eax
+   14000ad07:	01 d0                	add    %edx,%eax
+   14000ad09:	83 f8 10             	cmp    $0x10,%eax
+   14000ad0c:	0f 8e 45 01 00 00    	jle    14000ae57 <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0x2d9>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:289
+   14000ad12:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   14000ad19:	c7 40 04 00 00 00 00 	movl   $0x0,0x4(%rax)
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:290
+   14000ad20:	48 8d 85 40 01 00 00 	lea    0x140(%rbp),%rax
+   14000ad27:	48 8b 95 60 04 00 00 	mov    0x460(%rbp),%rdx
+   14000ad2e:	48 89 c1             	mov    %rax,%rcx
+   14000ad31:	e8 3c 9c ff ff       	call   140004972 <fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::spec_builder()>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:292
+   14000ad36:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   14000ad3d:	48 8d 48 50          	lea    0x50(%rax),%rcx
+   14000ad41:	c6 85 5f 01 00 00 2e 	movb   $0x2e,0x15f(%rbp)
+   14000ad48:	48 8d 85 5f 01 00 00 	lea    0x15f(%rbp),%rax
+   14000ad4f:	48 89 c2             	mov    %rax,%rdx
+   14000ad52:	e8 29 42 c6 01       	call   141c6ef80 <fmt::v8::detail::buffer<char>::push_back(char const&)>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:293
+   14000ad57:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   14000ad5e:	48 83 c0 50          	add    $0x50,%rax
+   14000ad62:	48 89 c1             	mov    %rax,%rcx
+   14000ad65:	e8 96 cb ee 01       	call   141ef7900 <fmt::v8::detail::buffer<char>::size() const>
+   14000ad6a:	48 89 c3             	mov    %rax,%rbx
+   14000ad6d:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   14000ad74:	48 83 c0 50          	add    $0x50,%rax
+   14000ad78:	48 89 c1             	mov    %rax,%rcx
+   14000ad7b:	e8 60 41 c6 01       	call   141c6eee0 <fmt::v8::detail::buffer<char>::data()>
+   14000ad80:	48 89 c2             	mov    %rax,%rdx
+   14000ad83:	48 8d 45 60          	lea    0x60(%rbp),%rax
+   14000ad87:	49 89 d8             	mov    %rbx,%r8
+   14000ad8a:	48 89 c1             	mov    %rax,%rcx
+   14000ad8d:	e8 1e c2 0c 02       	call   1420d6fb0 <std::basic_string_view<char, std::char_traits<char> >::basic_string_view(char const*, unsigned long long)>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:294
+   14000ad92:	48 8d 85 70 01 00 00 	lea    0x170(%rbp),%rax
+   14000ad99:	48 8d 55 60          	lea    0x60(%rbp),%rdx
+   14000ad9d:	48 89 c1             	mov    %rax,%rcx
+   14000ada0:	e8 2b 80 c6 01       	call   141c72dd0 <fmt::v8::basic_runtime<fmt::v8::detail::char_t_impl<std::basic_string_view<char, std::char_traits<char> >, void>::type> fmt::v8::runtime<std::basic_string_view<char, std::char_traits<char> > >(std::basic_string_view<char, std::char_traits<char> > const&)>
+   14000ada5:	48 8b 85 70 01 00 00 	mov    0x170(%rbp),%rax
+   14000adac:	48 8b 95 78 01 00 00 	mov    0x178(%rbp),%rdx
+   14000adb3:	48 89 45 b0          	mov    %rax,-0x50(%rbp)
+   14000adb7:	48 89 55 b8          	mov    %rdx,-0x48(%rbp)
+   14000adbb:	48 8d 55 b0          	lea    -0x50(%rbp),%rdx
+   14000adbf:	48 8d 85 60 01 00 00 	lea    0x160(%rbp),%rax
+   14000adc6:	48 89 c1             	mov    %rax,%rcx
+   14000adc9:	e8 12 29 c4 01       	call   141c4d6e0 <fmt::v8::basic_format_string<char, double&>::basic_format_string(fmt::v8::basic_runtime<char>)>
+   14000adce:	48 8b 85 70 04 00 00 	mov    0x470(%rbp),%rax
+   14000add5:	48 89 c1             	mov    %rax,%rcx
+   14000add8:	e8 13 3a c4 01       	call   141c4e7f0 <fmt::v8::basic_format_context<fmt::v8::appender, char>::out()>
+   14000addd:	48 89 45 48          	mov    %rax,0x48(%rbp)
+   14000ade1:	48 8b 85 60 01 00 00 	mov    0x160(%rbp),%rax
+   14000ade8:	48 8b 95 68 01 00 00 	mov    0x168(%rbp),%rdx
+   14000adef:	48 89 45 50          	mov    %rax,0x50(%rbp)
+   14000adf3:	48 89 55 58          	mov    %rdx,0x58(%rbp)
+fmt::v8::appender fmt::v8::format_to<fmt::v8::appender, double&, 0>(fmt::v8::appender, fmt::v8::basic_format_string<char, fmt::v8::type_identity<double&>::type>, double&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:3008
+   14000adf7:	48 8d 85 30 03 00 00 	lea    0x330(%rbp),%rax
+   14000adfe:	48 8d 95 30 01 00 00 	lea    0x130(%rbp),%rdx
+   14000ae05:	48 89 c1             	mov    %rax,%rcx
+   14000ae08:	e8 a3 04 c4 01       	call   141c4b2b0 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, std::remove_cv<std::remove_reference<double&>::type>::type> fmt::v8::make_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char>, double&>(double&)>
+fmt::v8::basic_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char> >::basic_format_args(unsigned long long, fmt::v8::detail::value<fmt::v8::basic_format_context<fmt::v8::appender, char> > const*):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:1869
+   14000ae0d:	b8 0a 00 00 00       	mov    $0xa,%eax
+   14000ae12:	48 8d 8d 30 03 00 00 	lea    0x330(%rbp),%rcx
+   14000ae19:	48 89 ca             	mov    %rcx,%rdx
+fmt::v8::basic_format_string<char, double&>::operator fmt::v8::basic_string_view<char>() const:
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:2946
+   14000ae1c:	48 8b 4d 50          	mov    0x50(%rbp),%rcx
+   14000ae20:	48 8b 5d 58          	mov    0x58(%rbp),%rbx
+fmt::v8::appender fmt::v8::format_to<fmt::v8::appender, double&, 0>(fmt::v8::appender, fmt::v8::basic_format_string<char, fmt::v8::type_identity<double&>::type>, double&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:3008
+   14000ae24:	48 89 4d b0          	mov    %rcx,-0x50(%rbp)
+   14000ae28:	48 89 5d b8          	mov    %rbx,-0x48(%rbp)
+   14000ae2c:	48 89 45 a0          	mov    %rax,-0x60(%rbp)
+   14000ae30:	48 89 55 a8          	mov    %rdx,-0x58(%rbp)
+   14000ae34:	48 8d 4d a0          	lea    -0x60(%rbp),%rcx
+   14000ae38:	48 8d 55 b0          	lea    -0x50(%rbp),%rdx
+   14000ae3c:	48 8b 45 48          	mov    0x48(%rbp),%rax
+   14000ae40:	49 89 c8             	mov    %rcx,%r8
+   14000ae43:	48 89 c1             	mov    %rax,%rcx
+   14000ae46:	e8 f5 70 c2 01       	call   141c31f40 <fmt::v8::appender fmt::v8::vformat_to<fmt::v8::appender, 0>(fmt::v8::appender, fmt::v8::basic_string_view<char>, fmt::v8::basic_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char> >)>
+   14000ae4b:	48 89 c1             	mov    %rax,%rcx
+   14000ae4e:	48 89 cb             	mov    %rcx,%rbx
+   14000ae51:	90                   	nop
+format<fmt::v8::basic_format_context<fmt::v8::appender, char> >():
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:294
+   14000ae52:	e9 45 0a 00 00       	jmp    14000b89c <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0xd1e>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:296
+   14000ae57:	48 8d 85 90 01 00 00 	lea    0x190(%rbp),%rax
+   14000ae5e:	48 8b 95 60 04 00 00 	mov    0x460(%rbp),%rdx
+   14000ae65:	48 89 c1             	mov    %rax,%rcx
+   14000ae68:	e8 05 9b ff ff       	call   140004972 <fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::spec_builder()>
+   14000ae6d:	48 8d 85 a0 01 00 00 	lea    0x1a0(%rbp),%rax
+   14000ae74:	48 8d 95 90 01 00 00 	lea    0x190(%rbp),%rdx
+   14000ae7b:	48 89 c1             	mov    %rax,%rcx
+   14000ae7e:	e8 4d 7f c6 01       	call   141c72dd0 <fmt::v8::basic_runtime<fmt::v8::detail::char_t_impl<std::basic_string_view<char, std::char_traits<char> >, void>::type> fmt::v8::runtime<std::basic_string_view<char, std::char_traits<char> > >(std::basic_string_view<char, std::char_traits<char> > const&)>
+   14000ae83:	48 8b 85 a0 01 00 00 	mov    0x1a0(%rbp),%rax
+   14000ae8a:	48 8b 95 a8 01 00 00 	mov    0x1a8(%rbp),%rdx
+   14000ae91:	48 89 45 b0          	mov    %rax,-0x50(%rbp)
+   14000ae95:	48 89 55 b8          	mov    %rdx,-0x48(%rbp)
+   14000ae99:	48 8d 55 b0          	lea    -0x50(%rbp),%rdx
+   14000ae9d:	48 8d 85 80 01 00 00 	lea    0x180(%rbp),%rax
+   14000aea4:	48 89 c1             	mov    %rax,%rcx
+   14000aea7:	e8 34 28 c4 01       	call   141c4d6e0 <fmt::v8::basic_format_string<char, double&>::basic_format_string(fmt::v8::basic_runtime<char>)>
+   14000aeac:	48 8b 85 70 04 00 00 	mov    0x470(%rbp),%rax
+   14000aeb3:	48 89 c1             	mov    %rax,%rcx
+   14000aeb6:	e8 35 39 c4 01       	call   141c4e7f0 <fmt::v8::basic_format_context<fmt::v8::appender, char>::out()>
+   14000aebb:	48 89 45 78          	mov    %rax,0x78(%rbp)
+   14000aebf:	48 8b 85 80 01 00 00 	mov    0x180(%rbp),%rax
+   14000aec6:	48 8b 95 88 01 00 00 	mov    0x188(%rbp),%rdx
+   14000aecd:	48 89 85 80 00 00 00 	mov    %rax,0x80(%rbp)
+   14000aed4:	48 89 95 88 00 00 00 	mov    %rdx,0x88(%rbp)
+fmt::v8::appender fmt::v8::format_to<fmt::v8::appender, double&, 0>(fmt::v8::appender, fmt::v8::basic_format_string<char, fmt::v8::type_identity<double&>::type>, double&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:3008
+   14000aedb:	48 8d 85 40 03 00 00 	lea    0x340(%rbp),%rax
+   14000aee2:	48 8d 95 30 01 00 00 	lea    0x130(%rbp),%rdx
+   14000aee9:	48 89 c1             	mov    %rax,%rcx
+   14000aeec:	e8 bf 03 c4 01       	call   141c4b2b0 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, std::remove_cv<std::remove_reference<double&>::type>::type> fmt::v8::make_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char>, double&>(double&)>
+fmt::v8::basic_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char> >::basic_format_args(unsigned long long, fmt::v8::detail::value<fmt::v8::basic_format_context<fmt::v8::appender, char> > const*):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:1869
+   14000aef1:	b8 0a 00 00 00       	mov    $0xa,%eax
+   14000aef6:	48 8d 8d 40 03 00 00 	lea    0x340(%rbp),%rcx
+   14000aefd:	48 89 ca             	mov    %rcx,%rdx
+fmt::v8::basic_format_string<char, double&>::operator fmt::v8::basic_string_view<char>() const:
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:2946
+   14000af00:	48 8b 8d 80 00 00 00 	mov    0x80(%rbp),%rcx
+   14000af07:	48 8b 9d 88 00 00 00 	mov    0x88(%rbp),%rbx
+fmt::v8::appender fmt::v8::format_to<fmt::v8::appender, double&, 0>(fmt::v8::appender, fmt::v8::basic_format_string<char, fmt::v8::type_identity<double&>::type>, double&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:3008
+   14000af0e:	48 89 4d b0          	mov    %rcx,-0x50(%rbp)
+   14000af12:	48 89 5d b8          	mov    %rbx,-0x48(%rbp)
+   14000af16:	48 89 45 a0          	mov    %rax,-0x60(%rbp)
+   14000af1a:	48 89 55 a8          	mov    %rdx,-0x58(%rbp)
+   14000af1e:	48 8d 4d a0          	lea    -0x60(%rbp),%rcx
+   14000af22:	48 8d 55 b0          	lea    -0x50(%rbp),%rdx
+   14000af26:	48 8b 45 78          	mov    0x78(%rbp),%rax
+   14000af2a:	49 89 c8             	mov    %rcx,%r8
+   14000af2d:	48 89 c1             	mov    %rax,%rcx
+   14000af30:	e8 0b 70 c2 01       	call   141c31f40 <fmt::v8::appender fmt::v8::vformat_to<fmt::v8::appender, 0>(fmt::v8::appender, fmt::v8::basic_string_view<char>, fmt::v8::basic_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char> >)>
+   14000af35:	48 89 c1             	mov    %rax,%rcx
+   14000af38:	48 89 cb             	mov    %rcx,%rbx
+   14000af3b:	90                   	nop
+format<fmt::v8::basic_format_context<fmt::v8::appender, char> >():
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:296
+   14000af3c:	e9 5b 09 00 00       	jmp    14000b89c <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0xd1e>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:298
+   14000af41:	f2 0f 10 85 30 01 00 	movsd  0x130(%rbp),%xmm0
+   14000af48:	00 
+   14000af49:	66 0f ef c9          	pxor   %xmm1,%xmm1
+   14000af4d:	66 0f 2e c1          	ucomisd %xmm1,%xmm0
+   14000af51:	7a 0a                	jp     14000af5d <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0x3df>
+   14000af53:	66 0f ef c9          	pxor   %xmm1,%xmm1
+   14000af57:	66 0f 2e c1          	ucomisd %xmm1,%xmm0
+   14000af5b:	74 24                	je     14000af81 <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0x403>
+   14000af5d:	f2 0f 10 85 30 01 00 	movsd  0x130(%rbp),%xmm0
+   14000af64:	00 
+   14000af65:	66 0f ef c9          	pxor   %xmm1,%xmm1
+   14000af69:	66 0f 2e c1          	ucomisd %xmm1,%xmm0
+   14000af6d:	0f 8a 0a 01 00 00    	jp     14000b07d <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0x4ff>
+   14000af73:	66 0f ef c9          	pxor   %xmm1,%xmm1
+   14000af77:	66 0f 2e c1          	ucomisd %xmm1,%xmm0
+   14000af7b:	0f 85 fc 00 00 00    	jne    14000b07d <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0x4ff>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:299
+   14000af81:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   14000af85:	f2 0f 11 85 b8 01 00 	movsd  %xmm0,0x1b8(%rbp)
+   14000af8c:	00 
+   14000af8d:	48 8d 85 d0 01 00 00 	lea    0x1d0(%rbp),%rax
+   14000af94:	48 8b 95 60 04 00 00 	mov    0x460(%rbp),%rdx
+   14000af9b:	48 89 c1             	mov    %rax,%rcx
+   14000af9e:	e8 cf 99 ff ff       	call   140004972 <fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::spec_builder()>
+   14000afa3:	48 8d 85 e0 01 00 00 	lea    0x1e0(%rbp),%rax
+   14000afaa:	48 8d 95 d0 01 00 00 	lea    0x1d0(%rbp),%rdx
+   14000afb1:	48 89 c1             	mov    %rax,%rcx
+   14000afb4:	e8 17 7e c6 01       	call   141c72dd0 <fmt::v8::basic_runtime<fmt::v8::detail::char_t_impl<std::basic_string_view<char, std::char_traits<char> >, void>::type> fmt::v8::runtime<std::basic_string_view<char, std::char_traits<char> > >(std::basic_string_view<char, std::char_traits<char> > const&)>
+   14000afb9:	48 8b 85 e0 01 00 00 	mov    0x1e0(%rbp),%rax
+   14000afc0:	48 8b 95 e8 01 00 00 	mov    0x1e8(%rbp),%rdx
+   14000afc7:	48 89 45 b0          	mov    %rax,-0x50(%rbp)
+   14000afcb:	48 89 55 b8          	mov    %rdx,-0x48(%rbp)
+   14000afcf:	48 8d 55 b0          	lea    -0x50(%rbp),%rdx
+   14000afd3:	48 8d 85 c0 01 00 00 	lea    0x1c0(%rbp),%rax
+   14000afda:	48 89 c1             	mov    %rax,%rcx
+   14000afdd:	e8 0e 27 c4 01       	call   141c4d6f0 <fmt::v8::basic_format_string<char, double>::basic_format_string(fmt::v8::basic_runtime<char>)>
+   14000afe2:	48 8b 85 70 04 00 00 	mov    0x470(%rbp),%rax
+   14000afe9:	48 89 c1             	mov    %rax,%rcx
+   14000afec:	e8 ff 37 c4 01       	call   141c4e7f0 <fmt::v8::basic_format_context<fmt::v8::appender, char>::out()>
+   14000aff1:	48 89 85 98 00 00 00 	mov    %rax,0x98(%rbp)
+   14000aff8:	48 8b 85 c0 01 00 00 	mov    0x1c0(%rbp),%rax
+   14000afff:	48 8b 95 c8 01 00 00 	mov    0x1c8(%rbp),%rdx
+   14000b006:	48 89 85 a0 00 00 00 	mov    %rax,0xa0(%rbp)
+   14000b00d:	48 89 95 a8 00 00 00 	mov    %rdx,0xa8(%rbp)
+fmt::v8::appender fmt::v8::format_to<fmt::v8::appender, double, 0>(fmt::v8::appender, fmt::v8::basic_format_string<char, fmt::v8::type_identity<double>::type>, double&&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:3008
+   14000b014:	48 8d 85 50 03 00 00 	lea    0x350(%rbp),%rax
+   14000b01b:	48 8d 95 b8 01 00 00 	lea    0x1b8(%rbp),%rdx
+   14000b022:	48 89 c1             	mov    %rax,%rcx
+   14000b025:	e8 86 02 c4 01       	call   141c4b2b0 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, std::remove_cv<std::remove_reference<double&>::type>::type> fmt::v8::make_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char>, double&>(double&)>
+fmt::v8::basic_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char> >::basic_format_args(unsigned long long, fmt::v8::detail::value<fmt::v8::basic_format_context<fmt::v8::appender, char> > const*):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:1869
+   14000b02a:	b8 0a 00 00 00       	mov    $0xa,%eax
+   14000b02f:	48 8d 8d 50 03 00 00 	lea    0x350(%rbp),%rcx
+   14000b036:	48 89 ca             	mov    %rcx,%rdx
+fmt::v8::basic_format_string<char, double>::operator fmt::v8::basic_string_view<char>() const:
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:2946
+   14000b039:	48 8b 8d a0 00 00 00 	mov    0xa0(%rbp),%rcx
+   14000b040:	48 8b 9d a8 00 00 00 	mov    0xa8(%rbp),%rbx
+fmt::v8::appender fmt::v8::format_to<fmt::v8::appender, double, 0>(fmt::v8::appender, fmt::v8::basic_format_string<char, fmt::v8::type_identity<double>::type>, double&&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:3008
+   14000b047:	48 89 4d b0          	mov    %rcx,-0x50(%rbp)
+   14000b04b:	48 89 5d b8          	mov    %rbx,-0x48(%rbp)
+   14000b04f:	48 89 45 a0          	mov    %rax,-0x60(%rbp)
+   14000b053:	48 89 55 a8          	mov    %rdx,-0x58(%rbp)
+   14000b057:	48 8d 4d a0          	lea    -0x60(%rbp),%rcx
+   14000b05b:	48 8d 55 b0          	lea    -0x50(%rbp),%rdx
+   14000b05f:	48 8b 85 98 00 00 00 	mov    0x98(%rbp),%rax
+   14000b066:	49 89 c8             	mov    %rcx,%r8
+   14000b069:	48 89 c1             	mov    %rax,%rcx
+   14000b06c:	e8 cf 6e c2 01       	call   141c31f40 <fmt::v8::appender fmt::v8::vformat_to<fmt::v8::appender, 0>(fmt::v8::appender, fmt::v8::basic_string_view<char>, fmt::v8::basic_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char> >)>
+   14000b071:	48 89 c1             	mov    %rax,%rcx
+   14000b074:	48 89 cb             	mov    %rcx,%rbx
+   14000b077:	90                   	nop
+format<fmt::v8::basic_format_context<fmt::v8::appender, char> >():
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:299
+   14000b078:	e9 1f 08 00 00       	jmp    14000b89c <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0xd1e>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:301
+   14000b07d:	f2 0f 10 85 30 01 00 	movsd  0x130(%rbp),%xmm0
+   14000b084:	00 
+   14000b085:	48 8d 85 3f 01 00 00 	lea    0x13f(%rbp),%rax
+   14000b08c:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   14000b090:	48 89 c1             	mov    %rax,%rcx
+   14000b093:	e8 38 fa ff ff       	call   14000aad0 <fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)::{lambda(double)#1}::operator()(double) const>
+   14000b098:	66 48 0f 7e c2       	movq   %xmm0,%rdx
+   14000b09d:	48 8d 85 3f 01 00 00 	lea    0x13f(%rbp),%rax
+   14000b0a4:	66 48 0f 6e ca       	movq   %rdx,%xmm1
+   14000b0a9:	48 89 c1             	mov    %rax,%rcx
+   14000b0ac:	e8 1f fa ff ff       	call   14000aad0 <fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)::{lambda(double)#1}::operator()(double) const>
+   14000b0b1:	66 48 0f 7e c2       	movq   %xmm0,%rdx
+   14000b0b6:	48 8d 85 3f 01 00 00 	lea    0x13f(%rbp),%rax
+   14000b0bd:	66 48 0f 6e ca       	movq   %rdx,%xmm1
+   14000b0c2:	48 89 c1             	mov    %rax,%rcx
+   14000b0c5:	e8 06 fa ff ff       	call   14000aad0 <fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)::{lambda(double)#1}::operator()(double) const>
+   14000b0ca:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   14000b0cf:	48 89 85 f8 01 00 00 	mov    %rax,0x1f8(%rbp)
+   14000b0d6:	48 8d 85 10 02 00 00 	lea    0x210(%rbp),%rax
+   14000b0dd:	48 8b 95 60 04 00 00 	mov    0x460(%rbp),%rdx
+   14000b0e4:	48 89 c1             	mov    %rax,%rcx
+   14000b0e7:	e8 86 98 ff ff       	call   140004972 <fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::spec_builder()>
+   14000b0ec:	48 8d 85 20 02 00 00 	lea    0x220(%rbp),%rax
+   14000b0f3:	48 8d 95 10 02 00 00 	lea    0x210(%rbp),%rdx
+   14000b0fa:	48 89 c1             	mov    %rax,%rcx
+   14000b0fd:	e8 ce 7c c6 01       	call   141c72dd0 <fmt::v8::basic_runtime<fmt::v8::detail::char_t_impl<std::basic_string_view<char, std::char_traits<char> >, void>::type> fmt::v8::runtime<std::basic_string_view<char, std::char_traits<char> > >(std::basic_string_view<char, std::char_traits<char> > const&)>
+   14000b102:	48 8b 85 20 02 00 00 	mov    0x220(%rbp),%rax
+   14000b109:	48 8b 95 28 02 00 00 	mov    0x228(%rbp),%rdx
+   14000b110:	48 89 45 b0          	mov    %rax,-0x50(%rbp)
+   14000b114:	48 89 55 b8          	mov    %rdx,-0x48(%rbp)
+   14000b118:	48 8d 55 b0          	lea    -0x50(%rbp),%rdx
+   14000b11c:	48 8d 85 00 02 00 00 	lea    0x200(%rbp),%rax
+   14000b123:	48 89 c1             	mov    %rax,%rcx
+   14000b126:	e8 c5 25 c4 01       	call   141c4d6f0 <fmt::v8::basic_format_string<char, double>::basic_format_string(fmt::v8::basic_runtime<char>)>
+   14000b12b:	48 8b 85 70 04 00 00 	mov    0x470(%rbp),%rax
+   14000b132:	48 89 c1             	mov    %rax,%rcx
+   14000b135:	e8 b6 36 c4 01       	call   141c4e7f0 <fmt::v8::basic_format_context<fmt::v8::appender, char>::out()>
+   14000b13a:	48 89 85 b8 00 00 00 	mov    %rax,0xb8(%rbp)
+   14000b141:	48 8b 85 00 02 00 00 	mov    0x200(%rbp),%rax
+   14000b148:	48 8b 95 08 02 00 00 	mov    0x208(%rbp),%rdx
+   14000b14f:	48 89 85 c0 00 00 00 	mov    %rax,0xc0(%rbp)
+   14000b156:	48 89 95 c8 00 00 00 	mov    %rdx,0xc8(%rbp)
+fmt::v8::appender fmt::v8::format_to<fmt::v8::appender, double, 0>(fmt::v8::appender, fmt::v8::basic_format_string<char, fmt::v8::type_identity<double>::type>, double&&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:3008
+   14000b15d:	48 8d 85 60 03 00 00 	lea    0x360(%rbp),%rax
+   14000b164:	48 8d 95 f8 01 00 00 	lea    0x1f8(%rbp),%rdx
+   14000b16b:	48 89 c1             	mov    %rax,%rcx
+   14000b16e:	e8 3d 01 c4 01       	call   141c4b2b0 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, std::remove_cv<std::remove_reference<double&>::type>::type> fmt::v8::make_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char>, double&>(double&)>
+fmt::v8::basic_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char> >::basic_format_args(unsigned long long, fmt::v8::detail::value<fmt::v8::basic_format_context<fmt::v8::appender, char> > const*):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:1869
+   14000b173:	b8 0a 00 00 00       	mov    $0xa,%eax
+   14000b178:	48 8d 8d 60 03 00 00 	lea    0x360(%rbp),%rcx
+   14000b17f:	48 89 ca             	mov    %rcx,%rdx
+fmt::v8::basic_format_string<char, double>::operator fmt::v8::basic_string_view<char>() const:
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:2946
+   14000b182:	48 8b 8d c0 00 00 00 	mov    0xc0(%rbp),%rcx
+   14000b189:	48 8b 9d c8 00 00 00 	mov    0xc8(%rbp),%rbx
+fmt::v8::appender fmt::v8::format_to<fmt::v8::appender, double, 0>(fmt::v8::appender, fmt::v8::basic_format_string<char, fmt::v8::type_identity<double>::type>, double&&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:3008
+   14000b190:	48 89 4d b0          	mov    %rcx,-0x50(%rbp)
+   14000b194:	48 89 5d b8          	mov    %rbx,-0x48(%rbp)
+   14000b198:	48 89 45 a0          	mov    %rax,-0x60(%rbp)
+   14000b19c:	48 89 55 a8          	mov    %rdx,-0x58(%rbp)
+   14000b1a0:	48 8d 4d a0          	lea    -0x60(%rbp),%rcx
+   14000b1a4:	48 8d 55 b0          	lea    -0x50(%rbp),%rdx
+   14000b1a8:	48 8b 85 b8 00 00 00 	mov    0xb8(%rbp),%rax
+   14000b1af:	49 89 c8             	mov    %rcx,%r8
+   14000b1b2:	48 89 c1             	mov    %rax,%rcx
+   14000b1b5:	e8 86 6d c2 01       	call   141c31f40 <fmt::v8::appender fmt::v8::vformat_to<fmt::v8::appender, 0>(fmt::v8::appender, fmt::v8::basic_string_view<char>, fmt::v8::basic_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char> >)>
+   14000b1ba:	48 89 c1             	mov    %rax,%rcx
+   14000b1bd:	48 89 cb             	mov    %rcx,%rbx
+   14000b1c0:	90                   	nop
+format<fmt::v8::basic_format_context<fmt::v8::appender, char> >():
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:301
+   14000b1c1:	e9 d6 06 00 00       	jmp    14000b89c <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0xd1e>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:303
+   14000b1c6:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   14000b1cd:	c6 40 08 45          	movb   $0x45,0x8(%rax)
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:304
+   14000b1d1:	f2 0f 10 85 30 01 00 	movsd  0x130(%rbp),%xmm0
+   14000b1d8:	00 
+   14000b1d9:	48 8d 85 3f 01 00 00 	lea    0x13f(%rbp),%rax
+   14000b1e0:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   14000b1e4:	48 89 c1             	mov    %rax,%rcx
+   14000b1e7:	e8 e4 f8 ff ff       	call   14000aad0 <fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)::{lambda(double)#1}::operator()(double) const>
+   14000b1ec:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   14000b1f1:	48 89 85 38 02 00 00 	mov    %rax,0x238(%rbp)
+   14000b1f8:	48 8d 85 50 02 00 00 	lea    0x250(%rbp),%rax
+   14000b1ff:	48 8b 95 60 04 00 00 	mov    0x460(%rbp),%rdx
+   14000b206:	48 89 c1             	mov    %rax,%rcx
+   14000b209:	e8 64 97 ff ff       	call   140004972 <fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::spec_builder()>
+   14000b20e:	48 8d 85 60 02 00 00 	lea    0x260(%rbp),%rax
+   14000b215:	48 8d 95 50 02 00 00 	lea    0x250(%rbp),%rdx
+   14000b21c:	48 89 c1             	mov    %rax,%rcx
+   14000b21f:	e8 ac 7b c6 01       	call   141c72dd0 <fmt::v8::basic_runtime<fmt::v8::detail::char_t_impl<std::basic_string_view<char, std::char_traits<char> >, void>::type> fmt::v8::runtime<std::basic_string_view<char, std::char_traits<char> > >(std::basic_string_view<char, std::char_traits<char> > const&)>
+   14000b224:	48 8b 85 60 02 00 00 	mov    0x260(%rbp),%rax
+   14000b22b:	48 8b 95 68 02 00 00 	mov    0x268(%rbp),%rdx
+   14000b232:	48 89 45 b0          	mov    %rax,-0x50(%rbp)
+   14000b236:	48 89 55 b8          	mov    %rdx,-0x48(%rbp)
+   14000b23a:	48 8d 55 b0          	lea    -0x50(%rbp),%rdx
+   14000b23e:	48 8d 85 40 02 00 00 	lea    0x240(%rbp),%rax
+   14000b245:	48 89 c1             	mov    %rax,%rcx
+   14000b248:	e8 a3 24 c4 01       	call   141c4d6f0 <fmt::v8::basic_format_string<char, double>::basic_format_string(fmt::v8::basic_runtime<char>)>
+   14000b24d:	48 8b 85 40 02 00 00 	mov    0x240(%rbp),%rax
+   14000b254:	48 8b 95 48 02 00 00 	mov    0x248(%rbp),%rdx
+   14000b25b:	48 89 85 d0 00 00 00 	mov    %rax,0xd0(%rbp)
+   14000b262:	48 89 95 d8 00 00 00 	mov    %rdx,0xd8(%rbp)
+   14000b269:	48 8d 75 c0          	lea    -0x40(%rbp),%rsi
+std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > fmt::v8::format<double>(fmt::v8::basic_format_string<char, fmt::v8::type_identity<double>::type>, double&&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:2979
+   14000b26d:	48 8d 85 70 03 00 00 	lea    0x370(%rbp),%rax
+   14000b274:	48 8d 95 38 02 00 00 	lea    0x238(%rbp),%rdx
+   14000b27b:	48 89 c1             	mov    %rax,%rcx
+   14000b27e:	e8 2d 00 c4 01       	call   141c4b2b0 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, std::remove_cv<std::remove_reference<double&>::type>::type> fmt::v8::make_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char>, double&>(double&)>
+fmt::v8::basic_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char> >::basic_format_args(unsigned long long, fmt::v8::detail::value<fmt::v8::basic_format_context<fmt::v8::appender, char> > const*):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:1869
+   14000b283:	b8 0a 00 00 00       	mov    $0xa,%eax
+   14000b288:	48 8d 8d 70 03 00 00 	lea    0x370(%rbp),%rcx
+   14000b28f:	48 89 ca             	mov    %rcx,%rdx
+fmt::v8::basic_format_string<char, double>::operator fmt::v8::basic_string_view<char>() const:
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:2946
+   14000b292:	48 8b 8d d0 00 00 00 	mov    0xd0(%rbp),%rcx
+   14000b299:	48 8b 9d d8 00 00 00 	mov    0xd8(%rbp),%rbx
+std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > fmt::v8::format<double>(fmt::v8::basic_format_string<char, fmt::v8::type_identity<double>::type>, double&&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:2979
+   14000b2a0:	48 89 4d b0          	mov    %rcx,-0x50(%rbp)
+   14000b2a4:	48 89 5d b8          	mov    %rbx,-0x48(%rbp)
+   14000b2a8:	48 89 45 a0          	mov    %rax,-0x60(%rbp)
+   14000b2ac:	48 89 55 a8          	mov    %rdx,-0x58(%rbp)
+   14000b2b0:	48 8d 55 a0          	lea    -0x60(%rbp),%rdx
+   14000b2b4:	48 8d 45 b0          	lea    -0x50(%rbp),%rax
+   14000b2b8:	49 89 d0             	mov    %rdx,%r8
+   14000b2bb:	48 89 c2             	mov    %rax,%rdx
+   14000b2be:	48 89 f1             	mov    %rsi,%rcx
+   14000b2c1:	e8 8a 4a a7 01       	call   141a7fd50 <fmt::v8::vformat[abi:cxx11](fmt::v8::basic_string_view<char>, fmt::v8::basic_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char> >)>
+format<fmt::v8::basic_format_context<fmt::v8::appender, char> >():
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:305
+   14000b2c6:	48 8d 45 c0          	lea    -0x40(%rbp),%rax
+   14000b2ca:	48 89 c1             	mov    %rax,%rcx
+   14000b2cd:	e8 20 96 ff ff       	call   1400048f2 <fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::zero_pad_exponent(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&)>
+   14000b2d2:	48 89 c3             	mov    %rax,%rbx
+   14000b2d5:	4c 8d 25 1e 12 3e 02 	lea    0x23e121e(%rip),%r12        # 1423ec4fa <EnergyPlus::OutputProcessor::groupNamesUC+0x311a>
+   14000b2dc:	41 bd 02 00 00 00    	mov    $0x2,%r13d
+   14000b2e2:	48 8b 85 70 04 00 00 	mov    0x470(%rbp),%rax
+   14000b2e9:	48 89 c1             	mov    %rax,%rcx
+   14000b2ec:	e8 ff 34 c4 01       	call   141c4e7f0 <fmt::v8::basic_format_context<fmt::v8::appender, char>::out()>
+   14000b2f1:	48 89 85 e8 00 00 00 	mov    %rax,0xe8(%rbp)
+   14000b2f8:	4c 89 a5 f0 00 00 00 	mov    %r12,0xf0(%rbp)
+   14000b2ff:	4c 89 ad f8 00 00 00 	mov    %r13,0xf8(%rbp)
+   14000b306:	48 89 9d f8 03 00 00 	mov    %rbx,0x3f8(%rbp)
+fmt::v8::appender fmt::v8::format_to<fmt::v8::appender, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, 0>(fmt::v8::appender, fmt::v8::basic_format_string<char, fmt::v8::type_identity<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&>::type>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:3008
+   14000b30d:	48 8d 85 80 03 00 00 	lea    0x380(%rbp),%rax
+   14000b314:	48 8b 95 f8 03 00 00 	mov    0x3f8(%rbp),%rdx
+   14000b31b:	48 89 c1             	mov    %rax,%rcx
+   14000b31e:	e8 bd ed c3 01       	call   141c4a0e0 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, std::remove_cv<std::remove_reference<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&>::type>::type> fmt::v8::make_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&>(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&)>
+fmt::v8::basic_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char> >::basic_format_args(unsigned long long, fmt::v8::detail::value<fmt::v8::basic_format_context<fmt::v8::appender, char> > const*):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:1869
+   14000b323:	b9 0d 00 00 00       	mov    $0xd,%ecx
+   14000b328:	48 8d 85 80 03 00 00 	lea    0x380(%rbp),%rax
+   14000b32f:	48 89 c3             	mov    %rax,%rbx
+fmt::v8::basic_format_string<char, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&>::operator fmt::v8::basic_string_view<char>() const:
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:2946
+   14000b332:	48 8b 85 f0 00 00 00 	mov    0xf0(%rbp),%rax
+   14000b339:	48 8b 95 f8 00 00 00 	mov    0xf8(%rbp),%rdx
+fmt::v8::appender fmt::v8::format_to<fmt::v8::appender, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, 0>(fmt::v8::appender, fmt::v8::basic_format_string<char, fmt::v8::type_identity<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&>::type>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:3008
+   14000b340:	48 89 45 b0          	mov    %rax,-0x50(%rbp)
+   14000b344:	48 89 55 b8          	mov    %rdx,-0x48(%rbp)
+   14000b348:	48 89 4d a0          	mov    %rcx,-0x60(%rbp)
+   14000b34c:	48 89 5d a8          	mov    %rbx,-0x58(%rbp)
+   14000b350:	48 8d 4d a0          	lea    -0x60(%rbp),%rcx
+   14000b354:	48 8d 55 b0          	lea    -0x50(%rbp),%rdx
+   14000b358:	48 8b 85 e8 00 00 00 	mov    0xe8(%rbp),%rax
+   14000b35f:	49 89 c8             	mov    %rcx,%r8
+   14000b362:	48 89 c1             	mov    %rax,%rcx
+   14000b365:	e8 d6 6b c2 01       	call   141c31f40 <fmt::v8::appender fmt::v8::vformat_to<fmt::v8::appender, 0>(fmt::v8::appender, fmt::v8::basic_string_view<char>, fmt::v8::basic_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char> >)>
+   14000b36a:	48 89 c3             	mov    %rax,%rbx
+   14000b36d:	90                   	nop
+format<fmt::v8::basic_format_context<fmt::v8::appender, char> >():
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:305
+   14000b36e:	90                   	nop
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:306
+   14000b36f:	48 8d 45 c0          	lea    -0x40(%rbp),%rax
+   14000b373:	48 89 c1             	mov    %rax,%rcx
+   14000b376:	e8 05 2b 1e 02       	call   1421ede80 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string()>
+   14000b37b:	e9 1c 05 00 00       	jmp    14000b89c <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0xd1e>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:307
+   14000b380:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   14000b387:	0f b6 40 08          	movzbl 0x8(%rax),%eax
+   14000b38b:	3c 54                	cmp    $0x54,%al
+   14000b38d:	0f 85 1d 04 00 00    	jne    14000b7b0 <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0xc32>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:308
+   14000b393:	48 8b 85 30 01 00 00 	mov    0x130(%rbp),%rax
+   14000b39a:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   14000b39f:	e8 ed 94 ff ff       	call   140004891 <fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::should_be_fixed_output(double)>
+   14000b3a4:	88 85 1f 04 00 00    	mov    %al,0x41f(%rbp)
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:310
+   14000b3aa:	80 bd 1f 04 00 00 00 	cmpb   $0x0,0x41f(%rbp)
+   14000b3b1:	0f 84 58 01 00 00    	je     14000b50f <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0x991>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:311
+   14000b3b7:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   14000b3be:	8b 40 04             	mov    0x4(%rax),%eax
+   14000b3c1:	89 c2                	mov    %eax,%edx
+   14000b3c3:	b9 0a 00 00 00       	mov    $0xa,%ecx
+   14000b3c8:	e8 f3 00 35 02       	call   14235b4c0 <__gnu_cxx::__promote_2<decltype (((__gnu_cxx::__promote_2<int, std::__is_integer<int>::__value>::__type)(0))+((__gnu_cxx::__promote_2<int, std::__is_integer<int>::__value>::__type)(0))), std::__is_integer<decltype (((__gnu_cxx::__promote_2<int, std::__is_integer<int>::__value>::__type)(0))+((__gnu_cxx::__promote_2<int, std::__is_integer<int>::__value>::__type)(0)))>::__value>::__type std::pow<int, int>(int, int)>
+   14000b3cd:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   14000b3d2:	48 89 85 10 04 00 00 	mov    %rax,0x410(%rbp)
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:312
+   14000b3d9:	f2 0f 10 85 30 01 00 	movsd  0x130(%rbp),%xmm0
+   14000b3e0:	00 
+   14000b3e1:	66 0f 28 c8          	movapd %xmm0,%xmm1
+   14000b3e5:	f2 0f 59 8d 10 04 00 	mulsd  0x410(%rbp),%xmm1
+   14000b3ec:	00 
+   14000b3ed:	f2 0f 10 05 c3 25 3e 	movsd  0x23e25c3(%rip),%xmm0        # 1423ed9b8 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, (anonymous namespace)::DoubleWrapper>::desc+0xa0>
+   14000b3f4:	02 
+   14000b3f5:	f2 0f 58 c1          	addsd  %xmm1,%xmm0
+   14000b3f9:	f2 0f 11 85 08 04 00 	movsd  %xmm0,0x408(%rbp)
+   14000b400:	00 
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:313
+   14000b401:	48 8b 85 08 04 00 00 	mov    0x408(%rbp),%rax
+   14000b408:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   14000b40d:	e8 5e b1 a9 01       	call   141aa6570 <trunc>
+   14000b412:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   14000b417:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   14000b41c:	f2 0f 5e 85 10 04 00 	divsd  0x410(%rbp),%xmm0
+   14000b423:	00 
+   14000b424:	f2 0f 11 45 08       	movsd  %xmm0,0x8(%rbp)
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:314
+   14000b429:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   14000b430:	c6 40 08 46          	movb   $0x46,0x8(%rax)
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:315
+   14000b434:	48 8d 85 80 02 00 00 	lea    0x280(%rbp),%rax
+   14000b43b:	48 8b 95 60 04 00 00 	mov    0x460(%rbp),%rdx
+   14000b442:	48 89 c1             	mov    %rax,%rcx
+   14000b445:	e8 28 95 ff ff       	call   140004972 <fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::spec_builder()>
+   14000b44a:	48 8d 85 90 02 00 00 	lea    0x290(%rbp),%rax
+   14000b451:	48 8d 95 80 02 00 00 	lea    0x280(%rbp),%rdx
+   14000b458:	48 89 c1             	mov    %rax,%rcx
+   14000b45b:	e8 70 79 c6 01       	call   141c72dd0 <fmt::v8::basic_runtime<fmt::v8::detail::char_t_impl<std::basic_string_view<char, std::char_traits<char> >, void>::type> fmt::v8::runtime<std::basic_string_view<char, std::char_traits<char> > >(std::basic_string_view<char, std::char_traits<char> > const&)>
+   14000b460:	48 8b 85 90 02 00 00 	mov    0x290(%rbp),%rax
+   14000b467:	48 8b 95 98 02 00 00 	mov    0x298(%rbp),%rdx
+   14000b46e:	48 89 45 b0          	mov    %rax,-0x50(%rbp)
+   14000b472:	48 89 55 b8          	mov    %rdx,-0x48(%rbp)
+   14000b476:	48 8d 55 b0          	lea    -0x50(%rbp),%rdx
+   14000b47a:	48 8d 85 70 02 00 00 	lea    0x270(%rbp),%rax
+   14000b481:	48 89 c1             	mov    %rax,%rcx
+   14000b484:	e8 57 1f c4 01       	call   141c4d3e0 <fmt::v8::basic_format_string<char, double const&>::basic_format_string(fmt::v8::basic_runtime<char>)>
+   14000b489:	48 8b 85 70 04 00 00 	mov    0x470(%rbp),%rax
+   14000b490:	48 89 c1             	mov    %rax,%rcx
+   14000b493:	e8 58 33 c4 01       	call   141c4e7f0 <fmt::v8::basic_format_context<fmt::v8::appender, char>::out()>
+   14000b498:	48 89 45 e8          	mov    %rax,-0x18(%rbp)
+   14000b49c:	48 8b 85 70 02 00 00 	mov    0x270(%rbp),%rax
+   14000b4a3:	48 8b 95 78 02 00 00 	mov    0x278(%rbp),%rdx
+   14000b4aa:	48 89 45 f0          	mov    %rax,-0x10(%rbp)
+   14000b4ae:	48 89 55 f8          	mov    %rdx,-0x8(%rbp)
+fmt::v8::appender fmt::v8::format_to<fmt::v8::appender, double const&, 0>(fmt::v8::appender, fmt::v8::basic_format_string<char, fmt::v8::type_identity<double const&>::type>, double const&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:3008
+   14000b4b2:	48 8d 85 90 03 00 00 	lea    0x390(%rbp),%rax
+   14000b4b9:	48 8d 55 08          	lea    0x8(%rbp),%rdx
+   14000b4bd:	48 89 c1             	mov    %rax,%rcx
+   14000b4c0:	e8 8b aa c3 01       	call   141c45f50 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, std::remove_cv<std::remove_reference<double const&>::type>::type> fmt::v8::make_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char>, double const&>(double const&)>
+fmt::v8::basic_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char> >::basic_format_args(unsigned long long, fmt::v8::detail::value<fmt::v8::basic_format_context<fmt::v8::appender, char> > const*):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:1869
+   14000b4c5:	b8 0a 00 00 00       	mov    $0xa,%eax
+   14000b4ca:	48 8d 8d 90 03 00 00 	lea    0x390(%rbp),%rcx
+   14000b4d1:	48 89 ca             	mov    %rcx,%rdx
+fmt::v8::basic_format_string<char, double const&>::operator fmt::v8::basic_string_view<char>() const:
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:2946
+   14000b4d4:	48 8b 4d f0          	mov    -0x10(%rbp),%rcx
+   14000b4d8:	48 8b 5d f8          	mov    -0x8(%rbp),%rbx
+fmt::v8::appender fmt::v8::format_to<fmt::v8::appender, double const&, 0>(fmt::v8::appender, fmt::v8::basic_format_string<char, fmt::v8::type_identity<double const&>::type>, double const&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:3008
+   14000b4dc:	48 89 4d b0          	mov    %rcx,-0x50(%rbp)
+   14000b4e0:	48 89 5d b8          	mov    %rbx,-0x48(%rbp)
+   14000b4e4:	48 89 45 a0          	mov    %rax,-0x60(%rbp)
+   14000b4e8:	48 89 55 a8          	mov    %rdx,-0x58(%rbp)
+   14000b4ec:	48 8d 4d a0          	lea    -0x60(%rbp),%rcx
+   14000b4f0:	48 8d 55 b0          	lea    -0x50(%rbp),%rdx
+   14000b4f4:	48 8b 45 e8          	mov    -0x18(%rbp),%rax
+   14000b4f8:	49 89 c8             	mov    %rcx,%r8
+   14000b4fb:	48 89 c1             	mov    %rax,%rcx
+   14000b4fe:	e8 3d 6a c2 01       	call   141c31f40 <fmt::v8::appender fmt::v8::vformat_to<fmt::v8::appender, 0>(fmt::v8::appender, fmt::v8::basic_string_view<char>, fmt::v8::basic_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char> >)>
+   14000b503:	48 89 c1             	mov    %rax,%rcx
+   14000b506:	48 89 cb             	mov    %rcx,%rbx
+   14000b509:	90                   	nop
+format<fmt::v8::basic_format_context<fmt::v8::appender, char> >():
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:315
+   14000b50a:	e9 8d 03 00 00       	jmp    14000b89c <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0xd1e>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:317
+   14000b50f:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   14000b516:	c6 40 08 45          	movb   $0x45,0x8(%rax)
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:318
+   14000b51a:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   14000b521:	8b 40 04             	mov    0x4(%rax),%eax
+   14000b524:	8d 50 02             	lea    0x2(%rax),%edx
+   14000b527:	48 8b 85 60 04 00 00 	mov    0x460(%rbp),%rax
+   14000b52e:	89 50 04             	mov    %edx,0x4(%rax)
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:321
+   14000b531:	48 8d 85 b0 02 00 00 	lea    0x2b0(%rbp),%rax
+   14000b538:	48 8b 95 60 04 00 00 	mov    0x460(%rbp),%rdx
+   14000b53f:	48 89 c1             	mov    %rax,%rcx
+   14000b542:	e8 2b 94 ff ff       	call   140004972 <fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::spec_builder()>
+   14000b547:	48 8d 85 c0 02 00 00 	lea    0x2c0(%rbp),%rax
+   14000b54e:	48 8d 95 b0 02 00 00 	lea    0x2b0(%rbp),%rdx
+   14000b555:	48 89 c1             	mov    %rax,%rcx
+   14000b558:	e8 73 78 c6 01       	call   141c72dd0 <fmt::v8::basic_runtime<fmt::v8::detail::char_t_impl<std::basic_string_view<char, std::char_traits<char> >, void>::type> fmt::v8::runtime<std::basic_string_view<char, std::char_traits<char> > >(std::basic_string_view<char, std::char_traits<char> > const&)>
+   14000b55d:	48 8b 85 c0 02 00 00 	mov    0x2c0(%rbp),%rax
+   14000b564:	48 8b 95 c8 02 00 00 	mov    0x2c8(%rbp),%rdx
+   14000b56b:	48 89 45 b0          	mov    %rax,-0x50(%rbp)
+   14000b56f:	48 89 55 b8          	mov    %rdx,-0x48(%rbp)
+   14000b573:	48 8d 55 b0          	lea    -0x50(%rbp),%rdx
+   14000b577:	48 8d 85 a0 02 00 00 	lea    0x2a0(%rbp),%rax
+   14000b57e:	48 89 c1             	mov    %rax,%rcx
+   14000b581:	e8 5a 21 c4 01       	call   141c4d6e0 <fmt::v8::basic_format_string<char, double&>::basic_format_string(fmt::v8::basic_runtime<char>)>
+   14000b586:	48 8b 85 a0 02 00 00 	mov    0x2a0(%rbp),%rax
+   14000b58d:	48 8b 95 a8 02 00 00 	mov    0x2a8(%rbp),%rdx
+   14000b594:	48 89 45 10          	mov    %rax,0x10(%rbp)
+   14000b598:	48 89 55 18          	mov    %rdx,0x18(%rbp)
+   14000b59c:	4c 8d 65 c0          	lea    -0x40(%rbp),%r12
+std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > fmt::v8::format<double&>(fmt::v8::basic_format_string<char, fmt::v8::type_identity<double&>::type>, double&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:2979
+   14000b5a0:	48 8d 85 a0 03 00 00 	lea    0x3a0(%rbp),%rax
+   14000b5a7:	48 8d 95 30 01 00 00 	lea    0x130(%rbp),%rdx
+   14000b5ae:	48 89 c1             	mov    %rax,%rcx
+   14000b5b1:	e8 fa fc c3 01       	call   141c4b2b0 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, std::remove_cv<std::remove_reference<double&>::type>::type> fmt::v8::make_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char>, double&>(double&)>
+fmt::v8::basic_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char> >::basic_format_args(unsigned long long, fmt::v8::detail::value<fmt::v8::basic_format_context<fmt::v8::appender, char> > const*):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:1869
+   14000b5b6:	b8 0a 00 00 00       	mov    $0xa,%eax
+   14000b5bb:	48 8d 8d a0 03 00 00 	lea    0x3a0(%rbp),%rcx
+   14000b5c2:	48 89 ca             	mov    %rcx,%rdx
+fmt::v8::basic_format_string<char, double&>::operator fmt::v8::basic_string_view<char>() const:
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:2946
+   14000b5c5:	48 8b 4d 10          	mov    0x10(%rbp),%rcx
+   14000b5c9:	48 8b 5d 18          	mov    0x18(%rbp),%rbx
+std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > fmt::v8::format<double&>(fmt::v8::basic_format_string<char, fmt::v8::type_identity<double&>::type>, double&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:2979
+   14000b5cd:	48 89 4d b0          	mov    %rcx,-0x50(%rbp)
+   14000b5d1:	48 89 5d b8          	mov    %rbx,-0x48(%rbp)
+   14000b5d5:	48 89 45 a0          	mov    %rax,-0x60(%rbp)
+   14000b5d9:	48 89 55 a8          	mov    %rdx,-0x58(%rbp)
+   14000b5dd:	48 8d 55 a0          	lea    -0x60(%rbp),%rdx
+   14000b5e1:	48 8d 45 b0          	lea    -0x50(%rbp),%rax
+   14000b5e5:	49 89 d0             	mov    %rdx,%r8
+   14000b5e8:	48 89 c2             	mov    %rax,%rdx
+   14000b5eb:	4c 89 e1             	mov    %r12,%rcx
+   14000b5ee:	e8 5d 47 a7 01       	call   141a7fd50 <fmt::v8::vformat[abi:cxx11](fmt::v8::basic_string_view<char>, fmt::v8::basic_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char> >)>
+format<fmt::v8::basic_format_context<fmt::v8::appender, char> >():
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:322
+   14000b5f3:	48 8d 45 c0          	lea    -0x40(%rbp),%rax
+   14000b5f7:	48 89 c1             	mov    %rax,%rcx
+   14000b5fa:	e8 f3 92 ff ff       	call   1400048f2 <fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::zero_pad_exponent(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&)>
+   14000b5ff:	48 89 c2             	mov    %rax,%rdx
+   14000b602:	48 8d 45 c0          	lea    -0x40(%rbp),%rax
+   14000b606:	48 89 c1             	mov    %rax,%rcx
+   14000b609:	e8 22 2b 1e 02       	call   1421ee130 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator=(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:325
+   14000b60e:	c6 85 df 02 00 00 45 	movb   $0x45,0x2df(%rbp)
+decltype (({parm#1}.end)()) std::end<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/include/c++/13.2.0/bits/range_access.h:75
+   14000b615:	48 8d 45 c0          	lea    -0x40(%rbp),%rax
+   14000b619:	48 89 c1             	mov    %rax,%rcx
+   14000b61c:	e8 9f 03 1e 02       	call   1421eb9c0 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::end()>
+   14000b621:	90                   	nop
+   14000b622:	48 89 c3             	mov    %rax,%rbx
+decltype (({parm#1}.begin)()) std::begin<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/include/c++/13.2.0/bits/range_access.h:53
+   14000b625:	48 8d 45 c0          	lea    -0x40(%rbp),%rax
+   14000b629:	48 89 c1             	mov    %rax,%rcx
+   14000b62c:	e8 5f 08 1e 02       	call   1421ebe90 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::begin()>
+   14000b631:	90                   	nop
+   14000b632:	48 89 c1             	mov    %rax,%rcx
+format<fmt::v8::basic_format_context<fmt::v8::appender, char> >():
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:325
+   14000b635:	48 8d 85 df 02 00 00 	lea    0x2df(%rbp),%rax
+   14000b63c:	49 89 c0             	mov    %rax,%r8
+   14000b63f:	48 89 da             	mov    %rbx,%rdx
+   14000b642:	e8 99 77 35 02       	call   142362de0 <__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > std::find<__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, char>(__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, __gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, char const&)>
+   14000b647:	48 89 45 40          	mov    %rax,0x40(%rbp)
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:326
+   14000b64b:	48 8d 45 c0          	lea    -0x40(%rbp),%rax
+   14000b64f:	48 89 c1             	mov    %rax,%rcx
+   14000b652:	e8 69 03 1e 02       	call   1421eb9c0 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::end()>
+   14000b657:	48 89 85 e0 02 00 00 	mov    %rax,0x2e0(%rbp)
+   14000b65e:	48 8d 95 e0 02 00 00 	lea    0x2e0(%rbp),%rdx
+   14000b665:	48 8d 45 40          	lea    0x40(%rbp),%rax
+   14000b669:	48 89 c1             	mov    %rax,%rcx
+   14000b66c:	e8 6f 56 ed 01       	call   141ee0ce0 <bool __gnu_cxx::operator==<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >(__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, __gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&)>
+   14000b671:	83 f0 01             	xor    $0x1,%eax
+   14000b674:	84 c0                	test   %al,%al
+   14000b676:	0f 84 a6 00 00 00    	je     14000b722 <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0xba4>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:327
+   14000b67c:	48 8d 55 40          	lea    0x40(%rbp),%rdx
+   14000b680:	48 8d 85 e8 02 00 00 	lea    0x2e8(%rbp),%rax
+   14000b687:	48 89 c1             	mov    %rax,%rcx
+   14000b68a:	e8 e1 3a ec 01       	call   141ecf170 <__gnu_cxx::__normal_iterator<char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::__normal_iterator<char*, void>(__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&)>
+   14000b68f:	48 8b 45 40          	mov    0x40(%rbp),%rax
+   14000b693:	48 89 45 20          	mov    %rax,0x20(%rbp)
+   14000b697:	48 c7 85 f0 03 00 00 	movq   $0x2,0x3f0(%rbp)
+   14000b69e:	02 00 00 00 
+__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > std::prev<__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >(__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::iterator_traits<__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::difference_type):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/include/c++/13.2.0/bits/stl_iterator_base_funcs.h:250
+   14000b6a2:	48 8b 85 f0 03 00 00 	mov    0x3f0(%rbp),%rax
+   14000b6a9:	48 f7 d8             	neg    %rax
+   14000b6ac:	48 89 85 e8 03 00 00 	mov    %rax,0x3e8(%rbp)
+void std::advance<__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, long long>(__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >&, long long):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/include/c++/13.2.0/bits/stl_iterator_base_funcs.h:223
+   14000b6b3:	48 8b 85 e8 03 00 00 	mov    0x3e8(%rbp),%rax
+   14000b6ba:	48 89 85 e0 03 00 00 	mov    %rax,0x3e0(%rbp)
+   14000b6c1:	48 8d 45 20          	lea    0x20(%rbp),%rax
+   14000b6c5:	48 89 85 d8 03 00 00 	mov    %rax,0x3d8(%rbp)
+std::iterator_traits<__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::iterator_category std::__iterator_category<__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >(__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/include/c++/13.2.0/bits/stl_iterator_base_types.h:240
+   14000b6cc:	90                   	nop
+void std::advance<__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, long long>(__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >&, long long):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/include/c++/13.2.0/bits/stl_iterator_base_funcs.h:224
+   14000b6cd:	48 8b 95 e0 03 00 00 	mov    0x3e0(%rbp),%rdx
+   14000b6d4:	48 8d 45 20          	lea    0x20(%rbp),%rax
+   14000b6d8:	45 89 f0             	mov    %r14d,%r8d
+   14000b6db:	48 89 c1             	mov    %rax,%rcx
+   14000b6de:	e8 8d f5 37 02       	call   14238ac70 <void std::__advance<__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, long long>(__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >&, long long, std::random_access_iterator_tag)>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/include/c++/13.2.0/bits/stl_iterator_base_funcs.h:225
+   14000b6e3:	90                   	nop
+__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > std::prev<__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >(__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::iterator_traits<__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::difference_type):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/include/c++/13.2.0/bits/stl_iterator_base_funcs.h:251
+   14000b6e4:	48 8b 45 20          	mov    0x20(%rbp),%rax
+format<fmt::v8::basic_format_context<fmt::v8::appender, char> >():
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:327
+   14000b6e8:	48 89 85 f8 02 00 00 	mov    %rax,0x2f8(%rbp)
+   14000b6ef:	48 8d 95 f8 02 00 00 	lea    0x2f8(%rbp),%rdx
+   14000b6f6:	48 8d 85 f0 02 00 00 	lea    0x2f0(%rbp),%rax
+   14000b6fd:	48 89 c1             	mov    %rax,%rcx
+   14000b700:	e8 6b 3a ec 01       	call   141ecf170 <__gnu_cxx::__normal_iterator<char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::__normal_iterator<char*, void>(__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&)>
+   14000b705:	48 8b 8d e8 02 00 00 	mov    0x2e8(%rbp),%rcx
+   14000b70c:	48 8b 95 f0 02 00 00 	mov    0x2f0(%rbp),%rdx
+   14000b713:	48 8d 45 c0          	lea    -0x40(%rbp),%rax
+   14000b717:	49 89 c8             	mov    %rcx,%r8
+   14000b71a:	48 89 c1             	mov    %rax,%rcx
+   14000b71d:	e8 de 07 1e 02       	call   1421ebf00 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::erase(__gnu_cxx::__normal_iterator<char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, __gnu_cxx::__normal_iterator<char const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >)>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:330
+   14000b722:	48 8d 35 d1 0d 3e 02 	lea    0x23e0dd1(%rip),%rsi        # 1423ec4fa <EnergyPlus::OutputProcessor::groupNamesUC+0x311a>
+   14000b729:	bf 02 00 00 00       	mov    $0x2,%edi
+   14000b72e:	48 8b 85 70 04 00 00 	mov    0x470(%rbp),%rax
+   14000b735:	48 89 c1             	mov    %rax,%rcx
+   14000b738:	e8 b3 30 c4 01       	call   141c4e7f0 <fmt::v8::basic_format_context<fmt::v8::appender, char>::out()>
+   14000b73d:	48 89 45 28          	mov    %rax,0x28(%rbp)
+   14000b741:	48 89 75 30          	mov    %rsi,0x30(%rbp)
+   14000b745:	48 89 7d 38          	mov    %rdi,0x38(%rbp)
+fmt::v8::appender fmt::v8::format_to<fmt::v8::appender, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, 0>(fmt::v8::appender, fmt::v8::basic_format_string<char, fmt::v8::type_identity<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&>::type>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:3008
+   14000b749:	48 8d 85 b0 03 00 00 	lea    0x3b0(%rbp),%rax
+   14000b750:	48 8d 55 c0          	lea    -0x40(%rbp),%rdx
+   14000b754:	48 89 c1             	mov    %rax,%rcx
+   14000b757:	e8 84 e9 c3 01       	call   141c4a0e0 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, std::remove_cv<std::remove_reference<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&>::type>::type> fmt::v8::make_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&>(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&)>
+fmt::v8::basic_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char> >::basic_format_args(unsigned long long, fmt::v8::detail::value<fmt::v8::basic_format_context<fmt::v8::appender, char> > const*):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:1869
+   14000b75c:	b9 0d 00 00 00       	mov    $0xd,%ecx
+   14000b761:	48 8d 85 b0 03 00 00 	lea    0x3b0(%rbp),%rax
+   14000b768:	48 89 c3             	mov    %rax,%rbx
+fmt::v8::basic_format_string<char, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&>::operator fmt::v8::basic_string_view<char>() const:
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:2946
+   14000b76b:	48 8b 45 30          	mov    0x30(%rbp),%rax
+   14000b76f:	48 8b 55 38          	mov    0x38(%rbp),%rdx
+fmt::v8::appender fmt::v8::format_to<fmt::v8::appender, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, 0>(fmt::v8::appender, fmt::v8::basic_format_string<char, fmt::v8::type_identity<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&>::type>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:3008
+   14000b773:	48 89 45 b0          	mov    %rax,-0x50(%rbp)
+   14000b777:	48 89 55 b8          	mov    %rdx,-0x48(%rbp)
+   14000b77b:	48 89 4d a0          	mov    %rcx,-0x60(%rbp)
+   14000b77f:	48 89 5d a8          	mov    %rbx,-0x58(%rbp)
+   14000b783:	48 8d 4d a0          	lea    -0x60(%rbp),%rcx
+   14000b787:	48 8d 55 b0          	lea    -0x50(%rbp),%rdx
+   14000b78b:	48 8b 45 28          	mov    0x28(%rbp),%rax
+   14000b78f:	49 89 c8             	mov    %rcx,%r8
+   14000b792:	48 89 c1             	mov    %rax,%rcx
+   14000b795:	e8 a6 67 c2 01       	call   141c31f40 <fmt::v8::appender fmt::v8::vformat_to<fmt::v8::appender, 0>(fmt::v8::appender, fmt::v8::basic_string_view<char>, fmt::v8::basic_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char> >)>
+   14000b79a:	48 89 c3             	mov    %rax,%rbx
+   14000b79d:	90                   	nop
+format<fmt::v8::basic_format_context<fmt::v8::appender, char> >():
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:330
+   14000b79e:	90                   	nop
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:331
+   14000b79f:	48 8d 45 c0          	lea    -0x40(%rbp),%rax
+   14000b7a3:	48 89 c1             	mov    %rax,%rcx
+   14000b7a6:	e8 d5 26 1e 02       	call   1421ede80 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string()>
+   14000b7ab:	e9 ec 00 00 00       	jmp    14000b89c <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0xd1e>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:332
+   14000b7b0:	48 8d 85 10 03 00 00 	lea    0x310(%rbp),%rax
+   14000b7b7:	48 8b 95 60 04 00 00 	mov    0x460(%rbp),%rdx
+   14000b7be:	48 89 c1             	mov    %rax,%rcx
+   14000b7c1:	e8 ac 91 ff ff       	call   140004972 <fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::spec_builder()>
+   14000b7c6:	48 8d 85 20 03 00 00 	lea    0x320(%rbp),%rax
+   14000b7cd:	48 8d 95 10 03 00 00 	lea    0x310(%rbp),%rdx
+   14000b7d4:	48 89 c1             	mov    %rax,%rcx
+   14000b7d7:	e8 f4 75 c6 01       	call   141c72dd0 <fmt::v8::basic_runtime<fmt::v8::detail::char_t_impl<std::basic_string_view<char, std::char_traits<char> >, void>::type> fmt::v8::runtime<std::basic_string_view<char, std::char_traits<char> > >(std::basic_string_view<char, std::char_traits<char> > const&)>
+   14000b7dc:	48 8b 85 20 03 00 00 	mov    0x320(%rbp),%rax
+   14000b7e3:	48 8b 95 28 03 00 00 	mov    0x328(%rbp),%rdx
+   14000b7ea:	48 89 45 b0          	mov    %rax,-0x50(%rbp)
+   14000b7ee:	48 89 55 b8          	mov    %rdx,-0x48(%rbp)
+   14000b7f2:	48 8d 55 b0          	lea    -0x50(%rbp),%rdx
+   14000b7f6:	48 8d 85 00 03 00 00 	lea    0x300(%rbp),%rax
+   14000b7fd:	48 89 c1             	mov    %rax,%rcx
+   14000b800:	e8 db 1e c4 01       	call   141c4d6e0 <fmt::v8::basic_format_string<char, double&>::basic_format_string(fmt::v8::basic_runtime<char>)>
+   14000b805:	48 8b 85 70 04 00 00 	mov    0x470(%rbp),%rax
+   14000b80c:	48 89 c1             	mov    %rax,%rcx
+   14000b80f:	e8 dc 2f c4 01       	call   141c4e7f0 <fmt::v8::basic_format_context<fmt::v8::appender, char>::out()>
+   14000b814:	48 89 85 08 01 00 00 	mov    %rax,0x108(%rbp)
+   14000b81b:	48 8b 85 00 03 00 00 	mov    0x300(%rbp),%rax
+   14000b822:	48 8b 95 08 03 00 00 	mov    0x308(%rbp),%rdx
+   14000b829:	48 89 85 10 01 00 00 	mov    %rax,0x110(%rbp)
+   14000b830:	48 89 95 18 01 00 00 	mov    %rdx,0x118(%rbp)
+fmt::v8::appender fmt::v8::format_to<fmt::v8::appender, double&, 0>(fmt::v8::appender, fmt::v8::basic_format_string<char, fmt::v8::type_identity<double&>::type>, double&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:3008
+   14000b837:	48 8d 85 c0 03 00 00 	lea    0x3c0(%rbp),%rax
+   14000b83e:	48 8d 95 30 01 00 00 	lea    0x130(%rbp),%rdx
+   14000b845:	48 89 c1             	mov    %rax,%rcx
+   14000b848:	e8 63 fa c3 01       	call   141c4b2b0 <fmt::v8::format_arg_store<fmt::v8::basic_format_context<fmt::v8::appender, char>, std::remove_cv<std::remove_reference<double&>::type>::type> fmt::v8::make_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char>, double&>(double&)>
+fmt::v8::basic_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char> >::basic_format_args(unsigned long long, fmt::v8::detail::value<fmt::v8::basic_format_context<fmt::v8::appender, char> > const*):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:1869
+   14000b84d:	b8 0a 00 00 00       	mov    $0xa,%eax
+   14000b852:	48 8d 8d c0 03 00 00 	lea    0x3c0(%rbp),%rcx
+   14000b859:	48 89 ca             	mov    %rcx,%rdx
+fmt::v8::basic_format_string<char, double&>::operator fmt::v8::basic_string_view<char>() const:
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:2946
+   14000b85c:	48 8b 8d 10 01 00 00 	mov    0x110(%rbp),%rcx
+   14000b863:	48 8b 9d 18 01 00 00 	mov    0x118(%rbp),%rbx
+fmt::v8::appender fmt::v8::format_to<fmt::v8::appender, double&, 0>(fmt::v8::appender, fmt::v8::basic_format_string<char, fmt::v8::type_identity<double&>::type>, double&):
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/third_party/fmt-8.0.1/include/fmt/core.h:3008
+   14000b86a:	48 89 4d b0          	mov    %rcx,-0x50(%rbp)
+   14000b86e:	48 89 5d b8          	mov    %rbx,-0x48(%rbp)
+   14000b872:	48 89 45 a0          	mov    %rax,-0x60(%rbp)
+   14000b876:	48 89 55 a8          	mov    %rdx,-0x58(%rbp)
+   14000b87a:	48 8d 4d a0          	lea    -0x60(%rbp),%rcx
+   14000b87e:	48 8d 55 b0          	lea    -0x50(%rbp),%rdx
+   14000b882:	48 8b 85 08 01 00 00 	mov    0x108(%rbp),%rax
+   14000b889:	49 89 c8             	mov    %rcx,%r8
+   14000b88c:	48 89 c1             	mov    %rax,%rcx
+   14000b88f:	e8 ac 66 c2 01       	call   141c31f40 <fmt::v8::appender fmt::v8::vformat_to<fmt::v8::appender, 0>(fmt::v8::appender, fmt::v8::basic_string_view<char>, fmt::v8::basic_format_args<fmt::v8::basic_format_context<fmt::v8::appender, char> >)>
+   14000b894:	48 89 c1             	mov    %rax,%rcx
+   14000b897:	48 89 cb             	mov    %rcx,%rbx
+   14000b89a:	90                   	nop
+format<fmt::v8::basic_format_context<fmt::v8::appender, char> >():
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:332
+   14000b89b:	90                   	nop
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:333
+   14000b89c:	48 89 d8             	mov    %rbx,%rax
+   14000b89f:	eb 34                	jmp    14000b8d5 <auto fmt::v8::formatter<(anonymous namespace)::DoubleWrapper, char, void>::format<fmt::v8::basic_format_context<fmt::v8::appender, char> >((anonymous namespace)::DoubleWrapper const&, fmt::v8::basic_format_context<fmt::v8::appender, char>&)+0xd57>
+   14000b8a1:	48 89 c3             	mov    %rax,%rbx
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:306
+   14000b8a4:	48 8d 45 c0          	lea    -0x40(%rbp),%rax
+   14000b8a8:	48 89 c1             	mov    %rax,%rcx
+   14000b8ab:	e8 d0 25 1e 02       	call   1421ede80 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string()>
+   14000b8b0:	48 89 d8             	mov    %rbx,%rax
+   14000b8b3:	48 89 c1             	mov    %rax,%rcx
+   14000b8b6:	e8 ed 27 a9 01       	call   141a9e0a8 <_Unwind_Resume>
+   14000b8bb:	48 89 c3             	mov    %rax,%rbx
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:331
+   14000b8be:	48 8d 45 c0          	lea    -0x40(%rbp),%rax
+   14000b8c2:	48 89 c1             	mov    %rax,%rcx
+   14000b8c5:	e8 b6 25 1e 02       	call   1421ede80 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string()>
+   14000b8ca:	48 89 d8             	mov    %rbx,%rax
+   14000b8cd:	48 89 c1             	mov    %rax,%rcx
+   14000b8d0:	e8 d3 27 a9 01       	call   141a9e0a8 <_Unwind_Resume>
+C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh:333
+   14000b8d5:	48 81 c4 a0 04 00 00 	add    $0x4a0,%rsp
+   14000b8dc:	5b                   	pop    %rbx
+   14000b8dd:	5e                   	pop    %rsi
+   14000b8de:	5f                   	pop    %rdi
+   14000b8df:	41 5c                	pop    %r12
+   14000b8e1:	41 5d                	pop    %r13
+   14000b8e3:	41 5e                	pop    %r14
+   14000b8e5:	5d                   	pop    %rbp
+   14000b8e6:	c3                   	ret

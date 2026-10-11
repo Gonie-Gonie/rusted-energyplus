@@ -14963,6 +14963,11 @@
         "path": "energyplus_porting_plan/evidence/SYS-03-warmup-owner/summary.json",
         "sha256": "3922d1a4dae0c8f190903bc6c8e3d2833ef2fb36a8c20158fdbbeb396c509e71",
         "size_bytes": 74997
+      },
+      "actual_selected_R_format_comparison": {
+        "path": "energyplus_porting_plan/evidence/SYS-03-round-format/summary.json",
+        "sha256": "0bb2ff7ffaace772c680b90cf3b4a0aed57eb185e941048783e42c83dcae09ab",
+        "size_bytes": 173446
       }
     },
     {

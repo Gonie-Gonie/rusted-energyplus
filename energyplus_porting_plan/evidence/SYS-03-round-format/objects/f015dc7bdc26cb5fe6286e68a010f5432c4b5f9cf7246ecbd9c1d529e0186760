@@ -1,0 +1,66 @@
+{
+  "schema": "source-round-format-failed-loader-review.v1",
+  "actual_execution": {
+    "path": ".runtime/porting/SYS-03/round-format-observation-01/Native-command/receipt.json",
+    "sha256": "3106e90f6ad36782a3aca0ff95ec1607ecf10453986c646d8e938e287516b53f",
+    "size_bytes": 3546
+  },
+  "actual_before": {
+    "path": ".runtime/porting/SYS-03/round-format-observation-01/Native-execution.before.json",
+    "sha256": "a8cc1c468d3ff6b8b5cd1c4eddec1554a1b19ac526f0de1968c1ff4feb89abc4",
+    "size_bytes": 499
+  },
+  "actual_post_review_input": {
+    "path": ".runtime/porting/SYS-03/round-format-observation-01/Native-input.json",
+    "sha256": "0aea2faeb87c38a88323804614efad87f4693b39c91dd500846fc5f0fa0b7600",
+    "size_bytes": 12394
+  },
+  "actual_post_review_binary": {
+    "path": "D:\\CodexBuild\\rusted-energyplus\\SYS-03\\round-format-native-build-01\\bin\\source_round_format_unit_helper.exe",
+    "sha256": "e8d59c8ae4f152b5230e662ee2474451e68ba5e0126c0dc909d3e8095f1be969",
+    "size_bytes": 1244728855
+  },
+  "actual_exit_code": 3221225781,
+  "reason": "Windows STATUS_DLL_NOT_FOUND; inherited PATH omitted pinned Winlibs runtime DLL directory; formatter did not run",
+  "actual_PE_import_DLL_names": [
+    "libgcc_s_seh-1.dll",
+    "libstdc++-6.dll",
+    "GDI32.dll",
+    "KERNEL32.dll",
+    "api-ms-win-crt-convert-l1-1-0.dll",
+    "api-ms-win-crt-environment-l1-1-0.dll",
+    "api-ms-win-crt-filesystem-l1-1-0.dll",
+    "api-ms-win-crt-heap-l1-1-0.dll",
+    "api-ms-win-crt-locale-l1-1-0.dll",
+    "api-ms-win-crt-math-l1-1-0.dll",
+    "api-ms-win-crt-private-l1-1-0.dll",
+    "api-ms-win-crt-runtime-l1-1-0.dll",
+    "api-ms-win-crt-stdio-l1-1-0.dll",
+    "api-ms-win-crt-string-l1-1-0.dll",
+    "api-ms-win-crt-time-l1-1-0.dll",
+    "api-ms-win-crt-utility-l1-1-0.dll",
+    "libwinpthread-1.dll",
+    "SHELL32.dll",
+    "USER32.dll",
+    "WSOCK32.dll"
+  ],
+  "required_pinned_runtime_DLLs": [
+    {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/libgcc_s_seh-1.dll",
+      "sha256": "403b4169b307d0bfb27a9cbcccbca491efe634eb0462fc1f3fc5ace373bd2827",
+      "size_bytes": 740183
+    },
+    {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/libstdc++-6.dll",
+      "sha256": "748b10c9f25828fbc78e8eaf50355e7f178d0ed0438d2c396565b56c5bd4ac0a",
+      "size_bytes": 2304720
+    },
+    {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/libwinpthread-1.dll",
+      "sha256": "a086938c9612746fda0ab8640b8d21e8d36bc3e53c1e8e70f9896888b41607dd",
+      "size_bytes": 94355
+    }
+  ],
+  "numerical_result_available": false,
+  "historical_within_command_after_guard_claimed": false
+}
