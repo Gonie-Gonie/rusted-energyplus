@@ -1,0 +1,37 @@
+--- before/run-ordinary-init-smoke-03.py
++++ run-ordinary-init-smoke-03.py
+@@ -4,7 +4,7 @@
+ from pathlib import Path
+ ROOT=Path.cwd();BASE=ROOT/'.runtime/porting/CTF-10'
+ PARENT_SHA='7776c20153b64ec93b89b33e095b104ed003b9c0cf54cf657271095334f89a79'
+-CORRECTION_SHAS={'.runtime/porting/CTF-10/ordinary-initialization-correction-02/record.json': 'dec40058cf955ff94caaaa676afe1cee084ad49053ef014cb20630bdd332b9d1', '.runtime/porting/CTF-10/ordinary-initialization-correction-03/record.json': '7e821dab38b3e50566750afca08eda1643c906f3e38f887eb2c2e7f480a4958d'}
++CORRECTION_SHAS={'.runtime/porting/CTF-10/ordinary-initialization-correction-02/record.json': 'dec40058cf955ff94caaaa676afe1cee084ad49053ef014cb20630bdd332b9d1', '.runtime/porting/CTF-10/ordinary-initialization-correction-03/record.json': '7e821dab38b3e50566750afca08eda1643c906f3e38f887eb2c2e7f480a4958d', '.runtime/porting/CTF-10/ordinary-initialization-correction-06/record.json': 'b9e8b631ed8f952b53b05eb5c0eb854bee6fe35f6a1e0279ebe1f4a70ccb6d0a'}
+ CORRECTED_PART03_SHA='fff25a816be772d0d4d4dc2d782e2a45f800bcd9c61dfa92b7fe9364fbca8536'
+ def read(p):return json.loads(p.read_bytes())
+ def sha(p):
+@@ -13,7 +13,7 @@
+ def arg(p):return ref(p)['path']+'#'+sha(p)
+ def write(p,v):p.write_bytes((json.dumps(v,indent=2,allow_nan=False)+'\n').encode('utf8'))
+ assert len(sys.argv)==7
+-final=(ROOT/sys.argv[1]).resolve();assert final==BASE/'ordinary-initialization-applied-02/record.json' and sha(final)==sys.argv[2]
++final=(ROOT/sys.argv[1]).resolve();assert final==BASE/'ordinary-initialization-applied-03/record.json' and sha(final)==sys.argv[2]
+ v=read(final);assert v['schema']=='ctf10-ordinary-initialization-actual-application.v1' and v['Root_and_Header_cumulative_Source_review_accepted']is True and v['ordinary_A_and_B_dispatch_connected']is True
+ preparation=BASE/'ordinary-init-plumbing-prep-02/manifest.json';assert sha(preparation)=='8304bd40b65e0f176bdb2e1a9a92e75567d8569fb4e9d264d1316a599b1c8f1a'
+ assert v['actual_source_preparation']['path']==preparation.relative_to(ROOT).as_posix() and v['actual_source_preparation']['sha256']==sha(preparation)
+@@ -23,13 +23,14 @@
+ parent_rows=read(parent_application)['actual_sources'];assert len(parent_rows)==18
+ expected={row['canonical_path']for row in read(preparation)['own_sources']}|{'crates/ep_model/src/model.rs','crates/ep_run/examples/ctf10_report_format_unit_observer.rs','crates/ep_runtime/src/runtime/tests/part03.rs'}
+ assert len(paths)==19 and len(paths)==len(set(paths)) and set(paths)==expected
+-corrections={row['path']:row for row in v['correction_records']};assert len(corrections)==len(v['correction_records'])==2 and set(corrections)==set(CORRECTION_SHAS)
++corrections={row['path']:row for row in v['correction_records']};assert len(corrections)==len(v['correction_records'])==3 and set(corrections)==set(CORRECTION_SHAS)
+ for name,digest in CORRECTION_SHAS.items():assert corrections[name]['sha256']==sha(ROOT/name)==digest
+ previous={row['canonical_path']:row for row in parent_rows};current={row['canonical_path']:row for row in final_rows}
+ for name,row in previous.items():
+- if name!='crates/ep_run/src/ctf_initialization_outputs.rs':assert current[name]['actual_final_source']['sha256']==row['actual_final_source']['sha256']
++ if name not in {'crates/ep_run/src/ctf_initialization_outputs.rs','crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs'}:assert current[name]['actual_final_source']['sha256']==row['actual_final_source']['sha256']
+ assert current['crates/ep_run/src/ctf_initialization_outputs.rs']['actual_final_source']['sha256']==read(BASE/'ordinary-initialization-correction-03/record.json')['after_sha256']
+ assert current['crates/ep_runtime/src/runtime/tests/part03.rs']['actual_final_source']['sha256']==CORRECTED_PART03_SHA
++assert current['crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs']['actual_final_source']['sha256']=='94d8a5bf1d5440ab505d6a2f3373b76f3f564da28deb29beb716b2967156e3c1'
+ def final_sources_unchanged():
+  assert sha(parent_application)==PARENT_SHA
+  for name,digest in CORRECTION_SHAS.items():assert sha(ROOT/name)==digest

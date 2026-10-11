@@ -21,7 +21,9 @@ use fixtures::*;
 #[path = "arbitrary_run/output_manifest.rs"]
 mod output_manifest;
 
-use output_manifest::{SUPPORTED_RUNTIME_MANIFEST, assert_output_manifest};
+use output_manifest::{
+    DIAGNOSTIC_RUNTIME_MANIFEST, SUPPORTED_RUNTIME_MANIFEST, assert_output_manifest,
+};
 
 #[path = "arbitrary_run_ideal_loads/cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_assertions.rs"]
 mod cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_assertions;
@@ -1060,7 +1062,7 @@ fn ideal_loads_fixture_demand_runs_only_as_explicit_diagnostic_with_provenance()
     );
     cp353_assertions::assert_non_direct(rust_runtime);
     assert_eq!(summary["source_order_gate"]["matches"], true);
-    assert_output_manifest(&output_dir, SUPPORTED_RUNTIME_MANIFEST)?;
+    assert_output_manifest(&output_dir, DIAGNOSTIC_RUNTIME_MANIFEST)?;
     assert!(
         summary["rust_runtime"]["source_order_stages"]
             .as_array()

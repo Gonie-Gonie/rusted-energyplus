@@ -1,0 +1,179 @@
+//! Actual selected CTF diagnostic calls into the caller-owned Source backend.
+
+use super::error_backend::{SourceErrorBackend, SourceErrorBackendFailure, SourceFatalStop};
+use super::surface_manager::ctf_caller_stability::{CtfCallerDiagnostic, CtfCallerDiagnosticLevel};
+use super::surface_manager::ctf_layer_preprocessing::CtfLayerDiagnostic;
+use std::fmt::{Display, Formatter};
+
+/// A missing actual original name or unrepresentable formatter result is a scope stop.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum CtfSourceDiagnosticUnavailable {
+    /// Actual one-based original layer name was not supplied at its reached callpoint.
+    OriginalLayerName(usize),
+    /// The formatter did not yield a representable exponent; no replacement text.
+    ExponentFormat,
+    /// Source log10-to-int conversion is outside its defined domain.
+    UndefinedLog10Conversion,
+}
+
+/// An actual backend/fatal stop remains distinct from a Source-domain gap.
+#[derive(Debug)]
+pub enum CtfSourceDiagnosticStop {
+    /// Missing actual diagnostic operand, never a fabricated Source fatal.
+    Unavailable(CtfSourceDiagnosticUnavailable),
+    /// Actual borrowed output/database operation failed.
+    Backend(SourceErrorBackendFailure),
+    /// Actual fatal effects stopped or completed with typed termination.
+    Fatal(SourceFatalStop),
+}
+impl Display for CtfSourceDiagnosticStop {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Unavailable(error) => write!(formatter, "CTF diagnostic unavailable: {error:?}"),
+            Self::Backend(error) => Display::fmt(error, formatter),
+            Self::Fatal(error) => Display::fmt(error, formatter),
+        }
+    }
+}
+impl std::error::Error for CtfSourceDiagnosticStop {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::Unavailable(_) => None,
+            Self::Backend(error) => Some(error),
+            Self::Fatal(error) => Some(error),
+        }
+    }
+}
+impl From<SourceErrorBackendFailure> for CtfSourceDiagnosticStop {
+    fn from(value: SourceErrorBackendFailure) -> Self {
+        Self::Backend(value)
+    }
+}
+impl From<CtfSourceDiagnosticUnavailable> for CtfSourceDiagnosticStop {
+    fn from(value: CtfSourceDiagnosticUnavailable) -> Self {
+        Self::Unavailable(value)
+    }
+}
+
+// IOFiles.hh249-259 nextafter toward lowest/max, retaining both zeros and endpoints.
+fn source_next_float(value: f64) -> f64 {
+    if value.is_nan() || value == 0.0 {
+        return value;
+    }
+    if value.is_sign_negative() {
+        if value == f64::MIN {
+            value
+        } else if value == f64::NEG_INFINITY {
+            f64::MIN
+        } else {
+            f64::from_bits(value.to_bits() + 1)
+        }
+    } else if value == f64::MAX {
+        value
+    } else if value == f64::INFINITY {
+        f64::MAX
+    } else {
+        f64::from_bits(value.to_bits() + 1)
+    }
+}
+
+// Literal selected .3R branch, including the source's asymmetric large-positive test.
+fn source_round_three(value: f64) -> Result<String, CtfSourceDiagnosticUnavailable> {
+    let fixed_threshold = f64::from_bits(0x3fb9999999999999); // Source 0.099999999999999995.
+    if (value >= fixed_threshold || value <= -fixed_threshold) || value == 0.0 || value == -0.0 {
+        if value > 100000.0 {
+            if !value.is_finite() {
+                return Err(CtfSourceDiagnosticUnavailable::UndefinedLog10Conversion);
+            }
+            let digits10 = value.log10() as i32;
+            if digits10 + 3 >= 17 {
+                return Ok(format!("{value:.0}."));
+            }
+            return Ok(format!("{value:.3}"));
+        }
+        if value == 0.0 || value == -0.0 {
+            return Ok(format!("{:.3}", 0.0));
+        }
+        let nudged = source_next_float(source_next_float(source_next_float(value)));
+        return Ok(format!("{nudged:.3}").to_uppercase());
+    }
+    let nudged = source_next_float(value);
+    let text = format!("{nudged:.3E}");
+    if !nudged.is_finite() {
+        return Ok(text.to_uppercase());
+    }
+    let (mantissa, exponent) = text
+        .split_once('E')
+        .ok_or(CtfSourceDiagnosticUnavailable::ExponentFormat)?;
+    let exponent: i32 = exponent
+        .parse()
+        .map_err(|_| CtfSourceDiagnosticUnavailable::ExponentFormat)?;
+    // fmt starts with two exponent digits; original zero_pad_exponent adds the third.
+    Ok(format!("{mantissa}E{exponent:+04}"))
+}
+
+fn layer_name<'a>(
+    names: &'a [&'a str],
+    ordinal: usize,
+) -> Result<&'a str, CtfSourceDiagnosticStop> {
+    ordinal
+        .checked_sub(1)
+        .and_then(|index| names.get(index))
+        .copied()
+        .ok_or_else(|| CtfSourceDiagnosticUnavailable::OriginalLayerName(ordinal).into())
+}
+
+/// Dispatch exactly one actually reached loading call; no issue-ledger replay.
+pub fn emit_ctf_loading_diagnostic(
+    backend: &mut SourceErrorBackend<'_>,
+    original_layer_names: &[&str],
+    call: CtfLayerDiagnostic,
+) -> Result<(), CtfSourceDiagnosticStop> {
+    match call {
+        CtfLayerDiagnostic::MaterialTooThick { .. } => backend.show_severe_error(
+            "InitConductionTransferFunctions: Material too thick for CTF calculation",
+        )?,
+        CtfLayerDiagnostic::MaterialName { layer_ordinal } => {
+            backend.show_continue_error(&format!(
+                "material name = {}",
+                layer_name(original_layer_names, layer_ordinal)?
+            ))?
+        }
+        CtfLayerDiagnostic::ResistanceBelowMinimum { layer_ordinal } => {
+            backend.show_severe_error(&format!(
+                "InitConductionTransferFunctions: Material={}R Value below lowest allowed value",
+                layer_name(original_layer_names, layer_ordinal)?
+            ))?
+        }
+        CtfLayerDiagnostic::ResistanceValues {
+            minimum,
+            resistance,
+            ..
+        } => backend.show_continue_error(&format!(
+            "Lowest allowed value=[{}], Material R Value=[{}].",
+            source_round_three(minimum)?,
+            source_round_three(resistance)?
+        ))?,
+    }
+    Ok(())
+}
+
+/// Dispatch one reached selected caller call before subsequent flags/stores.
+pub fn emit_ctf_caller_diagnostic(
+    backend: &mut SourceErrorBackend<'_>,
+    call: &CtfCallerDiagnostic,
+) -> Result<(), CtfSourceDiagnosticStop> {
+    match call.level {
+        CtfCallerDiagnosticLevel::Severe => backend.show_severe_error(&call.message)?,
+        CtfCallerDiagnosticLevel::Continue => backend.show_continue_error(&call.message)?,
+        CtfCallerDiagnosticLevel::Fatal => match backend.show_fatal_error(&call.message) {
+            Ok(never) => match never {},
+            Err(stop) => return Err(CtfSourceDiagnosticStop::Fatal(stop)),
+        },
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+#[path = "ctf_source_diagnostics_tests.rs"]
+mod tests;

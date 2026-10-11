@@ -1,0 +1,117 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "cargo",
+    "build",
+    "-p",
+    "ep_run",
+    "--example",
+    "ctf10_report_format_unit_observer",
+    "--message-format=json-render-diagnostics",
+    "--config",
+    "profile.dev.debug=0",
+    "--config",
+    "build.incremental=false"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-11T08:04:56.122776+00:00",
+  "finished_utc": "2026-10-11T08:05:10.690831+00:00",
+  "elapsed_seconds": 14.56793540000217,
+  "repository_before": {
+    "head": "9558fcc344016f0df7778307d3049635d3e07e8c",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_model/src/model.rs\u0000 M crates/ep_run/src/lib.rs\u0000 M crates/ep_run/src/pipeline.rs\u0000 M crates/ep_run/tests/arbitrary_run/output_manifest.rs\u0000 M crates/ep_run/tests/arbitrary_run_ideal_loads.rs\u0000 M crates/ep_runtime/src/error.rs\u0000 M crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs\u0000 M crates/ep_runtime/src/heat_balance/ctf_reports.rs\u0000 M crates/ep_runtime/src/heat_balance/ctf_reports_format.rs\u0000 M crates/ep_runtime/src/heat_balance/ctf_reports_tests.rs\u0000 M crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs\u0000 M crates/ep_runtime/src/heat_balance/initialization.rs\u0000 M crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs\u0000 M crates/ep_runtime/src/heat_balance/mod.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs\u0000 M crates/ep_runtime/src/ideal_loads/coupled_runtime.rs\u0000 M crates/ep_runtime/src/runtime.rs\u0000 M crates/ep_runtime/src/runtime/tests.rs\u0000 M crates/ep_runtime/src/runtime/tests/part03.rs\u0000?? crates/ep_run/examples/ctf10_report_format_unit_observer.rs\u0000?? crates/ep_run/src/ctf_initialization_outputs.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs\u0000?? crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs\u0000"
+  },
+  "repository_after": {
+    "head": "9558fcc344016f0df7778307d3049635d3e07e8c",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_model/src/model.rs\u0000 M crates/ep_run/src/lib.rs\u0000 M crates/ep_run/src/pipeline.rs\u0000 M crates/ep_run/tests/arbitrary_run/output_manifest.rs\u0000 M crates/ep_run/tests/arbitrary_run_ideal_loads.rs\u0000 M crates/ep_runtime/src/error.rs\u0000 M crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs\u0000 M crates/ep_runtime/src/heat_balance/ctf_reports.rs\u0000 M crates/ep_runtime/src/heat_balance/ctf_reports_format.rs\u0000 M crates/ep_runtime/src/heat_balance/ctf_reports_tests.rs\u0000 M crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs\u0000 M crates/ep_runtime/src/heat_balance/initialization.rs\u0000 M crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs\u0000 M crates/ep_runtime/src/heat_balance/mod.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs\u0000 M crates/ep_runtime/src/ideal_loads/coupled_runtime.rs\u0000 M crates/ep_runtime/src/runtime.rs\u0000 M crates/ep_runtime/src/runtime/tests.rs\u0000 M crates/ep_runtime/src/runtime/tests/part03.rs\u0000?? crates/ep_run/examples/ctf10_report_format_unit_observer.rs\u0000?? crates/ep_run/src/ctf_initialization_outputs.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs\u0000?? crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs\u0000"
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/ca/cae115f4bcf0212021276eecf9b6f613630d80dc952bb27e96e8cc76bcc3fa16",
+    "sha256": "cae115f4bcf0212021276eecf9b6f613630d80dc952bb27e96e8cc76bcc3fa16"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/57/5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CTF-10/report-format-candidate-workflow-02/cargo/stdout.log",
+    "sha256": "4effadfca0b29f940d42691602adfc0e1025752e87a497c7b84347f1c20b38d3"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CTF-10/report-format-candidate-workflow-02/cargo/stderr.log",
+    "sha256": "def9a53807dc03a104a94ced0b2bea6d19b978f779cb898f64a59d617f61332b"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": true,
+    "captured_utc": "2026-10-11T08:05:10.690831+00:00",
+    "status": "pass",
+    "rows": [
+      {
+        "cargo_message": {
+          "reason": "compiler-artifact",
+          "package_id": "path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/crates/ep_run#0.1.0",
+          "manifest_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\Cargo.toml",
+          "target": {
+            "kind": [
+              "example"
+            ],
+            "crate_types": [
+              "bin"
+            ],
+            "name": "ctf10_report_format_unit_observer",
+            "src_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\crates\\ep_run\\examples\\ctf10_report_format_unit_observer.rs",
+            "edition": "2024",
+            "doc": false,
+            "doctest": false,
+            "test": false
+          },
+          "profile": {
+            "opt_level": "0",
+            "debuginfo": 0,
+            "debug_assertions": true,
+            "overflow_checks": true,
+            "test": false
+          },
+          "features": [],
+          "filenames": [
+            "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\ctf10_report_format_unit_observer.exe"
+          ],
+          "executable": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\examples\\ctf10_report_format_unit_observer.exe",
+          "fresh": false
+        },
+        "executable": {
+          "historical_path": "target/debug/examples/ctf10_report_format_unit_observer.exe",
+          "sha256": "3e353fa2840152d594350542ec8df1c20f3b9cafb07307fb67310ad7ba52e395"
+        }
+      }
+    ],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

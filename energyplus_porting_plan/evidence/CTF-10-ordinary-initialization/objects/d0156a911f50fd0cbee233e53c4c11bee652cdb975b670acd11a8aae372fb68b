@@ -1,0 +1,36 @@
+--- before/finalize-ordinary-initialization.py
++++ finalize-ordinary-initialization.py
+@@ -40,6 +40,7 @@
+ packet_path = (ROOT / sys.argv[1]).resolve(); assert packet_path.is_relative_to(BASE) and sha(packet_path) == sys.argv[2]
+ packet = read(packet_path); assert packet['schema'] == 'ctf10-ordinary-initialization-milestone-inputs.v1'
+ select(packet_path, 'actual-finalization-operands'); select(Path(__file__).resolve(), 'actual-finalizer-source')
++assert exact(packet['application']) == BASE / 'ordinary-initialization-applied-03/record.json'
+ application = value(packet['application'], 'accepted-current-application')
+ assert application['schema'] == 'ctf10-ordinary-initialization-actual-application.v1'
+ assert application['Root_and_Header_cumulative_Source_review_accepted'] is True and application['ordinary_A_and_B_dispatch_connected'] is True
+@@ -48,7 +49,7 @@
+ rows = application['actual_sources']; by_path = {row['canonical_path']: row for row in rows}
+ expected = {row['canonical_path'] for row in preparation['own_sources']} | {'crates/ep_model/src/model.rs', 'crates/ep_run/examples/ctf10_report_format_unit_observer.rs', 'crates/ep_runtime/src/runtime/tests/part03.rs'}
+ assert len(rows) == len(by_path) == 19 and set(by_path) == expected and len(parent['actual_sources']) == 18
+-assert len(application['correction_records']) == 2
++assert len(application['correction_records']) == 3
+ for row in application['correction_records']: value(row, 'actual-test-correction-record')
+ for row in rows + packet['additional_test_sources']:
+     archive = exact(row['actual_final_source']); live = ROOT / row['canonical_path']
+@@ -73,14 +74,14 @@
+ for name, row in captured.items(): assert sha(exact(row['archive'])) == sha(ROOT / name) and (ROOT / name).stat().st_size == row['size_bytes']
+ for row in rows + packet['additional_test_sources']: assert captured[row['canonical_path']]['archive']['sha256'] == row['actual_final_source']['sha256']
+ lineage_names = {row['path'] for row in packet['retained_lineage']}
+-for number in [1, 2, 3, 4, 5]: assert any(f'ordinary-initialization-correction-{number:02}/' in name for name in lineage_names)
++for number in [1, 2, 3, 4, 5, 6]: assert any(f'ordinary-initialization-correction-{number:02}/' in name for name in lineage_names)
+ for row in packet['retained_lineage']: select(exact(row), 'opaque-failure-and-correction-lineage')
+ failed = []
+ for row in packet['retained_lineage_receipts']:
+     record = command(row, 'actual-historical-execution', zero=False)
+     if record['exit_code'] != 0: failed.append(row['path'])
+ assert any('clippy-command-01/' in name for name in failed)
+-for number in [2, 3, 4]: assert any(f'workspace-command-{number:02}/' in name for name in failed)
++for number in [2, 3, 4, 5]: assert any(f'workspace-command-{number:02}/' in name for name in failed)
+ comparison = value(packet['format_comparison'], 'actual-selected-format-comparison')
+ assert comparison['schema'] == 'ctf10-report-format-unit-comparison.v1' and comparison['status'] == 'pass-exact-608-required-texts'
+ assert comparison['selected_format_unit_comparison_passed'] is True and comparison['required_calls'] == 608 and comparison['mismatch_count'] == 0

@@ -1,0 +1,4 @@
+Root actual ordinary initialization smoke starting ordinary-init-smoke-build-command-01
+Root actual ordinary initialization smoke completed ordinary-init-smoke-build-command-01 {'path': '.runtime/porting/CTF-10/ordinary-init-smoke-build-command-01/receipt.json', 'sha256': 'ed3bbb733aa47f21306d2b9554e820359ce3596e6f1af582f94e59e97990a00b', 'size_bytes': 6938}
+Root actual ordinary initialization smoke starting ordinary-init-smoke-command-01/A-24H
+Root actual ordinary initialization smoke completed ordinary-init-smoke-command-01/A-24H {'path': '.runtime/porting/CTF-10/ordinary-init-smoke-command-01/A-24H/receipt.json', 'sha256': 'f25aa8ab6b0b320d887681d692c867213ed2dd9647831536046bd5fe230bf633', 'size_bytes': 5908}

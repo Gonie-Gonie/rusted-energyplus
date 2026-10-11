@@ -9,7 +9,10 @@ use crate::heat_balance::air_manager::seed_zone_air_humidity_ratios_from_weather
 use crate::heat_balance::algorithm::{
     HeatBalanceRuntimeConfig, direct_zone_purchased_air_fixed_step_runtime_config,
 };
-use crate::heat_balance::initialization::initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache_profiled;
+use crate::heat_balance::initialization::{
+    initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache_profiled,
+    initialize_heat_balance_state_with_initialization_context_profiled,
+};
 use crate::heat_balance::manager::init_heat_balance_source_order_path;
 use crate::heat_balance::reports::{
     HeatBalanceResultSeriesTraces, heat_balance_result_store_from_traces,
@@ -5904,6 +5907,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         HeatBalanceWeatherDriver::Legacy(weather_series),
         coupling_schedule_cache,
         options,
+        None,
     )
 }
 
@@ -5924,6 +5928,28 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance_with_production_w
         HeatBalanceWeatherDriver::Production(weather_series),
         coupling_schedule_cache,
         options,
+        None,
+    )
+}
+
+/// Ordinary coupled production path retaining the real initialization outputs through errors.
+pub fn simulate_direct_zone_purchased_air_coupled_heat_balance_with_production_weather_and_initialization_context(
+    model: &SimulationModel,
+    weather: &ProductionWeatherTimestepSeries,
+    coupling_schedule_cache: &ScheduleSeriesCache,
+    options: DirectZonePurchasedAirCoupledOptions,
+    context: &mut crate::heat_balance::ctf_initialization_context::CtfInitializationContext<'_>,
+) -> Result<DirectZonePurchasedAirCoupledSimulation, DirectZonePurchasedAirCoupledRuntimeError> {
+    crate::schedules::production_trace::record_cache(
+        crate::schedules::production_trace::ScheduleCacheOrigin::CoupledProductionArgument,
+        coupling_schedule_cache,
+    );
+    simulate_direct_zone_purchased_air_coupled_heat_balance_with_driver(
+        model,
+        HeatBalanceWeatherDriver::Production(weather),
+        coupling_schedule_cache,
+        options,
+        Some(context),
     )
 }
 
@@ -5932,6 +5958,9 @@ fn simulate_direct_zone_purchased_air_coupled_heat_balance_with_driver(
     weather_driver: HeatBalanceWeatherDriver<'_>,
     coupling_schedule_cache: &ScheduleSeriesCache,
     options: DirectZonePurchasedAirCoupledOptions,
+    initialization: Option<
+        &mut crate::heat_balance::ctf_initialization_context::CtfInitializationContext<'_>,
+    >,
 ) -> Result<DirectZonePurchasedAirCoupledSimulation, DirectZonePurchasedAirCoupledRuntimeError> {
     let weather_dry_bulb_c = match weather_driver {
         HeatBalanceWeatherDriver::Legacy(series) => series.hourly_dry_bulb_c(),
@@ -6007,7 +6036,16 @@ fn simulate_direct_zone_purchased_air_coupled_heat_balance_with_driver(
                 crate::schedules::production_trace::ScheduleCacheOrigin::CoupledReferencedInitialization,
                 &schedule_cache,
             );
-            let mut state =
+            let mut state = if let Some(context) = initialization {
+                initialize_heat_balance_state_with_initialization_context_profiled(
+                    model,
+                    options.initial_zone_air_temperature_c,
+                    &[],
+                    &schedule_cache,
+                    &mut schedule_cache_profile,
+                    context,
+                )
+            } else {
                 initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache_profiled(
                     model,
                     options.initial_zone_air_temperature_c,
@@ -6015,7 +6053,8 @@ fn simulate_direct_zone_purchased_air_coupled_heat_balance_with_driver(
                     &schedule_cache,
                     &mut schedule_cache_profile,
                 )
-                .map_err(DirectZonePurchasedAirCoupledRuntimeError::HeatBalance)?;
+            }
+            .map_err(DirectZonePurchasedAirCoupledRuntimeError::HeatBalance)?;
             seed_zone_air_humidity_ratios_from_weather_context(
                 &mut state,
                 initial_weather_context,

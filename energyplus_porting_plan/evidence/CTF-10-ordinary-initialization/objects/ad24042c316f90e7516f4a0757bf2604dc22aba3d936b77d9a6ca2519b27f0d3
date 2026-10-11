@@ -1,0 +1,17 @@
+"""Check actual ordinary connection after correcting existing test call arity."""
+import json, subprocess, sys
+from pathlib import Path
+BASE = Path('.runtime/porting/CTF-10')
+snapshot = None
+for role in ['fmt-check', 'clippy', 'focused', 'workspace']:
+    prior = json.loads((BASE / ('postlude-registry-severe-' + role + '-command-01/receipt.json')).read_bytes())
+    assert prior['exit_code'] == 0
+    output = BASE / ('ordinary-initialization-' + role + '-command-02')
+    assert not output.exists()
+    result = subprocess.run([sys.executable, '-X', 'utf8', '-B', 'tools/porting/record_command.py',
+                             '--output-dir', str(output), '--', *prior['command']], stdout=subprocess.DEVNULL)
+    actual = json.loads((output / 'receipt.json').read_bytes())
+    print(json.dumps({'role': role, 'exit_code': actual['exit_code'], 'source_snapshot': actual['source_snapshot']}), flush=True)
+    assert result.returncode == 0 and actual['exit_code'] == 0 and actual['source_bytes_match_before_and_after'] is True
+    if snapshot is None: snapshot = actual['source_snapshot']
+    assert actual['source_snapshot'] == snapshot

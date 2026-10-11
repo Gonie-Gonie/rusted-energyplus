@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-10\run-ordinary-validation-04.py", line 33, in <module>
+    record('report-format-candidate-workflow-command-01', [sys.executable, '-X', 'utf8', '-B', str(runner), 'candidate', '--approved-runner-sha256', sha(runner), '--native-workflow', operand(native), '--observer-source', operand(observer), '--format-source', operand(formatter), '--output-dir', str(BASE / 'report-format-candidate-workflow-01')])
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-10\run-ordinary-validation-04.py", line 30, in record
+    assert result.returncode == actual['exit_code'] == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

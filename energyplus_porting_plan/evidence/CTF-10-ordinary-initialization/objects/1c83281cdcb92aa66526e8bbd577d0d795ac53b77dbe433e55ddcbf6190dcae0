@@ -1,0 +1,267 @@
+use super::*;
+use ep_model::{NoMassMaterial, OpaqueSurfaceProperties};
+
+fn input(public: &CtfPublicCoefficientStorage) -> CtfConstructionReport<'_> {
+    CtfConstructionReport {
+        construction_id: ConstructionId(50),
+        declared_counter: 9,
+        name: "DECLARED NINTH",
+        layers: vec![CtfMaterialReport {
+            material_id: MaterialId(4),
+            name: "Authored Report Material",
+            air_gap: false,
+            values: [0.0, 0.0, 0.0, 0.0, 0.25],
+        }],
+        public,
+        absorptance: [0.9, 0.9, 0.7, 0.7],
+        outside_roughness: MaterialSurfaceRoughness::Smooth,
+    }
+}
+
+#[test]
+fn general_and_fixed_preserve_source_notation_rounding_and_ieee_signs()
+-> Result<(), CtfReportUnavailable> {
+    use formatting::{fixed, general};
+    assert_eq!(general(1.23, 8, 4)?, "    1.23");
+    assert_eq!(general(0.0001, 0, 4)?, "0.0001");
+    assert_eq!(general(0.00001, 0, 4)?, "1E-05");
+    assert_eq!(general(9999.75, 0, 4)?, "1E+04");
+    assert_eq!(general(1e100, 0, 8)?, "1E+100");
+    assert_eq!(general(-0.0, 5, 8)?, "   -0");
+    assert_eq!(fixed(-0.0, 8, 3), "  -0.000");
+    assert_eq!(fixed(0.125, 0, 2), "0.12");
+    assert_eq!(general(f64::INFINITY, 5, 4)?, "INF  ");
+    assert_eq!(
+        general(f64::from_bits(0xfff8_0000_0000_0001), 0, 4)?,
+        "-NAN"
+    );
+    assert_eq!(fixed(f64::NEG_INFINITY, 0, 3), "-INF");
+    Ok(())
+}
+
+#[test]
+fn nonfinite_f_and_g_use_source_default_left_alignment()
+-> Result<(), CtfReportUnavailable> {
+    use formatting::{fixed, general};
+    // The fmt8 nonfinite branch writes its signed word before width padding.
+    // Quiet/signaling payloads are real bit inputs, not expected Native data.
+    for (bits, text) in [
+        (0x7ff0_0000_0000_0000, "INF  "),
+        (0xfff0_0000_0000_0000, "-INF "),
+        (0x7ff8_0000_0000_0001, "NAN  "),
+        (0xfff8_0000_0000_0001, "-NAN "),
+        (0x7ff0_0000_0000_0001, "NAN  "),
+        (0xfff0_0000_0000_0001, "-NAN "),
+    ] {
+        let value = f64::from_bits(bits);
+        assert_eq!(fixed(value, 5, 3), text);
+        assert_eq!(fixed(value, 5, 4), text);
+        assert_eq!(general(value, 5, 4)?, text);
+        assert_eq!(general(value, 5, 8)?, text);
+    }
+    // Width is a minimum; the signed word is retained when it does not fit.
+    assert_eq!(fixed(f64::INFINITY, 2, 3), "INF");
+    assert_eq!(general(f64::NEG_INFINITY, 2, 4)?, "-INF");
+    Ok(())
+}
+
+#[test]
+fn string_table_allocates100_then_doubles_and_keeps_untouched_members()
+-> Result<(), CtfReportUnavailable> {
+    // Native's unallocated branch replaces both counters, even stale ones.
+    let mut table = PredefinedStringTable {
+        entries: None,
+        size_table_entry: 7,
+        num_table_entry: 4,
+    };
+    table.string_entry(42, "object 1", "layer 1")?;
+    assert_eq!((table.num_table_entry, table.size_table_entry), (1, 100));
+    let entries = table
+        .entries
+        .as_mut()
+        .ok_or(CtfReportUnavailable::TableOwner)?;
+    entries[1].original_real_entry = -0.0;
+    entries[1].original_entry_is_real = true;
+    for index in 2..=101 {
+        table.string_entry(index, "object", "layer")?;
+    }
+    assert_eq!((table.num_table_entry, table.size_table_entry), (101, 200));
+    let entries = table
+        .entries
+        .as_ref()
+        .ok_or(CtfReportUnavailable::TableOwner)?;
+    assert_eq!(entries.len(), 200);
+    assert_eq!(entries[0].char_entry, "layer 1");
+    assert_eq!(entries[0].index_column, 42);
+    assert_eq!(
+        entries[1].original_real_entry.to_bits(),
+        (-0.0f64).to_bits()
+    );
+    assert!(entries[1].original_entry_is_real);
+    assert_eq!(entries[199], PredefinedTableEntry::default());
+    Ok(())
+}
+
+#[test]
+fn layer_reporting_uses_real_columns_and_empty_registry_has_no_effect()
+-> Result<(), CtfReportUnavailable> {
+    let public = CtfPublicCoefficientStorage::reset();
+    let mut report = input(&public);
+    report.layers.push(CtfMaterialReport {
+        material_id: MaterialId(7),
+        name: "SECOND",
+        air_gap: true,
+        values: [0.0; 5],
+    });
+    let mut table = PredefinedStringTable::default();
+    report_ctf_layers(&report, &[], &mut table)?;
+    assert_eq!(table, PredefinedStringTable::default());
+    report_ctf_layers(&report, &[81, 93], &mut table)?;
+    let entries = table
+        .entries
+        .as_ref()
+        .ok_or(CtfReportUnavailable::TableOwner)?;
+    assert_eq!(entries[0].index_column, 81);
+    assert_eq!(entries[1].index_column, 93);
+    assert_eq!(entries[0].object_name, "DECLARED NINTH");
+    assert_eq!(entries[1].char_entry, "SECOND");
+    let mut partial = PredefinedStringTable::default();
+    assert_eq!(
+        report_ctf_layers(&report, &[81], &mut partial),
+        Err(CtfReportUnavailable::MissingLayerColumn)
+    );
+    assert_eq!(partial.num_table_entry, 1);
+    Ok(())
+}
+
+#[test]
+fn nomass_report_projection_uses_actual_base_defaults_and_loader_name()
+-> Result<(), CtfReportUnavailable> {
+    let material = Material {
+        id: MaterialId(4),
+        name: NormalizedName::new("Mixed NoMass"),
+        definition: MaterialDefinition::NoMass(NoMassMaterial {
+            roughness: MaterialSurfaceRoughness::Smooth,
+            thermal_resistance_m2_k_per_w: 0.25,
+            surface: OpaqueSurfaceProperties::default(),
+        }),
+    };
+    let mut model = TypedModel::default();
+    model
+        .ctf_report_names
+        .materials
+        .push((material.id, "MIXED NOMASS".to_string()));
+    let report = material_report(&model, &material)?;
+    assert_eq!(report.name, "MIXED NOMASS");
+    assert!(!report.air_gap);
+    for value in &report.values[..4] {
+        assert_eq!(value.to_bits(), 0.0f64.to_bits());
+    }
+    assert_eq!(report.values[4].to_bits(), 0.25f64.to_bits());
+    model.ctf_report_names.materials.clear();
+    assert_eq!(
+        material_report(&model, &material),
+        Err(CtfReportUnavailable::LoaderNameUnavailable)
+    );
+    Ok(())
+}
+
+#[test]
+fn eio_rows_keep_declared_counter_descending_terms_and_zero_flux_omission()
+-> Result<(), CtfReportError> {
+    let mut public = CtfPublicCoefficientStorage::reset();
+    // These are explicit direct-report test inputs, never Native endpoint answers.
+    public.num_ctf_terms = 2;
+    public.ctf_time_step = 0.5;
+    public.u_value = 4.0;
+    public.outside[2] = -0.0;
+    public.flux[0] = 12345.0;
+    let report = input(&public);
+    let mut sink = Vec::new();
+    write_ctf_report_headers(&mut sink)?;
+    report_ctf_transfer_function(&report, &mut sink)?;
+    let text = String::from_utf8(sink).map_err(io::Error::other)?;
+    let rows = text.lines().collect::<Vec<_>>();
+    assert_eq!(rows.len(), 9);
+    assert!(rows[0].contains("Time Step {hours}"));
+    assert!(rows[4].starts_with(" Construction CTF,DECLARED NINTH,   9,   1,   2,   0.500,"));
+    assert!(rows[5].starts_with(" Material CTF Summary,Authored Report Material,  0.0000,"));
+    assert!(rows[6].starts_with(" CTF,   2,"));
+    assert!(rows[6].contains("                  -0"));
+    assert!(rows[7].starts_with(" CTF,   1,"));
+    assert!(rows[8].starts_with(" CTF,   0,"));
+    assert_eq!(rows[6].split(',').count(), 6);
+    assert_eq!(rows[8].split(',').count(), 5);
+    assert!(!rows[8].contains("12345"));
+    Ok(())
+}
+
+#[test]
+fn air_gap_row_is_distinct_and_full19_prefix_is_not_clipped() -> Result<(), CtfReportError> {
+    let mut public = CtfPublicCoefficientStorage::reset();
+    public.num_ctf_terms = 18;
+    let mut report = input(&public);
+    report.layers[0].air_gap = true;
+    let mut sink = Vec::new();
+    report_ctf_transfer_function(&report, &mut sink)?;
+    let text = String::from_utf8(sink).map_err(io::Error::other)?;
+    assert!(
+        text.lines()
+            .nth(1)
+            .is_some_and(|line| line.starts_with(" Material:Air CTF Summary,"))
+    );
+    assert_eq!(
+        text.lines()
+            .filter(|line| line.starts_with(" CTF,"))
+            .count(),
+        19
+    );
+    public.num_ctf_terms = 19;
+    let report = input(&public);
+    let mut rejected = Vec::new();
+    assert!(matches!(
+        report_ctf_transfer_function(&report, &mut rejected),
+        Err(CtfReportError::Unavailable(
+            CtfReportUnavailable::PublicCapacity(19)
+        ))
+    ));
+    assert!(rejected.is_empty());
+    Ok(())
+}
+
+#[test]
+fn actual_writer_failure_retains_prefix_and_never_claims_native_return() {
+    struct FailAfterOne {
+        bytes: Vec<u8>,
+        writes: usize,
+    }
+    impl Write for FailAfterOne {
+        fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
+            if self.writes != 0 {
+                return Err(io::Error::other("authored failing writer"));
+            }
+            self.writes += 1;
+            self.bytes.extend_from_slice(bytes);
+            Ok(bytes.len())
+        }
+        fn flush(&mut self) -> io::Result<()> {
+            Ok(())
+        }
+    }
+    let public = CtfPublicCoefficientStorage::reset();
+    let mut sink = FailAfterOne {
+        bytes: Vec::new(),
+        writes: 0,
+    };
+    assert!(matches!(
+        report_ctf_transfer_function(&input(&public), &mut sink),
+        Err(CtfReportError::Io(_))
+    ));
+    assert!(sink.bytes.starts_with(b" Construction CTF,"));
+    assert!(
+        !sink
+            .bytes
+            .windows(b"Material CTF".len())
+            .any(|window| window == b"Material CTF")
+    );
+}

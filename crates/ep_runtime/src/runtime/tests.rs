@@ -14,3 +14,4 @@ include!("tests/part13.rs");
 include!("tests/part14_geometry.rs");
 include!("tests/production_weather.rs");
 include!("tests/ctf02_surface_integration.rs");
+include!("tests/ctf_ordinary_outputs.rs");

@@ -2,13 +2,15 @@
 
 use super::CtfReportUnavailable;
 
-fn nonfinite(value: f64) -> String {
+fn nonfinite(value: f64, width: usize) -> String {
     let word = if value.is_infinite() { "INF" } else { "NAN" };
-    if value.is_sign_negative() {
+    let text = if value.is_sign_negative() {
         format!("-{word}")
     } else {
         word.to_string()
-    }
+    };
+    // fmt8 write_nonfinite uses write_padded's default left alignment.
+    format!("{text:<width$}")
 }
 
 fn padded(text: String, width: usize) -> String {
@@ -19,7 +21,7 @@ pub(super) fn fixed(value: f64, width: usize, precision: usize) -> String {
     let text = if value.is_finite() {
         format!("{value:.precision$}")
     } else {
-        nonfinite(value)
+        return nonfinite(value, width);
     };
     padded(text, width)
 }
@@ -30,7 +32,7 @@ pub(super) fn general(
     precision: usize,
 ) -> Result<String, CtfReportUnavailable> {
     if !value.is_finite() {
-        return Ok(padded(nonfinite(value), width));
+        return Ok(nonfinite(value, width));
     }
     // fmt8 uses significant decimal digits, rounded once, then chooses notation
     // from that rounded exponent. Do not rescale or recompute a source value.

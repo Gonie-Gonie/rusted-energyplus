@@ -1,0 +1,37 @@
+"""Record the actual tested ordinary connection while preserving unfinished gates."""
+import hashlib, json, re, subprocess, sys
+from pathlib import Path
+ROOT=Path.cwd().resolve()
+OUT=ROOT/'energyplus_porting_plan/evidence/CTF-10-ordinary-initialization'
+summary_path=OUT/'summary.json';summary=json.loads(summary_path.read_bytes())
+assert summary['ordinary_production_connection_applied'] is True
+assert summary['complete_CTF10_PASS_claimed'] is False and summary['gates_updated'] is False
+quality=summary['actual_quality'];assert all(row['exit_code']==0 for row in quality.values())
+passed=quality['workspace']['passed'];focused=quality['focused']['passed']
+reference={'path':summary_path.relative_to(ROOT).as_posix(),'sha256':hashlib.sha256(summary_path.read_bytes()).hexdigest(),'size_bytes':summary_path.stat().st_size}
+plan_path=ROOT/'energyplus_porting_plan/plan.json';plan=json.loads(plan_path.read_bytes())
+task=next(row for row in plan['tasks'] if row['id']=='CTF-10')
+assert 'actual_ordinary_initialization_implementation' not in task
+task['actual_ordinary_initialization_implementation']=reference
+plan_path.write_bytes((json.dumps(plan,ensure_ascii=False,indent=2,allow_nan=False)+'\n').encode())
+card_path=ROOT/'energyplus_porting_plan/cards/CTF-10.md';card=card_path.read_text(encoding='utf8')
+anchor='## Complete registry, producer diagnostics and Init postlude\n'
+assert card.count(anchor)==1
+optional=' A separate append-only Output:Constructions input also reached the enabled EIO branch.' if summary['optional_report_EIO_enabled_observed'] else ''
+section=('## Ordinary initialization reporting and formatter comparison\n\n'
+    'Both ordinary A/B runtime paths now retain the real predefined registry, string table, Scan cache and error/output owners across initialization success or failure. Loading and retry diagnostics execute at their producer sites; the complete report/Scan/EIO/final-fatal suffix runs before surface lifecycle allocation. Genuine I/O causes remain discoverable through RuntimeError. Reached CTF error, EIO and console streams are exported independently, and the error prefix is retained in the ordinary summary.\n\n'
+    f'The [ordinary initialization evidence](../evidence/CTF-10-ordinary-initialization/summary.json) records fmt/Clippy0, focused{focused} and workspace{passed} PASS on the same actual SourceSnapshot. All608 same-input Native/Rust F/G formatted texts matched exactly. The unchanged six ordinary A/B CLI cases returned0 with all45 input guards and the current three output files.'+optional+' Failed checks and test-only corrections are retained.\n\n'
+    'These results establish the ordinary connection, regression behavior and selected formatter equivalence. Native registry/backend/whole-Init comparison and persistent ordinary numerical/history integration remain pending; no card gate is promoted.\n\n')
+card=card.replace(anchor,section+anchor)
+card=card.replace('Same-input genuine Native getter/cache/query comparison remains pending. The scan is not yet called by the ordinary whole-Init postlude; predefined/EIO reporting and final fatal backend composition remain pending.','At that milestone, Native getter/cache/query comparison and ordinary postlude connection were pending. The later comparison and ordinary initialization sections record their current results.')
+card=card.replace('Ordinary caller connection and Native registry/backend/whole-Init comparison remain pending; no card gate is promoted.','At that milestone, ordinary caller connection and Native registry/backend/whole-Init comparison were pending. The ordinary connection is now recorded above; Native whole-Init comparison remains pending and no card gate is promoted.')
+card_path.write_bytes(card.encode())
+checklist_path=ROOT/'energyplus_porting_plan/CHECKLIST.md';checklist=checklist_path.read_text(encoding='utf8')
+anchor='## 전체 체크리스트\n\n';assert checklist.count(anchor)==1
+note=f'CTF-10 일반 A/B 초기화에 보고서·오류 출력 경로를 연결했습니다. [현재 실행 증거](evidence/CTF-10-ordinary-initialization/summary.json): 전체 {passed:,}개 테스트, 원본/Rust 숫자 출력 608개 정확 일치, 기존 6개 CLI 실행 성공. 원본 초기화 전체 비교와 지속 실행의 수치 통합 검증은 계속 진행하며 카드 완료로 표시하지 않습니다.\n\n'
+old_notes=('CTF-10은 일반 표면·이력 수명주기를 연결했고','보고 출력·오류 백엔드 구현은','CTF-10의 실제 원본·Rust 조회 비교는','CTF-10의 전체 보고서 등록·실제 오류 발생 지점·초기화 후처리를 구현하고')
+checklist='\n'.join(line for line in checklist.splitlines() if not line.startswith(old_notes))+'\n'
+checklist=re.sub(r'(?m)^(\|[^\n]*\|)\n(?:[ \t]*\n)+(?=\|)',r'\1\n',checklist)
+checklist_path.write_bytes(checklist.replace(anchor,anchor+note).encode())
+subprocess.run([sys.executable,'-X','utf8','-B','tools/porting/sync_plan_views.py','--write'],check=True)
+print('Updated actual ordinary milestone documents and synchronized offline plan; no gates changed',flush=True)

@@ -1,0 +1,11 @@
+--- .runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs
++++ .runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs
+@@ -98,7 +98,7 @@
+     layer_columns: &[i32],
+     table: &mut PredefinedStringTable,
+     scan: &mut ReportScanState,
+-    eio: &mut impl Write,
++    eio: &mut (impl Write + ?Sized),
+     backend: &mut SourceErrorBackend<'_>,
+     progress: &mut CtfInitPostludeProgress,
+ ) -> Result<(), CtfInitPostludeError> {

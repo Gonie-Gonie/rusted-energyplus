@@ -1,0 +1,198 @@
+{
+  "schema": "ctf10-ordinary-initialization-milestone-finalizer-source-preparation.v1",
+  "status": "SOURCE-READY HELD; unexecuted Root workflow skeleton",
+  "held_immutable": true,
+  "own_source": {
+    "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-02/finalize-ordinary-initialization.py",
+    "sha256": "3a7afa3e28a4394898e62ef783c5360888dc6ff79cd1cf7c400204d57ddee08c",
+    "size_bytes": 14955,
+    "line_count": 144
+  },
+  "before_template": {
+    "original": {
+      "path": ".runtime/porting/CTF-10/finalize-postlude-registry-severe-01.py",
+      "sha256": "9c5aabc9fa5c8f14a841637f40b256b4d406e6bd5ed26ddb1d95ad9d02805dfb",
+      "size_bytes": 9261,
+      "line_count": 108
+    },
+    "archive": {
+      "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-01/before/finalize-postlude-registry-severe-01.py",
+      "sha256": "9c5aabc9fa5c8f14a841637f40b256b4d406e6bd5ed26ddb1d95ad9d02805dfb",
+      "size_bytes": 9261,
+      "line_count": 108
+    }
+  },
+  "README": {
+    "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-02/README.md",
+    "sha256": "a34ce2df58fa6b9d83ed3a833606e5d2274ac300d2f75752c7c559a9e62a4fc1",
+    "size_bytes": 4700,
+    "line_count": 23
+  },
+  "dependencies": [
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-02/manifest.json",
+      "sha256": "7ebf5091d1ae3d448c4884722b81cf5882a8357e6b7d9b8257555d681250400b",
+      "size_bytes": 7583,
+      "line_count": 192
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-02/run-ordinary-init-smoke-02.py",
+      "sha256": "dcf701df742dabec7f0e4e83e8645ee8aeccc9c036a130670b739d7925638433",
+      "size_bytes": 14532,
+      "line_count": 131
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-02/manifest.json",
+      "sha256": "fd149d75f1ba7dee0ca3cc833aa109028bd69bfd669b22ab55a57b6a73232cd7",
+      "size_bytes": 4413,
+      "line_count": 113
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-02/prepare-report-input.py",
+      "sha256": "e39d2d3d1662e764990aad845f882447c1198a5c2541b60bfd965a08467e11af",
+      "size_bytes": 6081,
+      "line_count": 68
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-02/record.json",
+      "sha256": "90c6b581dbca40d3f30ee2cf255ba3315a63a44dff8270615a665ff1c2783a32",
+      "size_bytes": 10063,
+      "line_count": 210
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-02/record.json",
+      "sha256": "dec40058cf955ff94caaaa676afe1cee084ad49053ef014cb20630bdd332b9d1",
+      "size_bytes": 418,
+      "line_count": 7
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-03/record.json",
+      "sha256": "7e821dab38b3e50566750afca08eda1643c906f3e38f887eb2c2e7f480a4958d",
+      "size_bytes": 834,
+      "line_count": 15
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-workflow-prep-02/run_format_workflow.py",
+      "sha256": "de9f75292a7848e00566ad2795d16c3ea11a1fac1287ff94b7c4c408d97301ad",
+      "size_bytes": 20092,
+      "line_count": 220
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "size_bytes": 8453,
+      "line_count": 204
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "path": ".runtime/porting/CTF-10/report-format-workflow-prep-02/run_format_workflow.py",
+      "first_line": 146,
+      "last_line": 157,
+      "sha256": "096179a7c986b0293d3ef4adc13e40825350e9561a31c9d326bcae04ef07de61",
+      "size_bytes": 2095,
+      "purpose": "Historical Native complete608 release/result direct refs"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-workflow-prep-02/run_format_workflow.py",
+      "first_line": 160,
+      "last_line": 205,
+      "sha256": "3eb31d98155153d066f746427c1500858c9eb76548e123ef937197fd3136c76b",
+      "size_bytes": 5741,
+      "purpose": "Current candidate Source/Cargo/recorder/comparison interface"
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "first_line": 174,
+      "last_line": 202,
+      "sha256": "7a9ab143b0880b4751048727bd7d1eb6923b6938a83d5d625e368ebd3959e562",
+      "size_bytes": 1834,
+      "purpose": "Actual recorded receipt/streams/snapshot/launcher field shape"
+    }
+  ],
+  "selected_range_encoding": "logical UTF-8 joined LF with trailing LF",
+  "runtime_operand_schema": "ctf10-ordinary-initialization-milestone-inputs.v1",
+  "expected_current_application_archive_count": 19,
+  "expected_additional_test_archive_count": 2,
+  "runtime_outcome_or_identity_predictions": false,
+  "quality_or_targets_rerun": false,
+  "Native_or_candidate_result_bodies_read_by_author": false,
+  "binary_weather_or_fixture_payloads_read": false,
+  "canonical_docs_Git_or_gate_mutation": false,
+  "stdlib_AST_valid": true,
+  "predecessor_manifest": {
+    "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-01/manifest.json",
+    "sha256": "ff99e9e8e38e279eee3f9776a6d70605ac0ed4cad5c6da905cd212fb18d6ca9e",
+    "size_bytes": 5198,
+    "line_count": 129
+  },
+  "predecessor_source": {
+    "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-02/before/finalize-ordinary-initialization.py",
+    "sha256": "fda4ea866daa608cb836070bfcc0e56e7c9366692e47ca0bdd51b0eee4040671",
+    "size_bytes": 14854,
+    "line_count": 143
+  },
+  "predecessor_README": {
+    "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-02/before/README.md",
+    "sha256": "f7abcf7e13d34e57e28785dee4be26c6a4689546699635dbc614862bfd4ddf32",
+    "size_bytes": 3981,
+    "line_count": 20
+  },
+  "predecessor_manifest_archive": {
+    "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-02/before/manifest.json",
+    "sha256": "ff99e9e8e38e279eee3f9776a6d70605ac0ed4cad5c6da905cd212fb18d6ca9e",
+    "size_bytes": 5198,
+    "line_count": 129
+  },
+  "exact_from_previous_diff": {
+    "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-02/from-previous.diff",
+    "sha256": "d0156a911f50fd0cbee233e53c4c11bee652cdb975b670acd11a8aae372fb68b",
+    "size_bytes": 3199,
+    "line_count": 36
+  },
+  "current_application_context": {
+    "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-03/record.json",
+    "sha256": "d8dd8f803c33a20dc6ab9ef07e0dd170c857ae8aeb9716f527115ad3f2b4ba33",
+    "size_bytes": 10475,
+    "line_count": 220
+  },
+  "actual_correction06": {
+    "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-06/record.json",
+    "sha256": "b9e8b631ed8f952b53b05eb5c0eb854bee6fe35f6a1e0279ebe1f4a70ccb6d0a",
+    "size_bytes": 907,
+    "line_count": 14
+  },
+  "historical_cumulative_01_diff": {
+    "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-01/finalizer.diff",
+    "sha256": "3e4693c64a1187d73e1c7263f5b5658197fad3a2f11e9512d43dc21d87e54b27",
+    "size_bytes": 24123,
+    "line_count": 247
+  },
+  "only_declared_application03_test_authority_revision": true,
+  "current_transport_dependencies": [
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-03/manifest.json",
+      "sha256": "20da95e4bef40abad5390fb49ed703fb6b52884721f8e99bc17083260cfbab53",
+      "size_bytes": 8425,
+      "line_count": 211
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-03/run-ordinary-init-smoke-03.py",
+      "sha256": "2c909462a87e0c9f545624e2edbe11f7245874e8eb125364d6781329bb4ac60b",
+      "size_bytes": 14926,
+      "line_count": 132
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-03/manifest.json",
+      "sha256": "d4f37d6b50b7e4dce1f28e93dda98885f8293540aa126f01058d598ed7be0061",
+      "size_bytes": 5538,
+      "line_count": 140
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-03/prepare-report-input.py",
+      "sha256": "6b824f971a174ae2addb12c0e0edd4bc48f4704a43f11cacaadbc03c9b41614a",
+      "size_bytes": 6447,
+      "line_count": 69
+    }
+  ]
+}

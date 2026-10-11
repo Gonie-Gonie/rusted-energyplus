@@ -5,9 +5,12 @@ mod state_shell;
 
 #[cfg(test)]
 pub(crate) use schedule_cache::initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache;
-pub(crate) use schedule_cache::initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache_profiled;
 pub use schedule_cache::{
     initialize_heat_balance_state, initialize_heat_balance_state_with_ctf_coefficients,
+};
+pub(crate) use schedule_cache::{
+    initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache_profiled,
+    initialize_heat_balance_state_with_initialization_context_profiled,
 };
 
 use crate::error::RuntimeError;
@@ -39,6 +42,9 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
     ctf_coefficients: &[ConstructionCtfCoefficientOverride],
     schedule_cache: &ScheduleSeriesCache,
     mut operations: Option<&mut InternalGainSchedulePhaseOperations>,
+    initialization: Option<
+        &mut crate::heat_balance::ctf_initialization_context::CtfInitializationContext<'_>,
+    >,
 ) -> Result<HeatBalanceState, RuntimeError> {
     let ctf_coefficients_by_construction = construction_ctf_coefficients_by_name(ctf_coefficients);
     let mut zones = Vec::with_capacity(model.typed.zones.len());
@@ -106,8 +112,16 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
         .iter()
         .map(|surface| resolve_surface_boundary_target(&model.typed, surface))
         .collect::<Result<Vec<_>, _>>()?;
-    let mut construction_thermal_data =
-        ConstructionThermalDataCache::build(&model.typed, &ctf_coefficients_by_construction)?;
+    let mut construction_thermal_data = if let Some(actual) = initialization {
+        actual.prepare_registry(&model.typed)?;
+        ConstructionThermalDataCache::build_with_initialization_context(
+            &model.typed,
+            &ctf_coefficients_by_construction,
+            actual,
+        )?
+    } else {
+        ConstructionThermalDataCache::build(&model.typed, &ctf_coefficients_by_construction)?
+    };
     let construction_cache_token = construction_thermal_data.invalidation_token();
     debug_assert!(!construction_thermal_data.is_invalidated_by(construction_cache_token));
     let ctf_surface_lifecycle = construction_thermal_data

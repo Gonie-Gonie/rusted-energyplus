@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-10\run-ordinary-validation-05.py", line 39, in <module>
+    record('ordinary-init-smoke-workflow-command-01', [sys.executable, '-X', 'utf8', '-B', str(smoke), str(application), sha(application), *quality])
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-10\run-ordinary-validation-05.py", line 30, in record
+    assert result.returncode == actual['exit_code'] == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

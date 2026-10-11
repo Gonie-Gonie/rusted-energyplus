@@ -1,0 +1,54 @@
+{
+  "schema": "ctf10-report-format-unit-comparison.v1",
+  "status": "pass-exact-608-required-texts",
+  "selected_format_unit_comparison_passed": true,
+  "native_workflow": {
+    "path": ".runtime/porting/CTF-10/report-format-native-workflow-01/native.json",
+    "sha256": "862887b58164e3d13e6739d5004b55c27314820c4259c1c52f24b5d824382b68",
+    "size_bytes": 170414
+  },
+  "frozen_input": {
+    "path": ".runtime/porting/CTF-10/report-format-native-workflow-01/request.json",
+    "sha256": "2963a0bc26f939405c549f6bb29dc12d1ccdb9f7ba78a60ebc2879d248a34f09",
+    "size_bytes": 7928
+  },
+  "policy": {
+    "path": ".runtime/porting/CTF-10/report-format-native-workflow-01/policy.json",
+    "sha256": "2b817a3d528689686088da4944ddfd5774f77f084ba3c92fbadc4f94fed60ae4",
+    "size_bytes": 895
+  },
+  "actual_observer_source": {
+    "path": "crates/ep_run/examples/ctf10_report_format_unit_observer.rs",
+    "sha256": "c2c57750cf987bfb6cd5b392d9b93098e067a3ba2706bd0fd2f21c0d0c422481",
+    "size_bytes": 4521
+  },
+  "actual_formatter_source": {
+    "path": "crates/ep_runtime/src/heat_balance/ctf_reports_format.rs",
+    "sha256": "d8aa1aa88e3000a4be37f6179c3c6829b7ff534d16efded123d91ab5045c0151",
+    "size_bytes": 2813
+  },
+  "cargo": {
+    "path": ".runtime/porting/CTF-10/report-format-candidate-workflow-02/cargo/receipt.json",
+    "sha256": "ff9840411846fb486d58893b3e49671d527a646b92dccc5a8fa3dc8d3ca88038",
+    "size_bytes": 7086
+  },
+  "rust_execution": {
+    "path": ".runtime/porting/CTF-10/report-format-candidate-workflow-02/rust-execution/receipt.json",
+    "sha256": "9486c77e2a79902468de7e524133344b8159bc88f78aa38448fc4a5fdc8f1a51",
+    "size_bytes": 5615
+  },
+  "actual_rust_results": {
+    "path": ".runtime/porting/CTF-10/report-format-candidate-workflow-02/rust-execution/stdout.log",
+    "sha256": "0fb71d8e91fe759a9f2d5c1b4fbac1e0308e6e5bfe5f484b2e7a3dec6cb08381"
+  },
+  "required_calls": 608,
+  "mismatch_count": 0,
+  "mismatches": {
+    "path": ".runtime/porting/CTF-10/report-format-candidate-workflow-02/mismatches.json",
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "size_bytes": 3
+  },
+  "numeric_profiles": [],
+  "full_report_or_backend_equivalence_claimed": false,
+  "gates_updated": false
+}

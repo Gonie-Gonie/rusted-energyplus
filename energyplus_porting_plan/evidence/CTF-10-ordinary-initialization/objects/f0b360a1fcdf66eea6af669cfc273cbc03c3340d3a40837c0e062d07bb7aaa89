@@ -1,0 +1,2 @@
+{"role": "fmt-check", "exit_code": 0, "source_snapshot": {"path": ".runtime/porting/source-objects/1f/1f77e353f2733084fbb4bae07df606b748570699303b2365d454bdeaa861a525", "sha256": "1f77e353f2733084fbb4bae07df606b748570699303b2365d454bdeaa861a525"}}
+{"role": "clippy", "exit_code": 101, "source_snapshot": {"path": ".runtime/porting/source-objects/1f/1f77e353f2733084fbb4bae07df606b748570699303b2365d454bdeaa861a525", "sha256": "1f77e353f2733084fbb4bae07df606b748570699303b2365d454bdeaa861a525"}}

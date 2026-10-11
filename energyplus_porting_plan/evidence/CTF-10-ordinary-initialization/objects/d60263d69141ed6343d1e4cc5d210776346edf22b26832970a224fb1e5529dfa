@@ -1,0 +1,12 @@
+--- before
++++ crates/ep_run/tests/arbitrary_run/output_manifest.rs
+@@ -20,6 +20,9 @@
+ 
+ pub(crate) const SUPPORTED_RUNTIME_MANIFEST: &[&str] = &[
+     "diagnostics.json",
++    "eplusrs.ctf.err",
++    "eplusrs.ctf.log",
++    "eplusrs.eio",
+     "eplusrs.err",
+     "input/converted.epJSON",
+     "input/input-hashes.json",

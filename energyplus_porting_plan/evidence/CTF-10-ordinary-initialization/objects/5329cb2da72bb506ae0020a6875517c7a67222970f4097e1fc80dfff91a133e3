@@ -1,0 +1,10 @@
+--- .runtime/porting/CTF-10/ordinary-initialization-correction-02/part03.before.rs
++++ crates/ep_runtime/src/runtime/tests/part03.rs
+@@ -1096,6 +1096,7 @@
+                     flux: Some(0.5),
+                 },
+             ],
++            None,
+         )?;
+ 
+         let floor_initial_slots = simulation

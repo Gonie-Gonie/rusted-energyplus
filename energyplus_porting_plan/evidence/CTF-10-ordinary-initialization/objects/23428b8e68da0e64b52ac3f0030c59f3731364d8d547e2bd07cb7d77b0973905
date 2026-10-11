@@ -1,0 +1,26 @@
+This is an unexecuted Root-only evidence finalizer, adapted from the existing selected-file archive/finalizer. It runs no Cargo, tests, CLI, Native target, Git or documentation writer. Root authors the actual operand packet after current quality, F/G and smoke finish; no successful future identity is supplied here.
+
+CLI: python -X utf8 -B finalize-ordinary-initialization.py actual_operands.json actual_operands_sha256
+
+The packet schema is ctf10-ordinary-initialization-milestone-inputs.v1. Each ref is a genuine root-relative path/SHA256 with optional actual size_bytes. Required fields:
+
+- application: actual ordinary-initialization-applied-02 record ref, nineteen canonical archives and accepted parent/correction authorities.
+- additional_test_sources: the two current test rows for arbitrary_run/output_manifest.rs and arbitrary_run_ideal_loads.rs, each canonical_path plus actual_final_source ref. Root supplies their genuine correction archives; these do not replace the immutable application19.
+- quality: map in arbitrary JSON key order, with fmt-check, clippy, focused and workspace refs. All four must be genuine successful identical raw current SourceSnapshots and exact established Cargo commands. Test counts are parsed only from their actual logs, without a predicted count or rerun.
+- retained_lineage: opaque authenticated refs covering actual corrections01-05, including the unexecuted wrong-match correction01. Supply before/source/diff/record files and actual reviewed helper Sources as appropriate; this field is never JSON-decoded.
+- retained_lineage_receipts: actual recorder receipt refs, including failed clippy01/workspace02/workspace03/workspace04 and their launch receipts. Only genuine receipt files are parsed; complete associated stdout/stderr/SourceSnapshot/recorder Source are retained. There is no fictional workspace01 prerequisite.
+- format_comparison and format_comparison_execution: genuine selected608 text comparison and its actual outer recorder refs. Native workflow must have released its complete608 capture. Full Native and candidate result stdout are copied opaquely with full SHA; no rendering, numeric evaluation, or body parsing. Candidate Cargo/run/outer recorder bind current successful quality Source; Native remains its genuine historical Source.
+- ordinary_smoke: actual smoke02 six-case summary ref. Six actual zero CLI receipts, current Source, exact quality refs, caller output streams and run summaries are retained; large traces, fixture bodies, weather and binaries are excluded.
+- optional_report_input_packet and optional_report_CLI_receipt: both null or both genuine refs after the optional append-only A24 report variant was executed successfully. Only actual EIO headers/prefix are checked; no physical answers or Native same-input claim.
+
+The output directory energyplus_porting_plan/evidence/CTF-10-ordinary-initialization must be fresh. It receives accepted.json, manifest.json, summary.json and content-addressed selected byte copies. This selected archive is explicitly not a transitive replay closure. All source/metadata inputs are reauthenticated before and after archiving. The complete raw current SourceSnapshot also covers test changes outside the nineteen application rows.
+
+The milestone records actual ordinary A/B initialization connection, selected608 formatting parity, quality and six smoke successes. It retains the six-case EIO enabled/disabled coverage exactly and separately records any successful extra-case enabled evidence. Native full registry/backend/whole Init and ordinary numerical/history/full-card gates remain unclaimed; Root authors final docs/check_plan/commit separately. Existing immutable evidence is not rewritten.
+
+Source authorship read only reviewed Sources and small actual application/correction/receipt metadata. No new quality/results/Native payloads, binaries, weather or input bodies were read; no proposed finalizer execution or canonical/Git mutation occurred.
+
+
+Source02 narrow authority successor: actual application03 has the same nineteen canonical rows and three actual test corrections02/03/06. Additional two output-manifest tests remain separately archived/current-snapshot-bound. Opaque corrections01-06 and genuine failed quality01-05 receipts are retained; the successful four current quality receipts remain runtime operands with no numeric suffix requirement. All archive, F/G608/Native-historical/current-Rust, six-smoke, optional EIO and no-gates/docs/Git behavior remains01. In the preceding README, application02/corrections01-05/failed01-04 are now explicitly historical predecessor descriptions; current admission is application03/corrections01-06/failed01-05.
+
+
+Source03 metadata-only repair: the Source02 finalizer manifest referenced an intermediate writer03 manifest hash created before its final dependency seal. This successor corrects only that dependency identity to the authentic immutable announced d4f37d6b writer03. All finalizer Source144 bytes, before/template/narrow diff, guards and runtime contract remain literal02; no Source execution or output change. Source02 is preserved as historical defective metadata.

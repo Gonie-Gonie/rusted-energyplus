@@ -13,6 +13,7 @@ mod clk03_trace;
 mod clk06_sky_trace;
 mod clock_trace;
 mod config;
+mod ctf_initialization_outputs;
 mod diagnostics;
 mod geo02_trace;
 mod geo03_trace;

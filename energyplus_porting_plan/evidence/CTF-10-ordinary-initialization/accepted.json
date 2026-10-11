@@ -1,0 +1,206 @@
+{
+  "schema": "ctf10-ordinary-initialization-accepted-current-source.v1",
+  "actual_application": {
+    "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-03/record.json",
+    "sha256": "d8dd8f803c33a20dc6ab9ef07e0dd170c857ae8aeb9716f527115ad3f2b4ba33",
+    "size_bytes": 10475
+  },
+  "actual_sources": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-02/current/crates__ep_runtime__src__heat_balance__ctf_initialization_context.rs",
+        "sha256": "08cb5697f9e412d953075d707b010af3efd539faef6940f66e337145b20ac659",
+        "size_bytes": 9251
+      },
+      "Source_authority": "byte-exact accepted parent application01"
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-02/current/crates__ep_runtime__src__heat_balance__ctf_source_diagnostics.rs",
+        "sha256": "25db310ed83eaf2bdf97f1189700aa985935101d1c5ae12397a42e50e116c1c3",
+        "size_bytes": 7238
+      },
+      "Source_authority": "byte-exact accepted parent application01"
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-02/current/crates__ep_runtime__src__heat_balance__ctf_reports.rs",
+        "sha256": "fc1e151753fb50b43333cd28e293a2560ff3b623f247676d745a692858b303a7",
+        "size_bytes": 16564
+      },
+      "Source_authority": "byte-exact accepted parent application01"
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-02/current/crates__ep_runtime__src__heat_balance__ctf_init_postlude.rs",
+        "sha256": "7628526fb3d4ef28fb0061df6d0b621ae3abb2c4481f9e8835fb8a1c9fdebefd",
+        "size_bytes": 8177
+      },
+      "Source_authority": "byte-exact accepted parent application01"
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-02/current/crates__ep_runtime__src__heat_balance__surface_manager__construction_cache.rs",
+        "sha256": "6975e14b493175e09abb5a4de865aa06c47765a98fe69a0fdbbf075240f9c198",
+        "size_bytes": 30066
+      },
+      "Source_authority": "byte-exact accepted parent application01"
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/error.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-02/current/crates__ep_runtime__src__error.rs",
+        "sha256": "0b2cc9b5d3add64df91f27c632b41a76f48f477e2b7cb2b9ae13260c380f924f",
+        "size_bytes": 9509
+      },
+      "Source_authority": "byte-exact accepted parent application01"
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-02/current/crates__ep_runtime__src__heat_balance__initialization.rs",
+        "sha256": "a65f48ff6e13a0a97cdd8378d162adf03c2950b1e21ad8cff894d6016895de6a",
+        "size_bytes": 13634
+      },
+      "Source_authority": "byte-exact accepted parent application01"
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-02/current/crates__ep_runtime__src__heat_balance__initialization__schedule_cache.rs",
+        "sha256": "78fb5b7616416089b96e8868be0f5227952cce69b47974aa1ac630861452c320",
+        "size_bytes": 5143
+      },
+      "Source_authority": "byte-exact accepted parent application01"
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/runtime.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-02/current/crates__ep_runtime__src__runtime.rs",
+        "sha256": "3d9fa35b763a43d0a9b9b1a559ae4a0dacf5ff6ae02790d044894190e08f3a49",
+        "size_bytes": 25403
+      },
+      "Source_authority": "byte-exact accepted parent application01"
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-02/current/crates__ep_runtime__src__ideal_loads__coupled_runtime.rs",
+        "sha256": "064b727d522fad72b74f11d54e26216d89e79c2762985bb66641f4321b4d0b5f",
+        "size_bytes": 597445
+      },
+      "Source_authority": "byte-exact accepted parent application01"
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-02/current/crates__ep_runtime__src__heat_balance__mod.rs",
+        "sha256": "189dd2b58a10ac7e590a37548c166ab5596d93eb408186a68f339230e523861e",
+        "size_bytes": 2092
+      },
+      "Source_authority": "byte-exact accepted parent application01"
+    },
+    {
+      "canonical_path": "crates/ep_run/src/ctf_initialization_outputs.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-02/current/crates__ep_run__src__ctf_initialization_outputs.rs",
+        "sha256": "34c171d4608a419f51655da4ab24ffbfbe485733a1728a8fb779c7564f2799cb",
+        "size_bytes": 6212
+      },
+      "Source_authority": "reviewed fatal-test correction03"
+    },
+    {
+      "canonical_path": "crates/ep_run/src/lib.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-02/current/crates__ep_run__src__lib.rs",
+        "sha256": "46aa4eb3d6dbcf7a2ee013a5146ee2c5fd0f01d780aa41ac23f5a37099156aff",
+        "size_bytes": 1021
+      },
+      "Source_authority": "byte-exact accepted parent application01"
+    },
+    {
+      "canonical_path": "crates/ep_run/src/pipeline.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-02/current/crates__ep_run__src__pipeline.rs",
+        "sha256": "a12f7e5bec9dc1df72007568a84a2b8a149822ceff58d3974652e099e8a667b3",
+        "size_bytes": 822206
+      },
+      "Source_authority": "byte-exact accepted parent application01"
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-06/ctf_ordinary_outputs.rs",
+        "sha256": "94d8a5bf1d5440ab505d6a2f3373b76f3f564da28deb29beb716b2967156e3c1",
+        "size_bytes": 9667
+      },
+      "Source_authority": "reviewed unchanged-fatal-flag runtime test correction06"
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/runtime/tests.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-02/current/crates__ep_runtime__src__runtime__tests.rs",
+        "sha256": "a448d3b45ab0996c6e60c2936160d57130fcdee7f5481de9bcaf1b83e528aef0",
+        "size_bytes": 547
+      },
+      "Source_authority": "byte-exact accepted parent application01"
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/ctf10_report_format_unit_observer.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-02/current/crates__ep_run__examples__ctf10_report_format_unit_observer.rs",
+        "sha256": "c2c57750cf987bfb6cd5b392d9b93098e067a3ba2706bd0fd2f21c0d0c422481",
+        "size_bytes": 4521
+      },
+      "Source_authority": "byte-exact accepted parent application01"
+    },
+    {
+      "canonical_path": "crates/ep_model/src/model.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-02/current/crates__ep_model__src__model.rs",
+        "sha256": "334ae93fc3cdd32580f1e49349ecbe07fb1dab83809e371c16b4ac5fadd20ba7",
+        "size_bytes": 93321
+      },
+      "Source_authority": "byte-exact accepted parent application01"
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/runtime/tests/part03.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-02/current/crates__ep_runtime__src__runtime__tests__part03.rs",
+        "sha256": "fff25a816be772d0d4d4dc2d782e2a45f800bcd9c61dfa92b7fe9364fbca8536",
+        "size_bytes": 48079
+      },
+      "Source_authority": "reviewed existing-test arity correction02"
+    }
+  ],
+  "additional_test_sources": [
+    {
+      "canonical_path": "crates/ep_run/tests/arbitrary_run/output_manifest.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-05/output_manifest.rs",
+        "sha256": "2c90e6517ac7060082c3588c86747ab1789272535033c2a3a9e0a551999b66a5",
+        "size_bytes": 3147
+      }
+    },
+    {
+      "canonical_path": "crates/ep_run/tests/arbitrary_run_ideal_loads.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-05/arbitrary_run_ideal_loads.rs",
+        "sha256": "ff9555916a95fb744f147388d92cfe27eab18ac7ad872c613b623d7660999e4b",
+        "size_bytes": 47420
+      }
+    }
+  ],
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/ca/cae115f4bcf0212021276eecf9b6f613630d80dc952bb27e96e8cc76bcc3fa16",
+    "sha256": "cae115f4bcf0212021276eecf9b6f613630d80dc952bb27e96e8cc76bcc3fa16"
+  },
+  "ordinary_A_and_B_dispatch_connected": true,
+  "raw_Source_snapshots_normalized": false,
+  "gates_updated": false
+}

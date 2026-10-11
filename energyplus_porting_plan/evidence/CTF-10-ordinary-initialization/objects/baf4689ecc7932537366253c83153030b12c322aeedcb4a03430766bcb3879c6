@@ -1,0 +1,2 @@
+{"stage": "cargo", "receipt": {"path": ".runtime/porting/CTF-10/report-format-candidate-workflow-02/cargo/receipt.json", "sha256": "ff9840411846fb486d58893b3e49671d527a646b92dccc5a8fa3dc8d3ca88038", "size_bytes": 7086}, "exit_code": 0}
+{"stage": "rust-execution", "receipt": {"path": ".runtime/porting/CTF-10/report-format-candidate-workflow-02/rust-execution/receipt.json", "sha256": "9486c77e2a79902468de7e524133344b8159bc88f78aa38448fc4a5fdc8f1a51", "size_bytes": 5615}, "exit_code": 0}

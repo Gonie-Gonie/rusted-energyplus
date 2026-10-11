@@ -1096,6 +1096,7 @@
                     flux: Some(0.5),
                 },
             ],
+            None,
         )?;
 
         let floor_initial_slots = simulation

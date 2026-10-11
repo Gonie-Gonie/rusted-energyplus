@@ -1,5 +1,6 @@
 //! Arbitrary-run pipeline implementation.
 
+use crate::ctf_initialization_outputs::{CtfRunOutputs, write_error_summary};
 use std::collections::BTreeMap;
 use std::fmt::{Display, Formatter};
 use std::hash::Hasher;
@@ -164,8 +165,8 @@ use ep_runtime::{
     build_hourly_time_axis, build_hourly_time_axis_with_weather_metadata, precompute_runtime_data,
     precompute_schedule_cache_for_environment_time_axis, precompute_schedule_cache_for_time_axis,
     select_epw_environment_weather,
-    simulate_direct_zone_purchased_air_coupled_heat_balance_with_production_weather,
-    simulate_heat_balance_zone_air_temperatures_with_production_weather,
+    simulate_direct_zone_purchased_air_coupled_heat_balance_with_production_weather_and_initialization_context,
+    simulate_heat_balance_zone_air_temperatures_with_production_weather_and_initialization_context,
     simulate_ideal_loads_node_state_projection, simulate_ideal_loads_purchased_air_compat,
 };
 use serde::Serialize;
@@ -1424,26 +1425,36 @@ fn run_with_optional_porting_scope_impl(
         );
 
         let runtime_start = Instant::now();
-        match validate_runtime_selection(assessment.run_result_state, assessment.runtime_class)
-            .and_then(|()| {
-                ep_runtime::psychrometrics::production_trace::in_phase("rust_runtime", || {
-                    execute_rust_runtime(
-                        simulation_model.as_ref(),
-                        assessment.runtime_class,
-                        source_order_gate,
-                        &runtime_inputs,
-                        config.trace_level == TraceLevel::Full,
-                    )
-                })
-            })
-            .and_then(|result| {
-                validate_runtime_demand_provenance(
-                    assessment.run_result_state,
-                    &result,
-                    simulation_model.as_ref(),
-                )?;
-                Ok(result)
-            }) {
+        let version = simulation_model
+            .as_ref()
+            .map(|model| model.typed.version.to_string())
+            .unwrap_or_else(|| "unavailable (initializer not reached)".into());
+        let mut ctf_outputs = CtfRunOutputs::new(&version);
+        let runtime_result =
+            validate_runtime_selection(assessment.run_result_state, assessment.runtime_class)
+                .and_then(|()| {
+                    ep_runtime::psychrometrics::production_trace::in_phase("rust_runtime", || {
+                        execute_rust_runtime(
+                            simulation_model.as_ref(),
+                            assessment.runtime_class,
+                            source_order_gate,
+                            &runtime_inputs,
+                            config.trace_level == TraceLevel::Full,
+                            &mut ctf_outputs,
+                        )
+                    })
+                });
+        ctf_outputs
+            .persist(&config.output_dir)
+            .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
+        match runtime_result.and_then(|result| {
+            validate_runtime_demand_provenance(
+                assessment.run_result_state,
+                &result,
+                simulation_model.as_ref(),
+            )?;
+            Ok(result)
+        }) {
             Ok(result) => {
                 timing.push(
                     "rust_runtime",
@@ -1616,8 +1627,8 @@ fn finish_early(
     timing.total_wall_seconds = timing.phases.iter().map(|phase| phase.wall_seconds).sum();
     write_json(&config.output_dir.join("diagnostics.json"), &diagnostics)
         .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
-    write_text(
-        &config.output_dir.join("eplusrs.err"),
+    write_error_summary(
+        &config.output_dir,
         &render_eplusrs_err(&diagnostics, exit_code),
     )
     .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
@@ -2028,8 +2039,8 @@ fn finish_successful_summary(
 ) -> Result<RunOutcome, RunError> {
     write_json(&config.output_dir.join("diagnostics.json"), &diagnostics)
         .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
-    write_text(
-        &config.output_dir.join("eplusrs.err"),
+    write_error_summary(
+        &config.output_dir,
         &render_eplusrs_err(&diagnostics, exit_code),
     )
     .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
@@ -3577,6 +3588,7 @@ fn execute_rust_runtime(
     source_order_gate: SourceOrderGateSummary,
     runtime_inputs: &PreparedRuntimeInputs,
     capture_geometry: bool,
+    ctf_outputs: &mut CtfRunOutputs,
 ) -> Result<RustRuntimeResult, String> {
     let model = simulation_model.ok_or_else(|| "missing compiled simulation model".to_string())?;
     let sample_count = runtime_inputs.sample_count;
@@ -3591,10 +3603,12 @@ fn execute_rust_runtime(
             let _runtime_time_axis_samples = runtime_inputs.time_axis.sample_count();
             let _runtime_precomputed_schedule_count = runtime_inputs.schedule_cache.len();
             let options = HeatBalanceSimulationOptions::hourly_samples(sample_count);
-            let simulation = simulate_heat_balance_zone_air_temperatures_with_production_weather(
+            let mut initialization = ctf_outputs.context();
+            let simulation = simulate_heat_balance_zone_air_temperatures_with_production_weather_and_initialization_context(
                 model,
                 weather_series,
                 options,
+                &mut initialization,
             )
             .map_err(|error| error.to_string())?;
             Ok(RustRuntimeResult {
@@ -3804,12 +3818,14 @@ fn execute_rust_runtime(
                 })?;
             let schedule_cache_sample_count = schedule_cache.sample_count();
             let schedule_cache_profile = schedule_cache.profile();
+            let mut initialization = ctf_outputs.context();
             let simulation =
-                simulate_direct_zone_purchased_air_coupled_heat_balance_with_production_weather(
+                simulate_direct_zone_purchased_air_coupled_heat_balance_with_production_weather_and_initialization_context(
                     model,
                     weather_series,
                     schedule_cache,
                     DirectZonePurchasedAirCoupledOptions::hourly_samples(sample_count),
+                    &mut initialization,
                 )
                 .map_err(|error| error.to_string())?;
             let zone_demand_source = Some(simulation.summary.zone_demand_source.to_string());

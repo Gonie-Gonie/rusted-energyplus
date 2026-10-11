@@ -1,0 +1,1714 @@
+{
+  "schema": "ctf10-ordinary-initialization-milestone-inputs.v1",
+  "application": {
+    "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-03/record.json",
+    "sha256": "d8dd8f803c33a20dc6ab9ef07e0dd170c857ae8aeb9716f527115ad3f2b4ba33",
+    "size_bytes": 10475
+  },
+  "additional_test_sources": [
+    {
+      "canonical_path": "crates/ep_run/tests/arbitrary_run/output_manifest.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-05/output_manifest.rs",
+        "sha256": "2c90e6517ac7060082c3588c86747ab1789272535033c2a3a9e0a551999b66a5",
+        "size_bytes": 3147
+      }
+    },
+    {
+      "canonical_path": "crates/ep_run/tests/arbitrary_run_ideal_loads.rs",
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-05/arbitrary_run_ideal_loads.rs",
+        "sha256": "ff9555916a95fb744f147388d92cfe27eab18ac7ad872c613b623d7660999e4b",
+        "size_bytes": 47420
+      }
+    }
+  ],
+  "quality": {
+    "fmt-check": {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-fmt-check-command-07/receipt.json",
+      "sha256": "50c4701871ccbfd7f94689d47561cc82c86d6d2b2cefab3d30f250f2b1d031c7",
+      "size_bytes": 5318
+    },
+    "clippy": {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-clippy-command-07/receipt.json",
+      "sha256": "6746441d3ddb9f9fc870dbdfb0b79081d72e258217fd48dbd23465147530c5de",
+      "size_bytes": 5503
+    },
+    "focused": {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-focused-command-07/receipt.json",
+      "sha256": "2cd9d6f3b0343233f9b493938463f8cbdd41c085ec895a8742def8861564636b",
+      "size_bytes": 5491
+    },
+    "workspace": {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-workspace-command-07/receipt.json",
+      "sha256": "727852e1f2313fdae2ac75cefedda11e781a2e0fabbebc5c2a65e1ab098a6ef0",
+      "size_bytes": 5450
+    }
+  },
+  "retained_lineage": [
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-01/correction.diff",
+      "sha256": "10a80c98a264cb39b7cfd9b2cf95cc1b74836153c7dd67ada34af6d6825c8948",
+      "size_bytes": 304
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-01/part03.before.rs",
+      "sha256": "dc09a2bf601876562036eb62e41d4d5eb7f213e59b080c150bc59790ed6f4983",
+      "size_bytes": 48061
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-01/part03.rs",
+      "sha256": "2c0a8af58a81d32074833b6fe4ce589d90a87986773511fef9a373e57d1a2ce5",
+      "size_bytes": 48079
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-02/correction.diff",
+      "sha256": "5329cb2da72bb506ae0020a6875517c7a67222970f4097e1fc80dfff91a133e3",
+      "size_bytes": 309
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-02/part03.before.rs",
+      "sha256": "dc09a2bf601876562036eb62e41d4d5eb7f213e59b080c150bc59790ed6f4983",
+      "size_bytes": 48061
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-02/part03.rs",
+      "sha256": "fff25a816be772d0d4d4dc2d782e2a45f800bcd9c61dfa92b7fe9364fbca8536",
+      "size_bytes": 48079
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-02/record.json",
+      "sha256": "dec40058cf955ff94caaaa676afe1cee084ad49053ef014cb20630bdd332b9d1",
+      "size_bytes": 418
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-03/correction.diff",
+      "sha256": "23c398f5109120acdd11cd2114835ae215f258e9c2a5d2ea7c5c123b58bfa696",
+      "size_bytes": 550
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-03/ctf_initialization_outputs.before.rs",
+      "sha256": "fabdd6d34476639e28deb3cb24695e69b05e68031d481b8131c80f0fd01b84f8",
+      "size_bytes": 6128
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-03/ctf_initialization_outputs.rs",
+      "sha256": "34c171d4608a419f51655da4ab24ffbfbe485733a1728a8fb779c7564f2799cb",
+      "size_bytes": 6212
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-03/record.json",
+      "sha256": "7e821dab38b3e50566750afca08eda1643c906f3e38f887eb2c2e7f480a4958d",
+      "size_bytes": 834
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-03/ShowFatalError.original.txt",
+      "sha256": "672cf909c316d2b2b718c3d672d4e0268d48e00cd4b824f2086032b9c021279c",
+      "size_bytes": 1678
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-04/correction.diff",
+      "sha256": "d60263d69141ed6343d1e4cc5d210776346edf22b26832970a224fb1e5529dfa",
+      "size_bytes": 323
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-04/output_manifest.before.rs",
+      "sha256": "35ab4cecab7f1b91a116b8e6585058c79f12c116dad7482f3a42e903e7476db7",
+      "size_bytes": 2395
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-04/output_manifest.rs",
+      "sha256": "d5e08f272b8de7c072a3cd12aa12066bb36127c8fc6d259b09515b40934b9495",
+      "size_bytes": 2460
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-04/record.json",
+      "sha256": "69a5c0418cc1ae8f0cd9bce841547c3f5cfce1e1077e2a26f4abeeda68180c8d",
+      "size_bytes": 610
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-05/arbitrary_run_ideal_loads.rs",
+      "sha256": "ff9555916a95fb744f147388d92cfe27eab18ac7ad872c613b623d7660999e4b",
+      "size_bytes": 47420
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-05/arbitrary_run_ideal_loads.rs.before",
+      "sha256": "bca1f00ca1d9d847fd701512650cff7cd69191e60859749400c81bd30c9a69a2",
+      "size_bytes": 47383
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-05/arbitrary_run_ideal_loads.rs.diff",
+      "sha256": "0676ac88afb8541a254718f7b76484e850c0606c80863e79d943fcd90272cea6",
+      "size_bytes": 1046
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-05/output_manifest.rs",
+      "sha256": "2c90e6517ac7060082c3588c86747ab1789272535033c2a3a9e0a551999b66a5",
+      "size_bytes": 3147
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-05/output_manifest.rs.before",
+      "sha256": "d5e08f272b8de7c072a3cd12aa12066bb36127c8fc6d259b09515b40934b9495",
+      "size_bytes": 2460
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-05/output_manifest.rs.diff",
+      "sha256": "e6698b6ca8b07ead09b0a4426886fbca891631a64b17b64cb8712ae5a323097c",
+      "size_bytes": 947
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-05/record.json",
+      "sha256": "9dfe138a46cc0e29381023da16a28dbd65861f2715b61c1719e956c71e789e0d",
+      "size_bytes": 951
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-06/correction.diff",
+      "sha256": "1cc34024a8f5e919226aa9457127e960c1d2e57e749f427758838c2d8e57d049",
+      "size_bytes": 502
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-06/ctf_ordinary_outputs.before.rs",
+      "sha256": "0927264bcfb992e9e65d9876c2da1ba4387aa1cdf8c5678f8636369233e551a1",
+      "size_bytes": 9666
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-06/ctf_ordinary_outputs.rs",
+      "sha256": "94d8a5bf1d5440ab505d6a2f3373b76f3f564da28deb29beb716b2967156e3c1",
+      "size_bytes": 9667
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-06/record.json",
+      "sha256": "b9e8b631ed8f952b53b05eb5c0eb854bee6fe35f6a1e0279ebe1f4a70ccb6d0a",
+      "size_bytes": 907
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-prep-01/before/crates/ep_runtime/src/heat_balance/ctf_reports_format.rs",
+      "sha256": "a4c0f21ecc2caf3c223c69dfef65b0a2fdd866268484ce66575080a35a4af49c",
+      "size_bytes": 2678
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-prep-01/before/crates/ep_runtime/src/heat_balance/ctf_reports_tests.rs",
+      "sha256": "f63f6090a9bbfb6fc8b9f059845041542a0e1de275a9ed8064562fef8923a2e9",
+      "size_bytes": 8333
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-prep-01/diffs/ctf_reports_format.rs.diff",
+      "sha256": "f6984d1a1522e66dc52d11d0be781306bda51a29cf0d64e59f762112fc0f1556",
+      "size_bytes": 1257
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-prep-01/diffs/ctf_reports_tests.rs.diff",
+      "sha256": "7a9f130f25a144f4b2b9cb30f79d6a9d72fccfc2312e9e4d446184f2e118d2bb",
+      "size_bytes": 1627
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-prep-01/manifest.json",
+      "sha256": "91d5cb69e9d9defa6937b3558ad5b7c18bfe3fdb060a92f4cae7bc655770558e",
+      "size_bytes": 7078
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_reports_format.rs",
+      "sha256": "d8aa1aa88e3000a4be37f6179c3c6829b7ff534d16efded123d91ab5045c0151",
+      "size_bytes": 2813
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_reports_tests.rs",
+      "sha256": "1c83281cdcb92aa66526e8bbd577d0d795ac53b77dbe433e55ddcbf6190dcae0",
+      "size_bytes": 9356
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-prep-01/README.md",
+      "sha256": "8b5712d6dfbac0171f5efb23e474b8d1c01297c85702436f7b2cc8b7e36122a9",
+      "size_bytes": 2072
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-applied-01/ctf_reports_format.rs",
+      "sha256": "d8aa1aa88e3000a4be37f6179c3c6829b7ff534d16efded123d91ab5045c0151",
+      "size_bytes": 2813
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-applied-01/ctf_reports_format.rs.diff",
+      "sha256": "f6984d1a1522e66dc52d11d0be781306bda51a29cf0d64e59f762112fc0f1556",
+      "size_bytes": 1257
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-applied-01/ctf_reports_tests.rs",
+      "sha256": "773888d469697ab73fd8d8c799233fb7f07684861b82c6f5b6047e549926582e",
+      "size_bytes": 9356
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-applied-01/ctf_reports_tests.rs.diff",
+      "sha256": "91b9efc232a93e868cb1392e314900fbabb918a5874a93f6e67bd6b6c73dddd7",
+      "size_bytes": 1626
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-applied-01/record.json",
+      "sha256": "dee36a57246fa167a994b654734dee98a6a5f1de1b8fe9c6c8081bf497ff2e9d",
+      "size_bytes": 2984
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_run/src/lib.rs",
+      "sha256": "9851f0f5fd39b6d18367a94f05fc672e86ff195537aace73898fa196015dca0f",
+      "size_bytes": 989
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_run/src/pipeline.rs",
+      "sha256": "f4f4fb7931f3f1e36bff1a92ec5776b18487258a96acd63522be263836df5e11",
+      "size_bytes": 821302
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/error.rs",
+      "sha256": "e93b95a35b4c75ef8a97b1b27199a4a0e87dce2799b36dc668d6a7368f2a609b",
+      "size_bytes": 8753
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs",
+      "sha256": "1469a0bd2c82ba4bb6efbcc0f9aa63466cd26fc7bb953f107c6e2ddc86a834ea",
+      "size_bytes": 7600
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+      "sha256": "c645bf2d52dcd8722025899b5609ae737b3fc591aa1f5fd00e19cd3573cef21f",
+      "size_bytes": 16349
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+      "sha256": "c2f14f6edf4e34554841c758ee72fde06f329cc50be42b27146de7e19c8123da",
+      "size_bytes": 6467
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "sha256": "2b3343ff4f3cec29be8cc77bcd4d14a8bbcc78464812ad04b88d22469f7f0dfb",
+      "size_bytes": 4401
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "1085d4cca6abb6cd92d4757d0f8ddb2af55dc7082b2acbc6f14953c9b5c6826f",
+      "size_bytes": 13143
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "954197538ee3821bb133e1162464026aa7c3dfe8f9737da07db30339d305f34a",
+      "size_bytes": 1970
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "sha256": "ad3169215dc487403513967f007591f66bffbbea95f3569f6feb67a8d67ff923",
+      "size_bytes": 26039
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+      "sha256": "b730956c47a069469572cec8dfb6c469912444a94dc8aa0b7fd7d463b263f602",
+      "size_bytes": 595815
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/runtime/tests.rs",
+      "sha256": "15e1fa2ba20f8c2b6a89d4671e73c239ebb161f82bba3fe62efb0dcada51eebd",
+      "size_bytes": 504
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/runtime.rs",
+      "sha256": "6bc4ec918517ea6e9b2a0cfde0f6fecd8cbd22f0da7cf95cc07c0f8c8fcac350",
+      "size_bytes": 24048
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/diffs/00.diff",
+      "sha256": "c646d16920283e79c1e3ebd73cb762f94841fba6e78d9e26c3a7bdc6e521c677",
+      "size_bytes": 8810
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/diffs/01.diff",
+      "sha256": "0370c817c488fc58e878ab862b5127a3cf1a35b3c25835ef3974017087800be4",
+      "size_bytes": 2505
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/diffs/02.diff",
+      "sha256": "d40f8b22686af8ad7b08fafdd3dbd10c00a9ef70d7b2f35c2ef4064d2df78546",
+      "size_bytes": 1261
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/diffs/03.diff",
+      "sha256": "0a7113434f6dbec28de448adc53d6c0bd014f55b8433a8cba30489358dcce47c",
+      "size_bytes": 559
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/diffs/04.diff",
+      "sha256": "4d1f212583a2f5bfd1a4f209cf2bd981c0244e0aab1a47a21fab3e7beb519321",
+      "size_bytes": 7890
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/diffs/05.diff",
+      "sha256": "7f96421f3612273afbc04c67b5374c8440f8f71ac61061677ddc52d325e6a682",
+      "size_bytes": 1853
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/diffs/06.diff",
+      "sha256": "c35cfc3f80c734d832ec0f69bf3cf6b33e553284964e919356d69d4f6e1fc85c",
+      "size_bytes": 2242
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/diffs/07.diff",
+      "sha256": "bf61b7c40f5713e45535c4a39c85116b8b61fc980574d69d9fd66954d8e77cc7",
+      "size_bytes": 1264
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/diffs/08.diff",
+      "sha256": "ea947db2b157efd7955c6e49061619c9d26a61df75d1743ded844df005e25da1",
+      "size_bytes": 3674
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/diffs/09.diff",
+      "sha256": "2d46afb47b9bd5e95bfd9f4fa2b9f8b5e05b9544047952005c491c8f8d12fa03",
+      "size_bytes": 4155
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/diffs/10.diff",
+      "sha256": "f0f3ff4ff892db655306589e46dfb63c97939492d7332033a42c3caa0e77a661",
+      "size_bytes": 814
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/diffs/11.diff",
+      "sha256": "bc5b4dd4b47c89b6c2b28d8d9bc8f1500550bc4e8c96ad151a7ab11d0f305ee6",
+      "size_bytes": 5704
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/diffs/12.diff",
+      "sha256": "73a30784bcb72539bb1de18157c85d5ca771a1d766467f3d47c3c9269455f6d1",
+      "size_bytes": 342
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/diffs/13.diff",
+      "sha256": "a1cfc07501c1a1840767cb6a1c7b4d07e4582418b5d805d61d1491f33cd16678",
+      "size_bytes": 5631
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/diffs/14.diff",
+      "sha256": "eafbdf218749bfe78c9eb44aaa5f1856119d9314fc5c8add6ee8488e5c5e1dcf",
+      "size_bytes": 6838
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/diffs/15.diff",
+      "sha256": "02b293e6a96076a06a081f198843eba670f4e5d90ddf80c3437d0a3593fc6a97",
+      "size_bytes": 404
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/manifest.json",
+      "sha256": "6fcbc12f1882011a4b17cdad0e96b9322f170b792e210f62441001f488289070",
+      "size_bytes": 26148
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/prepare-caller.py",
+      "sha256": "637e26f3a7a11bccf53a399f7c65c57981ed477e6a234a68559cf8f6633db333",
+      "size_bytes": 17091
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/prepare.py",
+      "sha256": "015518d13d274ff7b9744733f1f44f8d0041509e9be02385c0b291506e18df52",
+      "size_bytes": 26802
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/proposed/crates/ep_run/src/ctf_initialization_outputs.rs",
+      "sha256": "6e54d05aa0697888bf8bbba548dafb8cd89191adccc2cc0e7b120c36e4d7e60e",
+      "size_bytes": 5444
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/proposed/crates/ep_run/src/lib.rs",
+      "sha256": "46aa4eb3d6dbcf7a2ee013a5146ee2c5fd0f01d780aa41ac23f5a37099156aff",
+      "size_bytes": 1021
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/proposed/crates/ep_run/src/pipeline.rs",
+      "sha256": "3d72d0801b96ae4e4b1ec4ab0b377537a3112dc4a1ec0aca9d1512008e6388a0",
+      "size_bytes": 822135
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/proposed/crates/ep_runtime/src/error.rs",
+      "sha256": "e23a9f102d874626c548db33cc0641d9b5a1828420d507f15d5483e09a31efbb",
+      "size_bytes": 9457
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs",
+      "sha256": "4e0143fb5da1188812be828cc1a4716bbe1090c269c4c36838916b085cf799de",
+      "size_bytes": 7611
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "5491fb748ff560412115f9616d80d971e1239d405d57689e7edd4a5e3768e264",
+      "size_bytes": 8498
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+      "sha256": "e5003f133faad9975acf3bead1dd907fef979a287712d8722593e3e705f77a49",
+      "size_bytes": 16371
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+      "sha256": "e40b395482873af354f836f28c0de3f25f96071f44f4cdbc8e039b5a877c831a",
+      "size_bytes": 6873
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/proposed/crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "sha256": "85a0de2d2714f6ce1613f0ec3e8829d48beba85e79a8488d121d29f8c922bd8e",
+      "size_bytes": 5096
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/proposed/crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "30353890166ea00b6cd709767f0f6d063dea9dd284551915d1648427870a7a0d",
+      "size_bytes": 13578
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/proposed/crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "a90e2b087ee7fbbf51d840fafc2414c8f4c63fae7d2a09748aaac6847cb8d392",
+      "size_bytes": 2092
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "sha256": "3336b3a947d25130c7bb2208f1c58dce14648c9d4ef9c4b5334c41af03af7ce6",
+      "size_bytes": 29638
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/proposed/crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+      "sha256": "353135c5d2e9b382eceb8d4f54175cf090126a318f06211229d0d3ca5a9a1009",
+      "size_bytes": 597179
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/proposed/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "565e33a0baed2a3b8c2ceb5f99950594b2a80e201b2de58aab5f0c8e4bc3670a",
+      "size_bytes": 6572
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/proposed/crates/ep_runtime/src/runtime/tests.rs",
+      "sha256": "a448d3b45ab0996c6e60c2936160d57130fcdee7f5481de9bcaf1b83e528aef0",
+      "size_bytes": 547
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/proposed/crates/ep_runtime/src/runtime.rs",
+      "sha256": "dcedf58f9aca0a151769faf5628c5235f4989bc6f5dab15643e93a3f2c64ed09",
+      "size_bytes": 25144
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/README.md",
+      "sha256": "103d87c1cb0792f8ba051fd5969b1f5aeb07634d76783bfc5db0827949ac35c9",
+      "size_bytes": 4124
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/unsealed-source-entries.json",
+      "sha256": "de748b6ebf978bcad43b7ecedc097763b8eb83475e88e7072b9c02b21eac4b8d",
+      "size_bytes": 4159
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-01/before/run-production-activation-cli6-01.py",
+      "sha256": "92cc7e826151cf9034d08668a03e625de95f2c4b949abbeee61571f7fbc7022a",
+      "size_bytes": 10070
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-01/manifest.json",
+      "sha256": "fe4123c6c2d243562991949b74ce84fe3e56336f368216f5004826ab6d470df0",
+      "size_bytes": 6392
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-01/README.md",
+      "sha256": "8a96389b37e70c0aa404c533a39a6321e46829fe4fc7d09d5479aced5cfe979c",
+      "size_bytes": 2236
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-01/run-ordinary-init-smoke-01.py",
+      "sha256": "5503dffd0b9a5f9c9a6ee168702f9a165f79b29e8297e12f65d396394421d1c9",
+      "size_bytes": 12705
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-01/runner.diff",
+      "sha256": "f5e8ff81d14b2cfd6f595a6647e2915e3ea7c99ae22afa598bb3c1be648c9b5b",
+      "size_bytes": 14651
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-01/manifest.json",
+      "sha256": "9166ae053355219562901e49c25b130f72ba52bfe41dadf805b059ee61753a9c",
+      "size_bytes": 3245
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-01/prepare-report-input.py",
+      "sha256": "dafe6b3603c36a38d9a0aa370a72657ac598c1a9a77cdca6216a53c15c20a5dd",
+      "size_bytes": 4644
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-01/README.md",
+      "sha256": "efde67a8e6ea9b613b67d82dbbbc5911e8cf797aa3f95616d639bccec6c8abdc",
+      "size_bytes": 1705
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-01/writer.diff",
+      "sha256": "1e35a2be01261446b6b32833dc4c05d8693f005f9bb220229ab712db002d33c2",
+      "size_bytes": 4823
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-01/before/finalize-postlude-registry-severe-01.py",
+      "sha256": "9c5aabc9fa5c8f14a841637f40b256b4d406e6bd5ed26ddb1d95ad9d02805dfb",
+      "size_bytes": 9261
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-01/finalize-ordinary-initialization.py",
+      "sha256": "fda4ea866daa608cb836070bfcc0e56e7c9366692e47ca0bdd51b0eee4040671",
+      "size_bytes": 14854
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-01/finalizer.diff",
+      "sha256": "3e4693c64a1187d73e1c7263f5b5658197fad3a2f11e9512d43dc21d87e54b27",
+      "size_bytes": 24123
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-01/manifest.json",
+      "sha256": "ff99e9e8e38e279eee3f9776a6d70605ac0ed4cad5c6da905cd212fb18d6ca9e",
+      "size_bytes": 5198
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-01/README.md",
+      "sha256": "f7abcf7e13d34e57e28785dee4be26c6a4689546699635dbc614862bfd4ddf32",
+      "size_bytes": 3981
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before/crates/ep_run/src/lib.rs",
+      "sha256": "9851f0f5fd39b6d18367a94f05fc672e86ff195537aace73898fa196015dca0f",
+      "size_bytes": 989
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before/crates/ep_run/src/pipeline.rs",
+      "sha256": "f4f4fb7931f3f1e36bff1a92ec5776b18487258a96acd63522be263836df5e11",
+      "size_bytes": 821302
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before/crates/ep_runtime/src/error.rs",
+      "sha256": "e93b95a35b4c75ef8a97b1b27199a4a0e87dce2799b36dc668d6a7368f2a609b",
+      "size_bytes": 8753
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before/crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs",
+      "sha256": "9ba9ca900670bc10b60ac3989c6c33cee3e71ca12205830db87e9591d7b5c35e",
+      "size_bytes": 7857
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before/crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+      "sha256": "c645bf2d52dcd8722025899b5609ae737b3fc591aa1f5fd00e19cd3573cef21f",
+      "size_bytes": 16349
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before/crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+      "sha256": "5bb50c7b3744eae4454bb368e0f4299e1f7d0a07bc012b6f89464354e4bd23e2",
+      "size_bytes": 6874
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before/crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "sha256": "2b3343ff4f3cec29be8cc77bcd4d14a8bbcc78464812ad04b88d22469f7f0dfb",
+      "size_bytes": 4401
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before/crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "1085d4cca6abb6cd92d4757d0f8ddb2af55dc7082b2acbc6f14953c9b5c6826f",
+      "size_bytes": 13143
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before/crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "028ba24b0f052ebfbc69f619e48ff6a45b99a082e7972fe9af419d38b4db784d",
+      "size_bytes": 2056
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "sha256": "f2863445071eb42a1ea91dac7c7d6424eebfbe2a8f14e84ee8e4bbaabf2a475c",
+      "size_bytes": 26029
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before/crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+      "sha256": "b730956c47a069469572cec8dfb6c469912444a94dc8aa0b7fd7d463b263f602",
+      "size_bytes": 595815
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before/crates/ep_runtime/src/runtime/tests.rs",
+      "sha256": "15e1fa2ba20f8c2b6a89d4671e73c239ebb161f82bba3fe62efb0dcada51eebd",
+      "size_bytes": 504
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before/crates/ep_runtime/src/runtime.rs",
+      "sha256": "6bc4ec918517ea6e9b2a0cfde0f6fecd8cbd22f0da7cf95cc07c0f8c8fcac350",
+      "size_bytes": 24048
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before-01/crates/ep_run/src/ctf_initialization_outputs.rs",
+      "sha256": "6e54d05aa0697888bf8bbba548dafb8cd89191adccc2cc0e7b120c36e4d7e60e",
+      "size_bytes": 5444
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before-01/crates/ep_run/src/lib.rs",
+      "sha256": "46aa4eb3d6dbcf7a2ee013a5146ee2c5fd0f01d780aa41ac23f5a37099156aff",
+      "size_bytes": 1021
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before-01/crates/ep_run/src/pipeline.rs",
+      "sha256": "3d72d0801b96ae4e4b1ec4ab0b377537a3112dc4a1ec0aca9d1512008e6388a0",
+      "size_bytes": 822135
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before-01/crates/ep_runtime/src/error.rs",
+      "sha256": "e23a9f102d874626c548db33cc0641d9b5a1828420d507f15d5483e09a31efbb",
+      "size_bytes": 9457
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before-01/crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs",
+      "sha256": "4e0143fb5da1188812be828cc1a4716bbe1090c269c4c36838916b085cf799de",
+      "size_bytes": 7611
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before-01/crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "5491fb748ff560412115f9616d80d971e1239d405d57689e7edd4a5e3768e264",
+      "size_bytes": 8498
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before-01/crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+      "sha256": "e5003f133faad9975acf3bead1dd907fef979a287712d8722593e3e705f77a49",
+      "size_bytes": 16371
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before-01/crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+      "sha256": "e40b395482873af354f836f28c0de3f25f96071f44f4cdbc8e039b5a877c831a",
+      "size_bytes": 6873
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before-01/crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "sha256": "85a0de2d2714f6ce1613f0ec3e8829d48beba85e79a8488d121d29f8c922bd8e",
+      "size_bytes": 5096
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before-01/crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "30353890166ea00b6cd709767f0f6d063dea9dd284551915d1648427870a7a0d",
+      "size_bytes": 13578
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before-01/crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "a90e2b087ee7fbbf51d840fafc2414c8f4c63fae7d2a09748aaac6847cb8d392",
+      "size_bytes": 2092
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before-01/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "sha256": "3336b3a947d25130c7bb2208f1c58dce14648c9d4ef9c4b5334c41af03af7ce6",
+      "size_bytes": 29638
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before-01/crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+      "sha256": "353135c5d2e9b382eceb8d4f54175cf090126a318f06211229d0d3ca5a9a1009",
+      "size_bytes": 597179
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before-01/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "565e33a0baed2a3b8c2ceb5f99950594b2a80e201b2de58aab5f0c8e4bc3670a",
+      "size_bytes": 6572
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before-01/crates/ep_runtime/src/runtime/tests.rs",
+      "sha256": "a448d3b45ab0996c6e60c2936160d57130fcdee7f5481de9bcaf1b83e528aef0",
+      "size_bytes": 547
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before-01/crates/ep_runtime/src/runtime.rs",
+      "sha256": "dcedf58f9aca0a151769faf5628c5235f4989bc6f5dab15643e93a3f2c64ed09",
+      "size_bytes": 25144
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before-01/README.md",
+      "sha256": "103d87c1cb0792f8ba051fd5969b1f5aeb07634d76783bfc5db0827949ac35c9",
+      "size_bytes": 4124
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/diffs/00.diff",
+      "sha256": "dd39b3c708e05da3e1bafe2e201f2316a9b6a28fb3dd896d792cea7690ec4ec7",
+      "size_bytes": 8810
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/diffs/01.diff",
+      "sha256": "44eb4ce3318175aa0bb879d16d25ad5549a5f9e60c7657f26affc9d78fcc9de0",
+      "size_bytes": 2324
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/diffs/02.diff",
+      "sha256": "9b75d3fae223bff392119a8865290edc809061e963445411e0d46adcea06324f",
+      "size_bytes": 1725
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/diffs/03.diff",
+      "sha256": "fd26bcc1691e8718433e7c8258a59274a40f2bf9eb5207212ec18f26540a069f",
+      "size_bytes": 1148
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/diffs/04.diff",
+      "sha256": "87d98054e73be142de4400e292b75e0a7ba3b62f9eade9fa5c55d90149260cda",
+      "size_bytes": 7928
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/diffs/05.diff",
+      "sha256": "ea361bbce73e360a2d39e24d731b4b1fa245868e3cd67b94e057af72edd04089",
+      "size_bytes": 1853
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/diffs/06.diff",
+      "sha256": "8ec05e18d500f8636ce8538a220e359c05daf85c7eccc9f3ca6a011394feff16",
+      "size_bytes": 2242
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/diffs/07.diff",
+      "sha256": "9e7ca2b16f147759cb9369f4cdd41186368b7fdf9c2f29519403eb53df71413c",
+      "size_bytes": 1264
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/diffs/08.diff",
+      "sha256": "17447b02d703ddb83a18557aa4b54531d310820c6f0b54d5e00f4998e4fd3afb",
+      "size_bytes": 3674
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/diffs/09.diff",
+      "sha256": "59ba1ac74fd5d2f877c8e85a4ad8877496293cde251bcecf195c3053c9cff231",
+      "size_bytes": 4155
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/diffs/10.diff",
+      "sha256": "cb38eb0e5a67db94804a4d7a6fc6bf585ed6c54cf09d2197ce347c2a31b1967d",
+      "size_bytes": 454
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/diffs/11.diff",
+      "sha256": "d6cf262aabf2e10f18e697a57fbed7807a61a725ad752babc478202f42b29fa5",
+      "size_bytes": 5704
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/diffs/12.diff",
+      "sha256": "85a775477d62647a9e619c4d192315ca14380999252bc9f02501da28ded78f8d",
+      "size_bytes": 342
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/diffs/13.diff",
+      "sha256": "58fbcb621a85506bf51010dc1d57add50c06a5c3a83c81326d07c6462d40eb56",
+      "size_bytes": 5631
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/diffs/14.diff",
+      "sha256": "f7285d6df69f80205f41ab05218a1e9425c87d2fd85287e53c89df8a4a2e2584",
+      "size_bytes": 9985
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/diffs/15.diff",
+      "sha256": "d0bd17ccfed08c4c521d2325966ca7ebd55a1ee9f767d54fd245e546498235c8",
+      "size_bytes": 404
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/from-01-diffs/00.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/from-01-diffs/01.diff",
+      "sha256": "5fbebbc5a9eb59413a68c4841b72f4f15d0b7edaf3349b8d9401282ff80ec614",
+      "size_bytes": 6646
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/from-01-diffs/02.diff",
+      "sha256": "7b384e6bce231a1253b918969b704fe3072a0da2f1138a7db1aa29ae014ea989",
+      "size_bytes": 701
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/from-01-diffs/03.diff",
+      "sha256": "83f13033f12af3381412a54fa0afb6e98c6631d1425de10ec0e3de50ceff936f",
+      "size_bytes": 5798
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/from-01-diffs/04.diff",
+      "sha256": "211d79df8361fcf86b9ae9499eeeb04741c4b7ce0dfe717d04fa6c330f86e32e",
+      "size_bytes": 869
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/from-01-diffs/05.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/from-01-diffs/06.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/from-01-diffs/07.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/from-01-diffs/08.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/from-01-diffs/09.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/from-01-diffs/10.diff",
+      "sha256": "043cd8e97b7ad455d1442fcb86a5237f5992ad0a2526b72c698247fbdfa5ac9d",
+      "size_bytes": 581
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/from-01-diffs/11.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/from-01-diffs/12.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/from-01-diffs/13.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/from-01-diffs/14.diff",
+      "sha256": "abb5ece22ef2be8771bb9dcb8802ad8c519da4b5f517bdb75659780a5def7887",
+      "size_bytes": 3532
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/from-01-diffs/15.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/manifest.json",
+      "sha256": "8304bd40b65e0f176bdb2e1a9a92e75567d8569fb4e9d264d1316a599b1c8f1a",
+      "size_bytes": 39245
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_run/src/ctf_initialization_outputs.rs",
+      "sha256": "6e54d05aa0697888bf8bbba548dafb8cd89191adccc2cc0e7b120c36e4d7e60e",
+      "size_bytes": 5444
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_run/src/lib.rs",
+      "sha256": "46aa4eb3d6dbcf7a2ee013a5146ee2c5fd0f01d780aa41ac23f5a37099156aff",
+      "size_bytes": 1021
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_run/src/pipeline.rs",
+      "sha256": "3d72d0801b96ae4e4b1ec4ab0b377537a3112dc4a1ec0aca9d1512008e6388a0",
+      "size_bytes": 822135
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_runtime/src/error.rs",
+      "sha256": "e23a9f102d874626c548db33cc0641d9b5a1828420d507f15d5483e09a31efbb",
+      "size_bytes": 9457
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs",
+      "sha256": "7628526fb3d4ef28fb0061df6d0b621ae3abb2c4481f9e8835fb8a1c9fdebefd",
+      "size_bytes": 8177
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "sha256": "5491fb748ff560412115f9616d80d971e1239d405d57689e7edd4a5e3768e264",
+      "size_bytes": 8498
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+      "sha256": "fc1e151753fb50b43333cd28e293a2560ff3b623f247676d745a692858b303a7",
+      "size_bytes": 16564
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+      "sha256": "82c7fecd5d79656c8b2674b1373ca6a45e43eec78edb475f5e4c9a78dcef282d",
+      "size_bytes": 7284
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "sha256": "85a0de2d2714f6ce1613f0ec3e8829d48beba85e79a8488d121d29f8c922bd8e",
+      "size_bytes": 5096
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "30353890166ea00b6cd709767f0f6d063dea9dd284551915d1648427870a7a0d",
+      "size_bytes": 13578
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "3682aafff1b368f5f139fc60dac58b4bbb0d1d972ed55083f1150724af9034b3",
+      "size_bytes": 2092
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "sha256": "5e9ed19136381ffe8efbddd62a156b4e1b6b27afb9c885ec7fef247c70077d0f",
+      "size_bytes": 29613
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+      "sha256": "353135c5d2e9b382eceb8d4f54175cf090126a318f06211229d0d3ca5a9a1009",
+      "size_bytes": 597179
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+      "sha256": "0927264bcfb992e9e65d9876c2da1ba4387aa1cdf8c5678f8636369233e551a1",
+      "size_bytes": 9666
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_runtime/src/runtime/tests.rs",
+      "sha256": "a448d3b45ab0996c6e60c2936160d57130fcdee7f5481de9bcaf1b83e528aef0",
+      "size_bytes": 547
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_runtime/src/runtime.rs",
+      "sha256": "dcedf58f9aca0a151769faf5628c5235f4989bc6f5dab15643e93a3f2c64ed09",
+      "size_bytes": 25144
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/README.from-01.diff",
+      "sha256": "a5371a6023d08011be46c2a5afbe6fe1a57d5549972f7e1af6048bf6037d5262",
+      "size_bytes": 6396
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/README.md",
+      "sha256": "97d8b5392782f0c84cc0ede8fc6501364254d951de211a4b69cbf666c3cdd0f0",
+      "size_bytes": 2024
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-02/before/manifest.json",
+      "sha256": "fe4123c6c2d243562991949b74ce84fe3e56336f368216f5004826ab6d470df0",
+      "size_bytes": 6392
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-02/before/README.md",
+      "sha256": "8a96389b37e70c0aa404c533a39a6321e46829fe4fc7d09d5479aced5cfe979c",
+      "size_bytes": 2236
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-02/before/run-ordinary-init-smoke-01.py",
+      "sha256": "5503dffd0b9a5f9c9a6ee168702f9a165f79b29e8297e12f65d396394421d1c9",
+      "size_bytes": 12705
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-02/manifest.json",
+      "sha256": "7ebf5091d1ae3d448c4884722b81cf5882a8357e6b7d9b8257555d681250400b",
+      "size_bytes": 7583
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-02/README.md",
+      "sha256": "ead9d42abc7d50f2089d092943d11632c55f868865d5e3f587fdb96567eaaf78",
+      "size_bytes": 1651
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-02/run-ordinary-init-smoke-02.py",
+      "sha256": "dcf701df742dabec7f0e4e83e8645ee8aeccc9c036a130670b739d7925638433",
+      "size_bytes": 14532
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-02/runner-from-01.diff",
+      "sha256": "6ef58179fb89f18b92574336beef773c53517d09bc152013751b061f66fdd094",
+      "size_bytes": 4002
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-02/before/manifest.json",
+      "sha256": "9166ae053355219562901e49c25b130f72ba52bfe41dadf805b059ee61753a9c",
+      "size_bytes": 3245
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-02/before/prepare-report-input.py",
+      "sha256": "dafe6b3603c36a38d9a0aa370a72657ac598c1a9a77cdca6216a53c15c20a5dd",
+      "size_bytes": 4644
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-02/before/README.md",
+      "sha256": "efde67a8e6ea9b613b67d82dbbbc5911e8cf797aa3f95616d639bccec6c8abdc",
+      "size_bytes": 1705
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-02/manifest.json",
+      "sha256": "fd149d75f1ba7dee0ca3cc833aa109028bd69bfd669b22ab55a57b6a73232cd7",
+      "size_bytes": 4413
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-02/prepare-report-input.py",
+      "sha256": "e39d2d3d1662e764990aad845f882447c1198a5c2541b60bfd965a08467e11af",
+      "size_bytes": 6081
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-02/README.md",
+      "sha256": "cb38857851db31b1a9c09ca83a0cd97e8f5f0b939f4b3c9d5ae63f7ece2d3b51",
+      "size_bytes": 849
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-02/writer-from-01.diff",
+      "sha256": "78e1b2cd4a926383bfa8a9aecf29f2f98253f3826212430c9738604374a2b2d5",
+      "size_bytes": 2437
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-02/before/finalize-ordinary-initialization.py",
+      "sha256": "fda4ea866daa608cb836070bfcc0e56e7c9366692e47ca0bdd51b0eee4040671",
+      "size_bytes": 14854
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-02/before/manifest.json",
+      "sha256": "ff99e9e8e38e279eee3f9776a6d70605ac0ed4cad5c6da905cd212fb18d6ca9e",
+      "size_bytes": 5198
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-02/before/README.md",
+      "sha256": "f7abcf7e13d34e57e28785dee4be26c6a4689546699635dbc614862bfd4ddf32",
+      "size_bytes": 3981
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-02/finalize-ordinary-initialization.py",
+      "sha256": "3a7afa3e28a4394898e62ef783c5360888dc6ff79cd1cf7c400204d57ddee08c",
+      "size_bytes": 14955
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-02/from-previous.diff",
+      "sha256": "d0156a911f50fd0cbee233e53c4c11bee652cdb975b670acd11a8aae372fb68b",
+      "size_bytes": 3199
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-02/manifest.json",
+      "sha256": "5202e1575e77ff235be8f4300da60d4413d85c744dc246cec546a521b91a4d3f",
+      "size_bytes": 8137
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-02/README.md",
+      "sha256": "a34ce2df58fa6b9d83ed3a833606e5d2274ac300d2f75752c7c559a9e62a4fc1",
+      "size_bytes": 4700
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-03/before/manifest.json",
+      "sha256": "7ebf5091d1ae3d448c4884722b81cf5882a8357e6b7d9b8257555d681250400b",
+      "size_bytes": 7583
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-03/before/README.md",
+      "sha256": "ead9d42abc7d50f2089d092943d11632c55f868865d5e3f587fdb96567eaaf78",
+      "size_bytes": 1651
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-03/before/run-ordinary-init-smoke-02.py",
+      "sha256": "dcf701df742dabec7f0e4e83e8645ee8aeccc9c036a130670b739d7925638433",
+      "size_bytes": 14532
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-03/from-previous.diff",
+      "sha256": "f176fddde21b575a0145f914bb532d8a4d950e19a8a28368da4049b85e704e3a",
+      "size_bytes": 4120
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-03/manifest.json",
+      "sha256": "20da95e4bef40abad5390fb49ed703fb6b52884721f8e99bc17083260cfbab53",
+      "size_bytes": 8425
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-03/README.md",
+      "sha256": "73afd6ee9e4fe611e03a45bf6aedcd7d11bdddd015a8126542df175f52ec3de3",
+      "size_bytes": 2240
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-03/run-ordinary-init-smoke-03.py",
+      "sha256": "2c909462a87e0c9f545624e2edbe11f7245874e8eb125364d6781329bb4ac60b",
+      "size_bytes": 14926
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-03/before/manifest.json",
+      "sha256": "fd149d75f1ba7dee0ca3cc833aa109028bd69bfd669b22ab55a57b6a73232cd7",
+      "size_bytes": 4413
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-03/before/prepare-report-input.py",
+      "sha256": "e39d2d3d1662e764990aad845f882447c1198a5c2541b60bfd965a08467e11af",
+      "size_bytes": 6081
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-03/before/README.md",
+      "sha256": "cb38857851db31b1a9c09ca83a0cd97e8f5f0b939f4b3c9d5ae63f7ece2d3b51",
+      "size_bytes": 849
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-03/from-previous.diff",
+      "sha256": "e8a482bd4d14f785582f8d82da69f0f8938410943ad2e4e6f9122eb3cf1f6a17",
+      "size_bytes": 3376
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-03/manifest.json",
+      "sha256": "d4f37d6b50b7e4dce1f28e93dda98885f8293540aa126f01058d598ed7be0061",
+      "size_bytes": 5538
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-03/prepare-report-input.py",
+      "sha256": "6b824f971a174ae2addb12c0e0edd4bc48f4704a43f11cacaadbc03c9b41614a",
+      "size_bytes": 6447
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-eio-report-input-prep-03/README.md",
+      "sha256": "433c894d0638be9f26979f3ef764e833efa63d2d691b7d21f88a32b9056e4a93",
+      "size_bytes": 1264
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-03/manifest.json",
+      "sha256": "e13f49f10ded171c6d15a66dd61d023a15dad707900d9f2c0e54aac3a96af773",
+      "size_bytes": 9202
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-03/metadata-after.json",
+      "sha256": "2bd3bcb0fe4634587fbb4c8524f888619268a8d7736a2688f9e68a3760a8f738",
+      "size_bytes": 8137
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-03/metadata-before.json",
+      "sha256": "5202e1575e77ff235be8f4300da60d4413d85c744dc246cec546a521b91a4d3f",
+      "size_bytes": 8137
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-03/metadata.diff",
+      "sha256": "ac7de0274d21d5ae4da9c62853d80c6178a4bac1404d0ee892b7f3986492c1c0",
+      "size_bytes": 573
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-03/README.md",
+      "sha256": "23428b8e68da0e64b52ac3f0030c59f3731364d8d547e2bd07cb7d77b0973905",
+      "size_bytes": 5167
+    },
+    {
+      "path": ".runtime/porting/CTF-10/run-ordinary-initialization-milestone-01.py",
+      "sha256": "82597b91bf81f42740aed3c5a6df87999c0a8357bed901d251a0ae34b0c9487b",
+      "size_bytes": 3623
+    },
+    {
+      "path": ".runtime/porting/CTF-10/run-ordinary-initialization-quality-01.py",
+      "sha256": "6fa8ef04d75df3250eaeadafca26febefe8fdbec91e79cbcdad5189b3612b4a8",
+      "size_bytes": 1139
+    },
+    {
+      "path": ".runtime/porting/CTF-10/run-ordinary-initialization-quality-02.py",
+      "sha256": "ad24042c316f90e7516f4a0757bf2604dc22aba3d936b77d9a6ca2519b27f0d3",
+      "size_bytes": 1139
+    },
+    {
+      "path": ".runtime/porting/CTF-10/run-ordinary-initialization-quality-03.py",
+      "sha256": "bae39ac828c937222b878f076c6e6a96954609e5510a9e803b561519f115f819",
+      "size_bytes": 1141
+    },
+    {
+      "path": ".runtime/porting/CTF-10/run-ordinary-initialization-quality-04.py",
+      "sha256": "2387f28d417fd2fc268fdd9f3007622126e347d73304a0eb5609bba7ab754982",
+      "size_bytes": 1142
+    },
+    {
+      "path": ".runtime/porting/CTF-10/run-ordinary-initialization-quality-05.py",
+      "sha256": "f3b5a59d341fa820ea14ee40c65d4cf59716f2a883cd13f76bfc9ece68cbb9da",
+      "size_bytes": 1150
+    },
+    {
+      "path": ".runtime/porting/CTF-10/run-ordinary-initialization-quality-06.py",
+      "sha256": "87b4759b40a2b096cf6367dd23202f7241a3655d4c13fa8e2ad805d481fb26a2",
+      "size_bytes": 1150
+    },
+    {
+      "path": ".runtime/porting/CTF-10/run-ordinary-initialization-quality-07.py",
+      "sha256": "abe1ae476856b78a25788752a62e5438b44e588763e4ceb67e8a12ef49fe3493",
+      "size_bytes": 1151
+    },
+    {
+      "path": ".runtime/porting/CTF-10/run-ordinary-validation-01.py",
+      "sha256": "561d1f29061289eb2e4b1b78c0b4f40c743e90a070216ca1ed0c97aa5e2985a0",
+      "size_bytes": 2971
+    },
+    {
+      "path": ".runtime/porting/CTF-10/run-ordinary-validation-02.py",
+      "sha256": "9a741cad5c61f192fbc5e515bd007800a397de21b951cb37b31ab27dbd6201d7",
+      "size_bytes": 2981
+    },
+    {
+      "path": ".runtime/porting/CTF-10/run-ordinary-validation-03.py",
+      "sha256": "a2875d0a6107dd42e326d9695c4a8f79323d9c1ae98f6ce46931b0c60df5eeb1",
+      "size_bytes": 2981
+    },
+    {
+      "path": ".runtime/porting/CTF-10/run-ordinary-validation-04.py",
+      "sha256": "7d199dfeac1b68251f5bba73f2c42e0f3e3be52bebdbe806c54124cc18aec716",
+      "size_bytes": 3069
+    },
+    {
+      "path": ".runtime/porting/CTF-10/run-ordinary-validation-05.py",
+      "sha256": "8fe7dd891ecb4493753cc02f0d55c09d86f414440312c289bf927fda699f431c",
+      "size_bytes": 3069
+    },
+    {
+      "path": ".runtime/porting/CTF-10/prepare-ordinary-smoke-runner-01.py",
+      "sha256": "baa85ac25668f0efd59d29ed81444730fae7b644d585eb79efb8e58cc5564ab5",
+      "size_bytes": 12245
+    },
+    {
+      "path": ".runtime/porting/CTF-10/prepare-ordinary-successor-02.py",
+      "sha256": "ad7b876e43d3260c1deb295dfc450eb908852b9f2fb308e00c1856a9a10b56ab",
+      "size_bytes": 13929
+    },
+    {
+      "path": ".runtime/porting/CTF-10/correct-ordinary-fatal-test-03.py",
+      "sha256": "9145a02fcbc9468e34a3468d7e814a5c46108d8e4fe05003cb47738802193ded",
+      "size_bytes": 2417
+    },
+    {
+      "path": ".runtime/porting/CTF-10/correct-ordinary-output-manifest-04.py",
+      "sha256": "409a575d6a90ad29903079f17cfdd8fe9d18dcb554808e650a8dfcc006ba2d77",
+      "size_bytes": 1761
+    },
+    {
+      "path": ".runtime/porting/CTF-10/correct-ordinary-runtime-fatal-test-06.py",
+      "sha256": "7d7b6b20483edb54ca1376f7a016270b26966847e90c15875013bccff32bb873",
+      "size_bytes": 2924
+    },
+    {
+      "path": ".runtime/porting/CTF-10/seal-ordinary-current-sources-02.py",
+      "sha256": "6b4ac72d224dfb39c6c8e1fbd79dd7b206ffdc0b15823d7084fe9ee888d60ec6",
+      "size_bytes": 2689
+    },
+    {
+      "path": ".runtime/porting/CTF-10/apply-ordinary-initialization-01.py",
+      "sha256": "954f72802c7c360ffba5d38d0a0ab9a5611dd2d14a95b157cfca4bedb8394cc1",
+      "size_bytes": 4067
+    },
+    {
+      "path": ".runtime/porting/CTF-10/update-ordinary-initialization-documents-01.py",
+      "sha256": "592d725313a4d31d84f11dcdd6e2fff655f841c09e83b6e67b9e40d91e7c1aaa",
+      "size_bytes": 5101
+    },
+    {
+      "path": ".runtime/porting/CTF-10/publish-ordinary-initialization-01.py",
+      "sha256": "00b56f4e03d918d346c05613c06b314e7e1e09b96f2327f6645f446dd18793e9",
+      "size_bytes": 4774
+    },
+    {
+      "path": ".runtime/porting/CTF-10/build-ordinary-init-finalizer-packet-01.py",
+      "sha256": "50714ed5bf823ce105a748cea18a7758461f75694093d9c324fe1fa9ad9c0e93",
+      "size_bytes": 7681
+    },
+    {
+      "path": ".runtime/porting/CTF-10/apply-report-nonfinite-repair-01.py",
+      "sha256": "d126c3263820e44aee4625d9029dd928747831fd73e364cc5085007a974d6185",
+      "size_bytes": 1955
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-04/before/manifest.json",
+      "sha256": "20da95e4bef40abad5390fb49ed703fb6b52884721f8e99bc17083260cfbab53",
+      "size_bytes": 8425
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-04/before/README.md",
+      "sha256": "73afd6ee9e4fe611e03a45bf6aedcd7d11bdddd015a8126542df175f52ec3de3",
+      "size_bytes": 2240
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-04/before/run-ordinary-init-smoke-03.py",
+      "sha256": "2c909462a87e0c9f545624e2edbe11f7245874e8eb125364d6781329bb4ac60b",
+      "size_bytes": 14926
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-04/from-03.diff",
+      "sha256": "204d557dd5fe57166f625cdf212362bc6248c769fb050d2e63ef9c2a46060c7a",
+      "size_bytes": 14309
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-04/manifest.json",
+      "sha256": "109d8d5898acab3eae80635d40d4545f60eb5d9b6eca0a39b5c9d7f7fec64756",
+      "size_bytes": 6205
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-04/README.md",
+      "sha256": "0ac2c0fe533d23a37e0b339a90cf61d5733be0520ea1158c1b7ba725b4dfb67e",
+      "size_bytes": 2196
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-04/run-ordinary-init-smoke-04.py",
+      "sha256": "f99d259781d1950954de75b155b758f1d10d2fd218823d12944c34beef491cea",
+      "size_bytes": 18968
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-candidate-workflow-01/comparison.json",
+      "sha256": "8df2887fb44f365a94bbc1e7d0eb944a69f4ef21d7a0bccce360ba0efeb66120",
+      "size_bytes": 2261
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-candidate-workflow-01/mismatches.json",
+      "sha256": "a0a9882830a1d0294baf67967581acdd00ccaa2fba1c55d2a43e95e042e27396",
+      "size_bytes": 26151
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-apply-command-01/receipt.json",
+      "sha256": "7cedc46adadad967474bc470e49dfe09385d9412159418e33ab0dfd5d121327b",
+      "size_bytes": 3739
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-apply-command-01/stdout.log",
+      "sha256": "02c35cb4bf6c81ba34c67cf28d95e87e30e62950e877f88b7526f1aed6fd2a93",
+      "size_bytes": 225
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-apply-command-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/source-objects/87/8790104a80664af191a9c49103364ca57edb7068aa814f25a8d3b1816b2fe807",
+      "sha256": "8790104a80664af191a9c49103364ca57edb7068aa814f25a8d3b1816b2fe807",
+      "size_bytes": 1620653
+    },
+    {
+      "path": ".runtime/porting/source-objects/57/5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "size_bytes": 8453
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-diagnostic-manifest-correction-command-05/receipt.json",
+      "sha256": "66574c7c8361530db02ae9504bf6338bcda122182b5ec97a52ccfea4b0787682",
+      "size_bytes": 5104
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-diagnostic-manifest-correction-command-05/stdout.log",
+      "sha256": "0a54c1cc5a0aedbf426a84ce15be6d5d223287c5cffc725ecb36b59e89955932",
+      "size_bytes": 488
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-diagnostic-manifest-correction-command-05/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/source-objects/15/15b2fbb4fe66ee8e59d0586ea8f4ae513f74b7afd1e84b21d487a51fdec4d4fd",
+      "sha256": "15b2fbb4fe66ee8e59d0586ea8f4ae513f74b7afd1e84b21d487a51fdec4d4fd",
+      "size_bytes": 1622079
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-fatal-test-correction-command-03/receipt.json",
+      "sha256": "52d87b752af03d694c067c4dc649c00b4a650314ef5e4c8d1162a532eec69560",
+      "size_bytes": 4900
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-fatal-test-correction-command-03/stdout.log",
+      "sha256": "fbe7613022aa54b180c5c1e50b1f83f8ddbf5a9c89e213ee43007591a4defa1e",
+      "size_bytes": 132
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-fatal-test-correction-command-03/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/source-objects/7b/7ba5010f3a9d96394f1763d06468287c9b8b1f89be54b4c45a259a991fdff5df",
+      "sha256": "7ba5010f3a9d96394f1763d06468287c9b8b1f89be54b4c45a259a991fdff5df",
+      "size_bytes": 1622079
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-format-command-01/receipt.json",
+      "sha256": "b4ba683c579fe896c7e114eb76b9eb79a6f81c45ea40d9b2ea84c13c901e6fd4",
+      "size_bytes": 4685
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-format-command-01/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-format-command-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/source-objects/8e/8e6b8b5e359a333fd3e722b5d1ca926d293012ee4377a2b5ca73b1271aa0ec48",
+      "sha256": "8e6b8b5e359a333fd3e722b5d1ca926d293012ee4377a2b5ca73b1271aa0ec48",
+      "size_bytes": 1622079
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-output-manifest-correction-command-04/receipt.json",
+      "sha256": "4d8115b213628eca0197069ce7b2defe82c4a0ec598f88a7fa2f148bde6cb048",
+      "size_bytes": 4976
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-output-manifest-correction-command-04/stdout.log",
+      "sha256": "92d01bc7d651efb12615b1d45e0aa42d8a20932a1bc47d6cc66dc3a2ff72018e",
+      "size_bytes": 114
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-output-manifest-correction-command-04/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/source-objects/df/df3a0d87af9fe143423544021c126cb612c1fb3fd93716ac9831494ef9ef515c",
+      "sha256": "df3a0d87af9fe143423544021c126cb612c1fb3fd93716ac9831494ef9ef515c",
+      "size_bytes": 1622079
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-runtime-fatal-test-correction-command-06/receipt.json",
+      "sha256": "1cfe3168d72fe67a236fcd876e8a3bba2d8466cf321454675896bfaf558b9421",
+      "size_bytes": 5160
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-runtime-fatal-test-correction-command-06/stdout.log",
+      "sha256": "5db34e54f1603cb0ecc7f23317aea7a399fc32d64dbabd0b3e094ab2d49031ed",
+      "size_bytes": 594
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-runtime-fatal-test-correction-command-06/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/source-objects/e1/e1e6f3b153f10e21982247b956c34a1ed1ec4874dbd077da8650ec4327ca20e1",
+      "sha256": "e1e6f3b153f10e21982247b956c34a1ed1ec4874dbd077da8650ec4327ca20e1",
+      "size_bytes": 1622079
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-apply-command-01/receipt.json",
+      "sha256": "2e66a0425e0d29911e5d4c0155b1ec8d4373d2e0a5e9a94ebbe0dc6b3cd74102",
+      "size_bytes": 5247
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-apply-command-01/stdout.log",
+      "sha256": "3d509f69d816d2e4a0120d218c84abbae674b7201ff53b10980ea9ba16045f00",
+      "size_bytes": 189
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-apply-command-01/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": ".runtime/porting/source-objects/db/dbc350f53d96910194c90b82f396cc8a464ba1c87de10055c4a209b8bc6b05eb",
+      "sha256": "dbc350f53d96910194c90b82f396cc8a464ba1c87de10055c4a209b8bc6b05eb",
+      "size_bytes": 1622079
+    }
+  ],
+  "retained_lineage_receipts": [
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-fmt-check-command-07/receipt.json",
+      "sha256": "50c4701871ccbfd7f94689d47561cc82c86d6d2b2cefab3d30f250f2b1d031c7",
+      "size_bytes": 5318
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-clippy-command-07/receipt.json",
+      "sha256": "6746441d3ddb9f9fc870dbdfb0b79081d72e258217fd48dbd23465147530c5de",
+      "size_bytes": 5503
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-focused-command-07/receipt.json",
+      "sha256": "2cd9d6f3b0343233f9b493938463f8cbdd41c085ec895a8742def8861564636b",
+      "size_bytes": 5491
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-workspace-command-07/receipt.json",
+      "sha256": "727852e1f2313fdae2ac75cefedda11e781a2e0fabbebc5c2a65e1ab098a6ef0",
+      "size_bytes": 5450
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-fmt-check-command-01/receipt.json",
+      "sha256": "f7e7032cdb5e19a1f28308bad48fb1f066d4228bd75e718b3cd28a6ce1cc8237",
+      "size_bytes": 4715
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-clippy-command-01/receipt.json",
+      "sha256": "9ef2f0cd7f129fd4853a7fbddd2b25e986833c08afc0e63593d60abaa6cc912d",
+      "size_bytes": 4904
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-quality-launch-command-01/receipt.json",
+      "sha256": "81506ee5f212ac92b737c996f99f18beb58a75d81f84c6bc93f54cca5f27805e",
+      "size_bytes": 4783
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-fmt-check-command-02/receipt.json",
+      "sha256": "afc36bd1007065c1148b5920c82ed4e1d0e0533487b68cc340ef786c05cbcb1c",
+      "size_bytes": 4824
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-clippy-command-02/receipt.json",
+      "sha256": "364d26c19c6bc06e2b00384d21cce5c3be87ea3b9a6f6df41124a6f36fd88e04",
+      "size_bytes": 5009
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-focused-command-02/receipt.json",
+      "sha256": "acb34675bd067906e16c6932995d0d3eae8b33fd4b48fbc19ceb6e844ed577cd",
+      "size_bytes": 4996
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-workspace-command-02/receipt.json",
+      "sha256": "b00fb5d59c907ecc9b69137ddaa2a90fa6554fa89daa43d004b21b2fc3f9f34a",
+      "size_bytes": 4956
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-quality-launch-command-02/receipt.json",
+      "sha256": "c20d010612cbaccbcb9ffb6a6d5e10e204f5812689b305fa80500bb85f8b84f3",
+      "size_bytes": 4891
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-fmt-check-command-03/receipt.json",
+      "sha256": "4f68dbb43f88c2de2745fb4a3436c12d739a61d33dd4a87761f8e12305fe805d",
+      "size_bytes": 4824
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-clippy-command-03/receipt.json",
+      "sha256": "14a030d7f150207a4a262dcfba030ac7d13fcd9b72f2b81b5b24a6b2572991d2",
+      "size_bytes": 5007
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-focused-command-03/receipt.json",
+      "sha256": "e30d9b577789821cdffc3de57206b2eb3f2d3b89923586cb9668f4531f1cfb79",
+      "size_bytes": 4996
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-workspace-command-03/receipt.json",
+      "sha256": "b7ce81cb3d6592d30ff353114b64673972797aa989f5facc65cc255376ac17fa",
+      "size_bytes": 4958
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-quality-launch-command-03/receipt.json",
+      "sha256": "12ea807f284ff27fb168d92e945bb440eb7ff7345cca3653f08e231908a311b9",
+      "size_bytes": 4892
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-fmt-check-command-04/receipt.json",
+      "sha256": "50f4691b9edca68e853a3864227bebb2e83331d34281481e0a36097ab738d7f2",
+      "size_bytes": 4946
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-clippy-command-04/receipt.json",
+      "sha256": "3e48c756d38e62866f1277b200c12e38236c4910e5d9dd3fdff000f386238735",
+      "size_bytes": 5131
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-focused-command-04/receipt.json",
+      "sha256": "5e07ea02ab91e33190be7b166e97add23f7f38338d58d279ee9cced8daf88efa",
+      "size_bytes": 5118
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-workspace-command-04/receipt.json",
+      "sha256": "9ecbc56bbb6e9231334f5cd77bf100a93b4544cf0f6f69badc48b060361d76cd",
+      "size_bytes": 5081
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-quality-launch-command-04/receipt.json",
+      "sha256": "da7a9d9859fa3ff5c63dbe1a5430b723c884d2ea405c244969f1ac9ad546f017",
+      "size_bytes": 5013
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-fmt-check-command-05/receipt.json",
+      "sha256": "a872432b6a82eb6765731e30531e3c655a8d047caf5c5f5563292535630f0cf2",
+      "size_bytes": 5061
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-clippy-command-05/receipt.json",
+      "sha256": "08a3ee8db32261060e91357cbc0eee47ff48214d27f74a00681cbef013fb6dc2",
+      "size_bytes": 5245
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-focused-command-05/receipt.json",
+      "sha256": "eb2763700239aa608cdbfdd5320e1b3ebf26554db5cae1818adacf493147fe18",
+      "size_bytes": 5232
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-workspace-command-05/receipt.json",
+      "sha256": "e28df14d856e2dd6037bdccc445e2056be52d5294e0108b7e41747ad3d171a51",
+      "size_bytes": 5194
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-quality-launch-command-05/receipt.json",
+      "sha256": "40f81f71eb22f38fd1cf5565f1217f28435e79ad47a57a7ab709944c1e9a5046",
+      "size_bytes": 5127
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-fmt-check-command-06/receipt.json",
+      "sha256": "64eacd886457ae5b5a577c7826f8dc6f4a803f6ab3d196a4c9adbe191074904b",
+      "size_bytes": 5059
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-clippy-command-06/receipt.json",
+      "sha256": "23d7f015118ad5a43352a9f5a7d839906dcfebf26446955f0aa3f354443e1c99",
+      "size_bytes": 5245
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-focused-command-06/receipt.json",
+      "sha256": "13bcfc51ac1807895dd8d387ffce797abe2537380798820a2226cddc1e344e11",
+      "size_bytes": 5233
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-workspace-command-06/receipt.json",
+      "sha256": "bcefa0d589e7318177d1dc2d7869c0ce80f5609a1c99509538edc78f6b432b68",
+      "size_bytes": 5192
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-quality-launch-command-06/receipt.json",
+      "sha256": "32f64a2af476ee92fd495493c212ee9870f027912caf7dc26709d63604922e42",
+      "size_bytes": 5127
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-quality-launch-command-07/receipt.json",
+      "sha256": "e0ebf6c61f8ec21468609df0eecc35405a5aedb0e70c5a5230ebf7379c9d47b5",
+      "size_bytes": 5385
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-candidate-workflow-command-01/receipt.json",
+      "sha256": "45b85c23f4d7cc44aaec229273b2415703a344f18cb2e49e1346fb326e2afd6f",
+      "size_bytes": 5890
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-candidate-workflow-01/cargo/receipt.json",
+      "sha256": "954a709fe036bb23669c1637726687c9976e5b93bfb85ce292781694feddf02c",
+      "size_bytes": 6829
+    },
+    {
+      "path": ".runtime/porting/CTF-10/report-format-candidate-workflow-01/rust-execution/receipt.json",
+      "sha256": "2d1d2fe1e3b6ad8893ec9e072b070e32c91fc85791c1f3dc4fe75c34a7843759",
+      "size_bytes": 5356
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-build-command-01/receipt.json",
+      "sha256": "ed3bbb733aa47f21306d2b9554e820359ce3596e6f1af582f94e59e97990a00b",
+      "size_bytes": 6938
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-recovery-workflow-command-01/receipt.json",
+      "sha256": "4a214ad3a8aa1a5876751adbb962a7dfb0b685814b55ed77f050627064778822",
+      "size_bytes": 6167
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-workflow-command-01/receipt.json",
+      "sha256": "9cbecaba288269421adbc79617f5462fc84ecc436317371ef5b6e5062b8c0f02",
+      "size_bytes": 6229
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-current-source-seal-command-02/receipt.json",
+      "sha256": "8c85055801a8215823f7349823d198d062582ee8a7b21e7b17a7e1a67b19e135",
+      "size_bytes": 4897
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-validation-launch-command-01/receipt.json",
+      "sha256": "d262176b46c13fb945bafc8a931735f3a9b6d73659ea9313a7c604c8bb6b1376",
+      "size_bytes": 5092
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-validation-launch-command-02/receipt.json",
+      "sha256": "09b67a82ec25b7566398cc979188664b6f7fe8da570c4970efc9570d277d462f",
+      "size_bytes": 5350
+    }
+  ],
+  "format_comparison": {
+    "path": ".runtime/porting/CTF-10/report-format-candidate-workflow-02/comparison.json",
+    "sha256": "9c6e56696c6b3aa0fd2bbd9f26ba1c5175fb2fa7337da8071c2a4815a12769a5",
+    "size_bytes": 2258
+  },
+  "format_comparison_execution": {
+    "path": ".runtime/porting/CTF-10/report-format-candidate-workflow-command-02/receipt.json",
+    "sha256": "638f911cdd45381c7b22a57aeb114d67d0698b5c9dce5751751a5a271fcd20c4",
+    "size_bytes": 6147
+  },
+  "ordinary_smoke": {
+    "path": ".runtime/porting/CTF-10/ordinary-init-smoke-inputs-02/execution-summary.json",
+    "sha256": "5aa063c7abc626463d4ff8f43793ad062a2dab7baa5fa2822c2988c3ad816daa",
+    "size_bytes": 15299
+  },
+  "optional_report_input_packet": null,
+  "optional_report_CLI_receipt": null
+}

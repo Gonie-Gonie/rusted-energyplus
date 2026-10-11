@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-10\ordinary-init-smoke-runner-prep-03\run-ordinary-init-smoke-03.py", line 119, in <module>
+    assert result['config']['dry_run']is False and result['config']['oracle_baseline']is False and result['rust_runtime']is not None and result['rust_runtime']['fixture_demand_injection_used']is False
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

@@ -1,0 +1,57 @@
+"""Verify complete indexed tested bytes and publish the ordinary reporting milestone."""
+import hashlib, io, json, shutil, subprocess
+from pathlib import Path
+ROOT=Path.cwd().resolve(); BASE=ROOT/'.runtime/porting/CTF-10'
+OUT=ROOT/'energyplus_porting_plan/evidence/CTF-10-ordinary-initialization'
+def read(path):return json.loads(path.read_bytes())
+def ref(path):
+    data=path.read_bytes();return {'path':path.relative_to(ROOT).as_posix(),'sha256':hashlib.sha256(data).hexdigest(),'size_bytes':len(data)}
+accepted=read(OUT/'accepted.json')
+SOURCE=accepted['actual_source_snapshot']['sha256']
+assert accepted['ordinary_A_and_B_dispatch_connected'] is True
+repair=read(BASE/'report-format-nonfinite-repair-applied-01/record.json')
+assert repair['Root_Source_review_accepted'] is True and repair['finite_calculation_and_comparison_policy_unchanged'] is True
+assert {row['canonical_path'] for row in repair['actual_sources']}=={'crates/ep_runtime/src/heat_balance/ctf_reports_format.rs','crates/ep_runtime/src/heat_balance/ctf_reports_tests.rs'}
+source_rows=accepted['actual_sources']+accepted['additional_test_sources']+repair['actual_sources']
+sources=[row['canonical_path'] for row in source_rows]
+assert len(sources)==len(set(sources))==23
+for row in source_rows:assert ref(ROOT/row['canonical_path'])['sha256']==row['actual_final_source']['sha256']
+docs=['energyplus_porting_plan/'+name for name in ['plan.json','cards/CTF-10.md','CHECKLIST.md','energyplus_porting_checklist.html']]
+validation_path=BASE/'ordinary-initialization-plan-check-command-01/receipt.json'
+validation=read(validation_path)
+assert validation['command']==['python','-X','utf8','-B','tools/porting/check_plan.py','--check']
+rows=[]
+for name in ['ordinary-initialization-finalize-command-01','ordinary-initialization-document-update-command-01','ordinary-initialization-plan-check-command-01']:
+    path=BASE/name/'receipt.json';receipt=read(path)
+    assert receipt['exit_code']==0 and receipt['source_bytes_match_before_and_after'] is True and receipt['source_snapshot']['sha256']==SOURCE
+    files=[path,*[ROOT/receipt[key]['path'] for key in ['stdout','stderr','source_snapshot']]]
+    for file in files:
+        original=ref(file);stored=OUT/'objects'/original['sha256']
+        if not stored.exists():shutil.copyfile(file,stored)
+        assert stored.read_bytes()==file.read_bytes()
+        rows.append({'original':original,'stored':ref(stored)})
+publisher=ref(Path(__file__).resolve());stored=OUT/'objects'/publisher['sha256']
+if not stored.exists():shutil.copyfile(Path(__file__).resolve(),stored)
+assert stored.read_bytes()==Path(__file__).resolve().read_bytes()
+rows.append({'original':publisher,'stored':ref(stored)})
+(OUT/'validation.json').write_bytes((json.dumps({'schema':'ctf10-ordinary-initialization-actual-plan-validation.v1','actual_execution':ref(validation_path),'selected_files':rows,'validated_documents':[ref(ROOT/name) for name in docs],'tested_source_bytes_equal_index_required':True,'gates_updated':False},indent=2)+'\n').encode())
+prefix=OUT.relative_to(ROOT).as_posix()+'/'
+def staged():return set(subprocess.check_output(['git','diff','--cached','--name-only','--no-renames','-z']).decode().split('\0')[:-1])
+def allowed(name):return name in sources or name in docs or name.startswith(prefix)
+assert all(allowed(name) for name in staged())
+subprocess.run(['git','diff','--check'],check=True)
+subprocess.run(['git','add','--',*sources,*docs,OUT.relative_to(ROOT).as_posix()],check=True)
+for name in sources:assert subprocess.check_output(['git','show',':'+name])==(ROOT/name).read_bytes()
+names=sorted(staged());assert names and all(allowed(name) for name in names)
+stream=io.BytesIO(subprocess.check_output(['git','cat-file','--batch'],input=('\n'.join(':'+name for name in names)+'\n').encode()))
+for name in names:
+    header=stream.readline().decode().strip().split();assert len(header)==3 and header[1]=='blob'
+    body=stream.read(int(header[2]));assert stream.read(1)==b'\n' and body==(ROOT/name).read_bytes()
+    assert hashlib.sha1(b'blob '+str(len(body)).encode()+b'\0'+body).hexdigest()==header[0]
+assert stream.read()==b''
+print('Verified complete indexed files:',len(names),'; every current tested Source byte matches index',flush=True)
+subprocess.run(['git','commit','--quiet','-m','feat(ctf): connect initialization reporting to ordinary runs'],check=True)
+subprocess.run(['git','push','origin','main'],check=True)
+assert not subprocess.check_output(['git','status','--porcelain'])
+assert subprocess.check_output(['git','rev-list','--left-right','--count','HEAD...origin/main']).decode().strip()=='0\t0'
+print('Committed and pushed clean ordinary initialization milestone:',subprocess.check_output(['git','rev-parse','HEAD']).decode().strip(),flush=True)

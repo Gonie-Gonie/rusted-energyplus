@@ -1,0 +1,10 @@
+--- .runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before/crates/ep_run/src/lib.rs
++++ .runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_run/src/lib.rs
+@@ -13,6 +13,7 @@
+ mod clk06_sky_trace;
+ mod clock_trace;
+ mod config;
++mod ctf_initialization_outputs;
+ mod diagnostics;
+ mod geo02_trace;
+ mod geo03_trace;

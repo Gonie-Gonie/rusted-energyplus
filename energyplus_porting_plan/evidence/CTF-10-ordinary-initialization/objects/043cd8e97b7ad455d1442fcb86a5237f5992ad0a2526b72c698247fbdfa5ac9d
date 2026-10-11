@@ -1,0 +1,14 @@
+--- .runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/before-01/crates/ep_runtime/src/heat_balance/mod.rs
++++ .runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_runtime/src/heat_balance/mod.rs
+@@ -19,9 +19,9 @@
+ pub mod ctf_first_gamma_owner;
+ pub mod ctf_first_inverse_owner;
+ pub mod ctf_first_matrix_owner;
++pub mod ctf_init_postlude;
++pub mod ctf_initialization_context;
+ pub mod ctf_initial_owner;
+-pub mod ctf_initialization_context;
+-pub mod ctf_init_postlude;
+ pub mod ctf_public_initialization;
+ pub mod ctf_reports;
+ pub mod ctf_retry_driver;

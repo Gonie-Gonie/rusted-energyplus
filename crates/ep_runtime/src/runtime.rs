@@ -36,11 +36,14 @@ use crate::heat_balance::ctf::{
     surface_outside_conduction_flux_w_per_m2, surface_outside_conduction_rate_w,
     update_surface_ctf_history_constants,
 };
-use crate::heat_balance::initialization::initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache_profiled;
 #[cfg(test)]
 pub(crate) use crate::heat_balance::initialization::{
     initialize_heat_balance_state, initialize_heat_balance_state_with_ctf_coefficients,
     initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache,
+};
+use crate::heat_balance::initialization::{
+    initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache_profiled,
+    initialize_heat_balance_state_with_initialization_context_profiled,
 };
 #[cfg(test)]
 use crate::heat_balance::inside_convection::{
@@ -201,6 +204,7 @@ pub fn simulate_heat_balance_zone_air_temperatures(
         None,
         options,
         &[],
+        None,
     )
 }
 
@@ -274,6 +278,7 @@ pub fn simulate_heat_balance_zone_air_temperatures_with_weather_series_and_ctf_c
         Some(HeatBalanceWeatherDriver::Legacy(weather_series)),
         options,
         ctf_coefficients,
+        None,
     )
 }
 
@@ -291,6 +296,25 @@ pub fn simulate_heat_balance_zone_air_temperatures_with_production_weather(
         Some(HeatBalanceWeatherDriver::Production(weather_series)),
         options,
         &[],
+        None,
+    )
+}
+
+/// Ordinary production path with caller-retained report/error owners on success and failure.
+pub fn simulate_heat_balance_zone_air_temperatures_with_production_weather_and_initialization_context(
+    model: &SimulationModel,
+    weather: &ProductionWeatherTimestepSeries,
+    options: HeatBalanceSimulationOptions,
+    context: &mut crate::heat_balance::ctf_initialization_context::CtfInitializationContext<'_>,
+) -> Result<HeatBalanceSimulation, RuntimeError> {
+    simulate_heat_balance_zone_air_temperatures_internal(
+        model,
+        &[],
+        None,
+        Some(HeatBalanceWeatherDriver::Production(weather)),
+        options,
+        &[],
+        Some(context),
     )
 }
 
@@ -301,6 +325,9 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
     weather_driver: Option<HeatBalanceWeatherDriver<'_>>,
     options: HeatBalanceSimulationOptions,
     ctf_coefficients: &[ConstructionCtfCoefficientOverride],
+    initialization: Option<
+        &mut crate::heat_balance::ctf_initialization_context::CtfInitializationContext<'_>,
+    >,
 ) -> Result<HeatBalanceSimulation, RuntimeError> {
     let hourly_count =
         weather_driver.map_or(weather_dry_bulb_c.len(), |driver| driver.hourly_count());
@@ -352,14 +379,24 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
                 crate::schedules::production_trace::ScheduleCacheOrigin::HeatBalanceReferencedInitialization,
                 &schedule_cache,
             );
-            let mut state =
+            let mut state = if let Some(context) = initialization {
+                initialize_heat_balance_state_with_initialization_context_profiled(
+                    model,
+                    options.initial_zone_air_temperature_c,
+                    ctf_coefficients,
+                    &schedule_cache,
+                    &mut schedule_cache_profile,
+                    context,
+                )?
+            } else {
                 initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache_profiled(
                     model,
                     options.initial_zone_air_temperature_c,
                     ctf_coefficients,
                     &schedule_cache,
                     &mut schedule_cache_profile,
-                )?;
+                )?
+            };
             seed_zone_air_humidity_ratios_from_weather_context(
                 &mut state,
                 initial_weather_context,

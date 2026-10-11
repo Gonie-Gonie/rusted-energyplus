@@ -94,13 +94,21 @@ These ordinary runs establish regression success; persistent ordinary Rust/Nativ
 The ordinary compiler now preserves all five report input families, unnamed IDF declaration order, physical alpha counts and exact default/blank/case facts.
 General's first-scan flags/options/EMS effects, retained cache and optional queries are implemented in source order. Unknown surface-list tokens retain the EMPTY warning path.
 The [report-input and Scan evidence](../evidence/CTF-10-report-input-scan/summary.json) records fmt/Clippy0, focused250 and workspace4859 PASS, including all eight new regression tests, on SourceSnapshot `95197194b3c81732677230e3699d3522f03e3890077688d85907745ebf57a723`.
-Same-input genuine Native getter/cache/query comparison remains pending. The scan is not yet called by the ordinary whole-Init postlude; predefined/EIO reporting and final fatal backend composition remain pending.
+At that milestone, Native getter/cache/query comparison and ordinary postlude connection were pending. The later comparison and ordinary initialization sections record their current results.
 This milestone promotes no card gate; the earlier activation replay and ordinary CLI results retain their own recorded source identity.
+
+## Ordinary initialization reporting and formatter comparison
+
+Both ordinary A/B runtime paths now retain the real predefined registry, string table, Scan cache and error/output owners across initialization success or failure. Loading and retry diagnostics execute at their producer sites; the complete report/Scan/EIO/final-fatal suffix runs before surface lifecycle allocation. Genuine I/O causes remain discoverable through RuntimeError. Reached CTF error, EIO and console streams are exported independently, and the error prefix is retained in the ordinary summary.
+
+The [ordinary initialization evidence](../evidence/CTF-10-ordinary-initialization/summary.json) records fmt/Clippy0, focused300 and workspace4920 PASS on the same actual SourceSnapshot. All608 same-input Native/Rust F/G formatted texts matched exactly. The unchanged six ordinary A/B CLI cases returned0 with all45 input guards and the current three output files. Failed checks and test-only corrections are retained.
+
+These results establish the ordinary connection, regression behavior and selected formatter equivalence. Native registry/backend/whole-Init comparison and persistent ordinary numerical/history integration remain pending; no card gate is promoted.
 
 ## Complete registry, producer diagnostics and Init postlude
 
 The full predefined registry retains1301 named indices, all1206 ordered calls, the actual sizing branch and opaque-layer IDs. Genuine first SimulationControl sizing inputs are retained. Selected loading/retry Severe/Continue/Fatal effects execute at their producer callpoints before later flags/stores, through borrowed real backend owners. Final shared flags and the complete ordered report/Scan/EIO/fatal postlude are implemented.
-The [Init postlude implementation evidence](../evidence/CTF-10-init-postlude/summary.json) records fmt/Clippy0, focused299 and workspace4914 PASS, adding34 tests. Independent Source and actual formatter/composed-module reviews passed. Ordinary caller connection and Native registry/backend/whole-Init comparison remain pending; no card gate is promoted.
+The [Init postlude implementation evidence](../evidence/CTF-10-init-postlude/summary.json) records fmt/Clippy0, focused299 and workspace4914 PASS, adding34 tests. Independent Source and actual formatter/composed-module reviews passed. At that milestone, ordinary caller connection and Native registry/backend/whole-Init comparison were pending. The ordinary connection is now recorded above; Native whole-Init comparison remains pending and no card gate is promoted.
 
 ## Actual selected Scan comparison
 

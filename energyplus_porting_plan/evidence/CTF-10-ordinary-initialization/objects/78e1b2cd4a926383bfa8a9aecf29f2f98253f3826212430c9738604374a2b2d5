@@ -1,0 +1,29 @@
+--- before/prepare-report-input.py
++++ prepare-report-input.py
+@@ -3,6 +3,8 @@
+ from pathlib import Path
+ ROOT=Path.cwd().resolve();BASE=ROOT/'.runtime/porting/CTF-10'
+ OUT=BASE/'ordinary-init-eio-enabled-inputs-01'
++PARENT_SHA='7776c20153b64ec93b89b33e095b104ed003b9c0cf54cf657271095334f89a79'
++CORRECTION_SHAS={'.runtime/porting/CTF-10/ordinary-initialization-correction-02/record.json': 'dec40058cf955ff94caaaa676afe1cee084ad49053ef014cb20630bdd332b9d1', '.runtime/porting/CTF-10/ordinary-initialization-correction-03/record.json': '7e821dab38b3e50566750afca08eda1643c906f3e38f887eb2c2e7f480a4958d'}
+ def sha(path):
+     with path.open('rb')as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+ def ref(path):return {'path':path.relative_to(ROOT).as_posix(),'sha256':sha(path),'size_bytes':path.stat().st_size}
+@@ -22,7 +24,16 @@
+ for row in captured['files']:
+     assert sha(ROOT/row['historical_path'])==row['archive']['sha256']
+ inventory=exact(summary['current_final_source_inventory'])
+-for row in json.loads(inventory.read_bytes())['actual_sources']:
++assert inventory==BASE/'ordinary-initialization-applied-02/record.json'
++application=json.loads(inventory.read_bytes());assert application['schema']=='ctf10-ordinary-initialization-actual-application.v1'
++assert application['Root_and_Header_cumulative_Source_review_accepted']is True and application['ordinary_A_and_B_dispatch_connected']is True
++parent=exact(application['parent_application']);assert parent==BASE/'ordinary-initialization-applied-01/record.json' and sha(parent)==PARENT_SHA
++parent_rows=json.loads(parent.read_bytes())['actual_sources'];rows=application['actual_sources']
++assert len(parent_rows)==18 and len(rows)==19 and len({row['canonical_path']for row in rows})==19
++assert {row['canonical_path']for row in rows}=={row['canonical_path']for row in parent_rows}|{'crates/ep_runtime/src/runtime/tests/part03.rs'}
++corrections={row['path']:row for row in application['correction_records']};assert len(corrections)==len(application['correction_records'])==2 and set(corrections)==set(CORRECTION_SHAS)
++for name,digest in CORRECTION_SHAS.items():assert sha(exact(corrections[name]))==digest
++for row in rows:
+     assert sha(ROOT/row['canonical_path'])==sha(exact(row['actual_final_source']))
+ packet_path=BASE/'production-cli-inputs-01/manifest.json'
+ assert sha(packet_path)=='fbd21f9ac33f3dbd2b047c30fdb266e50f202d796eb3ab647f67c229bc9dac45'

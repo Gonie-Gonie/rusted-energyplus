@@ -1,0 +1,11 @@
+--- before
++++ crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs
+@@ -66,7 +66,7 @@
+     };
+     assert!(matches!(result,Err(crate::RuntimeError::CtfInitialization(_))));
+     assert_eq!(state.tracking.total_severe_errors,1);
+-    assert!(state.tracking.abort_processing);
++    assert!(!state.tracking.abort_processing);
+     assert_eq!(reports.progress.layer_report_declared_indices,[0]);
+     assert!(reports.progress.final_fatal_invoked);
+     assert!(!reports.progress.postlude_returned);

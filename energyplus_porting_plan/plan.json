@@ -12256,6 +12256,11 @@
         "path": "energyplus_porting_plan/evidence/CTF-10-init-postlude/summary.json",
         "sha256": "c18a01d9aab6878127fbdd7eef00fd8ae473b62dd55355c3ad1ada85441df753",
         "size_bytes": 3357
+      },
+      "actual_ordinary_initialization_implementation": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-ordinary-initialization/summary.json",
+        "sha256": "8bbbaadc51011f459a81c97fbedee08d0037c0b10c3232bcd86a9a993abe548d",
+        "size_bytes": 3616
       }
     },
     {

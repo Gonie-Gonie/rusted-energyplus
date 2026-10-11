@@ -1,0 +1,99 @@
+{
+  "schema": "ctf10-ordinary-initialization-implementation-milestone.v1",
+  "card": "CTF-10",
+  "status": "Ordinary A/B initialization connected; current quality, selected608 format texts and fixed six ordinary CLI smoke passed.",
+  "selected_evidence_manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-ordinary-initialization/manifest.json",
+    "sha256": "d71e877005c142d1fc248cee6512a5e62c5bbb5fc9a16380e9893aa15e0841ae",
+    "size_bytes": 331996
+  },
+  "actual_accepted_source": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-ordinary-initialization/accepted.json",
+    "sha256": "0d0a3c19060db84580bb390303e94409feba849410d75682c682cb9f3f871e63",
+    "size_bytes": 9904
+  },
+  "actual_quality": {
+    "fmt-check": {
+      "actual_execution": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-fmt-check-command-07/receipt.json",
+        "sha256": "50c4701871ccbfd7f94689d47561cc82c86d6d2b2cefab3d30f250f2b1d031c7",
+        "size_bytes": 5318
+      },
+      "exit_code": 0,
+      "test_groups": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0
+    },
+    "clippy": {
+      "actual_execution": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-clippy-command-07/receipt.json",
+        "sha256": "6746441d3ddb9f9fc870dbdfb0b79081d72e258217fd48dbd23465147530c5de",
+        "size_bytes": 5503
+      },
+      "exit_code": 0,
+      "test_groups": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0
+    },
+    "focused": {
+      "actual_execution": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-focused-command-07/receipt.json",
+        "sha256": "2cd9d6f3b0343233f9b493938463f8cbdd41c085ec895a8742def8861564636b",
+        "size_bytes": 5491
+      },
+      "exit_code": 0,
+      "test_groups": 1,
+      "passed": 300,
+      "failed": 0,
+      "ignored": 0
+    },
+    "workspace": {
+      "actual_execution": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-workspace-command-07/receipt.json",
+        "sha256": "727852e1f2313fdae2ac75cefedda11e781a2e0fabbebc5c2a65e1ab098a6ef0",
+        "size_bytes": 5450
+      },
+      "exit_code": 0,
+      "test_groups": 21,
+      "passed": 4920,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/ca/cae115f4bcf0212021276eecf9b6f613630d80dc952bb27e96e8cc76bcc3fa16",
+    "sha256": "cae115f4bcf0212021276eecf9b6f613630d80dc952bb27e96e8cc76bcc3fa16"
+  },
+  "actual_selected_format_comparison": {
+    "path": ".runtime/porting/CTF-10/report-format-candidate-workflow-02/comparison.json",
+    "sha256": "9c6e56696c6b3aa0fd2bbd9f26ba1c5175fb2fa7337da8071c2a4815a12769a5",
+    "size_bytes": 2258
+  },
+  "actual_ordinary_smoke": {
+    "path": ".runtime/porting/CTF-10/ordinary-init-smoke-inputs-02/execution-summary.json",
+    "sha256": "5aa063c7abc626463d4ff8f43793ad062a2dab7baa5fa2822c2988c3ad816daa",
+    "size_bytes": 15299
+  },
+  "actual_optional_report_cli": null,
+  "optional_report_EIO_enabled_observed": false,
+  "six_case_EIO_enabled_cases": [
+    "A-24H",
+    "A-72H"
+  ],
+  "six_case_EIO_disabled_cases": [
+    "B-NOLIMIT-24H",
+    "B-FLOW-24H",
+    "B-CAPACITY-24H",
+    "B-BOTH-24H"
+  ],
+  "six_case_EIO_coverage_gaps": [],
+  "failed_execution_and_correction_lineage_preserved": true,
+  "ordinary_production_connection_applied": true,
+  "Native_registry_backend_or_whole_Init_equivalence_claimed": false,
+  "ordinary_numerical_equivalence_claimed": false,
+  "full_production_history_integration_PASS_claimed": false,
+  "complete_CTF10_PASS_claimed": false,
+  "gates_updated": false
+}

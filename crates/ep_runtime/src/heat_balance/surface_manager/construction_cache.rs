@@ -8,6 +8,7 @@ use super::ctf_layer_preprocessing::{
     ConstructionCtfLayerPreprocessing, CtfLayerContext, material_layer_inputs,
     preprocess_ctf_layers,
 };
+use super::ctf_layer_preprocessing::{CtfLayerFailure, try_preprocess_ctf_layers};
 use super::{ConstructionCacheInvalidationToken, ConstructionThermalData};
 use crate::RuntimeError;
 use crate::heat_balance::ctf::ConstructionCtfCoefficientOverride;
@@ -21,11 +22,16 @@ use crate::heat_balance::ctf_first_matrix_owner::ConstructionCtfFirstInverseAfte
 use crate::heat_balance::ctf_initial_owner::{
     ConstructionCtfInitialDiscretization, initialize_construction_ctf_initial,
 };
+use crate::heat_balance::ctf_initialization_context::{
+    CtfInitializationContext, CtfInitializationError, original_loader_name, original_material_name,
+};
 use crate::heat_balance::ctf_public_initialization::OrderedCtfPublicInitialization;
+use crate::heat_balance::ctf_retry_initialization::try_initialize_construction_ctf_retry;
 use crate::heat_balance::ctf_retry_initialization::{
     ConstructionCtfRetryInitialization, initialize_construction_ctf_retry,
     skip_construction_ctf_retry,
 };
+use crate::heat_balance::ctf_source_diagnostics::emit_ctf_caller_diagnostic;
 use crate::heat_balance::id_slot_index::TypedIdSlotIndex;
 use ep_model::{
     Construction, ConstructionId, Material, MaterialId, MaterialSurfaceRoughness,
@@ -93,6 +99,25 @@ impl ConstructionThermalDataCache {
             Vec<&ConstructionCtfCoefficientOverride>,
         >,
     ) -> Result<Self, RuntimeError> {
+        Self::build_with_optional_context(model, ctf_coefficients_by_construction, None)
+    }
+
+    pub(crate) fn build_with_initialization_context(
+        model: &TypedModel,
+        coefficients: &BTreeMap<String, Vec<&ConstructionCtfCoefficientOverride>>,
+        context: &mut CtfInitializationContext<'_>,
+    ) -> Result<Self, RuntimeError> {
+        Self::build_with_optional_context(model, coefficients, Some(context))
+    }
+
+    fn build_with_optional_context(
+        model: &TypedModel,
+        ctf_coefficients_by_construction: &BTreeMap<
+            String,
+            Vec<&ConstructionCtfCoefficientOverride>,
+        >,
+        mut initialization: Option<&mut CtfInitializationContext<'_>>,
+    ) -> Result<Self, RuntimeError> {
         let build_start = Instant::now();
         let mut entries = Vec::with_capacity(
             model
@@ -144,6 +169,9 @@ impl ConstructionThermalDataCache {
             if !construction.is_ordinary_opaque() {
                 if used_ctf_constructions.contains(&construction.id.0) {
                     public_initialization.record_excluded(construction_index, construction, true);
+                    if initialization.is_some() {
+                        return Err(CtfInitializationError::Owner(crate::heat_balance::ctf_reports::CtfReportUnavailable::UnsupportedConstruction).into());
+                    }
                 } else {
                     // Source public reset/unused return precedes all layer/retry reads.
                     public_initialization.record_unused_reset(
@@ -169,6 +197,7 @@ impl ConstructionThermalDataCache {
                 entries.len(),
                 ctf_coefficients_by_construction,
                 context,
+                initialization.as_deref_mut(),
             )?;
             // Legacy thermal/EIO construction remains separate after a selected stop.
             // Only a genuinely invoked selected chain may update its shared flags.
@@ -183,12 +212,30 @@ impl ConstructionThermalDataCache {
                 construction,
                 &entry.material_layer_stack,
             )?;
-            let original_layer_names = original_materials
-                .iter()
-                .map(|material| material.name.0.as_str())
-                .collect::<Vec<_>>();
+            let original_layer_names = if initialization.is_some() && context.is_used_ctf {
+                original_materials
+                    .iter()
+                    .map(|material| original_material_name(model, material.id))
+                    .collect::<Result<Vec<_>, _>>()
+                    .map_err(|error| RuntimeError::from(CtfInitializationError::Owner(error)))?
+            } else {
+                original_materials
+                    .iter()
+                    .map(|material| material.name.0.as_str())
+                    .collect::<Vec<_>>()
+            };
+            let original_construction_name = if initialization.is_some() && context.is_used_ctf {
+                original_loader_name(
+                    &model.ctf_report_names.constructions,
+                    construction.id,
+                    &construction.name,
+                )
+                .map_err(|error| RuntimeError::from(CtfInitializationError::Owner(error)))?
+            } else {
+                construction.name.0.as_str()
+            };
             let names = CtfCallerDiagnosticNames {
-                construction_name: construction.name.0.as_str(),
+                construction_name: original_construction_name,
                 original_tot_layers: original_layer_names.len() as i32,
                 original_layer_material_names: &original_layer_names,
             };
@@ -209,7 +256,17 @@ impl ConstructionThermalDataCache {
                 );
                 initial_discretizations.push(initial);
                 // Move the original first Box once; no combined08 call or replay.
-                initialize_construction_ctf_retry(first_assembly, shared_flags, names)
+                if let Some(actual) = initialization.as_deref_mut() {
+                    try_initialize_construction_ctf_retry(
+                        first_assembly,
+                        shared_flags,
+                        names,
+                        |call| emit_ctf_caller_diagnostic(&mut actual.backend, call),
+                    )
+                    .map_err(CtfInitializationError::Diagnostic)?
+                } else {
+                    initialize_construction_ctf_retry(first_assembly, shared_flags, names)
+                }
             };
             shared_flags = retry.flags_on_return;
             selected_chain_stop = retry.selected_chain_stop;
@@ -225,6 +282,16 @@ impl ConstructionThermalDataCache {
                 &retry,
             );
             retry_initializations.push(retry);
+            if initialization.is_some()
+                && let Some(stop) = selected_chain_stop
+            {
+                return Err(CtfInitializationError::SelectedChain(stop).into());
+            }
+            if initialization.is_some()
+                && let Some(stop) = public_initialization.selected_stop
+            {
+                return Err(CtfInitializationError::PublicStop(stop).into());
+            }
             if entry.heat_capacity_j_per_m2_k.is_some() {
                 massive_ctf_construction_ids.push(entry.construction_id);
             } else {
@@ -244,6 +311,9 @@ impl ConstructionThermalDataCache {
         public_initialization
             .finish_declared_loop_with_flags(model.constructions.len(), shared_flags);
         validate_surface_construction_families(model, &construction_slots)?;
+        if let Some(actual) = initialization {
+            actual.complete(model, &mut public_initialization)?;
+        }
 
         let coefficient_cache_hash = construction_cache_hash(&entries);
         // Capture at the single actual producer call, before its owners move.
@@ -402,11 +472,28 @@ fn construction_thermal_data(
     cache_index: usize,
     ctf_coefficients_by_construction: &BTreeMap<String, Vec<&ConstructionCtfCoefficientOverride>>,
     ctf_layer_context: CtfLayerContext,
+    initialization: Option<&mut CtfInitializationContext<'_>>,
 ) -> Result<ConstructionThermalData, RuntimeError> {
     let layer_ids = construction_layer_stack(construction);
     let layer_materials = layer_materials(model, material_slots, construction, &layer_ids)?;
     let opaque_layer_materials = opaque_layer_materials(&layer_materials, construction)?;
-    let ctf01_result = if ctf_layer_context.is_used_ctf {
+    let ctf01_result = if let Some(actual) = initialization {
+        let inputs = if ctf_layer_context.is_used_ctf {
+            material_layer_inputs(&layer_materials)
+        } else {
+            Ok(Vec::new())
+        };
+        match inputs {
+            Err(error) => Err(error),
+            Ok(inputs) => match try_preprocess_ctf_layers(&inputs, ctf_layer_context, |call| {
+                actual.loading_diagnostic(model, construction, call)
+            }) {
+                Ok(value) => Ok(value),
+                Err(CtfLayerFailure::Unavailable(error)) => Err(error),
+                Err(CtfLayerFailure::Diagnostic(error)) => return Err(error.into()),
+            },
+        }
+    } else if ctf_layer_context.is_used_ctf {
         material_layer_inputs(&layer_materials)
             .and_then(|inputs| preprocess_ctf_layers(&inputs, ctf_layer_context))
     } else {

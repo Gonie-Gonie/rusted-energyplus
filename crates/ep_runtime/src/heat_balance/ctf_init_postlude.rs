@@ -68,7 +68,16 @@ impl std::fmt::Display for CtfInitPostludeError {
     }
 }
 
-impl std::error::Error for CtfInitPostludeError {}
+impl std::error::Error for CtfInitPostludeError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::Report(error) => Some(error),
+            Self::Backend(error) => Some(error),
+            Self::Fatal(error) => Some(error),
+            Self::Unavailable(_) | Self::Scan(_) => None,
+        }
+    }
+}
 
 /// Reached Rust call boundaries only; not a Native return, report or PASS claim.
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
@@ -101,7 +110,7 @@ pub fn complete_ctf_init_postlude(
     layer_columns: &[i32],
     table: &mut PredefinedStringTable,
     scan: &mut ReportScanState,
-    eio: &mut impl Write,
+    eio: &mut (impl Write + ?Sized),
     backend: &mut SourceErrorBackend<'_>,
     progress: &mut CtfInitPostludeProgress,
 ) -> Result<(), CtfInitPostludeError> {

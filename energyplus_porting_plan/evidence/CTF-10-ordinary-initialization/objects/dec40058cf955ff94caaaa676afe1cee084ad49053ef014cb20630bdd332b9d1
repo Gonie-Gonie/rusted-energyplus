@@ -1,0 +1,7 @@
+{
+  "schema": "ctf10-ordinary-existing-test-arity-correction.v1",
+  "actual_test": "heat_balance_summary_captures_run_period_initial_ctf_history_slots",
+  "change": "Explicit None preserves old diagnostic-only internal call semantics.",
+  "unexecuted_prior_edit": "correction01 matched an earlier similar coefficient block; corrected before any test or build execution.",
+  "test_expectations_changed": false
+}

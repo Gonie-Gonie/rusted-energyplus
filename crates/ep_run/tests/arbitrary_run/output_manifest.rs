@@ -20,6 +20,31 @@ pub(crate) const BLOCKED_AFTER_SUPPORT_MANIFEST: &[&str] = &[
 
 pub(crate) const SUPPORTED_RUNTIME_MANIFEST: &[&str] = &[
     "diagnostics.json",
+    "eplusrs.ctf.err",
+    "eplusrs.ctf.log",
+    "eplusrs.eio",
+    "eplusrs.err",
+    "input/converted.epJSON",
+    "input/input-hashes.json",
+    "input/original.epJSON",
+    "logs/command.log",
+    "model/execution-plan.json",
+    "model/graph-summary.json",
+    "model/raw-model-summary.json",
+    "model/typed-model-summary.json",
+    "reports/compatibility-boundary.md",
+    "reports/run-report.md",
+    "results/meters.csv",
+    "results/result-store.json",
+    "results/selected-outputs.csv",
+    "run-summary.json",
+    "support-assessment.json",
+    "support-report.md",
+];
+
+// Fixture-demand diagnostic execution does not enter construction initialization.
+pub(crate) const DIAGNOSTIC_RUNTIME_MANIFEST: &[&str] = &[
+    "diagnostics.json",
     "eplusrs.err",
     "input/converted.epJSON",
     "input/input-hashes.json",

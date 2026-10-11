@@ -1,0 +1,26 @@
+"""Apply reviewed fmt8 nonfinite-only alignment and archive actual formatted bytes."""
+import difflib, hashlib, json, shutil, subprocess
+from pathlib import Path
+BASE=Path('.runtime/porting/CTF-10')
+HOLD=BASE/'report-format-nonfinite-repair-prep-01'
+OUT=BASE/'report-format-nonfinite-repair-applied-01'
+def ref(path):
+    data=path.read_bytes(); return {'path':path.as_posix(),'sha256':hashlib.sha256(data).hexdigest(),'size_bytes':len(data)}
+manifest=HOLD/'manifest.json'
+assert ref(manifest)['sha256']=='91d5cb69e9d9defa6937b3558ad5b7c18bfe3fdb060a92f4cae7bc655770558e'
+packet=json.loads(manifest.read_bytes())
+for row in packet['own_sources']:
+    assert ref(Path(row['target']))['sha256']==row['before']['sha256']
+    assert ref(Path(row['source']['path']))=={k:row['source'][k] for k in ['path','sha256','size_bytes']}
+assert not OUT.exists(); OUT.mkdir()
+for row in packet['own_sources']: shutil.copyfile(row['source']['path'],row['target'])
+subprocess.run(['cargo','fmt','--all'],check=True)
+rows=[]
+for row in packet['own_sources']:
+    live=Path(row['target']); archive=OUT/live.name; shutil.copyfile(live,archive)
+    diff=OUT/(live.name+'.diff')
+    diff.write_bytes(''.join(difflib.unified_diff(Path(row['before']['path']).read_text(encoding='utf8').splitlines(True),live.read_text(encoding='utf8').splitlines(True),fromfile='a/'+row['target'],tofile='b/'+row['target'])).encode())
+    rows.append({'canonical_path':row['target'],'before':row['before'],'reviewed_proposal':row['source'],'actual_final_source':ref(archive),'actual_diff':ref(diff)})
+record={'schema':'ctf10-report-format-nonfinite-actual-repair.v1','reviewed_preparation':ref(manifest),'Root_Source_review_accepted':True,'actual_sources':rows,'finite_calculation_and_comparison_policy_unchanged':True,'failed_comparison_preserved':True,'gates_updated':False}
+(OUT/'record.json').write_bytes((json.dumps(record,indent=2)+'\n').encode())
+print(json.dumps(ref(OUT/'record.json')))

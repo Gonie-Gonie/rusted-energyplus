@@ -1,0 +1,59 @@
+"""Install reviewed ordinary02 and F/G observer, preserving raw application custody."""
+import difflib, hashlib, json, subprocess, sys
+from pathlib import Path
+ROOT = Path.cwd().resolve()
+BASE = ROOT / '.runtime/porting/CTF-10'
+OUT = BASE / 'ordinary-initialization-applied-01'
+def ref(path):
+    data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(data).hexdigest(), 'size_bytes': len(data)}
+def exact(row):
+    path = ROOT / row['path']
+    assert ref(path)['sha256'] == row['sha256'] and path.stat().st_size == row['size_bytes']
+    return path.read_bytes()
+manifest_path = BASE / 'ordinary-init-plumbing-prep-02/manifest.json'
+assert ref(manifest_path)['sha256'] == '8304bd40b65e0f176bdb2e1a9a92e75567d8569fb4e9d264d1316a599b1c8f1a'
+assert not OUT.exists() and not subprocess.check_output(['git', 'status', '--porcelain'])
+manifest = json.loads(manifest_path.read_bytes())
+planned = {}
+for row in manifest['own_sources']:
+    target = ROOT / row['canonical_path']
+    before = exact(row['before_archive']) if row['before_archive'] else None
+    assert (target.read_bytes() if target.exists() else None) == before
+    planned[row['canonical_path']] = (exact(row['proposed_source']), row['proposed_source'])
+observer = BASE / 'report-format-native-prep-01/proposed/crates/ep_run/examples/ctf10_report_format_unit_observer.rs'
+assert ref(observer)['sha256'] == '2adf216e3c35c21bdc424cbdc4c87c2fa938a4a8481347bd84ae300c31575bb6'
+observer_target = 'crates/ep_run/examples/ctf10_report_format_unit_observer.rs'
+assert not (ROOT / observer_target).exists()
+planned[observer_target] = (observer.read_bytes(), ref(observer))
+model_target = 'crates/ep_model/src/model.rs'
+model = ROOT / model_target
+assert subprocess.check_output(['git', 'show', ':' + model_target]) == model.read_bytes().replace(b'\r\n', b'\n')
+planned[model_target] = (model.read_bytes().replace(b'\r\n', b'\n'), ref(model))
+assert len(planned) == 18
+for folder in ['before', 'held', 'formatted', 'formatter-diffs']: (OUT / folder).mkdir(parents=True, exist_ok=False)
+for target, (body, authority) in planned.items():
+    path = ROOT / target
+    name = target.replace('/', '__')
+    if path.exists(): (OUT / 'before' / name).write_bytes(path.read_bytes())
+    (OUT / 'held' / name).write_bytes(body)
+    path.write_bytes(body)
+fmt_dir = BASE / 'ordinary-initialization-format-command-01'
+assert not fmt_dir.exists()
+subprocess.run([sys.executable, '-X', 'utf8', '-B', 'tools/porting/record_command.py', '--output-dir', str(fmt_dir.relative_to(ROOT)), '--', 'cargo', 'fmt', '--all'], stdout=subprocess.DEVNULL, check=True)
+actual = []
+for target, (body, authority) in planned.items():
+    name = target.replace('/', '__')
+    final = (ROOT / target).read_bytes()
+    archive = OUT / 'formatted' / name
+    archive.write_bytes(final)
+    delta = OUT / 'formatter-diffs' / (name + '.diff')
+    delta.write_bytes(''.join(difflib.unified_diff(body.decode().splitlines(True), final.decode().splitlines(True), fromfile=(OUT / 'held' / name).relative_to(ROOT).as_posix(), tofile=target)).encode())
+    actual.append({'canonical_path': target, 'reviewed_source_authority': authority, 'actual_composed_source': ref(OUT / 'held' / name), 'actual_final_source': ref(archive), 'actual_formatter_diff': ref(delta)})
+record = {'schema': 'ctf10-ordinary-initialization-actual-application.v1', 'actual_sources': actual,
+    'actual_source_preparation': ref(manifest_path), 'actual_format_execution': ref(fmt_dir / 'receipt.json'),
+    'Root_and_Header_cumulative_Source_review_accepted': True, 'ordinary_A_and_B_dispatch_connected': True,
+    'model_source_change': 'Normalize raw CRLF worktree to the already committed LF Git index; no logical source change.',
+    'actual_Root_source': ref(Path(__file__).resolve()), 'scientific_PASS_claimed': False, 'gates_updated': False}
+(OUT / 'record.json').write_bytes((json.dumps(record, indent=2) + '\n').encode())
+print(json.dumps({'record': ref(OUT / 'record.json'), 'actual_canonical_files': len(actual)}), flush=True)

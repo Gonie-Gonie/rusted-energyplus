@@ -1,0 +1,962 @@
+[
+  {
+    "call_ordinal": 17,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000000",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:8.3F}",
+      "outcome": "source_returned",
+      "text": "INF     "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000000",
+      "format": "{:8.3F}",
+      "outcome": "source_returned",
+      "text": "     INF",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 18,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000000",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:8.4F}",
+      "outcome": "source_returned",
+      "text": "INF     "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000000",
+      "format": "{:8.4F}",
+      "outcome": "source_returned",
+      "text": "     INF",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 19,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000000",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:14.3F}",
+      "outcome": "source_returned",
+      "text": "INF           "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000000",
+      "format": "{:14.3F}",
+      "outcome": "source_returned",
+      "text": "           INF",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 20,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000000",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:11.3F}",
+      "outcome": "source_returned",
+      "text": "INF        "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000000",
+      "format": "{:11.3F}",
+      "outcome": "source_returned",
+      "text": "        INF",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 21,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000000",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:13.3F}",
+      "outcome": "source_returned",
+      "text": "INF          "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000000",
+      "format": "{:13.3F}",
+      "outcome": "source_returned",
+      "text": "          INF",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 22,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000000",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:15.4G}",
+      "outcome": "source_returned",
+      "text": "INF            "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000000",
+      "format": "{:15.4G}",
+      "outcome": "source_returned",
+      "text": "            INF",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 23,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000000",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:12.4G}",
+      "outcome": "source_returned",
+      "text": "INF         "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000000",
+      "format": "{:12.4G}",
+      "outcome": "source_returned",
+      "text": "         INF",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 24,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000000",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:20.8G}",
+      "outcome": "source_returned",
+      "text": "INF                 "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000000",
+      "format": "{:20.8G}",
+      "outcome": "source_returned",
+      "text": "                 INF",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 25,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000000",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:8.3F}",
+      "outcome": "source_returned",
+      "text": "-INF    "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000000",
+      "format": "{:8.3F}",
+      "outcome": "source_returned",
+      "text": "    -INF",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 26,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000000",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:8.4F}",
+      "outcome": "source_returned",
+      "text": "-INF    "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000000",
+      "format": "{:8.4F}",
+      "outcome": "source_returned",
+      "text": "    -INF",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 27,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000000",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:14.3F}",
+      "outcome": "source_returned",
+      "text": "-INF          "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000000",
+      "format": "{:14.3F}",
+      "outcome": "source_returned",
+      "text": "          -INF",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 28,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000000",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:11.3F}",
+      "outcome": "source_returned",
+      "text": "-INF       "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000000",
+      "format": "{:11.3F}",
+      "outcome": "source_returned",
+      "text": "       -INF",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 29,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000000",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:13.3F}",
+      "outcome": "source_returned",
+      "text": "-INF         "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000000",
+      "format": "{:13.3F}",
+      "outcome": "source_returned",
+      "text": "         -INF",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 30,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000000",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:15.4G}",
+      "outcome": "source_returned",
+      "text": "-INF           "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000000",
+      "format": "{:15.4G}",
+      "outcome": "source_returned",
+      "text": "           -INF",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 31,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000000",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:12.4G}",
+      "outcome": "source_returned",
+      "text": "-INF        "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000000",
+      "format": "{:12.4G}",
+      "outcome": "source_returned",
+      "text": "        -INF",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 32,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000000",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:20.8G}",
+      "outcome": "source_returned",
+      "text": "-INF                "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000000",
+      "format": "{:20.8G}",
+      "outcome": "source_returned",
+      "text": "                -INF",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 33,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff8000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:8.3F}",
+      "outcome": "source_returned",
+      "text": "NAN     "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff8000000000001",
+      "format": "{:8.3F}",
+      "outcome": "source_returned",
+      "text": "     NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 34,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff8000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:8.4F}",
+      "outcome": "source_returned",
+      "text": "NAN     "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff8000000000001",
+      "format": "{:8.4F}",
+      "outcome": "source_returned",
+      "text": "     NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 35,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff8000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:14.3F}",
+      "outcome": "source_returned",
+      "text": "NAN           "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff8000000000001",
+      "format": "{:14.3F}",
+      "outcome": "source_returned",
+      "text": "           NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 36,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff8000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:11.3F}",
+      "outcome": "source_returned",
+      "text": "NAN        "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff8000000000001",
+      "format": "{:11.3F}",
+      "outcome": "source_returned",
+      "text": "        NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 37,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff8000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:13.3F}",
+      "outcome": "source_returned",
+      "text": "NAN          "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff8000000000001",
+      "format": "{:13.3F}",
+      "outcome": "source_returned",
+      "text": "          NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 38,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff8000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:15.4G}",
+      "outcome": "source_returned",
+      "text": "NAN            "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff8000000000001",
+      "format": "{:15.4G}",
+      "outcome": "source_returned",
+      "text": "            NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 39,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff8000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:12.4G}",
+      "outcome": "source_returned",
+      "text": "NAN         "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff8000000000001",
+      "format": "{:12.4G}",
+      "outcome": "source_returned",
+      "text": "         NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 40,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff8000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:20.8G}",
+      "outcome": "source_returned",
+      "text": "NAN                 "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff8000000000001",
+      "format": "{:20.8G}",
+      "outcome": "source_returned",
+      "text": "                 NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 41,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff8000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:8.3F}",
+      "outcome": "source_returned",
+      "text": "-NAN    "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff8000000000001",
+      "format": "{:8.3F}",
+      "outcome": "source_returned",
+      "text": "    -NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 42,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff8000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:8.4F}",
+      "outcome": "source_returned",
+      "text": "-NAN    "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff8000000000001",
+      "format": "{:8.4F}",
+      "outcome": "source_returned",
+      "text": "    -NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 43,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff8000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:14.3F}",
+      "outcome": "source_returned",
+      "text": "-NAN          "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff8000000000001",
+      "format": "{:14.3F}",
+      "outcome": "source_returned",
+      "text": "          -NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 44,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff8000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:11.3F}",
+      "outcome": "source_returned",
+      "text": "-NAN       "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff8000000000001",
+      "format": "{:11.3F}",
+      "outcome": "source_returned",
+      "text": "       -NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 45,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff8000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:13.3F}",
+      "outcome": "source_returned",
+      "text": "-NAN         "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff8000000000001",
+      "format": "{:13.3F}",
+      "outcome": "source_returned",
+      "text": "         -NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 46,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff8000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:15.4G}",
+      "outcome": "source_returned",
+      "text": "-NAN           "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff8000000000001",
+      "format": "{:15.4G}",
+      "outcome": "source_returned",
+      "text": "           -NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 47,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff8000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:12.4G}",
+      "outcome": "source_returned",
+      "text": "-NAN        "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff8000000000001",
+      "format": "{:12.4G}",
+      "outcome": "source_returned",
+      "text": "        -NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 48,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff8000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:20.8G}",
+      "outcome": "source_returned",
+      "text": "-NAN                "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff8000000000001",
+      "format": "{:20.8G}",
+      "outcome": "source_returned",
+      "text": "                -NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 49,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:8.3F}",
+      "outcome": "source_returned",
+      "text": "NAN     "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000001",
+      "format": "{:8.3F}",
+      "outcome": "source_returned",
+      "text": "     NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 50,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:8.4F}",
+      "outcome": "source_returned",
+      "text": "NAN     "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000001",
+      "format": "{:8.4F}",
+      "outcome": "source_returned",
+      "text": "     NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 51,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:14.3F}",
+      "outcome": "source_returned",
+      "text": "NAN           "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000001",
+      "format": "{:14.3F}",
+      "outcome": "source_returned",
+      "text": "           NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 52,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:11.3F}",
+      "outcome": "source_returned",
+      "text": "NAN        "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000001",
+      "format": "{:11.3F}",
+      "outcome": "source_returned",
+      "text": "        NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 53,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:13.3F}",
+      "outcome": "source_returned",
+      "text": "NAN          "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000001",
+      "format": "{:13.3F}",
+      "outcome": "source_returned",
+      "text": "          NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 54,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:15.4G}",
+      "outcome": "source_returned",
+      "text": "NAN            "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000001",
+      "format": "{:15.4G}",
+      "outcome": "source_returned",
+      "text": "            NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 55,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:12.4G}",
+      "outcome": "source_returned",
+      "text": "NAN         "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000001",
+      "format": "{:12.4G}",
+      "outcome": "source_returned",
+      "text": "         NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 56,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:20.8G}",
+      "outcome": "source_returned",
+      "text": "NAN                 "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "7ff0000000000001",
+      "format": "{:20.8G}",
+      "outcome": "source_returned",
+      "text": "                 NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 57,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:8.3F}",
+      "outcome": "source_returned",
+      "text": "-NAN    "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000001",
+      "format": "{:8.3F}",
+      "outcome": "source_returned",
+      "text": "    -NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 58,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:8.4F}",
+      "outcome": "source_returned",
+      "text": "-NAN    "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000001",
+      "format": "{:8.4F}",
+      "outcome": "source_returned",
+      "text": "    -NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 59,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:14.3F}",
+      "outcome": "source_returned",
+      "text": "-NAN          "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000001",
+      "format": "{:14.3F}",
+      "outcome": "source_returned",
+      "text": "          -NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 60,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:11.3F}",
+      "outcome": "source_returned",
+      "text": "-NAN       "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000001",
+      "format": "{:11.3F}",
+      "outcome": "source_returned",
+      "text": "       -NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 61,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:13.3F}",
+      "outcome": "source_returned",
+      "text": "-NAN         "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000001",
+      "format": "{:13.3F}",
+      "outcome": "source_returned",
+      "text": "         -NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 62,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:15.4G}",
+      "outcome": "source_returned",
+      "text": "-NAN           "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000001",
+      "format": "{:15.4G}",
+      "outcome": "source_returned",
+      "text": "           -NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 63,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:12.4G}",
+      "outcome": "source_returned",
+      "text": "-NAN        "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000001",
+      "format": "{:12.4G}",
+      "outcome": "source_returned",
+      "text": "        -NAN",
+      "unavailable": null
+    }
+  },
+  {
+    "call_ordinal": 64,
+    "Native": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000001",
+      "exception_message": null,
+      "exception_type": null,
+      "format": "{:20.8G}",
+      "outcome": "source_returned",
+      "text": "-NAN                "
+    },
+    "Rust": {
+      "actual_source_invoked": true,
+      "actual_value_bits_before_call": "fff0000000000001",
+      "format": "{:20.8G}",
+      "outcome": "source_returned",
+      "text": "                -NAN",
+      "unavailable": null
+    }
+  }
+]

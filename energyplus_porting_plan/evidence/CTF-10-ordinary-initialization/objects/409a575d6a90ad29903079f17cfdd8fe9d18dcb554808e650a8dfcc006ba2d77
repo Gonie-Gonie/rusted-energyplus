@@ -1,0 +1,19 @@
+"""Update the successful runtime's exact output contract for three real artifacts."""
+import difflib, hashlib, json
+from pathlib import Path
+ROOT = Path.cwd().resolve(); BASE = ROOT / '.runtime/porting/CTF-10'
+path = ROOT/'crates/ep_run/tests/arbitrary_run/output_manifest.rs'
+before = path.read_bytes()
+old = b'pub(crate) const SUPPORTED_RUNTIME_MANIFEST: &[&str] = &[\n    "diagnostics.json",\n    "eplusrs.err",'
+new = b'pub(crate) const SUPPORTED_RUNTIME_MANIFEST: &[&str] = &[\n    "diagnostics.json",\n    "eplusrs.ctf.err",\n    "eplusrs.ctf.log",\n    "eplusrs.eio",\n    "eplusrs.err",'
+assert before.count(old)==1
+after = before.replace(old,new)
+out = BASE/'ordinary-initialization-correction-04'
+assert not out.exists(); out.mkdir()
+(out/'output_manifest.before.rs').write_bytes(before)
+(out/'output_manifest.rs').write_bytes(after)
+(out/'correction.diff').write_text(''.join(difflib.unified_diff(before.decode().splitlines(True),after.decode().splitlines(True),fromfile='before',tofile=path.relative_to(ROOT).as_posix())),encoding='utf8',newline='\n')
+record = {'schema':'ctf10-ordinary-output-manifest-correction.v1','canonical_path':path.relative_to(ROOT).as_posix(),'before_sha256':hashlib.sha256(before).hexdigest(),'after_sha256':hashlib.sha256(after).hexdigest(),'production_implementation_changed':False,'change':'Require the three actual persistent CTF outputs in the exact successful runtime file inventory; blocked-before-runtime inventory remains unchanged.','actual_failure_receipt':'ordinary-initialization-workspace-command-03/receipt.json'}
+(out/'record.json').write_bytes((json.dumps(record,indent=2)+'\n').encode())
+path.write_bytes(after)
+print('Updated successful runtime exact file inventory', record['after_sha256'],flush=True)

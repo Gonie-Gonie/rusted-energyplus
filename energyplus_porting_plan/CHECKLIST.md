@@ -67,7 +67,8 @@ B에서는 그 의존성을 적용한다.
 
 ## 전체 체크리스트
 
-CTF-10은 일반 표면·이력 수명주기를 연결했고 전체 테스트 4,851개, 동일 Native 입력 2,029건의 선택 단위 비교와 일반 실행 6개를 통과했다. [현재 증거](evidence/CTF-10-production-activation/summary.json)를 보존했다. 보고 요청 입력·Scan 캐시 구현도 추가 회귀시험 8개를 포함한 전체 4,859개 시험을 통과했다. [Scan 증거](evidence/CTF-10-report-input-scan/summary.json)의 Native 비교, 전체 Init 보고·최종 오류 처리와 일반 실행의 Native 수치 동등성은 미완료이며 완료 체크는 유지한다.
+CTF-10 일반 A/B 초기화에 보고서·오류 출력 경로를 연결했습니다. [현재 실행 증거](evidence/CTF-10-ordinary-initialization/summary.json): 전체 4,920개 테스트, 원본/Rust 숫자 출력 608개 정확 일치, 기존 6개 CLI 실행 성공. 원본 초기화 전체 비교와 지속 실행의 수치 통합 검증은 계속 진행하며 카드 완료로 표시하지 않습니다.
+
 
 ### 00 범위·계약
 | 완료 | ID | 작업 | EP 파일·심벌 | 선행 |
@@ -112,12 +113,6 @@ CTF-10은 일반 표면·이력 수명주기를 연결했고 전체 테스트 4,
 | [ ] | [CTF-07](cards/CTF-07.md) | Gamma 행렬 계산 | `Construction.cc` · `ConstructionProps::calculateGammas` | CTF-05, CTF-06 |
 | [ ] | [CTF-08](cards/CTF-08.md) | 최종 CTF 계수와 차수 | `Construction.cc` · `ConstructionProps::calculateFinalCoefficients` | CTF-07 |
 | [ ] | [CTF-09](cards/CTF-09.md) | 계수 안정성 검사·timestep 재시도 | `Construction.cc` · `ConstructionProps::calculateTransferFunction` | CTF-08 |
-보고 출력·오류 백엔드 구현은 추가 시험 21개를 포함한 전체 4,880개 시험을 통과했다. [보고 출력 증거](evidence/CTF-10-report-output/summary.json)를 보존했으며, 원본 비교와 일반 Init 연결은 계속 진행한다.
-
-CTF-10의 실제 원본·Rust 조회 비교는 12개 입력·264개 조회·21,405개 항목에서 차이 0으로 통과했습니다. [비교 증거](evidence/CTF-10-report-scan-comparison/summary.json)를 보존했으며 전체 초기화·일반 실행 통합은 계속 진행합니다.
-
-CTF-10의 전체 보고서 등록·실제 오류 발생 지점·초기화 후처리를 구현하고 추가 34개를 포함한 전체 4,914개 테스트를 통과했습니다. [구현 증거](evidence/CTF-10-init-postlude/summary.json)를 보존했으며 일반 실행 경로 연결과 원본 통합 비교는 계속 진행합니다.
-
 | [ ] | [CTF-10](cards/CTF-10.md) | 구성체별 생성 연결·역순 재사용 | `HeatBalanceManager.cc` · `InitConductionTransferFunctions; ConstructionProps::calculateTransferFunction` | CTF-02, CTF-09 |
 
 ### 05 열원·외부 경계

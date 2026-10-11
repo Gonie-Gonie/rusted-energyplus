@@ -1,0 +1,64 @@
+{
+  "schema": "ctf10-report-format-nonfinite-actual-repair.v1",
+  "reviewed_preparation": {
+    "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-prep-01/manifest.json",
+    "sha256": "91d5cb69e9d9defa6937b3558ad5b7c18bfe3fdb060a92f4cae7bc655770558e",
+    "size_bytes": 7078
+  },
+  "Root_Source_review_accepted": true,
+  "actual_sources": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_reports_format.rs",
+      "before": {
+        "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-prep-01/before/crates/ep_runtime/src/heat_balance/ctf_reports_format.rs",
+        "sha256": "a4c0f21ecc2caf3c223c69dfef65b0a2fdd866268484ce66575080a35a4af49c",
+        "size_bytes": 2678,
+        "line_count": 81
+      },
+      "reviewed_proposal": {
+        "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_reports_format.rs",
+        "sha256": "d8aa1aa88e3000a4be37f6179c3c6829b7ff534d16efded123d91ab5045c0151",
+        "size_bytes": 2813,
+        "line_count": 83
+      },
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-applied-01/ctf_reports_format.rs",
+        "sha256": "d8aa1aa88e3000a4be37f6179c3c6829b7ff534d16efded123d91ab5045c0151",
+        "size_bytes": 2813
+      },
+      "actual_diff": {
+        "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-applied-01/ctf_reports_format.rs.diff",
+        "sha256": "f6984d1a1522e66dc52d11d0be781306bda51a29cf0d64e59f762112fc0f1556",
+        "size_bytes": 1257
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_reports_tests.rs",
+      "before": {
+        "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-prep-01/before/crates/ep_runtime/src/heat_balance/ctf_reports_tests.rs",
+        "sha256": "f63f6090a9bbfb6fc8b9f059845041542a0e1de275a9ed8064562fef8923a2e9",
+        "size_bytes": 8333,
+        "line_count": 241
+      },
+      "reviewed_proposal": {
+        "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_reports_tests.rs",
+        "sha256": "1c83281cdcb92aa66526e8bbd577d0d795ac53b77dbe433e55ddcbf6190dcae0",
+        "size_bytes": 9356,
+        "line_count": 267
+      },
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-applied-01/ctf_reports_tests.rs",
+        "sha256": "773888d469697ab73fd8d8c799233fb7f07684861b82c6f5b6047e549926582e",
+        "size_bytes": 9356
+      },
+      "actual_diff": {
+        "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-applied-01/ctf_reports_tests.rs.diff",
+        "sha256": "91b9efc232a93e868cb1392e314900fbabb918a5874a93f6e67bd6b6c73dddd7",
+        "size_bytes": 1626
+      }
+    }
+  ],
+  "finite_calculation_and_comparison_policy_unchanged": true,
+  "failed_comparison_preserved": true,
+  "gates_updated": false
+}

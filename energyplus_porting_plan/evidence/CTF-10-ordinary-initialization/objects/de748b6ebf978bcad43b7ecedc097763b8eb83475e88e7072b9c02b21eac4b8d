@@ -1,0 +1,82 @@
+[
+  {
+    "target": "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+    "before_origin": null,
+    "before": null
+  },
+  {
+    "target": "crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+    "before_origin": ".runtime/porting/CTF-10/severe-producer-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+    "before": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs"
+  },
+  {
+    "target": "crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+    "before_origin": "crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+    "before": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/heat_balance/ctf_reports.rs"
+  },
+  {
+    "target": "crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs",
+    "before_origin": ".runtime/porting/CTF-10/whole-init-postlude-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs",
+    "before": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs"
+  },
+  {
+    "target": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+    "before_origin": ".runtime/porting/CTF-10/whole-init-postlude-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+    "before": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs"
+  },
+  {
+    "target": "crates/ep_runtime/src/error.rs",
+    "before_origin": "crates/ep_runtime/src/error.rs",
+    "before": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/error.rs"
+  },
+  {
+    "target": "crates/ep_runtime/src/heat_balance/initialization.rs",
+    "before_origin": "crates/ep_runtime/src/heat_balance/initialization.rs",
+    "before": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/heat_balance/initialization.rs"
+  },
+  {
+    "target": "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+    "before_origin": "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+    "before": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs"
+  },
+  {
+    "target": "crates/ep_runtime/src/runtime.rs",
+    "before_origin": "crates/ep_runtime/src/runtime.rs",
+    "before": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/runtime.rs"
+  },
+  {
+    "target": "crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+    "before_origin": "crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+    "before": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/ideal_loads/coupled_runtime.rs"
+  },
+  {
+    "target": "crates/ep_runtime/src/heat_balance/mod.rs",
+    "before_origin": "crates/ep_runtime/src/heat_balance/mod.rs",
+    "before": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/heat_balance/mod.rs"
+  },
+  {
+    "target": "crates/ep_run/src/ctf_initialization_outputs.rs",
+    "before_origin": null,
+    "before": null
+  },
+  {
+    "target": "crates/ep_run/src/lib.rs",
+    "before_origin": "crates/ep_run/src/lib.rs",
+    "before": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_run/src/lib.rs"
+  },
+  {
+    "target": "crates/ep_run/src/pipeline.rs",
+    "before_origin": "crates/ep_run/src/pipeline.rs",
+    "before": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_run/src/pipeline.rs"
+  },
+  {
+    "target": "crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+    "before_origin": null,
+    "before": null
+  },
+  {
+    "target": "crates/ep_runtime/src/runtime/tests.rs",
+    "before_origin": "crates/ep_runtime/src/runtime/tests.rs",
+    "before": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-01/before/crates/ep_runtime/src/runtime/tests.rs"
+  }
+]

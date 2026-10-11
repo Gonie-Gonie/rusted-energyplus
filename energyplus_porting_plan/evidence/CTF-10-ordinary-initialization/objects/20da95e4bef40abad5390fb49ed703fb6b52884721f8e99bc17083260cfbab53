@@ -1,0 +1,211 @@
+{
+  "schema": "ctf10-ordinary-initialization-smoke-runner-source-preparation.v1",
+  "status": "SOURCE-READY HELD; unexecuted",
+  "held_immutable": true,
+  "own_source": {
+    "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-03/run-ordinary-init-smoke-03.py",
+    "sha256": "2c909462a87e0c9f545624e2edbe11f7245874e8eb125364d6781329bb4ac60b",
+    "size_bytes": 14926,
+    "line_count": 132
+  },
+  "README": {
+    "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-03/README.md",
+    "sha256": "73afd6ee9e4fe611e03a45bf6aedcd7d11bdddd015a8126542df175f52ec3de3",
+    "size_bytes": 2240,
+    "line_count": 10
+  },
+  "dependencies": [
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-01/manifest.json",
+      "sha256": "fe4123c6c2d243562991949b74ce84fe3e56336f368216f5004826ab6d470df0",
+      "size_bytes": 6392,
+      "line_count": 166
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-01/record.json",
+      "sha256": "7776c20153b64ec93b89b33e095b104ed003b9c0cf54cf657271095334f89a79",
+      "size_bytes": 24288,
+      "line_count": 455
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-02/record.json",
+      "sha256": "dec40058cf955ff94caaaa676afe1cee084ad49053ef014cb20630bdd332b9d1",
+      "size_bytes": 418,
+      "line_count": 7
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-03/record.json",
+      "sha256": "7e821dab38b3e50566750afca08eda1643c906f3e38f887eb2c2e7f480a4958d",
+      "size_bytes": 834,
+      "line_count": 15
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-02/part03.rs",
+      "sha256": "fff25a816be772d0d4d4dc2d782e2a45f800bcd9c61dfa92b7fe9364fbca8536",
+      "size_bytes": 48079,
+      "line_count": 1181
+    }
+  ],
+  "inherited_full_review_context": [
+    {
+      "path": ".runtime/porting/CTF-10/production-activation-cli6-runner-prep-01/manifest.json",
+      "sha256": "1855bb7167edab6f7352dc75f9476088e42bcfc912e27089b130c55db39c3271",
+      "size_bytes": 9274,
+      "line_count": 238
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/manifest.json",
+      "sha256": "8304bd40b65e0f176bdb2e1a9a92e75567d8569fb4e9d264d1316a599b1c8f1a",
+      "size_bytes": 39245,
+      "line_count": 867
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "size_bytes": 8453,
+      "line_count": 204
+    },
+    {
+      "path": ".runtime/porting/CTF-10/production-cli-inputs-01/manifest.json",
+      "sha256": "fbd21f9ac33f3dbd2b047c30fdb266e50f202d796eb3ab647f67c229bc9dac45",
+      "size_bytes": 14074,
+      "line_count": 441
+    },
+    {
+      "path": ".runtime/porting/CTF-10/production-activation-cli6-command-01/A-24H/receipt.json",
+      "sha256": "620e7be2f777674e8f0193a20aaaabc30cff1040b4d608b65682faca6c27cf50",
+      "size_bytes": 7662,
+      "line_count": 82
+    },
+    {
+      "path": ".runtime/porting/CTF-10/production-activation-cli6-command-01/A-72H/receipt.json",
+      "sha256": "584fa13c11b3453bccc21bc4662d790f96d8e81a2534f5677c0612e37631e543",
+      "size_bytes": 7661,
+      "line_count": 82
+    },
+    {
+      "path": ".runtime/porting/CTF-10/production-activation-cli6-command-01/B-NOLIMIT-24H/receipt.json",
+      "sha256": "9dceac6e2913e57f6c2dcfe90c52d9b3d2e6392ed609c2becf8be8920634e6ca",
+      "size_bytes": 7694,
+      "line_count": 82
+    },
+    {
+      "path": ".runtime/porting/CTF-10/production-activation-cli6-command-01/B-FLOW-24H/receipt.json",
+      "sha256": "9c8230da1024043a7fd977d30b76ae985fc858141d0cdb281cd3b16208a4a52b",
+      "size_bytes": 7681,
+      "line_count": 82
+    },
+    {
+      "path": ".runtime/porting/CTF-10/production-activation-cli6-command-01/B-CAPACITY-24H/receipt.json",
+      "sha256": "c8813bf91e5f8567b4dd6b2c5c01f88876f578b1d8070bb8d7685ee930505245",
+      "size_bytes": 7698,
+      "line_count": 82
+    },
+    {
+      "path": ".runtime/porting/CTF-10/production-activation-cli6-command-01/B-BOTH-24H/receipt.json",
+      "sha256": "f96def4b33c5409767755a6cc503db1b3ee93f944f05dbb58eb5fb8cf9c5ec6d",
+      "size_bytes": 7682,
+      "line_count": 82
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_run/src/ctf_initialization_outputs.rs",
+      "first_line": 42,
+      "last_line": 80,
+      "sha256": "7913f1b10a5a7340385351cd18b680e2297fec45f8e988ee8e4d3109c24c8dbd",
+      "size_bytes": 1952,
+      "purpose": "Only reached caller writes three artifacts; exact error prefix merging"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+      "first_line": 339,
+      "last_line": 349,
+      "sha256": "d84fc7e6ed31dd9ba9babe1b151816a9c941b18aab897f7b4c4e98eba55e1c22",
+      "size_bytes": 704,
+      "purpose": "Literal four EIO header writes"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-init-plumbing-prep-02/proposed/crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs",
+      "first_line": 170,
+      "last_line": 198,
+      "sha256": "e8ffe107269d7e5dcfa64e0146137e12a9d7383ee376f10b461020f2947db13c",
+      "size_bytes": 1149,
+      "purpose": "Conditional EIO then fatal and genuine successful return"
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "first_line": 77,
+      "last_line": 104,
+      "sha256": "6e6cfe7caf7eff567f7375537610ef928b61158de4d41e022d473d419a1022d0",
+      "size_bytes": 1162,
+      "purpose": "Raw current SourceSnapshot"
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "first_line": 118,
+      "last_line": 143,
+      "sha256": "5403bbccfd1bfb4390999c2033fa0083e196ad92134a96cd89de15eb94906ca9",
+      "size_bytes": 1255,
+      "purpose": "Actual Cargo-emitted artifact capture"
+    }
+  ],
+  "required_current_archive_count": 19,
+  "required_parent_archive_count": 18,
+  "CLI_operands": [
+    "actual ordinary application record path",
+    "actual record SHA256",
+    "fmt receipt path#SHA256",
+    "clippy receipt path#SHA256",
+    "focused receipt path#SHA256",
+    "workspace receipt path#SHA256"
+  ],
+  "required_record_schema": "ctf10-ordinary-initialization-actual-application.v1",
+  "future_application_or_quality_identities_invented": false,
+  "all_other_runner_logic_literal_01": true,
+  "stdlib_AST_valid": true,
+  "canonical_Git_Cargo_target_or_payload_actions": false,
+  "predecessor_manifest": {
+    "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-02/manifest.json",
+    "sha256": "7ebf5091d1ae3d448c4884722b81cf5882a8357e6b7d9b8257555d681250400b",
+    "size_bytes": 7583,
+    "line_count": 192
+  },
+  "predecessor_source": {
+    "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-03/before/run-ordinary-init-smoke-02.py",
+    "sha256": "dcf701df742dabec7f0e4e83e8645ee8aeccc9c036a130670b739d7925638433",
+    "size_bytes": 14532,
+    "line_count": 131
+  },
+  "predecessor_README": {
+    "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-03/before/README.md",
+    "sha256": "ead9d42abc7d50f2089d092943d11632c55f868865d5e3f587fdb96567eaaf78",
+    "size_bytes": 1651,
+    "line_count": 7
+  },
+  "predecessor_manifest_archive": {
+    "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-03/before/manifest.json",
+    "sha256": "7ebf5091d1ae3d448c4884722b81cf5882a8357e6b7d9b8257555d681250400b",
+    "size_bytes": 7583,
+    "line_count": 192
+  },
+  "exact_from_previous_diff": {
+    "path": ".runtime/porting/CTF-10/ordinary-init-smoke-runner-prep-03/from-previous.diff",
+    "sha256": "f176fddde21b575a0145f914bb532d8a4d950e19a8a28368da4049b85e704e3a",
+    "size_bytes": 4120,
+    "line_count": 37
+  },
+  "current_application_context": {
+    "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-03/record.json",
+    "sha256": "d8dd8f803c33a20dc6ab9ef07e0dd170c857ae8aeb9716f527115ad3f2b4ba33",
+    "size_bytes": 10475,
+    "line_count": 220
+  },
+  "actual_correction06": {
+    "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-06/record.json",
+    "sha256": "b9e8b631ed8f952b53b05eb5c0eb854bee6fe35f6a1e0279ebe1f4a70ccb6d0a",
+    "size_bytes": 907,
+    "line_count": 14
+  },
+  "only_declared_application03_test_authority_revision": true
+}
