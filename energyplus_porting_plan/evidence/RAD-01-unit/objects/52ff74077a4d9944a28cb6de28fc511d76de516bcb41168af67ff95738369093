@@ -1,0 +1,25 @@
+   Compiling ep_runtime v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_runtime)
+   Compiling ep_run v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_run)
+   Compiling ep_cli v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_cli)
+    Finished `test` profile [unoptimized] target(s) in 1m 02s
+     Running unittests src\main.rs (target\debug\deps\eplus_rs-72151de376788545.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_compare-a9c45e5b3381a65a.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_compiler-2267ba82fbc5af26.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_conformance-b0e181263c2404bb.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_model-7586f88ea75fa6e4.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_oracle-2789f432948718ca.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_raw_model-370e175284b468c1.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_run-d3c4ae11174178fb.exe)
+     Running tests\arbitrary_run.rs (target\debug\deps\arbitrary_run-bc6cc46c04ebfbba.exe)
+     Running tests\arbitrary_run_direct_zone_coupled.rs (target\debug\deps\arbitrary_run_direct_zone_coupled-5b49478be1409afd.exe)
+     Running tests\arbitrary_run_exit_codes.rs (target\debug\deps\arbitrary_run_exit_codes-20e40a639ccc9a69.exe)
+     Running tests\arbitrary_run_ideal_loads.rs (target\debug\deps\arbitrary_run_ideal_loads-fc8516b4eed6ce1d.exe)
+     Running unittests src\lib.rs (target\debug\deps\ep_runtime-0bbf2dbab5936b8c.exe)
+   Doc-tests ep_compare
+   Doc-tests ep_compiler
+   Doc-tests ep_conformance
+   Doc-tests ep_model
+   Doc-tests ep_oracle
+   Doc-tests ep_raw_model
+   Doc-tests ep_run
+   Doc-tests ep_runtime

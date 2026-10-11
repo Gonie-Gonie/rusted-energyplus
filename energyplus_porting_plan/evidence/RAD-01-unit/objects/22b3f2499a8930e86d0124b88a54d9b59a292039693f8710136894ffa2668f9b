@@ -1,0 +1,8 @@
+--- .runtime/porting/RAD-01/comparer-prep-02/before-01/README.md
++++ .runtime/porting/RAD-01/comparer-prep-02/README.md
+@@ -23,3 +23,5 @@
+ The six unexecuted `comparison_contract_tests.py` cases cover exact signed zero, equal negative zero, one-ULP strictness, nonfinite availability, both-required absence/empty profiles and malformed DTO rejection. They exercise only the existing comparison primitive with scalar values; they are not RAD expected answers or an extra QA/proof stage. This agent ran only stdlib metadata/hash/AST/diff authoring, and no target import, test, formatter, engine, scientific result or binary payload read.
+ 
+ Base authored the Native/Rust RAD arithmetic, Raw authored factual OriginalDataQA, and Header authored this observer/comparison adaptation. Full other-author source review and Root's independent review remain prerequisites. Actual same-input comparison is a later separate obligation, and no formula certificate or scientific completion is claimed here.
++
++Fresh02 replaces only the approved factual QA03 manifest path/SHA, whose Native02/freezer03/current-successful-build scope pins supersede the failed-build ancestry. Comparator pairing/numeric/absence/warning logic, six unexecuted primitive tests and exact shape/IO copies remain byte-identical01. Current reader/dependency/range descriptors follow the reviewed successors; historical01 before/diffs remain authentic. No stage was imported or executed, and no policy or outcome was changed.

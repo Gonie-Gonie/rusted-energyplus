@@ -1,0 +1,141 @@
+{
+  "schema": "rad01-actual-formatted-source-inventory.v1",
+  "created_utc": "2026-10-11T01:12:28.543207+00:00",
+  "actual_sources": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/radiation.rs",
+      "accepted_held_source": {
+        "path": ".runtime/porting/RAD-01/source-prep-02/new/radiation.rs",
+        "sha256": "39868c0acaf663b36df4f11067d2ee645ffad1139d2e458c233581c9ea500184",
+        "size_bytes": 27191,
+        "line_count": 697
+      },
+      "actual_before_archive": {
+        "path": ".runtime/porting/RAD-01/applied-source-01/before/crates/ep_runtime/src/heat_balance/radiation.rs",
+        "sha256": "55e0b9ccba8e2ee5f8856f8afc033ff6158c18265b6fb55ae9cea2fce78f7bde",
+        "size_bytes": 19811
+      },
+      "actual_literal_archive": {
+        "path": ".runtime/porting/RAD-01/applied-source-01/crates/ep_runtime/src/heat_balance/radiation.rs",
+        "sha256": "39868c0acaf663b36df4f11067d2ee645ffad1139d2e458c233581c9ea500184",
+        "size_bytes": 27191
+      },
+      "package": "accepted-pure-RAD03",
+      "actual_final_source": {
+        "path": ".runtime/porting/RAD-01/applied-final-source-01/crates/ep_runtime/src/heat_balance/radiation.rs",
+        "sha256": "dec5d7bf1adbd13ab6535639f878b7671d1cc04305342686586799dcf5808c5c",
+        "size_bytes": 27520
+      },
+      "format_correspondence_diff": {
+        "path": ".runtime/porting/RAD-01/applied-final-source-01/format-diffs/crates__ep_runtime__src__heat_balance__radiation.rs.diff",
+        "sha256": "717ec8950f9208143aaf755c3c4c2173dd69e415547382fa99d5d0557adeb328",
+        "size_bytes": 4691
+      },
+      "line_count": 722
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/radiation_approximate_view_factor_tests.rs",
+      "accepted_held_source": {
+        "path": ".runtime/porting/RAD-01/source-prep-02/new/radiation_approximate_view_factor_tests.rs",
+        "sha256": "878b7d67710cee3b79cae8b7c342fca98db8d56b3212cd22b8f0c09a31ab81fc",
+        "size_bytes": 6999,
+        "line_count": 157
+      },
+      "actual_before_archive": null,
+      "actual_literal_archive": {
+        "path": ".runtime/porting/RAD-01/applied-source-01/crates/ep_runtime/src/heat_balance/radiation_approximate_view_factor_tests.rs",
+        "sha256": "878b7d67710cee3b79cae8b7c342fca98db8d56b3212cd22b8f0c09a31ab81fc",
+        "size_bytes": 6999
+      },
+      "package": "accepted-pure-RAD03",
+      "actual_final_source": {
+        "path": ".runtime/porting/RAD-01/applied-final-source-01/crates/ep_runtime/src/heat_balance/radiation_approximate_view_factor_tests.rs",
+        "sha256": "67f45fd2d00ce02e06c2c51392819760c86afe71653efdfc90797a3532d1966c",
+        "size_bytes": 7420
+      },
+      "format_correspondence_diff": {
+        "path": ".runtime/porting/RAD-01/applied-final-source-01/format-diffs/crates__ep_runtime__src__heat_balance__radiation_approximate_view_factor_tests.rs.diff",
+        "sha256": "1de88a4347cc7448766b6d08f6899f814d866977fe0c2ed80d1bc4e078e31cc5",
+        "size_bytes": 9896
+      },
+      "line_count": 205
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/rad01_candidate_unit_observer.rs",
+      "accepted_held_source": {
+        "path": ".runtime/porting/RAD-01/rust-observer-prep-02/new/rad01_candidate_unit_observer.rs",
+        "sha256": "b5f7a48e092c6c5de73a6bd44cd4318eec0084ab8f24cc5fd4d28a83b01c64a2",
+        "size_bytes": 13711,
+        "line_count": 207,
+        "prospective_canonical_path": "crates/ep_run/examples/rad01_candidate_unit_observer.rs"
+      },
+      "actual_before_archive": null,
+      "actual_literal_archive": {
+        "path": ".runtime/porting/RAD-01/applied-source-01/crates/ep_run/examples/rad01_candidate_unit_observer.rs",
+        "sha256": "b5f7a48e092c6c5de73a6bd44cd4318eec0084ab8f24cc5fd4d28a83b01c64a2",
+        "size_bytes": 13711
+      },
+      "package": "accepted-observer02",
+      "actual_final_source": {
+        "path": ".runtime/porting/RAD-01/applied-final-source-01/crates/ep_run/examples/rad01_candidate_unit_observer.rs",
+        "sha256": "e52941043d7e93415cc3f4a695b8f17ff811ef6d2f1804d72068f87de7f050c1",
+        "size_bytes": 15408
+      },
+      "format_correspondence_diff": {
+        "path": ".runtime/porting/RAD-01/applied-final-source-01/format-diffs/crates__ep_run__examples__rad01_candidate_unit_observer.rs.diff",
+        "sha256": "a3ef3aac0c6c8da2705d2a2469705dfee8e110d82c744b81218439a9cb50660f",
+        "size_bytes": 23788
+      },
+      "line_count": 377
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/rad01_candidate_unit_support/fields.rs",
+      "accepted_held_source": {
+        "path": ".runtime/porting/RAD-01/rust-observer-prep-02/new/rad01_candidate_unit_support/fields.rs",
+        "sha256": "b6d3fa11384e3c96ce3c3cb184574a353b1b18beffda37c24d42213158516285",
+        "size_bytes": 3558,
+        "line_count": 63,
+        "prospective_canonical_path": "crates/ep_run/examples/rad01_candidate_unit_support/fields.rs"
+      },
+      "actual_before_archive": null,
+      "actual_literal_archive": {
+        "path": ".runtime/porting/RAD-01/applied-source-01/crates/ep_run/examples/rad01_candidate_unit_support/fields.rs",
+        "sha256": "b6d3fa11384e3c96ce3c3cb184574a353b1b18beffda37c24d42213158516285",
+        "size_bytes": 3558
+      },
+      "package": "accepted-observer02",
+      "actual_final_source": {
+        "path": ".runtime/porting/RAD-01/applied-final-source-01/crates/ep_run/examples/rad01_candidate_unit_support/fields.rs",
+        "sha256": "703f40eca5fa106d2df40193c670508611900e7e3a4383802863f5221e2dff19",
+        "size_bytes": 3693
+      },
+      "format_correspondence_diff": {
+        "path": ".runtime/porting/RAD-01/applied-final-source-01/format-diffs/crates__ep_run__examples__rad01_candidate_unit_support__fields.rs.diff",
+        "sha256": "6446a4bfc9c2807095b5b546d2919745a2332872cb0ae7f92db1736477fc9992",
+        "size_bytes": 3530
+      },
+      "line_count": 82
+    }
+  ],
+  "accepted_literal_application": {
+    "path": ".runtime/porting/RAD-01/applied-source-01/manifest.json",
+    "sha256": "ecd37a0d99dddeee2ab92931b4030e6cf227f0dc1c0518e53eb27b7173eeef23",
+    "size_bytes": 4408
+  },
+  "actual_formatter_execution": {
+    "path": ".runtime/porting/RAD-01/source-format-command-01/receipt.json",
+    "sha256": "582209d2c8d3fa127d75b8b9d3da0ab4addc8617b055931df065b98256e713a2",
+    "size_bytes": 3146
+  },
+  "Root_and_other_author_FULL_literal_sources_accepted": true,
+  "actual_formatter_correspondence_FULL_review_pending": false,
+  "quality_or_candidate_execution_claimed": false,
+  "gates_updated": false,
+  "Root_and_other_author_FULL_formatter_correspondence_accepted": true,
+  "reviewed_predecessor": {
+    "path": ".runtime/porting/RAD-01/applied-final-source-01/manifest.json",
+    "sha256": "866251a58a7ab8524bbbeffc415d872bf2fba08584b8164762f8fc6f77f1eb91",
+    "size_bytes": 6618
+  },
+  "formatter_review_scope": "Root and Base FULL all4 deltas; whitespace, trailing commas and block layout only; prior other-author literal FULL source reviews carry. No science or target execution certified."
+}

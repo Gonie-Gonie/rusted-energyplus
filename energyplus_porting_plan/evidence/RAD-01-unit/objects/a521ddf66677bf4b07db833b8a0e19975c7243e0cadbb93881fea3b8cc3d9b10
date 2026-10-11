@@ -1,0 +1,270 @@
+{
+  "schema": "rad01-candidate-unit-observer-source-preparation.v1",
+  "card": "RAD-01",
+  "status": "SOURCE-ONLY-held-unexecuted-awaiting-Root-and-other-author-FULL-review",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/RAD-01/rust-observer-prep-01/new/rad01_candidate_unit_observer.rs",
+      "sha256": "5e62f0e69a5bfdf682ec430fe5c04a199301bf0203e753834caf2bdac53a6ffb",
+      "size_bytes": 13711,
+      "line_count": 207,
+      "prospective_canonical_path": "crates/ep_run/examples/rad01_candidate_unit_observer.rs"
+    },
+    {
+      "path": ".runtime/porting/RAD-01/rust-observer-prep-01/new/rad01_candidate_unit_support/fields.rs",
+      "sha256": "b6d3fa11384e3c96ce3c3cb184574a353b1b18beffda37c24d42213158516285",
+      "size_bytes": 3558,
+      "line_count": 63,
+      "prospective_canonical_path": "crates/ep_run/examples/rad01_candidate_unit_support/fields.rs"
+    }
+  ],
+  "exact_diffs": [
+    {
+      "path": ".runtime/porting/RAD-01/rust-observer-prep-01/diffs/rad01_candidate_unit_observer.rs.diff",
+      "sha256": "a131161ac32d34f4c5707b4dc91076d823b878a384701c98282a866b1d4024c0",
+      "size_bytes": 14010,
+      "line_count": 210
+    },
+    {
+      "path": ".runtime/porting/RAD-01/rust-observer-prep-01/diffs/fields.rs.diff",
+      "sha256": "7d99f2b8605517a14137bc5f8cb5de96338aa8a39dbccbe49b67dc9e3061a1a0",
+      "size_bytes": 3718,
+      "line_count": 66
+    }
+  ],
+  "before_templates": [
+    {
+      "path": ".runtime/porting/RAD-01/rust-observer-prep-01/before/observer.rs",
+      "sha256": "9831ab30fa95d62ae24c59405b9b8c6de2563d25a1511cb55390ee7b3842fbef",
+      "size_bytes": 13347,
+      "line_count": 316
+    },
+    {
+      "path": ".runtime/porting/RAD-01/rust-observer-prep-01/before/fields.rs",
+      "sha256": "3884dd940881ed1d93aef09872b1a99c62209d0954a08d599dc500bea8e83696",
+      "size_bytes": 5000,
+      "line_count": 102
+    }
+  ],
+  "template_authorities": [
+    {
+      "path": "crates/ep_run/examples/ctf01_candidate_unit_observer.rs",
+      "sha256": "9831ab30fa95d62ae24c59405b9b8c6de2563d25a1511cb55390ee7b3842fbef",
+      "size_bytes": 13347,
+      "line_count": 316
+    },
+    {
+      "path": "crates/ep_run/examples/ctf01_candidate_unit_support/fields.rs",
+      "sha256": "3884dd940881ed1d93aef09872b1a99c62209d0954a08d599dc500bea8e83696",
+      "size_bytes": 5000,
+      "line_count": 102
+    }
+  ],
+  "current_API_context": [
+    {
+      "path": "crates/ep_run/Cargo.toml",
+      "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+      "size_bytes": 524,
+      "line_count": 21
+    },
+    {
+      "path": "crates/ep_model/src/lib.rs",
+      "sha256": "2a756532553034fb2b92c892cb2e6f3c147aa129f6dce64b63763f364cb3cee4",
+      "size_bytes": 284,
+      "line_count": 15
+    },
+    {
+      "path": "crates/ep_model/src/ids.rs",
+      "sha256": "83b32ebf02684f459cb0a789f498de08b849b94a7072f1f5870663a4b3cca7be",
+      "size_bytes": 2029,
+      "line_count": 61
+    },
+    {
+      "path": "crates/ep_model/src/objects/mod.rs",
+      "sha256": "cb752e4c143386ce432adc84dc8d36d8358bd0ea1b0fc2b01f240795c7ec96c1",
+      "size_bytes": 2068,
+      "line_count": 61
+    },
+    {
+      "path": "crates/ep_model/src/objects/surfaces.rs",
+      "sha256": "54569b984efd25320447a8eecb94f351037ab6b63a5cfb31d0af1ecc225a1755",
+      "size_bytes": 6656,
+      "line_count": 197
+    },
+    {
+      "path": "crates/ep_runtime/Cargo.toml",
+      "sha256": "bb81b5793debafd84300ec9905f0cda65ab32d216633543bab375b30a7a379e9",
+      "size_bytes": 327,
+      "line_count": 17
+    },
+    {
+      "path": "crates/ep_runtime/src/lib.rs",
+      "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+      "size_bytes": 868,
+      "line_count": 41
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+      "size_bytes": 1785,
+      "line_count": 71
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/radiation.rs",
+      "sha256": "55e0b9ccba8e2ee5f8856f8afc033ff6158c18265b6fb55ae9cea2fce78f7bde",
+      "size_bytes": 19811,
+      "line_count": 522
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+      "size_bytes": 3172,
+      "line_count": 75
+    }
+  ],
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/RAD-01/source-prep-03/manifest.json",
+      "sha256": "7eccdc42462b91539e963715eed808f02ed4d37d14d479dacdaeb4004a9dd3c1",
+      "size_bytes": 16463,
+      "line_count": 418
+    },
+    {
+      "path": ".runtime/porting/RAD-01/source-prep-02/new/radiation.rs",
+      "sha256": "39868c0acaf663b36df4f11067d2ee645ffad1139d2e458c233581c9ea500184",
+      "size_bytes": 27191,
+      "line_count": 697
+    },
+    {
+      "path": ".runtime/porting/RAD-01/source-prep-02/new/radiation_approximate_view_factor_tests.rs",
+      "sha256": "878b7d67710cee3b79cae8b7c342fca98db8d56b3212cd22b8f0c09a31ab81fc",
+      "size_bytes": 6999,
+      "line_count": 157
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/manifest.json",
+      "sha256": "489a7caa4086722bb5057cfc8489803b21ce7723f881ffcbe54252d604e86618",
+      "size_bytes": 21959,
+      "line_count": 545
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_helper.cpp",
+      "sha256": "1f16572cbd9da579a6f8e4c79cec64a687e7cecd70d823f1a16a1973cfdfad86",
+      "size_bytes": 11938,
+      "line_count": 140
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_admission.hh",
+      "sha256": "9b2c28fc02ff5eba7c8b1fd0bfe5cb23552def15c5ee8d9ba4745bc81f744600",
+      "size_bytes": 9313,
+      "line_count": 115
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_observer.hh",
+      "sha256": "362166c03ca9596ffaa97942d258c3d50f1b5fd0b0edcc26ae1d6203600a7dac",
+      "size_bytes": 2142,
+      "line_count": 49
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_observer.cc",
+      "sha256": "f92a72e0f417ffff9ff9bf0178347919de95dbe20d13e74d87e0db334067981a",
+      "size_bytes": 4899,
+      "line_count": 89
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/input-fixture-proposal.json",
+      "sha256": "5bf064f4f61f7e271f6f5a1306855c3e986d942cf859faf152ab5e6d5e4146f7",
+      "size_bytes": 38084,
+      "line_count": 1511
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/observation-policy-proposal.json",
+      "sha256": "7dfb0ccc1b50f34c8a7e30a0e34369e022faa79c507f41c60b47d2b5bad4d5a4",
+      "size_bytes": 710,
+      "line_count": 25
+    },
+    {
+      "path": ".runtime/porting/RAD-01/input-writer-prep-02/manifest.json",
+      "sha256": "fac0f91eebebab8edd5a9feb58bd30ca9281932c04fef291274524eba9b6810c",
+      "size_bytes": 20173,
+      "line_count": 517
+    },
+    {
+      "path": ".runtime/porting/RAD-01/input-writer-prep-02/freeze_packet.py",
+      "sha256": "f4727575c348bd4a5eb5128b67eafc5b823fb56ee0726ab0e826641bee0c04f2",
+      "size_bytes": 13402,
+      "line_count": 162
+    },
+    {
+      "path": "crates/ep_run/examples/ctf10_candidate_unit_observer.rs",
+      "sha256": "8fa4be4d74be216ec2ef3d6b925d6b94c454ab8d2370d0791d2dc6b30b9fa533",
+      "size_bytes": 32111,
+      "line_count": 671
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "path": ".runtime/porting/RAD-01/source-prep-02/new/radiation.rs",
+      "start_line": 223,
+      "end_line": 361,
+      "sha256": "d5d23d780cd84a5b1e2fc9591b6a866391788f152c7e3fc443d95611c0b32957",
+      "size_bytes": 6189,
+      "purpose": "actual public types/call and warning ownership"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.cc",
+      "start_line": 1406,
+      "end_line": 1519,
+      "sha256": "a1a29a01e53f10bc25fdfa3c2e3fefdd5007fd1c8c962f826a88771ccfb6e51b",
+      "size_bytes": 6927,
+      "purpose": "whole selected Native owner/layout/lifetime"
+    },
+    {
+      "path": "crates/ep_model/src/ids.rs",
+      "start_line": 1,
+      "end_line": 25,
+      "sha256": "dc0f31bea46334eb58a4f1a5180fea790c17be9ad0bbfcd5060e96f605697013",
+      "size_bytes": 758,
+      "purpose": "actual opaque typed IDs"
+    },
+    {
+      "path": "crates/ep_model/src/objects/surfaces.rs",
+      "start_line": 60,
+      "end_line": 72,
+      "sha256": "3344801860e3ee3c38e4772a26bcb02582dc889c6d384e1ca69b047c1878e527",
+      "size_bytes": 234,
+      "purpose": "actual opaque SurfaceType domain"
+    }
+  ],
+  "readme": {
+    "path": ".runtime/porting/RAD-01/rust-observer-prep-01/README.md",
+    "sha256": "83002b30396bdbfa46ae5bef5e21f58e7cb8d69ed4f7c65c9c7251f6cc5de884",
+    "size_bytes": 4156,
+    "line_count": 23
+  },
+  "authoring_source": {
+    "path": ".runtime/porting/RAD-01/rust-observer-prep-01/prepare_source.py",
+    "sha256": "2654d1aa31a5d0830cb423b2d8b8b7e5947169c2c4cb2d03aee2d354d558b5e7",
+    "size_bytes": 5193,
+    "line_count": 76
+  },
+  "runtime_interfaces": {
+    "schema": "rad01-candidate-unit-observer-results.v1",
+    "argument_count_after_executable": 5,
+    "observer_source_count": 2,
+    "API_source_count": 10,
+    "model_cases": 21,
+    "runtime_source_inventory_schema": "rad01-candidate-unit-runtime-source-bindings.v1",
+    "future_runtime_refs": null,
+    "old_private_F_only_API_public_owner_available": false
+  },
+  "proof_boundary": {
+    "source_only": true,
+    "target_import_or_execution_performed": false,
+    "Native_results_or_binary_payloads_read": false,
+    "canonical_files_modified": false,
+    "production_fixture_injection": false,
+    "numerical_PASS_claimed": false,
+    "gates_updated": false
+  }
+}

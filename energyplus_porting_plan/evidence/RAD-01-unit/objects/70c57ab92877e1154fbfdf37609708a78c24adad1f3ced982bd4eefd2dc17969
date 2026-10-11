@@ -1,0 +1,246 @@
+"value": 0.20833333333333334,
+              "value_bits": "3fcaaaaaaaaaaaab",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.21739130434782608,
+              "value_bits": "3fcbd37a6f4de9bd",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.23809523809523808,
+              "value_bits": "3fce79e79e79e79e",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.25,
+              "value_bits": "3fd0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.24,
+              "value_bits": "3fceb851eb851eb8",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.25,
+              "value_bits": "3fd0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2608695652173913,
+              "value_bits": "3fd0b21642c8590b",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2727272727272727,
+              "value_bits": "3fd1745d1745d174",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.3,
+              "value_bits": "3fd3333333333333",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.28,
+              "value_bits": "3fd1eb851eb851ec",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2916666666666667,
+              "value_bits": "3fd2aaaaaaaaaaab",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.30434782608695654,
+              "value_bits": "3fd37a6f4de9bd38",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.3181818181818182,
+              "value_bits": "3fd45d1745d1745d",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.3333333333333333,
+              "value_bits": "3fd5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            6,
+            6
+          ],
+          "ZoneArea": [
+            {
+              "value": 25.0,
+              "value_bits": "4039000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 24.0,
+              "value_bits": "4038000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 23.0,
+              "value_bits": "4037000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 22.0,
+              "value_bits": "4036000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 21.0,
+              "value_bits": "4035000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 20.0,
+              "value_bits": "4034000000000000",
+              "value_class": "finite"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "warnings": []
+        },
+        "status": "source-returned"
+      }
+    }
+  ],
+  "numerical_PASS_claimed": false,
+  "observation_policy": {
+    "arithmetic_profiles_by_variable": {
+      "F": {
+        "atol": 0.0,
+        "rtol": 0.0,
+        "shape_exact": true,
+        "signed_zero_exact": true,
+        "value_class_exact": true
+      },
+      "ZoneArea": {
+        "atol": 0.0,
+        "rtol": 0.0,
+        "shape_exact": true,
+        "signed_zero_exact": true,
+        "value_class_exact": true
+      }
+    },
+    "copied_input_bits_and_owner_ids_exact": true,
+    "full_engine_geometry_or_RAD02_RAD03_claimed": false,
+    "required_reached_owner_absence_fails": true,
+    "row_first_F_destination_source_layout": true,
+    "scope": "direct-declared-geometry-CalcApproximateViewFactors-only",
+    "unreached_owner_counted_as_PASS": false,
+    "warning_identity_and_order_exact": true
+  },
+  "projection": {
+    "path": ".runtime/porting/RAD-01/frozen-packet-02/projection.json",
+    "sha256": "a148b401e2b6af8b1651074aedad0ca98ce15a11af17bcaecdd68396789da361",
+    "size_bytes": 5163
+  },
+  "requested_counts": {
+    "CalcApproximateViewFactors": 21,
+    "model_cases": 21
+  },
+  "runtime_source_bindings": {
+    "path": ".runtime/porting/RAD-01/candidate-launch-inputs-01/runtime-source-bindings.json",
+    "sha256": "5a3fe725453acc363a78d4b226ee389796c5755c3f2fd1f1ddf177baaf68d30a",
+    "size_bytes": 2274
+  },
+  "schema": "rad01-candidate-unit-observer-results.v1",
+  "source_authorities": {
+    "actual_scope_amendment": {
+      "path": ".runtime/porting/RAD-01/scope-amendment-02/amendment.json",
+      "sha256": "18c8882af64d38926e7ec56e1b2920944c4124a727f85d84db21637dc7551952",
+      "size_bytes": 3690
+    },
+    "actual_scope_amendment_execution": {
+      "path": ".runtime/porting/RAD-01/scope-check-command-02/receipt.json",
+      "sha256": "59d43659d5662573fe99db3e0c8e46cd5a277aad0e40e1fa3b3544034c303b68",
+      "size_bytes": 2874
+    },
+    "actual_scope_check_role": "real-RAD-01-check-only",
+    "current_after_documents": [
+      {
+        "path": "energyplus_porting_plan/plan.json",
+        "sha256": "997a7407cb3e516ce7729a45b23767a04971c10ddb2d76b005f07a6f1f568f31",
+        "size_bytes": 731167
+      },
+      {
+        "path": "energyplus_porting_plan/cards/RAD-01.md",
+        "sha256": "578f3adcf3fe4028334cef45261609b119426197fa446c7f0133ea69b925569a",
+        "size_bytes": 5064
+      }
+    ],
+    "current_card": {
+      "path": "energyplus_porting_plan/cards/RAD-01.md",
+      "sha256": "578f3adcf3fe4028334cef45261609b119426197fa446c7f0133ea69b925569a",
+      "size_bytes": 5064
+    },
+    "historical_before_documents": [
+      {
+        "path": ".runtime/porting/RAD-01/scope-amendment-02/before/plan.json",
+        "sha256": "10f2a9b78107fdbb3d65b658d4578cd9dd1f2c69ba31c6fd01d7bbd9081575ad",
+        "size_bytes": 730031
+      },
+      {
+        "path": ".runtime/porting/RAD-01/scope-amendment-02/before/RAD-01.md",
+        "sha256": "27d751313190f01319c0e46dd1fbca12735df841553e783b766d0a34bb467ea1",
+        "size_bytes": 4408
+      }
+    ],
+    "input_fixture_proposal": {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/input-fixture-proposal.json",
+      "sha256": "5bf064f4f61f7e271f6f5a1306855c3e986d942cf859faf152ab5e6d5e4146f7",
+      "size_bytes": 38084
+    },
+    "native_helper_source_manifest": {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-02/manifest.json",
+      "sha256": "b4e10bd483af44f6f5d0b6f5fa13051d106d6d672d1ec0af1b79bbf5d5986b89",
+      "size_bytes": 24281
+    },
+    "observation_policy_proposal": {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/observation-policy-proposal.json",
+      "sha256": "7dfb0ccc1b50f34c8a7e30a0e34369e022faa79c507f41c60b47d2b5bad4d5a4",
+      "size_bytes": 710
+    },
+    "scope_recorder_role": "validated-already-Root-authored-documents; did-not-author-amendment",
+    "writer_source_manifest": {
+      "path": ".runtime/porting/RAD-01/input-writer-prep-03/manifest.json",
+      "sha256": "c3f140b8b4384e61a1fc5ba5e198b4f1facc39082f1521b68c895ea53974aace",
+      "size_bytes": 23365
+    }
+  }
+}
+{"receipt": {"path": ".runtime/porting/RAD-01/candidate-unit-command-01/receipt.json", "sha256": "abb03dd77246caa431f099ba01fad58e366a32d77b276b70e64d201f93a3d934"}, "exit_code": 0, "source_bytes_match_before_and_after": true}

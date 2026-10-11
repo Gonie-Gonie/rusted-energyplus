@@ -1,0 +1,42 @@
+--- .runtime/porting/RAD-01/source-prep-02/manifest.json
++++ .runtime/porting/RAD-01/source-prep-03/manifest.json
+@@ -311,18 +311,17 @@
+       "path": ".runtime/porting/RAD-01/source-prep-02/before/radiation.rs",
+       "start_line": 223,
+       "end_line": 270,
+-      "sha256": "55e0b9ccba8e2ee5f8856f8afc033ff6158c18265b6fb55ae9cea2fce78f7bde",
+-      "size_bytes": 19811,
++      "sha256": "f3ab2200022c768b3390fa9da2a63dc5651f66bbf2a280128b294d381da42be8",
++      "size_bytes": 1915,
+       "label": "exact existing selected kernel/epsilon guard before proposal",
+-      "hash_kind": "exact_line_range_including_original_line_endings",
+-      "line_count": 522
++      "hash_kind": "exact_line_range_including_original_line_endings"
+     }
+   ],
+   "readme": {
+-    "path": ".runtime/porting/RAD-01/source-prep-02/README.md",
+-    "sha256": "0efe09d5716869b0008c35bc6e8ce64418bd2847957b61248ac0fe9771dd0d2e",
+-    "size_bytes": 5959,
+-    "line_count": 96
++    "path": ".runtime/porting/RAD-01/source-prep-03/README.md",
++    "sha256": "bc6a44a9c5c0260662e7aeeeaffde8672b98d16674faafe3795ba49838633db3",
++    "size_bytes": 6436,
++    "line_count": 103
+   },
+   "source_contract": {
+     "caller_supplied_actual_identity": [
+@@ -408,5 +407,12 @@
+       "size_bytes": 765,
+       "line_count": 12
+     }
+-  ]
++  ],
++  "metadata_only_predecessor": {
++    "path": ".runtime/porting/RAD-01/source-prep-02/manifest.json",
++    "sha256": "aeb9acdf3105f177f7f8383296b1cb2a766c0bc3b0e6f481be159706ae9d7e01",
++    "size_bytes": 16135,
++    "line_count": 412
++  },
++  "fresh03_change": "correct local archive typed range223-270 only; all code/source diff refs literally02 unchanged"
+ }

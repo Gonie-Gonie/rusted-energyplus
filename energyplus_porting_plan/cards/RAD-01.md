@@ -78,3 +78,11 @@ Root and Raw completed FULL cumulative reviews of the held Rust proposal03 and N
 ## Native helper compile repair before numerical execution
 
 The first actual build stopped at two misleading-indentation diagnostics in transport helper statements under unchanged -Werror. No helper or scientific command ran. Fresh Native02 changes only those statement layouts; all Original arithmetic, passive observations, literal21 inputs and exact profiles remain unchanged. The first failed build and its receipts are preserved. An exact recorded replay of the previous CTF10 configure restored the actual717-row baseline before this new freeze/build attempt. Root and Raw source reviews cover the narrow Native02 repair. Full gates remain pending.
+
+## Actual selected direct-unit comparison
+
+All21 genuine Original calls and21 actual Rust public API calls returned complete owners on the same frozen inputs. ZoneArea71/F307 numerical comparisons and2115 discrete comparisons have mismatch0; maximum absolute error and RMSE are0 for both exact profiles. All11 warning records match identity, count and source order. No unavailable observation receives PASS. Native global diagnostic backend/text remains unpaired context.
+
+Actual fmt/Clippy exit0; focused heat-balance203 and workspace4808 tests passed. Candidate and quality executions bind raw Source688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27 (3868 files). The shared kernel now preserves positive areas below EPSILON and the literal source division predicate. The first candidate launcher preflight had an incorrect factual QA field name and stopped before any target/recorder; corrected02 executed the actual stages. Evidence: evidence/RAD-01-unit/{manifest,summary}.json.
+
+Selected declared geometry does not establish initialized production enclosures or the GEO-02/RAD-02/RAD-03 integration handoff. Full unit/integration/production gates remain pending; ordinary fixed6 CLI regression is next.

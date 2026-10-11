@@ -1,0 +1,67 @@
+{
+  "schema": "rad01-candidate-unit-runtime-source-bindings.v1",
+  "observer_sources": [
+    {
+      "path": "crates/ep_run/examples/rad01_candidate_unit_observer.rs",
+      "sha256": "e52941043d7e93415cc3f4a695b8f17ff811ef6d2f1804d72068f87de7f050c1",
+      "size_bytes": 15408
+    },
+    {
+      "path": "crates/ep_run/examples/rad01_candidate_unit_support/fields.rs",
+      "sha256": "703f40eca5fa106d2df40193c670508611900e7e3a4383802863f5221e2dff19",
+      "size_bytes": 3693
+    }
+  ],
+  "actual_public_API_sources": [
+    {
+      "path": "crates/ep_run/Cargo.toml",
+      "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+      "size_bytes": 524
+    },
+    {
+      "path": "crates/ep_model/src/lib.rs",
+      "sha256": "2a756532553034fb2b92c892cb2e6f3c147aa129f6dce64b63763f364cb3cee4",
+      "size_bytes": 284
+    },
+    {
+      "path": "crates/ep_model/src/ids.rs",
+      "sha256": "83b32ebf02684f459cb0a789f498de08b849b94a7072f1f5870663a4b3cca7be",
+      "size_bytes": 2029
+    },
+    {
+      "path": "crates/ep_model/src/objects/mod.rs",
+      "sha256": "cb752e4c143386ce432adc84dc8d36d8358bd0ea1b0fc2b01f240795c7ec96c1",
+      "size_bytes": 2068
+    },
+    {
+      "path": "crates/ep_model/src/objects/surfaces.rs",
+      "sha256": "54569b984efd25320447a8eecb94f351037ab6b63a5cfb31d0af1ecc225a1755",
+      "size_bytes": 6656
+    },
+    {
+      "path": "crates/ep_runtime/Cargo.toml",
+      "sha256": "bb81b5793debafd84300ec9905f0cda65ab32d216633543bab375b30a7a379e9",
+      "size_bytes": 327
+    },
+    {
+      "path": "crates/ep_runtime/src/lib.rs",
+      "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+      "size_bytes": 868
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+      "size_bytes": 1785
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/radiation.rs",
+      "sha256": "dec5d7bf1adbd13ab6535639f878b7671d1cc04305342686586799dcf5808c5c",
+      "size_bytes": 27520
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+      "size_bytes": 3172
+    }
+  ]
+}

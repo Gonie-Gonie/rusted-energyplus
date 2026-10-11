@@ -1,0 +1,79 @@
+--- accepted-literal/crates/ep_run/examples/rad01_candidate_unit_support/fields.rs
++++ actual-formatted/crates/ep_run/examples/rad01_candidate_unit_support/fields.rs
+@@ -1,8 +1,8 @@
+ //! Copies of actual RAD-01 public owners; no view-factor or warning arithmetic.
+ use ep_model::SurfaceType;
+ use ep_runtime::heat_balance::radiation::{
+-    ApproximateViewFactorContext, ApproximateViewFactorScopeError,
+-    ApproximateViewFactorSurface, ApproximateViewFactors,
++    ApproximateViewFactorContext, ApproximateViewFactorScopeError, ApproximateViewFactorSurface,
++    ApproximateViewFactors,
+ };
+ use serde_json::{Value, json};
+ 
+@@ -10,10 +10,20 @@
+     let class = if value.is_nan() {
+         "nan"
+     } else if value.is_infinite() {
+-        if value.is_sign_negative() { "negative_infinity" } else { "positive_infinity" }
++        if value.is_sign_negative() {
++            "negative_infinity"
++        } else {
++            "positive_infinity"
++        }
+     } else if value == 0.0 {
+-        if value.is_sign_negative() { "negative_zero" } else { "positive_zero" }
+-    } else { "finite" };
++        if value.is_sign_negative() {
++            "negative_zero"
++        } else {
++            "positive_zero"
++        }
++    } else {
++        "finite"
++    };
+     json!({"value": if value.is_finite() { Some(value) } else { None },
+         "value_bits": format!("{:016x}", value.to_bits()), "value_class": class})
+ }
+@@ -22,15 +32,19 @@
+ }
+ pub(super) fn surface(value: &ApproximateViewFactorSurface) -> Value {
+     let class = match value.surface_type {
+-        SurfaceType::Wall => "Wall", SurfaceType::Floor => "Floor",
+-        SurfaceType::Roof => "Roof", SurfaceType::Ceiling => "Ceiling",
++        SurfaceType::Wall => "Wall",
++        SurfaceType::Floor => "Floor",
++        SurfaceType::Roof => "Roof",
++        SurfaceType::Ceiling => "Ceiling",
+     };
+     json!({"surface_id": value.surface_id.0, "surface_name": value.surface_name,
+         "zone_id": value.zone_id.0, "zone_name": value.zone_name, "surface_type": class,
+         "area_m2": scalar(value.area_m2), "azimuth_deg": scalar(value.azimuth_deg),
+         "tilt_deg": scalar(value.tilt_deg)})
+ }
+-pub(super) fn result(value: &Result<ApproximateViewFactors, ApproximateViewFactorScopeError>) -> Value {
++pub(super) fn result(
++    value: &Result<ApproximateViewFactors, ApproximateViewFactorScopeError>,
++) -> Value {
+     match value {
+         Err(error) => json!({"status": "scope-error-returned", "owner_available": false,
+             "scope_error": format!("{error:?}"), "snapshot": null, "counted_as_PASS": false,
+@@ -55,9 +69,14 @@
+     "crates/ep_run/examples/rad01_candidate_unit_support/fields.rs",
+ ];
+ pub(super) const API_PATHS: &[&str] = &[
+-    "crates/ep_run/Cargo.toml", "crates/ep_model/src/lib.rs", "crates/ep_model/src/ids.rs",
+-    "crates/ep_model/src/objects/mod.rs", "crates/ep_model/src/objects/surfaces.rs",
+-    "crates/ep_runtime/Cargo.toml", "crates/ep_runtime/src/lib.rs",
+-    "crates/ep_runtime/src/heat_balance/mod.rs", "crates/ep_runtime/src/heat_balance/radiation.rs",
++    "crates/ep_run/Cargo.toml",
++    "crates/ep_model/src/lib.rs",
++    "crates/ep_model/src/ids.rs",
++    "crates/ep_model/src/objects/mod.rs",
++    "crates/ep_model/src/objects/surfaces.rs",
++    "crates/ep_runtime/Cargo.toml",
++    "crates/ep_runtime/src/lib.rs",
++    "crates/ep_runtime/src/heat_balance/mod.rs",
++    "crates/ep_runtime/src/heat_balance/radiation.rs",
+     "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+ ];

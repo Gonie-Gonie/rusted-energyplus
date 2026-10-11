@@ -1,0 +1,112 @@
+"""Prepare only immutable Source pin successors; no imports or target execution."""
+import ast
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+BASE = ROOT / ".runtime/porting/RAD-01"
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(raw).hexdigest(),
+            "size_bytes": len(raw), "line_count": len(raw.splitlines())}
+
+
+def diff(before, after, path):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("".join(difflib.unified_diff(before.read_text().splitlines(keepends=True), after.read_text().splitlines(keepends=True),
+        fromfile=before.relative_to(ROOT).as_posix(), tofile=after.relative_to(ROOT).as_posix())), encoding="utf-8", newline="\n")
+    return ref(path)
+
+
+native = BASE / "native-helper-prep-02/manifest.json"
+writer = BASE / "input-writer-prep-03/manifest.json"
+qa = BASE / "original-data-review-prep-03/manifest.json"
+assert ref(native)["sha256"] == "b4e10bd483af44f6f5d0b6f5fa13051d106d6d672d1ec0af1b79bbf5d5986b89"
+assert ref(writer)["sha256"] == "c3f140b8b4384e61a1fc5ba5e198b4f1facc39082f1521b68c895ea53974aace"
+assert ref(qa)["sha256"] == "dad47201a33690de530f32eef2287636f3117383221ebf5d11c187114719b4bb"
+rebindings = {
+    BASE / "native-helper-prep-01/manifest.json": native,
+    BASE / "native-helper-prep-01/rad01_helper.cpp": BASE / "native-helper-prep-02/rad01_helper.cpp",
+    BASE / "input-writer-prep-02/manifest.json": writer,
+    BASE / "input-writer-prep-02/freeze_packet.py": BASE / "input-writer-prep-03/freeze_packet.py",
+    BASE / "original-data-review-prep-02/manifest.json": qa,
+    BASE / "original-data-review-prep-02/review_data.py": BASE / "original-data-review-prep-03/review_data.py",
+    BASE / "original-data-review-prep-02/shape.py": BASE / "original-data-review-prep-03/shape.py",
+    BASE / "original-data-review-prep-02/packet_io.py": BASE / "original-data-review-prep-03/packet_io.py",
+}
+
+
+def successor(kind, names, replacements, disclosure):
+    old = BASE / (kind + "-prep-01"); out = BASE / (kind + "-prep-02"); out.mkdir(exist_ok=True)
+    previous = out / "before-01"; previous.mkdir(exist_ok=False)
+    m = copy.deepcopy(json.loads((old / "manifest.json").read_bytes()))
+    for name in [*names, "manifest.json", "README.md"]:
+        destination = previous / name; destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes((old / name).read_bytes())
+    own, narrow = [], []
+    for index, name in enumerate(names):
+        destination = out / name; destination.parent.mkdir(parents=True, exist_ok=True)
+        raw = (old / name).read_bytes()
+        if index == 0:
+            for left, right in replacements:
+                assert raw.count(left.encode()) == 1, left
+                raw = raw.replace(left.encode(), right.encode())
+        destination.write_bytes(raw)
+        row = ref(destination)
+        if "prospective_canonical_path" in m["own_sources"][index]: row["prospective_canonical_path"] = m["own_sources"][index]["prospective_canonical_path"]
+        own.append(row)
+        narrow.append(diff(previous / name, destination, out / "from-01" / (Path(name).name + ".diff")))
+    m["own_sources"] = own
+    (out / "README.md").write_bytes((old / "README.md").read_bytes() + ("\n" + disclosure + "\n").encode())
+    narrow.append(diff(previous / "README.md", out / "README.md", out / "from-01/README.md.diff"))
+    m["historical_before_and_diffs"] = {key: m.pop(key) for key in ["exact_diffs"]}
+    if kind == "rust-observer":
+        m["exact_diffs"] = []
+        for name, row in zip(names, own):
+            destination = out / "diffs" / (Path(name).name + ".diff"); destination.parent.mkdir(exist_ok=True)
+            destination.write_text("".join(difflib.unified_diff([], (out / name).read_text().splitlines(keepends=True),
+                fromfile="/dev/null", tofile=row["prospective_canonical_path"])), encoding="utf-8", newline="\n")
+            m["exact_diffs"].append(ref(destination))
+    else:
+        tests = "comparison_contract_tests.py"; (out / tests).write_bytes((old / tests).read_bytes()); (previous / tests).write_bytes((old / tests).read_bytes())
+        ast.parse((out / tests).read_text()); m["contract_test_source"] = ref(out / tests)
+        m["exact_diffs"] = [diff(ROOT / before["path"], out / name, out / (name + ".diff")) for name, before in zip(names, m["before_sources"])]
+        td = out / "comparison_contract_tests.py.diff"
+        td.write_text("".join(difflib.unified_diff([], (out / tests).read_text().splitlines(keepends=True), fromfile="/dev/null", tofile=(out / tests).relative_to(ROOT).as_posix())), encoding="utf-8", newline="\n")
+        m["exact_diffs"].append(ref(td))
+        m["read_source_ranges"] = json.loads(qa.read_bytes())["read_source_ranges"] + json.loads((BASE / "rust-observer-prep-02/manifest.json").read_bytes())["read_source_ranges"]
+        for name in names: ast.parse((out / name).read_text())
+    m["historical_superseded_dependencies"] = []
+    updated = []
+    for row in m["source_dependencies"]:
+        path = ROOT / row["path"]
+        if path in rebindings:
+            m["historical_superseded_dependencies"].append(row); updated.append(ref(rebindings[path]))
+        else: updated.append(row)
+    m["source_dependencies"] = updated
+    m["predecessor_01"] = ref(old / "manifest.json")
+    m["before_01"] = [ref(path) for path in previous.rglob("*") if path.is_file()]
+    m["from_01_diffs"] = narrow
+    m["readme"] = ref(out / "README.md"); m["authoring_source"] = ref(Path(__file__).resolve())
+    m["successor_scope"] = disclosure
+    (out / "manifest.json").write_text(json.dumps(m, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    return out
+
+
+observer = successor("rust-observer", ["new/rad01_candidate_unit_observer.rs", "new/rad01_candidate_unit_support/fields.rs"], [
+    ("489a7caa4086722bb5057cfc8489803b21ce7723f881ffcbe54252d604e86618", ref(native)["sha256"]),
+    ("fac0f91eebebab8edd5a9feb58bd30ca9281932c04fef291274524eba9b6810c", ref(writer)["sha256"])],
+    "Fresh02 replaces only the held Native02 and freezer03 SHA pins after the genuine failed Native01 formatting build. All typed input/call/copier/output behavior, profiles and runtime API10 paths are unchanged; fields.rs is byte-exact01. Historical01 remains immutable. Current scope uses the genuine successful-build-only flag in the reviewed freezer/QA contract; no scientific execution or outcome is inferred.")
+rebindings[BASE / "rust-observer-prep-01/manifest.json"] = observer / "manifest.json"
+for name in ["new/rad01_candidate_unit_observer.rs", "new/rad01_candidate_unit_support/fields.rs"]:
+    rebindings[BASE / "rust-observer-prep-01" / name] = observer / name
+comparer = successor("comparer", ["compare_unit.py", "packet_io.py", "shape.py"], [
+    ("original-data-review-prep-02/manifest.json", "original-data-review-prep-03/manifest.json"),
+    ("661b38f57a7af736515d93b7e3debb780f69ec529e4e290b10c7269dda679fdd", ref(qa)["sha256"])],
+    "Fresh02 replaces only the approved factual QA03 manifest path/SHA, whose Native02/freezer03/current-successful-build scope pins supersede the failed-build ancestry. Comparator pairing/numeric/absence/warning logic, six unexecuted primitive tests and exact shape/IO copies remain byte-identical01. Current reader/dependency/range descriptors follow the reviewed successors; historical01 before/diffs remain authentic. No stage was imported or executed, and no policy or outcome was changed.")
+print(json.dumps({"observer": ref(observer / "manifest.json"), "comparer": ref(comparer / "manifest.json")}))

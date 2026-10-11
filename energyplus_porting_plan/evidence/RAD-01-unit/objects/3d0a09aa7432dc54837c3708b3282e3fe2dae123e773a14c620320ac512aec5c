@@ -1,0 +1,13 @@
+--- .runtime/porting/RAD-01/comparer-prep-02/before-01/compare_unit.py
++++ .runtime/porting/RAD-01/comparer-prep-02/compare_unit.py
+@@ -12,8 +12,8 @@
+ PREP = Path(__file__).resolve().parent
+ IO_SHA = "d038fcddb3319eb0494e059ffdd5453355ceff2494872c96c5d60c2492d623c9"
+ SHAPE_SHA = "682a2ed4fd087cbbcdff05fef90ea6aa7bec6b618b12d72aca4fa87dc3b1d15d"
+-QA_PREPARATION = {"path": ".runtime/porting/RAD-01/original-data-review-prep-02/manifest.json",
+-                  "sha256": "661b38f57a7af736515d93b7e3debb780f69ec529e4e290b10c7269dda679fdd"}
++QA_PREPARATION = {"path": ".runtime/porting/RAD-01/original-data-review-prep-03/manifest.json",
++                  "sha256": "dad47201a33690de530f32eef2287636f3117383221ebf5d11c187114719b4bb"}
+ VARIABLES = ["ZoneArea", "F"]
+ OBSERVER_PATHS = ["crates/ep_run/examples/rad01_candidate_unit_observer.rs",
+                   "crates/ep_run/examples/rad01_candidate_unit_support/fields.rs"]

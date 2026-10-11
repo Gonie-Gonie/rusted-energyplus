@@ -1,0 +1,210 @@
+--- /dev/null
++++ crates/ep_run/examples/rad01_candidate_unit_observer.rs
+@@ -0,0 +1,207 @@
++//! Frozen declared-geometry unit calls to the actual RAD-01 public API.
++#[path = "../../ep_runtime/examples/clk02_probe_support/digest.rs"]
++mod digest;
++#[path = "rad01_candidate_unit_support/fields.rs"]
++mod fields;
++
++use ep_model::{SurfaceId, SurfaceType, ZoneId};
++use ep_runtime::heat_balance::radiation::{
++    ApproximateViewFactorContext, ApproximateViewFactorSurface,
++    calculate_selected_approximate_view_factors,
++};
++use serde_json::{Value, json};
++use std::collections::BTreeMap;
++use std::path::{Path, PathBuf};
++type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
++
++fn require(ok: bool, message: &str) -> Result<()> {
++    if ok { Ok(()) } else { Err(message.to_owned().into()) }
++}
++fn text(value: &Value) -> Result<&str> {
++    value.as_str().ok_or_else(|| "typed string required".into())
++}
++fn rows(value: &Value) -> Result<&[Value]> {
++    value.as_array().map(Vec::as_slice).ok_or_else(|| "typed array required".into())
++}
++fn u32_value(value: &Value) -> Result<u32> {
++    Ok(u32::try_from(value.as_u64().ok_or("typed opaque u32 required")?)?)
++}
++fn scalar(value: &Value) -> Result<f64> {
++    let bits = text(&value["bits"])?;
++    require(value.as_object().is_some_and(|v| v.len() == 1) && bits.len() == 16 &&
++        bits.bytes().all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c)), "literal binary64 required")?;
++    let result = f64::from_bits(u64::from_str_radix(bits, 16)?);
++    require(result.is_finite(), "finite frozen literal required")?;
++    Ok(result)
++}
++fn bound(root: &Path, binding: &Value) -> Result<(PathBuf, Vec<u8>)> {
++    let relative = Path::new(text(&binding["path"])?);
++    require(relative.is_relative(), "relative binding required")?;
++    let path = root.join(relative).canonicalize()?;
++    require(path.starts_with(root) && path != root && path.is_file(), "contained regular source/input required")?;
++    require(std::fs::metadata(&path)?.len() <= 64_000_000, "bounded source/input required")?;
++    let bytes = std::fs::read(&path)?;
++    require(digest::sha256(&bytes) == text(&binding["sha256"])? , "source/input SHA differs")?;
++    for key in ["bytes", "size_bytes"] {
++        if let Some(size) = binding.get(key) {
++            require(size.as_u64() == Some(u64::try_from(bytes.len())?), "source/input size differs")?;
++        }
++    }
++    Ok((path, bytes))
++}
++fn load(root: &Path, binding: &Value) -> Result<Value> {
++    let (_, bytes) = bound(root, binding)?;
++    require(bytes.len() <= 16_000_000, "small metadata required")?;
++    Ok(serde_json::from_slice(&bytes)?)
++}
++fn same_ref(left: &Value, right: &Value) -> Result<()> {
++    require(text(&left["path"])? == text(&right["path"])? &&
++        text(&left["sha256"])? == text(&right["sha256"])? &&
++        left["size_bytes"] == right["size_bytes"], "direct source/input identity differs")
++}
++fn source_pins(root: &Path, inventory: &Value) -> Result<()> {
++    require(inventory["schema"] == "rad01-candidate-unit-runtime-source-bindings.v1" &&
++        inventory.as_object().is_some_and(|v| v.len() == 3), "source inventory schema differs")?;
++    for (key, paths) in [("observer_sources", fields::OBSERVER_PATHS), ("actual_public_API_sources", fields::API_PATHS)] {
++        let bindings = rows(&inventory[key])?;
++        require(bindings.len() == paths.len(), "source inventory count differs")?;
++        for (binding, path) in bindings.iter().zip(paths) {
++            require(text(&binding["path"])? == *path, "source path/order differs")?;
++            bound(root, binding)?;
++        }
++    }
++    Ok(())
++}
++fn model_case(model: &Value) -> Result<Value> {
++    require(model["lane"] == "declared-geometry-unit" ||
++        model["lane"] == "CON-membership-template-declared-geometry-unit", "declared unit lane required")?;
++    let context = ApproximateViewFactorContext {
++        enclosure_index: usize::try_from(u32_value(&model["context"]["enclosure_index"])?)?,
++        zone_id: ZoneId(u32_value(&model["context"]["zone_id"])?) };
++    let mut registry = Vec::new();
++    let mut by_id = BTreeMap::new();
++    for (index, surface) in rows(&model["surface_registry"])?.iter().enumerate() {
++        require(surface["native_surface_index"].as_u64() == Some(u64::try_from(index + 1)?), "declared Native registry order differs")?;
++        let id = SurfaceId(u32_value(&surface["surface_id"]) ?);
++        require(by_id.insert(id, index).is_none(), "duplicate declared surface ID")?;
++        let surface_type = match text(&surface["surface_type"])? {
++            "Wall" => SurfaceType::Wall, "Floor" => SurfaceType::Floor,
++            "Roof" => SurfaceType::Roof, "Ceiling" => SurfaceType::Ceiling,
++            _ => return Err("unsupported declared opaque class".into()),
++        };
++        registry.push(ApproximateViewFactorSurface {
++            surface_id: id, surface_name: text(&surface["name"])?.to_owned(),
++            zone_id: context.zone_id, zone_name: text(&model["context"]["zone_name"])?.to_owned(),
++            surface_type, area_m2: scalar(&surface["area_m2"])?,
++            azimuth_deg: scalar(&surface["azimuth_deg"])?, tilt_deg: scalar(&surface["tilt_deg"])? });
++    }
++    let mut seen = BTreeMap::new();
++    let mut ordered = Vec::new();
++    for value in rows(&model["surface_order"])? {
++        let id = SurfaceId(u32_value(value)?);
++        require(seen.insert(id, ()).is_none(), "duplicate pointer ID")?;
++        let index = *by_id.get(&id).ok_or("pointer ID lacks actual typed registry member")?;
++        ordered.push(registry[index].clone());
++    }
++    require(ordered.len() == registry.len(), "complete unchanged pointer permutation required")?;
++    let actual = calculate_selected_approximate_view_factors(context, &ordered);
++    Ok(json!({"id": model["id"], "lane": model["lane"], "declared_context": model["context"],
++        "actual_context": fields::context(context),
++        "actual_surface_registry": registry.iter().map(fields::surface).collect::<Vec<_>>(),
++        "actual_input_pointer_order": ordered.iter().map(fields::surface).collect::<Vec<_>>(),
++        "actual_Rust_API": "calculate_selected_approximate_view_factors", "actual_source_invoked": true,
++        "result": fields::result(&actual), "Native_warning_backend_or_outcome_inferred": false}))
++}
++fn run() -> Result<()> {
++    let args = std::env::args().skip(1).collect::<Vec<_>>();
++    require(args.len() == 5, "expected request path/SHA, admission path/SHA, runtime source inventory path")?;
++    let root = std::env::current_dir()?.canonicalize()?;
++    let request_ref = json!({"path": args[0], "sha256": args[1]});
++    let admission_ref = json!({"path": args[2], "sha256": args[3]});
++    let (request_path, request_bytes) = bound(&root, &request_ref)?;
++    let (admission_path, admission_bytes) = bound(&root, &admission_ref)?;
++    let request_ref = json!({"path": args[0], "sha256": args[1], "size_bytes": request_bytes.len()});
++    let admission_ref = json!({"path": args[2], "sha256": args[3], "size_bytes": admission_bytes.len()});
++    let sources_path = root.join(&args[4]).canonicalize()?;
++    require(sources_path.starts_with(&root) && sources_path != root && sources_path.is_file() &&
++        std::fs::metadata(&sources_path)?.len() <= 16_000_000, "contained small runtime inventory required")?;
++    require(request_bytes.len() <= 16_000_000 && admission_bytes.len() <= 16_000_000, "small packet metadata required")?;
++    let sources_bytes = std::fs::read(&sources_path)?;
++    let sources: Value = serde_json::from_slice(&sources_bytes)?;
++    let request: Value = serde_json::from_slice(&request_bytes)?;
++    let admission: Value = serde_json::from_slice(&admission_bytes)?;
++    require(request["schema"] == "rad01-helper-cases.v1" && admission["schema"] == "rad01-native-admission-contract.v1" &&
++        admission["helper_request"] == request_ref, "frozen request/admission schema or binding differs")?;
++    let projection = load(&root, &admission["projection"])?;
++    require(projection["schema"] == "rad01-observation-projection.v1" && projection["helper_request"] == request_ref &&
++        projection["contracts"] == admission["contracts"], "projection contract DAG differs")?;
++    let mut bindings = vec![request_ref.clone(), admission_ref.clone(), admission["projection"].clone()];
++    let mut contracts = BTreeMap::new();
++    for key in ["source", "cases", "tolerances"] {
++        let value = load(&root, &admission["contracts"][key])?;
++        require(value["schema"] == format!("rad01-{key}-contract.v1"), "contract schema differs")?;
++        if key != "cases" { require(request["contracts"][key] == admission["contracts"][key], "request contract differs")?; }
++        bindings.push(admission["contracts"][key].clone());
++        contracts.insert(key, value);
++    }
++    require(contracts["cases"]["helper_request"] == request_ref && contracts["cases"]["source"] == admission["contracts"]["source"] &&
++        contracts["cases"]["tolerances"] == admission["contracts"]["tolerances"], "one-way cases DAG differs")?;
++    for packet in [&request, &admission, &projection, &contracts["source"], &contracts["cases"], &contracts["tolerances"]] {
++        for key in ["frozen_before_this_RAD01_helper_execution", "frozen_before_numerical_execution"] {
++            require(packet[key] == true, "pre-output frozen flag required")?;
++        }
++        for key in ["expected_values_supplied", "expected_exits_supplied", "scientific_execution_performed", "full_engine_production_geometry_supplied"] {
++            require(packet[key] == false, "input-only declared geometry required")?;
++        }
++    }
++    let authority = &contracts["source"]["source_authorities"];
++    require(authority == &projection["source_authorities"] && authority["actual_scope_check_role"] == "real-RAD-01-check-only" &&
++        authority["native_helper_source_manifest"]["sha256"] == "b4e10bd483af44f6f5d0b6f5fa13051d106d6d672d1ec0af1b79bbf5d5986b89",
++        "reviewed Native source/current scope authority differs")?;
++    let native = load(&root, &authority["native_helper_source_manifest"])?;
++    for key in ["input_fixture_proposal", "observation_policy_proposal"] { same_ref(&native[key], &authority[key])?; }
++    let declared_native = rows(&native["native_source_files"])?;
++    let admitted_native = rows(&admission["native_source_files"])?;
++    require(declared_native.len() == 6 && admitted_native.len() == 6 &&
++        authority["writer_source_manifest"]["sha256"] == "c3f140b8b4384e61a1fc5ba5e198b4f1facc39082f1521b68c895ea53974aace",
++        "held Native source count or writer identity differs")?;
++    for (left, right) in declared_native.iter().zip(admitted_native) { same_ref(left, right)?; }
++    for key in ["native_helper_source_manifest", "input_fixture_proposal", "observation_policy_proposal", "writer_source_manifest",
++        "current_card", "actual_scope_amendment", "actual_scope_amendment_execution"] { bindings.push(authority[key].clone()); }
++    for key in ["historical_before_documents", "current_after_documents"] { bindings.extend(rows(&authority[key])?.iter().cloned()); }
++    bindings.extend(rows(&contracts["source"]["source_files"])?.iter().cloned());
++    bindings.extend(rows(&admission["native_source_files"])?.iter().cloned());
++    let fixture = load(&root, &authority["input_fixture_proposal"])?;
++    let policy = load(&root, &authority["observation_policy_proposal"])?;
++    require(fixture["model_cases"] == request["model_cases"] && fixture["proposed_counts"] == request["requested_counts"] &&
++        request["observation_policy"] == policy && admission["observation_policy"] == policy &&
++        projection["observation_policy"] == policy && contracts["tolerances"]["observation_policy"] == policy,
++        "literal fixture/policy differs")?;
++    for binding in &bindings { bound(&root, binding)?; }
++    source_pins(&root, &sources)?;
++    let cases = rows(&request["model_cases"])?;
++    require(cases.len() == 21 && request["requested_counts"] == admission["requested_counts"] &&
++        request["requested_counts"] == json!({"model_cases": cases.len(), "CalcApproximateViewFactors": cases.len()}),
++        "literal21 count contract differs")?;
++    let models = cases.iter().map(model_case).collect::<Result<Vec<_>>>()?;
++    let calls = models.iter().filter(|row| row["actual_source_invoked"] == true).count();
++    for binding in &bindings { bound(&root, binding)?; }
++    source_pins(&root, &sources)?;
++    require(std::fs::read(&request_path)? == request_bytes && std::fs::read(&admission_path)? == admission_bytes &&
++        std::fs::read(&sources_path)? == sources_bytes, "source/input bytes changed during actual calls")?;
++    println!("{}", serde_json::to_string_pretty(&json!({
++        "schema": "rad01-candidate-unit-observer-results.v1", "energyplus_commit": request["energyplus_commit"],
++        "actual_request": request_ref, "actual_native_admission": admission_ref, "projection": admission["projection"],
++        "contracts": admission["contracts"], "observation_policy": policy, "source_authorities": authority,
++        "runtime_source_bindings": {"path": args[4], "sha256": digest::sha256(&sources_bytes), "size_bytes": sources_bytes.len()},
++        "authenticated_source_inventory": sources, "requested_counts": request["requested_counts"], "model_cases": models,
++        "actual_Rust_API_invocations": calls, "all_bound_inputs_and_sources_unchanged": true,
++        "Native_result_or_expected_values_read": false, "Native_warning_backend_or_outcome_inferred": false,
++        "full_engine_production_geometry_certified": false, "RAD02_RAD03_or_production_integration_certified": false,
++        "numerical_PASS_claimed": false, "gates_updated": false
++    }))?);
++    Ok(())
++}
++fn main() {
++    if let Err(error) = run() { eprintln!("RAD-01 candidate observer: {error}"); std::process::exit(2); }
++}

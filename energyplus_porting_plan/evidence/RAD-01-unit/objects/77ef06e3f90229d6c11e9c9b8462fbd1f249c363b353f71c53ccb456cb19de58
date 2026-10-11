@@ -1,0 +1,6344 @@
+{
+  "Native_result_or_expected_values_read": false,
+  "Native_warning_backend_or_outcome_inferred": false,
+  "RAD02_RAD03_or_production_integration_certified": false,
+  "actual_Rust_API_invocations": 21,
+  "actual_native_admission": {
+    "path": ".runtime/porting/RAD-01/frozen-packet-02/native-admission-contract.json",
+    "sha256": "5e315968bcd4774c952177e97fbe91391c90f413b01e02a9c81f03cabaf6bde4",
+    "size_bytes": 4009
+  },
+  "actual_request": {
+    "path": ".runtime/porting/RAD-01/frozen-packet-02/helper-request.json",
+    "sha256": "a614ee77cd37acb35d8e1f6a44930130eb1214efdd3189da5f05e150235c957c",
+    "size_bytes": 36373
+  },
+  "all_bound_inputs_and_sources_unchanged": true,
+  "authenticated_source_inventory": {
+    "actual_public_API_sources": [
+      {
+        "path": "crates/ep_run/Cargo.toml",
+        "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+        "size_bytes": 524
+      },
+      {
+        "path": "crates/ep_model/src/lib.rs",
+        "sha256": "2a756532553034fb2b92c892cb2e6f3c147aa129f6dce64b63763f364cb3cee4",
+        "size_bytes": 284
+      },
+      {
+        "path": "crates/ep_model/src/ids.rs",
+        "sha256": "83b32ebf02684f459cb0a789f498de08b849b94a7072f1f5870663a4b3cca7be",
+        "size_bytes": 2029
+      },
+      {
+        "path": "crates/ep_model/src/objects/mod.rs",
+        "sha256": "cb752e4c143386ce432adc84dc8d36d8358bd0ea1b0fc2b01f240795c7ec96c1",
+        "size_bytes": 2068
+      },
+      {
+        "path": "crates/ep_model/src/objects/surfaces.rs",
+        "sha256": "54569b984efd25320447a8eecb94f351037ab6b63a5cfb31d0af1ecc225a1755",
+        "size_bytes": 6656
+      },
+      {
+        "path": "crates/ep_runtime/Cargo.toml",
+        "sha256": "bb81b5793debafd84300ec9905f0cda65ab32d216633543bab375b30a7a379e9",
+        "size_bytes": 327
+      },
+      {
+        "path": "crates/ep_runtime/src/lib.rs",
+        "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+        "size_bytes": 868
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+        "size_bytes": 1785
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/radiation.rs",
+        "sha256": "dec5d7bf1adbd13ab6535639f878b7671d1cc04305342686586799dcf5808c5c",
+        "size_bytes": 27520
+      },
+      {
+        "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+        "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+        "size_bytes": 3172
+      }
+    ],
+    "observer_sources": [
+      {
+        "path": "crates/ep_run/examples/rad01_candidate_unit_observer.rs",
+        "sha256": "e52941043d7e93415cc3f4a695b8f17ff811ef6d2f1804d72068f87de7f050c1",
+        "size_bytes": 15408
+      },
+      {
+        "path": "crates/ep_run/examples/rad01_candidate_unit_support/fields.rs",
+        "sha256": "703f40eca5fa106d2df40193c670508611900e7e3a4383802863f5221e2dff19",
+        "size_bytes": 3693
+      }
+    ],
+    "schema": "rad01-candidate-unit-runtime-source-bindings.v1"
+  },
+  "contracts": {
+    "cases": {
+      "path": ".runtime/porting/RAD-01/frozen-packet-02/cases.json",
+      "sha256": "22803157955aa591a8479edb4729faecd3a6a19be88f50e0deade6b2489719f1",
+      "size_bytes": 1297
+    },
+    "source": {
+      "path": ".runtime/porting/RAD-01/frozen-packet-02/source.json",
+      "sha256": "a24be68e2ed62eb9d9f3f9dfbe282927c669e62ff786f9b1b51ae9ad0e9c27ca",
+      "size_bytes": 12909
+    },
+    "tolerances": {
+      "path": ".runtime/porting/RAD-01/frozen-packet-02/tolerances.json",
+      "sha256": "3e477ed896353f1eaaefd8d4cd287bf9b0af11053fe7291386631503c1bd085c",
+      "size_bytes": 1323
+    }
+  },
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "full_engine_production_geometry_certified": false,
+  "gates_updated": false,
+  "model_cases": [
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 90,
+          "surface_name": "surface-90",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 4.0,
+            "value_bits": "4010000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 3,
+          "surface_name": "surface-3",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 8.0,
+            "value_bits": "4020000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 41,
+          "surface_name": "surface-41",
+          "surface_type": "Floor",
+          "tilt_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 90,
+          "surface_name": "surface-90",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 4.0,
+            "value_bits": "4010000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 3,
+          "surface_name": "surface-3",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 8.0,
+            "value_bits": "4020000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 41,
+          "surface_name": "surface-41",
+          "surface_type": "Floor",
+          "tilt_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "selected-zone"
+      },
+      "id": "asymmetric-areas",
+      "lane": "declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.2,
+              "value_bits": "3fc999999999999a",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.3333333333333333,
+              "value_bits": "3fd5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.3333333333333333,
+              "value_bits": "3fd5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.6666666666666666,
+              "value_bits": "3fe5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.6666666666666666,
+              "value_bits": "3fe5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.8,
+              "value_bits": "3fe999999999999a",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            3,
+            3
+          ],
+          "ZoneArea": [
+            {
+              "value": 12.0,
+              "value_bits": "4028000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 10.0,
+              "value_bits": "4024000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 6.0,
+              "value_bits": "4018000000000000",
+              "value_class": "finite"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            90,
+            3,
+            41
+          ],
+          "warnings": []
+        },
+        "status": "source-returned"
+      }
+    },
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 9,
+          "surface_name": "surface-9",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 10.0,
+            "value_bits": "4024000000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 2,
+          "surface_name": "surface-2",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 9,
+          "surface_name": "surface-9",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 10.0,
+            "value_bits": "4024000000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 2,
+          "surface_name": "surface-2",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "selected-zone"
+      },
+      "id": "azimuth-at10",
+      "lane": "declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            2,
+            2
+          ],
+          "ZoneArea": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            9,
+            2
+          ],
+          "warnings": [
+            {
+              "surface_id": 9,
+              "surface_index": 0,
+              "surface_name": "surface-9",
+              "zone_id": 4,
+              "zone_name": "selected-zone"
+            },
+            {
+              "surface_id": 2,
+              "surface_index": 1,
+              "surface_name": "surface-2",
+              "zone_id": 4,
+              "zone_name": "selected-zone"
+            }
+          ]
+        },
+        "status": "source-returned"
+      }
+    },
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 9,
+          "surface_name": "surface-9",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 10.0001,
+            "value_bits": "4024000d1b71758e",
+            "value_class": "finite"
+          },
+          "surface_id": 2,
+          "surface_name": "surface-2",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 9,
+          "surface_name": "surface-9",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 10.0001,
+            "value_bits": "4024000d1b71758e",
+            "value_class": "finite"
+          },
+          "surface_id": 2,
+          "surface_name": "surface-2",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "selected-zone"
+      },
+      "id": "azimuth-above10",
+      "lane": "declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            2,
+            2
+          ],
+          "ZoneArea": [
+            {
+              "value": 3.0,
+              "value_bits": "4008000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 2.0,
+              "value_bits": "4000000000000000",
+              "value_class": "finite"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            9,
+            2
+          ],
+          "warnings": []
+        },
+        "status": "source-returned"
+      }
+    },
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 9,
+          "surface_name": "surface-9",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 350.0,
+            "value_bits": "4075e00000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 2,
+          "surface_name": "surface-2",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 9,
+          "surface_name": "surface-9",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 350.0,
+            "value_bits": "4075e00000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 2,
+          "surface_name": "surface-2",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "selected-zone"
+      },
+      "id": "azimuth-at350",
+      "lane": "declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            2,
+            2
+          ],
+          "ZoneArea": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            9,
+            2
+          ],
+          "warnings": [
+            {
+              "surface_id": 9,
+              "surface_index": 0,
+              "surface_name": "surface-9",
+              "zone_id": 4,
+              "zone_name": "selected-zone"
+            },
+            {
+              "surface_id": 2,
+              "surface_index": 1,
+              "surface_name": "surface-2",
+              "zone_id": 4,
+              "zone_name": "selected-zone"
+            }
+          ]
+        },
+        "status": "source-returned"
+      }
+    },
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 9,
+          "surface_name": "surface-9",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 349.9999,
+            "value_bits": "4075dfff97247454",
+            "value_class": "finite"
+          },
+          "surface_id": 2,
+          "surface_name": "surface-2",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 9,
+          "surface_name": "surface-9",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 349.9999,
+            "value_bits": "4075dfff97247454",
+            "value_class": "finite"
+          },
+          "surface_id": 2,
+          "surface_name": "surface-2",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "selected-zone"
+      },
+      "id": "azimuth-below350",
+      "lane": "declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            2,
+            2
+          ],
+          "ZoneArea": [
+            {
+              "value": 3.0,
+              "value_bits": "4008000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 2.0,
+              "value_bits": "4000000000000000",
+              "value_class": "finite"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            9,
+            2
+          ],
+          "warnings": []
+        },
+        "status": "source-returned"
+      }
+    },
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 9,
+          "surface_name": "surface-9",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 2,
+          "surface_name": "surface-2",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 100.0,
+            "value_bits": "4059000000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 9,
+          "surface_name": "surface-9",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 2,
+          "surface_name": "surface-2",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 100.0,
+            "value_bits": "4059000000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "selected-zone"
+      },
+      "id": "tilt-at10",
+      "lane": "declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            2,
+            2
+          ],
+          "ZoneArea": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            9,
+            2
+          ],
+          "warnings": [
+            {
+              "surface_id": 9,
+              "surface_index": 0,
+              "surface_name": "surface-9",
+              "zone_id": 4,
+              "zone_name": "selected-zone"
+            },
+            {
+              "surface_id": 2,
+              "surface_index": 1,
+              "surface_name": "surface-2",
+              "zone_id": 4,
+              "zone_name": "selected-zone"
+            }
+          ]
+        },
+        "status": "source-returned"
+      }
+    },
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 9,
+          "surface_name": "surface-9",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 2,
+          "surface_name": "surface-2",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 100.0001,
+            "value_bits": "40590001a36e2eb2",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 9,
+          "surface_name": "surface-9",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 2,
+          "surface_name": "surface-2",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 100.0001,
+            "value_bits": "40590001a36e2eb2",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "selected-zone"
+      },
+      "id": "tilt-above10",
+      "lane": "declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            2,
+            2
+          ],
+          "ZoneArea": [
+            {
+              "value": 3.0,
+              "value_bits": "4008000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 2.0,
+              "value_bits": "4000000000000000",
+              "value_class": "finite"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            9,
+            2
+          ],
+          "warnings": []
+        },
+        "status": "source-returned"
+      }
+    },
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 9,
+          "surface_name": "surface-9",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 360.0,
+            "value_bits": "4076800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 2,
+          "surface_name": "surface-2",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 9,
+          "surface_name": "surface-9",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 360.0,
+            "value_bits": "4076800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 2,
+          "surface_name": "surface-2",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "selected-zone"
+      },
+      "id": "azimuth-360",
+      "lane": "declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            2,
+            2
+          ],
+          "ZoneArea": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            9,
+            2
+          ],
+          "warnings": [
+            {
+              "surface_id": 9,
+              "surface_index": 0,
+              "surface_name": "surface-9",
+              "zone_id": 4,
+              "zone_name": "selected-zone"
+            },
+            {
+              "surface_id": 2,
+              "surface_index": 1,
+              "surface_name": "surface-2",
+              "zone_id": 4,
+              "zone_name": "selected-zone"
+            }
+          ]
+        },
+        "status": "source-returned"
+      }
+    },
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 12,
+          "surface_name": "surface-12",
+          "surface_type": "Floor",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 4.0,
+            "value_bits": "4010000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 1,
+          "surface_name": "surface-1",
+          "surface_type": "Floor",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 8.0,
+            "value_bits": "4020000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 8,
+          "surface_name": "surface-8",
+          "surface_type": "Roof",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 12,
+          "surface_name": "surface-12",
+          "surface_type": "Floor",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 4.0,
+            "value_bits": "4010000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 1,
+          "surface_name": "surface-1",
+          "surface_type": "Floor",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 8.0,
+            "value_bits": "4020000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 8,
+          "surface_name": "surface-8",
+          "surface_type": "Roof",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "selected-zone"
+      },
+      "id": "floor-floor-roof",
+      "lane": "declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.3333333333333333,
+              "value_bits": "3fd5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.6666666666666666,
+              "value_bits": "3fe5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            3,
+            3
+          ],
+          "ZoneArea": [
+            {
+              "value": 8.0,
+              "value_bits": "4020000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 8.0,
+              "value_bits": "4020000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 6.0,
+              "value_bits": "4018000000000000",
+              "value_class": "finite"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            12,
+            1,
+            8
+          ],
+          "warnings": []
+        },
+        "status": "source-returned"
+      }
+    },
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": 1.1102230246251565e-16,
+            "value_bits": "3ca0000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 5,
+          "surface_name": "surface-5",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 1.1102230246251565e-16,
+            "value_bits": "3ca0000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 6,
+          "surface_name": "surface-6",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": 1.1102230246251565e-16,
+            "value_bits": "3ca0000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 5,
+          "surface_name": "surface-5",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 1.1102230246251565e-16,
+            "value_bits": "3ca0000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 6,
+          "surface_name": "surface-6",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "selected-zone"
+      },
+      "id": "positive-below-epsilon",
+      "lane": "declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            2,
+            2
+          ],
+          "ZoneArea": [
+            {
+              "value": 1.1102230246251565e-16,
+              "value_bits": "3ca0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 1.1102230246251565e-16,
+              "value_bits": "3ca0000000000000",
+              "value_class": "finite"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            5,
+            6
+          ],
+          "warnings": []
+        },
+        "status": "source-returned"
+      }
+    },
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": -1.0,
+            "value_bits": "bff0000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 99,
+          "surface_name": "surface-99",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 2,
+          "surface_name": "surface-2",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": -1.0,
+            "value_bits": "bff0000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 99,
+          "surface_name": "surface-99",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 2,
+          "surface_name": "surface-2",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "selected-zone"
+      },
+      "id": "nonpositive-diagnostic",
+      "lane": "declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            2,
+            2
+          ],
+          "ZoneArea": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": -1.0,
+              "value_bits": "bff0000000000000",
+              "value_class": "finite"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            99,
+            2
+          ],
+          "warnings": [
+            {
+              "surface_id": 99,
+              "surface_index": 0,
+              "surface_name": "surface-99",
+              "zone_id": 4,
+              "zone_name": "selected-zone"
+            },
+            {
+              "surface_id": 2,
+              "surface_index": 1,
+              "surface_name": "surface-2",
+              "zone_id": 4,
+              "zone_name": "selected-zone"
+            }
+          ]
+        },
+        "status": "source-returned"
+      }
+    },
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": 5.0,
+            "value_bits": "4014000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 40,
+          "surface_name": "surface-40",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 1e+16,
+            "value_bits": "4341c37937e08000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 8,
+          "surface_name": "surface-8",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 1.0,
+            "value_bits": "3ff0000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 2,
+          "surface_name": "surface-2",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 1.0,
+            "value_bits": "3ff0000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 1,
+          "surface_name": "surface-1",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": 5.0,
+            "value_bits": "4014000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 40,
+          "surface_name": "surface-40",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 1e+16,
+            "value_bits": "4341c37937e08000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 8,
+          "surface_name": "surface-8",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 1.0,
+            "value_bits": "3ff0000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 2,
+          "surface_name": "surface-2",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 1.0,
+            "value_bits": "3ff0000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 1,
+          "surface_name": "surface-1",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "selected-zone"
+      },
+      "id": "accumulation-registry-order",
+      "lane": "declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 1e-16,
+              "value_bits": "3c9cd2b297d889bc",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 1e-16,
+              "value_bits": "3c9cd2b297d889bc",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            4,
+            4
+          ],
+          "ZoneArea": [
+            {
+              "value": 1e+16,
+              "value_bits": "4341c37937e08000",
+              "value_class": "finite"
+            },
+            {
+              "value": 5.0,
+              "value_bits": "4014000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 5.0,
+              "value_bits": "4014000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 5.0,
+              "value_bits": "4014000000000000",
+              "value_class": "finite"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            40,
+            8,
+            2,
+            1
+          ],
+          "warnings": []
+        },
+        "status": "source-returned"
+      }
+    },
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": 5.0,
+            "value_bits": "4014000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 40,
+          "surface_name": "surface-40",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 1.0,
+            "value_bits": "3ff0000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 2,
+          "surface_name": "surface-2",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 1.0,
+            "value_bits": "3ff0000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 1,
+          "surface_name": "surface-1",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 1e+16,
+            "value_bits": "4341c37937e08000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 8,
+          "surface_name": "surface-8",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": 5.0,
+            "value_bits": "4014000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 40,
+          "surface_name": "surface-40",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 1e+16,
+            "value_bits": "4341c37937e08000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 8,
+          "surface_name": "surface-8",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 1.0,
+            "value_bits": "3ff0000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 2,
+          "surface_name": "surface-2",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 1.0,
+            "value_bits": "3ff0000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 1,
+          "surface_name": "surface-1",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "selected-zone"
+      },
+      "id": "accumulation-pointer-permutation",
+      "lane": "declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 9.999999999999999e-17,
+              "value_bits": "3c9cd2b297d889bb",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 9.999999999999999e-17,
+              "value_bits": "3c9cd2b297d889bb",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.9999999999999998,
+              "value_bits": "3feffffffffffffe",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            4,
+            4
+          ],
+          "ZoneArea": [
+            {
+              "value": 1.0000000000000002e+16,
+              "value_bits": "4341c37937e08001",
+              "value_class": "finite"
+            },
+            {
+              "value": 5.0,
+              "value_bits": "4014000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 5.0,
+              "value_bits": "4014000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 5.0,
+              "value_bits": "4014000000000000",
+              "value_class": "finite"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            40,
+            2,
+            1,
+            8
+          ],
+          "warnings": []
+        },
+        "status": "source-returned"
+      }
+    },
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": 1.0,
+            "value_bits": "3ff0000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 4,
+          "surface_name": "surface-4",
+          "surface_type": "Ceiling",
+          "tilt_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 9,
+          "surface_name": "surface-9",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": 1.0,
+            "value_bits": "3ff0000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 4,
+          "surface_name": "surface-4",
+          "surface_type": "Ceiling",
+          "tilt_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        },
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 9,
+          "surface_name": "surface-9",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "selected-zone"
+      },
+      "id": "declared-ceiling-maps-Native-roof",
+      "lane": "declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            2,
+            2
+          ],
+          "ZoneArea": [
+            {
+              "value": 2.0,
+              "value_bits": "4000000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000",
+              "value_class": "finite"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            4,
+            9
+          ],
+          "warnings": []
+        },
+        "status": "source-returned"
+      }
+    },
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": 1.0,
+            "value_bits": "3ff0000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 4,
+          "surface_name": "surface-4",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": 1.0,
+            "value_bits": "3ff0000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 4,
+          "surface_name": "surface-4",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "selected-zone"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "selected-zone"
+      },
+      "id": "one-direct-surface-diagnostic",
+      "lane": "declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            1,
+            1
+          ],
+          "ZoneArea": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            4
+          ],
+          "warnings": [
+            {
+              "surface_id": 4,
+              "surface_index": 0,
+              "surface_name": "surface-4",
+              "zone_id": 4,
+              "zone_name": "selected-zone"
+            }
+          ]
+        },
+        "status": "source-returned"
+      }
+    },
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 1,
+          "surface_name": "Zn001:Wall001",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 2,
+          "surface_name": "Zn001:Wall002",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 4.0,
+            "value_bits": "4010000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 3,
+          "surface_name": "Zn001:Wall003",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 5.0,
+            "value_bits": "4014000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 270.0,
+            "value_bits": "4070e00000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 4,
+          "surface_name": "Zn001:Wall004",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 6.0,
+            "value_bits": "4018000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 5,
+          "surface_name": "Zn001:Flr001",
+          "surface_type": "Floor",
+          "tilt_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 7.0,
+            "value_bits": "401c000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 6,
+          "surface_name": "Zn001:Roof001",
+          "surface_type": "Roof",
+          "tilt_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 1,
+          "surface_name": "Zn001:Wall001",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 2,
+          "surface_name": "Zn001:Wall002",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 4.0,
+            "value_bits": "4010000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 3,
+          "surface_name": "Zn001:Wall003",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 5.0,
+            "value_bits": "4014000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 270.0,
+            "value_bits": "4070e00000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 4,
+          "surface_name": "Zn001:Wall004",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 6.0,
+            "value_bits": "4018000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 5,
+          "surface_name": "Zn001:Flr001",
+          "surface_type": "Floor",
+          "tilt_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 7.0,
+            "value_bits": "401c000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 6,
+          "surface_name": "Zn001:Roof001",
+          "surface_type": "Roof",
+          "tilt_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "ZONEONE"
+      },
+      "id": "CON-template-A-24H",
+      "lane": "CON-membership-template-declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.08333333333333333,
+              "value_bits": "3fb5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.08695652173913043,
+              "value_bits": "3fb642c8590b2164",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.09090909090909091,
+              "value_bits": "3fb745d1745d1746",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.09523809523809523,
+              "value_bits": "3fb8618618618618",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.1,
+              "value_bits": "3fb999999999999a",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.12,
+              "value_bits": "3fbeb851eb851eb8",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.13043478260869565,
+              "value_bits": "3fc0b21642c8590b",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.13636363636363635,
+              "value_bits": "3fc1745d1745d174",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.14285714285714285,
+              "value_bits": "3fc2492492492492",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.15,
+              "value_bits": "3fc3333333333333",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.16,
+              "value_bits": "3fc47ae147ae147b",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.16666666666666666,
+              "value_bits": "3fc5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.18181818181818182,
+              "value_bits": "3fc745d1745d1746",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.19047619047619047,
+              "value_bits": "3fc8618618618618",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2,
+              "value_bits": "3fc999999999999a",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2,
+              "value_bits": "3fc999999999999a",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.20833333333333334,
+              "value_bits": "3fcaaaaaaaaaaaab",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.21739130434782608,
+              "value_bits": "3fcbd37a6f4de9bd",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.23809523809523808,
+              "value_bits": "3fce79e79e79e79e",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.25,
+              "value_bits": "3fd0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.24,
+              "value_bits": "3fceb851eb851eb8",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.25,
+              "value_bits": "3fd0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2608695652173913,
+              "value_bits": "3fd0b21642c8590b",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2727272727272727,
+              "value_bits": "3fd1745d1745d174",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.3,
+              "value_bits": "3fd3333333333333",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.28,
+              "value_bits": "3fd1eb851eb851ec",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2916666666666667,
+              "value_bits": "3fd2aaaaaaaaaaab",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.30434782608695654,
+              "value_bits": "3fd37a6f4de9bd38",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.3181818181818182,
+              "value_bits": "3fd45d1745d1745d",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.3333333333333333,
+              "value_bits": "3fd5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            6,
+            6
+          ],
+          "ZoneArea": [
+            {
+              "value": 25.0,
+              "value_bits": "4039000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 24.0,
+              "value_bits": "4038000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 23.0,
+              "value_bits": "4037000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 22.0,
+              "value_bits": "4036000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 21.0,
+              "value_bits": "4035000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 20.0,
+              "value_bits": "4034000000000000",
+              "value_class": "finite"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "warnings": []
+        },
+        "status": "source-returned"
+      }
+    },
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 1,
+          "surface_name": "Zn001:Wall001",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 2,
+          "surface_name": "Zn001:Wall002",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 4.0,
+            "value_bits": "4010000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 3,
+          "surface_name": "Zn001:Wall003",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 5.0,
+            "value_bits": "4014000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 270.0,
+            "value_bits": "4070e00000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 4,
+          "surface_name": "Zn001:Wall004",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 6.0,
+            "value_bits": "4018000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 5,
+          "surface_name": "Zn001:Flr001",
+          "surface_type": "Floor",
+          "tilt_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 7.0,
+            "value_bits": "401c000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 6,
+          "surface_name": "Zn001:Roof001",
+          "surface_type": "Roof",
+          "tilt_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 1,
+          "surface_name": "Zn001:Wall001",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 2,
+          "surface_name": "Zn001:Wall002",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 4.0,
+            "value_bits": "4010000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 3,
+          "surface_name": "Zn001:Wall003",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 5.0,
+            "value_bits": "4014000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 270.0,
+            "value_bits": "4070e00000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 4,
+          "surface_name": "Zn001:Wall004",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 6.0,
+            "value_bits": "4018000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 5,
+          "surface_name": "Zn001:Flr001",
+          "surface_type": "Floor",
+          "tilt_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 7.0,
+            "value_bits": "401c000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 6,
+          "surface_name": "Zn001:Roof001",
+          "surface_type": "Roof",
+          "tilt_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "ZONEONE"
+      },
+      "id": "CON-template-A-72H",
+      "lane": "CON-membership-template-declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.08333333333333333,
+              "value_bits": "3fb5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.08695652173913043,
+              "value_bits": "3fb642c8590b2164",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.09090909090909091,
+              "value_bits": "3fb745d1745d1746",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.09523809523809523,
+              "value_bits": "3fb8618618618618",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.1,
+              "value_bits": "3fb999999999999a",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.12,
+              "value_bits": "3fbeb851eb851eb8",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.13043478260869565,
+              "value_bits": "3fc0b21642c8590b",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.13636363636363635,
+              "value_bits": "3fc1745d1745d174",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.14285714285714285,
+              "value_bits": "3fc2492492492492",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.15,
+              "value_bits": "3fc3333333333333",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.16,
+              "value_bits": "3fc47ae147ae147b",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.16666666666666666,
+              "value_bits": "3fc5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.18181818181818182,
+              "value_bits": "3fc745d1745d1746",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.19047619047619047,
+              "value_bits": "3fc8618618618618",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2,
+              "value_bits": "3fc999999999999a",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2,
+              "value_bits": "3fc999999999999a",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.20833333333333334,
+              "value_bits": "3fcaaaaaaaaaaaab",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.21739130434782608,
+              "value_bits": "3fcbd37a6f4de9bd",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.23809523809523808,
+              "value_bits": "3fce79e79e79e79e",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.25,
+              "value_bits": "3fd0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.24,
+              "value_bits": "3fceb851eb851eb8",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.25,
+              "value_bits": "3fd0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2608695652173913,
+              "value_bits": "3fd0b21642c8590b",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2727272727272727,
+              "value_bits": "3fd1745d1745d174",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.3,
+              "value_bits": "3fd3333333333333",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.28,
+              "value_bits": "3fd1eb851eb851ec",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2916666666666667,
+              "value_bits": "3fd2aaaaaaaaaaab",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.30434782608695654,
+              "value_bits": "3fd37a6f4de9bd38",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.3181818181818182,
+              "value_bits": "3fd45d1745d1745d",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.3333333333333333,
+              "value_bits": "3fd5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            6,
+            6
+          ],
+          "ZoneArea": [
+            {
+              "value": 25.0,
+              "value_bits": "4039000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 24.0,
+              "value_bits": "4038000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 23.0,
+              "value_bits": "4037000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 22.0,
+              "value_bits": "4036000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 21.0,
+              "value_bits": "4035000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 20.0,
+              "value_bits": "4034000000000000",
+              "value_class": "finite"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "warnings": []
+        },
+        "status": "source-returned"
+      }
+    },
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 1,
+          "surface_name": "FLOOR",
+          "surface_type": "Floor",
+          "tilt_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 2,
+          "surface_name": "ROOF",
+          "surface_type": "Roof",
+          "tilt_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 4.0,
+            "value_bits": "4010000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 3,
+          "surface_name": "WALL X0",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 5.0,
+            "value_bits": "4014000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 4,
+          "surface_name": "WALL X1",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 6.0,
+            "value_bits": "4018000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 5,
+          "surface_name": "WALL Y0",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 7.0,
+            "value_bits": "401c000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 270.0,
+            "value_bits": "4070e00000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 6,
+          "surface_name": "WALL Y1",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 1,
+          "surface_name": "FLOOR",
+          "surface_type": "Floor",
+          "tilt_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 2,
+          "surface_name": "ROOF",
+          "surface_type": "Roof",
+          "tilt_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 4.0,
+            "value_bits": "4010000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 3,
+          "surface_name": "WALL X0",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 5.0,
+            "value_bits": "4014000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 4,
+          "surface_name": "WALL X1",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 6.0,
+            "value_bits": "4018000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 5,
+          "surface_name": "WALL Y0",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 7.0,
+            "value_bits": "401c000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 270.0,
+            "value_bits": "4070e00000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 6,
+          "surface_name": "WALL Y1",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "ZONEONE"
+      },
+      "id": "CON-template-B-NOLIMIT-24H",
+      "lane": "CON-membership-template-declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.08333333333333333,
+              "value_bits": "3fb5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.08695652173913043,
+              "value_bits": "3fb642c8590b2164",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.09090909090909091,
+              "value_bits": "3fb745d1745d1746",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.09523809523809523,
+              "value_bits": "3fb8618618618618",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.1,
+              "value_bits": "3fb999999999999a",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.12,
+              "value_bits": "3fbeb851eb851eb8",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.13043478260869565,
+              "value_bits": "3fc0b21642c8590b",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.13636363636363635,
+              "value_bits": "3fc1745d1745d174",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.14285714285714285,
+              "value_bits": "3fc2492492492492",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.15,
+              "value_bits": "3fc3333333333333",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.16,
+              "value_bits": "3fc47ae147ae147b",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.16666666666666666,
+              "value_bits": "3fc5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.18181818181818182,
+              "value_bits": "3fc745d1745d1746",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.19047619047619047,
+              "value_bits": "3fc8618618618618",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2,
+              "value_bits": "3fc999999999999a",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2,
+              "value_bits": "3fc999999999999a",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.20833333333333334,
+              "value_bits": "3fcaaaaaaaaaaaab",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.21739130434782608,
+              "value_bits": "3fcbd37a6f4de9bd",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.23809523809523808,
+              "value_bits": "3fce79e79e79e79e",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.25,
+              "value_bits": "3fd0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.24,
+              "value_bits": "3fceb851eb851eb8",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.25,
+              "value_bits": "3fd0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2608695652173913,
+              "value_bits": "3fd0b21642c8590b",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2727272727272727,
+              "value_bits": "3fd1745d1745d174",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.3,
+              "value_bits": "3fd3333333333333",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.28,
+              "value_bits": "3fd1eb851eb851ec",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2916666666666667,
+              "value_bits": "3fd2aaaaaaaaaaab",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.30434782608695654,
+              "value_bits": "3fd37a6f4de9bd38",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.3181818181818182,
+              "value_bits": "3fd45d1745d1745d",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.3333333333333333,
+              "value_bits": "3fd5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            6,
+            6
+          ],
+          "ZoneArea": [
+            {
+              "value": 25.0,
+              "value_bits": "4039000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 24.0,
+              "value_bits": "4038000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 23.0,
+              "value_bits": "4037000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 22.0,
+              "value_bits": "4036000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 21.0,
+              "value_bits": "4035000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 20.0,
+              "value_bits": "4034000000000000",
+              "value_class": "finite"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "warnings": []
+        },
+        "status": "source-returned"
+      }
+    },
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 1,
+          "surface_name": "FLOOR",
+          "surface_type": "Floor",
+          "tilt_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 2,
+          "surface_name": "ROOF",
+          "surface_type": "Roof",
+          "tilt_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 4.0,
+            "value_bits": "4010000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 3,
+          "surface_name": "WALL X0",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 5.0,
+            "value_bits": "4014000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 4,
+          "surface_name": "WALL X1",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 6.0,
+            "value_bits": "4018000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 5,
+          "surface_name": "WALL Y0",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 7.0,
+            "value_bits": "401c000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 270.0,
+            "value_bits": "4070e00000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 6,
+          "surface_name": "WALL Y1",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 1,
+          "surface_name": "FLOOR",
+          "surface_type": "Floor",
+          "tilt_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 2,
+          "surface_name": "ROOF",
+          "surface_type": "Roof",
+          "tilt_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 4.0,
+            "value_bits": "4010000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 3,
+          "surface_name": "WALL X0",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 5.0,
+            "value_bits": "4014000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 4,
+          "surface_name": "WALL X1",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 6.0,
+            "value_bits": "4018000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 5,
+          "surface_name": "WALL Y0",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 7.0,
+            "value_bits": "401c000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 270.0,
+            "value_bits": "4070e00000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 6,
+          "surface_name": "WALL Y1",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "ZONEONE"
+      },
+      "id": "CON-template-B-FLOW-24H",
+      "lane": "CON-membership-template-declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.08333333333333333,
+              "value_bits": "3fb5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.08695652173913043,
+              "value_bits": "3fb642c8590b2164",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.09090909090909091,
+              "value_bits": "3fb745d1745d1746",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.09523809523809523,
+              "value_bits": "3fb8618618618618",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.1,
+              "value_bits": "3fb999999999999a",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.12,
+              "value_bits": "3fbeb851eb851eb8",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.13043478260869565,
+              "value_bits": "3fc0b21642c8590b",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.13636363636363635,
+              "value_bits": "3fc1745d1745d174",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.14285714285714285,
+              "value_bits": "3fc2492492492492",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.15,
+              "value_bits": "3fc3333333333333",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.16,
+              "value_bits": "3fc47ae147ae147b",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.16666666666666666,
+              "value_bits": "3fc5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.18181818181818182,
+              "value_bits": "3fc745d1745d1746",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.19047619047619047,
+              "value_bits": "3fc8618618618618",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2,
+              "value_bits": "3fc999999999999a",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2,
+              "value_bits": "3fc999999999999a",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.20833333333333334,
+              "value_bits": "3fcaaaaaaaaaaaab",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.21739130434782608,
+              "value_bits": "3fcbd37a6f4de9bd",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.23809523809523808,
+              "value_bits": "3fce79e79e79e79e",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.25,
+              "value_bits": "3fd0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.24,
+              "value_bits": "3fceb851eb851eb8",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.25,
+              "value_bits": "3fd0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2608695652173913,
+              "value_bits": "3fd0b21642c8590b",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2727272727272727,
+              "value_bits": "3fd1745d1745d174",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.3,
+              "value_bits": "3fd3333333333333",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.28,
+              "value_bits": "3fd1eb851eb851ec",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2916666666666667,
+              "value_bits": "3fd2aaaaaaaaaaab",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.30434782608695654,
+              "value_bits": "3fd37a6f4de9bd38",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.3181818181818182,
+              "value_bits": "3fd45d1745d1745d",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.3333333333333333,
+              "value_bits": "3fd5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            6,
+            6
+          ],
+          "ZoneArea": [
+            {
+              "value": 25.0,
+              "value_bits": "4039000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 24.0,
+              "value_bits": "4038000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 23.0,
+              "value_bits": "4037000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 22.0,
+              "value_bits": "4036000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 21.0,
+              "value_bits": "4035000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 20.0,
+              "value_bits": "4034000000000000",
+              "value_class": "finite"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "warnings": []
+        },
+        "status": "source-returned"
+      }
+    },
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 1,
+          "surface_name": "FLOOR",
+          "surface_type": "Floor",
+          "tilt_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 2,
+          "surface_name": "ROOF",
+          "surface_type": "Roof",
+          "tilt_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 4.0,
+            "value_bits": "4010000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 3,
+          "surface_name": "WALL X0",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 5.0,
+            "value_bits": "4014000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 4,
+          "surface_name": "WALL X1",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 6.0,
+            "value_bits": "4018000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 5,
+          "surface_name": "WALL Y0",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 7.0,
+            "value_bits": "401c000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 270.0,
+            "value_bits": "4070e00000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 6,
+          "surface_name": "WALL Y1",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 1,
+          "surface_name": "FLOOR",
+          "surface_type": "Floor",
+          "tilt_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 2,
+          "surface_name": "ROOF",
+          "surface_type": "Roof",
+          "tilt_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 4.0,
+            "value_bits": "4010000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 3,
+          "surface_name": "WALL X0",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 5.0,
+            "value_bits": "4014000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 4,
+          "surface_name": "WALL X1",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 6.0,
+            "value_bits": "4018000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 5,
+          "surface_name": "WALL Y0",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 7.0,
+            "value_bits": "401c000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 270.0,
+            "value_bits": "4070e00000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 6,
+          "surface_name": "WALL Y1",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "ZONEONE"
+      },
+      "id": "CON-template-B-CAPACITY-24H",
+      "lane": "CON-membership-template-declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.08333333333333333,
+              "value_bits": "3fb5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.08695652173913043,
+              "value_bits": "3fb642c8590b2164",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.09090909090909091,
+              "value_bits": "3fb745d1745d1746",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.09523809523809523,
+              "value_bits": "3fb8618618618618",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.1,
+              "value_bits": "3fb999999999999a",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.12,
+              "value_bits": "3fbeb851eb851eb8",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.13043478260869565,
+              "value_bits": "3fc0b21642c8590b",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.13636363636363635,
+              "value_bits": "3fc1745d1745d174",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.14285714285714285,
+              "value_bits": "3fc2492492492492",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.15,
+              "value_bits": "3fc3333333333333",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.16,
+              "value_bits": "3fc47ae147ae147b",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.16666666666666666,
+              "value_bits": "3fc5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.18181818181818182,
+              "value_bits": "3fc745d1745d1746",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.19047619047619047,
+              "value_bits": "3fc8618618618618",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2,
+              "value_bits": "3fc999999999999a",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2,
+              "value_bits": "3fc999999999999a",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.20833333333333334,
+              "value_bits": "3fcaaaaaaaaaaaab",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.21739130434782608,
+              "value_bits": "3fcbd37a6f4de9bd",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.23809523809523808,
+              "value_bits": "3fce79e79e79e79e",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.25,
+              "value_bits": "3fd0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.24,
+              "value_bits": "3fceb851eb851eb8",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.25,
+              "value_bits": "3fd0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2608695652173913,
+              "value_bits": "3fd0b21642c8590b",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2727272727272727,
+              "value_bits": "3fd1745d1745d174",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.3,
+              "value_bits": "3fd3333333333333",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.28,
+              "value_bits": "3fd1eb851eb851ec",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2916666666666667,
+              "value_bits": "3fd2aaaaaaaaaaab",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.30434782608695654,
+              "value_bits": "3fd37a6f4de9bd38",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.3181818181818182,
+              "value_bits": "3fd45d1745d1745d",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.3333333333333333,
+              "value_bits": "3fd5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            6,
+            6
+          ],
+          "ZoneArea": [
+            {
+              "value": 25.0,
+              "value_bits": "4039000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 24.0,
+              "value_bits": "4038000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 23.0,
+              "value_bits": "4037000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 22.0,
+              "value_bits": "4036000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 21.0,
+              "value_bits": "4035000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 20.0,
+              "value_bits": "4034000000000000",
+              "value_class": "finite"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "warnings": []
+        },
+        "status": "source-returned"
+      }
+    },
+    {
+      "Native_warning_backend_or_outcome_inferred": false,
+      "actual_Rust_API": "calculate_selected_approximate_view_factors",
+      "actual_context": {
+        "enclosure_index": 7,
+        "zone_id": 4
+      },
+      "actual_input_pointer_order": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 1,
+          "surface_name": "FLOOR",
+          "surface_type": "Floor",
+          "tilt_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 2,
+          "surface_name": "ROOF",
+          "surface_type": "Roof",
+          "tilt_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 4.0,
+            "value_bits": "4010000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 3,
+          "surface_name": "WALL X0",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 5.0,
+            "value_bits": "4014000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 4,
+          "surface_name": "WALL X1",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 6.0,
+            "value_bits": "4018000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 5,
+          "surface_name": "WALL Y0",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 7.0,
+            "value_bits": "401c000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 270.0,
+            "value_bits": "4070e00000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 6,
+          "surface_name": "WALL Y1",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        }
+      ],
+      "actual_source_invoked": true,
+      "actual_surface_registry": [
+        {
+          "area_m2": {
+            "value": 2.0,
+            "value_bits": "4000000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 1,
+          "surface_name": "FLOOR",
+          "surface_type": "Floor",
+          "tilt_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 3.0,
+            "value_bits": "4008000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 2,
+          "surface_name": "ROOF",
+          "surface_type": "Roof",
+          "tilt_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 4.0,
+            "value_bits": "4010000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "surface_id": 3,
+          "surface_name": "WALL X0",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 5.0,
+            "value_bits": "4014000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 4,
+          "surface_name": "WALL X1",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 6.0,
+            "value_bits": "4018000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 180.0,
+            "value_bits": "4066800000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 5,
+          "surface_name": "WALL Y0",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        },
+        {
+          "area_m2": {
+            "value": 7.0,
+            "value_bits": "401c000000000000",
+            "value_class": "finite"
+          },
+          "azimuth_deg": {
+            "value": 270.0,
+            "value_bits": "4070e00000000000",
+            "value_class": "finite"
+          },
+          "surface_id": 6,
+          "surface_name": "WALL Y1",
+          "surface_type": "Wall",
+          "tilt_deg": {
+            "value": 90.0,
+            "value_bits": "4056800000000000",
+            "value_class": "finite"
+          },
+          "zone_id": 4,
+          "zone_name": "ZONEONE"
+        }
+      ],
+      "declared_context": {
+        "enclosure_index": 7,
+        "native_zone_index": 1,
+        "zone_id": 4,
+        "zone_name": "ZONEONE"
+      },
+      "id": "CON-template-B-BOTH-24H",
+      "lane": "CON-membership-template-declared-geometry-unit",
+      "result": {
+        "Native_outcome_inferred": false,
+        "counted_as_PASS": false,
+        "owner_available": true,
+        "scope_error": null,
+        "snapshot": {
+          "F": [
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.08333333333333333,
+              "value_bits": "3fb5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.08695652173913043,
+              "value_bits": "3fb642c8590b2164",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.09090909090909091,
+              "value_bits": "3fb745d1745d1746",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.09523809523809523,
+              "value_bits": "3fb8618618618618",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.1,
+              "value_bits": "3fb999999999999a",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.12,
+              "value_bits": "3fbeb851eb851eb8",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.13043478260869565,
+              "value_bits": "3fc0b21642c8590b",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.13636363636363635,
+              "value_bits": "3fc1745d1745d174",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.14285714285714285,
+              "value_bits": "3fc2492492492492",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.15,
+              "value_bits": "3fc3333333333333",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.16,
+              "value_bits": "3fc47ae147ae147b",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.16666666666666666,
+              "value_bits": "3fc5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.18181818181818182,
+              "value_bits": "3fc745d1745d1746",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.19047619047619047,
+              "value_bits": "3fc8618618618618",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2,
+              "value_bits": "3fc999999999999a",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2,
+              "value_bits": "3fc999999999999a",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.20833333333333334,
+              "value_bits": "3fcaaaaaaaaaaaab",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.21739130434782608,
+              "value_bits": "3fcbd37a6f4de9bd",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.23809523809523808,
+              "value_bits": "3fce79e79e79e79e",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.25,
+              "value_bits": "3fd0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.24,
+              "value_bits": "3fceb851eb851eb8",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.25,
+              "value_bits": "3fd0000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2608695652173913,
+              "value_bits": "3fd0b21642c8590b",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2727272727272727,
+              "value_bits": "3fd1745d1745d174",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            },
+            {
+              "value": 0.3,
+              "value_bits": "3fd3333333333333",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.28,
+              "value_bits": "3fd1eb851eb851ec",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.2916666666666667,
+              "value_bits": "3fd2aaaaaaaaaaab",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.30434782608695654,
+              "value_bits": "3fd37a6f4de9bd38",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.3181818181818182,
+              "value_bits": "3fd45d1745d1745d",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.3333333333333333,
+              "value_bits": "3fd5555555555555",
+              "value_class": "finite"
+            },
+            {
+              "value": 0.0,
+              "value_bits": "0000000000000000",
+              "value_class": "positive_zero"
+            }
+          ],
+          "F_layout": "actual Rust row-first F(j,i), flat offset j*N+i",
+          "F_shape": [
+            6,
+            6
+          ],
+          "ZoneArea": [
+            {
+              "value": 25.0,
+              "value_bits": "4039000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 24.0,
+              "value_bits": "4038000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 23.0,
+              "value_bits": "4037000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 22.0,
+              "value_bits": "4036000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 21.0,
+              "value_bits": "4035000000000000",
+              "value_class": "finite"
+            },
+            {
+              "value": 20.0,
+              "value_bits": "4034000000000000",
+              "value_class": "finite"
+            }
+          ],
+          "context": {
+            "enclosure_index": 7,
+            "zone_id": 4
+          },
+          "ordered_surface_ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "warnings": []
+        },
+        "status": "source-returned"
+      }
+    }
+  ],
+  "numerical_PASS_claimed": false,
+  "observation_policy": {
+    "arithmetic_profiles_by_variable": {
+      "F": {
+        "atol": 0.0,
+        "rtol": 0.0,
+        "shape_exact": true,
+        "signed_zero_exact": true,
+        "value_class_exact": true
+      },
+      "ZoneArea": {
+        "atol": 0.0,
+        "rtol": 0.0,
+        "shape_exact": true,
+        "signed_zero_exact": true,
+        "value_class_exact": true
+      }
+    },
+    "copied_input_bits_and_owner_ids_exact": true,
+    "full_engine_geometry_or_RAD02_RAD03_claimed": false,
+    "required_reached_owner_absence_fails": true,
+    "row_first_F_destination_source_layout": true,
+    "scope": "direct-declared-geometry-CalcApproximateViewFactors-only",
+    "unreached_owner_counted_as_PASS": false,
+    "warning_identity_and_order_exact": true
+  },
+  "projection": {
+    "path": ".runtime/porting/RAD-01/frozen-packet-02/projection.json",
+    "sha256": "a148b401e2b6af8b1651074aedad0ca98ce15a11af17bcaecdd68396789da361",
+    "size_bytes": 5163
+  },
+  "requested_counts": {
+    "CalcApproximateViewFactors": 21,
+    "model_cases": 21
+  },
+  "runtime_source_bindings": {
+    "path": ".runtime/porting/RAD-01/candidate-launch-inputs-01/runtime-source-bindings.json",
+    "sha256": "5a3fe725453acc363a78d4b226ee389796c5755c3f2fd1f1ddf177baaf68d30a",
+    "size_bytes": 2274
+  },
+  "schema": "rad01-candidate-unit-observer-results.v1",
+  "source_authorities": {
+    "actual_scope_amendment": {
+      "path": ".runtime/porting/RAD-01/scope-amendment-02/amendment.json",
+      "sha256": "18c8882af64d38926e7ec56e1b2920944c4124a727f85d84db21637dc7551952",
+      "size_bytes": 3690
+    },
+    "actual_scope_amendment_execution": {
+      "path": ".runtime/porting/RAD-01/scope-check-command-02/receipt.json",
+      "sha256": "59d43659d5662573fe99db3e0c8e46cd5a277aad0e40e1fa3b3544034c303b68",
+      "size_bytes": 2874
+    },
+    "actual_scope_check_role": "real-RAD-01-check-only",
+    "current_after_documents": [
+      {
+        "path": "energyplus_porting_plan/plan.json",
+        "sha256": "997a7407cb3e516ce7729a45b23767a04971c10ddb2d76b005f07a6f1f568f31",
+        "size_bytes": 731167
+      },
+      {
+        "path": "energyplus_porting_plan/cards/RAD-01.md",
+        "sha256": "578f3adcf3fe4028334cef45261609b119426197fa446c7f0133ea69b925569a",
+        "size_bytes": 5064
+      }
+    ],
+    "current_card": {
+      "path": "energyplus_porting_plan/cards/RAD-01.md",
+      "sha256": "578f3adcf3fe4028334cef45261609b119426197fa446c7f0133ea69b925569a",
+      "size_bytes": 5064
+    },
+    "historical_before_documents": [
+      {
+        "path": ".runtime/porting/RAD-01/scope-amendment-02/before/plan.json",
+        "sha256": "10f2a9b78107fdbb3d65b658d4578cd9dd1f2c69ba31c6fd01d7bbd9081575ad",
+        "size_bytes": 730031
+      },
+      {
+        "path": ".runtime/porting/RAD-01/scope-amendment-02/before/RAD-01.md",
+        "sha256": "27d751313190f01319c0e46dd1fbca12735df841553e783b766d0a34bb467ea1",
+        "size_bytes": 4408
+      }
+    ],
+    "input_fixture_proposal": {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/input-fixture-proposal.json",
+      "sha256": "5bf064f4f61f7e271f6f5a1306855c3e986d942cf859faf152ab5e6d5e4146f7",
+      "size_bytes": 38084
+    },
+    "native_helper_source_manifest": {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-02/manifest.json",
+      "sha256": "b4e10bd483af44f6f5d0b6f5fa13051d106d6d672d1ec0af1b79bbf5d5986b89",
+      "size_bytes": 24281
+    },
+    "observation_policy_proposal": {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/observation-policy-proposal.json",
+      "sha256": "7dfb0ccc1b50f34c8a7e30a0e34369e022faa79c507f41c60b47d2b5bad4d5a4",
+      "size_bytes": 710
+    },
+    "scope_recorder_role": "validated-already-Root-authored-documents; did-not-author-amendment",
+    "writer_source_manifest": {
+      "path": ".runtime/porting/RAD-01/input-writer-prep-03/manifest.json",
+      "sha256": "c3f140b8b4384e61a1fc5ba5e198b4f1facc39082f1521b68c895ea53974aace",
+      "size_bytes": 23365
+    }
+  }
+}

@@ -304,10 +304,7 @@ pub enum ApproximateViewFactorScopeError {
 
 impl std::fmt::Display for ApproximateViewFactorScopeError {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            formatter,
-            "selected approximate view factors unavailable: {self:?}"
-        )
+        write!(formatter, "selected approximate view factors unavailable: {self:?}")
     }
 }
 
@@ -324,50 +321,35 @@ pub fn calculate_selected_approximate_view_factors(
     context: ApproximateViewFactorContext,
     surfaces: &[ApproximateViewFactorSurface],
 ) -> Result<ApproximateViewFactors, ApproximateViewFactorScopeError> {
-    let matrix_size = surfaces
-        .len()
-        .checked_mul(surfaces.len())
+    let matrix_size = surfaces.len().checked_mul(surfaces.len())
         .ok_or(ApproximateViewFactorScopeError::MatrixSizeOverflow)?;
     for (index, surface) in surfaces.iter().enumerate() {
         if surface.zone_id != context.zone_id {
-            return Err(ApproximateViewFactorScopeError::ZoneMismatch {
-                surface_index: index,
-            });
+            return Err(ApproximateViewFactorScopeError::ZoneMismatch { surface_index: index });
         }
-        if let Some(first_index) = surfaces[..index]
-            .iter()
+        if let Some(first_index) = surfaces[..index].iter()
             .position(|prior| prior.surface_id == surface.surface_id)
         {
             return Err(ApproximateViewFactorScopeError::DuplicateSurfaceId {
-                first_index,
-                duplicate_index: index,
+                first_index, duplicate_index: index,
             });
         }
     }
-    let geometry = surfaces
-        .iter()
-        .map(|surface| ViewFactorGeometry {
-            surface_type: surface.surface_type,
-            area_m2: surface.area_m2,
-            azimuth_deg: surface.azimuth_deg,
-            tilt_deg: surface.tilt_deg,
-        })
-        .collect::<Vec<_>>();
+    let geometry = surfaces.iter().map(|surface| ViewFactorGeometry {
+        surface_type: surface.surface_type,
+        area_m2: surface.area_m2,
+        azimuth_deg: surface.azimuth_deg,
+        tilt_deg: surface.tilt_deg,
+    }).collect::<Vec<_>>();
     let actual = populate_approximate_view_factors(&geometry, matrix_size);
-    let warnings = actual
-        .warning_indices
-        .into_iter()
-        .map(|surface_index| {
-            let surface = &surfaces[surface_index];
-            ApproximateViewFactorWarning {
-                surface_index,
-                surface_id: surface.surface_id,
-                surface_name: surface.surface_name.clone(),
-                zone_id: surface.zone_id,
-                zone_name: surface.zone_name.clone(),
-            }
-        })
-        .collect();
+    let warnings = actual.warning_indices.into_iter().map(|surface_index| {
+        let surface = &surfaces[surface_index];
+        ApproximateViewFactorWarning {
+            surface_index, surface_id: surface.surface_id,
+            surface_name: surface.surface_name.clone(), zone_id: surface.zone_id,
+            zone_name: surface.zone_name.clone(),
+        }
+    }).collect();
     Ok(ApproximateViewFactors {
         context,
         ordered_surface_ids: surfaces.iter().map(|surface| surface.surface_id).collect(),
@@ -394,15 +376,12 @@ struct ApproximateViewFactorKernel {
 pub(crate) fn energyplus_approximate_view_factors(
     surfaces: &[InteriorLongwaveSurfaceSnapshot],
 ) -> Vec<f64> {
-    let geometry = surfaces
-        .iter()
-        .map(|surface| ViewFactorGeometry {
-            surface_type: surface.surface_type,
-            area_m2: surface.area_m2,
-            azimuth_deg: surface.azimuth_deg,
-            tilt_deg: surface.tilt_deg,
-        })
-        .collect::<Vec<_>>();
+    let geometry = surfaces.iter().map(|surface| ViewFactorGeometry {
+        surface_type: surface.surface_type,
+        area_m2: surface.area_m2,
+        azimuth_deg: surface.azimuth_deg,
+        tilt_deg: surface.tilt_deg,
+    }).collect::<Vec<_>>();
     // The legacy probe has no actual IDs/names or diagnostic backend. It borrows
     // the same arithmetic, without inventing metadata for the new public owner.
     populate_approximate_view_factors(&geometry, surfaces.len() * surfaces.len()).view_factors
@@ -437,11 +416,7 @@ fn populate_approximate_view_factors(
             }
         }
     }
-    ApproximateViewFactorKernel {
-        zone_area_seen_m2,
-        view_factors,
-        warning_indices,
-    }
+    ApproximateViewFactorKernel { zone_area_seen_m2, view_factors, warning_indices }
 }
 
 fn energyplus_surface_sees_surface(

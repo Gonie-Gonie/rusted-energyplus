@@ -1,0 +1,25 @@
+# RAD-01 candidate unit observer source proposal
+
+This held proposal adds only an `ep_run` test example and its field copier. It calls the accepted public `calculate_selected_approximate_view_factors` exactly once for each authentic frozen declared-geometry row. It constructs actual typed `SurfaceId`/`ZoneId` objects, retains the registry order and supplies the frozen complete pointer permutation unchanged. `ZoneArea`, destination-row/source-column `F`, returned context/ordered IDs and ordered typed warning records are copied from the actual return owner. The copier does not evaluate visibility, areas, division, warning predicates or global diagnostics.
+
+Root must apply the already reviewed public Rust source and these two files only after genuine Native OriginalDataQA release. The canonical public API is currently absent; this source preparation is not an application or build. Runtime formatted source SHA values are supplied by Root through the existing source-binding inventory. The inventory contains exactly the two observer paths and ten ordered API paths declared in `fields.rs`; the comparer must join them to the genuine Cargo source snapshot and executable artifact.
+
+The future example command has exactly five arguments after the executable:
+
+```text
+<actual Cargo example executable> <frozen request relative path> <request SHA> <frozen admission relative path> <admission SHA> <runtime source inventory path>
+```
+
+The runtime inventory schema is `rad01-candidate-unit-runtime-source-bindings.v1`, with exactly `schema`, `observer_sources` and `actual_public_API_sources`. No future identities or artifact outcomes are present here. The observer authenticates request/admission/projection and the existing one-way three-contract DAG, source/current-scope documents, actual six admitted Native source references, held fixture/policy and all runtime sources before and after its calls. Small metadata is bounded by 16000000 bytes; input/source identities by 64000000 bytes. It reads no Native result, baseline result or expected array.
+
+The output schema is `rad01-candidate-unit-observer-results.v1`. Each row has actual typed registry and pointer-order inputs, `actual_source_invoked`, the literal public API name, and `result`. A real `Ok` has `owner_available:true`, status `source-returned` and the copied snapshot; a real typed `Err` has status `scope-error-returned`, a debug error identity, null snapshot and no PASS. Actual invocation count derives from the produced invocation ledger. Every scalar retains decimal/bits/class; nonfinite values retain null decimal. Matrix shape is copied from the returned ordered owner length and checked by the comparer rather than used to fabricate values.
+
+The Rust warning owner contains zero-based position, opaque surface/zone IDs and names. It has no observed Native global severity, message indices, backend text or seen-area scalar. The comparer must require exact identity/count/order against actual Native warning markers while leaving the real Native diagnostic backend/text as unpaired context. Zero warning records are not assumed in advance. Native stop, absent owner, Rust scope error or missing row cannot become numerical PASS.
+
+All 21 rows are unit declarations. The six CON-name templates do not establish actual full-engine geometry, enclosure admission or a production path. This example has no production injection or runtime activation, FixViewFactors/RAD-02, ScriptF/RAD-03, cache or gate update. No scientific helper, build, formatter, test or target was run while authoring this hold.
+
+The old canonical helper is private and returns only `F`; it has no public ZoneArea/warning/context owners. It is explicitly unavailable to this external example. There is no fabricated old-API baseline owner or new visibility exposure. Root can preserve that gap before applying the reviewed public API.
+
+Base authored the public RAD arithmetic and Native helper/passive collector. Header authored this candidate transport and copier. Future source peers and actual same-input comparisons are separate obligations, and this package is not an independent formula certificate.
+
+Fresh02 replaces only the held Native02 and freezer03 SHA pins after the genuine failed Native01 formatting build. All typed input/call/copier/output behavior, profiles and runtime API10 paths are unchanged; fields.rs is byte-exact01. Historical01 remains immutable. Current scope uses the genuine successful-build-only flag in the reviewed freezer/QA contract; no scientific execution or outcome is inferred.

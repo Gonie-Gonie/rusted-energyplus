@@ -1,0 +1,761 @@
+{
+  "schema": "rad01-unit-comparison.v1",
+  "status": "pass-selected-approximate-view-factors",
+  "started_utc": "2026-10-11T01:23:07.949008+00:00",
+  "finished_utc": "2026-10-11T01:23:08.325906+00:00",
+  "reviewed_Original_data_review": {
+    "path": ".runtime/porting/RAD-01/original-data-review-02/review.json",
+    "sha256": "77e4b9421e662bf403d1584bf7af4c0be59600a26839e183455ab5e9174af319",
+    "size_bytes": 7604
+  },
+  "reviewed_Original_data_review_execution": {
+    "path": ".runtime/porting/RAD-01/original-data-review-command-02/receipt.json",
+    "sha256": "4c54e61292168985ce53a765a44e8acb8f3d3fd1c1e76db737276688c09f4c02",
+    "size_bytes": 4162
+  },
+  "reviewed_Native_results": {
+    "path": ".runtime/porting/RAD-01/native-unit-output-02/rad01-helper-results.json",
+    "sha256": "99e3215de15633daf28fd09a8dbcd173d6174b192b5adde51c2bf377b00ec58a",
+    "size_bytes": 205984
+  },
+  "reviewed_Native_execution": {
+    "path": ".runtime/porting/RAD-01/native-unit-command-02/receipt.json",
+    "sha256": "6d2762f05363b253ddfadb199f1a4a612d8f15c742c1a701fe139e1fc14787dd",
+    "size_bytes": 3173
+  },
+  "reviewed_request": {
+    "path": ".runtime/porting/RAD-01/frozen-packet-02/helper-request.json",
+    "sha256": "a614ee77cd37acb35d8e1f6a44930130eb1214efdd3189da5f05e150235c957c",
+    "size_bytes": 36373
+  },
+  "reviewed_projection": {
+    "path": ".runtime/porting/RAD-01/frozen-packet-02/projection.json",
+    "sha256": "a148b401e2b6af8b1651074aedad0ca98ce15a11af17bcaecdd68396789da361",
+    "size_bytes": 5163
+  },
+  "reviewed_contracts": {
+    "source": {
+      "path": ".runtime/porting/RAD-01/frozen-packet-02/source.json",
+      "sha256": "a24be68e2ed62eb9d9f3f9dfbe282927c669e62ff786f9b1b51ae9ad0e9c27ca",
+      "size_bytes": 12909
+    },
+    "cases": {
+      "path": ".runtime/porting/RAD-01/frozen-packet-02/cases.json",
+      "sha256": "22803157955aa591a8479edb4729faecd3a6a19be88f50e0deade6b2489719f1",
+      "size_bytes": 1297
+    },
+    "tolerances": {
+      "path": ".runtime/porting/RAD-01/frozen-packet-02/tolerances.json",
+      "sha256": "3e477ed896353f1eaaefd8d4cd287bf9b0af11053fe7291386631503c1bd085c",
+      "size_bytes": 1323
+    }
+  },
+  "actual_packet_freeze": {
+    "path": ".runtime/porting/RAD-01/frozen-packet-02/freeze-receipt.json",
+    "sha256": "3fd04656d897306acb216fd2df56e121014c7402d20f50e7b22145c33ff73cd0",
+    "size_bytes": 15336
+  },
+  "actual_packet_freeze_execution": {
+    "path": ".runtime/porting/RAD-01/freeze-command-02/receipt.json",
+    "sha256": "6ee6ba94380decb69ae4a95e7d083c52edb113b601b566d74502de2d78fa5e67",
+    "size_bytes": 3654
+  },
+  "actual_scope_amendment": {
+    "path": ".runtime/porting/RAD-01/scope-amendment-02/amendment.json",
+    "sha256": "18c8882af64d38926e7ec56e1b2920944c4124a727f85d84db21637dc7551952",
+    "size_bytes": 3690
+  },
+  "actual_scope_check_execution": {
+    "path": ".runtime/porting/RAD-01/scope-check-command-02/receipt.json",
+    "sha256": "59d43659d5662573fe99db3e0c8e46cd5a277aad0e40e1fa3b3544034c303b68",
+    "size_bytes": 2874
+  },
+  "Rust_results": {
+    "path": ".runtime/porting/RAD-01/candidate-unit-command-01/stdout.log",
+    "sha256": "77ef06e3f90229d6c11e9c9b8462fbd1f249c363b353f71c53ccb456cb19de58",
+    "size_bytes": 182222
+  },
+  "Rust_execution": {
+    "path": ".runtime/porting/RAD-01/candidate-unit-command-01/receipt.json",
+    "sha256": "abb03dd77246caa431f099ba01fad58e366a32d77b276b70e64d201f93a3d934",
+    "size_bytes": 3616
+  },
+  "Rust_build_execution": {
+    "path": ".runtime/porting/RAD-01/candidate-build-command-01/receipt.json",
+    "sha256": "48c849c59e9f2ba5cff91e4dee9a60bd686ba4103fc995058831ed0c8d6ac8e0",
+    "size_bytes": 4985
+  },
+  "actual_Rust_binary": {
+    "historical_path": "target/debug/examples/rad01_candidate_unit_observer.exe",
+    "sha256": "cd4e022e5b42772ea3b98ff2a49070611eba875d7e6439d6a310b0208829b441"
+  },
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/68/688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27",
+    "sha256": "688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27"
+  },
+  "actual_source_inventory": {
+    "schema": "rad01-candidate-unit-runtime-source-bindings.v1",
+    "observer_sources": [
+      {
+        "path": "crates/ep_run/examples/rad01_candidate_unit_observer.rs",
+        "sha256": "e52941043d7e93415cc3f4a695b8f17ff811ef6d2f1804d72068f87de7f050c1",
+        "size_bytes": 15408
+      },
+      {
+        "path": "crates/ep_run/examples/rad01_candidate_unit_support/fields.rs",
+        "sha256": "703f40eca5fa106d2df40193c670508611900e7e3a4383802863f5221e2dff19",
+        "size_bytes": 3693
+      }
+    ],
+    "actual_public_API_sources": [
+      {
+        "path": "crates/ep_run/Cargo.toml",
+        "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+        "size_bytes": 524
+      },
+      {
+        "path": "crates/ep_model/src/lib.rs",
+        "sha256": "2a756532553034fb2b92c892cb2e6f3c147aa129f6dce64b63763f364cb3cee4",
+        "size_bytes": 284
+      },
+      {
+        "path": "crates/ep_model/src/ids.rs",
+        "sha256": "83b32ebf02684f459cb0a789f498de08b849b94a7072f1f5870663a4b3cca7be",
+        "size_bytes": 2029
+      },
+      {
+        "path": "crates/ep_model/src/objects/mod.rs",
+        "sha256": "cb752e4c143386ce432adc84dc8d36d8358bd0ea1b0fc2b01f240795c7ec96c1",
+        "size_bytes": 2068
+      },
+      {
+        "path": "crates/ep_model/src/objects/surfaces.rs",
+        "sha256": "54569b984efd25320447a8eecb94f351037ab6b63a5cfb31d0af1ecc225a1755",
+        "size_bytes": 6656
+      },
+      {
+        "path": "crates/ep_runtime/Cargo.toml",
+        "sha256": "bb81b5793debafd84300ec9905f0cda65ab32d216633543bab375b30a7a379e9",
+        "size_bytes": 327
+      },
+      {
+        "path": "crates/ep_runtime/src/lib.rs",
+        "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+        "size_bytes": 868
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+        "size_bytes": 1785
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/radiation.rs",
+        "sha256": "dec5d7bf1adbd13ab6535639f878b7671d1cc04305342686586799dcf5808c5c",
+        "size_bytes": 27520
+      },
+      {
+        "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+        "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+        "size_bytes": 3172
+      }
+    ]
+  },
+  "requested_counts": {
+    "model_cases": 21,
+    "CalcApproximateViewFactors": 21
+  },
+  "frozen_numeric_profiles": {
+    "ZoneArea": {
+      "atol": 0.0,
+      "rtol": 0.0,
+      "value_class_exact": true,
+      "signed_zero_exact": true,
+      "shape_exact": true
+    },
+    "F": {
+      "atol": 0.0,
+      "rtol": 0.0,
+      "value_class_exact": true,
+      "signed_zero_exact": true,
+      "shape_exact": true
+    }
+  },
+  "reviewed_observation_policy": {
+    "scope": "direct-declared-geometry-CalcApproximateViewFactors-only",
+    "arithmetic_profiles_by_variable": {
+      "ZoneArea": {
+        "atol": 0.0,
+        "rtol": 0.0,
+        "value_class_exact": true,
+        "signed_zero_exact": true,
+        "shape_exact": true
+      },
+      "F": {
+        "atol": 0.0,
+        "rtol": 0.0,
+        "value_class_exact": true,
+        "signed_zero_exact": true,
+        "shape_exact": true
+      }
+    },
+    "copied_input_bits_and_owner_ids_exact": true,
+    "warning_identity_and_order_exact": true,
+    "required_reached_owner_absence_fails": true,
+    "unreached_owner_counted_as_PASS": false,
+    "row_first_F_destination_source_layout": true,
+    "full_engine_geometry_or_RAD02_RAD03_claimed": false
+  },
+  "actual_Native_observation_counts": {
+    "scalar_DTO_visits": 815,
+    "actual_input_snapshots": 21,
+    "actual_zone_area_callback_count": 21,
+    "actual_matrix_callback_count": 21,
+    "actual_warning_callback_count": 11,
+    "actual_diagnostic_callback_count": 22,
+    "omitted_warning_records": 0,
+    "omitted_diagnostic_records": 0,
+    "model_cases": 21,
+    "actual_source_invocations": 21,
+    "returned_ZoneArea_owners": 21,
+    "returned_F_owners": 21,
+    "retained_warning_records": 11,
+    "retained_diagnostic_records": 22,
+    "actual_source_status_counts": {
+      "source_returned": 21
+    },
+    "actual_constructor_status_counts": {
+      "source_returned": 21
+    },
+    "actual_member_seed_status_counts": {
+      "source_returned": 21
+    }
+  },
+  "actual_Rust_API_invocations": 21,
+  "Native_source_outcomes_and_global_diagnostics_context_only": [
+    {
+      "model_id": "asymmetric-areas",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/asymmetric-areas.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    },
+    {
+      "model_id": "azimuth-at10",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [
+        {
+          "actual_callback_ordinal": 1,
+          "actual_error_level": 2,
+          "message": "CalcApproximateViewFactors: Zero area for all other zone surfaces."
+        },
+        {
+          "actual_callback_ordinal": 2,
+          "actual_error_level": 0,
+          "message": "Happens for Surface=\"surface-9\" in Zone=selected-zone"
+        },
+        {
+          "actual_callback_ordinal": 3,
+          "actual_error_level": 2,
+          "message": "CalcApproximateViewFactors: Zero area for all other zone surfaces."
+        },
+        {
+          "actual_callback_ordinal": 4,
+          "actual_error_level": 0,
+          "message": "Happens for Surface=\"surface-2\" in Zone=selected-zone"
+        }
+      ],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/azimuth-at10.err",
+        "sha256": "8483e044ef513b78577bc518a4fe2fe134034d8ecc54c4c7bc008460cc87305e",
+        "size_bytes": 328
+      },
+      "actual_TotalWarningErrors": 2
+    },
+    {
+      "model_id": "azimuth-above10",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/azimuth-above10.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    },
+    {
+      "model_id": "azimuth-at350",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [
+        {
+          "actual_callback_ordinal": 1,
+          "actual_error_level": 2,
+          "message": "CalcApproximateViewFactors: Zero area for all other zone surfaces."
+        },
+        {
+          "actual_callback_ordinal": 2,
+          "actual_error_level": 0,
+          "message": "Happens for Surface=\"surface-9\" in Zone=selected-zone"
+        },
+        {
+          "actual_callback_ordinal": 3,
+          "actual_error_level": 2,
+          "message": "CalcApproximateViewFactors: Zero area for all other zone surfaces."
+        },
+        {
+          "actual_callback_ordinal": 4,
+          "actual_error_level": 0,
+          "message": "Happens for Surface=\"surface-2\" in Zone=selected-zone"
+        }
+      ],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/azimuth-at350.err",
+        "sha256": "8483e044ef513b78577bc518a4fe2fe134034d8ecc54c4c7bc008460cc87305e",
+        "size_bytes": 328
+      },
+      "actual_TotalWarningErrors": 2
+    },
+    {
+      "model_id": "azimuth-below350",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/azimuth-below350.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    },
+    {
+      "model_id": "tilt-at10",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [
+        {
+          "actual_callback_ordinal": 1,
+          "actual_error_level": 2,
+          "message": "CalcApproximateViewFactors: Zero area for all other zone surfaces."
+        },
+        {
+          "actual_callback_ordinal": 2,
+          "actual_error_level": 0,
+          "message": "Happens for Surface=\"surface-9\" in Zone=selected-zone"
+        },
+        {
+          "actual_callback_ordinal": 3,
+          "actual_error_level": 2,
+          "message": "CalcApproximateViewFactors: Zero area for all other zone surfaces."
+        },
+        {
+          "actual_callback_ordinal": 4,
+          "actual_error_level": 0,
+          "message": "Happens for Surface=\"surface-2\" in Zone=selected-zone"
+        }
+      ],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/tilt-at10.err",
+        "sha256": "8483e044ef513b78577bc518a4fe2fe134034d8ecc54c4c7bc008460cc87305e",
+        "size_bytes": 328
+      },
+      "actual_TotalWarningErrors": 2
+    },
+    {
+      "model_id": "tilt-above10",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/tilt-above10.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    },
+    {
+      "model_id": "azimuth-360",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [
+        {
+          "actual_callback_ordinal": 1,
+          "actual_error_level": 2,
+          "message": "CalcApproximateViewFactors: Zero area for all other zone surfaces."
+        },
+        {
+          "actual_callback_ordinal": 2,
+          "actual_error_level": 0,
+          "message": "Happens for Surface=\"surface-9\" in Zone=selected-zone"
+        },
+        {
+          "actual_callback_ordinal": 3,
+          "actual_error_level": 2,
+          "message": "CalcApproximateViewFactors: Zero area for all other zone surfaces."
+        },
+        {
+          "actual_callback_ordinal": 4,
+          "actual_error_level": 0,
+          "message": "Happens for Surface=\"surface-2\" in Zone=selected-zone"
+        }
+      ],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/azimuth-360.err",
+        "sha256": "8483e044ef513b78577bc518a4fe2fe134034d8ecc54c4c7bc008460cc87305e",
+        "size_bytes": 328
+      },
+      "actual_TotalWarningErrors": 2
+    },
+    {
+      "model_id": "floor-floor-roof",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/floor-floor-roof.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    },
+    {
+      "model_id": "positive-below-epsilon",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/positive-below-epsilon.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    },
+    {
+      "model_id": "nonpositive-diagnostic",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [
+        {
+          "actual_callback_ordinal": 1,
+          "actual_error_level": 2,
+          "message": "CalcApproximateViewFactors: Zero area for all other zone surfaces."
+        },
+        {
+          "actual_callback_ordinal": 2,
+          "actual_error_level": 0,
+          "message": "Happens for Surface=\"surface-99\" in Zone=selected-zone"
+        },
+        {
+          "actual_callback_ordinal": 3,
+          "actual_error_level": 2,
+          "message": "CalcApproximateViewFactors: Zero area for all other zone surfaces."
+        },
+        {
+          "actual_callback_ordinal": 4,
+          "actual_error_level": 0,
+          "message": "Happens for Surface=\"surface-2\" in Zone=selected-zone"
+        }
+      ],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/nonpositive-diagnostic.err",
+        "sha256": "b191a683893b8c4c6e82f66ff0e064865d90476159588cd8f697e45cc9cf7e82",
+        "size_bytes": 329
+      },
+      "actual_TotalWarningErrors": 2
+    },
+    {
+      "model_id": "accumulation-registry-order",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/accumulation-registry-order.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    },
+    {
+      "model_id": "accumulation-pointer-permutation",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/accumulation-pointer-permutation.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    },
+    {
+      "model_id": "declared-ceiling-maps-Native-roof",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/declared-ceiling-maps-Native-roof.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    },
+    {
+      "model_id": "one-direct-surface-diagnostic",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [
+        {
+          "actual_callback_ordinal": 1,
+          "actual_error_level": 2,
+          "message": "CalcApproximateViewFactors: Zero area for all other zone surfaces."
+        },
+        {
+          "actual_callback_ordinal": 2,
+          "actual_error_level": 0,
+          "message": "Happens for Surface=\"surface-4\" in Zone=selected-zone"
+        }
+      ],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/one-direct-surface-diagnostic.err",
+        "sha256": "22bd8c998c597309c942bc4b174eddaff9e048267003892c974ecff5a8f32f8c",
+        "size_bytes": 173
+      },
+      "actual_TotalWarningErrors": 1
+    },
+    {
+      "model_id": "CON-template-A-24H",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/CON-template-A-24H.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    },
+    {
+      "model_id": "CON-template-A-72H",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/CON-template-A-72H.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    },
+    {
+      "model_id": "CON-template-B-NOLIMIT-24H",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/CON-template-B-NOLIMIT-24H.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    },
+    {
+      "model_id": "CON-template-B-FLOW-24H",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/CON-template-B-FLOW-24H.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    },
+    {
+      "model_id": "CON-template-B-CAPACITY-24H",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/CON-template-B-CAPACITY-24H.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    },
+    {
+      "model_id": "CON-template-B-BOTH-24H",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/CON-template-B-BOTH-24H.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    }
+  ],
+  "comparison": {
+    "numeric_comparisons": 378,
+    "discrete_comparisons": 2115,
+    "mismatch_count": 0,
+    "mismatch_categories": {
+      "discrete_comparisons": 2115,
+      "numeric_comparisons": 378,
+      "warning_vector_pairings": 21
+    },
+    "metrics": {
+      "ZoneArea": {
+        "count": 71,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "F": {
+        "count": 307,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "mismatch_samples": [],
+    "mismatch_samples_omitted": 0,
+    "unavailable_observations": [],
+    "unavailable_counted_as_PASS": false
+  },
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/RAD-01/comparer-prep-02/compare_unit.py",
+      "archive": {
+        "path": ".runtime/porting/RAD-01/unit-comparison-01/000-compare_unit.py",
+        "sha256": "88d74d290713af9cea59add806390c49d33d94da0edc2525e01a3b1b74cf9328",
+        "size_bytes": 28722
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/RAD-01/comparer-prep-02/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/RAD-01/unit-comparison-01/001-packet_io.py",
+        "sha256": "d038fcddb3319eb0494e059ffdd5453355ceff2494872c96c5d60c2492d623c9",
+        "size_bytes": 3893
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/RAD-01/comparer-prep-02/shape.py",
+      "archive": {
+        "path": ".runtime/porting/RAD-01/unit-comparison-01/002-shape.py",
+        "sha256": "682a2ed4fd087cbbcdff05fef90ea6aa7bec6b618b12d72aca4fa87dc3b1d15d",
+        "size_bytes": 14075
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/RAD-01/unit-comparison-01/000-compare_unit.py",
+    "sha256": "88d74d290713af9cea59add806390c49d33d94da0edc2525e01a3b1b74cf9328",
+    "size_bytes": 28722
+  },
+  "selected_declared_geometry_unit_PASS_claimed": true,
+  "complete_RAD01_PASS_claimed": false,
+  "warning_identity_count_and_order_required": true,
+  "Native_global_diagnostic_backend_or_text_certified": false,
+  "full_engine_production_geometry_certified": false,
+  "RAD02_RAD03_or_production_integration_certified": false,
+  "Native_flags_answers_or_expected_arrays_injected_into_Rust": false,
+  "scientific_engine_or_view_factor_evaluator_invoked": false,
+  "Rust_binary_payload_rehashed": true,
+  "Native_binary_payloads_read_or_rehashed": false,
+  "gates_updated": false,
+  "authorship_limits": "Base authored Native/Rust RAD arithmetic; Header authored candidate transport and comparison glue. This is selected actual-data comparison, not an independent formula certificate."
+}

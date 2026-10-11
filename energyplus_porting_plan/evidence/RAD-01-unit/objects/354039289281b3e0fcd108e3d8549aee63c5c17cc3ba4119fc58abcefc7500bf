@@ -1,0 +1,214 @@
+maps-Native-roof",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/declared-ceiling-maps-Native-roof.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    },
+    {
+      "model_id": "one-direct-surface-diagnostic",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [
+        {
+          "actual_callback_ordinal": 1,
+          "actual_error_level": 2,
+          "message": "CalcApproximateViewFactors: Zero area for all other zone surfaces."
+        },
+        {
+          "actual_callback_ordinal": 2,
+          "actual_error_level": 0,
+          "message": "Happens for Surface=\"surface-4\" in Zone=selected-zone"
+        }
+      ],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/one-direct-surface-diagnostic.err",
+        "sha256": "22bd8c998c597309c942bc4b174eddaff9e048267003892c974ecff5a8f32f8c",
+        "size_bytes": 173
+      },
+      "actual_TotalWarningErrors": 1
+    },
+    {
+      "model_id": "CON-template-A-24H",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/CON-template-A-24H.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    },
+    {
+      "model_id": "CON-template-A-72H",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/CON-template-A-72H.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    },
+    {
+      "model_id": "CON-template-B-NOLIMIT-24H",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/CON-template-B-NOLIMIT-24H.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    },
+    {
+      "model_id": "CON-template-B-FLOW-24H",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/CON-template-B-FLOW-24H.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    },
+    {
+      "model_id": "CON-template-B-CAPACITY-24H",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/CON-template-B-CAPACITY-24H.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    },
+    {
+      "model_id": "CON-template-B-BOTH-24H",
+      "actual_source_invoked": true,
+      "call_outcome": {
+        "exception_message": null,
+        "exception_type": null,
+        "status": "source_returned"
+      },
+      "diagnostics": [],
+      "err_stream": {
+        "path": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/RAD-01/native-unit-output-02/CON-template-B-BOTH-24H.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_TotalWarningErrors": 0
+    }
+  ],
+  "comparison": {
+    "numeric_comparisons": 378,
+    "discrete_comparisons": 2115,
+    "mismatch_count": 0,
+    "mismatch_categories": {
+      "discrete_comparisons": 2115,
+      "numeric_comparisons": 378,
+      "warning_vector_pairings": 21
+    },
+    "metrics": {
+      "ZoneArea": {
+        "count": 71,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "F": {
+        "count": 307,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "mismatch_samples": [],
+    "mismatch_samples_omitted": 0,
+    "unavailable_observations": [],
+    "unavailable_counted_as_PASS": false
+  },
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/RAD-01/comparer-prep-02/compare_unit.py",
+      "archive": {
+        "path": ".runtime/porting/RAD-01/unit-comparison-01/000-compare_unit.py",
+        "sha256": "88d74d290713af9cea59add806390c49d33d94da0edc2525e01a3b1b74cf9328",
+        "size_bytes": 28722
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/RAD-01/comparer-prep-02/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/RAD-01/unit-comparison-01/001-packet_io.py",
+        "sha256": "d038fcddb3319eb0494e059ffdd5453355ceff2494872c96c5d60c2492d623c9",
+        "size_bytes": 3893
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/RAD-01/comparer-prep-02/shape.py",
+      "archive": {
+        "path": ".runtime/porting/RAD-01/unit-comparison-01/002-shape.py",
+        "sha256": "682a2ed4fd087cbbcdff05fef90ea6aa7bec6b618b12d72aca4fa87dc3b1d15d",
+        "size_bytes": 14075
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/RAD-01/unit-comparison-01/000-compare_unit.py",
+    "sha256": "88d74d290713af9cea59add806390c49d33d94da0edc2525e01a3b1b74cf9328",
+    "size_bytes": 28722
+  },
+  "selected_declared_geometry_unit_PASS_claimed": true,
+  "complete_RAD01_PASS_claimed": false,
+  "warning_identity_count_and_order_required": true,
+  "Native_global_diagnostic_backend_or_text_certified": false,
+  "full_engine_production_geometry_certified": false,
+  "RAD02_RAD03_or_production_integration_certified": false,
+  "Native_flags_answers_or_expected_arrays_injected_into_Rust": false,
+  "scientific_engine_or_view_factor_evaluator_invoked": false,
+  "Rust_binary_payload_rehashed": true,
+  "Native_binary_payloads_read_or_rehashed": false,
+  "gates_updated": false,
+  "authorship_limits": "Base authored Native/Rust RAD arithmetic; Header authored candidate transport and comparison glue. This is selected actual-data comparison, not an independent formula certificate."
+}
+{"receipt": {"path": ".runtime/porting/RAD-01/unit-comparison-command-01/receipt.json", "sha256": "a79df754a434969738be1e0300f4e538bbe7cb6378ace5578613ce6de8e3b7e3"}, "exit_code": 0, "source_bytes_match_before_and_after": true}

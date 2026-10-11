@@ -1,0 +1,8 @@
+--- .runtime/porting/RAD-01/rust-observer-prep-02/before-01/README.md
++++ .runtime/porting/RAD-01/rust-observer-prep-02/README.md
+@@ -21,3 +21,5 @@
+ The old canonical helper is private and returns only `F`; it has no public ZoneArea/warning/context owners. It is explicitly unavailable to this external example. There is no fabricated old-API baseline owner or new visibility exposure. Root can preserve that gap before applying the reviewed public API.
+ 
+ Base authored the public RAD arithmetic and Native helper/passive collector. Header authored this candidate transport and copier. Future source peers and actual same-input comparisons are separate obligations, and this package is not an independent formula certificate.
++
++Fresh02 replaces only the held Native02 and freezer03 SHA pins after the genuine failed Native01 formatting build. All typed input/call/copier/output behavior, profiles and runtime API10 paths are unchanged; fields.rs is byte-exact01. Historical01 remains immutable. Current scope uses the genuine successful-build-only flag in the reviewed freezer/QA contract; no scientific execution or outcome is inferred.

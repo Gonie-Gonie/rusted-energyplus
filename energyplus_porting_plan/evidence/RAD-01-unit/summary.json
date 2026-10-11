@@ -1,0 +1,135 @@
+{
+  "schema": "rad01-selected-actual-unit-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/RAD-01-unit/manifest.json",
+    "sha256": "be9a141bc8357b778a9e99ec456dc30e5058482da19918ab2ebbc6f6810b5e00",
+    "size_bytes": 116533
+  },
+  "prior_actual_Original_baseline": {
+    "path": "energyplus_porting_plan/evidence/RAD-01-original-baseline/summary.json",
+    "sha256": "f81e56184197bf4a7645a565d5653e868934674259f853531594e9a47e1ab972",
+    "size_bytes": 3596
+  },
+  "actual_applied_source": {
+    "path": ".runtime/porting/RAD-01/applied-final-source-02/manifest.json",
+    "sha256": "c4fe04de28096aa1617fb133df9b05eb63d79e03c1288c4f8bfc0ea2183a549f",
+    "size_bytes": 7116
+  },
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/68/688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27",
+    "sha256": "688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27"
+  },
+  "actual_source_file_count": 3868,
+  "actual_Cargo_build": {
+    "path": ".runtime/porting/RAD-01/candidate-build-command-01/receipt.json",
+    "sha256": "48c849c59e9f2ba5cff91e4dee9a60bd686ba4103fc995058831ed0c8d6ac8e0",
+    "size_bytes": 4985
+  },
+  "actual_Rust_execution": {
+    "path": ".runtime/porting/RAD-01/candidate-unit-command-01/receipt.json",
+    "sha256": "abb03dd77246caa431f099ba01fad58e366a32d77b276b70e64d201f93a3d934",
+    "size_bytes": 3616
+  },
+  "actual_comparison": {
+    "path": ".runtime/porting/RAD-01/unit-comparison-01/comparison.json",
+    "sha256": "ebd57037dafcb995dd48c52a881b5ab8f85beacdb660672b81688d923ef45a07",
+    "size_bytes": 27529
+  },
+  "actual_comparison_execution": {
+    "path": ".runtime/porting/RAD-01/unit-comparison-command-01/receipt.json",
+    "sha256": "a79df754a434969738be1e0300f4e538bbe7cb6378ace5578613ce6de8e3b7e3",
+    "size_bytes": 4284
+  },
+  "model_cases": 21,
+  "actual_Native_calls_returned": 21,
+  "actual_Rust_API_invocations": 21,
+  "numeric_comparisons": 378,
+  "discrete_comparisons": 2115,
+  "mismatch_count": 0,
+  "metrics": {
+    "ZoneArea": {
+      "count": 71,
+      "finite_metric_available": true,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0,
+      "nonfinite_error_count": 0
+    },
+    "F": {
+      "count": 307,
+      "finite_metric_available": true,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0,
+      "nonfinite_error_count": 0
+    }
+  },
+  "warning_records_exact_identity_count_and_order": 11,
+  "selected_declared_geometry_unit_comparison_passed": true,
+  "quality": {
+    "format_check": {
+      "execution": {
+        "path": ".runtime/porting/RAD-01/fmt-check-command-01/receipt.json",
+        "sha256": "ec53a32970272a2fb7e25e6fbdbd2dce45d55098f885c8696593fbbfec99e883",
+        "size_bytes": 3162
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/68/688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27",
+        "sha256": "688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27"
+      }
+    },
+    "clippy": {
+      "execution": {
+        "path": ".runtime/porting/RAD-01/clippy-command-01/receipt.json",
+        "sha256": "276c58ed893cb54c6e4b20c2c4db416b89f4c32c0b921f6ab15520725b55dc8f",
+        "size_bytes": 3347
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/68/688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27",
+        "sha256": "688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27"
+      }
+    },
+    "focused_heat_balance_tests": {
+      "execution": {
+        "path": ".runtime/porting/RAD-01/focused-command-01/receipt.json",
+        "sha256": "874d181db99459a82cd6b3c22d23abec1f3a2eaabdc244b0e774d8ef00982907",
+        "size_bytes": 3335
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/68/688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27",
+        "sha256": "688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27"
+      },
+      "actual_test_result_totals": {
+        "passed": 203,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    "workspace_tests": {
+      "execution": {
+        "path": ".runtime/porting/RAD-01/workspace-command-01/receipt.json",
+        "sha256": "f8e02543d86159f84da11d2cac85ce1c73efbb6a63e28db2738cbcfa2ee70b3c",
+        "size_bytes": 3294
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/68/688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27",
+        "sha256": "688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27"
+      },
+      "actual_test_result_totals": {
+        "passed": 4808,
+        "failed": 0,
+        "ignored": 0
+      }
+    }
+  },
+  "Root_and_other_author_FULL_literal_and_formatter_and_comparer_Source_accepted": true,
+  "frozen_profiles_or_required_absence_rules_changed": false,
+  "ordinary_shared_kernel_behavior_changed": "remove EPSILON suppression; divide only when actual ordered ZoneArea is positive",
+  "old_private_F_only_public_ZoneArea_warning_context_baseline_available": false,
+  "Root_launch_preflight_01_failed_before_any_target_or_recorder": "incorrect report field spelling; preserved run-actual-candidate-01.py; corrected operational02 before actual Cargo",
+  "complete_RAD01_PASS_claimed": false,
+  "full_card_gates_updated": false,
+  "full_engine_geometry_RAD02_RAD03_or_production_integration_certified": false,
+  "Native_diagnostic_backend_text_certified": false,
+  "ordinary_fixed6_CLI_regression_pending": true,
+  "unavailable_observation_counted_as_PASS": false,
+  "Root_authored_summary_is_not_a_command_recorder": true
+}

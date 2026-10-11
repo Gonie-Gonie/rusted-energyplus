@@ -1,0 +1,11 @@
+--- .runtime/porting/RAD-01/comparer-prep-01/before/packet_io.py
++++ .runtime/porting/RAD-01/comparer-prep-02/packet_io.py
+@@ -6,7 +6,7 @@
+ from pathlib import Path
+ 
+ ROOT = Path(__file__).resolve().parents[4]
+-CTF = ROOT / ".runtime/porting/CTF-01"
++BASE = ROOT / ".runtime/porting/RAD-01"
+ TRACKED = {}
+ 
+ 

@@ -1,0 +1,418 @@
+{
+  "schema": "rad01-source-preparation.v1",
+  "card": "RAD-01",
+  "status": "held-source-only-unexecuted-proposal",
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/RAD-01/source-prep-02/new/radiation.rs",
+      "sha256": "39868c0acaf663b36df4f11067d2ee645ffad1139d2e458c233581c9ea500184",
+      "size_bytes": 27191,
+      "line_count": 697
+    },
+    {
+      "path": ".runtime/porting/RAD-01/source-prep-02/new/radiation_approximate_view_factor_tests.rs",
+      "sha256": "878b7d67710cee3b79cae8b7c342fca98db8d56b3212cd22b8f0c09a31ab81fc",
+      "size_bytes": 6999,
+      "line_count": 157
+    }
+  ],
+  "installation_proposals": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/radiation.rs",
+      "before": {
+        "path": ".runtime/porting/RAD-01/source-prep-02/before/radiation.rs",
+        "sha256": "55e0b9ccba8e2ee5f8856f8afc033ff6158c18265b6fb55ae9cea2fce78f7bde",
+        "size_bytes": 19811,
+        "line_count": 522
+      },
+      "proposed": {
+        "path": ".runtime/porting/RAD-01/source-prep-02/new/radiation.rs",
+        "sha256": "39868c0acaf663b36df4f11067d2ee645ffad1139d2e458c233581c9ea500184",
+        "size_bytes": 27191,
+        "line_count": 697
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/RAD-01/source-prep-02/diffs/radiation.rs.diff",
+        "sha256": "f257efda66f31d615d36e754049b6fa53f812db14504f5678d081a0a0ec8daf5",
+        "size_bytes": 10437,
+        "line_count": 246
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/radiation_approximate_view_factor_tests.rs",
+      "absent_before": true,
+      "proposed": {
+        "path": ".runtime/porting/RAD-01/source-prep-02/new/radiation_approximate_view_factor_tests.rs",
+        "sha256": "878b7d67710cee3b79cae8b7c342fca98db8d56b3212cd22b8f0c09a31ab81fc",
+        "size_bytes": 6999,
+        "line_count": 157
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/RAD-01/source-prep-02/diffs/radiation_approximate_view_factor_tests.rs.diff",
+        "sha256": "b9887fbd6e1cb636926f534933c9efef9398dd07464e0d6ff9eeef2316f47341",
+        "size_bytes": 7239,
+        "line_count": 160
+      }
+    }
+  ],
+  "historical_authorities": [
+    {
+      "original_path": "energyplus_porting_plan/cards/RAD-01.md",
+      "archived_content": {
+        "path": ".runtime/porting/RAD-01/source-prep-02/before/RAD-01.md",
+        "sha256": "6a0be76be4299e401380db885b65d12b37c3079e9a25a6489f5b7055e9902d37",
+        "size_bytes": 2636,
+        "line_count": 70
+      }
+    },
+    {
+      "original_path": "energyplus_porting_plan/cards/CON-01.md",
+      "archived_content": {
+        "path": ".runtime/porting/RAD-01/source-prep-02/before/CON-01.md",
+        "sha256": "ee5472f255d63e2049da8abaf42780a96a3facc94c4e565b7982a06ad11dd656",
+        "size_bytes": 6265,
+        "line_count": 114
+      }
+    },
+    {
+      "original_path": "energyplus_porting_plan/cards/GEO-02.md",
+      "archived_content": {
+        "path": ".runtime/porting/RAD-01/source-prep-02/before/GEO-02.md",
+        "sha256": "2d1446382a82b0c6f2063dfb034d8aee2f2e6e6d55c691578f3f2330b9b88d16",
+        "size_bytes": 7047,
+        "line_count": 120
+      }
+    },
+    {
+      "original_path": "energyplus_porting_plan/contracts/scope.json",
+      "archived_content": {
+        "path": ".runtime/porting/RAD-01/source-prep-02/before/scope.json",
+        "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879",
+        "size_bytes": 15325,
+        "line_count": 418
+      }
+    }
+  ],
+  "source_dependencies": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.cc",
+      "sha256": "36e3f002a5298dc4d52b9eb4697a4b07f9d9dc7c25e2434a059dcbd06eeeb3b3",
+      "size_bytes": 120027,
+      "line_count": 2118
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.hh",
+      "sha256": "ef4fd977481582cc4ada7b140b97782af7a7945010bf3e36b440e7a6b0c3e3e5",
+      "size_bytes": 11786,
+      "line_count": 208
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+      "sha256": "7eea2e660914574ce9b5b633ac2099d49b09255d6c215b84e47edccbbb5cffae",
+      "size_bytes": 113537,
+      "line_count": 1850
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "sha256": "9228be3483674ab79ea9faafffb20f5d26eecbd857d32a0c3e3d95e8247233a5",
+      "size_bytes": 22000,
+      "line_count": 1060
+    },
+    {
+      "path": "crates/ep_model/src/objects/surfaces.rs",
+      "sha256": "54569b984efd25320447a8eecb94f351037ab6b63a5cfb31d0af1ecc225a1755",
+      "size_bytes": 6656,
+      "line_count": 197
+    },
+    {
+      "path": "crates/ep_model/src/ids.rs",
+      "sha256": "83b32ebf02684f459cb0a789f498de08b849b94a7072f1f5870663a4b3cca7be",
+      "size_bytes": 2029,
+      "line_count": 61
+    },
+    {
+      "path": "crates/ep_run/src/porting_scope.rs",
+      "sha256": "66665f9026988f91a7455b0f18d8f32048572a46f8e8d8765e7d05263fcc7eeb",
+      "size_bytes": 17114,
+      "line_count": 458
+    },
+    {
+      "path": "crates/ep_runtime/src/geometry/source_geometry.rs",
+      "sha256": "c42d7c9afa4f09e700abca21c237631e51494b59206a9f54acbcf1d9ddc1d7ed",
+      "size_bytes": 11235,
+      "line_count": 334
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "ef9e101fedc4d920327a55551e4403e3ee72739b319c7d1c0523dd2d8b6bbc38",
+      "size_bytes": 1756,
+      "line_count": 70
+    },
+    {
+      "path": "crates/ep_runtime/src/lib.rs",
+      "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+      "size_bytes": 868,
+      "line_count": 41
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "833a9f5bb991874dd972e044949fee695b36b17a857d7603cc0e45921a945b09",
+      "size_bytes": 597,
+      "line_count": 30
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.cc",
+      "start_line": 1406,
+      "end_line": 1519,
+      "sha256": "a1a29a01e53f10bc25fdfa3c2e3fefdd5007fd1c8c962f826a88771ccfb6e51b",
+      "size_bytes": 6927,
+      "label": "complete CalcApproximateViewFactors body; both loops/warnings/division/deallocation",
+      "hash_kind": "exact_line_range_including_original_line_endings"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.cc",
+      "start_line": 496,
+      "end_line": 587,
+      "sha256": "4185411533e426865ea0cf1e8753bc0fa8af7f94ce162fef579988c4eb1d03c2",
+      "size_bytes": 5681,
+      "label": "radiant enclosure actual membership/order/areas/one-surface bypass",
+      "hash_kind": "exact_line_range_including_original_line_endings"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.cc",
+      "start_line": 590,
+      "end_line": 654,
+      "sha256": "74299cd9ab7b1ff1818b951b5b7addb3613328edca5832cb63ed45eb68e36b7b",
+      "size_bytes": 4366,
+      "label": "radiant solar-reuse versus raw approximate call and separate correction",
+      "hash_kind": "exact_line_range_including_original_line_endings"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.cc",
+      "start_line": 840,
+      "end_line": 914,
+      "sha256": "cbe3210226796fde9682e43cacda5fc6f2ab2d76010cd3dd360bb92a24b3919a",
+      "size_bytes": 4734,
+      "label": "solar enclosure SurfacePtr registration and actual initialized operands",
+      "hash_kind": "exact_line_range_including_original_line_endings"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.cc",
+      "start_line": 916,
+      "end_line": 954,
+      "sha256": "f521df2c7bfc17325ed0748226ff97f0d5984abe4717357e88e2c4649cbead0a",
+      "size_bytes": 1943,
+      "label": "solar one-surface bypass/user F/helper call before correction",
+      "hash_kind": "exact_line_range_including_original_line_endings"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.hh",
+      "start_line": 109,
+      "end_line": 116,
+      "sha256": "8aaf46c8e20a39ecd7c2a9f8585f6d6265129eef08d9c82cadbef43d5d678b62",
+      "size_bytes": 733,
+      "label": "exact helper declaration and SPtr binding",
+      "hash_kind": "exact_line_range_including_original_line_endings"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+      "start_line": 149,
+      "end_line": 168,
+      "sha256": "90f9ed24225a7249642e49df06f1a90dd6d0e8ceaac225c25df18fb3f4a384a1",
+      "size_bytes": 638,
+      "label": "actual Native SurfaceClass including excluded IntMass",
+      "hash_kind": "exact_line_range_including_original_line_endings"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "start_line": 604,
+      "end_line": 627,
+      "sha256": "e2066f9de8074f111d83e0e524b6368ba5c0ffa8f94131d04c2195b90f47747d",
+      "size_bytes": 448,
+      "label": "actual row-first operator/index expression",
+      "hash_kind": "exact_line_range_including_original_line_endings"
+    },
+    {
+      "path": "crates/ep_model/src/objects/surfaces.rs",
+      "start_line": 61,
+      "end_line": 72,
+      "sha256": "c3826fe7da78133834c26ac8e4f6cc31a6984309aae6413836576f9e623461e0",
+      "size_bytes": 233,
+      "label": "current selected typed opaque class domain",
+      "hash_kind": "exact_line_range_including_original_line_endings"
+    },
+    {
+      "path": "crates/ep_model/src/ids.rs",
+      "start_line": 1,
+      "end_line": 20,
+      "sha256": "636a85c60dae6ccfb080473a0125aa16761019950f48f6a4d8f2d6e03c6e61dd",
+      "size_bytes": 576,
+      "label": "actual ZoneId/SurfaceId definitions",
+      "hash_kind": "exact_line_range_including_original_line_endings"
+    },
+    {
+      "path": "crates/ep_run/src/porting_scope.rs",
+      "start_line": 158,
+      "end_line": 199,
+      "sha256": "3be5c65d1e35bba22d02075f939776988c7e7504b0c2f657183eb869d303fa7c",
+      "size_bytes": 1398,
+      "label": "CON object whitelist; excludes InternalMass/user F and representative-surface inputs",
+      "hash_kind": "exact_line_range_including_original_line_endings"
+    },
+    {
+      "path": "crates/ep_run/src/porting_scope.rs",
+      "start_line": 281,
+      "end_line": 307,
+      "sha256": "31532619dcff4b6c09dfe34e5f67f252709851eabb972b18fcd17303a8f59b24",
+      "size_bytes": 1240,
+      "label": "actual one-zone/six-surface/timestep/solar admission",
+      "hash_kind": "exact_line_range_including_original_line_endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/geometry/source_geometry.rs",
+      "start_line": 20,
+      "end_line": 25,
+      "sha256": "aaaaea3be5bffed31f82ff7118f778a89a2327b64cc3b3be92ed7b9c8eab2640",
+      "size_bytes": 290,
+      "label": "stored area and degree-angle owner fields",
+      "hash_kind": "exact_line_range_including_original_line_endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/geometry/source_geometry.rs",
+      "start_line": 247,
+      "end_line": 330,
+      "sha256": "d7ffb7034523778b4b94342c814f3b93774c5a3785728dba7687ac9c02eef1d9",
+      "size_bytes": 2463,
+      "label": "actual accepted geometry producer; no derivation in RAD01",
+      "hash_kind": "exact_line_range_including_original_line_endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "start_line": 25,
+      "end_line": 32,
+      "sha256": "963efac257aac7bcac26c47f10fdd64c53e6331bc1fdd28cb87f1d00f5a1153e",
+      "size_bytes": 179,
+      "label": "already-public radiation module",
+      "hash_kind": "exact_line_range_including_original_line_endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "start_line": 50,
+      "end_line": 61,
+      "sha256": "f205d57c441eaeb0d118ad40fb8d5ce66fd2857c5b8f3114a20b9e11dc5b16e1",
+      "size_bytes": 261,
+      "label": "already-exported radiation public items",
+      "hash_kind": "exact_line_range_including_original_line_endings"
+    },
+    {
+      "path": ".runtime/porting/RAD-01/source-prep-02/before/radiation.rs",
+      "start_line": 223,
+      "end_line": 270,
+      "sha256": "f3ab2200022c768b3390fa9da2a63dc5651f66bbf2a280128b294d381da42be8",
+      "size_bytes": 1915,
+      "label": "exact existing selected kernel/epsilon guard before proposal",
+      "hash_kind": "exact_line_range_including_original_line_endings"
+    }
+  ],
+  "readme": {
+    "path": ".runtime/porting/RAD-01/source-prep-03/README.md",
+    "sha256": "bc6a44a9c5c0260662e7aeeeaffde8672b98d16674faafe3795ba49838633db3",
+    "size_bytes": 6436,
+    "line_count": 103
+  },
+  "source_contract": {
+    "caller_supplied_actual_identity": [
+      "enclosure_index",
+      "zone_id",
+      "ordered_surface_id/name/zone_id/name/class"
+    ],
+    "caller_supplied_actual_geometry": [
+      "area_m2",
+      "azimuth_deg",
+      "tilt_deg"
+    ],
+    "outputs": [
+      "context",
+      "ordered_surface_ids",
+      "zone_area_seen_m2",
+      "view_factors",
+      "ordered_zero_seen_area_warning_records"
+    ],
+    "matrix_layout": "row-first F(j,i); zero-based offset j*N+i",
+    "arithmetic_order": "first i/j area sums and per-i <=0 warning; then zero F; then i/j visibility and >0 division",
+    "new_scope_errors_not_native_guards": [
+      "zone association mismatch",
+      "duplicate surface identity",
+      "unrepresentable square matrix length"
+    ],
+    "one_shared_kernel": true,
+    "legacy_probe_caller_signature_preserved": true,
+    "existing_non_RAD01_functions_byte_exact": true,
+    "numerical_delta": "old <=EPSILON outer skip replaced with source >0 inner division condition; no other source arithmetic fallback",
+    "diagnostic_delivery": "typed relative warning+continuation record only; global backend and global indexes unpaired"
+  },
+  "tests_proposed_not_executed": {
+    "count": 7,
+    "topics": [
+      "asymmetric directed matrix offsets and actual ID order",
+      "strict angle/tilt boundaries without normalization",
+      "floor-floor exclusion and floor-roof visibility",
+      "tiny positive area below epsilon in both shared interfaces",
+      "nonpositive diagnostic area warnings and positive-zero matrix",
+      "floating point accumulation follows caller order",
+      "association scope errors and empty direct-helper boundary"
+    ]
+  },
+  "pending": [
+    "Root full source review",
+    "other-author full source peer",
+    "actual current source rebase before application",
+    "actual scope/card amendment",
+    "genuine Native observation",
+    "actual Rust compilation and tests",
+    "RAD02 correction/RAD03 ScriptF/RAD04 exchange",
+    "actual initialized enclosure/caller/cache integration",
+    "all RAD01 gates"
+  ],
+  "restrictions_observed": {
+    "canonical_or_git_changed": false,
+    "plan_or_card_amended": false,
+    "target_or_engine_executed": false,
+    "project_imported": false,
+    "scientific_result_read": false,
+    "weather_or_binary_payload_read": false,
+    "native_expected_answers_supplied": false,
+    "actual_or_future_PASS_claimed": false
+  },
+  "predecessor_held_source": {
+    "path": ".runtime/porting/RAD-01/source-prep-01/manifest.json",
+    "sha256": "961487d2ec24722fe0cfa37b9b0466966ca823da7f268bfb903dccef3191445a",
+    "size_bytes": 15272,
+    "line_count": 390
+  },
+  "fresh02_change": "visibility first short-circuit positive-area collapse only; tests unchanged; no target execution",
+  "narrow_from_01_diffs": [
+    {
+      "path": ".runtime/porting/RAD-01/source-prep-02/from-01/radiation.rs.diff",
+      "sha256": "afcc2537ca6488d8541363029d84453f26a01ca37a4277c6108a82d2d6734061",
+      "size_bytes": 1003,
+      "line_count": 19
+    },
+    {
+      "path": ".runtime/porting/RAD-01/source-prep-02/from-01/README.md.diff",
+      "sha256": "f1834693224d449d6b921bd50edca16dec243702d9f7b52247d6452f5bea2f43",
+      "size_bytes": 765,
+      "line_count": 12
+    }
+  ],
+  "metadata_only_predecessor": {
+    "path": ".runtime/porting/RAD-01/source-prep-02/manifest.json",
+    "sha256": "aeb9acdf3105f177f7f8383296b1cb2a766c0bc3b0e6f481be159706ae9d7e01",
+    "size_bytes": 16135,
+    "line_count": 412
+  },
+  "fresh03_change": "correct local archive typed range223-270 only; all code/source diff refs literally02 unchanged"
+}

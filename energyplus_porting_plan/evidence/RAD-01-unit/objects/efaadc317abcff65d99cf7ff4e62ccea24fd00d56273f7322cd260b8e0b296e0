@@ -1,0 +1,19 @@
+--- .runtime/porting/RAD-01/rust-observer-prep-02/before-01/new/rad01_candidate_unit_observer.rs
++++ .runtime/porting/RAD-01/rust-observer-prep-02/new/rad01_candidate_unit_observer.rs
+@@ -156,14 +156,14 @@
+     }
+     let authority = &contracts["source"]["source_authorities"];
+     require(authority == &projection["source_authorities"] && authority["actual_scope_check_role"] == "real-RAD-01-check-only" &&
+-        authority["native_helper_source_manifest"]["sha256"] == "489a7caa4086722bb5057cfc8489803b21ce7723f881ffcbe54252d604e86618",
++        authority["native_helper_source_manifest"]["sha256"] == "b4e10bd483af44f6f5d0b6f5fa13051d106d6d672d1ec0af1b79bbf5d5986b89",
+         "reviewed Native source/current scope authority differs")?;
+     let native = load(&root, &authority["native_helper_source_manifest"])?;
+     for key in ["input_fixture_proposal", "observation_policy_proposal"] { same_ref(&native[key], &authority[key])?; }
+     let declared_native = rows(&native["native_source_files"])?;
+     let admitted_native = rows(&admission["native_source_files"])?;
+     require(declared_native.len() == 6 && admitted_native.len() == 6 &&
+-        authority["writer_source_manifest"]["sha256"] == "fac0f91eebebab8edd5a9feb58bd30ca9281932c04fef291274524eba9b6810c",
++        authority["writer_source_manifest"]["sha256"] == "c3f140b8b4384e61a1fc5ba5e198b4f1facc39082f1521b68c895ea53974aace",
+         "held Native source count or writer identity differs")?;
+     for (left, right) in declared_native.iter().zip(admitted_native) { same_ref(left, right)?; }
+     for key in ["native_helper_source_manifest", "input_fixture_proposal", "observation_policy_proposal", "writer_source_manifest",

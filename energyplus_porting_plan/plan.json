@@ -12098,7 +12098,7 @@
       "integration_gate": "미확인",
       "production_gate": "미확인",
       "applicability": "A/B",
-      "source_boundary_note": "파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.\n\nSelected direct-unit CalcApproximateViewFactors scope is the complete pinned function1406-1519, its actual declaration109-116 and direct warning helpers. Inputs are21 explicitly declared opaque geometry registries with actual Native1-based indices and independent Rust opaque IDs; six CON name/class templates do not represent observed production geometry or GetSurfaceData order. Preserve strict visibility10/350/tilt10 predicates, Native ordered ZoneArea accumulation, warning/continue identity and order, positive-area division, F(j,i) row-first layout and source outcomes. ZoneArea/F use separate exact zero atol/rtol profiles with class, shape and signed-zero equality; copied input bits/identities/order are exact. Reached required owner absence or an unreturned required function cannot pass. Scope excludes geometry derivation, initialized enclosures, FixViewFactors, ScriptF, radiation exchange and all full-engine integration/production claims. Genuine Native capture and OriginalDataQA precede applying the held Rust arithmetic repair. No unit or full-card PASS follows from source review, build or direct fixtures alone.\n\nSelected direct-unit CalcApproximateViewFactors scope is the complete pinned function1406-1519, its actual declaration109-116 and direct warning helpers. Inputs are21 explicitly declared opaque geometry registries with actual Native1-based indices and independent Rust opaque IDs; six CON name/class templates do not represent observed production geometry or GetSurfaceData order. Preserve strict visibility10/350/tilt10 predicates, Native ordered ZoneArea accumulation, warning/continue identity and order, positive-area division, F(j,i) row-first layout and source outcomes. ZoneArea/F use separate exact zero atol/rtol profiles with class, shape and signed-zero equality; copied input bits/identities/order are exact. Reached required owner absence or an unreturned required function cannot pass. Scope excludes geometry derivation, initialized enclosures, FixViewFactors, ScriptF, radiation exchange and all full-engine integration/production claims. Genuine Native capture and OriginalDataQA precede applying the held Rust arithmetic repair. No unit or full-card PASS follows from source review, build or direct fixtures alone.",
+      "source_boundary_note": "파일·심벌 기준의 작업 범위이다. 함수 전체가 아닌 분기 카드에서는 착수 시 해당 커밋의 실제 start/end 행과 직접 호출 helper를 고정한다. 이 작업계획은 모든 함수 본문을 잘라 검증한 소스 패킷은 아니다.\n\nSelected direct-unit CalcApproximateViewFactors scope is the complete pinned function1406-1519, its actual declaration109-116 and direct warning helpers. Inputs are21 explicitly declared opaque geometry registries with actual Native1-based indices and independent Rust opaque IDs; six CON name/class templates do not represent observed production geometry or GetSurfaceData order. Preserve strict visibility10/350/tilt10 predicates, Native ordered ZoneArea accumulation, warning/continue identity and order, positive-area division, F(j,i) row-first layout and source outcomes. ZoneArea/F use separate exact zero atol/rtol profiles with class, shape and signed-zero equality; copied input bits/identities/order are exact. Reached required owner absence or an unreturned required function cannot pass. Scope excludes geometry derivation, initialized enclosures, FixViewFactors, ScriptF, radiation exchange and all full-engine integration/production claims. Genuine Native capture and OriginalDataQA precede applying the held Rust arithmetic repair. No unit or full-card PASS follows from source review, build or direct fixtures alone.",
       "numeric_policy": "단위가 있는 수치는 변수별 atol/rtol을 계약에 고정하고 0 부근은 절대오차로 판정. 분기·ID·배열길이·타임스탬프는 정확 일치. 필요하면 원소/상태전이별 오차를 별도 제한. 하나의 포괄적인 온도/W/kg-kg 허용오차를 공유하지 않는다.",
       "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
       "source_ranges_input_only": [
@@ -12304,7 +12304,17 @@
         "model_cases": 21,
         "CalcApproximateViewFactors": 21
       },
-      "fixed_CON_real_production_geometry_unavailable": true
+      "fixed_CON_real_production_geometry_unavailable": true,
+      "actual_Original_baseline": {
+        "path": "energyplus_porting_plan/evidence/RAD-01-original-baseline/summary.json",
+        "sha256": "f81e56184197bf4a7645a565d5653e868934674259f853531594e9a47e1ab972",
+        "size_bytes": 3596
+      },
+      "actual_selected_approximate_view_factor_comparison": {
+        "path": "energyplus_porting_plan/evidence/RAD-01-unit/summary.json",
+        "sha256": "c9d8cd152e0924a2bd79d4625a165238b054cc3b40f48f41d9f513e6c99845ee",
+        "size_bytes": 5614
+      }
     },
     {
       "id": "RAD-02",

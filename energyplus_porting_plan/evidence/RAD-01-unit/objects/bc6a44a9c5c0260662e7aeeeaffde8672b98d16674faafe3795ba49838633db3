@@ -1,0 +1,103 @@
+# RAD-01 source proposal 01
+
+This is an ignored, source-only proposal for the pinned EnergyPlus 26.1.0
+`CalcApproximateViewFactors`, commit
+`6f2e40d10250a105b49966baa24d843711e61048`. No card, plan, canonical source,
+Cargo target, runtime state or execution result is changed by this preparation.
+
+## Proposed files and scope
+
+`new/radiation.rs` is the complete current radiation file with the existing
+approximate-view-factor body extracted into a shared private geometry kernel.
+The unchanged legacy probe signature and the new selected public API both use
+that one body. `new/radiation_approximate_view_factor_tests.rs` adds seven focused
+unit tests through a local cfg(test) include. No parent declaration is needed:
+heat_balance already exposes its radiation module and exports its public items.
+The exact current radiation file and historical scope/card bytes are in before/.
+
+The selected API takes the caller's actual enclosure index and ZoneId plus an
+ordered slice of actual SurfaceId/name/zone/class/area/azimuth/tilt rows. It does
+not derive geometry, sort or renumber surfaces, normalize angles or manufacture
+an enclosure. Input classes are the existing typed Wall/Floor/Roof/Ceiling
+variants. The CON object whitelist excludes InternalMass, windows, user view
+factors, representative-surface inputs and other unselected object families.
+Ceiling is a typed spelling with the same selected non-floor visibility path;
+no claim of identical native enum integers is made.
+
+Zone association, duplicate surface identity and unrepresentable square length
+are explicit Rust API scope errors. They are not invented Native guards or
+Native termination outcomes. Empty/small direct-helper unit cases do not claim
+the real initializer invokes the helper for those cases: the actual one-surface
+caller bypass remains separate. Fixed-CON production still means one zone/six
+surfaces, and this pure API does not itself certify that admission.
+
+## Source arithmetic and warning custody
+
+The first outer/inner loops retain caller pointer order and left-to-right
+`ZoneArea(i) += A(j)`. Self and floor-floor pairs are excluded; floors otherwise
+see every selected class. Other pairs require strict azimuth difference >10
+and <350, or strict tilt difference >10. No modulo-angle conversion is added.
+After each source row, `ZoneArea(i) <= 0.0` appends one typed warning record.
+The source warning call followed by its surface/zone continuation is represented
+by that record, using the actual input identities and names. Relative record
+order is retained; global diagnostic indexes/backend delivery remain unowned.
+The literal warning head is `CalcApproximateViewFactors: Zero area for all other
+zone surfaces.`; its continuation is `Happens for Surface="..." in Zone=...`.
+
+Only after all area/warning rows, F is initialized to positive zero. The second
+outer/inner loops repeat visibility and assign `F(j,i) = A(j)/ZoneArea(i)` only
+when `ZoneArea(i) > 0.0`. Flat storage is row-first, offset j*N+i with zero-based
+Rust indices, matching the actual Objexx Array2 index. The output retains both
+ZoneArea and F, unchanged context and input ID order, plus warning records.
+
+The deliberate numerical delta to the old Rust kernel is removal of its
+`<= f64::EPSILON` outer skip in favor of the exact source >0 inner guard.
+Positive tiny seen areas are divided; nonpositive areas leave zero F. IEEE
+comparisons and arithmetic are otherwise unchecked as in the selected source:
+no finite guard, output clamp, reciprocity correction or fallback is introduced.
+The shared legacy adapter copies only class/area/angles and discards the typed
+warning-index ledger because that existing interface owns no IDs/names/backend.
+It does not fabricate those metadata fields for the new API.
+
+## Seven proposed, unexecuted tests
+
+1. Asymmetric areas: actual input ID order, ZoneArea, directed F(j,i) offsets,
+   nonzero entries and positive-zero diagonal.
+2. Exact 10/350-degree and adjacent angle boundaries, tilt-only visibility,
+   and 360-degree difference without normalization.
+3. Floor-floor exclusion and same-orientation floor-roof visibility.
+4. Positive area below epsilon, with exact shared-kernel legacy/public equality.
+5. Zero/negative diagnostic areas: zero F and warning identity/name/order.
+6. Positive-area floating-point accumulation demonstrates caller order matters.
+7. Zone/duplicate association failures plus the direct empty helper boundary.
+
+These are literal-input source regression tests, not Native-generated expected
+answers or executed scientific comparisons. Negative/empty diagnostic cases do
+not expand CON production scope. No test, compiler, formatter, project import,
+engine, binary, weather payload or scientific result was executed/read here.
+
+## Boundaries still pending
+
+Actual initialized enclosure membership and class/name maps need an admitted
+caller adapter and real observation. Native InitSolarViewFactors constructs its
+own SurfacePtr sequence before the helper; InitInteriorRadExchange may instead
+reuse the already corrected solar F. Those paths must not be replaced by a
+per-zone recomputation or silently equated with this raw approximate matrix.
+RAD-02 FixViewFactors, RAD-03 ScriptF, RAD-04 exchange, initialization/cache
+wiring, backend diagnostics, genuine Native/Rust comparisons and all RAD-01
+gates remain pending. The held scope/card copies are historical authority only;
+Root must accept any actual card amendment and rebase current source identities
+before application. No current/future output hashes or PASS are supplied.
+
+Fresh02 narrow source successor preserves01. The second-pass nested visibility
+then positive-area conditions are expressed as short-circuit `&&`, with visibility
+first and identical division/assignment operands and order. This avoids a prospective
+Clippy collapsible-if concern identified during source peer; no Clippy or Rust
+target was executed. Tests and all other source bodies are unchanged.
+
+Fresh03 is metadata-only. Fresh02's local reference rebinding accidentally replaced
+the before/radiation.rs223-270 range identity with that whole archive's identity.
+This successor restores the exact48-line range hash/1915-byte length and removes
+the misleading whole-file line_count. Source01 had the correct range originally;
+all fresh02 Rust sources/tests/before/diffs remain literally referenced and unchanged.
+No project execution or current canonical mutation occurred.

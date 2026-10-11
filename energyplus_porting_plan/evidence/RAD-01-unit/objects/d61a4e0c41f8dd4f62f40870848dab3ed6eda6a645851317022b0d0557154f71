@@ -1,0 +1,51 @@
+"""Root executes the reviewed RAD01 observer/comparer with actual artifacts."""
+import hashlib,json,re,subprocess
+from pathlib import Path
+ROOT=Path.cwd(); BASE=ROOT/'.runtime/porting/RAD-01'
+def read(p): return json.loads(p.read_bytes())
+def sha(p):
+ with p.open('rb') as s: return hashlib.file_digest(s,'sha256').hexdigest()
+def ref(p): return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+def arg(p): return ref(p)['path']+'#'+sha(p)
+def write(p,v): p.write_bytes((json.dumps(v,indent=2,allow_nan=False)+'\n').encode('utf8'))
+final=BASE/'applied-final-source-02/manifest.json'
+assert sha(final)=='c4fe04de28096aa1617fb133df9b05eb63d79e03c1288c4f8bfc0ea2183a549f'
+for row in read(final)['actual_sources']:
+ assert sha(ROOT/row['canonical_path'])==row['actual_final_source']['sha256']
+source=None
+for name in ['fmt-check-command-01','clippy-command-01','focused-command-01','workspace-command-01']:
+ r=read(BASE/name/'receipt.json'); assert r['exit_code']==0 and r['launch_error'] is None and r['source_bytes_match_before_and_after']
+ if source is None: source=r['source_snapshot']
+ else: assert r['source_snapshot']==source
+qa_path=BASE/'original-data-review-02/review.json'; qa=read(qa_path)
+assert qa['Rust_baseline_released'] and qa['status']=='pass-actual-original-data-and-provenance-before-Rust'
+assert qa['actual_observation_counts']['source_status_counts']=={'source_returned':21}
+inputs=BASE/'candidate-launch-inputs-01'; inputs.mkdir()
+fields=(ROOT/'crates/ep_run/examples/rad01_candidate_unit_support/fields.rs').read_text(encoding='utf8')
+inventory={'schema':'rad01-candidate-unit-runtime-source-bindings.v1'}
+for key,constant,count in [('observer_sources','OBSERVER_PATHS',2),('actual_public_API_sources','API_PATHS',10)]:
+ block=re.search(r'const '+constant+r':.*?= &\[(.*?)\];',fields,re.S).group(1)
+ paths=re.findall(r'"([^"]+)"',block); assert len(paths)==count
+ inventory[key]=[ref(ROOT/p) for p in paths]
+write(inputs/'runtime-source-bindings.json',inventory)
+def record(name,command):
+ with (inputs/(name+'.orchestration.log')).open('xb') as s:
+  subprocess.run(['python','-X','utf8','-B','tools/porting/record_command.py','--output-dir',(BASE/name).relative_to(ROOT).as_posix(),'--',*command],check=True,stdout=s,stderr=subprocess.STDOUT)
+ r=read(BASE/name/'receipt.json')
+ assert r['exit_code']==0 and r['launch_error'] is None and r['source_bytes_match_before_and_after'] and r['source_snapshot']==source
+ print('Root actual RAD01 stage completed',name,ref(BASE/name/'receipt.json'),flush=True)
+ return r
+build=record('candidate-build-command-01',['cargo','build','--locked','--config','profile.dev.debug=0','--config','profile.test.debug=0','--config','build.incremental=false','-p','ep_run','--example','rad01_candidate_unit_observer','--message-format=json-render-diagnostics'])
+rows=[r for r in build['cargo_compiler_artifacts_capture']['rows'] if r['cargo_message']['target']['name']=='rad01_candidate_unit_observer' and 'example' in r['cargo_message']['target']['kind']]
+assert len(rows)==1; artifact=rows[0]['executable']; binary=ROOT/artifact['historical_path']; assert sha(binary)==artifact['sha256']
+request=qa['reviewed_request']; admission=qa['reviewed_native_admission_contract']
+record('candidate-unit-command-01',[str(binary),request['path'],request['sha256'],admission['path'],admission['sha256'],(inputs/'runtime-source-bindings.json').relative_to(ROOT).as_posix()])
+assert sha(binary)==artifact['sha256']
+prep=BASE/'comparer-prep-02/manifest.json'; assert sha(prep)=='98b68a058021126a6489a849a4035890e4df4de9f177b1ddf68e08523a531d00'
+for row in read(prep)['own_sources']: assert ref(ROOT/row['path'])['sha256']==row['sha256']
+reader=BASE/'comparer-prep-02/compare_unit.py'
+record('unit-comparison-command-01',['python','-X','utf8','-B',str(reader),'--approved-source-sha256',sha(reader),'--original-data-review',arg(qa_path),'--original-data-review-execution',arg(BASE/'original-data-review-command-02/receipt.json'),'--Rust-build-execution',arg(BASE/'candidate-build-command-01/receipt.json'),'--Rust-execution',arg(BASE/'candidate-unit-command-01/receipt.json'),'--Rust-results',arg(BASE/'candidate-unit-command-01/stdout.log'),'--output-dir',(BASE/'unit-comparison-01').relative_to(ROOT).as_posix()])
+comparison=read(BASE/'unit-comparison-01/comparison.json')
+assert comparison['selected_declared_geometry_unit_PASS_claimed'] and comparison['status']=='pass-selected-approximate-view-factors'
+assert not comparison['complete_RAD01_PASS_claimed'] and not comparison['gates_updated']
+print('Root actual RAD01 selected21 comparison passed; full-card obligations remain',flush=True)

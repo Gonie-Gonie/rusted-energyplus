@@ -1,0 +1,13 @@
+--- .runtime/porting/RAD-01/source-prep-02/README.md
++++ .runtime/porting/RAD-01/source-prep-03/README.md
+@@ -94,3 +94,10 @@
+ first and identical division/assignment operands and order. This avoids a prospective
+ Clippy collapsible-if concern identified during source peer; no Clippy or Rust
+ target was executed. Tests and all other source bodies are unchanged.
++
++Fresh03 is metadata-only. Fresh02's local reference rebinding accidentally replaced
++the before/radiation.rs223-270 range identity with that whole archive's identity.
++This successor restores the exact48-line range hash/1915-byte length and removes
++the misleading whole-file line_count. Source01 had the correct range originally;
++all fresh02 Rust sources/tests/before/diffs remain literally referenced and unchanged.
++No project execution or current canonical mutation occurred.

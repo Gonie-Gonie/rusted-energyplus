@@ -1,0 +1,349 @@
+"""Compare authentic RAD-01 returned owners; no view-factor or warning evaluator."""
+import argparse
+from collections import Counter
+from datetime import datetime, timezone
+import hashlib
+import importlib.util
+import json
+import math
+from pathlib import Path
+import struct
+
+PREP = Path(__file__).resolve().parent
+IO_SHA = "d038fcddb3319eb0494e059ffdd5453355ceff2494872c96c5d60c2492d623c9"
+SHAPE_SHA = "682a2ed4fd087cbbcdff05fef90ea6aa7bec6b618b12d72aca4fa87dc3b1d15d"
+QA_PREPARATION = {"path": ".runtime/porting/RAD-01/original-data-review-prep-02/manifest.json",
+                  "sha256": "661b38f57a7af736515d93b7e3debb780f69ec529e4e290b10c7269dda679fdd"}
+VARIABLES = ["ZoneArea", "F"]
+OBSERVER_PATHS = ["crates/ep_run/examples/rad01_candidate_unit_observer.rs",
+                  "crates/ep_run/examples/rad01_candidate_unit_support/fields.rs"]
+API_PATHS = ["crates/ep_run/Cargo.toml", "crates/ep_model/src/lib.rs", "crates/ep_model/src/ids.rs",
+             "crates/ep_model/src/objects/mod.rs", "crates/ep_model/src/objects/surfaces.rs",
+             "crates/ep_runtime/Cargo.toml", "crates/ep_runtime/src/lib.rs", "crates/ep_runtime/src/heat_balance/mod.rs",
+             "crates/ep_runtime/src/heat_balance/radiation.rs", "crates/ep_runtime/examples/clk02_probe_support/digest.rs"]
+
+
+class Comparison:
+    def __init__(self, need):
+        self.need = need
+        self.counts = Counter()
+        self.samples = []
+        self.unavailable = []
+        self.metrics = {key: {"count": 0, "maximum_absolute_error": 0.0, "norm": 0.0,
+                              "nonfinite_error_count": 0} for key in VARIABLES}
+
+    def failure(self, path, category, native, rust):
+        self.counts["mismatches"] += 1
+        self.counts[category] += 1
+        if len(self.samples) < 1000:
+            self.samples.append({"path": path, "category": category, "Native": native, "Rust": rust})
+
+    def exact(self, path, native, rust):
+        self.counts["discrete_comparisons"] += 1
+        if type(native) is not type(rust) or native != rust:
+            self.failure(path, "discrete_mismatches", native, rust)
+
+    def absence(self, path, native_available, rust_available, required, reason):
+        self.unavailable.append({"path": path, "Native_available": native_available, "Rust_available": rust_available,
+                                 "required": required, "reason": reason, "counted_as_PASS": False})
+        if required:
+            self.failure(path, "availability_failures", native_available, rust_available)
+
+    def dto(self, row):
+        self.need(isinstance(row, dict) and set(row) == {"value", "value_bits", "value_class"}, "Actual complete binary64 DTO required")
+        bits = row["value_bits"]
+        self.need(isinstance(bits, str) and len(bits) == 16 and all(c in "0123456789abcdef" for c in bits), "Actual binary64 bits required")
+        word = int(bits, 16)
+        value = struct.unpack(">d", word.to_bytes(8, "big"))[0]
+        kind = "nan" if math.isnan(value) else ("negative_infinity" if word >> 63 else "positive_infinity") if math.isinf(value) else (
+            "negative_zero" if word >> 63 else "positive_zero") if value == 0 else "finite"
+        self.need(row["value_class"] == kind, "Actual binary64 class differs from its bits")
+        if math.isfinite(value):
+            self.need(type(row["value"]) in (int, float) and struct.pack(">d", float(row["value"])).hex() == bits,
+                      "Actual JSON scalar differs from its bits")
+        else:
+            self.need(row["value"] is None, "Observed nonfinite must retain bits/class and null JSON decimal")
+        return value
+
+    def number(self, path, profile, native, rust):
+        left, right = self.dto(native), self.dto(rust)
+        self.exact(path + "/class", native["value_class"], rust["value_class"])
+        if left == 0.0 and right == 0.0:
+            self.exact(path + "/signed_zero_bits", native["value_bits"], rust["value_bits"])
+        if not (math.isfinite(left) and math.isfinite(right)):
+            self.absence(path, True, True, True, "actual nonfinite remains available; frozen policy supplies no nonfinite numerical PASS")
+            return
+        metric = self.metrics[profile]
+        error = abs(left - right)
+        metric["count"] += 1
+        self.counts["numeric_comparisons"] += 1
+        if not math.isfinite(error):
+            metric["nonfinite_error_count"] += 1
+        else:
+            metric["maximum_absolute_error"] = max(metric["maximum_absolute_error"], error)
+            metric["norm"] = math.hypot(metric["norm"], error)
+        if error != 0.0:
+            self.failure(path, "numeric_mismatches", native, rust)
+
+    def report(self):
+        metrics = {}
+        for key, metric in self.metrics.items():
+            available = metric["count"] > 0 and metric["nonfinite_error_count"] == 0 and math.isfinite(metric["norm"])
+            if metric["count"] == 0:
+                self.absence("metrics/" + key, False, False, True, "no finite actual observations for this frozen profile")
+            metrics[key] = {"count": metric["count"], "finite_metric_available": available,
+                            "maximum_absolute_error": metric["maximum_absolute_error"] if available else None,
+                            "RMSE": metric["norm"] / math.sqrt(metric["count"]) if available else None,
+                            "nonfinite_error_count": metric["nonfinite_error_count"]}
+        return {"numeric_comparisons": self.counts["numeric_comparisons"], "discrete_comparisons": self.counts["discrete_comparisons"],
+                "mismatch_count": self.counts["mismatches"], "mismatch_categories": dict(self.counts), "metrics": metrics,
+                "mismatch_samples": self.samples, "mismatch_samples_omitted": max(0, self.counts["mismatches"] - len(self.samples)),
+                "unavailable_observations": self.unavailable, "unavailable_counted_as_PASS": False}
+
+
+def compare_models(native, rust, request, c):
+    c.need(len(native["model_cases"]) == len(rust["model_cases"]) == len(request["model_cases"]), "Complete ordered model ledger required")
+    actual_calls = 0
+    for expected, left, right in zip(request["model_cases"], native["model_cases"], rust["model_cases"]):
+        path = expected["id"]
+        for key in ["id", "lane", "declared_context"]:
+            value = expected["context"] if key == "declared_context" else expected[key]
+            c.exact(path + "/Native/" + key, value, left[key]); c.exact(path + "/Rust/" + key, value, right[key])
+        context = {key: expected["context"][key] for key in ["enclosure_index", "zone_id"]}
+        c.exact(path + "/actual_context", context, right["actual_context"])
+        for key in context: c.exact(path + "/actual_context/" + key, context[key], right["actual_context"][key])
+        c.exact(path + "/actual_Rust_API", "calculate_selected_approximate_view_factors", right["actual_Rust_API"])
+        c.need(type(right["actual_source_invoked"]) is bool, "Typed actual Rust invocation required")
+        actual_calls += int(right["actual_source_invoked"])
+        c.exact(path + "/Native_backend_inference", False, right["Native_warning_backend_or_outcome_inferred"])
+        registry, ordered = right["actual_surface_registry"], right["actual_input_pointer_order"]
+        n = len(expected["surface_registry"])
+        c.need(len(registry) == len(ordered) == n, "Actual typed registry/pointer shape required")
+        by_id = {row["surface_id"]: row for row in expected["surface_registry"]}
+        for family, declared_rows, actual_rows in [("registry", expected["surface_registry"], registry),
+                ("pointer_order", [by_id[value] for value in expected["surface_order"]], ordered)]:
+            for position, (declared, actual) in enumerate(zip(declared_rows, actual_rows)):
+                label = path + "/" + family + "/" + str(position)
+                for key, value in [("surface_id", declared["surface_id"]), ("surface_name", declared["name"]),
+                        ("zone_id", context["zone_id"]), ("zone_name", expected["context"]["zone_name"]),
+                        ("surface_type", declared["surface_type"])]: c.exact(label + "/" + key, value, actual[key])
+                for key in ["area_m2", "azimuth_deg", "tilt_deg"]:
+                    c.dto(actual[key]); c.exact(label + "/" + key + "/bits", declared[key]["bits"], actual[key]["value_bits"])
+        result = right["result"]
+        c.need(type(result["owner_available"]) is bool and result["status"] in ["source-returned", "scope-error-returned"] and
+               result["owner_available"] is (result["status"] == "source-returned") and
+               result["counted_as_PASS"] is False and result["Native_outcome_inferred"] is False, "Actual Rust owner/error ledger differs")
+        if not result["owner_available"]:
+            c.need(result["snapshot"] is None and isinstance(result["scope_error"], str), "Real typed error must retain null owner")
+        else: c.need(result["scope_error"] is None and isinstance(result["snapshot"], dict), "Real returned owner required")
+        observed = left["observations"]
+        native_available = left["actual_source_invoked"] and left["call_outcome"]["status"] == "source_returned" and (
+            observed["ZoneArea"] is not None and observed["F"] is not None and observed["actual_SPtr"] is not None)
+        rust_available = right["actual_source_invoked"] and result["owner_available"]
+        if not native_available or not rust_available:
+            c.absence(path + "/required_returned_owners", native_available, rust_available, True,
+                      "selected direct call requires both genuine complete returned owners; stop/missing/unreached is not PASS")
+            continue
+        source, actual = left["actual_input_snapshot"], result["snapshot"]
+        c.exact(path + "/returned_context", context, actual["context"])
+        for key in context: c.exact(path + "/returned_context/" + key, context[key], actual["context"][key])
+        c.need(isinstance(actual["ordered_surface_ids"], list) and all(type(value) is int for value in actual["ordered_surface_ids"]) and
+               isinstance(actual["F_shape"], list) and len(actual["F_shape"]) == 2 and all(type(value) is int for value in actual["F_shape"]),
+               "Actual returned owner IDs and matrix dimensions must retain integer types")
+        c.exact(path + "/returned_order", [row["opaque_surface_id"] for row in source["actual_input_pointer_order"]], actual["ordered_surface_ids"])
+        c.exact(path + "/Native_F_layout", "actual Array2 row-first: F(j,i), flat offset (j-1)*N+(i-1)", observed["F_layout"])
+        c.exact(path + "/Rust_F_layout", "actual Rust row-first F(j,i), flat offset j*N+i", actual["F_layout"])
+        c.exact(path + "/F_shape", observed["F_shape"], actual["F_shape"])
+        for key, size in [("ZoneArea", n), ("F", n * n)]:
+            c.exact(path + "/" + key + "/shape", len(observed[key]), len(actual[key]))
+            if len(observed[key]) != size or len(actual[key]) != size:
+                c.absence(path + "/" + key + "/required_shape", len(observed[key]) == size, len(actual[key]) == size, True, "required owner shape differs")
+                continue
+            for index, (a, b) in enumerate(zip(observed[key], actual[key])): c.number(path + "/" + key + "/" + str(index), key, a, b)
+        warnings = actual["warnings"]
+        c.need(isinstance(warnings, list), "Actual ordered typed warning vector required")
+        c.counts["warning_vector_pairings"] += 1
+        c.exact(path + "/warning_count", len(observed["warnings"]), len(warnings))
+        for index, (a, b) in enumerate(zip(observed["warnings"], warnings)):
+            label = path + "/warning/" + str(index)
+            position = a["source_surface_position"] - 1
+            member = source["actual_input_pointer_order"][position]
+            c.exact(label + "/surface_index", position, b["surface_index"])
+            c.exact(label + "/surface_id", member["opaque_surface_id"], b["surface_id"])
+            c.exact(label + "/surface_name", a["surface_name"], b["surface_name"])
+            c.exact(label + "/zone_id", source["opaque_zone_id"], b["zone_id"])
+            c.exact(label + "/zone_name", a["zone_name"], b["zone_name"])
+    c.need(type(rust["actual_Rust_API_invocations"]) is int and rust["actual_Rust_API_invocations"] == actual_calls,
+           "Actual Rust invocation count disagrees with retained ledger")
+
+
+def boot(name, filename, digest):
+    path = PREP / filename
+    if hashlib.sha256(path.read_bytes()).hexdigest() != digest: raise ValueError("Reviewed reader dependency differs before import")
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module
+
+
+def run(args):
+    m = boot("rad01_compare_io", "packet_io.py", IO_SHA)
+    shape = boot("rad01_compare_shape", "shape.py", SHAPE_SHA)
+    own = m.bind(m.identity(__file__))
+    m.require(Path.cwd().resolve() == m.ROOT and own["sha256"] == args.approved_source_sha256, "Root-reviewed source and repository cwd required")
+    started = datetime.now(timezone.utc).isoformat()
+
+    def same(a, b):
+        m.require(m.contained(a["path"], existing=False) == m.contained(b["path"], existing=False) and a["sha256"] == b["sha256"], "Actual direct identities differ")
+
+    def instant(value):
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00")); m.require(parsed.tzinfo is not None, "Aware actual UTC required"); return parsed
+
+    def recorded(ref):
+        value = m.load(ref)
+        m.require(value["schema"] == "recorded-porting-command.v1" and type(value["exit_code"]) is int and value["exit_code"] == 0 and
+                  value["launch_error"] is None and value["source_bytes_match_before_and_after"] is True and Path(value["cwd"]).resolve() == m.ROOT,
+                  "Actual successful source-preserving repository command required")
+        m.require(instant(value["started_utc"]) <= instant(value["finished_utc"]) <= instant(started), "Actual preceding command interval required")
+        for key in ["stdout", "stderr", "source_snapshot"]: m.bind(value[key])
+        m.require(value["executed_launcher"]["historical_path"] == "tools/porting/record_command.py", "Actual recorder source owner differs")
+        m.bind(value["executed_launcher"]["archive"])
+        return value
+
+    refs = {name: m.argument(getattr(args, name.replace("-", "_"))) for name in [
+        "original-data-review", "original-data-review-execution", "Rust-build-execution", "Rust-execution", "Rust-results"]}
+    qa, qc = m.load(refs["original-data-review"]), recorded(refs["original-data-review-execution"])
+    m.require(qa["schema"] == "rad01-independent-original-data-review.v1" and qa["status"] == "pass-actual-original-data-and-provenance-before-Rust" and
+              qa["Rust_baseline_released"] is True and qa["complete_requested_record_ledger_validated"] is True and qa["actual_method_counts_unknown"] is False and
+              type(qa["actual_native_process_exit_code"]) is int and qa["actual_native_process_exit_code"] == 0 and qa["actual_native_launch_error"] is None and
+              not qa["observation_integrity_failures"] and qa["numerical_PASS_claimed"] is False and m.load(qc["stdout"]) == qa,
+              "Genuine preceding OriginalDataQA0/full stdout and release required")
+    preparation = m.load(QA_PREPARATION)
+    qa_sources = [m.bind(row) for row in preparation["own_sources"]]
+    archives = qa["executed_reader_sources"]
+    m.require(len(qa_sources) == len(archives) == 3, "Exact executed QA source3 required")
+    for source, row in zip(qa_sources, archives):
+        m.bind(row["archive"])
+        m.require(row["historical_path"] == source["path"] and row["archive"]["sha256"] == source["sha256"], "Actual executed QA archive differs from approved hold")
+    same(qa["executed_reader_source_archive"], archives[0]["archive"])
+    argv = qc["command"]
+    m.require(len(argv) == 25 and Path(argv[0]).name.lower() in ["python", "python.exe"] and argv[1:4] == ["-X", "utf8", "-B"] and
+              m.contained(argv[4]) == m.contained(qa_sources[0]["path"]), "Actual reviewed QA command differs")
+    pairs = list(zip(argv[5::2], argv[6::2])); options = dict(pairs)
+    option_names = ["--approved-source-sha256", "--native-execution", "--results", "--freeze-receipt", "--freeze-execution", "--build",
+                    "--build-execution", "--build-review", "--build-review-execution", "--output-dir"]
+    m.require(len(options) == len(pairs) == 10 and set(options) == set(option_names) and
+              options["--approved-source-sha256"] == qa_sources[0]["sha256"] and
+              m.contained(options["--output-dir"], existing=False) == m.contained(refs["original-data-review"]["path"]).parent,
+              "Exact actual QA approval/options/output binding required")
+    for name, key in [("native-execution", "reviewed_native_execution"), ("results", "reviewed_results"), ("freeze-receipt", "actual_packet_freeze"),
+            ("freeze-execution", "actual_packet_freeze_execution"), ("build", "reviewed_build"), ("build-execution", "reviewed_build_execution"),
+            ("build-review", "reviewed_build_review"), ("build-review-execution", "reviewed_build_review_execution")]: same(m.argument(options["--" + name]), qa[key])
+    request = m.load(qa["reviewed_request"]); native = m.load(qa["reviewed_results"]); rust = m.load(refs["Rust-results"])
+    freeze = m.load(qa["actual_packet_freeze"]); freeze_command = recorded(qa["actual_packet_freeze_execution"])
+    m.require(m.load(freeze_command["stdout"]) == freeze and freeze["schema"] == "rad01-frozen-packet.v1" and
+              freeze["status"] == "frozen-literal-input-and-policy-before-numerical-execution" and freeze["frozen_before_this_RAD01_helper_execution"] is True and
+              freeze["frozen_before_numerical_execution"] is True and freeze["numerical_PASS_claimed"] is False,
+              "Authentic fresh pre-output freeze/full stdout required")
+    same(freeze["helper_request"], qa["reviewed_request"]); same(freeze["native_admission_contract"], qa["reviewed_native_admission_contract"])
+    same(freeze["projection"], qa["reviewed_projection"])
+    for key in ["source", "cases", "tolerances"]: same(freeze["contracts"][key], qa["reviewed_contracts"][key])
+    policy = m.load(qa["reviewed_contracts"]["tolerances"])["observation_policy"]
+    zero = {"atol": 0.0, "rtol": 0.0, "value_class_exact": True, "signed_zero_exact": True, "shape_exact": True}
+    profiles = policy["arithmetic_profiles_by_variable"]
+    m.require(list(profiles) == VARIABLES and profiles == {key: zero for key in VARIABLES} and
+              all(type(profile["atol"]) is float and type(profile["rtol"]) is float for profile in profiles.values()) and
+              policy == qa["reviewed_observation_policy"] == request["observation_policy"], "Exactly frozen two strict zero profiles required")
+    counts, integrity = shape.review(native, request, m.require, m.bind)
+    m.require(not integrity and counts == qa["actual_observation_counts"] and native["actual_helper_exit_code"] == 0 and
+              native["schema"] == "rad01-helper-results.v1" and native["complete_requested_record_ledger"] is True,
+              "Actual complete Native ledger/counters/integrity differ")
+    m.require(rust["schema"] == "rad01-candidate-unit-observer-results.v1" and rust["all_bound_inputs_and_sources_unchanged"] is True and
+              rust["numerical_PASS_claimed"] is False and rust["Native_result_or_expected_values_read"] is False and
+              rust["Native_warning_backend_or_outcome_inferred"] is False and rust["full_engine_production_geometry_certified"] is False and
+              rust["RAD02_RAD03_or_production_integration_certified"] is False and rust["gates_updated"] is False and rust["observation_policy"] == policy,
+              "Actual selected candidate-only Source result required")
+    for key, ref in [("actual_request", qa["reviewed_request"]), ("actual_native_admission", qa["reviewed_native_admission_contract"]),
+                     ("projection", qa["reviewed_projection"])]: same(rust[key], ref)
+    for key in ["source", "cases", "tolerances"]: same(rust["contracts"][key], qa["reviewed_contracts"][key])
+    m.require(rust["requested_counts"] == request["requested_counts"] == qa["requested_counts"] and
+              request["requested_counts"] == {"model_cases": 21, "CalcApproximateViewFactors": 21} and len(request["model_cases"]) == 21 and
+              rust["energyplus_commit"] == native["energyplus_commit"] == request["energyplus_commit"] and
+              rust["source_authorities"] == freeze["source_authorities"], "Same literal input/scope/count authorities required")
+    build, executed = recorded(refs["Rust-build-execution"]), recorded(refs["Rust-execution"])
+    m.require(instant(qc["finished_utc"]) <= instant(build["started_utc"]) and instant(build["finished_utc"]) <= instant(executed["started_utc"]),
+              "OriginalDataQA must precede actual Cargo then Rust execution")
+    m.require(m.load(executed["stdout"]) == rust and m.contained(executed["stderr"]["path"]).stat().st_size == 0, "Actual Rust full stdout/empty stderr required")
+    capture = build["cargo_compiler_artifacts_capture"]
+    m.require(build["command"][:2] == ["cargo", "build"] and capture["requested"] is True and capture["status"] == "pass" and capture["error"] is None,
+              "Actual Cargo compiler-artifact capture required")
+    m.require(instant(build["finished_utc"]) <= instant(capture["captured_utc"]) <= instant(executed["started_utc"]), "Actual captured artifact must precede execution")
+    artifacts = [row for row in capture["rows"] if row["cargo_message"]["target"]["name"] == "rad01_candidate_unit_observer" and
+                 "example" in row["cargo_message"]["target"]["kind"]]
+    m.require(len(artifacts) == 1, "Unique actual candidate example artifact required")
+    artifact = artifacts[0]; binary = artifact["executable"]; binary_path = m.contained(binary["historical_path"])
+    def binary_sha():
+        digest = hashlib.sha256()
+        with binary_path.open("rb") as handle:
+            for block in iter(lambda: handle.read(1024 * 1024), b""): digest.update(block)
+        return digest.hexdigest()
+    m.require(binary_sha() == binary["sha256"] and len(executed["command"]) == 6 and m.contained(executed["command"][0]) == binary_path,
+              "Actual executed Rust binary differs from unique Cargo artifact")
+    same(build["source_snapshot"], executed["source_snapshot"])
+    snapshot = m.load(build["source_snapshot"])
+    m.require(snapshot["schema"] == "rust-command-source-snapshot.v1" and snapshot["bytes_normalized"] is False, "Actual full Cargo/Rust raw source capture required")
+    available = {row["historical_path"]: row["archive"] for row in snapshot["files"]}
+    m.require(len(available) == len(snapshot["files"]), "Unique actual captured Source paths required")
+    inventory = m.load(rust["runtime_source_bindings"])
+    m.require(inventory == rust["authenticated_source_inventory"] and inventory["schema"] == "rad01-candidate-unit-runtime-source-bindings.v1" and
+              set(inventory) == {"schema", "observer_sources", "actual_public_API_sources"}, "Actual runtime source inventory differs")
+    for key, paths in [("observer_sources", OBSERVER_PATHS), ("actual_public_API_sources", API_PATHS)]:
+        m.require([row["path"] for row in inventory[key]] == paths, "Actual source inventory paths/order differ")
+        for binding in inventory[key]:
+            m.bind(binding); m.bind(available[binding["path"]])
+            m.require(binding["sha256"] == available[binding["path"]]["sha256"], "Actual compiled/captured source differs from observer binding")
+    m.require(m.contained(artifact["cargo_message"]["target"]["src_path"]) == m.contained(OBSERVER_PATHS[0]) and
+              m.contained(artifact["cargo_message"]["manifest_path"]) == m.contained(API_PATHS[0]), "Actual Cargo target/package source differs")
+    command = executed["command"]
+    for value, ref in [(command[1], qa["reviewed_request"]), (command[3], qa["reviewed_native_admission_contract"]),
+                       (command[5], rust["runtime_source_bindings"])]:
+        m.require(m.contained(value) == m.contained(ref["path"]), "Actual input-only Rust argv path differs")
+    m.require(command[2] == qa["reviewed_request"]["sha256"] and command[4] == qa["reviewed_native_admission_contract"]["sha256"],
+              "Actual input-only Rust argv SHA differs")
+    comparison = Comparison(m.require); compare_models(native, rust, request, comparison); result = comparison.report()
+    passed = result["mismatch_count"] == 0
+    m.recheck(); m.require(binary_sha() == binary["sha256"], "Actual Rust binary changed during comparison")
+    output = m.contained(args.output_dir, existing=False)
+    m.require(output.is_relative_to(m.BASE) and output != m.BASE and not output.exists(), "Fresh contained RAD comparison output required")
+    output.mkdir(parents=True, exist_ok=False)
+    sources = [m.archive(m.identity(path), output, index) for index, path in enumerate([Path(__file__), PREP / "packet_io.py", PREP / "shape.py"])]
+    report = {"schema": "rad01-unit-comparison.v1", "status": "pass-selected-approximate-view-factors" if passed else "fail-selected-approximate-view-factors",
+        "started_utc": started, "finished_utc": datetime.now(timezone.utc).isoformat(),
+        "reviewed_Original_data_review": refs["original-data-review"], "reviewed_Original_data_review_execution": refs["original-data-review-execution"],
+        "reviewed_Native_results": qa["reviewed_results"], "reviewed_Native_execution": qa["reviewed_native_execution"],
+        "reviewed_request": qa["reviewed_request"], "reviewed_projection": qa["reviewed_projection"], "reviewed_contracts": qa["reviewed_contracts"],
+        "actual_packet_freeze": qa["actual_packet_freeze"], "actual_packet_freeze_execution": qa["actual_packet_freeze_execution"],
+        "actual_scope_amendment": qa["reviewed_actual_scope_amendment"], "actual_scope_check_execution": qa["reviewed_actual_scope_check_execution"],
+        "Rust_results": refs["Rust-results"], "Rust_execution": refs["Rust-execution"], "Rust_build_execution": refs["Rust-build-execution"],
+        "actual_Rust_binary": binary, "actual_source_snapshot": build["source_snapshot"], "actual_source_inventory": inventory,
+        "requested_counts": request["requested_counts"], "frozen_numeric_profiles": profiles, "reviewed_observation_policy": policy,
+        "actual_Native_observation_counts": counts, "actual_Rust_API_invocations": rust["actual_Rust_API_invocations"],
+        "Native_source_outcomes_and_global_diagnostics_context_only": [{"model_id": row["id"], "actual_source_invoked": row["actual_source_invoked"],
+            "call_outcome": row["call_outcome"], "diagnostics": row["observations"]["diagnostics"], "err_stream": row["observations"]["err_stream"],
+            "actual_TotalWarningErrors": row["observations"]["actual_TotalWarningErrors"]} for row in native["model_cases"]],
+        "comparison": result, "executed_reader_sources": sources, "executed_reader_source_archive": sources[0]["archive"],
+        "selected_declared_geometry_unit_PASS_claimed": passed, "complete_RAD01_PASS_claimed": False,
+        "warning_identity_count_and_order_required": True, "Native_global_diagnostic_backend_or_text_certified": False,
+        "full_engine_production_geometry_certified": False, "RAD02_RAD03_or_production_integration_certified": False,
+        "Native_flags_answers_or_expected_arrays_injected_into_Rust": False, "scientific_engine_or_view_factor_evaluator_invoked": False,
+        "Rust_binary_payload_rehashed": True, "Native_binary_payloads_read_or_rehashed": False, "gates_updated": False,
+        "authorship_limits": "Base authored Native/Rust RAD arithmetic; Header authored candidate transport and comparison glue. This is selected actual-data comparison, not an independent formula certificate."}
+    m.recheck(); m.emit(output / "comparison.json", report); m.recheck()
+    print(json.dumps(report, allow_nan=False, indent=2))
+    return 0 if passed else 1
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ["approved-source-sha256", "original-data-review", "original-data-review-execution", "Rust-build-execution", "Rust-execution", "Rust-results", "output-dir"]:
+        parser.add_argument("--" + name, required=True)
+    raise SystemExit(run(parser.parse_args()))
