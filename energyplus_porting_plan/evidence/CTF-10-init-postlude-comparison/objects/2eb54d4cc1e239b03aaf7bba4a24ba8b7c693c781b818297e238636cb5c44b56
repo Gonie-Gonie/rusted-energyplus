@@ -1,0 +1,78 @@
+"""Seal Source only; never import or invoke the held application workflow."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+BASE = OUT.parent
+
+def ref(p):
+    raw = p.read_bytes()
+    return dict(path=p.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw))
+
+def exact(r):
+    p = ROOT / r['path']; assert ref(p)['sha256'] == r['sha256']
+    if 'size_bytes' in r: assert p.stat().st_size == r['size_bytes']
+    return p
+
+def put(p, raw):
+    p.parent.mkdir(parents=True, exist_ok=True)
+    with p.open('xb') as stream: stream.write(raw)
+
+def main():
+    assert not (OUT / 'manifest.json').exists()
+    names = ['init-postlude-rust-observer-prep-01', 'init-postlude-direct-state-prep-01', 'init-postlude-direct-rust-observer-prep-02']
+    pins = ['b089d724b65467e72564176038001e6567e51861a924cc0bcd9f94848fe19c5c', 'f4d6b158e2cdf57cb59858f5ed83772302697ce50ce2b2649eafe915f5a00ef2', 'beef016a72873faad6e5d80db580ba1c3773b454fc4b40b31e7f7f744428c80b']
+    parents = [ref(BASE / n / 'manifest.json') for n in names]
+    assert [r['sha256'] for r in parents] == pins
+    groups = [json.loads(exact(r).read_bytes()) for r in parents]
+    source_rows = [groups[0]['own_sources'], groups[1]['application_sources'], groups[2]['application_sources']]
+    rows = []; regenerated = 0
+    for i, sources in enumerate(source_rows):
+        for r in sources:
+            proposal = r['proposed_source'] if i == 1 else r['proposal']
+            before = r['actual_before_archive'] if i == 1 else r['before_archive']
+            new = r['new_canonical_destination_absent'] if i == 1 else r['new_destination_absent']
+            old = exact(before).read_bytes() if before else b''; body = exact(proposal).read_bytes(); target = ROOT / r['canonical_path']
+            assert (new is True and not target.exists() and old == b'') or (new is not True and target.read_bytes() == old)
+            delta = exact(r['exact_diff']).read_bytes(); lines = delta.decode().splitlines()
+            assert ''.join(difflib.unified_diff(old.decode().splitlines(True), body.decode().splitlines(True), fromfile=lines[0][4:], tofile=lines[1][4:], n=3)).encode() == delta
+            rows.append(dict(canonical_path=r['canonical_path'], source_preparation=parents[i], reviewed_source_authority=proposal, held_before_archive=before, exact_held_diff=r['exact_diff'], new_destination_absent=new is True)); regenerated += 1
+    assert len(rows) == 12 and len({r['canonical_path'] for r in rows}) == 12 and sum(r['new_destination_absent'] for r in rows) == 7
+    templates = []
+    for n in ['apply-ordinary-initialization-01.py', 'apply-and-format-thermal-history-01.py', 'run-ordinary-initialization-quality-07.py']:
+        p = BASE / n; archive = OUT / 'before' / n; put(archive, p.read_bytes()); templates.append(dict(actual_source=ref(p), before_archive=ref(archive)))
+        ast.parse(p.read_bytes())
+    source = OUT / 'run_batch.py'; ast.parse(source.read_bytes())
+    diff = OUT / 'run_batch.py.diff'; old = ROOT / templates[0]['before_archive']['path']
+    put(diff, ''.join(difflib.unified_diff(old.read_bytes().decode().splitlines(True), source.read_bytes().decode().splitlines(True), fromfile=old.relative_to(ROOT).as_posix(), tofile=source.relative_to(ROOT).as_posix(), n=3)).encode())
+    workflow = ref(BASE / 'native-init-postlude-workflow-prep-04/manifest.json'); assert workflow['sha256'] == 'ff01bf13b14562e21d2bd8a1b08ceec5cfb39f4281b2dd7af1846fd3127fa4c7'
+    native = ref(BASE / 'native-init-postlude-prep-05/manifest.json'); assert native['sha256'] == '07fe5b830b16d93ead4e08e374f1b851d40b48f7c9f2fb2cacb5d527f16c02d9'
+    snapshot = json.loads((BASE / 'native-init-postlude-workflow-03/configure/receipt.json').read_bytes())['source_snapshot']
+    assert snapshot['sha256'] == 'cae115f4bcf0212021276eecf9b6f613630d80dc952bb27e96e8cc76bcc3fa16'; exact(snapshot)
+    lineage = [dict(role='unexecuted-wrong-correction01-Source-only', files=[ref(p) for p in sorted((BASE / 'ordinary-initialization-correction-01').iterdir())])]
+    lineage += [dict(role='actual-existing-correction' + str(i).zfill(2), record=ref(BASE / ('ordinary-initialization-correction-' + str(i).zfill(2)) / 'record.json')) for i in range(2, 7)]
+    lineage.append(dict(role='actual-nonfinite-Source-repair', record=ref(BASE / 'report-format-nonfinite-repair-applied-01/record.json')))
+    m = dict(schema='ctf10-Init-postlude-batch-application-source-preparation.v1', status='SOURCE-READY-HELD-NOT-EXECUTED', held_immutable=True,
+        workflow_source=ref(source), README=ref(OUT / 'README.md'), exact_source_diff=ref(diff), authoring_source=ref(Path(__file__)),
+        reviewed_fixed_source_preparations=parents[:2], reviewed_direct_observer_source=parents[2], reviewed_native_workflow_source=workflow, reviewed_native_source=native,
+        fixed_application_paths=[r['canonical_path'] for r in rows[:9]], direct_observer_paths=groups[2]['runtime_interfaces']['ordered_observer_source_paths'], held_application_sources=rows,
+        held_before_Source_snapshot=snapshot, prior_ordinary_application=ref(BASE / 'ordinary-initialization-applied-03/record.json'), inherited_correction_lineage=lineage,
+        reused_actual_Root_source_templates=templates, source_dependencies=[ref(ROOT / 'tools/porting/record_command.py')],
+        runtime_interfaces=dict(application_schema='ctf10-Init-postlude-actual-formatted-source-inventory.v1', quality_schema='ctf10-Init-postlude-actual-quality.v1', actual_application_file_count=12, existing_before_count=5, new_destination_count=7, Native_completion='future genuine Root path#SHA operand; release required', candidate_artifact='not built; later launcher must bind actual Cargo emitted artifact and identical complete Source snapshot', formatter_review='Root explicitly supplies accepted actual formatted inventory after Root and independent review', quality_roles=['fmt-check','clippy','focused','workspace']),
+        Source_only_checks=dict(regenerated_held_source_diffs=regenerated, current_before_or_absence_verified=12, workflow_AST_parsed=True, actual_application_or_formatter_or_quality_or_target_execution=False, canonical_or_Git_mutation=False, Native_output_or_binary_read=False, numerical_or_whole_CTF10_PASS_claimed=False),
+        authorship_limit='Header authored direct API and production observer ancestry plus this Root workflow. Independent review covers batching/custody/formatting/quality transport; it does not certify scientific equivalence or any gate.')
+    whole = set()
+    def verify(v):
+        if isinstance(v, dict):
+            if {'path','sha256'} <= v.keys(): exact(v); whole.add((v['path'],v['sha256']))
+            for x in v.values(): verify(x)
+        elif isinstance(v, list):
+            for x in v: verify(x)
+    verify(m); ast.parse(Path(__file__).read_bytes()); put(OUT / 'manifest.json', (json.dumps(m, indent=2, allow_nan=False) + '\n').encode())
+    print(json.dumps(dict(manifest=ref(OUT / 'manifest.json'), unique_whole=len(whole), source_lines=len(source.read_bytes().splitlines()), exact_held_source_diffs=regenerated)))
+
+if __name__ == '__main__': main()

@@ -1,0 +1,67 @@
+"""Source-only immutable packaging; does not import or run the finalizer."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd().resolve()
+PREP = ROOT / '.runtime/porting/CTF-10/init-postlude-finalization-prep-01'
+def ref(p):
+    b = p.read_bytes()
+    return dict(path=p.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(b).hexdigest(), size_bytes=len(b), line_count=len(b.splitlines()))
+def write(p, v):
+    with p.open('x', encoding='utf8', newline='\n') as stream: json.dump(v, stream, indent=2); stream.write('\n')
+
+assert not (PREP / 'manifest.json').exists()
+before = PREP / 'before'; before.mkdir()
+diffs = PREP / 'diffs'; diffs.mkdir()
+templates = [ROOT / '.runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-02/finalize-ordinary-initialization.py', ROOT / '.runtime/porting/CTF-10/finalize-report-scan-comparison-01.py']
+old = []
+for p in templates:
+    archive = before / p.name; archive.write_bytes(p.read_bytes()); old.append(dict(actual_source=ref(p), before_archive=ref(archive)))
+source = PREP / 'finalize.py'; ast.parse(source.read_bytes())
+delta = diffs / 'finalize-from-ordinary.diff'
+delta.write_bytes(''.join(difflib.unified_diff(templates[0].read_bytes().decode().splitlines(True), source.read_bytes().decode().splitlines(True), fromfile=ref(before / templates[0].name)['path'], tofile=ref(source)['path'])).encode())
+addition = diffs / 'finalize.new.diff'
+addition.write_bytes(''.join(difflib.unified_diff([], source.read_bytes().decode().splitlines(True), fromfile='/dev/null', tofile=ref(source)['path'])).encode())
+dependencies = [
+    '.runtime/porting/CTF-10/init-postlude-comparison-prep-02/compare.py',
+    '.runtime/porting/CTF-10/init-postlude-comparison-prep-02/comparison.py',
+    '.runtime/porting/CTF-10/init-postlude-comparison-prep-02/packet_io.py',
+    '.runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-02/run_candidates.py',
+    '.runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-02/write_request.py',
+    '.runtime/porting/CTF-10/init-postlude-batch-application-prep-02/run_batch.py',
+    '.runtime/porting/CTF-10/init-postlude-clippy-correction-prep-01/run_correction.py',
+    'tools/porting/record_command.py']
+ranges = [
+    (dependencies[0], 187, 209, 'Exact selected comparison result fields and runtime CLI.'),
+    (dependencies[1], 37, 43, 'Actual mismatch/absence ledger summary; no numeric evaluation.'),
+    (dependencies[2], 92, 103, 'Executed comparer Source archive descriptor shape.'),
+    (dependencies[3], 60, 64, 'Actual candidate workflow schema, output refs and honest exit0/2.'),
+    (dependencies[5], 117, 128, 'Four actual quality commands and same complete raw Source result.'),
+    (dependencies[6], 83, 106, 'Explicit source-correction ancestry and original inventory retained.')]
+typed = []
+for name, first, last, purpose in ranges:
+    lines = (ROOT / name).read_bytes().splitlines(keepends=True); assert 1 <= first <= last <= len(lines)
+    b = b''.join(lines[first - 1:last]); typed.append(dict(path=name, first_line=first, last_line=last, sha256=hashlib.sha256(b).hexdigest(), size_bytes=len(b), line_count=last-first+1, purpose=purpose))
+metadata = [
+    '.runtime/porting/CTF-10/native-init-postlude-workflow-05/completion.json',
+    '.runtime/porting/CTF-10/native-init-postlude-workflow-05/qa/review.json',
+    '.runtime/porting/CTF-10/native-init-postlude-failed04-linked-archive-01/archive.json',
+    '.runtime/porting/CTF-10/init-postlude-applied-source-02/record.json',
+    '.runtime/porting/CTF-10/init-postlude-applied-source-02/correction.json',
+    '.runtime/porting/CTF-10/init-postlude-quality-08/clippy-command-08/receipt.json']
+manifest = dict(schema='ctf10-Init-postlude-finalization-source-preparation.v1', status='held-Source-only-unexecuted', held_immutable=True,
+    own_sources=[ref(source)], template_before=old, exact_template_diff=ref(delta), exact_source_addition=ref(addition),
+    source_dependencies=[ref(ROOT / n) for n in dependencies], read_source_ranges=typed,
+    metadata_only_protocol_context=[ref(ROOT / n) for n in metadata], README=ref(PREP / 'README.md'), authoring_source=ref(Path(__file__).resolve()),
+    runtime_interfaces=dict(argv=['--approved-source-sha256', '--inputs'], inputs='actual path#SHA operand', input_packet_schema='ctf10-Init-postlude-finalization-inputs.v1',
+        required_packet_keys=['schema','native_completion','original_data_review','original_data_review_execution','formatted_inventory','source_correction','quality','candidate_workflow','comparison','comparison_execution','failed_native_workflow','failed_artifact_archive','source_preparations','recorded_outer_receipts','retained_lineage','prior_evidence'],
+        output_directory='energyplus_porting_plan/evidence/CTF-10-init-postlude-comparison', comparison_allowed_actual_exit_codes=[0,1], candidate_allowed_actual_exit_codes=[0,2],
+        canonical_or_documents_modified=False, generic_framework_added=False, binary_payloads_archived=False, selected_archive_is_transitive_replay_closure=False,
+        prior_large_observation_trace_rearchived=False, fixed_future_test_totals=False, whole_Init_or_persistent_integration_or_CTF10_gates_promoted=False),
+    Source_only_checks=dict(AST_valid=True, project_import_execution_or_target_calls_performed=False, canonical_Git_or_scientific_payload_reads_performed=False, only_source_and_metadata_packaging=True),
+    authorship_limit='Base authored candidate workflow/direct observer ancestry and this evidence adapter. Independent Source peer must review receipt/archive/status custody; no numerical or gate certificate is supplied.')
+write(PREP / 'manifest.json', manifest)
+print(json.dumps(ref(PREP / 'manifest.json')))

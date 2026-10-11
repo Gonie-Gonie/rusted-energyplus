@@ -1,0 +1,60 @@
+--- .runtime/porting/CTF-10/init-postlude-applied-source-01/literal/crates__ep_runtime__src__heat_balance__ctf_init_postlude.rs
++++ crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs
+@@ -6,8 +6,8 @@
+ use super::ctf_public_initialization::OrderedCtfPublicInitialization;
+ use super::ctf_reports::{
+     CtfConstructionReport, CtfReportError, CtfReportUnavailable, PredefinedStringTable,
+-    prepare_ctf_construction_report,
+-    report_ctf_layers, report_ctf_transfer_function, write_ctf_report_headers,
++    prepare_ctf_construction_report, report_ctf_layers, report_ctf_transfer_function,
++    write_ctf_report_headers,
+ };
+ use super::error_backend::{SourceErrorBackend, SourceErrorBackendFailure, SourceFatalStop};
+ use super::report_scan::{
+@@ -135,7 +135,10 @@
+         .ok_or(CtfInitPostludeError::Unavailable(
+             Unavailable::MissingFinalSharedFlags,
+         ))?;
+-    let reports = ModelReportProvider { model, rows: &public.constructions };
++    let reports = ModelReportProvider {
++        model,
++        rows: &public.constructions,
++    };
+     complete_ctf_init_postlude_from_provider(
+         &model.report_inputs,
+         &reports,
+@@ -155,7 +158,10 @@
+ pub(crate) trait CtfInitReportProvider {
+     fn construction_count(&self) -> usize;
+     fn is_used_ctf(&self, index: usize) -> Result<bool, CtfReportUnavailable>;
+-    fn prepare_report(&self, index: usize) -> Result<CtfConstructionReport<'_>, CtfReportUnavailable>;
++    fn prepare_report(
++        &self,
++        index: usize,
++    ) -> Result<CtfConstructionReport<'_>, CtfReportUnavailable>;
+ }
+ 
+ struct ModelReportProvider<'a> {
+@@ -167,11 +173,19 @@
+         self.rows.len()
+     }
+     fn is_used_ctf(&self, index: usize) -> Result<bool, CtfReportUnavailable> {
+-        self.rows.get(index).map(|row| row.is_used_ctf)
++        self.rows
++            .get(index)
++            .map(|row| row.is_used_ctf)
+             .ok_or(CtfReportUnavailable::Association)
+     }
+-    fn prepare_report(&self, index: usize) -> Result<CtfConstructionReport<'_>, CtfReportUnavailable> {
+-        let row = self.rows.get(index).ok_or(CtfReportUnavailable::Association)?;
++    fn prepare_report(
++        &self,
++        index: usize,
++    ) -> Result<CtfConstructionReport<'_>, CtfReportUnavailable> {
++        let row = self
++            .rows
++            .get(index)
++            .ok_or(CtfReportUnavailable::Association)?;
+         prepare_ctf_construction_report(self.model, row)
+     }
+ }

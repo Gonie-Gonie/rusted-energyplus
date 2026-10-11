@@ -1,0 +1,50 @@
+--- .runtime/porting/CTF-10/init-postlude-comparison-prep-02/before01/compare_case.py
++++ .runtime/porting/CTF-10/init-postlude-comparison-prep-02/compare_case.py
+@@ -44,9 +44,12 @@
+     returned=pair.checkpoint(ledger['actual_caller_return']);partial=pair.checkpoint(ledger['scope_exit'])
+     if type(before) is not dict:
+         c.absence(path+'/before_reset',False,type(rust) is dict,'Actual invoked public before-reset owner is required');return
++    actual=returned if returned is not None else partial
++    selected=type(actual) is dict and not before['SourceSinkPresent'] and before['SolutionDimensions']==1 and \
++        type(actual.get('NumCTFTerms')) is int and 0<=actual['NumCTFTerms']<=18
+     if type(rust) is not dict:
+-        if returned is not None:c.absence(path+'/returned',True,False,'Actual returned Native owner cannot be paired with missing Rust storage')
+-        else:pair.unpaired(c,path+'/partial','Native unreturned partial storage has no retained production State owner')
++        if selected:c.absence(path+'/required_retained_public',True,False,'Selected actual returned or partial fixed-capacity public owner missing from Rust, including dropped State on Err')
++        else:pair.unpaired(c,path+'/excluded_public','Actual source/2D/out-of-capacity or unavailable storage is excluded; no numerical PASS',actual is not None,False)
+         return
+     if 'snapshot' in rust:
+         current=rust.get('snapshot');storage=current.get('public_storage') if type(current) is dict else None
+@@ -66,8 +69,10 @@
+             for key in ['ErrorsFound','DoCTFErrorReport']:c.exact(path+'/return_flags/'+key,returned[key],flags.get(key))
+     else:
+         pair.unpaired(c,path+'/numerical_selection','Actual nonreturned/source/2D/out-of-capacity route is excluded from numerical PASS',returned is not None,type(storage) is dict)
+-        if partial is not None and storage is not None:
+-            pair.storage(c,path+'/retained_partial_copy_facts',partial,storage,need,numeric=False)
++        if selected:
++            pair.storage(c,path+'/required_partial_copy_facts',partial,storage,need,numeric=False)
++        elif partial is not None and storage is not None:
++            pair.storage(c,path+'/excluded_retained_copy_facts',partial,storage,need,numeric=False)
+     reset=pair.checkpoint(ledger['after_reset'])
+     if pair.required(c,path+'/actual_reset',reset,reset):
+         for name in pair.ARRAYS:
+@@ -194,13 +199,15 @@
+                 for key in ['ErrorsFound','DoCTFErrorReport']:c.exact(path+'/actual_final_flags/'+key,events[-1]['snapshot'][key],flags[key])
+             c.exact(path+'/direct_init_return',whole['call_outcome']['status']=='source_returned',state['init_returned'])
+         elif operations:c.absence(path+'/retained_direct_state',True,False,'Required caller-retained direct state is absent after the actual invocation')
+-    if n_after is not None and type(state) is dict:
+-        aggregate=state.get('aggregate_after_actual_returned_calls') if direct else state.get('aggregate_after_returned_calls')
++    if n_after is not None:
++        aggregate=(state.get('aggregate_after_actual_returned_calls') if direct else state.get('aggregate_after_returned_calls')) if type(state) is dict else None
+         if type(aggregate) is dict:
+             for key in ['SimpleCTFOnly','MaxCTFTerms']:c.exact(path+'/actual_aggregate/'+key,n_after[key],aggregate[key])
+             calls=observation.get('construction_records',[]) if type(observation) is dict else []
+             c.exact(path+'/actual_aggregate/returned_calls',sum(v['postaggregate_reached'] for v in calls),aggregate['returned_constructions'])
+         else:c.absence(path+'/actual_aggregate',True,False,'Available actual public state must retain its aggregate owner')
+-        if not direct and type(state.get('actual_final_shared_flags')) is dict and type(observation) is dict and observation['events']:
+-            for key in ['ErrorsFound','DoCTFErrorReport']:c.exact(path+'/actual_final_shared_flags/'+key,observation['events'][-1]['snapshot'][key],state['actual_final_shared_flags'][key])
++        if not direct and type(observation) is dict and observation['events']:
++            flags=state.get('actual_final_shared_flags') if type(state) is dict else None
++            if pair.required(c,path+'/required_final_shared_flags',observation['events'][-1]['snapshot'],flags):
++                for key in ['ErrorsFound','DoCTFErrorReport']:c.exact(path+'/actual_final_shared_flags/'+key,observation['events'][-1]['snapshot'][key],flags.get(key))
+     pair.unpaired(c,path+'/other_whole_Init_owners','Native sizing input flags and AnyInternalHeatSourceInInput are captured; no corresponding actual Rust field is exposed by these observer schemas',True,False)

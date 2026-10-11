@@ -1,0 +1,7 @@
+Program Version,,
+   ** Severe  ** InitConductionTransferFunctions: Material=UNIT MATERIALR Value below lowest allowed value
+   **   ~~~   ** Lowest allowed value=[1.000E-003], Material R Value=[0.000].
+   **  Fatal  ** Program terminated for reasons listed (InitConductionTransferFunctions)
+   ...Summary of Errors that led to program termination:
+   ..... Reference severe error count=1
+   ..... Last severe error=InitConductionTransferFunctions: Material=UNIT MATERIALR Value below lowest allowed value

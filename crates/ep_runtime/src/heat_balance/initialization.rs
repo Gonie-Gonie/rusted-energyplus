@@ -7,6 +7,7 @@ mod state_shell;
 pub(crate) use schedule_cache::initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache;
 pub use schedule_cache::{
     initialize_heat_balance_state, initialize_heat_balance_state_with_ctf_coefficients,
+    initialize_heat_balance_state_with_initialization_context,
 };
 pub(crate) use schedule_cache::{
     initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache_profiled,

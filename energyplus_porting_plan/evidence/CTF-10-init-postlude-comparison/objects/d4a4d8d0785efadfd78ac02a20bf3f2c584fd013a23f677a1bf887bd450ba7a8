@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-10\init-postlude-batch-application-prep-02\run_batch.py", line 140, in <module>
+    apply(args, out, prep, prep_ref) if args.phase == 'apply' else quality(args, out, prep_ref)
+                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-10\init-postlude-batch-application-prep-02\run_batch.py", line 125, in quality
+    need(v['exit_code'] == 0, 'Actual quality failed; no remaining command or source correction is attempted')
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-10\init-postlude-batch-application-prep-02\run_batch.py", line 21, in need
+    if not ok: raise ValueError(message)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Actual quality failed; no remaining command or source correction is attempted

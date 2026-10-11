@@ -1,0 +1,534 @@
+{
+  "schema": "ctf10-Init-postlude-batch-application-source-preparation.v1",
+  "status": "SOURCE-READY-HELD-NOT-EXECUTED",
+  "held_immutable": true,
+  "workflow_source": {
+    "path": ".runtime/porting/CTF-10/init-postlude-batch-application-prep-01/run_batch.py",
+    "sha256": "3af51976cf0917c9b112cf8c7a6cb4def07aee4608fa9e4e17d7f23f31dc0b6c",
+    "size_bytes": 15633
+  },
+  "README": {
+    "path": ".runtime/porting/CTF-10/init-postlude-batch-application-prep-01/README.md",
+    "sha256": "3431c48b33864a85882c76a741e45ed3a253c3ef42c19a8cee5f1edbf1a8f292",
+    "size_bytes": 3575
+  },
+  "exact_source_diff": {
+    "path": ".runtime/porting/CTF-10/init-postlude-batch-application-prep-01/run_batch.py.diff",
+    "sha256": "748eb973e81c7165d72a95a490b7d669bad06e4e5ac8104e8321dcc8e7f4baf4",
+    "size_bytes": 20014
+  },
+  "authoring_source": {
+    "path": ".runtime/porting/CTF-10/init-postlude-batch-application-prep-01/seal_sources.py",
+    "sha256": "2eb54d4cc1e239b03aaf7bba4a24ba8b7c693c781b818297e238636cb5c44b56",
+    "size_bytes": 7254
+  },
+  "reviewed_fixed_source_preparations": [
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/manifest.json",
+      "sha256": "b089d724b65467e72564176038001e6567e51861a924cc0bcd9f94848fe19c5c",
+      "size_bytes": 39237
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/manifest.json",
+      "sha256": "f4d6b158e2cdf57cb59858f5ed83772302697ce50ce2b2649eafe915f5a00ef2",
+      "size_bytes": 22343
+    }
+  ],
+  "reviewed_direct_observer_source": {
+    "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/manifest.json",
+    "sha256": "beef016a72873faad6e5d80db580ba1c3773b454fc4b40b31e7f7f744428c80b",
+    "size_bytes": 52394
+  },
+  "reviewed_native_workflow_source": {
+    "path": ".runtime/porting/CTF-10/native-init-postlude-workflow-prep-04/manifest.json",
+    "sha256": "ff01bf13b14562e21d2bd8a1b08ceec5cfb39f4281b2dd7af1846fd3127fa4c7",
+    "size_bytes": 36946
+  },
+  "reviewed_native_source": {
+    "path": ".runtime/porting/CTF-10/native-init-postlude-prep-05/manifest.json",
+    "sha256": "07fe5b830b16d93ead4e08e374f1b851d40b48f7c9f2fb2cacb5d527f16c02d9",
+    "size_bytes": 38036
+  },
+  "fixed_application_paths": [
+    "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+    "crates/ep_runtime/src/heat_balance/initialization.rs",
+    "crates/ep_run/examples/ctf10_init_postlude_candidate_production_observer.rs",
+    "crates/ep_run/examples/ctf10_init_postlude_support/fields.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs",
+    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+    "crates/ep_runtime/src/heat_balance/mod.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_direct_initialization.rs",
+    "crates/ep_runtime/src/heat_balance/ctf_direct_initialization_tests.rs"
+  ],
+  "direct_observer_paths": [
+    "crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+    "crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+    "crates/ep_run/examples/ctf10_init_postlude_direct_support/compile_report_inputs.rs"
+  ],
+  "held_application_sources": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "source_preparation": {
+        "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/manifest.json",
+        "sha256": "b089d724b65467e72564176038001e6567e51861a924cc0bcd9f94848fe19c5c",
+        "size_bytes": 39237
+      },
+      "reviewed_source_authority": {
+        "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/proposed/crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+        "sha256": "b4a69e7eaec615c6a8d535b05259198499d9b9d3563166f5a9ab45ea9cf22ccf",
+        "size_bytes": 5978,
+        "line_count": 158
+      },
+      "held_before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/before/crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+        "sha256": "78fb5b7616416089b96e8868be0f5227952cce69b47974aa1ac630861452c320",
+        "size_bytes": 5143,
+        "line_count": 138
+      },
+      "exact_held_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/diffs/crates__ep_runtime__src__heat_balance__initialization__schedule_cache.rs.diff",
+        "sha256": "35402e65c8a9d777d64360f39a6c9029a36ad1b5db638b23f825d3ab1b1a03b2",
+        "size_bytes": 1304,
+        "line_count": 29
+      },
+      "new_destination_absent": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "source_preparation": {
+        "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/manifest.json",
+        "sha256": "b089d724b65467e72564176038001e6567e51861a924cc0bcd9f94848fe19c5c",
+        "size_bytes": 39237
+      },
+      "reviewed_source_authority": {
+        "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/proposed/crates/ep_runtime/src/heat_balance/initialization.rs",
+        "sha256": "5c8ce72a61fc77d59d2844be74e91b66729b1159a12149b28422290c331d9dd3",
+        "size_bytes": 13697,
+        "line_count": 280
+      },
+      "held_before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/before/crates/ep_runtime/src/heat_balance/initialization.rs",
+        "sha256": "a65f48ff6e13a0a97cdd8378d162adf03c2950b1e21ad8cff894d6016895de6a",
+        "size_bytes": 13634,
+        "line_count": 279
+      },
+      "exact_held_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/diffs/crates__ep_runtime__src__heat_balance__initialization.rs.diff",
+        "sha256": "d3466d32cc24d151ca0481d02de39b4eeee6ae6eda30c3a6acc12501e26db58d",
+        "size_bytes": 545,
+        "line_count": 10
+      },
+      "new_destination_absent": false
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/ctf10_init_postlude_candidate_production_observer.rs",
+      "source_preparation": {
+        "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/manifest.json",
+        "sha256": "b089d724b65467e72564176038001e6567e51861a924cc0bcd9f94848fe19c5c",
+        "size_bytes": 39237
+      },
+      "reviewed_source_authority": {
+        "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/proposed/crates/ep_run/examples/ctf10_init_postlude_candidate_production_observer.rs",
+        "sha256": "4251d705d81a8e7aeba06496d44f278d22a46e164e4de8285443a018b69455b4",
+        "size_bytes": 24975,
+        "line_count": 558
+      },
+      "held_before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/before/crates/ep_run/examples/ctf10_init_postlude_candidate_production_observer.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "exact_held_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/diffs/crates__ep_run__examples__ctf10_init_postlude_candidate_production_observer.rs.diff",
+        "sha256": "bf9b11a6247a4e7dbefb92282605ac7827868e54d7d295ca5c998e5ba4b0304e",
+        "size_bytes": 25718,
+        "line_count": 561
+      },
+      "new_destination_absent": true
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/ctf10_init_postlude_support/fields.rs",
+      "source_preparation": {
+        "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/manifest.json",
+        "sha256": "b089d724b65467e72564176038001e6567e51861a924cc0bcd9f94848fe19c5c",
+        "size_bytes": 39237
+      },
+      "reviewed_source_authority": {
+        "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/proposed/crates/ep_run/examples/ctf10_init_postlude_support/fields.rs",
+        "sha256": "c7cb0137e58fd1b1ef72861ee6e4af25f059da2fe0cc207570ee64be63f83ba3",
+        "size_bytes": 13639,
+        "line_count": 208
+      },
+      "held_before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/before/crates/ep_run/examples/ctf10_init_postlude_support/fields.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "exact_held_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/diffs/crates__ep_run__examples__ctf10_init_postlude_support__fields.rs.diff",
+        "sha256": "2541fc8ce1bd81dbfd0f7f2bdb56a765ab14ba2788d4709e3c2adbc74a9c41d7",
+        "size_bytes": 14002,
+        "line_count": 211
+      },
+      "new_destination_absent": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs",
+      "source_preparation": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/manifest.json",
+        "sha256": "f4d6b158e2cdf57cb59858f5ed83772302697ce50ce2b2649eafe915f5a00ef2",
+        "size_bytes": 22343
+      },
+      "reviewed_source_authority": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs",
+        "sha256": "57afbab1c2867b5a54d1b3863d321700925bd87e4ff21c449637c765d7b27d30",
+        "size_bytes": 10211,
+        "line_count": 254
+      },
+      "held_before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/before/crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs",
+        "sha256": "7628526fb3d4ef28fb0061df6d0b621ae3abb2c4481f9e8835fb8a1c9fdebefd",
+        "size_bytes": 8177,
+        "line_count": 202
+      },
+      "exact_held_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/diffs/crates__ep_runtime__src__heat_balance__ctf_init_postlude.rs.diff",
+        "sha256": "01a5f14a66f3f2a9dff5a478b54996deed17aeab73d2e03e1f050a82ba66c7df",
+        "size_bytes": 5557,
+        "line_count": 132
+      },
+      "new_destination_absent": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "source_preparation": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/manifest.json",
+        "sha256": "f4d6b158e2cdf57cb59858f5ed83772302697ce50ce2b2649eafe915f5a00ef2",
+        "size_bytes": 22343
+      },
+      "reviewed_source_authority": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+        "sha256": "a63c8719b48997c801d4a41527526d9404540858069565c62bdb65ece5a9cdda",
+        "size_bytes": 15720,
+        "line_count": 415
+      },
+      "held_before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/before/crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+        "sha256": "f852ed0bb96cb655b207c3abcb5976db642405c96a7332af17317a3be6329d67",
+        "size_bytes": 14738,
+        "line_count": 389
+      },
+      "exact_held_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/diffs/crates__ep_runtime__src__heat_balance__surface_manager__ctf_layer_preprocessing.rs.diff",
+        "sha256": "e84aec195e8e31b6df56a5562c139fa16812b5cf256271f13373f6571db08a6c",
+        "size_bytes": 2513,
+        "line_count": 69
+      },
+      "new_destination_absent": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "source_preparation": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/manifest.json",
+        "sha256": "f4d6b158e2cdf57cb59858f5ed83772302697ce50ce2b2649eafe915f5a00ef2",
+        "size_bytes": 22343
+      },
+      "reviewed_source_authority": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/proposed/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "33ae4c0548e84c59044bdf10aff87094cbd3cb604acf8fb185cc22aaa31a9dd3",
+        "size_bytes": 2127,
+        "line_count": 83
+      },
+      "held_before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/before/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "189dd2b58a10ac7e590a37548c166ab5596d93eb408186a68f339230e523861e",
+        "size_bytes": 2092,
+        "line_count": 82
+      },
+      "exact_held_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/diffs/crates__ep_runtime__src__heat_balance__mod.rs.diff",
+        "sha256": "244b43a9f7e17d2320bdc5c8e293a9ff08f44c93bfc69e4ae201624e5674bcaf",
+        "size_bytes": 462,
+        "line_count": 10
+      },
+      "new_destination_absent": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_direct_initialization.rs",
+      "source_preparation": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/manifest.json",
+        "sha256": "f4d6b158e2cdf57cb59858f5ed83772302697ce50ce2b2649eafe915f5a00ef2",
+        "size_bytes": 22343
+      },
+      "reviewed_source_authority": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_direct_initialization.rs",
+        "sha256": "ee8175a0aa125565b6c81f22c7dbb261fa5212406de1b6e6171fd42a4cecd200",
+        "size_bytes": 12032,
+        "line_count": 248
+      },
+      "held_before_archive": null,
+      "exact_held_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/diffs/crates__ep_runtime__src__heat_balance__ctf_direct_initialization.rs.diff",
+        "sha256": "10ddaa8fc1dfb400026df1ed9eafa12ef3c0b3852ae5691a6195b35ddc426880",
+        "size_bytes": 12448,
+        "line_count": 251
+      },
+      "new_destination_absent": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_direct_initialization_tests.rs",
+      "source_preparation": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/manifest.json",
+        "sha256": "f4d6b158e2cdf57cb59858f5ed83772302697ce50ce2b2649eafe915f5a00ef2",
+        "size_bytes": 22343
+      },
+      "reviewed_source_authority": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_direct_initialization_tests.rs",
+        "sha256": "d36f9218913358f85ba3bdd146c355ebfb516a497f8f378781910b1643e0e4f3",
+        "size_bytes": 10741,
+        "line_count": 199
+      },
+      "held_before_archive": null,
+      "exact_held_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/diffs/crates__ep_runtime__src__heat_balance__ctf_direct_initialization_tests.rs.diff",
+        "sha256": "1fd110bf25f0e93b25afb0a6e556d91140a8458dafbaf9fe161f0246ab7914eb",
+        "size_bytes": 11114,
+        "line_count": 202
+      },
+      "new_destination_absent": true
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+      "source_preparation": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/manifest.json",
+        "sha256": "beef016a72873faad6e5d80db580ba1c3773b454fc4b40b31e7f7f744428c80b",
+        "size_bytes": 52394
+      },
+      "reviewed_source_authority": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/proposed/crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+        "sha256": "0c2a0a5c5336d09ca385548e08e17828c53db683b07022cc03731b869ab76376",
+        "size_bytes": 17903,
+        "line_count": 233
+      },
+      "held_before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/before/crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "exact_held_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/diffs/crates__ep_run__examples__ctf10_init_postlude_candidate_direct_observer.rs.diff",
+        "sha256": "225b3fc9ab3a5e65a541300aa806a3ab5e471aff9361316e52058be729e9bb88",
+        "size_bytes": 18456,
+        "line_count": 236
+      },
+      "new_destination_absent": true
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+      "source_preparation": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/manifest.json",
+        "sha256": "beef016a72873faad6e5d80db580ba1c3773b454fc4b40b31e7f7f744428c80b",
+        "size_bytes": 52394
+      },
+      "reviewed_source_authority": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/proposed/crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+        "sha256": "4a8a98d724a9c5d3cd583ce7511249fda982447bea072c12202aa8b7b8de9421",
+        "size_bytes": 21235,
+        "line_count": 314
+      },
+      "held_before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/before/crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "exact_held_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/diffs/crates__ep_run__examples__ctf10_init_postlude_direct_support__fields.rs.diff",
+        "sha256": "b2d271505fe23d3b790758d59ab413822f01a3b253e21decc3beecac6337236b",
+        "size_bytes": 21861,
+        "line_count": 317
+      },
+      "new_destination_absent": true
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/ctf10_init_postlude_direct_support/compile_report_inputs.rs",
+      "source_preparation": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/manifest.json",
+        "sha256": "beef016a72873faad6e5d80db580ba1c3773b454fc4b40b31e7f7f744428c80b",
+        "size_bytes": 52394
+      },
+      "reviewed_source_authority": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/proposed/crates/ep_run/examples/ctf10_init_postlude_direct_support/compile_report_inputs.rs",
+        "sha256": "bab02fb4ae7532a01bf59e8e124ef72f81f6f5ba9cefdfe98b4debca5a49d73e",
+        "size_bytes": 1601,
+        "line_count": 38
+      },
+      "held_before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/before/crates/ep_run/examples/ctf10_init_postlude_direct_support/compile_report_inputs.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "exact_held_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/diffs/crates__ep_run__examples__ctf10_init_postlude_direct_support__compile_report_inputs.rs.diff",
+        "sha256": "c1ba64ebf4b761657c7bf6eeb73f2595ca20d90786e5cef04386fbf3fe746dfd",
+        "size_bytes": 1980,
+        "line_count": 41
+      },
+      "new_destination_absent": true
+    }
+  ],
+  "held_before_Source_snapshot": {
+    "path": ".runtime/porting/source-objects/ca/cae115f4bcf0212021276eecf9b6f613630d80dc952bb27e96e8cc76bcc3fa16",
+    "sha256": "cae115f4bcf0212021276eecf9b6f613630d80dc952bb27e96e8cc76bcc3fa16"
+  },
+  "prior_ordinary_application": {
+    "path": ".runtime/porting/CTF-10/ordinary-initialization-applied-03/record.json",
+    "sha256": "d8dd8f803c33a20dc6ab9ef07e0dd170c857ae8aeb9716f527115ad3f2b4ba33",
+    "size_bytes": 10475
+  },
+  "inherited_correction_lineage": [
+    {
+      "role": "unexecuted-wrong-correction01-Source-only",
+      "files": [
+        {
+          "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-01/correction.diff",
+          "sha256": "10a80c98a264cb39b7cfd9b2cf95cc1b74836153c7dd67ada34af6d6825c8948",
+          "size_bytes": 304
+        },
+        {
+          "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-01/part03.before.rs",
+          "sha256": "dc09a2bf601876562036eb62e41d4d5eb7f213e59b080c150bc59790ed6f4983",
+          "size_bytes": 48061
+        },
+        {
+          "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-01/part03.rs",
+          "sha256": "2c0a8af58a81d32074833b6fe4ce589d90a87986773511fef9a373e57d1a2ce5",
+          "size_bytes": 48079
+        }
+      ]
+    },
+    {
+      "role": "actual-existing-correction02",
+      "record": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-02/record.json",
+        "sha256": "dec40058cf955ff94caaaa676afe1cee084ad49053ef014cb20630bdd332b9d1",
+        "size_bytes": 418
+      }
+    },
+    {
+      "role": "actual-existing-correction03",
+      "record": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-03/record.json",
+        "sha256": "7e821dab38b3e50566750afca08eda1643c906f3e38f887eb2c2e7f480a4958d",
+        "size_bytes": 834
+      }
+    },
+    {
+      "role": "actual-existing-correction04",
+      "record": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-04/record.json",
+        "sha256": "69a5c0418cc1ae8f0cd9bce841547c3f5cfce1e1077e2a26f4abeeda68180c8d",
+        "size_bytes": 610
+      }
+    },
+    {
+      "role": "actual-existing-correction05",
+      "record": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-05/record.json",
+        "sha256": "9dfe138a46cc0e29381023da16a28dbd65861f2715b61c1719e956c71e789e0d",
+        "size_bytes": 951
+      }
+    },
+    {
+      "role": "actual-existing-correction06",
+      "record": {
+        "path": ".runtime/porting/CTF-10/ordinary-initialization-correction-06/record.json",
+        "sha256": "b9e8b631ed8f952b53b05eb5c0eb854bee6fe35f6a1e0279ebe1f4a70ccb6d0a",
+        "size_bytes": 907
+      }
+    },
+    {
+      "role": "actual-nonfinite-Source-repair",
+      "record": {
+        "path": ".runtime/porting/CTF-10/report-format-nonfinite-repair-applied-01/record.json",
+        "sha256": "dee36a57246fa167a994b654734dee98a6a5f1de1b8fe9c6c8081bf497ff2e9d",
+        "size_bytes": 2984
+      }
+    }
+  ],
+  "reused_actual_Root_source_templates": [
+    {
+      "actual_source": {
+        "path": ".runtime/porting/CTF-10/apply-ordinary-initialization-01.py",
+        "sha256": "954f72802c7c360ffba5d38d0a0ab9a5611dd2d14a95b157cfca4bedb8394cc1",
+        "size_bytes": 4067
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-batch-application-prep-01/before/apply-ordinary-initialization-01.py",
+        "sha256": "954f72802c7c360ffba5d38d0a0ab9a5611dd2d14a95b157cfca4bedb8394cc1",
+        "size_bytes": 4067
+      }
+    },
+    {
+      "actual_source": {
+        "path": ".runtime/porting/CTF-10/apply-and-format-thermal-history-01.py",
+        "sha256": "de9b0ec056ed96313b92d39df89521214b5fd9cb55dcab46a3f942d59c0ba108",
+        "size_bytes": 5465
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-batch-application-prep-01/before/apply-and-format-thermal-history-01.py",
+        "sha256": "de9b0ec056ed96313b92d39df89521214b5fd9cb55dcab46a3f942d59c0ba108",
+        "size_bytes": 5465
+      }
+    },
+    {
+      "actual_source": {
+        "path": ".runtime/porting/CTF-10/run-ordinary-initialization-quality-07.py",
+        "sha256": "abe1ae476856b78a25788752a62e5438b44e588763e4ceb67e8a12ef49fe3493",
+        "size_bytes": 1151
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-batch-application-prep-01/before/run-ordinary-initialization-quality-07.py",
+        "sha256": "abe1ae476856b78a25788752a62e5438b44e588763e4ceb67e8a12ef49fe3493",
+        "size_bytes": 1151
+      }
+    }
+  ],
+  "source_dependencies": [
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "size_bytes": 8453
+    }
+  ],
+  "runtime_interfaces": {
+    "application_schema": "ctf10-Init-postlude-actual-formatted-source-inventory.v1",
+    "quality_schema": "ctf10-Init-postlude-actual-quality.v1",
+    "actual_application_file_count": 12,
+    "existing_before_count": 5,
+    "new_destination_count": 7,
+    "Native_completion": "future genuine Root path#SHA operand; release required",
+    "candidate_artifact": "not built; later launcher must bind actual Cargo emitted artifact and identical complete Source snapshot",
+    "formatter_review": "Root explicitly supplies accepted actual formatted inventory after Root and independent review",
+    "quality_roles": [
+      "fmt-check",
+      "clippy",
+      "focused",
+      "workspace"
+    ]
+  },
+  "Source_only_checks": {
+    "regenerated_held_source_diffs": 12,
+    "current_before_or_absence_verified": 12,
+    "workflow_AST_parsed": true,
+    "actual_application_or_formatter_or_quality_or_target_execution": false,
+    "canonical_or_Git_mutation": false,
+    "Native_output_or_binary_read": false,
+    "numerical_or_whole_CTF10_PASS_claimed": false
+  },
+  "authorship_limit": "Header authored direct API and production observer ancestry plus this Root workflow. Independent review covers batching/custody/formatting/quality transport; it does not certify scientific equivalence or any gate."
+}

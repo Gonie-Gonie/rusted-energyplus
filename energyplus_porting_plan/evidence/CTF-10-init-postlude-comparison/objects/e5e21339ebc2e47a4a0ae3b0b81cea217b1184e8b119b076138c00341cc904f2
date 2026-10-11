@@ -1,0 +1,52 @@
+# Input transport and recorded candidate workflow
+
+This held Source preparation performs no command, project import, input
+conversion, Cargo build, observer call, comparison, publication or gate update.
+Only Root may invoke these scripts after actual Native05 custody release and
+independent formatter/quality08 review. Future output identities are operands.
+
+`write_request.py` requires these options:
+
+```
+--approved-source-sha256 WRITER_SHA --source-manifest PREP#SHA
+--native-freeze FREEZE#SHA --formatted-inventory INVENTORY#SHA
+--quality QUALITY08#SHA --conversion-ledger LEDGER#SHA
+--conversion-execution RECORDER_RECEIPT#SHA --output-dir FRESH_DIRECTORY
+```
+
+It validates the exact twelve applied bodies from b089/f4d6/beef, their held
+literal archives and current formatted archives, both ordered runtime bindings,
+and all four actual successful quality commands with the same full raw Source
+snapshot. Recorder snapshot references may omit size; supplied sizes remain
+mandatory exact checks. Current source membership, every archive and every
+current Rust/Cargo byte are checked independently of narrow API bindings.
+
+The Native05 freeze supplies exact direct6, admission12 and literal input refs.
+The one genuine SCH input conversion must join the frozen IDF, unchanged staged
+IDF, available epJSON, converter Source archives, ledger and recorded stdout.
+Its declared input-only/non-scientifically-frozen scope is retained. No manual
+ReportInputs, geometry, timestep, Native answer or result is accepted. The writer
+emits the observer's exact twelve-key request and separate input custody record.
+
+`run_candidates.py` takes all the same options, plus:
+
+```
+--production-request REQUEST15#SHA
+--production-projection-execution PROJECTOR_RECEIPT#SHA
+```
+
+It authenticates the existing reviewed projector03 invocation and request, then
+records the direct writer in a fresh child directory. One Cargo build with both
+`--example` arguments captures the actual emitted production and direct binaries.
+Both source closures must match the full quality snapshot. Each binary is called
+once with its separate request path and SHA (argc3), under distinct receipts.
+Actual exit 0 or 2 is retained; the workflow returns 2 if either observer returns
+2. A compile/launch/custody failure stops without rerun or correction. No observer
+stdout numerical values are parsed, compared or supplied to the other lane.
+
+All outputs are fresh children of `.runtime/porting/CTF-10`. The workflow stores
+actual writer/build/candidate identities and rechecks full sources, inputs and
+executables. Success here means recorded execution custody only. Numerical,
+whole-Init and integration parity require their separate reviewed comparison;
+this preparation claims none. Native historical source documents are validated
+through sealed refs; old live plan/card paths are not recursively rebound.

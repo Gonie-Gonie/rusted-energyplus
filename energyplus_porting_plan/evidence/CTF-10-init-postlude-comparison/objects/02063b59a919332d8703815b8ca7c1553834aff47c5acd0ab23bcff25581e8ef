@@ -1,0 +1,46 @@
+"""Seal only the reviewed Native06 literal-pin successor; no projector execution."""
+import argparse
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+BASE = OUT.parent
+
+def ref(p):
+    raw = p.read_bytes()
+    return dict(path=p.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw))
+
+def put(p, raw):
+    with p.open('xb') as stream: stream.write(raw)
+
+def main(native_sha):
+    assert not (OUT / 'manifest.json').exists()
+    old = BASE / 'init-postlude-input-projector-prep-03'
+    assert ref(old / 'manifest.json')['sha256'] == '69bc0aeeef10428b27dac71576b3f3005690e901aa60b41291a43ff6204e5072'
+    prior = json.loads((old / 'manifest.json').read_bytes()); before = ROOT / prior['source']['path']
+    native = BASE / 'native-init-postlude-prep-06/manifest.json'; assert ref(native)['sha256'] == native_sha
+    old_pin = prior['native_typed_SHA_operand_correction']['sha256'].encode(); raw = before.read_bytes()
+    assert raw.count(old_pin) == 1; body = raw.replace(old_pin, native_sha.encode())
+    assert body.replace(native_sha.encode(), old_pin) == raw; ast.parse(body)
+    proposal = OUT / 'project-inputs.py'; put(proposal, body)
+    diff = OUT / 'project-inputs.diff'
+    put(diff, ''.join(difflib.unified_diff(raw.decode().splitlines(True), body.decode().splitlines(True), fromfile=before.relative_to(ROOT).as_posix(), tofile=proposal.relative_to(ROOT).as_posix(), n=3)).encode())
+    put(OUT / 'README.md', b'''# Input projector04 Source preparation
+
+Only the Native manifest SHA literal changes from reviewed projector03 to06.
+Native06 fixes five numeric direct seeds against the unchanged literal request.
+The fixed15 transport, conversion proofs, separate direct lane, own4/API58 and
+all other121-line Source bytes are preserved by exact inverse substitution.
+No projector, engine, Cargo, canonical or Git action or output read occurs here.
+''')
+    m = dict(schema='ctf10-Init-postlude-input-projector-source-preparation.v4', parent_reviewed_preparation=ref(old / 'manifest.json'), source=ref(proposal), before_source=ref(before), exact_diff=ref(diff), README=ref(OUT / 'README.md'), native_numeric_seed_transport_correction=ref(native), authoring_source=ref(Path(__file__)), only_one_literal_change=True, parent_body_byte_inverse_exact=True, execution_performed=False, canonical_mutation=False, numerical_PASS_claimed=False, gates_updated=False)
+    ast.parse(Path(__file__).read_bytes()); put(OUT / 'manifest.json', (json.dumps(m, indent=2) + '\n').encode())
+    print(json.dumps(dict(projector=ref(OUT / 'manifest.json'), source=ref(proposal))))
+
+if __name__ == '__main__':
+    p = argparse.ArgumentParser(description=__doc__); p.add_argument('--native-sha256', required=True)
+    main(p.parse_args().native_sha256)

@@ -1,0 +1,68 @@
+{
+  "schema": "ctf10-next-unit-retained-Cargo-cache-transparent-storage.v1",
+  "files": [
+    {
+      "before": {
+        "path": "target/debug/deps/eplus_rs-591b04cd3fa3a5b1.exe",
+        "sha256": "619d7ca80395203fd55fd2960a792b13517b9a9881847c0d443423cd95c54287",
+        "size_bytes": 612592027
+      },
+      "after": {
+        "path": "target/debug/deps/eplus_rs-591b04cd3fa3a5b1.exe",
+        "sha256": "619d7ca80395203fd55fd2960a792b13517b9a9881847c0d443423cd95c54287",
+        "size_bytes": 612592027
+      },
+      "compact_exit_code": 0,
+      "command_log": {
+        "path": ".runtime/porting/CTF-10/init-postlude-retained-cargo-storage-01/eplus_rs-591b04cd3fa3a5b1.exe.log",
+        "sha256": "5c0f89122e6de0e3fdf5dd57b430348ea5ff6ef6e751fe0832b4d99bcaf57141",
+        "size_bytes": 251
+      },
+      "bytes_and_path_unchanged": true
+    },
+    {
+      "before": {
+        "path": "target/debug/deps/eplus_rs-5d435c28fb58030b.exe",
+        "sha256": "fc378d9ee4b1b54167daa93a3f4e74088bfae3cee01baf98ce1db81c091f8fd3",
+        "size_bytes": 614531211
+      },
+      "after": {
+        "path": "target/debug/deps/eplus_rs-5d435c28fb58030b.exe",
+        "sha256": "fc378d9ee4b1b54167daa93a3f4e74088bfae3cee01baf98ce1db81c091f8fd3",
+        "size_bytes": 614531211
+      },
+      "compact_exit_code": 0,
+      "command_log": {
+        "path": ".runtime/porting/CTF-10/init-postlude-retained-cargo-storage-01/eplus_rs-5d435c28fb58030b.exe.log",
+        "sha256": "6168728fe6ad4414404a7f27b90a20b04c92935d06646594986285f372a287bd",
+        "size_bytes": 251
+      },
+      "bytes_and_path_unchanged": true
+    },
+    {
+      "before": {
+        "path": "target/debug/deps/arbitrary_run_ideal_loads-dd485b1133f18062.exe",
+        "sha256": "9ba430be6a27a98a7ec1c7c451636527eb6dff179b6f86e21b54a5d1ea9e5cb6",
+        "size_bytes": 599531633
+      },
+      "after": {
+        "path": "target/debug/deps/arbitrary_run_ideal_loads-dd485b1133f18062.exe",
+        "sha256": "9ba430be6a27a98a7ec1c7c451636527eb6dff179b6f86e21b54a5d1ea9e5cb6",
+        "size_bytes": 599531633
+      },
+      "compact_exit_code": 0,
+      "command_log": {
+        "path": ".runtime/porting/CTF-10/init-postlude-retained-cargo-storage-01/arbitrary_run_ideal_loads-dd485b1133f18062.exe.log",
+        "sha256": "c66312e9ae662a0fc2061ee159011ac8db2c02ac736ab99dffdb1265b6cad68c",
+        "size_bytes": 251
+      },
+      "bytes_and_path_unchanged": true
+    }
+  ],
+  "observed_free_bytes_before": 259215360,
+  "observed_free_bytes_after": 1836535808,
+  "operation": "NTFS compact.exe /C /EXE:LZX /Q",
+  "file_deleted_or_moved": false,
+  "Original_or_scientific_result_mutated": false,
+  "gates_updated": false
+}

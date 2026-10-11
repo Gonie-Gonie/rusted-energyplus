@@ -1,0 +1,59 @@
+--- .runtime/porting/CTF-10/native-init-postlude-prep-05/README.md
++++ .runtime/porting/CTF-10/native-init-postlude-prep-06/README.md
+@@ -1,27 +1,33 @@
+-# Native Init postlude Source05 compile correction
++# Native Init direct-input transport correction06
+ 
+-This held successor adds explicit .get<std::string>() to the two SHA256 JSON
+-operands at helper03 lines392/437. Actual compile03 diagnostics contain exactly
+-these two primary operator== errors and no warning. It stopped before Native
+-capture; no scientific outcome is inferred. Failed compile logs/receipt remain
+-immutable historical lineage. All predicates and identity checks remain.
++This immutable successor changes exactly the five direct Material seed readers
++at helper05 lines298-302: bits-only input_real(row...) becomes the same row's
++get<Real64>(). The fixed Source fixture has JSON numbers in these thirty cells.
++Its only five finite values (0, 0.5, 1, 4, 1000) are exactly representable binary64
++inputs. Literal case order, names, independent ROnly flags, setup calls and all
++other values remain unchanged. The explicit input encoding map is in manifest.
++Rust direct observer already reads these finite JSON numbers via as_f64().
+ 
+-Removing only those two suffixes restores accepted04 helper bytes exactly.
+-No calculation, callback, observer, loader, literal input, policy, capture,
+-tolerance, output schema or gate changes. Actual outcomes remain unknown until
+-Root performs a fresh approved build/capture and factual QA.
++No Native calculation, predicate, callback, report, backend, Original function,
++policy, tolerance, expected value or output is changed. The exact Source020c
++literal six cases and IDF39df are preserved, including main's SHA and full-case
++equality checks. Replacing only the five new readers with their old calls restores
++the entire accepted05 helper byte-for-byte. All eight other own sources are exact.
+ 
+-All six helper/header files are physically present under05 for quoted includes.
+-Recipe05 is byte-identical accepted04 including its top-level/global DEFER guard;
+-Root passes this directory via CTF10_INIT_POSTLUDE_SOURCE_DIR. The three passive
+-TUs and six external Native refs are unchanged. Admission retains twelve sources:
+-six relocated same-parent bodies (only helper hash new), six external unchanged.
+-The compiled inventory remains four TUs. Direct IDF/cases are literal exact copies.
++All six required same-parent helper/headers are physically copied under06.
++The recipe is exact05/04 with the accepted top-level/global DEFER scheduling guard.
++Root supplies Source_DIR06; Native admission remains12 and compiled graph4 TUs.
++Six external Native sources are unchanged; no core object or binary is accessed.
++The unrelated full-surface Native06 proposal remains paused and unchanged.
+ 
+-Nine authentic04 before archives and nine exact diffs are retained (eight empty).
+-Current recipe/source refs are explicit; inherited Source/range/dependency context
+-is historical and unmodified. Root supplies fresh scope/freeze, SourceSnapshot,
+-configure/build/PE/provider/OriginalQA operands. No future identity or success is
+-predicted. Preparation uses only standard-library Source/metadata/hash/diff checks.
+-No project import, CMake, build, target, engine, Git or canonical action occurs.
+-Only authorized compile diagnostic text and identity metadata were read.
++Actual workflow04 Native execution failed on input transport after a successful
++build, according to its retained receipt and Root's diagnostic. That failure
++is historical and supplies no numerical result or PASS. Only its small execution
++receipt is bound here; no stdout/result/owner payload or binary is read or hashed.
++Root separately owns fresh scope/freeze/build/provider/capture/QA and preservation
++of the failed Original. This preparation does not predict those outcomes.
++
++Nine authentic05 before archives and nine exact diffs (eight empty) are retained.
++Inherited old Source/range and failure context stays literal and historical.
++Only stdlib Source/literal-input/metadata hash, AST and diff checks are performed.
++No project imports, configure/build/target, canonical or Git action occurs.

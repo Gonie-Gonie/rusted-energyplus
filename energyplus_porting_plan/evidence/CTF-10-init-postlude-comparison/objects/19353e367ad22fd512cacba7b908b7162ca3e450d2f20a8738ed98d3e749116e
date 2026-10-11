@@ -1,0 +1,96 @@
+"""Stdlib Source-only metadata; no project import or captured numerical input."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT=Path.cwd().resolve();OUT=Path(__file__).resolve().parent;OLD=OUT.with_name('init-postlude-comparison-prep-01')
+def ref(p):
+    p=Path(p);p=p if p.is_absolute() else ROOT/p;b=p.read_bytes()
+    return dict(path=p.relative_to(ROOT).as_posix(),sha256=hashlib.sha256(b).hexdigest(),size_bytes=len(b),line_count=len(b.splitlines()))
+def load(p):return json.loads((ROOT/p).read_text(encoding='utf8'))
+def write(p,b):
+    p.parent.mkdir(parents=True,exist_ok=True)
+    if p.exists():assert p.read_bytes()==b;return
+    p.write_bytes(b)
+def diff(a,b):
+    return ''.join(difflib.unified_diff(a.read_text(encoding='utf8').splitlines(True),b.read_text(encoding='utf8').splitlines(True),
+        fromfile=a.relative_to(ROOT).as_posix(),tofile=b.relative_to(ROOT).as_posix())).encode('utf8')
+old=load(OLD.relative_to(ROOT).as_posix()+'/manifest.json')
+assert ref(OLD/'manifest.json')['sha256']=='18da6d5bbe86b77ff81ca66e856447c9966e7a111447f3acd6433b879599ecd2'
+write(OUT/'before01/manifest.json',(OLD/'manifest.json').read_bytes())
+write(OUT/'before01/README.md',(OLD/'README.md').read_bytes())
+append='''
+
+Source-only successor02 preserves01. The frozen policy has its own genuine path;
+both files are tracked and their actual SHA/size must be identical to the held
+policy Source. A renamed byte copy is not required to have the Source path.
+
+Selected ordinary fixed-capacity partial public storage is a required copy-fact
+owner even when no normal return occurs. Missing Rust storage, actual aggregate
+or event-owned final shared flags, including State dropped on Err, is a required
+absence and comparison failure. Returned-only numerical selection and all frozen
+profiles remain unchanged; excluded source/2D/out-of-capacity branches remain
+unavailable and do not acquire numerical PASS.
+
+The earlier two canonical Source ranges changed during actual application.
+Their original range descriptors remain explicit historical identities; the
+same bytes now bind authentic accepted before archives, with the original
+canonical path and authority retained. No current formatted Source hash is
+invented. Other five runtime bodies are byte-exact01.
+'''
+write(OUT/'README.md',(OLD/'README.md').read_bytes()+append.encode('utf8'))
+rows=[]
+for before in old['own_sources']:
+    name=Path(before['path']).name;a=OUT/'before01'/name;b=OUT/name
+    assert ref(a)['sha256']==before['sha256'];ast.parse(b.read_text(encoding='utf8'))
+    write(OUT/'from-01-diffs'/(name+'.diff'),diff(a,b))
+    rows.append(dict(before=ref(a),after=ref(b),exact_diff=ref(OUT/'from-01-diffs'/(name+'.diff'))))
+write(OUT/'from-01-diffs/README.md.diff',diff(OUT/'before01/README.md',OUT/'README.md'))
+manifest=dict(old);manifest['own_sources']=[r['after'] for r in rows]
+manifest['predecessor_manifest']=ref(OLD/'manifest.json');manifest['predecessor_manifest_archive']=ref(OUT/'before01/manifest.json')
+manifest['historical_source_correspondence']=old['source_correspondence'];manifest['source_correspondence']=rows
+manifest['README']=ref(OUT/'README.md');manifest['README_before01']=ref(OUT/'before01/README.md')
+manifest['README_exact_diff']=ref(OUT/'from-01-diffs/README.md.diff')
+direct_path='.runtime/porting/CTF-10/init-postlude-direct-state-prep-01/manifest.json'
+direct=load(direct_path);production=load(old['production_observer_preparation']['path'])
+archives={r['canonical_path']:(r['actual_before_archive'],ref(direct_path)) for r in direct['application_sources'] if r['actual_before_archive']}
+archives.update({r['canonical_path']:(r['before_archive'],old['production_observer_preparation']) for r in production['own_sources'] if r['before_archive']})
+applied_path='.runtime/porting/CTF-10/init-postlude-applied-source-01/record.json'
+applied=load(applied_path);applied_ref=ref(applied_path)
+for actual in applied['actual_sources']:
+    canonical=actual['canonical_path']
+    if canonical in ['crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs','crates/ep_runtime/src/heat_balance/initialization.rs']:
+        accepted,authority=archives[canonical];before=actual['actual_before_archive']
+        assert all(before[k]==accepted[k] for k in ['sha256','size_bytes'])
+        assert actual['source_preparation']['sha256']==authority['sha256']
+        archives[canonical]=(before,applied_ref)
+ranges=[];history=[];dependencies={r['path']:r for r in old['source_dependencies']}
+for original in old['selected_source_ranges']:
+    row=dict(original)
+    if original['path'] in ['crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs','crates/ep_runtime/src/heat_balance/initialization.rs']:
+        archive,authority=archives[original['path']];actual=ref(archive['path'])
+        assert actual['sha256']==archive['sha256'] and actual['size_bytes']==archive['size_bytes']
+        row['path']=archive['path'];row['historical_path']=original['path']
+        row['purpose']='Historical accepted before-application context: '+row['purpose']
+        history.append(dict(historical_original_range_descriptor=original,bound_range=dict(row),
+            accepted_actual_before_archive=archive,accepted_source_authority=authority,
+            current_canonical_Source_equality_claimed=False))
+        dependencies[archive['path']]=archive;dependencies[authority['path']]=authority
+    data=b''.join((ROOT/row['path']).read_bytes().splitlines(keepends=True)[row['start_line']-1:row['end_line']])
+    assert hashlib.sha256(data).hexdigest()==row['sha256'] and len(data)==row['size_bytes'],row
+    ranges.append(row)
+manifest['selected_source_ranges']=ranges;manifest['historical_range_correspondence']=history
+manifest['source_dependencies']=list(dependencies.values())
+for row in manifest['source_dependencies']:
+    actual=ref(row['path']);assert actual['sha256']==row['sha256'] and actual['size_bytes']==row['size_bytes']
+manifest['Source_only_validation']=dict(old['Source_only_validation'],narrow_regenerated_diffs=7,
+    other_five_runtime_bodies_literal01=True,historical_range_archive_correspondences=len(history),
+    whole_source_dependencies=len(dependencies))
+for row in rows:
+    if Path(row['after']['path']).name not in ['compare.py','compare_case.py']:
+        assert row['before']['sha256']==row['after']['sha256'] and row['exact_diff']['size_bytes']==0
+manifest['authoring_sources']=[ref(OUT/'prepare_sources.py'),ref(Path(__file__))]
+write(OUT/'manifest.json',(json.dumps(manifest,ensure_ascii=False,allow_nan=False,indent=2)+'\n').encode('utf8'))
+print(json.dumps(dict(manifest=ref(OUT/'manifest.json'),own_sources=manifest['own_sources'],whole_refs=len(dependencies),typed_ranges=len(ranges)),indent=2))

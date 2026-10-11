@@ -1,0 +1,325 @@
+"""Root-only four-TU whole-Init capture workflow. No canonical install or numerical PASS."""
+import argparse
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+
+ROOT = Path.cwd().resolve()
+BASE = ROOT / '.runtime/porting/CTF-10'
+BUILD = ROOT / '.runtime/ep261-gcc13-o0'
+TARGET = 'ctf10_init_postlude_helper'
+RECORDER = ROOT / 'tools/porting/record_command.py'
+DERIVE = ROOT / 'tools/porting/derive_native_helper.py'
+HISTORICAL_PRODUCTION_FREEZE_RECEIPT = {'path': '.runtime/porting/CTF-10/production-freeze-command-01/receipt.json', 'sha256': '0682bd2b783a97cfee127b1e467d07bf5d333ba047390cfac5212c56c4c34298', 'size_bytes': 4228}
+HISTORICAL_PRODUCTION_FREEZE_RECORDER = {'path': '.runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c', 'sha256': '8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c', 'size_bytes': 8125}
+
+def need(ok, message):
+    if not ok: raise ValueError(message)
+
+def sha(p):
+    with p.open('rb') as s:return hashlib.file_digest(s,'sha256').hexdigest()
+
+def path(name):
+    p=(ROOT/name).resolve();need(p.is_relative_to(ROOT) and p!=ROOT,'Contained repository file required');return p
+
+def ref(p):return dict(path=p.relative_to(ROOT).as_posix(),sha256=sha(p),size_bytes=p.stat().st_size)
+
+def exact(r):
+    p=path(r['path']);need(sha(p)==r['sha256'] and ('size_bytes' not in r or type(r['size_bytes']) is int and p.stat().st_size==r['size_bytes']),'Actual file identity differs');return p
+
+def operand(s):
+    p,h=s.rsplit('#',1);return ref(exact(dict(path=p,sha256=h)))
+
+def pairs(rows):
+    out={}
+    for k,v in rows:need(k not in out,'Duplicate JSON key');out[k]=v
+    return out
+
+def read(p):
+    with p.open('r',encoding='utf8') as s:return json.load(s,object_pairs_hook=pairs,parse_constant=lambda v:need(False,'Nonfinite JSON token: '+v))
+
+def write(p,v):
+    with p.open('x',encoding='utf8',newline='\n') as s:json.dump(v,s,indent=2,allow_nan=False);s.write('\n')
+
+def recorded(r,allowed=(0,),*,historical_production_freeze=False):
+    v=read(exact(r));need(v['schema']=='recorded-porting-command.v1' and type(v['exit_code']) is int and v['exit_code'] in allowed and v['launch_error'] is None and v['source_bytes_match_before_and_after'] is True and Path(v['cwd']).resolve()==ROOT,'Genuine source-preserving command required')
+    for k in ['stdout','stderr','source_snapshot']:exact(v[k])
+    expected_recorder=sha(RECORDER)
+    if historical_production_freeze:
+        need(ref(exact(r))==HISTORICAL_PRODUCTION_FREEZE_RECEIPT,'Only the exact historical production-freeze receipt is admitted')
+        need(ref(exact(v['executed_launcher']['archive']))==HISTORICAL_PRODUCTION_FREEZE_RECORDER,'Exact historical production-freeze recorder archive required')
+        expected_recorder=sha(exact(HISTORICAL_PRODUCTION_FREEZE_RECORDER))
+    need(v['executed_launcher']['historical_path']=='tools/porting/record_command.py' and sha(exact(v['executed_launcher']['archive']))==expected_recorder,'Reviewed actual recorder differs');return v
+
+def execute(out,name,command,allowed=(0,)):
+    directory=out/name
+    subprocess.run([sys.executable,'-X','utf8','-B',str(RECORDER),'--output-dir',str(directory),'--',*command],env=ENV,stdout=subprocess.DEVNULL,check=False)
+    r=ref(directory/'receipt.json');v=recorded(r,allowed);need(v['command']==command,'Actual argv differs');print(json.dumps(dict(stage=name,receipt=r,exit_code=v['exit_code'])),flush=True);return r,v
+
+def preserve(prior):
+    rows=prior['protected_refs']+[prior[k] for k in ['linked_original','helper_binary','link_map']]
+    need(len(rows)==61 and len({r['path'] for r in rows})==61 and len(prior['core_refs'])==631 and len(prior['absent_paths'])==24,'Inherited actual58 plus format Original/helper/map,631 core and24 absent required')
+    for r in rows+prior['core_refs']:exact(r)
+    for n in prior['absent_paths']:need(not path(n).exists(),'Protected absent file recreated')
+    return rows
+
+def prepare_sources(m):
+    need(m['schema']=='ctf10-native-Init-postlude-source-preparation.v1' and m['runtime_interfaces']['compiled_TU_count']==4 and m['runtime_interfaces']['Native_admission_source_count']==12,'Reviewed four-TU source manifest required')
+    for r in m['native_source_files']+[m['recipe']]:exact(r)
+    for r in m['source_ranges']:
+        b=b''.join(path(r['path']).read_bytes().splitlines(True)[r['start_line']-1:r['end_line']]);need(hashlib.sha256(b).hexdigest()==r['sha256'] and len(b)==r['size_bytes'],'Pinned Original Source range differs')
+
+def freeze(args,out,m,native_ref,policy_ref):
+    old_ref=operand(args.prior_production_freeze);old=read(exact(old_ref));receipt=recorded(operand(args.prior_production_freeze_execution),historical_production_freeze=True)
+    need(old['schema']=='ctf10-production-frozen-packet.v1' and old['frozen_before_this_CTF10_helper_execution'] is True and old['expected_values_supplied'] is False,'Genuine historical fixed15 input freeze required')
+    old_stdout=read(exact(receipt['stdout']));need(old_stdout==old,'Historical freezer full stdout differs')
+    scope_ref=operand(args.scope);scope=read(exact(scope_ref));scope_execution=operand(args.scope_execution);recorded(scope_execution)
+    need(scope['schema']=='ctf10-native-Init-postlude-scope-amendment.v1' and scope['native_source_manifest']==native_ref and scope['observation_policy']==policy_ref,'Reviewed current scope Source/policy binding differs')
+    for k in ['expected_values_supplied','expected_exits_supplied','scientific_execution_performed','integration_PASS_claimed','gates_updated']:need(scope[k] is False,'Scope must precede scientific execution and claim no PASS')
+    docs=scope['source_authorities']['current_after_documents'];need([r['path'] for r in docs]==['energyplus_porting_plan/plan.json','energyplus_porting_plan/cards/CTF-10.md','energyplus_porting_plan/energyplus_porting_checklist.html'],'Exact current three-document order required')
+    for r in docs:exact(r)
+    directory=out/'frozen';directory.mkdir()
+    source=read(exact(old['contracts']['source']));tol=read(exact(old['contracts']['tolerances']));request=read(exact(old['helper_request']))
+    need(request['model_cases'] and len(request['model_cases'])==15 and request['requested_counts']=={'model_cases':15,'loader_phase_records':195},'Unchanged fixed15/13 loader declaration required')
+    for r in request['all_45_guard_refs']:exact(r)
+    need(len(request['all_45_guard_refs'])==45 and old['all_45_guard_refs']==request['all_45_guard_refs'],'Exact45 inherited input guards required')
+    for r in source['source_files']:exact({**r,'path':'.reference/energyplus-src/26.1.0/'+r['path']})
+    fresh=dict(frozen_before_this_CTF10_helper_execution=True,expected_values_supplied=False,expected_exits_supplied=False,scientific_execution_performed=False,actual_scope_amendment=scope_ref,actual_scope_amendment_execution=scope_execution,actual_scope_amendment_execution_role='real-CTF-10-Init-postlude-check-only',current_cards={'CTF-10':docs[1]})
+    authorities=dict(current_after_documents=docs,actual_scope_amendment=scope_ref,actual_scope_amendment_execution=scope_execution,historical_prior_production_freeze=old_ref,historical_prior_production_authority=old['source_authorities'])
+    source.update(fresh);source['source_authorities']=authorities;tol.update(fresh);request.update(fresh)
+    write(directory/'source.json',source);write(directory/'tolerances.json',tol)
+    contracts={k:ref(directory/(k+'.json')) for k in ['source','tolerances']};request['contracts']=contracts
+    write(directory/'helper-request.json',request);request_ref=ref(directory/'helper-request.json')
+    cases=read(exact(old['contracts']['cases']));cases.update(fresh);cases.update(helper_request=request_ref,source=contracts['source'],tolerances=contracts['tolerances']);write(directory/'cases.json',cases);contracts['cases']=ref(directory/'cases.json')
+    projection=read(exact(old['projection']));projection.update(fresh);projection.update(helper_request=request_ref,contracts=contracts);projection['source_authorities']=authorities;write(directory/'projection.json',projection)
+    declared=next(r['source'] for r in m['own_sources'] if Path(r['source']['path']).name=='direct-unit-cases.proposed.json');literal=read(exact(declared));need(len(literal['cases'])==6 and literal['expected_values_supplied'] is False,'Six literal direct input-only states required')
+    shutil.copyfile(exact(literal['literal_IDF_source']),directory/'direct-input.idf')
+    direct=dict(schema='ctf10-Init-postlude-direct-unit-request.v1',frozen_before_this_helper_execution=True,expected_values_supplied=False,expected_exits_supplied=False,scientific_execution_performed=False,literal_case_source=declared,cases=literal['cases'],input=ref(directory/'direct-input.idf'))
+    write(directory/'direct-request.json',direct)
+    admission=read(exact(old['native_admission_contract']));admission.update(fresh);admission.update(helper_request=request_ref,contracts=contracts,projection=ref(directory/'projection.json'),native_source_files=m['native_source_files'],direct_unit_request=ref(directory/'direct-request.json'));write(directory/'native-admission.json',admission)
+    shutil.copyfile(exact(policy_ref),directory/'policy.json')
+    packet=dict(schema='ctf10-native-Init-postlude-frozen-inputs.v1',native_source_manifest=native_ref,prior_production_freeze=old_ref,prior_production_freeze_execution=operand(args.prior_production_freeze_execution),helper_request=request_ref,native_admission_contract=ref(directory/'native-admission.json'),projection=ref(directory/'projection.json'),contracts=contracts,direct_unit_request=ref(directory/'direct-request.json'),observation_policy=ref(directory/'policy.json'),actual_runner_source=ref(Path(__file__).resolve()),source_authorities=authorities,declared_model_cases=15,declared_direct_cases=6,expected_values_supplied=False,expected_exits_supplied=False,scientific_execution_performed=False,frozen_before_this_execution=True,numerical_PASS_claimed=False,gates_updated=False)
+    write(out/'freeze.json',packet);return packet
+
+def providers(link_map,sources):
+    prefixes={'EnergyPlus::HeatBalanceManager::InitConductionTransferFunctions(':'HeatBalanceManager.ctf10.cc.obj'}
+    prefixes.update({'EnergyPlus::Construction::ConstructionProps::'+name+'(':'Construction.ctf10.cc.obj' for name in ['calculateTransferFunction','reportLayers','reportTransferFunction']})
+    hits={k:[] for k in prefixes};loads=[];core=[];section=None;original_hits=0
+    with link_map.open(encoding='utf8') as s:
+        for number,line in enumerate(s,1):
+            if line.startswith(' .text '):section=(number,line)
+            f=line.split()
+            if len(f)>=2 and f[0].startswith('0x'):
+                symbol=line.strip().split(None,1)[1]
+                for prefix,owner in prefixes.items():
+                    if symbol.startswith(prefix):
+                        need(section is not None and 'CMakeFiles/'+TARGET+'.dir/' in section[1] and owner in section[1],'Selected genuine derived provider required');parts=section[1].split();address=int(f[0],16)
+                        need(int(parts[1],16)<=address<int(parts[1],16)+int(parts[2],16),'Symbol address must belong to actual latest text section');hits[prefix].append(dict(symbol_line=number,symbol=line.rstrip(),section_provider=dict(line=section[0],text=section[1].rstrip())))
+            if line.startswith('LOAD ') and 'CMakeFiles/'+TARGET+'.dir/' in line:loads.append(dict(line=number,text=line.rstrip()))
+            if line.strip()=='LOAD Products/libenergypluslib.a':core.append(number)
+            if any('libenergypluslib.a('+n+'.cc.obj)' in line for n in ['Construction','HeatBalanceManager']):original_hits+=1
+    need(all(len(v)==1 for v in hits.values()) and len(loads)==4 and len(core)==1 and max(r['line'] for r in loads)<core[0] and original_hits==0,'Four genuine TU loads/unique derived providers/no selected core duplicates required')
+    need(all(sum(Path(r['path']).name+'.obj' in v['text'] for v in loads)==1 for r in sources),'Every actual four-TU object required');return dict(address_bound_selected_providers={k:v[0] for k,v in hits.items()},actual_target_LOADs=loads,core_LOAD=core,selected_core_duplicate_hits=original_hits)
+
+def historical_registration_recovery(prep,actual_before,prior,*,require_unbuilt=False):
+    recovery=prep['failed_registration_recovery']
+    old_native_ref=recovery['native_source_manifest'];old_native=read(exact(old_native_ref));prepare_sources(old_native)
+    old_freeze=read(exact(recovery['freeze']))
+    need(old_freeze['native_source_manifest']==old_native_ref and old_freeze['actual_runner_source']==prep['predecessor_runner_source'],'Exact failed Native04/freeze/runner binding required')
+    inherited=read(exact(recovery['compile_before']));failed_after=read(exact(recovery['compile_after']))
+    old_target=[r for r in failed_after if 'CMakeFiles/'+TARGET+'.dir/' in r['command'].replace('\\','/')]
+    need(len(inherited)==733 and len(failed_after)==737 and len(old_target)==4 and
+        [r for r in failed_after if r not in old_target]==inherited and actual_before==failed_after and
+        {Path(r['file']).resolve() for r in old_target}=={exact(r) for r in old_native['compiled_source_files']},
+        'Actual failed737 must contain exactly inherited733 plus four authenticated old target rows')
+    need(all(Path(r['directory']).resolve()==BUILD and Path(r['output']).resolve().is_relative_to(BUILD) and
+        '/CMakeFiles/'+TARGET+'.dir/' in Path(r['output']).resolve().as_posix() for r in old_target),
+        'Exact contained target object output ownership required')
+    receipts={k:recorded(recovery[k],(1,) if k in ['compile','workflow_execution','outer_launch_execution'] else (0,))
+        for k in ['configure','dry_build','compile','workflow_execution','outer_launch_execution']}
+    need(all(v['source_snapshot']==receipts['configure']['source_snapshot'] for v in receipts.values()),
+        'Actual failed recovery command Source snapshots differ')
+    old_recipe=exact(recovery['additive_recipe'])
+    inherited_recipe=exact(prior['freeze']).parent/'additive-reference.cmake'
+    need(old_recipe.read_text(encoding='utf8')=='include("'+inherited_recipe.as_posix()+'")\ninclude("'+exact(old_native['recipe']).as_posix()+'")\n',
+        'Exact failed additive recipe inheritance required')
+    command=recorded(prior['configure'])['command'].copy()
+    need(sum(v.startswith('-DCMAKE_PROJECT_INCLUDE=') for v in command)==1,'Single prior configured recipe required')
+    command=['-DCMAKE_PROJECT_INCLUDE='+str(old_recipe) if v.startswith('-DCMAKE_PROJECT_INCLUDE=') else v for v in command]
+    command+=['-DCTF10_INIT_POSTLUDE_SOURCE_DIR='+str(exact(old_native['compiled_source_files'][0]).parent)]
+    need(receipts['configure']['command']==command and
+        receipts['dry_build']['command']==[str(ROOT/'.runtime/reference-tools/ninja-1.13.2/ninja.exe'),'-C',str(BUILD),'-n','-v','Products/'+TARGET+'.exe'] and
+        receipts['compile']['command']==[command[0],'--build',str(BUILD),'--target',TARGET,'--parallel','1','--verbose'],
+        'Exact failed configure/dry/compile argv required')
+    failed_directory=exact(recovery['freeze']).parent
+    need(not (failed_directory/'capture').exists() and not (failed_directory/'native.json').exists(),
+        'Preserved failure must precede capture and completed workflow')
+    if require_unbuilt:
+        need(not (BUILD/('Products/'+TARGET+'.exe')).exists() and not (BUILD/(TARGET+'.map')).exists() and
+            all(not Path(r['output']).exists() for r in old_target),'Failed first TU must not have produced target objects, Original or map')
+    return inherited
+
+def failed_capture_recovery(prep,actual_before,prior,archive_ref,*,require_archived=False):
+    recovery=prep['failed_capture_recovery'];old_ref=recovery['native_build'];old=read(exact(old_ref))
+    old_prep=read(exact(prep['predecessor_manifest']));old_native=read(exact(old['native_source_manifest']));prepare_sources(old_native)
+    need(old['schema']=='ctf10-native-Init-postlude-workflow.v1' and old['workflow_source_manifest']==prep['predecessor_manifest'] and
+        old['native_source_manifest']==old_prep['recovery_native_source_manifest'] and read(exact(old['prior_format_workflow']))==prior and old['actual_helper_exit_code']==1,
+        'Exact failed completed Native05 workflow required')
+    old_freeze=read(exact(old['freeze']))
+    need(old_freeze['native_source_manifest']==old['native_source_manifest'] and old_freeze['actual_runner_source']==prep['predecessor_runner_source'],
+        'Exact failed Native05 freeze and runner binding required')
+    inherited=historical_registration_recovery(old_prep,read(exact(old['compile_before'])),prior)
+    failed_after=read(exact(old['compile_after']));old_target=[r for r in failed_after if 'CMakeFiles/'+TARGET+'.dir/' in r['command'].replace('\\','/')]
+    need(len(inherited)==733 and len(failed_after)==737 and len(old_target)==4 and
+        [r for r in failed_after if r not in old_target]==inherited and actual_before==failed_after and
+        read(exact(old['compile_inherited_before']))==inherited and
+        {Path(r['file']).resolve() for r in old_target}=={exact(r) for r in old_native['compiled_source_files']},
+        'Actual failed737 must retain literal inherited733 and four genuine Native05 rows')
+    need(all(Path(r['directory']).resolve()==BUILD and Path(r['output']).resolve().is_relative_to(BUILD) and
+        '/CMakeFiles/'+TARGET+'.dir/' in Path(r['output']).resolve().as_posix() for r in old_target),'Contained old target object ownership required')
+    commands={k:recorded(old[k]) for k in ['configure','dry_build','compile','compact_original_and_map','derive']}
+    execution=recorded(old['native_execution'],(1,));qa_execution=recorded(recovery['qa_execution'],(2,))
+    workflow_execution=recorded(recovery['workflow_execution'],(2,));outer_execution=recorded(recovery['outer_launch_execution'],(1,))
+    need(all(v['source_snapshot']==execution['source_snapshot'] for v in [*commands.values(),qa_execution,workflow_execution,outer_execution]),
+        'Failed build/capture/QA/workflow/launch Source snapshots differ')
+    old_recipe=exact(old['freeze']).parent/'additive-reference.cmake';inherited_recipe=exact(prior['freeze']).parent/'additive-reference.cmake'
+    need(old_recipe.read_text(encoding='utf8')=='include("'+inherited_recipe.as_posix()+'")\ninclude("'+exact(old_native['recipe']).as_posix()+'")\n',
+        'Exact failed additive recipe inheritance required')
+    command=recorded(prior['configure'])['command'].copy();need(sum(v.startswith('-DCMAKE_PROJECT_INCLUDE=') for v in command)==1,'Single inherited recipe required')
+    command=['-DCMAKE_PROJECT_INCLUDE='+str(old_recipe) if v.startswith('-DCMAKE_PROJECT_INCLUDE=') else v for v in command]
+    command+=['-DCTF10_INIT_POSTLUDE_SOURCE_DIR='+str(exact(old_native['compiled_source_files'][0]).parent)]
+    need(commands['configure']['command']==command and commands['dry_build']['command']==[str(ROOT/'.runtime/reference-tools/ninja-1.13.2/ninja.exe'),'-C',str(BUILD),'-n','-v','Products/'+TARGET+'.exe'] and
+        commands['compile']['command']==[command[0],'--build',str(BUILD),'--target',TARGET,'--parallel','1','--verbose'],'Exact successful old build argv required')
+    dry_lines=[v for v in exact(commands['dry_build']['stdout']).read_text(encoding='utf8').splitlines() if ' -c ' in v]
+    actual_lines=[v for v in exact(commands['compile']['stdout']).read_text(encoding='utf8').splitlines() if re.match(r'^\[\d+/\d+\] ',v) and ' -c ' in v]
+    need(len(dry_lines)==4 and dry_lines==actual_lines and all('CMakeFiles/'+TARGET+'.dir/' in v.replace('\\','/') for v in dry_lines) and
+        all(sum(str(exact(r)).replace('\\','/').casefold() in v.replace('\\','/').casefold() for v in dry_lines)==1 for r in old_native['compiled_source_files']),
+        'Actual successful old four dry and compile commands differ')
+    need(execution['command']==[str(exact(old['helper_binary'])),str(ROOT),str(exact(old_freeze['helper_request'])),str(exact(old_freeze['native_admission_contract'])),str(exact(old_freeze['direct_unit_request'])),str(path(old['actual_native_output_directory']))],
+        'Actual failed argc6 input-only capture argv differs')
+    completion=read(exact(recovery['completion']));qa=read(exact(recovery['qa_report']))
+    need(completion['schema']=='ctf10-native-Init-postlude-completion.v1' and completion['workflow']==old_ref and
+        completion['OriginalDataQA']==recovery['qa_report'] and completion['OriginalDataQA_execution']==recovery['qa_execution'] and completion['Original_capture_custody_released'] is False and
+        qa['schema']=='ctf10-native-Init-postlude-independent-original-data-review.v1' and qa['reviewed_source_manifest']==prep['predecessor_manifest'] and qa['actual_workflow']==old_ref and
+        qa['actual_native_execution']==old['native_execution'] and qa['Original_capture_custody_released'] is False and qa['actual_native_results'] is None and qa['actual_observation_counts'] is None and
+        qa['observation_integrity_failures']==['Actual Native result file absent; no counts inferred'] and read(exact(qa_execution['stdout']))==qa and not path(old['result_file']).exists(),
+        'Retained failed capture and factual QA must remain unreleased with no result/count inference')
+    proof=read(exact(archive_ref));failed_directory=exact(old['freeze']).parent;archive_directory=path(proof['archive_directory'])
+    need(proof['schema']=='ctf10-Init-postlude-failed-build-artifact-archive.v1' and Path(proof['failed_workflow_directory']).resolve()==failed_directory and
+        archive_directory.is_relative_to(BASE) and not archive_directory.is_relative_to(failed_directory) and not archive_directory.is_relative_to(BUILD),
+        'Dedicated contained failed-artifact archive required')
+    for key,value in [('failed_native_build',old_ref),('failed_completion',recovery['completion']),('failed_native_execution',old['native_execution']),('failed_qa_execution',recovery['qa_execution']),('failed_workflow_execution',recovery['workflow_execution']),('failed_outer_launch_execution',recovery['outer_launch_execution'])]:
+        need(proof[key]==value,'Archive proof actual failure reference differs: '+key);exact(proof[key])
+    need(proof['protected_refs']==old['protected_refs']==preserve(prior) and proof['core_refs']==old['core_refs']==prior['core_refs'] and proof['absent_paths']==old['absent_paths']==prior['absent_paths'] and
+        proof['protected_refs_unchanged'] is True and proof['core_refs_unchanged'] is True and proof['core_present_count']==631 and
+        all(proof[k] is False for k in ['capture_replayed','failed_capture_released','scientific_execution_certified','gates_updated']),
+        'Archive must retain protected61/core631/absence24 and unreleased failure status')
+    entries=proof['entries'];need(len(entries)==2 and [r['role'] for r in entries]==['linked_original','link_map'],'Only failed Original and map may be archived')
+    archived={}
+    for row in entries:
+        role=row['role'];a=exact(row['archived']);need(row['original']==old[role] and a.parent==archive_directory and a!=path(row['original']['path']) and
+            row['archived']['sha256']==row['original']['sha256'] and row['archived']['size_bytes']==row['original']['size_bytes'] and
+            row['original_absent_after_move'] is True and row['logical_bytes_equal'] is True,'Full exact failed artifact archive correspondence differs')
+        if require_archived:need(not path(row['original']['path']).exists(),'Failed Original/map must be archived before new configure')
+        archived[role]=a
+    need(providers(archived['link_map'],old_native['compiled_source_files'])==old['link_providers'],'Archived old map/provider correspondence differs')
+    derivative=read(exact(old['derivative']))
+    need(derivative['status']=='pass-exact-retained-runtime-sections-and-directories' and all(derivative[k] is True for k in ['original_bytes_unchanged','source_bytes_match_before_and_after','accepted_derivative_bytes_unchanged']) and
+        derivative['original_before']==derivative['original_after'] and derivative['original_before']['sha256']==old['linked_original']['sha256'] and derivative['original_before']['size_bytes']==old['linked_original']['size_bytes'] and
+        derivative['accepted_derivative']==derivative['observed_derivative'] and ref(exact(derivative['accepted_derivative']))==old['helper_binary'],
+        'Actual old derivative must stay retained and bound to archived Original')
+    need(commands['compact_original_and_map']['command'][1:5]==['/C','/F','/I','/EXE:LZX'] and commands['compact_original_and_map']['command'][5:]==[str(path(old['linked_original']['path'])),str(path(old['link_map']['path']))] and
+        old['logical_original_and_map_before_compact']==[old['linked_original'],old['link_map']],'Actual old logical compaction identities differ')
+    return inherited,old_target
+
+def native(args,out,prep,prep_ref):
+    native_ref=operand(args.native_source);m=read(exact(native_ref));prepare_sources(m);need(native_ref==prep['recovery_native_source_manifest'],'Exact reviewed recovery Native06 manifest required')
+    prior_ref=operand(args.prior_format_workflow);prior=read(exact(prior_ref));need(prior['schema']=='ctf10-report-format-native-workflow.v1' and prior['Original_capture_custody_released'] is True,'Actual completed F/G733 workflow required')
+    protected=preserve(prior)
+    for k in ['configure','dry_build','compile','derive']:recorded(prior[k])
+    policy_ref=prep['prospective_policy'];packet=freeze(args,out,m,native_ref,policy_ref)
+    archive_ref=operand(args.failed_artifact_archive);before=read(BUILD/'compile_commands.json')
+    inherited_rows,old_target=failed_capture_recovery(prep,before,prior,archive_ref,require_archived=True);old_objects=[ref(Path(r['output'])) for r in old_target]
+    write(out/'compile-before.json',before);write(out/'compile-inherited-before.json',inherited_rows)
+    recipe=out/'additive-reference.cmake';recipe.write_text('include("'+exact(prior['freeze']).parent.joinpath('additive-reference.cmake').as_posix()+'")\ninclude("'+exact(m['recipe']).as_posix()+'")\n',encoding='utf8',newline='\n')
+    inherited=exact(prior['freeze']).parent/'additive-reference.cmake';need(inherited.is_file(),'Prior actual additive recipe required');inherited_ref=ref(inherited)
+    command=recorded(prior['configure'])['command'].copy();need(sum(v.startswith('-DCMAKE_PROJECT_INCLUDE=') for v in command)==1,'Single inherited CMake include required');need(next(v.split('=',1)[1] for v in command if v.startswith('-DCMAKE_PROJECT_INCLUDE='))==str(inherited),'Inherited actual configured recipe differs')
+    command=['-DCMAKE_PROJECT_INCLUDE='+str(recipe) if v.startswith('-DCMAKE_PROJECT_INCLUDE=') else v for v in command];command+=['-DCTF10_INIT_POSTLUDE_SOURCE_DIR='+str(exact(m['compiled_source_files'][0]).parent)]
+    configure,_=execute(out,'configure',command);after=read(BUILD/'compile_commands.json');new=[r for r in after if 'CMakeFiles/'+TARGET+'.dir/' in r['command'].replace('\\','/')]
+    need(len(after)==737 and len(new)==4 and [r for r in after if r not in new]==inherited_rows and {Path(r['file']).resolve() for r in new}=={exact(r) for r in m['compiled_source_files']},'Replace only four exact target Source rows while retaining all inherited733 in order; actual737-to737');write(out/'compile-after.json',after)
+    ninja=ROOT/'.runtime/reference-tools/ninja-1.13.2/ninja.exe';dry,dv=execute(out,'dry-build',[str(ninja),'-C',str(BUILD),'-n','-v','Products/'+TARGET+'.exe'])
+    lines=[v for v in exact(dv['stdout']).read_text(encoding='utf8').splitlines() if ' -c ' in v]
+    need(len(lines)==4 and all('CMakeFiles/'+TARGET+'.dir/' in v.replace('\\','/') for v in lines) and all(sum(str(exact(r)).replace('\\','/').casefold() in v.replace('\\','/').casefold() for v in lines)==1 for r in m['compiled_source_files']),'Dry build must compile only four genuine target TUs')
+    for r in old_objects:exact(r)
+    compile_ref,cv=execute(out,'compile',[command[0],'--build',str(BUILD),'--target',TARGET,'--parallel','1','--verbose']);actual=[v for v in exact(cv['stdout']).read_text(encoding='utf8').splitlines() if re.match(r'^\[\d+/\d+\] ',v) and ' -c ' in v];need(actual==lines,'Actual four commands must equal authenticated dry plan')
+    preserve(prior);original=BUILD/('Products/'+TARGET+'.exe');link_map=BUILD/(TARGET+'.map');provider=providers(link_map,m['compiled_source_files'])
+    before_compact=[ref(original),ref(link_map)];compact=Path(os.environ['WINDIR'])/'System32/compact.exe';need(compact.is_file(),'Actual Windows NTFS compact utility required')
+    compact_ref,_=execute(out,'compact-linked-original-and-map',[str(compact),'/C','/F','/I','/EXE:LZX',str(original),str(link_map)])
+    for r in before_compact:exact(r)
+    derive_command=recorded(prior['derive'])['command'].copy();need(derive_command[4]=='tools/porting/derive_native_helper.py','Reviewed standard PE driver required')
+    for flag,value in [('--original',original.relative_to(ROOT).as_posix()),('--original-sha256',sha(original)),('--output-dir',(out/'derivation').relative_to(ROOT).as_posix())]:derive_command[derive_command.index(flag)+1]=value
+    derive_ref,_=execute(out,'derive',derive_command);d=read(out/'derivation/receipt.json')
+    need(d['status']=='pass-exact-retained-runtime-sections-and-directories' and all(d[k] is True for k in ['original_bytes_unchanged','source_bytes_match_before_and_after','accepted_derivative_bytes_unchanged']) and d['original_before']==d['original_after'] and d['original_before']['sha256']==sha(original) and d['accepted_derivative']==d['observed_derivative'],'Actual both-PE/runtime derivative preservation required')
+    helper=exact(d['accepted_derivative']);new_refs=[ref(original),ref(helper),ref(link_map)]
+    execution,ev=execute(out,'native-execution',[str(helper),str(ROOT),str(exact(packet['helper_request'])),str(exact(packet['native_admission_contract'])),str(exact(packet['direct_unit_request'])),str(out/'capture')],(0,1,2))
+    preserve(prior);prepare_sources(m);exact(inherited_ref)
+    for r in new_refs:exact(r)
+    workflow=dict(schema='ctf10-native-Init-postlude-workflow.v1',workflow_source_manifest=prep_ref,native_source_manifest=native_ref,prior_format_workflow=prior_ref,freeze=ref(out/'freeze.json'),protected_refs=protected,core_refs=prior['core_refs'],absent_paths=prior['absent_paths'],compile_before=ref(out/'compile-before.json'),compile_inherited_before=ref(out/'compile-inherited-before.json'),compile_after=ref(out/'compile-after.json'),registration_recovery=prep['failed_capture_recovery'],failed_artifact_archive=archive_ref,old_target_objects_before_recompile=old_objects,previous_compile_rows=737,inherited_compile_rows=733,current_compile_rows=737,configure=configure,dry_build=dry,compile=compile_ref,compact_original_and_map=compact_ref,logical_original_and_map_before_compact=before_compact,derive=derive_ref,derivative=ref(out/'derivation/receipt.json'),linked_original=ref(original),helper_binary=ref(helper),link_map=ref(link_map),link_providers=provider,native_execution=execution,actual_native_output_directory=(out/'capture').relative_to(ROOT).as_posix(),result_file=(out/'capture/ctf10-Init-postlude-helper-results.json').relative_to(ROOT).as_posix(),actual_helper_exit_code=ev['exit_code'],numerical_PASS_claimed=False,gates_updated=False)
+    write(out/'native.json',workflow)
+    qa,qv=execute(out,'original-data-review',[sys.executable,'-X','utf8','-B',str(Path(__file__).resolve()),'qa','--approved-runner-sha256',sha(Path(__file__).resolve()),'--source-manifest',prep_ref['path']+'#'+prep_ref['sha256'],'--native-workflow',ref(out/'native.json')['path']+'#'+sha(out/'native.json'),'--output-dir',str(out/'qa')],(0,2))
+    write(out/'completion.json',dict(schema='ctf10-native-Init-postlude-completion.v1',workflow=ref(out/'native.json'),OriginalDataQA=ref(out/'qa/review.json'),OriginalDataQA_execution=qa,Original_capture_custody_released=qv['exit_code']==0,numerical_PASS_claimed=False,gates_updated=False));return 0 if qv['exit_code']==0 else 2
+
+def qa(args,out,prep,prep_ref):
+    stream_path=exact(prep['stream_reader']);spec=importlib.util.spec_from_file_location('held_Init_stream',stream_path);stream=importlib.util.module_from_spec(spec);spec.loader.exec_module(stream)
+    review_path=exact(prep['factual_reader']);spec=importlib.util.spec_from_file_location('held_Init_factual',review_path);review=importlib.util.module_from_spec(spec);spec.loader.exec_module(review)
+    workflow_ref=operand(args.native_workflow);w=read(exact(workflow_ref));need(w['schema']=='ctf10-native-Init-postlude-workflow.v1' and w['workflow_source_manifest']==prep_ref,'Actual reviewed workflow required')
+    packet=read(exact(w['freeze']));m=read(exact(w['native_source_manifest']));prepare_sources(m);need(w['native_source_manifest']==prep['recovery_native_source_manifest'],'Exact reviewed recovery Native06 manifest required')
+    bound=[w['freeze'],w['native_source_manifest'],packet['helper_request'],packet['native_admission_contract'],packet['projection'],packet['direct_unit_request'],packet['observation_policy'],*packet['contracts'].values(),*packet['source_authorities']['current_after_documents'],*prep['own_sources']]
+    frozen_request=read(exact(packet['helper_request']));bound+=frozen_request['all_45_guard_refs']
+    direct=read(exact(packet['direct_unit_request']));bound+=[direct['input'],direct['literal_case_source']]
+    for r in bound:exact(r)
+    execution=recorded(w['native_execution'],(0,1,2));need(execution['command']==[str(exact(w['helper_binary'])),str(ROOT),str(exact(packet['helper_request'])),str(exact(packet['native_admission_contract'])),str(exact(packet['direct_unit_request'])),str(path(w['actual_native_output_directory']))],'Actual argc6/frozen operands required')
+    build={k:recorded(w[k]) for k in ['configure','dry_build','compile','compact_original_and_map','derive']}
+    need(all(v['source_snapshot']==execution['source_snapshot'] for v in build.values()),'Actual build/compact/derive/capture Source snapshot differs')
+    need(packet['schema']=='ctf10-native-Init-postlude-frozen-inputs.v1' and packet['native_source_manifest']==w['native_source_manifest'] and packet['frozen_before_this_execution'] is True,'Actual fresh pre-execution freeze required')
+    old_rows=read(exact(w['compile_before']));prior=read(exact(w['prior_format_workflow']));inherited_rows,old_target=failed_capture_recovery(prep,old_rows,prior,w['failed_artifact_archive'])
+    need(w['registration_recovery']==prep['failed_capture_recovery'] and w['previous_compile_rows']==737 and w['inherited_compile_rows']==733 and read(exact(w['compile_inherited_before']))==inherited_rows and
+        [path(r['path']) for r in w['old_target_objects_before_recompile']]==[Path(r['output']).resolve() for r in old_target],
+        'Exact independently authenticated failed-capture registration and old object custody required')
+    new_rows=read(exact(w['compile_after']));added=[r for r in new_rows if 'CMakeFiles/'+TARGET+'.dir/' in r['command'].replace('\\','/')]
+    need(len(new_rows)==737 and len(added)==4 and [r for r in new_rows if r not in added]==inherited_rows and {Path(r['file']).resolve() for r in added}=={exact(r) for r in m['compiled_source_files']} and read(BUILD/'compile_commands.json')==new_rows,'Actual archived737-to737/four-row replacement/inherited733/live graph correspondence differs')
+    need(providers(exact(w['link_map']),m['compiled_source_files'])==w['link_providers'],'Actual map/provider correspondence differs')
+    derivative=read(exact(w['derivative']))
+    need(derivative['status']=='pass-exact-retained-runtime-sections-and-directories' and all(derivative[k] is True for k in ['original_bytes_unchanged','source_bytes_match_before_and_after','accepted_derivative_bytes_unchanged']) and derivative['original_before']==derivative['original_after'] and derivative['original_before']['sha256']==w['linked_original']['sha256'] and derivative['original_before']['size_bytes']==w['linked_original']['size_bytes'] and derivative['accepted_derivative']==derivative['observed_derivative'] and ref(exact(derivative['accepted_derivative']))==w['helper_binary'],'Actual standard PE/Original/helper correspondence differs')
+    for r in w['logical_original_and_map_before_compact']:exact(r)
+    need(build['compact_original_and_map']['command'][1:5]==['/C','/F','/I','/EXE:LZX'] and build['compact_original_and_map']['command'][5:]==[str(exact(w['linked_original'])),str(exact(w['link_map']))],'Actual same-path compaction operands differ')
+    bound+=[w['compile_before'],w['compile_inherited_before'],w['compile_after'],w['prior_format_workflow'],w['failed_artifact_archive'],*prep['failed_capture_recovery'].values()]
+    failures=[];files={};counts={};result_path=path(w['result_file'])
+    if result_path.is_file():
+        result_ref=ref(result_path);counts=review.review(result_path,w,packet,m,need,read,exact,ref,stream.read,failures,files)
+        exact(result_ref)
+    else:result_ref=None;failures.append('Actual Native result file absent; no counts inferred')
+    for r in list(files.values())+bound+w['protected_refs']+w['core_refs']+[w[k] for k in ['linked_original','helper_binary','link_map','derivative']]:exact(r)
+    prepare_sources(m)
+    for n in w['absent_paths']:need(not path(n).exists(),'Protected absent file recreated')
+    released=execution['exit_code']==0 and not failures
+    report=dict(schema='ctf10-native-Init-postlude-independent-original-data-review.v1',status='pass-actual-Init-postlude-custody-before-Rust' if released else 'fail-or-unavailable-Init-postlude-custody',Original_capture_custody_released=released,reviewed_source_manifest=prep_ref,actual_workflow=workflow_ref,actual_frozen_input=w['freeze'],actual_native_execution=w['native_execution'],actual_native_results=result_ref,actual_observation_counts=counts if result_ref else None,observation_integrity_failures=failures,complete_payload_file_identities=list(files.values()),executed_reader_sources=prep['own_sources'],numerical_PASS_claimed=False,production_Rust_byte_header_parity_claimed=False,whole_CTF10_gates_updated=False)
+    write(out/'review.json',report);print(json.dumps(report));return 0 if released else 2
+
+if __name__=='__main__':
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('phase',choices=['native','qa'])
+    for n in ['approved-runner-sha256','source-manifest','output-dir']:p.add_argument('--'+n,required=True)
+    for n in ['native-source','prior-format-workflow','prior-production-freeze','prior-production-freeze-execution','scope','scope-execution','native-workflow','failed-artifact-archive']:p.add_argument('--'+n)
+    args=p.parse_args();need(sha(Path(__file__).resolve())==args.approved_runner_sha256,'Reviewed actual runner SHA required');prep_ref=operand(args.source_manifest);prep=read(exact(prep_ref))
+    for r in prep['own_sources']:exact(r)
+    need(ref(Path(__file__).resolve()) in prep['own_sources'],'Actual runner must be owned by approved source preparation')
+    need(sha(RECORDER)=='5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba' and sha(DERIVE)=='3b39cc4562943692e43e11e4d2d7e1bc70f84a58e09c0fea28c0b85b8e905dcf','Reviewed recorder/PE Source required')
+    out=path(args.output_dir);need(out.is_relative_to(BASE) and not out.exists(),'Fresh contained workflow output required');out.mkdir()
+    ENV=dict(os.environ);ENV['PATH']=str(ROOT/'.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin')+os.pathsep+ENV['PATH']
+    raise SystemExit(native(args,out,prep,prep_ref) if args.phase=='native' else qa(args,out,prep,prep_ref))

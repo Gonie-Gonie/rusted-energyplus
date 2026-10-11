@@ -1,0 +1,47 @@
+This held Root-only finalizer reuses the selected-file, exact-identity and
+receipt mechanisms of the earlier ordinary-init finalizer. It is unexecuted.
+It imports only Python standard-library modules, runs no commands, and changes
+no existing evidence, canonical Source, plan, card, gates or Git state.
+
+After Source review and actual comparison, Root may invoke:
+
+    python -X utf8 -B finalize.py --approved-source-sha256 SOURCE_SHA --inputs PACKET_PATH#PACKET_SHA
+
+The input packet schema is `ctf10-Init-postlude-finalization-inputs.v1`. Every
+reference below is an actual path/SHA descriptor, with actual size when present:
+
+- `native_completion`, `original_data_review`, `original_data_review_execution`;
+- `formatted_inventory`, `source_correction`, `quality`, `candidate_workflow`;
+- `comparison`, `comparison_execution`, `failed_native_workflow`,
+  `failed_artifact_archive`;
+- `source_preparations`: reviewed manifest refs under CTF-10 `*-prep-*` dirs;
+- `recorded_outer_receipts`: rows `{role, execution, allowed_exit_codes}` for
+  actual source-preserving Root launchers (distinct explicit exit expectations);
+- `retained_lineage`: opaque actual Source/diff/application/correction/receipt
+  refs; mutating outer receipts with Sourceguard=false belong only here;
+- `prior_evidence`: prior committed small evidence/summary refs, including F/G
+  or earlier history evidence if Root selects them. They are not replayed.
+
+The four quality commands must actually return zero on the identical complete
+raw current Source snapshot. Focused/workspace test counts come from genuine
+stdout, with no predicted totals. The twelve canonical finals, original literal
+archives, explicit non-formatter Clippy correction and refreshed own/API runtime
+bindings must join that snapshot. Original and correction formatter receipts
+remain distinct and may honestly have Sourceguard=false.
+
+The released Native capture and fixed15/direct6 comparison retain their separate
+Source identities. Candidate exits0/2 and comparator exits0/1 are preserved;
+actual mismatch and required-unavailable records determine the reported selected
+comparison status. A failing comparison remains failing evidence. No complete
+whole-Init, persistent ordinary integration, CTF-10 or card-gate PASS is claimed.
+
+Output is fresh `energyplus_porting_plan/evidence/CTF-10-init-postlude-comparison`
+only: selected content-addressed objects, accepted.json, manifest.json and
+summary.json. Existing `CTF-10-init-postlude` evidence stays untouched. Current
+Native result/partition/log files and both candidate stdout files are full-byte
+copies, without numerical JSON parsing or equation evaluation. Existing large
+ordinary history traces and binaries/maps/weather/IDF payloads are excluded.
+The archive explicitly does not claim a transitive replay closure; complete
+Source-snapshot members are authenticated but only selected Source is stored.
+All authenticated inputs are rechecked before and after storage. No results,
+future hashes, receipts, counts or gate changes are supplied by this preparation.

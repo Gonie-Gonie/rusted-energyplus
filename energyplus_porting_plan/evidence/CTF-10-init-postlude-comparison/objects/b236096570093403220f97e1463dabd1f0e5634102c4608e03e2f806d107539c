@@ -1,0 +1,67 @@
+{
+  "schema": "sch01-converted-inputs.v1",
+  "started_utc": "2026-10-11T08:35:22.766150+00:00",
+  "finished_utc": "2026-10-11T08:35:23.094178+00:00",
+  "input_cases": {
+    "path": ".runtime/porting/CTF-10/direct-report-input-conversion-inputs-01/input-cases.json",
+    "sha256": "322b34f1d02530e9c4b29bb1639670b02526728d780ec08c23fb658619bef83d"
+  },
+  "converter": {
+    "path": ".runtime/energyplus/26.1.0/ConvertInputFormat.exe",
+    "sha256": "04f1327fef7148118ea1d79d9e990fb2447b9731e9c1b28a9a8276b840d7cbfe"
+  },
+  "conversion_recipe": "actual ConvertInputFormat.exe input.idf in each fresh case directory, matching ep_run::oracle input-only route",
+  "conversions": [
+    {
+      "case_id": "CTF10-DIRECT-REPORT",
+      "input": {
+        "path": ".runtime/porting/CTF-10/native-init-postlude-prep-01/direct-report-input.idf",
+        "sha256": "39df3d0362e93ecef52b04510559f00096fa89b9055fda0fbc48931f75fc02e4",
+        "size_bytes": 202
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/ctf10-direct-report-converted-inputs-01/CTF10-DIRECT-REPORT/input.epJSON",
+        "sha256": "1697488b7db21caa370f20908dad5075ffc84aaa78ff2c0dfd48e38bcaa17403",
+        "size_bytes": 1046
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/ctf10-direct-report-converted-inputs-01/CTF10-DIRECT-REPORT/conversion.json",
+        "sha256": "3d2553e460642ba4057d8c7021f8fe006cb765233fbbc5a8ca7e5d668703f8d8",
+        "size_bytes": 3030
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    }
+  ],
+  "case_count": 1,
+  "available_converted_input_count": 1,
+  "unavailable_converted_input_count": 0,
+  "executed_runner_sources": [
+    {
+      "historical_path": ".runtime/porting/SCH-01/input-prep-02/convert_inputs.py",
+      "archive": {
+        "path": ".runtime/porting/SCH-01/ctf10-direct-report-converted-inputs-01/sources/convert_inputs.py",
+        "sha256": "82f27c8327d2409bb3bcba727044ebe6a36641ed8d7c404e08dd4bc92c990dbb",
+        "size_bytes": 7727
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/SCH-01/input-prep-02/input_common.py",
+      "archive": {
+        "path": ".runtime/porting/SCH-01/ctf10-direct-report-converted-inputs-01/sources/input_common.py",
+        "sha256": "b38466a0dd8851935d0ef28c079220d7c48f2c05506926d1ad4e7fb463f6de77",
+        "size_bytes": 2765
+      }
+    }
+  ],
+  "scientific_execution_performed": false,
+  "Native_scientific_outputs_used_as_inputs": false,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "failed_conversions_counted_as_PASS": false,
+  "outer_zero_means_factual_input_conversion_ledger_complete": true,
+  "all_conversions_successful_claimed": true,
+  "final_scientific_packet_frozen": false,
+  "gates_updated": false
+}

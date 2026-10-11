@@ -1,0 +1,125 @@
+--- .runtime/porting/CTF-10/init-postlude-applied-source-01/literal/crates__ep_run__examples__ctf10_init_postlude_support__fields.rs
++++ crates/ep_run/examples/ctf10_init_postlude_support/fields.rs
+@@ -2,15 +2,17 @@
+ use super::{fields, unit_fields};
+ use ep_model::{SimulationModel, TypedModel};
+ use ep_runtime::error::RuntimeError;
++use ep_runtime::heat_balance::ctf_init_postlude::CtfInitPostludeError;
+ use ep_runtime::heat_balance::ctf_initialization_context::{
+     CtfInitializationContext, CtfInitializationError, CtfInitializationReports,
+ };
+-use ep_runtime::heat_balance::ctf_init_postlude::CtfInitPostludeError;
+ use ep_runtime::heat_balance::ctf_source_diagnostics::CtfSourceDiagnosticStop;
+ use ep_runtime::heat_balance::error_backend::{
+     SourceErrorBackend, SourceErrorState, SourceErrorTracking, SourceFatalStop,
+ };
+-use ep_runtime::heat_balance::{HeatBalanceState, initialize_heat_balance_state_with_initialization_context};
++use ep_runtime::heat_balance::{
++    HeatBalanceState, initialize_heat_balance_state_with_initialization_context,
++};
+ use serde_json::{Value, json};
+ 
+ // Literal declaration order, not registry values or expected initialized IDs.
+@@ -131,17 +133,30 @@
+         Self {
+             reports: CtfInitializationReports::default(),
+             state: SourceErrorState {
+-                output_error_header:true,
+-                version_string:concat!("rusted-energyplus ",env!("CARGO_PKG_VERSION")).into(),
+-                idd_version_string:format!("Rust typed input version {version}"),
+-                doing_input_processing:false,print_console_output:true,kickoff_simulation:false,
+-                developer_flag:false,warmup_flag:false,doing_sizing:false,
+-                tracking:SourceErrorTracking {match_counts:[0;20],abort_processing:false,
+-                    total_severe_errors:0,last_severe_error:String::new(),
+-                    total_severe_errors_during_warmup:0,total_severe_errors_during_sizing:0,
+-                    total_warning_errors:0,total_warning_errors_during_warmup:0,total_warning_errors_during_sizing:0},
++                output_error_header: true,
++                version_string: concat!("rusted-energyplus ", env!("CARGO_PKG_VERSION")).into(),
++                idd_version_string: format!("Rust typed input version {version}"),
++                doing_input_processing: false,
++                print_console_output: true,
++                kickoff_simulation: false,
++                developer_flag: false,
++                warmup_flag: false,
++                doing_sizing: false,
++                tracking: SourceErrorTracking {
++                    match_counts: [0; 20],
++                    abort_processing: false,
++                    total_severe_errors: 0,
++                    last_severe_error: String::new(),
++                    total_severe_errors_during_warmup: 0,
++                    total_severe_errors_during_sizing: 0,
++                    total_warning_errors: 0,
++                    total_warning_errors_during_warmup: 0,
++                    total_warning_errors_during_sizing: 0,
++                },
+             },
+-            error:Vec::new(),console:Vec::new(),eio:Vec::new(),
++            error: Vec::new(),
++            console: Vec::new(),
++            eio: Vec::new(),
+         }
+     }
+     pub(super) fn snapshot(&self) -> Value {
+@@ -149,18 +164,30 @@
+             "prefixes":{"error":bytes(&self.error),"console":bytes(&self.console),"eio":bytes(&self.eio)},
+             "actual_Rust_caller_owner_copied":true,"Native_intermediate_checkpoint_inferred":false})
+     }
+-    pub(super) fn initialize(&mut self,model:&SimulationModel,initial:f64) -> Result<HeatBalanceState,RuntimeError> {
++    pub(super) fn initialize(
++        &mut self,
++        model: &SimulationModel,
++        initial: f64,
++    ) -> Result<HeatBalanceState, RuntimeError> {
+         let mut context = CtfInitializationContext {
+-            reports:&mut self.reports,eio:&mut self.eio,
+-            backend:SourceErrorBackend {
+-                state:&mut self.state,error_stream:Some(&mut self.error),console:&mut self.console,
+-                out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None,
++            reports: &mut self.reports,
++            eio: &mut self.eio,
++            backend: SourceErrorBackend {
++                state: &mut self.state,
++                error_stream: Some(&mut self.error),
++                console: &mut self.console,
++                out_unit1: None,
++                out_unit2: None,
++                f_message: None,
++                message_callback: None,
++                error_callback: None,
++                sqlite: None,
+             },
+         };
+-        initialize_heat_balance_state_with_initialization_context(model,initial,&mut context)
+-    }
+-}
+-pub(super) fn typed_report_inputs(model:&TypedModel) -> Value {
++        initialize_heat_balance_state_with_initialization_context(model, initial, &mut context)
++    }
++}
++pub(super) fn typed_report_inputs(model: &TypedModel) -> Value {
+     json!({"report_inputs":{"objects":model.report_inputs.objects.iter().enumerate().map(|(index,v)|json!({
+         "vector_index":index,"object_name":v.object_name,"object_type":v.object_type.source_name(),
+         "alphas":v.alphas,"alpha_blank":v.alpha_blank,"default_applied":v.default_applied,
+@@ -171,7 +198,7 @@
+         "loader_material_names":model.ctf_report_names.materials.iter().map(|(id,name)|json!({"id":id.0,"name":name})).collect::<Vec<_>>(),
+         "loader_construction_names":model.ctf_report_names.constructions.iter().map(|(id,name)|json!({"id":id.0,"name":name})).collect::<Vec<_>>()})
+ }
+-pub(super) fn public_owner(state:&HeatBalanceState) -> Value {
++pub(super) fn public_owner(state: &HeatBalanceState) -> Value {
+     match state.construction_ctf10_public_initialization.as_ref() {
+         None => unavailable("returned State has no actual public owner"),
+         Some(source) => json!({"owner_available":true,
+@@ -189,10 +216,10 @@
+             "Native_whole_Init_return_inferred":false,"counted_as_PASS":false}),
+     }
+ }
+-pub(super) fn unavailable(reason:&str) -> Value {
++pub(super) fn unavailable(reason: &str) -> Value {
+     json!({"owner_available":false,"snapshot":null,"reason":reason,"counted_as_PASS":false})
+ }
+-pub(super) fn error(error:&RuntimeError) -> Value {
++pub(super) fn error(error: &RuntimeError) -> Value {
+     let source_fatal = matches!(error,RuntimeError::CtfInitialization(value) if matches!(value.as_ref(),
+         CtfInitializationError::Diagnostic(CtfSourceDiagnosticStop::Fatal(SourceFatalStop::Fatal(_))) |
+         CtfInitializationError::Postlude(CtfInitPostludeError::Fatal(SourceFatalStop::Fatal(_)))));

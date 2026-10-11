@@ -1,0 +1,21 @@
+{
+  "schema": "ctf10-native-Init-postlude-completion.v1",
+  "workflow": {
+    "path": ".runtime/porting/CTF-10/native-init-postlude-workflow-05/native.json",
+    "sha256": "8347778b6b45aac456a8fbadc4455d6c1ce9635b4dfe273aae96aae01a79e212",
+    "size_bytes": 179261
+  },
+  "OriginalDataQA": {
+    "path": ".runtime/porting/CTF-10/native-init-postlude-workflow-05/qa/review.json",
+    "sha256": "1010cbc10317320409c34bd48de7c69c5d05234768544f7e307eb105df3480ba",
+    "size_bytes": 97172
+  },
+  "OriginalDataQA_execution": {
+    "path": ".runtime/porting/CTF-10/native-init-postlude-workflow-05/original-data-review/receipt.json",
+    "sha256": "4fdd8c83d40d99c42a23c99ec856649162c1f162b1a0f73c23411b556368d601",
+    "size_bytes": 3503
+  },
+  "Original_capture_custody_released": true,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false
+}

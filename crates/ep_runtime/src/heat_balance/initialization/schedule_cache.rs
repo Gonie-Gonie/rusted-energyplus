@@ -22,6 +22,26 @@ pub fn initialize_heat_balance_state(
     initialize_heat_balance_state_with_ctf_coefficients(model, initial_zone_air_temperature_c, &[])
 }
 
+/// Initializes once with real caller-retained report, output and backend owners.
+///
+/// This uses the same ordinary initializer without diagnostic coefficient rows.
+/// Every reached output prefix remains with `context` when the call returns Err.
+pub fn initialize_heat_balance_state_with_initialization_context(
+    model: &SimulationModel,
+    initial_zone_air_temperature_c: f64,
+    context: &mut crate::heat_balance::ctf_initialization_context::CtfInitializationContext<'_>,
+) -> Result<HeatBalanceState, RuntimeError> {
+    let schedule_cache = precompute_hour_only_internal_gain_schedule_cache(&model.typed)?;
+    initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
+        model,
+        initial_zone_air_temperature_c,
+        &[],
+        &schedule_cache,
+        None,
+        Some(context),
+    )
+}
+
 /// Initializes the heat-balance state shell with diagnostic CTF coefficient rows.
 ///
 /// This is an oracle-isolation hook for heat-balance diagnostics. It does not

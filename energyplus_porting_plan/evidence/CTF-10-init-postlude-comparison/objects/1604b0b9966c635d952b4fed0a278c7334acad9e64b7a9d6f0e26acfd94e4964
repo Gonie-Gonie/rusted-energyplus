@@ -1,0 +1,43 @@
+"""Literal accepted exact mismatch/absence ledger; equations are not evaluated."""
+from collections import Counter
+
+class Comparison:
+    def __init__(self, need):
+        self.need = need
+        self.counts = Counter()
+        self.mismatches = []
+        self.unavailable = []
+
+    def failure(self, path, category, native, rust):
+        self.counts["mismatches"] += 1
+        self.counts[category] += 1
+        self.mismatches.append({"path": path, "category": category, "Native": native, "Rust": rust})
+
+    def exact(self, path, native, rust):
+        self.counts["discrete_comparisons"] += 1
+        if type(native) is not type(rust) or native != rust:
+            self.failure(path, "discrete_mismatches", native, rust)
+
+    def absence(self, path, native_available, rust_available, reason):
+        self.unavailable.append({"path": path, "Native_available": native_available, "Rust_available": rust_available,
+                                 "required": True, "reason": reason, "counted_as_PASS": False})
+        self.failure(path, "availability_failures", native_available, rust_available)
+
+    def tree(self, path, native, rust):
+        if type(native) is not type(rust):
+            self.failure(path, "class_or_shape_mismatches", native, rust)
+        elif type(native) is dict:
+            self.exact(path + "/keys", sorted(native), sorted(rust))
+            for key in sorted(set(native) & set(rust)): self.tree(path + "/" + key, native[key], rust[key])
+        elif type(native) is list:
+            self.exact(path + "/length", len(native), len(rust))
+            for index, (left, right) in enumerate(zip(native, rust)): self.tree(path + "/" + str(index), left, right)
+        else:
+            self.exact(path, native, rust)
+
+    def report(self):
+        return {"numeric_comparisons": 0, "discrete_comparisons": self.counts["discrete_comparisons"],
+                "mismatch_count": self.counts["mismatches"], "mismatch_categories": dict(self.counts),
+                "complete_mismatch_ledger": self.mismatches, "mismatch_records_dropped": 0,
+                "unavailable_observations": self.unavailable, "unavailable_counted_as_PASS": False}
+

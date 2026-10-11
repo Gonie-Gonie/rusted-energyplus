@@ -1,0 +1,117 @@
+--- .runtime/porting/CTF-10/update-ordinary-initialization-documents-01.py
++++ .runtime/porting/CTF-10/init-postlude-documents-prep-01/update_documents.py
+@@ -1,37 +1,78 @@
+-"""Record the actual tested ordinary connection while preserving unfinished gates."""
+-import hashlib, json, re, subprocess, sys
++"""Install reviewed literal failed-comparison documents; no gate or Source changes."""
++import argparse
++import copy
++import hashlib
++import json
+ from pathlib import Path
+-ROOT=Path.cwd().resolve()
+-OUT=ROOT/'energyplus_porting_plan/evidence/CTF-10-ordinary-initialization'
+-summary_path=OUT/'summary.json';summary=json.loads(summary_path.read_bytes())
+-assert summary['ordinary_production_connection_applied'] is True
+-assert summary['complete_CTF10_PASS_claimed'] is False and summary['gates_updated'] is False
+-quality=summary['actual_quality'];assert all(row['exit_code']==0 for row in quality.values())
+-passed=quality['workspace']['passed'];focused=quality['focused']['passed']
+-reference={'path':summary_path.relative_to(ROOT).as_posix(),'sha256':hashlib.sha256(summary_path.read_bytes()).hexdigest(),'size_bytes':summary_path.stat().st_size}
+-plan_path=ROOT/'energyplus_porting_plan/plan.json';plan=json.loads(plan_path.read_bytes())
+-task=next(row for row in plan['tasks'] if row['id']=='CTF-10')
+-assert 'actual_ordinary_initialization_implementation' not in task
+-task['actual_ordinary_initialization_implementation']=reference
+-plan_path.write_bytes((json.dumps(plan,ensure_ascii=False,indent=2,allow_nan=False)+'\n').encode())
+-card_path=ROOT/'energyplus_porting_plan/cards/CTF-10.md';card=card_path.read_text(encoding='utf8')
+-anchor='## Complete registry, producer diagnostics and Init postlude\n'
+-assert card.count(anchor)==1
+-optional=' A separate append-only Output:Constructions input also reached the enabled EIO branch.' if summary['optional_report_EIO_enabled_observed'] else ''
+-section=('## Ordinary initialization reporting and formatter comparison\n\n'
+-    'Both ordinary A/B runtime paths now retain the real predefined registry, string table, Scan cache and error/output owners across initialization success or failure. Loading and retry diagnostics execute at their producer sites; the complete report/Scan/EIO/final-fatal suffix runs before surface lifecycle allocation. Genuine I/O causes remain discoverable through RuntimeError. Reached CTF error, EIO and console streams are exported independently, and the error prefix is retained in the ordinary summary.\n\n'
+-    f'The [ordinary initialization evidence](../evidence/CTF-10-ordinary-initialization/summary.json) records fmt/Clippy0, focused{focused} and workspace{passed} PASS on the same actual SourceSnapshot. All608 same-input Native/Rust F/G formatted texts matched exactly. The unchanged six ordinary A/B CLI cases returned0 with all45 input guards and the current three output files.'+optional+' Failed checks and test-only corrections are retained.\n\n'
+-    'These results establish the ordinary connection, regression behavior and selected formatter equivalence. Native registry/backend/whole-Init comparison and persistent ordinary numerical/history integration remain pending; no card gate is promoted.\n\n')
+-card=card.replace(anchor,section+anchor)
+-card=card.replace('Same-input genuine Native getter/cache/query comparison remains pending. The scan is not yet called by the ordinary whole-Init postlude; predefined/EIO reporting and final fatal backend composition remain pending.','At that milestone, Native getter/cache/query comparison and ordinary postlude connection were pending. The later comparison and ordinary initialization sections record their current results.')
+-card=card.replace('Ordinary caller connection and Native registry/backend/whole-Init comparison remain pending; no card gate is promoted.','At that milestone, ordinary caller connection and Native registry/backend/whole-Init comparison were pending. The ordinary connection is now recorded above; Native whole-Init comparison remains pending and no card gate is promoted.')
+-card_path.write_bytes(card.encode())
+-checklist_path=ROOT/'energyplus_porting_plan/CHECKLIST.md';checklist=checklist_path.read_text(encoding='utf8')
+-anchor='## 전체 체크리스트\n\n';assert checklist.count(anchor)==1
+-note=f'CTF-10 일반 A/B 초기화에 보고서·오류 출력 경로를 연결했습니다. [현재 실행 증거](evidence/CTF-10-ordinary-initialization/summary.json): 전체 {passed:,}개 테스트, 원본/Rust 숫자 출력 608개 정확 일치, 기존 6개 CLI 실행 성공. 원본 초기화 전체 비교와 지속 실행의 수치 통합 검증은 계속 진행하며 카드 완료로 표시하지 않습니다.\n\n'
+-old_notes=('CTF-10은 일반 표면·이력 수명주기를 연결했고','보고 출력·오류 백엔드 구현은','CTF-10의 실제 원본·Rust 조회 비교는','CTF-10의 전체 보고서 등록·실제 오류 발생 지점·초기화 후처리를 구현하고')
+-checklist='\n'.join(line for line in checklist.splitlines() if not line.startswith(old_notes))+'\n'
+-checklist=re.sub(r'(?m)^(\|[^\n]*\|)\n(?:[ \t]*\n)+(?=\|)',r'\1\n',checklist)
+-checklist_path.write_bytes(checklist.replace(anchor,anchor+note).encode())
+-subprocess.run([sys.executable,'-X','utf8','-B','tools/porting/sync_plan_views.py','--write'],check=True)
+-print('Updated actual ordinary milestone documents and synchronized offline plan; no gates changed',flush=True)
++import re
++
++ROOT = Path.cwd().resolve()
++GATES = ('scope_review', 'unit_gate', 'integration_gate', 'production_gate')
++PLAN_SCRIPT = re.compile(r'(<script id="plan" type="application/json">)(.*?)(</script>)', re.S)
++
++def exact(row):
++    path = (ROOT / row['path']).resolve()
++    assert path.is_relative_to(ROOT) and path.is_file()
++    data = path.read_bytes()
++    assert hashlib.sha256(data).hexdigest() == row['sha256'] and len(data) == row['size_bytes']
++    return path, data
++
++def totals(plan):
++    result = {}
++    for scope in ('A', 'B'):
++        selected = [task for task in plan['tasks'] if scope in task['applicability'].split('/')]
++        def complete(task):
++            scoped = task.get('scope_gates')
++            values = scoped.get(scope) if isinstance(scoped, dict) else None
++            if not isinstance(values, dict): values = {key: task.get(key) for key in GATES}
++            return set(values) == set(GATES) and all(value == '\uD1B5\uACFC' for value in values.values())
++        result[scope] = [sum(complete(task) for task in selected), len(selected)]
++    return result
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--source-manifest', required=True)
++    args = parser.parse_args()
++    name, digest = args.source_manifest.rsplit('#', 1)
++    manifest_path = (ROOT / name).resolve()
++    assert manifest_path.is_relative_to(ROOT) and manifest_path.is_file()
++    manifest_bytes = manifest_path.read_bytes(); assert hashlib.sha256(manifest_bytes).hexdigest() == digest
++    manifest = json.loads(manifest_bytes)
++    assert manifest['schema'] == 'ctf10-Init-postlude-failed-milestone-documents-source.v1'
++    own_path, _ = exact(manifest['workflow_source']); assert own_path == Path(__file__).resolve()
++    _, summary_bytes = exact(manifest['actual_summary']); summary = json.loads(summary_bytes)
++    assert summary['schema'] == 'ctf10-Init-postlude-actual-selected-comparison-milestone.v1'
++    assert summary['status'] == 'fail-selected-paired-Init-owner-fields' and summary['selected_paired_owner_fields_passed'] is False
++    assert summary['actual_case_counts'] == {'model_cases': 15, 'direct_unit_cases': 6}
++    assert summary['comparison']['mismatch_count'] == 829 and summary['comparison']['numeric_comparisons'] == 2106 and summary['comparison']['discrete_comparisons'] == 696389
++    assert summary['comparison']['mismatch_records_dropped'] == 0 and summary['comparison']['unavailable_counted_as_PASS'] is False
++    assert all(summary[key] is False for key in ['whole_Init_equivalence_claimed', 'ordinary_persistent_integration_PASS_claimed', 'complete_CTF10_PASS_claimed', 'card_gates_promoted', 'A_and_B_gate_counts_changed', 'gates_updated'])
++    assert set(summary['actual_quality']) == {'fmt-check', 'clippy', 'focused', 'workspace'}
++    assert all(row['actual_exit_code'] == 0 and row['failed'] == 0 for row in summary['actual_quality'].values())
++    assert summary['actual_quality']['focused']['passed'] == 306 and summary['actual_quality']['workspace']['passed'] == 4926 and summary['actual_quality']['workspace']['test_groups'] == 21
++    assert summary['actual_Source_snapshot']['sha256'] == '7222438fc3281d590c1fc044121314464c3c965150d9e1b03eef2a5e9f79cab9'
++    assert len(summary['comparison']['unavailable_observations']) == 132
++    originals = {}; proposals = {}; destinations = []
++    assert len(manifest['documents']) == 4
++    for row in manifest['documents']:
++        path, before = exact(row['actual_before']); _, proposal = exact(row['proposal']); exact(row['exact_diff'])
++        assert row['canonical_path'] == path.relative_to(ROOT).as_posix() and path not in destinations
++        destinations.append(path); originals[path.name] = before.decode('utf8'); proposals[path.name] = proposal.decode('utf8')
++    before = json.loads(originals['plan.json']); after = json.loads(proposals['plan.json']); restored = copy.deepcopy(after)
++    task = next(task for task in restored['tasks'] if task['id'] == 'CTF-10')
++    assert task.pop('actual_selected_Init_postlude_owner_comparison') == manifest['actual_summary'] and restored == before
++    assert totals(before) == totals(after) == {'A': [14, 54], 'B': [14, 64]}
++    tables = lambda text: [line for line in text.splitlines() if line.startswith('|')]
++    assert len(tables(originals['CHECKLIST.md'])) == 86 and tables(originals['CHECKLIST.md']) == tables(proposals['CHECKLIST.md'])
++    assert tables(originals['CTF-10.md']) == tables(proposals['CTF-10.md'])
++    assert originals['CTF-10.md'].splitlines()[:8] == proposals['CTF-10.md'].splitlines()[:8]
++    old_html = originals['energyplus_porting_checklist.html']; new_html = proposals['energyplus_porting_checklist.html']
++    assert len(PLAN_SCRIPT.findall(old_html)) == len(PLAN_SCRIPT.findall(new_html)) == 1
++    assert json.loads(PLAN_SCRIPT.search(old_html)[2]) == before and json.loads(PLAN_SCRIPT.search(new_html)[2]) == after
++    assert PLAN_SCRIPT.sub(r'\1\3', old_html) == PLAN_SCRIPT.sub(r'\1\3', new_html)
++    for row in manifest['documents']: exact(row['actual_before']); exact(row['proposal'])
++    exact(manifest['actual_summary'])
++    for row, destination in zip(manifest['documents'], destinations, strict=True): destination.write_bytes(exact(row['proposal'])[1])
++    print(json.dumps({'status': 'recorded-failed-selected-comparison-documents', 'mismatches': 829, 'gates_updated': False, 'A': [14, 54], 'B': [14, 64]}), flush=True)
++
++if __name__ == '__main__': main()

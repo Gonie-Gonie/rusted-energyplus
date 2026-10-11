@@ -1,0 +1,27 @@
+{
+  "schema": "ctf10-Init-postlude-failed-milestone-document-audit.v1",
+  "checklist_table_lines": 86,
+  "card_rows": 64,
+  "ordered_table_lines_unchanged": true,
+  "all_plan_fields_except_one_actual_evidence_reference_unchanged": true,
+  "gate_counts": {
+    "A": [
+      14,
+      54
+    ],
+    "B": [
+      14,
+      64
+    ]
+  },
+  "historical_report_output_pending_sentence_qualified": true,
+  "actual_summary": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-init-postlude-comparison/summary.json",
+    "sha256": "167ea315b51dca7db6de633c5b1db4524d716e0f6318d70cf9797f91495e0857",
+    "size_bytes": 271237
+  },
+  "actual_comparison_status": "fail-selected-paired-Init-owner-fields",
+  "future_results_or_hashes_supplied": false,
+  "canonical_documents_mutated": false,
+  "gates_updated": false
+}

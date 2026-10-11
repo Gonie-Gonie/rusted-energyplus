@@ -1,0 +1,70 @@
+--- .runtime/porting/CTF-10/run-native-init-postlude-recovery-04.py
++++ .runtime/porting/CTF-10/run-native-init-postlude-recovery-05.py
+@@ -18,9 +18,9 @@
+ prep_name, digest = sys.argv[1].rsplit('#', 1)
+ native_name, native_digest = sys.argv[2].rsplit('#', 1)
+ native_path = Path(native_name)
+-assert native_path == BASE / 'native-init-postlude-prep-05/manifest.json' and sha(native_path) == native_digest
++assert native_path == BASE / 'native-init-postlude-prep-06/manifest.json' and sha(native_path) == native_digest
+ prep_path = Path(prep_name)
+-assert prep_path == BASE / 'native-init-postlude-workflow-prep-04/manifest.json'
++assert prep_path == BASE / 'native-init-postlude-workflow-prep-05/manifest.json'
+ assert sha(prep_path) == digest
+ prep = read(prep_path)
+ runner = prep_path.parent / 'run_workflow.py'
+@@ -37,14 +37,25 @@
+ actual(BASE / 'native-init-postlude-workflow-03/configure/receipt.json', 0)
+ actual(BASE / 'native-init-postlude-workflow-03/dry-build/receipt.json', 0)
+ actual(BASE / 'native-init-postlude-workflow-03/compile/receipt.json', 1)
+-assert read(BASE / 'native-init-postlude-workflow-03/compile-after.json') == read(Path('.runtime/ep261-gcc13-o0/compile_commands.json'))
++actual(BASE / 'native-init-postlude-workflow-command-04/receipt.json', 2)
++actual(BASE / 'native-init-postlude-workflow-04/compile/receipt.json', 0)
++actual(BASE / 'native-init-postlude-workflow-04/native-execution/receipt.json', 1)
++actual(BASE / 'native-init-postlude-workflow-04/original-data-review/receipt.json', 2)
++actual(BASE / 'native-init-postlude-launch-command-04/receipt.json', 1)
++actual(BASE / 'native-init-postlude-failed04-archive-command-01/receipt.json', 0)
++assert read(BASE / 'native-init-postlude-workflow-04/completion.json')['Original_capture_custody_released'] is False
++assert read(BASE / 'native-init-postlude-workflow-04/qa/review.json')['observation_integrity_failures'] == ['Actual Native result file absent; no counts inferred']
++archive_path = BASE / 'native-init-postlude-failed04-linked-archive-01/archive.json'
++assert sha(archive_path) == 'bc641ecefa6581a721245e30afeff41df3ab394203c86bc8d6ae362a687b4a20'
++assert not Path('.runtime/ep261-gcc13-o0/ctf10_init_postlude_helper.map').exists()
++assert read(BASE / 'native-init-postlude-workflow-04/compile-after.json') == read(Path('.runtime/ep261-gcc13-o0/compile_commands.json'))
+ assert not (BASE / 'native-init-postlude-workflow-03/capture').exists()
+ assert not Path('.runtime/ep261-gcc13-o0/Products/ctf10_init_postlude_helper.exe').exists()
+ assert not (BASE / 'native-init-postlude-workflow-02/compile').exists() and not (BASE / 'native-init-postlude-workflow-02/capture').exists()
+-scope_dir = BASE / 'native-init-postlude-current-scope-03'
+-writer = BASE / 'write-native-init-postlude-scope-03.py'
+-assert sha(writer) == '322e90b7295daa31a08ae15dfc9b40807b96d7b5d9c9d8622a2fdcf4258a10f0'
+-scope_command = BASE / 'native-init-postlude-scope-workflow-command-03'
++scope_dir = BASE / 'native-init-postlude-current-scope-04'
++writer = BASE / 'write-native-init-postlude-scope-04.py'
++assert sha(writer) == 'a4b94a5adbf12cca785f04c4270954d49eb62b81dc45dd97f9ef03dc837f7e9d'
++scope_command = BASE / 'native-init-postlude-scope-workflow-command-04'
+ assert not scope_command.exists() and not scope_dir.exists()
+ subprocess.run([sys.executable, '-X', 'utf8', '-B', 'tools/porting/record_command.py', '--output-dir', str(scope_command), '--', sys.executable, '-X', 'utf8', '-B', str(writer), '--approved-source-sha256', sha(writer), '--native-source', operand(native_path), '--output-dir', str(scope_dir)], check=True)
+ actual(scope_command / 'receipt.json', 0)
+@@ -53,6 +64,7 @@
+     assert sha(Path(row['path'])) == row['sha256']
+ refs = {
+     'source-manifest': (prep_path, digest),
++    'failed-artifact-archive': (archive_path, 'bc641ecefa6581a721245e30afeff41df3ab394203c86bc8d6ae362a687b4a20'),
+     'native-source': (native_path, native_digest),
+     'prior-format-workflow': (BASE / 'report-format-native-workflow-01/native.json', '862887b58164e3d13e6739d5004b55c27314820c4259c1c52f24b5d824382b68'),
+     'prior-production-freeze': (BASE / 'production-frozen-packet-01/freeze-receipt.json', 'a5404a2e783a92354131b8976a3a28ad3c11e99e9cbc1dca6604ae6cd247449a'),
+@@ -62,12 +74,12 @@
+ for key, (path, expected) in refs.items():
+     assert sha(path) == expected
+     command += ['--' + key, operand(path)]
+-command += ['--scope', operand(scope_dir / 'scope.json'), '--scope-execution', operand(scope_dir / 'check-command/receipt.json'), '--output-dir', str(BASE / 'native-init-postlude-workflow-04')]
+-out = BASE / 'native-init-postlude-workflow-command-04'
+-assert not out.exists() and not (BASE / 'native-init-postlude-workflow-04').exists()
++command += ['--scope', operand(scope_dir / 'scope.json'), '--scope-execution', operand(scope_dir / 'check-command/receipt.json'), '--output-dir', str(BASE / 'native-init-postlude-workflow-05')]
++out = BASE / 'native-init-postlude-workflow-command-05'
++assert not out.exists() and not (BASE / 'native-init-postlude-workflow-05').exists()
+ result = subprocess.run([sys.executable, '-X', 'utf8', '-B', 'tools/porting/record_command.py', '--output-dir', str(out), '--', *command])
+ actual(out / 'receipt.json', result.returncode)
+ assert result.returncode == 0
+-completion = read(BASE / 'native-init-postlude-workflow-04/completion.json')
++completion = read(BASE / 'native-init-postlude-workflow-05/completion.json')
+ assert completion['Original_capture_custody_released'] is True and completion['numerical_PASS_claimed'] is False
+ print('Actual Native Init recovery capture and custody QA complete; Rust comparison remains pending', flush=True)

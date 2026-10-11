@@ -1,0 +1,29 @@
+    Checking ep_runtime v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_runtime)
+    Checking ep_run v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_run)
+    Checking ep_cli v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_cli)
+error: this `if` statement can be collapsed
+   --> crates\ep_run\examples\ctf10_init_postlude_candidate_direct_observer.rs:355:9
+    |
+355 | /         if let Ok(proof) = serde_json::from_slice::<Value>(&bytes) {
+356 | |             if proof["schema"] == "sch01-input-conversion-command.v1" {
+357 | |                 require(
+358 | |                     proof["case_id"] == "CTF10-DIRECT-REPORT"
+...   |
+382 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.96.0/index.html#collapsible_if
+    = note: `-D clippy::collapsible-if` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+    |
+355 ~         if let Ok(proof) = serde_json::from_slice::<Value>(&bytes)
+356 ~             && proof["schema"] == "sch01-input-conversion-command.v1" {
+357 |                 require(
+...
+380 |                 actual_conversion_count += 1;
+381 ~             }
+    |
+
+error: could not compile `ep_run` (example "ctf10_init_postlude_candidate_direct_observer") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

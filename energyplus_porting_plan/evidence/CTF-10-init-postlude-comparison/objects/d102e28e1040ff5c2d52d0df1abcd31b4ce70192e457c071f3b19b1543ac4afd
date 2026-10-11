@@ -1,0 +1,365 @@
+{
+  "schema": "ctf10-Init-postlude-candidate-workflow-source-preparation.v1",
+  "status": "SOURCE-READY-HELD-NOT-EXECUTED",
+  "held_immutable": true,
+  "own_sources": [
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-01/write_request.py",
+      "sha256": "7a48c9d6dea2531379574cf5968e3ebe6c2d1db73bd65fe100c5db9953080cab",
+      "size_bytes": 17170,
+      "line_count": 159
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-01/run_candidates.py",
+      "sha256": "62bf86ce104b51a005b3b10b3861cb8b6423671db2c8e04090f985fc4842cf86",
+      "size_bytes": 8785,
+      "line_count": 64
+    }
+  ],
+  "source_additions": [
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-01/write_request.py",
+        "sha256": "7a48c9d6dea2531379574cf5968e3ebe6c2d1db73bd65fe100c5db9953080cab",
+        "size_bytes": 17170,
+        "line_count": 159
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-01/before-empty/write_request.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-01/addition-diffs/write_request.py.diff",
+        "sha256": "2ab8283a24215a26efc966f4c8a486f2ea7715a27c67763a4769e5dc13bc9524",
+        "size_bytes": 17532,
+        "line_count": 162
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-01/run_candidates.py",
+        "sha256": "62bf86ce104b51a005b3b10b3861cb8b6423671db2c8e04090f985fc4842cf86",
+        "size_bytes": 8785,
+        "line_count": 64
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-01/before-empty/run_candidates.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-01/addition-diffs/run_candidates.py.diff",
+        "sha256": "1c607ce1f9a9aecd67ab1eb279121981e43aa40e3ed7682bcfd740943a0379e1",
+        "size_bytes": 9053,
+        "line_count": 67
+      }
+    }
+  ],
+  "template_correspondence": [
+    {
+      "template": {
+        "path": ".runtime/porting/CTF-10/init-postlude-input-projector-prep-03/project-inputs.py",
+        "sha256": "65d0b651f23ee0d56e10c73d64dca390612f688064cd33378d4325532a89de3d",
+        "size_bytes": 10336,
+        "line_count": 121
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-01/before-templates/write_request.py",
+        "sha256": "65d0b651f23ee0d56e10c73d64dca390612f688064cd33378d4325532a89de3d",
+        "size_bytes": 10336,
+        "line_count": 121
+      },
+      "source": {
+        "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-01/write_request.py",
+        "sha256": "7a48c9d6dea2531379574cf5968e3ebe6c2d1db73bd65fe100c5db9953080cab",
+        "size_bytes": 17170,
+        "line_count": 159
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-01/template-diffs/write_request.py.diff",
+        "sha256": "30d12b75c644f361c96709eff0cb6b1fb3e20e403f950ffb2d19d19d245759fa",
+        "size_bytes": 27686,
+        "line_count": 258
+      }
+    },
+    {
+      "template": {
+        "path": ".runtime/porting/CTF-10/run-candidate-observers-02.py",
+        "sha256": "1c0144d4f3e3d4b7af715874aa8ee7135c55114b5a5bfbc27cd157cbeef213aa",
+        "size_bytes": 6097,
+        "line_count": 86
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-01/before-templates/run_candidates.py",
+        "sha256": "1c0144d4f3e3d4b7af715874aa8ee7135c55114b5a5bfbc27cd157cbeef213aa",
+        "size_bytes": 6097,
+        "line_count": 86
+      },
+      "source": {
+        "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-01/run_candidates.py",
+        "sha256": "62bf86ce104b51a005b3b10b3861cb8b6423671db2c8e04090f985fc4842cf86",
+        "size_bytes": 8785,
+        "line_count": 64
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-01/template-diffs/run_candidates.py.diff",
+        "sha256": "8e0b5a1a1e49c77330c7d75ebfb90b7bf7804d20941ffc835d051042531a1911",
+        "size_bytes": 15201,
+        "line_count": 147
+      }
+    }
+  ],
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/manifest.json",
+      "sha256": "beef016a72873faad6e5d80db580ba1c3773b454fc4b40b31e7f7f744428c80b",
+      "size_bytes": 52394,
+      "line_count": 1219
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/manifest.json",
+      "sha256": "b089d724b65467e72564176038001e6567e51861a924cc0bcd9f94848fe19c5c",
+      "size_bytes": 39237,
+      "line_count": 923
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/manifest.json",
+      "sha256": "f4d6b158e2cdf57cb59858f5ed83772302697ce50ce2b2649eafe915f5a00ef2",
+      "size_bytes": 22343,
+      "line_count": 528
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-batch-application-prep-01/manifest.json",
+      "sha256": "f3278411ea902c75f8a7d43edd13728455c3544451c119133e78d0ebc35b7f98",
+      "size_bytes": 25614,
+      "line_count": 534
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-init-postlude-prep-05/manifest.json",
+      "sha256": "07fe5b830b16d93ead4e08e374f1b851d40b48f7c9f2fb2cacb5d527f16c02d9",
+      "size_bytes": 38036,
+      "line_count": 938
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-input-projector-prep-03/manifest.json",
+      "sha256": "69bc0aeeef10428b27dac71576b3f3005690e901aa60b41291a43ff6204e5072",
+      "size_bytes": 1630,
+      "line_count": 39
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "size_bytes": 8453,
+      "line_count": 204
+    },
+    {
+      "path": ".runtime/porting/SCH-01/input-prep-02/convert_inputs.py",
+      "sha256": "82f27c8327d2409bb3bcba727044ebe6a36641ed8d7c404e08dd4bc92c990dbb",
+      "size_bytes": 7727,
+      "line_count": 144
+    },
+    {
+      "path": ".runtime/porting/SCH-01/input-prep-02/input_common.py",
+      "sha256": "b38466a0dd8851935d0ef28c079220d7c48f2c05506926d1ad4e7fb463f6de77",
+      "size_bytes": 2765,
+      "line_count": 84
+    }
+  ],
+  "input_conversion_metadata_context": [
+    {
+      "path": ".runtime/porting/SCH-01/ctf10-direct-report-converted-inputs-01/converted-inputs.json",
+      "sha256": "69538d17dd458e0f968bfbd274bc29dce80cebc951ff3c0aeadf3e66d7e83c91",
+      "size_bytes": 2844,
+      "line_count": 67
+    },
+    {
+      "path": ".runtime/porting/SCH-01/ctf10-direct-report-converted-inputs-01/CTF10-DIRECT-REPORT/conversion.json",
+      "sha256": "3d2553e460642ba4057d8c7021f8fe006cb765233fbbc5a8ca7e5d668703f8d8",
+      "size_bytes": 3030,
+      "line_count": 70
+    },
+    {
+      "path": ".runtime/porting/CTF-10/direct-report-input-conversion-command-01/receipt.json",
+      "sha256": "3f55e9fd83c85d072ca42e2c866fe8ff9b7baf9069f9632999598c9daa754ebd",
+      "size_bytes": 3227,
+      "line_count": 80
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "path": "tools/porting/record_command.py",
+      "start_line": 63,
+      "end_line": 110,
+      "sha256": "d1ca86f20696e24c6736f96bf41904f5d72578b5f121ce879af17d272fb47ea4",
+      "size_bytes": 1905,
+      "line_count": 48,
+      "purpose": "Raw full Source membership/custody"
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "start_line": 128,
+      "end_line": 157,
+      "sha256": "6fd6d82c80b0010192ecfe86c4085c4971fdcfde9453a0de0fd52f171fc14636",
+      "size_bytes": 1281,
+      "line_count": 30,
+      "purpose": "Real Cargo emitted executable capture"
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "start_line": 160,
+      "end_line": 234,
+      "sha256": "b3e9e045587a7c0a567a7b34d5db004a153f3da67c83b2c000829a922651fa01",
+      "size_bytes": 2679,
+      "line_count": 75,
+      "purpose": "Actual subprocess and recorder receipt"
+    },
+    {
+      "path": ".runtime/porting/SCH-01/input-prep-02/convert_inputs.py",
+      "start_line": 85,
+      "end_line": 144,
+      "sha256": "f3786e61e06deded224245686ab80b2d393887455fac4bc344a2e7ce8dcac273",
+      "size_bytes": 3754,
+      "line_count": 60,
+      "purpose": "Input-only converter CLI and full ledger"
+    }
+  ],
+  "README": {
+    "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-01/README.md",
+    "sha256": "e5e21339ebc2e47a4a0ae3b0b81cea217b1184e8b119b076138c00341cc904f2",
+    "size_bytes": 2875,
+    "line_count": 52
+  },
+  "authoring_source": {
+    "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-01/seal_sources.py",
+    "sha256": "820d1f1e2b5ad4b20fa1f0a51f46d578512d171dbbfcd534b0ace8529975623b",
+    "size_bytes": 5860,
+    "line_count": 42
+  },
+  "runtime_interfaces": {
+    "writer_options": [
+      "approved-source-sha256",
+      "source-manifest",
+      "native-freeze",
+      "formatted-inventory",
+      "quality",
+      "conversion-ledger",
+      "conversion-execution",
+      "output-dir"
+    ],
+    "runner_additional_options": [
+      "production-request",
+      "production-projection-execution"
+    ],
+    "direct_request_schema": "ctf10-Init-postlude-candidate-direct-observer-request.v1",
+    "direct_request_keys": [
+      "schema",
+      "direct_unit_request",
+      "native_admission_contract",
+      "native_frozen_packet",
+      "report_input_epjson",
+      "report_conversion_proof_bindings",
+      "observer_sources",
+      "actual_public_API_sources",
+      "actual_Cargo_source_capture_must_match",
+      "frozen_before_execution",
+      "expected_values_supplied",
+      "Native_results_supplied"
+    ],
+    "direct_runtime_bindings_schema": "ctf10-Init-postlude-direct-runtime-source-bindings.v1",
+    "direct_own_paths": [
+      "crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+      "crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+      "crates/ep_run/examples/ctf10_init_postlude_direct_support/compile_report_inputs.rs"
+    ],
+    "direct_API_paths": [
+      "crates/ep_run/Cargo.toml",
+      "crates/ep_raw_model/src/lib.rs",
+      "crates/ep_raw_model/src/idf_order.rs",
+      "crates/ep_compiler/src/lib.rs",
+      "crates/ep_compiler/src/compiler.rs",
+      "crates/ep_model/src/lib.rs",
+      "crates/ep_model/src/model.rs",
+      "crates/ep_model/src/objects/materials.rs",
+      "crates/ep_model/src/objects/construction.rs",
+      "crates/ep_runtime/src/lib.rs",
+      "crates/ep_runtime/src/heat_balance/mod.rs",
+      "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "crates/ep_runtime/src/heat_balance/state.rs",
+      "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "crates/ep_model/src/objects/building.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+      "crates/ep_compiler/src/compiler/surface_space.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_final_coefficients.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_owner.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_ingress.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_public_initialization.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs",
+      "crates/ep_model/src/report_inputs.rs",
+      "crates/ep_compiler/src/compiler/report_inputs.rs",
+      "crates/ep_runtime/src/error.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_reports_format.rs",
+      "crates/ep_runtime/src/heat_balance/predefined_tables.rs",
+      "crates/ep_runtime/src/heat_balance/predefined_tables_names.rs",
+      "crates/ep_runtime/src/heat_balance/predefined_tables_catalog.rs",
+      "crates/ep_runtime/src/heat_balance/report_scan.rs",
+      "crates/ep_runtime/src/heat_balance/error_backend.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+      "crates/ep_run/src/ctf_initialization_outputs.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_direct_initialization.rs"
+    ],
+    "inventory_schema": "ctf10-Init-postlude-actual-formatted-source-inventory.v1",
+    "quality_schema": "ctf10-Init-postlude-actual-quality.v1",
+    "actual_Cargo_emitted_example_names": [
+      "ctf10_init_postlude_candidate_production_observer",
+      "ctf10_init_postlude_candidate_direct_observer"
+    ],
+    "candidate_argv": [
+      "actual_emitted_executable",
+      "request_path",
+      "request_sha256"
+    ],
+    "optional_recorded_candidate_exit_codes": [
+      0,
+      2
+    ],
+    "workflow_result_schema": "ctf10-Init-postlude-actual-candidate-execution-workflow.v1"
+  },
+  "Source_only_checks": {
+    "AST_parsed_sources": 2,
+    "source_diffs_regenerated": 4,
+    "project_import_or_target_or_Cargo_or_formatter_executed": false,
+    "canonical_or_Git_mutation": false,
+    "Native_results_or_binary_or_epJSON_payload_read": false,
+    "future_output_or_SourceSnapshot_hash_invented": false,
+    "numerical_or_whole_Init_PASS_claimed": false
+  },
+  "authorship_limit": "Base authored the direct observer01 and backend/postlude ancestry. Independent review certifies this new transport/execution custody, not own scientific equivalence."
+}

@@ -241,18 +241,44 @@ pub fn preprocess_ctf_layers(
 pub fn try_preprocess_ctf_layers<E>(
     inputs: &[CtfLayerInput],
     context: CtfLayerContext,
-    mut diagnostic: impl FnMut(CtfLayerDiagnostic) -> Result<(), E>,
+    diagnostic: impl FnMut(CtfLayerDiagnostic) -> Result<(), E>,
 ) -> Result<CtfLayerPreprocessing, CtfLayerFailure<E>> {
-    let mut result = CtfLayerPreprocessing {
+    let mut result = begin_preprocessing(context);
+    preprocess_ctf_layers_body(inputs, context, &mut result, diagnostic)?;
+    Ok(result)
+}
+
+/// Retain the actual partial loading owner if a reached callback or scope stops.
+/// Later checkpoints remain absent; no missing phase is reconstructed on error.
+pub fn try_preprocess_ctf_layers_retained<E>(
+    inputs: &[CtfLayerInput],
+    context: CtfLayerContext,
+    owner: &mut Option<CtfLayerPreprocessing>,
+    diagnostic: impl FnMut(CtfLayerDiagnostic) -> Result<(), E>,
+) -> Result<(), CtfLayerFailure<E>> {
+    let result = owner.insert(begin_preprocessing(context));
+    preprocess_ctf_layers_body(inputs, context, result, diagnostic)
+}
+
+fn begin_preprocessing(context: CtfLayerContext) -> CtfLayerPreprocessing {
+    CtfLayerPreprocessing {
         skipped_unused: !context.is_used_ctf,
         errors_found: context.errors_found,
         issues: Vec::new(),
         after_load: None,
         after_merge: None,
         after_conversion: None,
-    };
+    }
+}
+
+fn preprocess_ctf_layers_body<E>(
+    inputs: &[CtfLayerInput],
+    context: CtfLayerContext,
+    result: &mut CtfLayerPreprocessing,
+    mut diagnostic: impl FnMut(CtfLayerDiagnostic) -> Result<(), E>,
+) -> Result<(), CtfLayerFailure<E>> {
     if !context.is_used_ctf {
-        return Ok(result);
+        return Ok(());
     }
     if context.source_sink_present {
         return Err(CtfLayerScopeError::InternalSource.into());
@@ -331,7 +357,7 @@ pub fn try_preprocess_ctf_layers<E>(
         num_res_layers,
     });
     if result.errors_found {
-        return Ok(result);
+        return Ok(());
     }
     if layers.len() > 3 && num_res_layers > 1 {
         let mut adjacent = Vec::new();
@@ -382,7 +408,7 @@ pub fn try_preprocess_ctf_layers<E>(
         total_resistance: rs,
         conductance: cnd,
     });
-    Ok(result)
+    Ok(())
 }
 
 #[cfg(test)]

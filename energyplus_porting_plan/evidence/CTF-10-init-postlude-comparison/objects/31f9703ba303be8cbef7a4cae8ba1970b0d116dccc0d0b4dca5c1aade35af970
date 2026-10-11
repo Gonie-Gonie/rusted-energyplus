@@ -1,0 +1,44 @@
+{
+  "schema": "ctf10-Init-postlude-input-projector-source-preparation.v4",
+  "parent_reviewed_preparation": {
+    "path": ".runtime/porting/CTF-10/init-postlude-input-projector-prep-03/manifest.json",
+    "sha256": "69bc0aeeef10428b27dac71576b3f3005690e901aa60b41291a43ff6204e5072",
+    "size_bytes": 1630
+  },
+  "source": {
+    "path": ".runtime/porting/CTF-10/init-postlude-input-projector-prep-04/project-inputs.py",
+    "sha256": "a2255c10cebd9e81620f63d77935a1456361335628b4fa29dfed812dad1b8ed7",
+    "size_bytes": 10336
+  },
+  "before_source": {
+    "path": ".runtime/porting/CTF-10/init-postlude-input-projector-prep-03/project-inputs.py",
+    "sha256": "65d0b651f23ee0d56e10c73d64dca390612f688064cd33378d4325532a89de3d",
+    "size_bytes": 10336
+  },
+  "exact_diff": {
+    "path": ".runtime/porting/CTF-10/init-postlude-input-projector-prep-04/project-inputs.diff",
+    "sha256": "024b7fcdeb1d6ca240f65bf8f0b03e21baa7ff06bd96100159138d26c4d54316",
+    "size_bytes": 771
+  },
+  "README": {
+    "path": ".runtime/porting/CTF-10/init-postlude-input-projector-prep-04/README.md",
+    "sha256": "ba0da07381be886ef471fa5347e1a164e2007d060d89ce14a8a73fcd208d9d2a",
+    "size_bytes": 433
+  },
+  "native_numeric_seed_transport_correction": {
+    "path": ".runtime/porting/CTF-10/native-init-postlude-prep-06/manifest.json",
+    "sha256": "9a664b1a4ac99b8b6b00813aaa43a59bb61bab24b3752ebaf06d22324d29160b",
+    "size_bytes": 40324
+  },
+  "authoring_source": {
+    "path": ".runtime/porting/CTF-10/init-postlude-input-projector-prep-04/prepare_sources.py",
+    "sha256": "02063b59a919332d8703815b8ca7c1553834aff47c5acd0ab23bcff25581e8ef",
+    "size_bytes": 2883
+  },
+  "only_one_literal_change": true,
+  "parent_body_byte_inverse_exact": true,
+  "execution_performed": false,
+  "canonical_mutation": false,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false
+}

@@ -1,0 +1,162 @@
+"""Root-only selected Init-postlude evidence; no reruns, documents, gates or Git."""
+import argparse
+from datetime import datetime, timezone
+import hashlib, json, re, shutil
+from pathlib import Path
+
+ROOT = Path.cwd().resolve()
+BASE = ROOT / '.runtime/porting/CTF-10'
+OUT = ROOT / 'energyplus_porting_plan/evidence/CTF-10-init-postlude-comparison'
+RECORDER_SHA = '5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'
+checked, selected = {}, {}
+def sha(p):
+    with p.open('rb') as stream: return hashlib.file_digest(stream, 'sha256').hexdigest()
+def ref(p): return dict(path=p.relative_to(ROOT).as_posix(), sha256=sha(p), size_bytes=p.stat().st_size)
+def path(name):
+    p = (ROOT / name).resolve(); assert p.is_relative_to(ROOT) and p != ROOT; return p
+def exact(row):
+    p = path(row['path']); actual = ref(p); assert actual['sha256'] == row['sha256']
+    if 'size_bytes' in row: assert type(row['size_bytes']) is int and actual['size_bytes'] == row['size_bytes']
+    checked[p] = actual; return p
+def select(p, role):
+    p = p.resolve(); assert p.is_relative_to(ROOT) and p.suffix.lower() not in ['.exe', '.dll', '.rlib', '.obj', '.o', '.a', '.lib', '.pdb', '.map', '.epw', '.idf']
+    exact(ref(p)); selected.setdefault(p, []).append(role)
+def value(row, role):
+    p = exact(row); select(p, role); return json.loads(p.read_bytes())
+def same(a, b): return path(a['path']) == path(b['path']) and a['sha256'] == b['sha256']
+def stamp(text):
+    v = datetime.fromisoformat(text.replace('Z', '+00:00')); assert v.tzinfo is not None; return v
+def command(row, role, allowed=(0,), current=False, preserved=True):
+    v = value(row, role); assert v['schema'] == 'recorded-porting-command.v1' and Path(v['cwd']).resolve() == ROOT
+    assert type(v['exit_code']) is int and v['exit_code'] in allowed and v['launch_error'] is None
+    assert not preserved or v['source_bytes_match_before_and_after'] is True
+    assert stamp(v['started_utc']) <= stamp(v['finished_utc']) <= datetime.now(timezone.utc)
+    if current: assert same(v['source_snapshot'], source)
+    for key in ['stdout', 'stderr', 'source_snapshot']: select(exact(v[key]), role + '/' + key)
+    assert v['executed_launcher']['historical_path'] == 'tools/porting/record_command.py'
+    assert v['executed_launcher']['archive']['sha256'] == RECORDER_SHA
+    select(exact(v['executed_launcher']['archive']), role + '/recorder-source'); return v
+def write(p, v):
+    with p.open('x', encoding='utf8', newline='\n') as stream: json.dump(v, stream, indent=2, allow_nan=False); stream.write('\n')
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--inputs', required=True); parser.add_argument('--approved-source-sha256', required=True)
+args = parser.parse_args(); assert sha(Path(__file__).resolve()) == args.approved_source_sha256
+name, digest = args.inputs.rsplit('#', 1); packet_ref = ref(exact(dict(path=name, sha256=digest)))
+assert path(name).is_relative_to(BASE)
+packet = value(packet_ref, 'actual-finalization-operands'); assert packet['schema'] == 'ctf10-Init-postlude-finalization-inputs.v1'
+select(Path(__file__).resolve(), 'actual-finalizer-source')
+inventory = value(packet['formatted_inventory'], 'accepted-corrected-source-inventory')
+correction = value(packet['source_correction'], 'actual-Source-correction')
+quality = value(packet['quality'], 'actual-four-quality-results')
+assert inventory['schema'] == 'ctf10-Init-postlude-actual-formatted-source-inventory.v1' and len(inventory['actual_sources']) == 12
+assert correction['schema'] == 'ctf10-Init-postlude-actual-source-correction.v1' and correction['source_correction_is_formatter_only'] is False
+assert inventory['source_corrections'] == [packet['source_correction']] and same(inventory['accepted_parent_inventory'], correction['accepted_parent_inventory'])
+assert same(inventory['actual_correction_Root_source'], correction['actual_correction_Root_source'])
+assert quality['schema'] == 'ctf10-Init-postlude-actual-quality.v1' and same(quality['accepted_formatted_inventory'], packet['formatted_inventory'])
+assert quality['numerical_or_CTF10_PASS_claimed'] is False and quality['gates_updated'] is False
+source = quality['Source_snapshot']; settings = ['--config', 'profile.dev.debug=0', '--config', 'profile.test.debug=0', '--config', 'build.incremental=false']
+expected = [('fmt-check', ['cargo', 'fmt', '--all', '--', '--check']), ('clippy', ['cargo', 'clippy', *settings, '--locked', '--workspace', '--all-targets', '--', '-D', 'warnings']), ('focused', ['cargo', 'test', *settings, '--locked', '-p', 'ep_runtime', '--lib', 'heat_balance::']), ('workspace', ['cargo', 'test', *settings, '--locked', '--workspace'])]
+totals = {}; previous = None
+assert len(quality['actual_commands']) == 4
+for row, (role, argv) in zip(quality['actual_commands'], expected, strict=True):
+    v = command(row['execution'], 'actual-quality/' + role, current=True)
+    assert row['role'] == role and row['actual_exit_code'] == 0 and v['command'] == argv and same(row['actual_Source_snapshot'], source)
+    assert previous is None or previous <= stamp(v['started_utc']); previous = stamp(v['finished_utc'])
+    groups = [tuple(map(int, group)) for group in re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored;', exact(v['stdout']).read_text(encoding='utf8'))]
+    if role in ['focused', 'workspace']: assert groups and all(failed == ignored == 0 for _, failed, ignored in groups)
+    totals[role] = dict(execution=row['execution'], actual_exit_code=v['exit_code'], test_groups=len(groups), passed=sum(r[0] for r in groups), failed=sum(r[1] for r in groups), ignored=sum(r[2] for r in groups))
+snapshot = value(source, 'complete-current-Source-snapshot'); assert snapshot['schema'] == 'rust-command-source-snapshot.v1' and snapshot['bytes_normalized'] is False
+current = set((ROOT / 'crates').rglob('*.rs')) | set((ROOT / 'crates').rglob('Cargo.toml'))
+current.update(ROOT / n for n in ['Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml'] if (ROOT / n).is_file())
+captured = {r['historical_path']: r for r in snapshot['files']}; assert len(captured) == len(snapshot['files']) and set(captured) == {p.relative_to(ROOT).as_posix() for p in current}
+for n, row in captured.items(): assert sha(exact(row['archive'])) == sha(path(n)) and path(n).stat().st_size == row['size_bytes']
+assert len({r['canonical_path'] for r in inventory['actual_sources']}) == 12
+for row in inventory['actual_sources']:
+    for key in ['actual_before_archive', 'actual_literal_source', 'actual_final_source', 'formatter_correspondence_diff']:
+        if row.get(key) is not None: select(exact(row[key]), 'actual-applied-source/' + key)
+    assert sha(path(row['canonical_path'])) == row['actual_final_source']['sha256'] == captured[row['canonical_path']]['archive']['sha256']
+    select(path(row['canonical_path']), 'current-canonical-Source')
+for row in inventory['runtime_source_bindings'].values():
+    binding = value(row, 'actual-runtime-Source-bindings')
+    for r in binding['observer_sources'] + binding['actual_public_API_sources']: assert exact(r).stat().st_size == captured[r['path']]['size_bytes'] and r['sha256'] == captured[r['path']]['archive']['sha256']
+for key in ['actual_before', 'actual_corrected_literal', 'exact_source_correction_diff', 'actual_final_source', 'correction_from_formatted_diff', 'correction_formatter_diff', 'actual_correction_Root_source']: select(exact(correction[key]), 'actual-Clippy-correction/' + key)
+assert correction['other11_application_sources_unchanged'] is True and correction['all_other_full_Source_snapshot_members_unchanged'] is True
+command(correction['failed_clippy_execution'], 'failed-Clippy08', (101,)); command(correction['failed_quality_execution'], 'failed-quality08', (1,))
+command(correction['successful_fmt_check_execution'], 'prior-fmt-check08')
+command(inventory['actual_format_execution'], 'original-formatter', preserved=False); command(correction['actual_correction_format_execution'], 'correction-formatter', preserved=False)
+completion = value(packet['native_completion'], 'released-Native-completion'); qa = value(packet['original_data_review'], 'released-factual-OriginalQA')
+assert completion['schema'] == 'ctf10-native-Init-postlude-completion.v1' and completion['Original_capture_custody_released'] is True and completion['numerical_PASS_claimed'] is False and completion['gates_updated'] is False
+assert same(completion['OriginalDataQA'], packet['original_data_review']) and same(completion['OriginalDataQA_execution'], packet['original_data_review_execution'])
+assert same(inventory['actual_Native_completion'], packet['native_completion']) and same(inventory['actual_Native_QA'], packet['original_data_review'])
+assert qa['schema'] == 'ctf10-native-Init-postlude-independent-original-data-review.v1' and qa['status'] == 'pass-actual-Init-postlude-custody-before-Rust' and qa['Original_capture_custody_released'] is True and qa['observation_integrity_failures'] == [] and qa['numerical_PASS_claimed'] is False and qa['whole_CTF10_gates_updated'] is False
+native = value(completion['workflow'], 'actual-Native-workflow'); assert same(qa['actual_workflow'], completion['workflow']) and same(qa['actual_frozen_input'], native['freeze']) and same(qa['actual_native_execution'], native['native_execution'])
+freeze = value(native['freeze'], 'actual-pre-output-Native-freeze'); assert native['numerical_PASS_claimed'] is False and native['gates_updated'] is False
+assert freeze['frozen_before_this_execution'] is True and all(freeze[k] is False for k in ['expected_values_supplied', 'expected_exits_supplied', 'scientific_execution_performed', 'numerical_PASS_claimed', 'gates_updated'])
+qe = command(packet['original_data_review_execution'], 'actual-factual-OriginalQA'); assert json.loads(exact(qe['stdout']).read_bytes()) == qa
+ne = command(native['native_execution'], 'actual-Native-execution'); assert stamp(ne['finished_utc']) <= stamp(qe['started_utc'])
+for key in ['configure', 'dry_build', 'compile', 'compact_original_and_map', 'derive']: command(native[key], 'actual-Native-build/' + key)
+select(exact(qa['actual_native_results']), 'opaque-complete-current-Native-results')
+for row in qa['complete_payload_file_identities']: select(exact(row), 'opaque-complete-current-Native-partition-or-log')
+for key in ['helper_request', 'native_admission_contract', 'direct_unit_request', 'observation_policy']: select(exact(freeze[key]), 'actual-frozen-input-metadata/' + key)
+candidate = value(packet['candidate_workflow'], 'actual-two-lane-candidate-workflow')
+assert candidate['schema'] == 'ctf10-Init-postlude-actual-candidate-execution-workflow.v1' and same(candidate['accepted_formatted_inventory'], packet['formatted_inventory']) and same(candidate['actual_quality'], packet['quality']) and same(candidate['actual_Source_snapshot'], source) and same(candidate['actual_native_freeze'], native['freeze'])
+assert candidate['all_bound_inputs_and_sources_unchanged'] is True and all(candidate[k] is False for k in ['Native_results_read', 'scientific_comparison_performed', 'numerical_PASS_claimed', 'whole_Init_parity_claimed', 'gates_updated'])
+build = command(candidate['actual_build'], 'actual-two-example-Cargo-build', current=True); assert previous <= stamp(build['started_utc'])
+assert build['cargo_compiler_artifacts_capture']['requested'] is True and build['cargo_compiler_artifacts_capture']['status'] == 'pass'
+assert [r['lane'] for r in candidate['actual_candidate_executions']] == ['production', 'direct']
+candidate_receipts = {}
+for row in candidate['actual_candidate_executions']:
+    v = command(row['execution'], 'actual-candidate/' + row['lane'], (0, 2), current=True); assert v['exit_code'] == row['actual_exit_code']
+    assert stamp(qe['finished_utc']) <= stamp(v['started_utc']) and stamp(build['finished_utc']) <= stamp(v['started_utc'])
+    request = value(row['request'], 'actual-input-only-request/' + row['lane']); assert request['expected_values_supplied'] is False and request['Native_results_supplied'] is False
+    assert v['command'][1:] == [str(exact(row['request'])), row['request']['sha256']]
+    candidate_receipts[row['lane']] = (row, v)
+for key in ['production_projection_execution', 'direct_input_writer_execution']: command(candidate[key], 'actual-candidate-input/' + key, current=True)
+value(candidate['direct_input_custody'], 'actual-direct-input-custody')
+comparison = value(packet['comparison'], 'actual-selected-owner-comparison'); ce = command(packet['comparison_execution'], 'actual-comparison-execution', (0, 1), current=True)
+assert comparison['schema'] == 'ctf10-Init-postlude-same-input-owner-comparison.v1' and comparison['actual_case_counts'] == {'model_cases': 15, 'direct_unit_cases': 6}
+assert same(comparison['actual_original_data_review'], packet['original_data_review']) and same(comparison['actual_original_data_review_execution'], packet['original_data_review_execution']) and same(comparison['actual_Native_results'], qa['actual_native_results']) and same(comparison['actual_Native_frozen_input'], native['freeze'])
+assert json.loads(exact(ce['stdout']).read_bytes()) == comparison
+comparer = value(comparison['comparer_source_preparation'], 'executed-comparer-Source-preparation')
+assert len(comparer['own_sources']) == len(comparison['executed_comparer_sources'])
+for held, executed in zip(comparer['own_sources'], comparison['executed_comparer_sources'], strict=True):
+    assert executed['historical_path'] == held['path'] and executed['archive']['sha256'] == held['sha256']; select(exact(executed['archive']), 'executed-comparer-Source')
+assert ce['command'][1:4] == ['-X', 'utf8', '-B'] and path(ce['command'][4]) == path(comparer['own_sources'][0]['path'])
+options = dict(zip(ce['command'][5::2], ce['command'][6::2], strict=True)); assert len(ce['command']) == 27 and len(options) == 11 and options['--source-manifest'] == comparison['comparer_source_preparation']['path'] + '#' + comparison['comparer_source_preparation']['sha256'] and options['--approved-source-sha256'] == comparison['comparer_source_preparation']['sha256']
+paired = comparison['comparison']; passed = paired['mismatch_count'] == 0
+assert type(paired['mismatch_count']) is int and paired['mismatch_count'] >= 0 and paired['mismatch_records_dropped'] == 0 and len(paired['complete_mismatch_ledger']) == paired['mismatch_count'] and paired['unavailable_counted_as_PASS'] is False
+assert comparison['selected_paired_owner_fields_passed'] is passed and comparison['status'] == ('pass-selected-paired-Init-owner-fields' if passed else 'fail-selected-paired-Init-owner-fields') and ce['exit_code'] == (0 if passed else 1)
+assert not passed or paired['unavailable_observations'] == []
+assert all(comparison[k] is False for k in ['required_missing_counted_as_PASS', 'whole_Init_equivalence_claimed', 'ordinary_production_integration_PASS_claimed', 'complete_CTF10_PASS_claimed', 'gates_updated'])
+assert same(comparison['policy'], freeze['observation_policy']); value(comparison['policy'], 'actual-frozen-policy')
+for lane, prefix in [('model_cases', 'production'), ('direct_unit_cases', 'direct')]:
+    row, v = candidate_receipts[prefix]; binding = comparison['actual_candidate_bindings'][lane]
+    assert same(binding['request'], row['request']) and same(binding['build_execution'], candidate['actual_build']) and same(binding['execution'], row['execution']) and same(binding['result'], v['stdout']) and same(binding['source_snapshot'], source)
+    assert path(v['command'][0]) == path(row['emitted_artifact']['historical_path']) and binding['executable']['sha256'] == row['emitted_artifact']['sha256']
+    assert stamp(v['finished_utc']) <= stamp(ce['started_utc'])
+failed_native = value(packet['failed_native_workflow'], 'historical-failed-Native04-workflow'); archive = value(packet['failed_artifact_archive'], 'failed-Native04-full-artifact-archive-proof')
+assert same(native['failed_artifact_archive'], packet['failed_artifact_archive'])
+assert archive['schema'] == 'ctf10-Init-postlude-failed-build-artifact-archive.v1' and same(archive['failed_native_build'], packet['failed_native_workflow']) and failed_native['actual_helper_exit_code'] == 1
+assert archive['protected_refs_unchanged'] is True and archive['core_refs_unchanged'] is True and all(archive[k] is False for k in ['capture_replayed', 'failed_capture_released', 'scientific_execution_certified', 'gates_updated'])
+for key, allowed in [('failed_native_execution', (1,)), ('failed_qa_execution', (2,)), ('failed_workflow_execution', (2,)), ('failed_outer_launch_execution', (1,))]: command(archive[key], 'actual-failed-Native04/' + key, allowed)
+failed_completion = value(archive['failed_completion'], 'actual-failed-Native04-completion'); assert failed_completion['Original_capture_custody_released'] is False and failed_completion['numerical_PASS_claimed'] is False
+for row in packet['retained_lineage']: select(exact(row), 'opaque-failure-and-correction-lineage')
+for row in packet['recorded_outer_receipts']: command(row['execution'], 'actual-Root-outer/' + row['role'], tuple(row['allowed_exit_codes']))
+for row in packet['prior_evidence']: select(exact(row), 'historical-committed-evidence-not-replayed')
+for row in packet['source_preparations']:
+    preparation = exact(row); assert preparation.name == 'manifest.json' and preparation.parent.is_relative_to(BASE) and 'prep-' in preparation.parent.name
+    for p in sorted(preparation.parent.rglob('*')):
+        if p.is_file() and p.suffix.lower() != '.idf': select(p, 'reviewed-Source-preparation/' + preparation.parent.name)
+for p, r in checked.items(): assert ref(p) == r
+assert not OUT.exists(); (OUT / 'objects').mkdir(parents=True); stored_rows = []
+for p, roles in selected.items():
+    original = ref(p); destination = OUT / 'objects' / original['sha256']
+    if not destination.exists(): shutil.copyfile(p, destination)
+    assert sha(destination) == original['sha256'] and destination.stat().st_size == original['size_bytes']
+    stored_rows.append(dict(roles=roles, original=original, stored=ref(destination)))
+write(OUT / 'accepted.json', dict(schema='ctf10-Init-postlude-selected-accepted-Source.v1', formatted_inventory=packet['formatted_inventory'], source_correction=packet['source_correction'], actual_sources=inventory['actual_sources'], actual_Source_snapshot=source, actual_quality=totals, gates_updated=False))
+write(OUT / 'manifest.json', dict(schema='ctf10-Init-postlude-selected-evidence.v1', selected_files=stored_rows, actual_operands=packet_ref, selected_archive_is_transitive_replay_closure=False, binary_payloads_committed=False, prior_large_observation_traces_rearchived=False, gates_updated=False))
+write(OUT / 'summary.json', dict(schema='ctf10-Init-postlude-actual-selected-comparison-milestone.v1', card='CTF-10', status=comparison['status'], selected_paired_owner_fields_passed=passed, selected_evidence_manifest=ref(OUT / 'manifest.json'), accepted_current_Source=ref(OUT / 'accepted.json'), actual_Native_completion=packet['native_completion'], actual_OriginalDataQA=packet['original_data_review'], actual_Native_observation_counts=qa['actual_observation_counts'], actual_quality=totals, actual_Source_snapshot=source, actual_candidate_workflow=packet['candidate_workflow'], actual_comparison=packet['comparison'], actual_case_counts=comparison['actual_case_counts'], comparison=paired, arithmetic_profile_authority=comparison['arithmetic_profile_authority'], failed_Native04_archive=packet['failed_artifact_archive'], failed_Clippy08_and_actual_correction_preserved=True, historical_Native_and_current_Rust_Source_identities_are_distinct=True, prior_evidence_replayed=False, whole_Init_equivalence_claimed=False, ordinary_persistent_integration_PASS_claimed=False, complete_CTF10_PASS_claimed=False, card_gates_promoted=False, A_and_B_gate_counts_changed=False, gates_updated=False))
+for p, r in checked.items(): assert ref(p) == r
+print(json.dumps(ref(OUT / 'summary.json')), flush=True)

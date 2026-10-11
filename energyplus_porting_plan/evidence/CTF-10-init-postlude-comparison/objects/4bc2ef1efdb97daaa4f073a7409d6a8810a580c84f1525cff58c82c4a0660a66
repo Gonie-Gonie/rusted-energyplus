@@ -1,0 +1,12 @@
+--- .runtime/porting/CTF-10/init-postlude-comparison-prep-02/before01/compare.py
++++ .runtime/porting/CTF-10/init-postlude-comparison-prep-02/compare.py
+@@ -36,7 +36,8 @@
+         freeze['frozen_before_this_execution'] is True and freeze['declared_model_cases']==15 and freeze['declared_direct_cases']==6 and
+         all(freeze[k] is False for k in ['expected_values_supplied','expected_exits_supplied','scientific_execution_performed','numerical_PASS_claimed','gates_updated']),
+         'Exact pre-execution fixed15/direct6 Native Source/policy packet required')
+-    c.same(m,freeze['observation_policy'],manifest['prospective_policy']);m.bind(freeze['observation_policy'])
++    frozen_policy=m.bind(freeze['observation_policy']);policy_source=m.bind(manifest['prospective_policy'])
++    m.require(all(frozen_policy[k]==policy_source[k] for k in ['sha256','size_bytes']),'Frozen policy must retain the exact reviewed Source bytes')
+     for row in native['native_source_files']+[native['recipe']]:m.bind(row)
+     for row in [*freeze['contracts'].values(),freeze['projection'],*freeze['source_authorities']['current_after_documents']]:m.bind(row)
+     req=m.load(freeze['helper_request']);direct=m.load(freeze['direct_unit_request']);admission=m.load(freeze['native_admission_contract'])

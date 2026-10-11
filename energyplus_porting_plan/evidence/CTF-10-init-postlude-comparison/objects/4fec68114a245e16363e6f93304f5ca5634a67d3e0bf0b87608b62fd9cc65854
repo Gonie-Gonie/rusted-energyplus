@@ -1,0 +1,79 @@
+{
+  "schema": "ctf10-Init-postlude-actual-source-correction.v1",
+  "accepted_parent_inventory": {
+    "path": ".runtime/porting/CTF-10/init-postlude-applied-source-01/record.json",
+    "sha256": "19a295f7fe4c3fe7500b51dca49bcac867cc44fb05b30f1789bae81cc86244c1",
+    "size_bytes": 27331
+  },
+  "reviewed_correction_source": {
+    "path": ".runtime/porting/CTF-10/init-postlude-clippy-correction-prep-01/manifest.json",
+    "sha256": "d64ccb18e3c4b24093b24f322d44fd9a2f0559d98bb4ee0050aa5363d14a17c2",
+    "size_bytes": 5704
+  },
+  "actual_correction_Root_source": {
+    "path": ".runtime/porting/CTF-10/init-postlude-clippy-correction-prep-01/run_correction.py",
+    "sha256": "ee4cd1dd53fc53a149d333e9e2fd0367dfd85e9eccd090bb4a1c999252d17aa1",
+    "size_bytes": 10245
+  },
+  "failed_quality_execution": {
+    "path": ".runtime/porting/CTF-10/init-postlude-quality-command-08/receipt.json",
+    "sha256": "6cb8ef2e7ce23f90f00e6fcb0b1b932650adda5d031b30b8b3a206bd4221798e",
+    "size_bytes": 4825
+  },
+  "failed_clippy_execution": {
+    "path": ".runtime/porting/CTF-10/init-postlude-quality-08/clippy-command-08/receipt.json",
+    "sha256": "4ab61799178e9b635564d2dc3b2153a573c8451b4ad83dc71865d6ffa8967507",
+    "size_bytes": 4421
+  },
+  "successful_fmt_check_execution": {
+    "path": ".runtime/porting/CTF-10/init-postlude-quality-08/fmt-check-command-08/receipt.json",
+    "sha256": "b1fcf8ce1a94bf6576c6c1e13dd7025ea0e17d94d224bfce3ecfd88f9e70ca8e",
+    "size_bytes": 4235
+  },
+  "failed_Source_snapshot": {
+    "path": ".runtime/porting/source-objects/a9/a91857c1957bbdbc70450c22a531a5de078a1ed377317e0c10936a56e19eaad7",
+    "sha256": "a91857c1957bbdbc70450c22a531a5de078a1ed377317e0c10936a56e19eaad7"
+  },
+  "canonical_path": "crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+  "actual_before": {
+    "path": ".runtime/porting/CTF-10/init-postlude-applied-source-02/direct.before.rs",
+    "sha256": "1e2a6b4d8d8dde706667becefe0d2b039f83cedfe9d3f41b63c0f179a0645195",
+    "size_bytes": 20633
+  },
+  "actual_corrected_literal": {
+    "path": ".runtime/porting/CTF-10/init-postlude-applied-source-02/direct.corrected-literal.rs",
+    "sha256": "d1d90bc66dbbf09908220a58f5276b08ab222701517473ddc37bcbe1deacfc20",
+    "size_bytes": 20529
+  },
+  "exact_source_correction_diff": {
+    "path": ".runtime/porting/CTF-10/init-postlude-applied-source-02/source-correction.diff",
+    "sha256": "ad093f0dc1a05a77319a89003a0c9b8cee87dccdafb640565e33413dac4f80a6",
+    "size_bytes": 3852
+  },
+  "actual_final_source": {
+    "path": ".runtime/porting/CTF-10/init-postlude-applied-source-02/direct.final.rs",
+    "sha256": "d1d90bc66dbbf09908220a58f5276b08ab222701517473ddc37bcbe1deacfc20",
+    "size_bytes": 20529
+  },
+  "correction_from_formatted_diff": {
+    "path": ".runtime/porting/CTF-10/init-postlude-applied-source-02/correction-from-formatted.diff",
+    "sha256": "ad093f0dc1a05a77319a89003a0c9b8cee87dccdafb640565e33413dac4f80a6",
+    "size_bytes": 3852
+  },
+  "correction_formatter_diff": {
+    "path": ".runtime/porting/CTF-10/init-postlude-applied-source-02/correction-formatter.diff",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size_bytes": 0
+  },
+  "actual_correction_format_execution": {
+    "path": ".runtime/porting/CTF-10/init-postlude-applied-source-02/format-command-08-correction/receipt.json",
+    "sha256": "24c5c187e6de66fd2236a41456dd88bc1545b9bfe654c04ffa330a39e37cccb8",
+    "size_bytes": 4240
+  },
+  "source_correction_is_formatter_only": false,
+  "other11_application_sources_unchanged": true,
+  "all_other_full_Source_snapshot_members_unchanged": true,
+  "quality_rerun_performed": false,
+  "scientific_PASS_claimed": false,
+  "gates_updated": false
+}

@@ -1,0 +1,80 @@
+"""Exact generic recorder/file custody adapted from accepted Scan stages."""
+import ast
+from datetime import datetime, timezone
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+
+PREP=Path(__file__).resolve().parent
+IO_SHA="ce1e2f98e975c5fb7d250af9c2503c9cd15aa86422d249ed807253d87cba13cf"
+LARGE={}
+
+def boot(name, filename, digest):
+    path = PREP / filename
+    if hashlib.sha256(path.read_bytes()).hexdigest() != digest: raise ValueError("Reviewed stdlib dependency differs before import")
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module
+
+
+def modules():
+    m = boot("scan_packet_io", "packet_io.py", IO_SHA)
+    return m
+
+
+def full(m, row):
+    """Unbounded streamed binary/core identity; never load binary bytes as JSON."""
+    path = m.contained(row["path"]); digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1048576), b""): digest.update(block)
+    actual = {"path": path.relative_to(m.ROOT).as_posix(), "sha256": digest.hexdigest(), "size_bytes": path.stat().st_size}
+    m.require(actual["sha256"] == row["sha256"] and ("size_bytes" not in row or (type(row["size_bytes"]) is int and row["size_bytes"] == actual["size_bytes"])), "Full binary/core identity differs")
+    LARGE[actual["path"]] = actual
+    return actual
+
+
+def recheck(m):
+    m.recheck()
+    for row in list(LARGE.values()): m.require(full(m, row) == row, "Full binary/core file changed during stage")
+
+
+def same(m, left, right):
+    m.require(m.contained(left["path"], existing=False) == m.contained(right["path"], existing=False) and left["sha256"] == right["sha256"], "Actual artifact path/SHA identities differ")
+    if "size_bytes" in left and "size_bytes" in right: m.require(type(left["size_bytes"]) is int and left["size_bytes"] == right["size_bytes"], "Actual artifact sizes differ")
+
+
+def instant(value, need):
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    need(parsed.tzinfo is not None, "Aware actual command interval required")
+    return parsed
+
+
+def recorded(m, ref, allowed=(0,), allow_failure=False):
+    value = m.load(ref)
+    known = type(value["exit_code"]) is int
+    unknown = value["exit_code"] is None and type(value["launch_error"]) is str and bool(value["launch_error"])
+    m.require(value["schema"] == "recorded-porting-command.v1" and (known or (allow_failure and unknown)) and
+              value["source_bytes_match_before_and_after"] is True and Path(value["cwd"]).resolve() == m.ROOT,
+              "Genuine source-preserving repository recorder required")
+    if not allow_failure: m.require(value["exit_code"] in allowed and value["launch_error"] is None, "Actual required recorded command exit differs")
+    m.require(instant(value["started_utc"], m.require) <= instant(value["finished_utc"], m.require) <= datetime.now(timezone.utc), "Actual preceding command interval required")
+    for key in ["stdout", "stderr"]: full(m, value[key])
+    m.bind(value["source_snapshot"])
+    m.require(value["executed_launcher"]["historical_path"] == "tools/porting/record_command.py", "Actual recorder owner differs")
+    m.bind(value["executed_launcher"]["archive"])
+    m.require(value["executed_launcher"]["archive"]["sha256"]=="5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba", "Actual current reviewed recorder required")
+    return value
+
+
+def before(m, earlier, later):
+    m.require(instant(earlier["finished_utc"], m.require) <= instant(later["started_utc"], m.require), "Required predecessor completed after dependent invocation")
+
+
+def python_cli(m, command, source, names):
+    m.require(len(command) == 5 + 2 * len(names) and Path(command[0]).name.lower() in ["python", "python.exe"] and command[1:4] == ["-X", "utf8", "-B"] and m.contained(command[4]) == m.contained(source["path"]), "Actual reviewed Python CLI differs")
+    pairs = list(zip(command[5::2], command[6::2])); options = dict(pairs)
+    m.require(len(options) == len(pairs) and set(options) == {"--" + name for name in names}, "Exact recorded options required")
+    return options
+
+

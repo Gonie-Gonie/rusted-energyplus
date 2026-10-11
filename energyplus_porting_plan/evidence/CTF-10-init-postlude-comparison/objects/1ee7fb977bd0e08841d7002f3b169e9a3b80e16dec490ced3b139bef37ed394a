@@ -1,0 +1,36 @@
+# Add one four-TU target. The caller's additive include preserves every existing target.
+if(NOT DEFINED CTF10_INIT_POSTLUDE_SOURCE_DIR OR NOT DEFINED CLK03_REPOSITORY_ROOT)
+  message(FATAL_ERROR "Explicit CTF10 postlude source/root required")
+endif()
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+  get_property(_ctf10_init_postlude_scheduled GLOBAL PROPERTY CTF10_INIT_POSTLUDE_REFERENCE_SCHEDULED)
+  if(NOT _ctf10_init_postlude_scheduled)
+    set_property(GLOBAL PROPERTY CTF10_INIT_POSTLUDE_REFERENCE_SCHEDULED TRUE)
+function(ctf10_add_init_postlude)
+  if(NOT TARGET energypluslib)
+    message(FATAL_ERROR "Unchanged genuine core archive required")
+  endif()
+  get_target_property(_postlude_defs energypluslib COMPILE_DEFINITIONS)
+  get_directory_property(_postlude_directory_defs DIRECTORY "${CMAKE_SOURCE_DIR}/src/EnergyPlus" COMPILE_DEFINITIONS)
+  list(APPEND _postlude_defs ${_postlude_directory_defs})
+  list(FILTER _postlude_defs EXCLUDE REGEX "-NOTFOUND$")
+  list(REMOVE_DUPLICATES _postlude_defs)
+  set(_postlude_passive "${CLK03_REPOSITORY_ROOT}/.runtime/porting/CTF-10/native-observer-prep-01")
+  add_executable(ctf10_init_postlude_helper
+    "${CTF10_INIT_POSTLUDE_SOURCE_DIR}/ctf10_production_helper.cpp"
+    "${_postlude_passive}/Construction.ctf10.cc"
+    "${_postlude_passive}/HeatBalanceManager.ctf10.cc"
+    "${_postlude_passive}/ctf10_observer.cc")
+  target_include_directories(ctf10_init_postlude_helper PRIVATE "$<TARGET_PROPERTY:energypluslib,INCLUDE_DIRECTORIES>"
+    "${CTF10_INIT_POSTLUDE_SOURCE_DIR}" "${_postlude_passive}"
+    "${CLK03_REPOSITORY_ROOT}/.runtime/porting/CTF-10/report-input-scan-native-prep-01"
+    "${CLK03_REPOSITORY_ROOT}/.runtime/porting/CTF-01/native-helper-prep-01"
+    "${CLK03_REPOSITORY_ROOT}/.runtime/porting/CTF-01/native-production-prep-02")
+  target_compile_definitions(ctf10_init_postlude_helper PRIVATE ${_postlude_defs})
+  target_compile_features(ctf10_init_postlude_helper PRIVATE cxx_std_20)
+  target_link_libraries(ctf10_init_postlude_helper PRIVATE energypluslib project_options project_fp_options project_warnings bcrypt)
+  target_link_options(ctf10_init_postlude_helper PRIVATE "-Wl,-Map,${CMAKE_CURRENT_BINARY_DIR}/ctf10_init_postlude_helper.map")
+endfunction()
+cmake_language(DEFER CALL ctf10_add_init_postlude)
+  endif()
+endif()

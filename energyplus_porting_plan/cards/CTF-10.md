@@ -105,6 +105,14 @@ The [ordinary initialization evidence](../evidence/CTF-10-ordinary-initializatio
 
 These results establish the ordinary connection, regression behavior and selected formatter equivalence. Native registry/backend/whole-Init comparison and persistent ordinary numerical/history integration remain pending; no card gate is promoted.
 
+## Actual Init postlude reference comparison
+
+The [current selected Init comparison evidence](../evidence/CTF-10-init-postlude-comparison/summary.json) records a failed comparison over the frozen15 model and6 direct-state cases: numeric2106/discrete696389 comparisons, with829 discrete mismatches retained in the complete ledger. The132 optional unpaired observations receive no PASS. This is a failing reference comparison, not selected-owner equivalence.
+
+Current fmt/Clippy0, focused306 and workspace4926 PASS/21 groups share SourceSnapshot `7222438fc3281d590c1fc044121314464c3c965150d9e1b03eef2a5e9f79cab9`. Both candidate executions returned0; their process success does not override the comparison failure. Genuine Native capture and current Rust retain their distinct Source identities.
+
+Native04 failure/archive custody and Clippy08 failure/corrected-Source ancestry remain recorded. Direct initialization preparation and production predecessor-owner corrections are pending. Selected scope exclusions, unavailable owners, authored header differences and unpaired optional backends receive no PASS. Complete whole-Init equivalence and persistent ordinary numerical/history integration remain unconfirmed; no card gate is promoted.
+
 ## Complete registry, producer diagnostics and Init postlude
 
 The full predefined registry retains1301 named indices, all1206 ordered calls, the actual sizing branch and opaque-layer IDs. Genuine first SimulationControl sizing inputs are retained. Selected loading/retry Severe/Continue/Fatal effects execute at their producer callpoints before later flags/stores, through borrowed real backend owners. Final shared flags and the complete ordered report/Scan/EIO/fatal postlude are implemented.
@@ -119,7 +127,7 @@ The [selected Scan comparison evidence](../evidence/CTF-10-report-scan-compariso
 
 Actual compiler names, construction layers, retained predefined string entries and borrowed EIO output are implemented. Source warning/continue/fatal output, counters, optional callbacks and SQLite adapter boundaries retain their real order and output prefix on failure.
 The [report output/backend evidence](../evidence/CTF-10-report-output/summary.json) records fmt/Clippy0, focused270 and workspace4880 PASS with21 added tests. The observer compilation failure and exact correction are retained. Concurrent recorder publication passed eight-process regression.
-Native Scan/getter and numeric-format byte comparisons, full registry/severe producer plumbing and ordinary whole-Init composition remain pending. No card gate is promoted.
+At that report-output milestone, Native Scan/getter and numeric-format byte comparisons, full registry/severe producer plumbing and ordinary whole-Init composition were pending. Their later selected Scan/F/G, registry and ordinary-connection results are recorded above; the current Init owner comparison failed. No card gate is promoted.
 
 ## Retained failure-to-fix lineage
 

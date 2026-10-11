@@ -5,15 +5,16 @@
 
 use super::ctf_public_initialization::OrderedCtfPublicInitialization;
 use super::ctf_reports::{
-    CtfReportError, CtfReportUnavailable, PredefinedStringTable, prepare_ctf_construction_report,
-    report_ctf_layers, report_ctf_transfer_function, write_ctf_report_headers,
+    CtfConstructionReport, CtfReportError, CtfReportUnavailable, PredefinedStringTable,
+    prepare_ctf_construction_report, report_ctf_layers, report_ctf_transfer_function,
+    write_ctf_report_headers,
 };
 use super::error_backend::{SourceErrorBackend, SourceErrorBackendFailure, SourceFatalStop};
 use super::report_scan::{
     ReportScanDiagnostic, ReportScanFailure, ReportScanState, ReportScanUnavailable,
     try_scan_for_reports,
 };
-use ep_model::TypedModel;
+use ep_model::{ReportInputs, TypedModel};
 use std::io::Write;
 
 /// Source/custody stops remain distinct from actual report/backend failures.
@@ -134,25 +135,93 @@ pub fn complete_ctf_init_postlude(
         .ok_or(CtfInitPostludeError::Unavailable(
             Unavailable::MissingFinalSharedFlags,
         ))?;
+    let reports = ModelReportProvider {
+        model,
+        rows: &public.constructions,
+    };
+    complete_ctf_init_postlude_from_provider(
+        &model.report_inputs,
+        &reports,
+        flags,
+        any_internal_heat_source_in_input,
+        &mut public.aggregate_after_returned_calls.simple_ctf_only,
+        layer_columns,
+        table,
+        scan,
+        eio,
+        backend,
+        progress,
+    )
+}
+
+// Prepare only reached used rows; neither wrapper eagerly builds later reports.
+pub(crate) trait CtfInitReportProvider {
+    fn construction_count(&self) -> usize;
+    fn is_used_ctf(&self, index: usize) -> Result<bool, CtfReportUnavailable>;
+    fn prepare_report(
+        &self,
+        index: usize,
+    ) -> Result<CtfConstructionReport<'_>, CtfReportUnavailable>;
+}
+
+struct ModelReportProvider<'a> {
+    model: &'a TypedModel,
+    rows: &'a [super::ctf_public_initialization::ConstructionCtfPublicInitialization],
+}
+impl CtfInitReportProvider for ModelReportProvider<'_> {
+    fn construction_count(&self) -> usize {
+        self.rows.len()
+    }
+    fn is_used_ctf(&self, index: usize) -> Result<bool, CtfReportUnavailable> {
+        self.rows
+            .get(index)
+            .map(|row| row.is_used_ctf)
+            .ok_or(CtfReportUnavailable::Association)
+    }
+    fn prepare_report(
+        &self,
+        index: usize,
+    ) -> Result<CtfConstructionReport<'_>, CtfReportUnavailable> {
+        let row = self
+            .rows
+            .get(index)
+            .ok_or(CtfReportUnavailable::Association)?;
+        prepare_ctf_construction_report(self.model, row)
+    }
+}
+
+// Both callers establish actual construction returns before entering this body.
+// The model wrapper retains its exact association/complete-loop guards above.
+pub(crate) fn complete_ctf_init_postlude_from_provider(
+    report_inputs: &ReportInputs,
+    reports: &impl CtfInitReportProvider,
+    flags: super::surface_manager::ctf_caller_stability::CtfCallerSharedFlags,
+    any_internal_heat_source_in_input: bool,
+    simple_ctf_only: &mut bool,
+    layer_columns: &[i32],
+    table: &mut PredefinedStringTable,
+    scan: &mut ReportScanState,
+    eio: &mut (impl Write + ?Sized),
+    backend: &mut SourceErrorBackend<'_>,
+    progress: &mut CtfInitPostludeProgress,
+) -> Result<(), CtfInitPostludeError> {
     if any_internal_heat_source_in_input {
-        public.aggregate_after_returned_calls.simple_ctf_only = false;
+        *simple_ctf_only = false;
     }
 
     // Prepare only the reached used row. A later unavailable row cannot erase
     // or prevent the already completed earlier table writes.
-    for row in &public.constructions {
-        if !row.is_used_ctf {
+    for index in 0..reports.construction_count() {
+        if !reports.is_used_ctf(index)? {
             continue;
         }
-        let report = prepare_ctf_construction_report(model, row)?;
+        let report = reports.prepare_report(index)?;
         report_ctf_layers(&report, layer_columns, table)?;
-        progress
-            .layer_report_declared_indices
-            .push(row.declared_index);
+        progress.layer_report_declared_indices.push(index);
     }
 
     let do_report = try_scan_for_reports(
-        &model.report_inputs,
+        report_inputs,
         scan,
         "Constructions",
         Some("Constructions"),
@@ -171,17 +240,14 @@ pub fn complete_ctf_init_postlude(
     if do_report || flags.do_ctf_error_report {
         write_ctf_report_headers(eio).map_err(CtfReportError::Io)?;
         progress.report_headers_written = true;
-        // The declared counter includes unused rows through each row's original
-        // declaration index; no filtered-vector index substitutes for it.
-        for row in &public.constructions {
-            if !row.is_used_ctf {
+        // Original declaration positions include unused rows.
+        for index in 0..reports.construction_count() {
+            if !reports.is_used_ctf(index)? {
                 continue;
             }
-            let report = prepare_ctf_construction_report(model, row)?;
+            let report = reports.prepare_report(index)?;
             report_ctf_transfer_function(&report, eio)?;
-            progress
-                .coefficient_report_declared_indices
-                .push(row.declared_index);
+            progress.coefficient_report_declared_indices.push(index);
         }
     }
     if flags.errors_found {

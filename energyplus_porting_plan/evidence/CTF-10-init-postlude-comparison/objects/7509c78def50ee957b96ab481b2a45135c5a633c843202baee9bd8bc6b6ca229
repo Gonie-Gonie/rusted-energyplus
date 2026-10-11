@@ -1,0 +1,425 @@
+--- .runtime/porting/CTF-10/init-postlude-applied-source-01/literal/crates__ep_run__examples__ctf10_init_postlude_direct_support__fields.rs
++++ crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs
+@@ -1,13 +1,22 @@
+ //! Copies caller-retained direct Init owners, including every error prefix.
+ use ep_model::ReportInputs;
+-use ep_runtime::heat_balance::ctf_direct_initialization::{CtfDirectRegularConstructionInput, CtfDirectInitializationState, CtfDirectInitializationError, initialize_direct_regular_ctf};
+-use ep_runtime::heat_balance::ctf_initialization_context::{CtfInitializationContext, CtfInitializationReports};
++use ep_runtime::heat_balance::ctf_direct_initialization::{
++    CtfDirectInitializationError, CtfDirectInitializationState, CtfDirectRegularConstructionInput,
++    initialize_direct_regular_ctf,
++};
+ use ep_runtime::heat_balance::ctf_init_postlude::CtfInitPostludeError;
++use ep_runtime::heat_balance::ctf_initialization_context::{
++    CtfInitializationContext, CtfInitializationReports,
++};
++use ep_runtime::heat_balance::ctf_reports::CtfReportUnavailable;
+ use ep_runtime::heat_balance::ctf_source_diagnostics::CtfSourceDiagnosticStop;
+-use ep_runtime::heat_balance::error_backend::{SourceErrorBackend, SourceErrorState, SourceErrorTracking, SourceErrorLevel, SourceFatalStop};
+-use ep_runtime::heat_balance::report_scan::{try_scan_for_reports, ReportScanDiagnostic, ReportScanFailure};
+-use ep_runtime::heat_balance::ctf_reports::CtfReportUnavailable;
+ use ep_runtime::heat_balance::error_backend::SourceErrorBackendFailure;
++use ep_runtime::heat_balance::error_backend::{
++    SourceErrorBackend, SourceErrorLevel, SourceErrorState, SourceErrorTracking, SourceFatalStop,
++};
++use ep_runtime::heat_balance::report_scan::{
++    ReportScanDiagnostic, ReportScanFailure, try_scan_for_reports,
++};
+ use ep_runtime::heat_balance::surface_manager::ctf_layer_preprocessing::CtfLayerCheckpoint;
+ use serde_json::{Value, json};
+ use std::cell::RefCell;
+@@ -122,31 +131,45 @@
+         "Native_registry_real_totals_component_or_shadow_owners_paired":false})
+ }
+ 
+-
+ #[derive(Debug)]
+ pub(super) enum SetupError {
+-    Registry(CtfReportUnavailable), Scan(ReportScanFailure<SourceErrorBackendFailure>), UnknownAction,
++    Registry(CtfReportUnavailable),
++    Scan(ReportScanFailure<SourceErrorBackendFailure>),
++    UnknownAction,
+ }
+ impl std::fmt::Display for SetupError {
+-    fn fmt(&self, f:&mut std::fmt::Formatter<'_>)->std::fmt::Result {
+-        match self {Self::Registry(error)=>write!(f,"actual registry unavailable: {error:?}"),
+-            Self::Scan(error)=>write!(f,"actual Scan stopped: {error:?}"),Self::UnknownAction=>f.write_str("undeclared setup action")}
++    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
++        match self {
++            Self::Registry(error) => write!(f, "actual registry unavailable: {error:?}"),
++            Self::Scan(error) => write!(f, "actual Scan stopped: {error:?}"),
++            Self::UnknownAction => f.write_str("undeclared setup action"),
++        }
+     }
+ }
+ impl std::error::Error for SetupError {
+-    fn source(&self)->Option<&(dyn std::error::Error+'static)> {
+-        match self {Self::Scan(ReportScanFailure::Diagnostic(error))=>Some(error),_=>None}
+-    }
+-}
+-pub(super) fn setup_error(error:&SetupError)->Value {
+-    let mut sources=Vec::new();let mut next=std::error::Error::source(error);
+-    while let Some(source)=next {sources.push(source.to_string());next=source.source();}
++    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
++        match self {
++            Self::Scan(ReportScanFailure::Diagnostic(error)) => Some(error),
++            _ => None,
++        }
++    }
++}
++pub(super) fn setup_error(error: &SetupError) -> Value {
++    let mut sources = Vec::new();
++    let mut next = std::error::Error::source(error);
++    while let Some(source) = next {
++        sources.push(source.to_string());
++        next = source.source();
++    }
+     json!({"actual_type":format!("{error:?}"),"message":error.to_string(),"source_chain":sources,"Native_outcome_inferred":false})
+ }
+ pub(super) struct Caller {
+     reports: CtfInitializationReports,
+     state: SourceErrorState,
+-    error: Vec<u8>, console: Vec<u8>, eio: Vec<u8>, callbacks: Vec<Value>,
++    error: Vec<u8>,
++    console: Vec<u8>,
++    eio: Vec<u8>,
++    callbacks: Vec<Value>,
+ }
+ impl Caller {
+     pub(super) fn new() -> Self {
+@@ -155,73 +178,128 @@
+         Self {
+             reports: CtfInitializationReports::default(),
+             state: SourceErrorState {
+-                output_error_header:true,
+-                version_string:concat!("rusted-energyplus ",env!("CARGO_PKG_VERSION")).into(),
+-                idd_version_string:"Rust direct report input 26.1".into(),
+-                doing_input_processing:false,print_console_output:true,kickoff_simulation:false,
+-                developer_flag:false,warmup_flag:false,doing_sizing:false,
+-                tracking:SourceErrorTracking {match_counts:[0;20],abort_processing:false,
+-                    total_severe_errors:0,last_severe_error:String::new(),
+-                    total_severe_errors_during_warmup:0,total_severe_errors_during_sizing:0,
+-                    total_warning_errors:0,total_warning_errors_during_warmup:0,total_warning_errors_during_sizing:0},
+-            }, error:Vec::new(),console:Vec::new(),eio:Vec::new(),callbacks:Vec::new(),
++                output_error_header: true,
++                version_string: concat!("rusted-energyplus ", env!("CARGO_PKG_VERSION")).into(),
++                idd_version_string: "Rust direct report input 26.1".into(),
++                doing_input_processing: false,
++                print_console_output: true,
++                kickoff_simulation: false,
++                developer_flag: false,
++                warmup_flag: false,
++                doing_sizing: false,
++                tracking: SourceErrorTracking {
++                    match_counts: [0; 20],
++                    abort_processing: false,
++                    total_severe_errors: 0,
++                    last_severe_error: String::new(),
++                    total_severe_errors_during_warmup: 0,
++                    total_severe_errors_during_sizing: 0,
++                    total_warning_errors: 0,
++                    total_warning_errors_during_warmup: 0,
++                    total_warning_errors_during_sizing: 0,
++                },
++            },
++            error: Vec::new(),
++            console: Vec::new(),
++            eio: Vec::new(),
++            callbacks: Vec::new(),
+         }
+     }
+-    fn with_context<T>(&mut self, action:impl FnOnce(&mut CtfInitializationContext<'_>)->T)->T {
++    fn with_context<T>(
++        &mut self,
++        action: impl FnOnce(&mut CtfInitializationContext<'_>) -> T,
++    ) -> T {
+         let callbacks = RefCell::new(&mut self.callbacks);
+-        let mut message = |_: &mut SourceErrorState, text:&str| {
+-            let mut rows = callbacks.borrow_mut(); let ordinal=rows.len()+1;
++        let mut message = |_: &mut SourceErrorState, text: &str| {
++            let mut rows = callbacks.borrow_mut();
++            let ordinal = rows.len() + 1;
+             rows.push(json!({"actual_ordinal":ordinal,"kind":"messageCallback","actual_level":null,"actual_message":text}));
+         };
+-        let mut error = |_: &mut SourceErrorState, level:SourceErrorLevel, text:&str| {
+-            let mut rows = callbacks.borrow_mut(); let ordinal=rows.len()+1;
++        let mut error = |_: &mut SourceErrorState, level: SourceErrorLevel, text: &str| {
++            let mut rows = callbacks.borrow_mut();
++            let ordinal = rows.len() + 1;
+             rows.push(json!({"actual_ordinal":ordinal,"kind":"errorCallback","actual_level":level as i32,"actual_message":text}));
+         };
+-        let mut context=CtfInitializationContext {
+-            reports:&mut self.reports,eio:&mut self.eio,
+-            backend:SourceErrorBackend {state:&mut self.state,error_stream:Some(&mut self.error),console:&mut self.console,
+-                out_unit1:None,out_unit2:None,f_message:None,message_callback:Some(&mut message),error_callback:Some(&mut error),sqlite:None},
++        let mut context = CtfInitializationContext {
++            reports: &mut self.reports,
++            eio: &mut self.eio,
++            backend: SourceErrorBackend {
++                state: &mut self.state,
++                error_stream: Some(&mut self.error),
++                console: &mut self.console,
++                out_unit1: None,
++                out_unit2: None,
++                f_message: None,
++                message_callback: Some(&mut message),
++                error_callback: Some(&mut error),
++                sqlite: None,
++            },
+         };
+         action(&mut context)
+     }
+-    pub(super) fn snapshot(&self)->Value {
++    pub(super) fn snapshot(&self) -> Value {
+         json!({"reports":reports(&self.reports),"backend":backend(&self.state),
+             "prefixes":{"error":bytes(&self.error),"console":bytes(&self.console),"eio":bytes(&self.eio)},
+             "backend_callbacks":self.callbacks,"actual_backend_callback_count":self.callbacks.len(),
+             "actual_Rust_caller_owner_copied":true,"Native_intermediate_checkpoint_inferred":false})
+     }
+-    pub(super) fn setup(&mut self, action:&str, inputs:&ReportInputs)->Result<Option<bool>,SetupError> {
++    pub(super) fn setup(
++        &mut self,
++        action: &str,
++        inputs: &ReportInputs,
++    ) -> Result<Option<bool>, SetupError> {
+         self.with_context(|context| match action {
+             "SetPredefinedTables" => {
+-                context.reports.registry.set_predefined_tables(false,false).map_err(SetupError::Registry)?;
++                context
++                    .reports
++                    .registry
++                    .set_predefined_tables(false, false)
++                    .map_err(SetupError::Registry)?;
+                 Ok(None)
+-            },
++            }
+             "ScanForReports(Constructions)" => {
+-                let result=try_scan_for_reports(inputs,&mut context.reports.scan,"Constructions",Some("Constructions"),None,None,
+-                    |call|match call {ReportScanDiagnostic::Warning(message)=>context.backend.show_warning_error(&message),
+-                        ReportScanDiagnostic::Continue(message)=>context.backend.show_continue_error(&message)})
+-                    .map_err(SetupError::Scan)?;
++                let result = try_scan_for_reports(
++                    inputs,
++                    &mut context.reports.scan,
++                    "Constructions",
++                    Some("Constructions"),
++                    None,
++                    None,
++                    |call| match call {
++                        ReportScanDiagnostic::Warning(message) => {
++                            context.backend.show_warning_error(&message)
++                        }
++                        ReportScanDiagnostic::Continue(message) => {
++                            context.backend.show_continue_error(&message)
++                        }
++                    },
++                )
++                .map_err(SetupError::Scan)?;
+                 Ok(Some(result))
+-            },
+-            _=>Err(SetupError::UnknownAction),
++            }
++            _ => Err(SetupError::UnknownAction),
+         })
+     }
+-    pub(super) fn initialize(&mut self,input:&CtfDirectRegularConstructionInput<'_>,reports:&ReportInputs,state:&mut CtfDirectInitializationState)
+-        ->Result<(),CtfDirectInitializationError> {
+-        self.with_context(|context|initialize_direct_regular_ctf(input,reports,state,context))
+-    }
+-}
+-fn checkpoint(source:Option<&CtfLayerCheckpoint>)->Value {
++    pub(super) fn initialize(
++        &mut self,
++        input: &CtfDirectRegularConstructionInput<'_>,
++        reports: &ReportInputs,
++        state: &mut CtfDirectInitializationState,
++    ) -> Result<(), CtfDirectInitializationError> {
++        self.with_context(|context| initialize_direct_regular_ctf(input, reports, state, context))
++    }
++}
++fn checkpoint(source: Option<&CtfLayerCheckpoint>) -> Value {
+     source.map_or(Value::Null,|v|json!({"LayersInConstruct":v.layers.len(),"NumResLayers":v.num_res_layers,
+         "active_prefix":v.layers.iter().map(|l|json!({"dl":scalar(l.dl),"rk":scalar(l.rk),"rho":scalar(l.rho),
+             "cp":scalar(l.cp),"lr":scalar(l.lr),"ResLayer":l.res_layer})).collect::<Vec<_>>()}))
+ }
+-pub(super) fn direct_state(source:&CtfDirectInitializationState)->Value {
++pub(super) fn direct_state(source: &CtfDirectInitializationState) -> Value {
+     let preprocessing=source.preprocessing.as_ref().map(|v|json!({"skipped_unused":v.skipped_unused,"errors_found":v.errors_found,
+         "issues_in_actual_order":format!("{:?}",v.issues),"after_load":checkpoint(v.after_load.as_ref()),
+         "after_merge":checkpoint(v.after_merge.as_ref()),"after_conversion":v.after_conversion.as_ref().map(|c|json!({
+             "active":checkpoint(Some(&c.active)),"dyn":scalar(c.dyn_spacing),"rs":scalar(c.total_resistance),"cnd":scalar(c.conductance)}))}));
+-    let values=|v:&[f64]|v.iter().copied().map(scalar).collect::<Vec<_>>();
++    let values = |v: &[f64]| v.iter().copied().map(scalar).collect::<Vec<_>>();
+     json!({"public_storage":public_storage(&source.storage),"retained_preprocessing":preprocessing,
+         "all_resistive":source.all_resistive.as_ref().map(|v|json!({"CTFOutside":values(&v.outside),"CTFCross":values(&v.cross),
+             "CTFInside":values(&v.inside),"CTFFlux":values(&v.flux),"CTFTimeStep":scalar(v.ctf_time_step),"UValue":scalar(v.u_value),
+@@ -232,83 +310,97 @@
+         "construction_invoked":source.construction_invoked,"construction_return_route":source.construction_return_route.map(|v|format!("{v:?}")),
+         "init_returned":source.init_returned,"owner_retained_on_Err":true,"Native_return_inferred":false,"counted_as_PASS":false})
+ }
+-pub(super) fn error(error:&CtfDirectInitializationError)->Value {
+-    let fatal=matches!(error,CtfDirectInitializationError::Diagnostic(CtfSourceDiagnosticStop::Fatal(SourceFatalStop::Fatal(_))) |
+-        CtfDirectInitializationError::Postlude(CtfInitPostludeError::Fatal(SourceFatalStop::Fatal(_))));
+-    let mut sources=Vec::new();let mut next=std::error::Error::source(error);
+-    while let Some(source)=next {sources.push(source.to_string());next=source.source();}
++pub(super) fn error(error: &CtfDirectInitializationError) -> Value {
++    let fatal = matches!(
++        error,
++        CtfDirectInitializationError::Diagnostic(CtfSourceDiagnosticStop::Fatal(
++            SourceFatalStop::Fatal(_)
++        )) | CtfDirectInitializationError::Postlude(CtfInitPostludeError::Fatal(
++            SourceFatalStop::Fatal(_)
++        ))
++    );
++    let mut sources = Vec::new();
++    let mut next = std::error::Error::source(error);
++    while let Some(source) = next {
++        sources.push(source.to_string());
++        next = source.source();
++    }
+     json!({"status":if fatal {"actual-Source-fatal-returned"} else {"actual-Rust-error-returned"},"actual_type":format!("{error:?}"),
+         "message":error.to_string(),"source_chain":sources,"actual_SourceFatalError_returned":fatal,"Native_process_outcome_inferred":false,"counted_as_PASS":false})
+ }
+-pub(super) fn typed_report_inputs(inputs:&ReportInputs)->Value {
++pub(super) fn typed_report_inputs(inputs: &ReportInputs) -> Value {
+     json!({"objects":inputs.objects.iter().enumerate().map(|(i,v)|json!({"vector_index":i,"object_name":v.object_name,
+         "object_type":v.object_type.source_name(),"alphas":v.alphas,"alpha_blank":v.alpha_blank,"default_applied":v.default_applied,
+         "num_alphas":v.num_alphas,"is_epjson":v.is_epjson})).collect::<Vec<_>>(),"legacy_variable_dictionary_sections":inputs.legacy_variable_dictionary_sections})
+ }
+ 
+-pub(super) fn observer_paths()->Vec<&'static str> {vec![
+-    "crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+-    "crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+-    "crates/ep_run/examples/ctf10_init_postlude_direct_support/compile_report_inputs.rs",
+-]}
+-pub(super) fn api_paths()->Vec<&'static str> {vec![
+-    "crates/ep_run/Cargo.toml",
+-    "crates/ep_raw_model/src/lib.rs",
+-    "crates/ep_raw_model/src/idf_order.rs",
+-    "crates/ep_compiler/src/lib.rs",
+-    "crates/ep_compiler/src/compiler.rs",
+-    "crates/ep_model/src/lib.rs",
+-    "crates/ep_model/src/model.rs",
+-    "crates/ep_model/src/objects/materials.rs",
+-    "crates/ep_model/src/objects/construction.rs",
+-    "crates/ep_runtime/src/lib.rs",
+-    "crates/ep_runtime/src/heat_balance/mod.rs",
+-    "crates/ep_runtime/src/heat_balance/initialization.rs",
+-    "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+-    "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+-    "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+-    "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+-    "crates/ep_runtime/src/heat_balance/state.rs",
+-    "crates/ep_runtime/src/heat_balance/ctf.rs",
+-    "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+-    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+-    "crates/ep_model/src/objects/building.rs",
+-    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+-    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+-    "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+-    "crates/ep_compiler/src/compiler/surface_space.rs",
+-    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+-    "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
+-    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+-    "crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs",
+-    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+-    "crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs",
+-    "crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs",
+-    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+-    "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs",
+-    "crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs",
+-    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_final_coefficients.rs",
+-    "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_owner.rs",
+-    "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_ingress.rs",
+-    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability.rs",
+-    "crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs",
+-    "crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs",
+-    "crates/ep_runtime/src/heat_balance/ctf_public_initialization.rs",
+-    "crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs",
+-    "crates/ep_model/src/report_inputs.rs",
+-    "crates/ep_compiler/src/compiler/report_inputs.rs",
+-    "crates/ep_runtime/src/error.rs",
+-    "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+-    "crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs",
+-    "crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+-    "crates/ep_runtime/src/heat_balance/ctf_reports_format.rs",
+-    "crates/ep_runtime/src/heat_balance/predefined_tables.rs",
+-    "crates/ep_runtime/src/heat_balance/predefined_tables_names.rs",
+-    "crates/ep_runtime/src/heat_balance/predefined_tables_catalog.rs",
+-    "crates/ep_runtime/src/heat_balance/report_scan.rs",
+-    "crates/ep_runtime/src/heat_balance/error_backend.rs",
+-    "crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+-    "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+-    "crates/ep_run/src/ctf_initialization_outputs.rs",
+-    "crates/ep_runtime/src/heat_balance/ctf_direct_initialization.rs",
+-]}
++pub(super) fn observer_paths() -> Vec<&'static str> {
++    vec![
++        "crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
++        "crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
++        "crates/ep_run/examples/ctf10_init_postlude_direct_support/compile_report_inputs.rs",
++    ]
++}
++pub(super) fn api_paths() -> Vec<&'static str> {
++    vec![
++        "crates/ep_run/Cargo.toml",
++        "crates/ep_raw_model/src/lib.rs",
++        "crates/ep_raw_model/src/idf_order.rs",
++        "crates/ep_compiler/src/lib.rs",
++        "crates/ep_compiler/src/compiler.rs",
++        "crates/ep_model/src/lib.rs",
++        "crates/ep_model/src/model.rs",
++        "crates/ep_model/src/objects/materials.rs",
++        "crates/ep_model/src/objects/construction.rs",
++        "crates/ep_runtime/src/lib.rs",
++        "crates/ep_runtime/src/heat_balance/mod.rs",
++        "crates/ep_runtime/src/heat_balance/initialization.rs",
++        "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
++        "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
++        "crates/ep_runtime/src/heat_balance/surface_manager.rs",
++        "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
++        "crates/ep_runtime/src/heat_balance/state.rs",
++        "crates/ep_runtime/src/heat_balance/ctf.rs",
++        "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
++        "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
++        "crates/ep_model/src/objects/building.rs",
++        "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
++        "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
++        "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
++        "crates/ep_compiler/src/compiler/surface_space.rs",
++        "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
++        "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
++        "crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
++        "crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs",
++        "crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
++        "crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs",
++        "crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs",
++        "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
++        "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs",
++        "crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs",
++        "crates/ep_runtime/src/heat_balance/surface_manager/ctf_final_coefficients.rs",
++        "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_owner.rs",
++        "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_ingress.rs",
++        "crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability.rs",
++        "crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs",
++        "crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs",
++        "crates/ep_runtime/src/heat_balance/ctf_public_initialization.rs",
++        "crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs",
++        "crates/ep_model/src/report_inputs.rs",
++        "crates/ep_compiler/src/compiler/report_inputs.rs",
++        "crates/ep_runtime/src/error.rs",
++        "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
++        "crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs",
++        "crates/ep_runtime/src/heat_balance/ctf_reports.rs",
++        "crates/ep_runtime/src/heat_balance/ctf_reports_format.rs",
++        "crates/ep_runtime/src/heat_balance/predefined_tables.rs",
++        "crates/ep_runtime/src/heat_balance/predefined_tables_names.rs",
++        "crates/ep_runtime/src/heat_balance/predefined_tables_catalog.rs",
++        "crates/ep_runtime/src/heat_balance/report_scan.rs",
++        "crates/ep_runtime/src/heat_balance/error_backend.rs",
++        "crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
++        "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
++        "crates/ep_run/src/ctf_initialization_outputs.rs",
++        "crates/ep_runtime/src/heat_balance/ctf_direct_initialization.rs",
++    ]
++}

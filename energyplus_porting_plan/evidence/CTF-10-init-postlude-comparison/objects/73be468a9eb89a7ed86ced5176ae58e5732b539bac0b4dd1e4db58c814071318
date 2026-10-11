@@ -1,0 +1,28 @@
+--- .runtime/porting/CTF-10/init-postlude-applied-source-01/literal/crates__ep_run__examples__ctf10_init_postlude_direct_support__compile_report_inputs.rs
++++ crates/ep_run/examples/ctf10_init_postlude_direct_support/compile_report_inputs.rs
+@@ -8,11 +8,12 @@
+ /// Only the actual ReportInputs are moved out. Typed simulation timestep,
+ /// geometry, constructions and material owners never seed the direct Init call.
+ /// Missing compiled input remains None with the real compiler report retained.
+-pub fn compile_direct_report_inputs(
+-    raw: &RawModel,
+-) -> (Option<ReportInputs>, CompileReport) {
++pub fn compile_direct_report_inputs(raw: &RawModel) -> (Option<ReportInputs>, CompileReport) {
+     let compiled = compile_raw_model(raw);
+-    (compiled.model.map(|model| model.report_inputs), compiled.report)
++    (
++        compiled.model.map(|model| model.report_inputs),
++        compiled.report,
++    )
+ }
+ 
+ #[cfg(test)]
+@@ -22,7 +23,7 @@
+ 
+     #[test]
+     fn report_only_input_keeps_real_default_and_idf_order_owners()
+-        -> Result<(), Box<dyn std::error::Error>> {
++    -> Result<(), Box<dyn std::error::Error>> {
+         let raw = parse_epjson_str_with_idf_order(
+             r#"{"Output:Constructions":{"Output:Constructions 1":{"details_type_1":"Constructions","details_type_2":"Materials"}}}"#,
+             "Output:Constructions,Constructions,Materials;",

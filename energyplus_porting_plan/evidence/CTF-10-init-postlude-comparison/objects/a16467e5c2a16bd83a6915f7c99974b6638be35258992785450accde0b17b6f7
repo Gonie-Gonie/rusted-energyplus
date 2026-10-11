@@ -1,0 +1,11 @@
+--- .runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-02/before-01/run_candidates.py
++++ .runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-02/run_candidates.py
+@@ -7,7 +7,7 @@
+ import sys
+ import write_request as m
+ 
+-PROJECTOR = {'path': '.runtime/porting/CTF-10/init-postlude-input-projector-prep-03/manifest.json', 'sha256': '69bc0aeeef10428b27dac71576b3f3005690e901aa60b41291a43ff6204e5072'}
++PROJECTOR = {'path': '.runtime/porting/CTF-10/init-postlude-input-projector-prep-04/manifest.json', 'sha256': '31f9703ba303be8cbef7a4cae8ba1970b0d116dccc0d0b4dca5c1aade35af970'}
+ EXAMPLES = {'production': 'ctf10_init_postlude_candidate_production_observer', 'direct': 'ctf10_init_postlude_candidate_direct_observer'}
+ 
+ def record(out, role, command, snapshot, earliest, allowed=(0,)):

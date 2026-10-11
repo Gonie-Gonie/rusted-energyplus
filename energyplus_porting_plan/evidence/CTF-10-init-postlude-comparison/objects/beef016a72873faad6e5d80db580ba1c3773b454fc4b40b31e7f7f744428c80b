@@ -1,0 +1,1219 @@
+{
+  "schema": "ctf10-Init-postlude-Rust-direct-observer-source-preparation.v1",
+  "status": "SOURCE-READY-HELD-NOT-EXECUTED",
+  "held_immutable": true,
+  "own_sources": [
+    {
+      "canonical_path": "crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+      "proposal": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/proposed/crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+        "sha256": "0c2a0a5c5336d09ca385548e08e17828c53db683b07022cc03731b869ab76376",
+        "size_bytes": 17903,
+        "line_count": 233
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/before/crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/diffs/crates__ep_run__examples__ctf10_init_postlude_candidate_direct_observer.rs.diff",
+        "sha256": "225b3fc9ab3a5e65a541300aa806a3ab5e471aff9361316e52058be729e9bb88",
+        "size_bytes": 18456,
+        "line_count": 236
+      },
+      "new_destination_absent": true
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+      "proposal": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/proposed/crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+        "sha256": "4a8a98d724a9c5d3cd583ce7511249fda982447bea072c12202aa8b7b8de9421",
+        "size_bytes": 21235,
+        "line_count": 314
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/before/crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/diffs/crates__ep_run__examples__ctf10_init_postlude_direct_support__fields.rs.diff",
+        "sha256": "b2d271505fe23d3b790758d59ab413822f01a3b253e21decc3beecac6337236b",
+        "size_bytes": 21861,
+        "line_count": 317
+      },
+      "new_destination_absent": true
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/ctf10_init_postlude_direct_support/compile_report_inputs.rs",
+      "proposal": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/proposed/crates/ep_run/examples/ctf10_init_postlude_direct_support/compile_report_inputs.rs",
+        "sha256": "bab02fb4ae7532a01bf59e8e124ef72f81f6f5ba9cefdfe98b4debca5a49d73e",
+        "size_bytes": 1601,
+        "line_count": 38
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/before/crates/ep_run/examples/ctf10_init_postlude_direct_support/compile_report_inputs.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/diffs/crates__ep_run__examples__ctf10_init_postlude_direct_support__compile_report_inputs.rs.diff",
+        "sha256": "c1ba64ebf4b761657c7bf6eeb73f2595ca20d90786e5cef04386fbf3fe746dfd",
+        "size_bytes": 1980,
+        "line_count": 41
+      },
+      "new_destination_absent": true
+    }
+  ],
+  "application_sources": [
+    {
+      "canonical_path": "crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+      "proposal": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/proposed/crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+        "sha256": "0c2a0a5c5336d09ca385548e08e17828c53db683b07022cc03731b869ab76376",
+        "size_bytes": 17903,
+        "line_count": 233
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/before/crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/diffs/crates__ep_run__examples__ctf10_init_postlude_candidate_direct_observer.rs.diff",
+        "sha256": "225b3fc9ab3a5e65a541300aa806a3ab5e471aff9361316e52058be729e9bb88",
+        "size_bytes": 18456,
+        "line_count": 236
+      },
+      "new_destination_absent": true
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+      "proposal": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/proposed/crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+        "sha256": "4a8a98d724a9c5d3cd583ce7511249fda982447bea072c12202aa8b7b8de9421",
+        "size_bytes": 21235,
+        "line_count": 314
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/before/crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/diffs/crates__ep_run__examples__ctf10_init_postlude_direct_support__fields.rs.diff",
+        "sha256": "b2d271505fe23d3b790758d59ab413822f01a3b253e21decc3beecac6337236b",
+        "size_bytes": 21861,
+        "line_count": 317
+      },
+      "new_destination_absent": true
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/ctf10_init_postlude_direct_support/compile_report_inputs.rs",
+      "proposal": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/proposed/crates/ep_run/examples/ctf10_init_postlude_direct_support/compile_report_inputs.rs",
+        "sha256": "bab02fb4ae7532a01bf59e8e124ef72f81f6f5ba9cefdfe98b4debca5a49d73e",
+        "size_bytes": 1601,
+        "line_count": 38
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/before/crates/ep_run/examples/ctf10_init_postlude_direct_support/compile_report_inputs.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/diffs/crates__ep_run__examples__ctf10_init_postlude_direct_support__compile_report_inputs.rs.diff",
+        "sha256": "c1ba64ebf4b761657c7bf6eeb73f2595ca20d90786e5cef04386fbf3fe746dfd",
+        "size_bytes": 1980,
+        "line_count": 41
+      },
+      "new_destination_absent": true
+    }
+  ],
+  "template_correspondence": [
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/proposed/crates/ep_run/examples/ctf10_init_postlude_candidate_production_observer.rs",
+        "sha256": "4251d705d81a8e7aeba06496d44f278d22a46e164e4de8285443a018b69455b4",
+        "size_bytes": 24975,
+        "line_count": 558
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-01/before-templates/production-main.rs",
+        "sha256": "4251d705d81a8e7aeba06496d44f278d22a46e164e4de8285443a018b69455b4",
+        "size_bytes": 24975,
+        "line_count": 558
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/proposed/crates/ep_run/examples/ctf10_init_postlude_support/fields.rs",
+        "sha256": "c7cb0137e58fd1b1ef72861ee6e4af25f059da2fe0cc207570ee64be63f83ba3",
+        "size_bytes": 13639,
+        "line_count": 208
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-01/before-templates/production-fields.rs",
+        "sha256": "c7cb0137e58fd1b1ef72861ee6e4af25f059da2fe0cc207570ee64be63f83ba3",
+        "size_bytes": 13639,
+        "line_count": 208
+      }
+    },
+    {
+      "source": {
+        "path": "crates/ep_run/examples/ctf10_candidate_production_support/unit_fields.rs",
+        "sha256": "6d2d9a111da360943cc35f881bbfc7afc9fe8ef5af68461c2b2f07c1acf6788e",
+        "size_bytes": 37889,
+        "line_count": 685
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-01/before-templates/public-unit-fields.rs",
+        "sha256": "6d2d9a111da360943cc35f881bbfc7afc9fe8ef5af68461c2b2f07c1acf6788e",
+        "size_bytes": 37889,
+        "line_count": 685
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/helper/compile-direct-report-inputs.rs",
+        "sha256": "bab02fb4ae7532a01bf59e8e124ef72f81f6f5ba9cefdfe98b4debca5a49d73e",
+        "size_bytes": 1601,
+        "line_count": 38
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-01/before-templates/compile-direct-report-inputs.rs",
+        "sha256": "bab02fb4ae7532a01bf59e8e124ef72f81f6f5ba9cefdfe98b4debca5a49d73e",
+        "size_bytes": 1601,
+        "line_count": 38
+      }
+    }
+  ],
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/manifest.json",
+      "sha256": "b089d724b65467e72564176038001e6567e51861a924cc0bcd9f94848fe19c5c",
+      "size_bytes": 39237,
+      "line_count": 923
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/manifest.json",
+      "sha256": "f4d6b158e2cdf57cb59858f5ed83772302697ce50ce2b2649eafe915f5a00ef2",
+      "size_bytes": 22343,
+      "line_count": 528
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-init-postlude-prep-03/manifest.json",
+      "sha256": "2fff41eea32cc29a22f901df41bf455385e5b238a5c58b7cf5350201315b0210",
+      "size_bytes": 33904,
+      "line_count": 830
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-init-postlude-prep-04/manifest.json",
+      "sha256": "27019bc48750e353169f51ed917b0b80da14df9c9274c6d608422fcea218d2fd",
+      "size_bytes": 36313,
+      "line_count": 883
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-init-postlude-prep-03/direct-unit-cases.proposed.json",
+      "sha256": "020c6bf53a8fd6bf49caafd1bd74eb3dae45b5272cdd6d27dade57392daf8b08",
+      "size_bytes": 3144,
+      "line_count": 128
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-init-postlude-prep-03/direct-report-input.idf",
+      "sha256": "39df3d0362e93ecef52b04510559f00096fa89b9055fda0fbc48931f75fc02e4",
+      "size_bytes": 202,
+      "line_count": 5
+    },
+    {
+      "path": ".runtime/porting/SCH-01/input-prep-02/convert_inputs.py",
+      "sha256": "82f27c8327d2409bb3bcba727044ebe6a36641ed8d7c404e08dd4bc92c990dbb",
+      "size_bytes": 7727,
+      "line_count": 144
+    },
+    {
+      "path": ".runtime/porting/SCH-01/input-prep-02/input_common.py",
+      "sha256": "b38466a0dd8851935d0ef28c079220d7c48f2c05506926d1ad4e7fb463f6de77",
+      "size_bytes": 2765,
+      "line_count": 84
+    },
+    {
+      "path": ".runtime/porting/CTF-10/direct-report-input-conversion-command-01/receipt.json",
+      "sha256": "3f55e9fd83c85d072ca42e2c866fe8ff9b7baf9069f9632999598c9daa754ebd",
+      "size_bytes": 3227,
+      "line_count": 80
+    },
+    {
+      "path": ".runtime/porting/SCH-01/ctf10-direct-report-converted-inputs-01/CTF10-DIRECT-REPORT/conversion.json",
+      "sha256": "3d2553e460642ba4057d8c7021f8fe006cb765233fbbc5a8ca7e5d668703f8d8",
+      "size_bytes": 3030,
+      "line_count": 70
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-init-postlude-prep-05/manifest.json",
+      "sha256": "07fe5b830b16d93ead4e08e374f1b851d40b48f7c9f2fb2cacb5d527f16c02d9",
+      "size_bytes": 38036,
+      "line_count": 938
+    }
+  ],
+  "API_source_context_inventory": [
+    {
+      "canonical_path": "crates/ep_run/Cargo.toml",
+      "source_context": {
+        "path": "crates/ep_run/Cargo.toml",
+        "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+        "size_bytes": 524,
+        "line_count": 21
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_raw_model/src/lib.rs",
+      "source_context": {
+        "path": "crates/ep_raw_model/src/lib.rs",
+        "sha256": "08f4a3bcf27c2f4e2577b534ad505176d0877b46709bb512b71685ebef6fa9a8",
+        "size_bytes": 16493,
+        "line_count": 491
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_raw_model/src/idf_order.rs",
+      "source_context": {
+        "path": "crates/ep_raw_model/src/idf_order.rs",
+        "sha256": "ed6f7148f8e956a1a27eed0d24b351a26204c395158dcf32e039a764713b1e42",
+        "size_bytes": 32076,
+        "line_count": 889
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_compiler/src/lib.rs",
+      "source_context": {
+        "path": "crates/ep_compiler/src/lib.rs",
+        "sha256": "1931ed21f1fae2fe5d7e90bb954f1f91812fec1d1eeb7daf102a6ba0007424fe",
+        "size_bytes": 165,
+        "line_count": 7
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_compiler/src/compiler.rs",
+      "source_context": {
+        "path": "crates/ep_compiler/src/compiler.rs",
+        "sha256": "bfbd8cab425fbed44367cb05217e0697aeda7bcddffc9605603fe496c05d1d7e",
+        "size_bytes": 772522,
+        "line_count": 19758
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_model/src/lib.rs",
+      "source_context": {
+        "path": "crates/ep_model/src/lib.rs",
+        "sha256": "dd2fa6189146f9eb03adc913f79901b056f5e6fdb095089bcf1828cb50fb12b1",
+        "size_bytes": 329,
+        "line_count": 17
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_model/src/model.rs",
+      "source_context": {
+        "path": "crates/ep_model/src/model.rs",
+        "sha256": "334ae93fc3cdd32580f1e49349ecbe07fb1dab83809e371c16b4ac5fadd20ba7",
+        "size_bytes": 93321,
+        "line_count": 2332
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_model/src/objects/materials.rs",
+      "source_context": {
+        "path": "crates/ep_model/src/objects/materials.rs",
+        "sha256": "23d9f6dd7af7ef0aff73f3e4697ece3e5acd58104d2d5e3e1edbc46bfaa71653",
+        "size_bytes": 54627,
+        "line_count": 1205
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_model/src/objects/construction.rs",
+      "source_context": {
+        "path": "crates/ep_model/src/objects/construction.rs",
+        "sha256": "f1886c8b2f9aede1e661210520b668d52f74d884d9a207de9f0c046e4170f191",
+        "size_bytes": 18134,
+        "line_count": 445
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/lib.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/lib.rs",
+        "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+        "size_bytes": 868,
+        "line_count": 41
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "source_context": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/proposed/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "33ae4c0548e84c59044bdf10aff87094cbd3cb604acf8fb185cc22aaa31a9dd3",
+        "size_bytes": 2127,
+        "line_count": 83
+      },
+      "held_prospective_source": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "source_context": {
+        "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/proposed/crates/ep_runtime/src/heat_balance/initialization.rs",
+        "sha256": "5c8ce72a61fc77d59d2844be74e91b66729b1159a12149b28422290c331d9dd3",
+        "size_bytes": 13697,
+        "line_count": 280
+      },
+      "held_prospective_source": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "source_context": {
+        "path": ".runtime/porting/CTF-10/init-postlude-rust-observer-prep-01/proposed/crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+        "sha256": "b4a69e7eaec615c6a8d535b05259198499d9b9d3563166f5a9ab45ea9cf22ccf",
+        "size_bytes": 5978,
+        "line_count": 158
+      },
+      "held_prospective_source": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+        "sha256": "c54f4de5dfd0cd58c56a913495d7c98ccc124ea11ff272d92e51e56e84b444ef",
+        "size_bytes": 2936,
+        "line_count": 53
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+        "sha256": "15165c7b9b347d3841136b088d3085d0d0aa9b8d428625f61f923b715a970371",
+        "size_bytes": 6171,
+        "line_count": 178
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+        "sha256": "6975e14b493175e09abb5a4de865aa06c47765a98fe69a0fdbbf075240f9c198",
+        "size_bytes": 30066,
+        "line_count": 724
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "e4a903ad226410b9f84530e675d6dbfafa528212c2bf10a5e5686de2df2e383e",
+        "size_bytes": 49041,
+        "line_count": 1050
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+        "sha256": "b2968bf646f31e339c01094237a9ee76e1b6b6184c44e18a6b7ce45311dc46e5",
+        "size_bytes": 31697,
+        "line_count": 858
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+        "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+        "size_bytes": 3172,
+        "line_count": 75
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "source_context": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/proposed/crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+        "sha256": "a63c8719b48997c801d4a41527526d9404540858069565c62bdb65ece5a9cdda",
+        "size_bytes": 15720,
+        "line_count": 415
+      },
+      "held_prospective_source": true
+    },
+    {
+      "canonical_path": "crates/ep_model/src/objects/building.rs",
+      "source_context": {
+        "path": "crates/ep_model/src/objects/building.rs",
+        "sha256": "d6a3fbc6b39106f8d0b5195822bfc354e505e557f2b9406409b68aebfb089ef0",
+        "size_bytes": 11621,
+        "line_count": 373
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+        "sha256": "8e02f58b2da67416342b15f281cd270f80c1bafcd7600931899aef2f920f2bfc",
+        "size_bytes": 4902,
+        "line_count": 122
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+        "sha256": "9fb5548009e539ba6dfbdc42c592aff3359cdc9901c34ca2dd6c137590fa0bb5",
+        "size_bytes": 7433,
+        "line_count": 201
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+        "sha256": "0d5b57ec2c0b60111cdc29d94288d38d6abce78a95b4f9bbb155624babe558e5",
+        "size_bytes": 5605,
+        "line_count": 136
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_compiler/src/compiler/surface_space.rs",
+      "source_context": {
+        "path": "crates/ep_compiler/src/compiler/surface_space.rs",
+        "sha256": "8e7dccc67a68ccb71b9c284f78c83a681a81940998672cf945c9c0e8cfb7a379",
+        "size_bytes": 9708,
+        "line_count": 254
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+        "sha256": "69fd790e6a54ec6c521fb3b7332a4eff0dfe3c89331b305d904cb30c7820bb00",
+        "size_bytes": 17755,
+        "line_count": 458
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
+        "sha256": "dd8a47daa27abe47f58ae5eef5a6713a657aa1332d5c620d88ba65c7a056d8c2",
+        "size_bytes": 5167,
+        "line_count": 126
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+        "sha256": "32765ebea79d230319352d39de6fabf099a7c15a3c294456810c58bc1e21cc73",
+        "size_bytes": 9825,
+        "line_count": 264
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs",
+        "sha256": "a6f1d30c0c8228d943a660f33c6dc853f36001bf0f8e42d0a01d4d918ad01b5b",
+        "size_bytes": 4259,
+        "line_count": 102
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+        "sha256": "3676c27ee3a0c0f9e2540e1df028c6df4305e14d80b49d65e37a7f6be5d123a8",
+        "size_bytes": 3628,
+        "line_count": 104
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs",
+        "sha256": "e4e50e38d21ea1b7fa1537a440dbfcdf53c5b876050987b5f247cc6b160f63a4",
+        "size_bytes": 4612,
+        "line_count": 110
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs",
+        "sha256": "218c2f5ee11581437f48d56a7a1a90e4e7af832d42854e09c8753a8198f859ff",
+        "size_bytes": 4152,
+        "line_count": 95
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+        "sha256": "ca5097dddf11de2d54f6041fa5fb9390df1762cb0dcfb86668543e35a49dc7d3",
+        "size_bytes": 6499,
+        "line_count": 156
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs",
+        "sha256": "f90e3b4ab611c3ab1acec463541fcdb0fac31a3204265f09f7b07a9b558c076d",
+        "size_bytes": 7659,
+        "line_count": 174
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs",
+        "sha256": "08541dd2d6a3e75f5418643dca857155edf33cb083bceb044ff8f19de9842249",
+        "size_bytes": 1812,
+        "line_count": 38
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_final_coefficients.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_final_coefficients.rs",
+        "sha256": "a7e5afcd2daf74dc599a8eb340ec3df579756a09e6df991e41691530d2d5fb55",
+        "size_bytes": 10350,
+        "line_count": 257
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_owner.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_owner.rs",
+        "sha256": "5f701d1e767ce8c10473b1029b9f34566d1e1a2df8617f4d861f667cdf66f30f",
+        "size_bytes": 9143,
+        "line_count": 203
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_ingress.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_ingress.rs",
+        "sha256": "c404116f307951477eac749781c86c5ff2de794d02834edda7c69961e6610f1d",
+        "size_bytes": 2323,
+        "line_count": 48
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability.rs",
+        "sha256": "6f92ce52fef6820757a7144dab773edde0c6ede6b54ab655c43c0c6863e50462",
+        "size_bytes": 16319,
+        "line_count": 398
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs",
+        "sha256": "7f286730093c50cc435b657f7746a26265f5da19f4af3324aef720561532f69d",
+        "size_bytes": 20250,
+        "line_count": 505
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs",
+        "sha256": "7208d194c29c3573581d2207dd67c81a337f7a7e2cff838ae8a7c70be56975a6",
+        "size_bytes": 8132,
+        "line_count": 193
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_public_initialization.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_public_initialization.rs",
+        "sha256": "b52aaed467b5f8e146e79867f947b3d1137d68f9199a092213d2a98167f547de",
+        "size_bytes": 22932,
+        "line_count": 520
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs",
+        "sha256": "3327c29942113e0b5cd2fcf502d70933b080efa6b4e76ebca83dd36a534fe5a9",
+        "size_bytes": 9057,
+        "line_count": 198
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_model/src/report_inputs.rs",
+      "source_context": {
+        "path": "crates/ep_model/src/report_inputs.rs",
+        "sha256": "a04b9a90f4f66e6425d120292ec869b0230cd097b3ad99d3bbf570e97f69c835",
+        "size_bytes": 4808,
+        "line_count": 127
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_compiler/src/compiler/report_inputs.rs",
+      "source_context": {
+        "path": "crates/ep_compiler/src/compiler/report_inputs.rs",
+        "sha256": "a86f97af46ade8a8588a4074cce6bb0f9b9a87446216d5ebb904873c04163d87",
+        "size_bytes": 15936,
+        "line_count": 404
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/error.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/error.rs",
+        "sha256": "0b2cc9b5d3add64df91f27c632b41a76f48f477e2b7cb2b9ae13260c380f924f",
+        "size_bytes": 9509,
+        "line_count": 246
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+        "sha256": "08cb5697f9e412d953075d707b010af3efd539faef6940f66e337145b20ac659",
+        "size_bytes": 9251,
+        "line_count": 217
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs",
+      "source_context": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs",
+        "sha256": "57afbab1c2867b5a54d1b3863d321700925bd87e4ff21c449637c765d7b27d30",
+        "size_bytes": 10211,
+        "line_count": 254
+      },
+      "held_prospective_source": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+        "sha256": "fc1e151753fb50b43333cd28e293a2560ff3b623f247676d745a692858b303a7",
+        "size_bytes": 16564,
+        "line_count": 435
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_reports_format.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_reports_format.rs",
+        "sha256": "d8aa1aa88e3000a4be37f6179c3c6829b7ff534d16efded123d91ab5045c0151",
+        "size_bytes": 2813,
+        "line_count": 83
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/predefined_tables.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/predefined_tables.rs",
+        "sha256": "9c63ae62f5348562f4f64972266ed9ed7eaab842cc80836f61e4c8690de68405",
+        "size_bytes": 10010,
+        "line_count": 295
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/predefined_tables_names.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/predefined_tables_names.rs",
+        "sha256": "940e50d664865c17cbe00d1d0f2f29d03b158adb5942e89a0aaedf1071a64687",
+        "size_bytes": 31107,
+        "line_count": 331
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/predefined_tables_catalog.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/predefined_tables_catalog.rs",
+        "sha256": "b0a3515673a61e9b15cdff6691f5f3d0dd583697b91ecbe5dc1e4f3cfe728984",
+        "size_bytes": 126416,
+        "line_count": 1214
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/report_scan.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/report_scan.rs",
+        "sha256": "4d18fc4720bef47c02d4cdeb64c8e3bc4712018f27f63ee2af1e77d46f64ae41",
+        "size_bytes": 19302,
+        "line_count": 551
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/error_backend.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/error_backend.rs",
+        "sha256": "d9806884275aead705154e0f9cbe5fd14300246cd424a78276dcb77775aad908",
+        "size_bytes": 16927,
+        "line_count": 435
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+        "sha256": "25db310ed83eaf2bdf97f1189700aa985935101d1c5ae12397a42e50e116c1c3",
+        "size_bytes": 7238,
+        "line_count": 187
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+      "source_context": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+        "sha256": "74de5eadbbde6f1f9d52f63d728704c06039465fe15b518033b5fcbb8e8f5dd8",
+        "size_bytes": 26856,
+        "line_count": 630
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_run/src/ctf_initialization_outputs.rs",
+      "source_context": {
+        "path": "crates/ep_run/src/ctf_initialization_outputs.rs",
+        "sha256": "34c171d4608a419f51655da4ab24ffbfbe485733a1728a8fb779c7564f2799cb",
+        "size_bytes": 6212,
+        "line_count": 163
+      },
+      "held_prospective_source": false
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_direct_initialization.rs",
+      "source_context": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_direct_initialization.rs",
+        "sha256": "ee8175a0aa125565b6c81f22c7dbb261fa5212406de1b6e6171fd42a4cecd200",
+        "size_bytes": 12032,
+        "line_count": 248
+      },
+      "held_prospective_source": true
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "path": ".runtime/porting/CTF-10/native-init-postlude-prep-03/ctf10_production_helper.cpp",
+      "start_line": 43,
+      "end_line": 115,
+      "sha256": "0df7f124b60570620b9e327f101b808673c950ca164ad45f88cc77e53428625c",
+      "size_bytes": 4650,
+      "line_count": 73,
+      "purpose": "Actual Factory setup/sinks/callbacks/initial registry"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-init-postlude-prep-03/ctf10_production_helper.cpp",
+      "start_line": 270,
+      "end_line": 367,
+      "sha256": "eb130c63cdec253014d6c08d5554cf284720ef677bd85083590da774d21ad104",
+      "size_bytes": 7324,
+      "line_count": 98,
+      "purpose": "Six direct seed/setup/Init calls"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+      "start_line": 108,
+      "end_line": 145,
+      "sha256": "5f7908972b27d5dae55458b64a596eeb0622d9012e17f251ae428ec1267c9c04",
+      "size_bytes": 3759,
+      "line_count": 38,
+      "purpose": "Global zero timestep/false flags constructor"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+      "start_line": 161,
+      "end_line": 194,
+      "sha256": "54bf8e00f2318ae9d89f14513c7db817218a13a5a34e9657db3416689456020e",
+      "size_bytes": 1507,
+      "line_count": 34,
+      "purpose": "Console/callback and empty init owners"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataErrorTracking.hh",
+      "start_line": 204,
+      "end_line": 241,
+      "sha256": "9a0f0e55ac2ecc2ce55a9bd53a8a29441067cf2660c52adbf53f57870cb81a58",
+      "size_bytes": 1790,
+      "line_count": 38,
+      "purpose": "Tracking zero defaults/twenty MatchCounts"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.hh",
+      "start_line": 687,
+      "end_line": 702,
+      "sha256": "19112eca4d15524e3f86858a07774fa5c3e99030e45a1d15df0a74bd24d3e6b9",
+      "size_bytes": 376,
+      "line_count": 16,
+      "purpose": "Error header true default/empty init"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSystemVariables.hh",
+      "start_line": 103,
+      "end_line": 103,
+      "sha256": "e94bcafa3dba38e1caa8891baf271b276967c0262285ff652d0788ed125f1463",
+      "size_bytes": 108,
+      "line_count": 1,
+      "purpose": "Developer false default"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SimulationManager.cc",
+      "start_line": 2777,
+      "end_line": 2800,
+      "sha256": "fb484e3764085392f7120265b7ea7efd17990350bfb6b7b93092737c3370977b",
+      "size_bytes": 951,
+      "line_count": 24,
+      "purpose": "Post-input DoingInputProcessing false"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.hh",
+      "start_line": 134,
+      "end_line": 190,
+      "sha256": "ce38444b10e385f56f1cdb36b6286498dc658776af47eb7a213a25532eaa920d",
+      "size_bytes": 4992,
+      "line_count": 57,
+      "purpose": "Construction defaults/absorptance zero"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Material.hh",
+      "start_line": 164,
+      "end_line": 180,
+      "sha256": "a1221c09be6ada4957e587557ff3c2efb838d0be090258e5f4870b9a67268912",
+      "size_bytes": 474,
+      "line_count": 17,
+      "purpose": "Roughness ordinal2 MediumRough"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_direct_initialization.rs",
+      "start_line": 29,
+      "end_line": 98,
+      "sha256": "200982152ba3d392aada250ce2b80f4a100442b9845fefaa38b44f929dc10c25",
+      "size_bytes": 3431,
+      "line_count": 70,
+      "purpose": "Real direct input/retained state"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-direct-state-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_direct_initialization.rs",
+      "start_line": 174,
+      "end_line": 248,
+      "sha256": "8abef261190ca84d8a073551f7adfd3182a2e75617fdf19d60f6d0e45885e478",
+      "size_bytes": 3561,
+      "line_count": 75,
+      "purpose": "Once-only direct calculation/postlude entry"
+    }
+  ],
+  "runtime_interfaces": {
+    "argv": [
+      "observer_executable",
+      "request_path",
+      "request_sha256"
+    ],
+    "request_schema": "ctf10-Init-postlude-candidate-direct-observer-request.v1",
+    "results_schema": "ctf10-Init-postlude-candidate-direct-observer-results.v1",
+    "runtime_source_bindings_schema": "ctf10-Init-postlude-direct-runtime-source-bindings.v1",
+    "runtime_source_binding_keys": [
+      "schema",
+      "observer_sources",
+      "actual_public_API_sources"
+    ],
+    "ordered_request_keys": [
+      "schema",
+      "direct_unit_request",
+      "native_admission_contract",
+      "native_frozen_packet",
+      "report_input_epjson",
+      "report_conversion_proof_bindings",
+      "observer_sources",
+      "actual_public_API_sources",
+      "actual_Cargo_source_capture_must_match",
+      "frozen_before_execution",
+      "expected_values_supplied",
+      "Native_results_supplied"
+    ],
+    "ordered_observer_source_paths": [
+      "crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+      "crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+      "crates/ep_run/examples/ctf10_init_postlude_direct_support/compile_report_inputs.rs"
+    ],
+    "ordered_public_API_source_paths": [
+      "crates/ep_run/Cargo.toml",
+      "crates/ep_raw_model/src/lib.rs",
+      "crates/ep_raw_model/src/idf_order.rs",
+      "crates/ep_compiler/src/lib.rs",
+      "crates/ep_compiler/src/compiler.rs",
+      "crates/ep_model/src/lib.rs",
+      "crates/ep_model/src/model.rs",
+      "crates/ep_model/src/objects/materials.rs",
+      "crates/ep_model/src/objects/construction.rs",
+      "crates/ep_runtime/src/lib.rs",
+      "crates/ep_runtime/src/heat_balance/mod.rs",
+      "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "crates/ep_runtime/src/heat_balance/state.rs",
+      "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "crates/ep_model/src/objects/building.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_initial_discretization.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_initial_owner.rs",
+      "crates/ep_compiler/src/compiler/surface_space.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_state_space_assembly.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_assembly_owner.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_exponential_matrix.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_exponential_owner.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_inverse_matrix.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_inverse_owner.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_matrix_owner.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_gamma_matrix.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_gamma_owner.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_gamma_ingress.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_final_coefficients.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_owner.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_first_final_coefficients_ingress.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_public_initialization.rs",
+      "crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs",
+      "crates/ep_model/src/report_inputs.rs",
+      "crates/ep_compiler/src/compiler/report_inputs.rs",
+      "crates/ep_runtime/src/error.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_reports_format.rs",
+      "crates/ep_runtime/src/heat_balance/predefined_tables.rs",
+      "crates/ep_runtime/src/heat_balance/predefined_tables_names.rs",
+      "crates/ep_runtime/src/heat_balance/predefined_tables_catalog.rs",
+      "crates/ep_runtime/src/heat_balance/report_scan.rs",
+      "crates/ep_runtime/src/heat_balance/error_backend.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+      "crates/ep_run/src/ctf_initialization_outputs.rs",
+      "crates/ep_runtime/src/heat_balance/ctf_direct_initialization.rs"
+    ],
+    "observer_source_count": 3,
+    "public_API_source_count": 59,
+    "current_scope_execution_role": "real-CTF-10-Init-postlude-check-only",
+    "Native_admission_source_count": 12,
+    "direct_input_case_count": 6,
+    "current_native_source_manifest": {
+      "path": ".runtime/porting/CTF-10/native-init-postlude-prep-05/manifest.json",
+      "sha256": "07fe5b830b16d93ead4e08e374f1b851d40b48f7c9f2fb2cacb5d527f16c02d9",
+      "size_bytes": 38036,
+      "line_count": 938
+    },
+    "actual_report_conversion_required": true,
+    "actual_Cargo_source_capture_must_match": true,
+    "actual_runtime_source_hashes_supplied_after_application_only": true,
+    "constructor_global_TimeStepZone": 0.0,
+    "production_lane_or_geometry_synthesized": false
+  },
+  "reuse_checks": {
+    "transport_helpers_literal": [
+      "require",
+      "text",
+      "rows",
+      "keys",
+      "bound",
+      "source_pins"
+    ],
+    "scalar_and_public_storage_literal": true,
+    "compile_helper_byte_exact": true,
+    "allocated_bytes_reports_only_local_scalar_path_substitution": true,
+    "backend_only_actual_installed_callback_presence_changed": true
+  },
+  "README": {
+    "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/README.md",
+    "sha256": "1844e779494ef366bfb1c13ed2bbb1f14d9b4030ff1353f5067b8e03a38d97a6",
+    "size_bytes": 3901,
+    "line_count": 58
+  },
+  "Source_only_validation": {
+    "destinations_absent": true,
+    "canonical_changed": false,
+    "project_import_or_Cargo_or_formatter_or_test_or_target_or_Git_executed": false,
+    "scientific_results_or_binaries_or_weather_read": false,
+    "future_output_or_SourceSnapshot_identity_invented": false,
+    "numerical_or_whole_Init_or_integration_PASS_claimed": false
+  },
+  "authorship_limit": "Base authored error backend/postlude ancestry. Independent peer certifies new observer transport/lifetime/custody; no self numerical certificate. Header authored the sole Source02 pin substitution; Base/Root independent narrow review remains required.",
+  "from01_source_correspondence": [
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/proposed/crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+        "sha256": "0c2a0a5c5336d09ca385548e08e17828c53db683b07022cc03731b869ab76376",
+        "size_bytes": 17903,
+        "line_count": 233
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/before-01/crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+        "sha256": "862b6e0efdcc21588187a439b5ba88e545f931eb91767e42486949c2b04b274a",
+        "size_bytes": 17903,
+        "line_count": 233
+      },
+      "immutable01_source": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-01/proposed/crates/ep_run/examples/ctf10_init_postlude_candidate_direct_observer.rs",
+        "sha256": "862b6e0efdcc21588187a439b5ba88e545f931eb91767e42486949c2b04b274a",
+        "size_bytes": 17903,
+        "line_count": 233
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/from-01-diffs/crates__ep_run__examples__ctf10_init_postlude_candidate_direct_observer.rs.diff",
+        "sha256": "13644599424474811df4a792df40fc38a30d4c0a946bed052cc919ac62a139a6",
+        "size_bytes": 1561,
+        "line_count": 11
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/proposed/crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+        "sha256": "4a8a98d724a9c5d3cd583ce7511249fda982447bea072c12202aa8b7b8de9421",
+        "size_bytes": 21235,
+        "line_count": 314
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/before-01/crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+        "sha256": "4a8a98d724a9c5d3cd583ce7511249fda982447bea072c12202aa8b7b8de9421",
+        "size_bytes": 21235,
+        "line_count": 314
+      },
+      "immutable01_source": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-01/proposed/crates/ep_run/examples/ctf10_init_postlude_direct_support/fields.rs",
+        "sha256": "4a8a98d724a9c5d3cd583ce7511249fda982447bea072c12202aa8b7b8de9421",
+        "size_bytes": 21235,
+        "line_count": 314
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/from-01-diffs/crates__ep_run__examples__ctf10_init_postlude_direct_support__fields.rs.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/proposed/crates/ep_run/examples/ctf10_init_postlude_direct_support/compile_report_inputs.rs",
+        "sha256": "bab02fb4ae7532a01bf59e8e124ef72f81f6f5ba9cefdfe98b4debca5a49d73e",
+        "size_bytes": 1601,
+        "line_count": 38
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/before-01/crates/ep_run/examples/ctf10_init_postlude_direct_support/compile_report_inputs.rs",
+        "sha256": "bab02fb4ae7532a01bf59e8e124ef72f81f6f5ba9cefdfe98b4debca5a49d73e",
+        "size_bytes": 1601,
+        "line_count": 38
+      },
+      "immutable01_source": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-01/proposed/crates/ep_run/examples/ctf10_init_postlude_direct_support/compile_report_inputs.rs",
+        "sha256": "bab02fb4ae7532a01bf59e8e124ef72f81f6f5ba9cefdfe98b4debca5a49d73e",
+        "size_bytes": 1601,
+        "line_count": 38
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/from-01-diffs/crates__ep_run__examples__ctf10_init_postlude_direct_support__compile_report_inputs.rs.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      }
+    }
+  ],
+  "predecessor_manifest": {
+    "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-01/manifest.json",
+    "sha256": "ba60ce3f55fb6e57cf609d1e74127f186bad17db9ad0b6156b575d57851e7ca4",
+    "size_bytes": 46519,
+    "line_count": 1103
+  },
+  "predecessor_manifest_archive": {
+    "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/before-01/manifest.json",
+    "sha256": "ba60ce3f55fb6e57cf609d1e74127f186bad17db9ad0b6156b575d57851e7ca4",
+    "size_bytes": 46519,
+    "line_count": 1103
+  },
+  "README_before01": {
+    "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/before-01/README.md",
+    "sha256": "c20fa9d764e91ce42d8bd724e0f5f30fd23043c1d133461f8d0c30d42d92fbb5",
+    "size_bytes": 3265,
+    "line_count": 48
+  },
+  "README_exact_diff": {
+    "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/from-01-diffs/README.md.diff",
+    "sha256": "2b1a46abb1e14cf4c171e3dad87454818bdf7afc71e723c042e932495585e6f1",
+    "size_bytes": 999,
+    "line_count": 16
+  },
+  "authoring_source": {
+    "path": ".runtime/porting/CTF-10/init-postlude-direct-rust-observer-prep-02/prepare_sources.py",
+    "sha256": "4c0ffeb74baa1690f925bfa0fc543cb62026439fa15024a6147dbd237654e469",
+    "size_bytes": 5249,
+    "line_count": 79
+  }
+}

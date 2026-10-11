@@ -1,0 +1,135 @@
+"""Factual full owner/return custody only. No equations, expected exits or byte parity."""
+from pathlib import Path
+import re
+
+MAX_BYTES=4294967296
+EVENTS=['Entry','ConstructionEntry','ConstructionReturn','PostConstructionAggregate','AfterAllAggregates','ReportLayersEntry','ReportLayersReturn','ScanEntry','ScanReturn','ReportHeaders','ReportTransferEntry','ReportTransferReturn','FinalFatalBoundary','FunctionEnd','ScopeExit']
+
+def review(result_path,workflow,packet,native,need,read,exact,ref,stream,failures,files):
+    request=read(exact(packet['helper_request']));direct=read(exact(packet['direct_unit_request']));policy=read(exact(packet['observation_policy']))
+    need(policy['schema']=='ctf10-native-Init-postlude-factual-observation-policy.v1' and policy['observation_max_file_bytes']==MAX_BYTES,'Frozen factual resource policy required')
+    capture=result_path.parent.resolve();counts={'production_cases':0,'direct_cases':0,'actual_Init_calls':0,'Init_events':0,'actual_Construction_calls':0,'Init_diagnostics':0,'postlude_partitions':0,'backend_callbacks':0,'returned_Init_calls':0,'fatal_Init_calls':0,'exception_Init_calls':0,'uninvoked_Init_calls':0}
+    outcomes=[]
+    def require(ok,label):
+        if not ok:failures.append(label)
+    def full(r):
+        p=exact(r);need(p.resolve().is_relative_to(capture),'Actual capture payload must belong to fresh capture directory');files[r['path']]=ref(p);return p
+    def same(a,b):need(ref(exact(a))==ref(exact(b)),'Actual absolute/relative full file binding differs')
+    def scalar(v):
+        need(type(v) is dict and set(v)=={'value','value_bits','value_class'} and type(v['value_bits']) is str and re.fullmatch('[0-9a-f]{16}',v['value_bits']) and v['value_class'] in ['finite','positive_zero','negative_zero','nan','positive_infinity','negative_infinity'],'Genuine complete binary64 scalar DTO required')
+        need(v['value'] is None or type(v['value']) in [int,float],'Actual decimal scalar copy type differs')
+    def array(v):
+        need(type(v) is dict and set(v)=={'allocated','size','lower','upper','rows'} and type(v['allocated']) is bool and type(v['size']) is int and v['size']>=0 and type(v['rows']) is list and len(v['rows'])==v['size'],'Full allocated owner shape differs')
+        if v['allocated']:
+            need(type(v['lower']) is int and type(v['upper']) is int and v['upper']-v['lower']+1==v['size'],'Actual allocated bounds differ')
+            need([r['actual_array_index'] for r in v['rows']]==list(range(v['lower'],v['upper']+1)),'Every allocated tail slot in actual order required')
+        else:need(v['size']==0 and v['lower'] is None and v['upper'] is None,'Unallocated owner must remain explicit')
+        return [r['value'] for r in v['rows']]
+    named_source=next(r for r in native['native_source_files'] if Path(r['path']).name=='ctf10_predefined_named_fields.inc')
+    names=re.findall(r'CTF10_COPY_INDEX\((\w+)\)',exact(named_source).read_text(encoding='utf8'));need(len(names)==1301,'Exact Source index catalog required')
+    scalar_source=next(r for r in native['native_source_files'] if Path(r['path']).name=='ctf10_init_postlude_fields.hh')
+    registry_scalars=re.findall(r'\{"(\w+)", scalar\(s\.\w+\)\}',exact(scalar_source).read_text(encoding='utf8'));need(len(registry_scalars)==22,'All22 actual registry scalar owner fields required')
+    scan_source=next(r for r in native['native_source_files'] if Path(r['path']).name=='scan_unit_fields.hh')
+    scan_text=exact(scan_source).read_text(encoding='utf8')
+    scan_groups={name:re.findall(r'X\((\w+)\)',next(v for v in scan_text.splitlines() if v.startswith('#define '+name+'(X)'))) for name in ['SCAN_GENERAL_BOOL','SCAN_GENERAL_TEXT','SCAN_EMS_BOOL']}
+    cache_bools=scan_groups['SCAN_GENERAL_BOOL']+scan_groups['SCAN_EMS_BOOL']+['ShowDecayCurvesInEIO'];cache_strings=scan_groups['SCAN_GENERAL_TEXT']
+    need(len(cache_bools)==21 and len(cache_strings)==10,'Actual Source31 cache field catalog differs')
+    def partition(row,expected_stage):
+        need(row['stage']==expected_stage and type(row['available']) is bool,'Actual checkpoint stage/type differs')
+        if not row['available']:
+            need(row['owner_file'] is None and type(row['failure']) is str,'Unavailable copy must remain explicit');require(False,'Required owner copy unavailable: '+expected_stage);return
+        need(row['failure'] is None,'Successful copy cannot have failure');p=full(row['owner_file'])
+        if p.stat().st_size>MAX_BYTES:require(False,'Full retained partition exceeds frozen4GiB QA resource bound');return
+        v=read(p);need(set(v)=={'schema','stage','owner'} and v['schema']=='ctf10-actual-Init-postlude-owner.v1' and v['stage']==expected_stage,'Actual full partition schema/stage differs');o=v['owner'];r=o['registry']
+        need([v['name'] for v in r['named_indices']]==names and all(type(v['value']) is int for v in r['named_indices']),'Every actual named registry index must be retained without expected values')
+        for name in registry_scalars:scalar(r[name])
+        for name in ['reportName','subTable','columnTag','tableEntry','CompSizeTableEntry','ShadowRelate']:
+            values=array(r[name]);need(type(r['num'+name[0].upper()+name[1:]]) is int and 0<=r['num'+name[0].upper()+name[1:]]<=r['size'+name[0].upper()+name[1:]]==len(values),'Actual count/capacity/full tail shape differs')
+            for value in values:
+                if name=='tableEntry':scalar(value['origRealEntry'])
+                if name=='CompSizeTableEntry':scalar(value['valField'])
+        need(type(r['pdchOpqConsLayCol']) is list and all(type(v) is int for v in r['pdchOpqConsLayCol']) and r['full_allocated_tails_copied'] is True and r['registry_or_table_recomputed'] is False,'Actual full layer-column owner required')
+        cache=o['scan_cache'];need(type(cache) is dict and set(cache)==set(cache_bools+cache_strings) and all(type(cache[k]) is bool for k in cache_bools) and all(type(cache[k]) is str for k in cache_strings),'All exact Source31 Scan cache names/types required')
+        b=o['backend'];need(b['sqlite_operations_observed'] is False and b['optional_OutUnit_arguments_supplied_by_Init'] is False and b['source_version_and_date_header_bytes_paired_with_production_Rust'] is False,'Actual backend explicit unpaired roles required')
+        for k in ['AbortProcessing','WarmupFlag','DoingSizing','KickOffSimulation','DoingInputProcessing','printConsoleOutput','outputErrorHeader','error_stream_present','errorCallback_present','messageCallback_present','fMessagePtr_present','sqlite_present']:need(type(b[k]) is bool,'Every actual backend bool owner required')
+        for k in ['LastSevereError','VerStringVar','IDDVerString','CurrentDateTime']:need(type(b[k]) is str,'Every actual backend text owner required')
+        matches=array(b['MatchCounts']);need(b['MatchCounts']['allocated'] is True and b['MatchCounts']['lower']==1 and b['MatchCounts']['upper']==20 and len(matches)==20 and all(type(v) is int for v in matches),'Actual constructor-owned20 MatchCounts integer slots required')
+        for k in ['TotalWarningErrors','TotalSevereErrors','TotalWarningErrorsDuringWarmup','TotalSevereErrorsDuringWarmup','TotalWarningErrorsDuringSizing','TotalSevereErrorsDuringSizing']:need(type(b[k]) is int,'Actual severity counter type differs')
+        for k in ['DoZoneSizing','DoSystemSizing','DoPlantSizing','SimpleCTFOnly','AnyInternalHeatSourceInInput']:need(type(o[k]) is bool,'Actual global flag copy required')
+        need(type(o['MaxCTFTerms']) is int,'Actual aggregate count required');counts['postlude_partitions']+=1
+    def init(row,whole,label):
+        invoked=whole['actual_source_invoked'];need(type(invoked) is bool,'Actual invocation availability required');status=whole['call_outcome']['status'];outcomes.append({'case_id':row['id'],'actual_source_invoked':invoked,'actual_outcome':whole['call_outcome']})
+        if not invoked:counts['uninvoked_Init_calls']+=1;require(False,'Required Init unavailable: '+label);return
+        need(status in ['source_returned','source_fatal','source_exception','source_nonstandard_exception'],'Actual outer caught outcome required');counts['actual_Init_calls']+=1;counts['returned_Init_calls' if status=='source_returned' else 'fatal_Init_calls' if status=='source_fatal' else 'exception_Init_calls']+=1
+        ob=whole['observations'];need(ob['protocol']=='ctf10-actual-whole-Init-observation.v1' and ob['original_loop_owned_all_calls'] is True and ob['outer_helper_Invoke_owns_exception_outcome'] is True,'Genuine whole Init owner required')
+        for k in ['binding_error','integrity_failed','Init_copy_integrity_failed']:require(ob[k] is False,'Actual Init observer failure: '+k)
+        for k in ['event_records_omitted','construction_records_omitted','diagnostic_records_omitted']:require(ob[k]==0,'Actual Init omitted records: '+k)
+        for key,kind in [('events','event'),('construction_records','construction_call'),('diagnostics','diagnostic')]:
+            entries=ob[key];need(len(entries)==ob['actual_'+kind+'_count']==ob['actual_retained_'+kind+'_count'],'Every actual Init record required');ordinal={'event':'actual_event_ordinal','construction_call':'actual_call_ordinal','diagnostic':'actual_diagnostic_ordinal'}[kind];need([r[ordinal] for r in entries]==list(range(1,len(entries)+1)),'Actual Init retained ordering differs')
+        require(all(v['actual_count']==0 for v in ob['failure_kind_counts']) and ob['first_failure'] is None and ob['last_failure'] is None,'Actual Init copy/identity/order/counter failure')
+        ev=ob['events'];need(len(ob['actual_event_kind_counts'])==15 and [sum(e['event']==k for e in ev) for k in EVENTS]==ob['actual_event_kind_counts'],'Actual event kind counter equality required')
+        for e in ev:require(e['copy_available'] is True and e['snapshot'] is not None,'Actual retained event copy unavailable')
+        calls=ob['construction_records'];need(len(calls)==len(row['operations']),'Whole Init operations must be same retained call ledger')
+        for call,operation in zip(calls,row['operations'],strict=True):
+            require(call['identity_available'] is True,'Actual Construction identity unavailable')
+            need((call['actual_call_ordinal'],call['actual_construction_index'],call['actual_construction_address'],call['actual_Name'])==(operation['actual_Init_call_ordinal'],operation['actual_construction_index'],operation['actual_construction_address'],operation['actual_construction_Name']),'Actual operation/call ID/address/order join differs')
+            need(operation['before'] is None and operation['after'] is None and operation['unreturned_call_fatal_or_exception_inferred'] is False,'Per-call full-model snapshots/outcomes cannot be manufactured')
+            require(call['scope_exit_reached'] is True,'Reached construction scope exit must be copied')
+            need(operation['call_outcome']['status']==('source_returned' if call['actual_caller_return_reached'] else 'source_return_not_observed'),'Actual return availability must not infer exception')
+        messages=row['source_diagnostics']['messages']
+        for d in ob['diagnostics']:
+            require(d['copy_available'] is True,'Actual diagnostic copy unavailable');i=d['actual_global_message_index'];need(type(i) is int and 0<=i<len(messages) and messages[i]=={'level':d['actual_level'],'message':d['actual_message']},'Actual global diagnostic raw identity/order join differs')
+            for k,entries,ordinal in [('preceding_retained_event_ordinal',ev,'actual_event_ordinal'),('active_retained_construction_call_ordinal',calls,'actual_call_ordinal')]:need(d[k] is None or d[k] in [v[ordinal] for v in entries],'Actual temporal diagnostic owner absent')
+        require(ob['actual_global_diagnostic_join_valid'] is True,'Actual diagnostic owner join unavailable')
+        require(ob['actual_entry_reached'] is True and ob['scope_exit_reached'] is True,'Actual Init entry/scope required')
+        need(ob['actual_caller_return_reached']==(status=='source_returned') and ob['actual_function_end_reached']==(status=='source_returned') and ob['scope_exited_during_unwind']==(status!='source_returned'),'Actual normal-return and unwind distinction differs')
+        counts['Init_events']+=len(ev);counts['actual_Construction_calls']+=len(calls);counts['Init_diagnostics']+=len(ob['diagnostics'])
+    def visit(lane,ordinal,row):
+        supplied=(request['model_cases'] if lane=='model_cases' else direct['cases']);need(ordinal<=len(supplied) and row['id']==supplied[ordinal-1]['id'],'Complete literal case identity/order required');label=row['id'];is_model=lane=='model_cases';counts['production_cases' if is_model else 'direct_cases']+=1
+        require(row['observer_integrity_failed'] is False,'Actual helper observer integrity failure: '+label);require(row['backend_callback_records_omitted']==0 and row['backend_counter_overflow'] is False,'Actual backend copy omission/overflow: '+label)
+        cb=row['backend_callbacks'];need(len(cb)==row['actual_backend_callback_count'] and [v['actual_ordinal'] for v in cb]==list(range(1,len(cb)+1)),'Every actual mixed callback in source order required');counts['backend_callbacks']+=len(cb)
+        for v in cb:need(v['kind'] in ['errorCallback','messageCallback'] and type(v['actual_message']) is str and (type(v['actual_level']) is int if v['kind']=='errorCallback' else v['actual_level'] is None),'Actual callback arguments/optional level differ')
+        diagnostics=row['source_diagnostics'];require(diagnostics['available'] is True,'Actual source diagnostic streams unavailable')
+        if diagnostics['available']:
+            need(set(diagnostics['logs'])=={'console','err','audit','eso','eio','mtr','bnd','debug','rdd','mdd','mtd','edd','dfs','shade'},'Every actual diagnostic stream required')
+            for r in diagnostics['logs'].values():full(r)
+            need([{'level':v['actual_level'],'message':v['actual_message']} for v in cb if v['kind']=='errorCallback']==diagnostics['messages'],'Mixed error callback/raw message ledger order differs')
+        phases=row['lifecycle'];need([v['kind'] for v in phases]==request['loader_phase_order'][:13 if is_model else 5],'Actual original loader order differs')
+        require(all(v['actual_source_invoked'] is True and v['call_outcome']['status']=='source_returned' for v in phases),'Required genuine preparation did not return: '+label)
+        if is_model:
+            need(row['actual_input']==supplied[ordinal-1]['input'] and row['declared_caller']==supplied[ordinal-1]['caller'] and row['manual_material_or_construction_or_use_seeding'] is False and row['manual_Construction_call_loop_performed'] is False,'Unchanged ordinary input/no manual scientific loop required')
+            require(row['loader_ready'] is True and row['source_produced_caller_matches_declared'] is True,'Actual ordinary loader/caller unavailable: '+label);owners=row['postlude_owner_records']
+        else:
+            need(row['lane']=='explicit-direct-state-whole-Init-unit' and row['expected_exit_or_values_supplied'] is False,'Explicit separate direct input ownership required');same(row['actual_raw_input'],direct['input']);owners=row['preparation_owner_records'];require(row['state_input']['available'] is True,'Actual direct state preparation unavailable')
+            if row['state_input']['available']:need(row['state_input']['actual_supplied_material']==supplied[ordinal-1]['material'] and row['state_input']['actual_supplied_construction']==supplied[ordinal-1]['construction'] and row['state_input']['whole_Init_local_flags_supplied'] is False and row['state_input']['ordinary_model_admission_claimed'] is False,'Actual direct state input must be the declared separate lane')
+            need([v['action'] for v in row['setup_calls']]==supplied[ordinal-1]['setup_calls'],'Only literal direct setup calls allowed')
+            require(all(v['actual_source_invoked'] is True and v['call_outcome']['status']=='source_returned' for v in row['setup_calls']),'Actual direct setup did not return')
+        whole=row['whole_Init'];invoked=whole['actual_source_invoked'];terminal='AfterInitReturn' if whole['call_outcome']['status']=='source_returned' else 'AfterInitOuterCatch' if invoked else 'AfterUnavailableInit'
+        expected=['BeforeRegistry','AfterRegistry']
+        if is_model and invoked:expected+=['BeforeInit',terminal]
+        need([v['stage'] for v in owners]==expected,'Every reached checkpoint partition must be retained in source order')
+        for v,stage in zip(owners,expected,strict=True):partition(v,stage)
+        if not is_model:partition(whole['before_postlude_owner'],'BeforeInit');partition(whole['after_postlude_owner'],terminal)
+        init(row,whole,label)
+    result_ref=ref(result_path);files[result_ref['path']]=result_ref
+    if result_path.stat().st_size>MAX_BYTES:failures.append('Full retained result exceeds frozen4GiB factual QA resource bound');return {'actual_counts_unknown':True}
+    top=stream(result_path,need,lambda rows:unique(rows,need),visit)
+    need(top['schema']=='ctf10-Init-postlude-helper-results.v1' and top['model_cases']['streamed_case_count']==15 and top['direct_unit_cases']['streamed_case_count']==6,'Every literal15+6 actual case required')
+    for key,binding in [('actual_request','helper_request'),('native_admission_contract','native_admission_contract'),('observation_projection','projection'),('direct_unit_request','direct_unit_request')]:same(top[key],packet[binding])
+    need(top['native_source_files']==native['native_source_files'] and set(top['contracts'])==set(packet['contracts']),'Actual Native Source/contracts differ')
+    for k in packet['contracts']:same(top['contracts'][k],packet['contracts'][k])
+    same(top['actual_binary'],workflow['helper_binary']);need(top['actual_helper_exit_code']==workflow['actual_helper_exit_code'],'Actual executable/recorder exit differs')
+    for k in ['scientific_comparison_performed','numerical_PASS_claimed','gates_updated','actual_header_bytes_paired_with_production_Rust','whole_building_or_CTF02_through_CTF10_certified']:need(top[k] is False,'No numerical/header/fullcard claim is admitted')
+    require(top['observer_integrity_failed'] is False and top['matrix_attempt_records_omitted']==0,'Actual retained helper observation failure')
+    actual={p.resolve() for p in capture.rglob('*') if p.is_file()};tracked={exact(r).resolve() for r in files.values()};need(tracked<=actual,'Required capture file disappeared')
+    additional=[]
+    for p in sorted(actual-tracked):
+        r=ref(p);files[r['path']]=r;additional.append({'file':r,'role':'additional_actual_capture_directory_file_unclassified','numerically_paired':False})
+    counts['additional_actual_files']=additional
+    need(actual=={exact(r).resolve() for r in files.values()},'Every actual produced file must retain full SHA/size custody')
+    counts['actual_outcomes']=outcomes;return counts
+
+def unique(rows,need):
+    out={}
+    for k,v in rows:need(k not in out,'Duplicate JSON object key');out[k]=v
+    return out

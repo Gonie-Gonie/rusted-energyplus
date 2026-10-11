@@ -1,0 +1,86 @@
+"""Root binds actual formatted source and runs reviewed real observers/comparers."""
+import hashlib
+import json
+import subprocess
+from pathlib import Path
+
+ROOT = Path.cwd(); BASE = ROOT / '.runtime/porting/CTF-10'; PRIOR = ROOT / '.runtime/porting/CTF-09'
+def read(p): return json.loads(p.read_bytes())
+def sha(p):
+    with p.open('rb') as stream: return hashlib.file_digest(stream, 'sha256').hexdigest()
+def ref(p): return {'path': p.relative_to(ROOT).as_posix(), 'sha256': sha(p), 'size_bytes': p.stat().st_size}
+def pin(p): return p.relative_to(ROOT).as_posix() + '#' + sha(p)
+def write(p, value): p.write_bytes((json.dumps(value, indent=2, allow_nan=False) + '\n').encode('utf8'))
+
+manifest = read(BASE / 'applied-final-source-02/manifest.json')
+assert manifest['Root_and_Raw_FULL_formatter_correspondence_accepted']
+for row in manifest['actual_sources']: assert sha(ROOT / row['canonical_path']) == row['actual_final_source']['sha256']
+source = None
+for name in ['quality-clippy-command-02', 'coefficient-tests-command-01', 'quality-tests-command-01', 'quality-fmt-command-01']:
+    r = read(BASE / name / 'receipt.json')
+    assert r['exit_code'] == 0 and r['source_bytes_match_before_and_after'] and r['launch_error'] is None
+    if source is None: source = r['source_snapshot']['sha256']
+    assert r['source_snapshot']['sha256'] == source
+closure = read(BASE / 'rust-observer-prep-01/application-readiness.json')['runtime_source_closures']
+bindings = {}
+for lane in ['unit', 'production']:
+    bindings[lane] = {key: [ref(ROOT / p) for p in closure[lane][name]]
+        for key, name in [('observer_sources', 'ordered_own_paths'), ('actual_public_API_sources', 'ordered_API_paths')]}
+    assert len(bindings[lane]['observer_sources']) == (2 if lane == 'unit' else 3)
+    assert len(bindings[lane]['actual_public_API_sources']) == (31 if lane == 'unit' else 43)
+unit_dir = BASE / 'candidate-unit-inputs-01'; unit_dir.mkdir()
+unit_path = unit_dir / 'source-bindings.json'
+write(unit_path, {'schema': 'ctf10-candidate-unit-runtime-source-bindings.v1', **bindings['unit']})
+prod_dir = BASE / 'candidate-production-inputs-01'; prod_dir.mkdir()
+prod_path = prod_dir / 'request.json'
+request = read(PRIOR / 'candidate-production-inputs-01/request.json'); previous = json.loads(json.dumps(request))
+request['schema'] = 'ctf10-candidate-production-observer-request.v1'
+request.update(bindings['production'])
+request['native_helper_request'] = ref(BASE / 'production-frozen-packet-01/helper-request.json')
+request['native_admission_contract'] = ref(BASE / 'production-frozen-packet-01/native-admission-contract.json')
+allowed = {'schema', 'observer_sources', 'actual_public_API_sources', 'native_helper_request', 'native_admission_contract'}
+for k in previous:
+    if k not in allowed: assert request[k] == previous[k]
+assert len(request['model_cases']) == 15 and request['initial_zone_air_temperature_c']['bits'] == '4034000000000000'
+write(prod_path, request)
+logs = BASE / 'candidate-launch-inputs-01'; logs.mkdir()
+write(logs / 'input-custody.json', {'schema': 'ctf10-actual-formatted-candidate-input-custody.v1',
+    'Root_authored_record_not_command_recorder': True, 'actual_formatted_source': ref(BASE / 'applied-final-source-02/manifest.json'),
+    'actual_unit_bindings': ref(unit_path), 'actual_production_request': ref(prod_path),
+    'literal_prior15_model_rows_conversion_refs_temperature_and_fixed_scope_unchanged': True,
+    'unit39_42_real10_Native_frozen_request_used': ref(BASE / 'frozen-packet-01/helper-request.json'),
+    'Native_values_expected_arrays_attempt_counts_or_exit_answers_supplied_to_Rust': False})
+
+def record(name, args):
+    print('Root actual10 candidate starting', name, flush=True)
+    with (logs / (name + '.orchestration.log')).open('xb') as stream:
+        subprocess.run(['python', '-X', 'utf8', '-B', 'tools/porting/record_command.py',
+            '--output-dir', (BASE / name).relative_to(ROOT).as_posix(), '--', *args], check=True,
+            stdout=stream, stderr=subprocess.STDOUT)
+    r = read(BASE / name / 'receipt.json')
+    assert r['exit_code'] == 0 and r['source_bytes_match_before_and_after'] and r['launch_error'] is None
+    assert r['source_snapshot']['sha256'] == source
+    print('Root actual10 candidate completed', name, ref(BASE / name / 'receipt.json'), flush=True)
+    return r
+
+build = record('candidate-build-command-01', ['cargo', 'build', '--locked', '--config', 'profile.dev.debug=0',
+    '--config', 'profile.test.debug=0', '--config', 'build.incremental=false', '-p', 'ep_run',
+    '--example', 'ctf10_candidate_unit_observer', '--example', 'ctf10_candidate_production_observer',
+    '--message-format=json-render-diagnostics'])
+snapshot = read(ROOT / build['source_snapshot']['path']); files = {r['historical_path']: r for r in snapshot['files']}
+artifacts = {}
+for lane in ['unit', 'production']:
+    name = f'ctf10_candidate_{lane}_observer'
+    rows = [r for r in build['cargo_compiler_artifacts_capture']['rows']
+        if r['cargo_message']['target']['name'] == name and 'example' in r['cargo_message']['target']['kind']]
+    assert len(rows) == 1; artifacts[lane] = rows[0]['executable']
+    for row in bindings[lane]['observer_sources'] + bindings[lane]['actual_public_API_sources']:
+        assert files[row['path']]['archive']['sha256'] == row['sha256'] and files[row['path']]['size_bytes'] == row['size_bytes']
+for lane in ['unit', 'production']:
+    artifact = artifacts[lane]; binary = ROOT / artifact['historical_path']; assert sha(binary) == artifact['sha256']
+    if lane == 'unit':
+        frozen = BASE / 'frozen-packet-01'; request_path = frozen / 'helper-request.json'; admission = frozen / 'native-admission-contract.json'
+        args = [str(binary), str(request_path), sha(request_path), str(admission), sha(admission), str(unit_path)]
+    else: args = [str(binary), str(prod_path), sha(prod_path)]
+    record(f'candidate-{lane}-command-01', args); assert sha(binary) == artifact['sha256']
+print('actual10 both real observer commands completed0; comparison awaits accepted Source hold', flush=True)

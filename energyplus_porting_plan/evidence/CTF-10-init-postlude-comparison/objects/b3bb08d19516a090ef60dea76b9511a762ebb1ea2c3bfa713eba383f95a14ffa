@@ -1,0 +1,39 @@
+--- .runtime/porting/CTF-10/init-postlude-applied-source-01/literal/crates__ep_run__examples__ctf10_init_postlude_candidate_production_observer.rs
++++ crates/ep_run/examples/ctf10_init_postlude_candidate_production_observer.rs
+@@ -5,11 +5,11 @@
+ #[path = "ctf10_candidate_production_support/fields.rs"]
+ mod fields;
+ // Exact accepted serializer copy includes unit-only helpers and path constants.
++#[path = "ctf10_init_postlude_support/fields.rs"]
++mod postlude_fields;
+ #[allow(dead_code)]
+ #[path = "ctf10_candidate_production_support/unit_fields.rs"]
+ mod unit_fields;
+-#[path = "ctf10_init_postlude_support/fields.rs"]
+-mod postlude_fields;
+ 
+ use ep_model::SimulationModel;
+ use serde_json::{Value, json};
+@@ -177,7 +177,9 @@
+         }
+         Err(error) => {
+             out["selected_Init_postlude"]["error"] = postlude_fields::error(&error);
+-            out["selected_Init_postlude"]["public_owner"] = postlude_fields::unavailable("initializer Err dropped its unreturned local State/public owner; no reconstruction");
++            out["selected_Init_postlude"]["public_owner"] = postlude_fields::unavailable(
++                "initializer Err dropped its unreturned local State/public owner; no reconstruction",
++            );
+             out["initialization"] = json!({"invoked":true,"status":"source-error-returned",
+             "message":error.to_string(),"initial_zone_air_temperature_c":fields::scalar(initial),
+             "external_CTF_rows_supplied":false})
+@@ -311,7 +313,10 @@
+         request["native_admission_contract"].clone(),
+         admission["projection"].clone(),
+     ];
+-    require(rows(&admission["native_source_files"])?.len() == 12, "actual twelve-source Native admission required")?;
++    require(
++        rows(&admission["native_source_files"])?.len() == 12,
++        "actual twelve-source Native admission required",
++    )?;
+     bindings.extend(rows(&admission["native_source_files"])?.iter().cloned());
+     for key in ["source", "tolerances", "cases"] {
+         bindings.push(admission["contracts"][key].clone());

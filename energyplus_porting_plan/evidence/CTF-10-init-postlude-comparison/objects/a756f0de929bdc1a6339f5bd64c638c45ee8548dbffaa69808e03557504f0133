@@ -1,0 +1,63 @@
+--- .runtime/porting/CTF-10/init-postlude-clippy-correction-prep-01/before/direct-observer.rs
++++ .runtime/porting/CTF-10/init-postlude-clippy-correction-prep-01/proposed/direct-observer.rs
+@@ -352,33 +352,33 @@
+     let mut actual_conversion_count = 0;
+     for binding in rows(&request["report_conversion_proof_bindings"])? {
+         let (_, bytes) = bound(&root, binding)?;
+-        if let Ok(proof) = serde_json::from_slice::<Value>(&bytes) {
+-            if proof["schema"] == "sch01-input-conversion-command.v1" {
+-                require(
+-                    proof["case_id"] == "CTF10-DIRECT-REPORT"
+-                        && proof["exit_code"] == 0
+-                        && proof["launch_error"].is_null()
+-                        && proof["epjson_available"] == true
+-                        && proof["unavailable_reason"].is_null()
+-                        && proof["available_epjson_input"] == request["report_input_epjson"]
+-                        && proof["source_input"]["sha256"] == direct["input"]["sha256"]
+-                        && proof["staged_input"]["sha256"] == direct["input"]["sha256"]
+-                        && proof["source_input"]["size_bytes"] == direct["input"]["size_bytes"]
+-                        && proof["staged_input"]["size_bytes"] == direct["input"]["size_bytes"]
+-                        && proof["original_and_staged_IDF_preserved"] == true
+-                        && proof["numerical_engine_executed"] == false
+-                        && proof["Native_scientific_outputs_used_as_inputs"] == false
+-                        && proof["expected_answers_supplied"] == false
+-                        && proof["converter"]["path"]
+-                            == ".runtime/energyplus/26.1.0/ConvertInputFormat.exe"
+-                        && rows(&proof["command"])?.len() == 2
+-                        && proof["command"][1] == "input.idf",
+-                    "genuine input-only conversion proof differs",
+-                )?;
+-                bindings.push(proof["source_input"].clone());
+-                bindings.push(proof["staged_input"].clone());
+-                actual_conversion_count += 1;
+-            }
++        if let Ok(proof) = serde_json::from_slice::<Value>(&bytes)
++            && proof["schema"] == "sch01-input-conversion-command.v1"
++        {
++            require(
++                proof["case_id"] == "CTF10-DIRECT-REPORT"
++                    && proof["exit_code"] == 0
++                    && proof["launch_error"].is_null()
++                    && proof["epjson_available"] == true
++                    && proof["unavailable_reason"].is_null()
++                    && proof["available_epjson_input"] == request["report_input_epjson"]
++                    && proof["source_input"]["sha256"] == direct["input"]["sha256"]
++                    && proof["staged_input"]["sha256"] == direct["input"]["sha256"]
++                    && proof["source_input"]["size_bytes"] == direct["input"]["size_bytes"]
++                    && proof["staged_input"]["size_bytes"] == direct["input"]["size_bytes"]
++                    && proof["original_and_staged_IDF_preserved"] == true
++                    && proof["numerical_engine_executed"] == false
++                    && proof["Native_scientific_outputs_used_as_inputs"] == false
++                    && proof["expected_answers_supplied"] == false
++                    && proof["converter"]["path"]
++                        == ".runtime/energyplus/26.1.0/ConvertInputFormat.exe"
++                    && rows(&proof["command"])?.len() == 2
++                    && proof["command"][1] == "input.idf",
++                "genuine input-only conversion proof differs",
++            )?;
++            bindings.push(proof["source_input"].clone());
++            bindings.push(proof["staged_input"].clone());
++            actual_conversion_count += 1;
+         }
+     }
+     require(

@@ -1,0 +1,128 @@
+{
+  "schema": "ctf10-Init-postlude-direct-unit-cases-proposed.v1",
+  "status": "SOURCE-ONLY-NOT-FROZEN",
+  "literal_IDF_source": {
+    "path": ".runtime/porting/CTF-10/native-init-postlude-prep-01/direct-report-input.idf",
+    "sha256": "39df3d0362e93ecef52b04510559f00096fa89b9055fda0fbc48931f75fc02e4",
+    "size_bytes": 202,
+    "line_count": 5
+  },
+  "cases": [
+    {
+      "material": {
+        "Name": "UNIT MATERIAL",
+        "Thickness": 0.0,
+        "Conductivity": 0.0,
+        "Density": 0.0,
+        "SpecHeat": 0.0,
+        "Resistance": 0.5,
+        "ROnly": true
+      },
+      "construction": {
+        "Name": "UNIT CONSTRUCTION",
+        "IsUsedCTF": false,
+        "OutsideRoughness": 2
+      },
+      "setup_calls": [],
+      "id": "direct-unused-reset"
+    },
+    {
+      "material": {
+        "Name": "UNIT MATERIAL",
+        "Thickness": 0.0,
+        "Conductivity": 0.0,
+        "Density": 0.0,
+        "SpecHeat": 0.0,
+        "Resistance": 0.5,
+        "ROnly": true
+      },
+      "construction": {
+        "Name": "UNIT CONSTRUCTION",
+        "IsUsedCTF": true,
+        "OutsideRoughness": 2
+      },
+      "setup_calls": [],
+      "id": "direct-resistive-report"
+    },
+    {
+      "material": {
+        "Name": "UNIT MATERIAL",
+        "Thickness": 0.0,
+        "Conductivity": 0.0,
+        "Density": 0.0,
+        "SpecHeat": 0.0,
+        "Resistance": 0.0,
+        "ROnly": true
+      },
+      "construction": {
+        "Name": "UNIT CONSTRUCTION",
+        "IsUsedCTF": true,
+        "OutsideRoughness": 2
+      },
+      "setup_calls": [],
+      "id": "direct-zero-resistance-input"
+    },
+    {
+      "material": {
+        "Name": "UNIT MATERIAL",
+        "Thickness": 4.0,
+        "Conductivity": 1.0,
+        "Density": 1000.0,
+        "SpecHeat": 1000.0,
+        "Resistance": 4.0,
+        "ROnly": false
+      },
+      "construction": {
+        "Name": "UNIT CONSTRUCTION",
+        "IsUsedCTF": true,
+        "OutsideRoughness": 2
+      },
+      "setup_calls": [],
+      "id": "direct-thick-material-input"
+    },
+    {
+      "material": {
+        "Name": "UNIT MATERIAL",
+        "Thickness": 0.0,
+        "Conductivity": 0.0,
+        "Density": 0.0,
+        "SpecHeat": 0.0,
+        "Resistance": 0.5,
+        "ROnly": true
+      },
+      "construction": {
+        "Name": "UNIT CONSTRUCTION",
+        "IsUsedCTF": true,
+        "OutsideRoughness": 2
+      },
+      "setup_calls": [
+        "SetPredefinedTables"
+      ],
+      "id": "direct-repeat-registry"
+    },
+    {
+      "material": {
+        "Name": "UNIT MATERIAL",
+        "Thickness": 0.0,
+        "Conductivity": 0.0,
+        "Density": 0.0,
+        "SpecHeat": 0.0,
+        "Resistance": 0.5,
+        "ROnly": true
+      },
+      "construction": {
+        "Name": "UNIT CONSTRUCTION",
+        "IsUsedCTF": true,
+        "OutsideRoughness": 2
+      },
+      "setup_calls": [
+        "ScanForReports(Constructions)"
+      ],
+      "id": "direct-pre-scanned-cache"
+    }
+  ],
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "ordinary_CON_admission_expanded": false,
+  "actual_whole_Init_local_flags_supplied": false
+}

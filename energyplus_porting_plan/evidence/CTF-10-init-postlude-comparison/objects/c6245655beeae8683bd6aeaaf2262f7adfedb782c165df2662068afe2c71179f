@@ -1,0 +1,39 @@
+"""Ignored stdlib Source successor; no comparer/project import or numerical read."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT=Path.cwd().resolve();OUT=Path(__file__).resolve().parent;OLD=OUT.with_name('init-postlude-comparison-prep-01')
+def ref(p):
+    b=p.read_bytes();return dict(path=p.relative_to(ROOT).as_posix(),sha256=hashlib.sha256(b).hexdigest(),size_bytes=len(b),line_count=len(b.splitlines()))
+def write(p,b):
+    p.parent.mkdir(parents=True,exist_ok=True)
+    if p.exists():assert p.read_bytes()==b,p;return
+    p.write_bytes(b)
+manifest=json.loads((OLD/'manifest.json').read_text(encoding='utf8'))
+assert ref(OLD/'manifest.json')['sha256']=='18da6d5bbe86b77ff81ca66e856447c9966e7a111447f3acd6433b879599ecd2'
+for row in manifest['own_sources']:
+    name=Path(row['path']).name;b=(ROOT/row['path']).read_bytes();assert hashlib.sha256(b).hexdigest()==row['sha256']
+    write(OUT/'before01'/name,b)
+    text=b.decode('utf8')
+    if name=='compare.py':
+        old="    c.same(m,freeze['observation_policy'],manifest['prospective_policy']);m.bind(freeze['observation_policy'])"
+        new="    frozen_policy=m.bind(freeze['observation_policy']);policy_source=m.bind(manifest['prospective_policy'])\n    m.require(all(frozen_policy[k]==policy_source[k] for k in ['sha256','size_bytes']),'Frozen policy must retain the exact reviewed Source bytes')"
+        assert text.count(old)==1;text=text.replace(old,new)
+    if name=='compare_case.py':
+        old="    if type(rust) is not dict:\n        if returned is not None:c.absence(path+'/returned',True,False,'Actual returned Native owner cannot be paired with missing Rust storage')\n        else:pair.unpaired(c,path+'/partial','Native unreturned partial storage has no retained production State owner')\n        return"
+        new="    actual=returned if returned is not None else partial\n    selected=type(actual) is dict and not before['SourceSinkPresent'] and before['SolutionDimensions']==1 and \\\n        type(actual.get('NumCTFTerms')) is int and 0<=actual['NumCTFTerms']<=18\n    if type(rust) is not dict:\n        if selected:c.absence(path+'/required_retained_public',True,False,'Selected actual returned or partial fixed-capacity public owner missing from Rust, including dropped State on Err')\n        else:pair.unpaired(c,path+'/excluded_public','Actual source/2D/out-of-capacity or unavailable storage is excluded; no numerical PASS',actual is not None,False)\n        return"
+        assert text.count(old)==1;text=text.replace(old,new)
+        old="        if partial is not None and storage is not None:\n            pair.storage(c,path+'/retained_partial_copy_facts',partial,storage,need,numeric=False)"
+        new="        if selected:\n            pair.storage(c,path+'/required_partial_copy_facts',partial,storage,need,numeric=False)\n        elif partial is not None and storage is not None:\n            pair.storage(c,path+'/excluded_retained_copy_facts',partial,storage,need,numeric=False)"
+        assert text.count(old)==1;text=text.replace(old,new)
+        old="    if n_after is not None and type(state) is dict:\n        aggregate=state.get('aggregate_after_actual_returned_calls') if direct else state.get('aggregate_after_returned_calls')"
+        new="    if n_after is not None:\n        aggregate=(state.get('aggregate_after_actual_returned_calls') if direct else state.get('aggregate_after_returned_calls')) if type(state) is dict else None"
+        assert text.count(old)==1;text=text.replace(old,new)
+        old="        if not direct and type(state.get('actual_final_shared_flags')) is dict and type(observation) is dict and observation['events']:\n            for key in ['ErrorsFound','DoCTFErrorReport']:c.exact(path+'/actual_final_shared_flags/'+key,observation['events'][-1]['snapshot'][key],state['actual_final_shared_flags'][key])"
+        new="        if not direct and type(observation) is dict and observation['events']:\n            flags=state.get('actual_final_shared_flags') if type(state) is dict else None\n            if pair.required(c,path+'/required_final_shared_flags',observation['events'][-1]['snapshot'],flags):\n                for key in ['ErrorsFound','DoCTFErrorReport']:c.exact(path+'/actual_final_shared_flags/'+key,observation['events'][-1]['snapshot'][key],flags.get(key))"
+        assert text.count(old)==1;text=text.replace(old,new)
+    ast.parse(text);write(OUT/name,text.encode('utf8'))
+print('Source-only unsealed successor bodies prepared; no stage executed')

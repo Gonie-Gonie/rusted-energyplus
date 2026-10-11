@@ -1,0 +1,63 @@
+{
+  "schema": "ctf10-scan-unit-actual-comparison-milestone.v1",
+  "card": "CTF-10",
+  "status": "PASS exact selected same-input Scan/getter/cache/diagnostic comparison; whole Init and production integration pending.",
+  "actual_comparison": {
+    "path": ".runtime/porting/CTF-10/report-scan-unit-comparison-01/comparison.json",
+    "sha256": "30d73e96fd2a4579d623cc166949b5627d867af487e142019a11bab29041561f",
+    "size_bytes": 6495
+  },
+  "selected_evidence_manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-report-scan-comparison/manifest.json",
+    "sha256": "6dd41651f215568cdb9881be3a0a3c2bd0a40e4693fc87be72b81cd788a09290",
+    "size_bytes": 162819
+  },
+  "actual_observation_counts": {
+    "cases": 12,
+    "actual_queries": 264,
+    "actual_getter_records": 64,
+    "actual_diagnostics": 4,
+    "actual_query_diagnostics": 4,
+    "actual_preparation_diagnostics": 0
+  },
+  "comparison": {
+    "numeric_comparisons": 0,
+    "discrete_comparisons": 21405,
+    "mismatch_count": 0,
+    "mismatch_categories": {
+      "discrete_comparisons": 21405
+    },
+    "complete_mismatch_ledger": [],
+    "mismatch_records_dropped": 0,
+    "unavailable_observations": [],
+    "unavailable_counted_as_PASS": false
+  },
+  "actual_candidate_source": {
+    "path": "crates/ep_run/examples/ctf10_report_scan_unit_observer.rs",
+    "sha256": "28ec60347a3737d5938e604a344e0c5e54b2235afbdd45eea7fb7dc143f4e85d",
+    "size_bytes": 11934
+  },
+  "actual_Rust_source_snapshot": {
+    "path": ".runtime/porting/source-objects/3f/3f7582828a91af70bfca8aa3c0094cbaa5d8075ff5ee0a89c020d50fb48c3811",
+    "sha256": "3f7582828a91af70bfca8aa3c0094cbaa5d8075ff5ee0a89c020d50fb48c3811"
+  },
+  "unpaired_context": [
+    "Native backend flags/counters/enum levels/err/audit/console/SQLite",
+    "Rust default_applied flags (Native did not copy equivalent flags)",
+    "Native alpha field names and JSON object ordinal"
+  ],
+  "validated_native_build": {
+    "path": ".runtime/porting/CTF-10/report-scan-native-build-02/native-build.json",
+    "sha256": "ecbb0187b20d67ca5160a1f3059e48fc4ed7784244a9e2f8ebd91225792d34f3",
+    "size_bytes": 3812
+  },
+  "failed_then_corrected_build_lineage": "Initial graph assertion and initial completion namespace assertion failed; corrected additive graph and actual InputProcessor namespace are retained. Historical validation01/02 were not executed.",
+  "remaining": [
+    "Native F/G formatting byte comparison.",
+    "Complete registry, real severe producers and ordinary whole-Init output composition.",
+    "Ordinary persistent Native/Rust numerical integration and remaining CTF prerequisites."
+  ],
+  "whole_Init_or_production_PASS_claimed": false,
+  "complete_CTF10_PASS_claimed": false,
+  "gates_updated": false
+}

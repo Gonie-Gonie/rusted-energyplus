@@ -1,0 +1,260 @@
+{
+  "schema": "ctf10-Init-postlude-finalization-source-preparation.v1",
+  "status": "held-Source-only-unexecuted",
+  "held_immutable": true,
+  "own_sources": [
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-01/finalize.py",
+      "sha256": "18e044228668299314a3e3a7d1703c2d401bc8fa1e7fe80878e5922fbe4419db",
+      "size_bytes": 20020,
+      "line_count": 162
+    }
+  ],
+  "template_before": [
+    {
+      "actual_source": {
+        "path": ".runtime/porting/CTF-10/ordinary-init-milestone-finalizer-prep-02/finalize-ordinary-initialization.py",
+        "sha256": "3a7afa3e28a4394898e62ef783c5360888dc6ff79cd1cf7c400204d57ddee08c",
+        "size_bytes": 14955,
+        "line_count": 144
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-01/before/finalize-ordinary-initialization.py",
+        "sha256": "3a7afa3e28a4394898e62ef783c5360888dc6ff79cd1cf7c400204d57ddee08c",
+        "size_bytes": 14955,
+        "line_count": 144
+      }
+    },
+    {
+      "actual_source": {
+        "path": ".runtime/porting/CTF-10/finalize-report-scan-comparison-01.py",
+        "sha256": "ca98077f0a6b37991eaf58725d966c67feb0b26795d746210017b44a3a87e8dc",
+        "size_bytes": 9085,
+        "line_count": 117
+      },
+      "before_archive": {
+        "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-01/before/finalize-report-scan-comparison-01.py",
+        "sha256": "ca98077f0a6b37991eaf58725d966c67feb0b26795d746210017b44a3a87e8dc",
+        "size_bytes": 9085,
+        "line_count": 117
+      }
+    }
+  ],
+  "exact_template_diff": {
+    "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-01/diffs/finalize-from-ordinary.diff",
+    "sha256": "d4fb1ee963abc64038e73ae80c410a0e6d3c99c84d7d228cf1f15576b93fa0cf",
+    "size_bytes": 35019,
+    "line_count": 298
+  },
+  "exact_source_addition": {
+    "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-01/diffs/finalize.new.diff",
+    "sha256": "933f250a272cff49401674c93ce7cdfa2dcfeb796680e642419293dc58f1922f",
+    "size_bytes": 20289,
+    "line_count": 165
+  },
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-comparison-prep-02/compare.py",
+      "sha256": "0a0c21720698c239af9dd6bbdb19d9163383354cc37f88379adda9dd4a79c097",
+      "size_bytes": 21142,
+      "line_count": 209
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-comparison-prep-02/comparison.py",
+      "sha256": "1604b0b9966c635d952b4fed0a278c7334acad9e64b7a9d6f0e26acfd94e4964",
+      "size_bytes": 2169,
+      "line_count": 43
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-comparison-prep-02/packet_io.py",
+      "sha256": "ce1e2f98e975c5fb7d250af9c2503c9cd15aa86422d249ed807253d87cba13cf",
+      "size_bytes": 3893,
+      "line_count": 105
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-02/run_candidates.py",
+      "sha256": "b70c35b6b53a563c0b2668f1cabe6cae5ed26dda4affef6dfb5c00e404321527",
+      "size_bytes": 8785,
+      "line_count": 64
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-02/write_request.py",
+      "sha256": "fa975bc88d34e98a8994f060b756d0ff98601c714f7bbc6903d8aa1115a80087",
+      "size_bytes": 17291,
+      "line_count": 159
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-batch-application-prep-02/run_batch.py",
+      "sha256": "3af51976cf0917c9b112cf8c7a6cb4def07aee4608fa9e4e17d7f23f31dc0b6c",
+      "size_bytes": 15633,
+      "line_count": 140
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-clippy-correction-prep-01/run_correction.py",
+      "sha256": "ee4cd1dd53fc53a149d333e9e2fd0367dfd85e9eccd090bb4a1c999252d17aa1",
+      "size_bytes": 10245,
+      "line_count": 106
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "size_bytes": 8453,
+      "line_count": 204
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-comparison-prep-02/compare.py",
+      "first_line": 187,
+      "last_line": 209,
+      "sha256": "7d9b14c365318e2ca0853a45a7e04e9f2ffa21cf15a97967bc9820d536eeddcd",
+      "size_bytes": 2746,
+      "line_count": 23,
+      "purpose": "Exact selected comparison result fields and runtime CLI."
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-comparison-prep-02/comparison.py",
+      "first_line": 37,
+      "last_line": 43,
+      "sha256": "b383a0af92b66db660e8656febe04aa23b1512a515b3fb989886b547479966dd",
+      "size_bytes": 422,
+      "line_count": 7,
+      "purpose": "Actual mismatch/absence ledger summary; no numeric evaluation."
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-comparison-prep-02/packet_io.py",
+      "first_line": 92,
+      "last_line": 103,
+      "sha256": "723793f3cc9c9921ea2212dab81b0cc96889153a5ff9e069bef8f890df04dec8",
+      "size_bytes": 419,
+      "line_count": 12,
+      "purpose": "Executed comparer Source archive descriptor shape."
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-candidate-workflow-prep-02/run_candidates.py",
+      "first_line": 60,
+      "last_line": 64,
+      "sha256": "c9ac125b0fbf6239d642c86dcd08b128078cb6a1185b2aadc74684ffc97d9661",
+      "size_bytes": 1103,
+      "line_count": 5,
+      "purpose": "Actual candidate workflow schema, output refs and honest exit0/2."
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-batch-application-prep-02/run_batch.py",
+      "first_line": 117,
+      "last_line": 128,
+      "sha256": "9837997f57a482839382224cffaef76c1987500cce23dbea9e2a2701a20c350b",
+      "size_bytes": 1025,
+      "line_count": 12,
+      "purpose": "Four actual quality commands and same complete raw Source result."
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-clippy-correction-prep-01/run_correction.py",
+      "first_line": 83,
+      "last_line": 106,
+      "sha256": "5aa7a1012b32576454e4c9fda5184ebb1690a10e189b48f7a344d6466cee9cff",
+      "size_bytes": 3265,
+      "line_count": 24,
+      "purpose": "Explicit source-correction ancestry and original inventory retained."
+    }
+  ],
+  "metadata_only_protocol_context": [
+    {
+      "path": ".runtime/porting/CTF-10/native-init-postlude-workflow-05/completion.json",
+      "sha256": "6b1292ef726c7a9d980f5fc548119a992c33e95ffb499bb3107733bf99b5412f",
+      "size_bytes": 845,
+      "line_count": 21
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-init-postlude-workflow-05/qa/review.json",
+      "sha256": "1010cbc10317320409c34bd48de7c69c5d05234768544f7e307eb105df3480ba",
+      "size_bytes": 97172,
+      "line_count": 2196
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-init-postlude-failed04-linked-archive-01/archive.json",
+      "sha256": "bc641ecefa6581a721245e30afeff41df3ab394203c86bc8d6ae362a687b4a20",
+      "size_bytes": 247315,
+      "line_count": 3569
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-applied-source-02/record.json",
+      "sha256": "fc44736d677b8ca0c2dfc019856fa956fcce04f88a32c26a2f9df9b77d5f12dc",
+      "size_bytes": 28796,
+      "line_count": 560
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-applied-source-02/correction.json",
+      "sha256": "4fec68114a245e16363e6f93304f5ca5634a67d3e0bf0b87608b62fd9cc65854",
+      "size_bytes": 3744,
+      "line_count": 79
+    },
+    {
+      "path": ".runtime/porting/CTF-10/init-postlude-quality-08/clippy-command-08/receipt.json",
+      "sha256": "4ab61799178e9b635564d2dc3b2153a573c8451b4ad83dc71865d6ffa8967507",
+      "size_bytes": 4421,
+      "line_count": 81
+    }
+  ],
+  "README": {
+    "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-01/README.md",
+    "sha256": "08936c8dc4211ee633c6e88545168ac56a5524f4d73cc3dcbb3257eac6a3bd2c",
+    "size_bytes": 3065,
+    "line_count": 47
+  },
+  "authoring_source": {
+    "path": ".runtime/porting/CTF-10/init-postlude-finalization-prep-01/seal_sources.py",
+    "sha256": "197f747ce04b62dfe3e0d726530b322ee9e9792ef3d28c19c6e1d4accafde7f5",
+    "size_bytes": 5747,
+    "line_count": 67
+  },
+  "runtime_interfaces": {
+    "argv": [
+      "--approved-source-sha256",
+      "--inputs"
+    ],
+    "inputs": "actual path#SHA operand",
+    "input_packet_schema": "ctf10-Init-postlude-finalization-inputs.v1",
+    "required_packet_keys": [
+      "schema",
+      "native_completion",
+      "original_data_review",
+      "original_data_review_execution",
+      "formatted_inventory",
+      "source_correction",
+      "quality",
+      "candidate_workflow",
+      "comparison",
+      "comparison_execution",
+      "failed_native_workflow",
+      "failed_artifact_archive",
+      "source_preparations",
+      "recorded_outer_receipts",
+      "retained_lineage",
+      "prior_evidence"
+    ],
+    "output_directory": "energyplus_porting_plan/evidence/CTF-10-init-postlude-comparison",
+    "comparison_allowed_actual_exit_codes": [
+      0,
+      1
+    ],
+    "candidate_allowed_actual_exit_codes": [
+      0,
+      2
+    ],
+    "canonical_or_documents_modified": false,
+    "generic_framework_added": false,
+    "binary_payloads_archived": false,
+    "selected_archive_is_transitive_replay_closure": false,
+    "prior_large_observation_trace_rearchived": false,
+    "fixed_future_test_totals": false,
+    "whole_Init_or_persistent_integration_or_CTF10_gates_promoted": false
+  },
+  "Source_only_checks": {
+    "AST_valid": true,
+    "project_import_execution_or_target_calls_performed": false,
+    "canonical_Git_or_scientific_payload_reads_performed": false,
+    "only_source_and_metadata_packaging": true
+  },
+  "authorship_limit": "Base authored candidate workflow/direct observer ancestry and this evidence adapter. Independent Source peer must review receipt/archive/status custody; no numerical or gate certificate is supplied."
+}
