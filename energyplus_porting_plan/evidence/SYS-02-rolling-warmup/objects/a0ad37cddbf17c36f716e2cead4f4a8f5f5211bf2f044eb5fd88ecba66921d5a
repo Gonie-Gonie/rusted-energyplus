@@ -1,0 +1,27 @@
+The bounded Source addition is HeatBalanceManager.cc2899-2906,3001-3007.
+
+Allocate initializes TempZone,LoadZone,TempZonePrevDay,LoadZonePrevDay,
+TempZoneSecPrevDay,LoadZoneSecPrevDay to positive zero. For every real selected
+Record call, after the existing daily extrema updates, mutate in this order:
+
+1. TempZoneSecPrevDay = TempZonePrevDay.
+2. LoadZoneSecPrevDay = LoadZonePrevDay.
+3. TempZonePrevDay = TempZone.
+4. LoadZonePrevDay = LoadZone.
+5. TempZone = the same passed actual ZTAV, including its signed-zero bits.
+6. LoadZone = max(passed heat_rate,abs(passed cool_rate)).
+
+EnergyPlus.hh165 imports ObjexxFCL::max; Fmath.hh338-344 selects its first
+operand when the values compare equal. The proposed finite Rust selection uses
+`heat_rate < cool_load` where `cool_load = cool_rate.abs()`, rather than changing
+that tie route. Existing daily Check transfer/reset leaves all six rolling
+owners unchanged. The explicit rates remain selected input operands; this adds
+no SNLoad conversion, report producer, first-Run callback or backend.
+
+The accepted25-case companion,21 literal rate mappings and every pre-RecKeep
+same-input admission remain byte-identical. The observer adds only an actual
+per-Zone rolling_owners object with the six Native field names; the old13-key
+selected_owners object and all other unavailable owner families remain intact.
+No expected Native endpoint, simulation, numerical comparison or gate promotion
+is performed by this held proposal. First-Run reporting and whole SYS02/03
+handoff remain pending.

@@ -14916,6 +14916,11 @@
         "path": "energyplus_porting_plan/evidence/SYS-02-selected-warmup/summary.json",
         "sha256": "d0844e7898420da97f9bcc5f997ee9c00f1313c314a4b39d397a8ba6f2505b23",
         "size_bytes": 102702
+      },
+      "actual_selected_rolling_warmup_comparison": {
+        "path": "energyplus_porting_plan/evidence/SYS-02-rolling-warmup/summary.json",
+        "sha256": "c47c491c78c2adc3821ebff3c7c4ce6f7c9d4b6184abc652b0316f2fab38f93a",
+        "size_bytes": 146738
       }
     },
     {

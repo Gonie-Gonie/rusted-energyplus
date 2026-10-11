@@ -1,0 +1,129 @@
+--- /dev/null
++++ .runtime/porting/SYS-02/prepare-warmup-selected-comparison-02.py
+@@ -0,0 +1,126 @@
++"""Author only the ignored rolling-six selected comparer successor; no observations."""
++import argparse
++import ast
++import copy
++import difflib
++import hashlib
++import json
++from pathlib import Path
++
++ROOT = Path(__file__).resolve().parents[3]
++BASE = ROOT / '.runtime/porting/SYS-02/warmup-selected-comparison-prep-01'
++OUT = ROOT / '.runtime/porting/SYS-02/warmup-selected-comparison-prep-02'
++EXPECTED = {
++    'crates/ep_runtime/src/heat_balance/state.rs': '510457237ace95e3d483067b2b875af1e2b63f67a20478c79d18db1c19812514',
++    'crates/ep_runtime/src/heat_balance/warmup.rs': '448e818f17f4f58bf7a34d73a63d65beab55bf3fa08d245d5af3cce2b9411226',
++    'crates/ep_runtime/src/heat_balance/warmup_selected_reference.rs': 'f1aabf1039d207b569fd7362681252acb3f539a56251ea6c2f5b838ca1fb8a36',
++    'crates/ep_runtime/src/heat_balance/warmup_rolling_tests.rs': '0dafb358feb02cf64b5b341657fdad13ddd83e2d43b897a74111fa5ebc32215c',
++}
++ROLLING = ['TempZone', 'LoadZone', 'TempZonePrevDay', 'LoadZonePrevDay', 'TempZoneSecPrevDay', 'LoadZoneSecPrevDay']
++
++
++def ref(path):
++    data = path.read_bytes()
++    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(data).hexdigest(),
++            'size_bytes': len(data), 'line_count': len(data.splitlines())}
++
++
++def checked(row):
++    path = (ROOT / row['path']).resolve()
++    assert path.is_relative_to(ROOT)
++    data = path.read_bytes()
++    assert hashlib.sha256(data).hexdigest() == row['sha256']
++    assert 'size_bytes' not in row or len(data) == row['size_bytes']
++    return data
++
++
++def put(path, data):
++    path.parent.mkdir(parents=True, exist_ok=True)
++    path.write_bytes(data)
++    return ref(path)
++
++
++def one(data, old, new):
++    assert data.count(old) == 1
++    return data.replace(old, new)
++
++
++parser = argparse.ArgumentParser(description=__doc__)
++parser.add_argument('--rolling-source-preparation', required=True)
++args = parser.parse_args()
++path, sha = args.rolling_source_preparation.rsplit('#', 1)
++rolling_ref = {'path': path, 'sha256': sha}
++rolling = json.loads(checked(rolling_ref))
++rolling_ref = ref(ROOT / path)
++rows = {r['canonical_path']: r for r in rolling['application_sources']}
++assert all(rows[name]['proposal']['sha256'] == digest for name, digest in EXPECTED.items())
++assert rolling['runtime_interfaces']['rolling_owner_names'] == ROLLING
++assert rolling['runtime_interfaces']['selected_owners_keys_unchanged'] == 13
++assert rolling['unchanged_input_only_bindings']['Native_input']['sha256'] == '34a6d7cd40ff24ae08c04b7be88cbc527c2e4c003d734f7e6b212ed121359637'
++assert rolling['unchanged_input_only_bindings']['Rust_companion']['sha256'] == '0203787f9662128c9600ec801c1cbaa0527ba4080ae3466158f0ad4acfe1d7b5'
++assert not (OUT / 'manifest.json').exists()
++parent_ref = ref(BASE / 'manifest.json')
++assert parent_ref['sha256'] == 'e1bda64a7606fa5fcef4bfc1f302d4f366b91294264ede3708496579df39c69a'
++parent = json.loads(checked(parent_ref))
++before = {name: (BASE / name).read_bytes() for name in ('compare.py', 'policy.json', 'README.md', 'manifest.json')}
++old = before['compare.py'].decode('utf8')
++body = one(old, 'fields = {name: array_rows(owner[\'arrays\'][name], count) for name in policy[\'daily_owner_fields\']}',
++    'fields = {name: array_rows(owner[\'arrays\'][name], count) for name in policy[\'daily_owner_fields\'] + policy[\'rolling_owner_fields\']}')
++body = one(body, "        zone = {name: scalar(fields[name]) for name in policy['daily_owner_fields'] + policy['metric_fields']}\n",
++    "        rolling = row['rolling_owners']\n"
++    "        need(set(rolling) == set(policy['rolling_owner_fields']), 'complete six Rust rolling owners required')\n"
++    "        zone = {name: scalar(fields[name]) for name in policy['daily_owner_fields'] + policy['metric_fields']}\n"
++    "        zone.update({name: scalar(rolling[name]) for name in policy['rolling_owner_fields']})\n")
++tree_old, tree_new = ast.parse(old), ast.parse(body)
++func_old = {n.name: ast.dump(n, include_attributes=False) for n in tree_old.body if isinstance(n, ast.FunctionDef)}
++func_new = {n.name: ast.dump(n, include_attributes=False) for n in tree_new.body if isinstance(n, ast.FunctionDef)}
++assert [name for name in func_old if func_old[name] != func_new[name]] == ['native_selected', 'rust_selected']
++policy = json.loads(before['policy.json'])
++policy['frozen_before_numerical_outputs_read'] = False
++policy['parent_policy_frozen_before_numerical_outputs_read'] = True
++policy['rolling_policy_fixed_from_held_Source_before_Rust_rolling_observation'] = True
++policy['prior_selected_actual_evidence_reviewed_before_this_Source_authorship'] = True
++policy['no_observation_outputs_read_during_this_Source_authorship'] = True
++policy['Rust_source_preparation'] = rolling_ref
++policy['Rust_observer_source_paths'] = list(EXPECTED)
++policy['Rust_reviewed_proposals'] = [rows[name]['proposal'] for name in EXPECTED]
++policy['rolling_owner_fields'] = ROLLING
++policy['unavailable_Native_owner_families'].remove('rolling6')
++readme = one(before['README.md'].decode('utf8'),
++    'This is prospective Source only. Neither result was read, no project/target was executed, and no canonical file was changed. Native61e2 and selected observer83a09 remain immutable.',
++    'This is a prospective rolling-six Source successor. Prior selected01 actual evidence was independently reviewed before this authorship; no observation output was read during this authorship. The new rolling rule comes only from the held rolling Source and retains the original exact0/0 policy, before any Rust rolling observation. No project/target was executed and no canonical file was changed. Parent comparer01 and all earlier evidence remain immutable.')
++readme = one(readme, 'actual_Rust_observer_sources is the ordered two-row list warmup.rs then warmup_selected_reference.rs.',
++    'actual_Rust_observer_sources is the ordered four-row list state.rs, warmup.rs, warmup_selected_reference.rs, warmup_rolling_tests.rs. Their literal bytes bind the exact reviewed rolling proposals, including the owner layout and cfg(test) child.')
++readme = one(readme, 'eight daily current/previous owners, four pass flags, four stored metrics and WarmupFlag.',
++    'eight daily current/previous owners, six rolling owners, four pass flags, four stored metrics and WarmupFlag. Initial rolling owners join globally before endpoint pairing, and every selected record/check before/after and final includes all six. Native rolling arrays use their actual bounds/order/availability; Rust must supply exactly the six rolling_owners keys, with no default or fallback.')
++readme = one(readme, 'Rolling6, difference/report/StdDev/Count/header owners,', 'Difference/report/StdDev/Count/header owners,')
++readme += '\nOnly Native/Rust selected owner extraction changes; every other comparer function is AST-identical to01. The unavailable Report status string remains the historical literal supplied by the accepted rolling observer; it means the Report method was not invoked. The inherited rolling_report_backend_PASS_claimed:false excludes the combined full subsystem, while the exact six selected rolling fields are now paired. The genuine Native25-case request, independent companion, literal rate mapping, actual environment/Source custody, all previous input joins and uncapped mismatches remain unchanged. No new runner, endpoint fixture, equations or future actual identities are added.\n'
++own = []
++deltas = []
++before_refs = []
++for name, data in [('compare.py', body.encode('utf8')), ('policy.json', (json.dumps(policy, ensure_ascii=False, indent=2) + '\n').encode('utf8')), ('README.md', readme.encode('utf8'))]:
++    before_refs.append(put(OUT / 'before' / name, before[name]))
++    own.append(put(OUT / name, data))
++    delta = ''.join(difflib.unified_diff(before[name].decode('utf8').splitlines(keepends=True), data.decode('utf8').splitlines(keepends=True), fromfile=(BASE / name).relative_to(ROOT).as_posix(), tofile=(OUT / name).relative_to(ROOT).as_posix())).encode('utf8')
++    deltas.append(put(OUT / 'diffs' / (name + '.diff'), delta))
++before_refs.append(put(OUT / 'before' / 'manifest.json', before['manifest.json']))
++author_ref = ref(Path(__file__))
++own.append(author_ref)
++author_bytes = checked(author_ref)
++deltas.append(put(OUT / 'diffs' / 'author.addition.diff', ''.join(difflib.unified_diff([], author_bytes.decode('utf8').splitlines(keepends=True), fromfile='/dev/null', tofile=author_ref['path'])).encode('utf8')))
++manifest = copy.deepcopy(parent)
++manifest['parent_Source_preparation'] = parent_ref
++manifest['rolling_Source_preparation'] = rolling_ref
++manifest['own_sources_and_metadata'] = own
++manifest.pop('exact_addition_diffs')
++manifest['authentic_parent_before_archives'] = before_refs
++manifest['exact_successor_diffs'] = deltas
++manifest['Source_dependencies'] += [parent_ref, rolling_ref] + [rows[name]['proposal'] for name in EXPECTED]
++manifest['read_source_ranges'] += rolling['read_Source_ranges']
++manifest['runtime_interfaces']['ordered_Rust_observer_source_paths'] = list(EXPECTED)
++manifest['runtime_interfaces']['rolling_owner_fields'] = ROLLING
++manifest['runtime_interfaces']['selected_owner_extraction_functions_changed_only'] = ['native_selected', 'rust_selected']
++manifest['prior_selected_actual_evidence_reviewed_before_this_Source_authorship'] = True
++manifest['no_observation_outputs_read_during_this_Source_authorship'] = True
++result = put(OUT / 'manifest.json', (json.dumps(manifest, ensure_ascii=False, indent=2) + '\n').encode('utf8'))
++print(json.dumps(result))

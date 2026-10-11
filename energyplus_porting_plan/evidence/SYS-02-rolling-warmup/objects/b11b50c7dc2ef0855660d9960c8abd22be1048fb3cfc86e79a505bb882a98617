@@ -1,0 +1,19 @@
+/// Actual demand report and daily warmup owners for one admitted uncontrolled Zone.
+#[derive(Clone, Debug, PartialEq)]
+pub struct HeatBalanceWarmupZoneConvergence {
+    /// Actual Zone identity in the caller's declared order.
+    pub zone_id: ep_model::ZoneId,
+    /// Actual unmultiplied air-system heating/cooling rates after the report seam.
+    /// None is not an observed zero and cannot be sampled by RecKeep.
+    pub air_system_sensible_rates_w: Option<(f64, f64)>,
+    /// Actual zero-based timestep at which corrector reporting was reached.
+    pub sensible_report_timestep: Option<usize>,
+    /// Current daily MaxHeatLoadZone, MaxCoolLoadZone, MaxTempZone and MinTempZone.
+    pub current: [f64; 4],
+    /// Retained prior-day values in the same order; BeginEnvrn initializes zero.
+    pub previous: [f64; 4],
+    /// Native PassFlag order: max temperature, min temperature, heat, cool; 2=pass.
+    pub pass_flags: [u8; 4],
+    /// Actual corresponding comparison values; no-load guards retain prior metrics.
+    pub test_values: [f64; 4],
+}

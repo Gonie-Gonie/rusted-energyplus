@@ -894,6 +894,9 @@ pub struct HeatBalanceWarmupZoneConvergence {
     pub current: [f64; 4],
     /// Retained prior-day values in the same order; BeginEnvrn initializes zero.
     pub previous: [f64; 4],
+    /// Rolling TempZone [C], LoadZone [W], then their PrevDay and SecPrevDay pairs.
+    /// Allocate initializes all six to +0; daily extrema transfer does not reset them.
+    pub rolling: [f64; 6],
     /// Native PassFlag order: max temperature, min temperature, heat, cool; 2=pass.
     pub pass_flags: [u8; 4],
     /// Actual corresponding comparison values; no-load guards retain prior metrics.

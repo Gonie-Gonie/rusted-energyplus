@@ -1,0 +1,10 @@
+--- .runtime/porting/SYS-02/warmup-rolling-owner-prep-02/before/energyplus_porting_plan/cards/SYS-02.md
++++ .runtime/porting/SYS-02/warmup-rolling-owner-prep-02/proposed/energyplus_porting_plan/cards/SYS-02.md
+@@ -77,3 +77,7 @@
+ 
+ Genuine unchanged-core Native calls and the real Rust private methods matched all 25 fixed cases: 10,785 input/initial-owner checks and 7,383 selected comparisons across 343 boundaries, zero mismatches. Native retained all 347 calls; 14 Report operations and all rolling/report/backend/producer/ordinary obligations remain unavailable for this selected lane. Actual Rust Source360ab473 has 3,916 members and 3,914 unrelated files unchanged. fmt/Clippy passed; focused323/workspace4,947 passed with one intentionally ignored observer; its explicit exact invocation passed one test. No whole-card gate changed.
+ Evidence: [selected daily methods, complete observations and quality](../evidence/SYS-02-selected-warmup/summary.json) (`d0844e7898420da97f9bcc5f997ee9c00f1313c314a4b39d397a8ba6f2505b23`).
++
++## Rolling owner extension (before observation)
++
++The bounded extension retains TempZone/LoadZone [C/W] and their PrevDay and SecPrevDay owners, initialized to +0 by Original Allocate (2899-2906). Every selected Record performs the exact ordered six writes (3002-3007); daily extrema transfer/reset leaves them intact. Load selection retains the first operand on an equal comparison, including signed zero. The existing input-only companion is unchanged and all initial/pre-RecKeep input joins remain mandatory. The observer adds all six actual per-Zone rolling scalars; the existing 13 selected-owner keys are unchanged. A prospective comparer successor must bind these new owners before any pairing. First-Run report collection/caller continuation, report/StdDev, diagnostics/backend and ordinary handoff remain pending. This Source proposal, its unexecuted tests and any future selected observation do not promote SYS-02/03 gates.

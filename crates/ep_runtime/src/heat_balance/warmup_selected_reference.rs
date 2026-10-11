@@ -69,6 +69,11 @@ fn snapshot(owner: &HeatBalanceWarmupConvergenceState) -> Value {
             "TestMinTempValue": scalar(z.test_values[1]), "TestMaxHeatLoadValue": scalar(z.test_values[2]),
             "TestMaxCoolLoadValue": scalar(z.test_values[3])
         },
+        "rolling_owners": {
+            "TempZone": scalar(z.rolling[0]), "LoadZone": scalar(z.rolling[1]),
+            "TempZonePrevDay": scalar(z.rolling[2]), "LoadZonePrevDay": scalar(z.rolling[3]),
+            "TempZoneSecPrevDay": scalar(z.rolling[4]), "LoadZoneSecPrevDay": scalar(z.rolling[5])
+        },
         "unpaired_actual_Rust_fields": {
             "air_system_sensible_rates_w": z.air_system_sensible_rates_w.map(|(h,c)| json!([scalar(h),scalar(c)])),
             "sensible_report_timestep": z.sensible_report_timestep
@@ -79,7 +84,7 @@ fn snapshot(owner: &HeatBalanceWarmupConvergenceState) -> Value {
             "convergence_checks_failed": owner.convergence_checks_failed,
             "maximum_day_forced_exit": owner.maximum_day_forced_exit,
             "unavailable_reason": owner.unavailable_reason},
-        "unavailable_Native_owner_families": ["rolling6", "WarmupTempDiff", "WarmupLoadDiff",
+        "unavailable_Native_owner_families": ["WarmupTempDiff", "WarmupLoadDiff",
             "TempZoneRpt", "LoadZoneRpt", "MaxLoadZoneRpt", "TempZoneRptStdDev", "LoadZoneRptStdDev",
             "CountWarmupDayPoints", "warning_and_report_header_flags", "sensible_report_producer_and_energies",
             "error_backend_and_callbacks", "error_console_and_EIO_prefixes", "ordinary_weather_handoff"],

@@ -1,0 +1,46 @@
+inline json owners(EnergyPlus::EnergyPlusData const &state, bool allocated_returned, bool stddev_known)
+{
+    auto const &h = *state.dataHeatBalMgr;
+    auto const &g = *state.dataGlobal;
+    json arrays = json::object();
+#define WARMUP_ARRAY(name) arrays[#name] = array1(h.name, [](double v) -> json { return scalar(v); });
+    WARMUP_ARRAY(MaxCoolLoadPrevDay) WARMUP_ARRAY(MaxCoolLoadZone)
+    WARMUP_ARRAY(MaxHeatLoadPrevDay) WARMUP_ARRAY(MaxHeatLoadZone)
+    WARMUP_ARRAY(MaxTempPrevDay) WARMUP_ARRAY(MaxTempZone)
+    WARMUP_ARRAY(MinTempPrevDay) WARMUP_ARRAY(MinTempZone)
+    WARMUP_ARRAY(TempZoneSecPrevDay) WARMUP_ARRAY(LoadZoneSecPrevDay)
+    WARMUP_ARRAY(TempZonePrevDay) WARMUP_ARRAY(LoadZonePrevDay)
+    WARMUP_ARRAY(TempZone) WARMUP_ARRAY(LoadZone)
+    WARMUP_ARRAY(WarmupTempDiff) WARMUP_ARRAY(WarmupLoadDiff)
+#undef WARMUP_ARRAY
+    arrays["TempZoneRpt"] = array2(h.TempZoneRpt);
+    arrays["LoadZoneRpt"] = array2(h.LoadZoneRpt);
+    arrays["MaxLoadZoneRpt"] = array2(h.MaxLoadZoneRpt);
+    arrays["TempZoneRptStdDev"] = array1(h.TempZoneRptStdDev, [](double v) -> json { return scalar(v); }, stddev_known);
+    arrays["LoadZoneRptStdDev"] = array1(h.LoadZoneRptStdDev, [](double v) -> json { return scalar(v); }, stddev_known);
+    arrays["WarmupConvergenceValues"] = array1(h.WarmupConvergenceValues, [](auto const &v) -> json {
+        return {{"PassFlag", array1(v.PassFlag, [](int x) -> json { return x; })},
+                {"TestMaxTempValue", scalar(v.TestMaxTempValue)}, {"TestMinTempValue", scalar(v.TestMinTempValue)},
+                {"TestMaxHeatLoadValue", scalar(v.TestMaxHeatLoadValue)}, {"TestMaxCoolLoadValue", scalar(v.TestMaxCoolLoadValue)}};
+    });
+    json zones = json::array();
+    for (int i = 1; i <= g.NumOfZones; ++i) {
+        json hb = nullptr, demand = nullptr;
+        if (allocated_returned) {
+            auto const &d = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(i);
+            hb = scalar(state.dataZoneTempPredictorCorrector->zoneHeatBalance(i).ZTAV);
+            demand = {{"airSysHeatRate", scalar(d.airSysHeatRate)}, {"airSysCoolRate", scalar(d.airSysCoolRate)},
+                      {"airSysHeatEnergy", scalar(d.airSysHeatEnergy)}, {"airSysCoolEnergy", scalar(d.airSysCoolEnergy)}};
+        }
+        zones.push_back({{"actual_zone_index", i}, {"Name", state.dataHeatBal->Zone(i).Name}, {"ZTAV", hb}, {"sensible_report", demand}});
+    }
+    return {{"arrays", arrays}, {"zones", zones},
+            {"CountWarmupDayPoints", allocated_returned ? json(h.CountWarmupDayPoints) : json(nullptr)},
+            {"CountWarmupDayPoints_available", allocated_returned},
+            {"FirstWarmupWrite", h.FirstWarmupWrite}, {"WarmupConvergenceWarning", h.WarmupConvergenceWarning},
+            {"SizingWarmupConvergenceWarning", h.SizingWarmupConvergenceWarning},
+            {"ReportWarmupConvergenceFirstWarmupWrite", h.ReportWarmupConvergenceFirstWarmupWrite},
+            {"clock", {{"WarmupFlag", g.WarmupFlag}, {"DayOfSim", g.DayOfSim}, {"HourOfDay", g.HourOfDay},
+                       {"TimeStep", g.TimeStep}, {"TimeStepsInHour", g.TimeStepsInHour},
+                       {"TimeStepZone", scalar(g.TimeStepZone)}, {"DoingSizing", g.DoingSizing},
+                       {"DoPureLoadCalc", g.DoPureLoadCalc}, {"KickOffSimulation", g.KickOffSimulation}}},

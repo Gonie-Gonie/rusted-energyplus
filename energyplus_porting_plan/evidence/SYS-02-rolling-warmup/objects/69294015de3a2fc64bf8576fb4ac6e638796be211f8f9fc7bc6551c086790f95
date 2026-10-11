@@ -1,0 +1,13 @@
+--- .runtime/porting/SYS-02/warmup-rolling-owner-prep-01/README.md
++++ .runtime/porting/SYS-02/warmup-rolling-owner-prep-02/README.md
+@@ -7,3 +7,10 @@
+ Observer result schema stays sys02-warmup-selected-results.v1. Each Zone adds rolling_owners with exactly TempZone, LoadZone, TempZonePrevDay, LoadZonePrevDay, TempZoneSecPrevDay, LoadZoneSecPrevDay; each uses the existing scalar DTO. selected_owners remains exactly13keys and only rolling6 is removed from unavailable_Native_owner_families. Report operation status remains the literal historical unavailable status; it does not claim the Report API was invoked. The exact Native25-case input, independent companion and rate mapping stay byte-identical. Current comparer01 explicitly excludes rolling and cannot be silently reused: a reviewed prospective successor is required before execution.
+ 
+ All new numerical/copy endpoints require genuine Native input/initial-owner admission, finite exact IEEE bits/class/signed-zero comparison and full ordered record/check/final coverage. Missing/stopped/unavailable owners cannot PASS. No numerical outcomes or future receipt/Source identities are supplied.
++
++
++Source-only successor02 rebases only the SYS-02 card row on the actual selected
++daily publication d0844e78. The four Rust application rows, equations, literal
++companion/rate inputs, runtime interfaces and scientific exclusions are exactly01.
++The new card retains the actual daily evidence and appends the same prospective
++rolling contract. No canonical Source, target or gate was changed by this author.

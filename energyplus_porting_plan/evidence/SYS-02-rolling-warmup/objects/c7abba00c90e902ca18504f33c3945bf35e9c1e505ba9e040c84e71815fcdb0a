@@ -1,0 +1,237 @@
+{
+  "schema": "sys02-rolling-owner-actual-application.v1",
+  "source_preparation": {
+    "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-02/manifest.json",
+    "sha256": "14ead3e7cf28b35400f091ed0d085a101a2ee60ae6fffe741fc24ab68aef8ce5"
+  },
+  "card_contract_before_implementation": {
+    "path": ".runtime/porting/source-objects/e4/e440c72d0f932c65aa8aef842d5ef981e2c31d2375f6c9edc04e5c0a396628a6",
+    "sha256": "e440c72d0f932c65aa8aef842d5ef981e2c31d2375f6c9edc04e5c0a396628a6"
+  },
+  "source_before": {
+    "path": ".runtime/porting/source-objects/36/360ab473f6203cc14df283158630b9060ccaac394839f3099a08a2d48d576c2e",
+    "sha256": "360ab473f6203cc14df283158630b9060ccaac394839f3099a08a2d48d576c2e"
+  },
+  "source_literal": {
+    "path": ".runtime/porting/source-objects/6c/6cd6589b7ffa081ab87792d873130d0c5be84493d6f16e9301bd373502fb4e9c",
+    "sha256": "6cd6589b7ffa081ab87792d873130d0c5be84493d6f16e9301bd373502fb4e9c"
+  },
+  "source_final": {
+    "path": ".runtime/porting/source-objects/5f/5f982aba87e32de31a541c3cef83fd6a6d2e2fcd12efe1276b6ed2b694d0c899",
+    "sha256": "5f982aba87e32de31a541c3cef83fd6a6d2e2fcd12efe1276b6ed2b694d0c899"
+  },
+  "source_file_count": 3917,
+  "unrelated_source_files_verified_byte_exact": 3913,
+  "actual_format_receipt": {
+    "path": ".runtime/porting/SYS-02/rolling-owner-format-command-01/receipt.json",
+    "sha256": "27f9e716580f285151c5a0e0c9be115ac538609c09b5c2211d9a12178e39922f"
+  },
+  "application": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "proposal": {
+        "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "510457237ace95e3d483067b2b875af1e2b63f67a20478c79d18db1c19812514",
+        "size_bytes": 51384,
+        "line_count": 1093
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-01/before/crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "aeec5163ad5c4063f934f762247d9bfed786d37041026763f087b16fc7d21a81",
+        "size_bytes": 51184,
+        "line_count": 1090
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-01/diffs/crates__ep_runtime__src__heat_balance__state.rs.diff",
+        "sha256": "63d31533e53329b896c45f0fa1d3911a65bfdab52c285d93250f8a95bfd5c720",
+        "size_bytes": 723,
+        "line_count": 12
+      },
+      "new_destination_absent": false,
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "aeec5163ad5c4063f934f762247d9bfed786d37041026763f087b16fc7d21a81",
+        "size_bytes": 51184,
+        "line_count": 1090
+      },
+      "actual_final": {
+        "path": "crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "510457237ace95e3d483067b2b875af1e2b63f67a20478c79d18db1c19812514",
+        "size_bytes": 51384
+      },
+      "actual_formatter_diff": {
+        "path": ".runtime/porting/SYS-02/rolling-owner-applied-01/formatter-1.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_final_archive": {
+        "path": ".runtime/porting/source-objects/51/510457237ace95e3d483067b2b875af1e2b63f67a20478c79d18db1c19812514",
+        "sha256": "510457237ace95e3d483067b2b875af1e2b63f67a20478c79d18db1c19812514"
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/warmup.rs",
+      "proposal": {
+        "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/warmup.rs",
+        "sha256": "448e818f17f4f58bf7a34d73a63d65beab55bf3fa08d245d5af3cce2b9411226",
+        "size_bytes": 20621,
+        "line_count": 531
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-01/before/crates/ep_runtime/src/heat_balance/warmup.rs",
+        "sha256": "91cbbe5b9f79d9bb094c6838df848a846b83caf6de1f12c273ae7cd3a2a04c75",
+        "size_bytes": 20117,
+        "line_count": 518
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-01/diffs/crates__ep_runtime__src__heat_balance__warmup.rs.diff",
+        "sha256": "2685fbc6fc6b3d39883fd2798a305fe3904754793d24690492bb7f8a73054dbb",
+        "size_bytes": 1224,
+        "line_count": 33
+      },
+      "new_destination_absent": false,
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/warmup.rs",
+        "sha256": "91cbbe5b9f79d9bb094c6838df848a846b83caf6de1f12c273ae7cd3a2a04c75",
+        "size_bytes": 20117,
+        "line_count": 518
+      },
+      "actual_final": {
+        "path": "crates/ep_runtime/src/heat_balance/warmup.rs",
+        "sha256": "7c07bd3d83d0b1241ca8bd4fc239610f908080a2146eb195663cf52b2b1efe7e",
+        "size_bytes": 20661
+      },
+      "actual_formatter_diff": {
+        "path": ".runtime/porting/SYS-02/rolling-owner-applied-01/formatter-2.diff",
+        "sha256": "f483034c6094663737282d9446b920550c3ccdb6d2c5a73f09e9cdad042126c6",
+        "size_bytes": 640
+      },
+      "actual_final_archive": {
+        "path": ".runtime/porting/source-objects/7c/7c07bd3d83d0b1241ca8bd4fc239610f908080a2146eb195663cf52b2b1efe7e",
+        "sha256": "7c07bd3d83d0b1241ca8bd4fc239610f908080a2146eb195663cf52b2b1efe7e"
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/warmup_selected_reference.rs",
+      "proposal": {
+        "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/warmup_selected_reference.rs",
+        "sha256": "f1aabf1039d207b569fd7362681252acb3f539a56251ea6c2f5b838ca1fb8a36",
+        "size_bytes": 12393,
+        "line_count": 276
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-01/before/crates/ep_runtime/src/heat_balance/warmup_selected_reference.rs",
+        "sha256": "3cefa2328de56a47a49f7077d8574d41eba26c567bf4427b228102a9a386942d",
+        "size_bytes": 12093,
+        "line_count": 271
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-01/diffs/crates__ep_runtime__src__heat_balance__warmup_selected_reference.rs.diff",
+        "sha256": "dcaff75bdb30d047940b84e10bec17b8d8e4fe64dd1cb93592a3cb42543fc402",
+        "size_bytes": 1671,
+        "line_count": 23
+      },
+      "new_destination_absent": false,
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/warmup_selected_reference.rs",
+        "sha256": "3cefa2328de56a47a49f7077d8574d41eba26c567bf4427b228102a9a386942d",
+        "size_bytes": 12093,
+        "line_count": 271
+      },
+      "actual_final": {
+        "path": "crates/ep_runtime/src/heat_balance/warmup_selected_reference.rs",
+        "sha256": "f1aabf1039d207b569fd7362681252acb3f539a56251ea6c2f5b838ca1fb8a36",
+        "size_bytes": 12393
+      },
+      "actual_formatter_diff": {
+        "path": ".runtime/porting/SYS-02/rolling-owner-applied-01/formatter-3.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_final_archive": {
+        "path": ".runtime/porting/source-objects/f1/f1aabf1039d207b569fd7362681252acb3f539a56251ea6c2f5b838ca1fb8a36",
+        "sha256": "f1aabf1039d207b569fd7362681252acb3f539a56251ea6c2f5b838ca1fb8a36"
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/warmup_rolling_tests.rs",
+      "proposal": {
+        "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/warmup_rolling_tests.rs",
+        "sha256": "0dafb358feb02cf64b5b341657fdad13ddd83e2d43b897a74111fa5ebc32215c",
+        "size_bytes": 2634,
+        "line_count": 61
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-01/before/crates/ep_runtime/src/heat_balance/warmup_rolling_tests.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-01/diffs/crates__ep_runtime__src__heat_balance__warmup_rolling_tests.rs.diff",
+        "sha256": "e004008a1342b1180a411f490581a16aee499c0e8e5c4b34f8de3427cc6c9dc4",
+        "size_bytes": 2900,
+        "line_count": 64
+      },
+      "new_destination_absent": true,
+      "actual_final": {
+        "path": "crates/ep_runtime/src/heat_balance/warmup_rolling_tests.rs",
+        "sha256": "f9e52be421b9e1107470cf12f89eb91f9c505c4969281cb52dfc7034d139c18a",
+        "size_bytes": 2791
+      },
+      "actual_formatter_diff": {
+        "path": ".runtime/porting/SYS-02/rolling-owner-applied-01/formatter-4.diff",
+        "sha256": "d92561d520e5e55f655dca8d505f9bb1cc6855033ba052913c1979f8f349fcb6",
+        "size_bytes": 1631
+      },
+      "actual_final_archive": {
+        "path": ".runtime/porting/source-objects/f9/f9e52be421b9e1107470cf12f89eb91f9c505c4969281cb52dfc7034d139c18a",
+        "sha256": "f9e52be421b9e1107470cf12f89eb91f9c505c4969281cb52dfc7034d139c18a"
+      }
+    },
+    {
+      "canonical_path": "energyplus_porting_plan/cards/SYS-02.md",
+      "proposal": {
+        "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-02/proposed/energyplus_porting_plan/cards/SYS-02.md",
+        "sha256": "e440c72d0f932c65aa8aef842d5ef981e2c31d2375f6c9edc04e5c0a396628a6",
+        "size_bytes": 5579,
+        "line_count": 83
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-02/before/energyplus_porting_plan/cards/SYS-02.md",
+        "sha256": "86f77626aae4ddc29c276daeaf586ae6b80058bf3f5f3608daf9398a2c08d2b8",
+        "size_bytes": 4645,
+        "line_count": 79
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-02/diffs/SYS-02.md.diff",
+        "sha256": "8ae6d4a9d602d771226bcb32594b663469ed8d52bab20d2de46e55efb6e67e02",
+        "size_bytes": 1968,
+        "line_count": 10
+      },
+      "new_destination_absent": false,
+      "actual_before": {
+        "path": "energyplus_porting_plan/cards/SYS-02.md",
+        "sha256": "86f77626aae4ddc29c276daeaf586ae6b80058bf3f5f3608daf9398a2c08d2b8",
+        "size_bytes": 4645,
+        "line_count": 79
+      },
+      "actual_final": {
+        "path": "energyplus_porting_plan/cards/SYS-02.md",
+        "sha256": "e440c72d0f932c65aa8aef842d5ef981e2c31d2375f6c9edc04e5c0a396628a6",
+        "size_bytes": 5579
+      },
+      "actual_formatter_diff": {
+        "path": ".runtime/porting/SYS-02/rolling-owner-applied-01/formatter-5.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_final_archive": {
+        "path": ".runtime/porting/source-objects/e4/e440c72d0f932c65aa8aef842d5ef981e2c31d2375f6c9edc04e5c0a396628a6",
+        "sha256": "e440c72d0f932c65aa8aef842d5ef981e2c31d2375f6c9edc04e5c0a396628a6"
+      }
+    }
+  ],
+  "numerical_comparison_performed": false,
+  "gates_updated": false
+}

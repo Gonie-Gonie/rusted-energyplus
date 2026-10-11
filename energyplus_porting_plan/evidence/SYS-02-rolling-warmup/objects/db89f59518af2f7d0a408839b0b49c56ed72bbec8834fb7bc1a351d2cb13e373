@@ -1,0 +1,48 @@
+void prepare(Fixture &fixture, json const &v)
+{
+    keys(v, {"zone_names", "TimeStepsInHour", "TimeStepZone", "TimeStepSysSec", "TempConvergTol", "LoadsConvergTol",
+             "MinNumberOfWarmupDays", "MaxNumberOfWarmupDays", "DoingSizing", "DoPureLoadCalc",
+             "RunPeriodEnvironment", "EnvironmentName", "ReportDetailedWarmupConvergence"});
+    auto &s = *fixture.state;
+    auto &g = *s.dataGlobal;
+    auto const &names = v.at("zone_names");
+    require(names.is_array() && names.size() <= static_cast<std::size_t>(std::numeric_limits<int>::max()), "Source-sized zone array required");
+    g.NumOfZones = static_cast<int>(names.size());
+    g.numSpaces = 0;
+    g.TimeStepsInHour = integer(v.at("TimeStepsInHour"), 1, std::numeric_limits<int>::max() / 24);
+    g.TimeStepZone = input(v.at("TimeStepZone"));
+    require(g.TimeStepZone > 0.0, "Positive declared zone-step hours required");
+    g.WarmupFlag = true;
+    g.DayOfSim = 1;
+    g.HourOfDay = 1;
+    g.TimeStep = 1;
+    g.DoingSizing = boolean(v.at("DoingSizing"));
+    g.DoPureLoadCalc = boolean(v.at("DoPureLoadCalc"));
+    s.dataHVACGlobal->TimeStepSysSec = input(v.at("TimeStepSysSec"));
+    require(s.dataHVACGlobal->TimeStepSysSec > 0.0, "Positive sensible-report elapsed seconds required");
+    s.dataHeatBal->TempConvergTol = input(v.at("TempConvergTol"));
+    s.dataHeatBal->LoadsConvergTol = input(v.at("LoadsConvergTol"));
+    require(s.dataHeatBal->TempConvergTol >= 0.0 && s.dataHeatBal->LoadsConvergTol >= 0.0, "Nonnegative actual tolerances required");
+    s.dataHeatBal->MinNumberOfWarmupDays = integer(v.at("MinNumberOfWarmupDays"), 1, std::numeric_limits<int>::max());
+    s.dataHeatBal->MaxNumberOfWarmupDays = integer(v.at("MaxNumberOfWarmupDays"), s.dataHeatBal->MinNumberOfWarmupDays, std::numeric_limits<int>::max());
+    s.dataEnvrn->RunPeriodEnvironment = boolean(v.at("RunPeriodEnvironment"));
+    require(v.at("EnvironmentName").is_string(), "Environment name required");
+    s.dataEnvrn->EnvironmentName = v.at("EnvironmentName").get<std::string>();
+    s.dataSysVars->ReportDetailedWarmupConvergence = boolean(v.at("ReportDetailedWarmupConvergence"));
+    s.dataHeatBal->Zone.allocate(g.NumOfZones);
+    s.dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(names.size());
+    for (int i = 1; i <= g.NumOfZones; ++i) {
+        auto const &name = names.at(static_cast<std::size_t>(i - 1));
+        require(name.is_string() && !name.get<std::string>().empty(), "Zone name required");
+        s.dataHeatBal->Zone(i).Name = name.get<std::string>();
+    }
+    require(!s.dataSurface->AnyMovableInsulation && s.dataSurface->AllHTWindowSurfaceList.empty() &&
+            !s.dataContaminantBalance->Contaminant.CO2Simulation && !s.dataContaminantBalance->Contaminant.GenericContamSimulation &&
+            s.dataViewFactor->NumOfSolarEnclosures == 0 && s.dataWeather->TotThermalReportPers == 0 &&
+            s.dataWeather->TotCO2ReportPers == 0 && s.dataWeather->TotVisualReportPers == 0 &&
+            s.dataSQLiteProcedures->sqlite == nullptr && !g.KickOffSimulation && !g.DoingInputProcessing,
+            "Fresh direct fixture prerequisites differ; no silent substitution");
+    fixture.invoke("allocate", "HeatBalanceManager::AllocateHeatBalArrays", 0, [&] {
+        EnergyPlus::HeatBalanceManager::AllocateHeatBalArrays(s);
+        fixture.allocated_returned = true;
+    });

@@ -1,0 +1,139 @@
+{
+  "schema": "sys02-selected-warmup-prospective-comparison-policy.v1",
+  "frozen_before_numerical_outputs_read": false,
+  "Native_source_preparation": {
+    "path": ".runtime/porting/SYS-02/warmup-native-prep-01/manifest.json",
+    "sha256": "61e2ca2825d527fe0da515cbc7d3d5ae2076eac32806130336faeaef49937368",
+    "size_bytes": 28473,
+    "line_count": 694
+  },
+  "Rust_source_preparation": {
+    "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-02/manifest.json",
+    "sha256": "14ead3e7cf28b35400f091ed0d085a101a2ee60ae6fffe741fc24ab68aef8ce5",
+    "size_bytes": 21470,
+    "line_count": 484
+  },
+  "Native_input_source": {
+    "path": ".runtime/porting/SYS-02/warmup-native-prep-01/input-only-cases.proposed.json",
+    "sha256": "34a6d7cd40ff24ae08c04b7be88cbc527c2e4c003d734f7e6b212ed121359637",
+    "size_bytes": 96140,
+    "line_count": 3816
+  },
+  "Rust_input_source": {
+    "path": ".runtime/porting/SYS-02/warmup-selected-observer-prep-01/input-only-companion.proposed.json",
+    "sha256": "0203787f9662128c9600ec801c1cbaa0527ba4080ae3466158f0ad4acfe1d7b5",
+    "size_bytes": 118992,
+    "line_count": 4548
+  },
+  "literal_rate_bindings": {
+    "path": ".runtime/porting/SYS-02/warmup-selected-observer-prep-01/literal-rate-input-bindings.json",
+    "sha256": "4c5cdccb11d0ac9aa456883494c1367a19cacf2b82f24e307140bc59b4261831",
+    "size_bytes": 4372,
+    "line_count": 119
+  },
+  "Rust_observer_source_paths": [
+    "crates/ep_runtime/src/heat_balance/state.rs",
+    "crates/ep_runtime/src/heat_balance/warmup.rs",
+    "crates/ep_runtime/src/heat_balance/warmup_selected_reference.rs",
+    "crates/ep_runtime/src/heat_balance/warmup_rolling_tests.rs"
+  ],
+  "Rust_reviewed_proposals": [
+    {
+      "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "510457237ace95e3d483067b2b875af1e2b63f67a20478c79d18db1c19812514",
+      "size_bytes": 51384,
+      "line_count": 1093
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/warmup.rs",
+      "sha256": "448e818f17f4f58bf7a34d73a63d65beab55bf3fa08d245d5af3cce2b9411226",
+      "size_bytes": 20621,
+      "line_count": 531
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/warmup_selected_reference.rs",
+      "sha256": "f1aabf1039d207b569fd7362681252acb3f539a56251ea6c2f5b838ca1fb8a36",
+      "size_bytes": 12393,
+      "line_count": 276
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-rolling-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/warmup_rolling_tests.rs",
+      "sha256": "0dafb358feb02cf64b5b341657fdad13ddd83e2d43b897a74111fa5ebc32215c",
+      "size_bytes": 2634,
+      "line_count": 61
+    }
+  ],
+  "daily_owner_fields": [
+    "MaxHeatLoadZone",
+    "MaxCoolLoadZone",
+    "MaxTempZone",
+    "MinTempZone",
+    "MaxHeatLoadPrevDay",
+    "MaxCoolLoadPrevDay",
+    "MaxTempPrevDay",
+    "MinTempPrevDay"
+  ],
+  "metric_fields": [
+    "TestMaxTempValue",
+    "TestMinTempValue",
+    "TestMaxHeatLoadValue",
+    "TestMaxCoolLoadValue"
+  ],
+  "exact_discrete_owners": [
+    "PassFlag[1..4]",
+    "WarmupFlag",
+    "case/order/operation/call/zone/clock/configuration"
+  ],
+  "scalar_policy": {
+    "finite_required": true,
+    "IEEE_bits_exact": true,
+    "value_class_exact": true,
+    "decimal_matches_bits": true,
+    "signed_zero_exact": true,
+    "absolute_tolerance": 0,
+    "relative_tolerance": 0
+  },
+  "endpoint_pairing_requires_every_initial_selected_owner_and_pre_Record_operand_join": true,
+  "full_ordered_record_check_before_after_and_final_all_zones": true,
+  "all_mismatches_uncapped": true,
+  "unavailable_Native_owner_families": [
+    "WarmupTempDiff",
+    "WarmupLoadDiff",
+    "TempZoneRpt",
+    "LoadZoneRpt",
+    "MaxLoadZoneRpt",
+    "TempZoneRptStdDev",
+    "LoadZoneRptStdDev",
+    "CountWarmupDayPoints",
+    "warning_and_report_header_flags",
+    "sensible_report_producer_and_energies",
+    "error_backend_and_callbacks",
+    "error_console_and_EIO_prefixes",
+    "ordinary_weather_handoff"
+  ],
+  "unavailable_counted_as_PASS": false,
+  "convergence_or_SNLoad_equations_reimplemented": false,
+  "Native_results_read": false,
+  "Rust_results_read": false,
+  "whole_SYS02_SYS03_or_ordinary_handoff_PASS_claimed": false,
+  "producer_PASS_claimed": false,
+  "gates_updated": false,
+  "recorder_source": {
+    "path": "tools/porting/record_command.py",
+    "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+    "size_bytes": 8453,
+    "line_count": 204
+  },
+  "parent_policy_frozen_before_numerical_outputs_read": true,
+  "rolling_policy_fixed_from_held_Source_before_Rust_rolling_observation": true,
+  "prior_selected_actual_evidence_reviewed_before_this_Source_authorship": true,
+  "no_observation_outputs_read_during_this_Source_authorship": true,
+  "rolling_owner_fields": [
+    "TempZone",
+    "LoadZone",
+    "TempZonePrevDay",
+    "LoadZonePrevDay",
+    "TempZoneSecPrevDay",
+    "LoadZoneSecPrevDay"
+  ]
+}

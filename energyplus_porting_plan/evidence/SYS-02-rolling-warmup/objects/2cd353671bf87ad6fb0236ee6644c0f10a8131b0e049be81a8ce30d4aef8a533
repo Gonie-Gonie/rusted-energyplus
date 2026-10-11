@@ -1,0 +1,44 @@
+        auto const before_input = fixture.snapshot();
+        auto const &clock = op.at("clock");
+        keys(clock, {"DayOfSim", "HourOfDay", "TimeStep"});
+        s.dataGlobal->DayOfSim = integer(clock.at("DayOfSim"), 1, std::numeric_limits<int>::max());
+        s.dataGlobal->HourOfDay = integer(clock.at("HourOfDay"), 1, 24);
+        s.dataGlobal->TimeStep = integer(clock.at("TimeStep"), 1, s.dataGlobal->TimeStepsInHour);
+        auto const &samples = op.at("zone_samples");
+        require(samples.is_array() && samples.size() == (kind == "record" ? static_cast<std::size_t>(s.dataGlobal->NumOfZones) : 0),
+                "Complete ordered record operands or genuinely empty nonrecord operands required");
+        if (kind == "record") {
+            for (int i = 1; i <= s.dataGlobal->NumOfZones; ++i) {
+                auto const &sample = samples.at(static_cast<std::size_t>(i - 1));
+                keys(sample, {"ZTAV", "SNLoad"});
+                s.dataZoneTempPredictorCorrector->zoneHeatBalance(i).ZTAV = input(sample.at("ZTAV"));
+                (void)input(sample.at("SNLoad"));
+            }
+        }
+        inputs.push_back({{"operation_id", id}, {"literal_input", op}, {"before_declared_input_writes", before_input},
+                          {"after_declared_input_writes", fixture.snapshot()}, {"WarmupFlag_overwritten_by_input", false}});
+        if (kind == "record") {
+            bool const report_point = !s.dataGlobal->WarmupFlag && s.dataGlobal->DayOfSim == 1 &&
+                                      (!s.dataGlobal->DoingSizing || s.dataGlobal->DoPureLoadCalc);
+            require(!report_point || s.dataGlobal->NumOfZones == 0 ||
+                    s.dataHeatBalMgr->CountWarmupDayPoints < s.dataGlobal->TimeStepsInHour * 24, "Full report capacity required; no truncation");
+            for (int i = 1; i <= s.dataGlobal->NumOfZones && !fixture.stopped; ++i) {
+                double const load = input(samples.at(static_cast<std::size_t>(i - 1)).at("SNLoad"));
+                fixture.invoke(id, "ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads", i,
+                               [&] { s.dataZoneEnergyDemand->ZoneSysEnergyDemand(i).reportZoneAirSystemSensibleLoads(s, load); });
+            }
+            if (!fixture.stopped) {
+                fixture.invoke(id, "HeatBalanceManager::RecKeepHeatBalance", 0, [&] { EnergyPlus::HeatBalanceManager::RecKeepHeatBalance(s); });
+            }
+        } else if (kind == "check") {
+            fixture.invoke(id, "HeatBalanceManager::CheckWarmupConvergence", 0, [&] { EnergyPlus::HeatBalanceManager::CheckWarmupConvergence(s); });
+        } else {
+            require(s.dataGlobal->WarmupFlag || s.dataGlobal->NumOfZones == 0 || s.dataHeatBalMgr->CountWarmupDayPoints > 0,
+                    "Positive actual report point count required before division; no synthetic points");
+            fixture.invoke(id, "HeatBalanceManager::ReportWarmupConvergence", 0, [&] {
+                fixture.stddev_known = false;
+                EnergyPlus::HeatBalanceManager::ReportWarmupConvergence(s);
+                if (!s.dataGlobal->WarmupFlag) {
+                    fixture.stddev_known = true;
+                }
+            });

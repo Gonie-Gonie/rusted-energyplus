@@ -1,0 +1,15 @@
+--- .runtime/porting/SYS-02/warmup-rolling-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/warmup.rs
++++ crates/ep_runtime/src/heat_balance/warmup.rs
+@@ -295,7 +295,11 @@
+         self.rolling[0] = ztav;
+         let cool_load = cool_rate.abs();
+         // Original ObjexxFCL::max selects the first operand on equality.
+-        self.rolling[1] = if heat_rate < cool_load { cool_load } else { heat_rate };
++        self.rolling[1] = if heat_rate < cool_load {
++            cool_load
++        } else {
++            heat_rate
++        };
+     }
+ 
+     fn check(&mut self, temperature_tolerance: f64, load_tolerance: f64) -> bool {
