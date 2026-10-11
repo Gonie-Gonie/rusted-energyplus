@@ -1,0 +1,79 @@
+{
+  "schema": "ctf10-surface-consumer-actual-runtime-loader-after-execution.v1",
+  "created_utc": "2026-10-11T03:33:48.840555+00:00",
+  "executed_Root_launcher": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-root-orchestration-prep-02/run-original-surface-consumer05-stages.py",
+    "sha256": "947f6b50d87653fcaca0f4baea1dba878fe0dc25a8f8390f663c84247b13558a",
+    "size_bytes": 9808
+  },
+  "PATH_prepend_as_supplied_by_launcher": [
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0\\Products"
+  ],
+  "runtime_DLL_files": [
+    {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/libgcc_s_seh-1.dll",
+      "sha256": "403b4169b307d0bfb27a9cbcccbca491efe634eb0462fc1f3fc5ace373bd2827",
+      "size_bytes": 740183
+    },
+    {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/libstdc++-6.dll",
+      "sha256": "748b10c9f25828fbc78e8eaf50355e7f178d0ed0438d2c396565b56c5bd4ac0a",
+      "size_bytes": 2304720
+    },
+    {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/libwinpthread-1.dll",
+      "sha256": "a086938c9612746fda0ab8640b8d21e8d36bc3e53c1e8e70f9896888b41607dd",
+      "size_bytes": 94355
+    }
+  ],
+  "actual_loaded_DLL_modules_observed": false,
+  "actual_build": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-01/native-build.json",
+    "sha256": "7c55c7a9ce52952c22b4f6fad898164adb6725048d3e8a9f00bd311d3322ade7",
+    "size_bytes": 8723
+  },
+  "actual_strict_PE_review": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/build-review/review.json",
+    "sha256": "80b0153f54ff5294b92c6fa44ab6662ac355a1a0444d1c58d27b36dc204405f1",
+    "size_bytes": 2646
+  },
+  "actual_freeze": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-frozen-inputs-01/freeze-receipt.json",
+    "sha256": "08c035ab7a675b3f7e715e20c599bf1488aa65bc3a189287ba68e5bb5a31239f",
+    "size_bytes": 20598
+  },
+  "observed_free_bytes_before_engine": 2091024384,
+  "linked_original_and_helper_before": [
+    {
+      "path": ".runtime/ep261-gcc13-o0/Products/surface_consumer_helper05.exe",
+      "sha256": "00c3684bd14adfd267a44fd398e972c9aa192401d94893c4a109b804f068da6d",
+      "size_bytes": 1304503612
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-01/derivation/derived-helper.exe",
+      "sha256": "815584163856e8ea59df63d4058a079dda35f302df40a1d01388122a3d125cc8",
+      "size_bytes": 150839483
+    }
+  ],
+  "observed_utc": "2026-10-11T03:36:46.009738+00:00",
+  "actual_native_execution": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/surface-consumer-native-command-01/receipt.json",
+    "sha256": "f26a8837ba0d9e7aadcd842d5083ebac40e52af72e9c28eed9ceb901cf381536",
+    "size_bytes": 3570
+  },
+  "linked_original_and_helper_after": [
+    {
+      "path": ".runtime/ep261-gcc13-o0/Products/surface_consumer_helper05.exe",
+      "sha256": "00c3684bd14adfd267a44fd398e972c9aa192401d94893c4a109b804f068da6d",
+      "size_bytes": 1304503612
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-01/derivation/derived-helper.exe",
+      "sha256": "815584163856e8ea59df63d4058a079dda35f302df40a1d01388122a3d125cc8",
+      "size_bytes": 150839483
+    }
+  ],
+  "DLL_and_binary_bytes_unchanged": true,
+  "observed_free_bytes_after_engine": 1001013248
+}

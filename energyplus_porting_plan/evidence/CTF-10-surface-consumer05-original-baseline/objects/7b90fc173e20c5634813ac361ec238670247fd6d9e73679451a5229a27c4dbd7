@@ -1,0 +1,39 @@
+{
+  "schema": "root-protected-original-transparent-compression.v1",
+  "created_utc": "2026-10-11T03:29:37.367553+00:00",
+  "actual_before_authority": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-01/native-build.json",
+    "sha256": "7c55c7a9ce52952c22b4f6fad898164adb6725048d3e8a9f00bd311d3322ade7",
+    "size_bytes": 8723
+  },
+  "operation": "NTFS compact.exe /C /EXE:LZX /Q exact1 retained surface consumer05 Original",
+  "files": [
+    {
+      "file_before": {
+        "path": ".runtime/ep261-gcc13-o0/Products/surface_consumer_helper05.exe",
+        "sha256": "00c3684bd14adfd267a44fd398e972c9aa192401d94893c4a109b804f068da6d",
+        "size_bytes": 1304503612
+      },
+      "file_after": {
+        "path": ".runtime/ep261-gcc13-o0/Products/surface_consumer_helper05.exe",
+        "sha256": "00c3684bd14adfd267a44fd398e972c9aa192401d94893c4a109b804f068da6d",
+        "size_bytes": 1304503612
+      },
+      "compact_exit_code": 0,
+      "command_log": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-protected-original-storage-compression-01/surface_consumer_helper05.exe.log",
+        "sha256": "4c2c78fb83e7d9ce1590c7e640e8b23670a74588a390fcf5533bdf6df8872118",
+        "size_bytes": 269
+      },
+      "bytes_and_path_unchanged": true
+    }
+  ],
+  "observed_free_bytes_before": 1065816064,
+  "observed_free_bytes_after": 2109689856,
+  "physical_free_change_is_observation_not_exclusive_attribution": true,
+  "all1_bytes_and_paths_unchanged": true,
+  "file_deleted_or_moved": false,
+  "scientific_values_recomputed": false,
+  "original_executable_executed": false,
+  "gates_updated": false
+}

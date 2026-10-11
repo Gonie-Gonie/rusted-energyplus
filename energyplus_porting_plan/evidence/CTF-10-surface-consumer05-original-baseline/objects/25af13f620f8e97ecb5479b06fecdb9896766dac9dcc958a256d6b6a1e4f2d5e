@@ -1,0 +1,39 @@
+{
+  "schema": "root-protected-original-transparent-compression.v1",
+  "created_utc": "2026-10-11T03:40:29.608446+00:00",
+  "actual_before_authority": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-observation-archive-01/record.json",
+    "sha256": "1127191a37e14cec2d068976dbf4a2bdfb654c3a0242950b85e3b963e19c9abe",
+    "size_bytes": 1224
+  },
+  "operation": "NTFS compact.exe /C /EXE:LZX /Q exact1 retained genuine CTF10 full A24 observation",
+  "files": [
+    {
+      "file_before": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-native-output-01/A-24H.observation.json",
+        "sha256": "eb344b4086531b636d5c701e454477248224aa5c30722e75a15eae0ef035e436",
+        "size_bytes": 1074976333
+      },
+      "file_after": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-native-output-01/A-24H.observation.json",
+        "sha256": "eb344b4086531b636d5c701e454477248224aa5c30722e75a15eae0ef035e436",
+        "size_bytes": 1074976333
+      },
+      "compact_exit_code": 0,
+      "command_log": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-observation-storage-compression-01/A-24H.observation.json.log",
+        "sha256": "3e89637bd11ee9eed454d4415d8e88cb744dab902f6816ce12ba2729ba43717a",
+        "size_bytes": 296
+      },
+      "bytes_and_path_unchanged": true
+    }
+  ],
+  "observed_free_bytes_before": 981106688,
+  "observed_free_bytes_after": 1987493888,
+  "physical_free_change_is_observation_not_exclusive_attribution": true,
+  "all1_bytes_and_paths_unchanged": true,
+  "file_deleted_or_moved": false,
+  "scientific_values_recomputed": false,
+  "original_executable_executed": false,
+  "gates_updated": false
+}

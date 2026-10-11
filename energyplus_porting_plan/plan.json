@@ -11895,9 +11895,14 @@
         },
         "scope": "Output-only consumer05 augmentation of the ordinary full engine: actual selected history initialization input/completion and master-update completion, full allocated history/scratch/report context at those sites and simple completion, and current first-referenced Construction catalog. All existing51 sites remain; no branch is forced or inferred.",
         "observation_max_bytes": 4294967296,
-        "actual_capture_available": false,
+        "actual_capture_available": true,
         "thermal_history_Rust_arithmetic_applied": false,
         "full_card_gates_updated": false
+      },
+      "actual_ordinary_surface_history_boundary_capture": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-consumer05-original-baseline/summary.json",
+        "sha256": "49f284c4fb174651b085eac061afe56d0b33bc81372eb88f88204f2569bc0b95",
+        "size_bytes": 15700
       }
     },
     {

@@ -1,0 +1,61 @@
+{
+  "schema": "ctf10-surface-consumer05-independent-build-PE-review.v1",
+  "status": "pass-exact-retained-PE-runtime-and-actual-build-identity",
+  "observed_utc": "2026-10-11T03:33:44.833371+00:00",
+  "lane": "ordinary-full-run",
+  "target": "surface_consumer_helper05",
+  "actual_previous_compile_rows": 717,
+  "actual_current_compile_rows": 727,
+  "actual_protected_ref_count": 54,
+  "build": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-01/native-build.json",
+    "sha256": "7c55c7a9ce52952c22b4f6fad898164adb6725048d3e8a9f00bd311d3322ade7",
+    "size_bytes": 8723
+  },
+  "helper_binary": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-01/derivation/derived-helper.exe",
+    "sha256": "815584163856e8ea59df63d4058a079dda35f302df40a1d01388122a3d125cc8",
+    "size_bytes": 150839483
+  },
+  "linked_original": {
+    "path": ".runtime/ep261-gcc13-o0/Products/surface_consumer_helper05.exe",
+    "sha256": "00c3684bd14adfd267a44fd398e972c9aa192401d94893c4a109b804f068da6d",
+    "size_bytes": 1304503612
+  },
+  "validated_derivative": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-01/derivation/receipt.json",
+    "sha256": "a452039f34010cd5079592117073a2f38ab907138f8c6cdd5460e7a572d24403",
+    "size_bytes": 12968
+  },
+  "native_pe_source": {
+    "path": "tools/porting/native_pe.py",
+    "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+    "size_bytes": 20217
+  },
+  "executed_reader": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-review-prep-01/review_build.py",
+    "sha256": "ee3a3da643b733fba90280797eecd620d4e0c269bb1e4a1a220a321e73d28fc2",
+    "size_bytes": 6963
+  },
+  "maps": {
+    "original": {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/build-review/original-pe.json",
+      "sha256": "41ea2d65c8600511405c9e3372c3c408c0b63c19bddba7fc730ede10edfa0c59",
+      "size_bytes": 16047
+    },
+    "derived": {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/build-review/derived-pe.json",
+      "sha256": "2ff50e64e683ad0e8d76c0f5c558a6aa8c486aca022618cb4d12437ce0013a99",
+      "size_bytes": 12193
+    },
+    "comparison": {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/build-review/comparison-pe.json",
+      "sha256": "ee97948dc45650e6713b61c03de5eb1a7fd019c74878c459dc7e05f8f66efce5",
+      "size_bytes": 4820
+    }
+  },
+  "retained_runtime_exact": true,
+  "engine_invoked": false,
+  "scientific_execution_certified": false,
+  "gates_updated": false
+}

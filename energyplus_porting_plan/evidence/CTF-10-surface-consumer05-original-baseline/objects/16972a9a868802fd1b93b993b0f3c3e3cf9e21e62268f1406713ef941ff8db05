@@ -1,0 +1,59 @@
+"""Root publishes genuine consumer05 custody, preserving all earlier evidence."""
+import hashlib,json,shutil,subprocess
+from datetime import datetime,timezone
+from pathlib import Path
+ROOT=Path.cwd();BASE=ROOT/'.runtime/porting/CTF-10';STAGES=BASE/'surface-consumer05-original-stages-02'
+OUT=ROOT/'energyplus_porting_plan/evidence/CTF-10-surface-consumer05-original-baseline'
+def read(p):return json.loads(p.read_bytes())
+def sha(p):
+ with p.open('rb')as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+def ref(p):return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+def write(p,v):p.write_bytes((json.dumps(v,ensure_ascii=False,indent=2,allow_nan=False)+'\n').encode('utf8'))
+assert OUT.is_dir()and not (OUT/'summary.json').exists()
+qa_path=STAGES/'original-data-review/review.json';qa=read(qa_path);counts=qa['actual_observation_counts']
+assert qa['schema']=='ctf10-surface-consumer05-independent-original-data-review.v1'
+assert qa['status']=='pass-actual-full-event-custody-before-Rust'and qa['Original_capture_custody_released']and qa['complete_actual_event_ledger_validated']
+assert counts['actual_retained_events']==counts['actual_attempted_events']==404886 and counts['actual_omitted_events']==0 and qa['observation_integrity_failures']==[]
+assert qa['history_direct_unit_execution_authorized']is False and qa['numerical_PASS_claimed']is False
+freeze_path=BASE/'surface-consumer05-frozen-inputs-01/freeze-receipt.json';freeze=read(freeze_path)
+for row in freeze['source_authorities']['current_after_documents']:assert ref(ROOT/row['path'])==row
+execution_paths=[BASE/'surface-consumer05-build-launch-command-01/receipt.json',BASE/'surface-consumer05-original-stages-command-02/receipt.json',BASE/'surface-consumer05-protected-original-storage-command-01/receipt.json',BASE/'surface-consumer05-observation-archive-command-01/receipt.json',BASE/'surface-consumer05-observation-storage-command-01/receipt.json']
+execution_paths += [STAGES/name/'receipt.json'for name in ['surface-consumer-native-build-review-command-01','surface-consumer-native-command-01','surface-consumer-original-data-review-command-01']]
+for p in execution_paths:
+ r=read(p);assert r['exit_code']==0 and r['launch_error']is None and r['source_bytes_match_before_and_after']
+ assert r['source_snapshot']['sha256']=='ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193'
+archive_path=BASE/'surface-consumer05-observation-archive-01/record.json';archive=read(archive_path)
+assert archive['original']==qa['reviewed_results']and archive['all_original_bytes_retained']and ref(ROOT/archive['stored']['path'])==archive['stored']
+(OUT/'objects').mkdir();known={}
+for p in (ROOT/'energyplus_porting_plan/evidence').glob('*/manifest.json'):
+ for row in read(p).get('selected_files',[]):
+  stored=row.get('stored',{});digest=stored.get('sha256')
+  if digest and (ROOT/stored['path']).is_file():known.setdefault(digest,stored)
+paths=set(execution_paths)
+directories=['surface-consumer05-native-build-01','surface-consumer05-original-stages-02','surface-consumer05-build-launch-command-01','surface-consumer05-original-stages-command-01','surface-consumer05-original-stages-command-02','surface-consumer05-root-orchestration-prep-01','surface-consumer05-root-orchestration-prep-02','surface-consumer05-protected-original-storage-command-01','surface-consumer05-protected-original-storage-compression-01','surface-consumer05-observation-archive-01','surface-consumer05-observation-archive-command-01','surface-consumer05-observation-storage-command-01','surface-consumer05-observation-storage-compression-01']
+excluded=['.exe','.dll','.a','.obj','.map','.epw']
+for name in directories:
+ for p in (BASE/name).rglob('*'):
+  if p.is_file()and '__pycache__'not in p.parts and p.suffix.lower()not in excluded:paths.add(p)
+ for p in (BASE/name).rglob('receipt.json'):
+  r=read(p)
+  if 'source_snapshot'in r:paths.add(ROOT/r['source_snapshot']['path'])
+  if 'executed_launcher'in r:paths.add(ROOT/r['executed_launcher']['archive']['path'])
+for name in ['compress-surface-consumer05-retained-original-01.py','archive-surface-consumer05-observation-01.py','compress-consumer05-retained-observation-01.py','publish-surface-consumer05-original-baseline-01.py']:paths.add(BASE/name)
+for row in qa['actual_ordinary_output_files']:paths.add(ROOT/row['path'])
+rows=[];new=[]
+for p in sorted(paths):
+ r=ref(p);assert r['size_bytes']<16000000 and p.suffix.lower()not in excluded
+ if r['sha256']not in known:
+  dest=OUT/'objects'/r['sha256'];shutil.copyfile(p,dest);known[r['sha256']]=ref(dest);new.append(ref(dest))
+ stored=known[r['sha256']];assert p.read_bytes()==(ROOT/stored['path']).read_bytes();rows.append({'original':r,'stored':stored})
+write(OUT/'manifest.json',{'schema':'ctf10-surface-consumer05-actual-Original-selected-evidence.v1','created_utc':datetime.now(timezone.utc).isoformat(),'selected_files':rows,'compressed_scientific_observations':[archive],'new_unique_raw_objects':len(new),'new_unique_raw_object_bytes':sum(r['size_bytes']for r in new),'binary_payloads_archived':False,'large_link_maps_archived':False,'selected_archive_is_transitive_replay_closure':False})
+summary={'schema':'ctf10-surface-consumer05-actual-Original-baseline-summary.v1','manifest':ref(OUT/'manifest.json'),'actual_OriginalDataQA':ref(qa_path),'actual_native_execution':qa['reviewed_native_execution'],'actual_native_build':qa['reviewed_build'],'actual_PE_review':qa['reviewed_build_review'],'actual_input_freeze':ref(freeze_path),'actual_executions':[ref(p)for p in execution_paths],'actual_observation_counts':counts,'lossless_full_observation_archive':ref(archive_path),'actual_ordinary_output_files':qa['actual_ordinary_output_files'],'Original_capture_custody_released':True,'history_direct_unit_execution_authorized_by_factual_QA':False,'selected_pre_boundary_inputs_and_complete_allocated_endpoints_observed':True,'current_referenced_coefficients_and_source_traversal_observed':True,'unreached_master_update_visits':0,'unreached_master_update_numerical_PASS_claimed':False,'thermal_history_Rust_arithmetic_applied':False,'Native_trace_used_as_ordinary_Rust_production_input':False,'numerical_comparison_count':None,'numerical_PASS_claimed':False,'integration_PASS_claimed':False,'full_card_gates_updated':False,'preserved_failed_pre_engine_preflight':ref(BASE/'surface-consumer05-original-stages-command-01/receipt.json')}
+write(OUT/'summary.json',summary)
+plan_path=ROOT/'energyplus_porting_plan/plan.json';plan=read(plan_path);task=next(t for t in plan['tasks']if t['id']=='CTF-10')
+task['prospective_ordinary_surface_history_boundary_capture']['actual_capture_available']=True
+task['actual_ordinary_surface_history_boundary_capture']=ref(OUT/'summary.json');write(plan_path,plan)
+with (ROOT/'energyplus_porting_plan/cards/CTF-10.md').open('a',encoding='utf8',newline='\n')as stream:
+ stream.write('\nActual consumer05 ordinary A-24H capture and full-stream OriginalDataQA passed:404886 attempted/retained events, zero omissions,4 selected initialization inputs/completions and2025 simple update inputs/completions with full allocated owners/current Construction catalogs. The1074976333-byte observation is losslessly archived with full decompressed SHA verified. Master update was not reached and remains numerically unverified. An initial preflight size-ref error stopped before PE/engine and is preserved; the narrow reviewed successor completed. Thermal arithmetic/direct comparison and production lifecycle activation remain pending. See evidence/CTF-10-surface-consumer05-original-baseline/summary.json.\n')
+subprocess.run(['python','-X','utf8','-B','tools/porting/sync_plan_views.py','--write'],check=True)
+print('Root actual consumer05 baseline published',len(rows),'selected',len(new),'new',ref(OUT/'summary.json'),flush=True)

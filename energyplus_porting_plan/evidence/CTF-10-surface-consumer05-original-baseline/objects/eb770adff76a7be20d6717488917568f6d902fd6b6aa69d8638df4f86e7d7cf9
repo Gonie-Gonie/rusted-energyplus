@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-10\surface-consumer05-root-orchestration-prep-01\run-original-surface-consumer05-stages.py", line 53, in <module>
+    for row in [build['build_source_manifest'],build['native_source_manifest'],freeze['scope_amendment'],freeze['scope_execution'],freeze_execution['stdout']]:exact(row)
+                                                                                                                                                               ^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-10\surface-consumer05-root-orchestration-prep-01\run-original-surface-consumer05-stages.py", line 11, in exact
+    def exact(row):assert ref(ROOT/row['path'])=={k:row[k]for k in ['path','sha256','size_bytes']},row['path']
+                                                    ~~~^^^
+KeyError: 'size_bytes'

@@ -1,0 +1,24 @@
+"""Root losslessly archives the completed, genuinely reviewed full observation."""
+import gzip,hashlib,json,shutil
+from pathlib import Path
+ROOT=Path.cwd(); BASE=ROOT/'.runtime/porting/CTF-10'; OUT=ROOT/'energyplus_porting_plan/evidence/CTF-10-surface-consumer05-original-baseline'
+def read(p):return json.loads(p.read_bytes())
+def sha(p):
+ with p.open('rb')as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+def ref(p):return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+qa_path=BASE/'surface-consumer05-original-stages-02/original-data-review/review.json';qa=read(qa_path)
+assert qa['status']=='pass-actual-full-event-custody-before-Rust'and qa['Original_capture_custody_released']and qa['complete_actual_event_ledger_validated']
+assert qa['actual_native_process_exit_code']==0 and qa['observation_integrity_failures']==[]and qa['history_direct_unit_execution_authorized']is False
+source=ROOT/qa['reviewed_results']['path'];before=ref(source);assert before==qa['reviewed_results']
+assert not OUT.exists();(OUT/'observations').mkdir(parents=True)
+dest=OUT/'observations'/(before['sha256']+'.json.gz')
+with source.open('rb')as src,dest.open('xb')as dst:
+ with gzip.GzipFile(filename='',mode='wb',compresslevel=6,fileobj=dst,mtime=0)as packed:shutil.copyfileobj(src,packed,16*1024*1024)
+digest=hashlib.sha256();count=0
+with gzip.open(dest,'rb')as stream:
+ while chunk:=stream.read(16*1024*1024):digest.update(chunk);count+=len(chunk)
+assert digest.hexdigest()==before['sha256']and count==before['size_bytes']and ref(source)==before
+record={'schema':'ctf10-surface-consumer-lossless-observation-archive.v1','actual_OriginalDataQA':ref(qa_path),'original':before,'stored':ref(dest),'compression':'gzip','full_decompressed_sha256':digest.hexdigest(),'full_decompressed_size_bytes':count,'all_original_bytes_retained':True,'original_file_retained':True,'numerical_values_modified_or_recomputed':False,'numerical_PASS_claimed':False,'full_card_gates_updated':False}
+(BASE/'surface-consumer05-observation-archive-01').mkdir()
+(BASE/'surface-consumer05-observation-archive-01/record.json').write_bytes((json.dumps(record,indent=2)+'\n').encode('utf8'))
+print('Root full observation losslessly archived',record['stored'],flush=True)

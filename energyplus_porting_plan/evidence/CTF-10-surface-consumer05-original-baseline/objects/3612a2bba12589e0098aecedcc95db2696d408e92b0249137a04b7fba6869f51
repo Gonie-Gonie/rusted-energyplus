@@ -1,0 +1,9 @@
+# Consumer05 Root orchestration: Source-only successor02
+
+The actual01 launch stopped before PE or engine invocation because an existing recorder stdout identity has only path and SHA256. The01 source is preserved.
+
+This successor changes only the stages exact(ref) helper: actual contained-relative path and SHA remain required; size is checked when the ref supplies size_bytes. No size is invented for a two-field recorder ref. All child CLI, guards, fixed output paths, frozen policy, build, PE, engine and factual-QA behavior remain literal01.
+
+The build53 source is copied byte-exact01. The stages94 source differs only by the four-line helper replacing one line. Removing that helper restores01 bytes exactly. The unchanged original01 source dependency/range authorities remain historical accepted Source context.
+
+Root must independently review and obtain other-author narrow Source acceptance before running a fresh stages attempt. This package does not execute or rerun anything, and does not certify thermal-history numerical or integration behavior.

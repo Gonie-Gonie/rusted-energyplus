@@ -1,0 +1,204 @@
+{"review": {"path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/build-review/review.json", "sha256": "80b0153f54ff5294b92c6fa44ab6662ac355a1a0444d1c58d27b36dc204405f1", "size_bytes": 2646}, "status": "pass-exact-retained-PE-runtime-and-actual-build-identity"}
+{"receipt": {"path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/surface-consumer-native-build-review-command-01/receipt.json", "sha256": "36ff68df9de761896fb0deab7b687f2db51af7b2b49c263b741beb3c5bc686e3"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+EnergyPlus Starting
+EnergyPlus, Version 26.1.0-6f2e40d102, YMD=2026.10.11 12:33
+Adjusting Air System Sizing
+Adjusting Standard 62.1 Ventilation Sizing
+Initializing Simulation
+Reporting Surfaces
+Beginning Primary Simulation
+Initializing New Environment Parameters
+Warming up {1}
+Warming up {2}
+Warming up {3}
+Warming up {4}
+Warming up {5}
+Warming up {6}
+Warming up {7}
+Warming up {8}
+Warming up {9}
+Warming up {10}
+Warming up {11}
+Warming up {12}
+Warming up {13}
+Warming up {14}
+Warming up {15}
+Warming up {16}
+Warming up {17}
+Warming up {18}
+Warming up {19}
+Warming up {20}
+Starting Simulation at 01/01/2013 for RUN PERIOD 1
+Writing tabular output file results using comma format.
+Writing tabular output file results using tab format.
+Writing tabular output file results using text format.
+Writing tabular output file results using HTML format.
+Writing tabular output file results using XML format.
+EnergyPlus Run Time=00hr 02min 42.80sec
+EnergyPlus Completed Successfully.
+{"receipt": {"path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/surface-consumer-native-command-01/receipt.json", "sha256": "f26a8837ba0d9e7aadcd842d5083ebac40e52af72e9c28eed9ceb901cf381536"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+e52952c22b4f6fad898164adb6725048d3e8a9f00bd311d3322ade7",
+    "size_bytes": 8723
+  },
+  "reviewed_build_execution": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-01/native-compile-command-01/receipt.json",
+    "sha256": "e767c12e2c7bd866756ce72e65ad2f44a298a4cbad32ea3b3af134430a5efc72",
+    "size_bytes": 2996
+  },
+  "reviewed_build_review": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/build-review/review.json",
+    "sha256": "80b0153f54ff5294b92c6fa44ab6662ac355a1a0444d1c58d27b36dc204405f1",
+    "size_bytes": 2646
+  },
+  "reviewed_build_review_execution": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/surface-consumer-native-build-review-command-01/receipt.json",
+    "sha256": "36ff68df9de761896fb0deab7b687f2db51af7b2b49c263b741beb3c5bc686e3",
+    "size_bytes": 3101
+  },
+  "reviewed_source_snapshot": {
+    "path": ".runtime/porting/source-objects/ab/ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193",
+    "sha256": "ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193"
+  },
+  "reviewed_reader_source_preparation": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/manifest.json",
+    "sha256": "a27641042054dea917f17cbbf2f710e765496cfd7f3445f81bfcd35498b2a1a0",
+    "size_bytes": 48595
+  },
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/review_data.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/original-data-review/000-review_data.py",
+        "sha256": "522fa42b31dcfe4b490b3779785bf1fef2cb953ca50aab21501ebf0838abb3f4",
+        "size_bytes": 24559
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/event_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/original-data-review/001-event_shape.py",
+        "sha256": "15f49e7646649b8701d889962cb6756b5260fb2262551c2b299a446d8bdc9b17",
+        "size_bytes": 28204
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/stream_events.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/original-data-review/002-stream_events.py",
+        "sha256": "8e7f05196fe567c052352d4d0fe501eb02a0f8e5a623c20f7dcd3db669f6bab8",
+        "size_bytes": 2385
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/original-data-review/003-packet_io.py",
+        "sha256": "7c91d59d774d4e3cc9141cc9f40d0ae9abdb736385f17bb2b9afcf295222a27d",
+        "size_bytes": 4673
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/original-data-review/000-review_data.py",
+    "sha256": "522fa42b31dcfe4b490b3779785bf1fef2cb953ca50aab21501ebf0838abb3f4",
+    "size_bytes": 24559
+  },
+  "reviewed_native_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_main.cpp",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/original-data-review/004-surface_consumer_main.cpp",
+        "sha256": "181dfc603f18775527763afb89a718b3e91092a74b8692de7ad463653d2e2303",
+        "size_bytes": 2216
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/HeatBalanceSurfaceManager.surface_consumer.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/original-data-review/005-HeatBalanceSurfaceManager.surface_consumer.cc",
+        "sha256": "51daf3db085dfe9d0c73a044ff74cc63fc38c68f169cfcb2d45f676f5d3a2060",
+        "size_bytes": 714386
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_observer.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/original-data-review/006-surface_consumer_observer.cc",
+        "sha256": "7a966b5b17b63eb6541ffc3d318851c940134ee67bec76e14f1180ad391b883a",
+        "size_bytes": 22282
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/api/EnergyPlusPgm.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/original-data-review/007-EnergyPlusPgm.cc",
+        "sha256": "2789f0ddea774deb1c3de15f0266e20ee1855c7f8051394e66e58a7ac592210e",
+        "size_bytes": 24694
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/CommandLineInterface.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/original-data-review/008-CommandLineInterface.cc",
+        "sha256": "b89b527f59f46f9b8d98a9022345dc83972998864089c335a5ed82e7b987b107",
+        "size_bytes": 46621
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_observer.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/original-data-review/009-surface_consumer_observer.hh",
+        "sha256": "1d9befcc41cba45b74d36d27f75836249d9ce20f44173c84a195b446d8f2e7dd",
+        "size_bytes": 2403
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/original-data-review/010-surface_consumer_reference.cmake",
+        "sha256": "f6e5d4c4d03f0c1f5299a2e9c9f145083442ada92364750f6eac292584ac670e",
+        "size_bytes": 6750
+      }
+    }
+  ],
+  "reviewed_current_document_archives": [
+    {
+      "historical_path": "energyplus_porting_plan/plan.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/original-data-review/011-plan.json",
+        "sha256": "3c64da9715a56eaced7d0d5368feb5e249eb173def0a8a40a01f5f0af9e31913",
+        "size_bytes": 758805
+      }
+    },
+    {
+      "historical_path": "energyplus_porting_plan/cards/CTF-10.md",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/original-data-review/012-CTF-10.md",
+        "sha256": "6605d39276ae450f8eb5959c372d72711ef4e4ac5c0007a4b9cba6d255dbc7d2",
+        "size_bytes": 11761
+      }
+    },
+    {
+      "historical_path": "energyplus_porting_plan/energyplus_porting_checklist.html",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/original-data-review/013-energyplus_porting_checklist.html",
+        "sha256": "f459e1c215cfab65bac21194bb2ae6d5cf783fe13be500362579ef095b0abe24",
+        "size_bytes": 610399
+      }
+    }
+  ],
+  "Original_capture_custody_released": true,
+  "history_direct_unit_execution_authorized": false,
+  "native_binary_payloads_rehashed_or_parsed": false,
+  "scientific_values_recomputed_or_compared": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "unreached_or_unallocated_owners_counted_as_PASS": false,
+  "complete_heat_balance_lifecycle_certified": false,
+  "integration_PASS_claimed": false,
+  "full_card_gates_updated": false,
+  "authorship_limits": "Header adapted Raw accepted consumer factual QA; Raw authored passive05. Source custody review is not an independent formula or numerical certificate."
+}
+{"receipt": {"path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/surface-consumer-original-data-review-command-01/receipt.json", "sha256": "3f785779d0092b6686e8bf0a203a9d828969bc276927b12eb5b5ca3b89b1cecd"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+Root genuine consumer05 ordinary A24 capture and factual OriginalDataQA completed; history-unit authorization remains separate.

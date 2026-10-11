@@ -1,0 +1,14 @@
+--- .runtime/porting/CTF-10/surface-consumer05-root-orchestration-prep-02/before/run-original-surface-consumer05-stages.py
++++ .runtime/porting/CTF-10/surface-consumer05-root-orchestration-prep-02/run-original-surface-consumer05-stages.py
+@@ -8,7 +8,10 @@
+  with p.open('rb')as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+ def ref(p):return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+ def arg(p):return p.relative_to(ROOT).as_posix()+'#'+sha(p)
+-def exact(row):assert ref(ROOT/row['path'])=={k:row[k]for k in ['path','sha256','size_bytes']},row['path']
++def exact(row):
++ actual=ref(ROOT/row['path'])
++ assert actual['path']==row['path'] and actual['sha256']==row['sha256'],row['path']
++ if 'size_bytes'in row:assert type(row['size_bytes'])is int and actual['size_bytes']==row['size_bytes'],row['path']
+ def recorded(name,command,check=True):
+  output=OUT/name;result=subprocess.run(['python','-X','utf8','-B','tools/porting/record_command.py','--output-dir',output.relative_to(ROOT).as_posix(),'--',*command])
+  if check:result.check_returncode()

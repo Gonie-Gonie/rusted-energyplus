@@ -1,0 +1,198 @@
+{
+  "schema": "ctf10-surface-consumer05-native-build.v1",
+  "target": "surface_consumer_helper05",
+  "status": "pass-actual-5TU-link-and-preservation",
+  "authorship": "Root assembled genuine recorded configure/compile/derivation, actual address-bound HBSM/Pgm/CLI providers and fresh54 protected/core hashes. No engine/scientific claim.",
+  "observed_utc": "2026-10-11T03:26:45.789597+00:00",
+  "helper_binary": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-01/derivation/derived-helper.exe",
+    "sha256": "815584163856e8ea59df63d4058a079dda35f302df40a1d01388122a3d125cc8",
+    "size_bytes": 150839483
+  },
+  "linked_original": {
+    "path": ".runtime/ep261-gcc13-o0/Products/surface_consumer_helper05.exe",
+    "sha256": "00c3684bd14adfd267a44fd398e972c9aa192401d94893c4a109b804f068da6d",
+    "size_bytes": 1304503612
+  },
+  "native_source_manifest": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/manifest.json",
+    "sha256": "8eac3eb0ec2a28c91db06e5c9d02ab0611090b68095183569df58b8198a8a94c",
+    "size_bytes": 31280
+  },
+  "build_source_manifest": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-prep-02/manifest.json",
+    "sha256": "b845f22a1ac9cac06b39d1a884a00dff7500b5cfc9e5b7431834a288691f61e1",
+    "size_bytes": 26578
+  },
+  "native_source_files": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_main.cpp",
+      "sha256": "181dfc603f18775527763afb89a718b3e91092a74b8692de7ad463653d2e2303",
+      "size_bytes": 2216,
+      "line_count": 55
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/HeatBalanceSurfaceManager.surface_consumer.cc",
+      "sha256": "51daf3db085dfe9d0c73a044ff74cc63fc38c68f169cfcb2d45f676f5d3a2060",
+      "size_bytes": 714386,
+      "line_count": 10288
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_observer.cc",
+      "sha256": "7a966b5b17b63eb6541ffc3d318851c940134ee67bec76e14f1180ad391b883a",
+      "size_bytes": 22282,
+      "line_count": 384
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/api/EnergyPlusPgm.cc",
+      "sha256": "2789f0ddea774deb1c3de15f0266e20ee1855c7f8051394e66e58a7ac592210e",
+      "size_bytes": 24694,
+      "line_count": 530
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/CommandLineInterface.cc",
+      "sha256": "b89b527f59f46f9b8d98a9022345dc83972998864089c335a5ed82e7b987b107",
+      "size_bytes": 46621,
+      "line_count": 950
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_observer.hh",
+      "sha256": "1d9befcc41cba45b74d36d27f75836249d9ce20f44173c84a195b446d8f2e7dd",
+      "size_bytes": 2403,
+      "line_count": 66
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_reference.cmake",
+      "sha256": "f6e5d4c4d03f0c1f5299a2e9c9f145083442ada92364750f6eac292584ac670e",
+      "size_bytes": 6750,
+      "line_count": 106
+    }
+  ],
+  "compiled_source_files": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_main.cpp",
+      "sha256": "181dfc603f18775527763afb89a718b3e91092a74b8692de7ad463653d2e2303",
+      "size_bytes": 2216,
+      "line_count": 55
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/HeatBalanceSurfaceManager.surface_consumer.cc",
+      "sha256": "51daf3db085dfe9d0c73a044ff74cc63fc38c68f169cfcb2d45f676f5d3a2060",
+      "size_bytes": 714386,
+      "line_count": 10288
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_observer.cc",
+      "sha256": "7a966b5b17b63eb6541ffc3d318851c940134ee67bec76e14f1180ad391b883a",
+      "size_bytes": 22282,
+      "line_count": 384
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/api/EnergyPlusPgm.cc",
+      "sha256": "2789f0ddea774deb1c3de15f0266e20ee1855c7f8051394e66e58a7ac592210e",
+      "size_bytes": 24694,
+      "line_count": 530
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/CommandLineInterface.cc",
+      "sha256": "b89b527f59f46f9b8d98a9022345dc83972998864089c335a5ed82e7b987b107",
+      "size_bytes": 46621,
+      "line_count": 950
+    }
+  ],
+  "configure_execution": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-01/native-configure-command-01/receipt.json",
+    "sha256": "205b2d2b93e2712f9103e3d4064a1c53d145cf0c921a05de980f0d17a2eb1bff",
+    "size_bytes": 7791
+  },
+  "compile_execution": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-01/native-compile-command-01/receipt.json",
+    "sha256": "e767c12e2c7bd866756ce72e65ad2f44a298a4cbad32ea3b3af134430a5efc72",
+    "size_bytes": 2996
+  },
+  "derivation_execution": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-01/native-derive-command-01/receipt.json",
+    "sha256": "7c867301a50e2d6c8d87ee9215933ca5801b40b53a24e6ef8eebfa9f8432042a",
+    "size_bytes": 3294
+  },
+  "validated_derivative": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-01/derivation/receipt.json",
+    "sha256": "a452039f34010cd5079592117073a2f38ab907138f8c6cdd5460e7a572d24403",
+    "size_bytes": 12968
+  },
+  "preservation": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-native-build-01/preservation-after.json",
+    "sha256": "7b581301b705f1c866fd49864985bbb9ff2aaa7a4c7e8728816e1cf8641b3c5a",
+    "size_bytes": 174046
+  },
+  "actual_consumer04_build_identity_metadata": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-build-02/native-build.json",
+    "sha256": "9c81ac5f733edd260ff62871d87cb7e1e56059bb4b200e22ee2d094998c7b41c",
+    "size_bytes": 7781
+  },
+  "actual_ZON_build_identity_metadata": {
+    "path": ".runtime/porting/ZON-05/native-build-01/native-build.json",
+    "sha256": "5384861acb91c1be5ca312db3efd9bd01ad76eed412ee834a991baec9d64eb79",
+    "size_bytes": 5910
+  },
+  "inherited_consumer04_compile_commands": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-build-02/after/compile_commands.json",
+    "sha256": "a6bac157980368b9db4b43e5425ae5dc3e3fdc17926f61a602c4cfab6d8c82cb",
+    "size_bytes": 3842371
+  },
+  "inherited_consumer04_registration_count": 5,
+  "new_consumer05_registration_count": 5,
+  "actual_fresh_compiled_TU_count": 5,
+  "no_consumer04_compile_command_observed": true,
+  "actual_restore_configure_execution": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-restore-configure-command-01/receipt.json",
+    "sha256": "6ce813c775af5da0bdac33ef26a041d0ff13885b58845077a5937efdd5823419",
+    "size_bytes": 7423
+  },
+  "actual_RAD_build_identity_metadata": {
+    "path": ".runtime/porting/RAD-01/native-build-02/native-build.json",
+    "sha256": "3bf6a649c4ee2c67a4d9ae0c6a01c4fef1f987243685fdb205f46289cef62fed",
+    "size_bytes": 3989
+  },
+  "freeze_receipt": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-frozen-inputs-01/freeze-receipt.json",
+    "sha256": "08c035ab7a675b3f7e715e20c599bf1488aa65bc3a189287ba68e5bb5a31239f",
+    "size_bytes": 20598
+  },
+  "freeze_execution": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-freeze-command-01/receipt.json",
+    "sha256": "4eefd9a6280c54795473e7beee0e711f52c985b746a90ba0698a0df400b14a21",
+    "size_bytes": 3047
+  },
+  "scope_amendment": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-scope-amendment-01/amendment.json",
+    "sha256": "14aaebc5cdf1616a7adaef95e0ba598af7b05aca192037fb994919c40f5edafe",
+    "size_bytes": 19593
+  },
+  "scope_execution": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-scope-check-command-01/receipt.json",
+    "sha256": "09b519a9e5e15120a7ebd24d5393d669fdd595a0f81d5d824049cfe67809dd8c",
+    "size_bytes": 3045
+  },
+  "core_before_check": {
+    "path": ".runtime/porting/CTF-01/native-core-before-check-command-01/receipt.json",
+    "sha256": "e1da6904b99a635a16994406919608fa7284f19276d8d3a45eb4f3df8c807702",
+    "size_bytes": 3019
+  },
+  "previous_compile_rows": 717,
+  "current_compile_rows": 727,
+  "core_registered": 643,
+  "core_present": 631,
+  "core_absent": 12,
+  "all_previous_compile_commands_unchanged": true,
+  "protected_artifacts_and_present_core_objects_unchanged": true,
+  "link_provider_verified": true,
+  "protected_ref_count": 54,
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/ab/ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193",
+    "sha256": "ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193"
+  },
+  "scientific_execution_certified": false,
+  "integration_PASS_claimed": false,
+  "gates_updated": false
+}

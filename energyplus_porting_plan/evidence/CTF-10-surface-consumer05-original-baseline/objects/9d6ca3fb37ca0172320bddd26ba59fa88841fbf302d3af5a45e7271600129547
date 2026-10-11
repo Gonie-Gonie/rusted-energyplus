@@ -1,0 +1,62 @@
+"""Root transparent NTFS storage maintenance; exact protected bytes and paths stay."""
+import datetime
+import hashlib
+import json
+import shutil
+import subprocess
+from pathlib import Path
+
+ROOT = Path.cwd().resolve()
+BASE = ROOT / '.runtime/porting/CTF-10'
+OUT = BASE / 'surface-consumer05-observation-storage-compression-01'
+
+def sha(p):
+    with p.open('rb') as stream:
+        return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+def ref(p):
+    return {'path': p.relative_to(ROOT).as_posix(), 'sha256': sha(p), 'size_bytes': p.stat().st_size}
+
+final_path = BASE / 'surface-consumer05-observation-archive-01/record.json'
+final = json.loads(final_path.read_bytes())
+names = ['A-24H.observation.json']
+protected = {Path(final['original']['path']).name: final['original']}
+assert final['all_original_bytes_retained'] and final['full_decompressed_sha256']=='eb344b4086531b636d5c701e454477248224aa5c30722e75a15eae0ef035e436'
+assert names[0] in protected
+assert not OUT.exists()
+OUT.mkdir()
+rows = []
+free_before = shutil.disk_usage(ROOT).free
+for name in names:
+    row = protected[name]
+    p = (ROOT / row['path']).resolve(strict=True)
+    assert p.parent == BASE / 'surface-consumer05-native-output-01'
+    assert p.is_file() and not p.is_symlink() and not p.is_junction()
+    assert not (p.stat().st_file_attributes & 0x400)
+    before = ref(p)
+    assert before == row
+    log = OUT / (name + '.log')
+    with log.open('xb') as stream:
+        result = subprocess.run(['compact.exe', '/C', '/EXE:LZX', '/Q', str(p)],
+                                stdout=stream, stderr=subprocess.STDOUT)
+    after = ref(p)
+    assert before == after
+    rows.append({'file_before': before, 'file_after': after,
+                 'compact_exit_code': result.returncode, 'command_log': ref(log),
+                 'bytes_and_path_unchanged': True})
+    print('Root retained full observation transparent compression', name,
+          'exit', result.returncode, 'exact bytes unchanged', before['size_bytes'], flush=True)
+    assert result.returncode == 0
+record = {'schema': 'root-protected-original-transparent-compression.v1',
+          'created_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+          'actual_before_authority': ref(final_path),
+          'operation': 'NTFS compact.exe /C /EXE:LZX /Q exact1 retained genuine CTF10 full A24 observation',
+          'files': rows, 'observed_free_bytes_before': free_before,
+          'observed_free_bytes_after': shutil.disk_usage(ROOT).free,
+          'physical_free_change_is_observation_not_exclusive_attribution': True,
+          'all1_bytes_and_paths_unchanged': len(rows) == 1,
+          'file_deleted_or_moved': False, 'scientific_values_recomputed': False,
+          'original_executable_executed': False, 'gates_updated': False}
+(OUT / 'record.json').write_bytes((json.dumps(record, indent=2) + '\n').encode())
+print('Root transparent Original compression completed', len(rows),
+      'observed free', record['observed_free_bytes_after'], flush=True)
