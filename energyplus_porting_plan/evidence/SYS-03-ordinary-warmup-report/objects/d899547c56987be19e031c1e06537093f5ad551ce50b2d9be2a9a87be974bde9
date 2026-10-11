@@ -1,0 +1,17 @@
+--- .runtime/porting/SYS-03/ordinary-warmup-report-prep-01/proposed/crates/ep_run/src/pipeline.rs
++++ crates/ep_run/src/pipeline.rs
+@@ -3580,9 +3580,12 @@
+         schedule_cache,
+         zone_timestep_schedule_cache,
+         weather_series,
+-        ordinary_warmup_reporting: if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility {
++        ordinary_warmup_reporting: if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility
++        {
+             Some(crate::warmup_report_controls::resolve(raw_model)?)
+-        } else { None },
++        } else {
++            None
++        },
+     })
+ }
+ 

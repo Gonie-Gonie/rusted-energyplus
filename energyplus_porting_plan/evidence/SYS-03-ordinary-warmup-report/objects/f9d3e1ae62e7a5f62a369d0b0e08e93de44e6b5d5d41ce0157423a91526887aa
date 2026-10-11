@@ -1,0 +1,90 @@
+--- .runtime/porting/SYS-03/ordinary-warmup-report-prep-01/proposed/crates/ep_runtime/src/heat_balance/warmup.rs
++++ crates/ep_runtime/src/heat_balance/warmup.rs
+@@ -48,11 +48,22 @@
+     ),
+ {
+     run_heat_balance_run_period_warmup_with_reporting(
+-        simulation_model, state, weather_dry_bulb_c, weather_records, weather_driver,
+-        zone_steps_per_hour, seconds_per_timestep, options, runtime_config,
+-        surface_iteration_count, inside_hconv_reevaluation_interval,
+-        surface_loop_zone_air_correction, first_hour_interpolation_starting_values,
+-        day_end_zone_air_states, None, advance_timestep,
++        simulation_model,
++        state,
++        weather_dry_bulb_c,
++        weather_records,
++        weather_driver,
++        zone_steps_per_hour,
++        seconds_per_timestep,
++        options,
++        runtime_config,
++        surface_iteration_count,
++        inside_hconv_reevaluation_interval,
++        surface_loop_zone_air_correction,
++        first_hour_interpolation_starting_values,
++        day_end_zone_air_states,
++        None,
++        advance_timestep,
+     )
+ }
+ 
+@@ -103,20 +114,24 @@
+         return Err(unavailable("nonfinite or negative convergence tolerance"));
+     }
+     let model = &simulation_model.typed;
+-    if state.warmup_convergence.as_ref().is_none_or(|owner| owner.report.is_none()) {
+-    state.warmup_convergence = Some(HeatBalanceWarmupConvergenceState {
+-        zones: state
+-            .zones
+-            .iter()
+-            .map(|zone| HeatBalanceWarmupZoneConvergence::new(zone.zone_id))
+-            .collect(),
+-        checked_day: 0,
+-        convergence_checks_failed: false,
+-        warmup_flag: true,
+-        maximum_day_forced_exit: false,
+-        unavailable_reason: None,
+-        report: None,
+-    });
++    if state
++        .warmup_convergence
++        .as_ref()
++        .is_none_or(|owner| owner.report.is_none())
++    {
++        state.warmup_convergence = Some(HeatBalanceWarmupConvergenceState {
++            zones: state
++                .zones
++                .iter()
++                .map(|zone| HeatBalanceWarmupZoneConvergence::new(zone.zone_id))
++                .collect(),
++            checked_day: 0,
++            convergence_checks_failed: false,
++            warmup_flag: true,
++            maximum_day_forced_exit: false,
++            unavailable_reason: None,
++            report: None,
++        });
+     }
+     let hours_per_day = hourly_count.min(24);
+     let maximum_days = options.maximum_days.max(options.minimum_days).max(1);
+@@ -182,13 +197,18 @@
+                     surface_loop_zone_air_correction,
+                 );
+                 super::ctf_surface_lifecycle::ensure_available(state)?;
+-                let reporting = state.warmup_convergence.as_ref().is_some_and(|owner| owner.report.is_some());
++                let reporting = state
++                    .warmup_convergence
++                    .as_ref()
++                    .is_some_and(|owner| owner.report.is_some());
+                 if reporting {
+                     ordinary::record_completed_step(state, weather_driver, output.as_deref_mut())?;
+                 }
+                 super::ctf_caller_clock::commit_legacy_step(state, prepared_legacy_clock)?;
+                 if !reporting {
+-                    state.warmup_convergence.as_mut()
++                    state
++                        .warmup_convergence
++                        .as_mut()
+                         .ok_or_else(|| unavailable("missing actual convergence owner"))?
+                         .record_state(&state.zones, state.timestep_index)?;
+                 }

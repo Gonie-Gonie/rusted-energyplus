@@ -1,0 +1,63 @@
+        if (state.dataDuctLoss->DuctLossSimu) {
+            this->TempIndCoef += state.dataDuctLoss->ZoneSen(zoneNum);
+        }
+
+        // Solve for zone air temperature
+        switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
+        case DataHeatBalance::SolutionAlgo::ThirdOrder: {
+            this->ZT = (this->TempIndCoef + this->AirPowerCap * (3.0 * this->ZTM[0] - (3.0 / 2.0) * this->ZTM[1] + (1.0 / 3.0) * this->ZTM[2])) /
+                       ((11.0 / 6.0) * this->AirPowerCap + this->TempDepCoef);
+            // Exact solution
+        } break;
+        case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
+            if (this->TempDepCoef == 0.0) { // B=0
+                this->ZT = this->T1 + this->TempIndCoef / this->AirPowerCap;
+            } else {
+                this->ZT = (this->T1 - this->TempIndCoef / this->TempDepCoef) * std::exp(min(700.0, -this->TempDepCoef / this->AirPowerCap)) +
+                           this->TempIndCoef / this->TempDepCoef;
+            }
+        } break;
+        case DataHeatBalance::SolutionAlgo::EulerMethod: {
+            this->ZT = (this->AirPowerCap * this->T1 + this->TempIndCoef) / (this->AirPowerCap + this->TempDepCoef);
+        } break;
+        default:
+            break;
+        }
+
+        // SpaceHB TODO: For now, room air model is only for zones
+        if (spaceNum == 0 && state.dataRoomAir->anyNonMixingRoomAirModel) {
+            if (state.dataRoomAir->AirModel(zoneNum).AirModel == RoomAir::RoomAirModel::AirflowNetwork) {
+                this->ZT = state.dataRoomAir->AFNZoneInfo(zoneNum).Node(state.dataRoomAir->AFNZoneInfo(zoneNum).ControlAirNodeID).AirTemp;
+            }
+        }
+
+        // No sensible load
+        SNLoad = 0.0;
+    }
+
+    // Hybrid modeling start
+    // SpaceHB TODO: For now, hybrid model is only for zones
+    if (spaceNum == 0 && state.dataHybridModel->FlagHybridModel) {
+        auto &hmZone = state.dataHybridModel->hybridModelZones(zoneNum);
+        if ((hmZone.InfiltrationCalc_T || hmZone.InternalThermalMassCalc_T || hmZone.PeopleCountCalc_T) && (!state.dataGlobal->WarmupFlag) &&
+            (!state.dataGlobal->DoingSizing)) {
+            InverseModelTemperature(state,
+                                    zoneNum,
+                                    this->SumIntGain,
+                                    this->SumIntGainExceptPeople,
+                                    this->SumHA,
+                                    this->SumHATsurf,
+                                    this->SumHATref,
+                                    this->SumMCp,
+                                    this->SumMCpT,
+                                    this->SumSysMCp,
+                                    this->SumSysMCpT,
+                                    this->AirPowerCap);
+        }
+    }
+
+    this->MAT = this->ZT;
+
+    // Determine sensible load heating/cooling rate and energy
+    if (spaceNum > 0) {
+        state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum).reportZoneAirSystemSensibleLoads(state, SNLoad);

@@ -1,0 +1,71 @@
+    Checking ep_runtime v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_runtime)
+error[E0425]: cannot find function `simulate_heat_balance_zone_air_temperatures_with_production_weather_and_warmup_reporting` in this scope
+   --> crates\ep_runtime\src\runtime\tests/warmup_ordinary_reports.rs:21:13
+    |
+ 21 |               simulate_heat_balance_zone_air_temperatures_with_production_weather_and_warmup_reporting(
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+   ::: crates\ep_runtime\src\runtime.rs:216:1
+    |
+216 | / pub fn simulate_heat_balance_zone_air_temperatures_with_weather_records(
+217 | |     model: &SimulationModel,
+218 | |     weather_records: &[EpwRecord],
+219 | |     options: HeatBalanceSimulationOptions,
+...   |
+227 | | }
+    | |_- similarly named function `simulate_heat_balance_zone_air_temperatures_with_weather_records` defined here
+    |
+help: a function with a similar name exists
+    |
+ 21 -             simulate_heat_balance_zone_air_temperatures_with_production_weather_and_warmup_reporting(
+ 21 +             simulate_heat_balance_zone_air_temperatures_with_weather_records(
+    |
+help: consider importing this function through its public re-export
+   --> crates\ep_runtime\src\runtime\tests/part01.rs:1:5
+    |
+  1 +     use crate::simulate_heat_balance_zone_air_temperatures_with_production_weather_and_warmup_reporting;
+    |
+
+error[E0422]: cannot find struct, variant or union type `HeatBalanceOrdinaryWarmupReportInputs` in this scope
+  --> crates\ep_runtime\src\runtime\tests/warmup_ordinary_reports.rs:22:54
+   |
+22 |                 &model,&weather,options,&mut context,HeatBalanceOrdinaryWarmupReportInputs {detailed:true,do_pure_load_calc:false})?
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this struct through its public re-export
+  --> crates\ep_runtime\src\runtime\tests/part01.rs:1:5
+   |
+ 1 +     use crate::HeatBalanceOrdinaryWarmupReportInputs;
+   |
+
+Some errors have detailed explanations: E0422, E0425.
+For more information about an error, try `rustc --explain E0422`.
+error: could not compile `ep_runtime` (lib test) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: this function has too many arguments (8/7)
+   --> crates\ep_runtime\src\runtime.rs:348:1
+    |
+348 | / fn simulate_heat_balance_zone_air_temperatures_internal(
+349 | |     model: &SimulationModel,
+350 | |     weather_dry_bulb_c: &[f64],
+351 | |     weather_records: Option<&[EpwRecord]>,
+...   |
+358 | |     reporting: Option<HeatBalanceOrdinaryWarmupReportInputs>,
+359 | | ) -> Result<HeatBalanceSimulation, RuntimeError> {
+    | |________________________________________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.96.0/index.html#too_many_arguments
+    = note: `-D clippy::too-many-arguments` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::too_many_arguments)]`
+
+error: derefed type is same as origin
+   --> crates\ep_runtime\src\runtime.rs:561:9
+    |
+561 |         initialization.as_deref_mut(),
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `initialization`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.96.0/index.html#needless_option_as_deref
+    = note: `-D clippy::needless-option-as-deref` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::needless_option_as_deref)]`
+
+error: could not compile `ep_runtime` (lib) due to 2 previous errors

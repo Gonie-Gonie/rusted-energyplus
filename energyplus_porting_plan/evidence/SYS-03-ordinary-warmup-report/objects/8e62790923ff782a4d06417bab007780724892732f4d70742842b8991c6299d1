@@ -1,0 +1,155 @@
+{
+  "schema": "sys02-selected-report-invocation-Source-preparation.v1",
+  "status": "SOURCE-READY-unexecuted",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/SYS-02/warmup-report-invocation-prep-01/run_selected_report.py",
+      "sha256": "c3f2e10d5db9d3e904bf26faaccc22f8dc39ce268cc50925b6dc662d50c1341c",
+      "size_bytes": 10900,
+      "line_count": 146
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-report-invocation-prep-01/README.md",
+      "sha256": "d5df641e80ee2897a2d7d3d7c87a70f224f63ff392c57dd5cea4a76ce54f3d90",
+      "size_bytes": 2654,
+      "line_count": 13
+    },
+    {
+      "path": ".runtime/porting/SYS-02/seal-warmup-report-invocation-01.py",
+      "sha256": "7cdbdaad627ce70fc157fa836e22a343adc2fb9043baf591d3277a2854dbae1c",
+      "size_bytes": 5983,
+      "line_count": 46
+    }
+  ],
+  "Source_dependencies": [
+    {
+      "path": ".runtime/porting/SYS-02/warmup-selected-comparison-prep-03/manifest.json",
+      "sha256": "43726e7117bfa2ddca19a0cb73235dd7e1fd8cdb6d78ce2720995960a12cce07",
+      "size_bytes": 55638,
+      "line_count": 1262
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-selected-comparison-prep-03/compare.py",
+      "sha256": "fc2351ba9447ed468255d3f1c020f3734f5bee1fb72e0c41e627a511853b6240",
+      "size_bytes": 33967,
+      "line_count": 442
+    },
+    {
+      "path": ".runtime/porting/SYS-02/warmup-selected-comparison-prep-03/policy.json",
+      "sha256": "b0322ec362129c5499636a885aa0cefb64baa95ab07f43ce02e5d677d468604e",
+      "size_bytes": 11220,
+      "line_count": 276
+    },
+    {
+      "path": ".runtime/porting/SYS-03/ordinary-warmup-report-prep-02/manifest.json",
+      "sha256": "77afec21f0dc8e485611b0e11a6f3b308857c44f06b377b25b2060d7e0b310b9",
+      "size_bytes": 39103,
+      "line_count": 898
+    },
+    {
+      "path": ".runtime/porting/SYS-03/apply-ordinary-warmup-report-01.py",
+      "sha256": "2c764f27843ef5694e9ed8d5c642c2ae939f507636ecb3be3dd8b7ad4c3e5e0c",
+      "size_bytes": 6662,
+      "line_count": 108
+    },
+    {
+      "path": ".runtime/porting/SYS-02/run-selected-observer-01.py",
+      "sha256": "7cd1403488fac0fbd730b353053150443ec4097888a23ec427ce3085f7adb688",
+      "size_bytes": 2398,
+      "line_count": 39
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "size_bytes": 8453,
+      "line_count": 204
+    },
+    {
+      "path": ".runtime/porting/SYS-02/rolling-observation-01/comparison-custody.json",
+      "sha256": "fbb707cb30a1adb6acefb096c719aa2d7bf0e154a7323bb201fffcb1c7ada3fd",
+      "size_bytes": 6841,
+      "line_count": 148
+    },
+    {
+      "path": ".runtime/porting/SYS-03/round-format-applied-01/record.json",
+      "sha256": "cb235f65732ec822cb160693ac6ee8fce0d5373cd84659743b2fb26abe0dfa01",
+      "size_bytes": 11256,
+      "line_count": 236
+    },
+    {
+      "path": ".runtime/porting/SYS-03/ordinary-warmup-report-Native-baseline-Root-01.json",
+      "sha256": "e26951d8a902511edd75e3ab49f13090ab3556a2060970cac80db8d781697d77",
+      "size_bytes": 2099,
+      "line_count": 46
+    }
+  ],
+  "exact_addition_diffs": [
+    {
+      "before": {
+        "path": ".runtime/porting/SYS-02/warmup-report-invocation-prep-01/before.empty",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "proposal": {
+        "path": ".runtime/porting/SYS-02/warmup-report-invocation-prep-01/run_selected_report.py",
+        "sha256": "c3f2e10d5db9d3e904bf26faaccc22f8dc39ce268cc50925b6dc662d50c1341c",
+        "size_bytes": 10900,
+        "line_count": 146
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-02/warmup-report-invocation-prep-01/run_selected_report.py.addition.diff",
+        "sha256": "a00c593dffb1020d14cad8b8f51076ae329e3993b8b9358666e9a8a3d394547e",
+        "size_bytes": 11222,
+        "line_count": 149
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/SYS-02/warmup-report-invocation-prep-01/before.empty",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "proposal": {
+        "path": ".runtime/porting/SYS-02/warmup-report-invocation-prep-01/README.md",
+        "sha256": "d5df641e80ee2897a2d7d3d7c87a70f224f63ff392c57dd5cea4a76ce54f3d90",
+        "size_bytes": 2654,
+        "line_count": 13
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-02/warmup-report-invocation-prep-01/README.md.addition.diff",
+        "sha256": "5351ea5c271b75c23a4253faaa3a08f21aebb8badf27ab6ef4285ca9d278dccb",
+        "size_bytes": 2829,
+        "line_count": 16
+      }
+    }
+  ],
+  "runtime_interfaces": {
+    "argv_options": [
+      "--applied-record",
+      "--formatter-acceptance"
+    ],
+    "applied_record_schema": "sys03-ordinary-A-warmup-report-actual-application.v1",
+    "formatter_acceptance_schema": "sys03-ordinary-warmup-report-formatter-review.v1",
+    "formatter_acceptance_fields": [
+      "actual_application",
+      "source_final",
+      "Root_FULL_formatter_correspondence_accepted",
+      "Header_FULL_formatter_correspondence_accepted"
+    ],
+    "custody_schema": "sys02-selected-warmup-comparison-custody.v1",
+    "frozen_inputs_schema": "sys02-selected-report-invocation-frozen-inputs.v1",
+    "workflow_schema": "sys02-selected-report-invocation.v1",
+    "historical_Native_replay": false,
+    "ordinary_tests": false,
+    "comparer_policy_changed": false,
+    "actual_Rust_observer_source_count": 19,
+    "future_record_and_approval_hashes_are_explicit_runtime_operands": true
+  },
+  "target_or_Cargo_or_script_execution_performed": false,
+  "Native_or_Rust_numerical_outputs_read_during_authorship": false,
+  "canonical_Source_changed": false,
+  "expected_values_supplied": false,
+  "gates_updated": false
+}

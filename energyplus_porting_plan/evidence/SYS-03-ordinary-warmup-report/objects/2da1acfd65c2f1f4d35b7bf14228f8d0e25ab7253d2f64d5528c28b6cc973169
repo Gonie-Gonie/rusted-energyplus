@@ -1,0 +1,28 @@
+--- .runtime/porting/SYS-03/ordinary-warmup-report-prep-01/proposed/crates/ep_runtime/src/weather_day/production.rs
++++ crates/ep_runtime/src/weather_day/production.rs
+@@ -445,13 +445,21 @@
+     }
+     /// Borrow only actual report operands after the genuine current-step call.
+     pub fn warmup_report_context(&self) -> Result<ProductionWarmupReportContext, WeatherDayError> {
+-        let phase = self.current_phase.borrow().ok_or_else(|| WeatherDayError::admission("missing report weather phase"))?;
++        let phase = self
++            .current_phase
++            .borrow()
++            .ok_or_else(|| WeatherDayError::admission("missing report weather phase"))?;
+         let session = self.session.borrow();
+         let global = &session.state.global;
+         Ok(ProductionWarmupReportContext {
+-            phase, begin_environment: global.begin_envrn_flag, warmup_flag: global.warmup_flag,
+-            end_day: global.end_day_flag, day: global.day_of_sim, hour: global.hour_of_day,
+-            time_step: global.time_step, time_steps_in_hour: global.time_steps_in_hour,
++            phase,
++            begin_environment: global.begin_envrn_flag,
++            warmup_flag: global.warmup_flag,
++            end_day: global.end_day_flag,
++            day: global.day_of_sim,
++            hour: global.hour_of_day,
++            time_step: global.time_step,
++            time_steps_in_hour: global.time_steps_in_hour,
+             run_period_environment: global.kind_of_sim == 3,
+             environment_name: session.state.environment.environment_name.clone(),
+         })

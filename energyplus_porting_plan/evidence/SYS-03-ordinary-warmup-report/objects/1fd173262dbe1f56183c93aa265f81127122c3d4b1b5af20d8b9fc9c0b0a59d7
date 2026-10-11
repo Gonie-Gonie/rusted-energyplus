@@ -1,0 +1,85 @@
+--- .runtime/porting/SYS-03/ordinary-warmup-report-prep-01/proposed/crates/ep_runtime/src/runtime.rs
++++ crates/ep_runtime/src/runtime.rs
+@@ -334,11 +334,21 @@
+     reporting: HeatBalanceOrdinaryWarmupReportInputs,
+ ) -> Result<HeatBalanceSimulation, RuntimeError> {
+     simulate_heat_balance_zone_air_temperatures_internal(
+-        model, &[], None, Some(HeatBalanceWeatherDriver::Production(weather)),
+-        options, &[], Some(context), Some(reporting),
+-    )
+-}
+-
++        model,
++        &[],
++        None,
++        Some(HeatBalanceWeatherDriver::Production(weather)),
++        options,
++        &[],
++        Some(context),
++        Some(reporting),
++    )
++}
++
++#[expect(
++    clippy::too_many_arguments,
++    reason = "Retain explicit source-order weather, coefficient and output owners"
++)]
+ fn simulate_heat_balance_zone_air_temperatures_internal(
+     model: &SimulationModel,
+     weather_dry_bulb_c: &[f64],
+@@ -395,12 +405,23 @@
+         .transpose()?;
+     if reporting.is_some() {
+         let actual = match weather_driver {
+-            Some(HeatBalanceWeatherDriver::Production(weather)) => weather.warmup_report_context()?,
+-            _ => return Err(RuntimeError::WarmupUnavailable { reason: "missing actual ordinary weather phase before initialization".into() }),
++            Some(HeatBalanceWeatherDriver::Production(weather)) => {
++                weather.warmup_report_context()?
++            }
++            _ => {
++                return Err(RuntimeError::WarmupUnavailable {
++                    reason: "missing actual ordinary weather phase before initialization".into(),
++                });
++            }
+         };
+-        initialization.as_deref_mut()
+-            .ok_or_else(|| RuntimeError::WarmupUnavailable { reason: "missing ordinary output owner before initialization".into() })?
+-            .backend.state.warmup_flag = actual.warmup_flag;
++        initialization
++            .as_deref_mut()
++            .ok_or_else(|| RuntimeError::WarmupUnavailable {
++                reason: "missing ordinary output owner before initialization".into(),
++            })?
++            .backend
++            .state
++            .warmup_flag = actual.warmup_flag;
+     }
+     let (mut state, internal_gain_schedule_cache, mut internal_gain_schedule_cache_profile) =
+         init_heat_balance_source_order_path(|| {
+@@ -449,8 +470,15 @@
+         })?;
+     if let Some(input) = reporting {
+         crate::heat_balance::warmup::ordinary::prepare(
+-            model, &mut state, weather_driver, input,
+-            initialization.as_deref_mut().ok_or_else(|| RuntimeError::WarmupUnavailable { reason: "missing explicit ordinary output context".into() })?,
++            model,
++            &mut state,
++            weather_driver,
++            input,
++            initialization
++                .as_deref_mut()
++                .ok_or_else(|| RuntimeError::WarmupUnavailable {
++                    reason: "missing explicit ordinary output context".into(),
++                })?,
+         )?;
+     }
+     let mut warmup_day_end_zone_air_states = Vec::new();
+@@ -534,7 +562,7 @@
+         zone_steps_per_hour,
+         seconds_per_timestep,
+         first_hour_interpolation_starting_values,
+-        initialization.as_deref_mut(),
++        initialization,
+     )?;
+     if let Some(driver) = weather_driver {
+         driver.finish_environment()?;

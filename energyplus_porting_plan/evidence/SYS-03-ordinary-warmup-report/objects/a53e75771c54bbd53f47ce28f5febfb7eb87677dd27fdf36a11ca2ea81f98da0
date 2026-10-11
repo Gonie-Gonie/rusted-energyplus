@@ -1,0 +1,11 @@
+
+running 1 test
+test heat_balance::warmup::selected_reference::observe_literal_selected_warmup_methods ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3324 filtered out; finished in 25.64s
+
+   Compiling ep_runtime v0.1.0 (C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\crates\ep_runtime)
+    Finished `test` profile [unoptimized] target(s) in 56.15s
+     Running unittests src\lib.rs (target\debug\deps\ep_runtime-880f77a2e9883822.exe)
+{"receipt": {"path": ".runtime/porting/SYS-02/report-observation-01/Rust/cargo-command/receipt.json", "sha256": "9eb26385b8545da407539c0b11c7c327cdbc29c3e8d89789cf1d4ae825688b1b"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+{"sidecar": {"path": ".runtime/porting/SYS-02/report-observation-01/Rust/result.custody.json", "sha256": "5aa27e0d2234dae54022ad877b1031b7331c26dbad89488e15655a569c48c292", "size_bytes": 2023}, "actual_Cargo_exit_code": 0}

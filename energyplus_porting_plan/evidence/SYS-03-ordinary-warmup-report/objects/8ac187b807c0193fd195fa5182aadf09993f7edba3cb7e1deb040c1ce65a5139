@@ -1,0 +1,67 @@
+--- crates/ep_runtime/src/heat_balance/warmup_report.rs (held report c34)
++++ crates/ep_runtime/src/heat_balance/warmup_report.rs (ordinary proposal)
+@@ -48,6 +48,8 @@
+     pub load_stddev: Vec<Option<f64>>,
+     pub first_detailed_write: bool,
+     pub first_summary_write: bool,
++    pub warmup_convergence_warning: bool,
++    pub sizing_warmup_convergence_warning: bool,
+     pub last_local_summaries: Vec<WarmupReportSummary>,
+ }
+ 
+@@ -96,8 +98,21 @@
+             load: vec![vec![0.0; zones]; points_per_day],
+             maximum_load: vec![vec![0.0; zones]; points_per_day],
+             temperature_stddev: vec![None; points_per_day], load_stddev: vec![None; points_per_day],
+-            first_detailed_write: true, first_summary_write: true, last_local_summaries: Vec::new(),
++            first_detailed_write: true, first_summary_write: true, warmup_convergence_warning: false,
++            sizing_warmup_convergence_warning: false, last_local_summaries: Vec::new(),
+         })
++    }
++
++    /// InitHeatBalance BeginEnvrn resets arrays/Count, not scratch/header/warning flags.
++    pub fn begin_environment(&mut self) -> Result<(), WarmupReportError> {
++        self.validate_layout()?;
++        self.temperature_difference.fill(0.0);
++        self.load_difference.fill(0.0);
++        for matrix in [&mut self.temperature, &mut self.load, &mut self.maximum_load] {
++            for row in matrix { row.fill(0.0); }
++        }
++        self.count = 0;
++        Ok(())
+     }
+ 
+     fn validate_layout(&self) -> Result<(), WarmupReportError> {
+@@ -185,11 +200,12 @@
+                 sum_load_stddev += self.load_stddev[point].ok_or(WarmupReportError::Unavailable("unwritten load scratch"))?;
+             }
+             let stddev_load = (sum_load_stddev / count).sqrt();
+-            self.last_local_summaries.push(WarmupReportSummary { zone_index, mean_temperature, mean_load, stddev_temperature, stddev_load });
+-            writeln!(eio, " Warmup Convergence Information,{},{},{},{},{},{},{},{},{},{}", self.zone_names[zone_index],
++            let summary = WarmupReportSummary { zone_index, mean_temperature, mean_load, stddev_temperature, stddev_load };
++            self.last_local_summaries.push(summary);
++            writeln!(eio, " Warmup Convergence Information,{},{},{},{},{},{},{},{},{},{}", self.zone_names[summary.zone_index],
+                 format_args!("{environment_header} {}", self.configuration.environment_name),
+-                round(mean_temperature)?, round(stddev_temperature)?, pass_fail(zone.pass_flags[0])?, pass_fail(zone.pass_flags[1])?,
+-                round(mean_load)?, round(stddev_load)?, pass_fail(zone.pass_flags[2])?, pass_fail(zone.pass_flags[3])?)?;
++                round(summary.mean_temperature)?, round(summary.stddev_temperature)?, pass_fail(zone.pass_flags[0])?, pass_fail(zone.pass_flags[1])?,
++                round(summary.mean_load)?, round(summary.stddev_load)?, pass_fail(zone.pass_flags[2])?, pass_fail(zone.pass_flags[3])?)?;
+         }
+         Ok(())
+     }
+@@ -198,3 +214,15 @@
+ #[cfg(test)]
+ #[path = "warmup_report_tests.rs"]
+ mod tests;
++
++impl From<WarmupReportError> for crate::error::RuntimeError {
++    fn from(error: WarmupReportError) -> Self {
++        use crate::error::WarmupOutputError;
++        let error = match error {
++            WarmupReportError::Unavailable(reason) => WarmupOutputError::Unavailable(reason.into()),
++            WarmupReportError::Format(reason) => WarmupOutputError::Format(format!("{reason:?}")),
++            WarmupReportError::Io(error) => WarmupOutputError::Io(error),
++        };
++        Self::WarmupOutput(Box::new(error))
++    }
++}

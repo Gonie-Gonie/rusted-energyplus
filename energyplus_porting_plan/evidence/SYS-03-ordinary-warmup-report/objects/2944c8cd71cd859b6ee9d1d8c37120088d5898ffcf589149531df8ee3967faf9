@@ -1,0 +1,12 @@
+--- .runtime/porting/SYS-03/ordinary-warmup-report-prep-01/proposed/crates/ep_run/src/lib.rs
++++ crates/ep_run/src/lib.rs
+@@ -28,8 +28,8 @@
+ mod sch01_trace;
+ mod support;
+ mod support_registry;
++mod warmup_report_controls;
+ mod weather_solar_controls;
+-mod warmup_report_controls;
+ mod zon01_trace;
+ 
+ pub use config::*;

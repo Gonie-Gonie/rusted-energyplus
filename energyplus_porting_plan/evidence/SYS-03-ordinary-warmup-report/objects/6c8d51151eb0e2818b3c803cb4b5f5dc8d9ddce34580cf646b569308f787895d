@@ -1,0 +1,39 @@
+{
+  "schema": "sys03-ordinary-warmup-report-Header-fixture-correspondence-review.v1",
+  "actual_application": {
+    "path": ".runtime/porting/SYS-03/ordinary-warmup-report-applied-03/record.json",
+    "sha256": "3a9bf1cf2735d1fc44c16f2f6ea64fad74c581d6a237131d1db20a352f785032",
+    "size_bytes": 49800
+  },
+  "selected_actual_application": {
+    "path": ".runtime/porting/SYS-03/ordinary-warmup-report-applied-02/record.json",
+    "sha256": "4625cb6fc6f8d2b17ac99e7e30d17a98abd17ee058798d7caed2f41a7b6e5e01",
+    "size_bytes": 45842,
+    "line_count": 916
+  },
+  "source_final": {
+    "path": ".runtime/porting/source-objects/d3/d34a84b7f0fad57ae1a46799a8b9b8b31247239206556ce342bb4e17287775c4",
+    "sha256": "d34a84b7f0fad57ae1a46799a8b9b8b31247239206556ce342bb4e17287775c4"
+  },
+  "Header_FULL_test_fixture_correction_correspondence_accepted": true,
+  "Header_FULL_cumulative_source_correspondence_accepted": true,
+  "inherited_formatter_build_fix_review": {
+    "path": ".runtime/porting/SYS-03/ordinary-warmup-report-Header-formatter-review-02.json",
+    "sha256": "1dd29cdeb90a42a7febd99e9a89e1c54cbfbd97ab84bc5597d65c82d89a632d6"
+  },
+  "actual_fixture_name_fix": {
+    "path": ".runtime/porting/SYS-03/ordinary-warmup-report-fixture-name-fix-prep-01/manifest.json",
+    "sha256": "7910657aedc0ffc348022b7da0b3cb97a27fc5cedb3e8b0e54f6df55a092d2af",
+    "size_bytes": 8106
+  },
+  "Source_member_count": 3928,
+  "all_other_Source_members_unchanged": 3927,
+  "cumulative_application_rows_regenerated": 20,
+  "changed_paths": [
+    "crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs"
+  ],
+  "correction_scope": "One test fixture-builder identifier only; supplies existing genuine R1/Wall names. Numeric inputs, geometry, production code, assertions and selected D362 evidence are unchanged.",
+  "numerical_results_read": false,
+  "targets_executed": false,
+  "gates_updated": false
+}

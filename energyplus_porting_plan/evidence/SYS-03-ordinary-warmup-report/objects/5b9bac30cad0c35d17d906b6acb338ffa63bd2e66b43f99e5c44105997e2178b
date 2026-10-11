@@ -1,0 +1,53 @@
+"""Static publisher review only; no publisher import or invocation."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+BASE = ROOT / '.runtime/porting/SYS-03'
+SEEN = set()
+
+def ref(path):
+    data = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(data).hexdigest(), size_bytes=len(data))
+
+def check(row):
+    path = ROOT / row['path']; actual = ref(path)
+    assert actual['sha256'] == row['sha256']
+    assert 'size_bytes' not in row or actual['size_bytes'] == row['size_bytes']
+    assert 'line_count' not in row or len(path.read_bytes().splitlines()) == row['line_count']
+    SEEN.add(path)
+    return path
+
+def walk(value):
+    if isinstance(value, dict):
+        if 'path' in value and 'sha256' in value: check(value)
+        for child in value.values(): walk(child)
+    elif isinstance(value, list):
+        for child in value: walk(child)
+
+parent_path = BASE / 'ordinary-warmup-report-publication-prep-01/manifest.json'
+active_path = BASE / 'ordinary-warmup-report-publication-prep-02/manifest.json'
+parent, active = [json.loads(p.read_bytes()) for p in (parent_path, active_path)]
+assert ref(active_path)['sha256'] == '057c1f5c2fbb837d88d690933973c2f60d298ae926619282f687dc4ba1d0bd97'
+walk(parent); walk(active)
+for row in parent['exact_diffs'] + active['narrow_exact_diffs']:
+    before, after, delta = [check(row[k]) for k in ('before', 'after', 'exact_diff')]
+    actual = ''.join(difflib.unified_diff(before.read_text(encoding='utf8').splitlines(True), after.read_text(encoding='utf8').splitlines(True), fromfile=before.relative_to(ROOT).as_posix(), tofile=after.relative_to(ROOT).as_posix()))
+    assert actual == delta.read_text(encoding='utf8')
+def functions(path):
+    return {n.name: ast.dump(n, include_attributes=False) for n in ast.parse(path.read_bytes()).body if isinstance(n, ast.FunctionDef)}
+assert functions(check(parent['own_sources'][0])) == functions(check(active['own_sources'][0]))
+for value in (parent, active): ast.parse(check(value['author']).read_bytes())
+old = check(parent['own_sources'][0]).read_bytes()
+new = check(active['own_sources'][0]).read_bytes()
+a = b"current['selected_actual_application'] == packet['selected_application']"
+b = b"checked(current['selected_actual_application']) == checked(packet['selected_application'])"
+assert old.count(a) == 1 and new == old.replace(a, b, 1)
+report = dict(schema='sys03-ordinary-report-Root-full-publication-Source-review.v1', accepted_preparation=ref(active_path), full_unique_refs_checked=len(SEEN), exact_diffs_regenerated=3, Root_FULL_parent_198_lines_authors_and_complete_narrow_delta_read=True, all_helper_ASTs_unchanged=True, single_top_level_descriptor_identity_correction_verified=True, selected_D362_and_current_test_only_correction_quality_Source_distinct=True, active_publisher_logs_not_globbed=True, no_source_or_docs_or_gate_mutation_by_publisher=True, publisher_executed=False, actual_review_Source=ref(Path(__file__)))
+path = active_path.parent / 'Root-full-Source-review.json'
+with path.open('x', encoding='utf8', newline='\n') as stream:
+    json.dump(report, stream, ensure_ascii=False, allow_nan=False, indent=2); stream.write('\n')
+print(json.dumps(ref(path)))

@@ -1,0 +1,36 @@
+--- .runtime/porting/SYS-02/warmup-report-invocation-prep-01/run_selected_report.py
++++ .runtime/porting/SYS-02/warmup-report-invocation-prep-02/run_selected_report.py
+@@ -75,7 +75,7 @@
+ parser.add_argument('--formatter-acceptance', required=True)
+ args = parser.parse_args()
+ applied_ref, acceptance_ref = operand(args.applied_record), operand(args.formatter_acceptance)
+-assert checked(applied_ref) == ROOT / '.runtime/porting/SYS-03/ordinary-warmup-report-applied-01/record.json'
++assert checked(applied_ref) == ROOT / '.runtime/porting/SYS-03/ordinary-warmup-report-applied-02/record.json'
+ applied, acceptance = load(applied_ref), load(acceptance_ref)
+ assert applied['schema'] == 'sys03-ordinary-A-warmup-report-actual-application.v1'
+ assert applied['source_preparation']['sha256'] == '77afec21f0dc8e485611b0e11a6f3b308857c44f06b377b25b2060d7e0b310b9'
+@@ -83,6 +83,15 @@
+ assert checked(acceptance['actual_application']) == checked(applied_ref) and acceptance['source_final'] == applied['source_final']
+ assert acceptance['Root_FULL_formatter_correspondence_accepted'] is True and acceptance['Header_FULL_formatter_correspondence_accepted'] is True
+ assert applied['numerical_comparison_performed'] is False and applied['ordinary_execution_performed'] is False and applied['gates_updated'] is False
++assert acceptance['Root_FULL_build_fix_correspondence_accepted'] is True and acceptance['Header_FULL_build_fix_correspondence_accepted'] is True
++assert applied['actual_post_application_build_fixes']['sha256'] == acceptance['actual_post_application_build_fixes']['sha256'] == 'ad3febbb71fa3ba8ba5d19e2bf9f830db4cad66303594a655908ad56fe794a7e'
++fixes = load(applied['actual_post_application_build_fixes'])
++assert len(fixes['application_sources']) == 2 and fixes['arithmetic_or_branch_or_output_order_changed'] is False
++checked(applied['previous_actual_application'])
++checked(fixes['previous_full_formatter_acceptance'])
++assert applied['arithmetic_or_branch_or_output_order_changed_by_build_fixes'] is False
++post_fmt = load(applied['actual_post_application_fix_format_receipt'])
++assert post_fmt['exit_code'] == 0 and post_fmt['command'] == ['cargo', 'fmt', '--all'] and post_fmt['source_snapshot'] == applied['post_application_fix_literal_Source']
+ assert applied['source_before']['sha256'] == '5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548'
+ assert full(COMPARER)['sha256'] == '43726e7117bfa2ddca19a0cb73235dd7e1fd8cdb6d78ce2720995960a12cce07'
+ comparer_ref = full(COMPARER); comparer = load(comparer_ref)
+@@ -123,7 +132,7 @@
+ OUT.mkdir(); (OUT / 'Rust').mkdir()
+ input_path = OUT / 'Rust-input.json'; input_path.write_bytes(checked(policy['Rust_input_source']).read_bytes())
+ policy_path = OUT / 'prospective-policy.json'; policy_path.write_bytes(checked(policy_source).read_bytes())
+-packet.update(prospective_policy=full(policy_path), Rust_input=full(input_path), Rust_launch_source=launcher_ref, actual_Rust_observer_sources=actual_sources, Root_and_other_author_FULL_formatter_correspondence_accepted=True, Root_reviewed_literal_environment_launcher=True, actual_ordinary_application=applied_ref, actual_formatter_acceptance=acceptance_ref)
++packet.update(prospective_policy=full(policy_path), Rust_input=full(input_path), Rust_launch_source=launcher_ref, actual_Rust_observer_sources=actual_sources, Root_and_other_author_FULL_formatter_correspondence_accepted=True, Root_and_other_author_FULL_build_fix_correspondence_accepted=True, actual_post_application_build_fixes=applied['actual_post_application_build_fixes'], source_correspondence_scope='accepted original formatter plus separately reviewed compile/lint fixes; no arithmetic, branch or output-order change', Root_reviewed_literal_environment_launcher=True, actual_ordinary_application=applied_ref, actual_formatter_acceptance=acceptance_ref)
+ checked(packet['Rust_input']); checked(packet['prospective_policy'])
+ frozen = dict(schema='sys02-selected-report-invocation-frozen-inputs.v1', actual_application=applied_ref, actual_formatter_acceptance=acceptance_ref, current_Source_snapshot=applied['source_final'], reviewed_comparer=comparer_ref, actual_comparer_source=compare_source, prospective_policy_source=policy_source, frozen_policy=packet['prospective_policy'], actual_Rust_input=packet['Rust_input'], actual_Rust_observer_sources=actual_sources, historical_Native_custody=full(HISTORY), historical_Native_artifacts={k: packet[k] for k in native_keys}, frozen_artifacts=list(FROZEN.values()), Native_replay_performed=False, ordinary_tests_or_execution_performed=False, gates_updated=False)
+ write(OUT / 'frozen-inputs.json', frozen)

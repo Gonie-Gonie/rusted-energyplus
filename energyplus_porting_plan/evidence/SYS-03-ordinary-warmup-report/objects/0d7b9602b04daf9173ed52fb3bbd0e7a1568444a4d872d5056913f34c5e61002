@@ -1,0 +1,89 @@
+
+        state.dataGlobal->DoZoneSizing = false;
+        state.dataGlobal->DoSystemSizing = false;
+        state.dataGlobal->DoPlantSizing = false;
+        state.dataGlobal->DoDesDaySim = true;
+        state.dataGlobal->DoWeathSim = true;
+        state.dataGlobal->DoHVACSizingSimulation = false;
+        state.dataGlobal->HVACSizingSimMaxIterations = 0;
+        CurrentModuleObject = "SimulationControl";
+        NumRunControl = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        if (NumRunControl > 0) {
+            state.dataSimulationManager->RunControlInInput = true;
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     1,
+                                                                     Alphas,
+                                                                     NumAlpha,
+                                                                     Number,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            if (Alphas(1) == "YES") {
+                state.dataGlobal->DoZoneSizing = true;
+            }
+            if (Alphas(2) == "YES") {
+                state.dataGlobal->DoSystemSizing = true;
+            }
+            if (Alphas(3) == "YES") {
+                state.dataGlobal->DoPlantSizing = true;
+            }
+            if (Alphas(4) == "NO") {
+                state.dataGlobal->DoDesDaySim = false;
+            }
+            if (Alphas(5) == "NO") {
+                state.dataGlobal->DoWeathSim = false;
+            }
+            if (NumAlpha > 5) {
+                if (Alphas(6) == "YES") {
+                    state.dataGlobal->DoHVACSizingSimulation = true;
+                    if (!state.dataGlobal->DoPlantSizing) { // if not doing plant sizing, cannot do HVAC sizing simulation
+                        state.dataGlobal->DoHVACSizingSimulation = false;
+
+                        ShowWarningError(
+                            state, "GetProjectData: Mismatch in the Sizing Flags Do HVAC Sizing and Do Plant Sizing in SimulationControl object");
+                        ShowContinueError(state, "...The Do HVAC Sizing Simulation for Sizing Periods flag is YES, but the Do Plant Sizing");
+                        ShowContinueError(state, "...Calculation flag is NO.  This is not allowed.  Either set the Do HVAC Sizing Simulation");
+                        ShowContinueError(state, "...for Sizing Periods flag to NO or set the Do Plant Sizing Calculation to YES and add the");
+                        ShowContinueError(state, "...appropriate Sizing:Plant object(s) to the input file.  The simulation continues with");
+                        ShowContinueError(state, "...the Do HVAC Sizing flag reset to NO.");
+                    } else {
+                        std::string spObject = "Sizing:Plant";
+                        int NumPltSizInput = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, spObject);
+                        if (NumPltSizInput == 0 && state.dataGlobal->DoHVACSizingSimulation && state.dataGlobal->DoPlantSizing) {
+                            ShowSevereError(
+                                state,
+                                EnergyPlus::format(
+                                    "GetProjectData: No {} object entered when the Do HVAC Sizing Simulation and Do Plant Sizing are both YES in the "
+                                    "SimulationControl object.",
+                                    spObject));
+                            ShowContinueError(state,
+                                              EnergyPlus::format("...When these input flags are both yes, a {} object is required.", spObject));
+                            ShowContinueError(state,
+                                              EnergyPlus::format("...Either add one or more appropriate {} objects to the input file", spObject));
+                            ShowContinueError(state, "...or change both the Do HVAC Sizing Simulation and Do Plant Sizing are both YES. ");
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+            }
+        }
+        if (state.dataSysVars->DDOnly) {
+            state.dataGlobal->DoDesDaySim = true;
+            state.dataGlobal->DoWeathSim = false;
+        }
+        if (state.dataSysVars->FullAnnualRun) {
+            state.dataGlobal->DoDesDaySim = false;
+            state.dataGlobal->DoWeathSim = true;
+        }
+
+        if ((!state.dataGlobal->DoDesDaySim && !state.dataGlobal->DoWeathSim && !state.dataGlobal->DoHVACSizingSimulation) &&
+            (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing)) {
+            state.dataGlobal->DoPureLoadCalc = true;
+        }
+
+        CurrentModuleObject = "PerformancePrecisionTradeoffs";
+        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);

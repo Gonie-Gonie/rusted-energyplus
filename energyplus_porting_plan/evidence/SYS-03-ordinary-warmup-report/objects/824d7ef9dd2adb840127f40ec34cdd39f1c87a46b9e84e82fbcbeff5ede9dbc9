@@ -1,0 +1,48 @@
+"""Seal one optional-metadata identity correction; never invoke the publisher."""
+import ast
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+import shutil
+
+ROOT = Path(__file__).resolve().parents[3]
+OLD = ROOT / '.runtime/porting/SYS-03/ordinary-warmup-report-publication-prep-01'
+OUT = ROOT / '.runtime/porting/SYS-03/ordinary-warmup-report-publication-prep-02'
+
+
+def ref(path):
+    b = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(b).hexdigest(), size_bytes=len(b), line_count=len(b.splitlines()))
+
+
+def write(path, b):
+    with path.open('xb') as stream: stream.write(b)
+
+
+assert ref(OLD / 'manifest.json')['sha256'] == 'fd29b653f979a3b485c54ead7310d78b3664285a21417072736834f770e1e1d8'
+OUT.mkdir(); (OUT / 'before').mkdir()
+for name in ('publish.py', 'README.md', 'manifest.json'): shutil.copyfile(OLD / name, OUT / 'before' / name)
+old = (OLD / 'publish.py').read_bytes()
+a = b"current['selected_actual_application'] == packet['selected_application']"
+b = b"checked(current['selected_actual_application']) == checked(packet['selected_application'])"
+assert old.count(a) == 1
+new = old.replace(a, b)
+assert new.replace(b, a) == old
+write(OUT / 'publish.py', new)
+readme = (OLD / 'README.md').read_text(encoding='utf8').replace('current nineteen production sources stay equal to selected02', 'all production Source stays equal to selected02; eighteen of the nineteen Rust application rows stay byte-exact')
+readme += '\nSuccessor02 authenticates both selected-application descriptors independently by full SHA/size and compares resolved file identity, admitting optional line_count metadata on only one descriptor. Both original descriptors remain retained. The other historical custody refs keep their actual shapes; no Source/scientific/status/archive behavior changes. The README also clarifies eighteen unchanged Rust rows plus one test row.\n'
+write(OUT / 'README.md', readme.encode())
+diffs = []
+for name in ('publish.py', 'README.md'):
+    before, after = OUT / 'before' / name, OUT / name
+    delta = OUT / (name + '.narrow.diff')
+    write(delta, ''.join(difflib.unified_diff(before.read_text(encoding='utf8').splitlines(True), after.read_text(encoding='utf8').splitlines(True), fromfile=before.relative_to(ROOT).as_posix(), tofile=after.relative_to(ROOT).as_posix())).encode())
+    diffs.append(dict(before=ref(before), after=ref(after), exact_diff=ref(delta)))
+manifest = copy.deepcopy(json.loads((OLD / 'manifest.json').read_bytes()))
+manifest.update(own_sources=[ref(OUT / 'publish.py')], author=ref(Path(__file__)), README=ref(OUT / 'README.md'), predecessor_source_preparation=ref(OLD / 'manifest.json'), before_archives=[ref(OUT / 'before' / name) for name in ('publish.py', 'README.md', 'manifest.json')], narrow_exact_diffs=diffs)
+manifest['source_dependencies'] += [ref(OLD / name) for name in ('manifest.json', 'publish.py', 'README.md')]
+ast.parse(new); ast.parse(Path(__file__).read_bytes())
+write(OUT / 'manifest.json', (json.dumps(manifest, ensure_ascii=False, indent=2) + '\n').encode())
+print(json.dumps(ref(OUT / 'manifest.json')))

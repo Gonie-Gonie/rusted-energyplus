@@ -1,0 +1,24 @@
+pub(crate) fn original_material_name(
+    model: &TypedModel,
+    id: MaterialId,
+) -> Result<&str, CtfReportUnavailable> {
+    let material = model
+        .materials
+        .iter()
+        .find(|material| material.id == id)
+        .ok_or(CtfReportUnavailable::Material(id))?;
+    original_loader_name(&model.ctf_report_names.materials, id, &material.name)
+}
+pub(crate) fn original_loader_name<'a, I: Copy + Eq>(
+    names: &'a [(I, String)],
+    id: I,
+    normalized: &NormalizedName,
+) -> Result<&'a str, CtfReportUnavailable> {
+    let mut found = names.iter().filter(|(actual, _)| *actual == id);
+    let (_, name) = found
+        .next()
+        .ok_or(CtfReportUnavailable::LoaderNameUnavailable)?;
+    if found.next().is_some() || NormalizedName::new(name) != *normalized {
+        return Err(CtfReportUnavailable::Association);
+    }
+    Ok(name)

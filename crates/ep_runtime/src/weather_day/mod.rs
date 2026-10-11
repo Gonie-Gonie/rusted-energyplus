@@ -24,8 +24,8 @@ pub use error::WeatherDayError;
 pub use handoff::update_weather_data;
 pub use lifecycle::{WeatherEnvironmentConfiguration, WeatherSession};
 pub use production::{
-    ProductionCtfHistoryClock, ProductionSolarMetadata, ProductionWeatherContext,
-    ProductionWeatherTimestepSeries, WeatherDayPhase,
+    ProductionCtfHistoryClock, ProductionSolarMetadata, ProductionWarmupReportContext,
+    ProductionWeatherContext, ProductionWeatherTimestepSeries, WeatherDayPhase,
 };
 pub use sky::{WeatherSky, default_clark_allen_sky_emissivity, default_weather_file_sky};
 pub use state::{

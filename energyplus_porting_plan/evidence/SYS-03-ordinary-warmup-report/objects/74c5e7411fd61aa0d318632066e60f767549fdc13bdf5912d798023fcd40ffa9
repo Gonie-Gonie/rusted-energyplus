@@ -1,0 +1,15 @@
+            state.dataHeatBalMgr->MaxCoolLoadZone = -9999.0;
+            state.dataHeatBalMgr->MaxTempZone = -9999.0;
+            state.dataHeatBalMgr->MinTempZone = 1000.0;
+            state.dataHeatBalMgr->TempZone = -9999.0;
+            state.dataHeatBalMgr->LoadZone = -9999.0;
+            state.dataHeatBalMgr->TempZonePrevDay = 1000.0;
+            state.dataHeatBalMgr->LoadZonePrevDay = -9999.0;
+            state.dataHeatBalMgr->TempZoneSecPrevDay = -9999.0;
+            state.dataHeatBalMgr->WarmupTempDiff = 0.0;
+            state.dataHeatBalMgr->WarmupLoadDiff = 0.0;
+            state.dataHeatBalMgr->TempZoneRpt = 0.0;
+            state.dataHeatBalMgr->LoadZoneRpt = 0.0;
+            state.dataHeatBalMgr->MaxLoadZoneRpt = 0.0;
+            state.dataHeatBalMgr->CountWarmupDayPoints = 0;
+

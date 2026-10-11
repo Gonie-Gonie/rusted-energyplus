@@ -1,0 +1,198 @@
+"""Root-only evidence publication; preserve historical selected proof and current test quality separately."""
+import argparse
+import difflib
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import re
+import shutil
+
+ROOT = Path.cwd()
+OUT = ROOT / 'energyplus_porting_plan/evidence/SYS-03-ordinary-warmup-report'
+SELECTED = {}
+SEEN = {}
+EXCLUDED = {'.exe', '.dll', '.obj', '.a', '.lib', '.map', '.epw', '.pdb'}
+RECORDER_SHA = '5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'
+
+
+def ref(path):
+    with path.open('rb') as stream: digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=digest, size_bytes=path.stat().st_size)
+
+
+def checked(row, retain=True):
+    path = (ROOT / row['path']).resolve()
+    assert path.is_relative_to(ROOT) and path.suffix.lower() not in EXCLUDED
+    actual = ref(path)
+    assert actual['sha256'] == row['sha256'] and ('size_bytes' not in row or actual['size_bytes'] == row['size_bytes'])
+    SEEN[path] = actual
+    if retain: SELECTED[path] = actual
+    return path
+
+
+def load(row):
+    return json.loads(checked(row).read_bytes())
+
+
+def operand(text):
+    path, digest = text.rsplit('#', 1)
+    return ref(checked(dict(path=path, sha256=digest)))
+
+
+def selected_refs(value):
+    if isinstance(value, dict):
+        if 'path' in value and 'sha256' in value:
+            path = Path(value['path'])
+            if not path.is_absolute() and value['path'].startswith(('.runtime/', '.reference/', 'energyplus_porting_plan/evidence/')) and path.suffix.lower() not in EXCLUDED: checked(value)
+        else:
+            for child in value.values(): selected_refs(child)
+    elif isinstance(value, list):
+        for child in value: selected_refs(child)
+
+
+def receipt(row, snapshot=None, exit_code=None):
+    value = load(row)
+    assert value['schema'] == 'recorded-porting-command.v1' and value['finished_utc'] and value['launch_error'] is None
+    assert value['executed_launcher']['archive']['sha256'] == RECORDER_SHA
+    for key in ('stdout', 'stderr', 'source_snapshot'): checked(value[key])
+    checked(value['executed_launcher']['archive'])
+    if snapshot is not None: assert value['source_snapshot'] == snapshot and value['source_bytes_match_before_and_after'] is True
+    if exit_code is not None: assert value['exit_code'] == exit_code
+    return value
+
+
+def snapshot_rows(row, current=False):
+    value = load(row)
+    assert value['schema'] == 'rust-command-source-snapshot.v1' and value['bytes_normalized'] is False
+    rows = {item['historical_path']: item for item in value['files']}
+    assert len(rows) == len(value['files'])
+    for name, item in rows.items():
+        archive = checked(item['archive'], retain=False)
+        assert archive.stat().st_size == item['size_bytes']
+        if current: checked(dict(path=name, sha256=item['archive']['sha256'], size_bytes=item['size_bytes']), retain=False)
+    if current:
+        paths = set((ROOT / 'crates').rglob('*.rs')) | set((ROOT / 'crates').rglob('Cargo.toml'))
+        paths |= {ROOT / name for name in ('Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml') if (ROOT / name).is_file()}
+        assert {p.relative_to(ROOT).as_posix() for p in paths} == set(rows)
+    return rows
+
+
+def exact_diff(before, after, delta):
+    a, b, d = checked(before).read_bytes(), checked(after).read_bytes(), checked(delta).read_text(encoding='utf8')
+    if not d: assert a == b; return
+    labels = d.splitlines()[:2]
+    assert len(labels) == 2 and labels[0].startswith('--- ') and labels[1].startswith('+++ ')
+    assert ''.join(difflib.unified_diff(a.decode().splitlines(True), b.decode().splitlines(True), fromfile=labels[0][4:], tofile=labels[1][4:])) == d
+
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--packet', required=True, help='Closed actual Root publication operands path#SHA256')
+args = parser.parse_args()
+packet_ref = operand(args.packet); packet = load(packet_ref)
+assert packet['schema'] == 'sys03-ordinary-A-report-publication-inputs.v1' and not OUT.exists()
+selected = load(packet['selected_application']); current = load(packet['current_application'])
+assert selected['schema'] == current['schema'] == 'sys03-ordinary-A-warmup-report-actual-application.v1'
+assert packet['selected_application']['sha256'] == '4625cb6fc6f8d2b17ac99e7e30d17a98abd17ee058798d7caed2f41a7b6e5e01'
+assert current['selected_actual_application'] == packet['selected_application'] and current['source_final_before_test_fixture_correction'] == selected['source_final']
+assert current['actual_post_application_fixture_name_fix']['sha256'] == '7910657aedc0ffc348022b7da0b3cb97a27fc5cedb3e8b0e54f6df55a092d2af'
+assert current['production_Source_changed_by_test_fixture_correction'] is False and current['all_other_3927_Source_files_preserved_during_test_fixture_correction'] is True
+before, after = snapshot_rows(selected['source_final']), snapshot_rows(current['source_final'], current=True)
+fixture = 'crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs'
+assert len(before) == len(after) == 3928 and before.keys() == after.keys()
+assert [name for name in before if before[name]['archive']['sha256'] != after[name]['archive']['sha256']] == [fixture]
+fix, = current['test_only_source_correction']
+assert fix['canonical_path'] == fixture
+a, b = checked(fix['before_archive']).read_bytes(), checked(fix['proposal']).read_bytes()
+assert a.count(b'cube_model()') == 1 and b == a.replace(b'cube_model()', b'ctf_ordinary_output_test_model()', 1)
+assert fix['actual_before']['sha256'] == before[fixture]['archive']['sha256'] and fix['actual_final_archive']['sha256'] == after[fixture]['archive']['sha256'] == fix['proposal']['sha256']
+exact_diff(fix['before_archive'], fix['proposal'], fix['exact_diff'])
+assert [r['canonical_path'] for r in selected['application']] == [r['canonical_path'] for r in current['application']] and len(current['application']) == 20
+for old, row in zip(selected['application'], current['application']):
+    for key in old:
+        if key not in ('actual_final', 'actual_final_archive', 'actual_formatter_diff', 'correspondence_scope'): assert row[key] == old[key]
+    checked(row['actual_final'], retain=False); exact_diff(row['proposal'], row['actual_final_archive'], row['actual_formatter_diff'])
+    if row['canonical_path'] != fixture: assert old['actual_final']['sha256'] == row['actual_final']['sha256']
+review = load(packet['actual_formatter_acceptance'])
+assert review['actual_application'] == packet['current_application'] and review['source_final'] == current['source_final']
+assert review['Root_FULL_fixture_name_Source_review_accepted'] is True and review['Header_FULL_fixture_name_Source_review_accepted'] is True
+workflow = load(packet['actual_invocation_workflow']); comparison = load(packet['actual_comparison'])
+assert workflow['schema'] == 'sys02-selected-report-invocation.v1' and workflow['actual_comparison'] == packet['actual_comparison']
+assert workflow['actual_comparison_execution'] == packet['actual_comparison_execution'] and workflow['Native_replay_performed'] is False
+assert comparison['schema'] == 'sys02-selected-warmup-comparison.v1' and comparison['findings']['actual_Cargo_Source_snapshot'] == selected['source_final']
+statuses = {'pass-selected-methods-only': 0, 'fail-selected-methods-or-input-join': 1}
+execution = receipt(packet['actual_comparison_execution'], selected['source_final'], statuses[comparison['status']])
+command = execution['command']; assert len(command) == 9 and command[1:4] == ['-X', 'utf8', '-B']
+comparer = ROOT / '.runtime/porting/SYS-02/warmup-selected-comparison-prep-03/compare.py'
+assert (ROOT / command[4]).resolve() == comparer and ref(comparer)['sha256'] == 'fc2351ba9447ed468255d3f1c020f3734f5bee1fb72e0c41e627a511853b6240'
+assert command[5] == '--custody' and command[7] == '--output-dir' and operand(command[6])['sha256'] == comparison['actual_custody']['sha256']
+assert (ROOT / command[8]).resolve() == checked(packet['actual_comparison']).parent
+custody = load(comparison['actual_custody']); assert custody['actual_ordinary_application'] == packet['selected_application']
+historical_review = load(custody['actual_formatter_acceptance'])
+assert historical_review['actual_application'] == packet['selected_application'] and historical_review['Root_FULL_formatter_correspondence_accepted'] is True and historical_review['Header_FULL_formatter_correspondence_accepted'] is True
+assert custody['Rust_execution'] == workflow['actual_Cargo_execution'] and custody['Rust_execution_sidecar'] == workflow['actual_execution_sidecar']
+sidecar = load(workflow['actual_execution_sidecar'])
+assert sidecar['actual_input_before'] == sidecar['actual_input_after'] == custody['Rust_input'] and sidecar['actual_output'] == custody['Rust_result']
+assert sidecar['input_bytes_match_before_after'] is True and sidecar['actual_Cargo_execution'] == workflow['actual_Cargo_execution']
+receipt(workflow['actual_Cargo_execution'], selected['source_final'], 0); receipt(workflow['actual_Rust_launch'], selected['source_final'], 0)
+receipt(custody['Native_execution'], comparison['findings']['actual_Native_Source_snapshot'], 0)
+assert comparison['all_mismatches_retained'] is True
+checked(comparison['mismatches'])
+for key in ('producer_equivalence_PASS_claimed', 'rolling_report_backend_PASS_claimed', 'full_error_backend_or_ordinary_report_caller_PASS_claimed', 'whole_SYS02_SYS03_or_ordinary_handoff_PASS_claimed', 'gates_updated'): assert comparison[key] is False
+assert all(row['counted_as_PASS'] is False for row in comparison['findings']['unavailable_owner_families'])
+passed = comparison['status'] == 'pass-selected-methods-only'
+assert not passed or comparison['mismatch_count'] == 0 and comparison['findings']['input_and_initial_owner_join_passed'] and comparison['findings']['endpoint_pairing_performed']
+quality = []
+config = ['--config', 'profile.dev.debug=0', '--config', 'profile.test.debug=0', '--config', 'build.incremental=false', '--locked']
+commands = dict(fmt=['cargo', 'fmt', '--all', '--', '--check'], clippy=['cargo', 'clippy', *config, '--workspace', '--all-targets', '--', '-D', 'warnings'], focused=['cargo', 'test', *config, '-p', 'ep_runtime', '--lib', 'heat_balance::'], workspace=['cargo', 'test', *config, '--workspace'])
+assert [row['role'] for row in packet['quality']] == ['fmt', 'clippy', 'focused', 'workspace']
+for row in packet['quality'] + packet.get('supplementary_quality', []):
+    value = receipt(row['execution'], current['source_final'], 0)
+    assert execution['finished_utc'] <= value['started_utc'] and value['command'][0] == 'cargo'
+    if row['role'] in commands: assert value['command'] == commands[row['role']]
+    groups = re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored;', checked(value['stdout']).read_text(encoding='utf8'))
+    totals = [sum(int(group[i]) for group in groups) for i in range(3)]
+    assert totals[1] == 0 and (totals[0] > 0 if row['role'] not in ('fmt', 'clippy') else not groups)
+    quality.append(dict(role=row['role'], execution=row['execution'], actual_command=value['command'], actual_Source_snapshot=value['source_snapshot'], test_totals=totals, test_result_groups=len(groups)))
+receipt(current['historical_failed_workspace_preserved'])
+receipt(selected['historical_failed_build_preserved'])
+for row in packet.get('closed_executions', []): receipt(row)
+for key in ('selected_application', 'current_application', 'actual_formatter_acceptance', 'actual_invocation_workflow', 'actual_comparison', 'actual_comparison_execution'):
+    selected_refs(load(packet[key]))
+selected_refs(custody); selected_refs(sidecar)
+frozen = load(workflow['frozen_inputs'])
+assert frozen['actual_application'] == packet['selected_application'] and frozen['current_Source_snapshot'] == selected['source_final']
+for key in ('actual_Rust_observer_sources', 'historical_Native_artifacts', 'reviewed_comparer', 'actual_comparer_source', 'prospective_policy_source', 'frozen_policy'): selected_refs(frozen[key])
+for row in packet['selected_source_preparations']: selected_refs(load(row))
+for row in packet.get('opaque_lineage', []) + packet.get('prior_evidence', []): checked(row)
+large = {checked(custody['Native_result']), checked(custody['Rust_result'])}
+SELECTED[Path(__file__).resolve()] = ref(Path(__file__).resolve())
+checked(dict(path='tools/porting/record_command.py', sha256=RECORDER_SHA))
+stored = {}
+for directory in (ROOT / 'energyplus_porting_plan/evidence').glob('*/objects'):
+    for path in directory.iterdir():
+        if path.is_file() and re.fullmatch('[0-9a-f]{64}', path.name): stored.setdefault(path.name, path)
+OUT.mkdir(); (OUT / 'objects').mkdir(); (OUT / 'observations').mkdir()
+objects = []
+for path, original in sorted(SELECTED.items()):
+    assert ref(path) == original
+    if path in large:
+        matches = sorted((ROOT / 'energyplus_porting_plan/evidence').glob('*/observations/' + original['sha256'] + '.json.gz'))
+        target = matches[0] if matches else OUT / 'observations' / (original['sha256'] + '.json.gz')
+        if not matches:
+            with path.open('rb') as source, target.open('xb') as output:
+                with gzip.GzipFile(filename='', fileobj=output, mode='wb', mtime=0) as compressed: shutil.copyfileobj(source, compressed)
+        digest = hashlib.sha256(); size = 0
+        with gzip.open(target, 'rb') as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b''): digest.update(chunk); size += len(chunk)
+        assert digest.hexdigest() == original['sha256'] and size == original['size_bytes']
+        objects.append(dict(original=original, stored=ref(target), encoding='gzip', complete_original_bytes_verified=True, reused=bool(matches)))
+    else:
+        target = stored.get(original['sha256'], OUT / 'objects' / original['sha256'])
+        if not target.exists(): shutil.copyfile(path, target)
+        actual = ref(target); assert actual['sha256'] == original['sha256'] and actual['size_bytes'] == original['size_bytes']
+        stored[original['sha256']] = target; objects.append(dict(original=original, stored=actual, reused=not target.is_relative_to(OUT)))
+assert all(ref(path) == row for path, row in SEEN.items())
+summary = dict(schema='sys03-actual-selected-report-and-ordinary-A-source-quality.v1', actual_publication_packet=packet_ref, selected_application=packet['selected_application'], current_application=packet['current_application'], selected_comparison_Source_snapshot=selected['source_final'], current_quality_Source_snapshot=current['source_final'], selected_comparison_replayed_after_test_fixture_correction=False, test_only_source_correction=current['test_only_source_correction'], unrelated_Source_files_preserved_by_test_fixture_correction=3927, actual_formatter_acceptance=packet['actual_formatter_acceptance'], actual_invocation_workflow=packet['actual_invocation_workflow'], actual_comparison=packet['actual_comparison'], actual_comparison_execution=packet['actual_comparison_execution'], actual_status=comparison['status'], actual_counts=comparison['counts'], actual_findings=comparison['findings'], actual_mismatch_count=comparison['mismatch_count'], actual_mismatches=comparison['mismatches'], selected_report_owner_and_EIO_text_comparison_passed=passed, actual_quality=quality, selected_objects=objects, opaque_lineage=packet.get('opaque_lineage', []), prior_evidence=packet.get('prior_evidence', []), selected_closure_transitively_replayable=False, binary_payloads_retained=False, selected_result_full_bytes_retained=True, unavailable_counted_as_PASS=False, producer_equivalence_PASS_claimed=False, full_error_backend_or_ordinary_report_caller_PASS_claimed=False, whole_SYS02_SYS03_or_ordinary_handoff_PASS_claimed=False, gates_updated=False, A_gate_count_unchanged='14/54', B_gate_count_unchanged='14/64', docs_updated=False)
+with (OUT / 'summary.json').open('x', encoding='utf8', newline='\n') as stream: json.dump(summary, stream, ensure_ascii=False, allow_nan=False, indent=2); stream.write('\n')
+print(json.dumps(dict(summary=ref(OUT / 'summary.json'), selected_objects=len(objects), actual_status=comparison['status'], docs_updated=False, gates_updated=False)))

@@ -1,0 +1,231 @@
+--- crates/ep_runtime/src/heat_balance/warmup_report.rs (actual before)
++++ crates/ep_runtime/src/heat_balance/warmup_report.rs (Source proposal)
+@@ -0,0 +1,228 @@
++//! Retained selected RecKeep/report owners; actual ordinary caller wiring is separate.
++use super::{HeatBalanceWarmupZoneConvergence, super::source_round_format};
++use std::io::{self, Write};
++
++pub(crate) const DETAILED_HEADER: &str = "! <Warmup Convergence Information - Detailed>,Zone Name,Time Step,Hour of Day,Warmup Temperature Difference {deltaC},Warmup Load Difference {W}\n";
++pub(crate) const SUMMARY_HEADER: &str = "! <Warmup Convergence Information>,Zone Name,Environment Type/Name,Average Warmup Temperature Difference {deltaC},Std Dev Warmup Temperature Difference {deltaC},Max Temperature Pass/Fail Convergence,Min Temperature Pass/Fail Convergence,Average Warmup Load Difference {W},Std Dev Warmup Load Difference {W},Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence\n";
++
++#[derive(Clone, Debug, PartialEq)]
++pub(crate) struct WarmupReportConfiguration {
++    pub doing_sizing: bool,
++    pub do_pure_load_calc: bool,
++    pub run_period_environment: bool,
++    pub environment_name: String,
++    pub detailed: bool,
++}
++
++#[derive(Clone, Copy, Debug, PartialEq)]
++pub(crate) struct WarmupRecordClock {
++    pub day: u32,
++    pub hour: u32,
++    pub time_step: u32,
++}
++
++/// Actual local means/deviations retained for observation, not Native allocated fields.
++#[derive(Clone, Copy, Debug, PartialEq)]
++pub(crate) struct WarmupReportSummary {
++    pub zone_index: usize,
++    pub mean_temperature: f64,
++    pub mean_load: f64,
++    pub stddev_temperature: f64,
++    pub stddev_load: f64,
++}
++
++#[derive(Clone, Debug, PartialEq)]
++pub(crate) struct WarmupReportState {
++    pub zone_names: Vec<String>,
++    pub configuration: WarmupReportConfiguration,
++    pub points_per_day: usize,
++    pub count: usize,
++    pub temperature_difference: Vec<f64>,
++    pub load_difference: Vec<f64>,
++    /// Full allocated point-major arrays, including all untouched zero tails.
++    pub temperature: Vec<Vec<f64>>,
++    pub load: Vec<Vec<f64>>,
++    pub maximum_load: Vec<Vec<f64>>,
++    /// Allocation is real; None explicitly retains uninitialized value availability.
++    pub temperature_stddev: Vec<Option<f64>>,
++    pub load_stddev: Vec<Option<f64>>,
++    pub first_detailed_write: bool,
++    pub first_summary_write: bool,
++    pub warmup_convergence_warning: bool,
++    pub sizing_warmup_convergence_warning: bool,
++    pub last_local_summaries: Vec<WarmupReportSummary>,
++}
++
++#[derive(Debug)]
++pub(crate) enum WarmupReportError {
++    Unavailable(&'static str),
++    Format(source_round_format::SourceRoundFormatUnavailable),
++    Io(io::Error),
++}
++
++impl std::fmt::Display for WarmupReportError {
++    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
++        match self {
++            Self::Unavailable(reason) => write!(f, "warmup report owner unavailable: {reason}"),
++            Self::Format(reason) => write!(f, "warmup report R formatting unavailable: {reason:?}"),
++            Self::Io(error) => std::fmt::Display::fmt(error, f),
++        }
++    }
++}
++impl std::error::Error for WarmupReportError {
++    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
++        match self { Self::Io(error) => Some(error), _ => None }
++    }
++}
++impl From<io::Error> for WarmupReportError {
++    fn from(value: io::Error) -> Self { Self::Io(value) }
++}
++
++fn round(value: f64) -> Result<String, WarmupReportError> {
++    source_round_format::round(value, 10).map_err(WarmupReportError::Format)
++}
++
++fn pass_fail(flag: u8) -> Result<&'static str, WarmupReportError> {
++    match flag { 1 => Ok("Fail"), 2 => Ok("Pass"), _ => Err(WarmupReportError::Unavailable("PassFlag outside actual 1..2 bounds")) }
++}
++
++impl WarmupReportState {
++    pub fn new(zone_names: Vec<String>, time_steps_in_hour: u32, configuration: WarmupReportConfiguration) -> Result<Self, WarmupReportError> {
++        let points_per_day = usize::try_from(time_steps_in_hour).ok().and_then(|n| n.checked_mul(24))
++            .filter(|n| *n > 0).ok_or(WarmupReportError::Unavailable("report allocation extent"))?;
++        let zones = zone_names.len();
++        Ok(Self {
++            zone_names, configuration, points_per_day, count: 0,
++            temperature_difference: vec![0.0; zones], load_difference: vec![0.0; zones],
++            temperature: vec![vec![0.0; zones]; points_per_day],
++            load: vec![vec![0.0; zones]; points_per_day],
++            maximum_load: vec![vec![0.0; zones]; points_per_day],
++            temperature_stddev: vec![None; points_per_day], load_stddev: vec![None; points_per_day],
++            first_detailed_write: true, first_summary_write: true, warmup_convergence_warning: false,
++            sizing_warmup_convergence_warning: false, last_local_summaries: Vec::new(),
++        })
++    }
++
++    /// InitHeatBalance BeginEnvrn resets arrays/Count, not scratch/header/warning flags.
++    pub fn begin_environment(&mut self) -> Result<(), WarmupReportError> {
++        self.validate_layout()?;
++        self.temperature_difference.fill(0.0);
++        self.load_difference.fill(0.0);
++        for matrix in [&mut self.temperature, &mut self.load, &mut self.maximum_load] {
++            for row in matrix { row.fill(0.0); }
++        }
++        self.count = 0;
++        Ok(())
++    }
++
++    fn validate_layout(&self) -> Result<(), WarmupReportError> {
++        let zones = self.zone_names.len();
++        let matrices = [&self.temperature, &self.load, &self.maximum_load];
++        if self.points_per_day == 0 || self.temperature_difference.len() != zones || self.load_difference.len() != zones
++            || self.temperature_stddev.len() != self.points_per_day || self.load_stddev.len() != self.points_per_day
++            || matrices.iter().any(|m| m.len() != self.points_per_day || m.iter().any(|row| row.len() != zones)) {
++            return Err(WarmupReportError::Unavailable("incomplete full report allocation"));
++        }
++        Ok(())
++    }
++
++    /// Called immediately after this same Zone's genuine daily/rolling record.
++    /// Errors retain all already reached Zone writes, Count and sink prefix.
++    pub fn record_zone(&mut self, zone_index: usize, zone: &HeatBalanceWarmupZoneConvergence, warmup_flag: bool, clock: WarmupRecordClock, eio: &mut dyn Write) -> Result<(), WarmupReportError> {
++        if warmup_flag || clock.day != 1 || (self.configuration.doing_sizing && !self.configuration.do_pure_load_calc) {
++            return Ok(());
++        }
++        self.validate_layout()?;
++        if zone_index >= self.zone_names.len() { return Err(WarmupReportError::Unavailable("actual report Zone index")); }
++        self.temperature_difference[zone_index] = (zone.rolling[4] - zone.rolling[2]).abs();
++        self.load_difference[zone_index] = (zone.rolling[5] - zone.rolling[3]).abs();
++        if zone_index == 0 {
++            self.count = self.count.checked_add(1).ok_or(WarmupReportError::Unavailable("Count increment"))?;
++        }
++        if self.count == 0 || self.count > self.points_per_day {
++            return Err(WarmupReportError::Unavailable("actual Count outside report allocation"));
++        }
++        self.temperature[self.count - 1][zone_index] = self.temperature_difference[zone_index];
++        self.load[self.count - 1][zone_index] = self.load_difference[zone_index];
++        self.maximum_load[self.count - 1][zone_index] = zone.rolling[1];
++        if self.configuration.detailed {
++            if self.first_detailed_write {
++                eio.write_all(DETAILED_HEADER.as_bytes())?;
++                self.first_detailed_write = false;
++            }
++            let temperature = round(self.temperature_difference[zone_index])?;
++            let load = round(self.load_difference[zone_index])?;
++            writeln!(eio, " Warmup Convergence Information - Detailed, {},{},{},{},{}", self.zone_names[zone_index], clock.time_step, clock.hour, temperature, load)?;
++        }
++        Ok(())
++    }
++
++    /// Literal Report mutation order; repeated calls normalize retained Load again.
++    pub fn report(&mut self, warmup_flag: bool, zones: &[HeatBalanceWarmupZoneConvergence], eio: &mut dyn Write) -> Result<(), WarmupReportError> {
++        if warmup_flag { return Ok(()); }
++        self.validate_layout()?;
++        if zones.len() != self.zone_names.len() { return Err(WarmupReportError::Unavailable("complete report Zone owner order")); }
++        if self.first_summary_write && !zones.is_empty() {
++            eio.write_all(SUMMARY_HEADER.as_bytes())?;
++            self.first_summary_write = false;
++        }
++        self.temperature_stddev.fill(Some(0.0));
++        self.load_stddev.fill(Some(0.0));
++        self.last_local_summaries.clear();
++        let environment_header = if self.configuration.run_period_environment { "RunPeriod:" } else { "SizingPeriod:" };
++        for (zone_index, zone) in zones.iter().enumerate() {
++            if self.count == 0 || self.count > self.points_per_day { return Err(WarmupReportError::Unavailable("zero or out-of-bounds report Count")); }
++            let count = self.count as f64;
++            let mut sum_temperature = 0.0;
++            for point in 0..self.count { sum_temperature += self.temperature[point][zone_index]; }
++            let mean_temperature = sum_temperature / count;
++            for point in 0..self.count {
++                if self.maximum_load[point][zone_index] > 1.0e-4 {
++                    self.load[point][zone_index] /= self.maximum_load[point][zone_index];
++                } else { self.load[point][zone_index] = 0.0; }
++            }
++            let mut sum_load = 0.0;
++            for point in 0..self.count { sum_load += self.load[point][zone_index]; }
++            let mean_load = sum_load / count;
++            for point in 0..self.count {
++                let temperature_difference = self.temperature[point][zone_index] - mean_temperature;
++                let load_difference = self.load[point][zone_index] - mean_load;
++                self.temperature_stddev[point] = Some(temperature_difference * temperature_difference);
++                self.load_stddev[point] = Some(load_difference * load_difference);
++            }
++            let mut sum_temperature_stddev = 0.0;
++            let mut sum_load_stddev = 0.0;
++            for point in 0..self.count {
++                sum_temperature_stddev += self.temperature_stddev[point].ok_or(WarmupReportError::Unavailable("unwritten temperature scratch"))?;
++            }
++            let stddev_temperature = (sum_temperature_stddev / count).sqrt();
++            for point in 0..self.count {
++                sum_load_stddev += self.load_stddev[point].ok_or(WarmupReportError::Unavailable("unwritten load scratch"))?;
++            }
++            let stddev_load = (sum_load_stddev / count).sqrt();
++            let summary = WarmupReportSummary { zone_index, mean_temperature, mean_load, stddev_temperature, stddev_load };
++            self.last_local_summaries.push(summary);
++            writeln!(eio, " Warmup Convergence Information,{},{},{},{},{},{},{},{},{},{}", self.zone_names[summary.zone_index],
++                format_args!("{environment_header} {}", self.configuration.environment_name),
++                round(summary.mean_temperature)?, round(summary.stddev_temperature)?, pass_fail(zone.pass_flags[0])?, pass_fail(zone.pass_flags[1])?,
++                round(summary.mean_load)?, round(summary.stddev_load)?, pass_fail(zone.pass_flags[2])?, pass_fail(zone.pass_flags[3])?)?;
++        }
++        Ok(())
++    }
++}
++
++#[cfg(test)]
++#[path = "warmup_report_tests.rs"]
++mod tests;
++
++impl From<WarmupReportError> for crate::error::RuntimeError {
++    fn from(error: WarmupReportError) -> Self {
++        use crate::error::WarmupOutputError;
++        let error = match error {
++            WarmupReportError::Unavailable(reason) => WarmupOutputError::Unavailable(reason.into()),
++            WarmupReportError::Format(reason) => WarmupOutputError::Format(format!("{reason:?}")),
++            WarmupReportError::Io(error) => WarmupOutputError::Io(error),
++        };
++        Self::WarmupOutput(Box::new(error))
++    }
++}

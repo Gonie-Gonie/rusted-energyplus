@@ -918,6 +918,9 @@ pub struct HeatBalanceWarmupConvergenceState {
     pub maximum_day_forced_exit: bool,
     /// Sticky representability failure at the demand-report seam.
     pub unavailable_reason: Option<&'static str>,
+    /// Selected report allocation when genuine flags/environment/sink inputs exist.
+    /// Present only for an explicit ordinary-A report caller or selected test.
+    pub(crate) report: Option<super::warmup::report::WarmupReportState>,
 }
 
 /// Warmup settings for heat-balance diagnostic traces.
@@ -1090,4 +1093,14 @@ impl HeatBalanceSimulationOptions {
         self.surface_loop_zone_air_correction = surface_loop_zone_air_correction;
         self
     }
+}
+
+/// Input-only selected GetProjectData facts for the explicit ordinary A caller.
+/// Sizing/controlled/generic callers cannot infer these from absent report owners.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct HeatBalanceOrdinaryWarmupReportInputs {
+    /// Actual selected first Output:Diagnostics detailed warmup key.
+    pub detailed: bool,
+    /// Actual selected project control result; the weather A admission requires false.
+    pub do_pure_load_calc: bool,
 }

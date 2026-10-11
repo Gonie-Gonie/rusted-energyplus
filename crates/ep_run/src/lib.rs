@@ -28,6 +28,7 @@ mod psychrometrics_trace;
 mod sch01_trace;
 mod support;
 mod support_registry;
+mod warmup_report_controls;
 mod weather_solar_controls;
 mod zon01_trace;
 

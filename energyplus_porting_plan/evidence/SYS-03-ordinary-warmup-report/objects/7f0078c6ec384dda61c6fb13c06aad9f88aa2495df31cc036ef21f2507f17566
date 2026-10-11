@@ -1,0 +1,71 @@
+{
+  "schema": "sys02-selected-warmup-comparison.v1",
+  "status": "pass-selected-methods-only",
+  "actual_custody": {
+    "path": ".runtime/porting/SYS-02/report-observation-01/comparison-custody.json",
+    "sha256": "8fb40c2ea8c8e22769961d911ebabd30b524cb6722174d432aeb9226064a8bb0"
+  },
+  "actual_prospective_policy": {
+    "path": ".runtime/porting/SYS-02/warmup-selected-comparison-prep-03/policy.json",
+    "sha256": "b0322ec362129c5499636a885aa0cefb64baa95ab07f43ce02e5d677d468604e",
+    "size_bytes": 11220
+  },
+  "findings": {
+    "input_and_initial_owner_join_passed": true,
+    "endpoint_pairing_performed": true,
+    "actual_case_count": 25,
+    "actual_selected_boundary_count": 371,
+    "actual_selected_Report_method_calls": 14,
+    "actual_report_boundary_count": 371,
+    "unavailable_report_operations": [],
+    "unavailable_owner_families": [
+      {
+        "family": "warning_flags",
+        "counted_as_PASS": false
+      },
+      {
+        "family": "sensible_report_producer_and_energies",
+        "counted_as_PASS": false
+      },
+      {
+        "family": "error_backend_and_callbacks",
+        "counted_as_PASS": false
+      },
+      {
+        "family": "error_console_prefixes",
+        "counted_as_PASS": false
+      },
+      {
+        "family": "ordinary_weather_handoff",
+        "counted_as_PASS": false
+      }
+    ],
+    "actual_Cargo_Source_snapshot": {
+      "path": ".runtime/porting/source-objects/d3/d362e54d3fda7abd6caa874f3cff9ca05b95b1a27005151182bc16099c201ac8",
+      "sha256": "d362e54d3fda7abd6caa874f3cff9ca05b95b1a27005151182bc16099c201ac8"
+    },
+    "actual_Native_Source_snapshot": {
+      "path": ".runtime/porting/source-objects/8f/8fc2a29bcaffe86bd59eeba73792e9f731ee37007ea250488980bccae62f6687",
+      "sha256": "8fc2a29bcaffe86bd59eeba73792e9f731ee37007ea250488980bccae62f6687"
+    }
+  },
+  "counts": {
+    "input_join_comparisons": 10953,
+    "selected_endpoint_comparisons": 10887,
+    "report_initial_owner_comparisons": 3325,
+    "report_endpoint_comparisons": 210245
+  },
+  "mismatch_count": 0,
+  "all_mismatches_retained": true,
+  "mismatches": {
+    "path": ".runtime/porting/SYS-02/report-comparison-01/mismatches.ndjson",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size_bytes": 0
+  },
+  "producer_equivalence_PASS_claimed": false,
+  "rolling_report_backend_PASS_claimed": false,
+  "selected_report_owner_and_EIO_text_comparison_performed": true,
+  "full_error_backend_or_ordinary_report_caller_PASS_claimed": false,
+  "whole_SYS02_SYS03_or_ordinary_handoff_PASS_claimed": false,
+  "gates_updated": false
+}

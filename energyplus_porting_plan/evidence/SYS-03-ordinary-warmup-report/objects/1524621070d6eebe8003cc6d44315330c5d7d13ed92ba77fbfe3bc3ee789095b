@@ -1,0 +1,49 @@
+--- .runtime/porting/SYS-03/ordinary-warmup-report-prep-01/proposed/crates/ep_runtime/src/error.rs
++++ crates/ep_runtime/src/error.rs
+@@ -280,18 +280,40 @@
+ }
+ impl std::error::Error for WarmupOutputError {
+     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+-        match self { Self::Io(error) => Some(error), Self::Backend(error) => Some(error), _ => None }
++        match self {
++            Self::Io(error) => Some(error),
++            Self::Backend(error) => Some(error),
++            _ => None,
++        }
+     }
+ }
+ impl PartialEq for WarmupOutputError {
+     fn eq(&self, other: &Self) -> bool {
+         use crate::heat_balance::error_backend::SourceErrorBackendFailure as B;
+-        let io_equal = |a: &std::io::Error, b: &std::io::Error| a.kind() == b.kind() && a.raw_os_error() == b.raw_os_error() && a.to_string() == b.to_string();
++        let io_equal = |a: &std::io::Error, b: &std::io::Error| {
++            a.kind() == b.kind()
++                && a.raw_os_error() == b.raw_os_error()
++                && a.to_string() == b.to_string()
++        };
+         match (self, other) {
+-            (Self::Unavailable(a), Self::Unavailable(b)) | (Self::Format(a), Self::Format(b)) => a == b,
+-            (Self::Io(a), Self::Io(b)) => io_equal(a,b),
+-            (Self::Backend(B::Effect{operation:a,source:x}), Self::Backend(B::Effect{operation:b,source:y})) => a == b && io_equal(x,y),
+-            (Self::Backend(B::UndefinedCounterIncrement{counter:a}), Self::Backend(B::UndefinedCounterIncrement{counter:b})) => a == b,
++            (Self::Unavailable(a), Self::Unavailable(b)) | (Self::Format(a), Self::Format(b)) => {
++                a == b
++            }
++            (Self::Io(a), Self::Io(b)) => io_equal(a, b),
++            (
++                Self::Backend(B::Effect {
++                    operation: a,
++                    source: x,
++                }),
++                Self::Backend(B::Effect {
++                    operation: b,
++                    source: y,
++                }),
++            ) => a == b && io_equal(x, y),
++            (
++                Self::Backend(B::UndefinedCounterIncrement { counter: a }),
++                Self::Backend(B::UndefinedCounterIncrement { counter: b }),
++            ) => a == b,
+             _ => false,
+         }
+     }

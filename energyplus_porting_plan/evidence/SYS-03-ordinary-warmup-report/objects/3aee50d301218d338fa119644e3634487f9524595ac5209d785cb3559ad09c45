@@ -1,0 +1,2 @@
+
+    Array1D_string const PassFail(2, {"Fail", "Pass"});

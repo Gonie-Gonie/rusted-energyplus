@@ -1,0 +1,13 @@
+	// Allocate Raw Array Memory with ::operator new Even if Size is Zero
+	static
+	void *
+	allocate_zero( size_type const n )
+	{
+#ifdef OBJEXXFCL_ALIGN
+		void * mem( ::operator new( ( n * sizeof( T ) ) + ( OBJEXXFCL_ALIGN - 1 ) ) );
+#else
+		void * mem( ::operator new( n * sizeof( T ) ) );
+#endif
+		assert( ( n == 0u ) || ( mem != nullptr ) );
+		return mem;
+	}

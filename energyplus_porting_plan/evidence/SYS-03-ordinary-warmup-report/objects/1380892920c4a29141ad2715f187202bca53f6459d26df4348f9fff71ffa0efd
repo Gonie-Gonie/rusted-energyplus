@@ -1,0 +1,13 @@
+--- crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs
++++ .runtime/porting/SYS-03/ordinary-warmup-report-build-fixes-prep-01/proposed/crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs
+@@ -18,8 +18,8 @@
+             let mut context=CtfInitializationContext {reports:&mut reports,eio:&mut eio,
+                 backend:SourceErrorBackend {state:&mut backend_state,error_stream:Some(&mut error),console:&mut console,
+                 out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None}};
+-            simulate_heat_balance_zone_air_temperatures_with_production_weather_and_warmup_reporting(
+-                &model,&weather,options,&mut context,HeatBalanceOrdinaryWarmupReportInputs {detailed:true,do_pure_load_calc:false})?
++            crate::simulate_heat_balance_zone_air_temperatures_with_production_weather_and_warmup_reporting(
++                &model,&weather,options,&mut context,crate::HeatBalanceOrdinaryWarmupReportInputs {detailed:true,do_pure_load_calc:false})?
+         };
+         let owner=simulation.state.warmup_convergence.as_ref().ok_or("missing actual ordinary owner")?;
+         let report=owner.report.as_ref().ok_or("missing actual ordinary report allocation")?;

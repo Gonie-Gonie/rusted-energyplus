@@ -1,0 +1,11 @@
+--- crates/ep_runtime/src/weather_day/mod.rs (actual before)
++++ crates/ep_runtime/src/weather_day/mod.rs (Source proposal)
+@@ -25,7 +25,7 @@
+ pub use lifecycle::{WeatherEnvironmentConfiguration, WeatherSession};
+ pub use production::{
+     ProductionCtfHistoryClock, ProductionSolarMetadata, ProductionWeatherContext,
+-    ProductionWeatherTimestepSeries, WeatherDayPhase,
++    ProductionWeatherTimestepSeries, ProductionWarmupReportContext, WeatherDayPhase,
+ };
+ pub use sky::{WeatherSky, default_clark_allen_sky_emissivity, default_weather_file_sky};
+ pub use state::{

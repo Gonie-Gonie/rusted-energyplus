@@ -24,6 +24,9 @@ pub(crate) fn sample_heat_balance_run_period(
     zone_steps_per_hour: u32,
     seconds_per_timestep: f64,
     first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+    mut output: Option<
+        &mut crate::heat_balance::ctf_initialization_context::CtfInitializationContext<'_>,
+    >,
 ) -> Result<HeatBalanceRunPeriodSamples, RuntimeError> {
     let sampled = sample_heat_balance_run_period_with_step_driver(
         model,
@@ -49,7 +52,19 @@ pub(crate) fn sample_heat_balance_run_period(
                 options.inside_hconv_reevaluation_interval,
                 options.surface_loop_zone_air_correction,
             );
-            crate::heat_balance::ctf_surface_lifecycle::ensure_available(state)
+            crate::heat_balance::ctf_surface_lifecycle::ensure_available(state)?;
+            if state
+                .warmup_convergence
+                .as_ref()
+                .is_some_and(|owner| owner.report.is_some())
+            {
+                crate::heat_balance::warmup::ordinary::record_completed_step(
+                    state,
+                    weather_driver,
+                    output.as_deref_mut(),
+                )?;
+            }
+            Ok::<(), crate::error::RuntimeError>(())
         },
     );
     sampled.map(|(samples, _)| samples)

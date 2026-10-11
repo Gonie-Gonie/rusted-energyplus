@@ -839,6 +839,7 @@ struct PreparedRuntimeInputs {
     schedule_cache: ScheduleSeriesCache,
     zone_timestep_schedule_cache: Option<ScheduleSeriesCache>,
     weather_series: Option<ProductionWeatherTimestepSeries>,
+    ordinary_warmup_reporting: Option<ep_runtime::HeatBalanceOrdinaryWarmupReportInputs>,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
@@ -3579,6 +3580,12 @@ fn prepare_runtime_inputs(
         schedule_cache,
         zone_timestep_schedule_cache,
         weather_series,
+        ordinary_warmup_reporting: if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility
+        {
+            Some(crate::warmup_report_controls::resolve(raw_model)?)
+        } else {
+            None
+        },
     })
 }
 
@@ -3608,13 +3615,15 @@ fn execute_rust_runtime(
                 HeatBalanceSimulationOptions::hourly_samples(sample_count)
             };
             let mut initialization = ctf_outputs.context();
-            let simulation = simulate_heat_balance_zone_air_temperatures_with_production_weather_and_initialization_context(
-                model,
-                weather_series,
-                options,
-                &mut initialization,
-            )
-            .map_err(|error| error.to_string())?;
+            let simulation = if let Some(reporting) = runtime_inputs.ordinary_warmup_reporting {
+                ep_runtime::simulate_heat_balance_zone_air_temperatures_with_production_weather_and_warmup_reporting(
+                    model, weather_series, options, &mut initialization, reporting,
+                )
+            } else {
+                simulate_heat_balance_zone_air_temperatures_with_production_weather_and_initialization_context(
+                    model, weather_series, options, &mut initialization,
+                )
+            }.map_err(|error| error.to_string())?;
             Ok(RustRuntimeResult {
                 geometry_snapshot: capture_geometry.then(|| {
                     crate::geometry_trace::runtime_projection(&model.typed, &simulation.state)

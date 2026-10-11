@@ -38,6 +38,7 @@ fn two_zone_records_and_real_day_check_keep_independent_rolling_owners() {
         warmup_flag: true,
         maximum_day_forced_exit: false,
         unavailable_reason: None,
+        report: None,
     };
     owner.zones[0].record(5.0, 1.0, 4.0);
     owner.zones[1].record(-2.0, 8.0, 3.0);

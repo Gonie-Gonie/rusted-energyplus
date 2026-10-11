@@ -1,0 +1,10 @@
+--- crates/ep_runtime/src/runtime/tests/part03.rs (actual before)
++++ crates/ep_runtime/src/runtime/tests/part03.rs (Source proposal)
+@@ -1101,6 +1101,7 @@
+                 },
+             ],
+             None,
++            None,
+         )?;
+ 
+         let floor_initial_slots = simulation

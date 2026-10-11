@@ -30,3 +30,7 @@ EP struct 전체를 복제하지 않고 아래 데이터의 생산자·소비자
 카드는 선언된 출력/변경 필드 외에는 쓰지 않는다.
 단위시험은 읽기 입력뿐 아니라 원본에서 변경되는 캐시·flag·배열도 비교한다.
 캐시 재사용은 입력 키·무효화 시점·계산 순서를 보존한다.
+
+## SYS-02/03 선택 보고서와 실제 A caller
+
+선택 보고서 계약은 Zone별 여섯 rolling owner, 첫 Run day의 차이 벡터·전체 행렬·Count, 보고서 scratch의 실제 할당/기록 범위와 caller 소유 EIO를 구분한다. BeginEnvrn reset, 매 zone timestep의 RecKeep, 실제 첫 Run EndDay의 Report 호출은 각각 원본 시점과 상태를 유지한다. [선택 owner/EIO 비교와 현재 A caller 시험](evidence/SYS-03-ordinary-warmup-report/summary.json)은 전체 backend·부하 생산자·ordinary weather handoff의 Native 동등성을 뜻하지 않는다.

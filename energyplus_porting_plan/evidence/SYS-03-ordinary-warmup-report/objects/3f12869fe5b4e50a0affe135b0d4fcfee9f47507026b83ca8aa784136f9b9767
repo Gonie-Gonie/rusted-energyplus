@@ -1,0 +1,155 @@
+"""Root-only selected report unit, then comparison; no ordinary tests or Native replay."""
+import argparse
+import difflib
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = ROOT / '.runtime/porting/SYS-02/report-observation-01'
+COMPARE_OUT = ROOT / '.runtime/porting/SYS-02/report-comparison-01'
+RECORDER = ROOT / 'tools/porting/record_command.py'
+LAUNCHER = ROOT / '.runtime/porting/SYS-02/run-selected-observer-01.py'
+COMPARER = ROOT / '.runtime/porting/SYS-02/warmup-selected-comparison-prep-03/manifest.json'
+HISTORY = ROOT / '.runtime/porting/SYS-02/rolling-observation-01/comparison-custody.json'
+FROZEN = {}
+
+
+def full(path):
+    with path.open('rb') as stream:
+        sha = hashlib.file_digest(stream, 'sha256').hexdigest()
+    return dict(path=path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else str(path), sha256=sha, size_bytes=path.stat().st_size)
+
+
+def checked(row, external_binary=False):
+    path = (ROOT / row['path']).resolve()
+    assert path.is_relative_to(ROOT) or (external_binary and Path(row['path']).is_absolute() and not str(path).startswith('\\\\') and path.suffix.lower() == '.exe')
+    actual = full(path)
+    assert actual['sha256'] == row['sha256'] and ('size_bytes' not in row or actual['size_bytes'] == row['size_bytes']), row['path']
+    FROZEN[path] = actual
+    return path
+
+
+def operand(token):
+    name, sha = token.rsplit('#', 1)
+    return full(checked(dict(path=name, sha256=sha)))
+
+
+def load(row):
+    return json.loads(checked(row).read_bytes())
+
+
+def write(path, value):
+    with path.open('xb') as stream:
+        stream.write((json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode())
+
+
+def current_source(row):
+    value = load(row)
+    assert value['schema'] == 'rust-command-source-snapshot.v1' and value['bytes_normalized'] is False
+    members = {r['historical_path']: r for r in value['files']}
+    paths = set((ROOT / 'crates').rglob('*.rs')) | set((ROOT / 'crates').rglob('Cargo.toml'))
+    paths |= {ROOT / n for n in ('Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml') if (ROOT / n).is_file()}
+    assert len(members) == len(value['files']) == 3928 and {p.relative_to(ROOT).as_posix() for p in paths} == set(members)
+    for name, item in members.items():
+        checked(item['archive'])
+        checked(dict(path=name, sha256=item['archive']['sha256'], size_bytes=item['size_bytes']))
+    return members
+
+
+def recorded(command, directory, source):
+    code = subprocess.run([sys.executable, '-X', 'utf8', '-B', str(RECORDER), '--output-dir', directory.relative_to(ROOT).as_posix(), '--', *command], cwd=ROOT).returncode
+    row = full(directory / 'receipt.json')
+    receipt = load(row)
+    assert receipt['command'] == command and receipt['exit_code'] == code and receipt['source_snapshot'] == source and receipt['source_bytes_match_before_and_after'] is True
+    assert receipt['launch_error'] is None
+    checked(receipt['stdout']); checked(receipt['stderr'])
+    assert checked(receipt['executed_launcher']['archive']).read_bytes() == RECORDER.read_bytes()
+    return code, row
+
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--applied-record', required=True)
+parser.add_argument('--formatter-acceptance', required=True)
+args = parser.parse_args()
+applied_ref, acceptance_ref = operand(args.applied_record), operand(args.formatter_acceptance)
+assert checked(applied_ref) == ROOT / '.runtime/porting/SYS-03/ordinary-warmup-report-applied-02/record.json'
+applied, acceptance = load(applied_ref), load(acceptance_ref)
+assert applied['schema'] == 'sys03-ordinary-A-warmup-report-actual-application.v1'
+assert applied['source_preparation']['sha256'] == '77afec21f0dc8e485611b0e11a6f3b308857c44f06b377b25b2060d7e0b310b9'
+assert acceptance['schema'] == 'sys03-ordinary-warmup-report-formatter-review.v1'
+assert checked(acceptance['actual_application']) == checked(applied_ref) and acceptance['source_final'] == applied['source_final']
+assert acceptance['Root_FULL_formatter_correspondence_accepted'] is True and acceptance['Header_FULL_formatter_correspondence_accepted'] is True
+assert applied['numerical_comparison_performed'] is False and applied['ordinary_execution_performed'] is False and applied['gates_updated'] is False
+assert acceptance['Root_FULL_build_fix_correspondence_accepted'] is True and acceptance['Header_FULL_build_fix_correspondence_accepted'] is True
+assert applied['actual_post_application_build_fixes']['sha256'] == acceptance['actual_post_application_build_fixes']['sha256'] == 'ad3febbb71fa3ba8ba5d19e2bf9f830db4cad66303594a655908ad56fe794a7e'
+fixes = load(applied['actual_post_application_build_fixes'])
+assert len(fixes['application_sources']) == 2 and fixes['arithmetic_or_branch_or_output_order_changed'] is False
+checked(applied['previous_actual_application'])
+checked(fixes['previous_full_formatter_acceptance'])
+assert applied['arithmetic_or_branch_or_output_order_changed_by_build_fixes'] is False
+post_fmt = load(applied['actual_post_application_fix_format_receipt'])
+assert post_fmt['exit_code'] == 0 and post_fmt['command'] == ['cargo', 'fmt', '--all'] and post_fmt['source_snapshot'] == applied['post_application_fix_literal_Source']
+assert applied['source_before']['sha256'] == '5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548'
+assert full(COMPARER)['sha256'] == '43726e7117bfa2ddca19a0cb73235dd7e1fd8cdb6d78ce2720995960a12cce07'
+comparer_ref = full(COMPARER); comparer = load(comparer_ref)
+for row in comparer['own_sources_and_metadata']:
+    checked(row)
+compare_source, policy_source = comparer['own_sources_and_metadata'][:2]
+policy = load(policy_source)
+assert policy['schema'] == 'sys02-selected-warmup-prospective-comparison-policy.v1' and checked(policy['Rust_source_preparation']) == checked(applied['source_preparation'])
+checked(policy['Rust_source_preparation']); checked(policy['Native_source_preparation']); checked(policy['literal_rate_bindings'])
+assert full(RECORDER)['sha256'] == policy['recorder_source']['sha256'] == '5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'
+checked(policy['recorder_source'])
+assert full(LAUNCHER)['sha256'] == '7cd1403488fac0fbd730b353053150443ec4097888a23ec427ce3085f7adb688'
+launcher_ref = full(LAUNCHER); checked(launcher_ref); checked(full(Path(__file__).resolve()))
+members = current_source(applied['source_final'])
+fmt = load(applied['actual_format_receipt'])
+assert fmt['exit_code'] == 0 and fmt['command'] == ['cargo', 'fmt', '--all'] and fmt['source_snapshot'] == applied['source_literal']
+rows = [r for r in applied['application'] if r['canonical_path'].endswith('.rs')]
+assert len(applied['application']) == 20 and [r['canonical_path'] for r in rows] == policy['Rust_observer_source_paths']
+actual_sources = []
+for row, held in zip(rows, policy['Rust_reviewed_proposals']):
+    assert row['proposal'] == held
+    before, after = checked(row['proposal']).read_bytes(), checked(row['actual_final_archive']).read_bytes()
+    assert checked(row['actual_final']).read_bytes() == after == checked(members[row['canonical_path']]['archive']).read_bytes()
+    expected = ''.join(difflib.unified_diff(before.decode().splitlines(True), after.decode().splitlines(True), fromfile=row['proposal']['path'], tofile=row['canonical_path'])).encode()
+    assert checked(row['actual_formatter_diff']).read_bytes() == expected
+    actual_sources.append(dict(canonical_path=row['canonical_path'], actual_literal_source=row['proposal'], actual_final_source=row['actual_final_archive'], formatter_correspondence_diff=row['actual_formatter_diff']))
+shared_R = load(policy['actual_shared_R_application'])
+for row in shared_R['application']:
+    assert checked(row['actual_final_archive']).read_bytes() == checked(members[row['canonical_path']]['archive']).read_bytes()
+assert full(HISTORY)['sha256'] == 'fbb707cb30a1adb6acefb096c719aa2d7bf0e154a7323bb201fffcb1c7ada3fd'
+history = load(full(HISTORY))
+native_keys = ('Native_input', 'Native_result', 'Native_binary', 'Native_execution', 'Native_build_execution', 'Native_frozen_build_inputs')
+packet = dict(schema='sys02-selected-warmup-comparison-custody.v1', **{k: history[k] for k in native_keys})
+for key in native_keys:
+    checked(packet[key], key == 'Native_binary')
+assert packet['Native_input']['sha256'] == policy['Native_input_source']['sha256']
+assert not OUT.exists() and not COMPARE_OUT.exists()
+OUT.mkdir(); (OUT / 'Rust').mkdir()
+input_path = OUT / 'Rust-input.json'; input_path.write_bytes(checked(policy['Rust_input_source']).read_bytes())
+policy_path = OUT / 'prospective-policy.json'; policy_path.write_bytes(checked(policy_source).read_bytes())
+packet.update(prospective_policy=full(policy_path), Rust_input=full(input_path), Rust_launch_source=launcher_ref, actual_Rust_observer_sources=actual_sources, Root_and_other_author_FULL_formatter_correspondence_accepted=True, Root_and_other_author_FULL_build_fix_correspondence_accepted=True, actual_post_application_build_fixes=applied['actual_post_application_build_fixes'], source_correspondence_scope='accepted original formatter plus separately reviewed compile/lint fixes; no arithmetic, branch or output-order change', Root_reviewed_literal_environment_launcher=True, actual_ordinary_application=applied_ref, actual_formatter_acceptance=acceptance_ref)
+checked(packet['Rust_input']); checked(packet['prospective_policy'])
+frozen = dict(schema='sys02-selected-report-invocation-frozen-inputs.v1', actual_application=applied_ref, actual_formatter_acceptance=acceptance_ref, current_Source_snapshot=applied['source_final'], reviewed_comparer=comparer_ref, actual_comparer_source=compare_source, prospective_policy_source=policy_source, frozen_policy=packet['prospective_policy'], actual_Rust_input=packet['Rust_input'], actual_Rust_observer_sources=actual_sources, historical_Native_custody=full(HISTORY), historical_Native_artifacts={k: packet[k] for k in native_keys}, frozen_artifacts=list(FROZEN.values()), Native_replay_performed=False, ordinary_tests_or_execution_performed=False, gates_updated=False)
+write(OUT / 'frozen-inputs.json', frozen)
+output_path = OUT / 'Rust/result.json'
+code, launch_ref = recorded([sys.executable, '-X', 'utf8', '-B', str(LAUNCHER), str(input_path), str(output_path)], OUT / 'Rust-launch-command', applied['source_final'])
+if code != 0:
+    current_source(applied['source_final'])
+    assert all(full(path) == row for path, row in FROZEN.items())
+    write(OUT / 'failed-selected-execution.json', dict(actual_execution=launch_ref, actual_exit_code=code, comparison_invoked=False, ordinary_tests_invoked=False))
+    raise SystemExit(code)
+sidecar_ref = full(output_path.with_suffix('.custody.json')); sidecar = load(sidecar_ref)
+packet.update(Rust_result=full(output_path), Rust_execution=sidecar['actual_Cargo_execution'], Rust_launch_execution=launch_ref, Rust_execution_sidecar=sidecar_ref)
+write(OUT / 'comparison-custody.json', packet)
+custody_ref = full(OUT / 'comparison-custody.json')
+code, compare_ref = recorded([sys.executable, '-X', 'utf8', '-B', str(checked(compare_source)), '--custody', custody_ref['path'] + '#' + custody_ref['sha256'], '--output-dir', COMPARE_OUT.relative_to(ROOT).as_posix()], OUT / 'comparison-command', applied['source_final'])
+current_source(applied['source_final'])
+assert all(full(path) == row for path, row in FROZEN.items())
+write(OUT / 'workflow.json', dict(schema='sys02-selected-report-invocation.v1', frozen_inputs=full(OUT / 'frozen-inputs.json'), actual_Rust_launch=launch_ref, actual_Cargo_execution=packet['Rust_execution'], actual_execution_sidecar=sidecar_ref, actual_comparison_execution=compare_ref, actual_comparison_exit_code=code, actual_custody=custody_ref, actual_comparison=full(COMPARE_OUT / 'comparison.json'), full_frozen_artifacts_preserved=True, Native_replay_performed=False, ordinary_tests_or_execution_performed=False, numerical_PASS_claimed=False, gates_updated=False))
+print(json.dumps(dict(workflow=full(OUT / 'workflow.json'), actual_comparison_exit_code=code)))
+raise SystemExit(code)

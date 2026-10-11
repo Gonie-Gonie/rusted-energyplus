@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SYS-03\ordinary-warmup-report-publication-prep-02\publish.py", line 166, in <module>
+    for row in packet['selected_source_preparations']: selected_refs(load(row))
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SYS-03\ordinary-warmup-report-publication-prep-02\publish.py", line 49, in selected_refs
+    for child in value.values(): selected_refs(child)
+                                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SYS-03\ordinary-warmup-report-publication-prep-02\publish.py", line 51, in selected_refs
+    for child in value: selected_refs(child)
+                        ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SYS-03\ordinary-warmup-report-publication-prep-02\publish.py", line 47, in selected_refs
+    if not path.is_absolute() and value['path'].startswith(('.runtime/', '.reference/', 'energyplus_porting_plan/evidence/')) and path.suffix.lower() not in EXCLUDED: checked(value)
+                                                                                                                                                                       ^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SYS-03\ordinary-warmup-report-publication-prep-02\publish.py", line 28, in checked
+    assert actual['sha256'] == row['sha256'] and ('size_bytes' not in row or actual['size_bytes'] == row['size_bytes'])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

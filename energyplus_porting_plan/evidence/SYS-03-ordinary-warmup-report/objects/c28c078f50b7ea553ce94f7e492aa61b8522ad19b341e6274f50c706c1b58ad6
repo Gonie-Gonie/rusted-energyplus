@@ -1,0 +1,33 @@
+    fn cube_model() -> TypedModel {
+        let mut model = TypedModel {
+            timestep: TimestepConfig {
+                number_of_timesteps_per_hour: 6,
+            },
+            ..TypedModel::default()
+        };
+        model.materials.push(Material {
+            id: MaterialId(0),
+            name: NormalizedName::new("R1"),
+            definition: ep_model::MaterialDefinition::NoMass(ep_model::NoMassMaterial {
+                roughness: MaterialSurfaceRoughness::Rough,
+                thermal_resistance_m2_k_per_w: 1.0,
+                surface: ep_model::OpaqueSurfaceProperties {
+                    thermal_absorptance: 0.9,
+                    solar_absorptance: 0.75,
+                    visible_absorptance: 0.75,
+                },
+            }),
+        });
+        model.constructions.push(Construction {
+            id: ConstructionId(0),
+            name: NormalizedName::new("Wall"),
+            kind: ConstructionKind::Opaque,
+            outside_layer: Some(MaterialId(0)),
+            layers: vec![MaterialId(0)],
+            thermochromic_master: None,
+            ground_factor: None,
+            air_boundary: None,
+            complex_fenestration: None,
+            window_equivalent_layer: None,
+            internal_heat_source: None,
+        });

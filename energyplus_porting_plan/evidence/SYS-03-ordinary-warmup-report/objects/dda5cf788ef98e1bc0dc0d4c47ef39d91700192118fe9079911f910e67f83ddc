@@ -1,0 +1,36 @@
+{
+  "schema": "sys02-selected-report-invocation-Source-preparation.v2",
+  "parent": {
+    "path": ".runtime/porting/SYS-02/warmup-report-invocation-prep-01/manifest.json",
+    "sha256": "8e62790923ff782a4d06417bab007780724892732f4d70742842b8991c6299d1",
+    "size_bytes": 5932
+  },
+  "own_sources": [
+    {
+      "path": ".runtime/porting/SYS-02/warmup-report-invocation-prep-02/run_selected_report.py",
+      "sha256": "3f12869fe5b4e50a0affe135b0d4fcfee9f47507026b83ca8aa784136f9b9767",
+      "size_bytes": 12144
+    },
+    {
+      "path": ".runtime/porting/SYS-02/prepare-warmup-report-invocation-02.py",
+      "sha256": "d4394ed71fbba1e2736ed05b1d9fde28a12669eaa19fa2f95b8660c0f26620ad",
+      "size_bytes": 3789
+    }
+  ],
+  "exact_parent_delta": {
+    "path": ".runtime/porting/SYS-02/warmup-report-invocation-prep-02/driver.diff",
+    "sha256": "b7485ab8d4a41f284d80bf3e03ad8babbc6f37406537a64fe6557a72f3210d87",
+    "size_bytes": 4635
+  },
+  "actual_build_fix_preparation": {
+    "path": ".runtime/porting/SYS-03/ordinary-warmup-report-build-fixes-prep-01/manifest.json",
+    "sha256": "ad3febbb71fa3ba8ba5d19e2bf9f830db4cad66303594a655908ad56fe794a7e",
+    "size_bytes": 3860
+  },
+  "schema_compatibility": "original actual application and correspondence schemas retained; new fields explicitly retain separate compile-fix provenance",
+  "inherited_functions_AST_unchanged": true,
+  "comparison_Source_or_policy_changed": false,
+  "target_executed": false,
+  "canonical_Source_changed": false,
+  "gates_updated": false
+}

@@ -1,0 +1,24 @@
+/// Actual uncontrolled corrector report seam, after MAT and before humidity.
+/// Only the caller-admitted warmup owner can reach this literal SNLoad=0 branch.
+pub(crate) fn report_uncontrolled_sensible_loads(state: &mut HeatBalanceState) {
+    let Some(owner) = state.warmup_convergence.as_mut() else {
+        return;
+    };
+    if !owner.warmup_flag {
+        return;
+    }
+    if owner.zones.len() != state.zones.len()
+        || owner
+            .zones
+            .iter()
+            .zip(&state.zones)
+            .any(|(owner, actual)| owner.zone_id != actual.zone_id)
+    {
+        owner.unavailable_reason = Some("Zone ownership changed before sensible reporting");
+        return;
+    }
+    for zone in &mut owner.zones {
+        let sn_load = 0.0_f64; // Native uncontrolled correctAirTemp branch, not predicted demand.
+        zone.air_system_sensible_rates_w = Some((sn_load.max(0.0), sn_load.min(0.0).abs()));
+        zone.sensible_report_timestep = Some(state.timestep_index);
+    }

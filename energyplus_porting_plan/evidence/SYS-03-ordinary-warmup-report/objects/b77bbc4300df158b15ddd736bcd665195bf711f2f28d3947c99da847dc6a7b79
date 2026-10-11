@@ -1,0 +1,7 @@
+# Ordinary warmup report fixture name correction (held Source)
+
+The actual workspace test stopped with `CtfInitialization(Owner(LoaderNameUnavailable))` before reaching the warmup assertions. Its hand-authored `cube_model()` declares material `R1` and construction `Wall` but leaves their separate report-name owners empty. The real context requires these loader names; the production error remains correct.
+
+The only proposed change selects the existing `ctf_ordinary_output_test_model()` wrapper, which adds the two declared fixture names to the identical cube. The timestep, geometry, material properties, weather, options, calculation, reporting call, and all assertions stay byte-exact. No production fallback, output expectation or tolerance is changed. The inverse one-token substitution restores the complete actual before file.
+
+This hold preserves the actual failed workspace receipt and stdout/stderr identities. No test, formatter, build, engine, comparer, canonical edit, or Git operation was performed during this Source preparation. Root and an independent peer must review before applying; a successful rerun is still required.

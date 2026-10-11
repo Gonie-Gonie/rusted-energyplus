@@ -14968,6 +14968,11 @@
         "path": "energyplus_porting_plan/evidence/SYS-03-round-format/summary.json",
         "sha256": "0bb2ff7ffaace772c680b90cf3b4a0aed57eb185e941048783e42c83dcae09ab",
         "size_bytes": 173446
+      },
+      "actual_selected_report_and_ordinary_A_source_quality": {
+        "path": "energyplus_porting_plan/evidence/SYS-03-ordinary-warmup-report/summary.json",
+        "sha256": "788a2adbc69948d3f1e3220d9889b5331361cf153788e231fb2115d9fa21e01a",
+        "size_bytes": 246549
       }
     },
     {

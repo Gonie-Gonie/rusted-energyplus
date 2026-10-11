@@ -1,0 +1,45 @@
+{
+  "schema": "sys03-ordinary-warmup-report-current-correspondence-review.v1",
+  "actual_application": {
+    "path": ".runtime/porting/SYS-03/ordinary-warmup-report-applied-03/record.json",
+    "sha256": "3a9bf1cf2735d1fc44c16f2f6ea64fad74c581d6a237131d1db20a352f785032",
+    "size_bytes": 49800
+  },
+  "source_final": {
+    "path": ".runtime/porting/source-objects/d3/d34a84b7f0fad57ae1a46799a8b9b8b31247239206556ce342bb4e17287775c4",
+    "sha256": "d34a84b7f0fad57ae1a46799a8b9b8b31247239206556ce342bb4e17287775c4"
+  },
+  "selected_actual_application": {
+    "path": ".runtime/porting/SYS-03/ordinary-warmup-report-applied-02/record.json",
+    "sha256": "4625cb6fc6f8d2b17ac99e7e30d17a98abd17ee058798d7caed2f41a7b6e5e01",
+    "size_bytes": 45842
+  },
+  "Root_FULL_fixture_name_Source_review_accepted": true,
+  "Header_FULL_fixture_name_Source_review_accepted": true,
+  "Root_FULL_cumulative_source_correspondence_accepted": true,
+  "Header_FULL_cumulative_source_correspondence_accepted": true,
+  "Root_fixture_Source_review": {
+    "path": ".runtime/porting/SYS-03/ordinary-warmup-report-fixture-name-fix-prep-01/Root-full-Source-review.json",
+    "sha256": "dcae61bbe785415b2ee03c212629a1e6d353ddbcf0d6bd5a7a90d5cbcaa0c950",
+    "size_bytes": 852
+  },
+  "independent_Header_review": {
+    "path": ".runtime/porting/SYS-03/ordinary-warmup-report-Header-fixture-review-03.json",
+    "sha256": "6c8d51151eb0e2818b3c803cb4b5f5dc8d9ddce34580cf646b569308f787895d",
+    "size_bytes": 1940
+  },
+  "inherited_formatter_build_fix_review": {
+    "path": ".runtime/porting/SYS-03/ordinary-warmup-report-applied-02/Root-and-Header-full-formatter-review.json",
+    "sha256": "090d865288836e43198051b5ae9a0d902dde50553a7f8b5943d4f620945513cb",
+    "size_bytes": 4690
+  },
+  "full_archived_snapshots_and_current_Source_members_verified": 3928,
+  "unchanged_Source_members": 3927,
+  "cumulative_application_diffs_regenerated": 20,
+  "changed_paths": [
+    "crates/ep_runtime/src/runtime/tests/warmup_ordinary_reports.rs"
+  ],
+  "correspondence_scope": "Accepted formatting and four reviewed compile/lint fixes, then one test fixture builder identifier; production bytes unchanged since actual selected report comparison.",
+  "selected_comparison_replayed_after_fixture_correction": false,
+  "gates_updated": false
+}

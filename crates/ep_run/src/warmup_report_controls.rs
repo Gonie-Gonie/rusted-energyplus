@@ -1,0 +1,121 @@
+//! Input-only selected GetProjectData warmup report facts; no output/result inputs.
+use ep_raw_model::{FieldName, ObjectType, RawModel, RawValue};
+use ep_runtime::HeatBalanceOrdinaryWarmupReportInputs;
+
+pub(crate) fn resolve(raw: &RawModel) -> Result<HeatBalanceOrdinaryWarmupReportInputs, String> {
+    let control = raw.objects.get(&ObjectType("SimulationControl".into()));
+    if control.is_some_and(|instances| instances.len() > 1) {
+        return Err("ordinary A reporting requires the admitted unique SimulationControl".into());
+    }
+    let first = control
+        .and_then(|instances| instances.first_key_value())
+        .map(|(_, instance)| instance);
+    let yes_no = |field: &str, default: bool| -> Result<bool, String> {
+        match first.and_then(|instance| instance.fields.get(&FieldName(field.into()))) {
+            None => Ok(default),
+            Some(RawValue::String(text)) if text.is_empty() => Ok(default),
+            Some(RawValue::String(text)) if text.eq_ignore_ascii_case("Yes") => Ok(true),
+            Some(RawValue::String(text)) if text.eq_ignore_ascii_case("No") => Ok(false),
+            Some(_) => Err(format!(
+                "ordinary A SimulationControl.{field} is outside actual Yes/No input"
+            )),
+        }
+    };
+    let do_zone_sizing = yes_no("do_zone_sizing_calculation", false)?;
+    let do_system_sizing = yes_no("do_system_sizing_calculation", false)?;
+    let do_plant_sizing = yes_no("do_plant_sizing_calculation", false)?;
+    let do_des_day_sim = yes_no("run_simulation_for_sizing_periods", true)?;
+    let do_weather_sim = yes_no("run_simulation_for_weather_file_run_periods", true)?;
+    let do_hvac_sizing = yes_no("do_hvac_sizing_simulation_for_sizing_periods", false)?;
+    let do_pure_load_calc = !do_des_day_sim
+        && !do_weather_sim
+        && !do_hvac_sizing
+        && (do_zone_sizing || do_system_sizing);
+    let design_days = raw
+        .objects
+        .get(&ObjectType("SizingPeriod:DesignDay".into()))
+        .is_some_and(|instances| !instances.is_empty());
+    if do_zone_sizing
+        || do_system_sizing
+        || do_plant_sizing
+        || do_hvac_sizing
+        || !do_weather_sim
+        || (do_des_day_sim && design_days)
+    {
+        return Err(
+            "ordinary A warmup reporting excludes active sizing/pure-load environments".into(),
+        );
+    }
+    // DataSystemVariables constructor false; GetProjectData processes only the
+    // first name-ordered instance, retaining every actual selected key in order.
+    let mut detailed = false;
+    if let Some((_, first)) = raw
+        .objects
+        .get(&ObjectType("Output:Diagnostics".into()))
+        .and_then(|instances| instances.first_key_value())
+        && let Some(value) = first.fields.get(&FieldName("diagnostics".into()))
+    {
+        let RawValue::Array(entries) = value else {
+            return Err("Output:Diagnostics diagnostics is outside array input".into());
+        };
+        for entry in entries {
+            let RawValue::Object(fields) = entry else {
+                return Err("Output:Diagnostics entry is outside object input".into());
+            };
+            let Some(value) = fields.get(&FieldName("key".into())) else {
+                continue;
+            };
+            let RawValue::String(key) = value else {
+                return Err("Output:Diagnostics key is outside string input".into());
+            };
+            if key.eq_ignore_ascii_case("ReportDetailedWarmupConvergence") {
+                detailed = true;
+            }
+        }
+    }
+    Ok(HeatBalanceOrdinaryWarmupReportInputs {
+        detailed,
+        do_pure_load_calc,
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ep_raw_model::parse_epjson_str;
+
+    #[test]
+    fn absent_controls_use_source_defaults_and_real_selected_key_is_retained()
+    -> Result<(), Box<dyn std::error::Error>> {
+        assert_eq!(
+            resolve(&parse_epjson_str("{}")?)?,
+            HeatBalanceOrdinaryWarmupReportInputs {
+                detailed: false,
+                do_pure_load_calc: false
+            }
+        );
+        let raw = parse_epjson_str(
+            r#"{"Output:Diagnostics":{"first":{"diagnostics":[{}, {"key":"reportdetailedwarmupconvergence"}]}}}"#,
+        )?;
+        assert!(resolve(&raw)?.detailed);
+        Ok(())
+    }
+
+    #[test]
+    fn first_name_ordered_diagnostics_only_and_active_sizing_is_unavailable()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw = parse_epjson_str(
+            r#"{"Output:Diagnostics":{"Z":{"diagnostics":[{"key":"ReportDetailedWarmupConvergence"}]},"A":{"diagnostics":[{"key":"DisplayExtraWarnings"}]} }}"#,
+        )?;
+        assert!(!resolve(&raw)?.detailed);
+        let raw = parse_epjson_str(
+            r#"{"SimulationControl":{"control":{"do_zone_sizing_calculation":"Yes"}}}"#,
+        )?;
+        assert!(resolve(&raw).is_err());
+        let raw = parse_epjson_str(
+            r#"{"SimulationControl":{"control":{"run_simulation_for_weather_file_run_periods":"No"}}}"#,
+        )?;
+        assert!(resolve(&raw).is_err());
+        Ok(())
+    }
+}

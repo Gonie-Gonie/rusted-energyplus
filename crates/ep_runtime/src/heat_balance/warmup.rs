@@ -17,6 +17,7 @@ use crate::weather::{
 };
 use ep_model::{FirstHourInterpolationStartingValues, SimulationModel, TypedModel};
 
+#[cfg(test)]
 pub(crate) fn run_heat_balance_run_period_warmup<F>(
     simulation_model: &SimulationModel,
     state: &mut HeatBalanceState,
@@ -32,6 +33,56 @@ pub(crate) fn run_heat_balance_run_period_warmup<F>(
     surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
     first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
     day_end_zone_air_states: &mut Vec<HeatBalanceWarmupDayEndZoneAirStateSample>,
+    advance_timestep: F,
+) -> Result<HeatBalanceWarmupSummary, RuntimeError>
+where
+    F: for<'weather> FnMut(
+        &TypedModel,
+        &mut HeatBalanceState,
+        HeatBalanceStepInput,
+        Option<HeatBalanceWeatherContext<'weather>>,
+        HeatBalanceRuntimeConfig,
+        u32,
+        Option<u32>,
+        HeatBalanceSurfaceLoopZoneAirCorrection,
+    ),
+{
+    run_heat_balance_run_period_warmup_with_reporting(
+        simulation_model,
+        state,
+        weather_dry_bulb_c,
+        weather_records,
+        weather_driver,
+        zone_steps_per_hour,
+        seconds_per_timestep,
+        options,
+        runtime_config,
+        surface_iteration_count,
+        inside_hconv_reevaluation_interval,
+        surface_loop_zone_air_correction,
+        first_hour_interpolation_starting_values,
+        day_end_zone_air_states,
+        None,
+        advance_timestep,
+    )
+}
+
+pub(crate) fn run_heat_balance_run_period_warmup_with_reporting<F>(
+    simulation_model: &SimulationModel,
+    state: &mut HeatBalanceState,
+    weather_dry_bulb_c: &[f64],
+    weather_records: Option<&[EpwRecord]>,
+    weather_driver: Option<HeatBalanceWeatherDriver<'_>>,
+    zone_steps_per_hour: u32,
+    seconds_per_timestep: f64,
+    options: HeatBalanceWarmupOptions,
+    runtime_config: HeatBalanceRuntimeConfig,
+    surface_iteration_count: u32,
+    inside_hconv_reevaluation_interval: Option<u32>,
+    surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+    day_end_zone_air_states: &mut Vec<HeatBalanceWarmupDayEndZoneAirStateSample>,
+    mut output: Option<&mut super::ctf_initialization_context::CtfInitializationContext<'_>>,
     mut advance_timestep: F,
 ) -> Result<HeatBalanceWarmupSummary, RuntimeError>
 where
@@ -63,18 +114,25 @@ where
         return Err(unavailable("nonfinite or negative convergence tolerance"));
     }
     let model = &simulation_model.typed;
-    state.warmup_convergence = Some(HeatBalanceWarmupConvergenceState {
-        zones: state
-            .zones
-            .iter()
-            .map(|zone| HeatBalanceWarmupZoneConvergence::new(zone.zone_id))
-            .collect(),
-        checked_day: 0,
-        convergence_checks_failed: false,
-        warmup_flag: true,
-        maximum_day_forced_exit: false,
-        unavailable_reason: None,
-    });
+    if state
+        .warmup_convergence
+        .as_ref()
+        .is_none_or(|owner| owner.report.is_none())
+    {
+        state.warmup_convergence = Some(HeatBalanceWarmupConvergenceState {
+            zones: state
+                .zones
+                .iter()
+                .map(|zone| HeatBalanceWarmupZoneConvergence::new(zone.zone_id))
+                .collect(),
+            checked_day: 0,
+            convergence_checks_failed: false,
+            warmup_flag: true,
+            maximum_day_forced_exit: false,
+            unavailable_reason: None,
+            report: None,
+        });
+    }
     let hours_per_day = hourly_count.min(24);
     let maximum_days = options.maximum_days.max(options.minimum_days).max(1);
     let tolerance = options.temperature_convergence_tolerance_delta_c;
@@ -139,12 +197,21 @@ where
                     surface_loop_zone_air_correction,
                 );
                 super::ctf_surface_lifecycle::ensure_available(state)?;
-                super::ctf_caller_clock::commit_legacy_step(state, prepared_legacy_clock)?;
-                let owner = state
+                let reporting = state
                     .warmup_convergence
-                    .as_mut()
-                    .ok_or_else(|| unavailable("missing actual convergence owner"))?;
-                owner.record_state(&state.zones, state.timestep_index)?;
+                    .as_ref()
+                    .is_some_and(|owner| owner.report.is_some());
+                if reporting {
+                    ordinary::record_completed_step(state, weather_driver, output.as_deref_mut())?;
+                }
+                super::ctf_caller_clock::commit_legacy_step(state, prepared_legacy_clock)?;
+                if !reporting {
+                    state
+                        .warmup_convergence
+                        .as_mut()
+                        .ok_or_else(|| unavailable("missing actual convergence owner"))?
+                        .record_state(&state.zones, state.timestep_index)?;
+                }
             }
         }
 
@@ -158,7 +225,11 @@ where
             .warmup_convergence
             .as_mut()
             .ok_or_else(|| unavailable("missing actual convergence owner"))?;
-        owner.check_day(day, options);
+        if owner.report.is_some() {
+            ordinary::check_day(owner, day, options, weather_driver, output.as_deref_mut())?;
+        } else {
+            owner.check_day(day, options);
+        }
         final_delta = owner
             .zones
             .iter()
@@ -168,6 +239,9 @@ where
             let converged = !owner.convergence_checks_failed;
             if let Some(driver) = weather_driver {
                 driver.finish_warmup()?;
+            }
+            if let Some(context) = output.as_deref_mut() {
+                context.backend.state.warmup_flag = false;
             }
             return Ok(HeatBalanceWarmupSummary {
                 enabled: true,
@@ -241,7 +315,7 @@ pub(crate) fn report_uncontrolled_sensible_loads(state: &mut HeatBalanceState) {
     let Some(owner) = state.warmup_convergence.as_mut() else {
         return;
     };
-    if !owner.warmup_flag {
+    if !owner.warmup_flag && owner.report.is_none() {
         return;
     }
     if owner.zones.len() != state.zones.len()
@@ -479,6 +553,7 @@ mod tests {
             warmup_flag: true,
             maximum_day_forced_exit: false,
             unavailable_reason: None,
+            report: None,
         };
         owner.check_day(
             1,
@@ -507,6 +582,7 @@ mod tests {
             warmup_flag: true,
             maximum_day_forced_exit: false,
             unavailable_reason: None,
+            report: None,
         };
         owner.zones[0].record(20.0, 0.0, 0.0);
         owner.check_day(
@@ -533,3 +609,9 @@ mod selected_reference;
 #[cfg(test)]
 #[path = "warmup_rolling_tests.rs"]
 mod rolling_tests;
+
+#[path = "warmup_report.rs"]
+pub(crate) mod report;
+
+#[path = "warmup_ordinary.rs"]
+pub(crate) mod ordinary;

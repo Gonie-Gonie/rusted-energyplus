@@ -95,6 +95,31 @@ pub struct ProductionWeatherContext {
     pub ctf_history_clock: Option<ProductionCtfHistoryClock>,
 }
 
+/// Actual selected owner view for the ordinary warmup report call boundary.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ProductionWarmupReportContext {
+    /// Actual prepared phase, not a derived convergence count.
+    pub phase: WeatherDayPhase,
+    /// Actual BeginEnvrnFlag at this consumer.
+    pub begin_environment: bool,
+    /// Actual WarmupFlag at this consumer.
+    pub warmup_flag: bool,
+    /// Actual EndDayFlag at this consumer.
+    pub end_day: bool,
+    /// Actual DayOfSim, HourOfDay and TimeStep.
+    pub day: i32,
+    /// Actual HourOfDay.
+    pub hour: i32,
+    /// Actual TimeStep.
+    pub time_step: i32,
+    /// Actual TimeStepsInHour allocation input.
+    pub time_steps_in_hour: i32,
+    /// WeatherManager's literal KindOfSim == RunPeriodWeather result.
+    pub run_period_environment: bool,
+    /// Actual admitted environment owner.
+    pub environment_name: String,
+}
+
 /// Production weather lifecycle shared by A and B consumers.
 ///
 /// Its interior owner is borrowed only while advancing or copying operands.
@@ -418,6 +443,28 @@ impl ProductionWeatherTimestepSeries {
     pub fn first_hour_interpolation_starting_values(&self) -> FirstHourInterpolationStartingValues {
         self.session.borrow().configuration.first_policy()
     }
+    /// Borrow only actual report operands after the genuine current-step call.
+    pub fn warmup_report_context(&self) -> Result<ProductionWarmupReportContext, WeatherDayError> {
+        let phase = self
+            .current_phase
+            .borrow()
+            .ok_or_else(|| WeatherDayError::admission("missing report weather phase"))?;
+        let session = self.session.borrow();
+        let global = &session.state.global;
+        Ok(ProductionWarmupReportContext {
+            phase,
+            begin_environment: global.begin_envrn_flag,
+            warmup_flag: global.warmup_flag,
+            end_day: global.end_day_flag,
+            day: global.day_of_sim,
+            hour: global.hour_of_day,
+            time_step: global.time_step,
+            time_steps_in_hour: global.time_steps_in_hour,
+            run_period_environment: global.kind_of_sim == 3,
+            environment_name: session.state.environment.environment_name.clone(),
+        })
+    }
+
     /// Read-only owned snapshot for independently collected evidence.
     #[must_use]
     pub fn snapshot(&self) -> super::production_trace::WeatherSessionSnapshot {

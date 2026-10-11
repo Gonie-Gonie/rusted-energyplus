@@ -1,0 +1,235 @@
+--- .runtime/porting/SYS-03/ordinary-warmup-report-prep-01/proposed/crates/ep_runtime/src/heat_balance/warmup_selected_reference.rs
++++ crates/ep_runtime/src/heat_balance/warmup_selected_reference.rs
+@@ -58,17 +58,23 @@
+ }
+ 
+ fn report_snapshot(report: &report::WarmupReportState, eio: &[u8]) -> Value {
+-    let array = |values: &[f64]| json!({"allocated": true, "lower": 1, "upper": values.len(),
++    let array = |values: &[f64]| {
++        json!({"allocated": true, "lower": 1, "upper": values.len(),
+         "size": values.len(), "values_available": true,
+-        "rows": values.iter().enumerate().map(|(index,value)| json!({"actual_array_index": index+1, "value": scalar(*value)})).collect::<Vec<_>>()});
+-    let matrix = |values: &[Vec<f64>]| json!({"allocated": true, "lower1": 1, "upper1": report.zone_names.len(),
++        "rows": values.iter().enumerate().map(|(index,value)| json!({"actual_array_index": index+1, "value": scalar(*value)})).collect::<Vec<_>>()})
++    };
++    let matrix = |values: &[Vec<f64>]| {
++        json!({"allocated": true, "lower1": 1, "upper1": report.zone_names.len(),
+         "lower2": 1, "upper2": report.points_per_day, "size": report.zone_names.len()*report.points_per_day,
+         "rows": values.iter().enumerate().map(|(point,zones)| json!({"actual_point_index": point+1,
+-            "zones": zones.iter().enumerate().map(|(zone,value)| json!({"actual_zone_index": zone+1,"value":scalar(*value)})).collect::<Vec<_>>() })).collect::<Vec<_>>()});
+-    let scratch = |values: &[Option<f64>]| json!({"allocated": true, "lower": 1, "upper": report.points_per_day,
++            "zones": zones.iter().enumerate().map(|(zone,value)| json!({"actual_zone_index": zone+1,"value":scalar(*value)})).collect::<Vec<_>>() })).collect::<Vec<_>>()})
++    };
++    let scratch = |values: &[Option<f64>]| {
++        json!({"allocated": true, "lower": 1, "upper": report.points_per_day,
+         "size": report.points_per_day, "values_available": values.iter().all(Option::is_some),
+         "rows": values.iter().copied().collect::<Option<Vec<_>>>().map(|values| values.iter().enumerate().map(|(index,value)|
+-            json!({"actual_array_index":index+1,"value":scalar(*value)})).collect::<Vec<_>>())});
++            json!({"actual_array_index":index+1,"value":scalar(*value)})).collect::<Vec<_>>())})
++    };
+     json!({"schema":"sys02-selected-warmup-report-owners.v1",
+         "zone_names": report.zone_names, "CountWarmupDayPoints":report.count, "CountWarmupDayPoints_available":true,
+         "configuration":{"DoingSizing":report.configuration.doing_sizing,"DoPureLoadCalc":report.configuration.do_pure_load_calc,
+@@ -150,16 +156,38 @@
+         warmup_flag: true,
+         maximum_day_forced_exit: false,
+         unavailable_reason: None,
+-        report: Some(report::WarmupReportState::new(
+-            names.iter().map(|v| v.as_str().map(str::to_owned).ok_or("literal Zone name required")).collect::<Result<Vec<_>,_>>()?,
+-            positive_u32(required(initial,"TimeStepsInHour")?)?,
+-            report::WarmupReportConfiguration {
+-                doing_sizing: required(initial,"DoingSizing")?.as_bool().ok_or("actual DoingSizing required")?,
+-                do_pure_load_calc: required(initial,"DoPureLoadCalc")?.as_bool().ok_or("actual DoPureLoadCalc required")?,
+-                run_period_environment: required(initial,"RunPeriodEnvironment")?.as_bool().ok_or("actual environment type required")?,
+-                environment_name: required(initial,"EnvironmentName")?.as_str().ok_or("actual environment name required")?.to_owned(),
+-                detailed: required(initial,"ReportDetailedWarmupConvergence")?.as_bool().ok_or("actual detailed-report flag required")?,
+-            }).map_err(|e|e.to_string())?),
++        report: Some(
++            report::WarmupReportState::new(
++                names
++                    .iter()
++                    .map(|v| {
++                        v.as_str()
++                            .map(str::to_owned)
++                            .ok_or("literal Zone name required")
++                    })
++                    .collect::<Result<Vec<_>, _>>()?,
++                positive_u32(required(initial, "TimeStepsInHour")?)?,
++                report::WarmupReportConfiguration {
++                    doing_sizing: required(initial, "DoingSizing")?
++                        .as_bool()
++                        .ok_or("actual DoingSizing required")?,
++                    do_pure_load_calc: required(initial, "DoPureLoadCalc")?
++                        .as_bool()
++                        .ok_or("actual DoPureLoadCalc required")?,
++                    run_period_environment: required(initial, "RunPeriodEnvironment")?
++                        .as_bool()
++                        .ok_or("actual environment type required")?,
++                    environment_name: required(initial, "EnvironmentName")?
++                        .as_str()
++                        .ok_or("actual environment name required")?
++                        .to_owned(),
++                    detailed: required(initial, "ReportDetailedWarmupConvergence")?
++                        .as_bool()
++                        .ok_or("actual detailed-report flag required")?,
++                },
++            )
++            .map_err(|e| e.to_string())?,
++        ),
+     };
+     let mut eio = Vec::new();
+     let constructed = snapshot(&owner, &eio);
+@@ -181,67 +209,97 @@
+         let mut report_record_calls = 0;
+         let (status, invoked, calls) = if stopped {
+             ("unreached-after-actual-report-error", false, 0)
+-        } else { match kind {
+-            "record" => {
+-                if observations.len() != owner.zones.len() {
+-                    return Err("incomplete direct record operands".into());
++        } else {
++            match kind {
++                "record" => {
++                    if observations.len() != owner.zones.len() {
++                        return Err("incomplete direct record operands".into());
++                    }
++                    let mut calls = 0;
++                    let warmup_flag = owner.warmup_flag;
++                    for (index, (zone, observed)) in
++                        owner.zones.iter_mut().zip(observations).enumerate()
++                    {
++                        let native_index = required(observed, "native_zone_index")?
++                            .as_u64()
++                            .ok_or("Native unit index required")?;
++                        let rust_id = required(observed, "Rust_direct_zone_id")?
++                            .as_u64()
++                            .ok_or("Rust direct unit ID required")?;
++                        if native_index != u64::try_from(index + 1).map_err(|e| e.to_string())?
++                            || rust_id != u64::from(zone.zone_id.0)
++                        {
++                            return Err("explicit direct unit association/order differs".into());
++                        }
++                        let ztav = number(required(observed, "ZTAV")?)?;
++                        let heat = number(required(observed, "heat_rate")?)?;
++                        let cool = number(required(observed, "cool_rate")?)?;
++                        if heat < 0.0 || cool < 0.0 {
++                            return Err("nonnegative sensible input rates required".into());
++                        }
++                        zone.record(ztav, heat, cool);
++                        calls += 1;
++                        report_record_calls += 1;
++                        let clock = report::WarmupRecordClock {
++                            day,
++                            hour: positive_u32(required(required(op, "clock")?, "HourOfDay")?)?,
++                            time_step: positive_u32(required(required(op, "clock")?, "TimeStep")?)?,
++                        };
++                        if let Err(error) = owner
++                            .report
++                            .as_mut()
++                            .ok_or("actual report owner absent")?
++                            .record_zone(index, zone, warmup_flag, clock, &mut eio)
++                        {
++                            report_error = Some(error.to_string());
++                            break;
++                        }
++                    }
++                    (
++                        if report_error.is_none() {
++                            "selected-private-method-returned"
++                        } else {
++                            "actual-report-error-returned"
++                        },
++                        true,
++                        calls,
++                    )
+                 }
+-                let mut calls = 0;
+-                let warmup_flag = owner.warmup_flag;
+-                for (index, (zone, observed)) in
+-                    owner.zones.iter_mut().zip(observations).enumerate()
+-                {
+-                    let native_index = required(observed, "native_zone_index")?
+-                        .as_u64()
+-                        .ok_or("Native unit index required")?;
+-                    let rust_id = required(observed, "Rust_direct_zone_id")?
+-                        .as_u64()
+-                        .ok_or("Rust direct unit ID required")?;
+-                    if native_index != u64::try_from(index + 1).map_err(|e| e.to_string())?
+-                        || rust_id != u64::from(zone.zone_id.0)
++                "check" => {
++                    if !observations.is_empty() {
++                        return Err("Check does not take record operands".into());
++                    }
++                    owner.check_day(day, options);
++                    ("selected-private-method-returned", true, 1)
++                }
++                "report" => {
++                    if !observations.is_empty() {
++                        return Err("Report does not take record operands".into());
++                    }
++                    if let Err(error) = owner
++                        .report
++                        .as_mut()
++                        .ok_or("actual report owner absent")?
++                        .report(owner.warmup_flag, &owner.zones, &mut eio)
+                     {
+-                        return Err("explicit direct unit association/order differs".into());
+-                    }
+-                    let ztav = number(required(observed, "ZTAV")?)?;
+-                    let heat = number(required(observed, "heat_rate")?)?;
+-                    let cool = number(required(observed, "cool_rate")?)?;
+-                    if heat < 0.0 || cool < 0.0 {
+-                        return Err("nonnegative sensible input rates required".into());
+-                    }
+-                    zone.record(ztav, heat, cool);
+-                    calls += 1;
+-                    report_record_calls += 1;
+-                    let clock = report::WarmupRecordClock { day,
+-                        hour: positive_u32(required(required(op,"clock")?,"HourOfDay")?)?,
+-                        time_step: positive_u32(required(required(op,"clock")?,"TimeStep")?)? };
+-                    if let Err(error) = owner.report.as_mut().ok_or("actual report owner absent")?
+-                        .record_zone(index, zone, warmup_flag, clock, &mut eio) {
+                         report_error = Some(error.to_string());
+-                        break;
+-                    }
++                    }
++                    (
++                        if report_error.is_none() {
++                            "selected-private-method-returned"
++                        } else {
++                            "actual-report-error-returned"
++                        },
++                        true,
++                        1,
++                    )
+                 }
+-                (if report_error.is_none() {"selected-private-method-returned"} else {"actual-report-error-returned"}, true, calls)
++                _ => return Err("unknown operation; no silent skip".into()),
+             }
+-            "check" => {
+-                if !observations.is_empty() {
+-                    return Err("Check does not take record operands".into());
+-                }
+-                owner.check_day(day, options);
+-                ("selected-private-method-returned", true, 1)
+-            }
+-            "report" => {
+-                if !observations.is_empty() {
+-                    return Err("Report does not take record operands".into());
+-                }
+-                if let Err(error) = owner.report.as_mut().ok_or("actual report owner absent")?
+-                    .report(owner.warmup_flag, &owner.zones, &mut eio) {
+-                    report_error = Some(error.to_string());
+-                }
+-                (if report_error.is_none() {"selected-private-method-returned"} else {"actual-report-error-returned"}, true, 1)
+-            }
+-            _ => return Err("unknown operation; no silent skip".into()),
+-        }};
+-        if report_error.is_some() { stopped = true; }
++        };
++        if report_error.is_some() {
++            stopped = true;
++        }
+         operations.push(
+             json!({"operation_id": required(op,"operation_id")?, "operation": kind,
+             "literal_input": op, "status": status, "actual_selected_method_invoked": invoked,
