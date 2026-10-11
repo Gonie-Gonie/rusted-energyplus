@@ -44,3 +44,7 @@ EP struct 전체를 복제하지 않고 아래 데이터의 생산자·소비자
 ## SRC-06 선택 TARP 상태·정밀도 계약
 
 Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 strict 부호 분기를 유지한다. Detailed은 실제 outward cosine의 음수를 전달하며 Hc<LowHConvLimit일 때만 하한을 대입한다. 선택 원본에는 EPS, 상한 clamp, NaN 대체가 없다. [선택 API 비교](evidence/SRC-06-tarp-inside-selected/summary.json)는 입력·초기 상태·모든 pre-owner·유지 셀을 NaN payload까지 비트 그대로 대조한다. 현재 계산된 비정상 endpoint만 class 확인 후 unavailable로 남긴다. 공간 MAT, balance reference snapshot, 초기/반복 표면온도 배열과 갱신 시점은 서로 다른 실제 owner이며 다음 caller 연결에서 보존해야 한다.
+
+## CTF-10 실제 main 실행의 이력 비교
+
+[동일 A-24H 입력의 전체 비교](evidence/CTF-10-main-thread-history-comparison/summary.json)는 1,340개 대응 단계의 불일치 235,456개와 필수 미확인·미대응 경계 2,754개를 FAIL로 보존한다. 최초 대응 차이는 이력 갱신 전 입력 SurfTempIn에 이미 존재한다. Warmup 횟수·실제 시계·배열 소유자·초기화·반복 호출 시점을 각각 검증해야 하며, 입력 경계의 차이를 특정 생산자의 원인이나 갱신 식의 실패로 단정하지 않는다. 실제 상태와 호출 순서의 동등성 및 전체 게이트는 계속 미확인이다.

@@ -1,0 +1,29 @@
+{
+  "schema": "ctf10-ordinary-history-comparison-independent-Source-review.v1",
+  "reviewer": "/root/clk02_baseline_audit",
+  "reviewed_preparation": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/manifest.json",
+    "sha256": "201953b343269271d185aef6bfc2b455c99fb2c0785268bb9e7f6a37bebb826b",
+    "size_bytes": 55146
+  },
+  "status": "accepted-source-only",
+  "FULL_main_163_custody_224_author_133_README_and_pair_437_read": true,
+  "distinct_authenticated_whole_descriptors": 91,
+  "explicit_historical_Source_correspondences": 6,
+  "physical_ranges_verified": 42,
+  "exact_unified_diffs_regenerated": 4,
+  "Python_ASTs_verified_without_import": 4,
+  "pairer_bytes_exact_accepted_predecessor03": true,
+  "prospective_policy02_unchanged": true,
+  "actual_producer_metadata_schemas_argv_Source_and_chronology_checked": true,
+  "historical_policy_copy_chronology_checked_without_new_freeze_claim": true,
+  "captured_archived_Source_and_current_comparison_Source_distinct": true,
+  "concrete_blockers": [],
+  "numerical_or_event_payloads_read": false,
+  "Native_or_Rust_targets_executed": false,
+  "project_or_workflow_modules_imported": false,
+  "canonical_changes_performed": false,
+  "scientific_PASS_claimed": false,
+  "gates_updated": false,
+  "reviewed_utc": "2026-10-11T20:11:55.590805+00:00"
+}

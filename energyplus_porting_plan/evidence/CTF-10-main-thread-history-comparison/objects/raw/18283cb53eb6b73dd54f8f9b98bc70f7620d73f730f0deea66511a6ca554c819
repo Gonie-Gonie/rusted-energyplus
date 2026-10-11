@@ -1,0 +1,198 @@
+{
+  "schema": "ctf10-main-thread-history-publication-Source-preparation.v1",
+  "status": "HELD-Source-only-unexecuted",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-01/publish.py",
+      "sha256": "d80b24e62540c0ecfc1500c188753f5eea889fbbdc18e18a1f47b9c040970f40",
+      "size_bytes": 13320,
+      "line_count": 129
+    },
+    {
+      "path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-01/README.md",
+      "sha256": "9dfa19d6e2b12eccc31a00d32dc0b9e80a6b9ce95743b9c0734066790ca79bea",
+      "size_bytes": 2521,
+      "line_count": 15
+    },
+    {
+      "path": ".runtime/porting/CTF-10/seal-main-thread-history-publication-01.py",
+      "sha256": "621ae6a738568b5fbac1db3d5edd9de6f4fa20d5732610144984a98ad1b01349",
+      "size_bytes": 6724,
+      "line_count": 51
+    },
+    {
+      "path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-01/before/publish.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-01/diffs/publish.py.diff",
+      "sha256": "25ca3e91a23136d576b94ebd6ae384ed51e280f360c32dcaff51eb151970fe85",
+      "size_bytes": 13632,
+      "line_count": 132
+    }
+  ],
+  "runtime_interfaces": {
+    "publisher": {
+      "path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-01/publish.py",
+      "sha256": "d80b24e62540c0ecfc1500c188753f5eea889fbbdc18e18a1f47b9c040970f40",
+      "size_bytes": 13320,
+      "line_count": 129
+    },
+    "CLI": [
+      "--source-preparation",
+      "--packet"
+    ],
+    "packet_schema": "ctf10-main-thread-history-publication-inputs.v1",
+    "packet_keys": [
+      "schema",
+      "comparison",
+      "comparison_execution",
+      "Root_factual_review",
+      "independent_factual_review"
+    ],
+    "evidence_directory": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison"
+  },
+  "actual_comparison": {
+    "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/comparison.json",
+    "sha256": "0e55aabd12e38e13a08c46a6147b94fb0e527bc6199ca71b0d9d6a248353adfb",
+    "size_bytes": 20915,
+    "line_count": 563
+  },
+  "actual_comparison_execution": {
+    "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-command-01/receipt.json",
+    "sha256": "e9d7632e79949b141e5cf0ce0da021e3230bd410ef00258f424e566a72eecd9e",
+    "size_bytes": 4094,
+    "line_count": 88
+  },
+  "reviewed_comparer_preparation": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/manifest.json",
+    "sha256": "201953b343269271d185aef6bfc2b455c99fb2c0785268bb9e7f6a37bebb826b",
+    "size_bytes": 55146,
+    "line_count": 1283
+  },
+  "prospective_policy_preparation": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-pairing-policy-prep-02/manifest.json",
+    "sha256": "5e59c6e3e73d840e982f79fee676033919c353e3ce4b35295385349ea9b31031",
+    "size_bytes": 37520,
+    "line_count": 859
+  },
+  "prospective_policy": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-pairing-policy-prep-02/policy.json",
+    "sha256": "cbff525dbe30ae671069d3ddaed52825bb7e9a1f80c610d34d15e67d4238ac61",
+    "size_bytes": 18354,
+    "line_count": 527
+  },
+  "Root_Source_review": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/Root-FULL-Source-review-04.json",
+    "sha256": "25aec14f76da8c4d0623282837dcff28d39c4defb7ba9903597f0c2bad3a62b9",
+    "size_bytes": 1121,
+    "line_count": 28
+  },
+  "independent_Source_review": {
+    "path": ".runtime/porting/CTF-10/Base-ordinary-history-comparison-Source-review-04/review.json",
+    "sha256": "c4ee2a2c2902213713519076e5294f467b6917a87b7fb44c3590f6001a4eece7",
+    "size_bytes": 1329,
+    "line_count": 29
+  },
+  "previous_CLI_summary": {
+    "path": "energyplus_porting_plan/evidence/SRC-05-production-main-thread/summary.json",
+    "sha256": "db4da22bc0c16e38ba6e799e26b47e56b7a41e9ba65ef533e68e7d87aa6b69d6",
+    "size_bytes": 441884,
+    "line_count": 10406
+  },
+  "previous_Native_summary": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-surface-consumer05-original-baseline/summary.json",
+    "sha256": "49f284c4fb174651b085eac061afe56d0b33bc81372eb88f88204f2569bc0b95",
+    "size_bytes": 15700,
+    "line_count": 388
+  },
+  "recorder_Source": {
+    "path": "tools/porting/record_command.py",
+    "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+    "size_bytes": 8453,
+    "line_count": 204
+  },
+  "fixed_evidence": [
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/manifest.json",
+      "sha256": "201953b343269271d185aef6bfc2b455c99fb2c0785268bb9e7f6a37bebb826b",
+      "size_bytes": 55146,
+      "line_count": 1283
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-history-pairing-policy-prep-02/manifest.json",
+      "sha256": "5e59c6e3e73d840e982f79fee676033919c353e3ce4b35295385349ea9b31031",
+      "size_bytes": 37520,
+      "line_count": 859
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-history-pairing-policy-prep-02/policy.json",
+      "sha256": "cbff525dbe30ae671069d3ddaed52825bb7e9a1f80c610d34d15e67d4238ac61",
+      "size_bytes": 18354,
+      "line_count": 527
+    },
+    {
+      "path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/Root-FULL-Source-review-04.json",
+      "sha256": "25aec14f76da8c4d0623282837dcff28d39c4defb7ba9903597f0c2bad3a62b9",
+      "size_bytes": 1121,
+      "line_count": 28
+    },
+    {
+      "path": ".runtime/porting/CTF-10/Base-ordinary-history-comparison-Source-review-04/review.json",
+      "sha256": "c4ee2a2c2902213713519076e5294f467b6917a87b7fb44c3590f6001a4eece7",
+      "size_bytes": 1329,
+      "line_count": 29
+    },
+    {
+      "path": ".runtime/porting/CTF-10/review-main-thread-comparer-Root-04.py",
+      "sha256": "9640926751aa3e70a608b053cdc21586f8c7506f339d29a2d07d2a3351f5d661",
+      "size_bytes": 3756,
+      "line_count": 48
+    },
+    {
+      "path": ".runtime/porting/CTF-10/review-main-thread-comparison-Root-01.py",
+      "sha256": "ef64299d7ec54de274a494e671f8a1a19d8d60eb9b2b04454793fc50a09603fc",
+      "size_bytes": 4194,
+      "line_count": 46
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/SRC-05-production-main-thread/summary.json",
+      "sha256": "db4da22bc0c16e38ba6e799e26b47e56b7a41e9ba65ef533e68e7d87aa6b69d6",
+      "size_bytes": 441884,
+      "line_count": 10406
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/CTF-10-surface-consumer05-original-baseline/summary.json",
+      "sha256": "49f284c4fb174651b085eac061afe56d0b33bc81372eb88f88204f2569bc0b95",
+      "size_bytes": 15700,
+      "line_count": 388
+    }
+  ],
+  "exact_source_correspondence": {
+    "before": {
+      "path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-01/before/publish.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    "proposal": {
+      "path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-01/publish.py",
+      "sha256": "d80b24e62540c0ecfc1500c188753f5eea889fbbdc18e18a1f47b9c040970f40",
+      "size_bytes": 13320,
+      "line_count": 129
+    },
+    "exact_diff": {
+      "path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-01/diffs/publish.py.diff",
+      "sha256": "25ca3e91a23136d576b94ebd6ae384ed51e280f360c32dcaff51eb151970fe85",
+      "size_bytes": 13632,
+      "line_count": 132
+    }
+  },
+  "selection_scope": "Finite explicit Source, actual comparison/factual metadata and all five complete compressed ledgers; no recursive ancestry, whole Source members or original huge event streams.",
+  "target_or_publisher_execution_performed": false,
+  "canonical_mutation_performed": false,
+  "event_or_ledger_values_parsed": false,
+  "gates_updated": false
+}

@@ -213,3 +213,11 @@ Evidence: [observer entry and quality](../evidence/CTF-10-ordinary-history-captu
 
 Strict A/Deny ordinary execution exited0 and captured all578 observed lifecycle events. The frozen full-stream comparer exited1:192 paired stages,3,898 required unavailable/unmatched stages,1,978,267 exact observations and35,031 mismatches. Stream custody completed without truncation; every mismatch/unmatched stage and the full Rust stream are archived. Warmup/kickoff/start-flag and outdoor weather owner differences remain. No integration, equation-per-iteration, whole-manager or full-card PASS is claimed.
 Evidence: [retained ordinary comparison](../evidence/CTF-10-ordinary-history-comparison/summary.json) (`77c800f7f6314a8fa640defd419103781748b56d997135a016a5a3c3d41f5cc2`).
+
+## Windows main ordinary history comparison: retained FAIL
+
+The unchanged strict A/Deny A-24H input completed on the actual Windows main entry. The full frozen-policy comparison retained FAIL: 1,340 paired stages, 2,754 required unavailable/unmatched stages, 13,807,360 exact observations and 235,456 mismatches. Native captured 404,886 events and Rust captured 4,034 events. Both full factual reviews checked the five complete ledgers, including every mismatch and required boundary; 4,094 required-ledger rows include the 1,340 paired stages.
+
+The first paired difference is already present in incoming SurfTempIn at Warmup day1/hour1/timestep2, before that history update. Incoming histories, constants and reports also differ. This identifies a differing boundary, without establishing its cause. Native has 20 warmup days and Rust has6; the original ambiguous initialization key remains unavailable under the unchanged pairing policy. Required missing or ambiguous stages cannot PASS.
+
+[Actual main-entry comparison evidence](../evidence/CTF-10-main-thread-history-comparison/summary.json) preserves all five full compressed ledgers and the finite selected Source/custody archive (57 rows, 51 stored objects). Large original streams and whole Source payloads remain provenance references to the earlier released evidence; the selected archive does not claim transitive replayability. The previous worker-entry FAIL remains immutable. Ordinary lifecycle/state/cadence, inside iteration, predecessor integration and all three full-card gates remain pending; A14/54 and B14/64 are unchanged.

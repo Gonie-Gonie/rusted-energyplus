@@ -1,0 +1,212 @@
+{
+  "schema": "ctf10-main-thread-comparison-Root-full-factual-review.v1",
+  "accepted": true,
+  "actual_comparison": {
+    "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/comparison.json",
+    "sha256": "0e55aabd12e38e13a08c46a6147b94fb0e527bc6199ca71b0d9d6a248353adfb",
+    "size_bytes": 20915
+  },
+  "actual_execution": {
+    "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-command-01/receipt.json",
+    "sha256": "e9d7632e79949b141e5cf0ce0da021e3230bd410ef00258f424e566a72eecd9e",
+    "size_bytes": 4094
+  },
+  "captured_Source_snapshot": {
+    "path": ".runtime/porting/source-objects/00/00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a",
+    "sha256": "00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a"
+  },
+  "full_all_five_ledgers_read": true,
+  "ledgers": {
+    "mismatches": {
+      "records": 235456,
+      "decoded_bytes": 163461284,
+      "decoded_sha256": "cdef62c167604c9f5518f41653f03d4951bdbb9d426638bf6f5bd101e25c7f0a"
+    },
+    "required-boundaries": {
+      "records": 4094,
+      "decoded_bytes": 2642762,
+      "decoded_sha256": "83a44cb3a2147c0ea7d464a907305f99fbbbf37b80deb07e1d45fe2690caa799"
+    },
+    "optional-context": {
+      "records": 410261,
+      "decoded_bytes": 134819450,
+      "decoded_sha256": "97ac716390217d9179bb10c4328df740174f156fdf6e034d7b2a0abfad7212e0"
+    },
+    "inside-prerequisites": {
+      "records": 86832,
+      "decoded_bytes": 81993588,
+      "decoded_sha256": "799863e25eda96120e5089d519bfb839c8c59fa879480162a2f611ed74a0eeac"
+    },
+    "Native-selected-boundaries": {
+      "records": 4058,
+      "decoded_bytes": 406101411,
+      "decoded_sha256": "ee92d473e02a866c8b1df68f32b17981c978985bdb7fab13ef324a11a3a127d2"
+    }
+  },
+  "ledger_reason_counts": {
+    "mismatches": {
+      "exact identity/shape/order/copy bits differ": 211336,
+      "Frozen exact-zero arithmetic profile differs": 24120
+    },
+    "required-boundaries": {
+      "Native shared clock/stage absent or ambiguous; no occurrence pairing": 6,
+      "paired-comparison-performed": 1340,
+      "Duplicated Native shared clock/stage; no occurrence pairing": 30,
+      "Unmatched required Native selected stage": 2718
+    },
+    "optional-context": {
+      "No shared selected semantic boundary; retained full Original stream": 400828,
+      "unspecified": 8092,
+      "generation": 1,
+      "Actual material-name arena unavailable; raw LayerPoint IDs retained without positional mapping": 1340
+    },
+    "inside-prerequisites": {
+      "Prerequisite custody only; no Rust per-iteration seam or inside-equation numerical PASS": 86832
+    },
+    "Native-selected-boundaries": {
+      "unspecified": 4058
+    }
+  },
+  "ledger_status_counts": {
+    "mismatches": {
+      "unspecified": 235456
+    },
+    "required-boundaries": {
+      "required-unavailable-or-unmatched": 2754,
+      "paired-comparison-performed": 1340
+    },
+    "optional-context": {
+      "unspecified": 410261
+    },
+    "inside-prerequisites": {
+      "unspecified": 86832
+    },
+    "Native-selected-boundaries": {
+      "unspecified": 4058
+    }
+  },
+  "full_decoded_bytes": 789018495,
+  "actual_first_mismatch_and_required_omission": {
+    "mismatches": {
+      "case_ordinal": {
+        "shared_key": [
+          "update-input",
+          "Warmup",
+          1,
+          1,
+          2,
+          "3fd0000000000000",
+          "408c200000000000"
+        ],
+        "Native": {
+          "state_address": 412522371840,
+          "procedure": "UpdateThermalHistories",
+          "invocation_ordinal": 11,
+          "event_ordinal": 7013,
+          "checkpoint": "history_update_entry_owners"
+        },
+        "Rust_event": 11,
+        "actual_identity_mapping": {
+          "zone": {
+            "0": 1
+          },
+          "space": {
+            "0": 1
+          },
+          "construction": {
+            "0": 1,
+            "1": 2,
+            "2": 3
+          },
+          "surface": {
+            "0": 1,
+            "1": 2,
+            "2": 3,
+            "3": 4,
+            "4": 5,
+            "5": 6
+          }
+        },
+        "actual_Rust_boundary": "HistoryUpdateInput",
+        "actual_Rust_update_route": null
+      },
+      "path": "selected_input/1/SurfTempIn/value_bits",
+      "reason": "exact identity/shape/order/copy bits differ",
+      "Native": "40347c1c56426e21",
+      "Rust": "4033010de6867060"
+    },
+    "required-boundaries": {
+      "status": "required-unavailable-or-unmatched",
+      "side": "Rust",
+      "identity": {
+        "event": 2,
+        "boundary": "InitializationInput",
+        "Native_candidates": [
+          {
+            "state_address": 412522371840,
+            "procedure": "InitThermalAndFluxHistories",
+            "invocation_ordinal": 1,
+            "event_ordinal": 9,
+            "checkpoint": "history_selected_initialization_input"
+          },
+          {
+            "state_address": 412522371840,
+            "procedure": "InitThermalAndFluxHistories",
+            "invocation_ordinal": 2,
+            "event_ordinal": 2504,
+            "checkpoint": "history_selected_initialization_input"
+          },
+          {
+            "state_address": 412522371840,
+            "procedure": "InitThermalAndFluxHistories",
+            "invocation_ordinal": 3,
+            "event_ordinal": 4352,
+            "checkpoint": "history_selected_initialization_input"
+          },
+          {
+            "state_address": 412522371840,
+            "procedure": "InitThermalAndFluxHistories",
+            "invocation_ordinal": 4,
+            "event_ordinal": 6371,
+            "checkpoint": "history_selected_initialization_input"
+          }
+        ]
+      },
+      "shared_key": [
+        "initialization-input",
+        "Warmup",
+        1,
+        1,
+        1,
+        "3fd0000000000000",
+        "408c200000000000"
+      ],
+      "reason": "Native shared clock/stage absent or ambiguous; no occurrence pairing",
+      "required": true,
+      "counted_as_PASS": false
+    }
+  },
+  "scientific_result": "FAIL retained; this review accepts complete evidence, not numerical parity",
+  "comparison_counts": {
+    "exact_observations": 13807360,
+    "mismatches": 235456
+  },
+  "boundary_counts": {
+    "all_Native_events": 404886,
+    "Native_selected_stages": 4058,
+    "Native_inside_scope_rows": 86832,
+    "Native_inside_scope_rows_unavailable": 0,
+    "all_Rust_events": 4034,
+    "Rust_selected_stages": 1346,
+    "required_unavailable_or_unmatched": 2754,
+    "paired_stages": 1340
+  },
+  "stream_custody_failure": null,
+  "no_causal_or_whole_integration_PASS_inferred": true,
+  "gates_updated": false,
+  "review_Source": {
+    "path": ".runtime/porting/CTF-10/review-main-thread-comparison-Root-01.py",
+    "sha256": "ef64299d7ec54de274a494e671f8a1a19d8d60eb9b2b04454793fc50a09603fc",
+    "size_bytes": 4194
+  }
+}

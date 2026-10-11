@@ -12291,6 +12291,11 @@
         "path": "energyplus_porting_plan/evidence/CTF-10-ordinary-history-comparison/summary.json",
         "sha256": "77c800f7f6314a8fa640defd419103781748b56d997135a016a5a3c3d41f5cc2",
         "size_bytes": 54383
+      },
+      "actual_main_thread_ordinary_history_comparison": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/summary.json",
+        "sha256": "3375f6f5cd9dfc84d31c4173e0f0316226e81f8f6bdd14fbd2608d317de89cd8",
+        "size_bytes": 5020
       }
     },
     {

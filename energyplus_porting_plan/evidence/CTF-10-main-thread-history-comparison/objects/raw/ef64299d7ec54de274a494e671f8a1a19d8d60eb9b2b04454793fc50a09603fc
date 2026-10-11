@@ -1,0 +1,46 @@
+"""Review every uncapped actual comparison ledger and retain the scientific failure."""
+from collections import Counter
+import gzip
+import hashlib
+import json
+from pathlib import Path
+ROOT=Path.cwd(); HERE=ROOT/'.runtime/porting/CTF-10/ordinary-main-thread-comparison-01'
+def ref(path):
+    with path.open('rb') as stream: sha=hashlib.file_digest(stream,'sha256').hexdigest()
+    return dict(path=path.relative_to(ROOT).as_posix(),sha256=sha,size_bytes=path.stat().st_size)
+def checked(row):
+    path=ROOT/row['path']; actual=ref(path)
+    assert actual['sha256']==row['sha256'] and ('size_bytes' not in row or actual['size_bytes']==row['size_bytes'])
+    return path
+sref=ref(HERE/'comparison.json'); s=json.loads(checked(sref).read_bytes())
+receipt_ref=ref(HERE.parent/'ordinary-main-thread-comparison-command-01/receipt.json')
+r=json.loads(checked(receipt_ref).read_bytes())
+assert r['exit_code']==1 and r['source_bytes_match_before_and_after'] is True and r['launch_error'] is None
+assert s['status']=='fail-retained-mismatch-or-required-unavailable' and s['stream_custody_failure'] is None
+assert s['selected_paired_boundary_comparison_passed'] is False and s['all_unmatched_and_mismatches_retained_without_cap'] is True
+assert r['source_snapshot']['sha256']==s['actual_Source_snapshot']['sha256']=='00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a'
+assert s['boundary_counts']==dict(all_Native_events=404886,Native_selected_stages=4058,Native_inside_scope_rows=86832,Native_inside_scope_rows_unavailable=0,all_Rust_events=4034,Rust_selected_stages=1346,required_unavailable_or_unmatched=2754,paired_stages=1340)
+counts={}; reasons={}; statuses={}; first={}; total_bytes=0
+for name,row in s['full_gzip_ledgers'].items():
+    path=checked(row); count=0; size=0; digest=hashlib.sha256(); groups=Counter(); status=Counter()
+    with gzip.open(path,'rb') as stream:
+        for raw in stream:
+            assert raw.endswith(b'\n') and len(raw)>1
+            digest.update(raw); size+=len(raw); value=json.loads(raw)
+            assert isinstance(value,dict)
+            if 'counted_as_PASS' in value: assert value['counted_as_PASS'] is False
+            if count==0 and name in ('mismatches','required-boundaries'): first[name]=value
+            groups[value.get('reason',value.get('status',value.get('record_type','unspecified')))]+=1
+            status[value.get('status','unspecified')]+=1
+            count+=1
+    counts[name]=dict(records=count,decoded_bytes=size,decoded_sha256=digest.hexdigest())
+    reasons[name]=dict(groups); statuses[name]=dict(status); total_bytes+=size
+assert counts['mismatches']['records']==s['comparison_counts']['mismatches']==235456
+assert statuses['required-boundaries']['required-unavailable-or-unmatched']==s['boundary_counts']['required_unavailable_or_unmatched']==2754
+assert statuses['required-boundaries']['paired-comparison-performed']==s['boundary_counts']['paired_stages']==1340
+assert counts['inside-prerequisites']['records']==s['boundary_counts']['Native_inside_scope_rows']==86832
+assert all(s[key] is False for key in ('inside_equation_per_iteration_PASS_claimed','whole_manager_PASS_claimed','integration_PASS_claimed','full_card_gates_updated'))
+report=dict(schema='ctf10-main-thread-comparison-Root-full-factual-review.v1',accepted=True,actual_comparison=sref,actual_execution=receipt_ref,captured_Source_snapshot=s['actual_Source_snapshot'],full_all_five_ledgers_read=True,ledgers=counts,ledger_reason_counts=reasons,ledger_status_counts=statuses,full_decoded_bytes=total_bytes,actual_first_mismatch_and_required_omission=first,scientific_result='FAIL retained; this review accepts complete evidence, not numerical parity',comparison_counts=s['comparison_counts'],boundary_counts=s['boundary_counts'],stream_custody_failure=None,no_causal_or_whole_integration_PASS_inferred=True,gates_updated=False,review_Source=ref(Path(__file__)))
+out=HERE/'Root-full-factual-review.json'
+with out.open('x',encoding='utf8',newline='\n') as stream: json.dump(report,stream,indent=2); stream.write('\n')
+print(json.dumps(dict(review=ref(out),ledgers=counts,comparison_counts=s['comparison_counts'],boundary_counts=s['boundary_counts'])))

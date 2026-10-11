@@ -1,0 +1,1082 @@
+{
+  "schema": "ctf10-ordinary-main-thread-comparison-factual-review.v1",
+  "reviewer_role": "Header",
+  "accepted": true,
+  "actual_execution": {
+    "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-command-01/receipt.json",
+    "sha256": "e9d7632e79949b141e5cf0ce0da021e3230bd410ef00258f424e566a72eecd9e",
+    "size_bytes": 4094
+  },
+  "accepted_as_honest_retained_scientific_failure": true,
+  "actual_comparison": {
+    "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/comparison.json",
+    "sha256": "0e55aabd12e38e13a08c46a6147b94fb0e527bc6199ca71b0d9d6a248353adfb",
+    "size_bytes": 20915
+  },
+  "actual_comparison_execution": {
+    "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-command-01/receipt.json",
+    "sha256": "e9d7632e79949b141e5cf0ce0da021e3230bd410ef00258f424e566a72eecd9e",
+    "size_bytes": 4094
+  },
+  "captured_and_comparison_Source": {
+    "path": ".runtime/porting/source-objects/00/00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a",
+    "sha256": "00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a"
+  },
+  "captured_Source_members_archived": 3931,
+  "current_Source_separately_reviewed": "062d37e84728f90782e4306db62f52fbc43b3c06d22b2d0a3f1c04c893b75ab1",
+  "current_Source_members": 3937,
+  "all_five_ledgers_full_hash_JSON_and_gzip_integrity_accepted": true,
+  "ledger_rows": {
+    "mismatches": 235456,
+    "required-boundaries": 4094,
+    "Native-selected-boundaries": 4058,
+    "optional-context": 410261,
+    "inside-prerequisites": 86832
+  },
+  "ledger_decoded_bytes": {
+    "mismatches": 163461284,
+    "required-boundaries": 2642762,
+    "Native-selected-boundaries": 406101411,
+    "optional-context": 134819450,
+    "inside-prerequisites": 81993588
+  },
+  "ledger_decoded_sha256": {
+    "mismatches": "cdef62c167604c9f5518f41653f03d4951bdbb9d426638bf6f5bd101e25c7f0a",
+    "required-boundaries": "83a44cb3a2147c0ea7d464a907305f99fbbbf37b80deb07e1d45fe2690caa799",
+    "Native-selected-boundaries": "ee92d473e02a866c8b1df68f32b17981c978985bdb7fab13ef324a11a3a127d2",
+    "optional-context": "97ac716390217d9179bb10c4328df740174f156fdf6e034d7b2a0abfad7212e0",
+    "inside-prerequisites": "799863e25eda96120e5089d519bfb839c8c59fa879480162a2f611ed74a0eeac"
+  },
+  "all_4058_spooled_Native_boundaries_equal_actual_original_events": true,
+  "all_235456_mismatch_values_independently_joined_to_actual_both_side_owners": true,
+  "all_1340_pair_clock_identity_and_actual_scope_return_joins_verified": true,
+  "Native_events": 404886,
+  "Rust_events": 4034,
+  "Native_selected": 4058,
+  "Rust_selected": 1346,
+  "paired": 1340,
+  "required_unavailable_or_unmatched": 2754,
+  "exact_observations_reported_not_independently_recomputed": 13807360,
+  "mismatches": 235456,
+  "mismatch_families": {
+    "selected_input/SurfTempIn": 8040,
+    "selected_input/SurfCTFConstInPart": 1340,
+    "selected_input/SurfCTFConstOutPart": 1340,
+    "normal/SurfInsideFluxHist": 48144,
+    "normal/SurfInsideTempHist": 48144,
+    "normal/SurfOutsideFluxHist": 48144,
+    "normal/SurfOutsideTempHist": 48144,
+    "flux_reports/SurfOpaqInsFaceCond": 8040,
+    "flux_reports/SurfOpaqOutFaceCondFlux": 8040,
+    "flux_reports/SurfOpaqOutFaceCond": 8040,
+    "flux_reports/SurfOpaqInsFaceCondFlux": 8040
+  },
+  "mismatch_stage_groups": [
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "count": 100784
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "count": 100880
+    },
+    {
+      "stage": "update-input",
+      "phase": "Run",
+      "count": 16896
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Run",
+      "count": 16896
+    }
+  ],
+  "mismatch_reasons": {
+    "exact identity/shape/order/copy bits differ": 211336,
+    "Frozen exact-zero arithmetic profile differs": 24120
+  },
+  "required_reasons": [
+    {
+      "side": "Rust",
+      "reason": "Native shared clock/stage absent or ambiguous; no occurrence pairing",
+      "count": 6
+    },
+    {
+      "side": "Native",
+      "reason": "Duplicated Native shared clock/stage; no occurrence pairing",
+      "count": 30
+    },
+    {
+      "side": "Native",
+      "reason": "Unmatched required Native selected stage",
+      "count": 2718
+    }
+  ],
+  "first_mismatch": {
+    "case_ordinal": {
+      "shared_key": [
+        "update-input",
+        "Warmup",
+        1,
+        1,
+        2,
+        "3fd0000000000000",
+        "408c200000000000"
+      ],
+      "Native": {
+        "state_address": 412522371840,
+        "procedure": "UpdateThermalHistories",
+        "invocation_ordinal": 11,
+        "event_ordinal": 7013,
+        "checkpoint": "history_update_entry_owners"
+      },
+      "Rust_event": 11,
+      "actual_identity_mapping": {
+        "zone": {
+          "0": 1
+        },
+        "space": {
+          "0": 1
+        },
+        "construction": {
+          "0": 1,
+          "1": 2,
+          "2": 3
+        },
+        "surface": {
+          "0": 1,
+          "1": 2,
+          "2": 3,
+          "3": 4,
+          "4": 5,
+          "5": 6
+        }
+      },
+      "actual_Rust_boundary": "HistoryUpdateInput",
+      "actual_Rust_update_route": null
+    },
+    "path": "selected_input/1/SurfTempIn/value_bits",
+    "reason": "exact identity/shape/order/copy bits differ",
+    "Native": "40347c1c56426e21",
+    "Rust": "4033010de6867060"
+  },
+  "first_mismatch_by_family": {
+    "selected_input/SurfTempIn": {
+      "case_ordinal": {
+        "shared_key": [
+          "update-input",
+          "Warmup",
+          1,
+          1,
+          2,
+          "3fd0000000000000",
+          "408c200000000000"
+        ],
+        "Native": {
+          "state_address": 412522371840,
+          "procedure": "UpdateThermalHistories",
+          "invocation_ordinal": 11,
+          "event_ordinal": 7013,
+          "checkpoint": "history_update_entry_owners"
+        },
+        "Rust_event": 11,
+        "actual_identity_mapping": {
+          "zone": {
+            "0": 1
+          },
+          "space": {
+            "0": 1
+          },
+          "construction": {
+            "0": 1,
+            "1": 2,
+            "2": 3
+          },
+          "surface": {
+            "0": 1,
+            "1": 2,
+            "2": 3,
+            "3": 4,
+            "4": 5,
+            "5": 6
+          }
+        },
+        "actual_Rust_boundary": "HistoryUpdateInput",
+        "actual_Rust_update_route": null
+      },
+      "path": "selected_input/1/SurfTempIn/value_bits",
+      "reason": "exact identity/shape/order/copy bits differ",
+      "Native": "40347c1c56426e21",
+      "Rust": "4033010de6867060"
+    },
+    "selected_input/SurfCTFConstInPart": {
+      "case_ordinal": {
+        "shared_key": [
+          "update-input",
+          "Warmup",
+          1,
+          1,
+          2,
+          "3fd0000000000000",
+          "408c200000000000"
+        ],
+        "Native": {
+          "state_address": 412522371840,
+          "procedure": "UpdateThermalHistories",
+          "invocation_ordinal": 11,
+          "event_ordinal": 7013,
+          "checkpoint": "history_update_entry_owners"
+        },
+        "Rust_event": 11,
+        "actual_identity_mapping": {
+          "zone": {
+            "0": 1
+          },
+          "space": {
+            "0": 1
+          },
+          "construction": {
+            "0": 1,
+            "1": 2,
+            "2": 3
+          },
+          "surface": {
+            "0": 1,
+            "1": 2,
+            "2": 3,
+            "3": 4,
+            "4": 5,
+            "5": 6
+          }
+        },
+        "actual_Rust_boundary": "HistoryUpdateInput",
+        "actual_Rust_update_route": null
+      },
+      "path": "selected_input/5/SurfCTFConstInPart/value_bits",
+      "reason": "exact identity/shape/order/copy bits differ",
+      "Native": "40947c16076b3ae9",
+      "Rust": "409499d1e1d11b79"
+    },
+    "selected_input/SurfCTFConstOutPart": {
+      "case_ordinal": {
+        "shared_key": [
+          "update-input",
+          "Warmup",
+          1,
+          1,
+          2,
+          "3fd0000000000000",
+          "408c200000000000"
+        ],
+        "Native": {
+          "state_address": 412522371840,
+          "procedure": "UpdateThermalHistories",
+          "invocation_ordinal": 11,
+          "event_ordinal": 7013,
+          "checkpoint": "history_update_entry_owners"
+        },
+        "Rust_event": 11,
+        "actual_identity_mapping": {
+          "zone": {
+            "0": 1
+          },
+          "space": {
+            "0": 1
+          },
+          "construction": {
+            "0": 1,
+            "1": 2,
+            "2": 3
+          },
+          "surface": {
+            "0": 1,
+            "1": 2,
+            "2": 3,
+            "3": 4,
+            "4": 5,
+            "5": 6
+          }
+        },
+        "actual_Rust_boundary": "HistoryUpdateInput",
+        "actual_Rust_update_route": null
+      },
+      "path": "selected_input/5/SurfCTFConstOutPart/value_bits",
+      "reason": "exact identity/shape/order/copy bits differ",
+      "Native": "c094971429c31b79",
+      "Rust": "c09499d1e1d11b73"
+    },
+    "normal/SurfInsideFluxHist": {
+      "case_ordinal": {
+        "shared_key": [
+          "update-input",
+          "Warmup",
+          1,
+          1,
+          2,
+          "3fd0000000000000",
+          "408c200000000000"
+        ],
+        "Native": {
+          "state_address": 412522371840,
+          "procedure": "UpdateThermalHistories",
+          "invocation_ordinal": 11,
+          "event_ordinal": 7013,
+          "checkpoint": "history_update_entry_owners"
+        },
+        "Rust_event": 11,
+        "actual_identity_mapping": {
+          "zone": {
+            "0": 1
+          },
+          "space": {
+            "0": 1
+          },
+          "construction": {
+            "0": 1,
+            "1": 2,
+            "2": 3
+          },
+          "surface": {
+            "0": 1,
+            "1": 2,
+            "2": 3,
+            "3": 4,
+            "4": 5,
+            "5": 6
+          }
+        },
+        "actual_Rust_boundary": "HistoryUpdateInput",
+        "actual_Rust_update_route": null
+      },
+      "path": "normal/SurfInsideFluxHist/0/1/copied_owner/value_bits",
+      "reason": "exact identity/shape/order/copy bits differ",
+      "Native": "c026132d4eee760a",
+      "Rust": "c02780b56cddf0a7"
+    },
+    "normal/SurfInsideTempHist": {
+      "case_ordinal": {
+        "shared_key": [
+          "update-input",
+          "Warmup",
+          1,
+          1,
+          2,
+          "3fd0000000000000",
+          "408c200000000000"
+        ],
+        "Native": {
+          "state_address": 412522371840,
+          "procedure": "UpdateThermalHistories",
+          "invocation_ordinal": 11,
+          "event_ordinal": 7013,
+          "checkpoint": "history_update_entry_owners"
+        },
+        "Rust_event": 11,
+        "actual_identity_mapping": {
+          "zone": {
+            "0": 1
+          },
+          "space": {
+            "0": 1
+          },
+          "construction": {
+            "0": 1,
+            "1": 2,
+            "2": 3
+          },
+          "surface": {
+            "0": 1,
+            "1": 2,
+            "2": 3,
+            "3": 4,
+            "4": 5,
+            "5": 6
+          }
+        },
+        "actual_Rust_boundary": "HistoryUpdateInput",
+        "actual_Rust_update_route": null
+      },
+      "path": "normal/SurfInsideTempHist/0/1/copied_owner/value_bits",
+      "reason": "exact identity/shape/order/copy bits differ",
+      "Native": "40347c1c56426e21",
+      "Rust": "4033010de6867060"
+    },
+    "normal/SurfOutsideFluxHist": {
+      "case_ordinal": {
+        "shared_key": [
+          "update-input",
+          "Warmup",
+          1,
+          1,
+          2,
+          "3fd0000000000000",
+          "408c200000000000"
+        ],
+        "Native": {
+          "state_address": 412522371840,
+          "procedure": "UpdateThermalHistories",
+          "invocation_ordinal": 11,
+          "event_ordinal": 7013,
+          "checkpoint": "history_update_entry_owners"
+        },
+        "Rust_event": 11,
+        "actual_identity_mapping": {
+          "zone": {
+            "0": 1
+          },
+          "space": {
+            "0": 1
+          },
+          "construction": {
+            "0": 1,
+            "1": 2,
+            "2": 3
+          },
+          "surface": {
+            "0": 1,
+            "1": 2,
+            "2": 3,
+            "3": 4,
+            "4": 5,
+            "5": 6
+          }
+        },
+        "actual_Rust_boundary": "HistoryUpdateInput",
+        "actual_Rust_update_route": null
+      },
+      "path": "normal/SurfOutsideFluxHist/0/1/copied_owner/value_bits",
+      "reason": "exact identity/shape/order/copy bits differ",
+      "Native": "c026132d4eee760a",
+      "Rust": "c02780b56cddf0a7"
+    },
+    "normal/SurfOutsideTempHist": {
+      "case_ordinal": {
+        "shared_key": [
+          "update-input",
+          "Warmup",
+          1,
+          1,
+          2,
+          "3fd0000000000000",
+          "408c200000000000"
+        ],
+        "Native": {
+          "state_address": 412522371840,
+          "procedure": "UpdateThermalHistories",
+          "invocation_ordinal": 11,
+          "event_ordinal": 7013,
+          "checkpoint": "history_update_entry_owners"
+        },
+        "Rust_event": 11,
+        "actual_identity_mapping": {
+          "zone": {
+            "0": 1
+          },
+          "space": {
+            "0": 1
+          },
+          "construction": {
+            "0": 1,
+            "1": 2,
+            "2": 3
+          },
+          "surface": {
+            "0": 1,
+            "1": 2,
+            "2": 3,
+            "3": 4,
+            "4": 5,
+            "5": 6
+          }
+        },
+        "actual_Rust_boundary": "HistoryUpdateInput",
+        "actual_Rust_update_route": null
+      },
+      "path": "normal/SurfOutsideTempHist/0/1/copied_owner/value_bits",
+      "reason": "exact identity/shape/order/copy bits differ",
+      "Native": "c014351778e0e123",
+      "Rust": "c014053b4afb6109"
+    },
+    "flux_reports/SurfOpaqInsFaceCond": {
+      "case_ordinal": {
+        "shared_key": [
+          "update-input",
+          "Warmup",
+          1,
+          1,
+          2,
+          "3fd0000000000000",
+          "408c200000000000"
+        ],
+        "Native": {
+          "state_address": 412522371840,
+          "procedure": "UpdateThermalHistories",
+          "invocation_ordinal": 11,
+          "event_ordinal": 7013,
+          "checkpoint": "history_update_entry_owners"
+        },
+        "Rust_event": 11,
+        "actual_identity_mapping": {
+          "zone": {
+            "0": 1
+          },
+          "space": {
+            "0": 1
+          },
+          "construction": {
+            "0": 1,
+            "1": 2,
+            "2": 3
+          },
+          "surface": {
+            "0": 1,
+            "1": 2,
+            "2": 3,
+            "3": 4,
+            "4": 5,
+            "5": 6
+          }
+        },
+        "actual_Rust_boundary": "HistoryUpdateInput",
+        "actual_Rust_update_route": null
+      },
+      "path": "flux_reports/SurfOpaqInsFaceCond/0/1/copied_owner/value_bits",
+      "reason": "exact identity/shape/order/copy bits differ",
+      "Native": "c088087a908be26b",
+      "Rust": "c089966f95c02154"
+    },
+    "flux_reports/SurfOpaqOutFaceCondFlux": {
+      "case_ordinal": {
+        "shared_key": [
+          "update-input",
+          "Warmup",
+          1,
+          1,
+          2,
+          "3fd0000000000000",
+          "408c200000000000"
+        ],
+        "Native": {
+          "state_address": 412522371840,
+          "procedure": "UpdateThermalHistories",
+          "invocation_ordinal": 11,
+          "event_ordinal": 7013,
+          "checkpoint": "history_update_entry_owners"
+        },
+        "Rust_event": 11,
+        "actual_identity_mapping": {
+          "zone": {
+            "0": 1
+          },
+          "space": {
+            "0": 1
+          },
+          "construction": {
+            "0": 1,
+            "1": 2,
+            "2": 3
+          },
+          "surface": {
+            "0": 1,
+            "1": 2,
+            "2": 3,
+            "3": 4,
+            "4": 5,
+            "5": 6
+          }
+        },
+        "actual_Rust_boundary": "HistoryUpdateInput",
+        "actual_Rust_update_route": null
+      },
+      "path": "flux_reports/SurfOpaqOutFaceCondFlux/0/1/copied_owner/value_bits",
+      "reason": "exact identity/shape/order/copy bits differ",
+      "Native": "4026132d4eee760a",
+      "Rust": "402780b56cddf0a7"
+    },
+    "flux_reports/SurfOpaqOutFaceCond": {
+      "case_ordinal": {
+        "shared_key": [
+          "update-input",
+          "Warmup",
+          1,
+          1,
+          2,
+          "3fd0000000000000",
+          "408c200000000000"
+        ],
+        "Native": {
+          "state_address": 412522371840,
+          "procedure": "UpdateThermalHistories",
+          "invocation_ordinal": 11,
+          "event_ordinal": 7013,
+          "checkpoint": "history_update_entry_owners"
+        },
+        "Rust_event": 11,
+        "actual_identity_mapping": {
+          "zone": {
+            "0": 1
+          },
+          "space": {
+            "0": 1
+          },
+          "construction": {
+            "0": 1,
+            "1": 2,
+            "2": 3
+          },
+          "surface": {
+            "0": 1,
+            "1": 2,
+            "2": 3,
+            "3": 4,
+            "4": 5,
+            "5": 6
+          }
+        },
+        "actual_Rust_boundary": "HistoryUpdateInput",
+        "actual_Rust_update_route": null
+      },
+      "path": "flux_reports/SurfOpaqOutFaceCond/0/1/copied_owner/value_bits",
+      "reason": "exact identity/shape/order/copy bits differ",
+      "Native": "4088087a908be26b",
+      "Rust": "4089966f95c02154"
+    },
+    "flux_reports/SurfOpaqInsFaceCondFlux": {
+      "case_ordinal": {
+        "shared_key": [
+          "update-input",
+          "Warmup",
+          1,
+          1,
+          2,
+          "3fd0000000000000",
+          "408c200000000000"
+        ],
+        "Native": {
+          "state_address": 412522371840,
+          "procedure": "UpdateThermalHistories",
+          "invocation_ordinal": 11,
+          "event_ordinal": 7013,
+          "checkpoint": "history_update_entry_owners"
+        },
+        "Rust_event": 11,
+        "actual_identity_mapping": {
+          "zone": {
+            "0": 1
+          },
+          "space": {
+            "0": 1
+          },
+          "construction": {
+            "0": 1,
+            "1": 2,
+            "2": 3
+          },
+          "surface": {
+            "0": 1,
+            "1": 2,
+            "2": 3,
+            "3": 4,
+            "4": 5,
+            "5": 6
+          }
+        },
+        "actual_Rust_boundary": "HistoryUpdateInput",
+        "actual_Rust_update_route": null
+      },
+      "path": "flux_reports/SurfOpaqInsFaceCondFlux/0/1/copied_owner/value_bits",
+      "reason": "exact identity/shape/order/copy bits differ",
+      "Native": "c026132d4eee760a",
+      "Rust": "c02780b56cddf0a7"
+    }
+  },
+  "Native_shared_key_multiplicities": {
+    "4": 4,
+    "7": 2,
+    "1": 4028
+  },
+  "Native_selected_by_phase_day": [
+    {
+      "stage": "initialization-input",
+      "phase": "Warmup",
+      "day": 1,
+      "count": 4
+    },
+    {
+      "stage": "initialization-returned",
+      "phase": "Warmup",
+      "day": 1,
+      "count": 4
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 1,
+      "count": 105
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 1,
+      "count": 105
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 2,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 2,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 3,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 3,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 4,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 4,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 5,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 5,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 6,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 6,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 7,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 7,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 8,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 8,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 9,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 9,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 10,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 10,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 11,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 11,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 12,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 12,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 13,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 13,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 14,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 14,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 15,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 15,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 16,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 16,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 17,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 17,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 18,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 18,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 19,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 19,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 20,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 20,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Run",
+      "day": 1,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Run",
+      "day": 1,
+      "count": 96
+    }
+  ],
+  "Rust_selected_by_phase_day": [
+    {
+      "stage": "initialization-input",
+      "phase": "Warmup",
+      "day": 1,
+      "count": 1
+    },
+    {
+      "stage": "initialization-returned",
+      "phase": "Warmup",
+      "day": 1,
+      "count": 1
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 1,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 1,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 2,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 2,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 3,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 3,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 4,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 4,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 5,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 5,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Warmup",
+      "day": 6,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Warmup",
+      "day": 6,
+      "count": 96
+    },
+    {
+      "stage": "update-input",
+      "phase": "Run",
+      "day": 1,
+      "count": 96
+    },
+    {
+      "stage": "update-returned",
+      "phase": "Run",
+      "day": 1,
+      "count": 96
+    }
+  ],
+  "Rust_actual_boundary_counts": {
+    "BeginEntry": 672,
+    "InitializationInput": 1,
+    "InitializationReturned": 1,
+    "BeginReturned": 672,
+    "HistoryUpdateInput": 672,
+    "HistoryUpdateReturned": 672,
+    "HistoryCommitBeforeClockRelease": 672,
+    "CommitReturned": 672
+  },
+  "first_mismatch_interpretation": "The first paired update-input is Warmup day1/hour1/timestep2. Its incoming SurfTempIn and history/constant/report owners already differ. This locates a boundary difference; it does not isolate a formula, provider, initialization, weather, caller, or floating-control cause. Initialization keys and first update key are ambiguous on Native and remain unavailable under the unchanged no-occurrence policy.",
+  "no_equations_recomputed": true,
+  "policy_or_inputs_changed": false,
+  "targets_rerun": false,
+  "causal_claim_made": false,
+  "scientific_PASS_claimed": false,
+  "whole_ordinary_PASS_claimed": false,
+  "gates_updated": false
+}

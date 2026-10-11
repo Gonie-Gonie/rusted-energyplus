@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-10\main-thread-history-publication-prep-02\publish.py", line 129, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-10\main-thread-history-publication-prep-02\publish.py", line 70, in main
+    same(execution['source_snapshot'], report['actual_comparison_Source_snapshot']); same(execution['executed_launcher']['archive'], prep['recorder_Source'])
+                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-10\main-thread-history-publication-prep-02\publish.py", line 38, in same
+    need(checked(a) == checked(b), 'actual artifact identities differ')
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-10\main-thread-history-publication-prep-02\publish.py", line 16, in need
+    if not value: raise ValueError(text)
+                  ^^^^^^^^^^^^^^^^^^^^^^
+ValueError: actual artifact identities differ

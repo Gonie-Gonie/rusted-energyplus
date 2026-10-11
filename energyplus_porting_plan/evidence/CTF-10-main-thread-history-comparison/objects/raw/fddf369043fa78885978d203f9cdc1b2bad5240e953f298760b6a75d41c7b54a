@@ -1,0 +1,25 @@
+{
+  "schema": "ctf10-main-thread-history-publication-inputs.v1",
+  "comparison": {
+    "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/comparison.json",
+    "sha256": "0e55aabd12e38e13a08c46a6147b94fb0e527bc6199ca71b0d9d6a248353adfb",
+    "size_bytes": 20915,
+    "line_count": 563
+  },
+  "comparison_execution": {
+    "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-command-01/receipt.json",
+    "sha256": "e9d7632e79949b141e5cf0ce0da021e3230bd410ef00258f424e566a72eecd9e",
+    "size_bytes": 4094,
+    "line_count": 88
+  },
+  "Root_factual_review": {
+    "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/Root-full-factual-review.json",
+    "sha256": "d49b594041cabaff03862699e15e09b9a72c986a877d3c7ecba9ca5689b88986",
+    "size_bytes": 6847
+  },
+  "independent_factual_review": {
+    "path": ".runtime/porting/CTF-10/Header-main-thread-comparison-factual-review-01/review.json",
+    "sha256": "e1828dfc355b7b2ac7c89db779e860027c95c5ab81c7a5db03efaf7b8f17307f",
+    "size_bytes": 27497
+  }
+}

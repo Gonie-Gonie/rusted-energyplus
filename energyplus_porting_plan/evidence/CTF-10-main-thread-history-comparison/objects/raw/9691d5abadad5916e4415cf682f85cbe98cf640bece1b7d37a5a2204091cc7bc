@@ -1,0 +1,43 @@
+"""Source-only one-key publisher repair after independent full producer-schema review."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+BASE = ROOT / '.runtime/porting/CTF-10'
+OLD = BASE / 'main-thread-history-publication-prep-01'
+NEW = BASE / 'main-thread-history-publication-prep-02'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+
+def write(path, raw):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream: stream.write(raw)
+    return ref(path)
+
+
+old = (OLD / 'publish.py').read_bytes()
+left = b"peer_review['paired'] == report['boundary_counts']['paired']"
+right = b"peer_review['paired'] == report['boundary_counts']['paired_stages']"
+assert old.count(left) == 1
+new = old.replace(left, right, 1)
+assert new.replace(right, left, 1) == old
+ast.parse(old); ast.parse(new)
+before = write(NEW / 'before/publish.py', old)
+source = write(NEW / 'publish.py', new)
+diff = write(NEW / 'diffs/publish.py.diff', ''.join(difflib.unified_diff(old.decode().splitlines(True), new.decode().splitlines(True), fromfile=before['path'], tofile=source['path'])).encode())
+readme = (OLD / 'README.md').read_bytes().replace(b'publication-prep-01/', b'publication-prep-02/')
+readme += b'\nSuccessor02 preserves01 and repairs only the report count key paired_stages, while the independent review field remains paired. All129 publisher lines otherwise remain literal01; no scientific result, ledger, input, policy, guard or selection change. Independent FULL01 review found no other issue. A Source-only AST check of134 literal nested metadata field accesses found only this same lookup.\n'
+doc = write(NEW / 'README.md', readme)
+manifest = json.loads((OLD / 'manifest.json').read_bytes())
+manifest.update(parent_Source_preparation=ref(OLD / 'manifest.json'), own_sources=[source, doc, ref(Path(__file__)), before, diff], exact_source_correspondence=dict(before=before, proposal=source, exact_diff=diff))
+manifest['runtime_interfaces'] = dict(manifest['runtime_interfaces'], publisher=source)
+manifest['fixed_evidence'] += [ref(OLD / name) for name in ['manifest.json', 'publish.py', 'README.md']] + [ref(BASE / 'seal-main-thread-history-publication-01.py')]
+raw = (json.dumps(manifest, ensure_ascii=False, allow_nan=False, indent=2) + '\n').encode()
+print(json.dumps(write(NEW / 'manifest.json', raw)))

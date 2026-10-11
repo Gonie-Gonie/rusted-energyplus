@@ -1,0 +1,110 @@
+{
+  "schema": "ctf10-main-thread-history-comparison-evidence.v1",
+  "status": "fail-retained-mismatch-or-required-unavailable",
+  "actual_comparison": {
+    "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/comparison.json",
+    "sha256": "0e55aabd12e38e13a08c46a6147b94fb0e527bc6199ca71b0d9d6a248353adfb",
+    "size_bytes": 20915,
+    "line_count": 563
+  },
+  "actual_execution": {
+    "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-command-01/receipt.json",
+    "sha256": "e9d7632e79949b141e5cf0ce0da021e3230bd410ef00258f424e566a72eecd9e",
+    "size_bytes": 4094,
+    "line_count": 88
+  },
+  "actual_factual_reviews": {
+    "Root_factual_review": {
+      "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/Root-full-factual-review.json",
+      "sha256": "d49b594041cabaff03862699e15e09b9a72c986a877d3c7ecba9ca5689b88986",
+      "size_bytes": 6847
+    },
+    "independent_factual_review": {
+      "path": ".runtime/porting/CTF-10/Header-main-thread-comparison-factual-review-01/review.json",
+      "sha256": "e1828dfc355b7b2ac7c89db779e860027c95c5ab81c7a5db03efaf7b8f17307f",
+      "size_bytes": 27497
+    }
+  },
+  "actual_comparison_Source_snapshot": {
+    "path": ".runtime/porting/source-objects/00/00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a",
+    "sha256": "00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a",
+    "size_bytes": 1632864
+  },
+  "actual_comparison_Source_members": 3931,
+  "comparison_counts": {
+    "exact_observations": 13807360,
+    "mismatches": 235456
+  },
+  "boundary_counts": {
+    "all_Native_events": 404886,
+    "Native_selected_stages": 4058,
+    "Native_inside_scope_rows": 86832,
+    "Native_inside_scope_rows_unavailable": 0,
+    "all_Rust_events": 4034,
+    "Rust_selected_stages": 1346,
+    "required_unavailable_or_unmatched": 2754,
+    "paired_stages": 1340
+  },
+  "full_gzip_ledgers": {
+    "mismatches": {
+      "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/mismatches.ndjson.gz",
+      "sha256": "79e35c8e7c2b76f5d6e0eade9edfda33783b208a0a29d302977b445f4d8b96d6",
+      "size_bytes": 4909597
+    },
+    "required-boundaries": {
+      "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/required-boundaries.ndjson.gz",
+      "sha256": "a34af1a7857ab4f6039108b98f400c4247bdf5b26bcc88427e2315b986483468",
+      "size_bytes": 56005
+    },
+    "optional-context": {
+      "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/optional-context.ndjson.gz",
+      "sha256": "e5f9fd75d994fdc776a8d9a7625f22932309bee1441b62bd835f3a020ffd1b52",
+      "size_bytes": 2971865
+    },
+    "inside-prerequisites": {
+      "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/inside-prerequisites.ndjson.gz",
+      "sha256": "ee6fdbf3009dbb8866ac5aeccd7214f530b039881ae098228118bd16c3323012",
+      "size_bytes": 674940
+    },
+    "Native-selected-boundaries": {
+      "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/Native-selected-boundaries.ndjson.gz",
+      "sha256": "9e9ad10df0d37f8eaf8c74a0bbfef3e506c3c94a8deb397168c57132739d04e6",
+      "size_bytes": 14971290
+    }
+  },
+  "selected_archive": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/manifest.json",
+    "sha256": "045f0f585d873b72a1443cf24a5b735cf6de05cff640ee7e0d1bcad4a29a2016",
+    "size_bytes": 44578
+  },
+  "previous_CLI_evidence": {
+    "path": "energyplus_porting_plan/evidence/SRC-05-production-main-thread/summary.json",
+    "sha256": "db4da22bc0c16e38ba6e799e26b47e56b7a41e9ba65ef533e68e7d87aa6b69d6",
+    "size_bytes": 441884,
+    "line_count": 10406
+  },
+  "previous_released_Native_evidence": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-surface-consumer05-original-baseline/summary.json",
+    "sha256": "49f284c4fb174651b085eac061afe56d0b33bc81372eb88f88204f2569bc0b95",
+    "size_bytes": 15700,
+    "line_count": 388
+  },
+  "Native_stream_provenance_only": {
+    "path": ".runtime/porting/CTF-10/surface-consumer05-native-output-01/A-24H.observation.json",
+    "sha256": "eb344b4086531b636d5c701e454477248224aa5c30722e75a15eae0ef035e436",
+    "size_bytes": 1074976333
+  },
+  "Rust_stream_provenance_only": {
+    "path": "D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01/capture/events.ndjson",
+    "sha256": "08de12c7339f42837416c0dbdd0389b7d29f83bdc09cac6beefa8003d18b182c",
+    "size_bytes": 581361739
+  },
+  "large_stream_storage_scope": "Full hash/size provenance retained; large original streams are not copied or revalidated by this bounded publisher. Their released custody and availability statements remain in the prior published CLI/Native evidence.",
+  "event_or_ledger_values_parsed_by_publisher": false,
+  "full_ledger_compressed_bytes_published": true,
+  "selected_closure_transitively_replayable": false,
+  "whole_Source_or_stream_payloads_published": false,
+  "numerical_PASS_claimed": false,
+  "integration_PASS_claimed": false,
+  "gates_updated": false
+}

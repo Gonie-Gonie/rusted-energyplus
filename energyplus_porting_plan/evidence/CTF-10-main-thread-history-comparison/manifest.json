@@ -1,0 +1,986 @@
+{
+  "schema": "ctf10-main-thread-history-selected-archive.v1",
+  "objects": [
+    {
+      "historical_path": ".runtime/porting/CTF-10/Base-ordinary-history-comparison-Source-review-04/review.json",
+      "original": {
+        "path": ".runtime/porting/CTF-10/Base-ordinary-history-comparison-Source-review-04/review.json",
+        "sha256": "c4ee2a2c2902213713519076e5294f467b6917a87b7fb44c3590f6001a4eece7",
+        "size_bytes": 1329
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/c4ee2a2c2902213713519076e5294f467b6917a87b7fb44c3590f6001a4eece7",
+        "sha256": "c4ee2a2c2902213713519076e5294f467b6917a87b7fb44c3590f6001a4eece7",
+        "size_bytes": 1329
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "actual-comparer-Source-review",
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/Header-main-thread-comparison-factual-review-01/review.json",
+      "original": {
+        "path": ".runtime/porting/CTF-10/Header-main-thread-comparison-factual-review-01/review.json",
+        "sha256": "e1828dfc355b7b2ac7c89db779e860027c95c5ab81c7a5db03efaf7b8f17307f",
+        "size_bytes": 27497
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/e1828dfc355b7b2ac7c89db779e860027c95c5ab81c7a5db03efaf7b8f17307f",
+        "sha256": "e1828dfc355b7b2ac7c89db779e860027c95c5ab81c7a5db03efaf7b8f17307f",
+        "size_bytes": 27497
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "actual-independent_factual_review"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/main-thread-history-publication-command-01/receipt.json",
+      "original": {
+        "path": ".runtime/porting/CTF-10/main-thread-history-publication-command-01/receipt.json",
+        "sha256": "08e209041b6cc6627081bd1f2f3d6733629068a79da1b4770346bb50c738b191",
+        "size_bytes": 4002
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/08e209041b6cc6627081bd1f2f3d6733629068a79da1b4770346bb50c738b191",
+        "sha256": "08e209041b6cc6627081bd1f2f3d6733629068a79da1b4770346bb50c738b191",
+        "size_bytes": 4002
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/main-thread-history-publication-command-01/stderr.log",
+      "original": {
+        "path": ".runtime/porting/CTF-10/main-thread-history-publication-command-01/stderr.log",
+        "sha256": "854630cb3ef20daa8df678940dbd75d7f58963afd1658b9c18a409cf9ace7b00",
+        "size_bytes": 1238
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/854630cb3ef20daa8df678940dbd75d7f58963afd1658b9c18a409cf9ace7b00",
+        "sha256": "854630cb3ef20daa8df678940dbd75d7f58963afd1658b9c18a409cf9ace7b00",
+        "size_bytes": 1238
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/main-thread-history-publication-command-01/stdout.log",
+      "original": {
+        "path": ".runtime/porting/CTF-10/main-thread-history-publication-command-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/main-thread-history-publication-inputs-Root-01.json",
+      "original": {
+        "path": ".runtime/porting/CTF-10/main-thread-history-publication-inputs-Root-01.json",
+        "sha256": "fddf369043fa78885978d203f9cdc1b2bad5240e953f298760b6a75d41c7b54a",
+        "size_bytes": 1048
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/fddf369043fa78885978d203f9cdc1b2bad5240e953f298760b6a75d41c7b54a",
+        "sha256": "fddf369043fa78885978d203f9cdc1b2bad5240e953f298760b6a75d41c7b54a",
+        "size_bytes": 1048
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-01/manifest.json",
+      "original": {
+        "path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-01/manifest.json",
+        "sha256": "18283cb53eb6b73dd54f8f9b98bc70f7620d73f730f0deea66511a6ca554c819",
+        "size_bytes": 7947
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/18283cb53eb6b73dd54f8f9b98bc70f7620d73f730f0deea66511a6ca554c819",
+        "sha256": "18283cb53eb6b73dd54f8f9b98bc70f7620d73f730f0deea66511a6ca554c819",
+        "size_bytes": 7947
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-01/publish.py",
+      "original": {
+        "path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-01/publish.py",
+        "sha256": "d80b24e62540c0ecfc1500c188753f5eea889fbbdc18e18a1f47b9c040970f40",
+        "size_bytes": 13320
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/d80b24e62540c0ecfc1500c188753f5eea889fbbdc18e18a1f47b9c040970f40",
+        "sha256": "d80b24e62540c0ecfc1500c188753f5eea889fbbdc18e18a1f47b9c040970f40",
+        "size_bytes": 13320
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-01/README.md",
+      "original": {
+        "path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-01/README.md",
+        "sha256": "9dfa19d6e2b12eccc31a00d32dc0b9e80a6b9ce95743b9c0734066790ca79bea",
+        "size_bytes": 2521
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/9dfa19d6e2b12eccc31a00d32dc0b9e80a6b9ce95743b9c0734066790ca79bea",
+        "sha256": "9dfa19d6e2b12eccc31a00d32dc0b9e80a6b9ce95743b9c0734066790ca79bea",
+        "size_bytes": 2521
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-02/manifest.json",
+      "original": {
+        "path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-02/manifest.json",
+        "sha256": "b2a0bcc4d4a1be7013f474182d54207c270aad8ae3d6610d5cf828dd36e0173b",
+        "size_bytes": 9163
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/b2a0bcc4d4a1be7013f474182d54207c270aad8ae3d6610d5cf828dd36e0173b",
+        "sha256": "b2a0bcc4d4a1be7013f474182d54207c270aad8ae3d6610d5cf828dd36e0173b",
+        "size_bytes": 9163
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-02/publish.py",
+      "original": {
+        "path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-02/publish.py",
+        "sha256": "6472c0ffb54c0d6e49fbcab0454f6abe18b95f2db37337bfdff82c0f40886cc6",
+        "size_bytes": 13327
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/6472c0ffb54c0d6e49fbcab0454f6abe18b95f2db37337bfdff82c0f40886cc6",
+        "sha256": "6472c0ffb54c0d6e49fbcab0454f6abe18b95f2db37337bfdff82c0f40886cc6",
+        "size_bytes": 13327
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-02/README.md",
+      "original": {
+        "path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-02/README.md",
+        "sha256": "1829af47b14526430a767e3071956dd727f0e99fcc6b72c40cbd64cdff62ec7e",
+        "size_bytes": 2919
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/1829af47b14526430a767e3071956dd727f0e99fcc6b72c40cbd64cdff62ec7e",
+        "sha256": "1829af47b14526430a767e3071956dd727f0e99fcc6b72c40cbd64cdff62ec7e",
+        "size_bytes": 2919
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-03/before/publish.py",
+      "original": {
+        "path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-03/before/publish.py",
+        "sha256": "6472c0ffb54c0d6e49fbcab0454f6abe18b95f2db37337bfdff82c0f40886cc6",
+        "size_bytes": 13327
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/6472c0ffb54c0d6e49fbcab0454f6abe18b95f2db37337bfdff82c0f40886cc6",
+        "sha256": "6472c0ffb54c0d6e49fbcab0454f6abe18b95f2db37337bfdff82c0f40886cc6",
+        "size_bytes": 13327
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-03/diffs/publish.py.diff",
+      "original": {
+        "path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-03/diffs/publish.py.diff",
+        "sha256": "b2046335750354ef31929eea6c9a8a815bb5640fbf266137698a8cc4c2ed0734",
+        "size_bytes": 2400
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/b2046335750354ef31929eea6c9a8a815bb5640fbf266137698a8cc4c2ed0734",
+        "sha256": "b2046335750354ef31929eea6c9a8a815bb5640fbf266137698a8cc4c2ed0734",
+        "size_bytes": 2400
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-03/manifest.json",
+      "original": {
+        "path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-03/manifest.json",
+        "sha256": "53b4d3dc3afc60b432081b90d9a5f1390ce7c114ea6516a52c45edf595ba5398",
+        "size_bytes": 11105
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/53b4d3dc3afc60b432081b90d9a5f1390ce7c114ea6516a52c45edf595ba5398",
+        "sha256": "53b4d3dc3afc60b432081b90d9a5f1390ce7c114ea6516a52c45edf595ba5398",
+        "size_bytes": 11105
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-03/publish.py",
+      "original": {
+        "path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-03/publish.py",
+        "sha256": "0a699d7895b663522fafb57ffb793f3b54859f81c5852fb545ca2d980ff53d1c",
+        "size_bytes": 13435
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/0a699d7895b663522fafb57ffb793f3b54859f81c5852fb545ca2d980ff53d1c",
+        "sha256": "0a699d7895b663522fafb57ffb793f3b54859f81c5852fb545ca2d980ff53d1c",
+        "size_bytes": 13435
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-03/README.md",
+      "original": {
+        "path": ".runtime/porting/CTF-10/main-thread-history-publication-prep-03/README.md",
+        "sha256": "1c9b7d95b9970811d40ae25e28165f5ed06bf2b882e3ad49999bd0a1db9746d8",
+        "size_bytes": 3342
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/1c9b7d95b9970811d40ae25e28165f5ed06bf2b882e3ad49999bd0a1db9746d8",
+        "sha256": "1c9b7d95b9970811d40ae25e28165f5ed06bf2b882e3ad49999bd0a1db9746d8",
+        "size_bytes": 3342
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/before-03/compare_history.py",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/before-03/compare_history.py",
+        "sha256": "eaa75e21d41ff27dbfadf58638de9023e83754d013cc65e85eca060d26529448",
+        "size_bytes": 33086
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/eaa75e21d41ff27dbfadf58638de9023e83754d013cc65e85eca060d26529448",
+        "sha256": "eaa75e21d41ff27dbfadf58638de9023e83754d013cc65e85eca060d26529448",
+        "size_bytes": 33086
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "exact-comparer-Source-correspondence"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/before-03/main_thread_custody.py",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/before-03/main_thread_custody.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "exact-comparer-Source-correspondence"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/before-03/pair_history.py",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/before-03/pair_history.py",
+        "sha256": "1ce6fa6a9e324ac7c78ccf93ce00035c11fa447e9a77c5e299d8af46dfc38470",
+        "size_bytes": 33957
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/1ce6fa6a9e324ac7c78ccf93ce00035c11fa447e9a77c5e299d8af46dfc38470",
+        "sha256": "1ce6fa6a9e324ac7c78ccf93ce00035c11fa447e9a77c5e299d8af46dfc38470",
+        "size_bytes": 33957
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "exact-comparer-Source-correspondence"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/before-03/README.md",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/before-03/README.md",
+        "sha256": "f6b6164db44d5e75b57d5f943b5928dfd32f5ce17ff8dad541aadea4a8ff1a1c",
+        "size_bytes": 5376
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/f6b6164db44d5e75b57d5f943b5928dfd32f5ce17ff8dad541aadea4a8ff1a1c",
+        "sha256": "f6b6164db44d5e75b57d5f943b5928dfd32f5ce17ff8dad541aadea4a8ff1a1c",
+        "size_bytes": 5376
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "exact-comparer-Source-correspondence"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/compare_history.py",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/compare_history.py",
+        "sha256": "5d498bcd4c7919406780bcfc3f78fbf8a459fd5e976d5acfa96b3d9612c9f116",
+        "size_bytes": 12859
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/5d498bcd4c7919406780bcfc3f78fbf8a459fd5e976d5acfa96b3d9612c9f116",
+        "sha256": "5d498bcd4c7919406780bcfc3f78fbf8a459fd5e976d5acfa96b3d9612c9f116",
+        "size_bytes": 12859
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "exact-comparer-Source-correspondence",
+        "reviewed-comparer-Source"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/compare_history.py.diff",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/compare_history.py.diff",
+        "sha256": "ffac4df46bb9e9216106650724aadd466731068f5be859414122d2c14206cbc5",
+        "size_bytes": 27080
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/ffac4df46bb9e9216106650724aadd466731068f5be859414122d2c14206cbc5",
+        "sha256": "ffac4df46bb9e9216106650724aadd466731068f5be859414122d2c14206cbc5",
+        "size_bytes": 27080
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "exact-comparer-Source-correspondence"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/main_thread_custody.py",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/main_thread_custody.py",
+        "sha256": "cd073d40f93399bc1eb59efd2090e520db730c32259abed453387c01e82559d5",
+        "size_bytes": 18327
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/cd073d40f93399bc1eb59efd2090e520db730c32259abed453387c01e82559d5",
+        "sha256": "cd073d40f93399bc1eb59efd2090e520db730c32259abed453387c01e82559d5",
+        "size_bytes": 18327
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "exact-comparer-Source-correspondence",
+        "reviewed-comparer-Source"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/main_thread_custody.py.diff",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/main_thread_custody.py.diff",
+        "sha256": "1c068aae273c28aa25a60f4b4202610e1a994347a7192aaf646911d58dee13b4",
+        "size_bytes": 18633
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/1c068aae273c28aa25a60f4b4202610e1a994347a7192aaf646911d58dee13b4",
+        "sha256": "1c068aae273c28aa25a60f4b4202610e1a994347a7192aaf646911d58dee13b4",
+        "size_bytes": 18633
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "exact-comparer-Source-correspondence"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/manifest.json",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/manifest.json",
+        "sha256": "201953b343269271d185aef6bfc2b455c99fb2c0785268bb9e7f6a37bebb826b",
+        "size_bytes": 55146
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/201953b343269271d185aef6bfc2b455c99fb2c0785268bb9e7f6a37bebb826b",
+        "sha256": "201953b343269271d185aef6bfc2b455c99fb2c0785268bb9e7f6a37bebb826b",
+        "size_bytes": 55146
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/pair_history.py",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/pair_history.py",
+        "sha256": "1ce6fa6a9e324ac7c78ccf93ce00035c11fa447e9a77c5e299d8af46dfc38470",
+        "size_bytes": 33957
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/1ce6fa6a9e324ac7c78ccf93ce00035c11fa447e9a77c5e299d8af46dfc38470",
+        "sha256": "1ce6fa6a9e324ac7c78ccf93ce00035c11fa447e9a77c5e299d8af46dfc38470",
+        "size_bytes": 33957
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "exact-comparer-Source-correspondence",
+        "reviewed-comparer-Source"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/pair_history.py.diff",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/pair_history.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "exact-comparer-Source-correspondence"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/README.md",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/README.md",
+        "sha256": "1adbe1fbfedbc78a80cc010189c553f60c3abcf72c2facd16c912ad49b954568",
+        "size_bytes": 3891
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/1adbe1fbfedbc78a80cc010189c553f60c3abcf72c2facd16c912ad49b954568",
+        "sha256": "1adbe1fbfedbc78a80cc010189c553f60c3abcf72c2facd16c912ad49b954568",
+        "size_bytes": 3891
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "exact-comparer-Source-correspondence",
+        "reviewed-comparer-Source"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/README.md.diff",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/README.md.diff",
+        "sha256": "67a8b0983884efd06d5275a2d1c7e2d159722f93e441e02e6a37705a469b30c9",
+        "size_bytes": 9405
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/67a8b0983884efd06d5275a2d1c7e2d159722f93e441e02e6a37705a469b30c9",
+        "sha256": "67a8b0983884efd06d5275a2d1c7e2d159722f93e441e02e6a37705a469b30c9",
+        "size_bytes": 9405
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "exact-comparer-Source-correspondence"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/Root-FULL-Source-review-04.json",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/Root-FULL-Source-review-04.json",
+        "sha256": "25aec14f76da8c4d0623282837dcff28d39c4defb7ba9903597f0c2bad3a62b9",
+        "size_bytes": 1121
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/25aec14f76da8c4d0623282837dcff28d39c4defb7ba9903597f0c2bad3a62b9",
+        "sha256": "25aec14f76da8c4d0623282837dcff28d39c4defb7ba9903597f0c2bad3a62b9",
+        "size_bytes": 1121
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "actual-comparer-Source-review",
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-history-invocation-03/policy.json",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-invocation-03/policy.json",
+        "sha256": "cbff525dbe30ae671069d3ddaed52825bb7e9a1f80c610d34d15e67d4238ac61",
+        "size_bytes": 18354
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/cbff525dbe30ae671069d3ddaed52825bb7e9a1f80c610d34d15e67d4238ac61",
+        "sha256": "cbff525dbe30ae671069d3ddaed52825bb7e9a1f80c610d34d15e67d4238ac61",
+        "size_bytes": 18354
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "actual-comparison-or-historical-freeze-metadata"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-history-invocation-03/request.json",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-invocation-03/request.json",
+        "sha256": "aedaa4451e3005c53b729cdccd0c54735a957d1ae2bb140d55e4264a98c217e6",
+        "size_bytes": 24872
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/aedaa4451e3005c53b729cdccd0c54735a957d1ae2bb140d55e4264a98c217e6",
+        "sha256": "aedaa4451e3005c53b729cdccd0c54735a957d1ae2bb140d55e4264a98c217e6",
+        "size_bytes": 24872
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "actual-comparison-or-historical-freeze-metadata"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-history-pairing-policy-prep-02/manifest.json",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-pairing-policy-prep-02/manifest.json",
+        "sha256": "5e59c6e3e73d840e982f79fee676033919c353e3ce4b35295385349ea9b31031",
+        "size_bytes": 37520
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/5e59c6e3e73d840e982f79fee676033919c353e3ce4b35295385349ea9b31031",
+        "sha256": "5e59c6e3e73d840e982f79fee676033919c353e3ce4b35295385349ea9b31031",
+        "size_bytes": 37520
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-history-pairing-policy-prep-02/policy.json",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-pairing-policy-prep-02/policy.json",
+        "sha256": "cbff525dbe30ae671069d3ddaed52825bb7e9a1f80c610d34d15e67d4238ac61",
+        "size_bytes": 18354
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/cbff525dbe30ae671069d3ddaed52825bb7e9a1f80c610d34d15e67d4238ac61",
+        "sha256": "cbff525dbe30ae671069d3ddaed52825bb7e9a1f80c610d34d15e67d4238ac61",
+        "size_bytes": 18354
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-history-request-command-03/receipt.json",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-history-request-command-03/receipt.json",
+        "sha256": "3e1553e87f8f4195dc503ce6ee0e6491ac1c8926b7a2004baf2d14d5e560b35a",
+        "size_bytes": 66476
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/3e1553e87f8f4195dc503ce6ee0e6491ac1c8926b7a2004baf2d14d5e560b35a",
+        "sha256": "3e1553e87f8f4195dc503ce6ee0e6491ac1c8926b7a2004baf2d14d5e560b35a",
+        "size_bytes": 66476
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "actual-comparison-or-historical-freeze-metadata"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/comparison.json",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/comparison.json",
+        "sha256": "0e55aabd12e38e13a08c46a6147b94fb0e527bc6199ca71b0d9d6a248353adfb",
+        "size_bytes": 20915
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/0e55aabd12e38e13a08c46a6147b94fb0e527bc6199ca71b0d9d6a248353adfb",
+        "sha256": "0e55aabd12e38e13a08c46a6147b94fb0e527bc6199ca71b0d9d6a248353adfb",
+        "size_bytes": 20915
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "actual-comparison"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/inside-prerequisites.ndjson.gz",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/inside-prerequisites.ndjson.gz",
+        "sha256": "ee6fdbf3009dbb8866ac5aeccd7214f530b039881ae098228118bd16c3323012",
+        "size_bytes": 674940
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/ee6fdbf3009dbb8866ac5aeccd7214f530b039881ae098228118bd16c3323012",
+        "sha256": "ee6fdbf3009dbb8866ac5aeccd7214f530b039881ae098228118bd16c3323012",
+        "size_bytes": 674940
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "complete-opaque-gzip-ledger:inside-prerequisites"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/mismatches.ndjson.gz",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/mismatches.ndjson.gz",
+        "sha256": "79e35c8e7c2b76f5d6e0eade9edfda33783b208a0a29d302977b445f4d8b96d6",
+        "size_bytes": 4909597
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/79e35c8e7c2b76f5d6e0eade9edfda33783b208a0a29d302977b445f4d8b96d6",
+        "sha256": "79e35c8e7c2b76f5d6e0eade9edfda33783b208a0a29d302977b445f4d8b96d6",
+        "size_bytes": 4909597
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "complete-opaque-gzip-ledger:mismatches"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/Native-selected-boundaries.ndjson.gz",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/Native-selected-boundaries.ndjson.gz",
+        "sha256": "9e9ad10df0d37f8eaf8c74a0bbfef3e506c3c94a8deb397168c57132739d04e6",
+        "size_bytes": 14971290
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/9e9ad10df0d37f8eaf8c74a0bbfef3e506c3c94a8deb397168c57132739d04e6",
+        "sha256": "9e9ad10df0d37f8eaf8c74a0bbfef3e506c3c94a8deb397168c57132739d04e6",
+        "size_bytes": 14971290
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "complete-opaque-gzip-ledger:Native-selected-boundaries"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/optional-context.ndjson.gz",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/optional-context.ndjson.gz",
+        "sha256": "e5f9fd75d994fdc776a8d9a7625f22932309bee1441b62bd835f3a020ffd1b52",
+        "size_bytes": 2971865
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/e5f9fd75d994fdc776a8d9a7625f22932309bee1441b62bd835f3a020ffd1b52",
+        "sha256": "e5f9fd75d994fdc776a8d9a7625f22932309bee1441b62bd835f3a020ffd1b52",
+        "size_bytes": 2971865
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "complete-opaque-gzip-ledger:optional-context"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/required-boundaries.ndjson.gz",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/required-boundaries.ndjson.gz",
+        "sha256": "a34af1a7857ab4f6039108b98f400c4247bdf5b26bcc88427e2315b986483468",
+        "size_bytes": 56005
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/a34af1a7857ab4f6039108b98f400c4247bdf5b26bcc88427e2315b986483468",
+        "sha256": "a34af1a7857ab4f6039108b98f400c4247bdf5b26bcc88427e2315b986483468",
+        "size_bytes": 56005
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "complete-opaque-gzip-ledger:required-boundaries"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/Root-full-factual-review.json",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-01/Root-full-factual-review.json",
+        "sha256": "d49b594041cabaff03862699e15e09b9a72c986a877d3c7ecba9ca5689b88986",
+        "size_bytes": 6847
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/d49b594041cabaff03862699e15e09b9a72c986a877d3c7ecba9ca5689b88986",
+        "sha256": "d49b594041cabaff03862699e15e09b9a72c986a877d3c7ecba9ca5689b88986",
+        "size_bytes": 6847
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "actual-Root_factual_review"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-command-01/receipt.json",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-command-01/receipt.json",
+        "sha256": "e9d7632e79949b141e5cf0ce0da021e3230bd410ef00258f424e566a72eecd9e",
+        "size_bytes": 4094
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/e9d7632e79949b141e5cf0ce0da021e3230bd410ef00258f424e566a72eecd9e",
+        "sha256": "e9d7632e79949b141e5cf0ce0da021e3230bd410ef00258f424e566a72eecd9e",
+        "size_bytes": 4094
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "actual-comparison_execution"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-command-01/stderr.log",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "actual-comparison-or-historical-freeze-metadata"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-command-01/stdout.log",
+      "original": {
+        "path": ".runtime/porting/CTF-10/ordinary-main-thread-comparison-command-01/stdout.log",
+        "sha256": "8a84bb03f370fa3778ce406b7ac8ba9ead0a1a2d14ce8c77c133db97584dbb0f",
+        "size_bytes": 21478
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/8a84bb03f370fa3778ce406b7ac8ba9ead0a1a2d14ce8c77c133db97584dbb0f",
+        "sha256": "8a84bb03f370fa3778ce406b7ac8ba9ead0a1a2d14ce8c77c133db97584dbb0f",
+        "size_bytes": 21478
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "actual-comparison-or-historical-freeze-metadata"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/prepare-ordinary-history-main-thread-comparison-04.py",
+      "original": {
+        "path": ".runtime/porting/CTF-10/prepare-ordinary-history-main-thread-comparison-04.py",
+        "sha256": "3a43e72ab1f9f5914eed649cbe714875dedc0699978b949587371637e849740f",
+        "size_bytes": 13740
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/3a43e72ab1f9f5914eed649cbe714875dedc0699978b949587371637e849740f",
+        "sha256": "3a43e72ab1f9f5914eed649cbe714875dedc0699978b949587371637e849740f",
+        "size_bytes": 13740
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "reviewed-comparer-Source"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/review-main-thread-comparer-Root-04.py",
+      "original": {
+        "path": ".runtime/porting/CTF-10/review-main-thread-comparer-Root-04.py",
+        "sha256": "9640926751aa3e70a608b053cdc21586f8c7506f339d29a2d07d2a3351f5d661",
+        "size_bytes": 3756
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/9640926751aa3e70a608b053cdc21586f8c7506f339d29a2d07d2a3351f5d661",
+        "sha256": "9640926751aa3e70a608b053cdc21586f8c7506f339d29a2d07d2a3351f5d661",
+        "size_bytes": 3756
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/review-main-thread-comparison-Root-01.py",
+      "original": {
+        "path": ".runtime/porting/CTF-10/review-main-thread-comparison-Root-01.py",
+        "sha256": "ef64299d7ec54de274a494e671f8a1a19d8d60eb9b2b04454793fc50a09603fc",
+        "size_bytes": 4194
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/ef64299d7ec54de274a494e671f8a1a19d8d60eb9b2b04454793fc50a09603fc",
+        "sha256": "ef64299d7ec54de274a494e671f8a1a19d8d60eb9b2b04454793fc50a09603fc",
+        "size_bytes": 4194
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/seal-main-thread-history-publication-01.py",
+      "original": {
+        "path": ".runtime/porting/CTF-10/seal-main-thread-history-publication-01.py",
+        "sha256": "621ae6a738568b5fbac1db3d5edd9de6f4fa20d5732610144984a98ad1b01349",
+        "size_bytes": 6724
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/621ae6a738568b5fbac1db3d5edd9de6f4fa20d5732610144984a98ad1b01349",
+        "sha256": "621ae6a738568b5fbac1db3d5edd9de6f4fa20d5732610144984a98ad1b01349",
+        "size_bytes": 6724
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/seal-main-thread-history-publication-02.py",
+      "original": {
+        "path": ".runtime/porting/CTF-10/seal-main-thread-history-publication-02.py",
+        "sha256": "9691d5abadad5916e4415cf682f85cbe98cf640bece1b7d37a5a2204091cc7bc",
+        "size_bytes": 2543
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/9691d5abadad5916e4415cf682f85cbe98cf640bece1b7d37a5a2204091cc7bc",
+        "sha256": "9691d5abadad5916e4415cf682f85cbe98cf640bece1b7d37a5a2204091cc7bc",
+        "size_bytes": 2543
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/seal-main-thread-history-publication-03.py",
+      "original": {
+        "path": ".runtime/porting/CTF-10/seal-main-thread-history-publication-03.py",
+        "sha256": "92d010ef793fe9115003a881c2d110e2742352cb52ee6715a75be21d5b97d1cd",
+        "size_bytes": 3107
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/92d010ef793fe9115003a881c2d110e2742352cb52ee6715a75be21d5b97d1cd",
+        "sha256": "92d010ef793fe9115003a881c2d110e2742352cb52ee6715a75be21d5b97d1cd",
+        "size_bytes": 3107
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer05-frozen-inputs-01/freeze-receipt.json",
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-frozen-inputs-01/freeze-receipt.json",
+        "sha256": "08c035ab7a675b3f7e715e20c599bf1488aa65bc3a189287ba68e5bb5a31239f",
+        "size_bytes": 20598
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/08c035ab7a675b3f7e715e20c599bf1488aa65bc3a189287ba68e5bb5a31239f",
+        "sha256": "08c035ab7a675b3f7e715e20c599bf1488aa65bc3a189287ba68e5bb5a31239f",
+        "size_bytes": 20598
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "actual-comparison-or-historical-freeze-metadata"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/original-data-review/review.json",
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/original-data-review/review.json",
+        "sha256": "59b16aa6d6fa4f1417b98baa85a02a6e6942a28efc2c2ed8f1ac70f47145f82a",
+        "size_bytes": 36895
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/59b16aa6d6fa4f1417b98baa85a02a6e6942a28efc2c2ed8f1ac70f47145f82a",
+        "sha256": "59b16aa6d6fa4f1417b98baa85a02a6e6942a28efc2c2ed8f1ac70f47145f82a",
+        "size_bytes": 36895
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "released-OriginalDataQA-metadata"
+      ]
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/surface-consumer-original-data-review-command-01/receipt.json",
+      "original": {
+        "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/surface-consumer-original-data-review-command-01/receipt.json",
+        "sha256": "3f785779d0092b6686e8bf0a203a9d828969bc276927b12eb5b5ca3b89b1cecd",
+        "size_bytes": 4913
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/3f785779d0092b6686e8bf0a203a9d828969bc276927b12eb5b5ca3b89b1cecd",
+        "sha256": "3f785779d0092b6686e8bf0a203a9d828969bc276927b12eb5b5ca3b89b1cecd",
+        "size_bytes": 4913
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "released-OriginalDataQA-metadata"
+      ]
+    },
+    {
+      "historical_path": "energyplus_porting_plan/evidence/CTF-10-surface-consumer05-original-baseline/summary.json",
+      "original": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-consumer05-original-baseline/summary.json",
+        "sha256": "49f284c4fb174651b085eac061afe56d0b33bc81372eb88f88204f2569bc0b95",
+        "size_bytes": 15700
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/49f284c4fb174651b085eac061afe56d0b33bc81372eb88f88204f2569bc0b95",
+        "sha256": "49f284c4fb174651b085eac061afe56d0b33bc81372eb88f88204f2569bc0b95",
+        "size_bytes": 15700
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof",
+        "explicit-prior-published-provenance"
+      ]
+    },
+    {
+      "historical_path": "energyplus_porting_plan/evidence/SRC-05-production-main-thread/summary.json",
+      "original": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-production-main-thread/summary.json",
+        "sha256": "db4da22bc0c16e38ba6e799e26b47e56b7a41e9ba65ef533e68e7d87aa6b69d6",
+        "size_bytes": 441884
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-main-thread-history-comparison/objects/raw/db4da22bc0c16e38ba6e799e26b47e56b7a41e9ba65ef533e68e7d87aa6b69d6",
+        "sha256": "db4da22bc0c16e38ba6e799e26b47e56b7a41e9ba65ef533e68e7d87aa6b69d6",
+        "size_bytes": 441884
+      },
+      "storage": "raw-byte-exact",
+      "roles": [
+        "bounded-Source-or-proof",
+        "explicit-prior-published-provenance"
+      ]
+    }
+  ],
+  "all_selected_bytes_stored_exact": true,
+  "recursive_ancestry_collected": false,
+  "whole_Source_snapshot_payloads_published": false,
+  "large_original_stream_payloads_published": false
+}

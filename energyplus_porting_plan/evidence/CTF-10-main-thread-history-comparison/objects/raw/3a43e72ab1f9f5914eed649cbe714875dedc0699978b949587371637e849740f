@@ -1,0 +1,133 @@
+"""Prepare custody-only comparison of existing complete captures; no target/import/event read."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+OLD = ROOT / '.runtime/porting/CTF-10/ordinary-history-comparison-prep-03'
+OUT = ROOT / '.runtime/porting/CTF-10/ordinary-history-comparison-prep-04'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(),
+                size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+
+assert not (OUT / 'manifest.json').exists()
+assert ref(OLD / 'manifest.json')['sha256'] == '05cb4d87caad4fdd22e97a84257d1c5a63769f09a5fe2681b5cb7a406373c92f'
+assert (OUT / 'main_thread_custody.py').is_file()
+(OUT / 'before-03').mkdir(exist_ok=False)
+for name in ('manifest.json', 'compare_history.py', 'pair_history.py', 'README.md'):
+    (OUT / 'before-03' / name).write_bytes((OLD / name).read_bytes())
+text = (OLD / 'compare_history.py').read_text(encoding='utf8')
+# Old caller/worker transport remains preserved in the authentic predecessor, not an active requirement.
+begin = text.index('def scoped_application(')
+end = text.index('def rust_stream(', begin)
+text = text[:begin] + text[end:]
+begin = text.index("INVOCATION = ")
+end = text.index("EXPORTER_SHA = ", begin)
+text = text[:begin] + text[end:]
+begin = text.index("PARENT_APPLICATION = ")
+end = text.index('\n\ndef boot(', begin)
+text = text[:begin] + text[end:]
+old = "    refs, request, execution, rust_ref = candidate(c, m, args, qa, original_refs, freeze, policy_ref)"
+new = "    custody = boot(PREP / 'main_thread_custody.py', own['own_sources'][2]['sha256'], 'ordinary_main_thread_custody')\n    refs, request, execution, rust_ref = custody.candidate(c, m, args, qa, original_refs, freeze, policy_ref, own)"
+assert text.count(old) == 1; text = text.replace(old, new)
+old = "rust_counts = rust_stream(m, pair, m.contained(rust_ref['path']), execution, handles['optional-context'])"
+new = "rust_counts = rust_stream(m, pair, Path(rust_ref['path']), execution, handles['optional-context'])\n            proof = request['actual_capture_custody']\n            m.require(rust_counts['header'] == proof['actual_header'] and rust_counts['summary'] == proof['actual_footer'] and\n                      rust_counts['records'] == proof['physical_line_count'], 'Complete parsed stream must equal accepted IO custody')"
+assert text.count(old) == 1; text = text.replace(old, new)
+assert text.count('    c.large(m, rust_ref)') == 1
+text = text.replace('    c.large(m, rust_ref)', '    custody.recheck(c, m)')
+old = "        'original_exporter_application': PARENT_APPLICATION, 'scoped_caller_correction_preparation': SCOPE_CORRECTION,\n        'scoped_exporter_application': SCOPED_APPLICATION, 'observer_entry_correction_preparation': ENTRY_CORRECTION,"
+new = "        'actual_main_thread_validation': request['actual_validation'], 'actual_main_thread_execution_custody': request['actual_execution_custody'],\n        'historical_policy_freeze': request['historical_policy_freeze'], 'new_pre_run_policy_copy_claimed': False,\n        'captured_Source_validated_from_immutable_archives': True,\n        'actual_comparison_Source_snapshot': request['actual_comparison_Source_snapshot'],\n        'actual_comparison_Source_members': request['actual_comparison_Source_members'],"
+assert text.count(old) == 1; text = text.replace(old, new)
+old = "                 'invocation-request', 'invocation-execution', 'ordinary-execution', 'rust-events', 'output-dir']:"
+new = "                 'production-packet', 'comparison-source-snapshot', 'rust-events', 'output-dir']:"
+assert text.count(old) == 1; text = text.replace(old, new)
+(OUT / 'compare_history.py').write_text(text, encoding='utf8', newline='\n')
+(OUT / 'pair_history.py').write_bytes((OLD / 'pair_history.py').read_bytes())
+readme = '''# Ordinary CTF history comparison: main-thread custody successor
+
+This held Source compares the existing complete Native A24 capture with the closed actual 00bf main-thread ordinary capture. It does not execute either engine, copy Native state into Rust, modify canonical Source, or read event values while being prepared. The exact scientific pair_history.py is literal accepted predecessor03 (437 lines); policy02 is unchanged. All unique-key, ambiguity, required-unmatched, copied bits/NaN payload, arithmetic, nonfinite-unavailable, full-owner and uncapped ledger rules remain unchanged. Historical failed comparison evidence is preserved.
+
+Root supplies eight explicit options: --source-manifest path#SHA, --approved-source-sha256 SHA, --original-data-review path#SHA, --original-data-review-execution path#SHA, --production-packet path#SHA, --comparison-source-snapshot path#SHA, --rust-events path#SHA, --output-dir fresh-repository-CTF-directory. The first two bind this reviewed Source; Native QA uses the existing unchanged common.original/review_stream custody reader. The production packet is the existing actual six-role SRC05 publication input packet; the six mandatory identities are fixed to the genuinely closed validation, PE acceptance, custody, outer receipt and distinct Root/Header factual reviews. Packet additions do not alter those bindings.
+
+The new transport authenticates actual b979 application, four exact quality commands, both actual Cargo JSON emitted executables/Source and 8MiB PE acceptance, exact compatibility/deny/A CLI and ordinary observer argv, actual two-process chronology, all frozen inputs and the full D output inventory. All five Native input/weather/metadata/IDD/scope identities and all45 guards must match exactly. Captured 00bf Source is authenticated from every immutable archive, including the four actual application semantic/formatter correspondences. It never asserts that historical 00bf canonical Rust is the later live comparer Source. The separately supplied current comparison Source snapshot authenticates its full archives, current bytes and exact membership; this supports approved later unrelated dispatcher application without rebinding the historical capture.
+
+Policy02 and its authentic older writer03 bytecopy were sealed before these actual processes. Their complete request, recorded writer stdout, exact writer Source, policy bytes and genuine chronology are validated again. This is explicitly a historical policy freeze: the new main-thread driver did not make a new pre-run policy copy. There is no retroactive freeze claim or change to the prospective policy.
+
+External reading is limited to D:/CodexBuild/rusted-energyplus/SRC-05/ordinary-main-production-01. Every file and membership is checked in full before and after comparison. The stream must be the exact captured events.ndjson SHA08de12c7/581361739B. No generic repository-containment function is loosened. The existing full stream visitor retains every event and independently checks header/footer/counts against accepted IO custody. Native raw1074976333B remains available, with a previously published full lossless gzip backup; no new Native execution is requested. The inherited prospective4GiB full-reader resource bound is unchanged and never truncates input.
+
+Five full gzip NDJSON ledgers retain all mismatches, required omissions, optional context, inside prerequisites and the complete selected Native spool. Result exit0 requires complete available selected pairs and zero required omissions/ambiguities/mismatches; exit1 retains any such failure. Preflight failure is an exception/nonzero with no invented result counts. No whole manager, ordinary integration, inside-equation iteration, floating-point cause or card gate PASS is claimed. Any concrete scientific conclusion requires separately authorized actual comparison and factual review.
+'''
+(OUT / 'README.md').write_text(readme, encoding='utf8', newline='\n')
+old_tree = ast.parse((OLD / 'compare_history.py').read_bytes()); new_tree = ast.parse((OUT / 'compare_history.py').read_bytes())
+functions = lambda tree: {n.name: ast.dump(n, include_attributes=False) for n in tree.body if isinstance(n, ast.FunctionDef)}
+for name in ('boot', 'current_recorded', 'rust_stream'): assert functions(old_tree)[name] == functions(new_tree)[name]
+assert (OUT / 'pair_history.py').read_bytes() == (OLD / 'pair_history.py').read_bytes()
+for path in (OUT / 'main_thread_custody.py', Path(__file__)): ast.parse(path.read_bytes())
+correspondence = []
+for name in ('compare_history.py', 'pair_history.py', 'main_thread_custody.py', 'README.md'):
+    before = OUT / 'before-03' / name
+    old_bytes = before.read_bytes() if before.exists() else b''
+    if not before.exists(): before.write_bytes(b'')
+    after = OUT / name
+    delta = ''.join(difflib.unified_diff(old_bytes.decode('utf8').splitlines(True), after.read_text(encoding='utf8').splitlines(True), fromfile='before-03/' + name, tofile=name))
+    target = OUT / (name + '.diff'); target.write_text(delta, encoding='utf8', newline='\n')
+    correspondence.append(dict(before=ref(before), proposal=ref(after), exact_diff=ref(target)))
+old = json.loads((OLD / 'manifest.json').read_bytes())
+packet = json.loads((ROOT / '.runtime/porting/SRC-05/ordinary-main-publication-inputs-Root-01.json').read_bytes())
+keys = ['actual_validation', 'Root_PE_acceptance', 'actual_execution_custody', 'actual_execution_outer_receipt', 'Root_factual_review', 'Header_factual_review']
+history = dict(request=ref(ROOT / '.runtime/porting/CTF-10/ordinary-history-invocation-03/request.json'),
+    execution=ref(ROOT / '.runtime/porting/CTF-10/ordinary-history-request-command-03/receipt.json'))
+writer = json.loads((ROOT / '.runtime/porting/CTF-10/ordinary-history-invocation-prep-01/manifest.json').read_bytes())['writer']
+historical_request = json.loads((ROOT / history['request']['path']).read_bytes())
+old_snapshot = json.loads((ROOT / historical_request['Source_snapshot']['path']).read_bytes())
+old_rows = {row['historical_path']: row for row in old_snapshot['files']}
+resolved = []
+def historical_range(row):
+    result = dict(row); source = row.get('source')
+    if source and source['path'].startswith('crates/'):
+        archive = old_rows[source['path']]['archive']
+        observed = ref(ROOT / archive['path'])
+        assert observed['sha256'] == source['sha256'] and observed['size_bytes'] == source['size_bytes']
+        result['historical_source'] = source; result['source'] = observed
+        resolved.append(dict(historical_source=source, authentic_preserved_Source=observed,
+                             historical_snapshot=historical_request['Source_snapshot']))
+    return result
+dependencies = []
+for row in old['source_dependencies']:
+    if row['path'].startswith('crates/'):
+        archive = old_rows[row['path']]['archive']; observed = ref(ROOT / archive['path'])
+        assert observed['sha256'] == row['sha256']
+        dependencies.append(observed)
+    else: dependencies.append(row)
+manifest = dict(schema=old['schema'], status='HELD_SOURCE_ONLY', held_immutable=True, author='/root/clk02_header_port',
+    own_sources=[ref(OUT / name) for name in ('compare_history.py', 'pair_history.py', 'main_thread_custody.py')],
+    README=ref(OUT / 'README.md'), author_source=ref(Path(__file__)), accepted_predecessor=ref(OLD / 'manifest.json'),
+    authentic_before_manifest=ref(OUT / 'before-03/manifest.json'), source_correspondence=correspondence,
+    prospective_policy_preparation=old['accepted_pairing_policy_preparation'],
+    historical_policy_freeze=history, historical_invocation_writer=writer,
+    actual_main_thread_bindings={key: packet[key] for key in keys},
+    actual_application=ref(ROOT / '.runtime/porting/SRC-05/ordinary-main-thread-applied-01/record.json'),
+    accepted_execution_preparation=ref(ROOT / '.runtime/porting/SRC-05/ordinary-main-execution-prep-02/manifest.json'),
+    actual_captured_Source_snapshot=dict(path='.runtime/porting/source-objects/00/' + '00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a',sha256='00bfa56db38bf31ce1f11772b0c0d5cd0479d707fa80c6b3e20a54252db1fd0a'),
+    source_dependencies=dependencies,
+    selected_source_ranges=[historical_range(row) for row in old['selected_source_ranges']],
+    inherited_historical_context=dict(scope=[historical_range(row) for row in old['scope_correction_Source_ranges']],
+        entry=[historical_range(row) for row in old['observer_entry_Source_ranges']]),
+    historical_Source_correspondence=resolved,
+    runtime_interface=dict(required_options=['source-manifest', 'approved-source-sha256', 'original-data-review', 'original-data-review-execution',
+        'production-packet', 'comparison-source-snapshot', 'rust-events', 'output-dir'], argv_count_including_python_X_utf8_B_script=21,
+        result_schema=old['runtime_interface']['result_schema'], ledger_IO=old['runtime_interface']['ledger_IO']),
+    scientific_pairer_byte_exact_predecessor=True, unchanged_policy_profiles_and_pair_rules=True,
+    old_runtime_caller_worker_bindings_replaced_by_explicit_actual_main_thread_custody=True,
+    historical_policy_freeze_not_new_before_run_copy=True, captured_and_current_comparison_Source_snapshots_distinct=True,
+    numerical_event_values_read_while_authoring=False, targets_or_project_imports_executed=False,
+    canonical_mutation=False, integration_PASS_claimed=False, gates_updated=False,
+    prior_authorship_disclosure='Header authored exporter/main-thread implementation and performed factual capture review; this is custody transport, not an independent scientific certificate.')
+(OUT / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, allow_nan=False, indent=2) + '\n', encoding='utf8', newline='\n')
+print(json.dumps(ref(OUT / 'manifest.json')))

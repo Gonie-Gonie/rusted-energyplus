@@ -1,0 +1,28 @@
+{
+  "schema": "ctf10-main-thread-comparer-Root-FULL-Source-review.v1",
+  "Source_preparation": {
+    "path": ".runtime/porting/CTF-10/ordinary-history-comparison-prep-04/manifest.json",
+    "sha256": "201953b343269271d185aef6bfc2b455c99fb2c0785268bb9e7f6a37bebb826b",
+    "size_bytes": 55146
+  },
+  "accepted": true,
+  "FULL_main163_custody224_README13_author133_and_diff302_read": true,
+  "whole_descriptor_checks": 203,
+  "unique_identities": 94,
+  "physical_Source_ranges": 42,
+  "exact_source_diffs": 4,
+  "scientific_pairer437_byte_exact_predecessor": true,
+  "policy02_unchanged": true,
+  "stream_visitor_AST_exact_predecessor": true,
+  "full_captured_and_live_Source_distinguished": true,
+  "historical_policy_freeze_not_new_copy": true,
+  "fixed_external_tree_full_IO_custody_only": true,
+  "no_events_or_numeric_results_read": true,
+  "no_target_or_comparer_execution": true,
+  "gates_updated": false,
+  "review_Source": {
+    "path": ".runtime/porting/CTF-10/review-main-thread-comparer-Root-04.py",
+    "sha256": "9640926751aa3e70a608b053cdc21586f8c7506f339d29a2d07d2a3351f5d661",
+    "size_bytes": 3756
+  }
+}
