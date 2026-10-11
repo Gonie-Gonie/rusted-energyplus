@@ -1,0 +1,25 @@
+{
+  "scope": "direct-declared-geometry-CalcApproximateViewFactors-only",
+  "arithmetic_profiles_by_variable": {
+    "ZoneArea": {
+      "atol": 0.0,
+      "rtol": 0.0,
+      "value_class_exact": true,
+      "signed_zero_exact": true,
+      "shape_exact": true
+    },
+    "F": {
+      "atol": 0.0,
+      "rtol": 0.0,
+      "value_class_exact": true,
+      "signed_zero_exact": true,
+      "shape_exact": true
+    }
+  },
+  "copied_input_bits_and_owner_ids_exact": true,
+  "warning_identity_and_order_exact": true,
+  "required_reached_owner_absence_fails": true,
+  "unreached_owner_counted_as_PASS": false,
+  "row_first_F_destination_source_layout": true,
+  "full_engine_geometry_or_RAD02_RAD03_claimed": false
+}

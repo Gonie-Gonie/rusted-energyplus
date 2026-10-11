@@ -1,0 +1,32 @@
+{
+  "schema": "rad01-passive-additions.v1",
+  "original": {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.cc",
+    "sha256": "36e3f002a5298dc4d52b9eb4697a4b07f9d9dc7c25e2434a059dcbd06eeeb3b3",
+    "size_bytes": 120027,
+    "line_count": 2118
+  },
+  "blocks": [
+    {
+      "ordinal": 1,
+      "anchor_utf8": "#include <EnergyPlus/WindowEquivalentLayer.hh>\n",
+      "added_utf8": "#include \"rad01_observer.hh\"\n"
+    },
+    {
+      "ordinal": 2,
+      "anchor_utf8": "                                                     state.dataHeatBal->Zone(state.dataSurface->Surface(SPtr(i)).Zone).Name));\n",
+      "added_utf8": "                Rad01Observer::warning_emitted(state, N, i, SPtr(i), ZoneArea(i));\n"
+    },
+    {
+      "ordinal": 3,
+      "anchor_utf8": "        // Set up the approximate view factors.  First these are initialized to all zero.\n",
+      "added_utf8": "        Rad01Observer::zone_area_ready(state, N, ZoneArea, SPtr);\n\n"
+    },
+    {
+      "ordinal": 4,
+      "anchor_utf8": "        ZoneArea.deallocate();\n",
+      "added_utf8": "        Rad01Observer::matrix_ready(state, N, F);\n\n"
+    }
+  ],
+  "inverse_restores_full_Original_bytes": true
+}

@@ -1,0 +1,65 @@
+"""Source metadata author only; never import or invoke the proposed freezer."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd().resolve()
+OUT = ROOT / '.runtime/porting/RAD-01/input-writer-prep-01'
+
+
+def ref(path):
+    path = path if isinstance(path, Path) else ROOT / path
+    raw = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(raw).hexdigest(),
+            'size_bytes': len(raw), 'line_count': len(raw.splitlines())}
+
+
+def emit(path, value):
+    path.write_bytes((json.dumps(value, indent=2, ensure_ascii=False) + '\n').encode('utf-8'))
+
+
+before = OUT / 'before'
+before.mkdir(exist_ok=False)
+origins = [ROOT / '.runtime/porting/CTF-01/input-writer-prep-01/freeze_packet.py',
+           ROOT / '.runtime/porting/CTF-01/unit-comparer-prep-02/packet_io.py']
+for origin in origins:
+    (before / origin.name).write_bytes(origin.read_bytes())
+io = origins[1].read_text(encoding='utf-8').replace('CTF = ROOT / ".runtime/porting/CTF-01"',
+                                                 'BASE = ROOT / ".runtime/porting/RAD-01"')
+(OUT / 'packet_io.py').write_bytes(io.encode('utf-8'))
+writer = OUT / 'freeze_packet.py'
+writer.write_bytes(writer.read_bytes().replace(b'PENDING_IO_SHA', ref(OUT / 'packet_io.py')['sha256'].encode()))
+own = [writer, OUT / 'packet_io.py']
+diffs = []
+for path in own:
+    ast.parse(path.read_text(encoding='utf-8'))
+    patch = ''.join(difflib.unified_diff((before / path.name).read_text(encoding='utf-8').splitlines(True),
+                                      path.read_text(encoding='utf-8').splitlines(True),
+                                      fromfile=ref(before / path.name)['path'], tofile=ref(path)['path']))
+    target = OUT / (path.name + '.diff')
+    target.write_bytes(patch.encode('utf-8'))
+    diffs.append(ref(target))
+native_path = ROOT / '.runtime/porting/RAD-01/native-helper-prep-01/manifest.json'
+native = json.loads(native_path.read_text(encoding='utf-8'))
+manifest = {'schema': 'rad01-input-writer-source-preparation.v1', 'card': 'RAD-01',
+    'status': 'SOURCE-ONLY-held-unexecuted-awaiting-Root-and-other-author-FULL-review',
+    'own_sources': [ref(path) for path in own], 'authoring_source': ref(Path(__file__).resolve()),
+    'readme': ref(OUT / 'README.md'), 'before_sources': [ref(before / p.name) for p in origins],
+    'predecessor_sources': [ref(p) for p in origins], 'exact_diffs': diffs,
+    'source_dependencies': [ref(native_path), native['input_fixture_proposal'], native['observation_policy_proposal'],
+        *native['native_source_files'], *native['source_dependencies'], ref(ROOT / 'tools/porting/check_plan.py'),
+        ref(ROOT / 'tools/porting/record_command.py')],
+    'read_source_ranges': native['read_source_ranges'],
+    'runtime_protocol': {'scope_schema': 'rad01-source-scope-amendment.v1', 'cards': ['RAD-01'],
+        'scope_inventory_key': 'rad_policy_source_inventory', 'scope_check_role': 'real-RAD-01-check-only',
+        'freeze_schema': 'rad01-frozen-packet.v1', 'native_request_schema': 'rad01-helper-cases.v1',
+        'native_admission_schema': 'rad01-native-admission-contract.v1', 'metadata_file_bound_bytes': 16000000,
+        'input_source_file_bound_bytes': 64000000, 'model_cases': 21, 'scientific_execution_performed': False,
+        'actual_future_authorities': None},
+    'proof_boundary': {'physics_or_warning_predicates_evaluated': False, 'expected_values_or_exits_generated': False,
+        'target_import_build_or_execution_performed': False, 'canonical_files_modified': False,
+        'production_geometry_certified': False, 'gates_updated': False}}
+emit(OUT / 'manifest.json', manifest)
+print(json.dumps({'manifest': ref(OUT / 'manifest.json'), 'own_sources': manifest['own_sources'], 'diffs': diffs}))

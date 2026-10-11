@@ -1,0 +1,143 @@
+--- /dev/null
++++ .runtime/porting/RAD-01/native-helper-prep-01/rad01_helper.cpp
+@@ -0,0 +1,140 @@
++// Genuine whole Original helper, called once for each declared input-only model.
++#include "rad01_admission.hh"
++#include "rad01_observer.hh"
++#include <EnergyPlus/DataGlobals.hh>
++#include <EnergyPlus/DataErrorTracking.hh>
++#include <EnergyPlus/DataHeatBalance.hh>
++#include <EnergyPlus/DataSurfaces.hh>
++#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
++#include <EnergyPlus/UtilityRoutines.hh>
++#include <ObjexxFCL/Array2D.hh>
++#include <iostream>
++#include <map>
++#include <memory>
++#include <typeinfo>
++
++namespace Rad01 {
++template<class Function> json invoke(Function &&function)
++{
++    try { function(); return {{"status", "source_returned"}, {"exception_type", nullptr}, {"exception_message", nullptr}}; }
++    catch (EnergyPlus::FatalError const &error) { return {{"status", "source_fatal"}, {"exception_type", typeid(error).name()}, {"exception_message", error.what()}}; }
++    catch (std::exception const &error) { return {{"status", "source_exception"}, {"exception_type", typeid(error).name()}, {"exception_message", error.what()}}; }
++    catch (...) { return {{"status", "source_nonstandard_exception"}, {"exception_type", nullptr}, {"exception_message", nullptr}}; }
++}
++json bits(std::optional<std::vector<std::uint64_t>> const &values)
++{
++    if (!values) return nullptr; json rows = json::array(); for (auto value : *values) rows.push_back(scalar_bits(value)); return rows;
++}
++EnergyPlus::DataSurfaces::SurfaceClass surface_class(std::string const &name)
++{
++    using Class = EnergyPlus::DataSurfaces::SurfaceClass;
++    if (name == "Wall") return Class::Wall; if (name == "Floor") return Class::Floor; return Class::Roof;
++}
++json model_case(json const &row, fs::path const &output)
++{
++    // Capture outlives state, including its installed error callback.
++    Rad01Observer::Capture capture; std::unique_ptr<EnergyPlus::EnergyPlusData> state;
++    json constructor = invoke([&] { state = std::make_unique<EnergyPlus::EnergyPlusData>(); });
++    json input_snapshot = nullptr, seeded = nullptr, outcome = {{"status", "source_not_invoked_after_constructor_stop"},
++        {"exception_type", nullptr}, {"exception_message", nullptr}};
++    std::ostringstream *error_text = nullptr; bool invoked = false;
++    if (state) {
++        capture.state = state.get(); capture.n = static_cast<int>(row.at("surface_registry").size());
++        auto sink = std::make_unique<std::ostringstream>(); error_text = sink.get(); state->files.err_stream = std::move(sink);
++        state->dataGlobal->errorCallback = [&capture](EnergyPlus::Error level, std::string const &message) {
++            Rad01Observer::diagnostic(capture, static_cast<int>(level), message);
++        };
++        ObjexxFCL::Array1D<double> areas(capture.n), azimuths(capture.n), tilts(capture.n);
++        ObjexxFCL::Array1D<int> pointers(capture.n); ObjexxFCL::Array2D<double> factors(capture.n, capture.n);
++        seeded = invoke([&] {
++            state->dataSurface->Surface.allocate(capture.n); state->dataHeatBal->Zone.allocate(1);
++            state->dataHeatBal->Zone(1).Name = row.at("context").at("zone_name").get<std::string>();
++            std::map<std::uint32_t, int> native_by_id;
++            json registry = json::array(), actual_inputs = json::array();
++            for (auto const &surface : row.at("surface_registry")) {
++                int const index = surface.at("native_surface_index").get<int>(); auto &actual = state->dataSurface->Surface(index);
++                actual.Name = surface.at("name").get<std::string>(); actual.Zone = 1;
++                actual.Class = surface_class(surface.at("surface_type").get<std::string>());
++                actual.Area = input_real(surface.at("area_m2")); actual.Azimuth = input_real(surface.at("azimuth_deg")); actual.Tilt = input_real(surface.at("tilt_deg"));
++                native_by_id.emplace(opaque_id(surface.at("surface_id")), index);
++                registry.push_back({{"opaque_surface_id", surface.at("surface_id")}, {"actual_surface_index", index}, {"Name", actual.Name},
++                    {"Zone", actual.Zone}, {"Class", static_cast<int>(actual.Class)}, {"declared_surface_type", surface.at("surface_type")},
++                    {"Area", scalar(actual.Area)}, {"Azimuth", scalar(actual.Azimuth)}, {"Tilt", scalar(actual.Tilt)}});
++            }
++            for (int i = 1; i <= capture.n; ++i) {
++                auto const id = opaque_id(row.at("surface_order").at(static_cast<std::size_t>(i - 1))); int const index = native_by_id.at(id);
++                auto const &actual = state->dataSurface->Surface(index); pointers(i) = index;
++                areas(i) = actual.Area; azimuths(i) = actual.Azimuth; tilts(i) = actual.Tilt;
++                actual_inputs.push_back({{"source_surface_position", i}, {"opaque_surface_id", id}, {"SPtr", pointers(i)},
++                    {"A", scalar(areas(i))}, {"Azimuth", scalar(azimuths(i))}, {"Tilt", scalar(tilts(i))}});
++            }
++            input_snapshot = {{"N", capture.n}, {"actual_zone_index", 1}, {"actual_zone_name", state->dataHeatBal->Zone(1).Name},
++                {"opaque_zone_id", row.at("context").at("zone_id")}, {"declared_enclosure_index", row.at("context").at("enclosure_index")},
++                {"actual_surface_registry", registry}, {"actual_input_pointer_order", actual_inputs},
++                {"geometry_loader_invoked", false}, {"Native_enclosure_owner_produced", false}};
++        });
++        if (seeded.at("status") == "source_returned") {
++            Rad01Observer::Binding binding(capture); invoked = true;
++            outcome = invoke([&] { EnergyPlus::HeatBalanceIntRadExchange::CalcApproximateViewFactors(*state, capture.n, areas, azimuths, tilts, factors, pointers); });
++        } else outcome = {{"status", "source_not_invoked_after_member_seed_stop"}, {"exception_type", nullptr}, {"exception_message", nullptr}};
++    }
++    bool const returned = outcome.at("status") == "source_returned";
++    bool const required_missing = returned && (capture.zone_area_callbacks != 1 || capture.matrix_callbacks != 1 ||
++        !capture.zone_area_bits || !capture.matrix_bits || !capture.actual_surface_pointers);
++    bool const integrity_failed = capture.observer_failure || required_missing || capture.omitted_warnings != 0 || capture.omitted_diagnostics != 0;
++    json warnings = json::array(), diagnostics = json::array();
++    for (auto const &warning : capture.warnings) warnings.push_back({{"actual_warning_callback_ordinal", warning.ordinal},
++        {"source_surface_position", warning.source_surface_position}, {"actual_surface_index", warning.actual_surface_index},
++        {"actual_zone_index", warning.actual_zone_index}, {"surface_name", warning.surface_name}, {"zone_name", warning.zone_name},
++        {"actual_seen_area", scalar_bits(warning.seen_area_bits)}, {"actual_diagnostic_end_exclusive", warning.diagnostic_end}});
++    for (auto const &diagnostic : capture.diagnostics) diagnostics.push_back({{"actual_callback_ordinal", diagnostic.ordinal},
++        {"actual_error_level", diagnostic.level}, {"message", diagnostic.message}});
++    json log = nullptr;
++    if (error_text != nullptr) { auto const path = output / (row.at("id").get<std::string>() + ".err"); write_text(path, error_text->str()); log = file_ref(path); }
++    return {{"id", row.at("id")}, {"lane", row.at("lane")}, {"declared_context", row.at("context")}, {"constructor_outcome", constructor},
++        {"member_seed_outcome", seeded}, {"actual_input_snapshot", input_snapshot}, {"actual_source_invoked", invoked}, {"call_outcome", outcome},
++        {"observations", {{"actual_zone_area_callback_count", capture.zone_area_callbacks}, {"actual_matrix_callback_count", capture.matrix_callbacks},
++            {"actual_warning_callback_count", capture.warning_callbacks}, {"actual_diagnostic_callback_count", capture.diagnostic_callbacks},
++            {"ZoneArea", bits(capture.zone_area_bits)}, {"F", bits(capture.matrix_bits)},
++            {"actual_SPtr", capture.actual_surface_pointers ? json(*capture.actual_surface_pointers) : json(nullptr)},
++            {"F_shape", capture.matrix_bits ? json::array({capture.n, capture.n}) : json(nullptr)},
++            {"F_layout", "actual Array2 row-first: F(j,i), flat offset (j-1)*N+(i-1)"},
++            {"warnings", warnings}, {"diagnostics", diagnostics}, {"err_stream", log},
++            {"actual_TotalWarningErrors", state ? json(state->dataErrTracking->TotalWarningErrors) : json(nullptr)},
++            {"failure_counts", capture.failures}, {"omitted_warning_records", capture.omitted_warnings},
++            {"omitted_diagnostic_records", capture.omitted_diagnostics}, {"observer_failure", capture.observer_failure},
++            {"required_reached_owner_missing", required_missing}, {"observation_integrity_failed", integrity_failed}}}};
++}
++} // namespace Rad01
++
++int main(int argc, char **argv)
++{
++    using namespace Rad01;
++    try {
++        require(argc == 5, "Expected root, frozen request, admission contract, fresh output directory");
++        auto const root = fs::canonical(argv[1]); auto const request_path = fs::weakly_canonical(argv[2]);
++        auto const admission_path = fs::weakly_canonical(argv[3]); auto const output = fs::weakly_canonical(argv[4]);
++        require(!fs::exists(output) && !output.lexically_relative(root).empty() && *output.lexically_relative(root).begin() != "..", "Fresh contained output required");
++        auto const packet = admit(root, request_path, admission_path); fs::create_directories(output);
++        json models = json::array(), statuses = json::object(); std::size_t invocations = 0; bool integrity_failed = false;
++        for (auto const &row : packet.request.at("model_cases")) {
++            auto result = model_case(row, output); auto const status = result.at("call_outcome").at("status").get<std::string>();
++            statuses[status] = (statuses.contains(status) ? statuses.at(status).get<std::size_t>() : 0) + 1;
++            if (result.at("actual_source_invoked").get<bool>()) ++invocations;
++            integrity_failed = integrity_failed || result.at("observations").at("observation_integrity_failed").get<bool>(); models.push_back(std::move(result));
++        }
++        auto const after = admit(root, request_path, admission_path);
++        require(after.request == packet.request && after.admission == packet.admission && after.contracts == packet.contracts, "Input/source bindings changed during actual calls");
++        int const exit_code = integrity_failed ? 2 : 0;
++        json const result = {{"schema", "rad01-helper-results.v1"}, {"energyplus_commit", packet.request.at("energyplus_commit")},
++            {"actual_request", file_ref(request_path)}, {"native_admission_contract", file_ref(admission_path)},
++            {"actual_scope_amendment", packet.request.at("actual_scope_amendment")}, {"actual_scope_amendment_execution", packet.request.at("actual_scope_amendment_execution")},
++            {"observation_projection", file_ref(packet.projection_path)}, {"contracts", packet.contracts}, {"native_source_files", packet.admission.at("native_source_files")},
++            {"actual_binary", file_ref(fs::absolute(argv[0]))}, {"observation_policy", packet.request.at("observation_policy")},
++            {"requested_counts", packet.counts}, {"model_cases", models}, {"actual_source_invocations", invocations}, {"actual_status_counts", statuses},
++            {"observer_integrity_failed", integrity_failed}, {"actual_helper_exit_code", exit_code}, {"complete_requested_record_ledger", true},
++            {"unreached_observations_counted_as_PASS", false}, {"full_engine_production_geometry_certified", false},
++            {"RAD02_RAD03_or_production_integration_certified", false}, {"scientific_comparison_performed", false}, {"numerical_PASS_claimed", false}, {"gates_updated", false}};
++        write_text(output / "rad01-helper-results.json", result.dump(2) + "\n"); return exit_code;
++    } catch (std::exception const &error) { std::cerr << error.what() << '\n'; return 1; }
++}

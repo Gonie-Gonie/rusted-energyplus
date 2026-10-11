@@ -1,0 +1,36 @@
+{
+  "schema": "rad01-actual-pre-output-scope-and-freeze-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/RAD-01-frozen/manifest.json",
+    "sha256": "e7fe26efdbb5d57e2895da049f0e9c2dbe44e70cde8a881528124465db27d0eb",
+    "size_bytes": 48425
+  },
+  "actual_scope_amendment": {
+    "path": ".runtime/porting/RAD-01/scope-amendment-01/amendment.json",
+    "sha256": "51885f2bab3ca0fbf383f0bd4b6d4f6d3cdcc9ea28837dd9c58be19660eba264",
+    "size_bytes": 2854
+  },
+  "actual_scope_check": {
+    "path": ".runtime/porting/RAD-01/scope-check-command-01/receipt.json",
+    "sha256": "a5c6d3aa9d55aced5be813578da624130fc2c63b3d511a422f0ac481cb5fb560",
+    "size_bytes": 2874
+  },
+  "unit_freeze": {
+    "path": ".runtime/porting/RAD-01/frozen-packet-01/freeze-receipt.json",
+    "sha256": "bdc59cf7294f6fc783be49b625dba4aaa774cdfd469dab675fd5a1b79ea10701",
+    "size_bytes": 15336
+  },
+  "unit_freeze_execution": {
+    "path": ".runtime/porting/RAD-01/freeze-command-01/receipt.json",
+    "sha256": "10373a4591d05fbd1273b4c976babc2d2453bf961dea85cc9f063586b22709b8",
+    "size_bytes": 3654
+  },
+  "actual_RAD01_helper_build_or_execution_performed": false,
+  "separate_ZoneArea_and_F_zero_profiles_settled_before_outputs": true,
+  "literal21_unit_inputs_preserved": true,
+  "CON_templates_certified_as_production_geometry": false,
+  "scientific_values_or_expected_arrays_evaluated": false,
+  "numerical_PASS_claimed": false,
+  "unit_integration_production_PASS_claimed": false,
+  "Original_capture_and_Rust_comparison_pending": true
+}

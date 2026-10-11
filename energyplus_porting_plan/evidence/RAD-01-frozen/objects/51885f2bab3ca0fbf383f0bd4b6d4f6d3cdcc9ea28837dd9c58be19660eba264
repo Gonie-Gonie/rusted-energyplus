@@ -1,0 +1,76 @@
+{
+  "schema": "rad01-source-scope-amendment.v1",
+  "draft_only_not_actual_scope_receipt": false,
+  "created_utc": "2026-10-11T00:37:41.727220+00:00",
+  "cards": [
+    "RAD-01"
+  ],
+  "scope_review_passed": true,
+  "all_other_gates_pending": true,
+  "strict_profiles_settled_before_outputs": true,
+  "actual_RAD01_build_or_engine_execution_performed": false,
+  "native_observer": {
+    "path": ".runtime/porting/RAD-01/native-helper-prep-01/manifest.json",
+    "sha256": "489a7caa4086722bb5057cfc8489803b21ce7723f881ffcbe54252d604e86618",
+    "size_bytes": 21959
+  },
+  "rad_policy_source_inventory": {
+    "native_helper": {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/manifest.json",
+      "sha256": "489a7caa4086722bb5057cfc8489803b21ce7723f881ffcbe54252d604e86618",
+      "size_bytes": 21959
+    },
+    "input_fixture": {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/input-fixture-proposal.json",
+      "sha256": "5bf064f4f61f7e271f6f5a1306855c3e986d942cf859faf152ab5e6d5e4146f7",
+      "size_bytes": 38084
+    },
+    "observation_policy": {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/observation-policy-proposal.json",
+      "sha256": "7dfb0ccc1b50f34c8a7e30a0e34369e022faa79c507f41c60b47d2b5bad4d5a4",
+      "size_bytes": 710
+    },
+    "input_writer": {
+      "path": ".runtime/porting/RAD-01/input-writer-prep-02/manifest.json",
+      "sha256": "fac0f91eebebab8edd5a9feb58bd30ca9281932c04fef291274524eba9b6810c",
+      "size_bytes": 20173
+    }
+  },
+  "input_only_fixture_source_inventory": {
+    "path": ".runtime/porting/RAD-01/native-helper-prep-01/input-fixture-proposal.json",
+    "sha256": "5bf064f4f61f7e271f6f5a1306855c3e986d942cf859faf152ab5e6d5e4146f7",
+    "size_bytes": 38084
+  },
+  "requested_counts": {
+    "model_cases": 21,
+    "CalcApproximateViewFactors": 21
+  },
+  "before_documents": [
+    {
+      "path": ".runtime/porting/RAD-01/scope-amendment-01/before/plan.json",
+      "sha256": "f97a550ce0849ee5268fe83a2fe23619b0e53b70ead35d85604c2dc71c2689f8",
+      "size_bytes": 719762
+    },
+    {
+      "path": ".runtime/porting/RAD-01/scope-amendment-01/before/RAD-01.md",
+      "sha256": "6a0be76be4299e401380db885b65d12b37c3079e9a25a6489f5b7055e9902d37",
+      "size_bytes": 2636
+    }
+  ],
+  "after_documents": [
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "10f2a9b78107fdbb3d65b658d4578cd9dd1f2c69ba31c6fd01d7bbd9081575ad",
+      "size_bytes": 730031
+    },
+    {
+      "path": "energyplus_porting_plan/cards/RAD-01.md",
+      "sha256": "27d751313190f01319c0e46dd1fbca12735df841553e783b766d0a34bb467ea1",
+      "size_bytes": 4408
+    }
+  ],
+  "recorder_role": "real-RAD-01-check-only",
+  "scope_only_no_numerical_PASS": true,
+  "actual_doc_and_check_refs_supplied_by_Root_later": false,
+  "fixed_CON_real_production_geometry_unavailable": true
+}

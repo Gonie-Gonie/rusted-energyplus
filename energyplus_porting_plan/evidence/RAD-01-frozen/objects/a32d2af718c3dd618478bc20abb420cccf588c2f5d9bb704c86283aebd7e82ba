@@ -1,0 +1,8 @@
+--- .runtime/porting/RAD-01/input-writer-prep-02/before-01/README.md
++++ .runtime/porting/RAD-01/input-writer-prep-02/README.md
+@@ -15,3 +15,5 @@
+ The prospective amendment schema is `rad01-source-scope-amendment.v1`, cards `["RAD-01"]`, with `rad_policy_source_inventory` binding the Native helper manifest, literal fixture, policy and this writer manifest. Actual current after-documents and the real `check_plan.py --check --card RAD-01` recorder must exist and authenticate before freezing. The recorder validates already Root-authored documents; it does not author them. Current role is `real-RAD-01-check-only`. There is no actual scope amendment, freeze receipt, build, execution or numerical PASS in this source preparation.
+ 
+ The Native six-file admission order is helper, metadata, admission, observer header, observer implementation, full derived Original TU. The whole pinned Original TU authority and all declared source ranges are retained. No scientific project module is imported. This stage does not configure/build/run Native or Rust, change cards or canonical source, retire files, update gates, or certify production geometry/RAD-02/RAD-03. Historical CTF-10 source references remain documentary and its retired linked originals must not be relaunched.
++
++Fresh02 changes only the prospective amendment key to `all_other_gates_pending`: Source review is already passed, while unit, integration and production remain pending. Held01 is preserved; no false pending Source gate is required. IO bytes, literal inputs, exact policy and all admission semantics are unchanged.

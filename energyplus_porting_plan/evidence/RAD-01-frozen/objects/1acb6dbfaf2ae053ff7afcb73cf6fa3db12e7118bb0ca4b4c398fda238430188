@@ -1,0 +1,33 @@
+--- .runtime/porting/RAD-01/native-helper-prep-01/before/HeatBalanceIntRadExchange.cc
++++ .runtime/porting/RAD-01/native-helper-prep-01/HeatBalanceIntRadExchange.rad01.cc
+@@ -70,6 +70,7 @@
+ #include <EnergyPlus/Material.hh>
+ #include <EnergyPlus/UtilityRoutines.hh>
+ #include <EnergyPlus/WindowEquivalentLayer.hh>
++#include "rad01_observer.hh"
+ 
+ namespace EnergyPlus {
+ 
+@@ -1478,8 +1479,11 @@
+                                   EnergyPlus::format("Happens for Surface=\"{}\" in Zone={}",
+                                                      state.dataSurface->Surface(SPtr(i)).Name,
+                                                      state.dataHeatBal->Zone(state.dataSurface->Surface(SPtr(i)).Zone).Name));
+-            }
+-        }
++                Rad01Observer::warning_emitted(state, N, i, SPtr(i), ZoneArea(i));
++            }
++        }
++
++        Rad01Observer::zone_area_ready(state, N, ZoneArea, SPtr);
+ 
+         // Set up the approximate view factors.  First these are initialized to all zero.
+         // This will clear out any junk leftover from whenever.  Then, for each zone
+@@ -1514,6 +1518,8 @@
+                 }
+             }
+         }
++
++        Rad01Observer::matrix_ready(state, N, F);
+ 
+         ZoneArea.deallocate();
+     }

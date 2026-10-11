@@ -1,0 +1,1511 @@
+{
+  "schema": "rad01-input-fixture-proposal.v1",
+  "frozen": false,
+  "scientific_execution_performed": false,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "model_cases": [
+    {
+      "id": "asymmetric-areas",
+      "lane": "declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "selected-zone"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 90,
+          "name": "surface-90",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4000000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 2,
+          "surface_id": 3,
+          "name": "surface-3",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4010000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4066800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 3,
+          "surface_id": 41,
+          "name": "surface-41",
+          "surface_type": "Floor",
+          "area_m2": {
+            "bits": "4020000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4066800000000000"
+          }
+        }
+      ],
+      "surface_order": [
+        90,
+        3,
+        41
+      ]
+    },
+    {
+      "id": "azimuth-at10",
+      "lane": "declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "selected-zone"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 9,
+          "name": "surface-9",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4000000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 2,
+          "surface_id": 2,
+          "name": "surface-2",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4008000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4024000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        }
+      ],
+      "surface_order": [
+        9,
+        2
+      ]
+    },
+    {
+      "id": "azimuth-above10",
+      "lane": "declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "selected-zone"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 9,
+          "name": "surface-9",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4000000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 2,
+          "surface_id": 2,
+          "name": "surface-2",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4008000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4024000d1b71758e"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        }
+      ],
+      "surface_order": [
+        9,
+        2
+      ]
+    },
+    {
+      "id": "azimuth-at350",
+      "lane": "declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "selected-zone"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 9,
+          "name": "surface-9",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4000000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 2,
+          "surface_id": 2,
+          "name": "surface-2",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4008000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4075e00000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        }
+      ],
+      "surface_order": [
+        9,
+        2
+      ]
+    },
+    {
+      "id": "azimuth-below350",
+      "lane": "declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "selected-zone"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 9,
+          "name": "surface-9",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4000000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 2,
+          "surface_id": 2,
+          "name": "surface-2",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4008000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4075dfff97247454"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        }
+      ],
+      "surface_order": [
+        9,
+        2
+      ]
+    },
+    {
+      "id": "tilt-at10",
+      "lane": "declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "selected-zone"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 9,
+          "name": "surface-9",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4000000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 2,
+          "surface_id": 2,
+          "name": "surface-2",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4008000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4059000000000000"
+          }
+        }
+      ],
+      "surface_order": [
+        9,
+        2
+      ]
+    },
+    {
+      "id": "tilt-above10",
+      "lane": "declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "selected-zone"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 9,
+          "name": "surface-9",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4000000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 2,
+          "surface_id": 2,
+          "name": "surface-2",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4008000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "40590001a36e2eb2"
+          }
+        }
+      ],
+      "surface_order": [
+        9,
+        2
+      ]
+    },
+    {
+      "id": "azimuth-360",
+      "lane": "declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "selected-zone"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 9,
+          "name": "surface-9",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4000000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 2,
+          "surface_id": 2,
+          "name": "surface-2",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4008000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4076800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        }
+      ],
+      "surface_order": [
+        9,
+        2
+      ]
+    },
+    {
+      "id": "floor-floor-roof",
+      "lane": "declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "selected-zone"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 12,
+          "name": "surface-12",
+          "surface_type": "Floor",
+          "area_m2": {
+            "bits": "4000000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 2,
+          "surface_id": 1,
+          "name": "surface-1",
+          "surface_type": "Floor",
+          "area_m2": {
+            "bits": "4010000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 3,
+          "surface_id": 8,
+          "name": "surface-8",
+          "surface_type": "Roof",
+          "area_m2": {
+            "bits": "4020000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        }
+      ],
+      "surface_order": [
+        12,
+        1,
+        8
+      ]
+    },
+    {
+      "id": "positive-below-epsilon",
+      "lane": "declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "selected-zone"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 5,
+          "name": "surface-5",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "3ca0000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 2,
+          "surface_id": 6,
+          "name": "surface-6",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "3ca0000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4066800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        }
+      ],
+      "surface_order": [
+        5,
+        6
+      ]
+    },
+    {
+      "id": "nonpositive-diagnostic",
+      "lane": "declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "selected-zone"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 99,
+          "name": "surface-99",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "bff0000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 2,
+          "surface_id": 2,
+          "name": "surface-2",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "0000000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4066800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        }
+      ],
+      "surface_order": [
+        99,
+        2
+      ]
+    },
+    {
+      "id": "accumulation-registry-order",
+      "lane": "declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "selected-zone"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 40,
+          "name": "surface-40",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4014000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 2,
+          "surface_id": 8,
+          "name": "surface-8",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4341c37937e08000"
+          },
+          "azimuth_deg": {
+            "bits": "4066800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 3,
+          "surface_id": 2,
+          "name": "surface-2",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "3ff0000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4066800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 4,
+          "surface_id": 1,
+          "name": "surface-1",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "3ff0000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4066800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        }
+      ],
+      "surface_order": [
+        40,
+        8,
+        2,
+        1
+      ]
+    },
+    {
+      "id": "accumulation-pointer-permutation",
+      "lane": "declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "selected-zone"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 40,
+          "name": "surface-40",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4014000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 2,
+          "surface_id": 8,
+          "name": "surface-8",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4341c37937e08000"
+          },
+          "azimuth_deg": {
+            "bits": "4066800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 3,
+          "surface_id": 2,
+          "name": "surface-2",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "3ff0000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4066800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 4,
+          "surface_id": 1,
+          "name": "surface-1",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "3ff0000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4066800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        }
+      ],
+      "surface_order": [
+        40,
+        2,
+        1,
+        8
+      ]
+    },
+    {
+      "id": "declared-ceiling-maps-Native-roof",
+      "lane": "declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "selected-zone"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 4,
+          "name": "surface-4",
+          "surface_type": "Ceiling",
+          "area_m2": {
+            "bits": "3ff0000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "0000000000000000"
+          }
+        },
+        {
+          "native_surface_index": 2,
+          "surface_id": 9,
+          "name": "surface-9",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4000000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        }
+      ],
+      "surface_order": [
+        4,
+        9
+      ]
+    },
+    {
+      "id": "one-direct-surface-diagnostic",
+      "lane": "declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "selected-zone"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 4,
+          "name": "surface-4",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "3ff0000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        }
+      ],
+      "surface_order": [
+        4
+      ]
+    },
+    {
+      "id": "CON-template-A-24H",
+      "lane": "CON-membership-template-declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "ZONEONE"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 1,
+          "name": "Zn001:Wall001",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4000000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 2,
+          "surface_id": 2,
+          "name": "Zn001:Wall002",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4008000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4056800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 3,
+          "surface_id": 3,
+          "name": "Zn001:Wall003",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4010000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4066800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 4,
+          "surface_id": 4,
+          "name": "Zn001:Wall004",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4014000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4070e00000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 5,
+          "surface_id": 5,
+          "name": "Zn001:Flr001",
+          "surface_type": "Floor",
+          "area_m2": {
+            "bits": "4018000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4066800000000000"
+          }
+        },
+        {
+          "native_surface_index": 6,
+          "surface_id": 6,
+          "name": "Zn001:Roof001",
+          "surface_type": "Roof",
+          "area_m2": {
+            "bits": "401c000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "0000000000000000"
+          }
+        }
+      ],
+      "surface_order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "id": "CON-template-A-72H",
+      "lane": "CON-membership-template-declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "ZONEONE"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 1,
+          "name": "Zn001:Wall001",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4000000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 2,
+          "surface_id": 2,
+          "name": "Zn001:Wall002",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4008000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4056800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 3,
+          "surface_id": 3,
+          "name": "Zn001:Wall003",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4010000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4066800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 4,
+          "surface_id": 4,
+          "name": "Zn001:Wall004",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4014000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4070e00000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 5,
+          "surface_id": 5,
+          "name": "Zn001:Flr001",
+          "surface_type": "Floor",
+          "area_m2": {
+            "bits": "4018000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4066800000000000"
+          }
+        },
+        {
+          "native_surface_index": 6,
+          "surface_id": 6,
+          "name": "Zn001:Roof001",
+          "surface_type": "Roof",
+          "area_m2": {
+            "bits": "401c000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "0000000000000000"
+          }
+        }
+      ],
+      "surface_order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "id": "CON-template-B-NOLIMIT-24H",
+      "lane": "CON-membership-template-declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "ZONEONE"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 1,
+          "name": "FLOOR",
+          "surface_type": "Floor",
+          "area_m2": {
+            "bits": "4000000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4066800000000000"
+          }
+        },
+        {
+          "native_surface_index": 2,
+          "surface_id": 2,
+          "name": "ROOF",
+          "surface_type": "Roof",
+          "area_m2": {
+            "bits": "4008000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "0000000000000000"
+          }
+        },
+        {
+          "native_surface_index": 3,
+          "surface_id": 3,
+          "name": "WALL X0",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4010000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 4,
+          "surface_id": 4,
+          "name": "WALL X1",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4014000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4056800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 5,
+          "surface_id": 5,
+          "name": "WALL Y0",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4018000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4066800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 6,
+          "surface_id": 6,
+          "name": "WALL Y1",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "401c000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4070e00000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        }
+      ],
+      "surface_order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "id": "CON-template-B-FLOW-24H",
+      "lane": "CON-membership-template-declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "ZONEONE"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 1,
+          "name": "FLOOR",
+          "surface_type": "Floor",
+          "area_m2": {
+            "bits": "4000000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4066800000000000"
+          }
+        },
+        {
+          "native_surface_index": 2,
+          "surface_id": 2,
+          "name": "ROOF",
+          "surface_type": "Roof",
+          "area_m2": {
+            "bits": "4008000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "0000000000000000"
+          }
+        },
+        {
+          "native_surface_index": 3,
+          "surface_id": 3,
+          "name": "WALL X0",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4010000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 4,
+          "surface_id": 4,
+          "name": "WALL X1",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4014000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4056800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 5,
+          "surface_id": 5,
+          "name": "WALL Y0",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4018000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4066800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 6,
+          "surface_id": 6,
+          "name": "WALL Y1",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "401c000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4070e00000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        }
+      ],
+      "surface_order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "id": "CON-template-B-CAPACITY-24H",
+      "lane": "CON-membership-template-declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "ZONEONE"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 1,
+          "name": "FLOOR",
+          "surface_type": "Floor",
+          "area_m2": {
+            "bits": "4000000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4066800000000000"
+          }
+        },
+        {
+          "native_surface_index": 2,
+          "surface_id": 2,
+          "name": "ROOF",
+          "surface_type": "Roof",
+          "area_m2": {
+            "bits": "4008000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "0000000000000000"
+          }
+        },
+        {
+          "native_surface_index": 3,
+          "surface_id": 3,
+          "name": "WALL X0",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4010000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 4,
+          "surface_id": 4,
+          "name": "WALL X1",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4014000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4056800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 5,
+          "surface_id": 5,
+          "name": "WALL Y0",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4018000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4066800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 6,
+          "surface_id": 6,
+          "name": "WALL Y1",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "401c000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4070e00000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        }
+      ],
+      "surface_order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "id": "CON-template-B-BOTH-24H",
+      "lane": "CON-membership-template-declared-geometry-unit",
+      "context": {
+        "enclosure_index": 7,
+        "zone_id": 4,
+        "native_zone_index": 1,
+        "zone_name": "ZONEONE"
+      },
+      "surface_registry": [
+        {
+          "native_surface_index": 1,
+          "surface_id": 1,
+          "name": "FLOOR",
+          "surface_type": "Floor",
+          "area_m2": {
+            "bits": "4000000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4066800000000000"
+          }
+        },
+        {
+          "native_surface_index": 2,
+          "surface_id": 2,
+          "name": "ROOF",
+          "surface_type": "Roof",
+          "area_m2": {
+            "bits": "4008000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "0000000000000000"
+          }
+        },
+        {
+          "native_surface_index": 3,
+          "surface_id": 3,
+          "name": "WALL X0",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4010000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "0000000000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 4,
+          "surface_id": 4,
+          "name": "WALL X1",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4014000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4056800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 5,
+          "surface_id": 5,
+          "name": "WALL Y0",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "4018000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4066800000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        },
+        {
+          "native_surface_index": 6,
+          "surface_id": 6,
+          "name": "WALL Y1",
+          "surface_type": "Wall",
+          "area_m2": {
+            "bits": "401c000000000000"
+          },
+          "azimuth_deg": {
+            "bits": "4070e00000000000"
+          },
+          "tilt_deg": {
+            "bits": "4056800000000000"
+          }
+        }
+      ],
+      "surface_order": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    }
+  ],
+  "proposed_counts": {
+    "model_cases": 21,
+    "CalcApproximateViewFactors": 21
+  },
+  "CON_membership_template_authorities": [
+    {
+      "model_id": "CON-template-A-24H",
+      "source_scope_case_id": "A-24H",
+      "input_source_descriptor_copied_from_fixed_CON_scope": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+      },
+      "geometry_authority": "explicit unit literals; no vertex calculation or Native enclosure observation",
+      "registry_order_authority": "declared IDF-name/class template order; not Native GetSurfaceData registration order"
+    },
+    {
+      "model_id": "CON-template-A-72H",
+      "source_scope_case_id": "A-72H",
+      "input_source_descriptor_copied_from_fixed_CON_scope": {
+        "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+        "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+      },
+      "geometry_authority": "explicit unit literals; no vertex calculation or Native enclosure observation",
+      "registry_order_authority": "declared IDF-name/class template order; not Native GetSurfaceData registration order"
+    },
+    {
+      "model_id": "CON-template-B-NOLIMIT-24H",
+      "source_scope_case_id": "B-NOLIMIT-24H",
+      "input_source_descriptor_copied_from_fixed_CON_scope": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+        "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+      },
+      "geometry_authority": "explicit unit literals; no vertex calculation or Native enclosure observation",
+      "registry_order_authority": "declared IDF-name/class template order; not Native GetSurfaceData registration order"
+    },
+    {
+      "model_id": "CON-template-B-FLOW-24H",
+      "source_scope_case_id": "B-FLOW-24H",
+      "input_source_descriptor_copied_from_fixed_CON_scope": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+        "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+      },
+      "geometry_authority": "explicit unit literals; no vertex calculation or Native enclosure observation",
+      "registry_order_authority": "declared IDF-name/class template order; not Native GetSurfaceData registration order"
+    },
+    {
+      "model_id": "CON-template-B-CAPACITY-24H",
+      "source_scope_case_id": "B-CAPACITY-24H",
+      "input_source_descriptor_copied_from_fixed_CON_scope": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+        "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+      },
+      "geometry_authority": "explicit unit literals; no vertex calculation or Native enclosure observation",
+      "registry_order_authority": "declared IDF-name/class template order; not Native GetSurfaceData registration order"
+    },
+    {
+      "model_id": "CON-template-B-BOTH-24H",
+      "source_scope_case_id": "B-BOTH-24H",
+      "input_source_descriptor_copied_from_fixed_CON_scope": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+        "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+      },
+      "geometry_authority": "explicit unit literals; no vertex calculation or Native enclosure observation",
+      "registry_order_authority": "declared IDF-name/class template order; not Native GetSurfaceData registration order"
+    }
+  ],
+  "unpaired_Rust_only_tests": [
+    "ZoneMismatch",
+    "DuplicateSurfaceId",
+    "empty direct helper"
+  ],
+  "full_engine_production_geometry_unavailable": true
+}

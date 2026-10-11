@@ -68,9 +68,3 @@ RAD-02의 행렬 인덱스와 행/열 의미 보존
 증거 경로:  
 최대오차/RMSE/상태 불일치:  
 추가 검토할 helper:  
-
-## Actual pre-output direct-unit source scope
-
-Selected direct-unit CalcApproximateViewFactors scope is the complete pinned function1406-1519, its actual declaration109-116 and direct warning helpers. Inputs are21 explicitly declared opaque geometry registries with actual Native1-based indices and independent Rust opaque IDs; six CON name/class templates do not represent observed production geometry or GetSurfaceData order. Preserve strict visibility10/350/tilt10 predicates, Native ordered ZoneArea accumulation, warning/continue identity and order, positive-area division, F(j,i) row-first layout and source outcomes. ZoneArea/F use separate exact zero atol/rtol profiles with class, shape and signed-zero equality; copied input bits/identities/order are exact. Reached required owner absence or an unreturned required function cannot pass. Scope excludes geometry derivation, initialized enclosures, FixViewFactors, ScriptF, radiation exchange and all full-engine integration/production claims. Genuine Native capture and OriginalDataQA precede applying the held Rust arithmetic repair. No unit or full-card PASS follows from source review, build or direct fixtures alone.
-
-Root and Raw completed FULL cumulative reviews of the held Rust proposal03 and Native helper489a7caa, including all21 input-only cases and the variable profiles. The passive fork contains only four additions and independently restores the whole pinned Original TU exactly. Scope review passes; unit, integration and production gates remain unconfirmed. The three Rust-only invalid-association/empty cases have no Native pair and cannot count as scientific coverage. Actual build/provider/PE provenance, OriginalDataQA, same-input Rust comparison and real runtime connection remain pending.

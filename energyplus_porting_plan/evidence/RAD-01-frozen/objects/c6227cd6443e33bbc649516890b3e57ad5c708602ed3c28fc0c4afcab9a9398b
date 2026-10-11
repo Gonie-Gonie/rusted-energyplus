@@ -1,0 +1,55 @@
+"""Metadata/source successor author; never execute the proposed input writer."""
+import ast
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd().resolve()
+OLD = ROOT / '.runtime/porting/RAD-01/input-writer-prep-01'
+OUT = Path(__file__).resolve().parent
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(raw).hexdigest(),
+            'size_bytes': len(raw), 'line_count': len(raw.splitlines())}
+
+
+def diff(before, after, name):
+    text = ''.join(difflib.unified_diff(before.read_text(encoding='utf-8').splitlines(True),
+        after.read_text(encoding='utf-8').splitlines(True), fromfile=ref(before)['path'], tofile=ref(after)['path']))
+    path = OUT / name
+    path.write_bytes(text.encode('utf-8'))
+    return ref(path)
+
+
+before = OUT / 'before'
+previous = OUT / 'before-01'
+before.mkdir(exist_ok=False); previous.mkdir(exist_ok=False)
+for name in ['freeze_packet.py', 'packet_io.py']:
+    (before / name).write_bytes((OLD / 'before' / name).read_bytes())
+    (previous / name).write_bytes((OLD / name).read_bytes())
+    raw = (OLD / name).read_bytes()
+    if name == 'freeze_packet.py':
+        assert raw.count(b'all_four_gates_pending') == 1
+        raw = raw.replace(b'all_four_gates_pending', b'all_other_gates_pending')
+    (OUT / name).write_bytes(raw)
+    ast.parse(raw.decode('utf-8'))
+for name in ['README.md', 'manifest.json']:
+    (previous / name).write_bytes((OLD / name).read_bytes())
+readme = (OLD / 'README.md').read_text(encoding='utf-8') + '\nFresh02 changes only the prospective amendment key to `all_other_gates_pending`: Source review is already passed, while unit, integration and production remain pending. Held01 is preserved; no false pending Source gate is required. IO bytes, literal inputs, exact policy and all admission semantics are unchanged.\n'
+(OUT / 'README.md').write_bytes(readme.encode('utf-8'))
+manifest = copy.deepcopy(json.loads((OLD / 'manifest.json').read_text(encoding='utf-8')))
+manifest['own_sources'] = [ref(OUT / name) for name in ['freeze_packet.py', 'packet_io.py']]
+manifest['authoring_source'] = ref(Path(__file__).resolve())
+manifest['readme'] = ref(OUT / 'README.md')
+manifest['before_sources'] = [ref(before / name) for name in ['freeze_packet.py', 'packet_io.py']]
+manifest['exact_diffs'] = [diff(before / name, OUT / name, name + '.diff') for name in ['freeze_packet.py', 'packet_io.py']]
+manifest['predecessor_01'] = ref(OLD / 'manifest.json')
+manifest['before_01'] = [ref(path) for path in previous.iterdir()]
+manifest['from_01_diffs'] = [diff(previous / name, OUT / name, name + '.from-01.diff') for name in ['freeze_packet.py', 'packet_io.py', 'README.md']]
+manifest['successor_change'] = 'Sole prospective scope key all_four_gates_pending -> all_other_gates_pending; IO exact01.'
+(OUT / 'manifest.json').write_bytes((json.dumps(manifest, indent=2) + '\n').encode('utf-8'))
+print(json.dumps({'manifest': ref(OUT / 'manifest.json'), 'own_sources': manifest['own_sources'], 'from_01_diffs': manifest['from_01_diffs']}))

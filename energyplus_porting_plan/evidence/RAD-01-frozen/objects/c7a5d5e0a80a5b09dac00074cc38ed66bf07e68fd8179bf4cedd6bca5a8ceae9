@@ -1,0 +1,17 @@
+# RAD-01 literal input freezer source proposal
+
+This is an unexecuted adaptation of the accepted CTF-01 input writer and its Windows drive-path transport repair. It copies the accepted Native direct-unit input fixture and exact policy; it evaluates no geometry, warning predicate or floating-point formula. Root must review this source and obtain an independent full peer before any invocation.
+
+The authentic input fixture has 21 declared geometry cases. Its six CON membership templates remain declared unit registry/SPtr inputs, rather than observations of genuine Native enclosure registration. The request preserves registry order, opaque IDs, names, input bits and complete SPtr order. Only ZoneArea and F have arithmetic profiles, both with float atol=0.0/rtol=0.0 and exact class, shape and signed zero. Warning identity/order and reached-owner absence are separate exact obligations. No expected value, warning outcome or exit is supplied.
+
+The existing seven-file one-way DAG is retained: source, tolerances, request, cases, projection, Native admission, freeze receipt. Source and input archives authenticate actual bytes. Metadata JSON is limited to 16000000 bytes by the existing transport; input/source identities are limited to 64000000 bytes. Verbatim Windows drive paths normalize before containment; UNC/device paths, symlinks and reparse parents remain rejected.
+
+Future Root invocation is the existing recorded Python stage:
+
+```text
+python -X utf8 -B <this freeze_packet.py> --approved-source-sha256 <actual reviewed writer SHA> --source-manifest <manifest path#SHA> --current-card <current RAD-01 card path#SHA> --actual-scope-amendment <actual amendment path#SHA> --actual-scope-amendment-execution <actual check receipt path#SHA> --output-dir <fresh RAD-01 packet directory>
+```
+
+The prospective amendment schema is `rad01-source-scope-amendment.v1`, cards `["RAD-01"]`, with `rad_policy_source_inventory` binding the Native helper manifest, literal fixture, policy and this writer manifest. Actual current after-documents and the real `check_plan.py --check --card RAD-01` recorder must exist and authenticate before freezing. The recorder validates already Root-authored documents; it does not author them. Current role is `real-RAD-01-check-only`. There is no actual scope amendment, freeze receipt, build, execution or numerical PASS in this source preparation.
+
+The Native six-file admission order is helper, metadata, admission, observer header, observer implementation, full derived Original TU. The whole pinned Original TU authority and all declared source ranges are retained. No scientific project module is imported. This stage does not configure/build/run Native or Rust, change cards or canonical source, retire files, update gates, or certify production geometry/RAD-02/RAD-03. Historical CTF-10 source references remain documentary and its retired linked originals must not be relaunched.

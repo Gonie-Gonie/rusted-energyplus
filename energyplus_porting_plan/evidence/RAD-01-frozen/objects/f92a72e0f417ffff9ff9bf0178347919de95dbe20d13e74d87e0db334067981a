@@ -1,0 +1,89 @@
+#include "rad01_observer.hh"
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <bit>
+
+namespace Rad01Observer {
+namespace {
+thread_local Capture *active = nullptr;
+void fail(Capture &capture, Failure kind) noexcept
+{
+    capture.observer_failure = true;
+    ++capture.failures[static_cast<unsigned>(kind)];
+}
+Capture *bound(EnergyPlus::EnergyPlusData &state, int n) noexcept
+{
+    if (active == nullptr) return nullptr;
+    if (active->state != &state || n != active->n) {
+        fail(*active, Failure::Binding);
+        return nullptr;
+    }
+    return active;
+}
+}
+Binding::Binding(Capture &capture) noexcept : previous_(active)
+{
+    if (previous_ != nullptr) { fail(capture, Failure::Binding); fail(*previous_, Failure::Binding); return; }
+    active = &capture; installed_ = true;
+}
+Binding::~Binding() noexcept { if (installed_) active = previous_; }
+void diagnostic(Capture &capture, int level, std::string const &message) noexcept
+{
+    ++capture.diagnostic_callbacks;
+    try { capture.diagnostics.push_back({capture.diagnostic_callbacks, level, message}); }
+    catch (...) { ++capture.omitted_diagnostics; fail(capture, Failure::AllocationOrCopy); }
+}
+void warning_emitted(EnergyPlus::EnergyPlusData &state, int n, int source_position, int surface_index, double seen_area) noexcept
+{
+    auto *capture = bound(state, n); if (capture == nullptr) return;
+    ++capture->warning_callbacks;
+    if (capture->zone_area_callbacks != 0 || capture->matrix_callbacks != 0 ||
+        (!capture->warnings.empty() && capture->warnings.back().source_surface_position >= source_position)) {
+        ++capture->omitted_warnings; fail(*capture, Failure::DuplicateOrOrder); return;
+    }
+    if (source_position < 1 || source_position > n || !state.dataSurface->Surface.allocated() ||
+        surface_index < 1 || static_cast<std::size_t>(surface_index) > state.dataSurface->Surface.size()) {
+        ++capture->omitted_warnings; fail(*capture, Failure::ShapeOrAssociation); return;
+    }
+    auto const &surface = state.dataSurface->Surface(surface_index);
+    if (!state.dataHeatBal->Zone.allocated() || surface.Zone < 1 || static_cast<std::size_t>(surface.Zone) > state.dataHeatBal->Zone.size()) {
+        ++capture->omitted_warnings; fail(*capture, Failure::ShapeOrAssociation); return;
+    }
+    try {
+        capture->warnings.push_back({capture->warning_callbacks, capture->diagnostic_callbacks, source_position, surface_index,
+            surface.Zone, surface.Name, state.dataHeatBal->Zone(surface.Zone).Name, std::bit_cast<std::uint64_t>(seen_area)});
+    } catch (...) { ++capture->omitted_warnings; fail(*capture, Failure::AllocationOrCopy); }
+}
+void zone_area_ready(EnergyPlus::EnergyPlusData &state, int n, ObjexxFCL::Array1D<double> const &zone_area,
+                     ObjexxFCL::Array1D<int> const &pointers) noexcept
+{
+    auto *capture = bound(state, n); if (capture == nullptr) return;
+    ++capture->zone_area_callbacks;
+    if (capture->zone_area_callbacks != 1 || capture->matrix_callbacks != 0) { fail(*capture, Failure::DuplicateOrOrder); return; }
+    if (n < 1 || zone_area.l() != 1 || zone_area.u() != n || pointers.l() != 1 || pointers.u() != n ||
+        zone_area.size() != static_cast<std::size_t>(n) || pointers.size() != static_cast<std::size_t>(n)) {
+        fail(*capture, Failure::ShapeOrAssociation); return;
+    }
+    try {
+        std::vector<std::uint64_t> values; std::vector<int> ids; values.reserve(n); ids.reserve(n);
+        for (int i = 1; i <= n; ++i) { values.push_back(std::bit_cast<std::uint64_t>(zone_area(i))); ids.push_back(pointers(i)); }
+        capture->zone_area_bits = std::move(values); capture->actual_surface_pointers = std::move(ids);
+    } catch (...) { capture->zone_area_bits.reset(); capture->actual_surface_pointers.reset(); fail(*capture, Failure::AllocationOrCopy); }
+}
+void matrix_ready(EnergyPlus::EnergyPlusData &state, int n, ObjexxFCL::Array2A<double> const &matrix) noexcept
+{
+    auto *capture = bound(state, n); if (capture == nullptr) return;
+    ++capture->matrix_callbacks;
+    if (capture->zone_area_callbacks != 1 || capture->matrix_callbacks != 1) { fail(*capture, Failure::DuplicateOrOrder); return; }
+    if (n < 1 || matrix.l1() != 1 || matrix.u1() != n || matrix.l2() != 1 || matrix.u2() != n ||
+        matrix.size() != static_cast<std::size_t>(n) * static_cast<std::size_t>(n)) {
+        fail(*capture, Failure::ShapeOrAssociation); return;
+    }
+    try {
+        std::vector<std::uint64_t> values; values.reserve(matrix.size());
+        for (int row = 1; row <= n; ++row) for (int column = 1; column <= n; ++column)
+            values.push_back(std::bit_cast<std::uint64_t>(matrix(row, column)));
+        capture->matrix_bits = std::move(values);
+    } catch (...) { capture->matrix_bits.reset(); fail(*capture, Failure::AllocationOrCopy); }
+}
+} // namespace Rad01Observer

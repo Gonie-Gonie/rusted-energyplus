@@ -1,0 +1,37 @@
+--- .runtime/porting/RAD-01/native-helper-prep-01/before/ctf01_reference_metadata.hh
++++ .runtime/porting/RAD-01/native-helper-prep-01/rad01_metadata.hh
+@@ -1,6 +1,6 @@
+-// Reused SCH-01 byte authentication and binary64 DTO pattern; no CTF arithmetic.
+-#ifndef CTF01_REFERENCE_METADATA_HH
+-#define CTF01_REFERENCE_METADATA_HH
++// Reused SCH-01 byte authentication and binary64 DTO pattern; no radiation arithmetic.
++#ifndef RAD01_METADATA_HH
++#define RAD01_METADATA_HH
+ #ifndef WIN32_LEAN_AND_MEAN
+ #define WIN32_LEAN_AND_MEAN
+ #endif
+@@ -24,7 +24,7 @@
+ #include <vector>
+ 
+ #if !defined(__MINGW32__) || !defined(_WIN64) || __GNUC__ != 13 || __GNUC_MINOR__ != 2
+-#error "CTF observer proposal requires the verified GCC13.2 Windows ABI"
++#error "RAD observer proposal requires the verified GCC13.2 Windows ABI"
+ #endif
+ #if defined(_GLIBCXX_DEBUG) || defined(__FAST_MATH__) || defined(NDEBUG)
+ #error "Reference requires original assertions, nondebug containers and no fast math"
+@@ -33,7 +33,7 @@
+ #error "Reference definitions must match the genuine original core"
+ #endif
+ 
+-namespace Ctf01 {
++namespace Rad01 {
+ using json = nlohmann::json;
+ namespace fs = std::filesystem;
+ inline void require(bool condition, std::string const &message)
+@@ -143,5 +143,5 @@
+     return {{"value", std::isfinite(value) ? json(value) : json(nullptr)}, {"value_bits", bit_text(bits)}, {"value_class", kind}};
+ }
+ inline json scalar(double value) { return scalar_bits(std::bit_cast<std::uint64_t>(value)); }
+-} // namespace Ctf01
++} // namespace Rad01
+ #endif

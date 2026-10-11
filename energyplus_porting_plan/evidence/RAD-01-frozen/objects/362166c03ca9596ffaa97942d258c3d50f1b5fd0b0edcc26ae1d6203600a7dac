@@ -1,0 +1,49 @@
+// Passive copies only; no view-factor evaluator or source-state writes.
+#ifndef RAD01_OBSERVER_HH
+#define RAD01_OBSERVER_HH
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2A.hh>
+#include <array>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <vector>
+
+namespace Rad01Observer {
+enum class Failure : unsigned { Binding, DuplicateOrOrder, ShapeOrAssociation, AllocationOrCopy, Count };
+struct Diagnostic { std::uint64_t ordinal; int level; std::string message; };
+struct Warning {
+    std::uint64_t ordinal, diagnostic_end;
+    int source_surface_position, actual_surface_index, actual_zone_index;
+    std::string surface_name, zone_name;
+    std::uint64_t seen_area_bits;
+};
+struct Capture {
+    EnergyPlus::EnergyPlusData *state = nullptr;
+    int n = 0;
+    std::uint64_t warning_callbacks = 0, zone_area_callbacks = 0, matrix_callbacks = 0, diagnostic_callbacks = 0;
+    std::array<std::uint64_t, static_cast<unsigned>(Failure::Count)> failures{};
+    std::uint64_t omitted_warnings = 0, omitted_diagnostics = 0;
+    bool observer_failure = false;
+    std::optional<std::vector<std::uint64_t>> zone_area_bits, matrix_bits;
+    std::optional<std::vector<int>> actual_surface_pointers;
+    std::vector<Warning> warnings;
+    std::vector<Diagnostic> diagnostics;
+};
+class Binding {
+    Capture *previous_ = nullptr;
+    bool installed_ = false;
+public:
+    explicit Binding(Capture &capture) noexcept;
+    ~Binding() noexcept;
+    Binding(Binding const &) = delete;
+    Binding &operator=(Binding const &) = delete;
+};
+void diagnostic(Capture &capture, int level, std::string const &message) noexcept;
+void warning_emitted(EnergyPlus::EnergyPlusData &state, int n, int source_position, int actual_surface_index, double seen_area) noexcept;
+void zone_area_ready(EnergyPlus::EnergyPlusData &state, int n, ObjexxFCL::Array1D<double> const &zone_area,
+                     ObjexxFCL::Array1D<int> const &pointers) noexcept;
+void matrix_ready(EnergyPlus::EnergyPlusData &state, int n, ObjexxFCL::Array2A<double> const &matrix) noexcept;
+} // namespace Rad01Observer
+#endif

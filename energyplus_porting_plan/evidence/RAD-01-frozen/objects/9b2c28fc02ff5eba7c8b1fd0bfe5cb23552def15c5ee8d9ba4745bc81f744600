@@ -1,0 +1,115 @@
+// One-way input-only admission. No expected arrays, warning decisions or exits.
+#ifndef RAD01_ADMISSION_HH
+#define RAD01_ADMISSION_HH
+#include "rad01_metadata.hh"
+#include <set>
+
+namespace Rad01 {
+struct Packet { json request, admission, contracts, counts; fs::path projection_path; };
+inline json observation_policy()
+{
+    json const zero = {{"atol", 0.0}, {"rtol", 0.0}, {"value_class_exact", true}, {"signed_zero_exact", true}, {"shape_exact", true}};
+    return {{"scope", "direct-declared-geometry-CalcApproximateViewFactors-only"},
+        {"arithmetic_profiles_by_variable", {{"ZoneArea", zero}, {"F", zero}}},
+        {"copied_input_bits_and_owner_ids_exact", true}, {"warning_identity_and_order_exact", true},
+        {"required_reached_owner_absence_fails", true}, {"unreached_owner_counted_as_PASS", false},
+        {"row_first_F_destination_source_layout", true}, {"full_engine_geometry_or_RAD02_RAD03_claimed", false}};
+}
+inline void name(json const &value)
+{
+    require(value.is_string(), "Actual declared name required"); auto const text = value.get<std::string>();
+    require(!text.empty() && text.size() <= 200 && std::all_of(text.begin(), text.end(), [](unsigned char c) {
+        return c >= 32 && c < 127; }), "Bounded printable ASCII name required");
+}
+inline std::uint32_t opaque_id(json const &value)
+{
+    require(value.is_number_unsigned() || (value.is_number_integer() && value.get<std::int64_t>() >= 0), "Nonnegative opaque ID required");
+    auto const id = value.get<std::uint64_t>(); require(id <= UINT32_MAX, "Opaque ID exceeds actual Rust u32 domain");
+    return static_cast<std::uint32_t>(id);
+}
+inline Packet admit(fs::path const &root, fs::path const &request_path, fs::path const &admission_path)
+{
+    Packet packet; packet.request = read_json(request_path); packet.admission = read_json(admission_path);
+    auto const &request = packet.request; auto const &admission = packet.admission;
+    require(request.at("schema") == "rad01-helper-cases.v1" && admission.at("schema") == "rad01-native-admission-contract.v1" &&
+        request.at("energyplus_commit") == "6f2e40d10250a105b49966baa24d843711e61048" &&
+        admission.at("energyplus_commit") == request.at("energyplus_commit"), "Pinned Original/schema required");
+    for (auto const *value : {&request, &admission}) require(value->at("frozen_before_this_RAD01_helper_execution") == true &&
+        value->at("expected_values_supplied") == false && value->at("expected_exits_supplied") == false &&
+        value->at("scientific_execution_performed") == false && value->at("full_engine_production_geometry_supplied") == false,
+        "Pre-execution declared-geometry-only packet required");
+    require(bound_path(root, admission.at("helper_request")) == fs::weakly_canonical(request_path), "One-way request binding differs");
+    for (auto const *key : {"actual_scope_amendment", "actual_scope_amendment_execution", "observation_policy"}) {
+        require(request.at(key) == admission.at(key), "Actual scope/policy differs");
+        if (std::string(key) != "observation_policy") bound_path(root, request.at(key));
+    }
+    require(request.at("observation_policy") == observation_policy(), "Literal pre-output zero/class/shape policy required");
+    require(request.at("contracts").is_object() && request.at("contracts").size() == 2 &&
+        admission.at("contracts").is_object() && admission.at("contracts").size() == 3, "Exact one-way contract DAG required");
+    packet.contracts = json::object();
+    for (auto const *key : {"source", "cases", "tolerances"}) {
+        auto const path = bound_path(root, admission.at("contracts").at(key)); auto const value = read_json(path);
+        require(value.at("schema") == std::string("rad01-") + key + "-contract.v1" &&
+            value.at("frozen_before_this_RAD01_helper_execution") == true, "Contract schema/frozen flag differs");
+        if (std::string(key) != "cases") require(request.at("contracts").at(key) == admission.at("contracts").at(key), "Contract identity differs");
+        if (std::string(key) == "source") {
+            require(value.at("energyplus_commit") == request.at("energyplus_commit"), "Original source commit differs");
+            bool original_present = false;
+            for (auto const &row : value.at("source_files")) {
+                bound_path(root, row);
+                if (row.at("path") == ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.cc") {
+                    require(row.at("sha256") == "36e3f002a5298dc4d52b9eb4697a4b07f9d9dc7c25e2434a059dcbd06eeeb3b3", "Pinned whole Original TU identity differs");
+                    original_present = true;
+                }
+            }
+            require(original_present, "Original whole TU source authority is required");
+        }
+        if (std::string(key) == "cases") require(value.at("helper_request") == admission.at("helper_request") &&
+            value.at("source") == admission.at("contracts").at("source") &&
+            value.at("tolerances") == admission.at("contracts").at("tolerances"), "Cases DAG differs");
+        if (std::string(key) == "tolerances") require(value.at("observation_policy") == request.at("observation_policy"), "Policy contract differs");
+        packet.contracts[key] = file_ref(path);
+    }
+    std::set<std::string> native_names;
+    require(admission.at("native_source_files").is_array() && admission.at("native_source_files").size() == 6, "Exact six Native source files required");
+    for (auto const &row : admission.at("native_source_files"))
+        require(native_names.insert(bound_path(root, row).filename().string()).second, "Duplicate Native source filename");
+    require(native_names == std::set<std::string>{"rad01_helper.cpp", "rad01_metadata.hh", "rad01_admission.hh", "rad01_observer.hh",
+        "rad01_observer.cc", "HeatBalanceIntRadExchange.rad01.cc"}, "Native source inventory differs");
+    packet.projection_path = bound_path(root, admission.at("projection")); auto const projection = read_json(packet.projection_path);
+    require(projection.at("schema") == "rad01-observation-projection.v1" && projection.at("frozen_before_this_RAD01_helper_execution") == true &&
+        projection.at("helper_request") == admission.at("helper_request") && projection.at("contracts") == admission.at("contracts") &&
+        projection.at("observation_policy") == request.at("observation_policy"), "Observation DAG differs");
+    auto const &cases = request.at("model_cases"); std::set<std::string> case_ids;
+    require(cases.is_array() && !cases.empty() && cases.size() <= 256, "Bounded nonempty direct-unit case list required");
+    for (auto const &row : cases) {
+        require(row.is_object() && row.size() == 5 && (row.at("lane") == "declared-geometry-unit" ||
+            row.at("lane") == "CON-membership-template-declared-geometry-unit"), "Exact direct-unit case keys/lane required");
+        identifier(row.at("id")); require(case_ids.insert(row.at("id").get<std::string>()).second, "Duplicate case ID");
+        auto const &context = row.at("context");
+        require(context.is_object() && context.size() == 4 && context.at("native_zone_index").is_number_integer() &&
+            context.at("native_zone_index") == 1, "One actual declared Native Zone owner required");
+        opaque_id(context.at("zone_id")); opaque_id(context.at("enclosure_index")); name(context.at("zone_name"));
+        auto const &surfaces = row.at("surface_registry"); auto const &order = row.at("surface_order");
+        require(surfaces.is_array() && !surfaces.empty() && surfaces.size() <= 1024 && order.is_array() && order.size() == surfaces.size(),
+            "One-to-1024 complete direct-unit registry/SPtr owners required; empty Rust-only case remains unpaired");
+        std::set<std::uint32_t> ids; std::set<std::string> names;
+        for (std::size_t i = 0; i < surfaces.size(); ++i) {
+            auto const &surface = surfaces.at(i);
+            require(surface.is_object() && surface.size() == 7 && surface.at("native_surface_index").is_number_integer() &&
+                surface.at("native_surface_index").get<std::size_t>() == i + 1, "Explicit actual one-based Surface registry order required");
+            require(ids.insert(opaque_id(surface.at("surface_id"))).second, "Duplicate opaque Surface ID"); name(surface.at("name"));
+            require(names.insert(surface.at("name").get<std::string>()).second, "Duplicate Surface name");
+            auto const &kind = surface.at("surface_type");
+            require(kind == "Wall" || kind == "Floor" || kind == "Roof" || kind == "Ceiling", "Selected CON opaque classes only");
+            input_real(surface.at("area_m2")); input_real(surface.at("azimuth_deg")); input_real(surface.at("tilt_deg"));
+        }
+        std::set<std::uint32_t> members;
+        for (auto const &id : order) require(ids.contains(opaque_id(id)) && members.insert(opaque_id(id)).second, "SPtr membership must be a complete ordered permutation");
+    }
+    packet.counts = {{"model_cases", cases.size()}, {"CalcApproximateViewFactors", cases.size()}};
+    require(request.at("requested_counts") == packet.counts && admission.at("requested_counts") == packet.counts, "Requested counts differ from input records");
+    return packet;
+}
+} // namespace Rad01
+#endif

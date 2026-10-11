@@ -1,0 +1,108 @@
+{
+  "schema": "rad01-native-admission-contract.v1",
+  "frozen_before_this_RAD01_helper_execution": true,
+  "frozen_before_numerical_execution": true,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "scientific_execution_performed": false,
+  "full_engine_production_geometry_supplied": false,
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "actual_scope_amendment": {
+    "path": ".runtime/porting/RAD-01/scope-amendment-01/amendment.json",
+    "sha256": "51885f2bab3ca0fbf383f0bd4b6d4f6d3cdcc9ea28837dd9c58be19660eba264",
+    "size_bytes": 2854
+  },
+  "actual_scope_amendment_execution": {
+    "path": ".runtime/porting/RAD-01/scope-check-command-01/receipt.json",
+    "sha256": "a5c6d3aa9d55aced5be813578da624130fc2c63b3d511a422f0ac481cb5fb560",
+    "size_bytes": 2874
+  },
+  "observation_policy": {
+    "scope": "direct-declared-geometry-CalcApproximateViewFactors-only",
+    "arithmetic_profiles_by_variable": {
+      "ZoneArea": {
+        "atol": 0.0,
+        "rtol": 0.0,
+        "value_class_exact": true,
+        "signed_zero_exact": true,
+        "shape_exact": true
+      },
+      "F": {
+        "atol": 0.0,
+        "rtol": 0.0,
+        "value_class_exact": true,
+        "signed_zero_exact": true,
+        "shape_exact": true
+      }
+    },
+    "copied_input_bits_and_owner_ids_exact": true,
+    "warning_identity_and_order_exact": true,
+    "required_reached_owner_absence_fails": true,
+    "unreached_owner_counted_as_PASS": false,
+    "row_first_F_destination_source_layout": true,
+    "full_engine_geometry_or_RAD02_RAD03_claimed": false
+  },
+  "helper_request": {
+    "path": ".runtime/porting/RAD-01/frozen-packet-01/helper-request.json",
+    "sha256": "587a4249889775e0e42e7a217df40b6f69901c5f2be7178e1f01765a7875fcae",
+    "size_bytes": 36373
+  },
+  "projection": {
+    "path": ".runtime/porting/RAD-01/frozen-packet-01/projection.json",
+    "sha256": "e97c0ee3915f389487205ca3cdccf1f5be301f533fa6f15fa015ea238c7fafe9",
+    "size_bytes": 5163
+  },
+  "contracts": {
+    "source": {
+      "path": ".runtime/porting/RAD-01/frozen-packet-01/source.json",
+      "sha256": "ae71b95bb859ed495389fdbae287ef3cea46282eaf9a278749e9a235c4f59a60",
+      "size_bytes": 12909
+    },
+    "cases": {
+      "path": ".runtime/porting/RAD-01/frozen-packet-01/cases.json",
+      "sha256": "da0fa01d90072f677b455b25c96cbe6e891f7cb8b51e17d0030f66fe6a4449e0",
+      "size_bytes": 1297
+    },
+    "tolerances": {
+      "path": ".runtime/porting/RAD-01/frozen-packet-01/tolerances.json",
+      "sha256": "3e477ed896353f1eaaefd8d4cd287bf9b0af11053fe7291386631503c1bd085c",
+      "size_bytes": 1323
+    }
+  },
+  "native_source_files": [
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_helper.cpp",
+      "sha256": "1f16572cbd9da579a6f8e4c79cec64a687e7cecd70d823f1a16a1973cfdfad86",
+      "size_bytes": 11938
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_metadata.hh",
+      "sha256": "00894557c7d1a186f4220c93f03cb54b1f16ddfb29c3cf55a7eceb1403aa2ac1",
+      "size_bytes": 7420
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_admission.hh",
+      "sha256": "9b2c28fc02ff5eba7c8b1fd0bfe5cb23552def15c5ee8d9ba4745bc81f744600",
+      "size_bytes": 9313
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_observer.hh",
+      "sha256": "362166c03ca9596ffaa97942d258c3d50f1b5fd0b0edcc26ae1d6203600a7dac",
+      "size_bytes": 2142
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_observer.cc",
+      "sha256": "f92a72e0f417ffff9ff9bf0178347919de95dbe20d13e74d87e0db334067981a",
+      "size_bytes": 4899
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/HeatBalanceIntRadExchange.rad01.cc",
+      "sha256": "e3ef247c59f1fbac29e1d619e3d2d6b9826aa5ff52947e77e21c51efefb16551",
+      "size_bytes": 120257
+    }
+  ],
+  "requested_counts": {
+    "model_cases": 21,
+    "CalcApproximateViewFactors": 21
+  }
+}

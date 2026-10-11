@@ -1,0 +1,39 @@
+{
+  "schema": "rad01-tolerances-contract.v1",
+  "frozen_before_this_RAD01_helper_execution": true,
+  "frozen_before_numerical_execution": true,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "scientific_execution_performed": false,
+  "full_engine_production_geometry_supplied": false,
+  "observation_policy": {
+    "scope": "direct-declared-geometry-CalcApproximateViewFactors-only",
+    "arithmetic_profiles_by_variable": {
+      "ZoneArea": {
+        "atol": 0.0,
+        "rtol": 0.0,
+        "value_class_exact": true,
+        "signed_zero_exact": true,
+        "shape_exact": true
+      },
+      "F": {
+        "atol": 0.0,
+        "rtol": 0.0,
+        "value_class_exact": true,
+        "signed_zero_exact": true,
+        "shape_exact": true
+      }
+    },
+    "copied_input_bits_and_owner_ids_exact": true,
+    "warning_identity_and_order_exact": true,
+    "required_reached_owner_absence_fails": true,
+    "unreached_owner_counted_as_PASS": false,
+    "row_first_F_destination_source_layout": true,
+    "full_engine_geometry_or_RAD02_RAD03_claimed": false
+  },
+  "source_proposal": {
+    "path": ".runtime/porting/RAD-01/native-helper-prep-01/observation-policy-proposal.json",
+    "sha256": "7dfb0ccc1b50f34c8a7e30a0e34369e022faa79c507f41c60b47d2b5bad4d5a4",
+    "size_bytes": 710
+  }
+}
