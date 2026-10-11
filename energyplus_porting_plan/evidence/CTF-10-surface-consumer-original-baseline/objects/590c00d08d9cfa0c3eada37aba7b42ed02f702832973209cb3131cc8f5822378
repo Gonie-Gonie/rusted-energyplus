@@ -1,0 +1,26 @@
+{
+  "schema": "ctf10-surface-consumer-lossless-observation-archive.v1",
+  "actual_OriginalDataQA": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-01/review.json",
+    "sha256": "709f03189cc80da46ec34f2000b1f2eb122545426a98ae8dc513e950c5a2d008",
+    "size_bytes": 33304
+  },
+  "original": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H.observation.json",
+    "sha256": "3b073668c61881e5cb4a123758bfb39bd9a0273ccd03d9fe56d9fc721e0c3e7f",
+    "size_bytes": 962546811
+  },
+  "stored": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-surface-consumer-original-baseline/observations/3b073668c61881e5cb4a123758bfb39bd9a0273ccd03d9fe56d9fc721e0c3e7f.json.gz",
+    "sha256": "7d41339b0b5a23ff5b60175cad7b45ddd5e2594e3c506390d0203881aad08313",
+    "size_bytes": 33088088
+  },
+  "compression": "gzip",
+  "full_decompressed_sha256": "3b073668c61881e5cb4a123758bfb39bd9a0273ccd03d9fe56d9fc721e0c3e7f",
+  "full_decompressed_size_bytes": 962546811,
+  "all_original_bytes_retained": true,
+  "original_file_retained": true,
+  "numerical_values_modified_or_recomputed": false,
+  "numerical_PASS_claimed": false,
+  "full_card_gates_updated": false
+}

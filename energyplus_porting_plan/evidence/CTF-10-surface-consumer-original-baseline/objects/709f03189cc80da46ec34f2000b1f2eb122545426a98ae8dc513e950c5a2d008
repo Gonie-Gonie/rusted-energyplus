@@ -1,0 +1,891 @@
+{
+  "schema": "ctf10-surface-consumer-independent-original-data-review.v1",
+  "status": "pass-actual-full-event-custody-before-Rust",
+  "started_utc": "2026-10-11T02:15:08.572759+00:00",
+  "finished_utc": "2026-10-11T02:15:49.468508+00:00",
+  "reviewed_results": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H.observation.json",
+    "sha256": "3b073668c61881e5cb4a123758bfb39bd9a0273ccd03d9fe56d9fc721e0c3e7f",
+    "size_bytes": 962546811
+  },
+  "reviewed_supplied_results_argument": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H.observation.json#3b073668c61881e5cb4a123758bfb39bd9a0273ccd03d9fe56d9fc721e0c3e7f",
+  "reviewed_native_execution": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-command-01/receipt.json",
+    "sha256": "3d53b5915381b66577710b8ae3c65fafb6f98feca22191676d8d9d4c8a6dce5d",
+    "size_bytes": 3488
+  },
+  "actual_native_process_exit_code": 0,
+  "actual_native_launch_error": null,
+  "complete_actual_event_ledger_validated": true,
+  "actual_observation_counts": {
+    "actual_retained_events": 404878,
+    "actual_attempted_events": 404878,
+    "actual_omitted_events": 0,
+    "actual_procedure_calls": {
+      "ManageSurfaceHeatBalance": 2025,
+      "InitSurfaceHeatBalance": 2025,
+      "InitThermalAndFluxHistories": 4,
+      "UpdateThermalHistories": 2025,
+      "CalcHeatBalanceInsideSurf2CTFOnly": 2025,
+      "ReportSurfaceHeatBalance": 2025
+    },
+    "actual_checkpoint_counts": {
+      "scope_entry": 10129,
+      "actual_surface_bulb_setter_return": 2025,
+      "actual_surface_wind_setters_return": 2025,
+      "effective_surface_environment": 2025,
+      "actual_surface_allocation_return": 1,
+      "history_initialization_entry_owners": 4,
+      "history_initialization_before_flux": 144,
+      "history_initialization_after_flux": 144,
+      "history_initialization_final_owners": 4,
+      "scope_normal_exit": 10129,
+      "actual_InitThermalAndFluxHistories_return": 4,
+      "constant_before_reset": 12150,
+      "constant_after_reset": 12150,
+      "constant_skipped_num_terms_le_one": 10125,
+      "constant_after_each_ordered_term": 10125,
+      "actual_InitSurfaceHeatBalance_return": 2025,
+      "actual_outside_surface_return": 2025,
+      "inside_ctf_actual_caller_bounds": 2025,
+      "inside_ctf_cache_assigned": 12150,
+      "inside_ctf_precalculation_assigned": 12150,
+      "inside_ctf_before_temperature_assignment": 74682,
+      "inside_ctf_after_temperature_assignment": 74682,
+      "inside_ctf_current_temperature_history_assigned": 74682,
+      "inside_ctf_convergence_checks_reached": 12447,
+      "inside_ctf_loop_exited": 2025,
+      "actual_inside_surface_return": 2025,
+      "actual_air_heat_balance_return": 2025,
+      "actual_final_surface_update_return": 2025,
+      "history_update_entry_owners": 2025,
+      "actual_history_scratch_allocation_return": 1,
+      "history_actual_inside_flux_assigned": 12150,
+      "history_actual_outside_flux_and_report_assigned": 12150,
+      "simple_history_hard_copy_complete": 2025,
+      "actual_UpdateThermalHistories_return": 2025,
+      "opaque_conduction_report_loop_reached": 2025,
+      "conduction_reports_before_face_assignments": 12150,
+      "conduction_reports_after_storage_assignments": 12150,
+      "actual_ReportSurfaceHeatBalance_return": 2025
+    },
+    "actual_copy_kind_counts": {
+      "None": 141816,
+      "Catalog": 1,
+      "Environment": 2025,
+      "Histories": 4058,
+      "HistoryTerm": 288,
+      "Constants": 34425,
+      "Cache": 12150,
+      "Inside": 86832,
+      "InsideResult": 74682,
+      "Flux": 24300,
+      "Scratch": 1,
+      "HistorySurface": 0,
+      "Reports": 24300
+    },
+    "actual_history_entry_contexts": 2029,
+    "actual_unallocated_owner_copies": 99431,
+    "actual_history_entry_allocation_witness_counts": {
+      "history_initialization_entry_owners": [
+        {
+          "allocation": {
+            "normal_histories_complete": true,
+            "master_allocation": "none",
+            "scratch_allocation": "none",
+            "counter_allocated": false,
+            "flux_report_owners_allocated": true,
+            "surface_operand_owners_allocated": true,
+            "actual_update_first_time": true
+          },
+          "actual_entry_count": 1
+        },
+        {
+          "allocation": {
+            "normal_histories_complete": true,
+            "master_allocation": "none",
+            "scratch_allocation": "all",
+            "counter_allocated": false,
+            "flux_report_owners_allocated": true,
+            "surface_operand_owners_allocated": true,
+            "actual_update_first_time": false
+          },
+          "actual_entry_count": 3
+        }
+      ],
+      "history_update_entry_owners": [
+        {
+          "allocation": {
+            "normal_histories_complete": true,
+            "master_allocation": "none",
+            "scratch_allocation": "none",
+            "counter_allocated": false,
+            "flux_report_owners_allocated": true,
+            "surface_operand_owners_allocated": true,
+            "actual_update_first_time": true
+          },
+          "actual_entry_count": 1
+        },
+        {
+          "allocation": {
+            "normal_histories_complete": true,
+            "master_allocation": "none",
+            "scratch_allocation": "all",
+            "counter_allocated": false,
+            "flux_report_owners_allocated": true,
+            "surface_operand_owners_allocated": true,
+            "actual_update_first_time": false
+          },
+          "actual_entry_count": 2024
+        }
+      ]
+    },
+    "actual_null_scalar_copies": 6,
+    "copy_or_stream_integrity_failed": false,
+    "required_lifecycle_owners_reached": true
+  },
+  "actual_event_counts_unknown": false,
+  "actual_terminal_availability": {
+    "actual_engine_entry_returned": true,
+    "actual_engine_exit_code": 0,
+    "all_source_calls_or_complete_history_lifecycle_certified": false,
+    "attempted_events": 404878,
+    "copy_failures_by_Copy_enum": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "counter_overflow": false,
+    "first_failed_event": 0,
+    "integration_PASS_claimed": false,
+    "last_failed_event": 0,
+    "numeric_profiles_chosen": false,
+    "outer_caught_exception_class": null,
+    "procedure_calls": [
+      2025,
+      2025,
+      4,
+      2025,
+      2025,
+      2025
+    ],
+    "retained_events": 404878,
+    "stream_failed": false,
+    "stream_failed_events": 0
+  },
+  "observation_integrity_failures": [],
+  "observation_max_bytes": 4294967296,
+  "actual_ordinary_output_files": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.audit",
+      "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+      "size_bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.bnd",
+      "sha256": "3b785b952938ac42ddc998f5ba34006f202cbcab4cbfb7d595816e2bead3b414",
+      "size_bytes": 6365
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.dxf",
+      "sha256": "a4794b3d55ad482af760aa8e86d6a4ef2f572a8ee0658ed9eca2487622b3a58b",
+      "size_bytes": 6096
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.eio",
+      "sha256": "d64f45b8e0348064f5db8ec487e68a28f15949cc8dc64034592f2c9c5addeab5",
+      "size_bytes": 15376
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.end",
+      "sha256": "2e189976516da8c22dce1cd8e096a720b986478ff3724e4cef7377b49fa3e206",
+      "size_bytes": 98
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.err",
+      "sha256": "28e8b032541d742932598912366f71039df413219946d2de32fc98c1343f8f8a",
+      "size_bytes": 897
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.eso",
+      "sha256": "86301f72bb534736bbadb901323a842e3d4b7cfb8002fe49a027264f3994e889",
+      "size_bytes": 112213
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.mdd",
+      "sha256": "75e6284dee8e4772b3cb7d3aba79bdf46b641ac011038698c03382cea13fe4e7",
+      "size_bytes": 3851
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.mtd",
+      "sha256": "c2b05a418e2bead4118bd119f61478e0913be42e9af907b6f883afedace1ffe2",
+      "size_bytes": 7539
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.mtr",
+      "sha256": "18b032122db2039b9c509b42a4df83fb87bb080478cae061d7bad93f9d7e9bb4",
+      "size_bytes": 2490
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.rdd",
+      "sha256": "967d841572d9c80e4231fbea374b0428a829623303677b848cf8c5e8811b0bef",
+      "size_bytes": 30562
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.shd",
+      "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+      "size_bytes": 1557
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplustbl.csv",
+      "sha256": "2ae0996ac9eda803a74f40d0df75af2fa4505bdba67d28e680dd9c0090b236ce",
+      "size_bytes": 84703
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplustbl.htm",
+      "sha256": "6bcb5076f628cdbff9f610825ec03fb722cb173675245c595d267d7c556047be",
+      "size_bytes": 354322
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplustbl.tab",
+      "sha256": "e59a26633d3c680658cf4f406e5bd432a3a5d18db752146f4a4cdd0de8d06273",
+      "size_bytes": 84700
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplustbl.txt",
+      "sha256": "9d1d3368c1edeb66eb8a1cb8f1cedf0e84cc540debf0c30c3dd446cb13a115e1",
+      "size_bytes": 163344
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplustbl.xml",
+      "sha256": "f63248461b645b5168ba7226d62854bf46fe2a959b7a41faa4ae31a6fec6db70",
+      "size_bytes": 226145
+    }
+  ],
+  "ordinary_output_file_contents_parsed": false,
+  "actual_packet_freeze": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-frozen-inputs-02/freeze-receipt.json",
+    "sha256": "23499b76a3eac950fd893e0c5f2ac33af2d11b88a71be9f2a37085ac5d9fc645",
+    "size_bytes": 20255
+  },
+  "actual_packet_freeze_execution": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-freeze-command-02/receipt.json",
+    "sha256": "0346ca301c8225b74bb8cc1db45ce1ca976fa0055f969dc29fb6c6725e2e495a",
+    "size_bytes": 3022
+  },
+  "reviewed_actual_scope_amendment": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-scope-amendment-02/amendment.json",
+    "sha256": "56c82fde93bb4bd0fc90e318e654aabf586a93175a3cc08228c36cad698aff3a",
+    "size_bytes": 19535
+  },
+  "reviewed_actual_scope_check_execution": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-scope-check-command-02/receipt.json",
+    "sha256": "798f65aa4cc16cef14b743e5825d1da1b5f8dde293de5b2f0c78765f8c5e11f8",
+    "size_bytes": 3040
+  },
+  "reviewed_selected_input": {
+    "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+    "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+    "size_bytes": 9275
+  },
+  "reviewed_selected_weather": {
+    "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+    "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+    "size_bytes": 1623506
+  },
+  "reviewed_selected_idd": {
+    "path": ".runtime/energyplus/26.1.0/Energy+.idd",
+    "sha256": "7d30c281aa21d63555c753a953124da03d88b6b149dc19e3649f2cbe6c944c68",
+    "size_bytes": 4613646
+  },
+  "reviewed_all45_fixed_input_guards": [
+    {
+      "case_id": "A-24H",
+      "kind": "input",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+        "size_bytes": 9275
+      }
+    },
+    {
+      "case_id": "A-24H",
+      "kind": "weather",
+      "actual": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "size_bytes": 1623506
+      }
+    },
+    {
+      "case_id": "A-24H",
+      "kind": "metadata",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+        "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb",
+        "size_bytes": 18360
+      }
+    },
+    {
+      "case_id": "A-72H",
+      "kind": "input",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+        "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc",
+        "size_bytes": 9275
+      }
+    },
+    {
+      "case_id": "A-72H",
+      "kind": "weather",
+      "actual": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "size_bytes": 1623506
+      }
+    },
+    {
+      "case_id": "A-72H",
+      "kind": "metadata",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+        "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650",
+        "size_bytes": 18906
+      }
+    },
+    {
+      "case_id": "A-ANNUAL",
+      "kind": "input",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+        "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0",
+        "size_bytes": 9280
+      }
+    },
+    {
+      "case_id": "A-ANNUAL",
+      "kind": "weather",
+      "actual": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "size_bytes": 1623506
+      }
+    },
+    {
+      "case_id": "A-ANNUAL",
+      "kind": "metadata",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
+        "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb",
+        "size_bytes": 18020
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-24H",
+      "kind": "input",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+        "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12",
+        "size_bytes": 13025
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-24H",
+      "kind": "weather",
+      "actual": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "size_bytes": 1623506
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-24H",
+      "kind": "metadata",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+        "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68",
+        "size_bytes": 23645
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-72H",
+      "kind": "input",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+        "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda",
+        "size_bytes": 13025
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-72H",
+      "kind": "weather",
+      "actual": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "size_bytes": 1623506
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-72H",
+      "kind": "metadata",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+        "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e",
+        "size_bytes": 24541
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-ANNUAL",
+      "kind": "input",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+        "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb",
+        "size_bytes": 13030
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-ANNUAL",
+      "kind": "weather",
+      "actual": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "size_bytes": 1623506
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-ANNUAL",
+      "kind": "metadata",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+        "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8",
+        "size_bytes": 24009
+      }
+    },
+    {
+      "case_id": "B-FLOW-24H",
+      "kind": "input",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+        "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced",
+        "size_bytes": 13042
+      }
+    },
+    {
+      "case_id": "B-FLOW-24H",
+      "kind": "weather",
+      "actual": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "size_bytes": 1623506
+      }
+    },
+    {
+      "case_id": "B-FLOW-24H",
+      "kind": "metadata",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+        "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828",
+        "size_bytes": 23218
+      }
+    },
+    {
+      "case_id": "B-FLOW-72H",
+      "kind": "input",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+        "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c",
+        "size_bytes": 13042
+      }
+    },
+    {
+      "case_id": "B-FLOW-72H",
+      "kind": "weather",
+      "actual": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "size_bytes": 1623506
+      }
+    },
+    {
+      "case_id": "B-FLOW-72H",
+      "kind": "metadata",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+        "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29",
+        "size_bytes": 24114
+      }
+    },
+    {
+      "case_id": "B-FLOW-ANNUAL",
+      "kind": "input",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+        "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5",
+        "size_bytes": 13047
+      }
+    },
+    {
+      "case_id": "B-FLOW-ANNUAL",
+      "kind": "weather",
+      "actual": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "size_bytes": 1623506
+      }
+    },
+    {
+      "case_id": "B-FLOW-ANNUAL",
+      "kind": "metadata",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+        "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6",
+        "size_bytes": 23582
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-24H",
+      "kind": "input",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+        "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf",
+        "size_bytes": 13044
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-24H",
+      "kind": "weather",
+      "actual": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "size_bytes": 1623506
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-24H",
+      "kind": "metadata",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+        "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4",
+        "size_bytes": 23246
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-72H",
+      "kind": "input",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+        "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001",
+        "size_bytes": 13044
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-72H",
+      "kind": "weather",
+      "actual": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "size_bytes": 1623506
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-72H",
+      "kind": "metadata",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+        "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd",
+        "size_bytes": 24142
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-ANNUAL",
+      "kind": "input",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+        "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95",
+        "size_bytes": 13049
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-ANNUAL",
+      "kind": "weather",
+      "actual": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "size_bytes": 1623506
+      }
+    },
+    {
+      "case_id": "B-CAPACITY-ANNUAL",
+      "kind": "metadata",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+        "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3",
+        "size_bytes": 23610
+      }
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "kind": "input",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+        "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea",
+        "size_bytes": 13070
+      }
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "kind": "weather",
+      "actual": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "size_bytes": 1623506
+      }
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "kind": "metadata",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+        "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656",
+        "size_bytes": 22328
+      }
+    },
+    {
+      "case_id": "B-BOTH-72H",
+      "kind": "input",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+        "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506",
+        "size_bytes": 13070
+      }
+    },
+    {
+      "case_id": "B-BOTH-72H",
+      "kind": "weather",
+      "actual": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "size_bytes": 1623506
+      }
+    },
+    {
+      "case_id": "B-BOTH-72H",
+      "kind": "metadata",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+        "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993",
+        "size_bytes": 23224
+      }
+    },
+    {
+      "case_id": "B-BOTH-ANNUAL",
+      "kind": "input",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+        "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d",
+        "size_bytes": 13075
+      }
+    },
+    {
+      "case_id": "B-BOTH-ANNUAL",
+      "kind": "weather",
+      "actual": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+        "size_bytes": 1623506
+      }
+    },
+    {
+      "case_id": "B-BOTH-ANNUAL",
+      "kind": "metadata",
+      "actual": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+        "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4",
+        "size_bytes": 22692
+      }
+    }
+  ],
+  "reviewed_forwarded_native_arguments": [
+    "-i",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\Energy+.idd",
+    "-w",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw",
+    "-d",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-10\\surface-consumer-native-output-01\\A-24H",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\A-24H\\input.idf"
+  ],
+  "reviewed_build": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-build-02/native-build.json",
+    "sha256": "9c81ac5f733edd260ff62871d87cb7e1e56059bb4b200e22ee2d094998c7b41c",
+    "size_bytes": 7781
+  },
+  "reviewed_build_execution": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-build-02/native-compile-command-01/receipt.json",
+    "sha256": "3744063a1a19643999724bf6cdd62dbfe68c2070dfe8562822101f8ccc34917d",
+    "size_bytes": 2990
+  },
+  "reviewed_build_review": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-build-review-01/review.json",
+    "sha256": "bf2025ff3268a75f67e284fae0f0a803086d13e281a54f7ab68a6e5681491d60",
+    "size_bytes": 2599
+  },
+  "reviewed_build_review_execution": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-build-review-command-01/receipt.json",
+    "sha256": "05867f0a692e33abe321ede463a934afca64ce3174c315e0ed704d10ece9cc01",
+    "size_bytes": 3010
+  },
+  "reviewed_source_snapshot": {
+    "path": ".runtime/porting/source-objects/68/688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27",
+    "sha256": "688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27"
+  },
+  "reviewed_reader_source_preparation": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-prep-02/manifest.json",
+    "sha256": "feb7ad1f92db2b939b68f4612de7f3e7033aa503a8e4fa2a5348adcb6809cddf",
+    "size_bytes": 41182
+  },
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-prep-02/review_data.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-01/000-review_data.py",
+        "sha256": "e5a1d3b3bf60a22326ab679e7dff875204fe1a969cdacc27e426f1a6ede75b55",
+        "size_bytes": 23718
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-prep-02/event_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-01/001-event_shape.py",
+        "sha256": "0c0ab15c3d065263154f5b784d8354b49f250f5d9deae3d2b66a26160b717128",
+        "size_bytes": 22640
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-prep-02/stream_events.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-01/002-stream_events.py",
+        "sha256": "8e7f05196fe567c052352d4d0fe501eb02a0f8e5a623c20f7dcd3db669f6bab8",
+        "size_bytes": 2385
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-prep-02/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-01/003-packet_io.py",
+        "sha256": "7c91d59d774d4e3cc9141cc9f40d0ae9abdb736385f17bb2b9afcf295222a27d",
+        "size_bytes": 4673
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-01/000-review_data.py",
+    "sha256": "e5a1d3b3bf60a22326ab679e7dff875204fe1a969cdacc27e426f1a6ede75b55",
+    "size_bytes": 23718
+  },
+  "reviewed_native_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/surface_consumer_main.cpp",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-01/004-surface_consumer_main.cpp",
+        "sha256": "181dfc603f18775527763afb89a718b3e91092a74b8692de7ad463653d2e2303",
+        "size_bytes": 2216
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/HeatBalanceSurfaceManager.surface_consumer.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-01/005-HeatBalanceSurfaceManager.surface_consumer.cc",
+        "sha256": "e37acaa62973ff87aa15dd113ebf77bbc459091a6ff8fc72c9baada1d93c17ce",
+        "size_bytes": 713540
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/surface_consumer_observer.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-01/006-surface_consumer_observer.cc",
+        "sha256": "5d4f23c000efe0e1342553f08a8861e7c310cc4278ebc928cb15ae0bd6be69bc",
+        "size_bytes": 20532
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/api/EnergyPlusPgm.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-01/007-EnergyPlusPgm.cc",
+        "sha256": "2789f0ddea774deb1c3de15f0266e20ee1855c7f8051394e66e58a7ac592210e",
+        "size_bytes": 24694
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/CommandLineInterface.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-01/008-CommandLineInterface.cc",
+        "sha256": "b89b527f59f46f9b8d98a9022345dc83972998864089c335a5ed82e7b987b107",
+        "size_bytes": 46621
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/surface_consumer_observer.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-01/009-surface_consumer_observer.hh",
+        "sha256": "1d9befcc41cba45b74d36d27f75836249d9ce20f44173c84a195b446d8f2e7dd",
+        "size_bytes": 2403
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/surface-consumer-native-prep-04/surface_consumer_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-01/010-surface_consumer_reference.cmake",
+        "sha256": "f4f25bd910c81a494b2b5b023f95abd91097376c9d0664826cad02851e685c67",
+        "size_bytes": 4527
+      }
+    }
+  ],
+  "reviewed_current_document_archives": [
+    {
+      "historical_path": "energyplus_porting_plan/plan.json",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-01/011-plan.json",
+        "sha256": "0a1c39045c9f55cacc5ce64b2462cb293aae9ae961a3a49c31c8005cc66d39cb",
+        "size_bytes": 732414
+      }
+    },
+    {
+      "historical_path": "energyplus_porting_plan/cards/CTF-10.md",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-01/012-CTF-10.md",
+        "sha256": "4428855c985355dcfef1a3e36eb81af4774c36899c084a8a027d71d5b0249f4b",
+        "size_bytes": 10585
+      }
+    },
+    {
+      "historical_path": "energyplus_porting_plan/energyplus_porting_checklist.html",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-01/013-energyplus_porting_checklist.html",
+        "sha256": "a3de5c87e2e066b9827b0ab3c6dd62c4c44d246d3c960dfe44eaadff923a5373",
+        "size_bytes": 589356
+      }
+    }
+  ],
+  "Original_capture_custody_released": true,
+  "history_direct_unit_execution_authorized": false,
+  "native_binary_payloads_rehashed_or_parsed": false,
+  "scientific_values_recomputed_or_compared": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "unreached_or_unallocated_owners_counted_as_PASS": false,
+  "complete_heat_balance_lifecycle_certified": false,
+  "integration_PASS_claimed": false,
+  "full_card_gates_updated": false,
+  "authorship_limits": "Raw authored consumer passive transport and this custody reader; no independent numerical or formula certificate."
+}

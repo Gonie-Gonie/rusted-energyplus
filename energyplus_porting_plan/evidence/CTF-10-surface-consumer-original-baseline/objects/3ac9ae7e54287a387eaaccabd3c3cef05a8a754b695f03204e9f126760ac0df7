@@ -1,0 +1,24 @@
+# Surface-consumer independent build/PE Source proposal
+
+SOURCE-ONLY, held unexecuted. This adapts the accepted RAD01 strict PE reader,
+keeping tools/porting/native_pe.py and both genuine Original/derivative inspections.
+No engine, capture, build, result, binary or weather was read during preparation.
+
+The existing command is `python -X utf8 -B review_build.py --build <actual-path#SHA>
+--output-dir <fresh-contained-dir>`. The actual build must be the reviewed
+surface_consumer_helper five-TU build, with actual before rows plus5, Native7,
+core643/631/12 and dynamic protected count. Eight literal address-bound function
+providers must belong to their actual selected HBSM/Pgm/CLI target objects;
+five target LOADs precede the core and no original HBSM object is selected.
+
+The unchanged strict PE primitive inspects both real binaries, verifies their
+accepted derivation maps, and compares retained runtime sections/directories.
+It archives actual maps and emits the existing compact {review,status} stdout.
+Report schema is ctf10-surface-consumer-independent-build-PE-review.v1;
+status pass-exact-retained-PE-runtime-and-actual-build-identity, ordinary-full-run.
+Actual build/native receipts/identities are supplied later, never guessed here.
+No numerical, whole-engine, lifecycle, production or gate certificate is made.
+
+Root and independent FULL peer must review this source before any invocation.
+Raw authored this narrow transport adaptation and the consumer producer; this
+is no independent formula or numerical certificate. All predecessor files remain.

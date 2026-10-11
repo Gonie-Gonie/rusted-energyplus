@@ -1,0 +1,31 @@
+"""Root runs the FULL reviewed existing five-TU build stages, without an engine."""
+import hashlib,json,subprocess
+from pathlib import Path
+ROOT=Path.cwd(); BASE=ROOT/'.runtime/porting/CTF-10'; PREP=BASE/'surface-consumer-native-build-prep-02'; OPS=BASE/'surface-consumer-native-build-prep-01'; OUT=BASE/'surface-consumer-native-build-02'
+def read(p): return json.loads(p.read_bytes())
+def arg(p): return p.relative_to(ROOT).as_posix()+'#'+hashlib.sha256(p.read_bytes()).hexdigest()
+assert not subprocess.check_output(['git','status','--porcelain'])
+assert subprocess.check_output(['git','rev-parse','HEAD'])==subprocess.check_output(['git','rev-parse','@{u}'])
+manifest=PREP/'manifest.json'; assert arg(manifest).endswith('#a585f8bb507a5d046cc726f0da0dc80775abe4a9cee38d151921c9051619b230')
+native=BASE/'surface-consumer-native-prep-04/manifest.json'; assert arg(native).endswith('#ab3ce0f37c5649672e4fba4b348322f53e0736ad84aa52c49475696660022391')
+for row in read(manifest)['own_sources']: assert arg(ROOT/row['path']).endswith('#'+row['sha256'])
+restore_path=BASE/'surface-consumer-restore-configure-command-02/receipt.json'; restore=read(restore_path)
+assert restore['exit_code']==0 and restore['source_bytes_match_before_and_after']
+preservation=read(BASE/'surface-consumer-restore-preservation-02/preservation.json'); assert preservation['all50_and631_fresh_hashes_unchanged'] and preservation['literal_prior717_rows_equal']
+assert len(read(ROOT/'.runtime/ep261-gcc13-o0/compile_commands.json'))==717
+old_path=BASE/'native-build-01/unit/native-build.json'; old=read(old_path)
+options={'build-source-manifest':manifest,'native-source-manifest':native,
+ 'freeze-receipt':BASE/'surface-consumer-frozen-inputs-02/freeze-receipt.json','freeze-execution':BASE/'surface-consumer-freeze-command-02/receipt.json',
+ 'scope-amendment':BASE/'surface-consumer-scope-amendment-02/amendment.json','scope-execution':BASE/'surface-consumer-scope-check-command-02/receipt.json',
+ 'fixed-input-guards-source':BASE/'production-cli-inputs-01/manifest.json','prior-final-preservation':BASE/'retirement-01/after-retirement.json',
+ 'prior-retirement':BASE/'retirement-01/retirement.json','prior-retirement-execution':BASE/'retirement-command-01/receipt.json',
+ 'prior-native-build':old_path,'rad-native-build':ROOT/'.runtime/porting/RAD-01/native-build-02/native-build.json',
+ 'prior-configure-execution':ROOT/old['configure_execution']['path'],'prior-compile-execution':ROOT/old['compile_execution']['path'],'restore-configure-execution':restore_path}
+command=['python','-X','utf8','-B',(OPS/'run-native-build.py').relative_to(ROOT).as_posix()]
+for name,path in options.items(): command+=['--'+name,arg(path)]
+command+=['--output-dir',OUT.relative_to(ROOT).as_posix()]
+subprocess.run(command,check=True)
+before=OUT/'before/preservation.json'
+subprocess.run(['python','-X','utf8','-B',(OPS/'derive-and-describe-native-build.py').relative_to(ROOT).as_posix(),'--before-preservation',arg(before),'--prior-derivation-execution',arg(ROOT/old['derivation_execution']['path']),'--output-dir',OUT.relative_to(ROOT).as_posix()],check=True)
+subprocess.run(['python','-X','utf8','-B',(OPS/'complete-native-build-metadata.py').relative_to(ROOT).as_posix(),'--before-preservation',arg(before),'--output-dir',OUT.relative_to(ROOT).as_posix()],check=True)
+print('Root actual full-reviewed surface consumer build completed',arg(OUT/'native-build.json'),flush=True)

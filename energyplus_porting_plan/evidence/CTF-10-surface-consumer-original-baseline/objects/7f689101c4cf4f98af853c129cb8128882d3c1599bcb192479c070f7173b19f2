@@ -1,0 +1,11 @@
+--- .runtime/porting/CTF-10/surface-consumer-original-data-review-prep-02/before-01/review_data.py
++++ .runtime/porting/CTF-10/surface-consumer-original-data-review-prep-02/review_data.py
+@@ -107,7 +107,7 @@
+     m.require(m.load(frozen_command["stdout"]) == freeze and freeze["schema"] == "ctf10-surface-consumer-input-freeze.v1" and
+               freeze["frozen_before_this_surface_consumer_execution"] is True, "Actual input-only freeze/fullstdout required")
+     literal_writer = m.bind(freeze["executed_literal_writer"])
+-    m.require(literal_writer["path"] == ".runtime/porting/CTF-10/freeze-surface-consumer-inputs.py",
++    m.require(literal_writer["path"] == ".runtime/porting/CTF-10/freeze-surface-consumer-inputs-02.py",
+               "Actual Root literal-freeze source owner differs")
+     m.require(any(m.contained(value, existing=False) == m.contained(literal_writer["path"])
+                   for value in frozen_command["command"] if type(value) is str and value.endswith(".py")),

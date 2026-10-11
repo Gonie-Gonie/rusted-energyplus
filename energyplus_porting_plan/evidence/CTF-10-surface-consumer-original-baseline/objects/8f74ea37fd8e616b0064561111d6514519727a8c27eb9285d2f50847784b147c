@@ -1,0 +1,107 @@
+"""Source-only one-literal successor; never imports or invokes the staged reader."""
+import ast
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+OLD = Path('.runtime/porting/CTF-10/surface-consumer-original-data-review-prep-01')
+NEW = Path('.runtime/porting/CTF-10/surface-consumer-original-data-review-prep-02')
+
+def ref(path):
+    data = path.read_bytes()
+    return {'path': path.as_posix(), 'sha256': hashlib.sha256(data).hexdigest(),
+            'size_bytes': len(data), 'line_count': len(data.splitlines())}
+
+def write(path, data):
+    assert not path.exists(), path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(data)
+
+def diff(before, after, target):
+    old = before.read_text(encoding='utf-8').splitlines(keepends=True) if before else []
+    new = after.read_text(encoding='utf-8').splitlines(keepends=True)
+    text = ''.join(difflib.unified_diff(old, new,
+        fromfile=before.as_posix() if before else '/dev/null', tofile=after.as_posix()))
+    write(target, text.encode('utf-8'))
+    return {'before': ref(before) if before else None, 'after': ref(after), 'exact_diff': ref(target)}
+
+manifest = json.loads((OLD/'manifest.json').read_text(encoding='utf-8'))
+assert ref(OLD/'manifest.json')['sha256'] == '067da6a84ba311b3c1252c3f0780784d7ccc1227b9a6fa78084eee7012835b3b'
+names = [Path(row['path']).name for row in manifest['own_sources']]
+assert names == ['review_data.py', 'event_shape.py', 'stream_events.py', 'packet_io.py']
+old_literal = b'.runtime/porting/CTF-10/freeze-surface-consumer-inputs.py'
+new_literal = b'.runtime/porting/CTF-10/freeze-surface-consumer-inputs-02.py'
+for name in names:
+    data = (OLD/name).read_bytes()
+    write(NEW/'before-01'/name, data)
+    if name == 'review_data.py':
+        assert data.count(old_literal) == 1
+        data = data.replace(old_literal, new_literal)
+    write(NEW/name, data)
+    ast.parse(data, filename=name)
+    if name != 'review_data.py':
+        assert data == (OLD/name).read_bytes()
+assert (NEW/'review_data.py').read_bytes().replace(new_literal,old_literal) == (OLD/'review_data.py').read_bytes()
+for name in ['README.md','manifest.json']:
+    write(NEW/'before-01'/name, (OLD/name).read_bytes())
+for row in manifest['before_archives']:
+    path = Path(row['path'])
+    write(NEW/'before'/path.name, path.read_bytes())
+
+append = '''
+
+## Fresh02 exact active Root writer binding
+
+The sole executable correction pins the actual immutable Root retry writer
+`freeze-surface-consumer-inputs-02.py` in place of the predecessor filename.
+The writer remains an exact required owner, not a generic filename allowance.
+Root's failed first compile and unchanged-input retry are separate actual receipts;
+this preparation supplies no successful build, engine, freeze or QA outcome.
+
+All four reader sources are copied under this fresh02 directory. The three
+supports are byte-identical01; the main inverse replacement restores01 exactly.
+Full before01 source/document archives, narrow deltas and regenerated cumulative
+source diffs are retained. Native/build source revisions remain authenticated by
+the same runtime scope/freeze/build equalities, including the independently
+reviewed Native04/build02 when Root supplies those real references.
+All shape/class/counter/absence/source/4-GiB and no-numerical-release rules remain
+unchanged. Immutable01 remains the FULL predecessor review authority.
+'''
+write(NEW/'README.md', (OLD/'README.md').read_bytes()+append.encode('utf-8'))
+updated = copy.deepcopy(manifest)
+updated['status'] = 'held-source-only-fresh02-exact-active-writer-path-repair-unexecuted'
+updated['own_sources'] = [ref(NEW/name) for name in names]
+updated['before_archives'] = [ref(NEW/'before'/Path(row['path']).name) for row in manifest['before_archives']]
+updated['exact_diffs'] = []
+for row in manifest['exact_diffs']:
+    name = Path(row['after']['path']).name
+    before = NEW/'before'/Path(row['before']['path']).name if row['before'] else None
+    updated['exact_diffs'].append(diff(before, NEW/name, NEW/'diffs'/(name+'.diff')))
+updated['documentation'] = ref(NEW/'README.md')
+updated['predecessor_authority'] = ref(OLD/'manifest.json')
+updated['before_01_archives'] = [ref(NEW/'before-01'/name) for name in names+['README.md','manifest.json']]
+updated['from_01_diffs'] = [diff(NEW/'before-01'/name, NEW/name, NEW/'from-01'/(name+'.diff')) for name in names]
+updated['from_01_diffs'].append(diff(NEW/'before-01'/'README.md',NEW/'README.md',NEW/'from-01'/'README.md.diff'))
+writer = Path('.runtime/porting/CTF-10/freeze-surface-consumer-inputs-02.py')
+updated['exact_active_literal_writer_source'] = ref(writer)
+updated['successor_scope'] = {
+    'only_executable_change': 'Exact Root writer filename inputs.py -> inputs-02.py; no generic relaxation.',
+    'support_sources_byte_identical_01': names[1:],
+    'main_inverse_restores_01': True,
+    'prior_failed_build_is_not_engine_execution': True,
+    'future_runtime_refs_not_synthesized': True,
+}
+updated['authoring_source_metadata_only'] = ref(NEW/'prepare_metadata.py')
+write(NEW/'manifest.json', (json.dumps(updated,indent=2,ensure_ascii=False)+'\n').encode('utf-8'))
+for row in updated['exact_diffs']+updated['from_01_diffs']:
+    b = Path(row['before']['path']) if row['before'] else None
+    a = Path(row['after']['path'])
+    generated=''.join(difflib.unified_diff(b.read_text(encoding='utf-8').splitlines(keepends=True) if b else [],a.read_text(encoding='utf-8').splitlines(keepends=True),fromfile=b.as_posix() if b else '/dev/null',tofile=a.as_posix()))
+    assert generated.encode('utf-8') == Path(row['exact_diff']['path']).read_bytes()
+print(json.dumps({'manifest':ref(NEW/'manifest.json'),'main':ref(NEW/'review_data.py'),
+                  'narrow_main_diff':updated['from_01_diffs'][0]['exact_diff'],
+                  'README':ref(NEW/'README.md'),'supports_byte_identical':3,
+                  'AST':4,'regenerated_diffs':len(updated['exact_diffs'])+len(updated['from_01_diffs'])},indent=2))

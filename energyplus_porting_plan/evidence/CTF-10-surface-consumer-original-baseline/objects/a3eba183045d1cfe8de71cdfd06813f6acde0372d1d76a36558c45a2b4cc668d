@@ -1,0 +1,14 @@
+{
+  "schema": "ctf10-surface-consumer-actual-derivation-command-authority.v1",
+  "prior_derivation_execution": {
+    "path": ".runtime/porting/CTF-10/native-unit-derive-command-01/receipt.json",
+    "sha256": "d72a57d6fc9de98eb14620d2d789ac5e9b63e5b7ea07a7e4ea1677354860a562",
+    "size_bytes": 3210
+  },
+  "linked_original": {
+    "path": ".runtime/ep261-gcc13-o0/Products/surface_consumer_helper.exe",
+    "sha256": "d4a4525bef2879e4c7bf79d8498c1d80dfe5e9e6bf39ce85b32ba95ebe5d9509",
+    "size_bytes": 1304486021
+  },
+  "scientific_execution_performed": false
+}

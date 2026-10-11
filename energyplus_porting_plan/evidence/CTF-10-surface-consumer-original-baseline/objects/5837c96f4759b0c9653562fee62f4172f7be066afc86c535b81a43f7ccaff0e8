@@ -1,0 +1,17 @@
+--- .runtime/porting/CTF-10/surface-consumer-original-data-review-prep-02/before/packet_io.py
++++ .runtime/porting/CTF-10/surface-consumer-original-data-review-prep-02/packet_io.py
+@@ -65,7 +65,7 @@
+ def bind_observation(row):
+     require(isinstance(row, dict) and isinstance(row.get("path"), str) and
+             re.fullmatch("[0-9a-f]{64}", row.get("sha256", "")), "Actual observation path/SHA required")
+-    actual = identity(row["path"], 1024 * 1024 * 1024)
++    actual = identity(row["path"], 4 * 1024 * 1024 * 1024)
+     require(actual["sha256"] == row["sha256"], "Actual observation SHA differs")
+     for key in ["bytes", "size_bytes"]:
+         if key in row: require(type(row[key]) is int and row[key] == actual["size_bytes"], "Actual observation size differs")
+@@ -117,4 +117,4 @@
+         require(identity(ref["path"]) == ref, "Input/source changed during input freeze")
+ 
+     for ref in list(OBSERVATIONS.values()):
+-        require(identity(ref["path"], 1024 * 1024 * 1024) == ref, "Actual observation changed during factual review")
++        require(identity(ref["path"], 4 * 1024 * 1024 * 1024) == ref, "Actual observation changed during factual review")

@@ -1,0 +1,336 @@
+"""Factual consumer event custody/allocation review; no heat-balance equations or values are derived."""
+import re
+
+PROCEDURES = ["ManageSurfaceHeatBalance", "InitSurfaceHeatBalance", "InitThermalAndFluxHistories",
+              "UpdateThermalHistories", "CalcHeatBalanceInsideSurf2CTFOnly", "ReportSurfaceHeatBalance"]
+COPIES = ["None", "Catalog", "Environment", "Histories", "HistoryTerm", "Constants", "Cache", "Inside",
+          "InsideResult", "Flux", "Scratch", "HistorySurface", "Reports"]
+HISTORIES = ["SurfInsideTempHist", "SurfOutsideTempHist", "SurfInsideFluxHist", "SurfOutsideFluxHist"]
+MASTERS = [name + "Master" for name in HISTORIES]
+PUBLIC = ["CTFOutside", "CTFCross", "CTFInside", "CTFFlux", "CTFSourceIn", "CTFSourceOut", "CTFTSourceOut",
+          "CTFTSourceIn", "CTFTSourceQ", "CTFTUserOut", "CTFTUserIn", "CTFTUserSource"]
+BOOL_CLOCK = ["KickOffSimulation", "WarmupFlag", "BeginSimFlag", "BeginEnvrnFlag", "BeginDayFlag",
+              "BeginHourFlag", "BeginTimeStepFlag", "ZoneSizingCalc", "AllCTF", "AnyCTF", "SimpleCTFOnly",
+              "AnyInternalHeatSourceInInput", "UpdateThermalHistoriesFirstTimeFlag", "AnyEMS",
+              "AnyConstrOverrides", "AnySurfPropOverrides"]
+INT_CLOCK = ["state_address", "environment_index", "CalendarYear", "Month", "DayOfMonth", "DayOfSim",
+             "HourOfDay", "TimeStep", "MaxCTFTerms", "InsideSurfIterations"]
+INTEGER_OWNERS = {"SurfCurrNumHist", "SurfIsAdiabatic", "SurfIsSourceOrSink", "SurfIsOperatingPool"}
+SCALAR_FIELDS = {
+    "Environment": "SurfOutDryBulbTemp SurfOutWetBulbTemp SurfOutWindSpeed SurfOutWindDir",
+    "HistoryTerm": "SurfOutsideFluxHist_slot2 SurfOutsideTempHist_term SurfInsideTempHist_term SurfOutsideFluxHist_term SurfInsideFluxHist_term SurfOutsideTempHist_slot1 SurfInsideTempHist_slot1",
+    "Constants": "SurfCTFConstInPart SurfCTFConstOutPart",
+    "Cache": "SurfCTFCross0 SurfCTFInside0 SurfCTFSourceIn0 SurfTempOutHist SurfIsAdiabatic SurfIsSourceOrSink",
+    "Inside": "SurfTempTerm SurfTempDiv SurfTempInsOld SurfTempInTmp SurfTempIn SurfCTFCross0 SurfCTFInside0 SurfTempOutHist SurfCTFConstInPart SurfCTFSourceIn0 SurfQSourceSinkHist SurfQdotRadNetLWInPerArea SurfHConvInt RefAirTemp SurfOpaqQRadSWInAbs SurfQAdditionalHeatSourceInside SurfQdotRadHVACInPerArea SurfQdotRadIntGainsInPerArea QPoolSurfNumerator PoolHeatTransCoefs QRadSurfAFNDuct SurfIsAdiabatic SurfIsSourceOrSink SurfIsOperatingPool",
+    "InsideResult": "SurfTempInTmp SurfTempIn",
+    "Flux": "SurfOutsideTempHist_slot1 SurfInsideTempHist_slot1 SurfOutsideFluxHist_slot1 SurfInsideFluxHist_slot1 SurfTempIn SurfCTFConstInPart SurfCTFConstOutPart SurfOpaqInsFaceCond SurfOpaqInsFaceCondFlux SurfOpaqOutFaceCond SurfOpaqOutFaceCondFlux",
+    "Scratch": "TempExt1 TempInt1 QExt1 QInt1 SumTime SurfCurrNumHist",
+    "Reports": "SurfOpaqInsFaceCond SurfOpaqInsFaceCondFlux SurfOpaqInsFaceCondEnergy SurfOpaqOutFaceCond SurfOpaqOutFaceCondFlux SurfOpaqOutFaceCondEnergy SurfOpaqAvgFaceCond SurfOpaqAvgFaceCondFlux SurfOpaqAvgFaceCondEnergy SurfOpaqStorageCond SurfOpaqStorageCondFlux SurfOpaqStorageCondEnergy"}
+
+
+def scalar(value, need):
+    need(type(value) is dict and set(value) == {"value_bits", "value_class"} and
+         isinstance(value["value_bits"], str) and re.fullmatch("[0-9a-f]{16}", value["value_bits"]),
+         "Actual binary64 copy required")
+    bits = int(value["value_bits"], 16)
+    magnitude, negative = bits & 0x7fffffffffffffff, bits >> 63
+    kind = ("nan" if magnitude > 0x7ff0000000000000 else
+            ("negative_infinity" if negative else "positive_infinity") if magnitude == 0x7ff0000000000000 else
+            ("negative_zero" if negative else "positive_zero") if magnitude == 0 else "finite")
+    need(value["value_class"] == kind, "Copied IEEE class differs from actual bits")
+
+
+def checkpoint_spec(additions, need):
+    result = {}
+    for row in additions:
+        for match in re.finditer(r'record\(state, "([^"]+)".*?Copy::(\w+)', row["insertion"]):
+            name, kind = match.groups()
+            need(kind in COPIES and name not in result, "Unique actual source checkpoint required")
+            result[name] = COPIES.index(kind)
+    need(len(result) == 45, "Held source checkpoint inventory differs")
+    return result
+
+
+class Review:
+    def __init__(self, need, checkpoints):
+        self.need, self.checkpoints = need, checkpoints
+        self.events, self.last_ordinal, self.gaps = 0, 0, 0
+        self.calls = {name: 0 for name in PROCEDURES}
+        self.checkpoint_counts, self.copy_counts = {}, {name: 0 for name in COPIES}
+        self.stack, self.catalog, self.state_address = [], None, None
+        self.entry_contexts, self.unallocated_owners, self.null_scalar_copies = 0, 0, 0
+        self.entry_allocations = {}
+
+    def integer(self, value, minimum=None):
+        self.need(type(value) is int and (minimum is None or value >= minimum), "Actual typed integer required")
+
+    def array(self, value, integer=False, total=None):
+        n = self.need
+        n(type(value) is dict and set(value) == {"allocated", "lower", "upper", "values"} and
+          type(value["allocated"]) is bool, "Actual complete allocated-array copy required")
+        if not value["allocated"]:
+            n(value["lower"] is None and value["upper"] is None and value["values"] is None,
+              "Unallocated owner must not become a fabricated array")
+            self.unallocated_owners += 1
+            return
+        lo, hi, rows = value["lower"], value["upper"], value["values"]
+        self.integer(lo); self.integer(hi)
+        n(hi >= lo - 1 and type(rows) is list and len(rows) == hi - lo + 1, "Full actual array bounds/length differ")
+        if total is not None:
+            n((lo, hi) == (1, total), "Actual full surface-ID array layout differs")
+        for index, row in enumerate(rows, lo):
+            n(type(row) is dict and set(row) == {"index", "value"} and row["index"] == index,
+              "Actual ordered array index differs")
+            self.integer(row["value"]) if integer else scalar(row["value"], n)
+
+    def history(self, value, surface):
+        n = self.need
+        n(type(value) is dict and type(value.get("allocated")) is bool, "History allocation witness required")
+        if not value["allocated"]:
+            n(set(value) == {"allocated", "terms"} and value["terms"] is None, "Unallocated history differs")
+            self.unallocated_owners += 1
+            return
+        n(set(value) == {"allocated", "terms", "lower", "upper"} and
+          (value["lower"], value["upper"]) == (1, 19) and type(value["terms"]) is list and
+          len(value["terms"]) == 19, "Full fixed19 source history bounds required")
+        for term, row in enumerate(value["terms"], 1):
+            n(set(row) == {"term", "surface_lower", "surface_upper", "surface_allocated", "value"} and
+              row["term"] == term and type(row["surface_allocated"]) is bool, "Actual ordered term copy differs")
+            self.integer(row["surface_lower"]); self.integer(row["surface_upper"])
+            present = row["surface_allocated"] and row["surface_lower"] <= surface <= row["surface_upper"]
+            if present:
+                scalar(row["value"], n)
+            else:
+                n(row["value"] is None, "Absent surface history must remain null")
+            if self.catalog is not None and row["surface_allocated"]:
+                n((row["surface_lower"], row["surface_upper"]) == (1, len(self.catalog["surfaces"])),
+                  "Actual complete per-term surface layout differs")
+
+    def surface(self, row, kind):
+        n = self.need
+        n(type(row) is dict, "Actual surface owner object required")
+        self.integer(row.get("surface_index"), 1)
+        surface = row["surface_index"]
+        if self.catalog is not None:
+            n(surface <= len(self.catalog["surfaces"]), "Actual surface ID escapes catalog")
+        if kind in ["Histories", "HistorySurface"]:
+            n(set(row) == {"surface_index", "SurfCurrNumHist", *HISTORIES, *MASTERS}, "Full actual history row required")
+            for key in HISTORIES + MASTERS:
+                self.history(row[key], surface)
+            if row["SurfCurrNumHist"] is not None:
+                self.integer(row["SurfCurrNumHist"])
+            return
+        fields = SCALAR_FIELDS[kind].split()
+        n(set(row) == {"surface_index", *fields, *(["term"] if kind == "HistoryTerm" else [])},
+          "Actual source copy field inventory differs")
+        if kind == "HistoryTerm":
+            self.integer(row["term"], 1)
+        for key in fields:
+            if row[key] is None:
+                self.null_scalar_copies += 1
+            elif key in INTEGER_OWNERS:
+                self.integer(row[key])
+            else:
+                scalar(row[key], n)
+
+    def catalog_copy(self, value):
+        n = self.need
+        n(type(value) is dict and set(value) == {"surfaces", "constructions", "zones", "spaces", "AllHTSurfaceList"},
+          "Complete actual identity catalog required")
+        for family in ["surfaces", "constructions", "zones", "spaces"]:
+            n(type(value[family]) is list, "Actual catalog array required")
+            for index, row in enumerate(value[family], 1):
+                n(type(row) is dict and row["index"] == index and type(row["Name"]) is str,
+                  "Actual declared catalog identity/order differs")
+        surfaces, constructions = value["surfaces"], value["constructions"]
+        for row in surfaces:
+            for key in ["Construction", "Class", "OriginalClass", "HeatTransferAlgorithm", "Zone", "Space", "ExtBoundCond"]:
+                self.integer(row[key])
+            scalar(row["Area"], n)
+        for row in constructions:
+            for key in ["TotLayers", "SolutionDimensions", "NumCTFTerms", "NumHistories"]:
+                self.integer(row[key])
+            for key in ["IsUsedCTF", "SourceSinkPresent"]:
+                n(type(row[key]) is bool, "Actual construction flag required")
+            n(type(row["LayerPoint"]) is list and len(row["LayerPoint"]) == 11, "Full original layer identity capacity required")
+            for item in row["LayerPoint"]:
+                self.integer(item)
+            for key in ["CTFTimeStep", "UValue"]:
+                scalar(row[key], n)
+            for key in PUBLIC:
+                n(type(row[key]) is list and len(row[key]) == 19, "All12 fixed19 public copies required")
+                for item in row[key]:
+                    scalar(item, n)
+        ht = value["AllHTSurfaceList"]
+        n(type(ht) is list and len(ht) == len(set(ht)), "Actual complete AllHT order required")
+        for index in ht:
+            self.integer(index, 1)
+            n(index <= len(surfaces) and 1 <= surfaces[index - 1]["Construction"] <= len(constructions),
+              "Actual HT surface/construction association differs")
+        for row in value["zones"]:
+            n(type(row["spaceIndexes"]) is list, "Actual Zone-space order required")
+            for index in row["spaceIndexes"]:
+                self.integer(index, 1); n(index <= len(value["spaces"]), "Actual space reference differs")
+        for row in value["spaces"]:
+            for key in ["HTSurfaceFirst", "HTSurfaceLast", "OpaqOrIntMassSurfaceFirst", "OpaqOrIntMassSurfaceLast"]:
+                self.integer(row[key])
+        self.catalog = value
+
+    def entry_context(self, context, owners, checkpoint, clock):
+        n = self.need
+        n(type(context) is dict and context["protocol"] == "ctf10-surface-history-entry-context.v1" and
+          type(context["Surface_allocated"]) is bool and self.catalog is not None, "Real complete history entry/custody required")
+        self.integer(context["TotSurfaces"], 0); self.integer(context["NumOfZones"], 0)
+        total = context["TotSurfaces"]
+        n(context["Surface_allocated"] and total == len(self.catalog["surfaces"]) and
+          context["NumOfZones"] == len(self.catalog["zones"]) and
+          context["AllHTSurfaceList"] == self.catalog["AllHTSurfaceList"], "Actual entry layout/catalog join differs")
+        rows = context["allocated_surfaces"]
+        n(type(rows) is list and len(rows) == total, "All actual allocated surface identities required")
+        for index, row in enumerate(rows, 1):
+            n(row["index"] == index and all(row[key] == self.catalog["surfaces"][index - 1][key]
+              for key in ["Name", "Construction", "Class", "HeatTransferAlgorithm", "ExtBoundCond", "Area"]),
+              "Actual entry/catalog surface identity differs")
+        other = context["non_AllHT_history_owners"]
+        n(type(other) is list and [row["surface_index"] for row in other] ==
+          [index for index in range(1, total + 1) if index not in context["AllHTSurfaceList"]],
+          "Actual non-AllHT history owner inventory differs")
+        for row in other:
+            self.surface(row, "Histories")
+        combined = owners + other
+        n(len(combined) == total and {row["surface_index"] for row in combined} == set(range(1, total + 1)),
+          "Full surface layout must have exactly one history row per ID")
+        self.array(context["SurfCurrNumHist"], integer=True, total=total)
+        groups = {"scratch": ["QExt1", "QInt1", "TempInt1", "TempExt1", "SumTime"],
+                  "flux_reports": ["SurfOpaqInsFaceCond", "SurfOpaqInsFaceCondFlux", "SurfOpaqOutFaceCond", "SurfOpaqOutFaceCondFlux"],
+                  "surface_operands": ["SurfTempIn", "SurfCTFConstInPart", "SurfCTFConstOutPart", "SurfOutDryBulbTemp"]}
+        for group, fields in groups.items():
+            n(set(context[group]) == set(fields), "Actual complete entry operand inventory differs")
+            for key in fields:
+                self.array(context[group][key], total=total)
+        # Allocation witnesses only, never a fabricated seed or mathematical admission.
+        normal = all(row[key]["allocated"] and all(term["surface_allocated"] for term in row[key]["terms"])
+                     for row in combined for key in HISTORIES)
+        master_flags = {row[key]["allocated"] for row in combined for key in MASTERS}
+        scratch_flags = {value["allocated"] for value in context["scratch"].values()}
+        allocation = {"normal_histories_complete": normal,
+            "master_allocation": "all" if master_flags == {True} else "none" if master_flags == {False} else "mixed",
+            "scratch_allocation": "all" if scratch_flags == {True} else "none" if scratch_flags == {False} else "mixed",
+            "counter_allocated": context["SurfCurrNumHist"]["allocated"],
+            "flux_report_owners_allocated": all(value["allocated"] for value in context["flux_reports"].values()),
+            "surface_operand_owners_allocated": all(value["allocated"] for value in context["surface_operands"].values()),
+            "actual_update_first_time": clock["UpdateThermalHistoriesFirstTimeFlag"]}
+        rows = self.entry_allocations.setdefault(checkpoint, [])
+        matching = [row for row in rows if row["allocation"] == allocation]
+        if matching:
+            matching[0]["actual_entry_count"] += 1
+        else:
+            rows.append({"allocation": allocation, "actual_entry_count": 1})
+        self.entry_contexts += 1
+
+    def visit(self, event):
+        n = self.need
+        self.integer(event["event_ordinal"], 1)
+        n(event["event_ordinal"] > self.last_ordinal, "Actual event ordinal order differs")
+        self.gaps += event["event_ordinal"] - self.last_ordinal - 1
+        self.last_ordinal = event["event_ordinal"]; self.events += 1
+        checkpoint, procedure, invocation = event["checkpoint"], event["procedure"], event["invocation_ordinal"]
+        n(procedure in PROCEDURES and event["counted_as_PASS"] is False, "Actual bounded procedure/noPASS required")
+        self.integer(invocation, 1)
+        if checkpoint == "scope_entry":
+            self.calls[procedure] += 1
+            n(invocation == self.calls[procedure], "Actual procedure invocation order differs")
+            self.stack.append((procedure, invocation))
+        n(self.stack and self.stack[-1] == (procedure, invocation), "Actual scope/invocation custody differs")
+        parent = self.stack[-2] if len(self.stack) > 1 else (None, None)
+        n((event["parent_procedure"], event["parent_invocation_ordinal"]) == parent, "Actual parent invocation differs")
+        kind = event["copy_kind"]
+        self.integer(kind, 0); n(kind < len(COPIES), "Known source copy enum required")
+        if checkpoint in ["scope_entry", "scope_normal_exit", "scope_unwinding"]:
+            n(kind == 0, "Scope marker copy enum differs")
+        else:
+            n(checkpoint in self.checkpoints and self.checkpoints[checkpoint] == kind, "Actual source checkpoint/copy kind differs")
+        self.checkpoint_counts[checkpoint] = self.checkpoint_counts.get(checkpoint, 0) + 1
+        self.copy_counts[COPIES[kind]] += 1
+        clock = event["clock"]
+        n(set(clock) == {*BOOL_CLOCK, *INT_CLOCK, "environment_name", "TimeStepZone", "TimeStepZoneSec"}, "Actual full clock inventory differs")
+        for key in BOOL_CLOCK:
+            n(type(clock[key]) is bool, "Actual clock flag required")
+        for key in INT_CLOCK:
+            self.integer(clock[key])
+        n(type(clock["environment_name"]) is str and clock["state_address"] > 0, "Actual state/environment custody required")
+        if self.state_address is None:
+            self.state_address = clock["state_address"]
+        n(clock["state_address"] == self.state_address, "Actual state instance changed")
+        for key in ["TimeStepZone", "TimeStepZoneSec"]:
+            scalar(clock[key], n)
+        n(type(event["locals"]) is dict, "Actual assigned locals object required")
+        for key, value in event["locals"].items():
+            n(type(key) is str, "Actual local name required")
+            self.integer(value) if type(value) is int else scalar(value, n)
+        owners = event["owners"]
+        if kind == 0:
+            n(owners is None, "No-copy source event must retain null owner")
+        elif kind == 1:
+            self.catalog_copy(owners)
+        elif type(owners) is list:
+            ids = []
+            for row in owners:
+                self.surface(row, COPIES[kind]); ids.append(row["surface_index"])
+            n(len(ids) == len(set(ids)), "Actual surface owner duplication differs")
+            if self.catalog is not None:
+                n(ids == self.catalog["AllHTSurfaceList"], "Actual full AllHT owner order differs")
+        else:
+            self.surface(owners, COPIES[kind])
+        entry = checkpoint in ["history_initialization_entry_owners", "history_update_entry_owners"]
+        n(("history_entry_context" in event) == entry, "Actual entry-context availability differs")
+        if entry:
+            n(type(owners) is list, "Actual full history entry rows required")
+            self.entry_context(event["history_entry_context"], owners, checkpoint, clock)
+        if checkpoint in ["scope_normal_exit", "scope_unwinding"]:
+            self.stack.pop()
+
+    def finish(self, summary):
+        n = self.need
+        for key in ["actual_engine_entry_returned", "counter_overflow", "stream_failed"]:
+            n(type(summary[key]) is bool, "Actual terminal availability flag required")
+        if summary["actual_engine_entry_returned"]:
+            self.integer(summary["actual_engine_exit_code"])
+            n(summary["outer_caught_exception_class"] is None, "Returned engine cannot have a caught exception")
+        else:
+            n(summary["actual_engine_exit_code"] is None and summary["outer_caught_exception_class"] in
+              ["std::exception", "unknown-exception"], "Unreturned engine outcome must remain unavailable")
+        for key in ["attempted_events", "retained_events", "first_failed_event", "last_failed_event", "stream_failed_events"]:
+            self.integer(summary[key], 0)
+        failures, calls = summary["copy_failures_by_Copy_enum"], summary["procedure_calls"]
+        n(type(failures) is list and len(failures) == len(COPIES) and type(calls) is list and len(calls) == len(PROCEDURES),
+          "Actual complete counter shape required")
+        for item in failures + calls:
+            self.integer(item, 0)
+        n(summary["retained_events"] == self.events and summary["attempted_events"] >= self.last_ordinal,
+          "Actual complete streamed event count differs")
+        omitted = summary["attempted_events"] - self.events
+        n(omitted == sum(failures) + summary["stream_failed_events"], "Actual failure/omission ledger differs")
+        if sum(failures):
+            n(1 <= summary["first_failed_event"] <= summary["last_failed_event"] <= summary["attempted_events"],
+              "Actual failed event ordinal bounds differ")
+        else:
+            n(summary["first_failed_event"] == summary["last_failed_event"] == 0, "Absent copy failure must retain zero ordinals")
+        for key in ["all_source_calls_or_complete_history_lifecycle_certified", "numeric_profiles_chosen", "integration_PASS_claimed"]:
+            n(summary[key] is False, "Actual capture scope must not claim numerical completion")
+        integrity = bool(omitted or summary["counter_overflow"] or summary["stream_failed"])
+        if not integrity:
+            n(not self.stack and calls == [self.calls[name] for name in PROCEDURES] and self.gaps == 0,
+              "Actual complete procedure/scope/ordinal ledger differs")
+        required = ["actual_surface_allocation_return", "history_initialization_entry_owners",
+                    "history_initialization_final_owners", "history_update_entry_owners",
+                    "actual_InitThermalAndFluxHistories_return", "actual_UpdateThermalHistories_return",
+                    "actual_ReportSurfaceHeatBalance_return"]
+        available = all(self.checkpoint_counts.get(key, 0) > 0 for key in required) and all(calls)
+        return {"actual_retained_events": self.events, "actual_attempted_events": summary["attempted_events"],
+                "actual_omitted_events": omitted, "actual_procedure_calls": dict(zip(PROCEDURES, calls)),
+                "actual_checkpoint_counts": self.checkpoint_counts, "actual_copy_kind_counts": self.copy_counts,
+                "actual_history_entry_contexts": self.entry_contexts, "actual_unallocated_owner_copies": self.unallocated_owners,
+                "actual_history_entry_allocation_witness_counts": self.entry_allocations,
+                "actual_null_scalar_copies": self.null_scalar_copies, "copy_or_stream_integrity_failed": integrity,
+                "required_lifecycle_owners_reached": available}

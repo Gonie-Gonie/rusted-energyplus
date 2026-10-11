@@ -1,0 +1,102 @@
+{
+  "schema": "ctf10-source-only-history-boundary-augmentation-plan.v1",
+  "status": "prospective-plan-only-no-executable-source",
+  "prospective_native_successor": ".runtime/porting/CTF-10/surface-consumer-native-prep-05",
+  "prospective_unique_target": "surface_consumer_helper05",
+  "prospective_original_product": "Products/surface_consumer_helper05.exe",
+  "preserve_retained04_target_and_products": true,
+  "existing51_passive_calls_unchanged": true,
+  "new_passive_calls": [
+    {
+      "after_original_line": 2322,
+      "before_original_line": 2323,
+      "checkpoint": "history_selected_initialization_input",
+      "role": "selected-initialization-suffix-input",
+      "copy_kind": "Histories",
+      "full_history_boundary_context": true,
+      "current_history_catalog": true
+    },
+    {
+      "after_original_line": 2436,
+      "before_original_line": 2437,
+      "checkpoint": "history_selected_initialization_complete",
+      "role": "selected-initialization-suffix-complete-before-OSCM",
+      "copy_kind": "Histories",
+      "full_history_boundary_context": true,
+      "current_history_catalog": false
+    },
+    {
+      "after_original_line": 5496,
+      "before_original_line": 5497,
+      "checkpoint": "history_selected_master_update_complete",
+      "role": "ordinary-update-complete-before-internal-source-suffix",
+      "copy_kind": "Histories",
+      "full_history_boundary_context": true,
+      "current_history_catalog": false
+    }
+  ],
+  "extend_existing_payload_only": [
+    {
+      "after_original_line": 5222,
+      "checkpoint": "history_update_entry_owners",
+      "existing_history_entry_context_unchanged": true,
+      "current_history_catalog": true
+    },
+    {
+      "after_original_line": 5354,
+      "checkpoint": "simple_history_hard_copy_complete",
+      "existing_AllHT_owners_unchanged": true,
+      "full_history_boundary_context": true,
+      "current_history_catalog": false
+    }
+  ],
+  "full_context_payload_proposal": {
+    "field": "history_boundary_context",
+    "reuse_existing_history_entry_context_copier": true,
+    "existing_protocol_retained_as_literal_owner_format": "ctf10-surface-history-entry-context.v1",
+    "AllHT_histories_remain_in_event_owners": true,
+    "non_AllHT_histories_and_full_allocated_surface_layout": true,
+    "full_counter_scratch5_reports4_operand4_vectors_with_actual_bounds_and_nulls": true,
+    "actual_clock_and_update_first_time_flag": true,
+    "no_zero_fill_or_selected_term_clamp": true
+  },
+  "current_catalog_payload_proposal": {
+    "field": "current_history_catalog",
+    "input_boundaries_only": true,
+    "full_actual_surface_Zone_space_layout_and_traversal_fields": true,
+    "construction_selection": "actual AllHTSurfaceList order; first encounter of current Surface.Construction ID; no numeric eligibility filter or sorting",
+    "selected_Construction_owner_fields": [
+      "index", "Name", "SourceSinkPresent", "SolutionDimensions",
+      "NumCTFTerms", "NumHistories", "CTFTimeStep", "UValue",
+      "CTFOutside", "CTFCross", "CTFInside", "CTFFlux",
+      "CTFSourceIn", "CTFSourceOut", "CTFTSourceOut", "CTFTSourceIn",
+      "CTFTSourceQ", "CTFTUserOut", "CTFTUserIn", "CTFTUserSource"
+    ],
+    "reuse_catalog_literal_field_copiers": true,
+    "observer_only_invalid_reference_or_copy_failure": "surface existing typed copy failure and required-owner unavailability; never change engine branch or substitute another owner",
+    "endpoint_Construction_ID_join_must_match_current_input_custody": true
+  },
+  "association_and_availability": {
+    "join": ["actual state_address", "procedure", "invocation_ordinal", "parent procedure/invocation", "ordered event ordinals", "actual clock/context"],
+    "normal_procedure_exit_required_for_returned_call_pairing": true,
+    "selected_complete_endpoint_does_not_invent_whole_return": true,
+    "unwinding_or_missing_endpoint_or_failed_capture_cannot_PASS": true,
+    "simple_and_master_return_routes_remain_distinct": true,
+    "AnyInternalHeatSource_false_required_by_direct_API_scope": true,
+    "all_referenced_members_must_meet_exact_API_scope_no_subset_drop": "ordinary opaque CTF/EMPD, no source, Outdoors/Adiabatic; same HT/opaque/AllHT membership sets",
+    "no_successful_visit_count_or_route_predicted": true
+  },
+  "later_existing_mechanism_adaptation_only": {
+    "five_TU_graph": "new05 wrapper, derived whole HBSM, collector; unchanged Original EnergyPlusPgm and CLI",
+    "strict_target_qualified_source_rows_and_address_bound_HBSM_Pgm_CLI_providers": true,
+    "all_actual_retained04_and_legacy_binaries_core_and_absences_protected": true,
+    "protected_count_and_before_rows": "actual future inventory/restore operands only",
+    "same_ordinary_engine_arguments_and_complete_stream_no_event_cap": true,
+    "fresh_Root_scope_freeze_build_PE_OriginalQA_before_any_direct_test_or_application": true
+  },
+  "actual_native_source_or_execution_or_output_hashes_for05": null,
+  "executable_source_authored": false,
+  "expected_values_or_outcomes_supplied": false,
+  "numeric_policy_frozen": false,
+  "integration_PASS_or_card_gate_change": false
+}

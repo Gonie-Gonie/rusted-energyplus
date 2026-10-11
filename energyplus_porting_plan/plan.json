@@ -11840,7 +11840,7 @@
         "selected_case_id": "A-24H",
         "scope": "Complete ordinary Original lifecycle, including all actual initialization, kickoff, warmup and weather calls. Passive51 callback sites; actual SurfaceId/ConstructionId association, all allocated current/master histories, counters, scratch and flux reports. Native observations may later supply direct-unit test operands only. Independent Rust coefficient generation, lifecycle and production handoff remain unproven.",
         "observation_max_bytes": 4294967296,
-        "actual_capture_available": false,
+        "actual_capture_available": true,
         "thermal_history_Rust_arithmetic_applied": false,
         "full_card_gates_updated": false,
         "build_only_retry": {
@@ -11853,6 +11853,11 @@
           "engine_execution_occurred": false,
           "repair": "Only explicit void argc/argv in existing Windows main branch; six other transport/source artifacts byte-exact03; compiler flags, all51 callbacks, science, inputs and resource policy unchanged."
         }
+      },
+      "actual_ordinary_surface_lifecycle_capture": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-surface-consumer-original-baseline/summary.json",
+        "sha256": "d6b6a51df4bad9d38a0345b03e8387b099a979e6d3dd70fde84899d8b6f443cb",
+        "size_bytes": 12957
       }
     },
     {

@@ -1,0 +1,78 @@
+--- .runtime/porting/CTF-10/surface-consumer-native-build-review-prep-01/before/review_build.py
++++ .runtime/porting/CTF-10/surface-consumer-native-build-review-prep-01/review_build.py
+@@ -1,4 +1,4 @@
+-"""Independent actual RAD01 build/PE inspection; no engine is invoked."""
++"""Independent actual surface-consumer build/PE inspection; no engine is invoked."""
+ from pathlib import Path
+ import argparse
+ import datetime
+@@ -43,11 +43,11 @@
+ assert separator and len(build_sha) == 64 and all(c in '0123456789abcdef' for c in build_sha)
+ build_path = bound({'path': build_name, 'sha256': build_sha})
+ build = json.loads(build_path.read_text(encoding='utf-8'))
+-prefix = 'rad01'
+-target = 'rad01_unit_helper'
++prefix = 'ctf10-surface-consumer'
++target = 'surface_consumer_helper'
+ assert build['schema'] == prefix + '-native-build.v1'
+ assert build['target'] == target
+-assert build['status'] == 'pass-actual-3TU-link-and-preservation'
++assert build['status'] == 'pass-actual-5TU-link-and-preservation'
+ for key in ('configure_execution', 'compile_execution', 'derivation_execution'):
+     receipt = json.loads(bound(build[key]).read_text(encoding='utf-8'))
+     assert receipt['exit_code'] == 0 and receipt['source_bytes_match_before_and_after']
+@@ -58,23 +58,39 @@
+     assert build[key] is True
+ for key in ('previous_compile_rows', 'current_compile_rows', 'core_registered', 'core_present', 'core_absent', 'protected_ref_count'):
+     assert type(build[key]) is int and build[key] >= 0
+-# One new target with three genuine source objects; actual before inventory is Root-owned.
+-assert build['current_compile_rows'] == build['previous_compile_rows'] + 3
++# One new target with five genuine source objects; actual before inventory is Root-owned.
++assert build['current_compile_rows'] == build['previous_compile_rows'] + 5
+ assert (build['core_registered'], build['core_present'], build['core_absent']) == (643, 631, 12)
+ assert build['protected_ref_count'] > 0
+-assert len(build['native_source_files']) == 6
++assert len(build['native_source_files']) == 7 and len(build['compiled_source_files']) == 5
+ for binding in build['native_source_files']:
+     bound(binding)
+ preservation = json.loads(bound(build['preservation']).read_text(encoding='utf-8'))
+-assert preservation['selected_core_HeatBalanceIntRadExchange_object_hits'] == 0
+-assert 'HeatBalanceIntRadExchange.rad01.cc.obj' in preservation['derived_provider']['section_provider']['text']
++assert preservation['selected_core_HeatBalanceSurfaceManager_object_hits'] == 0
++assert preservation['target_objects_before_core_archive'] == 5
++assert len(preservation['actual_target_object_loads']) == 5
++providers = preservation['address_bound_selected_providers']
++assert set(providers) == {
++    'EnergyPlus::HeatBalanceSurfaceManager::ManageSurfaceHeatBalance(',
++    'EnergyPlus::HeatBalanceSurfaceManager::InitSurfaceHeatBalance(',
++    'EnergyPlus::HeatBalanceSurfaceManager::InitThermalAndFluxHistories(',
++    'EnergyPlus::HeatBalanceSurfaceManager::UpdateThermalHistories(',
++    'EnergyPlus::HeatBalanceSurfaceManager::ReportSurfaceHeatBalance(',
++    'EnergyPlus::HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf2CTFOnly(',
++    'EnergyPlusPgm(', 'EnergyPlus::CommandLineInterface::ProcessArgs('}
++for name, provider in providers.items():
++    text = provider['section_provider']['text'].replace('\\', '/')
++    assert 'CMakeFiles/surface_consumer_helper.dir/' in text
++    owner = 'EnergyPlusPgm.cc.obj' if name.startswith('EnergyPlusPgm(') else (
++        'CommandLineInterface.cc.obj' if 'ProcessArgs(' in name else 'HeatBalanceSurfaceManager.surface_consumer.cc.obj')
++    assert owner in text and type(provider['symbol_line']) is int and provider['symbol']
+ assert len(preservation['present_objects']) == build['core_present']
+ assert len(preservation['protected_refs']) == build['protected_ref_count']
+ assert all(preservation[key] == build[key] for key in ('previous_compile_rows', 'current_compile_rows', 'core_registered'))
+ derivation = json.loads(bound(build['validated_derivative']).read_text(encoding='utf-8'))
+ assert derivation['status'] == 'pass-exact-retained-runtime-sections-and-directories'
+ reader = ROOT / 'tools/porting/native_pe.py'
+-spec = importlib.util.spec_from_file_location('actual_rad_pe', reader)
++spec = importlib.util.spec_from_file_location('actual_surface_consumer_pe', reader)
+ module = importlib.util.module_from_spec(spec)
+ spec.loader.exec_module(module)
+ original = module.inspect(bound(build['linked_original']))
+@@ -92,7 +108,7 @@
+ report = {'schema': prefix + '-independent-build-PE-review.v1',
+           'status': 'pass-exact-retained-PE-runtime-and-actual-build-identity',
+           'observed_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+-          'lane': 'unit', 'target': target,
++          'lane': 'ordinary-full-run', 'target': target,
+           'actual_previous_compile_rows': build['previous_compile_rows'],
+           'actual_current_compile_rows': build['current_compile_rows'],
+           'actual_protected_ref_count': build['protected_ref_count'],

@@ -1,0 +1,93 @@
+# Selected thermal-history observation gaps and reuse plan
+
+This immutable source-only note binds accepted consumer Native04 and the held
+standalone thermal-history API. It proposes no executable source, adapter, input,
+profile freeze, actual observation or gate change. Frozen04 capture and factual
+OriginalQA remain separate Root work; this note makes no statement about that run.
+
+## Exact scope and existing gaps
+
+The Rust initialization API owns only Original HBSM2323-2357,2381-2400,2413-2435.
+The update API owns the ordinary no-internal-source path5245-5496. The complete
+module483/tests269 remain held and unapplied dependencies, not runtime evidence.
+
+Consumer04 copies full allocated entry context only at2209/5222. Its final2446,
+simple5354 and per-surface5457/5492 copies cover AllHT or one surface. They do not
+observe the entire returned normal/master/scratch/counter/report allocation.
+The simple branch5334-5354 moves full surface columns, including non-AllHT columns.
+An AllHT-only endpoint cannot certify those copied tails or a complete state.
+
+Init prefix2258-2300 changes current surface temperatures and inside report arrays
+before the selected suffix starts2323. Feeding reports from2209 and comparing
+their whole-Init reset to an API that preserves them would compare different
+boundaries. A real snapshot after2322 supplies the exact selected suffix input.
+Only history-state outputs are claimed; zone air, convection, cavities, Kiva,
+OSCM and whole report completion remain outside this API.
+
+The catalog is captured after actual allocation350. Entry context has current
+Surface.Construction IDs, but that does not prove an older catalog's coefficients
+are the current referenced owners. A new input-boundary catalog must copy actual
+referenced Construction IDs,12 fixed19 arrays,counts,CTFTimeStep,UValue and scope
+selectors, with actual Zone/Space traversal and AllHT order. No name-only lookup,
+coefficient inference, stale-generation assumption or recreated coefficients.
+
+## Minimum prospective Native05 augmentation
+
+The accompanying plan selects three new passive calls after Original2322,2436,
+5496. It extends existing Update entry5222 and simple-copy5354 payloads, retaining
+all51 existing passive calls unchanged. Reuse the actual history copier for full
+allocated normal/master histories, non-AllHT columns, counter/scratch/report
+vectors and operands. Preserve true bounds/null allocation and actual clocks.
+At the two input boundaries only, copy the current catalog in genuine source
+order, selecting Construction owners by actual AllHT references without sorting.
+New field/checkpoint spellings in the plan are prospective, not an executed DTO.
+
+Selected completion is separate from the existing procedure scope_normal_exit or
+scope_unwinding event. Require both the relevant complete endpoint and genuine
+normal procedure exit for a returned-call comparison; a reached suffix followed
+by a later stop is partial context, never a fabricated function return or PASS.
+Any event copy/allocation/stream/count failure retains existing fail-closed
+integrity reporting. No event cap, observer math, engine guard or new bound.
+
+Future05 must use a distinct target/output from surface_consumer_helper so the
+retained04 Original is not overwritten. The existing five-TU recipe/core/provider
+mechanism can be adapted later with exact new target/source qualifiers. Actual
+prior inventory and all retained binaries must be protected from future metadata;
+this note invents no protected count, build row count, receipt or binary identity.
+
+## Existing-framework direct-test reuse
+
+After genuine OriginalQA, a separately reviewed input projector may bind the
+reviewed stream/source/freeze/recorder and construct explicit direct-test inputs
+from actual input-boundary owners. Join AllHT and non-AllHT rows by actual indices;
+require all19 term rows and exact full surface bounds, without clamping or filling.
+Copy the separate Zone/Space HT, opaque and AllHT orders, current public owners,
+flags,TimeStepZone,TempIn,constants,dry-bulb and allocation availability literally.
+Admission requires the API's exact ordinary opaque CTF/EMPD, no-source,
+Outdoors/Adiabatic scope and equal HT/opaque/AllHT membership sets. An unsupported
+member cannot be dropped to manufacture an eligible subset or completion.
+Use explicit identity custody; do not silently convert Native indices into real
+production Rust IDs. These are direct-function inputs, not ordinary Rust runtime
+operands or evidence that the Rust engine produced those temperatures/histories.
+
+An existing-style Rust observer invokes the selected API once per direct input
+and serializes its actual state/route/error. The strict comparer pairs the same
+Native state/procedure/invocation, complete input/output boundary and true return.
+Retain all admitted reached visits and explicit unavailability; missing required
+owners, omission or failed custody cannot pass. No branch counts are predicted.
+
+Prospective arithmetic policy can use zero atol/rtol with class/shape/signed-zero
+equality for literal finite operations. Copied/untouched owners require exact
+bits, including signed zero and supplied NaN payloads. Arithmetic NaN payload
+equivalence is not established by source alone. Root must freeze the reviewed
+policy before any new numerical comparison; no policy is tuned from observations.
+Actual float compiler options and formatted source identities remain future binds.
+
+Partial allocations, unsupported scope, capacity, missing scratch/masters,
+counter successor and SimpleCurrentRowMove stay typed unavailable, not Native
+fatal outcomes or zero defaults. A direct test does not establish multi-visit
+ordinary lifecycle, history generation/invalidation or SUR04/SUR07 integration.
+
+Base authored earlier CTF/RAD source and reviewed these dependencies. This note
+is a source/custody assessment and needs other-author review; it is no numerical
+certificate. No targets, payloads, binaries, canonical files or Git were used.

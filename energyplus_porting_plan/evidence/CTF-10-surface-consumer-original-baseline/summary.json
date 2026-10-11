@@ -1,0 +1,307 @@
+{
+  "schema": "ctf10-surface-consumer-actual-Original-baseline-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-surface-consumer-original-baseline/manifest.json",
+    "sha256": "167e150ca26665e083ef704dd4fc5ee95100a4611f13e3d45c260bae971d2898",
+    "size_bytes": 74121
+  },
+  "actual_OriginalDataQA": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-01/review.json",
+    "sha256": "709f03189cc80da46ec34f2000b1f2eb122545426a98ae8dc513e950c5a2d008",
+    "size_bytes": 33304
+  },
+  "actual_native_execution": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-command-01/receipt.json",
+    "sha256": "3d53b5915381b66577710b8ae3c65fafb6f98feca22191676d8d9d4c8a6dce5d",
+    "size_bytes": 3488
+  },
+  "actual_native_build": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-build-02/native-build.json",
+    "sha256": "9c81ac5f733edd260ff62871d87cb7e1e56059bb4b200e22ee2d094998c7b41c",
+    "size_bytes": 7781
+  },
+  "actual_PE_review": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-build-review-01/review.json",
+    "sha256": "bf2025ff3268a75f67e284fae0f0a803086d13e281a54f7ab68a6e5681491d60",
+    "size_bytes": 2599
+  },
+  "actual_input_freeze": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-frozen-inputs-02/freeze-receipt.json",
+    "sha256": "23499b76a3eac950fd893e0c5f2ac33af2d11b88a71be9f2a37085ac5d9fc645",
+    "size_bytes": 20255
+  },
+  "actual_executions": {
+    "surface-consumer-build-launch-command-02": {
+      "path": ".runtime/porting/CTF-10/surface-consumer-build-launch-command-02/receipt.json",
+      "sha256": "edf2d7de2553d5aeea491ad61e22803e7ec695061d52f6a94f0cd75af4240060",
+      "size_bytes": 2720
+    },
+    "surface-consumer-native-build-review-command-01": {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-build-review-command-01/receipt.json",
+      "sha256": "05867f0a692e33abe321ede463a934afca64ce3174c315e0ed704d10ece9cc01",
+      "size_bytes": 3010
+    },
+    "surface-consumer-native-command-01": {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-command-01/receipt.json",
+      "sha256": "3d53b5915381b66577710b8ae3c65fafb6f98feca22191676d8d9d4c8a6dce5d",
+      "size_bytes": 3488
+    },
+    "surface-consumer-original-data-review-command-01": {
+      "path": ".runtime/porting/CTF-10/surface-consumer-original-data-review-command-01/receipt.json",
+      "sha256": "22a55a199b536fab99dfbf194349d7bdfca1f995e0e58a377121145002a37663",
+      "size_bytes": 4533
+    },
+    "surface-consumer-original-stages-launch-command-01": {
+      "path": ".runtime/porting/CTF-10/surface-consumer-original-stages-launch-command-01/receipt.json",
+      "sha256": "24ab362107932431586eda8b82d4fa38c5d5038c3ef0adc9a857f14decb5789f",
+      "size_bytes": 2744
+    },
+    "surface-consumer-protected-original-storage-command-01": {
+      "path": ".runtime/porting/CTF-10/surface-consumer-protected-original-storage-command-01/receipt.json",
+      "sha256": "83ad01afe35141a673e9125bdd3768238164a49d06f861f33ea78bd2cddd1829",
+      "size_bytes": 2756
+    },
+    "surface-consumer-observation-archive-command-01": {
+      "path": ".runtime/porting/CTF-10/surface-consumer-observation-archive-command-01/receipt.json",
+      "sha256": "5d805caf830c6e730559db4dbe696d1deeb2ac2a09176903771215c12e0e7172",
+      "size_bytes": 2824
+    }
+  },
+  "actual_observation_counts": {
+    "actual_retained_events": 404878,
+    "actual_attempted_events": 404878,
+    "actual_omitted_events": 0,
+    "actual_procedure_calls": {
+      "ManageSurfaceHeatBalance": 2025,
+      "InitSurfaceHeatBalance": 2025,
+      "InitThermalAndFluxHistories": 4,
+      "UpdateThermalHistories": 2025,
+      "CalcHeatBalanceInsideSurf2CTFOnly": 2025,
+      "ReportSurfaceHeatBalance": 2025
+    },
+    "actual_checkpoint_counts": {
+      "scope_entry": 10129,
+      "actual_surface_bulb_setter_return": 2025,
+      "actual_surface_wind_setters_return": 2025,
+      "effective_surface_environment": 2025,
+      "actual_surface_allocation_return": 1,
+      "history_initialization_entry_owners": 4,
+      "history_initialization_before_flux": 144,
+      "history_initialization_after_flux": 144,
+      "history_initialization_final_owners": 4,
+      "scope_normal_exit": 10129,
+      "actual_InitThermalAndFluxHistories_return": 4,
+      "constant_before_reset": 12150,
+      "constant_after_reset": 12150,
+      "constant_skipped_num_terms_le_one": 10125,
+      "constant_after_each_ordered_term": 10125,
+      "actual_InitSurfaceHeatBalance_return": 2025,
+      "actual_outside_surface_return": 2025,
+      "inside_ctf_actual_caller_bounds": 2025,
+      "inside_ctf_cache_assigned": 12150,
+      "inside_ctf_precalculation_assigned": 12150,
+      "inside_ctf_before_temperature_assignment": 74682,
+      "inside_ctf_after_temperature_assignment": 74682,
+      "inside_ctf_current_temperature_history_assigned": 74682,
+      "inside_ctf_convergence_checks_reached": 12447,
+      "inside_ctf_loop_exited": 2025,
+      "actual_inside_surface_return": 2025,
+      "actual_air_heat_balance_return": 2025,
+      "actual_final_surface_update_return": 2025,
+      "history_update_entry_owners": 2025,
+      "actual_history_scratch_allocation_return": 1,
+      "history_actual_inside_flux_assigned": 12150,
+      "history_actual_outside_flux_and_report_assigned": 12150,
+      "simple_history_hard_copy_complete": 2025,
+      "actual_UpdateThermalHistories_return": 2025,
+      "opaque_conduction_report_loop_reached": 2025,
+      "conduction_reports_before_face_assignments": 12150,
+      "conduction_reports_after_storage_assignments": 12150,
+      "actual_ReportSurfaceHeatBalance_return": 2025
+    },
+    "actual_copy_kind_counts": {
+      "None": 141816,
+      "Catalog": 1,
+      "Environment": 2025,
+      "Histories": 4058,
+      "HistoryTerm": 288,
+      "Constants": 34425,
+      "Cache": 12150,
+      "Inside": 86832,
+      "InsideResult": 74682,
+      "Flux": 24300,
+      "Scratch": 1,
+      "HistorySurface": 0,
+      "Reports": 24300
+    },
+    "actual_history_entry_contexts": 2029,
+    "actual_unallocated_owner_copies": 99431,
+    "actual_history_entry_allocation_witness_counts": {
+      "history_initialization_entry_owners": [
+        {
+          "allocation": {
+            "normal_histories_complete": true,
+            "master_allocation": "none",
+            "scratch_allocation": "none",
+            "counter_allocated": false,
+            "flux_report_owners_allocated": true,
+            "surface_operand_owners_allocated": true,
+            "actual_update_first_time": true
+          },
+          "actual_entry_count": 1
+        },
+        {
+          "allocation": {
+            "normal_histories_complete": true,
+            "master_allocation": "none",
+            "scratch_allocation": "all",
+            "counter_allocated": false,
+            "flux_report_owners_allocated": true,
+            "surface_operand_owners_allocated": true,
+            "actual_update_first_time": false
+          },
+          "actual_entry_count": 3
+        }
+      ],
+      "history_update_entry_owners": [
+        {
+          "allocation": {
+            "normal_histories_complete": true,
+            "master_allocation": "none",
+            "scratch_allocation": "none",
+            "counter_allocated": false,
+            "flux_report_owners_allocated": true,
+            "surface_operand_owners_allocated": true,
+            "actual_update_first_time": true
+          },
+          "actual_entry_count": 1
+        },
+        {
+          "allocation": {
+            "normal_histories_complete": true,
+            "master_allocation": "none",
+            "scratch_allocation": "all",
+            "counter_allocated": false,
+            "flux_report_owners_allocated": true,
+            "surface_operand_owners_allocated": true,
+            "actual_update_first_time": false
+          },
+          "actual_entry_count": 2024
+        }
+      ]
+    },
+    "actual_null_scalar_copies": 6,
+    "copy_or_stream_integrity_failed": false,
+    "required_lifecycle_owners_reached": true
+  },
+  "lossless_full_observation_archive": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-observation-archive-01/record.json",
+    "sha256": "590c00d08d9cfa0c3eada37aba7b42ed02f702832973209cb3131cc8f5822378",
+    "size_bytes": 1200
+  },
+  "actual_ordinary_output_files": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.audit",
+      "sha256": "6e7174454717473719262f20f6d1b372cfb16b4f50e07880512c8e89c1a04666",
+      "size_bytes": 1569
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.bnd",
+      "sha256": "3b785b952938ac42ddc998f5ba34006f202cbcab4cbfb7d595816e2bead3b414",
+      "size_bytes": 6365
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.dxf",
+      "sha256": "a4794b3d55ad482af760aa8e86d6a4ef2f572a8ee0658ed9eca2487622b3a58b",
+      "size_bytes": 6096
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.eio",
+      "sha256": "d64f45b8e0348064f5db8ec487e68a28f15949cc8dc64034592f2c9c5addeab5",
+      "size_bytes": 15376
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.end",
+      "sha256": "2e189976516da8c22dce1cd8e096a720b986478ff3724e4cef7377b49fa3e206",
+      "size_bytes": 98
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.err",
+      "sha256": "28e8b032541d742932598912366f71039df413219946d2de32fc98c1343f8f8a",
+      "size_bytes": 897
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.eso",
+      "sha256": "86301f72bb534736bbadb901323a842e3d4b7cfb8002fe49a027264f3994e889",
+      "size_bytes": 112213
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.mdd",
+      "sha256": "75e6284dee8e4772b3cb7d3aba79bdf46b641ac011038698c03382cea13fe4e7",
+      "size_bytes": 3851
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.mtd",
+      "sha256": "c2b05a418e2bead4118bd119f61478e0913be42e9af907b6f883afedace1ffe2",
+      "size_bytes": 7539
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.mtr",
+      "sha256": "18b032122db2039b9c509b42a4df83fb87bb080478cae061d7bad93f9d7e9bb4",
+      "size_bytes": 2490
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.rdd",
+      "sha256": "967d841572d9c80e4231fbea374b0428a829623303677b848cf8c5e8811b0bef",
+      "size_bytes": 30562
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplusout.shd",
+      "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+      "size_bytes": 1557
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplustbl.csv",
+      "sha256": "2ae0996ac9eda803a74f40d0df75af2fa4505bdba67d28e680dd9c0090b236ce",
+      "size_bytes": 84703
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplustbl.htm",
+      "sha256": "6bcb5076f628cdbff9f610825ec03fb722cb173675245c595d267d7c556047be",
+      "size_bytes": 354322
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplustbl.tab",
+      "sha256": "e59a26633d3c680658cf4f406e5bd432a3a5d18db752146f4a4cdd0de8d06273",
+      "size_bytes": 84700
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplustbl.txt",
+      "sha256": "9d1d3368c1edeb66eb8a1cb8f1cedf0e84cc540debf0c30c3dd446cb13a115e1",
+      "size_bytes": 163344
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-output-01/A-24H/eplustbl.xml",
+      "sha256": "f63248461b645b5168ba7226d62854bf46fe2a959b7a41faa4ae31a6fec6db70",
+      "size_bytes": 226145
+    }
+  ],
+  "Original_capture_custody_released": true,
+  "history_direct_unit_execution_authorized": false,
+  "history_observation_gap_assessment": {
+    "path": ".runtime/porting/CTF-10/thermal-history-observation-readiness-prep-01/manifest.json",
+    "sha256": "01124804d787c3454d80e3f8c506fc81b0465c132d21f99bfbd010047fdf19a4",
+    "size_bytes": 19188
+  },
+  "remaining_history_observation_gaps": [
+    "actual selected suffix input afterOriginal2322",
+    "complete allocated normal/master/scratch/report/counter endpoint owners",
+    "current referenced Construction coefficients and source-order traversal at input boundaries"
+  ],
+  "thermal_history_Rust_arithmetic_applied": false,
+  "Native_trace_used_as_ordinary_Rust_production_input": false,
+  "numerical_comparison_count": null,
+  "numerical_PASS_claimed": false,
+  "integration_PASS_claimed": false,
+  "full_card_gates_updated": false
+}

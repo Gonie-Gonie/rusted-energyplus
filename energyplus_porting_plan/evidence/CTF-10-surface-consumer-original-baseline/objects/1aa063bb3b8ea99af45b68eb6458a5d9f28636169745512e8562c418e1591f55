@@ -1,0 +1,312 @@
+"""Factual whole-engine surface event custody; no equations, Rust run or comparison."""
+import argparse
+import hashlib
+import importlib.util
+import json
+import re
+from datetime import datetime, timezone
+from pathlib import Path
+
+PREP = Path(__file__).resolve().parent
+IO_SHA = "7c91d59d774d4e3cc9141cc9f40d0ae9abdb736385f17bb2b9afcf295222a27d"
+SHAPE_SHA = "0c0ab15c3d065263154f5b784d8354b49f250f5d9deae3d2b66a26160b717128"
+STREAM_SHA = "8e7f05196fe567c052352d4d0fe501eb02a0f8e5a623c20f7dcd3db669f6bab8"
+PE_PREPARATION = {"path": ".runtime/porting/CTF-10/surface-consumer-native-build-review-prep-01/manifest.json",
+                  "sha256": "a1a37dcd134bc4b04ae3fa03f48b55faf63938df9a1839e7f377ed509f5d301b"}
+PE_READER_SHA = "2dc1c55ac42ae046ffc5ad5401a8b0c56859556817d2d1bed92082bd02b5a3da"
+MAX_OBSERVATION_BYTES = 4294967296
+
+
+def boot(name, filename, digest):
+    path = PREP / filename
+    if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+        raise ValueError("Reviewed stdlib dependency differs before import")
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module
+
+
+def run(args):
+    m = boot("surface_data_io", "packet_io.py", IO_SHA)
+    shape = boot("surface_event_shape", "event_shape.py", SHAPE_SHA)
+    stream = boot("surface_event_stream", "stream_events.py", STREAM_SHA)
+    started = datetime.now(timezone.utc).isoformat()
+    m.require(Path.cwd().resolve() == m.ROOT and m.identity(__file__)["sha256"] == args.approved_source_sha256,
+              "Approved source SHA and actual recorded repository cwd required")
+
+    def same(left, right):
+        m.require(m.contained(left["path"], existing=False) == m.contained(right["path"], existing=False) and
+                  left["sha256"] == right["sha256"] and re.fullmatch("[0-9a-f]{64}", left["sha256"]),
+                  "Actual direct artifact identities differ")
+
+    def instant(text):
+        value = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        m.require(value.tzinfo is not None, "Aware actual UTC interval required")
+        return value
+
+    def recorded(ref, before=None, require_zero=True):
+        value = m.load(ref)
+        exit_known = type(value["exit_code"]) is int
+        launch_unknown = (not require_zero and value["exit_code"] is None and
+                          type(value["launch_error"]) is str and bool(value["launch_error"]))
+        m.require(value["schema"] == "recorded-porting-command.v1" and (exit_known or launch_unknown) and
+                  value["source_bytes_match_before_and_after"] is True and Path(value["cwd"]).resolve() == m.ROOT,
+                  "Genuine source-preserving repository recorder required")
+        if require_zero:
+            m.require(value["exit_code"] == 0 and value["launch_error"] is None, "Actual preceding recorded command0 required")
+        m.require(instant(value["started_utc"]) <= instant(value["finished_utc"]), "Actual command interval differs")
+        if before is not None:
+            m.require(instant(value["finished_utc"]) <= instant(before), "Required actual predecessor is later")
+        for key in ["stdout", "stderr", "source_snapshot"]:
+            m.bind(value[key])
+        m.require(value["executed_launcher"]["historical_path"] == "tools/porting/record_command.py",
+                  "Actual recorder source owner differs")
+        m.bind(value["executed_launcher"]["archive"])
+        return value
+
+    def python_command(command, reader, options):
+        m.require(len(command) == 5 + 2 * len(options) and Path(command[0]).name.lower() in ["python", "python.exe"] and
+                  command[1:4] == ["-X", "utf8", "-B"] and m.contained(command[4]) == m.contained(reader["path"]),
+                  "Actual approved reader CLI differs")
+        pairs = list(zip(command[5::2], command[6::2]))
+        m.require(len({key for key, _ in pairs}) == len(pairs) and {key for key, _ in pairs} == set(options),
+                  "Exact actual reader options required")
+        return dict(pairs)
+
+    names = ["source-manifest", "native-execution", "freeze-receipt", "freeze-execution", "build",
+             "build-execution", "build-review", "build-review-execution"]
+    refs = {name: m.argument(getattr(args, name.replace("-", "_"))) for name in names}
+    native = recorded(refs["native-execution"], started, require_zero=False)
+    own_manifest = m.load(refs["source-manifest"])
+    own_paths = [Path(__file__), PREP / "event_shape.py", PREP / "stream_events.py", PREP / "packet_io.py"]
+    m.require(own_manifest["schema"] == "ctf10-surface-consumer-original-data-source-preparation.v1" and
+              [m.bind(row) for row in own_manifest["own_sources"]] == [m.identity(path) for path in own_paths],
+              "Actual approved four-source reader inventory differs")
+    freeze, build = m.load(refs["freeze-receipt"]), m.load(refs["build"])
+    native_ref = m.bind(freeze["native_source_manifest"])
+    build_source_ref, pe_preparation_ref = m.bind(build["build_source_manifest"]), m.bind(PE_PREPARATION)
+    native_prep, build_prep, pe_prep = m.load(native_ref), m.load(build_source_ref), m.load(pe_preparation_ref)
+    m.require(native_prep["schema"] == "ctf10-surface-consumer-native-source-preparation.v1" and
+              build_prep["schema"] == "ctf10-surface-consumer-native-build-source-preparation.v1",
+              "Actual reviewed consumer source preparation schemas differ")
+    same(build_prep["native_source_manifest"], native_ref)
+    native_own = {Path(row["path"]).name: m.bind(row) for row in native_prep["own_source_and_metadata"]}
+    context = m.load(native_own["source-context.json"])
+    context_sources = {row["path"]: m.bind(row) for row in context["sources"]}
+    original_paths = [".reference/energyplus-src/26.1.0/src/EnergyPlus/api/EnergyPlusPgm.cc",
+                      ".reference/energyplus-src/26.1.0/src/EnergyPlus/CommandLineInterface.cc"]
+    compiled = [native_own[name] for name in ["surface_consumer_main.cpp", "HeatBalanceSurfaceManager.surface_consumer.cc",
+                "surface_consumer_observer.cc"]] + [context_sources[name] for name in original_paths]
+    native_sources = compiled + [native_own[name] for name in ["surface_consumer_observer.hh", "surface_consumer_reference.cmake"]]
+    additions = m.load(native_own["additions.json"])
+    checkpoints = shape.checkpoint_spec(additions, m.require)
+    for row in build_prep["own_sources"] + build_prep["mechanism_sources"] + build_prep["inherited_recipe_sources"]:
+        m.bind(row)
+
+    frozen_command = recorded(refs["freeze-execution"], native["started_utc"])
+    m.require(m.load(frozen_command["stdout"]) == freeze and freeze["schema"] == "ctf10-surface-consumer-input-freeze.v1" and
+              freeze["frozen_before_this_surface_consumer_execution"] is True, "Actual input-only freeze/fullstdout required")
+    literal_writer = m.bind(freeze["executed_literal_writer"])
+    m.require(literal_writer["path"] == ".runtime/porting/CTF-10/freeze-surface-consumer-inputs.py",
+              "Actual Root literal-freeze source owner differs")
+    m.require(any(m.contained(value, existing=False) == m.contained(literal_writer["path"])
+                  for value in frozen_command["command"] if type(value) is str and value.endswith(".py")),
+              "Actual freeze command does not invoke its authenticated literal writer")
+    scope_ref, scope_execution_ref = freeze["scope_amendment"], freeze["scope_execution"]
+    scope = m.load(scope_ref)
+    scope_command = recorded(scope_execution_ref, frozen_command["started_utc"])
+    m.require(scope["schema"] == "ctf10-surface-consumer-scope-amendment.v1", "Actual selected source scope required")
+    command = scope_command["command"]
+    m.require(command[:4] == ["python", "-X", "utf8", "-B"] and
+              command[4:] == ["tools/porting/check_plan.py", "--check", "--card", "CTF-10"], "Actual selected source check command differs")
+    guards_source = m.load(build_prep["fixed_input_guards_source"])
+    guards = guards_source["all45_fixed_input_guards"]
+    m.require(type(guards) is list and len(guards) == 45, "All45 authentic fixed input guards required")
+    for packet in [scope, freeze]:
+        same(packet["native_source_manifest"], native_ref)
+        m.require(packet["fixed_scope"] == guards_source["fixed_scope"] and packet["all45_fixed_input_guards"] == guards and
+                  packet["selected_case_id"] == "A-24H" and type(packet["observation_max_bytes"]) is int and
+                  packet["observation_max_bytes"] == MAX_OBSERVATION_BYTES, "Literal selected input/physical resource scope differs")
+        for key in ["scientific_execution_performed", "expected_values_supplied", "integration_PASS_claimed", "full_card_gates_updated"]:
+            m.require(packet[key] is False, "Actual pre-capture scope exceeds admission")
+        docs = packet["source_authorities"]["current_after_documents"]
+        m.require([row["path"] for row in docs] == build_prep["current_after_document_paths"] and len(docs) == 3,
+                  "Exact current three documentary owners required")
+        for row in docs:
+            m.bind(row)
+        for kind, key in [("input", "selected_input"), ("weather", "selected_weather")]:
+            matches = [row["actual"] for row in guards if row["case_id"] == "A-24H" and row["kind"] == kind]
+            m.require(len(matches) == 1 and packet[key] == matches[0], "Actual A24 input/weather guard association differs")
+    m.require(freeze["source_authorities"] == scope["source_authorities"], "Actual scope/freeze documentary custody differs")
+    m.bind(freeze["fixed_scope"])
+    for row in guards:
+        m.bind(row["actual"])
+    idd = m.bind(freeze["selected_idd"])
+    m.require(idd["path"] == ".runtime/energyplus/26.1.0/Energy+.idd", "Genuine selected IDD owner required")
+    forwarded = freeze["forwarded_native_arguments"]
+    m.require(type(forwarded) is list and len(forwarded) == 7 and all(type(x) is str for x in forwarded) and
+              forwarded[::2][:3] == ["-i", "-w", "-d"], "Only actual ordinary seven arguments admitted; no run shortening")
+    for index, row in [(1, idd), (3, freeze["selected_weather"]), (6, freeze["selected_input"])]:
+        m.require(Path(forwarded[index]).is_absolute() and m.contained(forwarded[index]) == m.contained(row["path"]),
+                  "Actual forwarded IDD/weather/input path differs")
+    native_output = m.contained(forwarded[5], existing=False)
+    observation_path = m.contained(freeze["observation_output_path"], existing=False)
+    expected_base = m.CTF / "surface-consumer-native-output-01"
+    m.require(Path(forwarded[5]).is_absolute() and Path(freeze["observation_output_path"]).is_absolute() and
+              native_output == expected_base / "A-24H" and observation_path == expected_base / "A-24H.observation.json",
+              "Exact fresh ordinary/observation output identities differ")
+
+    peer = m.load(refs["build-review"])
+    m.require(build["schema"] == "ctf10-surface-consumer-native-build.v1" and build["target"] == "surface_consumer_helper" and
+              build["status"] == "pass-actual-5TU-link-and-preservation", "Actual five-TU build required")
+    for key in ["all_previous_compile_commands_unchanged", "protected_artifacts_and_present_core_objects_unchanged", "link_provider_verified"]:
+        m.require(build[key] is True, "Actual build preservation/provider proof required")
+    m.require([m.bind(row) for row in build["native_source_files"]] == native_sources and
+              [m.bind(row) for row in build["compiled_source_files"]] == compiled and
+              build["current_compile_rows"] == build["previous_compile_rows"] + 5 and
+              (build["core_registered"], build["core_present"], build["core_absent"]) == (643, 631, 12) and
+              type(build["protected_ref_count"]) is int and build["protected_ref_count"] > 0, "Actual Native/core/old-row custody differs")
+    for key, expected in [("native_source_manifest", native_ref), ("build_source_manifest", build_source_ref),
+                          ("freeze_receipt", refs["freeze-receipt"]), ("freeze_execution", refs["freeze-execution"]),
+                          ("scope_amendment", scope_ref), ("scope_execution", scope_execution_ref),
+                          ("compile_execution", refs["build-execution"])]:
+        same(build[key], expected)
+    compile_command = recorded(refs["build-execution"], native["started_utc"])
+    configure_command = recorded(build["configure_execution"], compile_command["started_utc"])
+    derivation_command = recorded(build["derivation_execution"], native["started_utc"])
+    peer_command = recorded(refs["build-review-execution"], native["started_utc"])
+    m.require(instant(frozen_command["finished_utc"]) <= instant(configure_command["started_utc"]) and
+              instant(compile_command["finished_utc"]) <= instant(derivation_command["started_utc"]) and
+              instant(derivation_command["finished_utc"]) <= instant(peer_command["started_utc"]), "Actual freeze/build/derive/PE ordering differs")
+    m.require(peer["schema"] == "ctf10-surface-consumer-independent-build-PE-review.v1" and
+              peer["status"] == "pass-exact-retained-PE-runtime-and-actual-build-identity" and peer["retained_runtime_exact"] is True,
+              "Actual independent strict PE review required")
+    same(peer["build"], refs["build"])
+    pe_reader = m.bind(peer["executed_reader"])
+    same(pe_reader, pe_prep["own_sources"][0])
+    m.require(pe_reader["sha256"] == PE_READER_SHA, "Exact reviewed PE source required")
+    options = python_command(peer_command["command"], pe_reader, ["--build", "--output-dir"])
+    same(m.argument(options["--build"]), refs["build"])
+    m.require(m.contained(options["--output-dir"], existing=False) == m.contained(refs["build-review"]["path"]).parent,
+              "Actual independent PE output operand differs")
+    stdout = m.load(peer_command["stdout"])
+    m.require(set(stdout) == {"review", "status"} and stdout["status"] == peer["status"], "Actual compact PE stdout required")
+    same(stdout["review"], refs["build-review"])
+    for key in ["helper_binary", "linked_original", "validated_derivative"]:
+        same(peer[key], build[key])
+    m.bind(peer["native_pe_source"]); m.bind(build["validated_derivative"]); m.bind(build["preservation"])
+    maps = {key: m.load(peer["maps"][key]) for key in ["original", "derived", "comparison"]}
+    m.require(maps["comparison"]["status"] == "pass-exact-retained-runtime-sections-and-directories", "Actual strict retained-runtime comparison required")
+    for key, binary in [("original", "linked_original"), ("derived", "helper_binary")]:
+        m.require(maps[key]["sha256"] == build[binary]["sha256"] and type(build[binary]["size_bytes"]) is int and
+                  maps[key]["size_bytes"] == build[binary]["size_bytes"] > 0, "Actual PE full binary identity differs")
+    for receipt in [scope_command, frozen_command, configure_command, compile_command, derivation_command, peer_command]:
+        same(receipt["source_snapshot"], native["source_snapshot"])
+    snapshot = m.load(native["source_snapshot"])
+    m.require(snapshot["schema"] == "rust-command-source-snapshot.v1" and snapshot["bytes_normalized"] is False,
+              "Actual whole source snapshot required")
+    seen = set()
+    for row in snapshot["files"]:
+        m.require(row["historical_path"] not in seen, "Duplicate whole-source member")
+        seen.add(row["historical_path"]); archive = m.bind(row["archive"])
+        current = m.bind({"path": row["historical_path"], "sha256": archive["sha256"], "size_bytes": row["size_bytes"]})
+        m.require(current["size_bytes"] == archive["size_bytes"], "Actual source member archive differs")
+
+    result_name, separator, result_sha = args.results.rpartition("#")
+    if not separator:
+        result_name, result_sha = args.results, None
+    m.require(result_sha is None or re.fullmatch("[0-9a-f]{64}", result_sha), "Explicit preserved observation SHA required")
+    m.require(m.contained(result_name, existing=False) == observation_path, "Actual frozen observation output differs")
+    command = native["command"]
+    m.require(len(command) == 11 and m.contained(command[0], existing=False) == m.contained(build["helper_binary"]["path"], existing=False) and
+              command[1:4] == ["--surface-observation-file", freeze["observation_output_path"], "--"] and command[4:] == forwarded,
+              "Actual whole-engine helper argc11/forwarded ordinary arguments differ")
+    counts, header, result_ref, failure = None, None, None, []
+    complete = False
+    if observation_path.is_file() and native["launch_error"] is None:
+        if observation_path.stat().st_size > MAX_OBSERVATION_BYTES:
+            failure.append("Complete retained observation exceeds frozen4GiB physical review bound; no prefix reviewed")
+        else:
+            m.require(result_sha is not None, "Existing actual observation requires supplied exact SHA")
+            result_ref = m.bind_observation({"path": result_name, "sha256": result_sha})
+            review = shape.Review(m.require, checkpoints)
+            try:
+                header = stream.read(observation_path, m.require, m.unique_object, review.visit)
+                m.require(header["schema"] == "ctf10-surface-consumer-native-observation.v1" and
+                          header["actual_native_arguments"] == [command[0], *forwarded], "Actual engine forwarded argv8 differs")
+                counts = review.finish(header["summary"])
+                complete = True
+            except (ValueError, KeyError, TypeError, OverflowError, UnicodeError) as error:
+                failure.append(type(error).__name__ + ": " + str(error))
+    else:
+        failure.append("Actual observation file or OS launch unavailable; no event/return count inferred")
+    if complete:
+        summary = header["summary"]
+        expected_exit = (74 if counts["copy_or_stream_integrity_failed"] else
+                         70 if not summary["actual_engine_entry_returned"] else summary["actual_engine_exit_code"])
+        if native["exit_code"] != expected_exit:
+            failure.append("Actual helper exit differs from retained transport/engine return availability")
+        if counts["copy_or_stream_integrity_failed"]:
+            failure.append("Actual copy/stream omission or counter integrity failure")
+        if not counts["required_lifecycle_owners_reached"]:
+            failure.append("Required ordinary lifecycle checkpoint/return owners not reached")
+    release = complete and not failure and native["exit_code"] == 0 and native["launch_error"] is None
+
+    # Full ordinary files are hashed, never parsed as scientific values. No file-size cap or truncation.
+    output_files = []
+    if native_output.exists():
+        m.require(native_output.is_dir(), "Actual ordinary output owner must be a directory")
+        for path in sorted(native_output.rglob("*")):
+            if path.is_file():
+                output_files.append(m.identity(path, max_bytes=path.stat().st_size))
+    def recheck_outputs():
+        paths = sorted(path for path in native_output.rglob("*") if path.is_file()) if native_output.exists() else []
+        m.require([m.identity(path, max_bytes=path.stat().st_size) for path in paths] == output_files,
+                  "Actual ordinary output file inventory/bytes changed during review")
+
+    output = m.contained(args.output_dir, existing=False)
+    m.require(output.is_relative_to(m.CTF) and output != m.CTF and not output.exists() and
+              not output.is_relative_to(native_output) and output != observation_path.parent,
+              "Fresh separate contained OriginalDataQA output required")
+    output.mkdir(parents=True, exist_ok=False)
+    archives = [m.archive(m.identity(path), output, index) for index, path in enumerate(own_paths)]
+    reviewed_native_archives = [m.archive(row, output, index + len(archives)) for index, row in enumerate(native_sources)]
+    documentary_archives = [m.archive(m.bind(row), output, index + len(archives) + len(native_sources))
+                           for index, row in enumerate(freeze["source_authorities"]["current_after_documents"])]
+    report = {"schema": "ctf10-surface-consumer-independent-original-data-review.v1",
+        "status": "pass-actual-full-event-custody-before-Rust" if release else "fail-process-event-custody-or-required-availability-before-Rust",
+        "started_utc": started, "finished_utc": datetime.now(timezone.utc).isoformat(),
+        "reviewed_results": result_ref, "reviewed_supplied_results_argument": args.results,
+        "reviewed_native_execution": refs["native-execution"], "actual_native_process_exit_code": native["exit_code"],
+        "actual_native_launch_error": native["launch_error"], "complete_actual_event_ledger_validated": complete,
+        "actual_observation_counts": counts, "actual_event_counts_unknown": not complete,
+        "actual_terminal_availability": header["summary"] if complete else None,
+        "observation_integrity_failures": failure, "observation_max_bytes": MAX_OBSERVATION_BYTES,
+        "actual_ordinary_output_files": output_files, "ordinary_output_file_contents_parsed": False,
+        "actual_packet_freeze": refs["freeze-receipt"], "actual_packet_freeze_execution": refs["freeze-execution"],
+        "reviewed_actual_scope_amendment": scope_ref, "reviewed_actual_scope_check_execution": scope_execution_ref,
+        "reviewed_selected_input": freeze["selected_input"], "reviewed_selected_weather": freeze["selected_weather"],
+        "reviewed_selected_idd": idd, "reviewed_all45_fixed_input_guards": guards,
+        "reviewed_forwarded_native_arguments": forwarded, "reviewed_build": refs["build"],
+        "reviewed_build_execution": refs["build-execution"], "reviewed_build_review": refs["build-review"],
+        "reviewed_build_review_execution": refs["build-review-execution"], "reviewed_source_snapshot": native["source_snapshot"],
+        "reviewed_reader_source_preparation": refs["source-manifest"], "executed_reader_sources": archives,
+        "executed_reader_source_archive": archives[0]["archive"], "reviewed_native_source_archives": reviewed_native_archives,
+        "reviewed_current_document_archives": documentary_archives, "Original_capture_custody_released": release,
+        "history_direct_unit_execution_authorized": False, "native_binary_payloads_rehashed_or_parsed": False,
+        "scientific_values_recomputed_or_compared": False, "numerical_comparison_count": None,
+        "numerical_mismatch_count": None, "numerical_PASS_claimed": False,
+        "unreached_or_unallocated_owners_counted_as_PASS": False, "complete_heat_balance_lifecycle_certified": False,
+        "integration_PASS_claimed": False, "full_card_gates_updated": False,
+        "authorship_limits": "Raw authored consumer passive transport and this custody reader; no independent numerical or formula certificate."}
+    m.recheck(); recheck_outputs(); m.emit(output / "review.json", report); m.recheck(); recheck_outputs()
+    print(json.dumps(report, allow_nan=False, indent=2))
+    return 0 if release else 1
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ["approved-source-sha256", "source-manifest", "native-execution", "results", "freeze-receipt",
+                 "freeze-execution", "build", "build-execution", "build-review", "build-review-execution", "output-dir"]:
+        parser.add_argument("--" + name, required=True)
+    raise SystemExit(run(parser.parse_args()))

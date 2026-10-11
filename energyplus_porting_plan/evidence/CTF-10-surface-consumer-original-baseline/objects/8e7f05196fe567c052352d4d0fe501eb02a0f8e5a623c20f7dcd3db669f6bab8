@@ -1,0 +1,69 @@
+"""Read only the held consumer's fixed top-level JSON/event transport, without a run-sized tree."""
+import json
+
+
+def read(path, need, unique_object, visit):
+    """Visit every complete event; return the actual header and terminal summary."""
+    decoder = json.JSONDecoder(object_pairs_hook=unique_object,
+        parse_constant=lambda value: need(False, "Nonfinite JSON literal: " + value))
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        buffer, eof = "", False
+
+        def more():
+            nonlocal buffer, eof
+            block = handle.read(65536)
+            if block:
+                buffer += block
+            else:
+                eof = True
+
+        def whitespace():
+            nonlocal buffer
+            while True:
+                buffer = buffer.lstrip(" \t\r\n")
+                if buffer or eof:
+                    return
+                more()
+
+        def literal(text):
+            nonlocal buffer
+            whitespace()
+            while len(buffer) < len(text) and not eof:
+                more()
+            need(buffer.startswith(text), "Consumer JSON delimiter/order differs: " + text)
+            buffer = buffer[len(text):]
+
+        def value(expected_type):
+            nonlocal buffer
+            whitespace()
+            while True:
+                try:
+                    result, end = decoder.raw_decode(buffer)
+                except json.JSONDecodeError:
+                    if eof:
+                        raise
+                    more()
+                    continue
+                need(type(result) is expected_type, "Consumer JSON member type differs")
+                buffer = buffer[end:]
+                return result
+
+        literal('{"schema":')
+        schema = value(str)
+        literal(',"actual_native_arguments":')
+        arguments = value(list)
+        literal(',"events":[')
+        whitespace()
+        if not buffer.startswith("]"):
+            while True:
+                visit(value(dict))
+                whitespace()
+                if buffer.startswith("]"):
+                    break
+                literal(",")
+        literal('],"summary":')
+        summary = value(dict)
+        literal("}")
+        whitespace()
+        need(eof and not buffer, "Trailing consumer JSON bytes are not admitted")
+    return {"schema": schema, "actual_native_arguments": arguments, "summary": summary}
