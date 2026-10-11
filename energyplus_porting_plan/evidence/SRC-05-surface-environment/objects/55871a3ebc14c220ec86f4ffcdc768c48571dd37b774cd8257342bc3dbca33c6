@@ -1,0 +1,15 @@
+--- .runtime/porting/SRC-05/surface-environment-prep-01/proposed/crates/ep_runtime/src/heat_balance/convection.rs
++++ crates/ep_runtime/src/heat_balance/convection.rs
+@@ -402,8 +402,10 @@
+     height_m: f64,
+ ) -> f64 {
+     // Terrain does not change the admitted temperature-gradient/station defaults.
+-    surface_environment::SurfaceOutdoorEnvironmentParameters::default_weather_station(Terrain::Suburbs)
+-        .temperature_at_height(weather_file_temperature_c, height_m)
++    surface_environment::SurfaceOutdoorEnvironmentParameters::default_weather_station(
++        Terrain::Suburbs,
++    )
++    .temperature_at_height(weather_file_temperature_c, height_m)
+ }
+ 
+ pub(crate) fn heat_balance_uses_doe2_outside_convection(

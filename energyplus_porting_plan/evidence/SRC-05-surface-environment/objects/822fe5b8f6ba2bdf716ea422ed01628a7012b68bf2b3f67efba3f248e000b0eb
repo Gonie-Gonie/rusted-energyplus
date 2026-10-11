@@ -1,0 +1,40 @@
+"""Source-only equivalent Boolean lint repair; no target or result execution."""
+from pathlib import Path
+import ast, difflib, hashlib, json
+
+ROOT=Path.cwd();OLD=ROOT/'.runtime/porting/SRC-05/surface-environment-prep-04';OUT=ROOT/'.runtime/porting/SRC-05/surface-environment-prep-05'
+assert not OUT.exists();OUT.mkdir(parents=True)
+def ref(p):
+    p=Path(p);b=p.read_bytes();return dict(path=p.relative_to(ROOT).as_posix(),sha256=hashlib.sha256(b).hexdigest(),size_bytes=len(b),line_count=len(b.splitlines()))
+def write(p,s):p.parent.mkdir(parents=True,exist_ok=True);p.write_text(s,encoding='utf-8',newline='\n')
+def delta(a,b,n):return ''.join(difflib.unified_diff(a.splitlines(True),b.splitlines(True),fromfile='a/'+n,tofile='b/'+n))
+m=json.loads((OLD/'manifest.json').read_text(encoding='utf-8'));name='crates/ep_runtime/src/heat_balance/convection/surface_environment_selected_reference.rs'
+row=next(r for r in m['application'] if r['canonical_path']==name)
+old='!value.is_finite() && !(retained_nan && value.is_nan())';new='!(value.is_finite() || retained_nan && value.is_nan())'
+before=(ROOT/row['proposal']['path']).read_text(encoding='utf-8');assert before.count(old)==1
+after=before.replace(old,new);write(OUT/'before'/name,before);write(OUT/'proposed'/name,after)
+write(OUT/'diffs'/'selected_reference.from04.diff',delta(before,after,name));write(OUT/'diffs'/'selected_reference.full.diff',delta('',after,name))
+row['proposal']=ref(OUT/'proposed'/name);row['exact_diff']=ref(OUT/'diffs'/'selected_reference.full.diff')
+current=(ROOT/name).read_text(encoding='utf-8');assert current.count(old)==1
+write(OUT/'current-before'/name,current);write(OUT/'current-proposed'/name,current.replace(old,new))
+write(OUT/'diffs'/'selected_reference.actual-current.diff',delta(current,current.replace(old,new),name))
+current_row=dict(canonical_path=name,actual_before=ref(ROOT/name),before_archive=ref(OUT/'current-before'/name),proposal=ref(OUT/'current-proposed'/name),exact_diff=ref(OUT/'diffs'/'selected_reference.actual-current.diff'),new_destination_absent=False)
+readme=(OLD/'README.md').read_text(encoding='utf-8')+'''
+Narrow05 changes only the finite-or-retained-NaN Boolean spelling to the exact
+equivalent Clippy form. All constructors, calls, DTOs, inputs, scope and arithmetic
+are unchanged. The prior quality01 Clippy failure remains authentic retained
+lineage. Raw has read the released Native baseline for factual custody only;
+no Rust numerical result exists or was read, and no parity claim is supplied.
+The cumulative five proposals retain the original historical before identities;
+`narrow_actual_correction` separately pins the one actual formatted current
+file and its one-line repair for Root's application. Neither is applied here.
+'''
+write(OUT/'README.md',readme)
+for n in ('manifest.json','README.md'):write(OUT/'before'/n,(OLD/n).read_text(encoding='utf-8'))
+write(OUT/'diffs'/'README.from04.diff',delta((OLD/'README.md').read_text(encoding='utf-8'),readme,'README.md'))
+failure=ROOT/'.runtime/porting/SRC-05/surface-environment-quality-01/clippy-command/receipt.json'
+f=json.loads(failure.read_text(encoding='utf-8'));assert f['exit_code']==101 and f['source_bytes_match_before_and_after'] is True
+m.update(predecessor_source_preparation=ref(OLD/'manifest.json'),before_manifest=ref(OUT/'before'/'manifest.json'),before_README=ref(OUT/'before'/'README.md'),narrow_observer_before=ref(OUT/'before'/name),narrow_observer_diff=ref(OUT/'diffs'/'selected_reference.from04.diff'),narrow_actual_correction=current_row,retained_failed_quality=ref(failure),README=ref(OUT/'README.md'),author=ref(__file__),Native_result_values_read=True,Rust_result_values_read=False,Native_values_read_role='Released factual baseline custody only; no parity or expected values')
+m['own_sources']=[r['proposal'] for r in m['application'] if r['canonical_path'].endswith('.rs')]
+m['selected_observer_sources']=[next(r['proposal'] for r in m['application'] if r['canonical_path']==p) for p in m['selected_observer_source_paths']]
+ast.parse(Path(__file__).read_text(encoding='utf-8'));write(OUT/'manifest.json',json.dumps(m,indent=2)+'\n');print(json.dumps(ref(OUT/'manifest.json')))

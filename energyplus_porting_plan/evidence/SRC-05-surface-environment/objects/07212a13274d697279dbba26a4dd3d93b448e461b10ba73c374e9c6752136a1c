@@ -1,0 +1,59 @@
+--- a/crates/ep_runtime/src/heat_balance/convection.rs
++++ b/crates/ep_runtime/src/heat_balance/convection.rs
+@@ -1,6 +1,7 @@
+ //! Heat-balance convection source-order ownership notes.
+ 
+ mod geometry_operands;
++pub mod surface_environment;
+ use crate::geometry::production_trace::{self, GeometryConsumer, GeometryOperand};
+ use crate::heat_balance::algorithm::HeatBalanceRuntimeConfig;
+ use crate::heat_balance::state::SurfaceHeatBalanceState;
+@@ -24,11 +25,7 @@
+ 
+ pub(crate) const ENERGYPLUS_LOW_CONVECTION_LIMIT_W_PER_M2_K: f64 = 0.1;
+ pub(crate) const ENERGYPLUS_HIGH_CONVECTION_LIMIT_W_PER_M2_K: f64 = 1000.0;
+-const ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_SENSOR_HEIGHT_M: f64 = 10.0;
+-const ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_EXPONENT: f64 = 0.14;
+-const ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_BOUNDARY_LAYER_HEIGHT_M: f64 = 270.0;
+ pub(crate) const ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M: f64 = 1.5;
+-const ENERGYPLUS_DEFAULT_OUTDOOR_AIR_TEMPERATURE_GRADIENT_K_PER_M: f64 = 0.0065;
+ 
+ #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+ pub(crate) enum EnergyPlusTarpNaturalConvectionBranch {
+@@ -377,21 +374,8 @@
+     weather_file_wind_speed_m_per_s: f64,
+     height_m: f64,
+ ) -> f64 {
+-    if height_m <= 0.0 || weather_file_wind_speed_m_per_s <= 0.0 {
+-        return 0.0;
+-    }
+-
+-    let (site_wind_exp, site_wind_boundary_layer_height_m) = energyplus_site_wind_profile(terrain);
+-    if site_wind_exp == 0.0 {
+-        return weather_file_wind_speed_m_per_s;
+-    }
+-
+-    let weather_file_wind_mod_coeff = (ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_BOUNDARY_LAYER_HEIGHT_M
+-        / ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_SENSOR_HEIGHT_M)
+-        .powf(ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_EXPONENT);
+-    weather_file_wind_speed_m_per_s
+-        * weather_file_wind_mod_coeff
+-        * (height_m / site_wind_boundary_layer_height_m).powf(site_wind_exp)
++    surface_environment::SurfaceOutdoorEnvironmentParameters::default_weather_station(terrain)
++        .wind_speed_at_height(weather_file_wind_speed_m_per_s, height_m)
+ }
+ 
+ pub(crate) fn energyplus_site_wind_profile(terrain: Terrain) -> (f64, f64) {
+@@ -417,9 +401,9 @@
+     weather_file_temperature_c: f64,
+     height_m: f64,
+ ) -> f64 {
+-    weather_file_temperature_c
+-        - ENERGYPLUS_DEFAULT_OUTDOOR_AIR_TEMPERATURE_GRADIENT_K_PER_M
+-            * (height_m - ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M)
++    // Terrain does not change the admitted temperature-gradient/station defaults.
++    surface_environment::SurfaceOutdoorEnvironmentParameters::default_weather_station(Terrain::Suburbs)
++        .temperature_at_height(weather_file_temperature_c, height_m)
+ }
+ 
+ pub(crate) fn heat_balance_uses_doe2_outside_convection(

@@ -1,0 +1,237 @@
+{
+  "schema": "src05-surface-environment-actual-application.v1",
+  "source_preparation": {
+    "path": ".runtime/porting/SRC-05/surface-environment-prep-04/manifest.json",
+    "sha256": "05dad8308583e1c441c1ff8c59bb4253b2b61906935fa4ef37b2ad7d848d4722"
+  },
+  "genuine_Native_baseline_before_application": {
+    "path": ".runtime/porting/SRC-05/selected-observation-01/Root-full-baseline-review.json",
+    "sha256": "630ed63a0af0a6607a3f5fa1e593c88c93ff98182d63dda23afb8914387955df"
+  },
+  "card_contract_before_implementation": {
+    "path": ".runtime/porting/source-objects/86/86ebac512f3a5c85754a0d74f8beb16e1c94a8d19362279229b74f83ced37377",
+    "sha256": "86ebac512f3a5c85754a0d74f8beb16e1c94a8d19362279229b74f83ced37377"
+  },
+  "source_before": {
+    "path": ".runtime/porting/source-objects/5f/5f982aba87e32de31a541c3cef83fd6a6d2e2fcd12efe1276b6ed2b694d0c899",
+    "sha256": "5f982aba87e32de31a541c3cef83fd6a6d2e2fcd12efe1276b6ed2b694d0c899"
+  },
+  "source_literal": {
+    "path": ".runtime/porting/source-objects/b6/b6602aad82e6f579f42226f82838c2dfc85363dad1c356e5209a961621d369c5",
+    "sha256": "b6602aad82e6f579f42226f82838c2dfc85363dad1c356e5209a961621d369c5"
+  },
+  "source_final": {
+    "path": ".runtime/porting/source-objects/c2/c21f5f0a687046825827d499e6d91cee58685c3fe95d21f9fbdc674d03cc00c1",
+    "sha256": "c21f5f0a687046825827d499e6d91cee58685c3fe95d21f9fbdc674d03cc00c1"
+  },
+  "source_file_count": 3919,
+  "unrelated_source_files_verified_byte_exact": 3915,
+  "actual_format_receipt": {
+    "path": ".runtime/porting/SRC-05/surface-environment-format-command-01/receipt.json",
+    "sha256": "b40415ec6455ce197ddef2c2d328969991f6ea18d1da613f16f8fbb0367ba195"
+  },
+  "application": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/convection.rs",
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/convection.rs",
+        "sha256": "186d1fbd20428d0dfb89de409116d7acec3f2fdc51aedf545abea4768cbcca7b",
+        "size_bytes": 14649,
+        "line_count": 437
+      },
+      "new_destination_absent": false,
+      "before_archive": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/before/crates/ep_runtime/src/heat_balance/convection.rs",
+        "sha256": "186d1fbd20428d0dfb89de409116d7acec3f2fdc51aedf545abea4768cbcca7b",
+        "size_bytes": 14649,
+        "line_count": 437
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/proposed/crates/ep_runtime/src/heat_balance/convection.rs",
+        "sha256": "cf8761f03d9d2080b4fad34fedd9c384ea0e23ed10a9286e288c6ae64a0b221b",
+        "size_bytes": 13959,
+        "line_count": 421
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/diffs/crates__ep_runtime__src__heat_balance__convection.rs.diff",
+        "sha256": "07212a13274d697279dbba26a4dd3d93b448e461b10ba73c374e9c6752136a1c",
+        "size_bytes": 2737,
+        "line_count": 59
+      },
+      "actual_final": {
+        "path": "crates/ep_runtime/src/heat_balance/convection.rs",
+        "sha256": "1117aece5e2ef573512147a3602e1e0d44999cb6c713105e3f7d1cf0ece1cfe5",
+        "size_bytes": 13970
+      },
+      "actual_formatter_diff": {
+        "path": ".runtime/porting/SRC-05/surface-environment-applied-01/formatter-1.diff",
+        "sha256": "55871a3ebc14c220ec86f4ffcdc768c48571dd37b774cd8257342bc3dbca33c6",
+        "size_bytes": 730
+      },
+      "actual_final_archive": {
+        "path": ".runtime/porting/source-objects/11/1117aece5e2ef573512147a3602e1e0d44999cb6c713105e3f7d1cf0ece1cfe5",
+        "sha256": "1117aece5e2ef573512147a3602e1e0d44999cb6c713105e3f7d1cf0ece1cfe5"
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/convection/surface_environment.rs",
+      "actual_before": null,
+      "new_destination_absent": true,
+      "before_archive": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/before/crates/ep_runtime/src/heat_balance/convection/surface_environment.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-03/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment.rs",
+        "sha256": "dd4e271c8f435cacebfe2dadbc426da51679c80f4873095317c25e5c0d7f1e18",
+        "size_bytes": 11070,
+        "line_count": 256
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-03/diffs/surface_environment.full.diff",
+        "sha256": "a89432c01f6f0d5b2ca708220c3c3815c23f0d4913b48e7033b29d3a6efc54c1",
+        "size_bytes": 11494,
+        "line_count": 259
+      },
+      "actual_final": {
+        "path": "crates/ep_runtime/src/heat_balance/convection/surface_environment.rs",
+        "sha256": "47f3c5f5867a2ee1f3afe631a8e939da9978264029246170677ccb5d9043ba2a",
+        "size_bytes": 11541
+      },
+      "actual_formatter_diff": {
+        "path": ".runtime/porting/SRC-05/surface-environment-applied-01/formatter-2.diff",
+        "sha256": "efe3fcbac1d408591270dccb4134d1283d89f263e3f717c10236e54487c26dc0",
+        "size_bytes": 9283
+      },
+      "actual_final_archive": {
+        "path": ".runtime/porting/source-objects/47/47f3c5f5867a2ee1f3afe631a8e939da9978264029246170677ccb5d9043ba2a",
+        "sha256": "47f3c5f5867a2ee1f3afe631a8e939da9978264029246170677ccb5d9043ba2a"
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/runtime/tests/part03.rs",
+      "actual_before": {
+        "path": "crates/ep_runtime/src/runtime/tests/part03.rs",
+        "sha256": "fff25a816be772d0d4d4dc2d782e2a45f800bcd9c61dfa92b7fe9364fbca8536",
+        "size_bytes": 48079,
+        "line_count": 1181
+      },
+      "new_destination_absent": false,
+      "before_archive": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/before/crates/ep_runtime/src/runtime/tests/part03.rs",
+        "sha256": "fff25a816be772d0d4d4dc2d782e2a45f800bcd9c61dfa92b7fe9364fbca8536",
+        "size_bytes": 48079,
+        "line_count": 1181
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/proposed/crates/ep_runtime/src/runtime/tests/part03.rs",
+        "sha256": "12df9c3a605b1d5e1ffa2c4236b0cff22f188a66915b0454de7e9c04c20d738f",
+        "size_bytes": 48358,
+        "line_count": 1185
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/diffs/crates__ep_runtime__src__runtime__tests__part03.rs.diff",
+        "sha256": "fe7cd5b36e3292c0cf7487bc76ec4ab8143454074ee51f33df4367d6a4b24a4e",
+        "size_bytes": 1288,
+        "line_count": 23
+      },
+      "actual_final": {
+        "path": "crates/ep_runtime/src/runtime/tests/part03.rs",
+        "sha256": "12df9c3a605b1d5e1ffa2c4236b0cff22f188a66915b0454de7e9c04c20d738f",
+        "size_bytes": 48358
+      },
+      "actual_formatter_diff": {
+        "path": ".runtime/porting/SRC-05/surface-environment-applied-01/formatter-3.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_final_archive": {
+        "path": ".runtime/porting/source-objects/12/12df9c3a605b1d5e1ffa2c4236b0cff22f188a66915b0454de7e9c04c20d738f",
+        "sha256": "12df9c3a605b1d5e1ffa2c4236b0cff22f188a66915b0454de7e9c04c20d738f"
+      }
+    },
+    {
+      "canonical_path": "energyplus_porting_plan/cards/SRC-05.md",
+      "actual_before": {
+        "path": "energyplus_porting_plan/cards/SRC-05.md",
+        "sha256": "444a3b1b2c36b2032117aaaa0012527963a439c0a31321bc37784b4e43bbec49",
+        "size_bytes": 2795,
+        "line_count": 70
+      },
+      "new_destination_absent": false,
+      "before_archive": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/before/energyplus_porting_plan/cards/SRC-05.md",
+        "sha256": "444a3b1b2c36b2032117aaaa0012527963a439c0a31321bc37784b4e43bbec49",
+        "size_bytes": 2795,
+        "line_count": 70
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/proposed/energyplus_porting_plan/cards/SRC-05.md",
+        "sha256": "86ebac512f3a5c85754a0d74f8beb16e1c94a8d19362279229b74f83ced37377",
+        "size_bytes": 4503,
+        "line_count": 96
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/diffs/energyplus_porting_plan__cards__SRC-05.md.diff",
+        "sha256": "8adbf997fe67cdfd3de3ebfd935af59971207f58c9caa762ae3d78f38cdd7730",
+        "size_bytes": 1930,
+        "line_count": 32
+      },
+      "actual_final": {
+        "path": "energyplus_porting_plan/cards/SRC-05.md",
+        "sha256": "86ebac512f3a5c85754a0d74f8beb16e1c94a8d19362279229b74f83ced37377",
+        "size_bytes": 4503
+      },
+      "actual_formatter_diff": {
+        "path": ".runtime/porting/SRC-05/surface-environment-applied-01/formatter-4.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "actual_final_archive": {
+        "path": ".runtime/porting/source-objects/86/86ebac512f3a5c85754a0d74f8beb16e1c94a8d19362279229b74f83ced37377",
+        "sha256": "86ebac512f3a5c85754a0d74f8beb16e1c94a8d19362279229b74f83ced37377"
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/convection/surface_environment_selected_reference.rs",
+      "actual_before": null,
+      "before_archive": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-03/before/crates/ep_runtime/src/heat_balance/convection/surface_environment_selected_reference.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-04/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment_selected_reference.rs",
+        "sha256": "069057c9bdf5bfd9ed150d8b7b90dacb8f668997280000ee590aa106352b6d50",
+        "size_bytes": 13756,
+        "line_count": 179
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-04/diffs/selected_reference.full.diff",
+        "sha256": "2551b5d26f959fc8a33f94ee0d6fb7dcf914fab8203b0c57b3d482995272b24f",
+        "size_bytes": 14141,
+        "line_count": 182
+      },
+      "new_destination_absent": true,
+      "actual_final": {
+        "path": "crates/ep_runtime/src/heat_balance/convection/surface_environment_selected_reference.rs",
+        "sha256": "eedf56d71325e87e17803560b7c87aaa880ca9b70430cd2bf556caf8e312a954",
+        "size_bytes": 15971
+      },
+      "actual_formatter_diff": {
+        "path": ".runtime/porting/SRC-05/surface-environment-applied-01/formatter-5.diff",
+        "sha256": "f8506d859c451662a944b797a83ccaa0b5e2918f5191ca89a5fe19f713c01d45",
+        "size_bytes": 23708
+      },
+      "actual_final_archive": {
+        "path": ".runtime/porting/source-objects/ee/eedf56d71325e87e17803560b7c87aaa880ca9b70430cd2bf556caf8e312a954",
+        "sha256": "eedf56d71325e87e17803560b7c87aaa880ca9b70430cd2bf556caf8e312a954"
+      }
+    }
+  ],
+  "numerical_comparison_performed": false,
+  "gates_updated": false
+}

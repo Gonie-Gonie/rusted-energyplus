@@ -1,0 +1,33 @@
+# Genuine Native same-input unit plan (not executed)
+
+No existing standalone DataSurfaces setter helper was found. Reuse the accepted
+RAD/ZON one-TU JSON request/response/IEEE codec and real EnergyPlusData/CoreArchive
+pattern; do not derive another engine TU or reuse Native06 lifecycle machinery.
+Call the unchanged public DataSurfaces functions, with an address-bound core
+provider proof when built. No target/build/runner is authored in this hold.
+
+Prepare fresh true state; allocate Surface plus all four SurfOut arrays to the
+literal row count. Assign actual centroid z/ExtWind, global weather operands,
+site/station parameters and all four incoming owners from input-only bit DTOs.
+Retain row identity/order, every before/after owner and actual call/return/throw.
+For the normal source-order lane call bulb setter, genuine CheckSurfaceOutBulbTempAt,
+wind speed setter, wind direction setter; after a fatal do not call later stages.
+For diagnostic setter-only zero-gradient/exponent operands label the distinct
+direct-unit lane; never claim such inputs were admitted by fixed CON-01.
+
+Prospective finite weather/height cases: each actual Terrain default; z below/at/
+above0; weather temperature at/below/above sensor height; nonzero dry/wet separation;
+negative/zero/positive wind; both exposures with distinct nonzero incoming wind;
+two ordered calls preserving NoWind seeds; zero gradient with nonzero modifier;
+zero exponent with NoWind/nonpositive z; raw ±0 and out-of-range direction copies;
+zero surfaces; and a real below-100 guard failure with retained bulb prefix.
+Include retained NaN-payload wind seeds only on the genuine skipped NoWind row.
+No numerical outputs, expected arrays, frozen result hashes or run counts exist.
+
+Freeze source/request/ID mapping and variable-specific exact IEEE/class/copy
+policy before Native output. Compare every declared row/owner/branch; no sampling,
+clipping or blanket tolerance. Exact powf/libm disagreement is a retained mismatch,
+not a reason to alter the prospective policy. Capture backend arguments separately
+for the guard; the existing real backend can be reused only after its API review.
+Root must obtain/release actual Native data before authorizing canonical math
+application. Ordinary setter owner/timing integration is not certified by this unit.

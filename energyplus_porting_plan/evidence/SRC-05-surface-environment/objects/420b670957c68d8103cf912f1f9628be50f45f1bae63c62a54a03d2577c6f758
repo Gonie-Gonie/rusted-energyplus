@@ -1,0 +1,38 @@
+
+[[noreturn]] void
+ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda K. Lawrie
+    //       DATE WRITTEN   September 1997
+    //       MODIFIED       Kyle Benne August 2010 Added sqlite output
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine puts ErrorMessage with a Fatal designation on
+    // designated output files.  Then, the program is aborted.
+
+    // METHODOLOGY EMPLOYED:
+    // Calls ShowErrorMessage utility routine.
+    // Calls AbortEnergyPlus
+
+    using namespace DataErrorTracking;
+
+    ShowErrorMessage(state, EnergyPlus::format(" **  Fatal  ** {}", ErrorMessage), OutUnit1, OutUnit2);
+    DisplayString(state, "**FATAL:" + ErrorMessage);
+
+    ShowErrorMessage(state, " ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2);
+    ShowErrorMessage(
+        state, EnergyPlus::format(" ..... Reference severe error count={}", state.dataErrTracking->TotalSevereErrors), OutUnit1, OutUnit2);
+    ShowErrorMessage(state, EnergyPlus::format(" ..... Last severe error={}", state.dataErrTracking->LastSevereError), OutUnit1, OutUnit2);
+    if (state.dataSQLiteProcedures->sqlite) {
+        state.dataSQLiteProcedures->sqlite->createSQLiteErrorRecord(1, 2, ErrorMessage, 1);
+        if (state.dataSQLiteProcedures->sqlite->sqliteWithinTransaction()) {
+            state.dataSQLiteProcedures->sqlite->sqliteCommit();
+        }
+    }
+    if (state.dataGlobal->errorCallback) {
+        state.dataGlobal->errorCallback(Error::Fatal, ErrorMessage);
+    }
+    throw FatalError(ErrorMessage);
+}

@@ -1,0 +1,15 @@
+--- a/README.md
++++ b/README.md
+@@ -32,3 +32,12 @@
+ wind_speed_at_height returns at each real probe boundary. These methods share
+ only actual literal weather/height/parameter inputs. Native skipped NoWind or
+ unreached stages remain unpaired, never arithmetic PASS. No method math changed.
++
++Narrow05 changes only the finite-or-retained-NaN Boolean spelling to the exact
++equivalent Clippy form. All constructors, calls, DTOs, inputs, scope and arithmetic
++are unchanged. The prior quality01 Clippy failure remains authentic retained
++lineage. Raw has read the released Native baseline for factual custody only;
++no Rust numerical result exists or was read, and no parity claim is supplied.
++The cumulative five proposals retain the original historical before identities;
++`narrow_actual_correction` separately pins the one actual formatted current
++file and its one-line repair for Root's application. Neither is applied here.

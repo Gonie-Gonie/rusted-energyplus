@@ -1,0 +1,12 @@
+--- a/README.md
++++ b/README.md
+@@ -37,3 +37,9 @@
+ be reported PASS by setter comparison. Backend header defaults are actual Native
+ constructor inputs; exact Rust pairing requires identical declared caller input
+ or must remain explicitly unavailable. No card/integration/production gate closes.
++
++Compile-only correction02: WeatherManager.hh was already included. Its actual
++public namespace is EnergyPlus::Weather, not the file name WeatherManager. Only
++the qualified GetWeatherStation call and truthful API label are corrected; real
++provider metadata uses the same actual Weather namespace. All header/recipe and
++literal input/policy bytes remain exact01. Failed actual build01 is retained.

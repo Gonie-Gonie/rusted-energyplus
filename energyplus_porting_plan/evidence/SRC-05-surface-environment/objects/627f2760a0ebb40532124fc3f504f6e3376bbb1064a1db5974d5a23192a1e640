@@ -1,0 +1,59 @@
+{
+  "schema": "src05-selected-surface-environment-comparison.v1",
+  "status": "fail-selected-setters-or-input-join",
+  "actual_custody": {
+    "path": ".runtime/porting/SRC-05/selected-observation-02/comparison-custody.json",
+    "sha256": "762668e6c1f16118b04e156665d6e49dfa10b45b4317fa706084654660bf0bcb"
+  },
+  "actual_prospective_policy": {
+    "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-03/policy.json",
+    "sha256": "7968c53e85cbc93fe8c8d15887666daae1d8c195e90d86b9f1c2571be6de2cc0",
+    "size_bytes": 4639
+  },
+  "findings": {
+    "input_and_initial_owner_join_passed": true,
+    "endpoint_pairing_performed": true,
+    "actual_case_count": 26,
+    "actual_weather_operation_count": 30,
+    "paired_available_setter_boundaries": 70,
+    "actual_Native_process_exit_code": 2,
+    "actual_Native_Source_snapshot": {
+      "path": ".runtime/porting/source-objects/5f/5f982aba87e32de31a541c3cef83fd6a6d2e2fcd12efe1276b6ed2b694d0c899",
+      "sha256": "5f982aba87e32de31a541c3cef83fd6a6d2e2fcd12efe1276b6ed2b694d0c899"
+    },
+    "actual_Cargo_Source_snapshot": {
+      "path": ".runtime/porting/source-objects/37/371ee432d89384311dbe6c07f0d3beb8cb99cba51ab69d14a71b7a63ce0df6ea",
+      "sha256": "371ee432d89384311dbe6c07f0d3beb8cb99cba51ab69d14a71b7a63ce0df6ea"
+    }
+  },
+  "counts": {
+    "input_join_comparisons": 2112,
+    "pre_owner_comparisons": 1384,
+    "selected_endpoint_comparisons": 1334,
+    "point_helper_comparisons": 189
+  },
+  "mismatch_count": 3,
+  "required_unavailable_count": 103,
+  "nonfinite_arithmetic_unavailable_count": 0,
+  "all_mismatches_and_unavailable_rows_retained_uncapped": true,
+  "ledgers": {
+    "mismatches": {
+      "path": ".runtime/porting/SRC-05/selected-comparison-02/mismatches.ndjson",
+      "sha256": "556f4cbc3dbd747c015d887d07171d3eea3c9f0ac043a0518666fea8b3e87188",
+      "size_bytes": 690
+    },
+    "unavailable": {
+      "path": ".runtime/porting/SRC-05/selected-comparison-02/unavailable.ndjson",
+      "sha256": "04f48f46adaccdf986b8f43cc876da14aaaf67774bf0ddc97fbe78500ff9deb8",
+      "size_bytes": 23525
+    },
+    "paired-boundaries": {
+      "path": ".runtime/porting/SRC-05/selected-comparison-02/paired-boundaries.ndjson",
+      "sha256": "567348bf40f4f111e76fa27236a3dae285bd7bc34e6ac61fe8b428c58f08b5d5",
+      "size_bytes": 15204
+    }
+  },
+  "cold_guard_backend_PASS_claimed": false,
+  "whole_SRC05_unit_or_ordinary_manager_PASS_claimed": false,
+  "gates_updated": false
+}

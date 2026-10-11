@@ -1,0 +1,5 @@
+    Real64 WeatherFileWindModCoeff = 1.5863;                    // =(WindBLHeight/WindSensorHeight)**WindExp for conditions at the weather station
+    Real64 WeatherFileTempModCoeff = 0.0;                       // =AtmosphericTempGradient*EarthRadius*SensorHeight/(EarthRadius+SensorHeight)
+    Real64 SiteWindExp = 0.22;                                  // Exponent for the wind velocity profile at the site
+    Real64 SiteWindBLHeight = 370.0;                            // Boundary layer height for the wind velocity profile at the site (m)
+    Real64 SiteTempGradient = 0.0065;                           // Air temperature gradient coefficient (K/m)

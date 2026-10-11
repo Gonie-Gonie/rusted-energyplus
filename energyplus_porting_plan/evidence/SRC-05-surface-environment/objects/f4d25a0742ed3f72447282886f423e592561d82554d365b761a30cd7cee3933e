@@ -1,0 +1,83 @@
+{
+  "schema": "src05-direct-setters-frozen-build-inputs.v1",
+  "reviewed_Source_preparation": {
+    "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/manifest.json",
+    "sha256": "ca915feec3d44f60bd64d102c9cbcc0cbb0b195ef1e3cc5d1db14785067056fd",
+    "size_bytes": 32654
+  },
+  "frozen_Source_and_input": [
+    {
+      "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/surface_environment_reference_helper.cpp",
+      "sha256": "7e40b92b4bf8ceff895a9a89cb49994d5c6219c84d4c6dc0ddd9e410748f01e4",
+      "size_bytes": 14193,
+      "line_count": 236
+    },
+    {
+      "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/surface_environment_reference_fields.hh",
+      "sha256": "3f9da88accc83fc059b89c5f520cae5cc94dfced25f227a69cb903fe287e0b75",
+      "size_bytes": 5849,
+      "line_count": 103
+    },
+    {
+      "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/surface_environment_reference.cmake",
+      "sha256": "f5e58635049619c1b8eab7c03bbd484dda37ac0f52dd802ddc770f01230efbe9",
+      "size_bytes": 1837,
+      "line_count": 28
+    },
+    {
+      "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/input-only-cases.proposed.json",
+      "sha256": "0191a53ee11a1767a1b35023fcf5a3769e8c9df89c4d297847e3ed9d31cb4c15",
+      "size_bytes": 80365,
+      "line_count": 2866
+    },
+    {
+      "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/observation-policy.proposed.json",
+      "sha256": "f9420ff80690a61f9f85f14957a163d65a19cf326c2227770504712e371991b7",
+      "size_bytes": 1173,
+      "line_count": 38
+    }
+  ],
+  "reviewed_output_wrapper": {
+    "path": ".runtime/porting/SRC-05/native-build-01/additive-reference.cmake",
+    "sha256": "e729244dcd80f3862f7a5b237447e71925e36114710d150630d6021f8202bf53",
+    "size_bytes": 951
+  },
+  "actual_inherited_recipe": {
+    "path": ".runtime/porting/SYS-02/warmup-native-build-01/additive-reference.cmake",
+    "sha256": "a0c9df31421494eb6dbb0a4789b644d7c1098e4f50d0999e7d20f527c716a1f0",
+    "size_bytes": 860
+  },
+  "retained_failed_first_compile": {
+    "path": ".runtime/porting/SRC-05/native-build-01/compile-command/receipt.json",
+    "sha256": "60fe8bb086436e31d9f02813d8aab6649a3db42a3010224f09227fc6cf5c7cc9",
+    "size_bytes": 3293
+  },
+  "authentic_previous_configure_execution": {
+    "path": ".runtime/porting/SRC-05/native-build-01/configure-command/receipt.json",
+    "sha256": "98334133b652a034ac51788a2b3fec027ceb8ffc6dffdda8d6cf994f2425326c",
+    "size_bytes": 9829
+  },
+  "previous_actual_argv": {
+    "path": ".runtime/porting/SRC-05/native-build-01/configure-argv.json",
+    "sha256": "ea25c320fa4ce29404d7abca9ba1de9c04b401d498b41f54c7ee54faa17879eb",
+    "size_bytes": 6774
+  },
+  "actual_configure_argv": {
+    "path": ".runtime/porting/SRC-05/native-build-02/configure-argv.json",
+    "sha256": "ed60c923f93906b5b9d9b24467de19925dc209846bc36a3f33be6627ae11ed4d",
+    "size_bytes": 6774
+  },
+  "actual_before_cache_archive": {
+    "path": ".runtime/porting/SRC-05/native-build-02/CMakeCache.before.txt",
+    "sha256": "30acba25236c38e60fe1e7eba3032660c2aa1b41764e1754a6100e7d2fc09d8c",
+    "size_bytes": 61306
+  },
+  "fresh_external_output_directory": "D:\\CodexBuild\\rusted-energyplus\\SRC-05\\native-build-02\\bin",
+  "only_actual_argv_changes": [
+    "SRC05_SOURCE_DIR",
+    "SRC05_REFERENCE_RECIPE",
+    "SRC05_OUTPUT_DIR"
+  ],
+  "expected_values_supplied": false,
+  "gates_updated": false
+}

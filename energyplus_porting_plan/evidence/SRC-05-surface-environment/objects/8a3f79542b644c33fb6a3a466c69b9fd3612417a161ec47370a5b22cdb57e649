@@ -1,0 +1,12 @@
+--- a/README.md
++++ b/README.md
+@@ -60,3 +60,9 @@
+ arithmetic classification uses Original's literal `not (z <= 0)` branch rather
+ than `z > 0`; the fixed centroids remain finite. Inputs, tolerances, equations,
+ process outcome rules and whole-unit exclusions are unchanged. No output read.
++
++Narrow03 changes only the reviewed Rust Source preparation to05 after the
++equivalent finite-or-retained-NaN Clippy predicate repair. compare.py is byte
++exact02; all inputs, profiles, custody contract and pairing rules are unchanged.
++Raw read the released Native baseline solely for factual custody; no Rust result
++was read or exists. This update does not use Native answers to change formulas.

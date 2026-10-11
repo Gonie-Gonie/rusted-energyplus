@@ -1,0 +1,2869 @@
+--- a/input-only-cases.proposed.json
++++ b/input-only-cases.proposed.json
+@@ -0,0 +1,2866 @@
++{
++  "schema": "src05-surface-environment-direct-request.v1",
++  "expected_values_supplied": false,
++  "ordinary_production_prestate_supplied": false,
++  "cases": [
++    {
++      "case_id": "terrain-country",
++      "purpose": "Source-selected Building terrain state operands; real absent-object station/site producers",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Country",
++          "SiteWindExp": {
++            "bits": "3fc1eb851eb851ec"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4070e00000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "c008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 2,
++            "Name": "INPUT-SURFACE-2",
++            "Centroid_z": {
++              "bits": "8000000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4022000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 3,
++            "Name": "INPUT-SURFACE-3",
++            "Centroid_z": {
++              "bits": "0000000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4024000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 4,
++            "Name": "INPUT-SURFACE-4",
++            "Centroid_z": {
++              "bits": "3fe0000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4026000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 5,
++            "Name": "INPUT-SURFACE-5",
++            "Centroid_z": {
++              "bits": "3ff8000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4028000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 6,
++            "Name": "INPUT-SURFACE-6",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "402a000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 7,
++            "Name": "INPUT-SURFACE-7",
++            "Centroid_z": {
++              "bits": "4024000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "402c000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 8,
++            "Name": "INPUT-SURFACE-8",
++            "Centroid_z": {
++              "bits": "4059000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "402e000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "4034000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "terrain-suburbs",
++      "purpose": "Source-selected Building terrain state operands; real absent-object station/site producers",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "c008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 2,
++            "Name": "INPUT-SURFACE-2",
++            "Centroid_z": {
++              "bits": "8000000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4022000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 3,
++            "Name": "INPUT-SURFACE-3",
++            "Centroid_z": {
++              "bits": "0000000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4024000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 4,
++            "Name": "INPUT-SURFACE-4",
++            "Centroid_z": {
++              "bits": "3fe0000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4026000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 5,
++            "Name": "INPUT-SURFACE-5",
++            "Centroid_z": {
++              "bits": "3ff8000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4028000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 6,
++            "Name": "INPUT-SURFACE-6",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "402a000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 7,
++            "Name": "INPUT-SURFACE-7",
++            "Centroid_z": {
++              "bits": "4024000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "402c000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 8,
++            "Name": "INPUT-SURFACE-8",
++            "Centroid_z": {
++              "bits": "4059000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "402e000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "4034000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "terrain-city",
++      "purpose": "Source-selected Building terrain state operands; real absent-object station/site producers",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "City",
++          "SiteWindExp": {
++            "bits": "3fd51eb851eb851f"
++          },
++          "SiteWindBLHeight": {
++            "bits": "407cc00000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "c008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 2,
++            "Name": "INPUT-SURFACE-2",
++            "Centroid_z": {
++              "bits": "8000000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4022000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 3,
++            "Name": "INPUT-SURFACE-3",
++            "Centroid_z": {
++              "bits": "0000000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4024000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 4,
++            "Name": "INPUT-SURFACE-4",
++            "Centroid_z": {
++              "bits": "3fe0000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4026000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 5,
++            "Name": "INPUT-SURFACE-5",
++            "Centroid_z": {
++              "bits": "3ff8000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4028000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 6,
++            "Name": "INPUT-SURFACE-6",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "402a000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 7,
++            "Name": "INPUT-SURFACE-7",
++            "Centroid_z": {
++              "bits": "4024000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "402c000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 8,
++            "Name": "INPUT-SURFACE-8",
++            "Centroid_z": {
++              "bits": "4059000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "402e000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "4034000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "terrain-ocean",
++      "purpose": "Source-selected Building terrain state operands; real absent-object station/site producers",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Ocean",
++          "SiteWindExp": {
++            "bits": "3fb999999999999a"
++          },
++          "SiteWindBLHeight": {
++            "bits": "406a400000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "c008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 2,
++            "Name": "INPUT-SURFACE-2",
++            "Centroid_z": {
++              "bits": "8000000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4022000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 3,
++            "Name": "INPUT-SURFACE-3",
++            "Centroid_z": {
++              "bits": "0000000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4024000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 4,
++            "Name": "INPUT-SURFACE-4",
++            "Centroid_z": {
++              "bits": "3fe0000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4026000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 5,
++            "Name": "INPUT-SURFACE-5",
++            "Centroid_z": {
++              "bits": "3ff8000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4028000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 6,
++            "Name": "INPUT-SURFACE-6",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "402a000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 7,
++            "Name": "INPUT-SURFACE-7",
++            "Centroid_z": {
++              "bits": "4024000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "402c000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 8,
++            "Name": "INPUT-SURFACE-8",
++            "Centroid_z": {
++              "bits": "4059000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "402e000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "4034000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "terrain-urban",
++      "purpose": "Source-selected Building terrain state operands; real absent-object station/site producers",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Urban",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "c008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 2,
++            "Name": "INPUT-SURFACE-2",
++            "Centroid_z": {
++              "bits": "8000000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4022000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 3,
++            "Name": "INPUT-SURFACE-3",
++            "Centroid_z": {
++              "bits": "0000000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4024000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 4,
++            "Name": "INPUT-SURFACE-4",
++            "Centroid_z": {
++              "bits": "3fe0000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4026000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 5,
++            "Name": "INPUT-SURFACE-5",
++            "Centroid_z": {
++              "bits": "3ff8000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4028000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 6,
++            "Name": "INPUT-SURFACE-6",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "402a000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 7,
++            "Name": "INPUT-SURFACE-7",
++            "Centroid_z": {
++              "bits": "4024000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "402c000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 8,
++            "Name": "INPUT-SURFACE-8",
++            "Centroid_z": {
++              "bits": "4059000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "402e000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "4034000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "empty-layout",
++      "purpose": "True zero-surface setter and check loops",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": []
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "4034000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "negative-weather-wind",
++      "purpose": "No introduced negative-weather wind floor",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "4034000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "c000000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "positive-zero-weather-wind",
++      "purpose": "Real multiplication and positive-zero owner",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "4034000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "0000000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "negative-zero-weather-wind",
++      "purpose": "Real multiplication and negative-zero operand",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "4034000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "8000000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "raw-negative-zero-direction",
++      "purpose": "All rows receive raw direction bits independent of exposure",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "bff0000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 2,
++            "Name": "INPUT-SURFACE-2",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "4034000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "8000000000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "raw-unbounded-direction",
++      "purpose": "No direction normalization",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "4034000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4086880000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "repeated-nowind-retention",
++      "purpose": "Retain genuine nonzero NoWind incoming owner over ordered weather calls",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4051c00000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 2,
++            "Name": "INPUT-SURFACE-2",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "4034000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        },
++        {
++          "operation_id": "weather-2",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "c018000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "c01c000000000000"
++            },
++            "WindSpeed": {
++              "bits": "c000000000000000"
++            },
++            "WindDir": {
++              "bits": "c014000000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        },
++        {
++          "operation_id": "weather-3",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "4034000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "0000000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "retained-nowind-nan-payload",
++      "purpose": "NaN payload only in genuinely skipped wind owner",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "7ff8000000001234"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 2,
++            "Name": "INPUT-SURFACE-2",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "4034000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        },
++        {
++          "operation_id": "weather-2",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "4034000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "c000000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "zero-exponent-all-rows",
++      "purpose": "Diagnostic exponent-zero route writes NoWind and nonpositive heights",
++      "admission_lane": "diagnostic-direct-operands",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "0000000000000000"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "bff0000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 2,
++            "Name": "INPUT-SURFACE-2",
++            "Centroid_z": {
++              "bits": "0000000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 3,
++            "Name": "INPUT-SURFACE-3",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "4034000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "8000000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "zero-gradient-nonzero-modifier",
++      "purpose": "Diagnostic zero-gradient route ignores actual nonzero modifier",
++      "admission_lane": "diagnostic-direct-operands",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": {
++            "bits": "0000000000000000"
++          },
++          "WeatherFileTempModCoeff_override": {
++            "bits": "4049000000000000"
++          },
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "bff0000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 2,
++            "Name": "INPUT-SURFACE-2",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": false,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "8000000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4008000000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "negative-zero-gradient",
++      "purpose": "Diagnostic signed-zero gradient equal-zero branch",
++      "admission_lane": "diagnostic-direct-operands",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": {
++            "bits": "8000000000000000"
++          },
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "4034000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "sensor-height-neighbors",
++      "purpose": "Centroid height below/at/above actual default temperature sensor",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "3ff0000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 2,
++            "Name": "INPUT-SURFACE-2",
++            "Centroid_z": {
++              "bits": "3ff8000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 3,
++            "Name": "INPUT-SURFACE-3",
++            "Centroid_z": {
++              "bits": "4000000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "4034000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "cold-dry-prefix",
++      "purpose": "Actual bulb/check severe/fatal with later setters retained unreached",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "0000000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          },
++          {
++            "actual_surface_index": 2,
++            "Name": "INPUT-SURFACE-2",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "c059400000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "c056800000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        },
++        {
++          "operation_id": "weather-2",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "4034000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "cold-wet-prefix",
++      "purpose": "Actual check reads wet owner independently",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "c056800000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "c059400000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "cold-exact-boundary",
++      "purpose": "Direct zero-gradient strict minus100 boundary operand",
++      "admission_lane": "diagnostic-direct-operands",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": {
++            "bits": "0000000000000000"
++          },
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "c059000000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "c059000000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "cold-one-ulp-below",
++      "purpose": "Direct strict boundary neighbor bit input",
++      "admission_lane": "diagnostic-direct-operands",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": {
++            "bits": "0000000000000000"
++          },
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "c059000000000001"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "cold-stratosphere-height",
++      "purpose": "Actual extra Continue calls use passed stored centroid and Name",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "40d3880000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "c059400000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "c059400000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "cold-warmup-counts",
++      "purpose": "Actual severe warmup counter owner",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": true,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "c059400000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "cold-sizing-counts",
++      "purpose": "Actual severe sizing counter owner",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": true,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "c059400000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "cold-kickoff-counts",
++      "purpose": "Actual kickoff exclusion from warmup severity",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": true,
++          "DoingSizing": false,
++          "KickOffSimulation": true,
++          "DoingInputProcessing": false,
++          "printConsoleOutput": false
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "c059400000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    },
++    {
++      "case_id": "cold-input-console",
++      "purpose": "Actual input-processing console/header backend branch",
++      "admission_lane": "fixed-default-state-direct",
++      "initial": {
++        "site_parameters": {
++          "Terrain_source_label": "Suburbs",
++          "SiteWindExp": {
++            "bits": "3fcc28f5c28f5c29"
++          },
++          "SiteWindBLHeight": {
++            "bits": "4077200000000000"
++          },
++          "SiteTempGradient_override": null,
++          "WeatherFileTempModCoeff_override": null,
++          "WeatherFileWindModCoeff_override": null
++        },
++        "backend_flags": {
++          "WarmupFlag": false,
++          "DoingSizing": false,
++          "KickOffSimulation": false,
++          "DoingInputProcessing": true,
++          "printConsoleOutput": true
++        },
++        "surfaces": [
++          {
++            "actual_surface_index": 1,
++            "Name": "INPUT-SURFACE-1",
++            "Centroid_z": {
++              "bits": "4008000000000000"
++            },
++            "ExtWind": true,
++            "SurfOutDryBulbTemp": {
++              "bits": "401c000000000000"
++            },
++            "SurfOutWetBulbTemp": {
++              "bits": "4018000000000000"
++            },
++            "SurfOutWindSpeed": {
++              "bits": "4020000000000000"
++            },
++            "SurfOutWindDir": {
++              "bits": "405ec00000000000"
++            }
++          }
++        ]
++      },
++      "operations": [
++        {
++          "operation_id": "weather-1",
++          "weather": {
++            "OutDryBulbTemp": {
++              "bits": "c059400000000000"
++            },
++            "OutWetBulbTemp": {
++              "bits": "4024000000000000"
++            },
++            "WindSpeed": {
++              "bits": "4010000000000000"
++            },
++            "WindDir": {
++              "bits": "4075e00000000000"
++            }
++          },
++          "sequence": [
++            "bulbs",
++            "check",
++            "wind_speed",
++            "wind_direction"
++          ]
++        }
++      ]
++    }
++  ]
++}

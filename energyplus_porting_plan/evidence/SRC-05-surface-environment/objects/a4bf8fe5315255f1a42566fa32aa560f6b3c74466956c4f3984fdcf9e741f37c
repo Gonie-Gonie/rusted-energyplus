@@ -1,0 +1,10 @@
+--- a/crates/ep_runtime/src/heat_balance/convection/surface_environment.rs
++++ b/crates/ep_runtime/src/heat_balance/convection/surface_environment.rs
+@@ -250,3 +250,7 @@
+         }
+     }
+ }
++
++#[cfg(test)]
++#[path = "surface_environment_selected_reference.rs"]
++mod selected_reference;

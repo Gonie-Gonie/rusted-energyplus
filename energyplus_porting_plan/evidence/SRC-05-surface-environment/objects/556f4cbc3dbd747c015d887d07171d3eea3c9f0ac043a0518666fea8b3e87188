@@ -1,0 +1,3 @@
+{"phase": "selected_endpoint_comparisons", "path": "terrain-country/weather-1/wind_speed/after/surface7/SurfOutWindSpeed", "Native_or_required": ["400fffffffffffff", "finite"], "Rust_or_observed": ["4010000000000000", "finite"]}
+{"phase": "point_helper_comparisons", "path": "terrain-country/weather-1/wind_speed/point/surface7/wind_speed_at_height", "Native_or_required": ["400fffffffffffff", "finite"], "Rust_or_observed": ["4010000000000000", "finite"]}
+{"phase": "pre_owner_comparisons", "path": "terrain-country/weather-1/wind_direction/full-preowner/surface7/SurfOutWindSpeed", "Native_or_required": ["400fffffffffffff", "finite"], "Rust_or_observed": ["4010000000000000", "finite"]}

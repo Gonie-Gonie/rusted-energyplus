@@ -757,11 +757,15 @@
         let expected_weather_mod = (270.0_f64 / 10.0).powf(0.14);
         let roof_height_m =
             roof.vertices.iter().map(|vertex| vertex.z_m).sum::<f64>() / roof.vertices.len() as f64;
-        let expected_roof_wind = 4.0 * expected_weather_mod * (roof_height_m / 370.0).powf(0.22);
+        let expected_roof_wind =
+            (4.0 * expected_weather_mod * 370.0_f64.powf(-0.22)) * roof_height_m.powf(0.22);
 
-        let expected_roof_air_temperature = 20.0
-            - 0.0065
-                * (roof_height_m - ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M);
+        let earth_radius_m = 6_356_000.0;
+        let sensor_height_m = ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M;
+        let station_modifier = 0.0065 * earth_radius_m * sensor_height_m
+            / (earth_radius_m + sensor_height_m);
+        let expected_roof_air_temperature = (20.0 + station_modifier)
+            - (0.0065 * earth_radius_m * roof_height_m) / (earth_radius_m + roof_height_m);
         assert!(
             (energyplus_surface_outdoor_air_temperature_c(roof, 20.0)
                 - expected_roof_air_temperature)

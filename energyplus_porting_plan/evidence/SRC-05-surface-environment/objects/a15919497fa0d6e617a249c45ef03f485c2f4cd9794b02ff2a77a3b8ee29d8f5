@@ -1,0 +1,1 @@
+    void GetSiteAtmosphereData(EnergyPlusData &state, bool &ErrorsFound);

@@ -1,0 +1,5 @@
+    Array1D<DataSurfaces::MovInsul> extMovInsuls;
+
+    EPVector<DataSurfaces::SurfaceData> Surface;
+    EPVector<DataSurfaces::SurfaceWindowCalc> SurfaceWindow;
+    EPVector<DataSurfaces::SurfaceShade> surfShades;

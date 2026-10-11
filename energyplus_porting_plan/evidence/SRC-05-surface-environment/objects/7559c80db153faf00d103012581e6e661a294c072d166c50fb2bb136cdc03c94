@@ -1,0 +1,52 @@
+from pathlib import Path
+import ast, copy, difflib, hashlib, json
+
+ROOT = Path.cwd()
+OLD = ROOT / '.runtime/porting/SRC-05/surface-environment-prep-01'
+OUT = ROOT / '.runtime/porting/SRC-05/surface-environment-prep-02'
+assert not OUT.exists()
+OUT.mkdir()
+def ref(p):
+    p = Path(p); p = p if p.is_absolute() else ROOT / p
+    b = p.read_bytes()
+    return {'path': p.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(b).hexdigest(), 'size_bytes': len(b), 'line_count': len(b.splitlines())}
+def write(p, s):
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(s, encoding='utf-8', newline='\n')
+def diff(a, b, path):
+    return ''.join(difflib.unified_diff(a.splitlines(keepends=True), b.splitlines(keepends=True), fromfile='a/' + path, tofile='b/' + path))
+m = copy.deepcopy(json.loads((OLD / 'manifest.json').read_text(encoding='utf-8')))
+key = 'crates/ep_runtime/src/heat_balance/convection/surface_environment.rs'
+row = next(r for r in m['application'] if r['canonical_path'] == key)
+before = (ROOT / row['proposal']['path']).read_text(encoding='utf-8')
+assert before.count('let temperature_sensor_height_m = 1.5;') == 1
+after = before.replace('let temperature_sensor_height_m = 1.5;', 'let temperature_sensor_height_m = super::ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M;')
+write(OUT / 'before-01/surface_environment.rs', before)
+write(OUT / 'proposed' / key, after)
+write(OUT / 'diffs/surface_environment.rs.from-01.diff', diff(before, after, key))
+write(OUT / 'diffs/surface_environment.rs.diff', diff('', after, key))
+row['proposal'] = ref(OUT / 'proposed' / key)
+row['exact_diff'] = ref(OUT / 'diffs/surface_environment.rs.diff')
+m['own_sources'] = [r['proposal'] for r in m['application'] if r['canonical_path'].endswith('.rs')]
+plan_before = (OLD / 'native-unit-plan.md').read_text(encoding='utf-8')
+plan_after = plan_before.replace('weather temperature at/below/above sensor height', 'surface centroid height at/below/above sensor height')
+write(OUT / 'before-01/native-unit-plan.md', plan_before)
+write(OUT / 'native-unit-plan.md', plan_after)
+write(OUT / 'diffs/native-unit-plan.md.from-01.diff', diff(plan_before, plan_after, 'native-unit-plan.md'))
+readme_before = (OLD / 'README.md').read_text(encoding='utf-8')
+readme_after = readme_before + '\n## Narrow Source successor\n\nUse the existing parent temperature sensor constant in the real default producer,\nso it remains used in non-test builds. The operand is the same literal1.5 bits.\nClarify the prospective centroid-height case wording. All other Rust/card bytes,\nSource admission, tests, mathematical order and pending gates remain unchanged.\nIndependent FULL01 Source review is carried with this exact narrowdelta; no test\nor target was run and no canonical file was changed.\n'
+write(OUT / 'before-01/README.md', readme_before)
+write(OUT / 'README.md', readme_after)
+write(OUT / 'diffs/README.md.from-01.diff', diff(readme_before, readme_after, 'README.md'))
+(OUT / 'before-01/manifest.json').write_bytes((OLD / 'manifest.json').read_bytes())
+m['accepted_predecessor'] = ref(OLD / 'manifest.json')
+m['before_predecessor_manifest'] = ref(OUT / 'before-01/manifest.json')
+m['narrow_before'] = [ref(OUT / 'before-01' / p) for p in ['surface_environment.rs', 'native-unit-plan.md', 'README.md']]
+m['narrow_diffs'] = [ref(OUT / 'diffs' / p) for p in ['surface_environment.rs.from-01.diff', 'native-unit-plan.md.from-01.diff', 'README.md.from-01.diff']]
+m['README'] = ref(OUT / 'README.md')
+m['native_unit_plan'] = ref(OUT / 'native-unit-plan.md')
+m['predecessor_author'] = m['author']
+m['author'] = ref(__file__)
+ast.parse(Path(__file__).read_text(encoding='utf-8'))
+write(OUT / 'manifest.json', json.dumps(m, indent=2, ensure_ascii=False) + '\n')
+print(json.dumps(ref(OUT / 'manifest.json')))

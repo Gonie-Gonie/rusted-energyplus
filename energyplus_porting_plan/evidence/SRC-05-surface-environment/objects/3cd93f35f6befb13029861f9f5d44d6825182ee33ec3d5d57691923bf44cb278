@@ -1,0 +1,10 @@
+
+running 1 test
+test heat_balance::convection::surface_environment::selected_reference::observe_literal_surface_environment_setters ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3311 filtered out; finished in 4.96s
+
+    Finished `test` profile [unoptimized] target(s) in 0.27s
+     Running unittests src\lib.rs (target\debug\deps\ep_runtime-880f77a2e9883822.exe)
+{"receipt": {"path": ".runtime/porting/SRC-05/selected-observation-01/Rust/cargo-command/receipt.json", "sha256": "5e6be248e41dd1ffde9307c4999278dae0e57af5530823ed6c3b764b0dde82c7"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+{"sidecar": {"path": ".runtime/porting/SRC-05/selected-observation-01/Rust/result.custody.json", "sha256": "5d6faab95cef65170d40a6603779ce0982d776fd08c314408e2609ed5832765c", "size_bytes": 2075}, "actual_Cargo_exit_code": 0}

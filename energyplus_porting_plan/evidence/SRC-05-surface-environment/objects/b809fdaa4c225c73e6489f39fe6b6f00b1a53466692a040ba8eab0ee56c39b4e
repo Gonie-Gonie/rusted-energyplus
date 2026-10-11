@@ -1,0 +1,45 @@
+# SRC05 genuine Native surface-environment unit (HELD)
+
+One TU calls unchanged DataSurfaces bulb/check/wind/direction APIs. No setter,
+guard, station modifier, pow or error formatting arithmetic is copied here.
+Actual GetSiteAtmosphereData/GetWeatherStation run against a fresh explicitly
+empty InputProcessor getter-domain owner. No processInput/ordinary input-validity
+claim is made. SiteWindExp/BL are explicitly supplied Source-selected terrain
+state inputs; this helper does not claim to invoke full GetProjectData.
+
+All surfaces are retained in actual contiguous one-based order with real stored
+centroid, Name, ExtWind and incoming dry/wet/wind/direction. The serializer keeps
+every four-array element, bounds/allocation, environment operands and full actual
+backend/callback/stream prefixes before and after every real call. It retains
+fresh constructor/default-producer and explicit input-write boundaries. No caps,
+sampled rows, expected results or Native-derived operands exist.
+
+Literal cases include all four Terrain profiles plus Urban alias, zero surfaces,
+negative/zero heights and weather wind, sensor-height neighbors, nonzero NoWind
+seeds, repeated calls and skipped NaN payload. Zero exponent/gradient/modifier
+overrides are diagnostic direct operands, not admitted ordinary CON01 inputs.
+Real below-minus100, strict boundary, stratosphere and backend phase cases call
+the actual guard. Caught OriginalFatalError retains all partial owners/diagnostics
+and marks later stages uninvoked. Full response is emitted; any caught stop or
+callback integrity failure yields exit2. Exit2 is never rewritten as numerical
+success; a reader may validate genuine available prefix while retaining failure.
+
+The three actual native artifacts are helper/header/recipe. Recipe requires an
+explicit actual inherited recipe and appends only this one genuine helper TU,
+using unchanged Original energypluslib with its real compile definitions/flags.
+No build, runner, derivation, binary, configure or shared graph action occurred.
+Future Root build must preserve every actual prior registration/protected file
+and prove address-bound public APIs from unchanged core, one helper LOAD, genuine
+PE/debug derivation and full Source/input/receipt custody before releasing data.
+
+The Rust proposal02 is a separate held authority. Cold check/backend and ordinary
+four-array manager integration are not implemented by that proposal and cannot
+be reported PASS by setter comparison. Backend header defaults are actual Native
+constructor inputs; exact Rust pairing requires identical declared caller input
+or must remain explicitly unavailable. No card/integration/production gate closes.
+
+Compile-only correction02: WeatherManager.hh was already included. Its actual
+public namespace is EnergyPlus::Weather, not the file name WeatherManager. Only
+the qualified GetWeatherStation call and truthful API label are corrected; real
+provider metadata uses the same actual Weather namespace. All header/recipe and
+literal input/policy bytes remain exact01. Failed actual build01 is retained.

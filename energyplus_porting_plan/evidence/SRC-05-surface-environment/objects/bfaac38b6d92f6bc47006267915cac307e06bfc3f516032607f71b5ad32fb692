@@ -1,0 +1,7 @@
+    void SetSurfaceOutBulbTempAt(EnergyPlusData &state);
+
+    void CheckSurfaceOutBulbTempAt(EnergyPlusData &state);
+
+    void SetSurfaceWindSpeedAt(EnergyPlusData &state);
+
+    void SetSurfaceWindDirAt(EnergyPlusData &state);

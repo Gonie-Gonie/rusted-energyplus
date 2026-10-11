@@ -1,0 +1,68 @@
+# SRC-05 selected surface-environment comparison (held Source)
+
+This is the bounded comparison counterpart to Native02 and cfg(test) Rust04.
+No numerical output has been read while authoring. No runner or equation is added.
+It adapts the genuine SYS02 receipt/Source/input protocol and scalar DTO checks.
+
+Root CLI: `python -X utf8 -B compare.py --custody <path>#<SHA> --output-dir <fresh ignored SRC-05 dir>`.
+The actual custody packet schema is `src05-surface-environment-comparison-custody.v1`.
+Required refs: prospective_policy, Native_input, Rust_input, Native_result,
+Native_execution, Native_build_execution, Native_frozen_build_inputs,
+Native_execution_build_inputs, Native_binary, Rust_result, Rust_execution,
+Rust_launch_execution, Rust_launch_source, Rust_execution_sidecar.
+Both complete literal requests must equal Native01 input bytes; all 26 cases and
+30 operations remain ordered. Active Native authority is the namespace-correct02.
+
+Native actual link proof uses `src05-direct-setters-actual-link-inputs.v1` and
+reviewed_Source_preparation/frozen_Source_and_input/actual_Native_binary/
+actual_full_link_map/selected_link_provider_lines/actual_link_command/
+official_Source_and_core_check/Original_Source_or_core_math_modified. Root's
+review bool is Root_FULL_address_bound_provider_and_PE_review_accepted.
+The only external files permitted are explicit D: .exe/.map refs, fully hashed.
+Native argc2 stdout is the sole complete result. Exit2 is retained and accepted
+only with the complete actual OriginalFatalError stop/unreached ledger. It never
+becomes a whole-unit PASS. Callback-integrity failures remain integrity failures.
+
+Rust uses the same SYS02 three Cargo configs/--locked with exact ignored filter:
+`heat_balance::convection::surface_environment::selected_reference::observe_literal_surface_environment_setters`.
+The literal env operands are SRC05_REFERENCE_INPUT/OUTPUT. Sidecar schema is
+`src05-selected-surface-environment-execution-input-custody.v1`; actual_launcher_source,
+actual_environment_operands, actual_input_before/after, actual_Cargo_execution,
+actual_output, actual_Cargo_exit_code and input_bytes_match_before_after are checked.
+Rust_launch_execution binds that launcher. It wraps the actual Rust_execution;
+both have the same Source snapshot. Four quality_executions roles are fmt_check,
+clippy, focused and workspace, all exit0/Source-stable before the test.
+actual_Rust_observer_sources has the exact three ordered canonical_path/
+actual_literal_source/actual_final_source/formatter_correspondence_diff rows.
+Root_and_other_author_FULL_formatter_correspondence_accepted and
+Root_reviewed_literal_environment_launcher must be true. Full Source archives
+are authenticated, plus actual literal-to-final diffs and compiled final bytes.
+
+All initial/default/input joins finish before any setter endpoint. Every reached
+returned endpoint needs full selected preowner equality; mismatch prevents that
+endpoint pair. All four arrays/all rows remain present. Arithmetic output cells
+require finite exact IEEE bits/classes; copied/retained cells include signedzero
+and preserved NaN payloads. Point probes pair only corresponding written cells.
+NoWind skipped rows and Native fatal/unreached setters are required unpaired.
+Native backend, constructor-weather and allocation implementation have no Rust
+counterpart here and remain required whole-unit unavailable, never counted PASS.
+
+Every mismatch, unavailable boundary and paired boundary is retained in uncapped
+NDJSON. A selected available-setter status can be exit0 while whole-unit required
+unavailable remains; the report explicitly withholds cold/backend, ordinary and
+whole SRC05 PASS. Integrity failure is exit2, selected mismatch/nonfinite is exit1.
+No tolerance change, Native-derived input, cold-guard reconstruction, ordinary
+handoff, producer replacement or gate update is authorized by this package.
+
+Narrow02 validates full Rust before/after DTOs even when Native already stopped,
+and checks all four actual Rust weather writes against every literal operation.
+These independent probes stay unpaired where Native is unreached. Wind-cell
+arithmetic classification uses Original's literal `not (z <= 0)` branch rather
+than `z > 0`; the fixed centroids remain finite. Inputs, tolerances, equations,
+process outcome rules and whole-unit exclusions are unchanged. No output read.
+
+Narrow03 changes only the reviewed Rust Source preparation to05 after the
+equivalent finite-or-retained-NaN Clippy predicate repair. compare.py is byte
+exact02; all inputs, profiles, custody contract and pairing rules are unchanged.
+Raw read the released Native baseline solely for factual custody; no Rust result
+was read or exists. This update does not use Native answers to change formulas.

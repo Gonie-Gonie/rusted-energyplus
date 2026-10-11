@@ -1,0 +1,31 @@
+"""Finish unshared Source05 metadata, then Source-only comparison authority successor."""
+from pathlib import Path
+import ast, difflib, hashlib, json
+ROOT=Path.cwd();BASE=ROOT/'.runtime/porting/SRC-05';S=BASE/'surface-environment-prep-05';OLD=BASE/'surface-environment-selected-comparison-prep-02';OUT=BASE/'surface-environment-selected-comparison-prep-03'
+assert not OUT.exists()
+def ref(p):
+    b=p.read_bytes();return dict(path=p.relative_to(ROOT).as_posix(),sha256=hashlib.sha256(b).hexdigest(),size_bytes=len(b),line_count=len(b.splitlines()))
+def write(p,s):p.parent.mkdir(parents=True,exist_ok=True);p.write_text(s,encoding='utf-8',newline='\n')
+def delta(a,b,n):return ''.join(difflib.unified_diff(a.splitlines(True),b.splitlines(True),fromfile='a/'+n,tofile='b/'+n))
+m=json.loads((S/'manifest.json').read_text(encoding='utf-8'));m['narrow_actual_correction']=m.pop('narrow_current_application')
+text=(S/'README.md').read_text(encoding='utf-8').replace('narrow_current_application','narrow_actual_correction');write(S/'README.md',text)
+write(S/'diffs/README.from04.diff',delta((S/'before/README.md').read_text(encoding='utf-8'),text,'README.md'))
+m['README']=ref(S/'README.md');m['author']=ref(BASE/'prepare-selected-observer-05.py');m['metadata_sealer']=ref(Path(__file__));write(S/'manifest.json',json.dumps(m,indent=2)+'\n')
+OUT.mkdir();c=json.loads((OLD/'manifest.json').read_text(encoding='utf-8'));policy=json.loads((OLD/'policy.json').read_text(encoding='utf-8'));oldrust=policy['Rust_source_preparation'];policy['Rust_source_preparation']=ref(S/'manifest.json')
+write(OUT/'policy.json',json.dumps(policy,indent=2)+'\n');(OUT/'compare.py').write_bytes((OLD/'compare.py').read_bytes())
+readme=(OLD/'README.md').read_text(encoding='utf-8')+'''
+Narrow03 changes only the reviewed Rust Source preparation to05 after the
+equivalent finite-or-retained-NaN Clippy predicate repair. compare.py is byte
+exact02; all inputs, profiles, custody contract and pairing rules are unchanged.
+Raw read the released Native baseline solely for factual custody; no Rust result
+was read or exists. This update does not use Native answers to change formulas.
+''';write(OUT/'README.md',readme)
+before=[];diffs=[]
+for n in ('compare.py','policy.json','README.md','manifest.json'):
+    p=OUT/'before'/n;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes((OLD/n).read_bytes());before.append(dict(original=ref(OLD/n),archive=ref(p)))
+for n in ('compare.py','policy.json','README.md'):
+    p=OUT/'diffs'/(n+'.from02.diff');write(p,delta((OLD/n).read_text(encoding='utf-8'),(OUT/n).read_text(encoding='utf-8'),n));diffs.append(ref(p))
+c['Source_dependencies']=[ref(S/'manifest.json') if r==oldrust else r for r in c['Source_dependencies']]
+c.update(own_sources_and_metadata=[ref(OUT/n) for n in ('compare.py','policy.json','README.md')],author=ref(Path(__file__)),predecessor_source_preparation=ref(OLD/'manifest.json'),narrow_before_archives=before,narrow_exact_source_diffs=diffs,Native_result_values_read=True,Rust_result_values_read=False,changes='Rust Source05 authority-only successor; comparer Python/rules/input/tolerances exact02',active_selected_observer_sources=m['selected_observer_sources'])
+ast.parse((OUT/'compare.py').read_text(encoding='utf-8'));ast.parse(Path(__file__).read_text(encoding='utf-8'));write(OUT/'manifest.json',json.dumps(c,indent=2)+'\n')
+print(json.dumps(dict(Rust=ref(S/'manifest.json'),comparison=ref(OUT/'manifest.json'))))

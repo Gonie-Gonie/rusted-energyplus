@@ -1,0 +1,157 @@
+{
+  "schema": "src05-selected-comparison-factual-review.v1",
+  "status": "accepted-factual-comparison-with-explicit-scope",
+  "actual_review_source": {
+    "path": ".runtime/porting/SRC-05/review-selected-comparison-02.py",
+    "sha256": "8f585e1d3e31b8228b3e2edc64690bce7ed4fed8594ce8d42efc911eed4127ff",
+    "size_bytes": 9143
+  },
+  "comparison": {
+    "path": ".runtime/porting/SRC-05/selected-comparison-02/comparison.json",
+    "sha256": "627f2760a0ebb40532124fc3f504f6e3376bbb1064a1db5974d5a23192a1e640",
+    "size_bytes": 2477
+  },
+  "execution": {
+    "path": ".runtime/porting/SRC-05/selected-comparison-command-02/receipt.json",
+    "sha256": "a1a76910fe8eb9ee1c1297ef6b2ab6e06232214ca644b279051ae5646df02656",
+    "size_bytes": 3621
+  },
+  "actual_custody": {
+    "path": ".runtime/porting/SRC-05/selected-observation-02/comparison-custody.json",
+    "sha256": "762668e6c1f16118b04e156665d6e49dfa10b45b4317fa706084654660bf0bcb"
+  },
+  "reviewed_comparer_preparation": {
+    "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-03/manifest.json",
+    "sha256": "e88c49510e61e8111eb84a014013478c48b871efea7d34d3f99ed16c76b93d08",
+    "size_bytes": 43047
+  },
+  "all_input_DTO_and_complete_ledger_protocol_replay_exact": true,
+  "independent_complete_scalar_DTO_checks": {
+    "Native": 9600,
+    "Rust": 7861
+  },
+  "independent_snapshot_structural_checks": 544,
+  "actual_case_count": 26,
+  "actual_weather_operation_count": 30,
+  "actual_Native_calls_by_API": {
+    "HeatBalanceManager::GetSiteAtmosphereData": 26,
+    "Weather::GetWeatherStation": 26,
+    "DataSurfaces::SetSurfaceOutBulbTempAt": 29,
+    "DataSurfaces::CheckSurfaceOutBulbTempAt": 29,
+    "DataSurfaces::SetSurfaceWindSpeedAt": 21,
+    "DataSurfaces::SetSurfaceWindDirAt": 21
+  },
+  "actual_Rust_selected_calls_by_stage": {
+    "bulbs": 30,
+    "check": 0,
+    "wind_speed": 30,
+    "wind_direction": 30
+  },
+  "actual_Rust_point_helper_return_count": 231,
+  "actual_OriginalFatalError_stops": [
+    {
+      "case_id": "cold-dry-prefix",
+      "api": "DataSurfaces::CheckSurfaceOutBulbTempAt",
+      "operation_id": "weather-1",
+      "exception": {
+        "kind": "OriginalFatalError",
+        "message": "Program terminates due to preceding condition(s)."
+      }
+    },
+    {
+      "case_id": "cold-wet-prefix",
+      "api": "DataSurfaces::CheckSurfaceOutBulbTempAt",
+      "operation_id": "weather-1",
+      "exception": {
+        "kind": "OriginalFatalError",
+        "message": "Program terminates due to preceding condition(s)."
+      }
+    },
+    {
+      "case_id": "cold-one-ulp-below",
+      "api": "DataSurfaces::CheckSurfaceOutBulbTempAt",
+      "operation_id": "weather-1",
+      "exception": {
+        "kind": "OriginalFatalError",
+        "message": "Program terminates due to preceding condition(s)."
+      }
+    },
+    {
+      "case_id": "cold-stratosphere-height",
+      "api": "DataSurfaces::CheckSurfaceOutBulbTempAt",
+      "operation_id": "weather-1",
+      "exception": {
+        "kind": "OriginalFatalError",
+        "message": "Program terminates due to preceding condition(s)."
+      }
+    },
+    {
+      "case_id": "cold-warmup-counts",
+      "api": "DataSurfaces::CheckSurfaceOutBulbTempAt",
+      "operation_id": "weather-1",
+      "exception": {
+        "kind": "OriginalFatalError",
+        "message": "Program terminates due to preceding condition(s)."
+      }
+    },
+    {
+      "case_id": "cold-sizing-counts",
+      "api": "DataSurfaces::CheckSurfaceOutBulbTempAt",
+      "operation_id": "weather-1",
+      "exception": {
+        "kind": "OriginalFatalError",
+        "message": "Program terminates due to preceding condition(s)."
+      }
+    },
+    {
+      "case_id": "cold-kickoff-counts",
+      "api": "DataSurfaces::CheckSurfaceOutBulbTempAt",
+      "operation_id": "weather-1",
+      "exception": {
+        "kind": "OriginalFatalError",
+        "message": "Program terminates due to preceding condition(s)."
+      }
+    },
+    {
+      "case_id": "cold-input-console",
+      "api": "DataSurfaces::CheckSurfaceOutBulbTempAt",
+      "operation_id": "weather-1",
+      "exception": {
+        "kind": "OriginalFatalError",
+        "message": "Program terminates due to preceding condition(s)."
+      }
+    }
+  ],
+  "actual_returned_setter_boundaries": 71,
+  "reported_counts": {
+    "input_join_comparisons": 2112,
+    "pre_owner_comparisons": 1384,
+    "selected_endpoint_comparisons": 1334,
+    "point_helper_comparisons": 189
+  },
+  "ledger_row_counts": {
+    "mismatches": 3,
+    "unavailable": 103,
+    "paired-boundaries": 70
+  },
+  "unavailable_reasons": {
+    "Rust-cold-check-and-full-backend-unavailable": 29,
+    "actual-cold-backend/constructor-weather/allocation-implementation-unpaired": 26,
+    "Native-stage-unreached; independent-Rust-probe-not-paired": 20,
+    "Native-NoWind-row-skipped; independent-point-result-not-paired": 27,
+    "full-preowner-join-failed; endpoint-not-paired": 1
+  },
+  "mismatch_phases": {
+    "selected_endpoint_comparisons": 1,
+    "point_helper_comparisons": 1,
+    "pre_owner_comparisons": 1
+  },
+  "actual_comparison_status": "fail-selected-setters-or-input-join",
+  "actual_comparison_exit_code": 1,
+  "selected_comparison_released": false,
+  "reviewer_authored_comparer": true,
+  "review_limit": "Independent factual custody/count/DTO/complete-ledger review; protocol replay reuses Root/Header independently Source-reviewed comparer, not a new independent scientific implementation",
+  "cold_guard_backend_PASS_claimed": false,
+  "whole_SRC05_unit_or_ordinary_manager_PASS_claimed": false,
+  "gates_updated": false
+}

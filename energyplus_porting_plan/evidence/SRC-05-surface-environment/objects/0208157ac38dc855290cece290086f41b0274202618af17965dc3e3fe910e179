@@ -1,0 +1,11 @@
+--- a/README.md
++++ b/README.md
+@@ -27,3 +27,8 @@
+ Root reuses the existing SYS02 literal-env launcher with SRC05 prefix/filter.
+ Input/output SHA and full Source snapshots are external before/after requirements.
+ The ignored test writes only a fresh contained runtime output. Tests are unexecuted.
++
++Source-only self-review04 also records actual temperature_at_height dry/wet and
++wind_speed_at_height returns at each real probe boundary. These methods share
++only actual literal weather/height/parameter inputs. Native skipped NoWind or
++unreached stages remain unpaired, never arithmetic PASS. No method math changed.

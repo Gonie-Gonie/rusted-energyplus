@@ -1,0 +1,41 @@
+--- a/observation-policy.proposed.json
++++ b/observation-policy.proposed.json
+@@ -0,0 +1,38 @@
++{
++  "schema": "src05-surface-environment-observation-policy.v1",
++  "frozen_before_Native_output_required": true,
++  "arithmetic": {
++    "absolute_tolerance": 0,
++    "relative_tolerance": 0,
++    "finite_only": true,
++    "class_and_signed_zero_required": true,
++    "fields": [
++      "SurfOutDryBulbTemp",
++      "SurfOutWetBulbTemp",
++      "SurfOutWindSpeed",
++      "actual_default_station_modifiers"
++    ]
++  },
++  "copied_or_retained": {
++    "IEEE_bits_exact": true,
++    "NaN_payload_bits_exact": true,
++    "fields": [
++      "every_route_retained_owner",
++      "zero_gradient_bulbs",
++      "zero_exponent_wind",
++      "SurfOutWindDir",
++      "input_state_owners"
++    ]
++  },
++  "structure": [
++    "full bounds/allocation/row order/actual indexes/names",
++    "every declared call/return/exception/unreached stage",
++    "actual ordered diagnostics/counters/callbacks/prefixes"
++  ],
++  "cold_guard_Rust_backend_available": false,
++  "cold_guard_backend_rows_required_but_not_numerical_PASS": true,
++  "ordinary_production_handoff_verified": false,
++  "gates_updated": false,
++  "unavailable_or_missing_never_PASS": true,
++  "runtime_receipts_and_actual_binary_providers_required": true
++}

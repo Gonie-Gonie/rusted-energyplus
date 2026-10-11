@@ -191,3 +191,5 @@ SYS-03 uncontrolled warmup owner applied in strict ordinary A; focused323/worksp
 SYS-02 selected daily warmup methods: genuine Native/Rust25-case comparison matched10,785 input/initial checks and7,383 state comparisons with zero mismatches. [Full evidence](evidence/SYS-02-selected-warmup/summary.json). Rolling/report/backend/producer and ordinary handoff remain pending; gates unchanged.
 
 SYS-02 selected daily and six rolling warmup methods: genuine Native/Rust25-case comparison matched10,953 input/initial checks and10,023 state comparisons with zero mismatches. [Full evidence](evidence/SYS-02-rolling-warmup/summary.json). Report/backend/producer and ordinary handoff remain pending; gates unchanged.
+
+SRC-05 actual selected surface environment comparison: fail-selected-setters-or-input-join, 26 cases/30 weather operations, 3 mismatches; complete required-unavailable ledgers retained. [Full evidence](evidence/SRC-05-surface-environment/summary.json). Cold guard/backend/ordinary handoff and whole-card gates remain pending; gates unchanged.

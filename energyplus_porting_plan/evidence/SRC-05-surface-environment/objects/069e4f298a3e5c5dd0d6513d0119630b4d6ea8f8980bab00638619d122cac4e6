@@ -1,0 +1,54 @@
+{
+  "schema": "src05-selected-surface-environment-execution-input-custody.v1",
+  "actual_launcher_source": {
+    "path": ".runtime/porting/SRC-05/run-selected-observer-01.py",
+    "sha256": "b53e257f07df2dfd748f70f90e8e76d1e356d56016de34bd57224e7875ff1cdd",
+    "size_bytes": 2440
+  },
+  "actual_environment_operands": {
+    "SRC05_REFERENCE_INPUT": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-05\\selected-observation-02\\Rust-input.json",
+    "SRC05_REFERENCE_OUTPUT": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-05\\selected-observation-02\\Rust\\result.json"
+  },
+  "actual_input_before": {
+    "path": ".runtime/porting/SRC-05/selected-observation-02/Rust-input.json",
+    "sha256": "0191a53ee11a1767a1b35023fcf5a3769e8c9df89c4d297847e3ed9d31cb4c15",
+    "size_bytes": 80365
+  },
+  "actual_Cargo_command": [
+    "cargo",
+    "test",
+    "--config",
+    "profile.dev.debug=0",
+    "--config",
+    "profile.test.debug=0",
+    "--config",
+    "build.incremental=false",
+    "--locked",
+    "-p",
+    "ep_runtime",
+    "--lib",
+    "heat_balance::convection::surface_environment::selected_reference::observe_literal_surface_environment_setters",
+    "--",
+    "--exact",
+    "--ignored"
+  ],
+  "actual_input_after": {
+    "path": ".runtime/porting/SRC-05/selected-observation-02/Rust-input.json",
+    "sha256": "0191a53ee11a1767a1b35023fcf5a3769e8c9df89c4d297847e3ed9d31cb4c15",
+    "size_bytes": 80365
+  },
+  "actual_Cargo_execution": {
+    "path": ".runtime/porting/SRC-05/selected-observation-02/Rust/cargo-command/receipt.json",
+    "sha256": "07c65dcf460179895604d753cdf59d1e68730385ee49757d047ca1c497cd6edb",
+    "size_bytes": 3650
+  },
+  "actual_output": {
+    "path": ".runtime/porting/SRC-05/selected-observation-02/Rust/result.json",
+    "sha256": "511f5e3e0ec52179a76c0607144b677a53b6b8037415510e54fb5d72eebdf9ff",
+    "size_bytes": 1017414
+  },
+  "actual_Cargo_exit_code": 0,
+  "input_bytes_match_before_after": true,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false
+}

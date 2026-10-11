@@ -1,0 +1,496 @@
+"""Prepare an immutable Source-only SRC05 proposal; never import or run a target."""
+from pathlib import Path
+import ast
+import difflib
+import hashlib
+import json
+
+ROOT = Path.cwd()
+OUT = ROOT / '.runtime/porting/SRC-05/surface-environment-prep-01'
+assert not OUT.exists()
+OUT.mkdir(parents=True)
+
+def ref(path):
+    path = Path(path)
+    if not path.is_absolute():
+        path = ROOT / path
+    raw = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(raw).hexdigest(),
+            'size_bytes': len(raw), 'line_count': len(raw.splitlines())}
+
+module = r'''//! Direct DataSurfaces surface-environment setters, with caller-owned rows.
+//!
+//! The ordinary runtime does not yet retain this four-array owner. These setters
+//! are a direct unit API, not an assertion that its manager handoff is active.
+
+use ep_model::Terrain;
+
+const EARTH_RADIUS_M: f64 = 6_356_000.0;
+const ATMOSPHERIC_TEMPERATURE_GRADIENT_K_PER_M: f64 = 0.0065;
+
+/// Actual environment operands read by the three setters.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct SurfaceOutdoorEnvironmentParameters {
+    /// Actual SiteTempGradient.
+    pub site_temperature_gradient_k_per_m: f64,
+    /// Actual WeatherFileTempModCoeff after the station producer.
+    pub weather_file_temperature_modifier_c: f64,
+    /// Actual SiteWindExp.
+    pub site_wind_exponent: f64,
+    /// Actual SiteWindBLHeight.
+    pub site_wind_boundary_layer_height_m: f64,
+    /// Actual WeatherFileWindModCoeff.
+    pub weather_file_wind_modifier: f64,
+}
+
+impl SurfaceOutdoorEnvironmentParameters {
+    /// Source default producer for absent Site:WeatherStation/HeightVariation.
+    /// Terrain is the actual compiled Building value. Explicit overrides remain
+    /// outside the ordinary CON01 scope; the direct API can receive real operands.
+    #[must_use]
+    pub fn default_weather_station(terrain: Terrain) -> Self {
+        let (site_wind_exponent, site_wind_boundary_layer_height_m) =
+            super::energyplus_site_wind_profile(terrain);
+        let wind_sensor_height_m = 10.0;
+        let wind_exponent = 0.14;
+        let wind_boundary_layer_height_m: f64 = 270.0;
+        let temperature_sensor_height_m = 1.5;
+        Self {
+            site_temperature_gradient_k_per_m: 0.0065,
+            weather_file_temperature_modifier_c: ATMOSPHERIC_TEMPERATURE_GRADIENT_K_PER_M
+                * EARTH_RADIUS_M * temperature_sensor_height_m
+                / (EARTH_RADIUS_M + temperature_sensor_height_m),
+            site_wind_exponent,
+            site_wind_boundary_layer_height_m,
+            weather_file_wind_modifier:
+                (wind_boundary_layer_height_m / wind_sensor_height_m).powf(wind_exponent),
+        }
+    }
+
+    fn temperature_from_base(self, base_temperature_c: f64, height_m: f64) -> f64 {
+        if height_m <= 0.0 {
+            base_temperature_c
+        } else {
+            let gradient_dividend = self.site_temperature_gradient_k_per_m * EARTH_RADIUS_M * height_m;
+            let gradient_divisor = EARTH_RADIUS_M + height_m;
+            base_temperature_c - gradient_dividend / gradient_divisor
+        }
+    }
+
+    /// The selected setter's temperature operand, not DataEnvironment's distinct
+    /// point getter (whose zero-gradient branch differs in its base handling).
+    #[must_use]
+    pub fn temperature_at_height(self, outdoor_temperature_c: f64, height_m: f64) -> f64 {
+        if self.site_temperature_gradient_k_per_m == 0.0 {
+            outdoor_temperature_c
+        } else {
+            let base_temperature_c = outdoor_temperature_c + self.weather_file_temperature_modifier_c;
+            self.temperature_from_base(base_temperature_c, height_m)
+        }
+    }
+
+    /// Wind-exposed row of SetSurfaceWindSpeedAt, preserving its multiplication
+    /// and pow order. No clipping of the passed wind operand is introduced.
+    #[must_use]
+    pub fn wind_speed_at_height(self, wind_speed_m_per_s: f64, height_m: f64) -> f64 {
+        let factor = wind_speed_m_per_s * self.weather_file_wind_modifier
+            * self.site_wind_boundary_layer_height_m.powf(-self.site_wind_exponent);
+        if self.site_wind_exponent == 0.0 {
+            wind_speed_m_per_s
+        } else if height_m <= 0.0 {
+            0.0
+        } else {
+            factor * height_m.powf(self.site_wind_exponent)
+        }
+    }
+}
+
+/// Actual global weather values at the selected setter call.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct SurfaceOutdoorWeather {
+    /// Actual OutDryBulbTemp.
+    pub dry_bulb_c: f64,
+    /// Actual OutWetBulbTemp.
+    pub wet_bulb_c: f64,
+    /// Actual WindSpeed.
+    pub wind_speed_m_per_s: f64,
+    /// Actual WindDir.
+    pub wind_direction_deg: f64,
+}
+
+/// One ordered allocated surface row. The caller supplies actual geometry and
+/// exposure plus all four incoming owners, including retained NoWind values.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct SurfaceOutdoorEnvironmentRow {
+    /// Actual stored Surface.Centroid.z; never derived from vertices here.
+    pub centroid_height_m: f64,
+    /// Actual Surface.ExtWind.
+    pub wind_exposed: bool,
+    /// Actual incoming/current SurfOutDryBulbTemp row.
+    pub dry_bulb_c: f64,
+    /// Actual incoming/current SurfOutWetBulbTemp row.
+    pub wet_bulb_c: f64,
+    /// Actual incoming/current SurfOutWindSpeed row.
+    pub wind_speed_m_per_s: f64,
+    /// Actual incoming/current SurfOutWindDir row.
+    pub wind_direction_deg: f64,
+}
+
+/// SetSurfaceOutBulbTempAt: all TotSurfaces rows, dry then wet writes.
+pub fn set_surface_out_bulb_temperatures(
+    parameters: SurfaceOutdoorEnvironmentParameters,
+    weather: SurfaceOutdoorWeather,
+    rows: &mut [SurfaceOutdoorEnvironmentRow],
+) {
+    if parameters.site_temperature_gradient_k_per_m == 0.0 {
+        for row in rows {
+            row.dry_bulb_c = weather.dry_bulb_c;
+            row.wet_bulb_c = weather.wet_bulb_c;
+        }
+    } else {
+        let base_dry_temperature_c = weather.dry_bulb_c + parameters.weather_file_temperature_modifier_c;
+        let base_wet_temperature_c = weather.wet_bulb_c + parameters.weather_file_temperature_modifier_c;
+        for row in rows {
+            if row.centroid_height_m <= 0.0 {
+                row.dry_bulb_c = base_dry_temperature_c;
+                row.wet_bulb_c = base_wet_temperature_c;
+            } else {
+                let gradient_dividend = parameters.site_temperature_gradient_k_per_m
+                    * EARTH_RADIUS_M * row.centroid_height_m;
+                let gradient_divisor = EARTH_RADIUS_M + row.centroid_height_m;
+                row.dry_bulb_c = base_dry_temperature_c - gradient_dividend / gradient_divisor;
+                row.wet_bulb_c = base_wet_temperature_c - gradient_dividend / gradient_divisor;
+            }
+        }
+    }
+}
+
+/// SetSurfaceWindSpeedAt: zero exponent writes every row; otherwise NoWind rows
+/// retain their actual incoming value. Row order and allocation are unchanged.
+pub fn set_surface_wind_speeds(
+    parameters: SurfaceOutdoorEnvironmentParameters,
+    wind_speed_m_per_s: f64,
+    rows: &mut [SurfaceOutdoorEnvironmentRow],
+) {
+    let factor = wind_speed_m_per_s * parameters.weather_file_wind_modifier
+        * parameters.site_wind_boundary_layer_height_m.powf(-parameters.site_wind_exponent);
+    if parameters.site_wind_exponent == 0.0 {
+        for row in rows {
+            row.wind_speed_m_per_s = wind_speed_m_per_s;
+        }
+    } else {
+        for row in rows {
+            if !row.wind_exposed {
+                continue;
+            }
+            if row.centroid_height_m <= 0.0 {
+                row.wind_speed_m_per_s = 0.0;
+            } else {
+                row.wind_speed_m_per_s = factor * row.centroid_height_m.powf(parameters.site_wind_exponent);
+            }
+        }
+    }
+}
+
+/// SetSurfaceWindDirAt: no normalization or exposure filtering.
+pub fn set_surface_wind_directions(wind_direction_deg: f64, rows: &mut [SurfaceOutdoorEnvironmentRow]) {
+    for row in rows {
+        row.wind_direction_deg = wind_direction_deg;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn row(height: f64, exposed: bool, wind: f64) -> SurfaceOutdoorEnvironmentRow {
+        SurfaceOutdoorEnvironmentRow {
+            centroid_height_m: height, wind_exposed: exposed, dry_bulb_c: 7.0,
+            wet_bulb_c: 6.0, wind_speed_m_per_s: wind, wind_direction_deg: 123.0,
+        }
+    }
+
+    #[test]
+    fn no_wind_retains_owner_bits_across_multiple_calls() {
+        let parameters = SurfaceOutdoorEnvironmentParameters::default_weather_station(Terrain::Suburbs);
+        let retained = f64::from_bits(0x7ff8_0000_0000_1234);
+        let mut rows = [row(3.0, false, retained), row(0.0, true, 9.0)];
+        for wind in [4.0, -2.0, 0.0] {
+            set_surface_wind_speeds(parameters, wind, &mut rows);
+            assert_eq!(rows[0].wind_speed_m_per_s.to_bits(), retained.to_bits());
+            assert_eq!(rows[1].wind_speed_m_per_s.to_bits(), 0.0_f64.to_bits());
+            assert_eq!(rows[0].dry_bulb_c.to_bits(), 7.0_f64.to_bits());
+            assert_eq!(rows[0].wind_direction_deg.to_bits(), 123.0_f64.to_bits());
+        }
+    }
+
+    #[test]
+    fn zero_exponent_overwrites_no_wind_and_nonpositive_heights() {
+        let parameters = SurfaceOutdoorEnvironmentParameters {
+            site_wind_exponent: 0.0,
+            ..SurfaceOutdoorEnvironmentParameters::default_weather_station(Terrain::Country)
+        };
+        let mut rows = [row(-1.0, false, 9.0), row(0.0, true, 8.0), row(3.0, false, 7.0)];
+        set_surface_wind_speeds(parameters, -0.0, &mut rows);
+        for value in rows {
+            assert_eq!(value.wind_speed_m_per_s.to_bits(), (-0.0_f64).to_bits());
+        }
+    }
+
+    #[test]
+    fn zero_gradient_copies_bulbs_without_station_modifier() {
+        let parameters = SurfaceOutdoorEnvironmentParameters {
+            site_temperature_gradient_k_per_m: 0.0,
+            weather_file_temperature_modifier_c: 50.0,
+            ..SurfaceOutdoorEnvironmentParameters::default_weather_station(Terrain::Ocean)
+        };
+        let weather = SurfaceOutdoorWeather { dry_bulb_c: -0.0, wet_bulb_c: 3.0,
+            wind_speed_m_per_s: 9.0, wind_direction_deg: -12.0 };
+        let mut rows = [row(-5.0, true, 8.0), row(9.0, false, 7.0)];
+        set_surface_out_bulb_temperatures(parameters, weather, &mut rows);
+        for value in rows {
+            assert_eq!(value.dry_bulb_c.to_bits(), weather.dry_bulb_c.to_bits());
+            assert_eq!(value.wet_bulb_c.to_bits(), weather.wet_bulb_c.to_bits());
+            assert_eq!(value.wind_direction_deg.to_bits(), 123.0_f64.to_bits());
+        }
+    }
+
+    #[test]
+    fn nonpositive_heights_share_base_and_direction_copies_raw_signed_zero() {
+        let parameters = SurfaceOutdoorEnvironmentParameters::default_weather_station(Terrain::City);
+        let weather = SurfaceOutdoorWeather { dry_bulb_c: -6.0, wet_bulb_c: -7.0,
+            wind_speed_m_per_s: 4.0, wind_direction_deg: -0.0 };
+        let mut rows = [row(-5.0, true, 8.0), row(0.0, false, 7.0)];
+        set_surface_out_bulb_temperatures(parameters, weather, &mut rows);
+        assert_eq!(rows[0].dry_bulb_c.to_bits(), rows[1].dry_bulb_c.to_bits());
+        assert_eq!(rows[0].wet_bulb_c.to_bits(), rows[1].wet_bulb_c.to_bits());
+        set_surface_wind_directions(weather.wind_direction_deg, &mut rows);
+        for value in rows {
+            assert_eq!(value.wind_direction_deg.to_bits(), weather.wind_direction_deg.to_bits());
+        }
+    }
+}
+'''
+
+conv_path = 'crates/ep_runtime/src/heat_balance/convection.rs'
+conv = (ROOT / conv_path).read_text(encoding='utf-8')
+conv = conv.replace('mod geometry_operands;\n', 'mod geometry_operands;\npub mod surface_environment;\n', 1)
+for line in [
+    'const ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_SENSOR_HEIGHT_M: f64 = 10.0;\n',
+    'const ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_EXPONENT: f64 = 0.14;\n',
+    'const ENERGYPLUS_DEFAULT_WEATHER_FILE_WIND_BOUNDARY_LAYER_HEIGHT_M: f64 = 270.0;\n',
+    'const ENERGYPLUS_DEFAULT_OUTDOOR_AIR_TEMPERATURE_GRADIENT_K_PER_M: f64 = 0.0065;\n',
+]:
+    assert conv.count(line) == 1
+    conv = conv.replace(line, '', 1)
+start = conv.index('    if height_m <= 0.0 || weather_file_wind_speed_m_per_s <= 0.0 {', conv.index('pub(crate) fn energyplus_wind_speed_at_height_m_per_s'))
+end = conv.index('\n}\n', start)
+conv = conv[:start] + '''    surface_environment::SurfaceOutdoorEnvironmentParameters::default_weather_station(terrain)
+        .wind_speed_at_height(weather_file_wind_speed_m_per_s, height_m)''' + conv[end:]
+start = conv.index('    weather_file_temperature_c\n', conv.index('pub(crate) fn energyplus_air_temperature_at_height_c'))
+end = conv.index('\n}\n', start)
+conv = conv[:start] + '''    // Terrain does not change the admitted temperature-gradient/station defaults.
+    surface_environment::SurfaceOutdoorEnvironmentParameters::default_weather_station(Terrain::Suburbs)
+        .temperature_at_height(weather_file_temperature_c, height_m)''' + conv[end:]
+
+test_path = 'crates/ep_runtime/src/runtime/tests/part03.rs'
+tests = (ROOT / test_path).read_text(encoding='utf-8')
+old = '''        let expected_roof_wind = 4.0 * expected_weather_mod * (roof_height_m / 370.0).powf(0.22);
+
+        let expected_roof_air_temperature = 20.0
+            - 0.0065
+                * (roof_height_m - ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M);'''
+new = '''        let expected_roof_wind =
+            (4.0 * expected_weather_mod * 370.0_f64.powf(-0.22)) * roof_height_m.powf(0.22);
+
+        let earth_radius_m = 6_356_000.0;
+        let sensor_height_m = ENERGYPLUS_DEFAULT_WEATHER_FILE_TEMPERATURE_SENSOR_HEIGHT_M;
+        let station_modifier = 0.0065 * earth_radius_m * sensor_height_m
+            / (earth_radius_m + sensor_height_m);
+        let expected_roof_air_temperature = (20.0 + station_modifier)
+            - (0.0065 * earth_radius_m * roof_height_m) / (earth_radius_m + roof_height_m);'''
+assert tests.count(old) == 1
+tests = tests.replace(old, new, 1)
+
+card_path = 'energyplus_porting_plan/cards/SRC-05.md'
+card = (ROOT / card_path).read_text(encoding='utf-8')
+card += '''
+## SRC-05 bounded Source proposal (unexecuted)
+
+The exact selected bodies are `DataSurfaces.cc:594–618,634–666`; their caller is
+`HeatBalanceSurfaceManager.cc:308–345`. The intervening temperature guard
+`DataSurfaces.cc:620–632` delegates the severe/continue/fatal backend to
+`DataEnvironment.cc:236–247`; that backend is a remaining integration obligation.
+Declarations and allocation/initialization are `DataSurfaces.hh:1540–1543` and
+`SurfaceGeometry.cc:862–873`. Weather-station coefficients are produced at
+`WeatherManager.cc:7233–7301`; constants are `DataEnvironment.hh:79–80`.
+Terrain/default scope is `HeatBalanceManager.cc:566–585,1252–1317` plus CON-01.
+
+Use actual all-surface order, stored centroid height, ExtWind and incoming four
+owners. Zero gradient copies global bulbs without the station modifier. Nonzero
+gradient uses the EarthRadius quotient and clamps nonpositive height to base.
+Wind uses the original factor/pow order; nonzero exponent skips NoWind writes,
+while zero exponent writes every surface. Wind direction copies raw bits.
+Local environments, EMS overrides and explicit station/height variation remain
+outside ordinary admission; direct operand cases do not expand that admission.
+
+Held Rust setters and compatibility-helper corrections are Source proposals,
+with four unexecuted owner/branch regressions. No numerical Native claim or gate
+change is made. The ordinary runtime still lacks the retained four-array owner
+and true setter/check sequence at InitSurfaceHeatBalance. Full production
+handoff, guard/backend and SRC-07/08 consumers remain separate prerequisites.
+The actual failed persistent comparison remains evidence; no policy is changed.
+'''
+
+application = []
+for path, text in [(conv_path, conv), ('crates/ep_runtime/src/heat_balance/convection/surface_environment.rs', module), (test_path, tests), (card_path, card)]:
+    actual = ROOT / path
+    proposal = OUT / 'proposed' / path
+    proposal.parent.mkdir(parents=True, exist_ok=True)
+    proposal.write_text(text, encoding='utf-8', newline='\n')
+    before = OUT / 'before' / path
+    before.parent.mkdir(parents=True, exist_ok=True)
+    if actual.exists():
+        before.write_bytes(actual.read_bytes())
+        actual_before = ref(actual)
+        before_text = actual.read_text(encoding='utf-8')
+    else:
+        before.write_bytes(b'')
+        actual_before = None
+        before_text = ''
+    diff = OUT / 'diffs' / (path.replace('/', '__') + '.diff')
+    diff.parent.mkdir(exist_ok=True)
+    diff.write_text(''.join(difflib.unified_diff(before_text.splitlines(keepends=True), text.splitlines(keepends=True), fromfile='a/' + path, tofile='b/' + path)), encoding='utf-8', newline='\n')
+    application.append({'canonical_path': path, 'actual_before': actual_before,
+        'new_destination_absent': actual_before is None, 'before_archive': ref(before),
+        'proposal': ref(proposal), 'exact_diff': ref(diff)})
+
+source_ranges = []
+for path, start, end, purpose in [
+    ('.reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.cc',594,618,'Full bulb setter'),
+    ('.reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.cc',620,632,'Intervening caller guard; backend remains pending'),
+    ('.reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.cc',634,666,'Full wind speed and direction setters'),
+    ('.reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc',308,345,'Actual setter/check order and excluded override branches'),
+    ('.reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.hh',79,80,'Actual EarthRadius and atmospheric gradient'),
+    ('.reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.hh',192,196,'Constructor fields, distinct from later real station producer'),
+    ('.reference/energyplus-src/26.1.0/src/EnergyPlus/WeatherManager.cc',7233,7301,'Actual station default producer and modifier order'),
+    ('.reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc',566,585,'Terrain producer'),
+    ('.reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc',1252,1317,'Absent HeightVariation gradient producer'),
+    ('.reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh',1540,1543,'Four actual array owners'),
+    ('.reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc',862,873,'Actual allocation and initial positive-zero values'),
+    ('.reference/energyplus-src/26.1.0/src/EnergyPlus/DataEnvironment.cc',236,247,'Temperature error helper; not ported here'),
+    ('crates/ep_runtime/src/heat_balance/convection/geometry_operands.rs',8,49,'Existing passed stored centroid consumers'),
+    ('crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs',430,448,'Existing genuine selected outside-dry operand consumer'),
+    ('crates/ep_runtime/src/heat_balance/surface_balance.rs',156,172,'Existing dry/wet height consumers'),
+    ('crates/ep_runtime/src/heat_balance/state.rs',383,435,'Actual surface owner has no stored environment quartet'),
+    ('crates/ep_run/src/porting_scope/settings.rs',215,231,'Actual compiled Terrain/default atmosphere projection'),
+]:
+    raw = (ROOT / path).read_bytes().splitlines(keepends=True)
+    assert 1 <= start <= end <= len(raw)
+    archive = OUT / 'ranges' / (path.replace('/', '__') + f'.{start}-{end}.txt')
+    archive.parent.mkdir(exist_ok=True)
+    archive.write_bytes(b''.join(raw[start-1:end]))
+    source_ranges.append({'source': ref(path), 'start_line': start, 'end_line': end,
+                          'purpose': purpose, 'archive': ref(archive)})
+
+plan = '''# Genuine Native same-input unit plan (not executed)
+
+No existing standalone DataSurfaces setter helper was found. Reuse the accepted
+RAD/ZON one-TU JSON request/response/IEEE codec and real EnergyPlusData/CoreArchive
+pattern; do not derive another engine TU or reuse Native06 lifecycle machinery.
+Call the unchanged public DataSurfaces functions, with an address-bound core
+provider proof when built. No target/build/runner is authored in this hold.
+
+Prepare fresh true state; allocate Surface plus all four SurfOut arrays to the
+literal row count. Assign actual centroid z/ExtWind, global weather operands,
+site/station parameters and all four incoming owners from input-only bit DTOs.
+Retain row identity/order, every before/after owner and actual call/return/throw.
+For the normal source-order lane call bulb setter, genuine CheckSurfaceOutBulbTempAt,
+wind speed setter, wind direction setter; after a fatal do not call later stages.
+For diagnostic setter-only zero-gradient/exponent operands label the distinct
+direct-unit lane; never claim such inputs were admitted by fixed CON-01.
+
+Prospective finite weather/height cases: each actual Terrain default; z below/at/
+above0; weather temperature at/below/above sensor height; nonzero dry/wet separation;
+negative/zero/positive wind; both exposures with distinct nonzero incoming wind;
+two ordered calls preserving NoWind seeds; zero gradient with nonzero modifier;
+zero exponent with NoWind/nonpositive z; raw ±0 and out-of-range direction copies;
+zero surfaces; and a real below-100 guard failure with retained bulb prefix.
+Include retained NaN-payload wind seeds only on the genuine skipped NoWind row.
+No numerical outputs, expected arrays, frozen result hashes or run counts exist.
+
+Freeze source/request/ID mapping and variable-specific exact IEEE/class/copy
+policy before Native output. Compare every declared row/owner/branch; no sampling,
+clipping or blanket tolerance. Exact powf/libm disagreement is a retained mismatch,
+not a reason to alter the prospective policy. Capture backend arguments separately
+for the guard; the existing real backend can be reused only after its API review.
+Root must obtain/release actual Native data before authorizing canonical math
+application. Ordinary setter owner/timing integration is not certified by this unit.
+'''
+(OUT / 'native-unit-plan.md').write_text(plan, encoding='utf-8', newline='\n')
+readme = '''# SRC05 surface environment Source proposal
+
+Held Source only: three Rust application rows (one new module) and a card scope
+amendment. No target/import/test/formatter/Cargo/Git/canonical operation occurred.
+This is separate from pending SYS03 and changes none of its owned paths.
+
+The actual failed ordinary comparison identified different outside dry-bulb bits;
+Source inspection independently finds the affine lapse and regrouped wind powers
+disagree with the fixed Original expressions. This proposal takes no Native
+outputs as operands or expectations and changes no comparison policy.
+
+The new direct row API keeps all four genuine incoming owners and preserves
+NoWind skipped-write bits. Empty slices are the true zero-surface loop case.
+Default weather-station/terrain parameters have an explicit Source producer;
+constructor WeatherFileTempModCoeff=0 is not substituted for GetWeatherStation.
+Existing compatibility height consumers delegate the new exact expressions.
+The old NoWind compatibility getter still returns the Source-initialized zero
+under fixed absent-override scope; it is explicitly not the stateful setter API.
+The new direct API must not be presented as an already integrated live owner.
+
+The four tests exercise skipped-write payload retention across calls, zero
+exponent overwrite, zero-gradient copies and nonpositive-height/raw-direction
+semantics. They are unexecuted and supply no expected Native arithmetic results.
+The existing geometry consumer test retains its assertions/tolerances and uses
+the correct Source expectation instead of the old affine/regrouped expression.
+See native-unit-plan.md for genuine same-input public-function verification.
+
+Not certified: real retained ordinary four-array owner/manager ordering, cold
+temperature error/backend, override branches, downstream convection or heat
+balance numeric parity, any production/integration/card gate. No full-engine
+observation is rerun or filtered. Original comparison remains an honest failure.
+'''
+(OUT / 'README.md').write_text(readme, encoding='utf-8', newline='\n')
+
+dependencies = [
+    'energyplus_porting_plan/PORTING_INSTRUCTIONS.md', 'energyplus_porting_plan/STATE_CONTRACTS.md',
+    'energyplus_porting_plan/cards/CON-01.md', 'energyplus_porting_plan/cards/CLK-04.md',
+    'energyplus_porting_plan/cards/GEO-02.md', 'energyplus_porting_plan/evidence/CON-01/source-review.md',
+    'crates/ep_runtime/src/heat_balance/convection/geometry_operands.rs',
+    'crates/ep_runtime/src/heat_balance/surface_balance.rs',
+    'crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs',
+    'crates/ep_runtime/src/heat_balance/state.rs', 'crates/ep_run/src/porting_scope/settings.rs',
+    '.runtime/porting/RAD-01/native-helper-prep-02/manifest.json',
+    '.runtime/porting/ZON-05/native-helper-prep-01/manifest.json',
+]
+manifest = {'schema': 'src05-surface-environment-source-proposal.v1', 'status': 'held-Source-only-unexecuted',
+    'EnergyPlus_commit': '6f2e40d10250a105b49966baa24d843711e61048',
+    'application': application,
+    'own_sources': [r['proposal'] for r in application if r['canonical_path'].endswith('.rs')],
+    'source_dependencies': [ref(x) for x in dependencies], 'selected_source_ranges': source_ranges,
+    'README': ref(OUT / 'README.md'), 'native_unit_plan': ref(OUT / 'native-unit-plan.md'),
+    'author': ref(__file__), 'tests_authored': 4, 'tests_executed': False,
+    'Native_unit_baseline_required_before_canonical_math_application': True,
+    'ordinary_four_array_owner_and_manager_handoff_verified': False,
+    'cold_temperature_guard_backend_verified': False,
+    'canonical_mutation_performed': False, 'target_execution_performed': False,
+    'scientific_result_values_used_as_inputs_or_expectations': False, 'gates_updated': False}
+ast.parse(Path(__file__).read_text(encoding='utf-8'))
+for row in application:
+    path = row['canonical_path']
+    a = (ROOT / row['before_archive']['path']).read_text(encoding='utf-8')
+    b = (ROOT / row['proposal']['path']).read_text(encoding='utf-8')
+    expected = ''.join(difflib.unified_diff(a.splitlines(keepends=True), b.splitlines(keepends=True), fromfile='a/' + path, tofile='b/' + path))
+    assert expected == (ROOT / row['exact_diff']['path']).read_text(encoding='utf-8')
+(OUT / 'manifest.json').write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + '\n', encoding='utf-8', newline='\n')
+print(json.dumps(ref(OUT / 'manifest.json')))
