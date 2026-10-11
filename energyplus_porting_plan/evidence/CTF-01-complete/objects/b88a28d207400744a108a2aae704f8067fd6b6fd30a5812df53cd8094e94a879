@@ -1,0 +1,418 @@
+{
+  "schema_version": "con01-scope.v2",
+  "energyplus": {
+    "version": "26.1.0",
+    "commit": "6f2e40d10250a105b49966baa24d843711e61048"
+  },
+  "original_rust_baseline": "d7b516627f421259012f3e61bc28cca831452468",
+  "calendar": {
+    "civil_year": 2013,
+    "time_steps_per_hour": 4,
+    "nominal_zone_step_seconds": 900,
+    "time_zone_hours": -7,
+    "leap_year": false,
+    "weather_only": true,
+    "design_day_declarations_inactive": true,
+    "effective_dst": false,
+    "effective_weather_holidays": 0,
+    "weather_data_period_weekday": "Sunday",
+    "weekday_policy": "RunPeriod explicit 2013 civil weekday overrides EPW header weekday",
+    "ordinal_policy": {
+      "civil_weather_day_of_year": "2013 non-leap 365-day calendar",
+      "schedule_day_of_year": "always-leap 366-day index; Jun30=182 while civil/weather=181 (WeatherManager.cc2076, ScheduleManager.cc2527)"
+    },
+    "api_year_semantics": {
+      "calendar_year": "civil simulation year (2013)",
+      "year": "weather record year from EPW, not civil year"
+    }
+  },
+  "scopes": {
+    "A": {
+      "zone_count": 1,
+      "opaque_surfaces": 6,
+      "hvac_count": 0,
+      "allowed_thermal_features": [
+        "Material",
+        "Material:NoMass",
+        "opaque CTF",
+        "OtherEquipment",
+        "TARP",
+        "DOE-2",
+        "MinimalShadowing",
+        "Zone ceiling-height/volume Autocalculate from opaque surfaces (delegated GEO)"
+      ],
+      "nonthermal_features_retained": [
+        "Exterior:Lights (exterior meter only)",
+        "inactive SizingPeriod:DesignDay declarations",
+        "output/report requests"
+      ]
+    },
+    "B": {
+      "zone_count": 1,
+      "opaque_surfaces": 6,
+      "ideal_loads_count": 1,
+      "room_air": "Mixing",
+      "connection": "direct zone equipment",
+      "outdoor_air": false,
+      "dehumidification": "None",
+      "humidification": "None",
+      "limits": {
+        "NOLIMIT": "NoLimit",
+        "FLOW": "LimitFlowRate",
+        "CAPACITY": "LimitCapacity",
+        "BOTH": "LimitFlowRateAndCapacity"
+      },
+      "hard_sizes": {
+        "flow_m3_s": 0.02,
+        "capacity_W": 120
+      },
+      "active_branch_declarations": {
+        "AvailabilityActive": {
+          "schedule_name": "CON-01 System Availability",
+          "daily_off_hours": 3,
+          "daily_on_hours": 21,
+          "downstream_cards": [
+            "HVAC-03",
+            "SYS-06"
+          ],
+          "internal_phase_gate_passed": false
+        }
+      }
+    }
+  },
+  "excluded_active_features": [
+    "windows/fenestration",
+    "shading devices",
+    "infiltration/ventilation/AFN",
+    "outdoor-air paths",
+    "non-Mixing room air",
+    "air loops",
+    "plant",
+    "EMS",
+    "equipment/HVAC autosizing/autocalculate",
+    "multiple zones/equipment",
+    "Kiva",
+    "phase-change/hysteresis",
+    "spectral/thermochromic glass",
+    "space heat-balance sizing/simulation",
+    "contaminants",
+    "zone mass-flow conservation"
+  ],
+  "execution_policy": {
+    "reference": "read-only EnergyPlus API observers; no actuators or state setters",
+    "raw_results_root": ".runtime/porting/CON-01",
+    "automatic_gate_updates": false,
+    "prepared_is_executed": false,
+    "downstream_numerics_certified_by_CON01": false
+  },
+  "cases": [
+    {
+      "id": "A-24H",
+      "scope": "A",
+      "duration": "24H",
+      "limit_variant": null,
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+        "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+      }
+    },
+    {
+      "id": "A-72H",
+      "scope": "A",
+      "duration": "72H",
+      "limit_variant": null,
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+        "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+        "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+      }
+    },
+    {
+      "id": "A-ANNUAL",
+      "scope": "A",
+      "duration": "ANNUAL",
+      "limit_variant": null,
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+        "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
+        "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb"
+      }
+    },
+    {
+      "id": "B-NOLIMIT-24H",
+      "scope": "B",
+      "duration": "24H",
+      "limit_variant": "NOLIMIT",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+        "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+        "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+      }
+    },
+    {
+      "id": "B-NOLIMIT-72H",
+      "scope": "B",
+      "duration": "72H",
+      "limit_variant": "NOLIMIT",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+        "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+        "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e"
+      }
+    },
+    {
+      "id": "B-NOLIMIT-ANNUAL",
+      "scope": "B",
+      "duration": "ANNUAL",
+      "limit_variant": "NOLIMIT",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+        "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+        "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8"
+      }
+    },
+    {
+      "id": "B-FLOW-24H",
+      "scope": "B",
+      "duration": "24H",
+      "limit_variant": "FLOW",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+        "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+        "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+      }
+    },
+    {
+      "id": "B-FLOW-72H",
+      "scope": "B",
+      "duration": "72H",
+      "limit_variant": "FLOW",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+        "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+        "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29"
+      }
+    },
+    {
+      "id": "B-FLOW-ANNUAL",
+      "scope": "B",
+      "duration": "ANNUAL",
+      "limit_variant": "FLOW",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+        "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+        "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6"
+      }
+    },
+    {
+      "id": "B-CAPACITY-24H",
+      "scope": "B",
+      "duration": "24H",
+      "limit_variant": "CAPACITY",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+        "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+        "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+      }
+    },
+    {
+      "id": "B-CAPACITY-72H",
+      "scope": "B",
+      "duration": "72H",
+      "limit_variant": "CAPACITY",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+        "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+        "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd"
+      }
+    },
+    {
+      "id": "B-CAPACITY-ANNUAL",
+      "scope": "B",
+      "duration": "ANNUAL",
+      "limit_variant": "CAPACITY",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+        "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+        "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3"
+      }
+    },
+    {
+      "id": "B-BOTH-24H",
+      "scope": "B",
+      "duration": "24H",
+      "limit_variant": "BOTH",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+        "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+        "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+      }
+    },
+    {
+      "id": "B-BOTH-72H",
+      "scope": "B",
+      "duration": "72H",
+      "limit_variant": "BOTH",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+        "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+        "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+      }
+    },
+    {
+      "id": "B-BOTH-ANNUAL",
+      "scope": "B",
+      "duration": "ANNUAL",
+      "limit_variant": "BOTH",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+        "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+        "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4"
+      }
+    }
+  ],
+  "unit_settings_cases": [
+    {
+      "id": "UNIT-NORTH-NEGATIVE-WARMUP",
+      "scope": "A",
+      "duration": "24H",
+      "limit_variant": null,
+      "input": {
+        "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/input.idf",
+        "sha256": "4463bcc07733f98c7accb4f14c099eb86d843ef49e830bb296428de785d05b10"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-NEGATIVE-WARMUP/metadata.json",
+        "sha256": "53359b2fc6e5572619e02991da1c69357223d9f9d7a9717057db76239884221a"
+      }
+    },
+    {
+      "id": "UNIT-NORTH-POSITIVE-DEFAULT-WARMUP",
+      "scope": "A",
+      "duration": "24H",
+      "limit_variant": null,
+      "input": {
+        "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/input.idf",
+        "sha256": "bd6cb059ee5ac4bf6e571987817af6d322503d074aec7ec3bbaddc0122f0c007"
+      },
+      "weather": {
+        "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+        "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+      },
+      "metadata": {
+        "path": "energyplus_porting_plan/evidence/CON-01/unit-settings/UNIT-NORTH-POSITIVE-DEFAULT-WARMUP/metadata.json",
+        "sha256": "b7de28514bee6df1fdde72d6aa98290111a760a094b7a40c5a715cd5d1b886ad"
+      }
+    }
+  ]
+}

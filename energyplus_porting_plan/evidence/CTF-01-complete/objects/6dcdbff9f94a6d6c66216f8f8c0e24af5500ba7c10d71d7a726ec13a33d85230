@@ -1,0 +1,256 @@
+{
+  "schema": "ctf03-selected-initial-actual-comparison-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-03-unit/manifest.json",
+    "sha256": "7fefd89590e8b497f4ef79f28f72ab2dcb83a244232736465fda6af27585e9f8",
+    "size_bytes": 40442
+  },
+  "Original_and_existing_Rust_baseline": {
+    "path": "energyplus_porting_plan/evidence/CTF-03-original-baseline/summary.json",
+    "sha256": "235dac313ebd08074a7f373a41fab2270c88d3051f932156f7f61043da3a2f4d",
+    "size_bytes": 6469
+  },
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/eb/eb7b5e9050a1f2194e5f18016d06e094934f2d2097463ac938c48834a3afb0c3",
+    "sha256": "eb7b5e9050a1f2194e5f18016d06e094934f2d2097463ac938c48834a3afb0c3"
+  },
+  "applied_formatted_source_inventory": {
+    "path": "energyplus_porting_plan/evidence/CTF-03-unit/objects/e666d0a0b43d82981637f38c5bd3475897b7d8d05f43f15c009e8e915a178b49",
+    "sha256": "e666d0a0b43d82981637f38c5bd3475897b7d8d05f43f15c009e8e915a178b49",
+    "size_bytes": 11357
+  },
+  "actual_Rust_build_used_for_both_observers": {
+    "path": "energyplus_porting_plan/evidence/CTF-03-unit/objects/0666cd2725da662e647279bbd15f7b2f8cd209e5b6b6aaa4fbf428bf1479087a",
+    "sha256": "0666cd2725da662e647279bbd15f7b2f8cd209e5b6b6aaa4fbf428bf1479087a",
+    "size_bytes": 7778
+  },
+  "actual_unit_execution": {
+    "path": "energyplus_porting_plan/evidence/CTF-03-unit/objects/958bddec76f9d177b476f99de022e4b87757cab4c6b085821349698d1ba4d213",
+    "sha256": "958bddec76f9d177b476f99de022e4b87757cab4c6b085821349698d1ba4d213",
+    "size_bytes": 5062
+  },
+  "actual_production_execution": {
+    "path": "energyplus_porting_plan/evidence/CTF-03-unit/objects/b65f96313b83c7babe8b66a791428230a172eae9d80544f63fa4283dee56b6b7",
+    "sha256": "b65f96313b83c7babe8b66a791428230a172eae9d80544f63fa4283dee56b6b7",
+    "size_bytes": 4729
+  },
+  "actual_unit_comparison_execution": {
+    "path": "energyplus_porting_plan/evidence/CTF-03-unit/objects/d4b9ae837c5f831c77401b72a8174b62f89691c61c78387046d9a22127569fe7",
+    "sha256": "d4b9ae837c5f831c77401b72a8174b62f89691c61c78387046d9a22127569fe7",
+    "size_bytes": 5489
+  },
+  "actual_production_comparison_execution": {
+    "path": "energyplus_porting_plan/evidence/CTF-03-unit/objects/075add50f553199da43bc81bd0b4ba87956cbf9ce14b43a5da9aee9b70f0e77f",
+    "sha256": "075add50f553199da43bc81bd0b4ba87956cbf9ce14b43a5da9aee9b70f0e77f",
+    "size_bytes": 5873
+  },
+  "actual_unit_comparison": {
+    "path": "energyplus_porting_plan/evidence/CTF-03-unit/objects/65846c39fd129812c4612967d4f406e355b63e89101d665fe8ca68a767148d3d",
+    "sha256": "65846c39fd129812c4612967d4f406e355b63e89101d665fe8ca68a767148d3d",
+    "size_bytes": 194993
+  },
+  "actual_production_comparison": {
+    "path": "energyplus_porting_plan/evidence/CTF-03-unit/objects/32942b8c0349bb4c3176bc9242dbfa3583871ddb5fd986a6ca54b797ea43d0ea",
+    "sha256": "32942b8c0349bb4c3176bc9242dbfa3583871ddb5fd986a6ca54b797ea43d0ea",
+    "size_bytes": 96844
+  },
+  "unit": {
+    "numeric_comparisons": 148,
+    "discrete_comparisons": 7644,
+    "mismatch_count": 0,
+    "metrics": {
+      "dx": {
+        "count": 98,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "initial_CTFTimeStep": {
+        "count": 25,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "caller_TimeStepZone": {
+        "count": 25,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "unavailable_context_records_not_PASS": 37,
+    "actual_Native_observation_counts": {
+      "initial_record_count": 42,
+      "initial_reached_phase_records": 25,
+      "initial_unreached_phase_records": 17,
+      "initial_available_owner_count": 25,
+      "initial_unavailable_owner_count": 17,
+      "initial_selected_1D_owner_count": 25,
+      "initial_unselected_context_count": 0,
+      "actual_initial_callback_count": 25,
+      "model_cases": 39,
+      "operation_records": 42,
+      "actual_operation_invocations": 42,
+      "actual_operations_skipped": 0,
+      "actual_phase_callback_count": 131,
+      "unreached_phase_records": 20,
+      "scalar_DTO_visits": 4902,
+      "snapshot_visits": 318,
+      "actual_source_function_counts": {
+        "calculateTransferFunction": 42
+      },
+      "actual_source_status_counts": {
+        "source_returned": 42
+      },
+      "actual_constructor_status_counts": {
+        "source_returned": 39
+      },
+      "actual_initialization_status_counts": {
+        "source_returned": 39
+      },
+      "actual_phase_callback_counts": {
+        "PostLoad": 40,
+        "PostMerge": 33,
+        "PostConversion": 33,
+        "InitialDiscretization": 25
+      }
+    }
+  },
+  "production": {
+    "numeric_comparisons": 45,
+    "discrete_comparisons": 2556,
+    "mismatch_count": 0,
+    "metrics": {
+      "dx": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "initial_CTFTimeStep": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "caller_TimeStepZone": {
+        "count": 15,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "unavailable_context_records_not_PASS": 12,
+    "actual_Native_observation_counts": {
+      "initial_record_count": 21,
+      "initial_reached_phase_records": 15,
+      "initial_unreached_phase_records": 6,
+      "initial_available_owner_count": 15,
+      "initial_unavailable_owner_count": 6,
+      "initial_selected_1D_owner_count": 15,
+      "initial_unselected_context_count": 0,
+      "actual_initial_callback_count": 15,
+      "model_cases": 15,
+      "loader_phase_records": 195,
+      "operation_records": 21,
+      "actual_CTF_invocations": 21,
+      "actual_CTF_skipped_construct_rows": 0,
+      "loader_unavailable_model_cases": 0,
+      "actual_phase_callback_count": 78,
+      "unreached_phase_records": 0,
+      "scalar_DTO_visits": 2655,
+      "snapshot_visits": 462,
+      "unavailable_snapshot_records": 0,
+      "actual_source_function_counts": {
+        "InputProcessor::processInput": 15,
+        "SimulationManager::PostIPProcessing": 15,
+        "EnergyPlusData::init_constant_state": 15,
+        "EnergyPlusData::init_state": 15,
+        "OutputReportPredefined::SetPredefinedTables": 15,
+        "HeatBalanceManager::SetPreConstructionInputParameters": 15,
+        "OutputProcessor::SetupTimePointers(Zone)": 15,
+        "OutputProcessor::SetupTimePointers(System)": 15,
+        "HeatBalanceManager::GetProjectControlData": 15,
+        "HeatBalanceManager::GetSiteAtmosphereData": 15,
+        "Material::GetMaterialData": 15,
+        "HeatBalanceManager::GetConstructData": 15,
+        "HeatBalanceManager::GetBuildingData": 15,
+        "calculateTransferFunction": 21
+      },
+      "actual_CTF_status_counts": {
+        "source_returned": 21
+      },
+      "actual_loader_status_counts": {
+        "source_returned": 195
+      },
+      "actual_constructor_status_counts": {
+        "source_returned": 15
+      },
+      "actual_phase_callback_counts": {
+        "PostLoad": 21,
+        "PostMerge": 21,
+        "PostConversion": 21,
+        "InitialDiscretization": 15
+      },
+      "unknown_whole_call_obligations_for_unavailable_loaders": 0
+    }
+  },
+  "quality": {
+    "workspace_all_targets_passed": 4667,
+    "failed": 0,
+    "ignored": 0,
+    "test_binaries": 37,
+    "tests": {
+      "path": "energyplus_porting_plan/evidence/CTF-03-unit/objects/fa2a7b4715318647278cb104b4b584b3283ae32644722c3789af5eb0822dfe52",
+      "sha256": "fa2a7b4715318647278cb104b4b584b3283ae32644722c3789af5eb0822dfe52",
+      "size_bytes": 4451
+    },
+    "tests_executed_before_two_function_local_lint_attributes": true,
+    "bodies_tests_and_frozen_profiles_unchanged_after_tests": true,
+    "initial_clippy_exit101_preserved": {
+      "path": "energyplus_porting_plan/evidence/CTF-03-unit/objects/37fe53caac0461df2d5cf4eb34ba3bbd84b092f189fb5e4e452b304c4440dc7e",
+      "sha256": "37fe53caac0461df2d5cf4eb34ba3bbd84b092f189fb5e4e452b304c4440dc7e",
+      "size_bytes": 4493
+    },
+    "lint_amendment": {
+      "path": "energyplus_porting_plan/evidence/CTF-03-unit/objects/2348e5b25d3b14c98112d36921114d683fd75ba634883f8836a0cc3f9e7a398b",
+      "sha256": "2348e5b25d3b14c98112d36921114d683fd75ba634883f8836a0cc3f9e7a398b",
+      "size_bytes": 2262
+    },
+    "clippy_after_attributes": {
+      "path": "energyplus_porting_plan/evidence/CTF-03-unit/objects/558dbc4d183c0ef3cb46108188e60bacfdd2021cd0e3e39fcf565349cde9bd93",
+      "sha256": "558dbc4d183c0ef3cb46108188e60bacfdd2021cd0e3e39fcf565349cde9bd93",
+      "size_bytes": 4491
+    },
+    "fmt_after_attributes": {
+      "path": "energyplus_porting_plan/evidence/CTF-03-unit/objects/3a2ef693f0c06f0de174b99770bd4775441af32b1bedded3f79ffa24a6ff31f0",
+      "sha256": "3a2ef693f0c06f0de174b99770bd4775441af32b1bedded3f79ffa24a6ff31f0",
+      "size_bytes": 4418
+    }
+  },
+  "unused_input_bindings01_preserved": true,
+  "actual_candidate_bindings02_match_after_lint_sources": true,
+  "source_review": {
+    "Root_FULL_and_other_author_FULL_before_execution": true,
+    "formatted_source_correspondence_and_narrow_lint_amendment_reviewed": true,
+    "null_before_uninvoked_comparer_guard_corrected_before_execution": true
+  },
+  "selected_unit_gate_passed": true,
+  "integration_gate_passed": false,
+  "production_gate_passed": false,
+  "complete_CTF03_PASS_claimed": false,
+  "fixed6_CLI_at_this_source_executed": false,
+  "pending": [
+    "CTF01 dependency completion",
+    "CTF04 matrix/coefficient downstream handoff",
+    "genuine retry driver and final coefficient owners",
+    "fixed6 CLI at this source",
+    "integration and production gates"
+  ]
+}

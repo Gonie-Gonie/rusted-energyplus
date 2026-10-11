@@ -60,8 +60,8 @@ CTF-02/03에 전달되는 배열·순서 검증
 
 - [x] 원본 범위와 입출력·변경상태 계약 확정
 - [x] 단위시험 통과 및 실제 활성 분기 확인
-- [ ] 상태·시간·호출순서를 포함한 연결시험 통과
-- [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
+- [x] 상태·시간·호출순서를 포함한 연결시험 통과
+- [x] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
 
 구현 커밋:  
 시험 명령:  
@@ -104,3 +104,7 @@ CTF-02/03에 전달되는 배열·순서 검증
 ## Actual production CLI follow-up (2026-10-10)
 
 All fixed six A/B inputs ran through the actual Cargo-built CLI after the source-order repair, exited 0, and retained identical source and all45 input guards. Each used compatibility mode, partial deny, full trace, no hours override, no oracle comparison, and matching source order. B reports actual fixture_demand_injection_used=false; A reports null because that HVAC-demand field is absent, not a fabricated false. The actual A production weather call and earlier empty-override/no-fixture source audit are retained separately. See `evidence/CTF-01-production-cli/summary.json` for receipts, Cargo identity, source metadata and bounded run/support summaries. Huge traces remain in Runtime. Downstream CTF02/03 handoff and complete integration/production gates remain pending.
+
+## Selected gate closure (2026-10-11)
+
+The existing genuine CTF02/03 production comparisons each preserve all378 exact preprocessing scalar handoffs, actual15 model/21 owner associations and source order with zero mismatch. Later09 repeats those same378 copies without mismatch. Together with the recorded39/42 unit comparison, fixed15 repaired loader comparison and six production CLI runs, this completes the selected CTF01 scope and its four gates. No new physics replay is claimed. Current compiler/material/load sources remain byte-exact; the preprocessing change is only CFU visibility, and subsequent cache changes borrow existing owners without replay or reordering. Earlier pending statements above are historical. Twenty genuinely unreached phases remain numerically unverified. Diagnostic text/global fatal backend, later coefficient algorithms and SUR lifecycle remain separate obligations. Evidence: evidence/CTF-01-complete/summary.json.

@@ -1,0 +1,323 @@
+{
+  "schema": "ctf01-bounded-preprocessing-gate-closure.v1",
+  "selected_scope": "Construction.cc59-401 active layer preprocessing and CTF02/03 ordered handoff in fixed A/B scope",
+  "unit_numeric": 1874,
+  "unit_discrete": 4346,
+  "loader_numeric": 378,
+  "loader_discrete": 1614,
+  "mismatch_count": 0,
+  "frozen_profiles": [
+    {
+      "variable": "PostLoad.dl",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.rk",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.rho",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.cp",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostLoad.lr",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.dl",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.rk",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.rho",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.cp",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostMerge.lr",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.dl",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.rk",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.rho",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.cp",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.lr",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.dyn",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true,
+      "scope": "actual one-dimensional assignment only"
+    },
+    {
+      "variable": "PostConversion.rs",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    },
+    {
+      "variable": "PostConversion.cnd",
+      "atol": 0.0,
+      "rtol": 0.0,
+      "class_exact": true,
+      "shape_exact": true
+    }
+  ],
+  "genuinely_unreached_unit_phases_not_numerical_PASS": 20,
+  "actual_downstream_handoffs": {
+    "CTF-02-unit": {
+      "comparison": {
+        "path": "energyplus_porting_plan/evidence/CTF-02-unit/objects/76677d6cb3aae8f4e5c1b2760dd5d7f8d70a0ffdf00b16ce8cf1a453fe705020",
+        "sha256": "76677d6cb3aae8f4e5c1b2760dd5d7f8d70a0ffdf00b16ce8cf1a453fe705020",
+        "size_bytes": 122277
+      },
+      "execution": {
+        "path": "energyplus_porting_plan/evidence/CTF-02-unit/objects/e6bab5a40efe4cdb264c980dac9e1dc16190f8266967452d2ff05c34cc51968a",
+        "sha256": "e6bab5a40efe4cdb264c980dac9e1dc16190f8266967452d2ff05c34cc51968a",
+        "size_bytes": 5948
+      },
+      "actual_model_count": 15,
+      "actual_preprocessing_owner_count": 21,
+      "actual_preprocessing_scalar_handoffs": 378,
+      "mismatch_count": 0,
+      "actual_source_snapshot": {
+        "path": ".runtime/porting/source-objects/e1/e1f64b86889ebf4e945b584c2c0fc104e7aca22627003b13dd83492bc13fb30c",
+        "sha256": "e1f64b86889ebf4e945b584c2c0fc104e7aca22627003b13dd83492bc13fb30c"
+      }
+    },
+    "CTF-03-unit": {
+      "comparison": {
+        "path": "energyplus_porting_plan/evidence/CTF-03-unit/objects/32942b8c0349bb4c3176bc9242dbfa3583871ddb5fd986a6ca54b797ea43d0ea",
+        "sha256": "32942b8c0349bb4c3176bc9242dbfa3583871ddb5fd986a6ca54b797ea43d0ea",
+        "size_bytes": 96844
+      },
+      "execution": {
+        "path": "energyplus_porting_plan/evidence/CTF-03-unit/objects/075add50f553199da43bc81bd0b4ba87956cbf9ce14b43a5da9aee9b70f0e77f",
+        "sha256": "075add50f553199da43bc81bd0b4ba87956cbf9ce14b43a5da9aee9b70f0e77f",
+        "size_bytes": 5873
+      },
+      "actual_model_count": 15,
+      "actual_preprocessing_owner_count": 21,
+      "actual_preprocessing_scalar_handoffs": 378,
+      "mismatch_count": 0,
+      "actual_source_snapshot": {
+        "path": ".runtime/porting/source-objects/eb/eb7b5e9050a1f2194e5f18016d06e094934f2d2097463ac938c48834a3afb0c3",
+        "sha256": "eb7b5e9050a1f2194e5f18016d06e094934f2d2097463ac938c48834a3afb0c3"
+      }
+    },
+    "CTF-09-unit": {
+      "comparison": {
+        "path": ".runtime/porting/CTF-09/production-comparison-01/comparison.json",
+        "sha256": "67e6e7299573ce11c57d3894690fd6d0a6569a4747ac11090bbd216b8d90ea6d",
+        "size_bytes": 445008
+      },
+      "execution": {
+        "path": ".runtime/porting/CTF-09/production-comparison-command-01/receipt.json",
+        "sha256": "9db1a2df4994835401e0a71d1ee7c744f93d1c73578f63d6ea75a5ec50db3658",
+        "size_bytes": 6792
+      },
+      "actual_model_count": 15,
+      "actual_preprocessing_owner_count": 21,
+      "actual_preprocessing_scalar_handoffs": 378,
+      "mismatch_count": 0,
+      "actual_source_snapshot": {
+        "path": ".runtime/porting/source-objects/f2/f280b83b219794f7cca1cfd57a3e28d6443cc83c976569bf042a2034110c3ced",
+        "sha256": "f280b83b219794f7cca1cfd57a3e28d6443cc83c976569bf042a2034110c3ced"
+      }
+    }
+  },
+  "actual_fixed6_CLI": {
+    "path": "energyplus_porting_plan/evidence/CTF-01-production-cli/summary.json",
+    "sha256": "eb8a4187fbb2bd7f87e571fc36a35b2a8ce6a6991f6c77c76f89e1c6c31b847c",
+    "size_bytes": 25192
+  },
+  "current_byte_exact_recorded_API_sources": [
+    {
+      "path": "crates/ep_run/Cargo.toml",
+      "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+      "size_bytes": 524
+    },
+    {
+      "path": "crates/ep_raw_model/src/lib.rs",
+      "sha256": "08f4a3bcf27c2f4e2577b534ad505176d0877b46709bb512b71685ebef6fa9a8",
+      "size_bytes": 16493
+    },
+    {
+      "path": "crates/ep_raw_model/src/idf_order.rs",
+      "sha256": "5f2a1984ebc76a51938232ab7002c9c683666cf88d765af8e02dbf126bad7772",
+      "size_bytes": 28468
+    },
+    {
+      "path": "crates/ep_compiler/src/lib.rs",
+      "sha256": "1931ed21f1fae2fe5d7e90bb954f1f91812fec1d1eeb7daf102a6ba0007424fe",
+      "size_bytes": 165
+    },
+    {
+      "path": "crates/ep_compiler/src/compiler.rs",
+      "sha256": "52498a97e0444c82a91bcf7c362f70608822dc9d2428f1a37e568940c55b97a5",
+      "size_bytes": 771820
+    },
+    {
+      "path": "crates/ep_model/src/lib.rs",
+      "sha256": "2a756532553034fb2b92c892cb2e6f3c147aa129f6dce64b63763f364cb3cee4",
+      "size_bytes": 284
+    },
+    {
+      "path": "crates/ep_model/src/model.rs",
+      "sha256": "8fe75e51f50682d68d185d18613b4e1505093d071cc4db19947ef03756bbbf32",
+      "size_bytes": 92680
+    },
+    {
+      "path": "crates/ep_model/src/objects/materials.rs",
+      "sha256": "23d9f6dd7af7ef0aff73f3e4697ece3e5acd58104d2d5e3e1edbc46bfaa71653",
+      "size_bytes": 54627
+    },
+    {
+      "path": "crates/ep_model/src/objects/construction.rs",
+      "sha256": "f1886c8b2f9aede1e661210520b668d52f74d884d9a207de9f0c046e4170f191",
+      "size_bytes": 18134
+    },
+    {
+      "path": "crates/ep_runtime/src/lib.rs",
+      "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+      "size_bytes": 868
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs",
+      "sha256": "2b3343ff4f3cec29be8cc77bcd4d14a8bbcc78464812ad04b88d22469f7f0dfb",
+      "size_bytes": 4401
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+      "size_bytes": 3172
+    },
+    {
+      "path": "crates/ep_model/src/objects/building.rs",
+      "sha256": "d6a3fbc6b39106f8d0b5195822bfc354e505e557f2b9406409b68aebfb089ef0",
+      "size_bytes": 11621
+    }
+  ],
+  "later_changed_source_context": [
+    {
+      "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+      "size_bytes": 1819
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+      "sha256": "cf11441c2520af8b375e1d0085814ba50f4d4a1b442e56f6ab4ecbc64242a915",
+      "size_bytes": 11490
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "sha256": "48d1d98514ae136b180d7bdcf6c42c4eb02b2a19678bb8fcedc7fd047e57ddc4",
+      "size_bytes": 2758
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "sha256": "15165c7b9b347d3841136b088d3085d0d0aa9b8d428625f61f923b715a970371",
+      "size_bytes": 6171
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "sha256": "fc698d19778808f7712a1276db37b986f91238fb1b961a3178a113c6248912e9",
+      "size_bytes": 23902
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "d6187b9d4892f9c7362b4c33fcd05b4b2b2031521ac0007acad33897c098b3a5",
+      "size_bytes": 48412
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf.rs",
+      "sha256": "7506de40b75a45b9c8f2c01c0b5a4f1ffc5f82ebb1861413a04e7c17ebc342e4",
+      "size_bytes": 29922
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs",
+      "sha256": "0cf67532a277ea20c362acdcc97d2e293ee086a8757177e2b8ccb5bb52fb39a7",
+      "size_bytes": 11747
+    }
+  ],
+  "preprocessing_change": "sole CFU visibility change; all arithmetic and typed error behavior retained",
+  "cache_after09_change": "additive CTF10 borrowed public storage only; complete preprocessing producer byte-exact09",
+  "source_review": "Root and Raw reviewed current caller membership/order/shared flags and borrowed owners; actual01/02/03/09 historical executions retain their genuine SourceSnapshots",
+  "A_fixture_field": "actual null remains null; no-fixture weather/override Source path reviewed separately",
+  "diagnostic_text_fatal_backend_later_coefficients_or_SUR_certified": false,
+  "new_scientific_execution_or_current_snapshot_replay_claimed": false,
+  "selected_CTF01_four_gates_satisfied": true,
+  "downstream_CTF02_through_CTF10_complete_claimed": false
+}

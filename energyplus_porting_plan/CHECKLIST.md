@@ -101,7 +101,7 @@ B에서는 그 의존성을 적용한다.
 ### 04 CTF 계수 생성
 | 완료 | ID | 작업 | EP 파일·심벌 | 선행 |
 |---|---|---|---|---|
-| [ ] | [CTF-01](cards/CTF-01.md) | 구성체 열물성 전처리 | `Construction.cc` · `ConstructionProps::calculateTransferFunction` | CON-01 |
+| [x] | [CTF-01](cards/CTF-01.md) | 구성체 열물성 전처리 | `Construction.cc` · `ConstructionProps::calculateTransferFunction` | CON-01 |
 | [ ] | [CTF-02](cards/CTF-02.md) | 전부 저항층인 경우의 CTF | `Construction.cc` · `ConstructionProps::calculateTransferFunction` | CTF-01 |
 | [ ] | [CTF-03](cards/CTF-03.md) | 유질량 1D 구성체의 절점 분할 | `Construction.cc` · `ConstructionProps::calculateTransferFunction` | CTF-01 |
 | [ ] | [CTF-04](cards/CTF-04.md) | 상태공간 A/B/C/D 행렬 구성 | `Construction.cc` · `ConstructionProps::calculateTransferFunction` | CTF-03 |

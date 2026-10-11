@@ -9280,10 +9280,10 @@
       "source_url": "https://github.com/NatLabRockies/EnergyPlus/blob/6f2e40d10250a105b49966baa24d843711e61048/src/EnergyPlus/Construction.cc",
       "scope_review": "통과",
       "unit_gate": "통과",
-      "integration_gate": "미확인",
-      "production_gate": "미확인",
+      "integration_gate": "통과",
+      "production_gate": "통과",
       "applicability": "A/B",
-      "source_boundary_note": "Selected59-401 and companions reviewed; genuine whole Native continuation through1103 retained. Selected unit gate passed actual39-model/42-call comparison. Integration and production gates remain pending; later CTF02-10 are not certified.",
+      "source_boundary_note": "Selected59-401 four gates passed: actual39/42 unit, fixed15 loader, CTF02/03 and retained09 array/order handoff, and six production CLI runs. Diagnostic backend/later coefficient/SUR gates are separate.",
       "numeric_policy": "18 separate arithmetic profiles atol=rtol=0 with exact class/shape; copied inputs binary64 bits exact. Literal source constants/order/sqrt/unguarded conductance preserved. Required reached absence fails on either or both sides; unreached/stopped/unknown states never numeric PASS. No tolerance retuning after outputs.",
       "evidence_required": "원본 파일/심벌/행구간과 입력해시; C++ reference wrapper 또는 검증된 EP trace; 단위 비교결과; 연결 trace; 생산경로 EP/fixture 주입 부재; 테스트 명령·실행 커밋·실패 재현자료.",
       "source_ranges_input_only": [
@@ -9388,7 +9388,330 @@
         "path": "energyplus_porting_plan/evidence/CTF-01-production-cli/summary.json",
         "sha256": "eb8a4187fbb2bd7f87e571fc36a35b2a8ce6a6991f6c77c76f89e1c6c31b847c",
         "size_bytes": 25192
-      }
+      },
+      "evidence": {
+        "scopes": [
+          "A",
+          "B"
+        ],
+        "implementation_commit": "64aca9a938a9499acf3131d896cde9a656b19ca5",
+        "source_ranges": [
+          {
+            "path": "src/EnergyPlus/Construction.cc",
+            "symbol": "ConstructionProps::calculateTransferFunction",
+            "start_line": 59,
+            "end_line": 401,
+            "helpers": [
+              "Material::MaterialBase",
+              "DataConversions",
+              "ShowSevereError",
+              "ShowContinueError",
+              "ShowFatalError"
+            ]
+          }
+        ],
+        "input_hashes": [
+          {
+            "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+            "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-24H/metadata.json",
+            "sha256": "a742bece394b18ae199ee4d8df74f678f2903f561dc05bdc0abbc1b2ea99c3bb"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+            "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-72H/metadata.json",
+            "sha256": "7d579d2565dd076b5fe116be4d41d5b3c06fa171c06445af5359f673afd90650"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+            "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/A-ANNUAL/metadata.json",
+            "sha256": "f10b98a625544c5714079ef6b3ba74a0a8d6b191e6bd9bb524d193b5413892eb"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+            "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/metadata.json",
+            "sha256": "d6adc849ea7173c459765e61482105092ade359eba75d3d03d0d445e3fb37a68"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+            "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/metadata.json",
+            "sha256": "44a46f4290d8ac02ebc9ddc327fc9ed24a67ea8e64a6288c2494dbb775127f3e"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+            "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/metadata.json",
+            "sha256": "5cb5e356732086bd3c6a8e0c4df5528024984523efd4bed20e977bf8358a4ae8"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+            "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-24H/metadata.json",
+            "sha256": "83fcc9b334153bf6553a5cfdc045dcc22c239f04ae8e06de5aa6652365e7b828"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+            "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-72H/metadata.json",
+            "sha256": "7017bb586cadda6e819e2cc72f3c3e8622191d8854f81169beb4c5b8c300ca29"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+            "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/metadata.json",
+            "sha256": "98b150b9f4a2e5e6cf5e8fb832be67942c3ee3cf7f85bf70d385c7634eaa8eb6"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+            "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/metadata.json",
+            "sha256": "4566fd5ec02dfbb24b3497433ea8f081d6fdbe41896b7fd32397760d0a90b1c4"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+            "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/metadata.json",
+            "sha256": "0e1647d10fe98294261f43849ac006f9f1f2b47c945655e101f2a5f6933fc4cd"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+            "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/metadata.json",
+            "sha256": "f5f0fbca66199dc1a77331b4ec66738f763d97780cc572ffe31f051ea59eecd3"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+            "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-24H/metadata.json",
+            "sha256": "e28ed45408535dbef11174400112ec7f259fa25659cf64163aee749cf219e656"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+            "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-72H/metadata.json",
+            "sha256": "fc1f3dc5b5d5d1eb6bdb1976f3a047d186a0987759981747368598e3c1565993"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+            "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d"
+          },
+          {
+            "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+            "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f"
+          },
+          {
+            "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/metadata.json",
+            "sha256": "69f3e81a142be1a538c258eaf39a4932b2eb422a60e1a72bff2d0543405005c4"
+          }
+        ],
+        "reference": {
+          "kind": "cpp-wrapper",
+          "artifacts": [
+            {
+              "path": "energyplus_porting_plan/evidence/CTF-01-complete/objects/1cfd7d9f5e275aedeec6cf9677b75bf81642f67735d830549c7de5d9808ab4f8",
+              "sha256": "1cfd7d9f5e275aedeec6cf9677b75bf81642f67735d830549c7de5d9808ab4f8",
+              "size_bytes": 37621
+            },
+            {
+              "path": "energyplus_porting_plan/evidence/CTF-01-complete/objects/354230f617b6d8c2b2b351bf60ddae5b49c9202101381250f8a8c8c8a34bb825",
+              "sha256": "354230f617b6d8c2b2b351bf60ddae5b49c9202101381250f8a8c8c8a34bb825",
+              "size_bytes": 91606
+            }
+          ]
+        },
+        "checks": {
+          "scope_review": {
+            "command": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -X utf8 -B C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\unit-comparer-prep-02\\compare_unit.py --approved-source-sha256 6795c9a7c2ee40c49eea34d799c8af04400e86075bf90624960362140f949132 --original-data-review C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\original-data-review-01\\review.json#c6403cc1eddbb607998267984f63710841d9adf7159acc54a892e585f02bd846 --original-data-review-execution C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\original-data-review-command-01\\receipt.json#76390d418f87002cd85d9dba15b852c98ca0c5ea1557d4013f2d268b3fb462a4 --Rust-build-execution C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\candidate-unit-build-command-01\\receipt.json#e11cb5c465d55cc1d1ba96d5526a51bf19b6aea0f60133b9d106f2550b3a7014 --Rust-execution C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\candidate-unit-command-01\\receipt.json#54bb13b520194aa0ac395017764d647330b0a1e1bacb73071e518f70499f78fd --Rust-results C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\candidate-unit-command-01\\stdout.log#b592f4d1f8baa18af9059dbddedf52029d28273db124938a30d6fec2f0fa6594 --output-dir C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\candidate-unit-comparison-02",
+            "commit": "382dfb56a1a2aac2101492d90eac216062c9021d",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/evidence/CTF-01-complete/summary.json",
+                "sha256": "9066d056991d01601f5577b64a1a9fc73294f4b3e6d24989c901fefa28424f00",
+                "size_bytes": 10850
+              },
+              {
+                "path": "energyplus_porting_plan/contracts/scope.json",
+                "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879",
+                "size_bytes": 15325
+              }
+            ]
+          },
+          "unit_gate": {
+            "command": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -X utf8 -B C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\unit-comparer-prep-02\\compare_unit.py --approved-source-sha256 6795c9a7c2ee40c49eea34d799c8af04400e86075bf90624960362140f949132 --original-data-review C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\original-data-review-01\\review.json#c6403cc1eddbb607998267984f63710841d9adf7159acc54a892e585f02bd846 --original-data-review-execution C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\original-data-review-command-01\\receipt.json#76390d418f87002cd85d9dba15b852c98ca0c5ea1557d4013f2d268b3fb462a4 --Rust-build-execution C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\candidate-unit-build-command-01\\receipt.json#e11cb5c465d55cc1d1ba96d5526a51bf19b6aea0f60133b9d106f2550b3a7014 --Rust-execution C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\candidate-unit-command-01\\receipt.json#54bb13b520194aa0ac395017764d647330b0a1e1bacb73071e518f70499f78fd --Rust-results C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\candidate-unit-command-01\\stdout.log#b592f4d1f8baa18af9059dbddedf52029d28273db124938a30d6fec2f0fa6594 --output-dir C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\candidate-unit-comparison-02",
+            "commit": "382dfb56a1a2aac2101492d90eac216062c9021d",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/evidence/CTF-01-complete/objects/1cfd7d9f5e275aedeec6cf9677b75bf81642f67735d830549c7de5d9808ab4f8",
+                "sha256": "1cfd7d9f5e275aedeec6cf9677b75bf81642f67735d830549c7de5d9808ab4f8",
+                "size_bytes": 37621
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/CTF-01-complete/objects/0418e39b42a8fb4776db25ba038ddeddfb05ec06d5a7b6f4e98897091b828677",
+                "sha256": "0418e39b42a8fb4776db25ba038ddeddfb05ec06d5a7b6f4e98897091b828677",
+                "size_bytes": 5770
+              }
+            ]
+          },
+          "integration_gate": {
+            "command": "python -X utf8 -B .runtime\\porting\\CTF-03\\comparer-prep-02\\compare_production.py --approved-source-sha256 e22f1c47abca3a7d5192dbbfb2ad9753bbbed045cad051b1a3ca91aee98d6afc --original-data-review .runtime/porting/CTF-03/original-production-data-review-01/review.json#fc952f56c32b809f8494a96a117ff27be3181c1ced76dd2bd21e51dc293da13f --original-data-review-execution .runtime/porting/CTF-03/original-production-data-review-command-01/receipt.json#a55220c5c0f4ef4569cd587026d641c64772b1c4c0aadc9262d050cafcc68fc7 --Rust-build-execution .runtime/porting/CTF-03/candidate-build-command-01/receipt.json#0666cd2725da662e647279bbd15f7b2f8cd209e5b6b6aaa4fbf428bf1479087a --Rust-execution .runtime/porting/CTF-03/candidate-production-command-01/receipt.json#b65f96313b83c7babe8b66a791428230a172eae9d80544f63fa4283dee56b6b7 --Rust-results .runtime/porting/CTF-03/candidate-production-command-01/stdout.log#b4adfd8ad69d94a6a8bb4c3a3b1d636aed49d30357401136b58f8c372359f8b1 --conversion-ledger .runtime/porting/SCH-01/converted-inputs-01/converted-inputs.json#3dd6964e3f0252d587c6862925744fd5868eaaa26864ae8061bb534322d54367 --conversion-execution .runtime/porting/SCH-01/conversion-command-01/receipt.json#3bbff0d8e82a091a95444b595d348bfe4cde56f548d075b79cd7b0adc4c804ca --output-dir .runtime\\porting\\CTF-03\\production-comparison-01",
+            "commit": "4c916b51f69ad3479046e2928a893c39b88b0216",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/evidence/CTF-01-complete/summary.json",
+                "sha256": "9066d056991d01601f5577b64a1a9fc73294f4b3e6d24989c901fefa28424f00",
+                "size_bytes": 10850
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/CTF-01-complete/objects/76677d6cb3aae8f4e5c1b2760dd5d7f8d70a0ffdf00b16ce8cf1a453fe705020",
+                "sha256": "76677d6cb3aae8f4e5c1b2760dd5d7f8d70a0ffdf00b16ce8cf1a453fe705020",
+                "size_bytes": 122277
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/CTF-01-complete/objects/32942b8c0349bb4c3176bc9242dbfa3583871ddb5fd986a6ca54b797ea43d0ea",
+                "sha256": "32942b8c0349bb4c3176bc9242dbfa3583871ddb5fd986a6ca54b797ea43d0ea",
+                "size_bytes": 96844
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/CTF-01-complete/objects/67e6e7299573ce11c57d3894690fd6d0a6569a4747ac11090bbd216b8d90ea6d",
+                "sha256": "67e6e7299573ce11c57d3894690fd6d0a6569a4747ac11090bbd216b8d90ea6d",
+                "size_bytes": 445008
+              }
+            ]
+          },
+          "production_gate": {
+            "command": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\eplus-rs.exe run C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\energyplus_porting_plan\\cases\\B-BOTH-24H\\input.idf --weather C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\energyplus\\26.1.0\\WeatherData\\USA_CO_Golden-NREL.724666_TMY3.epw --output-dir C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\CTF-01\\production-cli-output-01\\B-BOTH-24H --mode compatibility --partial deny --trace-level full --porting-scope b",
+            "commit": "5e67e931b87c6b2ff42074b986efb55916391257",
+            "exit_code": 0,
+            "artifacts": [
+              {
+                "path": "energyplus_porting_plan/evidence/CTF-01-complete/summary.json",
+                "sha256": "9066d056991d01601f5577b64a1a9fc73294f4b3e6d24989c901fefa28424f00",
+                "size_bytes": 10850
+              },
+              {
+                "path": "energyplus_porting_plan/evidence/CTF-01-complete/objects/eb8a4187fbb2bd7f87e571fc36a35b2a8ce6a6991f6c77c76f89e1c6c31b847c",
+                "sha256": "eb8a4187fbb2bd7f87e571fc36a35b2a8ce6a6991f6c77c76f89e1c6c31b847c",
+                "size_bytes": 25192
+              }
+            ]
+          }
+        },
+        "production": {
+          "rust_entrypoint": "eplus-rs run --porting-scope a|b -> parsed model -> HeatBalanceManager -> SurfaceConstructionCache ordered preprocessing",
+          "oracle_inputs_used": false,
+          "fixture_inputs_used": false,
+          "gate_scope": "selected construction preprocessing; actual A null fixture-demand metadata retained separately"
+        },
+        "comparison": {
+          "contract": {
+            "path": "energyplus_porting_plan/contracts/scope.json",
+            "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879",
+            "size_bytes": 15325
+          },
+          "report": {
+            "path": "energyplus_porting_plan/evidence/CTF-01-complete/summary.json",
+            "sha256": "9066d056991d01601f5577b64a1a9fc73294f4b3e6d24989c901fefa28424f00",
+            "size_bytes": 10850
+          }
+        }
+      },
+      "actual_selected_gate_closure": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-complete/summary.json",
+        "sha256": "9066d056991d01601f5577b64a1a9fc73294f4b3e6d24989c901fefa28424f00",
+        "size_bytes": 10850
+      },
+      "completion_note": "Selected preprocessing and ordered CTF02/03 handoff complete; historical source identities and unreached states preserved."
     },
     {
       "id": "CTF-02",

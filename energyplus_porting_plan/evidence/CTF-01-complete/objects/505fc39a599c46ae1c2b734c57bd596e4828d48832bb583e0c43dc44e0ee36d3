@@ -1,0 +1,77 @@
+"""Root reconciles already executed selected preprocessing gates; no physics replay."""
+import difflib,hashlib,json,shutil,subprocess
+from pathlib import Path
+ROOT=Path.cwd();OUT=ROOT/'energyplus_porting_plan/evidence/CTF-01-complete'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def ref(p):return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+def read(p):return json.loads(p.read_bytes())
+def write(p,v):p.write_bytes((json.dumps(v,ensure_ascii=False,indent=2,allow_nan=False)+'\n').encode('utf8'))
+def exact(row):
+ p=(ROOT/row['path']).resolve();assert p.is_relative_to(ROOT)and sha(p)==row['sha256'];return p
+def load(row):return read(exact(row))
+def success(row):
+ r=load(row);assert r['exit_code']==0 and r['launch_error']is None and r['source_bytes_match_before_and_after'];exact(r['source_snapshot']);return r
+assert not OUT.exists();assert not subprocess.check_output(['git','status','--porcelain'])
+summaries={name:read(ROOT/'energyplus_porting_plan/evidence'/name/'summary.json')for name in ['CTF-01-unit','CTF-01-loader-fixed','CTF-01-production-cli','CTF-02-unit','CTF-03-unit','CTF-09-unit']}
+unit=summaries['CTF-01-unit'];u=load(unit['comparison']);ur=success(unit['comparison_execution'])
+loader=summaries['CTF-01-loader-fixed'];l=load(loader['actual_comparison']);lr=success(loader['actual_comparison_execution'])
+assert [u['comparison'][k]for k in ['numeric_comparisons','discrete_comparisons','mismatch_count']]==[1874,4346,0]
+assert [l['comparison'][k]for k in ['numeric_comparisons','discrete_comparisons','mismatch_count']]==[378,1614,0]
+profiles=u['frozen_numeric_profiles'];assert len(profiles)==18 and profiles==l['frozen_numeric_profiles']
+assert all(p['atol']==p['rtol']==0 and p['shape_exact']and p['class_exact']for p in profiles)
+assert len(u['comparison']['unavailable_observations'])==20 and all(not row['counted_as_PASS']for row in u['comparison']['unavailable_observations'])
+handoffs={};handoff_receipts={}
+for name in ['CTF-02-unit','CTF-03-unit','CTF-09-unit']:
+ s=summaries[name];d=load(s['actual_production_comparison']);r=success(s['actual_production_comparison_execution'])
+ assert d['inherited_preprocessing_handoff_profiles']==profiles and d['comparison']['mismatch_count']==0
+ assert d['comparison']['mismatch_categories']['preprocessing_handoff_scalar_copies']==378
+ owners=d['actual_owner_association_ledger'];assert len(owners)==15 and sum(row['actual_initialized_preprocessing_owner_count']for row in owners)==21
+ assert len(d['actual_input_conversion_bindings'])==15 and d['comparison']['unavailable_counted_as_PASS']is False
+ handoffs[name]={'comparison':s['actual_production_comparison'],'execution':s['actual_production_comparison_execution'],'actual_model_count':15,'actual_preprocessing_owner_count':21,'actual_preprocessing_scalar_handoffs':378,'mismatch_count':0,'actual_source_snapshot':d['actual_source_snapshot']}
+ handoff_receipts[name]=r
+cli=summaries['CTF-01-production-cli'];assert cli['actual_fixed6_exit0_and_source_unchanged']and cli['all45_input_guards_unchanged_after']and len(cli['actual_runs'])==6
+for row in cli['actual_build_and_executions']:success(row)
+for row in cli['actual_runs']:
+ assert row['status']=='success'and row['exit_code']==0 and row['oracle_requested']is False and row['hours_override']is None and row['source_order_matches']
+ assert row['fixture_demand_injection_used_actual_field']is(False if row['id'].startswith('B-')else None)
+ exact(row['run_summary'])
+scope_path=ROOT/'energyplus_porting_plan/contracts/scope.json';scope=read(scope_path)
+inputs=[row[k]for row in scope['cases']for k in ['input','weather','metadata']];assert len(inputs)==45
+for row in inputs:exact(row)
+results=load(l['Rust_results']);same=[];later_changed=[]
+for row in results['actual_public_API_sources']:
+ p=ROOT/row['path'];(same if sha(p)==row['sha256']else later_changed).append(ref(p))
+assert len(same)==13
+old=ROOT/'energyplus_porting_plan/evidence/CTF-01-unit/objects/20cfeef6709b59ed4ef66eb863f079edfd7803fc4522e18419429de49fe5a989'
+current=ROOT/'crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs'
+assert old.read_bytes().replace(b'const CFU:',b'pub(super) const CFU:')==current.read_bytes()
+cache=ROOT/'crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs'
+old_cache=ROOT/'energyplus_porting_plan/evidence/CTF-09-unit/objects/59ad114a67fbbbbce87cb7d3e78900ac81f34171733e1d56114aad5c9d4854bb'
+cache_diff=list(difflib.unified_diff(old_cache.read_text(encoding='utf8').splitlines(keepends=True),cache.read_text(encoding='utf8').splitlines(keepends=True)))
+assert not any(line.startswith('-')and not line.startswith('---')for line in cache_diff)
+assert cache.read_bytes()[cache.read_bytes().index(b'fn construction_thermal_data'):]==old_cache.read_bytes()[old_cache.read_bytes().index(b'fn construction_thermal_data'):]
+OUT.mkdir();(OUT/'objects').mkdir();selected=[]
+paths={Path(__file__).resolve(),scope_path,old,old_cache,current,cache}
+for name,s in summaries.items():paths.add(ROOT/'energyplus_porting_plan/evidence'/name/'summary.json')
+for row in [unit['comparison'],unit['comparison_execution'],loader['actual_comparison'],loader['actual_comparison_execution'],*cli['actual_build_and_executions'],*[x[k]for x in handoffs.values()for k in ['comparison','execution']]]:paths.add(exact(row))
+paths.add(ROOT/l['Rust_results']['path'])
+for p in sorted(paths):
+ r=ref(p);assert r['size_bytes']<16000000;dest=OUT/'objects'/r['sha256'];shutil.copyfile(p,dest);assert p.read_bytes()==dest.read_bytes();selected.append({'original':r,'stored':ref(dest)})
+stored={row['original']['sha256']:row['stored']for row in selected}
+def portable(row):return stored[row['sha256']]
+write(OUT/'manifest.json',{'schema':'ctf01-bounded-gate-closure-selected-evidence.v1','selected_files':selected,'historical_evidence_rewritten':False,'scientific_engine_replayed':False,'binary_payloads_archived':False})
+report={'schema':'ctf01-bounded-preprocessing-gate-closure.v1','selected_scope':'Construction.cc59-401 active layer preprocessing and CTF02/03 ordered handoff in fixed A/B scope','unit_numeric':1874,'unit_discrete':4346,'loader_numeric':378,'loader_discrete':1614,'mismatch_count':0,'frozen_profiles':profiles,'genuinely_unreached_unit_phases_not_numerical_PASS':20,'actual_downstream_handoffs':handoffs,'actual_fixed6_CLI':ref(ROOT/'energyplus_porting_plan/evidence/CTF-01-production-cli/summary.json'),'current_byte_exact_recorded_API_sources':same,'later_changed_source_context':later_changed,'preprocessing_change':'sole CFU visibility change; all arithmetic and typed error behavior retained','cache_after09_change':'additive CTF10 borrowed public storage only; complete preprocessing producer byte-exact09','source_review':'Root and Raw reviewed current caller membership/order/shared flags and borrowed owners; actual01/02/03/09 historical executions retain their genuine SourceSnapshots','A_fixture_field':'actual null remains null; no-fixture weather/override Source path reviewed separately','diagnostic_text_fatal_backend_later_coefficients_or_SUR_certified':False,'new_scientific_execution_or_current_snapshot_replay_claimed':False,'selected_CTF01_four_gates_satisfied':True,'downstream_CTF02_through_CTF10_complete_claimed':False}
+write(OUT/'summary.json',report)
+plan_path=ROOT/'energyplus_porting_plan/plan.json';plan=read(plan_path);task=next(t for t in plan['tasks']if t['id']=='CTF-01');con=next(t for t in plan['tasks']if t['id']=='CON-01')
+assert all(con[g]=='\uD1B5\uACFC'for g in ['scope_review','unit_gate','integration_gate','production_gate'])
+def check(receipt,artifacts):return {'command':subprocess.list2cmdline(receipt['command']),'commit':receipt['repository_before']['head'],'exit_code':0,'artifacts':artifacts}
+artifact=ref(OUT/'summary.json');cli_receipt=load(cli['actual_build_and_executions'][-1])
+assert all(task[g]=='\uD1B5\uACFC'for g in ['scope_review','unit_gate'])
+task['evidence']={'scopes':['A','B'],'implementation_commit':subprocess.check_output(['git','rev-parse','HEAD']).decode().strip(),'source_ranges':[{'path':'src/EnergyPlus/Construction.cc','symbol':'ConstructionProps::calculateTransferFunction','start_line':59,'end_line':401,'helpers':['Material::MaterialBase','DataConversions','ShowSevereError','ShowContinueError','ShowFatalError']}],'input_hashes':inputs,'reference':{'kind':'cpp-wrapper','artifacts':[portable(unit['comparison']),portable(loader['actual_comparison'])]},'checks':{'scope_review':check(ur,[artifact,ref(scope_path)]),'unit_gate':check(ur,[portable(unit['comparison']),portable(unit['comparison_execution'])]),'integration_gate':check(handoff_receipts['CTF-03-unit'],[artifact,*[portable(x['comparison'])for x in handoffs.values()]]),'production_gate':check(cli_receipt,[artifact,portable(ref(ROOT/'energyplus_porting_plan/evidence/CTF-01-production-cli/summary.json'))])},'production':{'rust_entrypoint':'eplus-rs run --porting-scope a|b -> parsed model -> HeatBalanceManager -> SurfaceConstructionCache ordered preprocessing','oracle_inputs_used':False,'fixture_inputs_used':False,'gate_scope':'selected construction preprocessing; actual A null fixture-demand metadata retained separately'},'comparison':{'contract':ref(scope_path),'report':artifact}}
+task['integration_gate']=task['production_gate']='\uD1B5\uACFC';task['actual_selected_gate_closure']=artifact
+task['source_boundary_note']='Selected59-401 four gates passed: actual39/42 unit, fixed15 loader, CTF02/03 and retained09 array/order handoff, and six production CLI runs. Diagnostic backend/later coefficient/SUR gates are separate.'
+task['completion_note']='Selected preprocessing and ordered CTF02/03 handoff complete; historical source identities and unreached states preserved.';write(plan_path,plan)
+card=ROOT/'energyplus_porting_plan/cards/CTF-01.md';text=card.read_text(encoding='utf8');text=text.replace('- [ ] \uC0C1\uD0DC\u00B7\uC2DC\uAC04\u00B7\uD638\uCD9C\uC21C\uC11C\uB97C \uD3EC\uD568\uD55C \uC5F0\uACB0\uC2DC\uD5D8 \uD1B5\uACFC','- [x] \uC0C1\uD0DC\u00B7\uC2DC\uAC04\u00B7\uD638\uCD9C\uC21C\uC11C\uB97C \uD3EC\uD568\uD55C \uC5F0\uACB0\uC2DC\uD5D8 \uD1B5\uACFC').replace('- [ ] \uC0DD\uC0B0 \uACBD\uB85C \uC5F0\uACB0\u00B7EP/fixture \uC8FC\uC785 \uBD80\uC7AC\u00B7\uC120\uD589 gate \uD655\uC778','- [x] \uC0DD\uC0B0 \uACBD\uB85C \uC5F0\uACB0\u00B7EP/fixture \uC8FC\uC785 \uBD80\uC7AC\u00B7\uC120\uD589 gate \uD655\uC778')
+text+='\n## Selected gate closure (2026-10-11)\n\nThe existing genuine CTF02/03 production comparisons each preserve all378 exact preprocessing scalar handoffs, actual15 model/21 owner associations and source order with zero mismatch. Later09 repeats those same378 copies without mismatch. Together with the recorded39/42 unit comparison, fixed15 repaired loader comparison and six production CLI runs, this completes the selected CTF01 scope and its four gates. No new physics replay is claimed. Current compiler/material/load sources remain byte-exact; the preprocessing change is only CFU visibility, and subsequent cache changes borrow existing owners without replay or reordering. Earlier pending statements above are historical. Twenty genuinely unreached phases remain numerically unverified. Diagnostic text/global fatal backend, later coefficient algorithms and SUR lifecycle remain separate obligations. Evidence: evidence/CTF-01-complete/summary.json.\n'
+card.write_bytes(text.encode('utf8'));subprocess.run(['python','-X','utf8','-B','tools/porting/sync_plan_views.py','--write'],check=True)
+print('Root reconciled actual selectedCTF01 four gates;',len(selected),'selected evidence files; no engine replay',flush=True)

@@ -1,0 +1,50 @@
+{
+  "schema": "ctf01-actual-candidate-unit-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-01-unit/manifest.json",
+    "sha256": "9ad8f407985b7fc43c4724c1c0c6fa8ca935ed1d28cb75059115f23306a2369a",
+    "size_bytes": 74064
+  },
+  "comparison": {
+    "path": ".runtime/porting/CTF-01/candidate-unit-comparison-02/comparison.json",
+    "sha256": "1cfd7d9f5e275aedeec6cf9677b75bf81642f67735d830549c7de5d9808ab4f8",
+    "size_bytes": 37621
+  },
+  "comparison_execution": {
+    "path": ".runtime/porting/CTF-01/candidate-unit-comparison-command-02/receipt.json",
+    "sha256": "0418e39b42a8fb4776db25ba038ddeddfb05ec06d5a7b6f4e98897091b828677",
+    "size_bytes": 5770
+  },
+  "selected_unit_PASS": true,
+  "numeric_comparisons": 1874,
+  "discrete_comparisons": 4346,
+  "mismatch_count": 0,
+  "numeric_profiles": 18,
+  "maximum_absolute_error": 0.0,
+  "maximum_profile_RMSE": 0.0,
+  "unreached_phases_not_counted_as_PASS": 20,
+  "quality": {
+    "tests_passed": 4642,
+    "test_binaries": 32,
+    "failed": 0,
+    "ignored": 0,
+    "clippy_D_warnings": {
+      "path": ".runtime/porting/CTF-01/candidate-quality-clippy-command-01/receipt.json",
+      "sha256": "ff4c4ed7a50668a77b13e0bb3a2e87f3d65ca0fd59814f0a2a8903c00f94aa1a",
+      "size_bytes": 4233
+    },
+    "fmt_check": {
+      "path": ".runtime/porting/CTF-01/candidate-quality-fmt-command-01/receipt.json",
+      "sha256": "e277a372423d375b620bbf3ae51b0e601fa65858234d8472d74e3e6e7fc53af5",
+      "size_bytes": 4160
+    },
+    "tests": {
+      "path": ".runtime/porting/CTF-01/candidate-quality-tests-command-01/receipt.json",
+      "sha256": "000515e1cf4a2db6406f3ac40ca4d2ae2644c25908db04d8ce1723081098a2b1",
+      "size_bytes": 4194
+    }
+  },
+  "integration_PASS": false,
+  "production_PASS": false,
+  "complete_CTF01_PASS": false
+}
