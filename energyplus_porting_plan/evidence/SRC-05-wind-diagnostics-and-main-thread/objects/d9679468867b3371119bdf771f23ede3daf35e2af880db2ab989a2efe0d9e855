@@ -1,0 +1,14 @@
+
+C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\target\debug\src05_wind_pow_probe.exe:     file format pei-x86-64
+
+
+Disassembly of section .text:
+
+0000000140512f40 <_ZN3std3f6421_$LT$impl$u20$f64$GT$4powf17h65eac0cc298c0fc8E>:
+   140512f40:	48 83 ec 28          	sub    $0x28,%rsp
+   140512f44:	e8 47 74 a8 00       	call   140f9a390 <pow>
+   140512f49:	f2 0f 11 44 24 20    	movsd  %xmm0,0x20(%rsp)
+   140512f4f:	f2 0f 10 44 24 20    	movsd  0x20(%rsp),%xmm0
+   140512f55:	48 83 c4 28          	add    $0x28,%rsp
+   140512f59:	c3                   	ret
+   140512f5a:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)

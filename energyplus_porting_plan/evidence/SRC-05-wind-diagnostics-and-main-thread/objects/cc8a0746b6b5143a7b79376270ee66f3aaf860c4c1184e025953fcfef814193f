@@ -1,0 +1,4108 @@
+{
+  "schema": "src05-actual-selected-surface-environment-comparison.v1",
+  "actual_application": {
+    "path": ".runtime/porting/SRC-05/observer-lint-applied-01/record.json",
+    "sha256": "2a2e4e5c33e8b55ca9e6af88955c62a63298937e2aa1d0e15dfa8fa35318b9f7",
+    "size_bytes": 12794
+  },
+  "original_application": {
+    "path": ".runtime/porting/SRC-05/surface-environment-applied-01/record.json",
+    "sha256": "7693e851fdb0d4b89f5bd1561107b1c1f230f67b8ae1b34a7cb7af4c11fe7a5c"
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/37/371ee432d89384311dbe6c07f0d3beb8cb99cba51ab69d14a71b7a63ce0df6ea",
+    "sha256": "371ee432d89384311dbe6c07f0d3beb8cb99cba51ab69d14a71b7a63ce0df6ea"
+  },
+  "Source_file_count": 3919,
+  "unrelated_Source_files_verified_byte_exact": 3918,
+  "actual_comparison": {
+    "path": ".runtime/porting/SRC-05/selected-comparison-02/comparison.json",
+    "sha256": "627f2760a0ebb40532124fc3f504f6e3376bbb1064a1db5974d5a23192a1e640",
+    "size_bytes": 2477
+  },
+  "actual_comparison_execution": {
+    "path": ".runtime/porting/SRC-05/selected-comparison-command-02/receipt.json",
+    "sha256": "a1a76910fe8eb9ee1c1297ef6b2ab6e06232214ca644b279051ae5646df02656",
+    "size_bytes": 3621
+  },
+  "actual_status": "fail-selected-setters-or-input-join",
+  "actual_counts": {
+    "input_join_comparisons": 2112,
+    "pre_owner_comparisons": 1384,
+    "selected_endpoint_comparisons": 1334,
+    "point_helper_comparisons": 189
+  },
+  "actual_quality": [
+    {
+      "role": "fmt",
+      "execution": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-02/fmt-command/receipt.json",
+        "sha256": "258950963c17ebfc016715889202cb9e1c62757972629d17ee5373fdd610b5bb",
+        "size_bytes": 3336
+      },
+      "test_totals": [
+        0,
+        0,
+        0
+      ],
+      "test_result_groups": 0
+    },
+    {
+      "role": "clippy",
+      "execution": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-02/clippy-command/receipt.json",
+        "sha256": "b83b07c804af24a0860484774f4f426be4bcc7a8e07cd2bbf9adfb5584cfff99",
+        "size_bytes": 3533
+      },
+      "test_totals": [
+        0,
+        0,
+        0
+      ],
+      "test_result_groups": 0
+    },
+    {
+      "role": "focused",
+      "execution": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-02/focused-command/receipt.json",
+        "sha256": "60b63b8dd83fc18a05dbb13a05e501a60db2d152c34c159c36d6abfbffc95819",
+        "size_bytes": 3520
+      },
+      "test_totals": [
+        329,
+        0,
+        2
+      ],
+      "test_result_groups": 1
+    },
+    {
+      "role": "workspace",
+      "execution": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-02/workspace-command/receipt.json",
+        "sha256": "b189fd0cad9020b93b9dcf150454603dc38f6c576318b653cd08634746ad9868",
+        "size_bytes": 3481
+      },
+      "test_totals": [
+        4953,
+        0,
+        2
+      ],
+      "test_result_groups": 21
+    }
+  ],
+  "actual_cases": 26,
+  "actual_weather_operations": 30,
+  "selected_objects": [
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/11/1117aece5e2ef573512147a3602e1e0d44999cb6c713105e3f7d1cf0ece1cfe5",
+        "sha256": "1117aece5e2ef573512147a3602e1e0d44999cb6c713105e3f7d1cf0ece1cfe5",
+        "size_bytes": 13970
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/1117aece5e2ef573512147a3602e1e0d44999cb6c713105e3f7d1cf0ece1cfe5",
+        "sha256": "1117aece5e2ef573512147a3602e1e0d44999cb6c713105e3f7d1cf0ece1cfe5",
+        "size_bytes": 13970
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/12/12df9c3a605b1d5e1ffa2c4236b0cff22f188a66915b0454de7e9c04c20d738f",
+        "sha256": "12df9c3a605b1d5e1ffa2c4236b0cff22f188a66915b0454de7e9c04c20d738f",
+        "size_bytes": 48358
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/12df9c3a605b1d5e1ffa2c4236b0cff22f188a66915b0454de7e9c04c20d738f",
+        "sha256": "12df9c3a605b1d5e1ffa2c4236b0cff22f188a66915b0454de7e9c04c20d738f",
+        "size_bytes": 48358
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/37/371ee432d89384311dbe6c07f0d3beb8cb99cba51ab69d14a71b7a63ce0df6ea",
+        "sha256": "371ee432d89384311dbe6c07f0d3beb8cb99cba51ab69d14a71b7a63ce0df6ea",
+        "size_bytes": 1628667
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/371ee432d89384311dbe6c07f0d3beb8cb99cba51ab69d14a71b7a63ce0df6ea",
+        "sha256": "371ee432d89384311dbe6c07f0d3beb8cb99cba51ab69d14a71b7a63ce0df6ea",
+        "size_bytes": 1628667
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/47/47f3c5f5867a2ee1f3afe631a8e939da9978264029246170677ccb5d9043ba2a",
+        "sha256": "47f3c5f5867a2ee1f3afe631a8e939da9978264029246170677ccb5d9043ba2a",
+        "size_bytes": 11541
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/47f3c5f5867a2ee1f3afe631a8e939da9978264029246170677ccb5d9043ba2a",
+        "sha256": "47f3c5f5867a2ee1f3afe631a8e939da9978264029246170677ccb5d9043ba2a",
+        "size_bytes": 11541
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/5f/5f982aba87e32de31a541c3cef83fd6a6d2e2fcd12efe1276b6ed2b694d0c899",
+        "sha256": "5f982aba87e32de31a541c3cef83fd6a6d2e2fcd12efe1276b6ed2b694d0c899",
+        "size_bytes": 1627912
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SYS-02-rolling-warmup/objects/5f982aba87e32de31a541c3cef83fd6a6d2e2fcd12efe1276b6ed2b694d0c899",
+        "sha256": "5f982aba87e32de31a541c3cef83fd6a6d2e2fcd12efe1276b6ed2b694d0c899",
+        "size_bytes": 1627912
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/86/86ebac512f3a5c85754a0d74f8beb16e1c94a8d19362279229b74f83ced37377",
+        "sha256": "86ebac512f3a5c85754a0d74f8beb16e1c94a8d19362279229b74f83ced37377",
+        "size_bytes": 4503
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/86ebac512f3a5c85754a0d74f8beb16e1c94a8d19362279229b74f83ced37377",
+        "sha256": "86ebac512f3a5c85754a0d74f8beb16e1c94a8d19362279229b74f83ced37377",
+        "size_bytes": 4503
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/b6/b6602aad82e6f579f42226f82838c2dfc85363dad1c356e5209a961621d369c5",
+        "sha256": "b6602aad82e6f579f42226f82838c2dfc85363dad1c356e5209a961621d369c5",
+        "size_bytes": 1628667
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/b6602aad82e6f579f42226f82838c2dfc85363dad1c356e5209a961621d369c5",
+        "sha256": "b6602aad82e6f579f42226f82838c2dfc85363dad1c356e5209a961621d369c5",
+        "size_bytes": 1628667
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/c2/c21f5f0a687046825827d499e6d91cee58685c3fe95d21f9fbdc674d03cc00c1",
+        "sha256": "c21f5f0a687046825827d499e6d91cee58685c3fe95d21f9fbdc674d03cc00c1",
+        "size_bytes": 1628667
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/c21f5f0a687046825827d499e6d91cee58685c3fe95d21f9fbdc674d03cc00c1",
+        "sha256": "c21f5f0a687046825827d499e6d91cee58685c3fe95d21f9fbdc674d03cc00c1",
+        "size_bytes": 1628667
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/d5/d51dc00cbc33efdf8eedef69dff404e234601e209342980a202a5285aec11551",
+        "sha256": "d51dc00cbc33efdf8eedef69dff404e234601e209342980a202a5285aec11551",
+        "size_bytes": 15970
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/d51dc00cbc33efdf8eedef69dff404e234601e209342980a202a5285aec11551",
+        "sha256": "d51dc00cbc33efdf8eedef69dff404e234601e209342980a202a5285aec11551",
+        "size_bytes": 15970
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/ee/eedf56d71325e87e17803560b7c87aaa880ca9b70430cd2bf556caf8e312a954",
+        "sha256": "eedf56d71325e87e17803560b7c87aaa880ca9b70430cd2bf556caf8e312a954",
+        "size_bytes": 15971
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/eedf56d71325e87e17803560b7c87aaa880ca9b70430cd2bf556caf8e312a954",
+        "sha256": "eedf56d71325e87e17803560b7c87aaa880ca9b70430cd2bf556caf8e312a954",
+        "size_bytes": 15971
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/apply-observer-lint-01.py",
+        "sha256": "2457048c4fe753aee0019a3e2a87fa0d778b13b834e00bb60978bf3d40862db5",
+        "size_bytes": 3827
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/2457048c4fe753aee0019a3e2a87fa0d778b13b834e00bb60978bf3d40862db5",
+        "sha256": "2457048c4fe753aee0019a3e2a87fa0d778b13b834e00bb60978bf3d40862db5",
+        "size_bytes": 3827
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/apply-surface-environment-01.py",
+        "sha256": "c086bff8f38d0acce671040bea15002be8e28cae7d8efab45ef74f071b25b369",
+        "size_bytes": 5262
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/c086bff8f38d0acce671040bea15002be8e28cae7d8efab45ef74f071b25b369",
+        "sha256": "c086bff8f38d0acce671040bea15002be8e28cae7d8efab45ef74f071b25b369",
+        "size_bytes": 5262
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-01/additive-reference.cmake",
+        "sha256": "e729244dcd80f3862f7a5b237447e71925e36114710d150630d6021f8202bf53",
+        "size_bytes": 951
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/e729244dcd80f3862f7a5b237447e71925e36114710d150630d6021f8202bf53",
+        "sha256": "e729244dcd80f3862f7a5b237447e71925e36114710d150630d6021f8202bf53",
+        "size_bytes": 951
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-01/CMakeCache.before.txt",
+        "sha256": "dc4c59fcaf14b01c7b08b031bf7a3c98cb98a1609bd04ec41268a64ee657db2c",
+        "size_bytes": 60368
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/dc4c59fcaf14b01c7b08b031bf7a3c98cb98a1609bd04ec41268a64ee657db2c",
+        "sha256": "dc4c59fcaf14b01c7b08b031bf7a3c98cb98a1609bd04ec41268a64ee657db2c",
+        "size_bytes": 60368
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-01/compile-command/receipt.json",
+        "sha256": "60fe8bb086436e31d9f02813d8aab6649a3db42a3010224f09227fc6cf5c7cc9",
+        "size_bytes": 3293
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/60fe8bb086436e31d9f02813d8aab6649a3db42a3010224f09227fc6cf5c7cc9",
+        "sha256": "60fe8bb086436e31d9f02813d8aab6649a3db42a3010224f09227fc6cf5c7cc9",
+        "size_bytes": 3293
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-01/compile-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-01/compile-command/stdout.log",
+        "sha256": "731b197ea544b37943a4d6eaf6e1389f9230a2588224fff13dc172e917b9e0c9",
+        "size_bytes": 13987
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/731b197ea544b37943a4d6eaf6e1389f9230a2588224fff13dc172e917b9e0c9",
+        "sha256": "731b197ea544b37943a4d6eaf6e1389f9230a2588224fff13dc172e917b9e0c9",
+        "size_bytes": 13987
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-01/configure-argv.json",
+        "sha256": "ea25c320fa4ce29404d7abca9ba1de9c04b401d498b41f54c7ee54faa17879eb",
+        "size_bytes": 6774
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/ea25c320fa4ce29404d7abca9ba1de9c04b401d498b41f54c7ee54faa17879eb",
+        "sha256": "ea25c320fa4ce29404d7abca9ba1de9c04b401d498b41f54c7ee54faa17879eb",
+        "size_bytes": 6774
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-01/configure-command/receipt.json",
+        "sha256": "98334133b652a034ac51788a2b3fec027ceb8ffc6dffdda8d6cf994f2425326c",
+        "size_bytes": 9829
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/98334133b652a034ac51788a2b3fec027ceb8ffc6dffdda8d6cf994f2425326c",
+        "sha256": "98334133b652a034ac51788a2b3fec027ceb8ffc6dffdda8d6cf994f2425326c",
+        "size_bytes": 9829
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-01/configure-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-01/configure-command/stdout.log",
+        "sha256": "0335b061ecc3582cca82a2aea3134f4283930cecccecd19af80f113b1feafb41",
+        "size_bytes": 743
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-original-baseline/objects/0335b061ecc3582cca82a2aea3134f4283930cecccecd19af80f113b1feafb41",
+        "sha256": "0335b061ecc3582cca82a2aea3134f4283930cecccecd19af80f113b1feafb41",
+        "size_bytes": 743
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-01/dry-build-command/receipt.json",
+        "sha256": "50ba8b5de442be2937530756e2dbdaec5ed1b9dcc5d0f2af5225a8e67ed2b995",
+        "size_bytes": 3319
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/50ba8b5de442be2937530756e2dbdaec5ed1b9dcc5d0f2af5225a8e67ed2b995",
+        "sha256": "50ba8b5de442be2937530756e2dbdaec5ed1b9dcc5d0f2af5225a8e67ed2b995",
+        "size_bytes": 3319
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-01/dry-build-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-01/dry-build-command/stdout.log",
+        "sha256": "8f7e27ac6274356a02c60ea6b2f91173596dc6ac2797740edf7adfd2c4b7eb59",
+        "size_bytes": 8097
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/8f7e27ac6274356a02c60ea6b2f91173596dc6ac2797740edf7adfd2c4b7eb59",
+        "sha256": "8f7e27ac6274356a02c60ea6b2f91173596dc6ac2797740edf7adfd2c4b7eb59",
+        "size_bytes": 8097
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-01/dry-build-review.json",
+        "sha256": "68b5507448b22b688906b0e2caed93ae87f7e40fe8cf894ba68bc9c22cfebc8f",
+        "size_bytes": 16210
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/68b5507448b22b688906b0e2caed93ae87f7e40fe8cf894ba68bc9c22cfebc8f",
+        "sha256": "68b5507448b22b688906b0e2caed93ae87f7e40fe8cf894ba68bc9c22cfebc8f",
+        "size_bytes": 16210
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-01/frozen-build-inputs.json",
+        "sha256": "8599006f3f43d5d01fe369a8648a821db70651e4400b3449777e206e570d7e6e",
+        "size_bytes": 3148
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/8599006f3f43d5d01fe369a8648a821db70651e4400b3449777e206e570d7e6e",
+        "sha256": "8599006f3f43d5d01fe369a8648a821db70651e4400b3449777e206e570d7e6e",
+        "size_bytes": 3148
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-01/object-parent-compression-command/receipt.json",
+        "sha256": "27ba511f8cd0fe227b26bace3a359d29a970c2c1775f693bd3703c81d2985e60",
+        "size_bytes": 3222
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/27ba511f8cd0fe227b26bace3a359d29a970c2c1775f693bd3703c81d2985e60",
+        "sha256": "27ba511f8cd0fe227b26bace3a359d29a970c2c1775f693bd3703c81d2985e60",
+        "size_bytes": 3222
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-01/object-parent-compression-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-01/object-parent-compression-command/stdout.log",
+        "sha256": "f593016eef888fa7607f79b73bb8bcd38445bc6eb68deeca8d8d3f7d4db0861a",
+        "size_bytes": 400
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/f593016eef888fa7607f79b73bb8bcd38445bc6eb68deeca8d8d3f7d4db0861a",
+        "sha256": "f593016eef888fa7607f79b73bb8bcd38445bc6eb68deeca8d8d3f7d4db0861a",
+        "size_bytes": 400
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/addr2line-command/receipt.json",
+        "sha256": "d18b75b6eb870423c789d6269720c21c872a2f335c20b6204530e2a26ce8db10",
+        "size_bytes": 3631
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/d18b75b6eb870423c789d6269720c21c872a2f335c20b6204530e2a26ce8db10",
+        "sha256": "d18b75b6eb870423c789d6269720c21c872a2f335c20b6204530e2a26ce8db10",
+        "size_bytes": 3631
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/addr2line-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/addr2line-command/stdout.log",
+        "sha256": "58d43212712e849c9bbf08007aa5a920c4016beb635004f97aa0c3e36d9cb14c",
+        "size_bytes": 1357
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/58d43212712e849c9bbf08007aa5a920c4016beb635004f97aa0c3e36d9cb14c",
+        "sha256": "58d43212712e849c9bbf08007aa5a920c4016beb635004f97aa0c3e36d9cb14c",
+        "size_bytes": 1357
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/address-bound-link-providers.txt",
+        "sha256": "be66e36814b2e1face0395360bc2c249e485ce8217b366ac0f55ecb4d36d0636",
+        "size_bytes": 7247
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/be66e36814b2e1face0395360bc2c249e485ce8217b366ac0f55ecb4d36d0636",
+        "sha256": "be66e36814b2e1face0395360bc2c249e485ce8217b366ac0f55ecb4d36d0636",
+        "size_bytes": 7247
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/CMakeCache.before.txt",
+        "sha256": "30acba25236c38e60fe1e7eba3032660c2aa1b41764e1754a6100e7d2fc09d8c",
+        "size_bytes": 61306
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/30acba25236c38e60fe1e7eba3032660c2aa1b41764e1754a6100e7d2fc09d8c",
+        "sha256": "30acba25236c38e60fe1e7eba3032660c2aa1b41764e1754a6100e7d2fc09d8c",
+        "size_bytes": 61306
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/compile-command/receipt.json",
+        "sha256": "8f002a59a748081caf321023fd7e16f4d3a0aa324d1fe80b9923d4e9a1c4860c",
+        "size_bytes": 3464
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/8f002a59a748081caf321023fd7e16f4d3a0aa324d1fe80b9923d4e9a1c4860c",
+        "sha256": "8f002a59a748081caf321023fd7e16f4d3a0aa324d1fe80b9923d4e9a1c4860c",
+        "size_bytes": 3464
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/compile-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/compile-command/stdout.log",
+        "sha256": "c624c1dc5d5e0d721067d047e3340fbff1a067b03380b538d1a9c581e4d9920a",
+        "size_bytes": 7941
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/c624c1dc5d5e0d721067d047e3340fbff1a067b03380b538d1a9c581e4d9920a",
+        "sha256": "c624c1dc5d5e0d721067d047e3340fbff1a067b03380b538d1a9c581e4d9920a",
+        "size_bytes": 7941
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/configure-argv.json",
+        "sha256": "ed60c923f93906b5b9d9b24467de19925dc209846bc36a3f33be6627ae11ed4d",
+        "size_bytes": 6774
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/ed60c923f93906b5b9d9b24467de19925dc209846bc36a3f33be6627ae11ed4d",
+        "sha256": "ed60c923f93906b5b9d9b24467de19925dc209846bc36a3f33be6627ae11ed4d",
+        "size_bytes": 6774
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/configure-command/receipt.json",
+        "sha256": "714bcbdeef607cebca702ef10a7c2105fa5d65cca1d86ffdedf0d3ed58030d84",
+        "size_bytes": 10068
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/714bcbdeef607cebca702ef10a7c2105fa5d65cca1d86ffdedf0d3ed58030d84",
+        "sha256": "714bcbdeef607cebca702ef10a7c2105fa5d65cca1d86ffdedf0d3ed58030d84",
+        "size_bytes": 10068
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/configure-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/configure-command/stdout.log",
+        "sha256": "982faeb91e60b569685aead9cee542bd64558b24632ca07989ef488b26420b3d",
+        "size_bytes": 743
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-scan-comparison/objects/982faeb91e60b569685aead9cee542bd64558b24632ca07989ef488b26420b3d",
+        "sha256": "982faeb91e60b569685aead9cee542bd64558b24632ca07989ef488b26420b3d",
+        "size_bytes": 743
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/core-after-command/receipt.json",
+        "sha256": "24b0fe3a6fe120b55fdd3e17148aa2962de951ba70f606d47f02058cf33e59d8",
+        "size_bytes": 3289
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/24b0fe3a6fe120b55fdd3e17148aa2962de951ba70f606d47f02058cf33e59d8",
+        "sha256": "24b0fe3a6fe120b55fdd3e17148aa2962de951ba70f606d47f02058cf33e59d8",
+        "size_bytes": 3289
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/core-after-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/core-after-command/stdout.log",
+        "sha256": "572c39339f0904265ff7e0019523d813c1c1fbbfe0a63ab656b75c29ea7fe656",
+        "size_bytes": 475
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SYS-02-selected-warmup/objects/572c39339f0904265ff7e0019523d813c1c1fbbfe0a63ab656b75c29ea7fe656",
+        "sha256": "572c39339f0904265ff7e0019523d813c1c1fbbfe0a63ab656b75c29ea7fe656",
+        "size_bytes": 475
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/dry-build-command/receipt.json",
+        "sha256": "50b601aea06d2b4fb6f918091d473aa940e9d24065c9ee2bba4a813596db3cb8",
+        "size_bytes": 3450
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/50b601aea06d2b4fb6f918091d473aa940e9d24065c9ee2bba4a813596db3cb8",
+        "sha256": "50b601aea06d2b4fb6f918091d473aa940e9d24065c9ee2bba4a813596db3cb8",
+        "size_bytes": 3450
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/dry-build-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/dry-build-command/stdout.log",
+        "sha256": "2311ff0b7700b43f6dc8007294f48af269fccee047e6003f0385b97317279710",
+        "size_bytes": 429
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/2311ff0b7700b43f6dc8007294f48af269fccee047e6003f0385b97317279710",
+        "sha256": "2311ff0b7700b43f6dc8007294f48af269fccee047e6003f0385b97317279710",
+        "size_bytes": 429
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/dry-build-review.json",
+        "sha256": "ab8815b120337a315f610f85e19939f831f39ef305dac40130b63d74ba99315c",
+        "size_bytes": 16307
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/ab8815b120337a315f610f85e19939f831f39ef305dac40130b63d74ba99315c",
+        "sha256": "ab8815b120337a315f610f85e19939f831f39ef305dac40130b63d74ba99315c",
+        "size_bytes": 16307
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/dry-verbose-command/receipt.json",
+        "sha256": "46da486580eb920678b1dd4574c909dfc7fcc5658336a2ca06f12bd397611be4",
+        "size_bytes": 3463
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/46da486580eb920678b1dd4574c909dfc7fcc5658336a2ca06f12bd397611be4",
+        "sha256": "46da486580eb920678b1dd4574c909dfc7fcc5658336a2ca06f12bd397611be4",
+        "size_bytes": 3463
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/dry-verbose-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/dry-verbose-command/stdout.log",
+        "sha256": "c624c1dc5d5e0d721067d047e3340fbff1a067b03380b538d1a9c581e4d9920a",
+        "size_bytes": 7941
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/c624c1dc5d5e0d721067d047e3340fbff1a067b03380b538d1a9c581e4d9920a",
+        "sha256": "c624c1dc5d5e0d721067d047e3340fbff1a067b03380b538d1a9c581e4d9920a",
+        "size_bytes": 7941
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/execution-build-inputs.json",
+        "sha256": "382d3645f8a8fac1b2da52aa0296712c55a8e5d8e0d14eb0749d88a5e142567c",
+        "size_bytes": 4059
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/382d3645f8a8fac1b2da52aa0296712c55a8e5d8e0d14eb0749d88a5e142567c",
+        "sha256": "382d3645f8a8fac1b2da52aa0296712c55a8e5d8e0d14eb0749d88a5e142567c",
+        "size_bytes": 4059
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/frozen-build-inputs.json",
+        "sha256": "f4d25a0742ed3f72447282886f423e592561d82554d365b761a30cd7cee3933e",
+        "size_bytes": 3479
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/f4d25a0742ed3f72447282886f423e592561d82554d365b761a30cd7cee3933e",
+        "sha256": "f4d25a0742ed3f72447282886f423e592561d82554d365b761a30cd7cee3933e",
+        "size_bytes": 3479
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/linked-provider-and-PE-inventory.json",
+        "sha256": "57f79923e2a11a41f0c0dfe8946227e0cd44da93fd82e8744e8aaf88ccbb909b",
+        "size_bytes": 18067
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/57f79923e2a11a41f0c0dfe8946227e0cd44da93fd82e8744e8aaf88ccbb909b",
+        "sha256": "57f79923e2a11a41f0c0dfe8946227e0cd44da93fd82e8744e8aaf88ccbb909b",
+        "size_bytes": 18067
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/object-parent-compression-command/receipt.json",
+        "sha256": "1be2bec0639ec3d124fd48233622160fd55c053a559971d54f7bce6ffa867933",
+        "size_bytes": 3460
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/1be2bec0639ec3d124fd48233622160fd55c053a559971d54f7bce6ffa867933",
+        "sha256": "1be2bec0639ec3d124fd48233622160fd55c053a559971d54f7bce6ffa867933",
+        "size_bytes": 3460
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/object-parent-compression-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/object-parent-compression-command/stdout.log",
+        "sha256": "1613214e1025fb084a0271853c3417d140e072819b5d6de4c0be59c64e932cbc",
+        "size_bytes": 400
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/1613214e1025fb084a0271853c3417d140e072819b5d6de4c0be59c64e932cbc",
+        "sha256": "1613214e1025fb084a0271853c3417d140e072819b5d6de4c0be59c64e932cbc",
+        "size_bytes": 400
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-build-02/selected-link-providers.txt",
+        "sha256": "3201dcd0919657d7ac7e5ff517a9f7b65728626ce17d553cea193a95cdc8d2e1",
+        "size_bytes": 192147
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/3201dcd0919657d7ac7e5ff517a9f7b65728626ce17d553cea193a95cdc8d2e1",
+        "sha256": "3201dcd0919657d7ac7e5ff517a9f7b65728626ce17d553cea193a95cdc8d2e1",
+        "size_bytes": 192147
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-factual-review-01/review.json",
+        "sha256": "ef82b36f7d05d632d511b27257732d67eaa58656011730acfe43fc675768394c",
+        "size_bytes": 74313
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/ef82b36f7d05d632d511b27257732d67eaa58656011730acfe43fc675768394c",
+        "sha256": "ef82b36f7d05d632d511b27257732d67eaa58656011730acfe43fc675768394c",
+        "size_bytes": 74313
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/before/warmup_reference.cmake",
+        "sha256": "7ec93f33f3d7adb97a3835eeaba2075046f9b917b056051bc12273dab4877dc9",
+        "size_bytes": 1733
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SYS-02-selected-warmup/objects/7ec93f33f3d7adb97a3835eeaba2075046f9b917b056051bc12273dab4877dc9",
+        "sha256": "7ec93f33f3d7adb97a3835eeaba2075046f9b917b056051bc12273dab4877dc9",
+        "size_bytes": 1733
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/before/warmup_reference_fields.hh",
+        "sha256": "0a0168b978a9b5acf8f107d1bfa30d8aaa0c9f1db90cb0e03d6f8420811b47d6",
+        "size_bytes": 10338
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SYS-02-selected-warmup/objects/0a0168b978a9b5acf8f107d1bfa30d8aaa0c9f1db90cb0e03d6f8420811b47d6",
+        "sha256": "0a0168b978a9b5acf8f107d1bfa30d8aaa0c9f1db90cb0e03d6f8420811b47d6",
+        "size_bytes": 10338
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/before/warmup_reference_helper.cpp",
+        "sha256": "49339c0febf2b7c7555ee8b78f8d3f4a6864301b8e8de3b16c8e7cd119428fad",
+        "size_bytes": 15294
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SYS-02-selected-warmup/objects/49339c0febf2b7c7555ee8b78f8d3f4a6864301b8e8de3b16c8e7cd119428fad",
+        "sha256": "49339c0febf2b7c7555ee8b78f8d3f4a6864301b8e8de3b16c8e7cd119428fad",
+        "size_bytes": 15294
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/diffs/input-only-cases.proposed.json.addition.diff",
+        "sha256": "bb7af2978cf3b29bdba8b9782112b2dd83ba54882ac08e79bae0d6ab24864625",
+        "size_bytes": 83324
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/bb7af2978cf3b29bdba8b9782112b2dd83ba54882ac08e79bae0d6ab24864625",
+        "sha256": "bb7af2978cf3b29bdba8b9782112b2dd83ba54882ac08e79bae0d6ab24864625",
+        "size_bytes": 83324
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/diffs/observation-policy.proposed.json.addition.diff",
+        "sha256": "a158764f949722478ca265432dc8aaf3f1bc6d46f8238fd708d34e5671ce71ce",
+        "size_bytes": 1306
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/a158764f949722478ca265432dc8aaf3f1bc6d46f8238fd708d34e5671ce71ce",
+        "sha256": "a158764f949722478ca265432dc8aaf3f1bc6d46f8238fd708d34e5671ce71ce",
+        "size_bytes": 1306
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/diffs/README.md.addition.diff",
+        "sha256": "0f748c82f6ff5d1a4f671345a6742c37605438197163daec77ade6342033b610",
+        "size_bytes": 2766
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/0f748c82f6ff5d1a4f671345a6742c37605438197163daec77ade6342033b610",
+        "sha256": "0f748c82f6ff5d1a4f671345a6742c37605438197163daec77ade6342033b610",
+        "size_bytes": 2766
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/diffs/surface_environment_reference.cmake.addition.diff",
+        "sha256": "71bc818c6e2236ca2209a2afc7984925ef1fa17e9cb6c310cb50aac0543b6dfa",
+        "size_bytes": 1966
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/71bc818c6e2236ca2209a2afc7984925ef1fa17e9cb6c310cb50aac0543b6dfa",
+        "sha256": "71bc818c6e2236ca2209a2afc7984925ef1fa17e9cb6c310cb50aac0543b6dfa",
+        "size_bytes": 1966
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/diffs/surface_environment_reference.cmake.from-reused-pattern.diff",
+        "sha256": "0bb8007010e20c01bca846c8b3ffba37ec4bf96443d2ba62b8246db78f804418",
+        "size_bytes": 3495
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/0bb8007010e20c01bca846c8b3ffba37ec4bf96443d2ba62b8246db78f804418",
+        "sha256": "0bb8007010e20c01bca846c8b3ffba37ec4bf96443d2ba62b8246db78f804418",
+        "size_bytes": 3495
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/diffs/surface_environment_reference_fields.hh.addition.diff",
+        "sha256": "0989397ae1a01137498342e026694a5bfe641dc0d30f38c250c5580012b2c10c",
+        "size_bytes": 6062
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/0989397ae1a01137498342e026694a5bfe641dc0d30f38c250c5580012b2c10c",
+        "sha256": "0989397ae1a01137498342e026694a5bfe641dc0d30f38c250c5580012b2c10c",
+        "size_bytes": 6062
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/diffs/surface_environment_reference_fields.hh.from-reused-pattern.diff",
+        "sha256": "a53886e7f2438b75670e39eb0f87094de7a494ca9f7cc6581d8600f7c9c2375c",
+        "size_bytes": 10031
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/a53886e7f2438b75670e39eb0f87094de7a494ca9f7cc6581d8600f7c9c2375c",
+        "sha256": "a53886e7f2438b75670e39eb0f87094de7a494ca9f7cc6581d8600f7c9c2375c",
+        "size_bytes": 10031
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/diffs/surface_environment_reference_helper.cpp.addition.diff",
+        "sha256": "983a522f86317e68071d84ca45d5aef83d8c5153badf97d0e94f52cba1c2624f",
+        "size_bytes": 14555
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/983a522f86317e68071d84ca45d5aef83d8c5153badf97d0e94f52cba1c2624f",
+        "sha256": "983a522f86317e68071d84ca45d5aef83d8c5153badf97d0e94f52cba1c2624f",
+        "size_bytes": 14555
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/diffs/surface_environment_reference_helper.cpp.from-reused-pattern.diff",
+        "sha256": "83b3c96af5b0bd800aa45644de1db2ecc3832a9aad75e6ca3c60e266e48562e2",
+        "size_bytes": 24705
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/83b3c96af5b0bd800aa45644de1db2ecc3832a9aad75e6ca3c60e266e48562e2",
+        "sha256": "83b3c96af5b0bd800aa45644de1db2ecc3832a9aad75e6ca3c60e266e48562e2",
+        "size_bytes": 24705
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/input-only-cases.proposed.json",
+        "sha256": "0191a53ee11a1767a1b35023fcf5a3769e8c9df89c4d297847e3ed9d31cb4c15",
+        "size_bytes": 80365
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/0191a53ee11a1767a1b35023fcf5a3769e8c9df89c4d297847e3ed9d31cb4c15",
+        "sha256": "0191a53ee11a1767a1b35023fcf5a3769e8c9df89c4d297847e3ed9d31cb4c15",
+        "size_bytes": 80365
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/manifest.json",
+        "sha256": "083338e735fbfc54a279a8c71592211b9ca24baf090cf838a16524d4a68b241c",
+        "size_bytes": 27490
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/083338e735fbfc54a279a8c71592211b9ca24baf090cf838a16524d4a68b241c",
+        "sha256": "083338e735fbfc54a279a8c71592211b9ca24baf090cf838a16524d4a68b241c",
+        "size_bytes": 27490
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/observation-policy.proposed.json",
+        "sha256": "f9420ff80690a61f9f85f14957a163d65a19cf326c2227770504712e371991b7",
+        "size_bytes": 1173
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/f9420ff80690a61f9f85f14957a163d65a19cf326c2227770504712e371991b7",
+        "sha256": "f9420ff80690a61f9f85f14957a163d65a19cf326c2227770504712e371991b7",
+        "size_bytes": 1173
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/README.md",
+        "sha256": "da7c0bb5ba53d0667eb60a639f8d813b23383653a537c7079cb2d03c638f4ff4",
+        "size_bytes": 2678
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/da7c0bb5ba53d0667eb60a639f8d813b23383653a537c7079cb2d03c638f4ff4",
+        "sha256": "da7c0bb5ba53d0667eb60a639f8d813b23383653a537c7079cb2d03c638f4ff4",
+        "size_bytes": 2678
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/Data__EnergyPlusData.cc.579-594.txt",
+        "sha256": "6b2a0d600f417692339a03b6b0a48cd74e8dc4ed6efe319ff34f59e6cf482a50",
+        "size_bytes": 607
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SYS-02-selected-warmup/objects/6b2a0d600f417692339a03b6b0a48cd74e8dc4ed6efe319ff34f59e6cf482a50",
+        "sha256": "6b2a0d600f417692339a03b6b0a48cd74e8dc4ed6efe319ff34f59e6cf482a50",
+        "size_bytes": 607
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/DataEnvironment.cc.236-247.txt",
+        "sha256": "38137605604731b27a8cea63c551831345cc7a50f2078f29bb103ce26d996c99",
+        "size_bytes": 759
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/38137605604731b27a8cea63c551831345cc7a50f2078f29bb103ce26d996c99",
+        "sha256": "38137605604731b27a8cea63c551831345cc7a50f2078f29bb103ce26d996c99",
+        "size_bytes": 759
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/DataEnvironment.hh.192-196.txt",
+        "sha256": "d170f54751f5f5dbfffca93105f00dbdfa10205583f82db6a9d9f219a7b58f0a",
+        "size_bytes": 654
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/d170f54751f5f5dbfffca93105f00dbdfa10205583f82db6a9d9f219a7b58f0a",
+        "sha256": "d170f54751f5f5dbfffca93105f00dbdfa10205583f82db6a9d9f219a7b58f0a",
+        "size_bytes": 654
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/DataEnvironment.hh.79-80.txt",
+        "sha256": "fa52f517e49ef11ec474a4c4b9d1df149bb126d3070119a6f962b662f2bb1cb3",
+        "size_bytes": 190
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/fa52f517e49ef11ec474a4c4b9d1df149bb126d3070119a6f962b662f2bb1cb3",
+        "sha256": "fa52f517e49ef11ec474a4c4b9d1df149bb126d3070119a6f962b662f2bb1cb3",
+        "size_bytes": 190
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/DataErrorTracking.hh.205-235.txt",
+        "sha256": "f311a869922c169aa9489a7a2964b991a85e2cca399d7ad3f7555c00a81ba3d6",
+        "size_bytes": 1695
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/f311a869922c169aa9489a7a2964b991a85e2cca399d7ad3f7555c00a81ba3d6",
+        "sha256": "f311a869922c169aa9489a7a2964b991a85e2cca399d7ad3f7555c00a81ba3d6",
+        "size_bytes": 1695
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/DataSurfaces.cc.594-666.txt",
+        "sha256": "9bcb51ff7ee90462ca790c1c212042fcf0d89a7c6b6896d0f2b421d5520ef22f",
+        "size_bytes": 3670
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/9bcb51ff7ee90462ca790c1c212042fcf0d89a7c6b6896d0f2b421d5520ef22f",
+        "sha256": "9bcb51ff7ee90462ca790c1c212042fcf0d89a7c6b6896d0f2b421d5520ef22f",
+        "size_bytes": 3670
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/DataSurfaces.hh.1446-1452.txt",
+        "sha256": "bfaac38b6d92f6bc47006267915cac307e06bfc3f516032607f71b5ad32fb692",
+        "size_bytes": 227
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/bfaac38b6d92f6bc47006267915cac307e06bfc3f516032607f71b5ad32fb692",
+        "sha256": "bfaac38b6d92f6bc47006267915cac307e06bfc3f516032607f71b5ad32fb692",
+        "size_bytes": 227
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/DataSurfaces.hh.1473-1478.txt",
+        "sha256": "bd4fd7b3b973f49f762096c3330d74edcbd04ecc52063dea9ed151f359f9470a",
+        "size_bytes": 400
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/bd4fd7b3b973f49f762096c3330d74edcbd04ecc52063dea9ed151f359f9470a",
+        "sha256": "bd4fd7b3b973f49f762096c3330d74edcbd04ecc52063dea9ed151f359f9470a",
+        "size_bytes": 400
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/DataSurfaces.hh.1538-1543.txt",
+        "sha256": "fe816e7c86fb50190137b6580118f78d3dac63eac7148067e3e0a1ea09102431",
+        "size_bytes": 480
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/fe816e7c86fb50190137b6580118f78d3dac63eac7148067e3e0a1ea09102431",
+        "sha256": "fe816e7c86fb50190137b6580118f78d3dac63eac7148067e3e0a1ea09102431",
+        "size_bytes": 480
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/DataSurfaces.hh.1813-1817.txt",
+        "sha256": "fcae52bf64dd99d40f36bdb6e938d6f31ba865f3eb866546067a8f608463ffbd",
+        "size_bytes": 214
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/fcae52bf64dd99d40f36bdb6e938d6f31ba865f3eb866546067a8f608463ffbd",
+        "sha256": "fcae52bf64dd99d40f36bdb6e938d6f31ba865f3eb866546067a8f608463ffbd",
+        "size_bytes": 214
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/DataSurfaces.hh.729-735.txt",
+        "sha256": "8a0579e43d3ae5c4c2fa3be02d0804f58017574b0059e1cb95e7c7d3f69c34bf",
+        "size_bytes": 334
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/8a0579e43d3ae5c4c2fa3be02d0804f58017574b0059e1cb95e7c7d3f69c34bf",
+        "sha256": "8a0579e43d3ae5c4c2fa3be02d0804f58017574b0059e1cb95e7c7d3f69c34bf",
+        "size_bytes": 334
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/DataSurfaces.hh.770-776.txt",
+        "sha256": "bd84269bfccca47598ac3c79c54bba308a0b2975c0db80b24f0eb02e52577925",
+        "size_bytes": 743
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/bd84269bfccca47598ac3c79c54bba308a0b2975c0db80b24f0eb02e52577925",
+        "sha256": "bd84269bfccca47598ac3c79c54bba308a0b2975c0db80b24f0eb02e52577925",
+        "size_bytes": 743
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/EPVector.hh.88-103.txt",
+        "sha256": "de188f5a5073ae0e83c54b80ca94950db3892642e2e9926e2ed792012693561b",
+        "size_bytes": 342
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SYS-02-selected-warmup/objects/de188f5a5073ae0e83c54b80ca94950db3892642e2e9926e2ed792012693561b",
+        "sha256": "de188f5a5073ae0e83c54b80ca94950db3892642e2e9926e2ed792012693561b",
+        "size_bytes": 342
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/HeatBalanceManager.cc.1252-1317.txt",
+        "sha256": "c0c661749d470affe5b4bee6635864e074770a144ad77b83f6ac9aa0c7df1274",
+        "size_bytes": 3543
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/c0c661749d470affe5b4bee6635864e074770a144ad77b83f6ac9aa0c7df1274",
+        "sha256": "c0c661749d470affe5b4bee6635864e074770a144ad77b83f6ac9aa0c7df1274",
+        "size_bytes": 3543
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/HeatBalanceManager.cc.566-585.txt",
+        "sha256": "110b001048545974cb03caca328c1f156154021158bde9965d7b8d0aca6a8bff",
+        "size_bytes": 1106
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/110b001048545974cb03caca328c1f156154021158bde9965d7b8d0aca6a8bff",
+        "sha256": "110b001048545974cb03caca328c1f156154021158bde9965d7b8d0aca6a8bff",
+        "size_bytes": 1106
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/HeatBalanceManager.hh.100-100.txt",
+        "sha256": "a15919497fa0d6e617a249c45ef03f485c2f4cd9794b02ff2a77a3b8ee29d8f5",
+        "size_bytes": 74
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/a15919497fa0d6e617a249c45ef03f485c2f4cd9794b02ff2a77a3b8ee29d8f5",
+        "sha256": "a15919497fa0d6e617a249c45ef03f485c2f4cd9794b02ff2a77a3b8ee29d8f5",
+        "size_bytes": 74
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/HeatBalanceSurfaceManager.cc.308-345.txt",
+        "sha256": "1ece82ef8c9af17341079cd5495194e42b84d9db9fc8a0c6a421451c662de7ad",
+        "size_bytes": 2456
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/1ece82ef8c9af17341079cd5495194e42b84d9db9fc8a0c6a421451c662de7ad",
+        "sha256": "1ece82ef8c9af17341079cd5495194e42b84d9db9fc8a0c6a421451c662de7ad",
+        "size_bytes": 2456
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/InputProcessing__InputProcessor.cc.505-541.txt",
+        "sha256": "fc01b6d7119d3b56f450dd1f3f5552c675aefc582dbd33d193ecfe5ff228f301",
+        "size_bytes": 1502
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/fc01b6d7119d3b56f450dd1f3f5552c675aefc582dbd33d193ecfe5ff228f301",
+        "sha256": "fc01b6d7119d3b56f450dd1f3f5552c675aefc582dbd33d193ecfe5ff228f301",
+        "size_bytes": 1502
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/InputProcessing__InputProcessor.hh.327-345.txt",
+        "sha256": "57b3aab3cb490af25c0377ad80b2f2c32a615a6e99f58c160f277ab9de0ae292",
+        "size_bytes": 446
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/57b3aab3cb490af25c0377ad80b2f2c32a615a6e99f58c160f277ab9de0ae292",
+        "sha256": "57b3aab3cb490af25c0377ad80b2f2c32a615a6e99f58c160f277ab9de0ae292",
+        "size_bytes": 446
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/SurfaceGeometry.cc.862-873.txt",
+        "sha256": "bf3bf949dc32af16f89bfc8ca004a8a52f11bdb9eff72f1936ef8a2e57f5aa0e",
+        "size_bytes": 949
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/bf3bf949dc32af16f89bfc8ca004a8a52f11bdb9eff72f1936ef8a2e57f5aa0e",
+        "sha256": "bf3bf949dc32af16f89bfc8ca004a8a52f11bdb9eff72f1936ef8a2e57f5aa0e",
+        "size_bytes": 949
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/UtilityRoutines.cc.1381-1423.txt",
+        "sha256": "42dd3a6e6296c2cb302f3188457bcc9575938e2fbb1f5c45b357931ba841080c",
+        "size_bytes": 1689
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SYS-02-selected-warmup/objects/42dd3a6e6296c2cb302f3188457bcc9575938e2fbb1f5c45b357931ba841080c",
+        "sha256": "42dd3a6e6296c2cb302f3188457bcc9575938e2fbb1f5c45b357931ba841080c",
+        "size_bytes": 1689
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/UtilityRoutines.cc.757-794.txt",
+        "sha256": "420b670957c68d8103cf912f1f9628be50f45f1bae63c62a54a03d2577c6f758",
+        "size_bytes": 1679
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/420b670957c68d8103cf912f1f9628be50f45f1bae63c62a54a03d2577c6f758",
+        "sha256": "420b670957c68d8103cf912f1f9628be50f45f1bae63c62a54a03d2577c6f758",
+        "size_bytes": 1679
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/UtilityRoutines.cc.796-833.txt",
+        "sha256": "0ba47cb0bf45f8dff7fd1a52e742056685d9cddfa8be219ab15d64815cd78e24",
+        "size_bytes": 1581
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SYS-02-selected-warmup/objects/0ba47cb0bf45f8dff7fd1a52e742056685d9cddfa8be219ab15d64815cd78e24",
+        "sha256": "0ba47cb0bf45f8dff7fd1a52e742056685d9cddfa8be219ab15d64815cd78e24",
+        "size_bytes": 1581
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/UtilityRoutines.cc.870-890.txt",
+        "sha256": "7f91a800f0b638518c3e002c9878e0574a18232d6aabfff4188ad41d860f8283",
+        "size_bytes": 806
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SYS-02-selected-warmup/objects/7f91a800f0b638518c3e002c9878e0574a18232d6aabfff4188ad41d860f8283",
+        "sha256": "7f91a800f0b638518c3e002c9878e0574a18232d6aabfff4188ad41d860f8283",
+        "size_bytes": 806
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/UtilityRoutines.hh.687-696.txt",
+        "sha256": "eac9471aa22b387a98250fe4b34f7a9b8483c19552c294de0bb00bdbc5d86be1",
+        "size_bytes": 282
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/eac9471aa22b387a98250fe4b34f7a9b8483c19552c294de0bb00bdbc5d86be1",
+        "sha256": "eac9471aa22b387a98250fe4b34f7a9b8483c19552c294de0bb00bdbc5d86be1",
+        "size_bytes": 282
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/WeatherManager.cc.7233-7301.txt",
+        "sha256": "ee0e54741b0a6f405d846d9ec0f1c7b6692e5ebd5b1a3113ba1b71bcf8c7fc44",
+        "size_bytes": 3695
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/ee0e54741b0a6f405d846d9ec0f1c7b6692e5ebd5b1a3113ba1b71bcf8c7fc44",
+        "sha256": "ee0e54741b0a6f405d846d9ec0f1c7b6692e5ebd5b1a3113ba1b71bcf8c7fc44",
+        "size_bytes": 3695
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/source-ranges/WeatherManager.hh.649-649.txt",
+        "sha256": "db2eb47960a42ce695e663deeeffaa275ac8050c7b6a0d9983ecfe12f8248b21",
+        "size_bytes": 70
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/db2eb47960a42ce695e663deeeffaa275ac8050c7b6a0d9983ecfe12f8248b21",
+        "sha256": "db2eb47960a42ce695e663deeeffaa275ac8050c7b6a0d9983ecfe12f8248b21",
+        "size_bytes": 70
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/surface_environment_reference.cmake",
+        "sha256": "f5e58635049619c1b8eab7c03bbd484dda37ac0f52dd802ddc770f01230efbe9",
+        "size_bytes": 1837
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/f5e58635049619c1b8eab7c03bbd484dda37ac0f52dd802ddc770f01230efbe9",
+        "sha256": "f5e58635049619c1b8eab7c03bbd484dda37ac0f52dd802ddc770f01230efbe9",
+        "size_bytes": 1837
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/surface_environment_reference_fields.hh",
+        "sha256": "3f9da88accc83fc059b89c5f520cae5cc94dfced25f227a69cb903fe287e0b75",
+        "size_bytes": 5849
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/3f9da88accc83fc059b89c5f520cae5cc94dfced25f227a69cb903fe287e0b75",
+        "sha256": "3f9da88accc83fc059b89c5f520cae5cc94dfced25f227a69cb903fe287e0b75",
+        "size_bytes": 5849
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/surface_environment_reference_helper.cpp",
+        "sha256": "2d3d1f0cbf625e0ad7eb5a2e07a19991bb14b0896efdfa309713f26356728348",
+        "size_bytes": 14207
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/2d3d1f0cbf625e0ad7eb5a2e07a19991bb14b0896efdfa309713f26356728348",
+        "sha256": "2d3d1f0cbf625e0ad7eb5a2e07a19991bb14b0896efdfa309713f26356728348",
+        "size_bytes": 14207
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/before/manifest.json",
+        "sha256": "083338e735fbfc54a279a8c71592211b9ca24baf090cf838a16524d4a68b241c",
+        "size_bytes": 27490
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/083338e735fbfc54a279a8c71592211b9ca24baf090cf838a16524d4a68b241c",
+        "sha256": "083338e735fbfc54a279a8c71592211b9ca24baf090cf838a16524d4a68b241c",
+        "size_bytes": 27490
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/before/README.md",
+        "sha256": "da7c0bb5ba53d0667eb60a639f8d813b23383653a537c7079cb2d03c638f4ff4",
+        "size_bytes": 2678
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/da7c0bb5ba53d0667eb60a639f8d813b23383653a537c7079cb2d03c638f4ff4",
+        "sha256": "da7c0bb5ba53d0667eb60a639f8d813b23383653a537c7079cb2d03c638f4ff4",
+        "size_bytes": 2678
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/before/surface_environment_reference.cmake",
+        "sha256": "f5e58635049619c1b8eab7c03bbd484dda37ac0f52dd802ddc770f01230efbe9",
+        "size_bytes": 1837
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/f5e58635049619c1b8eab7c03bbd484dda37ac0f52dd802ddc770f01230efbe9",
+        "sha256": "f5e58635049619c1b8eab7c03bbd484dda37ac0f52dd802ddc770f01230efbe9",
+        "size_bytes": 1837
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/before/surface_environment_reference_fields.hh",
+        "sha256": "3f9da88accc83fc059b89c5f520cae5cc94dfced25f227a69cb903fe287e0b75",
+        "size_bytes": 5849
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/3f9da88accc83fc059b89c5f520cae5cc94dfced25f227a69cb903fe287e0b75",
+        "sha256": "3f9da88accc83fc059b89c5f520cae5cc94dfced25f227a69cb903fe287e0b75",
+        "size_bytes": 5849
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/before/surface_environment_reference_helper.cpp",
+        "sha256": "2d3d1f0cbf625e0ad7eb5a2e07a19991bb14b0896efdfa309713f26356728348",
+        "size_bytes": 14207
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/2d3d1f0cbf625e0ad7eb5a2e07a19991bb14b0896efdfa309713f26356728348",
+        "sha256": "2d3d1f0cbf625e0ad7eb5a2e07a19991bb14b0896efdfa309713f26356728348",
+        "size_bytes": 14207
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/diffs/README.from01.diff",
+        "sha256": "73a8d63214fdb1e04b9daf6737bff1856fe8d04cedf4e40e9e79f412d4238a6c",
+        "size_bytes": 700
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/73a8d63214fdb1e04b9daf6737bff1856fe8d04cedf4e40e9e79f412d4238a6c",
+        "sha256": "73a8d63214fdb1e04b9daf6737bff1856fe8d04cedf4e40e9e79f412d4238a6c",
+        "size_bytes": 700
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/diffs/surface_environment_reference.cmake.from01.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/diffs/surface_environment_reference_fields.hh.from01.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/diffs/surface_environment_reference_helper.cpp.from01.diff",
+        "sha256": "d2240f7b91d84173722c53587da31cd6e5364b59cf826e702f21007aac12effa",
+        "size_bytes": 953
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/d2240f7b91d84173722c53587da31cd6e5364b59cf826e702f21007aac12effa",
+        "sha256": "d2240f7b91d84173722c53587da31cd6e5364b59cf826e702f21007aac12effa",
+        "size_bytes": 953
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/manifest.json",
+        "sha256": "ca915feec3d44f60bd64d102c9cbcc0cbb0b195ef1e3cc5d1db14785067056fd",
+        "size_bytes": 32654
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/ca915feec3d44f60bd64d102c9cbcc0cbb0b195ef1e3cc5d1db14785067056fd",
+        "sha256": "ca915feec3d44f60bd64d102c9cbcc0cbb0b195ef1e3cc5d1db14785067056fd",
+        "size_bytes": 32654
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/README.md",
+        "sha256": "b809fdaa4c225c73e6489f39fe6b6f00b1a53466692a040ba8eab0ee56c39b4e",
+        "size_bytes": 3075
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/b809fdaa4c225c73e6489f39fe6b6f00b1a53466692a040ba8eab0ee56c39b4e",
+        "sha256": "b809fdaa4c225c73e6489f39fe6b6f00b1a53466692a040ba8eab0ee56c39b4e",
+        "size_bytes": 3075
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/source-ranges/WeatherManager.hh.65-73.txt",
+        "sha256": "f8a5eaf9b136c97d017e834cd085e01c87756e8f84e0636e7c2bd7ad64ad453c",
+        "size_bytes": 123
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/f8a5eaf9b136c97d017e834cd085e01c87756e8f84e0636e7c2bd7ad64ad453c",
+        "sha256": "f8a5eaf9b136c97d017e834cd085e01c87756e8f84e0636e7c2bd7ad64ad453c",
+        "size_bytes": 123
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/surface_environment_reference.cmake",
+        "sha256": "f5e58635049619c1b8eab7c03bbd484dda37ac0f52dd802ddc770f01230efbe9",
+        "size_bytes": 1837
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/f5e58635049619c1b8eab7c03bbd484dda37ac0f52dd802ddc770f01230efbe9",
+        "sha256": "f5e58635049619c1b8eab7c03bbd484dda37ac0f52dd802ddc770f01230efbe9",
+        "size_bytes": 1837
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/surface_environment_reference_fields.hh",
+        "sha256": "3f9da88accc83fc059b89c5f520cae5cc94dfced25f227a69cb903fe287e0b75",
+        "size_bytes": 5849
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/3f9da88accc83fc059b89c5f520cae5cc94dfced25f227a69cb903fe287e0b75",
+        "sha256": "3f9da88accc83fc059b89c5f520cae5cc94dfced25f227a69cb903fe287e0b75",
+        "size_bytes": 5849
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/surface_environment_reference_helper.cpp",
+        "sha256": "7e40b92b4bf8ceff895a9a89cb49994d5c6219c84d4c6dc0ddd9e410748f01e4",
+        "size_bytes": 14193
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/7e40b92b4bf8ceff895a9a89cb49994d5c6219c84d4c6dc0ddd9e410748f01e4",
+        "sha256": "7e40b92b4bf8ceff895a9a89cb49994d5c6219c84d4c6dc0ddd9e410748f01e4",
+        "size_bytes": 14193
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/observer-lint-application-command-01/receipt.json",
+        "sha256": "acadd3157a9ce74225a40794f24580628c396ee37bbe1da4397aa1745cb6c03a",
+        "size_bytes": 3366
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/acadd3157a9ce74225a40794f24580628c396ee37bbe1da4397aa1745cb6c03a",
+        "sha256": "acadd3157a9ce74225a40794f24580628c396ee37bbe1da4397aa1745cb6c03a",
+        "size_bytes": 3366
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/observer-lint-application-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/observer-lint-application-command-01/stdout.log",
+        "sha256": "9dbeb8b16962a4fb844270d71c030d0fbc2dcb4d6a5d52581af320a78e497d57",
+        "size_bytes": 599
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/9dbeb8b16962a4fb844270d71c030d0fbc2dcb4d6a5d52581af320a78e497d57",
+        "sha256": "9dbeb8b16962a4fb844270d71c030d0fbc2dcb4d6a5d52581af320a78e497d57",
+        "size_bytes": 599
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/observer-lint-applied-01/formatter-1.diff",
+        "sha256": "55871a3ebc14c220ec86f4ffcdc768c48571dd37b774cd8257342bc3dbca33c6",
+        "size_bytes": 730
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/55871a3ebc14c220ec86f4ffcdc768c48571dd37b774cd8257342bc3dbca33c6",
+        "sha256": "55871a3ebc14c220ec86f4ffcdc768c48571dd37b774cd8257342bc3dbca33c6",
+        "size_bytes": 730
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/observer-lint-applied-01/formatter-2.diff",
+        "sha256": "efe3fcbac1d408591270dccb4134d1283d89f263e3f717c10236e54487c26dc0",
+        "size_bytes": 9283
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/efe3fcbac1d408591270dccb4134d1283d89f263e3f717c10236e54487c26dc0",
+        "sha256": "efe3fcbac1d408591270dccb4134d1283d89f263e3f717c10236e54487c26dc0",
+        "size_bytes": 9283
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/observer-lint-applied-01/formatter-3.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/observer-lint-applied-01/formatter-4.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/observer-lint-applied-01/formatter-5.diff",
+        "sha256": "1db09a8c5fb7b10c823719319f839b0f1f76723b04b69d67c2dd79653be92135",
+        "size_bytes": 23706
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/1db09a8c5fb7b10c823719319f839b0f1f76723b04b69d67c2dd79653be92135",
+        "sha256": "1db09a8c5fb7b10c823719319f839b0f1f76723b04b69d67c2dd79653be92135",
+        "size_bytes": 23706
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/observer-lint-applied-01/record.json",
+        "sha256": "2a2e4e5c33e8b55ca9e6af88955c62a63298937e2aa1d0e15dfa8fa35318b9f7",
+        "size_bytes": 12794
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/2a2e4e5c33e8b55ca9e6af88955c62a63298937e2aa1d0e15dfa8fa35318b9f7",
+        "sha256": "2a2e4e5c33e8b55ca9e6af88955c62a63298937e2aa1d0e15dfa8fa35318b9f7",
+        "size_bytes": 12794
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/observer-lint-format-command-01/receipt.json",
+        "sha256": "46f910c5245d20083c59c536d9ef5faf2233bcaea55530455a37be763c2cdeff",
+        "size_bytes": 3289
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/46f910c5245d20083c59c536d9ef5faf2233bcaea55530455a37be763c2cdeff",
+        "sha256": "46f910c5245d20083c59c536d9ef5faf2233bcaea55530455a37be763c2cdeff",
+        "size_bytes": 3289
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/observer-lint-format-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/observer-lint-format-command-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/prepare-native-surface-environment-01.py",
+        "sha256": "2e2658adf50b5dd9e4db5c8231cafacdd72f47da22c6445fee3cf802cf18f594",
+        "size_bytes": 34801
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/2e2658adf50b5dd9e4db5c8231cafacdd72f47da22c6445fee3cf802cf18f594",
+        "sha256": "2e2658adf50b5dd9e4db5c8231cafacdd72f47da22c6445fee3cf802cf18f594",
+        "size_bytes": 34801
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/prepare-native-surface-environment-02.py",
+        "sha256": "9ad577a2278fc27fa3b752668b51047a94fc873b84a617584e2890033cb44379",
+        "size_bytes": 3519
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/9ad577a2278fc27fa3b752668b51047a94fc873b84a617584e2890033cb44379",
+        "sha256": "9ad577a2278fc27fa3b752668b51047a94fc873b84a617584e2890033cb44379",
+        "size_bytes": 3519
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/prepare-selected-comparison-01.py",
+        "sha256": "20a85c8b53b7bf7df790bcac821df571c16afbcc6874067b2ba36f085f4e19cb",
+        "size_bytes": 12116
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/20a85c8b53b7bf7df790bcac821df571c16afbcc6874067b2ba36f085f4e19cb",
+        "sha256": "20a85c8b53b7bf7df790bcac821df571c16afbcc6874067b2ba36f085f4e19cb",
+        "size_bytes": 12116
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/prepare-selected-comparison-02.py",
+        "sha256": "a70493aa223a7948b3023993ab0bb9741ab4a84351505391ac60d66ac98e38a9",
+        "size_bytes": 4279
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/a70493aa223a7948b3023993ab0bb9741ab4a84351505391ac60d66ac98e38a9",
+        "sha256": "a70493aa223a7948b3023993ab0bb9741ab4a84351505391ac60d66ac98e38a9",
+        "size_bytes": 4279
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/prepare-selected-observer-03.py",
+        "sha256": "1034dfaa1ef68849590600775c05e08da6d42fa3fde71bad73a01da48cc49ab7",
+        "size_bytes": 18450
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/1034dfaa1ef68849590600775c05e08da6d42fa3fde71bad73a01da48cc49ab7",
+        "sha256": "1034dfaa1ef68849590600775c05e08da6d42fa3fde71bad73a01da48cc49ab7",
+        "size_bytes": 18450
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/prepare-selected-observer-04.py",
+        "sha256": "e3220aaa80482e0f187dbb6e367253b71c6f132a2954a5e32e66fc673b8fac9c",
+        "size_bytes": 3959
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/e3220aaa80482e0f187dbb6e367253b71c6f132a2954a5e32e66fc673b8fac9c",
+        "sha256": "e3220aaa80482e0f187dbb6e367253b71c6f132a2954a5e32e66fc673b8fac9c",
+        "size_bytes": 3959
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/prepare-selected-observer-05.py",
+        "sha256": "822fe5b8f6ba2bdf716ea422ed01628a7012b68bf2b3f67efba3f248e000b0eb",
+        "size_bytes": 4180
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/822fe5b8f6ba2bdf716ea422ed01628a7012b68bf2b3f67efba3f248e000b0eb",
+        "sha256": "822fe5b8f6ba2bdf716ea422ed01628a7012b68bf2b3f67efba3f248e000b0eb",
+        "size_bytes": 4180
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/prepare-surface-environment-01.py",
+        "sha256": "d6e02f009c04cf5ae84c8f453d95a83ff5f58c363a557d6bdaa8ecf3aff5cd80",
+        "size_bytes": 26586
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/d6e02f009c04cf5ae84c8f453d95a83ff5f58c363a557d6bdaa8ecf3aff5cd80",
+        "sha256": "d6e02f009c04cf5ae84c8f453d95a83ff5f58c363a557d6bdaa8ecf3aff5cd80",
+        "size_bytes": 26586
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/prepare-surface-environment-02.py",
+        "sha256": "7559c80db153faf00d103012581e6e661a294c072d166c50fb2bb136cdc03c94",
+        "size_bytes": 3803
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/7559c80db153faf00d103012581e6e661a294c072d166c50fb2bb136cdc03c94",
+        "sha256": "7559c80db153faf00d103012581e6e661a294c072d166c50fb2bb136cdc03c94",
+        "size_bytes": 3803
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/publish-surface-environment-01.diff",
+        "sha256": "f0ce184e796b58b4755879c1fc20496e7366fe92aa166a18c381a344c63132cd",
+        "size_bytes": 21264
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/f0ce184e796b58b4755879c1fc20496e7366fe92aa166a18c381a344c63132cd",
+        "sha256": "f0ce184e796b58b4755879c1fc20496e7366fe92aa166a18c381a344c63132cd",
+        "size_bytes": 21264
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/publish-surface-environment-01.py",
+        "sha256": "afaebeb26d67de45c791999b92333ac63b377b313561d259037af36cd1dd02cf",
+        "size_bytes": 13857
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/afaebeb26d67de45c791999b92333ac63b377b313561d259037af36cd1dd02cf",
+        "sha256": "afaebeb26d67de45c791999b92333ac63b377b313561d259037af36cd1dd02cf",
+        "size_bytes": 13857
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/review-native-baseline-01.py",
+        "sha256": "bac921093f74005a799f60aad544f6a1fb7902a7253176affb48f65b5f4ecce4",
+        "size_bytes": 17389
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/bac921093f74005a799f60aad544f6a1fb7902a7253176affb48f65b5f4ecce4",
+        "sha256": "bac921093f74005a799f60aad544f6a1fb7902a7253176affb48f65b5f4ecce4",
+        "size_bytes": 17389
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/review-selected-comparison-02.py",
+        "sha256": "8f585e1d3e31b8228b3e2edc64690bce7ed4fed8594ce8d42efc911eed4127ff",
+        "size_bytes": 9143
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/8f585e1d3e31b8228b3e2edc64690bce7ed4fed8594ce8d42efc911eed4127ff",
+        "sha256": "8f585e1d3e31b8228b3e2edc64690bce7ed4fed8594ce8d42efc911eed4127ff",
+        "size_bytes": 9143
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/run-selected-observer-01.py",
+        "sha256": "b53e257f07df2dfd748f70f90e8e76d1e356d56016de34bd57224e7875ff1cdd",
+        "size_bytes": 2440
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/b53e257f07df2dfd748f70f90e8e76d1e356d56016de34bd57224e7875ff1cdd",
+        "sha256": "b53e257f07df2dfd748f70f90e8e76d1e356d56016de34bd57224e7875ff1cdd",
+        "size_bytes": 2440
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/seal-selected-observer-05-and-comparison-03.py",
+        "sha256": "34ad53dedfcd49fd5bc80b1999c0e7298d611e70b55e4a07fbdf020aba805667",
+        "size_bytes": 3452
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/34ad53dedfcd49fd5bc80b1999c0e7298d611e70b55e4a07fbdf020aba805667",
+        "sha256": "34ad53dedfcd49fd5bc80b1999c0e7298d611e70b55e4a07fbdf020aba805667",
+        "size_bytes": 3452
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-comparison-01/comparison.json",
+        "sha256": "c81678cef131e9db824c09739c8e7f8cc3f3e67a7177a5808b2bd9c409d78670",
+        "size_bytes": 1833
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/c81678cef131e9db824c09739c8e7f8cc3f3e67a7177a5808b2bd9c409d78670",
+        "sha256": "c81678cef131e9db824c09739c8e7f8cc3f3e67a7177a5808b2bd9c409d78670",
+        "size_bytes": 1833
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-comparison-01/mismatches.ndjson",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-comparison-01/paired-boundaries.ndjson",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-comparison-01/unavailable.ndjson",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-comparison-02/comparison.json",
+        "sha256": "627f2760a0ebb40532124fc3f504f6e3376bbb1064a1db5974d5a23192a1e640",
+        "size_bytes": 2477
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/627f2760a0ebb40532124fc3f504f6e3376bbb1064a1db5974d5a23192a1e640",
+        "sha256": "627f2760a0ebb40532124fc3f504f6e3376bbb1064a1db5974d5a23192a1e640",
+        "size_bytes": 2477
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-comparison-02/mismatches.ndjson",
+        "sha256": "556f4cbc3dbd747c015d887d07171d3eea3c9f0ac043a0518666fea8b3e87188",
+        "size_bytes": 690
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/556f4cbc3dbd747c015d887d07171d3eea3c9f0ac043a0518666fea8b3e87188",
+        "sha256": "556f4cbc3dbd747c015d887d07171d3eea3c9f0ac043a0518666fea8b3e87188",
+        "size_bytes": 690
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-comparison-02/paired-boundaries.ndjson",
+        "sha256": "567348bf40f4f111e76fa27236a3dae285bd7bc34e6ac61fe8b428c58f08b5d5",
+        "size_bytes": 15204
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/567348bf40f4f111e76fa27236a3dae285bd7bc34e6ac61fe8b428c58f08b5d5",
+        "sha256": "567348bf40f4f111e76fa27236a3dae285bd7bc34e6ac61fe8b428c58f08b5d5",
+        "size_bytes": 15204
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-comparison-02/unavailable.ndjson",
+        "sha256": "04f48f46adaccdf986b8f43cc876da14aaaf67774bf0ddc97fbe78500ff9deb8",
+        "size_bytes": 23525
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/04f48f46adaccdf986b8f43cc876da14aaaf67774bf0ddc97fbe78500ff9deb8",
+        "sha256": "04f48f46adaccdf986b8f43cc876da14aaaf67774bf0ddc97fbe78500ff9deb8",
+        "size_bytes": 23525
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-comparison-command-01/receipt.json",
+        "sha256": "24e132bf11fd4e89df3f1bc032f2ccdef44f6ab18d5abf710360acad4c8f1253",
+        "size_bytes": 3622
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/24e132bf11fd4e89df3f1bc032f2ccdef44f6ab18d5abf710360acad4c8f1253",
+        "sha256": "24e132bf11fd4e89df3f1bc032f2ccdef44f6ab18d5abf710360acad4c8f1253",
+        "size_bytes": 3622
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-comparison-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-comparison-command-01/stdout.log",
+        "sha256": "07d3ecb43649510328a2704ba2746ea34246e94b9938af239a355985240babf9",
+        "size_bytes": 257
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/07d3ecb43649510328a2704ba2746ea34246e94b9938af239a355985240babf9",
+        "sha256": "07d3ecb43649510328a2704ba2746ea34246e94b9938af239a355985240babf9",
+        "size_bytes": 257
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-comparison-command-02/receipt.json",
+        "sha256": "a1a76910fe8eb9ee1c1297ef6b2ab6e06232214ca644b279051ae5646df02656",
+        "size_bytes": 3621
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/a1a76910fe8eb9ee1c1297ef6b2ab6e06232214ca644b279051ae5646df02656",
+        "sha256": "a1a76910fe8eb9ee1c1297ef6b2ab6e06232214ca644b279051ae5646df02656",
+        "size_bytes": 3621
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-comparison-command-02/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-comparison-command-02/stdout.log",
+        "sha256": "7d365d5eb4d1ea0ab2ff1f1893e361addb10dacf8e76c7906d27996fdb16bfaa",
+        "size_bytes": 255
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/7d365d5eb4d1ea0ab2ff1f1893e361addb10dacf8e76c7906d27996fdb16bfaa",
+        "sha256": "7d365d5eb4d1ea0ab2ff1f1893e361addb10dacf8e76c7906d27996fdb16bfaa",
+        "size_bytes": 255
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-comparison-factual-review-02/review.json",
+        "sha256": "a89bf181841b1867f82ac7e70727520dbb8971c13b13633e89c4698e4a2bfb46",
+        "size_bytes": 5608
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/a89bf181841b1867f82ac7e70727520dbb8971c13b13633e89c4698e4a2bfb46",
+        "sha256": "a89bf181841b1867f82ac7e70727520dbb8971c13b13633e89c4698e4a2bfb46",
+        "size_bytes": 5608
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-comparison-factual-review-Root-02/review.json",
+        "sha256": "89204ab5ede37a6b08634dce7345a64bb4c29e7cc36e6910e1c20de94d276b3f",
+        "size_bytes": 4271
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/89204ab5ede37a6b08634dce7345a64bb4c29e7cc36e6910e1c20de94d276b3f",
+        "sha256": "89204ab5ede37a6b08634dce7345a64bb4c29e7cc36e6910e1c20de94d276b3f",
+        "size_bytes": 4271
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-01/comparison-custody.json",
+        "sha256": "c113ceb5a1970676ebda6caf5f57ed450d905151623f9d6b41e813ea99fb4fcd",
+        "size_bytes": 7684
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/c113ceb5a1970676ebda6caf5f57ed450d905151623f9d6b41e813ea99fb4fcd",
+        "sha256": "c113ceb5a1970676ebda6caf5f57ed450d905151623f9d6b41e813ea99fb4fcd",
+        "size_bytes": 7684
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-01/frozen-observation-inputs.json",
+        "sha256": "4570038c0faed5c7c8b6266188a806965594e4aa1aef97e45ffd7cbe6fc616e0",
+        "size_bytes": 1536
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/4570038c0faed5c7c8b6266188a806965594e4aa1aef97e45ffd7cbe6fc616e0",
+        "sha256": "4570038c0faed5c7c8b6266188a806965594e4aa1aef97e45ffd7cbe6fc616e0",
+        "size_bytes": 1536
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-01/Native-command/receipt.json",
+        "sha256": "a4bb9ac4fbdb85e8ad426f24fbb182a006e0bc16d08186da45c8987cb9bec0b2",
+        "size_bytes": 3434
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/a4bb9ac4fbdb85e8ad426f24fbb182a006e0bc16d08186da45c8987cb9bec0b2",
+        "sha256": "a4bb9ac4fbdb85e8ad426f24fbb182a006e0bc16d08186da45c8987cb9bec0b2",
+        "size_bytes": 3434
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-01/Native-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-01/Native-command/stdout.log",
+        "sha256": "cc4134964a91e7e8df80535b36a9614520203319041c08d2d723d21e3f960b31",
+        "size_bytes": 2221024
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/observations/cc4134964a91e7e8df80535b36a9614520203319041c08d2d723d21e3f960b31.json.gz",
+        "sha256": "b111aa5cc36e2e1a09d582fab601bc3d9410fe9914cd925ffd0948233676a295",
+        "size_bytes": 45379
+      },
+      "encoding": "gzip",
+      "complete_original_bytes_verified": true
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-01/Native-input.json",
+        "sha256": "0191a53ee11a1767a1b35023fcf5a3769e8c9df89c4d297847e3ed9d31cb4c15",
+        "size_bytes": 80365
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/0191a53ee11a1767a1b35023fcf5a3769e8c9df89c4d297847e3ed9d31cb4c15",
+        "sha256": "0191a53ee11a1767a1b35023fcf5a3769e8c9df89c4d297847e3ed9d31cb4c15",
+        "size_bytes": 80365
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-01/Root-full-baseline-review.json",
+        "sha256": "630ed63a0af0a6607a3f5fa1e593c88c93ff98182d63dda23afb8914387955df",
+        "size_bytes": 2268
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/630ed63a0af0a6607a3f5fa1e593c88c93ff98182d63dda23afb8914387955df",
+        "sha256": "630ed63a0af0a6607a3f5fa1e593c88c93ff98182d63dda23afb8914387955df",
+        "size_bytes": 2268
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-01/Rust/cargo-command/receipt.json",
+        "sha256": "5e6be248e41dd1ffde9307c4999278dae0e57af5530823ed6c3b764b0dde82c7",
+        "size_bytes": 3650
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/5e6be248e41dd1ffde9307c4999278dae0e57af5530823ed6c3b764b0dde82c7",
+        "sha256": "5e6be248e41dd1ffde9307c4999278dae0e57af5530823ed6c3b764b0dde82c7",
+        "size_bytes": 3650
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-01/Rust/cargo-command/stderr.log",
+        "sha256": "421f739e3efbf4331b430c104d973c9eddb59478691f82e8f8ffb3ba3d5c2f22",
+        "size_bytes": 147
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/421f739e3efbf4331b430c104d973c9eddb59478691f82e8f8ffb3ba3d5c2f22",
+        "sha256": "421f739e3efbf4331b430c104d973c9eddb59478691f82e8f8ffb3ba3d5c2f22",
+        "size_bytes": 147
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-01/Rust/cargo-command/stdout.log",
+        "sha256": "b0b70e43d5d72a3214cba5ab806ac82c604472631171eb400e289328e23084e7",
+        "size_bytes": 238
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/b0b70e43d5d72a3214cba5ab806ac82c604472631171eb400e289328e23084e7",
+        "sha256": "b0b70e43d5d72a3214cba5ab806ac82c604472631171eb400e289328e23084e7",
+        "size_bytes": 238
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-01/Rust/result.before.json",
+        "sha256": "445874f9d7862392c9e34cbfd8df5ed41dea5561374ff9f7844b874e1c38a5f3",
+        "size_bytes": 1199
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/445874f9d7862392c9e34cbfd8df5ed41dea5561374ff9f7844b874e1c38a5f3",
+        "sha256": "445874f9d7862392c9e34cbfd8df5ed41dea5561374ff9f7844b874e1c38a5f3",
+        "size_bytes": 1199
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-01/Rust/result.custody.json",
+        "sha256": "5d6faab95cef65170d40a6603779ce0982d776fd08c314408e2609ed5832765c",
+        "size_bytes": 2075
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/5d6faab95cef65170d40a6603779ce0982d776fd08c314408e2609ed5832765c",
+        "sha256": "5d6faab95cef65170d40a6603779ce0982d776fd08c314408e2609ed5832765c",
+        "size_bytes": 2075
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-01/Rust/result.json",
+        "sha256": "e1b7f86cc3073dc5ddb0e1c4ef50cd9dda9853f770a4c165f6b32077e930f037",
+        "size_bytes": 1017414
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/observations/e1b7f86cc3073dc5ddb0e1c4ef50cd9dda9853f770a4c165f6b32077e930f037.json.gz",
+        "sha256": "1370caf7a53f007325b0fbc0a09252f88a1a2e65e9af999bb778ef24300049a8",
+        "size_bytes": 21661
+      },
+      "encoding": "gzip",
+      "complete_original_bytes_verified": true
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-01/Rust-input.json",
+        "sha256": "0191a53ee11a1767a1b35023fcf5a3769e8c9df89c4d297847e3ed9d31cb4c15",
+        "size_bytes": 80365
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/0191a53ee11a1767a1b35023fcf5a3769e8c9df89c4d297847e3ed9d31cb4c15",
+        "sha256": "0191a53ee11a1767a1b35023fcf5a3769e8c9df89c4d297847e3ed9d31cb4c15",
+        "size_bytes": 80365
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-01/Rust-launch-command/receipt.json",
+        "sha256": "479b0dabaecd12eb3b045386a2b2ff8e4f9f82609c4242ecdb544d0f06941a62",
+        "size_bytes": 3690
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/479b0dabaecd12eb3b045386a2b2ff8e4f9f82609c4242ecdb544d0f06941a62",
+        "sha256": "479b0dabaecd12eb3b045386a2b2ff8e4f9f82609c4242ecdb544d0f06941a62",
+        "size_bytes": 3690
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-01/Rust-launch-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-01/Rust-launch-command/stdout.log",
+        "sha256": "3cd93f35f6befb13029861f9f5d44d6825182ee33ec3d5d57691923bf44cb278",
+        "size_bytes": 864
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/3cd93f35f6befb13029861f9f5d44d6825182ee33ec3d5d57691923bf44cb278",
+        "sha256": "3cd93f35f6befb13029861f9f5d44d6825182ee33ec3d5d57691923bf44cb278",
+        "size_bytes": 864
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-02/comparison-custody.json",
+        "sha256": "762668e6c1f16118b04e156665d6e49dfa10b45b4317fa706084654660bf0bcb",
+        "size_bytes": 7916
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/762668e6c1f16118b04e156665d6e49dfa10b45b4317fa706084654660bf0bcb",
+        "sha256": "762668e6c1f16118b04e156665d6e49dfa10b45b4317fa706084654660bf0bcb",
+        "size_bytes": 7916
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-02/Rust/cargo-command/receipt.json",
+        "sha256": "07c65dcf460179895604d753cdf59d1e68730385ee49757d047ca1c497cd6edb",
+        "size_bytes": 3650
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/07c65dcf460179895604d753cdf59d1e68730385ee49757d047ca1c497cd6edb",
+        "sha256": "07c65dcf460179895604d753cdf59d1e68730385ee49757d047ca1c497cd6edb",
+        "size_bytes": 3650
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-02/Rust/cargo-command/stderr.log",
+        "sha256": "4e10571d96f2f7c8197d5a38c1d68123f6833fd5536004c8e498d70c915c0809",
+        "size_bytes": 147
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/4e10571d96f2f7c8197d5a38c1d68123f6833fd5536004c8e498d70c915c0809",
+        "sha256": "4e10571d96f2f7c8197d5a38c1d68123f6833fd5536004c8e498d70c915c0809",
+        "size_bytes": 147
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-02/Rust/cargo-command/stdout.log",
+        "sha256": "0b837bf49acb2f4aef1aa8cccea658a3611ee45f909df1a12026119ea49d1441",
+        "size_bytes": 238
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/0b837bf49acb2f4aef1aa8cccea658a3611ee45f909df1a12026119ea49d1441",
+        "sha256": "0b837bf49acb2f4aef1aa8cccea658a3611ee45f909df1a12026119ea49d1441",
+        "size_bytes": 238
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-02/Rust/result.before.json",
+        "sha256": "1a7f501e2b48c3d9320b30e5508998a3ba70c234f9eb2797693ca70841eeb62b",
+        "size_bytes": 1199
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/1a7f501e2b48c3d9320b30e5508998a3ba70c234f9eb2797693ca70841eeb62b",
+        "sha256": "1a7f501e2b48c3d9320b30e5508998a3ba70c234f9eb2797693ca70841eeb62b",
+        "size_bytes": 1199
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-02/Rust/result.custody.json",
+        "sha256": "069e4f298a3e5c5dd0d6513d0119630b4d6ea8f8980bab00638619d122cac4e6",
+        "size_bytes": 2075
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/069e4f298a3e5c5dd0d6513d0119630b4d6ea8f8980bab00638619d122cac4e6",
+        "sha256": "069e4f298a3e5c5dd0d6513d0119630b4d6ea8f8980bab00638619d122cac4e6",
+        "size_bytes": 2075
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-02/Rust/result.json",
+        "sha256": "511f5e3e0ec52179a76c0607144b677a53b6b8037415510e54fb5d72eebdf9ff",
+        "size_bytes": 1017414
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/observations/511f5e3e0ec52179a76c0607144b677a53b6b8037415510e54fb5d72eebdf9ff.json.gz",
+        "sha256": "d5c8bac92f36b110e72ed50ec0a620e8fd19d2f4fef68106f5c4106ff223dbdd",
+        "size_bytes": 21661
+      },
+      "encoding": "gzip",
+      "complete_original_bytes_verified": true
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-02/Rust-input.json",
+        "sha256": "0191a53ee11a1767a1b35023fcf5a3769e8c9df89c4d297847e3ed9d31cb4c15",
+        "size_bytes": 80365
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/0191a53ee11a1767a1b35023fcf5a3769e8c9df89c4d297847e3ed9d31cb4c15",
+        "sha256": "0191a53ee11a1767a1b35023fcf5a3769e8c9df89c4d297847e3ed9d31cb4c15",
+        "size_bytes": 80365
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-02/Rust-launch-command/receipt.json",
+        "sha256": "e8a282ff0c459bf87517b7ded61f465d2336be2f8490d26aa59eb1136fc1cb79",
+        "size_bytes": 3791
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/e8a282ff0c459bf87517b7ded61f465d2336be2f8490d26aa59eb1136fc1cb79",
+        "sha256": "e8a282ff0c459bf87517b7ded61f465d2336be2f8490d26aa59eb1136fc1cb79",
+        "size_bytes": 3791
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-02/Rust-launch-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/selected-observation-02/Rust-launch-command/stdout.log",
+        "sha256": "e20f3aac4e01144bd4af74d4aa12ac59671ffe6dbaa2536d50a18d40bcd02a70",
+        "size_bytes": 864
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/e20f3aac4e01144bd4af74d4aa12ac59671ffe6dbaa2536d50a18d40bcd02a70",
+        "sha256": "e20f3aac4e01144bd4af74d4aa12ac59671ffe6dbaa2536d50a18d40bcd02a70",
+        "size_bytes": 864
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-application-command-01/receipt.json",
+        "sha256": "347e833da6ab7c13af305afde4cf9762d8abc874d16c2b31317a0047ac08b4ad",
+        "size_bytes": 3210
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/347e833da6ab7c13af305afde4cf9762d8abc874d16c2b31317a0047ac08b4ad",
+        "sha256": "347e833da6ab7c13af305afde4cf9762d8abc874d16c2b31317a0047ac08b4ad",
+        "size_bytes": 3210
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-application-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-application-command-01/stdout.log",
+        "sha256": "ecbff262c931dfe3bfe5542ea2ee3bb60762515ae2f9c3ff3d96bb34d359eb37",
+        "size_bytes": 643
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/ecbff262c931dfe3bfe5542ea2ee3bb60762515ae2f9c3ff3d96bb34d359eb37",
+        "sha256": "ecbff262c931dfe3bfe5542ea2ee3bb60762515ae2f9c3ff3d96bb34d359eb37",
+        "size_bytes": 643
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-applied-01/formatter-1.diff",
+        "sha256": "55871a3ebc14c220ec86f4ffcdc768c48571dd37b774cd8257342bc3dbca33c6",
+        "size_bytes": 730
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/55871a3ebc14c220ec86f4ffcdc768c48571dd37b774cd8257342bc3dbca33c6",
+        "sha256": "55871a3ebc14c220ec86f4ffcdc768c48571dd37b774cd8257342bc3dbca33c6",
+        "size_bytes": 730
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-applied-01/formatter-2.diff",
+        "sha256": "efe3fcbac1d408591270dccb4134d1283d89f263e3f717c10236e54487c26dc0",
+        "size_bytes": 9283
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/efe3fcbac1d408591270dccb4134d1283d89f263e3f717c10236e54487c26dc0",
+        "sha256": "efe3fcbac1d408591270dccb4134d1283d89f263e3f717c10236e54487c26dc0",
+        "size_bytes": 9283
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-applied-01/formatter-3.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-applied-01/formatter-4.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-applied-01/formatter-5.diff",
+        "sha256": "f8506d859c451662a944b797a83ccaa0b5e2918f5191ca89a5fe19f713c01d45",
+        "size_bytes": 23708
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/f8506d859c451662a944b797a83ccaa0b5e2918f5191ca89a5fe19f713c01d45",
+        "sha256": "f8506d859c451662a944b797a83ccaa0b5e2918f5191ca89a5fe19f713c01d45",
+        "size_bytes": 23708
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-applied-01/record.json",
+        "sha256": "7693e851fdb0d4b89f5bd1561107b1c1f230f67b8ae1b34a7cb7af4c11fe7a5c",
+        "size_bytes": 11352
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/7693e851fdb0d4b89f5bd1561107b1c1f230f67b8ae1b34a7cb7af4c11fe7a5c",
+        "sha256": "7693e851fdb0d4b89f5bd1561107b1c1f230f67b8ae1b34a7cb7af4c11fe7a5c",
+        "size_bytes": 11352
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-format-command-01/receipt.json",
+        "sha256": "b40415ec6455ce197ddef2c2d328969991f6ea18d1da613f16f8fbb0367ba195",
+        "size_bytes": 3302
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/b40415ec6455ce197ddef2c2d328969991f6ea18d1da613f16f8fbb0367ba195",
+        "sha256": "b40415ec6455ce197ddef2c2d328969991f6ea18d1da613f16f8fbb0367ba195",
+        "size_bytes": 3302
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-format-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-format-command-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/before/crates/ep_runtime/src/heat_balance/convection/surface_environment.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/before/crates/ep_runtime/src/heat_balance/convection.rs",
+        "sha256": "186d1fbd20428d0dfb89de409116d7acec3f2fdc51aedf545abea4768cbcca7b",
+        "size_bytes": 14649
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/186d1fbd20428d0dfb89de409116d7acec3f2fdc51aedf545abea4768cbcca7b",
+        "sha256": "186d1fbd20428d0dfb89de409116d7acec3f2fdc51aedf545abea4768cbcca7b",
+        "size_bytes": 14649
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/before/crates/ep_runtime/src/runtime/tests/part03.rs",
+        "sha256": "fff25a816be772d0d4d4dc2d782e2a45f800bcd9c61dfa92b7fe9364fbca8536",
+        "size_bytes": 48079
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-ordinary-initialization/objects/fff25a816be772d0d4d4dc2d782e2a45f800bcd9c61dfa92b7fe9364fbca8536",
+        "sha256": "fff25a816be772d0d4d4dc2d782e2a45f800bcd9c61dfa92b7fe9364fbca8536",
+        "size_bytes": 48079
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/before/energyplus_porting_plan/cards/SRC-05.md",
+        "sha256": "444a3b1b2c36b2032117aaaa0012527963a439c0a31321bc37784b4e43bbec49",
+        "size_bytes": 2795
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/444a3b1b2c36b2032117aaaa0012527963a439c0a31321bc37784b4e43bbec49",
+        "sha256": "444a3b1b2c36b2032117aaaa0012527963a439c0a31321bc37784b4e43bbec49",
+        "size_bytes": 2795
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/diffs/crates__ep_runtime__src__heat_balance__convection.rs.diff",
+        "sha256": "07212a13274d697279dbba26a4dd3d93b448e461b10ba73c374e9c6752136a1c",
+        "size_bytes": 2737
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/07212a13274d697279dbba26a4dd3d93b448e461b10ba73c374e9c6752136a1c",
+        "sha256": "07212a13274d697279dbba26a4dd3d93b448e461b10ba73c374e9c6752136a1c",
+        "size_bytes": 2737
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/diffs/crates__ep_runtime__src__heat_balance__convection__surface_environment.rs.diff",
+        "sha256": "67506acd3e6b2cb7ed234e22e780f807e76807c59dfdc0590e5f677e6e26eceb",
+        "size_bytes": 11335
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/67506acd3e6b2cb7ed234e22e780f807e76807c59dfdc0590e5f677e6e26eceb",
+        "sha256": "67506acd3e6b2cb7ed234e22e780f807e76807c59dfdc0590e5f677e6e26eceb",
+        "size_bytes": 11335
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/diffs/crates__ep_runtime__src__runtime__tests__part03.rs.diff",
+        "sha256": "fe7cd5b36e3292c0cf7487bc76ec4ab8143454074ee51f33df4367d6a4b24a4e",
+        "size_bytes": 1288
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/fe7cd5b36e3292c0cf7487bc76ec4ab8143454074ee51f33df4367d6a4b24a4e",
+        "sha256": "fe7cd5b36e3292c0cf7487bc76ec4ab8143454074ee51f33df4367d6a4b24a4e",
+        "size_bytes": 1288
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/diffs/energyplus_porting_plan__cards__SRC-05.md.diff",
+        "sha256": "8adbf997fe67cdfd3de3ebfd935af59971207f58c9caa762ae3d78f38cdd7730",
+        "size_bytes": 1930
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/8adbf997fe67cdfd3de3ebfd935af59971207f58c9caa762ae3d78f38cdd7730",
+        "sha256": "8adbf997fe67cdfd3de3ebfd935af59971207f58c9caa762ae3d78f38cdd7730",
+        "size_bytes": 1930
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/manifest.json",
+        "sha256": "2df2052165392ed536fb043e08f861c7b8baacf280fd48d3c8ee092341d05812",
+        "size_bytes": 21809
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/2df2052165392ed536fb043e08f861c7b8baacf280fd48d3c8ee092341d05812",
+        "sha256": "2df2052165392ed536fb043e08f861c7b8baacf280fd48d3c8ee092341d05812",
+        "size_bytes": 21809
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/native-unit-plan.md",
+        "sha256": "4a7239555027c92671b15e730baf1ca05aa8db2178dce9830ee4699c56d0df30",
+        "size_bytes": 2314
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/4a7239555027c92671b15e730baf1ca05aa8db2178dce9830ee4699c56d0df30",
+        "sha256": "4a7239555027c92671b15e730baf1ca05aa8db2178dce9830ee4699c56d0df30",
+        "size_bytes": 2314
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment.rs",
+        "sha256": "c6bff7253cd2a22686b301187bc4f270f633f720b182c92bb3734f44861a9d10",
+        "size_bytes": 10915
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/c6bff7253cd2a22686b301187bc4f270f633f720b182c92bb3734f44861a9d10",
+        "sha256": "c6bff7253cd2a22686b301187bc4f270f633f720b182c92bb3734f44861a9d10",
+        "size_bytes": 10915
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/proposed/crates/ep_runtime/src/heat_balance/convection.rs",
+        "sha256": "cf8761f03d9d2080b4fad34fedd9c384ea0e23ed10a9286e288c6ae64a0b221b",
+        "size_bytes": 13959
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/cf8761f03d9d2080b4fad34fedd9c384ea0e23ed10a9286e288c6ae64a0b221b",
+        "sha256": "cf8761f03d9d2080b4fad34fedd9c384ea0e23ed10a9286e288c6ae64a0b221b",
+        "size_bytes": 13959
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/proposed/crates/ep_runtime/src/runtime/tests/part03.rs",
+        "sha256": "12df9c3a605b1d5e1ffa2c4236b0cff22f188a66915b0454de7e9c04c20d738f",
+        "size_bytes": 48358
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/12df9c3a605b1d5e1ffa2c4236b0cff22f188a66915b0454de7e9c04c20d738f",
+        "sha256": "12df9c3a605b1d5e1ffa2c4236b0cff22f188a66915b0454de7e9c04c20d738f",
+        "size_bytes": 48358
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/proposed/energyplus_porting_plan/cards/SRC-05.md",
+        "sha256": "86ebac512f3a5c85754a0d74f8beb16e1c94a8d19362279229b74f83ced37377",
+        "size_bytes": 4503
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/86ebac512f3a5c85754a0d74f8beb16e1c94a8d19362279229b74f83ced37377",
+        "sha256": "86ebac512f3a5c85754a0d74f8beb16e1c94a8d19362279229b74f83ced37377",
+        "size_bytes": 4503
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__DataEnvironment.cc.236-247.txt",
+        "sha256": "38137605604731b27a8cea63c551831345cc7a50f2078f29bb103ce26d996c99",
+        "size_bytes": 759
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/38137605604731b27a8cea63c551831345cc7a50f2078f29bb103ce26d996c99",
+        "sha256": "38137605604731b27a8cea63c551831345cc7a50f2078f29bb103ce26d996c99",
+        "size_bytes": 759
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__DataEnvironment.hh.192-196.txt",
+        "sha256": "d170f54751f5f5dbfffca93105f00dbdfa10205583f82db6a9d9f219a7b58f0a",
+        "size_bytes": 654
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/d170f54751f5f5dbfffca93105f00dbdfa10205583f82db6a9d9f219a7b58f0a",
+        "sha256": "d170f54751f5f5dbfffca93105f00dbdfa10205583f82db6a9d9f219a7b58f0a",
+        "size_bytes": 654
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__DataEnvironment.hh.79-80.txt",
+        "sha256": "fa52f517e49ef11ec474a4c4b9d1df149bb126d3070119a6f962b662f2bb1cb3",
+        "size_bytes": 190
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/fa52f517e49ef11ec474a4c4b9d1df149bb126d3070119a6f962b662f2bb1cb3",
+        "sha256": "fa52f517e49ef11ec474a4c4b9d1df149bb126d3070119a6f962b662f2bb1cb3",
+        "size_bytes": 190
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__DataSurfaces.cc.594-618.txt",
+        "sha256": "c13f914c3b7d04d81d6aa2868de2c2c61295383b394676dcec0d15cb834784ae",
+        "size_bytes": 1503
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/c13f914c3b7d04d81d6aa2868de2c2c61295383b394676dcec0d15cb834784ae",
+        "sha256": "c13f914c3b7d04d81d6aa2868de2c2c61295383b394676dcec0d15cb834784ae",
+        "size_bytes": 1503
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__DataSurfaces.cc.620-632.txt",
+        "sha256": "69dce661091e269fa184ab7747442e88c4eca93206a12b49adb37c4f3728f5ab",
+        "size_bytes": 560
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/69dce661091e269fa184ab7747442e88c4eca93206a12b49adb37c4f3728f5ab",
+        "sha256": "69dce661091e269fa184ab7747442e88c4eca93206a12b49adb37c4f3728f5ab",
+        "size_bytes": 560
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__DataSurfaces.cc.634-666.txt",
+        "sha256": "12e7c371d019ede79432c420d1d20f5d41d86c9a1bfa2f9bf89cfa0a645b7690",
+        "size_bytes": 1605
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/12e7c371d019ede79432c420d1d20f5d41d86c9a1bfa2f9bf89cfa0a645b7690",
+        "sha256": "12e7c371d019ede79432c420d1d20f5d41d86c9a1bfa2f9bf89cfa0a645b7690",
+        "size_bytes": 1605
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__DataSurfaces.hh.1540-1543.txt",
+        "sha256": "26e283f4b09b424daf3d4958c3ed82a0b6b1bc289a640db42e8cdc6125e5c1c6",
+        "size_bytes": 454
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/26e283f4b09b424daf3d4958c3ed82a0b6b1bc289a640db42e8cdc6125e5c1c6",
+        "sha256": "26e283f4b09b424daf3d4958c3ed82a0b6b1bc289a640db42e8cdc6125e5c1c6",
+        "size_bytes": 454
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__HeatBalanceManager.cc.1252-1317.txt",
+        "sha256": "c0c661749d470affe5b4bee6635864e074770a144ad77b83f6ac9aa0c7df1274",
+        "size_bytes": 3543
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/c0c661749d470affe5b4bee6635864e074770a144ad77b83f6ac9aa0c7df1274",
+        "sha256": "c0c661749d470affe5b4bee6635864e074770a144ad77b83f6ac9aa0c7df1274",
+        "size_bytes": 3543
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__HeatBalanceManager.cc.566-585.txt",
+        "sha256": "110b001048545974cb03caca328c1f156154021158bde9965d7b8d0aca6a8bff",
+        "size_bytes": 1106
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/110b001048545974cb03caca328c1f156154021158bde9965d7b8d0aca6a8bff",
+        "sha256": "110b001048545974cb03caca328c1f156154021158bde9965d7b8d0aca6a8bff",
+        "size_bytes": 1106
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__HeatBalanceSurfaceManager.cc.308-345.txt",
+        "sha256": "1ece82ef8c9af17341079cd5495194e42b84d9db9fc8a0c6a421451c662de7ad",
+        "size_bytes": 2456
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/1ece82ef8c9af17341079cd5495194e42b84d9db9fc8a0c6a421451c662de7ad",
+        "sha256": "1ece82ef8c9af17341079cd5495194e42b84d9db9fc8a0c6a421451c662de7ad",
+        "size_bytes": 2456
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__SurfaceGeometry.cc.862-873.txt",
+        "sha256": "bf3bf949dc32af16f89bfc8ca004a8a52f11bdb9eff72f1936ef8a2e57f5aa0e",
+        "size_bytes": 949
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/bf3bf949dc32af16f89bfc8ca004a8a52f11bdb9eff72f1936ef8a2e57f5aa0e",
+        "sha256": "bf3bf949dc32af16f89bfc8ca004a8a52f11bdb9eff72f1936ef8a2e57f5aa0e",
+        "size_bytes": 949
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__WeatherManager.cc.7233-7301.txt",
+        "sha256": "ee0e54741b0a6f405d846d9ec0f1c7b6692e5ebd5b1a3113ba1b71bcf8c7fc44",
+        "size_bytes": 3695
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/ee0e54741b0a6f405d846d9ec0f1c7b6692e5ebd5b1a3113ba1b71bcf8c7fc44",
+        "sha256": "ee0e54741b0a6f405d846d9ec0f1c7b6692e5ebd5b1a3113ba1b71bcf8c7fc44",
+        "size_bytes": 3695
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/ranges/crates__ep_run__src__porting_scope__settings.rs.215-231.txt",
+        "sha256": "d90e89ff621ffe4b7ac171dd99341044eda3d7a7f1ced8d19d3fcff5b64237bf",
+        "size_bytes": 848
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/d90e89ff621ffe4b7ac171dd99341044eda3d7a7f1ced8d19d3fcff5b64237bf",
+        "sha256": "d90e89ff621ffe4b7ac171dd99341044eda3d7a7f1ced8d19d3fcff5b64237bf",
+        "size_bytes": 848
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/ranges/crates__ep_runtime__src__heat_balance__convection__geometry_operands.rs.8-49.txt",
+        "sha256": "f20ffe2800ce19da5c9d217bae69aa98944b900eebe7163865e3b51f1f52962c",
+        "size_bytes": 1463
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/f20ffe2800ce19da5c9d217bae69aa98944b900eebe7163865e3b51f1f52962c",
+        "sha256": "f20ffe2800ce19da5c9d217bae69aa98944b900eebe7163865e3b51f1f52962c",
+        "size_bytes": 1463
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/ranges/crates__ep_runtime__src__heat_balance__ctf_surface_lifecycle.rs.430-448.txt",
+        "sha256": "cc0c261fb54cfdc436feade968fe29b10326d8d002fe13b8d83c52a64dd0a20c",
+        "size_bytes": 1041
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/cc0c261fb54cfdc436feade968fe29b10326d8d002fe13b8d83c52a64dd0a20c",
+        "sha256": "cc0c261fb54cfdc436feade968fe29b10326d8d002fe13b8d83c52a64dd0a20c",
+        "size_bytes": 1041
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/ranges/crates__ep_runtime__src__heat_balance__state.rs.383-435.txt",
+        "sha256": "b17478bd3ceab26a5141874eadbe3fe1df3c081c7f43dd9c8bfcec14f2b8ae03",
+        "size_bytes": 2485
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/b17478bd3ceab26a5141874eadbe3fe1df3c081c7f43dd9c8bfcec14f2b8ae03",
+        "sha256": "b17478bd3ceab26a5141874eadbe3fe1df3c081c7f43dd9c8bfcec14f2b8ae03",
+        "size_bytes": 2485
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/ranges/crates__ep_runtime__src__heat_balance__surface_balance.rs.156-172.txt",
+        "sha256": "b8d0113c46cf268ded2f1f09cb1d26b31ff3454fd616a4788f19cc8600969757",
+        "size_bytes": 885
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/b8d0113c46cf268ded2f1f09cb1d26b31ff3454fd616a4788f19cc8600969757",
+        "sha256": "b8d0113c46cf268ded2f1f09cb1d26b31ff3454fd616a4788f19cc8600969757",
+        "size_bytes": 885
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-01/README.md",
+        "sha256": "43648bb68dacfb404a4151533ee842ef9f1b53c46a231035d1ed540751bf9abf",
+        "size_bytes": 1998
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/43648bb68dacfb404a4151533ee842ef9f1b53c46a231035d1ed540751bf9abf",
+        "sha256": "43648bb68dacfb404a4151533ee842ef9f1b53c46a231035d1ed540751bf9abf",
+        "size_bytes": 1998
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-02/before-01/manifest.json",
+        "sha256": "2df2052165392ed536fb043e08f861c7b8baacf280fd48d3c8ee092341d05812",
+        "size_bytes": 21809
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/2df2052165392ed536fb043e08f861c7b8baacf280fd48d3c8ee092341d05812",
+        "sha256": "2df2052165392ed536fb043e08f861c7b8baacf280fd48d3c8ee092341d05812",
+        "size_bytes": 21809
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-02/before-01/native-unit-plan.md",
+        "sha256": "4a7239555027c92671b15e730baf1ca05aa8db2178dce9830ee4699c56d0df30",
+        "size_bytes": 2314
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/4a7239555027c92671b15e730baf1ca05aa8db2178dce9830ee4699c56d0df30",
+        "sha256": "4a7239555027c92671b15e730baf1ca05aa8db2178dce9830ee4699c56d0df30",
+        "size_bytes": 2314
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-02/before-01/README.md",
+        "sha256": "43648bb68dacfb404a4151533ee842ef9f1b53c46a231035d1ed540751bf9abf",
+        "size_bytes": 1998
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/43648bb68dacfb404a4151533ee842ef9f1b53c46a231035d1ed540751bf9abf",
+        "sha256": "43648bb68dacfb404a4151533ee842ef9f1b53c46a231035d1ed540751bf9abf",
+        "size_bytes": 1998
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-02/before-01/surface_environment.rs",
+        "sha256": "c6bff7253cd2a22686b301187bc4f270f633f720b182c92bb3734f44861a9d10",
+        "size_bytes": 10915
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/c6bff7253cd2a22686b301187bc4f270f633f720b182c92bb3734f44861a9d10",
+        "sha256": "c6bff7253cd2a22686b301187bc4f270f633f720b182c92bb3734f44861a9d10",
+        "size_bytes": 10915
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-02/diffs/native-unit-plan.md.from-01.diff",
+        "sha256": "26762af358dfc556be8879cdc6d08887f54d19601417ba53f359ce53ab1d1cd5",
+        "size_bytes": 655
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/26762af358dfc556be8879cdc6d08887f54d19601417ba53f359ce53ab1d1cd5",
+        "sha256": "26762af358dfc556be8879cdc6d08887f54d19601417ba53f359ce53ab1d1cd5",
+        "size_bytes": 655
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-02/diffs/README.md.from-01.diff",
+        "sha256": "7af7f3bfb48de885af9c71597f3371a336fdb2a3fd35ceb3d6cca67692a219a6",
+        "size_bytes": 783
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/7af7f3bfb48de885af9c71597f3371a336fdb2a3fd35ceb3d6cca67692a219a6",
+        "sha256": "7af7f3bfb48de885af9c71597f3371a336fdb2a3fd35ceb3d6cca67692a219a6",
+        "size_bytes": 783
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-02/diffs/surface_environment.rs.diff",
+        "sha256": "330e38dd6ddeb196a72112318cf76173ff24eedd844832e9f1eadb5d1cd5c8d4",
+        "size_bytes": 11398
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/330e38dd6ddeb196a72112318cf76173ff24eedd844832e9f1eadb5d1cd5c8d4",
+        "sha256": "330e38dd6ddeb196a72112318cf76173ff24eedd844832e9f1eadb5d1cd5c8d4",
+        "size_bytes": 11398
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-02/diffs/surface_environment.rs.from-01.diff",
+        "sha256": "e3a0fa650ce13bfc400fb04d3daefa6fc158812877699419d42d10e5706d01e6",
+        "size_bytes": 623
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/e3a0fa650ce13bfc400fb04d3daefa6fc158812877699419d42d10e5706d01e6",
+        "sha256": "e3a0fa650ce13bfc400fb04d3daefa6fc158812877699419d42d10e5706d01e6",
+        "size_bytes": 623
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-02/manifest.json",
+        "sha256": "86a3d652fb748346d5f9bf27c37f7af9251a26b7c578ea5e06296a34b4153cc4",
+        "size_bytes": 24023
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/86a3d652fb748346d5f9bf27c37f7af9251a26b7c578ea5e06296a34b4153cc4",
+        "sha256": "86a3d652fb748346d5f9bf27c37f7af9251a26b7c578ea5e06296a34b4153cc4",
+        "size_bytes": 24023
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-02/native-unit-plan.md",
+        "sha256": "39efff499fa6862a441db115f33fbf280b890a9321e46e933a9de7af0f512cd5",
+        "size_bytes": 2318
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/39efff499fa6862a441db115f33fbf280b890a9321e46e933a9de7af0f512cd5",
+        "sha256": "39efff499fa6862a441db115f33fbf280b890a9321e46e933a9de7af0f512cd5",
+        "size_bytes": 2318
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-02/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment.rs",
+        "sha256": "35c8bd5ce0f20bf7ba37b640653b142de9ce8d308fb3544a6c48f1f0094b2bb2",
+        "size_bytes": 10978
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/35c8bd5ce0f20bf7ba37b640653b142de9ce8d308fb3544a6c48f1f0094b2bb2",
+        "sha256": "35c8bd5ce0f20bf7ba37b640653b142de9ce8d308fb3544a6c48f1f0094b2bb2",
+        "size_bytes": 10978
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-02/README.md",
+        "sha256": "943bad8dd641c1965dc811ba66b47ab2c05800ab44b05c3fc0e62ac7ce19d1e1",
+        "size_bytes": 2484
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/943bad8dd641c1965dc811ba66b47ab2c05800ab44b05c3fc0e62ac7ce19d1e1",
+        "sha256": "943bad8dd641c1965dc811ba66b47ab2c05800ab44b05c3fc0e62ac7ce19d1e1",
+        "size_bytes": 2484
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-03/before/crates/ep_runtime/src/heat_balance/convection/surface_environment_selected_reference.rs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-03/before/manifest02.json",
+        "sha256": "86a3d652fb748346d5f9bf27c37f7af9251a26b7c578ea5e06296a34b4153cc4",
+        "size_bytes": 24023
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/86a3d652fb748346d5f9bf27c37f7af9251a26b7c578ea5e06296a34b4153cc4",
+        "sha256": "86a3d652fb748346d5f9bf27c37f7af9251a26b7c578ea5e06296a34b4153cc4",
+        "size_bytes": 24023
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-03/diffs/selected_reference.addition.diff",
+        "sha256": "bfbd3a7575d91f4034dc14e6cbb55a622ac9d5a072c41c9a54a545f3f1aa91c1",
+        "size_bytes": 13216
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/bfbd3a7575d91f4034dc14e6cbb55a622ac9d5a072c41c9a54a545f3f1aa91c1",
+        "sha256": "bfbd3a7575d91f4034dc14e6cbb55a622ac9d5a072c41c9a54a545f3f1aa91c1",
+        "size_bytes": 13216
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-03/diffs/surface_environment.from02.diff",
+        "sha256": "a4bf8fe5315255f1a42566fa32aa560f6b3c74466956c4f3984fdcf9e741f37c",
+        "size_bytes": 287
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/a4bf8fe5315255f1a42566fa32aa560f6b3c74466956c4f3984fdcf9e741f37c",
+        "sha256": "a4bf8fe5315255f1a42566fa32aa560f6b3c74466956c4f3984fdcf9e741f37c",
+        "size_bytes": 287
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-03/diffs/surface_environment.full.diff",
+        "sha256": "a89432c01f6f0d5b2ca708220c3c3815c23f0d4913b48e7033b29d3a6efc54c1",
+        "size_bytes": 11494
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/a89432c01f6f0d5b2ca708220c3c3815c23f0d4913b48e7033b29d3a6efc54c1",
+        "sha256": "a89432c01f6f0d5b2ca708220c3c3815c23f0d4913b48e7033b29d3a6efc54c1",
+        "size_bytes": 11494
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-03/manifest.json",
+        "sha256": "990e56e40f73faa3359aac2cf4f428ee3ff3764a4af987e55706d3ad67659e0a",
+        "size_bytes": 28765
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/990e56e40f73faa3359aac2cf4f428ee3ff3764a4af987e55706d3ad67659e0a",
+        "sha256": "990e56e40f73faa3359aac2cf4f428ee3ff3764a4af987e55706d3ad67659e0a",
+        "size_bytes": 28765
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-03/parent-before/crates/ep_runtime/src/heat_balance/convection/surface_environment.rs",
+        "sha256": "35c8bd5ce0f20bf7ba37b640653b142de9ce8d308fb3544a6c48f1f0094b2bb2",
+        "size_bytes": 10978
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/35c8bd5ce0f20bf7ba37b640653b142de9ce8d308fb3544a6c48f1f0094b2bb2",
+        "sha256": "35c8bd5ce0f20bf7ba37b640653b142de9ce8d308fb3544a6c48f1f0094b2bb2",
+        "size_bytes": 10978
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-03/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment.rs",
+        "sha256": "dd4e271c8f435cacebfe2dadbc426da51679c80f4873095317c25e5c0d7f1e18",
+        "size_bytes": 11070
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/dd4e271c8f435cacebfe2dadbc426da51679c80f4873095317c25e5c0d7f1e18",
+        "sha256": "dd4e271c8f435cacebfe2dadbc426da51679c80f4873095317c25e5c0d7f1e18",
+        "size_bytes": 11070
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-03/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment_selected_reference.rs",
+        "sha256": "fa1c4b92189b1664a10591af95f9a596c0ef76c962f46ddfe412e4e4008fac41",
+        "size_bytes": 12841
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/fa1c4b92189b1664a10591af95f9a596c0ef76c962f46ddfe412e4e4008fac41",
+        "sha256": "fa1c4b92189b1664a10591af95f9a596c0ef76c962f46ddfe412e4e4008fac41",
+        "size_bytes": 12841
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-03/README.md",
+        "sha256": "e448924148f0e5521e973e6621c81fb4cbd16aecb023837d71d68a9a554f6972",
+        "size_bytes": 1885
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/e448924148f0e5521e973e6621c81fb4cbd16aecb023837d71d68a9a554f6972",
+        "sha256": "e448924148f0e5521e973e6621c81fb4cbd16aecb023837d71d68a9a554f6972",
+        "size_bytes": 1885
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-04/before/crates/ep_runtime/src/heat_balance/convection/surface_environment_selected_reference.rs",
+        "sha256": "fa1c4b92189b1664a10591af95f9a596c0ef76c962f46ddfe412e4e4008fac41",
+        "size_bytes": 12841
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/fa1c4b92189b1664a10591af95f9a596c0ef76c962f46ddfe412e4e4008fac41",
+        "sha256": "fa1c4b92189b1664a10591af95f9a596c0ef76c962f46ddfe412e4e4008fac41",
+        "size_bytes": 12841
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-04/before/manifest.json",
+        "sha256": "990e56e40f73faa3359aac2cf4f428ee3ff3764a4af987e55706d3ad67659e0a",
+        "size_bytes": 28765
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/990e56e40f73faa3359aac2cf4f428ee3ff3764a4af987e55706d3ad67659e0a",
+        "sha256": "990e56e40f73faa3359aac2cf4f428ee3ff3764a4af987e55706d3ad67659e0a",
+        "size_bytes": 28765
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-04/before/README.md",
+        "sha256": "e448924148f0e5521e973e6621c81fb4cbd16aecb023837d71d68a9a554f6972",
+        "size_bytes": 1885
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/e448924148f0e5521e973e6621c81fb4cbd16aecb023837d71d68a9a554f6972",
+        "sha256": "e448924148f0e5521e973e6621c81fb4cbd16aecb023837d71d68a9a554f6972",
+        "size_bytes": 1885
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-04/diffs/README.from03.diff",
+        "sha256": "0208157ac38dc855290cece290086f41b0274202618af17965dc3e3fe910e179",
+        "size_bytes": 622
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/0208157ac38dc855290cece290086f41b0274202618af17965dc3e3fe910e179",
+        "sha256": "0208157ac38dc855290cece290086f41b0274202618af17965dc3e3fe910e179",
+        "size_bytes": 622
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-04/diffs/selected_reference.from03.diff",
+        "sha256": "0f6ed42a30af21ba5de56ddc01963783cf23ec6131cd67875f9bf2c59f99f1ed",
+        "size_bytes": 2968
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/0f6ed42a30af21ba5de56ddc01963783cf23ec6131cd67875f9bf2c59f99f1ed",
+        "sha256": "0f6ed42a30af21ba5de56ddc01963783cf23ec6131cd67875f9bf2c59f99f1ed",
+        "size_bytes": 2968
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-04/diffs/selected_reference.full.diff",
+        "sha256": "2551b5d26f959fc8a33f94ee0d6fb7dcf914fab8203b0c57b3d482995272b24f",
+        "size_bytes": 14141
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/2551b5d26f959fc8a33f94ee0d6fb7dcf914fab8203b0c57b3d482995272b24f",
+        "sha256": "2551b5d26f959fc8a33f94ee0d6fb7dcf914fab8203b0c57b3d482995272b24f",
+        "size_bytes": 14141
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-04/manifest.json",
+        "sha256": "05dad8308583e1c441c1ff8c59bb4253b2b61906935fa4ef37b2ad7d848d4722",
+        "size_bytes": 29584
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/05dad8308583e1c441c1ff8c59bb4253b2b61906935fa4ef37b2ad7d848d4722",
+        "sha256": "05dad8308583e1c441c1ff8c59bb4253b2b61906935fa4ef37b2ad7d848d4722",
+        "size_bytes": 29584
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-04/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment_selected_reference.rs",
+        "sha256": "069057c9bdf5bfd9ed150d8b7b90dacb8f668997280000ee590aa106352b6d50",
+        "size_bytes": 13756
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/069057c9bdf5bfd9ed150d8b7b90dacb8f668997280000ee590aa106352b6d50",
+        "sha256": "069057c9bdf5bfd9ed150d8b7b90dacb8f668997280000ee590aa106352b6d50",
+        "size_bytes": 13756
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-04/README.md",
+        "sha256": "68d23ec8836aa8fae639ff57e5e4e9659e04d5abab780abd2852f2dd4f5a8c40",
+        "size_bytes": 2203
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/68d23ec8836aa8fae639ff57e5e4e9659e04d5abab780abd2852f2dd4f5a8c40",
+        "sha256": "68d23ec8836aa8fae639ff57e5e4e9659e04d5abab780abd2852f2dd4f5a8c40",
+        "size_bytes": 2203
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-05/before/crates/ep_runtime/src/heat_balance/convection/surface_environment_selected_reference.rs",
+        "sha256": "069057c9bdf5bfd9ed150d8b7b90dacb8f668997280000ee590aa106352b6d50",
+        "size_bytes": 13756
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/069057c9bdf5bfd9ed150d8b7b90dacb8f668997280000ee590aa106352b6d50",
+        "sha256": "069057c9bdf5bfd9ed150d8b7b90dacb8f668997280000ee590aa106352b6d50",
+        "size_bytes": 13756
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-05/before/manifest.json",
+        "sha256": "05dad8308583e1c441c1ff8c59bb4253b2b61906935fa4ef37b2ad7d848d4722",
+        "size_bytes": 29584
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/05dad8308583e1c441c1ff8c59bb4253b2b61906935fa4ef37b2ad7d848d4722",
+        "sha256": "05dad8308583e1c441c1ff8c59bb4253b2b61906935fa4ef37b2ad7d848d4722",
+        "size_bytes": 29584
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-05/before/README.md",
+        "sha256": "68d23ec8836aa8fae639ff57e5e4e9659e04d5abab780abd2852f2dd4f5a8c40",
+        "size_bytes": 2203
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/68d23ec8836aa8fae639ff57e5e4e9659e04d5abab780abd2852f2dd4f5a8c40",
+        "sha256": "68d23ec8836aa8fae639ff57e5e4e9659e04d5abab780abd2852f2dd4f5a8c40",
+        "size_bytes": 2203
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-05/current-before/crates/ep_runtime/src/heat_balance/convection/surface_environment_selected_reference.rs",
+        "sha256": "eedf56d71325e87e17803560b7c87aaa880ca9b70430cd2bf556caf8e312a954",
+        "size_bytes": 15971
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/eedf56d71325e87e17803560b7c87aaa880ca9b70430cd2bf556caf8e312a954",
+        "sha256": "eedf56d71325e87e17803560b7c87aaa880ca9b70430cd2bf556caf8e312a954",
+        "size_bytes": 15971
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-05/current-proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment_selected_reference.rs",
+        "sha256": "d51dc00cbc33efdf8eedef69dff404e234601e209342980a202a5285aec11551",
+        "size_bytes": 15970
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/d51dc00cbc33efdf8eedef69dff404e234601e209342980a202a5285aec11551",
+        "sha256": "d51dc00cbc33efdf8eedef69dff404e234601e209342980a202a5285aec11551",
+        "size_bytes": 15970
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-05/diffs/README.from04.diff",
+        "sha256": "36544a9e698538e1f7bba90bcb0ca81b2405dbb246f7dcc9b0a661a8afa85123",
+        "size_bytes": 930
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/36544a9e698538e1f7bba90bcb0ca81b2405dbb246f7dcc9b0a661a8afa85123",
+        "sha256": "36544a9e698538e1f7bba90bcb0ca81b2405dbb246f7dcc9b0a661a8afa85123",
+        "size_bytes": 930
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-05/diffs/selected_reference.actual-current.diff",
+        "sha256": "36945cfc097b2c6e4b848eebe464af08b449c894d2221337d74742d6ef133e98",
+        "size_bytes": 613
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/36945cfc097b2c6e4b848eebe464af08b449c894d2221337d74742d6ef133e98",
+        "sha256": "36945cfc097b2c6e4b848eebe464af08b449c894d2221337d74742d6ef133e98",
+        "size_bytes": 613
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-05/diffs/selected_reference.from04.diff",
+        "sha256": "5b9a352b83cf13a4040bc147bf9e2d42bb1d0dc423eacf136513109e975280db",
+        "size_bytes": 708
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/5b9a352b83cf13a4040bc147bf9e2d42bb1d0dc423eacf136513109e975280db",
+        "sha256": "5b9a352b83cf13a4040bc147bf9e2d42bb1d0dc423eacf136513109e975280db",
+        "size_bytes": 708
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-05/diffs/selected_reference.full.diff",
+        "sha256": "c5d1d0b2552e49ec6f324741d4b0b0bca5eea68b7f5bbeacd122b45ba4b0806e",
+        "size_bytes": 14140
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/c5d1d0b2552e49ec6f324741d4b0b0bca5eea68b7f5bbeacd122b45ba4b0806e",
+        "sha256": "c5d1d0b2552e49ec6f324741d4b0b0bca5eea68b7f5bbeacd122b45ba4b0806e",
+        "size_bytes": 14140
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-05/manifest.json",
+        "sha256": "cff45c9a0db7972cf59243c53e68d58532fbc068fd4294f6e6c6acd530eecc75",
+        "size_bytes": 31586
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/cff45c9a0db7972cf59243c53e68d58532fbc068fd4294f6e6c6acd530eecc75",
+        "sha256": "cff45c9a0db7972cf59243c53e68d58532fbc068fd4294f6e6c6acd530eecc75",
+        "size_bytes": 31586
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-05/proposed/crates/ep_runtime/src/heat_balance/convection/surface_environment_selected_reference.rs",
+        "sha256": "8bd3785e018dbf569c7838d147a451da31366a1f293d966ec0c09c38f3484ffd",
+        "size_bytes": 13755
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/8bd3785e018dbf569c7838d147a451da31366a1f293d966ec0c09c38f3484ffd",
+        "sha256": "8bd3785e018dbf569c7838d147a451da31366a1f293d966ec0c09c38f3484ffd",
+        "size_bytes": 13755
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-prep-05/README.md",
+        "sha256": "90ca72d60ffe8031785dcd6394ea140e6c1309a669f36634b4a4cb104aa29a47",
+        "size_bytes": 2833
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/90ca72d60ffe8031785dcd6394ea140e6c1309a669f36634b4a4cb104aa29a47",
+        "sha256": "90ca72d60ffe8031785dcd6394ea140e6c1309a669f36634b4a4cb104aa29a47",
+        "size_bytes": 2833
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-01/clippy-command/receipt.json",
+        "sha256": "82656ea5eaa565341f831ff1c4df8f555e53023f5727211335fc8d4fa0de33fe",
+        "size_bytes": 3535
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/82656ea5eaa565341f831ff1c4df8f555e53023f5727211335fc8d4fa0de33fe",
+        "sha256": "82656ea5eaa565341f831ff1c4df8f555e53023f5727211335fc8d4fa0de33fe",
+        "size_bytes": 3535
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-01/clippy-command/stderr.log",
+        "sha256": "d97edd6a4ce009249fbe86231b564bb25e285d020efa537620d3052f040d6893",
+        "size_bytes": 1002
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/d97edd6a4ce009249fbe86231b564bb25e285d020efa537620d3052f040d6893",
+        "sha256": "d97edd6a4ce009249fbe86231b564bb25e285d020efa537620d3052f040d6893",
+        "size_bytes": 1002
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-01/clippy-command/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-01/fmt-command/receipt.json",
+        "sha256": "b69aaa39be9e4c58f4d6c8c31c9cce17336553f71ee2c1d81f47c9d33b949f6f",
+        "size_bytes": 3336
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/b69aaa39be9e4c58f4d6c8c31c9cce17336553f71ee2c1d81f47c9d33b949f6f",
+        "sha256": "b69aaa39be9e4c58f4d6c8c31c9cce17336553f71ee2c1d81f47c9d33b949f6f",
+        "size_bytes": 3336
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-01/fmt-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-01/fmt-command/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-02/clippy-command/receipt.json",
+        "sha256": "b83b07c804af24a0860484774f4f426be4bcc7a8e07cd2bbf9adfb5584cfff99",
+        "size_bytes": 3533
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/b83b07c804af24a0860484774f4f426be4bcc7a8e07cd2bbf9adfb5584cfff99",
+        "sha256": "b83b07c804af24a0860484774f4f426be4bcc7a8e07cd2bbf9adfb5584cfff99",
+        "size_bytes": 3533
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-02/clippy-command/stderr.log",
+        "sha256": "6923843796814f9eb48471dd217dee9a9e42d553f14cb97305c24d5b582566ab",
+        "size_bytes": 167
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/6923843796814f9eb48471dd217dee9a9e42d553f14cb97305c24d5b582566ab",
+        "sha256": "6923843796814f9eb48471dd217dee9a9e42d553f14cb97305c24d5b582566ab",
+        "size_bytes": 167
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-02/clippy-command/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-02/fmt-command/receipt.json",
+        "sha256": "258950963c17ebfc016715889202cb9e1c62757972629d17ee5373fdd610b5bb",
+        "size_bytes": 3336
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/258950963c17ebfc016715889202cb9e1c62757972629d17ee5373fdd610b5bb",
+        "sha256": "258950963c17ebfc016715889202cb9e1c62757972629d17ee5373fdd610b5bb",
+        "size_bytes": 3336
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-02/fmt-command/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-02/fmt-command/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-02/focused-command/receipt.json",
+        "sha256": "60b63b8dd83fc18a05dbb13a05e501a60db2d152c34c159c36d6abfbffc95819",
+        "size_bytes": 3520
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/60b63b8dd83fc18a05dbb13a05e501a60db2d152c34c159c36d6abfbffc95819",
+        "sha256": "60b63b8dd83fc18a05dbb13a05e501a60db2d152c34c159c36d6abfbffc95819",
+        "size_bytes": 3520
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-02/focused-command/stderr.log",
+        "sha256": "4839dd158ae62c87f505db7a1f1d44ea305752d3cd623c01ec0089a1feb8a259",
+        "size_bytes": 254
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SYS-02-rolling-warmup/objects/4839dd158ae62c87f505db7a1f1d44ea305752d3cd623c01ec0089a1feb8a259",
+        "sha256": "4839dd158ae62c87f505db7a1f1d44ea305752d3cd623c01ec0089a1feb8a259",
+        "size_bytes": 254
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-02/focused-command/stdout.log",
+        "sha256": "8b7fab058583ab80e93d873f821650276b81307766e6070178c95e8baf69238c",
+        "size_bytes": 42077
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/8b7fab058583ab80e93d873f821650276b81307766e6070178c95e8baf69238c",
+        "sha256": "8b7fab058583ab80e93d873f821650276b81307766e6070178c95e8baf69238c",
+        "size_bytes": 42077
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-02/workspace-command/receipt.json",
+        "sha256": "b189fd0cad9020b93b9dcf150454603dc38f6c576318b653cd08634746ad9868",
+        "size_bytes": 3481
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/b189fd0cad9020b93b9dcf150454603dc38f6c576318b653cd08634746ad9868",
+        "sha256": "b189fd0cad9020b93b9dcf150454603dc38f6c576318b653cd08634746ad9868",
+        "size_bytes": 3481
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-02/workspace-command/stderr.log",
+        "sha256": "b8864a01a0751f0d082979fc75560f27269b45aae72b6ef228b622485378f56f",
+        "size_bytes": 1779
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/b8864a01a0751f0d082979fc75560f27269b45aae72b6ef228b622485378f56f",
+        "sha256": "b8864a01a0751f0d082979fc75560f27269b45aae72b6ef228b622485378f56f",
+        "size_bytes": 1779
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-quality-02/workspace-command/stdout.log",
+        "sha256": "a87087bb20c018f3cb9d63778eea23022db7bb9959c51a81310b44b6661d86b4",
+        "size_bytes": 758702
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/a87087bb20c018f3cb9d63778eea23022db7bb9959c51a81310b44b6661d86b4",
+        "sha256": "a87087bb20c018f3cb9d63778eea23022db7bb9959c51a81310b44b6661d86b4",
+        "size_bytes": 758702
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-01/before/compare.py",
+        "sha256": "1bd3a3686cb085d86f51bf198597e022172c0c83affe82f536ad61340768aab9",
+        "size_bytes": 25714
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SYS-02-selected-warmup/objects/1bd3a3686cb085d86f51bf198597e022172c0c83affe82f536ad61340768aab9",
+        "sha256": "1bd3a3686cb085d86f51bf198597e022172c0c83affe82f536ad61340768aab9",
+        "size_bytes": 25714
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-01/before/policy.json",
+        "sha256": "f13b63a3b3d8964d3ca923f57977f65ac53b6da7844a1d094dc4c0fbc20a3a3f",
+        "size_bytes": 3994
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SYS-02-selected-warmup/objects/f13b63a3b3d8964d3ca923f57977f65ac53b6da7844a1d094dc4c0fbc20a3a3f",
+        "sha256": "f13b63a3b3d8964d3ca923f57977f65ac53b6da7844a1d094dc4c0fbc20a3a3f",
+        "size_bytes": 3994
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-01/before/README.md",
+        "sha256": "fa0499653b1ed064715317221901d500a9d42d8ff8ed80325108f5a8355bcd7c",
+        "size_bytes": 5277
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SYS-02-selected-warmup/objects/fa0499653b1ed064715317221901d500a9d42d8ff8ed80325108f5a8355bcd7c",
+        "sha256": "fa0499653b1ed064715317221901d500a9d42d8ff8ed80325108f5a8355bcd7c",
+        "size_bytes": 5277
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-01/compare.py",
+        "sha256": "1787424188652a8a0506b1bf3b04e988a6995b03201154aeaf70739d4125a262",
+        "size_bytes": 33847
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/1787424188652a8a0506b1bf3b04e988a6995b03201154aeaf70739d4125a262",
+        "sha256": "1787424188652a8a0506b1bf3b04e988a6995b03201154aeaf70739d4125a262",
+        "size_bytes": 33847
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-01/diffs/compare.py.from-SYS02.diff",
+        "sha256": "1be9dd51fea2e15aa69c00d02f7787b37e49aac2bc7fc5abc03f5d0c1a3f686b",
+        "size_bytes": 56025
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/1be9dd51fea2e15aa69c00d02f7787b37e49aac2bc7fc5abc03f5d0c1a3f686b",
+        "sha256": "1be9dd51fea2e15aa69c00d02f7787b37e49aac2bc7fc5abc03f5d0c1a3f686b",
+        "size_bytes": 56025
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-01/diffs/policy.json.from-SYS02.diff",
+        "sha256": "16a52c99afdc1991e9f84f39f2ed17f4238df69c070b1bf9eb7cc2aa5a1bd844",
+        "size_bytes": 8247
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/16a52c99afdc1991e9f84f39f2ed17f4238df69c070b1bf9eb7cc2aa5a1bd844",
+        "sha256": "16a52c99afdc1991e9f84f39f2ed17f4238df69c070b1bf9eb7cc2aa5a1bd844",
+        "size_bytes": 8247
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-01/diffs/README.md.from-SYS02.diff",
+        "sha256": "21a5dc3be9df8698827dad17c571e32adb77820ecfa6d8330d618cc7465cccad",
+        "size_bytes": 9295
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/21a5dc3be9df8698827dad17c571e32adb77820ecfa6d8330d618cc7465cccad",
+        "sha256": "21a5dc3be9df8698827dad17c571e32adb77820ecfa6d8330d618cc7465cccad",
+        "size_bytes": 9295
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-01/manifest.json",
+        "sha256": "6f6420291b0ea4864c58d3f44604f2676a18a5919f6442290c6663efb5e55db8",
+        "size_bytes": 38625
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/6f6420291b0ea4864c58d3f44604f2676a18a5919f6442290c6663efb5e55db8",
+        "sha256": "6f6420291b0ea4864c58d3f44604f2676a18a5919f6442290c6663efb5e55db8",
+        "size_bytes": 38625
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-01/policy.json",
+        "sha256": "d0d2781ae2725bcda1100f89155f47bf3aa76cd5d181e27ac717d59a2ef2ab5b",
+        "size_bytes": 4633
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/d0d2781ae2725bcda1100f89155f47bf3aa76cd5d181e27ac717d59a2ef2ab5b",
+        "sha256": "d0d2781ae2725bcda1100f89155f47bf3aa76cd5d181e27ac717d59a2ef2ab5b",
+        "size_bytes": 4633
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-01/README.md",
+        "sha256": "c5821217e7088a2883a88d36384663c2a9041c911ed3d8831a8606b39cbe1ad5",
+        "size_bytes": 3904
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/c5821217e7088a2883a88d36384663c2a9041c911ed3d8831a8606b39cbe1ad5",
+        "sha256": "c5821217e7088a2883a88d36384663c2a9041c911ed3d8831a8606b39cbe1ad5",
+        "size_bytes": 3904
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-02/before/compare.py",
+        "sha256": "1787424188652a8a0506b1bf3b04e988a6995b03201154aeaf70739d4125a262",
+        "size_bytes": 33847
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/1787424188652a8a0506b1bf3b04e988a6995b03201154aeaf70739d4125a262",
+        "sha256": "1787424188652a8a0506b1bf3b04e988a6995b03201154aeaf70739d4125a262",
+        "size_bytes": 33847
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-02/before/manifest.json",
+        "sha256": "6f6420291b0ea4864c58d3f44604f2676a18a5919f6442290c6663efb5e55db8",
+        "size_bytes": 38625
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/6f6420291b0ea4864c58d3f44604f2676a18a5919f6442290c6663efb5e55db8",
+        "sha256": "6f6420291b0ea4864c58d3f44604f2676a18a5919f6442290c6663efb5e55db8",
+        "size_bytes": 38625
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-02/before/policy.json",
+        "sha256": "d0d2781ae2725bcda1100f89155f47bf3aa76cd5d181e27ac717d59a2ef2ab5b",
+        "size_bytes": 4633
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/d0d2781ae2725bcda1100f89155f47bf3aa76cd5d181e27ac717d59a2ef2ab5b",
+        "sha256": "d0d2781ae2725bcda1100f89155f47bf3aa76cd5d181e27ac717d59a2ef2ab5b",
+        "size_bytes": 4633
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-02/before/README.md",
+        "sha256": "c5821217e7088a2883a88d36384663c2a9041c911ed3d8831a8606b39cbe1ad5",
+        "size_bytes": 3904
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/c5821217e7088a2883a88d36384663c2a9041c911ed3d8831a8606b39cbe1ad5",
+        "sha256": "c5821217e7088a2883a88d36384663c2a9041c911ed3d8831a8606b39cbe1ad5",
+        "size_bytes": 3904
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-02/compare.py",
+        "sha256": "762ee3695013464caf32b5207052204f8cd35a2a55a42bc758e920c89e99757f",
+        "size_bytes": 34193
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/762ee3695013464caf32b5207052204f8cd35a2a55a42bc758e920c89e99757f",
+        "sha256": "762ee3695013464caf32b5207052204f8cd35a2a55a42bc758e920c89e99757f",
+        "size_bytes": 34193
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-02/diffs/compare.py.from01.diff",
+        "sha256": "ccce2f9a3a830710e86302c59d431b623042a7b4730887b4685b9a74369d069c",
+        "size_bytes": 1984
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/ccce2f9a3a830710e86302c59d431b623042a7b4730887b4685b9a74369d069c",
+        "sha256": "ccce2f9a3a830710e86302c59d431b623042a7b4730887b4685b9a74369d069c",
+        "size_bytes": 1984
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-02/diffs/policy.json.from01.diff",
+        "sha256": "d6f715f88b688184362c10d533bf0913f2c10b9c97e324c1b1c7c0c1e71c0415",
+        "size_bytes": 829
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/d6f715f88b688184362c10d533bf0913f2c10b9c97e324c1b1c7c0c1e71c0415",
+        "sha256": "d6f715f88b688184362c10d533bf0913f2c10b9c97e324c1b1c7c0c1e71c0415",
+        "size_bytes": 829
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-02/diffs/README.md.from01.diff",
+        "sha256": "eeb2d84335b7e6d0da3fe6014cd626f87e45993ef3a3bebff43a849808000313",
+        "size_bytes": 776
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/eeb2d84335b7e6d0da3fe6014cd626f87e45993ef3a3bebff43a849808000313",
+        "sha256": "eeb2d84335b7e6d0da3fe6014cd626f87e45993ef3a3bebff43a849808000313",
+        "size_bytes": 776
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-02/manifest.json",
+        "sha256": "3c807fbff70da0149f7fee933dc202c637d8ce407b793c5bb7c46af78b5dfaab",
+        "size_bytes": 42189
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/3c807fbff70da0149f7fee933dc202c637d8ce407b793c5bb7c46af78b5dfaab",
+        "sha256": "3c807fbff70da0149f7fee933dc202c637d8ce407b793c5bb7c46af78b5dfaab",
+        "size_bytes": 42189
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-02/policy.json",
+        "sha256": "3ff574604e54e7d850007ba69958de84df5dc050fe04340e40a7faffe9797951",
+        "size_bytes": 4639
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/3ff574604e54e7d850007ba69958de84df5dc050fe04340e40a7faffe9797951",
+        "sha256": "3ff574604e54e7d850007ba69958de84df5dc050fe04340e40a7faffe9797951",
+        "size_bytes": 4639
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-02/README.md",
+        "sha256": "b7a81813bb2f040ef653c4082ca78d954f7919477e3e3dab446d02c5fd6204fc",
+        "size_bytes": 4380
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/b7a81813bb2f040ef653c4082ca78d954f7919477e3e3dab446d02c5fd6204fc",
+        "sha256": "b7a81813bb2f040ef653c4082ca78d954f7919477e3e3dab446d02c5fd6204fc",
+        "size_bytes": 4380
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-03/before/compare.py",
+        "sha256": "762ee3695013464caf32b5207052204f8cd35a2a55a42bc758e920c89e99757f",
+        "size_bytes": 34193
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/762ee3695013464caf32b5207052204f8cd35a2a55a42bc758e920c89e99757f",
+        "sha256": "762ee3695013464caf32b5207052204f8cd35a2a55a42bc758e920c89e99757f",
+        "size_bytes": 34193
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-03/before/manifest.json",
+        "sha256": "3c807fbff70da0149f7fee933dc202c637d8ce407b793c5bb7c46af78b5dfaab",
+        "size_bytes": 42189
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/3c807fbff70da0149f7fee933dc202c637d8ce407b793c5bb7c46af78b5dfaab",
+        "sha256": "3c807fbff70da0149f7fee933dc202c637d8ce407b793c5bb7c46af78b5dfaab",
+        "size_bytes": 42189
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-03/before/policy.json",
+        "sha256": "3ff574604e54e7d850007ba69958de84df5dc050fe04340e40a7faffe9797951",
+        "size_bytes": 4639
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/3ff574604e54e7d850007ba69958de84df5dc050fe04340e40a7faffe9797951",
+        "sha256": "3ff574604e54e7d850007ba69958de84df5dc050fe04340e40a7faffe9797951",
+        "size_bytes": 4639
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-03/before/README.md",
+        "sha256": "b7a81813bb2f040ef653c4082ca78d954f7919477e3e3dab446d02c5fd6204fc",
+        "size_bytes": 4380
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/b7a81813bb2f040ef653c4082ca78d954f7919477e3e3dab446d02c5fd6204fc",
+        "sha256": "b7a81813bb2f040ef653c4082ca78d954f7919477e3e3dab446d02c5fd6204fc",
+        "size_bytes": 4380
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-03/compare.py",
+        "sha256": "762ee3695013464caf32b5207052204f8cd35a2a55a42bc758e920c89e99757f",
+        "size_bytes": 34193
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/762ee3695013464caf32b5207052204f8cd35a2a55a42bc758e920c89e99757f",
+        "sha256": "762ee3695013464caf32b5207052204f8cd35a2a55a42bc758e920c89e99757f",
+        "size_bytes": 34193
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-03/diffs/compare.py.from02.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-baseline/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-03/diffs/policy.json.from02.diff",
+        "sha256": "b64002b8f31ac11d5465a0369d9e4ea645f0b80af8a654b6769e12e6c7c1ddd7",
+        "size_bytes": 684
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/b64002b8f31ac11d5465a0369d9e4ea645f0b80af8a654b6769e12e6c7c1ddd7",
+        "sha256": "b64002b8f31ac11d5465a0369d9e4ea645f0b80af8a654b6769e12e6c7c1ddd7",
+        "size_bytes": 684
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-03/diffs/README.md.from02.diff",
+        "sha256": "8a3f79542b644c33fb6a3a466c69b9fd3612417a161ec47370a5b22cdb57e649",
+        "size_bytes": 692
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/8a3f79542b644c33fb6a3a466c69b9fd3612417a161ec47370a5b22cdb57e649",
+        "sha256": "8a3f79542b644c33fb6a3a466c69b9fd3612417a161ec47370a5b22cdb57e649",
+        "size_bytes": 692
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-03/manifest.json",
+        "sha256": "e88c49510e61e8111eb84a014013478c48b871efea7d34d3f99ed16c76b93d08",
+        "size_bytes": 43047
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/e88c49510e61e8111eb84a014013478c48b871efea7d34d3f99ed16c76b93d08",
+        "sha256": "e88c49510e61e8111eb84a014013478c48b871efea7d34d3f99ed16c76b93d08",
+        "size_bytes": 43047
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-03/policy.json",
+        "sha256": "7968c53e85cbc93fe8c8d15887666daae1d8c195e90d86b9f1c2571be6de2cc0",
+        "size_bytes": 4639
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/7968c53e85cbc93fe8c8d15887666daae1d8c195e90d86b9f1c2571be6de2cc0",
+        "sha256": "7968c53e85cbc93fe8c8d15887666daae1d8c195e90d86b9f1c2571be6de2cc0",
+        "size_bytes": 4639
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/SRC-05/surface-environment-selected-comparison-prep-03/README.md",
+        "sha256": "c892d5e81fdf99072b4719b9986d5924583b01e968bdb600fa9e2f5ee3b83768",
+        "size_bytes": 4775
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/objects/c892d5e81fdf99072b4719b9986d5924583b01e968bdb600fa9e2f5ee3b83768",
+        "sha256": "c892d5e81fdf99072b4719b9986d5924583b01e968bdb600fa9e2f5ee3b83768",
+        "size_bytes": 4775
+      }
+    },
+    {
+      "original": {
+        "path": "tools/porting/record_command.py",
+        "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+        "size_bytes": 8453
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-init-postlude/objects/5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+        "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+        "size_bytes": 8453
+      }
+    }
+  ],
+  "available_selected_setters_only_passed": false,
+  "mismatches": 3,
+  "required_unavailable_count": 103,
+  "nonfinite_arithmetic_unavailable_count": 0,
+  "actual_findings": {
+    "input_and_initial_owner_join_passed": true,
+    "endpoint_pairing_performed": true,
+    "actual_case_count": 26,
+    "actual_weather_operation_count": 30,
+    "paired_available_setter_boundaries": 70,
+    "actual_Native_process_exit_code": 2,
+    "actual_Native_Source_snapshot": {
+      "path": ".runtime/porting/source-objects/5f/5f982aba87e32de31a541c3cef83fd6a6d2e2fcd12efe1276b6ed2b694d0c899",
+      "sha256": "5f982aba87e32de31a541c3cef83fd6a6d2e2fcd12efe1276b6ed2b694d0c899"
+    },
+    "actual_Cargo_Source_snapshot": {
+      "path": ".runtime/porting/source-objects/37/371ee432d89384311dbe6c07f0d3beb8cb99cba51ab69d14a71b7a63ce0df6ea",
+      "sha256": "371ee432d89384311dbe6c07f0d3beb8cb99cba51ab69d14a71b7a63ce0df6ea"
+    }
+  },
+  "full_uncapped_ledgers": {
+    "mismatches": {
+      "path": ".runtime/porting/SRC-05/selected-comparison-02/mismatches.ndjson",
+      "sha256": "556f4cbc3dbd747c015d887d07171d3eea3c9f0ac043a0518666fea8b3e87188",
+      "size_bytes": 690
+    },
+    "unavailable": {
+      "path": ".runtime/porting/SRC-05/selected-comparison-02/unavailable.ndjson",
+      "sha256": "04f48f46adaccdf986b8f43cc876da14aaaf67774bf0ddc97fbe78500ff9deb8",
+      "size_bytes": 23525
+    },
+    "paired-boundaries": {
+      "path": ".runtime/porting/SRC-05/selected-comparison-02/paired-boundaries.ndjson",
+      "sha256": "567348bf40f4f111e76fa27236a3dae285bd7bc34e6ac61fe8b428c58f08b5d5",
+      "size_bytes": 15204
+    }
+  },
+  "failed_prior_comparison": {
+    "path": ".runtime/porting/SRC-05/selected-comparison-01/comparison.json",
+    "sha256": "c81678cef131e9db824c09739c8e7f8cc3f3e67a7177a5808b2bd9c409d78670",
+    "size_bytes": 1833
+  },
+  "failed_prior_execution": {
+    "path": ".runtime/porting/SRC-05/selected-comparison-command-01/receipt.json",
+    "sha256": "24e132bf11fd4e89df3f1bc032f2ccdef44f6ab18d5abf710360acad4c8f1253",
+    "size_bytes": 3622
+  },
+  "cold_guard_backend_passed": false,
+  "whole_SRC05_unit_or_ordinary_manager_PASS_claimed": false,
+  "card_gates_updated": false,
+  "remaining_issues": [
+    "The three actual selected comparison mismatches remain unresolved; this publication does not claim selected setter PASS.",
+    "Cold guard and its real diagnostic/backend/error/console effects remain unavailable in Rust.",
+    "Native-stopped/unreached stages and skipped NoWind point returns remain explicit unpaired observations.",
+    "Ordinary manager handoff, station/site input caller and whole-card gates remain pending."
+  ],
+  "retained_attempts": "Failed first Native compile, failed first Clippy and first comparison argv-spelling integrity failure remain preserved. The second Rust invocation uses the same literal inputs and methods with the exact reviewed Windows path spelling; no scientific policy changed."
+}

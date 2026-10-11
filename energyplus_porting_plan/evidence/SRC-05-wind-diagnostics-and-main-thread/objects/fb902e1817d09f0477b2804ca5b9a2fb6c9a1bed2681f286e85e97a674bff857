@@ -1,0 +1,296 @@
+"""Seal an ignored transport proposal and custody-only comparer successor."""
+import ast
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+import shutil
+import tomllib
+
+ROOT = Path(__file__).resolve().parents[3]
+PACKAGE = ROOT / '.runtime/porting/SRC-05/surface-environment-main-thread-prep-01'
+OLD = ROOT / '.runtime/porting/SRC-05/surface-environment-selected-comparison-prep-03'
+OUT = ROOT / '.runtime/porting/SRC-05/surface-environment-selected-comparison-prep-04'
+
+
+def ref(path):
+    data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else str(path),
+            'sha256': hashlib.sha256(data).hexdigest(), 'size_bytes': len(data), 'line_count': len(data.splitlines())}
+
+
+def dump(path, value):
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + '\n', encoding='utf-8', newline='\n')
+
+
+def delta(before, after, dest):
+    dest.write_text(''.join(difflib.unified_diff(before.read_text(encoding='utf-8').splitlines(True),
+        after.read_text(encoding='utf-8').splitlines(True), fromfile=before.relative_to(ROOT).as_posix(),
+        tofile=after.relative_to(ROOT).as_posix())), encoding='utf-8', newline='\n')
+    return ref(dest)
+
+
+shutil.copyfile(ROOT / '.runtime/porting/SRC-05/selected-main-thread-launcher.template.py', PACKAGE / 'run_main_thread.py')
+delta(PACKAGE / 'before/run-selected-observer-01.py', PACKAGE / 'run_main_thread.py', PACKAGE / 'diffs/launcher.from-ignored-test.diff')
+readme = '''# SRC-05 standalone selected main-thread observation (held Source)
+
+This ignored standalone package calls the genuine current public SRC05 APIs on
+its actual main thread. It does not spawn a worker, read/write FP controls, or
+change production equations. The existing ignored-libtest FAIL is preserved.
+This new context cannot reconstruct historical libtest controls or establish a
+production CLI match: the genuine current CLI intentionally runs on a worker.
+
+The full current ignored observer is archived before import/entry transport
+adaptation. Required/keys/number/scalar/parameters/snapshot/evaluate are literal
+copies, and observe retains all parsing, calls, values, serialization and input
+rehash. Changes are public imports, two path operands (argc3), output containment
+relative to this package, and direct main entry. No result schema is changed.
+All 26 literal cases/30 operations and independent setter/point calls remain.
+Native fatal/unreached, check/backend, skipped NoWind and context stay unavailable.
+
+The isolated Cargo manifest keeps opt0/no LTO and the same three debug/incremental
+configs. serde_json is exactly 1.0.150 with the existing float_roundtrip feature;
+ep_runtime and ep_model are actual local path dependencies. The accepted Wind03
+offline lock is copied with only root package identity/direct ep_model edge added.
+No registry package/version/checksum changes. No Cargo command was executed.
+
+Root launcher CLI:
+`python -X utf8 -B run_main_thread.py --source-preparation <manifest>#<SHA> --policy <policy>#<SHA> --input <literal copy>#<SHA> --source-snapshot <actual current full snapshot>#<SHA> --quality fmt_check=<receipt>#<SHA> --quality clippy=<receipt>#<SHA> --quality focused=<receipt>#<SHA> --quality workspace=<receipt>#<SHA> --output-dir <fresh ignored SRC05 directory>`.
+It freezes reviewed package/input/policy and actual full current Source before
+the genuine standard-recorder Cargo build; Cargo JSON and recorder-emitted
+artifact hashes must agree. It immediately hashes the sole actual dev bin, then
+records its argc3 execution separately with full input/exe/package/Source guards.
+before.json, artifact.json and custody.json preserve real outcomes; missing output
+or a failed process never becomes a valid comparison. No fabricated future refs.
+
+The actual current full Source is a runtime operand and must match four quality,
+build and target receipts. The historical 52209e A02 snapshot is retained as Source
+basis, not assumed to remain live after unrelated genuine quality corrections.
+The two pinned SRC05 API files must remain byte-exact and occur in that actual full
+snapshot. Isolated package files are frozen separately because the standard
+recorder snapshots canonical workspace files. No canonical file is installed.
+
+precision-source-audit.json retains eleven literal local Source range authorities:
+Rust CreateThread/ThreadInit/libtest paths, MinGW precision-reset documentation,
+Original exception masks, tagged pow tail, and actual ordinary caller paths.
+It explicitly does not infer historical thread state or Windows loader behavior.
+Root reported fresh diagnostic thread precision differences; their result values
+were not read by this package author. Historical Native and old selected results
+were previously read for factual QA/diagnosis; all new main-thread outputs remain
+unread and nonexistent at seal. No historical FAIL is removed or relabeled.
+
+Future ordinary main-thread integration should reuse the existing bounded driver
+and complete ordinary observer run body, with an explicitly reviewed adequate
+main PE stack reserve. Existing ordinary worker/stack failure evidence remains.
+That separate observation context is not activated by this direct-setter package.
+No new engine, numerical tolerance, backend implementation, or gate claim.
+'''
+(PACKAGE / 'README.md').write_text(readme, encoding='utf-8', newline='\n')
+api_paths = ['crates/ep_runtime/src/heat_balance/convection.rs',
+             'crates/ep_runtime/src/heat_balance/convection/surface_environment.rs']
+audit = json.loads((PACKAGE / 'precision-source-audit.json').read_bytes())
+basis = json.loads((PACKAGE / 'source-basis.json').read_bytes())
+oldreport = json.loads((ROOT / basis['historical_comparison']['path']).read_bytes())
+package_manifest = {'schema': 'src05-selected-main-thread-Source-preparation.v1', 'status': 'HELD-Source-only-unexecuted',
+    'source_basis': ref(PACKAGE / 'source-basis.json'), 'local_precision_Source_audit': ref(PACKAGE / 'precision-source-audit.json'),
+    'runtime_interfaces': {'Cargo_manifest': ref(PACKAGE / 'rust/Cargo.toml'), 'Cargo_lock': ref(PACKAGE / 'rust/Cargo.lock'),
+        'Rust_main': ref(PACKAGE / 'rust/src/main.rs'), 'launcher': ref(PACKAGE / 'run_main_thread.py'),
+        'argc': 3, 'result_schema': 'src05-surface-environment-selected-results.v1',
+        'sidecar_schema': 'src05-selected-main-thread-execution-custody.v1', 'artifact_schema': 'src05-selected-main-thread-Cargo-artifact.v1'},
+    'actual_public_API_source_paths': api_paths, 'actual_public_API_sources': [ref(ROOT / p) for p in api_paths],
+    'selected_source_ranges': audit['selected_source_ranges'],
+    'observer_body_before': ref(PACKAGE / 'before/selected_reference.rs'),
+    'exact_transport_diffs': [ref(p) for p in sorted((PACKAGE / 'diffs').iterdir())],
+    'historical_libtest_failure': {'comparison': basis['historical_comparison'], 'execution': basis['historical_comparison_execution'],
+        'custody': basis['historical_custody'], 'ledgers': oldreport['ledgers']},
+    'author_sources': [ref(ROOT / '.runtime/porting/SRC-05/prepare-selected-main-thread-01.py'), ref(Path(__file__))],
+    'new_main_thread_results_read': False, 'FP_controls_read_or_written': False, 'production_math_changed': False,
+    'historical_libtest_context_reconstructed': False, 'gates_updated': False}
+package_manifest['own_sources'] = [ref(p) for p in sorted(PACKAGE.rglob('*')) if p.is_file()]
+dump(PACKAGE / 'manifest.json', package_manifest)
+assert not OUT.exists()
+(OUT / 'before').mkdir(parents=True)
+(OUT / 'diffs').mkdir()
+for name in ['compare.py','policy.json','README.md','manifest.json']:
+    shutil.copyfile(OLD / name, OUT / 'before' / name)
+policy = json.loads((OLD / 'policy.json').read_bytes())
+policy['Rust_source_preparation'] = ref(PACKAGE / 'manifest.json')
+policy['standalone_main_thread_transport'] = {'actual_main_entry_no_thread_spawn': True, 'FP_control_reads_or_writes': False,
+    'actual_full_current_Source_is_explicit_runtime_operand': True, 'same_quality_build_and_execution_Source_required': True,
+    'historical_libtest_FAIL_preserved': True, 'historical_thread_controls_or_cause_inferred': False,
+    'new_main_thread_results_read_before_seal': False, 'prior_Native_and_libtest_results_previously_read_for_factual_QA': True}
+dump(OUT / 'policy.json', policy)
+old = (OLD / 'compare.py').read_text(encoding='utf-8')
+begin = old.index("    command = ['cargo', 'test'] + CONFIGS")
+end = old.index('    return n, r\n', begin)
+text = old[:begin] + '    main_thread_rust_custody(packet, policy, rust_prep, r, outer)\n' + old[end:]
+helper = '''def main_thread_rust_custody(packet, policy, prep, r, outer):
+    need(prep['schema'] == 'src05-selected-main-thread-Source-preparation.v1', 'reviewed standalone Source preparation required')
+    for row in prep['own_sources']:
+        exact(row)
+    basis = load(prep['source_basis'])
+    history = prep['historical_libtest_failure']
+    prior = load(history['comparison'])
+    prior_execution = receipt(history['execution'], policy['recorder_source'], (1,))
+    need(prior['status'] == 'fail-selected-setters-or-input-join' and prior['all_mismatches_and_unavailable_rows_retained_uncapped'] is True, 'historical libtest FAIL must remain intact')
+    need(prior['ledgers'] == history['ledgers'] and prior['actual_custody']['sha256'] == history['custody']['sha256'], 'historical comparison/custody differs')
+    exact(history['custody'])
+    for row in history['ledgers'].values():
+        exact(row)
+    source = packet['actual_Runtime_Source_snapshot']
+    need(source == r['source_snapshot'] == outer['source_snapshot'], 'actual target/launcher full Source differs')
+    snap = load(source)
+    need(snap['schema'] == 'rust-command-source-snapshot.v1' and snap['bytes_normalized'] is False, 'literal full current Source snapshot required')
+    members = {row['historical_path']: row for row in snap['files']}
+    need(len(members) == len(snap['files']), 'duplicate current Source member')
+    paths = set((ROOT / 'crates').rglob('*.rs')) | set((ROOT / 'crates').rglob('Cargo.toml'))
+    paths |= {ROOT / name for name in ['Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml'] if (ROOT / name).is_file()}
+    need({p.relative_to(ROOT).as_posix() for p in paths} == set(members), 'actual current full Source membership differs')
+    for name, row in members.items():
+        need(exact(row['archive']).stat().st_size == row['size_bytes'], 'actual Source archive size differs')
+        exact({'path': name, 'sha256': row['archive']['sha256'], 'size_bytes': row['size_bytes']})
+    need([row['canonical_path'] for row in packet['actual_Rust_observer_sources']] == prep['actual_public_API_source_paths'], 'exact selected public API Source membership required')
+    for row, held in zip(packet['actual_Rust_observer_sources'], prep['actual_public_API_sources']):
+        need(exact(row['actual_final_source']).read_bytes() == exact(held).read_bytes() == exact(members[row['canonical_path']]['archive']).read_bytes(), 'compiled actual API differs from reviewed unchanged Source')
+    build = receipt(packet['Rust_build_execution'], policy['recorder_source'])
+    manifest = exact(prep['runtime_interfaces']['Cargo_manifest'])
+    command = ['cargo', 'build', '--manifest-path', str(manifest)] + CONFIGS + ['--locked', '--offline', '--target-dir', str(ROOT / 'target'), '--message-format=json-render-diagnostics', '--bin', 'src05_surface_environment_main']
+    need(build['command'] == command and build['source_snapshot'] == source, 'actual reviewed standalone Cargo command/Source differs')
+    need(outer['started_utc'] <= build['started_utc'] <= build['finished_utc'] <= r['started_utc'] <= r['finished_utc'] <= outer['finished_utc'], 'actual Cargo/main outside recorded launcher chronology')
+    artifact = load(packet['Rust_artifact_proof'])
+    need(artifact['schema'] == 'src05-selected-main-thread-Cargo-artifact.v1' and equal_ref(artifact['Source_preparation'], policy['Rust_source_preparation']) and artifact['Source_snapshot'] == source and equal_ref(artifact['actual_build_execution'], packet['Rust_build_execution']), 'actual immediate Cargo artifact custody differs')
+    need(equal_ref(artifact['actual_full_Cargo_JSON'], build['stdout']), 'complete actual Cargo stdout differs')
+    messages = [json.loads(line) for line in exact(build['stdout']).read_text(encoding='utf-8').splitlines() if line]
+    emitted = [v for v in messages if v.get('reason') == 'compiler-artifact' and v.get('executable')]
+    need(len(emitted) == 1, 'sole genuine emitted executable required')
+    message, recorded_artifact = emitted[0], artifact['actual_Cargo_emitted_artifact']
+    binary = exact(recorded_artifact['executable'])
+    need(recorded_artifact['cargo_message'] == message and Path(message['executable']).resolve() == binary and binary.is_relative_to(ROOT / 'target'), 'actual emitted executable differs')
+    need(message['target']['name'] == 'src05_surface_environment_main' and message['target']['kind'] == ['bin'] and Path(message['target']['src_path']).resolve() == exact(prep['runtime_interfaces']['Rust_main']) and message['profile']['opt_level'] == '0' and message['profile']['test'] is False, 'actual main/dev Source artifact differs')
+    capture = build['cargo_compiler_artifacts_capture']
+    need(capture['status'] == 'pass' and len(capture['rows']) == 1 and capture['rows'][0]['cargo_message'] == message and capture['rows'][0]['executable']['sha256'] == recorded_artifact['executable']['sha256'], 'actual recorder/Cargo artifact identity differs')
+    need(equal_ref(artifact['actual_binary_before'], recorded_artifact['executable']), 'immediate executable identity differs')
+    argv = [str(binary), str(exact(packet['Rust_input'])), str(exact(packet['Rust_result']))]
+    need(r['command'] == artifact['actual_argv'] == argv, 'actual main argc3/input/output differs')
+    launcher = exact(packet['Rust_launch_source'])
+    need(launcher == exact(prep['runtime_interfaces']['launcher']), 'reviewed standalone launcher required')
+    need(outer['command'][1:4] == ['-X','utf8','-B'] and Path(outer['command'][4]).resolve() == launcher, 'actual Root launcher command differs')
+    def option(name):
+        command = outer['command']
+        need(command.count(name) == 1, 'one actual launcher operand required: ' + name)
+        return command[command.index(name) + 1]
+    for name, row in [('--source-preparation',policy['Rust_source_preparation']),('--policy',packet['prospective_policy']),('--input',packet['Rust_input']),('--source-snapshot',source)]:
+        path, sha = option(name).rsplit('#',1)
+        need(Path(path).resolve() == exact(row) and sha == row['sha256'], 'actual launcher operand differs: ' + name)
+    need(Path(option('--output-dir')).resolve() == exact(packet['Rust_result']).parent, 'actual fresh output directory differs')
+    sidecar = load(packet['Rust_execution_sidecar'])
+    need(sidecar['schema'] == 'src05-selected-main-thread-execution-custody.v1' and sidecar['Source_snapshot'] == source and equal_ref(sidecar['Source_preparation'], policy['Rust_source_preparation']), 'actual main-thread sidecar Source differs')
+    for name, row in [('actual_execution',packet['Rust_execution']),('actual_build_execution',packet['Rust_build_execution']),('actual_artifact_proof',packet['Rust_artifact_proof']),('actual_launcher_source',packet['Rust_launch_source']),('actual_output',packet['Rust_result'])]:
+        need(equal_ref(sidecar[name],row), 'actual sidecar join differs: ' + name)
+    need(sidecar['actual_argv'] == argv and sidecar['actual_Cargo_emitted_artifact'] == recorded_artifact and sidecar['actual_exit_code'] == 0 and sidecar['all_frozen_artifacts_unchanged'] is True, 'actual main execution/guards differ')
+    need(sidecar['execution_context'] == 'standalone-main-thread-no-FP-control-writes' and sidecar['historical_libtest_state_inferred'] is False and sidecar['numerical_PASS_claimed'] is False and sidecar['gates_updated'] is False, 'actual main context declarations differ')
+    for name in ['actual_input_before','actual_input_after']:
+        need(exact(sidecar[name]).read_bytes() == exact(packet['Rust_input']).read_bytes(), 'complete actual input before/after differs')
+    for name in ['actual_binary_before','actual_binary_after']:
+        need(exact(sidecar[name]) == binary and sidecar[name]['sha256'] == recorded_artifact['executable']['sha256'], 'complete actual executable before/after differs')
+    before = load(sidecar['actual_before'])
+    need(before['Source_snapshot'] == source and equal_ref(before['Source_preparation'],policy['Rust_source_preparation']) and equal_ref(before['policy'],packet['prospective_policy']) and before['actual_Cargo_command'] == command, 'pre-build frozen Source/command differs')
+    need(before['execution_context'] == sidecar['execution_context'] and before['historical_libtest_state_inferred'] is False, 'actual before context differs')
+    frozen = {row['path']:row for row in before['frozen_artifacts']}
+    after = {row['path']:row for row in sidecar['frozen_artifacts_after']}
+    need(len(frozen) == len(before['frozen_artifacts']) and len(after) == len(sidecar['frozen_artifacts_after']) and set(frozen) <= set(after), 'all original frozen artifacts must remain')
+    for name,row in after.items():
+        exact(row)
+        if name in frozen:
+            need(equal_ref(row,frozen[name]), 'frozen before/after artifact differs')
+    need(set(packet['quality_executions']) == {'fmt_check','clippy','focused','workspace'} and sidecar['quality_executions'] == before['quality_executions'] == packet['quality_executions'], 'four current quality roles/sidecars differ')
+    actual_quality_operands = []
+    for i,value in enumerate(outer['command']):
+        if value == '--quality':
+            actual_quality_operands.append(outer['command'][i+1])
+    need(len(actual_quality_operands) == 4, 'actual four quality operands required')
+    quality_operand_roles = set()
+    for value in actual_quality_operands:
+        role,token = value.split('=',1)
+        path,sha = token.rsplit('#',1)
+        need(role in packet['quality_executions'] and role not in quality_operand_roles, 'actual unique quality role required')
+        row = packet['quality_executions'][role]
+        need(Path(path).resolve() == exact(row) and sha == row['sha256'], 'actual quality operand differs')
+        quality_operand_roles.add(role)
+    for row in packet['quality_executions'].values():
+        q = receipt(row,policy['recorder_source'])
+        need(q['source_snapshot'] == source and q['finished_utc'] <= build['started_utc'], 'quality/current Source/chronology differs')
+    need(packet['Root_and_other_author_FULL_standalone_transport_Source_accepted'] is True and packet['Root_FULL_actual_main_entry_and_Cargo_artifact_review_accepted'] is True, 'independent Source/actual main artifact review required')
+
+
+'''
+pos = text.index('def array_rows(')
+text = text[:pos] + helper + text[pos:]
+(OUT / 'compare.py').write_text(text, encoding='utf-8', newline='\n')
+readme = '''# SRC-05 selected main-thread comparison (held custody-only successor)
+
+Comparer03 is archived unchanged. Every function from array_rows through main,
+plus scalar/literal/same/receipt/exact primitives, is byte-exact03. Only the Rust
+custody transport in custody is replaced and one main_thread_rust_custody helper
+is added. Native original capture/build/source/exit2 stop contracts are unchanged.
+The scalar policy, route classifications, full input/preowner joins, selected
+endpoint/point pairing and all required unavailable ledgers are unchanged.
+The historical libtest comparison and all three uncapped ledgers remain pinned.
+
+Root CLI remains `python -X utf8 -B compare.py --custody <path>#<SHA> --output-dir <fresh ignored SRC05 dir>`.
+Custody packet schema remains src05-surface-environment-comparison-custody.v1.
+Native refs and review bool are exactly inherited03 and reuse its actual baseline.
+Rust_result/Rust_execution/Rust_launch_execution/Rust_launch_source and
+Rust_execution_sidecar now bind the standalone-main-thread package launcher.
+Additional refs: Rust_build_execution, Rust_artifact_proof and
+actual_Runtime_Source_snapshot (exact standard recorder path+SHA descriptor).
+Four quality_executions must share actual full Source with build/target/outer and
+precede the actual build. No future Source hash or outcome is supplied here.
+actual_Rust_observer_sources is the exact ordered two public API rows with
+canonical_path and actual_final_source; those bytes equal the reviewed current
+SRC05 API pins and the compiled full Source snapshot. All current Source files,
+archives and ignored package/body/Cargo/lock/diff pins are fully authenticated.
+
+Root_and_other_author_FULL_standalone_transport_Source_accepted and
+Root_FULL_actual_main_entry_and_Cargo_artifact_review_accepted must be true.
+The standard recorder's sole Cargo-emitted executable, full stdout and immediate
+artifact proof must agree; exact argc3 input/output and complete exe/input
+before/after hashes are required. The actual launcher options/quality identities,
+outer-build-target chronology and preserved full frozen set are authenticated.
+
+No FP controls are set, queried or normalized. A new main-thread endpoint is a
+distinct observed context, never a repair/relabel of the old ignored libtest FAIL
+or a claim about the production CLI worker. Old Native/libtest data were already
+read for authorized factual QA. No new main-thread output exists/read at seal.
+All missing/malformed/stopped/nonfinite states retain original failure/noPASS
+semantics; no tolerance, input, scientific body, backend or gate changes.
+'''
+(OUT / 'README.md').write_text(readme, encoding='utf-8', newline='\n')
+for name in ['compare.py','policy.json','README.md']:
+    delta(OUT / 'before' / name, OUT / name, OUT / 'diffs' / (name + '.from03.diff'))
+old_ast = ast.parse(old)
+new_ast = ast.parse(text)
+old_functions = {n.name: ast.dump(n,include_attributes=False) for n in old_ast.body if isinstance(n,(ast.FunctionDef,ast.AsyncFunctionDef))}
+new_functions = {n.name: ast.dump(n,include_attributes=False) for n in new_ast.body if isinstance(n,(ast.FunctionDef,ast.AsyncFunctionDef))}
+assert set(new_functions) - set(old_functions) == {'main_thread_rust_custody'}
+assert all(new_functions[n] == value for n,value in old_functions.items() if n != 'custody')
+for name in ['array_rows','selected','pair','arithmetic_cell','endpoint_scalar','endpoint','compare','main']:
+    def source_function(code,name):
+        tree = ast.parse(code)
+        node = next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name == name)
+        return ''.join(code.splitlines(True)[node.lineno-1:node.end_lineno])
+    assert source_function(old,name) == source_function(text,name)
+ast.parse((PACKAGE / 'run_main_thread.py').read_text(encoding='utf-8'))
+manifest = {'schema':'src05-selected-surface-environment-comparison-Source-preparation.v1','status':'HELD-Source-only-unexecuted',
+    'own_sources_and_metadata':[ref(OUT/name) for name in ['compare.py','policy.json','README.md']],
+    'author':ref(Path(__file__)), 'accepted_parent':ref(OLD/'manifest.json'),
+    'before':[ref(p) for p in sorted((OUT/'before').iterdir())], 'exact_diffs':[ref(p) for p in sorted((OUT/'diffs').iterdir())],
+    'Rust_main_thread_preparation':ref(PACKAGE/'manifest.json'),
+    'selected_source_ranges':json.loads((OLD/'manifest.json').read_bytes())['selected_source_ranges'],
+    'reused_static_references':json.loads((OLD/'manifest.json').read_bytes()).get('reused_static_references',[]),
+    'unchanged_scientific_functions':[n for n in old_functions if n != 'custody'],
+    'new_target_outputs_read':False,'historical_baselines_read_for_factual_QA':True,
+    'scientific_policy_changed':False,'canonical_Sources_changed':False,'gates_updated':False}
+dump(OUT/'manifest.json',manifest)
+print(json.dumps({'main_thread_preparation':ref(PACKAGE/'manifest.json'),'comparison_preparation':ref(OUT/'manifest.json')}))

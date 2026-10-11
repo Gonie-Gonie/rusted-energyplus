@@ -1,0 +1,21 @@
+{
+  "schema": "src05-wind-pow-Root-full-Rust-provider-review.v1",
+  "inventory": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/inventory.json",
+    "sha256": "62a0fb7adf97950cfe2c3371c378412cd3d9966947babd575b56800eac22911f",
+    "size_bytes": 46468
+  },
+  "collector_execution": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Rust-build-02/collect-provider-command/receipt.json",
+    "sha256": "c560b2909ceb10dbc2badf6c1a309439c9c9840a2ee2b1d1696e725ddb651f6a",
+    "size_bytes": 3816
+  },
+  "full_PE_independently_recomputed_equal": true,
+  "all_current_Source_and_archives_rehashed": 3922,
+  "all_nine_full_map_extents_and_disassembled_bytes_equal_PE": 2384,
+  "actual_Cargo_JSON_artifact_equal": true,
+  "opaque_unwind_payload_not_claimed_interpreted": true,
+  "powf_map_extent_may_include_adjacent_shim": true,
+  "helper_executed": false,
+  "diagnostic_results_read": false
+}

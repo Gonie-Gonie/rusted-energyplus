@@ -1,0 +1,17 @@
+--- .runtime/porting/SRC-05/wind-pow-isolation-prep-01/before/provider-evidence/Rust-library-pow-symbols.txt
++++ .runtime/porting/SRC-05/wind-pow-isolation-prep-01/provider-evidence/Rust-library-pow-symbols.txt
+@@ -0,0 +1,14 @@
++C:\Users\GonieGonie\.rustup\toolchains\1.96.0-x86_64-pc-windows-gnu\lib\rustlib\x86_64-pc-windows-gnu\lib\self-contained\libmsvcrt.a:lib64_libmsvcrt_common_a-pow.o:0000000000000000 b .bss
++C:\Users\GonieGonie\.rustup\toolchains\1.96.0-x86_64-pc-windows-gnu\lib\rustlib\x86_64-pc-windows-gnu\lib\self-contained\libmsvcrt.a:lib64_libmsvcrt_common_a-pow.o:0000000000000000 d .data
++C:\Users\GonieGonie\.rustup\toolchains\1.96.0-x86_64-pc-windows-gnu\lib\rustlib\x86_64-pc-windows-gnu\lib\self-contained\libmsvcrt.a:lib64_libmsvcrt_common_a-pow.o:0000000000000000 p .pdata
++C:\Users\GonieGonie\.rustup\toolchains\1.96.0-x86_64-pc-windows-gnu\lib\rustlib\x86_64-pc-windows-gnu\lib\self-contained\libmsvcrt.a:lib64_libmsvcrt_common_a-pow.o:0000000000000000 r .rdata
++C:\Users\GonieGonie\.rustup\toolchains\1.96.0-x86_64-pc-windows-gnu\lib\rustlib\x86_64-pc-windows-gnu\lib\self-contained\libmsvcrt.a:lib64_libmsvcrt_common_a-pow.o:0000000000000000 t .text
++C:\Users\GonieGonie\.rustup\toolchains\1.96.0-x86_64-pc-windows-gnu\lib\rustlib\x86_64-pc-windows-gnu\lib\self-contained\libmsvcrt.a:lib64_libmsvcrt_common_a-pow.o:0000000000000000 r .xdata
++C:\Users\GonieGonie\.rustup\toolchains\1.96.0-x86_64-pc-windows-gnu\lib\rustlib\x86_64-pc-windows-gnu\lib\self-contained\libmsvcrt.a:lib64_libmsvcrt_common_a-pow.o:                 U __mingw_raise_matherr
++C:\Users\GonieGonie\.rustup\toolchains\1.96.0-x86_64-pc-windows-gnu\lib\rustlib\x86_64-pc-windows-gnu\lib\self-contained\libmsvcrt.a:lib64_libmsvcrt_common_a-pow.o:                 U __powi
++C:\Users\GonieGonie\.rustup\toolchains\1.96.0-x86_64-pc-windows-gnu\lib\rustlib\x86_64-pc-windows-gnu\lib\self-contained\libmsvcrt.a:lib64_libmsvcrt_common_a-pow.o:                 U _errno
++C:\Users\GonieGonie\.rustup\toolchains\1.96.0-x86_64-pc-windows-gnu\lib\rustlib\x86_64-pc-windows-gnu\lib\self-contained\libmsvcrt.a:lib64_libmsvcrt_common_a-pow.o:                 U exp2l
++C:\Users\GonieGonie\.rustup\toolchains\1.96.0-x86_64-pc-windows-gnu\lib\rustlib\x86_64-pc-windows-gnu\lib\self-contained\libmsvcrt.a:lib64_libmsvcrt_common_a-pow.o:0000000000000000 t internal_modf
++C:\Users\GonieGonie\.rustup\toolchains\1.96.0-x86_64-pc-windows-gnu\lib\rustlib\x86_64-pc-windows-gnu\lib\self-contained\libmsvcrt.a:lib64_libmsvcrt_common_a-pow.o:                 U ldexp
++C:\Users\GonieGonie\.rustup\toolchains\1.96.0-x86_64-pc-windows-gnu\lib\rustlib\x86_64-pc-windows-gnu\lib\self-contained\libmsvcrt.a:lib64_libmsvcrt_common_a-pow.o:                 U log2l
++C:\Users\GonieGonie\.rustup\toolchains\1.96.0-x86_64-pc-windows-gnu\lib\rustlib\x86_64-pc-windows-gnu\lib\self-contained\libmsvcrt.a:lib64_libmsvcrt_common_a-pow.o:00000000000000a0 T pow

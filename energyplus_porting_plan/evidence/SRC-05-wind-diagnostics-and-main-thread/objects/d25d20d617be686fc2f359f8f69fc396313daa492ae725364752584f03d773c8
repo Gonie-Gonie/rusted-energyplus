@@ -1,0 +1,121 @@
+{
+  "schema": "src05-selected-surface-environment-prospective-comparison-policy.v1",
+  "frozen_before_numerical_outputs_read": true,
+  "Native_source_preparation": {
+    "path": ".runtime/porting/SRC-05/native-surface-environment-prep-02/manifest.json",
+    "sha256": "ca915feec3d44f60bd64d102c9cbcc0cbb0b195ef1e3cc5d1db14785067056fd",
+    "size_bytes": 32654,
+    "line_count": 823
+  },
+  "Rust_source_preparation": {
+    "path": ".runtime/porting/SRC-05/surface-environment-main-thread-prep-01/manifest.json",
+    "sha256": "829ea2f54c4b1d9b4399e1566d5897bd37be2d53de7aa749e0c25549a41b09e2",
+    "size_bytes": 20058,
+    "line_count": 499
+  },
+  "literal_input_source": {
+    "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/input-only-cases.proposed.json",
+    "sha256": "0191a53ee11a1767a1b35023fcf5a3769e8c9df89c4d297847e3ed9d31cb4c15",
+    "size_bytes": 80365,
+    "line_count": 2866
+  },
+  "Native_observation_policy": {
+    "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/observation-policy.proposed.json",
+    "sha256": "f9420ff80690a61f9f85f14957a163d65a19cf326c2227770504712e371991b7",
+    "size_bytes": 1173,
+    "line_count": 38
+  },
+  "literal_case_count": 26,
+  "literal_operation_count": 30,
+  "input_policy": {
+    "exact_same_complete_literal_request_bytes": true,
+    "all_cases_operations_order_and_input_witnesses_required": true,
+    "all_default_producer_initial_selected_owners_and_literal_weather_join_before_any_endpoint": true,
+    "every_available_endpoint_requires_full_actual_selected_preowner_join": true,
+    "Native_unreached_or_throwing_stages_never_paired_or_counted_as_PASS": true,
+    "Rust_setters_are_independent_probes_not_an_ordinary_manager": true
+  },
+  "selected_parameters": [
+    "SiteTempGradient",
+    "WeatherFileTempModCoeff",
+    "SiteWindExp",
+    "SiteWindBLHeight",
+    "WeatherFileWindModCoeff"
+  ],
+  "selected_weather": [
+    "OutDryBulbTemp",
+    "OutWetBulbTemp",
+    "WindSpeed",
+    "WindDir"
+  ],
+  "full_all_surface_arrays": [
+    "SurfOutDryBulbTemp",
+    "SurfOutWetBulbTemp",
+    "SurfOutWindSpeed",
+    "SurfOutWindDir"
+  ],
+  "exact_discrete_owners": [
+    "case/op/stage/source-call order",
+    "actual input surface ID/name/order",
+    "ExtWind",
+    "allocation/length/bounds/full-tail completeness within each implementation",
+    "full source-stop/unreached ledger"
+  ],
+  "scalar_policy": {
+    "complete_scalar_DTO_and_decimal_bits_consistency_required": true,
+    "absolute_tolerance": 0,
+    "relative_tolerance": 0,
+    "IEEE_bits_exact": true,
+    "value_class_exact": true,
+    "signed_zero_exact": true,
+    "arithmetic_endpoint_must_be_finite": true,
+    "copied_or_retained_nonfinite_owners_keep_exact_payload_bits": true
+  },
+  "source_route_cell_profiles": {
+    "bulbs": "dry/wet are arithmetic iff SiteTempGradient != either signed zero; otherwise raw weather copies; all other cells retained",
+    "wind_speed": "arithmetic iff exponent nonzero, ExtWind true, not(centroid<=0); zero exponent raw weather copy; exposed centroid<=0 literal +0; NoWind retained",
+    "wind_direction": "raw literal weather copy on all rows; every other cell retained",
+    "point_helpers": "pair actual temperature/wind method returns only with reached matching setter cells; NoWind retained rows are never independent wind-point answers"
+  },
+  "required_unavailable_families_retained_no_PASS": [
+    "actual cold check/diagnostic backend/callback/error/EIO/console result",
+    "actual Native source-fatal stopped and unreached stages/operations",
+    "fresh Native constructor weather absent from Rust constructor input",
+    "EPVector/Objexx allocation implementation versus Rust Vec capacity",
+    "NoWind independently calculated point result where Native setter skips",
+    "ordinary manager traversal and quartet ownership/handoff"
+  ],
+  "Native_process_outcomes": {
+    "allowed_actual_exit_codes": [
+      0,
+      2
+    ],
+    "exit2_requires_complete_result_and_actual_OriginalFatalError_source_stop_ledger": true,
+    "process_exit_never_rewritten": true
+  },
+  "ledgers": {
+    "all_mismatches_unavailable_and_paired_boundaries": "uncapped complete NDJSON",
+    "first_mismatch_selection_or_sampling": false
+  },
+  "selected_status_does_not_complete_whole_SRC05_unit": true,
+  "whole_SRC05_unit_or_ordinary_manager_PASS_claimed": false,
+  "gates_updated": false,
+  "Native_results_read": false,
+  "Rust_results_read": false,
+  "recorder_source": {
+    "path": "tools/porting/record_command.py",
+    "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+    "size_bytes": 8453,
+    "line_count": 204
+  },
+  "standalone_main_thread_transport": {
+    "actual_main_entry_no_thread_spawn": true,
+    "FP_control_reads_or_writes": false,
+    "actual_full_current_Source_is_explicit_runtime_operand": true,
+    "same_quality_build_and_execution_Source_required": true,
+    "historical_libtest_FAIL_preserved": true,
+    "historical_thread_controls_or_cause_inferred": false,
+    "new_main_thread_results_read_before_seal": false,
+    "prior_Native_and_libtest_results_previously_read_for_factual_QA": true
+  }
+}

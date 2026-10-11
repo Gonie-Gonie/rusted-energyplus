@@ -1,0 +1,206 @@
+"""Root-only evidence publication of closed wind diagnostics and standalone selected main results."""
+import argparse
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import re
+import shutil
+
+ROOT = Path.cwd()
+OUT = ROOT / 'energyplus_porting_plan/evidence/SRC-05-wind-diagnostics-and-main-thread'
+SELECTED = {}
+SEEN = {}
+EXCLUDED = {'.exe', '.dll', '.obj', '.a', '.lib', '.map', '.epw', '.pdb'}
+RECORDER_SHA = '5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'
+
+
+def ref(path):
+    with path.open('rb') as stream: digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=digest, size_bytes=path.stat().st_size)
+
+
+def checked(row, retain=True):
+    path = (ROOT / row['path']).resolve()
+    assert path.is_relative_to(ROOT) and path.suffix.lower() not in EXCLUDED
+    actual = ref(path)
+    assert actual['sha256'] == row['sha256'] and ('size_bytes' not in row or actual['size_bytes'] == row['size_bytes'])
+    SEEN[path] = actual
+    if retain: SELECTED[path] = actual
+    return path
+
+
+def load(row):
+    return json.loads(checked(row).read_bytes())
+
+
+def operand(text):
+    path, digest = text.rsplit('#', 1)
+    return ref(checked(dict(path=path, sha256=digest)))
+
+
+def selected_refs(value):
+    if isinstance(value, dict):
+        if {'path', 'sha256', 'start_line', 'end_line', 'literal_archive'} <= value.keys():
+            literal = checked(value['literal_archive']).read_bytes()
+            assert hashlib.sha256(literal).hexdigest() == value['sha256'] and len(literal) == value['size_bytes']
+            if value['path'].startswith(('.runtime/', '.reference/', 'energyplus_porting_plan/evidence/')):
+                source = checked(ref((ROOT / value['path']).resolve())).read_bytes().splitlines(True)
+                start, end = value['start_line'], value['end_line']
+                assert type(start) is int and type(end) is int and 1 <= start <= end <= len(source)
+                assert b''.join(source[start - 1:end]) == literal
+            return
+        if 'path' in value and 'sha256' in value:
+            path = Path(value['path'])
+            if not path.is_absolute() and value['path'].startswith(('.runtime/', '.reference/', 'energyplus_porting_plan/evidence/')) and path.suffix.lower() not in EXCLUDED: checked(value)
+        else:
+            for child in value.values(): selected_refs(child)
+    elif isinstance(value, list):
+        for child in value: selected_refs(child)
+
+
+def receipt(row, snapshot=None, exit_code=None):
+    value = load(row)
+    assert value['schema'] == 'recorded-porting-command.v1' and value['finished_utc'] and value['launch_error'] is None
+    assert value['executed_launcher']['archive']['sha256'] == RECORDER_SHA
+    for key in ('stdout', 'stderr', 'source_snapshot'): checked(value[key])
+    checked(value['executed_launcher']['archive'])
+    if snapshot is not None: assert value['source_snapshot'] == snapshot and value['source_bytes_match_before_and_after'] is True
+    if exit_code is not None: assert value['exit_code'] == exit_code
+    return value
+
+
+def snapshot_rows(row):
+    value = load(row)
+    assert value['schema'] == 'rust-command-source-snapshot.v1' and value['bytes_normalized'] is False
+    rows = {item['historical_path']: item for item in value['files']}
+    assert len(rows) == len(value['files'])
+    for item in rows.values(): assert checked(item['archive'], retain=False).stat().st_size == item['size_bytes']
+    return rows
+
+
+def frozen_rows(before, after):
+    old = {row['path']: {key: row[key] for key in ('path', 'sha256', 'size_bytes')} for row in before}
+    new = {row['path']: {key: row[key] for key in ('path', 'sha256', 'size_bytes')} for row in after}
+    assert len(old) == len(before) and len(new) == len(after) and all(new.get(path) == row for path, row in old.items())
+    assert all(row.get('available', True) is True for row in after)
+    return len(old), len(new)
+
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--packet', required=True, help='Closed actual Root publication operands path#SHA256')
+args = parser.parse_args()
+packet_ref = operand(args.packet); packet = load(packet_ref)
+assert packet['schema'] == 'src05-wind-diagnostics-and-main-publication-inputs.v1' and not OUT.exists()
+comparison = load(packet['actual_comparison']); custody = load(comparison['actual_custody'])
+assert packet['actual_comparison']['sha256'] == 'b991b18b7b462c844649aef3e7d13cf28e519f8ae5364e8d099f715f182f2da9'
+assert comparison['schema'] == 'src05-selected-surface-environment-comparison.v1' and comparison['status'] == 'pass-available-selected-setters-only'
+assert comparison['mismatch_count'] == 0 and comparison['all_mismatches_and_unavailable_rows_retained_uncapped'] is True
+assert comparison['findings']['paired_available_setter_boundaries'] == 71 and comparison['required_unavailable_count'] == 102
+for key in ('cold_guard_backend_PASS_claimed', 'whole_SRC05_unit_or_ordinary_manager_PASS_claimed', 'gates_updated'): assert comparison[key] is False
+for row in comparison['ledgers'].values(): checked(row)
+unavailable = [json.loads(line) for line in checked(comparison['ledgers']['unavailable']).read_bytes().splitlines()]
+assert len(unavailable) == comparison['required_unavailable_count'] and all(row['counted_as_PASS'] is False for row in unavailable)
+main = load(custody['Rust_execution_sidecar']); before = load(main['actual_before'])
+assert main['schema'] == 'src05-selected-main-thread-execution-custody.v1' and main['actual_exit_code'] == 0 and main['all_frozen_artifacts_unchanged'] is True
+assert main['execution_context'] == 'standalone-main-thread-no-FP-control-writes' and main['historical_libtest_state_inferred'] is False and main['numerical_PASS_claimed'] is False and main['gates_updated'] is False
+main_counts = frozen_rows(before['frozen_artifacts'], main['frozen_artifacts_after'])
+snapshot = main['Source_snapshot']; source_rows = snapshot_rows(snapshot)
+assert snapshot == comparison['findings']['actual_Cargo_Source_snapshot'] and len(source_rows) == 3928
+assert before['Source_snapshot'] == snapshot and before['actual_input_before'] == main['actual_input_before']
+assert main['actual_input_before'] == main['actual_input_after'] == custody['Rust_input'] and main['actual_output'] == custody['Rust_result']
+assert checked(custody['Native_input']).read_bytes() == checked(custody['Rust_input']).read_bytes()
+artifact = load(main['actual_artifact_proof']); build = receipt(main['actual_build_execution'], snapshot, 0)
+execute = receipt(main['actual_execution'], snapshot, 0); outer = receipt(custody['Rust_launch_execution'], snapshot, 0)
+assert before['actual_Cargo_command'] == build['command'] and main['actual_execution'] == custody['Rust_execution']
+assert artifact['actual_build_execution'] == main['actual_build_execution'] == custody['Rust_build_execution'] and artifact['Source_snapshot'] == snapshot
+emitted = artifact['actual_Cargo_emitted_artifact']; message = emitted['cargo_message']
+assert emitted == main['actual_Cargo_emitted_artifact'] and emitted['executable'] == main['actual_binary_before'] == main['actual_binary_after'] == artifact['actual_binary_before']
+messages = [json.loads(line) for line in checked(artifact['actual_full_Cargo_JSON']).read_bytes().splitlines()]
+assert [row for row in messages if row.get('reason') == 'compiler-artifact' and row.get('target', {}).get('name') == 'src05_surface_environment_main' and row.get('executable')] == [message]
+assert message['target']['kind'] == ['bin'] and message['profile']['test'] is False and message['profile']['opt_level'] == '0' and message['profile']['debuginfo'] == 0
+assert main['actual_argv'] == artifact['actual_argv'] == execute['command'] and len(execute['command']) == 3 and build['finished_utc'] <= execute['started_utc']
+assert Path(execute['command'][0]).resolve() == (ROOT / emitted['executable']['path']).resolve() and Path(execute['command'][1]).resolve() == checked(custody['Rust_input']) and Path(execute['command'][2]).resolve() == checked(custody['Rust_result'])
+capture, = build['cargo_compiler_artifacts_capture']['rows']
+assert build['cargo_compiler_artifacts_capture']['status'] == 'pass' and capture['cargo_message'] == message and capture['executable']['sha256'] == emitted['executable']['sha256']
+for row in custody['actual_Rust_observer_sources']:
+    final = row['actual_final_source']; archived = source_rows[row['canonical_path']]; assert archived['archive']['sha256'] == final['sha256'] and archived['size_bytes'] == final['size_bytes']; checked(archived['archive'])
+root_review = load(packet['actual_main_Root_review']); header_review = load(packet['actual_main_Header_review'])
+assert root_review['actual_sidecar'] == header_review['actual_custody'] == custody['Rust_execution_sidecar'] and root_review['actual_outer_execution'] == header_review['actual_outer_execution'] == custody['Rust_launch_execution']
+assert root_review['Root_FULL_actual_main_entry_and_Cargo_artifact_review_accepted'] is True and header_review['verified']['actual_exit_zero'] is True and header_review['verified']['sole_actual_Cargo_JSON_compiler_artifact'] is True
+ce = receipt(packet['actual_comparison_execution'], snapshot, 0); command = ce['command']; comparer = load(packet['actual_comparer_preparation'])
+assert len(command) == 9 and command[1:4] == ['-X', 'utf8', '-B'] and command[5] == '--custody' and command[7] == '--output-dir'
+assert operand(command[6])['sha256'] == comparison['actual_custody']['sha256'] and (ROOT / command[8]).resolve() == checked(packet['actual_comparison']).parent
+assert ref((ROOT / command[4]).resolve())['sha256'] == comparer['own_sources_and_metadata'][0]['sha256'] and comparison['actual_prospective_policy']['sha256'] == comparer['own_sources_and_metadata'][1]['sha256']
+assert execute['finished_utc'] <= ce['started_utc'] and main['quality_executions'] == custody['quality_executions']
+preparation = load(main['Source_preparation']); quality = []
+assert list(main['quality_executions']) == ['fmt_check', 'clippy', 'focused', 'workspace']
+for role, row in main['quality_executions'].items():
+    value = receipt(row, snapshot, 0); assert value['command'] == preparation['runtime_interfaces']['required_quality_commands'][role] and value['finished_utc'] <= build['started_utc']
+    groups = re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored;', checked(value['stdout']).read_text(encoding='utf8'))
+    totals = [sum(int(group[i]) for group in groups) for i in range(3)]; assert totals[1] == 0
+    quality.append(dict(role=role, execution=row, actual_Source_snapshot=value['source_snapshot'], test_totals=totals, test_result_groups=len(groups)))
+diagnostic = load(packet['actual_diagnostic_comparison']); dr = load(packet['actual_diagnostic_Root_review'])
+assert packet['actual_diagnostic_comparison']['sha256'] == '0675fa1939d9b6231b9ed241053fd8a2017becc78f2bdf9b9ff328da4a597f8c' and dr['full_actual_ledger']['sha256'] == packet['actual_diagnostic_comparison']['sha256']
+assert diagnostic['schema'] == 'src05-wind-pow-exact-current-diagnostic-comparison.v1'
+for key in ('arithmetic_recomputed', 'controls_written', 'cause_established', 'historical_execution_controls_reconstructed', 'old_libtest_worker_identity_claimed', 'scientific_PASS_claimed', 'production_math_changed', 'gates_updated'): assert diagnostic[key] is False
+assert len(diagnostic['result_differences']) == diagnostic['result_difference_count'] and len(diagnostic['stage_control_field_differences']) == diagnostic['stage_control_field_difference_count'] and len(diagnostic['lane_control_field_differences']) == diagnostic['lane_control_field_difference_count']
+diagnostic_lanes = []; large = {checked(custody['Native_result']), checked(custody['Rust_result'])}
+assert [row['implementation'] for row in packet['diagnostic_lanes']] == ['Native', 'Rust']
+for lane in packet['diagnostic_lanes']:
+    dc = load(lane['actual_custody']); db = load(dc['actual_before']); factual = load(lane['actual_independent_review'])
+    assert dc['schema'] == 'src05-wind-pow-execution-custody.v1' and db['implementation'] == lane['implementation'] and dc['actual_target_exit_code'] == dc['actual_recorder_exit_code'] == 0 and dc['all_frozen_artifacts_unchanged'] is True
+    assert dc['scientific_PASS_claimed'] is False and dc['gates_updated'] is False
+    frozen_rows(db['frozen_artifacts'], dc['frozen_artifacts_after']); snapshot_rows(db['Source_snapshot'])
+    command = receipt(dc['actual_command_receipt'], db['Source_snapshot'], 0)
+    assert command['command'] == db['actual_argv'] and command['stdout']['sha256'] == diagnostic[lane['implementation'] + '_stdout']['sha256']
+    assert db['actual_input'] == diagnostic['frozen_identical_input'] and db['policy'] == diagnostic['frozen_policy']
+    assert factual['actual_custody'] == lane['actual_custody'] and factual['actual_execution'] == dc['actual_command_receipt'] and factual['scientific_PASS_claimed'] is False
+    receipt(factual['actual_outer_execution'], db['Source_snapshot'], 0)
+    approval = load(db['Root_provider_acceptance']); assert approval['accepted'] is True and approval['binary'] == db['actual_binary'] and approval['provider_proof'] == db['provider_proof'] and approval['Source_snapshot'] == db['Source_snapshot']
+    selected_refs(load(db['provider_proof'])); selected_refs(approval); selected_refs(load(db['Source_preparation']))
+    for key in ('actual_input', 'policy'): checked(db[key])
+    large.add(checked(command['stdout'])); diagnostic_lanes.append(dict(implementation=lane['implementation'], actual_custody=lane['actual_custody'], actual_independent_review=lane['actual_independent_review'], actual_Source_snapshot=db['Source_snapshot'], actual_execution=dc['actual_command_receipt']))
+historical = load(packet['historical_failed_comparison'])
+assert packet['historical_failed_comparison']['sha256'] == '627f2760a0ebb40532124fc3f504f6e3376bbb1064a1db5974d5a23192a1e640' and historical['mismatch_count'] == 3
+selected_refs(historical)
+receipt(custody['Native_build_execution']); receipt(custody['Native_execution'], comparison['findings']['actual_Native_Source_snapshot'], 2)
+for row in packet.get('closed_executions', []): receipt(row)
+for value in (comparison, custody, artifact, root_review, header_review, comparer, preparation, diagnostic, dr): selected_refs(value)
+for key in ('actual_launcher_source', 'Source_preparation', 'actual_input_before', 'actual_output'): checked(main[key])
+for row in packet.get('selected_source_preparations', []): selected_refs(load(row))
+for row in packet.get('opaque_lineage', []) + packet.get('prior_evidence', []): checked(row)
+SELECTED[Path(__file__).resolve()] = ref(Path(__file__).resolve())
+checked(dict(path='tools/porting/record_command.py', sha256=RECORDER_SHA))
+stored = {}
+for directory in (ROOT / 'energyplus_porting_plan/evidence').glob('*/objects'):
+    for path in directory.iterdir():
+        if path.is_file() and re.fullmatch('[0-9a-f]{64}', path.name): stored.setdefault(path.name, path)
+OUT.mkdir(); (OUT / 'objects').mkdir(); (OUT / 'observations').mkdir()
+objects = []
+for path, original in sorted(SELECTED.items()):
+    assert ref(path) == original
+    if path in large:
+        matches = sorted((ROOT / 'energyplus_porting_plan/evidence').glob('*/observations/' + original['sha256'] + '.json.gz'))
+        target = matches[0] if matches else OUT / 'observations' / (original['sha256'] + '.json.gz')
+        if not matches:
+            with path.open('rb') as source, target.open('xb') as output:
+                with gzip.GzipFile(filename='', fileobj=output, mode='wb', mtime=0) as compressed: shutil.copyfileobj(source, compressed)
+        digest = hashlib.sha256(); size = 0
+        with gzip.open(target, 'rb') as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b''): digest.update(chunk); size += len(chunk)
+        assert digest.hexdigest() == original['sha256'] and size == original['size_bytes']
+        objects.append(dict(original=original, stored=ref(target), encoding='gzip', complete_original_bytes_verified=True, reused=bool(matches)))
+    else:
+        target = stored.get(original['sha256'], OUT / 'objects' / original['sha256'])
+        if not target.exists(): shutil.copyfile(path, target)
+        actual = ref(target); assert actual['sha256'] == original['sha256'] and actual['size_bytes'] == original['size_bytes']
+        stored[original['sha256']] = target; objects.append(dict(original=original, stored=actual, reused=not target.is_relative_to(OUT)))
+assert all(ref(path) == row for path, row in SEEN.items())
+summary = dict(schema='src05-actual-wind-diagnostics-and-standalone-main-evidence.v1', actual_publication_packet=packet_ref,
+    actual_comparison=packet['actual_comparison'], actual_comparison_execution=packet['actual_comparison_execution'], actual_status=comparison['status'], actual_findings=comparison['findings'], actual_counts=comparison['counts'], actual_mismatch_count=comparison['mismatch_count'], required_unavailable_count=comparison['required_unavailable_count'], actual_ledgers=comparison['ledgers'], selected_available_setter_comparison_passed=True,
+    actual_main_execution_custody=custody['Rust_execution_sidecar'], actual_main_Root_review=packet['actual_main_Root_review'], actual_main_Header_review=packet['actual_main_Header_review'], actual_main_Cargo_artifact=main['actual_artifact_proof'], main_Source_snapshot=snapshot, main_frozen_before_after_counts=main_counts, actual_quality=quality,
+    actual_diagnostic_comparison=packet['actual_diagnostic_comparison'], actual_diagnostic_Root_review=packet['actual_diagnostic_Root_review'], diagnostic_lanes=diagnostic_lanes, diagnostic_literal_input_joins=diagnostic['literal_input_joins'], diagnostic_common_stages=diagnostic['common_stages'], diagnostic_result_difference_count=diagnostic['result_difference_count'], diagnostic_result_differences_by_lane=diagnostic['result_difference_counts_by_lane'], diagnostic_stage_control_difference_count=diagnostic['stage_control_field_difference_count'], diagnostic_lane_control_difference_count=diagnostic['lane_control_field_difference_count'], historical_failed_comparison=packet['historical_failed_comparison'], selected_objects=objects, opaque_lineage=packet.get('opaque_lineage', []), prior_evidence=packet.get('prior_evidence', []),
+    selected_closure_transitively_replayable=False, binary_payloads_retained=False, selected_result_full_bytes_retained=True, unavailable_counted_as_PASS=False, historical_libtest_worker_state_inferred=False, diagnostic_cause_established=False, production_worker_or_CLI_equivalence_PASS_claimed=False, cold_guard_or_full_error_backend_PASS_claimed=False, whole_SRC05_or_ordinary_Manager_PASS_claimed=False, production_math_changed=False, gates_updated=False, A_gate_count_unchanged='14/54', B_gate_count_unchanged='14/64', docs_updated=False)
+with (OUT / 'summary.json').open('x', encoding='utf8', newline='\n') as stream: json.dump(summary, stream, ensure_ascii=False, allow_nan=False, indent=2); stream.write('\n')
+print(json.dumps(dict(summary=ref(OUT / 'summary.json'), selected_objects=len(objects), actual_status=comparison['status'], docs_updated=False, gates_updated=False)))

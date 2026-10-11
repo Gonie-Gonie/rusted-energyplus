@@ -1,0 +1,24 @@
+{
+  "schema": "src05-wind-pow-Root-full-dry-review.v1",
+  "actual_delegated_dry_review": {
+    "path": ".runtime/porting/SRC-05/wind-pow-native-build-02/configure-and-dry-review.json",
+    "sha256": "2ed9b5e88eff7da68bcdd93eddc31a40ae4e73a844a1f9c3077c2dfbcb1b5f61",
+    "size_bytes": 17498
+  },
+  "frozen_build_inputs": {
+    "path": ".runtime/porting/SRC-05/wind-pow-native-build-02/frozen-build-inputs.json",
+    "sha256": "fa6922e71ad22e34a77f6b2d99d0e62995cc87bd4d1c820f66cf7fea7b8a193b",
+    "size_bytes": 40671
+  },
+  "Root_FULL_compile_prefix_and_link_suffix_review_accepted": true,
+  "all740prior_compile_rows_byte_exact": true,
+  "only_one_new_O0_TU_and_one_link_required": true,
+  "all_five_cache_changes_reviewed": true,
+  "all_frozen_Source_pins_full_hash_verified": true,
+  "actual_new_object_absent": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0\\CMakeFiles\\src05_wind_pow_helper.dir\\56a6ffe24c02b5e1a68a11333bb834d6\\.runtime\\porting\\SRC-05\\wind-pow-isolation-prep-01\\wind_pow_reference_helper.cpp.obj",
+  "actual_new_binary_absent": true,
+  "Root_and_other_author_FULL_Source_preparation_review_accepted": true,
+  "compile_performed": false,
+  "helper_executed": false,
+  "gates_updated": false
+}

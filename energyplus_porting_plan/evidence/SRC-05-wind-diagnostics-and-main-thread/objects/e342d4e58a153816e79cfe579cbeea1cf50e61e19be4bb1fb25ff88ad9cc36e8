@@ -1,0 +1,256 @@
+"""Read-only provider/PE collection from an already successful Cargo rustc build."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[3]
+TOOLS = ROOT / '.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin'
+sys.path.insert(0, str(ROOT / 'tools/porting'))
+import native_pe
+
+
+def full(path):
+    path = path.resolve()
+    with path.open('rb') as stream:
+        digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+    return {'path': path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else str(path),
+            'sha256': digest, 'size_bytes': path.stat().st_size}
+
+
+def location(value):
+    path = Path(value)
+    return path.resolve() if path.is_absolute() else (ROOT / path).resolve()
+
+
+def exact(row):
+    actual = full(location(row['path']))
+    assert actual['sha256'] == row['sha256']
+    assert 'size_bytes' not in row or actual['size_bytes'] == row['size_bytes']
+    return location(row['path'])
+
+
+def operand(value):
+    path, digest = value.rsplit('#', 1)
+    assert re.fullmatch('[0-9a-f]{64}', digest)
+    result = full(location(path))
+    assert result['sha256'] == digest
+    return result
+
+
+def read(row):
+    return json.loads(exact(row).read_bytes())
+
+
+def dump(path, value):
+    assert not path.exists()
+    path.write_text(json.dumps(value, ensure_ascii=False, allow_nan=False, indent=2) + '\n', encoding='utf8', newline='\n')
+
+
+parser = argparse.ArgumentParser(description=__doc__)
+for name in ['source-preparation', 'frozen-build-inputs', 'build-execution', 'binary', 'link-map']:
+    parser.add_argument('--' + name, required=True)
+parser.add_argument('--emitted-artifact-proof', required=True, help='Root immediate actual Cargo rustc artifact custody path#SHA')
+parser.add_argument('--output-dir', required=True)
+args = parser.parse_args()
+refs = {name: operand(getattr(args, name.replace('-', '_'))) for name in
+        ['source-preparation', 'frozen-build-inputs', 'build-execution', 'binary', 'link-map']}
+preparation = read(refs['source-preparation'])
+assert preparation['schema'] == 'src05-wind-pow-diagnostic-source-preparation.v1'
+assert preparation['production_math_changed'] is False and preparation['gates_updated'] is False
+frozen = read(refs['frozen-build-inputs'])
+assert frozen['schema'] == 'src05-wind-pow-Rust-frozen-build-inputs.v2'
+assert frozen['reviewed_Source_preparation']['sha256'] == refs['source-preparation']['sha256']
+pins = frozen['frozen_Source_and_input']
+assert isinstance(pins, list) and pins
+for row in pins:
+    exact(row)
+build = read(refs['build-execution'])
+assert build['schema'] == 'recorded-porting-command.v1' and build['exit_code'] == 0
+assert build['launch_error'] is None and build['source_bytes_match_before_and_after'] is True
+assert build['executed_launcher']['archive']['sha256'] == '5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'
+exact(build['executed_launcher']['archive'])
+assert build['source_snapshot'] == frozen['Source_snapshot']
+snapshot = read(build['source_snapshot'])
+assert snapshot['schema'] == 'rust-command-source-snapshot.v1' and snapshot['bytes_normalized'] is False
+source_before = []
+for row in snapshot['files']:
+    archive = full(exact(row['archive']))
+    actual = full(location(row['historical_path']))
+    assert actual['sha256'] == archive['sha256'] and actual['size_bytes'] == row['size_bytes']
+    source_before.append(actual)
+command = build['command']
+assert len(command) > 4 and command[1] == 'rustc'
+assert all(flag in command for flag in ['--locked', '--offline', '--message-format=json-render-diagnostics', '--manifest-path', '--bin', '--target-dir'])
+assert command[command.index('--bin') + 1] == 'src05_wind_pow_probe'
+manifest = exact(preparation['runtime_interfaces']['Rust_Cargo_manifest'])
+assert location(command[command.index('--manifest-path') + 1]) == manifest
+assert location(command[command.index('--target-dir') + 1]) == ROOT / 'target'
+assert command[-3:] == ['--', '-C', 'link-arg=-Wl,-Map,' + str(location(refs['link-map']['path'])).replace('\\', '/')]
+stdout, stderr = exact(build['stdout']), exact(build['stderr'])
+artifacts = []
+with stdout.open(encoding='utf8') as stream:
+    for line in stream:
+        if not line.strip():
+            continue
+        item = json.loads(line)
+        if item.get('reason') == 'compiler-artifact' and item.get('target', {}).get('name') == 'src05_wind_pow_probe':
+            artifacts.append(item)
+assert len(artifacts) == 1
+artifact = artifacts[0]
+assert artifact['target']['kind'] == ['bin'] and artifact['profile']['opt_level'] == '0'
+assert artifact['profile']['test'] is False and location(artifact['executable']) == exact(refs['binary'])
+assert location(artifact['target']['src_path']) == manifest.parent / 'src/main.rs'
+assert location(artifact['manifest_path']) == manifest
+proof = operand(args.emitted_artifact_proof)
+emitted = read(proof)
+assert emitted['schema'] == 'src05-wind-pow-actual-Cargo-rustc-artifact-custody.v1'
+for key, expected in [('actual_Cargo_execution', refs['build-execution']), ('actual_full_Cargo_JSON', build['stdout']),
+                      ('Source_snapshot', build['source_snapshot']), ('Source_preparation', refs['source-preparation']),
+                      ('frozen_build_inputs', refs['frozen-build-inputs']), ('actual_Rust_binary', refs['binary']),
+                      ('actual_full_link_map', refs['link-map'])]:
+    exact(emitted[key])
+    assert location(emitted[key]['path']) == location(expected['path']) and emitted[key]['sha256'] == expected['sha256']
+assert emitted['actual_Cargo_artifacts'] == [{'cargo_message': artifact, 'executable': refs['binary']}]
+assert emitted['all_Source_package_and_previous_hold_pins_match_after_build'] is True and emitted['target_executed'] is False
+exact(emitted['capture_source'])
+out = location(args.output_dir)
+assert out.is_relative_to(ROOT / '.runtime/porting/SRC-05') and not out.exists()
+out.mkdir(parents=True)
+
+
+def role(symbol):
+    if symbol in ['pow', 'log2l', 'exp2l', 'fegetround', '_fpreset']:
+        return symbol
+    if 'powf' in symbol and 'std' in symbol and 'f64' in symbol:
+        return 'f64_powf'
+    if 'ep_runtime' in symbol and 'surface_environment' in symbol:
+        if 'set_surface_wind_speeds' in symbol:
+            return 'ep_runtime_setter'
+        if 'wind_speed_at_height' in symbol:
+            return 'ep_runtime_point'
+    return None
+
+
+selected = {name: [] for name in ['f64_powf', 'pow', 'log2l', 'exp2l', 'fegetround', '_fpreset',
+                                 'ep_runtime_setter', 'ep_runtime_point']}
+section_re = re.compile(r'^\s+(\.text\S*)\s+(0x[0-9a-fA-F]+)\s+(0x[0-9a-fA-F]+)\s+(.+?)\s*$')
+continued_re = re.compile(r'^\s+(0x[0-9a-fA-F]+)\s+(0x[0-9a-fA-F]+)\s+(.+?)\s*$')
+symbol_re = re.compile(r'^\s+(0x[0-9a-fA-F]+)\s+(.+?)\s*$')
+section = pending = None
+literal_lines = []
+with exact(refs['link-map']).open(encoding='utf8', errors='strict') as stream:
+    for number, line in enumerate(stream, 1):
+        text = line.rstrip('\n')
+        match = section_re.match(text)
+        if match:
+            name, start, size, owner = match.groups()
+            section = dict(name=name, start=int(start, 16), size=int(size, 16), owner=owner,
+                           line_number=number, literal_line=text)
+            pending = None
+        elif re.match(r'^\s+\.text\S*\s*$', text):
+            pending = dict(name=text.strip(), name_line=text, name_line_number=number)
+        elif pending and (match := continued_re.match(text)):
+            start, size, owner = match.groups()
+            section = dict(pending, start=int(start, 16), size=int(size, 16), owner=owner,
+                           line_number=number, literal_line=text)
+            pending = None
+        match = symbol_re.match(text)
+        if not match or not section:
+            continue
+        address = int(match[1], 16)
+        in_section = section['start'] <= address < section['start'] + section['size']
+        if in_section:
+            for prior in (row for rows in selected.values() for row in rows):
+                if prior['owning_text_section'] == section and address > prior['address_integer']:
+                    prior['code_end'] = min(prior['code_end'], address)
+        name = role(match[2])
+        if name:
+            assert in_section
+            selected[name].append(dict(role=name, symbol=match[2], address=match[1], address_integer=address,
+                                       owning_text_section=dict(section), line_number=number, literal_line=text,
+                                       code_end=section['start'] + section['size']))
+            if 'name_line' in section:
+                literal_lines.append(f"{section['name_line_number']}: {section['name_line']}")
+            literal_lines.extend([f"{section['line_number']}: {section['literal_line']}", f'{number}: {text}'])
+assert all(len(selected[name]) == 1 for name in ['pow', 'log2l', 'exp2l', 'fegetround', '_fpreset'])
+assert selected['f64_powf'] and len({row['address_integer'] for row in selected['f64_powf']}) == len(selected['f64_powf'])
+assert all(len(selected[name]) <= 1 for name in ['ep_runtime_setter', 'ep_runtime_point'])
+providers = [row for rows in selected.values() for row in rows]
+(out / 'selected-map-lines.txt').write_text('\n'.join(literal_lines) + '\n', encoding='utf8', newline='\n')
+pe = native_pe.inspect(exact(refs['binary']))
+archives = {}
+tool_refs = {name: full(TOOLS / (name + '.exe')) for name in ['objdump', 'addr2line']}
+
+
+def inspect_tool(name, operands, stem):
+    argv = [str(exact(tool_refs[name])), *operands]
+    with (out / (stem + '.stdout.txt')).open('wb') as output, (out / (stem + '.stderr.txt')).open('wb') as errors:
+        result = subprocess.run(argv, cwd=ROOT, stdout=output, stderr=errors, check=False)
+    assert result.returncode == 0 and (out / (stem + '.stderr.txt')).stat().st_size == 0
+    return {'command': argv, 'exit_code': result.returncode, 'stdout': full(out / (stem + '.stdout.txt')),
+            'stderr': full(out / (stem + '.stderr.txt'))}
+
+
+for row in providers:
+    address, end = row['address_integer'], row['code_end']
+    rva = address - pe['image_base']
+    matches = [s for s in pe['sections'] if not s['debug'] and s['characteristics'] & 0x20000000
+               and s['rva'] <= rva and end - pe['image_base'] <= s['rva'] + s['raw_size']]
+    assert len(matches) == 1 and end > address
+    section = matches[0]
+    with exact(refs['binary']).open('rb') as stream:
+        stream.seek(section['raw_offset'] + rva - section['rva'])
+        code = stream.read(end - address)
+    assert len(code) == end - address
+    row['actual_PE_code_extent'] = dict(start=hex(address), end_exclusive=hex(end), size_bytes=len(code),
+                                        sha256=hashlib.sha256(code).hexdigest(), hex_bytes=code.hex())
+    row['disassembly'] = inspect_tool('objdump', ['-d', '--start-address=' + hex(address), '--stop-address=' + hex(end),
+                                                str(exact(refs['binary']))], row['role'] + '-' + format(address, 'x') + '-disassembly')
+    seen = {}
+    for line in exact(row['disassembly']['stdout']).read_text(encoding='utf8').splitlines():
+        match = re.match(r'^\s*([0-9a-fA-F]+):\s*\t((?:[0-9a-fA-F]{2}(?:\s+|$))+)', line)
+        if match:
+            start = int(match[1], 16)
+            for i, byte in enumerate(bytes.fromhex(match[2])):
+                assert start + i not in seen
+                seen[start + i] = byte
+    assert sorted(seen) == list(range(address, end)) and bytes(seen[i] for i in range(address, end)) == code
+    owner = row['owning_text_section']['owner']
+    match = re.fullmatch(r'(.+\.(?:a|rlib))\(([^()]*)\)', owner)
+    if match:
+        archive_path = location(match[1])
+        assert archive_path.is_file()
+        archives[str(archive_path)] = full(archive_path)
+        row['actual_owning_archive'] = archives[str(archive_path)]
+        row['actual_archive_member'] = match[2]
+    else:
+        row['actual_owning_archive'] = None
+        row['nonarchive_owner_retained_from_link_map'] = owner
+assert all(selected[name][0].get('actual_owning_archive') for name in ['pow', 'log2l', 'exp2l', 'fegetround', '_fpreset'])
+address_tool = inspect_tool('addr2line', ['-f', '-C', '-e', str(exact(refs['binary'])),
+                                       *[row['address'] for row in providers]], 'providers-addr2line')
+for row in [*refs.values(), *pins, *tool_refs.values(), *archives.values(), *source_before]:
+    exact(row)
+exact(proof)
+call = lambda parent, child: all(bool(re.search(r'\bcall\S*\s+' + format(selected[child][0]['address_integer'], 'x') + r'\s+<',
+                                              exact(row['disassembly']['stdout']).read_text(encoding='utf8'))) for row in selected[parent])
+result = {'schema': 'src05-wind-pow-Rust-linked-provider-inventory.v1', 'implementation': 'Rust',
+          'reviewed_Source_preparation': refs['source-preparation'], 'frozen_build_inputs': refs['frozen-build-inputs'],
+          'actual_build_execution': refs['build-execution'], 'actual_Cargo_compiler_artifact': artifact,
+          'Root_immediate_emitted_artifact_proof': proof, 'actual_Rust_binary': refs['binary'], 'actual_full_link_map': refs['link-map'],
+          'Source_snapshot': build['source_snapshot'], 'all_current_Source_files_rehashed': len(source_before),
+          'actual_address_bound_providers': providers, 'selected_map_lines': full(out / 'selected-map-lines.txt'),
+          'actual_PE_reader': full(ROOT / 'tools/porting/native_pe.py'), 'actual_PE': pe,
+          'actual_linked_archives': list(archives.values()), 'actual_read_only_tools': tool_refs,
+          'actual_provider_addr2line': address_tool, 'f64_powf_calls_selected_pow': call('f64_powf', 'pow'),
+          'selected_pow_calls_selected_log2l': call('pow', 'log2l'), 'selected_pow_calls_selected_exp2l': call('pow', 'exp2l'),
+          'all_disassembled_code_bytes_equal_actual_PE': True, 'full_input_Source_binary_map_archive_tool_hashes_match_before_after': True,
+          'actual_collector_source': full(Path(__file__)), 'helper_executed': False, 'diagnostic_results_read': False,
+          'historical_controls_reconstructed': False, 'production_math_changed': False, 'gates_updated': False,
+          'Root_FULL_provider_and_PE_review_pending': True}
+dump(out / 'inventory.json', result)
+print(json.dumps(full(out / 'inventory.json')))

@@ -1,0 +1,17 @@
+--- .runtime/porting/SRC-05/surface-environment-main-thread-prep-02/before/README.md
++++ .runtime/porting/SRC-05/surface-environment-main-thread-prep-02/README.md
+@@ -50,3 +50,14 @@
+ main PE stack reserve. Existing ordinary worker/stack failure evidence remains.
+ That separate observation context is not activated by this direct-setter package.
+ No new engine, numerical tolerance, backend implementation, or gate claim.
++
++
++Narrow02 binds each runtime quality receipt to its genuine intended argv. Roles
++cannot be satisfied by repeating one successful fmt receipt. Commands are exact
++existing SRC05 quality02: cargo fmt --all -- --check; clippy with CONFIGS/--locked/
++--workspace/--all-targets/--/-D warnings; focused test with CONFIGS/--locked/-p
++ep_runtime/--lib/heat_balance::; workspace test with CONFIGS/--locked/--workspace.
++Runtime full Source/chronology and four explicit receipt operands are preserved.
++Rust/Cargo/lock/body/local audit and all mathematical policy stay literal01.
++The actual Cargo manifest/main remain borrowed immutable01; only launcher02 is
++new. No build, observation, new output read or canonical mutation occurred.

@@ -1,0 +1,18 @@
+--- before/README.md
++++ proposed/README.md
+@@ -0,0 +1,15 @@
++# Reviewed wind diagnostic execution custody
++
++This unexecuted driver launches one reviewed implementation through the existing recorder. It neither builds nor parses diagnostic results. All commands preserve the fixed input and prospective policy, and carry no scientific PASS or gate claim. Native uses argc2; Rust uses argc3 with the actual full input SHA.
++
++Runtime operands are `--implementation Native|Rust --binary <path>#<sha256> --provider-review <path>#<sha256> --preparation <path>#<sha256> --output-dir <fresh ignored SRC-05 directory>`. Root supplies its actual approval packet only after its full provider/PE review. Preparation is reviewed02 for Native or lock-only03 for Rust; their actual identities are runtime operands rather than future hashes.
++
++The approval schema is `src05-wind-pow-Root-provider-acceptance.v1`, with `implementation`, full `binary`, full `provider_proof`, `accepted:true`, `Source_snapshot`, `Source_preparation`, optional full `link_map`, and Rust-only `actual_Cargo_execution`. Every reference is authenticated; implementation, binary and preparation must match the CLI. The actual Source snapshot must be5660999c, with complete current membership and all raw bytes verified. Root's packet records prior review; this driver does not replace provider or PE analysis.
++
++Rust requires the actual successful same-Source `cargo rustc --locked --manifest-path ... --message-format=json-render-diagnostics` receipt. It independently reads full Cargo JSON and binds the sole matching `src05_wind_pow_probe` binary artifact and literal main path. The existing recorder honestly reports artifact capture not requested for `cargo rustc`; the new before-record retains this independently extracted message and its actual executable hash.
++
++Native requires the full accepted map. Its PATH prepends only the authentic Winlibs GCC13.2 bin directory to the complete inherited PATH. The three DLL operands and hashes come from the already genuine R Native custody record64c0bcf5, and all three receive new before/after checks. Rust preserves its complete inherited PATH. Neither lane changes floating-point controls.
++
++Before launch the driver retains exact argv, approval/proof/preparation/policy/input/binary/map/Cargo/PATH/DLL references and the full frozen artifact list. This includes the driver, recorder, all preparation-owned files and directly referenced source files, every canonical Source member and its archive. The child recorder retains actual exit/full stdout/stderr and its complete same-Source snapshot. After return the driver rehashes every frozen artifact, repeats complete canonical membership, writes custody even for a nonzero actual target exit or a missing child receipt, then rejects any custody failure. A nonzero target exit remains nonzero. A driver/interpreter failure is retained by Root's external recorder and never implies completion.
++
++Only fresh ignored output files are written at runtime. This hold has not been executed, imported, built or used to read numerical results. There are no canonical changes, policy changes, new tolerances, comparisons or reference answers.

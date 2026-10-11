@@ -1,0 +1,47 @@
+
+C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\target\debug\src05_wind_pow_probe.exe:     file format pei-x86-64
+
+
+Disassembly of section .text:
+
+0000000140f9b680 <log2l>:
+   140f9b680:	dd 05 ea ff ff ff    	fldl   -0x16(%rip)        # 140f9b670 <one>
+   140f9b686:	db 2a                	fldt   (%rdx)
+   140f9b688:	d9 e5                	fxam
+   140f9b68a:	df e0                	fnstsw %ax
+   140f9b68c:	d9 c0                	fld    %st(0)
+   140f9b68e:	9e                   	sahf
+   140f9b68f:	72 37                	jb     140f9b6c8 <log2l+0x48>
+   140f9b691:	d8 e2                	fsub   %st(2),%st
+   140f9b693:	d9 c0                	fld    %st(0)
+   140f9b695:	d9 e1                	fabs
+   140f9b697:	dc 1d db ff ff ff    	fcompl -0x25(%rip)        # 140f9b678 <limit>
+   140f9b69d:	df e0                	fnstsw %ax
+   140f9b69f:	80 e4 45             	and    $0x45,%ah
+   140f9b6a2:	74 12                	je     140f9b6b6 <log2l+0x36>
+   140f9b6a4:	dd d9                	fstp   %st(1)
+   140f9b6a6:	d9 f9                	fyl2xp1
+   140f9b6a8:	48 89 c8             	mov    %rcx,%rax
+   140f9b6ab:	48 c7 41 08 00 00 00 	movq   $0x0,0x8(%rcx)
+   140f9b6b2:	00 
+   140f9b6b3:	db 39                	fstpt  (%rcx)
+   140f9b6b5:	c3                   	ret
+   140f9b6b6:	dd d8                	fstp   %st(0)
+   140f9b6b8:	d9 f1                	fyl2x
+   140f9b6ba:	48 89 c8             	mov    %rcx,%rax
+   140f9b6bd:	48 c7 41 08 00 00 00 	movq   $0x0,0x8(%rcx)
+   140f9b6c4:	00 
+   140f9b6c5:	db 39                	fstpt  (%rcx)
+   140f9b6c7:	c3                   	ret
+   140f9b6c8:	7a c7                	jp     140f9b691 <log2l+0x11>
+   140f9b6ca:	dd d9                	fstp   %st(1)
+   140f9b6cc:	dd d9                	fstp   %st(1)
+   140f9b6ce:	48 89 c8             	mov    %rcx,%rax
+   140f9b6d1:	48 c7 41 08 00 00 00 	movq   $0x0,0x8(%rcx)
+   140f9b6d8:	00 
+   140f9b6d9:	db 39                	fstpt  (%rcx)
+   140f9b6db:	c3                   	ret
+   140f9b6dc:	90                   	nop
+   140f9b6dd:	90                   	nop
+   140f9b6de:	90                   	nop
+   140f9b6df:	90                   	nop

@@ -1,0 +1,26 @@
+--- .runtime/porting/SRC-05/surface-environment-main-thread-prep-02/before/run_main_thread.py
++++ .runtime/porting/SRC-05/surface-environment-main-thread-prep-02/run_main_thread.py
+@@ -9,6 +9,12 @@
+ ROOT = Path(__file__).resolve().parents[4]
+ SEEN = {}
+ CONFIGS = ['--config', 'profile.dev.debug=0', '--config', 'profile.test.debug=0', '--config', 'build.incremental=false']
++QUALITY_COMMANDS = {
++    'fmt_check': ['cargo', 'fmt', '--all', '--', '--check'],
++    'clippy': ['cargo', 'clippy'] + CONFIGS + ['--locked', '--workspace', '--all-targets', '--', '-D', 'warnings'],
++    'focused': ['cargo', 'test'] + CONFIGS + ['--locked', '-p', 'ep_runtime', '--lib', 'heat_balance::'],
++    'workspace': ['cargo', 'test'] + CONFIGS + ['--locked', '--workspace'],
++}
+ 
+ 
+ def need(value, message):
+@@ -89,8 +95,8 @@
+         need(role not in quality, 'duplicate quality role')
+         quality[role] = operand(value)
+     need(set(quality) == {'fmt_check', 'clippy', 'focused', 'workspace'}, 'four exact quality roles required')
+-    for row in quality.values():
+-        recorded(row, source, recorder)
++    for role, row in quality.items():
++        need(recorded(row, source, recorder)['command'] == QUALITY_COMMANDS[role], 'actual quality command differs: ' + role)
+     output = (ROOT / args.output_dir).resolve()
+     need(output.is_relative_to(ROOT / '.runtime/porting/SRC-05') and not output.exists(), 'fresh ignored output directory required')
+     output.mkdir(parents=True)

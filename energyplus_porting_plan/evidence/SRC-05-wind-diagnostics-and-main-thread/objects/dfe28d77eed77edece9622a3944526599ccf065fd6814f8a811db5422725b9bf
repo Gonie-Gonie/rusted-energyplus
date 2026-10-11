@@ -1,0 +1,22 @@
+{
+  "schema": "src05-wind-pow-Root-full-linked-inventory-review.v1",
+  "inventory": {
+    "path": ".runtime/porting/SRC-05/wind-pow-native-build-02/linked-provider-and-PE-inventory.json",
+    "sha256": "a969ae89e55211d93c51082627053e483bb4bff5a83de1c160bf700d8986808a",
+    "size_bytes": 25792
+  },
+  "all_frozen_Source_and_input_pins_verified": true,
+  "all_actual_receipts_and_exact_dry_compile_link_commands_verified": true,
+  "all_selected_actual_map_lines_verified": 14,
+  "full_PE_independently_recomputed_equal": true,
+  "PE_sections": 20,
+  "opaque_handler_records_preserved_without_complete_pointer_claim": 13982,
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/56/5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548",
+    "sha256": "5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548"
+  },
+  "descriptors_verified": 125,
+  "provider_disassembly_review_still_pending": true,
+  "target_executed": false,
+  "gates_updated": false
+}

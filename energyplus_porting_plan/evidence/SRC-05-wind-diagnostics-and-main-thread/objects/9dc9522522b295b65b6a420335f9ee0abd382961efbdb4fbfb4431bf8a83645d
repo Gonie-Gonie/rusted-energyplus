@@ -1,0 +1,57 @@
+--- .runtime/porting/SRC-05/surface-environment-main-thread-prep-01/before/selected_reference.rs
++++ .runtime/porting/SRC-05/surface-environment-main-thread-prep-01/rust/src/main.rs
+@@ -1,5 +1,6 @@
+-//! Ignored input-only observer of the real selected setter APIs.
+-use super::*;
++//! Standalone main-thread input-only observation of the genuine public setter APIs.
++use ep_model::Terrain;
++use ep_runtime::heat_balance::convection::surface_environment::*;
+ use serde_json::{Value, json};
+ use std::collections::BTreeSet;
+ use std::fs::{self, OpenOptions};
+@@ -292,14 +293,7 @@
+         "actual_point_helper_call_count":point_call_count,"cold_check_or_backend_invoked":false,"ordinary_production_handoff_verified":false,"numerical_PASS_claimed":false}),
+     )
+ }
+-fn observe() -> Result<(), String> {
+-    let input_path = std::path::PathBuf::from(
+-        std::env::var_os("SRC05_REFERENCE_INPUT").ok_or("Root-recorded input operand required")?,
+-    );
+-    let output_path = std::path::PathBuf::from(
+-        std::env::var_os("SRC05_REFERENCE_OUTPUT")
+-            .ok_or("Root-recorded fresh output operand required")?,
+-    );
++fn observe(input_path: std::path::PathBuf, output_path: std::path::PathBuf) -> Result<(), String> {
+     let bytes = fs::read(&input_path).map_err(|e| e.to_string())?;
+     let request: Value = serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+     keys(
+@@ -341,7 +335,7 @@
+         .canonicalize()
+         .map_err(|e| e.to_string())?;
+     let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+-        .join("../..")
++        .join("../../../../..")
+         .canonicalize()
+         .map_err(|e| e.to_string())?;
+     let runtime_root = root
+@@ -364,8 +358,15 @@
+     }
+     Ok(())
+ }
+-#[test]
+-#[ignore = "Root-only literal input observation with full Source/environment custody"]
+-fn observe_literal_surface_environment_setters() -> Result<(), String> {
+-    observe()
+-}
++fn main() {
++    let args = std::env::args_os().skip(1).collect::<Vec<_>>();
++    let result = if args.len() == 2 {
++        observe(std::path::PathBuf::from(&args[0]), std::path::PathBuf::from(&args[1]))
++    } else {
++        Err("literal input and fresh output paths required".to_string())
++    };
++    if let Err(error) = result {
++        eprintln!("{error}");
++        std::process::exit(2);
++    }
++}

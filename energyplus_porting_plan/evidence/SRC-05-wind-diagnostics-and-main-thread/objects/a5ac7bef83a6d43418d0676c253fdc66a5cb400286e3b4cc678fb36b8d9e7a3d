@@ -1,0 +1,135 @@
+{
+  "schema": "src05-wind-pow-Native-independent-factual-review.v1",
+  "status": "ACCEPTED diagnostic capture custody and completeness; no scientific PASS",
+  "actual_custody": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Native-observation-01/custody.json",
+    "sha256": "856783eb0f4831f2adf66a7b11078cc02f2e5c5f8910d6bbf49c51c6a2569681",
+    "size_bytes": 2146719
+  },
+  "actual_execution": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Native-observation-01/command/receipt.json",
+    "sha256": "16927da16e7d5aa53f287ba64040f123340f6d91234d1096fbb3c4c79314b88c",
+    "size_bytes": 2847
+  },
+  "actual_outer_execution": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Native-execution-driver-command-01/receipt.json",
+    "sha256": "851c3f28b1cc0c8ca4045b73695f1c3446aefd8af854d4c884b994f61bd54d91",
+    "size_bytes": 3373
+  },
+  "actual_stdout": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Native-observation-01/command/stdout.log",
+    "sha256": "11710991a1049ec487072cdb035485cdf634944d72b08d03ecabb5b916ae4da6",
+    "size_bytes": 146792
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/56/5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548",
+    "sha256": "5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548"
+  },
+  "Source_preparation": {
+    "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-02/manifest.json",
+    "sha256": "193ea67ee3d7c2681ca5b799078659934330e28bbfd87afb2a895805f8f58939",
+    "size_bytes": 38345
+  },
+  "Root_provider_acceptance": {
+    "path": ".runtime/porting/SRC-05/wind-pow-native-build-02/Root-provider-acceptance.json",
+    "sha256": "f8b5bb6a540a285500e8d504277c54f1944967436f922a0a785ad2ae76f83b3a",
+    "size_bytes": 1814
+  },
+  "provider_proof": {
+    "path": ".runtime/porting/SRC-05/wind-pow-native-build-02/actual-link-custody-review.json",
+    "sha256": "9c285d17fecfce9ef76d7b6b71ad07467513ff04109712567e5562b95cda4cc3",
+    "size_bytes": 4571
+  },
+  "verified_unique_full_files": 7915,
+  "frozen_artifact_rows": 7868,
+  "canonical_Source_members": 3922,
+  "all_current_and_archived_Source_bytes_exact": true,
+  "all_frozen_before_after_and_current_full_hashes_exact": true,
+  "actual_argv_and_literal_PATH_exact": true,
+  "DLLs_full_before_after": 3,
+  "provider_receipts_before_execution": 11,
+  "literal_cases": 25,
+  "actual_case_lane_rows": 50,
+  "literal_binary64_input_joins": 250,
+  "actual_stages": 300,
+  "scalar_bit_class_and_JSON_value_checks": {
+    "finite": 212,
+    "positive_zero": 32,
+    "negative_zero": 16,
+    "nan": 18,
+    "positive_infinity": 22
+  },
+  "control_snapshots": 604,
+  "actual_control_values": {
+    "x87_control_word": [
+      895
+    ],
+    "MXCSR": [
+      8064,
+      8096,
+      8098,
+      8099,
+      8103
+    ],
+    "c_fegetround": [
+      0
+    ],
+    "x87_rounding_control_bits": [
+      0
+    ],
+    "SSE_rounding_control_bits": [
+      0
+    ]
+  },
+  "stage_control_snapshot_changes": {
+    "fac": 2,
+    "Z_pow_exponent": 2,
+    "Native_SetSurfaceWindSpeedAt": 2,
+    "BL_pow_negative_exponent": 2
+  },
+  "lane_entry_exit_controls": [
+    {
+      "lane": "main_thread",
+      "entry": {
+        "MXCSR": 8064,
+        "SSE_rounding_control_bits": 0,
+        "c_fegetround": 0,
+        "x87_control_word": 895,
+        "x87_rounding_control_bits": 0
+      },
+      "exit": {
+        "MXCSR": 8103,
+        "SSE_rounding_control_bits": 0,
+        "c_fegetround": 0,
+        "x87_control_word": 895,
+        "x87_rounding_control_bits": 0
+      }
+    },
+    {
+      "lane": "std_thread_spawn",
+      "entry": {
+        "MXCSR": 8064,
+        "SSE_rounding_control_bits": 0,
+        "c_fegetround": 0,
+        "x87_control_word": 895,
+        "x87_rounding_control_bits": 0
+      },
+      "exit": {
+        "MXCSR": 8103,
+        "SSE_rounding_control_bits": 0,
+        "c_fegetround": 0,
+        "x87_control_word": 895,
+        "x87_rounding_control_bits": 0
+      }
+    }
+  ],
+  "current_main_worker_stage_bit_differences": [],
+  "historical_thread_controls_available": false,
+  "diagnostic_stages_are_Original_internal_locals": false,
+  "arithmetic_recomputed": false,
+  "Native_Rust_comparison_performed": false,
+  "scientific_PASS_claimed": false,
+  "production_math_changed": false,
+  "gates_updated": false,
+  "authorship_limit": "Header authored the execution custody driver. This factual review independently verifies Root execution and Raw Native protocol/results. Base supplied the independent Source peer of the execution driver."
+}

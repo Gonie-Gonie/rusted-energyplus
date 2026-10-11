@@ -1,0 +1,60 @@
+"""Prepare actual closed publication operands only; never invoke publisher or a target."""
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+BASE = '.runtime/porting/SRC-05/'
+
+def ref(name):
+    path = ROOT / name
+    data = path.read_bytes()
+    return dict(path=name, sha256=hashlib.sha256(data).hexdigest(), size_bytes=len(data))
+
+def src(name):
+    return ref(BASE + name)
+
+def closed(name):
+    row = src(name); value = json.loads((ROOT / row['path']).read_bytes())
+    assert value['schema'] == 'recorded-porting-command.v1' and value['finished_utc'] and value['launch_error'] is None
+    assert value['executed_launcher']['archive']['sha256'] == '5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'
+    return row
+
+packet = dict(schema='src05-wind-diagnostics-and-main-publication-inputs.v1',
+    actual_comparison=src('selected-main-thread-comparison-01/comparison.json'),
+    actual_comparison_execution=closed('selected-main-thread-comparison-command-01/receipt.json'),
+    actual_comparer_preparation=src('surface-environment-selected-comparison-prep-05/manifest.json'),
+    actual_main_Root_review=src('selected-main-thread-observation-01/Root-full-main-artifact-review.json'),
+    actual_main_Header_review=src('Header-main-thread-factual-review-01/review.json'),
+    actual_diagnostic_comparison=src('wind-pow-independent-diagnostic-comparison-01/comparison.json'),
+    actual_diagnostic_Root_review=src('wind-pow-independent-diagnostic-comparison-01/Root-full-ledger-review.json'),
+    historical_failed_comparison=src('selected-comparison-02/comparison.json'),
+    diagnostic_lanes=[dict(implementation=implementation,
+        actual_custody=src('wind-pow-'+implementation+'-observation-01/custody.json'),
+        actual_independent_review=src('wind-pow-'+implementation+'-independent-factual-review-01/review.json'))
+        for implementation in ('Native', 'Rust')],
+    selected_source_preparations=[src(name+'/manifest.json') for name in (
+        'wind-diagnostics-publication-prep-01', 'surface-environment-main-thread-prep-02',
+        'surface-environment-selected-comparison-prep-05', 'wind-pow-execution-prep-01',
+        'wind-pow-isolation-prep-02', 'wind-pow-isolation-prep-03')],
+    closed_executions=[closed(name+'/receipt.json') for name in (
+        'selected-main-thread-driver-command-01', 'selected-main-thread-observation-01/Cargo-command',
+        'selected-main-thread-observation-01/command', 'wind-pow-Native-execution-driver-command-01',
+        'wind-pow-Rust-execution-driver-command-01', 'wind-pow-Rust-build-02/Cargo-command',
+        'wind-pow-Rust-build-01/Cargo-command', 'selected-comparison-command-01', 'selected-comparison-command-02')],
+    opaque_lineage=[src(name) for name in (
+        'wind-pow-native-build-02/Root-provider-acceptance.json', 'wind-pow-native-build-02/Root-full-linked-inventory-review.json',
+        'wind-pow-native-build-02/actual-link-custody-review.json', 'wind-pow-Rust-provider-review-01/Root-provider-acceptance.json',
+        'wind-pow-Rust-provider-review-01/Root-full-provider-review.json', 'wind-pow-Rust-provider-review-01/inventory.json',
+        'selected-observation-01/Root-full-baseline-review.json', 'native-factual-review-01/review.json',
+        'selected-main-thread-observation-01/before.json', 'selected-main-thread-observation-01/custody.json',
+        'prepare-wind-diagnostics-publication-inputs-01.py')],
+    prior_evidence=[ref('energyplus_porting_plan/evidence/'+name+'/summary.json') for name in (
+        'SRC-05-surface-environment', 'SYS-03-round-format', 'SYS-03-ordinary-warmup-report')])
+assert packet['actual_comparison']['sha256'] == 'b991b18b7b462c844649aef3e7d13cf28e519f8ae5364e8d099f715f182f2da9'
+assert packet['actual_diagnostic_comparison']['sha256'] == '0675fa1939d9b6231b9ed241053fd8a2017becc78f2bdf9b9ff328da4a597f8c'
+assert packet['historical_failed_comparison']['sha256'] == '627f2760a0ebb40532124fc3f504f6e3376bbb1064a1db5974d5a23192a1e640'
+path = ROOT / (BASE + 'wind-diagnostics-publication-inputs-01.json')
+with path.open('x', encoding='utf8', newline='\n') as stream:
+    json.dump(packet, stream, ensure_ascii=False, indent=2); stream.write('\n')
+print(json.dumps(dict(packet=ref(path.relative_to(ROOT).as_posix()), author=src('prepare-wind-diagnostics-publication-inputs-01.py'), publisher_executed=False)))

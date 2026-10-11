@@ -1,0 +1,535 @@
+--- .runtime/porting/SRC-05/wind-pow-isolation-prep-01/before/input-only.json
++++ .runtime/porting/SRC-05/wind-pow-isolation-prep-01/input-only.json
+@@ -0,0 +1,532 @@
++{
++  "schema": "src05-wind-pow-diagnostic-request.v1",
++  "expected_values_supplied": false,
++  "diagnostic_only": true,
++  "cases": [
++    {
++      "case_id": "terrain-country-preoperands",
++      "purpose": "Released equal preoperands; height10 differs from boundary-layer270, no endpoint supplied",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff96191914cb607"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3fc1eb851eb851ec"
++        },
++        "Centroid_z": {
++          "bits": "4024000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "wind-positive-zero",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "0000000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3fc1eb851eb851ec"
++        },
++        "Centroid_z": {
++          "bits": "4024000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "wind-negative-zero",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "8000000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3fc1eb851eb851ec"
++        },
++        "Centroid_z": {
++          "bits": "4024000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "wind-negative",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "c010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3fc1eb851eb851ec"
++        },
++        "Centroid_z": {
++          "bits": "4024000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "height-positive-zero",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3fc1eb851eb851ec"
++        },
++        "Centroid_z": {
++          "bits": "0000000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "height-negative-zero",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3fc1eb851eb851ec"
++        },
++        "Centroid_z": {
++          "bits": "8000000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "height-negative-fractional-domain",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3fc1eb851eb851ec"
++        },
++        "Centroid_z": {
++          "bits": "c024000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "height-positive-subnormal",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3fc1eb851eb851ec"
++        },
++        "Centroid_z": {
++          "bits": "0000000000000001"
++        }
++      }
++    },
++    {
++      "case_id": "height-positive-infinity",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3fc1eb851eb851ec"
++        },
++        "Centroid_z": {
++          "bits": "7ff0000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "height-quiet-nan",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3fc1eb851eb851ec"
++        },
++        "Centroid_z": {
++          "bits": "7ff8000000000042"
++        }
++      }
++    },
++    {
++      "case_id": "boundary-positive-zero",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "0000000000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3fc1eb851eb851ec"
++        },
++        "Centroid_z": {
++          "bits": "4024000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "boundary-negative-zero",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "8000000000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3fc1eb851eb851ec"
++        },
++        "Centroid_z": {
++          "bits": "4024000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "boundary-negative-fractional-domain",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "c070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3fc1eb851eb851ec"
++        },
++        "Centroid_z": {
++          "bits": "4024000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "boundary-one",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3fc1eb851eb851ec"
++        },
++        "Centroid_z": {
++          "bits": "4024000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "exponent-positive-zero",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "0000000000000000"
++        },
++        "Centroid_z": {
++          "bits": "4024000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "exponent-negative-zero",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "8000000000000000"
++        },
++        "Centroid_z": {
++          "bits": "4024000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "exponent-half",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3fe0000000000000"
++        },
++        "Centroid_z": {
++          "bits": "4024000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "exponent-one",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3ff0000000000000"
++        },
++        "Centroid_z": {
++          "bits": "4024000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "exponent-two-negative-height",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "4000000000000000"
++        },
++        "Centroid_z": {
++          "bits": "c024000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "exponent-minus-one",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "bff0000000000000"
++        },
++        "Centroid_z": {
++          "bits": "4024000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "exact-powers-of-two",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4000000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3fe0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070000000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3fd0000000000000"
++        },
++        "Centroid_z": {
++          "bits": "4030000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "modifier-positive-zero",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "0000000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3fc1eb851eb851ec"
++        },
++        "Centroid_z": {
++          "bits": "4024000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "modifier-negative-zero",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "8000000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3fc1eb851eb851ec"
++        },
++        "Centroid_z": {
++          "bits": "4024000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "wind-largest-finite",
++      "purpose": "Independent Source-chosen diagnostic operands, not ordinary admission or expected answers",
++      "operands": {
++        "WindSpeed": {
++          "bits": "7fefffffffffffff"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff0000000000000"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3fc1eb851eb851ec"
++        },
++        "Centroid_z": {
++          "bits": "4024000000000000"
++        }
++      }
++    },
++    {
++      "case_id": "terrain-country-repeated-after-edges",
++      "purpose": "Repeat unchanged first operands without resetting retained thread FP state",
++      "operands": {
++        "WindSpeed": {
++          "bits": "4010000000000000"
++        },
++        "WeatherFileWindModCoeff": {
++          "bits": "3ff96191914cb607"
++        },
++        "SiteWindBLHeight": {
++          "bits": "4070e00000000000"
++        },
++        "SiteWindExp": {
++          "bits": "3fc1eb851eb851ec"
++        },
++        "Centroid_z": {
++          "bits": "4024000000000000"
++        }
++      }
++    }
++  ]
++}

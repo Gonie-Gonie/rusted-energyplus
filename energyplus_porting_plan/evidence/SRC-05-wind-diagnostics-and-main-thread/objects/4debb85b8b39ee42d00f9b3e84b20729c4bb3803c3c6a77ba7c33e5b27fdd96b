@@ -1,0 +1,70 @@
+{
+  "schema": "src05-selected-main-thread-Cargo-artifact.v1",
+  "Source_preparation": {
+    "path": ".runtime/porting/SRC-05/surface-environment-main-thread-prep-02/manifest.json",
+    "sha256": "84bbd0adc1d0dfbf1240dbf7a45a4e0b916f591057c6c8f1079877f04790e782",
+    "size_bytes": 25719
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/d3/d34a84b7f0fad57ae1a46799a8b9b8b31247239206556ce342bb4e17287775c4",
+    "sha256": "d34a84b7f0fad57ae1a46799a8b9b8b31247239206556ce342bb4e17287775c4"
+  },
+  "actual_build_execution": {
+    "path": ".runtime/porting/SRC-05/selected-main-thread-observation-01/Cargo-command/receipt.json",
+    "sha256": "16232a8573b3d7668c4f2a6610d6b466edf117ec55ea88375d06349a08e58365",
+    "size_bytes": 7090
+  },
+  "actual_full_Cargo_JSON": {
+    "path": ".runtime/porting/SRC-05/selected-main-thread-observation-01/Cargo-command/stdout.log",
+    "sha256": "3027f131119e2a04ff6c3a4e709c9d24e4dec695f7ade8c417a05df87a284743"
+  },
+  "actual_Cargo_emitted_artifact": {
+    "cargo_message": {
+      "reason": "compiler-artifact",
+      "package_id": "path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/SRC-05/surface-environment-main-thread-prep-01/rust#src05_surface_environment_main@0.0.0",
+      "manifest_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-05\\surface-environment-main-thread-prep-01\\rust\\Cargo.toml",
+      "target": {
+        "kind": [
+          "bin"
+        ],
+        "crate_types": [
+          "bin"
+        ],
+        "name": "src05_surface_environment_main",
+        "src_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-05\\surface-environment-main-thread-prep-01\\rust\\src\\main.rs",
+        "edition": "2024",
+        "doc": true,
+        "doctest": false,
+        "test": true
+      },
+      "profile": {
+        "opt_level": "0",
+        "debuginfo": 0,
+        "debug_assertions": true,
+        "overflow_checks": true,
+        "test": false
+      },
+      "features": [],
+      "filenames": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src05_surface_environment_main.exe"
+      ],
+      "executable": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src05_surface_environment_main.exe",
+      "fresh": false
+    },
+    "executable": {
+      "path": "target/debug/src05_surface_environment_main.exe",
+      "sha256": "6a1d577eb43f7564c139c0e444765955085dda0fefa14da3b8e972793736430d",
+      "size_bytes": 29947062
+    }
+  },
+  "actual_argv": [
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src05_surface_environment_main.exe",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-05\\selected-observation-02\\Rust-input.json",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-05\\selected-main-thread-observation-01\\result.json"
+  ],
+  "actual_binary_before": {
+    "path": "target/debug/src05_surface_environment_main.exe",
+    "sha256": "6a1d577eb43f7564c139c0e444765955085dda0fefa14da3b8e972793736430d",
+    "size_bytes": 29947062
+  }
+}

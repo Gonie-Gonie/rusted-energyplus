@@ -1,0 +1,13 @@
+--- .runtime/porting/SRC-05/surface-environment-selected-comparison-prep-05/before/README.md
++++ .runtime/porting/SRC-05/surface-environment-selected-comparison-prep-05/README.md
+@@ -35,3 +35,10 @@
+ read for authorized factual QA. No new main-thread output exists/read at seal.
+ All missing/malformed/stopped/nonfinite states retain original failure/noPASS
+ semantics; no tolerance, input, scientific body, backend or gate changes.
++
++
++Narrow05 carries only the independently identified quality-command completeness
++repair and standalone02 authority. Both launcher and comparer require each of
++four exact genuine argv, so a copied fmt receipt cannot impersonate another role.
++No scalar, route, input, endpoint/stop/unavailable logic or new outcome is changed.
++All Rust main/Cargo/lock, old FAIL, and local precision Source bytes remain01.

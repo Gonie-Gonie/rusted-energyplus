@@ -1,0 +1,18 @@
+1703:  .text          0x000000014001b630     0x412b C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\target\debug\deps\src05_wind_pow_probe-a94bbe4063010d6e.src05_wind_pow_probe.82a3ddcc322b18a9-cgu.4.rcgu.o
+1724:                 0x000000014001d230                std::f64::<impl f64>::powf
+12690:  .text          0x000000014049d620    0xa34fd C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\target\debug\deps\libep_runtime-341e0c1bf50b07ca.rlib(ep_runtime-341e0c1bf50b07ca.ep_runtime.f1d4681676afb974-cgu.03.rcgu.o)
+13433:                 0x0000000140512f40                std::f64::<impl f64>::powf
+27774:  .text          0x00000001407195c0    0xd309f C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\target\debug\deps\libep_runtime-341e0c1bf50b07ca.rlib(ep_runtime-341e0c1bf50b07ca.ep_runtime.f1d4681676afb974-cgu.07.rcgu.o)
+28459:                 0x0000000140782230                ep_runtime::heat_balance::convection::surface_environment::set_surface_wind_speeds
+27774:  .text          0x00000001407195c0    0xd309f C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\target\debug\deps\libep_runtime-341e0c1bf50b07ca.rlib(ep_runtime-341e0c1bf50b07ca.ep_runtime.f1d4681676afb974-cgu.07.rcgu.o)
+28462:                 0x00000001407825f0                ep_runtime::heat_balance::convection::surface_environment::SurfaceOutdoorEnvironmentParameters::wind_speed_at_height
+54104:  .text          0x0000000140f9a2f0      0x630 C:\Users\GonieGonie\.rustup\toolchains\1.96.0-x86_64-pc-windows-gnu\lib\rustlib\x86_64-pc-windows-gnu\lib\self-contained/libmsvcrt.a(lib64_libmsvcrt_common_a-pow.o)
+54105:                 0x0000000140f9a390                pow
+54157:  .text          0x0000000140f9b480       0x20 C:\Users\GonieGonie\.rustup\toolchains\1.96.0-x86_64-pc-windows-gnu\lib\rustlib\x86_64-pc-windows-gnu\lib\self-contained/libmingwex.a(lib64_libmingwex_a-fegetround.o)
+54158:                 0x0000000140f9b480                fegetround
+54161:  .text          0x0000000140f9b4d0       0x70 C:\Users\GonieGonie\.rustup\toolchains\1.96.0-x86_64-pc-windows-gnu\lib\rustlib\x86_64-pc-windows-gnu\lib\self-contained/libmingwex.a(lib64_libmingwex_a-exp2l.o)
+54162:                 0x0000000140f9b4d0                exp2l
+54167:  .text          0x0000000140f9b670       0x70 C:\Users\GonieGonie\.rustup\toolchains\1.96.0-x86_64-pc-windows-gnu\lib\rustlib\x86_64-pc-windows-gnu\lib\self-contained/libmingwex.a(lib64_libmingwex_a-log2l.o)
+54168:                 0x0000000140f9b680                log2l
+54182:  .text          0x0000000140f9b9d0       0x10 C:\Users\GonieGonie\.rustup\toolchains\1.96.0-x86_64-pc-windows-gnu\lib\rustlib\x86_64-pc-windows-gnu\lib\self-contained/libmingw32.a(lib64_libmingw32_a-CRT_fp10.o)
+54183:                 0x0000000140f9b9d0                _fpreset

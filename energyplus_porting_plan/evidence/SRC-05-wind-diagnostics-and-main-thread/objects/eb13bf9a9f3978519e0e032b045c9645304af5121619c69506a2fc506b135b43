@@ -1,0 +1,119 @@
+--- .runtime/porting/SRC-05/wind-pow-isolation-prep-01/before/rust/src/main.rs
++++ .runtime/porting/SRC-05/wind-pow-isolation-prep-01/rust/src/main.rs
+@@ -0,0 +1,116 @@
++//! Diagnostic hardware reads only. No production Source or FPU control is changed.
++#[cfg(not(all(target_arch = "x86_64", target_os = "windows", target_env = "gnu")))]
++compile_error!("This diagnostic requires the reviewed x86_64-pc-windows-gnu target");
++mod digest;
++use ep_runtime::heat_balance::convection::surface_environment::{
++    SurfaceOutdoorEnvironmentParameters, SurfaceOutdoorEnvironmentRow, set_surface_wind_speeds,
++};
++use serde_json::{Value, json};
++use std::collections::BTreeSet;
++
++type Result<T> = std::result::Result<T, String>;
++unsafe extern "C" { fn fegetround() -> i32; }
++
++fn require(condition: bool, message: &str) -> Result<()> {
++    if condition { Ok(()) } else { Err(message.to_owned()) }
++}
++fn keys(value: &Value, names: &[&str]) -> Result<()> {
++    require(value.as_object().is_some_and(|v| v.len() == names.len() && names.iter().all(|n| v.contains_key(*n))), "exact object required")
++}
++fn input(value: &Value) -> Result<f64> {
++    keys(value, &["bits"])?;
++    let token = value["bits"].as_str().ok_or("literal IEEE bits required")?;
++    require(token.len() == 16 && token.bytes().all(|v| v.is_ascii_digit() || (b'a'..=b'f').contains(&v)), "canonical IEEE bits required")?;
++    Ok(f64::from_bits(u64::from_str_radix(token, 16).map_err(|v| v.to_string())?))
++}
++fn scalar(value: f64) -> Value {
++    let class = if value.is_nan() { "nan" } else if value == f64::INFINITY { "positive_infinity" }
++        else if value == f64::NEG_INFINITY { "negative_infinity" } else if value == 0.0 {
++            if value.is_sign_negative() { "negative_zero" } else { "positive_zero" }
++        } else { "finite" };
++    json!({"value":if value.is_finite() { Some(value) } else { None },"value_bits":format!("{:016x}",value.to_bits()),"value_class":class})
++}
++#[inline(never)]
++fn controls() -> Value {
++    let mut cw: u16 = 0;
++    let mut mxcsr: u32 = 0;
++    // SAFETY: both pointers address live, correctly sized writable locals.
++    // FNSTCW and STMXCSR only read controls; they never load or modify controls.
++    unsafe {
++        std::arch::asm!("fnstcw [{address}]", address = in(reg) &mut cw, options(nostack, preserves_flags));
++        std::arch::asm!("stmxcsr [{address}]", address = in(reg) &mut mxcsr, options(nostack, preserves_flags));
++    }
++    // SAFETY: genuine C fenv getter has no arguments and only reads thread state.
++    let round = unsafe { fegetround() };
++    json!({"x87_control_word":cw,"MXCSR":mxcsr,"c_fegetround":round,
++        "x87_rounding_control_bits":(cw >> 10) & 3,"SSE_rounding_control_bits":(mxcsr >> 13) & 3})
++}
++#[inline(never)]
++fn observe(stages: &mut Vec<Value>, name: &str, function: impl FnOnce() -> f64) -> f64 {
++    let before = controls();
++    let value = function();
++    let after = controls();
++    stages.push(json!({"stage":name,"controls_before":before,"controls_after":after,"result":scalar(value)}));
++    value
++}
++fn lane(request: &Value, name: &str) -> Result<Value> {
++    let entry = controls();
++    let mut rows = Vec::new();
++    for row in request["cases"].as_array().ok_or("ordered cases required")? {
++        keys(row, &["case_id", "purpose", "operands"])?;
++        let o = &row["operands"];
++        keys(o, &["WindSpeed","WeatherFileWindModCoeff","SiteWindBLHeight","SiteWindExp","Centroid_z"])?;
++        let wind = input(&o["WindSpeed"])?;
++        let modifier = input(&o["WeatherFileWindModCoeff"])?;
++        let bl = input(&o["SiteWindBLHeight"])?;
++        let exponent = input(&o["SiteWindExp"])?;
++        let z = input(&o["Centroid_z"])?;
++        let mut stages = Vec::new();
++        let product = observe(&mut stages, "wind_times_modifier", || wind * modifier);
++        let bl_power = observe(&mut stages, "BL_pow_negative_exponent", || bl.powf(-exponent));
++        let fac = observe(&mut stages, "fac", || product * bl_power);
++        let z_power = observe(&mut stages, "Z_pow_exponent", || z.powf(exponent));
++        observe(&mut stages, "diagnostic_fac_times_Z_power", || fac * z_power);
++        let p = SurfaceOutdoorEnvironmentParameters {
++            site_temperature_gradient_k_per_m:0.0,weather_file_temperature_modifier_c:0.0,
++            site_wind_exponent:exponent,site_wind_boundary_layer_height_m:bl,weather_file_wind_modifier:modifier,
++        };
++        let mut surface = [SurfaceOutdoorEnvironmentRow {
++            centroid_height_m:z,wind_exposed:true,dry_bulb_c:0.0,wet_bulb_c:0.0,
++            wind_speed_m_per_s:14.0,wind_direction_deg:0.0,
++        }];
++        observe(&mut stages, "Rust_set_surface_wind_speeds", || {
++            set_surface_wind_speeds(p, wind, &mut surface);
++            surface[0].wind_speed_m_per_s
++        });
++        observe(&mut stages, "Rust_wind_speed_at_height", || p.wind_speed_at_height(wind, z));
++        rows.push(json!({"literal_input":row,"stages":stages,"diagnostic_stages_are_Original_internal_locals":false,
++            "genuine_setter_surface_count":1,"genuine_setter_ExtWind":true,"incoming_wind_owner":scalar(14.0)}));
++    }
++    Ok(json!({"lane":name,"entry_controls":entry,"rows":rows,"exit_controls":controls()}))
++}
++fn run() -> Result<()> {
++    let args: Vec<String> = std::env::args().collect();
++    require(args.len() == 3, "usage: src05_wind_pow_probe <input-only.json> <actual SHA256>")?;
++    let bytes = std::fs::read(&args[1]).map_err(|v| v.to_string())?;
++    require(digest::sha256(&bytes) == args[2], "full input SHA differs")?;
++    let request: Value = serde_json::from_slice(&bytes).map_err(|v| v.to_string())?;
++    keys(&request, &["schema","expected_values_supplied","diagnostic_only","cases"])?;
++    require(request["schema"] == "src05-wind-pow-diagnostic-request.v1" && request["expected_values_supplied"] == false && request["diagnostic_only"] == true, "unadmitted request")?;
++    let cases = request["cases"].as_array().ok_or("ordered cases required")?;
++    require(!cases.is_empty(), "literal cases required")?;
++    let mut ids = BTreeSet::new();
++    for row in cases { require(ids.insert(row["case_id"].as_str().ok_or("case ID required")?), "duplicate case ID")?; }
++    let main_lane = lane(&request, "main_thread")?;
++    let worker_request = request.clone();
++    let worker_lane = std::thread::spawn(move || lane(&worker_request, "std_thread_spawn"))
++        .join().map_err(|_| "worker panicked".to_owned())??;
++    println!("{}", json!({"schema":"src05-wind-pow-diagnostic-results.v1","implementation":"Rust",
++        "actual_input_SHA256":args[2],"lanes":[main_lane,worker_lane],"expected_values_supplied":false,
++        "floating_point_controls_written":false,"historical_execution_controls_observed":false,
++        "scientific_PASS_claimed":false,"production_math_changed":false,"gates_updated":false}));
++    Ok(())
++}
++fn main() {
++    if let Err(error) = run() { eprintln!("{error}"); std::process::exit(2); }
++}

@@ -1,0 +1,23 @@
+
+  if (internal_modf (y, &d) != 0.0)
+    {
+      if (signbit (x))
+	{
+	  __FLT_RPT_DOMAIN ("pow", x, y, -__FLT_NAN);
+	  return -__FLT_NAN;
+	}
+      if (y == __FLT_CST(0.5))
+	{
+	  asm volatile ("fsqrt" : "=t" (rslt) : "0" (x));
+	  return rslt;
+	}
+    }
+  else if ((d <= (__FLT_TYPE) INT_MAX && d >= (__FLT_TYPE) INT_MIN))
+     return __FLT_ABI (__powi) (x, (int) y);
+  /* As exp already checks for minlog and maxlog no further checks are necessary.  */
+  rslt = (__FLT_TYPE) exp2l ((long double) y * log2l ((long double) __FLT_ABI(fabs) (x)));
+
+  if (signbit (x) && internal_modf (__FLT_ABI (ldexp) (y, -1), &d) != 0.0)
+    rslt = -rslt;
+  return rslt;
+}

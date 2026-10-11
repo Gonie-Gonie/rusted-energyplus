@@ -1,0 +1,22 @@
+
+C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\target\debug\src05_wind_pow_probe.exe:     file format pei-x86-64
+
+
+Disassembly of section .text:
+
+0000000140f9b9d0 <_fpreset>:
+   140f9b9d0:	db e3                	fninit
+   140f9b9d2:	c3                   	ret
+   140f9b9d3:	90                   	nop
+   140f9b9d4:	90                   	nop
+   140f9b9d5:	90                   	nop
+   140f9b9d6:	90                   	nop
+   140f9b9d7:	90                   	nop
+   140f9b9d8:	90                   	nop
+   140f9b9d9:	90                   	nop
+   140f9b9da:	90                   	nop
+   140f9b9db:	90                   	nop
+   140f9b9dc:	90                   	nop
+   140f9b9dd:	90                   	nop
+   140f9b9de:	90                   	nop
+   140f9b9df:	90                   	nop

@@ -1,0 +1,468 @@
+
+D:\CodexBuild\rusted-energyplus\SRC-05\native-build-02\bin\src05_surface_environment_helper.exe:     file format pei-x86-64
+
+
+Disassembly of section .text:
+
+0000000141ac2f76 <pow>:
+   141ac2f76:	55                   	push   %rbp
+   141ac2f77:	48 89 e5             	mov    %rsp,%rbp
+   141ac2f7a:	48 81 ec a0 00 00 00 	sub    $0xa0,%rsp
+   141ac2f81:	f2 0f 11 45 10       	movsd  %xmm0,0x10(%rbp)
+   141ac2f86:	f2 0f 11 4d 18       	movsd  %xmm1,0x18(%rbp)
+   141ac2f8b:	48 8b 45 10          	mov    0x10(%rbp),%rax
+   141ac2f8f:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac2f94:	e8 e7 8a ff ff       	call   141abba80 <__fpclassify>
+   141ac2f99:	89 45 f4             	mov    %eax,-0xc(%rbp)
+   141ac2f9c:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   141ac2fa0:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac2fa5:	e8 d6 8a ff ff       	call   141abba80 <__fpclassify>
+   141ac2faa:	89 45 f0             	mov    %eax,-0x10(%rbp)
+   141ac2fad:	c7 45 ec 00 00 00 00 	movl   $0x0,-0x14(%rbp)
+   141ac2fb4:	81 7d f0 00 40 00 00 	cmpl   $0x4000,-0x10(%rbp)
+   141ac2fbb:	74 1e                	je     141ac2fdb <pow+0x65>
+   141ac2fbd:	f2 0f 10 05 3b 29 39 	movsd  0x239293b(%rip),%xmm0        # 143e55900 <.rdata+0x10>
+   141ac2fc4:	02 
+   141ac2fc5:	66 0f 2e 45 10       	ucomisd 0x10(%rbp),%xmm0
+   141ac2fca:	7a 1b                	jp     141ac2fe7 <pow+0x71>
+   141ac2fcc:	f2 0f 10 05 2c 29 39 	movsd  0x239292c(%rip),%xmm0        # 143e55900 <.rdata+0x10>
+   141ac2fd3:	02 
+   141ac2fd4:	66 0f 2e 45 10       	ucomisd 0x10(%rbp),%xmm0
+   141ac2fd9:	75 0c                	jne    141ac2fe7 <pow+0x71>
+   141ac2fdb:	48 8b 05 1e 29 39 02 	mov    0x239291e(%rip),%rax        # 143e55900 <.rdata+0x10>
+   141ac2fe2:	e9 2b 07 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac2fe7:	81 7d f4 00 01 00 00 	cmpl   $0x100,-0xc(%rbp)
+   141ac2fee:	74 0d                	je     141ac2ffd <pow+0x87>
+   141ac2ff0:	81 7d f0 00 01 00 00 	cmpl   $0x100,-0x10(%rbp)
+   141ac2ff7:	0f 85 93 00 00 00    	jne    141ac3090 <pow+0x11a>
+   141ac2ffd:	81 7d f4 00 01 00 00 	cmpl   $0x100,-0xc(%rbp)
+   141ac3004:	75 45                	jne    141ac304b <pow+0xd5>
+   141ac3006:	e8 fd ad 00 00       	call   141acde08 <_errno>
+   141ac300b:	c7 00 21 00 00 00    	movl   $0x21,(%rax)
+   141ac3011:	f2 0f 10 55 18       	movsd  0x18(%rbp),%xmm2
+   141ac3016:	f2 0f 10 4d 10       	movsd  0x10(%rbp),%xmm1
+   141ac301b:	f2 0f 10 45 10       	movsd  0x10(%rbp),%xmm0
+   141ac3020:	f2 0f 11 44 24 20    	movsd  %xmm0,0x20(%rsp)
+   141ac3026:	66 0f 28 da          	movapd %xmm2,%xmm3
+   141ac302a:	66 0f 28 d1          	movapd %xmm1,%xmm2
+   141ac302e:	48 8d 05 bb 28 39 02 	lea    0x23928bb(%rip),%rax        # 143e558f0 <.rdata>
+   141ac3035:	48 89 c2             	mov    %rax,%rdx
+   141ac3038:	b9 01 00 00 00       	mov    $0x1,%ecx
+   141ac303d:	e8 0e 79 ff ff       	call   141aba950 <__mingw_raise_matherr>
+   141ac3042:	48 8b 45 10          	mov    0x10(%rbp),%rax
+   141ac3046:	e9 c7 06 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac304b:	e8 b8 ad 00 00       	call   141acde08 <_errno>
+   141ac3050:	c7 00 21 00 00 00    	movl   $0x21,(%rax)
+   141ac3056:	f2 0f 10 55 18       	movsd  0x18(%rbp),%xmm2
+   141ac305b:	f2 0f 10 4d 10       	movsd  0x10(%rbp),%xmm1
+   141ac3060:	f2 0f 10 45 18       	movsd  0x18(%rbp),%xmm0
+   141ac3065:	f2 0f 11 44 24 20    	movsd  %xmm0,0x20(%rsp)
+   141ac306b:	66 0f 28 da          	movapd %xmm2,%xmm3
+   141ac306f:	66 0f 28 d1          	movapd %xmm1,%xmm2
+   141ac3073:	48 8d 05 76 28 39 02 	lea    0x2392876(%rip),%rax        # 143e558f0 <.rdata>
+   141ac307a:	48 89 c2             	mov    %rax,%rdx
+   141ac307d:	b9 01 00 00 00       	mov    $0x1,%ecx
+   141ac3082:	e8 c9 78 ff ff       	call   141aba950 <__mingw_raise_matherr>
+   141ac3087:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   141ac308b:	e9 82 06 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac3090:	81 7d f4 00 40 00 00 	cmpl   $0x4000,-0xc(%rbp)
+   141ac3097:	0f 85 97 01 00 00    	jne    141ac3234 <pow+0x2be>
+   141ac309d:	81 7d f0 00 05 00 00 	cmpl   $0x500,-0x10(%rbp)
+   141ac30a4:	75 2a                	jne    141ac30d0 <pow+0x15a>
+   141ac30a6:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   141ac30aa:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac30af:	e8 4c 38 00 00       	call   141ac6900 <__signbit>
+   141ac30b4:	85 c0                	test   %eax,%eax
+   141ac30b6:	74 0c                	je     141ac30c4 <pow+0x14e>
+   141ac30b8:	48 8b 05 49 28 39 02 	mov    0x2392849(%rip),%rax        # 143e55908 <.rdata+0x18>
+   141ac30bf:	e9 4e 06 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac30c4:	48 8b 05 2d 28 39 02 	mov    0x239282d(%rip),%rax        # 143e558f8 <.rdata+0x8>
+   141ac30cb:	e9 42 06 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac30d0:	48 8b 45 10          	mov    0x10(%rbp),%rax
+   141ac30d4:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac30d9:	e8 22 38 00 00       	call   141ac6900 <__signbit>
+   141ac30de:	85 c0                	test   %eax,%eax
+   141ac30e0:	74 6a                	je     141ac314c <pow+0x1d6>
+   141ac30e2:	48 8d 55 d8          	lea    -0x28(%rbp),%rdx
+   141ac30e6:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   141ac30ea:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac30ef:	e8 ec fd ff ff       	call   141ac2ee0 <internal_modf>
+   141ac30f4:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   141ac30f9:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   141ac30fd:	66 48 0f 6e e0       	movq   %rax,%xmm4
+   141ac3102:	66 0f 2e e0          	ucomisd %xmm0,%xmm4
+   141ac3106:	7a 0f                	jp     141ac3117 <pow+0x1a1>
+   141ac3108:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   141ac310c:	66 48 0f 6e e8       	movq   %rax,%xmm5
+   141ac3111:	66 0f 2e e8          	ucomisd %xmm0,%xmm5
+   141ac3115:	74 35                	je     141ac314c <pow+0x1d6>
+   141ac3117:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   141ac311b:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac3120:	e8 db 37 00 00       	call   141ac6900 <__signbit>
+   141ac3125:	85 c0                	test   %eax,%eax
+   141ac3127:	74 17                	je     141ac3140 <pow+0x1ca>
+   141ac3129:	f2 0f 10 05 df 27 39 	movsd  0x23927df(%rip),%xmm0        # 143e55910 <.rdata+0x20>
+   141ac3130:	02 
+   141ac3131:	f2 0f 5e 45 10       	divsd  0x10(%rbp),%xmm0
+   141ac3136:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   141ac313b:	e9 d2 05 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac3140:	48 8b 05 b1 27 39 02 	mov    0x23927b1(%rip),%rax        # 143e558f8 <.rdata+0x8>
+   141ac3147:	e9 c6 05 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac314c:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   141ac3150:	ba ff ff ff ff       	mov    $0xffffffff,%edx
+   141ac3155:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac315a:	e8 e1 f9 ff ff       	call   141ac2b40 <ldexp>
+   141ac315f:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   141ac3164:	48 8d 55 d8          	lea    -0x28(%rbp),%rdx
+   141ac3168:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac316d:	e8 6e fd ff ff       	call   141ac2ee0 <internal_modf>
+   141ac3172:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   141ac3177:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   141ac317b:	66 48 0f 6e e0       	movq   %rax,%xmm4
+   141ac3180:	66 0f 2e e0          	ucomisd %xmm0,%xmm4
+   141ac3184:	0f 9a c2             	setp   %dl
+   141ac3187:	b9 01 00 00 00       	mov    $0x1,%ecx
+   141ac318c:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   141ac3190:	66 48 0f 6e e8       	movq   %rax,%xmm5
+   141ac3195:	66 0f 2e e8          	ucomisd %xmm0,%xmm5
+   141ac3199:	89 c8                	mov    %ecx,%eax
+   141ac319b:	0f 44 c2             	cmove  %edx,%eax
+   141ac319e:	0f b6 c0             	movzbl %al,%eax
+   141ac31a1:	89 45 ec             	mov    %eax,-0x14(%rbp)
+   141ac31a4:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   141ac31a8:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac31ad:	e8 4e 37 00 00       	call   141ac6900 <__signbit>
+   141ac31b2:	85 c0                	test   %eax,%eax
+   141ac31b4:	75 30                	jne    141ac31e6 <pow+0x270>
+   141ac31b6:	83 7d ec 00          	cmpl   $0x0,-0x14(%rbp)
+   141ac31ba:	74 12                	je     141ac31ce <pow+0x258>
+   141ac31bc:	48 8b 45 10          	mov    0x10(%rbp),%rax
+   141ac31c0:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac31c5:	e8 36 37 00 00       	call   141ac6900 <__signbit>
+   141ac31ca:	85 c0                	test   %eax,%eax
+   141ac31cc:	75 0c                	jne    141ac31da <pow+0x264>
+   141ac31ce:	48 8b 05 23 27 39 02 	mov    0x2392723(%rip),%rax        # 143e558f8 <.rdata+0x8>
+   141ac31d5:	e9 38 05 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac31da:	48 8b 05 37 27 39 02 	mov    0x2392737(%rip),%rax        # 143e55918 <.rdata+0x28>
+   141ac31e1:	e9 2c 05 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac31e6:	83 7d ec 00          	cmpl   $0x0,-0x14(%rbp)
+   141ac31ea:	74 12                	je     141ac31fe <pow+0x288>
+   141ac31ec:	48 8b 45 10          	mov    0x10(%rbp),%rax
+   141ac31f0:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac31f5:	e8 06 37 00 00       	call   141ac6900 <__signbit>
+   141ac31fa:	85 c0                	test   %eax,%eax
+   141ac31fc:	75 0c                	jne    141ac320a <pow+0x294>
+   141ac31fe:	48 8b 05 03 27 39 02 	mov    0x2392703(%rip),%rax        # 143e55908 <.rdata+0x18>
+   141ac3205:	e9 08 05 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac320a:	48 8b 45 10          	mov    0x10(%rbp),%rax
+   141ac320e:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac3213:	e8 e8 36 00 00       	call   141ac6900 <__signbit>
+   141ac3218:	85 c0                	test   %eax,%eax
+   141ac321a:	74 0c                	je     141ac3228 <pow+0x2b2>
+   141ac321c:	48 8b 05 fd 26 39 02 	mov    0x23926fd(%rip),%rax        # 143e55920 <.rdata+0x30>
+   141ac3223:	e9 ea 04 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac3228:	48 8b 05 d9 26 39 02 	mov    0x23926d9(%rip),%rax        # 143e55908 <.rdata+0x18>
+   141ac322f:	e9 de 04 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac3234:	81 7d f0 00 05 00 00 	cmpl   $0x500,-0x10(%rbp)
+   141ac323b:	0f 85 f3 00 00 00    	jne    141ac3334 <pow+0x3be>
+   141ac3241:	81 7d f4 00 05 00 00 	cmpl   $0x500,-0xc(%rbp)
+   141ac3248:	75 2a                	jne    141ac3274 <pow+0x2fe>
+   141ac324a:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   141ac324e:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac3253:	e8 a8 36 00 00       	call   141ac6900 <__signbit>
+   141ac3258:	85 c0                	test   %eax,%eax
+   141ac325a:	74 0c                	je     141ac3268 <pow+0x2f2>
+   141ac325c:	48 8b 05 95 26 39 02 	mov    0x2392695(%rip),%rax        # 143e558f8 <.rdata+0x8>
+   141ac3263:	e9 aa 04 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac3268:	48 8b 05 99 26 39 02 	mov    0x2392699(%rip),%rax        # 143e55908 <.rdata+0x18>
+   141ac326f:	e9 9e 04 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac3274:	48 8b 45 10          	mov    0x10(%rbp),%rax
+   141ac3278:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac327d:	e8 7e 36 00 00       	call   141ac6900 <__signbit>
+   141ac3282:	85 c0                	test   %eax,%eax
+   141ac3284:	74 13                	je     141ac3299 <pow+0x323>
+   141ac3286:	f2 0f 10 45 10       	movsd  0x10(%rbp),%xmm0
+   141ac328b:	f3 0f 7e 0d 9d 26 39 	movq   0x239269d(%rip),%xmm1        # 143e55930 <.rdata+0x40>
+   141ac3292:	02 
+   141ac3293:	66 0f 57 c1          	xorpd  %xmm1,%xmm0
+   141ac3297:	eb 05                	jmp    141ac329e <pow+0x328>
+   141ac3299:	f2 0f 10 45 10       	movsd  0x10(%rbp),%xmm0
+   141ac329e:	f2 0f 11 45 e0       	movsd  %xmm0,-0x20(%rbp)
+   141ac32a3:	f2 0f 10 05 55 26 39 	movsd  0x2392655(%rip),%xmm0        # 143e55900 <.rdata+0x10>
+   141ac32aa:	02 
+   141ac32ab:	66 0f 2e 45 e0       	ucomisd -0x20(%rbp),%xmm0
+   141ac32b0:	7a 1b                	jp     141ac32cd <pow+0x357>
+   141ac32b2:	f2 0f 10 05 46 26 39 	movsd  0x2392646(%rip),%xmm0        # 143e55900 <.rdata+0x10>
+   141ac32b9:	02 
+   141ac32ba:	66 0f 2e 45 e0       	ucomisd -0x20(%rbp),%xmm0
+   141ac32bf:	75 0c                	jne    141ac32cd <pow+0x357>
+   141ac32c1:	48 8b 05 38 26 39 02 	mov    0x2392638(%rip),%rax        # 143e55900 <.rdata+0x10>
+   141ac32c8:	e9 45 04 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac32cd:	f2 0f 10 45 e0       	movsd  -0x20(%rbp),%xmm0
+   141ac32d2:	f2 0f 10 0d 26 26 39 	movsd  0x2392626(%rip),%xmm1        # 143e55900 <.rdata+0x10>
+   141ac32d9:	02 
+   141ac32da:	66 0f 2f c1          	comisd %xmm1,%xmm0
+   141ac32de:	76 2a                	jbe    141ac330a <pow+0x394>
+   141ac32e0:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   141ac32e4:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac32e9:	e8 12 36 00 00       	call   141ac6900 <__signbit>
+   141ac32ee:	85 c0                	test   %eax,%eax
+   141ac32f0:	75 0c                	jne    141ac32fe <pow+0x388>
+   141ac32f2:	48 8b 05 0f 26 39 02 	mov    0x239260f(%rip),%rax        # 143e55908 <.rdata+0x18>
+   141ac32f9:	e9 14 04 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac32fe:	48 8b 05 f3 25 39 02 	mov    0x23925f3(%rip),%rax        # 143e558f8 <.rdata+0x8>
+   141ac3305:	e9 08 04 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac330a:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   141ac330e:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac3313:	e8 e8 35 00 00       	call   141ac6900 <__signbit>
+   141ac3318:	85 c0                	test   %eax,%eax
+   141ac331a:	75 0c                	jne    141ac3328 <pow+0x3b2>
+   141ac331c:	48 8b 05 d5 25 39 02 	mov    0x23925d5(%rip),%rax        # 143e558f8 <.rdata+0x8>
+   141ac3323:	e9 ea 03 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac3328:	48 8b 05 d9 25 39 02 	mov    0x23925d9(%rip),%rax        # 143e55908 <.rdata+0x18>
+   141ac332f:	e9 de 03 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac3334:	81 7d f4 00 05 00 00 	cmpl   $0x500,-0xc(%rbp)
+   141ac333b:	0f 85 f7 01 00 00    	jne    141ac3538 <pow+0x5c2>
+   141ac3341:	48 8b 45 10          	mov    0x10(%rbp),%rax
+   141ac3345:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac334a:	e8 b1 35 00 00       	call   141ac6900 <__signbit>
+   141ac334f:	85 c0                	test   %eax,%eax
+   141ac3351:	74 79                	je     141ac33cc <pow+0x456>
+   141ac3353:	48 8d 55 d8          	lea    -0x28(%rbp),%rdx
+   141ac3357:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   141ac335b:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac3360:	e8 7b fb ff ff       	call   141ac2ee0 <internal_modf>
+   141ac3365:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   141ac336a:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   141ac336e:	66 48 0f 6e d8       	movq   %rax,%xmm3
+   141ac3373:	66 0f 2e d8          	ucomisd %xmm0,%xmm3
+   141ac3377:	7a 0f                	jp     141ac3388 <pow+0x412>
+   141ac3379:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   141ac337d:	66 48 0f 6e e0       	movq   %rax,%xmm4
+   141ac3382:	66 0f 2e e0          	ucomisd %xmm0,%xmm4
+   141ac3386:	74 44                	je     141ac33cc <pow+0x456>
+   141ac3388:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   141ac338c:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac3391:	e8 6a 35 00 00       	call   141ac6900 <__signbit>
+   141ac3396:	85 c0                	test   %eax,%eax
+   141ac3398:	74 17                	je     141ac33b1 <pow+0x43b>
+   141ac339a:	f2 0f 10 05 6e 25 39 	movsd  0x239256e(%rip),%xmm0        # 143e55910 <.rdata+0x20>
+   141ac33a1:	02 
+   141ac33a2:	f2 0f 5e 45 10       	divsd  0x10(%rbp),%xmm0
+   141ac33a7:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   141ac33ac:	e9 61 03 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac33b1:	f2 0f 10 45 10       	movsd  0x10(%rbp),%xmm0
+   141ac33b6:	f3 0f 7e 0d 72 25 39 	movq   0x2392572(%rip),%xmm1        # 143e55930 <.rdata+0x40>
+   141ac33bd:	02 
+   141ac33be:	66 0f 57 c1          	xorpd  %xmm1,%xmm0
+   141ac33c2:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   141ac33c7:	e9 46 03 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac33cc:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   141ac33d0:	ba ff ff ff ff       	mov    $0xffffffff,%edx
+   141ac33d5:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac33da:	e8 61 f7 ff ff       	call   141ac2b40 <ldexp>
+   141ac33df:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   141ac33e4:	48 8d 55 d8          	lea    -0x28(%rbp),%rdx
+   141ac33e8:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac33ed:	e8 ee fa ff ff       	call   141ac2ee0 <internal_modf>
+   141ac33f2:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   141ac33f7:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   141ac33fb:	66 48 0f 6e e8       	movq   %rax,%xmm5
+   141ac3400:	66 0f 2e e8          	ucomisd %xmm0,%xmm5
+   141ac3404:	0f 9a c2             	setp   %dl
+   141ac3407:	b9 01 00 00 00       	mov    $0x1,%ecx
+   141ac340c:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   141ac3410:	66 48 0f 6e d8       	movq   %rax,%xmm3
+   141ac3415:	66 0f 2e d8          	ucomisd %xmm0,%xmm3
+   141ac3419:	89 c8                	mov    %ecx,%eax
+   141ac341b:	0f 44 c2             	cmove  %edx,%eax
+   141ac341e:	0f b6 c0             	movzbl %al,%eax
+   141ac3421:	89 45 ec             	mov    %eax,-0x14(%rbp)
+   141ac3424:	48 8b 45 10          	mov    0x10(%rbp),%rax
+   141ac3428:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac342d:	e8 ce 34 00 00       	call   141ac6900 <__signbit>
+   141ac3432:	85 c0                	test   %eax,%eax
+   141ac3434:	74 24                	je     141ac345a <pow+0x4e4>
+   141ac3436:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   141ac343a:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac343f:	e8 bc 34 00 00       	call   141ac6900 <__signbit>
+   141ac3444:	85 c0                	test   %eax,%eax
+   141ac3446:	74 12                	je     141ac345a <pow+0x4e4>
+   141ac3448:	83 7d ec 00          	cmpl   $0x0,-0x14(%rbp)
+   141ac344c:	75 0c                	jne    141ac345a <pow+0x4e4>
+   141ac344e:	48 8b 05 a3 24 39 02 	mov    0x23924a3(%rip),%rax        # 143e558f8 <.rdata+0x8>
+   141ac3455:	e9 b8 02 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac345a:	48 8b 45 10          	mov    0x10(%rbp),%rax
+   141ac345e:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac3463:	e8 98 34 00 00       	call   141ac6900 <__signbit>
+   141ac3468:	85 c0                	test   %eax,%eax
+   141ac346a:	74 24                	je     141ac3490 <pow+0x51a>
+   141ac346c:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   141ac3470:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac3475:	e8 86 34 00 00       	call   141ac6900 <__signbit>
+   141ac347a:	85 c0                	test   %eax,%eax
+   141ac347c:	75 12                	jne    141ac3490 <pow+0x51a>
+   141ac347e:	83 7d ec 00          	cmpl   $0x0,-0x14(%rbp)
+   141ac3482:	74 0c                	je     141ac3490 <pow+0x51a>
+   141ac3484:	48 8b 05 95 24 39 02 	mov    0x2392495(%rip),%rax        # 143e55920 <.rdata+0x30>
+   141ac348b:	e9 82 02 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac3490:	48 8b 45 10          	mov    0x10(%rbp),%rax
+   141ac3494:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac3499:	e8 62 34 00 00       	call   141ac6900 <__signbit>
+   141ac349e:	85 c0                	test   %eax,%eax
+   141ac34a0:	74 24                	je     141ac34c6 <pow+0x550>
+   141ac34a2:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   141ac34a6:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac34ab:	e8 50 34 00 00       	call   141ac6900 <__signbit>
+   141ac34b0:	85 c0                	test   %eax,%eax
+   141ac34b2:	75 12                	jne    141ac34c6 <pow+0x550>
+   141ac34b4:	83 7d ec 00          	cmpl   $0x0,-0x14(%rbp)
+   141ac34b8:	75 0c                	jne    141ac34c6 <pow+0x550>
+   141ac34ba:	48 8b 05 47 24 39 02 	mov    0x2392447(%rip),%rax        # 143e55908 <.rdata+0x18>
+   141ac34c1:	e9 4c 02 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac34c6:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   141ac34ca:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac34cf:	e8 2c 34 00 00       	call   141ac6900 <__signbit>
+   141ac34d4:	85 c0                	test   %eax,%eax
+   141ac34d6:	74 30                	je     141ac3508 <pow+0x592>
+   141ac34d8:	83 7d ec 00          	cmpl   $0x0,-0x14(%rbp)
+   141ac34dc:	74 1e                	je     141ac34fc <pow+0x586>
+   141ac34de:	48 8b 45 10          	mov    0x10(%rbp),%rax
+   141ac34e2:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac34e7:	e8 14 34 00 00       	call   141ac6900 <__signbit>
+   141ac34ec:	85 c0                	test   %eax,%eax
+   141ac34ee:	74 0c                	je     141ac34fc <pow+0x586>
+   141ac34f0:	48 8b 05 21 24 39 02 	mov    0x2392421(%rip),%rax        # 143e55918 <.rdata+0x28>
+   141ac34f7:	e9 16 02 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac34fc:	48 8b 05 f5 23 39 02 	mov    0x23923f5(%rip),%rax        # 143e558f8 <.rdata+0x8>
+   141ac3503:	e9 0a 02 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac3508:	83 7d ec 00          	cmpl   $0x0,-0x14(%rbp)
+   141ac350c:	74 1e                	je     141ac352c <pow+0x5b6>
+   141ac350e:	48 8b 45 10          	mov    0x10(%rbp),%rax
+   141ac3512:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac3517:	e8 e4 33 00 00       	call   141ac6900 <__signbit>
+   141ac351c:	85 c0                	test   %eax,%eax
+   141ac351e:	74 0c                	je     141ac352c <pow+0x5b6>
+   141ac3520:	48 8b 05 f9 23 39 02 	mov    0x23923f9(%rip),%rax        # 143e55920 <.rdata+0x30>
+   141ac3527:	e9 e6 01 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac352c:	48 8b 05 d5 23 39 02 	mov    0x23923d5(%rip),%rax        # 143e55908 <.rdata+0x18>
+   141ac3533:	e9 da 01 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac3538:	48 8d 55 d8          	lea    -0x28(%rbp),%rdx
+   141ac353c:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   141ac3540:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac3545:	e8 96 f9 ff ff       	call   141ac2ee0 <internal_modf>
+   141ac354a:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   141ac354f:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   141ac3553:	66 48 0f 6e e0       	movq   %rax,%xmm4
+   141ac3558:	66 0f 2e e0          	ucomisd %xmm0,%xmm4
+   141ac355c:	7a 13                	jp     141ac3571 <pow+0x5fb>
+   141ac355e:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   141ac3562:	66 48 0f 6e e8       	movq   %rax,%xmm5
+   141ac3567:	66 0f 2e e8          	ucomisd %xmm0,%xmm5
+   141ac356b:	0f 84 96 00 00 00    	je     141ac3607 <pow+0x691>
+   141ac3571:	48 8b 45 10          	mov    0x10(%rbp),%rax
+   141ac3575:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac357a:	e8 81 33 00 00       	call   141ac6900 <__signbit>
+   141ac357f:	85 c0                	test   %eax,%eax
+   141ac3581:	74 4b                	je     141ac35ce <pow+0x658>
+   141ac3583:	e8 80 a8 00 00       	call   141acde08 <_errno>
+   141ac3588:	c7 00 21 00 00 00    	movl   $0x21,(%rax)
+   141ac358e:	f2 0f 10 55 18       	movsd  0x18(%rbp),%xmm2
+   141ac3593:	f2 0f 10 4d 10       	movsd  0x10(%rbp),%xmm1
+   141ac3598:	f2 0f 10 05 a0 23 39 	movsd  0x23923a0(%rip),%xmm0        # 143e55940 <.rdata+0x50>
+   141ac359f:	02 
+   141ac35a0:	f2 0f 11 44 24 20    	movsd  %xmm0,0x20(%rsp)
+   141ac35a6:	66 0f 28 da          	movapd %xmm2,%xmm3
+   141ac35aa:	66 0f 28 d1          	movapd %xmm1,%xmm2
+   141ac35ae:	48 8d 05 3b 23 39 02 	lea    0x239233b(%rip),%rax        # 143e558f0 <.rdata>
+   141ac35b5:	48 89 c2             	mov    %rax,%rdx
+   141ac35b8:	b9 01 00 00 00       	mov    $0x1,%ecx
+   141ac35bd:	e8 8e 73 ff ff       	call   141aba950 <__mingw_raise_matherr>
+   141ac35c2:	48 8b 05 77 23 39 02 	mov    0x2392377(%rip),%rax        # 143e55940 <.rdata+0x50>
+   141ac35c9:	e9 44 01 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac35ce:	f2 0f 10 45 18       	movsd  0x18(%rbp),%xmm0
+   141ac35d3:	66 0f 2e 05 6d 23 39 	ucomisd 0x239236d(%rip),%xmm0        # 143e55948 <.rdata+0x58>
+   141ac35da:	02 
+   141ac35db:	7a 6d                	jp     141ac364a <pow+0x6d4>
+   141ac35dd:	f2 0f 10 45 18       	movsd  0x18(%rbp),%xmm0
+   141ac35e2:	66 0f 2e 05 5e 23 39 	ucomisd 0x239235e(%rip),%xmm0        # 143e55948 <.rdata+0x58>
+   141ac35e9:	02 
+   141ac35ea:	75 5e                	jne    141ac364a <pow+0x6d4>
+   141ac35ec:	f2 0f 10 45 10       	movsd  0x10(%rbp),%xmm0
+   141ac35f1:	f2 0f 11 45 a0       	movsd  %xmm0,-0x60(%rbp)
+   141ac35f6:	dd 45 a0             	fldl   -0x60(%rbp)
+   141ac35f9:	d9 fa                	fsqrt
+   141ac35fb:	dd 5d f8             	fstpl  -0x8(%rbp)
+   141ac35fe:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+   141ac3602:	e9 0b 01 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac3607:	f2 0f 10 4d d8       	movsd  -0x28(%rbp),%xmm1
+   141ac360c:	f2 0f 10 05 3c 23 39 	movsd  0x239233c(%rip),%xmm0        # 143e55950 <.rdata+0x60>
+   141ac3613:	02 
+   141ac3614:	66 0f 2f c1          	comisd %xmm1,%xmm0
+   141ac3618:	72 30                	jb     141ac364a <pow+0x6d4>
+   141ac361a:	f2 0f 10 45 d8       	movsd  -0x28(%rbp),%xmm0
+   141ac361f:	66 0f 2f 05 31 23 39 	comisd 0x2392331(%rip),%xmm0        # 143e55958 <.rdata+0x68>
+   141ac3626:	02 
+   141ac3627:	72 21                	jb     141ac364a <pow+0x6d4>
+   141ac3629:	f2 0f 10 45 18       	movsd  0x18(%rbp),%xmm0
+   141ac362e:	f2 0f 2c d0          	cvttsd2si %xmm0,%edx
+   141ac3632:	48 8b 45 10          	mov    0x10(%rbp),%rax
+   141ac3636:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac363b:	e8 2c 2f 00 00       	call   141ac656c <__powi>
+   141ac3640:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   141ac3645:	e9 c8 00 00 00       	jmp    141ac3712 <pow+0x79c>
+   141ac364a:	dd 45 18             	fldl   0x18(%rbp)
+   141ac364d:	db 7d a0             	fstpt  -0x60(%rbp)
+   141ac3650:	f2 0f 10 45 10       	movsd  0x10(%rbp),%xmm0
+   141ac3655:	f3 0f 7e 0d 03 23 39 	movq   0x2392303(%rip),%xmm1        # 143e55960 <.rdata+0x70>
+   141ac365c:	02 
+   141ac365d:	66 0f 54 c1          	andpd  %xmm1,%xmm0
+   141ac3661:	f2 0f 11 45 98       	movsd  %xmm0,-0x68(%rbp)
+   141ac3666:	dd 45 98             	fldl   -0x68(%rbp)
+   141ac3669:	48 8d 45 c0          	lea    -0x40(%rbp),%rax
+   141ac366d:	db 7d b0             	fstpt  -0x50(%rbp)
+   141ac3670:	48 8d 55 b0          	lea    -0x50(%rbp),%rdx
+   141ac3674:	48 89 c1             	mov    %rax,%rcx
+   141ac3677:	e8 84 5d 00 00       	call   141ac9400 <log2l>
+   141ac367c:	db 6d c0             	fldt   -0x40(%rbp)
+   141ac367f:	db 6d a0             	fldt   -0x60(%rbp)
+   141ac3682:	de c9                	fmulp  %st,%st(1)
+   141ac3684:	48 8d 45 c0          	lea    -0x40(%rbp),%rax
+   141ac3688:	db 7d b0             	fstpt  -0x50(%rbp)
+   141ac368b:	48 8d 55 b0          	lea    -0x50(%rbp),%rdx
+   141ac368f:	48 89 c1             	mov    %rax,%rcx
+   141ac3692:	e8 89 5c 00 00       	call   141ac9320 <exp2l>
+   141ac3697:	db 6d c0             	fldt   -0x40(%rbp)
+   141ac369a:	dd 5d f8             	fstpl  -0x8(%rbp)
+   141ac369d:	48 8b 45 10          	mov    0x10(%rbp),%rax
+   141ac36a1:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac36a6:	e8 55 32 00 00       	call   141ac6900 <__signbit>
+   141ac36ab:	85 c0                	test   %eax,%eax
+   141ac36ad:	74 5f                	je     141ac370e <pow+0x798>
+   141ac36af:	48 8b 45 18          	mov    0x18(%rbp),%rax
+   141ac36b3:	ba ff ff ff ff       	mov    $0xffffffff,%edx
+   141ac36b8:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac36bd:	e8 7e f4 ff ff       	call   141ac2b40 <ldexp>
+   141ac36c2:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   141ac36c7:	48 8d 55 d8          	lea    -0x28(%rbp),%rdx
+   141ac36cb:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac36d0:	e8 0b f8 ff ff       	call   141ac2ee0 <internal_modf>
+   141ac36d5:	66 48 0f 7e c0       	movq   %xmm0,%rax
+   141ac36da:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   141ac36de:	66 48 0f 6e d8       	movq   %rax,%xmm3
+   141ac36e3:	66 0f 2e d8          	ucomisd %xmm0,%xmm3
+   141ac36e7:	7a 0f                	jp     141ac36f8 <pow+0x782>
+   141ac36e9:	66 0f ef c0          	pxor   %xmm0,%xmm0
+   141ac36ed:	66 48 0f 6e e0       	movq   %rax,%xmm4
+   141ac36f2:	66 0f 2e e0          	ucomisd %xmm0,%xmm4
+   141ac36f6:	74 16                	je     141ac370e <pow+0x798>
+   141ac36f8:	f2 0f 10 45 f8       	movsd  -0x8(%rbp),%xmm0
+   141ac36fd:	f3 0f 7e 0d 2b 22 39 	movq   0x239222b(%rip),%xmm1        # 143e55930 <.rdata+0x40>
+   141ac3704:	02 
+   141ac3705:	66 0f 57 c1          	xorpd  %xmm1,%xmm0
+   141ac3709:	f2 0f 11 45 f8       	movsd  %xmm0,-0x8(%rbp)
+   141ac370e:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+   141ac3712:	66 48 0f 6e c0       	movq   %rax,%xmm0
+   141ac3717:	48 81 c4 a0 00 00 00 	add    $0xa0,%rsp
+   141ac371e:	5d                   	pop    %rbp
+   141ac371f:	c3                   	ret

@@ -1,0 +1,16 @@
+--- .runtime/porting/SRC-05/wind-pow-isolation-prep-01/before/provider-evidence/Native-fpreset.txt
++++ .runtime/porting/SRC-05/wind-pow-isolation-prep-01/provider-evidence/Native-fpreset.txt
+@@ -0,0 +1,13 @@
++
++D:\CodexBuild\rusted-energyplus\SRC-05\native-build-02\bin\src05_surface_environment_helper.exe:     file format pei-x86-64
++
++
++Disassembly of section .text:
++
++0000000141aba0a0 <_fpreset>:
++   141aba0a0:	55                   	push   %rbp
++   141aba0a1:	48 89 e5             	mov    %rsp,%rbp
++   141aba0a4:	db e3                	fninit
++   141aba0a6:	90                   	nop
++   141aba0a7:	5d                   	pop    %rbp
++   141aba0a8:	c3                   	ret

@@ -1,0 +1,139 @@
+"""Preserve accepted holds and prepare a fresh package for offline lock resolution."""
+from pathlib import Path
+import hashlib
+import json
+import sys
+import copy
+import difflib
+import re
+import tomllib
+
+ROOT = Path(__file__).resolve().parents[3]
+BASE = ROOT / '.runtime/porting/SRC-05'
+OLD = BASE / 'wind-pow-isolation-prep-01'
+PARENT = BASE / 'wind-pow-isolation-prep-02'
+OUT = BASE / 'wind-pow-isolation-prep-03'
+SNAPSHOT_SHA = '5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548'
+SNAPSHOT = ROOT / '.runtime/porting/source-objects/56' / SNAPSHOT_SHA
+PACKAGE = ('Cargo.toml', 'Cargo.lock', 'src/main.rs', 'src/digest.rs')
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+def emit(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes((json.dumps(value, indent=2, ensure_ascii=False) + '\n').encode())
+
+def preserve():
+    return [ref(p) for d in (OLD, PARENT) for p in sorted(d.rglob('*')) if p.is_file()]
+
+def current_source():
+    assert ref(SNAPSHOT)['sha256'] == SNAPSHOT_SHA
+    snapshot = json.loads(SNAPSHOT.read_text(encoding='utf-8'))
+    paths = set((ROOT / 'crates').rglob('*.rs')) | set((ROOT / 'crates').rglob('Cargo.toml'))
+    paths |= {ROOT / n for n in ('Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml') if (ROOT / n).is_file()}
+    assert {p.relative_to(ROOT).as_posix() for p in paths} == {r['historical_path'] for r in snapshot['files']}
+    for row in snapshot['files']:
+        actual = ref(ROOT / row['historical_path'])
+        assert actual['sha256'] == row['archive']['sha256']
+        assert actual['size_bytes'] == row['size_bytes']
+    return ref(SNAPSHOT)
+
+def prepare():
+    assert not OUT.exists()
+    source = current_source()
+    preserved = preserve()
+    for name in PACKAGE:
+        raw = (OLD / 'rust' / name).read_bytes()
+        for destination in (OUT / 'rust' / name, OUT / 'before/rust' / name):
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_bytes(raw)
+    for source_path, destination in ((OLD / 'manifest.json', OUT / 'before/manifest01.json'), (PARENT / 'manifest.json', OUT / 'before/manifest02.json'), (PARENT / 'README.md', OUT / 'before/README02.md'), (ROOT / 'Cargo.lock', OUT / 'before/root-Cargo.lock')):
+        destination.write_bytes(source_path.read_bytes())
+    assert (OUT / 'rust/../../../../../crates/ep_runtime').resolve() == (ROOT / 'crates/ep_runtime').resolve()
+    assert preserve() == preserved
+    emit(OUT / 'preservation-before.json', dict(schema='src05-wind-pow-lock-resolution-preservation.v1', current_Source_snapshot=source, accepted_hold_files=preserved, copied_package=[ref(OUT / 'rust' / p) for p in PACKAGE], root_lock=ref(ROOT / 'Cargo.lock')))
+    print(json.dumps(dict(prepared=OUT.relative_to(ROOT).as_posix(), package_files=len(PACKAGE), preserved_hold_files=len(preserved), canonical_Source_snapshot=source['sha256'])))
+
+def diff(before, after, name):
+    path = OUT / 'diffs' / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    raw = ''.join(difflib.unified_diff(before.read_text(encoding='utf-8').splitlines(True), after.read_text(encoding='utf-8').splitlines(True), fromfile=before.relative_to(ROOT).as_posix(), tofile=after.relative_to(ROOT).as_posix())).encode()
+    path.write_bytes(raw)
+    return dict(before=ref(before), after=ref(after), diff=ref(path))
+
+def seal():
+    assert OUT.is_dir() and not (OUT / 'manifest.json').exists()
+    preserved = json.loads((OUT / 'preservation-before.json').read_text(encoding='utf-8'))
+    assert preserve() == preserved['accepted_hold_files']
+    assert current_source() == preserved['current_Source_snapshot']
+    receipt_path = BASE / 'wind-pow-lock-resolution-command-01/receipt.json'
+    receipt = json.loads(receipt_path.read_text(encoding='utf-8'))
+    assert ref(receipt_path)['sha256'] == '6be7f51dd85a02ebb038c0bf661ed90a8eb8a669ba499206e1150fa22fc21e93'
+    assert receipt['exit_code'] == 0 and receipt['source_bytes_match_before_and_after'] is True
+    assert receipt['source_snapshot']['sha256'] == SNAPSHOT_SHA
+    assert receipt['command'] == ['cargo', 'generate-lockfile', '--offline', '--manifest-path', str(OUT / 'rust/Cargo.toml')]
+    failed_path = BASE / 'wind-pow-Rust-build-01/Cargo-command/receipt.json'
+    failed = json.loads(failed_path.read_text(encoding='utf-8'))
+    assert ref(failed_path)['sha256'] == '8071404ad902792909e2ca95c2ed460cead8b378859e530a6338d4208ddba2ad'
+    assert failed['exit_code'] == 101 and failed['source_bytes_match_before_and_after'] is True
+    assert failed['source_snapshot']['sha256'] == SNAPSHOT_SHA
+    assert ref(ROOT / failed['stderr']['path'])['sha256'] == failed['stderr']['sha256']
+    assert 'cannot update the lock file' in (ROOT / failed['stderr']['path']).read_text(encoding='utf-8')
+    generated = OUT / 'offline-generated-Cargo.lock'
+    assert not generated.exists()
+    generated.write_bytes((OUT / 'rust/Cargo.lock').read_bytes())
+    root_packages = {p['name']: p for p in tomllib.loads((ROOT / 'Cargo.lock').read_text())['package']}
+    generated_packages = {p['name']: p for p in tomllib.loads(generated.read_text())['package']}
+    changes = [(n, p['version'], root_packages[n]['version']) for n, p in generated_packages.items() if p.get('source') and p['version'] != root_packages[n]['version']]
+    assert changes == [('memchr', '2.8.3', '2.8.1'), ('zmij', '1.0.23', '1.0.21')]
+    final = generated.read_text(encoding='utf-8')
+    for name, _, _ in changes:
+        pattern = r'(\[\[package\]\]\nname = "' + re.escape(name) + r'"\n)version = "[^"\n]+"\n(source = "[^"\n]+"\n)checksum = "[^"\n]+"'
+        replacement = r'\g<1>version = "' + root_packages[name]['version'] + r'"\n\g<2>checksum = "' + root_packages[name]['checksum'] + '"'
+        final, count = re.subn(pattern, replacement, final)
+        assert count == 1
+    (OUT / 'rust/Cargo.lock').write_bytes(final.encode())
+    final_packages = {p['name']: p for p in tomllib.loads(final)['package']}
+    assert len(final_packages) == 14
+    assert final_packages['ep_runtime']['dependencies'] == ['ep_model']
+    assert final_packages['serde']['dependencies'] == ['serde_core']
+    assert final_packages['src05_wind_pow_probe']['dependencies'] == ['ep_runtime', 'serde_json']
+    assert all((p['version'], p.get('checksum'), p.get('source')) == (root_packages[n]['version'], root_packages[n].get('checksum'), root_packages[n].get('source')) for n, p in final_packages.items() if p.get('source'))
+    assert all((OUT / 'rust' / n).read_bytes() == (OLD / 'rust' / n).read_bytes() for n in PACKAGE if n != 'Cargo.lock')
+    rows = [diff(OLD / 'rust' / n, OUT / 'rust' / n, n.replace('/', '__') + '.from01.diff') for n in PACKAGE]
+    generated_diff = diff(OLD / 'rust/Cargo.lock', generated, 'Cargo.lock.offline-generated.from01.diff')
+    pin_diff = diff(generated, OUT / 'rust/Cargo.lock', 'Cargo.lock.root-pins.from-generated.diff')
+    audit = dict(schema='src05-wind-pow-lock-root-version-audit.v1', root_lock=ref(ROOT / 'Cargo.lock'), generated_lock=ref(generated), proposed_lock=ref(OUT / 'rust/Cargo.lock'), registry_packages=[dict(name=n, generated_version=p['version'], proposed_version=final_packages[n]['version'], root_version=root_packages[n]['version'], proposed_checksum=final_packages[n]['checksum'], root_checksum=root_packages[n]['checksum']) for n, p in generated_packages.items() if p.get('source')], all_proposed_registry_versions_and_checksums_equal_root=True, resolver_edge_removals=[['ep_runtime', 'serde_json'], ['serde', 'serde_derive']], package_added_or_removed=False, package_position_sorted_by_Cargo=True, proposed_locked_build_executed=False)
+    emit(OUT / 'root-version-audit.json', audit)
+    readme = '''# Wind/pow isolated Cargo lock successor03
+
+Accepted prep01/prep02 and canonical Source566 remain byte-exact. This fresh same-depth package copies Cargo.toml, main.rs and digest.rs literally; only Cargo.lock changes. The path dependency still resolves to the genuine canonical ep_runtime crate. Native Sources, input-only request, policy and source-provider contracts remain inherited from prep02.
+
+The failed build01 exited101 before compilation because --locked rejected the hand-selected workspace lock subset. Recorded offline lock resolution6be7f51d exited0 with Source566 unchanged. Cargo removed ep_runtime's dev-only serde_json edge and serde's workspace-unified derive edge, and sorted the probe package entry. The generated lock is retained verbatim, including its opportunistic cached memchr2.8.3/zmij1.0.23 upgrades.
+
+The proposed lock restores those two versions and checksums literally from root Cargo.lock (memchr2.8.1, zmij1.0.21). All eleven registry package versions/checksums equal the root lock; all fourteen package identities remain. Both the full original-to-generated and generated-to-root-pinned deltas are retained, as is the final original-to-proposal diff. No Cargo.toml feature/dependency or Rust implementation changes are proposed.
+
+Only cargo generate-lockfile --offline was executed. The pinned proposal has not been built, observed or separately accepted by Cargo --locked; that remains Root's next build validation. No numerical result, expected value, tolerance, production Source or gate changed. Authentic failed-build and resolver receipts/logs, all83 accepted hold-file hashes and full3922-member canonical preservation are recorded.
+'''
+    (OUT / 'README.md').write_bytes(readme.encode())
+    parent = json.loads((PARENT / 'manifest.json').read_text(encoding='utf-8'))
+    manifest = copy.deepcopy(parent)
+    replacements = {(OLD / 'rust' / n).relative_to(ROOT).as_posix(): ref(OUT / 'rust' / n) for n in PACKAGE}
+    manifest['own_sources'] = [replacements.get(r['path'], r) for r in parent['own_sources']]
+    manifest['own_sources'] += [ref(OUT / p) for p in ('README.md', 'offline-generated-Cargo.lock', 'root-version-audit.json', 'preservation-before.json')]
+    manifest['own_sources'].append(ref(Path(__file__).resolve()))
+    manifest['exact_source_diffs'] = [r for r in parent['exact_source_diffs'] if r['after']['path'] not in replacements] + rows
+    manifest['runtime_interfaces']['Rust_Cargo_manifest'] = ref(OUT / 'rust/Cargo.toml')
+    manifest['prior_metadata_successor'] = manifest.pop('metadata_successor')
+    manifest['metadata_successor'] = dict(parent_preparation=ref(PARENT / 'manifest.json'), authentic_before_manifest=ref(OUT / 'before/manifest02.json'), authentic_original_manifest=ref(OUT / 'before/manifest01.json'), inherited_Native_and_scientific_Source_contracts_byte_exact=True, copied_Rust_nonlock_bodies_byte_exact=True, lock_only_semantic_change=True, Cargo_lock_resolution_executed=True, failed_locked_build_execution=ref(failed_path), failed_build_stdout=ref(ROOT / failed['stdout']['path']), failed_build_stderr=ref(ROOT / failed['stderr']['path']), actual_offline_lock_resolution=ref(receipt_path), actual_offline_stdout=ref(ROOT / receipt['stdout']['path']), actual_offline_stderr=ref(ROOT / receipt['stderr']['path']), actual_executed_recorder=receipt['executed_launcher'], full_original_to_generated_lock_diff=generated_diff, full_generated_to_proposed_lock_diff=pin_diff, root_lock_before_archive=ref(OUT / 'before/root-Cargo.lock'), root_version_audit=ref(OUT / 'root-version-audit.json'), accepted_hold_preservation=ref(OUT / 'preservation-before.json'), current_canonical_Source_snapshot=preserved['current_Source_snapshot'], all83_accepted_hold_files_unchanged=preserve() == preserved['accepted_hold_files'], full3922_canonical_Source_members_unchanged=current_source() == preserved['current_Source_snapshot'], proposed_locked_build_executed=False, author=ref(Path(__file__).resolve()))
+    assert manifest['build_or_target_execution_performed'] is False and manifest['gates_updated'] is False
+    emit(OUT / 'manifest.json', manifest)
+    diff(OUT / 'before/README02.md', OUT / 'README.md', 'README.from02.diff')
+    diff(OUT / 'before/manifest02.json', OUT / 'manifest.json', 'manifest.from02.diff')
+    print(json.dumps(dict(manifest=ref(OUT / 'manifest.json'), proposed_lock=ref(OUT / 'rust/Cargo.lock'), original_to_proposed_diff=rows[1]['diff'], offline_execution=ref(receipt_path))))
+
+if __name__ == '__main__':
+    assert len(sys.argv) == 2 and sys.argv[1] in ('prepare', 'seal')
+    (prepare if sys.argv[1] == 'prepare' else seal)()

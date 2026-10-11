@@ -1,0 +1,195 @@
+{
+  "schema": "src05-read-only-current-pow-provider-inspection.v1",
+  "binaries_before_and_after_equal": [
+    {
+      "path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\ep_runtime-880f77a2e9883822.exe",
+      "sha256": "27cf7d7947528e85b4a0a5329a4d6f2535157969a06db2f1363e7b811e6a800a",
+      "size_bytes": 68411530
+    },
+    {
+      "path": "D:\\CodexBuild\\rusted-energyplus\\SRC-05\\native-build-02\\bin\\src05_surface_environment_helper.exe",
+      "sha256": "99535e2c1dfd53f4ed3af4ec5da0d03fb597fc707523f8ee1629a56794c84b6f",
+      "size_bytes": 1295817841
+    }
+  ],
+  "static_inspections": [
+    {
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\objdump.exe",
+        "-d",
+        "--start-address=0x1417e45c0",
+        "--stop-address=0x1417e45e0",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\ep_runtime-880f77a2e9883822.exe"
+      ],
+      "stdout": {
+        "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-01/provider-evidence/Rust-powf.txt",
+        "sha256": "c183f8efbe67771d33cd4e8f0b23e84ff8040144304babf3db2abca0972f1931",
+        "size_bytes": 648,
+        "line_count": 14
+      },
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\objdump.exe",
+        "-d",
+        "--start-address=0x141c5b6a0",
+        "--stop-address=0x141c5bc30",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\ep_runtime-880f77a2e9883822.exe"
+      ],
+      "stdout": {
+        "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-01/provider-evidence/Rust-pow.txt",
+        "sha256": "376e290a4a96d90173e6220d614baf383945cbfe908faed8243c36e12ac74e51",
+        "size_bytes": 20642,
+        "line_count": 355
+      },
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\objdump.exe",
+        "-d",
+        "--start-address=0x141c5c890",
+        "--stop-address=0x141c5c8f8",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\ep_runtime-880f77a2e9883822.exe"
+      ],
+      "stdout": {
+        "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-01/provider-evidence/Rust-exp2l.txt",
+        "sha256": "5bd83be9a7ab07863cfcd2bff9dc0277eac7fd652119c616d940053e8b17453c",
+        "size_bytes": 2102,
+        "line_count": 45
+      },
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\objdump.exe",
+        "-d",
+        "--start-address=0x141c5ca40",
+        "--stop-address=0x141c5caa0",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\ep_runtime-880f77a2e9883822.exe"
+      ],
+      "stdout": {
+        "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-01/provider-evidence/Rust-log2l.txt",
+        "sha256": "3bbcbe6bd9d83bff8b7d7d3c783f690938e88222d4344cd1c0c28a6cf88d9db9",
+        "size_bytes": 2177,
+        "line_count": 47
+      },
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\objdump.exe",
+        "-d",
+        "--start-address=0x141c5cd90",
+        "--stop-address=0x141c5cd93",
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\ep_runtime-880f77a2e9883822.exe"
+      ],
+      "stdout": {
+        "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-01/provider-evidence/Rust-fpreset.txt",
+        "sha256": "8f71bef493a4bd0c62ed70f4c179e295b06119ce8c831f810389891e580dda2d",
+        "size_bytes": 288,
+        "line_count": 9
+      },
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\objdump.exe",
+        "-d",
+        "--start-address=0x141ac2f76",
+        "--stop-address=0x141ac3720",
+        "D:\\CodexBuild\\rusted-energyplus\\SRC-05\\native-build-02\\bin\\src05_surface_environment_helper.exe"
+      ],
+      "stdout": {
+        "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-01/provider-evidence/Native-pow.txt",
+        "sha256": "003e4a88867c83f1e5a28e9b2bf79d954c5cac23561c75a4dbdaba0213008c7a",
+        "size_bytes": 28899,
+        "line_count": 468
+      },
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\objdump.exe",
+        "-d",
+        "--start-address=0x141ac9320",
+        "--stop-address=0x141ac9388",
+        "D:\\CodexBuild\\rusted-energyplus\\SRC-05\\native-build-02\\bin\\src05_surface_environment_helper.exe"
+      ],
+      "stdout": {
+        "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-01/provider-evidence/Native-exp2l.txt",
+        "sha256": "03f89a89395edc5230d71a8356e3a821d069a78358013d52acfeaa98a4470e28",
+        "size_bytes": 2093,
+        "line_count": 45
+      },
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\objdump.exe",
+        "-d",
+        "--start-address=0x141ac9400",
+        "--stop-address=0x141ac9460",
+        "D:\\CodexBuild\\rusted-energyplus\\SRC-05\\native-build-02\\bin\\src05_surface_environment_helper.exe"
+      ],
+      "stdout": {
+        "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-01/provider-evidence/Native-log2l.txt",
+        "sha256": "214ec7411b81ac0e442848e06942b83d4be98742c0fb3aa9cceef8dfca81c488",
+        "size_bytes": 2168,
+        "line_count": 47
+      },
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\objdump.exe",
+        "-d",
+        "--start-address=0x141aba0a0",
+        "--stop-address=0x141aba0a9",
+        "D:\\CodexBuild\\rusted-energyplus\\SRC-05\\native-build-02\\bin\\src05_surface_environment_helper.exe"
+      ],
+      "stdout": {
+        "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-01/provider-evidence/Native-fpreset.txt",
+        "sha256": "f5af656e97b51e0767402ce8fe6ae3ade93b800c25db317c12e35e57bdf4e748",
+        "size_bytes": 472,
+        "line_count": 13
+      },
+      "exit_code": 0
+    }
+  ],
+  "actual_Rust_library_archive": {
+    "path": "C:\\Users\\GonieGonie\\.rustup\\toolchains\\1.96.0-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\lib\\self-contained\\libmsvcrt.a",
+    "sha256": "18941805e69109d61d0f4aefafa4f1dd5dd79c57c9ba099b812b4f7679bb19a5",
+    "size_bytes": 1232122
+  },
+  "selected_library_symbols": {
+    "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-01/provider-evidence/Rust-library-pow-symbols.txt",
+    "sha256": "915544c1d83d300d1741af833db6a4a177481d555c00ba37d199af7b59f24b1d",
+    "size_bytes": 2672,
+    "line_count": 14
+  },
+  "read_only_inspection_tools": [
+    {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/objdump.exe",
+      "sha256": "0d140222ea3e5bb234a98c602350c1ace10ddaba7638dbb96f3ec9a0d17bfbc1",
+      "size_bytes": 2440206,
+      "line_count": 11313
+    },
+    {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/nm.exe",
+      "sha256": "a3f09f2c10b21e9b05c21b6aad33cc48be1234a2b5904ff846872b45fcdf89d3",
+      "size_bytes": 1197070,
+      "line_count": 7886
+    }
+  ],
+  "old_Cargo_artifact_name_authority": {
+    "path": ".runtime/porting/SRC-05/selected-observation-02/Rust/cargo-command/stderr.log",
+    "sha256": "4e10571d96f2f7c8197d5a38c1d68123f6833fd5536004c8e498d70c915c0809",
+    "size_bytes": 147,
+    "line_count": 2
+  },
+  "historical_Rust_executable_SHA_recorded_at_execution": false,
+  "provider_correspondence_limit": "Current static call/symbol/family evidence only; no retrospective historical artifact/worker-state guard inferred",
+  "new_target_execution": false
+}

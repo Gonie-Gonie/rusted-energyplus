@@ -1,0 +1,16 @@
+[package]
+name = "src05_wind_pow_probe"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+# Isolated diagnostic executable: no canonical workspace lint is weakened.
+[workspace]
+
+[dependencies]
+ep_runtime = { path = "../../../../../crates/ep_runtime" }
+serde_json = "=1.0.150"
+
+[profile.dev]
+opt-level = 0
+lto = false

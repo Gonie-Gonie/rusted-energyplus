@@ -1,0 +1,62 @@
+--- .runtime/porting/SRC-05/wind-pow-isolation-prep-01/rust/Cargo.lock
++++ .runtime/porting/SRC-05/wind-pow-isolation-prep-03/offline-generated-Cargo.lock
+@@ -11,7 +11,6 @@
+ version = "0.1.0"
+ dependencies = [
+  "ep_model",
+- "serde_json",
+ ]
+ 
+ [[package]]
+@@ -22,9 +21,9 @@
+ 
+ [[package]]
+ name = "memchr"
+-version = "2.8.1"
++version = "2.8.3"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "6b947ae49db0d222b1dbc6b113ce7248a3fc3a6ca21b696717bfc000ba4484d8"
++checksum = "cf8baf1c55e62ffcace7a9f06f4bd9cd3f0c4beb022d3b367256b91b87513d98"
+ 
+ [[package]]
+ name = "proc-macro2"
+@@ -51,7 +50,6 @@
+ checksum = "9a8e94ea7f378bd32cbbd37198a4a91436180c5bb472411e48b5ec2e2124ae9e"
+ dependencies = [
+  "serde_core",
+- "serde_derive",
+ ]
+ 
+ [[package]]
+@@ -88,6 +86,14 @@
+ ]
+ 
+ [[package]]
++name = "src05_wind_pow_probe"
++version = "0.0.0"
++dependencies = [
++ "ep_runtime",
++ "serde_json",
++]
++
++[[package]]
+ name = "syn"
+ version = "2.0.117"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+@@ -106,14 +112,6 @@
+ 
+ [[package]]
+ name = "zmij"
+-version = "1.0.21"
++version = "1.0.23"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "b8848ee67ecc8aedbaf3e4122217aff892639231befc6a1b58d29fff4c2cabaa"
+-
+-[[package]]
+-name = "src05_wind_pow_probe"
+-version = "0.0.0"
+-dependencies = [
+- "ep_runtime",
+- "serde_json",
+-]
++checksum = "29666d0abbfad1e3dc4dcf6144730dd3a3ab225bbbdac83319345b1b44ccfc1b"

@@ -1,0 +1,9 @@
+# Wind/pow isolated Cargo lock successor03
+
+Accepted prep01/prep02 and canonical Source566 remain byte-exact. This fresh same-depth package copies Cargo.toml, main.rs and digest.rs literally; only Cargo.lock changes. The path dependency still resolves to the genuine canonical ep_runtime crate. Native Sources, input-only request, policy and source-provider contracts remain inherited from prep02.
+
+The failed build01 exited101 before compilation because --locked rejected the hand-selected workspace lock subset. Recorded offline lock resolution6be7f51d exited0 with Source566 unchanged. Cargo removed ep_runtime's dev-only serde_json edge and serde's workspace-unified derive edge, and sorted the probe package entry. The generated lock is retained verbatim, including its opportunistic cached memchr2.8.3/zmij1.0.23 upgrades.
+
+The proposed lock restores those two versions and checksums literally from root Cargo.lock (memchr2.8.1, zmij1.0.21). All eleven registry package versions/checksums equal the root lock; all fourteen package identities remain. Both the full original-to-generated and generated-to-root-pinned deltas are retained, as is the final original-to-proposal diff. No Cargo.toml feature/dependency or Rust implementation changes are proposed.
+
+Only cargo generate-lockfile --offline was executed. The pinned proposal has not been built, observed or separately accepted by Cargo --locked; that remains Root's next build validation. No numerical result, expected value, tolerance, production Source or gate changed. Authentic failed-build and resolver receipts/logs, all83 accepted hold-file hashes and full3922-member canonical preservation are recorded.

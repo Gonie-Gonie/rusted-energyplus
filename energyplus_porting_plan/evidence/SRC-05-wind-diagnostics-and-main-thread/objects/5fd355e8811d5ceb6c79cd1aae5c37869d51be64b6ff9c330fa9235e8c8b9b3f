@@ -1,0 +1,8 @@
+--- .runtime/porting/SRC-05/wind-pow-isolation-prep-02/before/README.md
++++ .runtime/porting/SRC-05/wind-pow-isolation-prep-02/README.md
+@@ -17,3 +17,5 @@
+ No libm crate is an existing repository dependency. The bundled Rust compiler-builtins libm pow Source is FreeBSD/Sun split-log arithmetic, distinct from this MinGW x87 family; its mere availability does not justify replacing std::powf. No production correction is proposed.
+ 
+ Run protocol after Source acceptance only: Native argc2 input-only path; Rust argc3 the identical full request path and actual SHA256. Use existing record_command.py, full frozen Sources/lock/policy and complete stdout/stderr, input and actual emitted executable before/after hashes, same actual stable Source receipt. No new execution/comparison framework is supplied. Full rows/stages/control facts must be retained, including nonfinite/domain outcomes and any process failure. Any later diagnostic analysis must distinguish primitive observations from true setter routes and historical unavailable controls. No numerical, backend, ordinary-manager or gate PASS is claimed.
++
++Metadata-only successor02 corrects the tagged pow.def.h Source bound to197-219, including the finite expression at214. All22 original own Source descriptors, helpers, input, policy, provider transcripts, runtime interfaces and other seven ranges remain literal01. The historical static-provider audit remains at its actual sealing cutoff; a later rebuilt test executable does not rewrite that evidence. Future probes require newly emitted artifact custody. No build, target, Cargo or diagnostic execution occurred.

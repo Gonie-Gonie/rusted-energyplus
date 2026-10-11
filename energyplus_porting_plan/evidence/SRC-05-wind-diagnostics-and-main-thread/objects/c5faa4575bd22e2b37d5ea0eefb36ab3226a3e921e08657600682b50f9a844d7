@@ -1,0 +1,17 @@
+[package]
+name = "src05_surface_environment_main"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+# Isolated diagnostic executable: no canonical workspace lint is weakened.
+[workspace]
+
+[dependencies]
+ep_model = { path = "../../../../../crates/ep_model" }
+ep_runtime = { path = "../../../../../crates/ep_runtime" }
+serde_json = { version = "=1.0.150", features = ["float_roundtrip"] }
+
+[profile.dev]
+opt-level = 0
+lto = false

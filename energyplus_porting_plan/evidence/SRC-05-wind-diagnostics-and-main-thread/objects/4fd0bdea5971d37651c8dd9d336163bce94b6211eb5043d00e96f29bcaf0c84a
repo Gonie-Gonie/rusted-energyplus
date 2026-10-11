@@ -1,0 +1,17 @@
+--- .runtime/porting/SRC-05/surface-environment-selected-comparison-prep-05/before/policy.json
++++ .runtime/porting/SRC-05/surface-environment-selected-comparison-prep-05/policy.json
+@@ -8,10 +8,10 @@
+     "line_count": 823
+   },
+   "Rust_source_preparation": {
+-    "path": ".runtime/porting/SRC-05/surface-environment-main-thread-prep-01/manifest.json",
+-    "sha256": "829ea2f54c4b1d9b4399e1566d5897bd37be2d53de7aa749e0c25549a41b09e2",
+-    "size_bytes": 20058,
+-    "line_count": 499
++    "path": ".runtime/porting/SRC-05/surface-environment-main-thread-prep-02/manifest.json",
++    "sha256": "84bbd0adc1d0dfbf1240dbf7a45a4e0b916f591057c6c8f1079877f04790e782",
++    "size_bytes": 25719,
++    "line_count": 665
+   },
+   "literal_input_source": {
+     "path": ".runtime/porting/SRC-05/native-surface-environment-prep-01/input-only-cases.proposed.json",

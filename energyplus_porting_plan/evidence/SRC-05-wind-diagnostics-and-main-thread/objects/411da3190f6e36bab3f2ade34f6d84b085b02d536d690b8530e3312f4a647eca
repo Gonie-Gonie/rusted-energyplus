@@ -1,0 +1,55 @@
+
+C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\target\debug\src05_wind_pow_probe.exe:     file format pei-x86-64
+
+
+Disassembly of section .text:
+
+00000001407825f0 <_ZN10ep_runtime12heat_balance10convection19surface_environment35SurfaceOutdoorEnvironmentParameters20wind_speed_at_height17h67e3e5c838817387E>:
+   1407825f0:	48 83 ec 58          	sub    $0x58,%rsp
+   1407825f4:	f2 0f 11 54 24 28    	movsd  %xmm2,0x28(%rsp)
+   1407825fa:	f2 0f 11 4c 24 30    	movsd  %xmm1,0x30(%rsp)
+   140782600:	48 89 4c 24 38       	mov    %rcx,0x38(%rsp)
+   140782605:	f2 0f 59 49 20       	mulsd  0x20(%rcx),%xmm1
+   14078260a:	f2 0f 11 4c 24 40    	movsd  %xmm1,0x40(%rsp)
+   140782610:	f2 0f 10 41 18       	movsd  0x18(%rcx),%xmm0
+   140782615:	f2 0f 10 49 10       	movsd  0x10(%rcx),%xmm1
+   14078261a:	66 48 0f 7e c8       	movq   %xmm1,%rax
+   14078261f:	48 b9 00 00 00 00 00 	movabs $0x8000000000000000,%rcx
+   140782626:	00 00 80 
+   140782629:	48 31 c8             	xor    %rcx,%rax
+   14078262c:	66 48 0f 6e c8       	movq   %rax,%xmm1
+   140782631:	e8 0a 09 d9 ff       	call   140512f40 <_ZN3std3f6421_$LT$impl$u20$f64$GT$4powf17h65eac0cc298c0fc8E>
+   140782636:	48 8b 4c 24 38       	mov    0x38(%rsp),%rcx
+   14078263b:	0f 28 c8             	movaps %xmm0,%xmm1
+   14078263e:	f2 0f 10 44 24 40    	movsd  0x40(%rsp),%xmm0
+   140782644:	f2 0f 59 c1          	mulsd  %xmm1,%xmm0
+   140782648:	f2 0f 11 44 24 48    	movsd  %xmm0,0x48(%rsp)
+   14078264e:	f2 0f 10 41 10       	movsd  0x10(%rcx),%xmm0
+   140782653:	0f 57 c9             	xorps  %xmm1,%xmm1
+   140782656:	66 0f 2e c1          	ucomisd %xmm1,%xmm0
+   14078265a:	75 04                	jne    140782660 <_ZN10ep_runtime12heat_balance10convection19surface_environment35SurfaceOutdoorEnvironmentParameters20wind_speed_at_height17h67e3e5c838817387E+0x70>
+   14078265c:	7a 02                	jp     140782660 <_ZN10ep_runtime12heat_balance10convection19surface_environment35SurfaceOutdoorEnvironmentParameters20wind_speed_at_height17h67e3e5c838817387E+0x70>
+   14078265e:	eb 11                	jmp    140782671 <_ZN10ep_runtime12heat_balance10convection19surface_environment35SurfaceOutdoorEnvironmentParameters20wind_speed_at_height17h67e3e5c838817387E+0x81>
+   140782660:	f2 0f 10 4c 24 28    	movsd  0x28(%rsp),%xmm1
+   140782666:	0f 57 c0             	xorps  %xmm0,%xmm0
+   140782669:	66 0f 2e c1          	ucomisd %xmm1,%xmm0
+   14078266d:	73 3a                	jae    1407826a9 <_ZN10ep_runtime12heat_balance10convection19surface_environment35SurfaceOutdoorEnvironmentParameters20wind_speed_at_height17h67e3e5c838817387E+0xb9>
+   14078266f:	eb 0e                	jmp    14078267f <_ZN10ep_runtime12heat_balance10convection19surface_environment35SurfaceOutdoorEnvironmentParameters20wind_speed_at_height17h67e3e5c838817387E+0x8f>
+   140782671:	f2 0f 10 44 24 30    	movsd  0x30(%rsp),%xmm0
+   140782677:	f2 0f 11 44 24 50    	movsd  %xmm0,0x50(%rsp)
+   14078267d:	eb 33                	jmp    1407826b2 <_ZN10ep_runtime12heat_balance10convection19surface_environment35SurfaceOutdoorEnvironmentParameters20wind_speed_at_height17h67e3e5c838817387E+0xc2>
+   14078267f:	f2 0f 10 44 24 28    	movsd  0x28(%rsp),%xmm0
+   140782685:	48 8b 44 24 38       	mov    0x38(%rsp),%rax
+   14078268a:	f2 0f 10 48 10       	movsd  0x10(%rax),%xmm1
+   14078268f:	e8 ac 08 d9 ff       	call   140512f40 <_ZN3std3f6421_$LT$impl$u20$f64$GT$4powf17h65eac0cc298c0fc8E>
+   140782694:	0f 28 c8             	movaps %xmm0,%xmm1
+   140782697:	f2 0f 10 44 24 48    	movsd  0x48(%rsp),%xmm0
+   14078269d:	f2 0f 59 c1          	mulsd  %xmm1,%xmm0
+   1407826a1:	f2 0f 11 44 24 50    	movsd  %xmm0,0x50(%rsp)
+   1407826a7:	eb 09                	jmp    1407826b2 <_ZN10ep_runtime12heat_balance10convection19surface_environment35SurfaceOutdoorEnvironmentParameters20wind_speed_at_height17h67e3e5c838817387E+0xc2>
+   1407826a9:	0f 57 c0             	xorps  %xmm0,%xmm0
+   1407826ac:	f2 0f 11 44 24 50    	movsd  %xmm0,0x50(%rsp)
+   1407826b2:	f2 0f 10 44 24 50    	movsd  0x50(%rsp),%xmm0
+   1407826b8:	48 83 c4 58          	add    $0x58,%rsp
+   1407826bc:	c3                   	ret
+   1407826bd:	0f 1f 00             	nopl   (%rax)

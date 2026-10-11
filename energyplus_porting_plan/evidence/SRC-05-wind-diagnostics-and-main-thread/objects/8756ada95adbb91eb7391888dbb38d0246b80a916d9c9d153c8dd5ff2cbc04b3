@@ -1,0 +1,169 @@
+{
+  "schema": "src05-wind-pow-execution-driver-Source-preparation.v1",
+  "status": "SOURCE-READY-unexecuted",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/SRC-05/wind-pow-execution-prep-01/run_execution.py",
+      "sha256": "d4cdae04af2f21d9f5c489dc89cc031218445772b404b31412f1b5f5da2ac736",
+      "size_bytes": 9767,
+      "line_count": 147
+    },
+    {
+      "path": ".runtime/porting/SRC-05/wind-pow-execution-prep-01/README.md",
+      "sha256": "74eb0d27fb993e7809921096f686da062caeacff00c90dd09ede7d6319a72fb7",
+      "size_bytes": 3129,
+      "line_count": 15
+    },
+    {
+      "path": ".runtime/porting/SRC-05/wind-pow-execution-prep-01/before.empty",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/SRC-05/wind-pow-execution-prep-01/run_execution.py.addition.diff",
+      "sha256": "7d5539c4acd98e996245b936379066b266d5b8d956299ee2a7dde87b00a54a17",
+      "size_bytes": 9990,
+      "line_count": 150
+    },
+    {
+      "path": ".runtime/porting/SRC-05/wind-pow-execution-prep-01/README.md.addition.diff",
+      "sha256": "ccf27589168fab71cc5190fe486630d20cde603cd8385ec2c69dcbcffdc574bc",
+      "size_bytes": 3205,
+      "line_count": 18
+    }
+  ],
+  "Source_dependencies": [
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "size_bytes": 8453,
+      "line_count": 204
+    },
+    {
+      "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-02/manifest.json",
+      "sha256": "193ea67ee3d7c2681ca5b799078659934330e28bbfd87afb2a895805f8f58939",
+      "size_bytes": 38345,
+      "line_count": 932
+    },
+    {
+      "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-03/manifest.json",
+      "sha256": "f981be1c461227a9152ded3288bf14cd0e007cbd6ab0ba74ac91674b36acc4a2",
+      "size_bytes": 45607,
+      "line_count": 1102
+    },
+    {
+      "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-01/prospective-policy.json",
+      "sha256": "981e07628dd6057d53367cddc1493746b78b5b6e86c38e52b7815484041761f7",
+      "size_bytes": 3011,
+      "line_count": 68
+    },
+    {
+      "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-01/input-only.json",
+      "sha256": "26a0e40334b037b3b22721766dc331f20887d3ee8ab751ee90d46c994272eb17",
+      "size_bytes": 14409,
+      "line_count": 532
+    },
+    {
+      "path": ".runtime/porting/SYS-03/round-format-observation-02/Native-execution.custody.json",
+      "sha256": "64c0bcf58914b868ad0c51ca247c765bdc30333b0b5ec7c93f75fa2b1fda4452",
+      "size_bytes": 5003,
+      "line_count": 67
+    },
+    {
+      "path": ".runtime/porting/SYS-03/run-round-format-Rust-01.py",
+      "sha256": "4cb38899b519e94b3c8b9be63d5a6a8eed8a1594d25778bf35fe91066297b556",
+      "size_bytes": 4053,
+      "line_count": 60
+    },
+    {
+      "path": ".runtime/porting/source-objects/56/5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548",
+      "sha256": "5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548",
+      "size_bytes": 1629743,
+      "line_count": 31383
+    }
+  ],
+  "exact_addition_diffs": [
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-05/wind-pow-execution-prep-01/before.empty",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-05/wind-pow-execution-prep-01/run_execution.py",
+        "sha256": "d4cdae04af2f21d9f5c489dc89cc031218445772b404b31412f1b5f5da2ac736",
+        "size_bytes": 9767,
+        "line_count": 147
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-05/wind-pow-execution-prep-01/run_execution.py.addition.diff",
+        "sha256": "7d5539c4acd98e996245b936379066b266d5b8d956299ee2a7dde87b00a54a17",
+        "size_bytes": 9990,
+        "line_count": 150
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-05/wind-pow-execution-prep-01/before.empty",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-05/wind-pow-execution-prep-01/README.md",
+        "sha256": "74eb0d27fb993e7809921096f686da062caeacff00c90dd09ede7d6319a72fb7",
+        "size_bytes": 3129,
+        "line_count": 15
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-05/wind-pow-execution-prep-01/README.md.addition.diff",
+        "sha256": "ccf27589168fab71cc5190fe486630d20cde603cd8385ec2c69dcbcffdc574bc",
+        "size_bytes": 3205,
+        "line_count": 18
+      }
+    }
+  ],
+  "runtime_interfaces": {
+    "implementation": [
+      "Native",
+      "Rust"
+    ],
+    "argv_options": [
+      "--implementation",
+      "--binary",
+      "--provider-review",
+      "--preparation",
+      "--output-dir"
+    ],
+    "Root_acceptance_schema": "src05-wind-pow-Root-provider-acceptance.v1",
+    "Root_acceptance_fields": [
+      "schema",
+      "implementation",
+      "binary",
+      "provider_proof",
+      "accepted",
+      "Source_snapshot",
+      "Source_preparation"
+    ],
+    "Root_acceptance_optional_fields": [
+      "link_map"
+    ],
+    "Rust_required_acceptance_field": "actual_Cargo_execution",
+    "before_schema": "src05-wind-pow-execution-before.v1",
+    "custody_schema": "src05-wind-pow-execution-custody.v1",
+    "fresh_output_parent": ".runtime/porting/SRC-05",
+    "Native_argc": 2,
+    "Rust_argc": 3,
+    "actual_Rust_Cargo_artifact_extracted_from_full_stdout": true,
+    "provider_review_is_prior_Root_approval_not_driver_analysis": true
+  },
+  "scientific_outputs_read": false,
+  "target_or_build_or_harness_execution_performed": false,
+  "project_import_performed": false,
+  "canonical_Source_changed": false,
+  "policy_or_formula_or_tolerance_changed": false,
+  "expected_answers_supplied": false,
+  "gates_updated": false
+}

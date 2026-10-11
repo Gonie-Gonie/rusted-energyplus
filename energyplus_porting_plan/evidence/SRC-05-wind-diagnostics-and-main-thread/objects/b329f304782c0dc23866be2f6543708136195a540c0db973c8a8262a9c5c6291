@@ -1,0 +1,43 @@
+{
+  "schema": "src05-wind-pow-Root-provider-acceptance.v1",
+  "implementation": "Rust",
+  "binary": {
+    "path": "target/debug/src05_wind_pow_probe.exe",
+    "sha256": "65047c13139946c34af7ce23b5084994dd2b8d68cb41ddea509ab34516912b10",
+    "size_bytes": 29678273
+  },
+  "provider_proof": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/inventory.json",
+    "sha256": "62a0fb7adf97950cfe2c3371c378412cd3d9966947babd575b56800eac22911f",
+    "size_bytes": 46468
+  },
+  "accepted": true,
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/56/5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548",
+    "sha256": "5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548"
+  },
+  "Source_preparation": {
+    "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-03/manifest.json",
+    "sha256": "f981be1c461227a9152ded3288bf14cd0e007cbd6ab0ba74ac91674b36acc4a2",
+    "size_bytes": 45607
+  },
+  "link_map": {
+    "path": "D:\\CodexBuild\\rusted-energyplus\\SRC-05\\wind-pow-Rust-build-02\\src05_wind_pow_probe.map",
+    "sha256": "ad2a224c7bd70afd0a856fbd7c220d2c6f8f020c18db99b17f6e2ab50f119218",
+    "size_bytes": 8943799
+  },
+  "actual_Cargo_execution": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Rust-build-02/Cargo-command/receipt.json",
+    "sha256": "56550fe1c86f75fb5ff6da5b198513b254f696d4e05e789d1e292fed73797f46",
+    "size_bytes": 3268
+  },
+  "Root_FULL_inventory_review": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/Root-full-provider-review.json",
+    "sha256": "d8d2656330be749b8d48f0b24af3d52416e02d49ef36e04c1220a680b95492c4",
+    "size_bytes": 908
+  },
+  "helper_executed": false,
+  "diagnostic_results_read": false,
+  "production_math_changed": false,
+  "gates_updated": false
+}

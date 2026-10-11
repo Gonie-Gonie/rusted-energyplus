@@ -1,0 +1,20 @@
+{
+  "schema": "src05-wind-pow-Root-independent-full-diagnostic-ledger-review.v1",
+  "full_actual_ledger": {
+    "path": ".runtime/porting/SRC-05/wind-pow-independent-diagnostic-comparison-01/comparison.json",
+    "sha256": "0675fa1939d9b6231b9ed241053fd8a2017becc78f2bdf9b9ff328da4a597f8c",
+    "size_bytes": 713080
+  },
+  "complete_current_raw_captures_bound": true,
+  "all_650_scalar_IEEE_class_JSON_witnesses_verified": true,
+  "all_300_pairs_29_result_differences_662_stage_control_differences_4_lane_control_differences_reconstructed_from_raw_captures": true,
+  "exact_input_copy_rows": 100,
+  "independent_Header_custody_and_factual_reviews_retained": true,
+  "current_main_common_result_bit_differences": 0,
+  "current_spawned_common_result_bit_differences": 29,
+  "current_observation_is_causal_experiment": false,
+  "historical_controls_available": false,
+  "scientific_PASS_claimed": false,
+  "production_math_changed": false,
+  "gates_updated": false
+}

@@ -1,0 +1,58 @@
+"""Seal ignored publication Source and exact template correspondence; never execute publisher."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+OUT = ROOT / '.runtime/porting/SRC-05/wind-diagnostics-publication-prep-01'
+TEMPLATE = ROOT / '.runtime/porting/SYS-03/ordinary-warmup-report-publication-prep-03/publish.py'
+
+def ref(path):
+    data = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(data).hexdigest(), size_bytes=len(data), line_count=len(data.splitlines()))
+
+def write(path, data):
+    with path.open('xb') as stream: stream.write(data)
+
+source = (OUT / 'publish.py').read_bytes(); ast.parse(source)
+write(OUT / 'publish.before.py', TEMPLATE.read_bytes())
+write(OUT / 'before.empty', b'')
+delta = ''.join(difflib.unified_diff(TEMPLATE.read_text(encoding='utf8').splitlines(True), source.decode().splitlines(True), fromfile=TEMPLATE.relative_to(ROOT).as_posix(), tofile=(OUT/'publish.py').relative_to(ROOT).as_posix()))
+write(OUT / 'publish.diff', delta.encode())
+readme = (OUT / 'README.md').read_bytes()
+write(OUT / 'README.addition.diff', ''.join(difflib.unified_diff([], readme.decode().splitlines(True), fromfile='/dev/null', tofile=(OUT/'README.md').relative_to(ROOT).as_posix())).encode())
+functions = lambda data: {node.name: ast.dump(node, include_attributes=False) for node in ast.parse(data).body if isinstance(node, ast.FunctionDef)}
+old, new = functions(TEMPLATE.read_bytes()), functions(source)
+unchanged = ['ref', 'checked', 'load', 'operand', 'selected_refs', 'receipt']
+assert all(old[name] == new[name] for name in unchanged)
+dependencies = [
+    '.runtime/porting/SRC-05/selected-main-thread-comparison-01/comparison.json',
+    '.runtime/porting/SRC-05/selected-main-thread-comparison-command-01/receipt.json',
+    '.runtime/porting/SRC-05/surface-environment-selected-comparison-prep-05/manifest.json',
+    '.runtime/porting/SRC-05/selected-main-thread-observation-01/comparison-custody.json',
+    '.runtime/porting/SRC-05/selected-main-thread-observation-01/custody.json',
+    '.runtime/porting/SRC-05/selected-main-thread-observation-01/artifact.json',
+    '.runtime/porting/SRC-05/selected-main-thread-observation-01/Root-full-main-artifact-review.json',
+    '.runtime/porting/SRC-05/Header-main-thread-factual-review-01/review.json',
+    '.runtime/porting/SRC-05/wind-pow-independent-diagnostic-comparison-01/comparison.json',
+    '.runtime/porting/SRC-05/wind-pow-independent-diagnostic-comparison-01/Root-full-ledger-review.json',
+    '.runtime/porting/SRC-05/wind-pow-Native-observation-01/custody.json',
+    '.runtime/porting/SRC-05/wind-pow-Rust-observation-01/custody.json',
+    '.runtime/porting/SRC-05/wind-pow-Native-independent-factual-review-01/review.json',
+    '.runtime/porting/SRC-05/wind-pow-Rust-independent-factual-review-01/review.json',
+    '.runtime/porting/SRC-05/selected-comparison-02/comparison.json',
+    'tools/porting/record_command.py',
+    'energyplus_porting_plan/evidence/SRC-05-surface-environment/summary.json',
+]
+manifest = dict(schema='src05-wind-diagnostics-publication-Source-preparation.v1', status='HELD-Source-only-unexecuted',
+    own_sources=[ref(OUT/'publish.py'), ref(OUT/'README.md')], author=ref(Path(__file__).resolve()),
+    accepted_template=ref(TEMPLATE), before=ref(OUT/'publish.before.py'), exact_diff=ref(OUT/'publish.diff'), README_before=ref(OUT/'before.empty'), README_exact_diff=ref(OUT/'README.addition.diff'),
+    unchanged_template_functions=unchanged, archive_copy_and_full_gzip_verification_reused=True,
+    dependencies=[ref(ROOT/name) for name in dependencies],
+    runtime_interfaces=dict(argv=['python','-X','utf8','-B',(OUT/'publish.py').relative_to(ROOT).as_posix(),'--packet','PATH#SHA256'], packet_schema='src05-wind-diagnostics-and-main-publication-inputs.v1',
+        required_fields=['actual_comparison','actual_comparison_execution','actual_comparer_preparation','actual_main_Root_review','actual_main_Header_review','actual_diagnostic_comparison','actual_diagnostic_Root_review','historical_failed_comparison','diagnostic_lanes'], optional_fields=['selected_source_preparations','opaque_lineage','prior_evidence','closed_executions'], output_directory='energyplus_porting_plan/evidence/SRC-05-wind-diagnostics-and-main-thread', summary_schema='src05-actual-wind-diagnostics-and-standalone-main-evidence.v1'),
+    current_canonical_Source_not_required=True, historical_Source_checked_through_archives=True, prospective_publisher_executed=False, targets_executed=False, scientific_comparison_recomputed=False, production_Source_changed=False, docs_changed=False, gates_updated=False)
+write(OUT / 'manifest.json', (json.dumps(manifest, ensure_ascii=False, indent=2)+'\n').encode())
+print(json.dumps(dict(manifest=ref(OUT/'manifest.json'), source=ref(OUT/'publish.py'), dependency_count=len(dependencies), targets_executed=False)))

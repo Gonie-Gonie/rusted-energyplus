@@ -1,0 +1,28 @@
+/// The data passed to the spawned thread for thread initialization. Any thread
+/// implementation should start a new thread by calling .init() on this before
+/// doing anything else to ensure the current thread is properly initialized and
+/// the global allocator works.
+pub(crate) struct ThreadInit {
+    pub handle: Thread,
+    pub rust_start: Box<dyn FnOnce() + Send>,
+}
+
+impl ThreadInit {
+    /// Initialize the 'current thread' mechanism on this thread, returning the
+    /// Rust entry point.
+    pub fn init(self: Box<Self>) -> Box<dyn FnOnce() + Send> {
+        // Set the current thread before any (de)allocations on the global allocator occur,
+        // so that it may call std::thread::current() in its implementation. This is also
+        // why we take Box<Self>, to ensure the Box is not destroyed until after this point.
+        // Cloning the handle does not invoke the global allocator, it is an Arc.
+        if let Err(_thread) = set_current(self.handle.clone()) {
+            // The current thread should not have set yet. Use an abort to save binary size (see #123356).
+            rtabort!("current thread handle already set during thread spawn");
+        }
+
+        if let Some(name) = self.handle.cname() {
+            imp::set_name(name);
+        }
+
+        self.rust_start
+    }

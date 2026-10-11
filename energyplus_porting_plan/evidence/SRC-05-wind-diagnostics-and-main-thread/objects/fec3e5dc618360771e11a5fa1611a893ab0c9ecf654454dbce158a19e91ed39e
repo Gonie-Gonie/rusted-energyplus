@@ -1,0 +1,125 @@
+{
+  "schema": "src05-wind-pow-lock-root-version-audit.v1",
+  "root_lock": {
+    "path": "Cargo.lock",
+    "sha256": "ebddfe56e3c0d242b920814be6c69b97c2f81bb99909dcbb27b75fead358df3a",
+    "size_bytes": 5543,
+    "line_count": 252
+  },
+  "generated_lock": {
+    "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-03/offline-generated-Cargo.lock",
+    "sha256": "fb799d9ef06ed2a78050cba9c69ba726c60654b8b051900f5d9adf65ca1e16e2",
+    "size_bytes": 2799,
+    "line_count": 117
+  },
+  "proposed_lock": {
+    "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-03/rust/Cargo.lock",
+    "sha256": "810b99c7ed2b53fe6e10335108b0e458d34796e79bafc50af513a8d4605a67b1",
+    "size_bytes": 2799,
+    "line_count": 117
+  },
+  "registry_packages": [
+    {
+      "name": "itoa",
+      "generated_version": "1.0.18",
+      "proposed_version": "1.0.18",
+      "root_version": "1.0.18",
+      "proposed_checksum": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682",
+      "root_checksum": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
+    },
+    {
+      "name": "memchr",
+      "generated_version": "2.8.3",
+      "proposed_version": "2.8.1",
+      "root_version": "2.8.1",
+      "proposed_checksum": "6b947ae49db0d222b1dbc6b113ce7248a3fc3a6ca21b696717bfc000ba4484d8",
+      "root_checksum": "6b947ae49db0d222b1dbc6b113ce7248a3fc3a6ca21b696717bfc000ba4484d8"
+    },
+    {
+      "name": "proc-macro2",
+      "generated_version": "1.0.106",
+      "proposed_version": "1.0.106",
+      "root_version": "1.0.106",
+      "proposed_checksum": "8fd00f0bb2e90d81d1044c2b32617f68fcb9fa3bb7640c23e9c748e53fb30934",
+      "root_checksum": "8fd00f0bb2e90d81d1044c2b32617f68fcb9fa3bb7640c23e9c748e53fb30934"
+    },
+    {
+      "name": "quote",
+      "generated_version": "1.0.45",
+      "proposed_version": "1.0.45",
+      "root_version": "1.0.45",
+      "proposed_checksum": "41f2619966050689382d2b44f664f4bc593e129785a36d6ee376ddf37259b924",
+      "root_checksum": "41f2619966050689382d2b44f664f4bc593e129785a36d6ee376ddf37259b924"
+    },
+    {
+      "name": "serde",
+      "generated_version": "1.0.228",
+      "proposed_version": "1.0.228",
+      "root_version": "1.0.228",
+      "proposed_checksum": "9a8e94ea7f378bd32cbbd37198a4a91436180c5bb472411e48b5ec2e2124ae9e",
+      "root_checksum": "9a8e94ea7f378bd32cbbd37198a4a91436180c5bb472411e48b5ec2e2124ae9e"
+    },
+    {
+      "name": "serde_core",
+      "generated_version": "1.0.228",
+      "proposed_version": "1.0.228",
+      "root_version": "1.0.228",
+      "proposed_checksum": "41d385c7d4ca58e59fc732af25c3983b67ac852c1a25000afe1175de458b67ad",
+      "root_checksum": "41d385c7d4ca58e59fc732af25c3983b67ac852c1a25000afe1175de458b67ad"
+    },
+    {
+      "name": "serde_derive",
+      "generated_version": "1.0.228",
+      "proposed_version": "1.0.228",
+      "root_version": "1.0.228",
+      "proposed_checksum": "d540f220d3187173da220f885ab66608367b6574e925011a9353e4badda91d79",
+      "root_checksum": "d540f220d3187173da220f885ab66608367b6574e925011a9353e4badda91d79"
+    },
+    {
+      "name": "serde_json",
+      "generated_version": "1.0.150",
+      "proposed_version": "1.0.150",
+      "root_version": "1.0.150",
+      "proposed_checksum": "e8014e44b4736ed0538adeecded0fce2a272f22dc9578a7eb6b2d9993c74cfb9",
+      "root_checksum": "e8014e44b4736ed0538adeecded0fce2a272f22dc9578a7eb6b2d9993c74cfb9"
+    },
+    {
+      "name": "syn",
+      "generated_version": "2.0.117",
+      "proposed_version": "2.0.117",
+      "root_version": "2.0.117",
+      "proposed_checksum": "e665b8803e7b1d2a727f4023456bbbbe74da67099c585258af0ad9c5013b9b99",
+      "root_checksum": "e665b8803e7b1d2a727f4023456bbbbe74da67099c585258af0ad9c5013b9b99"
+    },
+    {
+      "name": "unicode-ident",
+      "generated_version": "1.0.24",
+      "proposed_version": "1.0.24",
+      "root_version": "1.0.24",
+      "proposed_checksum": "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75",
+      "root_checksum": "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75"
+    },
+    {
+      "name": "zmij",
+      "generated_version": "1.0.23",
+      "proposed_version": "1.0.21",
+      "root_version": "1.0.21",
+      "proposed_checksum": "b8848ee67ecc8aedbaf3e4122217aff892639231befc6a1b58d29fff4c2cabaa",
+      "root_checksum": "b8848ee67ecc8aedbaf3e4122217aff892639231befc6a1b58d29fff4c2cabaa"
+    }
+  ],
+  "all_proposed_registry_versions_and_checksums_equal_root": true,
+  "resolver_edge_removals": [
+    [
+      "ep_runtime",
+      "serde_json"
+    ],
+    [
+      "serde",
+      "serde_derive"
+    ]
+  ],
+  "package_added_or_removed": false,
+  "package_position_sorted_by_Cargo": true,
+  "proposed_locked_build_executed": false
+}

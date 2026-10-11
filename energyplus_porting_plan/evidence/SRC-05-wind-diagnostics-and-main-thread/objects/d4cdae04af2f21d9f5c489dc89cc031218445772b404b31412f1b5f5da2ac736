@@ -1,0 +1,147 @@
+"""Root-only byte custody for one reviewed wind diagnostic; no result parsing."""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+SOURCE = '5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548'
+RECORDER = ROOT / 'tools/porting/record_command.py'
+RECORDER_SHA = '5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'
+DLL_CUSTODY = {'path': '.runtime/porting/SYS-03/round-format-observation-02/Native-execution.custody.json',
+               'sha256': '64c0bcf58914b868ad0c51ca247c765bdc30333b0b5ec7c93f75fa2b1fda4452'}
+FROZEN = {}
+
+
+def need(condition, message):
+    if not condition:
+        raise ValueError(message)
+
+
+def full(path):
+    with path.open('rb') as stream:
+        sha = hashlib.file_digest(stream, 'sha256').hexdigest()
+    return {'path': path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else str(path),
+            'sha256': sha, 'size_bytes': path.stat().st_size}
+
+
+def bind(row):
+    path = (ROOT / row['path']).resolve()
+    need(not str(path).startswith('\\\\') and path.is_file(), 'missing or network-bound artifact')
+    if path in FROZEN:
+        actual = FROZEN[path]
+    else:
+        actual = full(path)
+    need(actual['sha256'] == row['sha256'] and ('size_bytes' not in row or actual['size_bytes'] == row['size_bytes']), 'bound bytes differ: ' + row['path'])
+    FROZEN[path] = actual
+    return path
+
+
+def operand(token):
+    name, sha = token.rsplit('#', 1)
+    return full(bind({'path': name, 'sha256': sha}))
+
+
+def load(row):
+    return json.loads(bind(row).read_bytes())
+
+
+def write(path, value):
+    with path.open('xb') as stream:
+        stream.write((json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode('utf-8'))
+
+
+def source_paths():
+    paths = set((ROOT / 'crates').rglob('*.rs')) | set((ROOT / 'crates').rglob('Cargo.toml'))
+    return paths | {ROOT / name for name in ('Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml') if (ROOT / name).is_file()}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ('implementation', 'binary', 'provider-review', 'preparation', 'output-dir'):
+        parser.add_argument('--' + name, required=True)
+    args = parser.parse_args()
+    need(args.implementation in ('Native', 'Rust'), 'explicit implementation required')
+    binary, approval_ref, preparation_ref = (operand(v) for v in (args.binary, args.provider_review, args.preparation))
+    need(Path(binary['path']).suffix.lower() == '.exe', 'actual executable required')
+    approval, preparation = load(approval_ref), load(preparation_ref)
+    need(approval['schema'] == 'src05-wind-pow-Root-provider-acceptance.v1' and approval['accepted'] is True, 'actual Root provider/PE acceptance required')
+    need(approval['implementation'] == args.implementation and full(bind(approval['binary'])) == binary, 'accepted implementation/binary differs')
+    need(bind(approval['Source_preparation']) == bind(preparation_ref), 'accepted preparation differs')
+    need(preparation['schema'] == 'src05-wind-pow-diagnostic-source-preparation.v1', 'reviewed diagnostic preparation required')
+    provider_proof = full(bind(approval['provider_proof']))
+    need(approval['Source_snapshot']['sha256'] == SOURCE, 'accepted actual Source differs')
+    snapshot = load(approval['Source_snapshot'])
+    need(snapshot['schema'] == 'rust-command-source-snapshot.v1' and snapshot['bytes_normalized'] is False, 'literal complete Source snapshot required')
+    members = {row['historical_path']: row for row in snapshot['files']}
+    need(len(members) == len(snapshot['files']), 'duplicate Source member')
+    paths = source_paths()
+    need({p.relative_to(ROOT).as_posix() for p in paths} == set(members), 'current full Source membership differs')
+    for name, row in members.items():
+        bind(row['archive'])
+        bind({'path': name, 'sha256': row['archive']['sha256'], 'size_bytes': row['size_bytes']})
+    for row in preparation['own_sources']:
+        bind(row)
+    for row in preparation['selected_source_ranges']:
+        bind(row['source'])
+    bind({'path': str(RECORDER), 'sha256': RECORDER_SHA})
+    bind(full(Path(__file__).resolve()))
+    policy_ref = preparation['runtime_interfaces']['policy']
+    policy = load(policy_ref)
+    need(policy['schema'] == 'src05-wind-pow-diagnostic-policy.v1' and policy['scientific_PASS_claimed'] is False, 'unchanged diagnostic policy required')
+    input_ref = full(bind(policy['input']))
+    need(input_ref['sha256'] == '26a0e40334b037b3b22721766dc331f20887d3ee8ab751ee90d46c994272eb17', 'fixed input differs')
+    link_map = full(bind(approval['link_map'])) if 'link_map' in approval else None
+    cargo_artifact = None
+    if args.implementation == 'Rust':
+        build_ref = approval['actual_Cargo_execution']
+        build = load(build_ref)
+        need(build['schema'] == 'recorded-porting-command.v1' and build['exit_code'] == 0 and build['launch_error'] is None and build['source_bytes_match_before_and_after'] is True and build['source_snapshot']['sha256'] == SOURCE, 'actual successful same-Source Cargo execution required')
+        command = build['command']
+        manifest = bind(preparation['runtime_interfaces']['Rust_Cargo_manifest'])
+        need(command[:2] == ['cargo', 'rustc'] and '--locked' in command and '--message-format=json-render-diagnostics' in command and Path(command[command.index('--manifest-path') + 1]).resolve() == manifest, 'actual reviewed Cargo rustc command required')
+        bind(build['stderr'])
+        messages = [json.loads(line) for line in bind(build['stdout']).read_text(encoding='utf-8').splitlines() if line]
+        emitted = [v for v in messages if v.get('reason') == 'compiler-artifact' and v.get('executable') and Path(v['executable']).resolve() == bind(binary)]
+        need(len(emitted) == 1 and emitted[0]['target']['name'] == 'src05_wind_pow_probe' and emitted[0]['target']['kind'] == ['bin'] and Path(emitted[0]['target']['src_path']).resolve() == manifest.parent / 'src/main.rs', 'sole actual Cargo-emitted diagnostic executable required')
+        need(build['finished_utc'] is not None, 'closed actual Cargo command required')
+        cargo_artifact = {'actual_Cargo_execution': build_ref, 'compiler_artifact_message': emitted[0], 'actual_binary': binary}
+    environment = os.environ.copy()
+    inherited_path, dlls = environment.get('PATH', ''), []
+    if args.implementation == 'Native':
+        need(link_map is not None, 'actual complete Native link map required')
+        prior = load(DLL_CUSTODY)
+        dlls = [full(bind(row)) for row in prior['actual_pinned_runtime_DLLs_before']]
+        directory = (ROOT / '.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin').resolve()
+        need({Path(v['path']).name for v in dlls} == {'libgcc_s_seh-1.dll', 'libstdc++-6.dll', 'libwinpthread-1.dll'} and all(bind(v).parent == directory for v in dlls), 'authentic complete Winlibs DLL set required')
+        environment['PATH'] = str(directory) + os.pathsep + inherited_path
+    output = (ROOT / args.output_dir).resolve()
+    need(output.is_relative_to(ROOT / '.runtime/porting/SRC-05') and not output.exists(), 'fresh ignored SRC05 directory required')
+    output.mkdir(parents=True, exist_ok=False)
+    argv = [str(bind(binary)), str(bind(input_ref))] + ([input_ref['sha256']] if args.implementation == 'Rust' else [])
+    before = {'schema': 'src05-wind-pow-execution-before.v1', 'implementation': args.implementation,
+              'Source_preparation': preparation_ref, 'Source_snapshot': approval['Source_snapshot'], 'Root_provider_acceptance': approval_ref,
+              'provider_proof': provider_proof, 'actual_input': input_ref, 'actual_binary': binary, 'actual_link_map': link_map,
+              'actual_Cargo_artifact': cargo_artifact, 'inherited_PATH': inherited_path, 'actual_PATH': environment.get('PATH'),
+              'pinned_runtime_DLLs': dlls, 'policy': policy_ref, 'actual_argv': argv, 'frozen_artifacts': list(FROZEN.values())}
+    write(output / 'before.json', before)
+    result = subprocess.run([sys.executable, '-X', 'utf8', '-B', str(RECORDER), '--output-dir', str(output / 'command'), '--', *argv], cwd=ROOT, env=environment)
+    receipt_path = output / 'command/receipt.json'
+    receipt = json.loads(receipt_path.read_bytes()) if receipt_path.is_file() else None
+    after = [{**full(p), 'available': True} if p.is_file() else {'path': row['path'], 'available': False} for p, row in FROZEN.items()]
+    unchanged = source_paths() == paths and all(row.get('available') and {k: row[k] for k in ('path', 'sha256', 'size_bytes')} == old for row, old in zip(after, FROZEN.values()))
+    guard = {'schema': 'src05-wind-pow-execution-custody.v1', 'actual_before': full(output / 'before.json'),
+             'actual_command_receipt': full(receipt_path) if receipt else None, 'actual_recorder_exit_code': result.returncode,
+             'actual_target_exit_code': receipt['exit_code'] if receipt else None, 'all_frozen_artifacts_unchanged': unchanged,
+             'frozen_artifacts_after': after, 'scientific_PASS_claimed': False, 'gates_updated': False}
+    write(output / 'custody.json', guard)
+    need(unchanged and receipt is not None and receipt['source_bytes_match_before_and_after'] is True and receipt['source_snapshot']['sha256'] == SOURCE and receipt['command'] == argv and receipt['exit_code'] == result.returncode, 'actual execution custody failed; all closed records retained')
+    print(json.dumps({'custody': full(output / 'custody.json'), 'actual_exit_code': result.returncode}))
+    return result.returncode
+
+
+if __name__ == '__main__':
+    sys.exit(main())

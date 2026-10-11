@@ -1,0 +1,69 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "D:\\CodexBuild\\rusted-energyplus\\SRC-05\\wind-pow-native-build-02\\bin\\src05_wind_pow_helper.exe",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-05\\wind-pow-isolation-prep-01\\input-only.json"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-11T16:18:35.638063+00:00",
+  "finished_utc": "2026-10-11T16:18:46.387356+00:00",
+  "elapsed_seconds": 10.749683200003346,
+  "repository_before": {
+    "head": "ea02b1810280992aab59fe9c56ee762a7b6fe998",
+    "worktree_clean": true,
+    "porcelain_v1_nul_utf8": ""
+  },
+  "repository_after": {
+    "head": "ea02b1810280992aab59fe9c56ee762a7b6fe998",
+    "worktree_clean": true,
+    "porcelain_v1_nul_utf8": ""
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/56/5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548",
+    "sha256": "5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/57/5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Native-observation-01/command/stdout.log",
+    "sha256": "11710991a1049ec487072cdb035485cdf634944d72b08d03ecabb5b916ae4da6"
+  },
+  "stderr": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Native-observation-01/command/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-11T16:18:46.387356+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

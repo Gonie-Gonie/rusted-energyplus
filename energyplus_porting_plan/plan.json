@@ -12446,6 +12446,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-05-surface-environment/summary.json",
         "sha256": "cc8a0746b6b5143a7b79376270ee66f3aaf860c4c1184e025953fcfef814193f",
         "size_bytes": 187448
+      },
+      "actual_wind_diagnostics_and_standalone_main": {
+        "path": "energyplus_porting_plan/evidence/SRC-05-wind-diagnostics-and-main-thread/summary.json",
+        "sha256": "1d889d2628491567e676f64e2bc0fe6f7e05258fe0702f3a5c89136507f17411",
+        "size_bytes": 239879
       }
     },
     {

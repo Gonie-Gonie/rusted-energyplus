@@ -1,0 +1,93 @@
+{
+  "schema": "src05-wind-pow-post-link-factual-custody-review.v1",
+  "actual_provider_and_PE_inventory": {
+    "path": ".runtime/porting/SRC-05/wind-pow-native-build-02/linked-provider-and-PE-inventory.json",
+    "sha256": "a969ae89e55211d93c51082627053e483bb4bff5a83de1c160bf700d8986808a",
+    "size_bytes": 25792
+  },
+  "actual_receipts": {
+    "configure-command": {
+      "path": ".runtime/porting/SRC-05/wind-pow-native-build-02/configure-command/receipt.json",
+      "sha256": "d64f770ba75cd57219a8ce56b2e1b1d7d38ea37d0453a599179897779f37c0de",
+      "size_bytes": 11915
+    },
+    "dry-verbose-command": {
+      "path": ".runtime/porting/SRC-05/wind-pow-native-build-02/dry-verbose-command/receipt.json",
+      "sha256": "b571c982af919320a7e3e591aacb8b935db525dfa727971ab03c7eda87aa4c74",
+      "size_bytes": 4062
+    },
+    "compile-command": {
+      "path": ".runtime/porting/SRC-05/wind-pow-native-build-02/compile-command/receipt.json",
+      "sha256": "16310c000b1c389b04574310b46ba77b239dbfa211808190e2028a2a3b303f1f",
+      "size_bytes": 2750
+    },
+    "core-after-command": {
+      "path": ".runtime/porting/SRC-05/wind-pow-native-build-02/core-after-command/receipt.json",
+      "sha256": "970f84b4b51523b9ed85496d633f83329dffa52c804e7c740a611ebe4f0bf7dd",
+      "size_bytes": 2721
+    },
+    "collect-evidence-command": {
+      "path": ".runtime/porting/SRC-05/wind-pow-native-build-02/collect-evidence-command/receipt.json",
+      "sha256": "d2e983ed03173b072d98d20ec3701455ba840bb9915e9a3a24d397e7369a9663",
+      "size_bytes": 2736
+    },
+    "provider-addr2line-command": {
+      "path": ".runtime/porting/SRC-05/wind-pow-native-build-02/provider-addr2line-command/receipt.json",
+      "sha256": "4c80eaeb74f4fcb455e44bd3e9493db070939e4867a7a20f5f28dae1dc8d228b",
+      "size_bytes": 2955
+    },
+    "setter-disassembly-command": {
+      "path": ".runtime/porting/SRC-05/wind-pow-native-build-02/setter-disassembly-command/receipt.json",
+      "sha256": "106667298336984aac95358e3f3b8299d3c21f7e498427d3b5a4d4f562911973",
+      "size_bytes": 2899
+    },
+    "pow-disassembly-command": {
+      "path": ".runtime/porting/SRC-05/wind-pow-native-build-02/pow-disassembly-command/receipt.json",
+      "sha256": "3b2ac7a68ce550fba87d26632b136aaa3498f0db9081d88f74c3ed760da9e9b6",
+      "size_bytes": 2894
+    },
+    "extended-pow-disassembly-command": {
+      "path": ".runtime/porting/SRC-05/wind-pow-native-build-02/extended-pow-disassembly-command/receipt.json",
+      "sha256": "e85fda909497e63c28a0b1a15c691f6e46bbfce6ae906b2c3f59d0238e3b6e96",
+      "size_bytes": 2911
+    },
+    "rounding-disassembly-command": {
+      "path": ".runtime/porting/SRC-05/wind-pow-native-build-02/rounding-disassembly-command/receipt.json",
+      "sha256": "9b13d09240a782d910056e5693b744e8fff61189f7e548a103bb2368f0a92314",
+      "size_bytes": 2903
+    },
+    "fpreset-disassembly-command": {
+      "path": ".runtime/porting/SRC-05/wind-pow-native-build-02/fpreset-disassembly-command/receipt.json",
+      "sha256": "8a3793eae326b5234654edee9476b34f526db51f25a775475f49a62de4bda74f",
+      "size_bytes": 2901
+    }
+  },
+  "actual_Root_dry_review": {
+    "path": ".runtime/porting/SRC-05/wind-pow-native-build-02/Root-full-dry-review.json",
+    "sha256": "63aca30dd8d77f14366f4c61f9d60fe45eee711e787e137b78a8800d5db33525",
+    "size_bytes": 1286
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/56/5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548",
+    "sha256": "5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548"
+  },
+  "dry_and_actual_compile_link_commands_byte_exact": true,
+  "current_compile_graph_equals_configured_after_archive": true,
+  "full_binary_map_and_object_rehashed_after_all_read_only_tools": true,
+  "genuine_setter_calls_selected_pow_twice": true,
+  "selected_pow_calls_selected_log2l_then_extended_multiply_then_selected_exp2l": true,
+  "selected_exp2l_temporarily_changes_rounding_control_and_restores_saved_word": true,
+  "CRT_fp10_selected_fpreset_contains_FNINIT": true,
+  "actual_review_source": {
+    "path": ".runtime/porting/SRC-05/review-wind-pow-native-link-01.py",
+    "sha256": "fc035ce6c97d631f22381d2d18244142d780e76a6f6ec102d5c3e8399b6ade0c",
+    "size_bytes": 4247
+  },
+  "helper_executed": false,
+  "numerical_results_read": false,
+  "historical_controls_reconstructed": false,
+  "thread_precision_hypothesis_established": false,
+  "production_math_changed": false,
+  "Root_FULL_provider_and_PE_acceptance_required_before_helper_execution": true,
+  "gates_updated": false
+}

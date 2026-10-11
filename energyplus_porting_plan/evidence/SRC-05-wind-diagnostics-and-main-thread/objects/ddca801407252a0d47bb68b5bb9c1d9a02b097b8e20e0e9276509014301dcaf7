@@ -1,0 +1,85 @@
+{
+  "schema": "src05-wind-pow-actual-Cargo-rustc-artifact-custody.v1",
+  "actual_Cargo_execution": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Rust-build-02/Cargo-command/receipt.json",
+    "sha256": "56550fe1c86f75fb5ff6da5b198513b254f696d4e05e789d1e292fed73797f46",
+    "size_bytes": 3268
+  },
+  "actual_full_Cargo_JSON": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Rust-build-02/Cargo-command/stdout.log",
+    "sha256": "184e6ae1e17dc3e6c44a45be02ee7766e9b67ac0d17d42f2bb8f5200b2979f81"
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/56/5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548",
+    "sha256": "5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548"
+  },
+  "Source_preparation": {
+    "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-03/manifest.json",
+    "sha256": "f981be1c461227a9152ded3288bf14cd0e007cbd6ab0ba74ac91674b36acc4a2",
+    "size_bytes": 45607
+  },
+  "frozen_build_inputs": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Rust-build-02/frozen-build-inputs.json",
+    "sha256": "bf0f3915f3ca30d3b1318f08b23b39cc15b0a5ef2e8cb8aec322c16a412ebddd",
+    "size_bytes": 28889
+  },
+  "actual_Cargo_artifacts": [
+    {
+      "cargo_message": {
+        "reason": "compiler-artifact",
+        "package_id": "path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/SRC-05/wind-pow-isolation-prep-03/rust#src05_wind_pow_probe@0.0.0",
+        "manifest_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-05\\wind-pow-isolation-prep-03\\rust\\Cargo.toml",
+        "target": {
+          "kind": [
+            "bin"
+          ],
+          "crate_types": [
+            "bin"
+          ],
+          "name": "src05_wind_pow_probe",
+          "src_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-05\\wind-pow-isolation-prep-03\\rust\\src\\main.rs",
+          "edition": "2024",
+          "doc": true,
+          "doctest": false,
+          "test": true
+        },
+        "profile": {
+          "opt_level": "0",
+          "debuginfo": 0,
+          "debug_assertions": true,
+          "overflow_checks": true,
+          "test": false
+        },
+        "features": [],
+        "filenames": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src05_wind_pow_probe.exe"
+        ],
+        "executable": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src05_wind_pow_probe.exe",
+        "fresh": false
+      },
+      "executable": {
+        "path": "target/debug/src05_wind_pow_probe.exe",
+        "sha256": "65047c13139946c34af7ce23b5084994dd2b8d68cb41ddea509ab34516912b10",
+        "size_bytes": 29678273
+      }
+    }
+  ],
+  "actual_Rust_binary": {
+    "path": "target/debug/src05_wind_pow_probe.exe",
+    "sha256": "65047c13139946c34af7ce23b5084994dd2b8d68cb41ddea509ab34516912b10",
+    "size_bytes": 29678273
+  },
+  "actual_full_link_map": {
+    "path": "D:\\CodexBuild\\rusted-energyplus\\SRC-05\\wind-pow-Rust-build-02\\src05_wind_pow_probe.map",
+    "sha256": "ad2a224c7bd70afd0a856fbd7c220d2c6f8f020c18db99b17f6e2ab50f119218",
+    "size_bytes": 8943799
+  },
+  "capture_source": {
+    "path": ".runtime/porting/SRC-05/build-wind-Rust-02.py",
+    "sha256": "e231518f355f42ca4ea7b0c5e7642b17b1f002e1ad41baa540b9714247f7a3cb",
+    "size_bytes": 5256
+  },
+  "all_Source_package_and_previous_hold_pins_match_after_build": true,
+  "target_executed": false,
+  "gates_updated": false
+}

@@ -1,0 +1,14 @@
+
+C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\target\debug\deps\ep_runtime-880f77a2e9883822.exe:     file format pei-x86-64
+
+
+Disassembly of section .text:
+
+00000001417e45c0 <_ZN3std3f6421_$LT$impl$u20$f64$GT$4powf17hd2a1a0a1d78e4d7cE>:
+   1417e45c0:	48 83 ec 28          	sub    $0x28,%rsp
+   1417e45c4:	e8 d7 70 47 00       	call   141c5b6a0 <pow>
+   1417e45c9:	f2 0f 11 44 24 20    	movsd  %xmm0,0x20(%rsp)
+   1417e45cf:	f2 0f 10 44 24 20    	movsd  0x20(%rsp),%xmm0
+   1417e45d5:	48 83 c4 28          	add    $0x28,%rsp
+   1417e45d9:	c3                   	ret
+   1417e45da:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)

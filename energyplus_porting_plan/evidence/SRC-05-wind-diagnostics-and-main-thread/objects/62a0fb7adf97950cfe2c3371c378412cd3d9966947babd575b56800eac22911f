@@ -1,0 +1,975 @@
+{
+  "schema": "src05-wind-pow-Rust-linked-provider-inventory.v1",
+  "implementation": "Rust",
+  "reviewed_Source_preparation": {
+    "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-03/manifest.json",
+    "sha256": "f981be1c461227a9152ded3288bf14cd0e007cbd6ab0ba74ac91674b36acc4a2",
+    "size_bytes": 45607
+  },
+  "frozen_build_inputs": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Rust-build-02/frozen-build-inputs.json",
+    "sha256": "bf0f3915f3ca30d3b1318f08b23b39cc15b0a5ef2e8cb8aec322c16a412ebddd",
+    "size_bytes": 28889
+  },
+  "actual_build_execution": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Rust-build-02/Cargo-command/receipt.json",
+    "sha256": "56550fe1c86f75fb5ff6da5b198513b254f696d4e05e789d1e292fed73797f46",
+    "size_bytes": 3268
+  },
+  "actual_Cargo_compiler_artifact": {
+    "reason": "compiler-artifact",
+    "package_id": "path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/SRC-05/wind-pow-isolation-prep-03/rust#src05_wind_pow_probe@0.0.0",
+    "manifest_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-05\\wind-pow-isolation-prep-03\\rust\\Cargo.toml",
+    "target": {
+      "kind": [
+        "bin"
+      ],
+      "crate_types": [
+        "bin"
+      ],
+      "name": "src05_wind_pow_probe",
+      "src_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-05\\wind-pow-isolation-prep-03\\rust\\src\\main.rs",
+      "edition": "2024",
+      "doc": true,
+      "doctest": false,
+      "test": true
+    },
+    "profile": {
+      "opt_level": "0",
+      "debuginfo": 0,
+      "debug_assertions": true,
+      "overflow_checks": true,
+      "test": false
+    },
+    "features": [],
+    "filenames": [
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src05_wind_pow_probe.exe"
+    ],
+    "executable": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src05_wind_pow_probe.exe",
+    "fresh": false
+  },
+  "Root_immediate_emitted_artifact_proof": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Rust-build-02/actual-Cargo-artifact-custody.json",
+    "sha256": "ddca801407252a0d47bb68b5bb9c1d9a02b097b8e20e0e9276509014301dcaf7",
+    "size_bytes": 3536
+  },
+  "actual_Rust_binary": {
+    "path": "target/debug/src05_wind_pow_probe.exe",
+    "sha256": "65047c13139946c34af7ce23b5084994dd2b8d68cb41ddea509ab34516912b10",
+    "size_bytes": 29678273
+  },
+  "actual_full_link_map": {
+    "path": "D:\\CodexBuild\\rusted-energyplus\\SRC-05\\wind-pow-Rust-build-02\\src05_wind_pow_probe.map",
+    "sha256": "ad2a224c7bd70afd0a856fbd7c220d2c6f8f020c18db99b17f6e2ab50f119218",
+    "size_bytes": 8943799
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/56/5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548",
+    "sha256": "5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548"
+  },
+  "all_current_Source_files_rehashed": 3922,
+  "actual_address_bound_providers": [
+    {
+      "role": "f64_powf",
+      "symbol": "std::f64::<impl f64>::powf",
+      "address": "0x000000014001d230",
+      "address_integer": 5368828464,
+      "owning_text_section": {
+        "name": ".text",
+        "start": 5368821296,
+        "size": 16683,
+        "owner": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\src05_wind_pow_probe-a94bbe4063010d6e.src05_wind_pow_probe.82a3ddcc322b18a9-cgu.4.rcgu.o",
+        "line_number": 1703,
+        "literal_line": " .text          0x000000014001b630     0x412b C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\src05_wind_pow_probe-a94bbe4063010d6e.src05_wind_pow_probe.82a3ddcc322b18a9-cgu.4.rcgu.o"
+      },
+      "line_number": 1724,
+      "literal_line": "                0x000000014001d230                std::f64::<impl f64>::powf",
+      "code_end": 5368828512,
+      "actual_PE_code_extent": {
+        "start": "0x14001d230",
+        "end_exclusive": "0x14001d260",
+        "size_bytes": 48,
+        "sha256": "65796a3ebe86b38e2a7183652d2bf1168f86c3dd145e6667cbc4297522f1014f",
+        "hex_bytes": "4883ec28e857d1f700f20f11442420f20f104424204883c428c3660f1f4400004883ec28e817b7ffff904883c428c390"
+      },
+      "disassembly": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\objdump.exe",
+          "-d",
+          "--start-address=0x14001d230",
+          "--stop-address=0x14001d260",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src05_wind_pow_probe.exe"
+        ],
+        "exit_code": 0,
+        "stdout": {
+          "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/f64_powf-14001d230-disassembly.stdout.txt",
+          "sha256": "71d54edc1c06b5edb4fef8c6666b3d1f4595bc021e9eea7566a7a3ebf87e8fb0",
+          "size_bytes": 1079
+        },
+        "stderr": {
+          "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/f64_powf-14001d230-disassembly.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      },
+      "actual_owning_archive": null,
+      "nonarchive_owner_retained_from_link_map": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\src05_wind_pow_probe-a94bbe4063010d6e.src05_wind_pow_probe.82a3ddcc322b18a9-cgu.4.rcgu.o"
+    },
+    {
+      "role": "f64_powf",
+      "symbol": "std::f64::<impl f64>::powf",
+      "address": "0x0000000140512f40",
+      "address_integer": 5374029632,
+      "owning_text_section": {
+        "name": ".text",
+        "start": 5373548064,
+        "size": 668925,
+        "owner": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libep_runtime-341e0c1bf50b07ca.rlib(ep_runtime-341e0c1bf50b07ca.ep_runtime.f1d4681676afb974-cgu.03.rcgu.o)",
+        "line_number": 12690,
+        "literal_line": " .text          0x000000014049d620    0xa34fd C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libep_runtime-341e0c1bf50b07ca.rlib(ep_runtime-341e0c1bf50b07ca.ep_runtime.f1d4681676afb974-cgu.03.rcgu.o)"
+      },
+      "line_number": 13433,
+      "literal_line": "                0x0000000140512f40                std::f64::<impl f64>::powf",
+      "code_end": 5374029664,
+      "actual_PE_code_extent": {
+        "start": "0x140512f40",
+        "end_exclusive": "0x140512f60",
+        "size_bytes": 32,
+        "sha256": "88938268134ae6a483e4e7e0f33d789bceff9c1f2e3f3e6617211489d86f5d34",
+        "hex_bytes": "4883ec28e84774a800f20f11442420f20f104424204883c428c3660f1f440000"
+      },
+      "disassembly": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\objdump.exe",
+          "-d",
+          "--start-address=0x140512f40",
+          "--stop-address=0x140512f60",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src05_wind_pow_probe.exe"
+        ],
+        "exit_code": 0,
+        "stdout": {
+          "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/f64_powf-140512f40-disassembly.stdout.txt",
+          "sha256": "d9679468867b3371119bdf771f23ede3daf35e2af880db2ab989a2efe0d9e855",
+          "size_bytes": 636
+        },
+        "stderr": {
+          "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/f64_powf-140512f40-disassembly.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      },
+      "actual_owning_archive": {
+        "path": "target/debug/deps/libep_runtime-341e0c1bf50b07ca.rlib",
+        "sha256": "b12bc43aaec6467c244ee1dc8d607a9de3f997ddd62835f83ed3f08c8497a854",
+        "size_bytes": 80814436
+      },
+      "actual_archive_member": "ep_runtime-341e0c1bf50b07ca.ep_runtime.f1d4681676afb974-cgu.03.rcgu.o"
+    },
+    {
+      "role": "pow",
+      "symbol": "pow",
+      "address": "0x0000000140f9a390",
+      "address_integer": 5385069456,
+      "owning_text_section": {
+        "name": ".text",
+        "start": 5385069296,
+        "size": 1584,
+        "owner": "C:\\Users\\GonieGonie\\.rustup\\toolchains\\1.96.0-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\lib\\self-contained/libmsvcrt.a(lib64_libmsvcrt_common_a-pow.o)",
+        "line_number": 54104,
+        "literal_line": " .text          0x0000000140f9a2f0      0x630 C:\\Users\\GonieGonie\\.rustup\\toolchains\\1.96.0-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\lib\\self-contained/libmsvcrt.a(lib64_libmsvcrt_common_a-pow.o)"
+      },
+      "line_number": 54105,
+      "literal_line": "                0x0000000140f9a390                pow",
+      "code_end": 5385070880,
+      "actual_PE_code_extent": {
+        "start": "0x140f9a390",
+        "end_exclusive": "0x140f9a920",
+        "size_bytes": 1424,
+        "sha256": "94f04b31b55b768e8fef78b16886bf028a28149de153bc8b30c691f079e7065c",
+        "hex_bytes": "4154555756534883c4800f2974247066480f7ec0660f28d066480f7ecb4889c748c1ef2089fa89f981e2ffff0f0081e10000f07f09c289ceb80040000009d6741a85c9b800440000741181f90000f07fb8000400000f84f50000004889de48c1ee2089f289f181e2ffff0f0081e10000f07f09da4189c84109d00f84e800000085c9740881f90000f07f7464660f2e158cfd1c007a060f84740200003d000100000f84090100003d004000000f84260200003d000500000f853301000085ff0f88db020000baffffffff66480f6ec3e83c110000488d542468e882feffff85f60f891b020000660feff6e9810000009085d20f8490000000660f2e1520fd1c007a060f84080200003d000100000f849d000000f20f1154243866480f6ef3e81d0c0000f20f1054243866480f6edbb901000000c70021000000488d15d0fc1c0048895c2420e8461a0000eb240f1f400083fa0119c025000400000500010000e9f7feffff0f1f4000f20f1035b0fc1c00660f28c60f287424704883ec805b5e5f5d415cc30f1f4000f20f100590fc1c00660f2ed07a060f84740100003d000100000f8559020000660f1f840000000000f20f11542438e8850b0000f20f1054243866480f6edbb901000000c70021000000488d1538fc1c00f20f11542420e8ad190000f20f10542438660f28f2eb8190488d74246866480f6ec34889f2e85efdffff660f28c8660fefc0660f2ec80f8a0c0100000f8506010000f20f10442468f20f100d30fc1c00660f2fc8720e660f2f052afc1c000f8329030000488d6c2450660f541527fc1c00f20f11542438dd442438db7c24404c8d6424404889e94c89e2e88910000048895c24384c89e24889e9db6c2450dd442438dec9db7c2440e8bb0e000085ffdb6c2450dd5c2438f20f107424380f89d5feffffbaffffffff66480f6ec3e8660f00004889f2e8aefcffff660f28c8660fefc0660f2ec87a060f84aafeffff660f573572fb1c00e99dfeffff0f1f44000085ff0f8850010000baffffffff66480f6ec3e8210f0000488d542468e867fcffff85f60f89e5fdfffff20f10351ffb1c00e962feffff6690660f28f2e957feffff0f1f800000000085ff0f88fd01000066480f6ee3660f2e251bfb1c007a060f84b3010000488d742450660f541526fb1c00f20f11542438dd442438db7c2440488d7c24404889f14889fae8880f000048895c24384889fa4889f1db6c2450dd442438dec9db7c2440e8ba0d0000db6c2450dd5c2438f20f10742438e9d7fdffff0f1f8000000000488d7c246866480f6ec3660feff64889fae8aafbffff660f2ec60f8a500100000f854a010000baffffffff66480f6ec3e83b0e00004889fae883fbffff85f60f88fb000000660f2ec67a060f8410fffffff20f103537fa1c00e972fdffff66903d004000000f84eefeffff3d000500000f84c8fcffff85ff786e660f2fd00f87bafcffffe9d0feffff0f1f8000000000488d7c246866480f6ec3660feff64889fae81afbffff660f2ec67a747572baffffffff66480f6ec3e8b30d00004889fae8fbfaffff85f67840660f2ec67a060f8471fcfffff20f1035c3f91c00e9eefcffff660f1f440000660f2e15a8f91c007a0a660f28f00f84d4fcffff660f57159cf91c00e971ffffff660f2ec60f8a3effffff0f8538ffffffe943feffff669085f60f891efcfffff20f103568f91c00f20f5ef2e997fcffff0f1f8000000000660f2ec67a8f0f84fafbffffeb876690f20f11542438dd442438d9fadd5c2438f20f10742438e965fcffff0f1f44000085f678b4660f28f2660f573520f91c00e94bfcfffff20f11542438e810080000f20f1054243866480f6edbb901000000f20f1035d0f81c00c70021000000488d15bbf81c00f20f11742420e830160000e90bfcffff66480f6eeb0f28742470660f28c2f20f2cd54883ec805b5e5f5d415ce92a08000090909090909090909090"
+      },
+      "disassembly": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\objdump.exe",
+          "-d",
+          "--start-address=0x140f9a390",
+          "--stop-address=0x140f9a920",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src05_wind_pow_probe.exe"
+        ],
+        "exit_code": 0,
+        "stdout": {
+          "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/pow-140f9a390-disassembly.stdout.txt",
+          "sha256": "1a5fdeae727610dbf96d7c08281f13eaef145f3f195b9be5d1160e3b6ad5fdc7",
+          "size_bytes": 20609
+        },
+        "stderr": {
+          "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/pow-140f9a390-disassembly.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      },
+      "actual_owning_archive": {
+        "path": "C:\\Users\\GonieGonie\\.rustup\\toolchains\\1.96.0-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\lib\\self-contained\\libmsvcrt.a",
+        "sha256": "18941805e69109d61d0f4aefafa4f1dd5dd79c57c9ba099b812b4f7679bb19a5",
+        "size_bytes": 1232122
+      },
+      "actual_archive_member": "lib64_libmsvcrt_common_a-pow.o"
+    },
+    {
+      "role": "log2l",
+      "symbol": "log2l",
+      "address": "0x0000000140f9b680",
+      "address_integer": 5385074304,
+      "owning_text_section": {
+        "name": ".text",
+        "start": 5385074288,
+        "size": 112,
+        "owner": "C:\\Users\\GonieGonie\\.rustup\\toolchains\\1.96.0-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\lib\\self-contained/libmingwex.a(lib64_libmingwex_a-log2l.o)",
+        "line_number": 54167,
+        "literal_line": " .text          0x0000000140f9b670       0x70 C:\\Users\\GonieGonie\\.rustup\\toolchains\\1.96.0-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\lib\\self-contained/libmingwex.a(lib64_libmingwex_a-log2l.o)"
+      },
+      "line_number": 54168,
+      "literal_line": "                0x0000000140f9b680                log2l",
+      "code_end": 5385074400,
+      "actual_PE_code_extent": {
+        "start": "0x140f9b680",
+        "end_exclusive": "0x140f9b6e0",
+        "size_bytes": 96,
+        "sha256": "4eb7f85f83091a992312a1e6f317852df097e57c6c867bd4f92278f0650da411",
+        "hex_bytes": "dd05eaffffffdb2ad9e5dfe0d9c09e7237d8e2d9c0d9e1dc1ddbffffffdfe080e4457412ddd9d9f94889c848c7410800000000db39c3ddd8d9f14889c848c7410800000000db39c37ac7ddd9ddd94889c848c7410800000000db39c390909090"
+      },
+      "disassembly": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\objdump.exe",
+          "-d",
+          "--start-address=0x140f9b680",
+          "--stop-address=0x140f9b6e0",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src05_wind_pow_probe.exe"
+        ],
+        "exit_code": 0,
+        "stdout": {
+          "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/log2l-140f9b680-disassembly.stdout.txt",
+          "sha256": "0b209d7b30222e56e5a2a8467a7edc6a7d49e2b9021b8eef63047ae38b42c31b",
+          "size_bytes": 2165
+        },
+        "stderr": {
+          "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/log2l-140f9b680-disassembly.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      },
+      "actual_owning_archive": {
+        "path": "C:\\Users\\GonieGonie\\.rustup\\toolchains\\1.96.0-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\lib\\self-contained\\libmingwex.a",
+        "sha256": "00d540cc648dba1bcfc222ba8e0a56f70e55fd06a3d6ee0551a9306866cc81ca",
+        "size_bytes": 470418
+      },
+      "actual_archive_member": "lib64_libmingwex_a-log2l.o"
+    },
+    {
+      "role": "exp2l",
+      "symbol": "exp2l",
+      "address": "0x0000000140f9b4d0",
+      "address_integer": 5385073872,
+      "owning_text_section": {
+        "name": ".text",
+        "start": 5385073872,
+        "size": 112,
+        "owner": "C:\\Users\\GonieGonie\\.rustup\\toolchains\\1.96.0-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\lib\\self-contained/libmingwex.a(lib64_libmingwex_a-exp2l.o)",
+        "line_number": 54161,
+        "literal_line": " .text          0x0000000140f9b4d0       0x70 C:\\Users\\GonieGonie\\.rustup\\toolchains\\1.96.0-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\lib\\self-contained/libmingwex.a(lib64_libmingwex_a-exp2l.o)"
+      },
+      "line_number": 54162,
+      "literal_line": "                0x0000000140f9b4d0                exp2l",
+      "code_end": 5385073984,
+      "actual_PE_code_extent": {
+        "start": "0x140f9b4d0",
+        "end_exclusive": "0x140f9b540",
+        "size_bytes": 112,
+        "sha256": "60f0360a862c91b6294d5c85044071c201f96a3190f87588d139576693163578",
+        "hex_bytes": "db2ad9e59bdfe0b64520e680fe05743fd9c04883ec08d97c24040fb744240480cc0c66890424d92c24d9fcd96c24044883c408dce9d9c9d9f0d9e8dec1d9fdddd94889c848c7410800000000db39c3a9000200007404ddd8d9ee4889c848c7410800000000db39c39090909090909090"
+      },
+      "disassembly": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\objdump.exe",
+          "-d",
+          "--start-address=0x140f9b4d0",
+          "--stop-address=0x140f9b540",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src05_wind_pow_probe.exe"
+        ],
+        "exit_code": 0,
+        "stdout": {
+          "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/exp2l-140f9b4d0-disassembly.stdout.txt",
+          "sha256": "cc2ad3e1d9a0bde41265f6066f2aaeecc897e807a148a7be16514a612e74e6d3",
+          "size_bytes": 2418
+        },
+        "stderr": {
+          "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/exp2l-140f9b4d0-disassembly.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      },
+      "actual_owning_archive": {
+        "path": "C:\\Users\\GonieGonie\\.rustup\\toolchains\\1.96.0-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\lib\\self-contained\\libmingwex.a",
+        "sha256": "00d540cc648dba1bcfc222ba8e0a56f70e55fd06a3d6ee0551a9306866cc81ca",
+        "size_bytes": 470418
+      },
+      "actual_archive_member": "lib64_libmingwex_a-exp2l.o"
+    },
+    {
+      "role": "fegetround",
+      "symbol": "fegetround",
+      "address": "0x0000000140f9b480",
+      "address_integer": 5385073792,
+      "owning_text_section": {
+        "name": ".text",
+        "start": 5385073792,
+        "size": 32,
+        "owner": "C:\\Users\\GonieGonie\\.rustup\\toolchains\\1.96.0-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\lib\\self-contained/libmingwex.a(lib64_libmingwex_a-fegetround.o)",
+        "line_number": 54157,
+        "literal_line": " .text          0x0000000140f9b480       0x20 C:\\Users\\GonieGonie\\.rustup\\toolchains\\1.96.0-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\lib\\self-contained/libmingwex.a(lib64_libmingwex_a-fegetround.o)"
+      },
+      "line_number": 54158,
+      "literal_line": "                0x0000000140f9b480                fegetround",
+      "code_end": 5385073824,
+      "actual_PE_code_extent": {
+        "start": "0x140f9b480",
+        "end_exclusive": "0x140f9b4a0",
+        "size_bytes": 32,
+        "sha256": "5a7280f05f7631bf9fb587b6ac2f69ee398fa42dc0b048fca4bb19fd228645b7",
+        "hex_bytes": "4883ec18d97c240c8b44240c25000c00004883c418c390909090909090909090"
+      },
+      "disassembly": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\objdump.exe",
+          "-d",
+          "--start-address=0x140f9b480",
+          "--stop-address=0x140f9b4a0",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src05_wind_pow_probe.exe"
+        ],
+        "exit_code": 0,
+        "stdout": {
+          "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/fegetround-140f9b480-disassembly.stdout.txt",
+          "sha256": "36bb6d5fb3c7c11be4af676b4c452528bcb559870b9547f63894e404d87fbd78",
+          "size_bytes": 923
+        },
+        "stderr": {
+          "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/fegetround-140f9b480-disassembly.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      },
+      "actual_owning_archive": {
+        "path": "C:\\Users\\GonieGonie\\.rustup\\toolchains\\1.96.0-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\lib\\self-contained\\libmingwex.a",
+        "sha256": "00d540cc648dba1bcfc222ba8e0a56f70e55fd06a3d6ee0551a9306866cc81ca",
+        "size_bytes": 470418
+      },
+      "actual_archive_member": "lib64_libmingwex_a-fegetround.o"
+    },
+    {
+      "role": "_fpreset",
+      "symbol": "_fpreset",
+      "address": "0x0000000140f9b9d0",
+      "address_integer": 5385075152,
+      "owning_text_section": {
+        "name": ".text",
+        "start": 5385075152,
+        "size": 16,
+        "owner": "C:\\Users\\GonieGonie\\.rustup\\toolchains\\1.96.0-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\lib\\self-contained/libmingw32.a(lib64_libmingw32_a-CRT_fp10.o)",
+        "line_number": 54182,
+        "literal_line": " .text          0x0000000140f9b9d0       0x10 C:\\Users\\GonieGonie\\.rustup\\toolchains\\1.96.0-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\lib\\self-contained/libmingw32.a(lib64_libmingw32_a-CRT_fp10.o)"
+      },
+      "line_number": 54183,
+      "literal_line": "                0x0000000140f9b9d0                _fpreset",
+      "code_end": 5385075168,
+      "actual_PE_code_extent": {
+        "start": "0x140f9b9d0",
+        "end_exclusive": "0x140f9b9e0",
+        "size_bytes": 16,
+        "sha256": "9ee529d0c0c6a6654c793b8aef4407259f9789e6609011b203b81c1e2efeb7c7",
+        "hex_bytes": "dbe3c390909090909090909090909090"
+      },
+      "disassembly": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\objdump.exe",
+          "-d",
+          "--start-address=0x140f9b9d0",
+          "--stop-address=0x140f9b9e0",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src05_wind_pow_probe.exe"
+        ],
+        "exit_code": 0,
+        "stdout": {
+          "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/_fpreset-140f9b9d0-disassembly.stdout.txt",
+          "sha256": "45920a06a764154b01dea2a6500c9ac2ea00c0a6a42fbbea053f8ccd554098e7",
+          "size_bytes": 809
+        },
+        "stderr": {
+          "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/_fpreset-140f9b9d0-disassembly.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      },
+      "actual_owning_archive": {
+        "path": "C:\\Users\\GonieGonie\\.rustup\\toolchains\\1.96.0-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\lib\\self-contained\\libmingw32.a",
+        "sha256": "901e8b09fbda4da401cf4a67dd2f0a1c486bf8fab4615eaabdd6fa5f4e396636",
+        "size_bytes": 40626
+      },
+      "actual_archive_member": "lib64_libmingw32_a-CRT_fp10.o"
+    },
+    {
+      "role": "ep_runtime_setter",
+      "symbol": "ep_runtime::heat_balance::convection::surface_environment::set_surface_wind_speeds",
+      "address": "0x0000000140782230",
+      "address_integer": 5376582192,
+      "owning_text_section": {
+        "name": ".text",
+        "start": 5376153024,
+        "size": 864415,
+        "owner": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libep_runtime-341e0c1bf50b07ca.rlib(ep_runtime-341e0c1bf50b07ca.ep_runtime.f1d4681676afb974-cgu.07.rcgu.o)",
+        "line_number": 27774,
+        "literal_line": " .text          0x00000001407195c0    0xd309f C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libep_runtime-341e0c1bf50b07ca.rlib(ep_runtime-341e0c1bf50b07ca.ep_runtime.f1d4681676afb974-cgu.07.rcgu.o)"
+      },
+      "line_number": 28459,
+      "literal_line": "                0x0000000140782230                ep_runtime::heat_balance::convection::surface_environment::set_surface_wind_speeds",
+      "code_end": 5376582608,
+      "actual_PE_code_extent": {
+        "start": "0x140782230",
+        "end_exclusive": "0x1407823d0",
+        "size_bytes": 416,
+        "sha256": "f2b568abe2915fcb7a767d734dd73b149fbb99721c57c300030a69e57158fd97",
+        "hex_bytes": "4881ec880000004c894c24284c89442430f20f114c243848894c2440f20f594920f20f114c2448f20f104118f20f10491066480f7ec848b900000000000000804831c866480f6ec8e8c30cd9ff488b4c24400f28c8f20f10442448f20f59c1f20f11442450f20f1041100f57c9660f2ec175047a02eb1b488b542428488b4c2430e84a03030048894424704889542478eb1e488b542428488b4c2430e82f03030048894424584889542460e9a2000000488d4c2470e8d669f9ff4889842480000000488b942480000000b80100000031c94883fa00480f44c148a9010000007415488b8424800000004889442420f6402801750aebba4881c488000000c3488b4424200f57c0660f2e007334488b4c2420488b442440f20f1001f20f104810e8ec0bd9ff488b4424200f28c8f20f10442450f20f59c1f20f114018e970ffffff488b4424200f57c0f20f114018e95effffff488d4c2458e83469f9ff4889442468488b542468b80100000031c94883fa00480f44c148a9010000000f8475fffffff20f10442438488b442468f20f114018ebbf666666662e0f1f840000000000"
+      },
+      "disassembly": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\objdump.exe",
+          "-d",
+          "--start-address=0x140782230",
+          "--stop-address=0x1407823d0",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src05_wind_pow_probe.exe"
+        ],
+        "exit_code": 0,
+        "stdout": {
+          "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/ep_runtime_setter-140782230-disassembly.stdout.txt",
+          "sha256": "a90f37b82e4bc8fa1af2842a026a17dbc6edcb8d31e281fee12d156213917e9e",
+          "size_bytes": 7649
+        },
+        "stderr": {
+          "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/ep_runtime_setter-140782230-disassembly.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      },
+      "actual_owning_archive": {
+        "path": "target/debug/deps/libep_runtime-341e0c1bf50b07ca.rlib",
+        "sha256": "b12bc43aaec6467c244ee1dc8d607a9de3f997ddd62835f83ed3f08c8497a854",
+        "size_bytes": 80814436
+      },
+      "actual_archive_member": "ep_runtime-341e0c1bf50b07ca.ep_runtime.f1d4681676afb974-cgu.07.rcgu.o"
+    },
+    {
+      "role": "ep_runtime_point",
+      "symbol": "ep_runtime::heat_balance::convection::surface_environment::SurfaceOutdoorEnvironmentParameters::wind_speed_at_height",
+      "address": "0x00000001407825f0",
+      "address_integer": 5376583152,
+      "owning_text_section": {
+        "name": ".text",
+        "start": 5376153024,
+        "size": 864415,
+        "owner": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libep_runtime-341e0c1bf50b07ca.rlib(ep_runtime-341e0c1bf50b07ca.ep_runtime.f1d4681676afb974-cgu.07.rcgu.o)",
+        "line_number": 27774,
+        "literal_line": " .text          0x00000001407195c0    0xd309f C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\deps\\libep_runtime-341e0c1bf50b07ca.rlib(ep_runtime-341e0c1bf50b07ca.ep_runtime.f1d4681676afb974-cgu.07.rcgu.o)"
+      },
+      "line_number": 28462,
+      "literal_line": "                0x00000001407825f0                ep_runtime::heat_balance::convection::surface_environment::SurfaceOutdoorEnvironmentParameters::wind_speed_at_height",
+      "code_end": 5376583360,
+      "actual_PE_code_extent": {
+        "start": "0x1407825f0",
+        "end_exclusive": "0x1407826c0",
+        "size_bytes": 208,
+        "sha256": "3b2c259a27fa11b4b0d63d05f743f140d2b05183972e4a74b627ae4ae5e573a8",
+        "hex_bytes": "4883ec58f20f11542428f20f114c243048894c2438f20f594920f20f114c2440f20f104118f20f10491066480f7ec848b900000000000000804831c866480f6ec8e80a09d9ff488b4c24380f28c8f20f10442440f20f59c1f20f11442448f20f1041100f57c9660f2ec175047a02eb11f20f104c24280f57c0660f2ec1733aeb0ef20f10442430f20f11442450eb33f20f10442428488b442438f20f104810e8ac08d9ff0f28c8f20f10442448f20f59c1f20f11442450eb090f57c0f20f11442450f20f104424504883c458c30f1f00"
+      },
+      "disassembly": {
+        "command": [
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\objdump.exe",
+          "-d",
+          "--start-address=0x1407825f0",
+          "--stop-address=0x1407826c0",
+          "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src05_wind_pow_probe.exe"
+        ],
+        "exit_code": 0,
+        "stdout": {
+          "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/ep_runtime_point-1407825f0-disassembly.stdout.txt",
+          "sha256": "411da3190f6e36bab3f2ade34f6d84b085b02d536d690b8530e3312f4a647eca",
+          "size_bytes": 4221
+        },
+        "stderr": {
+          "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/ep_runtime_point-1407825f0-disassembly.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0
+        }
+      },
+      "actual_owning_archive": {
+        "path": "target/debug/deps/libep_runtime-341e0c1bf50b07ca.rlib",
+        "sha256": "b12bc43aaec6467c244ee1dc8d607a9de3f997ddd62835f83ed3f08c8497a854",
+        "size_bytes": 80814436
+      },
+      "actual_archive_member": "ep_runtime-341e0c1bf50b07ca.ep_runtime.f1d4681676afb974-cgu.07.rcgu.o"
+    }
+  ],
+  "selected_map_lines": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/selected-map-lines.txt",
+    "sha256": "1b95516098789ad9c53648dfa5316eff794b370282d0e4b858c84295307355ab",
+    "size_bytes": 2801
+  },
+  "actual_PE_reader": {
+    "path": "tools/porting/native_pe.py",
+    "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+    "size_bytes": 20217
+  },
+  "actual_PE": {
+    "sha256": "65047c13139946c34af7ce23b5084994dd2b8d68cb41ddea509ab34516912b10",
+    "size_bytes": 29678273,
+    "pe_offset": 128,
+    "dos_prefix_sha256": "bfdf5e72651b4ec588bd5fc6a9f17e9e0972248146bbacc10478f48d72f29b81",
+    "machine": 34404,
+    "section_count": 10,
+    "timestamp": 1791735408,
+    "symbol_table_offset": 19766784,
+    "symbol_count": 72531,
+    "optional_header_size": 240,
+    "coff_characteristics": 550,
+    "complete_header_hex": "4d5a90000300000004000000ffff0000b800000000000000400000000000000000000000000000000000000000000000000000000000000000000000800000000e1fba0e00b409cd21b8014ccd21546869732070726f6772616d2063616e6e6f742062652072756e20696e20444f53206d6f64652e0d0d0a24000000000000005045000064860a0070b6cb6a009e2d01531b0100f00026020b02022a00baf90000e0330000040000f013000000100000000000400100000000100000000200000400000000000000050002000000000000002e010004000084a5c5010300600100002000000000000010000000000000000010000000000000100000000000000000000010000000000000000000000000102d01b41c0000000000000000000000b016018c640900000000000000000000502d0184a3000000000000000000000000000000000000000000000000000040a316012800000000000000000000000000000000000000b0162d01100600000000000000000000000000000000000000000000000000002e7465787400000060b8f9000010000000baf90000040000000000000000000000000000200000602e64617461000000900e000000d0f9000010000000bef900000000000000000000000000400000c02e7264617461000038c81c0000e0f90000ca1c0000cef900000000000000000000000000400000402e706461746100008c64090000b016010066090000981601000000000000000000000000400000402e78646174610000f0d90c000020200100da0c0000fe1f01000000000000000000000000400000402e627373000000004002000000002d010000000000000000000000000000000000000000800000c02e69646174610000b41c000000102d01001e000000d82c01000000000000000000000000400000c02e435254000000006800000000302d010002000000f62c01000000000000000000000000400000c02e746c73000000001000000000402d010002000000f82c01000000000000000000000000400000c02e72656c6f63000084a3000000502d0100a4000000fa2c010000000000000000000000004000004200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "optional_header_hex": "0b02022a00baf90000e0330000040000f013000000100000000000400100000000100000000200000400000000000000050002000000000000002e010004000084a5c5010300600100002000000000000010000000000000000010000000000000100000000000000000000010000000000000000000000000102d01b41c0000000000000000000000b016018c640900000000000000000000502d0184a3000000000000000000000000000000000000000000000000000040a316012800000000000000000000000000000000000000b0162d0110060000000000000000000000000000000000000000000000000000",
+    "entry_rva": 5104,
+    "image_base": 5368709120,
+    "section_alignment": 4096,
+    "file_alignment": 512,
+    "code_size": 16366080,
+    "initialized_data_size": 3399680,
+    "uninitialized_data_size": 1024,
+    "image_size": 19791872,
+    "header_size": 1024,
+    "checksum": 29730180,
+    "sections": [
+      {
+        "name": ".text",
+        "rva": 4096,
+        "virtual_size": 16365664,
+        "raw_size": 16366080,
+        "raw_offset": 1024,
+        "characteristics": 1610612768,
+        "debug": false,
+        "raw_sha256": "0bde7afb2133803d8688d4cac9f3699a4f73efd082cd027b8e71cfbdf2587de0"
+      },
+      {
+        "name": ".data",
+        "rva": 16371712,
+        "virtual_size": 3728,
+        "raw_size": 4096,
+        "raw_offset": 16367104,
+        "characteristics": 3221225536,
+        "debug": false,
+        "raw_sha256": "ea029b0c9f63fd66acf17a7d3f86af113f04e197c06d464b2fe2ddaee3e6c168"
+      },
+      {
+        "name": ".rdata",
+        "rva": 16375808,
+        "virtual_size": 1886264,
+        "raw_size": 1886720,
+        "raw_offset": 16371200,
+        "characteristics": 1073741888,
+        "debug": false,
+        "raw_sha256": "574c6798d203189dc6574d0405f6a0bc827a045c6ef8d59b572e78a1828f8017"
+      },
+      {
+        "name": ".pdata",
+        "rva": 18264064,
+        "virtual_size": 615564,
+        "raw_size": 615936,
+        "raw_offset": 18257920,
+        "characteristics": 1073741888,
+        "debug": false,
+        "raw_sha256": "ced81820e5c7d6900076c660db78a10055af6ca5ead1959f112f423c9bead3cc"
+      },
+      {
+        "name": ".xdata",
+        "rva": 18882560,
+        "virtual_size": 842224,
+        "raw_size": 842240,
+        "raw_offset": 18873856,
+        "characteristics": 1073741888,
+        "debug": false,
+        "raw_sha256": "d09af6ad52e20e404bb33801353f42923f3d314da4f9ec9ab091b525db5f2950"
+      },
+      {
+        "name": ".bss",
+        "rva": 19726336,
+        "virtual_size": 576,
+        "raw_size": 0,
+        "raw_offset": 0,
+        "characteristics": 3221225600,
+        "debug": false,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": ".idata",
+        "rva": 19730432,
+        "virtual_size": 7348,
+        "raw_size": 7680,
+        "raw_offset": 19716096,
+        "characteristics": 3221225536,
+        "debug": false,
+        "raw_sha256": "5f1ed0d50362ff5ca3811a5d947e05e66d977c083d689bf888e8eeeb23124bbe"
+      },
+      {
+        "name": ".CRT",
+        "rva": 19738624,
+        "virtual_size": 104,
+        "raw_size": 512,
+        "raw_offset": 19723776,
+        "characteristics": 3221225536,
+        "debug": false,
+        "raw_sha256": "57b6ac729c72f8919c5a4f79f6a4cac8ed27482291ecc35c20cbec4a44e6928c"
+      },
+      {
+        "name": ".tls",
+        "rva": 19742720,
+        "virtual_size": 16,
+        "raw_size": 512,
+        "raw_offset": 19724288,
+        "characteristics": 3221225536,
+        "debug": false,
+        "raw_sha256": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560"
+      },
+      {
+        "name": ".reloc",
+        "rva": 19746816,
+        "virtual_size": 41860,
+        "raw_size": 41984,
+        "raw_offset": 19724800,
+        "characteristics": 1107296320,
+        "debug": false,
+        "raw_sha256": "36f140f879babc5b8fbd1288b91f8ce1b25d038d4b9954cf9a5528f211b8df10"
+      }
+    ],
+    "data_directories": [
+      {
+        "index": 0,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 1,
+        "rva": 19730432,
+        "size": 7348,
+        "section": ".idata",
+        "section_relative_offset": 0,
+        "payload_sha256": "44d036579f7af30e942ca619d811c7d23c845ed4059e6d5f7597f3e46d52bda5"
+      },
+      {
+        "index": 2,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 3,
+        "rva": 18264064,
+        "size": 615564,
+        "section": ".pdata",
+        "section_relative_offset": 0,
+        "payload_sha256": "27e28b2515c88d6fc8eb1507f783904059e0700dcb82fa66760112295cd0f6e4"
+      },
+      {
+        "index": 4,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 5,
+        "rva": 19746816,
+        "size": 41860,
+        "section": ".reloc",
+        "section_relative_offset": 0,
+        "payload_sha256": "5547a4949590188a1f3f67d1e970ebb0b489ca1cb1420dde096dbff760493021"
+      },
+      {
+        "index": 6,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 7,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 8,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 9,
+        "rva": 18260800,
+        "size": 40,
+        "section": ".rdata",
+        "section_relative_offset": 1884992,
+        "payload_sha256": "cc3f61f0059fbe0e7dfc6de7af1656afbd641d22f12f40f7edf614ac5de9c9d1"
+      },
+      {
+        "index": 10,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 11,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 12,
+        "rva": 19732144,
+        "size": 1552,
+        "section": ".idata",
+        "section_relative_offset": 1712,
+        "payload_sha256": "64bd33046f4c6711a3b2e99905ed0d3ab9a641fb48dc936c91be50b34be3e466"
+      },
+      {
+        "index": 13,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 14,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      },
+      {
+        "index": 15,
+        "rva": 0,
+        "size": 0,
+        "section": null,
+        "section_relative_offset": null,
+        "payload_sha256": null
+      }
+    ],
+    "runtime_references": {
+      "schema": "native-helper-loader-reference-walk.v1",
+      "scope": "GNU-x64-unbound-imports-unwind-v1-TLS-DIR64",
+      "counts": {
+        "entry": 1,
+        "import_descriptor": 8,
+        "import_dll": 7,
+        "import_lookup": 194,
+        "import_iat": 194,
+        "import_hint": 187,
+        "import_name": 187,
+        "exception_entry": 51297,
+        "runtime_function": 51297,
+        "unwind_header": 51297,
+        "unwind_codes": 51297,
+        "unwind_handler_rva": 11779,
+        "unwind_handler": 11779,
+        "tls_directory": 1,
+        "tls_template": 1,
+        "tls_index": 1,
+        "tls_callback_table": 4,
+        "tls_callback": 3,
+        "relocation_block": 314,
+        "relocation_entry": 19674,
+        "relocation_slot": 19518,
+        "relocated_image_pointer": 19517,
+        "relocated_image_base_anchor": 1
+      },
+      "target_sections": {
+        "entry": [
+          ".text"
+        ],
+        "import_descriptor": [
+          ".idata"
+        ],
+        "import_dll": [
+          ".idata"
+        ],
+        "import_lookup": [
+          ".idata"
+        ],
+        "import_iat": [
+          ".idata"
+        ],
+        "import_hint": [
+          ".idata"
+        ],
+        "import_name": [
+          ".idata"
+        ],
+        "exception_entry": [
+          ".pdata"
+        ],
+        "runtime_function": [
+          ".text"
+        ],
+        "unwind_header": [
+          ".xdata"
+        ],
+        "unwind_codes": [
+          ".xdata"
+        ],
+        "unwind_handler_rva": [
+          ".xdata"
+        ],
+        "unwind_handler": [
+          ".text"
+        ],
+        "tls_directory": [
+          ".rdata"
+        ],
+        "tls_template": [
+          ".tls"
+        ],
+        "tls_index": [
+          ".bss"
+        ],
+        "tls_callback_table": [
+          ".CRT"
+        ],
+        "tls_callback": [
+          ".text"
+        ],
+        "relocation_block": [
+          ".reloc"
+        ],
+        "relocation_entry": [
+          ".reloc"
+        ],
+        "relocation_slot": [
+          ".CRT",
+          ".data",
+          ".rdata"
+        ],
+        "relocated_image_pointer": [
+          ".CRT",
+          ".bss",
+          ".data",
+          ".idata",
+          ".rdata",
+          ".text",
+          ".tls"
+        ]
+      },
+      "all_walked_targets_retained": true,
+      "complete_runtime_pointer_walk": false,
+      "opaque_language_specific_handler_records": 11779,
+      "opaque_handler_data_preservation": "Exact full containing-section payload comparison; not interpreted",
+      "disassembly_or_scientific_execution": false
+    }
+  },
+  "actual_linked_archives": [
+    {
+      "path": "target/debug/deps/libep_runtime-341e0c1bf50b07ca.rlib",
+      "sha256": "b12bc43aaec6467c244ee1dc8d607a9de3f997ddd62835f83ed3f08c8497a854",
+      "size_bytes": 80814436
+    },
+    {
+      "path": "C:\\Users\\GonieGonie\\.rustup\\toolchains\\1.96.0-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\lib\\self-contained\\libmsvcrt.a",
+      "sha256": "18941805e69109d61d0f4aefafa4f1dd5dd79c57c9ba099b812b4f7679bb19a5",
+      "size_bytes": 1232122
+    },
+    {
+      "path": "C:\\Users\\GonieGonie\\.rustup\\toolchains\\1.96.0-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\lib\\self-contained\\libmingwex.a",
+      "sha256": "00d540cc648dba1bcfc222ba8e0a56f70e55fd06a3d6ee0551a9306866cc81ca",
+      "size_bytes": 470418
+    },
+    {
+      "path": "C:\\Users\\GonieGonie\\.rustup\\toolchains\\1.96.0-x86_64-pc-windows-gnu\\lib\\rustlib\\x86_64-pc-windows-gnu\\lib\\self-contained\\libmingw32.a",
+      "sha256": "901e8b09fbda4da401cf4a67dd2f0a1c486bf8fab4615eaabdd6fa5f4e396636",
+      "size_bytes": 40626
+    }
+  ],
+  "actual_read_only_tools": {
+    "objdump": {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/objdump.exe",
+      "sha256": "0d140222ea3e5bb234a98c602350c1ace10ddaba7638dbb96f3ec9a0d17bfbc1",
+      "size_bytes": 2440206
+    },
+    "addr2line": {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/addr2line.exe",
+      "sha256": "2a09b9eb95ea235075831caf186c746c1e4a2c566a2b065f13ce8912df3b5885",
+      "size_bytes": 1180686
+    }
+  },
+  "actual_provider_addr2line": {
+    "command": [
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin\\addr2line.exe",
+      "-f",
+      "-C",
+      "-e",
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src05_wind_pow_probe.exe",
+      "0x000000014001d230",
+      "0x0000000140512f40",
+      "0x0000000140f9a390",
+      "0x0000000140f9b680",
+      "0x0000000140f9b4d0",
+      "0x0000000140f9b480",
+      "0x0000000140f9b9d0",
+      "0x0000000140782230",
+      "0x00000001407825f0"
+    ],
+    "exit_code": 0,
+    "stdout": {
+      "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/providers-addr2line.stdout.txt",
+      "sha256": "43e2298fbaa8d8c824b94cf2d1bada26edef3eaa5e75b8cdf61fe81ba6e2dcbf",
+      "size_bytes": 90
+    },
+    "stderr": {
+      "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/providers-addr2line.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    }
+  },
+  "f64_powf_calls_selected_pow": true,
+  "selected_pow_calls_selected_log2l": true,
+  "selected_pow_calls_selected_exp2l": true,
+  "all_disassembled_code_bytes_equal_actual_PE": true,
+  "full_input_Source_binary_map_archive_tool_hashes_match_before_after": true,
+  "actual_collector_source": {
+    "path": ".runtime/porting/SRC-05/collect-wind-pow-Rust-providers-01.py",
+    "sha256": "e342d4e58a153816e79cfe579cbeea1cf50e61e19be4bb1fb25ff88ad9cc36e8",
+    "size_bytes": 14498
+  },
+  "helper_executed": false,
+  "diagnostic_results_read": false,
+  "historical_controls_reconstructed": false,
+  "production_math_changed": false,
+  "gates_updated": false,
+  "Root_FULL_provider_and_PE_review_pending": true
+}

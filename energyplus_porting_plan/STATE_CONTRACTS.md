@@ -34,3 +34,7 @@ EP struct 전체를 복제하지 않고 아래 데이터의 생산자·소비자
 ## SYS-02/03 선택 보고서와 실제 A caller
 
 선택 보고서 계약은 Zone별 여섯 rolling owner, 첫 Run day의 차이 벡터·전체 행렬·Count, 보고서 scratch의 실제 할당/기록 범위와 caller 소유 EIO를 구분한다. BeginEnvrn reset, 매 zone timestep의 RecKeep, 실제 첫 Run EndDay의 Report 호출은 각각 원본 시점과 상태를 유지한다. [선택 owner/EIO 비교와 현재 A caller 시험](evidence/SYS-03-ordinary-warmup-report/summary.json)은 전체 backend·부하 생산자·ordinary weather handoff의 Native 동등성을 뜻하지 않는다.
+
+## SRC-05 선택 setter와 실행 문맥
+
+표면의 기존 네 상태 배열, 실제 높이·ExtWind·날씨 보정 입력과 원본 쓰기 순서를 유지한다. [별도 main 실행의 선택 setter 비교](evidence/SRC-05-wind-diagnostics-and-main-thread/summary.json)는 실제 argc3/Cargo 산출물과 역사적 Source에 묶여 있다. read-only main/spawn 부동소수점 진단과 과거 실패는 별도 증거이며, 생산 worker의 동등성이나 차이의 원인으로 단정하지 않는다. 실제 ordinary 초기화·온도 검사·후속 소비자 연결은 계속 미확인이다.

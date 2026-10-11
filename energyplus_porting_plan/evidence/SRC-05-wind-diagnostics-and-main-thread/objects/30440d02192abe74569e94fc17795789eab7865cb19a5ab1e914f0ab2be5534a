@@ -1,0 +1,397 @@
+{
+  "schema": "src05-wind-pow-Rust-independent-factual-review.v1",
+  "status": "ACCEPTED diagnostic capture custody and completeness; no scientific PASS",
+  "actual_custody": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Rust-observation-01/custody.json",
+    "sha256": "47730b70ff6f82e7a7c101ba34da66128068811c9a5d3faf67f5b819c9647b3d",
+    "size_bytes": 2147534
+  },
+  "actual_execution": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Rust-observation-01/command/receipt.json",
+    "sha256": "97c11b49eba5e81f21656a669c683d550fcdbeb95387ab77e058f64d538fb741",
+    "size_bytes": 2916
+  },
+  "actual_outer_execution": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Rust-execution-driver-command-01/receipt.json",
+    "sha256": "c5c5a0bf2406dea9899f45debaa6c7b802368a1b8904c97fc388a5d96b0dffef",
+    "size_bytes": 3311
+  },
+  "actual_stdout": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Rust-observation-01/command/stdout.log",
+    "sha256": "664a23e45b7bc145d18cda2bf3464365fba3091426604ccfb78b163c82f5f360",
+    "size_bytes": 166263
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/56/5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548",
+    "sha256": "5660999cac47deb982091970d2e19af4853b000515b541a5119a90e022f1c548"
+  },
+  "Source_preparation": {
+    "path": ".runtime/porting/SRC-05/wind-pow-isolation-prep-03/manifest.json",
+    "sha256": "f981be1c461227a9152ded3288bf14cd0e007cbd6ab0ba74ac91674b36acc4a2",
+    "size_bytes": 45607
+  },
+  "Root_provider_acceptance": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/Root-provider-acceptance.json",
+    "sha256": "b329f304782c0dc23866be2f6543708136195a540c0db973c8a8262a9c5c6291",
+    "size_bytes": 1788
+  },
+  "provider_proof": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Rust-provider-review-01/inventory.json",
+    "sha256": "62a0fb7adf97950cfe2c3371c378412cd3d9966947babd575b56800eac22911f",
+    "size_bytes": 46468
+  },
+  "actual_Cargo_execution": {
+    "path": ".runtime/porting/SRC-05/wind-pow-Rust-build-02/Cargo-command/receipt.json",
+    "sha256": "56550fe1c86f75fb5ff6da5b198513b254f696d4e05e789d1e292fed73797f46",
+    "size_bytes": 3268
+  },
+  "actual_Cargo_compiler_artifact": {
+    "reason": "compiler-artifact",
+    "package_id": "path+file:///C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus/.runtime/porting/SRC-05/wind-pow-isolation-prep-03/rust#src05_wind_pow_probe@0.0.0",
+    "manifest_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-05\\wind-pow-isolation-prep-03\\rust\\Cargo.toml",
+    "target": {
+      "kind": [
+        "bin"
+      ],
+      "crate_types": [
+        "bin"
+      ],
+      "name": "src05_wind_pow_probe",
+      "src_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-05\\wind-pow-isolation-prep-03\\rust\\src\\main.rs",
+      "edition": "2024",
+      "doc": true,
+      "doctest": false,
+      "test": true
+    },
+    "profile": {
+      "opt_level": "0",
+      "debuginfo": 0,
+      "debug_assertions": true,
+      "overflow_checks": true,
+      "test": false
+    },
+    "features": [],
+    "filenames": [
+      "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src05_wind_pow_probe.exe"
+    ],
+    "executable": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\target\\debug\\src05_wind_pow_probe.exe",
+    "fresh": false
+  },
+  "verified_unique_full_files": 7916,
+  "frozen_artifact_rows": 7872,
+  "canonical_Source_members": 3922,
+  "all_current_and_archived_Source_bytes_exact": true,
+  "all_frozen_before_after_and_current_full_hashes_exact": true,
+  "actual_argv_and_literal_PATH_exact": true,
+  "Cargo_artifact_independently_extracted_and_equal": true,
+  "provider_and_Cargo_receipts_before_execution": true,
+  "Source566_guard_complete": true,
+  "literal_cases": 25,
+  "actual_case_lane_rows": 50,
+  "literal_binary64_input_joins": 250,
+  "actual_stages": 350,
+  "scalar_bit_class_and_JSON_value_checks": {
+    "finite": 236,
+    "positive_zero": 44,
+    "negative_zero": 20,
+    "nan": 22,
+    "positive_infinity": 28
+  },
+  "control_snapshots": 704,
+  "actual_control_values": {
+    "x87_control_word": [
+      639,
+      895
+    ],
+    "MXCSR": [
+      8064,
+      8096,
+      8098,
+      8102
+    ],
+    "c_fegetround": [
+      0
+    ],
+    "x87_rounding_control_bits": [
+      0
+    ],
+    "SSE_rounding_control_bits": [
+      0
+    ]
+  },
+  "stage_control_snapshot_changes": {
+    "fac": 2,
+    "Z_pow_exponent": 2,
+    "BL_pow_negative_exponent": 2
+  },
+  "lane_entry_exit_controls": [
+    {
+      "lane": "main_thread",
+      "entry": {
+        "MXCSR": 8064,
+        "SSE_rounding_control_bits": 0,
+        "c_fegetround": 0,
+        "x87_control_word": 895,
+        "x87_rounding_control_bits": 0
+      },
+      "exit": {
+        "MXCSR": 8102,
+        "SSE_rounding_control_bits": 0,
+        "c_fegetround": 0,
+        "x87_control_word": 895,
+        "x87_rounding_control_bits": 0
+      }
+    },
+    {
+      "lane": "std_thread_spawn",
+      "entry": {
+        "MXCSR": 8064,
+        "SSE_rounding_control_bits": 0,
+        "c_fegetround": 0,
+        "x87_control_word": 639,
+        "x87_rounding_control_bits": 0
+      },
+      "exit": {
+        "MXCSR": 8102,
+        "SSE_rounding_control_bits": 0,
+        "c_fegetround": 0,
+        "x87_control_word": 639,
+        "x87_rounding_control_bits": 0
+      }
+    }
+  ],
+  "current_main_worker_stage_bit_difference_count": 36,
+  "current_main_worker_stage_bit_differences": [
+    {
+      "case_id": "terrain-country-preoperands",
+      "stage": "Z_pow_exponent",
+      "main_bits": "3ff6160dcf861e50",
+      "worker_bits": "3ff6160dcf861e51"
+    },
+    {
+      "case_id": "terrain-country-preoperands",
+      "stage": "diagnostic_fac_times_Z_power",
+      "main_bits": "400fffffffffffff",
+      "worker_bits": "4010000000000000"
+    },
+    {
+      "case_id": "terrain-country-preoperands",
+      "stage": "Rust_set_surface_wind_speeds",
+      "main_bits": "400fffffffffffff",
+      "worker_bits": "4010000000000000"
+    },
+    {
+      "case_id": "terrain-country-preoperands",
+      "stage": "Rust_wind_speed_at_height",
+      "main_bits": "400fffffffffffff",
+      "worker_bits": "4010000000000000"
+    },
+    {
+      "case_id": "wind-positive-zero",
+      "stage": "Z_pow_exponent",
+      "main_bits": "3ff6160dcf861e50",
+      "worker_bits": "3ff6160dcf861e51"
+    },
+    {
+      "case_id": "wind-negative-zero",
+      "stage": "Z_pow_exponent",
+      "main_bits": "3ff6160dcf861e50",
+      "worker_bits": "3ff6160dcf861e51"
+    },
+    {
+      "case_id": "wind-negative",
+      "stage": "Z_pow_exponent",
+      "main_bits": "3ff6160dcf861e50",
+      "worker_bits": "3ff6160dcf861e51"
+    },
+    {
+      "case_id": "wind-negative",
+      "stage": "diagnostic_fac_times_Z_power",
+      "main_bits": "c0042c26e9753bf7",
+      "worker_bits": "c0042c26e9753bf8"
+    },
+    {
+      "case_id": "wind-negative",
+      "stage": "Rust_set_surface_wind_speeds",
+      "main_bits": "c0042c26e9753bf7",
+      "worker_bits": "c0042c26e9753bf8"
+    },
+    {
+      "case_id": "wind-negative",
+      "stage": "Rust_wind_speed_at_height",
+      "main_bits": "c0042c26e9753bf7",
+      "worker_bits": "c0042c26e9753bf8"
+    },
+    {
+      "case_id": "height-positive-subnormal",
+      "stage": "Z_pow_exponent",
+      "main_bits": "3688eeea8e7afd23",
+      "worker_bits": "3688eeea8e7afd26"
+    },
+    {
+      "case_id": "height-positive-subnormal",
+      "stage": "diagnostic_fac_times_Z_power",
+      "main_bits": "3696c5dc769ccc3e",
+      "worker_bits": "3696c5dc769ccc41"
+    },
+    {
+      "case_id": "height-positive-subnormal",
+      "stage": "Rust_set_surface_wind_speeds",
+      "main_bits": "3696c5dc769ccc3e",
+      "worker_bits": "3696c5dc769ccc41"
+    },
+    {
+      "case_id": "height-positive-subnormal",
+      "stage": "Rust_wind_speed_at_height",
+      "main_bits": "3696c5dc769ccc3e",
+      "worker_bits": "3696c5dc769ccc41"
+    },
+    {
+      "case_id": "boundary-positive-zero",
+      "stage": "Z_pow_exponent",
+      "main_bits": "3ff6160dcf861e50",
+      "worker_bits": "3ff6160dcf861e51"
+    },
+    {
+      "case_id": "boundary-negative-zero",
+      "stage": "Z_pow_exponent",
+      "main_bits": "3ff6160dcf861e50",
+      "worker_bits": "3ff6160dcf861e51"
+    },
+    {
+      "case_id": "boundary-negative-fractional-domain",
+      "stage": "Z_pow_exponent",
+      "main_bits": "3ff6160dcf861e50",
+      "worker_bits": "3ff6160dcf861e51"
+    },
+    {
+      "case_id": "boundary-one",
+      "stage": "Z_pow_exponent",
+      "main_bits": "3ff6160dcf861e50",
+      "worker_bits": "3ff6160dcf861e51"
+    },
+    {
+      "case_id": "boundary-one",
+      "stage": "diagnostic_fac_times_Z_power",
+      "main_bits": "4016160dcf861e50",
+      "worker_bits": "4016160dcf861e51"
+    },
+    {
+      "case_id": "boundary-one",
+      "stage": "Rust_set_surface_wind_speeds",
+      "main_bits": "4016160dcf861e50",
+      "worker_bits": "4016160dcf861e51"
+    },
+    {
+      "case_id": "boundary-one",
+      "stage": "Rust_wind_speed_at_height",
+      "main_bits": "4016160dcf861e50",
+      "worker_bits": "4016160dcf861e51"
+    },
+    {
+      "case_id": "exponent-half",
+      "stage": "BL_pow_negative_exponent",
+      "main_bits": "3faf28c9b380eb76",
+      "worker_bits": "3faf28c9b380eb73"
+    },
+    {
+      "case_id": "exponent-half",
+      "stage": "fac",
+      "main_bits": "3fcf28c9b380eb76",
+      "worker_bits": "3fcf28c9b380eb73"
+    },
+    {
+      "case_id": "exponent-half",
+      "stage": "diagnostic_fac_times_Z_power",
+      "main_bits": "3fe8a2345cc04426",
+      "worker_bits": "3fe8a2345cc04424"
+    },
+    {
+      "case_id": "exponent-half",
+      "stage": "Rust_set_surface_wind_speeds",
+      "main_bits": "3fe8a2345cc04426",
+      "worker_bits": "3fe8a2345cc04424"
+    },
+    {
+      "case_id": "exponent-half",
+      "stage": "Rust_wind_speed_at_height",
+      "main_bits": "3fe8a2345cc04426",
+      "worker_bits": "3fe8a2345cc04424"
+    },
+    {
+      "case_id": "modifier-positive-zero",
+      "stage": "Z_pow_exponent",
+      "main_bits": "3ff6160dcf861e50",
+      "worker_bits": "3ff6160dcf861e51"
+    },
+    {
+      "case_id": "modifier-negative-zero",
+      "stage": "Z_pow_exponent",
+      "main_bits": "3ff6160dcf861e50",
+      "worker_bits": "3ff6160dcf861e51"
+    },
+    {
+      "case_id": "wind-largest-finite",
+      "stage": "Z_pow_exponent",
+      "main_bits": "3ff6160dcf861e50",
+      "worker_bits": "3ff6160dcf861e51"
+    },
+    {
+      "case_id": "wind-largest-finite",
+      "stage": "diagnostic_fac_times_Z_power",
+      "main_bits": "7fe42c26e9753bf6",
+      "worker_bits": "7fe42c26e9753bf7"
+    },
+    {
+      "case_id": "wind-largest-finite",
+      "stage": "Rust_set_surface_wind_speeds",
+      "main_bits": "7fe42c26e9753bf6",
+      "worker_bits": "7fe42c26e9753bf7"
+    },
+    {
+      "case_id": "wind-largest-finite",
+      "stage": "Rust_wind_speed_at_height",
+      "main_bits": "7fe42c26e9753bf6",
+      "worker_bits": "7fe42c26e9753bf7"
+    },
+    {
+      "case_id": "terrain-country-repeated-after-edges",
+      "stage": "Z_pow_exponent",
+      "main_bits": "3ff6160dcf861e50",
+      "worker_bits": "3ff6160dcf861e51"
+    },
+    {
+      "case_id": "terrain-country-repeated-after-edges",
+      "stage": "diagnostic_fac_times_Z_power",
+      "main_bits": "400fffffffffffff",
+      "worker_bits": "4010000000000000"
+    },
+    {
+      "case_id": "terrain-country-repeated-after-edges",
+      "stage": "Rust_set_surface_wind_speeds",
+      "main_bits": "400fffffffffffff",
+      "worker_bits": "4010000000000000"
+    },
+    {
+      "case_id": "terrain-country-repeated-after-edges",
+      "stage": "Rust_wind_speed_at_height",
+      "main_bits": "400fffffffffffff",
+      "worker_bits": "4010000000000000"
+    }
+  ],
+  "Source_guard_temporal_scope": "All current Source566 checks completed and Root was notified before Root applied ordinary A02. Subsequent diagnostic comparison reads only immutable captured outputs and Source archives.",
+  "exact_current_diagnostic_comparison": {
+    "path": ".runtime/porting/SRC-05/wind-pow-independent-diagnostic-comparison-01/comparison.json",
+    "sha256": "0675fa1939d9b6231b9ed241053fd8a2017becc78f2bdf9b9ff328da4a597f8c",
+    "size_bytes": 713080
+  },
+  "historical_thread_controls_available": false,
+  "diagnostic_stages_are_Original_internal_locals": false,
+  "arithmetic_recomputed": false,
+  "controls_written": false,
+  "cause_established": false,
+  "scientific_PASS_claimed": false,
+  "production_math_changed": false,
+  "gates_updated": false,
+  "authorship_limit": "Header authored the execution custody driver. This factual audit independently verifies Root Rust execution and Raw diagnostic protocol/results; Base supplied the independent Source peer of that driver."
+}

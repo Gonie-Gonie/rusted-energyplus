@@ -69,7 +69,7 @@ SRC-07/08에 같은 snapshot 전달
 최대오차/RMSE/상태 불일치:  
 추가 검토할 helper:  
 
-## SRC-05 bounded Source proposal (unexecuted)
+## Historical SRC-05 bounded Source proposal (before application)
 
 The exact selected bodies are `DataSurfaces.cc:594–618,634–666`; their caller is
 `HeatBalanceSurfaceManager.cc:308–345`. The intervening temperature guard
@@ -95,7 +95,17 @@ and true setter/check sequence at InitSurfaceHeatBalance. Full production
 handoff, guard/backend and SRC-07/08 consumers remain separate prerequisites.
 The actual failed persistent comparison remains evidence; no policy is changed.
 
-## Actual selected surface environment comparison
+## Historical selected surface environment comparison (libtest observer)
 
 Genuine unchanged-core Native calls and actual Rust selected setters did not pass the selected scope on 26 literal cases and 30 weather operations. Actual status: fail-selected-setters-or-input-join; input joins 2,112, full pre-owner checks 1,384, selected endpoint checks 1,334, point-helper checks 189; mismatches 3. Required-unavailable observations 103 and nonfinite arithmetic exclusions 0 are retained without PASS. Rust Source371ee432 has 3,919 members; its one-row predicate repair left 3,918 unrelated files unchanged. fmt/Clippy passed; focused329/workspace4,953 passed with two intentionally ignored observers, and the explicit SRC05 invocation passed one test. Both attempted comparison chains, complete observations and all ledgers are retained. Cold guard/backend, Native-unreached/skipped observations, ordinary manager handoff and whole-card gates remain pending. No gate changed.
 Evidence: [selected setters, complete observations and quality](../evidence/SRC-05-surface-environment/summary.json) (cc8a0746b6b5143a7b79376270ee66f3aaf860c4c1184e025953fcfef814193f).
+
+## Actual standalone main comparison and wind diagnostics
+
+The independent standalone Rust main and genuine Native setters matched the available selected scope: 26 literal cases, 30 weather operations, 71 paired setter boundaries, 2,112 input joins, 1,384 full pre-owner and 1,384 selected endpoint checks, 189 point-helper checks, zero mismatches. All 102 required-unavailable rows remain excluded from PASS. This proof is bound to historical Source d34a84b7, its four closed fmt/Clippy/focused/workspace checks (341/4,968 passed, two ignored observers), the sole actual Cargo-emitted dev executable and its argc3 main execution. Later SRC-06 changes do not rewrite this capture.
+
+Separate read-only floating point diagnostics retain all 25 cases in main and spawned lanes: 29 intermediate/result differences, 662 stage-control field differences and four lane-control differences. Native and Rust main lanes had no result differences; the spawned lane had 29. Actual x87 control words were 0x037f for Native main/spawn and Rust main, and 0x027f for Rust spawn. Both linked pow providers use the observed x87 helper family. These observations establish neither causation nor the historical libtest worker controls. No floating point controls, formula, tolerance or production execution path were changed for this result. The previous three-mismatch comparison and all diagnostics remain retained.
+
+The production CLI and ordinary observer still use a worker. Standalone selected parity does not prove that path, the cold guard/error backend, retained ordinary four-array setter/check sequence, SRC-07/08 handoff or whole SRC-05. All four gates remain pending; A 14/54 and B 14/64 are unchanged.
+
+Evidence: [complete selected observations, diagnostics, custody and historical failure](../evidence/SRC-05-wind-diagnostics-and-main-thread/summary.json).

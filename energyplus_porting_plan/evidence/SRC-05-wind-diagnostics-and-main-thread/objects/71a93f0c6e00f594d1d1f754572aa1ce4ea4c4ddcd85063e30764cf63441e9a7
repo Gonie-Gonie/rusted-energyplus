@@ -1,0 +1,48 @@
+--- .runtime/porting/SRC-05/wind-pow-isolation-prep-01/before/provider-evidence/Native-exp2l.txt
++++ .runtime/porting/SRC-05/wind-pow-isolation-prep-01/provider-evidence/Native-exp2l.txt
+@@ -0,0 +1,45 @@
++
++D:\CodexBuild\rusted-energyplus\SRC-05\native-build-02\bin\src05_surface_environment_helper.exe:     file format pei-x86-64
++
++
++Disassembly of section .text:
++
++0000000141ac9320 <exp2l>:
++   141ac9320:	db 2a                	fldt   (%rdx)
++   141ac9322:	d9 e5                	fxam
++   141ac9324:	9b df e0             	fstsw  %ax
++   141ac9327:	b6 45                	mov    $0x45,%dh
++   141ac9329:	20 e6                	and    %ah,%dh
++   141ac932b:	80 fe 05             	cmp    $0x5,%dh
++   141ac932e:	74 3f                	je     141ac936f <exp2l+0x4f>
++   141ac9330:	d9 c0                	fld    %st(0)
++   141ac9332:	48 83 ec 08          	sub    $0x8,%rsp
++   141ac9336:	d9 7c 24 04          	fnstcw 0x4(%rsp)
++   141ac933a:	0f b7 44 24 04       	movzwl 0x4(%rsp),%eax
++   141ac933f:	80 cc 0c             	or     $0xc,%ah
++   141ac9342:	66 89 04 24          	mov    %ax,(%rsp)
++   141ac9346:	d9 2c 24             	fldcw  (%rsp)
++   141ac9349:	d9 fc                	frndint
++   141ac934b:	d9 6c 24 04          	fldcw  0x4(%rsp)
++   141ac934f:	48 83 c4 08          	add    $0x8,%rsp
++   141ac9353:	dc e9                	fsubr  %st,%st(1)
++   141ac9355:	d9 c9                	fxch   %st(1)
++   141ac9357:	d9 f0                	f2xm1
++   141ac9359:	d9 e8                	fld1
++   141ac935b:	de c1                	faddp  %st,%st(1)
++   141ac935d:	d9 fd                	fscale
++   141ac935f:	dd d9                	fstp   %st(1)
++   141ac9361:	48 89 c8             	mov    %rcx,%rax
++   141ac9364:	48 c7 41 08 00 00 00 	movq   $0x0,0x8(%rcx)
++   141ac936b:	00 
++   141ac936c:	db 39                	fstpt  (%rcx)
++   141ac936e:	c3                   	ret
++   141ac936f:	a9 00 02 00 00       	test   $0x200,%eax
++   141ac9374:	74 04                	je     141ac937a <exp2l+0x5a>
++   141ac9376:	dd d8                	fstp   %st(0)
++   141ac9378:	d9 ee                	fldz
++   141ac937a:	48 89 c8             	mov    %rcx,%rax
++   141ac937d:	48 c7 41 08 00 00 00 	movq   $0x0,0x8(%rcx)
++   141ac9384:	00 
++   141ac9385:	db 39                	fstpt  (%rcx)
++   141ac9387:	c3                   	ret

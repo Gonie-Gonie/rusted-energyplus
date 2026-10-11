@@ -1,0 +1,26 @@
+--- .runtime/porting/SRC-05/surface-environment-selected-comparison-prep-05/before/compare.py
++++ .runtime/porting/SRC-05/surface-environment-selected-comparison-prep-05/compare.py
+@@ -13,6 +13,12 @@
+ HERE = Path(__file__).resolve().parent
+ FILTER = 'heat_balance::convection::surface_environment::selected_reference::observe_literal_surface_environment_setters'
+ CONFIGS = ['--config', 'profile.dev.debug=0', '--config', 'profile.test.debug=0', '--config', 'build.incremental=false']
++QUALITY_COMMANDS = {
++    'fmt_check': ['cargo', 'fmt', '--all', '--', '--check'],
++    'clippy': ['cargo', 'clippy'] + CONFIGS + ['--locked', '--workspace', '--all-targets', '--', '-D', 'warnings'],
++    'focused': ['cargo', 'test'] + CONFIGS + ['--locked', '-p', 'ep_runtime', '--lib', 'heat_balance::'],
++    'workspace': ['cargo', 'test'] + CONFIGS + ['--locked', '--workspace'],
++}
+ PARAMS = ['SiteTempGradient', 'WeatherFileTempModCoeff', 'SiteWindExp', 'SiteWindBLHeight', 'WeatherFileWindModCoeff']
+ WEATHER = ['OutDryBulbTemp', 'OutWetBulbTemp', 'WindSpeed', 'WindDir']
+ ARRAYS = ['SurfOutDryBulbTemp', 'SurfOutWetBulbTemp', 'SurfOutWindSpeed', 'SurfOutWindDir']
+@@ -234,8 +240,9 @@
+         row = packet['quality_executions'][role]
+         need(Path(path).resolve() == exact(row) and sha == row['sha256'], 'actual quality operand differs')
+         quality_operand_roles.add(role)
+-    for row in packet['quality_executions'].values():
++    for role, row in packet['quality_executions'].items():
+         q = receipt(row,policy['recorder_source'])
++        need(q['command'] == QUALITY_COMMANDS[role], 'actual quality command differs: ' + role)
+         need(q['source_snapshot'] == source and q['finished_utc'] <= build['started_utc'], 'quality/current Source/chronology differs')
+     need(packet['Root_and_other_author_FULL_standalone_transport_Source_accepted'] is True and packet['Root_FULL_actual_main_entry_and_Cargo_artifact_review_accepted'] is True, 'independent Source/actual main artifact review required')
+ 

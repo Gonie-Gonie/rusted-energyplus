@@ -1,0 +1,66 @@
+"""Source-only metadata successor; never invoke a build, probe or target."""
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+import shutil
+
+ROOT = Path.cwd()
+OLD = ROOT / '.runtime/porting/SRC-05/wind-pow-isolation-prep-01'
+OUT = ROOT / '.runtime/porting/SRC-05/wind-pow-isolation-prep-02'
+
+
+def ref(path):
+    data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(data).hexdigest(),
+            'size_bytes': len(data), 'line_count': len(data.splitlines())}
+
+
+def dump(path, value):
+    path.write_text(json.dumps(value, ensure_ascii=False, allow_nan=False, indent=2) + '\n', encoding='utf8', newline='\n')
+
+
+def delta(before, after, path):
+    path.write_text(''.join(difflib.unified_diff(before.read_text(encoding='utf8').splitlines(keepends=True),
+        after.read_text(encoding='utf8').splitlines(keepends=True),
+        fromfile=before.relative_to(ROOT).as_posix(), tofile=after.relative_to(ROOT).as_posix())), encoding='utf8', newline='\n')
+
+
+assert not OUT.exists()
+parent = ref(OLD / 'manifest.json')
+assert parent['sha256'] == '15dbb59d4d3369e4baf9ed5f42418260c81f4cebc2b793771945d47e90807d86'
+old = json.loads((OLD / 'manifest.json').read_bytes())
+for row in old['own_sources']:
+    assert ref(ROOT / row['path']) == row
+OUT.mkdir(); (OUT / 'before').mkdir(); (OUT / 'diffs').mkdir()
+for name in ['manifest.json', 'README.md']:
+    shutil.copyfile(OLD / name, OUT / 'before' / name)
+contract = copy.deepcopy(old)
+row = contract['selected_source_ranges'][4]
+assert (row['start_line'], row['end_line']) == (185, 206)
+source = ROOT / row['source']['path']
+assert ref(source) == row['source']
+data = b''.join(source.read_bytes().splitlines(keepends=True)[196:219])
+assert b'exp2l ((long double) y * log2l' in data
+row.update(start_line=197, end_line=219, sha256=hashlib.sha256(data).hexdigest(), size_bytes=len(data),
+    purpose='Tagged MinGW x86 pow fractional/integer branches and actual log2l/extended multiply/exp2l finite tail')
+inverse = copy.deepcopy(contract); inverse['selected_source_ranges'][4] = old['selected_source_ranges'][4]
+assert inverse == old
+dump(OUT / 'corrected-Source-contract.json', contract)
+readme = (OLD / 'README.md').read_text(encoding='utf8').replace('??held Source only', '(held Source only)', 1)
+readme += '\nMetadata-only successor02 corrects the tagged pow.def.h Source bound to197-219, including the finite expression at214. All22 original own Source descriptors, helpers, input, policy, provider transcripts, runtime interfaces and other seven ranges remain literal01. The historical static-provider audit remains at its actual sealing cutoff; a later rebuilt test executable does not rewrite that evidence. Future probes require newly emitted artifact custody. No build, target, Cargo or diagnostic execution occurred.\n'
+(OUT / 'README.md').write_text(readme, encoding='utf8', newline='\n')
+delta(OUT / 'before/manifest.json', OUT / 'corrected-Source-contract.json', OUT / 'diffs/metadata.from01.diff')
+delta(OUT / 'before/README.md', OUT / 'README.md', OUT / 'diffs/README.from01.diff')
+manifest = copy.deepcopy(contract)
+manifest['metadata_successor'] = {'parent_preparation': parent, 'authentic_before_manifest': ref(OUT / 'before/manifest.json'),
+    'corrected_Source_contract': ref(OUT / 'corrected-Source-contract.json'),
+    'exact_metadata_diff': ref(OUT / 'diffs/metadata.from01.diff'), 'authentic_before_README': ref(OUT / 'before/README.md'),
+    'README': ref(OUT / 'README.md'), 'exact_README_diff': ref(OUT / 'diffs/README.from01.diff'),
+    'author': ref(Path(__file__)), 'original_own_sources_byte_exact': True,
+    'change': 'Only selected_source_ranges[4]197-219 hash/size/purpose and documentary README; all executable/input/policy paths remain01'}
+dump(OUT / 'manifest.json', manifest)
+assert manifest['own_sources'] == old['own_sources']
+print(json.dumps({'manifest': ref(OUT / 'manifest.json'), 'metadata_diff': ref(OUT / 'diffs/metadata.from01.diff'),
+    'README_diff': ref(OUT / 'diffs/README.from01.diff'), 'unchanged_original_own_sources': len(old['own_sources']), 'Source_only': True}))

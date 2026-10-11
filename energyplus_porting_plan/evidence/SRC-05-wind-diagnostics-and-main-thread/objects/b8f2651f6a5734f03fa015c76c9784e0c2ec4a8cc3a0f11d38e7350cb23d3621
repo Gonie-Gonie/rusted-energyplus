@@ -1,0 +1,2 @@
+error: cannot update the lock file C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-05\wind-pow-isolation-prep-01\rust\Cargo.lock because --locked was passed to prevent this
+help: to generate the lock file without accessing the network, remove the --locked flag and use --offline instead.
