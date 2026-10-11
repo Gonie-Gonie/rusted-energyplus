@@ -12226,6 +12226,11 @@
         "path": "energyplus_porting_plan/evidence/CTF-10-surface-consumer05-original-baseline/summary.json",
         "sha256": "49f284c4fb174651b085eac061afe56d0b33bc81372eb88f88204f2569bc0b95",
         "size_bytes": 15700
+      },
+      "actual_selected_thermal_history_unit_comparison": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-thermal-history-unit/summary.json",
+        "sha256": "166cdbeca01f8551d1e3ece22ea0c3c4a2c9492233db46104f99f22c8e15fdaf",
+        "size_bytes": 12623
       }
     },
     {

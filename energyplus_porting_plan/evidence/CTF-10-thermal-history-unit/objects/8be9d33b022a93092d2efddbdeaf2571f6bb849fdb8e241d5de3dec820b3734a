@@ -1,0 +1,39 @@
+{
+  "schema": "root-retained-input-transparent-compression.v1",
+  "created_utc": "2026-10-11T04:00:27.813581+00:00",
+  "actual_before_authority": {
+    "path": ".runtime/porting/CTF-10/thermal-history-projection-01/projection.json",
+    "sha256": "5667d39d42c6ca6c1b53cc0b023c8d1f3d2c92efd3fd2d965ad3ae527c4e6998",
+    "size_bytes": 11273
+  },
+  "operation": "NTFS compact.exe /C /EXE:LZX /Q exact1 retained genuine CTF10 complete projected input file",
+  "files": [
+    {
+      "file_before": {
+        "path": ".runtime/porting/CTF-10/thermal-history-projection-01/input-cases.ndjson",
+        "sha256": "6a2d721b229c26f7dc50dd17f4ba140f6d2ce9dba4ca72ba744291704f3dc5f0",
+        "size_bytes": 250546511
+      },
+      "file_after": {
+        "path": ".runtime/porting/CTF-10/thermal-history-projection-01/input-cases.ndjson",
+        "sha256": "6a2d721b229c26f7dc50dd17f4ba140f6d2ce9dba4ca72ba744291704f3dc5f0",
+        "size_bytes": 250546511
+      },
+      "compact_exit_code": 0,
+      "command_log": {
+        "path": ".runtime/porting/CTF-10/thermal-history-input-storage-compression-01/input-cases.ndjson.log",
+        "sha256": "8e8cd807a1d25a0550f2610b7d2527042eafedfc1493f8fb4b17dcbc7e197c32",
+        "size_bytes": 288
+      },
+      "bytes_and_path_unchanged": true
+    }
+  ],
+  "observed_free_bytes_before": 1695006720,
+  "observed_free_bytes_after": 1934561280,
+  "physical_free_change_is_observation_not_exclusive_attribution": true,
+  "all1_bytes_and_paths_unchanged": true,
+  "file_deleted_or_moved": false,
+  "scientific_values_recomputed": false,
+  "original_executable_executed": false,
+  "gates_updated": false
+}

@@ -1,0 +1,224 @@
+SS": false
+    },
+    "SurfInsideFluxHist": {
+      "numeric_observations": 231306,
+      "class_observations": 231306,
+      "nonfinite_unverified": 0,
+      "maximum_absolute_error": 0.0,
+      "absolute_error_overflow": false,
+      "l2_error": 0.0,
+      "l2_error_overflow": false,
+      "profile_observed": true,
+      "unobserved_profile_counted_as_PASS": false
+    },
+    "SurfOutsideFluxHist": {
+      "numeric_observations": 231306,
+      "class_observations": 231306,
+      "nonfinite_unverified": 0,
+      "maximum_absolute_error": 0.0,
+      "absolute_error_overflow": false,
+      "l2_error": 0.0,
+      "l2_error_overflow": false,
+      "profile_observed": true,
+      "unobserved_profile_counted_as_PASS": false
+    },
+    "SurfInsideTempHistMaster": {
+      "numeric_observations": 0,
+      "class_observations": 0,
+      "nonfinite_unverified": 0,
+      "maximum_absolute_error": 0.0,
+      "absolute_error_overflow": false,
+      "l2_error": 0.0,
+      "l2_error_overflow": false,
+      "profile_observed": false,
+      "unobserved_profile_counted_as_PASS": false
+    },
+    "SurfOutsideTempHistMaster": {
+      "numeric_observations": 0,
+      "class_observations": 0,
+      "nonfinite_unverified": 0,
+      "maximum_absolute_error": 0.0,
+      "absolute_error_overflow": false,
+      "l2_error": 0.0,
+      "l2_error_overflow": false,
+      "profile_observed": false,
+      "unobserved_profile_counted_as_PASS": false
+    },
+    "SurfInsideFluxHistMaster": {
+      "numeric_observations": 0,
+      "class_observations": 0,
+      "nonfinite_unverified": 0,
+      "maximum_absolute_error": 0.0,
+      "absolute_error_overflow": false,
+      "l2_error": 0.0,
+      "l2_error_overflow": false,
+      "profile_observed": false,
+      "unobserved_profile_counted_as_PASS": false
+    },
+    "SurfOutsideFluxHistMaster": {
+      "numeric_observations": 0,
+      "class_observations": 0,
+      "nonfinite_unverified": 0,
+      "maximum_absolute_error": 0.0,
+      "absolute_error_overflow": false,
+      "l2_error": 0.0,
+      "l2_error_overflow": false,
+      "profile_observed": false,
+      "unobserved_profile_counted_as_PASS": false
+    },
+    "QExt1": {
+      "numeric_observations": 6,
+      "class_observations": 6,
+      "nonfinite_unverified": 0,
+      "maximum_absolute_error": 0.0,
+      "absolute_error_overflow": false,
+      "l2_error": 0.0,
+      "l2_error_overflow": false,
+      "profile_observed": true,
+      "unobserved_profile_counted_as_PASS": false
+    },
+    "QInt1": {
+      "numeric_observations": 6,
+      "class_observations": 6,
+      "nonfinite_unverified": 0,
+      "maximum_absolute_error": 0.0,
+      "absolute_error_overflow": false,
+      "l2_error": 0.0,
+      "l2_error_overflow": false,
+      "profile_observed": true,
+      "unobserved_profile_counted_as_PASS": false
+    },
+    "TempInt1": {
+      "numeric_observations": 6,
+      "class_observations": 6,
+      "nonfinite_unverified": 0,
+      "maximum_absolute_error": 0.0,
+      "absolute_error_overflow": false,
+      "l2_error": 0.0,
+      "l2_error_overflow": false,
+      "profile_observed": true,
+      "unobserved_profile_counted_as_PASS": false
+    },
+    "TempExt1": {
+      "numeric_observations": 6,
+      "class_observations": 6,
+      "nonfinite_unverified": 0,
+      "maximum_absolute_error": 0.0,
+      "absolute_error_overflow": false,
+      "l2_error": 0.0,
+      "l2_error_overflow": false,
+      "profile_observed": true,
+      "unobserved_profile_counted_as_PASS": false
+    },
+    "SumTime": {
+      "numeric_observations": 6,
+      "class_observations": 6,
+      "nonfinite_unverified": 0,
+      "maximum_absolute_error": 0.0,
+      "absolute_error_overflow": false,
+      "l2_error": 0.0,
+      "l2_error_overflow": false,
+      "profile_observed": true,
+      "unobserved_profile_counted_as_PASS": false
+    },
+    "SurfOpaqInsFaceCond": {
+      "numeric_observations": 12150,
+      "class_observations": 12150,
+      "nonfinite_unverified": 0,
+      "maximum_absolute_error": 0.0,
+      "absolute_error_overflow": false,
+      "l2_error": 0.0,
+      "l2_error_overflow": false,
+      "profile_observed": true,
+      "unobserved_profile_counted_as_PASS": false
+    },
+    "SurfOpaqInsFaceCondFlux": {
+      "numeric_observations": 12150,
+      "class_observations": 12150,
+      "nonfinite_unverified": 0,
+      "maximum_absolute_error": 0.0,
+      "absolute_error_overflow": false,
+      "l2_error": 0.0,
+      "l2_error_overflow": false,
+      "profile_observed": true,
+      "unobserved_profile_counted_as_PASS": false
+    },
+    "SurfOpaqOutFaceCond": {
+      "numeric_observations": 12150,
+      "class_observations": 12150,
+      "nonfinite_unverified": 0,
+      "maximum_absolute_error": 0.0,
+      "absolute_error_overflow": false,
+      "l2_error": 0.0,
+      "l2_error_overflow": false,
+      "profile_observed": true,
+      "unobserved_profile_counted_as_PASS": false
+    },
+    "SurfOpaqOutFaceCondFlux": {
+      "numeric_observations": 12150,
+      "class_observations": 12150,
+      "nonfinite_unverified": 0,
+      "maximum_absolute_error": 0.0,
+      "absolute_error_overflow": false,
+      "l2_error": 0.0,
+      "l2_error_overflow": false,
+      "profile_observed": true,
+      "unobserved_profile_counted_as_PASS": false
+    }
+  },
+  "complete_case_ledger": {
+    "path": ".runtime/porting/CTF-10/thermal-history-unit-comparison-01/case-ledger.ndjson",
+    "sha256": "93ae7146e49f2d39d05e2fdd7349022f40257a43dcb7f87f10bee18b92e6acf1",
+    "size_bytes": 1940416
+  },
+  "complete_mismatch_ledger": {
+    "path": ".runtime/porting/CTF-10/thermal-history-unit-comparison-01/mismatches.ndjson",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size_bytes": 0
+  },
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/CTF-10/thermal-history-unit-comparison-prep-01/project_inputs.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/thermal-history-unit-comparison-01/000-project_inputs.py",
+        "sha256": "2757b38a5d9b07b56380999befc0ebd4c01d0cb3a4e28b768954458d2a7d6364",
+        "size_bytes": 3094
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/thermal-history-unit-comparison-prep-01/compare_units.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/thermal-history-unit-comparison-01/001-compare_units.py",
+        "sha256": "1b915c830af575f5cb0792f9ddd627309397d3411a7005f93798f389c9c7dfcd",
+        "size_bytes": 29821
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/thermal-history-unit-comparison-prep-01/history_unit_common.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/thermal-history-unit-comparison-01/002-history_unit_common.py",
+        "sha256": "7808162aa42c0d06c3893acf325346c473455df993d2705ac1f7a3888f1dd74c",
+        "size_bytes": 15391
+      }
+    }
+  ],
+  "reviewed_reader_source_preparation": {
+    "path": ".runtime/porting/CTF-10/thermal-history-unit-comparison-prep-01/manifest.json",
+    "sha256": "92bff4190395851eb4b80b1672c436dae757d909e766404e49d89a030eff1be0",
+    "size_bytes": 16527
+  },
+  "selected_available_direct_unit_calls_PASS_claimed": true,
+  "complete_history_state_or_production_PASS_claimed": false,
+  "unobserved_general_master_branch_PASS_claimed": false,
+  "unavailable_or_unreached_counted_as_PASS": false,
+  "Native_equations_or_branch_outcomes_recomputed": false,
+  "Native_expected_endpoint_values_supplied_to_Rust": false,
+  "all_actual_events_and_projected_cases_consumed": true,
+  "sampling_or_event_caps_used": false,
+  "full_input_SHA_externally_verified": true,
+  "arithmetic_NaN_payload_equivalence_claimed": false,
+  "integration_PASS_claimed": false,
+  "full_card_PASS_claimed": false,
+  "gates_updated": false
+}
+{"receipt": {"path": ".runtime/porting/CTF-10/thermal-history-unit-comparison-command-01/receipt.json", "sha256": "cf6b3cf4be2376fe7b04bd2e885148ba3a9e914957d3ed81b33c5ad371931c43"}, "exit_code": 0, "source_bytes_match_before_and_after": true}

@@ -1,0 +1,143 @@
+//! Actual selected Rust owners only; no humidity or cache-tag evaluator.
+use ep_runtime::heat_balance::zone_air_initialization::ZoneAirInitializationState;
+use ep_runtime::heat_balance::zone_humidity_correction::{
+    ZoneHumidityCorrectionCall, ZoneHumidityCorrectionContext,
+    ZoneHumidityCorrectionUnavailable, ZoneHumidityNode, ZoneHumiditySourceTerms,
+};
+use ep_runtime::psychrometrics::{
+    ENERGYPLUS_PSY_CACHE_SIZE, EnergyPlusPsychrometricCacheSlot,
+    EnergyPlusPsychrometricOperation, EnergyPlusPsychrometricStateSnapshot,
+    EnergyPlusPsychrometricsState,
+};
+use serde_json::{Value, json};
+
+pub(super) fn scalar(value: f64) -> Value {
+    let class = if value.is_nan() {
+        "nan"
+    } else if value.is_infinite() {
+        if value.is_sign_negative() { "negative_infinity" } else { "positive_infinity" }
+    } else if value == 0.0 {
+        if value.is_sign_negative() { "negative_zero" } else { "positive_zero" }
+    } else { "finite" };
+    json!({"value": if value.is_finite() { Some(value) } else { None },
+        "value_bits": format!("{:016x}", value.to_bits()), "value_class": class})
+}
+fn state_fields(value: &ZoneAirInitializationState) -> Value {
+    let mut out = json!({});
+    macro_rules! real { ($($native:literal => $field:ident),* $(,)?) => {
+        $(out[$native] = scalar(value.$field);)*
+    }; }
+    real!("MAT" => mat, "ZT" => zt, "ZTAV" => ztav, "XMPT" => xmpt,
+        "TMX" => tmx, "TM2" => tm2, "airHumRat" => air_hum_rat,
+        "airHumRatAvg" => air_hum_rat_avg, "WTimeMinusP" => w_time_minus_p,
+        "W1" => w1, "WMX" => wmx, "WM2" => wm2, "airHumRatTemp" => air_hum_rat_temp,
+        "tempIndLoad" => temp_ind_load, "tempDepLoad" => temp_dep_load,
+        "airRelHum" => air_rel_hum, "AirPowerCap" => air_power_cap, "T1" => t1);
+    for (key, values) in [("XMAT", &value.xmat), ("DSXMAT", &value.dsxmat),
+        ("ZTM", &value.ztm), ("WPrevZoneTS", &value.w_prev_zone_ts),
+        ("DSWPrevZoneTS", &value.dsw_prev_zone_ts),
+        ("WPrevZoneTSTemp", &value.w_prev_zone_ts_temp)] {
+        out[key] = json!(values.iter().map(|v| scalar(*v)).collect::<Vec<_>>());
+    }
+    out
+}
+fn sources(value: &ZoneHumiditySourceTerms) -> Value {
+    json!({"OAMFL": scalar(value.oamfl), "VAMFL": scalar(value.vamfl),
+        "CTMFL": scalar(value.ctmfl), "EAMFL": scalar(value.eamfl),
+        "EAMFLxHumRat": scalar(value.eamfl_x_hum_rat), "SumHmARa": scalar(value.sum_hm_ara),
+        "SumHmARaW": scalar(value.sum_hm_ara_w), "MixingMassFlowZone": scalar(value.mixing_mass_flow_zone),
+        "MixingMassFlowXHumRat": scalar(value.mixing_mass_flow_x_hum_rat), "MDotOA": scalar(value.m_dot_oa),
+        "latentGain": scalar(value.latent_gain), "latentGainExceptPeople": scalar(value.latent_gain_except_people)})
+}
+pub(super) fn context(c: &ZoneHumidityCorrectionContext) -> Value {
+    json!({"zone_id": c.zone_id, "space_id": c.space_id, "zone_name": c.zone_name,
+        "Volume": scalar(c.volume), "ZoneVolCapMultpMoist": scalar(c.moisture_capacitance_multiplier),
+        "Multiplier": c.multiplier, "ListMultiplier": c.list_multiplier,
+        "IsControlled": c.is_controlled, "IsReturnPlenum": c.is_return_plenum,
+        "IsSupplyPlenum": c.is_supply_plenum, "SystemZoneNodeNumber": c.system_zone_node_number,
+        "leakageParallelPIU_count": c.leakage_parallel_piu_count,
+        "ZoneAirSolutionAlgo": c.solution_algorithm, "RoomAirModel": c.room_air_model,
+        "doSpaceHeatBalance": c.do_space_heat_balance, "DoLatentSizing": c.do_latent_sizing,
+        "AFN_control_type": c.afn_control_type, "AFN_multizone_always_simulated": c.afn_multizone_always_simulated,
+        "AFN_FanActivated": c.afn_fan_activated, "AFN_distribution_simulated": c.afn_distribution_simulated,
+        "DuctLossSimu": c.duct_loss_simulated, "FlagHybridModel": c.hybrid_model,
+        "OutBaroPress": scalar(c.outdoor_pressure), "OutHumRat": scalar(c.outdoor_humidity_ratio),
+        "TimeStepSysSec": scalar(c.time_step_sys_seconds), "TimeStepSys": scalar(c.time_step_sys),
+        "TimeStepZone": scalar(c.time_step_zone), "inlet_node_ids": c.inlet_node_ids})
+}
+fn psych_state(s: EnergyPlusPsychrometricStateSnapshot) -> Value {
+    json!({"iconvTol": scalar(s.iconv_tol), "last_Patm": scalar(s.last_patm),
+        "last_tBoil": scalar(s.last_t_boil), "Press_Save": scalar(s.press_save),
+        "tSat_Save": scalar(s.t_sat_save), "warmup": s.warmup,
+        "useInterpolationPsychTsatFnPb": s.use_interpolation})
+}
+fn slot(value: EnergyPlusPsychrometricCacheSlot) -> Value {
+    match value {
+        EnergyPlusPsychrometricCacheSlot::Psat { index, i_tdb, value } =>
+            json!({"index": index, "iTdb": i_tdb, "Psat": scalar(value)}),
+        EnergyPlusPsychrometricCacheSlot::Twb { index, i_tdb, i_w, i_pb, value } =>
+            json!({"kind": "Twb", "index": index, "iTdb": i_tdb, "iW": i_w, "iPb": i_pb, "value": scalar(value)}),
+        EnergyPlusPsychrometricCacheSlot::TsatPb { index, i_h, i_pb, value } =>
+            json!({"kind": "TsatPb", "index": index, "iH": i_h, "iPb": i_pb, "value": scalar(value)}),
+        EnergyPlusPsychrometricCacheSlot::TsatHPb { index, i_h, i_pb, value } =>
+            json!({"kind": "TsatHPb", "index": index, "iH": i_h, "iPb": i_pb, "value": scalar(value)}),
+    }
+}
+fn psych(value: &EnergyPlusPsychrometricsState) -> Value {
+    let mut out = psych_state(value.snapshot());
+    let caches = value.final_caches();
+    // Copy actual named Psat slots. No hash/tag calculation or HIT inference.
+    out["nondefault_Psat_rows"] = json!(caches.psat.iter().copied().filter(|row| {
+        matches!(row, EnergyPlusPsychrometricCacheSlot::Psat { i_tdb, value, .. }
+            if *i_tdb != -1000 || value.to_bits() != 0)
+    }).map(slot).collect::<Vec<_>>());
+    out["Psat_cache_capacity"] = json!(ENERGYPLUS_PSY_CACHE_SIZE);
+    out["other_actual_nondefault_cache_rows"] = json!({
+        "Twb": caches.twb.iter().copied().map(slot).collect::<Vec<_>>(),
+        "TsatPb": caches.tsat_pb.iter().copied().map(slot).collect::<Vec<_>>(),
+        "TsatHPb": caches.tsat_h_pb.iter().copied().map(slot).collect::<Vec<_>>()});
+    out["cache_hits_or_Native_internal_locals_observed"] = json!(false);
+    out["Native_global_diagnostic_indices_or_backend_inferred"] = json!(false);
+    out
+}
+pub(super) fn snapshot(
+    phase: &str, state: &ZoneAirInitializationState, source: &ZoneHumiditySourceTerms,
+    c: &ZoneHumidityCorrectionContext, nodes: &[ZoneHumidityNode], p: &EnergyPlusPsychrometricsState,
+) -> Value {
+    json!({"phase": phase, "actual_context": context(c), "zone_fields": state_fields(state),
+        "moisture_source_terms": sources(source), "SumLatentHTRadSys": scalar(source.sum_latent_ht_rad_sys),
+        "SumLatentPool": scalar(source.sum_latent_pool),
+        "nodes": nodes.iter().map(|n| json!({"node_id": n.node_id, "name": n.name,
+            "MassFlowRate": scalar(n.mass_flow_rate), "Temp": scalar(n.temperature),
+            "HumRat": scalar(n.humidity_ratio), "Enthalpy": scalar(n.enthalpy)})).collect::<Vec<_>>(),
+        "actual_node_row_count": nodes.len(), "psychrometrics": psych(p)})
+}
+fn property_call(value: &EnergyPlusPsychrometricOperation) -> Value {
+    json!({"actual_Rust_property_result": scalar(value.result),
+        "state_before": psych_state(value.state_before), "state_after": psych_state(value.state_after),
+        "cache_before": value.cache_before.map(slot), "cache_after": value.cache_after.map(slot),
+        "paired_as_Native_internal_Wsat_or_guard": false})
+}
+pub(super) fn returned(value: &Result<ZoneHumidityCorrectionCall, ZoneHumidityCorrectionUnavailable>) -> Value {
+    match value {
+        Ok(call) => json!({"status": "source-returned", "owner_available": true,
+            "unavailable": null, "zone_id": call.zone_id, "system_node_written": call.system_node_written,
+            "actual_Rust_saturation_property_call": property_call(&call.saturation_call), "counted_as_PASS": false}),
+        Err(error) => json!({"status": "typed-unavailable-returned", "owner_available": false,
+            "unavailable": format!("{error:?}"), "zone_id": null, "system_node_written": null,
+            "actual_Rust_saturation_property_call": null, "counted_as_PASS": false}),
+    }
+}
+pub(super) const OBSERVER_PATHS: &[&str] = &[
+    "crates/ep_run/examples/zon05_candidate_unit_observer.rs",
+    "crates/ep_run/examples/zon05_candidate_unit_support/fields.rs",
+];
+pub(super) const API_PATHS: &[&str] = &[
+    "crates/ep_run/Cargo.toml", "crates/ep_runtime/Cargo.toml", "crates/ep_runtime/src/lib.rs",
+    "crates/ep_runtime/src/heat_balance/mod.rs", "crates/ep_runtime/src/heat_balance/zone_air_initialization.rs",
+    "crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs", "crates/ep_runtime/src/heat_balance/state.rs",
+    "crates/ep_runtime/src/psychrometrics.rs", "crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+    "crates/ep_runtime/src/psychrometrics/psy02_trace.rs", "crates/ep_runtime/src/psychrometrics/production_trace.rs",
+    "crates/ep_runtime/src/psychrometrics_spline_tables.rs", "crates/ep_runtime/src/psychrometrics/cp_cache.rs",
+    "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+];

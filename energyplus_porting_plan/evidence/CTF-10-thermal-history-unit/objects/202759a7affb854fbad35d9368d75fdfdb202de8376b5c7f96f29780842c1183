@@ -1,0 +1,597 @@
+{
+  "schema": "ctf10-selected-thermal-history-Rust-observer-source-preparation.v1",
+  "status": "SOURCE-READY HELD - unexecuted direct-unit proposal",
+  "held_immutable": true,
+  "own_observer_sources": [
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/thermal-history-rust-observer-prep-01/new/ctf10_thermal_history_unit_observer.rs",
+        "sha256": "72aff87e89b4a88dddf36a8ca1ecb535ad438d3cf5dc7a0d2282c5aaf6d6451a",
+        "size_bytes": 14169,
+        "line_count": 207
+      },
+      "target": "crates/ep_run/examples/ctf10_thermal_history_unit_observer.rs",
+      "before": null,
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/thermal-history-rust-observer-prep-01/diffs/ctf10_thermal_history_unit_observer.rs.diff",
+        "sha256": "095bffe28d81c2d04e719196a337fb77e59f74e4d2cd68bd159307fee59a5e56",
+        "size_bytes": 14474,
+        "line_count": 210
+      }
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/CTF-10/thermal-history-rust-observer-prep-01/new/ctf10_thermal_history_unit_support/fields.rs",
+        "sha256": "5713fb9f15457de4885d34863ac64952743c6057c53fa635431cf3db973cfa2d",
+        "size_bytes": 21533,
+        "line_count": 333
+      },
+      "target": "crates/ep_run/examples/ctf10_thermal_history_unit_support/fields.rs",
+      "before": null,
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/thermal-history-rust-observer-prep-01/diffs/fields.rs.diff",
+        "sha256": "17b07355c95bf39ed178bc713817c999c10a5df634630647fea927679253d498",
+        "size_bytes": 21970,
+        "line_count": 336
+      }
+    }
+  ],
+  "minimal_parent_proposal": {
+    "target": "crates/ep_runtime/src/heat_balance/mod.rs",
+    "actual_current_before": {
+      "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+      "size_bytes": 1819,
+      "line_count": 72
+    },
+    "before_archive": {
+      "path": ".runtime/porting/CTF-10/thermal-history-rust-observer-prep-01/before/heat_balance_mod.rs",
+      "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+      "size_bytes": 1819,
+      "line_count": 72
+    },
+    "proposed": {
+      "path": ".runtime/porting/CTF-10/thermal-history-rust-observer-prep-01/proposed/heat_balance_mod.rs",
+      "sha256": "18bd9d5b469316f5acc076582d482f79fd1ade886d7f0ce3a2a0dc7814b825b5",
+      "size_bytes": 1848,
+      "line_count": 73
+    },
+    "exact_diff": {
+      "path": ".runtime/porting/CTF-10/thermal-history-rust-observer-prep-01/diffs/heat_balance_mod.rs.diff",
+      "sha256": "3f5844747e5c083f93d27d98f5ccb3d88e449c52916ea840a852d6cb78d54c58",
+      "size_bytes": 336,
+      "line_count": 10
+    },
+    "sole_addition": "pub mod ctf_thermal_history;",
+    "actual_current72_preserved_including_ZON05": true,
+    "old_held71_parent_must_not_replace_current72": true
+  },
+  "template_before_and_exact_adaptation_diffs": [
+    {
+      "authority": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-01/new/zon05_candidate_unit_observer.rs",
+        "sha256": "cd9d0b8a123f04cdba97345eedbf813796528ec35e2a2e508f00685bd0ef4db5",
+        "size_bytes": 20510,
+        "line_count": 273
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-10/thermal-history-rust-observer-prep-01/before-zon05/zon05_candidate_unit_observer.rs",
+        "sha256": "cd9d0b8a123f04cdba97345eedbf813796528ec35e2a2e508f00685bd0ef4db5",
+        "size_bytes": 20510,
+        "line_count": 273
+      },
+      "adaptation_diff": {
+        "path": ".runtime/porting/CTF-10/thermal-history-rust-observer-prep-01/template-diffs/0.diff",
+        "sha256": "a6908a866af0f98b303211b9a63cf25006135f0ca0ce960c77f3b0a4a23ee926",
+        "size_bytes": 34449,
+        "line_count": 453
+      }
+    },
+    {
+      "authority": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-01/new/zon05_candidate_unit_support/fields.rs",
+        "sha256": "d5fc420ed302cb3bd940e18fe8487478d84e7d648d13158acfe89e840ab4723a",
+        "size_bytes": 9174,
+        "line_count": 143
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-10/thermal-history-rust-observer-prep-01/before-zon05/fields.rs",
+        "sha256": "d5fc420ed302cb3bd940e18fe8487478d84e7d648d13158acfe89e840ab4723a",
+        "size_bytes": 9174,
+        "line_count": 143
+      },
+      "adaptation_diff": {
+        "path": ".runtime/porting/CTF-10/thermal-history-rust-observer-prep-01/template-diffs/1.diff",
+        "sha256": "72b2bf5f6ed7c769c410ba6b50231414ee648cbe243914e5b91ae495e85b840d",
+        "size_bytes": 31279,
+        "line_count": 471
+      }
+    }
+  ],
+  "readme": {
+    "path": ".runtime/porting/CTF-10/thermal-history-rust-observer-prep-01/README.md",
+    "sha256": "b0cae61ff519de6f470aff41a8535b67d1727e18cd3af42015b8124dd26eace7",
+    "size_bytes": 5798,
+    "line_count": 87
+  },
+  "source_authorities": [
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-prep-01/manifest.json",
+      "sha256": "343fb38575bdf76f6fc6d671fae06a03422384b9b920dde65c2553acddcf5c83",
+      "size_bytes": 26081,
+      "line_count": 637
+    },
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-prep-01/new/ctf_thermal_history.rs",
+      "sha256": "e14aaf27dda04b2105dfb2a00b056d7bc7d934105593bf1692817bc31ca641f6",
+      "size_bytes": 26022,
+      "line_count": 483
+    },
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-prep-01/new/ctf_thermal_history_tests.rs",
+      "sha256": "68446ae96d3783dd4fba7d87fc40fe98bd3ebe2a497bce62171313d48de92c1b",
+      "size_bytes": 13023,
+      "line_count": 269
+    },
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-observation-readiness-prep-01/manifest.json",
+      "sha256": "01124804d787c3454d80e3f8c506fc81b0465c132d21f99bfbd010047fdf19a4",
+      "size_bytes": 19188,
+      "line_count": 466
+    },
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-observation-readiness-prep-01/README.md",
+      "sha256": "a740ccea321007111e396c9955dbb70df86516c385e7f109cc61acf66eebde15",
+      "size_bytes": 6010,
+      "line_count": 93
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/manifest.json",
+      "sha256": "8eac3eb0ec2a28c91db06e5c9d02ab0611090b68095183569df58b8198a8a94c",
+      "size_bytes": 31280,
+      "line_count": 754
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_observer.cc",
+      "sha256": "7a966b5b17b63eb6541ffc3d318851c940134ee67bec76e14f1180ad391b883a",
+      "size_bytes": 22282,
+      "line_count": 384
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/surface_consumer_observer.hh",
+      "sha256": "1d9befcc41cba45b74d36d27f75836249d9ce20f44173c84a195b446d8f2e7dd",
+      "size_bytes": 2403,
+      "line_count": 66
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/source-context.json",
+      "sha256": "3686810d9ad18411322bbbe0f7ed23e19b67a1c93f3551b33b4b3de1496dbd8d",
+      "size_bytes": 12921,
+      "line_count": 319
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-05/additions.json",
+      "sha256": "c7ffcc545815a1ee2c613d8976f19e3265494e5ba0c060b9493c58520cfaf350",
+      "size_bytes": 26113,
+      "line_count": 326
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/manifest.json",
+      "sha256": "a27641042054dea917f17cbbf2f710e765496cfd7f3445f81bfcd35498b2a1a0",
+      "size_bytes": 48595,
+      "line_count": 1193
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/event_shape.py",
+      "sha256": "15f49e7646649b8701d889962cb6756b5260fb2262551c2b299a446d8bdc9b17",
+      "size_bytes": 28204,
+      "line_count": 406
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/review_data.py",
+      "sha256": "522fa42b31dcfe4b490b3779785bf1fef2cb953ca50aab21501ebf0838abb3f4",
+      "size_bytes": 24559,
+      "line_count": 320
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-02/manifest.json",
+      "sha256": "179b5d010719c9a34a9e5868a11a7c7f888d1636be7aa896ad5e798b7aa19d14",
+      "size_bytes": 4159,
+      "line_count": 100
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/thermal-history-unit-policy.json",
+      "sha256": "e26264adfab95edc104b29f8ac0d9259192b6a5e4e32963505f1dd93eb6cfd9d",
+      "size_bytes": 3961,
+      "line_count": 55
+    },
+    {
+      "path": ".runtime/porting/ZON-05/rust-observer-prep-02/manifest.json",
+      "sha256": "fdfac830c0b40ba4e6cb49bb6049a7e5d3f8d554b9d9439b8bd1ee968fad3bdf",
+      "size_bytes": 17073,
+      "line_count": 443
+    },
+    {
+      "path": ".runtime/porting/ZON-05/rust-observer-prep-01/new/zon05_candidate_unit_observer.rs",
+      "sha256": "cd9d0b8a123f04cdba97345eedbf813796528ec35e2a2e508f00685bd0ef4db5",
+      "size_bytes": 20510,
+      "line_count": 273
+    },
+    {
+      "path": ".runtime/porting/ZON-05/rust-observer-prep-01/new/zon05_candidate_unit_support/fields.rs",
+      "sha256": "d5fc420ed302cb3bd940e18fe8487478d84e7d648d13158acfe89e840ab4723a",
+      "size_bytes": 9174,
+      "line_count": 143
+    },
+    {
+      "path": "crates/ep_run/Cargo.toml",
+      "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+      "size_bytes": 524,
+      "line_count": 21
+    },
+    {
+      "path": "crates/ep_runtime/Cargo.toml",
+      "sha256": "bb81b5793debafd84300ec9905f0cda65ab32d216633543bab375b30a7a379e9",
+      "size_bytes": 327,
+      "line_count": 17
+    },
+    {
+      "path": "crates/ep_runtime/src/lib.rs",
+      "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+      "size_bytes": 868,
+      "line_count": 41
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+      "size_bytes": 1819,
+      "line_count": 72
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "sha256": "15165c7b9b347d3841136b088d3085d0d0aa9b8d428625f61f923b715a970371",
+      "size_bytes": 6171,
+      "line_count": 178
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs",
+      "sha256": "3327c29942113e0b5cd2fcf502d70933b080efa6b4e76ebca83dd36a534fe5a9",
+      "size_bytes": 9057,
+      "line_count": 198
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+      "sha256": "8e02f58b2da67416342b15f281cd270f80c1bafcd7600931899aef2f920f2bfc",
+      "size_bytes": 4902,
+      "line_count": 122
+    },
+    {
+      "path": "crates/ep_model/Cargo.toml",
+      "sha256": "80483c7b8bd8e1f878c5576d2d4973826123a744c269d4a1d19ec3c02c811da0",
+      "size_bytes": 188,
+      "line_count": 11
+    },
+    {
+      "path": "crates/ep_model/src/lib.rs",
+      "sha256": "2a756532553034fb2b92c892cb2e6f3c147aa129f6dce64b63763f364cb3cee4",
+      "size_bytes": 284,
+      "line_count": 15
+    },
+    {
+      "path": "crates/ep_model/src/ids.rs",
+      "sha256": "83b32ebf02684f459cb0a789f498de08b849b94a7072f1f5870663a4b3cca7be",
+      "size_bytes": 2029,
+      "line_count": 61
+    },
+    {
+      "path": "crates/ep_model/src/objects/mod.rs",
+      "sha256": "cb752e4c143386ce432adc84dc8d36d8358bd0ea1b0fc2b01f240795c7ec96c1",
+      "size_bytes": 2068,
+      "line_count": 61
+    },
+    {
+      "path": "crates/ep_model/src/objects/surfaces.rs",
+      "sha256": "54569b984efd25320447a8eecb94f351037ab6b63a5cfb31d0af1ecc225a1755",
+      "size_bytes": 6656,
+      "line_count": 197
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+      "size_bytes": 3172,
+      "line_count": 75
+    }
+  ],
+  "actual_API_source_contexts": [
+    {
+      "target": "crates/ep_run/Cargo.toml",
+      "actual_current_context": {
+        "path": "crates/ep_run/Cargo.toml",
+        "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+        "size_bytes": 524,
+        "line_count": 21
+      }
+    },
+    {
+      "target": "crates/ep_runtime/Cargo.toml",
+      "actual_current_context": {
+        "path": "crates/ep_runtime/Cargo.toml",
+        "sha256": "bb81b5793debafd84300ec9905f0cda65ab32d216633543bab375b30a7a379e9",
+        "size_bytes": 327,
+        "line_count": 17
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/lib.rs",
+      "actual_current_context": {
+        "path": "crates/ep_runtime/src/lib.rs",
+        "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+        "size_bytes": 868,
+        "line_count": 41
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "actual_current_context": {
+        "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+        "size_bytes": 1819,
+        "line_count": 72
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/ctf_thermal_history.rs",
+      "held_unapplied_dependency": {
+        "path": ".runtime/porting/CTF-10/thermal-history-prep-01/new/ctf_thermal_history.rs",
+        "sha256": "e14aaf27dda04b2105dfb2a00b056d7bc7d934105593bf1692817bc31ca641f6",
+        "size_bytes": 26022,
+        "line_count": 483
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "actual_current_context": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+        "sha256": "15165c7b9b347d3841136b088d3085d0d0aa9b8d428625f61f923b715a970371",
+        "size_bytes": 6171,
+        "line_count": 178
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs",
+      "actual_current_context": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs",
+        "sha256": "3327c29942113e0b5cd2fcf502d70933b080efa6b4e76ebca83dd36a534fe5a9",
+        "size_bytes": 9057,
+        "line_count": 198
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+      "actual_current_context": {
+        "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+        "sha256": "8e02f58b2da67416342b15f281cd270f80c1bafcd7600931899aef2f920f2bfc",
+        "size_bytes": 4902,
+        "line_count": 122
+      }
+    },
+    {
+      "target": "crates/ep_model/Cargo.toml",
+      "actual_current_context": {
+        "path": "crates/ep_model/Cargo.toml",
+        "sha256": "80483c7b8bd8e1f878c5576d2d4973826123a744c269d4a1d19ec3c02c811da0",
+        "size_bytes": 188,
+        "line_count": 11
+      }
+    },
+    {
+      "target": "crates/ep_model/src/lib.rs",
+      "actual_current_context": {
+        "path": "crates/ep_model/src/lib.rs",
+        "sha256": "2a756532553034fb2b92c892cb2e6f3c147aa129f6dce64b63763f364cb3cee4",
+        "size_bytes": 284,
+        "line_count": 15
+      }
+    },
+    {
+      "target": "crates/ep_model/src/ids.rs",
+      "actual_current_context": {
+        "path": "crates/ep_model/src/ids.rs",
+        "sha256": "83b32ebf02684f459cb0a789f498de08b849b94a7072f1f5870663a4b3cca7be",
+        "size_bytes": 2029,
+        "line_count": 61
+      }
+    },
+    {
+      "target": "crates/ep_model/src/objects/mod.rs",
+      "actual_current_context": {
+        "path": "crates/ep_model/src/objects/mod.rs",
+        "sha256": "cb752e4c143386ce432adc84dc8d36d8358bd0ea1b0fc2b01f240795c7ec96c1",
+        "size_bytes": 2068,
+        "line_count": 61
+      }
+    },
+    {
+      "target": "crates/ep_model/src/objects/surfaces.rs",
+      "actual_current_context": {
+        "path": "crates/ep_model/src/objects/surfaces.rs",
+        "sha256": "54569b984efd25320447a8eecb94f351037ab6b63a5cfb31d0af1ecc225a1755",
+        "size_bytes": 6656,
+        "line_count": 197
+      }
+    },
+    {
+      "target": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "actual_current_context": {
+        "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+        "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+        "size_bytes": 3172,
+        "line_count": 75
+      }
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+        "sha256": "0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c",
+        "size_bytes": 698972,
+        "line_count": 10119
+      },
+      "first_line": 1455,
+      "last_line": 1479,
+      "range_sha256": "b23b0eed479627606689afe115f54390a3e55e29e8c85c8752dcd79d84d3ef8a",
+      "range_size_bytes": 1919,
+      "purpose": "full19 and optional master/counter allocation"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+        "sha256": "0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c",
+        "size_bytes": 698972,
+        "line_count": 10119
+      },
+      "first_line": 2258,
+      "last_line": 2327,
+      "range_sha256": "8b1f7f075efda5a21b3f10b8018f3481115d281e0da00b460086e09d29f19723",
+      "range_size_bytes": 5129,
+      "purpose": "excluded Init prefix and exact selected pre-boundary"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+        "sha256": "0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c",
+        "size_bytes": 698972,
+        "line_count": 10119
+      },
+      "first_line": 2323,
+      "last_line": 2358,
+      "range_sha256": "023a024d676ace42d1a938824ed20486b93ce6dd17c42b1d8065285289cdc596",
+      "range_size_bytes": 2433,
+      "purpose": "selected normal/master reset traversal"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+        "sha256": "0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c",
+        "size_bytes": 698972,
+        "line_count": 10119
+      },
+      "first_line": 2381,
+      "last_line": 2436,
+      "range_sha256": "1f3aed1625a8954e5dce56e36b2d60c6688674b1e820736e46a7bbadd4dee4e2",
+      "range_size_bytes": 4241,
+      "purpose": "selected flux/master suffix and endpoint"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+        "sha256": "0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c",
+        "size_bytes": 698972,
+        "line_count": 10119
+      },
+      "first_line": 5245,
+      "last_line": 5355,
+      "range_sha256": "08264a55d35d117083fe78d8404ee824239f0fb9b384b86a04eee99b6a42a5c8",
+      "range_size_bytes": 8920,
+      "purpose": "actual scratch flag/report/simple selected suffix"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+        "sha256": "0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c",
+        "size_bytes": 698972,
+        "line_count": 10119
+      },
+      "first_line": 5358,
+      "last_line": 5497,
+      "range_sha256": "bbf7a50426096bd94d6c2d4767e446de3d041f233870a4b3ab6ae19e51fe5ae3",
+      "range_size_bytes": 11363,
+      "purpose": "actual block/counter/completion/interpolation suffix"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+        "sha256": "7eea2e660914574ce9b5b633ac2099d49b09255d6c215b84e47edccbbb5cffae",
+        "size_bytes": 113537,
+        "line_count": 1850
+      },
+      "first_line": 149,
+      "last_line": 170,
+      "range_sha256": "2e08c7ffb2c3fe2df5c5ec7749bcae18ee2b6afcf4b09e66d482fe3ef898be4c",
+      "range_size_bytes": 685,
+      "purpose": "Native SurfaceClass integer mapping"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+        "sha256": "7eea2e660914574ce9b5b633ac2099d49b09255d6c215b84e47edccbbb5cffae",
+        "size_bytes": 113537,
+        "line_count": 1850
+      },
+      "first_line": 287,
+      "last_line": 297,
+      "range_sha256": "4be39dfb01fcd677306b5ab628a533ba29812a971e81cf0dc2226ee6d82468bf",
+      "range_size_bytes": 483,
+      "purpose": "actual boundary selectors"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+        "sha256": "7eea2e660914574ce9b5b633ac2099d49b09255d6c215b84e47edccbbb5cffae",
+        "size_bytes": 113537,
+        "line_count": 1850
+      },
+      "first_line": 320,
+      "last_line": 340,
+      "range_sha256": "7adeb34c4c2ecfd3c95d87f4099b7d7d039d34641a5c68a7599fc0eb4beeb3a3",
+      "range_size_bytes": 856,
+      "purpose": "actual CTF/EMPD algorithm selectors"
+    }
+  ],
+  "runtime_interfaces": {
+    "candidate_argv5": [
+      "cases.ndjson",
+      "cases_sha",
+      "projection.json",
+      "projection_sha",
+      "runtime_sources.json"
+    ],
+    "projection_schema": "ctf10-thermal-history-direct-unit-projection.v1",
+    "input_case_schema": "ctf10-thermal-history-direct-unit-input.v1",
+    "input_case_exact_keys": [
+      "schema",
+      "case_ordinal",
+      "operation",
+      "input_event"
+    ],
+    "input_line_SHA": "exact UTF-8 bytes excluding one terminal LF; compact JSON no CR",
+    "candidate_header_schema": "ctf10-thermal-history-unit-observer-results.v1",
+    "candidate_case_schema": "ctf10-thermal-history-direct-unit-result.v1",
+    "candidate_summary_schema": "ctf10-thermal-history-unit-observer-summary.v1",
+    "state_schema": "ctf10-selected-thermal-history-state.v1",
+    "status_strings": [
+      "source-returned",
+      "typed-unavailable-returned",
+      "input-unrepresentable"
+    ],
+    "runtime_inventory_schema": "ctf10-thermal-history-unit-runtime-source-bindings.v1",
+    "own_source_count": 2,
+    "API_source_count": 14,
+    "actual_full_input_SHA_candidate_verification": false,
+    "actual_full_input_SHA_recorded_launcher_and_comparer_required": true,
+    "all_actual_visits_no_filter_cap_or_sampler": true,
+    "future_projection_SourceSnapshot_receipts_policy_identity_and_counts": null
+  },
+  "source_only_checks": {
+    "current_parent_before_archive_equal": true,
+    "parent_single_addition_inverse_exact": true,
+    "new_observer_destinations_absent": true,
+    "all_exact_diffs_regenerated": true,
+    "Rust_source_compilation_or_formatter_performed": false,
+    "project_import_target_execution": false,
+    "scientific_results_weather_binary_payloads_read": false,
+    "canonical_or_Git_actions": false
+  },
+  "authorship_limits": "Header authored held history math and this owner adapter; independent other-author Source review required, no mathematical/numerical/ordinary-integration certificate."
+}

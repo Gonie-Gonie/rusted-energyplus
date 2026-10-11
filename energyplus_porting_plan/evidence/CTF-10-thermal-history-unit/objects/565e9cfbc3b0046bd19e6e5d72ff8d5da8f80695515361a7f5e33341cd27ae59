@@ -1,0 +1,49 @@
+{
+  "schema": "ctf10-thermal-history-lossless-direct-unit-observations.v1",
+  "actual_comparison": {
+    "path": ".runtime/porting/CTF-10/thermal-history-unit-comparison-01/comparison.json",
+    "sha256": "66a16d66f1c8c2abc05e497e3343c1ec94cd7ca0ac3775523da918f815f92880",
+    "size_bytes": 28524
+  },
+  "files": [
+    {
+      "role": "complete_projected_inputs",
+      "original": {
+        "path": ".runtime/porting/CTF-10/thermal-history-projection-01/input-cases.ndjson",
+        "sha256": "6a2d721b229c26f7dc50dd17f4ba140f6d2ce9dba4ca72ba744291704f3dc5f0",
+        "size_bytes": 250546511
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-thermal-history-unit/observations/6a2d721b229c26f7dc50dd17f4ba140f6d2ce9dba4ca72ba744291704f3dc5f0.ndjson.gz",
+        "sha256": "b9ef319eefc5ca5d8913f9095938da2e9822375c90bb1b63964c682d5dc716c1",
+        "size_bytes": 9237854
+      },
+      "compression": "gzip",
+      "full_decompressed_sha256": "6a2d721b229c26f7dc50dd17f4ba140f6d2ce9dba4ca72ba744291704f3dc5f0",
+      "full_decompressed_size_bytes": 250546511,
+      "all_original_bytes_retained": true,
+      "original_file_retained": true
+    },
+    {
+      "role": "complete_actual_Rust_results",
+      "original": {
+        "path": ".runtime/porting/CTF-10/thermal-history-candidate-unit-command-01/stdout.log",
+        "sha256": "59d0b537af2717e3feab72048c5fe324d27ca0dad7e1c309575811e839ddbff1",
+        "size_bytes": 378376951
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-thermal-history-unit/observations/59d0b537af2717e3feab72048c5fe324d27ca0dad7e1c309575811e839ddbff1.ndjson.gz",
+        "sha256": "4f3158f374357523cc31a860e8d22eab2e74c5da1e1ada4d057e9cab2b97ad74",
+        "size_bytes": 14466345
+      },
+      "compression": "gzip",
+      "full_decompressed_sha256": "59d0b537af2717e3feab72048c5fe324d27ca0dad7e1c309575811e839ddbff1",
+      "full_decompressed_size_bytes": 378376951,
+      "all_original_bytes_retained": true,
+      "original_file_retained": true
+    }
+  ],
+  "numerical_values_modified_or_recomputed": false,
+  "numerical_PASS_produced_by_storage_operation": false,
+  "gates_updated": false
+}

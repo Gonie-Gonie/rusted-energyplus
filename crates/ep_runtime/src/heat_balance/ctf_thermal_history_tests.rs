@@ -1,0 +1,363 @@
+use super::*;
+
+type TestResult = Result<(), CtfThermalHistoryUnavailable>;
+
+fn arrays(count: usize, seed: f64) -> CtfThermalHistoryArrays {
+    let terms = [
+        0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0,
+        17.0, 18.0,
+    ];
+    CtfThermalHistoryArrays {
+        inside_temperature: std::array::from_fn(|term| vec![seed + terms[term]; count]),
+        outside_temperature: std::array::from_fn(|term| vec![seed + 100.0 + terms[term]; count]),
+        inside_flux: std::array::from_fn(|term| vec![seed + 200.0 + terms[term]; count]),
+        outside_flux: std::array::from_fn(|term| vec![seed + 300.0 + terms[term]; count]),
+    }
+}
+
+fn state() -> CtfThermalHistoryState {
+    CtfThermalHistoryState {
+        surface_ids: vec![SurfaceId(77), SurfaceId(9)],
+        normal: arrays(2, 1000.0),
+        masters: Some(CtfThermalHistoryMasters {
+            arrays: arrays(2, 2000.0),
+            current_num_histories: vec![0, 8],
+        }),
+        scratch: None,
+        update_first_time: true,
+        flux_reports: CtfThermalHistoryFluxReports {
+            inside_conduction: vec![81.0; 2],
+            inside_flux: vec![82.0; 2],
+            outside_flux: vec![83.0; 2],
+            outside_conduction: vec![84.0; 2],
+        },
+    }
+}
+
+fn coefficients(terms: i32, histories: i32, dt: f64) -> CtfPublicCoefficientStorage {
+    let mut value = CtfPublicCoefficientStorage::reset();
+    value.num_ctf_terms = terms;
+    value.num_histories = histories;
+    value.ctf_time_step = dt;
+    value.u_value = 2.0;
+    value
+}
+
+fn surface(coefficients: &CtfPublicCoefficientStorage) -> CtfThermalHistorySurface<'_> {
+    CtfThermalHistorySurface {
+        surface_id: SurfaceId(77),
+        construction_id: ConstructionId(22),
+        public_owner_construction_id: ConstructionId(22),
+        coefficients,
+        algorithm: CtfThermalHistoryAlgorithm::Ctf,
+        ordinary_opaque: true,
+        source_sink_present: false,
+        outside_boundary: OutsideBoundaryCondition::Outdoors,
+        outside_dry_bulb: 5.0,
+        area: 2.0,
+        inside_surface_temperature: 7.0,
+        inside_constant: 2.0,
+        outside_constant: 3.0,
+    }
+}
+
+fn context<'a>(groups: &'a [Vec<SurfaceId>], all: &'a [SurfaceId]) -> CtfThermalHistoryContext<'a> {
+    CtfThermalHistoryContext {
+        simple_ctf_only: false,
+        any_ems_in_model: false,
+        any_construction_overrides: false,
+        any_internal_heat_source: false,
+        global_max_ctf_terms: 2,
+        time_step_zone_hours: 0.25,
+        heat_transfer_groups: groups,
+        opaque_groups: groups,
+        all_heat_transfer_surfaces: all,
+    }
+}
+
+#[test]
+fn initialization_preserves_old_second_outside_flux_at_first_term() -> TestResult {
+    let groups = [vec![SurfaceId(77)]];
+    let all = [SurfaceId(77)];
+    let coefficients = coefficients(2, 2, 0.5);
+    let mut actual = state();
+    let untouched = actual.normal.clone();
+    initialize_selected_ctf_thermal_histories(
+        &mut actual,
+        &[surface(&coefficients)],
+        context(&groups, &all),
+    )?;
+    assert_eq!(actual.normal.inside_flux[0][0].to_bits(), 0.0_f64.to_bits());
+    assert_eq!(actual.normal.outside_flux[0][0], -36.0);
+    assert_eq!(actual.normal.inside_flux[1][0], -36.0);
+    assert_eq!(actual.normal.inside_flux[2][0], -36.0);
+    assert_eq!(actual.normal.outside_temperature[3][0], 23.0);
+    assert_eq!(actual.normal.inside_temperature[18][0], 23.0);
+    assert_eq!(
+        actual.normal.outside_flux[18][0].to_bits(),
+        0.0_f64.to_bits()
+    );
+    for term in 0..CTF_COEFFICIENT_SLOTS {
+        assert_eq!(
+            actual.normal.inside_temperature[term][1],
+            untouched.inside_temperature[term][1]
+        );
+    }
+    let masters = actual
+        .masters
+        .as_ref()
+        .ok_or(CtfThermalHistoryUnavailable::MastersUnallocated)?;
+    assert_eq!(masters.current_num_histories, [0, 8]);
+    assert_eq!(masters.arrays.outside_temperature[18][0], 5.0);
+    assert_eq!(
+        masters.arrays.outside_flux[0][0].to_bits(),
+        0.0_f64.to_bits()
+    );
+    assert_eq!(masters.arrays.inside_flux[2][0], -36.0);
+    assert!(actual.scratch.is_none());
+    assert!(actual.update_first_time);
+    Ok(())
+}
+
+#[test]
+fn ems_requires_actual_masters_even_when_simple_initialization_selected() -> TestResult {
+    let groups = [vec![SurfaceId(77)]];
+    let all = [SurfaceId(77)];
+    let coefficients = coefficients(1, 1, 0.25);
+    let mut actual = state();
+    actual.masters = None;
+    let mut caller = context(&groups, &all);
+    caller.simple_ctf_only = true;
+    caller.any_ems_in_model = true;
+    let before = actual.clone();
+    assert_eq!(
+        initialize_selected_ctf_thermal_histories(&mut actual, &[surface(&coefficients)], caller),
+        Err(CtfThermalHistoryUnavailable::MastersUnallocated)
+    );
+    assert_eq!(actual, before);
+    caller.any_ems_in_model = false;
+    let mut input = surface(&coefficients);
+    input.outside_boundary = OutsideBoundaryCondition::Adiabatic;
+    initialize_selected_ctf_thermal_histories(&mut actual, &[input], caller)?;
+    assert_eq!(actual.normal.outside_temperature[0][0], 23.0);
+    assert_eq!(
+        actual.normal.outside_flux[0][0].to_bits(),
+        0.0_f64.to_bits()
+    );
+    assert!(actual.masters.is_none());
+    Ok(())
+}
+
+#[test]
+fn simple_shift_uses_global_extent_and_keeps_current_history_distinct_from_surface_temp()
+-> TestResult {
+    let groups = [vec![SurfaceId(77)]];
+    let all = [SurfaceId(77)];
+    let mut coefficients = coefficients(1, 1, 0.25);
+    coefficients.outside[0] = 2.0;
+    coefficients.cross[0] = 3.0;
+    coefficients.inside[0] = 4.0;
+    let mut input = surface(&coefficients);
+    input.inside_constant = 1.0;
+    input.outside_constant = 2.0;
+    input.algorithm = CtfThermalHistoryAlgorithm::Empd;
+    let mut actual = state();
+    actual.normal.outside_temperature[0][0] = 10.0;
+    actual.normal.inside_temperature[0][0] = 100.0;
+    actual.normal.inside_temperature[0][1] = -0.0;
+    actual.normal.inside_temperature[4][1] = f64::from_bits(0x7ff8_0000_0000_0123);
+    let old_second = actual.normal.inside_temperature[1].clone();
+    let old_third = actual.normal.inside_temperature[2].clone();
+    let mut caller = context(&groups, &all);
+    caller.simple_ctf_only = true;
+    caller.global_max_ctf_terms = 3;
+    assert_eq!(
+        update_selected_ctf_thermal_histories(&mut actual, &[input], caller)?,
+        CtfThermalHistoryUpdateRoute::SimpleShift
+    );
+    assert_eq!(actual.normal.inside_temperature[1][0], 100.0);
+    assert_eq!(
+        actual.normal.inside_temperature[1][1].to_bits(),
+        (-0.0_f64).to_bits()
+    );
+    assert_eq!(actual.normal.inside_temperature[2], old_second);
+    assert_eq!(actual.normal.inside_temperature[3], old_third);
+    assert_eq!(
+        actual.normal.inside_temperature[4][1].to_bits(),
+        0x7ff8_0000_0000_0123
+    );
+    assert_eq!(actual.normal.inside_flux[0][0], 3.0);
+    assert_eq!(actual.normal.inside_flux[1][0], 3.0);
+    assert_eq!(actual.normal.outside_flux[1][0], 1.0);
+    assert_eq!(actual.flux_reports.inside_conduction[0], 6.0);
+    assert_eq!(actual.flux_reports.outside_flux[0], -1.0);
+    assert_eq!(actual.flux_reports.outside_conduction[0], -2.0);
+    assert!(!actual.update_first_time);
+    let scratch = actual
+        .scratch
+        .as_ref()
+        .ok_or(CtfThermalHistoryUnavailable::ScratchUnallocated)?;
+    assert_eq!(scratch.sum_time, [0.0, 0.0]);
+    Ok(())
+}
+
+#[test]
+fn master_interpolation_then_completion_preserves_block_start_and_literal_shift() -> TestResult {
+    let groups = [vec![SurfaceId(77)]];
+    let all = [SurfaceId(77)];
+    let coefficients = coefficients(2, 2, 0.5);
+    let input = surface(&coefficients);
+    let mut actual = state();
+    actual.normal.outside_temperature[0][0] = 10.0;
+    actual.normal.inside_temperature[0][0] = 11.0;
+    let masters = actual
+        .masters
+        .as_mut()
+        .ok_or(CtfThermalHistoryUnavailable::MastersUnallocated)?;
+    masters.arrays.outside_temperature[1][0] = 40.0;
+    masters.arrays.outside_temperature[2][0] = 80.0;
+    masters.arrays.inside_temperature[1][0] = 50.0;
+    masters.arrays.inside_temperature[2][0] = 90.0;
+    update_selected_ctf_thermal_histories(&mut actual, &[input], context(&groups, &all))?;
+    assert_eq!(actual.normal.outside_temperature[1][0], 25.0);
+    assert_eq!(actual.normal.outside_temperature[2][0], 60.0);
+    assert_eq!(actual.normal.inside_temperature[1][0], 30.5);
+    actual.normal.outside_temperature[0][0] = 12.0;
+    actual.normal.inside_temperature[0][0] = 13.0;
+    update_selected_ctf_thermal_histories(&mut actual, &[input], context(&groups, &all))?;
+    let masters = actual
+        .masters
+        .as_ref()
+        .ok_or(CtfThermalHistoryUnavailable::MastersUnallocated)?;
+    assert_eq!(masters.current_num_histories[0], 0);
+    assert_eq!(masters.arrays.outside_temperature[2][0], 40.0);
+    assert_eq!(actual.normal.outside_temperature[2][0], 40.0);
+    assert_eq!(actual.normal.outside_temperature[1][0], 10.0);
+    assert_eq!(actual.normal.inside_temperature[1][0], 11.0);
+    assert_eq!(actual.normal.outside_flux[1][0], 3.0);
+    assert_eq!(actual.normal.inside_flux[1][0], 2.0);
+    let scratch = actual
+        .scratch
+        .as_ref()
+        .ok_or(CtfThermalHistoryUnavailable::ScratchUnallocated)?;
+    assert_eq!(scratch.outside_temperature_first[0], 10.0);
+    assert_eq!(scratch.inside_temperature_first[0], 11.0);
+    assert_eq!(scratch.sum_time[0], 0.5);
+    Ok(())
+}
+
+#[test]
+fn override_selects_master_branch_and_zero_terms_skip_flux_but_not_counter() -> TestResult {
+    let groups = [vec![SurfaceId(77)]];
+    let all = [SurfaceId(77)];
+    let coefficients = coefficients(0, 2, 0.5);
+    let mut actual = state();
+    let before_reports = actual.flux_reports.clone();
+    let before_current_flux = actual.normal.inside_flux[0][0];
+    let mut caller = context(&groups, &all);
+    caller.simple_ctf_only = true;
+    caller.any_construction_overrides = true;
+    assert_eq!(
+        update_selected_ctf_thermal_histories(&mut actual, &[surface(&coefficients)], caller)?,
+        CtfThermalHistoryUpdateRoute::MasterHistories
+    );
+    assert_eq!(actual.flux_reports, before_reports);
+    assert_eq!(actual.normal.inside_flux[0][0], before_current_flux);
+    let masters = actual
+        .masters
+        .as_ref()
+        .ok_or(CtfThermalHistoryUnavailable::MastersUnallocated)?;
+    assert_eq!(masters.current_num_histories[0], 1);
+    Ok(())
+}
+
+#[test]
+fn zero_ctf_timestep_preserves_ieee_interpolation_without_a_finite_guard() -> TestResult {
+    let groups = [vec![SurfaceId(77)]];
+    let all = [SurfaceId(77)];
+    let coefficients = coefficients(1, 2, 0.0);
+    let mut actual = state();
+    update_selected_ctf_thermal_histories(
+        &mut actual,
+        &[surface(&coefficients)],
+        context(&groups, &all),
+    )?;
+    assert!(actual.normal.outside_temperature[1][0].is_infinite());
+    assert!(actual.normal.inside_temperature[1][0].is_infinite());
+    Ok(())
+}
+
+#[test]
+fn missing_scratch_and_counter_overflow_are_explicit_without_mutation() -> TestResult {
+    let groups = [vec![SurfaceId(77)]];
+    let all = [SurfaceId(77)];
+    let coefficients = coefficients(1, 2, 0.5);
+    let mut actual = state();
+    actual.update_first_time = false;
+    let before = actual.clone();
+    assert_eq!(
+        update_selected_ctf_thermal_histories(
+            &mut actual,
+            &[surface(&coefficients)],
+            context(&groups, &all)
+        ),
+        Err(CtfThermalHistoryUnavailable::ScratchUnallocated)
+    );
+    assert_eq!(actual, before);
+    actual.update_first_time = true;
+    if let Some(masters) = actual.masters.as_mut() {
+        masters.current_num_histories[0] = i32::MAX;
+    }
+    let before = actual.clone();
+    assert_eq!(
+        update_selected_ctf_thermal_histories(
+            &mut actual,
+            &[surface(&coefficients)],
+            context(&groups, &all)
+        ),
+        Err(CtfThermalHistoryUnavailable::CounterSuccessor)
+    );
+    assert_eq!(actual, before);
+    Ok(())
+}
+
+#[test]
+fn identity_scope_loop_and_global_capacity_errors_never_seed_histories() {
+    let groups = [vec![SurfaceId(77)]];
+    let all = [SurfaceId(77)];
+    let coefficients = coefficients(1, 1, 0.25);
+    let mut actual = state();
+    let before = actual.clone();
+    let mut input = surface(&coefficients);
+    input.public_owner_construction_id = ConstructionId(23);
+    assert_eq!(
+        initialize_selected_ctf_thermal_histories(&mut actual, &[input], context(&groups, &all)),
+        Err(CtfThermalHistoryUnavailable::Association)
+    );
+    input = surface(&coefficients);
+    input.source_sink_present = true;
+    assert_eq!(
+        initialize_selected_ctf_thermal_histories(&mut actual, &[input], context(&groups, &all)),
+        Err(CtfThermalHistoryUnavailable::UnsupportedScope)
+    );
+    let mut caller = context(&groups, &all);
+    caller.global_max_ctf_terms = 19;
+    assert_eq!(
+        initialize_selected_ctf_thermal_histories(&mut actual, &[surface(&coefficients)], caller),
+        Err(CtfThermalHistoryUnavailable::HistoryCapacity)
+    );
+    let duplicate = [SurfaceId(77), SurfaceId(77)];
+    caller = context(&groups, &duplicate);
+    assert_eq!(
+        initialize_selected_ctf_thermal_histories(&mut actual, &[surface(&coefficients)], caller),
+        Err(CtfThermalHistoryUnavailable::Association)
+    );
+    caller = context(&groups, &all);
+    caller.simple_ctf_only = true;
+    caller.global_max_ctf_terms = 0;
+    assert_eq!(
+        update_selected_ctf_thermal_histories(&mut actual, &[surface(&coefficients)], caller),
+        Err(CtfThermalHistoryUnavailable::SimpleCurrentRowMove)
+    );
+    assert_eq!(actual, before);
+}

@@ -1,0 +1,471 @@
+--- .runtime/porting/ZON-05/rust-observer-prep-01/new/zon05_candidate_unit_support/fields.rs
++++ .runtime/porting/CTF-10/thermal-history-rust-observer-prep-01/new/ctf10_thermal_history_unit_support/fields.rs
+@@ -1,143 +1,333 @@
+-//! Actual selected Rust owners only; no humidity or cache-tag evaluator.
+-use ep_runtime::heat_balance::zone_air_initialization::ZoneAirInitializationState;
+-use ep_runtime::heat_balance::zone_humidity_correction::{
+-    ZoneHumidityCorrectionCall, ZoneHumidityCorrectionContext,
+-    ZoneHumidityCorrectionUnavailable, ZoneHumidityNode, ZoneHumiditySourceTerms,
++//! Literal pre-boundary DTO conversion and actual returned owner copies only.
++use ep_model::{ConstructionId, OutsideBoundaryCondition, SurfaceId};
++use ep_runtime::heat_balance::ctf_thermal_history::{
++    CtfThermalHistoryAlgorithm, CtfThermalHistoryArrays, CtfThermalHistoryContext,
++    CtfThermalHistoryFluxReports, CtfThermalHistoryMasters, CtfThermalHistoryScratch,
++    CtfThermalHistoryState, CtfThermalHistorySurface,
+ };
+-use ep_runtime::psychrometrics::{
+-    ENERGYPLUS_PSY_CACHE_SIZE, EnergyPlusPsychrometricCacheSlot,
+-    EnergyPlusPsychrometricOperation, EnergyPlusPsychrometricStateSnapshot,
+-    EnergyPlusPsychrometricsState,
+-};
++use ep_runtime::heat_balance::surface_manager::ctf_public_storage::CtfPublicCoefficientStorage;
+ use serde_json::{Value, json};
++use std::collections::{BTreeMap, BTreeSet};
++type Result<T> = std::result::Result<T, String>;
+ 
++fn need(ok: bool, message: &str) -> Result<()> {
++    if ok { Ok(()) } else { Err(message.to_owned()) }
++}
++pub(super) fn rows(value: &Value) -> Result<&[Value]> {
++    value.as_array().map(Vec::as_slice).ok_or_else(|| "typed array required".to_owned())
++}
++pub(super) fn integer(value: &Value) -> Result<i32> {
++    value.as_i64().and_then(|v| i32::try_from(v).ok()).ok_or_else(|| "Native i32 required".to_owned())
++}
++fn boolean(value: &Value) -> Result<bool> {
++    value.as_bool().ok_or_else(|| "actual Boolean required".to_owned())
++}
++fn text(value: &Value) -> Result<&str> {
++    value.as_str().ok_or_else(|| "typed string required".to_owned())
++}
++fn index(value: &Value) -> Result<usize> {
++    usize::try_from(integer(value)?).map_err(|_| "nonnegative index required".to_owned())
++}
++fn id(value: &Value) -> Result<SurfaceId> {
++    let value = integer(value)?;
++    need(value > 0, "positive actual Native identity required")?;
++    Ok(SurfaceId(u32::try_from(value).map_err(|_| "ID representation".to_owned())?))
++}
++fn keys(value: &Value, names: &[&str]) -> Result<()> {
++    need(value.as_object().is_some_and(|v| v.len() == names.len() && names.iter().all(|n| v.contains_key(*n))),
++        "exact actual owner field inventory required")
++}
+ pub(super) fn scalar(value: f64) -> Value {
+-    let class = if value.is_nan() {
+-        "nan"
+-    } else if value.is_infinite() {
+-        if value.is_sign_negative() { "negative_infinity" } else { "positive_infinity" }
+-    } else if value == 0.0 {
+-        if value.is_sign_negative() { "negative_zero" } else { "positive_zero" }
+-    } else { "finite" };
+-    json!({"value": if value.is_finite() { Some(value) } else { None },
+-        "value_bits": format!("{:016x}", value.to_bits()), "value_class": class})
+-}
+-fn state_fields(value: &ZoneAirInitializationState) -> Value {
++    let bits = value.to_bits();
++    let magnitude = bits & 0x7fff_ffff_ffff_ffff;
++    let negative = bits >> 63 != 0;
++    let class = if magnitude > 0x7ff0_0000_0000_0000 { "nan" }
++        else if magnitude == 0x7ff0_0000_0000_0000 {
++            if negative { "negative_infinity" } else { "positive_infinity" }
++        } else if magnitude == 0 { if negative { "negative_zero" } else { "positive_zero" } }
++        else { "finite" };
++    json!({"value_bits": format!("{bits:016x}"), "value_class": class})
++}
++fn real(value: &Value) -> Result<f64> {
++    keys(value, &["value_bits", "value_class"])?;
++    let token = text(&value["value_bits"])?;
++    need(token.len() == 16 && token.bytes().all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c)),
++        "exact binary64 token required")?;
++    let bits = u64::from_str_radix(token, 16).map_err(|_| "binary64 token".to_owned())?;
++    let value_copy = f64::from_bits(bits);
++    need(scalar(value_copy) == *value, "IEEE class differs from supplied bits")?;
++    Ok(value_copy)
++}
++fn vector<T>(value: &Value, total: usize, copy: impl Fn(&Value) -> Result<T>) -> Result<Option<Vec<T>>> {
++    keys(value, &["allocated", "lower", "upper", "values"])?;
++    if !boolean(&value["allocated"])? {
++        need(value["lower"].is_null() && value["upper"].is_null() && value["values"].is_null(),
++            "unallocated owner must stay null")?;
++        return Ok(None);
++    }
++    need(integer(&value["lower"])? == 1 && index(&value["upper"])? == total,
++        "complete actual surface bounds required")?;
++    let source = rows(&value["values"])?;
++    need(source.len() == total, "complete allocated values required")?;
++    source.iter().enumerate().map(|(position, row)| {
++        keys(row, &["index", "value"])?;
++        need(index(&row["index"])? == position + 1, "actual index order differs")?;
++        copy(&row["value"])
++    }).collect::<Result<Vec<_>>>().map(Some)
++}
++fn required(value: &Value, total: usize) -> Result<Vec<f64>> {
++    vector(value, total, real)?.ok_or_else(|| "required allocated scalar owner absent".to_owned())
++}
++fn history(owners: &[&Value], name: &str, total: usize) -> Result<Option<[Vec<f64>; 19]>> {
++    let flags = owners.iter().map(|row| boolean(&row[name]["allocated"])).collect::<Result<Vec<_>>>()?;
++    if flags.iter().all(|flag| !flag) {
++        for row in owners {
++            keys(&row[name], &["allocated", "terms"])?;
++            need(row[name]["terms"].is_null(), "unallocated history terms must stay null")?;
++        }
++        return Ok(None);
++    }
++    need(flags.iter().all(|flag| *flag), "partially allocated history cannot become a complete owner")?;
++    let mut out: [Vec<f64>; 19] = std::array::from_fn(|_| Vec::with_capacity(total));
++    for row in owners {
++        let source = &row[name];
++        keys(source, &["allocated", "lower", "upper", "terms"])?;
++        need(integer(&source["lower"])? == 1 && integer(&source["upper"])? == 19 && rows(&source["terms"] )?.len() == 19,
++            "all19 actual history terms required")?;
++        for (term, value) in rows(&source["terms"] )?.iter().enumerate() {
++            keys(value, &["term", "surface_lower", "surface_upper", "surface_allocated", "value"])?;
++            need(index(&value["term"])? == term + 1 && integer(&value["surface_lower"])? == 1 &&
++                index(&value["surface_upper"])? == total && boolean(&value["surface_allocated"] )?,
++                "full allocated history row required")?;
++            out[term].push(real(&value["value"])?);
++        }
++    }
++    Ok(Some(out))
++}
++fn arrays(owners: &[&Value], total: usize, suffix: &str) -> Result<Option<CtfThermalHistoryArrays>> {
++    let values = ["SurfInsideTempHist", "SurfOutsideTempHist", "SurfInsideFluxHist", "SurfOutsideFluxHist"]
++        .iter().map(|name| history(owners, &format!("{name}{suffix}"), total)).collect::<Result<Vec<_>>>()?;
++    if values.iter().all(Option::is_none) { return Ok(None); }
++    need(values.iter().all(Option::is_some), "mixed four-history allocation is unrepresentable")?;
++    let mut values = values.into_iter();
++    let mut next = || values.next().flatten().ok_or_else(|| "complete history owner required".to_owned());
++    Ok(Some(CtfThermalHistoryArrays { inside_temperature: next()?, outside_temperature: next()?,
++        inside_flux: next()?, outside_flux: next()? }))
++}
++fn fixed(value: &Value) -> Result<[f64; 19]> {
++    rows(value)?.iter().map(real).collect::<Result<Vec<_>>>()?.try_into()
++        .map_err(|_| "full19 public coefficients required".to_owned())
++}
++fn coefficients(value: &Value) -> Result<CtfPublicCoefficientStorage> {
++    Ok(CtfPublicCoefficientStorage {
++        outside: fixed(&value["CTFOutside"] )?, cross: fixed(&value["CTFCross"] )?,
++        inside: fixed(&value["CTFInside"] )?, flux: fixed(&value["CTFFlux"] )?,
++        source_in: fixed(&value["CTFSourceIn"] )?, source_out: fixed(&value["CTFSourceOut"] )?,
++        temperature_source_out: fixed(&value["CTFTSourceOut"] )?, temperature_source_in: fixed(&value["CTFTSourceIn"] )?,
++        temperature_source_q: fixed(&value["CTFTSourceQ"] )?, temperature_user_out: fixed(&value["CTFTUserOut"] )?,
++        temperature_user_in: fixed(&value["CTFTUserIn"] )?, temperature_user_source: fixed(&value["CTFTUserSource"] )?,
++        ctf_time_step: real(&value["CTFTimeStep"] )?, num_histories: integer(&value["NumHistories"] )?,
++        num_ctf_terms: integer(&value["NumCTFTerms"] )?, u_value: real(&value["UValue"] )?,
++    })
++}
++
++pub(super) struct Prepared<'a> {
++    pub state: CtfThermalHistoryState,
++    pub inputs: Inputs<'a>,
++}
++pub(super) struct Inputs<'a> {
++    pub total: usize,
++    pub catalog: &'a Value,
++    pub context_value: &'a Value,
++    pub clock: &'a Value,
++    pub coefficients: Vec<CtfPublicCoefficientStorage>,
++    pub construction_positions: BTreeMap<i32, usize>,
++    pub heat_transfer: Vec<Vec<SurfaceId>>,
++    pub opaque: Vec<Vec<SurfaceId>>,
++    pub all: Vec<SurfaceId>,
++}
++pub(super) fn prepare<'a>(event: &'a Value, operation: &str) -> Result<Prepared<'a>> {
++    let (checkpoint, procedure, context_key) = if operation == "initialize" {
++        ("history_selected_initialization_input", "InitThermalAndFluxHistories", "history_boundary_context")
++    } else {
++        need(operation == "update", "declared selected operation required")?;
++        ("history_update_entry_owners", "UpdateThermalHistories", "history_entry_context")
++    };
++    keys(event, &["event_ordinal", "checkpoint", "copy_kind", "clock", "procedure", "invocation_ordinal",
++        "parent_procedure", "parent_invocation_ordinal", "locals", "owners", "counted_as_PASS", context_key, "current_history_catalog"])?;
++    need(event["checkpoint"] == checkpoint && event["procedure"] == procedure && event["copy_kind"] == 3 &&
++        event["counted_as_PASS"] == false && event["event_ordinal"].as_u64().is_some_and(|v| v > 0) &&
++        event["invocation_ordinal"].as_u64().is_some_and(|v| v > 0), "genuine selected input boundary required")?;
++    let context = &event[context_key];
++    let catalog = &event["current_history_catalog"];
++    need(context["protocol"] == "ctf10-surface-history-entry-context.v1" && boolean(&context["Surface_allocated"] )?,
++        "actual allocated history context required")?;
++    let total = index(&context["TotSurfaces"])?;
++    need(total > 0, "empty layout has no observed per-term allocation witness")?;
++    let surfaces = rows(&catalog["surfaces"])?;
++    need(surfaces.len() == total && rows(&context["allocated_surfaces"] )?.len() == total &&
++        index(&context["NumOfZones"])? == rows(&catalog["zones"] )?.len() &&
++        context["AllHTSurfaceList"] == catalog["AllHTSurfaceList"], "actual context/catalog layout differs")?;
++    let all = rows(&catalog["AllHTSurfaceList"] )?.iter().map(id).collect::<Result<Vec<_>>>()?;
++    need(all.iter().copied().collect::<BTreeSet<_>>().len() == all.len(), "duplicate AllHT identity")?;
++    let mut owners: BTreeMap<usize, &Value> = BTreeMap::new();
++    let all_owners = rows(&event["owners"])?;
++    need(all_owners.len() == all.len(), "complete AllHT histories required")?;
++    for (row, surface) in all_owners.iter().zip(&all) {
++        need(row["surface_index"].as_u64() == Some(u64::from(surface.0)), "AllHT history order differs")?;
++    }
++    for row in all_owners.iter().chain(rows(&context["non_AllHT_history_owners"] )?) {
++        let position = index(&row["surface_index"])?;
++        need(position > 0 && position <= total && owners.insert(position, row).is_none(), "history owner association differs")?;
++    }
++    need(owners.len() == total, "no full-layout history owner may be dropped")?;
++    let owners = owners.into_values().collect::<Vec<_>>();
++    let counters = vector(&context["SurfCurrNumHist"], total, integer)?;
++    for (position, row) in owners.iter().enumerate() {
++        need(row["SurfCurrNumHist"] == counters.as_ref().map_or(Value::Null, |values| json!(values[position])),
++            "independent same-owner counter copies differ")?;
++    }
++    let normal = arrays(&owners, total, "")?.ok_or_else(|| "required normal histories absent".to_owned())?;
++    let master_arrays = arrays(&owners, total, "Master")?;
++    let masters = match (master_arrays, counters) {
++        (None, None) => None,
++        (Some(arrays), Some(current_num_histories)) => Some(CtfThermalHistoryMasters { arrays, current_num_histories }),
++        _ => return Err("master/counter allocation is not jointly representable".to_owned()),
++    };
++    let scratch_names = ["QExt1", "QInt1", "TempInt1", "TempExt1", "SumTime"];
++    keys(&context["scratch"], &scratch_names)?;
++    let scratch_values = scratch_names.iter().map(|name| vector(&context["scratch"][*name], total, real)).collect::<Result<Vec<_>>>()?;
++    let scratch = if scratch_values.iter().all(Option::is_none) { None } else {
++        need(scratch_values.iter().all(Option::is_some), "partial scratch allocation cannot be filled")?;
++        let mut values = scratch_values.into_iter();
++        let mut next = || values.next().flatten().ok_or_else(|| "complete scratch owner required".to_owned());
++        Some(CtfThermalHistoryScratch { outside_flux_first: next()?, inside_flux_first: next()?,
++            inside_temperature_first: next()?, outside_temperature_first: next()?, sum_time: next()? })
++    };
++    let reports = &context["flux_reports"];
++    keys(reports, &["SurfOpaqInsFaceCond", "SurfOpaqInsFaceCondFlux", "SurfOpaqOutFaceCond", "SurfOpaqOutFaceCondFlux"])?;
++    let state = CtfThermalHistoryState {
++        surface_ids: (1..=total).map(|v| u32::try_from(v).map(SurfaceId).map_err(|_| "surface ID capacity".to_owned())).collect::<Result<Vec<_>>>()?,
++        normal, masters, scratch, update_first_time: boolean(&event["clock"]["UpdateThermalHistoriesFirstTimeFlag"] )?,
++        flux_reports: CtfThermalHistoryFluxReports { inside_conduction: required(&reports["SurfOpaqInsFaceCond"], total)?,
++            inside_flux: required(&reports["SurfOpaqInsFaceCondFlux"], total)?, outside_flux: required(&reports["SurfOpaqOutFaceCondFlux"], total)?,
++            outside_conduction: required(&reports["SurfOpaqOutFaceCond"], total)? },
++    };
++    for (position, surface) in surfaces.iter().enumerate() {
++        need(index(&surface["index"])? == position + 1, "complete declared surface order differs")?;
++        let witness = &context["allocated_surfaces"][position];
++        for key in ["index", "Name", "Construction", "Class", "HeatTransferAlgorithm", "ExtBoundCond", "Area"] {
++            need(surface[key] == witness[key], "current catalog/layout identity differs")?;
++        }
++    }
++    let spaces = rows(&catalog["spaces"])?;
++    let mut heat_transfer = Vec::new(); let mut opaque = Vec::new();
++    for (zone_position, zone) in rows(&catalog["zones"] )?.iter().enumerate() {
++        need(index(&zone["index"])? == zone_position + 1, "actual Zone order differs")?;
++        for space_index in rows(&zone["spaceIndexes"])? {
++            let number = index(space_index)?;
++            let space = number.checked_sub(1).and_then(|v| spaces.get(v)).ok_or("actual Space unavailable")?;
++            need(index(&space["index"])? == number, "actual Space identity differs")?;
++            for (first, last, out) in [("HTSurfaceFirst", "HTSurfaceLast", &mut heat_transfer),
++                ("OpaqOrIntMassSurfaceFirst", "OpaqOrIntMassSurfaceLast", &mut opaque)] {
++                let ids = (integer(&space[first])?..=integer(&space[last])?).map(|number| {
++                    need(number > 0 && usize::try_from(number).is_ok_and(|v| v <= total), "traversed surface outside allocated layout")?;
++                    Ok(SurfaceId(u32::try_from(number).map_err(|_| "traversal ID representation".to_owned())?))
++                }).collect::<Result<Vec<_>>>()?;
++                out.push(ids);
++            }
++        }
++    }
++    let mut construction_positions = BTreeMap::new(); let mut coefficients_values = Vec::new();
++    let mut expected = Vec::new();
++    for surface in &all {
++        let row = surfaces.get(usize::try_from(surface.0).map_err(|_| "surface ID representation")? - 1).ok_or("AllHT surface unavailable")?;
++        let construction = integer(&row["Construction"])?;
++        if !expected.contains(&construction) { expected.push(construction); }
++    }
++    let construction_rows = rows(&catalog["constructions"])?;
++    need(construction_rows.len() == expected.len(), "all referenced public owners required")?;
++    for (position, (row, expected_id)) in construction_rows.iter().zip(expected).enumerate() {
++        let actual_id = integer(&row["index"])?;
++        need(actual_id > 0 && actual_id == expected_id && construction_positions.insert(actual_id, position).is_none(),
++            "first current Construction encounter order differs")?;
++        coefficients_values.push(coefficients(row)?);
++    }
++    Ok(Prepared { state, inputs: Inputs { total, catalog, context_value: context, clock: &event["clock"], coefficients: coefficients_values,
++        construction_positions, heat_transfer, opaque, all } })
++}
++
++impl Inputs<'_> {
++    pub(super) fn context(&self) -> Result<CtfThermalHistoryContext<'_>> {
++        Ok(CtfThermalHistoryContext { simple_ctf_only: boolean(&self.clock["SimpleCTFOnly"] )?,
++            any_ems_in_model: boolean(&self.clock["AnyEMS"] )?, any_construction_overrides: boolean(&self.clock["AnyConstrOverrides"] )?,
++            any_internal_heat_source: boolean(&self.clock["AnyInternalHeatSourceInInput"] )?,
++            global_max_ctf_terms: integer(&self.clock["MaxCTFTerms"] )?, time_step_zone_hours: real(&self.clock["TimeStepZone"] )?,
++            heat_transfer_groups: &self.heat_transfer, opaque_groups: &self.opaque, all_heat_transfer_surfaces: &self.all })
++    }
++    pub(super) fn surfaces(&self) -> Result<Vec<CtfThermalHistorySurface<'_>>> {
++        let total = self.total;
++        let operands = &self.context_value["surface_operands"];
++        let names = ["SurfTempIn", "SurfCTFConstInPart", "SurfCTFConstOutPart", "SurfOutDryBulbTemp"];
++        keys(operands, &names)?;
++        let values = names.iter().map(|name| required(&operands[*name], total)).collect::<Result<Vec<_>>>()?;
++        self.all.iter().map(|surface| {
++            let position = usize::try_from(surface.0).map_err(|_| "surface ID representation")? - 1;
++            let row = &self.catalog["surfaces"][position];
++            let construction_id = integer(&row["Construction"])?;
++            let construction_position = *self.construction_positions.get(&construction_id).ok_or("actual public owner missing")?;
++            let construction = &self.catalog["constructions"][construction_position];
++            let algorithm = match integer(&row["HeatTransferAlgorithm"])? {
++                1 => CtfThermalHistoryAlgorithm::Ctf, 2 => CtfThermalHistoryAlgorithm::Empd, _ => CtfThermalHistoryAlgorithm::Other,
++            };
++            let outside_boundary = match integer(&row["ExtBoundCond"])? {
++                0 => OutsideBoundaryCondition::Outdoors,
++                value if i64::from(value) == i64::from(surface.0) => OutsideBoundaryCondition::Adiabatic,
++                _ => OutsideBoundaryCondition::Other,
++            };
++            let id = ConstructionId(u32::try_from(construction_id).map_err(|_| "construction ID representation")?);
++            Ok(CtfThermalHistorySurface { surface_id: *surface, construction_id: id, public_owner_construction_id: id,
++                coefficients: &self.coefficients[construction_position], algorithm,
++                ordinary_opaque: matches!(integer(&row["Class"] )?, 1 | 2 | 3 | 4 | 9),
++                source_sink_present: boolean(&construction["SourceSinkPresent"] )?, outside_boundary,
++                outside_dry_bulb: values[3][position], area: real(&row["Area"] )?, inside_surface_temperature: values[0][position],
++                inside_constant: values[1][position], outside_constant: values[2][position] })
++        }).collect()
++    }
++    pub(super) fn context_dto(&self) -> Result<Value> {
++        let context = self.context()?;
++        Ok(json!({"SimpleCTFOnly": context.simple_ctf_only, "AnyEMS": context.any_ems_in_model,
++            "AnyConstrOverrides": context.any_construction_overrides, "AnyInternalHeatSourceInInput": context.any_internal_heat_source,
++            "MaxCTFTerms": context.global_max_ctf_terms, "TimeStepZone": scalar(context.time_step_zone_hours),
++            "heat_transfer_groups": self.heat_transfer.iter().map(|g| g.iter().map(|v| v.0).collect::<Vec<_>>()).collect::<Vec<_>>(),
++            "opaque_groups": self.opaque.iter().map(|g| g.iter().map(|v| v.0).collect::<Vec<_>>()).collect::<Vec<_>>(),
++            "AllHTSurfaceList": self.all.iter().map(|v| v.0).collect::<Vec<_>>() }))
++    }
++}
++fn real_vector(values: &[f64]) -> Value { json!(values.iter().copied().map(scalar).collect::<Vec<_>>()) }
++fn history_matrix(values: &[Vec<f64>; 19]) -> Value { json!(values.iter().map(|row| real_vector(row)).collect::<Vec<_>>()) }
++fn array_dto(value: &CtfThermalHistoryArrays, suffix: &str) -> Value {
+     let mut out = json!({});
+-    macro_rules! real { ($($native:literal => $field:ident),* $(,)?) => {
+-        $(out[$native] = scalar(value.$field);)*
+-    }; }
+-    real!("MAT" => mat, "ZT" => zt, "ZTAV" => ztav, "XMPT" => xmpt,
+-        "TMX" => tmx, "TM2" => tm2, "airHumRat" => air_hum_rat,
+-        "airHumRatAvg" => air_hum_rat_avg, "WTimeMinusP" => w_time_minus_p,
+-        "W1" => w1, "WMX" => wmx, "WM2" => wm2, "airHumRatTemp" => air_hum_rat_temp,
+-        "tempIndLoad" => temp_ind_load, "tempDepLoad" => temp_dep_load,
+-        "airRelHum" => air_rel_hum, "AirPowerCap" => air_power_cap, "T1" => t1);
+-    for (key, values) in [("XMAT", &value.xmat), ("DSXMAT", &value.dsxmat),
+-        ("ZTM", &value.ztm), ("WPrevZoneTS", &value.w_prev_zone_ts),
+-        ("DSWPrevZoneTS", &value.dsw_prev_zone_ts),
+-        ("WPrevZoneTSTemp", &value.w_prev_zone_ts_temp)] {
+-        out[key] = json!(values.iter().map(|v| scalar(*v)).collect::<Vec<_>>());
++    for (name, values) in [("SurfInsideTempHist", &value.inside_temperature), ("SurfOutsideTempHist", &value.outside_temperature),
++        ("SurfInsideFluxHist", &value.inside_flux), ("SurfOutsideFluxHist", &value.outside_flux)] {
++        out[format!("{name}{suffix}")] = history_matrix(values);
+     }
+     out
+ }
+-fn sources(value: &ZoneHumiditySourceTerms) -> Value {
+-    json!({"OAMFL": scalar(value.oamfl), "VAMFL": scalar(value.vamfl),
+-        "CTMFL": scalar(value.ctmfl), "EAMFL": scalar(value.eamfl),
+-        "EAMFLxHumRat": scalar(value.eamfl_x_hum_rat), "SumHmARa": scalar(value.sum_hm_ara),
+-        "SumHmARaW": scalar(value.sum_hm_ara_w), "MixingMassFlowZone": scalar(value.mixing_mass_flow_zone),
+-        "MixingMassFlowXHumRat": scalar(value.mixing_mass_flow_x_hum_rat), "MDotOA": scalar(value.m_dot_oa),
+-        "latentGain": scalar(value.latent_gain), "latentGainExceptPeople": scalar(value.latent_gain_except_people)})
+-}
+-pub(super) fn context(c: &ZoneHumidityCorrectionContext) -> Value {
+-    json!({"zone_id": c.zone_id, "space_id": c.space_id, "zone_name": c.zone_name,
+-        "Volume": scalar(c.volume), "ZoneVolCapMultpMoist": scalar(c.moisture_capacitance_multiplier),
+-        "Multiplier": c.multiplier, "ListMultiplier": c.list_multiplier,
+-        "IsControlled": c.is_controlled, "IsReturnPlenum": c.is_return_plenum,
+-        "IsSupplyPlenum": c.is_supply_plenum, "SystemZoneNodeNumber": c.system_zone_node_number,
+-        "leakageParallelPIU_count": c.leakage_parallel_piu_count,
+-        "ZoneAirSolutionAlgo": c.solution_algorithm, "RoomAirModel": c.room_air_model,
+-        "doSpaceHeatBalance": c.do_space_heat_balance, "DoLatentSizing": c.do_latent_sizing,
+-        "AFN_control_type": c.afn_control_type, "AFN_multizone_always_simulated": c.afn_multizone_always_simulated,
+-        "AFN_FanActivated": c.afn_fan_activated, "AFN_distribution_simulated": c.afn_distribution_simulated,
+-        "DuctLossSimu": c.duct_loss_simulated, "FlagHybridModel": c.hybrid_model,
+-        "OutBaroPress": scalar(c.outdoor_pressure), "OutHumRat": scalar(c.outdoor_humidity_ratio),
+-        "TimeStepSysSec": scalar(c.time_step_sys_seconds), "TimeStepSys": scalar(c.time_step_sys),
+-        "TimeStepZone": scalar(c.time_step_zone), "inlet_node_ids": c.inlet_node_ids})
+-}
+-fn psych_state(s: EnergyPlusPsychrometricStateSnapshot) -> Value {
+-    json!({"iconvTol": scalar(s.iconv_tol), "last_Patm": scalar(s.last_patm),
+-        "last_tBoil": scalar(s.last_t_boil), "Press_Save": scalar(s.press_save),
+-        "tSat_Save": scalar(s.t_sat_save), "warmup": s.warmup,
+-        "useInterpolationPsychTsatFnPb": s.use_interpolation})
+-}
+-fn slot(value: EnergyPlusPsychrometricCacheSlot) -> Value {
+-    match value {
+-        EnergyPlusPsychrometricCacheSlot::Psat { index, i_tdb, value } =>
+-            json!({"index": index, "iTdb": i_tdb, "Psat": scalar(value)}),
+-        EnergyPlusPsychrometricCacheSlot::Twb { index, i_tdb, i_w, i_pb, value } =>
+-            json!({"kind": "Twb", "index": index, "iTdb": i_tdb, "iW": i_w, "iPb": i_pb, "value": scalar(value)}),
+-        EnergyPlusPsychrometricCacheSlot::TsatPb { index, i_h, i_pb, value } =>
+-            json!({"kind": "TsatPb", "index": index, "iH": i_h, "iPb": i_pb, "value": scalar(value)}),
+-        EnergyPlusPsychrometricCacheSlot::TsatHPb { index, i_h, i_pb, value } =>
+-            json!({"kind": "TsatHPb", "index": index, "iH": i_h, "iPb": i_pb, "value": scalar(value)}),
+-    }
+-}
+-fn psych(value: &EnergyPlusPsychrometricsState) -> Value {
+-    let mut out = psych_state(value.snapshot());
+-    let caches = value.final_caches();
+-    // Copy actual named Psat slots. No hash/tag calculation or HIT inference.
+-    out["nondefault_Psat_rows"] = json!(caches.psat.iter().copied().filter(|row| {
+-        matches!(row, EnergyPlusPsychrometricCacheSlot::Psat { i_tdb, value, .. }
+-            if *i_tdb != -1000 || value.to_bits() != 0)
+-    }).map(slot).collect::<Vec<_>>());
+-    out["Psat_cache_capacity"] = json!(ENERGYPLUS_PSY_CACHE_SIZE);
+-    out["other_actual_nondefault_cache_rows"] = json!({
+-        "Twb": caches.twb.iter().copied().map(slot).collect::<Vec<_>>(),
+-        "TsatPb": caches.tsat_pb.iter().copied().map(slot).collect::<Vec<_>>(),
+-        "TsatHPb": caches.tsat_h_pb.iter().copied().map(slot).collect::<Vec<_>>()});
+-    out["cache_hits_or_Native_internal_locals_observed"] = json!(false);
+-    out["Native_global_diagnostic_indices_or_backend_inferred"] = json!(false);
+-    out
+-}
+-pub(super) fn snapshot(
+-    phase: &str, state: &ZoneAirInitializationState, source: &ZoneHumiditySourceTerms,
+-    c: &ZoneHumidityCorrectionContext, nodes: &[ZoneHumidityNode], p: &EnergyPlusPsychrometricsState,
+-) -> Value {
+-    json!({"phase": phase, "actual_context": context(c), "zone_fields": state_fields(state),
+-        "moisture_source_terms": sources(source), "SumLatentHTRadSys": scalar(source.sum_latent_ht_rad_sys),
+-        "SumLatentPool": scalar(source.sum_latent_pool),
+-        "nodes": nodes.iter().map(|n| json!({"node_id": n.node_id, "name": n.name,
+-            "MassFlowRate": scalar(n.mass_flow_rate), "Temp": scalar(n.temperature),
+-            "HumRat": scalar(n.humidity_ratio), "Enthalpy": scalar(n.enthalpy)})).collect::<Vec<_>>(),
+-        "actual_node_row_count": nodes.len(), "psychrometrics": psych(p)})
+-}
+-fn property_call(value: &EnergyPlusPsychrometricOperation) -> Value {
+-    json!({"actual_Rust_property_result": scalar(value.result),
+-        "state_before": psych_state(value.state_before), "state_after": psych_state(value.state_after),
+-        "cache_before": value.cache_before.map(slot), "cache_after": value.cache_after.map(slot),
+-        "paired_as_Native_internal_Wsat_or_guard": false})
+-}
+-pub(super) fn returned(value: &Result<ZoneHumidityCorrectionCall, ZoneHumidityCorrectionUnavailable>) -> Value {
+-    match value {
+-        Ok(call) => json!({"status": "source-returned", "owner_available": true,
+-            "unavailable": null, "zone_id": call.zone_id, "system_node_written": call.system_node_written,
+-            "actual_Rust_saturation_property_call": property_call(&call.saturation_call), "counted_as_PASS": false}),
+-        Err(error) => json!({"status": "typed-unavailable-returned", "owner_available": false,
+-            "unavailable": format!("{error:?}"), "zone_id": null, "system_node_written": null,
+-            "actual_Rust_saturation_property_call": null, "counted_as_PASS": false}),
+-    }
+-}
+-pub(super) const OBSERVER_PATHS: &[&str] = &[
+-    "crates/ep_run/examples/zon05_candidate_unit_observer.rs",
+-    "crates/ep_run/examples/zon05_candidate_unit_support/fields.rs",
+-];
+-pub(super) const API_PATHS: &[&str] = &[
+-    "crates/ep_run/Cargo.toml", "crates/ep_runtime/Cargo.toml", "crates/ep_runtime/src/lib.rs",
+-    "crates/ep_runtime/src/heat_balance/mod.rs", "crates/ep_runtime/src/heat_balance/zone_air_initialization.rs",
+-    "crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs", "crates/ep_runtime/src/heat_balance/state.rs",
+-    "crates/ep_runtime/src/psychrometrics.rs", "crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+-    "crates/ep_runtime/src/psychrometrics/psy02_trace.rs", "crates/ep_runtime/src/psychrometrics/production_trace.rs",
+-    "crates/ep_runtime/src/psychrometrics_spline_tables.rs", "crates/ep_runtime/src/psychrometrics/cp_cache.rs",
+-    "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+-];
++pub(super) fn snapshot(value: &CtfThermalHistoryState) -> Value {
++    let masters = value.masters.as_ref().map(|owner| {
++        let mut out = array_dto(&owner.arrays, "Master"); out["SurfCurrNumHist"] = json!(owner.current_num_histories); out
++    });
++    let scratch = value.scratch.as_ref().map(|owner| json!({"QExt1": real_vector(&owner.outside_flux_first),
++        "QInt1": real_vector(&owner.inside_flux_first), "TempInt1": real_vector(&owner.inside_temperature_first),
++        "TempExt1": real_vector(&owner.outside_temperature_first), "SumTime": real_vector(&owner.sum_time)}));
++    json!({"schema": "ctf10-selected-thermal-history-state.v1",
++        "surface_ids": value.surface_ids.iter().map(|v| v.0).collect::<Vec<_>>(),
++        "layout": {"surface_lower": 1, "surface_upper": value.surface_ids.len(), "term_lower": 1, "term_upper": 19},
++        "normal": array_dto(&value.normal, ""), "masters": masters, "scratch": scratch,
++        "update_first_time": value.update_first_time,
++        "flux_reports": {"SurfOpaqInsFaceCond": real_vector(&value.flux_reports.inside_conduction),
++            "SurfOpaqInsFaceCondFlux": real_vector(&value.flux_reports.inside_flux),
++            "SurfOpaqOutFaceCond": real_vector(&value.flux_reports.outside_conduction),
++            "SurfOpaqOutFaceCondFlux": real_vector(&value.flux_reports.outside_flux)}})
++}

@@ -1,0 +1,87 @@
+# Selected thermal-history direct-unit Rust observer proposal
+
+This immutable Source proposal adds one existing-style direct-unit observer and
+its owner DTO support. It changes no canonical source and executes no target.
+It uses held thermal-history module343fb385 and actual Native05 pre-boundary DTOs
+8eac3eb0. Numerical equivalence and ordinary lifecycle activation remain pending.
+
+The parent proposal adds only `pub mod ctf_thermal_history;` to the actual72-line
+heat_balance parent. The existing ZON humidity declaration remains literal.
+Removing that one addition restores the archived current parent exactly. The old
+thermal proposal's71-line parent must never replace this current72-line parent.
+Root must review/apply the held math module/tests separately and merge to73.
+
+## One genuine pre-boundary input per direct call
+
+CLI5 is cases.ndjson cases_sha projection.json projection_sha runtime_sources.json.
+Projection schema is ctf10-thermal-history-direct-unit-projection.v1. Actual refs
+are runtime operands: released consumer05 OriginalQA+execution, freeze, frozen
+policy, Native/API/QA/projector Source preparations and executed projector Source.
+No future hash, SourceSnapshot, branch/result count or invocation outcome is set.
+
+Each compact UTF-8 LF-only line has exactly schema,case_ordinal,operation,input_event.
+Schema is ctf10-thermal-history-direct-unit-input.v1, ordinals contiguous from1,
+operation initialize or update. input_event is the entire authentic Native input
+record: Init history_selected_initialization_input after2322, or Update
+history_update_entry_owners after5222. Its complete clock, owners, current catalog
+and matching boundary/entry context are retained. Endpoints/return markers are
+never candidate inputs. Each call starts from its independently copied prestate;
+this is direct-function testing, not a production cross-call history driver.
+
+The observer validates contiguous actual declared surface IDs and full bounds,
+joins AllHT and non-AllHT histories into all allocated columns, and preserves all
+19 terms. It copies all12 public19 arrays, counts/dt/U by actual first referenced
+Construction identity. Zone/Space HT and opaque groups follow real Zone order,
+spaceIndexes and inclusive ranges. AllHT order remains separate; unsupported
+members are never removed. Actual Native indices are explicit direct-test IDs,
+not an assertion that production Rust produced or owns those surfaces.
+
+All four normal arrays and reports are required. Master4+counter must be jointly
+all allocated or all absent. Scratch5 must be all allocated or all absent. A mixed
+or incomplete allocation, unsupported empty allocation witness or malformed owner
+is input-unrepresentable: no API call, no fabricated empty/zero replacement.
+Supported representation still passes genuine scope/capacity/counter conditions
+to the actual API; its typed error is not a Native fatal outcome.
+
+## Returned owner transport
+
+Output is NDJSON: one header, one result per input, one final summary. Each result
+copies the complete input_witness and SHA256 of exact case UTF-8 bytes excluding
+LF. The native_input_event_key contains actual state_address/procedure/invocation/
+event ordinal/checkpoint. before/after copy actual typed state; actual_context
+copies the exact flags, TimeStepZone and HT/opaque/AllHT orders used by the call.
+No thermal expression, history seed, coefficient or expected endpoint is computed
+by the observer. Binary64 is reconstructed from observed bits; class is checked
+and actual returned bits/class are serialized without decimal replacement.
+
+State schema ctf10-selected-thermal-history-state.v1 has surface_ids, layout,
+normal four term-major19-by-N matrices, optional masters four + SurfCurrNumHist,
+optional scratch QExt1/QInt1/TempInt1/TempExt1/SumTime, update_first_time and the four
+flux_reports. All retained columns/tails remain visible. Units and fixed-zero
+arithmetic/copy/class/signedzero policy come from the separately frozen55-line
+input-only policy, not outcomes or an invented scalar count. Native23 and prior
+20C zone-air fixtures remain separate. No defaults are inserted for either.
+
+Status source-returned means actual API Ok only. typed-unavailable-returned keeps
+actual before/after after API Err. input-unrepresentable has null before/after/
+context and no API invocation. All records explicitly decline numerical and
+integration PASS. Missing/blank/duplicate/trailing input or count mismatch fails;
+zero input cannot release calls. Any unavailable call produces process exit2
+while retaining every complete result; malformed transport exits2 without a
+successful final summary. There is no sampling, event cap or selected subset.
+
+The existing SHA primitive is reused per input line and small metadata/source.
+The candidate does NOT claim an internally verified full cases-file SHA. The
+actual projector/launcher and independent comparer must hash the complete file,
+match its actual ref/recorded argv, consume every line/result, and join each real
+Native completed endpoint plus genuine procedure/parent return. Only then can
+numerical parity be assessed. Full-file4GiB, source64,000,000 and smallmetadata
+16,000,000 physical bounds remain explicit; exceeding a bound fails, never drops.
+
+Own runtime inventory is2 observer files and14 ordered API/identity sources.
+Current identities are context only until Root actual application/format/source
+receipt exists. Source-only checks are exact diffs/current-before/new absences;
+no Rust parser, target, formatter, Cargo, results, weather, binaries or Git ran.
+Header authored the held history math and this adapter. Other-author Source peer
+is required; this proposal is no independent mathematical certificate. Actual
+capture QA is mandatory before Root applies or runs this candidate.

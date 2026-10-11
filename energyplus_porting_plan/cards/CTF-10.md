@@ -58,7 +58,7 @@ CON-01에서 제외한 입력·분기는 이 카드에서 구현하지 않는다
 
 ## 종료 체크
 
-- [ ] 원본 범위와 입출력·변경상태 계약 확정
+- [x] 원본 범위와 입출력·변경상태 계약 확정
 - [ ] 단위시험 통과 및 실제 활성 분기 확인
 - [ ] 상태·시간·호출순서를 포함한 연결시험 통과
 - [ ] 생산 경로 연결·EP/fixture 주입 부재·선행 gate 확인
@@ -136,3 +136,7 @@ Actual ordinary A-24H Original capture and independent full-event custody review
 Prospective consumer05 adds three actual history-boundary checkpoints and full allocated context/current referenced Construction ownership to the reviewed ordinary engine capture. Existing consumer04 evidence and all gates remain unchanged. The same A-24H input,45 guards, ordinary duration,7 forwarded arguments and4GiB factual QA bound remain; no general branch is forced, no mathematical answers or Rust history execution are supplied. Fresh consumer05 scope/freeze/build/PE/OriginalQA must precede any later history mathematical pairing.
 
 Actual consumer05 ordinary A-24H capture and full-stream OriginalDataQA passed:404886 attempted/retained events, zero omissions,4 selected initialization inputs/completions and2025 simple update inputs/completions with full allocated owners/current Construction catalogs. The1074976333-byte observation is losslessly archived with full decompressed SHA verified. Master update was not reached and remains numerically unverified. An initial preflight size-ref error stopped before PE/engine and is preserved; the narrow reviewed successor completed. Thermal arithmetic/direct comparison and production lifecycle activation remain pending. See evidence/CTF-10-surface-consumer05-original-baseline/summary.json.
+
+## Actual same-input selected thermal-history comparison
+
+The genuine complete A-24H Native stream supplies 2029 input-only cases. All actual Rust API calls returned and joined their selected Native completion, normal exit and parent caller return. Numeric comparisons: 973854; mismatch0; every observed finite owner profile has maximum absolute error and RMSE0. All19 rows, allocated surface columns, copied input bits, actual clock/traversal and report signs remain exact. Four master profiles are unobserved and receive no numerical PASS. Complete input/Rust bytes are losslessly archived. Actual quality: {"fmt-check":null,"clippy":null,"focused":{"passed":219,"failed":0,"ignored":0},"workspace":{"passed":4824,"failed":0,"ignored":0}}. SourceSnapshot: b8d982626fd380eff8bf37ee4c70dbb33071c1e3d4677f44534acb06f6641698. This implements only the selected direct history API, with no production activation. Whole unit gate remains pending actual producer invalidation; integration/production/whole-card gates remain pending. Earlier pending observations above are historical. Evidence: evidence/CTF-10-thermal-history-unit/summary.json.

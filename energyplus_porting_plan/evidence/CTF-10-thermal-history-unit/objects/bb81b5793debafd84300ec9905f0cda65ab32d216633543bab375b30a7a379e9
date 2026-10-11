@@ -1,0 +1,17 @@
+[package]
+name = "ep_runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+ep_model = { path = "../ep_model" }
+
+[dev-dependencies]
+serde_json = { version = "1.0", features = ["float_roundtrip"] }
+
+[lints]
+workspace = true
+

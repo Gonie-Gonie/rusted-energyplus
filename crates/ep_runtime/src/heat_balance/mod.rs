@@ -23,6 +23,7 @@ pub mod ctf_public_initialization;
 pub mod ctf_retry_driver;
 pub mod ctf_retry_initialization;
 pub mod ctf_surface_binding;
+pub mod ctf_thermal_history;
 pub(crate) mod id_slot_index;
 pub mod initialization;
 pub mod inside_convection;

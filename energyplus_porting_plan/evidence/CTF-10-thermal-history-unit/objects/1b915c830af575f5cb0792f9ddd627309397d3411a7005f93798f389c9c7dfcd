@@ -1,0 +1,322 @@
+"""Compare every same-input selected API visit after factual Original custody release."""
+import argparse
+from collections import Counter
+from datetime import datetime, timezone
+import hashlib
+import importlib.util
+import json
+import math
+from pathlib import Path
+import struct
+
+PREP = Path(__file__).resolve().parent
+COMMON_SHA = '7808162aa42c0d06c3893acf325346c473455df993d2705ac1f7a3888f1dd74c'
+OBSERVER_PATHS = ['crates/ep_run/examples/ctf10_thermal_history_unit_observer.rs',
+                  'crates/ep_run/examples/ctf10_thermal_history_unit_support/fields.rs']
+API_PATHS = ['crates/ep_run/Cargo.toml', 'crates/ep_runtime/Cargo.toml', 'crates/ep_runtime/src/lib.rs',
+    'crates/ep_runtime/src/heat_balance/mod.rs', 'crates/ep_runtime/src/heat_balance/ctf_thermal_history.rs',
+    'crates/ep_runtime/src/heat_balance/surface_manager.rs', 'crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs',
+    'crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs', 'crates/ep_model/Cargo.toml',
+    'crates/ep_model/src/lib.rs', 'crates/ep_model/src/ids.rs', 'crates/ep_model/src/objects/mod.rs',
+    'crates/ep_model/src/objects/surfaces.rs', 'crates/ep_runtime/examples/clk02_probe_support/digest.rs']
+CASE_KEYS = set('schema record_type case_ordinal operation native_input_event_key actual_input_line_sha256 input_witness status actual_API_invoked unavailable_reason before after actual_context actual_update_route Native_expected_endpoint_values_read Native_return_or_branch_outcome_inferred Native_indices_are_production_Rust_IDs_claimed numerical_PASS_claimed integration_PASS_claimed'.split())
+HEADER_KEYS = set('schema record_type actual_input_cases actual_input_projection runtime_source_bindings authenticated_source_inventory policy projected_case_count full_input_file_SHA_verified_by_candidate full_input_SHA_external_recorder_and_comparer_required Native_expected_endpoint_values_read numerical_PASS_claimed integration_PASS_claimed'.split())
+ENDPOINTS = {'history_selected_initialization_complete': ('initialize', None),
+             'simple_history_hard_copy_complete': ('update', 'SimpleShift'),
+             'history_selected_master_update_complete': ('update', 'MasterHistories')}
+CALLER_RETURN = {'InitThermalAndFluxHistories': 'actual_InitThermalAndFluxHistories_return',
+                 'UpdateThermalHistories': 'actual_UpdateThermalHistories_return'}
+
+
+def read_line(handle, m):
+    raw = handle.readline()
+    m.require(raw.endswith(b'\n') and len(raw) > 1 and b'\r' not in raw, 'One complete nonblank LF-only actual record required')
+    value = json.loads(raw[:-1], object_pairs_hook=m.unique_object, parse_constant=lambda token: m.require(False, 'No non-JSON number'))
+    m.require(type(value) is dict, 'Actual record object required')
+    return raw[:-1], value
+
+
+class Comparison:
+    def __init__(self, m, shape, policy, mismatches):
+        self.m, self.shape, self.policy, self.output = m, shape, policy, mismatches
+        self.counts = Counter(); self.profiles = {name: {'numeric_observations': 0, 'class_observations': 0,
+            'nonfinite_unverified': 0, 'maximum_absolute_error': 0.0, 'absolute_error_overflow': False,
+            'l2_error': 0.0, 'l2_error_overflow': False} for name in policy['real_profiles_by_owner']}
+        self.case = None
+
+    def mismatch(self, path, native, rust, reason):
+        self.counts['mismatches'] += 1
+        self.output.write(json.dumps({'case_ordinal': self.case, 'path': path, 'reason': reason,
+            'Native': native, 'Rust': rust}, ensure_ascii=False, allow_nan=False, separators=(',', ':')).encode('utf8') + b'\n')
+
+    def exact(self, path, a, b):
+        self.counts['exact_observations'] += 1
+        if type(a) is not type(b) or a != b: self.mismatch(path, a, b, 'exact identity/shape/order/copy bits differ')
+
+    def tree(self, path, a, b):
+        if type(a) is dict and type(b) is dict:
+            self.exact(path + '/keys', sorted(a), sorted(b))
+            for key in a.keys() & b.keys(): self.tree(path + '/' + key, a[key], b[key])
+        elif type(a) is list and type(b) is list:
+            self.exact(path + '/length', len(a), len(b))
+            for index, (left, right) in enumerate(zip(a, b)): self.tree(path + '/' + str(index), left, right)
+        else: self.exact(path, a, b)
+
+    def numeric(self, path, name, a, b):
+        if type(a) is list and type(b) is list:
+            self.exact(path + '/length', len(a), len(b))
+            for index, (left, right) in enumerate(zip(a, b)): self.numeric(path + '/' + str(index), name, left, right)
+            return
+        self.shape.scalar(a, self.m.require); self.shape.scalar(b, self.m.require)
+        metric = self.profiles[name]; metric['class_observations'] += 1
+        self.exact(path + '/class', a['value_class'], b['value_class'])
+        left = struct.unpack('>d', bytes.fromhex(a['value_bits']))[0]
+        right = struct.unpack('>d', bytes.fromhex(b['value_bits']))[0]
+        if not math.isfinite(left) or not math.isfinite(right):
+            metric['nonfinite_unverified'] += 1
+            # No NaN arithmetic payload equivalence or absent finite comparison is claimed.
+            return
+        metric['numeric_observations'] += 1
+        difference = abs(left - right)
+        if math.isfinite(difference):
+            metric['maximum_absolute_error'] = max(metric['maximum_absolute_error'], difference)
+            norm = math.hypot(metric['l2_error'], difference)
+            if math.isfinite(norm): metric['l2_error'] = norm
+            else: metric['l2_error_overflow'] = True
+        else: metric['absolute_error_overflow'] = metric['l2_error_overflow'] = True
+        profile = self.policy['real_profiles_by_owner'][name]
+        if difference > profile['atol'] + profile['rtol'] * abs(left): self.mismatch(path, a, b, 'Frozen exact-zero arithmetic profile differs')
+        if left == right == 0.0: self.exact(path + '/signed_zero', a['value_bits'], b['value_bits'])
+
+    def state(self, path, native, rust, retained=()):
+        self.m.require(type(rust) is dict and set(rust) == set(native), 'Complete actual Rust state inventory required')
+        for key in ['schema', 'surface_ids', 'layout', 'update_first_time']: self.tree(path + '/' + key, native[key], rust[key])
+        for group in ['normal', 'masters', 'scratch', 'flux_reports']:
+            left, right = native[group], rust[group]
+            if group in retained:
+                self.tree(path + '/retained_copy_bits/' + group, left, right)
+                continue
+            if left is None or right is None:
+                self.exact(path + '/' + group + '/availability', left is None, right is None)
+                continue
+            self.m.require(type(right) is dict, 'Actual complete owner object required')
+            self.exact(path + '/' + group + '/keys', sorted(left), sorted(right))
+            for name in left.keys() & right.keys():
+                if name == 'SurfCurrNumHist': self.tree(path + '/' + name, left[name], right[name])
+                else: self.numeric(path + '/' + name, name, left[name], right[name])
+
+
+def projection_custody(c, m, args, own_ref, qa, original_refs):
+    refs = {name: m.argument(getattr(args, name.replace('-', '_'))) for name in ['projection', 'projection-execution']}
+    refs['input-cases'] = c.large_argument(m, args.input_cases)
+    value = m.load(refs['projection']); execution = c.recorded(m, refs['projection-execution'])
+    m.require(m.load(execution['stdout']) == value and value['schema'] == 'ctf10-thermal-history-direct-unit-projection.v1' and
+              value['complete_actual_native_event_ledger_validated'] is True and value['Native_expected_endpoint_values_supplied'] is False and
+              value['scientific_values_computed_or_compared'] is False and value['unreached_or_excluded_counted_as_PASS'] is False and
+              value['integration_PASS_claimed'] is False and type(value['projected_case_count']) is int and value['projected_case_count'] > 0,
+              'Genuine preceding complete input-only projection required')
+    for key, ref in [('reviewed_original_data', original_refs['original-data-review']),
+        ('reviewed_original_data_execution', original_refs['original-data-review-execution']), ('actual_packet_freeze', qa['actual_packet_freeze']),
+        ('native_source_preparation', c.NATIVE), ('thermal_history_API_preparation', c.API), ('OriginalQA_source_preparation', c.QA),
+        ('projector_source_preparation', own_ref), ('thermal_history_direct_unit_policy', m.load(qa['actual_packet_freeze'])['thermal_history_direct_unit_policy'])]: c.same(m, value[key], ref)
+    c.same(m, value['input_cases'], refs['input-cases']); c.large(m, value['input_cases'])
+    manifest = m.load(own_ref); sources = manifest['own_sources']; archives = value['executed_projector_sources']
+    m.require(len(sources) == len(archives) == 3, 'Actual executed projector three-source archive required')
+    for source, archive in zip(sources, archives):
+        m.bind(archive['archive']); m.require(archive['historical_path'] == source['path'] and archive['archive']['sha256'] == source['sha256'], 'Projector source archive differs')
+    c.same(m, value['executed_projector_source'], sources[0])
+    command = execution['command']; pairs = list(zip(command[5::2], command[6::2])); options = dict(pairs)
+    m.require(len(command) == 15 and Path(command[0]).name.lower() in ['python', 'python.exe'] and command[1:4] == ['-X', 'utf8', '-B'] and
+              m.contained(command[4]) == m.contained(sources[0]['path']) and len(pairs) == len(options) == 5 and
+              set(options) == {'--approved-source-sha256', '--source-manifest', '--original-data-review', '--original-data-review-execution', '--output-dir'} and
+              options['--approved-source-sha256'] == sources[0]['sha256'] and
+              m.contained(options['--output-dir'], existing=False) == m.contained(refs['projection']['path']).parent, 'Exact genuine projector CLI required')
+    for option, ref in [('source-manifest', own_ref), ('original-data-review', original_refs['original-data-review']),
+                        ('original-data-review-execution', original_refs['original-data-review-execution'])]: c.same(m, m.argument(options['--' + option]), ref)
+    return refs, value, execution
+
+
+def rust_custody(c, m, args, header, projection, projection_refs, qa_execution, projection_execution):
+    refs = {name: m.argument(getattr(args, name.replace('-', '_'))) for name in ['Rust-build-execution', 'Rust-execution']}
+    build = c.recorded(m, refs['Rust-build-execution'])
+    execution = c.recorded(m, refs['Rust-execution'], large_stdout=True, allowed_exit=(0, 2))
+    m.require(c.instant(qa_execution['finished_utc'], m.require) <= c.instant(projection_execution['started_utc'], m.require) and
+              c.instant(projection_execution['finished_utc'], m.require) <= c.instant(build['started_utc'], m.require) and
+              c.instant(build['finished_utc'], m.require) <= c.instant(execution['started_utc'], m.require), 'Actual OriginalQA then projection then Cargo then candidate order required')
+    m.require(m.contained(execution['stderr']['path']).stat().st_size == 0, 'No unreported candidate process failure allowed')
+    m.require(set(header) == HEADER_KEYS and header['schema'] == 'ctf10-thermal-history-unit-observer-results.v1' and header['record_type'] == 'header' and
+              header['full_input_file_SHA_verified_by_candidate'] is False and header['full_input_SHA_external_recorder_and_comparer_required'] is True and
+              header['Native_expected_endpoint_values_read'] is False and header['numerical_PASS_claimed'] is False and header['integration_PASS_claimed'] is False and
+              type(header['projected_case_count']) is int and header['projected_case_count'] == projection['projected_case_count'], 'Exact honest direct-unit candidate header required')
+    c.same(m, header['actual_input_cases'], projection['input_cases']); c.same(m, header['actual_input_projection'], projection_refs['projection'])
+    c.same(m, build['source_snapshot'], execution['source_snapshot'])
+    capture = build['cargo_compiler_artifacts_capture']
+    m.require(build['command'][:2] == ['cargo', 'build'] and capture['requested'] is True and capture['status'] == 'pass' and capture['error'] is None and
+              c.instant(build['finished_utc'], m.require) <= c.instant(capture['captured_utc'], m.require) <= c.instant(execution['started_utc'], m.require),
+              'Actual Cargo compiler-artifact capture required')
+    artifacts = [row for row in capture['rows'] if row['cargo_message']['target']['name'] == 'ctf10_thermal_history_unit_observer' and 'example' in row['cargo_message']['target']['kind']]
+    m.require(len(artifacts) == 1, 'Unique actual candidate example artifact required'); artifact = artifacts[0]; binary = artifact['executable']
+    binary_path = m.contained(binary['historical_path'])
+    def binary_sha():
+        with binary_path.open('rb') as handle: return hashlib.file_digest(handle, 'sha256').hexdigest()
+    command = execution['command']
+    m.require(binary_sha() == binary['sha256'] and len(command) == 6 and m.contained(command[0]) == binary_path, 'Actual executed binary differs from captured Cargo artifact')
+    for value, ref in [(command[1], projection['input_cases']), (command[3], projection_refs['projection']), (command[5], header['runtime_source_bindings'])]:
+        m.require(m.contained(value) == m.contained(ref['path']), 'Input-only candidate argv path differs')
+    m.require(command[2] == projection['input_cases']['sha256'] and command[4] == projection_refs['projection']['sha256'], 'Candidate input-only argv hashes differ')
+    inventory = m.load(header['runtime_source_bindings']); snapshot = m.load(build['source_snapshot'])
+    m.require(inventory == header['authenticated_source_inventory'] and inventory['schema'] == 'ctf10-thermal-history-unit-runtime-source-bindings.v1' and
+              set(inventory) == {'schema', 'observer_sources', 'actual_public_API_sources'} and snapshot['schema'] == 'rust-command-source-snapshot.v1' and
+              snapshot['bytes_normalized'] is False, 'Actual full raw Cargo source capture and inventory required')
+    available = {row['historical_path']: row['archive'] for row in snapshot['files']}
+    m.require(len(available) == len(snapshot['files']), 'Unique actual captured Source paths required')
+    for key, paths in [('observer_sources', OBSERVER_PATHS), ('actual_public_API_sources', API_PATHS)]:
+        m.require([row['path'] for row in inventory[key]] == paths, 'Actual source inventory paths/order differ')
+        for binding in inventory[key]:
+            m.bind(binding); m.bind(available[binding['path']]); m.require(binding['sha256'] == available[binding['path']]['sha256'], 'Compiled source differs from actual observer binding')
+    m.require(m.contained(artifact['cargo_message']['target']['src_path']) == m.contained(OBSERVER_PATHS[0]) and
+              m.contained(artifact['cargo_message']['manifest_path']) == m.contained(API_PATHS[0]), 'Actual Cargo target/package Source differs')
+    m.bind(c.OBSERVER)
+    return refs, execution, binary, binary_sha, build['source_snapshot'], inventory
+
+
+def run(args):
+    common = PREP / 'history_unit_common.py'
+    if hashlib.sha256(common.read_bytes()).hexdigest() != COMMON_SHA: raise ValueError('Held helper differs before import')
+    spec = importlib.util.spec_from_file_location('history_compare_common', common)
+    c = importlib.util.module_from_spec(spec); spec.loader.exec_module(c)
+    m, shape, stream = c.modules(); own_ref, own_paths = c.own(m, args, Path(__file__))
+    original_refs, qa, qa_execution, freeze, policy_ref, policy = c.original(m, args)
+    projection_refs, projection, projection_execution = projection_custody(c, m, args, own_ref, qa, original_refs)
+    # Large direct files are authenticated without imposing a new line/event/run cap.
+    rust_ref = c.large_argument(m, args.Rust_results); rust_path = m.contained(rust_ref['path'])
+    output = m.contained(args.output_dir, existing=False)
+    m.require(output.is_relative_to(m.CTF) and output != m.CTF and not output.exists(), 'Fresh contained comparison output required')
+    output.mkdir(parents=True, exist_ok=False)
+    pending, returns = {}, {}; actual = Counter(); statuses = Counter()
+    started = datetime.now(timezone.utc).isoformat()
+    with m.contained(projection['input_cases']['path']).open('rb') as cases, rust_path.open('rb') as rust, \
+         (output / 'mismatches.ndjson').open('xb') as mismatches, (output / 'case-ledger.ndjson').open('xb') as ledger:
+        _, header = read_line(rust, m)
+        rust_refs, rust_execution, binary, binary_sha, snapshot_ref, inventory = rust_custody(c, m, args, header, projection, projection_refs, qa_execution, projection_execution)
+        c.same(m, rust_execution['stdout'], rust_ref); m.require(header['policy'] == policy, 'Candidate pre-output frozen17 policy differs')
+        comparison = Comparison(m, shape, policy, mismatches)
+        def visit(event):
+            key = (event['clock']['state_address'], event['procedure'], event['invocation_ordinal']); checkpoint = event['checkpoint']
+            if checkpoint in c.INPUTS:
+                mismatches_on_entry = comparison.counts['mismatches']
+                actual['cases'] += 1; ordinal = actual['cases']; raw, supplied = read_line(cases, m)
+                m.require(raw == c.line(c.case(event, ordinal)) and supplied == c.case(event, ordinal), 'Complete projected preevent bytes differ from genuine Native input')
+                _, result = read_line(rust, m)
+                m.require(set(result) == CASE_KEYS and result['schema'] == 'ctf10-thermal-history-direct-unit-result.v1' and result['record_type'] == 'case' and
+                          type(result['case_ordinal']) is int and result['case_ordinal'] == ordinal and result['operation'] == c.INPUTS[checkpoint] and result['native_input_event_key'] == c.event_key(event) and
+                          result['input_witness'] == event and result['actual_input_line_sha256'] == hashlib.sha256(raw).hexdigest(), 'Exact case/line/input witness/actual event association required')
+                for name in ['Native_expected_endpoint_values_read', 'Native_return_or_branch_outcome_inferred', 'Native_indices_are_production_Rust_IDs_claimed', 'numerical_PASS_claimed', 'integration_PASS_claimed']:
+                    m.require(result[name] is False, 'Candidate must preserve direct-unit/no-Native-answer/no-PASS scope')
+                status = result['status']; m.require(status in ['source-returned', 'typed-unavailable-returned', 'input-unrepresentable'], 'Actual typed candidate outcome required')
+                statuses[status] += 1
+                m.require(type(result['actual_API_invoked']) is bool and result['actual_API_invoked'] == (status != 'input-unrepresentable'), 'Actual invocation availability differs')
+                if status == 'input-unrepresentable':
+                    m.require(result['before'] is result['after'] is result['actual_context'] is result['actual_update_route'] is None and
+                              type(result['unavailable_reason']) is str and result['unavailable_reason'], 'Unrepresentable inputs cannot fabricate state/call/outcome')
+                else:
+                    actual['API_invocations'] += 1; comparison.case = ordinal
+                    comparison.tree('before', c.state(event, m.require), result['before'])
+                    comparison.tree('actual_context', c.context(event, m.require), result['actual_context'])
+                    if status == 'source-returned': m.require(result['unavailable_reason'] is None, 'Returned API has no unavailable reason')
+                    else:
+                        m.require(type(result['unavailable_reason']) is str and result['unavailable_reason'] and result['actual_update_route'] is None, 'Actual API error remains typed unavailable')
+                        # The accepted API's typed guard errors precede its first writes.
+                        comparison.tree('typed_unavailable_retained_state', result['before'], result['after'])
+                m.require(key not in pending, 'Duplicate actual input invocation')
+                pending[key] = {'ordinal': ordinal, 'input': event, 'result': result, 'endpoint': None, 'normal_exit': None,
+                                'mismatches_on_entry': mismatches_on_entry, 'nonfinite_on_entry': sum(row['nonfinite_unverified'] for row in comparison.profiles.values())}
+            elif checkpoint in ENDPOINTS:
+                m.require(key in pending and pending[key]['endpoint'] is None, 'Selected endpoint requires one actual same-invocation input')
+                row = pending[key]; operation, route = ENDPOINTS[checkpoint]
+                m.require(operation == row['result']['operation'], 'Actual selected endpoint procedure differs')
+                row['endpoint'] = event
+                if row['result']['status'] == 'source-returned':
+                    comparison.case = row['ordinal']; comparison.exact('actual_update_route', route, row['result']['actual_update_route'])
+                    after = c.state(event, m.require)
+                    before = c.state(row['input'], m.require); rust_before = row['result']['before']; rust_after = row['result']['after']
+                    retained = ['scratch', 'flux_reports'] if operation == 'initialize' else []
+                    if operation == 'initialize' and row['input']['clock']['SimpleCTFOnly'] and not row['input']['clock']['AnyEMS']: retained.append('masters')
+                    if route == 'SimpleShift':
+                        retained.append('masters')
+                        if not row['input']['clock']['UpdateThermalHistoriesFirstTimeFlag']: retained.append('scratch')
+                    comparison.state('after', after, row['result']['after'], retained)
+                    for group in retained:
+                        comparison.tree('Native_retained/' + group, before[group], after[group])
+                        comparison.tree('Rust_retained/' + group, rust_before[group], rust_after[group])
+                        comparison.tree('retained_copy_bits/' + group, after[group], rust_after[group])
+            elif checkpoint in ['scope_normal_exit', 'scope_unwinding'] and key in pending:
+                row = pending[key]
+                m.require(checkpoint == 'scope_normal_exit' and row['endpoint'] is not None and row['normal_exit'] is None,
+                          'Missing selected endpoint or stopped invocation never PASS')
+                row['normal_exit'] = event
+                parent = (event['clock']['state_address'], event['parent_procedure'], event['parent_invocation_ordinal'], CALLER_RETURN[event['procedure']])
+                m.require(parent not in returns, 'Duplicate unresolved actual caller return'); returns[parent] = key
+            parent_key = (*key, checkpoint)
+            if parent_key in returns:
+                key = returns.pop(parent_key); row = pending.pop(key); result = row['result']; actual['caller_return_joins'] += 1
+                nonfinite = sum(value['nonfinite_unverified'] for value in comparison.profiles.values()) - row['nonfinite_on_entry']
+                matched = result['status'] == 'source-returned' and comparison.counts['mismatches'] == row['mismatches_on_entry'] and nonfinite == 0
+                actual['paired_available_cases'] += int(result['status'] == 'source-returned'); actual['matched_available_cases'] += int(matched)
+                ledger.write(c.line({'case_ordinal': row['ordinal'], 'operation': result['operation'], 'Native_input': c.event_key(row['input']),
+                    'Native_selected_complete': c.event_key(row['endpoint']), 'Native_normal_exit': c.event_key(row['normal_exit']),
+                    'Native_caller_return': c.event_key(event), 'Rust_status': result['status'], 'Rust_unavailable_reason': result['unavailable_reason'],
+                    'selected_available_case_matched': matched, 'unavailable_or_nonfinite_counted_as_PASS': False,
+                    'integration_PASS_claimed': False}) + b'\n')
+        counts = c.review_stream(m, shape, stream, qa, visit)
+        m.require(not pending and not returns and cases.read(1) == b'' and actual['cases'] == projection['projected_case_count'] and
+                  counts == projection['actual_observation_counts'], 'All actual cases/return joins/projected suffix required')
+        _, summary = read_line(rust, m); m.require(rust.read(1) == b'', 'No unreviewed candidate suffix allowed')
+        expected = {'schema': 'ctf10-thermal-history-unit-observer-summary.v1', 'record_type': 'summary',
+            'actual_case_count': actual['cases'], 'actual_API_invocation_count': actual['API_invocations'], 'actual_source_return_count': statuses['source-returned'],
+            'input_unrepresentable_count': statuses['input-unrepresentable'], 'typed_unavailable_count': statuses['typed-unavailable-returned'],
+            'all_projected_cases_consumed': True, 'all_projected_calls_returned_available': statuses['source-returned'] == actual['cases'],
+            'metadata_and_sources_unchanged': True, 'full_input_file_SHA_verified_by_candidate': False,
+            'unavailable_or_unreached_counted_as_PASS': False, 'numerical_PASS_claimed': False, 'integration_PASS_claimed': False}
+        m.require(set(summary) == set(expected) and all(type(summary[key]) is type(value) and summary[key] == value for key, value in expected.items()) and
+                  rust_execution['exit_code'] == (0 if expected['all_projected_calls_returned_available'] else 2), 'Exact honest candidate summary/process availability differs')
+    passed = actual['cases'] > 0 and actual['matched_available_cases'] == actual['cases'] and comparison.counts['mismatches'] == 0
+    for value in comparison.profiles.values():
+        value['profile_observed'] = value['class_observations'] > 0
+        value['unobserved_profile_counted_as_PASS'] = False
+        if value['absolute_error_overflow']: value['maximum_absolute_error'] = None
+        if value['l2_error_overflow']: value['l2_error'] = None
+    sources = [m.archive(m.identity(path), output, index) for index, path in enumerate(own_paths)]
+    report = {'schema': 'ctf10-selected-thermal-history-direct-unit-comparison.v1',
+        'status': 'pass-available-same-input-selected-history-calls' if passed else 'fail-or-unverified-selected-history-calls',
+        'started_utc': started, 'finished_utc': datetime.now(timezone.utc).isoformat(),
+        'reviewed_Original_data_review': original_refs['original-data-review'], 'reviewed_Original_data_review_execution': original_refs['original-data-review-execution'],
+        'reviewed_Native_results': qa['reviewed_results'], 'reviewed_Native_execution': qa['reviewed_native_execution'],
+        'actual_packet_freeze': qa['actual_packet_freeze'], 'thermal_history_direct_unit_policy': policy_ref, 'reviewed_policy': policy,
+        'reviewed_projection': projection_refs['projection'], 'reviewed_projection_execution': projection_refs['projection-execution'], 'reviewed_input_cases': projection['input_cases'],
+        'Rust_results': rust_ref, 'Rust_execution': rust_refs['Rust-execution'], 'Rust_build_execution': rust_refs['Rust-build-execution'],
+        'actual_Rust_binary': binary, 'actual_source_snapshot': snapshot_ref, 'actual_source_inventory': inventory,
+        'Native_source_preparation': m.bind(c.NATIVE), 'Rust_observer_source_preparation': m.bind(c.OBSERVER), 'thermal_history_API_preparation': m.bind(c.API),
+        'actual_Native_observation_counts': counts, 'actual_case_counts': dict(actual), 'actual_Rust_status_counts': dict(statuses),
+        'comparison_counts': dict(comparison.counts), 'profiles': comparison.profiles,
+        'complete_case_ledger': m.identity(output / 'case-ledger.ndjson', max_bytes=(output / 'case-ledger.ndjson').stat().st_size),
+        'complete_mismatch_ledger': m.identity(output / 'mismatches.ndjson', max_bytes=(output / 'mismatches.ndjson').stat().st_size),
+        'executed_reader_sources': sources, 'reviewed_reader_source_preparation': own_ref,
+        'selected_available_direct_unit_calls_PASS_claimed': passed, 'complete_history_state_or_production_PASS_claimed': False,
+        'unobserved_general_master_branch_PASS_claimed': False, 'unavailable_or_unreached_counted_as_PASS': False,
+        'Native_equations_or_branch_outcomes_recomputed': False, 'Native_expected_endpoint_values_supplied_to_Rust': False,
+        'all_actual_events_and_projected_cases_consumed': True, 'sampling_or_event_caps_used': False,
+        'full_input_SHA_externally_verified': True, 'arithmetic_NaN_payload_equivalence_claimed': False,
+        'integration_PASS_claimed': False, 'full_card_PASS_claimed': False, 'gates_updated': False}
+    m.recheck(); c.large(m, projection['input_cases']); c.large(m, rust_ref); m.require(binary_sha() == binary['sha256'], 'Actual Rust binary changed')
+    m.emit(output / 'comparison.json', report); m.recheck(); c.large(m, projection['input_cases']); c.large(m, rust_ref)
+    print(json.dumps(report, ensure_ascii=False, allow_nan=False, indent=2))
+    return 0 if passed else 1
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['approved-source-sha256', 'source-manifest', 'original-data-review', 'original-data-review-execution',
+                 'projection', 'projection-execution', 'input-cases', 'Rust-build-execution', 'Rust-execution', 'Rust-results', 'output-dir']:
+        parser.add_argument('--' + name, required=True)
+    raise SystemExit(run(parser.parse_args()))
