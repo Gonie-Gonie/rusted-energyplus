@@ -1,0 +1,267 @@
+--- accepted-literal/crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs
++++ actual-formatted/crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs
+@@ -7,8 +7,8 @@
+ use super::zone_air_initialization::ZoneAirInitializationState;
+ use crate::psychrometrics::{
+     EnergyPlusPsychrometricFunction, EnergyPlusPsychrometricOperation,
+-    EnergyPlusPsychrometricsState, energyplus_psy_h_fn_tdb_w,
+-    energyplus_psy_hg_air_fn_w_tdb, energyplus_psy_rho_air_fn_pb_tdb_w,
++    EnergyPlusPsychrometricsState, energyplus_psy_h_fn_tdb_w, energyplus_psy_hg_air_fn_w_tdb,
++    energyplus_psy_rho_air_fn_pb_tdb_w,
+ };
+ 
+ /// Actual allocated node row, in the source's one-based allocation order.
+@@ -114,55 +114,124 @@
+     nodes: &[ZoneHumidityNode],
+ ) -> Result<i32, ZoneHumidityCorrectionUnavailable> {
+     use ZoneHumidityCorrectionUnavailable::Scope;
+-    if context.zone_id <= 0 || context.space_id != 0 || context.zone_name.is_empty()
+-        || context.solution_algorithm != 0 || context.room_air_model != 1
+-        || context.do_space_heat_balance || context.do_latent_sizing
+-        || context.is_return_plenum || context.is_supply_plenum
+-        || context.leakage_parallel_piu_count != 0 || context.afn_control_type != 0
+-        || context.afn_multizone_always_simulated || context.afn_fan_activated
+-        || context.afn_distribution_simulated || context.duct_loss_simulated || context.hybrid_model
++    if context.zone_id <= 0
++        || context.space_id != 0
++        || context.zone_name.is_empty()
++        || context.solution_algorithm != 0
++        || context.room_air_model != 1
++        || context.do_space_heat_balance
++        || context.do_latent_sizing
++        || context.is_return_plenum
++        || context.is_supply_plenum
++        || context.leakage_parallel_piu_count != 0
++        || context.afn_control_type != 0
++        || context.afn_multizone_always_simulated
++        || context.afn_fan_activated
++        || context.afn_distribution_simulated
++        || context.duct_loss_simulated
++        || context.hybrid_model
+     {
+-        return Err(Scope("zone-only mixed ThirdOrder without excluded routes required"));
++        return Err(Scope(
++            "zone-only mixed ThirdOrder without excluded routes required",
++        ));
+     }
+     if context.multiplier < 1 || context.list_multiplier < 1 {
+         return Err(Scope("positive Original integer multipliers required"));
+     }
+-    let zone_mult = context.multiplier.checked_mul(context.list_multiplier)
+-        .ok_or(Scope("Original int multiplier product is not representable"))?;
+-    let physical = [context.volume, context.moisture_capacitance_multiplier,
+-        context.outdoor_pressure, context.time_step_sys_seconds];
++    let zone_mult = context
++        .multiplier
++        .checked_mul(context.list_multiplier)
++        .ok_or(Scope(
++            "Original int multiplier product is not representable",
++        ))?;
++    let physical = [
++        context.volume,
++        context.moisture_capacitance_multiplier,
++        context.outdoor_pressure,
++        context.time_step_sys_seconds,
++    ];
+     if physical.iter().any(|v| !v.is_finite() || *v <= 0.0)
+-        || [context.outdoor_humidity_ratio,context.time_step_sys,context.time_step_zone]
+-            .iter().any(|v| !v.is_finite())
++        || [
++            context.outdoor_humidity_ratio,
++            context.time_step_sys,
++            context.time_step_zone,
++        ]
++        .iter()
++        .any(|v| !v.is_finite())
+     {
+-        return Err(Scope("finite declared positive capacity/pressure/seconds required"));
+-    }
+-    let retained = [state.zt,state.mat,state.ztav,state.air_hum_rat,state.air_hum_rat_avg,
+-        state.air_hum_rat_temp,state.w1,state.wmx,state.wm2,state.w_time_minus_p,state.air_rel_hum];
+-    if retained.iter().chain(state.w_prev_zone_ts.iter()).chain(state.dsw_prev_zone_ts.iter())
+-        .chain(state.w_prev_zone_ts_temp.iter()).any(|v| !v.is_finite())
++        return Err(Scope(
++            "finite declared positive capacity/pressure/seconds required",
++        ));
++    }
++    let retained = [
++        state.zt,
++        state.mat,
++        state.ztav,
++        state.air_hum_rat,
++        state.air_hum_rat_avg,
++        state.air_hum_rat_temp,
++        state.w1,
++        state.wmx,
++        state.wm2,
++        state.w_time_minus_p,
++        state.air_rel_hum,
++    ];
++    if retained
++        .iter()
++        .chain(state.w_prev_zone_ts.iter())
++        .chain(state.dsw_prev_zone_ts.iter())
++        .chain(state.w_prev_zone_ts_temp.iter())
++        .any(|v| !v.is_finite())
+     {
+-        return Err(Scope("finite independently supplied state and all four history slots required"));
+-    }
+-    let zero = [sources.oamfl,sources.vamfl,sources.ctmfl,sources.eamfl,sources.eamfl_x_hum_rat,
+-        sources.sum_hm_ara,sources.sum_hm_ara_w,sources.mixing_mass_flow_zone,
+-        sources.mixing_mass_flow_x_hum_rat,sources.m_dot_oa,sources.latent_gain,
+-        sources.latent_gain_except_people,sources.sum_latent_ht_rad_sys,sources.sum_latent_pool];
++        return Err(Scope(
++            "finite independently supplied state and all four history slots required",
++        ));
++    }
++    let zero = [
++        sources.oamfl,
++        sources.vamfl,
++        sources.ctmfl,
++        sources.eamfl,
++        sources.eamfl_x_hum_rat,
++        sources.sum_hm_ara,
++        sources.sum_hm_ara_w,
++        sources.mixing_mass_flow_zone,
++        sources.mixing_mass_flow_x_hum_rat,
++        sources.m_dot_oa,
++        sources.latent_gain,
++        sources.latent_gain_except_people,
++        sources.sum_latent_ht_rad_sys,
++        sources.sum_latent_pool,
++    ];
+     if zero.iter().any(|v| *v != 0.0) {
+-        return Err(Scope("actual excluded OA/latent/surface/mixing operands must be zero"));
+-    }
+-    if nodes.len() > i32::MAX as usize || context.inlet_node_ids.len() > i32::MAX as usize
++        return Err(Scope(
++            "actual excluded OA/latent/surface/mixing operands must be zero",
++        ));
++    }
++    if nodes.len() > i32::MAX as usize
++        || context.inlet_node_ids.len() > i32::MAX as usize
+         || (!context.is_controlled && !context.inlet_node_ids.is_empty())
+     {
+-        return Err(Scope("source-sized ordered allocation and controlled inlet owner required"));
+-    }
+-    for (index,node) in nodes.iter().enumerate() {
++        return Err(Scope(
++            "source-sized ordered allocation and controlled inlet owner required",
++        ));
++    }
++    for (index, node) in nodes.iter().enumerate() {
+         if node.node_id != (index + 1) as i32
+-            || [node.mass_flow_rate,node.temperature,node.humidity_ratio,node.enthalpy]
+-                .iter().any(|v| !v.is_finite())
+-            || node.mass_flow_rate < 0.0 || node.humidity_ratio < 0.0
++            || [
++                node.mass_flow_rate,
++                node.temperature,
++                node.humidity_ratio,
++                node.enthalpy,
++            ]
++            .iter()
++            .any(|v| !v.is_finite())
++            || node.mass_flow_rate < 0.0
++            || node.humidity_ratio < 0.0
+         {
+-            return Err(Scope("contiguous actual nodes with finite nonnegative mass/W required"));
++            return Err(Scope(
++                "contiguous actual nodes with finite nonnegative mass/W required",
++            ));
+         }
+     }
+     let mut seen = std::collections::BTreeSet::new();
+@@ -173,7 +242,9 @@
+     }
+     let id = context.system_zone_node_number;
+     if id < 0 || id as usize > nodes.len() || (id > 0 && seen.contains(&id)) {
+-        return Err(Scope("allocated feedback node distinct from declared inlets required"));
++        return Err(Scope(
++            "allocated feedback node distinct from declared inlets required",
++        ));
+     }
+     Ok(zone_mult)
+ }
+@@ -190,48 +261,64 @@
+     nodes: &mut [ZoneHumidityNode],
+     psychrometrics: &mut EnergyPlusPsychrometricsState,
+ ) -> Result<ZoneHumidityCorrectionCall, ZoneHumidityCorrectionUnavailable> {
+-    let zone_mult = validate(state,sources,context,nodes)?;
++    let zone_mult = validate(state, sources, context, nodes)?;
+     let mut moisture_mass_flow_rate = 0.0;
+     let mut zone_mass_flow_rate = 0.0;
+     if context.is_controlled {
+         for &id in &context.inlet_node_ids {
+             let inlet = &nodes[(id - 1) as usize];
+-            moisture_mass_flow_rate += (inlet.mass_flow_rate * inlet.humidity_ratio) / f64::from(zone_mult);
++            moisture_mass_flow_rate +=
++                (inlet.mass_flow_rate * inlet.humidity_ratio) / f64::from(zone_mult);
+             zone_mass_flow_rate += inlet.mass_flow_rate / f64::from(zone_mult);
+         }
+     }
+     let latent_gain = sources.latent_gain + sources.sum_latent_ht_rad_sys + sources.sum_latent_pool;
+-    let rho_air = energyplus_psy_rho_air_fn_pb_tdb_w(context.outdoor_pressure,state.zt,state.air_hum_rat);
++    let rho_air =
++        energyplus_psy_rho_air_fn_pb_tdb_w(context.outdoor_pressure, state.zt, state.air_hum_rat);
+     if rho_air < 0.0 {
+         // EP_psych_errors invokes a stateful diagnostic/fatal path here. The
+         // existing Rust density owner does not implement that backend.
+         return Err(ZoneHumidityCorrectionUnavailable::NegativeDensityDiagnostic);
+     }
+-    let h2o_ht_of_vap = energyplus_psy_hg_air_fn_w_tdb(state.air_hum_rat,state.zt);
++    let h2o_ht_of_vap = energyplus_psy_hg_air_fn_w_tdb(state.air_hum_rat, state.zt);
+     let b = (latent_gain / h2o_ht_of_vap)
+         + ((sources.oamfl + sources.vamfl + sources.ctmfl) * context.outdoor_humidity_ratio)
+-        + sources.eamfl_x_hum_rat + moisture_mass_flow_rate + sources.sum_hm_ara_w
+-        + sources.mixing_mass_flow_x_hum_rat + sources.m_dot_oa * context.outdoor_humidity_ratio;
+-    let a = zone_mass_flow_rate + sources.oamfl + sources.vamfl + sources.eamfl
+-        + sources.ctmfl + sources.sum_hm_ara + sources.mixing_mass_flow_zone + sources.m_dot_oa;
+-    let c = rho_air * context.volume * context.moisture_capacitance_multiplier / context.time_step_sys_seconds;
+-    state.air_hum_rat_temp =
+-        (b + c * (3.0 * state.w_prev_zone_ts_temp[0]
+-            - (3.0 / 2.0) * state.w_prev_zone_ts_temp[1]
+-            + (1.0 / 3.0) * state.w_prev_zone_ts_temp[2])) / ((11.0 / 6.0) * c + a);
++        + sources.eamfl_x_hum_rat
++        + moisture_mass_flow_rate
++        + sources.sum_hm_ara_w
++        + sources.mixing_mass_flow_x_hum_rat
++        + sources.m_dot_oa * context.outdoor_humidity_ratio;
++    let a = zone_mass_flow_rate
++        + sources.oamfl
++        + sources.vamfl
++        + sources.eamfl
++        + sources.ctmfl
++        + sources.sum_hm_ara
++        + sources.mixing_mass_flow_zone
++        + sources.m_dot_oa;
++    let c = rho_air * context.volume * context.moisture_capacitance_multiplier
++        / context.time_step_sys_seconds;
++    state.air_hum_rat_temp = (b + c
++        * (3.0 * state.w_prev_zone_ts_temp[0] - (3.0 / 2.0) * state.w_prev_zone_ts_temp[1]
++            + (1.0 / 3.0) * state.w_prev_zone_ts_temp[2]))
++        / ((11.0 / 6.0) * c + a);
+     if state.air_hum_rat_temp < 0.0 {
+         state.air_hum_rat_temp = 0.0;
+     }
+-    let saturation_call = psychrometrics.evaluate(
+-        EnergyPlusPsychrometricFunction::WFromRh,&[state.zt,1.0,context.outdoor_pressure],
+-    ).map_err(ZoneHumidityCorrectionUnavailable::PsychrometricInterface)?;
++    let saturation_call = psychrometrics
++        .evaluate(
++            EnergyPlusPsychrometricFunction::WFromRh,
++            &[state.zt, 1.0, context.outdoor_pressure],
++        )
++        .map_err(ZoneHumidityCorrectionUnavailable::PsychrometricInterface)?;
+     if state.air_hum_rat_temp > saturation_call.result {
+         state.air_hum_rat_temp = saturation_call.result;
+     }
+     let id = context.system_zone_node_number;
+     if id > 0 {
+         nodes[(id - 1) as usize].humidity_ratio = state.air_hum_rat_temp;
+-        nodes[(id - 1) as usize].enthalpy = energyplus_psy_h_fn_tdb_w(state.zt,state.air_hum_rat_temp);
++        nodes[(id - 1) as usize].enthalpy =
++            energyplus_psy_h_fn_tdb_w(state.zt, state.air_hum_rat_temp);
+     }
+     Ok(ZoneHumidityCorrectionCall {
+         zone_id: context.zone_id,

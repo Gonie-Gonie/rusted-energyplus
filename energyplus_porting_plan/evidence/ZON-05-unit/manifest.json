@@ -1,0 +1,2460 @@
+{
+  "schema": "zon05-selected-actual-unit-evidence.v1",
+  "created_utc": "2026-10-11T03:03:45.570712+00:00",
+  "selected_files": [
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/68/688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27",
+        "sha256": "688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27",
+        "size_bytes": 1610289
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/RAD-01-unit/objects/688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27",
+        "sha256": "688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27",
+        "size_bytes": 1610289
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+        "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+        "size_bytes": 8125
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-01-unit/objects/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+        "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+        "size_bytes": 8125
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/compress-retained-original-01.py",
+        "sha256": "3da73eff0f235e0b7cfcb809ac40944f576d216e957aacc25d88c44f118130e3",
+        "size_bytes": 2817
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/3da73eff0f235e0b7cfcb809ac40944f576d216e957aacc25d88c44f118130e3",
+        "sha256": "3da73eff0f235e0b7cfcb809ac40944f576d216e957aacc25d88c44f118130e3",
+        "size_bytes": 2817
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/after/compile-row-correspondence.json",
+        "sha256": "75526f3771635064f81c60fd976f61d4bd16df74811d31fc1a546d0e0ddad163",
+        "size_bytes": 59263
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/75526f3771635064f81c60fd976f61d4bd16df74811d31fc1a546d0e0ddad163",
+        "sha256": "75526f3771635064f81c60fd976f61d4bd16df74811d31fc1a546d0e0ddad163",
+        "size_bytes": 59263
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/after/compile_commands.json",
+        "sha256": "251fc06218a9f2c9b1f963d4a2fcd34574ea3f895f3b914d5d81dd37e89c12b3",
+        "size_bytes": 3836000
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/251fc06218a9f2c9b1f963d4a2fcd34574ea3f895f3b914d5d81dd37e89c12b3",
+        "sha256": "251fc06218a9f2c9b1f963d4a2fcd34574ea3f895f3b914d5d81dd37e89c12b3",
+        "size_bytes": 3836000
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/after/derivation-command-authority.json",
+        "sha256": "99e3c7f692b94c18cc53533be9417b7aa5cdb78db65f47adbe22d65a180e12c9",
+        "size_bytes": 541
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/99e3c7f692b94c18cc53533be9417b7aa5cdb78db65f47adbe22d65a180e12c9",
+        "sha256": "99e3c7f692b94c18cc53533be9417b7aa5cdb78db65f47adbe22d65a180e12c9",
+        "size_bytes": 541
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/before/compile_commands.json",
+        "sha256": "2a129ce55c110294b04e49470322e0f743a662d44f6a5ea1b2e0237bf64ce497",
+        "size_bytes": 3810316
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-original-baseline/objects/2a129ce55c110294b04e49470322e0f743a662d44f6a5ea1b2e0237bf64ce497",
+        "sha256": "2a129ce55c110294b04e49470322e0f743a662d44f6a5ea1b2e0237bf64ce497",
+        "size_bytes": 3810316
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/before/preservation.json",
+        "sha256": "ba3c8d6b70df7e63552cd80cbfa8be0b84221fa15ce9718dc30eb47adbf80bb4",
+        "size_bytes": 191372
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/ba3c8d6b70df7e63552cd80cbfa8be0b84221fa15ce9718dc30eb47adbf80bb4",
+        "sha256": "ba3c8d6b70df7e63552cd80cbfa8be0b84221fa15ce9718dc30eb47adbf80bb4",
+        "size_bytes": 191372
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/derivation/derive_native_helper.py",
+        "sha256": "3b39cc4562943692e43e11e4d2d7e1bc70f84a58e09c0fea28c0b85b8e905dcf",
+        "size_bytes": 12713
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/3b39cc4562943692e43e11e4d2d7e1bc70f84a58e09c0fea28c0b85b8e905dcf",
+        "sha256": "3b39cc4562943692e43e11e4d2d7e1bc70f84a58e09c0fea28c0b85b8e905dcf",
+        "size_bytes": 12713
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/derivation/derived-pe.json",
+        "sha256": "93fcbaff638a499e6069e2f55df9bf3f41727d23afbb9022aebfcebc0183973a",
+        "size_bytes": 11815
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/93fcbaff638a499e6069e2f55df9bf3f41727d23afbb9022aebfcebc0183973a",
+        "sha256": "93fcbaff638a499e6069e2f55df9bf3f41727d23afbb9022aebfcebc0183973a",
+        "size_bytes": 11815
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/derivation/native_pe.py",
+        "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+        "size_bytes": 20217
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+        "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+        "size_bytes": 20217
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/derivation/original-after-pe.json",
+        "sha256": "6a22c2fe93cf8b484fbf55d9da254e51d2adb44f360292160763fb50cfb6442f",
+        "size_bytes": 15579
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/6a22c2fe93cf8b484fbf55d9da254e51d2adb44f360292160763fb50cfb6442f",
+        "sha256": "6a22c2fe93cf8b484fbf55d9da254e51d2adb44f360292160763fb50cfb6442f",
+        "size_bytes": 15579
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/derivation/original-before-pe.json",
+        "sha256": "6a22c2fe93cf8b484fbf55d9da254e51d2adb44f360292160763fb50cfb6442f",
+        "size_bytes": 15579
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/6a22c2fe93cf8b484fbf55d9da254e51d2adb44f360292160763fb50cfb6442f",
+        "sha256": "6a22c2fe93cf8b484fbf55d9da254e51d2adb44f360292160763fb50cfb6442f",
+        "size_bytes": 15579
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/derivation/pe-comparison.json",
+        "sha256": "a590f64ac1cbb48ebf83268eb16a1a99f84fe76c3360b90325dd860a206e6814",
+        "size_bytes": 4634
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/a590f64ac1cbb48ebf83268eb16a1a99f84fe76c3360b90325dd860a206e6814",
+        "sha256": "a590f64ac1cbb48ebf83268eb16a1a99f84fe76c3360b90325dd860a206e6814",
+        "size_bytes": 4634
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/derivation/receipt.json",
+        "sha256": "db50a2e16e95111d70848aefdcf6677103c72a02246d74cb1f584c66f8c06f47",
+        "size_bytes": 12613
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/db50a2e16e95111d70848aefdcf6677103c72a02246d74cb1f584c66f8c06f47",
+        "sha256": "db50a2e16e95111d70848aefdcf6677103c72a02246d74cb1f584c66f8c06f47",
+        "size_bytes": 12613
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/derivation/strip-command.json",
+        "sha256": "a7c1176a65aed41031991a01415bd2fdfe448aad4470ec864f58ab6e273ab11b",
+        "size_bytes": 1094
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/a7c1176a65aed41031991a01415bd2fdfe448aad4470ec864f58ab6e273ab11b",
+        "sha256": "a7c1176a65aed41031991a01415bd2fdfe448aad4470ec864f58ab6e273ab11b",
+        "size_bytes": 1094
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/derivation/strip-stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/derivation/strip-stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/derivation/tool-audit.json",
+        "sha256": "5377a49adb9929b5779219689e4ef951197bfd53f2a07f805196c2f2bbf2da5f",
+        "size_bytes": 59343
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/5377a49adb9929b5779219689e4ef951197bfd53f2a07f805196c2f2bbf2da5f",
+        "sha256": "5377a49adb9929b5779219689e4ef951197bfd53f2a07f805196c2f2bbf2da5f",
+        "size_bytes": 59343
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/derivation/tool-help-receipt.json",
+        "sha256": "33575e30a7199de605ea8f8db4030a27fdb519d44b28d4fca2010925a519a45a",
+        "size_bytes": 2029
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/33575e30a7199de605ea8f8db4030a27fdb519d44b28d4fca2010925a519a45a",
+        "sha256": "33575e30a7199de605ea8f8db4030a27fdb519d44b28d4fca2010925a519a45a",
+        "size_bytes": 2029
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/derivation/tool-publisher-receipt.json",
+        "sha256": "ddc475481139ca95fc520c47bb326bd996ac377919d3fb1a634c8baaca334ab9",
+        "size_bytes": 2249
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/ddc475481139ca95fc520c47bb326bd996ac377919d3fb1a634c8baaca334ab9",
+        "sha256": "ddc475481139ca95fc520c47bb326bd996ac377919d3fb1a634c8baaca334ab9",
+        "size_bytes": 2249
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/native-build.json",
+        "sha256": "5384861acb91c1be5ca312db3efd9bd01ad76eed412ee834a991baec9d64eb79",
+        "size_bytes": 5910
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/5384861acb91c1be5ca312db3efd9bd01ad76eed412ee834a991baec9d64eb79",
+        "sha256": "5384861acb91c1be5ca312db3efd9bd01ad76eed412ee834a991baec9d64eb79",
+        "size_bytes": 5910
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/native-compile-command-01/receipt.json",
+        "sha256": "a4a0045701b34376b01a3d0183f9017f5d9b63c7aaa680c6b71de236e3c408f5",
+        "size_bytes": 2951
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/a4a0045701b34376b01a3d0183f9017f5d9b63c7aaa680c6b71de236e3c408f5",
+        "sha256": "a4a0045701b34376b01a3d0183f9017f5d9b63c7aaa680c6b71de236e3c408f5",
+        "size_bytes": 2951
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/native-compile-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/native-compile-command-01/stdout.log",
+        "sha256": "f784f7747356ac6ad5a505beff75b5121759433534e2922ab76303988b076667",
+        "size_bytes": 7952
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/f784f7747356ac6ad5a505beff75b5121759433534e2922ab76303988b076667",
+        "sha256": "f784f7747356ac6ad5a505beff75b5121759433534e2922ab76303988b076667",
+        "size_bytes": 7952
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/native-configure-command-01/receipt.json",
+        "sha256": "53e5362920ab3eeaaba1b475ce4261244619700dc951c6818123160a7ddba3d3",
+        "size_bytes": 7687
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/53e5362920ab3eeaaba1b475ce4261244619700dc951c6818123160a7ddba3d3",
+        "sha256": "53e5362920ab3eeaaba1b475ce4261244619700dc951c6818123160a7ddba3d3",
+        "size_bytes": 7687
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/native-configure-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/native-configure-command-01/stdout.log",
+        "sha256": "63cd9aae3cb4c15bd1bfb606c28d5889b3ca9a0c2a2d5ae5398bb9626267e0fb",
+        "size_bytes": 743
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/RAD-01-frozen-retry/objects/63cd9aae3cb4c15bd1bfb606c28d5889b3ca9a0c2a2d5ae5398bb9626267e0fb",
+        "sha256": "63cd9aae3cb4c15bd1bfb606c28d5889b3ca9a0c2a2d5ae5398bb9626267e0fb",
+        "size_bytes": 743
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/native-unit-derive-command-01/receipt.json",
+        "sha256": "36afe6e52eb9d84b3333100893e871d60e0004a4c059f2cf16c9e03810b995a3",
+        "size_bytes": 3239
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/36afe6e52eb9d84b3333100893e871d60e0004a4c059f2cf16c9e03810b995a3",
+        "sha256": "36afe6e52eb9d84b3333100893e871d60e0004a4c059f2cf16c9e03810b995a3",
+        "size_bytes": 3239
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/native-unit-derive-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/native-unit-derive-command-01/stdout.log",
+        "sha256": "bbe3d61d67269d3a95227c144984bc8b42dacd40590eee9a6cefb68019a358d5",
+        "size_bytes": 234
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/bbe3d61d67269d3a95227c144984bc8b42dacd40590eee9a6cefb68019a358d5",
+        "sha256": "bbe3d61d67269d3a95227c144984bc8b42dacd40590eee9a6cefb68019a358d5",
+        "size_bytes": 234
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-01/preservation-after.json",
+        "sha256": "51284b673f3a48c064d56675f8a1bec0dc6e5524198640180890aea2d4e7a217",
+        "size_bytes": 168451
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/51284b673f3a48c064d56675f8a1bec0dc6e5524198640180890aea2d4e7a217",
+        "sha256": "51284b673f3a48c064d56675f8a1bec0dc6e5524198640180890aea2d4e7a217",
+        "size_bytes": 168451
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-launch-command-01/receipt.json",
+        "sha256": "d6195abd878bcc0febb532fcd0ca649e4e24629d19714aaf5bd8e2503a2533f1",
+        "size_bytes": 2691
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/d6195abd878bcc0febb532fcd0ca649e4e24629d19714aaf5bd8e2503a2533f1",
+        "sha256": "d6195abd878bcc0febb532fcd0ca649e4e24629d19714aaf5bd8e2503a2533f1",
+        "size_bytes": 2691
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-launch-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-launch-command-01/stdout.log",
+        "sha256": "37e01de420808d9ebd6855ccf3b7a3d0a7d6b8aaec51e7018fdd23d8cd41821c",
+        "size_bytes": 10883
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/37e01de420808d9ebd6855ccf3b7a3d0a7d6b8aaec51e7018fdd23d8cd41821c",
+        "sha256": "37e01de420808d9ebd6855ccf3b7a3d0a7d6b8aaec51e7018fdd23d8cd41821c",
+        "size_bytes": 10883
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-review-01/comparison-pe.json",
+        "sha256": "e0ceb821a087255b1e8655be48711e3a133708f88f27068304550e9a6b045b30",
+        "size_bytes": 4820
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/e0ceb821a087255b1e8655be48711e3a133708f88f27068304550e9a6b045b30",
+        "sha256": "e0ceb821a087255b1e8655be48711e3a133708f88f27068304550e9a6b045b30",
+        "size_bytes": 4820
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-review-01/derived-pe.json",
+        "sha256": "a6f868442ed7024f5012db0a827b587959a53228539459bf6bb4eb8e94a961ac",
+        "size_bytes": 12193
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/a6f868442ed7024f5012db0a827b587959a53228539459bf6bb4eb8e94a961ac",
+        "sha256": "a6f868442ed7024f5012db0a827b587959a53228539459bf6bb4eb8e94a961ac",
+        "size_bytes": 12193
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-review-01/original-pe.json",
+        "sha256": "d40b46fec1c6ddf166ec2277e2596ee96b626e768d4a7fcdfdc5f1dec6b8ec7a",
+        "size_bytes": 16047
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/d40b46fec1c6ddf166ec2277e2596ee96b626e768d4a7fcdfdc5f1dec6b8ec7a",
+        "sha256": "d40b46fec1c6ddf166ec2277e2596ee96b626e768d4a7fcdfdc5f1dec6b8ec7a",
+        "size_bytes": 16047
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-review-01/review.json",
+        "sha256": "6e8abbded5ce6e229bef2cbd1887d12f1351e6d02745efe1ff1c50234f30dfae",
+        "size_bytes": 2438
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/6e8abbded5ce6e229bef2cbd1887d12f1351e6d02745efe1ff1c50234f30dfae",
+        "sha256": "6e8abbded5ce6e229bef2cbd1887d12f1351e6d02745efe1ff1c50234f30dfae",
+        "size_bytes": 2438
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-review-command-01/receipt.json",
+        "sha256": "93ae4e16fff328c32f054c3f500f91822284fe2fe0ed6c7322fddce6a87daf4e",
+        "size_bytes": 2925
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/93ae4e16fff328c32f054c3f500f91822284fe2fe0ed6c7322fddce6a87daf4e",
+        "sha256": "93ae4e16fff328c32f054c3f500f91822284fe2fe0ed6c7322fddce6a87daf4e",
+        "size_bytes": 2925
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-review-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-review-command-01/stdout.log",
+        "sha256": "9ae66043cc9eb9fb8c501608682308cfb722fc71f2e155357a5461390d97f989",
+        "size_bytes": 252
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/9ae66043cc9eb9fb8c501608682308cfb722fc71f2e155357a5461390d97f989",
+        "sha256": "9ae66043cc9eb9fb8c501608682308cfb722fc71f2e155357a5461390d97f989",
+        "size_bytes": 252
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-review-prep-01/before/manifest.json",
+        "sha256": "4832eec3a059787de1c1d17a86d343e9ccbd0007d69a5d1d94f34082da0a8c18",
+        "size_bytes": 4744
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/RAD-01-original-baseline/objects/4832eec3a059787de1c1d17a86d343e9ccbd0007d69a5d1d94f34082da0a8c18",
+        "sha256": "4832eec3a059787de1c1d17a86d343e9ccbd0007d69a5d1d94f34082da0a8c18",
+        "size_bytes": 4744
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-review-prep-01/before/README.md",
+        "sha256": "b9249414c2f27d253ff054c8410679b366ca3af207902f09f628b36ce7e0d9fc",
+        "size_bytes": 1827
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/RAD-01-original-baseline/objects/b9249414c2f27d253ff054c8410679b366ca3af207902f09f628b36ce7e0d9fc",
+        "sha256": "b9249414c2f27d253ff054c8410679b366ca3af207902f09f628b36ce7e0d9fc",
+        "size_bytes": 1827
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-review-prep-01/before/review_build.py",
+        "sha256": "eabb730f94984239a88ece66b7492d5812338b4f258d8dd93cdffad68e1e77f7",
+        "size_bytes": 5493
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/RAD-01-original-baseline/objects/eabb730f94984239a88ece66b7492d5812338b4f258d8dd93cdffad68e1e77f7",
+        "sha256": "eabb730f94984239a88ece66b7492d5812338b4f258d8dd93cdffad68e1e77f7",
+        "size_bytes": 5493
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-review-prep-01/diffs/review_build.py.diff",
+        "sha256": "716c624565acf1e40b34ecbe0272e6e3d228aeff0762afbe610709a76a586079",
+        "size_bytes": 5754
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-frozen/objects/716c624565acf1e40b34ecbe0272e6e3d228aeff0762afbe610709a76a586079",
+        "sha256": "716c624565acf1e40b34ecbe0272e6e3d228aeff0762afbe610709a76a586079",
+        "size_bytes": 5754
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-review-prep-01/manifest.json",
+        "sha256": "b94c528705271b4fa8d87bd39f580e575b55ef950093c3944b251b079286388d",
+        "size_bytes": 8015
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-frozen/objects/b94c528705271b4fa8d87bd39f580e575b55ef950093c3944b251b079286388d",
+        "sha256": "b94c528705271b4fa8d87bd39f580e575b55ef950093c3944b251b079286388d",
+        "size_bytes": 8015
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-review-prep-01/README.md",
+        "sha256": "bf577a6bf1bd294b4064b1efc0dbfcc0522dc3adf81378e60e2a27aec8b703b6",
+        "size_bytes": 2579
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-frozen/objects/bf577a6bf1bd294b4064b1efc0dbfcc0522dc3adf81378e60e2a27aec8b703b6",
+        "sha256": "bf577a6bf1bd294b4064b1efc0dbfcc0522dc3adf81378e60e2a27aec8b703b6",
+        "size_bytes": 2579
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-build-review-prep-01/review_build.py",
+        "sha256": "ffae754d726dfff5c5da2c5dc0af299118ed3859b30de481baea1d6d0978d63f",
+        "size_bytes": 7805
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-frozen/objects/ffae754d726dfff5c5da2c5dc0af299118ed3859b30de481baea1d6d0978d63f",
+        "sha256": "ffae754d726dfff5c5da2c5dc0af299118ed3859b30de481baea1d6d0978d63f",
+        "size_bytes": 7805
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-launch-inputs-01/after-environment.json",
+        "sha256": "4e18aaa0b49d27d72b3af89ceee138b2f199fd9d3ecf986e61bfd04bf552c629",
+        "size_bytes": 3247
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/4e18aaa0b49d27d72b3af89ceee138b2f199fd9d3ecf986e61bfd04bf552c629",
+        "sha256": "4e18aaa0b49d27d72b3af89ceee138b2f199fd9d3ecf986e61bfd04bf552c629",
+        "size_bytes": 3247
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-launch-inputs-01/before-environment.json",
+        "sha256": "07eb7c0df71598029dd462f23f131d9953d4f485e5174ac21f66e661bf96f448",
+        "size_bytes": 2472
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/07eb7c0df71598029dd462f23f131d9953d4f485e5174ac21f66e661bf96f448",
+        "sha256": "07eb7c0df71598029dd462f23f131d9953d4f485e5174ac21f66e661bf96f448",
+        "size_bytes": 2472
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-unit-command-01/receipt.json",
+        "sha256": "2ce46689bb2db6a7dd89b38348c00374d00d55b8689378b81c2b2c777661e74c",
+        "size_bytes": 2844
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/2ce46689bb2db6a7dd89b38348c00374d00d55b8689378b81c2b2c777661e74c",
+        "sha256": "2ce46689bb2db6a7dd89b38348c00374d00d55b8689378b81c2b2c777661e74c",
+        "size_bytes": 2844
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-unit-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/native-unit-command-01/stdout.log",
+        "sha256": "6ea93bd7dbb95b52ae6bfed3f229e6af8f066bcdd4ec75105ac56b2ae8e88635",
+        "size_bytes": 925161
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/6ea93bd7dbb95b52ae6bfed3f229e6af8f066bcdd4ec75105ac56b2ae8e88635",
+        "sha256": "6ea93bd7dbb95b52ae6bfed3f229e6af8f066bcdd4ec75105ac56b2ae8e88635",
+        "size_bytes": 925161
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-data-review-01/000-review_data.py",
+        "sha256": "fef0125a3a8622ab2756c9902db0dfb9931952f3cc6873f1b57748082b8b0dc8",
+        "size_bytes": 22936
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/fef0125a3a8622ab2756c9902db0dfb9931952f3cc6873f1b57748082b8b0dc8",
+        "sha256": "fef0125a3a8622ab2756c9902db0dfb9931952f3cc6873f1b57748082b8b0dc8",
+        "size_bytes": 22936
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-data-review-01/001-shape.py",
+        "sha256": "9a530999a7e861f9eca32553e484b766deaef2c0b392a90f8728579a5e4d958a",
+        "size_bytes": 17216
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/9a530999a7e861f9eca32553e484b766deaef2c0b392a90f8728579a5e4d958a",
+        "sha256": "9a530999a7e861f9eca32553e484b766deaef2c0b392a90f8728579a5e4d958a",
+        "size_bytes": 17216
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-data-review-01/002-packet_io.py",
+        "sha256": "4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+        "size_bytes": 3893
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-frozen/objects/4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+        "sha256": "4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+        "size_bytes": 3893
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-data-review-01/review.json",
+        "sha256": "5ae096bf49470d5595c9668ae920db35c79b82e63459f05bf047e94fe0a51271",
+        "size_bytes": 9213
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/5ae096bf49470d5595c9668ae920db35c79b82e63459f05bf047e94fe0a51271",
+        "sha256": "5ae096bf49470d5595c9668ae920db35c79b82e63459f05bf047e94fe0a51271",
+        "size_bytes": 9213
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-data-review-command-01/receipt.json",
+        "sha256": "81180861ecd47cce0d8b30076352351d6e6f9c88431453815b824f74a4132d18",
+        "size_bytes": 4147
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/81180861ecd47cce0d8b30076352351d6e6f9c88431453815b824f74a4132d18",
+        "sha256": "81180861ecd47cce0d8b30076352351d6e6f9c88431453815b824f74a4132d18",
+        "size_bytes": 4147
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-data-review-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-data-review-command-01/stdout.log",
+        "sha256": "0f4d557e290212a004716cb9b9a5730a61d8256adad83c4fea3cd8d359241cf0",
+        "size_bytes": 9424
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/0f4d557e290212a004716cb9b9a5730a61d8256adad83c4fea3cd8d359241cf0",
+        "sha256": "0f4d557e290212a004716cb9b9a5730a61d8256adad83c4fea3cd8d359241cf0",
+        "size_bytes": 9424
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-data-review-prep-01/before/manifest.json",
+        "sha256": "dad47201a33690de530f32eef2287636f3117383221ebf5d11c187114719b4bb",
+        "size_bytes": 29991
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/dad47201a33690de530f32eef2287636f3117383221ebf5d11c187114719b4bb",
+        "sha256": "dad47201a33690de530f32eef2287636f3117383221ebf5d11c187114719b4bb",
+        "size_bytes": 29991
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-data-review-prep-01/before/packet_io.py",
+        "sha256": "d038fcddb3319eb0494e059ffdd5453355ceff2494872c96c5d60c2492d623c9",
+        "size_bytes": 3893
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/RAD-01-frozen/objects/d038fcddb3319eb0494e059ffdd5453355ceff2494872c96c5d60c2492d623c9",
+        "sha256": "d038fcddb3319eb0494e059ffdd5453355ceff2494872c96c5d60c2492d623c9",
+        "size_bytes": 3893
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-data-review-prep-01/before/README.md",
+        "sha256": "725cc2af7f20505b0f3708b500dc0db4e528230c6fe2f884941afd3d8b51c761",
+        "size_bytes": 5562
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/725cc2af7f20505b0f3708b500dc0db4e528230c6fe2f884941afd3d8b51c761",
+        "sha256": "725cc2af7f20505b0f3708b500dc0db4e528230c6fe2f884941afd3d8b51c761",
+        "size_bytes": 5562
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-data-review-prep-01/before/review_data.py",
+        "sha256": "503dcfa8f1a176f25bbc2175cf3df7e2ac7b47fa2797adeb55961fa712cbf0ce",
+        "size_bytes": 23767
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/503dcfa8f1a176f25bbc2175cf3df7e2ac7b47fa2797adeb55961fa712cbf0ce",
+        "sha256": "503dcfa8f1a176f25bbc2175cf3df7e2ac7b47fa2797adeb55961fa712cbf0ce",
+        "size_bytes": 23767
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-data-review-prep-01/before/shape.py",
+        "sha256": "682a2ed4fd087cbbcdff05fef90ea6aa7bec6b618b12d72aca4fa87dc3b1d15d",
+        "size_bytes": 14075
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/682a2ed4fd087cbbcdff05fef90ea6aa7bec6b618b12d72aca4fa87dc3b1d15d",
+        "sha256": "682a2ed4fd087cbbcdff05fef90ea6aa7bec6b618b12d72aca4fa87dc3b1d15d",
+        "size_bytes": 14075
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-data-review-prep-01/diffs/packet_io.py.diff",
+        "sha256": "282027534da6fbe07df878e6dcc1a97f1e466692b79c680a333edaf30807e352",
+        "size_bytes": 335
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/282027534da6fbe07df878e6dcc1a97f1e466692b79c680a333edaf30807e352",
+        "sha256": "282027534da6fbe07df878e6dcc1a97f1e466692b79c680a333edaf30807e352",
+        "size_bytes": 335
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-data-review-prep-01/diffs/review_data.py.diff",
+        "sha256": "269e1514e47e24447877bf33f48082ee9f75792059ce522d8e56ab1138128f78",
+        "size_bytes": 26190
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/269e1514e47e24447877bf33f48082ee9f75792059ce522d8e56ab1138128f78",
+        "sha256": "269e1514e47e24447877bf33f48082ee9f75792059ce522d8e56ab1138128f78",
+        "size_bytes": 26190
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-data-review-prep-01/diffs/shape.py.diff",
+        "sha256": "be89469ce579d7df706187936610fe30bc3c60bd103aa089725c0f3ec8f80f23",
+        "size_bytes": 29995
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/be89469ce579d7df706187936610fe30bc3c60bd103aa089725c0f3ec8f80f23",
+        "sha256": "be89469ce579d7df706187936610fe30bc3c60bd103aa089725c0f3ec8f80f23",
+        "size_bytes": 29995
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-data-review-prep-01/manifest.json",
+        "sha256": "c52bd6b2a90f9e205b34c821fc1babf952b4593f5793e1bee699e6e83527b438",
+        "size_bytes": 33960
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/c52bd6b2a90f9e205b34c821fc1babf952b4593f5793e1bee699e6e83527b438",
+        "sha256": "c52bd6b2a90f9e205b34c821fc1babf952b4593f5793e1bee699e6e83527b438",
+        "size_bytes": 33960
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-data-review-prep-01/packet_io.py",
+        "sha256": "4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+        "size_bytes": 3893
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-frozen/objects/4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+        "sha256": "4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+        "size_bytes": 3893
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-data-review-prep-01/README.md",
+        "sha256": "88a596e834cae8a5857a1bc05760b3304df7918438b5bd00b4de7822bf1909a8",
+        "size_bytes": 6217
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/88a596e834cae8a5857a1bc05760b3304df7918438b5bd00b4de7822bf1909a8",
+        "sha256": "88a596e834cae8a5857a1bc05760b3304df7918438b5bd00b4de7822bf1909a8",
+        "size_bytes": 6217
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-data-review-prep-01/review_data.py",
+        "sha256": "fef0125a3a8622ab2756c9902db0dfb9931952f3cc6873f1b57748082b8b0dc8",
+        "size_bytes": 22936
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/fef0125a3a8622ab2756c9902db0dfb9931952f3cc6873f1b57748082b8b0dc8",
+        "sha256": "fef0125a3a8622ab2756c9902db0dfb9931952f3cc6873f1b57748082b8b0dc8",
+        "size_bytes": 22936
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-data-review-prep-01/shape.py",
+        "sha256": "9a530999a7e861f9eca32553e484b766deaef2c0b392a90f8728579a5e4d958a",
+        "size_bytes": 17216
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/9a530999a7e861f9eca32553e484b766deaef2c0b392a90f8728579a5e4d958a",
+        "sha256": "9a530999a7e861f9eca32553e484b766deaef2c0b392a90f8728579a5e4d958a",
+        "size_bytes": 17216
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-stages-launch-command-01/receipt.json",
+        "sha256": "f48e0fa70535a873b2832845b0810eab4f9039e9ffd472fa98b0b9881c766ff1",
+        "size_bytes": 2693
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/f48e0fa70535a873b2832845b0810eab4f9039e9ffd472fa98b0b9881c766ff1",
+        "sha256": "f48e0fa70535a873b2832845b0810eab4f9039e9ffd472fa98b0b9881c766ff1",
+        "size_bytes": 2693
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-stages-launch-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/original-stages-launch-command-01/stdout.log",
+        "sha256": "5bd117a7d640eb79f015dacea6ef3eae20c29839e10c4e286d1ad824bb93a04e",
+        "size_bytes": 17651
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/5bd117a7d640eb79f015dacea6ef3eae20c29839e10c4e286d1ad824bb93a04e",
+        "sha256": "5bd117a7d640eb79f015dacea6ef3eae20c29839e10c4e286d1ad824bb93a04e",
+        "size_bytes": 17651
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/protected-original-storage-command-01/receipt.json",
+        "sha256": "bb198a6ff9482a5068d86bf52148cd38d3089660bc6354a8fd7cb8533b1b8a71",
+        "size_bytes": 2709
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/bb198a6ff9482a5068d86bf52148cd38d3089660bc6354a8fd7cb8533b1b8a71",
+        "sha256": "bb198a6ff9482a5068d86bf52148cd38d3089660bc6354a8fd7cb8533b1b8a71",
+        "size_bytes": 2709
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/protected-original-storage-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/protected-original-storage-command-01/stdout.log",
+        "sha256": "1a586df114491624b130371f4c9e611c250cee1fcace4d72d8edf0262355cea9",
+        "size_bytes": 187
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/1a586df114491624b130371f4c9e611c250cee1fcace4d72d8edf0262355cea9",
+        "sha256": "1a586df114491624b130371f4c9e611c250cee1fcace4d72d8edf0262355cea9",
+        "size_bytes": 187
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/protected-original-storage-compression-01/record.json",
+        "sha256": "75ac24e8d57e16e1bf6064901e661636dea5f1db15ffaa20fa0f358213e5070c",
+        "size_bytes": 1564
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/75ac24e8d57e16e1bf6064901e661636dea5f1db15ffaa20fa0f358213e5070c",
+        "sha256": "75ac24e8d57e16e1bf6064901e661636dea5f1db15ffaa20fa0f358213e5070c",
+        "size_bytes": 1564
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/protected-original-storage-compression-01/zon05_unit_helper.exe.log",
+        "sha256": "3306a8a6d75b851b7c372ba3bf4cabebf93d54c2b92303a3d4cbb1c7eef4e6d7",
+        "size_bytes": 269
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/3306a8a6d75b851b7c372ba3bf4cabebf93d54c2b92303a3d4cbb1c7eef4e6d7",
+        "sha256": "3306a8a6d75b851b7c372ba3bf4cabebf93d54c2b92303a3d4cbb1c7eef4e6d7",
+        "size_bytes": 269
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/publish-original-baseline-01.py",
+        "sha256": "a9426b5a4049fca3f1c6c6fc873d05d74c9b56acd2a7bdbed3670d70fe1639b6",
+        "size_bytes": 5161
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/a9426b5a4049fca3f1c6c6fc873d05d74c9b56acd2a7bdbed3670d70fe1639b6",
+        "sha256": "a9426b5a4049fca3f1c6c6fc873d05d74c9b56acd2a7bdbed3670d70fe1639b6",
+        "size_bytes": 5161
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/run-actual-native-build-01.py",
+        "sha256": "2d8a32756b25697a5664cb7064678bbf8df1b6d7e853c8b233bf522c4f9661ee",
+        "size_bytes": 3529
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/2d8a32756b25697a5664cb7064678bbf8df1b6d7e853c8b233bf522c4f9661ee",
+        "sha256": "2d8a32756b25697a5664cb7064678bbf8df1b6d7e853c8b233bf522c4f9661ee",
+        "size_bytes": 3529
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/run-original-stages-01.py",
+        "sha256": "f0863d7e1895a8bd2a5988988e027efffb40fae05d4e43cc196fa14e353fcddf",
+        "size_bytes": 5866
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/f0863d7e1895a8bd2a5988988e027efffb40fae05d4e43cc196fa14e353fcddf",
+        "sha256": "f0863d7e1895a8bd2a5988988e027efffb40fae05d4e43cc196fa14e353fcddf",
+        "size_bytes": 5866
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/fmt-check-command-01/receipt.json",
+        "sha256": "7c1d9ee3e902a3df2514763d4a41d174f5470ab464594e513c56915449a106b8",
+        "size_bytes": 3274
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/7c1d9ee3e902a3df2514763d4a41d174f5470ab464594e513c56915449a106b8",
+        "sha256": "7c1d9ee3e902a3df2514763d4a41d174f5470ab464594e513c56915449a106b8",
+        "size_bytes": 3274
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/fmt-check-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/fmt-check-command-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/ab/ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193",
+        "sha256": "ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193",
+        "size_bytes": 1611733
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193",
+        "sha256": "ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193",
+        "size_bytes": 1611733
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/clippy-command-01/receipt.json",
+        "sha256": "444b4c085e985e524449c3d8a9a686888d7347dacb1f1946317162f7ee973c23",
+        "size_bytes": 3459
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/444b4c085e985e524449c3d8a9a686888d7347dacb1f1946317162f7ee973c23",
+        "sha256": "444b4c085e985e524449c3d8a9a686888d7347dacb1f1946317162f7ee973c23",
+        "size_bytes": 3459
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/clippy-command-01/stderr.log",
+        "sha256": "ba740b3c1e555318bc478d8cf84e299799e3d7bff75ab8f1e860b831e498eb02",
+        "size_bytes": 363
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/ba740b3c1e555318bc478d8cf84e299799e3d7bff75ab8f1e860b831e498eb02",
+        "sha256": "ba740b3c1e555318bc478d8cf84e299799e3d7bff75ab8f1e860b831e498eb02",
+        "size_bytes": 363
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/clippy-command-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/focused-command-01/receipt.json",
+        "sha256": "cb9721d65b0f2c5e3fb5e7fcbcd854fdbe62020446c64036c53561abb0591f97",
+        "size_bytes": 3447
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/cb9721d65b0f2c5e3fb5e7fcbcd854fdbe62020446c64036c53561abb0591f97",
+        "sha256": "cb9721d65b0f2c5e3fb5e7fcbcd854fdbe62020446c64036c53561abb0591f97",
+        "size_bytes": 3447
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/focused-command-01/stderr.log",
+        "sha256": "fa726b047eddaecce97f7e96fddcfd58cb0020926fed5d1c7630554fd8341317",
+        "size_bytes": 254
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/fa726b047eddaecce97f7e96fddcfd58cb0020926fed5d1c7630554fd8341317",
+        "sha256": "fa726b047eddaecce97f7e96fddcfd58cb0020926fed5d1c7630554fd8341317",
+        "size_bytes": 254
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/focused-command-01/stdout.log",
+        "sha256": "f18d6eb903c245c6136971b2d4519e7f263fbb09d4497c6c96900990eb0b49fb",
+        "size_bytes": 27693
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/f18d6eb903c245c6136971b2d4519e7f263fbb09d4497c6c96900990eb0b49fb",
+        "sha256": "f18d6eb903c245c6136971b2d4519e7f263fbb09d4497c6c96900990eb0b49fb",
+        "size_bytes": 27693
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/workspace-command-01/receipt.json",
+        "sha256": "bcf81d9945a1de40e67642866f0b16032cacb8b8606c21a1e6d746717b4b831c",
+        "size_bytes": 3407
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/bcf81d9945a1de40e67642866f0b16032cacb8b8606c21a1e6d746717b4b831c",
+        "sha256": "bcf81d9945a1de40e67642866f0b16032cacb8b8606c21a1e6d746717b4b831c",
+        "size_bytes": 3407
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/workspace-command-01/stderr.log",
+        "sha256": "3b8784bc0fa0383b403adb050b53c61fbc6809fb3a587bf1409ce3e5ae41da30",
+        "size_bytes": 1779
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/3b8784bc0fa0383b403adb050b53c61fbc6809fb3a587bf1409ce3e5ae41da30",
+        "sha256": "3b8784bc0fa0383b403adb050b53c61fbc6809fb3a587bf1409ce3e5ae41da30",
+        "size_bytes": 1779
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/workspace-command-01/stdout.log",
+        "sha256": "d20452e6771cfd1f5c600101b6c00e8e70314479b981d615b1c2fda0845c8dee",
+        "size_bytes": 742296
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/d20452e6771cfd1f5c600101b6c00e8e70314479b981d615b1c2fda0845c8dee",
+        "sha256": "d20452e6771cfd1f5c600101b6c00e8e70314479b981d615b1c2fda0845c8dee",
+        "size_bytes": 742296
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/manifest.json",
+        "sha256": "aa72577e3f4eeb802704cd1f6e817283708c384aebde8518d55c5b5003f3c8e6",
+        "size_bytes": 16989
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/aa72577e3f4eeb802704cd1f6e817283708c384aebde8518d55c5b5003f3c8e6",
+        "sha256": "aa72577e3f4eeb802704cd1f6e817283708c384aebde8518d55c5b5003f3c8e6",
+        "size_bytes": 16989
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/mod.rs",
+        "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+        "size_bytes": 1819
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+        "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+        "size_bytes": 1819
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/observer-plan.proposed.json",
+        "sha256": "1c40086ccedbaf3c219ecf4843933946dcec71a6086b8183f555cd3fed5c3e54",
+        "size_bytes": 3481
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/1c40086ccedbaf3c219ecf4843933946dcec71a6086b8183f555cd3fed5c3e54",
+        "sha256": "1c40086ccedbaf3c219ecf4843933946dcec71a6086b8183f555cd3fed5c3e54",
+        "size_bytes": 3481
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/prepare_metadata.py",
+        "sha256": "68d085083f322d19f25eb6bdd60fb54154269303ae34c37f4e1698579e78cd3d",
+        "size_bytes": 11220
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/68d085083f322d19f25eb6bdd60fb54154269303ae34c37f4e1698579e78cd3d",
+        "sha256": "68d085083f322d19f25eb6bdd60fb54154269303ae34c37f4e1698579e78cd3d",
+        "size_bytes": 11220
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/README.md",
+        "sha256": "8244aac875a602148b384d93f8898bd9dc13b889590d86cb2834e6016fd4bcd2",
+        "size_bytes": 5473
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/8244aac875a602148b384d93f8898bd9dc13b889590d86cb2834e6016fd4bcd2",
+        "sha256": "8244aac875a602148b384d93f8898bd9dc13b889590d86cb2834e6016fd4bcd2",
+        "size_bytes": 5473
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/zone_humidity_correction.rs",
+        "sha256": "f8279ee488005e9c274534c7fb009bbfe4a4cd55141797125b650f7a44230b6c",
+        "size_bytes": 11286
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/f8279ee488005e9c274534c7fb009bbfe4a4cd55141797125b650f7a44230b6c",
+        "sha256": "f8279ee488005e9c274534c7fb009bbfe4a4cd55141797125b650f7a44230b6c",
+        "size_bytes": 11286
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/zone_humidity_correction_tests.rs",
+        "sha256": "ef1b76b860fc775a3e01a94bfe851937219049fba694cccdf24c463555a83c0d",
+        "size_bytes": 7658
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/ef1b76b860fc775a3e01a94bfe851937219049fba694cccdf24c463555a83c0d",
+        "sha256": "ef1b76b860fc775a3e01a94bfe851937219049fba694cccdf24c463555a83c0d",
+        "size_bytes": 7658
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/before/mod.rs",
+        "sha256": "5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+        "size_bytes": 1785
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+        "sha256": "5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+        "size_bytes": 1785
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/diffs/mod.rs.diff",
+        "sha256": "36f2813571c5cbc6991102c2f057be6754bf34552c2fd4a17acc195faeca0b6a",
+        "size_bytes": 354
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/36f2813571c5cbc6991102c2f057be6754bf34552c2fd4a17acc195faeca0b6a",
+        "sha256": "36f2813571c5cbc6991102c2f057be6754bf34552c2fd4a17acc195faeca0b6a",
+        "size_bytes": 354
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/diffs/zone_humidity_correction.rs.diff",
+        "sha256": "2a36ebe4920a9888c4f0a675fd79d2f66db27b757021002a881d4fd5d87bedba",
+        "size_bytes": 11648
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/2a36ebe4920a9888c4f0a675fd79d2f66db27b757021002a881d4fd5d87bedba",
+        "sha256": "2a36ebe4920a9888c4f0a675fd79d2f66db27b757021002a881d4fd5d87bedba",
+        "size_bytes": 11648
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/diffs/zone_humidity_correction_tests.rs.diff",
+        "sha256": "540896f507c996a2ee551ceb310aeb71ce2b5adc4a6d2e9640ec9496c4efeb1f",
+        "size_bytes": 7938
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/540896f507c996a2ee551ceb310aeb71ce2b5adc4a6d2e9640ec9496c4efeb1f",
+        "sha256": "540896f507c996a2ee551ceb310aeb71ce2b5adc4a6d2e9640ec9496c4efeb1f",
+        "size_bytes": 7938
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-01/manifest.json",
+        "sha256": "f29de6a11105877bf7cd39346e1c21a69df91ccd535f2a7895981ce7ca412995",
+        "size_bytes": 16354
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/f29de6a11105877bf7cd39346e1c21a69df91ccd535f2a7895981ce7ca412995",
+        "sha256": "f29de6a11105877bf7cd39346e1c21a69df91ccd535f2a7895981ce7ca412995",
+        "size_bytes": 16354
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-01/prepare_metadata.py",
+        "sha256": "84d3d220da0cf4feeed1b66f34b26eb0fb480ab95f7c55fde833627752d1e023",
+        "size_bytes": 10873
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/84d3d220da0cf4feeed1b66f34b26eb0fb480ab95f7c55fde833627752d1e023",
+        "sha256": "84d3d220da0cf4feeed1b66f34b26eb0fb480ab95f7c55fde833627752d1e023",
+        "size_bytes": 10873
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-01/README.md",
+        "sha256": "01cfb287aba16d53d88907f3cb6f00da6fcab89f29f373e96a60cf2d6f7ea6d7",
+        "size_bytes": 3740
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/01cfb287aba16d53d88907f3cb6f00da6fcab89f29f373e96a60cf2d6f7ea6d7",
+        "sha256": "01cfb287aba16d53d88907f3cb6f00da6fcab89f29f373e96a60cf2d6f7ea6d7",
+        "size_bytes": 3740
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-01/before/fields.rs",
+        "sha256": "b6d3fa11384e3c96ce3c3cb184574a353b1b18beffda37c24d42213158516285",
+        "size_bytes": 3558
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/b6d3fa11384e3c96ce3c3cb184574a353b1b18beffda37c24d42213158516285",
+        "sha256": "b6d3fa11384e3c96ce3c3cb184574a353b1b18beffda37c24d42213158516285",
+        "size_bytes": 3558
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-01/before/rad01_candidate_unit_observer.rs",
+        "sha256": "b5f7a48e092c6c5de73a6bd44cd4318eec0084ab8f24cc5fd4d28a83b01c64a2",
+        "size_bytes": 13711
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/b5f7a48e092c6c5de73a6bd44cd4318eec0084ab8f24cc5fd4d28a83b01c64a2",
+        "sha256": "b5f7a48e092c6c5de73a6bd44cd4318eec0084ab8f24cc5fd4d28a83b01c64a2",
+        "size_bytes": 13711
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-01/diffs/fields.rs.diff",
+        "sha256": "b1172f95a5f9a94a7602670b6e67f757f625e075df3836e84462253d6ee86d1b",
+        "size_bytes": 12018
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/b1172f95a5f9a94a7602670b6e67f757f625e075df3836e84462253d6ee86d1b",
+        "sha256": "b1172f95a5f9a94a7602670b6e67f757f625e075df3836e84462253d6ee86d1b",
+        "size_bytes": 12018
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-01/diffs/zon05_candidate_unit_observer.rs.diff",
+        "sha256": "0eca4b4b597c837c2698ca9de08be55dc14798a3b063bbc97c979ae5bcf5dfcb",
+        "size_bytes": 29263
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/0eca4b4b597c837c2698ca9de08be55dc14798a3b063bbc97c979ae5bcf5dfcb",
+        "sha256": "0eca4b4b597c837c2698ca9de08be55dc14798a3b063bbc97c979ae5bcf5dfcb",
+        "size_bytes": 29263
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-01/new/zon05_candidate_unit_observer.rs",
+        "sha256": "cd9d0b8a123f04cdba97345eedbf813796528ec35e2a2e508f00685bd0ef4db5",
+        "size_bytes": 20510
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/cd9d0b8a123f04cdba97345eedbf813796528ec35e2a2e508f00685bd0ef4db5",
+        "sha256": "cd9d0b8a123f04cdba97345eedbf813796528ec35e2a2e508f00685bd0ef4db5",
+        "size_bytes": 20510
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-01/new/zon05_candidate_unit_support/fields.rs",
+        "sha256": "d5fc420ed302cb3bd940e18fe8487478d84e7d648d13158acfe89e840ab4723a",
+        "size_bytes": 9174
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/d5fc420ed302cb3bd940e18fe8487478d84e7d648d13158acfe89e840ab4723a",
+        "sha256": "d5fc420ed302cb3bd940e18fe8487478d84e7d648d13158acfe89e840ab4723a",
+        "size_bytes": 9174
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-02/manifest.json",
+        "sha256": "fdfac830c0b40ba4e6cb49bb6049a7e5d3f8d554b9d9439b8bd1ee968fad3bdf",
+        "size_bytes": 17073
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/fdfac830c0b40ba4e6cb49bb6049a7e5d3f8d554b9d9439b8bd1ee968fad3bdf",
+        "sha256": "fdfac830c0b40ba4e6cb49bb6049a7e5d3f8d554b9d9439b8bd1ee968fad3bdf",
+        "size_bytes": 17073
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-02/prepare_metadata.py",
+        "sha256": "756762ee86dc66d66e1062834f85fa05af4d8b73e720d411fc520fb15b0159f7",
+        "size_bytes": 2824
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/756762ee86dc66d66e1062834f85fa05af4d8b73e720d411fc520fb15b0159f7",
+        "sha256": "756762ee86dc66d66e1062834f85fa05af4d8b73e720d411fc520fb15b0159f7",
+        "size_bytes": 2824
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-02/README.md",
+        "sha256": "060536f087bf3f9a1daa343eaa8c48c7342cf0af3bb7d7a93ad9d332e5d9bc44",
+        "size_bytes": 4049
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/060536f087bf3f9a1daa343eaa8c48c7342cf0af3bb7d7a93ad9d332e5d9bc44",
+        "sha256": "060536f087bf3f9a1daa343eaa8c48c7342cf0af3bb7d7a93ad9d332e5d9bc44",
+        "size_bytes": 4049
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-02/before-01/manifest.json",
+        "sha256": "f29de6a11105877bf7cd39346e1c21a69df91ccd535f2a7895981ce7ca412995",
+        "size_bytes": 16354
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/f29de6a11105877bf7cd39346e1c21a69df91ccd535f2a7895981ce7ca412995",
+        "sha256": "f29de6a11105877bf7cd39346e1c21a69df91ccd535f2a7895981ce7ca412995",
+        "size_bytes": 16354
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-02/before-01/README.md",
+        "sha256": "01cfb287aba16d53d88907f3cb6f00da6fcab89f29f373e96a60cf2d6f7ea6d7",
+        "size_bytes": 3740
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/01cfb287aba16d53d88907f3cb6f00da6fcab89f29f373e96a60cf2d6f7ea6d7",
+        "sha256": "01cfb287aba16d53d88907f3cb6f00da6fcab89f29f373e96a60cf2d6f7ea6d7",
+        "size_bytes": 3740
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-02/diffs/manifest.json.from-01.diff",
+        "sha256": "bfcea7ed08248917e2c712f3ad1e42afc8be4902fafdd5fa65ea5fb453191cdf",
+        "size_bytes": 2359
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/bfcea7ed08248917e2c712f3ad1e42afc8be4902fafdd5fa65ea5fb453191cdf",
+        "sha256": "bfcea7ed08248917e2c712f3ad1e42afc8be4902fafdd5fa65ea5fb453191cdf",
+        "size_bytes": 2359
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-02/diffs/README.md.from-01.diff",
+        "sha256": "76c43c9f744e84980189718350022905c1ce5babcf0c237fa5582de896435ded",
+        "size_bytes": 696
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/76c43c9f744e84980189718350022905c1ce5babcf0c237fa5582de896435ded",
+        "sha256": "76c43c9f744e84980189718350022905c1ce5babcf0c237fa5582de896435ded",
+        "size_bytes": 696
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/compare_unit.py",
+        "sha256": "052a51115a164c60cab6aa222910dc95d15fda7d9bc12d41b30e1699c2589c28",
+        "size_bytes": 38311
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/052a51115a164c60cab6aa222910dc95d15fda7d9bc12d41b30e1699c2589c28",
+        "sha256": "052a51115a164c60cab6aa222910dc95d15fda7d9bc12d41b30e1699c2589c28",
+        "size_bytes": 38311
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/comparison_contract_tests.py",
+        "sha256": "2c2ceea41bc76acac377deef06d3d114f30b75e278ac33719ca9ff01640d4624",
+        "size_bytes": 3697
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/2c2ceea41bc76acac377deef06d3d114f30b75e278ac33719ca9ff01640d4624",
+        "sha256": "2c2ceea41bc76acac377deef06d3d114f30b75e278ac33719ca9ff01640d4624",
+        "size_bytes": 3697
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/manifest.json",
+        "sha256": "64de5c9282f7e26979da45ab5070db39ed482484429588f5d46845c68c22a14e",
+        "size_bytes": 23431
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/64de5c9282f7e26979da45ab5070db39ed482484429588f5d46845c68c22a14e",
+        "sha256": "64de5c9282f7e26979da45ab5070db39ed482484429588f5d46845c68c22a14e",
+        "size_bytes": 23431
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/prepare_metadata.py",
+        "sha256": "ce43959d4e859b0a5d7656114c0b616295aca70cf968950d537a44dbc81e66b6",
+        "size_bytes": 9241
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/ce43959d4e859b0a5d7656114c0b616295aca70cf968950d537a44dbc81e66b6",
+        "sha256": "ce43959d4e859b0a5d7656114c0b616295aca70cf968950d537a44dbc81e66b6",
+        "size_bytes": 9241
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/prepare_sources.py",
+        "sha256": "2dcff56a579ba8cd41884b715362aef394f7facf5ec0452c7519ae205217d99b",
+        "size_bytes": 23634
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/2dcff56a579ba8cd41884b715362aef394f7facf5ec0452c7519ae205217d99b",
+        "sha256": "2dcff56a579ba8cd41884b715362aef394f7facf5ec0452c7519ae205217d99b",
+        "size_bytes": 23634
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/README.md",
+        "sha256": "33f16b5a45ea3737f6a85f8f667b8dcc857deed5b32abf1a4a38294989f5bf96",
+        "size_bytes": 4968
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/33f16b5a45ea3737f6a85f8f667b8dcc857deed5b32abf1a4a38294989f5bf96",
+        "sha256": "33f16b5a45ea3737f6a85f8f667b8dcc857deed5b32abf1a4a38294989f5bf96",
+        "size_bytes": 4968
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/before/compare_unit.py",
+        "sha256": "88d74d290713af9cea59add806390c49d33d94da0edc2525e01a3b1b74cf9328",
+        "size_bytes": 28722
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/88d74d290713af9cea59add806390c49d33d94da0edc2525e01a3b1b74cf9328",
+        "sha256": "88d74d290713af9cea59add806390c49d33d94da0edc2525e01a3b1b74cf9328",
+        "size_bytes": 28722
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/before/comparison_contract_tests.py",
+        "sha256": "1dd01c53559cc39f87adb71c8fbdfd15b74303ff3be8982fecb8c536a2e3a533",
+        "size_bytes": 2818
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/1dd01c53559cc39f87adb71c8fbdfd15b74303ff3be8982fecb8c536a2e3a533",
+        "sha256": "1dd01c53559cc39f87adb71c8fbdfd15b74303ff3be8982fecb8c536a2e3a533",
+        "size_bytes": 2818
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/before/RAD-manifest.json",
+        "sha256": "98b68a058021126a6489a849a4035890e4df4de9f177b1ddf68e08523a531d00",
+        "size_bytes": 25372
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/98b68a058021126a6489a849a4035890e4df4de9f177b1ddf68e08523a531d00",
+        "sha256": "98b68a058021126a6489a849a4035890e4df4de9f177b1ddf68e08523a531d00",
+        "size_bytes": 25372
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/before/RAD-README.md",
+        "sha256": "cea86d1065b97cec48edd36e48bf60e0ca97e67b36adb092b2e9699df8a7206f",
+        "size_bytes": 5904
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/cea86d1065b97cec48edd36e48bf60e0ca97e67b36adb092b2e9699df8a7206f",
+        "sha256": "cea86d1065b97cec48edd36e48bf60e0ca97e67b36adb092b2e9699df8a7206f",
+        "size_bytes": 5904
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/diffs/compare_unit.py.diff",
+        "sha256": "a632e3924ef459bc0744740d2c2d064436de532f6a534c019d87ea819cd83e07",
+        "size_bytes": 42085
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/a632e3924ef459bc0744740d2c2d064436de532f6a534c019d87ea819cd83e07",
+        "sha256": "a632e3924ef459bc0744740d2c2d064436de532f6a534c019d87ea819cd83e07",
+        "size_bytes": 42085
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/diffs/comparison_contract_tests.py.diff",
+        "sha256": "12d3b00c1d6b9aff736cb8404fa61afbc87fc2dd187eaf977e7bda2441474779",
+        "size_bytes": 4530
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/12d3b00c1d6b9aff736cb8404fa61afbc87fc2dd187eaf977e7bda2441474779",
+        "sha256": "12d3b00c1d6b9aff736cb8404fa61afbc87fc2dd187eaf977e7bda2441474779",
+        "size_bytes": 4530
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/ordinary-integration-plan-prep-01/manifest.json",
+        "sha256": "519cce4ee474bde93d5d0a9ae2a677edf2ba505c769eee2a765d3d1d73625257",
+        "size_bytes": 33174
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/519cce4ee474bde93d5d0a9ae2a677edf2ba505c769eee2a765d3d1d73625257",
+        "sha256": "519cce4ee474bde93d5d0a9ae2a677edf2ba505c769eee2a765d3d1d73625257",
+        "size_bytes": 33174
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/ordinary-integration-plan-prep-01/README.md",
+        "sha256": "26471d1603d4e13fbba2ea6cbca6f42bd23bc238825b6f03e3f0281990c5c395",
+        "size_bytes": 7085
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/26471d1603d4e13fbba2ea6cbca6f42bd23bc238825b6f03e3f0281990c5c395",
+        "sha256": "26471d1603d4e13fbba2ea6cbca6f42bd23bc238825b6f03e3f0281990c5c395",
+        "size_bytes": 7085
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/applied-source-01/format-orchestration.log",
+        "sha256": "b79a8b31764723e2a86196201f245a50ecd9adcb1ef4041590e72305b5a305ad",
+        "size_bytes": 228
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/b79a8b31764723e2a86196201f245a50ecd9adcb1ef4041590e72305b5a305ad",
+        "sha256": "b79a8b31764723e2a86196201f245a50ecd9adcb1ef4041590e72305b5a305ad",
+        "size_bytes": 228
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/applied-source-01/manifest.json",
+        "sha256": "b376c6a2e498e66ad34197664f6998c44b88832bcd3eeb0548bc0075cd2e704e",
+        "size_bytes": 4938
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/b376c6a2e498e66ad34197664f6998c44b88832bcd3eeb0548bc0075cd2e704e",
+        "sha256": "b376c6a2e498e66ad34197664f6998c44b88832bcd3eeb0548bc0075cd2e704e",
+        "size_bytes": 4938
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/applied-source-01/before/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+        "size_bytes": 1785
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+        "sha256": "5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+        "size_bytes": 1785
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/applied-source-01/crates/ep_run/examples/zon05_candidate_unit_observer.rs",
+        "sha256": "cd9d0b8a123f04cdba97345eedbf813796528ec35e2a2e508f00685bd0ef4db5",
+        "size_bytes": 20510
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/cd9d0b8a123f04cdba97345eedbf813796528ec35e2a2e508f00685bd0ef4db5",
+        "sha256": "cd9d0b8a123f04cdba97345eedbf813796528ec35e2a2e508f00685bd0ef4db5",
+        "size_bytes": 20510
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/applied-source-01/crates/ep_run/examples/zon05_candidate_unit_support/fields.rs",
+        "sha256": "d5fc420ed302cb3bd940e18fe8487478d84e7d648d13158acfe89e840ab4723a",
+        "size_bytes": 9174
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/d5fc420ed302cb3bd940e18fe8487478d84e7d648d13158acfe89e840ab4723a",
+        "sha256": "d5fc420ed302cb3bd940e18fe8487478d84e7d648d13158acfe89e840ab4723a",
+        "size_bytes": 9174
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/applied-source-01/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+        "size_bytes": 1819
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+        "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+        "size_bytes": 1819
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/applied-source-01/crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs",
+        "sha256": "f8279ee488005e9c274534c7fb009bbfe4a4cd55141797125b650f7a44230b6c",
+        "size_bytes": 11286
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/f8279ee488005e9c274534c7fb009bbfe4a4cd55141797125b650f7a44230b6c",
+        "sha256": "f8279ee488005e9c274534c7fb009bbfe4a4cd55141797125b650f7a44230b6c",
+        "size_bytes": 11286
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/applied-source-01/crates/ep_runtime/src/heat_balance/zone_humidity_correction_tests.rs",
+        "sha256": "ef1b76b860fc775a3e01a94bfe851937219049fba694cccdf24c463555a83c0d",
+        "size_bytes": 7658
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/ef1b76b860fc775a3e01a94bfe851937219049fba694cccdf24c463555a83c0d",
+        "sha256": "ef1b76b860fc775a3e01a94bfe851937219049fba694cccdf24c463555a83c0d",
+        "size_bytes": 7658
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/manifest.json",
+        "sha256": "e976fec069e97882b613aab16edaef5e06ca76a5b5a3b99e3d0f53c049f63aac",
+        "size_bytes": 7724
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/e976fec069e97882b613aab16edaef5e06ca76a5b5a3b99e3d0f53c049f63aac",
+        "sha256": "e976fec069e97882b613aab16edaef5e06ca76a5b5a3b99e3d0f53c049f63aac",
+        "size_bytes": 7724
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/format-diffs/crates__ep_runtime__src__heat_balance__mod.rs.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/format-diffs/crates__ep_runtime__src__heat_balance__zone_humidity_correction.rs.diff",
+        "sha256": "13c50af61016283ba475991f887148247515f5a19e8283982754295c532fcd53",
+        "size_bytes": 12279
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/13c50af61016283ba475991f887148247515f5a19e8283982754295c532fcd53",
+        "sha256": "13c50af61016283ba475991f887148247515f5a19e8283982754295c532fcd53",
+        "size_bytes": 12279
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/format-diffs/crates__ep_runtime__src__heat_balance__zone_humidity_correction_tests.rs.diff",
+        "sha256": "0792eac129ee5e53e3f7bd71ffa93fec4401d32734fcd2eda44acbf2225950a8",
+        "size_bytes": 14446
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/0792eac129ee5e53e3f7bd71ffa93fec4401d32734fcd2eda44acbf2225950a8",
+        "sha256": "0792eac129ee5e53e3f7bd71ffa93fec4401d32734fcd2eda44acbf2225950a8",
+        "size_bytes": 14446
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/format-diffs/crates__ep_run__examples__zon05_candidate_unit_observer.rs.diff",
+        "sha256": "4b9589ef1b0f33731ba19cbba834f3cb8bddf328d489b4d0ede06809a0d5ee19",
+        "size_bytes": 37601
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/4b9589ef1b0f33731ba19cbba834f3cb8bddf328d489b4d0ede06809a0d5ee19",
+        "sha256": "4b9589ef1b0f33731ba19cbba834f3cb8bddf328d489b4d0ede06809a0d5ee19",
+        "size_bytes": 37601
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/format-diffs/crates__ep_run__examples__zon05_candidate_unit_support__fields.rs.diff",
+        "sha256": "2dc1835fb5e7f174587fa4983172dcfe7eb1d12cc56bff6059cbf177c147b267",
+        "size_bytes": 8513
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/2dc1835fb5e7f174587fa4983172dcfe7eb1d12cc56bff6059cbf177c147b267",
+        "sha256": "2dc1835fb5e7f174587fa4983172dcfe7eb1d12cc56bff6059cbf177c147b267",
+        "size_bytes": 8513
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/crates/ep_run/examples/zon05_candidate_unit_observer.rs",
+        "sha256": "7e2235beb161d55bc0820f3d5009136d94c32d629c29fa7d39800c0caeaf629d",
+        "size_bytes": 23959
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/7e2235beb161d55bc0820f3d5009136d94c32d629c29fa7d39800c0caeaf629d",
+        "sha256": "7e2235beb161d55bc0820f3d5009136d94c32d629c29fa7d39800c0caeaf629d",
+        "size_bytes": 23959
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/crates/ep_run/examples/zon05_candidate_unit_support/fields.rs",
+        "sha256": "bb4fa431ea5d37576b2046968dfa968ccf31f2611cfcca1606d83df67a3cdf93",
+        "size_bytes": 9701
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/bb4fa431ea5d37576b2046968dfa968ccf31f2611cfcca1606d83df67a3cdf93",
+        "sha256": "bb4fa431ea5d37576b2046968dfa968ccf31f2611cfcca1606d83df67a3cdf93",
+        "size_bytes": 9701
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+        "size_bytes": 1819
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+        "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+        "size_bytes": 1819
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs",
+        "sha256": "c35439dad6b498152a4b7bf109a5e4fa9420c24f32ebf444e36ff75ecbcc5b4d",
+        "size_bytes": 12162
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/c35439dad6b498152a4b7bf109a5e4fa9420c24f32ebf444e36ff75ecbcc5b4d",
+        "sha256": "c35439dad6b498152a4b7bf109a5e4fa9420c24f32ebf444e36ff75ecbcc5b4d",
+        "size_bytes": 12162
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/crates/ep_runtime/src/heat_balance/zone_humidity_correction_tests.rs",
+        "sha256": "19ee2f11c5b9029b6813569effe03d3f369ddf1452534957f149b2a40c38dcd6",
+        "size_bytes": 8665
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/19ee2f11c5b9029b6813569effe03d3f369ddf1452534957f149b2a40c38dcd6",
+        "sha256": "19ee2f11c5b9029b6813569effe03d3f369ddf1452534957f149b2a40c38dcd6",
+        "size_bytes": 8665
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-02/manifest.json",
+        "sha256": "c804a16426565fe183b3c2e87d40714c43c1edb70497190cb322cabc37b573cd",
+        "size_bytes": 8379
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/c804a16426565fe183b3c2e87d40714c43c1edb70497190cb322cabc37b573cd",
+        "sha256": "c804a16426565fe183b3c2e87d40714c43c1edb70497190cb322cabc37b573cd",
+        "size_bytes": 8379
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/source-format-command-01/receipt.json",
+        "sha256": "f5833496c99ab1dd7708b018e56f1fcdd4240ca78107ea26816aa8208af14bd8",
+        "size_bytes": 3258
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/f5833496c99ab1dd7708b018e56f1fcdd4240ca78107ea26816aa8208af14bd8",
+        "sha256": "f5833496c99ab1dd7708b018e56f1fcdd4240ca78107ea26816aa8208af14bd8",
+        "size_bytes": 3258
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/source-format-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/source-format-command-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/b6/b69eb2412bcbc05f7dcdc5f0b0dc5b65b12601cf6cebccf278517edaf4fd8df9",
+        "sha256": "b69eb2412bcbc05f7dcdc5f0b0dc5b65b12601cf6cebccf278517edaf4fd8df9",
+        "size_bytes": 1611733
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/b69eb2412bcbc05f7dcdc5f0b0dc5b65b12601cf6cebccf278517edaf4fd8df9",
+        "sha256": "b69eb2412bcbc05f7dcdc5f0b0dc5b65b12601cf6cebccf278517edaf4fd8df9",
+        "size_bytes": 1611733
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/candidate-launch-inputs-01/candidate-build-command-01.orchestration.log",
+        "sha256": "d5f37bb8fc06486c4204dc9e17d2ed1645af3f5d6d9d790221f7b4d1408b55e6",
+        "size_bytes": 8400
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/d5f37bb8fc06486c4204dc9e17d2ed1645af3f5d6d9d790221f7b4d1408b55e6",
+        "sha256": "d5f37bb8fc06486c4204dc9e17d2ed1645af3f5d6d9d790221f7b4d1408b55e6",
+        "size_bytes": 8400
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/candidate-launch-inputs-01/candidate-unit-command-01.orchestration.log",
+        "sha256": "3a57cf64a97da98b56bef3d7e14866733b135055e14adf426338411f765077b6",
+        "size_bytes": 8417
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/3a57cf64a97da98b56bef3d7e14866733b135055e14adf426338411f765077b6",
+        "sha256": "3a57cf64a97da98b56bef3d7e14866733b135055e14adf426338411f765077b6",
+        "size_bytes": 8417
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/candidate-launch-inputs-01/runtime-source-bindings.json",
+        "sha256": "09379f4abe382fc7ef09f206bf85c54ebc7a69f3e428b0f87e4801f779b30861",
+        "size_bytes": 3133
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/09379f4abe382fc7ef09f206bf85c54ebc7a69f3e428b0f87e4801f779b30861",
+        "sha256": "09379f4abe382fc7ef09f206bf85c54ebc7a69f3e428b0f87e4801f779b30861",
+        "size_bytes": 3133
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/candidate-launch-inputs-01/unit-comparison-command-01.orchestration.log",
+        "sha256": "64de3ea473da4653a61cbab8595a734d098101eace2da142ced52f4572320989",
+        "size_bytes": 8524
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/64de3ea473da4653a61cbab8595a734d098101eace2da142ced52f4572320989",
+        "sha256": "64de3ea473da4653a61cbab8595a734d098101eace2da142ced52f4572320989",
+        "size_bytes": 8524
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/candidate-build-command-01/receipt.json",
+        "sha256": "8ef353d70c6eca16c352291b4ad44839728d0e233b9d15182760020d80a0d451",
+        "size_bytes": 5097
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/8ef353d70c6eca16c352291b4ad44839728d0e233b9d15182760020d80a0d451",
+        "sha256": "8ef353d70c6eca16c352291b4ad44839728d0e233b9d15182760020d80a0d451",
+        "size_bytes": 5097
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/candidate-build-command-01/stderr.log",
+        "sha256": "7c65a173ac3a85e5c9b8c62f924f34b5b153dea24628fdf91224b4024e530499",
+        "size_bytes": 159
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/7c65a173ac3a85e5c9b8c62f924f34b5b153dea24628fdf91224b4024e530499",
+        "sha256": "7c65a173ac3a85e5c9b8c62f924f34b5b153dea24628fdf91224b4024e530499",
+        "size_bytes": 159
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/candidate-build-command-01/stdout.log",
+        "sha256": "3b6a36f42ed3b0f4c8ecfeaa02ab1b92752e8e165a6700702035acfcf2724e07",
+        "size_bytes": 31913
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/3b6a36f42ed3b0f4c8ecfeaa02ab1b92752e8e165a6700702035acfcf2724e07",
+        "sha256": "3b6a36f42ed3b0f4c8ecfeaa02ab1b92752e8e165a6700702035acfcf2724e07",
+        "size_bytes": 31913
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/candidate-unit-command-01/receipt.json",
+        "sha256": "58206c26399d9bcfd3c3f3b8b97ac6b7c9140d8f9c6ef51f0654a9345919798e",
+        "size_bytes": 3716
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/58206c26399d9bcfd3c3f3b8b97ac6b7c9140d8f9c6ef51f0654a9345919798e",
+        "sha256": "58206c26399d9bcfd3c3f3b8b97ac6b7c9140d8f9c6ef51f0654a9345919798e",
+        "size_bytes": 3716
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/candidate-unit-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/candidate-unit-command-01/stdout.log",
+        "sha256": "417a961b64881e16c9981cf4e49f723fe677daabb1e0f0240e41b54295e27dc0",
+        "size_bytes": 1801202
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/417a961b64881e16c9981cf4e49f723fe677daabb1e0f0240e41b54295e27dc0",
+        "sha256": "417a961b64881e16c9981cf4e49f723fe677daabb1e0f0240e41b54295e27dc0",
+        "size_bytes": 1801202
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/unit-comparison-01/000-compare_unit.py",
+        "sha256": "052a51115a164c60cab6aa222910dc95d15fda7d9bc12d41b30e1699c2589c28",
+        "size_bytes": 38311
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/052a51115a164c60cab6aa222910dc95d15fda7d9bc12d41b30e1699c2589c28",
+        "sha256": "052a51115a164c60cab6aa222910dc95d15fda7d9bc12d41b30e1699c2589c28",
+        "size_bytes": 38311
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/unit-comparison-01/001-shape.py",
+        "sha256": "9a530999a7e861f9eca32553e484b766deaef2c0b392a90f8728579a5e4d958a",
+        "size_bytes": 17216
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/objects/9a530999a7e861f9eca32553e484b766deaef2c0b392a90f8728579a5e4d958a",
+        "sha256": "9a530999a7e861f9eca32553e484b766deaef2c0b392a90f8728579a5e4d958a",
+        "size_bytes": 17216
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/unit-comparison-01/002-packet_io.py",
+        "sha256": "4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+        "size_bytes": 3893
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-frozen/objects/4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+        "sha256": "4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+        "size_bytes": 3893
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/unit-comparison-01/comparison.json",
+        "sha256": "ab51e4e2996721e2270a1bee577166460d2f9d2bb4a719de8169115e08fe00bc",
+        "size_bytes": 35772
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/ab51e4e2996721e2270a1bee577166460d2f9d2bb4a719de8169115e08fe00bc",
+        "sha256": "ab51e4e2996721e2270a1bee577166460d2f9d2bb4a719de8169115e08fe00bc",
+        "size_bytes": 35772
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/unit-comparison-command-01/receipt.json",
+        "sha256": "f3633cba20b62278b123d5a8301f245760d43e5a25ff55236ac78bcc1e0acc53",
+        "size_bytes": 4397
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/f3633cba20b62278b123d5a8301f245760d43e5a25ff55236ac78bcc1e0acc53",
+        "sha256": "f3633cba20b62278b123d5a8301f245760d43e5a25ff55236ac78bcc1e0acc53",
+        "size_bytes": 4397
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/unit-comparison-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/unit-comparison-command-01/stdout.log",
+        "sha256": "1fa168f20f5853d0ea2e59b1a623f9d64386a2627020316afcac04211a085272",
+        "size_bytes": 37096
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/1fa168f20f5853d0ea2e59b1a623f9d64386a2627020316afcac04211a085272",
+        "sha256": "1fa168f20f5853d0ea2e59b1a623f9d64386a2627020316afcac04211a085272",
+        "size_bytes": 37096
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/comparison-contract-tests-command-01/receipt.json",
+        "sha256": "8a2e9d7429254858b2484270931a6dcb796fc910db37b02237501c26a0801fd5",
+        "size_bytes": 3368
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/8a2e9d7429254858b2484270931a6dcb796fc910db37b02237501c26a0801fd5",
+        "sha256": "8a2e9d7429254858b2484270931a6dcb796fc910db37b02237501c26a0801fd5",
+        "size_bytes": 3368
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/comparison-contract-tests-command-01/stderr.log",
+        "sha256": "7a14a6b7a78ab0c73959601709b293818678a1cfb496728a9dcd17340f008027",
+        "size_bytes": 110
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/7a14a6b7a78ab0c73959601709b293818678a1cfb496728a9dcd17340f008027",
+        "sha256": "7a14a6b7a78ab0c73959601709b293818678a1cfb496728a9dcd17340f008027",
+        "size_bytes": 110
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/comparison-contract-tests-command-01/stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-07-unit/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/run-actual-candidate-01.py",
+        "sha256": "3ab70da4eb9b56dba188b28f6502479a8367a227a67f9b366abc8fded92aa329",
+        "size_bytes": 4680
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/3ab70da4eb9b56dba188b28f6502479a8367a227a67f9b366abc8fded92aa329",
+        "sha256": "3ab70da4eb9b56dba188b28f6502479a8367a227a67f9b366abc8fded92aa329",
+        "size_bytes": 4680
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/run-quality-01.py",
+        "sha256": "535fa0b229fb7688876bb3ebb5a201dd121f3aad112a489dc67583c4596907fe",
+        "size_bytes": 1613
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/535fa0b229fb7688876bb3ebb5a201dd121f3aad112a489dc67583c4596907fe",
+        "sha256": "535fa0b229fb7688876bb3ebb5a201dd121f3aad112a489dc67583c4596907fe",
+        "size_bytes": 1613
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/apply-and-format-accepted-source-01.py",
+        "sha256": "fa81cbb519ee5706466da3796f7d4b6556a40066ef716b716c202246e94feafd",
+        "size_bytes": 6559
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/fa81cbb519ee5706466da3796f7d4b6556a40066ef716b716c202246e94feafd",
+        "sha256": "fa81cbb519ee5706466da3796f7d4b6556a40066ef716b716c202246e94feafd",
+        "size_bytes": 6559
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/ZON-05/publish-selected-unit-01.py",
+        "sha256": "6f2e036f528269d142ef538a07865d13f833a40aed05a0a9702d1a0899b269e4",
+        "size_bytes": 13808
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/6f2e036f528269d142ef538a07865d13f833a40aed05a0a9702d1a0899b269e4",
+        "sha256": "6f2e036f528269d142ef538a07865d13f833a40aed05a0a9702d1a0899b269e4",
+        "size_bytes": 13808
+      }
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs",
+        "sha256": "c35439dad6b498152a4b7bf109a5e4fa9420c24f32ebf444e36ff75ecbcc5b4d",
+        "size_bytes": 12162
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/c35439dad6b498152a4b7bf109a5e4fa9420c24f32ebf444e36ff75ecbcc5b4d",
+        "sha256": "c35439dad6b498152a4b7bf109a5e4fa9420c24f32ebf444e36ff75ecbcc5b4d",
+        "size_bytes": 12162
+      }
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/zone_humidity_correction_tests.rs",
+        "sha256": "19ee2f11c5b9029b6813569effe03d3f369ddf1452534957f149b2a40c38dcd6",
+        "size_bytes": 8665
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/19ee2f11c5b9029b6813569effe03d3f369ddf1452534957f149b2a40c38dcd6",
+        "sha256": "19ee2f11c5b9029b6813569effe03d3f369ddf1452534957f149b2a40c38dcd6",
+        "size_bytes": 8665
+      }
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+        "size_bytes": 1819
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+        "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+        "size_bytes": 1819
+      }
+    },
+    {
+      "original": {
+        "path": "crates/ep_run/examples/zon05_candidate_unit_observer.rs",
+        "sha256": "7e2235beb161d55bc0820f3d5009136d94c32d629c29fa7d39800c0caeaf629d",
+        "size_bytes": 23959
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/7e2235beb161d55bc0820f3d5009136d94c32d629c29fa7d39800c0caeaf629d",
+        "sha256": "7e2235beb161d55bc0820f3d5009136d94c32d629c29fa7d39800c0caeaf629d",
+        "size_bytes": 23959
+      }
+    },
+    {
+      "original": {
+        "path": "crates/ep_run/examples/zon05_candidate_unit_support/fields.rs",
+        "sha256": "bb4fa431ea5d37576b2046968dfa968ccf31f2611cfcca1606d83df67a3cdf93",
+        "size_bytes": 9701
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/bb4fa431ea5d37576b2046968dfa968ccf31f2611cfcca1606d83df67a3cdf93",
+        "sha256": "bb4fa431ea5d37576b2046968dfa968ccf31f2611cfcca1606d83df67a3cdf93",
+        "size_bytes": 9701
+      }
+    },
+    {
+      "original": {
+        "path": "crates/ep_run/Cargo.toml",
+        "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+        "size_bytes": 524
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+        "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+        "size_bytes": 524
+      }
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/Cargo.toml",
+        "sha256": "bb81b5793debafd84300ec9905f0cda65ab32d216633543bab375b30a7a379e9",
+        "size_bytes": 327
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/bb81b5793debafd84300ec9905f0cda65ab32d216633543bab375b30a7a379e9",
+        "sha256": "bb81b5793debafd84300ec9905f0cda65ab32d216633543bab375b30a7a379e9",
+        "size_bytes": 327
+      }
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/lib.rs",
+        "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+        "size_bytes": 868
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+        "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+        "size_bytes": 868
+      }
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/zone_air_initialization.rs",
+        "sha256": "56b94253ec63ba83b4393f0d46974f3d65b294bb8c17694be2030ef849c8957b",
+        "size_bytes": 11003
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/56b94253ec63ba83b4393f0d46974f3d65b294bb8c17694be2030ef849c8957b",
+        "sha256": "56b94253ec63ba83b4393f0d46974f3d65b294bb8c17694be2030ef849c8957b",
+        "size_bytes": 11003
+      }
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "d6187b9d4892f9c7362b4c33fcd05b4b2b2031521ac0007acad33897c098b3a5",
+        "size_bytes": 48412
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/d6187b9d4892f9c7362b4c33fcd05b4b2b2031521ac0007acad33897c098b3a5",
+        "sha256": "d6187b9d4892f9c7362b4c33fcd05b4b2b2031521ac0007acad33897c098b3a5",
+        "size_bytes": 48412
+      }
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/psychrometrics.rs",
+        "sha256": "fe7b95c62aa56409193311b17d4f28478897592247b859f2656b33d8f8de8837",
+        "size_bytes": 42191
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/fe7b95c62aa56409193311b17d4f28478897592247b859f2656b33d8f8de8837",
+        "sha256": "fe7b95c62aa56409193311b17d4f28478897592247b859f2656b33d8f8de8837",
+        "size_bytes": 42191
+      }
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+        "sha256": "8f9567503bb8d361ebff3eb180d9a48c72e4ba19d56dc99c329ecd9e7efe885d",
+        "size_bytes": 19614
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/8f9567503bb8d361ebff3eb180d9a48c72e4ba19d56dc99c329ecd9e7efe885d",
+        "sha256": "8f9567503bb8d361ebff3eb180d9a48c72e4ba19d56dc99c329ecd9e7efe885d",
+        "size_bytes": 19614
+      }
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/psychrometrics/psy02_trace.rs",
+        "sha256": "ac3d54d959ae5e775b0fb3c01492b15f4ea68741779f56a65617dc1e11ea2046",
+        "size_bytes": 9122
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/ac3d54d959ae5e775b0fb3c01492b15f4ea68741779f56a65617dc1e11ea2046",
+        "sha256": "ac3d54d959ae5e775b0fb3c01492b15f4ea68741779f56a65617dc1e11ea2046",
+        "size_bytes": 9122
+      }
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/psychrometrics/production_trace.rs",
+        "sha256": "e32a1fe1b1a6a2fb84b0d591d8a111feac3a10c43c20ec3d9f575a71959e0fb3",
+        "size_bytes": 16724
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/e32a1fe1b1a6a2fb84b0d591d8a111feac3a10c43c20ec3d9f575a71959e0fb3",
+        "sha256": "e32a1fe1b1a6a2fb84b0d591d8a111feac3a10c43c20ec3d9f575a71959e0fb3",
+        "size_bytes": 16724
+      }
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/psychrometrics_spline_tables.rs",
+        "sha256": "405eed26d7fb07d710ad75ac237063caee993acfcfc9038754f945ae66bbabaf",
+        "size_bytes": 52855
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/405eed26d7fb07d710ad75ac237063caee993acfcfc9038754f945ae66bbabaf",
+        "sha256": "405eed26d7fb07d710ad75ac237063caee993acfcfc9038754f945ae66bbabaf",
+        "size_bytes": 52855
+      }
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/src/psychrometrics/cp_cache.rs",
+        "sha256": "0ebe23b129e3e6aaad5fe24ee3ba15f3799cf60ac93f63ecb73afa695fc1b0d2",
+        "size_bytes": 6674
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/0ebe23b129e3e6aaad5fe24ee3ba15f3799cf60ac93f63ecb73afa695fc1b0d2",
+        "sha256": "0ebe23b129e3e6aaad5fe24ee3ba15f3799cf60ac93f63ecb73afa695fc1b0d2",
+        "size_bytes": 6674
+      }
+    },
+    {
+      "original": {
+        "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+        "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+        "size_bytes": 3172
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/ZON-05-unit/objects/23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+        "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+        "size_bytes": 3172
+      }
+    }
+  ],
+  "compressed_scientific_observations": [],
+  "new_unique_raw_objects": 93,
+  "new_unique_raw_object_bytes": 6829566,
+  "binary_payloads_archived": false,
+  "selected_archive_is_transitive_replay_closure": false,
+  "full_selected_scientific_observation_bytes_preserved": true
+}

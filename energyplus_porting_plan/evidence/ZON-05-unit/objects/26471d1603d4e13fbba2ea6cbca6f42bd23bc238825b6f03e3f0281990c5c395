@@ -1,0 +1,92 @@
+# ZON-05 ordinary caller integration plan
+
+Source-only extension of readiness69ba8107, held before any integration changes.
+No code, target, input policy, canonical source, plan gate or runtime authority is changed.
+The refs/ranges in manifest.json pin the inspected bytes, not an execution result.
+
+## Ready source boundaries
+
+The held aa72577e direct member is the sole proposed humidity equation implementation.
+It consumes the existing full ZoneAirInitializationState, ordered allocated nodes,
+actual source/context and a passed PSY02 instance; it writes temporary W and node W/H.
+The accepted Native helper observes 21 input-only cases/43 direct requests, not a caller.
+Its independently supplied working4 histories cannot establish production selection.
+Root must finish genuine Native QA, unchanged Rust baseline, application and same-input
+unit comparison before releasing this member's numerical boundary. None is inferred here.
+
+The current PurchasedAir path already returns the genuine typed supply_node_update:
+NodeId, multiplied physical mass flow, temperature, W and enthalpy (update.rs8-18).
+binding.rs746-795 binds supply=inlet and distinct zone-air/return nodes;849-874 retains IDs.
+coupling.rs220-240 currently commits only sensible SumSysMCp and SumSysMCpT.
+Keep that existing calculation/Init/Calc/Update/Report path; carry its node owner onward.
+
+## Smallest proposed owner/dataflow changes, separately reviewed before activation
+
+1. Retain each actual ZON01 full initialization owner in ordinary zone runtime state.
+   air_manager.rs119-167 currently builds full owners then projects first3 into the shell;
+   initialization.rs162-175 drops working fields/fourth slots from that legacy projection.
+   Preserve all six four-slot buffers, temporary/current/average W and WTimeMinusP/W1/WMX/WM2.
+   Make that retained owner authoritative; legacy fields become explicit consumer projections.
+   Do not reconstruct it from first3 histories, defaults or Native fixture state per call.
+2. Retain actual supply and zone-air node T/W/mass/H under the bound runtime NodeIds.
+   Commit PurchasedAir's returned supply update before temperature/humidity correction,
+   including OFF/zero-flow values, rather than derive moisture from MCp/Cp or a report series.
+   Return-node refresh and next PurchasedAir recirculation must consume the actual caller
+   node owner at its real source phase; current binding.rs1560-1564 projects zone state instead.
+   Diagnostic NodeStateStore lacks enthalpy and uses defaults; it is not this solver owner.
+   Validate actual allocation/order and identity mapping; do not invent Native node indices.
+3. Supply real corrected ZT, old current W, volume, moisture capacity, pressure, dt and flags.
+   Preserve integer Multiplier*ListMultiplier in the admitted source i32 domain and each
+   original inlet contribution; the existing sensible feedback's f64 product is not its owner.
+   The selected model Zone/state has no moisture-capacity field. An owned default1.0 is
+   valid for the exact fixed15: all IDF bytes match scope.json and none declares
+   ZoneCapacitanceMultiplier:ResearchSpecial; Native hh681 and Source1452-1467 own that
+   default/zero-object assignment. Persist that input-derived ownership explicitly.
+   CON's generic exclusions do not name this override; broader inputs/override routes
+   need their actual producer or explicit unavailable admission, never an assumed default.
+   Prove no-OA/no-latent/other excluded sources from the real model/manager path and retain
+   their source operands. Use actual weather pressure/clock, not compatibility fallbacks.
+4. At the real correction caller, select/copy all4 histories before temperature solve:
+   Native3894-3900 copies WPrevZoneTS or DSWPrevZoneTS to working WPrevZoneTSTemp.
+   Correct temperature first, write its actual ZT/MAT and zone-node temperature, then call
+   correct_selected_zone_humidity_ratio once with the retained owner/node/PSY instance.
+   Native4128 returns before4130 commits current W and4131 evaluates RH; keep those separate.
+   Positive system-node W/H feedback is independent of IsControlled (Native4594-4601).
+   Replace the two legacy humidity approximation call sites through this same member;
+   do not leave an adaptive second equation, stored-W floor, fallback or duplicated call.
+5. Keep caller histories and averages as distinct phase-owned writes, not member effects.
+   HVAC165-176 resets averages;404-409 accumulates W*actual(TimeStepSys/TimeStepZone).
+   System push4297-4305 shifts four DS slots and inserts committed current W.
+   Zone push4197-4206 shifts four zone slots, inserts average, then writes current/WTimeMinusP.
+   Preserve source dispatch order and real timestep flags; do not substitute a1/count average.
+
+## Blocked caller work and honest first integration boundary
+
+The present fixed PurchasedAir config disables adaptive correction, selects system history
+through timestep.rs327 and assigns average=current/pushes DS each call at779-786.
+Native HVAC322-328 chooses zone history for a non-shortened full zone step; its DS push388-393
+is inside the shortened-step branch. Those meanings must be repaired/proven before parity,
+not hidden by supplying the old fixed history flag to the literal member.
+
+Adaptive integration additionally requires the real initial trial correction294-299,
+temperature-change timestep decision308-325, subsequent SimHVAC360 and correction374-393.
+Native updateTemperatures6776-6801 rewinds node T/W/H before optional four-value interpolation;
+6825-6832 copies the selected full history. Revert4395-4398 shifts only slots0..2 from1..3.
+Current three-value interpolation/per-zone retry does not authenticate this global lifecycle.
+No adaptive activation, rollback approximation or shortened-input run is proposed here.
+
+The smallest future ordinary integration review is the existing admitted no-OA, fully mixed,
+single-zone controlled PurchasedAir route and its uncontrolled counterpart, with genuine
+model/material/weather/schedule/node producers; broader inlet unit probes stay unit-only.
+It must pair actual post-PurchasedAir nodes, selected4 histories, post-temperature ZT,
+member return, current/RH commit, average and conditional pushes/rollback independently.
+Reuse the existing whole-engine entry/tracing mechanism with additive passive source sites;
+direct-member seeds and HBSM-only observations do not supply these missing caller records.
+Freeze any new capture scope/profiles before its outputs, using existing stages only.
+
+ZON02 temperature operands/caller and ZON04 history/clock custody remain prerequisites.
+First implement/review retained-owner and node handoff proposals; keep runtime activation
+blocked until actual caller records prove the selected path and all required owners exist.
+Stopped, unsupported, missing or excluded owners remain unavailable/noPASS, not default rows.
+Global diagnostics/fatal backend, warmup/report integration and full-card gates remain pending.
+Raw authored the held humidity kernel; this plan is not an independent formula certificate.

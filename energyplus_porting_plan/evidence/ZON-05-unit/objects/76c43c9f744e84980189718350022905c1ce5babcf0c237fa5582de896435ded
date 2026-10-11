@@ -1,0 +1,11 @@
+--- .runtime/porting/ZON-05/rust-observer-prep-02/before-01/README.md
++++ .runtime/porting/ZON-05/rust-observer-prep-02/README.md
+@@ -55,3 +55,8 @@
+ compiler, formatter, import, target or numerical execution has occurred.
+ Base authored this transport and previously reviewed the Raw kernel; Header
+ authored Native/freezer/QA. This is custody Source, not formula or science proof.
++
++Fresh02 changes only the purpose label for psy02_state.rs405-416 to the actual
++nested WFromRh route. Its range identity was already correct. All Rust bodies,
++before archives, exact source diffs and runtime interfaces remain literal01.
++The snapshots/final-cache owner API is separately covered by lines1-226.

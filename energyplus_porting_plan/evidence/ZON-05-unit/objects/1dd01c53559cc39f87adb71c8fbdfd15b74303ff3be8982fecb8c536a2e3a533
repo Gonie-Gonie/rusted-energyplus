@@ -1,0 +1,62 @@
+"""Unexecuted stdlib tests of the existing comparison primitive, not RAD answers."""
+import struct
+import unittest
+
+from compare_unit import Comparison
+
+
+def need(value, message):
+    if not value: raise ValueError(message)
+
+
+def dto(value):
+    return {"value": value, "value_bits": struct.pack(">d", value).hex(),
+            "value_class": "negative_zero" if value == 0.0 and struct.pack(">d", value).hex()[0] == "8" else
+                           "positive_zero" if value == 0.0 else "finite"}
+
+
+class ComparisonContracts(unittest.TestCase):
+    def test_signed_zero_is_exact_even_when_numeric_difference_is_zero(self):
+        comparison = Comparison(need)
+        comparison.number("zero", "F", dto(-0.0), dto(0.0))
+        self.assertEqual(comparison.metrics["F"]["maximum_absolute_error"], 0.0)
+        self.assertEqual(comparison.counts["discrete_mismatches"], 2)
+        self.assertEqual(comparison.counts["numeric_mismatches"], 0)
+
+    def test_equal_negative_zero_retains_a_finite_numeric_comparison(self):
+        comparison = Comparison(need)
+        comparison.number("zero", "F", dto(-0.0), dto(-0.0))
+        self.assertEqual(comparison.counts["mismatches"], 0)
+        self.assertEqual(comparison.metrics["F"]["count"], 1)
+
+    def test_a_single_ulp_difference_is_not_tolerated(self):
+        comparison = Comparison(need)
+        neighbor = struct.unpack(">d", bytes.fromhex("3ff0000000000001"))[0]
+        comparison.number("finite", "ZoneArea", dto(1.0), dto(neighbor))
+        self.assertEqual(comparison.counts["numeric_mismatches"], 1)
+        self.assertGreater(comparison.metrics["ZoneArea"]["maximum_absolute_error"], 0.0)
+
+    def test_nonfinite_class_is_retained_without_numerical_pass(self):
+        comparison = Comparison(need)
+        actual = {"value": None, "value_bits": "7ff0000000000000", "value_class": "positive_infinity"}
+        comparison.number("infinity", "F", actual, actual)
+        self.assertEqual(comparison.counts["availability_failures"], 1)
+        self.assertEqual(comparison.metrics["F"]["count"], 0)
+        self.assertFalse(comparison.unavailable[0]["counted_as_PASS"])
+
+    def test_required_both_missing_and_empty_profiles_fail(self):
+        comparison = Comparison(need)
+        comparison.absence("required", False, False, True, "both absent")
+        report = comparison.report()
+        self.assertEqual(report["mismatch_count"], 3)
+        self.assertEqual(report["numeric_comparisons"], 0)
+        self.assertFalse(report["unavailable_counted_as_PASS"])
+
+    def test_bits_class_decimal_disagreement_is_rejected(self):
+        comparison = Comparison(need)
+        malformed = dto(0.0); malformed["value_bits"] = "8000000000000000"
+        with self.assertRaises(ValueError): comparison.dto(malformed)
+
+
+if __name__ == "__main__":
+    unittest.main()

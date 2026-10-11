@@ -1,0 +1,10 @@
+--- .runtime/porting/ZON-05/rust-humidity-member-prep-01/before/mod.rs
++++ .runtime/porting/ZON-05/rust-humidity-member-prep-01/mod.rs
+@@ -46,6 +46,7 @@
+ pub mod zone_air_correction;
+ pub mod zone_air_initialization;
+ pub mod zone_air_initialization_trace;
++pub mod zone_humidity_correction;
+ pub mod zone_predictor_corrector;
+ 
+ pub use air_manager::*;

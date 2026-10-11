@@ -1,0 +1,69 @@
+{
+  "schema": "zon05-direct-member-Rust-observer-proposal.v1",
+  "status": "Source-only-future-unexecuted",
+  "input_request_schema": "zon05-native-unit-request.v1",
+  "future_observer_result_schema": "unsettled-not-authored",
+  "input_only_fixture": {
+    "path": ".runtime/porting/ZON-05/native-helper-prep-01/input-only-cases.proposed.json",
+    "sha256": "e2a98523a591dd76c370d70e0ebc3464d97ba62bd512d4b5f9f60c3b5662bcaf",
+    "size_bytes": 94170,
+    "line_count": 3032
+  },
+  "Native_helper": {
+    "path": ".runtime/porting/ZON-05/native-helper-prep-01/manifest.json",
+    "sha256": "5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1",
+    "size_bytes": 39009,
+    "line_count": 962
+  },
+  "scope": "zone-only-mixed-noOA-noLatent-ThirdOrder-direct-member",
+  "case_and_operation_identity": "literal request order/IDs, no sorting or inferred Native return count",
+  "passed_psychrometric_instance": "fresh accepted State once per case, same owner across all actual operations",
+  "state_owner": "full ZoneAirInitializationState; actual request zone_fields override only declared fields; other fields use genuine initialization-owner defaults",
+  "state_mapping": {
+    "ZT": "zt",
+    "MAT": "mat",
+    "ZTAV": "ztav",
+    "airHumRat": "air_hum_rat",
+    "airHumRatAvg": "air_hum_rat_avg",
+    "airHumRatTemp": "air_hum_rat_temp",
+    "W1": "w1",
+    "WMX": "wmx",
+    "WM2": "wm2",
+    "WTimeMinusP": "w_time_minus_p",
+    "airRelHum": "air_rel_hum",
+    "WPrevZoneTS": "w_prev_zone_ts[4]",
+    "DSWPrevZoneTS": "dsw_prev_zone_ts[4]",
+    "WPrevZoneTSTemp": "w_prev_zone_ts_temp[4]"
+  },
+  "geometry_clock_mapping": {
+    "Multiplier": "multiplier",
+    "ListMultiplier": "list_multiplier",
+    "Volume": "volume",
+    "ZoneVolCapMultpMoist": "moisture_capacitance_multiplier",
+    "OutBaroPress": "outdoor_pressure",
+    "OutHumRat": "outdoor_humidity_ratio",
+    "TimeStepSysSec": "time_step_sys_seconds",
+    "TimeStepSys": "time_step_sys",
+    "TimeStepZone": "time_step_zone",
+    "inlet_node_ids": "ordered original IDs",
+    "SystemZoneNodeNumber": "system_zone_node_number"
+  },
+  "scope_flags": "actual selected Native-helper preparation literals only, never copied from Native numerical output",
+  "source_operands": "retain all12 declared zero source fields plus actual zero SumLatentHTRadSys/SumLatentPool allocation operands",
+  "nodes": "actual original contiguous node_id/name/MassFlowRate/Temp/HumRat/Enthalpy independent request fields and bit tokens",
+  "actual_Rust_outputs": "copy before/after full state, all nodes, actual psych snapshot/final_caches and typed call/error",
+  "Native_internal_locals": "unobserved; do not compare own helper result/guards as Native locals or recompute A/B/C/rho/Hg/Wsat",
+  "diagnostics": "Native-only actual global message/err_stream context, no fabricated Rust backend or fatal equality",
+  "scope_unavailable": "typed scope/negative-density backend/property-interface, noPASS; required admitted missing owners fail future comparer",
+  "caller_operations_not_invoked": [
+    "correctAirTemp",
+    "working-history selection",
+    "current/airRelHum commit",
+    "time-weighted average",
+    "zone/system history push"
+  ],
+  "actual_Cargo_API_source_bindings": "future actual paths/SHAs/full SourceSnapshot supplied at runtime after reviewed apply/format/quality; none guessed here",
+  "Native_values_as_Rust_inputs": false,
+  "new_profiles_or_tolerances": false,
+  "execution_or_PASS_claimed": false
+}

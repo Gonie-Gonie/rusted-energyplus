@@ -1,0 +1,109 @@
+{
+  "schema": "zon05-actual-literal-source-application.v1",
+  "applied_utc": "2026-10-11T02:43:07.749535+00:00",
+  "actual_sources": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs",
+      "accepted_held_source": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/zone_humidity_correction.rs",
+        "sha256": "f8279ee488005e9c274534c7fb009bbfe4a4cd55141797125b650f7a44230b6c",
+        "size_bytes": 11286,
+        "line_count": 245
+      },
+      "actual_before_archive": null,
+      "actual_literal_archive": {
+        "path": ".runtime/porting/ZON-05/applied-source-01/crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs",
+        "sha256": "f8279ee488005e9c274534c7fb009bbfe4a4cd55141797125b650f7a44230b6c",
+        "size_bytes": 11286
+      },
+      "package": "accepted-pure-ZON05-01"
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/zone_humidity_correction_tests.rs",
+      "accepted_held_source": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/zone_humidity_correction_tests.rs",
+        "sha256": "ef1b76b860fc775a3e01a94bfe851937219049fba694cccdf24c463555a83c0d",
+        "size_bytes": 7658,
+        "line_count": 157
+      },
+      "actual_before_archive": null,
+      "actual_literal_archive": {
+        "path": ".runtime/porting/ZON-05/applied-source-01/crates/ep_runtime/src/heat_balance/zone_humidity_correction_tests.rs",
+        "sha256": "ef1b76b860fc775a3e01a94bfe851937219049fba694cccdf24c463555a83c0d",
+        "size_bytes": 7658
+      },
+      "package": "accepted-pure-ZON05-01"
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "accepted_held_source": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/mod.rs",
+        "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+        "size_bytes": 1819,
+        "line_count": 72
+      },
+      "actual_before_archive": {
+        "path": ".runtime/porting/ZON-05/applied-source-01/before/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+        "size_bytes": 1785
+      },
+      "actual_literal_archive": {
+        "path": ".runtime/porting/ZON-05/applied-source-01/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+        "size_bytes": 1819
+      },
+      "package": "accepted-pure-ZON05-01"
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/zon05_candidate_unit_observer.rs",
+      "accepted_held_source": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-01/new/zon05_candidate_unit_observer.rs",
+        "sha256": "cd9d0b8a123f04cdba97345eedbf813796528ec35e2a2e508f00685bd0ef4db5",
+        "size_bytes": 20510,
+        "line_count": 273
+      },
+      "actual_before_archive": null,
+      "actual_literal_archive": {
+        "path": ".runtime/porting/ZON-05/applied-source-01/crates/ep_run/examples/zon05_candidate_unit_observer.rs",
+        "sha256": "cd9d0b8a123f04cdba97345eedbf813796528ec35e2a2e508f00685bd0ef4db5",
+        "size_bytes": 20510
+      },
+      "package": "accepted-observer02"
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/zon05_candidate_unit_support/fields.rs",
+      "accepted_held_source": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-01/new/zon05_candidate_unit_support/fields.rs",
+        "sha256": "d5fc420ed302cb3bd940e18fe8487478d84e7d648d13158acfe89e840ab4723a",
+        "size_bytes": 9174,
+        "line_count": 143
+      },
+      "actual_before_archive": null,
+      "actual_literal_archive": {
+        "path": ".runtime/porting/ZON-05/applied-source-01/crates/ep_run/examples/zon05_candidate_unit_support/fields.rs",
+        "sha256": "d5fc420ed302cb3bd940e18fe8487478d84e7d648d13158acfe89e840ab4723a",
+        "size_bytes": 9174
+      },
+      "package": "accepted-observer02"
+    }
+  ],
+  "actual5_literal_bodies_match_FULL_accepted_sources": true,
+  "Root_and_other_author_FULL_review_before_application": true,
+  "actual_Original_baseline": {
+    "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/summary.json",
+    "sha256": "2b39420930237c5c53c1d0d252349f84fa1356d7585cc60e0ed6fc3be179baec",
+    "size_bytes": 2280
+  },
+  "accepted_public_source": {
+    "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/manifest.json",
+    "sha256": "aa72577e3f4eeb802704cd1f6e817283708c384aebde8518d55c5b5003f3c8e6",
+    "size_bytes": 16989
+  },
+  "accepted_observer_source": {
+    "path": ".runtime/porting/ZON-05/rust-observer-prep-02/manifest.json",
+    "sha256": "fdfac830c0b40ba4e6cb49bb6049a7e5d3f8d554b9d9439b8bd1ee968fad3bdf",
+    "size_bytes": 17073
+  },
+  "Cargo_format_quality_or_scientific_execution_claimed": false,
+  "all_four_new_destinations_were_absent": true
+}

@@ -1,0 +1,1324 @@
+{
+  "schema": "zon05-unit-comparison.v1",
+  "status": "pass-selected-direct-humidity-member",
+  "started_utc": "2026-10-11T02:54:25.165024+00:00",
+  "finished_utc": "2026-10-11T02:54:25.582113+00:00",
+  "reviewed_Original_data_review": {
+    "path": ".runtime/porting/ZON-05/original-data-review-01/review.json",
+    "sha256": "5ae096bf49470d5595c9668ae920db35c79b82e63459f05bf047e94fe0a51271",
+    "size_bytes": 9213
+  },
+  "reviewed_Original_data_review_execution": {
+    "path": ".runtime/porting/ZON-05/original-data-review-command-01/receipt.json",
+    "sha256": "81180861ecd47cce0d8b30076352351d6e6f9c88431453815b824f74a4132d18",
+    "size_bytes": 4147
+  },
+  "reviewed_Native_results": {
+    "path": ".runtime/porting/ZON-05/native-unit-command-01/stdout.log",
+    "sha256": "6ea93bd7dbb95b52ae6bfed3f229e6af8f066bcdd4ec75105ac56b2ae8e88635",
+    "size_bytes": 925161
+  },
+  "reviewed_Native_execution": {
+    "path": ".runtime/porting/ZON-05/native-unit-command-01/receipt.json",
+    "sha256": "2ce46689bb2db6a7dd89b38348c00374d00d55b8689378b81c2b2c777661e74c",
+    "size_bytes": 2844
+  },
+  "reviewed_request": {
+    "path": ".runtime/porting/ZON-05/frozen-packet-02/helper-request.json",
+    "sha256": "e2a98523a591dd76c370d70e0ebc3464d97ba62bd512d4b5f9f60c3b5662bcaf",
+    "size_bytes": 94170
+  },
+  "reviewed_projection": {
+    "path": ".runtime/porting/ZON-05/frozen-packet-02/projection.json",
+    "sha256": "76e864d1a0d6de729faa5d70db99ee32abb8e631570c1c72ba5e30beb1b6aa73",
+    "size_bytes": 7738
+  },
+  "reviewed_contracts": {
+    "source": {
+      "path": ".runtime/porting/ZON-05/frozen-packet-02/source.json",
+      "sha256": "339d6313259711794051ff269013213a0912e5b61668c412cae380abceadff85",
+      "size_bytes": 26039
+    },
+    "cases": {
+      "path": ".runtime/porting/ZON-05/frozen-packet-02/cases.json",
+      "sha256": "e8fd8db5aa615b751bcf1a1d4cf5e54a4f01a3bb59ed731e974cce5b9b3c8582",
+      "size_bytes": 1282
+    },
+    "tolerances": {
+      "path": ".runtime/porting/ZON-05/frozen-packet-02/tolerances.json",
+      "sha256": "247e34992b4c3dbebfdab0e37766fa95f1b25688dc62ba5d9ba5dccc5923cdf0",
+      "size_bytes": 3451
+    }
+  },
+  "actual_packet_freeze": {
+    "path": ".runtime/porting/ZON-05/frozen-packet-02/freeze-receipt.json",
+    "sha256": "0ae6d1acaed32b10f497855f1552879efdcecb78527f7818be95489298318434",
+    "size_bytes": 21040
+  },
+  "actual_packet_freeze_execution": {
+    "path": ".runtime/porting/ZON-05/freeze-command-02/receipt.json",
+    "sha256": "ab74179a85c694375d16a93fd8cdd365fd767ec42c09d95b6581245e8718407b",
+    "size_bytes": 3898
+  },
+  "actual_scope_amendment": {
+    "path": ".runtime/porting/ZON-05/scope-amendment-01/amendment.json",
+    "sha256": "fc63fa7b5caf58292b77aa6df2a3dba989f9fc8b92d6a4450e5e262b32a371e4",
+    "size_bytes": 3116
+  },
+  "actual_scope_check_execution": {
+    "path": ".runtime/porting/ZON-05/scope-check-command-01/receipt.json",
+    "sha256": "2c1f33a4bdc0e1f5bc59930c5fbfda052fc34a302a0aca93a4850558ba01636a",
+    "size_bytes": 3006
+  },
+  "Rust_results": {
+    "path": ".runtime/porting/ZON-05/candidate-unit-command-01/stdout.log",
+    "sha256": "417a961b64881e16c9981cf4e49f723fe677daabb1e0f0240e41b54295e27dc0",
+    "size_bytes": 1801202
+  },
+  "Rust_execution": {
+    "path": ".runtime/porting/ZON-05/candidate-unit-command-01/receipt.json",
+    "sha256": "58206c26399d9bcfd3c3f3b8b97ac6b7c9140d8f9c6ef51f0654a9345919798e",
+    "size_bytes": 3716
+  },
+  "Rust_build_execution": {
+    "path": ".runtime/porting/ZON-05/candidate-build-command-01/receipt.json",
+    "sha256": "8ef353d70c6eca16c352291b4ad44839728d0e233b9d15182760020d80a0d451",
+    "size_bytes": 5097
+  },
+  "actual_Rust_binary": {
+    "historical_path": "target/debug/examples/zon05_candidate_unit_observer.exe",
+    "sha256": "85a216eb47db8f52b5dd0bf5cfe7384821fcdd5f607fbd9109ccb1eaaadf4cb5"
+  },
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/ab/ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193",
+    "sha256": "ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193"
+  },
+  "actual_source_inventory": {
+    "schema": "zon05-candidate-unit-runtime-source-bindings.v1",
+    "observer_sources": [
+      {
+        "path": "crates/ep_run/examples/zon05_candidate_unit_observer.rs",
+        "sha256": "7e2235beb161d55bc0820f3d5009136d94c32d629c29fa7d39800c0caeaf629d",
+        "size_bytes": 23959
+      },
+      {
+        "path": "crates/ep_run/examples/zon05_candidate_unit_support/fields.rs",
+        "sha256": "bb4fa431ea5d37576b2046968dfa968ccf31f2611cfcca1606d83df67a3cdf93",
+        "size_bytes": 9701
+      }
+    ],
+    "actual_public_API_sources": [
+      {
+        "path": "crates/ep_run/Cargo.toml",
+        "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+        "size_bytes": 524
+      },
+      {
+        "path": "crates/ep_runtime/Cargo.toml",
+        "sha256": "bb81b5793debafd84300ec9905f0cda65ab32d216633543bab375b30a7a379e9",
+        "size_bytes": 327
+      },
+      {
+        "path": "crates/ep_runtime/src/lib.rs",
+        "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+        "size_bytes": 868
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+        "size_bytes": 1819
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/zone_air_initialization.rs",
+        "sha256": "56b94253ec63ba83b4393f0d46974f3d65b294bb8c17694be2030ef849c8957b",
+        "size_bytes": 11003
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs",
+        "sha256": "c35439dad6b498152a4b7bf109a5e4fa9420c24f32ebf444e36ff75ecbcc5b4d",
+        "size_bytes": 12162
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "d6187b9d4892f9c7362b4c33fcd05b4b2b2031521ac0007acad33897c098b3a5",
+        "size_bytes": 48412
+      },
+      {
+        "path": "crates/ep_runtime/src/psychrometrics.rs",
+        "sha256": "fe7b95c62aa56409193311b17d4f28478897592247b859f2656b33d8f8de8837",
+        "size_bytes": 42191
+      },
+      {
+        "path": "crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+        "sha256": "8f9567503bb8d361ebff3eb180d9a48c72e4ba19d56dc99c329ecd9e7efe885d",
+        "size_bytes": 19614
+      },
+      {
+        "path": "crates/ep_runtime/src/psychrometrics/psy02_trace.rs",
+        "sha256": "ac3d54d959ae5e775b0fb3c01492b15f4ea68741779f56a65617dc1e11ea2046",
+        "size_bytes": 9122
+      },
+      {
+        "path": "crates/ep_runtime/src/psychrometrics/production_trace.rs",
+        "sha256": "e32a1fe1b1a6a2fb84b0d591d8a111feac3a10c43c20ec3d9f575a71959e0fb3",
+        "size_bytes": 16724
+      },
+      {
+        "path": "crates/ep_runtime/src/psychrometrics_spline_tables.rs",
+        "sha256": "405eed26d7fb07d710ad75ac237063caee993acfcfc9038754f945ae66bbabaf",
+        "size_bytes": 52855
+      },
+      {
+        "path": "crates/ep_runtime/src/psychrometrics/cp_cache.rs",
+        "sha256": "0ebe23b129e3e6aaad5fe24ee3ba15f3799cf60ac93f63ecb73afa695fc1b0d2",
+        "size_bytes": 6674
+      },
+      {
+        "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+        "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+        "size_bytes": 3172
+      }
+    ]
+  },
+  "requested_counts": {
+    "cases": 21,
+    "correctHumRat": 43
+  },
+  "frozen_numeric_profiles": {
+    "airHumRatTemp": {
+      "unit": "kg/kg",
+      "atol": 1e-12,
+      "rtol": 1e-13
+    },
+    "SystemNode.HumRat": {
+      "unit": "kg/kg",
+      "atol": 1e-12,
+      "rtol": 1e-13,
+      "condition": "actual SystemZoneNodeNumber > 0"
+    },
+    "SystemNode.Enthalpy": {
+      "unit": "J/kg",
+      "atol": 1e-07,
+      "rtol": 1e-13,
+      "condition": "actual SystemZoneNodeNumber > 0"
+    },
+    "psychrometrics.nondefault_Psat_rows.Psat": {
+      "unit": "Pa",
+      "atol": 1e-08,
+      "rtol": 1e-13
+    }
+  },
+  "reviewed_observation_policy": {
+    "schema": "zon05-direct-member-observation-policy-proposal.v1",
+    "card": "ZON-05",
+    "status": "prospective-source-only-before-new-output",
+    "selected_source": "correctHumRat4433-4619, zone1/space0, ThirdOrder, mixed, noOA/noLatent",
+    "unit_domain": "21 declared independent input-only cases, 43 real member operations if all return",
+    "production_admission_expanded": false,
+    "required_numerical_profiles": {
+      "airHumRatTemp": {
+        "unit": "kg/kg",
+        "atol": 1e-12,
+        "rtol": 1e-13
+      },
+      "SystemNode.HumRat": {
+        "unit": "kg/kg",
+        "atol": 1e-12,
+        "rtol": 1e-13,
+        "condition": "actual SystemZoneNodeNumber > 0"
+      },
+      "SystemNode.Enthalpy": {
+        "unit": "J/kg",
+        "atol": 1e-07,
+        "rtol": 1e-13,
+        "condition": "actual SystemZoneNodeNumber > 0"
+      },
+      "psychrometrics.nondefault_Psat_rows.Psat": {
+        "unit": "Pa",
+        "atol": 1e-08,
+        "rtol": 1e-13
+      }
+    },
+    "state_retention": "Actual pre/post scalar/array/input/source terms and every non-feedback node remain exact own bits. Four slots required for every captured history array. Temporary W and positive system-node W/H use their named profiles.",
+    "cache_state": "Actual indices/tags/capacity/shape/control state exact; nondefault values use their profile and own unchanged rows retain bits. No cache-HIT classification or hash/tag recomputation in readers.",
+    "source_direct_member_state": "Current W/average W/zone+system+working histories are observed retained only. No correctAirTemp, selection, current/average commit, history push, parser, or calendar caller is invoked.",
+    "class": "exact",
+    "signed_zero": "exact when both numerical results are zero",
+    "nan_payload_bits": "record only; finite request domain, no physical-validity inferred from any nonfinite output",
+    "identity_inputs_order_counts_outcomes": "exact IDs/names/input bits/ordered inlet associations/multiplier integers/clock fields/invocations/return/exception/completeness",
+    "diagnostics": "Actual message indices/order/level/text and err_stream retained as Native-only context. No causal warning classifier or Rust global diagnostic backend parity.",
+    "internal_locals_unobserved": [
+      "MoistureMassFlowRate",
+      "ZoneMassFlowRate",
+      "LatentGain",
+      "RhoAir",
+      "H2OHtOfVap",
+      "A",
+      "B",
+      "C",
+      "WZSat",
+      "lower_guard_taken",
+      "saturation_guard_taken"
+    ],
+    "no_local_or_expected_answer_recomputation": true,
+    "process_or_copy_failure": "required FAIL; partial or absent records never PASS",
+    "missing_on_one_or_both_sides": "required FAIL",
+    "unsupported_stopped_unreached": "unavailable/noPASS",
+    "no_tolerance_relaxation_after_outputs": true,
+    "complete_ZON05_PASS_claimed": false,
+    "gate_updates": false
+  },
+  "actual_Native_observation_counts": {
+    "cases": 21,
+    "correctHumRat": 43,
+    "source_returns": 43,
+    "caught_source_exceptions": 0,
+    "declared_unreached_operations": 0,
+    "snapshots": 107,
+    "scalar_DTO_visits": 9531,
+    "source_messages": 0
+  },
+  "actual_Rust_API_invocations": 43,
+  "Native_source_outcomes_and_global_diagnostics_context_only": [
+    {
+      "case_id": "equal-working-no-inlet",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "equal-working-no-inlet-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "equal-working-no-inlet-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "equal-working-no-inlet-CALL-3",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "nonuniform-working",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "nonuniform-working-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "nonuniform-working-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "cold-ZT",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "cold-ZT-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "cold-ZT-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "warm-ZT",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "warm-ZT-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "warm-ZT-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "pressure-80000",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "pressure-80000-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "pressure-80000-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "volume-200",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "volume-200-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "volume-200-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "seconds-300",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "seconds-300-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "seconds-300-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "moisture-capacity-2",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "moisture-capacity-2-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "moisture-capacity-2-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "supply-dry",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "supply-dry-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "supply-dry-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "supply-moist",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "supply-moist-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "supply-moist-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "controlled-zero-flow",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "controlled-zero-flow-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "controlled-zero-flow-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "ordered-three-inlets",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "ordered-three-inlets-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "ordered-three-inlets-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "reverse-declared-inlet-order",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "reverse-declared-inlet-order-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "reverse-declared-inlet-order-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "subfloor-working",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "subfloor-working-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "subfloor-working-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "lower-guard-probe",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "lower-guard-probe-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "lower-guard-probe-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "saturation-guard-probe",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "saturation-guard-probe-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "saturation-guard-probe-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "positive-zero-working",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "positive-zero-working-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "positive-zero-working-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "negative-zero-working",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "negative-zero-working-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "negative-zero-working-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "controlled-no-feedback-node",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "controlled-no-feedback-node-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "controlled-no-feedback-node-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "uncontrolled-with-feedback-node",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "uncontrolled-with-feedback-node-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "uncontrolled-with-feedback-node-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "integer-zone-multipliers",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "integer-zone-multipliers-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "integer-zone-multipliers-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "comparison": {
+    "numeric_comparisons": 208,
+    "discrete_comparisons": 21573,
+    "mismatch_count": 0,
+    "mismatch_categories": {
+      "discrete_comparisons": 21573,
+      "numeric_comparisons": 208
+    },
+    "metrics": {
+      "airHumRatTemp": {
+        "count": 65,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "SystemNode.HumRat": {
+        "count": 39,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "SystemNode.Enthalpy": {
+        "count": 39,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "psychrometrics.nondefault_Psat_rows.Psat": {
+        "count": 65,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "mismatch_samples": [],
+    "mismatch_samples_omitted": 0,
+    "unavailable_observations": [],
+    "unavailable_counted_as_PASS": false
+  },
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/ZON-05/comparer-prep-01/compare_unit.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/unit-comparison-01/000-compare_unit.py",
+        "sha256": "052a51115a164c60cab6aa222910dc95d15fda7d9bc12d41b30e1699c2589c28",
+        "size_bytes": 38311
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/ZON-05/original-data-review-prep-01/shape.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/unit-comparison-01/001-shape.py",
+        "sha256": "9a530999a7e861f9eca32553e484b766deaef2c0b392a90f8728579a5e4d958a",
+        "size_bytes": 17216
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/ZON-05/original-data-review-prep-01/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/unit-comparison-01/002-packet_io.py",
+        "sha256": "4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+        "size_bytes": 3893
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/ZON-05/unit-comparison-01/000-compare_unit.py",
+    "sha256": "052a51115a164c60cab6aa222910dc95d15fda7d9bc12d41b30e1699c2589c28",
+    "size_bytes": 38311
+  },
+  "selected_declared_direct_member_unit_PASS_claimed": true,
+  "complete_ZON05_PASS_claimed": false,
+  "retained_fields_and_unchanged_cache_bits_exact": true,
+  "Native_global_diagnostic_backend_or_text_certified": false,
+  "unobserved_internal_locals_or_guard_outcomes_paired": false,
+  "cache_HIT_or_hash_or_tag_recomputed": false,
+  "history_selection_commit_push_parser_or_production_certified": false,
+  "Native_flags_answers_or_expected_arrays_injected_into_Rust": false,
+  "scientific_engine_or_moisture_evaluator_invoked": false,
+  "Rust_binary_payload_rehashed": true,
+  "Native_binary_payloads_read_or_rehashed": false,
+  "gates_updated": false,
+  "authorship_limits": "Base authored candidate/comparison custody and independently reviewed Raw humidity Source; Header authored Native/freezer/factual QA. Actual selected comparison is not independent full scientific certification."
+}

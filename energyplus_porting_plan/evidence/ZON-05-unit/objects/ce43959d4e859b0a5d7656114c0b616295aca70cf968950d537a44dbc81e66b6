@@ -1,0 +1,130 @@
+"""Seal raw Source metadata only; never import or execute comparison code."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[4]
+HERE = Path(__file__).resolve().parent
+RAD = HERE.parents[1] / 'RAD-01/comparer-prep-02'
+ZON = HERE.parent
+
+def ref(path):
+    data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(data).hexdigest(),
+            'size_bytes': len(data), 'line_count': len(data.splitlines())}
+
+def put(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as handle: handle.write(data)
+
+def read(path):
+    return json.loads(path.read_text(encoding='utf-8'))
+
+def ranged(path, first, last, purpose):
+    data = b''.join(path.read_bytes().splitlines(keepends=True)[first-1:last])
+    return {'source': ref(path), 'first_line': first, 'last_line': last,
+            'range_sha256': hashlib.sha256(data).hexdigest(), 'range_size_bytes': len(data), 'purpose': purpose}
+
+observer_path = ZON / 'rust-observer-prep-02/manifest.json'
+qa_path = ZON / 'original-data-review-prep-01/manifest.json'
+native_path = ZON / 'native-helper-prep-01/manifest.json'
+freeze_path = ZON / 'input-writer-prep-01/manifest.json'
+pure_path = ZON / 'rust-humidity-member-prep-01/manifest.json'
+assert ref(observer_path)['sha256'] == 'fdfac830c0b40ba4e6cb49bb6049a7e5d3f8d554b9d9439b8bd1ee968fad3bdf'
+assert ref(qa_path)['sha256'] == 'c52bd6b2a90f9e205b34c821fc1babf952b4593f5793e1bee699e6e83527b438'
+observer, qa, native = read(observer_path), read(qa_path), read(native_path)
+main_path = HERE / 'compare_unit.py'
+tests_path = HERE / 'comparison_contract_tests.py'
+for path in [main_path, tests_path, HERE / 'prepare_sources.py', Path(__file__)]: ast.parse(path.read_text(encoding='utf-8'))
+test_tree = ast.parse(tests_path.read_text(encoding='utf-8'))
+assert sum(isinstance(node, ast.FunctionDef) and node.name.startswith('test_') for node in ast.walk(test_tree)) == 7
+put(HERE / 'before/comparison_contract_tests.py', (RAD / 'comparison_contract_tests.py').read_bytes())
+diffs = []
+for name in ['compare_unit.py', 'comparison_contract_tests.py']:
+    before, after = HERE / 'before' / name, HERE / name
+    delta = ''.join(difflib.unified_diff(before.read_text(encoding='utf-8').splitlines(True), after.read_text(encoding='utf-8').splitlines(True),
+                    fromfile=ref(before)['path'], tofile=ref(after)['path'])).encode('utf-8')
+    path = HERE / 'diffs' / (name + '.diff')
+    if path.exists(): path.write_bytes(delta)
+    else: put(path, delta)
+    diffs.append({'before': ref(before), 'after': ref(after), 'diff': ref(path)})
+policy = read(ZON / 'native-helper-prep-01/observation-policy.proposed.json')
+source = main_path.read_text(encoding='utf-8')
+tree = ast.parse(source)
+assignments = {node.targets[0].id: node.value for node in tree.body if isinstance(node, ast.Assign) and isinstance(node.targets[0], ast.Name)}
+assert ast.literal_eval(assignments['FROZEN_PROFILES']) == policy['required_numerical_profiles']
+assert ast.literal_eval(assignments['API_PATHS']) == observer['runtime_interfaces']['actual_public_API_sources']
+assert ast.literal_eval(assignments['OBSERVER_PATHS']) == observer['runtime_interfaces']['observer_sources']
+assert ast.literal_eval(assignments['IO_SHA']) == qa['own_sources'][2]['sha256']
+assert ast.literal_eval(assignments['SHAPE_SHA']) == qa['own_sources'][1]['sha256']
+assert 'frozen_before_this_ZON05_helper_execution' in source and 'RAD01' not in source
+assert 'request["requested_counts"]' not in source and 'native["energyplus_commit"]' not in source
+ranges = observer['read_source_ranges'] + [
+    ranged(ZON / 'original-data-review-prep-01/shape.py', 1, 204, 'unchanged whole factual Native ledger validator, directly reused'),
+    ranged(ZON / 'original-data-review-prep-01/packet_io.py', 1, 105, 'unchanged direct Source/input identity and archive IO'),
+    ranged(ZON / 'original-data-review-prep-01/review_data.py', 1, 261, 'actual QA schema/argv/source archives and release protocol'),
+    ranged(ROOT / 'crates/ep_runtime/src/psychrometrics/psy02_state.rs', 230, 257, 'actual WFromRh has no direct target cache slot; nested rows separate'),
+    ranged(ROOT / observer['own_sources'][1]['path'], 1, 143, 'actual serialized Rust field/phase/property owner contract'),
+    ranged(ROOT / observer['own_sources'][0]['path'], 149, 177, 'actual same-case call/prefix/phase/result Source contract')]
+deps = [ref(p) for p in [native_path, freeze_path, qa_path, observer_path, pure_path,
+        ZON / 'native-helper-prep-01/input-only-cases.proposed.json',
+        ZON / 'native-helper-prep-01/observation-policy.proposed.json']]
+own = [ref(main_path), ref(tests_path)]
+manifest = {'schema': 'zon05-same-input-unit-comparison-source-preparation.v1', 'card': 'ZON-05',
+    'status': 'held-source-only-unexecuted-awaiting-Root-and-other-author-FULL-review',
+    'own_sources': own, 'documentation': ref(HERE / 'README.md'),
+    'authoring_sources': [ref(HERE / 'prepare_sources.py'), ref(Path(__file__))],
+    'literal_dependencies': deps, 'direct_unchanged_QA_runtime_support_sources': qa['own_sources'][1:],
+    'before_templates': [{'historical_source': ref(RAD / name), 'archive': ref(HERE / 'before' / name)}
+        for name in ['compare_unit.py', 'comparison_contract_tests.py']] + [
+        {'historical_source': ref(RAD / 'manifest.json'), 'archive': ref(HERE / 'before/RAD-manifest.json')},
+        {'historical_source': ref(RAD / 'README.md'), 'archive': ref(HERE / 'before/RAD-README.md')}],
+    'exact_diffs': diffs, 'read_source_ranges': ranges,
+    'native_source_files': native['own_sources'],
+    'current_API_source_context_only': observer['current_API_source_context_only'],
+    'prospective_API_source': observer['prospective_API_source'],
+    'runtime_interfaces': {'flags': ['--approved-source-sha256', '--original-data-review', '--original-data-review-execution',
+        '--Rust-build-execution', '--Rust-execution', '--Rust-results', '--output-dir'],
+        'comparison_schema': 'zon05-unit-comparison.v1', 'pass_status': 'pass-selected-direct-humidity-member',
+        'fail_status': 'fail-selected-direct-humidity-member',
+        'executed_reader_sources_order': [own[0]] + qa['own_sources'][1:],
+        'candidate_arguments': observer['runtime_interfaces']['arguments'],
+        'observer_sources': observer['runtime_interfaces']['observer_sources'],
+        'actual_public_API_sources': observer['runtime_interfaces']['actual_public_API_sources'],
+        'actual_final_SourceSnapshot_Cargo_binary_and_results': None},
+    'fixed_literal_policy': {'proposal': deps[-1], 'required_numerical_profiles': policy['required_numerical_profiles'],
+        'retained_inputs_state_nodes_and_unchanged_cache_rows_exact_bits': True,
+        'formula_or_cache_hash_or_guard_recomputation': False, 'tuning_after_outputs': False},
+    'tests_proposed_not_executed': {'count': 7, 'purpose': 'generic comparison primitives only; no new scientific input fixture or answer'},
+    'Source_verification': {'own_and_author_AST_only': True, 'before_templates_exact': True, 'source_diffs_regenerated': True,
+        'direct_QA_supports_byte_unchanged': True, 'fixed_policy_literal_exact': True, 'missing_stopped_nonfinite_never_PASS': True,
+        'project_or_comparer_or_tests_import_or_execution': False, 'targets_or_Cargo_or_formatter': False,
+        'Native_numeric_weather_binary_or_core_payload_read': False, 'canonical_or_Git_changed': False,
+        'future_outputs_SourceSnapshot_or_digests_guessed': False, 'full_card_or_scientific_PASS_claimed': False}}
+put(HERE / 'manifest.json', (json.dumps(manifest, ensure_ascii=False, indent=2) + '\n').encode('utf-8'))
+seen, count = set(), 0
+def walk(value):
+    global count
+    if isinstance(value, list):
+        for item in value: walk(item)
+    elif isinstance(value, dict):
+        if 'path' in value and 'sha256' in value:
+            key = (value['path'], value['sha256'])
+            if key not in seen:
+                seen.add(key); actual = ref(ROOT / value['path'])
+                for field in ['sha256', 'size_bytes', 'line_count']:
+                    if field in value: assert value[field] == actual[field], (key, field)
+        if 'range_sha256' in value:
+            data = b''.join((ROOT / value['source']['path']).read_bytes().splitlines(keepends=True)[value['first_line']-1:value['last_line']])
+            assert hashlib.sha256(data).hexdigest() == value['range_sha256'] and len(data) == value['range_size_bytes']
+            count += 1
+        for item in value.values(): walk(item)
+walk(manifest)
+for row in diffs:
+    before, after = ROOT / row['before']['path'], ROOT / row['after']['path']
+    delta = ''.join(difflib.unified_diff(before.read_text(encoding='utf-8').splitlines(True), after.read_text(encoding='utf-8').splitlines(True), fromfile=row['before']['path'], tofile=row['after']['path'])).encode('utf-8')
+    assert delta == (ROOT / row['diff']['path']).read_bytes()
+print(json.dumps({'manifest': ref(HERE / 'manifest.json'), 'own': own,
+    'unique_whole_refs': len(seen), 'typed_ranges': count, 'diffs': [row['diff'] for row in diffs]}, indent=2))

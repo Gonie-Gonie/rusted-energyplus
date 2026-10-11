@@ -1,0 +1,179 @@
+--- accepted-literal/crates/ep_run/examples/zon05_candidate_unit_support/fields.rs
++++ actual-formatted/crates/ep_run/examples/zon05_candidate_unit_support/fields.rs
+@@ -1,13 +1,12 @@
+ //! Actual selected Rust owners only; no humidity or cache-tag evaluator.
+ use ep_runtime::heat_balance::zone_air_initialization::ZoneAirInitializationState;
+ use ep_runtime::heat_balance::zone_humidity_correction::{
+-    ZoneHumidityCorrectionCall, ZoneHumidityCorrectionContext,
+-    ZoneHumidityCorrectionUnavailable, ZoneHumidityNode, ZoneHumiditySourceTerms,
++    ZoneHumidityCorrectionCall, ZoneHumidityCorrectionContext, ZoneHumidityCorrectionUnavailable,
++    ZoneHumidityNode, ZoneHumiditySourceTerms,
+ };
+ use ep_runtime::psychrometrics::{
+-    ENERGYPLUS_PSY_CACHE_SIZE, EnergyPlusPsychrometricCacheSlot,
+-    EnergyPlusPsychrometricOperation, EnergyPlusPsychrometricStateSnapshot,
+-    EnergyPlusPsychrometricsState,
++    ENERGYPLUS_PSY_CACHE_SIZE, EnergyPlusPsychrometricCacheSlot, EnergyPlusPsychrometricOperation,
++    EnergyPlusPsychrometricStateSnapshot, EnergyPlusPsychrometricsState,
+ };
+ use serde_json::{Value, json};
+ 
+@@ -15,10 +14,20 @@
+     let class = if value.is_nan() {
+         "nan"
+     } else if value.is_infinite() {
+-        if value.is_sign_negative() { "negative_infinity" } else { "positive_infinity" }
++        if value.is_sign_negative() {
++            "negative_infinity"
++        } else {
++            "positive_infinity"
++        }
+     } else if value == 0.0 {
+-        if value.is_sign_negative() { "negative_zero" } else { "positive_zero" }
+-    } else { "finite" };
++        if value.is_sign_negative() {
++            "negative_zero"
++        } else {
++            "positive_zero"
++        }
++    } else {
++        "finite"
++    };
+     json!({"value": if value.is_finite() { Some(value) } else { None },
+         "value_bits": format!("{:016x}", value.to_bits()), "value_class": class})
+ }
+@@ -33,10 +42,14 @@
+         "W1" => w1, "WMX" => wmx, "WM2" => wm2, "airHumRatTemp" => air_hum_rat_temp,
+         "tempIndLoad" => temp_ind_load, "tempDepLoad" => temp_dep_load,
+         "airRelHum" => air_rel_hum, "AirPowerCap" => air_power_cap, "T1" => t1);
+-    for (key, values) in [("XMAT", &value.xmat), ("DSXMAT", &value.dsxmat),
+-        ("ZTM", &value.ztm), ("WPrevZoneTS", &value.w_prev_zone_ts),
++    for (key, values) in [
++        ("XMAT", &value.xmat),
++        ("DSXMAT", &value.dsxmat),
++        ("ZTM", &value.ztm),
++        ("WPrevZoneTS", &value.w_prev_zone_ts),
+         ("DSWPrevZoneTS", &value.dsw_prev_zone_ts),
+-        ("WPrevZoneTSTemp", &value.w_prev_zone_ts_temp)] {
++        ("WPrevZoneTSTemp", &value.w_prev_zone_ts_temp),
++    ] {
+         out[key] = json!(values.iter().map(|v| scalar(*v)).collect::<Vec<_>>());
+     }
+     out
+@@ -73,24 +86,54 @@
+ }
+ fn slot(value: EnergyPlusPsychrometricCacheSlot) -> Value {
+     match value {
+-        EnergyPlusPsychrometricCacheSlot::Psat { index, i_tdb, value } =>
+-            json!({"index": index, "iTdb": i_tdb, "Psat": scalar(value)}),
+-        EnergyPlusPsychrometricCacheSlot::Twb { index, i_tdb, i_w, i_pb, value } =>
+-            json!({"kind": "Twb", "index": index, "iTdb": i_tdb, "iW": i_w, "iPb": i_pb, "value": scalar(value)}),
+-        EnergyPlusPsychrometricCacheSlot::TsatPb { index, i_h, i_pb, value } =>
+-            json!({"kind": "TsatPb", "index": index, "iH": i_h, "iPb": i_pb, "value": scalar(value)}),
+-        EnergyPlusPsychrometricCacheSlot::TsatHPb { index, i_h, i_pb, value } =>
+-            json!({"kind": "TsatHPb", "index": index, "iH": i_h, "iPb": i_pb, "value": scalar(value)}),
++        EnergyPlusPsychrometricCacheSlot::Psat {
++            index,
++            i_tdb,
++            value,
++        } => json!({"index": index, "iTdb": i_tdb, "Psat": scalar(value)}),
++        EnergyPlusPsychrometricCacheSlot::Twb {
++            index,
++            i_tdb,
++            i_w,
++            i_pb,
++            value,
++        } => {
++            json!({"kind": "Twb", "index": index, "iTdb": i_tdb, "iW": i_w, "iPb": i_pb, "value": scalar(value)})
++        }
++        EnergyPlusPsychrometricCacheSlot::TsatPb {
++            index,
++            i_h,
++            i_pb,
++            value,
++        } => {
++            json!({"kind": "TsatPb", "index": index, "iH": i_h, "iPb": i_pb, "value": scalar(value)})
++        }
++        EnergyPlusPsychrometricCacheSlot::TsatHPb {
++            index,
++            i_h,
++            i_pb,
++            value,
++        } => {
++            json!({"kind": "TsatHPb", "index": index, "iH": i_h, "iPb": i_pb, "value": scalar(value)})
++        }
+     }
+ }
+ fn psych(value: &EnergyPlusPsychrometricsState) -> Value {
+     let mut out = psych_state(value.snapshot());
+     let caches = value.final_caches();
+     // Copy actual named Psat slots. No hash/tag calculation or HIT inference.
+-    out["nondefault_Psat_rows"] = json!(caches.psat.iter().copied().filter(|row| {
+-        matches!(row, EnergyPlusPsychrometricCacheSlot::Psat { i_tdb, value, .. }
++    out["nondefault_Psat_rows"] = json!(
++        caches
++            .psat
++            .iter()
++            .copied()
++            .filter(|row| {
++                matches!(row, EnergyPlusPsychrometricCacheSlot::Psat { i_tdb, value, .. }
+             if *i_tdb != -1000 || value.to_bits() != 0)
+-    }).map(slot).collect::<Vec<_>>());
++            })
++            .map(slot)
++            .collect::<Vec<_>>()
++    );
+     out["Psat_cache_capacity"] = json!(ENERGYPLUS_PSY_CACHE_SIZE);
+     out["other_actual_nondefault_cache_rows"] = json!({
+         "Twb": caches.twb.iter().copied().map(slot).collect::<Vec<_>>(),
+@@ -101,8 +144,12 @@
+     out
+ }
+ pub(super) fn snapshot(
+-    phase: &str, state: &ZoneAirInitializationState, source: &ZoneHumiditySourceTerms,
+-    c: &ZoneHumidityCorrectionContext, nodes: &[ZoneHumidityNode], p: &EnergyPlusPsychrometricsState,
++    phase: &str,
++    state: &ZoneAirInitializationState,
++    source: &ZoneHumiditySourceTerms,
++    c: &ZoneHumidityCorrectionContext,
++    nodes: &[ZoneHumidityNode],
++    p: &EnergyPlusPsychrometricsState,
+ ) -> Value {
+     json!({"phase": phase, "actual_context": context(c), "zone_fields": state_fields(state),
+         "moisture_source_terms": sources(source), "SumLatentHTRadSys": scalar(source.sum_latent_ht_rad_sys),
+@@ -118,7 +165,9 @@
+         "cache_before": value.cache_before.map(slot), "cache_after": value.cache_after.map(slot),
+         "paired_as_Native_internal_Wsat_or_guard": false})
+ }
+-pub(super) fn returned(value: &Result<ZoneHumidityCorrectionCall, ZoneHumidityCorrectionUnavailable>) -> Value {
++pub(super) fn returned(
++    value: &Result<ZoneHumidityCorrectionCall, ZoneHumidityCorrectionUnavailable>,
++) -> Value {
+     match value {
+         Ok(call) => json!({"status": "source-returned", "owner_available": true,
+             "unavailable": null, "zone_id": call.zone_id, "system_node_written": call.system_node_written,
+@@ -133,11 +182,18 @@
+     "crates/ep_run/examples/zon05_candidate_unit_support/fields.rs",
+ ];
+ pub(super) const API_PATHS: &[&str] = &[
+-    "crates/ep_run/Cargo.toml", "crates/ep_runtime/Cargo.toml", "crates/ep_runtime/src/lib.rs",
+-    "crates/ep_runtime/src/heat_balance/mod.rs", "crates/ep_runtime/src/heat_balance/zone_air_initialization.rs",
+-    "crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs", "crates/ep_runtime/src/heat_balance/state.rs",
+-    "crates/ep_runtime/src/psychrometrics.rs", "crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+-    "crates/ep_runtime/src/psychrometrics/psy02_trace.rs", "crates/ep_runtime/src/psychrometrics/production_trace.rs",
+-    "crates/ep_runtime/src/psychrometrics_spline_tables.rs", "crates/ep_runtime/src/psychrometrics/cp_cache.rs",
++    "crates/ep_run/Cargo.toml",
++    "crates/ep_runtime/Cargo.toml",
++    "crates/ep_runtime/src/lib.rs",
++    "crates/ep_runtime/src/heat_balance/mod.rs",
++    "crates/ep_runtime/src/heat_balance/zone_air_initialization.rs",
++    "crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs",
++    "crates/ep_runtime/src/heat_balance/state.rs",
++    "crates/ep_runtime/src/psychrometrics.rs",
++    "crates/ep_runtime/src/psychrometrics/psy02_state.rs",
++    "crates/ep_runtime/src/psychrometrics/psy02_trace.rs",
++    "crates/ep_runtime/src/psychrometrics/production_trace.rs",
++    "crates/ep_runtime/src/psychrometrics_spline_tables.rs",
++    "crates/ep_runtime/src/psychrometrics/cp_cache.rs",
+     "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+ ];

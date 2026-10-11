@@ -1,0 +1,438 @@
+{
+  "schema": "zon05-Rust-humidity-member-source-preparation.v1",
+  "status": "held-Source-only-unapplied-unexecuted",
+  "author": "/root/clk02_raw_port",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/zone_humidity_correction.rs",
+      "sha256": "f8279ee488005e9c274534c7fb009bbfe4a4cd55141797125b650f7a44230b6c",
+      "size_bytes": 11286,
+      "line_count": 245
+    },
+    {
+      "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/zone_humidity_correction_tests.rs",
+      "sha256": "ef1b76b860fc775a3e01a94bfe851937219049fba694cccdf24c463555a83c0d",
+      "size_bytes": 7658,
+      "line_count": 157
+    },
+    {
+      "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/mod.rs",
+      "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+      "size_bytes": 1819,
+      "line_count": 72
+    }
+  ],
+  "documentation": {
+    "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/README.md",
+    "sha256": "8244aac875a602148b384d93f8898bd9dc13b889590d86cb2834e6016fd4bcd2",
+    "size_bytes": 5473,
+    "line_count": 83
+  },
+  "prospective_observer": {
+    "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/observer-plan.proposed.json",
+    "sha256": "1c40086ccedbaf3c219ecf4843933946dcec71a6086b8183f555cd3fed5c3e54",
+    "size_bytes": 3481,
+    "line_count": 69
+  },
+  "exact_changes": [
+    {
+      "canonical_destination": "crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs",
+      "before": null,
+      "proposed": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/zone_humidity_correction.rs",
+        "sha256": "f8279ee488005e9c274534c7fb009bbfe4a4cd55141797125b650f7a44230b6c",
+        "size_bytes": 11286,
+        "line_count": 245
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/diffs/zone_humidity_correction.rs.diff",
+        "sha256": "2a36ebe4920a9888c4f0a675fd79d2f66db27b757021002a881d4fd5d87bedba",
+        "size_bytes": 11648,
+        "line_count": 248
+      }
+    },
+    {
+      "canonical_destination": "crates/ep_runtime/src/heat_balance/zone_humidity_correction_tests.rs",
+      "before": null,
+      "proposed": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/zone_humidity_correction_tests.rs",
+        "sha256": "ef1b76b860fc775a3e01a94bfe851937219049fba694cccdf24c463555a83c0d",
+        "size_bytes": 7658,
+        "line_count": 157
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/diffs/zone_humidity_correction_tests.rs.diff",
+        "sha256": "540896f507c996a2ee551ceb310aeb71ce2b5adc4a6d2e9640ec9496c4efeb1f",
+        "size_bytes": 7938,
+        "line_count": 160
+      }
+    },
+    {
+      "canonical_destination": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "before": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/before/mod.rs",
+        "sha256": "5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+        "size_bytes": 1785,
+        "line_count": 71
+      },
+      "proposed": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/mod.rs",
+        "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+        "size_bytes": 1819,
+        "line_count": 72
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/diffs/mod.rs.diff",
+        "sha256": "36f2813571c5cbc6991102c2f057be6754bf34552c2fd4a17acc195faeca0b6a",
+        "size_bytes": 354,
+        "line_count": 10
+      }
+    }
+  ],
+  "current_canonical_parent": {
+    "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+    "sha256": "5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+    "size_bytes": 1785,
+    "line_count": 71
+  },
+  "canonical_new_destinations_absent_at_preparation": [
+    "crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs",
+    "crates/ep_runtime/src/heat_balance/zone_humidity_correction_tests.rs"
+  ],
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/manifest.json",
+      "sha256": "5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1",
+      "size_bytes": 39009,
+      "line_count": 962
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_helper.cpp",
+      "sha256": "89fcfc63be7ba3a5c190c828f8167a305695a88aee3f30583dafd196f115ca09",
+      "size_bytes": 14797,
+      "line_count": 241
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_fields.hh",
+      "sha256": "0ab7025e2914ab8b72edac40bd674be1469fd870dd0aa0192ad0e4c26b0bdd0c",
+      "size_bytes": 6453,
+      "line_count": 102
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon01_reference_fields.hh",
+      "sha256": "24e96e01b8c6f5ed445c94dd6f5a486dac5d79c175df62ba55af46bd10ad86f8",
+      "size_bytes": 5146,
+      "line_count": 96
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/input-only-cases.proposed.json",
+      "sha256": "e2a98523a591dd76c370d70e0ebc3464d97ba62bd512d4b5f9f60c3b5662bcaf",
+      "size_bytes": 94170,
+      "line_count": 3032
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/observation-policy.proposed.json",
+      "sha256": "b3adf14637d3c9794d0a7127a46bc6c9bba1f7378726c1c6001990fb833b56a2",
+      "size_bytes": 2609,
+      "line_count": 30
+    },
+    {
+      "path": ".runtime/porting/ZON-05/readiness-audit-01/manifest.json",
+      "sha256": "69ba81077d8b40028f56f15e4595782ed9248a136b964f791705ac6025ffc4de",
+      "size_bytes": 37185,
+      "line_count": 916
+    },
+    {
+      "path": ".runtime/porting/ZON-05/readiness-audit-01/README.md",
+      "sha256": "b50761fb237858ba7884b767a0472b8565facf070874b7b1bb020c570c0b1711",
+      "size_bytes": 8994,
+      "line_count": 125
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/zone_air_initialization.rs",
+      "sha256": "56b94253ec63ba83b4393f0d46974f3d65b294bb8c17694be2030ef849c8957b",
+      "size_bytes": 11003,
+      "line_count": 290
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics.rs",
+      "sha256": "fe7b95c62aa56409193311b17d4f28478897592247b859f2656b33d8f8de8837",
+      "size_bytes": 42191,
+      "line_count": 1226
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+      "sha256": "8f9567503bb8d361ebff3eb180d9a48c72e4ba19d56dc99c329ecd9e7efe885d",
+      "size_bytes": 19614,
+      "line_count": 637
+    },
+    {
+      "path": "crates/ep_runtime/src/lib.rs",
+      "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+      "size_bytes": 868,
+      "line_count": 41
+    },
+    {
+      "path": "crates/ep_runtime/Cargo.toml",
+      "sha256": "bb81b5793debafd84300ec9905f0cda65ab32d216633543bab375b30a7a379e9",
+      "size_bytes": 327,
+      "line_count": 17
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "833a9f5bb991874dd972e044949fee695b36b17a857d7603cc0e45921a945b09",
+      "size_bytes": 597,
+      "line_count": 30
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "sha256": "9b0aff100fff104dcf9268b46328c1bda5452a28894a6ecb1385bb63ef975ab6",
+      "size_bytes": 404705,
+      "line_count": 7244
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh",
+      "sha256": "30c9575bc5a8e73d33d111e0d54a4da8916af4534175e9b95071aca2513aef45",
+      "size_bytes": 108928,
+      "line_count": 1739
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.cc",
+      "sha256": "3dd30eb577f5c0d440cf41295e7456e09929921f0ed3f17bbfeec02d14de0b4f",
+      "size_bytes": 73171,
+      "line_count": 1477
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+      "size_bytes": 133816,
+      "line_count": 2059
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataRoomAirModel.hh",
+      "sha256": "fbf9f40e9eb8d63ecd9fd8fb750ea7b29912dd2c86f613e7093969bd08f61cd9",
+      "size_bytes": 45326,
+      "line_count": 797
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/AirflowNetwork/include/AirflowNetwork/Solver.hpp",
+      "sha256": "08f9d970200b2adb9b69cf3500cb63cf7bf873eb482d705fdc02827a6ce30759",
+      "size_bytes": 38569,
+      "line_count": 739
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "start_line": 4433,
+      "end_line": 4619,
+      "sha256": "3c3f5304c4e9d2ca160f482508dc17ed17538566a6b84f25c78151a7062e155e",
+      "size_bytes": 10253,
+      "purpose": "complete original member and retained excluded routes"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "start_line": 3894,
+      "end_line": 3900,
+      "sha256": "835334f0ef46b70d31e4733606668cef0a73ade9fab9acf7def3a0cba26fccb0",
+      "size_bytes": 224,
+      "purpose": "actual working history selection caller"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "start_line": 4128,
+      "end_line": 4132,
+      "sha256": "74aca3a1f13074149f6a5b64c54870814eddf3b032d5432817289f2dc4b34ddb",
+      "size_bytes": 235,
+      "purpose": "member return then current/RH commit"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "start_line": 4195,
+      "end_line": 4206,
+      "sha256": "86ce8606230d7debaaf6ab3bcbf133504e1858a563ee0e0bb1f3e888b6d9694b",
+      "size_bytes": 667,
+      "purpose": "distinct zone history transition"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "start_line": 4297,
+      "end_line": 4305,
+      "sha256": "d0e30b8799b5ec5e27ad3fbfb77d04163d477ab3e1b3f6165b1414c0611f5d26",
+      "size_bytes": 423,
+      "purpose": "distinct system four-slot history shift"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh",
+      "start_line": 513,
+      "end_line": 548,
+      "sha256": "202e153093fac034be0a51a3007a4e7f6c81ef5ef4e8350d24ee33655f2d04e4",
+      "size_bytes": 1541,
+      "purpose": "stateful density arithmetic and deferred diagnostic branch"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh",
+      "start_line": 623,
+      "end_line": 674,
+      "sha256": "957085d4dddf4d3aaeae5c3750e038ca70dc7a0f0d65a493bb93d333c2c5164f",
+      "size_bytes": 1941,
+      "purpose": "gas enthalpy and node enthalpy operand semantics"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.hh",
+      "start_line": 1342,
+      "end_line": 1398,
+      "sha256": "c285eafb873452848dd8516389298c37e1b6f4ca4ffa01864cd78b2df4d9a3f9",
+      "size_bytes": 2788,
+      "purpose": "actual cached W-from-RH path and guards"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Psychrometrics.cc",
+      "start_line": 198,
+      "end_line": 218,
+      "sha256": "d285cd48312de0d95c35e95b50bfe211c03e0a65611b54d43959b9575e8f2c7a",
+      "size_bytes": 1248,
+      "purpose": "negative density genuine severe/fatal backend gap"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "start_line": 100,
+      "end_line": 107,
+      "sha256": "87880a8bfefb0fac347b47bdc4606564f073121528b8469e5de4f36faf3d6093",
+      "size_bytes": 144,
+      "purpose": "literal ThirdOrder enum"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataRoomAirModel.hh",
+      "start_line": 73,
+      "end_line": 86,
+      "sha256": "a64fc1a528a259b38f3a0d7c48c6959de60bd73683b5600e52191d5c064a248a",
+      "size_bytes": 507,
+      "purpose": "literal Mixing enum"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/AirflowNetwork/include/AirflowNetwork/Solver.hpp",
+      "start_line": 76,
+      "end_line": 84,
+      "sha256": "0b2b826b665548a4c7a7e6f34ab686b787d68a20cef95302ab01917e3cf53824",
+      "size_bytes": 734,
+      "purpose": "literal NoMultizone enum"
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics.rs",
+      "start_line": 105,
+      "end_line": 130,
+      "sha256": "2a712fef4023fcacacb78a665c76bf7481b450426605bdedafc2ca4b67c9fda0",
+      "size_bytes": 865,
+      "purpose": "existing ordered operand floor/raw arithmetic"
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics.rs",
+      "start_line": 255,
+      "end_line": 280,
+      "sha256": "3283b5a6e1c32e3e1da317427887c47d455f034862a5ba32fe685cc2a726011e",
+      "size_bytes": 890,
+      "purpose": "existing density numerical owner/diagnostic gap"
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics.rs",
+      "start_line": 319,
+      "end_line": 340,
+      "sha256": "94237d27b7e068fb7e79a5990ab3f2cd45fa693c7d929292fc0297884601bfd6",
+      "size_bytes": 786,
+      "purpose": "existing Hg/H owners"
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics.rs",
+      "start_line": 705,
+      "end_line": 722,
+      "sha256": "76148801a250777403ef8138cdb059bfeb249700733c85c1a1183a66f981a936",
+      "size_bytes": 622,
+      "purpose": "existing instance-bound public Wsat route"
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+      "start_line": 126,
+      "end_line": 226,
+      "sha256": "2b18139e07ea109de56420a1f4bc12409e9ec164fb909095710d031b56e0383e",
+      "size_bytes": 4013,
+      "purpose": "existing passed state/default/API/cache-operation owner"
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+      "start_line": 405,
+      "end_line": 416,
+      "sha256": "9c2a23629d71195fdd42e2fb7c96450d9266a160ef5136d64c451db51c0d6b55",
+      "size_bytes": 350,
+      "purpose": "same passed-instance WFromRh ordered helper"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/zone_air_initialization.rs",
+      "start_line": 1,
+      "end_line": 111,
+      "sha256": "ce738b1ba93fac40ce3c18946e665fa9b2a127ee8301f4344638159053ee7047",
+      "size_bytes": 3832,
+      "purpose": "full four-slot retained existing initialization owner"
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_helper.cpp",
+      "start_line": 39,
+      "end_line": 161,
+      "sha256": "142ce5a5b780d39f135b63b710614472051b02a3868cd863731cf4083a68d573",
+      "size_bytes": 8167,
+      "purpose": "actual input preparation/admission/node/source domain"
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_helper.cpp",
+      "start_line": 164,
+      "end_line": 218,
+      "sha256": "6230b53cf55c8905c94baad6e5a5167c6fbaa4283e5b7e0a361d968b83d48960",
+      "size_bytes": 3520,
+      "purpose": "actual same-case call and return/owner snapshots"
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_fields.hh",
+      "start_line": 22,
+      "end_line": 102,
+      "sha256": "a76c7e1dd959fe43fc7d2de3af667ea3c8a816a58f81e51a07e02fef6fe004cb",
+      "size_bytes": 5378,
+      "purpose": "real captured fields/cache context and internal-locals boundary"
+    }
+  ],
+  "authoring_source_metadata_only": {
+    "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/prepare_metadata.py",
+    "sha256": "68d085083f322d19f25eb6bdd60fb54154269303ae34c37f4e1698579e78cd3d",
+    "size_bytes": 11220,
+    "line_count": 129
+  },
+  "source_checks": {
+    "new_module_declaration_only": true,
+    "three_exact_diffs_generated": true,
+    "tests_proposed": 8,
+    "project_or_target_imported": false,
+    "Rust_parser_formatter_compiler_or_tests_invoked": false,
+    "scientific_outputs_binary_weather_read": false,
+    "canonical_or_Git_mutation": false
+  },
+  "prerequisites": {
+    "Native_helper_Source": {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/manifest.json",
+      "sha256": "5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1",
+      "size_bytes": 39009,
+      "line_count": 962
+    },
+    "same_input_Native_capture_and_QA_before_math_apply": true,
+    "existing_Rust_baseline_before_apply": true,
+    "Root_and_other_author_FULL_peer_before_apply": true
+  },
+  "unavailable_boundaries": [
+    "PSY01 stateful negative-density fatal backend",
+    "global psych diagnostics/statistics/compile variants",
+    "caller working-history selection/current commit/averaging/history transitions",
+    "ordinary production/parser admission"
+  ],
+  "no_new_QA_framework": true,
+  "runtime_activation": false,
+  "full_ZON05_PASS_claimed": false,
+  "gate_updates": false
+}

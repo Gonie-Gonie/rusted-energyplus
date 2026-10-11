@@ -1,0 +1,784 @@
+{
+  "schema": "zon05-ordinary-integration-source-plan.v1",
+  "status": "held-Source-only-no-implementation-or-activation",
+  "author": "/root/clk02_raw_port",
+  "pinned_original": {
+    "version": "26.1.0",
+    "commit": "6f2e40d10250a105b49966baa24d843711e61048"
+  },
+  "own_documents": [
+    {
+      "path": ".runtime/porting/ZON-05/ordinary-integration-plan-prep-01/README.md",
+      "sha256": "26471d1603d4e13fbba2ea6cbca6f42bd23bc238825b6f03e3f0281990c5c395",
+      "size_bytes": 7085,
+      "line_count": 92
+    }
+  ],
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/ZON-05/readiness-audit-01/manifest.json",
+      "sha256": "69ba81077d8b40028f56f15e4595782ed9248a136b964f791705ac6025ffc4de",
+      "size_bytes": 37185,
+      "line_count": 916,
+      "role": "accepted predecessor"
+    },
+    {
+      "path": ".runtime/porting/ZON-05/readiness-audit-01/README.md",
+      "sha256": "b50761fb237858ba7884b767a0472b8565facf070874b7b1bb020c570c0b1711",
+      "size_bytes": 8994,
+      "line_count": 125,
+      "role": "accepted caller/member Source boundaries"
+    },
+    {
+      "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/manifest.json",
+      "sha256": "aa72577e3f4eeb802704cd1f6e817283708c384aebde8518d55c5b5003f3c8e6",
+      "size_bytes": 16989,
+      "line_count": 438,
+      "role": "accepted sole proposed humidity implementation"
+    },
+    {
+      "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/zone_humidity_correction.rs",
+      "sha256": "f8279ee488005e9c274534c7fb009bbfe4a4cd55141797125b650f7a44230b6c",
+      "size_bytes": 11286,
+      "line_count": 245,
+      "role": "held pure member no activation"
+    },
+    {
+      "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/observer-plan.proposed.json",
+      "sha256": "1c40086ccedbaf3c219ecf4843933946dcec71a6086b8183f555cd3fed5c3e54",
+      "size_bytes": 3481,
+      "line_count": 69,
+      "role": "held direct observation scope"
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/manifest.json",
+      "sha256": "5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1",
+      "size_bytes": 39009,
+      "line_count": 962,
+      "role": "accepted direct Native source-input protocol"
+    },
+    {
+      "path": ".runtime/porting/ZON-05/input-writer-prep-01/manifest.json",
+      "sha256": "eecf913773178e0de74705403ea5bb1a0f8ee8367811f4969664eec4d4210a80",
+      "size_bytes": 33168,
+      "line_count": 837,
+      "role": "accepted input-only fixture freezer"
+    },
+    {
+      "path": ".runtime/porting/ZON-05/original-data-review-prep-01/manifest.json",
+      "sha256": "c52bd6b2a90f9e205b34c821fc1babf952b4593f5793e1bee699e6e83527b438",
+      "size_bytes": 33960,
+      "line_count": 841,
+      "role": "accepted factual Native custody reader"
+    },
+    {
+      "path": "energyplus_porting_plan/contracts/scope.json",
+      "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879",
+      "size_bytes": 15325,
+      "line_count": 418,
+      "role": "exact fixed15 input authority; weather not read"
+    }
+  ],
+  "inspected_whole_sources": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "sha256": "9b0aff100fff104dcf9268b46328c1bda5452a28894a6ecb1385bb63ef975ab6",
+      "size_bytes": 404705,
+      "line_count": 7244,
+      "role": "observed actual current Source context; future changes require fresh review"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+      "size_bytes": 133816,
+      "line_count": 2059,
+      "role": "observed actual current Source context; future changes require fresh review"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HVACManager.cc",
+      "sha256": "1a0db29afb07a4fc7ff5619a1419ca7f5bdf13251917c616ad2dd9c3a9355954",
+      "size_bytes": 198904,
+      "line_count": 3117,
+      "role": "observed actual current Source context; future changes require fresh review"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc",
+      "sha256": "54d960bcbfdf4f424a84ba73bf62040677424ad93e2f9362584898b0b146c005",
+      "size_bytes": 209881,
+      "line_count": 3475,
+      "role": "observed actual current Source context; future changes require fresh review"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/zone_air_initialization.rs",
+      "sha256": "56b94253ec63ba83b4393f0d46974f3d65b294bb8c17694be2030ef849c8957b",
+      "size_bytes": 11003,
+      "line_count": 290,
+      "role": "observed actual current Source context; future changes require fresh review"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/air_manager.rs",
+      "sha256": "54c1f4ea221db9ffa2d5b3b2fe66bbfcb36c895988c868d91e62640ba02ed4ec",
+      "size_bytes": 7735,
+      "line_count": 198,
+      "role": "observed actual current Source context; future changes require fresh review"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "d6187b9d4892f9c7362b4c33fcd05b4b2b2031521ac0007acad33897c098b3a5",
+      "size_bytes": 48412,
+      "line_count": 1043,
+      "role": "observed actual current Source context; future changes require fresh review"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/timestep/purchased_air.rs",
+      "sha256": "b4f83b2aa25e7d1499576fcef230d5a108b9610a2a9cc2c671d92f1aedb92583",
+      "size_bytes": 5298,
+      "line_count": 111,
+      "role": "observed actual current Source context; future changes require fresh review"
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/coupling.rs",
+      "sha256": "21a8f85fe33f2dadac6f6d847bd767deedb05e35bcd4d496b3ee809d72e38b47",
+      "size_bytes": 49620,
+      "line_count": 1253,
+      "role": "observed actual current Source context; future changes require fresh review"
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/update.rs",
+      "sha256": "c043ea7c7ffea5c793b3fbda728b00c27894adcc2519fab2344906c76ea4db59",
+      "size_bytes": 656,
+      "line_count": 19,
+      "role": "observed actual current Source context; future changes require fresh review"
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/dispatch.rs",
+      "sha256": "b4423112a0c81ae1c70d3db67aeb2f0aa8064c2e0c4b6b78cb0c2405b00a1a56",
+      "size_bytes": 33594,
+      "line_count": 828,
+      "role": "observed actual current Source context; future changes require fresh review"
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/binding.rs",
+      "sha256": "0066ea1649caaf852c7f90d5e8e8d39b38cc938261103ac81917d44e4c5d8fdd",
+      "size_bytes": 186296,
+      "line_count": 2723,
+      "role": "observed actual current Source context; future changes require fresh review"
+    },
+    {
+      "path": "crates/ep_runtime/src/node/mod.rs",
+      "sha256": "5b3d85874624f2e4c602bc396caabb50641add26804ea55d1cb3132208fd6abd",
+      "size_bytes": 1302,
+      "line_count": 34,
+      "role": "observed actual current Source context; future changes require fresh review"
+    },
+    {
+      "path": "crates/ep_runtime/src/node/state.rs",
+      "sha256": "3c28f2f1a2bf2c8aa2fa974aca3ebdaf76c8323d4b7b6af2846fb25783d62154",
+      "size_bytes": 4539,
+      "line_count": 133,
+      "role": "observed actual current Source context; future changes require fresh review"
+    },
+    {
+      "path": "crates/ep_model/src/objects/building.rs",
+      "sha256": "d6a3fbc6b39106f8d0b5195822bfc354e505e557f2b9406409b68aebfb089ef0",
+      "size_bytes": 11621,
+      "line_count": 373,
+      "role": "observed actual current Source context; future changes require fresh review"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/timestep.rs",
+      "sha256": "c3691f65dcb4abd5d3dc11dd81ab59daecaf888c1edc84a97ef4cb143c65aff4",
+      "size_bytes": 38979,
+      "line_count": 808,
+      "role": "observed actual current Source context; future changes require fresh review"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/zone_air_correction.rs",
+      "sha256": "c592565704ca4e48aee4dac703cbfe19b8190ca8fda40c7521e3c265be7da99b",
+      "size_bytes": 18474,
+      "line_count": 443,
+      "role": "observed actual current Source context; future changes require fresh review"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/algorithm.rs",
+      "sha256": "dc00aef90374ca111ad94ced8925813eb024215510a4ccafac3595677b27d34f",
+      "size_bytes": 9960,
+      "line_count": 214,
+      "role": "observed actual current Source context; future changes require fresh review"
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+      "sha256": "b730956c47a069469572cec8dfb6c469912444a94dc8aa0b7fd7d463b263f602",
+      "size_bytes": 595815,
+      "line_count": 10367,
+      "role": "observed actual current Source context; future changes require fresh review"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/run_period.rs",
+      "sha256": "f43d0aa74109034f77797da695d8a89d0b677993f028397d2a19d9446bc58ad8",
+      "size_bytes": 54954,
+      "line_count": 932,
+      "role": "observed actual current Source context; future changes require fresh review"
+    }
+  ],
+  "source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "first_line": 1452,
+      "last_line": 1540,
+      "sha256": "49114353fbf58d113eeb48a6f060ffc1c8c5734cf21c8f5c7595a614c0c42cf9",
+      "size_bytes": 4822,
+      "purpose": "actual default and override moisture-capacitance producer",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "first_line": 680,
+      "last_line": 683,
+      "sha256": "ec9a6258ea94665924328fa7a93914ef97783745c51b18087ef43b07f41c20d1",
+      "size_bytes": 447,
+      "purpose": "literal zone capacity defaults",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "first_line": 3863,
+      "last_line": 4165,
+      "sha256": "c0975502ffae6199ac2996cc49d9c80d02864c04cb993fb9d10c0e0e052a66f1",
+      "size_bytes": 15690,
+      "purpose": "temperature before humidity and selected working4 caller",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "first_line": 4187,
+      "last_line": 4206,
+      "sha256": "ce86e7ec3f91b8c62e8426e1e29f3c15f90568d6796ce4eb53d8989135a30c03",
+      "size_bytes": 946,
+      "purpose": "zone push four slots/current/average",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "first_line": 4297,
+      "last_line": 4330,
+      "sha256": "ed3ab55852781d86cc84cae7f7bc8b6441385d9ef705b180ec7073b24ffe37a4",
+      "size_bytes": 2251,
+      "purpose": "system push four slots/current",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "first_line": 4372,
+      "last_line": 4405,
+      "sha256": "3d912301ae1865830a98cd8e11ea6087d77345c6fa17d06bbea4fc3858a40ad5",
+      "size_bytes": 1479,
+      "purpose": "revert only0..2 from1..3",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "first_line": 4433,
+      "last_line": 4619,
+      "sha256": "3c3f5304c4e9d2ca160f482508dc17ed17538566a6b84f25c78151a7062e155e",
+      "size_bytes": 10253,
+      "purpose": "whole correctHumRat authority",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "first_line": 4704,
+      "last_line": 4736,
+      "sha256": "37963e00e17bf1b57b57f34b36090e450e7e03a83e808e376b00d2afd36e1832",
+      "size_bytes": 1498,
+      "purpose": "actual full4 interpolation",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "first_line": 6768,
+      "last_line": 6833,
+      "sha256": "dabcfaa47ba8fd5cb95c73f96b4f7133d79fab13db8f14b84598005b32097393",
+      "size_bytes": 4269,
+      "purpose": "node rewind before interpolation/full4 working copy",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HVACManager.cc",
+      "first_line": 165,
+      "last_line": 176,
+      "sha256": "e0f87be59a40ba50ec24f043b1eca35f26c22161d089ad296b8fd43f4f922566",
+      "size_bytes": 576,
+      "purpose": "actual average reset",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HVACManager.cc",
+      "first_line": 277,
+      "last_line": 423,
+      "sha256": "6888e06eb233e2d87ae6ec08cd9f21a44dae349c666e306ba72d5a04516dd991",
+      "size_bytes": 9792,
+      "purpose": "global trial/timestep/conditional push/weighted average",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/PurchasedAirManager.cc",
+      "first_line": 2647,
+      "last_line": 2752,
+      "sha256": "1d4b8621e83106c607b31667f712aaa0d5a74e03320ca0d02ed177dab0755b81",
+      "size_bytes": 5662,
+      "purpose": "actual active and OFF supply-node owners",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/zone_air_initialization.rs",
+      "first_line": 11,
+      "last_line": 118,
+      "sha256": "7b966706d9e659d34256e73a9a37e14cf4e2c3d0eaba93d39635183e51427461",
+      "size_bytes": 3712,
+      "purpose": "full6 four-slot owner and caller input API",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/zone_air_initialization.rs",
+      "first_line": 119,
+      "last_line": 175,
+      "sha256": "cbfe8e58cf3dfad245fd05a8768c0b82279d08b37a1cb9e757f8ca83736df18c",
+      "size_bytes": 2732,
+      "purpose": "environment suffix and legacy first3 projection",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/air_manager.rs",
+      "first_line": 42,
+      "last_line": 167,
+      "sha256": "2bbc90259ccfdc96e079b3e2a323a42055264912d1060e015f4574e6deeb79e7",
+      "size_bytes": 5059,
+      "purpose": "actual environment caller/projected owner",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "first_line": 218,
+      "last_line": 283,
+      "sha256": "8fd6165fdf9729b63c1ac6ac85275b88300b7fc695e3d089f6846d4c03c06aa7",
+      "size_bytes": 3448,
+      "purpose": "current legacy shell owner fields",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/timestep/purchased_air.rs",
+      "first_line": 1,
+      "last_line": 111,
+      "sha256": "b4f83b2aa25e7d1499576fcef230d5a108b9610a2a9cc2c671d92f1aedb92583",
+      "size_bytes": 5298,
+      "purpose": "actual genuine coupling closure/timestep handoff",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/coupling.rs",
+      "first_line": 52,
+      "last_line": 120,
+      "sha256": "41127fc8bd57ab1160fe3f1e8b7653abef564d000c7ce76f33a3dfcb18ea8846",
+      "size_bytes": 3138,
+      "purpose": "coupled output/node ownership",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/coupling.rs",
+      "first_line": 185,
+      "last_line": 317,
+      "sha256": "29a341a80820377bbc1c8de7f7540db0d2e0169f42b9072f9ec00eca68939d3f",
+      "size_bytes": 5034,
+      "purpose": "actual feedback sensible-only and owner validation",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/update.rs",
+      "first_line": 1,
+      "last_line": 19,
+      "sha256": "c043ea7c7ffea5c793b3fbda728b00c27894adcc2519fab2344906c76ea4db59",
+      "size_bytes": 656,
+      "purpose": "literal actual supply-node update",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/dispatch.rs",
+      "first_line": 270,
+      "last_line": 317,
+      "sha256": "f0f35369e8598193abe928d158f0bba448136a06d95d0c2ea77ec6892b205fb7",
+      "size_bytes": 1490,
+      "purpose": "actual calc/update/report result",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/binding.rs",
+      "first_line": 555,
+      "last_line": 587,
+      "sha256": "fc472ea5c1be45c2690bc2730b08837e8a9538bbaef5669ea0417fc98a87b894",
+      "size_bytes": 1332,
+      "purpose": "retained zone/supply/feedback/return IDs",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/binding.rs",
+      "first_line": 737,
+      "last_line": 806,
+      "sha256": "7bf322eeedc9986827afa70362f7e32e2e473be1f66af5a3a042e3e92e1294e4",
+      "size_bytes": 2773,
+      "purpose": "actual node identity checks",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/binding.rs",
+      "first_line": 849,
+      "last_line": 874,
+      "sha256": "e41b3b1b631515be7b3fc38c100c7b5a33f1427cb38c238676f87e9746c1bd65",
+      "size_bytes": 1216,
+      "purpose": "stored bound identity",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/binding.rs",
+      "first_line": 1545,
+      "last_line": 1619,
+      "sha256": "60b05769214c36e1b13a8d52aca08a166bdfd0f3647da999d4e4cca45eb6124a",
+      "size_bytes": 3110,
+      "purpose": "actual current-state recirculation projection",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/binding.rs",
+      "first_line": 2438,
+      "last_line": 2505,
+      "sha256": "f3913e921e3ecbc43261ab0455b5810d61343025acde5602a9fe09c01ebdb132",
+      "size_bytes": 2882,
+      "purpose": "actual final coupled calculation/result",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/node/mod.rs",
+      "first_line": 1,
+      "last_line": 34,
+      "sha256": "5b3d85874624f2e4c602bc396caabb50641add26804ea55d1cb3132208fd6abd",
+      "size_bytes": 1302,
+      "purpose": "actual supply-node DTO T/W/mass/enthalpy",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/node/state.rs",
+      "first_line": 40,
+      "last_line": 100,
+      "sha256": "8d8b21fd557874fb6a939dfa3ea81c89b813b8a05c8a172c10369c9c6d117304",
+      "size_bytes": 1797,
+      "purpose": "diagnostic node defaults/no enthalpy",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_model/src/objects/building.rs",
+      "first_line": 247,
+      "last_line": 285,
+      "sha256": "dca67bdc48e152f77118d8385ef662eb33555a3253a27cd865363437b1fda4bf",
+      "size_bytes": 1573,
+      "purpose": "Zone fields no moisture-capacity owner",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/timestep.rs",
+      "first_line": 320,
+      "last_line": 370,
+      "sha256": "82849eaf0bde18b17b1e35a0be2dac087f9411498f8fc65c2331c80705bba201",
+      "size_bytes": 3508,
+      "purpose": "current history selection/3-slot push",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/timestep.rs",
+      "first_line": 705,
+      "last_line": 805,
+      "sha256": "c6f387942d30d74f5a22768b04e7a27076814ffc0686088348fe3bcd3d14adf1",
+      "size_bytes": 5110,
+      "purpose": "actual correction/average/DS push",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/zone_air_correction.rs",
+      "first_line": 117,
+      "last_line": 175,
+      "sha256": "1fdb4f38e6f9d8564043d6c7366a57afcbb09a531ec497e6b296275d74d7293d",
+      "size_bytes": 2414,
+      "purpose": "legacy vector humidity approximation",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/zone_air_correction.rs",
+      "first_line": 177,
+      "last_line": 311,
+      "sha256": "e04d8b6dbb4bdb0c6c902ebff4e1ec45e83bb5be8950e652c1fa79529db49564",
+      "size_bytes": 6191,
+      "purpose": "legacy per-zone adaptive3-slot path",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/zone_air_correction.rs",
+      "first_line": 384,
+      "last_line": 417,
+      "sha256": "e25415c2229edfb8b0398cb56a64ff2d0ef65bee6cce97a8a854cffdd55f9e24",
+      "size_bytes": 1365,
+      "purpose": "second legacy humidity approximation",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/algorithm.rs",
+      "first_line": 63,
+      "last_line": 77,
+      "sha256": "5a28ce651041455652ce4afb116e118109f96b8604032875a9b63e27fb52076b",
+      "size_bytes": 762,
+      "purpose": "actual fixed direct PurchasedAir configuration",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+      "first_line": 5974,
+      "last_line": 5994,
+      "sha256": "4396071027f58702d606e1ba2a90423d9b43f9389ac5d27e64efd9b4e3783c09",
+      "size_bytes": 993,
+      "purpose": "actual fixed config selection",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+      "first_line": 6048,
+      "last_line": 6086,
+      "sha256": "f96cea4df12754e521f8d4284bea5ef0ab33edd527e9463f3f5bcc328f63a9f0",
+      "size_bytes": 1697,
+      "purpose": "ordinary binding/weather/schedule/clock handoff",
+      "encoding": "literal inclusive bytes, original line endings"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/run_period.rs",
+      "first_line": 370,
+      "last_line": 409,
+      "sha256": "001c2e8d226cca8c06bd45109d00f63df45c03e1038c00a6c81f2ae23e8182d7",
+      "size_bytes": 2632,
+      "purpose": "actual report average consumer",
+      "encoding": "literal inclusive bytes, original line endings"
+    }
+  ],
+  "fixed_input_default_authority": {
+    "scope_contract": {
+      "path": "energyplus_porting_plan/contracts/scope.json",
+      "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879",
+      "size_bytes": 15325,
+      "line_count": 418
+    },
+    "method": "exact SHA check for15 input-only IDFs; UTF-8 Source comment stripping/case-insensitive absence scan for full object-name token; no project parser executed",
+    "cases": [
+      {
+        "case_id": "A-24H",
+        "input": {
+          "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+          "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+          "size_bytes": 9275,
+          "line_count": 680,
+          "role": "input-only Source authority"
+        },
+        "matches_scope_input_SHA": true,
+        "ZoneCapacitanceMultiplier_ResearchSpecial_object_present": false
+      },
+      {
+        "case_id": "A-72H",
+        "input": {
+          "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+          "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc",
+          "size_bytes": 9275,
+          "line_count": 680,
+          "role": "input-only Source authority"
+        },
+        "matches_scope_input_SHA": true,
+        "ZoneCapacitanceMultiplier_ResearchSpecial_object_present": false
+      },
+      {
+        "case_id": "A-ANNUAL",
+        "input": {
+          "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+          "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0",
+          "size_bytes": 9280,
+          "line_count": 680,
+          "role": "input-only Source authority"
+        },
+        "matches_scope_input_SHA": true,
+        "ZoneCapacitanceMultiplier_ResearchSpecial_object_present": false
+      },
+      {
+        "case_id": "B-NOLIMIT-24H",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+          "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12",
+          "size_bytes": 13025,
+          "line_count": 894,
+          "role": "input-only Source authority"
+        },
+        "matches_scope_input_SHA": true,
+        "ZoneCapacitanceMultiplier_ResearchSpecial_object_present": false
+      },
+      {
+        "case_id": "B-NOLIMIT-72H",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+          "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda",
+          "size_bytes": 13025,
+          "line_count": 894,
+          "role": "input-only Source authority"
+        },
+        "matches_scope_input_SHA": true,
+        "ZoneCapacitanceMultiplier_ResearchSpecial_object_present": false
+      },
+      {
+        "case_id": "B-NOLIMIT-ANNUAL",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+          "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb",
+          "size_bytes": 13030,
+          "line_count": 894,
+          "role": "input-only Source authority"
+        },
+        "matches_scope_input_SHA": true,
+        "ZoneCapacitanceMultiplier_ResearchSpecial_object_present": false
+      },
+      {
+        "case_id": "B-FLOW-24H",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+          "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced",
+          "size_bytes": 13042,
+          "line_count": 894,
+          "role": "input-only Source authority"
+        },
+        "matches_scope_input_SHA": true,
+        "ZoneCapacitanceMultiplier_ResearchSpecial_object_present": false
+      },
+      {
+        "case_id": "B-FLOW-72H",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+          "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c",
+          "size_bytes": 13042,
+          "line_count": 894,
+          "role": "input-only Source authority"
+        },
+        "matches_scope_input_SHA": true,
+        "ZoneCapacitanceMultiplier_ResearchSpecial_object_present": false
+      },
+      {
+        "case_id": "B-FLOW-ANNUAL",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+          "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5",
+          "size_bytes": 13047,
+          "line_count": 894,
+          "role": "input-only Source authority"
+        },
+        "matches_scope_input_SHA": true,
+        "ZoneCapacitanceMultiplier_ResearchSpecial_object_present": false
+      },
+      {
+        "case_id": "B-CAPACITY-24H",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+          "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf",
+          "size_bytes": 13044,
+          "line_count": 894,
+          "role": "input-only Source authority"
+        },
+        "matches_scope_input_SHA": true,
+        "ZoneCapacitanceMultiplier_ResearchSpecial_object_present": false
+      },
+      {
+        "case_id": "B-CAPACITY-72H",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+          "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001",
+          "size_bytes": 13044,
+          "line_count": 894,
+          "role": "input-only Source authority"
+        },
+        "matches_scope_input_SHA": true,
+        "ZoneCapacitanceMultiplier_ResearchSpecial_object_present": false
+      },
+      {
+        "case_id": "B-CAPACITY-ANNUAL",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+          "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95",
+          "size_bytes": 13049,
+          "line_count": 894,
+          "role": "input-only Source authority"
+        },
+        "matches_scope_input_SHA": true,
+        "ZoneCapacitanceMultiplier_ResearchSpecial_object_present": false
+      },
+      {
+        "case_id": "B-BOTH-24H",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+          "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea",
+          "size_bytes": 13070,
+          "line_count": 894,
+          "role": "input-only Source authority"
+        },
+        "matches_scope_input_SHA": true,
+        "ZoneCapacitanceMultiplier_ResearchSpecial_object_present": false
+      },
+      {
+        "case_id": "B-BOTH-72H",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+          "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506",
+          "size_bytes": 13070,
+          "line_count": 894,
+          "role": "input-only Source authority"
+        },
+        "matches_scope_input_SHA": true,
+        "ZoneCapacitanceMultiplier_ResearchSpecial_object_present": false
+      },
+      {
+        "case_id": "B-BOTH-ANNUAL",
+        "input": {
+          "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+          "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d",
+          "size_bytes": 13075,
+          "line_count": 894,
+          "role": "input-only Source authority"
+        },
+        "matches_scope_input_SHA": true,
+        "ZoneCapacitanceMultiplier_ResearchSpecial_object_present": false
+      }
+    ],
+    "Source_owned_moisture_capacity_default": 1.0,
+    "authority": "DataHeatBalance.hh681 and ZoneTempPredictorCorrector.cc1452-1467; objectcount0 from these exact input-only sources",
+    "generic_CON_exclusion_names_this_override": false,
+    "broader_input_override_producer_admitted": false
+  },
+  "ready_boundaries": [
+    "Held literal member and passed PSY02 instance API",
+    "Actual PurchasedAir NodeId/mass/T/W/enthalpy update and identity binding",
+    "Explicit Source-owned1.0 moisture default for exact15 no-object inputs"
+  ],
+  "required_before_ordinary_activation": [
+    "Persist full ZON01 owner with6 four-slot arrays and current/temporary/average separation",
+    "True supply/zone-air/return node owners and actual update/feedback phase",
+    "Temperature-before-humidity caller with selected4 history/ordered inlets/real source/context",
+    "Global clock and reset/weighted average/conditional4-slot push/rollback",
+    "Independent actual caller observations, separately frozen scope before outputs"
+  ],
+  "factual_limits": {
+    "target_execution_performed": false,
+    "scientific_weather_or_binary_payload_read": false,
+    "new_equations_or_expected_answers_generated": false,
+    "implementation_canonical_or_gate_changes": false,
+    "integration_PASS_claimed": false,
+    "complete_ZON05_PASS_claimed": false,
+    "review_limit": "Raw authored held pure member; Source owner/dataflow plan, not independent formula certificate"
+  }
+}

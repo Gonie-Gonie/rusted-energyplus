@@ -1,0 +1,159 @@
+"""Seal only ignored Source/metadata; never import or execute project code."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd().resolve()
+OUT = ROOT / ".runtime/porting/ZON-05/rust-observer-prep-01"
+RAD = ROOT / ".runtime/porting/RAD-01/rust-observer-prep-02"
+NATIVE = ROOT / ".runtime/porting/ZON-05/native-helper-prep-01"
+PURE = ROOT / ".runtime/porting/ZON-05/rust-humidity-member-prep-01"
+FREEZER = ROOT / ".runtime/porting/ZON-05/input-writer-prep-01"
+
+
+def ref(path):
+    data = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(data).hexdigest(),
+            "size_bytes": len(data), "line_count": len(data.splitlines())}
+
+
+def put(name, data):
+    path = OUT / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("xb") as handle:
+        handle.write(data if isinstance(data, bytes) else data.encode("utf-8"))
+    return ref(path)
+
+
+def ranged(path, first, last, purpose):
+    data = b"".join(path.read_bytes().splitlines(keepends=True)[first - 1:last])
+    return {"source": ref(path), "first_line": first, "last_line": last,
+            "range_sha256": hashlib.sha256(data).hexdigest(), "range_size_bytes": len(data), "purpose": purpose}
+
+
+assert ref(NATIVE / "manifest.json")["sha256"] == "5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1"
+assert ref(PURE / "manifest.json")["sha256"] == "aa72577e3f4eeb802704cd1f6e817283708c384aebde8518d55c5b5003f3c8e6"
+assert ref(FREEZER / "manifest.json")["sha256"] == "eecf913773178e0de74705403ea5bb1a0f8ee8367811f4969664eec4d4210a80"
+own = [OUT / "new/zon05_candidate_unit_observer.rs", OUT / "new/zon05_candidate_unit_support/fields.rs"]
+templates = [RAD / "new/rad01_candidate_unit_observer.rs", RAD / "new/rad01_candidate_unit_support/fields.rs"]
+assert [ref(path)["sha256"] for path in templates] == [
+    "b5f7a48e092c6c5de73a6bd44cd4318eec0084ab8f24cc5fd4d28a83b01c64a2",
+    "b6d3fa11384e3c96ce3c3cb184574a353b1b18beffda37c24d42213158516285"]
+before = []
+diffs = []
+for index, (old, new) in enumerate(zip(templates, own)):
+    archive = put("before/" + old.name, old.read_bytes())
+    before.append({"historical_source": ref(old), "archive": archive})
+    delta = "".join(difflib.unified_diff(old.read_text(encoding="utf-8").splitlines(True),
+        new.read_text(encoding="utf-8").splitlines(True), fromfile=archive["path"], tofile=ref(new)["path"]))
+    diffs.append({"before": archive, "after": ref(new), "diff": put("diffs/" + new.name + ".diff", delta)})
+api_paths = ["crates/ep_run/Cargo.toml", "crates/ep_runtime/Cargo.toml", "crates/ep_runtime/src/lib.rs",
+    "crates/ep_runtime/src/heat_balance/mod.rs", "crates/ep_runtime/src/heat_balance/zone_air_initialization.rs",
+    "crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs", "crates/ep_runtime/src/heat_balance/state.rs",
+    "crates/ep_runtime/src/psychrometrics.rs", "crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+    "crates/ep_runtime/src/psychrometrics/psy02_trace.rs", "crates/ep_runtime/src/psychrometrics/production_trace.rs",
+    "crates/ep_runtime/src/psychrometrics_spline_tables.rs", "crates/ep_runtime/src/psychrometrics/cp_cache.rs",
+    "crates/ep_runtime/examples/clk02_probe_support/digest.rs"]
+destinations = ["crates/ep_run/examples/zon05_candidate_unit_observer.rs",
+                "crates/ep_run/examples/zon05_candidate_unit_support/fields.rs"]
+assert all(not (ROOT / path).exists() for path in destinations)
+assert not (ROOT / api_paths[5]).exists()
+current = [ref(ROOT / path) for path in api_paths if path != api_paths[5]]
+native = json.loads((NATIVE / "manifest.json").read_bytes())
+ranges = [
+    ranged(ROOT / ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc", 4433, 4619, "whole selected genuine member; no private locals observed"),
+    ranged(NATIVE / "zon05_reference_helper.cpp", 41, 145, "literal state/input preparation and actual node/inlet order"),
+    ranged(NATIVE / "zon05_reference_helper.cpp", 148, 241, "actual direct calls, stop/return and full stdout contract"),
+    ranged(NATIVE / "zon05_reference_fields.hh", 20, 102, "actual snapshot and cache fields; no local evaluator"),
+    ranged(NATIVE / "zon01_reference_fields.hh", 20, 96, "all retained initialization fields and four slots"),
+    ranged(PURE / "zone_humidity_correction.rs", 1, 245, "held real API context/state/cache/unavailable contract"),
+    ranged(ROOT / "crates/ep_runtime/src/heat_balance/zone_air_initialization.rs", 1, 111, "actual constructor and full retained state owner"),
+    ranged(ROOT / "crates/ep_runtime/src/psychrometrics/psy02_state.rs", 1, 226, "actual passed state/cache and operation owner APIs"),
+    ranged(ROOT / "crates/ep_runtime/src/psychrometrics/psy02_state.rs", 405, 416, "actual snapshots and final ordered nondefault cache owners"),
+]
+readme = """# ZON-05 actual candidate observation: held Source only
+
+This adapts the FULL accepted RAD candidate example and support, preserving its
+source/input hashing and runtime compiler-source inventory mechanism. It is
+unexecuted. Root must install the separately accepted humidity owner and this
+example, format it, bind its actual final Source, and complete OriginalDataQA
+before any candidate execution. No canonical source or gate is changed here.
+
+The CLI is request_path request_sha frozen_packet_path frozen_packet_sha
+runtime_sources_path. The Native request remains exactly its five original
+keys and byte-identical to the accepted 21-case fixture. The actual frozen
+packet supplies the sidecar DAG; the observer authenticates Native4, the literal
+policy, writer, current scope/documents and all source/input identities before
+and after calls. It reads neither Native results nor expected values.
+
+Each case constructs the real complete ZoneAirInitializationState, then assigns
+only the exact declared Native input fields. All four selected history slots
+and every node in actual allocation order are passed unchanged. Two +0 latent
+arrays and route flags come from Native prepare's explicit literal assignments,
+not from missing values. Runtime math/scope validation stays in the actual
+correct_selected_zone_humidity_ratio API. No duplicate moisture equation,
+density/saturation/guard evaluator or inlet sorting is implemented here.
+
+One real EnergyPlusPsychrometricsState persists across each case's ordered
+member calls. The observer captures preparation, before and after owners and
+the actual typed API result once per request. An unavailable result stops that
+case's later calls, retains real partial state and emits full JSON with exit2.
+There is no default owner or fabricated Native exception. A complete candidate
+run exits0 only when all actual requested Rust owners are available; this is
+availability, not numerical PASS.
+
+The serializer copies all24 initialization fields, all six four-slot arrays,
+actual sources/context, every node and actual named psychrometric state/cache.
+Nondefault Psat rows use the same copied tag/value predicate as Native, in the
+actual returned index order. Cached Psat values are separately observable; the
+Rust saturation operation detail is Rust-only custody and is never paired as
+Native Wsat/A/B/C/rho/Hg or guard outcomes. Other Rust cache families are context
+only. Native global diagnostic indices/backend/text are not invented in Rust.
+
+The forthcoming existing-stage comparator must bind the fixed policy exactly:
+temporary W and positive feedback W/H plus cached Psat use their named frozen
+profiles, retained inputs/state/four-slot arrays/non-feedback nodes and unchanged
+cache rows retain exact bits. Required absence, stop or nonfinite numerical
+availability cannot PASS. No history selection, current/average commit, history
+push, production/parser/calendar integration or diagnostic parity is certified.
+
+Own sources2 and ordered API14 are proposed paths only. One API module is the
+literal accepted prospective dependency; the other13 descriptors describe
+current Source at preparation time. Root must supply actual post-installation,
+post-format SHA bindings and full Cargo SourceSnapshot at runtime. No future
+receipt, output, binary, snapshot or result digest is guessed by this hold.
+
+Before2 RAD archives and two exact source diffs are retained. The metadata
+author uses stdlib only for raw hashes/ranges/diffs/AST of itself; no Rust parse,
+compiler, formatter, import, target or numerical execution has occurred.
+Base authored this transport and previously reviewed the Raw kernel; Header
+authored Native/freezer/QA. This is custody Source, not formula or science proof.
+"""
+documentation = put("README.md", readme)
+manifest = {
+    "schema": "zon05-candidate-unit-observer-source-preparation.v1", "card": "ZON-05",
+    "status": "held-source-only-unexecuted-awaiting-Root-and-other-author-FULL-review",
+    "own_sources": [ref(path) for path in own], "documentation": documentation,
+    "authoring_source": ref(OUT / "prepare_metadata.py"), "before_templates": before, "exact_diffs": diffs,
+    "literal_dependencies": [ref(NATIVE / "manifest.json"), ref(FREEZER / "manifest.json"), ref(PURE / "manifest.json"),
+        native["input_fixture_proposal"], native["observation_policy_proposal"], ref(PURE / "zone_humidity_correction.rs")],
+    "native_source_files": native["own_sources"], "current_API_source_context_only": current,
+    "prospective_API_source": {"target_path": api_paths[5], "held_source": ref(PURE / "zone_humidity_correction.rs"),
+        "Root_actual_application_and_formatted_identity_required": True},
+    "read_source_ranges": ranges,
+    "runtime_interfaces": {"arguments": ["request_path", "request_sha", "frozen_packet_path", "frozen_packet_sha", "runtime_sources_path"],
+        "result_schema": "zon05-candidate-unit-observer-results.v1", "runtime_inventory_schema": "zon05-candidate-unit-runtime-source-bindings.v1",
+        "observer_sources": destinations, "actual_public_API_sources": api_paths,
+        "requested_counts_from_literal_fixture": {"cases": 21, "correctHumRat": 43},
+        "actual_future_output_SourceSnapshot_and_Cargo_artifact": None},
+    "new_destinations_absent_at_preparation": destinations + [api_paths[5]],
+    "Source_verification": {"before_templates_raw_exact": True, "two_diffs_regenerated": True,
+        "own_author_AST_only": True, "project_import_build_target_or_formatter_performed": False,
+        "Native_numeric_or_binary_or_weather_payload_read": False, "canonical_or_Git_changed": False,
+        "new_fixtures_or_policy_tuning": False, "numerical_PASS_or_full_card_claimed": False},
+}
+ast.parse((OUT / "prepare_metadata.py").read_text(encoding="utf-8"))
+put("manifest.json", json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
+print(json.dumps({"manifest": ref(OUT / "manifest.json"), "own_sources": [ref(path) for path in own]}))

@@ -1,0 +1,625 @@
+{
+  "schema": "zon05-same-input-unit-comparison-source-preparation.v1",
+  "card": "ZON-05",
+  "status": "held-source-only-unexecuted-awaiting-Root-and-other-author-FULL-review",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/ZON-05/comparer-prep-01/compare_unit.py",
+      "sha256": "052a51115a164c60cab6aa222910dc95d15fda7d9bc12d41b30e1699c2589c28",
+      "size_bytes": 38311,
+      "line_count": 443
+    },
+    {
+      "path": ".runtime/porting/ZON-05/comparer-prep-01/comparison_contract_tests.py",
+      "sha256": "2c2ceea41bc76acac377deef06d3d114f30b75e278ac33719ca9ff01640d4624",
+      "size_bytes": 3697,
+      "line_count": 74
+    }
+  ],
+  "documentation": {
+    "path": ".runtime/porting/ZON-05/comparer-prep-01/README.md",
+    "sha256": "33f16b5a45ea3737f6a85f8f667b8dcc857deed5b32abf1a4a38294989f5bf96",
+    "size_bytes": 4968,
+    "line_count": 77
+  },
+  "authoring_sources": [
+    {
+      "path": ".runtime/porting/ZON-05/comparer-prep-01/prepare_sources.py",
+      "sha256": "2dcff56a579ba8cd41884b715362aef394f7facf5ec0452c7519ae205217d99b",
+      "size_bytes": 23634,
+      "line_count": 278
+    },
+    {
+      "path": ".runtime/porting/ZON-05/comparer-prep-01/prepare_metadata.py",
+      "sha256": "ce43959d4e859b0a5d7656114c0b616295aca70cf968950d537a44dbc81e66b6",
+      "size_bytes": 9241,
+      "line_count": 130
+    }
+  ],
+  "literal_dependencies": [
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/manifest.json",
+      "sha256": "5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1",
+      "size_bytes": 39009,
+      "line_count": 962
+    },
+    {
+      "path": ".runtime/porting/ZON-05/input-writer-prep-01/manifest.json",
+      "sha256": "eecf913773178e0de74705403ea5bb1a0f8ee8367811f4969664eec4d4210a80",
+      "size_bytes": 33168,
+      "line_count": 837
+    },
+    {
+      "path": ".runtime/porting/ZON-05/original-data-review-prep-01/manifest.json",
+      "sha256": "c52bd6b2a90f9e205b34c821fc1babf952b4593f5793e1bee699e6e83527b438",
+      "size_bytes": 33960,
+      "line_count": 841
+    },
+    {
+      "path": ".runtime/porting/ZON-05/rust-observer-prep-02/manifest.json",
+      "sha256": "fdfac830c0b40ba4e6cb49bb6049a7e5d3f8d554b9d9439b8bd1ee968fad3bdf",
+      "size_bytes": 17073,
+      "line_count": 443
+    },
+    {
+      "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/manifest.json",
+      "sha256": "aa72577e3f4eeb802704cd1f6e817283708c384aebde8518d55c5b5003f3c8e6",
+      "size_bytes": 16989,
+      "line_count": 438
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/input-only-cases.proposed.json",
+      "sha256": "e2a98523a591dd76c370d70e0ebc3464d97ba62bd512d4b5f9f60c3b5662bcaf",
+      "size_bytes": 94170,
+      "line_count": 3032
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/observation-policy.proposed.json",
+      "sha256": "b3adf14637d3c9794d0a7127a46bc6c9bba1f7378726c1c6001990fb833b56a2",
+      "size_bytes": 2609,
+      "line_count": 30
+    }
+  ],
+  "direct_unchanged_QA_runtime_support_sources": [
+    {
+      "path": ".runtime/porting/ZON-05/original-data-review-prep-01/shape.py",
+      "sha256": "9a530999a7e861f9eca32553e484b766deaef2c0b392a90f8728579a5e4d958a",
+      "size_bytes": 17216,
+      "line_count": 204
+    },
+    {
+      "path": ".runtime/porting/ZON-05/original-data-review-prep-01/packet_io.py",
+      "sha256": "4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+      "size_bytes": 3893,
+      "line_count": 105
+    }
+  ],
+  "before_templates": [
+    {
+      "historical_source": {
+        "path": ".runtime/porting/RAD-01/comparer-prep-02/compare_unit.py",
+        "sha256": "88d74d290713af9cea59add806390c49d33d94da0edc2525e01a3b1b74cf9328",
+        "size_bytes": 28722,
+        "line_count": 349
+      },
+      "archive": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/before/compare_unit.py",
+        "sha256": "88d74d290713af9cea59add806390c49d33d94da0edc2525e01a3b1b74cf9328",
+        "size_bytes": 28722,
+        "line_count": 349
+      }
+    },
+    {
+      "historical_source": {
+        "path": ".runtime/porting/RAD-01/comparer-prep-02/comparison_contract_tests.py",
+        "sha256": "1dd01c53559cc39f87adb71c8fbdfd15b74303ff3be8982fecb8c536a2e3a533",
+        "size_bytes": 2818,
+        "line_count": 62
+      },
+      "archive": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/before/comparison_contract_tests.py",
+        "sha256": "1dd01c53559cc39f87adb71c8fbdfd15b74303ff3be8982fecb8c536a2e3a533",
+        "size_bytes": 2818,
+        "line_count": 62
+      }
+    },
+    {
+      "historical_source": {
+        "path": ".runtime/porting/RAD-01/comparer-prep-02/manifest.json",
+        "sha256": "98b68a058021126a6489a849a4035890e4df4de9f177b1ddf68e08523a531d00",
+        "size_bytes": 25372,
+        "line_count": 645
+      },
+      "archive": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/before/RAD-manifest.json",
+        "sha256": "98b68a058021126a6489a849a4035890e4df4de9f177b1ddf68e08523a531d00",
+        "size_bytes": 25372,
+        "line_count": 645
+      }
+    },
+    {
+      "historical_source": {
+        "path": ".runtime/porting/RAD-01/comparer-prep-02/README.md",
+        "sha256": "cea86d1065b97cec48edd36e48bf60e0ca97e67b36adb092b2e9699df8a7206f",
+        "size_bytes": 5904,
+        "line_count": 27
+      },
+      "archive": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/before/RAD-README.md",
+        "sha256": "cea86d1065b97cec48edd36e48bf60e0ca97e67b36adb092b2e9699df8a7206f",
+        "size_bytes": 5904,
+        "line_count": 27
+      }
+    }
+  ],
+  "exact_diffs": [
+    {
+      "before": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/before/compare_unit.py",
+        "sha256": "88d74d290713af9cea59add806390c49d33d94da0edc2525e01a3b1b74cf9328",
+        "size_bytes": 28722,
+        "line_count": 349
+      },
+      "after": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/compare_unit.py",
+        "sha256": "052a51115a164c60cab6aa222910dc95d15fda7d9bc12d41b30e1699c2589c28",
+        "size_bytes": 38311,
+        "line_count": 443
+      },
+      "diff": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/diffs/compare_unit.py.diff",
+        "sha256": "a632e3924ef459bc0744740d2c2d064436de532f6a534c019d87ea819cd83e07",
+        "size_bytes": 42085,
+        "line_count": 447
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/before/comparison_contract_tests.py",
+        "sha256": "1dd01c53559cc39f87adb71c8fbdfd15b74303ff3be8982fecb8c536a2e3a533",
+        "size_bytes": 2818,
+        "line_count": 62
+      },
+      "after": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/comparison_contract_tests.py",
+        "sha256": "2c2ceea41bc76acac377deef06d3d114f30b75e278ac33719ca9ff01640d4624",
+        "size_bytes": 3697,
+        "line_count": 74
+      },
+      "diff": {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/diffs/comparison_contract_tests.py.diff",
+        "sha256": "12d3b00c1d6b9aff736cb8404fa61afbc87fc2dd187eaf977e7bda2441474779",
+        "size_bytes": 4530,
+        "line_count": 83
+      }
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+        "sha256": "9b0aff100fff104dcf9268b46328c1bda5452a28894a6ecb1385bb63ef975ab6",
+        "size_bytes": 404705,
+        "line_count": 7244
+      },
+      "first_line": 4433,
+      "last_line": 4619,
+      "range_sha256": "3c3f5304c4e9d2ca160f482508dc17ed17538566a6b84f25c78151a7062e155e",
+      "range_size_bytes": 10253,
+      "purpose": "whole selected genuine member; no private locals observed"
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_helper.cpp",
+        "sha256": "89fcfc63be7ba3a5c190c828f8167a305695a88aee3f30583dafd196f115ca09",
+        "size_bytes": 14797,
+        "line_count": 241
+      },
+      "first_line": 41,
+      "last_line": 145,
+      "range_sha256": "b1938ec4ecfa5347b77435c9f65936de5c4b8a602764b60c883a55f6ab6106a9",
+      "range_size_bytes": 7086,
+      "purpose": "literal state/input preparation and actual node/inlet order"
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_helper.cpp",
+        "sha256": "89fcfc63be7ba3a5c190c828f8167a305695a88aee3f30583dafd196f115ca09",
+        "size_bytes": 14797,
+        "line_count": 241
+      },
+      "first_line": 148,
+      "last_line": 241,
+      "range_sha256": "b83805dfb914c92abefd6112ee18bc313cb44fbbd8c69453439c18c916065d63",
+      "range_size_bytes": 5993,
+      "purpose": "actual direct calls, stop/return and full stdout contract"
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_fields.hh",
+        "sha256": "0ab7025e2914ab8b72edac40bd674be1469fd870dd0aa0192ad0e4c26b0bdd0c",
+        "size_bytes": 6453,
+        "line_count": 102
+      },
+      "first_line": 20,
+      "last_line": 102,
+      "range_sha256": "9bf52f6ac1eb90a6ae293ece2d54115b9dbd44cda2871fe97609559a8e14a651",
+      "range_size_bytes": 5728,
+      "purpose": "actual snapshot and cache fields; no local evaluator"
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon01_reference_fields.hh",
+        "sha256": "24e96e01b8c6f5ed445c94dd6f5a486dac5d79c175df62ba55af46bd10ad86f8",
+        "size_bytes": 5146,
+        "line_count": 96
+      },
+      "first_line": 20,
+      "last_line": 96,
+      "range_sha256": "4f780ad0d93fefab68067fdbd042b5910ad0ae1197dbfb04d16676eb702cc49e",
+      "range_size_bytes": 4412,
+      "purpose": "all retained initialization fields and four slots"
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/zone_humidity_correction.rs",
+        "sha256": "f8279ee488005e9c274534c7fb009bbfe4a4cd55141797125b650f7a44230b6c",
+        "size_bytes": 11286,
+        "line_count": 245
+      },
+      "first_line": 1,
+      "last_line": 245,
+      "range_sha256": "f8279ee488005e9c274534c7fb009bbfe4a4cd55141797125b650f7a44230b6c",
+      "range_size_bytes": 11286,
+      "purpose": "held real API context/state/cache/unavailable contract"
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/heat_balance/zone_air_initialization.rs",
+        "sha256": "56b94253ec63ba83b4393f0d46974f3d65b294bb8c17694be2030ef849c8957b",
+        "size_bytes": 11003,
+        "line_count": 290
+      },
+      "first_line": 1,
+      "last_line": 111,
+      "range_sha256": "ce738b1ba93fac40ce3c18946e665fa9b2a127ee8301f4344638159053ee7047",
+      "range_size_bytes": 3832,
+      "purpose": "actual constructor and full retained state owner"
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+        "sha256": "8f9567503bb8d361ebff3eb180d9a48c72e4ba19d56dc99c329ecd9e7efe885d",
+        "size_bytes": 19614,
+        "line_count": 637
+      },
+      "first_line": 1,
+      "last_line": 226,
+      "range_sha256": "6623d256c0bfbf2b5ab90facf908b91ba586f79dfe8b71f3693c04df098d1f7b",
+      "range_size_bytes": 7883,
+      "purpose": "actual passed state/cache and operation owner APIs"
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+        "sha256": "8f9567503bb8d361ebff3eb180d9a48c72e4ba19d56dc99c329ecd9e7efe885d",
+        "size_bytes": 19614,
+        "line_count": 637
+      },
+      "first_line": 405,
+      "last_line": 416,
+      "range_sha256": "9c2a23629d71195fdd42e2fb7c96450d9266a160ef5136d64c451db51c0d6b55",
+      "range_size_bytes": 350,
+      "purpose": "actual nested WFromRh property route; snapshots and final cache owners are covered separately by lines1-226"
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/ZON-05/original-data-review-prep-01/shape.py",
+        "sha256": "9a530999a7e861f9eca32553e484b766deaef2c0b392a90f8728579a5e4d958a",
+        "size_bytes": 17216,
+        "line_count": 204
+      },
+      "first_line": 1,
+      "last_line": 204,
+      "range_sha256": "9a530999a7e861f9eca32553e484b766deaef2c0b392a90f8728579a5e4d958a",
+      "range_size_bytes": 17216,
+      "purpose": "unchanged whole factual Native ledger validator, directly reused"
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/ZON-05/original-data-review-prep-01/packet_io.py",
+        "sha256": "4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+        "size_bytes": 3893,
+        "line_count": 105
+      },
+      "first_line": 1,
+      "last_line": 105,
+      "range_sha256": "4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+      "range_size_bytes": 3893,
+      "purpose": "unchanged direct Source/input identity and archive IO"
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/ZON-05/original-data-review-prep-01/review_data.py",
+        "sha256": "fef0125a3a8622ab2756c9902db0dfb9931952f3cc6873f1b57748082b8b0dc8",
+        "size_bytes": 22936,
+        "line_count": 261
+      },
+      "first_line": 1,
+      "last_line": 261,
+      "range_sha256": "fef0125a3a8622ab2756c9902db0dfb9931952f3cc6873f1b57748082b8b0dc8",
+      "range_size_bytes": 22936,
+      "purpose": "actual QA schema/argv/source archives and release protocol"
+    },
+    {
+      "source": {
+        "path": "crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+        "sha256": "8f9567503bb8d361ebff3eb180d9a48c72e4ba19d56dc99c329ecd9e7efe885d",
+        "size_bytes": 19614,
+        "line_count": 637
+      },
+      "first_line": 230,
+      "last_line": 257,
+      "range_sha256": "bd18b0e6e3ec2e8a45565b7dfbc75f80e1c3215963e342e7154a2e977b173eb7",
+      "range_size_bytes": 955,
+      "purpose": "actual WFromRh has no direct target cache slot; nested rows separate"
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-01/new/zon05_candidate_unit_support/fields.rs",
+        "sha256": "d5fc420ed302cb3bd940e18fe8487478d84e7d648d13158acfe89e840ab4723a",
+        "size_bytes": 9174,
+        "line_count": 143
+      },
+      "first_line": 1,
+      "last_line": 143,
+      "range_sha256": "d5fc420ed302cb3bd940e18fe8487478d84e7d648d13158acfe89e840ab4723a",
+      "range_size_bytes": 9174,
+      "purpose": "actual serialized Rust field/phase/property owner contract"
+    },
+    {
+      "source": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-01/new/zon05_candidate_unit_observer.rs",
+        "sha256": "cd9d0b8a123f04cdba97345eedbf813796528ec35e2a2e508f00685bd0ef4db5",
+        "size_bytes": 20510,
+        "line_count": 273
+      },
+      "first_line": 149,
+      "last_line": 177,
+      "range_sha256": "6934c21f8940eaf6b7ddc7c1b6ce42c03a8388eaa1b7f40d971926e82a57e373",
+      "range_size_bytes": 2386,
+      "purpose": "actual same-case call/prefix/phase/result Source contract"
+    }
+  ],
+  "native_source_files": [
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_helper.cpp",
+      "sha256": "89fcfc63be7ba3a5c190c828f8167a305695a88aee3f30583dafd196f115ca09",
+      "size_bytes": 14797,
+      "line_count": 241
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_fields.hh",
+      "sha256": "0ab7025e2914ab8b72edac40bd674be1469fd870dd0aa0192ad0e4c26b0bdd0c",
+      "size_bytes": 6453,
+      "line_count": 102
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon01_reference_fields.hh",
+      "sha256": "24e96e01b8c6f5ed445c94dd6f5a486dac5d79c175df62ba55af46bd10ad86f8",
+      "size_bytes": 5146,
+      "line_count": 96
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference.cmake",
+      "sha256": "5ae5067e6d5b0e19ac7cf74275e5b724946df9fb90254061b74e27850c060603",
+      "size_bytes": 1799,
+      "line_count": 28
+    }
+  ],
+  "current_API_source_context_only": [
+    {
+      "path": "crates/ep_run/Cargo.toml",
+      "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+      "size_bytes": 524,
+      "line_count": 21
+    },
+    {
+      "path": "crates/ep_runtime/Cargo.toml",
+      "sha256": "bb81b5793debafd84300ec9905f0cda65ab32d216633543bab375b30a7a379e9",
+      "size_bytes": 327,
+      "line_count": 17
+    },
+    {
+      "path": "crates/ep_runtime/src/lib.rs",
+      "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+      "size_bytes": 868,
+      "line_count": 41
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+      "size_bytes": 1785,
+      "line_count": 71
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/zone_air_initialization.rs",
+      "sha256": "56b94253ec63ba83b4393f0d46974f3d65b294bb8c17694be2030ef849c8957b",
+      "size_bytes": 11003,
+      "line_count": 290
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "d6187b9d4892f9c7362b4c33fcd05b4b2b2031521ac0007acad33897c098b3a5",
+      "size_bytes": 48412,
+      "line_count": 1043
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics.rs",
+      "sha256": "fe7b95c62aa56409193311b17d4f28478897592247b859f2656b33d8f8de8837",
+      "size_bytes": 42191,
+      "line_count": 1226
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+      "sha256": "8f9567503bb8d361ebff3eb180d9a48c72e4ba19d56dc99c329ecd9e7efe885d",
+      "size_bytes": 19614,
+      "line_count": 637
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics/psy02_trace.rs",
+      "sha256": "ac3d54d959ae5e775b0fb3c01492b15f4ea68741779f56a65617dc1e11ea2046",
+      "size_bytes": 9122,
+      "line_count": 282
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics/production_trace.rs",
+      "sha256": "e32a1fe1b1a6a2fb84b0d591d8a111feac3a10c43c20ec3d9f575a71959e0fb3",
+      "size_bytes": 16724,
+      "line_count": 469
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics_spline_tables.rs",
+      "sha256": "405eed26d7fb07d710ad75ac237063caee993acfcfc9038754f945ae66bbabaf",
+      "size_bytes": 52855,
+      "line_count": 3315
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics/cp_cache.rs",
+      "sha256": "0ebe23b129e3e6aaad5fe24ee3ba15f3799cf60ac93f63ecb73afa695fc1b0d2",
+      "size_bytes": 6674,
+      "line_count": 181
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+      "size_bytes": 3172,
+      "line_count": 75
+    }
+  ],
+  "prospective_API_source": {
+    "target_path": "crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs",
+    "held_source": {
+      "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/zone_humidity_correction.rs",
+      "sha256": "f8279ee488005e9c274534c7fb009bbfe4a4cd55141797125b650f7a44230b6c",
+      "size_bytes": 11286,
+      "line_count": 245
+    },
+    "Root_actual_application_and_formatted_identity_required": true
+  },
+  "runtime_interfaces": {
+    "flags": [
+      "--approved-source-sha256",
+      "--original-data-review",
+      "--original-data-review-execution",
+      "--Rust-build-execution",
+      "--Rust-execution",
+      "--Rust-results",
+      "--output-dir"
+    ],
+    "comparison_schema": "zon05-unit-comparison.v1",
+    "pass_status": "pass-selected-direct-humidity-member",
+    "fail_status": "fail-selected-direct-humidity-member",
+    "executed_reader_sources_order": [
+      {
+        "path": ".runtime/porting/ZON-05/comparer-prep-01/compare_unit.py",
+        "sha256": "052a51115a164c60cab6aa222910dc95d15fda7d9bc12d41b30e1699c2589c28",
+        "size_bytes": 38311,
+        "line_count": 443
+      },
+      {
+        "path": ".runtime/porting/ZON-05/original-data-review-prep-01/shape.py",
+        "sha256": "9a530999a7e861f9eca32553e484b766deaef2c0b392a90f8728579a5e4d958a",
+        "size_bytes": 17216,
+        "line_count": 204
+      },
+      {
+        "path": ".runtime/porting/ZON-05/original-data-review-prep-01/packet_io.py",
+        "sha256": "4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+        "size_bytes": 3893,
+        "line_count": 105
+      }
+    ],
+    "candidate_arguments": [
+      "request_path",
+      "request_sha",
+      "frozen_packet_path",
+      "frozen_packet_sha",
+      "runtime_sources_path"
+    ],
+    "observer_sources": [
+      "crates/ep_run/examples/zon05_candidate_unit_observer.rs",
+      "crates/ep_run/examples/zon05_candidate_unit_support/fields.rs"
+    ],
+    "actual_public_API_sources": [
+      "crates/ep_run/Cargo.toml",
+      "crates/ep_runtime/Cargo.toml",
+      "crates/ep_runtime/src/lib.rs",
+      "crates/ep_runtime/src/heat_balance/mod.rs",
+      "crates/ep_runtime/src/heat_balance/zone_air_initialization.rs",
+      "crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs",
+      "crates/ep_runtime/src/heat_balance/state.rs",
+      "crates/ep_runtime/src/psychrometrics.rs",
+      "crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+      "crates/ep_runtime/src/psychrometrics/psy02_trace.rs",
+      "crates/ep_runtime/src/psychrometrics/production_trace.rs",
+      "crates/ep_runtime/src/psychrometrics_spline_tables.rs",
+      "crates/ep_runtime/src/psychrometrics/cp_cache.rs",
+      "crates/ep_runtime/examples/clk02_probe_support/digest.rs"
+    ],
+    "actual_final_SourceSnapshot_Cargo_binary_and_results": null
+  },
+  "fixed_literal_policy": {
+    "proposal": {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/observation-policy.proposed.json",
+      "sha256": "b3adf14637d3c9794d0a7127a46bc6c9bba1f7378726c1c6001990fb833b56a2",
+      "size_bytes": 2609,
+      "line_count": 30
+    },
+    "required_numerical_profiles": {
+      "airHumRatTemp": {
+        "unit": "kg/kg",
+        "atol": 1e-12,
+        "rtol": 1e-13
+      },
+      "SystemNode.HumRat": {
+        "unit": "kg/kg",
+        "atol": 1e-12,
+        "rtol": 1e-13,
+        "condition": "actual SystemZoneNodeNumber > 0"
+      },
+      "SystemNode.Enthalpy": {
+        "unit": "J/kg",
+        "atol": 1e-07,
+        "rtol": 1e-13,
+        "condition": "actual SystemZoneNodeNumber > 0"
+      },
+      "psychrometrics.nondefault_Psat_rows.Psat": {
+        "unit": "Pa",
+        "atol": 1e-08,
+        "rtol": 1e-13
+      }
+    },
+    "retained_inputs_state_nodes_and_unchanged_cache_rows_exact_bits": true,
+    "formula_or_cache_hash_or_guard_recomputation": false,
+    "tuning_after_outputs": false
+  },
+  "tests_proposed_not_executed": {
+    "count": 7,
+    "purpose": "generic comparison primitives only; no new scientific input fixture or answer"
+  },
+  "Source_verification": {
+    "own_and_author_AST_only": true,
+    "before_templates_exact": true,
+    "source_diffs_regenerated": true,
+    "direct_QA_supports_byte_unchanged": true,
+    "fixed_policy_literal_exact": true,
+    "missing_stopped_nonfinite_never_PASS": true,
+    "project_or_comparer_or_tests_import_or_execution": false,
+    "targets_or_Cargo_or_formatter": false,
+    "Native_numeric_weather_binary_or_core_payload_read": false,
+    "canonical_or_Git_changed": false,
+    "future_outputs_SourceSnapshot_or_digests_guessed": false,
+    "full_card_or_scientific_PASS_claimed": false
+  }
+}

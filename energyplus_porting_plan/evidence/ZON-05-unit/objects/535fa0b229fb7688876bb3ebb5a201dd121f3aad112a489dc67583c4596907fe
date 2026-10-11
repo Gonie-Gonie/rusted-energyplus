@@ -1,0 +1,18 @@
+"""Root invokes the established Cargo checks on the accepted formatted ZON05 sources."""
+import hashlib,json,subprocess,sys
+from pathlib import Path
+ROOT=Path.cwd(); BASE=ROOT/'.runtime/porting/ZON-05'
+def read(p): return json.loads(p.read_bytes())
+assert len(sys.argv)==2
+p=BASE/'applied-final-source-02/manifest.json'; assert hashlib.sha256(p.read_bytes()).hexdigest()==sys.argv[1]
+v=read(p); assert v['Root_and_other_author_FULL_formatter_correspondence_accepted']
+for row in v['actual_sources']: assert hashlib.sha256((ROOT/row['canonical_path']).read_bytes()).hexdigest()==row['actual_final_source']['sha256']
+settings=['--config','profile.dev.debug=0','--config','profile.test.debug=0','--config','build.incremental=false','--locked']
+commands=[('fmt-check-command-01',['cargo','fmt','--all','--','--check']),('clippy-command-01',['cargo','clippy',*settings,'--workspace','--all-targets','--','-D','warnings']),('focused-command-01',['cargo','test',*settings,'-p','ep_runtime','--lib','heat_balance::']),('workspace-command-01',['cargo','test',*settings,'--workspace'])]
+source=None
+for name,command in commands:
+ subprocess.run(['python','-X','utf8','-B','tools/porting/record_command.py','--output-dir',(BASE/name).relative_to(ROOT).as_posix(),'--',*command],check=True)
+ receipt=read(BASE/name/'receipt.json'); assert receipt['exit_code']==0 and receipt['source_bytes_match_before_and_after'] and receipt['launch_error'] is None
+ if source is None: source=receipt['source_snapshot']
+ else: assert receipt['source_snapshot']==source
+ print('Root completed ZON05 quality',name,source['sha256'],flush=True)

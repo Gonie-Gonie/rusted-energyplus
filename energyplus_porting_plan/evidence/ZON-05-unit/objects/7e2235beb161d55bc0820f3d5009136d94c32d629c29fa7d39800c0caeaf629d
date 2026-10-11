@@ -1,0 +1,611 @@
+//! Frozen literal ZON-05 calls to the actual selected member owner.
+#[path = "../../ep_runtime/examples/clk02_probe_support/digest.rs"]
+mod digest;
+#[path = "zon05_candidate_unit_support/fields.rs"]
+mod fields;
+
+use ep_runtime::heat_balance::zone_air_initialization::ZoneAirInitializationState;
+use ep_runtime::heat_balance::zone_humidity_correction::{
+    ZoneHumidityCorrectionContext, ZoneHumidityNode, ZoneHumiditySourceTerms,
+    correct_selected_zone_humidity_ratio,
+};
+use ep_runtime::psychrometrics::EnergyPlusPsychrometricsState;
+use serde_json::{Value, json};
+use std::collections::{BTreeMap, BTreeSet};
+use std::path::{Path, PathBuf};
+type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+
+fn require(ok: bool, message: &str) -> Result<()> {
+    if ok {
+        Ok(())
+    } else {
+        Err(message.to_owned().into())
+    }
+}
+fn text(value: &Value) -> Result<&str> {
+    value.as_str().ok_or_else(|| "typed string required".into())
+}
+fn rows(value: &Value) -> Result<&[Value]> {
+    value
+        .as_array()
+        .map(Vec::as_slice)
+        .ok_or_else(|| "typed array required".into())
+}
+fn keys(value: &Value, names: &[&str]) -> Result<()> {
+    require(
+        value
+            .as_object()
+            .is_some_and(|v| v.len() == names.len() && names.iter().all(|n| v.contains_key(*n))),
+        "exact declared input object required",
+    )
+}
+fn integer(value: &Value) -> Result<i32> {
+    Ok(i32::try_from(
+        value.as_i64().ok_or("typed Original i32 required")?,
+    )?)
+}
+fn boolean(value: &Value) -> Result<bool> {
+    value
+        .as_bool()
+        .ok_or_else(|| "typed Boolean required".into())
+}
+fn input(value: &Value, token: &Value) -> Result<f64> {
+    let number = value.as_f64().ok_or("typed numeric input required")?;
+    let bits = text(token)?;
+    require(
+        number.is_finite()
+            && bits.len() == 16
+            && bits
+                .bytes()
+                .all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c))
+            && format!("{:016x}", number.to_bits()) == bits,
+        "independently parsed literal binary64 differs",
+    )?;
+    Ok(number)
+}
+fn history(value: &Value, token: &Value) -> Result<[f64; 4]> {
+    let values = rows(value)?;
+    let tokens = rows(token)?;
+    require(
+        values.len() == 4 && tokens.len() == 4,
+        "all four literal working-history slots required",
+    )?;
+    Ok([
+        input(&values[0], &tokens[0])?,
+        input(&values[1], &tokens[1])?,
+        input(&values[2], &tokens[2])?,
+        input(&values[3], &tokens[3])?,
+    ])
+}
+fn bound(root: &Path, binding: &Value) -> Result<(PathBuf, Vec<u8>)> {
+    let relative = Path::new(text(&binding["path"])?);
+    require(relative.is_relative(), "relative binding required")?;
+    let path = root.join(relative).canonicalize()?;
+    require(
+        path.starts_with(root) && path != root && path.is_file(),
+        "contained regular source/input required",
+    )?;
+    require(
+        std::fs::metadata(&path)?.len() <= 64_000_000,
+        "bounded source/input required",
+    )?;
+    let bytes = std::fs::read(&path)?;
+    require(
+        digest::sha256(&bytes) == text(&binding["sha256"])?,
+        "source/input SHA differs",
+    )?;
+    for key in ["bytes", "size_bytes"] {
+        if let Some(size) = binding.get(key) {
+            require(
+                size.as_u64() == Some(u64::try_from(bytes.len())?),
+                "source/input size differs",
+            )?;
+        }
+    }
+    Ok((path, bytes))
+}
+fn load(root: &Path, binding: &Value) -> Result<Value> {
+    let (_, bytes) = bound(root, binding)?;
+    require(bytes.len() <= 16_000_000, "small metadata required")?;
+    Ok(serde_json::from_slice(&bytes)?)
+}
+fn same_ref(left: &Value, right: &Value) -> Result<()> {
+    require(
+        text(&left["path"])? == text(&right["path"])?
+            && text(&left["sha256"])? == text(&right["sha256"])?
+            && left["size_bytes"] == right["size_bytes"],
+        "direct source/input identity differs",
+    )
+}
+fn source_pins(root: &Path, inventory: &Value) -> Result<()> {
+    require(
+        inventory["schema"] == "zon05-candidate-unit-runtime-source-bindings.v1"
+            && inventory.as_object().is_some_and(|v| v.len() == 3),
+        "source inventory schema differs",
+    )?;
+    for (key, paths) in [
+        ("observer_sources", fields::OBSERVER_PATHS),
+        ("actual_public_API_sources", fields::API_PATHS),
+    ] {
+        let bindings = rows(&inventory[key])?;
+        require(
+            bindings.len() == paths.len(),
+            "source inventory count differs",
+        )?;
+        for (binding, path) in bindings.iter().zip(paths) {
+            require(
+                text(&binding["path"])? == *path,
+                "source path/order differs",
+            )?;
+            bound(root, binding)?;
+        }
+    }
+    Ok(())
+}
+fn member_case(model: &Value) -> Result<Value> {
+    keys(
+        model,
+        &[
+            "case_id",
+            "purpose",
+            "admission_lane",
+            "initial",
+            "operations",
+        ],
+    )?;
+    text(&model["case_id"])?;
+    text(&model["purpose"])?;
+    require(
+        model["admission_lane"] == "CON-like-direct-member-unit"
+            || model["admission_lane"] == "unit-only-ordered-inlet-probe",
+        "declared direct-member lane required",
+    )?;
+    let initial = &model["initial"];
+    keys(
+        initial,
+        &[
+            "zone_name",
+            "IsControlled",
+            "SystemZoneNodeNumber",
+            "Multiplier",
+            "ListMultiplier",
+            "Volume",
+            "Volume_bits",
+            "ZoneVolCapMultpMoist",
+            "ZoneVolCapMultpMoist_bits",
+            "OutBaroPress",
+            "OutBaroPress_bits",
+            "OutHumRat",
+            "OutHumRat_bits",
+            "TimeStepSysSec",
+            "TimeStepSysSec_bits",
+            "TimeStepSys",
+            "TimeStepSys_bits",
+            "TimeStepZone",
+            "TimeStepZone_bits",
+            "zone_fields",
+            "zone_field_bits",
+            "nodes",
+            "inlet_node_ids",
+        ],
+    )?;
+    let values = &initial["zone_fields"];
+    let tokens = &initial["zone_field_bits"];
+    let names = [
+        "ZT",
+        "MAT",
+        "ZTAV",
+        "airHumRat",
+        "airHumRatAvg",
+        "airHumRatTemp",
+        "W1",
+        "WMX",
+        "WM2",
+        "WTimeMinusP",
+        "airRelHum",
+        "OAMFL",
+        "VAMFL",
+        "CTMFL",
+        "EAMFL",
+        "EAMFLxHumRat",
+        "SumHmARa",
+        "SumHmARaW",
+        "MixingMassFlowZone",
+        "MixingMassFlowXHumRat",
+        "MDotOA",
+        "latentGain",
+        "latentGainExceptPeople",
+        "WPrevZoneTS",
+        "DSWPrevZoneTS",
+        "WPrevZoneTSTemp",
+    ];
+    keys(values, &names)?;
+    keys(tokens, &names)?;
+    // Actual constructor first, then only the same declared input assignments as Native prepare.
+    let mut state = ZoneAirInitializationState::default();
+    macro_rules! seed { ($($native:literal => $field:ident),* $(,)?) => {
+        $(state.$field = input(&values[$native], &tokens[$native])?;)*
+    }; }
+    seed!("ZT" => zt, "MAT" => mat, "ZTAV" => ztav, "airHumRat" => air_hum_rat,
+        "airHumRatAvg" => air_hum_rat_avg, "airHumRatTemp" => air_hum_rat_temp, "W1" => w1,
+        "WMX" => wmx, "WM2" => wm2, "WTimeMinusP" => w_time_minus_p, "airRelHum" => air_rel_hum);
+    state.w_prev_zone_ts = history(&values["WPrevZoneTS"], &tokens["WPrevZoneTS"])?;
+    state.dsw_prev_zone_ts = history(&values["DSWPrevZoneTS"], &tokens["DSWPrevZoneTS"])?;
+    state.w_prev_zone_ts_temp = history(&values["WPrevZoneTSTemp"], &tokens["WPrevZoneTSTemp"])?;
+    let source = ZoneHumiditySourceTerms {
+        oamfl: input(&values["OAMFL"], &tokens["OAMFL"])?,
+        vamfl: input(&values["VAMFL"], &tokens["VAMFL"])?,
+        ctmfl: input(&values["CTMFL"], &tokens["CTMFL"])?,
+        eamfl: input(&values["EAMFL"], &tokens["EAMFL"])?,
+        eamfl_x_hum_rat: input(&values["EAMFLxHumRat"], &tokens["EAMFLxHumRat"])?,
+        sum_hm_ara: input(&values["SumHmARa"], &tokens["SumHmARa"])?,
+        sum_hm_ara_w: input(&values["SumHmARaW"], &tokens["SumHmARaW"])?,
+        mixing_mass_flow_zone: input(&values["MixingMassFlowZone"], &tokens["MixingMassFlowZone"])?,
+        mixing_mass_flow_x_hum_rat: input(
+            &values["MixingMassFlowXHumRat"],
+            &tokens["MixingMassFlowXHumRat"],
+        )?,
+        m_dot_oa: input(&values["MDotOA"], &tokens["MDotOA"])?,
+        latent_gain: input(&values["latentGain"], &tokens["latentGain"])?,
+        latent_gain_except_people: input(
+            &values["latentGainExceptPeople"],
+            &tokens["latentGainExceptPeople"],
+        )?,
+        // These are genuine Native prepare's two explicit dimension(1, +0.0) inputs.
+        sum_latent_ht_rad_sys: 0.0,
+        sum_latent_pool: 0.0,
+    };
+    let context = ZoneHumidityCorrectionContext {
+        zone_id: 1,
+        space_id: 0,
+        zone_name: text(&initial["zone_name"])?.to_owned(),
+        solution_algorithm: 0,
+        room_air_model: 1,
+        do_space_heat_balance: false,
+        do_latent_sizing: false,
+        is_controlled: boolean(&initial["IsControlled"])?,
+        is_return_plenum: false,
+        is_supply_plenum: false,
+        leakage_parallel_piu_count: 0,
+        afn_control_type: 0,
+        afn_multizone_always_simulated: false,
+        afn_fan_activated: false,
+        afn_distribution_simulated: false,
+        duct_loss_simulated: false,
+        hybrid_model: false,
+        multiplier: integer(&initial["Multiplier"])?,
+        list_multiplier: integer(&initial["ListMultiplier"])?,
+        volume: input(&initial["Volume"], &initial["Volume_bits"])?,
+        moisture_capacitance_multiplier: input(
+            &initial["ZoneVolCapMultpMoist"],
+            &initial["ZoneVolCapMultpMoist_bits"],
+        )?,
+        outdoor_pressure: input(&initial["OutBaroPress"], &initial["OutBaroPress_bits"])?,
+        outdoor_humidity_ratio: input(&initial["OutHumRat"], &initial["OutHumRat_bits"])?,
+        time_step_sys_seconds: input(&initial["TimeStepSysSec"], &initial["TimeStepSysSec_bits"])?,
+        time_step_sys: input(&initial["TimeStepSys"], &initial["TimeStepSys_bits"])?,
+        time_step_zone: input(&initial["TimeStepZone"], &initial["TimeStepZone_bits"])?,
+        inlet_node_ids: rows(&initial["inlet_node_ids"])?
+            .iter()
+            .map(integer)
+            .collect::<Result<Vec<_>>>()?,
+        system_zone_node_number: integer(&initial["SystemZoneNodeNumber"])?,
+    };
+    let mut nodes = rows(&initial["nodes"])?
+        .iter()
+        .map(|node| {
+            keys(
+                node,
+                &[
+                    "node_id",
+                    "name",
+                    "MassFlowRate",
+                    "MassFlowRate_bits",
+                    "Temp",
+                    "Temp_bits",
+                    "HumRat",
+                    "HumRat_bits",
+                    "Enthalpy",
+                    "Enthalpy_bits",
+                ],
+            )?;
+            Ok(ZoneHumidityNode {
+                node_id: integer(&node["node_id"])?,
+                name: text(&node["name"])?.to_owned(),
+                mass_flow_rate: input(&node["MassFlowRate"], &node["MassFlowRate_bits"])?,
+                temperature: input(&node["Temp"], &node["Temp_bits"])?,
+                humidity_ratio: input(&node["HumRat"], &node["HumRat_bits"])?,
+                enthalpy: input(&node["Enthalpy"], &node["Enthalpy_bits"])?,
+            })
+        })
+        .collect::<Result<Vec<_>>>()?;
+    let mut psychrometrics = EnergyPlusPsychrometricsState::default();
+    let prepared = fields::snapshot(
+        "after-declared-input-preparation-no-correction-call",
+        &state,
+        &source,
+        &context,
+        &nodes,
+        &psychrometrics,
+    );
+    let mut operations = Vec::new();
+    let mut ids = BTreeSet::new();
+    let requested = rows(&model["operations"])?;
+    require(!requested.is_empty(), "ordered member operations required")?;
+    let mut available = true;
+    for operation in requested {
+        keys(operation, &["operation_id", "operation"])?;
+        require(
+            operation["operation"] == "correctHumRat"
+                && ids.insert(text(&operation["operation_id"])?.to_owned()),
+            "unique literal correctHumRat operation required",
+        )?;
+        let before = fields::snapshot(
+            "before-actual-correctHumRat",
+            &state,
+            &source,
+            &context,
+            &nodes,
+            &psychrometrics,
+        );
+        let actual = correct_selected_zone_humidity_ratio(
+            &mut state,
+            &source,
+            &context,
+            &mut nodes,
+            &mut psychrometrics,
+        );
+        available = actual.is_ok();
+        operations.push(json!({"operation_id": operation["operation_id"], "operation": operation["operation"],
+            "actual_member_invocation_ordinal": operations.len() + 1, "actual_source_invoked": true,
+            "result": fields::returned(&actual), "before": before,
+            "after": fields::snapshot("after-actual-Rust-member-return", &state, &source, &context, &nodes, &psychrometrics),
+            "history_selection_caller_invoked": false, "current_average_or_history_commit_invoked": false,
+            "Native_internal_locals_or_guard_decisions_inferred": false}));
+        if !available {
+            break;
+        }
+    }
+    Ok(
+        json!({"case_id": model["case_id"], "purpose": model["purpose"], "admission_lane": model["admission_lane"],
+        "input": model, "prepared": prepared, "actual_member_invocation_count": operations.len(),
+        "requested_operation_count": requested.len(), "all_requested_owners_available": available && operations.len() == requested.len(),
+        "operations": operations, "Native_warning_backend_or_outcome_inferred": false}),
+    )
+}
+fn run() -> Result<bool> {
+    let args = std::env::args().skip(1).collect::<Vec<_>>();
+    require(
+        args.len() == 5,
+        "expected request path/SHA, frozen packet path/SHA, runtime source inventory path",
+    )?;
+    let root = std::env::current_dir()?.canonicalize()?;
+    let (request_path, request_bytes) = bound(&root, &json!({"path": args[0], "sha256": args[1]}))?;
+    let (freeze_path, freeze_bytes) = bound(&root, &json!({"path": args[2], "sha256": args[3]}))?;
+    let request_ref =
+        json!({"path": args[0], "sha256": args[1], "size_bytes": request_bytes.len()});
+    let freeze_ref = json!({"path": args[2], "sha256": args[3], "size_bytes": freeze_bytes.len()});
+    let sources_path = root.join(&args[4]).canonicalize()?;
+    require(
+        sources_path.starts_with(&root)
+            && sources_path != root
+            && sources_path.is_file()
+            && std::fs::metadata(&sources_path)?.len() <= 16_000_000,
+        "contained small runtime inventory required",
+    )?;
+    require(
+        request_bytes.len() <= 16_000_000 && freeze_bytes.len() <= 16_000_000,
+        "small packet metadata required",
+    )?;
+    let sources_bytes = std::fs::read(&sources_path)?;
+    let sources: Value = serde_json::from_slice(&sources_bytes)?;
+    let request: Value = serde_json::from_slice(&request_bytes)?;
+    let freeze: Value = serde_json::from_slice(&freeze_bytes)?;
+    keys(
+        &request,
+        &[
+            "schema",
+            "card",
+            "expected_values_supplied",
+            "source_scope",
+            "cases",
+        ],
+    )?;
+    require(
+        request["schema"] == "zon05-native-unit-request.v1"
+            && request["card"] == "ZON-05"
+            && request["expected_values_supplied"] == false
+            && request["source_scope"] == "zone-only-mixed-noOA-noLatent-ThirdOrder-direct-member"
+            && freeze["schema"] == "zon05-frozen-packet.v1"
+            && freeze["status"] == "frozen-literal-input-and-policy-before-numerical-execution",
+        "literal request or actual frozen packet differs",
+    )?;
+    same_ref(&freeze["helper_request"], &request_ref)?;
+    let admission = load(&root, &freeze["native_admission_contract"])?;
+    let projection = load(&root, &freeze["projection"])?;
+    require(
+        admission["schema"] == "zon05-native-admission-contract.v1"
+            && projection["schema"] == "zon05-observation-projection.v1"
+            && admission["helper_request"] == request_ref
+            && projection["helper_request"] == request_ref
+            && admission["projection"] == freeze["projection"]
+            && admission["contracts"] == freeze["contracts"]
+            && projection["contracts"] == freeze["contracts"],
+        "actual one-way contract DAG differs",
+    )?;
+    let mut bindings = vec![
+        request_ref.clone(),
+        freeze_ref.clone(),
+        freeze["native_admission_contract"].clone(),
+        freeze["projection"].clone(),
+    ];
+    let mut contracts = BTreeMap::new();
+    for key in ["source", "cases", "tolerances"] {
+        let value = load(&root, &freeze["contracts"][key])?;
+        require(
+            value["schema"] == format!("zon05-{key}-contract.v1"),
+            "contract schema differs",
+        )?;
+        bindings.push(freeze["contracts"][key].clone());
+        contracts.insert(key, value);
+    }
+    require(
+        contracts["cases"]["helper_request"] == request_ref
+            && contracts["cases"]["source"] == freeze["contracts"]["source"]
+            && contracts["cases"]["tolerances"] == freeze["contracts"]["tolerances"],
+        "cases DAG differs",
+    )?;
+    for packet in [
+        &freeze,
+        &admission,
+        &projection,
+        &contracts["source"],
+        &contracts["cases"],
+        &contracts["tolerances"],
+    ] {
+        for key in [
+            "frozen_before_this_ZON05_helper_execution",
+            "frozen_before_numerical_execution",
+        ] {
+            require(packet[key] == true, "pre-output frozen flag required")?;
+        }
+        for key in [
+            "expected_values_supplied",
+            "expected_exits_supplied",
+            "scientific_execution_performed",
+            "full_engine_production_geometry_supplied",
+        ] {
+            require(packet[key] == false, "literal input-only packet required")?;
+        }
+    }
+    let authority = &freeze["source_authorities"];
+    require(
+        authority == &projection["source_authorities"]
+            && authority == &contracts["source"]["source_authorities"]
+            && authority["actual_scope_check_role"] == "real-ZON-05-check-only"
+            && authority["native_helper_source_manifest"]["sha256"]
+                == "5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1"
+            && authority["writer_source_manifest"]["sha256"]
+                == "eecf913773178e0de74705403ea5bb1a0f8ee8367811f4969664eec4d4210a80",
+        "reviewed Native/writer/current scope authority differs",
+    )?;
+    let native = load(&root, &authority["native_helper_source_manifest"])?;
+    same_ref(
+        &freeze["native_source_manifest"],
+        &authority["native_helper_source_manifest"],
+    )?;
+    for key in ["input_fixture_proposal", "observation_policy_proposal"] {
+        same_ref(&native[key], &authority[key])?;
+    }
+    let declared = rows(&native["own_sources"])?;
+    let admitted = rows(&admission["native_source_files"])?;
+    require(
+        declared.len() == 4 && admitted.len() == 4,
+        "exact reviewed Native4 required",
+    )?;
+    for (left, right) in declared.iter().zip(admitted) {
+        same_ref(left, right)?;
+    }
+    for key in [
+        "native_helper_source_manifest",
+        "input_fixture_proposal",
+        "observation_policy_proposal",
+        "writer_source_manifest",
+        "current_card",
+        "actual_scope_amendment",
+        "actual_scope_amendment_execution",
+    ] {
+        bindings.push(authority[key].clone());
+    }
+    for key in ["historical_before_documents", "current_after_documents"] {
+        bindings.extend(rows(&authority[key])?.iter().cloned());
+    }
+    bindings.extend(rows(&contracts["source"]["source_files"])?.iter().cloned());
+    bindings.extend(admitted.iter().cloned());
+    let (_, fixture_bytes) = bound(&root, &authority["input_fixture_proposal"])?;
+    let policy = load(&root, &authority["observation_policy_proposal"])?;
+    require(
+        fixture_bytes == request_bytes
+            && freeze["observation_policy"] == policy
+            && admission["observation_policy"] == policy
+            && projection["observation_policy"] == policy
+            && contracts["tolerances"]["observation_policy"] == policy,
+        "byte-exact fixture or literal policy differs",
+    )?;
+    let cases = rows(&request["cases"])?;
+    let count = cases
+        .iter()
+        .map(|row| rows(&row["operations"]).map(<[Value]>::len))
+        .collect::<Result<Vec<_>>>()?
+        .iter()
+        .sum::<usize>();
+    let counts = json!({"cases": cases.len(), "correctHumRat": count});
+    require(
+        counts == json!({"cases": 21, "correctHumRat": 43})
+            && freeze["requested_counts"] == counts
+            && admission["requested_counts"] == counts
+            && contracts["cases"]["requested_counts"] == counts,
+        "literal requested counts differ",
+    )?;
+    for binding in &bindings {
+        bound(&root, binding)?;
+    }
+    source_pins(&root, &sources)?;
+    let mut case_ids = BTreeSet::new();
+    let mut results = Vec::new();
+    for model in cases {
+        require(
+            case_ids.insert(text(&model["case_id"])?.to_owned()),
+            "unique case IDs required",
+        )?;
+        results.push(member_case(model)?);
+    }
+    let actual_calls = results
+        .iter()
+        .map(|row| {
+            row["actual_member_invocation_count"]
+                .as_u64()
+                .ok_or("actual invocation count required")
+        })
+        .collect::<std::result::Result<Vec<_>, _>>()?
+        .iter()
+        .sum::<u64>();
+    let complete = results
+        .iter()
+        .all(|row| row["all_requested_owners_available"] == true);
+    for binding in &bindings {
+        bound(&root, binding)?;
+    }
+    source_pins(&root, &sources)?;
+    require(
+        std::fs::read(&request_path)? == request_bytes
+            && std::fs::read(&freeze_path)? == freeze_bytes
+            && std::fs::read(&sources_path)? == sources_bytes,
+        "source/input bytes changed during actual calls",
+    )?;
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&json!({
+            "schema": "zon05-candidate-unit-observer-results.v1", "energyplus_commit": native["energyplus_commit"],
+            "actual_request": request_ref, "actual_packet_freeze": freeze_ref, "actual_native_admission": freeze["native_admission_contract"],
+            "projection": freeze["projection"], "contracts": freeze["contracts"], "observation_policy": policy, "source_authorities": authority,
+            "runtime_source_bindings": {"path": args[4], "sha256": digest::sha256(&sources_bytes), "size_bytes": sources_bytes.len()},
+            "authenticated_source_inventory": sources, "requested_counts": counts, "cases": results,
+            "actual_Rust_API_invocations": actual_calls, "complete_requested_owners_available": complete,
+            "all_bound_inputs_and_sources_unchanged": true, "Native_result_or_expected_values_read": false,
+            "Native_warning_backend_or_outcome_inferred": false, "Native_internal_locals_or_guard_decisions_inferred": false,
+            "production_or_history_integration_certified": false, "numerical_PASS_claimed": false, "gates_updated": false
+        }))?
+    );
+    Ok(complete)
+}
+fn main() {
+    match run() {
+        Ok(true) => {}
+        Ok(false) => std::process::exit(2),
+        Err(error) => {
+            eprintln!("ZON-05 candidate observer: {error}");
+            std::process::exit(2);
+        }
+    }
+}

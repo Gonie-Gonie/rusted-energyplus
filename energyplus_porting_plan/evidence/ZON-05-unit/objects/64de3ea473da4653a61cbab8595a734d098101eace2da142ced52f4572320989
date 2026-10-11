@@ -1,0 +1,296 @@
+   }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "negative-zero-working",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "negative-zero-working-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "negative-zero-working-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "controlled-no-feedback-node",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "controlled-no-feedback-node-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "controlled-no-feedback-node-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "uncontrolled-with-feedback-node",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "uncontrolled-with-feedback-node-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "uncontrolled-with-feedback-node-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "case_id": "integer-zone-multipliers",
+      "status": "actual-selected-member-calls-returned",
+      "operations": [
+        {
+          "operation_id": "integer-zone-multipliers-CALL-1",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        },
+        {
+          "operation_id": "integer-zone-multipliers-CALL-2",
+          "actual_source_invoked": true,
+          "actual_source_return_observed": true,
+          "source_exception": null,
+          "source_message_begin": 0,
+          "source_message_end": 0
+        }
+      ],
+      "messages": [],
+      "err_stream": "",
+      "actual_psychrometric_error_indices": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "comparison": {
+    "numeric_comparisons": 208,
+    "discrete_comparisons": 21573,
+    "mismatch_count": 0,
+    "mismatch_categories": {
+      "discrete_comparisons": 21573,
+      "numeric_comparisons": 208
+    },
+    "metrics": {
+      "airHumRatTemp": {
+        "count": 65,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "SystemNode.HumRat": {
+        "count": 39,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "SystemNode.Enthalpy": {
+        "count": 39,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      },
+      "psychrometrics.nondefault_Psat_rows.Psat": {
+        "count": 65,
+        "finite_metric_available": true,
+        "maximum_absolute_error": 0.0,
+        "RMSE": 0.0,
+        "nonfinite_error_count": 0
+      }
+    },
+    "mismatch_samples": [],
+    "mismatch_samples_omitted": 0,
+    "unavailable_observations": [],
+    "unavailable_counted_as_PASS": false
+  },
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/ZON-05/comparer-prep-01/compare_unit.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/unit-comparison-01/000-compare_unit.py",
+        "sha256": "052a51115a164c60cab6aa222910dc95d15fda7d9bc12d41b30e1699c2589c28",
+        "size_bytes": 38311
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/ZON-05/original-data-review-prep-01/shape.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/unit-comparison-01/001-shape.py",
+        "sha256": "9a530999a7e861f9eca32553e484b766deaef2c0b392a90f8728579a5e4d958a",
+        "size_bytes": 17216
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/ZON-05/original-data-review-prep-01/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/unit-comparison-01/002-packet_io.py",
+        "sha256": "4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+        "size_bytes": 3893
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/ZON-05/unit-comparison-01/000-compare_unit.py",
+    "sha256": "052a51115a164c60cab6aa222910dc95d15fda7d9bc12d41b30e1699c2589c28",
+    "size_bytes": 38311
+  },
+  "selected_declared_direct_member_unit_PASS_claimed": true,
+  "complete_ZON05_PASS_claimed": false,
+  "retained_fields_and_unchanged_cache_bits_exact": true,
+  "Native_global_diagnostic_backend_or_text_certified": false,
+  "unobserved_internal_locals_or_guard_outcomes_paired": false,
+  "cache_HIT_or_hash_or_tag_recomputed": false,
+  "history_selection_commit_push_parser_or_production_certified": false,
+  "Native_flags_answers_or_expected_arrays_injected_into_Rust": false,
+  "scientific_engine_or_moisture_evaluator_invoked": false,
+  "Rust_binary_payload_rehashed": true,
+  "Native_binary_payloads_read_or_rehashed": false,
+  "gates_updated": false,
+  "authorship_limits": "Base authored candidate/comparison custody and independently reviewed Raw humidity Source; Header authored Native/freezer/factual QA. Actual selected comparison is not independent full scientific certification."
+}
+{"receipt": {"path": ".runtime/porting/ZON-05/unit-comparison-command-01/receipt.json", "sha256": "f3633cba20b62278b123d5a8301f245760d43e5a25ff55236ac78bcc1e0acc53"}, "exit_code": 0, "source_bytes_match_before_and_after": true}

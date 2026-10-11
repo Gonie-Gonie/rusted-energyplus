@@ -1,0 +1,87 @@
+{
+  "schema": "zon05-candidate-unit-runtime-source-bindings.v1",
+  "observer_sources": [
+    {
+      "path": "crates/ep_run/examples/zon05_candidate_unit_observer.rs",
+      "sha256": "7e2235beb161d55bc0820f3d5009136d94c32d629c29fa7d39800c0caeaf629d",
+      "size_bytes": 23959
+    },
+    {
+      "path": "crates/ep_run/examples/zon05_candidate_unit_support/fields.rs",
+      "sha256": "bb4fa431ea5d37576b2046968dfa968ccf31f2611cfcca1606d83df67a3cdf93",
+      "size_bytes": 9701
+    }
+  ],
+  "actual_public_API_sources": [
+    {
+      "path": "crates/ep_run/Cargo.toml",
+      "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+      "size_bytes": 524
+    },
+    {
+      "path": "crates/ep_runtime/Cargo.toml",
+      "sha256": "bb81b5793debafd84300ec9905f0cda65ab32d216633543bab375b30a7a379e9",
+      "size_bytes": 327
+    },
+    {
+      "path": "crates/ep_runtime/src/lib.rs",
+      "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+      "size_bytes": 868
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+      "size_bytes": 1819
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/zone_air_initialization.rs",
+      "sha256": "56b94253ec63ba83b4393f0d46974f3d65b294bb8c17694be2030ef849c8957b",
+      "size_bytes": 11003
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs",
+      "sha256": "c35439dad6b498152a4b7bf109a5e4fa9420c24f32ebf444e36ff75ecbcc5b4d",
+      "size_bytes": 12162
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "d6187b9d4892f9c7362b4c33fcd05b4b2b2031521ac0007acad33897c098b3a5",
+      "size_bytes": 48412
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics.rs",
+      "sha256": "fe7b95c62aa56409193311b17d4f28478897592247b859f2656b33d8f8de8837",
+      "size_bytes": 42191
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics/psy02_state.rs",
+      "sha256": "8f9567503bb8d361ebff3eb180d9a48c72e4ba19d56dc99c329ecd9e7efe885d",
+      "size_bytes": 19614
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics/psy02_trace.rs",
+      "sha256": "ac3d54d959ae5e775b0fb3c01492b15f4ea68741779f56a65617dc1e11ea2046",
+      "size_bytes": 9122
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics/production_trace.rs",
+      "sha256": "e32a1fe1b1a6a2fb84b0d591d8a111feac3a10c43c20ec3d9f575a71959e0fb3",
+      "size_bytes": 16724
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics_spline_tables.rs",
+      "sha256": "405eed26d7fb07d710ad75ac237063caee993acfcfc9038754f945ae66bbabaf",
+      "size_bytes": 52855
+    },
+    {
+      "path": "crates/ep_runtime/src/psychrometrics/cp_cache.rs",
+      "sha256": "0ebe23b129e3e6aaad5fe24ee3ba15f3799cf60ac93f63ecb73afa695fc1b0d2",
+      "size_bytes": 6674
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+      "size_bytes": 3172
+    }
+  ]
+}

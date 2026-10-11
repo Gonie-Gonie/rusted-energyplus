@@ -1,0 +1,159 @@
+{
+  "schema": "zon05-actual-formatted-source-inventory.v1",
+  "created_utc": "2026-10-11T02:43:25.871921+00:00",
+  "actual_sources": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs",
+      "accepted_held_source": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/zone_humidity_correction.rs",
+        "sha256": "f8279ee488005e9c274534c7fb009bbfe4a4cd55141797125b650f7a44230b6c",
+        "size_bytes": 11286,
+        "line_count": 245
+      },
+      "actual_before_archive": null,
+      "actual_literal_archive": {
+        "path": ".runtime/porting/ZON-05/applied-source-01/crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs",
+        "sha256": "f8279ee488005e9c274534c7fb009bbfe4a4cd55141797125b650f7a44230b6c",
+        "size_bytes": 11286
+      },
+      "package": "accepted-pure-ZON05-01",
+      "actual_final_source": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs",
+        "sha256": "c35439dad6b498152a4b7bf109a5e4fa9420c24f32ebf444e36ff75ecbcc5b4d",
+        "size_bytes": 12162
+      },
+      "format_correspondence_diff": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/format-diffs/crates__ep_runtime__src__heat_balance__zone_humidity_correction.rs.diff",
+        "sha256": "13c50af61016283ba475991f887148247515f5a19e8283982754295c532fcd53",
+        "size_bytes": 12279
+      },
+      "line_count": 332
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/zone_humidity_correction_tests.rs",
+      "accepted_held_source": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/zone_humidity_correction_tests.rs",
+        "sha256": "ef1b76b860fc775a3e01a94bfe851937219049fba694cccdf24c463555a83c0d",
+        "size_bytes": 7658,
+        "line_count": 157
+      },
+      "actual_before_archive": null,
+      "actual_literal_archive": {
+        "path": ".runtime/porting/ZON-05/applied-source-01/crates/ep_runtime/src/heat_balance/zone_humidity_correction_tests.rs",
+        "sha256": "ef1b76b860fc775a3e01a94bfe851937219049fba694cccdf24c463555a83c0d",
+        "size_bytes": 7658
+      },
+      "package": "accepted-pure-ZON05-01",
+      "actual_final_source": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/crates/ep_runtime/src/heat_balance/zone_humidity_correction_tests.rs",
+        "sha256": "19ee2f11c5b9029b6813569effe03d3f369ddf1452534957f149b2a40c38dcd6",
+        "size_bytes": 8665
+      },
+      "format_correspondence_diff": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/format-diffs/crates__ep_runtime__src__heat_balance__zone_humidity_correction_tests.rs.diff",
+        "sha256": "0792eac129ee5e53e3f7bd71ffa93fec4401d32734fcd2eda44acbf2225950a8",
+        "size_bytes": 14446
+      },
+      "line_count": 272
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "accepted_held_source": {
+        "path": ".runtime/porting/ZON-05/rust-humidity-member-prep-01/mod.rs",
+        "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+        "size_bytes": 1819,
+        "line_count": 72
+      },
+      "actual_before_archive": {
+        "path": ".runtime/porting/ZON-05/applied-source-01/before/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "5c3d1e04b6187c9fd62f1e20b9e02816c0e8e6cc0b18ddad7318e0ca405fd161",
+        "size_bytes": 1785
+      },
+      "actual_literal_archive": {
+        "path": ".runtime/porting/ZON-05/applied-source-01/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+        "size_bytes": 1819
+      },
+      "package": "accepted-pure-ZON05-01",
+      "actual_final_source": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "b58a0667c20ef58b3132fae07761585a694a74fb54cce5f2087e1588f73800ce",
+        "size_bytes": 1819
+      },
+      "format_correspondence_diff": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/format-diffs/crates__ep_runtime__src__heat_balance__mod.rs.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "line_count": 72
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/zon05_candidate_unit_observer.rs",
+      "accepted_held_source": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-01/new/zon05_candidate_unit_observer.rs",
+        "sha256": "cd9d0b8a123f04cdba97345eedbf813796528ec35e2a2e508f00685bd0ef4db5",
+        "size_bytes": 20510,
+        "line_count": 273
+      },
+      "actual_before_archive": null,
+      "actual_literal_archive": {
+        "path": ".runtime/porting/ZON-05/applied-source-01/crates/ep_run/examples/zon05_candidate_unit_observer.rs",
+        "sha256": "cd9d0b8a123f04cdba97345eedbf813796528ec35e2a2e508f00685bd0ef4db5",
+        "size_bytes": 20510
+      },
+      "package": "accepted-observer02",
+      "actual_final_source": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/crates/ep_run/examples/zon05_candidate_unit_observer.rs",
+        "sha256": "7e2235beb161d55bc0820f3d5009136d94c32d629c29fa7d39800c0caeaf629d",
+        "size_bytes": 23959
+      },
+      "format_correspondence_diff": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/format-diffs/crates__ep_run__examples__zon05_candidate_unit_observer.rs.diff",
+        "sha256": "4b9589ef1b0f33731ba19cbba834f3cb8bddf328d489b4d0ede06809a0d5ee19",
+        "size_bytes": 37601
+      },
+      "line_count": 611
+    },
+    {
+      "canonical_path": "crates/ep_run/examples/zon05_candidate_unit_support/fields.rs",
+      "accepted_held_source": {
+        "path": ".runtime/porting/ZON-05/rust-observer-prep-01/new/zon05_candidate_unit_support/fields.rs",
+        "sha256": "d5fc420ed302cb3bd940e18fe8487478d84e7d648d13158acfe89e840ab4723a",
+        "size_bytes": 9174,
+        "line_count": 143
+      },
+      "actual_before_archive": null,
+      "actual_literal_archive": {
+        "path": ".runtime/porting/ZON-05/applied-source-01/crates/ep_run/examples/zon05_candidate_unit_support/fields.rs",
+        "sha256": "d5fc420ed302cb3bd940e18fe8487478d84e7d648d13158acfe89e840ab4723a",
+        "size_bytes": 9174
+      },
+      "package": "accepted-observer02",
+      "actual_final_source": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/crates/ep_run/examples/zon05_candidate_unit_support/fields.rs",
+        "sha256": "bb4fa431ea5d37576b2046968dfa968ccf31f2611cfcca1606d83df67a3cdf93",
+        "size_bytes": 9701
+      },
+      "format_correspondence_diff": {
+        "path": ".runtime/porting/ZON-05/applied-final-source-01/format-diffs/crates__ep_run__examples__zon05_candidate_unit_support__fields.rs.diff",
+        "sha256": "2dc1835fb5e7f174587fa4983172dcfe7eb1d12cc56bff6059cbf177c147b267",
+        "size_bytes": 8513
+      },
+      "line_count": 199
+    }
+  ],
+  "accepted_literal_application": {
+    "path": ".runtime/porting/ZON-05/applied-source-01/manifest.json",
+    "sha256": "b376c6a2e498e66ad34197664f6998c44b88832bcd3eeb0548bc0075cd2e704e",
+    "size_bytes": 4938
+  },
+  "actual_formatter_execution": {
+    "path": ".runtime/porting/ZON-05/source-format-command-01/receipt.json",
+    "sha256": "f5833496c99ab1dd7708b018e56f1fcdd4240ca78107ea26816aa8208af14bd8",
+    "size_bytes": 3258
+  },
+  "Root_and_other_author_FULL_literal_sources_accepted": true,
+  "actual_formatter_correspondence_FULL_review_pending": true,
+  "quality_or_candidate_execution_claimed": false,
+  "gates_updated": false
+}

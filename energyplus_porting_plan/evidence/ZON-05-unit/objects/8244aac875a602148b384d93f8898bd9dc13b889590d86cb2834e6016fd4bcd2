@@ -1,0 +1,83 @@
+# ZON-05 selected humidity member Source proposal
+
+This immutable, unapplied proposal ports the admitted zone-only, fully mixed,
+ThirdOrder, no-OA/no-latent branch of the complete pinned Original
+ZoneTempPredictorCorrector.cc4433–4619. Root must obtain genuine Native capture,
+independent OriginalDataQA and an unchanged Rust baseline before any canonical
+math application. This preparation imports/runs no project, target or test and
+reads no numerical output, binary or weather payload.
+
+The only production-parent proposal declares a new standalone module. Existing
+humidity correction, state, PurchasedAir coupling and caller paths remain exact.
+The new function accepts the full existing `ZoneAirInitializationState`, actual
+zero-valued excluded source operands, explicit actual configuration/environment,
+the ordered allocated nodes and a borrowed mutable PSY02 instance. It writes only
+temporary W and positive system-node W/H. Current/average W, all four slots of
+each working/zone/system history, temperatures and other state fields are retained.
+
+## Arithmetic and dependencies
+
+Original inlet order is consumed literally. Each inlet first contributes
+`(mass*W)/ZoneMult`, then `mass/ZoneMult`; ZoneMult is the checked representable
+Original i32 product, not floating multiplication or pre-normalized aggregate.
+All original latent/B/A additions remain in order even for admitted zero operands.
+Density reads original current W and corrected ZT. Gas enthalpy uses PsyHg,
+not PsyHfg. Capacity retains rho*Volume*moistureMultiplier/seconds. The exact
+ThirdOrder expression reads the first three working slots without discarding
+the fourth. Negative then saturation guards remain ordered comparisons. Stored W
+receives no 1e-5 floor, finite fallback, pressure fallback, max/clamp or reconstruction.
+PsyH's own W operand floor does not floor node W.
+
+Existing accepted PSY01 numerical Rho/Hg/H functions are reused. Wsat uses actual
+passed `EnergyPlusPsychrometricsState::evaluate(WFromRh,[ZT,1.0,P])`, preserving
+that same instance across calls and retaining its actual property-operation copy.
+No TLS/new cache is substituted and no helper or A/B/C formula is copied into an
+observer. Source cache/diagnostic compile variants and global ErrorManager warning
+backend are not newly certified by this module.
+
+One explicit dependency gap is retained: the existing Rust density helper does
+not own Native EP_psych_errors' negative-density severe/fatal backend. An actual
+rho<0 returns typed `NegativeDensityDiagnostic` before later member writes. This
+is unavailable, not a claimed Native fatal/return. It changes no admitted21 input
+fixture. The unsupported -300C Rust-only test is a route probe, not a new Native
+fixture, expected output or production admission. PSY02 literal-arity errors are
+typed interface failures; no substitute Wsat is produced.
+
+## Direct DTO and prospective observer boundary
+
+The context retains actual zone/space indexes, enum integers, controlled/plenum/
+AFN/duct/hybrid/sizing exclusions, integer multipliers, geometry, pressure/outdoor
+W, three clock fields, ordered inlet IDs and feedback node. Native enum values
+ThirdOrder0/Mixing1/NoMultizone0 are pinned. All node rows remain original allocation
+order with independent mass/T/W/H owners. Scope validation follows the existing
+Native helper's finite positive capacity/pressure/seconds, representable integers,
+zero excluded sources and distinct allocated feedback owner admission. Signed
+zero source operands remain supplied values; no replacement zero fields are fed
+to arithmetic. Raw context assertions alone cannot prove an ordinary parser route.
+
+`observer-plan.proposed.json` maps these real operands to helper5f3d3fca DTOs.
+A future observer must independently parse genuine input-only fixtures, own one
+psychrometric instance per case and invoke this function once per declared operation.
+Actual before/after state/nodes/cache are copied; Native values, counts, flags,
+answers and diagnostic messages never become Rust inputs. Native A/B/C/rho/Hg/Wsat
+locals and guards remain unobserved; Rust's own helper operation is not a Native
+local measurement or cache-HIT classification. Existing frozen policy remains
+prospective, with no new profile or tolerance authored here.
+
+Eight proposed tests cover full-state/four-slot retention, persistent instance
+cache, independent positive feedback, subfloor stored W, ordered guards, ordered
+inlet/nonfeedback retention, pre-mutation scope/int rejection and the deferred
+density backend. Success fixtures are literal selected input-only case operands;
+assertions express Source invariants, never captured expected arrays. Tests are
+unexecuted and do not claim numerical or integration evidence.
+
+Temperature-to-working-history selection, real PurchasedAir moisture handoff,
+current/relative-humidity commit, time-weighted average, rollback/interpolation and
+zone/system history pushes remain separate pending callers. No runtime activation,
+whole HVAC/production parity, history transition, gate update or full ZON05 PASS
+is claimed. Parent/source hashes are current at preparation; Root must rebase any
+later canonical/formatter changes explicitly before application/runtime binding.
+
+Raw authored this Rust member and previously independently reviewed Header's Native
+unit helper. Header authored that helper/readiness. Root and another author's FULL
+Source review precede application; this hold is no numerical self-certificate.

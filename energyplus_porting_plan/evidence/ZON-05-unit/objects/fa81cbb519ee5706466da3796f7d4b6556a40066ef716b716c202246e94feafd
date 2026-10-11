@@ -1,0 +1,94 @@
+"""Root installs the already FULL-reviewed sources after genuine unchanged baseline."""
+import difflib
+import hashlib
+import json
+import shutil
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path.cwd(); BASE = ROOT / '.runtime/porting/ZON-05'
+RAW = BASE / 'applied-source-01'; FINAL = BASE / 'applied-final-source-01'
+def read(p): return json.loads(p.read_bytes())
+def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
+def ref(p): return {'path': p.relative_to(ROOT).as_posix(), 'sha256': sha(p), 'size_bytes': p.stat().st_size}
+def write(p, value): p.write_bytes((json.dumps(value, ensure_ascii=False, indent=2) + '\n').encode('utf8'))
+
+assert not RAW.exists() and not FINAL.exists()
+assert not subprocess.check_output(['git', 'status', '--porcelain'])
+assert subprocess.check_output(['git', 'rev-parse', 'HEAD']) == subprocess.check_output(['git', 'rev-parse', '@{upstream}'])
+publication = ROOT / 'energyplus_porting_plan/evidence/ZON-05-original-baseline/summary.json'
+published = read(publication)
+assert published['Rust_arithmetic_applied'] is False and published['requested_counts']=={'cases':21,'correctHumRat':43}
+qa = read(BASE / 'original-data-review-01/review.json')
+assert qa['Rust_baseline_released'] and qa['observation_integrity_failures'] == [] and qa['actual_observation_counts']['source_returns']==43
+public_path = BASE / 'rust-humidity-member-prep-01/manifest.json'
+observer_path = BASE / 'rust-observer-prep-02/manifest.json'
+assert sha(public_path) == 'aa72577e3f4eeb802704cd1f6e817283708c384aebde8518d55c5b5003f3c8e6'
+assert sha(observer_path) == 'fdfac830c0b40ba4e6cb49bb6049a7e5d3f8d554b9d9439b8bd1ee968fad3bdf'
+changes = [{'destination': row['canonical_destination'], 'accepted_source': row['proposed'],
+            'current_before': row['before'], 'package': 'accepted-pure-ZON05-01'}
+           for row in read(public_path)['exact_changes']]
+observer = read(observer_path)
+changes += [{'destination': destination, 'accepted_source': row,
+             'current_before': None, 'package': 'accepted-observer02'}
+            for destination,row in zip(observer['runtime_interfaces']['observer_sources'],observer['own_sources'])]
+assert len(changes) == 5
+for row in changes:
+    destination = ROOT / row['destination']; proposed = row['accepted_source']
+    assert sha(ROOT / proposed['path']) == proposed['sha256']
+    if row['current_before'] is None: assert not destination.exists()
+    else:
+        before = row['current_before']
+        assert sha(ROOT / before['path']) == before['sha256']
+        assert sha(destination) == before['sha256'] and destination.stat().st_size == before['size_bytes']
+RAW.mkdir(); FINAL.mkdir()
+actual = []
+for row in changes:
+    destination = ROOT / row['destination']; proposal = ROOT / row['accepted_source']['path']
+    before = None
+    if destination.exists():
+        prior = RAW / 'before' / row['destination']; prior.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(destination, prior); before = ref(prior)
+    destination.parent.mkdir(parents=True, exist_ok=True); shutil.copyfile(proposal, destination)
+    assert sha(destination) == row['accepted_source']['sha256']
+    archive = RAW / row['destination']; archive.parent.mkdir(parents=True, exist_ok=True); shutil.copyfile(destination, archive)
+    actual.append({'canonical_path': row['destination'], 'accepted_held_source': row['accepted_source'],
+                   'actual_before_archive': before, 'actual_literal_archive': ref(archive), 'package': row['package']})
+write(RAW / 'manifest.json', {'schema': 'zon05-actual-literal-source-application.v1',
+    'applied_utc': datetime.now(timezone.utc).isoformat(), 'actual_sources': actual,
+    'actual5_literal_bodies_match_FULL_accepted_sources': True,
+    'Root_and_other_author_FULL_review_before_application': True,
+    'actual_Original_baseline': ref(publication),
+    'accepted_public_source': ref(public_path), 'accepted_observer_source': ref(observer_path),
+    'Cargo_format_quality_or_scientific_execution_claimed': False,
+    'all_four_new_destinations_were_absent': True})
+command = ['python', '-X', 'utf8', '-B', 'tools/porting/record_command.py',
+           '--output-dir', (BASE / 'source-format-command-01').relative_to(ROOT).as_posix(), '--', 'cargo', 'fmt', '--all']
+with (RAW / 'format-orchestration.log').open('xb') as stream:
+    subprocess.run(command, check=True, stdout=stream, stderr=subprocess.STDOUT)
+formatter = read(BASE / 'source-format-command-01/receipt.json')
+assert formatter['exit_code'] == 0 and formatter['launch_error'] is None
+print('actual formatter Source guard', formatter['source_bytes_match_before_and_after'], '(mutation is the intended formatter action)', flush=True)
+final_rows = []
+for row in actual:
+    destination = ROOT / row['canonical_path']; literal = ROOT / row['actual_literal_archive']['path']
+    archive = FINAL / row['canonical_path']; archive.parent.mkdir(parents=True, exist_ok=True); shutil.copyfile(destination, archive)
+    diff_path = FINAL / 'format-diffs' / (row['canonical_path'].replace('/', '__') + '.diff')
+    diff_path.parent.mkdir(exist_ok=True)
+    delta = ''.join(difflib.unified_diff(literal.read_bytes().decode('utf8').splitlines(keepends=True),
+        destination.read_bytes().decode('utf8').splitlines(keepends=True), fromfile='accepted-literal/' + row['canonical_path'],
+        tofile='actual-formatted/' + row['canonical_path']))
+    diff_path.write_bytes(delta.encode('utf8'))
+    final_rows.append({**row, 'actual_final_source': ref(archive), 'format_correspondence_diff': ref(diff_path),
+                       'line_count': len(destination.read_bytes().splitlines())})
+tracked_changed = subprocess.check_output(['git', 'diff', '--name-only', '-z']).decode().split('\0')[:-1]
+assert set(tracked_changed) <= {r['canonical_path'] for r in final_rows}, tracked_changed
+write(FINAL / 'manifest.json', {'schema': 'zon05-actual-formatted-source-inventory.v1',
+    'created_utc': datetime.now(timezone.utc).isoformat(), 'actual_sources': final_rows,
+    'accepted_literal_application': ref(RAW / 'manifest.json'),
+    'actual_formatter_execution': ref(BASE / 'source-format-command-01/receipt.json'),
+    'Root_and_other_author_FULL_literal_sources_accepted': True,
+    'actual_formatter_correspondence_FULL_review_pending': True,
+    'quality_or_candidate_execution_claimed': False, 'gates_updated': False})
+print('actual ZON05 literal5 installed and formatted; actual final review pending', ref(FINAL / 'manifest.json'), flush=True)

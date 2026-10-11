@@ -1,0 +1,129 @@
+"""Source-only inventory/diffs; never imports or executes the proposed Rust."""
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+OUT = Path('.runtime/porting/ZON-05/rust-humidity-member-prep-01')
+def describe(path):
+    path = Path(path)
+    b = path.read_bytes()
+    return {'path':path.as_posix(),'sha256':hashlib.sha256(b).hexdigest(),
+            'size_bytes':len(b),'line_count':len(b.splitlines())}
+def write(path, data):
+    assert not path.exists(),path
+    path.parent.mkdir(parents=True,exist_ok=True)
+    path.write_bytes(data)
+def json_write(path, value): write(path,(json.dumps(value,indent=2,ensure_ascii=False)+'\n').encode())
+def patch(before, after, dest, destination):
+    old = before.read_text(encoding='utf8').splitlines(keepends=True) if before else []
+    new = after.read_text(encoding='utf8').splitlines(keepends=True)
+    value = ''.join(difflib.unified_diff(old,new,fromfile=before.as_posix() if before else '/dev/null',tofile=after.as_posix()))
+    write(dest,value.encode())
+    return {'canonical_destination':destination,'before':describe(before) if before else None,
+            'proposed':describe(after),'exact_diff':describe(dest)}
+def range_ref(path, first, last, purpose):
+    b=b''.join(Path(path).read_bytes().splitlines(keepends=True)[first-1:last])
+    return {'path':path,'start_line':first,'end_line':last,'sha256':hashlib.sha256(b).hexdigest(),
+            'size_bytes':len(b),'purpose':purpose}
+
+parent=Path('crates/ep_runtime/src/heat_balance/mod.rs')
+module_dest='crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs'
+tests_dest='crates/ep_runtime/src/heat_balance/zone_humidity_correction_tests.rs'
+assert not Path(module_dest).exists() and not Path(tests_dest).exists()
+parent_bytes=parent.read_bytes()
+assert b'pub mod zone_humidity_correction;' not in parent_bytes
+anchor=b'pub mod zone_predictor_corrector;'
+assert parent_bytes.count(anchor)==1
+write(OUT/'before'/'mod.rs',parent_bytes)
+write(OUT/'mod.rs',parent_bytes.replace(anchor,b'pub mod zone_humidity_correction;\n'+anchor))
+
+native=Path('.runtime/porting/ZON-05/native-helper-prep-01')
+readiness=Path('.runtime/porting/ZON-05/readiness-audit-01')
+assert describe(native/'manifest.json')['sha256']=='5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1'
+assert describe(readiness/'manifest.json')['sha256']=='69ba81077d8b40028f56f15e4595782ed9248a136b964f791705ac6025ffc4de'
+plan={
+ 'schema':'zon05-direct-member-Rust-observer-proposal.v1','status':'Source-only-future-unexecuted',
+ 'input_request_schema':'zon05-native-unit-request.v1','future_observer_result_schema':'unsettled-not-authored',
+ 'input_only_fixture':describe(native/'input-only-cases.proposed.json'),
+ 'Native_helper':describe(native/'manifest.json'),
+ 'scope':'zone-only-mixed-noOA-noLatent-ThirdOrder-direct-member',
+ 'case_and_operation_identity':'literal request order/IDs, no sorting or inferred Native return count',
+ 'passed_psychrometric_instance':'fresh accepted State once per case, same owner across all actual operations',
+ 'state_owner':'full ZoneAirInitializationState; actual request zone_fields override only declared fields; other fields use genuine initialization-owner defaults',
+ 'state_mapping':{'ZT':'zt','MAT':'mat','ZTAV':'ztav','airHumRat':'air_hum_rat','airHumRatAvg':'air_hum_rat_avg',
+  'airHumRatTemp':'air_hum_rat_temp','W1':'w1','WMX':'wmx','WM2':'wm2','WTimeMinusP':'w_time_minus_p','airRelHum':'air_rel_hum',
+  'WPrevZoneTS':'w_prev_zone_ts[4]','DSWPrevZoneTS':'dsw_prev_zone_ts[4]','WPrevZoneTSTemp':'w_prev_zone_ts_temp[4]'},
+ 'geometry_clock_mapping':{'Multiplier':'multiplier','ListMultiplier':'list_multiplier','Volume':'volume',
+  'ZoneVolCapMultpMoist':'moisture_capacitance_multiplier','OutBaroPress':'outdoor_pressure','OutHumRat':'outdoor_humidity_ratio',
+  'TimeStepSysSec':'time_step_sys_seconds','TimeStepSys':'time_step_sys','TimeStepZone':'time_step_zone',
+  'inlet_node_ids':'ordered original IDs','SystemZoneNodeNumber':'system_zone_node_number'},
+ 'scope_flags':'actual selected Native-helper preparation literals only, never copied from Native numerical output',
+ 'source_operands':'retain all12 declared zero source fields plus actual zero SumLatentHTRadSys/SumLatentPool allocation operands',
+ 'nodes':'actual original contiguous node_id/name/MassFlowRate/Temp/HumRat/Enthalpy independent request fields and bit tokens',
+ 'actual_Rust_outputs':'copy before/after full state, all nodes, actual psych snapshot/final_caches and typed call/error',
+ 'Native_internal_locals':'unobserved; do not compare own helper result/guards as Native locals or recompute A/B/C/rho/Hg/Wsat',
+ 'diagnostics':'Native-only actual global message/err_stream context, no fabricated Rust backend or fatal equality',
+ 'scope_unavailable':'typed scope/negative-density backend/property-interface, noPASS; required admitted missing owners fail future comparer',
+ 'caller_operations_not_invoked':['correctAirTemp','working-history selection','current/airRelHum commit','time-weighted average','zone/system history push'],
+ 'actual_Cargo_API_source_bindings':'future actual paths/SHAs/full SourceSnapshot supplied at runtime after reviewed apply/format/quality; none guessed here',
+ 'Native_values_as_Rust_inputs':False,'new_profiles_or_tolerances':False,'execution_or_PASS_claimed':False,
+}
+json_write(OUT/'observer-plan.proposed.json',plan)
+changes=[patch(None,OUT/'zone_humidity_correction.rs',OUT/'diffs'/'zone_humidity_correction.rs.diff',module_dest),
+ patch(None,OUT/'zone_humidity_correction_tests.rs',OUT/'diffs'/'zone_humidity_correction_tests.rs.diff',tests_dest),
+ patch(OUT/'before'/'mod.rs',OUT/'mod.rs',OUT/'diffs'/'mod.rs.diff',parent.as_posix())]
+original='.reference/energyplus-src/26.1.0/src/EnergyPlus/'
+ranges=[range_ref(original+'ZoneTempPredictorCorrector.cc',4433,4619,'complete original member and retained excluded routes'),
+ range_ref(original+'ZoneTempPredictorCorrector.cc',3894,3900,'actual working history selection caller'),
+ range_ref(original+'ZoneTempPredictorCorrector.cc',4128,4132,'member return then current/RH commit'),
+ range_ref(original+'ZoneTempPredictorCorrector.cc',4195,4206,'distinct zone history transition'),
+ range_ref(original+'ZoneTempPredictorCorrector.cc',4297,4305,'distinct system four-slot history shift'),
+ range_ref(original+'Psychrometrics.hh',513,548,'stateful density arithmetic and deferred diagnostic branch'),
+ range_ref(original+'Psychrometrics.hh',623,674,'gas enthalpy and node enthalpy operand semantics'),
+ range_ref(original+'Psychrometrics.hh',1342,1398,'actual cached W-from-RH path and guards'),
+ range_ref(original+'Psychrometrics.cc',198,218,'negative density genuine severe/fatal backend gap'),
+ range_ref(original+'DataHeatBalance.hh',100,107,'literal ThirdOrder enum'),
+ range_ref(original+'DataRoomAirModel.hh',73,86,'literal Mixing enum'),
+ range_ref(original+'AirflowNetwork/include/AirflowNetwork/Solver.hpp',76,84,'literal NoMultizone enum'),
+ range_ref('crates/ep_runtime/src/psychrometrics.rs',105,130,'existing ordered operand floor/raw arithmetic'),
+ range_ref('crates/ep_runtime/src/psychrometrics.rs',255,280,'existing density numerical owner/diagnostic gap'),
+ range_ref('crates/ep_runtime/src/psychrometrics.rs',319,340,'existing Hg/H owners'),
+ range_ref('crates/ep_runtime/src/psychrometrics.rs',705,722,'existing instance-bound public Wsat route'),
+ range_ref('crates/ep_runtime/src/psychrometrics/psy02_state.rs',126,226,'existing passed state/default/API/cache-operation owner'),
+ range_ref('crates/ep_runtime/src/psychrometrics/psy02_state.rs',405,416,'same passed-instance WFromRh ordered helper'),
+ range_ref('crates/ep_runtime/src/heat_balance/zone_air_initialization.rs',1,111,'full four-slot retained existing initialization owner'),
+ range_ref((native/'zon05_reference_helper.cpp').as_posix(),39,161,'actual input preparation/admission/node/source domain'),
+ range_ref((native/'zon05_reference_helper.cpp').as_posix(),164,218,'actual same-case call and return/owner snapshots'),
+ range_ref((native/'zon05_reference_fields.hh').as_posix(),22,102,'real captured fields/cache context and internal-locals boundary')]
+dependencies=[native/'manifest.json',native/'zon05_reference_helper.cpp',native/'zon05_reference_fields.hh',native/'zon01_reference_fields.hh',
+ native/'input-only-cases.proposed.json',native/'observation-policy.proposed.json',readiness/'manifest.json',readiness/'README.md',
+ 'crates/ep_runtime/src/heat_balance/zone_air_initialization.rs','crates/ep_runtime/src/psychrometrics.rs',
+ 'crates/ep_runtime/src/psychrometrics/psy02_state.rs','crates/ep_runtime/src/lib.rs','crates/ep_runtime/Cargo.toml','Cargo.toml']
+dependencies += list(dict.fromkeys(r['path'] for r in ranges))
+dependencies=list(dict.fromkeys(str(x).replace('\\','/') for x in dependencies))
+m={'schema':'zon05-Rust-humidity-member-source-preparation.v1','status':'held-Source-only-unapplied-unexecuted',
+ 'author':'/root/clk02_raw_port','own_sources':[describe(OUT/name) for name in ['zone_humidity_correction.rs','zone_humidity_correction_tests.rs','mod.rs']],
+ 'documentation':describe(OUT/'README.md'),'prospective_observer':describe(OUT/'observer-plan.proposed.json'),
+ 'exact_changes':changes,'current_canonical_parent':describe(parent),
+ 'canonical_new_destinations_absent_at_preparation':[module_dest,tests_dest],
+ 'source_dependencies':[describe(x) for x in dependencies],'read_source_ranges':ranges,
+ 'authoring_source_metadata_only':describe(OUT/'prepare_metadata.py'),
+ 'source_checks':{'new_module_declaration_only':True,'three_exact_diffs_generated':True,'tests_proposed':8,
+  'project_or_target_imported':False,'Rust_parser_formatter_compiler_or_tests_invoked':False,
+  'scientific_outputs_binary_weather_read':False,'canonical_or_Git_mutation':False},
+ 'prerequisites':{'Native_helper_Source':describe(native/'manifest.json'),'same_input_Native_capture_and_QA_before_math_apply':True,
+  'existing_Rust_baseline_before_apply':True,'Root_and_other_author_FULL_peer_before_apply':True},
+ 'unavailable_boundaries':['PSY01 stateful negative-density fatal backend','global psych diagnostics/statistics/compile variants',
+  'caller working-history selection/current commit/averaging/history transitions','ordinary production/parser admission'],
+ 'no_new_QA_framework':True,'runtime_activation':False,'full_ZON05_PASS_claimed':False,'gate_updates':False}
+json_write(OUT/'manifest.json',m)
+for r in ranges:
+ assert r['end_line']<=len(Path(r['path']).read_bytes().splitlines())
+for row in changes:
+ before=Path(row['before']['path']) if row['before'] else None
+ after=Path(row['proposed']['path'])
+ expected=''.join(difflib.unified_diff(before.read_text(encoding='utf8').splitlines(keepends=True) if before else [],after.read_text(encoding='utf8').splitlines(keepends=True),fromfile=before.as_posix() if before else '/dev/null',tofile=after.as_posix()))
+ assert expected.encode()==Path(row['exact_diff']['path']).read_bytes()
+assert (OUT/'mod.rs').read_bytes().replace(b'pub mod zone_humidity_correction;\n',b'',1)==parent_bytes
+print(json.dumps({'manifest':describe(OUT/'manifest.json'),'owned':m['own_sources'],'ranges':len(ranges),'dependencies':len(dependencies),'diffs':3},indent=2))

@@ -1,0 +1,162 @@
+{
+  "schema": "zon05-selected-actual-unit-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/ZON-05-unit/manifest.json",
+    "sha256": "f3b17696a016607c4c2c54a837626676a6b7da746ffda61cf88be8ca0d2ce449",
+    "size_bytes": 107450
+  },
+  "prior_actual_Original_baseline": {
+    "path": "energyplus_porting_plan/evidence/ZON-05-original-baseline/summary.json",
+    "sha256": "2b39420930237c5c53c1d0d252349f84fa1356d7585cc60e0ed6fc3be179baec",
+    "size_bytes": 2280
+  },
+  "actual_applied_source": {
+    "path": ".runtime/porting/ZON-05/applied-final-source-02/manifest.json",
+    "sha256": "c804a16426565fe183b3c2e87d40714c43c1edb70497190cb322cabc37b573cd",
+    "size_bytes": 8379
+  },
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/ab/ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193",
+    "sha256": "ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193"
+  },
+  "actual_source_file_count": 3872,
+  "actual_Cargo_build": {
+    "path": ".runtime/porting/ZON-05/candidate-build-command-01/receipt.json",
+    "sha256": "8ef353d70c6eca16c352291b4ad44839728d0e233b9d15182760020d80a0d451",
+    "size_bytes": 5097
+  },
+  "actual_Rust_execution": {
+    "path": ".runtime/porting/ZON-05/candidate-unit-command-01/receipt.json",
+    "sha256": "58206c26399d9bcfd3c3f3b8b97ac6b7c9140d8f9c6ef51f0654a9345919798e",
+    "size_bytes": 3716
+  },
+  "actual_comparison": {
+    "path": ".runtime/porting/ZON-05/unit-comparison-01/comparison.json",
+    "sha256": "ab51e4e2996721e2270a1bee577166460d2f9d2bb4a719de8169115e08fe00bc",
+    "size_bytes": 35772
+  },
+  "actual_comparison_execution": {
+    "path": ".runtime/porting/ZON-05/unit-comparison-command-01/receipt.json",
+    "sha256": "f3633cba20b62278b123d5a8301f245760d43e5a25ff55236ac78bcc1e0acc53",
+    "size_bytes": 4397
+  },
+  "requested_counts": {
+    "cases": 21,
+    "correctHumRat": 43
+  },
+  "actual_Native_calls_returned": 43,
+  "actual_Rust_API_invocations": 43,
+  "numeric_comparisons": 208,
+  "discrete_comparisons": 21573,
+  "mismatch_count": 0,
+  "metrics": {
+    "airHumRatTemp": {
+      "count": 65,
+      "finite_metric_available": true,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0,
+      "nonfinite_error_count": 0
+    },
+    "SystemNode.HumRat": {
+      "count": 39,
+      "finite_metric_available": true,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0,
+      "nonfinite_error_count": 0
+    },
+    "SystemNode.Enthalpy": {
+      "count": 39,
+      "finite_metric_available": true,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0,
+      "nonfinite_error_count": 0
+    },
+    "psychrometrics.nondefault_Psat_rows.Psat": {
+      "count": 65,
+      "finite_metric_available": true,
+      "maximum_absolute_error": 0.0,
+      "RMSE": 0.0,
+      "nonfinite_error_count": 0
+    }
+  },
+  "selected_declared_direct_member_unit_comparison_passed": true,
+  "quality": {
+    "format_check": {
+      "execution": {
+        "path": ".runtime/porting/ZON-05/fmt-check-command-01/receipt.json",
+        "sha256": "7c1d9ee3e902a3df2514763d4a41d174f5470ab464594e513c56915449a106b8",
+        "size_bytes": 3274
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/ab/ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193",
+        "sha256": "ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193"
+      }
+    },
+    "clippy": {
+      "execution": {
+        "path": ".runtime/porting/ZON-05/clippy-command-01/receipt.json",
+        "sha256": "444b4c085e985e524449c3d8a9a686888d7347dacb1f1946317162f7ee973c23",
+        "size_bytes": 3459
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/ab/ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193",
+        "sha256": "ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193"
+      }
+    },
+    "focused_heat_balance_tests": {
+      "execution": {
+        "path": ".runtime/porting/ZON-05/focused-command-01/receipt.json",
+        "sha256": "cb9721d65b0f2c5e3fb5e7fcbcd854fdbe62020446c64036c53561abb0591f97",
+        "size_bytes": 3447
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/ab/ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193",
+        "sha256": "ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193"
+      },
+      "actual_test_result_totals": {
+        "passed": 211,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    "workspace_tests": {
+      "execution": {
+        "path": ".runtime/porting/ZON-05/workspace-command-01/receipt.json",
+        "sha256": "bcf81d9945a1de40e67642866f0b16032cacb8b8606c21a1e6d746717b4b831c",
+        "size_bytes": 3407
+      },
+      "source_snapshot": {
+        "path": ".runtime/porting/source-objects/ab/ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193",
+        "sha256": "ab25fffa57a56d6b76d225c98cc5ecc4083ac70f454154a4cb90be83ee994193"
+      },
+      "actual_test_result_totals": {
+        "passed": 4816,
+        "failed": 0,
+        "ignored": 0
+      }
+    }
+  },
+  "comparison_contract_tests": {
+    "path": ".runtime/porting/ZON-05/comparison-contract-tests-command-01/receipt.json",
+    "sha256": "8a2e9d7429254858b2484270931a6dcb796fc910db37b02237501c26a0801fd5",
+    "size_bytes": 3368
+  },
+  "Root_and_other_author_FULL_literal_and_formatter_and_comparer_Source_accepted": true,
+  "frozen_profiles_or_required_absence_rules_changed": false,
+  "new_selected_kernel_behavior": "literal ordered inlet mass/W, integer multipliers, density/Hg/capacity and ThirdOrder, lower then saturation, positive node W/H feedback; passed PSY02 state",
+  "ordinary_solver_activation_performed": false,
+  "unit_gate": "통과",
+  "integration_gate": "미확인",
+  "production_gate": "미확인",
+  "Native_internal_locals_and_guards_unobserved": true,
+  "Native_negative_density_global_diagnostic_backend_parity_unavailable": true,
+  "complete_ZON05_PASS_claimed": false,
+  "history_selection_commit_push_parser_or_production_certified": false,
+  "unavailable_observation_counted_as_PASS": false,
+  "Root_authored_summary_is_not_a_command_recorder": true,
+  "remaining_integration_source_plan": {
+    "path": ".runtime/porting/ZON-05/ordinary-integration-plan-prep-01/manifest.json",
+    "sha256": "519cce4ee474bde93d5d0a9ae2a677edf2ba505c769eee2a765d3d1d73625257",
+    "size_bytes": 33174
+  }
+}

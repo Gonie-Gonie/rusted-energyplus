@@ -1,0 +1,190 @@
+    "value_class": "finite"
+          },
+          "tempDepLoad": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          },
+          "tempIndLoad": {
+            "value": 0.0,
+            "value_bits": "0000000000000000",
+            "value_class": "positive_zero"
+          }
+        }
+      },
+      "purpose": "Representable original integer multiplier operands with actual source divisions; no normalized moisture flow supplied.",
+      "requested_operation_count": 2
+    }
+  ],
+  "complete_requested_owners_available": true,
+  "contracts": {
+    "cases": {
+      "path": ".runtime/porting/ZON-05/frozen-packet-02/cases.json",
+      "sha256": "e8fd8db5aa615b751bcf1a1d4cf5e54a4f01a3bb59ed731e974cce5b9b3c8582",
+      "size_bytes": 1282
+    },
+    "source": {
+      "path": ".runtime/porting/ZON-05/frozen-packet-02/source.json",
+      "sha256": "339d6313259711794051ff269013213a0912e5b61668c412cae380abceadff85",
+      "size_bytes": 26039
+    },
+    "tolerances": {
+      "path": ".runtime/porting/ZON-05/frozen-packet-02/tolerances.json",
+      "sha256": "247e34992b4c3dbebfdab0e37766fa95f1b25688dc62ba5d9ba5dccc5923cdf0",
+      "size_bytes": 3451
+    }
+  },
+  "energyplus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "gates_updated": false,
+  "numerical_PASS_claimed": false,
+  "observation_policy": {
+    "cache_state": "Actual indices/tags/capacity/shape/control state exact; nondefault values use their profile and own unchanged rows retain bits. No cache-HIT classification or hash/tag recomputation in readers.",
+    "card": "ZON-05",
+    "class": "exact",
+    "complete_ZON05_PASS_claimed": false,
+    "diagnostics": "Actual message indices/order/level/text and err_stream retained as Native-only context. No causal warning classifier or Rust global diagnostic backend parity.",
+    "gate_updates": false,
+    "identity_inputs_order_counts_outcomes": "exact IDs/names/input bits/ordered inlet associations/multiplier integers/clock fields/invocations/return/exception/completeness",
+    "internal_locals_unobserved": [
+      "MoistureMassFlowRate",
+      "ZoneMassFlowRate",
+      "LatentGain",
+      "RhoAir",
+      "H2OHtOfVap",
+      "A",
+      "B",
+      "C",
+      "WZSat",
+      "lower_guard_taken",
+      "saturation_guard_taken"
+    ],
+    "missing_on_one_or_both_sides": "required FAIL",
+    "nan_payload_bits": "record only; finite request domain, no physical-validity inferred from any nonfinite output",
+    "no_local_or_expected_answer_recomputation": true,
+    "no_tolerance_relaxation_after_outputs": true,
+    "process_or_copy_failure": "required FAIL; partial or absent records never PASS",
+    "production_admission_expanded": false,
+    "required_numerical_profiles": {
+      "SystemNode.Enthalpy": {
+        "atol": 1e-7,
+        "condition": "actual SystemZoneNodeNumber > 0",
+        "rtol": 1e-13,
+        "unit": "J/kg"
+      },
+      "SystemNode.HumRat": {
+        "atol": 1e-12,
+        "condition": "actual SystemZoneNodeNumber > 0",
+        "rtol": 1e-13,
+        "unit": "kg/kg"
+      },
+      "airHumRatTemp": {
+        "atol": 1e-12,
+        "rtol": 1e-13,
+        "unit": "kg/kg"
+      },
+      "psychrometrics.nondefault_Psat_rows.Psat": {
+        "atol": 1e-8,
+        "rtol": 1e-13,
+        "unit": "Pa"
+      }
+    },
+    "schema": "zon05-direct-member-observation-policy-proposal.v1",
+    "selected_source": "correctHumRat4433-4619, zone1/space0, ThirdOrder, mixed, noOA/noLatent",
+    "signed_zero": "exact when both numerical results are zero",
+    "source_direct_member_state": "Current W/average W/zone+system+working histories are observed retained only. No correctAirTemp, selection, current/average commit, history push, parser, or calendar caller is invoked.",
+    "state_retention": "Actual pre/post scalar/array/input/source terms and every non-feedback node remain exact own bits. Four slots required for every captured history array. Temporary W and positive system-node W/H use their named profiles.",
+    "status": "prospective-source-only-before-new-output",
+    "unit_domain": "21 declared independent input-only cases, 43 real member operations if all return",
+    "unsupported_stopped_unreached": "unavailable/noPASS"
+  },
+  "production_or_history_integration_certified": false,
+  "projection": {
+    "path": ".runtime/porting/ZON-05/frozen-packet-02/projection.json",
+    "sha256": "76e864d1a0d6de729faa5d70db99ee32abb8e631570c1c72ba5e30beb1b6aa73",
+    "size_bytes": 7738
+  },
+  "requested_counts": {
+    "cases": 21,
+    "correctHumRat": 43
+  },
+  "runtime_source_bindings": {
+    "path": ".runtime/porting/ZON-05/candidate-launch-inputs-01/runtime-source-bindings.json",
+    "sha256": "09379f4abe382fc7ef09f206bf85c54ebc7a69f3e428b0f87e4801f779b30861",
+    "size_bytes": 3133
+  },
+  "schema": "zon05-candidate-unit-observer-results.v1",
+  "source_authorities": {
+    "actual_scope_amendment": {
+      "path": ".runtime/porting/ZON-05/scope-amendment-01/amendment.json",
+      "sha256": "fc63fa7b5caf58292b77aa6df2a3dba989f9fc8b92d6a4450e5e262b32a371e4",
+      "size_bytes": 3116
+    },
+    "actual_scope_amendment_execution": {
+      "path": ".runtime/porting/ZON-05/scope-check-command-01/receipt.json",
+      "sha256": "2c1f33a4bdc0e1f5bc59930c5fbfda052fc34a302a0aca93a4850558ba01636a",
+      "size_bytes": 3006
+    },
+    "actual_scope_check_role": "real-ZON-05-check-only",
+    "current_after_documents": [
+      {
+        "path": "energyplus_porting_plan/plan.json",
+        "sha256": "c4b57b0272e14e3999b47f04c073c7db4c425343923bad849480cb4fadbe010e",
+        "size_bytes": 755994
+      },
+      {
+        "path": "energyplus_porting_plan/cards/ZON-05.md",
+        "sha256": "210d5e79a467827ec33ed254006b1fc8c3c5ee8e3dd2f65a05f0bd8d78e84fb3",
+        "size_bytes": 4033
+      },
+      {
+        "path": "energyplus_porting_plan/energyplus_porting_checklist.html",
+        "sha256": "a2803a93e7cd45278456a5c4c5b38eb9c6eecfaae5e2d13a526befe8978e450f",
+        "size_bytes": 608072
+      }
+    ],
+    "current_card": {
+      "path": "energyplus_porting_plan/cards/ZON-05.md",
+      "sha256": "210d5e79a467827ec33ed254006b1fc8c3c5ee8e3dd2f65a05f0bd8d78e84fb3",
+      "size_bytes": 4033
+    },
+    "historical_before_documents": [
+      {
+        "path": ".runtime/porting/ZON-05/scope-amendment-01/before/plan.json",
+        "sha256": "1d39dfabfa9656d0048bebade12e5d5d96721413ef106281756ceca467e1a5a0",
+        "size_bytes": 732938
+      },
+      {
+        "path": ".runtime/porting/ZON-05/scope-amendment-01/before/ZON-05.md",
+        "sha256": "728ef93d0d1ea3f1f282a0df1331dcc4c0fa1672308e01e6f2f160bdaa66fc5b",
+        "size_bytes": 2771
+      },
+      {
+        "path": ".runtime/porting/ZON-05/scope-amendment-01/before/energyplus_porting_checklist.html",
+        "sha256": "8442cae2d6f72fe1a549d510b4054e4426b790465d0989ceee44da01e93bf75e",
+        "size_bytes": 589804
+      }
+    ],
+    "input_fixture_proposal": {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/input-only-cases.proposed.json",
+      "sha256": "e2a98523a591dd76c370d70e0ebc3464d97ba62bd512d4b5f9f60c3b5662bcaf",
+      "size_bytes": 94170
+    },
+    "native_helper_source_manifest": {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/manifest.json",
+      "sha256": "5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1",
+      "size_bytes": 39009
+    },
+    "observation_policy_proposal": {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/observation-policy.proposed.json",
+      "sha256": "b3adf14637d3c9794d0a7127a46bc6c9bba1f7378726c1c6001990fb833b56a2",
+      "size_bytes": 2609
+    },
+    "scope_recorder_role": "validated-already-Root-authored-documents; did-not-author-amendment",
+    "writer_source_manifest": {
+      "path": ".runtime/porting/ZON-05/input-writer-prep-01/manifest.json",
+      "sha256": "eecf913773178e0de74705403ea5bb1a0f8ee8367811f4969664eec4d4210a80",
+      "size_bytes": 33168
+    }
+  }
+}
+{"receipt": {"path": ".runtime/porting/ZON-05/candidate-unit-command-01/receipt.json", "sha256": "58206c26399d9bcfd3c3f3b8b97ac6b7c9140d8f9c6ef51f0654a9345919798e"}, "exit_code": 0, "source_bytes_match_before_and_after": true}

@@ -1,0 +1,58 @@
+--- .runtime/porting/ZON-05/rust-observer-prep-02/before-01/manifest.json
++++ .runtime/porting/ZON-05/rust-observer-prep-02/manifest.json
+@@ -17,16 +17,16 @@
+     }
+   ],
+   "documentation": {
+-    "path": ".runtime/porting/ZON-05/rust-observer-prep-01/README.md",
+-    "sha256": "01cfb287aba16d53d88907f3cb6f00da6fcab89f29f373e96a60cf2d6f7ea6d7",
+-    "size_bytes": 3740,
+-    "line_count": 57
++    "path": ".runtime/porting/ZON-05/rust-observer-prep-02/README.md",
++    "sha256": "060536f087bf3f9a1daa343eaa8c48c7342cf0af3bb7d7a93ad9d332e5d9bc44",
++    "size_bytes": 4049,
++    "line_count": 62
+   },
+   "authoring_source": {
+-    "path": ".runtime/porting/ZON-05/rust-observer-prep-01/prepare_metadata.py",
+-    "sha256": "84d3d220da0cf4feeed1b66f34b26eb0fb480ab95f7c55fde833627752d1e023",
+-    "size_bytes": 10873,
+-    "line_count": 159
++    "path": ".runtime/porting/ZON-05/rust-observer-prep-02/prepare_metadata.py",
++    "sha256": "756762ee86dc66d66e1062834f85fa05af4d8b73e720d411fc520fb15b0159f7",
++    "size_bytes": 2824,
++    "line_count": 47
+   },
+   "before_templates": [
+     {
+@@ -370,7 +370,7 @@
+       "last_line": 416,
+       "range_sha256": "9c2a23629d71195fdd42e2fb7c96450d9266a160ef5136d64c451db51c0d6b55",
+       "range_size_bytes": 350,
+-      "purpose": "actual snapshots and final ordered nondefault cache owners"
++      "purpose": "actual nested WFromRh property route; snapshots and final cache owners are covered separately by lines1-226"
+     }
+   ],
+   "runtime_interfaces": {
+@@ -423,5 +423,21 @@
+     "canonical_or_Git_changed": false,
+     "new_fixtures_or_policy_tuning": false,
+     "numerical_PASS_or_full_card_claimed": false
++  },
++  "predecessor_source_preparation": {
++    "path": ".runtime/porting/ZON-05/rust-observer-prep-01/manifest.json",
++    "sha256": "f29de6a11105877bf7cd39346e1c21a69df91ccd535f2a7895981ce7ca412995",
++    "size_bytes": 16354,
++    "line_count": 427
++  },
++  "metadata_only_successor": {
++    "changed_range_purpose_only": true,
++    "Rust_sources_before_archives_source_diffs_and_runtime_interfaces_literal01": true,
++    "historical_authoring_source": {
++      "path": ".runtime/porting/ZON-05/rust-observer-prep-01/prepare_metadata.py",
++      "sha256": "84d3d220da0cf4feeed1b66f34b26eb0fb480ab95f7c55fde833627752d1e023",
++      "size_bytes": 10873,
++      "line_count": 159
++    }
+   }
+ }

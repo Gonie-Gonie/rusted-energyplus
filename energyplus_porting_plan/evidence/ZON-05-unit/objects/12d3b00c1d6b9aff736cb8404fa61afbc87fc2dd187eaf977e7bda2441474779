@@ -1,0 +1,83 @@
+--- .runtime/porting/ZON-05/comparer-prep-01/before/comparison_contract_tests.py
++++ .runtime/porting/ZON-05/comparer-prep-01/comparison_contract_tests.py
+@@ -1,8 +1,8 @@
+-"""Unexecuted stdlib tests of the existing comparison primitive, not RAD answers."""
++"""Unexecuted comparison-contract checks; no ZON numerical fixture or answer."""
+ import struct
+ import unittest
+ 
+-from compare_unit import Comparison
++from compare_unit import Comparison, FROZEN_PROFILES, retained_cache_bits
+ 
+ 
+ def need(value, message):
+@@ -18,37 +18,40 @@
+ class ComparisonContracts(unittest.TestCase):
+     def test_signed_zero_is_exact_even_when_numeric_difference_is_zero(self):
+         comparison = Comparison(need)
+-        comparison.number("zero", "F", dto(-0.0), dto(0.0))
+-        self.assertEqual(comparison.metrics["F"]["maximum_absolute_error"], 0.0)
++        comparison.number("zero", "airHumRatTemp", dto(-0.0), dto(0.0))
++        self.assertEqual(comparison.metrics["airHumRatTemp"]["maximum_absolute_error"], 0.0)
+         self.assertEqual(comparison.counts["discrete_mismatches"], 2)
+         self.assertEqual(comparison.counts["numeric_mismatches"], 0)
+ 
+     def test_equal_negative_zero_retains_a_finite_numeric_comparison(self):
+         comparison = Comparison(need)
+-        comparison.number("zero", "F", dto(-0.0), dto(-0.0))
++        comparison.number("zero", "airHumRatTemp", dto(-0.0), dto(-0.0))
+         self.assertEqual(comparison.counts["mismatches"], 0)
+-        self.assertEqual(comparison.metrics["F"]["count"], 1)
++        self.assertEqual(comparison.metrics["airHumRatTemp"]["count"], 1)
+ 
+-    def test_a_single_ulp_difference_is_not_tolerated(self):
+-        comparison = Comparison(need)
+-        neighbor = struct.unpack(">d", bytes.fromhex("3ff0000000000001"))[0]
+-        comparison.number("finite", "ZoneArea", dto(1.0), dto(neighbor))
+-        self.assertEqual(comparison.counts["numeric_mismatches"], 1)
+-        self.assertGreater(comparison.metrics["ZoneArea"]["maximum_absolute_error"], 0.0)
++    def test_each_literal_profile_accepts_inside_and_rejects_outside(self):
++        for key, profile in FROZEN_PROFILES.items():
++            with self.subTest(profile=key):
++                comparison = Comparison(need)
++                threshold = profile["atol"] + profile["rtol"]
++                comparison.number("inside", key, dto(1.0), dto(1.0 + threshold * 0.5))
++                self.assertEqual(comparison.counts["mismatches"], 0)
++                comparison.number("outside", key, dto(1.0), dto(1.0 + threshold * 2.0))
++                self.assertEqual(comparison.counts["numeric_mismatches"], 1)
+ 
+     def test_nonfinite_class_is_retained_without_numerical_pass(self):
+         comparison = Comparison(need)
+         actual = {"value": None, "value_bits": "7ff0000000000000", "value_class": "positive_infinity"}
+-        comparison.number("infinity", "F", actual, actual)
++        comparison.number("infinity", "airHumRatTemp", actual, actual)
+         self.assertEqual(comparison.counts["availability_failures"], 1)
+-        self.assertEqual(comparison.metrics["F"]["count"], 0)
++        self.assertEqual(comparison.metrics["airHumRatTemp"]["count"], 0)
+         self.assertFalse(comparison.unavailable[0]["counted_as_PASS"])
+ 
+     def test_required_both_missing_and_empty_profiles_fail(self):
+         comparison = Comparison(need)
+         comparison.absence("required", False, False, True, "both absent")
+         report = comparison.report()
+-        self.assertEqual(report["mismatch_count"], 3)
++        self.assertEqual(report["mismatch_count"], 5)
+         self.assertEqual(report["numeric_comparisons"], 0)
+         self.assertFalse(report["unavailable_counted_as_PASS"])
+ 
+@@ -57,6 +60,15 @@
+         malformed = dto(0.0); malformed["value_bits"] = "8000000000000000"
+         with self.assertRaises(ValueError): comparison.dto(malformed)
+ 
++    def test_unchanged_cache_own_bits_are_stricter_than_numeric_profile(self):
++        def owner(value):
++            return {"psychrometrics": {"nondefault_Psat_rows": [{"index": 1, "iTdb": 2, "Psat": dto(value)}]}}
++        comparison = Comparison(need)
++        neighbor = struct.unpack(">d", bytes.fromhex("3ff0000000000001"))[0]
++        retained_cache_bits(comparison, "copied-row", owner(1.0), owner(1.0), owner(1.0), owner(neighbor))
++        self.assertEqual(comparison.counts["discrete_mismatches"], 1)
++        self.assertEqual(comparison.counts["numeric_comparisons"], 0)
++
+ 
+ if __name__ == "__main__":
+     unittest.main()

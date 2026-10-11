@@ -1,0 +1,278 @@
+"""Adapt the accepted existing comparer Source; stdlib metadata only, no imports."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd().resolve()
+OUT = ROOT / ".runtime/porting/ZON-05/comparer-prep-01"
+RAD = ROOT / ".runtime/porting/RAD-01/comparer-prep-02"
+QA = ROOT / ".runtime/porting/ZON-05/original-data-review-prep-01"
+OBSERVER = ROOT / ".runtime/porting/ZON-05/rust-observer-prep-02"
+NATIVE = ROOT / ".runtime/porting/ZON-05/native-helper-prep-01"
+
+
+def ref(path):
+    b = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(b).hexdigest(),
+            "size_bytes": len(b), "line_count": len(b.splitlines())}
+
+
+def put(name, data):
+    path = OUT / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("xb") as handle:
+        handle.write(data if isinstance(data, bytes) else data.encode("utf-8"))
+    return ref(path)
+
+
+assert ref(RAD / "compare_unit.py")["sha256"] == "88d74d290713af9cea59add806390c49d33d94da0edc2525e01a3b1b74cf9328"
+assert ref(QA / "manifest.json")["sha256"] == "c52bd6b2a90f9e205b34c821fc1babf952b4593f5793e1bee699e6e83527b438"
+assert ref(OBSERVER / "manifest.json")["sha256"] == "fdfac830c0b40ba4e6cb49bb6049a7e5d3f8d554b9d9439b8bd1ee968fad3bdf"
+policy = json.loads((NATIVE / "observation-policy.proposed.json").read_bytes())
+profiles = policy["required_numerical_profiles"]
+observer = json.loads((OBSERVER / "manifest.json").read_bytes())
+qa = json.loads((QA / "manifest.json").read_bytes())
+text = (RAD / "compare_unit.py").read_text(encoding="utf-8")
+prefix = text[:text.index("def compare_models(")]
+prefix = prefix.replace('"""Compare authentic RAD-01 returned owners; no view-factor or warning evaluator."""',
+    '"""Compare genuine selected ZON05 returned owners; no moisture or psychrometric evaluator."""')
+start, end = prefix.index('PREP = '), prefix.index('\n\nclass Comparison:')
+prefix = prefix[:start] + ('PREP = Path(__file__).resolve().parent\n'
+    'SUPPORT = PREP.parent / "original-data-review-prep-01"\n'
+    'IO_SHA = "4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948"\n'
+    'SHAPE_SHA = "9a530999a7e861f9eca32553e484b766deaef2c0b392a90f8728579a5e4d958a"\n'
+    'QA_PREPARATION = ' + repr({k: ref(QA / "manifest.json")[k] for k in ["path", "sha256"]}) + '\n'
+    'POLICY_REF = ' + repr({k: ref(NATIVE / "observation-policy.proposed.json")[k] for k in ["path", "sha256"]}) + '\n'
+    'FROZEN_PROFILES = ' + repr(profiles) + '\nVARIABLES = list(FROZEN_PROFILES)\n'
+    'OBSERVER_PATHS = ' + repr(observer["runtime_interfaces"]["observer_sources"]) + '\n'
+    'API_PATHS = ' + repr(observer["runtime_interfaces"]["actual_public_API_sources"]) + '\n') + prefix[end:]
+prefix = prefix.replace('def __init__(self, need):\n        self.need = need',
+    'def __init__(self, need):\n        self.need = need\n        self.profiles = FROZEN_PROFILES')
+prefix = prefix.replace('        if error != 0.0:\n',
+    '        threshold = self.profiles[profile]["atol"] + self.profiles[profile]["rtol"] * abs(left)\n'
+    '        if error > threshold:\n')
+pairing = '''def exact_dto(c, path, left, right):
+    c.dto(left); c.dto(right)
+    c.exact(path + "/class", left["value_class"], right["value_class"])
+    c.exact(path + "/bits", left["value_bits"], right["value_bits"])
+
+
+def compare_snapshot(c, path, left, right, initial, computed):
+    c.need(isinstance(right, dict) and set(right) == {"phase", "actual_context", "zone_fields", "moisture_source_terms",
+        "SumLatentHTRadSys", "SumLatentPool", "nodes", "actual_node_row_count", "psychrometrics"}, "Actual complete Rust snapshot required")
+    context_keys = "zone_id space_id zone_name Volume ZoneVolCapMultpMoist Multiplier ListMultiplier IsControlled IsReturnPlenum IsSupplyPlenum SystemZoneNodeNumber leakageParallelPIU_count ZoneAirSolutionAlgo RoomAirModel doSpaceHeatBalance DoLatentSizing AFN_control_type AFN_multizone_always_simulated AFN_FanActivated AFN_distribution_simulated DuctLossSimu FlagHybridModel OutBaroPress OutHumRat TimeStepSysSec TimeStepSys TimeStepZone inlet_node_ids".split()
+    context = right["actual_context"]
+    c.need(isinstance(context, dict) and set(context) == set(context_keys), "Actual Rust context shape differs")
+    scalar_keys = "Volume ZoneVolCapMultpMoist OutBaroPress OutHumRat TimeStepSysSec".split()
+    for key in context_keys:
+        if key in scalar_keys:
+            exact_dto(c, path + "/context/" + key, left[key], context[key])
+        elif key in ["TimeStepSys", "TimeStepZone"]:
+            clock = "system_timestep_hours" if key == "TimeStepSys" else "zone_timestep_hours"
+            exact_dto(c, path + "/context/" + key, left["context"][clock], context[key])
+        elif key == "inlet_node_ids":
+            c.need(type(context[key]) is list and all(type(value) is int for value in context[key]), "Typed original inlet IDs required")
+            c.exact(path + "/inlet_order", [row["node_id"] for row in left["inlet_order"]], context[key])
+        else:
+            c.exact(path + "/context/" + key, left[key], context[key])
+    fields = right["zone_fields"]
+    c.need(isinstance(fields, dict) and set(fields) == set(left["zone_fields"]), "All24 actual Rust fields required")
+    for key, value in left["zone_fields"].items():
+        label = path + "/zone_fields/" + key
+        if type(value) is list:
+            c.need(type(fields[key]) is list and len(value) == len(fields[key]) == 4, "All four actual slots required")
+            for index, (a, b) in enumerate(zip(value, fields[key])): exact_dto(c, label + "/" + str(index), a, b)
+        elif key == "airHumRatTemp" and computed:
+            c.number(label, "airHumRatTemp", value, fields[key])
+        else:
+            exact_dto(c, label, value, fields[key])
+    source = right["moisture_source_terms"]
+    c.need(isinstance(source, dict) and set(source) == set(left["moisture_source_terms"]), "All actual source terms required")
+    for key, value in left["moisture_source_terms"].items(): exact_dto(c, path + "/sources/" + key, value, source[key])
+    for key in ["SumLatentHTRadSys", "SumLatentPool"]: exact_dto(c, path + "/" + key, left[key], right[key])
+    nodes = right["nodes"]
+    c.need(type(nodes) is list and len(nodes) == len(left["nodes"]) == len(initial["nodes"]), "Full actual Rust node shape required")
+    c.exact(path + "/actual_node_row_count", left["NumOfNodes"], right["actual_node_row_count"])
+    feedback = initial["SystemZoneNodeNumber"]
+    for a, b in zip(left["nodes"], nodes):
+        c.need(isinstance(b, dict) and set(b) == set(a), "Actual Rust node owner keys differ")
+        label = path + "/node/" + str(a["node_id"])
+        for key in ["node_id", "name"]: c.exact(label + "/" + key, a[key], b[key])
+        for key in ["MassFlowRate", "Temp", "HumRat", "Enthalpy"]:
+            if computed and feedback > 0 and a["node_id"] == feedback and key in ["HumRat", "Enthalpy"]:
+                c.number(label + "/" + key, "SystemNode." + key, a[key], b[key])
+            else:
+                exact_dto(c, label + "/" + key, a[key], b[key])
+    a, b = left["psychrometrics"], right["psychrometrics"]
+    psych_scalars = "iconvTol last_Patm last_tBoil Press_Save tSat_Save".split()
+    c.need(isinstance(b, dict) and set(b) == set(psych_scalars + ["warmup", "useInterpolationPsychTsatFnPb", "nondefault_Psat_rows",
+        "Psat_cache_capacity", "other_actual_nondefault_cache_rows", "cache_hits_or_Native_internal_locals_observed", "Native_global_diagnostic_indices_or_backend_inferred"]),
+        "Actual Rust psychrometric owner keys differ")
+    for key in psych_scalars: exact_dto(c, path + "/psych/" + key, a[key], b[key])
+    for key in ["useInterpolationPsychTsatFnPb", "Psat_cache_capacity"]: c.exact(path + "/psych/" + key, a[key], b[key])
+    c.exact(path + "/psych/warmup", left["context"]["warmup"], b["warmup"])
+    for key in ["cache_hits_or_Native_internal_locals_observed", "Native_global_diagnostic_indices_or_backend_inferred"]:
+        c.exact(path + "/psych/" + key, False, b[key])
+    other = b["other_actual_nondefault_cache_rows"]
+    c.need(isinstance(other, dict) and set(other) == {"Twb", "TsatPb", "TsatHPb"} and all(type(row) is list for row in other.values()),
+        "Actual other Rust cache owners remain unpaired context, never defaulted")
+    a_rows, b_rows = a["nondefault_Psat_rows"], b["nondefault_Psat_rows"]
+    c.need(type(b_rows) is list and len(a_rows) == len(b_rows), "Complete actual Psat row shape required")
+    previous = -1
+    for aa, bb in zip(a_rows, b_rows):
+        c.need(isinstance(bb, dict) and set(bb) == {"index", "iTdb", "Psat"} and type(bb["index"]) is int and
+            previous < bb["index"] < b["Psat_cache_capacity"] and type(bb["iTdb"]) is int, "Actual ordered cache indices/tags required")
+        previous = bb["index"]
+        c.need(bb["iTdb"] != -1000 or bb["Psat"]["value_bits"] != "0000000000000000", "Actual nondefault copied row required")
+        c.exact(path + "/Psat/index", aa["index"], bb["index"]); c.exact(path + "/Psat/tag", aa["iTdb"], bb["iTdb"])
+        if computed: c.number(path + "/Psat/" + str(aa["index"]), "psychrometrics.nondefault_Psat_rows.Psat", aa["Psat"], bb["Psat"])
+        else: exact_dto(c, path + "/Psat/" + str(aa["index"]), aa["Psat"], bb["Psat"])
+
+
+def retained_cache_bits(c, path, before, after, rust_before, rust_after):
+    # Observe exact own retention only; never classify HIT/MISS or recompute tags.
+    families = [{(row["index"], row["iTdb"]): row["Psat"] for row in owner["psychrometrics"]["nondefault_Psat_rows"]}
+                for owner in [before, after, rust_before, rust_after]]
+    for key in families[0].keys() & families[1].keys() & families[2].keys() & families[3].keys():
+        a, b, x, y = [family[key] for family in families]
+        if a["value_bits"] == b["value_bits"] or x["value_bits"] == y["value_bits"]:
+            exact_dto(c, path + "/retained_Psat/" + str(key), x, y)
+            exact_dto(c, path + "/retained_Native_Psat/" + str(key), a, b)
+
+
+def compare_cases(native, rust, request, c):
+    c.need(type(rust["cases"]) is list and len(native["cases"]) == len(rust["cases"]) == len(request["cases"]), "Complete ordered case ledger required")
+    actual_calls = 0
+    for expected, left, right in zip(request["cases"], native["cases"], rust["cases"]):
+        c.need(isinstance(right, dict) and set(right) == {"case_id", "purpose", "admission_lane", "input", "prepared", "operations",
+            "requested_operation_count", "actual_member_invocation_count", "all_requested_owners_available", "Native_warning_backend_or_outcome_inferred"}, "Exact actual Rust case keys required")
+        path = expected["case_id"]; initial = expected["initial"]
+        for key in ["case_id", "purpose", "admission_lane"]: c.exact(path + "/" + key, expected[key], right[key])
+        c.exact(path + "/literal_input", expected, right["input"])
+        c.exact(path + "/Native_backend_inferred", False, right["Native_warning_backend_or_outcome_inferred"])
+        c.exact(path + "/prepared_phase", "after-declared-input-preparation-no-correction-call", right["prepared"]["phase"])
+        compare_snapshot(c, path + "/prepared", left["prepared"], right["prepared"], initial, False)
+        actual = right["operations"]
+        c.need(type(actual) is list and 0 < len(actual) <= len(expected["operations"]), "Actual Rust invoked prefix required")
+        c.exact(path + "/requested_operations", len(expected["operations"]), right["requested_operation_count"])
+        c.exact(path + "/actual_invocations", len(actual), right["actual_member_invocation_count"])
+        c.exact(path + "/complete_operations", len(left["operations"]), len(actual))
+        c.exact(path + "/all_owners_available", True, right["all_requested_owners_available"])
+        previous = right["prepared"]
+        stopped = False
+        for ordinal, (wanted, a, b) in enumerate(zip(expected["operations"], left["operations"], actual), 1):
+            label = path + "/" + wanted["operation_id"]
+            c.need(not stopped and isinstance(b, dict) and set(b) == {"operation_id", "operation", "actual_member_invocation_ordinal", "actual_source_invoked",
+                "result", "before", "after", "history_selection_caller_invoked", "current_average_or_history_commit_invoked", "Native_internal_locals_or_guard_decisions_inferred"}, "Exact actual Rust call keys and no calls after typed stop required")
+            for key in ["operation_id", "operation"]: c.exact(label + "/" + key, wanted[key], b[key])
+            c.exact(label + "/invocation_ordinal", ordinal, b["actual_member_invocation_ordinal"])
+            c.exact(label + "/source_invoked", True, b["actual_source_invoked"]); actual_calls += int(b["actual_source_invoked"] is True)
+            c.exact(label + "/before_phase", "before-actual-correctHumRat", b["before"]["phase"])
+            c.exact(label + "/after_phase", "after-actual-Rust-member-return", b["after"]["phase"])
+            for key in ["history_selection_caller_invoked", "current_average_or_history_commit_invoked", "Native_internal_locals_or_guard_decisions_inferred"]:
+                c.exact(label + "/" + key, False, b[key])
+            result = b["result"]
+            c.need(isinstance(result, dict) and set(result) == {"status", "owner_available", "unavailable", "zone_id", "system_node_written", "actual_Rust_saturation_property_call", "counted_as_PASS"} and
+                type(result["owner_available"]) is bool and result["counted_as_PASS"] is False, "Actual typed Rust returned/unavailable owner required")
+            available = result["owner_available"]
+            c.need(available is (result["status"] == "source-returned") and result["status"] in ["source-returned", "typed-unavailable-returned"], "Actual result status/availability differs")
+            if not available:
+                c.need(isinstance(result["unavailable"], str) and all(result[key] is None for key in ["zone_id", "system_node_written", "actual_Rust_saturation_property_call"]), "Typed stop cannot contain fabricated returned fields")
+                stopped = True
+                c.absence(label, a["actual_source_return_observed"], False, True, "genuine typed Rust unavailable; required returned pair absent")
+                continue
+            c.need(result["unavailable"] is None, "Returned owner cannot contain unavailable error")
+            c.exact(label + "/source_returned", True, a["actual_source_return_observed"])
+            c.exact(label + "/zone_id", a["after"]["zone_id"], result["zone_id"])
+            node = initial["SystemZoneNodeNumber"]
+            c.exact(label + "/actual_system_node_written", node if node > 0 else None, result["system_node_written"])
+            c.exact(label + "/persistent_owner", {k: v for k, v in previous.items() if k != "phase"}, {k: v for k, v in b["before"].items() if k != "phase"})
+            compare_snapshot(c, label + "/before", a["before"], b["before"], initial, ordinal > 1)
+            compare_snapshot(c, label + "/after", a["after"], b["after"], initial, True)
+            for key in ["actual_context", "moisture_source_terms", "SumLatentHTRadSys", "SumLatentPool", "actual_node_row_count"]:
+                c.exact(label + "/retained/" + key, b["before"][key], b["after"][key])
+            for key in set(b["before"]["zone_fields"]) - {"airHumRatTemp"}:
+                c.exact(label + "/retained/" + key, b["before"]["zone_fields"][key], b["after"]["zone_fields"][key])
+            for old, new in zip(b["before"]["nodes"], b["after"]["nodes"]):
+                for key in old:
+                    if old["node_id"] != node or key not in ["HumRat", "Enthalpy"]: c.exact(label + "/retained_node/" + str(old["node_id"]) + "/" + key, old[key], new[key])
+                if node > 0 and new["node_id"] == node: exact_dto(c, label + "/actual_feedback_W_assignment", b["after"]["zone_fields"]["airHumRatTemp"], new["HumRat"])
+            retained_cache_bits(c, label, a["before"], a["after"], b["before"], b["after"])
+            call = result["actual_Rust_saturation_property_call"]
+            c.need(isinstance(call, dict) and set(call) == {"actual_Rust_property_result", "state_before", "state_after", "cache_before", "cache_after", "paired_as_Native_internal_Wsat_or_guard"} and
+                call["paired_as_Native_internal_Wsat_or_guard"] is False, "Rust-only property custody cannot claim Native locals")
+            c.dto(call["actual_Rust_property_result"])
+            for phase in ["before", "after"]:
+                observed = b[phase]["psychrometrics"]
+                keys = "iconvTol last_Patm last_tBoil Press_Save tSat_Save warmup useInterpolationPsychTsatFnPb".split()
+                state = call["state_" + phase]
+                c.need(isinstance(state, dict) and set(state) == set(keys), "Complete actual Rust property state required")
+                c.exact(label + "/Rust_property_state_" + phase, {key: observed[key] for key in keys}, state)
+            c.need(call["cache_before"] is None and call["cache_after"] is None,
+                "Actual WFromRh operation has no direct target slot; nested actual Psat rows are observed separately")
+            previous = b["after"]
+        if len(actual) != len(expected["operations"]): c.absence(path + "/required_requested_suffix", True, False, True, "stopped or omitted requested Rust calls never PASS")
+    c.need(type(rust["actual_Rust_API_invocations"]) is int, "Typed actual Rust invocation aggregate required")
+    c.exact("actual_Rust_API_invocations", actual_calls, rust["actual_Rust_API_invocations"])
+    c.exact("complete_requested_owners_available", True, rust["complete_requested_owners_available"])
+
+
+'''
+tail = text[text.index("def boot("):]
+tail = tail.replace('path = PREP / filename', 'path = SUPPORT / filename')
+tail = tail.replace('rad01', 'zon05').replace('RAD01', 'ZON05').replace('RAD comparison', 'ZON05 comparison')
+start, end = tail.index('    zero = '), tail.index('    m.require(rust["schema"]')
+tail = tail[:start] + '''    fixed_policy = m.load(POLICY_REF)
+    profiles = policy["required_numerical_profiles"]
+    m.require(policy == fixed_policy == qa["reviewed_observation_policy"] == freeze["observation_policy"] and profiles == FROZEN_PROFILES and
+              policy["class"] == "exact" and policy["signed_zero"] == "exact when both numerical results are zero" and
+              policy["process_or_copy_failure"] == "required FAIL; partial or absent records never PASS" and
+              policy["missing_on_one_or_both_sides"] == "required FAIL", "Exactly pre-output frozen numerical/retention/absence policy required")
+    counts, integrity = shape.review(native, request, m.require)
+    m.require(not integrity and counts == qa["actual_observation_counts"] and counts["source_returns"] == counts["correctHumRat"] == 43 and
+              counts["cases"] == 21 and counts["caught_source_exceptions"] == counts["declared_unreached_operations"] == 0 and
+              native["schema"] == "zon05-native-unit-results.v1", "Actual complete Native direct-member ledger/integrity differ")
+''' + tail[end:]
+tail = tail.replace('rust["full_engine_production_geometry_certified"] is False and\n              rust["RAD02_RAD03_or_production_integration_certified"] is False',
+    'rust["Native_internal_locals_or_guard_decisions_inferred"] is False and\n              rust["production_or_history_integration_certified"] is False')
+start, end = tail.index('    m.require(rust["requested_counts"]'), tail.index('    build, executed = ')
+tail = tail[:start] + '''    same(rust["actual_packet_freeze"], qa["actual_packet_freeze"])
+    requested_counts = {"cases": len(request["cases"]), "correctHumRat": sum(len(case["operations"]) for case in request["cases"])}
+    m.require(rust["requested_counts"] == freeze["requested_counts"] == qa["requested_counts"] == requested_counts == {"cases": 21, "correctHumRat": 43} and
+              rust["energyplus_commit"] == "6f2e40d10250a105b49966baa24d843711e61048" and
+              rust["source_authorities"] == freeze["source_authorities"], "Same literal input/scope/count authorities required")
+''' + tail[end:]
+tail = tail.replace('(command[3], qa["reviewed_native_admission_contract"])', '(command[3], qa["actual_packet_freeze"])')
+tail = tail.replace('command[4] == qa["reviewed_native_admission_contract"]["sha256"]', 'command[4] == qa["actual_packet_freeze"]["sha256"]')
+tail = tail.replace('compare_models(native, rust, request, comparison)', 'compare_cases(native, rust, request, comparison)')
+tail = tail.replace('PREP / "packet_io.py", PREP / "shape.py"', 'SUPPORT / "shape.py", SUPPORT / "packet_io.py"')
+tail = tail.replace('pass-selected-approximate-view-factors', 'pass-selected-direct-humidity-member').replace('fail-selected-approximate-view-factors', 'fail-selected-direct-humidity-member')
+tail = tail.replace('"requested_counts": request["requested_counts"]', '"requested_counts": requested_counts')
+start, end = tail.index('        "Native_source_outcomes_and_global_diagnostics_context_only"'), tail.index('        "comparison": result,')
+tail = tail[:start] + '''        "Native_source_outcomes_and_global_diagnostics_context_only": [{"case_id": row["case_id"], "status": row["status"],
+            "operations": [{key: op[key] for key in ["operation_id", "actual_source_invoked", "actual_source_return_observed", "source_exception", "source_message_begin", "source_message_end"]} for op in row["operations"]],
+            "messages": row["source_messages"], "err_stream": row["source_error_stream"],
+            "actual_psychrometric_error_indices": row["operations"][-1]["after"]["psychrometrics"]["iPsyErrIndex"]} for row in native["cases"]],
+''' + tail[end:]
+start, end = tail.index('        "selected_declared_geometry_unit_PASS_claimed"'), tail.index('    m.recheck(); m.emit(')
+tail = tail[:start] + '''        "selected_declared_direct_member_unit_PASS_claimed": passed, "complete_ZON05_PASS_claimed": False,
+        "retained_fields_and_unchanged_cache_bits_exact": True, "Native_global_diagnostic_backend_or_text_certified": False,
+        "unobserved_internal_locals_or_guard_outcomes_paired": False, "cache_HIT_or_hash_or_tag_recomputed": False,
+        "history_selection_commit_push_parser_or_production_certified": False,
+        "Native_flags_answers_or_expected_arrays_injected_into_Rust": False, "scientific_engine_or_moisture_evaluator_invoked": False,
+        "Rust_binary_payload_rehashed": True, "Native_binary_payloads_read_or_rehashed": False, "gates_updated": False,
+        "authorship_limits": "Base authored candidate/comparison custody and independently reviewed Raw humidity Source; Header authored Native/freezer/factual QA. Actual selected comparison is not independent full scientific certification."}
+''' + tail[end:]
+source = prefix + pairing + tail
+assert 'rad01' not in source and 'RAD02' not in source and 'model_cases' not in source
+assert 'request["requested_counts"]' not in source and 'native["energyplus_commit"]' not in source
+ast.parse(source)
+put("compare_unit.py", source)
+put("before/compare_unit.py", (RAD / "compare_unit.py").read_bytes())
+put("before/RAD-manifest.json", (RAD / "manifest.json").read_bytes())
+put("before/RAD-README.md", (RAD / "README.md").read_bytes())
+delta = "".join(difflib.unified_diff((RAD / "compare_unit.py").read_text(encoding="utf-8").splitlines(True), source.splitlines(True),
+    fromfile=ref(OUT / "before/compare_unit.py")["path"], tofile=ref(OUT / "compare_unit.py")["path"]))
+put("diffs/compare_unit.py.diff", delta)

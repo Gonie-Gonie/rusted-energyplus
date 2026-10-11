@@ -1,0 +1,47 @@
+from pathlib import Path
+import ast
+import difflib
+import hashlib
+import json
+
+ROOT = Path(__file__).resolve().parents[4]
+HERE = Path(__file__).resolve().parent
+OLD = HERE.with_name('rust-observer-prep-01')
+
+def ref(path):
+    data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(data).hexdigest(),
+            'size_bytes': len(data), 'line_count': len(data.splitlines())}
+
+def put(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream:
+        stream.write(data)
+
+old = json.loads((OLD / 'manifest.json').read_text(encoding='utf-8'))
+assert ref(OLD / 'manifest.json')['sha256'] == 'f29de6a11105877bf7cd39346e1c21a69df91ccd535f2a7895981ce7ca412995'
+before_doc = (OLD / 'README.md').read_bytes()
+doc = before_doc + b'\nFresh02 changes only the purpose label for psy02_state.rs405-416 to the actual\nnested WFromRh route. Its range identity was already correct. All Rust bodies,\nbefore archives, exact source diffs and runtime interfaces remain literal01.\nThe snapshots/final-cache owner API is separately covered by lines1-226.\n'
+put(HERE / 'README.md', doc)
+for name in ('manifest.json', 'README.md'):
+    put(HERE / 'before-01' / name, (OLD / name).read_bytes())
+new = json.loads(json.dumps(old))
+row = new['read_source_ranges'][-1]
+assert (row['first_line'], row['last_line'], row['purpose']) == (405, 416, 'actual snapshots and final ordered nondefault cache owners')
+row['purpose'] = 'actual nested WFromRh property route; snapshots and final cache owners are covered separately by lines1-226'
+new['documentation'] = ref(HERE / 'README.md')
+new['authoring_source'] = ref(Path(__file__).resolve())
+new['predecessor_source_preparation'] = ref(OLD / 'manifest.json')
+new['metadata_only_successor'] = {'changed_range_purpose_only': True, 'Rust_sources_before_archives_source_diffs_and_runtime_interfaces_literal01': True,
+                                  'historical_authoring_source': old['authoring_source']}
+put(HERE / 'manifest.json', (json.dumps(new, ensure_ascii=False, indent=2) + '\n').encode('utf-8'))
+for name in ('manifest.json', 'README.md'):
+    before = HERE / 'before-01' / name
+    after = HERE / name
+    delta = ''.join(difflib.unified_diff(before.read_text(encoding='utf-8').splitlines(True), after.read_text(encoding='utf-8').splitlines(True),
+                    fromfile=ref(before)['path'], tofile=ref(after)['path']))
+    put(HERE / 'diffs' / (name + '.from-01.diff'), delta.encode('utf-8'))
+ast.parse(Path(__file__).read_text(encoding='utf-8'))
+for key in ('own_sources', 'before_templates', 'exact_diffs', 'runtime_interfaces'):
+    assert new[key] == old[key]
+print(json.dumps({'manifest': ref(HERE / 'manifest.json'), 'metadata_diffs': [ref(p) for p in (HERE / 'diffs').iterdir()]}, indent=2))
