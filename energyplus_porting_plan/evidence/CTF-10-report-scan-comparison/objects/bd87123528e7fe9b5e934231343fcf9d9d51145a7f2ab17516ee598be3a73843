@@ -1,0 +1,122 @@
+--- /dev/null
++++ .runtime/porting/CTF-10/report-scan-validation-prep-01/scan_compare.py
+@@ -0,0 +1,119 @@
++"""Exact pairing of actual Scan owners; no Scan/default/cache/backend evaluator."""
++from collections import Counter
++
++
++class Comparison:
++    def __init__(self, need):
++        self.need = need
++        self.counts = Counter()
++        self.mismatches = []
++        self.unavailable = []
++
++    def failure(self, path, category, native, rust):
++        self.counts["mismatches"] += 1
++        self.counts[category] += 1
++        self.mismatches.append({"path": path, "category": category, "Native": native, "Rust": rust})
++
++    def exact(self, path, native, rust):
++        self.counts["discrete_comparisons"] += 1
++        if type(native) is not type(rust) or native != rust:
++            self.failure(path, "discrete_mismatches", native, rust)
++
++    def absence(self, path, native_available, rust_available, reason):
++        self.unavailable.append({"path": path, "Native_available": native_available, "Rust_available": rust_available,
++                                 "required": True, "reason": reason, "counted_as_PASS": False})
++        self.failure(path, "availability_failures", native_available, rust_available)
++
++    def tree(self, path, native, rust):
++        if type(native) is not type(rust):
++            self.failure(path, "class_or_shape_mismatches", native, rust)
++        elif type(native) is dict:
++            self.exact(path + "/keys", sorted(native), sorted(rust))
++            for key in sorted(set(native) & set(rust)): self.tree(path + "/" + key, native[key], rust[key])
++        elif type(native) is list:
++            self.exact(path + "/length", len(native), len(rust))
++            for index, (left, right) in enumerate(zip(native, rust)): self.tree(path + "/" + str(index), left, right)
++        else:
++            self.exact(path, native, rust)
++
++    def report(self):
++        return {"numeric_comparisons": 0, "discrete_comparisons": self.counts["discrete_comparisons"],
++                "mismatch_count": self.counts["mismatches"], "mismatch_categories": dict(self.counts),
++                "complete_mismatch_ledger": self.mismatches, "mismatch_records_dropped": 0,
++                "unavailable_observations": self.unavailable, "unavailable_counted_as_PASS": False}
++
++
++def compare(native, rust, projection, need, shape):
++    c = Comparison(need)
++    need(type(rust) is dict and rust.get("schema") == "ctf10-scan-unit-candidate-results.v1", "Actual Rust result schema required")
++    need(all(rust[key] is False for key in ["expected_values_supplied", "numerical_or_discrete_PASS_claimed", "complete_CTF10_PASS_claimed", "gates_updated"]), "Candidate does not self-certify PASS")
++    c.tree("actual_input_authorities", projection["actual_input_authorities"], rust["actual_input_authorities"])
++    c.exact("actual_case_count", len(native["cases"]), rust["actual_case_count"])
++    c.exact("actual_API_invocations", sum(len(row["queries"]) for row in native["cases"]), rust["actual_API_invocations"])
++    c.exact("unavailable_count", 0, rust["unavailable_count"])
++    need(type(rust["cases"]) is list, "Complete actual Rust case ledger required")
++    c.exact("case_ledger_length", len(native["cases"]), len(rust["cases"]))
++    for index, original in enumerate(native["cases"]):
++        path = "cases/" + str(index)
++        if index >= len(rust["cases"]): c.absence(path, True, False, "required declared Rust case missing"); continue
++        candidate = rust["cases"][index]
++        if type(candidate) is not dict: c.absence(path, True, False, "required typed case owner absent"); continue
++        c.exact(path + "/case_id", original["case_id"], candidate.get("case_id"))
++        if candidate.get("status") != "typed-input-available":
++            c.absence(path, True, False, "actual compiler owner unavailable; no missing-owner PASS"); continue
++        c.exact(path + "/input_mode", original["input_mode"], candidate["input_mode"])
++        c.exact(path + "/Native_backend_equivalence_claimed", False, candidate["Native_backend_equivalence_claimed"])
++        c.exact(path + "/legacy_section_count", original["input_owner"]["legacy_section_count"], candidate["legacy_section_count"])
++        getters, objects = original["getter_records_after_queries"], candidate["input_objects"]
++        need(type(objects) is list, "Actual typed compiler object ledger required")
++        c.exact(path + "/getter_objects", len(getters), len(objects))
++        for object_index, getter in enumerate(getters):
++            label = path + "/getter/" + str(object_index)
++            if object_index >= len(objects): c.absence(label, True, False, "required actual typed getter owner missing"); continue
++            typed = objects[object_index]
++            if type(typed) is not dict: c.absence(label, True, False, "required typed getter owner absent"); continue
++            shape.keys(typed, ["family", "object_name", "alphas", "alpha_blanks", "default_applied", "NumAlphas", "isEpJSON"], need, label)
++            for key in ["alphas", "alpha_blanks", "default_applied"]:
++                need(type(typed[key]) is list and len(typed[key]) == 3, "Actual complete typed three-slot owner required")
++            need(all(type(value) is str for value in typed["alphas"]) and all(type(value) is bool for key in ["alpha_blanks", "default_applied"] for value in typed[key]), "Typed getter owner classes differ")
++            for key in ["family", "object_name", "NumAlphas"]: c.exact(label + "/" + key, getter[key], typed[key])
++            c.exact(label + "/isEpJSON", original["input_owner"]["isEpJSON"], typed["isEpJSON"])
++            width = len(getter["alphas"])
++            c.tree(label + "/alphas", getter["alphas"], typed["alphas"][:width])
++            c.tree(label + "/alpha_blanks", getter["alpha_blanks"], typed["alpha_blanks"][:width])
++        actual, supplied = original["queries"], candidate["queries"]
++        need(type(supplied) is list, "Complete actual Rust query ledger required")
++        c.exact(path + "/query_ledger_length", len(actual), len(supplied))
++        c.exact(path + "/actual_API_invocations", len(actual), candidate["actual_API_invocations"])
++        messages = candidate["diagnostics"]
++        need(type(messages) is list, "Actual Rust diagnostic intent ledger required")
++        previous_end = 0
++        for query_index, query in enumerate(actual):
++            label = path + "/query/" + str(query_index)
++            if query_index >= len(supplied): c.absence(label, True, False, "required actual Rust invocation missing"); continue
++            row = supplied[query_index]
++            if type(row) is not dict: c.absence(label, True, False, "required actual Rust invocation owner absent"); continue
++            shape.keys(row, ["ordinal", "actual_API_invoked", "input", "before", "after", "result", "option1_after", "option2_after", "diagnostic_begin", "diagnostic_end"], need, label)
++            c.exact(label + "/ordinal", query["ordinal"], row["ordinal"])
++            c.exact(label + "/actual_API_invoked", True, row["actual_API_invoked"])
++            c.tree(label + "/input", query["input"], row["input"])
++            for key in ["before", "after"]:
++                shape.cache(row[key], need, label + "/" + key)
++                c.tree(label + "/" + key, query[key]["snapshot"], row[key])
++            if row["result"].get("status") != "available": c.absence(label + "/return", True, False, "actual typed Scan result unavailable")
++            else: c.exact(label + "/DoReport_after", query["DoReport_after"], row["result"]["DoReport_after"])
++            for key in ["option1_after", "option2_after"]: c.exact(label + "/" + key, query[key], row[key])
++            begin, end = row["diagnostic_begin"], row["diagnostic_end"]
++            need(type(begin) is int and type(end) is int and begin == previous_end and begin <= end <= len(messages), "Rust diagnostic spans must retain every ordered intent")
++            observed = []
++            for message_index in range(begin, end):
++                message = messages[message_index]
++                shape.keys(message, ["ordinal", "query_ordinal", "kind", "argument"], need, "Rust intent")
++                need(type(message["ordinal"]) is int and message["ordinal"] == message_index + 1 and message["query_ordinal"] == query["ordinal"] and message["kind"] in ["Warning", "Continue"] and type(message["argument"]) is str, "Actual diagnostic intent identity/order differs")
++                observed.append({key: message[key] for key in ["query_ordinal", "kind", "argument"]})
++            wanted = [{key: message[key] for key in ["query_ordinal", "kind", "argument"]} for message in original["diagnostics"][query["diagnostic_begin"]:query["diagnostic_end"]]]
++            c.tree(label + "/diagnostic_intents", wanted, observed); previous_end = end
++        need(previous_end == len(messages), "Unassociated Rust intents cannot be dropped")
++        shape.cache(candidate["final"], need, path + "/final")
++        c.tree(path + "/final", original["final"]["snapshot"], candidate["final"])
++    return c.report()

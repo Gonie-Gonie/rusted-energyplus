@@ -1,0 +1,11 @@
+--- .runtime/porting/CTF-10/report-scan-validation-prep-02/before-01/compare_units.py
++++ .runtime/porting/CTF-10/report-scan-validation-prep-02/compare_units.py
+@@ -6,7 +6,7 @@
+ from pathlib import Path
+ 
+ PREP = Path(__file__).resolve().parent
+-COMMON_SHA = "fc6f0af5fcf1ec7f0a9c14e66ef9b027d54dccab5b715d2c169ba84f09186220"
++COMMON_SHA = "85abffa8f5d78de6e67f10ca56987f82a39a8bffa9abcf7d383af86fafe0473e"
+ SHAPE_SHA = "54dd3cf3ec618e6ff2d82475fe0d7d85e8aca5f88a3b2d8384ee96fa078caafa"
+ PAIR_SHA = "f3375f45bd1a440833b0cca0fa3962b527e25ceec97da39205c554a483332418"
+ OBSERVER = "crates/ep_run/examples/ctf10_report_scan_unit_observer.rs"

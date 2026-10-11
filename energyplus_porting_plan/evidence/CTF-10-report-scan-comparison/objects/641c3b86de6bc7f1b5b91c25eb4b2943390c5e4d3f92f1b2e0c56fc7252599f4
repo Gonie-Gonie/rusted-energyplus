@@ -1,0 +1,11 @@
+--- .runtime/porting/CTF-10/report-scan-validation-prep-02/before-01/scan_common.py
++++ .runtime/porting/CTF-10/report-scan-validation-prep-02/scan_common.py
+@@ -10,7 +10,7 @@
+ IO_SHA = "ce1e2f98e975c5fb7d250af9c2503c9cd15aa86422d249ed807253d87cba13cf"
+ NATIVE = {"path": ".runtime/porting/CTF-10/report-input-scan-native-prep-02/manifest.json", "sha256": "2e7270223af0ff188e5c7da4e0a6b2c308109da8d32ebda77366578a34afefba"}
+ WRITER = {"path": ".runtime/porting/CTF-10/freeze-report-scan-inputs-01.py", "sha256": "3205087d6174e481546643f67b9978ba277d8346a99fbd1794742651bdafeb10"}
+-COMPLETION = {"path": ".runtime/porting/CTF-10/complete-report-scan-native-01.py", "sha256": "2b68debc617f8eb26181902d2a21b796e62dcbcb1b83bbf87f7d9ecd07f82b32"}
++COMPLETION = {"path": ".runtime/porting/CTF-10/complete-report-scan-native-02.py", "sha256": "9c75f5a219d5020ed5c2e5b12c0d24598849a2dd0c868291af8043f5b828f009"}
+ PE = {"path": "tools/porting/native_pe.py", "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56"}
+ DERIVE = {"path": "tools/porting/derive_native_helper.py", "sha256": "3b39cc4562943692e43e11e4d2d7e1bc70f84a58e09c0fea28c0b85b8e905dcf"}
+ LARGE = {}

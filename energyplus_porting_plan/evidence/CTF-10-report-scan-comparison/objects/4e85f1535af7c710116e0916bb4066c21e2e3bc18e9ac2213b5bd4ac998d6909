@@ -1,0 +1,16 @@
+{
+  "schema": "ctf10-scan-unit-prospective-policy.v1",
+  "scope": "Fixed input-only direct ScanForReports cases; actual InputProcessor processInput and explicit getter-domain probes remain distinct.",
+  "required": ["complete frozen request and actual input files", "all declared cases/queries in exact order", "real preparation admission per mode", "actual input_owner parser transformation", "actual getter records and family widths", "actual same-case cache before/after/final", "actual invocation/return/copy status", "DoReport and optional key/options presence and values", "Warning/Continue arguments, query association and order"],
+  "comparison": "Exact class/type/shape/value for all Boolean/string/integer owners. All 31 retained cache keys are required. Two- and three-alpha family widths must match actual Native getters and compiler projection; defaults beyond NumAlphas remain actual values.",
+  "required_missing_one_or_both": "failure, never unavailable/PASS by omission",
+  "actual_stop_or_copy_failure": "retained failure and later explicit uninvoked records; no fabricated success",
+  "context_only_unpaired": ["global backend counters/flags", "native enum numeric levels", "err/audit/console text", "SQLite and generic input validation backend"],
+  "Rust_diagnostics": "Actual ordered Warning/Continue call intents only; not Native global backend equality.",
+  "numeric_profiles": [],
+  "sampling_or_visit_caps": false,
+  "expected_values_supplied": false,
+  "helper_PASS_claimed": false,
+  "whole_Init_production_or_full_card_PASS_claimed": false,
+  "all_card_gates_updated": false
+}

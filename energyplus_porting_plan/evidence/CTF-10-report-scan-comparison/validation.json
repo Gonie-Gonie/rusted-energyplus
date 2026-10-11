@@ -1,0 +1,141 @@
+{
+  "schema": "ctf10-scan-actual-plan-validation.v1",
+  "actual_execution": {
+    "path": ".runtime/porting/CTF-10/report-scan-comparison-plan-check-command-01/receipt.json",
+    "sha256": "61ea190f77c59e37016996e71b4068bd25b09448e9ed1135fc23bebbfc0f7c06",
+    "size_bytes": 3256
+  },
+  "selected_files": [
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/publish-report-scan-comparison-01.py",
+        "sha256": "cbfcc132936c1b2610e8ab12ef2c184097b3f697ef4dd695ba24513d3daf3463",
+        "size_bytes": 3698
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-scan-comparison/objects/cbfcc132936c1b2610e8ab12ef2c184097b3f697ef4dd695ba24513d3daf3463",
+        "sha256": "cbfcc132936c1b2610e8ab12ef2c184097b3f697ef4dd695ba24513d3daf3463",
+        "size_bytes": 3698
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-scan-comparison-finalize-command-01/receipt.json",
+        "sha256": "e3c96aa4efef6482065cc0fa3a4b9dac3cfc41f7ffd43f931aca1f2f7150c432",
+        "size_bytes": 2931
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-scan-comparison/objects/e3c96aa4efef6482065cc0fa3a4b9dac3cfc41f7ffd43f931aca1f2f7150c432",
+        "sha256": "e3c96aa4efef6482065cc0fa3a4b9dac3cfc41f7ffd43f931aca1f2f7150c432",
+        "size_bytes": 2931
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-scan-comparison-finalize-command-01/stdout.log",
+        "sha256": "6d7c0a368b36fcf279f3ac9bacb6ac9e75634ed3d59ad93df183c339f7ea7f72",
+        "size_bytes": 187
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-scan-comparison/objects/6d7c0a368b36fcf279f3ac9bacb6ac9e75634ed3d59ad93df183c339f7ea7f72",
+        "sha256": "6d7c0a368b36fcf279f3ac9bacb6ac9e75634ed3d59ad93df183c339f7ea7f72",
+        "size_bytes": 187
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-scan-comparison-finalize-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-scan-comparison/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/3f/3f7582828a91af70bfca8aa3c0094cbaa5d8075ff5ee0a89c020d50fb48c3811",
+        "sha256": "3f7582828a91af70bfca8aa3c0094cbaa5d8075ff5ee0a89c020d50fb48c3811",
+        "size_bytes": 1617773
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-scan-comparison/objects/3f7582828a91af70bfca8aa3c0094cbaa5d8075ff5ee0a89c020d50fb48c3811",
+        "sha256": "3f7582828a91af70bfca8aa3c0094cbaa5d8075ff5ee0a89c020d50fb48c3811",
+        "size_bytes": 1617773
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-scan-comparison-plan-check-command-01/receipt.json",
+        "sha256": "61ea190f77c59e37016996e71b4068bd25b09448e9ed1135fc23bebbfc0f7c06",
+        "size_bytes": 3256
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-scan-comparison/objects/61ea190f77c59e37016996e71b4068bd25b09448e9ed1135fc23bebbfc0f7c06",
+        "sha256": "61ea190f77c59e37016996e71b4068bd25b09448e9ed1135fc23bebbfc0f7c06",
+        "size_bytes": 3256
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-scan-comparison-plan-check-command-01/stdout.log",
+        "sha256": "d876fbdcdbfd728e64dfa7f80ad8f3964264616ef3dd197d29d38311a93e9b7c",
+        "size_bytes": 415
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-scan-comparison/objects/d876fbdcdbfd728e64dfa7f80ad8f3964264616ef3dd197d29d38311a93e9b7c",
+        "sha256": "d876fbdcdbfd728e64dfa7f80ad8f3964264616ef3dd197d29d38311a93e9b7c",
+        "size_bytes": 415
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/report-scan-comparison-plan-check-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-scan-comparison/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/3f/3f7582828a91af70bfca8aa3c0094cbaa5d8075ff5ee0a89c020d50fb48c3811",
+        "sha256": "3f7582828a91af70bfca8aa3c0094cbaa5d8075ff5ee0a89c020d50fb48c3811",
+        "size_bytes": 1617773
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-scan-comparison/objects/3f7582828a91af70bfca8aa3c0094cbaa5d8075ff5ee0a89c020d50fb48c3811",
+        "sha256": "3f7582828a91af70bfca8aa3c0094cbaa5d8075ff5ee0a89c020d50fb48c3811",
+        "size_bytes": 1617773
+      }
+    }
+  ],
+  "validated_documents": [
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "2f6f1c127803203ca2b708abe3ead463f8f163dc931a1850e5d3e05c540459dc",
+      "size_bytes": 780589
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CTF-10.md",
+      "sha256": "7b3ec64335e7804bac59e8beb2e53c69b10f8851a11695e5dfe44d1c4c7deaf7",
+      "size_bytes": 12928
+    },
+    {
+      "path": "energyplus_porting_plan/CHECKLIST.md",
+      "sha256": "5b37b4662ab898dfcaa293f8d422cc49cd61500777ec1fbc9fb3dfba84dae926",
+      "size_bytes": 17393
+    },
+    {
+      "path": "energyplus_porting_plan/energyplus_porting_checklist.html",
+      "sha256": "a79cc35d43180b4816cb707a719a8a373870a2d85afc6e85e56da14c23171006",
+      "size_bytes": 628067
+    }
+  ],
+  "gates_updated": false
+}

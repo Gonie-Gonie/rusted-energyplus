@@ -1,0 +1,22 @@
+{
+  "schema": "ctf10-scan-unit-input-projection-contract.v1",
+  "projection_schema": "ctf10-scan-unit-input-projection.v1",
+  "top_keys": ["schema", "expected_values_supplied", "actual_input_authorities", "cases"],
+  "case_keys": ["case_id", "input_mode", "input_only_epjson", "idf_text", "initial_cache", "queries"],
+  "query_keys": ["report_name", "report_key", "option1", "option2", "DoReport_before"],
+  "native_request_schema": "ctf10-scan-unit-request.v1",
+  "native_result_schema": "ctf10-scan-unit-native-results.v1",
+  "candidate_result_schema": "ctf10-scan-unit-candidate-results.v1",
+  "projection_authority": "Future independently reviewed factual QA authenticates exact frozen request/input bytes, real Native preparation outcome and actual input_owner only. actual_input_authorities retains genuine refs and command identities, supplied at runtime.",
+  "permitted_native_transformation": "Only input_owner.epJSON parser transformation of independently authenticated original input; no getter/cache/DoReport/diagnostic answers.",
+  "idf_text": "Exact original authenticated IDF text in process_input_idf mode; null otherwise. Existing raw IDF overlay preserves physical alpha count and source order.",
+  "literal_request_copies": ["case_id", "input_mode", "initial_cache", "queries"],
+  "independent_direct_getter_input": "Exact frozen JSON source after separately authenticated five-family/legacy-only admission; unavailable ordinary schema validation remains explicit.",
+  "declared_cases": 12,
+  "declared_queries": 264,
+  "counts_are_input_declarations_not_actual_outcomes": true,
+  "expected_values_supplied": false,
+  "Native_scan_output_as_Rust_input_allowed": false,
+  "whole_Init_or_production_admission_claimed": false,
+  "future_current_Cargo_artifact_and_source_closure_required": true
+}

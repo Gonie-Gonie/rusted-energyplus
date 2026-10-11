@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-10\complete-report-scan-native-01.py", line 45, in <module>
+    assert all(len(v)==1 for v in hits.values())and len(loads)==1 and 'scan_unit_helper.cpp.obj'in loads[0]['text']and len(core_load)==1 and loads[0]['line']<core_load[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

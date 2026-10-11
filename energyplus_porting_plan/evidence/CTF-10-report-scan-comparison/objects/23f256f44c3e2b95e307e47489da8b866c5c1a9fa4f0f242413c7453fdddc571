@@ -1,0 +1,29 @@
+{
+  "Version": {
+    "Version 1": {
+      "version_identifier": "26.1"
+    }
+  },
+  "Timestep": {
+    "Timestep 1": {
+      "number_of_timesteps_per_hour": 4
+    }
+  },
+  "Building": {
+    "ScanUnit": {}
+  },
+  "GlobalGeometryRules": {
+    "GlobalGeometryRules 1": {
+      "starting_vertex_position": "UpperLeftCorner",
+      "vertex_entry_direction": "Counterclockwise",
+      "coordinate_system": "Relative"
+    }
+  },
+  "Output:EnergyManagementSystem": {
+    "ems": {
+      "actuator_availability_dictionary_reporting": "None",
+      "internal_variable_availability_dictionary_reporting": "None",
+      "ems_runtime_language_debug_output_level": "None"
+    }
+  }
+}

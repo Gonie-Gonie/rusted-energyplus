@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-10\build-report-scan-native-01.py", line 36, in <module>
+    after=read(live);new=[r for r in after if r not in before];assert len(new)==1 and Path(new[0]['file']).resolve()==source
+                                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

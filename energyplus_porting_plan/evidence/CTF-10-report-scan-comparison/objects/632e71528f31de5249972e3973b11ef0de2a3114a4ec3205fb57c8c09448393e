@@ -1,0 +1,92 @@
+"""Authoring metadata only: archive actual predecessor Source and exact held deltas."""
+import ast
+import difflib
+import hashlib
+import json
+import shutil
+from pathlib import Path
+
+ROOT = Path.cwd().resolve()
+PREP = ROOT / ".runtime/porting/CTF-10/report-scan-validation-prep-01"
+
+
+def ref(path):
+    path = path if isinstance(path, Path) else ROOT / path
+    data = path.read_bytes()
+    return {"path": path.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(data).hexdigest(), "size_bytes": len(data)}
+
+
+def write(path, value):
+    with path.open("xb") as handle: handle.write((json.dumps(value, indent=2, ensure_ascii=False, allow_nan=False) + "\n").encode())
+
+
+files = ["review_data.py", "project_inputs.py", "compare_units.py", "scan_common.py", "scan_shape.py", "scan_compare.py", "packet_io.py"]
+templates = {
+    "review_data.py": ".runtime/porting/ZON-05/original-data-review-prep-01/review_data.py",
+    "project_inputs.py": ".runtime/porting/CTF-10/thermal-history-unit-comparison-prep-01/project_inputs.py",
+    "compare_units.py": ".runtime/porting/ZON-05/comparer-prep-01/compare_unit.py",
+    "scan_common.py": ".runtime/porting/CTF-10/thermal-history-unit-comparison-prep-01/history_unit_common.py",
+    "scan_shape.py": ".runtime/porting/ZON-05/original-data-review-prep-01/shape.py",
+    "packet_io.py": ".runtime/porting/ZON-05/original-data-review-prep-01/packet_io.py",
+    "README.md": ".runtime/porting/ZON-05/original-data-review-prep-01/README.md",
+}
+(PREP / "before").mkdir(exist_ok=False); (PREP / "diffs").mkdir(exist_ok=False)
+before = []; deltas = []
+for name in [*files, "README.md"]:
+    old = None
+    if name in templates:
+        source = ROOT / templates[name]; old = PREP / "before" / ("predecessor-" + name)
+        shutil.copyfile(source, old); assert source.read_bytes() == old.read_bytes()
+        before.append({"source": ref(source), "archive": ref(old)})
+    current = PREP / name
+    if name.endswith(".py"): ast.parse(current.read_bytes())
+    delta = "".join(difflib.unified_diff(old.read_text(encoding="utf-8").splitlines(keepends=True) if old else [], current.read_text(encoding="utf-8").splitlines(keepends=True), fromfile=ref(old)["path"] if old else "/dev/null", tofile=ref(current)["path"]))
+    out = PREP / "diffs" / (name + ".diff"); out.write_bytes(delta.encode())
+    deltas.append({"before": ref(old) if old else None, "after": ref(current), "diff": ref(out)})
+
+native_ref = ref(ROOT / ".runtime/porting/CTF-10/report-input-scan-native-prep-02/manifest.json")
+native = json.loads((ROOT / native_ref["path"]).read_bytes())
+contexts = [native_ref, ref(ROOT / ".runtime/porting/CTF-10/report-input-scan-native-prep-01/manifest.json")]
+contexts += [row["source"] for row in native["own_sources"]]
+contexts += [row for row in native["source_contexts"] if row["path"].startswith(".reference/")]
+contexts += [ref(ROOT / path) for path in [
+    ".runtime/porting/CTF-10/freeze-report-scan-inputs-01.py",
+    ".runtime/porting/CTF-10/build-report-scan-native-02.py",
+    ".runtime/porting/CTF-10/complete-report-scan-native-01.py",
+    ".runtime/porting/CTF-10/report-scan-additive-reference-01.cmake",
+    ".runtime/porting/CTF-10/report-scan-observer-correction-01/ctf10_report_scan_unit_observer.rs",
+    ".runtime/porting/CTF-10/report-scan-observer-correction-01/correction.diff",
+    "tools/porting/native_pe.py", "tools/porting/derive_native_helper.py", "tools/porting/record_command.py",
+]]
+contexts += [native["input_fixture_proposal"], native["observation_policy_proposal"], native["input_projection_contract_proposal"]]
+contexts += [row["source"] for row in before]
+unique = {}
+for row in contexts:
+    current = ref(ROOT / row["path"])
+    assert current["sha256"] == row["sha256"] and current["size_bytes"] == row["size_bytes"]
+    unique[current["path"]] = current
+ranges = native["selected_source_ranges"]
+for row in ranges:
+    data = b"".join((ROOT / row["path"]).read_bytes().splitlines(keepends=True)[row["start_line"] - 1:row["end_line"]])
+    assert hashlib.sha256(data).hexdigest() == row["sha256"] and len(data) == row["size_bytes"]
+manifest = {
+    "schema": "ctf10-scan-unit-validation-source-preparation.v1", "status": "held-Source-only-before-stage-execution", "held_immutable": True,
+    "author": "Raw", "own_sources": [ref(PREP / name) for name in files], "documentation": ref(PREP / "README.md"),
+    "authoring_source": ref(Path(__file__).resolve()), "authentic_predecessor_sources": before, "exact_source_and_document_diffs": deltas,
+    "source_contexts": list(unique.values()), "selected_source_ranges": ranges,
+    "runtime_interfaces": {
+        "OriginalQA_schema": "ctf10-scan-unit-independent-original-data-review.v1", "OriginalQA_argv_count": 23,
+        "OriginalQA_release_key": "Original_capture_custody_released", "OriginalQA_actual_counts": ["cases", "actual_queries", "actual_getter_records", "actual_diagnostics", "actual_query_diagnostics", "actual_preparation_diagnostics"],
+        "projection_schema": "ctf10-scan-unit-input-projection.v1", "projection_review_schema": "ctf10-scan-unit-input-projection-review.v1", "projector_argv_count": 15,
+        "comparison_schema": "ctf10-scan-unit-same-input-comparison.v1", "comparer_argv_count": 29,
+        "required_input_declarations": {"cases": 12, "queries": 264}, "cache_keys": 31, "Native_argc": 2, "candidate_argc": 3,
+        "candidate_current_source_binding": "Explicit canonical path#actualSHA and actual Cargo compiler-artifact/raw Source snapshot; historical flawed held observer does not assert compilation",
+        "whole_backend_or_production_PASS_claimed": False, "metadata_decoded_JSON_max_bytes": 16000000, "ordinary_identity_max_bytes": 64000000,
+        "binary_identity_streamed_without_size_cap": True, "numeric_profiles": [], "drop_or_sample_caps": False,
+    },
+    "authorship_limit": "Raw authored Native wrapper and transport. Root plus another author FULL required; no independent reused Scan formula certificate.",
+    "verification": {"seven_Python_AST_valid": True, "authentic_predecessor_bytecopies": True, "eight_exact_diffs_regenerated": True, "all_Source_refs_and_ranges_verified": True, "project_or_stage_import_execution": False, "target_or_Cargo_or_engine_execution": False, "scientific_output_or_binary_reads": False, "canonical_or_Git_mutation": False},
+    "future_actual_inputs": "Root supplies exact freeze/recorder/build completion, Original results and later projector/Cargo/candidate refs; no future hashes, outcomes or counts constructed.",
+}
+write(PREP / "manifest.json", manifest)
+print(json.dumps(ref(PREP / "manifest.json")))

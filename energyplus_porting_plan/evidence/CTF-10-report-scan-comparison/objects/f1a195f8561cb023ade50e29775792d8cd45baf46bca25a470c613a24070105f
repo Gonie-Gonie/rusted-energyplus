@@ -1,0 +1,2015 @@
+{
+  "schema": "ctf10-scan-unit-request.v1",
+  "card": "CTF-10",
+  "expected_values_supplied": false,
+  "cases": [
+    {
+      "case_id": "A-24H-report-input",
+      "input_mode": "process_input_idf",
+      "input_file": "../../../../energyplus_porting_plan/cases/A-24H/input.idf",
+      "initial_cache": null,
+      "queries": [
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Constructions",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Materials",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "unknown",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "CostInfo",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF:WireFrame",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "VRML",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Vertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Details",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DetailsWithVertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Lines",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "unknown",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "ViewFactorInfo",
+          "report_key": null,
+          "option1": "caller one",
+          "option2": "caller two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "EnergyManagementSystem",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "unknown",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Constructions",
+          "report_key": "Constructions",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        }
+      ]
+    },
+    {
+      "case_id": "B-NOLIMIT-24H-report-input",
+      "input_mode": "process_input_idf",
+      "input_file": "../../../../energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+      "initial_cache": null,
+      "queries": [
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Constructions",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Materials",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "unknown",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "CostInfo",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF:WireFrame",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "VRML",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Vertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Details",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DetailsWithVertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Lines",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "unknown",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "ViewFactorInfo",
+          "report_key": null,
+          "option1": "caller one",
+          "option2": "caller two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "EnergyManagementSystem",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "unknown",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Constructions",
+          "report_key": "Constructions",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        }
+      ]
+    },
+    {
+      "case_id": "empty-IDF",
+      "input_mode": "process_input_idf",
+      "input_file": "fixtures/empty.idf",
+      "initial_cache": null,
+      "queries": [
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Constructions",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Materials",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "unknown",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "CostInfo",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF:WireFrame",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "VRML",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Vertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Details",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DetailsWithVertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Lines",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "unknown",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "ViewFactorInfo",
+          "report_key": null,
+          "option1": "caller one",
+          "option2": "caller two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "EnergyManagementSystem",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "unknown",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Constructions",
+          "report_key": "Constructions",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        }
+      ]
+    },
+    {
+      "case_id": "all-five-IDF-12-list-order",
+      "input_mode": "process_input_idf",
+      "input_file": "fixtures/all-five.idf",
+      "initial_cache": null,
+      "queries": [
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Constructions",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Materials",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "unknown",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "CostInfo",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF:WireFrame",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "VRML",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Vertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Details",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DetailsWithVertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Lines",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "unknown",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "ViewFactorInfo",
+          "report_key": null,
+          "option1": "caller one",
+          "option2": "caller two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "EnergyManagementSystem",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "unknown",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Constructions",
+          "report_key": "Constructions",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        }
+      ]
+    },
+    {
+      "case_id": "default-and-explicit-blanks-IDF",
+      "input_mode": "process_input_idf",
+      "input_file": "fixtures/default-blanks.idf",
+      "initial_cache": null,
+      "queries": [
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Constructions",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Materials",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "unknown",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "CostInfo",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF:WireFrame",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "VRML",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Vertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Details",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DetailsWithVertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Lines",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "unknown",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "ViewFactorInfo",
+          "report_key": null,
+          "option1": "caller one",
+          "option2": "caller two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "EnergyManagementSystem",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "unknown",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Constructions",
+          "report_key": "Constructions",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        }
+      ]
+    },
+    {
+      "case_id": "all-five-direct-epJSON",
+      "input_mode": "process_input_epjson",
+      "input_file": "fixtures/all-five.epJSON",
+      "initial_cache": null,
+      "queries": [
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Constructions",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Materials",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "unknown",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "CostInfo",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF:WireFrame",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "VRML",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Vertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Details",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DetailsWithVertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Lines",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "unknown",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "ViewFactorInfo",
+          "report_key": null,
+          "option1": "caller one",
+          "option2": "caller two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "EnergyManagementSystem",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "unknown",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Constructions",
+          "report_key": "Constructions",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        }
+      ]
+    },
+    {
+      "case_id": "incoming-cache-EMS-reset",
+      "input_mode": "process_input_epjson",
+      "input_file": "fixtures/none-ems.epJSON",
+      "initial_cache": {
+        "GetReportInput": true,
+        "SurfVert": true,
+        "SurfDet": true,
+        "SurfDetWVert": true,
+        "DXFReport": true,
+        "DXFWFReport": true,
+        "VRMLReport": true,
+        "CostInfo": true,
+        "ViewFactorInfo": true,
+        "Constructions": true,
+        "Materials": true,
+        "LineRpt": true,
+        "VarDict": true,
+        "EMSoutput": true,
+        "ShowDecayCurvesInEIO": true,
+        "OutputEMSActuatorAvailSmall": true,
+        "OutputEMSActuatorAvailFull": true,
+        "OutputEMSInternalVarsSmall": true,
+        "OutputEMSInternalVarsFull": true,
+        "OutputEMSErrors": true,
+        "OutputFullEMSTrace": true,
+        "DXFOption1": "literal incoming DXFOption1",
+        "DXFOption2": "literal incoming DXFOption2",
+        "DXFWFOption1": "literal incoming DXFWFOption1",
+        "DXFWFOption2": "literal incoming DXFWFOption2",
+        "VRMLOption1": "literal incoming VRMLOption1",
+        "VRMLOption2": "literal incoming VRMLOption2",
+        "ViewRptOption1": "literal incoming ViewRptOption1",
+        "LineRptOption1": "literal incoming LineRptOption1",
+        "VarDictOption1": "literal incoming VarDictOption1",
+        "VarDictOption2": "literal incoming VarDictOption2"
+      },
+      "queries": [
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Constructions",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Materials",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "unknown",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "CostInfo",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF:WireFrame",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "VRML",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Vertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Details",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DetailsWithVertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Lines",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "unknown",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "ViewFactorInfo",
+          "report_key": null,
+          "option1": "caller one",
+          "option2": "caller two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "EnergyManagementSystem",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "unknown",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Constructions",
+          "report_key": "Constructions",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        }
+      ]
+    },
+    {
+      "case_id": "incoming-read-cache-no-reread",
+      "input_mode": "process_input_idf",
+      "input_file": "fixtures/all-five.idf",
+      "initial_cache": {
+        "GetReportInput": false,
+        "SurfVert": true,
+        "SurfDet": true,
+        "SurfDetWVert": true,
+        "DXFReport": true,
+        "DXFWFReport": true,
+        "VRMLReport": true,
+        "CostInfo": true,
+        "ViewFactorInfo": true,
+        "Constructions": true,
+        "Materials": true,
+        "LineRpt": true,
+        "VarDict": true,
+        "EMSoutput": true,
+        "ShowDecayCurvesInEIO": true,
+        "OutputEMSActuatorAvailSmall": true,
+        "OutputEMSActuatorAvailFull": true,
+        "OutputEMSInternalVarsSmall": true,
+        "OutputEMSInternalVarsFull": true,
+        "OutputEMSErrors": true,
+        "OutputFullEMSTrace": true,
+        "DXFOption1": "literal incoming DXFOption1",
+        "DXFOption2": "literal incoming DXFOption2",
+        "DXFWFOption1": "literal incoming DXFWFOption1",
+        "DXFWFOption2": "literal incoming DXFWFOption2",
+        "VRMLOption1": "literal incoming VRMLOption1",
+        "VRMLOption2": "literal incoming VRMLOption2",
+        "ViewRptOption1": "literal incoming ViewRptOption1",
+        "LineRptOption1": "literal incoming LineRptOption1",
+        "VarDictOption1": "literal incoming VarDictOption1",
+        "VarDictOption2": "literal incoming VarDictOption2"
+      },
+      "queries": [
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Constructions",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Materials",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "unknown",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "CostInfo",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF:WireFrame",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "VRML",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Vertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Details",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DetailsWithVertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Lines",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "unknown",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "ViewFactorInfo",
+          "report_key": null,
+          "option1": "caller one",
+          "option2": "caller two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "EnergyManagementSystem",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "unknown",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Constructions",
+          "report_key": "Constructions",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        }
+      ]
+    },
+    {
+      "case_id": "getter-domain-unknown-blank-and-aliases",
+      "input_mode": "direct_getter_epjson",
+      "input_file": "fixtures/getter-unknowns.json",
+      "initial_cache": null,
+      "queries": [
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Constructions",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Materials",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "unknown",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "CostInfo",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF:WireFrame",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "VRML",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Vertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Details",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DetailsWithVertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Lines",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "unknown",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "ViewFactorInfo",
+          "report_key": null,
+          "option1": "caller one",
+          "option2": "caller two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "EnergyManagementSystem",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "unknown",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Constructions",
+          "report_key": "Constructions",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        }
+      ]
+    },
+    {
+      "case_id": "getter-domain-legacy-section",
+      "input_mode": "direct_getter_epjson",
+      "input_file": "fixtures/getter-legacy.json",
+      "initial_cache": null,
+      "queries": [
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Constructions",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Materials",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "unknown",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "CostInfo",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF:WireFrame",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "VRML",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Vertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Details",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DetailsWithVertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Lines",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "unknown",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "ViewFactorInfo",
+          "report_key": null,
+          "option1": "caller one",
+          "option2": "caller two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "EnergyManagementSystem",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "unknown",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Constructions",
+          "report_key": "Constructions",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        }
+      ]
+    },
+    {
+      "case_id": "getter-domain-ordered-EMS-reassignments",
+      "input_mode": "direct_getter_epjson",
+      "input_file": "fixtures/getter-ordered-ems.json",
+      "initial_cache": null,
+      "queries": [
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Constructions",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Materials",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "unknown",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "CostInfo",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF:WireFrame",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "VRML",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Vertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Details",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DetailsWithVertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Lines",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "unknown",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "ViewFactorInfo",
+          "report_key": null,
+          "option1": "caller one",
+          "option2": "caller two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "EnergyManagementSystem",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "unknown",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Constructions",
+          "report_key": "Constructions",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        }
+      ]
+    },
+    {
+      "case_id": "getter-domain-empty",
+      "input_mode": "direct_getter_epjson",
+      "input_file": "fixtures/getter-empty.json",
+      "initial_cache": null,
+      "queries": [
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Constructions",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "Materials",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "cOnStRuCtIoNs",
+          "report_key": "unknown",
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "CostInfo",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF:WireFrame",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "VRML",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Vertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Details",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DetailsWithVertices",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "Lines",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "unknown",
+          "option1": "first caller value",
+          "option2": "second caller value",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": null,
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "VariableDictionary",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": true
+        },
+        {
+          "report_name": "ViewFactorInfo",
+          "report_key": null,
+          "option1": "caller one",
+          "option2": "caller two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "EnergyManagementSystem",
+          "report_key": null,
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "unknown",
+          "report_key": null,
+          "option1": "keep one",
+          "option2": "keep two",
+          "DoReport_before": false
+        },
+        {
+          "report_name": "Surfaces",
+          "report_key": "DXF",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": true
+        },
+        {
+          "report_name": "Constructions",
+          "report_key": "Constructions",
+          "option1": null,
+          "option2": null,
+          "DoReport_before": false
+        }
+      ]
+    }
+  ]
+}

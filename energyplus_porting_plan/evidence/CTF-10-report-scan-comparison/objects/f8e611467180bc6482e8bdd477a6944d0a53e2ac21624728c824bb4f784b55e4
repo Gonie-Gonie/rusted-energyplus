@@ -1,0 +1,9 @@
+--- .runtime/porting/CTF-10/report-scan-validation-prep-03/before-02/README.md
++++ .runtime/porting/CTF-10/report-scan-validation-prep-03/README.md
+@@ -91,3 +91,6 @@
+ derivation rather than running it again, so QA requires that actual derivation
+ to precede completion02. No schema, policy, input, shape, pairing, or PE rule
+ changes. Predecessor01 remains immutable and was not executed.
++
++
++Fresh03 authenticates the full actual link-map SHA/size with the existing streamed full-file identity helper before parsing and rechecks it with all other full-file authorities. A single text pass retains only the three selected symbols with their latest text sections and actual target/core LOAD records. Unique selected symbols/target LOAD and literal provider/address rules remain mandatory. Six other runtime bodies are byte-identical02; no input, policy, result or comparison rule changes.02 remains immutable and unexecuted.

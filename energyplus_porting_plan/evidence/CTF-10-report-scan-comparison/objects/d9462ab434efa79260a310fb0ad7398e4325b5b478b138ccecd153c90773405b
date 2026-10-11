@@ -1,0 +1,129 @@
+--- /dev/null
++++ .runtime/porting/CTF-10/report-input-scan-native-prep-01/scan_unit_fields.hh
+@@ -0,0 +1,126 @@
++// Copies actual report/cache owners; no scan, defaulting or diagnostic calculation.
++#ifndef CTF10_SCAN_UNIT_FIELDS_HH
++#define CTF10_SCAN_UNIT_FIELDS_HH
++#include <EnergyPlus/Data/EnergyPlusData.hh>
++#include <EnergyPlus/DataErrorTracking.hh>
++#include <EnergyPlus/DataGlobals.hh>
++#include <EnergyPlus/DataIPShortCuts.hh>
++#include <EnergyPlus/DataRuntimeLanguage.hh>
++#include <EnergyPlus/DataStringGlobals.hh>
++#include <EnergyPlus/General.hh>
++#include <EnergyPlus/FileSystem.hh>
++#include <EnergyPlus/IOFiles.hh>
++#include <EnergyPlus/InputProcessing/InputProcessor.hh>
++#include <EnergyPlus/UtilityRoutines.hh>
++#include <EnergyPlus/SQLiteProcedures.hh>
++#include <nlohmann/json.hpp>
++#include <array>
++#include <fstream>
++#include <initializer_list>
++#include <iterator>
++#include <sstream>
++#include <stdexcept>
++
++#define SCAN_GENERAL_BOOL(X) X(GetReportInput) X(SurfVert) X(SurfDet) X(SurfDetWVert) X(DXFReport) X(DXFWFReport) X(VRMLReport) X(CostInfo) X(ViewFactorInfo) X(Constructions) X(Materials) X(LineRpt) X(VarDict) X(EMSoutput)
++#define SCAN_GENERAL_TEXT(X) X(DXFOption1) X(DXFOption2) X(DXFWFOption1) X(DXFWFOption2) X(VRMLOption1) X(VRMLOption2) X(ViewRptOption1) X(LineRptOption1) X(VarDictOption1) X(VarDictOption2)
++#define SCAN_EMS_BOOL(X) X(OutputEMSActuatorAvailSmall) X(OutputEMSActuatorAvailFull) X(OutputEMSInternalVarsSmall) X(OutputEMSInternalVarsFull) X(OutputEMSErrors) X(OutputFullEMSTrace)
++
++namespace ScanUnit {
++using json = nlohmann::json;
++inline void require(bool value, std::string const &message)
++{
++    if (!value) { throw std::runtime_error(message); }
++}
++inline void keys(json const &value, std::initializer_list<char const *> names)
++{
++    require(value.is_object() && value.size() == names.size(), "Exact input object required");
++    for (auto const *name : names) { require(value.contains(name), std::string("Missing input: ") + name); }
++}
++inline json read_json(fs::path const &path)
++{
++    std::ifstream stream(path);
++    require(stream.is_open(), "Input-only JSON file unavailable");
++    return json::parse(stream);
++}
++inline json cache(EnergyPlus::EnergyPlusData const &state)
++{
++    json result = json::object();
++#define COPY_GENERAL(name) result[#name] = state.dataGeneral->name;
++    SCAN_GENERAL_BOOL(COPY_GENERAL)
++    SCAN_GENERAL_TEXT(COPY_GENERAL)
++#undef COPY_GENERAL
++#define COPY_EMS(name) result[#name] = state.dataRuntimeLang->name;
++    SCAN_EMS_BOOL(COPY_EMS)
++#undef COPY_EMS
++    result["ShowDecayCurvesInEIO"] = state.dataGlobal->ShowDecayCurvesInEIO;
++    return result;
++}
++inline void seed_cache(EnergyPlus::EnergyPlusData &state, json const &input)
++{
++    if (input.is_null()) { return; }
++    auto const original = cache(state);
++    require(input.is_object() && input.size() == original.size(), "Complete input-only cache seed required");
++    for (auto const &[name, value] : original.items()) {
++        require(input.contains(name) && input.at(name).type() == value.type(), "Cache seed owner/type differs");
++    }
++#define SEED_BOOL(name) state.dataGeneral->name = input.at(#name).get<bool>();
++    SCAN_GENERAL_BOOL(SEED_BOOL)
++#undef SEED_BOOL
++#define SEED_TEXT(name) state.dataGeneral->name = input.at(#name).get<std::string>();
++    SCAN_GENERAL_TEXT(SEED_TEXT)
++#undef SEED_TEXT
++#define SEED_EMS(name) state.dataRuntimeLang->name = input.at(#name).get<bool>();
++    SCAN_EMS_BOOL(SEED_EMS)
++#undef SEED_EMS
++    state.dataGlobal->ShowDecayCurvesInEIO = input.at("ShowDecayCurvesInEIO").get<bool>();
++}
++inline json backend_context(EnergyPlus::EnergyPlusData const &state)
++{
++    return {{"TotalWarningErrors", state.dataErrTracking->TotalWarningErrors},
++            {"TotalWarningErrorsDuringWarmup", state.dataErrTracking->TotalWarningErrorsDuringWarmup},
++            {"TotalWarningErrorsDuringSizing", state.dataErrTracking->TotalWarningErrorsDuringSizing},
++            {"TotalSevereErrors", state.dataErrTracking->TotalSevereErrors},
++            {"WarmupFlag", state.dataGlobal->WarmupFlag}, {"DoingSizing", state.dataGlobal->DoingSizing},
++            {"KickOffSimulation", state.dataGlobal->KickOffSimulation},
++            {"DoingInputProcessing", state.dataGlobal->DoingInputProcessing},
++            {"printConsoleOutput", state.dataGlobal->printConsoleOutput}};
++}
++inline constexpr std::array<char const *, 5> families{
++    "Output:Surfaces:List", "Output:Surfaces:Drawing", "Output:VariableDictionary",
++    "Output:Constructions", "Output:EnergyManagementSystem"};
++inline json getter_records(EnergyPlus::EnergyPlusData &state)
++{
++    // These actual reads occur after all queries, so they do not consume first-scan input.
++    auto &ip = *state.dataInputProcessing->inputProcessor;
++    int const max_alpha = state.dataIPShortCut->cAlphaArgs.isize();
++    int const max_numeric = state.dataIPShortCut->rNumericArgs.isize();
++    ObjexxFCL::Array1D_string alphas(max_alpha), alpha_names(max_alpha), numeric_names(max_numeric);
++    ObjexxFCL::Array1D<double> numbers(max_numeric);
++    ObjexxFCL::Array1D_bool alpha_blank(max_alpha), numeric_blank(max_numeric);
++    json records = json::array();
++    for (auto const *family : families) {
++        int const count = ip.getNumObjectsFound(state, family);
++        for (int ordinal = 1; ordinal <= count; ++ordinal) {
++            int num_alpha = 0, num_numeric = 0, status = 0;
++            ip.getObjectItem(state, family, ordinal, alphas, num_alpha, numbers, num_numeric,
++                             status, numeric_blank, alpha_blank, alpha_names, numeric_names);
++            int const json_ordinal = ip.getJSONObjNum(state, family, ordinal);
++            auto object = ip.epJSON.at(family).begin();
++            std::advance(object, json_ordinal - 1);
++            json values = json::array(), blanks = json::array(), names = json::array();
++            // Full declared family width, including defaults outside NumAlphas; no synthesized third slot.
++            int width = 2;
++            if (std::string(family) == "Output:Surfaces:Drawing" || std::string(family) == "Output:EnergyManagementSystem") { width = 3; }
++            require(max_alpha >= width, "Actual getter buffer cannot represent declared family");
++            for (int index = 1; index <= width; ++index) {
++                values.push_back(alphas(index)); blanks.push_back(alpha_blank(index)); names.push_back(alpha_names(index));
++            }
++            records.push_back({{"family", family}, {"source_ordinal", ordinal}, {"json_ordinal", json_ordinal},
++                {"object_name", object.key()}, {"NumAlphas", num_alpha}, {"NumNumbers", num_numeric}, {"Status", status},
++                {"alphas", values}, {"alpha_blanks", blanks}, {"alpha_field_names", names}});
++        }
++    }
++    return records;
++}
++} // namespace ScanUnit
++#endif

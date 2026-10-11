@@ -1,0 +1,350 @@
+--- .runtime/porting/CTF-10/report-scan-validation-prep-01/before/predecessor-scan_common.py
++++ .runtime/porting/CTF-10/report-scan-validation-prep-01/scan_common.py
+@@ -1,4 +1,5 @@
+-"""Existing factual consumer transport/provenance reuse; no history evaluator."""
++"""Reuse contained packet/recorder custody for the bounded Scan unit stages."""
++import ast
+ from datetime import datetime, timezone
+ import hashlib
+ import importlib.util
+@@ -6,217 +7,152 @@
+ from pathlib import Path
+ 
+ PREP = Path(__file__).resolve().parent
+-SUPPORT = PREP.parent / 'surface-consumer05-original-data-review-prep-01'
+-QA = {'path': '.runtime/porting/CTF-10/surface-consumer05-original-data-review-prep-01/manifest.json', 'sha256': 'a27641042054dea917f17cbbf2f710e765496cfd7f3445f81bfcd35498b2a1a0'}
+-NATIVE = {'path': '.runtime/porting/CTF-10/surface-consumer-native-prep-05/manifest.json', 'sha256': '8eac3eb0ec2a28c91db06e5c9d02ab0611090b68095183569df58b8198a8a94c'}
+-API = {'path': '.runtime/porting/CTF-10/thermal-history-prep-01/manifest.json', 'sha256': '343fb38575bdf76f6fc6d671fae06a03422384b9b920dde65c2553acddcf5c83'}
+-POLICY = {'path': '.runtime/porting/CTF-10/surface-consumer05-root-workflow-prep-01/thermal-history-unit-policy.json', 'sha256': 'e26264adfab95edc104b29f8ac0d9259192b6a5e4e32963505f1dd93eb6cfd9d'}
+-OBSERVER = {'path': '.runtime/porting/CTF-10/thermal-history-rust-observer-prep-01/manifest.json', 'sha256': '202759a7affb854fbad35d9368d75fdfdb202de8376b5c7f96f29780842c1183'}
+-INPUTS = {'history_selected_initialization_input': 'initialize', 'history_update_entry_owners': 'update'}
+-HISTORIES = ['SurfInsideTempHist', 'SurfOutsideTempHist', 'SurfInsideFluxHist', 'SurfOutsideFluxHist']
+-MASTERS = [name + 'Master' for name in HISTORIES]
+-SCRATCH = ['QExt1', 'QInt1', 'TempInt1', 'TempExt1', 'SumTime']
+-REPORTS = ['SurfOpaqInsFaceCond', 'SurfOpaqInsFaceCondFlux', 'SurfOpaqOutFaceCond', 'SurfOpaqOutFaceCondFlux']
++IO_SHA = "ce1e2f98e975c5fb7d250af9c2503c9cd15aa86422d249ed807253d87cba13cf"
++NATIVE = {"path": ".runtime/porting/CTF-10/report-input-scan-native-prep-02/manifest.json", "sha256": "2e7270223af0ff188e5c7da4e0a6b2c308109da8d32ebda77366578a34afefba"}
++WRITER = {"path": ".runtime/porting/CTF-10/freeze-report-scan-inputs-01.py", "sha256": "3205087d6174e481546643f67b9978ba277d8346a99fbd1794742651bdafeb10"}
++COMPLETION = {"path": ".runtime/porting/CTF-10/complete-report-scan-native-01.py", "sha256": "2b68debc617f8eb26181902d2a21b796e62dcbcb1b83bbf87f7d9ecd07f82b32"}
++PE = {"path": "tools/porting/native_pe.py", "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56"}
++DERIVE = {"path": "tools/porting/derive_native_helper.py", "sha256": "3b39cc4562943692e43e11e4d2d7e1bc70f84a58e09c0fea28c0b85b8e905dcf"}
++LARGE = {}
++FILES = ["review_data.py", "project_inputs.py", "compare_units.py", "scan_common.py", "scan_shape.py", "scan_compare.py", "packet_io.py"]
++QA_OPTIONS = ["approved-source-sha256", "source-manifest", "native-execution", "results", "freeze-receipt", "freeze-execution", "build-review", "build-review-execution", "output-dir"]
+ 
+ 
+ def boot(name, filename, digest):
+-    path = SUPPORT / filename
+-    if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+-        raise ValueError('Reviewed factual dependency differs before import')
++    path = PREP / filename
++    if hashlib.sha256(path.read_bytes()).hexdigest() != digest: raise ValueError("Reviewed stdlib dependency differs before import")
+     spec = importlib.util.spec_from_file_location(name, path)
+     module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+     return module
+ 
+ 
+ def modules():
+-    return (boot('history_unit_io', 'packet_io.py', '7c91d59d774d4e3cc9141cc9f40d0ae9abdb736385f17bb2b9afcf295222a27d'),
+-            boot('history_unit_shape', 'event_shape.py', '15f49e7646649b8701d889962cb6756b5260fb2262551c2b299a446d8bdc9b17'),
+-            boot('history_unit_stream', 'stream_events.py', '8e7f05196fe567c052352d4d0fe501eb02a0f8e5a623c20f7dcd3db669f6bab8'))
++    m = boot("scan_packet_io", "packet_io.py", IO_SHA)
++    return m
+ 
+ 
+-def instant(text, need):
+-    value = datetime.fromisoformat(text.replace('Z', '+00:00'))
+-    need(value.tzinfo is not None, 'Aware actual command interval required')
++def full(m, row):
++    """Unbounded streamed binary/core identity; never load binary bytes as JSON."""
++    path = m.contained(row["path"]); digest = hashlib.sha256()
++    with path.open("rb") as handle:
++        for block in iter(lambda: handle.read(1048576), b""): digest.update(block)
++    actual = {"path": path.relative_to(m.ROOT).as_posix(), "sha256": digest.hexdigest(), "size_bytes": path.stat().st_size}
++    m.require(actual["sha256"] == row["sha256"] and ("size_bytes" not in row or (type(row["size_bytes"]) is int and row["size_bytes"] == actual["size_bytes"])), "Full binary/core identity differs")
++    LARGE[actual["path"]] = actual
++    return actual
++
++
++def recheck(m):
++    m.recheck()
++    for row in list(LARGE.values()): m.require(full(m, row) == row, "Full binary/core file changed during stage")
++
++
++def same(m, left, right):
++    m.require(m.contained(left["path"], existing=False) == m.contained(right["path"], existing=False) and left["sha256"] == right["sha256"], "Actual artifact path/SHA identities differ")
++    if "size_bytes" in left and "size_bytes" in right: m.require(type(left["size_bytes"]) is int and left["size_bytes"] == right["size_bytes"], "Actual artifact sizes differ")
++
++
++def instant(value, need):
++    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
++    need(parsed.tzinfo is not None, "Aware actual command interval required")
++    return parsed
++
++
++def recorded(m, ref, allowed=(0,), allow_failure=False):
++    value = m.load(ref)
++    known = type(value["exit_code"]) is int
++    unknown = value["exit_code"] is None and type(value["launch_error"]) is str and bool(value["launch_error"])
++    m.require(value["schema"] == "recorded-porting-command.v1" and (known or (allow_failure and unknown)) and
++              value["source_bytes_match_before_and_after"] is True and Path(value["cwd"]).resolve() == m.ROOT,
++              "Genuine source-preserving repository recorder required")
++    if not allow_failure: m.require(value["exit_code"] in allowed and value["launch_error"] is None, "Actual required recorded command exit differs")
++    m.require(instant(value["started_utc"], m.require) <= instant(value["finished_utc"], m.require) <= datetime.now(timezone.utc), "Actual preceding command interval required")
++    for key in ["stdout", "stderr", "source_snapshot"]: m.bind(value[key])
++    m.require(value["executed_launcher"]["historical_path"] == "tools/porting/record_command.py", "Actual recorder owner differs")
++    m.bind(value["executed_launcher"]["archive"])
+     return value
+ 
+ 
+-def same(m, left, right):
+-    m.require(m.contained(left['path'], existing=False) == m.contained(right['path'], existing=False) and
+-              left['sha256'] == right['sha256'], 'Actual direct artifact identities differ')
++def before(m, earlier, later):
++    m.require(instant(earlier["finished_utc"], m.require) <= instant(later["started_utc"], m.require), "Required predecessor completed after dependent invocation")
+ 
+ 
+-def large(m, row):
+-    """Full actual direct-unit files: no line/event/run-size cap or truncation."""
+-    path = m.contained(row['path'])
+-    actual = m.identity(path, max_bytes=path.stat().st_size)
+-    m.require(actual['sha256'] == row['sha256'] and ('size_bytes' not in row or
+-              (type(row['size_bytes']) is int and actual['size_bytes'] == row['size_bytes'])), 'Full streamed file identity differs')
+-    return actual
+-
+-
+-def large_argument(m, text):
+-    name, separator, digest = text.rpartition('#'); path = m.contained(name)
+-    m.require(separator and len(digest) == 64 and all(ch in '0123456789abcdef' for ch in digest), 'Full streamed file path#SHA required')
+-    value = m.identity(path, max_bytes=path.stat().st_size)
+-    m.require(value['sha256'] == digest, 'Full streamed input SHA differs')
+-    return value
+-
+-
+-def recorded(m, row, large_stdout=False, allowed_exit=(0,)):
+-    value = m.load(row)
+-    m.require(value['schema'] == 'recorded-porting-command.v1' and type(value['exit_code']) is int and
+-              value['exit_code'] in allowed_exit and value['launch_error'] is None and
+-              value['source_bytes_match_before_and_after'] is True and Path(value['cwd']).resolve() == m.ROOT,
+-              'Genuine successful source-preserving repository recorder required')
+-    m.require(instant(value['started_utc'], m.require) <= instant(value['finished_utc'], m.require) <= datetime.now(timezone.utc),
+-              'Actual preceding command interval differs')
+-    large(m, value['stdout']) if large_stdout else m.bind(value['stdout'])
+-    for key in ['stderr', 'source_snapshot']: m.bind(value[key])
+-    m.require(value['executed_launcher']['historical_path'] == 'tools/porting/record_command.py', 'Actual recorder owner differs')
+-    m.bind(value['executed_launcher']['archive'])
+-    return value
++def python_cli(m, command, source, names):
++    m.require(len(command) == 5 + 2 * len(names) and Path(command[0]).name.lower() in ["python", "python.exe"] and command[1:4] == ["-X", "utf8", "-B"] and m.contained(command[4]) == m.contained(source["path"]), "Actual reviewed Python CLI differs")
++    pairs = list(zip(command[5::2], command[6::2])); options = dict(pairs)
++    m.require(len(options) == len(pairs) and set(options) == {"--" + name for name in names}, "Exact recorded options required")
++    return options
+ 
+ 
+ def own(m, args, path):
+     manifest_ref = m.argument(args.source_manifest); manifest = m.load(manifest_ref)
+-    m.require(Path.cwd().resolve() == m.ROOT and m.identity(path)['sha256'] == args.approved_source_sha256,
+-              'Root-reviewed source and repository cwd required')
+-    paths = [PREP / name for name in ['project_inputs.py', 'compare_units.py', 'history_unit_common.py']]
+-    m.require([m.bind(row) for row in manifest['own_sources']] == [m.identity(p) for p in paths], 'Exact held three-source inventory required')
+-    return manifest_ref, paths
++    m.require(Path.cwd().resolve() == m.ROOT and m.identity(path)["sha256"] == args.approved_source_sha256 and manifest["schema"] == "ctf10-scan-unit-validation-source-preparation.v1", "Root-reviewed stage Source/cwd required")
++    paths = [PREP / name for name in FILES]
++    m.require([m.bind(row) for row in manifest["own_sources"]] == [m.identity(path) for path in paths], "Exact seven-source held inventory required")
++    return manifest_ref, manifest, paths
+ 
+ 
+-def original(m, args):
+-    refs = {name: m.argument(getattr(args, name.replace('-', '_'))) for name in ['original-data-review', 'original-data-review-execution']}
+-    qa, execution = m.load(refs['original-data-review']), recorded(m, refs['original-data-review-execution'])
+-    m.require(qa['schema'] == 'ctf10-surface-consumer05-independent-original-data-review.v1' and
+-              qa['status'] == 'pass-actual-full-event-custody-before-Rust' and qa['Original_capture_custody_released'] is True and
+-              qa['complete_actual_event_ledger_validated'] is True and qa['actual_event_counts_unknown'] is False and
+-              type(qa['actual_native_process_exit_code']) is int and qa['actual_native_process_exit_code'] == 0 and
+-              qa['actual_native_launch_error'] is None and not qa['observation_integrity_failures'] and
+-              qa['numerical_PASS_claimed'] is False and m.load(execution['stdout']) == qa,
+-              'Complete genuine preceding factual OriginalQA0/full stdout/release required')
+-    preparation = m.load(QA); same(m, qa['reviewed_reader_source_preparation'], QA)
+-    sources = [m.bind(row) for row in preparation['own_sources']]
+-    archives = qa['executed_reader_sources']
+-    m.require(len(sources) == len(archives) == 4, 'Exact executed factual reader4 required')
+-    for source, row in zip(sources, archives):
+-        m.bind(row['archive'])
+-        m.require(row['historical_path'] == source['path'] and row['archive']['sha256'] == source['sha256'], 'Executed factual source archive differs')
+-    command = execution['command']
+-    m.require(len(command) == 29 and Path(command[0]).name.lower() in ['python', 'python.exe'] and command[1:4] == ['-X', 'utf8', '-B'] and
+-              m.contained(command[4]) == m.contained(sources[0]['path']), 'Actual factual QA CLI differs')
+-    pairs = list(zip(command[5::2], command[6::2])); options = dict(pairs)
+-    names = ['approved-source-sha256', 'source-manifest', 'native-execution', 'results', 'freeze-receipt', 'freeze-execution',
+-             'build', 'build-execution', 'build-review', 'build-review-execution', 'literal-freeze-writer', 'output-dir']
+-    m.require(len(pairs) == len(options) == 12 and set(options) == {'--' + name for name in names} and
+-              options['--approved-source-sha256'] == sources[0]['sha256'] and
+-              m.contained(options['--output-dir'], existing=False) == m.contained(refs['original-data-review']['path']).parent,
+-              'Exact factual QA options/approval/output required')
+-    for option, field in [('source-manifest', 'reviewed_reader_source_preparation'), ('native-execution', 'reviewed_native_execution'),
+-            ('freeze-receipt', 'actual_packet_freeze'), ('freeze-execution', 'actual_packet_freeze_execution'), ('build', 'reviewed_build'),
+-            ('build-execution', 'reviewed_build_execution'), ('build-review', 'reviewed_build_review'), ('build-review-execution', 'reviewed_build_review_execution'),
+-            ('literal-freeze-writer', 'reviewed_literal_freeze_writer')]: same(m, m.argument(options['--' + option]), qa[field])
+-    result = m.bind_observation(qa['reviewed_results'])
+-    name, separator, digest = options['--results'].rpartition('#')
+-    m.require(separator and m.contained(name) == m.contained(result['path']) and digest == result['sha256'], 'Full actual observation argument differs')
+-    same(m, qa['reviewed_native_source_preparation'], NATIVE)
+-    freeze = m.load(qa['actual_packet_freeze']); same(m, freeze['native_source_manifest'], NATIVE)
+-    policy_ref = m.bind(freeze['thermal_history_direct_unit_policy']); policy = m.load(policy_ref)
+-    fixed_ref = m.bind(POLICY); fixed = m.load(fixed_ref); same(m, freeze['thermal_history_direct_unit_policy_source'], POLICY)
+-    m.require(policy_ref['sha256'] == fixed_ref['sha256'] and policy_ref['size_bytes'] == fixed_ref['size_bytes'], 'Frozen policy is a literal reviewed Source bytecopy')
+-    m.require(policy == fixed and policy['schema'] == 'ctf10-selected-thermal-history-direct-unit-policy.v1' and
+-              all(row['atol'] == row['rtol'] == 0.0 for row in policy['real_profiles_by_owner'].values()) and
+-              set(policy['real_profiles_by_owner']) == set(HISTORIES + MASTERS + SCRATCH + REPORTS), 'Exactly frozen17 zero profiles required')
+-    m.bind(API)
+-    return refs, qa, execution, freeze, policy_ref, policy
++def frozen(m, freeze_ref, execution_ref, shape):
++    packet = m.load(freeze_ref); command = recorded(m, execution_ref)
++    shape.keys(packet, ["schema", "source_preparation", "literal_request_source", "request", "inputs", "policies", "input_counts", "expected_values_supplied", "numeric_profiles", "scientific_execution_performed", "Root_freezer_source"], m.require, "freeze")
++    m.require(packet["schema"] == "ctf10-scan-unit-frozen-inputs.v1" and packet["expected_values_supplied"] is False and packet["scientific_execution_performed"] is False and packet["numeric_profiles"] == [], "Actual input-only freeze schema/claims differ")
++    same(m, packet["source_preparation"], NATIVE); same(m, packet["Root_freezer_source"], WRITER)
++    native = m.load(NATIVE); writer = m.bind(WRITER)
++    m.require(command["command"] == ["python", "-X", "utf8", "-B", writer["path"]], "Actual Root literal freezer CLI differs")
++    printed = ast.literal_eval(m.contained(command["stdout"]["path"]).read_text(encoding="utf-8").strip())
++    m.require(printed == m.bind(freeze_ref), "Exact compact actual freeze reference stdout required")
++    request = m.load(packet["request"]); literal = m.load(packet["literal_request_source"])
++    same(m, packet["literal_request_source"], native["input_fixture_proposal"])
++    m.require(shape.equal(request, literal) and m.bind(packet["request"])["sha256"] == m.bind(packet["literal_request_source"])["sha256"], "Frozen request must retain exact literal Source bytes")
++    m.require(shape.request(request, m.require) == packet["input_counts"] == {"cases": 12, "queries": 264}, "Exact12/264 input declarations required")
++    m.require(type(packet["inputs"]) is list and len(packet["inputs"]) == 12, "Every declared frozen input authority required")
++    for row, case, original in zip(packet["inputs"], request["cases"], native["resolved_case_input_sources"], strict=True):
++        shape.keys(row, ["case_id", "input_mode", "original_input", "actual_input"], m.require, "frozen input")
++        m.require((row["case_id"], row["input_mode"]) == (case["case_id"], case["input_mode"]), "Frozen case identity/order differs")
++        same(m, row["original_input"], original)
++        old, actual = m.bind(original), m.bind(row["actual_input"])
++        m.require(old["sha256"] == actual["sha256"] and old["size_bytes"] == actual["size_bytes"] and (m.contained(packet["request"]["path"]).parent / case["input_file"]).resolve() == m.contained(actual["path"]), "Actual helper input location/bytecopy differs")
++    shape.keys(packet["policies"], ["observation_policy_proposal", "input_projection_contract_proposal"], m.require, "frozen policies")
++    for key, ref in packet["policies"].items():
++        actual, source = m.bind(ref), m.bind(native[key])
++        m.require(actual["sha256"] == source["sha256"] and actual["size_bytes"] == source["size_bytes"], "Literal pre-output policy/projection bytes differ")
++    for row in native["runtime_interfaces"]["native_source_files"]: m.bind(row)
++    for row in native["source_contexts"]:
++        if row["path"].startswith(".reference/"): m.bind(row)
++    for row in native["selected_source_ranges"]:
++        raw = b"".join(m.contained(row["path"]).read_bytes().splitlines(keepends=True)[row["start_line"] - 1:row["end_line"]])
++        m.require(hashlib.sha256(raw).hexdigest() == row["sha256"] and len(raw) == row["size_bytes"], "Actual selected Source range differs")
++    return packet, request, native, command
+ 
+ 
+-def case(event, ordinal):
+-    return {'schema': 'ctf10-thermal-history-direct-unit-input.v1', 'case_ordinal': ordinal,
+-            'operation': INPUTS[event['checkpoint']], 'input_event': event}
++def original(m, args, shape, manifest_ref, manifest):
++    refs = {name: m.argument(getattr(args, name.replace("-", "_"))) for name in ["original-data-review", "original-data-review-execution"]}
++    qa, execution = m.load(refs["original-data-review"]), recorded(m, refs["original-data-review-execution"])
++    m.require(qa["schema"] == "ctf10-scan-unit-independent-original-data-review.v1" and qa["status"] == "pass-actual-Scan-custody-before-Rust" and qa["Original_capture_custody_released"] is True and qa["actual_counts_unknown"] is False and not qa["observation_integrity_failures"] and qa["numerical_PASS_claimed"] is False and shape.equal(m.load(execution["stdout"]), qa), "Actual complete OriginalQA0/full stdout/release required")
++    same(m, qa["reviewed_reader_source_preparation"], manifest_ref)
++    sources = [m.bind(row) for row in manifest["own_sources"]]
++    archives = qa["executed_reader_sources"]
++    m.require(len(archives) == len(sources), "Every executed reader Source archive required")
++    for source, archived in zip(sources, archives, strict=True):
++        copied = m.bind(archived["archive"])
++        m.require(archived["historical_path"] == source["path"] and copied["sha256"] == source["sha256"] and copied["size_bytes"] == source["size_bytes"], "Actual executed reader archive differs")
++    options = python_cli(m, execution["command"], sources[0], QA_OPTIONS)
++    m.require(options["--approved-source-sha256"] == sources[0]["sha256"], "Actual approved reader Source differs")
++    same(m, m.argument(options["--source-manifest"]), manifest_ref)
++    for name, key in [("native-execution", "actual_native_execution"), ("results", "actual_native_results"), ("freeze-receipt", "actual_packet_freeze"), ("freeze-execution", "actual_freeze_execution"), ("build-review", "actual_build_review"), ("build-review-execution", "actual_build_review_execution")]: same(m, m.argument(options["--" + name]), qa[key])
++    m.require(m.contained(options["--output-dir"], existing=False) == m.contained(refs["original-data-review"]["path"]).parent, "Actual QA output owner differs")
++    packet, request, native, frozen_command = frozen(m, qa["actual_packet_freeze"], qa["actual_freeze_execution"], shape)
++    actual = recorded(m, qa["actual_native_execution"]); before(m, frozen_command, actual); before(m, actual, execution)
++    same(m, actual["stdout"], qa["actual_native_results"])
++    result = m.load(qa["actual_native_results"])
++    m.require(shape.review(result, request, m.require) == qa["actual_observation_counts"], "Complete actual Original ledger/count revalidation differs")
++    return refs, qa, execution, packet, request, result
+ 
+ 
+-def line(value):
+-    return json.dumps(value, ensure_ascii=False, allow_nan=False, separators=(',', ':')).encode('utf8')
+-
+-
+-def event_key(event):
+-    return {'state_address': event['clock']['state_address'], **{key: event[key] for key in ['procedure', 'invocation_ordinal', 'event_ordinal', 'checkpoint']}}
+-
+-
+-def review_stream(m, shape, stream, qa, visit):
+-    native = m.load(NATIVE)
+-    additions = next(row for row in native['own_source_and_metadata'] if Path(row['path']).name == 'additions.json')
+-    review = shape.Review(m.require, shape.checkpoint_spec(m.load(additions), m.require))
+-    def checked(event):
+-        review.visit(event); visit(event)
+-    header = stream.read(m.contained(qa['reviewed_results']['path']), m.require, m.unique_object, checked)
+-    counts = review.finish(header['summary'])
+-    m.require(header['schema'] == 'ctf10-surface-consumer-native-observation.v1' and
+-              header['actual_native_arguments'][1:] == qa['reviewed_forwarded_native_arguments'] and
+-              counts == qa['actual_observation_counts'] and not counts['copy_or_stream_integrity_failed'] and
+-              counts['required_lifecycle_owners_reached'], 'Full actual factual stream/count/custody differs')
+-    m.bind_observation(qa['reviewed_results'])
+-    return counts
+-
+-
+-def state(event, need):
+-    """Transpose complete actual owners only; never evaluate a history equation."""
+-    context = event['history_entry_context'] if event['checkpoint'] == 'history_update_entry_owners' else event['history_boundary_context']
+-    ids = [row['index'] for row in context['allocated_surfaces']]; total = context['TotSurfaces']
+-    need(total > 0 and ids == list(range(1, total + 1)), 'Complete nonempty actual allocated layout required')
+-    rows = event['owners'] + context['non_AllHT_history_owners']
+-    by_id = {row['surface_index']: row for row in rows}
+-    need(len(by_id) == len(rows) == total and set(by_id) == set(ids), 'All actual history columns required')
+-    def matrix(name):
+-        flags = [by_id[index][name]['allocated'] for index in ids]
+-        if not any(flags): return None
+-        need(all(flags), 'Mixed history allocation is unrepresentable')
+-        out = [[] for _ in range(19)]
+-        for index in ids:
+-            value = by_id[index][name]
+-            need(value['lower'] == 1 and value['upper'] == 19 and len(value['terms']) == 19, 'Actual full19 bounds required')
+-            for position, term in enumerate(value['terms']):
+-                need(term['term'] == position + 1 and term['surface_allocated'] is True and
+-                     term['surface_lower'] == 1 and term['surface_upper'] == total and term['value'] is not None,
+-                     'Actual complete allocated history row required')
+-                out[position].append(term['value'])
+-        return out
+-    def vector(value):
+-        if value['allocated'] is False: return None
+-        need(value['lower'] == 1 and value['upper'] == total and [row['index'] for row in value['values']] == ids,
+-             'Full actual vector bounds/order required')
+-        return [row['value'] for row in value['values']]
+-    normal = {name: matrix(name) for name in HISTORIES}
+-    need(all(value is not None for value in normal.values()), 'Required actual normal histories absent')
+-    masters = {name: matrix(name) for name in MASTERS}; counters = vector(context['SurfCurrNumHist'])
+-    for position, index in enumerate(ids):
+-        need(by_id[index]['SurfCurrNumHist'] == (None if counters is None else counters[position]), 'Same-owner counter copies differ')
+-    if counters is None and all(value is None for value in masters.values()): masters = None
+-    else:
+-        need(counters is not None and all(value is not None for value in masters.values()), 'Joint master/counter allocation required')
+-        masters['SurfCurrNumHist'] = counters
+-    scratch = {name: vector(context['scratch'][name]) for name in SCRATCH}
+-    if all(value is None for value in scratch.values()): scratch = None
+-    else: need(all(value is not None for value in scratch.values()), 'Partial scratch allocation is unrepresentable')
+-    reports = {name: vector(context['flux_reports'][name]) for name in REPORTS}
+-    need(all(value is not None for value in reports.values()), 'Complete actual report owners required')
+-    return {'schema': 'ctf10-selected-thermal-history-state.v1', 'surface_ids': ids,
+-            'layout': {'surface_lower': 1, 'surface_upper': total, 'term_lower': 1, 'term_upper': 19},
+-            'normal': normal, 'masters': masters, 'scratch': scratch,
+-            'update_first_time': event['clock']['UpdateThermalHistoriesFirstTimeFlag'], 'flux_reports': reports}
+-
+-
+-def context(event, need):
+-    catalog = event['current_history_catalog']; spaces = {row['index']: row for row in catalog['spaces']}
+-    groups = {'heat_transfer_groups': [], 'opaque_groups': []}
+-    for zone in catalog['zones']:
+-        for index in zone['spaceIndexes']:
+-            need(index in spaces, 'Actual traversed Space owner required'); space = spaces[index]
+-            for key, first, last in [('heat_transfer_groups', 'HTSurfaceFirst', 'HTSurfaceLast'),
+-                                      ('opaque_groups', 'OpaqOrIntMassSurfaceFirst', 'OpaqOrIntMassSurfaceLast')]:
+-                groups[key].append(list(range(space[first], space[last] + 1)))
+-    value = {key: event['clock'][key] for key in ['SimpleCTFOnly', 'AnyEMS', 'AnyConstrOverrides',
+-                                                  'AnyInternalHeatSourceInInput', 'MaxCTFTerms', 'TimeStepZone']}
+-    return {**value, **groups, 'AllHTSurfaceList': catalog['AllHTSurfaceList']}
++def projection_value(m, refs, qa, packet, request, original):
++    authorities = {"actual_packet_freeze": qa["actual_packet_freeze"], "actual_freeze_execution": qa["actual_freeze_execution"], "reviewed_original_data": refs["original-data-review"], "reviewed_original_data_execution": refs["original-data-review-execution"], "actual_native_execution": qa["actual_native_execution"], "actual_native_results": qa["actual_native_results"], "frozen_input_sources": packet["inputs"], "frozen_policies": packet["policies"]}
++    cases = []
++    for supplied, source, observed in zip(request["cases"], packet["inputs"], original["cases"], strict=True):
++        text = m.contained(source["actual_input"]["path"]).read_bytes().decode("utf-8") if supplied["input_mode"] == "process_input_idf" else None
++        cases.append({"case_id": supplied["case_id"], "input_mode": supplied["input_mode"], "input_only_epjson": observed["input_owner"]["epJSON"], "idf_text": text, "initial_cache": supplied["initial_cache"], "queries": supplied["queries"]})
++    return {"schema": "ctf10-scan-unit-input-projection.v1", "expected_values_supplied": False, "actual_input_authorities": authorities, "cases": cases}

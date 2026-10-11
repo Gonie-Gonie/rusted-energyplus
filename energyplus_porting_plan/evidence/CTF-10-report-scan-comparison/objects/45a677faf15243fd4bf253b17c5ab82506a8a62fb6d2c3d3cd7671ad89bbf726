@@ -1,0 +1,2 @@
+{"receipt": {"path": ".runtime/porting/CTF-10/report-scan-native-build-02/derivation/receipt.json", "sha256": "595d3dd447cd80fe3e6fddf501e3d6ab0c4219ce35e2a9e56fdec2d81f6dfc50"}, "status": "pass-exact-retained-runtime-sections-and-directories"}
+{"receipt": {"path": ".runtime/porting/CTF-10/report-scan-native-build-02/derive-command-01/receipt.json", "sha256": "25f21f169fe83fec7d4ceded00fb78e7f77c441f4acadad8cb1ce9760de40d96"}, "exit_code": 0, "source_bytes_match_before_and_after": true}

@@ -97,6 +97,11 @@ The [report-input and Scan evidence](../evidence/CTF-10-report-input-scan/summar
 Same-input genuine Native getter/cache/query comparison remains pending. The scan is not yet called by the ordinary whole-Init postlude; predefined/EIO reporting and final fatal backend composition remain pending.
 This milestone promotes no card gate; the earlier activation replay and ordinary CLI results retain their own recorded source identity.
 
+## Actual selected Scan comparison
+
+The genuine EnergyPlus helper and current Rust observer executed the same frozen inputs. All12 cases,264 queries,64 getter records and4 ordered diagnostics passed21,405 exact comparisons with0 mismatches and no missing or unavailable records. All31 cache members, optional arguments, getter contents and query association were required.
+The [selected Scan comparison evidence](../evidence/CTF-10-report-scan-comparison/summary.json) retains actual build, input, QA, projection and execution records. Backend streams/counters, Rust-only default metadata and Native-only getter metadata remain explicitly unpaired. Whole Init and production integration are pending; no card gate is promoted.
+
 ## Report output and error backend implementation
 
 Actual compiler names, construction layers, retained predefined string entries and borrowed EIO output are implemented. Source warning/continue/fatal output, counters, optional callbacks and SQLite adapter boundaries retain their real order and output prefix on failure.

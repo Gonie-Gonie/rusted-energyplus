@@ -1,0 +1,8 @@
+Version,26.1;
+Timestep,4;
+Building,ScanUnit,0,Suburbs,0.04,0.4,FullExterior,25,6;
+GlobalGeometryRules,UpperLeftCorner,Counterclockwise,Relative;
+Output:Surfaces:Drawing,DXF,,;
+Output:VariableDictionary,,;
+Output:Constructions,,Materials;
+Output:EnergyManagementSystem,,,;

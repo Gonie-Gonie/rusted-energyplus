@@ -1,0 +1,117 @@
+"""Seal actual exact Scan comparison and record its bounded scope in plan views."""
+import hashlib
+import json
+import shutil
+from pathlib import Path
+
+ROOT = Path.cwd().resolve()
+BASE = ROOT / '.runtime/porting/CTF-10'
+OUT = ROOT / 'energyplus_porting_plan/evidence/CTF-10-report-scan-comparison'
+SOURCE = '3f7582828a91af70bfca8aa3c0094cbaa5d8075ff5ee0a89c020d50fb48c3811'
+def read(path): return json.loads(path.read_bytes())
+def ref(path):
+    data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(data).hexdigest(), 'size_bytes': len(data)}
+def exact(row):
+    path = ROOT / row['path']
+    assert ref(path)['sha256'] == row['sha256']
+    return path
+def write(path, value): path.write_bytes((json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode())
+
+comparison_path = BASE / 'report-scan-unit-comparison-01/comparison.json'
+comparison = read(comparison_path)
+assert comparison['selected_Scan_unit_comparison_passed'] is True
+counts = comparison['actual_observation_counts']
+assert counts == {'cases': 12, 'actual_queries': 264, 'actual_getter_records': 64, 'actual_diagnostics': 4, 'actual_query_diagnostics': 4, 'actual_preparation_diagnostics': 0}
+paired = comparison['comparison']
+assert paired['discrete_comparisons'] == 21405 and paired['numeric_comparisons'] == 0
+assert paired['mismatch_count'] == 0 and paired['mismatch_records_dropped'] == 0 and not paired['complete_mismatch_ledger'] and not paired['unavailable_observations']
+assert comparison['actual_Rust_source_snapshot']['sha256'] == SOURCE
+qa = read(exact(comparison['actual_original_data_review']))
+assert qa['Original_capture_custody_released'] is True and qa['actual_observation_counts'] == counts
+assert ref(ROOT / 'crates/ep_run/examples/ctf10_report_scan_unit_observer.rs')['sha256'] == comparison['actual_candidate_source']['sha256']
+assert not OUT.exists()
+(OUT / 'objects').mkdir(parents=True)
+selected = []
+seen = set()
+def store(path, role):
+    path = path.resolve()
+    assert path.is_relative_to(ROOT) and path.suffix.lower() not in ['.exe', '.dll', '.rlib', '.obj', '.a', '.map', '.epw']
+    original = ref(path)
+    key = (original['path'], original['sha256'])
+    if key in seen: return
+    seen.add(key)
+    destination = OUT / 'objects' / original['sha256']
+    if not destination.exists(): shutil.copyfile(path, destination)
+    assert destination.read_bytes() == path.read_bytes()
+    selected.append({'role': role, 'original': original, 'stored': ref(destination)})
+def command(name):
+    path = BASE / name / 'receipt.json'
+    receipt = read(path)
+    store(path, 'actual-command')
+    for key in ['stdout', 'stderr', 'source_snapshot']: store(exact(receipt[key]), 'actual-command/' + key)
+    store(exact(receipt['executed_launcher']['archive']), 'actual-command/recorder-source')
+    return receipt
+
+for name in ['report-scan-freeze-command-01', 'report-scan-native-build-launch-command-02',
+             'report-scan-native-build-launch-command-03', 'report-scan-native-build-01/configure-command-01',
+             'report-scan-native-complete-command-01',
+             'report-scan-native-complete-command-02', 'report-scan-native-execution-command-01',
+             'report-scan-native-launch-command-01', 'report-scan-rust-build-command-01',
+             'report-scan-original-data-review-command-01', 'report-scan-input-projection-command-01',
+             'report-scan-rust-execution-command-01', 'report-scan-unit-comparison-command-01',
+             'report-scan-stages-command-01', 'report-scan-build-storage-command-01']:
+    receipt = command(name)
+    assert receipt['source_bytes_match_before_and_after'] is True
+    assert receipt['exit_code'] == (1 if name in ['report-scan-native-build-launch-command-02', 'report-scan-native-complete-command-01'] else 0)
+build = read(BASE / 'report-scan-native-build-02/native-build.json')
+assert build['status'] == 'pass-actual-one-TU-and-core-provider'
+for key in ['configure_execution', 'dry_build_execution', 'compile_execution', 'derivation_execution']:
+    command(exact(build[key]).parent.relative_to(BASE).as_posix())
+for name in ['report-scan-frozen-inputs-01', 'report-scan-original-data-review-01',
+             'report-scan-input-projection-01', 'report-scan-unit-comparison-01', 'report-scan-build-storage-01']:
+    for path in sorted((BASE / name).rglob('*')):
+        if path.is_file(): store(path, 'actual-stage/' + name)
+for name in ['report-input-scan-native-prep-01', 'report-input-scan-native-prep-02',
+             'report-scan-validation-prep-01', 'report-scan-validation-prep-02', 'report-scan-validation-prep-03']:
+    for path in sorted((BASE / name).rglob('*')):
+        if path.is_file(): store(path, 'reviewed-source/' + name)
+for name in ['freeze-report-scan-inputs-01.py', 'build-report-scan-native-01.py', 'build-report-scan-native-02.py',
+             'complete-report-scan-native-01.py', 'complete-report-scan-native-02.py', 'run-report-scan-native-01.py',
+             'run-report-scan-stages-01.py', 'compress-report-scan-build-01.py', 'report-scan-additive-reference-01.cmake']:
+    store(BASE / name, 'actual-Root-source')
+for key in ['preservation', 'link_provider_verification', 'validated_derivative']: store(exact(build[key]), 'actual-native-build')
+store(BASE / 'report-scan-native-build-02/native-build.json', 'actual-native-build')
+for key in ['original_before', 'original_after', 'derived', 'comparison']:
+    store(exact(read(exact(build['validated_derivative']))['maps'][key]), 'actual-PE-map')
+store(Path(__file__).resolve(), 'actual-finalization-source')
+write(OUT / 'manifest.json', {'schema': 'ctf10-scan-unit-selected-evidence.v1', 'selected_files': selected,
+    'selected_archive_is_transitive_replay_closure': False, 'binary_payloads_committed': False, 'gates_updated': False})
+summary = {'schema': 'ctf10-scan-unit-actual-comparison-milestone.v1', 'card': 'CTF-10',
+    'status': 'PASS exact selected same-input Scan/getter/cache/diagnostic comparison; whole Init and production integration pending.',
+    'actual_comparison': ref(comparison_path), 'selected_evidence_manifest': ref(OUT / 'manifest.json'),
+    'actual_observation_counts': counts, 'comparison': paired, 'actual_candidate_source': comparison['actual_candidate_source'],
+    'actual_Rust_source_snapshot': comparison['actual_Rust_source_snapshot'], 'unpaired_context': comparison['unpaired_context'],
+    'validated_native_build': ref(BASE / 'report-scan-native-build-02/native-build.json'),
+    'failed_then_corrected_build_lineage': 'Initial graph assertion and initial completion namespace assertion failed; corrected additive graph and actual InputProcessor namespace are retained. Historical validation01/02 were not executed.',
+    'remaining': ['Native F/G formatting byte comparison.', 'Complete registry, real severe producers and ordinary whole-Init output composition.', 'Ordinary persistent Native/Rust numerical integration and remaining CTF prerequisites.'],
+    'whole_Init_or_production_PASS_claimed': False, 'complete_CTF10_PASS_claimed': False, 'gates_updated': False}
+write(OUT / 'summary.json', summary)
+plan_path = ROOT / 'energyplus_porting_plan/plan.json'
+plan = read(plan_path)
+task = next(row for row in plan['tasks'] if row['id'] == 'CTF-10')
+assert 'actual_report_scan_unit_comparison' not in task
+task['actual_report_scan_unit_comparison'] = ref(OUT / 'summary.json')
+write(plan_path, plan)
+card_path = ROOT / 'energyplus_porting_plan/cards/CTF-10.md'
+card = card_path.read_text(encoding='utf-8')
+anchor = '## Report output and error backend implementation\n'
+assert card.count(anchor) == 1
+section = '## Actual selected Scan comparison\n\nThe genuine EnergyPlus helper and current Rust observer executed the same frozen inputs. All12 cases,264 queries,64 getter records and4 ordered diagnostics passed21,405 exact comparisons with0 mismatches and no missing or unavailable records. All31 cache members, optional arguments, getter contents and query association were required.\nThe [selected Scan comparison evidence](../evidence/CTF-10-report-scan-comparison/summary.json) retains actual build, input, QA, projection and execution records. Backend streams/counters, Rust-only default metadata and Native-only getter metadata remain explicitly unpaired. Whole Init and production integration are pending; no card gate is promoted.\n\n'
+card_path.write_bytes(card.replace(anchor, section + anchor).encode())
+checklist_path = ROOT / 'energyplus_porting_plan/CHECKLIST.md'
+checklist = checklist_path.read_text(encoding='utf-8')
+anchor = '| [ ] | [CTF-10]'
+assert checklist.count(anchor) == 1
+checklist_path.write_bytes(checklist.replace(anchor, 'CTF-10의 실제 원본·Rust 조회 비교는 12개 입력·264개 조회·21,405개 항목에서 차이 0으로 통과했습니다. [비교 증거](evidence/CTF-10-report-scan-comparison/summary.json)를 보존했으며 전체 초기화·일반 실행 통합은 계속 진행합니다.\n\n' + anchor).encode())
+print(json.dumps(ref(OUT / 'summary.json')), flush=True)

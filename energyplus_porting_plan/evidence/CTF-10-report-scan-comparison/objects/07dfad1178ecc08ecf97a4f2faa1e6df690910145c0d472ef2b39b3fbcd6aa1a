@@ -1,0 +1,291 @@
+{
+  "schema": "ctf10-scan-unit-independent-original-data-review.v1",
+  "status": "pass-actual-Scan-custody-before-Rust",
+  "Original_capture_custody_released": true,
+  "reviewed_reader_source_preparation": {
+    "path": ".runtime/porting/CTF-10/report-scan-validation-prep-03/manifest.json",
+    "sha256": "0edc9179c9e79f4769b9fff91deaf11a11891d5a207b62da1cf57ece2527f8e9",
+    "size_bytes": 45935
+  },
+  "executed_reader_source": {
+    "path": ".runtime/porting/CTF-10/report-scan-validation-prep-03/review_data.py",
+    "sha256": "1ee056fa19c58ea0e028702489021b238dcea1774510aa152c8030666d4dd77f",
+    "size_bytes": 12174
+  },
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/CTF-10/report-scan-validation-prep-03/review_data.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/000-review_data.py",
+        "sha256": "1ee056fa19c58ea0e028702489021b238dcea1774510aa152c8030666d4dd77f",
+        "size_bytes": 12174
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/report-scan-validation-prep-03/project_inputs.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/001-project_inputs.py",
+        "sha256": "bb338c0653afd4da0b2b95138362aea748970f45cf7b06657d6d5fd649862ffa",
+        "size_bytes": 2655
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/report-scan-validation-prep-03/compare_units.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/002-compare_units.py",
+        "sha256": "e8000bbea91168a0ca488f97c63c23d13a66025cd82f2b60446ce7c08ca8d92f",
+        "size_bytes": 10284
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/report-scan-validation-prep-03/scan_common.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/003-scan_common.py",
+        "sha256": "85abffa8f5d78de6e67f10ca56987f82a39a8bffa9abcf7d383af86fafe0473e",
+        "size_bytes": 12960
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/report-scan-validation-prep-03/scan_shape.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/004-scan_shape.py",
+        "sha256": "54dd3cf3ec618e6ff2d82475fe0d7d85e8aca5f88a3b2d8384ee96fa078caafa",
+        "size_bytes": 13040
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/report-scan-validation-prep-03/scan_compare.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/005-scan_compare.py",
+        "sha256": "f3375f45bd1a440833b0cca0fa3962b527e25ceec97da39205c554a483332418",
+        "size_bytes": 8945
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/report-scan-validation-prep-03/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/006-packet_io.py",
+        "sha256": "ce1e2f98e975c5fb7d250af9c2503c9cd15aa86422d249ed807253d87cba13cf",
+        "size_bytes": 3893
+      }
+    }
+  ],
+  "reviewed_source_archives": [
+    {
+      "historical_path": ".runtime/porting/CTF-10/report-input-scan-native-prep-01/scan_unit_helper.cpp",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/100-scan_unit_helper.cpp",
+        "sha256": "3e4445d53fcdbd7205d7709e8dce26a54798d76c1e78d390d3029c3b6c1151a7",
+        "size_bytes": 12173
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/report-input-scan-native-prep-01/scan_unit_fields.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/101-scan_unit_fields.hh",
+        "sha256": "627a68643e2a844c82c09927fd8911adbbfb73d802a91791d39f56f93417eaf0",
+        "size_bytes": 6675
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/report-input-scan-native-prep-01/scan_unit_reference.cmake",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/102-scan_unit_reference.cmake",
+        "sha256": "76796e8cb4e6aa59a0d8cd2acbf243f9052c3c435713c5b7b168452fe0655d9d",
+        "size_bytes": 1924
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/freeze-report-scan-inputs-01.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/103-freeze-report-scan-inputs-01.py",
+        "sha256": "3205087d6174e481546643f67b9978ba277d8346a99fbd1794742651bdafeb10",
+        "size_bytes": 2503
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/CTF-10/complete-report-scan-native-02.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/104-complete-report-scan-native-02.py",
+        "sha256": "9c75f5a219d5020ed5c2e5b12c0d24598849a2dd0c868291af8043f5b828f009",
+        "size_bytes": 5250
+      }
+    },
+    {
+      "historical_path": "tools/porting/native_pe.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/105-native_pe.py",
+        "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+        "size_bytes": 20217
+      }
+    },
+    {
+      "historical_path": "tools/porting/derive_native_helper.py",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/106-derive_native_helper.py",
+        "sha256": "3b39cc4562943692e43e11e4d2d7e1bc70f84a58e09c0fea28c0b85b8e905dcf",
+        "size_bytes": 12713
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/General.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/107-General.cc",
+        "sha256": "7ffbd1fe67b1d9806c169c6cd40e08a039a1c8692a93622137f07200cea02658",
+        "size_bytes": 66243
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/General.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/108-General.hh",
+        "sha256": "d7dcfac7390ef66dfee198739e1886110c494dd54ef953d204bad78d710eb021",
+        "size_bytes": 17396
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/109-InputProcessor.cc",
+        "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+        "size_bytes": 122929
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/110-InputProcessor.hh",
+        "sha256": "e99fa1600d88921975c45fcbca9c9c95985ea04d58eb02b0bdab049e2757463d",
+        "size_bytes": 14108
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/111-DataGlobals.hh",
+        "sha256": "2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25",
+        "size_bytes": 13547
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataRuntimeLanguage.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/112-DataRuntimeLanguage.hh",
+        "sha256": "23956875a5223d1302fed2f0006b92b5ffd82ef5391de339f898d6ddf3839316",
+        "size_bytes": 43065
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataIPShortCuts.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/113-DataIPShortCuts.hh",
+        "sha256": "14a4bb5259c6f6af69ae9597ad88dacc3db59639f974f8fc765f58acff05c6c6",
+        "size_bytes": 4197
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataErrorTracking.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/114-DataErrorTracking.hh",
+        "sha256": "966cc13df0bd9ff48d9995a390bce9005e141f45e534438591ff96f6614b7f58",
+        "size_bytes": 18669
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/115-UtilityRoutines.cc",
+        "sha256": "87bd8b6fac7001e26ffc08f5e3457a3f644098793a2734524c56de946c761ff2",
+        "size_bytes": 81995
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/idd/Energy+.idd.in",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/116-Energy+.idd.in",
+        "sha256": "62c94fef08c6a90f08630c6250a9f19d9dd701f249e2ff631070511ebfba651f",
+        "size_bytes": 4504288
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Optional.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/117-Optional.hh",
+        "sha256": "508becb92b04e3a78eef52e63ac887c3aa290b986e22b073d15541af2add2e9c",
+        "size_bytes": 4850
+      }
+    },
+    {
+      "historical_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/FileSystem.hh",
+      "archive": {
+        "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/118-FileSystem.hh",
+        "sha256": "c4e1aea5643a7d5fa01ff807dc269cf8010c81ada59ca61309c5595df8598a3a",
+        "size_bytes": 15195
+      }
+    }
+  ],
+  "actual_native_execution": {
+    "path": ".runtime/porting/CTF-10/report-scan-native-execution-command-01/receipt.json",
+    "sha256": "bd305b2a224ae79fa77c1fb3ace3040795c2e30eff408094fb52f8b90668a69b",
+    "size_bytes": 2896
+  },
+  "actual_native_results": {
+    "path": ".runtime/porting/CTF-10/report-scan-native-execution-command-01/stdout.log",
+    "sha256": "2c98e08b7b255675691b35a8f62e82071ae4ea5a3073308f709b1963f3f7d8f3",
+    "size_bytes": 757367
+  },
+  "actual_packet_freeze": {
+    "path": ".runtime/porting/CTF-10/report-scan-frozen-inputs-01/freeze.json",
+    "sha256": "01d4f82e67bc68ed2f6bc552e5d471422cc0850fafbd7fed42af19d9f8cf6365",
+    "size_bytes": 8954
+  },
+  "actual_freeze_execution": {
+    "path": ".runtime/porting/CTF-10/report-scan-freeze-command-01/receipt.json",
+    "sha256": "5504bd829e59bc94e45831aa50b2edff1e3023f1c49641ef18be0abe32a447a2",
+    "size_bytes": 3917
+  },
+  "actual_build_review": {
+    "path": ".runtime/porting/CTF-10/report-scan-native-build-02/native-build.json",
+    "sha256": "ecbb0187b20d67ca5160a1f3059e48fc4ed7784244a9e2f8ebd91225792d34f3",
+    "size_bytes": 3812
+  },
+  "actual_build_review_execution": {
+    "path": ".runtime/porting/CTF-10/report-scan-native-complete-command-02/receipt.json",
+    "sha256": "6d19b9a21c6a338b9830752f106b9a1fd7cde1866f09eaa198e7f740b614a857",
+    "size_bytes": 2711
+  },
+  "actual_native_process_exit_code": 0,
+  "actual_native_launch_error": null,
+  "actual_observation_counts": {
+    "cases": 12,
+    "actual_queries": 264,
+    "actual_getter_records": 64,
+    "actual_diagnostics": 4,
+    "actual_query_diagnostics": 4,
+    "actual_preparation_diagnostics": 0
+  },
+  "actual_counts_unknown": false,
+  "observation_integrity_failures": [],
+  "actual_both_PE_maps": {
+    "original": {
+      "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/original-pe.json",
+      "sha256": "32703511ea7204ee13080b9e5ba3252219190bc80c8b677be057f6f17d8d23d6",
+      "size_bytes": 15579
+    },
+    "helper": {
+      "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/helper-pe.json",
+      "sha256": "995cc8aac581fe71c19e9b88dc42935dd5dd762e11b882e0f68e3939433967de",
+      "size_bytes": 11815
+    },
+    "comparison": {
+      "path": ".runtime/porting/CTF-10/report-scan-original-data-review-01/comparison-pe.json",
+      "sha256": "9dab71dfde49b278f31be76e8785ebab68e3552a0cdfb727aec9405ce384b47f",
+      "size_bytes": 4634
+    }
+  },
+  "getter_domain_is_ordinary_input_admission": false,
+  "Native_backend_equivalence_claimed": false,
+  "numerical_PASS_claimed": false,
+  "complete_CTF10_PASS_claimed": false,
+  "gates_updated": false
+}

@@ -1,0 +1,92 @@
+"""Compare every actual same-input Scan unit owner under the pre-output exact policy."""
+import argparse
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+
+PREP = Path(__file__).resolve().parent
+COMMON_SHA = "85abffa8f5d78de6e67f10ca56987f82a39a8bffa9abcf7d383af86fafe0473e"
+SHAPE_SHA = "54dd3cf3ec618e6ff2d82475fe0d7d85e8aca5f88a3b2d8384ee96fa078caafa"
+PAIR_SHA = "f3375f45bd1a440833b0cca0fa3962b527e25ceec97da39205c554a483332418"
+OBSERVER = "crates/ep_run/examples/ctf10_report_scan_unit_observer.rs"
+
+
+def run(args):
+    path = PREP / "scan_common.py"
+    if hashlib.sha256(path.read_bytes()).hexdigest() != COMMON_SHA: raise ValueError("Reviewed common Source differs before import")
+    spec = importlib.util.spec_from_file_location("scan_comparison_common", path)
+    c = importlib.util.module_from_spec(spec); spec.loader.exec_module(c)
+    m = c.modules(); shape = c.boot("scan_comparison_shape", "scan_shape.py", SHAPE_SHA)
+    pair = c.boot("scan_comparison_pair", "scan_compare.py", PAIR_SHA)
+    own_ref, manifest, own_paths = c.own(m, args, Path(__file__))
+    refs, qa, qa_execution, freeze, request, original = c.original(m, args, shape, own_ref, manifest)
+    supplied = {name: m.argument(getattr(args, name.replace("-", "_"))) for name in ["projection", "projection-review", "projection-execution", "rust-build-command", "rust-execution", "rust-results", "candidate-source"]}
+    projection, proof = m.load(supplied["projection"]), m.load(supplied["projection-review"])
+    project = c.recorded(m, supplied["projection-execution"]); c.before(m, qa_execution, project)
+    m.require(proof["schema"] == "ctf10-scan-unit-input-projection-review.v1" and proof["status"] == "pass-actual-input-only-projection" and shape.equal(m.load(project["stdout"]), proof), "Actual complete input-only projector0/full stdout required")
+    c.same(m, proof["projection"], supplied["projection"]); c.same(m, proof["projector_source_preparation"], own_ref)
+    c.same(m, proof["reviewed_original_data"], refs["original-data-review"]); c.same(m, proof["reviewed_original_data_execution"], refs["original-data-review-execution"])
+    options = c.python_cli(m, project["command"], m.identity(PREP / "project_inputs.py"), ["approved-source-sha256", "source-manifest", "original-data-review", "original-data-review-execution", "output-dir"])
+    m.require(options["--approved-source-sha256"] == m.identity(PREP / "project_inputs.py")["sha256"], "Actual approved projector Source differs")
+    for option, expected in [("source-manifest", own_ref), ("original-data-review", refs["original-data-review"]), ("original-data-review-execution", refs["original-data-review-execution"])]: c.same(m, m.argument(options["--" + option]), expected)
+    m.require(m.contained(options["--output-dir"], existing=False) == m.contained(supplied["projection-review"]["path"]).parent, "Actual projector output owner differs")
+    m.require(shape.equal(projection, c.projection_value(m, refs, qa, freeze, request, original)) and proof["projected_counts"] == {"cases": 12, "queries": 264} and proof["Native_expected_endpoint_values_supplied"] is False and proof["Scan_or_getter_answers_projected"] is False and proof["whole_Init_or_production_PASS_claimed"] is False, "Reconstructed input-only projection must match exactly; no answers permitted")
+    archives = proof["executed_projector_sources"]
+    m.require(len(archives) == len(own_paths), "All executed projector Sources required")
+    for source, archived in zip(own_paths, archives, strict=True):
+        m.require(archived["historical_path"] == m.identity(source)["path"] and m.bind(archived["archive"])["sha256"] == m.identity(source)["sha256"], "Actual executed projector Source archive differs")
+    build = c.recorded(m, supplied["rust-build-command"])
+    actual = c.recorded(m, supplied["rust-execution"], allowed=(0, 2)); c.before(m, project, actual); c.before(m, build, actual)
+    candidate_source = m.bind(supplied["candidate-source"])
+    m.require(candidate_source["path"] == OBSERVER, "Explicit current corrected/formatted observer Source required")
+    command = build["command"]
+    m.require(command[:2] == ["cargo", "build"] and "--message-format=json-render-diagnostics" in command and "--example" in command and command[command.index("--example") + 1] == "ctf10_report_scan_unit_observer" and "-p" in command and command[command.index("-p") + 1] == "ep_run", "Actual ep_run observer Cargo artifact command required")
+    capture = build["cargo_compiler_artifacts_capture"]
+    m.require(capture["requested"] is True and capture["status"] == "pass" and capture["error"] is None, "Actual captured Cargo artifact required")
+    candidates = [row for row in capture["rows"] if row["cargo_message"]["target"]["name"] == "ctf10_report_scan_unit_observer" and "example" in row["cargo_message"]["target"]["kind"]]
+    m.require(len(candidates) == 1, "Exactly one actual emitted observer executable required")
+    artifact = candidates[0]; message = artifact["cargo_message"]
+    emitted = [json.loads(line, object_pairs_hook=m.unique_object) for line in m.contained(build["stdout"]["path"]).read_text(encoding="utf-8").splitlines() if line.strip()]
+    m.require(any(shape.equal(row, message) for row in emitted), "Actual captured Cargo artifact must occur in full Cargo stdout")
+    m.require(m.contained(message["target"]["src_path"]) == m.contained(OBSERVER) and message["executable"] is not None, "Actual Cargo target Source differs")
+    executable = c.full(m, {"path": artifact["executable"]["historical_path"], "sha256": artifact["executable"]["sha256"]})
+    m.require(m.contained(message["executable"]) == m.contained(executable["path"]) and len(actual["command"]) == 3 and m.contained(actual["command"][0]) == m.contained(executable["path"]) and m.contained(actual["command"][1]) == m.contained(supplied["projection"]["path"]) and actual["command"][2] == supplied["projection"]["sha256"], "Actual Rust executable/argc3/full projected SHA differs")
+    c.same(m, build["source_snapshot"], actual["source_snapshot"])
+    snapshot = m.load(build["source_snapshot"])
+    m.require(snapshot["schema"] == "rust-command-source-snapshot.v1" and snapshot["bytes_normalized"] is False, "Actual complete raw Rust source snapshot required")
+    rows = snapshot["files"]
+    m.require(type(rows) is list and len({row["historical_path"] for row in rows}) == len(rows), "Actual source snapshot membership differs")
+    found = set()
+    for row in rows:
+        archive = m.bind(row["archive"]); current = m.bind({"path": row["historical_path"], "sha256": archive["sha256"], "size_bytes": row["size_bytes"]})
+        m.require(archive["size_bytes"] == current["size_bytes"], "Actual current Cargo Source/archive bytes differ")
+        if current["path"] in [OBSERVER, "crates/ep_runtime/examples/clk02_probe_support/digest.rs"]: found.add(current["path"])
+    m.require(found == {OBSERVER, "crates/ep_runtime/examples/clk02_probe_support/digest.rs"}, "Actual observer and unchanged digest own2 Sources required")
+    c.same(m, actual["stdout"], supplied["rust-results"])
+    rust = m.load(supplied["rust-results"])
+    m.require(rust["actual_input_projection_SHA256"] == supplied["projection"]["sha256"], "Actual candidate full projection SHA differs")
+    comparison = pair.compare(original, rust, projection, m.require, shape)
+    if actual["exit_code"] != 0:
+        comparison["mismatch_count"] += 1
+        comparison["complete_mismatch_ledger"].append({"path": "actual_Rust_exit", "category": "availability_failures", "Native": 0, "Rust": actual["exit_code"]})
+        comparison["mismatch_categories"]["availability_failures"] = comparison["mismatch_categories"].get("availability_failures", 0) + 1
+        comparison["mismatch_categories"]["mismatches"] = comparison["mismatch_count"]
+    passed = comparison["mismatch_count"] == 0
+    output = m.contained(args.output_dir, existing=False)
+    m.require(output.is_relative_to(m.BASE) and output != m.BASE and not output.exists(), "Fresh contained comparison output required")
+    output.mkdir(parents=True, exist_ok=False)
+    sources = [m.archive(m.identity(path), output, index) for index, path in enumerate(own_paths)]
+    report = {"schema": "ctf10-scan-unit-same-input-comparison.v1", "status": "pass-exact-selected-Scan-unit-owners" if passed else "fail-selected-Scan-unit-owners", "selected_Scan_unit_comparison_passed": passed,
+        "comparer_source_preparation": own_ref, "executed_comparer_sources": sources, "actual_original_data_review": refs["original-data-review"], "actual_original_data_review_execution": refs["original-data-review-execution"], "actual_input_projection": supplied["projection"], "actual_projection_review": supplied["projection-review"], "actual_projection_execution": supplied["projection-execution"], "actual_Rust_build_execution": supplied["rust-build-command"], "actual_Rust_execution": supplied["rust-execution"], "actual_Rust_results": supplied["rust-results"], "actual_candidate_source": candidate_source, "actual_Rust_source_snapshot": build["source_snapshot"], "actual_Rust_executable": executable,
+        "actual_observation_counts": qa["actual_observation_counts"], "comparison": comparison, "policy": freeze["policies"]["observation_policy_proposal"],
+        "unpaired_context": ["Native backend flags/counters/enum levels/err/audit/console/SQLite", "Rust default_applied flags (Native did not copy equivalent flags)", "Native alpha field names and JSON object ordinal"], "whole_Init_or_production_PASS_claimed": False, "complete_CTF10_PASS_claimed": False, "gates_updated": False}
+    c.recheck(m); m.emit(output / "comparison.json", report); c.recheck(m)
+    print(json.dumps(report, ensure_ascii=False, allow_nan=False, indent=2))
+    return 0 if passed else 1
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ["approved-source-sha256", "source-manifest", "original-data-review", "original-data-review-execution", "projection", "projection-review", "projection-execution", "rust-build-command", "rust-execution", "rust-results", "candidate-source", "output-dir"]: parser.add_argument("--" + name, required=True)
+    raise SystemExit(run(parser.parse_args()))

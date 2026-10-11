@@ -1,0 +1,25 @@
+"""Root freezes complete literal inputs and comparison policy before Native calls."""
+import hashlib,json,shutil
+from pathlib import Path
+ROOT=Path.cwd().resolve();BASE=ROOT/'.runtime/porting/CTF-10';OUT=BASE/'report-scan-frozen-inputs-01'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def ref(p):return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+def exact(r):
+ p=ROOT/r['path'];assert sha(p)==r['sha256']and p.stat().st_size==r['size_bytes'];return p
+manifest=BASE/'report-input-scan-native-prep-02/manifest.json';assert sha(manifest)=='2e7270223af0ff188e5c7da4e0a6b2c308109da8d32ebda77366578a34afefba';m=json.loads(manifest.read_bytes())
+request_source=exact(m['input_fixture_proposal']);request=json.loads(request_source.read_bytes())
+assert request['expected_values_supplied']is False and len(request['cases'])==12 and sum(len(r['queries'])for r in request['cases'])==264
+assert not OUT.exists();(OUT/'fixtures').mkdir(parents=True)
+for row in m['input_files']:
+ p=exact(row);dest=OUT/'fixtures'/p.name;shutil.copyfile(p,dest);assert dest.read_bytes()==p.read_bytes()
+request_path=OUT/'request.json';shutil.copyfile(request_source,request_path);assert request_path.read_bytes()==request_source.read_bytes()
+inputs=[]
+for row,original in zip(request['cases'],m['resolved_case_input_sources'],strict=True):
+ old=(request_source.parent/row['input_file']).resolve(strict=True);assert old==exact(original).resolve()
+ frozen=(OUT/row['input_file']).resolve(strict=True);assert frozen.read_bytes()==old.read_bytes()
+ inputs.append({'case_id':row['case_id'],'input_mode':row['input_mode'],'original_input':original,'actual_input':ref(frozen)})
+policies={}
+for key,name in [('observation_policy_proposal','policy.json'),('input_projection_contract_proposal','projection-contract.json')]:
+ source=exact(m[key]);dest=OUT/name;shutil.copyfile(source,dest);assert source.read_bytes()==dest.read_bytes();policies[key]=ref(dest)
+record={'schema':'ctf10-scan-unit-frozen-inputs.v1','source_preparation':ref(manifest),'literal_request_source':m['input_fixture_proposal'],'request':ref(request_path),'inputs':inputs,'policies':policies,'input_counts':{'cases':12,'queries':264},'expected_values_supplied':False,'numeric_profiles':[],'scientific_execution_performed':False,'Root_freezer_source':ref(Path(__file__).resolve())}
+(OUT/'freeze.json').write_bytes((json.dumps(record,indent=2,allow_nan=False)+'\n').encode());print(ref(OUT/'freeze.json'),flush=True)

@@ -1,0 +1,13 @@
+--- .runtime/porting/CTF-10/report-scan-validation-prep-02/before-01/README.md
++++ .runtime/porting/CTF-10/report-scan-validation-prep-02/README.md
+@@ -84,3 +84,10 @@
+ none of these stages was imported or executed. Root and another author must
+ FULL review before actual use. Raw authored the Native wrapper and transport;
+ this is a Source/provenance proposal, not independent formula certification.
++
++Fresh02 binds the actual corrected Root completion02 Source. The real class is
++EnergyPlus::InputProcessor (InputProcessor.hh77-85); both provider prefixes now
++match that namespace. Completion02 authenticates the already completed genuine
++derivation rather than running it again, so QA requires that actual derivation
++to precede completion02. No schema, policy, input, shape, pairing, or PE rule
++changes. Predecessor01 remains immutable and was not executed.

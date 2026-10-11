@@ -1,0 +1,46 @@
+"""Root records the genuine one-TU Scan build and preserves all earlier artifacts."""
+import hashlib,json,os,shutil,subprocess,sys
+from pathlib import Path
+ROOT=Path.cwd().resolve();BASE=ROOT/'.runtime/porting/CTF-10';OUT=BASE/'report-scan-native-build-01';BUILD=ROOT/'.runtime/ep261-gcc13-o0'
+def read(p):return json.loads(p.read_bytes())
+def sha(p):
+ with p.open('rb')as s:return hashlib.file_digest(s,'sha256').hexdigest()
+def ref(p):return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+def exact(r):
+ p=(ROOT/r['path']).resolve(strict=True);assert p.is_relative_to(ROOT)and sha(p)==r['sha256']and p.stat().st_size==r['size_bytes'];return p
+def write(p,v):p.write_bytes((json.dumps(v,indent=2,allow_nan=False)+'\n').encode())
+assert len(sys.argv)==3
+manifest=(ROOT/sys.argv[1]).resolve(strict=True);assert sha(manifest)==sys.argv[2];m=read(manifest)
+assert m['execution_performed']is False and m['runtime_interfaces']['native_tu_count']==1
+sources={Path(r['source']['path']).name:exact(r['source'])for r in m['own_sources']}
+recipe=sources['scan_unit_reference.cmake'];source=sources['scan_unit_helper.cpp'];assert recipe.parent==source.parent
+prior=BASE/'surface-consumer05-native-build-01/native-build.json';old=read(prior)
+preservation=exact(old['preservation']);assert sha(preservation)=='7b581301b705f1c866fd49864985bbb9ff2aaa7a4c7e8728816e1cf8641b3c5a'
+p=read(preservation);protected=p['protected_refs']+[old['linked_original'],old['helper_binary']];core=p['present_objects'];absent=p['absent_registered_object_paths']+p['prior_original_absent_paths']
+assert len(protected)==len({r['path']for r in protected})==56 and len(core)==631 and len(absent)==24
+def guard():
+ for r in protected+core:exact(r)
+ for name in absent:assert not(ROOT/name).exists(),name
+assert not OUT.exists()and shutil.disk_usage(ROOT).free>3000000000;OUT.mkdir()
+guard();live=BUILD/'compile_commands.json';before=read(live);assert len(before)==727
+shutil.copyfile(live,OUT/'compile-commands-before.json')
+write(OUT/'preservation-before.json',{'protected_refs':protected,'present_objects':core,'absent_paths':absent,'actual_prior_build':ref(prior),'actual_prior_preservation':ref(preservation),'actual_compile_inventory':ref(OUT/'compile-commands-before.json')})
+configure_receipt=exact(old['configure_execution']);c=read(configure_receipt);assert c['exit_code']==0 and c['source_bytes_match_before_and_after']
+command=['-DCMAKE_PROJECT_INCLUDE='+str(recipe)if a.startswith('-DCMAKE_PROJECT_INCLUDE=')else a for a in c['command']]
+command+=['-DSCAN_UNIT_SOURCE_DIR='+str(source.parent),'-DZON05_SOURCE_DIR='+str(ROOT/'.runtime/porting/ZON-05/native-helper-prep-01')]
+env=dict(os.environ);env['PATH']=str(ROOT/'.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin')+os.pathsep+env['PATH']
+def execute(name,argv):
+ d=OUT/name;subprocess.run(['python','-X','utf8','-B','tools/porting/record_command.py','--output-dir',str(d),'--',*argv],check=True,env=env)
+ r=read(d/'receipt.json');assert r['exit_code']==0 and r['launch_error']is None and r['source_bytes_match_before_and_after']is True;return r
+execute('configure-command-01',command)
+after=read(live);new=[r for r in after if r not in before];assert len(new)==1 and Path(new[0]['file']).resolve()==source
+assert all(r in before for r in after if r not in new)
+shutil.copyfile(live,OUT/'compile-commands-after.json');write(OUT/'actual-target-compile-row.json',new[0])
+ninja=ROOT/'.runtime/reference-tools/ninja-1.13.2/ninja.exe';target='Products/ctf10_scan_unit_helper.exe'
+dry=execute('dry-build-command-01',[str(ninja),'-C',str(BUILD),'-n','-v',target]);dry_text=exact(dry['stdout']).read_text(encoding='utf8')
+assert dry_text.count(' -c ')==1 and str(source).replace('\\','/')in dry_text.replace('\\','/')
+assert 'energypluslib.dir'not in dry_text and 'surface_consumer_helper'not in dry_text
+execute('compile-command-01',[command[0],'--build',str(BUILD),'--target','ctf10_scan_unit_helper','--parallel','1','--verbose'])
+guard();linked=BUILD/target;assert linked.is_file();link_map=BUILD/'ctf10_scan_unit_helper.map';assert link_map.is_file()
+write(OUT/'preservation-after.json',{'protected_refs':protected,'present_objects':core,'absent_paths':absent,'all56_protected_and631_core_unchanged':True,'all24_absences_unchanged':True,'actual_compiled_source':ref(source),'actual_linked_original':ref(linked),'actual_link_map':ref(link_map),'actual_compile_rows_before':len(before),'actual_compile_rows_after':len(after),'actual_Source_preparation':ref(manifest),'actual_Root_build_source':ref(Path(__file__).resolve()),'scientific_execution_performed':False,'PE_and_selected_provider_verification_pending':True})
+print('Root genuine Scan one-TU build complete; provider and PE verification pending',ref(OUT/'preservation-after.json'),flush=True)

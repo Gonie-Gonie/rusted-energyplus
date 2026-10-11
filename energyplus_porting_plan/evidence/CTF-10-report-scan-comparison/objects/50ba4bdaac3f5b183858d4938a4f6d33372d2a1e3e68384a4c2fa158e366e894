@@ -1,0 +1,27 @@
+{
+  "Report Variable Dictionary": {
+    "old section": {}
+  },
+  "Output:VariableDictionary": {
+    "a first": {
+      "key_field": "IDF",
+      "sort_option": "Name"
+    },
+    "b last": {
+      "key_field": "Regular",
+      "sort_option": "Unsorted"
+    }
+  },
+  "Output:EnergyManagementSystem": {
+    "a first": {
+      "actuator_availability_dictionary_reporting": "Verbose",
+      "internal_variable_availability_dictionary_reporting": "Verbose",
+      "ems_runtime_language_debug_output_level": "Verbose"
+    },
+    "b last": {
+      "actuator_availability_dictionary_reporting": "None",
+      "internal_variable_availability_dictionary_reporting": "None",
+      "ems_runtime_language_debug_output_level": "ErrorsOnly"
+    }
+  }
+}

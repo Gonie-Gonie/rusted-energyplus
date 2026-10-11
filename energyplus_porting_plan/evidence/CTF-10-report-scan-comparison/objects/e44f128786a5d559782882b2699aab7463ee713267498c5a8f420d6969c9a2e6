@@ -1,0 +1,202 @@
+[
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/General.cc",
+    "start_line": 89,
+    "end_line": 151,
+    "sha256": "a9291deb63926a70585d98ade58200d6639bfe5e8206a16f2079f582fd2ac2ec",
+    "size_bytes": 1398,
+    "purpose": "Constructor defaults and actual retained owner"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/General.cc",
+    "start_line": 1130,
+    "end_line": 1469,
+    "sha256": "dd854e449424fb4d1b1bf1ddc719712ae631b1042b3cc081a6eb66401897b021",
+    "size_bytes": 18398,
+    "purpose": "Whole unchanged ScanForReports"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/General.hh",
+    "start_line": 213,
+    "end_line": 218,
+    "sha256": "7bc0304727b5118bd3b45954bf54faf5fdbe92bb94061b945c568f025746442d",
+    "size_bytes": 343,
+    "purpose": "Actual optional argument signature"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/General.hh",
+    "start_line": 332,
+    "end_line": 372,
+    "sha256": "04bb3b58d0f8401fd358778fffccd32db1140d8f7ae8ae5ce3d9d5d5dd327ad8",
+    "size_bytes": 1047,
+    "purpose": "General cache fields"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+    "start_line": 217,
+    "end_line": 237,
+    "sha256": "62a9762f01585fc519a87c6329b351ae426d1ff69d945ab83e76f2ee2a180f19",
+    "size_bytes": 947,
+    "purpose": "Actual map initialization"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+    "start_line": 259,
+    "end_line": 323,
+    "sha256": "2c253b8931957d0d342ade6ae81a92b32d5f786f856da91bba15adf61776b935",
+    "size_bytes": 3005,
+    "purpose": "processInput validation/scratch owner"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+    "start_line": 487,
+    "end_line": 503,
+    "sha256": "407cdfd9cdb0e1e7795ca363bcad2842ae2715e8407dfe600d262fefb023ce07",
+    "size_bytes": 685,
+    "purpose": "Legacy section detection"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+    "start_line": 543,
+    "end_line": 565,
+    "sha256": "87faffffa868cd1959755ed3213b59faeb1906ebd1440f044442db59fc53dc9d",
+    "size_bytes": 813,
+    "purpose": "Object count getter"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+    "start_line": 726,
+    "end_line": 884,
+    "sha256": "b8e571ba9b6def555554c4887cc6562a45ca9d50dc24e840b48e1fca9e36a159",
+    "size_bytes": 6881,
+    "purpose": "Actual schema/default maxima"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+    "start_line": 932,
+    "end_line": 1120,
+    "sha256": "83d71ce38620af856414b77756c0df21cbc1bc62fb2a737fa80b91b7a85f6494",
+    "size_bytes": 8344,
+    "purpose": "Actual getObjectItem alpha/default/blank and unused ledger"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+    "start_line": 1216,
+    "end_line": 1260,
+    "sha256": "a20d58092c88cf336e020a20ae6a592b181fedf3ad2d827ef9bdea2ec46d9175",
+    "size_bytes": 1490,
+    "purpose": "IDF source ordinal mapping"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+    "start_line": 1338,
+    "end_line": 1405,
+    "sha256": "c5fc4d1bfa0405481c9cedf6c7bd42f35774b444985ef549083fa1efd864486a",
+    "size_bytes": 2720,
+    "purpose": "Schema alpha/default helpers"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.hh",
+    "start_line": 114,
+    "end_line": 183,
+    "sha256": "6ab4fc172ec28b4571b0b298f734c1294561f447d9cf5aef7e48a9212db964fb",
+    "size_bytes": 3567,
+    "purpose": "Public actual InputProcessor API"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.hh",
+    "start_line": 303,
+    "end_line": 342,
+    "sha256": "dc12a9d2a91a8aaab831d01c89a5c07f817cd7cdf596532ee5830b878f1cddc7",
+    "size_bytes": 1318,
+    "purpose": "Public epJSON/private parser distinction"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+    "start_line": 75,
+    "end_line": 114,
+    "sha256": "577be0a22056f80dc1c6cfa21e2e65efabb419991060c32f130c8fa9e3bcbf27",
+    "size_bytes": 3047,
+    "purpose": "Actual global context"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+    "start_line": 128,
+    "end_line": 177,
+    "sha256": "989431a737ae21d565db96dc21ad7de3186532d6b9592049320b816226511051",
+    "size_bytes": 5178,
+    "purpose": "Actual global report and input flags"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataRuntimeLanguage.hh",
+    "start_line": 782,
+    "end_line": 788,
+    "sha256": "cf3c336922c6f74fa7f9b735c1c44f457e77089e6b78d27e51e910611a8b90df",
+    "size_bytes": 853,
+    "purpose": "EMS cache outputs"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataIPShortCuts.hh",
+    "start_line": 60,
+    "end_line": 81,
+    "sha256": "0ffeb117af329daa075d47bd0ac5cf05395afe727c10687c7b9d3a24eca4b1c6",
+    "size_bytes": 553,
+    "purpose": "Actual six scratch owners"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataErrorTracking.hh",
+    "start_line": 202,
+    "end_line": 245,
+    "sha256": "2d1e6370a2509bbf1eef58052e6dd4464f6fa5038925e27c5aacd6b54e6c0380",
+    "size_bytes": 1903,
+    "purpose": "Actual backend counters"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+    "start_line": 870,
+    "end_line": 890,
+    "sha256": "7f91a800f0b638518c3e002c9878e0574a18232d6aabfff4188ad41d860f8283",
+    "size_bytes": 806,
+    "purpose": "Continue error backend/callback"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+    "start_line": 980,
+    "end_line": 1016,
+    "sha256": "9022e9ff9b93bbe09a9840dd965f3816fc53366ee8f43548102582185c084d5e",
+    "size_bytes": 1468,
+    "purpose": "Warning backend/callback"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+    "start_line": 1381,
+    "end_line": 1423,
+    "sha256": "42dd3a6e6296c2cb302f3188457bcc9575938e2fbb1f5c45b357931ba841080c",
+    "size_bytes": 1689,
+    "purpose": "Actual error output/console"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/idd/Energy+.idd.in",
+    "start_line": 104119,
+    "end_line": 104225,
+    "sha256": "b423a4f3b3089fbaf27ddec4ce59d9be4a6436986f06c96aebff3b0f1dd464d9",
+    "size_bytes": 3479,
+    "purpose": "Five actual report-family schema fields"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Optional.hh",
+    "start_line": 32,
+    "end_line": 180,
+    "sha256": "739ae097919c31c93d414d7e80204ba36210ab7810495661b0cede213ed75d84",
+    "size_bytes": 2729,
+    "purpose": "Actual present optional refs"
+  },
+  {
+    "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/FileSystem.hh",
+    "start_line": 54,
+    "end_line": 66,
+    "sha256": "20a90c4ea32b60ea4cce1941269d178c549ac9da2f41f7fa39e6e7d67c5fd166",
+    "size_bytes": 413,
+    "purpose": "Actual global filesystem alias"
+  }
+]

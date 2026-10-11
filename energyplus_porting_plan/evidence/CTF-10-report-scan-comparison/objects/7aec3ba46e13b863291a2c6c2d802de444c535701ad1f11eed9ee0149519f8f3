@@ -1,0 +1,73 @@
+"""Run reviewed Scan custody/projection/candidate/comparison, preserving each receipt."""
+import hashlib
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path.cwd().resolve()
+BASE = Path('.runtime/porting/CTF-10')
+PREP = BASE / 'report-scan-validation-prep-03'
+
+def ref(path):
+    path = Path(path)
+    data = path.read_bytes()
+    return {'path': path.as_posix(), 'sha256': hashlib.sha256(data).hexdigest(), 'size_bytes': len(data)}
+
+def operand(path):
+    row = ref(path)
+    return row['path'] + '#' + row['sha256']
+
+manifest = ref(PREP / 'manifest.json')
+assert manifest['sha256'] == '0edc9179c9e79f4769b9fff91deaf11a11891d5a207b62da1cf57ece2527f8e9'
+for row in json.loads((PREP / 'manifest.json').read_text(encoding='utf-8'))['own_sources']:
+    assert ref(row['path']) == row
+
+def run(name, command):
+    output = BASE / ('report-scan-' + name + '-command-01')
+    assert not output.exists()
+    result = subprocess.run([sys.executable, '-X', 'utf8', '-B', 'tools/porting/record_command.py',
+                             '--output-dir', str(output), '--', *command], stdout=subprocess.DEVNULL)
+    receipt = json.loads((output / 'receipt.json').read_text(encoding='utf-8'))
+    print(json.dumps({'stage': name, 'receipt': ref(output / 'receipt.json'), 'exit_code': receipt['exit_code']}), flush=True)
+    assert result.returncode == 0 and receipt['exit_code'] == 0 and receipt['source_bytes_match_before_and_after'] is True
+    return output
+
+def python_stage(name, source, options):
+    command = [sys.executable, '-X', 'utf8', '-B', str(PREP / source),
+               '--approved-source-sha256', ref(PREP / source)['sha256'],
+               '--source-manifest', operand(PREP / 'manifest.json')]
+    for key, path in options.items():
+        command += ['--' + key, str(path) if key == 'output-dir' else operand(path)]
+    return run(name, command)
+
+qa = BASE / 'report-scan-original-data-review-01'
+qa_command = python_stage('original-data-review', 'review_data.py', {
+    'native-execution': BASE / 'report-scan-native-execution-command-01/receipt.json',
+    'results': BASE / 'report-scan-native-execution-command-01/stdout.log',
+    'freeze-receipt': BASE / 'report-scan-frozen-inputs-01/freeze.json',
+    'freeze-execution': BASE / 'report-scan-freeze-command-01/receipt.json',
+    'build-review': BASE / 'report-scan-native-build-02/native-build.json',
+    'build-review-execution': BASE / 'report-scan-native-complete-command-02/receipt.json',
+    'output-dir': qa})
+assert json.loads((qa / 'review.json').read_text(encoding='utf-8'))['Original_capture_custody_released'] is True
+projection = BASE / 'report-scan-input-projection-01'
+projection_command = python_stage('input-projection', 'project_inputs.py', {
+    'original-data-review': qa / 'review.json', 'original-data-review-execution': qa_command / 'receipt.json',
+    'output-dir': projection})
+build_command = BASE / 'report-scan-rust-build-command-01'
+build = json.loads((build_command / 'receipt.json').read_text(encoding='utf-8'))
+assert build['exit_code'] == 0 and build['source_bytes_match_before_and_after'] is True
+artifacts = [json.loads(line) for line in Path(build['stdout']['path']).read_text(encoding='utf-8').splitlines()]
+candidates = [row['executable'] for row in artifacts if row.get('reason') == 'compiler-artifact'
+              and row['target']['name'] == 'ctf10_report_scan_unit_observer' and row.get('executable')]
+assert len(candidates) == 1
+rust_command = run('rust-execution', [candidates[0], str(projection / 'input-projection.json'),
+                                     ref(projection / 'input-projection.json')['sha256']])
+python_stage('unit-comparison', 'compare_units.py', {
+    'original-data-review': qa / 'review.json', 'original-data-review-execution': qa_command / 'receipt.json',
+    'projection': projection / 'input-projection.json', 'projection-review': projection / 'projection-review.json',
+    'projection-execution': projection_command / 'receipt.json', 'rust-build-command': build_command / 'receipt.json',
+    'rust-execution': rust_command / 'receipt.json', 'rust-results': rust_command / 'stdout.log',
+    'candidate-source': Path('crates/ep_run/examples/ctf10_report_scan_unit_observer.rs'),
+    'output-dir': BASE / 'report-scan-unit-comparison-01'})

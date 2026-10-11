@@ -1,0 +1,31 @@
+--- .runtime/porting/CTF-10/report-scan-validation-prep-03/before-02/review_data.py
++++ .runtime/porting/CTF-10/report-scan-validation-prep-03/review_data.py
+@@ -47,15 +47,24 @@
+     c.same(m, provider["link_map"], preservation["actual_link_map"]); c.same(m, provider["actual_Root_source"], c.COMPLETION)
+     prefixes = {"EnergyPlus::General::ScanForReports(": "General.cc.obj", "EnergyPlus::InputProcessor::getObjectItem(": "InputProcessor.cc.obj", "EnergyPlus::InputProcessor::getNumObjectsFound(": "InputProcessor.cc.obj"}
+     m.require(provider["schema"] == "ctf10-report-scan-unit-address-bound-providers.v1" and provider["unchanged_core_archive_providers_verified"] is True and set(provider["address_bound_selected_providers"]) == set(prefixes), "All actual core address-bound providers required")
+-    lines = m.contained(provider["link_map"]["path"]).read_text(encoding="utf-8").splitlines()
++    link_map = c.full(m, provider["link_map"])
++    selected_symbols = {prefix: [] for prefix in prefixes}; actual_loads = []; core_loads = []; latest_text = None
++    with m.contained(link_map["path"]).open("r", encoding="utf-8") as handle:
++        for number, raw in enumerate(handle, 1):
++            line = raw.rstrip()
++            if line.startswith(" .text "): latest_text = {"line": number, "text": line}
++            fields = line.strip().split(None, 1)
++            for prefix in prefixes:
++                if len(fields) == 2 and fields[1].startswith(prefix): selected_symbols[prefix].append({"symbol_line": number, "symbol": line, "section_provider": latest_text})
++            if line.startswith("LOAD ") and "CMakeFiles/ctf10_scan_unit_helper.dir/" in line: actual_loads.append({"line": number, "text": line})
++            if line.strip() == "LOAD Products/libenergypluslib.a": core_loads.append(number)
+     for prefix, owner in prefixes.items():
+         row = provider["address_bound_selected_providers"][prefix]; section = row["section_provider"]
+-        m.require(type(row["symbol_line"]) is int and type(section["line"]) is int and lines[row["symbol_line"] - 1].rstrip() == row["symbol"] and lines[section["line"] - 1].rstrip() == section["text"] and row["symbol"].strip().split(None, 1)[1].startswith(prefix) and "Products/libenergypluslib.a(" + owner + ")" in section["text"], "Actual core symbol/provider literal lines differ")
+-        m.require(max(index + 1 for index, line in enumerate(lines[:row["symbol_line"]]) if line.startswith(" .text ")) == section["line"], "Actual latest text section must own selected symbol")
++        m.require(type(row["symbol_line"]) is int and type(section["line"]) is int and len(selected_symbols[prefix]) == 1 and selected_symbols[prefix][0] == row and "Products/libenergypluslib.a(" + owner + ")" in section["text"], "Actual unique core symbol/latest text provider literal lines differ")
+         symbol_address = int(row["symbol"].split()[0], 16); fields = section["text"].split()
+         m.require(int(fields[1], 16) <= symbol_address < int(fields[1], 16) + int(fields[2], 16), "Actual symbol address is outside its provider section")
+     loads = provider["actual_target_object_loads"]
+-    m.require(type(loads) is list and len(loads) == 1 and lines[loads[0]["line"] - 1].rstrip() == loads[0]["text"] and loads[0]["text"].startswith("LOAD ") and "CMakeFiles/ctf10_scan_unit_helper.dir/" in loads[0]["text"] and "scan_unit_helper.cpp.obj" in loads[0]["text"] and type(provider["core_archive_load_line"]) is int and lines[provider["core_archive_load_line"] - 1].strip() == "LOAD Products/libenergypluslib.a" and loads[0]["line"] < provider["core_archive_load_line"], "Actual single target LOAD must precede actual core archive")
++    m.require(type(loads) is list and len(loads) == 1 and actual_loads == loads and "scan_unit_helper.cpp.obj" in loads[0]["text"] and type(provider["core_archive_load_line"]) is int and core_loads == [provider["core_archive_load_line"]] and loads[0]["line"] < provider["core_archive_load_line"], "Actual unique single target LOAD must precede actual core archive")
+     derivation = m.load(build["validated_derivative"])
+     m.require(derivation["schema"] == "validated-debug-derivative.v1" and derivation["status"] == "pass-exact-retained-runtime-sections-and-directories" and all(derivation[key] is True for key in ["original_bytes_unchanged", "source_bytes_match_before_and_after", "accepted_derivative_bytes_unchanged"]) and derivation["original_before"] == derivation["original_after"] and derivation["accepted_derivative"] == derivation["observed_derivative"], "Actual retained debug derivative required")
+     for key, source in [("executed_driver", c.DERIVE), ("executed_PE_reader", c.PE)]:

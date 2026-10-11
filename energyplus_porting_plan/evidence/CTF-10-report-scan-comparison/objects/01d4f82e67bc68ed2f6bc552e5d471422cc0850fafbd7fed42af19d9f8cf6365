@@ -1,0 +1,225 @@
+{
+  "schema": "ctf10-scan-unit-frozen-inputs.v1",
+  "source_preparation": {
+    "path": ".runtime/porting/CTF-10/report-input-scan-native-prep-02/manifest.json",
+    "sha256": "2e7270223af0ff188e5c7da4e0a6b2c308109da8d32ebda77366578a34afefba",
+    "size_bytes": 30366
+  },
+  "literal_request_source": {
+    "path": ".runtime/porting/CTF-10/report-input-scan-native-prep-01/input-fixtures.proposed.json",
+    "sha256": "f1a195f8561cb023ade50e29775792d8cd45baf46bca25a470c613a24070105f",
+    "size_bytes": 58629,
+    "line_count": 2015
+  },
+  "request": {
+    "path": ".runtime/porting/CTF-10/report-scan-frozen-inputs-01/request.json",
+    "sha256": "f1a195f8561cb023ade50e29775792d8cd45baf46bca25a470c613a24070105f",
+    "size_bytes": 58629
+  },
+  "inputs": [
+    {
+      "case_id": "A-24H-report-input",
+      "input_mode": "process_input_idf",
+      "original_input": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+        "size_bytes": 9275,
+        "line_count": 680
+      },
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+        "size_bytes": 9275
+      }
+    },
+    {
+      "case_id": "B-NOLIMIT-24H-report-input",
+      "input_mode": "process_input_idf",
+      "original_input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+        "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12",
+        "size_bytes": 13025,
+        "line_count": 894
+      },
+      "actual_input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+        "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12",
+        "size_bytes": 13025
+      }
+    },
+    {
+      "case_id": "empty-IDF",
+      "input_mode": "process_input_idf",
+      "original_input": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-native-prep-01/fixtures/empty.idf",
+        "sha256": "c01917f9eb0e6f3e0cf18b5e2ca299b0cc6d736b1eccaed499b55368217e7171",
+        "size_bytes": 145,
+        "line_count": 4
+      },
+      "actual_input": {
+        "path": ".runtime/porting/CTF-10/report-scan-frozen-inputs-01/fixtures/empty.idf",
+        "sha256": "c01917f9eb0e6f3e0cf18b5e2ca299b0cc6d736b1eccaed499b55368217e7171",
+        "size_bytes": 145
+      }
+    },
+    {
+      "case_id": "all-five-IDF-12-list-order",
+      "input_mode": "process_input_idf",
+      "original_input": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-native-prep-01/fixtures/all-five.idf",
+        "sha256": "b47109e1e1b07ec7cf30b6deb94d440c4b726bb0a59279b01a6cb209f0cb59a2",
+        "size_bytes": 917,
+        "line_count": 24
+      },
+      "actual_input": {
+        "path": ".runtime/porting/CTF-10/report-scan-frozen-inputs-01/fixtures/all-five.idf",
+        "sha256": "b47109e1e1b07ec7cf30b6deb94d440c4b726bb0a59279b01a6cb209f0cb59a2",
+        "size_bytes": 917
+      }
+    },
+    {
+      "case_id": "default-and-explicit-blanks-IDF",
+      "input_mode": "process_input_idf",
+      "original_input": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-native-prep-01/fixtures/default-blanks.idf",
+        "sha256": "8387ff3637cbb733a261d46ec3d4c2a78d2850d1e20d925d22bbf81f6f31cd14",
+        "size_bytes": 272,
+        "line_count": 8
+      },
+      "actual_input": {
+        "path": ".runtime/porting/CTF-10/report-scan-frozen-inputs-01/fixtures/default-blanks.idf",
+        "sha256": "8387ff3637cbb733a261d46ec3d4c2a78d2850d1e20d925d22bbf81f6f31cd14",
+        "size_bytes": 272
+      }
+    },
+    {
+      "case_id": "all-five-direct-epJSON",
+      "input_mode": "process_input_epjson",
+      "original_input": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-native-prep-01/fixtures/all-five.epJSON",
+        "sha256": "988c624577a682de760bf0b920ccd7803df57e061426d063994e0f74f67564ae",
+        "size_bytes": 892,
+        "line_count": 45
+      },
+      "actual_input": {
+        "path": ".runtime/porting/CTF-10/report-scan-frozen-inputs-01/fixtures/all-five.epJSON",
+        "sha256": "988c624577a682de760bf0b920ccd7803df57e061426d063994e0f74f67564ae",
+        "size_bytes": 892
+      }
+    },
+    {
+      "case_id": "incoming-cache-EMS-reset",
+      "input_mode": "process_input_epjson",
+      "original_input": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-native-prep-01/fixtures/none-ems.epJSON",
+        "sha256": "23f256f44c3e2b95e307e47489da8b866c5c1a9fa4f0f242413c7453fdddc571",
+        "size_bytes": 668,
+        "line_count": 29
+      },
+      "actual_input": {
+        "path": ".runtime/porting/CTF-10/report-scan-frozen-inputs-01/fixtures/none-ems.epJSON",
+        "sha256": "23f256f44c3e2b95e307e47489da8b866c5c1a9fa4f0f242413c7453fdddc571",
+        "size_bytes": 668
+      }
+    },
+    {
+      "case_id": "incoming-read-cache-no-reread",
+      "input_mode": "process_input_idf",
+      "original_input": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-native-prep-01/fixtures/all-five.idf",
+        "sha256": "b47109e1e1b07ec7cf30b6deb94d440c4b726bb0a59279b01a6cb209f0cb59a2",
+        "size_bytes": 917,
+        "line_count": 24
+      },
+      "actual_input": {
+        "path": ".runtime/porting/CTF-10/report-scan-frozen-inputs-01/fixtures/all-five.idf",
+        "sha256": "b47109e1e1b07ec7cf30b6deb94d440c4b726bb0a59279b01a6cb209f0cb59a2",
+        "size_bytes": 917
+      }
+    },
+    {
+      "case_id": "getter-domain-unknown-blank-and-aliases",
+      "input_mode": "direct_getter_epjson",
+      "original_input": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-native-prep-01/fixtures/getter-unknowns.json",
+        "sha256": "b5b6db61aa765bf12fa066d1c0febd304873696531ff59ab77d7ba5ba825f1ff",
+        "size_bytes": 443,
+        "line_count": 24
+      },
+      "actual_input": {
+        "path": ".runtime/porting/CTF-10/report-scan-frozen-inputs-01/fixtures/getter-unknowns.json",
+        "sha256": "b5b6db61aa765bf12fa066d1c0febd304873696531ff59ab77d7ba5ba825f1ff",
+        "size_bytes": 443
+      }
+    },
+    {
+      "case_id": "getter-domain-legacy-section",
+      "input_mode": "direct_getter_epjson",
+      "original_input": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-native-prep-01/fixtures/getter-legacy.json",
+        "sha256": "3bd51139b9853ebf767d5ce79897fb679c27b1c172153eda880ef8661affab45",
+        "size_bytes": 64,
+        "line_count": 5
+      },
+      "actual_input": {
+        "path": ".runtime/porting/CTF-10/report-scan-frozen-inputs-01/fixtures/getter-legacy.json",
+        "sha256": "3bd51139b9853ebf767d5ce79897fb679c27b1c172153eda880ef8661affab45",
+        "size_bytes": 64
+      }
+    },
+    {
+      "case_id": "getter-domain-ordered-EMS-reassignments",
+      "input_mode": "direct_getter_epjson",
+      "original_input": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-native-prep-01/fixtures/getter-ordered-ems.json",
+        "sha256": "50ba4bdaac3f5b183858d4938a4f6d33372d2a1e3e68384a4c2fa158e366e894",
+        "size_bytes": 737,
+        "line_count": 27
+      },
+      "actual_input": {
+        "path": ".runtime/porting/CTF-10/report-scan-frozen-inputs-01/fixtures/getter-ordered-ems.json",
+        "sha256": "50ba4bdaac3f5b183858d4938a4f6d33372d2a1e3e68384a4c2fa158e366e894",
+        "size_bytes": 737
+      }
+    },
+    {
+      "case_id": "getter-domain-empty",
+      "input_mode": "direct_getter_epjson",
+      "original_input": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-native-prep-01/fixtures/getter-empty.json",
+        "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+        "size_bytes": 3,
+        "line_count": 1
+      },
+      "actual_input": {
+        "path": ".runtime/porting/CTF-10/report-scan-frozen-inputs-01/fixtures/getter-empty.json",
+        "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+        "size_bytes": 3
+      }
+    }
+  ],
+  "policies": {
+    "observation_policy_proposal": {
+      "path": ".runtime/porting/CTF-10/report-scan-frozen-inputs-01/policy.json",
+      "sha256": "4e85f1535af7c710116e0916bb4066c21e2e3bc18e9ac2213b5bd4ac998d6909",
+      "size_bytes": 1605
+    },
+    "input_projection_contract_proposal": {
+      "path": ".runtime/porting/CTF-10/report-scan-frozen-inputs-01/projection-contract.json",
+      "sha256": "f52c780bf36c8e4bc27e08c904cd86eb00dfbabdb6ea115bd3ffbaf9f57f5a12",
+      "size_bytes": 1813
+    }
+  },
+  "input_counts": {
+    "cases": 12,
+    "queries": 264
+  },
+  "expected_values_supplied": false,
+  "numeric_profiles": [],
+  "scientific_execution_performed": false,
+  "Root_freezer_source": {
+    "path": ".runtime/porting/CTF-10/freeze-report-scan-inputs-01.py",
+    "sha256": "3205087d6174e481546643f67b9978ba277d8346a99fbd1794742651bdafeb10",
+    "size_bytes": 2503
+  }
+}

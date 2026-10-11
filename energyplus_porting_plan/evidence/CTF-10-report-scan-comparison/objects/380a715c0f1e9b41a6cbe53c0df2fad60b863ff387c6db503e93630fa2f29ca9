@@ -1,0 +1,29 @@
+--- .runtime/porting/CTF-10/report-scan-validation-prep-02/before-01/review_data.py
++++ .runtime/porting/CTF-10/report-scan-validation-prep-02/review_data.py
+@@ -7,7 +7,7 @@
+ from pathlib import Path
+ 
+ PREP = Path(__file__).resolve().parent
+-COMMON_SHA = "fc6f0af5fcf1ec7f0a9c14e66ef9b027d54dccab5b715d2c169ba84f09186220"
++COMMON_SHA = "85abffa8f5d78de6e67f10ca56987f82a39a8bffa9abcf7d383af86fafe0473e"
+ SHAPE_SHA = "54dd3cf3ec618e6ff2d82475fe0d7d85e8aca5f88a3b2d8384ee96fa078caafa"
+ 
+ 
+@@ -36,7 +36,7 @@
+         command = c.recorded(m, build[key]); c.before(m, previous, command); c.before(m, command, completed); previous = command
+     derived_command = c.recorded(m, build["derivation_execution"])
+     c.before(m, previous, derived_command)
+-    m.require(c.instant(completed["started_utc"], m.require) <= c.instant(derived_command["started_utc"], m.require) and c.instant(derived_command["finished_utc"], m.require) <= c.instant(completed["finished_utc"], m.require), "Actual derivation must occur inside completion invocation")
++    c.before(m, derived_command, completed)
+     preservation = m.load(build["preservation"])
+     m.require(all(preservation[key] is True for key in ["all56_protected_and631_core_unchanged", "all24_absences_unchanged", "all727_prior_compile_rows_retained"]) and preservation["actual_compile_rows_before"] == 727 and preservation["actual_compile_rows_after"] == 732 and len(preservation["protected_refs"]) == 56 and len(preservation["present_objects"]) == 631 and len(preservation["absent_paths"]) == 24, "Actual before/after preservation ledger differs")
+     for row in preservation["protected_refs"] + preservation["present_objects"]: c.full(m, row)
+@@ -45,7 +45,7 @@
+     c.same(m, preservation["actual_additive_recipe"], build["actual_additive_recipe"])
+     provider = m.load(build["link_provider_verification"])
+     c.same(m, provider["link_map"], preservation["actual_link_map"]); c.same(m, provider["actual_Root_source"], c.COMPLETION)
+-    prefixes = {"EnergyPlus::General::ScanForReports(": "General.cc.obj", "EnergyPlus::InputProcessing::InputProcessor::getObjectItem(": "InputProcessor.cc.obj", "EnergyPlus::InputProcessing::InputProcessor::getNumObjectsFound(": "InputProcessor.cc.obj"}
++    prefixes = {"EnergyPlus::General::ScanForReports(": "General.cc.obj", "EnergyPlus::InputProcessor::getObjectItem(": "InputProcessor.cc.obj", "EnergyPlus::InputProcessor::getNumObjectsFound(": "InputProcessor.cc.obj"}
+     m.require(provider["schema"] == "ctf10-report-scan-unit-address-bound-providers.v1" and provider["unchanged_core_archive_providers_verified"] is True and set(provider["address_bound_selected_providers"]) == set(prefixes), "All actual core address-bound providers required")
+     lines = m.contained(provider["link_map"]["path"]).read_text(encoding="utf-8").splitlines()
+     for prefix, owner in prefixes.items():
