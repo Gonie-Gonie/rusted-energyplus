@@ -1,0 +1,13 @@
+# Arbitrary Run Report
+
+support_status: supported-compatibility
+run_result_state: supported_compatibility_run
+partial_policy: deny
+runtime_class: one-zone-heat-balance-compatibility
+runtime_selection_note: selected runtime 'one-zone-heat-balance-compatibility' executes the matched capability boundary; conformance_claim remains false for arbitrary runs
+rust_results_written: true
+oracle_status: not-requested
+compare_status: not-requested
+conformance_claim: false
+
+The input ran inside the current compatibility-mode arbitrary runtime boundary.

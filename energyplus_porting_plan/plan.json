@@ -12286,6 +12286,11 @@
         "path": "energyplus_porting_plan/evidence/CTF-10-ordinary-history-capture-source/entry-and-quality.json",
         "sha256": "ab5badeb6adf939b0ddbd303956ba6fa8d4ef18157ec045837dd62aa88fb647b",
         "size_bytes": 31851
+      },
+      "actual_persistent_ordinary_history_comparison": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-ordinary-history-comparison/summary.json",
+        "sha256": "77c800f7f6314a8fa640defd419103781748b56d997135a016a5a3c3d41f5cc2",
+        "size_bytes": 54383
       }
     },
     {

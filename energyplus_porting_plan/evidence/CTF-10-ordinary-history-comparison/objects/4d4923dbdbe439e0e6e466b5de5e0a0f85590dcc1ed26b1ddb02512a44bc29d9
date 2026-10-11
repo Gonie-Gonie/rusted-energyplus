@@ -1,0 +1,310 @@
+"""Compare full genuine ordinary boundary streams under one prospective policy."""
+import argparse
+from contextlib import ExitStack
+from datetime import datetime, timezone
+import difflib
+import gzip
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+
+PREP = Path(__file__).resolve().parent
+ROOT = PREP.parents[3]
+COMMON = ROOT / '.runtime/porting/CTF-10/thermal-history-unit-comparison-prep-01/history_unit_common.py'
+PRIMITIVES = COMMON.with_name('compare_units.py')
+POLICY = {'path': '.runtime/porting/CTF-10/ordinary-history-pairing-policy-prep-02/manifest.json',
+          'sha256': '5e59c6e3e73d840e982f79fee676033919c353e3ce4b35295385349ea9b31031'}
+INVOCATION = {'path': '.runtime/porting/CTF-10/ordinary-history-invocation-prep-01/manifest.json',
+              'sha256': '8b84dad71934f6648b96c249d7f410ff8e05e8d31d7754c7facaa39edf7899db'}
+EXPORTER_SHA = '0754e521a9bbc6eac7a26aa96bc5865626343a9df011cce21a6e984c09ae879e'
+RECORDER_SHA = '5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'
+CONFIG = ['--config', 'profile.dev.debug=0', '--config', 'profile.test.debug=0',
+          '--config', 'build.incremental=false', '--locked']
+QUALITY = {'fmt_check': ['cargo', 'fmt', '--all', '--', '--check'],
+    'clippy': ['cargo', 'clippy', *CONFIG, '--workspace', '--all-targets', '--', '-D', 'warnings'],
+    'focused': ['cargo', 'test', *CONFIG, '-p', 'ep_runtime', '--lib', 'heat_balance::'],
+    'workspace': ['cargo', 'test', *CONFIG, '--workspace']}
+BUILD = ['cargo', 'build', *CONFIG, '-p', 'ep_run', '--example', 'ctf10_ordinary_history_observer',
+         '--message-format=json-render-diagnostics']
+EVENT_KEYS = set('schema record_type boundary rust_local_generation_id caller_clock begin_timestep_seconds_argument outdoor_dry_bulb_c owner public model_catalog consumer_surfaces selected_inputs selected_context update_route error counted_as_PASS'.split())
+LARGE = []
+PARENT_APPLICATION = {'path': '.runtime/porting/CTF-10/ordinary-history-capture-applied-01/record.json',
+    'sha256': '3501c1e1d70d75bd03f742f4e906fc52484e7807e8584614572068775ddda88f'}
+SCOPE_CORRECTION = {'path': '.runtime/porting/CTF-10/ordinary-history-scope-correction-prep-01/manifest.json',
+    'sha256': 'dd02a82e2cd03b2f822a57ac20fb66c4aba9d2d9f4d019c1f795a708d6dd2adc'}
+
+
+def boot(path, digest, name):
+    if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+        raise ValueError('Reviewed Source differs before import: ' + str(path))
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module
+
+
+def current_recorded(c, m, ref, allowed_exit=(0,)):
+    value = c.recorded(m, ref, large_stdout=True, allowed_exit=allowed_exit)
+    LARGE.append(value['stdout'])
+    m.require(value['executed_launcher']['archive']['sha256'] == RECORDER_SHA, 'Reviewed current recorder required')
+    return value
+
+
+def scoped_application(c, m, ref):
+    """Authenticate the sole caller correction while retaining original seven rows."""
+    post = m.load(ref); c.same(m, post['parent_application'], PARENT_APPLICATION)
+    c.same(m, post['correction_preparation'], SCOPE_CORRECTION)
+    parent = m.load(PARENT_APPLICATION); correction = m.load(SCOPE_CORRECTION)
+    m.require(post['schema'] == 'ctf10-scoped-caller-actual-application.v1' and len(post['application']) == 1 and
+              post['numerical_comparison_performed'] is False and post['gates_updated'] is False,
+              'Exact one-row scoped caller correction required')
+    row, held = post['application'][0], correction['application'][0]
+    path = 'crates/ep_run/examples/ctf10_ordinary_history_observer.rs'
+    m.require(row['canonical_path'] == path and row['new_destination_absent'] is False and all(row[key] == held[key] for key in
+              ['canonical_path', 'actual_before', 'before_archive', 'proposal', 'exact_diff']), 'Reviewed caller-only literal correction differs')
+    old = next(item for item in parent['application'] if item['canonical_path'] == path)
+    for key in ['before_archive', 'proposal', 'exact_diff', 'actual_formatter_diff', 'actual_final_archive']: m.bind(row[key])
+    m.require(row['actual_before']['sha256'] == old['actual_final']['sha256'] == m.bind(old['actual_final_archive'])['sha256'] and
+              m.bind(row['before_archive'])['sha256'] == row['actual_before']['sha256'] and
+              m.bind(row['actual_final'])['sha256'] == m.bind(row['actual_final_archive'])['sha256'], 'Actual caller-before/final custody differs')
+    literal, final = m.contained(row['proposal']['path']).read_bytes(), m.contained(row['actual_final_archive']['path']).read_bytes()
+    delta = m.contained(row['actual_formatter_diff']['path']).read_bytes()
+    if not delta: m.require(literal == final, 'Empty formatter diff requires byte equality')
+    else:
+        labels = delta.decode('utf-8').splitlines()
+        m.require(len(labels) >= 2 and labels[0].startswith('--- ') and labels[1].startswith('+++ '), 'Actual formatter diff labels required')
+        expected = ''.join(difflib.unified_diff(literal.decode('utf-8').splitlines(keepends=True), final.decode('utf-8').splitlines(keepends=True),
+                         fromfile=labels[0][4:], tofile=labels[1][4:])).encode('utf-8')
+        m.require(expected == delta, 'Actual caller formatter diff differs')
+    c.same(m, post['source_before'], parent['source_final'])
+    snapshots = [m.load(post[name]) for name in ['source_before', 'source_literal', 'source_final']]
+    maps = [{item['historical_path']: item for item in value['files']} for value in snapshots]
+    m.require(all(len(value['files']) == len(table) == post['source_file_count'] for value, table in zip(snapshots, maps)) and
+              all(set(table) == set(maps[0]) for table in maps) and
+              post['unrelated_source_files_verified_byte_exact'] == post['source_file_count'] - 1,
+              'Full same-path Source closure and one changed caller required')
+    for table in maps[1:]:
+        m.require(all(table[name] == maps[0][name] for name in maps[0] if name != path), 'Unrelated Source changed during caller correction')
+    m.require(maps[0][path]['archive']['sha256'] == row['actual_before']['sha256'] and
+              maps[1][path]['archive']['sha256'] == row['proposal']['sha256'] and
+              maps[2][path]['archive']['sha256'] == row['actual_final']['sha256'], 'Actual full Source snapshots disagree with caller row')
+    fmt = m.load(post['actual_format_receipt'])
+    m.require(fmt['schema'] == 'recorded-porting-command.v1' and fmt['command'] == ['cargo', 'fmt', '--all'] and
+              type(fmt['exit_code']) is int and fmt['exit_code'] == 0 and fmt['launch_error'] is None and Path(fmt['cwd']).resolve() == ROOT and
+              type(fmt['source_bytes_match_before_and_after']) is bool and
+              fmt['source_bytes_match_before_and_after'] == (post['source_literal']['sha256'] == post['source_final']['sha256']) and
+              fmt['executed_launcher']['archive']['sha256'] == RECORDER_SHA, 'Actual isolated formatter receipt differs')
+    for key in ['stdout', 'stderr', 'source_snapshot']: m.bind(fmt[key])
+    m.bind(fmt['executed_launcher']['archive']); c.same(m, fmt['source_snapshot'], post['source_literal'])
+    failed = current_recorded(c, m, correction['retained_failed_ordinary_execution'], allowed_exit=(4,))
+    c.same(m, failed['source_snapshot'], post['source_before'])
+    m.require(c.instant(failed['finished_utc'], m.require) <= c.instant(fmt['started_utc'], m.require) <=
+              c.instant(fmt['finished_utc'], m.require) <= datetime.now(timezone.utc), 'Actual failed-attempt/correction chronology differs')
+    # Ephemeral current-body view only; every original literal/formatter row stays archived unchanged.
+    rows = [{**item, **{key: row[key] for key in ['actual_final', 'actual_final_archive']}}
+            if item['canonical_path'] == path else item for item in parent['application']]
+    return {**parent, 'application': rows, 'source_final': post['source_final']}, post, fmt
+
+
+def candidate(c, m, args, qa, original_refs, freeze, policy_ref):
+    refs = {name: m.argument(getattr(args, name.replace('-', '_'))) for name in
+            ['invocation-request', 'invocation-execution', 'ordinary-execution']}
+    request = m.load(refs['invocation-request']); writer = current_recorded(c, m, refs['invocation-execution'])
+    m.require(m.load(writer['stdout']) == request and request['schema'] == 'ctf10-persistent-ordinary-history-invocation-request.v1' and
+              request['selected_case_id'] == 'A-24H' and all(request[name] is False for name in
+              ['engine_execution_performed', 'expected_values_supplied', 'Native_owner_values_supplied_to_Rust', 'integration_PASS_claimed']),
+              'Genuine input-only invocation request/full stdout required')
+    c.same(m, request['invocation_source_preparation'], INVOCATION)
+    authority = m.load(INVOCATION); c.same(m, request['executed_literal_writer'], authority['writer']); m.bind(authority['writer'])
+    command = writer['command']; pairs = list(zip(command[5::2], command[6::2])); options = dict(pairs)
+    names = ['source-manifest', 'native-freeze', 'native-freeze-execution', 'original-review', 'original-review-execution',
+             'applied-source', 'build-execution', 'output-dir', 'fmt-check', 'clippy', 'focused', 'workspace']
+    m.require(len(command) == 29 and command[:4] == ['python', '-X', 'utf8', '-B'] and
+              m.contained(command[4]) == m.contained(authority['writer']['path']) and len(options) == len(pairs) == 12 and
+              set(options) == {'--' + name for name in names}, 'Exact recorded input-only writer CLI required')
+    for option, field in [('source-manifest', 'invocation_source_preparation'), ('native-freeze', 'Native_freeze'),
+            ('native-freeze-execution', 'Native_freeze_execution'), ('original-review', 'reviewed_Original_data'),
+            ('original-review-execution', 'reviewed_Original_data_execution'), ('applied-source', 'actual_applied_source_inventory'),
+            ('build-execution', 'actual_Cargo_build_execution')]:
+        c.same(m, m.argument(options['--' + option]), request[field])
+    m.require(m.contained(options['--output-dir'], existing=False) == m.contained(refs['invocation-request']['path']).parent,
+              'Actual writer output association differs')
+    c.same(m, request['Native_freeze'], qa['actual_packet_freeze']); c.same(m, request['Native_freeze_execution'], qa['actual_packet_freeze_execution'])
+    c.same(m, request['reviewed_Original_data'], original_refs['original-data-review'])
+    c.same(m, request['reviewed_Original_data_execution'], original_refs['original-data-review-execution'])
+    c.same(m, request['pairing_policy_preparation'], POLICY)
+    m.require(request['exporter_source_preparation']['sha256'] == EXPORTER_SHA, 'Exact reviewed exporter authority required')
+    exporter = m.load(request['exporter_source_preparation']); c.same(m, request['observation_policy_source'], policy_ref)
+    copied = m.bind(request['observation_policy']); source = m.bind(policy_ref)
+    m.require(copied['sha256'] == source['sha256'] and copied['size_bytes'] == source['size_bytes'], 'Exact before-run policy bytecopy required')
+    for name in ['selected_input', 'selected_weather', 'selected_metadata', 'selected_idd', 'fixed_scope']:
+        c.same(m, request[name], freeze[name]); m.bind(request[name])
+    m.require(request['all45_fixed_input_guards'] == freeze['all45_fixed_input_guards'] and
+              len(request['all45_fixed_input_guards']) == 45, 'All unchanged45 input guards required')
+    for row in request['all45_fixed_input_guards']: m.bind(row['actual'])
+    applied, post, fmt = scoped_application(c, m, request['actual_applied_source_inventory'])
+    m.require(applied['schema'] == 'ctf10-ordinary-history-actual-literal-application.v1' and
+              applied['implementation_preparation']['sha256'] == EXPORTER_SHA and len(applied['application']) == 7,
+              'Actual reviewed seven-body application required')
+    held = {row['canonical_path']: row for row in exporter['application']}
+    m.require({row['canonical_path'] for row in applied['application']} == set(held), 'Exact exporter path closure required')
+    for row in applied['application']:
+        m.require(row['proposal'] == held[row['canonical_path']]['proposal'], 'Reviewed literal exporter body differs')
+        archive = m.bind(row['actual_final_archive']); live = m.bind(row['actual_final'])
+        m.require(live['path'] == row['canonical_path'] and archive['sha256'] == live['sha256'], 'Actual final/current exporter correspondence differs')
+    build = current_recorded(c, m, request['actual_Cargo_build_execution'])
+    m.require(build['command'] == BUILD, 'Exact actual CargoJSON build command required')
+    snapshot = m.bind(request['Source_snapshot']); c.same(m, snapshot, build['source_snapshot']); c.same(m, snapshot, writer['source_snapshot'])
+    c.same(m, snapshot, applied['source_final'])
+    m.require(set(request['quality_executions']) == set(QUALITY), 'Four actual quality roles required')
+    quality = {}
+    for name, argv in QUALITY.items():
+        c.same(m, m.argument(options['--' + name.replace('_', '-')]), request['quality_executions'][name])
+        value = current_recorded(c, m, request['quality_executions'][name]); quality[name] = value
+        m.require(value['command'] == argv and value['source_snapshot']['sha256'] == snapshot['sha256'] and
+                  c.instant(fmt['finished_utc'], m.require) <= c.instant(value['started_utc'], m.require) and
+                  c.instant(value['finished_utc'], m.require) <= c.instant(build['started_utc'], m.require),
+                  'Same actual Source/preceding full quality command required')
+    capture = build['cargo_compiler_artifacts_capture']; artifact = request['actual_Cargo_emitted_artifact']
+    m.require(capture['requested'] is True and capture['status'] == 'pass' and artifact in capture['rows'] and
+              artifact['cargo_message']['target']['name'] == 'ctf10_ordinary_history_observer' and
+              'example' in artifact['cargo_message']['target']['kind'], 'Actual emitted Cargo example artifact required')
+    m.require(len([row for row in capture['rows'] if row['cargo_message']['target']['name'] == 'ctf10_ordinary_history_observer' and
+                   'example' in row['cargo_message']['target']['kind']]) == 1 and
+              m.contained(artifact['cargo_message']['target']['src_path']) == m.contained('crates/ep_run/examples/ctf10_ordinary_history_observer.rs') and
+              m.contained(artifact['cargo_message']['manifest_path']) == m.contained('crates/ep_run/Cargo.toml'), 'Actual unique Cargo target/package Source differs')
+    exe = c.large(m, {'path': artifact['executable']['historical_path'], 'sha256': artifact['executable']['sha256']})
+    LARGE.append(exe)
+    m.require(m.contained(artifact['cargo_message']['executable']) == m.contained(exe['path']), 'Cargo executable identity association differs')
+    source_rows = {row['historical_path']: row for row in m.load(snapshot)['files']}
+    paths = ['crates/ep_run/examples/ctf10_ordinary_history_observer.rs', 'crates/ep_run/examples/ctf10_ordinary_history_support/fields.rs']
+    m.require([row['path'] for row in request['observer_sources']] == paths, 'Exact ordinary observer two-source inventory required')
+    for row in request['observer_sources']:
+        m.require(m.bind(row)['sha256'] == m.bind(source_rows[row['path']]['archive'])['sha256'], 'Actual built observer Source differs')
+    execution = current_recorded(c, m, refs['ordinary-execution'], allowed_exit=tuple(range(10)))
+    c.same(m, execution['source_snapshot'], snapshot)
+    argv = request['command']
+    m.require(type(argv) is list and len(argv) == 5 and execution['command'] == argv and
+              m.contained(argv[0]) == m.contained(exe['path']) and
+              m.contained(argv[1]) == m.contained(request['selected_input']['path']) and
+              m.contained(argv[2]) == m.contained(request['selected_weather']['path']) and
+              request['recorded_command'] == ['python', '-X', 'utf8', '-B', 'tools/porting/record_command.py',
+                  '--output-dir', str(m.contained(refs['ordinary-execution']['path']).parent), '--', *argv],
+              'Exact full ordinary A24 argv/actual recorder association required')
+    m.require(c.instant(build['finished_utc'], m.require) <= c.instant(writer['started_utc'], m.require) and
+              c.instant(writer['finished_utc'], m.require) <= c.instant(execution['started_utc'], m.require),
+              'Policy/input request must follow actual build and precede ordinary execution')
+    rust_ref = c.large_argument(m, args.rust_events)
+    m.require(m.contained(rust_ref['path']) == m.contained(argv[4]), 'Actual complete NDJSON output path differs')
+    return refs, request, execution, rust_ref
+
+
+def rust_stream(m, pair, path, execution, optional):
+    header = summary = None; generations = set(); events = 0
+    with path.open('rb') as handle:
+        for line_number, raw in enumerate(handle, 1):
+            m.require(raw.endswith(b'\n') and len(raw) > 1, 'Complete nonblank actual NDJSON record required')
+            row = json.loads(raw, object_pairs_hook=m.unique_object,
+                             parse_constant=lambda token: m.require(False, 'No non-JSON number'))
+            m.require(type(row) is dict and row.get('counted_as_PASS') is False and summary is None,
+                      'Complete ordered actual NDJSON object before footer required')
+            kind = row.get('record_type')
+            if header is None:
+                m.require(line_number == 1 and kind == 'header' and row['schema'] == 'ctf10-persistent-ordinary-history-stream.v1' and
+                          row['expected_endpoints_read'] is False and row['Native_prestate_replayed'] is False and
+                          row['all_instrumented_lifecycle_visits_without_caps_or_filters'] is True and
+                          row['absent_lifecycle_is_not_observed_or_assumed_reached'] is True, 'Actual uncapped ordinary header required')
+                header = row
+            elif kind == 'generation':
+                gid = row['rust_local_generation_id']
+                m.require(row['schema'] == 'ctf10-persistent-ordinary-generation.v1' and type(gid) is int and
+                          gid == len(generations) + 1 and gid not in generations, 'Actual unique ordered Rust-local generation required')
+                generations.add(gid)
+                optional.write(pair.c.line(row) + b'\n')
+            elif kind == 'event':
+                m.require(row['schema'] == 'ctf10-persistent-ordinary-history-event.v1' and set(row) == EVENT_KEYS and
+                          row['rust_local_generation_id'] in generations and type(row['owner']) is dict and
+                          set(row['owner']) == set('initialized current_clock last_committed_clock failure history heat_transfer_groups opaque_groups all_heat_transfer_surfaces'.split()),
+                          'Complete actual borrowed event/owner inventory required')
+                events += 1; pair.rust_visit(row)
+            elif kind == 'summary':
+                m.require(row['schema'] == 'ctf10-persistent-ordinary-history-stream.v1', 'Actual ordinary footer schema differs'); summary = row
+            else: m.require(False, 'Unknown actual NDJSON record')
+    m.require(header is not None and summary is not None and summary['capture_complete'] is True and
+              summary['actual_written_event_count'] == summary['actual_observed_event_count'] == events and
+              summary['actual_Rust_generation_count'] == len(generations) and
+              summary['actual_runtime_exit_code'] == execution['exit_code'] and
+              all(summary[name] is False for name in ['boundary_reachability_verified', 'numerical_comparison_performed', 'integration_PASS_claimed']),
+              'Full actual IO footer/counts/runtime exit required; no inferred reachability')
+    return {'header': header, 'summary': summary, 'records': line_number}
+
+
+def run(args):
+    c = boot(COMMON, '7808162aa42c0d06c3893acf325346c473455df993d2705ac1f7a3888f1dd74c', 'ordinary_existing_custody')
+    m, shape, stream = c.modules()
+    own_ref = m.argument(args.source_manifest); own = m.load(own_ref)
+    m.require(Path.cwd().resolve() == ROOT and m.identity(__file__)['sha256'] == args.approved_source_sha256 and
+              own['schema'] == 'ctf10-ordinary-history-comparison-source-preparation.v1', 'Reviewed own Source/cwd required')
+    for row in own['own_sources']: m.bind(row)
+    primitive = boot(PRIMITIVES, '1b915c830af575f5cb0792f9ddd627309397d3411a7005f93798f389c9c7dfcd', 'ordinary_existing_comparison')
+    pair_module = boot(PREP / 'pair_history.py', own['own_sources'][1]['sha256'], 'ordinary_boundary_pairs')
+    policy_preparation = m.load(POLICY); policy_ref = m.bind(policy_preparation['own_sources'][0]); policy = m.load(policy_ref)
+    m.require(policy_preparation['final_exporter_Source_binding_available'] is True and policy_preparation['runtime_execution_authorized'] is False and
+              policy['rust_exporter_source_manifest']['sha256'] == EXPORTER_SHA,
+              'Exact prospectively reviewed policy required; this command is separately Root-authorized')
+    original_refs, qa, original_execution, freeze, _, _ = c.original(m, args)
+    refs, request, execution, rust_ref = candidate(c, m, args, qa, original_refs, freeze, policy_ref)
+    output = m.contained(args.output_dir, existing=False)
+    m.require(output.is_relative_to(m.CTF) and output != m.CTF and not output.exists(), 'Fresh contained comparison directory required')
+    output.mkdir(parents=True, exist_ok=False)
+    names = ['mismatches', 'required-boundaries', 'optional-context', 'inside-prerequisites']
+    stream_failure = None; native_counts = rust_counts = None
+    with ExitStack() as stack:
+        handles = {name: stack.enter_context(gzip.open(output / (name + '.ndjson.gz'), 'xb')) for name in names}
+        spool = stack.enter_context((output / 'Native-selected-boundaries.ndjson.gz').open('x+b'))
+        arithmetic_names = [row[0] for family in ['normal_histories', 'master_histories', 'scratch', 'flux_reports']
+                            for row in policy['field_profiles'][family]['pairs']]
+        profiles = {'real_profiles_by_owner': {name: dict(policy['scalar_rules']['finite_arithmetic']) for name in arithmetic_names}}
+        cmp = primitive.Comparison(m, shape, profiles, handles['mismatches'])
+        pair = pair_module.Pairing(c, shape, cmp, policy, handles['required-boundaries'], handles['optional-context'], handles['inside-prerequisites'], spool)
+        try:
+            m.require(rust_ref['size_bytes'] <= policy['full_stream_contract']['resource_bound_bytes'],
+                      'Retained full Rust stream exceeds prospective4GiB factual-reader resource bound; no truncation or shortening')
+            native_counts = c.review_stream(m, shape, stream, qa, pair.native_visit); spool.flush()
+            rust_counts = rust_stream(m, pair, m.contained(rust_ref['path']), execution, handles['optional-context'])
+            pair.finish()
+        except (ValueError, KeyError, TypeError, IndexError, OSError, UnicodeError) as error:
+            stream_failure = str(error); pair.issue(stream_failure, 'full-stream-custody', None)
+        if execution['exit_code'] != 0: pair.issue('Actual ordinary runtime/observer returned nonzero', 'Rust', execution['exit_code'])
+        if not pair.counts['Rust_selected_stages']: pair.issue('No required Rust selected lifecycle visits observed', 'Rust', None)
+        if not pair.counts['Native_selected_stages']: pair.issue('No required Native selected lifecycle visits observed', 'Native', None)
+        if any(value['nonfinite_unverified'] for value in cmp.profiles.values()):
+            pair.issue('Required arithmetic owner has nonfinite unverified cells', 'paired-numeric', None)
+    c.large(m, rust_ref)
+    for ref in LARGE: c.large(m, ref)
+    m.recheck()
+    ledgers = {name: m.identity(output / (name + '.ndjson.gz'), max_bytes=(output / (name + '.ndjson.gz')).stat().st_size)
+               for name in names + ['Native-selected-boundaries']}
+    passed = stream_failure is None and cmp.counts['mismatches'] == 0 and pair.counts['required_unavailable_or_unmatched'] == 0
+    report = {'schema': 'ctf10-persistent-ordinary-history-comparison.v1', 'status': 'pass-selected-paired-boundaries' if passed else 'fail-retained-mismatch-or-required-unavailable',
+        'reviewed_comparer_preparation': own_ref, 'prospective_pairing_policy_preparation': POLICY, 'frozen_policy': request['observation_policy'],
+        'Native_QA': original_refs, 'actual_Native_results': qa['reviewed_results'], 'actual_Native_freeze': qa['actual_packet_freeze'],
+        'actual_invocation': refs, 'actual_Rust_events': rust_ref, 'actual_Source_snapshot': request['Source_snapshot'],
+        'actual_applied_source_inventory': request['actual_applied_source_inventory'], 'actual_quality_executions': request['quality_executions'],
+        'original_exporter_application': PARENT_APPLICATION, 'scoped_caller_correction_preparation': SCOPE_CORRECTION,
+        'actual_native_stream_review': native_counts, 'actual_rust_stream_review': rust_counts, 'stream_custody_failure': stream_failure,
+        'boundary_counts': dict(pair.counts), 'comparison_counts': dict(cmp.counts), 'real_profiles': cmp.profiles, 'full_gzip_ledgers': ledgers,
+        'selected_paired_boundary_comparison_passed': passed, 'all_unmatched_and_mismatches_retained_without_cap': stream_failure is None,
+        'Native_only_context_or_Rust_generation_counted_as_PASS': False, 'inside_equation_per_iteration_PASS_claimed': False,
+        'whole_manager_PASS_claimed': False, 'integration_PASS_claimed': False, 'full_card_gates_updated': False,
+        'reviewed_utc': datetime.now(timezone.utc).isoformat()}
+    m.emit(output / 'comparison.json', report); print(json.dumps(report, ensure_ascii=False, allow_nan=False, indent=2))
+    return 0 if passed else 1
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['source-manifest', 'approved-source-sha256', 'original-data-review', 'original-data-review-execution',
+                 'invocation-request', 'invocation-execution', 'ordinary-execution', 'rust-events', 'output-dir']:
+        parser.add_argument('--' + name, required=True)
+    raise SystemExit(run(parser.parse_args()))

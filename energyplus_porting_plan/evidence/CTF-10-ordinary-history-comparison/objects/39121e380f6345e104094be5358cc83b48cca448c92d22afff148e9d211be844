@@ -1,0 +1,109 @@
+--- .runtime/porting/CTF-10/ordinary-history-comparison-prep-02/compare_history.py.before
++++ .runtime/porting/CTF-10/ordinary-history-comparison-prep-02/compare_history.py
+@@ -2,6 +2,7 @@
+ import argparse
+ from contextlib import ExitStack
+ from datetime import datetime, timezone
++import difflib
+ import gzip
+ import hashlib
+ import importlib.util
+@@ -28,6 +29,10 @@
+          '--message-format=json-render-diagnostics']
+ EVENT_KEYS = set('schema record_type boundary rust_local_generation_id caller_clock begin_timestep_seconds_argument outdoor_dry_bulb_c owner public model_catalog consumer_surfaces selected_inputs selected_context update_route error counted_as_PASS'.split())
+ LARGE = []
++PARENT_APPLICATION = {'path': '.runtime/porting/CTF-10/ordinary-history-capture-applied-01/record.json',
++    'sha256': '3501c1e1d70d75bd03f742f4e906fc52484e7807e8584614572068775ddda88f'}
++SCOPE_CORRECTION = {'path': '.runtime/porting/CTF-10/ordinary-history-scope-correction-prep-01/manifest.json',
++    'sha256': 'dd02a82e2cd03b2f822a57ac20fb66c4aba9d2d9f4d019c1f795a708d6dd2adc'}
+ 
+ 
+ def boot(path, digest, name):
+@@ -43,6 +48,62 @@
+     LARGE.append(value['stdout'])
+     m.require(value['executed_launcher']['archive']['sha256'] == RECORDER_SHA, 'Reviewed current recorder required')
+     return value
++
++
++def scoped_application(c, m, ref):
++    """Authenticate the sole caller correction while retaining original seven rows."""
++    post = m.load(ref); c.same(m, post['parent_application'], PARENT_APPLICATION)
++    c.same(m, post['correction_preparation'], SCOPE_CORRECTION)
++    parent = m.load(PARENT_APPLICATION); correction = m.load(SCOPE_CORRECTION)
++    m.require(post['schema'] == 'ctf10-scoped-caller-actual-application.v1' and len(post['application']) == 1 and
++              post['numerical_comparison_performed'] is False and post['gates_updated'] is False,
++              'Exact one-row scoped caller correction required')
++    row, held = post['application'][0], correction['application'][0]
++    path = 'crates/ep_run/examples/ctf10_ordinary_history_observer.rs'
++    m.require(row['canonical_path'] == path and row['new_destination_absent'] is False and all(row[key] == held[key] for key in
++              ['canonical_path', 'actual_before', 'before_archive', 'proposal', 'exact_diff']), 'Reviewed caller-only literal correction differs')
++    old = next(item for item in parent['application'] if item['canonical_path'] == path)
++    for key in ['before_archive', 'proposal', 'exact_diff', 'actual_formatter_diff', 'actual_final_archive']: m.bind(row[key])
++    m.require(row['actual_before']['sha256'] == old['actual_final']['sha256'] == m.bind(old['actual_final_archive'])['sha256'] and
++              m.bind(row['before_archive'])['sha256'] == row['actual_before']['sha256'] and
++              m.bind(row['actual_final'])['sha256'] == m.bind(row['actual_final_archive'])['sha256'], 'Actual caller-before/final custody differs')
++    literal, final = m.contained(row['proposal']['path']).read_bytes(), m.contained(row['actual_final_archive']['path']).read_bytes()
++    delta = m.contained(row['actual_formatter_diff']['path']).read_bytes()
++    if not delta: m.require(literal == final, 'Empty formatter diff requires byte equality')
++    else:
++        labels = delta.decode('utf-8').splitlines()
++        m.require(len(labels) >= 2 and labels[0].startswith('--- ') and labels[1].startswith('+++ '), 'Actual formatter diff labels required')
++        expected = ''.join(difflib.unified_diff(literal.decode('utf-8').splitlines(keepends=True), final.decode('utf-8').splitlines(keepends=True),
++                         fromfile=labels[0][4:], tofile=labels[1][4:])).encode('utf-8')
++        m.require(expected == delta, 'Actual caller formatter diff differs')
++    c.same(m, post['source_before'], parent['source_final'])
++    snapshots = [m.load(post[name]) for name in ['source_before', 'source_literal', 'source_final']]
++    maps = [{item['historical_path']: item for item in value['files']} for value in snapshots]
++    m.require(all(len(value['files']) == len(table) == post['source_file_count'] for value, table in zip(snapshots, maps)) and
++              all(set(table) == set(maps[0]) for table in maps) and
++              post['unrelated_source_files_verified_byte_exact'] == post['source_file_count'] - 1,
++              'Full same-path Source closure and one changed caller required')
++    for table in maps[1:]:
++        m.require(all(table[name] == maps[0][name] for name in maps[0] if name != path), 'Unrelated Source changed during caller correction')
++    m.require(maps[0][path]['archive']['sha256'] == row['actual_before']['sha256'] and
++              maps[1][path]['archive']['sha256'] == row['proposal']['sha256'] and
++              maps[2][path]['archive']['sha256'] == row['actual_final']['sha256'], 'Actual full Source snapshots disagree with caller row')
++    fmt = m.load(post['actual_format_receipt'])
++    m.require(fmt['schema'] == 'recorded-porting-command.v1' and fmt['command'] == ['cargo', 'fmt', '--all'] and
++              type(fmt['exit_code']) is int and fmt['exit_code'] == 0 and fmt['launch_error'] is None and Path(fmt['cwd']).resolve() == ROOT and
++              type(fmt['source_bytes_match_before_and_after']) is bool and
++              fmt['source_bytes_match_before_and_after'] == (post['source_literal']['sha256'] == post['source_final']['sha256']) and
++              fmt['executed_launcher']['archive']['sha256'] == RECORDER_SHA, 'Actual isolated formatter receipt differs')
++    for key in ['stdout', 'stderr', 'source_snapshot']: m.bind(fmt[key])
++    m.bind(fmt['executed_launcher']['archive']); c.same(m, fmt['source_snapshot'], post['source_literal'])
++    failed = current_recorded(c, m, correction['retained_failed_ordinary_execution'], allowed_exit=(4,))
++    c.same(m, failed['source_snapshot'], post['source_before'])
++    m.require(c.instant(failed['finished_utc'], m.require) <= c.instant(fmt['started_utc'], m.require) <=
++              c.instant(fmt['finished_utc'], m.require) <= datetime.now(timezone.utc), 'Actual failed-attempt/correction chronology differs')
++    # Ephemeral current-body view only; every original literal/formatter row stays archived unchanged.
++    rows = [{**item, **{key: row[key] for key in ['actual_final', 'actual_final_archive']}}
++            if item['canonical_path'] == path else item for item in parent['application']]
++    return {**parent, 'application': rows, 'source_final': post['source_final']}, post, fmt
+ 
+ 
+ def candidate(c, m, args, qa, original_refs, freeze, policy_ref):
+@@ -81,7 +142,7 @@
+     m.require(request['all45_fixed_input_guards'] == freeze['all45_fixed_input_guards'] and
+               len(request['all45_fixed_input_guards']) == 45, 'All unchanged45 input guards required')
+     for row in request['all45_fixed_input_guards']: m.bind(row['actual'])
+-    applied = m.load(request['actual_applied_source_inventory'])
++    applied, post, fmt = scoped_application(c, m, request['actual_applied_source_inventory'])
+     m.require(applied['schema'] == 'ctf10-ordinary-history-actual-literal-application.v1' and
+               applied['implementation_preparation']['sha256'] == EXPORTER_SHA and len(applied['application']) == 7,
+               'Actual reviewed seven-body application required')
+@@ -101,6 +162,7 @@
+         c.same(m, m.argument(options['--' + name.replace('_', '-')]), request['quality_executions'][name])
+         value = current_recorded(c, m, request['quality_executions'][name]); quality[name] = value
+         m.require(value['command'] == argv and value['source_snapshot']['sha256'] == snapshot['sha256'] and
++                  c.instant(fmt['finished_utc'], m.require) <= c.instant(value['started_utc'], m.require) and
+                   c.instant(value['finished_utc'], m.require) <= c.instant(build['started_utc'], m.require),
+                   'Same actual Source/preceding full quality command required')
+     capture = build['cargo_compiler_artifacts_capture']; artifact = request['actual_Cargo_emitted_artifact']
+@@ -229,6 +291,7 @@
+         'Native_QA': original_refs, 'actual_Native_results': qa['reviewed_results'], 'actual_Native_freeze': qa['actual_packet_freeze'],
+         'actual_invocation': refs, 'actual_Rust_events': rust_ref, 'actual_Source_snapshot': request['Source_snapshot'],
+         'actual_applied_source_inventory': request['actual_applied_source_inventory'], 'actual_quality_executions': request['quality_executions'],
++        'original_exporter_application': PARENT_APPLICATION, 'scoped_caller_correction_preparation': SCOPE_CORRECTION,
+         'actual_native_stream_review': native_counts, 'actual_rust_stream_review': rust_counts, 'stream_custody_failure': stream_failure,
+         'boundary_counts': dict(pair.counts), 'comparison_counts': dict(cmp.counts), 'real_profiles': cmp.profiles, 'full_gzip_ledgers': ledgers,
+         'selected_paired_boundary_comparison_passed': passed, 'all_unmatched_and_mismatches_retained_without_cap': stream_failure is None,

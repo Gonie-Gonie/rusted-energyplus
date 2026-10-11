@@ -183,3 +183,5 @@ CTF/SUR Source 진행: 원본 순서의 내부면 식과 이력 관측을 적용
 CTF-10 관측 예제를 기존 A 범위 진입 함수에 연결했습니다. Deny와 입력·계산·비교 정책을 유지했고, 관련316개/전체4,940개 테스트가 통과했습니다. [실제 보정·검증 기록](evidence/CTF-10-ordinary-history-capture-source/scoped-caller-and-quality.json). 일반 실행의 이력 도달·수치 비교는 아직 미확인입니다.
 
 CTF-10 observer now uses the existing CLI 8 MiB worker stack with strict A/Deny. Focused316/workspace4,940 tests passed with zero failed/ignored. [Actual entry and quality](evidence/CTF-10-ordinary-history-capture-source/entry-and-quality.json). Ordinary reachability and numerical comparison remain unverified.
+
+CTF-10 genuine A ordinary history capture completed (578 events, runtime exit0); full comparison retained FAIL (192 paired stages,3,898 required unavailable/unmatched,35,031 mismatches). [Full evidence and remaining issues](evidence/CTF-10-ordinary-history-comparison/summary.json). Card gates remain unchanged.

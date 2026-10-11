@@ -1,0 +1,1 @@
+command: eplus-rs run <input> --weather <epw> --output-dir <dir>

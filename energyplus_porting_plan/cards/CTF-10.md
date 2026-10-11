@@ -208,3 +208,8 @@ Scoped observer attempt02 terminated with Windows stack overflow (0xC00000FD) be
 
 Actual Source `e2dd7f51e2eda2899f028f281cbbb9d9d58690486754cc44c44c383101adf255` keeps3,915 files;3,913 unrelated files are byte-exact. The example now uses the existing CLI 8 MiB worker stack with strict A/Deny. fmt/Clippy and focused316/workspace4,940 tests passed (zero failed/ignored), followed by the actual CargoJSON example build. Both the initial unscoped exit4/zero-event attempt and scoped Windows stack-overflow attempt remain preserved; the latter has an empty stream and no completion footer. Ordinary lifecycle reachability and numerical comparison remain unverified; no card gates changed.
 Evidence: [observer entry and quality](../evidence/CTF-10-ordinary-history-capture-source/entry-and-quality.json) (`ab5badeb6adf939b0ddbd303956ba6fa8d4ef18157ec045837dd62aa88fb647b`).
+
+## First genuine ordinary history comparison: retained FAIL
+
+Strict A/Deny ordinary execution exited0 and captured all578 observed lifecycle events. The frozen full-stream comparer exited1:192 paired stages,3,898 required unavailable/unmatched stages,1,978,267 exact observations and35,031 mismatches. Stream custody completed without truncation; every mismatch/unmatched stage and the full Rust stream are archived. Warmup/kickoff/start-flag and outdoor weather owner differences remain. No integration, equation-per-iteration, whole-manager or full-card PASS is claimed.
+Evidence: [retained ordinary comparison](../evidence/CTF-10-ordinary-history-comparison/summary.json) (`77c800f7f6314a8fa640defd419103781748b56d997135a016a5a3c3d41f5cc2`).

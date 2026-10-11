@@ -1,0 +1,1022 @@
+{
+  "actual_executed_source_order_stages": [
+    "get-heat-balance-input",
+    "ems-begin-zone-timestep-before-init-heat-balance",
+    "init-heat-balance",
+    "ems-begin-zone-timestep-after-init-heat-balance",
+    "manage-surface-heat-balance",
+    "init-surface-heat-balance",
+    "calc-heat-balance-outside-surf",
+    "calc-heat-balance-inside-surf",
+    "manage-air-heat-balance",
+    "manage-zone-air-updates",
+    "update-final-surface-heat-balance",
+    "update-thermal-histories",
+    "report-surface-heat-balance",
+    "ems-end-zone-timestep-before-zone-reporting",
+    "rec-keep-heat-balance",
+    "report-heat-balance",
+    "ems-end-zone-timestep-after-zone-reporting",
+    "check-warmup-convergence"
+  ],
+  "compatibility_stages": [
+    {
+      "kind": "get_heat_balance_input",
+      "source_file": "src/EnergyPlus/HeatBalanceManager.cc",
+      "source_routine": "GetHeatBalanceInput",
+      "stage_name": "get-heat-balance-input"
+    },
+    {
+      "kind": "ems_begin_zone_timestep_before_init_heat_balance",
+      "source_file": "src/EnergyPlus/HeatBalanceManager.cc",
+      "source_routine": "EMS BeginZoneTimestepBeforeInitHeatBalance",
+      "stage_name": "ems-begin-zone-timestep-before-init-heat-balance"
+    },
+    {
+      "kind": "init_heat_balance",
+      "source_file": "src/EnergyPlus/HeatBalanceManager.cc",
+      "source_routine": "InitHeatBalance",
+      "stage_name": "init-heat-balance"
+    },
+    {
+      "kind": "ems_begin_zone_timestep_after_init_heat_balance",
+      "source_file": "src/EnergyPlus/HeatBalanceManager.cc",
+      "source_routine": "EMS BeginZoneTimestepAfterInitHeatBalance",
+      "stage_name": "ems-begin-zone-timestep-after-init-heat-balance"
+    },
+    {
+      "kind": "manage_surface_heat_balance",
+      "source_file": "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "source_routine": "ManageSurfaceHeatBalance",
+      "stage_name": "manage-surface-heat-balance"
+    },
+    {
+      "kind": "init_surface_heat_balance",
+      "source_file": "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "source_routine": "InitSurfaceHeatBalance",
+      "stage_name": "init-surface-heat-balance"
+    },
+    {
+      "kind": "calc_heat_balance_outside_surf",
+      "source_file": "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "source_routine": "CalcHeatBalanceOutsideSurf",
+      "stage_name": "calc-heat-balance-outside-surf"
+    },
+    {
+      "kind": "calc_heat_balance_inside_surf",
+      "source_file": "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "source_routine": "CalcHeatBalanceInsideSurf",
+      "stage_name": "calc-heat-balance-inside-surf"
+    },
+    {
+      "kind": "manage_air_heat_balance",
+      "source_file": "src/EnergyPlus/HeatBalanceAirManager.cc",
+      "source_routine": "ManageAirHeatBalance",
+      "stage_name": "manage-air-heat-balance"
+    },
+    {
+      "kind": "manage_zone_air_updates",
+      "source_file": "src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "source_routine": "ManageZoneAirUpdates",
+      "stage_name": "manage-zone-air-updates"
+    },
+    {
+      "kind": "update_final_surface_heat_balance",
+      "source_file": "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "source_routine": "UpdateFinalSurfaceHeatBalance",
+      "stage_name": "update-final-surface-heat-balance"
+    },
+    {
+      "kind": "update_thermal_histories",
+      "source_file": "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "source_routine": "UpdateThermalHistories",
+      "stage_name": "update-thermal-histories"
+    },
+    {
+      "kind": "report_surface_heat_balance",
+      "source_file": "src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "source_routine": "ReportSurfaceHeatBalance",
+      "stage_name": "report-surface-heat-balance"
+    },
+    {
+      "kind": "ems_end_zone_timestep_before_zone_reporting",
+      "source_file": "src/EnergyPlus/HeatBalanceManager.cc",
+      "source_routine": "EMS EndZoneTimestepBeforeZoneReporting",
+      "stage_name": "ems-end-zone-timestep-before-zone-reporting"
+    },
+    {
+      "kind": "rec_keep_heat_balance",
+      "source_file": "src/EnergyPlus/HeatBalanceManager.cc",
+      "source_routine": "RecKeepHeatBalance",
+      "stage_name": "rec-keep-heat-balance"
+    },
+    {
+      "kind": "report_heat_balance",
+      "source_file": "src/EnergyPlus/HeatBalanceManager.cc",
+      "source_routine": "ReportHeatBalance",
+      "stage_name": "report-heat-balance"
+    },
+    {
+      "kind": "ems_end_zone_timestep_after_zone_reporting",
+      "source_file": "src/EnergyPlus/HeatBalanceManager.cc",
+      "source_routine": "EMS EndZoneTimestepAfterZoneReporting",
+      "stage_name": "ems-end-zone-timestep-after-zone-reporting"
+    },
+    {
+      "kind": "check_warmup_convergence",
+      "source_file": "src/EnergyPlus/HeatBalanceManager.cc",
+      "source_routine": "CheckWarmupConvergence",
+      "stage_name": "check-warmup-convergence"
+    }
+  ],
+  "ctf_split_trace_enabled": false,
+  "expected_source_order_stages": [
+    "get-heat-balance-input",
+    "ems-begin-zone-timestep-before-init-heat-balance",
+    "init-heat-balance",
+    "ems-begin-zone-timestep-after-init-heat-balance",
+    "manage-surface-heat-balance",
+    "init-surface-heat-balance",
+    "calc-heat-balance-outside-surf",
+    "calc-heat-balance-inside-surf",
+    "manage-air-heat-balance",
+    "manage-zone-air-updates",
+    "update-final-surface-heat-balance",
+    "update-thermal-histories",
+    "report-surface-heat-balance",
+    "ems-end-zone-timestep-before-zone-reporting",
+    "rec-keep-heat-balance",
+    "report-heat-balance",
+    "ems-end-zone-timestep-after-zone-reporting",
+    "check-warmup-convergence"
+  ],
+  "full_surface_trace_opt_in": false,
+  "output_meter_registry_count": 0,
+  "output_registry_count": 146,
+  "prebound_summary": {
+    "construction_coefficient_references": 3,
+    "output_handles": 146,
+    "schedule_ids": 1,
+    "surface_loop_targets": 6,
+    "weather_series_indices": 1,
+    "zone_loop_targets": 1
+  },
+  "runtime_lookup_policy": {
+    "compatibility_plan_order": "deterministic-energyplus-source-order-then-typed-model-order",
+    "fast_mode_grouping_policy": "compatibility-mode-forbids-stage-reordering-fast-mode-only-safe-grouping",
+    "post_typed_model_object_lookup": "forbidden-after-rawmodel-typedmodel-runtime-uses-prebound-typed-ids",
+    "stage_execution_hash_map_lookup": "compile-and-report-only-hot-stages-use-vecs-and-typed-ids",
+    "stage_execution_string_comparison": "forbidden-in-source-order-stage-execution"
+  },
+  "schema_version": 1,
+  "selected_trace_enabled": false,
+  "selected_trace_policy": "zone/surface/ctf payloads are emitted only for explicitly requested names; source-order stage snapshots remain metadata-only",
+  "source_order_gate": {
+    "actual_executed_source_order_stages": [
+      "get-heat-balance-input",
+      "ems-begin-zone-timestep-before-init-heat-balance",
+      "init-heat-balance",
+      "ems-begin-zone-timestep-after-init-heat-balance",
+      "manage-surface-heat-balance",
+      "init-surface-heat-balance",
+      "calc-heat-balance-outside-surf",
+      "calc-heat-balance-inside-surf",
+      "manage-air-heat-balance",
+      "manage-zone-air-updates",
+      "update-final-surface-heat-balance",
+      "update-thermal-histories",
+      "report-surface-heat-balance",
+      "ems-end-zone-timestep-before-zone-reporting",
+      "rec-keep-heat-balance",
+      "report-heat-balance",
+      "ems-end-zone-timestep-after-zone-reporting",
+      "check-warmup-convergence"
+    ],
+    "expected_source_order_stages": [
+      "get-heat-balance-input",
+      "ems-begin-zone-timestep-before-init-heat-balance",
+      "init-heat-balance",
+      "ems-begin-zone-timestep-after-init-heat-balance",
+      "manage-surface-heat-balance",
+      "init-surface-heat-balance",
+      "calc-heat-balance-outside-surf",
+      "calc-heat-balance-inside-surf",
+      "manage-air-heat-balance",
+      "manage-zone-air-updates",
+      "update-final-surface-heat-balance",
+      "update-thermal-histories",
+      "report-surface-heat-balance",
+      "ems-end-zone-timestep-before-zone-reporting",
+      "rec-keep-heat-balance",
+      "report-heat-balance",
+      "ems-end-zone-timestep-after-zone-reporting",
+      "check-warmup-convergence"
+    ],
+    "matches": true
+  },
+  "stage_count": 18,
+  "stage_snapshot_policy": "metadata-only source-order snapshots generated from ExecutionPlan; no simulation values are read or mutated",
+  "stage_snapshots": [],
+  "stage_snapshots_enabled": false,
+  "stages": [
+    {
+      "dependencies": {
+        "reads": [
+          "typed_model"
+        ],
+        "writes": [
+          "heat_balance_input"
+        ]
+      },
+      "kind": "get_heat_balance_input",
+      "name": "get-heat-balance-input",
+      "prebound": {
+        "construction_ids": [],
+        "output_handles": [],
+        "schedule_ids": [],
+        "surface_ids": [],
+        "weather_series_indices": [],
+        "zone_ids": []
+      },
+      "steps": []
+    },
+    {
+      "dependencies": {
+        "reads": [
+          "ems_state"
+        ],
+        "writes": [
+          "ems_state"
+        ]
+      },
+      "kind": "ems_begin_zone_timestep_before_init_heat_balance",
+      "name": "ems-begin-zone-timestep-before-init-heat-balance",
+      "prebound": {
+        "construction_ids": [],
+        "output_handles": [],
+        "schedule_ids": [],
+        "surface_ids": [],
+        "weather_series_indices": [],
+        "zone_ids": []
+      },
+      "steps": []
+    },
+    {
+      "dependencies": {
+        "reads": [
+          "weather_series",
+          "schedule_series",
+          "heat_balance_input"
+        ],
+        "writes": [
+          "environment_state",
+          "schedule_state",
+          "heat_balance_state"
+        ]
+      },
+      "kind": "init_heat_balance",
+      "name": "init-heat-balance",
+      "prebound": {
+        "construction_ids": [],
+        "output_handles": [],
+        "schedule_ids": [
+          0
+        ],
+        "surface_ids": [],
+        "weather_series_indices": [
+          0
+        ],
+        "zone_ids": []
+      },
+      "steps": [
+        "UpdateWeather",
+        "EvaluateSchedule(0)"
+      ]
+    },
+    {
+      "dependencies": {
+        "reads": [
+          "ems_state"
+        ],
+        "writes": [
+          "ems_state"
+        ]
+      },
+      "kind": "ems_begin_zone_timestep_after_init_heat_balance",
+      "name": "ems-begin-zone-timestep-after-init-heat-balance",
+      "prebound": {
+        "construction_ids": [],
+        "output_handles": [],
+        "schedule_ids": [],
+        "surface_ids": [],
+        "weather_series_indices": [],
+        "zone_ids": []
+      },
+      "steps": []
+    },
+    {
+      "dependencies": {
+        "reads": [
+          "surface_state",
+          "zone_state",
+          "construction_thermal_data"
+        ],
+        "writes": [
+          "surface_heat_balance_state"
+        ]
+      },
+      "kind": "manage_surface_heat_balance",
+      "name": "manage-surface-heat-balance",
+      "prebound": {
+        "construction_ids": [
+          0,
+          1,
+          2
+        ],
+        "output_handles": [],
+        "schedule_ids": [],
+        "surface_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "weather_series_indices": [],
+        "zone_ids": []
+      },
+      "steps": []
+    },
+    {
+      "dependencies": {
+        "reads": [
+          "surface_state",
+          "construction_thermal_data"
+        ],
+        "writes": [
+          "surface_state"
+        ]
+      },
+      "kind": "init_surface_heat_balance",
+      "name": "init-surface-heat-balance",
+      "prebound": {
+        "construction_ids": [
+          0,
+          1,
+          2
+        ],
+        "output_handles": [],
+        "schedule_ids": [],
+        "surface_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "weather_series_indices": [],
+        "zone_ids": []
+      },
+      "steps": []
+    },
+    {
+      "dependencies": {
+        "reads": [
+          "surface_state",
+          "weather_series",
+          "construction_thermal_data"
+        ],
+        "writes": [
+          "outside_surface_heat_balance"
+        ]
+      },
+      "kind": "calc_heat_balance_outside_surf",
+      "name": "calc-heat-balance-outside-surf",
+      "prebound": {
+        "construction_ids": [
+          0,
+          1,
+          2
+        ],
+        "output_handles": [],
+        "schedule_ids": [],
+        "surface_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "weather_series_indices": [
+          0
+        ],
+        "zone_ids": []
+      },
+      "steps": []
+    },
+    {
+      "dependencies": {
+        "reads": [
+          "surface_state",
+          "zone_state",
+          "construction_thermal_data"
+        ],
+        "writes": [
+          "inside_surface_heat_balance"
+        ]
+      },
+      "kind": "calc_heat_balance_inside_surf",
+      "name": "calc-heat-balance-inside-surf",
+      "prebound": {
+        "construction_ids": [
+          0,
+          1,
+          2
+        ],
+        "output_handles": [],
+        "schedule_ids": [],
+        "surface_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "weather_series_indices": [],
+        "zone_ids": []
+      },
+      "steps": []
+    },
+    {
+      "dependencies": {
+        "reads": [
+          "zone_state",
+          "surface_heat_balance_state"
+        ],
+        "writes": [
+          "zone_air_heat_balance_state"
+        ]
+      },
+      "kind": "manage_air_heat_balance",
+      "name": "manage-air-heat-balance",
+      "prebound": {
+        "construction_ids": [],
+        "output_handles": [],
+        "schedule_ids": [],
+        "surface_ids": [],
+        "weather_series_indices": [],
+        "zone_ids": [
+          0
+        ]
+      },
+      "steps": []
+    },
+    {
+      "dependencies": {
+        "reads": [
+          "zone_air_heat_balance_state",
+          "thermostat_state"
+        ],
+        "writes": [
+          "zone_state"
+        ]
+      },
+      "kind": "manage_zone_air_updates",
+      "name": "manage-zone-air-updates",
+      "prebound": {
+        "construction_ids": [],
+        "output_handles": [],
+        "schedule_ids": [],
+        "surface_ids": [],
+        "weather_series_indices": [],
+        "zone_ids": [
+          0
+        ]
+      },
+      "steps": [
+        "SolveZone(0)"
+      ]
+    },
+    {
+      "dependencies": {
+        "reads": [
+          "inside_surface_heat_balance",
+          "outside_surface_heat_balance"
+        ],
+        "writes": [
+          "surface_state"
+        ]
+      },
+      "kind": "update_final_surface_heat_balance",
+      "name": "update-final-surface-heat-balance",
+      "prebound": {
+        "construction_ids": [
+          0,
+          1,
+          2
+        ],
+        "output_handles": [],
+        "schedule_ids": [],
+        "surface_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "weather_series_indices": [],
+        "zone_ids": []
+      },
+      "steps": []
+    },
+    {
+      "dependencies": {
+        "reads": [
+          "surface_state",
+          "construction_thermal_data"
+        ],
+        "writes": [
+          "surface_history_state"
+        ]
+      },
+      "kind": "update_thermal_histories",
+      "name": "update-thermal-histories",
+      "prebound": {
+        "construction_ids": [
+          0,
+          1,
+          2
+        ],
+        "output_handles": [],
+        "schedule_ids": [],
+        "surface_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "weather_series_indices": [],
+        "zone_ids": []
+      },
+      "steps": []
+    },
+    {
+      "dependencies": {
+        "reads": [
+          "surface_state",
+          "surface_history_state"
+        ],
+        "writes": [
+          "result_store"
+        ]
+      },
+      "kind": "report_surface_heat_balance",
+      "name": "report-surface-heat-balance",
+      "prebound": {
+        "construction_ids": [
+          0,
+          1,
+          2
+        ],
+        "output_handles": [],
+        "schedule_ids": [],
+        "surface_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "weather_series_indices": [],
+        "zone_ids": []
+      },
+      "steps": []
+    },
+    {
+      "dependencies": {
+        "reads": [
+          "ems_state"
+        ],
+        "writes": [
+          "ems_state"
+        ]
+      },
+      "kind": "ems_end_zone_timestep_before_zone_reporting",
+      "name": "ems-end-zone-timestep-before-zone-reporting",
+      "prebound": {
+        "construction_ids": [],
+        "output_handles": [],
+        "schedule_ids": [],
+        "surface_ids": [],
+        "weather_series_indices": [],
+        "zone_ids": []
+      },
+      "steps": []
+    },
+    {
+      "dependencies": {
+        "reads": [
+          "zone_state",
+          "surface_state"
+        ],
+        "writes": [
+          "result_store"
+        ]
+      },
+      "kind": "rec_keep_heat_balance",
+      "name": "rec-keep-heat-balance",
+      "prebound": {
+        "construction_ids": [],
+        "output_handles": [],
+        "schedule_ids": [],
+        "surface_ids": [],
+        "weather_series_indices": [],
+        "zone_ids": [
+          0
+        ]
+      },
+      "steps": []
+    },
+    {
+      "dependencies": {
+        "reads": [
+          "zone_state",
+          "surface_state",
+          "result_store"
+        ],
+        "writes": [
+          "result_store"
+        ]
+      },
+      "kind": "report_heat_balance",
+      "name": "report-heat-balance",
+      "prebound": {
+        "construction_ids": [],
+        "output_handles": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          95,
+          96,
+          97,
+          98,
+          99,
+          100,
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110,
+          111,
+          112,
+          113,
+          114,
+          115,
+          116,
+          117,
+          118,
+          119,
+          120,
+          121,
+          122,
+          123,
+          124,
+          125,
+          126,
+          127,
+          128,
+          129,
+          130,
+          131,
+          132,
+          133,
+          134,
+          135,
+          136,
+          137,
+          138,
+          139,
+          140,
+          141,
+          142,
+          143,
+          144,
+          145
+        ],
+        "schedule_ids": [],
+        "surface_ids": [],
+        "weather_series_indices": [],
+        "zone_ids": [
+          0
+        ]
+      },
+      "steps": [
+        "WriteOutput(0)",
+        "WriteOutput(1)",
+        "WriteOutput(2)",
+        "WriteOutput(3)",
+        "WriteOutput(4)",
+        "WriteOutput(5)",
+        "WriteOutput(6)",
+        "WriteOutput(7)",
+        "WriteOutput(8)",
+        "WriteOutput(9)",
+        "WriteOutput(10)",
+        "WriteOutput(11)",
+        "WriteOutput(12)",
+        "WriteOutput(13)",
+        "WriteOutput(14)",
+        "WriteOutput(15)",
+        "WriteOutput(16)",
+        "WriteOutput(17)",
+        "WriteOutput(18)",
+        "WriteOutput(19)",
+        "WriteOutput(20)",
+        "WriteOutput(21)",
+        "WriteOutput(22)",
+        "WriteOutput(23)",
+        "WriteOutput(24)",
+        "WriteOutput(25)",
+        "WriteOutput(26)",
+        "WriteOutput(27)",
+        "WriteOutput(28)",
+        "WriteOutput(29)",
+        "WriteOutput(30)",
+        "WriteOutput(31)",
+        "WriteOutput(32)",
+        "WriteOutput(33)",
+        "WriteOutput(34)",
+        "WriteOutput(35)",
+        "WriteOutput(36)",
+        "WriteOutput(37)",
+        "WriteOutput(38)",
+        "WriteOutput(39)",
+        "WriteOutput(40)",
+        "WriteOutput(41)",
+        "WriteOutput(42)",
+        "WriteOutput(43)",
+        "WriteOutput(44)",
+        "WriteOutput(45)",
+        "WriteOutput(46)",
+        "WriteOutput(47)",
+        "WriteOutput(48)",
+        "WriteOutput(49)",
+        "WriteOutput(50)",
+        "WriteOutput(51)",
+        "WriteOutput(52)",
+        "WriteOutput(53)",
+        "WriteOutput(54)",
+        "WriteOutput(55)",
+        "WriteOutput(56)",
+        "WriteOutput(57)",
+        "WriteOutput(58)",
+        "WriteOutput(59)",
+        "WriteOutput(60)",
+        "WriteOutput(61)",
+        "WriteOutput(62)",
+        "WriteOutput(63)",
+        "WriteOutput(64)",
+        "WriteOutput(65)",
+        "WriteOutput(66)",
+        "WriteOutput(67)",
+        "WriteOutput(68)",
+        "WriteOutput(69)",
+        "WriteOutput(70)",
+        "WriteOutput(71)",
+        "WriteOutput(72)",
+        "WriteOutput(73)",
+        "WriteOutput(74)",
+        "WriteOutput(75)",
+        "WriteOutput(76)",
+        "WriteOutput(77)",
+        "WriteOutput(78)",
+        "WriteOutput(79)",
+        "WriteOutput(80)",
+        "WriteOutput(81)",
+        "WriteOutput(82)",
+        "WriteOutput(83)",
+        "WriteOutput(84)",
+        "WriteOutput(85)",
+        "WriteOutput(86)",
+        "WriteOutput(87)",
+        "WriteOutput(88)",
+        "WriteOutput(89)",
+        "WriteOutput(90)",
+        "WriteOutput(91)",
+        "WriteOutput(92)",
+        "WriteOutput(93)",
+        "WriteOutput(94)",
+        "WriteOutput(95)",
+        "WriteOutput(96)",
+        "WriteOutput(97)",
+        "WriteOutput(98)",
+        "WriteOutput(99)",
+        "WriteOutput(100)",
+        "WriteOutput(101)",
+        "WriteOutput(102)",
+        "WriteOutput(103)",
+        "WriteOutput(104)",
+        "WriteOutput(105)",
+        "WriteOutput(106)",
+        "WriteOutput(107)",
+        "WriteOutput(108)",
+        "WriteOutput(109)",
+        "WriteOutput(110)",
+        "WriteOutput(111)",
+        "WriteOutput(112)",
+        "WriteOutput(113)",
+        "WriteOutput(114)",
+        "WriteOutput(115)",
+        "WriteOutput(116)",
+        "WriteOutput(117)",
+        "WriteOutput(118)",
+        "WriteOutput(119)",
+        "WriteOutput(120)",
+        "WriteOutput(121)",
+        "WriteOutput(122)",
+        "WriteOutput(123)",
+        "WriteOutput(124)",
+        "WriteOutput(125)",
+        "WriteOutput(126)",
+        "WriteOutput(127)",
+        "WriteOutput(128)",
+        "WriteOutput(129)",
+        "WriteOutput(130)",
+        "WriteOutput(131)",
+        "WriteOutput(132)",
+        "WriteOutput(133)",
+        "WriteOutput(134)",
+        "WriteOutput(135)",
+        "WriteOutput(136)",
+        "WriteOutput(137)",
+        "WriteOutput(138)",
+        "WriteOutput(139)",
+        "WriteOutput(140)",
+        "WriteOutput(141)",
+        "WriteOutput(142)",
+        "WriteOutput(143)",
+        "WriteOutput(144)",
+        "WriteOutput(145)"
+      ]
+    },
+    {
+      "dependencies": {
+        "reads": [
+          "ems_state"
+        ],
+        "writes": [
+          "ems_state"
+        ]
+      },
+      "kind": "ems_end_zone_timestep_after_zone_reporting",
+      "name": "ems-end-zone-timestep-after-zone-reporting",
+      "prebound": {
+        "construction_ids": [],
+        "output_handles": [],
+        "schedule_ids": [],
+        "surface_ids": [],
+        "weather_series_indices": [],
+        "zone_ids": []
+      },
+      "steps": []
+    },
+    {
+      "dependencies": {
+        "reads": [
+          "zone_state",
+          "surface_state"
+        ],
+        "writes": [
+          "warmup_convergence_state"
+        ]
+      },
+      "kind": "check_warmup_convergence",
+      "name": "check-warmup-convergence",
+      "prebound": {
+        "construction_ids": [],
+        "output_handles": [],
+        "schedule_ids": [],
+        "surface_ids": [],
+        "weather_series_indices": [],
+        "zone_ids": [
+          0
+        ]
+      },
+      "steps": []
+    }
+  ],
+  "step_count": 149,
+  "trace_file_size_bytes": 0,
+  "trace_level": "off",
+  "trace_output_write_policy": "buffered-json-writer",
+  "trace_selection": {
+    "node_names": [],
+    "surface_names": []
+  },
+  "trace_variable_handle_policy": "trace handles are separate from RuntimeOutputRegistry output handles"
+}

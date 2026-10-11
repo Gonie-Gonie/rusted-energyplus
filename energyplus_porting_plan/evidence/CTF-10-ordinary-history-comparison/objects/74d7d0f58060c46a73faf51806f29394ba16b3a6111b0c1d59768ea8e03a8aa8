@@ -1,0 +1,440 @@
+--- .runtime/porting/CTF-10/ordinary-history-comparison-prep-01/pair_history.py.before
++++ .runtime/porting/CTF-10/ordinary-history-comparison-prep-01/pair_history.py
+@@ -0,0 +1,437 @@
++"""Source-only prospective ordinary boundary joins; no history evaluator."""
++from collections import Counter
++import gzip
++import json
++import math
++import struct
++
++NAMES = ['SurfInsideTempHist', 'SurfOutsideTempHist', 'SurfInsideFluxHist', 'SurfOutsideFluxHist']
++RUST = ['inside_temperature', 'outside_temperature', 'inside_flux', 'outside_flux']
++SCRATCH = dict(zip(['QExt1', 'QInt1', 'TempInt1', 'TempExt1', 'SumTime'],
++                  ['outside_flux_first', 'inside_flux_first', 'inside_temperature_first', 'outside_temperature_first', 'sum_time']))
++REPORTS = dict(zip(['SurfOpaqInsFaceCond', 'SurfOpaqInsFaceCondFlux', 'SurfOpaqOutFaceCond', 'SurfOpaqOutFaceCondFlux'],
++                  ['inside_conduction', 'inside_flux', 'outside_conduction', 'outside_flux']))
++NATIVE_STAGES = {'history_selected_initialization_input': 'initialization-input',
++    'history_selected_initialization_complete': 'initialization-returned',
++    'history_update_entry_owners': 'update-input', 'simple_history_hard_copy_complete': 'update-returned',
++    'history_selected_master_update_complete': 'update-returned'}
++RUST_STAGES = dict(zip(['InitializationInput', 'InitializationReturned', 'HistoryUpdateInput', 'HistoryUpdateReturned'],
++                      ['initialization-input', 'initialization-returned', 'update-input', 'update-returned']))
++RETURN = {'InitThermalAndFluxHistories': 'actual_InitThermalAndFluxHistories_return',
++          'UpdateThermalHistories': 'actual_UpdateThermalHistories_return'}
++
++
++class Unavailable(ValueError):
++    pass
++
++
++def need(value, message):
++    if not value:
++        raise Unavailable(message)
++
++
++def emit(handle, value):
++    handle.write(json.dumps(value, ensure_ascii=False, allow_nan=False, separators=(',', ':')).encode() + b'\n')
++
++
++def clock_key(event, stage, native, scalar):
++    value = event.get('clock' if native else 'caller_clock')
++    need(type(value) is dict, 'Actual shared clock unavailable')
++    if native:
++        need(type(value.get('WarmupFlag')) is bool, 'Actual Native WarmupFlag unavailable')
++        kind = 'Warmup' if value['WarmupFlag'] else 'Run'
++        names = ['DayOfSim', 'HourOfDay', 'TimeStep', 'TimeStepZone', 'TimeStepZoneSec']
++    else:
++        phase = value.get('phase')
++        need(type(phase) is dict and phase.get('kind') in ['Warmup', 'Run'] and
++             type(phase.get('day')) is int and phase['day'] == value.get('day_of_sim'), 'Actual Rust phase/day differs')
++        kind = phase['kind']
++        names = ['day_of_sim', 'hour_of_day', 'time_step', 'time_step_zone_hours', 'time_step_zone_seconds']
++    integers = [value.get(name) for name in names[:3]]
++    need(all(type(item) is int for item in integers), 'Actual day/hour/timestep unavailable')
++    reals = [value.get(name) for name in names[3:]]
++    for item in reals:
++        scalar(item, need)
++        number = struct.unpack('>d', bytes.fromhex(item['value_bits']))[0]
++        need(math.isfinite(number) and number > 0.0, 'Actual positive finite clock timestep unavailable')
++    return (stage, kind, *integers, *(item['value_bits'] for item in reals))
++
++
++def unique(rows, key, label):
++    need(type(rows) is list, label + ' inventory unavailable')
++    out = {}
++    for row in rows:
++        need(type(row) is dict, label + ' row unavailable')
++        value = row.get(key)
++        need(value is not None and value not in out, label + ' identity missing or duplicated')
++        out[value] = row
++    return out
++
++
++def associations(native, rust):
++    """Actual names and relationships only; no raw-ID equality or positional zip."""
++    nz, rz = unique(native['zones'], 'Name', 'Native Zone'), unique(rust['zones'], 'name', 'Rust Zone')
++    for arena, rows, key in [('Native Zone', native['zones'], 'index'), ('Rust Zone', rust['zones'], 'id'),
++            ('Native Space', native['spaces'], 'index'), ('Rust Space', rust['spaces'], 'id'),
++            ('Native Construction', native['constructions'], 'index'), ('Rust Construction', rust['constructions'], 'id'),
++            ('Native Surface', native['surfaces'], 'index'), ('Rust Surface', rust['surfaces'], 'id')]:
++        need(all(type(row.get(key)) is int for row in rows), arena + ' actual integer ID unavailable')
++        unique(rows, key, arena)
++    need(set(nz) == set(rz), 'Complete Zone name bijection unavailable')
++    zone = {rz[name]['id']: nz[name]['index'] for name in nz}
++    ns, rs = unique(native['spaces'], 'Name', 'Native Space'), unique(rust['spaces'], 'name', 'Rust Space')
++    need(set(ns) == set(rs), 'Complete Space name bijection unavailable')
++    space = {rs[name]['id']: ns[name]['index'] for name in ns}
++    native_space_zone = {}
++    for row in nz.values():
++        for sid in row['spaceIndexes']:
++            need(sid not in native_space_zone, 'Native Space has multiple Zone owners')
++            native_space_zone[sid] = row['index']
++    for name, row in rs.items():
++        need(zone.get(row['zone_id']) == native_space_zone.get(ns[name]['index']), 'Actual Space owning Zone differs')
++    need(set(native_space_zone) == {row['index'] for row in ns.values()}, 'Complete actual Native Space ownership unavailable')
++    for name, row in rz.items():
++        need(type(row['spaces']) is list and all(sid in space for sid in row['spaces']) and
++             [space[sid] for sid in row['spaces']] == nz[name]['spaceIndexes'], 'Actual ordered Zone Space membership differs')
++    nc, rc = unique(native['constructions'], 'Name', 'Native referenced Construction'), unique(rust['constructions'], 'name', 'Rust Construction')
++    need(set(nc) <= set(rc), 'Actual referenced Construction name unavailable')
++    construction = {rc[name]['id']: nc[name]['index'] for name in nc}
++    nf, rf = unique(native['surfaces'], 'Name', 'Native Surface'), unique(rust['surfaces'], 'name', 'Rust Surface')
++    need(set(nf) == set(rf), 'Complete allocated Surface name bijection unavailable')
++    surface = {rf[name]['id']: nf[name]['index'] for name in nf}
++    classes = {1: ['Wall'], 2: ['Floor'], 3: ['Roof', 'Ceiling']}
++    for name, row in rf.items():
++        actual = nf[name]
++        need(row['surface_type'] in classes.get(actual['Class'], []), 'Actual surface class unsupported or differs')
++        need((zone.get(row['zone_id']), space.get(row['space_id']), construction.get(row['construction_id'])) ==
++             (actual['Zone'], actual['Space'], actual['Construction']), 'Actual surface owner associations differ')
++        boundary = 'Outdoors' if actual['ExtBoundCond'] == 0 else 'Adiabatic' if actual['ExtBoundCond'] == actual['index'] else None
++        need(boundary is not None and row['outside_boundary'] == boundary, 'Actual outside boundary unsupported or differs')
++        need(actual['HeatTransferAlgorithm'] in [1, 2], 'Native selected heat-transfer algorithm unsupported')
++    return {'zone': zone, 'space': space, 'construction': construction, 'surface': surface}
++
++
++def rust_state(event, mapping, scalar):
++    h = event['owner']['history']; ids = h['surface_ids']; total = len(mapping)
++    need(type(ids) is list and len(ids) == len(set(ids)) == total and set(ids) == set(mapping), 'Full actual Rust history layout differs')
++    native_ids = sorted(mapping.values())
++    need(native_ids == list(range(1, total + 1)), 'Full Native surface allocation unavailable')
++    positions = {mapping[sid]: index for index, sid in enumerate(ids)}
++    def vector(value, integer=False):
++        need(type(value) is dict and value.get('owner_present') is True and value.get('rust_vector_length') == total and
++             type(value.get('values')) is list and len(value['values']) == total, 'Complete actual Rust vector unavailable')
++        if integer: need(all(type(item) is int for item in value['values']), 'Actual integer vector unavailable')
++        else:
++            for item in value['values']: scalar(item, need)
++        return [value['values'][positions[sid]] for sid in native_ids]
++    def matrix(value):
++        need(type(value) is dict and value.get('owner_present') is True and value.get('term_rows') == 19 and
++             type(value.get('rows')) is list and len(value['rows']) == 19, 'Full19 actual Rust matrix unavailable')
++        result = []
++        for index, row in enumerate(value['rows']):
++            need(type(row.get('rust_row_index')) is int and row['rust_row_index'] == index, 'Actual Rust term order differs')
++            result.append(vector(row['vector']))
++        return result
++    def arrays(value, master=False):
++        need(type(value) is dict and set(value) == set(RUST), 'Four actual Rust history arrays required')
++        return {name + ('Master' if master else ''): matrix(value[member]) for name, member in zip(NAMES, RUST)}
++    def optional(value):
++        need(type(value) is dict and type(value.get('allocated')) is bool and
++             ((value['value'] is not None) == value['allocated']), 'Actual optional allocation differs')
++        return value['value']
++    normal = arrays(h['normal']); master = optional(h['masters']); scratch = optional(h['scratch'])
++    if master is not None:
++        master = {**arrays(master['arrays'], True), 'SurfCurrNumHist': vector(master['current_num_histories'], True)}
++    if scratch is not None:
++        need(set(scratch) == set(SCRATCH.values()), 'Five actual scratch owners required')
++        scratch = {name: vector(scratch[member]) for name, member in SCRATCH.items()}
++    need(set(h['flux_reports']) == set(REPORTS.values()) and type(h['update_first_time']) is bool, 'Four report owners and actual first-time flag required')
++    return {'schema': 'ctf10-selected-thermal-history-state.v1', 'surface_ids': native_ids,
++        'layout': {'surface_lower': 1, 'surface_upper': total, 'term_lower': 1, 'term_upper': 19},
++        'normal': normal, 'masters': master, 'scratch': scratch, 'update_first_time': h['update_first_time'],
++        'flux_reports': {name: vector(h['flux_reports'][member]) for name, member in REPORTS.items()}}
++
++
++class Pairing:
++    def __init__(self, common, shape, comparison, policy, ledger, optional, scope, spool):
++        self.c, self.shape, self.cmp, self.policy = common, shape, comparison, policy
++        self.ledger, self.optional, self.scope = ledger, optional, scope
++        self.spool = spool
++        self.native, self.calls, self.returns, self.rust_keys = {}, {}, {}, Counter()
++        self.counts = Counter(); self.rust_step = None; self.rust_phase = None
++        self.rust_begin = None; self.rust_init = None; self.rust_init_owner = None
++        self.rust_argument = None; self.rust_history = None
++
++    def retain(self, event):
++        # Independent gzip members permit one exact full boundary at a time,
++        # without retaining every large owner snapshot in process memory.
++        data = gzip.compress(self.c.line(event) + b'\n', mtime=0)
++        offset = self.spool.tell(); self.spool.write(data)
++        return {'offset': offset, 'compressed_bytes': len(data), 'identity': self.c.event_key(event)}
++
++    def retained(self, ref):
++        self.spool.seek(ref['offset']); raw = gzip.decompress(self.spool.read(ref['compressed_bytes']))
++        value = json.loads(raw, object_pairs_hook=self.cmp.m.unique_object,
++                           parse_constant=lambda token: need(False, 'No non-JSON number'))
++        need(self.c.event_key(value) == ref['identity'], 'Retained full Native boundary identity differs')
++        return value
++
++    def issue(self, reason, side, identity, key=None):
++        self.counts['required_unavailable_or_unmatched'] += 1
++        emit(self.ledger, {'status': 'required-unavailable-or-unmatched', 'side': side, 'identity': identity,
++            'shared_key': key, 'reason': reason, 'required': True, 'counted_as_PASS': False})
++
++    def native_visit(self, event):
++        self.counts['all_Native_events'] += 1
++        checkpoint = event['checkpoint']; identity = self.c.event_key(event)
++        call = (event['clock']['state_address'], event['procedure'], event['invocation_ordinal'])
++        retained = self.retain(event) if checkpoint in NATIVE_STAGES else None
++        if checkpoint in ['history_selected_initialization_input', 'history_update_entry_owners']:
++            need(call not in self.calls, 'Duplicate Native input in one actual invocation')
++            self.calls[call] = {'input': retained, 'rows': [], 'branches': {}, 'normal_exit': None, 'caller_return': None,
++                                'stages': [NATIVE_STAGES[checkpoint]]}
++        if checkpoint in ['master_history_completed_block', 'master_history_interpolation_complete'] and call in self.calls:
++            sid = event['owners']['surface_index']; branches = self.calls[call]['branches']
++            need(sid not in branches, 'Duplicate actual Native master branch')
++            branches[sid] = checkpoint
++        if checkpoint in NATIVE_STAGES:
++            self.counts['Native_selected_stages'] += 1
++            try:
++                need(call in self.calls, 'Native endpoint lacks same-invocation actual input')
++                if checkpoint not in ['history_selected_initialization_input', 'history_update_entry_owners']:
++                    self.calls[call]['stages'].append(NATIVE_STAGES[checkpoint])
++                key = clock_key(event, NATIVE_STAGES[checkpoint], True, self.shape.scalar)
++                row = {'event': retained, 'call': self.calls[call], 'consumed': False}
++                self.native.setdefault(key, []).append(row); self.calls[call]['rows'].append(row)
++            except Unavailable as error: self.issue(str(error), 'Native', identity)
++            emit(self.optional, {'side': 'Native', 'identity': identity, 'context': {name: event['clock'][name]
++                 for name in self.policy['optional_unpaired_Native_context']}, 'required': False, 'counted_as_PASS': False})
++        else:
++            emit(self.optional, {'side': 'Native', 'identity': identity, 'reason': 'No shared selected semantic boundary; retained full Original stream',
++                                 'required': False, 'counted_as_PASS': False})
++        if checkpoint in ['scope_normal_exit', 'scope_unwinding'] and call in self.calls:
++            row = self.calls[call]
++            if checkpoint == 'scope_unwinding':
++                for selected in row['rows']: self.issue('Actual Native invocation unwound', 'Native', selected['event']['identity'])
++            else:
++                need(row['normal_exit'] is None, 'Duplicate actual Native normal exit'); row['normal_exit'] = identity
++                parent = (event['clock']['state_address'], event['parent_procedure'], event['parent_invocation_ordinal'], RETURN[event['procedure']])
++                need(parent not in self.returns, 'Duplicate unresolved Native caller return'); self.returns[parent] = row
++        parent = (*call, checkpoint)
++        if parent in self.returns: self.returns.pop(parent)['caller_return'] = identity
++        if event['copy_kind'] == 7:  # Actual Copy::Inside, fixed by accepted observer.hh.
++            values = event['owners'] if type(event['owners']) is list else [event['owners']]
++            for row in values:
++                flags = {name: row.get(name) for name in self.policy['inside_equation_scope']['required_actual_zero_integer_flags']}
++                zeros = {name: row.get(name) for name in self.policy['inside_equation_scope']['required_actual_positive_zero_bits']}
++                eligible = all(type(value) is int and value == 0 for value in flags.values()) and all(
++                    type(value) is dict and value.get('value_bits') == '0000000000000000' and value.get('value_class') == 'positive_zero' for value in zeros.values())
++                self.counts['Native_inside_scope_rows'] += 1; self.counts['Native_inside_scope_rows_unavailable'] += int(not eligible)
++                emit(self.scope, {'Native': identity, 'surface_index': row['surface_index'], 'actual_flags': flags, 'actual_zero_owners': zeros,
++                    'zero_prerequisites_present': eligible, 'finite_active_operands_and_independent_inside_pair_verified': False,
++                    'reason': 'Prerequisite custody only; no Rust per-iteration seam or inside-equation numerical PASS', 'counted_as_PASS': False})
++
++    def rust_lifecycle(self, event):
++        boundary, owner = event['boundary'], event['owner']; current, last = owner['current_clock'], owner['last_committed_clock']
++        need(type(owner['initialized']) is bool, 'Actual Rust initialized owner unavailable')
++        if boundary not in ['BeginEntry', 'BeginReturned', 'BeginFailed']:
++            need(event['begin_timestep_seconds_argument'] is None, 'Private seam must not reconstruct a wrapper argument')
++        else:
++            self.shape.scalar(event['begin_timestep_seconds_argument'], need)
++        if boundary == 'BeginEntry':
++            need(self.rust_phase is None and self.rust_step is None, 'Unreturned or overlapping Rust ordinary call')
++            self.rust_phase = 'begin'; self.rust_begin = event['caller_clock']; self.rust_init = None
++            self.rust_argument = event['begin_timestep_seconds_argument']; self.rust_history = owner['history']
++        elif boundary == 'InitializationInput':
++            need(self.rust_phase == 'begin' and self.rust_init is None and current is None and type(owner['initialized']) is bool and
++                 event['caller_clock'] == self.rust_begin and self.rust_begin is not None and
++                 self.rust_begin['begin_environment'] is True, 'Rust Init input order/actual begin clock differs')
++            self.rust_init = 'input'; self.rust_init_owner = owner['initialized']
++        elif boundary == 'InitializationReturned':
++            need(self.rust_phase == 'begin' and self.rust_init == 'input' and current is None and owner['initialized'] == self.rust_init_owner and
++                 event['caller_clock'] == self.rust_begin and event['error'] is None, 'Rust Init endpoint order/actual clock differs')
++            self.rust_init = 'returned'
++            self.rust_history = owner['history']
++        elif boundary == 'BeginReturned':
++            need(self.rust_phase == 'begin' and current == event['caller_clock'] and current is not None and
++                 current == self.rust_begin and self.rust_init == ('returned' if current['begin_environment'] else None) and
++                 owner['initialized'] is True and event['error'] is None, 'Actual Rust begin returned clock/owner differs')
++            need(event['begin_timestep_seconds_argument'] == self.rust_argument == current['time_step_zone_seconds'] and
++                 owner['history'] == self.rust_history and owner['failure'] is None, 'Actual Rust begin copies/argument/sticky failure differ')
++            self.lagged_copy(event)
++            self.rust_step = current; self.rust_phase = 'accepted'
++        elif boundary == 'BeginFailed':
++            need(self.rust_phase == 'begin' and event['error'] is not None and owner['failure'] is not None, 'Actual Rust begin failure unavailable')
++            self.issue('Actual Rust BeginFailed', 'Rust', self.counts['all_Rust_events']); self.rust_phase = None
++        elif boundary == 'HistoryUpdateInput':
++            need(self.rust_phase == 'accepted' and event['caller_clock'] == current == self.rust_step, 'Actual Rust update input clock/order differs')
++            self.rust_phase = 'update'
++        elif boundary == 'HistoryUpdateReturned':
++            need(self.rust_phase == 'update' and event['caller_clock'] == current == self.rust_step and
++                 event['update_route'] in ['SimpleShift', 'MasterHistories'], 'Actual Rust update return unavailable')
++            self.rust_phase = 'updated'
++            self.rust_history = owner['history']
++        elif boundary == 'HistoryCommitBeforeClockRelease':
++            need(self.rust_phase == 'updated' and event['caller_clock'] == current == last == self.rust_step, 'Rust copy/last-clock boundary differs')
++            need(owner['history'] == self.rust_history, 'Rust lagged-view copy changed authoritative history')
++            self.lagged_copy(event)
++            self.rust_phase = 'copied'
++        elif boundary == 'CommitReturned':
++            need(self.rust_phase == 'copied' and current is None and event['caller_clock'] == last == self.rust_step and
++                 event['error'] is None, 'Actual Rust commit return/clock release differs')
++            need(owner['history'] == self.rust_history and owner['failure'] is None, 'Rust successful commit changed history or sticky failure')
++            self.rust_step = self.rust_phase = None
++        elif boundary == 'CommitFailed':
++            need(self.rust_phase in ['accepted', 'update', 'updated', 'copied'] and event['error'] is not None and
++                 owner['failure'] is not None, 'Actual Rust commit failure unavailable')
++            self.issue('Actual Rust CommitFailed', 'Rust', self.counts['all_Rust_events']); self.rust_step = self.rust_phase = None
++        else: need(False, 'Unknown actual Rust boundary')
++
++    def lagged_copy(self, event):
++        """Actual same-side copy custody only; no temperature/flux evaluator."""
++        h = event['owner']['history']; ids = h['surface_ids']
++        rows = unique(event['consumer_surfaces'], 'surface_id', 'Rust consumer')
++        need(set(rows) == set(ids) and len(ids) == len(set(ids)), 'Complete actual Rust consumer/history association unavailable')
++        for index, sid in enumerate(ids):
++            ctf = rows[sid]['ctf']; count = ctf['public_num_ctf_terms']
++            need(type(count) is int and 0 <= count < 19, 'Actual bounded consumer terms unavailable')
++            for name, member in zip(RUST, ['inside_temperature_history', 'outside_temperature_history', 'inside_flux_history', 'outside_flux_history']):
++                vector = ctf[member]
++                need(vector['owner_present'] is True and vector['rust_vector_length'] == len(vector['values']) == count,
++                     'Actual complete Rust lagged consumer vector unavailable')
++                need(vector['values'] == [h['normal'][name]['rows'][term + 1]['vector']['values'][index] for term in range(count)],
++                     'Actual Rust lagged consumer bits differ from authoritative history/' + member)
++
++    def pair(self, native_row, rust, key):
++        native, call = self.retained(native_row['event']), native_row['call']; entry = self.retained(call['input']); stage = key[0]
++        need(call['normal_exit'] is not None and call['caller_return'] is not None, 'Required actual Native normal exit/parent return unavailable')
++        mapping = associations(entry['current_history_catalog'], rust['model_catalog'])
++        sf, cf = mapping['surface'], mapping['construction']; total = len(sf)
++        left = self.c.state(native, need); right = rust_state(rust, sf, self.shape.scalar)
++        cmp = self.cmp; cmp.case = {'shared_key': key, 'Native': self.c.event_key(native), 'Rust_event': self.counts['all_Rust_events'],
++            'actual_identity_mapping': mapping, 'actual_Rust_boundary': rust['boundary'], 'actual_Rust_update_route': rust['update_route']}
++        for name in ['schema', 'surface_ids', 'layout', 'update_first_time']: cmp.tree(name, left[name], right[name])
++        for native_name, rust_name in [('BeginSimFlag', 'begin_simulation'), ('BeginEnvrnFlag', 'begin_environment')]:
++            cmp.exact('clock_context/' + native_name, native['clock'][native_name], rust['caller_clock'][rust_name])
++        context = {**native, 'current_history_catalog': entry['current_history_catalog']}
++        nc = self.c.context(context, need); rc = rust['selected_context']
++        need(type(rc) is dict, 'Actual selected context unavailable')
++        for n, r in [('SimpleCTFOnly', 'simple_ctf_only'), ('AnyEMS', 'any_ems_in_model'), ('AnyConstrOverrides', 'any_construction_overrides'),
++                     ('AnyInternalHeatSourceInInput', 'any_internal_heat_source'), ('MaxCTFTerms', 'global_max_ctf_terms'), ('TimeStepZone', 'time_step_zone_hours')]:
++            cmp.tree('selected_context/' + n, nc[n], rc[r])
++        for name in ['heat_transfer_groups', 'opaque_groups']:
++            need(rc[name] == rust['owner'][name], 'Same actual Rust loop copies differ')
++            cmp.tree('loops/' + name, nc[name], [[sf[sid] for sid in group] for group in rc[name]])
++        cmp.tree('loops/AllHT', nc['AllHTSurfaceList'], [sf[sid] for sid in rust['owner']['all_heat_transfer_surfaces']])
++        need(rc['all_heat_transfer_surfaces'] == rust['owner']['all_heat_transfer_surfaces'], 'Same actual Rust AllHT copies differ')
++        inputs = unique(rust['selected_inputs'], 'surface_id', 'Rust selected input')
++        need(set(inputs) == set(sf), 'Complete selected input columns unavailable')
++        public = unique(rust['public']['constructions'], 'construction_id', 'Rust public')
++        constructions = {row['index']: row for row in entry['current_history_catalog']['constructions']}
++        emit(self.optional, {'side': 'Native', 'identity': self.c.event_key(native),
++            'LayerPoint': {str(index): row['LayerPoint'] for index, row in constructions.items()},
++            'reason': 'Actual material-name arena unavailable; raw LayerPoint IDs retained without positional mapping',
++            'required': False, 'counted_as_PASS': False})
++        native_surfaces = {row['index']: row for row in entry['current_history_catalog']['surfaces']}
++        owner_context = native.get('history_entry_context', native.get('history_boundary_context'))
++        need(type(owner_context) is dict, 'Actual complete Native boundary context unavailable')
++        entry_context = entry.get('history_entry_context', entry.get('history_boundary_context'))
++        for field in ['TotSurfaces', 'NumOfZones', 'Surface_allocated', 'AllHTSurfaceList', 'allocated_surfaces']:
++            cmp.tree('same_Native_invocation_identity/' + field, entry_context[field], owner_context[field])
++        operands = owner_context['surface_operands']
++        def operand(name, sid):
++            value = operands[name]; need(value['allocated'] is True and value['lower'] == 1 and value['upper'] == total, 'Actual selected operand allocation unavailable')
++            rows = unique(value['values'], 'index', 'Native operand'); need(set(rows) == set(range(1, total + 1)), 'Actual full operand layout unavailable')
++            return rows[sid]['value']
++        for rid, sid in sf.items():
++            row = inputs[rid]; n = native_surfaces[sid]; construction = constructions[n['Construction']]
++            need(cf.get(row['construction_id']) == n['Construction'] and row['public_owner_construction_id'] == row['construction_id'] and
++                 row['construction_id'] in public, 'Actual selected/public construction owner unavailable')
++            cmp.exact('algorithm/' + str(sid), 'Ctf' if n['HeatTransferAlgorithm'] == 1 else 'Empd', row['algorithm'])
++            cmp.exact('opaque/' + str(sid), True, row['ordinary_opaque']); cmp.exact('source_sink/' + str(sid), construction['SourceSinkPresent'], row['source_sink_present'])
++            cmp.tree('same_Rust_public/' + str(sid), public[row['construction_id']]['storage'], row['coefficients'])
++            for field in [pair[0] for pair in self.policy['field_profiles']['public_coefficients']['pairs']] + ['NumCTFTerms', 'NumHistories', 'CTFTimeStep', 'UValue']:
++                cmp.tree('public/' + str(sid) + '/' + field, construction[field], row['coefficients'][field])
++            for field, member, _ in self.policy['field_profiles']['selected_inputs']['pairs']:
++                value = n['Area'] if field == 'Area' else operand(field, sid)
++                cmp.tree('selected_input/' + str(sid) + '/' + field, value, row[member])
++        route = 'SimpleShift' if native['checkpoint'] == 'simple_history_hard_copy_complete' else 'MasterHistories' if native['checkpoint'] == 'history_selected_master_update_complete' else None
++        cmp.exact('actual_update_route', route, rust['update_route'])
++        opaque = {sid for group in nc['opaque_groups'] for sid in group}; all_ht = set(nc['AllHTSurfaceList'])
++        def arithmetic(group, name, term, sid):
++            if stage == 'initialization-returned': return group == 'normal' and name == 'SurfOutsideFluxHist' and sid in all_ht and term <= nc['MaxCTFTerms']
++            if stage != 'update-returned' or sid not in opaque: return False
++            terms = constructions[native_surfaces[sid]['Construction']]['NumCTFTerms']
++            if group == 'flux_reports': return terms > 0
++            if group == 'scratch': return route == 'MasterHistories' and name == 'SumTime'
++            if group != 'normal': return False
++            if name in NAMES[2:] and term == 0: return terms > 0
++            if route == 'MasterHistories' and (term == 1 or 2 <= term <= terms):
++                need(sid in call['branches'], 'Actual Native per-surface master branch unavailable')
++                return call['branches'][sid] == 'master_history_interpolation_complete'
++            return False
++        for group in ['normal', 'masters', 'scratch', 'flux_reports']:
++            a, b = left[group], right[group]
++            cmp.exact(group + '/allocation', a is not None, b is not None)
++            if a is None or b is None: continue
++            cmp.exact(group + '/keys', sorted(a), sorted(b))
++            for name in a.keys() & b.keys():
++                if name == 'SurfCurrNumHist': cmp.tree(group + '/' + name, a[name], b[name]); continue
++                rows_a = a[name] if group in ['normal', 'masters'] else [a[name]]
++                rows_b = b[name] if group in ['normal', 'masters'] else [b[name]]
++                cmp.exact(group + '/' + name + '/rows', len(rows_a), len(rows_b))
++                for term, (va, vb) in enumerate(zip(rows_a, rows_b)):
++                    cmp.exact(group + '/' + name + '/columns', len(va), len(vb))
++                    for index, (na, rb) in enumerate(zip(va, vb)):
++                        path = f'{group}/{name}/{term}/{index+1}'
++                        if arithmetic(group, name, term, index + 1):
++                            cmp.numeric(path, name, na, rb)
++                            if na['value_class'] not in ['finite', 'positive_zero', 'negative_zero'] or rb['value_class'] not in ['finite', 'positive_zero', 'negative_zero']:
++                                self.issue('Required arithmetic cell nonfinite; no numerical PASS', 'paired-numeric',
++                                           {'pair': cmp.case, 'field_path': path, 'Native': na, 'Rust': rb}, key)
++                        else: cmp.tree(path + '/copied_owner', na, rb)
++        emit(self.ledger, {'status': 'paired-comparison-performed', 'shared_key': key,
++            'Native': self.c.event_key(native), 'Native_scope_normal_exit': call['normal_exit'], 'Native_actual_parent_return': call['caller_return'],
++            'Rust_event': self.counts['all_Rust_events'], 'actual_identity_mapping': mapping,
++            'Source_field_profile_names': list(self.policy['field_profiles']), 'actual_Native_update_route': route,
++            'actual_Rust_update_route': rust['update_route'], 'required': True, 'counted_as_PASS': False})
++        self.counts['paired_stages'] += 1
++
++    def rust_visit(self, event):
++        self.counts['all_Rust_events'] += 1
++        identity = self.counts['all_Rust_events']; boundary = event['boundary']
++        try: self.rust_lifecycle(event)
++        except (ValueError, KeyError, TypeError) as error: self.issue(str(error), 'Rust', {'event': identity, 'boundary': boundary})
++        emit(self.optional, {'side': 'Rust', 'identity': identity, 'boundary': boundary,
++            'context': {'record_index': None if event['caller_clock'] is None else event['caller_clock']['record_index'],
++                'sim_time_steps': None if event['caller_clock'] is None else event['caller_clock']['sim_time_steps'],
++                'rust_local_generation_id': event['rust_local_generation_id'], 'begin_timestep_seconds_argument': event['begin_timestep_seconds_argument']},
++            'required': False, 'counted_as_PASS': False})
++        if boundary not in RUST_STAGES: return
++        self.counts['Rust_selected_stages'] += 1
++        try:
++            key = clock_key(event, RUST_STAGES[boundary], False, self.shape.scalar)
++            self.rust_keys[key] += 1
++            need(self.rust_keys[key] == 1, 'Duplicated Rust shared clock/stage; no occurrence pairing')
++            native = self.native.get(key, [])
++            need(len(native) == 1, 'Native shared clock/stage absent or ambiguous; no occurrence pairing')
++            native[0]['consumed'] = True
++            self.pair(native[0], event, key)
++        except (ValueError, KeyError, TypeError, IndexError) as error:
++            self.issue(str(error), 'Rust', {'event': identity, 'boundary': boundary,
++                'Native_candidates': [row['event']['identity'] for row in locals().get('native', [])]}, locals().get('key'))
++
++    def finish(self):
++        for call, row in self.calls.items():
++            expected = ['initialization-input', 'initialization-returned'] if call[1] == 'InitThermalAndFluxHistories' else ['update-input', 'update-returned']
++            if row['stages'] != expected or row['normal_exit'] is None or row['caller_return'] is None:
++                self.issue('Required same-invocation input/endpoint/normal exit/parent return incomplete or out of order',
++                           'Native', row['input']['identity'])
++        for key, rows in self.native.items():
++            if len(rows) > 1:
++                for row in rows: self.issue('Duplicated Native shared clock/stage; no occurrence pairing', 'Native', row['event']['identity'], key)
++            for row in rows:
++                if not row['consumed']: self.issue('Unmatched required Native selected stage', 'Native', row['event']['identity'], key)
++        if self.rust_step is not None or self.rust_phase is not None: self.issue('Unreturned Rust caller lifecycle at full stream end', 'Rust', None)
++        need(not self.returns, 'Unresolved Native parent return at full stream end')
++        return dict(self.counts)

@@ -1,0 +1,12 @@
+# Compatibility Boundary
+
+status: supported-compatibility
+run_result_state: supported_compatibility_run
+runtime_class: one-zone-heat-balance-compatibility
+runtime_selection_note: selected runtime 'one-zone-heat-balance-compatibility' executes the matched capability boundary; conformance_claim remains false for arbitrary runs
+conformance_claim: false
+release_evidence: false
+
+Ad-hoc arbitrary runs do not become release conformance evidence automatically; compare reports are diagnostic unless promoted by a reviewed release manifest.
+
+This file is generated for every arbitrary run so support status and claim boundaries remain explicit even when oracle comparison artifacts are present.
