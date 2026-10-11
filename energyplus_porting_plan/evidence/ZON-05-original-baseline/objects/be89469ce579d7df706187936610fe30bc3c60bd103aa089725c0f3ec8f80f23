@@ -1,0 +1,354 @@
+--- .runtime/porting/ZON-05/original-data-review-prep-01/before/shape.py
++++ .runtime/porting/ZON-05/original-data-review-prep-01/shape.py
+@@ -1,24 +1,40 @@
+-"""Review actual RAD owner/serialization ledgers; no view-factor or warning evaluator."""
++"""Validate copied direct-member owners and actual call ledgers; no moisture evaluator."""
+ import re
+ import struct
+ from collections import Counter
+ 
+-LAYOUT = "actual Array2 row-first: F(j,i), flat offset (j-1)*N+(i-1)"
+-CLASSES = {"Wall": 1, "Floor": 2, "Roof": 3, "Ceiling": 3}
+-
+-
+-def review(result, request, need, bind):
+-    counts, statuses, constructors, seeds = Counter(), Counter(), Counter(), Counter()
++ZONE_SCALARS = "MAT ZT ZTAV XMPT TMX TM2 airHumRat airHumRatAvg WTimeMinusP W1 WMX WM2 airHumRatTemp tempIndLoad tempDepLoad airRelHum AirPowerCap T1".split()
++ZONE_ARRAYS = "XMAT DSXMAT ZTM WPrevZoneTS DSWPrevZoneTS WPrevZoneTSTemp".split()
++SOURCE_SCALARS = "OAMFL VAMFL CTMFL EAMFL EAMFLxHumRat SumHmARa SumHmARaW MixingMassFlowZone MixingMassFlowXHumRat MDotOA latentGain latentGainExceptPeople".split()
++OWNER_SCALARS = "Volume ZoneVolCapMultpMoist SumLatentHTRadSys SumLatentPool OutBaroPress OutHumRat TimeStepSysSec".split()
++OWNER_INTS = "zone_id space_id Multiplier ListMultiplier SystemZoneNodeNumber leakageParallelPIU_count NumInletNodes zone_owner_count zone_geometry_count zone_equip_config_count room_air_model_count NumOfNodes ZoneAirSolutionAlgo RoomAirModel AFN_control_type".split()
++OWNER_BOOLS = "IsControlled IsReturnPlenum IsSupplyPlenum InletNode_allocated Node_allocated NodeID_allocated doSpaceHeatBalance DoLatentSizing AFN_multizone_always_simulated AFN_FanActivated AFN_distribution_simulated DuctLossSimu FlagHybridModel".split()
++CONTEXT_INTS = "environment_index kind_of_sim day_of_sim hour_of_day zone_timestep zone_steps_per_hour system_timestep_count".split()
++CONTEXT_BOOLS = "warmup kickoff begin_sim end_environment first_system_timestep shorten_system_timestep use_zone_timestep_history".split()
++CONTEXT_SCALARS = "zone_timestep_hours system_timestep_hours system_time_elapsed_hours raw_current_time_hours".split()
++PSY_SCALARS = "iconvTol last_Patm last_tBoil Press_Save tSat_Save".split()
++PSY_KEYS = set(PSY_SCALARS + ["useInterpolationPsychTsatFnPb", "iPsyErrIndex", "Psat_cache_capacity", "nondefault_Psat_rows", "cache_hits_or_local_helper_calls_observed"])
++SNAPSHOT_KEYS = set(OWNER_SCALARS + OWNER_INTS + OWNER_BOOLS + ["phase", "zone_name", "zone_fields", "moisture_source_terms", "InletNode_lower", "InletNode_upper", "Node_lower", "Node_upper", "inlet_order", "nodes", "context", "psychrometrics"])
++
++
++def review(result, request, need):
++    counts = Counter({"cases": 0, "correctHumRat": 0, "source_returns": 0,
++                      "caught_source_exceptions": 0, "declared_unreached_operations": 0,
++                      "snapshots": 0, "scalar_DTO_visits": 0, "source_messages": 0})
+     integrity = []
+ 
+-    def integer(value, low=0, high=None):
+-        need(type(value) is int and value >= low and (high is None or value <= high), "Typed actual integer required")
++    def keys(value, names):
++        need(isinstance(value, dict) and set(value) == set(names), "Exact actual owner object keys required")
++
++    def integer(value, low=None, high=None):
++        need(type(value) is int and (low is None or value >= low) and (high is None or value <= high),
++             "Typed actual integer in owner bounds required")
+ 
+     def boolean(value):
+         need(type(value) is bool, "Typed actual boolean required")
+ 
+     def scalar(row):
+-        need(isinstance(row, dict) and set(row) == {"value", "value_bits", "value_class"}, "Complete actual scalar DTO required")
++        keys(row, ["value", "value_bits", "value_class"])
+         bits = row["value_bits"]
+         need(isinstance(bits, str) and re.fullmatch("[0-9a-f]{16}", bits), "Actual binary64 bits required")
+         word = int(bits, 16)
+@@ -33,147 +49,156 @@
+                  "Finite decimal serialization disagrees with copied bits")
+         counts["scalar_DTO_visits"] += 1
+ 
+-    def outcome(row, allowed):
+-        need(isinstance(row, dict) and set(row) == {"status", "exception_type", "exception_message"} and
+-             row["status"] in allowed, "Genuine caught/source-stop outcome required")
+-        status = row["status"]
+-        if status in ["source_fatal", "source_exception"]:
+-            need(isinstance(row["exception_type"], str) and isinstance(row["exception_message"], str), "Actual caught exception metadata required")
+-        else:
+-            need(row["exception_type"] is None and row["exception_message"] is None, "Unassigned exception metadata must remain null")
+-        return status
+-
+-    invoked_statuses = ["source_returned", "source_fatal", "source_exception", "source_nonstandard_exception"]
+-    need(len(result["model_cases"]) == len(request["model_cases"]), "Complete declared model ledger required")
+-    for declared, model in zip(request["model_cases"], result["model_cases"]):
+-        label = declared["id"]
+-        need(model["id"] == label and model["lane"] == declared["lane"] and model["declared_context"] == declared["context"],
+-             "Actual model identity/order/context differs")
+-        n = len(declared["surface_registry"])
+-        ctor = outcome(model["constructor_outcome"], invoked_statuses); constructors[ctor] += 1
+-        initialized = ctor == "source_returned"
+-        seed = model["member_seed_outcome"]
+-        if initialized:
+-            seed_status = outcome(seed, invoked_statuses); seeds[seed_status] += 1
+-        else:
+-            need(seed is None, "Uninvoked member seed must remain null")
+-            seed_status = None; seeds["source_not_invoked_after_constructor_stop"] += 1
+-        invoked = initialized and seed_status == "source_returned"
+-        boolean(model["actual_source_invoked"])
+-        need(model["actual_source_invoked"] is invoked, "Actual source invocation/seed custody differs")
+-        allowed = invoked_statuses if invoked else ["source_not_invoked_after_member_seed_stop" if initialized else
+-                                                   "source_not_invoked_after_constructor_stop"]
+-        status = outcome(model["call_outcome"], allowed); statuses[status] += 1
+-        snapshot = model["actual_input_snapshot"]
+-        expected_by_id = {row["surface_id"]: row for row in declared["surface_registry"]}
+-        expected_pointers = [expected_by_id[value]["native_surface_index"] for value in declared["surface_order"]]
+-        if invoked:
+-            need(isinstance(snapshot, dict) and snapshot["N"] == n and type(snapshot["N"]) is int and
+-                 snapshot["actual_zone_index"] == 1 and type(snapshot["actual_zone_index"]) is int and
+-                 snapshot["actual_zone_name"] == declared["context"]["zone_name"] and
+-                 snapshot["opaque_zone_id"] == declared["context"]["zone_id"] and
+-                 snapshot["declared_enclosure_index"] == declared["context"]["enclosure_index"] and
+-                 snapshot["geometry_loader_invoked"] is False and snapshot["Native_enclosure_owner_produced"] is False,
+-                 "Actual declared unit owners required; no production geometry claim")
+-            integer(snapshot["opaque_zone_id"], 0, 0xffffffff); integer(snapshot["declared_enclosure_index"], 0, 0xffffffff)
+-            need(len(snapshot["actual_surface_registry"]) == n and len(snapshot["actual_input_pointer_order"]) == n,
+-                 "Actual complete registry/SPtr input shape differs")
+-            for expected, actual in zip(declared["surface_registry"], snapshot["actual_surface_registry"]):
+-                integer(actual["opaque_surface_id"], 0, 0xffffffff); integer(actual["actual_surface_index"], 1, n)
+-                integer(actual["Zone"], 1, 1); integer(actual["Class"], 1, 3)
+-                need(actual["opaque_surface_id"] == expected["surface_id"] and actual["actual_surface_index"] == expected["native_surface_index"] and
+-                     actual["Name"] == expected["name"] and actual["Zone"] == 1 and actual["Class"] == CLASSES[expected["surface_type"]] and
+-                     actual["declared_surface_type"] == expected["surface_type"], "Actual seeded registry/class/ID order differs")
+-                for key, source in [("Area", "area_m2"), ("Azimuth", "azimuth_deg"), ("Tilt", "tilt_deg")]:
+-                    scalar(actual[key]); need(actual[key]["value_bits"] == expected[source]["bits"], "Actual registry input bits differ")
+-            for position, (opaque, actual) in enumerate(zip(declared["surface_order"], snapshot["actual_input_pointer_order"]), 1):
+-                expected = expected_by_id[opaque]
+-                integer(actual["source_surface_position"], 1, n); integer(actual["opaque_surface_id"], 0, 0xffffffff); integer(actual["SPtr"], 1, n)
+-                need(actual["source_surface_position"] == position and actual["opaque_surface_id"] == opaque and
+-                     actual["SPtr"] == expected["native_surface_index"], "Actual input SPtr association/order differs")
+-                for key, source in [("A", "area_m2"), ("Azimuth", "azimuth_deg"), ("Tilt", "tilt_deg")]:
+-                    scalar(actual[key]); need(actual[key]["value_bits"] == expected[source]["bits"], "Actual ordered source input bits differ")
+-            counts["actual_input_snapshots"] += 1
+-        else:
+-            need(snapshot is None, "Uncompleted seed must not invent an input snapshot")
+-        observed = model["observations"]
+-        for key in ["actual_zone_area_callback_count", "actual_matrix_callback_count", "actual_warning_callback_count",
+-                    "actual_diagnostic_callback_count", "omitted_warning_records", "omitted_diagnostic_records"]:
+-            integer(observed[key]); counts[key] += observed[key]
+-        failures = observed["failure_counts"]
+-        need(isinstance(failures, list) and len(failures) == 4, "Actual four typed observer failure sites required")
+-        for value in failures: integer(value)
+-        for key in ["observer_failure", "required_reached_owner_missing", "observation_integrity_failed"]: boolean(observed[key])
+-        need(observed["observer_failure"] is any(failures), "Actual failure-site aggregate differs")
+-        area, factors, pointers = observed["ZoneArea"], observed["F"], observed["actual_SPtr"]
+-        need(observed["F_layout"] == LAYOUT, "Actual destination-row/source-column layout differs")
+-        if area is not None:
+-            need(isinstance(area, list) and len(area) == n and observed["actual_zone_area_callback_count"] > 0,
+-                 "Actual ZoneArea owner/count/shape differs")
+-            for value in area: scalar(value)
+-        if pointers is not None:
+-            need(isinstance(pointers, list) and all(type(value) is int for value in pointers) and pointers == expected_pointers and
+-                 observed["actual_zone_area_callback_count"] > 0, "Actual copied SPtr owner differs")
+-        need((area is None) is (pointers is None), "Atomic ZoneArea/SPtr copy availability differs")
+-        if factors is not None:
+-            need(isinstance(factors, list) and len(factors) == n * n and observed["F_shape"] == [n, n] and
+-                 all(type(value) is int for value in observed["F_shape"]) and
+-                 observed["actual_matrix_callback_count"] > 0, "Actual matrix owner/count/shape differs")
+-            for value in factors: scalar(value)
+-        else:
+-            need(observed["F_shape"] is None, "Uncopied matrix shape must remain null")
+-        warning_rows, diagnostic_rows = observed["warnings"], observed["diagnostics"]
+-        need(isinstance(warning_rows, list) and isinstance(diagnostic_rows, list), "Actual retained diagnostic ledgers required")
+-        need(len(warning_rows) + observed["omitted_warning_records"] == observed["actual_warning_callback_count"] and
+-             len(diagnostic_rows) + observed["omitted_diagnostic_records"] == observed["actual_diagnostic_callback_count"],
+-             "Actual retained/omitted callback counts differ")
+-        previous_ordinal = previous_position = previous_end = 0
+-        for warning in warning_rows:
+-            integer(warning["actual_warning_callback_ordinal"], previous_ordinal + 1, observed["actual_warning_callback_count"])
+-            integer(warning["source_surface_position"], previous_position + 1, n)
+-            integer(warning["actual_diagnostic_end_exclusive"], previous_end, observed["actual_diagnostic_callback_count"])
+-            position = warning["source_surface_position"]
+-            expected = expected_by_id[declared["surface_order"][position - 1]]
+-            integer(warning["actual_surface_index"], 1, n); integer(warning["actual_zone_index"], 1, 1)
+-            need(warning["actual_surface_index"] == expected["native_surface_index"] and warning["actual_zone_index"] == 1 and
+-                 warning["surface_name"] == expected["name"] and warning["zone_name"] == declared["context"]["zone_name"],
+-                 "Actual reached warning owner association differs")
+-            scalar(warning["actual_seen_area"])
+-            if area is not None:
+-                need(warning["actual_seen_area"]["value_bits"] == area[position - 1]["value_bits"], "Actual warning/ZoneArea owner handoff differs")
+-            previous_ordinal, previous_position, previous_end = warning["actual_warning_callback_ordinal"], position, warning["actual_diagnostic_end_exclusive"]
+-        previous = 0
+-        for diagnostic in diagnostic_rows:
+-            integer(diagnostic["actual_callback_ordinal"], previous + 1, observed["actual_diagnostic_callback_count"])
+-            integer(diagnostic["actual_error_level"], -1)
+-            need(isinstance(diagnostic["message"], str), "Actual diagnostic text required")
+-            previous = diagnostic["actual_callback_ordinal"]
+-        if initialized:
+-            need(observed["err_stream"] is not None, "Actual installed Native stringstream log required")
+-            bind(observed["err_stream"]); integer(observed["actual_TotalWarningErrors"])
+-        else:
+-            need(observed["err_stream"] is None and observed["actual_TotalWarningErrors"] is None, "Unavailable Native state must retain null diagnostics owners")
+-        required_missing = status == "source_returned" and (observed["actual_zone_area_callback_count"] != 1 or
+-            observed["actual_matrix_callback_count"] != 1 or area is None or factors is None or pointers is None)
+-        need(observed["required_reached_owner_missing"] is required_missing, "Reached-required owner absence summary differs")
+-        failed = observed["observer_failure"] or required_missing or observed["omitted_warning_records"] != 0 or observed["omitted_diagnostic_records"] != 0
+-        need(observed["observation_integrity_failed"] is failed, "Actual observation integrity summary differs")
+-        if failed: integrity.append(label + "/observer-or-required-owner-integrity")
+-        if not invoked:
+-            need(area is None and factors is None and pointers is None and not warning_rows and
+-                 observed["actual_zone_area_callback_count"] == observed["actual_matrix_callback_count"] == observed["actual_warning_callback_count"] == 0,
+-                 "Uninvoked source must not invent calculation owners")
+-        counts["model_cases"] += 1
+-        counts["actual_source_invocations" if invoked else "actual_source_uninvoked"] += 1
+-        counts["returned_ZoneArea_owners"] += int(area is not None)
+-        counts["returned_F_owners"] += int(factors is not None)
+-        counts["retained_warning_records"] += len(warning_rows)
+-        counts["retained_diagnostic_records"] += len(diagnostic_rows)
+-    boolean(result["observer_integrity_failed"])
+-    need(result["observer_integrity_failed"] is bool(integrity), "Global actual integrity summary differs")
+-    integer(result["actual_source_invocations"])
+-    need(result["actual_source_invocations"] == counts["actual_source_invocations"] and result["actual_status_counts"] == dict(statuses),
+-         "Actual invocation/status counts differ from retained records")
+-    for value in result["actual_status_counts"].values(): integer(value)
+-    return {**dict(counts), "actual_source_status_counts": dict(statuses), "actual_constructor_status_counts": dict(constructors),
+-            "actual_member_seed_status_counts": dict(seeds)}, integrity
++    def same_input(row, token):
++        scalar(row)
++        need(row["value_bits"] == token, "Actual prepared input bits differ from literal request")
++
++    def array_bounds(owner, prefix, size):
++        need(owner[prefix + "_allocated"] is bool(size), "Actual allocation differs from declared owner size")
++        need(owner[prefix + "_lower"] == (1 if size else None) and
++             owner[prefix + "_upper"] == (size if size else None), "Actual allocated bounds differ")
++        if size:
++            integer(owner[prefix + "_lower"], 1, 1); integer(owner[prefix + "_upper"], size, size)
++
++    def snapshot(owner, initial, phase):
++        keys(owner, SNAPSHOT_KEYS)
++        need(owner["phase"] == phase and owner["zone_name"] == initial["zone_name"], "Actual phase/name association differs")
++        for key in OWNER_SCALARS: scalar(owner[key])
++        for key in OWNER_INTS: integer(owner[key])
++        for key in OWNER_BOOLS: boolean(owner[key])
++        need((owner["zone_id"], owner["space_id"]) == (1, 0) and
++             all(owner[key] == 1 for key in ["zone_owner_count", "zone_geometry_count", "zone_equip_config_count", "room_air_model_count"]),
++             "Actual allocated zone1/space0 owner required")
++        for key in ["Multiplier", "ListMultiplier", "IsControlled", "SystemZoneNodeNumber"]:
++            need(owner[key] == initial[key], "Actual declared zone integer/flag differs")
++        need((owner["ZoneAirSolutionAlgo"], owner["RoomAirModel"], owner["AFN_control_type"]) == (0, 1, 0) and
++             owner["leakageParallelPIU_count"] == 0, "Admitted ThirdOrder/Mixing/noAFN/emptyPIU owners required")
++        for key in ["IsReturnPlenum", "IsSupplyPlenum", "doSpaceHeatBalance", "DoLatentSizing", "AFN_multizone_always_simulated",
++                    "AFN_FanActivated", "AFN_distribution_simulated", "DuctLossSimu", "FlagHybridModel"]:
++            need(owner[key] is False, "Excluded source route must remain actually inactive")
++        fields = owner["zone_fields"]; keys(fields, ZONE_SCALARS + ZONE_ARRAYS)
++        for key in ZONE_SCALARS: scalar(fields[key])
++        for key in ZONE_ARRAYS:
++            need(type(fields[key]) is list and len(fields[key]) == 4, "All four actual history slots required")
++            for value in fields[key]: scalar(value)
++        keys(owner["moisture_source_terms"], SOURCE_SCALARS)
++        for key in SOURCE_SCALARS: same_input(owner["moisture_source_terms"][key], initial["zone_field_bits"][key])
++        for key in ["Volume", "ZoneVolCapMultpMoist", "OutBaroPress", "OutHumRat", "TimeStepSysSec"]:
++            same_input(owner[key], initial[key + "_bits"])
++        for key in ["SumLatentHTRadSys", "SumLatentPool"]:
++            need(owner[key]["value_bits"] == "0000000000000000", "Actual explicitly seeded zero latent owner required")
++        context = owner["context"]; keys(context, CONTEXT_INTS + CONTEXT_BOOLS + CONTEXT_SCALARS)
++        for key in CONTEXT_INTS: integer(context[key])
++        for key in CONTEXT_BOOLS: boolean(context[key])
++        for key in CONTEXT_SCALARS: scalar(context[key])
++        same_input(context["zone_timestep_hours"], initial["TimeStepZone_bits"])
++        same_input(context["system_timestep_hours"], initial["TimeStepSys_bits"])
++        need(context["warmup"] is False, "Declared direct unit is not a warmup caller")
++        node_count, inlet_count = len(initial["nodes"]), len(initial["inlet_node_ids"])
++        need(owner["NumOfNodes"] == node_count and owner["NumInletNodes"] == inlet_count, "Actual full node/inlet counts differ")
++        array_bounds(owner, "Node", node_count); array_bounds(owner, "InletNode", inlet_count)
++        need(owner["NodeID_allocated"] is bool(node_count), "Actual node-name allocation differs")
++        need(type(owner["inlet_order"]) is list and len(owner["inlet_order"]) == inlet_count and
++             type(owner["nodes"]) is list and len(owner["nodes"]) == node_count, "Complete actual ordered owner arrays required")
++        for index, (actual, node_id) in enumerate(zip(owner["inlet_order"], initial["inlet_node_ids"]), 1):
++            keys(actual, ["inlet_ordinal", "node_id"]); integer(actual["inlet_ordinal"], index, index); integer(actual["node_id"], 1, node_count)
++            need(actual["node_id"] == node_id, "Actual original ordered inlet IDs differ")
++        for index, (actual, declared) in enumerate(zip(owner["nodes"], initial["nodes"]), 1):
++            keys(actual, ["node_id", "name", "MassFlowRate", "Temp", "HumRat", "Enthalpy"])
++            integer(actual["node_id"], index, index)
++            need(actual["node_id"] == declared["node_id"] and actual["name"] == declared["name"], "Actual node identity/order differs")
++            for key in ["MassFlowRate", "Temp", "HumRat", "Enthalpy"]: scalar(actual[key])
++        psych = owner["psychrometrics"]; keys(psych, PSY_KEYS)
++        for key in PSY_SCALARS: scalar(psych[key])
++        boolean(psych["useInterpolationPsychTsatFnPb"])
++        need(psych["cache_hits_or_local_helper_calls_observed"] is False, "Unobserved psychrometric call/HIT claims prohibited")
++        need(type(psych["iPsyErrIndex"]) is list, "Actual psychrometric index owner required")
++        for value in psych["iPsyErrIndex"]: integer(value)
++        integer(psych["Psat_cache_capacity"], 1)
++        need(type(psych["nondefault_Psat_rows"]) is list, "Actual nondefault cache-row ledger required")
++        previous = -1
++        for row in psych["nondefault_Psat_rows"]:
++            keys(row, ["index", "iTdb", "Psat"])
++            integer(row["index"], previous + 1, psych["Psat_cache_capacity"] - 1); previous = row["index"]
++            integer(row["iTdb"]); scalar(row["Psat"])
++            need(row["iTdb"] != -1000 or row["Psat"]["value_bits"] != "0000000000000000", "Copied nondefault cache-row predicate differs")
++        counts["snapshots"] += 1
++
++    keys(result, ["schema", "cases", "requested_case_count", "recorded_case_count", "status", "expected_values_supplied",
++                  "actual_Original_body_modified", "humidity_member_was_actually_invoked", "complete_ZON05_PASS_claimed",
++                  "production_or_history_integration_certified", "gates_updated"])
++    need(result["schema"] == "zon05-native-unit-results.v1" and type(result["cases"]) is list and
++         len(result["cases"]) == len(request["cases"]), "Actual complete declared case ledger required")
++    integer(result["requested_case_count"], len(request["cases"]), len(request["cases"]))
++    integer(result["recorded_case_count"], len(result["cases"]), len(result["cases"]))
++    need(result["humidity_member_was_actually_invoked"] is True, "Actual member invocation ledger required")
++    for key in ["expected_values_supplied", "actual_Original_body_modified", "complete_ZON05_PASS_claimed", "production_or_history_integration_certified", "gates_updated"]:
++        need(result[key] is False, "Actual result exceeds the selected direct-member scope")
++    for declared, case in zip(request["cases"], result["cases"]):
++        keys(case, ["case_id", "purpose", "admission_lane", "input", "prepared", "operations", "requested_operation_count",
++                    "actual_member_invocation_count", "status", "source_messages", "source_error_stream", "source_warning_backend_paired",
++                    "parser_or_production_admission_claimed"])
++        need(case["input"] == declared and all(case[key] == declared[key] for key in ["case_id", "purpose", "admission_lane"]),
++             "Actual case identity/order/literal input differs")
++        initial = declared["initial"]; prepared = case["prepared"]
++        snapshot(prepared, initial, "after-declared-input-preparation-no-correction-call")
++        for key in initial["zone_fields"]:
++            if key in SOURCE_SCALARS: continue
++            values = prepared["zone_fields"][key]; tokens = initial["zone_field_bits"][key]
++            if key in ZONE_ARRAYS:
++                for value, token in zip(values, tokens): same_input(value, token)
++            else: same_input(values, tokens)
++        for node, source in zip(prepared["nodes"], initial["nodes"]):
++            for key in ["MassFlowRate", "Temp", "HumRat", "Enthalpy"]: same_input(node[key], source[key + "_bits"])
++        need(type(case["source_messages"]) is list and isinstance(case["source_error_stream"], str), "Actual Native diagnostic owners required")
++        for index, message in enumerate(case["source_messages"]):
++            keys(message, ["message_index", "level", "message"])
++            integer(message["message_index"], index, index); integer(message["level"])
++            need(isinstance(message["message"], str), "Actual raw diagnostic text required")
++        need(case["source_warning_backend_paired"] is False and case["parser_or_production_admission_claimed"] is False,
++             "Native diagnostics and direct unit are not production certificates")
++        operations = case["operations"]
++        need(type(operations) is list and 0 < len(operations) <= len(declared["operations"]), "Actual invoked prefix required")
++        integer(case["requested_operation_count"], len(declared["operations"]), len(declared["operations"]))
++        integer(case["actual_member_invocation_count"], len(operations), len(operations))
++        previous, message_end, stopped = prepared, 0, False
++        for ordinal, (operation, requested) in enumerate(zip(operations, declared["operations"]), 1):
++            keys(operation, ["operation_id", "operation", "actual_member_invocation_ordinal", "actual_source_invoked",
++                             "actual_source_return_observed", "source_exception", "before", "after", "source_message_begin", "source_message_end",
++                             "history_selection_caller_invoked", "current_average_or_history_commit_invoked", "local_A_B_C_rho_Hg_Wsat_or_guard_decisions_observed"])
++            need(not stopped and operation["operation_id"] == requested["operation_id"] and operation["operation"] == requested["operation"] == "correctHumRat" and
++                 operation["actual_source_invoked"] is True, "Actual requested member order/invocation differs")
++            integer(operation["actual_member_invocation_ordinal"], ordinal, ordinal)
++            boolean(operation["actual_source_return_observed"])
++            before, after = operation["before"], operation["after"]
++            snapshot(before, initial, "before-actual-correctHumRat"); snapshot(after, initial, "after-actual-call-or-caught-exception")
++            need({k: v for k, v in before.items() if k != "phase"} == {k: v for k, v in previous.items() if k != "phase"},
++                 "Actual same-case persistent state/cache custody differs")
++            for key in SNAPSHOT_KEYS - {"phase", "zone_fields", "nodes", "psychrometrics"}:
++                need(before[key] == after[key], "Direct member changed an observed retained source owner: " + key)
++            for key in set(ZONE_SCALARS + ZONE_ARRAYS) - {"airHumRatTemp"}:
++                need(before["zone_fields"][key] == after["zone_fields"][key], "Current/average/history/other zone field retention differs: " + key)
++            for old, new in zip(before["nodes"], after["nodes"]):
++                for key in old:
++                    if old["node_id"] != initial["SystemZoneNodeNumber"] or key not in ["HumRat", "Enthalpy"]:
++                        need(old[key] == new[key], "Non-feedback node owner retention differs")
++            integer(operation["source_message_begin"], message_end, message_end)
++            integer(operation["source_message_end"], message_end, len(case["source_messages"]))
++            message_end = operation["source_message_end"]
++            for key in ["history_selection_caller_invoked", "current_average_or_history_commit_invoked", "local_A_B_C_rho_Hg_Wsat_or_guard_decisions_observed"]:
++                need(operation[key] is False, "Uninvoked caller or unobserved local claim prohibited")
++            if operation["actual_source_return_observed"]:
++                need(operation["source_exception"] is None, "Returned source must not contain a caught exception")
++                counts["source_returns"] += 1
++            else:
++                need(isinstance(operation["source_exception"], str) and ordinal == len(operations), "Caught exception stops this actual case prefix")
++                stopped = True; counts["caught_source_exceptions"] += 1
++                integrity.append({"case_id": case["case_id"], "operation_id": operation["operation_id"], "kind": "actual-source-exception-stopped-sequence"})
++            previous = after; counts["correctHumRat"] += 1
++        need(message_end == len(case["source_messages"]), "Actual diagnostic index ledger has an unowned suffix")
++        need(case["status"] == ("actual-source-exception-stopped-sequence" if stopped else "actual-selected-member-calls-returned"), "Actual case stop/return status differs")
++        need(stopped or len(operations) == len(declared["operations"]), "Missing requested operations cannot become returned")
++        counts["declared_unreached_operations"] += len(declared["operations"]) - len(operations)
++        counts["source_messages"] += len(case["source_messages"]); counts["cases"] += 1
++    need(result["status"] == ("actual-source-exception" if integrity else "actual-selected-member-calls-returned"), "Actual aggregate source status differs")
++    return dict(counts), integrity

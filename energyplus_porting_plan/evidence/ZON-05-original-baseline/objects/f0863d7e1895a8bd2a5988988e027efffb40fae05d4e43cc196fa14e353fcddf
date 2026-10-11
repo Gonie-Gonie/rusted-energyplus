@@ -1,0 +1,44 @@
+"""Root executes reviewed strict PE, genuine direct member, then factual OriginalQA."""
+import hashlib,json,os,shutil,subprocess
+from datetime import datetime,timezone
+from pathlib import Path
+ROOT=Path.cwd();BASE=ROOT/'.runtime/porting/ZON-05'
+def read(p):return json.loads(p.read_bytes())
+def sha(p):
+ with p.open('rb')as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+def ref(p):return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+def arg(p):return p.relative_to(ROOT).as_posix()+'#'+sha(p)
+def exact(r):assert ref(ROOT/r['path'])=={k:r[k]for k in ['path','sha256','size_bytes']},r['path']
+def recorded(name,command,check=True):
+ out=BASE/name;result=subprocess.run(['python','-X','utf8','-B','tools/porting/record_command.py','--output-dir',out.relative_to(ROOT).as_posix(),'--',*command])
+ if check:result.check_returncode()
+ receipt=out/'receipt.json';assert read(receipt)['source_snapshot']['sha256']=='688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27'
+ return receipt
+def write(p,v):p.write_bytes((json.dumps(v,indent=2,allow_nan=False)+'\n').encode('utf8'))
+assert not subprocess.check_output(['git','status','--porcelain'])and subprocess.check_output(['git','rev-parse','HEAD'])==subprocess.check_output(['git','rev-parse','@{u}'])
+qa_prep=BASE/'original-data-review-prep-01/manifest.json';assert sha(qa_prep)=='c52bd6b2a90f9e205b34c821fc1babf952b4593f5793e1bee699e6e83527b438'
+for r in read(qa_prep)['own_sources']:exact(r)
+pe_prep=BASE/'native-build-review-prep-01/manifest.json';assert sha(pe_prep)=='b94c528705271b4fa8d87bd39f580e575b55ef950093c3944b251b079286388d'
+pe_reader=ROOT/read(pe_prep)['own_sources'][0]['path'];exact(read(pe_prep)['own_sources'][0])
+build_path=BASE/'native-build-01/native-build.json';build=read(build_path)
+assert build['status']=='pass-actual-1TU-link-and-preservation'and build['current_compile_rows']==721 and build['protected_ref_count']==52
+assert build['native_source_manifest']['sha256']=='5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1'and build['build_source_manifest']['sha256']=='4bf4d13edf3c79c36e063bda4c20755cb3c1d53e4c43f7e5e885334f7e89d293'
+freeze_path=BASE/'frozen-packet-02/freeze-receipt.json';freeze=read(freeze_path);assert build['freeze_receipt']==ref(freeze_path)and build['freeze_execution']==ref(BASE/'freeze-command-02/receipt.json')
+for r in freeze['source_authorities']['current_after_documents']+[freeze['helper_request']]+build['native_source_files']+[build['linked_original'],build['helper_binary']]:exact(r)
+for p in [BASE/'freeze-command-02/receipt.json',ROOT/build['configure_execution']['path'],ROOT/build['compile_execution']['path'],ROOT/build['derivation_execution']['path']]:assert read(p)['source_snapshot']['sha256']=='688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27'
+recorded('protected-original-storage-command-01',['python','-X','utf8','-B',(BASE/'compress-retained-original-01.py').relative_to(ROOT).as_posix()])
+pe_execution=recorded('native-build-review-command-01',['python','-X','utf8','-B',pe_reader.relative_to(ROOT).as_posix(),'--build',arg(build_path),'--output-dir',(BASE/'native-build-review-01').relative_to(ROOT).as_posix()])
+peer_path=BASE/'native-build-review-01/review.json';peer=read(peer_path);assert peer['retained_runtime_exact']and not peer['scientific_execution_certified']
+loader=ROOT/'.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin';products=ROOT/'.runtime/ep261-gcc13-o0/Products';os.environ['PATH']=str(loader)+os.pathsep+str(products)+os.pathsep+os.environ['PATH']
+dlls=read(ROOT/'.runtime/porting/RAD-01/native-launch-inputs-02/environment.json')['runtime_DLL_files']
+for r in dlls:exact(r)
+context=BASE/'native-launch-inputs-01';assert not context.exists();context.mkdir()
+env={'schema':'zon05-actual-runtime-loader-inputs.v1','created_utc':datetime.now(timezone.utc).isoformat(),'executed_Root_launcher':ref(Path(__file__).resolve()),'PATH_prepend_as_supplied_by_launcher':[str(loader),str(products)],'runtime_DLL_files':dlls,'actual_loaded_DLL_modules_observed':False,'actual_build':ref(build_path),'actual_PE_review':ref(peer_path),'actual_freeze':ref(freeze_path),'observed_free_bytes_before_engine':shutil.disk_usage(ROOT).free,'linked_original_and_helper_before':[ref(ROOT/build[k]['path'])for k in ['linked_original','helper_binary']]};write(context/'before-environment.json',env)
+native_execution=recorded('native-unit-command-01',[str(ROOT/build['helper_binary']['path']),str(ROOT/freeze['helper_request']['path'])],False)
+for r in dlls+build['native_source_files']+[build['linked_original'],build['helper_binary']]:exact(r)
+after=dict(env);after.update(schema='zon05-actual-runtime-loader-after-execution.v1',actual_native_execution=ref(native_execution),DLL_and_binary_bytes_unchanged=True,linked_original_and_helper_after=[ref(ROOT/build[k]['path'])for k in ['linked_original','helper_binary']],observed_free_bytes_after_engine=shutil.disk_usage(ROOT).free);write(context/'after-environment.json',after)
+reader=BASE/'original-data-review-prep-01/review_data.py';command=['python','-X','utf8','-B',reader.relative_to(ROOT).as_posix(),'--approved-source-sha256',sha(reader)]
+options={'native-execution':native_execution,'results':ROOT/read(native_execution)['stdout']['path'],'freeze-receipt':freeze_path,'freeze-execution':BASE/'freeze-command-02/receipt.json','build':build_path,'build-execution':ROOT/build['compile_execution']['path'],'build-review':peer_path,'build-review-execution':pe_execution}
+for name,p in options.items():command+=['--'+name,arg(p)]
+command+=['--output-dir',(BASE/'original-data-review-01').relative_to(ROOT).as_posix()];recorded('original-data-review-command-01',command)
+print('Root genuine ZON05 member and factual OriginalQA stages completed; Rust math remains unapplied.',flush=True)

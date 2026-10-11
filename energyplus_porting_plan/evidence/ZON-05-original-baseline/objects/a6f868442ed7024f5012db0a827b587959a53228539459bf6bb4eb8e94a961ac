@@ -1,0 +1,378 @@
+{
+  "sha256": "855e81e1bccf540a376a5af096b1148c03e0bcb3bf78c0126b32008b63d91178",
+  "size_bytes": 149739680,
+  "pe_offset": 128,
+  "dos_prefix_sha256": "bfdf5e72651b4ec588bd5fc6a9f17e9e0972248146bbacc10478f48d72f29b81",
+  "machine": 34404,
+  "section_count": 11,
+  "timestamp": 1791686065,
+  "symbol_table_offset": 70866944,
+  "symbol_count": 1316711,
+  "optional_header_size": 240,
+  "coff_characteristics": 550,
+  "complete_header_hex": "4d5a90000300000004000000ffff0000b800000000000000400000000000000000000000000000000000000000000000000000000000000000000000800000000e1fba0e00b409cd21b8014ccd21546869732070726f6772616d2063616e6e6f742062652072756e20696e20444f53206d6f64652e0d0d0a24000000000000005045000064860b00b1f5ca6a0058390467171400f00026020b02022900e052020054390400ce00002511000000100000000000400100000000100000000200000400000000000000050002000000000000803a0400040000b204ed080300600100002000000000000010000000000000000010000000000000100000000000000000000010000000000000000000000000703004d882000000000000000000000020ef0360a81800000000000000000000203104345a0900000000000000000000000000000000000000000000000000c08de503280000000000000000000000000000000000000060863004b81400000000000000000000000000000000000000000000000000002e7465787400000028de52020010000000e0520200040000000000000000000000000000600000602e64617461000000e043010000f052020044010000e45202000000000000000000000000400000c02e72646174610000b4ce9a010040540200d09a0100285402000000000000000000000000400000402f34000000000000040000000010ef030002000000f8ee03000000000000000000000000400000c02e7064617461000060a818000020ef0300aa180000faee03000000000000000000000000400000402e7864617461000078ce270000d0070400d0270000a40704000000000000000000000000400000402e6273730000000080cc000000a02f040000000000000000000000000000000000000000800000c02e69646174610000d8820000007030040084000000742f04000000000000000000000000400000c02e4352540000000060000000000031040002000000f82f04000000000000000000000000400000c02e746c730000000010000000001031040002000000fa2f04000000000000000000000000400000c02e72656c6f630000345a090000203104005c090000fc2f0400000000000000000000000040000042000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "optional_header_hex": "0b02022900e052020054390400ce00002511000000100000000000400100000000100000000200000400000000000000050002000000000000803a0400040000b204ed080300600100002000000000000010000000000000000010000000000000100000000000000000000010000000000000000000000000703004d882000000000000000000000020ef0360a81800000000000000000000203104345a0900000000000000000000000000000000000000000000000000c08de503280000000000000000000000000000000000000060863004b8140000000000000000000000000000000000000000000000000000",
+  "entry_rva": 4389,
+  "image_base": 5368709120,
+  "section_alignment": 4096,
+  "file_alignment": 512,
+  "code_size": 38985728,
+  "initialized_data_size": 70865920,
+  "uninitialized_data_size": 52736,
+  "image_size": 70942720,
+  "header_size": 1024,
+  "checksum": 149750962,
+  "sections": [
+    {
+      "name": ".text",
+      "rva": 4096,
+      "virtual_size": 38985256,
+      "raw_size": 38985728,
+      "raw_offset": 1024,
+      "characteristics": 1610612832,
+      "debug": false,
+      "raw_sha256": "47af913592275e1eba036dbff62527cccc0b37bdbff826be4199e5b43fc30bac"
+    },
+    {
+      "name": ".data",
+      "rva": 38989824,
+      "virtual_size": 82912,
+      "raw_size": 82944,
+      "raw_offset": 38986752,
+      "characteristics": 3221225536,
+      "debug": false,
+      "raw_sha256": "22c3b0efc3ebf7b88ca062a7fbbb93c793a56cd5f0decf7f82591f04c7119f99"
+    },
+    {
+      "name": ".rdata",
+      "rva": 39075840,
+      "virtual_size": 26922676,
+      "raw_size": 26923008,
+      "raw_offset": 39069696,
+      "characteristics": 1073741888,
+      "debug": false,
+      "raw_sha256": "d8f2f5cd429e94415e036292ac78910ab9df420ff09690101ba81ddb90aaabf0"
+    },
+    {
+      "name": ".eh_frame",
+      "rva": 65998848,
+      "virtual_size": 4,
+      "raw_size": 512,
+      "raw_offset": 65992704,
+      "characteristics": 3221225536,
+      "debug": false,
+      "raw_sha256": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560"
+    },
+    {
+      "name": ".pdata",
+      "rva": 66002944,
+      "virtual_size": 1615968,
+      "raw_size": 1616384,
+      "raw_offset": 65993216,
+      "characteristics": 1073741888,
+      "debug": false,
+      "raw_sha256": "8de771f0bcc0f3d4472c8b2080c7ced0ec2a40e358fe730490447afa98d32b1c"
+    },
+    {
+      "name": ".xdata",
+      "rva": 67620864,
+      "virtual_size": 2608760,
+      "raw_size": 2609152,
+      "raw_offset": 67609600,
+      "characteristics": 1073741888,
+      "debug": false,
+      "raw_sha256": "1b658bd0a22fc3d8f86f89a641ca0f4ffb4d67e330c491c06fad9b8f158358a8"
+    },
+    {
+      "name": ".bss",
+      "rva": 70230016,
+      "virtual_size": 52352,
+      "raw_size": 0,
+      "raw_offset": 0,
+      "characteristics": 3221225600,
+      "debug": false,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": ".idata",
+      "rva": 70283264,
+      "virtual_size": 33496,
+      "raw_size": 33792,
+      "raw_offset": 70218752,
+      "characteristics": 3221225536,
+      "debug": false,
+      "raw_sha256": "e242c77c331426df337b221c42871df31f440b0f508c17bf07e0783148c387b3"
+    },
+    {
+      "name": ".CRT",
+      "rva": 70320128,
+      "virtual_size": 96,
+      "raw_size": 512,
+      "raw_offset": 70252544,
+      "characteristics": 3221225536,
+      "debug": false,
+      "raw_sha256": "8919ee2ae1afe8cc7222410d4cab697a356e4d392bbe2687fa579efd113a26fe"
+    },
+    {
+      "name": ".tls",
+      "rva": 70324224,
+      "virtual_size": 16,
+      "raw_size": 512,
+      "raw_offset": 70253056,
+      "characteristics": 3221225536,
+      "debug": false,
+      "raw_sha256": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560"
+    },
+    {
+      "name": ".reloc",
+      "rva": 70328320,
+      "virtual_size": 612916,
+      "raw_size": 613376,
+      "raw_offset": 70253568,
+      "characteristics": 1107296320,
+      "debug": false,
+      "raw_sha256": "bbd2b13a73842743fa2a945ab5ed21ca44c3e980d5c5dd77d500171132ffcae3"
+    }
+  ],
+  "data_directories": [
+    {
+      "index": 0,
+      "rva": 0,
+      "size": 0,
+      "section": null,
+      "section_relative_offset": null,
+      "payload_sha256": null
+    },
+    {
+      "index": 1,
+      "rva": 70283264,
+      "size": 33496,
+      "section": ".idata",
+      "section_relative_offset": 0,
+      "payload_sha256": "d7331dd8a5eeaee37e328f0888cc36cff9d484cb0476572a707d968048e0d413"
+    },
+    {
+      "index": 2,
+      "rva": 0,
+      "size": 0,
+      "section": null,
+      "section_relative_offset": null,
+      "payload_sha256": null
+    },
+    {
+      "index": 3,
+      "rva": 66002944,
+      "size": 1615968,
+      "section": ".pdata",
+      "section_relative_offset": 0,
+      "payload_sha256": "865daf7806f60feaed5895981b83f0f015413b8cf783e2a23ba59d640e4afdd0"
+    },
+    {
+      "index": 4,
+      "rva": 0,
+      "size": 0,
+      "section": null,
+      "section_relative_offset": null,
+      "payload_sha256": null
+    },
+    {
+      "index": 5,
+      "rva": 70328320,
+      "size": 612916,
+      "section": ".reloc",
+      "section_relative_offset": 0,
+      "payload_sha256": "8ade2e2383fd3ccb946bc4c393dbb345aa91bf3b47bc600f39a34ce99fc886a3"
+    },
+    {
+      "index": 6,
+      "rva": 0,
+      "size": 0,
+      "section": null,
+      "section_relative_offset": null,
+      "payload_sha256": null
+    },
+    {
+      "index": 7,
+      "rva": 0,
+      "size": 0,
+      "section": null,
+      "section_relative_offset": null,
+      "payload_sha256": null
+    },
+    {
+      "index": 8,
+      "rva": 0,
+      "size": 0,
+      "section": null,
+      "section_relative_offset": null,
+      "payload_sha256": null
+    },
+    {
+      "index": 9,
+      "rva": 65375680,
+      "size": 40,
+      "section": ".rdata",
+      "section_relative_offset": 26299840,
+      "payload_sha256": "a05471f88225d74b6ebeec29680c78fa18bc750d6aa4c582fdb9750b80697ee6"
+    },
+    {
+      "index": 10,
+      "rva": 0,
+      "size": 0,
+      "section": null,
+      "section_relative_offset": null,
+      "payload_sha256": null
+    },
+    {
+      "index": 11,
+      "rva": 0,
+      "size": 0,
+      "section": null,
+      "section_relative_offset": null,
+      "payload_sha256": null
+    },
+    {
+      "index": 12,
+      "rva": 70288992,
+      "size": 5304,
+      "section": ".idata",
+      "section_relative_offset": 5728,
+      "payload_sha256": "696ed896db38d1c4c6af238a235c668c14b6e73354dc558f422b8f6babf3a741"
+    },
+    {
+      "index": 13,
+      "rva": 0,
+      "size": 0,
+      "section": null,
+      "section_relative_offset": null,
+      "payload_sha256": null
+    },
+    {
+      "index": 14,
+      "rva": 0,
+      "size": 0,
+      "section": null,
+      "section_relative_offset": null,
+      "payload_sha256": null
+    },
+    {
+      "index": 15,
+      "rva": 0,
+      "size": 0,
+      "section": null,
+      "section_relative_offset": null,
+      "payload_sha256": null
+    }
+  ],
+  "runtime_references": {
+    "schema": "native-helper-loader-reference-walk.v1",
+    "scope": "GNU-x64-unbound-imports-unwind-v1-TLS-DIR64",
+    "counts": {
+      "entry": 1,
+      "import_descriptor": 21,
+      "import_dll": 20,
+      "import_lookup": 663,
+      "import_iat": 663,
+      "import_hint": 643,
+      "import_name": 643,
+      "exception_entry": 134664,
+      "runtime_function": 134664,
+      "unwind_header": 134664,
+      "unwind_codes": 134664,
+      "unwind_handler_rva": 14020,
+      "unwind_handler": 14020,
+      "tls_directory": 1,
+      "tls_template": 1,
+      "tls_index": 1,
+      "tls_callback_table": 3,
+      "tls_callback": 2,
+      "relocation_block": 3090,
+      "relocation_entry": 294098,
+      "relocation_slot": 292618,
+      "relocated_image_pointer": 292617,
+      "relocated_image_base_anchor": 1
+    },
+    "target_sections": {
+      "entry": [
+        ".text"
+      ],
+      "import_descriptor": [
+        ".idata"
+      ],
+      "import_dll": [
+        ".idata"
+      ],
+      "import_lookup": [
+        ".idata"
+      ],
+      "import_iat": [
+        ".idata"
+      ],
+      "import_hint": [
+        ".idata"
+      ],
+      "import_name": [
+        ".idata"
+      ],
+      "exception_entry": [
+        ".pdata"
+      ],
+      "runtime_function": [
+        ".text"
+      ],
+      "unwind_header": [
+        ".xdata"
+      ],
+      "unwind_codes": [
+        ".xdata"
+      ],
+      "unwind_handler_rva": [
+        ".xdata"
+      ],
+      "unwind_handler": [
+        ".text"
+      ],
+      "tls_directory": [
+        ".rdata"
+      ],
+      "tls_template": [
+        ".tls"
+      ],
+      "tls_index": [
+        ".bss"
+      ],
+      "tls_callback_table": [
+        ".CRT"
+      ],
+      "tls_callback": [
+        ".text"
+      ],
+      "relocation_block": [
+        ".reloc"
+      ],
+      "relocation_entry": [
+        ".reloc"
+      ],
+      "relocation_slot": [
+        ".CRT",
+        ".data",
+        ".rdata",
+        ".text"
+      ],
+      "relocated_image_pointer": [
+        ".CRT",
+        ".bss",
+        ".data",
+        ".idata",
+        ".rdata",
+        ".text",
+        ".tls"
+      ]
+    },
+    "all_walked_targets_retained": true,
+    "complete_runtime_pointer_walk": false,
+    "opaque_language_specific_handler_records": 14020,
+    "opaque_handler_data_preservation": "Exact full containing-section payload comparison; not interpreted",
+    "disassembly_or_scientific_execution": false
+  }
+}

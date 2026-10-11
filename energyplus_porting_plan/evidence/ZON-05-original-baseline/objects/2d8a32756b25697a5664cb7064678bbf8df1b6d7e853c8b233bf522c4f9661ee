@@ -1,0 +1,26 @@
+"""Root invokes reviewed genuine ZON05 one-TU build stages; no scientific helper."""
+import hashlib,json,shutil,subprocess
+from pathlib import Path
+ROOT=Path.cwd();BASE=ROOT/'.runtime/porting/ZON-05';CTF=ROOT/'.runtime/porting/CTF-10';PREP=BASE/'native-build-prep-01';OUT=BASE/'native-build-01'
+def read(p):return json.loads(p.read_bytes())
+def arg(p):return p.relative_to(ROOT).as_posix()+'#'+hashlib.sha256(p.read_bytes()).hexdigest()
+assert not subprocess.check_output(['git','status','--porcelain'])
+assert subprocess.check_output(['git','rev-parse','HEAD'])==subprocess.check_output(['git','rev-parse','@{u}'])
+manifest=PREP/'manifest.json';assert arg(manifest).endswith('#4bf4d13edf3c79c36e063bda4c20755cb3c1d53e4c43f7e5e885334f7e89d293')
+native=BASE/'native-helper-prep-01/manifest.json';assert arg(native).endswith('#5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1')
+for row in read(manifest)['own_sources']:assert arg(ROOT/row['path']).endswith('#'+row['sha256'])
+restore=read(BASE/'restore-configure-command-01/receipt.json');assert restore['exit_code']==0 and restore['source_bytes_match_before_and_after']
+preservation=read(BASE/'restore-preservation-01/preservation.json');assert preservation['all52_and631_fresh_hashes_unchanged']and preservation['literal_prior717_rows_equal']
+assert len(read(ROOT/'.runtime/ep261-gcc13-o0/compile_commands.json'))==717
+freeze=read(BASE/'frozen-packet-02/freeze-receipt.json');assert freeze['requested_counts']=={'cases':21,'correctHumRat':43}
+assert read(BASE/'freeze-command-02/receipt.json')['command'][:5]==['python','-X','utf8','-B','.runtime/porting/ZON-05/input-writer-prep-01/freeze_packet.py']
+assert shutil.disk_usage(ROOT).free>2000000000
+old_path=CTF/'native-build-01/unit/native-build.json';old=read(old_path)
+options={'build-source-manifest':manifest,'native-source-manifest':native,'freeze-receipt':BASE/'frozen-packet-02/freeze-receipt.json','freeze-execution':BASE/'freeze-command-02/receipt.json','prior-final-preservation':CTF/'retirement-01/after-retirement.json','prior-retirement':CTF/'retirement-01/retirement.json','prior-retirement-execution':CTF/'retirement-command-01/receipt.json','prior-native-build':old_path,'rad-native-build':ROOT/'.runtime/porting/RAD-01/native-build-02/native-build.json','consumer-native-build':CTF/'surface-consumer-native-build-02/native-build.json','prior-configure-execution':ROOT/old['configure_execution']['path'],'prior-compile-execution':ROOT/old['compile_execution']['path'],'restore-configure-execution':BASE/'restore-configure-command-01/receipt.json','restore-preservation':BASE/'restore-preservation-01/preservation.json'}
+command=['python','-X','utf8','-B',(PREP/'run-native-build.py').relative_to(ROOT).as_posix()]
+for name,p in options.items():command+=['--'+name,arg(p)]
+command+=['--output-dir',OUT.relative_to(ROOT).as_posix()];subprocess.run(command,check=True)
+before=OUT/'before/preservation.json'
+subprocess.run(['python','-X','utf8','-B',(PREP/'derive-and-describe-native-build.py').relative_to(ROOT).as_posix(),'--before-preservation',arg(before),'--prior-derivation-execution',arg(ROOT/old['derivation_execution']['path']),'--output-dir',OUT.relative_to(ROOT).as_posix()],check=True)
+subprocess.run(['python','-X','utf8','-B',(PREP/'complete-native-build-metadata.py').relative_to(ROOT).as_posix(),'--before-preservation',arg(before),'--output-dir',OUT.relative_to(ROOT).as_posix()],check=True)
+print('Root genuine ZON05 one-TU build completed',arg(OUT/'native-build.json'),flush=True)

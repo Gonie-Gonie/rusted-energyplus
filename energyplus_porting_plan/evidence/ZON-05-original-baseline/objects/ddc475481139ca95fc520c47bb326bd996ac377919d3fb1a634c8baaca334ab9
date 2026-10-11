@@ -1,0 +1,41 @@
+{
+  "purpose": "Separate native full-library compatible compiler; existing PSY toolchain untouched",
+  "official_release_url": "https://github.com/brechtsanders/winlibs_mingw/releases/tag/13.2.0posix-17.0.5-11.0.1-ucrt-r3",
+  "release_id": 130825537,
+  "release_published_at": "2023-11-21T22:01:41Z",
+  "archive_asset_id": 136778622,
+  "archive_url": "https://github.com/brechtsanders/winlibs_mingw/releases/download/13.2.0posix-17.0.5-11.0.1-ucrt-r3/winlibs-x86_64-posix-seh-gcc-13.2.0-mingw-w64ucrt-11.0.1-r3.zip",
+  "archive_size": 222147082,
+  "publisher_checksums": {
+    "sha256": "4889a18dd97d601c1d6c2f141865469979472846751e444840532257dfac44b6",
+    "sha512": "d07dc478901e38ca14c9ff1e839747f922dfe2de892082bec3369d49d5868218199f559fa2991e3fc4988cc32e252b33379e983d59fe3995f34b9e19c80cb547"
+  },
+  "actual_checksums": {
+    "sha256": "4889a18dd97d601c1d6c2f141865469979472846751e444840532257dfac44b6",
+    "sha512": "d07dc478901e38ca14c9ff1e839747f922dfe2de892082bec3369d49d5868218199f559fa2991e3fc4988cc32e252b33379e983d59fe3995f34b9e19c80cb547"
+  },
+  "checksums_match": true,
+  "zip_crc_test": "PASS",
+  "installation": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3",
+  "archive": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-13.2.0-mingw-w64ucrt-11.0.1-r3.zip",
+  "installed_utc": "2026-10-07T12:23:00.820260+00:00",
+  "admin_or_global_install": false,
+  "executables": {
+    "gcc.exe": {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/gcc.exe",
+      "sha256": "d3cb308419f638f6f14019854a2e2f5db589a83bba0d0d11b5af95c55cfcabe5"
+    },
+    "g++.exe": {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/g++.exe",
+      "sha256": "d977abd355b8821f7347de03ed95a5976a2ebe6cd77a025ce8f83c79b77262d3"
+    },
+    "ar.exe": {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/ar.exe",
+      "sha256": "3d799edc5ce22d39effce1aa9b9a68442f70f24e4252a314aeb9011322cc0a15"
+    },
+    "ld.exe": {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/ld.exe",
+      "sha256": "613e332fa3eafbad0fb3d2b468b77e21b403cb4e2345ecdde7728e4d0cb959da"
+    }
+  }
+}

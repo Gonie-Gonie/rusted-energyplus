@@ -1,0 +1,39 @@
+{
+  "schema": "root-protected-original-transparent-compression.v1",
+  "created_utc": "2026-10-11T02:40:05.939440+00:00",
+  "actual_before_authority": {
+    "path": ".runtime/porting/ZON-05/native-build-01/native-build.json",
+    "sha256": "5384861acb91c1be5ca312db3efd9bd01ad76eed412ee834a991baec9d64eb79",
+    "size_bytes": 5910
+  },
+  "operation": "NTFS compact.exe /C /EXE:LZX /Q exact1 retained ZON05 Original",
+  "files": [
+    {
+      "file_before": {
+        "path": ".runtime/ep261-gcc13-o0/Products/zon05_unit_helper.exe",
+        "sha256": "bcbe25e5a5bc681f9ee9ffdca1c70b60f8cc5b03cfe401b416a5ba41a9546a97",
+        "size_bytes": 1297100194
+      },
+      "file_after": {
+        "path": ".runtime/ep261-gcc13-o0/Products/zon05_unit_helper.exe",
+        "sha256": "bcbe25e5a5bc681f9ee9ffdca1c70b60f8cc5b03cfe401b416a5ba41a9546a97",
+        "size_bytes": 1297100194
+      },
+      "compact_exit_code": 0,
+      "command_log": {
+        "path": ".runtime/porting/ZON-05/protected-original-storage-compression-01/zon05_unit_helper.exe.log",
+        "sha256": "3306a8a6d75b851b7c372ba3bf4cabebf93d54c2b92303a3d4cbb1c7eef4e6d7",
+        "size_bytes": 269
+      },
+      "bytes_and_path_unchanged": true
+    }
+  ],
+  "observed_free_bytes_before": 1166409728,
+  "observed_free_bytes_after": 2203402240,
+  "physical_free_change_is_observation_not_exclusive_attribution": true,
+  "all1_bytes_and_paths_unchanged": true,
+  "file_deleted_or_moved": false,
+  "scientific_values_recomputed": false,
+  "original_executable_executed": false,
+  "gates_updated": false
+}

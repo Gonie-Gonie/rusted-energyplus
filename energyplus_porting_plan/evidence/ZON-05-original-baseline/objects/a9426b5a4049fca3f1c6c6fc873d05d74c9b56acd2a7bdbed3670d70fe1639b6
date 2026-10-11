@@ -1,0 +1,41 @@
+"""Root publishes genuine Original observations before applying the accepted Rust owner."""
+import hashlib,json,shutil,subprocess
+from datetime import datetime,timezone
+from pathlib import Path
+ROOT=Path.cwd();BASE=ROOT/'.runtime/porting/ZON-05';OUT=ROOT/'energyplus_porting_plan/evidence/ZON-05-original-baseline'
+def read(p):return json.loads(p.read_bytes())
+def sha(p):
+ with p.open('rb')as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+def ref(p):return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+def write(p,v):p.write_bytes((json.dumps(v,ensure_ascii=False,indent=2,allow_nan=False)+'\n').encode('utf8'))
+assert not OUT.exists() and not subprocess.check_output(['git','status','--porcelain'])
+assert subprocess.check_output(['git','rev-parse','HEAD'])==subprocess.check_output(['git','rev-parse','@{u}'])
+qa_path=BASE/'original-data-review-01/review.json';qa=read(qa_path)
+assert qa['Rust_baseline_released'] and qa['complete_requested_record_ledger_validated'] and not qa['numerical_PASS_claimed'] and qa['observation_integrity_failures']==[]
+assert qa['actual_native_process_exit_code']==0 and not qa['actual_method_counts_unknown'] and qa['requested_counts']=={'cases':21,'correctHumRat':43}
+for name in ['native-build-launch-command-01','native-build-review-command-01','native-unit-command-01','original-data-review-command-01','original-stages-launch-command-01']:
+ v=read(BASE/name/'receipt.json');assert v['exit_code']==0 and v['source_bytes_match_before_and_after'] and v['launch_error']is None and v['source_snapshot']['sha256']=='688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27'
+assert not(ROOT/'crates/ep_runtime/src/heat_balance/zone_humidity_correction.rs').exists()
+for row in read(BASE/'frozen-packet-02/freeze-receipt.json')['source_authorities']['current_after_documents']:assert ref(ROOT/row['path'])==row
+(OUT/'objects').mkdir(parents=True);known={}
+for name in ['ZON-05-frozen','ZON-05-frozen-retry']:
+ for row in read(ROOT/'energyplus_porting_plan/evidence'/name/'manifest.json')['selected_files']:known.setdefault(row['stored']['sha256'],row['stored'])
+paths={Path(__file__).resolve(),BASE/'run-original-stages-01.py',BASE/'compress-retained-original-01.py',BASE/'run-actual-native-build-01.py'}
+for name in ['native-build-01','native-build-launch-command-01','protected-original-storage-compression-01','protected-original-storage-command-01','native-build-review-prep-01','native-build-review-01','native-build-review-command-01','native-unit-command-01','native-launch-inputs-01','original-data-review-prep-01','original-data-review-01','original-data-review-command-01','original-stages-launch-command-01']:
+ for p in (BASE/name).rglob('*'):
+  if p.is_file()and '__pycache__'not in p.parts and p.suffix.lower()not in ['.exe','.dll','.a','.obj','.map']:paths.add(p)
+ for p in (BASE/name).rglob('receipt.json'):
+  v=read(p)
+  if 'source_snapshot'in v:paths.add(ROOT/v['source_snapshot']['path'])
+  if 'executed_launcher'in v:paths.add(ROOT/v['executed_launcher']['archive']['path'])
+rows=[];new=[]
+for p in sorted(paths):
+ assert p.stat().st_size<16000000 and p.suffix.lower()not in ['.exe','.dll','.a','.obj','.map','.epw']
+ original=ref(p)
+ if original['sha256']not in known:
+  dest=OUT/'objects'/original['sha256'];shutil.copyfile(p,dest);known[original['sha256']]=ref(dest);new.append(ref(dest))
+ stored=known[original['sha256']];assert(ROOT/stored['path']).read_bytes()==p.read_bytes();rows.append({'original':original,'stored':stored})
+write(OUT/'manifest.json',{'schema':'zon05-actual-Original-baseline-selected-evidence.v1','created_utc':datetime.now(timezone.utc).isoformat(),'selected_files':rows,'compressed_scientific_observations':[],'new_unique_raw_objects':len(new),'binary_payloads_archived':False,'large_link_maps_archived':False,'selected_archive_is_transitive_replay_closure':False})
+build=read(BASE/'native-build-01/native-build.json')
+write(OUT/'summary.json',{'schema':'zon05-actual-Original-baseline-summary.v1','manifest':ref(OUT/'manifest.json'),'OriginalDataQA':ref(qa_path),'OriginalDataQA_execution':ref(BASE/'original-data-review-command-01/receipt.json'),'actual_observation_counts':qa['actual_observation_counts'],'actual_Native_execution':ref(BASE/'native-unit-command-01/receipt.json'),'actual_native_build':ref(BASE/'native-build-01/native-build.json'),'actual_PE_review':ref(BASE/'native-build-review-01/review.json'),'post_runtime_loader_and_binary_identity':ref(BASE/'native-launch-inputs-01/after-environment.json'),'Rust_arithmetic_applied':False,'requested_counts':qa['requested_counts'],'actual_protected_ref_count':build['protected_ref_count'],'prior_protected_and_core_hashes_unchanged':build['protected_artifacts_and_present_core_objects_unchanged'],'numerical_comparison_count':None,'numerical_PASS_claimed':False,'history_commit_or_production_integration_certified':False,'full_card_gates_updated':False,'current_frozen_plan_and_card_kept_literal_until_comparison':True})
+print('Root published genuine ZON05 Original baseline',len(rows),'selected',len(new),'new objects',ref(OUT/'summary.json'),flush=True)

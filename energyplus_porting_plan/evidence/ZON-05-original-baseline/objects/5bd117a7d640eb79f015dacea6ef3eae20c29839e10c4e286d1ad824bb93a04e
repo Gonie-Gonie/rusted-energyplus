@@ -1,0 +1,188 @@
+Root protected Original transparent compression zon05_unit_helper.exe exit 0 exact bytes unchanged 1297100194
+Root transparent Original compression completed 1 observed free 2203402240
+{"receipt": {"path": ".runtime/porting/ZON-05/protected-original-storage-command-01/receipt.json", "sha256": "bb198a6ff9482a5068d86bf52148cd38d3089660bc6354a8fd7cb8533b1b8a71"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+{"review": {"path": ".runtime/porting/ZON-05/native-build-review-01/review.json", "sha256": "6e8abbded5ce6e229bef2cbd1887d12f1351e6d02745efe1ff1c50234f30dfae", "size_bytes": 2438}, "status": "pass-exact-retained-PE-runtime-and-actual-build-identity"}
+{"receipt": {"path": ".runtime/porting/ZON-05/native-build-review-command-01/receipt.json", "sha256": "93ae4e16fff328c32f054c3f500f91822284fe2fe0ed6c7322fddce6a87daf4e"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+lue_bits":"3f789374bc6a7efa","value_class":"finite"},"RoomAirModel":1,"SumLatentHTRadSys":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},"SumLatentPool":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},"SystemZoneNodeNumber":2,"TimeStepSysSec":{"value":900.0,"value_bits":"408c200000000000","value_class":"finite"},"Volume":{"value":100.0,"value_bits":"4059000000000000","value_class":"finite"},"ZoneAirSolutionAlgo":0,"ZoneVolCapMultpMoist":{"value":1.0,"value_bits":"3ff0000000000000","value_class":"finite"},"context":{"begin_sim":false,"day_of_sim":0,"end_environment":false,"environment_index":0,"first_system_timestep":false,"hour_of_day":0,"kickoff":false,"kind_of_sim":-1,"raw_current_time_hours":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},"shorten_system_timestep":false,"system_time_elapsed_hours":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},"system_timestep_count":1,"system_timestep_hours":{"value":0.25,"value_bits":"3fd0000000000000","value_class":"finite"},"use_zone_timestep_history":true,"warmup":false,"zone_steps_per_hour":0,"zone_timestep":0,"zone_timestep_hours":{"value":0.25,"value_bits":"3fd0000000000000","value_class":"finite"}},"doSpaceHeatBalance":false,"inlet_order":[{"inlet_ordinal":1,"node_id":1}],"leakageParallelPIU_count":0,"moisture_source_terms":{"CTMFL":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},"EAMFL":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},"EAMFLxHumRat":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},"MDotOA":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},"MixingMassFlowXHumRat":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},"MixingMassFlowZone":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},"OAMFL":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},"SumHmARa":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},"SumHmARaW":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},"VAMFL":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},"latentGain":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},"latentGainExceptPeople":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"}},"nodes":[{"Enthalpy":{"value":12345.0,"value_bits":"40c81c8000000000","value_class":"finite"},"HumRat":{"value":0.004,"value_bits":"3f70624dd2f1a9fc","value_class":"finite"},"MassFlowRate":{"value":0.48,"value_bits":"3fdeb851eb851eb8","value_class":"finite"},"Temp":{"value":19.0,"value_bits":"4033000000000000","value_class":"finite"},"name":"DECLARED-NODE-1","node_id":1},{"Enthalpy":{"value":-321.0,"value_bits":"c074100000000000","value_class":"finite"},"HumRat":{"value":0.009,"value_bits":"3f826e978d4fdf3b","value_class":"finite"},"MassFlowRate":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},"Temp":{"value":19.0,"value_bits":"4033000000000000","value_class":"finite"},"name":"DECLARED-NODE-2","node_id":2}],"phase":"after-declared-input-preparation-no-correction-call","psychrometrics":{"Press_Save":{"value":-99999.0,"value_bits":"c0f869f000000000","value_class":"finite"},"Psat_cache_capacity":1048576,"cache_hits_or_local_helper_calls_observed":false,"iPsyErrIndex":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"iconvTol":{"value":0.0001,"value_bits":"3f1a36e2eb1c432d","value_class":"finite"},"last_Patm":{"value":-99999.0,"value_bits":"c0f869f000000000","value_class":"finite"},"last_tBoil":{"value":-99999.0,"value_bits":"c0f869f000000000","value_class":"finite"},"nondefault_Psat_rows":[],"tSat_Save":{"value":-99999.0,"value_bits":"c0f869f000000000","value_class":"finite"},"useInterpolationPsychTsatFnPb":false},"room_air_model_count":1,"space_id":0,"zone_equip_config_count":1,"zone_fields":{"AirPowerCap":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},"DSWPrevZoneTS":[{"value":0.013,"value_bits":"3f8a9fbe76c8b439","value_class":"finite"},{"value":0.012,"value_bits":"3f889374bc6a7efa","value_class":"finite"},{"value":0.011,"value_bits":"3f86872b020c49ba","value_class":"finite"},{"value":0.01,"value_bits":"3f847ae147ae147b","value_class":"finite"}],"DSXMAT":[{"value":23.0,"value_bits":"4037000000000000","value_class":"finite"},{"value":23.0,"value_bits":"4037000000000000","value_class":"finite"},{"value":23.0,"value_bits":"4037000000000000","value_class":"finite"},{"value":23.0,"value_bits":"4037000000000000","value_class":"finite"}],"MAT":{"value":18.0,"value_bits":"4032000000000000","value_class":"finite"},"T1":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},"TM2":{"value":23.0,"value_bits":"4037000000000000","value_class":"finite"},"TMX":{"value":23.0,"value_bits":"4037000000000000","value_class":"finite"},"W1":{"value":0.005,"value_bits":"3f747ae147ae147b","value_class":"finite"},"WM2":{"value":0.003,"value_bits":"3f689374bc6a7efa","value_class":"finite"},"WMX":{"value":0.004,"value_bits":"3f70624dd2f1a9fc","value_class":"finite"},"WPrevZoneTS":[{"value":0.019,"value_bits":"3f9374bc6a7ef9db","value_class":"finite"},{"value":0.018,"value_bits":"3f926e978d4fdf3b","value_class":"finite"},{"value":0.017,"value_bits":"3f916872b020c49c","value_class":"finite"},{"value":0.016,"value_bits":"3f90624dd2f1a9fc","value_class":"finite"}],"WPrevZoneTSTemp":[{"value":0.008,"value_bits":"3f80624dd2f1a9fc","value_class":"finite"},{"value":0.008,"value_bits":"3f80624dd2f1a9fc","value_class":"finite"},{"value":0.008,"value_bits":"3f80624dd2f1a9fc","value_class":"finite"},{"value":0.009,"value_bits":"3f826e978d4fdf3b","value_class":"finite"}],"WTimeMinusP":{"value":0.002,"value_bits":"3f60624dd2f1a9fc","value_class":"finite"},"XMAT":[{"value":23.0,"value_bits":"4037000000000000","value_class":"finite"},{"value":23.0,"value_bits":"4037000000000000","value_class":"finite"},{"value":23.0,"value_bits":"4037000000000000","value_class":"finite"},{"value":23.0,"value_bits":"4037000000000000","value_class":"finite"}],"XMPT":{"value":23.0,"value_bits":"4037000000000000","value_class":"finite"},"ZT":{"value":24.0,"value_bits":"4038000000000000","value_class":"finite"},"ZTAV":{"value":21.0,"value_bits":"4035000000000000","value_class":"finite"},"ZTM":[{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"}],"airHumRat":{"value":0.008,"value_bits":"3f80624dd2f1a9fc","value_class":"finite"},"airHumRatAvg":{"value":0.0075,"value_bits":"3f7eb851eb851eb8","value_class":"finite"},"airHumRatTemp":{"value":0.006,"value_bits":"3f789374bc6a7efa","value_class":"finite"},"airRelHum":{"value":37.0,"value_bits":"4042800000000000","value_class":"finite"},"tempDepLoad":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"},"tempIndLoad":{"value":0.0,"value_bits":"0000000000000000","value_class":"positive_zero"}},"zone_geometry_count":1,"zone_id":1,"zone_name":"DECLARED-DIRECT-MEMBER-ZONE","zone_owner_count":1},"purpose":"Representable original integer multiplier operands with actual source divisions; no normalized moisture flow supplied.","requested_operation_count":2,"source_error_stream":"","source_messages":[],"source_warning_backend_paired":false,"status":"actual-selected-member-calls-returned"}],"complete_ZON05_PASS_claimed":false,"expected_values_supplied":false,"gates_updated":false,"humidity_member_was_actually_invoked":true,"production_or_history_integration_certified":false,"recorded_case_count":21,"requested_case_count":21,"schema":"zon05-native-unit-results.v1","status":"actual-selected-member-calls-returned"}
+{"receipt": {"path": ".runtime/porting/ZON-05/native-unit-command-01/receipt.json", "sha256": "2ce46689bb2db6a7dd89b38348c00374d00d55b8689378b81c2b2c777661e74c"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+g/ZON-05/frozen-packet-02/source.json",
+      "sha256": "339d6313259711794051ff269013213a0912e5b61668c412cae380abceadff85",
+      "size_bytes": 26039
+    },
+    "cases": {
+      "path": ".runtime/porting/ZON-05/frozen-packet-02/cases.json",
+      "sha256": "e8fd8db5aa615b751bcf1a1d4cf5e54a4f01a3bb59ed731e974cce5b9b3c8582",
+      "size_bytes": 1282
+    },
+    "tolerances": {
+      "path": ".runtime/porting/ZON-05/frozen-packet-02/tolerances.json",
+      "sha256": "247e34992b4c3dbebfdab0e37766fa95f1b25688dc62ba5d9ba5dccc5923cdf0",
+      "size_bytes": 3451
+    }
+  },
+  "reviewed_build": {
+    "path": ".runtime/porting/ZON-05/native-build-01/native-build.json",
+    "sha256": "5384861acb91c1be5ca312db3efd9bd01ad76eed412ee834a991baec9d64eb79",
+    "size_bytes": 5910
+  },
+  "reviewed_build_execution": {
+    "path": ".runtime/porting/ZON-05/native-build-01/native-compile-command-01/receipt.json",
+    "sha256": "a4a0045701b34376b01a3d0183f9017f5d9b63c7aaa680c6b71de236e3c408f5",
+    "size_bytes": 2951
+  },
+  "reviewed_build_review": {
+    "path": ".runtime/porting/ZON-05/native-build-review-01/review.json",
+    "sha256": "6e8abbded5ce6e229bef2cbd1887d12f1351e6d02745efe1ff1c50234f30dfae",
+    "size_bytes": 2438
+  },
+  "reviewed_build_review_execution": {
+    "path": ".runtime/porting/ZON-05/native-build-review-command-01/receipt.json",
+    "sha256": "93ae4e16fff328c32f054c3f500f91822284fe2fe0ed6c7322fddce6a87daf4e",
+    "size_bytes": 2925
+  },
+  "actual_packet_freeze": {
+    "path": ".runtime/porting/ZON-05/frozen-packet-02/freeze-receipt.json",
+    "sha256": "0ae6d1acaed32b10f497855f1552879efdcecb78527f7818be95489298318434",
+    "size_bytes": 21040
+  },
+  "actual_packet_freeze_execution": {
+    "path": ".runtime/porting/ZON-05/freeze-command-02/receipt.json",
+    "sha256": "ab74179a85c694375d16a93fd8cdd365fd767ec42c09d95b6581245e8718407b",
+    "size_bytes": 3898
+  },
+  "actual_native_process_exit_code": 0,
+  "actual_native_launch_error": null,
+  "complete_requested_record_ledger_validated": true,
+  "actual_observation_counts": {
+    "cases": 21,
+    "correctHumRat": 43,
+    "source_returns": 43,
+    "caught_source_exceptions": 0,
+    "declared_unreached_operations": 0,
+    "snapshots": 107,
+    "scalar_DTO_visits": 9531,
+    "source_messages": 0
+  },
+  "actual_method_counts_unknown": false,
+  "observation_integrity_failures": [],
+  "reviewed_observation_policy": {
+    "schema": "zon05-direct-member-observation-policy-proposal.v1",
+    "card": "ZON-05",
+    "status": "prospective-source-only-before-new-output",
+    "selected_source": "correctHumRat4433-4619, zone1/space0, ThirdOrder, mixed, noOA/noLatent",
+    "unit_domain": "21 declared independent input-only cases, 43 real member operations if all return",
+    "production_admission_expanded": false,
+    "required_numerical_profiles": {
+      "airHumRatTemp": {
+        "unit": "kg/kg",
+        "atol": 1e-12,
+        "rtol": 1e-13
+      },
+      "SystemNode.HumRat": {
+        "unit": "kg/kg",
+        "atol": 1e-12,
+        "rtol": 1e-13,
+        "condition": "actual SystemZoneNodeNumber > 0"
+      },
+      "SystemNode.Enthalpy": {
+        "unit": "J/kg",
+        "atol": 1e-07,
+        "rtol": 1e-13,
+        "condition": "actual SystemZoneNodeNumber > 0"
+      },
+      "psychrometrics.nondefault_Psat_rows.Psat": {
+        "unit": "Pa",
+        "atol": 1e-08,
+        "rtol": 1e-13
+      }
+    },
+    "state_retention": "Actual pre/post scalar/array/input/source terms and every non-feedback node remain exact own bits. Four slots required for every captured history array. Temporary W and positive system-node W/H use their named profiles.",
+    "cache_state": "Actual indices/tags/capacity/shape/control state exact; nondefault values use their profile and own unchanged rows retain bits. No cache-HIT classification or hash/tag recomputation in readers.",
+    "source_direct_member_state": "Current W/average W/zone+system+working histories are observed retained only. No correctAirTemp, selection, current/average commit, history push, parser, or calendar caller is invoked.",
+    "class": "exact",
+    "signed_zero": "exact when both numerical results are zero",
+    "nan_payload_bits": "record only; finite request domain, no physical-validity inferred from any nonfinite output",
+    "identity_inputs_order_counts_outcomes": "exact IDs/names/input bits/ordered inlet associations/multiplier integers/clock fields/invocations/return/exception/completeness",
+    "diagnostics": "Actual message indices/order/level/text and err_stream retained as Native-only context. No causal warning classifier or Rust global diagnostic backend parity.",
+    "internal_locals_unobserved": [
+      "MoistureMassFlowRate",
+      "ZoneMassFlowRate",
+      "LatentGain",
+      "RhoAir",
+      "H2OHtOfVap",
+      "A",
+      "B",
+      "C",
+      "WZSat",
+      "lower_guard_taken",
+      "saturation_guard_taken"
+    ],
+    "no_local_or_expected_answer_recomputation": true,
+    "process_or_copy_failure": "required FAIL; partial or absent records never PASS",
+    "missing_on_one_or_both_sides": "required FAIL",
+    "unsupported_stopped_unreached": "unavailable/noPASS",
+    "no_tolerance_relaxation_after_outputs": true,
+    "complete_ZON05_PASS_claimed": false,
+    "gate_updates": false
+  },
+  "reviewed_actual_scope_amendment": {
+    "path": ".runtime/porting/ZON-05/scope-amendment-01/amendment.json",
+    "sha256": "fc63fa7b5caf58292b77aa6df2a3dba989f9fc8b92d6a4450e5e262b32a371e4",
+    "size_bytes": 3116
+  },
+  "reviewed_actual_scope_check_execution": {
+    "path": ".runtime/porting/ZON-05/scope-check-command-01/receipt.json",
+    "sha256": "2c1f33a4bdc0e1f5bc59930c5fbfda052fc34a302a0aca93a4850558ba01636a",
+    "size_bytes": 3006
+  },
+  "Rust_baseline_released": true,
+  "requested_counts": {
+    "cases": 21,
+    "correctHumRat": 43
+  },
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/ZON-05/original-data-review-prep-01/review_data.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/original-data-review-01/000-review_data.py",
+        "sha256": "fef0125a3a8622ab2756c9902db0dfb9931952f3cc6873f1b57748082b8b0dc8",
+        "size_bytes": 22936
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/ZON-05/original-data-review-prep-01/shape.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/original-data-review-01/001-shape.py",
+        "sha256": "9a530999a7e861f9eca32553e484b766deaef2c0b392a90f8728579a5e4d958a",
+        "size_bytes": 17216
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/ZON-05/original-data-review-prep-01/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/ZON-05/original-data-review-01/002-packet_io.py",
+        "sha256": "4b791c0327e258597df5475a8b9f79de21fa2ca41c15a52111658a0631b3c948",
+        "size_bytes": 3893
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/ZON-05/original-data-review-01/000-review_data.py",
+    "sha256": "fef0125a3a8622ab2756c9902db0dfb9931952f3cc6873f1b57748082b8b0dc8",
+    "size_bytes": 22936
+  },
+  "native_binary_payloads_rehashed_or_parsed": false,
+  "build_compile_recorder_authored_build_metadata_claimed": false,
+  "scientific_values_recomputed_or_compared": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "unreached_or_uninvoked_observation_counted_as_PASS": false,
+  "scientific_execution_performed": false,
+  "full_engine_production_geometry_certified": false,
+  "history_commit_or_production_integration_certified": false,
+  "gates_updated": false,
+  "authorship_limits": "Header authored Native input/state transport and factual QA; Raw authors the separate Rust humidity port. This structural review is no independent formula certificate."
+}
+{"receipt": {"path": ".runtime/porting/ZON-05/original-data-review-command-01/receipt.json", "sha256": "81180861ecd47cce0d8b30076352351d6e6f9c88431453815b824f74a4132d18"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+Root genuine ZON05 member and factual OriginalQA stages completed; Rust math remains unapplied.

@@ -1,0 +1,61 @@
+{
+  "schema": "zon05-independent-build-PE-review.v1",
+  "status": "pass-exact-retained-PE-runtime-and-actual-build-identity",
+  "observed_utc": "2026-10-11T02:40:29.067449+00:00",
+  "lane": "unit",
+  "target": "zon05_unit_helper",
+  "actual_previous_compile_rows": 717,
+  "actual_current_compile_rows": 721,
+  "actual_protected_ref_count": 52,
+  "build": {
+    "path": ".runtime/porting/ZON-05/native-build-01/native-build.json",
+    "sha256": "5384861acb91c1be5ca312db3efd9bd01ad76eed412ee834a991baec9d64eb79",
+    "size_bytes": 5910
+  },
+  "helper_binary": {
+    "path": ".runtime/porting/ZON-05/native-build-01/derivation/derived-helper.exe",
+    "sha256": "855e81e1bccf540a376a5af096b1148c03e0bcb3bf78c0126b32008b63d91178",
+    "size_bytes": 149739680
+  },
+  "linked_original": {
+    "path": ".runtime/ep261-gcc13-o0/Products/zon05_unit_helper.exe",
+    "sha256": "bcbe25e5a5bc681f9ee9ffdca1c70b60f8cc5b03cfe401b416a5ba41a9546a97",
+    "size_bytes": 1297100194
+  },
+  "validated_derivative": {
+    "path": ".runtime/porting/ZON-05/native-build-01/derivation/receipt.json",
+    "sha256": "db50a2e16e95111d70848aefdcf6677103c72a02246d74cb1f584c66f8c06f47",
+    "size_bytes": 12613
+  },
+  "native_pe_source": {
+    "path": "tools/porting/native_pe.py",
+    "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+    "size_bytes": 20217
+  },
+  "executed_reader": {
+    "path": ".runtime/porting/ZON-05/native-build-review-prep-01/review_build.py",
+    "sha256": "ffae754d726dfff5c5da2c5dc0af299118ed3859b30de481baea1d6d0978d63f",
+    "size_bytes": 7805
+  },
+  "maps": {
+    "original": {
+      "path": ".runtime/porting/ZON-05/native-build-review-01/original-pe.json",
+      "sha256": "d40b46fec1c6ddf166ec2277e2596ee96b626e768d4a7fcdfdc5f1dec6b8ec7a",
+      "size_bytes": 16047
+    },
+    "derived": {
+      "path": ".runtime/porting/ZON-05/native-build-review-01/derived-pe.json",
+      "sha256": "a6f868442ed7024f5012db0a827b587959a53228539459bf6bb4eb8e94a961ac",
+      "size_bytes": 12193
+    },
+    "comparison": {
+      "path": ".runtime/porting/ZON-05/native-build-review-01/comparison-pe.json",
+      "sha256": "e0ceb821a087255b1e8655be48711e3a133708f88f27068304550e9a6b045b30",
+      "size_bytes": 4820
+    }
+  },
+  "retained_runtime_exact": true,
+  "engine_invoked": false,
+  "scientific_execution_certified": false,
+  "gates_updated": false
+}

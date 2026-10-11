@@ -1,0 +1,61 @@
+"""Root transparent NTFS storage maintenance; exact protected bytes and paths stay."""
+import datetime
+import hashlib
+import json
+import shutil
+import subprocess
+from pathlib import Path
+
+ROOT = Path.cwd().resolve()
+BASE = ROOT / '.runtime/porting/ZON-05'
+OUT = BASE / 'protected-original-storage-compression-01'
+
+def sha(p):
+    with p.open('rb') as stream:
+        return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+def ref(p):
+    return {'path': p.relative_to(ROOT).as_posix(), 'sha256': sha(p), 'size_bytes': p.stat().st_size}
+
+final_path = BASE / 'native-build-01/native-build.json'
+final = json.loads(final_path.read_bytes())
+names = ['zon05_unit_helper.exe']
+protected = {Path(final['linked_original']['path']).name: final['linked_original']}
+assert names[0] in protected
+assert not OUT.exists()
+OUT.mkdir()
+rows = []
+free_before = shutil.disk_usage(ROOT).free
+for name in names:
+    row = protected[name]
+    p = (ROOT / row['path']).resolve(strict=True)
+    assert p.parent == ROOT / '.runtime/ep261-gcc13-o0/Products'
+    assert p.is_file() and not p.is_symlink() and not p.is_junction()
+    assert not (p.stat().st_file_attributes & 0x400)
+    before = ref(p)
+    assert before == row
+    log = OUT / (name + '.log')
+    with log.open('xb') as stream:
+        result = subprocess.run(['compact.exe', '/C', '/EXE:LZX', '/Q', str(p)],
+                                stdout=stream, stderr=subprocess.STDOUT)
+    after = ref(p)
+    assert before == after
+    rows.append({'file_before': before, 'file_after': after,
+                 'compact_exit_code': result.returncode, 'command_log': ref(log),
+                 'bytes_and_path_unchanged': True})
+    print('Root protected Original transparent compression', name,
+          'exit', result.returncode, 'exact bytes unchanged', before['size_bytes'], flush=True)
+    assert result.returncode == 0
+record = {'schema': 'root-protected-original-transparent-compression.v1',
+          'created_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+          'actual_before_authority': ref(final_path),
+          'operation': 'NTFS compact.exe /C /EXE:LZX /Q exact1 retained ZON05 Original',
+          'files': rows, 'observed_free_bytes_before': free_before,
+          'observed_free_bytes_after': shutil.disk_usage(ROOT).free,
+          'physical_free_change_is_observation_not_exclusive_attribution': True,
+          'all1_bytes_and_paths_unchanged': len(rows) == 1,
+          'file_deleted_or_moved': False, 'scientific_values_recomputed': False,
+          'original_executable_executed': False, 'gates_updated': False}
+(OUT / 'record.json').write_bytes((json.dumps(record, indent=2) + '\n').encode())
+print('Root transparent Original compression completed', len(rows),
+      'observed free', record['observed_free_bytes_after'], flush=True)

@@ -1,0 +1,140 @@
+{
+  "schema": "zon05-native-build.v1",
+  "target": "zon05_unit_helper",
+  "status": "pass-actual-1TU-link-and-preservation",
+  "authorship": "Root assembled genuine configure/one-TU compile/derivation, actual address-bound unchanged core member and fresh52 protected/core hashes. No engine/scientific claim.",
+  "observed_utc": "2026-10-11T02:35:33.109541+00:00",
+  "helper_binary": {
+    "path": ".runtime/porting/ZON-05/native-build-01/derivation/derived-helper.exe",
+    "sha256": "855e81e1bccf540a376a5af096b1148c03e0bcb3bf78c0126b32008b63d91178",
+    "size_bytes": 149739680
+  },
+  "linked_original": {
+    "path": ".runtime/ep261-gcc13-o0/Products/zon05_unit_helper.exe",
+    "sha256": "bcbe25e5a5bc681f9ee9ffdca1c70b60f8cc5b03cfe401b416a5ba41a9546a97",
+    "size_bytes": 1297100194
+  },
+  "native_source_manifest": {
+    "path": ".runtime/porting/ZON-05/native-helper-prep-01/manifest.json",
+    "sha256": "5f3d3fcaade1e95e434ff71e2636fe039e4e16758018d4b939aa193a82fd22e1",
+    "size_bytes": 39009
+  },
+  "build_source_manifest": {
+    "path": ".runtime/porting/ZON-05/native-build-prep-01/manifest.json",
+    "sha256": "4bf4d13edf3c79c36e063bda4c20755cb3c1d53e4c43f7e5e885334f7e89d293",
+    "size_bytes": 23839
+  },
+  "native_source_files": [
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_helper.cpp",
+      "sha256": "89fcfc63be7ba3a5c190c828f8167a305695a88aee3f30583dafd196f115ca09",
+      "size_bytes": 14797,
+      "line_count": 241
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_fields.hh",
+      "sha256": "0ab7025e2914ab8b72edac40bd674be1469fd870dd0aa0192ad0e4c26b0bdd0c",
+      "size_bytes": 6453,
+      "line_count": 102
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon01_reference_fields.hh",
+      "sha256": "24e96e01b8c6f5ed445c94dd6f5a486dac5d79c175df62ba55af46bd10ad86f8",
+      "size_bytes": 5146,
+      "line_count": 96
+    },
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference.cmake",
+      "sha256": "5ae5067e6d5b0e19ac7cf74275e5b724946df9fb90254061b74e27850c060603",
+      "size_bytes": 1799,
+      "line_count": 28
+    }
+  ],
+  "compiled_source_files": [
+    {
+      "path": ".runtime/porting/ZON-05/native-helper-prep-01/zon05_reference_helper.cpp",
+      "sha256": "89fcfc63be7ba3a5c190c828f8167a305695a88aee3f30583dafd196f115ca09",
+      "size_bytes": 14797,
+      "line_count": 241
+    }
+  ],
+  "configure_execution": {
+    "path": ".runtime/porting/ZON-05/native-build-01/native-configure-command-01/receipt.json",
+    "sha256": "53e5362920ab3eeaaba1b475ce4261244619700dc951c6818123160a7ddba3d3",
+    "size_bytes": 7687
+  },
+  "compile_execution": {
+    "path": ".runtime/porting/ZON-05/native-build-01/native-compile-command-01/receipt.json",
+    "sha256": "a4a0045701b34376b01a3d0183f9017f5d9b63c7aaa680c6b71de236e3c408f5",
+    "size_bytes": 2951
+  },
+  "derivation_execution": {
+    "path": ".runtime/porting/ZON-05/native-build-01/native-unit-derive-command-01/receipt.json",
+    "sha256": "36afe6e52eb9d84b3333100893e871d60e0004a4c059f2cf16c9e03810b995a3",
+    "size_bytes": 3239
+  },
+  "validated_derivative": {
+    "path": ".runtime/porting/ZON-05/native-build-01/derivation/receipt.json",
+    "sha256": "db50a2e16e95111d70848aefdcf6677103c72a02246d74cb1f584c66f8c06f47",
+    "size_bytes": 12613
+  },
+  "preservation": {
+    "path": ".runtime/porting/ZON-05/native-build-01/preservation-after.json",
+    "sha256": "51284b673f3a48c064d56675f8a1bec0dc6e5524198640180890aea2d4e7a217",
+    "size_bytes": 168451
+  },
+  "actual_restore_configure_execution": {
+    "path": ".runtime/porting/ZON-05/restore-configure-command-01/receipt.json",
+    "sha256": "57ec8fa0a899678482b6ccef35865e6b0d9cb290a2704e98ead18bf5d03d0d3c",
+    "size_bytes": 7554
+  },
+  "actual_restore_preservation": {
+    "path": ".runtime/porting/ZON-05/restore-preservation-01/preservation.json",
+    "sha256": "de351b3667bd0bc0616b771f59dfa919769a9bfd9289ae60be7902cc39fbe5a7",
+    "size_bytes": 332081
+  },
+  "actual_RAD_build_identity_metadata": {
+    "path": ".runtime/porting/RAD-01/native-build-02/native-build.json",
+    "sha256": "3bf6a649c4ee2c67a4d9ae0c6a01c4fef1f987243685fdb205f46289cef62fed",
+    "size_bytes": 3989
+  },
+  "actual_consumer_native_build": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-build-02/native-build.json",
+    "sha256": "9c81ac5f733edd260ff62871d87cb7e1e56059bb4b200e22ee2d094998c7b41c",
+    "size_bytes": 7781
+  },
+  "freeze_receipt": {
+    "path": ".runtime/porting/ZON-05/frozen-packet-02/freeze-receipt.json",
+    "sha256": "0ae6d1acaed32b10f497855f1552879efdcecb78527f7818be95489298318434",
+    "size_bytes": 21040
+  },
+  "freeze_execution": {
+    "path": ".runtime/porting/ZON-05/freeze-command-02/receipt.json",
+    "sha256": "ab74179a85c694375d16a93fd8cdd365fd767ec42c09d95b6581245e8718407b",
+    "size_bytes": 3898
+  },
+  "core_before_check": {
+    "path": ".runtime/porting/CTF-01/native-core-before-check-command-01/receipt.json",
+    "sha256": "e1da6904b99a635a16994406919608fa7284f19276d8d3a45eb4f3df8c807702",
+    "size_bytes": 3019
+  },
+  "previous_compile_rows": 717,
+  "current_compile_rows": 721,
+  "inherited_RAD_registration_count": 3,
+  "new_ZON_registration_count": 1,
+  "actual_fresh_compiled_TU_count": 1,
+  "core_registered": 643,
+  "core_present": 631,
+  "core_absent": 12,
+  "all_previous_compile_commands_unchanged": true,
+  "protected_artifacts_and_present_core_objects_unchanged": true,
+  "link_provider_verified": true,
+  "protected_ref_count": 52,
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/68/688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27",
+    "sha256": "688ec4189fa92e0ed39a0ed3d5716b7a584c5a959079852565bfb27f219bfc27"
+  },
+  "scientific_execution_certified": false,
+  "integration_PASS_claimed": false,
+  "gates_updated": false
+}
