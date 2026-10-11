@@ -1,0 +1,68 @@
+    struct ZoneSpaceData
+    {
+        // Base class for zones and spaces.
+        // For now, only including fields that are new to Space to avoid excess changes
+        // due to case differences between existing space and zone field names.
+        std::string Name;
+        Real64 CeilingHeight = Constant::AutoCalculate; // Ceiling Height entered by user [m] or calculated
+        Real64 Volume = Constant::AutoCalculate;        // Volume entered by user [m3] or calculated
+        Real64 ExtGrossWallArea = 0.0;                  // Exterior Wall Area for Zone (Gross)
+        Real64 ExteriorTotalSurfArea = 0.0;             // Total surface area of all exterior surfaces for Zone
+        Real64 extPerimeter = 0.0;                      // Total exposed perimeter (sum of width of exterior walls)
+        int SystemZoneNodeNumber = 0;                   // This is the zone or space node number for the system for a controlled zone
+        Real64 FloorArea = 0.0;                         // Floor area used for this space
+        Real64 TotOccupants = 0.0;                      // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
+        bool IsControlled = false;                      // True when this is a controlled zone or space.
+    };
+
+    struct SpaceData : ZoneSpaceData
+    {
+        int zoneNum = 0;                                       // Pointer to Zone which contains this space
+        Real64 userEnteredFloorArea = Constant::AutoCalculate; // User input floor area for this space
+        std::string spaceType = "General";                     // Space type tag
+        int spaceTypeNum = 0;                                  // Points to spaceType for this space
+        EPVector<std::string> tags;                            // Optional tags for reporting
+        EPVector<int> surfaces;                                // Pointers to surfaces in this space
+        bool hasFloor = false;                                 // Has "Floor" surface
+        Real64 fracZoneFloorArea = 0.0;                        // fraction of total floor area for all spaces in zone
+        Real64 fracZoneVolume = 0.0;                           // fraction of total volume for all spaces in zone
+        Real64 extWindowArea = 0.0;                            // Exterior Window Area for space
+        Real64 totalSurfArea = 0.0;                            // Total surface area for space
+        int radiantEnclosureNum = 0;                           // Radiant exchange enclosure this space belongs to
+        int solarEnclosureNum = 0;                             // Solar distribution enclosure this space belongs to
+        Real64 minOccupants = 0.0;     // minimum occupancy (sum of NomMinNumberPeople for the space People objects, not multiplied)
+        Real64 maxOccupants = 0.0;     // maximum occupancy (sum of NomMaxNumberPeople for the space People objects, not multiplied)
+        bool isRemainderSpace = false; // True if this space is auto-generated "-Remainder" space
+
+        std::vector<Constant::eFuel> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this space
+
+        // Pointers to Surface Data Structure
+        // |AllSurfF                                                                      |AllSurfL
+        // |            |HTSurfF                                                          |HTSurfL
+        // |            |OpaqOrWinMassSurfF                              |OpaqOrWinSurfL  |
+        // |            |OpaqOrIntMassSurfF      |OpaqOrIntMassSurfL                      |
+        // |            |                        ||WindowSurfF           |WindowSurfL     |
+        // |            |                        ||                      ||DomeF          |DomeL
+        // {[ SurfAir ] [(   SurfOpaqOrIntMass   )( SurfWinOrTDDDiffuser )( TDDDome       )]}
+        // HTSurfaceFirst == OpaqOrWinMassSurfaceFirst == OpaqOrIntMassSurfaceFirst
+        // WindowSurfaceFirst == OpaqOrIntMassSurfaceLast + 1
+        // TDDDomeFirst == OpaqOrWinSurfaceLast + 1 == WindowSurfaceLast + 1
+        // AllSurfaceLast == HTSurfaceLast = TDDDomeLast
+        int AllSurfaceFirst = 0;           // First surface in space including air boundaries
+        int AllSurfaceLast = -1;           // Last  surface in space including air boundaries
+        int HTSurfaceFirst = 0;            // First Heat Transfer Surface in space
+        int HTSurfaceLast = -1;            // Last  Heat Transfer Surface in space
+        int OpaqOrIntMassSurfaceFirst = 0; // First Opaque or Interior Mass Heat Transfer Surface (including opaque doors) in space
+        int OpaqOrIntMassSurfaceLast = -1; // Last  Opaque or Interior Mass Heat Transfer Surface (including opaque doors) in space
+        int WindowSurfaceFirst = 0;        // First Window Heat Transfer Surface in space
+        int WindowSurfaceLast = -1;        // Last  Window Heat Transfer Surface in space
+        int OpaqOrWinSurfaceFirst = 0;     // First opaque (including IntMass) or window (non TDD Dome) Surface in space
+        int OpaqOrWinSurfaceLast = -1;     // Last  opaque (including IntMass) or window (non TDD Dome) Surface in space
+        int TDDDomeFirst = 0;              // First TDD Dome Surface in space
+        int TDDDomeLast = -1;              // Last  TDD Dome Surface in space
+
+        Real64 sumHATsurf(EnergyPlusData &state);
+    };
+
+    struct SpaceListData
+    {

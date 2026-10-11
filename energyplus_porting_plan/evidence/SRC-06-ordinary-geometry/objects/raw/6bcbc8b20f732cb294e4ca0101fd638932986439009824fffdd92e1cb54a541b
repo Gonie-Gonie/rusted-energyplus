@@ -1,0 +1,10 @@
+                // zone names have to be looked at and generate the interzone array number
+                ++ArgPointer;
+                surfTemp.ExtBoundCondName = s_ipsc->cAlphaArgs(ArgPointer + 1);
+
+                if (Util::SameString(s_ipsc->cAlphaArgs(ArgPointer), "Outdoors")) {
+                    surfTemp.ExtBoundCond = DataSurfaces::ExternalEnvironment;
+                } else if (Util::SameString(s_ipsc->cAlphaArgs(ArgPointer), "Adiabatic")) {
+                    surfTemp.ExtBoundCond = unreconciledZoneSurface;
+                    surfTemp.ExtBoundCondName = surfTemp.Name;
+

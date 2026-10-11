@@ -1,0 +1,221 @@
+{
+  "schema": "ordinary-geometry-provider-contract.v1",
+  "providers": [
+    {
+      "role": "input",
+      "declared_provider": "InputProcessor::processInput",
+      "symbol": "EnergyPlus::InputProcessor::processInput(EnergyPlus::EnergyPlusData&)",
+      "core_owner": "Products/libenergypluslib.a(InputProcessor.cc.obj)",
+      "Original_relative_source": "InputProcessing/InputProcessor.cc",
+      "start_line": 259,
+      "end_line": 322
+    },
+    {
+      "role": "post-input",
+      "declared_provider": "SimulationManager::PostIPProcessing",
+      "symbol": "EnergyPlus::SimulationManager::PostIPProcessing(EnergyPlus::EnergyPlusData&)",
+      "core_owner": "Products/libenergypluslib.a(SimulationManager.cc.obj)",
+      "Original_relative_source": "SimulationManager.cc",
+      "start_line": 2777,
+      "end_line": 2840
+    },
+    {
+      "role": "constant-state",
+      "declared_provider": "EnergyPlusData::init_constant_state",
+      "symbol": "EnergyPlus::EnergyPlusData::init_constant_state(EnergyPlus::EnergyPlusData&)",
+      "core_owner": "Products/libenergypluslib.a(EnergyPlusData.cc.obj)",
+      "Original_relative_source": "Data/EnergyPlusData.cc",
+      "start_line": 579,
+      "end_line": 642
+    },
+    {
+      "role": "init-state",
+      "declared_provider": "EnergyPlusData::init_state",
+      "symbol": "EnergyPlus::EnergyPlusData::init_state(EnergyPlus::EnergyPlusData&)",
+      "core_owner": "Products/libenergypluslib.a(EnergyPlusData.cc.obj)",
+      "Original_relative_source": "Data/EnergyPlusData.cc",
+      "start_line": 840,
+      "end_line": 903
+    },
+    {
+      "role": "predefined",
+      "declared_provider": "OutputReportPredefined::SetPredefinedTables",
+      "symbol": "EnergyPlus::OutputReportPredefined::SetPredefinedTables(EnergyPlus::EnergyPlusData&)",
+      "core_owner": "Products/libenergypluslib.a(OutputReportPredefined.cc.obj)",
+      "Original_relative_source": "OutputReportPredefined.cc",
+      "start_line": 77,
+      "end_line": 140
+    },
+    {
+      "role": "preconstruction",
+      "declared_provider": "HeatBalanceManager::SetPreConstructionInputParameters",
+      "symbol": "EnergyPlus::HeatBalanceManager::SetPreConstructionInputParameters(EnergyPlus::EnergyPlusData&)",
+      "core_owner": "Products/libenergypluslib.a(HeatBalanceManager.cc.obj)",
+      "Original_relative_source": "HeatBalanceManager.cc",
+      "start_line": 446,
+      "end_line": 509
+    },
+    {
+      "role": "time-pointer",
+      "declared_provider": "OutputProcessor::SetupTimePointers",
+      "symbol": "EnergyPlus::OutputProcessor::SetupTimePointers(EnergyPlus::EnergyPlusData&, EnergyPlus::OutputProcessor::TimeStepType, double&)",
+      "core_owner": "Products/libenergypluslib.a(OutputProcessor.cc.obj)",
+      "Original_relative_source": "OutputProcessor.cc",
+      "start_line": 253,
+      "end_line": 316
+    },
+    {
+      "role": "project",
+      "declared_provider": "HeatBalanceManager::GetProjectControlData",
+      "symbol": "EnergyPlus::HeatBalanceManager::GetProjectControlData(EnergyPlus::EnergyPlusData&, bool&)",
+      "core_owner": "Products/libenergypluslib.a(HeatBalanceManager.cc.obj)",
+      "Original_relative_source": "HeatBalanceManager.cc",
+      "start_line": 494,
+      "end_line": 557
+    },
+    {
+      "role": "atmosphere",
+      "declared_provider": "HeatBalanceManager::GetSiteAtmosphereData",
+      "symbol": "EnergyPlus::HeatBalanceManager::GetSiteAtmosphereData(EnergyPlus::EnergyPlusData&, bool&)",
+      "core_owner": "Products/libenergypluslib.a(HeatBalanceManager.cc.obj)",
+      "Original_relative_source": "HeatBalanceManager.cc",
+      "start_line": 1252,
+      "end_line": 1315
+    },
+    {
+      "role": "materials",
+      "declared_provider": "Material::GetMaterialData",
+      "symbol": "EnergyPlus::Material::GetMaterialData(EnergyPlus::EnergyPlusData&, bool&)",
+      "core_owner": "Products/libenergypluslib.a(Material.cc.obj)",
+      "Original_relative_source": "Material.cc",
+      "start_line": 101,
+      "end_line": 164
+    },
+    {
+      "role": "construction",
+      "declared_provider": "HeatBalanceManager::GetConstructData",
+      "symbol": "EnergyPlus::HeatBalanceManager::GetConstructData(EnergyPlus::EnergyPlusData&, bool&)",
+      "core_owner": "Products/libenergypluslib.a(HeatBalanceManager.cc.obj)",
+      "Original_relative_source": "HeatBalanceManager.cc",
+      "start_line": 1319,
+      "end_line": 1382
+    },
+    {
+      "role": "building",
+      "declared_provider": "HeatBalanceManager::GetBuildingData",
+      "symbol": "EnergyPlus::HeatBalanceManager::GetBuildingData(EnergyPlus::EnergyPlusData&, bool&)",
+      "core_owner": "Products/libenergypluslib.a(HeatBalanceManager.cc.obj)",
+      "Original_relative_source": "HeatBalanceManager.cc",
+      "start_line": 1800,
+      "end_line": 1863
+    },
+    {
+      "role": "setup-zone-geometry",
+      "declared_provider": "SurfaceGeometry::SetupZoneGeometry",
+      "symbol": "EnergyPlus::SurfaceGeometry::SetupZoneGeometry(EnergyPlus::EnergyPlusData&, bool&)",
+      "core_owner": "Products/libenergypluslib.a(SurfaceGeometry.cc.obj)",
+      "Original_relative_source": "SurfaceGeometry.cc",
+      "start_line": 251,
+      "end_line": 314
+    },
+    {
+      "role": "vertices",
+      "declared_provider": "SurfaceGeometry::GetVertices",
+      "symbol": "EnergyPlus::SurfaceGeometry::GetVertices(EnergyPlus::EnergyPlusData&, int, int, ObjexxFCL::Array1S<double>)",
+      "core_owner": "Products/libenergypluslib.a(SurfaceGeometry.cc.obj)",
+      "Original_relative_source": "SurfaceGeometry.cc",
+      "start_line": 9169,
+      "end_line": 9232
+    },
+    {
+      "role": "process-vertices",
+      "declared_provider": "SurfaceGeometry::ProcessSurfaceVertices",
+      "symbol": "EnergyPlus::SurfaceGeometry::ProcessSurfaceVertices(EnergyPlus::EnergyPlusData&, int, bool&)",
+      "core_owner": "Products/libenergypluslib.a(SurfaceGeometry.cc.obj)",
+      "Original_relative_source": "SurfaceGeometry.cc",
+      "start_line": 12846,
+      "end_line": 12909
+    },
+    {
+      "role": "zone-volume",
+      "declared_provider": "SurfaceGeometry::CalculateZoneVolume",
+      "symbol": "EnergyPlus::SurfaceGeometry::CalculateZoneVolume(EnergyPlus::EnergyPlusData&)",
+      "core_owner": "Products/libenergypluslib.a(SurfaceGeometry.cc.obj)",
+      "Original_relative_source": "SurfaceGeometry.cc",
+      "start_line": 12010,
+      "end_line": 12073
+    }
+  ],
+  "ordered_declared_loader_calls": [
+    {
+      "actual_declared_ordinal": 1,
+      "call": "InputProcessor::processInput",
+      "provider_role": "input"
+    },
+    {
+      "actual_declared_ordinal": 2,
+      "call": "SimulationManager::PostIPProcessing",
+      "provider_role": "post-input"
+    },
+    {
+      "actual_declared_ordinal": 3,
+      "call": "EnergyPlusData::init_constant_state",
+      "provider_role": "constant-state"
+    },
+    {
+      "actual_declared_ordinal": 4,
+      "call": "EnergyPlusData::init_state",
+      "provider_role": "init-state"
+    },
+    {
+      "actual_declared_ordinal": 5,
+      "call": "OutputReportPredefined::SetPredefinedTables",
+      "provider_role": "predefined"
+    },
+    {
+      "actual_declared_ordinal": 6,
+      "call": "HeatBalanceManager::SetPreConstructionInputParameters",
+      "provider_role": "preconstruction"
+    },
+    {
+      "actual_declared_ordinal": 7,
+      "call": "OutputProcessor::SetupTimePointers(Zone)",
+      "provider_role": "time-pointer"
+    },
+    {
+      "actual_declared_ordinal": 8,
+      "call": "OutputProcessor::SetupTimePointers(System)",
+      "provider_role": "time-pointer"
+    },
+    {
+      "actual_declared_ordinal": 9,
+      "call": "HeatBalanceManager::GetProjectControlData",
+      "provider_role": "project"
+    },
+    {
+      "actual_declared_ordinal": 10,
+      "call": "HeatBalanceManager::GetSiteAtmosphereData",
+      "provider_role": "atmosphere"
+    },
+    {
+      "actual_declared_ordinal": 11,
+      "call": "Material::GetMaterialData",
+      "provider_role": "materials"
+    },
+    {
+      "actual_declared_ordinal": 12,
+      "call": "HeatBalanceManager::GetConstructData",
+      "provider_role": "construction"
+    },
+    {
+      "actual_declared_ordinal": 13,
+      "call": "HeatBalanceManager::GetBuildingData",
+      "provider_role": "building"
+    }
+  ],
+  "unique_loader_provider_count": 12,
+  "additional_inner_geometry_provider_count": 4,
+  "code_extent_rule": "next link-map text symbol in same input text section, otherwise section end; interval can include adjacent code and is not an exclusive-body claim",
+  "static_address_proof_is_not_inner_invocation_trace": true,
+  "expected_values_supplied": false
+}

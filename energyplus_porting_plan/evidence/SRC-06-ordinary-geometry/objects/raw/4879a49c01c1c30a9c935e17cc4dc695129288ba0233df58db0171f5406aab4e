@@ -1,0 +1,74 @@
+"""Seal only the actual recorder Cargo descriptor transport repair; no result import."""
+import ast
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+PARENT = ROOT / '.runtime/porting/SRC-06/ordinary-geometry-comparison-prep-03'
+OUT = ROOT / '.runtime/porting/SRC-06/ordinary-geometry-comparison-prep-04'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+
+def write(path, raw):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream: stream.write(raw)
+    return ref(path)
+
+
+def diff(before, after, left, right):
+    return ''.join(difflib.unified_diff(before.decode().splitlines(True), after.decode().splitlines(True), fromfile=left, tofile=right)).encode()
+
+
+def main():
+    parent_ref = ref(PARENT / 'manifest.json')
+    assert parent_ref['sha256'] == 'c1f7b3e59b4facb70ec9fc7058b2234645dc9422532647f028ed124d8ed1350f'
+    parent = json.loads((PARENT / 'manifest.json').read_bytes())
+    for row in parent['own_sources']:
+        actual = ref(ROOT / row['path']); assert all(actual[k] == row[k] for k in ('sha256', 'size_bytes'))
+    old = (PARENT / 'custody.py').read_bytes()
+    needle = b"    identity(C, capture['rows'][0]['executable'], artifact['executable'], True)\n"
+    replacement = b"    captured_executable = capture['rows'][0]['executable']\n    C.need(set(captured_executable) == {'historical_path', 'sha256'}, 'recorder immediate Cargo executable descriptor keys differ')\n    identity(C, dict(path=captured_executable['historical_path'], sha256=captured_executable['sha256']), artifact['executable'], True)\n"
+    assert old.count(needle) == 1
+    proposed = old.replace(needle, replacement)
+    assert proposed.replace(replacement, needle) == old
+    old_functions = {n.name: ast.dump(n) for n in ast.parse(old).body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
+    new_functions = {n.name: ast.dump(n) for n in ast.parse(proposed).body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
+    assert old_functions.keys() == new_functions.keys()
+    assert [k for k in old_functions if old_functions[k] != new_functions[k]] == ['authenticate']
+    assert not OUT.exists()
+    before = [write(OUT / 'before-03' / name, (PARENT / name).read_bytes()) for name in ('compare.py', 'custody.py', 'input_joins.py', 'README.md', 'manifest.json')]
+    sources, additions, narrow = [], [], []
+    for name in ('compare.py', 'custody.py', 'input_joins.py'):
+        prior = (PARENT / name).read_bytes(); raw = proposed if name == 'custody.py' else prior
+        ast.parse(raw); row = write(OUT / name, raw); sources.append(row)
+        additions.append(write(OUT / (name + '.diff'), diff(b'', raw, '/dev/null', row['path'])))
+        narrow.append(write(OUT / (name + '.narrow.diff'), diff(prior, raw, (PARENT / name).relative_to(ROOT).as_posix(), row['path'])))
+    prose = b'\nSuccessor04 repairs only the actual recorder executable descriptor transport after the first genuine comparison stopped on KeyError path before numerical joins. The recorded immediate descriptor has exactly historical_path and sha256; those exact keys are required and explicitly normalized to path and sha256 before the existing full-byte executable identity and declared artifact-size guard. Main comparison, all input joins, the prospective scalar policy, complete ledgers, Native/Rust captures and equations remain unchanged. No target rerun, geometry payload read or comparison execution was performed by this Source author. The failed comparison and original Source03 remain immutable historical evidence.\n'
+    readme_raw = (PARENT / 'README.md').read_bytes() + prose
+    readme = write(OUT / 'README.md', readme_raw)
+    readme_diff = write(OUT / 'README.narrow.diff', diff((PARENT / 'README.md').read_bytes(), readme_raw, (PARENT / 'README.md').relative_to(ROOT).as_posix(), readme['path']))
+    recorder = ROOT / parent['recorder_Source']['path']; whole = ref(recorder)
+    assert whole['sha256'] == parent['recorder_Source']['sha256']
+    literal = b''.join(recorder.read_bytes().splitlines(True)[117:143])
+    literal_ref = write(OUT / 'literal-source-ranges/record_command.py.118-143.literal', literal)
+    manifest = copy.deepcopy(parent)
+    manifest.update(status='HELD-Source-only-recorder-descriptor-repair-after-integrity-failure-before-numerical-joins',
+        own_sources=sources + [readme, ref(Path(__file__))], parent_Source_preparation=parent_ref,
+        authentic_before_03_archives=before, exact_addition_diffs=additions, exact_narrow_diffs=narrow,
+        exact_README_narrow_diff=readme_diff,
+        successor_scope='Strict historical_path/sha256 recorder descriptor normalization only; all science, policy and input joins literal Source03.',
+        Native_geometry_arithmetic_endpoints_read=False, Rust_geometry_results_read=False,
+        numerical_comparison_executed_by_Source_author=False)
+    manifest['literal_Source_ranges'].append(dict(whole_Source=whole, start_line=118, end_line=143, literal_archive=literal_ref, role='actual recorder immediate Cargo executable descriptor exact historical_path and sha256 keys'))
+    manifest['runtime_interfaces']['comparer'] = sources[0]
+    print(json.dumps(write(OUT / 'manifest.json', (json.dumps(manifest, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode())))
+
+
+if __name__ == '__main__': main()

@@ -1,0 +1,87 @@
+pub fn surface_geometry_properties(
+    vertices: &[Point3],
+) -> Result<SurfaceGeometryProperties, SurfaceGeometryError> {
+    if vertices.len() < 3 {
+        return Err(SurfaceGeometryError::TooFewVertices);
+    }
+    if vertices.iter().any(|value| {
+        vector(*value)
+            .iter()
+            .any(|component| !component.is_finite())
+    }) {
+        return Err(SurfaceGeometryError::Nonfinite);
+    }
+    // GetVertices producer order: cyclic normal, fan area, angles/local axes,
+    // stored trig, independently snapped outward normal; centroid is later.
+    let newell_normal = cyclic_normal(vertices);
+    let newell_area_vector_m2 = area_vector(vertices);
+    let gross_area_m2 = magnitude(newell_area_vector_m2);
+    let Orientation {
+        azimuth_deg,
+        tilt_deg,
+        lcsx,
+        lcsy,
+        lcsz,
+    } = orientation_from_normal(vertices, newell_normal);
+    if gross_area_m2 == 0.0 || newell_normal == [0.0; 3] {
+        return Err(SurfaceGeometryError::Degenerate);
+    }
+    let sin_azimuth = (azimuth_deg * DEG_TO_RAD).sin();
+    let cos_azimuth = (azimuth_deg * DEG_TO_RAD).cos();
+    let sin_tilt = (tilt_deg * DEG_TO_RAD).sin();
+    let cos_tilt = (tilt_deg * DEG_TO_RAD).cos();
+    let mut out_norm = newell_normal;
+    for value in &mut out_norm {
+        if (*value - 1.0).abs() < 1.0e-6 {
+            *value = 1.0;
+        }
+        if (*value + 1.0).abs() < 1.0e-6 {
+            *value = -1.0;
+        }
+        if value.abs() < 1.0e-6 {
+            *value = 0.0;
+        }
+    }
+    let centroid_m = centroid(vertices, gross_area_m2);
+    if [
+        gross_area_m2,
+        azimuth_deg,
+        tilt_deg,
+        sin_azimuth,
+        cos_azimuth,
+        sin_tilt,
+        cos_tilt,
+    ]
+    .into_iter()
+    .chain(newell_normal)
+    .chain(out_norm)
+    .chain(vector(centroid_m))
+    .chain(lcsx)
+    .chain(lcsy)
+    .chain(lcsz)
+    .any(|value| !value.is_finite())
+    {
+        return Err(SurfaceGeometryError::Nonfinite);
+    }
+    Ok(SurfaceGeometryProperties {
+        area_m2: gross_area_m2,
+        gross_area_m2,
+        net_area_shadow_m2: gross_area_m2,
+        azimuth_deg,
+        tilt_deg,
+        newell_area_vector_m2,
+        newell_normal,
+        out_norm,
+        centroid_m,
+        lcsx,
+        lcsy,
+        lcsz,
+        sin_azimuth,
+        cos_azimuth,
+        sin_tilt,
+        cos_tilt,
+    })
+}
+
+#[cfg(test)]
+mod tests;

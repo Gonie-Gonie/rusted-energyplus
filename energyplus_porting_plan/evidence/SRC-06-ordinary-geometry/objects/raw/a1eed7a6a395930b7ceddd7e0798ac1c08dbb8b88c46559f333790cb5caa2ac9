@@ -1,0 +1,42 @@
+{
+  "schema": "src06-ordinary-geometry-Rust-factual-checker-transport-failure-review.v1",
+  "accepted": false,
+  "reviewer_role": "Header",
+  "actual_checker_Source": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-Rust-factual-checker-prep-01/check.py",
+    "sha256": "1226c6daf16f53a7413766d4c9d2f36f7b7df043f29937a93f313a4b2c6b90c3",
+    "size_bytes": 44577
+  },
+  "actual_build_record": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-validation-01/record.json",
+    "sha256": "75a5222e7d38da2a5c1d8be2cc574a99d9538f4cebc15c89a21b646aa329515f",
+    "size_bytes": 10594
+  },
+  "actual_custody": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-Rust-capture-01/custody.json",
+    "sha256": "52f26f293f5d12762f74840d2b9010416f60188150deeb6e001c8608525274ba",
+    "size_bytes": 3476
+  },
+  "actual_outer_execution": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-Rust-capture-command-01/receipt.json",
+    "sha256": "67990b819721400ce1d3fba20c6610d7989e7bc30aa38e9671af10cb5f20a557",
+    "size_bytes": 5209
+  },
+  "failure_type": "KeyError",
+  "failure_key": "path",
+  "failure_line": 358,
+  "actual_captured_executable": {
+    "historical_path": "target/debug/examples/src06_ordinary_geometry_observer.exe",
+    "sha256": "9a1a7f4a546721e7883abc5303eeaf2e9faadca62fde1dcd370d45f7bdf132e4"
+  },
+  "actual_artifact_executable": {
+    "path": "target/debug/examples/src06_ordinary_geometry_observer.exe",
+    "sha256": "9a1a7f4a546721e7883abc5303eeaf2e9faadca62fde1dcd370d45f7bdf132e4",
+    "size_bytes": 52768059
+  },
+  "failure_scope": "checker recorder descriptor transport only; no factual acceptance or comparison",
+  "target_rerun_required": false,
+  "canonical_mutation": false,
+  "scientific_comparison_performed": false,
+  "gates_updated": false
+}

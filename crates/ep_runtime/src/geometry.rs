@@ -1,10 +1,16 @@
 //! Geometry summary and polygon helper functions.
 
 pub(crate) mod centroid_precision;
+mod inside_convection_owners;
 pub mod production_trace;
 mod source_geometry;
 mod zone_volume;
 pub mod zone_volume_trace;
+pub use inside_convection_owners::{
+    GeometryOwnerUnavailable, InitializedGeometryOwners, InitializedZoneGeometry,
+    OpaqueGeometryOwners, OpaqueSurfaceDimensions, OpaqueZoneGeometry, opaque_geometry_owners,
+    opaque_surface_dimensions,
+};
 pub use source_geometry::{
     SurfaceGeometryError, SurfaceGeometryProperties, source_triangle_centroid,
     surface_geometry_properties,

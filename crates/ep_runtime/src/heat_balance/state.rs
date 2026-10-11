@@ -48,6 +48,8 @@ pub struct HeatBalanceState {
     pub timestep_index: usize,
     /// Per-zone heat-balance state.
     pub zones: Vec<ZoneHeatBalanceState>,
+    /// Complete actual GEO03 returns and explicitly bounded retained geometry owners.
+    pub initialized_geometry: crate::geometry::InitializedGeometryOwners,
     /// Actual admitted uncontrolled warmup demand/daily convergence owners.
     /// None means no warmup owner has been invoked; it supplies no zero loads.
     pub warmup_convergence: Option<HeatBalanceWarmupConvergenceState>,

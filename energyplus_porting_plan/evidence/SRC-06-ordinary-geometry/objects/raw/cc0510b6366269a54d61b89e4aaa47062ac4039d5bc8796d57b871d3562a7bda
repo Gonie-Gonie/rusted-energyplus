@@ -1,0 +1,36 @@
+{
+  "schema": "src06-ordinary-geometry-owner-independent-Source-review.v1",
+  "reviewer_role": "Header",
+  "accepted": true,
+  "actual_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-02/manifest.json",
+    "sha256": "502237329524881eb7427b7721023f3608169cfeed1524cfa7001786b032381a",
+    "size_bytes": 56443
+  },
+  "previous_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/manifest.json",
+    "sha256": "aa9c906ca88b51beb13947913a265ff6bec937309621a15bf2bbbac9c912a83c",
+    "size_bytes": 46640,
+    "line_count": 1085
+  },
+  "direct_descriptor_occurrences": 145,
+  "direct_unique_whole_refs": 119,
+  "literal_Source_ranges_checked": 43,
+  "application_diffs_regenerated": 8,
+  "narrow_body_diff_regenerated": true,
+  "README_diff_regenerated": true,
+  "unchanged_other_application_rows": 7,
+  "Python_authors_AST_checked": 2,
+  "Native_static_PE_code_bytes_checked": 257,
+  "Native_binary_and_map_full_before_after_hashes_verified": true,
+  "full_Source_read": true,
+  "review_scope": "Full eight cumulative deltas/new bodies/tests, both authors, README/card draft,43 Source ranges and static provider proof read. The actual successful GEO03 return moves once after existing trace; existing Volume/error/air-capacity consumer preserved. Selected no-pop perimeter follows distance pow path; Width/Height keep explicit multiplication; source ordered area and bounds/tie operations preserved. Eight dispatcher/observer proposal bodies remain disjoint and exact.",
+  "prerequisites": "Source approval only. Fresh genuine missing-owner loader capture and exact no-transform/no-subsurface/complete opaque Raw caller admission are mandatory before application/observation. Empty-first-space/nonrectangular/near-edge variants need separate genuine evidence. Prior powf binary does not certify a future geometry artifact or FP environment; derived nonfinite results receive no numerical PASS.",
+  "Native_numerical_results_read": false,
+  "Rust_results_read": false,
+  "target_execution_performed": false,
+  "canonical_mutation_performed": false,
+  "numerical_PASS_claimed": false,
+  "whole_Setup_or_ordinary_PASS_claimed": false,
+  "gates_updated": false
+}

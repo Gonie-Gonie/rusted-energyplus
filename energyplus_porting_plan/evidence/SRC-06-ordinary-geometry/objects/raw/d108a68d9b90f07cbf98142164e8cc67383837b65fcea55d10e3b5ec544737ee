@@ -1,0 +1,677 @@
+{
+  "schema": "src06-ordinary-geometry-input-identity-ledger.v1",
+  "input": {
+    "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+    "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755"
+  },
+  "original_IDF_sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+  "converted_epJSON_sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578",
+  "complete_IDF_declarations": {
+    "Version": [
+      {
+        "name": "Version 1",
+        "global_ordinal": 1,
+        "max_fields": 1
+      }
+    ],
+    "Timestep": [
+      {
+        "name": "Timestep 1",
+        "global_ordinal": 2,
+        "max_fields": 1
+      }
+    ],
+    "Building": [
+      {
+        "name": "Simple One Zone (Wireframe DXF)",
+        "global_ordinal": 3,
+        "max_fields": 8
+      }
+    ],
+    "HeatBalanceAlgorithm": [
+      {
+        "name": "HeatBalanceAlgorithm 1",
+        "global_ordinal": 4,
+        "max_fields": 4
+      }
+    ],
+    "SurfaceConvectionAlgorithm:Inside": [
+      {
+        "name": "SurfaceConvectionAlgorithm:Inside 1",
+        "global_ordinal": 5,
+        "max_fields": 1
+      }
+    ],
+    "SurfaceConvectionAlgorithm:Outside": [
+      {
+        "name": "SurfaceConvectionAlgorithm:Outside 1",
+        "global_ordinal": 6,
+        "max_fields": 1
+      }
+    ],
+    "SimulationControl": [
+      {
+        "name": "SimulationControl 1",
+        "global_ordinal": 7,
+        "max_fields": 7
+      }
+    ],
+    "RunPeriod": [
+      {
+        "name": "Run Period 1",
+        "global_ordinal": 8,
+        "max_fields": 13
+      }
+    ],
+    "Site:Location": [
+      {
+        "name": "Denver Centennial  Golden   N_CO_USA Design_Conditions",
+        "global_ordinal": 9,
+        "max_fields": 5
+      }
+    ],
+    "SizingPeriod:DesignDay": [
+      {
+        "name": "Denver Centennial  Golden   N Ann Htg 99% Condns DB",
+        "global_ordinal": 10,
+        "max_fields": 26
+      },
+      {
+        "name": "Denver Centennial  Golden   N Ann Clg 1% Condns DB=>MWB",
+        "global_ordinal": 11,
+        "max_fields": 26
+      }
+    ],
+    "Material:NoMass": [
+      {
+        "name": "R13LAYER",
+        "global_ordinal": 12,
+        "max_fields": 6
+      },
+      {
+        "name": "R31LAYER",
+        "global_ordinal": 13,
+        "max_fields": 6
+      }
+    ],
+    "Material": [
+      {
+        "name": "C5 - 4 IN HW CONCRETE",
+        "global_ordinal": 14,
+        "max_fields": 9
+      }
+    ],
+    "Construction": [
+      {
+        "name": "R13WALL",
+        "global_ordinal": 15,
+        "max_fields": 2
+      },
+      {
+        "name": "FLOOR",
+        "global_ordinal": 16,
+        "max_fields": 2
+      },
+      {
+        "name": "ROOF31",
+        "global_ordinal": 17,
+        "max_fields": 2
+      }
+    ],
+    "Zone": [
+      {
+        "name": "ZONE ONE",
+        "global_ordinal": 18,
+        "max_fields": 9
+      }
+    ],
+    "ScheduleTypeLimits": [
+      {
+        "name": "Fraction",
+        "global_ordinal": 19,
+        "max_fields": 4
+      },
+      {
+        "name": "On/Off",
+        "global_ordinal": 37,
+        "max_fields": 4
+      }
+    ],
+    "GlobalGeometryRules": [
+      {
+        "name": "GlobalGeometryRules 1",
+        "global_ordinal": 20,
+        "max_fields": 3
+      }
+    ],
+    "BuildingSurface:Detailed": [
+      {
+        "name": "Zn001:Wall001",
+        "global_ordinal": 21,
+        "max_fields": 23
+      },
+      {
+        "name": "Zn001:Wall002",
+        "global_ordinal": 22,
+        "max_fields": 23
+      },
+      {
+        "name": "Zn001:Wall003",
+        "global_ordinal": 23,
+        "max_fields": 23
+      },
+      {
+        "name": "Zn001:Wall004",
+        "global_ordinal": 24,
+        "max_fields": 23
+      },
+      {
+        "name": "Zn001:Flr001",
+        "global_ordinal": 25,
+        "max_fields": 23
+      },
+      {
+        "name": "Zn001:Roof001",
+        "global_ordinal": 26,
+        "max_fields": 23
+      }
+    ],
+    "Output:Diagnostics": [
+      {
+        "name": "Output:Diagnostics 1",
+        "global_ordinal": 27,
+        "max_fields": 1
+      }
+    ],
+    "Output:VariableDictionary": [
+      {
+        "name": "Output:VariableDictionary 1",
+        "global_ordinal": 28,
+        "max_fields": 1
+      }
+    ],
+    "Output:Surfaces:Drawing": [
+      {
+        "name": "Output:Surfaces:Drawing 1",
+        "global_ordinal": 29,
+        "max_fields": 1
+      }
+    ],
+    "Output:Constructions": [
+      {
+        "name": "Output:Constructions 1",
+        "global_ordinal": 30,
+        "max_fields": 1
+      }
+    ],
+    "Output:Meter:MeterFileOnly": [
+      {
+        "name": "Output:Meter:MeterFileOnly 1",
+        "global_ordinal": 31,
+        "max_fields": 2
+      },
+      {
+        "name": "Output:Meter:MeterFileOnly 2",
+        "global_ordinal": 32,
+        "max_fields": 2
+      },
+      {
+        "name": "Output:Meter:MeterFileOnly 3",
+        "global_ordinal": 33,
+        "max_fields": 2
+      }
+    ],
+    "OutputControl:Table:Style": [
+      {
+        "name": "OutputControl:Table:Style 1",
+        "global_ordinal": 34,
+        "max_fields": 1
+      }
+    ],
+    "Output:Table:SummaryReports": [
+      {
+        "name": "Output:Table:SummaryReports 1",
+        "global_ordinal": 35,
+        "max_fields": 1
+      }
+    ],
+    "Exterior:Lights": [
+      {
+        "name": "ExtLights",
+        "global_ordinal": 36,
+        "max_fields": 5
+      }
+    ],
+    "OtherEquipment": [
+      {
+        "name": "Test 352a",
+        "global_ordinal": 38,
+        "max_fields": 11
+      },
+      {
+        "name": "Test 352 minus",
+        "global_ordinal": 39,
+        "max_fields": 11
+      }
+    ],
+    "Schedule:Constant": [
+      {
+        "name": "AlwaysOn",
+        "global_ordinal": 40,
+        "max_fields": 3
+      }
+    ],
+    "ZoneAirHeatBalanceAlgorithm": [
+      {
+        "name": "ZoneAirHeatBalanceAlgorithm 1",
+        "global_ordinal": 41,
+        "max_fields": 3
+      }
+    ],
+    "Output:Variable": [
+      {
+        "name": "Output:Variable 1",
+        "global_ordinal": 42,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 2",
+        "global_ordinal": 43,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 3",
+        "global_ordinal": 44,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 4",
+        "global_ordinal": 45,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 5",
+        "global_ordinal": 46,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 6",
+        "global_ordinal": 47,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 7",
+        "global_ordinal": 48,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 8",
+        "global_ordinal": 49,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 9",
+        "global_ordinal": 50,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 10",
+        "global_ordinal": 51,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 11",
+        "global_ordinal": 52,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 12",
+        "global_ordinal": 53,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 13",
+        "global_ordinal": 54,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 14",
+        "global_ordinal": 55,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 15",
+        "global_ordinal": 56,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 16",
+        "global_ordinal": 57,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 17",
+        "global_ordinal": 58,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 18",
+        "global_ordinal": 59,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 19",
+        "global_ordinal": 60,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 20",
+        "global_ordinal": 61,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 21",
+        "global_ordinal": 62,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 22",
+        "global_ordinal": 63,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 23",
+        "global_ordinal": 64,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 24",
+        "global_ordinal": 65,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 25",
+        "global_ordinal": 66,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 26",
+        "global_ordinal": 67,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 27",
+        "global_ordinal": 68,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 28",
+        "global_ordinal": 69,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 29",
+        "global_ordinal": 70,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 30",
+        "global_ordinal": 71,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 31",
+        "global_ordinal": 72,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 32",
+        "global_ordinal": 73,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 33",
+        "global_ordinal": 74,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 34",
+        "global_ordinal": 75,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 35",
+        "global_ordinal": 76,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 36",
+        "global_ordinal": 77,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 37",
+        "global_ordinal": 78,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 38",
+        "global_ordinal": 79,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 39",
+        "global_ordinal": 80,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 40",
+        "global_ordinal": 81,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 41",
+        "global_ordinal": 82,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 42",
+        "global_ordinal": 83,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 43",
+        "global_ordinal": 84,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 44",
+        "global_ordinal": 85,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 45",
+        "global_ordinal": 86,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 46",
+        "global_ordinal": 87,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 47",
+        "global_ordinal": 88,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 48",
+        "global_ordinal": 89,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 49",
+        "global_ordinal": 90,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 50",
+        "global_ordinal": 91,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 51",
+        "global_ordinal": 92,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 52",
+        "global_ordinal": 93,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 53",
+        "global_ordinal": 94,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 54",
+        "global_ordinal": 95,
+        "max_fields": 3
+      },
+      {
+        "name": "Output:Variable 55",
+        "global_ordinal": 96,
+        "max_fields": 3
+      }
+    ]
+  },
+  "effective_IDF_order": {
+    "Construction": [
+      {
+        "name": "R13WALL",
+        "global_ordinal": 15,
+        "max_fields": 2
+      },
+      {
+        "name": "FLOOR",
+        "global_ordinal": 16,
+        "max_fields": 2
+      },
+      {
+        "name": "ROOF31",
+        "global_ordinal": 17,
+        "max_fields": 2
+      }
+    ],
+    "Zone": [
+      {
+        "name": "ZONE ONE",
+        "global_ordinal": 18,
+        "max_fields": 9
+      }
+    ],
+    "ScheduleTypeLimits": [
+      {
+        "name": "Fraction",
+        "global_ordinal": 19,
+        "max_fields": 4
+      },
+      {
+        "name": "On/Off",
+        "global_ordinal": 37,
+        "max_fields": 4
+      }
+    ],
+    "BuildingSurface:Detailed": [
+      {
+        "name": "Zn001:Wall001",
+        "global_ordinal": 21,
+        "max_fields": 23
+      },
+      {
+        "name": "Zn001:Wall002",
+        "global_ordinal": 22,
+        "max_fields": 23
+      },
+      {
+        "name": "Zn001:Wall003",
+        "global_ordinal": 23,
+        "max_fields": 23
+      },
+      {
+        "name": "Zn001:Wall004",
+        "global_ordinal": 24,
+        "max_fields": 23
+      },
+      {
+        "name": "Zn001:Flr001",
+        "global_ordinal": 25,
+        "max_fields": 23
+      },
+      {
+        "name": "Zn001:Roof001",
+        "global_ordinal": 26,
+        "max_fields": 23
+      }
+    ],
+    "Output:VariableDictionary": [
+      {
+        "name": "Output:VariableDictionary 1",
+        "global_ordinal": 28,
+        "max_fields": 1
+      }
+    ],
+    "Output:Surfaces:Drawing": [
+      {
+        "name": "Output:Surfaces:Drawing 1",
+        "global_ordinal": 29,
+        "max_fields": 1
+      }
+    ],
+    "Output:Constructions": [
+      {
+        "name": "Output:Constructions 1",
+        "global_ordinal": 30,
+        "max_fields": 1
+      }
+    ],
+    "Schedule:Constant": [
+      {
+        "name": "AlwaysOn",
+        "global_ordinal": 40,
+        "max_fields": 3
+      }
+    ]
+  },
+  "unnamed_report_families": [
+    "Output:Surfaces:List",
+    "Output:Surfaces:Drawing",
+    "Output:VariableDictionary",
+    "Output:Constructions",
+    "Output:EnergyManagementSystem"
+  ],
+  "opaque_surface_group_order": [
+    "Zn001:Wall001",
+    "Zn001:Wall002",
+    "Zn001:Wall003",
+    "Zn001:Wall004",
+    "Zn001:Flr001",
+    "Zn001:Roof001"
+  ],
+  "excluded_families": [
+    "GeometryTransform",
+    "FenestrationSurface:Detailed",
+    "Window",
+    "Door",
+    "GlazedDoor",
+    "InternalMass",
+    "Shading:Site:Detailed",
+    "Shading:Building:Detailed",
+    "Shading:Zone:Detailed",
+    "Construction:AirBoundary"
+  ],
+  "literal_input_only": true,
+  "Native_or_Rust_result_values_used": false,
+  "scientific_expected_values_supplied": false
+}

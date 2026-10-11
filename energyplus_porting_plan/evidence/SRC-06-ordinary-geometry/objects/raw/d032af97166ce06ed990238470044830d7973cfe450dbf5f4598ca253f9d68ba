@@ -1,0 +1,26 @@
+Real64 VecSquaredLength(Vector const &vec)
+{
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine calculates the squared length of the input vector.
+
+    // REFERENCE:
+    // Graphic Gems.
+
+    Real64 vecsqlen = (vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+
+    return vecsqlen;
+}
+
+Real64 VecLength(Vector const &vec)
+{
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine calculates the length of the input vector.
+
+    // REFERENCE:
+    // Graphic Gems.
+
+    Real64 veclen = std::sqrt(VecSquaredLength(vec));
+
+    return veclen;

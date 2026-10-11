@@ -1,0 +1,19 @@
+--- before-01/geometry_loader.cmake
++++ geometry_loader.cmake
+@@ -7,7 +7,7 @@
+   get_property(_geometry_loader_scheduled GLOBAL PROPERTY GEOMETRY_LOADER_REFERENCE_SCHEDULED)
+   if(NOT _geometry_loader_scheduled)
+     set_property(GLOBAL PROPERTY GEOMETRY_LOADER_REFERENCE_SCHEDULED TRUE)
+-    function(src06_add_dispatcher_reference)
++    function(geometry_loader_add_reference)
+       if(NOT TARGET energypluslib)
+         message(FATAL_ERROR "Geometry loader requires unchanged Original energypluslib")
+       endif()
+@@ -23,6 +23,6 @@
+       target_compile_features(geometry_loader_helper PRIVATE cxx_std_20)
+       target_link_options(geometry_loader_helper PRIVATE "-Wl,-Map,${CMAKE_CURRENT_BINARY_DIR}/geometry_loader_helper.map")
+     endfunction()
+-    cmake_language(DEFER CALL src06_add_dispatcher_reference)
++    cmake_language(DEFER CALL geometry_loader_add_reference)
+   endif()
+ endif()

@@ -1,0 +1,29 @@
+--- .runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/before/apply.draft.py
++++ .runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/apply.py
+@@ -1,4 +1,4 @@
+-"""UNSEALED Root-only geometry application draft; missing authority stops before mutation."""
++"""Root-only reviewed ten-path geometry application; genuine released Native baseline required."""
+ import argparse
+ import hashlib
+ import importlib.util
+@@ -36,14 +36,15 @@
+ 
+ def baseline(A, prep):
+     release = A.load(prep['Native_baseline_acceptance'])
+-    A.need(release['accepted'] is True and release['complete_input_owner_prefix_and_custody_review_accepted'] is True,
+-           'genuine complete Native geometry release required')
+-    for key in ['factual_review', 'independent_FULL_factual_review', 'actual_custody', 'actual_provider_acceptance', 'release_Source']:
++    A.need(release['schema'] == 'ordinary-geometry-Native-baseline-acceptance.v1' and release['accepted'] is True and release['complete_input_owner_prefix_and_custody_review_accepted'] is True, 'genuine complete Native04 release required')
++    A.need(release['whole_geometry_or_ordinary_PASS_claimed'] is False and release['gates_updated'] is False, 'factual release cannot claim whole geometry PASS')
++    for key in ['Root_factual_review','independent_FULL_factual_review','actual_custody','actual_before','actual_authoritative_result','actual_provider_acceptance']:
+         A.bind(release[key])
+     actual = A.load(release['actual_Native_execution'])
+-    A.recorded(release['actual_Native_execution'], release['Source_snapshot'], actual['command'])
++    A.need(A.bind(actual['source_snapshot']) == A.bind(release['Source_snapshot']), 'actual Native Source identity differs')
++    A.recorded(release['actual_Native_execution'], actual['source_snapshot'], actual['command'])
+     A.need(actual['finished_utc'] is not None and actual['started_utc'] <= actual['finished_utc'], 'closed actual Native geometry required')
+-    A.need(A.bind(release['reviewed_Source_preparation']) == A.bind(prep['actual_Native_Source_preparation']), 'actual Native03 authority differs')
++    A.need(A.bind(release['Native_Source_preparation']) == A.bind(prep['actual_Native_Source_preparation']), 'actual Native04 authority differs')
+     return release, actual
+ 
+ 

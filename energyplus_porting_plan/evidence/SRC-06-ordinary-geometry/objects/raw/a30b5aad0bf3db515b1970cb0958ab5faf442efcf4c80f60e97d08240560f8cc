@@ -1,0 +1,27 @@
+
+D:\CodexBuild\rusted-energyplus\SRC-06\ordinary-geometry-native-build-03\bin\geometry_loader_helper_v4.exe:     file format pei-x86-64
+
+
+Disassembly of section .text:
+
+0000000140090580 <EnergyPlus::HeatBalanceManager::GetBuildingData(EnergyPlus::EnergyPlusData&, bool&)>:
+   140090580:	55                   	push   %rbp
+   140090581:	48 89 e5             	mov    %rsp,%rbp
+   140090584:	48 83 ec 20          	sub    $0x20,%rsp
+   140090588:	48 89 4d 10          	mov    %rcx,0x10(%rbp)
+   14009058c:	48 89 55 18          	mov    %rdx,0x18(%rbp)
+   140090590:	48 8b 45 10          	mov    0x10(%rbp),%rax
+   140090594:	48 89 c1             	mov    %rax,%rcx
+   140090597:	e8 ac ae 57 00       	call   14060b448 <EnergyPlus::SolarShading::GetShadowingInput(EnergyPlus::EnergyPlusData&)>
+   14009059c:	48 8b 55 18          	mov    0x18(%rbp),%rdx
+   1400905a0:	48 8b 45 10          	mov    0x10(%rbp),%rax
+   1400905a4:	48 89 c1             	mov    %rax,%rcx
+   1400905a7:	e8 17 00 00 00       	call   1400905c3 <EnergyPlus::HeatBalanceManager::GetZoneData(EnergyPlus::EnergyPlusData&, bool&)>
+   1400905ac:	48 8b 55 18          	mov    0x18(%rbp),%rdx
+   1400905b0:	48 8b 45 10          	mov    0x10(%rbp),%rax
+   1400905b4:	48 89 c1             	mov    %rax,%rcx
+   1400905b7:	e8 0c c6 5e 00       	call   14067cbc8 <EnergyPlus::SurfaceGeometry::SetupZoneGeometry(EnergyPlus::EnergyPlusData&, bool&)>
+   1400905bc:	90                   	nop
+   1400905bd:	48 83 c4 20          	add    $0x20,%rsp
+   1400905c1:	5d                   	pop    %rbp
+   1400905c2:	c3                   	ret

@@ -1,0 +1,146 @@
+"""Root-only reviewed geometry quality/artifact/capture; no Native replay."""
+import argparse
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+
+
+def bootstrap(token):
+    name, sha = token.rsplit('#', 1); path = (ROOT / name).resolve()
+    if not path.is_relative_to(ROOT) or hashlib.sha256(path.read_bytes()).hexdigest() != sha:
+        raise ValueError('reviewed workflow SHA differs')
+    prep = json.loads(path.read_bytes()); row = prep['runtime_interfaces']['apply']; apply_path = (ROOT / row['path']).resolve()
+    if not apply_path.is_relative_to(ROOT) or hashlib.sha256(apply_path.read_bytes()).hexdigest() != row['sha256']:
+        raise ValueError('reviewed shared application Source differs')
+    spec = importlib.util.spec_from_file_location('geometry_apply', apply_path)
+    M = importlib.util.module_from_spec(spec); spec.loader.exec_module(M)
+    A, prep_ref, prep = M.authority(token, 'validate', Path(__file__))
+    return M, A, prep_ref, prep
+
+
+def application(M, A, prep, app_ref, review_ref, source_ref):
+    app, review = A.load(app_ref), A.load(review_ref)
+    A.need(app['schema'] == 'src06-ordinary-geometry-actual-application.v1' and A.bind(app['Source_preparation']) == A.bind(A.operand(prep['_actual_operand'])), 'actual geometry application authority differs')
+    A.need(A.bind(app['source_final']) == A.bind(source_ref), 'actual formatted full Source differs')
+    A.need(review['Root_FULL_formatter_correspondence_accepted'] is True and review['independent_FULL_formatter_correspondence_accepted'] is True
+           and A.bind(review['actual_application']) == A.bind(app_ref) and A.bind(review['Source_snapshot']) == A.bind(source_ref), 'both full formatter acceptances required')
+    rows, observer = M.held_rows(A, prep)
+    before = A.members(app['source_before']); literal = A.members(app['source_literal']); final = M.protected(A, prep, source_ref)
+    paths = set(prep['application_paths']); added = {v['canonical_path'] for v in rows if v['new_destination_absent']}; unrelated = set(before) - paths
+    A.need(app['source_before'] == prep['source_before'] and len(app['application']) == 10 and len(added) == 5
+           and set(literal) == set(final) == set(before) | added and app['source_file_count'] == len(final)
+           and app['unrelated_source_files_verified_byte_exact'] == len(unrelated)
+           and all(before[k] == literal[k] == final[k] for k in unrelated), 'complete ten-path full Source correspondence differs')
+    for actual, held in zip(app['application'], rows):
+        A.need(all(actual[k] == v for k, v in held.items()), 'actual held application row differs')
+        a, b, c = [A.bind(actual[k]).read_bytes() for k in ['actual_before_archive', 'actual_literal_archive', 'actual_final_archive']]
+        A.need(a == (b'' if held['new_destination_absent'] else A.bind(held['before_archive']).read_bytes()) and b == A.bind(held['proposal']).read_bytes(), 'actual before/literal geometry differs')
+        A.check_diff(a, b, actual['actual_semantic_diff']); A.check_diff(b, c, actual['actual_formatter_diff'])
+        name = held['canonical_path']
+        A.need(literal[name]['archive']['sha256'] == actual['actual_literal_archive']['sha256'] and literal[name]['size_bytes'] == len(b)
+               and final[name]['archive']['sha256'] == actual['actual_final_archive']['sha256'] and final[name]['size_bytes'] == len(c)
+               and A.bind(actual['actual_final']).read_bytes() == c, 'actual final/canonical/snapshot bytes differ')
+    fmt = A.recorded(app['actual_formatter_execution'], app['source_literal'], ['cargo', 'fmt', '--all'], stable=app['source_literal'] == source_ref)
+    runtime = A.load(app['runtime_source_bindings']); interface = observer['runtime_interfaces']
+    A.need(set(runtime) == {'schema', 'observer_sources', 'actual_public_API_sources'} and runtime['schema'] == interface['runtime_source_bindings_schema'], 'actual geometry runtime schema differs')
+    for key, order in [('observer_sources', 'ordered_observer_source_paths'), ('actual_public_API_sources', 'ordered_public_API_source_paths')]:
+        A.need([v['path'] for v in runtime[key]] == interface[order], 'ordered own3/API28 runtime paths differ')
+        for row in runtime[key]:
+            A.bind(row); A.need(row['sha256'] == final[row['path']]['archive']['sha256'] and row['size_bytes'] == final[row['path']]['size_bytes'], 'runtime/full Source byte join differs')
+    release, native = M.baseline(A, prep)
+    A.need(A.bind(app['Native_baseline_acceptance']) == A.bind(prep['Native_baseline_acceptance']) and native['finished_utc'] <= fmt['started_utc'], 'Native must close before Rust application')
+    return app, fmt, observer
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('phase', choices=['build', 'execute'])
+    for key in ['source-preparation', 'application', 'formatter-review', 'Source-snapshot', 'output-dir']: parser.add_argument('--' + key, required=True)
+    parser.add_argument('--build-record'); parser.add_argument('--artifact-review')
+    args = parser.parse_args(); M, A, prep_ref, prep = bootstrap(args.source_preparation); prep['_actual_operand'] = args.source_preparation
+    app_ref, review_ref, source = A.operand(args.application), A.operand(args.formatter_review), A.operand(args.Source_snapshot)
+    source = {key:source[key] for key in ('path','sha256')}
+    app, fmt, observer = application(M, A, prep, app_ref, review_ref, source)
+    V = M.module('accepted_geometry_PE', A.bind(prep['CLI_validation_Source']))
+    example = observer['runtime_interfaces']['example']
+    argv = ['cargo', 'build'] + V.CONFIGS + ['--locked', '-p', 'ep_run', '--example', example, '--message-format=json-render-diagnostics']
+    out = (ROOT / args.output_dir).resolve(); A.need(out.is_relative_to(ROOT / '.runtime/porting/SRC-06') and not out.exists(), 'fresh ignored validation output required')
+    prefix = [sys.executable, '-X', 'utf8', '-B', str(A.bind(prep['recorder_Source'])), '--output-dir']
+    common = dict(Source_preparation=prep_ref, actual_application=app_ref, actual_formatter_review=review_ref, Source_snapshot=source,
+        Native_baseline_acceptance=prep['Native_baseline_acceptance'], protected_dispatcher_application=prep['protected_dispatcher_application'],
+        protected_prior_summary=prep['protected_prior_summary'], numerical_PASS_claimed=False, whole_geometry_or_ordinary_PASS_claimed=False, gates_updated=False)
+    if args.phase == 'build':
+        A.need(args.build_record is None and args.artifact_review is None, 'build takes no prior executable')
+        out.mkdir(); policy = observer['runtime_interfaces']['prospective_pairing_policy']
+        frozen = A.write(out / 'frozen-pair-policy.json', A.bind(policy).read_bytes()); quality, totals = {}, {}
+        A.dump(out / 'before.json', dict(common, actual_quality_commands=V.QUALITY, actual_Cargo_command=argv, frozen_policy=frozen, target_execution_performed=False))
+        for role, command in {**V.QUALITY, 'geometry_build': argv}.items():
+            A.members(source, current=True)
+            code = subprocess.call(prefix + [str(out / (role + '-command')), '--'] + command, cwd=ROOT)
+            receipt_ref = A.ref(out / (role + '-command/receipt.json'))
+            if code != 0:
+                A.dump(out / 'failed-build.json', dict(common, actual_failed_role=role, actual_execution=receipt_ref, actual_exit_code=code, target_execution_performed=False)); return code
+            actual = A.recorded(receipt_ref, source, command)
+            A.need(fmt['finished_utc'] <= actual['started_utc'], 'quality/build must follow formatting')
+            A.members(source, current=True)
+            if role in V.QUALITY:
+                quality[role] = receipt_ref
+                if role in ['focused', 'workspace']:
+                    groups = [tuple(map(int, v)) for v in re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored;', A.bind(actual['stdout']).read_text(encoding='utf8'))]
+                    A.need(groups and all(v[1] == 0 for v in groups), 'actual full test summary required')
+                    totals[role] = dict(groups=len(groups), passed=sum(v[0] for v in groups), failed=sum(v[1] for v in groups), ignored=sum(v[2] for v in groups))
+                continue
+            messages = [json.loads(v) for v in A.bind(actual['stdout']).read_text(encoding='utf8').splitlines() if v]
+            emitted = [v for v in messages if v.get('reason') == 'compiler-artifact' and v.get('executable')]
+            A.need(len(emitted) == 1 and any(v.get('reason') == 'build-finished' and v.get('success') is True for v in messages), 'sole actual Cargo-emitted example required')
+            message = emitted[0]; binary = Path(message['executable']).resolve(); immediate = A.ref(binary)
+            A.need(message['target']['name'] == example and message['target']['kind'] == ['example'] and Path(message['target']['src_path']).resolve() == ROOT / 'crates/ep_run/examples/src06_ordinary_geometry_observer.rs'
+                   and message['profile']['opt_level'] == '0' and message['profile']['test'] is False and binary.is_relative_to(ROOT / 'target') and binary.suffix.lower() == '.exe', 'actual Cargo geometry target differs')
+            captured = actual['cargo_compiler_artifacts_capture']
+            A.need(captured['status'] == 'pass' and len(captured['rows']) == 1 and captured['rows'][0]['cargo_message'] == message and captured['rows'][0]['executable']['sha256'] == immediate['sha256'], 'actual Cargo/recorder executable differs')
+            artifact = dict(actual_build_execution=receipt_ref, actual_full_Cargo_JSON=actual['stdout'], cargo_message=message, executable=immediate, PE_inspection=V.pe_header(A, binary, out, 'geometry'))
+        A.need(set(quality) == set(V.QUALITY) and all(A.load(v)['finished_utc'] <= actual['started_utc'] for v in quality.values()), 'four quality calls must precede sole build')
+        application(M, A, prep, app_ref, review_ref, source)
+        record = dict(common, schema='src06-ordinary-geometry-actual-quality-and-artifact.v1', quality_executions=quality, actual_test_totals=totals,
+            actual_Cargo_artifact=artifact, frozen_pair_policy=frozen, pair_policy=policy, runtime_source_bindings=app['runtime_source_bindings'], target_execution_performed=False)
+        print(json.dumps(dict(record=A.dump(out / 'record.json', record)))); return 0
+    A.need(args.build_record is not None and args.artifact_review is not None, 'execute requires closed build and explicit artifact acceptance')
+    build_ref, approval_ref = A.operand(args.build_record), A.operand(args.artifact_review); build, approval = A.load(build_ref), A.load(approval_ref)
+    A.need(build['schema'] == 'src06-ordinary-geometry-actual-quality-and-artifact.v1' and all(A.bind(build[k]) == A.bind(v) for k, v in [('Source_preparation', prep_ref), ('actual_application', app_ref), ('actual_formatter_review', review_ref), ('Source_snapshot', source)]), 'same-Source build authority differs')
+    A.need(approval['Root_FULL_PE_and_Cargo_artifact_accepted'] is True and A.bind(approval['actual_build_record']) == A.bind(build_ref) and A.bind(approval['Source_snapshot']) == A.bind(source), 'Root artifact acceptance required')
+    artifact = build['actual_Cargo_artifact']; A.bind(artifact['executable']); A.bind(artifact['PE_inspection']['actual_PE_header_bytes'])
+    A.need(A.bind(approval['actual_executable']) == A.bind(artifact['executable']) and artifact['PE_inspection']['stack_reserve_bytes'] == 8388608, 'accepted actual PE/stack differs')
+    for role, command in V.QUALITY.items(): A.recorded(build['quality_executions'][role], source, command)
+    actual_build = A.recorded(artifact['actual_build_execution'], source, argv)
+    A.need(all(A.load(v)['finished_utc'] <= actual_build['started_utc'] for v in build['quality_executions'].values()), 'quality/build chronology differs')
+    messages = [json.loads(v) for v in A.bind(actual_build['stdout']).read_text(encoding='utf8').splitlines() if v]
+    emitted = [v for v in messages if v.get('reason') == 'compiler-artifact' and v.get('executable')]
+    A.need(emitted == [artifact['cargo_message']] and Path(emitted[0]['executable']).resolve() == A.bind(artifact['executable']) and any(v.get('reason') == 'build-finished' and v.get('success') is True for v in messages), 'actual Cargo artifact messages differ')
+    policy = observer['runtime_interfaces']['prospective_pairing_policy']
+    A.need(A.bind(build['pair_policy']).read_bytes() == A.bind(build['frozen_pair_policy']).read_bytes() == A.bind(policy).read_bytes() and build['runtime_source_bindings'] == app['runtime_source_bindings'], 'frozen policy/runtime bytes differ')
+    request = dict(schema=observer['runtime_interfaces']['request_schema'], input_context=observer['runtime_interfaces']['fixed_input_context'], runtime_source_bindings=app['runtime_source_bindings'], pairing_policy=policy)
+    A.need(set(request) == set(observer['runtime_interfaces']['request_keys']), 'exact argc3 request keys required')
+    for key in ['input_context', 'runtime_source_bindings', 'pairing_policy']: A.bind(request[key])
+    out.mkdir(); request_ref = A.dump(out / 'request.json', request)
+    command = [str(A.bind(artifact['executable'])), str(A.bind(request_ref)), request_ref['sha256']]
+    A.dump(out / 'before.json', dict(common, actual_build_record=build_ref, actual_Root_artifact_acceptance=approval_ref, actual_request=request_ref, prospective_command=command, target_execution_performed=False))
+    A.members(source, current=True)
+    code = subprocess.call(prefix + [str(out / 'command'), '--'] + command, cwd=ROOT)
+    receipt_ref = A.ref(out / 'command/receipt.json'); actual = A.load(receipt_ref)
+    A.need(code in [0, 2] and actual['exit_code'] == code and actual['source_bytes_match_before_and_after'] is True and actual['command'] == command and actual['source_snapshot'] == source and actual['launch_error'] is None, 'actual guarded geometry capture differs')
+    A.need(actual_build['finished_utc'] <= actual['started_utc'] and A.bind(actual['executed_launcher']['archive']).read_bytes() == A.bind(prep['recorder_Source']).read_bytes(), 'actual build/recorder chronology differs')
+    for row in [actual['stdout'], actual['stderr'], request_ref, artifact['executable']]: A.bind(row)
+    A.members(source, current=True); application(M, A, prep, app_ref, review_ref, source)
+    custody = dict(common, schema='src06-ordinary-geometry-actual-Rust-capture-custody.v1', actual_build_record=build_ref, actual_Root_artifact_acceptance=approval_ref,
+        actual_request=request_ref, actual_execution=receipt_ref, actual_exit_code=code, actual_complete_stdout=actual['stdout'], actual_complete_stderr=actual['stderr'],
+        actual_executable_after=A.ref(A.bind(artifact['executable'])), target_execution_performed=True, comparison_performed=False)
+    print(json.dumps(dict(custody=A.dump(out / 'custody.json', custody)))); return code
+
+
+if __name__ == '__main__': sys.exit(main())

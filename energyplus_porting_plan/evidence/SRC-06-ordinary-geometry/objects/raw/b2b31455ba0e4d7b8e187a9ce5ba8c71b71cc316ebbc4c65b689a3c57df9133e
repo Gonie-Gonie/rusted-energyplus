@@ -1,0 +1,42 @@
+"""Retain the genuine Native input-shape conflict before any Rust application/comparison."""
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+BASE = ROOT / '.runtime/porting/SRC-06'
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw))
+
+def load(path, expected):
+    assert ref(path)['sha256'] == expected
+    return json.loads(path.read_bytes())
+
+manifest_path = BASE / 'ordinary-geometry-comparison-prep-02/manifest.json'
+manifest = load(manifest_path, '91e3da3be59799b3738032700a8db7643bca4019edf08032c6392cf33ea27976')
+result_path = BASE / 'ordinary-geometry-native-capture-01/loader-output/geometry-loader-results.json'
+result = load(result_path, '23e846ecc4c9b82b942921794145490cba86683bfadbb7c774b1ae9260281670')
+context_path = ROOT / manifest['input_context']['path']
+context = load(context_path, manifest['input_context']['sha256'])
+converted_path = ROOT / context['epjson_input']['path']
+converted = load(converted_path, context['epjson_input']['sha256'])
+native = result['selected_geometry']['actual_parsed_input_epJSON']
+extra = sorted(set(native) - set(converted)); missing = sorted(set(converted) - set(native))
+assert len(converted) == 29 and len(native) == 42 and len(extra) == 13 and missing == []
+assert all(native[name] is None for name in extra)
+report = dict(schema='src06-ordinary-geometry-input-admission-preflight.v1', status='held-Source02-family-membership-assumption-disagrees-with-genuine-Native-final-input-owner',
+    reviewed_comparer_Source_preparation=ref(manifest_path), actual_authoritative_Native_result=ref(result_path), literal_converted_input=ref(converted_path),
+    actual_Native_family_count=len(native), literal_converted_family_count=len(converted), missing_literal_families=missing,
+    complete_extra_Native_members=[dict(name=name, actual_JSON_type='null', actual_value=None, input_objects=0, counted_as_PASS=False) for name in extra],
+    condition_that_would_reject='input_joins.joins requires set(actual_parsed_input_family_counts) == set(converted_epJSON)',
+    original_Source_cause_requires_independent_review=True, Rust_application_performed=False, Rust_geometry_results_read=False,
+    numerical_geometry_values_compared=False, actual_comparer_executed=False, expected_values_or_tolerances_changed=False,
+    whole_geometry_or_ordinary_PASS_claimed=False, gates_updated=False, record_Source=ref(Path(__file__)))
+output = BASE / 'ordinary-geometry-input-admission-preflight-01'
+output.mkdir(parents=True, exist_ok=False)
+target = output / 'record.json'
+with target.open('xb') as stream:
+    stream.write((json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode())
+print(json.dumps(ref(target)))

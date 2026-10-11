@@ -1,0 +1,14 @@
+            TransformVertsByAspect(state, SurfNum, surfTemp.Sides);
+
+        } else {
+            ShowFatalError(state, EnergyPlus::format("{}Called with less than 2 sides, Surface={}", RoutineName, surfTemp.Name));
+        }
+
+        // Preliminary Height/Width
+        temp = surfTemp.Vertex(3) - surfTemp.Vertex(2);
+        ThisWidth = Vectors::VecLength(temp);
+        temp = surfTemp.Vertex(2) - surfTemp.Vertex(1);
+        ThisHeight = Vectors::VecLength(temp);
+        surfTemp.Height = ThisHeight;
+        surfTemp.Width = ThisWidth;
+    }

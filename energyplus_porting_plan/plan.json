@@ -12501,6 +12501,11 @@
         "path": "energyplus_porting_plan/evidence/SRC-06-tarp-dispatcher/summary.json",
         "sha256": "e06573e5cdd079c328b7dd27019c362d8496c9f2629064500ae7a5557101d808",
         "size_bytes": 13029
+      },
+      "actual_selected_ordinary_geometry_producers": {
+        "path": "energyplus_porting_plan/evidence/SRC-06-ordinary-geometry/summary.json",
+        "sha256": "e30c4c0345eb05d4db121491f55a54d69d94ca84658e9774cc6cc76407277b1f",
+        "size_bytes": 4530810
       }
     },
     {

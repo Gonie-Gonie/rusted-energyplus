@@ -15,7 +15,10 @@ pub(crate) use schedule_cache::{
 };
 
 use crate::error::RuntimeError;
-use crate::geometry::zone_geometry_properties;
+use crate::geometry::{
+    InitializedGeometryOwners, InitializedZoneGeometry, opaque_geometry_owners,
+    zone_geometry_properties,
+};
 use crate::heat_balance::ctf::{
     ConstructionCtfCoefficientOverride, all_resistive_surface_ctf_state,
     construction_ctf_coefficients_by_name, steady_ctf_coefficient_w_per_m2_k,
@@ -52,15 +55,19 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
     }
     let ctf_coefficients_by_construction = construction_ctf_coefficients_by_name(ctf_coefficients);
     let mut zones = Vec::with_capacity(model.typed.zones.len());
+    let mut zone_geometry_returns = Vec::with_capacity(model.typed.zones.len());
     for zone in &model.typed.zones {
         let geometry = zone_geometry_properties(&model.typed, zone);
         crate::geometry::zone_volume_trace::record(zone.id, &zone.name.0, &geometry);
-        let volume_m3 = geometry
-            .map_err(|error| RuntimeError::UnsupportedZoneVolumeGeometry {
-                zone_name: zone.name.0.clone(),
-                reason: error.to_string(),
-            })?
-            .volume_m3;
+        let geometry = geometry.map_err(|error| RuntimeError::UnsupportedZoneVolumeGeometry {
+            zone_name: zone.name.0.clone(),
+            reason: error.to_string(),
+        })?;
+        let volume_m3 = geometry.volume_m3;
+        zone_geometry_returns.push(InitializedZoneGeometry {
+            zone_id: zone.id,
+            returned: geometry,
+        });
         zones.push(ZoneHeatBalanceState {
             zone_id: zone.id,
             zone_name: zone.name.0.clone(),
@@ -250,6 +257,14 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
         operations,
     );
     let surface_indexes = HeatBalanceSurfaceIndexes::from_model_surfaces(model, &surfaces);
+    let actual_surface_geometry = surfaces
+        .iter()
+        .map(|surface| (surface.surface_id, surface.geometry))
+        .collect::<Vec<_>>();
+    let initialized_geometry = InitializedGeometryOwners {
+        zone_returns: zone_geometry_returns,
+        opaque_setup: opaque_geometry_owners(&model.typed, &actual_surface_geometry),
+    };
 
     for zone in &mut zones {
         let zone_surface_indexes = surface_indexes.surfaces_for_zone(zone.zone_id);
@@ -281,6 +296,7 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
 
     Ok(finish_heat_balance_state(
         zones,
+        initialized_geometry,
         surfaces,
         surface_indexes,
         construction_thermal_data,

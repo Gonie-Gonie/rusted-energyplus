@@ -1,0 +1,18 @@
+    void createSpaceSurfaceLists(EnergyPlusData &state)
+    {
+        static constexpr std::string_view RoutineName("createSpaceSurfaceLists: ");
+        // Build Space surface lists now that all of the surface sorting is complete
+        for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
+            auto &thisSurf = state.dataSurface->Surface(surfNum);
+            if (!thisSurf.HeatTransSurf) {
+                continue; // ignore shading surfaces
+            }
+            // Add to Space's list of surfaces
+            state.dataHeatBal->space(thisSurf.spaceNum).surfaces.emplace_back(surfNum);
+        }
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+            if (int(state.dataHeatBal->space(spaceNum).surfaces.size()) == 0) {
+                ShowWarningError(state, EnergyPlus::format("{}Space={} has no surfaces.", RoutineName, state.dataHeatBal->space(spaceNum).Name));
+            }
+        }
+    }

@@ -1,0 +1,17 @@
+            let geometry = crate::geometry::surface_geometry_properties(&surface.vertices)
+                .map_err(|error| RuntimeError::InvalidSurfaceGeometry {
+                    surface_name: surface.name.0.clone(),
+                    reason: error.to_string(),
+                })?;
+            let area_m2 = geometry.area_m2;
+            let azimuth_deg = geometry.azimuth_deg;
+            let tilt_deg = geometry.tilt_deg;
+            let thermal = construction_thermal_data.data_for_surface(surface)?;
+            let conductance_w_per_k = area_m2 / thermal.thermal_resistance_m2_k_per_w;
+            let steady_ctf_w_per_m2_k =
+                steady_ctf_coefficient_w_per_m2_k(area_m2, thermal.thermal_resistance_m2_k_per_w);
+            let ctf = if let Some(generation) = &public_generation {
+                let binding = generation
+                    .bind_surface(surface.id)
+                    .map_err(|error| RuntimeError::CtfSurfaceLifecycle(error.into()))?;
+                crate::heat_balance::ctf::surface_ctf_state_from_public_storage(

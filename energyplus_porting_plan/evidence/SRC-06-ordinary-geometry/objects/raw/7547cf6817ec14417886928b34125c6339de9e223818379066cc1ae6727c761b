@@ -1,0 +1,503 @@
+{
+  "schema": "ordinary-geometry-configure-dry-Source-preparation.v1",
+  "status": "HELD-Source-only-unexecuted",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-04/prepare_native.py",
+      "sha256": "2843c296e643ab04b6d932128bdb3f741b0194eee6605e7b87bcb6508328a068",
+      "size_bytes": 21460,
+      "line_count": 237
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-04/additive-reference.cmake",
+      "sha256": "94669602801f8d579f2f6bc2428f8f10865d333cebc2b13145ada59900ba401d",
+      "size_bytes": 1019,
+      "line_count": 14
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-04/README.md",
+      "sha256": "a5534be72e9d187c35227f736987f0c01ec6f6cee06a58b76ddc1a4e30f27e95",
+      "size_bytes": 1488,
+      "line_count": 9
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-geometry-configure-Source-04.py",
+      "sha256": "9571fb660f750f8df46e4693c331238f1b2696fbf833f3057a8bdc09efba2687",
+      "size_bytes": 9485,
+      "line_count": 102
+    }
+  ],
+  "dependencies": [
+    {
+      "path": ".runtime/porting/SRC-06/native-dispatcher-build-prep-02/manifest.json",
+      "sha256": "c54db349f9a874f87850d8c86e8abec9dda44cf34e8758162e91200eca2253ec",
+      "size_bytes": 10201,
+      "line_count": 279
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-02/manifest.json",
+      "sha256": "4a172ac50b50fd2151baa818919b1a51b496488afe2a2bc80ea3ce3b984cf1f4",
+      "size_bytes": 37743,
+      "line_count": 880
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-dispatcher-build-01/configure-and-dry-review.json",
+      "sha256": "d0ee2ec26aed08c39efb8c2079b1384910a9337a7c26b2cf6c3f19320c4ee551",
+      "size_bytes": 18590,
+      "line_count": 102
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-dispatcher-build-01/frozen-build-inputs.json",
+      "sha256": "6b0a644ec716abac0a6bba6c3c1bafd80e3e2b82b9de259de758b3f1054ea0d1",
+      "size_bytes": 4126099,
+      "line_count": 84297
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-dispatcher-build-01/configure-command/receipt.json",
+      "sha256": "b3f2f7c26a52ac7d5b17662adcf5063133ca3ac761b16b544603ffca180408dd",
+      "size_bytes": 11947,
+      "line_count": 143
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-dispatcher-provider-review-01/linked-provider-and-PE-inventory.json",
+      "sha256": "225baaf1541e54036c6277b0302891e18c0fb0ddb53e7ab4a8548f95f180ba63",
+      "size_bytes": 2372750,
+      "line_count": 44128
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "size_bytes": 8453,
+      "line_count": 204
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-01/manifest.json",
+      "sha256": "fe2c0b521809635fe09c94631f78ca2519a6021da130899133d59bac803b469f",
+      "size_bytes": 5194,
+      "line_count": 137
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-02/record.json",
+      "sha256": "a4eedbee038952b9928cefeeebfc83d51510dafe9c8d030ec4ef401a7a06c488",
+      "size_bytes": 27345,
+      "line_count": 531
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-02/Root-formatter-acceptance.json",
+      "sha256": "1e93a855803aaa26b5f38be6f09a5c50e96deddbe7ff200dcafc3a37ef617cbf",
+      "size_bytes": 1681,
+      "line_count": 32
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-02/Root-formatter-factual-review.json",
+      "sha256": "158c36393bec26fd759f7351fa0cd734069e8c19c33cf7f9489e79959af9e0de",
+      "size_bytes": 4225
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-dispatcher-actual-formatter-review-02/review.json",
+      "sha256": "0bce2eb59963c7fc8d721fdbb83e432761251a8b4d355b7e28cc18a49335a0e1",
+      "size_bytes": 3165
+    },
+    {
+      "path": ".runtime/porting/source-objects/4c/4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce",
+      "sha256": "4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce",
+      "size_bytes": 1635051,
+      "line_count": 31503
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-02/manifest.json",
+      "sha256": "31b632755afdc52f429eb3fe5256f20cffaec0d7c6f30398621e4ef5f3878ed0",
+      "size_bytes": 10136,
+      "line_count": 257
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-03/manifest.json",
+      "sha256": "72f75c5242e2df7457fb9fc065b2cc1fc5922f6bb9673e6b785e145bb54f47a1",
+      "size_bytes": 48488,
+      "line_count": 1110
+    },
+    {
+      "path": ".runtime/porting/SRC-06/dispatcher-build-metadata-restore-01/record.json",
+      "sha256": "15156d442e24f5ee4a2d60d4f861758ae2492364f0ae812657faa584cdfcee82",
+      "size_bytes": 4480,
+      "line_count": 108
+    },
+    {
+      "path": ".runtime/porting/SRC-06/restore-dispatcher-build-metadata-Root-01.py",
+      "sha256": "1e6c1cb6c4769a4f0f874f598286ff8a134e60155d58625a56e205e13df92977",
+      "size_bytes": 2340
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-01/configure-and-dry-review.json",
+      "sha256": "45578aae0a2051c9300dec822252b120d8944bcd0dd418f9945cf2578b52b0e6",
+      "size_bytes": 18672
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-compile-command-01/receipt.json",
+      "sha256": "fe57daf395aeb54ac7e2e238a854adcb64e90e97de06354b86f43585749a8950",
+      "size_bytes": 3791
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-01/CMakeCache.txt.after",
+      "sha256": "f0ff791953382bedf81514a75f232ead7a167518410cfb75a3e52c22665714fe",
+      "size_bytes": 66126
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-01/CMakeCache.txt.before",
+      "sha256": "ff0f7a23cb3dadc09599fdba3b89d3976640db42733017384d8bc7914838a986",
+      "size_bytes": 65130
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-01/compile_commands.json.after",
+      "sha256": "870c07e9cac2e4237633c86948931c8061b4c3aae741ae7e5f5ed135d62c05d2",
+      "size_bytes": 3985638
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-01/compile_commands.json.before",
+      "sha256": "273a71380a031cadc5b2936f9f6e4310d62caacf01c820642175b3eb31d3377a",
+      "size_bytes": 3979187
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-01/build.ninja.after",
+      "sha256": "b673716daa819aa580421c78d659af3c8577fd6b6ba0cd84f0f71ad495610770",
+      "size_bytes": 4660101
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-01/build.ninja.before",
+      "sha256": "599d5792e3d995808ed4156c445a5540dcb62cf8b1675c72fdf586765a4dd093",
+      "size_bytes": 4647918
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-03/manifest.json",
+      "sha256": "f5f7885c43eed8be89b558cc9b676fb4e7feeda54d6bc9b3735764336bc34fd4",
+      "size_bytes": 16032,
+      "line_count": 398
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-04/manifest.json",
+      "sha256": "2bcb4620c0519b2c796f96242430651d5bd6e737a5e793db4c24a6c03d9ee21b",
+      "size_bytes": 60112,
+      "line_count": 1355
+    },
+    {
+      "path": ".runtime/porting/SRC-06/geometry-build-metadata-restore-02/record.json",
+      "sha256": "e85a202e1d510223d091ceb0a3de631fc7a895c019ca3339ca8793e871fac0e9",
+      "size_bytes": 5575,
+      "line_count": 129
+    },
+    {
+      "path": ".runtime/porting/SRC-06/restore-geometry-build-metadata-Root-02.py",
+      "sha256": "6c3ff55172aa3d8636f24fe3072d76b675d096211ec26941b82d0ba8b3d278bb",
+      "size_bytes": 4600
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-02/configure-and-dry-review.json",
+      "sha256": "ed5ad64059759d43ed814f64a7b7632c7cccdd399531f9ec7f7ecc9c586e8257",
+      "size_bytes": 18715
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-compile-command-02/receipt.json",
+      "sha256": "86186f10cba3b3830566939ab6594395649914945355eff6351b500fd1382701",
+      "size_bytes": 2871
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-providers-01/linked-provider-and-PE-inventory.json",
+      "sha256": "07f561c7b99e483386d1f509e7f4888aac8cf0caf32b6e07f5e89416393ea6a5",
+      "size_bytes": 2989664
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Root-geometry-provider-factual-review-01/review.json",
+      "sha256": "77b59105920d11c479f96dcb7a462f633338c2e60836ef453ffd50a0cc2e402a",
+      "size_bytes": 14430
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-geometry-provider-factual-review-01/review.json",
+      "sha256": "2c24b015cd82a8e4fc10120a01fc54259086cef0a02af128eb4f3821078e824e",
+      "size_bytes": 14438
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-02/CMakeCache.txt.after",
+      "sha256": "e8ff9f52ee9325da83219a796cbd635a9ad7c3d54f79b1b3571319172a139e57",
+      "size_bytes": 66138
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-01/CMakeCache.txt.before",
+      "sha256": "ff0f7a23cb3dadc09599fdba3b89d3976640db42733017384d8bc7914838a986",
+      "size_bytes": 65130
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-02/compile_commands.json.after",
+      "sha256": "7dd734c4e3db77462a1750cbf62dad963848443289c0353955567484f1fad877",
+      "size_bytes": 3985644
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-01/compile_commands.json.before",
+      "sha256": "273a71380a031cadc5b2936f9f6e4310d62caacf01c820642175b3eb31d3377a",
+      "size_bytes": 3979187
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-02/build.ninja.after",
+      "sha256": "0cfdf45648020d1116485f3ea47d304d17339c6462b13ac32bb07419a8fbc1fe",
+      "size_bytes": 4660179
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-01/build.ninja.before",
+      "sha256": "599d5792e3d995808ed4156c445a5540dcb62cf8b1675c72fdf586765a4dd093",
+      "size_bytes": 4647918
+    }
+  ],
+  "source_correspondence": [
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-04/before/prepare_native.py",
+        "sha256": "25799b24092f3495db1065d5c44e3810a46d5cdad410915c08de8fd128cdb486",
+        "size_bytes": 18241,
+        "line_count": 216
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-04/prepare_native.py",
+        "sha256": "2843c296e643ab04b6d932128bdb3f741b0194eee6605e7b87bcb6508328a068",
+        "size_bytes": 21460,
+        "line_count": 237
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-04/prepare_native.py.diff",
+        "sha256": "c96583b4ae6ac13041f173ec76d8ded079917766008d59493aa4f014497191c1",
+        "size_bytes": 14885,
+        "line_count": 102
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-04/before/additive-reference.cmake",
+        "sha256": "d3eb40f81bcd7e5edf7568e646143f149460ede974edfd3ad0d79302b942a192",
+        "size_bytes": 1019,
+        "line_count": 14
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-04/additive-reference.cmake",
+        "sha256": "94669602801f8d579f2f6bc2428f8f10865d333cebc2b13145ada59900ba401d",
+        "size_bytes": 1019,
+        "line_count": 14
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-04/additive-reference.cmake.diff",
+        "sha256": "117ec73574ded03881b8116785118e46a21ff62617a081dbacb3c74cd0973b37",
+        "size_bytes": 2087,
+        "line_count": 26
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-04/before/README.md",
+        "sha256": "3bef3d866ed4b991e97686065dbc022931501226644fedeae2308bcf41952771",
+        "size_bytes": 1997,
+        "line_count": 9
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-04/README.md",
+        "sha256": "a5534be72e9d187c35227f736987f0c01ec6f6cee06a58b76ddc1a4e30f27e95",
+        "size_bytes": 1488,
+        "line_count": 9
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-04/README.md.diff",
+        "sha256": "2ea0ae8fd615607240e61bc5aeb426acc537584642868d12dd7e821c962ea3c1",
+        "size_bytes": 3658,
+        "line_count": 17
+      }
+    }
+  ],
+  "runtime_interfaces": {
+    "workflow": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-04/prepare_native.py",
+      "sha256": "2843c296e643ab04b6d932128bdb3f741b0194eee6605e7b87bcb6508328a068",
+      "size_bytes": 21460,
+      "line_count": 237
+    },
+    "CLI": [
+      "--source-snapshot"
+    ],
+    "Source_snapshot_sha256": "4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce",
+    "compile_target": "geometry_loader_helper_v4",
+    "prior_compile_rows": 743,
+    "current_compile_rows": 744,
+    "expected_dry_steps": 2,
+    "configure_argc": 80
+  },
+  "configuration_or_target_execution_performed": false,
+  "canonical_mutation_performed": false,
+  "numerical_values_read": false,
+  "gates_updated": false,
+  "parent_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-03/manifest.json",
+    "sha256": "f5f7885c43eed8be89b558cc9b676fb4e7feeda54d6bc9b3735764336bc34fd4",
+    "size_bytes": 16032,
+    "line_count": 398
+  },
+  "inherited_source_correspondence": [
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-01/before/prepare_native.py",
+        "sha256": "4c6319f44c5b69880b1a721865a2fe9c67aaa787ae8146c1a1bc642f3961ad9c",
+        "size_bytes": 13629,
+        "line_count": 183
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-01/prepare_native.py",
+        "sha256": "d91edfbf65972b46e9ab2262f12c7f36a3cc78c54605894d7f5b60281b1696cc",
+        "size_bytes": 15788,
+        "line_count": 199
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-01/prepare_native.py.diff",
+        "sha256": "e226b5dbeaeb50f4c992375fc6baae1f28fe6d2876625aac9c8f6eba56e9f347",
+        "size_bytes": 18425,
+        "line_count": 171
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-01/before/additive-reference.cmake",
+        "sha256": "c3b3da21445f8fa0d25a11cd74f863a65e34dc585ea6f07cfa042faad2f437bb",
+        "size_bytes": 989,
+        "line_count": 14
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-01/additive-reference.cmake",
+        "sha256": "fd0008f58ea08a2bbdb4aa445f439b147ac0471cac6d5fb523138b30d6eae390",
+        "size_bytes": 971,
+        "line_count": 14
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-01/additive-reference.cmake.diff",
+        "sha256": "ffaf11e67d799b99e4ed7d399ac060982f8857db9d93c9e1e01bea2af2032fac",
+        "size_bytes": 2009,
+        "line_count": 26
+      }
+    }
+  ],
+  "actual_current_Rust_Source": {
+    "path": ".runtime/porting/source-objects/4c/4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce",
+    "sha256": "4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce",
+    "size_bytes": 1635051,
+    "line_count": 31503
+  },
+  "actual_current_Rust_application": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-02/record.json",
+    "sha256": "a4eedbee038952b9928cefeeebfc83d51510dafe9c8d030ec4ef401a7a06c488",
+    "size_bytes": 27345,
+    "line_count": 531
+  },
+  "actual_current_Rust_formatter_acceptance": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-02/Root-formatter-acceptance.json",
+    "sha256": "1e93a855803aaa26b5f38be6f09a5c50e96deddbe7ff200dcafc3a37ef617cbf",
+    "size_bytes": 1681,
+    "line_count": 32
+  },
+  "previous_source_correspondence": [
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-03/before/prepare_native.py",
+        "sha256": "72088c167567057b610c2207544c279eb29b07ceb4097ffdaf81c3c612e1a832",
+        "size_bytes": 15788,
+        "line_count": 199
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-03/prepare_native.py",
+        "sha256": "25799b24092f3495db1065d5c44e3810a46d5cdad410915c08de8fd128cdb486",
+        "size_bytes": 18241,
+        "line_count": 216
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-03/prepare_native.py.diff",
+        "sha256": "f63427e3262ab03463108e025112df626c559796706df7c843139a51b197ff59",
+        "size_bytes": 14400,
+        "line_count": 103
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-03/before/additive-reference.cmake",
+        "sha256": "fd0008f58ea08a2bbdb4aa445f439b147ac0471cac6d5fb523138b30d6eae390",
+        "size_bytes": 971,
+        "line_count": 14
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-03/additive-reference.cmake",
+        "sha256": "d3eb40f81bcd7e5edf7568e646143f149460ede974edfd3ad0d79302b942a192",
+        "size_bytes": 1019,
+        "line_count": 14
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-03/additive-reference.cmake.diff",
+        "sha256": "b6d96d4146d337a0c702a9d5772b169c0d6ad54e0e97a89698ef9c46df66c29e",
+        "size_bytes": 2039,
+        "line_count": 26
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-03/before/README.md",
+        "sha256": "35e65d4685c21728147ccc49e211c79b0012c7b6b56203984142e253784c3c1e",
+        "size_bytes": 2607,
+        "line_count": 9
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-03/README.md",
+        "sha256": "3bef3d866ed4b991e97686065dbc022931501226644fedeae2308bcf41952771",
+        "size_bytes": 1997,
+        "line_count": 9
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-03/README.md.diff",
+        "sha256": "b65302d60a107722a54df14db28df2a01a57ddd9906db7d87b32ffa6b5efe4ed",
+        "size_bytes": 4777,
+        "line_count": 17
+      }
+    }
+  ],
+  "actual_restored_BUILD_metadata": {
+    "path": ".runtime/porting/SRC-06/geometry-build-metadata-restore-02/record.json",
+    "sha256": "e85a202e1d510223d091ceb0a3de631fc7a895c019ca3339ca8793e871fac0e9",
+    "size_bytes": 5575,
+    "line_count": 129
+  },
+  "failed_geometry744_history": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-01/configure-and-dry-review.json",
+    "sha256": "45578aae0a2051c9300dec822252b120d8944bcd0dd418f9945cf2578b52b0e6",
+    "size_bytes": 18672
+  },
+  "failed_geometry_compile": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-compile-command-01/receipt.json",
+    "sha256": "fe57daf395aeb54ac7e2e238a854adcb64e90e97de06354b86f43585749a8950",
+    "size_bytes": 3791
+  },
+  "retained_successful_v3_facts": {
+    "geometry_configure_review": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-02/configure-and-dry-review.json",
+      "sha256": "ed5ad64059759d43ed814f64a7b7632c7cccdd399531f9ec7f7ecc9c586e8257",
+      "size_bytes": 18715
+    },
+    "geometry_compile_execution": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-compile-command-02/receipt.json",
+      "sha256": "86186f10cba3b3830566939ab6594395649914945355eff6351b500fd1382701",
+      "size_bytes": 2871
+    },
+    "actual_provider_inventory": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-providers-01/linked-provider-and-PE-inventory.json",
+      "sha256": "07f561c7b99e483386d1f509e7f4888aac8cf0caf32b6e07f5e89416393ea6a5",
+      "size_bytes": 2989664
+    },
+    "Root_factual_review": {
+      "path": ".runtime/porting/SRC-06/Root-geometry-provider-factual-review-01/review.json",
+      "sha256": "77b59105920d11c479f96dcb7a462f633338c2e60836ef453ffd50a0cc2e402a",
+      "size_bytes": 14430
+    },
+    "independent_factual_review": {
+      "path": ".runtime/porting/SRC-06/Header-geometry-provider-factual-review-01/review.json",
+      "sha256": "2c24b015cd82a8e4fc10120a01fc54259086cef0a02af128eb4f3821078e824e",
+      "size_bytes": 14438
+    }
+  }
+}

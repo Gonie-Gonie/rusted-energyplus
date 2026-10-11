@@ -1,0 +1,23 @@
+{
+  "schema": "ordinary-geometry-execution-Source-review.v1",
+  "accepted": true,
+  "reviewed_manifest": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-06/manifest.json",
+    "sha256": "f88bf1a486d690155ceabee00791531113f887f79d719c3f1029d71622c850f6",
+    "size_bytes": 26529
+  },
+  "accepted_parent_review": ".runtime/porting/SRC-06/Base-geometry-execution-Source-review-04/review.json",
+  "complete_05_and_06_deltas_authors_README_read": true,
+  "descriptor_occurrences": 170,
+  "unique_whole_refs": 75,
+  "regenerated_diff_occurrences": 18,
+  "physical_provider_ranges": 16,
+  "ASTs": 4,
+  "exact_six_plus_one_substitution_inverse": true,
+  "all_nonmain_function_ASTs_exact": true,
+  "no_concrete_blocker_found": true,
+  "target_or_driver_execution_performed": false,
+  "numerical_results_read": false,
+  "canonical_mutation_performed": false,
+  "gates_updated": false
+}

@@ -1,0 +1,792 @@
+{
+  "schema": "ordinary-geometry-public-loader-Source-preparation.v1",
+  "status": "HELD_SOURCE_ONLY",
+  "Original_version": "26.1.0",
+  "Original_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/geometry_loader_helper.cpp",
+      "sha256": "ec30082bc4e7046acf155ca3579aace26ab2b399de888746129f52042193c050",
+      "size_bytes": 16750,
+      "line_count": 200
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/geometry_loader_fields.hh",
+      "sha256": "d7f1c38cbc1c13cf1e138ac6cfb07ffac24626157847ab844e3fb026603ae536",
+      "size_bytes": 7973,
+      "line_count": 106
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ctf01_reference_metadata.hh",
+      "sha256": "6332546299553c1c8f4d0de36676067decf6921c7e3e27ebc7bd2d6ca6f0dee9",
+      "size_bytes": 7434,
+      "line_count": 147
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/geo02_reference_fields.hh",
+      "sha256": "1bdfa041a6b4e6371b512b13263ae67dd2a62cd068105cf6d739451a556db410",
+      "size_bytes": 6611,
+      "line_count": 123
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/geo03_reference_fields.hh",
+      "sha256": "eac5857f1fc971911513851472694fc5d46c981c737d29ad17ed20343a09c113",
+      "size_bytes": 6161,
+      "line_count": 106
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/geometry_loader.cmake",
+      "sha256": "7e657526e9bd6338fffbdc277db8011fbd2a63b8dcfeca31696f95a573d98e4b",
+      "size_bytes": 1941,
+      "line_count": 28
+    }
+  ],
+  "authoring_source": {
+    "path": ".runtime/porting/SRC-06/prepare-ordinary-geometry-native-01.py",
+    "sha256": "b8d2e78cf994b0e3e27339ebec2b56df09e26e3864d32c0bfe1dda80082387d7",
+    "size_bytes": 14580,
+    "line_count": 160
+  },
+  "README": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/README.md",
+    "sha256": "bf45e27e6aa0cad43569c14e403f374e7bedbeb9ab577b3c228d8d3be9051281",
+    "size_bytes": 3969,
+    "line_count": 11
+  },
+  "prospective_request": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/request.proposed.json",
+    "sha256": "257c60e5b5366e8521b97408ca27e96618e9059e9001f4426e0743a1f78250ef",
+    "size_bytes": 11398,
+    "line_count": 278
+  },
+  "exact_copied_source_parents": [
+    {
+      "before": {
+        "path": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_metadata.hh",
+        "sha256": "6332546299553c1c8f4d0de36676067decf6921c7e3e27ebc7bd2d6ca6f0dee9",
+        "size_bytes": 7434,
+        "line_count": 147
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ctf01_reference_metadata.hh",
+        "sha256": "6332546299553c1c8f4d0de36676067decf6921c7e3e27ebc7bd2d6ca6f0dee9",
+        "size_bytes": 7434,
+        "line_count": 147
+      },
+      "bytes_exact": true
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/GEO-02/independent-native-source-review-01/reviewed-source/geo02_reference_fields.hh",
+        "sha256": "1bdfa041a6b4e6371b512b13263ae67dd2a62cd068105cf6d739451a556db410",
+        "size_bytes": 6611,
+        "line_count": 123
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/geo02_reference_fields.hh",
+        "sha256": "1bdfa041a6b4e6371b512b13263ae67dd2a62cd068105cf6d739451a556db410",
+        "size_bytes": 6611,
+        "line_count": 123
+      },
+      "bytes_exact": true
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/GEO-03/original-helper-first-01/source/geo03_reference_fields.hh",
+        "sha256": "eac5857f1fc971911513851472694fc5d46c981c737d29ad17ed20343a09c113",
+        "size_bytes": 6161,
+        "line_count": 106
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/geo03_reference_fields.hh",
+        "sha256": "eac5857f1fc971911513851472694fc5d46c981c737d29ad17ed20343a09c113",
+        "size_bytes": 6161,
+        "line_count": 106
+      },
+      "bytes_exact": true
+    }
+  ],
+  "authentic_loader_parent": {
+    "path": ".runtime/porting/CTF-10/native-init-postlude-prep-06/ctf10_production_helper.cpp",
+    "sha256": "c0c34d8c20801216e37b4e7a0e9c4f1eeb781617844ce2931551e4b18c7511e7",
+    "size_bytes": 37234,
+    "line_count": 477
+  },
+  "authentic_recipe_parent": {
+    "path": ".runtime/porting/SRC-06/native-tarp-dispatcher-prep-02/tarp_dispatcher.cmake",
+    "sha256": "0a8990a4650c7b64a70c0f826713ecdf8c12eab42c3687e0dc1a1a783108d6ef",
+    "size_bytes": 2001,
+    "line_count": 28
+  },
+  "source_correspondence": [
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/before/ctf10_production_helper.cpp",
+        "sha256": "c0c34d8c20801216e37b4e7a0e9c4f1eeb781617844ce2931551e4b18c7511e7",
+        "size_bytes": 37234,
+        "line_count": 477
+      },
+      "before_bytes_empty": false,
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/geometry_loader_helper.cpp",
+        "sha256": "ec30082bc4e7046acf155ca3579aace26ab2b399de888746129f52042193c050",
+        "size_bytes": 16750,
+        "line_count": 200
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/diffs/geometry_loader_helper.cpp.diff",
+        "sha256": "bec3efee4080c4246fbe6cd1e4a3e7ee1d1580ff6bfa7d8a18b11eae39d7b90d",
+        "size_bytes": 53218,
+        "line_count": 637
+      },
+      "fromfile": "accepted-CTF10-loader.cpp",
+      "tofile": "geometry_loader_helper.cpp"
+    },
+    {
+      "before": null,
+      "before_bytes_empty": true,
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/geometry_loader_fields.hh",
+        "sha256": "d7f1c38cbc1c13cf1e138ac6cfb07ffac24626157847ab844e3fb026603ae536",
+        "size_bytes": 7973,
+        "line_count": 106
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/diffs/geometry_loader_fields.hh.diff",
+        "sha256": "c0a8f3c57a5ccb445838aff3e94cc1be394817cfdded2030dae6aeebbe32aab6",
+        "size_bytes": 8141,
+        "line_count": 109
+      },
+      "fromfile": "/dev/null",
+      "tofile": "geometry_loader_fields.hh"
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/before/tarp_dispatcher.cmake",
+        "sha256": "0a8990a4650c7b64a70c0f826713ecdf8c12eab42c3687e0dc1a1a783108d6ef",
+        "size_bytes": 2001,
+        "line_count": 28
+      },
+      "before_bytes_empty": false,
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/geometry_loader.cmake",
+        "sha256": "7e657526e9bd6338fffbdc277db8011fbd2a63b8dcfeca31696f95a573d98e4b",
+        "size_bytes": 1941,
+        "line_count": 28
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/diffs/geometry_loader.cmake.diff",
+        "sha256": "227b53f86248d14ea62f4e6a38bcf92dce7be003462c36d14047a72e968e9fc1",
+        "size_bytes": 3727,
+        "line_count": 48
+      },
+      "fromfile": "accepted-dispatcher.cmake",
+      "tofile": "geometry_loader.cmake"
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_metadata.hh",
+        "sha256": "6332546299553c1c8f4d0de36676067decf6921c7e3e27ebc7bd2d6ca6f0dee9",
+        "size_bytes": 7434,
+        "line_count": 147
+      },
+      "before_bytes_empty": false,
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ctf01_reference_metadata.hh",
+        "sha256": "6332546299553c1c8f4d0de36676067decf6921c7e3e27ebc7bd2d6ca6f0dee9",
+        "size_bytes": 7434,
+        "line_count": 147
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/diffs/ctf01_reference_metadata.hh.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "fromfile": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_metadata.hh",
+      "tofile": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ctf01_reference_metadata.hh"
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/GEO-02/independent-native-source-review-01/reviewed-source/geo02_reference_fields.hh",
+        "sha256": "1bdfa041a6b4e6371b512b13263ae67dd2a62cd068105cf6d739451a556db410",
+        "size_bytes": 6611,
+        "line_count": 123
+      },
+      "before_bytes_empty": false,
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/geo02_reference_fields.hh",
+        "sha256": "1bdfa041a6b4e6371b512b13263ae67dd2a62cd068105cf6d739451a556db410",
+        "size_bytes": 6611,
+        "line_count": 123
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/diffs/geo02_reference_fields.hh.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "fromfile": ".runtime/porting/GEO-02/independent-native-source-review-01/reviewed-source/geo02_reference_fields.hh",
+      "tofile": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/geo02_reference_fields.hh"
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/GEO-03/original-helper-first-01/source/geo03_reference_fields.hh",
+        "sha256": "eac5857f1fc971911513851472694fc5d46c981c737d29ad17ed20343a09c113",
+        "size_bytes": 6161,
+        "line_count": 106
+      },
+      "before_bytes_empty": false,
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/geo03_reference_fields.hh",
+        "sha256": "eac5857f1fc971911513851472694fc5d46c981c737d29ad17ed20343a09c113",
+        "size_bytes": 6161,
+        "line_count": 106
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/diffs/geo03_reference_fields.hh.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      },
+      "fromfile": ".runtime/porting/GEO-03/original-helper-first-01/source/geo03_reference_fields.hh",
+      "tofile": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/geo03_reference_fields.hh"
+    }
+  ],
+  "Source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+        "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+        "size_bytes": 371103,
+        "line_count": 6206
+      },
+      "start_line": 1800,
+      "end_line": 1820,
+      "sha256": "3a64ac0d40227f10ccb5f34a4228b1341f8caac8fa5c7feba500630586e2db80",
+      "size_bytes": 762,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ranges/HeatBalanceManager.cc.1800-1820.literal",
+        "sha256": "3a64ac0d40227f10ccb5f34a4228b1341f8caac8fa5c7feba500630586e2db80",
+        "size_bytes": 762,
+        "line_count": 21
+      },
+      "purpose": "genuine GetBuildingData public return and unchanged direct loader calls"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+        "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1",
+        "size_bytes": 941682,
+        "line_count": 15690
+      },
+      "start_line": 251,
+      "end_line": 317,
+      "sha256": "e0666fd2dab86a0036fc2b4fef1a3641f1cad48dca144b647d6579f6e9090a4b",
+      "size_bytes": 3651,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ranges/SurfaceGeometry.cc.251-317.literal",
+        "sha256": "e0666fd2dab86a0036fc2b4fef1a3641f1cad48dca144b647d6579f6e9090a4b",
+        "size_bytes": 3651,
+        "line_count": 67
+      },
+      "purpose": "real setup prerequisite/GetSurfaceData/error early-return and no manual geometry setup"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+        "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1",
+        "size_bytes": 941682,
+        "line_count": 15690
+      },
+      "start_line": 337,
+      "end_line": 425,
+      "sha256": "adebc603d962b79b8c276b519292568d66b53cebab4d14b41482f934480c0c6d",
+      "size_bytes": 4891,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ranges/SurfaceGeometry.cc.337-425.literal",
+        "sha256": "adebc603d962b79b8c276b519292568d66b53cebab4d14b41482f934480c0c6d",
+        "size_bytes": 4891,
+        "line_count": 89
+      },
+      "purpose": "real ProcessSurfaceVertices and exterior area reset/addition"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+        "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1",
+        "size_bytes": 941682,
+        "line_count": 15690
+      },
+      "start_line": 550,
+      "end_line": 605,
+      "sha256": "f7a3b5830f1692cea93bad7e9cf2e7a762697b22a662df407ea15b36ef8315e3",
+      "size_bytes": 3670,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ranges/SurfaceGeometry.cc.550-605.literal",
+        "sha256": "f7a3b5830f1692cea93bad7e9cf2e7a762697b22a662df407ea15b36ef8315e3",
+        "size_bytes": 3670,
+        "line_count": 56
+      },
+      "purpose": "complete bound initialization/traversal and actual source checks"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+        "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1",
+        "size_bytes": 941682,
+        "line_count": 15690
+      },
+      "start_line": 3005,
+      "end_line": 3077,
+      "sha256": "438bb4539ea0e42779f0a939a9e42df58cf744e38b8fa6e1f93d9add56f4b116",
+      "size_bytes": 3818,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ranges/SurfaceGeometry.cc.3005-3077.literal",
+        "sha256": "438bb4539ea0e42779f0a939a9e42df58cf744e38b8fa6e1f93d9add56f4b116",
+        "size_bytes": 3818,
+        "line_count": 73
+      },
+      "purpose": "real empty-Space warning and actual retained pointer/ordered membership producer"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+        "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1",
+        "size_bytes": 941682,
+        "line_count": 15690
+      },
+      "start_line": 9108,
+      "end_line": 9167,
+      "sha256": "c9f4373addc74e55da925c86135d35d1eb0dbef1ef327c2bb8f8372c3f3a32e3",
+      "size_bytes": 2532,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ranges/SurfaceGeometry.cc.9108-9167.literal",
+        "sha256": "c9f4373addc74e55da925c86135d35d1eb0dbef1ef327c2bb8f8372c3f3a32e3",
+        "size_bytes": 2532,
+        "line_count": 60
+      },
+      "purpose": "real cyclic perimeter and coincident-disposal threshold helper"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+        "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1",
+        "size_bytes": 941682,
+        "line_count": 15690
+      },
+      "start_line": 9316,
+      "end_line": 9389,
+      "sha256": "e94b82d0f819cdcb6b95637b2a84888da428743afbf07e148e5718c94b5123f9",
+      "size_bytes": 4395,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ranges/SurfaceGeometry.cc.9316-9389.literal",
+        "sha256": "e94b82d0f819cdcb6b95637b2a84888da428743afbf07e148e5718c94b5123f9",
+        "size_bytes": 4395,
+        "line_count": 74
+      },
+      "purpose": "GetVertices real perimeter/disposal/error/geometry storage"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+        "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1",
+        "size_bytes": 941682,
+        "line_count": 15690
+      },
+      "start_line": 12917,
+      "end_line": 12983,
+      "sha256": "307a812400bb3bfbfd7846a7b4c1f9f515952b945a55f7dd9161b91f177ffe3c",
+      "size_bytes": 3291,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ranges/SurfaceGeometry.cc.12917-12983.literal",
+        "sha256": "307a812400bb3bfbfd7846a7b4c1f9f515952b945a55f7dd9161b91f177ffe3c",
+        "size_bytes": 3291,
+        "line_count": 67
+      },
+      "purpose": "actual base Width/Height and selected polygon branch"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+        "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1",
+        "size_bytes": 941682,
+        "line_count": 15690
+      },
+      "start_line": 12005,
+      "end_line": 12275,
+      "sha256": "0bddf635f76914065d7b267b339f38a1ffaddd6235d040bf6d8763dcfea8db9e",
+      "size_bytes": 16350,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ranges/SurfaceGeometry.cc.12005-12275.literal",
+        "sha256": "0bddf635f76914065d7b267b339f38a1ffaddd6235d040bf6d8763dcfea8db9e",
+        "size_bytes": 16350,
+        "line_count": 271
+      },
+      "purpose": "actual CalculateZoneVolume result producer and real space fractions"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+        "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+        "size_bytes": 133816,
+        "line_count": 2059
+      },
+      "start_line": 434,
+      "end_line": 501,
+      "sha256": "8ec67b917ce03e38d4a5136047b5f69e39b17dc3eac218bb9a4700c98f443c12",
+      "size_bytes": 5427,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ranges/DataHeatBalance.hh.434-501.literal",
+        "sha256": "8ec67b917ce03e38d4a5136047b5f69e39b17dc3eac218bb9a4700c98f443c12",
+        "size_bytes": 5427,
+        "line_count": 68
+      },
+      "purpose": "real ZoneSpace/Space constructor owners, empty ranges and ordered IDs"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+        "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+        "size_bytes": 133816,
+        "line_count": 2059
+      },
+      "start_line": 571,
+      "end_line": 632,
+      "sha256": "df26ed1829ade37c1465ce11b4090b2655c986bac3d82c9a36909147a8d17b90",
+      "size_bytes": 5967,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ranges/DataHeatBalance.hh.571-632.literal",
+        "sha256": "df26ed1829ade37c1465ce11b4090b2655c986bac3d82c9a36909147a8d17b90",
+        "size_bytes": 5967,
+        "line_count": 62
+      },
+      "purpose": "real Zone return/bounds/extarea members and defaults"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+        "sha256": "7eea2e660914574ce9b5b633ac2099d49b09255d6c215b84e47edccbbb5cffae",
+        "size_bytes": 113537,
+        "line_count": 1850
+      },
+      "start_line": 691,
+      "end_line": 752,
+      "sha256": "affb1f81269e8f89b985b03da8f673a179db569c27983fffc002c2197b64c359",
+      "size_bytes": 4472,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ranges/DataSurfaces.hh.691-752.literal",
+        "sha256": "affb1f81269e8f89b985b03da8f673a179db569c27983fffc002c2197b64c359",
+        "size_bytes": 4472,
+        "line_count": 62
+      },
+      "purpose": "real geometry member types/vertices/readability flags"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+        "sha256": "7eea2e660914574ce9b5b633ac2099d49b09255d6c215b84e47edccbbb5cffae",
+        "size_bytes": 113537,
+        "line_count": 1850
+      },
+      "start_line": 831,
+      "end_line": 848,
+      "sha256": "521157dfa5252d962a24f77569e6c1628102b62e67f2cf09f51910d10422a439",
+      "size_bytes": 1937,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ranges/DataSurfaces.hh.831-848.literal",
+        "sha256": "521157dfa5252d962a24f77569e6c1628102b62e67f2cf09f51910d10422a439",
+        "size_bytes": 1937,
+        "line_count": 18
+      },
+      "purpose": "actual Surface constructor initialized owners; no allocated-vertex assumption"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EPVector.hh",
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EPVector.hh",
+        "sha256": "155ac5aaf6bd6138ad1a397edf68e2c660a6595d94f291bcf671ebc040c335e2",
+        "size_bytes": 11096,
+        "line_count": 357
+      },
+      "start_line": 60,
+      "end_line": 154,
+      "sha256": "a96002183770766fc88cec83f7c8cc74bb58b2f53c9a22f232aef5ff80685956",
+      "size_bytes": 2182,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ranges/EPVector.hh.60-154.literal",
+        "sha256": "a96002183770766fc88cec83f7c8cc74bb58b2f53c9a22f232aef5ff80685956",
+        "size_bytes": 2182,
+        "line_count": 95
+      },
+      "purpose": "actual allocation and one-based parenthesis indexing; no0 member"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.hh",
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.hh",
+        "sha256": "e99fa1600d88921975c45fcbca9c9c95985ea04d58eb02b0bdab049e2757463d",
+        "size_bytes": 14108,
+        "line_count": 348
+      },
+      "start_line": 310,
+      "end_line": 319,
+      "sha256": "e1f1a62f62752b258313ce4d14b77a186851ceac1e54130be9c4e8b61009a867",
+      "size_bytes": 419,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ranges/InputProcessor.hh.310-319.literal",
+        "sha256": "e1f1a62f62752b258313ce4d14b77a186851ceac1e54130be9c4e8b61009a867",
+        "size_bytes": 419,
+        "line_count": 10
+      },
+      "purpose": "actual public processInput epJSON output copied without extra getter"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataErrorTracking.hh",
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataErrorTracking.hh",
+        "sha256": "966cc13df0bd9ff48d9995a390bce9005e141f45e534438591ff96f6614b7f58",
+        "size_bytes": 18669,
+        "line_count": 251
+      },
+      "start_line": 203,
+      "end_line": 245,
+      "sha256": "170b341475d5903388cdea81afc5e62fc0b9aaf20d0ff9489188c3a5cdf6477c",
+      "size_bytes": 1902,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ranges/DataErrorTracking.hh.203-245.literal",
+        "sha256": "170b341475d5903388cdea81afc5e62fc0b9aaf20d0ff9489188c3a5cdf6477c",
+        "size_bytes": 1902,
+        "line_count": 43
+      },
+      "purpose": "real retained error counters/LastSevereError and defaults"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.cc",
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.cc",
+        "sha256": "cfe62739c6327e692567d6e7fcd6abb5760548dd80d4195fe3c7eade5d33316a",
+        "size_bytes": 22346,
+        "line_count": 552
+      },
+      "start_line": 247,
+      "end_line": 267,
+      "sha256": "81cd022338ee0bed9be9bf771590943980cfba952b7eeb81863eb1718324a122",
+      "size_bytes": 353,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ranges/IOFiles.cc.247-267.literal",
+        "sha256": "81cd022338ee0bed9be9bf771590943980cfba952b7eeb81863eb1718324a122",
+        "size_bytes": 353,
+        "line_count": 21
+      },
+      "purpose": "real stringstream sink and nondraining get_output"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+        "sha256": "87bd8b6fac7001e26ffc08f5e3457a3f644098793a2734524c56de946c761ff2",
+        "size_bytes": 81995,
+        "line_count": 1813
+      },
+      "start_line": 1381,
+      "end_line": 1423,
+      "sha256": "42dd3a6e6296c2cb302f3188457bcc9575938e2fbb1f5c45b357931ba841080c",
+      "size_bytes": 1689,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ranges/UtilityRoutines.cc.1381-1423.literal",
+        "sha256": "42dd3a6e6296c2cb302f3188457bcc9575938e2fbb1f5c45b357931ba841080c",
+        "size_bytes": 1689,
+        "line_count": 43
+      },
+      "purpose": "real header/error output and optional sinks"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SQLiteProcedures.hh",
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SQLiteProcedures.hh",
+        "sha256": "7bf58cf745e82bdccd4fc22bdc54c0b09a530a69555ee4648f0dfba83b3d64bf",
+        "size_bytes": 50039,
+        "line_count": 1037
+      },
+      "start_line": 1018,
+      "end_line": 1033,
+      "sha256": "c6ddb1aefe23a002217a5b6c60e4a62439ece553525677505caea6fd7e012e76",
+      "size_bytes": 436,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/ranges/SQLiteProcedures.hh.1018-1033.literal",
+        "sha256": "c6ddb1aefe23a002217a5b6c60e4a62439ece553525677505caea6fd7e012e76",
+        "size_bytes": 436,
+        "line_count": 16
+      },
+      "purpose": "actual optional SQLite owner declaration"
+    }
+  ],
+  "whole_Original_sources": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+      "size_bytes": 371103,
+      "line_count": 6206
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+      "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1",
+      "size_bytes": 941682,
+      "line_count": 15690
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+      "size_bytes": 133816,
+      "line_count": 2059
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+      "sha256": "7eea2e660914574ce9b5b633ac2099d49b09255d6c215b84e47edccbbb5cffae",
+      "size_bytes": 113537,
+      "line_count": 1850
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EPVector.hh",
+      "sha256": "155ac5aaf6bd6138ad1a397edf68e2c660a6595d94f291bcf671ebc040c335e2",
+      "size_bytes": 11096,
+      "line_count": 357
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.hh",
+      "sha256": "e99fa1600d88921975c45fcbca9c9c95985ea04d58eb02b0bdab049e2757463d",
+      "size_bytes": 14108,
+      "line_count": 348
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataErrorTracking.hh",
+      "sha256": "966cc13df0bd9ff48d9995a390bce9005e141f45e534438591ff96f6614b7f58",
+      "size_bytes": 18669,
+      "line_count": 251
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.cc",
+      "sha256": "cfe62739c6327e692567d6e7fcd6abb5760548dd80d4195fe3c7eade5d33316a",
+      "size_bytes": 22346,
+      "line_count": 552
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+      "sha256": "87bd8b6fac7001e26ffc08f5e3457a3f644098793a2734524c56de946c761ff2",
+      "size_bytes": 81995,
+      "line_count": 1813
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SQLiteProcedures.hh",
+      "sha256": "7bf58cf745e82bdccd4fc22bdc54c0b09a530a69555ee4648f0dfba83b3d64bf",
+      "size_bytes": 50039,
+      "line_count": 1037
+    }
+  ],
+  "related_held_Rust_proposal": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/manifest.json",
+    "sha256": "aa9c906ca88b51beb13947913a265ff6bec937309621a15bf2bbbac9c912a83c",
+    "size_bytes": 46640,
+    "line_count": 1085
+  },
+  "protected_dispatcher_eight_proposals": [
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/proposed/crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+      "sha256": "425b4f6a80670afc9f807a906bc3a5e2db3c9e041183b89c62fb36af95dd0810",
+      "size_bytes": 29749,
+      "line_count": 727
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/proposed/crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/geometry.rs",
+      "sha256": "16db5ada72c2750b8c3a736500c1eb980cc0473ce4c359fc29755eec43a4d0fa",
+      "size_bytes": 6574,
+      "line_count": 142
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/proposed/crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/tests.rs",
+      "sha256": "960864afb27c149046a0893b7d957e0b047203aa2047c16c9b652eac7dbabbd6",
+      "size_bytes": 13686,
+      "line_count": 192
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/proposed/crates/ep_runtime/src/heat_balance/inside_convection_dispatcher.rs",
+      "sha256": "fdca530460d8b167f7b23a328a316eedc7c34b3e66dfd2e62a5a268f2736e4df",
+      "size_bytes": 26978,
+      "line_count": 514
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/proposed/crates/ep_runtime/src/heat_balance/inside_convection_layout.rs",
+      "sha256": "837f460d7b88c7aee8c80a6824f4f634a30de14e3722affe61281d7c5bb005ce",
+      "size_bytes": 5310,
+      "line_count": 121
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/proposed/crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "4cf7f90761914657ced2c71856c727f88be4d400fd6bb80c383fe54a0ce107af",
+      "size_bytes": 2294,
+      "line_count": 88
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-observer-prep-02/proposed/crates/ep_run/examples/src06_tarp_dispatcher_main.rs",
+      "sha256": "881639a4e448d90915a343ae21bbfabea8b3b9552cb9bedba76829b492d90850",
+      "size_bytes": 27739,
+      "line_count": 288
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-observer-prep-02/proposed/crates/ep_run/examples/src06_tarp_dispatcher_support/fields.rs",
+      "sha256": "6e12c23edd92b116ae68177f27a4bc968fc736434128ddc3cdbb1a46b3bfdc71",
+      "size_bytes": 16907,
+      "line_count": 174
+    }
+  ],
+  "protected_dispatcher_eight_proposal_bytes_unchanged": true,
+  "runtime_interfaces": {
+    "target": "geometry_loader_helper",
+    "compiled_TU_count": 1,
+    "helper_argc": 4,
+    "argv": [
+      "geometry_loader_helper.exe",
+      "repository-root",
+      "request-path",
+      "fresh-contained-SRC06-output"
+    ],
+    "result_schema": "ordinary-geometry-public-loader-results.v1",
+    "authoritative_result_filename": "geometry-loader-results.json",
+    "CMake_Source_directory_variable": "GEOMETRY_LOADER_SOURCE_DIR",
+    "inherited_recipe_variable": "GEOMETRY_LOADER_INHERITED_RECIPE",
+    "required_current_Source_snapshot": "explicit actual Root runtime operand, not predicted historical Rust hash",
+    "required_Original_provider_APIs": [
+      "HeatBalanceManager::GetBuildingData",
+      "SurfaceGeometry::SetupZoneGeometry",
+      "SurfaceGeometry::GetVertices",
+      "SurfaceGeometry::ProcessSurfaceVertices",
+      "SurfaceGeometry::CalculateZoneVolume"
+    ],
+    "full_output_caps": null,
+    "internal_call_trace_available": false,
+    "binary_build_or_execution_authorized_by_this_manifest": false
+  },
+  "source_only": true,
+  "actual_input_freeze_or_capture_created": false,
+  "expected_values_supplied": false,
+  "Native_or_Rust_result_values_read_during_authorship": false,
+  "target_or_build_or_configuration_performed": false,
+  "canonical_or_Git_mutation_performed": false,
+  "numerical_PASS_claimed": false,
+  "whole_geometry_or_ordinary_PASS_claimed": false,
+  "gates_updated": false
+}

@@ -1,0 +1,8 @@
+--- .runtime/porting/SRC-06/ordinary-geometry-publication-prep-02/before/README.md
++++ .runtime/porting/SRC-06/ordinary-geometry-publication-prep-02/README.md
+@@ -11,3 +11,5 @@
+ Standard `stdout.log`/`stderr.log` files require exact closed sibling recorder receipts. The two authentic historical converter-child logs have a separate exact input-only receipt/inventory proof. No active own publication logs are selected. SHA-addressed raw objects deduplicate equal selected bytes without truncation or gzip decoding; every selected and stored file is rehashed.
+ 
+ The publisher parses custody and review metadata only. It performs no geometry equations, endpoint comparison, engine invocation, FP control writes, canonical Source or documentation edits, gate updates, or Git actions. The selected archive is explicitly not transitively replayable; previous whole streams, whole Source trees, binaries, maps, libraries, and DLL payloads are not implied published.
++
++Successor02 binds the accepted current comparison workflow03/comparer04 separately from immutable actual application/build/capture workflow02. The original scalar policy and all finite selection/storage rules are unchanged. Closed comparison01 is explicitly retained as integrity-failed before any numerical joins, including its transport, both recorder receipts/full logs, all three complete empty gzip ledgers and both factual reviews. Checker failures are reviewer artifacts, never fabricated process receipts. No geometry payload or ledger values were read, publisher imported or executed by this author.

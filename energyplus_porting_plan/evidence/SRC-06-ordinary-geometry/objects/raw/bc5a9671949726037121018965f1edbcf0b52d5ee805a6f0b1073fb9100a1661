@@ -1,0 +1,74 @@
+) -> PortingScopeTrace {
+    let mut violations = Vec::new();
+    let settings = settings::project_settings(raw, model, &mut violations);
+    let object_counts: BTreeMap<_, _> = raw
+        .objects
+        .iter()
+        .map(|(kind, objects)| (kind.0.clone(), objects.len()))
+        .collect();
+    let mut inactive_branches = Vec::new();
+    for (kind, objects) in &raw.objects {
+        if !objects.is_empty() && !permitted_object(&kind.0, scope) {
+            violations.push(format!("{} is outside scope {}", kind.0, scope.id()));
+        }
+    }
+    validate_project_controls(raw, &settings, &mut violations);
+    if object_counts.contains_key("SizingPeriod:DesignDay")
+        && settings["simulation_control"]["run_simulation_for_sizing_periods"] == false
+    {
+        inactive_branches.push("SizingPeriod:DesignDay (sizing-period execution disabled)".into());
+    }
+    if object_counts.contains_key("Exterior:Lights") {
+        inactive_branches
+            .push("Exterior:Lights (external meter only; excluded from zone heat sources)".into());
+    }
+    if let Some(model) = model {
+        validate_typed_scope(model, scope, &mut violations);
+        if object_counts.contains_key("RoomAirModelType") {
+            if settings["room_air_controls"]["air_temperature_coupling_strategy"] != "Direct" {
+                violations
+                    .push("RoomAirModelType coupling must use the Direct default branch".into());
+            }
+            let named = settings["room_air_controls"]["zone_name"].as_str();
+            if !model
+                .zones
+                .iter()
+                .any(|zone| named.is_some_and(|name| name.eq_ignore_ascii_case(&zone.name.0)))
+            {
+                violations.push("RoomAirModelType must name the selected zone".into());
+            }
+        }
+    } else {
+        violations.push("typed compilation failed; bounded runtime cannot execute".into());
+    }
+    let compile_defaults = report
+        .defaults_applied
+        .iter()
+        .map(|default| {
+            json!({
+                "object_type": default.object_type, "object_name": default.object_name,
+                "field": default.field, "value": default.value,
+            })
+        })
+        .collect();
+    PortingScopeTrace {
+        schema: "porting-scope.v1",
+        scope,
+        admissible: violations.is_empty(),
+        violations,
+        settings,
+        compile_defaults,
+        object_counts,
+        inactive_branches,
+        environment: None,
+        production: json!({
+            "calculation_input_source": "original input and EPW; Rust compiled state",
+            "oracle_inputs_used": false, "fixture_inputs_used": false,
+            "conformance_claim": false,
+            "admission_semantics": "input scope only; unfinished numerical cards remain unconfirmed",
+            "excluded_reports": ["Exterior:Lights energy and nonselected meters"],
+        }),
+    }
+}
+
+fn permitted_object(kind: &str, scope: PortingScope) -> bool {

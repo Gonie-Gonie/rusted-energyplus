@@ -1,0 +1,2 @@
+{"receipt": {"path": ".runtime/porting/SRC-06/ordinary-geometry-native-capture-01/command/receipt.json", "sha256": "bce8cb718e0bc2e8cb85d349df10c48af46d9ec471512db6bb0f9fbd47f5e345"}, "exit_code": 0, "source_bytes_match_before_and_after": true}
+{"custody": {"path": ".runtime/porting/SRC-06/ordinary-geometry-native-capture-01/custody.json", "sha256": "ba8324f050b03825b0ef14c0394d1cd537f3b5766ce4815ed07446b8e73a344c", "size_bytes": 2323136}, "actual_exit_code": 0, "scientific_PASS_claimed": false}

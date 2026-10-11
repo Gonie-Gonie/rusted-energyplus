@@ -1,0 +1,25 @@
+{
+  "schema": "ordinary-geometry-Native-Root-Source-review.v1",
+  "accepted": true,
+  "reviewed_manifest": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-04/manifest.json",
+    "sha256": "2bcb4620c0519b2c796f96242430651d5bd6e737a5e793db4c24a6c03d9ee21b",
+    "size_bytes": 60112
+  },
+  "parent03_Root_Source_review": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-03/Root-FULL-Source-review-03.json",
+    "sha256": "8d1e387c593d7fd3c2e5566c59a0456bcfff9912197270dddc3acc58df86163c"
+  },
+  "full_reference_occurrences": 198,
+  "distinct_path_SHA_identities": 122,
+  "literal_Original_ranges": 26,
+  "exact_diffs_regenerated": 8,
+  "actual_fields117_recipe28_author85_README19_and_six_new_Original_ranges_read": true,
+  "helper_main_and_three_copied_headers_byte_exact03": true,
+  "all_fixed_input_and_thirteen_loader_calls_unchanged": true,
+  "changes": "Read-only complete actual Construction table/allocation/TotConstructs and actual InputProcessor.epJSON at existing returned_geometry, unique v4 recipe names only.",
+  "all_scientific_formulas_and_branch_order_unchanged": true,
+  "helper_or_build_executed": false,
+  "numerical_results_read": false,
+  "gates_updated": false
+}

@@ -1,0 +1,47 @@
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    Real64 thisZoneHorizHydralicDiameter;
+    bool DoReport;
+
+    Real64 BldgVolumeSum = 0.0;
+    for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
+        auto const &zone = state.dataHeatBal->Zone(ZoneLoop);
+        BldgVolumeSum += zone.Volume * zone.Multiplier * zone.ListMultiplier;
+        Real64 PerimExtLengthSum = 0.0; // init
+        int ExtWallCount = 0;           // init
+        int ExtWindowCount = 0;         // init
+        // model perimeter of bounding horizontal rectangle from max and min x and y values
+        Real64 thisZoneSimplePerim = 2.0 * (zone.MaximumY - zone.MinimumY) + 2.0 * (zone.MaximumX - zone.MinimumX);
+        if (thisZoneSimplePerim > 0.0) {
+            thisZoneHorizHydralicDiameter = 4.0 * zone.FloorArea / thisZoneSimplePerim;
+        } else if (zone.FloorArea > 0.0) {
+            thisZoneHorizHydralicDiameter = std::sqrt(zone.FloorArea);
+        }
+
+        Real64 thisWWR = (zone.ExtGrossWallArea > 0.0) ? (zone.ExtWindowArea / zone.ExtGrossWallArea) : -999.0; // throw error?
+
+        for (int spaceNum : zone.spaceIndexes) {
+            auto const &thisSpace = state.dataHeatBal->space(spaceNum);
+            // first pass thru this zones surfaces to gather data
+            for (int SurfLoop = thisSpace.HTSurfaceFirst; SurfLoop <= thisSpace.HTSurfaceLast; ++SurfLoop) {
+                auto const &surf = state.dataSurface->Surface(SurfLoop);
+                // first catch exterior walls and do summations
+                if (surf.ExtBoundCond != ExternalEnvironment) {
+                    continue;
+                }
+
+                if (surf.Class == SurfaceClass::Wall) {
+                    PerimExtLengthSum += surf.Width;
+                    ++ExtWallCount;
+                } else if (surf.Class == SurfaceClass::Window || surf.Class == SurfaceClass::GlassDoor) {
+                    ++ExtWindowCount;
+                }
+            }
+        }
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneLoop).spaceIndexes) {
+            auto const &thisSpace = state.dataHeatBal->space(spaceNum);
+            // second pass thru zone surfs to fill data
+            for (int SurfLoop = thisSpace.HTSurfaceFirst; SurfLoop <= thisSpace.HTSurfaceLast; ++SurfLoop) {
+                auto &surfIntConv = state.dataSurface->surfIntConv(SurfLoop);
+                surfIntConv.zoneWallHeight = zone.CeilingHeight;
+                surfIntConv.zonePerimLength = PerimExtLengthSum;

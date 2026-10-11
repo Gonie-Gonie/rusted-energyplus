@@ -1,0 +1,222 @@
+{
+  "schema": "ordinary-geometry-Header-null-admission-Source-review.v1",
+  "accepted": true,
+  "exact_optional_absent_family_names": [
+    "AirLoopHVAC:ReturnPath",
+    "AirLoopHVAC:SupplyPath",
+    "FenestrationSurface:Detailed",
+    "Floor:Detailed",
+    "NodeList",
+    "Output:Schedules",
+    "RoofCeiling:Detailed",
+    "Shading:Zone:Detailed",
+    "SpaceHVAC:EquipmentConnections",
+    "SurfaceProperty:ExteriorNaturalVentedCavity",
+    "Wall:Detailed",
+    "ZoneHVAC:EquipmentConnections",
+    "ZoneHVAC:EquipmentList"
+  ],
+  "required_actual_value": null,
+  "required_actual_JSON_type": "null",
+  "required_actual_size": 0,
+  "supplied_29_family_values_and_IDF_order_must_remain_exact": true,
+  "unknown_or_non_null_extra_families_must_fail": true,
+  "retained_optional_metadata_is_not_PASS": true,
+  "Source_conclusion": "getObjectDefMaxArgs on an absent valid schema name accesses epJSON[canonical_name]; bundled nonconst JSON object lookup inserts nullptr. This route covers all thirteen named callsites. getNumObjectsFound itself does not insert absent names.",
+  "getObjectItem_caveat": "getJSONObjNum has a similar conditional operator[] route, but no absent getObjectItem invocation is asserted here.",
+  "getObjectsOfType_identifier_present_in_InputProcessor_Source": false,
+  "Source_ranges": [
+    {
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+        "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+        "size_bytes": 122929
+      },
+      "start_line": 505,
+      "end_line": 532,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/Header-geometry-null-admission-Source-review-01/src__EnergyPlus__InputProcessing__InputProcessor.cc.505-532.literal",
+        "sha256": "a3dead73e3416a074bee0f988a18b816eb5eaff2605817270cc1d2305710c9f8",
+        "size_bytes": 1121
+      },
+      "role": "absent-safe getNumObjectsFound"
+    },
+    {
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+        "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+        "size_bytes": 122929
+      },
+      "start_line": 932,
+      "end_line": 968,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/Header-geometry-null-admission-Source-review-01/src__EnergyPlus__InputProcessing__InputProcessor.cc.932-968.literal",
+        "sha256": "fe64021fe7dee69cc46c1b7bf9516e22794e685b20c08662e034df76619c2f39",
+        "size_bytes": 1817
+      },
+      "role": "getObjectItem calls getJSONObjNum before absent object cache guard"
+    },
+    {
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+        "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+        "size_bytes": 122929
+      },
+      "start_line": 1216,
+      "end_line": 1235,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/Header-geometry-null-admission-Source-review-01/src__EnergyPlus__InputProcessing__InputProcessor.cc.1216-1235.literal",
+        "sha256": "4dd61c58afccd3c5f3f3c780a2c92fdd8dfa3a92e0dc00d2dc2eb30343b60f1a",
+        "size_bytes": 772
+      },
+      "role": "conditional IDF-order absent-name lookup may insert null"
+    },
+    {
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+        "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+        "size_bytes": 122929
+      },
+      "start_line": 1398,
+      "end_line": 1449,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/Header-geometry-null-admission-Source-review-01/src__EnergyPlus__InputProcessing__InputProcessor.cc.1398-1449.literal",
+        "sha256": "b609a96306ac43283ce4ce4dca65d337d5c5e8fce33033b5e8e872f97f76afb4",
+        "size_bytes": 2260
+      },
+      "role": "getObjectDefMaxArgs actual nonconst null-insertion route"
+    },
+    {
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEquipment.cc",
+        "sha256": "8d7eba6b146ad0b81312cbcfb32357b530ce6f5ec1716ed9e4dc8dd2901b3a6a",
+        "size_bytes": 142562
+      },
+      "start_line": 222,
+      "end_line": 245,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/Header-geometry-null-admission-Source-review-01/src__EnergyPlus__DataZoneEquipment.cc.222-245.literal",
+        "sha256": "cff9dfff45844a753710af5eca75d5380a0b2180daf4f0accb6f3d8d979c8d69",
+        "size_bytes": 1810
+      },
+      "role": "six unconditional absent-family maximum-argument lookups"
+    },
+    {
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ScheduleManager.cc",
+        "sha256": "02794f4182d4ba528c0a521e5c170f36fd980e96fe4d9a6b6ec03e7c5235a8ba",
+        "size_bytes": 187792
+      },
+      "start_line": 514,
+      "end_line": 517,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/Header-geometry-null-admission-Source-review-01/src__EnergyPlus__ScheduleManager.cc.514-517.literal",
+        "sha256": "685e1cce6b7bfd2b4cde8c0812019b064364c14de03ac85901955a5809f7a4d8",
+        "size_bytes": 230
+      },
+      "role": "Output:Schedules unconditional maximum-argument lookup"
+    },
+    {
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+        "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1",
+        "size_bytes": 941682
+      },
+      "start_line": 3830,
+      "end_line": 3870,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/Header-geometry-null-admission-Source-review-01/src__EnergyPlus__SurfaceGeometry.cc.3830-3870.literal",
+        "sha256": "a01803ccc48f9af4a50fb8d399f5f7e9a8ed33f9d99319886975519da9effdec",
+        "size_bytes": 1643
+      },
+      "role": "three absent detailed base-surface maximum-argument lookups"
+    },
+    {
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+        "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1",
+        "size_bytes": 941682
+      },
+      "start_line": 5034,
+      "end_line": 5036,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/Header-geometry-null-admission-Source-review-01/src__EnergyPlus__SurfaceGeometry.cc.5034-5036.literal",
+        "sha256": "b87e57f8b1e255310a76f93152ac49c612b7d9388dbf746979ba007db3e62ca7",
+        "size_bytes": 276
+      },
+      "role": "FenestrationSurface:Detailed maximum-argument lookup"
+    },
+    {
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+        "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1",
+        "size_bytes": 941682
+      },
+      "start_line": 6373,
+      "end_line": 6377,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/Header-geometry-null-admission-Source-review-01/src__EnergyPlus__SurfaceGeometry.cc.6373-6377.literal",
+        "sha256": "427ce9dc2f8443dc91415b6bd01da1b72d884bc625a8d414f29736687e5dad11",
+        "size_bytes": 454
+      },
+      "role": "Shading:Zone:Detailed maximum-argument lookup"
+    },
+    {
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+        "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1",
+        "size_bytes": 941682
+      },
+      "start_line": 7457,
+      "end_line": 7469,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/Header-geometry-null-admission-Source-review-01/src__EnergyPlus__SurfaceGeometry.cc.7457-7469.literal",
+        "sha256": "ebb951aa3fa2b4524ccedda35f781b85f5d62edbc9a9627056a8b2b7e197e1d2",
+        "size_bytes": 799
+      },
+      "role": "SurfaceProperty:ExteriorNaturalVentedCavity lookup then count"
+    },
+    {
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/third_party/nlohmann/json.hpp",
+        "sha256": "8baba4ddf871e448b8ecceb0e8add3c883c42311659e0a1fa517394f34460e75",
+        "size_bytes": 953482
+      },
+      "start_line": 22159,
+      "end_line": 22178,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/Header-geometry-null-admission-Source-review-01/third_party__nlohmann__json.hpp.22159-22178.literal",
+        "sha256": "50d46daec366bb8f399e9579997a4aadb61293a6a3485f257c81b4fb54b6cfbf",
+        "size_bytes": 844
+      },
+      "role": "actual bundled nonconst object lookup emplaces nullptr"
+    },
+    {
+      "whole_Source": {
+        "path": ".reference/energyplus-src/26.1.0/third_party/nlohmann/json.hpp",
+        "sha256": "8baba4ddf871e448b8ecceb0e8add3c883c42311659e0a1fa517394f34460e75",
+        "size_bytes": 953482
+      },
+      "start_line": 22985,
+      "end_line": 22995,
+      "literal_archive": {
+        "path": ".runtime/porting/SRC-06/Header-geometry-null-admission-Source-review-01/third_party__nlohmann__json.hpp.22985-22995.literal",
+        "sha256": "60c3f98735ce0dcdbe436887920c8f5e3ac5e7df73442bd0d09ef1c7ad18b26b",
+        "size_bytes": 314
+      },
+      "role": "JSON null size is zero"
+    }
+  ],
+  "actual_inner_invocation_trace_claimed": false,
+  "actual_geometry_results_read": false,
+  "numerical_equations_recomputed": false,
+  "target_or_helper_executed": false,
+  "canonical_or_Git_changed": false,
+  "scientific_PASS_claimed": false,
+  "gates_updated": false,
+  "review_Source": {
+    "path": ".runtime/porting/SRC-06/review-geometry-null-admission-Header-01.py",
+    "sha256": "329ec0feb6f48a670d45f2a378e4f8a282f673052fc49525d879680b6ae410ec",
+    "size_bytes": 4113
+  }
+}

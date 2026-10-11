@@ -7,6 +7,7 @@ use crate::heat_balance::surface_manager::ConstructionThermalDataCache;
 
 pub(super) fn finish_heat_balance_state(
     zones: Vec<ZoneHeatBalanceState>,
+    initialized_geometry: crate::geometry::InitializedGeometryOwners,
     surfaces: Vec<SurfaceHeatBalanceState>,
     surface_indexes: HeatBalanceSurfaceIndexes,
     mut construction_thermal_data: ConstructionThermalDataCache,
@@ -15,6 +16,7 @@ pub(super) fn finish_heat_balance_state(
     HeatBalanceState {
         timestep_index: 0,
         zones,
+        initialized_geometry,
         warmup_convergence: None,
         zone_air_environment_guard: Default::default(),
         surfaces,

@@ -1,0 +1,150 @@
+"""Root-only same-Source quality, two Cargo artifacts and PE headers; no run."""
+import argparse
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import re
+import struct
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+CONFIGS = ['--config', 'profile.dev.debug=0', '--config', 'profile.test.debug=0', '--config', 'build.incremental=false']
+QUALITY = {
+    'fmt_check': ['cargo', 'fmt', '--all', '--', '--check'],
+    'clippy': ['cargo', 'clippy'] + CONFIGS + ['--locked', '--workspace', '--all-targets', '--', '-D', 'warnings'],
+    'focused': ['cargo', 'test'] + CONFIGS + ['--locked', '-p', 'ep_runtime', '--lib', 'heat_balance::'],
+    'workspace': ['cargo', 'test'] + CONFIGS + ['--locked', '--workspace'],
+}
+BUILDS = {
+    'CLI': {'package': 'ep_cli', 'target': 'eplus-rs', 'kind': ['bin'], 'source': 'crates/ep_cli/src/main.rs', 'selector': '--bin'},
+    'ordinary_observer': {'package': 'ep_run', 'target': 'ctf10_ordinary_history_observer', 'kind': ['example'], 'source': 'crates/ep_run/examples/ctf10_ordinary_history_observer.rs', 'selector': '--example'},
+}
+
+
+def pe_header(A, binary, out, role):
+    before = A.ref(binary)
+    with binary.open('rb') as stream:
+        dos = stream.read(64)
+        A.need(dos[:2] == b'MZ' and len(dos) == 64, 'actual DOS header required')
+        offset = struct.unpack_from('<I', dos, 60)[0]
+        stream.seek(offset); coff = stream.read(24)
+        A.need(coff[:4] == b'PE\0\0', 'actual PE signature required')
+        machine, sections = struct.unpack_from('<HH', coff, 4)
+        optional_size, characteristics = struct.unpack_from('<HH', coff, 20)
+        optional = stream.read(optional_size)
+        A.need(machine == 0x8664 and len(optional) == optional_size and optional_size >= 240 and struct.unpack_from('<H', optional)[0] == 0x20b, 'actual x64 PE32+ required')
+        section_table = stream.read(sections * 40)
+        A.need(len(section_table) == sections * 40 and sections > 0, 'complete actual PE section table required')
+    reserve, commit = struct.unpack_from('<QQ', optional, 72)
+    A.need(reserve == 8388608 and 0 < commit <= reserve, 'actual Windows main stack reserve/commit differs')
+    count = struct.unpack_from('<I', optional, 108)[0]
+    A.need(16 <= count <= (optional_size - 112) // 8, 'complete actual standard data directories required')
+    directories = [dict(index=i, address=struct.unpack_from('<I', optional, 112 + 8 * i)[0], size=struct.unpack_from('<I', optional, 116 + 8 * i)[0]) for i in range(count)]
+    section_rows = []
+    for i in range(sections):
+        row = section_table[40 * i:40 * (i + 1)]
+        virtual_size, rva, raw_size, raw_offset = struct.unpack_from('<IIII', row, 8)
+        A.need(raw_offset + raw_size <= before['size_bytes'], 'PE section raw extent exceeds actual file')
+        section_rows.append({'name_bytes_hex': row[:8].hex(), 'virtual_size': virtual_size, 'virtual_address': rva, 'raw_size': raw_size, 'raw_offset': raw_offset, 'characteristics': struct.unpack_from('<I', row, 36)[0]})
+    security = directories[4]
+    A.need(security['address'] + security['size'] <= before['size_bytes'], 'PE security file extent exceeds actual file')
+    A.need(A.ref(binary) == before, 'binary changed during PE read')
+    headers = A.write(out / 'PE-headers' / (role + '.bin'), dos + coff + optional + section_table)
+    return {'actual_binary': before, 'actual_PE_header_bytes': headers, 'PE_header_file_offset': offset, 'machine': machine, 'COFF_characteristics': characteristics, 'entry_point_RVA': struct.unpack_from('<I', optional, 16)[0], 'subsystem': struct.unpack_from('<H', optional, 68)[0], 'DLL_characteristics': struct.unpack_from('<H', optional, 70)[0], 'stack_reserve_bytes': reserve, 'stack_commit_bytes': commit, 'data_directories': directories, 'sections': section_rows, 'loader_or_security_equivalence_claimed': False, 'Root_full_PE_acceptance_required_before_target_execution': True}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['source-preparation', 'application', 'formatter-review', 'output-dir']:
+        parser.add_argument('--' + name, required=True)
+    args = parser.parse_args()
+    name, sha = args.source_preparation.rsplit('#', 1)
+    preparation_path = (ROOT / name).resolve()
+    if not preparation_path.is_relative_to(ROOT) or hashlib.sha256(preparation_path.read_bytes()).hexdigest() != sha:
+        raise ValueError('reviewed Source preparation bytes differ')
+    prep = json.loads(preparation_path.read_bytes())
+    apply_source = prep['runtime_interfaces']['apply']
+    apply_path = (ROOT / apply_source['path']).resolve()
+    if not apply_path.is_relative_to(ROOT) or hashlib.sha256(apply_path.read_bytes()).hexdigest() != apply_source['sha256']:
+        raise ValueError('reviewed shared applier Source differs')
+    spec = importlib.util.spec_from_file_location('reviewed_apply', apply_path)
+    A = importlib.util.module_from_spec(spec); spec.loader.exec_module(A)
+    prep_ref, prep = A.preparation(args.source_preparation)
+    A.need(A.bind(prep['runtime_interfaces']['validate']) == Path(__file__).resolve(), 'actual validator Source differs')
+    application_ref, review_ref = A.operand(args.application), A.operand(args.formatter_review)
+    application, review = A.load(application_ref), A.load(review_ref)
+    A.need(application['schema'] == 'src05-ordinary-main-thread-actual-application.v1' and A.bind(application['Source_preparation']) == A.bind(prep_ref) and A.bind(application['accepted_main_thread_preparation']) == A.bind(A.PREP), 'actual reviewed application authority differs')
+    A.need(review['schema'] == 'src05-ordinary-main-thread-actual-formatter-review.v1' and review['Root_FULL_formatter_correspondence_accepted'] is True and review['independent_FULL_formatter_correspondence_accepted'] is True and A.bind(review['actual_application']) == A.bind(application_ref) and review['Source_snapshot'] == application['source_final'], 'actual Root and independent full formatter acceptance required')
+    source = application['source_final']
+    current = A.members(source, current=True)
+    old, literal = A.members(application['source_before']), A.members(application['source_literal'])
+    A.need(application['source_before'] == A.BEFORE and len(old) == 3929 and len(literal) == len(current) == application['source_file_count'] == 3931 and application['unrelated_source_files_verified_byte_exact'] == 3927, 'exact Source counts/authority differ')
+    A.need(set(literal) == set(current) == set(old) | set(A.PATHS[-2:]), 'actual membership differs')
+    A.need(all(old[n] == literal[n] == current[n] for n in set(old) - set(A.PATHS)), 'unrelated Source differs')
+    held = A.load(A.PREP)['application']
+    A.need([r['canonical_path'] for r in application['application']] == A.PATHS, 'exact four actual application rows required')
+    for row, original in zip(application['application'], held):
+        A.need(all(row[k] == v for k, v in original.items()), 'original reviewed application row differs')
+        before, body, final = [A.bind(row[k]).read_bytes() for k in ['actual_before_archive', 'actual_literal_archive', 'actual_final_archive']]
+        A.need(before == A.bind(original['before_archive']).read_bytes() and body == A.bind(original['proposal']).read_bytes(), 'actual literal/before archive differs')
+        A.check_diff(before, body, row['actual_semantic_diff']); A.check_diff(body, final, row['actual_formatter_diff'])
+        A.need(literal[row['canonical_path']]['archive']['sha256'] == row['actual_literal_archive']['sha256'] and literal[row['canonical_path']]['size_bytes'] == len(body), 'actual literal snapshot endpoint differs')
+        endpoint = A.ref(A.bind(row['actual_final']))
+        A.need(endpoint['sha256'] == row['actual_final_archive']['sha256'] == current[row['canonical_path']]['archive']['sha256'] and endpoint['size_bytes'] == current[row['canonical_path']]['size_bytes'], 'actual current endpoint differs')
+    fmt = A.recorded(application['actual_formatter_execution'], application['source_literal'], ['cargo', 'fmt', '--all'], stable=application['source_literal'] == source)
+    out = (ROOT / args.output_dir).resolve()
+    A.need(out.is_relative_to(ROOT / '.runtime/porting/SRC-05') and not out.exists(), 'fresh ignored validation directory required')
+    out.mkdir(parents=True)
+    commands = {role: ['cargo', 'build'] + CONFIGS + ['--locked', '-p', v['package'], v['selector'], v['target'], '--message-format=json-render-diagnostics'] for role, v in BUILDS.items()}
+    A.dump(out / 'before.json', {'schema': 'src05-ordinary-main-thread-validation-before.v1', 'Source_preparation': prep_ref, 'actual_application': application_ref, 'actual_formatter_review': review_ref, 'Source_snapshot': source, 'quality_commands': QUALITY, 'build_commands': commands, 'target_execution_performed': False})
+    prefix = [sys.executable, '-X', 'utf8', '-B', str(A.bind(A.RECORDER)), '--output-dir']
+    quality, totals, artifacts = {}, {}, {}
+    for role, command in {**QUALITY, **commands}.items():
+        A.members(source, current=True)
+        code = subprocess.call(prefix + [str(out / (role + '-command')), '--'] + command, cwd=ROOT)
+        receipt_ref = A.ref(out / (role + '-command') / 'receipt.json')
+        if code != 0:
+            A.dump(out / 'failed-validation.json', {'actual_failed_role': role, 'actual_execution': receipt_ref, 'actual_exit_code': code, 'Source_snapshot': source, 'target_execution_performed': False})
+            return code
+        actual = A.recorded(receipt_ref, source, command)
+        A.need(fmt['finished_utc'] <= actual['started_utc'], 'actual quality/build must follow actual formatting')
+        A.members(source, current=True)
+        if role in QUALITY:
+            quality[role] = receipt_ref
+            if role in ['focused', 'workspace']:
+                stdout = A.bind(actual['stdout']).read_text(encoding='utf-8')
+                rows = [tuple(map(int, r)) for r in re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored;', stdout)]
+                ignored = [{'name': m.group(1), 'actual_line': m.group(0)} for m in re.finditer(r'^test (\S+) \.\.\. ignored(?:,.*)?$', stdout, re.MULTILINE)]
+                expected_ignored = ['heat_balance::convection::surface_environment::selected_reference::observe_literal_surface_environment_setters', 'heat_balance::warmup::selected_reference::observe_literal_selected_warmup_methods']
+                A.need(rows and all(failed == 0 for _, failed, _ in rows), 'actual test groups must report zero failed')
+                A.need(sorted(r['name'] for r in ignored) == expected_ignored and sum(r[2] for r in rows) == len(ignored), 'exact existing Root-only ignored roster/count required')
+                totals[role] = {'groups': len(rows), 'passed': sum(r[0] for r in rows), 'failed': sum(r[1] for r in rows), 'ignored': sum(r[2] for r in rows), 'actual_ignored_tests': ignored}
+            continue
+        A.need(all(A.load(r)['finished_utc'] <= actual['started_utc'] for r in quality.values()) and set(quality) == set(QUALITY), 'four closed quality commands must precede build')
+        messages = [json.loads(line) for line in A.bind(actual['stdout']).read_text(encoding='utf-8').splitlines() if line]
+        emitted = [v for v in messages if v.get('reason') == 'compiler-artifact' and v.get('executable')]
+        A.need(len(emitted) == 1 and any(v.get('reason') == 'build-finished' and v.get('success') is True for v in messages), 'sole successful Cargo-emitted executable required')
+        message, expected = emitted[0], BUILDS[role]
+        A.need(message['target']['name'] == expected['target'] and message['target']['kind'] == expected['kind'] and Path(message['target']['src_path']).resolve() == ROOT / expected['source'], 'actual emitted target Source differs')
+        A.need(message['package_id'].startswith((ROOT / 'crates' / expected['package']).as_uri()) or message['package_id'].startswith('path+' + (ROOT / 'crates' / expected['package']).as_uri()), 'actual Cargo package identity differs')
+        A.need(message['profile']['opt_level'] == '0' and message['profile']['test'] is False, 'actual dev executable required')
+        binary = Path(message['executable']).resolve()
+        A.need(binary.is_relative_to(ROOT / 'target') and binary.suffix.lower() == '.exe', 'actual contained Windows emitted executable required')
+        immediate = A.ref(binary)
+        captured = actual['cargo_compiler_artifacts_capture']
+        A.need(captured['status'] == 'pass' and len(captured['rows']) == 1 and captured['rows'][0]['cargo_message'] == message and captured['rows'][0]['executable']['sha256'] == immediate['sha256'], 'recorder/immediate emitted executable differ')
+        artifact = {'actual_build_execution': receipt_ref, 'actual_full_Cargo_JSON': actual['stdout'], 'cargo_message': message, 'executable': immediate, 'PE_inspection': pe_header(A, binary, out, role)}
+        artifacts[role] = artifact
+        A.dump(out / (role + '-artifact.json'), artifact)
+    for artifact in artifacts.values():
+        A.bind(artifact['executable'])
+    A.members(source, current=True); A.preparation(args.source_preparation); A.load(application_ref); A.load(review_ref)
+    record = {'schema': 'src05-ordinary-main-thread-actual-quality-and-artifacts.v1', 'Source_preparation': prep_ref, 'actual_application': application_ref, 'actual_formatter_review': review_ref, 'Source_snapshot': source, 'quality_executions': quality, 'actual_test_totals': totals, 'actual_Cargo_artifacts': artifacts, 'all_emitted_executables_rehashed_after_both_builds': True, 'target_execution_performed': False, 'Root_full_PE_acceptance_required_before_target_execution': True, 'production_or_numerical_PASS_claimed': False, 'gates_updated': False}
+    print(json.dumps({'record': A.dump(out / 'record.json', record), 'Source_snapshot': source}))
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

@@ -1,0 +1,207 @@
+{
+  "schema": "src06-ordinary-geometry-comparison-factual-checker-Source-preparation.v1",
+  "status": "HELD-Source-only-unexecuted",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-factual-checker-prep-02/check.py",
+      "sha256": "9e7bdf14b4fd9bc02c2891e6234311543f8509bff77ee0b195bfd1d0a4f69be3",
+      "size_bytes": 19487,
+      "line_count": 235
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-factual-checker-prep-02/README.md",
+      "sha256": "b09cb98cf4deeac1e71852a894e69521a4050f479a801fe62bddcfa4b395cecf",
+      "size_bytes": 1992,
+      "line_count": 26
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-geometry-recorder-recovery-bundle-01.py",
+      "sha256": "7eed857d36f2d3fc2b33ad8bd50c584c4ae3d0b657548c0f9ceb1691880e288e",
+      "size_bytes": 14663,
+      "line_count": 142
+    }
+  ],
+  "workflow_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-03/manifest.json",
+    "sha256": "86a7de68a191db1fd5f56d3c6f573d8a2afeb5919b9c3b9cbdffe2fe51653c3c",
+    "size_bytes": 27907,
+    "line_count": 616
+  },
+  "comparer_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-prep-04/manifest.json",
+    "sha256": "f6a8b8f2149cedfea0faa8b788218f91fc1a801308ee219d1e72ba7b5a05c7ef",
+    "size_bytes": 35754,
+    "line_count": 884
+  },
+  "fixed_dependencies": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-03/manifest.json",
+      "sha256": "86a7de68a191db1fd5f56d3c6f573d8a2afeb5919b9c3b9cbdffe2fe51653c3c",
+      "size_bytes": 27907,
+      "line_count": 616
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-prep-04/manifest.json",
+      "sha256": "f6a8b8f2149cedfea0faa8b788218f91fc1a801308ee219d1e72ba7b5a05c7ef",
+      "size_bytes": 35754,
+      "line_count": 884
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-02/manifest.json",
+      "sha256": "863c5207c2ec3994c4448651b7f2fa154c4e3939760cc437fcaa5217b61db51c",
+      "size_bytes": 25893,
+      "line_count": 568
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/apply.py",
+      "sha256": "5aee3f6afa4e386bd5a94f556f96a39958177fe1194d0f06fc1533dedf65c636",
+      "size_bytes": 10854,
+      "line_count": 139
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/validate.py",
+      "sha256": "21e971bd701023e7d8c8b4e14cdbb0a7f4bb8c9ea4204616ccdbcd46f4d8d81c",
+      "size_bytes": 15189,
+      "line_count": 146
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-03/compare.py",
+      "sha256": "fe7fc756980d39c8fe89ffc671211d628eea685c693b7628480d310817d611e7",
+      "size_bytes": 7705,
+      "line_count": 95
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-prep-04/compare.py",
+      "sha256": "094ec8ae3c5880eda96f2d48b052e1f52fd7ef51236bddb539f0f7ca6b31ba70",
+      "size_bytes": 16191,
+      "line_count": 202
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-prep-04/custody.py",
+      "sha256": "c8177e008cb2e1cc019481ec331feabc7c82b75e47330727b4ed96a42b95360b",
+      "size_bytes": 20558,
+      "line_count": 200
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-prep-04/input_joins.py",
+      "sha256": "c932dd5bc9bd4c995ca9225afc9d881059ae475657fc462f10887119339aeb38",
+      "size_bytes": 21265,
+      "line_count": 238
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "size_bytes": 8453
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-observer-prep-02/policy.proposed.json",
+      "sha256": "0bb48c5f93aea8393c8012f28ccfaa37c9e191e201f402a547156a8376092f6b",
+      "size_bytes": 4965,
+      "line_count": 115
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-Native-baseline-01/acceptance.json",
+      "sha256": "b9d216a293632f25ab985a45d7cd51aa5480e7b9d64beb98576cd0401766194a",
+      "size_bytes": 2878,
+      "line_count": 63
+    },
+    {
+      "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-02/record.json",
+      "sha256": "a4eedbee038952b9928cefeeebfc83d51510dafe9c8d030ec4ef401a7a06c488",
+      "size_bytes": 27345
+    },
+    {
+      "path": "energyplus_porting_plan/evidence/SRC-06-tarp-dispatcher/summary.json",
+      "sha256": "e06573e5cdd079c328b7dd27019c362d8496c9f2629064500ae7a5557101d808",
+      "size_bytes": 13029,
+      "line_count": 320
+    }
+  ],
+  "exact_Source_correspondence": [
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-factual-checker-prep-02/before/check.py",
+        "sha256": "9e7bdf14b4fd9bc02c2891e6234311543f8509bff77ee0b195bfd1d0a4f69be3",
+        "size_bytes": 19487,
+        "line_count": 235
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-factual-checker-prep-02/check.py",
+        "sha256": "9e7bdf14b4fd9bc02c2891e6234311543f8509bff77ee0b195bfd1d0a4f69be3",
+        "size_bytes": 19487,
+        "line_count": 235
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-factual-checker-prep-02/check.py.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0,
+        "line_count": 0
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-factual-checker-prep-02/before/README.md",
+        "sha256": "bdf115889839e3ff969fad0eb36853bce752332a4947354c16566960a9b42c5e",
+        "size_bytes": 1617,
+        "line_count": 24
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-factual-checker-prep-02/README.md",
+        "sha256": "b09cb98cf4deeac1e71852a894e69521a4050f479a801fe62bddcfa4b395cecf",
+        "size_bytes": 1992,
+        "line_count": 26
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-factual-checker-prep-02/README.md.diff",
+        "sha256": "32e272bc9f125325675afb5de0a69ccd4c2bb84e8cf32138b452acaaf8ea75b4",
+        "size_bytes": 819,
+        "line_count": 8
+      }
+    }
+  ],
+  "runtime_interfaces": {
+    "checker": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-factual-checker-prep-02/check.py",
+      "sha256": "9e7bdf14b4fd9bc02c2891e6234311543f8509bff77ee0b195bfd1d0a4f69be3",
+      "size_bytes": 19487,
+      "line_count": 235
+    },
+    "required_options": [
+      "--source-preparation",
+      "--comparison-transport",
+      "--outer-execution",
+      "--output"
+    ],
+    "output_schema": "src06-ordinary-geometry-comparison-factual-review.v1",
+    "ledger_labels": [
+      "mismatches",
+      "unavailable",
+      "paired_owners"
+    ],
+    "ledger_fact_keys": [
+      "rows",
+      "decoded_bytes",
+      "decoded_sha256"
+    ]
+  },
+  "actual_comparison_results_read": false,
+  "Native_or_Rust_geometry_outputs_read": false,
+  "checker_imported_or_executed": false,
+  "geometry_equations_recomputed": false,
+  "targets_executed": false,
+  "canonical_or_Git_changed": false,
+  "scientific_PASS_claimed": false,
+  "gates_updated": false,
+  "parent_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-factual-checker-prep-01/manifest.json",
+    "sha256": "8b17ddedf2165c790662dec7943fc22547bc631d620a540b5ee0e56c39fd1e2c",
+    "size_bytes": 7146,
+    "line_count": 189
+  },
+  "actual_application_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-02/manifest.json",
+    "sha256": "863c5207c2ec3994c4448651b7f2fa154c4e3939760cc437fcaa5217b61db51c",
+    "size_bytes": 25893,
+    "line_count": 568
+  }
+}

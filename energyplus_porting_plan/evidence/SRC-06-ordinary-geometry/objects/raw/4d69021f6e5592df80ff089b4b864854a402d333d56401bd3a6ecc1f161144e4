@@ -1,0 +1,138 @@
+"""UNSEALED Root-only geometry application draft; missing authority stops before mutation."""
+import argparse
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+
+
+def module(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    value = importlib.util.module_from_spec(spec); spec.loader.exec_module(value)
+    return value
+
+
+def authority(token, role, actual_source=None):
+    name, sha = token.rsplit('#', 1); path = (ROOT / name).resolve()
+    if not path.is_relative_to(ROOT) or hashlib.sha256(path.read_bytes()).hexdigest() != sha:
+        raise ValueError('reviewed authority SHA differs')
+    prep = json.loads(path.read_bytes())
+    # draft-contract.json deliberately cannot satisfy this gate.
+    if prep['schema'] != 'src06-ordinary-geometry-workflow-Source-preparation.v1' or prep['application_authority_supplied'] is not True:
+        raise ValueError('fresh Native release/card/current-before rebase and final Source review are still required')
+    helper = prep['shared_custody_Source']; helper_path = (ROOT / helper['path']).resolve()
+    if not helper_path.is_relative_to(ROOT) or hashlib.sha256(helper_path.read_bytes()).hexdigest() != helper['sha256']:
+        raise ValueError('reviewed shared custody differs')
+    A = module('accepted_geometry_custody', helper_path)
+    A.need(A.ROOT == ROOT, 'custody Root differs')
+    for row in prep['own_sources']: A.bind(row)
+    A.need(A.bind(prep['runtime_interfaces'][role]) == (actual_source or Path(__file__)).resolve(), 'actual workflow role Source differs')
+    return A, A.ref(path), prep
+
+
+def baseline(A, prep):
+    release = A.load(prep['Native_baseline_acceptance'])
+    A.need(release['accepted'] is True and release['complete_input_owner_prefix_and_custody_review_accepted'] is True,
+           'genuine complete Native geometry release required')
+    for key in ['factual_review', 'independent_FULL_factual_review', 'actual_custody', 'actual_provider_acceptance', 'release_Source']:
+        A.bind(release[key])
+    actual = A.load(release['actual_Native_execution'])
+    A.recorded(release['actual_Native_execution'], release['Source_snapshot'], actual['command'])
+    A.need(actual['finished_utc'] is not None and actual['started_utc'] <= actual['finished_utc'], 'closed actual Native geometry required')
+    A.need(A.bind(release['reviewed_Source_preparation']) == A.bind(prep['actual_Native_Source_preparation']), 'actual Native03 authority differs')
+    return release, actual
+
+
+def held_rows(A, prep):
+    owner, observer = A.load(prep['geometry_Source_preparation']), A.load(prep['observer_Source_preparation'])
+    A.need(prep['geometry_Source_preparation']['sha256'] == '502237329524881eb7427b7721023f3608169cfeed1524cfa7001786b032381a'
+           and prep['observer_Source_preparation']['sha256'] == '9c3b3507f9a2b1f8c7fb973b5114397ecf81544a18c7be1313aaaf6cb5d73b75', 'reviewed geometry8+observer2 required')
+    rows = [dict(v, source_preparation=prep['geometry_Source_preparation']) for v in owner['application_sources']]
+    rows += [dict(v, source_preparation=prep['observer_Source_preparation']) for v in observer['application_sources']]
+    paths = [v['canonical_path'] for v in rows]
+    A.need(len(paths) == len(set(paths)) == 10 and paths == prep['application_paths'], 'exact ten geometry paths required')
+    A.need(sum(v['new_destination_absent'] for v in rows) == 5, 'five existing and five new Source paths required')
+    return rows, observer
+
+
+def protected(A, prep, source):
+    current = A.members(source, current=True)
+    prior = A.load(prep['protected_dispatcher_application'])
+    paths = [row['canonical_path'] for row in prior['application']]
+    A.need(len(paths) == len(set(paths)) == 8 and not set(paths).intersection(prep['application_paths']), 'disjoint protected eight dispatcher paths required')
+    for row in prior['application']:
+        A.need(A.bind(row['actual_final_archive']).read_bytes() == (ROOT / row['canonical_path']).read_bytes(), 'protected dispatcher endpoint differs')
+    A.bind(prep['protected_dispatcher_policy'])
+    A.need(prep['protected_dispatcher_policy']['sha256'] == 'ff49c35addf3990ff45e46d6be85e16fb71b9ba87b90f6b58416fd0000b27dc4', 'protected dispatcher policy differs')
+    A.bind(prep['protected_prior_summary'])
+    return current
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for key in ['source-preparation', 'output-dir']: parser.add_argument('--' + key, required=True)
+    args = parser.parse_args(); A, prep_ref, prep = authority(args.source_preparation, 'apply')
+    rows, observer = held_rows(A, prep); release, native = baseline(A, prep)
+    card = A.load(prep['bounded_card_acceptance'])
+    A.need(card['accepted'] is True and card['gates_updated'] is False, 'actual bounded card contract acceptance required')
+    A.bind(card['actual_card'])
+    old = protected(A, prep, prep['source_before'])
+    A.need(prep['fresh_actual_before_rebase']['Source_snapshot'] == prep['source_before'], 'fresh actual current-before Source rebase required')
+    A.need(len(prep['fresh_actual_before_rebase']['application_sources']) == len(rows), 'all ten fresh before rows required')
+    for row, rebased in zip(rows, prep['fresh_actual_before_rebase']['application_sources']):
+        A.need(row == rebased, 'fresh rebase must preserve every reviewed row exactly')
+        before = b'' if row['new_destination_absent'] else A.bind(row['before_archive']).read_bytes()
+        A.check_diff(before, A.bind(row['proposal']).read_bytes(), row['exact_diff'])
+        if row['new_destination_absent']: A.need(not (ROOT / row['canonical_path']).exists(), 'new geometry destination exists')
+        else: A.need(A.bind(row['actual_before']).read_bytes() == before, 'actual geometry before differs')
+    out = (ROOT / args.output_dir).resolve()
+    A.need(out.is_relative_to(ROOT / '.runtime/porting/SRC-06') and not out.exists(), 'fresh ignored application output required')
+    recorder = module('actual_geometry_recorder', A.bind(prep['recorder_Source']))
+    A.need(recorder.source_snapshot() == prep['source_before'], 'full Source changed before application')
+    out.mkdir(parents=True); applied = []
+    A.dump(out / 'before.json', dict(Source_preparation=prep_ref, source_before=prep['source_before'], Native_baseline_acceptance=prep['Native_baseline_acceptance'], bounded_card_acceptance=prep['bounded_card_acceptance']))
+    for row in rows:
+        name = row['canonical_path']; before = b'' if row['new_destination_absent'] else A.bind(row['before_archive']).read_bytes()
+        applied.append(dict(row, actual_before_archive=A.write(out / 'before' / name, before),
+            actual_literal_archive=A.write(out / 'literal' / name, A.bind(row['proposal']).read_bytes()),
+            actual_semantic_diff=A.write(out / 'semantic-diffs' / (name.replace('/', '__') + '.diff'), A.bind(row['exact_diff']).read_bytes())))
+    for row in applied:
+        path = ROOT / row['canonical_path']; path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(A.bind(row['actual_literal_archive']).read_bytes())
+    literal = recorder.source_snapshot(); literal_rows = A.members(literal, current=True)
+    paths = set(prep['application_paths']); added = {v['canonical_path'] for v in rows if v['new_destination_absent']}; unrelated = set(old) - paths
+    A.need(set(literal_rows) == set(old) | added and len(literal_rows) == len(old) + 5 and all(old[k] == literal_rows[k] for k in unrelated), 'only approved ten paths may change')
+    argv = ['cargo', 'fmt', '--all']
+    code = subprocess.call([sys.executable, '-X', 'utf8', '-B', str(A.bind(prep['recorder_Source'])), '--output-dir', str(out / 'fmt-command'), '--'] + argv, cwd=ROOT)
+    A.need(code == 0, 'actual formatter failure retained')
+    final = recorder.source_snapshot(); fmt_ref = A.ref(out / 'fmt-command/receipt.json')
+    fmt = A.recorded(fmt_ref, literal, argv, stable=literal == final)
+    A.need(native['finished_utc'] <= fmt['started_utc'], 'Native geometry capture must close first')
+    current = protected(A, prep, final)
+    A.need(set(current) == set(literal_rows) and all(old[k] == current[k] for k in unrelated), 'formatter changed unrelated Source')
+    for row in applied:
+        name = row['canonical_path']; raw = (ROOT / name).read_bytes()
+        row.update(actual_final=A.ref(ROOT / name), actual_final_archive=A.write(out / 'formatted' / name, raw),
+            actual_formatter_diff=A.write(out / 'formatter-diffs' / (name.replace('/', '__') + '.diff'), A.diff(A.bind(row['actual_literal_archive']).read_bytes(), raw, row['actual_literal_archive']['path'], name)))
+    interface = observer['runtime_interfaces']
+    runtime = dict(schema=interface['runtime_source_bindings_schema'], observer_sources=[A.ref(ROOT / p) for p in interface['ordered_observer_source_paths']],
+        actual_public_API_sources=[A.ref(ROOT / p) for p in interface['ordered_public_API_source_paths']])
+    A.need(len(runtime['observer_sources']) == 3 and len(runtime['actual_public_API_sources']) == 28, 'actual own3/API28 runtime packet required')
+    runtime_ref = A.dump(out / 'runtime-source-bindings.json', runtime)
+    A.members(final, current=True); A.load(prep_ref); A.load(prep['Native_baseline_acceptance'])
+    record = dict(schema='src06-ordinary-geometry-actual-application.v1', Source_preparation=prep_ref,
+        geometry_Source_preparation=prep['geometry_Source_preparation'], observer_Source_preparation=prep['observer_Source_preparation'],
+        Native_baseline_acceptance=prep['Native_baseline_acceptance'], bounded_card_acceptance=prep['bounded_card_acceptance'],
+        protected_dispatcher_application=prep['protected_dispatcher_application'], protected_prior_summary=prep['protected_prior_summary'],
+        source_before=prep['source_before'], source_literal=literal, source_final=final, source_file_count=len(current),
+        unrelated_source_files_verified_byte_exact=len(unrelated), actual_formatter_execution=fmt_ref, application=applied,
+        runtime_source_bindings=runtime_ref, formatter_correspondence_review_pending=True, target_execution_performed=False,
+        whole_geometry_or_ordinary_PASS_claimed=False, gates_updated=False)
+    print(json.dumps(dict(record=A.dump(out / 'record.json', record), source_final=final))); return 0
+
+
+if __name__ == '__main__': sys.exit(main())

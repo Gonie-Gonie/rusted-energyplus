@@ -1,0 +1,28 @@
+
+namespace DataVectorTypes {
+
+    // Using/Aliasing
+
+    // Data
+    // -only module should be available to other modules and routines.
+    // Thus, all variables in this module must be PUBLIC.
+
+    // MODULE PARAMETER DEFINITIONS:
+    // na
+
+    // DERIVED TYPE DEFINITIONS
+
+    // the following two derived types are used in triangulation (for DXF outputs)
+    //'Points (Vertices)
+
+    //'Created Triangles, vv# are the vertex pointers
+
+    // Types
+
+    // Vector2/3 are integrated with Array and offer additional capabilities such as
+    //  subscript lookup and are templates so we are using them as plug replacements
+    //  for consistent API and to avoid cost of copying them
+    // Note: For vectorization contexts std::array is a better choice
+    using Vector = ObjexxFCL::Vector3<Real64>;
+    using Vector_2d = ObjexxFCL::Vector2<Real64>;
+    using ObjexxFCL::cross;

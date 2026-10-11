@@ -1,0 +1,41 @@
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        static Array1D_string const cModuleObjects(4, {"BuildingSurface:Detailed", "Wall:Detailed", "Floor:Detailed", "RoofCeiling:Detailed"});
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int IOStat;          // IO Status when calling get input subroutine
+        int SurfaceNumAlpha; // Number of material alpha names being passed
+        int SurfaceNumProp;  // Number of material properties being passed
+        int ZoneNum;         // DO loop counter (zones)
+        int Found;           // For matching interzone surfaces
+        int Loop;
+        int ItemsToGet;
+        int ClassItem;
+        int ArgPointer;
+        int numSides;
+
+        auto &s_ipsc = state.dataIPShortCut;
+
+        GetOSCData(state, ErrorsFound);
+        GetOSCMData(state);
+        GetFoundationData(state, ErrorsFound);
+
+        NeedToAddSurfaces = 0;
+        for (int Item = 1; Item <= 4; ++Item) {
+
+            s_ipsc->cCurrentModuleObject = cModuleObjects(Item);
+            if (Item == 1) {
+                ItemsToGet = TotHTSurfs;
+                ClassItem = 0;
+            } else if (Item == 2) {
+                ItemsToGet = TotDetailedWalls;
+                ClassItem = 1;
+            } else if (Item == 3) {
+                ItemsToGet = TotDetailedFloors;
+                ClassItem = 2;
+            } else { // IF (Item == 4) THEN
+                ItemsToGet = TotDetailedRoofs;
+                ClassItem = 3;
+            }
+
+            state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+                state, s_ipsc->cCurrentModuleObject, Loop, SurfaceNumAlpha, SurfaceNumProp);

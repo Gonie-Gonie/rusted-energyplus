@@ -1,0 +1,114 @@
+"""Seal genuine geometry execution custody Source; never invoke it or inspect target results."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+BASE = ROOT / '.runtime/porting/SRC-06'
+OUT = BASE / 'ordinary-geometry-execution-prep-01'
+TEMPLATE = BASE / 'native-dispatcher-observation-prep-01/run_execution.py'
+PROVIDER = BASE / 'ordinary-geometry-provider-prep-02'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+
+def write(path, raw):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream:
+        stream.write(raw)
+    return ref(path)
+
+
+def replace_once(body, old, new):
+    assert body.count(old) == 1, old
+    return body.replace(old, new, 1)
+
+
+native = ref(BASE / 'ordinary-geometry-native-prep-03/manifest.json')
+configure = ref(BASE / 'ordinary-geometry-build-prep-03/manifest.json')
+provider = ref(PROVIDER / 'manifest.json')
+assert native['sha256'] == '72f75c5242e2df7457fb9fc065b2cc1fc5922f6bb9673e6b785e145bb54f47a1'
+assert configure['sha256'] == 'f5f7885c43eed8be89b558cc9b676fb4e7feeda54d6bc9b3735764336bc34fd4'
+assert provider['sha256'] == '5804749eb0d18130331560741dd59be7849d113ca4c4602c318edc4ed655fe87'
+body = TEMPLATE.read_text(encoding='utf8')
+for old, new in [
+    ('SRC06 dispatcher Native execution custody', 'SRC06 genuine geometry Native execution custody'),
+    ('native-tarp-dispatcher-prep-02/manifest.json', 'ordinary-geometry-native-prep-03/manifest.json'),
+    ('954a7779868d3ac65d88c553aab324f5e5e0a88d5d455a3126aecc5012ca3d50', native['sha256']),
+    ('native-dispatcher-build-prep-02/manifest.json', 'ordinary-geometry-build-prep-03/manifest.json'),
+    ('c54db349f9a874f87850d8c86e8abec9dda44cf34e8758162e91200eca2253ec', configure['sha256']),
+    ('D:/CodexBuild/rusted-energyplus/SRC-06/native-dispatcher-build-01/bin', 'D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-geometry-native-build-02/bin'),
+    ('src06-tarp-dispatcher-actual-linked-provider-and-PE-inventory.v1', 'ordinary-geometry-actual-linked-provider-and-PE-inventory.v1'),
+    ('src06-tarp-dispatcher-Root-provider-acceptance.v1', 'ordinary-geometry-Root-provider-acceptance.v1'),
+    ('all_ten_Original_providers_accepted', 'all_sixteen_Original_providers_accepted'),
+    ('all ten Original providers', 'all sixteen Original providers'),
+    ('src06-tarp-dispatcher-observation-source-preparation.v1', 'ordinary-geometry-provider-Source-preparation.v1'),
+    ('src06-tarp-dispatcher-provider-contract.v1', 'ordinary-geometry-provider-contract.v1'),
+    ("len(contract['providers']) == 10", "len(contract['providers']) == 16"),
+    ('src06-tarp-dispatcher-frozen-configure-inputs.v1', 'ordinary-geometry-frozen-configure-inputs.v1'),
+    ('src06-tarp-dispatcher-configure-dry-review.v1', 'ordinary-geometry-configure-dry-review.v1'),
+    ('src06_tarp_dispatcher_helper', 'geometry_loader_helper_v3'),
+    ("review['previous_compile_rows'] == 742 and review['current_compile_rows'] == 743", "review['previous_compile_rows'] == 743 and review['current_compile_rows'] == 744"),
+    ('exact_prior_core_link_suffix_preserved_after_declared_SHA_transport', 'exact_prior_core_link_suffix_preserved_without_additional_SHA_transport'),
+    ("len(inventory['actual_disassembly_executions']) == 10", "len(inventory['actual_disassembly_executions']) == 16"),
+    ('all ten unique Original providers', 'all sixteen unique Original providers'),
+    ('src06-tarp-dispatcher-execution-before.v1', 'ordinary-geometry-execution-before.v1'),
+    ('src06-tarp-dispatcher-execution-custody.v1', 'ordinary-geometry-execution-custody.v1'),
+]:
+    assert old in body, old
+    body = body.replace(old, new)
+body = replace_once(body, "need((path.is_relative_to(ROOT) or path.is_relative_to(EXTERNAL)) and path.is_file(),", "need((path.is_relative_to(ROOT) or path.is_relative_to(EXTERNAL) or path.is_relative_to(Path('D:/CodexBuild/rusted-energyplus/SRC-06/native-dispatcher-build-01/bin'))) and path.is_file(),")
+start, end = body.index('def historical_configure(freeze):'), body.index('def source_paths():')
+collector = (PROVIDER / 'collect_providers.py').read_text(encoding='utf8')
+history = collector[collector.index('def historical_configure(freeze):'):collector.index('def dump(path, value):')].replace('checked(', 'bind(').replace("ref(archive)", "full(archive)")
+body = body[:start] + history + body[end:]
+body = replace_once(body, "    same(full(Path(__file__)), provider_prep['own_sources'][1])\n    same(inventory['provider_contract'], provider_prep['own_sources'][2])", "    same(approval['reviewed_execution_driver'], full(Path(__file__)))\n    same(approval['provider_collection_preparation'], {'path': '.runtime/porting/SRC-06/ordinary-geometry-provider-prep-02/manifest.json', 'sha256': '5804749eb0d18130331560741dd59be7849d113ca4c4602c318edc4ed655fe87'})\n    same(inventory['provider_contract'], provider_prep['own_sources'][1])")
+body = replace_once(body, "    need([r['declared_provider'] for r in contract['providers']] == native['core_address_bound_providers_required'], 'all declared Original providers required')", "    request = load(native['prospective_request'])\n    need([r['call'] for r in contract['ordered_declared_loader_calls']] == request['loader_phase_order'] and len(contract['ordered_declared_loader_calls']) == 13, 'exact thirteen declared loader calls required')\n    need(len({r['provider_role'] for r in contract['ordered_declared_loader_calls']}) == contract['unique_loader_provider_count'] == 12 and contract['additional_inner_geometry_provider_count'] == 4, 'twelve loader plus four inner providers required')\n    need(set(native['runtime_interfaces']['required_Original_provider_APIs']) <= {r['declared_provider'] for r in contract['providers']}, 'all declared inner geometry Original providers required')\n    need(inventory['declared_loader_call_to_provider_mapping'] == contract['ordered_declared_loader_calls'] and inventory['unique_loader_provider_count'] == 12 and inventory['additional_inner_geometry_provider_count'] == 4 and inventory['static_address_proof_is_not_inner_invocation_trace'] is True, 'actual static mapping differs; no invocation trace is inferred')")
+body = replace_once(body, "    current = snapshot_members(execution_source, True)", "    current = snapshot_members(execution_source, True)\n    need(len(current) == 3937, 'complete current3937 Source required')")
+start, end = body.index("    input_ref, policy_ref, idf_ref ="), body.index("    wind_before, wind_guard =")
+body = body[:start] + '''    input_ref = full(bind(native['prospective_request']))
+    request = load(input_ref)
+    need(request['schema'] == 'ordinary-geometry-public-loader-request.v1' and request['case']['id'] == 'A-24H', 'exact genuine A24 loader request required')
+    need(all(request[k] is False for k in ('expected_values_supplied', 'expected_exits_supplied', 'Native_results_supplied', 'scientific_execution_performed')), 'input-only request required')
+    need(native['runtime_interfaces']['helper_argc'] == 4 and native['runtime_interfaces']['target'] == 'geometry_loader_helper_v3', 'genuine four-argument helper required')
+    need(len(request['all_45_guard_refs']) == 45 and len(request['loader_phase_order']) == 13 and len(request['native_source_files']) == 6, 'complete fixed input and helper Source closure required')
+    collect(request)
+    upstream = load(request['inherited_input_only_request'])
+    need(request['all_45_guard_refs'] == upstream['all_45_guard_refs'] and request['fixed_scope'] == upstream['fixed_scope'] and request['loader_phase_order'] == upstream['loader_phase_order'], 'immutable inherited forty-five guards and loader order differ')
+    need([row for row in upstream['model_cases'] if row['id'] == 'A-24H'] == [request['case']], 'actual inherited A24 input/caller row differs')
+    idf_ref = full(bind(request['case']['input']))
+    metadata_ref = full(bind(request['case_metadata']))
+    metadata = load(metadata_ref)
+    need(metadata['id'] == 'A-24H' and metadata['input'] == request['case']['input'], 'actual case metadata/input association differs')
+''' + body[end:]
+body = replace_once(body, "    case_runs = output / 'case-runs'\n    need(not case_runs.exists(), 'fresh per-case physical-IDF run root required')\n    argv = [str(bind(binary)), str(bind(input_ref)), str(case_runs)]", "    loader_output = output / 'loader-output'\n    need(not loader_output.exists(), 'fresh genuine physical-IDF loader output required')\n    argv = [str(bind(binary)), str(ROOT), str(bind(input_ref)), str(loader_output)]")
+body = replace_once(body, "'actual_input': input_ref, 'literal_IDF': idf_ref, 'observation_policy': policy_ref,", "'actual_input': input_ref, 'literal_IDF': idf_ref, 'actual_case_metadata': metadata_ref,")
+body = replace_once(body, "'declared_input_counts': {'cases': 8, 'Init_calls': 20, 'processInput_calls': 8, 'binary64_cells': 700, 'physical_IDF_bytes': 158},", "'declared_input_counts': {'cases': 1, 'declared_loader_calls': 13, 'unique_loader_providers': 12, 'additional_inner_geometry_providers': 4, 'fixed_input_guards': 45}, 'FP_control_words_available': False, 'FP_control_unavailable_reason': 'unchanged genuine helper and driver do not observe FP hardware controls',")
+body = replace_once(body, "    produced_files = [full(p) for p in sorted(case_runs.rglob('*')) if p.is_file()] if case_runs.is_dir() else []", "    produced_files = [full(p) for p in sorted(loader_output.rglob('*')) if p.is_file()] if loader_output.is_dir() else []\n    result_path = loader_output / 'geometry-loader-results.json'\n    actual_result = full(result_path) if result_path.is_file() else None")
+body = replace_once(body, "'produced_case_files_full_SHA_inventory': produced_files,", "'produced_loader_files_full_SHA_inventory': produced_files, 'actual_authoritative_result': actual_result, 'expected_diagnostic_file_count_when_constructor_owner_available': 14, 'FP_control_words_available': False,")
+body = replace_once(body, "    need(all(logs[k]['sha256'] == value[k]['sha256'] for k in logs), 'actual output log bytes differ from receipt')", "    need(all(logs[k]['sha256'] == value[k]['sha256'] and logs[k]['size_bytes'] == value[k]['size_bytes'] for k in logs), 'actual output log bytes differ from receipt')\n    need(actual_result is not None and actual_result in produced_files, 'complete authoritative result file must be retained; failure records remain')")
+ast.parse(body)
+driver = write(OUT / 'run_execution.py', body.encode())
+before = write(OUT / 'before/dispatcher-execution.py', TEMPLATE.read_bytes())
+delta = write(OUT / 'run_execution.py.diff', ''.join(difflib.unified_diff(TEMPLATE.read_text(encoding='utf8').splitlines(True), body.splitlines(True), fromfile=before['path'], tofile=driver['path'])).encode())
+doc = write(OUT / 'README.md', b'''# Genuine geometry capture custody - held Source
+
+Root supplies closed actual --provider-inventory path#SHA, --Root-provider-acceptance path#SHA, --source-snapshot path#SHA and a fresh ignored SRC06 --output-dir. This driver invokes only the unchanged genuine geometry Native helper, with four argv entries: actual accepted executable, repository root, exact immutable request, and fresh loader-output. No configure, compile, coefficient formula, geometry substitution, comparison or expected answer is performed here.
+
+The dynamic Root acceptance must use schema ordinary-geometry-Root-provider-acceptance.v1, accepted:true, and exact full references provider_inventory, reviewed_Source_preparation, actual_Native_binary, actual_full_link_map, actual_helper_object, actual_build_execution, Source_snapshot, provider_collection_preparation, actual_evidence_collector, reviewed_execution_driver. It must accept all_sixteen_Original_providers_accepted, full_PE_and_core_proof_accepted, dry_and_actual_compile_link_commands_byte_exact. The accepted collector02 and configure03 are exact Source authorities; every declared loader provider and additional inner geometry provider is address/Source/PE bound. Static provider intervals are not an inner invocation trace.
+
+Complete current3937 Source membership, immutable build Source, explicit inherited8aa3929 and nestedD3623928 archive aliases, all Original core proofs, actual compile/dry2/graph743-to744/cache/link suffix, full executable/map/object and provider bytes are authenticated before capture. Genuine historical Winlibs DLL/PATH provenance is retained. No FP controls are written; actual hardware control words are explicitly unavailable because neither unchanged helper nor driver observes them. No historic precision or process equivalence is inferred.
+
+Before and after records retain full actual request, fixed A24 physical IDF and metadata, all forty-five fixed guards, complete frozen bytes, actual recorder receipt/stdout/stderr and every produced loader file without caps or suppression. The helper normally writes fourteen diagnostic files when its constructor owner is available, plus the authoritative geometry-loader-results.json; actual files and availability are recorded without assuming that count or interpreting numerical JSON. Real extra side-effect files are retained. Actual target exits0 or2 are preserved, never rewritten into mathematical PASS. Errors/missing artifacts retain failure custody. No whole geometry/ordinary PASS, gates, canonical or Git action is authorized by this hold.
+''')
+native_m = json.loads((ROOT / native['path']).read_bytes())
+provider_m = json.loads((ROOT / provider['path']).read_bytes())
+dependencies = [native, configure, provider, ref(TEMPLATE), ref(ROOT / 'tools/porting/record_command.py'), ref(ROOT / 'tools/porting/native_pe.py')]
+dependencies.extend([ref(BASE / 'dispatcher-build-metadata-restore-01/record.json'), ref(BASE / 'ordinary-geometry-provider-prep-02/Root-FULL-Source-review-02.json')])
+manifest = dict(schema='ordinary-geometry-execution-Source-preparation.v1', status='HELD-Source-only-before-genuine-helper-execution', own_sources=[driver, doc, ref(Path(__file__))], Native_Source_preparation=native, configure_Source_preparation=configure, provider_Source_preparation=provider, source_correspondence=dict(before=before, proposal=driver, exact_diff=delta), provider_contract=provider_m['own_sources'][1], exact_input_request=native_m['prospective_request'], Original_provider_entry_ranges=provider_m['Original_provider_entry_ranges'], authentic_template=ref(TEMPLATE), dependencies=dependencies, runtime_interfaces=dict(driver=driver, required_options=['--provider-inventory', '--Root-provider-acceptance', '--source-snapshot', '--output-dir'], helper_argc=4, output_schema='ordinary-geometry-execution-custody.v1', before_schema='ordinary-geometry-execution-before.v1', Root_acceptance_schema='ordinary-geometry-Root-provider-acceptance.v1', authoritative_result_filename='geometry-loader-results.json'), numerical_outputs_read=False, helper_or_driver_executed=False, FP_control_writes=False, canonical_or_Git_changes=False, scientific_PASS_claimed=False, gates_updated=False)
+print(json.dumps(write(OUT / 'manifest.json', (json.dumps(manifest, ensure_ascii=False, indent=2) + '\n').encode())))

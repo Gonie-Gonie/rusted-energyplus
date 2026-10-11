@@ -1,0 +1,11 @@
+        //      Shading:Zone (and variants)
+        //    For each zone:
+        //      Walls
+        //        subsurfaces for each wall (windows, doors, in input order, not sorted) follow the base surface
+        //      Floors
+        //        subsurfaces for each floor (windows, doors, in input order, not sorted) follow the base surface
+        //      Roofs/Ceilings
+        //        subsurfaces for each roof/ceiling (windows, doors, in input order, not sorted) follow the base surface
+        //      Internal Mass
+        //    After reordering, MovedSurfs should equal TotSurfaces
+

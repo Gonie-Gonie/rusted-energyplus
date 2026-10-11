@@ -1,0 +1,19 @@
+--- .runtime/porting/SRC-06/ordinary-geometry-native-prep-03/before-02/geo02_reference_fields.hh
++++ .runtime/porting/SRC-06/ordinary-geometry-native-prep-03/geo02_reference_fields.hh
+@@ -3,6 +3,7 @@
+ #define GEO02_REFERENCE_FIELDS_HH
+ #include <EnergyPlus/Data/EnergyPlusData.hh>
+ #include <EnergyPlus/DataSurfaces.hh>
++#include <EnergyPlus/DataVectorTypes.hh>
+ #include <EnergyPlus/DataErrorTracking.hh>
+ #include <EnergyPlus/SurfaceGeometry.hh>
+ #include <nlohmann/json.hpp>
+@@ -38,7 +39,7 @@
+                        value == 0 ? (std::signbit(value) ? "negative_zero" : "positive_zero") : "finite";
+     return {{"value", std::isfinite(value) ? json(value) : json(nullptr)}, {"value_bits", bits(value)}, {"value_class", kind}};
+ }
+-inline json vector(EnergyPlus::Vector const &v)
++inline json vector(EnergyPlus::DataVectorTypes::Vector const &v)
+ {
+     return json::array({scalar(v.x), scalar(v.y), scalar(v.z)});
+ }

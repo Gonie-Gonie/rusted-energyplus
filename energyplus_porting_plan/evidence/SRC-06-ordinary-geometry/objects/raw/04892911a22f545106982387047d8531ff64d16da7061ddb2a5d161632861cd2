@@ -1,0 +1,44 @@
+"""Source-only successor: bind GEO03 policy fields to the actual copied DTO names."""
+from pathlib import Path
+import ast, difflib, hashlib, json
+ROOT=Path(__file__).resolve().parents[3]
+OLD=ROOT/'.runtime/porting/SRC-06/ordinary-geometry-observer-prep-01'
+NEW=ROOT/'.runtime/porting/SRC-06/ordinary-geometry-observer-prep-02'
+def ref(p):
+    b=p.read_bytes();return dict(path=p.relative_to(ROOT).as_posix(),sha256=hashlib.sha256(b).hexdigest(),size_bytes=len(b),line_count=len(b.splitlines()))
+def write(p,b):
+    p.parent.mkdir(parents=True,exist_ok=True)
+    with p.open('xb') as s:s.write(b)
+    return ref(p)
+def js(p,v):return write(p,(json.dumps(v,ensure_ascii=False,allow_nan=False,indent=2)+'\n').encode())
+assert ref(OLD/'manifest.json')['sha256']=='b4ae9289cd60d6ba7f0741a22735f97f1c3326f68b409a51faa2fbecbcc67f10'
+m=json.loads((OLD/'manifest.json').read_bytes())
+old_policy=m['runtime_interfaces']['prospective_pairing_policy']; p=json.loads((ROOT/old_policy['path']).read_bytes())
+old_fields=p['mandatory_selected_fields']['GEO03_return']
+assert old_fields==['Volume','CeilingHeight','CeilingHeightEntered','FloorArea','UserEnteredFloorArea','CalculatedFloorArea','CeilingArea','CalculatedCeilingArea','HasFloor','HasRoof']
+p['mandatory_selected_fields']['GEO03_return']=['volume_m3','ceiling_height_m','ceiling_height_entered','floor_area_m2','user_entered_floor_area_m2','geometric_floor_area_m2','ceiling_area_m2','geometric_ceiling_area_m2','has_floor','has_roof']
+new_policy=js(NEW/'policy.proposed.json',p)
+application=[]; incremental=[]; before_sources=[]; new_sources=[]
+for row in m['application_sources']:
+    canonical=row['canonical_path']; old=(ROOT/row['proposal']['path']).read_bytes()
+    after=old.replace(old_policy['sha256'].encode(),new_policy['sha256'].encode(),1) if canonical.endswith('src06_ordinary_geometry_observer.rs') else old
+    if canonical.endswith('src06_ordinary_geometry_observer.rs'):
+        assert old.count(old_policy['sha256'].encode())==1 and after.replace(new_policy['sha256'].encode(),old_policy['sha256'].encode(),1)==old
+    before=write(NEW/'before'/canonical,old); proposal=write(NEW/'proposed'/canonical,after)
+    diff=write(NEW/'diffs'/(canonical.replace('/','__')+'.diff'),''.join(difflib.unified_diff([],after.decode().splitlines(True),fromfile='/dev/null',tofile=canonical)).encode())
+    inc=write(NEW/'incremental'/(canonical.replace('/','__')+'.diff'),''.join(difflib.unified_diff(old.decode().splitlines(True),after.decode().splitlines(True),fromfile=before['path'],tofile=proposal['path'])).encode())
+    assert not (ROOT/canonical).exists()
+    application.append(dict(canonical_path=canonical,new_destination_absent=True,proposal=proposal,exact_diff=diff))
+    incremental.append(dict(before=before,proposal=proposal,exact_diff=inc));before_sources.append(before);new_sources.append(proposal)
+old_policy_bytes=(ROOT/old_policy['path']).read_bytes(); new_policy_bytes=(ROOT/new_policy['path']).read_bytes()
+policy_before=write(NEW/'before/policy.proposed.json',old_policy_bytes)
+policy_diff=write(NEW/'incremental/policy.diff',''.join(difflib.unified_diff(old_policy_bytes.decode().splitlines(True),new_policy_bytes.decode().splitlines(True),fromfile=policy_before['path'],tofile=new_policy['path'])).encode())
+readme=(OLD/'README.md').read_text(encoding='utf8')+'\nSuccessor02 preserves01 and corrects only the prospective GEO03 policy label list to the exact ten keys already copied by both Native Geo03::zone and Rust zone_return. The main changes only its policy SHA literal; fields.rs is byte-exact01. No producer, arithmetic, input, scope, tolerance, result selection or target execution changes. Both complete initial Source additions and narrow deltas are retained.\n'
+doc=write(NEW/'README.md',readme.encode())
+request=json.loads((ROOT/m['runtime_interfaces']['request_template']['path']).read_bytes());request['pairing_policy']=new_policy
+request_ref=js(NEW/'request.template.json',request)
+m.update(previous_preparation=ref(OLD/'manifest.json'),own_sources=new_sources+[doc,ref(Path(__file__))]+before_sources+[policy_before,policy_diff],application_sources=application,incremental_Source_differences=incremental,policy_exact_difference=dict(before=policy_before,proposal=new_policy,exact_diff=policy_diff))
+m['runtime_interfaces']=dict(m['runtime_interfaces'],prospective_pairing_policy=new_policy,request_template=request_ref)
+m['Source_dependencies']+= [ref(OLD/'manifest.json'),ref(OLD/'README.md'),ref(ROOT/'.runtime/porting/SRC-06/seal-ordinary-geometry-observer-01.py'),new_policy]
+ast.parse(Path(__file__).read_bytes())
+print(json.dumps(js(NEW/'manifest.json',m)))

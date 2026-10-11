@@ -1,0 +1,16 @@
+--- .runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/before/validate.draft.py
++++ .runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/validate.py
+@@ -1,4 +1,4 @@
+-"""UNSEALED Root-only geometry quality/artifact/capture draft; no Native replay."""
++"""Root-only reviewed geometry quality/artifact/capture; no Native replay."""
+ import argparse
+ import hashlib
+ import importlib.util
+@@ -65,6 +65,7 @@
+     parser.add_argument('--build-record'); parser.add_argument('--artifact-review')
+     args = parser.parse_args(); M, A, prep_ref, prep = bootstrap(args.source_preparation); prep['_actual_operand'] = args.source_preparation
+     app_ref, review_ref, source = A.operand(args.application), A.operand(args.formatter_review), A.operand(args.Source_snapshot)
++    source = {key:source[key] for key in ('path','sha256')}
+     app, fmt, observer = application(M, A, prep, app_ref, review_ref, source)
+     V = M.module('accepted_geometry_PE', A.bind(prep['CLI_validation_Source']))
+     example = observer['runtime_interfaces']['example']

@@ -1,0 +1,11 @@
+--- .runtime/porting/SRC-06/ordinary-geometry-execution-prep-06/before/run_execution.py
++++ .runtime/porting/SRC-06/ordinary-geometry-execution-prep-06/run_execution.py
+@@ -160,7 +160,7 @@
+     need(provider_prep['schema'] == 'ordinary-geometry-provider-Source-preparation.v1', 'actual reviewed collector preparation required')
+     same(inventory['configure_preparation'], authority_refs['configure_preparation'])
+     same(approval['reviewed_execution_driver'], full(Path(__file__)))
+-    same(approval['provider_collection_preparation'], {'path': '.runtime/porting/SRC-06/ordinary-geometry-provider-prep-02/manifest.json', 'sha256': '5804749eb0d18130331560741dd59be7849d113ca4c4602c318edc4ed655fe87'})
++    same(approval['provider_collection_preparation'], {'path': '.runtime/porting/SRC-06/ordinary-geometry-provider-prep-03/manifest.json', 'sha256': '05689d2f2a757258cc01932ef57b2b145115d741dc5e9766d98f4ef5c4deafcb'})
+     same(inventory['provider_contract'], provider_prep['own_sources'][1])
+     contract = load(inventory['provider_contract'])
+     need(contract['schema'] == 'ordinary-geometry-provider-contract.v1' and len(contract['providers']) == 16, 'complete declared provider contract required')

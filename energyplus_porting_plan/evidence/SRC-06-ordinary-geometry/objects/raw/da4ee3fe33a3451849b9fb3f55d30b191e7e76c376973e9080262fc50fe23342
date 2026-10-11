@@ -1,0 +1,80 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "cargo",
+    "test",
+    "--config",
+    "profile.dev.debug=0",
+    "--config",
+    "profile.test.debug=0",
+    "--config",
+    "build.incremental=false",
+    "--locked",
+    "-p",
+    "ep_runtime",
+    "--lib",
+    "heat_balance::"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-11T23:06:45.642038+00:00",
+  "finished_utc": "2026-10-11T23:07:46.734009+00:00",
+  "elapsed_seconds": 61.09113900002558,
+  "repository_before": {
+    "head": "f4f62821ce99529ba00ac832089a2c6ed762bf53",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/geometry.rs\u0000 M crates/ep_runtime/src/heat_balance/initialization.rs\u0000 M crates/ep_runtime/src/heat_balance/initialization/state_shell.rs\u0000 M crates/ep_runtime/src/heat_balance/state.rs\u0000 M crates/ep_runtime/src/runtime/tests.rs\u0000 M energyplus_porting_plan/cards/SRC-06.md\u0000?? crates/ep_run/examples/src06_ordinary_geometry_observer.rs\u0000?? crates/ep_run/examples/src06_ordinary_geometry_support/\u0000?? crates/ep_runtime/src/geometry/inside_convection_owners.rs\u0000?? crates/ep_runtime/src/geometry/inside_convection_owners/\u0000?? crates/ep_runtime/src/runtime/tests/initialized_geometry_owners.rs\u0000"
+  },
+  "repository_after": {
+    "head": "f4f62821ce99529ba00ac832089a2c6ed762bf53",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/geometry.rs\u0000 M crates/ep_runtime/src/heat_balance/initialization.rs\u0000 M crates/ep_runtime/src/heat_balance/initialization/state_shell.rs\u0000 M crates/ep_runtime/src/heat_balance/state.rs\u0000 M crates/ep_runtime/src/runtime/tests.rs\u0000 M energyplus_porting_plan/cards/SRC-06.md\u0000?? crates/ep_run/examples/src06_ordinary_geometry_observer.rs\u0000?? crates/ep_run/examples/src06_ordinary_geometry_support/\u0000?? crates/ep_runtime/src/geometry/inside_convection_owners.rs\u0000?? crates/ep_runtime/src/geometry/inside_convection_owners/\u0000?? crates/ep_runtime/src/runtime/tests/initialized_geometry_owners.rs\u0000"
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/47/47ebf61d9be4dbfcb30fb9b2f3ae8e962c497b0de8857f4e659dba802a72328b",
+    "sha256": "47ebf61d9be4dbfcb30fb9b2f3ae8e962c497b0de8857f4e659dba802a72328b"
+  },
+  "source_bytes_match_before_and_after": true,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/57/5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-validation-01/focused-command/stdout.log",
+    "sha256": "f720ac9d4c84811de48e7dfba89e6c6df9979e1eaf7667d4a157796496bc01b9"
+  },
+  "stderr": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-validation-01/focused-command/stderr.log",
+    "sha256": "f72ee5efe0cbe2f0dd4adce988b1706430c96c435b5318bc5fa8bba8bc8f0ee8"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-11T23:07:46.734009+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

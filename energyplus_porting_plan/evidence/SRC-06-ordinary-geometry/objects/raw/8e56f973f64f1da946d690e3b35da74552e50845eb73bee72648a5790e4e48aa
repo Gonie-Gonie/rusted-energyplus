@@ -1,0 +1,68 @@
+{
+  "schema": "src06-ordinary-geometry-selected-comparison.v1",
+  "status": "pass-available-selected-ordinary-geometry-only",
+  "actual_custody": {
+    "path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\SRC-06\\ordinary-geometry-comparison-02\\comparison-custody.json",
+    "sha256": "64c6be9f5ba02a8b75e7137a8ab38da1d02f54423967555cd656d10a08b19617"
+  },
+  "reviewed_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-prep-04/manifest.json",
+    "sha256": "f6a8b8f2149cedfea0faa8b788218f91fc1a801308ee219d1e72ba7b5a05c7ef",
+    "size_bytes": 35754
+  },
+  "prospective_policy": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-observer-prep-02/policy.proposed.json",
+    "sha256": "0bb48c5f93aea8393c8012f28ccfaa37c9e191e201f402a547156a8376092f6b",
+    "size_bytes": 4965,
+    "line_count": 115
+  },
+  "counts": {
+    "input_join_comparisons": 2255,
+    "pre_owner_comparisons": 0,
+    "selected_endpoint_comparisons": 36,
+    "point_helper_comparisons": 0
+  },
+  "mismatch_count": 0,
+  "required_unavailable_count": 0,
+  "optional_unpaired_count": 19,
+  "ledgers": {
+    "mismatches": {
+      "artifact": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-02/comparison/mismatches.jsonl.gz",
+        "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+        "size_bytes": 20
+      },
+      "rows": 0,
+      "decoded_bytes": 0,
+      "decoded_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "unavailable": {
+      "artifact": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-02/comparison/unavailable.jsonl.gz",
+        "sha256": "e6aaae2931e2138cf949d5751d8086aec54da740e4421bf1e7e6cc47ebe63b5f",
+        "size_bytes": 715
+      },
+      "rows": 19,
+      "decoded_bytes": 6315,
+      "decoded_sha256": "7d30dec4e083adcd262d6b54b9583926800dfc0d968413e8f73145cb8f6f8a19"
+    },
+    "paired_owners": {
+      "artifact": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-02/comparison/paired_owners.jsonl.gz",
+        "sha256": "5fc17c16f21b2ed14d57cd1f50fa50d4daee41c27496f645575f60376473c157",
+        "size_bytes": 209
+      },
+      "rows": 7,
+      "decoded_bytes": 845,
+      "decoded_sha256": "d752cc027df876d7dabf27dc187acb19c5e71986ad2b43cb14f1c0058b68905b"
+    }
+  },
+  "integrity_failure": null,
+  "Native_and_Rust_intermediate_checkpoint_pairing_claimed": false,
+  "all_differences_retained_without_cap": true,
+  "all_unavailable_counted_as_PASS": false,
+  "whole_geometry_PASS_claimed": false,
+  "whole_SetupZoneGeometry_PASS_claimed": false,
+  "ordinary_convection_or_cadence_PASS_claimed": false,
+  "gates_updated": false
+}

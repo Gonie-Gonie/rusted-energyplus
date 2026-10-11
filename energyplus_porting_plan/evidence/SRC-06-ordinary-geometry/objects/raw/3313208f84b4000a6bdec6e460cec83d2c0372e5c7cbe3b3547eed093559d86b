@@ -1,0 +1,46 @@
+{
+  "schema": "src06-ordinary-geometry-comparison-Source-review.v1",
+  "reviewer_role": "Header",
+  "accepted": true,
+  "reviewed_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-prep-02/manifest.json",
+    "sha256": "91e3da3be59799b3738032700a8db7643bca4019edf08032c6392cf33ea27976",
+    "size_bytes": 22898
+  },
+  "historical_predecessor": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-prep-01/manifest.json",
+    "sha256": "43b8a9e86e8aa3ab681c4300c7bde612efd262351c940130bb8ee4a529792fd6",
+    "size_bytes": 15121
+  },
+  "cumulative_FULL_Source_review_accepted": true,
+  "runtime_lines": {
+    "compare": 202,
+    "custody": 198,
+    "input_joins": 221
+  },
+  "whole_refs": 68,
+  "descriptor_occurrences": 147,
+  "physical_Source_ranges": 17,
+  "exact_addition_and_incremental_diffs_regenerated": 9,
+  "ASTs_parsed": 8,
+  "all96_literal_IDF_declarations_and_effective_order_independently_regenerated": true,
+  "same_comparer_and_frozen_policy_bytes": true,
+  "all_helpers_except_custody_authenticate_and_input_joins_AST_exact": true,
+  "consumed_boundary_object_and_opaque_construction_input_witnesses_complete": true,
+  "actual_Native_Outdoors_or_Adiabatic_self_ID_Source_join_accepted": true,
+  "factual_review_schema_and_release_custody_result_Source_provider_joins_accepted": true,
+  "actual_producer_API_and_DTO_interfaces_read": true,
+  "concrete_blockers": [],
+  "independence_disclosure": "Reviewer previously reviewed the geometry producer/observer and authored provider/configure factual transport. This is an independent review of Base-authored scientific comparison and custody Source; no new Native/Rust geometry outputs were read.",
+  "review_Source": {
+    "path": ".runtime/porting/SRC-06/review-geometry-comparer-Header-02.py",
+    "sha256": "f730f038a0ba458a72d1bc18270fec4757ef9e59c32fee3adf749f5d0e2e85c1",
+    "size_bytes": 7251
+  },
+  "comparer_imported_or_executed": false,
+  "engine_or_target_executed": false,
+  "new_geometry_numerical_results_read": false,
+  "canonical_or_Git_changes": false,
+  "whole_geometry_or_ordinary_PASS_claimed": false,
+  "gates_updated": false
+}

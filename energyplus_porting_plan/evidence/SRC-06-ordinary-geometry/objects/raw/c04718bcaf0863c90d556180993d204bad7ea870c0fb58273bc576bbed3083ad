@@ -1,0 +1,17 @@
+{
+  "accepted": true,
+  "cumulative_FULL_Source_review_accepted": true,
+  "reviewer_role": "Root",
+  "reviewed_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-prep-04/manifest.json",
+    "sha256": "f6a8b8f2149cedfea0faa8b788218f91fc1a801308ee219d1e72ba7b5a05c7ef",
+    "size_bytes": 35754
+  },
+  "whole_files_verified": 86,
+  "literal_Source_ranges_verified": 29,
+  "exact_narrow_diffs_regenerated": 3,
+  "only_authenticate_recorder_descriptor_normalization_changed": true,
+  "scientific_policy_or_equations_changed": false,
+  "target_executed": false,
+  "gates_updated": false
+}

@@ -1,0 +1,64 @@
+void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if errors found in input
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Richard Liesen
+    //       DATE WRITTEN   September 1997
+    //       MODIFIED       April 1999; L.Lawrie
+    //                      Sept 1999, FCW, Window5 modifications
+    //                      Mar 2001, FCW, WindowShade mods
+    //                      Sep 2001, FCW, add Material:WindowGasMixture
+    //                      Oct 2001, FCW, add Material:WindowBlind
+    //                      Dec 2003, FCW, add glass solar/visible transmittance dirt factor
+    //                      Feb 2009, TH, added WindowMaterial:GlazingGroup:Thermochromic
+
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // The purpose of this subroutine is to serve as a transfer agent
+    // between the input file and the material derived type.  The new input
+    // file is working, and this file reads the material data directly
+    // from the input file and transfer that information to the new data
+    // structure.  Data read in this routine is stored in a
+    // derived type (Material) defined in the DataHeatBalance module.
+
+    // In April 1999, a new set of material definitions replaced the one "all-purpose"
+    // material definition.  There are now 10 flavors of materials.  Definitions from
+    // the IDD appear below before their counterpart "gets".
+
+    using Curve::GetCurveIndex;
+    using Curve::GetCurveMinMaxValues;
+
+    using General::ScanForReports;
+
+    int IOStat;    // IO Status when calling get input subroutine
+    int NumAlphas; // Number of material alpha names being passed
+    int NumNums;   // Number of material properties being passed
+
+    int NumGas;                         // Index for loop over gap gases in a mixture
+    int NumGases;                       // Number of gasses in a mixture
+    GasType gasType = GasType::Invalid; // Gas type index: 1=air, 2=argon, 3=krypton, 4=xenon
+    int ICoeff;                         // Gas property coefficient index
+    Real64 MinSlatAngGeom;              // Minimum and maximum slat angle allowed by slat geometry (deg)
+    Real64 MaxSlatAngGeom;
+    Real64 ReflectivitySol;   // Glass reflectivity, solar
+    Real64 ReflectivityVis;   // Glass reflectivity, visible
+    Real64 TransmittivitySol; // Glass transmittivity, solar
+    Real64 TransmittivityVis; // Glass transmittivity, visible
+    Real64 DenomRGas;         // Denominator for WindowGas calculations of NominalR
+    Real64 Openness;          // insect screen openness fraction = (1-d/s)^2
+
+    // Added TH 1/9/2009 to read the thermochromic glazings
+
+    // Added TH 7/27/2009 for constructions defined with F or C factor method
+    int TotFfactorConstructs; // Number of slabs-on-grade or underground floor constructions defined with F factors
+    int TotCfactorConstructs; // Number of underground wall constructions defined with C factors
+
+    static constexpr std::string_view routineName = "GetMaterialData";
+
+    auto &s_mat = state.dataMaterial;
+    auto &s_ip = state.dataInputProcessing->inputProcessor;
+    auto &s_ipsc = state.dataIPShortCut;
+
+    s_mat->NumNoMasses = s_ip->getNumObjectsFound(state, "Material:NoMass");
+    s_mat->NumIRTs = s_ip->getNumObjectsFound(state, "Material:InfraredTransparent");

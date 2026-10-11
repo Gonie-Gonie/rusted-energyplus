@@ -1,0 +1,4 @@
+        CurrentModuleObject = "Output:Schedules";
+        s_ip->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
+        MaxNums = max(MaxNums, NumNumbers);
+        MaxAlps = max(MaxAlps, NumAlphas);

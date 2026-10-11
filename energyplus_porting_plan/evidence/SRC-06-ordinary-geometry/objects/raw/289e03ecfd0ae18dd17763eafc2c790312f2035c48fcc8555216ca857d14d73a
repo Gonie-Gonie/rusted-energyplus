@@ -1,0 +1,18 @@
+//! EnergyPlus-compatible name normalization and name maps.
+
+use std::collections::BTreeMap;
+
+/// Normalized name used only during compile, diagnostics, and export.
+#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct NormalizedName(pub String);
+
+impl NormalizedName {
+    /// Applies the first EnergyPlus-compatible name normalization rule.
+    #[must_use]
+    pub fn new(name: &str) -> Self {
+        Self(name.trim().to_ascii_uppercase())
+    }
+}
+
+/// Compile-time name map from EnergyPlus names to typed IDs.
+#[derive(Clone, Debug, Eq, PartialEq)]

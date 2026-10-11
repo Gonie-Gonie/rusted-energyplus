@@ -1,0 +1,7 @@
+            ++ConstrNum;
+            auto &thisConstruct = state.dataConstruction->Construct(ConstrNum);
+            // Assign Construction name to the Derived Type using the zeroth position of the array
+            thisConstruct.Name = ConstructAlphas(0);
+
+            // Set the total number of layers for the construction
+            thisConstruct.TotLayers = ConstructNumAlpha - 1;

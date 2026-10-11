@@ -1,0 +1,19 @@
+--- .runtime/porting/SRC-06/ordinary-geometry-factual-checker-prep-02/before/check.py
++++ .runtime/porting/SRC-06/ordinary-geometry-factual-checker-prep-02/check.py
+@@ -281,7 +281,15 @@
+     capture = bind(before_ref).parent; loader = Path(inner['command'][3]).resolve()
+     need((ROOT / command[12]).resolve() == capture and loader == capture / 'loader-output' and capture.is_relative_to(BASE), 'fresh contained actual loader output paths differ')
+     need(outer['started_utc'] <= inner['started_utc'] <= inner['finished_utc'] <= outer['finished_utc'] and outer['exit_code'] == inner['exit_code'] == custody['actual_target_exit_code'] == custody['actual_recorder_exit_code'], 'actual execution chronology/exit custody differs')
+-    summary = json.loads(bind(outer['stdout']).read_bytes()); same(summary['custody'],custody_ref); need(summary['actual_exit_code'] == inner['exit_code'] and summary['scientific_PASS_claimed'] is False, 'outer full stdout custody differs')
++    transport_lines = bind(outer['stdout']).read_bytes().splitlines()
++    need(len(transport_lines) == 2 and all(transport_lines), 'full outer stdout must contain exactly the recorder and driver transport records; unexpected stdio cannot be suppressed')
++    transport, summary = [json.loads(line) for line in transport_lines]
++    keys(transport, 'receipt exit_code source_bytes_match_before_and_after', 'inner recorder stdout transport')
++    same(transport['receipt'],custody['actual_command_receipt'])
++    need(transport['exit_code'] == inner['exit_code'] and transport['source_bytes_match_before_and_after'] is True, 'actual inner recorder transport exit/Source differs')
++    keys(summary, 'custody actual_exit_code scientific_PASS_claimed', 'driver stdout transport')
++    same(summary['custody'],custody_ref)
++    need(summary['actual_exit_code'] == inner['exit_code'] and summary['scientific_PASS_claimed'] is False, 'outer full stdout custody differs')
+     for key in ('stdout','stderr'): same(custody['actual_full_output_logs'][key],inner[key])
+     actual_files = custody['produced_loader_files_full_SHA_inventory']; need({bind(r) for r in actual_files} == {p.resolve() for p in loader.rglob('*') if p.is_file()} and len(actual_files) == len({bind(r) for r in actual_files}), 'every actual produced file must be retained')
+     result_ref = custody['actual_authoritative_result']; need(bind(result_ref) == loader / 'geometry-loader-results.json', 'actual authoritative result path differs')

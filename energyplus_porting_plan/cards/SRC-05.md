@@ -129,13 +129,12 @@ both exited 0, with unchanged Source, binaries and all 45 fixed input guards.
 All 62 output files (1,328,614,270 bytes) were fully hashed independently. The
 uncapped NDJSON closed with 4,034 written events, one Rust generation and 4,037
 physical lines. Complete ordinary outputs remain on D; published evidence
-retains their full hashes, sizes and IO completion metadata. This capture has
-not been numerically compared and does not certify boundary reachability.
+retains their full hashes, sizes and IO completion metadata. Capture completion alone does not establish numerical equivalence or certify boundary reachability; the later [CTF-10 comparison](../evidence/CTF-10-main-thread-history-comparison/summary.json) is retained separately.
 
 The genuine Native no-user TARP first/repeated-call baseline closed before this
 Rust application. This prerequisite and all actual application, quality, Cargo,
 PE, process and independent factual reviews are retained in the
 [production-entry evidence](../evidence/SRC-05-production-main-thread/summary.json).
 The cold guard/error backend, retained ordinary four-array setter/check sequence,
-SRC-07/08 handoff and complete ordinary comparison remain pending. No card gate
+SRC-07/08 handoff and successful complete ordinary comparison remain pending. No card gate
 or A/B completion count changes.

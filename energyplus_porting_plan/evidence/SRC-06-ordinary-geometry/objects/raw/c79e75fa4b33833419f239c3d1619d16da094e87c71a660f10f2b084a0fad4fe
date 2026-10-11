@@ -1,0 +1,15 @@
+        state.dataHeatBal->TotConstructs = TotRegConstructs + TotFfactorConstructs + TotCfactorConstructs + totAirBoundaryConstructs +
+                                           state.dataBSDFWindow->TotComplexFenStates + state.dataWindowEquivLayer->TotWinEquivLayerConstructs;
+
+        state.dataHeatBal->NominalRforNominalUCalculation.dimension(state.dataHeatBal->TotConstructs, 0.0);
+        state.dataHeatBal->NominalU.dimension(state.dataHeatBal->TotConstructs, 0.0);
+        state.dataHeatBal->NominalUBeforeAdjusted.dimension(state.dataHeatBal->TotConstructs, 0.0);
+        state.dataHeatBal->CoeffAdjRatio.dimension(state.dataHeatBal->TotConstructs, 1.0);
+
+        // Allocate the array to the number of constructions/initialize selected variables
+        state.dataConstruction->Construct.allocate(state.dataHeatBal->TotConstructs);
+        state.dataHeatBalMgr->UniqueConstructNames.reserve(state.dataHeatBal->TotConstructs);
+        // Note: If TotWindow5Constructs > 0, additional constructions are created in
+        // subr. SearchWindow5DataFile corresponding to those found on the data file.
+        for (auto &e : state.dataConstruction->Construct) {
+            // Initialize CTF and History terms

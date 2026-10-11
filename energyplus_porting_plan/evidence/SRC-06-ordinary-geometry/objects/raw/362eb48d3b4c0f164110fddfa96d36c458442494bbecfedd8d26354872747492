@@ -1,0 +1,49 @@
+use super::*;
+
+fn point(x_m: f64, y_m: f64, z_m: f64) -> Point3 { Point3 { x_m, y_m, z_m } }
+
+#[test]
+fn triangle_uses_ordered_edges_not_rectangular_perimeter() -> Result<(), Box<dyn std::error::Error>> {
+    let vertices = [point(0.0, 0.0, 0.0), point(0.0, 3.0, 0.0), point(4.0, 0.0, 0.0)];
+    let geometry = super::super::surface_geometry_properties(&vertices).map_err(|error| std::io::Error::other(error.to_string()))?;
+    let result = opaque_surface_dimensions(SurfaceId(7), &vertices, &geometry)?;
+    assert_eq!(result.surface_id, SurfaceId(7));
+    assert_eq!(result.perimeter_m.to_bits(), 12.0_f64.to_bits());
+    assert_eq!(result.width_m.to_bits(), 5.0_f64.to_bits());
+    assert_eq!(result.height_m.to_bits(), 3.0_f64.to_bits());
+    Ok(())
+}
+
+#[test]
+fn polygon_uses_the_actual_gross_area_replacement_branch() -> Result<(), Box<dyn std::error::Error>> {
+    let vertices = [point(0.0, 0.0, 0.0), point(0.0, 2.0, 0.0), point(2.0, 2.0, 0.0), point(3.0, 1.0, 0.0), point(2.0, 0.0, 0.0)];
+    let geometry = super::super::surface_geometry_properties(&vertices).map_err(|error| std::io::Error::other(error.to_string()))?;
+    let result = opaque_surface_dimensions(SurfaceId(9), &vertices, &geometry)?;
+    assert_eq!(geometry.gross_area_m2.to_bits(), 5.0_f64.to_bits());
+    assert_eq!(result.width_m.to_bits(), 5.0_f64.sqrt().to_bits());
+    assert_eq!(result.height_m.to_bits(), result.width_m.to_bits());
+    Ok(())
+}
+
+#[test]
+fn source_centimeter_boundary_is_admitted_and_vertex_disposal_is_unavailable() -> Result<(), Box<dyn std::error::Error>> {
+    let vertices = [point(0.0, 0.0, 0.0), point(0.01, 0.0, 0.0), point(0.01, 1.0, 0.0), point(0.0, 1.0, 0.0)];
+    let geometry = super::super::surface_geometry_properties(&vertices).map_err(|error| std::io::Error::other(error.to_string()))?;
+    assert!(opaque_surface_dimensions(SurfaceId(1), &vertices, &geometry).is_ok());
+    let close = [point(0.0, 0.0, 0.0), point(0.009, 0.0, 0.0), point(0.01, 1.0, 0.0), point(0.0, 1.0, 0.0)];
+    let geometry = super::super::surface_geometry_properties(&close).map_err(|error| std::io::Error::other(error.to_string()))?;
+    assert_eq!(opaque_surface_dimensions(SurfaceId(1), &close, &geometry), Err(GeometryOwnerUnavailable::CoincidentVertices(SurfaceId(1))));
+    Ok(())
+}
+
+#[test]
+fn member_reductions_preserve_first_signed_zero_operand() {
+    assert_eq!(source_min(-0.0, 0.0).to_bits(), (-0.0_f64).to_bits());
+    assert_eq!(source_max(-0.0, 0.0).to_bits(), (-0.0_f64).to_bits());
+    assert_eq!(source_min(0.0, -0.0).to_bits(), 0.0_f64.to_bits());
+    assert_eq!(source_max(0.0, -0.0).to_bits(), 0.0_f64.to_bits());
+    assert_eq!(source_bound_min(0.0, -0.0).to_bits(), (-0.0_f64).to_bits());
+    assert_eq!(source_bound_max(0.0, -0.0).to_bits(), 0.0_f64.to_bits());
+    assert_eq!(source_bound_min(-0.0, 0.0).to_bits(), 0.0_f64.to_bits());
+    assert_eq!(source_bound_max(-0.0, 0.0).to_bits(), (-0.0_f64).to_bits());
+}

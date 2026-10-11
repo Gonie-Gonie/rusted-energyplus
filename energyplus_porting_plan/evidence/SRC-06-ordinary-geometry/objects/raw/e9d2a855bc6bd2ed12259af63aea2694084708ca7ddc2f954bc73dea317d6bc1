@@ -1,0 +1,258 @@
+"""Finite combined geometry evidence publication; opaque actual result and full gzip copies."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import re
+import shutil
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = ROOT / 'energyplus_porting_plan/evidence/SRC-06-ordinary-geometry'
+SEEN, ROLES, PROVENANCE, CONVERTER_LOGS = {}, {}, [], {}
+
+
+def need(value, message):
+    if not value: raise ValueError(message)
+
+
+def digest(path):
+    with path.open('rb') as stream: return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def full(path): return dict(path=path.relative_to(ROOT).as_posix(), sha256=digest(path), size_bytes=path.stat().st_size)
+
+
+def checked(row, external=False):
+    path = (ROOT / row['path']).resolve()
+    need(path.is_file() and (path.is_relative_to(ROOT) or external and path.is_relative_to(Path('D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-geometry-native-build-03/bin'))), 'contained selected artifact or declared v4 binary/map required')
+    need(digest(path) == row['sha256'] and ('size_bytes' not in row or path.stat().st_size == row['size_bytes']), 'full actual SHA/size differs: ' + row['path'])
+    SEEN[path] = (row['sha256'], path.stat().st_size); return path
+
+
+def unique(pairs):
+    value = {}
+    for key, row in pairs: need(key not in value, 'duplicate metadata JSON key'); value[key] = row
+    return value
+
+
+def load(row): return json.loads(checked(row).read_bytes(), object_pairs_hook=unique)
+
+
+def same(a, b): need(checked(a) == checked(b), 'artifact path/SHA/size identity differs')
+
+
+def select(row, role):
+    path = checked(row)
+    if path in CONVERTER_LOGS: need(full(path) == CONVERTER_LOGS[path], 'exact closed input-converter child log differs')
+    elif path.name in ['stdout.log', 'stderr.log']:
+        sibling = path.parent / 'receipt.json'; need(sibling.is_file(), 'active/unrecorded standard log cannot be selected')
+        value = load(full(sibling)); need(value['schema'] == 'recorded-porting-command.v1' and value['finished_utc'] is not None and value['launch_error'] is None, 'closed sibling recorder receipt required')
+        same(value['stdout' if path.name == 'stdout.log' else 'stderr'], row)
+    ROLES.setdefault(path, set()).add(role)
+
+
+def receipt(row, role, source=None, allowed=(0,), argv=None, stable=True, recorder=None):
+    value = load(row)
+    need(value['schema'] == 'recorded-porting-command.v1' and value['exit_code'] in allowed and value['launch_error'] is None and value['finished_utc'] is not None and value['started_utc'] <= value['finished_utc'], 'closed genuine actual command required')
+    need(value['source_bytes_match_before_and_after'] is stable and value['recorder_updates_gates'] is False and value['recorder_supplies_reference_answers'] is False, 'actual command Source/scope guard differs')
+    if source is not None: same(value['source_snapshot'], source)
+    if argv is not None: need(value['command'] == argv, 'actual role argv differs')
+    need(checked(value['executed_launcher']['archive']).read_bytes() == checked(recorder or PREP['recorder_Source']).read_bytes(), 'authentic archived recorder Source differs')
+    for item in [row, value['stdout'], value['stderr'], value['executed_launcher']['archive']]: select(item, role)
+    return value
+
+
+def provenance(row, reason, metadata=False, current=False):
+    if metadata or current: checked(row, external=current)
+    PROVENANCE.append(dict(artifact=row, reason=reason, payload_published=False, current_payload_rehashed_by_publisher=current, metadata_file_rehashed_by_publisher=metadata, payload_availability='current-full-SHA-verified' if current else 'metadata-only-no-current-payload-claim'))
+
+
+def snapshot(row, current=False):
+    value = load(row); names = [r['historical_path'] for r in value['files']]
+    need(len(names) == len(set(names)) and value['bytes_normalized'] is False, 'complete unique byte-exact Source snapshot required')
+    for item in value['files']:
+        archive = checked(item['archive']); need(archive.stat().st_size == item['size_bytes'], 'whole Source archive size differs')
+        if current: checked(dict(path=item['historical_path'], sha256=item['archive']['sha256'], size_bytes=item['size_bytes']))
+    provenance(row, 'whole-Source-snapshot-descriptor-only; all archived members authenticated', metadata=True)
+
+
+def source_preparation(row, role):
+    value = load(row); select(row, role)
+    for item in value.get('own_sources', []): select(item, role + ':owned-Source')
+    for key in ['README', 'author_source', 'authoring_Source', 'authoring_source']:
+        if key in value: select(value[key], role + ':document')
+    for item in value.get('application_sources', []):
+        for key in ['proposal', 'exact_diff']: select(item[key], role + ':held-application')
+        if not item['new_destination_absent']: select(item['before_archive'], role + ':held-before')
+    for family, key in [('Source_ranges', 'literal_archive'), ('Source_context_ranges', 'literal_archive'), ('literal_Source_ranges', 'literal_archive'), ('Original_helper_ranges', 'literal_archive'), ('Original_provider_entry_ranges', 'archive'), ('Original_owner_ranges', 'literal_archive'), ('selected_source_ranges', 'archive')]:
+        for item in value.get(family, []): select(item[key], role + ':literal-range')
+    for family in ['source_correspondence', 'incremental_correspondence', 'prior_incremental_correspondence', 'inherited_source_correspondence', 'previous_source_correspondence', 'narrow_source_correspondence', 'previous_narrow_source_correspondence']:
+        items = value.get(family, [])
+        if isinstance(items, dict):
+            need(set(items) == {'before', 'proposal', 'exact_diff'}, 'exact single Source correspondence shape required')
+            items = [items]
+        need(isinstance(items, list) and all(isinstance(item, dict) for item in items), 'Source correspondence entries must be objects')
+        for item in items:
+            for key in ['before', 'before_proposal', 'before_archive', 'proposal', 'exact_diff']:
+                if isinstance(item.get(key), dict) and {'path', 'sha256'} <= set(item[key]): select(item[key], role + ':exact-Source-correspondence')
+    return value
+
+
+def application(row, workflow, source):
+    value = load(row); select(row, 'actual-ten-path-application'); same(value['Source_preparation'], workflow)
+    need(value['schema'] == 'src06-ordinary-geometry-actual-application.v1' and len(value['application']) == len({r['canonical_path'] for r in value['application']}) == 10, 'actual ten unique geometry application rows required')
+    same(value['source_final'], source)
+    for key in ['source_before', 'source_literal', 'source_final']: snapshot(value[key], current=key == 'source_final')
+    for item in value['application']:
+        for key in ['proposal', 'exact_diff', 'actual_before_archive', 'actual_literal_archive', 'actual_final_archive', 'actual_semantic_diff', 'actual_formatter_diff']: select(item[key], 'complete-ten-path-literal-format-correspondence')
+        if not item['new_destination_absent']: select(item['before_archive'], 'held-existing-Source-before')
+        select(item['actual_final'], 'actual-current-geometry-Source')
+    receipt(value['actual_formatter_execution'], 'actual-format-and-full-logs', value['source_literal'], argv=['cargo', 'fmt', '--all'], stable=value['source_literal'] == source)
+    return value
+
+
+def converter(context, comparer):
+    proof = context['conversion_proof_bindings']; need(len(proof) == 6, 'complete input-only conversion proof required')
+    ledger, child = load(proof[0]), load(proof[2]); outer = receipt(proof[1], 'historical-input-only-converter', recorder=comparer['historical_conversion_recorder_Source'])
+    need(load(outer['stdout']) == ledger and child['schema'] == 'sch01-input-conversion-command.v1' and child['exit_code'] == 0 and child['launch_error'] is None and child['finished_utc'] is not None, 'authentic closed input-only conversion required')
+    need(outer['started_utc'] <= child['started_utc'] <= child['finished_utc'] <= outer['finished_utc'] and all(child[k] is False for k in ['numerical_engine_executed', 'Native_scientific_outputs_used_as_inputs', 'expected_answers_supplied']), 'actual conversion chronology/input-only role differs')
+    for key, expected in zip(['stdout', 'stderr'], proof[4:]):
+        same(child[key], expected); need(child[key] in child['actual_output_inventory'], 'closed child log inventory differs'); CONVERTER_LOGS[checked(expected)] = full(checked(expected))
+    for item in proof + child['actual_output_inventory'] + [context['input'], context['epjson_input'], context['Native_input_request']]: select(item, 'complete-input-only-conversion')
+    for item in ledger['executed_runner_sources']: select(item['archive'], 'authentic-historical-conversion-Source')
+    provenance(child['converter'], 'historical-converter-executable-hash-only')
+
+
+def native_evidence(release_ref, expected_source):
+    release = load(release_ref); select(release_ref, 'released-genuine-Native04-baseline')
+    need(release['schema'] == 'ordinary-geometry-Native-baseline-acceptance.v1' and release['accepted'] is True and release['complete_input_owner_prefix_and_custody_review_accepted'] is True and release['all_thirteen_actual_loader_calls_returned'] is True and release['whole_geometry_or_ordinary_PASS_claimed'] is False and release['gates_updated'] is False, 'strict released Native geometry baseline required')
+    same(release['Native_Source_preparation'], expected_source)
+    native = receipt(release['actual_Native_execution'], 'complete-Native-capture-stdio', release['Source_snapshot']); guard = load(release['actual_custody']); before = load(release['actual_before'])
+    need(guard['schema'] == 'ordinary-geometry-execution-custody.v1' and guard['actual_target_exit_code'] == guard['actual_recorder_exit_code'] == 0 and guard['all_frozen_artifacts_unchanged'] is True, 'strict actual Native capture closure required')
+    same(guard['actual_before'], release['actual_before']); same(guard['actual_command_receipt'], release['actual_Native_execution']); same(guard['actual_authoritative_result'], release['actual_authoritative_result'])
+    same(before['Source_snapshot'], release['Source_snapshot']); same(before['Source_preparation'], expected_source)
+    for key in ['actual_input', 'literal_IDF', 'actual_case_metadata']: select(before[key], 'complete-Native-literal-input-only-owners')
+    for key in ['actual_custody', 'actual_before', 'actual_authoritative_result', 'release_Source']: select(release[key], 'complete-Native-capture-or-release-proof')
+    for key in ['Root_factual_review', 'independent_FULL_factual_review']:
+        review = load(release[key]); need(review['schema'] == 'ordinary-geometry-Native-factual-review.v1' and review['accepted'] is True and review['baseline_releasable'] is True and review['gates_updated'] is False, 'all-Total-counters-zero/noErrors Native factual release required')
+        same(review['actual_custody'], release['actual_custody']); same(review['Source_snapshot'], release['Source_snapshot']); select(release[key], 'strict-Native-factual-release-review')
+    receipt(release['actual_outer_capture_execution'], 'actual-Native-outer-launch', release['Source_snapshot'])
+    for row in guard['produced_loader_files_full_SHA_inventory']: select(row, 'complete-Native-result-and-fourteen-diagnostic-files')
+    snapshot(release['Source_snapshot']); snapshot(before['build_Source_snapshot'])
+    approval = load(release['actual_provider_acceptance']); select(release['actual_provider_acceptance'], 'actual-sixteen-provider-Root-acceptance')
+    need(approval['accepted'] is True and all(approval[k] is True for k in ['all_sixteen_Original_providers_accepted', 'full_PE_and_core_proof_accepted', 'dry_and_actual_compile_link_commands_byte_exact']), 'actual sixteen-provider/PE/core proof required')
+    provider = load(approval['provider_inventory']); select(approval['provider_inventory'], 'complete-address-bound-provider-inventory')
+    for key in ['Root_factual_review', 'independent_FULL_factual_review', 'release_Source', 'actual_evidence_collector']: select(approval[key], 'actual-provider-proof')
+    provider_facts = [load(approval[k]) for k in ['Root_factual_review', 'independent_FULL_factual_review']]
+    for value in provider_facts:
+        need(value['accepted'] is True and value['gates_updated'] is False, 'both complete actual Native provider factual reviews required'); same(value['actual_inventory'], approval['provider_inventory'])
+        receipt(value['actual_collection_execution'], 'actual-provider-collector-outer-and-full-logs', provider['Source_snapshot'])
+    source_preparation(approval['provider_collection_preparation'], 'accepted-provider-Source'); source_preparation(approval['reviewed_execution_Source_preparation'], 'accepted-capture-Source')
+    for key in ['actual_Native_binary', 'actual_full_link_map', 'actual_helper_object']: provenance(approval[key], 'large-Native-payload-proof-only:' + key, current=True)
+    for key in ['frozen_build_inputs', 'configure_review', 'selected_provider_map_lines', 'actual_PE_reader']: select(provider[key], 'actual-Native-build-provider-proof')
+    configure, frozen = load(provider['configure_review']), load(provider['frozen_build_inputs'])
+    for key in ['configure_execution', 'dry_execution', 'actual_core_before', 'actual_core_after']: receipt(configure[key], 'actual-configure-dry-core-and-complete-logs', provider['Source_snapshot'])
+    for key in ['actual_graph_before', 'actual_graph_after', 'actual_cache_before', 'actual_cache_after', 'actual_cache_diff']: select(configure[key], 'actual-generated-build-metadata-history')
+    for key in ['actual_build_ninja_before', 'actual_additive_wrapper', 'inherited_actual_wrapper', 'generated_BUILD_metadata_restoration', 'prior_generated_BUILD_metadata_restoration', 'retained_successful_v3_configure_review', 'retained_successful_v3_provider_inventory']: select(frozen[key], 'bounded-inherited-build-provenance')
+    for key in ['retained_successful_v3_compile_execution', 'retained_failed_geometry_compile_execution']: receipt(frozen[key], 'retained-closed-geometry-build-attempt', allowed=(0, 1))
+    PROVENANCE.append(dict(reason='historical BUILD Source aliases authenticated by full provider reviews, never rebound to current Rust Source', inherited_historical_BUILD_Source_aliases=frozen['inherited_historical_BUILD_Source_aliases'], prior_nested_historical_BUILD_Source_aliases=frozen['prior_nested_historical_BUILD_Source_aliases'], payload_published=False, current_Source_alias_equality_claimed=False))
+    source_preparation(provider['configure_preparation'], 'accepted-Native-configure-Source')
+    for key in ['actual_build_execution', 'actual_post_build_core_execution', 'actual_addr2line_execution']: receipt(provider[key], 'actual-Native-build-or-provider-command', provider['Source_snapshot'])
+    for row in provider['actual_disassembly_executions']: receipt(row, 'complete-uncapped-provider-disassembly', provider['Source_snapshot'])
+    # No native geometry/scalar result is parsed here; both factual reviews enforce the frozen release rule.
+    return release, native
+
+
+def main():
+    global PREP
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ['source-preparation', 'packet']: parser.add_argument('--' + name, required=True)
+    args = parser.parse_args()
+    def operand(token):
+        name, sha = token.rsplit('#', 1); return full(checked(dict(path=name, sha256=sha)))
+    prep_ref, packet_ref = operand(args.source_preparation), operand(args.packet); PREP, packet = load(prep_ref), load(packet_ref)
+    need(PREP['schema'] == 'src06-ordinary-geometry-publication-Source-preparation.v1' and checked(PREP['runtime_interfaces']['publisher']) == Path(__file__).resolve(), 'reviewed finite publisher Source required')
+    keys = ['workflow_Source_preparation', 'comparer_Source_preparation', 'Root_comparer_Source_review', 'independent_comparer_Source_review', 'Native_baseline_acceptance', 'actual_build_record', 'actual_Rust_capture_custody', 'actual_Rust_launch_execution', 'Root_Rust_factual_review', 'independent_Rust_factual_review', 'actual_comparison_transport', 'actual_comparison', 'actual_comparison_execution', 'Root_comparison_factual_review', 'independent_comparison_factual_review']
+    need(packet['schema'] == 'src06-ordinary-geometry-publication-inputs.v1' and set(packet) == set(keys) | {'schema'}, 'exact dynamic closed publication packet required')
+    for row in [prep_ref, packet_ref] + PREP['own_sources'] + PREP['fixed_evidence']: select(row, 'finite-held-Source-or-historical-evidence')
+    for row in PREP['historical_Source_preparations']: source_preparation(row, 'retained-historical-Source-preparation')
+    comparer = source_preparation(packet['comparer_Source_preparation'], 'accepted-current-comparer'); workflow = source_preparation(packet['workflow_Source_preparation'], 'accepted-final-workflow')
+    need(comparer['schema'] == 'src06-ordinary-geometry-comparison-Source-preparation.v1' and workflow['schema'] == 'src06-ordinary-geometry-workflow-Source-preparation.v1' and workflow['application_authority_supplied'] is True, 'reviewed final scientific Sources required')
+    for key in ['geometry_Source_preparation', 'observer_Source_preparation']: same(workflow[key], PREP[key]); same(comparer[key], PREP[key]); source_preparation(PREP[key], 'accepted-geometry-or-observer-Source')
+    same(comparer['Native_Source_preparation'], PREP['Native_Source_preparation']); source_preparation(PREP['Native_Source_preparation'], 'genuine-Native04-Source')
+    same(comparer['prospective_policy'], PREP['prospective_policy']); select(PREP['prospective_policy'], 'unchanged-prospective-scientific-policy')
+    for key in ['Root_comparer_Source_review', 'independent_comparer_Source_review']:
+        review = load(packet[key]); need(review['accepted'] is True, 'both actual comparer Source acceptances required'); same(review['reviewed_Source_preparation'], packet['comparer_Source_preparation'])
+    for key in ['shared_custody_Source', 'CLI_validation_Source']: select(workflow[key], 'reviewed-workflow-helper')
+    release, native = native_evidence(packet['Native_baseline_acceptance'], PREP['Native_Source_preparation']); same(workflow['Native_baseline_acceptance'], packet['Native_baseline_acceptance'])
+    same(packet['workflow_Source_preparation'], PREP['workflow_Source_preparation']); same(packet['comparer_Source_preparation'], PREP['comparer_Source_preparation'])
+    application_authority = workflow['actual_application_Source_preparation']; same(application_authority, PREP['actual_application_Source_preparation'])
+    source_preparation(application_authority, 'historical-actual-application-build-capture-workflow02')
+    build, guard = load(packet['actual_build_record']), load(packet['actual_Rust_capture_custody']); source = build['Source_snapshot']
+    need(build['schema'] == 'src06-ordinary-geometry-actual-quality-and-artifact.v1' and guard['schema'] == 'src06-ordinary-geometry-actual-Rust-capture-custody.v1', 'closed actual Rust producer schemas required')
+    same(build['Source_preparation'], application_authority); same(guard['Source_preparation'], application_authority); same(guard['actual_build_record'], packet['actual_build_record'])
+    for key in ['actual_application', 'actual_formatter_review', 'Source_snapshot', 'Native_baseline_acceptance']: same(build[key], guard[key])
+    app = application(build['actual_application'], application_authority, source); formatter = load(build['actual_formatter_review']); select(build['actual_formatter_review'], 'both-full-formatter-acceptance')
+    need(formatter['Root_FULL_formatter_correspondence_accepted'] is True and formatter['independent_FULL_formatter_correspondence_accepted'] is True, 'both actual full formatter acceptances required'); same(formatter['actual_application'], build['actual_application']); same(formatter['Source_snapshot'], source)
+    for key in ['Root_factual_review', 'independent_factual_review']: select(formatter[key], 'actual-formatter-review')
+    runtime = load(app['runtime_source_bindings']); select(app['runtime_source_bindings'], 'actual-runtime-Source-packet'); same(build['runtime_source_bindings'], app['runtime_source_bindings']); observer = load(PREP['observer_Source_preparation'])
+    for field, order in [('observer_sources', 'ordered_observer_source_paths'), ('actual_public_API_sources', 'ordered_public_API_source_paths')]:
+        need([r['path'] for r in runtime[field]] == observer['runtime_interfaces'][order], 'actual complete ordered3+28 runtime Source binding differs')
+        for row in runtime[field]: select(row, 'actual-runtime-Source:' + field)
+    quality, totals = {}, {}; need(set(build['quality_executions']) == set(comparer['runtime_interfaces']['required_quality_commands']), 'all four actual quality roles required')
+    for role, command in comparer['runtime_interfaces']['required_quality_commands'].items():
+        value = receipt(build['quality_executions'][role], 'actual-quality:' + role, source, argv=command); quality[role] = value
+        need(load(app['actual_formatter_execution'])['finished_utc'] <= value['started_utc'], 'quality must follow format')
+        if role in ['focused', 'workspace']:
+            groups = [tuple(map(int, r)) for r in re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored;', checked(value['stdout']).read_text(encoding='utf8'))]
+            need(groups and all(r[1] == 0 for r in groups), 'full genuine zero-failure test groups required'); totals[role] = dict(groups=len(groups), passed=sum(r[0] for r in groups), failed=sum(r[1] for r in groups), ignored=sum(r[2] for r in groups))
+    need(totals == build['actual_test_totals'], 'actual derived test totals differ')
+    artifact = build['actual_Cargo_artifact']; cargo = receipt(artifact['actual_build_execution'], 'actual-sole-Cargo-example-and-full-JSON', source, argv=comparer['runtime_interfaces']['required_Cargo_build_command']); same(cargo['stdout'], artifact['actual_full_Cargo_JSON']); need(all(v['finished_utc'] <= cargo['started_utc'] for v in quality.values()), 'actual quality/build chronology differs')
+    approval = load(guard['actual_Root_artifact_acceptance']); select(guard['actual_Root_artifact_acceptance'], 'actual-Rust-Cargo-PE-acceptance'); need(approval['schema'] == 'src06-ordinary-geometry-Root-artifact-acceptance.v1' and approval['accepted'] is True and approval['Root_FULL_PE_and_Cargo_artifact_accepted'] is True and approval['gates_updated'] is False, 'genuine Root Cargo/PE acceptance required')
+    same(approval['actual_build_record'], packet['actual_build_record']); same(approval['Source_snapshot'], source); same(approval['actual_executable'], artifact['executable']); provenance(artifact['executable'], 'actual-Rust-executable-hash-only', current=True); select(artifact['PE_inspection']['actual_PE_header_bytes'], 'complete-raw-Rust-PE-headers')
+    actual = receipt(guard['actual_execution'], 'complete-actual-Rust-result-and-stdio', source, (0, 2)); launch = receipt(packet['actual_Rust_launch_execution'], 'closed-Rust-outer-launch', source, (actual['exit_code'],)); same(actual['stdout'], guard['actual_complete_stdout']); same(actual['stderr'], guard['actual_complete_stderr'])
+    need(cargo['finished_utc'] <= actual['started_utc'] and launch['started_utc'] <= actual['started_utc'] <= actual['finished_utc'] <= launch['finished_utc'], 'actual capture chronology differs')
+    request = load(guard['actual_request']); select(guard['actual_request'], 'actual-input-only-request'); same(request['pairing_policy'], PREP['prospective_policy']); same(request['runtime_source_bindings'], app['runtime_source_bindings'])
+    need(actual['command'] == [str(checked(artifact['executable'])), str(checked(guard['actual_request'])), guard['actual_request']['sha256']] and actual['exit_code'] == guard['actual_exit_code'], 'actual Rust argc3/outcome differs')
+    context = load(request['input_context']); converter(context, comparer); select(request['input_context'], 'input-only-context'); select(comparer['input_identity_ledger'], 'fixed-input-identity-ledger')
+    for row in [build['pair_policy'], build['frozen_pair_policy']]: need(checked(row).read_bytes() == checked(PREP['prospective_policy']).read_bytes(), 'before-run policy differs'); select(row, 'frozen-before-run-policy')
+    for key in ['Root_Rust_factual_review', 'independent_Rust_factual_review']:
+        review = load(packet[key]); need(review['schema'] == 'src06-ordinary-geometry-Rust-factual-review.v1' and review['accepted'] is True and review['gates_updated'] is False, 'both full actual Rust factual reviews required'); same(review['actual_custody'], packet['actual_Rust_capture_custody']); same(review['Source_snapshot'], source)
+    transport, report = load(packet['actual_comparison_transport']), load(packet['actual_comparison']); need(transport['schema'] == 'src06-ordinary-geometry-actual-comparison-transport.v1' and report['schema'] == 'src06-ordinary-geometry-selected-comparison.v1', 'actual comparison producer schemas differ')
+    same(transport['actual_comparer'], packet['comparer_Source_preparation']); same(transport['actual_execution'], packet['actual_comparison_execution']); same(transport['Source_snapshot'], source); same(transport['actual_custody'], report['actual_custody']); same(report['reviewed_Source_preparation'], packet['comparer_Source_preparation'])
+    comparison_packet = load(report['actual_custody']); select(report['actual_custody'], 'actual-comparison-custody')
+    for left, right in [('Rust_execution_custody', 'actual_Rust_capture_custody'), ('Root_Rust_factual_review', 'Root_Rust_factual_review'), ('independent_Rust_factual_review', 'independent_Rust_factual_review'), ('Native_baseline_acceptance', 'Native_baseline_acceptance')]: same(comparison_packet[left], packet[right])
+    same(comparison_packet['Source_snapshot'], source); same(comparison_packet['actual_application'], build['actual_application']); same(report['prospective_policy'], PREP['prospective_policy'])
+    status_exit = {'integrity-failed': 2, 'failed-selected-ordinary-geometry': 1, 'pass-available-selected-ordinary-geometry-only': 0}; need(report['status'] in status_exit and report['all_differences_retained_without_cap'] is True and all(report[k] is False for k in ['Native_and_Rust_intermediate_checkpoint_pairing_claimed', 'all_unavailable_counted_as_PASS', 'whole_geometry_PASS_claimed', 'whole_SetupZoneGeometry_PASS_claimed', 'ordinary_convection_or_cadence_PASS_claimed', 'gates_updated']), 'honest bounded actual scientific status required')
+    argv = ['python', '-X', 'utf8', '-B', str(checked(comparer['runtime_interfaces']['comparer'])), '--source-preparation', str(checked(packet['comparer_Source_preparation'])) + '#' + packet['comparer_Source_preparation']['sha256'], '--custody', str(checked(report['actual_custody'])) + '#' + report['actual_custody']['sha256'], '--output-dir', str(checked(packet['actual_comparison']).parent)]
+    comparison = receipt(packet['actual_comparison_execution'], 'closed-comparison-and-complete-stdio', source, (status_exit[report['status']],), argv=argv); emitted = load(comparison['stdout']); same(emitted['comparison'], packet['actual_comparison']); need(emitted['actual_exit_code'] == comparison['exit_code'] == transport['actual_exit_code'], 'actual comparison transport/status differs')
+    need(comparison['finished_utc'] >= actual['finished_utc'] and set(report['ledgers']) == {'mismatches', 'unavailable', 'paired_owners'}, 'all three complete uncapped ledgers required')
+    facts = []
+    for key in ['Root_comparison_factual_review', 'independent_comparison_factual_review']:
+        review = load(packet[key]); need(review['schema'] == 'src06-ordinary-geometry-comparison-factual-review.v1' and review['accepted'] is True and review['gates_updated'] is False, 'both actual full comparison factual reviews required')
+        for field, expected in [('actual_comparison', packet['actual_comparison']), ('actual_execution', packet['actual_comparison_execution']), ('actual_custody', report['actual_custody']), ('Source_snapshot', source)]: same(review[field], expected)
+        for field in ['counts', 'mismatch_count', 'required_unavailable_count', 'optional_unpaired_count']: need(review[field] == report[field], 'actual independent comparison counts differ')
+        need(set(review['ledger_facts']) == set(report['ledgers']), 'all three independent full decoded ledger witnesses required'); facts.append(review['ledger_facts'])
+    need(facts[0] == facts[1], 'independent decoded ledger witnesses differ')
+    for name, row in report['ledgers'].items():
+        need(all(facts[0][name][key] == row[key] for key in ['rows', 'decoded_bytes', 'decoded_sha256']), 'full decoded ledger witness differs'); select(row['artifact'], 'complete-opaque-gzip-ledger:' + name)
+    need(report['ledgers']['mismatches']['rows'] == report['mismatch_count'] and report['ledgers']['unavailable']['rows'] == report['required_unavailable_count'] + report['optional_unpaired_count'], 'uncapped ledger/count arithmetic differs')
+    for key in keys: select(packet[key], 'actual-runtime:' + key)
+    for row in PREP['retained_closed_failures']: receipt(row, 'retained-historical-failed-command', allowed=(1, 2, 101))
+    for path, (sha, size) in SEEN.items(): need(digest(path) == sha and path.stat().st_size == size, 'authenticated bytes changed before storage')
+    need(not OUT.exists(), 'fresh combined canonical evidence directory required'); objects = OUT / 'objects/raw'; objects.mkdir(parents=True); rows = []
+    for path in sorted(ROLES):
+        original = full(path); target = objects / original['sha256']
+        if not target.exists():
+            with path.open('rb') as stream, target.open('xb') as sink: shutil.copyfileobj(stream, sink, 1024 * 1024)
+        stored = full(target); need(stored['sha256'] == original['sha256'] and stored['size_bytes'] == original['size_bytes'], 'complete content-addressed raw storage differs'); rows.append(dict(historical_path=original['path'], original=original, stored=stored, storage='raw-byte-exact', roles=sorted(ROLES[path])))
+    for path, (sha, size) in SEEN.items(): need(digest(path) == sha and path.stat().st_size == size, 'authenticated bytes changed during storage')
+    def write(path, value):
+        with path.open('x', encoding='utf8', newline='\n') as stream: json.dump(value, stream, ensure_ascii=False, allow_nan=False, indent=2); stream.write('\n')
+    archive = dict(schema='src06-ordinary-geometry-selected-archive.v1', objects=rows, all_selected_bytes_stored_exact=True, recursive_ancestry_collected=False, whole_Source_snapshot_payloads_published=False, executable_map_object_library_payloads_published=False); write(OUT / 'manifest.json', archive)
+    summary = dict(schema='src06-ordinary-geometry-evidence.v1', status=report['status'], actual_packet=packet_ref, actual_comparison=packet['actual_comparison'], actual_execution=packet['actual_comparison_execution'], actual_Source_snapshot=source, actual_test_totals=totals, actual_comparison_counts={k: report[k] for k in ['counts', 'mismatch_count', 'required_unavailable_count', 'optional_unpaired_count']}, full_gzip_ledgers=report['ledgers'], independent_decoded_ledger_facts=facts[0], Native_baseline_acceptance=packet['Native_baseline_acceptance'], selected_archive=full(OUT / 'manifest.json'), provenance_only=PROVENANCE, selected_closure_transitively_replayable=False, geometry_results_or_gzip_values_parsed_by_publisher=False, scientific_outcome_copied_from_actual_comparer=True, publisher_storage_success_is_not_scientific_PASS=True, whole_geometry_or_ordinary_PASS_claimed=False, gates_updated=False); write(OUT / 'summary.json', summary)
+    print(json.dumps(dict(summary=full(OUT / 'summary.json'), manifest=full(OUT / 'manifest.json'), status=report['status'], selected_rows=len(rows), stored_objects=len(list(objects.iterdir()))))); return 0
+
+
+if __name__ == '__main__': sys.exit(main())

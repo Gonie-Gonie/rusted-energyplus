@@ -1,0 +1,55 @@
+--- .runtime/porting/SRC-06/ordinary-geometry-native-prep-03/before-02/request.proposed.json
++++ .runtime/porting/SRC-06/ordinary-geometry-native-prep-03/request.proposed.json
+@@ -235,39 +235,39 @@
+   ],
+   "native_source_files": [
+     {
+-      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-02/geometry_loader_helper.cpp",
++      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-03/geometry_loader_helper.cpp",
+       "sha256": "ec30082bc4e7046acf155ca3579aace26ab2b399de888746129f52042193c050",
+       "size_bytes": 16750,
+       "line_count": 200
+     },
+     {
+-      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-02/geometry_loader_fields.hh",
++      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-03/geometry_loader_fields.hh",
+       "sha256": "d7f1c38cbc1c13cf1e138ac6cfb07ffac24626157847ab844e3fb026603ae536",
+       "size_bytes": 7973,
+       "line_count": 106
+     },
+     {
+-      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-02/ctf01_reference_metadata.hh",
++      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-03/ctf01_reference_metadata.hh",
+       "sha256": "6332546299553c1c8f4d0de36676067decf6921c7e3e27ebc7bd2d6ca6f0dee9",
+       "size_bytes": 7434,
+       "line_count": 147
+     },
+     {
+-      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-02/geo02_reference_fields.hh",
+-      "sha256": "1bdfa041a6b4e6371b512b13263ae67dd2a62cd068105cf6d739451a556db410",
+-      "size_bytes": 6611,
+-      "line_count": 123
+-    },
+-    {
+-      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-02/geo03_reference_fields.hh",
++      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-03/geo02_reference_fields.hh",
++      "sha256": "eddfe567a1bfeb9c946974d2c2a175faec47fd76666dcfc40cfa2085023d6629",
++      "size_bytes": 6669,
++      "line_count": 124
++    },
++    {
++      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-03/geo03_reference_fields.hh",
+       "sha256": "eac5857f1fc971911513851472694fc5d46c981c737d29ad17ed20343a09c113",
+       "size_bytes": 6161,
+       "line_count": 106
+     },
+     {
+-      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-02/geometry_loader.cmake",
+-      "sha256": "e903e9c396bc550ceb85612b9375291aa26acf5d812562d29310d88a23cdaa6c",
+-      "size_bytes": 1939,
++      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-03/geometry_loader.cmake",
++      "sha256": "722e01fd8eafebaacba5acf17782bf875bf171a0f82e37fdd935224404c27746",
++      "size_bytes": 2014,
+       "line_count": 28
+     }
+   ],

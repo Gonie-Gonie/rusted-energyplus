@@ -1,0 +1,37 @@
+--- .runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/proposed/crates/ep_runtime/src/geometry/inside_convection_owners.rs
++++ .runtime/porting/SRC-06/ordinary-geometry-owner-prep-02/proposed/crates/ep_runtime/src/geometry/inside_convection_owners.rs
+@@ -87,7 +87,13 @@
+     pub opaque_setup: Result<OpaqueGeometryOwners, GeometryOwnerUnavailable>,
+ }
+ 
+-fn distance(a: Point3, b: Point3) -> f64 {
++// SurfaceGeometry::distance reaches std::pow<double,int> then pow(double,double).
++// This differs from Vectors::VecLength used for the base Width and Height.
++fn perimeter_distance(a: Point3, b: Point3) -> f64 {
++    ((a.x_m - b.x_m).powf(2.0) + (a.y_m - b.y_m).powf(2.0) + (a.z_m - b.z_m).powf(2.0)).sqrt()
++}
++
++fn dimension_length(a: Point3, b: Point3) -> f64 {
+     let x = a.x_m - b.x_m;
+     let y = a.y_m - b.y_m;
+     let z = a.z_m - b.z_m;
+@@ -118,7 +124,7 @@
+     let mut perimeter = 0.0;
+     for index in 0..vertices.len() {
+         let next = if index + 1 == vertices.len() { 0 } else { index + 1 };
+-        let value = distance(vertices[index], vertices[next]);
++        let value = perimeter_distance(vertices[index], vertices[next]);
+         minimum_distance = source_min(minimum_distance, value);
+         perimeter += value;
+     }
+@@ -126,8 +132,8 @@
+     if minimum_distance < 0.01 {
+         return Err(GeometryOwnerUnavailable::CoincidentVertices(surface_id));
+     }
+-    let mut width = distance(vertices[2], vertices[1]);
+-    let mut height = distance(vertices[1], vertices[0]);
++    let mut width = dimension_length(vertices[2], vertices[1]);
++    let mut height = dimension_length(vertices[1], vertices[0]);
+     if vertices.len() > 4 && (height * width - actual_geometry.gross_area_m2).abs() > 0.001 {
+         width = actual_geometry.gross_area_m2.sqrt();
+         height = width;

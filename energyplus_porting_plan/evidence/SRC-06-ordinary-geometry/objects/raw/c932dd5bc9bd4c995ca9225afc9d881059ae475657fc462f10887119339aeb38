@@ -1,0 +1,238 @@
+"""Input identity and owner association joins only; no geometry equations."""
+import json
+import struct
+
+
+def key(value):
+    assert isinstance(value, str) and value and value.isascii()
+    assert value.strip()
+    return value.strip().lower()
+
+
+def unique(rows, name):
+    answer = {}
+    for row in rows:
+        identity = key(row[name])
+        assert identity not in answer, ('duplicate identity', name, identity)
+        answer[identity] = row
+    return answer
+
+
+def decode_raw(value):
+    kind = value['kind']
+    if kind == 'null':
+        assert set(value) == {'kind'}
+        return None
+    if kind in ('string', 'bool'):
+        assert set(value) == {'kind', 'value'}
+        assert type(value['value']) is (str if kind == 'string' else bool)
+        return value['value']
+    if kind == 'number':
+        assert set(value) == {'kind', 'lexical_value'} and isinstance(value['lexical_value'], str)
+        parsed = json.loads(value['lexical_value'], parse_constant=lambda text: (_ for _ in ()).throw(ValueError(text)))
+        assert type(parsed) in (int, float)
+        return parsed
+    if kind == 'array':
+        assert set(value) == {'kind', 'values'}
+        return [decode_raw(row) for row in value['values']]
+    assert kind == 'object' and set(value) == {'kind', 'fields'}
+    rows = value['fields']
+    assert [r['name'] for r in rows] == sorted({r['name'] for r in rows})
+    return {r['name']: decode_raw(r['value']) for r in rows}
+
+
+def conversion(C, context, manifest):
+    refs = context['conversion_proof_bindings']
+    C.need(len(refs) == 6, 'exact historical conversion proof closure required')
+    for row in refs: C.exact(row)
+    ledger, outer, child = (C.load(v) for v in refs[:3])
+    C.need(ledger['schema'] == 'sch01-converted-inputs.v1' and child['schema'] == 'sch01-input-conversion-command.v1', 'genuine input-only converter metadata required')
+    C.receipt(refs[1], manifest['historical_conversion_recorder_Source'])
+    C.need(C.load(outer['stdout']) == ledger, 'actual converter ledger/stdout differs')
+    cases = [v for v in ledger['conversions'] if v['case_id'] == 'A-24H']
+    C.need(len(cases) == 1 and cases[0]['available'] is True and cases[0]['status'] == 'actual-converted-input-available' and cases[0]['unavailable_reason'] is None, 'actual A24 conversion unavailable')
+    same_path = lambda a,b: C.exact(a).samefile(C.exact(b))
+    C.need(same_path(cases[0]['input'],context['input']) and same_path(cases[0]['epjson_input'],context['epjson_input']) and same_path(cases[0]['actual_conversion_execution'],refs[2]), 'ledger selected converter joins differ')
+    C.need(child['case_id'] == 'A-24H' and child['exit_code'] == 0 and child['launch_error'] is None and child['epjson_available'] is True and child['unavailable_reason'] is None and child['original_and_staged_IDF_preserved'] is True, 'actual selected converter success required')
+    C.need(same_path(child['source_input'],context['input']) and same_path(child['available_epjson_input'],context['epjson_input']) and same_path(child['staged_input'],refs[3]) and C.exact(child['source_input']).read_bytes() == C.exact(child['staged_input']).read_bytes(), 'original/staged/epJSON conversion bytes differ')
+    C.need(ledger['converter'] == child['converter'] and child['converter']['sha256'] == manifest['historical_converter_SHA256'], 'genuine converter identity differs')
+    converter = C.exact(child['converter']); cwd = (C.ROOT/child['cwd']).resolve()
+    C.need(len(child['command']) == 2 and (C.ROOT/child['command'][0]).resolve().samefile(converter) and child['command'][1] == 'input.idf' and (cwd/'input.idf').samefile(C.exact(refs[3])), 'actual converter argc/cwd differs')
+    C.need(outer['started_utc'] <= ledger['started_utc'] <= child['started_utc'] <= child['finished_utc'] <= ledger['finished_utc'] <= outer['finished_utc'], 'actual input-only conversion chronology differs')
+    C.need(len(outer['command']) == 13 and outer['command'][1:4] == ['-X','utf8','-B'] and outer['command'][5:7] == ['--approved-source-sha256',manifest['historical_conversion_runner_Source']['sha256']], 'actual historical converter runner argv differs')
+    C.need((C.ROOT/outer['command'][4]).resolve() == (C.ROOT/ledger['executed_runner_sources'][0]['historical_path']).resolve(), 'actual runner path differs')
+    C.need(outer['command'][7] == '--input-cases' and outer['command'][9] == '--converter' and outer['command'][11] == '--output-dir', 'actual converter options differ')
+    for token,row in [(outer['command'][8],ledger['input_cases']),(outer['command'][10],ledger['converter'])]:
+        name,digest=token.rsplit('#',1); C.need(digest == row['sha256'] and (C.ROOT/name).resolve().samefile(C.exact(row)), 'actual converter operand differs')
+    C.need((C.ROOT/outer['command'][12]).resolve() == C.exact(refs[0]).parent, 'actual converter output path differs')
+    declared = C.load(ledger['input_cases']); declared_case = [v for v in declared['model_cases'] if v['id'] == 'A-24H']
+    C.need(len(declared_case) == 1 and same_path(declared_case[0]['input'],context['input']), 'actual declared converter input differs')
+    C.need(C.exact(ledger['executed_runner_sources'][0]['archive']).read_bytes() == C.exact(manifest['historical_conversion_runner_Source']).read_bytes(), 'actual converter runner Source differs')
+    C.need(C.exact(ledger['executed_runner_sources'][1]['archive']).read_bytes() == C.exact(manifest['historical_conversion_support_Source']).read_bytes(), 'actual converter support Source differs')
+    for flag in ('scientific_execution_performed','Native_scientific_outputs_used_as_inputs','expected_values_supplied','expected_exits_supplied','gates_updated'): C.need(ledger[flag] is False, 'converter ledger scope changed')
+    for flag in ('numerical_engine_executed','Native_scientific_outputs_used_as_inputs','expected_answers_supplied'): C.need(child[flag] is False, 'converter child scope changed')
+    for name,row in [('stdout',refs[4]),('stderr',refs[5])]: C.need(same_path(child[name],row), 'actual child logs differ')
+    for row in child['actual_output_inventory']: C.exact(row)
+    C.need({str(C.exact(v)) for v in child['actual_output_inventory']} == {str(C.exact(v)) for v in [context['epjson_input'],*refs[3:]]}, 'complete actual converter output inventory differs')
+
+
+def clean_epjson(value):
+    # Literal ConvertInputFormat::cleanEPJSON: recurse into objects, never arrays.
+    if not isinstance(value, dict): return value
+    return {k:clean_epjson(v) for k,v in value.items() if k not in ('idf_order','idf_max_fields','idf_max_extensible_fields')}
+
+
+def joins(C, compare, native, rust, context, ledger):
+    """Require complete original input, actual converted Raw values and consumed associations."""
+    original = C.exact(context['input']).read_bytes()
+    converted = C.exact(context['epjson_input']).read_bytes()
+    C.need(original.decode('utf-8') == rust['complete_input']['original_IDF'], 'whole original IDF witness differs')
+    C.need(converted.decode('utf-8') == rust['complete_input']['converted_epJSON'], 'whole converted epJSON witness differs')
+    epjson = json.loads(converted)
+    compare(ledger['input'], context['input'], 'input-ledger/original-ref', 'input_join')
+    C.need(ledger['original_IDF_sha256'] == context['input']['sha256'] and ledger['converted_epJSON_sha256'] == context['epjson_input']['sha256'], 'frozen input identity ledger differs')
+    raw = rust['complete_input']['RawModel']
+    families = raw['families']
+    C.need([r['object_type'] for r in families] == sorted(epjson) and len(families) == len(epjson), 'complete actual Raw families required')
+    compare(raw['object_count'], sum(len(v) for v in epjson.values()), 'Raw/object_count', 'input_join')
+    compare(raw['object_type_counts'], {k: len(v) for k, v in epjson.items()}, 'Raw/family-counts', 'input_join')
+    compare(raw['version'], next(iter(epjson['Version'].values()))['version_identifier'], 'Raw/version', 'input_join')
+    declarations = ledger['effective_IDF_order']
+    for family in families:
+        kind = family['object_type']; rows = family['actual_ordered_instances']
+        expected = declarations.get(kind)
+        compare(family['has_IDF_declaration_order'], expected is not None, 'Raw/' + kind + '/has-order', 'input_join')
+        names = [r['name'] for r in rows]
+        compare(names, [v['name'] for v in expected] if expected is not None else sorted(epjson[kind]), 'Raw/' + kind + '/ordered-names', 'input_join')
+        C.need(set(names) == set(epjson[kind]) and len(names) == len(set(names)), 'Raw instance identities differ')
+        for index, row in enumerate(rows):
+            compare(row['vector_index'], index, 'Raw/' + kind + '/index/' + row['name'], 'input_join')
+            compare(row['source_span'], None, 'Raw/' + kind + '/epJSON-source-span/' + row['name'], 'input_join')
+            fields = row['fields']; C.need([v['name'] for v in fields] == sorted({v['name'] for v in fields}), 'Raw field order/uniqueness differs')
+            values = {v['name']: decode_raw(v['value']) for v in fields}
+            supplied = dict(epjson[kind][row['name']])
+            if kind in ledger['unnamed_report_families']:
+                supplied['idf_max_fields'] = next(v['max_fields'] for v in expected if v['name'] == row['name'])
+            compare(values, supplied, 'Raw/' + kind + '/' + row['name'] + '/complete-fields', 'input_join')
+    for family in ledger['excluded_families']:
+        C.need(family not in epjson and family not in raw['object_type_counts'], 'excluded geometry family is present')
+    C.need(len(epjson['GlobalGeometryRules']) == 1 and next(iter(epjson['GlobalGeometryRules'].values()))['coordinate_system'].lower() == 'world', 'this frozen input only supports actual World coordinates')
+    typed = rust['typed_geometry_inputs']; C.need(typed is not None, 'actual compiled typed geometry owners unavailable')
+    C.need(rust['actual_A_scope_preflight']['schema'] == 'porting-scope.v1' and rust['actual_A_scope_preflight']['scope'] == 'A' and rust['actual_A_scope_preflight']['admissible'] is True and rust['actual_A_scope_preflight']['violations'] == [], 'actual Scope A admission required')
+    compare(rust['actual_A_scope_preflight']['object_counts'], raw['object_type_counts'], 'actual-Scope-A/full-object-counts', 'input_join')
+    compare(rust['actual_compile_report']['raw_object_count'], raw['object_count'], 'actual-compiler/full-raw-count', 'input_join')
+    C.need(rust['actual_calls']['parse_epjson_with_IDF_order'] == rust['actual_calls']['compile_raw_model'] == 1, 'one real parser/compiler required')
+    for family, field in [('Zone', 'zones'), ('Construction', 'constructions')]:
+        compare([key(r['name']) for r in typed[field]], [key(v['name']) for v in declarations[family]], 'typed/' + family + '/source-order', 'input_join')
+    compare([key(r['name']) for r in typed['surfaces']], [key(v) for v in ledger['opaque_surface_group_order']], 'typed/surface/source-group-order', 'input_join')
+    def numeric(owner, supplied, path):
+        C.need(set(owner) == {'value','value_bits','value_class'}, 'complete actual typed scalar required')
+        compare(owner['value_bits'], struct.pack('>d',float(supplied)).hex(), path, 'input_join')
+    def auto(owner, supplied, path):
+        if isinstance(supplied,str) and supplied.lower() == 'autocalculate':
+            compare(owner, {'selector':'AutoCalculate','numeric_value':None}, path, 'input_join')
+        else:
+            compare(owner['selector'], 'Value', path+'/selector', 'input_join'); numeric(owner['numeric_value'],supplied,path+'/numeric-value')
+    zone_inputs={key(name):value for name,value in epjson['Zone'].items()}
+    for row in typed['zones']:
+        supplied=zone_inputs[key(row['name'])]
+        numeric(row['direction_of_relative_north_deg'], supplied.get('direction_of_relative_north',0), 'typed/zone/'+row['name']+'/north')
+        for index,axis in enumerate(('x','y','z')): numeric(row['origin'][index],supplied.get(axis+'_origin',0),'typed/zone/'+row['name']+'/'+axis+'-origin')
+        compare(row['zone_type'],supplied.get('type',1),'typed/zone/'+row['name']+'/type','input_join')
+        compare(row['multiplier'],supplied.get('multiplier',1),'typed/zone/'+row['name']+'/multiplier','input_join')
+        for field in ('ceiling_height','volume','floor_area'): auto(row[field],supplied.get(field,'Autocalculate'),'typed/zone/'+row['name']+'/'+field)
+    for field in ('zones', 'spaces', 'surfaces', 'constructions'):
+        rows = typed[field]; C.need(len({r['id'] for r in rows}) == len(rows), 'duplicate typed ID')
+        for index, row in enumerate(rows):
+            compare(row['vector_index'], index, 'typed/' + field + '/vector-index/' + row['name'], 'input_join')
+        unique(rows, 'name')
+    for row in typed['constructions']:
+        compare(row['kind'], 'Opaque', 'typed/construction/' + row['name'] + '/consumed-kind', 'input_join')
+    geometry = native.get('selected_geometry')
+    if geometry is None:
+        return None
+    zones, spaces, surfaces = (geometry[k] for k in ('zones', 'spaces', 'surfaces'))
+    nz, ns, nf = (unique(v, 'name') for v in (zones, spaces, surfaces))
+    nc = unique(geometry['constructions'], 'name')
+    rz, rs, rf, rc = (unique(typed[k], 'name') for k in ('zones', 'spaces', 'surfaces', 'constructions'))
+    compare(list(nz), list(rz), 'owner/zones/order', 'input_join')
+    compare(list(ns), list(rs), 'owner/spaces/order', 'input_join')
+    compare(list(nf), list(rf), 'owner/surfaces/order', 'input_join')
+    C.need(set(nz) == set(rz) and set(ns) == set(rs) and set(nf) == set(rf), 'actual Native/typed names unavailable or extra')
+    nzone_ids = {v['id']: k for k, v in nz.items()}; nspace_ids = {v['id']: k for k, v in ns.items()}; nconstruct_ids = {v['id']: k for k,v in nc.items()}
+    rzone_ids = {v['id']: k for k, v in rz.items()}; rspace_ids = {v['id']: k for k, v in rs.items()}; rconstruct_ids = {v['id']: k for k, v in rc.items()}
+    C.need(len(nzone_ids) == len(nz) and len(nspace_ids) == len(ns) and len({v['id'] for v in surfaces}) == len(surfaces), 'duplicate Native IDs')
+    class_map = {'Wall': 1, 'Floor': 2, 'Roof': 3}
+    compare(list(nc), list(rc), 'owner/constructions/source-order', 'input_join')
+    C.need(set(nc) == set(rc) and len(nconstruct_ids) == len(nc), 'actual Construction name/ID owner witness required')
+    compare(geometry['TotConstructs'], len(nc), 'owner/constructions/actual-count', 'input_join')
+    compare(geometry['construction_allocation'], {'container':'ObjexxFCL::Array1D','allocated':True,'size':len(nc),'lower':1,'upper':len(nc)}, 'owner/constructions/actual-Objexx-shape', 'input_join')
+    surface_inputs={key(name):value for name,value in epjson['BuildingSurface:Detailed'].items()}
+    for name, r in rf.items():
+        n = nf[name]; supplied = surface_inputs[name]
+        compare(rzone_ids[r['zone_id']], key(supplied['zone_name']), 'owner/' + name + '/typed-zone-input', 'input_join')
+        compare(nzone_ids[n['zone_id']], rzone_ids[r['zone_id']], 'owner/' + name + '/zone-association', 'input_join')
+        compare(nspace_ids[n['space_id']], rspace_ids[r['space_id']], 'owner/' + name + '/space-association', 'input_join')
+        compare(key(n['zone_name']), rzone_ids[r['zone_id']], 'owner/' + name + '/zone-name', 'input_join')
+        compare(r['class'].lower(), supplied['surface_type'].lower(), 'owner/' + name + '/typed-class-input', 'input_join')
+        compare(n['class'], class_map[r['class']], 'owner/' + name + '/class', 'input_join')
+        boundary = supplied['outside_boundary_condition']
+        C.need(boundary in ('Outdoors', 'Adiabatic') and supplied.get('outside_boundary_condition_object') is None, 'fixed A24 consumed boundary domain changed')
+        compare(r['outside_boundary_condition'], boundary, 'owner/' + name + '/typed-boundary-input', 'input_join')
+        compare(r['outside_boundary_condition_object'], None, 'owner/' + name + '/typed-boundary-object-input', 'input_join')
+        # Original Outdoors is ExternalEnvironment(0); Adiabatic reconciles to the actual same Surface ID.
+        compare(n['outside_boundary'], 0 if boundary == 'Outdoors' else n['id'], 'owner/' + name + '/actual-Native-boundary', 'input_join')
+        construction = rconstruct_ids[r['construction_id']]
+        compare(construction, key(supplied['construction_name']), 'owner/' + name + '/typed-construction-input', 'input_join')
+        compare(nconstruct_ids[n['construction_id']], construction, 'owner/' + name + '/actual-Native-construction-name', 'input_join')
+        C.need(n['geometry_values_observed'] is True and n['vertices_processed'] is True, 'actual processed Native vertex owner unavailable')
+        compare(n['sides'], len(r['vertices']), 'owner/' + name + '/vertex-width', 'input_join')
+        compare(n['vertex_allocation'], {'allocated': True, 'size': len(r['vertices']), 'lower': 1, 'upper': len(r['vertices'])}, 'owner/' + name + '/actual-vertex-allocation', 'input_join')
+        literal = [[struct.pack('>d', float(v['vertex_' + axis + '_coordinate'])).hex() for axis in ('x','y','z')] for v in supplied['vertices']]
+        compare([[v['value_bits'] for v in p] for p in r['vertices']], literal, 'owner/' + name + '/typed-complete-vertices', 'input_join')
+        compare(n['world_vertex_bits'], literal, 'owner/' + name + '/Native-complete-World-vertices', 'input_join')
+        compare(n['heat_transfer_surface'], True, 'owner/' + name + '/heat-transfer', 'input_join')
+        compare(n['air_boundary_surface'], False, 'owner/' + name + '/air-boundary', 'input_join')
+    for name, r in rs.items():
+        compare(nzone_ids[ns[name]['zone_id']], rzone_ids[r['zone_id']], 'owner/' + name + '/space-zone', 'input_join')
+    for name, r in rz.items():
+        compare([nspace_ids[v] for v in nz[name]['space_indexes']], [rspace_ids[v] for v in r['spaces']], 'owner/' + name + '/zone-space-order', 'input_join')
+        compare(nz[name]['num_spaces'], len(r['spaces']), 'owner/' + name + '/zone-space-width', 'input_join')
+    family_counts = geometry['actual_parsed_input_family_counts']
+    actual_raw = geometry['actual_parsed_input_epJSON']
+    # Original getObjectDefMaxArgs inserts these absent known-schema families via nonconst JSON[].
+    # They remain full copied metadata, never supplied input objects or selected geometry PASS.
+    null_families = {
+        'AirLoopHVAC:ReturnPath', 'AirLoopHVAC:SupplyPath', 'FenestrationSurface:Detailed',
+        'Floor:Detailed', 'NodeList', 'Output:Schedules', 'RoofCeiling:Detailed',
+        'Shading:Zone:Detailed', 'SpaceHVAC:EquipmentConnections',
+        'SurfaceProperty:ExteriorNaturalVentedCavity', 'Wall:Detailed',
+        'ZoneHVAC:EquipmentConnections', 'ZoneHVAC:EquipmentList',
+    }
+    C.need(not null_families.intersection(epjson), 'declared null-only families cannot become supplied input objects')
+    C.need(set(actual_raw) == set(family_counts) == set(epjson) | null_families, 'complete supplied and exact absent-null Native family closure differs')
+    for kind in sorted(null_families):
+        C.need(actual_raw[kind] is None and family_counts[kind] == {'actual_json_type':'null','actual_size':0}, 'absent Native family must retain actual JSON null and zero members')
+        C.UNAVAILABLE.append({'path':'Native-parser/absent-family-null/' + kind,
+            'reason':'Original lazy absent-family metadata; no supplied input object or geometry endpoint',
+            'required':False,'counted_as_PASS':False,
+            'details':{'actual_parsed_value':actual_raw[kind],'actual_family_counts':family_counts[kind],
+                       'actual_input_family_supplied':False,'measured_inner_creator_trace_claimed':False}})
+    for kind, rows in epjson.items():
+        compare(family_counts[kind], {'actual_json_type': 'object', 'actual_size': len(rows)}, 'Native-raw/' + kind, 'input_join')
+    cleaned = {}
+    for kind in epjson:
+        values = actual_raw[kind]
+        C.need(set(values) == set(epjson[kind]), 'actual Native parsed input instance names differ')
+        cleaned[kind] = {}
+        for name, value in values.items():
+            expected = next(r for r in ledger['complete_IDF_declarations'][kind] if r['name'] == name)
+            compare(value['idf_order'], expected['global_ordinal'], 'Native-raw/' + kind + '/' + name + '/actual-IDF-order', 'input_join')
+            for meta in ('idf_max_fields','idf_max_extensible_fields'):
+                C.need(type(value[meta]) is int and value[meta] >= 0, 'actual Native IDF field-count metadata unavailable')
+            # Exact genuine ConvertInputFormat::cleanEPJSON metadata projection, not numeric cleanup.
+            cleaned[kind][name] = clean_epjson(value)
+        compare([name for name,value in sorted(values.items(),key=lambda item:item[1]['idf_order'])], [v['name'] for v in ledger['complete_IDF_declarations'][kind]], 'Native-raw/' + kind + '/actual-effective-IDF-order', 'input_join')
+    compare(cleaned, epjson, 'Native-raw/complete-converted-value-correspondence', 'input_join')
+    return {'Native_zones': nz, 'Native_spaces': ns, 'Native_surfaces': nf,
+            'Rust_zones': rz, 'Rust_spaces': rs, 'Rust_surfaces': rf}

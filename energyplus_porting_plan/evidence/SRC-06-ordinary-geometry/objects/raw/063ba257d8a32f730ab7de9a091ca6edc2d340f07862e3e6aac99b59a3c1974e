@@ -1,0 +1,20 @@
+{
+  "schema": "src06-ordinary-geometry-observer-request.v1",
+  "input_context": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-observer-prep-01/fixed-input-context.json",
+    "sha256": "f9f645bd15fbd6cc96f584ea3d0b058ed0156da2f0bde8ffab56394835e8fa4e",
+    "size_bytes": 2287,
+    "line_count": 59
+  },
+  "runtime_source_bindings": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-applied-01/runtime-source-bindings.json",
+    "sha256": "6822986562f8e62c6b50a823f1c223e57cff55ddbbaf19751937e0e668b4287d",
+    "size_bytes": 5911
+  },
+  "pairing_policy": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-observer-prep-02/policy.proposed.json",
+    "sha256": "0bb48c5f93aea8393c8012f28ccfaa37c9e191e201f402a547156a8376092f6b",
+    "size_bytes": 4965,
+    "line_count": 115
+  }
+}

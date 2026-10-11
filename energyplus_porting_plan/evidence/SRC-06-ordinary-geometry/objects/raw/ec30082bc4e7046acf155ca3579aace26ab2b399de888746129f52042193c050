@@ -1,0 +1,200 @@
+// Genuine public loader sequence, followed only by read-only geometry copies.
+#include "geometry_loader_fields.hh"
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/Material.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <iostream>
+#include <limits>
+#include <memory>
+#include <optional>
+#include <set>
+#include <typeinfo>
+#include <utility>
+
+namespace GeometryLoader {
+using namespace Ctf01;
+template<class Function> json invoke(Function &&function)
+{
+    try { function(); return {{"status", "source_returned"}, {"exception_type", nullptr}, {"exception_message", nullptr}}; }
+    catch (EnergyPlus::FatalError const &error) { return {{"status", "source_fatal"}, {"exception_type", typeid(error).name()}, {"exception_message", error.what()}}; }
+    catch (std::exception const &error) { return {{"status", "source_exception"}, {"exception_type", typeid(error).name()}, {"exception_message", error.what()}}; }
+    catch (...) { return {{"status", "source_nonstandard_exception"}, {"exception_type", nullptr}, {"exception_message", nullptr}}; }
+}
+inline json loader_order()
+{
+    return {"InputProcessor::processInput", "SimulationManager::PostIPProcessing", "EnergyPlusData::init_constant_state", "EnergyPlusData::init_state",
+        "OutputReportPredefined::SetPredefinedTables", "HeatBalanceManager::SetPreConstructionInputParameters",
+        "OutputProcessor::SetupTimePointers(Zone)", "OutputProcessor::SetupTimePointers(System)", "HeatBalanceManager::GetProjectControlData",
+        "HeatBalanceManager::GetSiteAtmosphereData", "Material::GetMaterialData", "HeatBalanceManager::GetConstructData", "HeatBalanceManager::GetBuildingData"};
+}
+struct ConsoleCapture {
+    std::ostringstream text;
+    std::streambuf *previous;
+    ConsoleCapture() : previous(std::cout.rdbuf(text.rdbuf())) {}
+    ~ConsoleCapture() { std::cout.rdbuf(previous); }
+    ConsoleCapture(ConsoleCapture const &) = delete;
+    ConsoleCapture &operator=(ConsoleCapture const &) = delete;
+};
+struct Factory {
+    ConsoleCapture console;
+    std::unique_ptr<EnergyPlus::EnergyPlusData> state;
+    std::ostringstream *error_text = nullptr;
+    json constructor, callbacks = json::array();
+    std::size_t callback_count = 0, omitted_callback_records = 0;
+    bool stopped = false, integrity_failed = false;
+    std::string stop_reason;
+    void callback(char const *kind, std::optional<int> level, std::string const &message) noexcept
+    {
+        if (callback_count == std::numeric_limits<std::size_t>::max()) { integrity_failed = true; return; }
+        ++callback_count;
+        try { callbacks.push_back({{"ordinal", callback_count}, {"kind", kind}, {"level", level ? json(*level) : json(nullptr)}, {"message", message}}); }
+        catch (...) { integrity_failed = true; if (omitted_callback_records < std::numeric_limits<std::size_t>::max()) ++omitted_callback_records; }
+    }
+    Factory()
+    {
+        constructor = invoke([&] { state = std::make_unique<EnergyPlus::EnergyPlusData>(); });
+        stopped = constructor.at("status") != "source_returned";
+        if (stopped) { stop_reason = constructor.at("status").get<std::string>(); return; }
+        auto sink = std::make_unique<std::ostringstream>(); error_text = sink.get(); state->files.err_stream = std::move(sink);
+        for (auto *stream : {&state->files.audit, &state->files.eso, &state->files.eio, &state->files.mtr,
+            &state->files.bnd, &state->files.debug, &state->files.rdd, &state->files.mdd, &state->files.mtd,
+            &state->files.edd, &state->files.dfs, &state->files.shade}) stream->open_as_stringstream();
+        state->dataGlobal->errorCallback = [this](EnergyPlus::Error level, std::string const &message) { callback("errorCallback", static_cast<int>(level), message); };
+        state->dataGlobal->messageCallback = [this](std::string const &message) { callback("messageCallback", std::nullopt, message); };
+    }
+    ~Factory() { if (state) state->dataMaterial->clear_state(); }
+    json observed(bool input_errors)
+    {
+        if (!state) return {{"available", false}, {"reason", "EnergyPlusData_constructor_did_not_return"}, {"owners", nullptr}};
+        try { return {{"available", true}, {"reason", nullptr}, {"owners", counters(*state, input_errors)},
+            {"actual_error_prefix", error_text == nullptr ? json(nullptr) : json(error_text->str())},
+            {"actual_console_prefix", console.text.str()}, {"actual_EIO_prefix", state->files.eio.get_output()}, {"actual_callback_count", callback_count}}; }
+        catch (...) { integrity_failed = true; return {{"available", false}, {"reason", "read_only_prefix_copy_failed"}, {"owners", nullptr}}; }
+    }
+    void transport(fs::path const &input, fs::path const &output)
+    {
+        state->dataStrGlobals->inputFilePath = input; state->dataStrGlobals->outDirPath = output;
+        state->dataStrGlobals->outputPerfLogFilePath = output / "eplusout_perflog.csv"; state->files.outputErrFilePath = output / "eplusout.err";
+        state->files.sln.filePath = output / "eplusout.sln"; state->files.dxf.filePath = output / "eplusout.dxf";
+        state->files.sci.filePath = output / "eplusout.sci"; state->files.wrl.filePath = output / "eplusout.wrl"; state->files.endFile.filePath = output / "eplusout.end";
+        require(!state->dataGlobal->isEpJSON && state->dataGlobal->preserveIDFOrder && !state->dataGlobal->outputEpJSONConversion &&
+            !state->dataGlobal->outputEpJSONConversionOnly, "Real default raw-IDF/preserved-order/no-conversion context required");
+    }
+    template<class Function> void phase(json &ledger, char const *kind, bool &input_errors, Function &&function)
+    {
+        bool const called = !stopped; auto const before = observed(input_errors); auto const first = callback_count;
+        json outcome = {{"status", "source_not_invoked_due_to_unavailable_prerequisite"}, {"reason", stop_reason}};
+        if (called) {
+            outcome = invoke(std::forward<Function>(function));
+            if (outcome.at("status") != "source_returned") { stopped = true; stop_reason = outcome.at("status").get<std::string>(); }
+            else if (input_errors) { stopped = true; stop_reason = "actual_loader_ErrorsFound_true"; }
+        }
+        ledger.push_back({{"kind", kind}, {"actual_source_invoked", called}, {"call_outcome", outcome}, {"before", before},
+            {"after", observed(input_errors)}, {"callback_count_before", first}, {"callback_count_after", callback_count}});
+    }
+    json diagnostics(fs::path const &output)
+    {
+        json logs = json::object();
+        write_text(output / "console.txt", console.text.str()); logs["console"] = file_ref(output / "console.txt");
+        if (state && error_text != nullptr) {
+            write_text(output / "err.txt", error_text->str()); logs["err"] = file_ref(output / "err.txt");
+            for (auto const &[name, stream] : std::array<std::pair<char const *, EnergyPlus::InputOutputFile *>, 12>{{
+                {"audit", &state->files.audit}, {"eso", &state->files.eso}, {"eio", &state->files.eio}, {"mtr", &state->files.mtr},
+                {"bnd", &state->files.bnd}, {"debug", &state->files.debug}, {"rdd", &state->files.rdd}, {"mdd", &state->files.mdd},
+                {"mtd", &state->files.mtd}, {"edd", &state->files.edd}, {"dfs", &state->files.dfs}, {"shade", &state->files.shade}}}) {
+                auto const path = output / (std::string(name) + ".txt"); write_text(path, stream->get_output()); logs[name] = file_ref(path);
+            }
+        }
+        return {{"actual_files", logs}, {"callbacks", callbacks}, {"actual_callback_count", callback_count},
+            {"omitted_callback_records", omitted_callback_records}, {"callback_copy_integrity_failed", integrity_failed},
+            {"optional_SQLite_present", state ? json(state->dataSQLiteProcedures->sqlite != nullptr) : json(nullptr)},
+            {"SQLite_contents", nullptr}, {"SQLite_contents_role", "not_observed_or_reconstructed"}};
+    }
+};
+inline void admit(fs::path const &root, json const &request)
+{
+    require(request.at("schema") == "ordinary-geometry-public-loader-request.v1" &&
+        request.at("energyplus_commit") == "6f2e40d10250a105b49966baa24d843711e61048" &&
+        request.at("case").at("id") == "A-24H" && request.at("case").at("input").at("sha256") ==
+        "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755", "Exact fixed original A24 request required");
+    for (auto const *key : {"expected_values_supplied", "expected_exits_supplied", "Native_results_supplied", "scientific_execution_performed"})
+        require(request.at(key) == false, "Input-only request required");
+    require(request.at("loader_phase_order") == loader_order(), "Literal public loader order required");
+    auto const upstream = read_json(bound_path(root, request.at("inherited_input_only_request")));
+    require(request.at("inherited_input_only_request").at("sha256") == "19bc203662dff7bf3611e45bf1bd002c1ce7df5d5225d19a7cd7a098efe08443" &&
+        upstream.at("loader_phase_order") == loader_order(), "Inherited genuine loader sequence differs");
+    bool found = false;
+    for (auto const &row : upstream.at("model_cases")) if (row.at("id") == "A-24H") { require(row == request.at("case"), "Exact inherited input/caller row required"); found = true; }
+    require(found, "Inherited A24 input/caller row absent");
+    bound_path(root, request.at("case").at("input"));
+    auto const metadata = read_json(bound_path(root, request.at("case_metadata")));
+    bound_path(root, request.at("fixed_scope"));
+    require(request.at("fixed_scope") == upstream.at("fixed_scope") && metadata.at("id") == "A-24H" &&
+        metadata.at("input") == request.at("case").at("input"), "Actual inherited fixed scope/metadata/input association differs");
+    require(request.at("all_45_guard_refs") == upstream.at("all_45_guard_refs"), "Unchanged ordered45 fixed guards required");
+    for (auto const &row : request.at("all_45_guard_refs")) bound_path(root, row);
+    std::set<std::string> names;
+    for (auto const &row : request.at("native_source_files")) require(names.insert(bound_path(root, row).filename().string()).second, "Duplicate helper Source name");
+    require(names == std::set<std::string>{"geometry_loader_helper.cpp", "geometry_loader_fields.hh", "ctf01_reference_metadata.hh",
+        "geo02_reference_fields.hh", "geo03_reference_fields.hh", "geometry_loader.cmake"}, "Exact one-TU/copier/recipe Source closure required");
+}
+} // namespace GeometryLoader
+
+int main(int argc, char **argv)
+{
+    using namespace GeometryLoader;
+    try {
+        require(argc == 4, "Usage: helper repository-root request.json fresh-output-directory");
+        auto const root = fs::canonical(argv[1]), request_path = fs::canonical(argv[2]);
+        auto const request_relative = request_path.lexically_relative(root);
+        require(fs::current_path() == root && !request_relative.empty() && *request_relative.begin() != "..", "Actual repository cwd/contained request required");
+        auto const before_request = file_ref(request_path); auto const request = read_json(request_path); admit(root, request);
+        auto const output = fs::weakly_canonical(argv[3]); auto const relative = output.lexically_relative(root / ".runtime/porting/SRC-06");
+        require(!relative.empty() && *relative.begin() != ".." && output != root / ".runtime/porting/SRC-06" && !fs::exists(output), "Fresh contained SRC06 output required");
+        fs::create_directories(output); Factory factory; bool errors = false; json ledger = json::array();
+        if (!factory.stopped) factory.transport(bound_path(root, request.at("case").at("input")), output);
+        factory.phase(ledger, "InputProcessor::processInput", errors, [&] { factory.state->dataInputProcessing->inputProcessor->processInput(*factory.state); });
+        factory.phase(ledger, "SimulationManager::PostIPProcessing", errors, [&] { EnergyPlus::SimulationManager::PostIPProcessing(*factory.state); });
+        factory.phase(ledger, "EnergyPlusData::init_constant_state", errors, [&] { factory.state->init_constant_state(*factory.state); });
+        factory.phase(ledger, "EnergyPlusData::init_state", errors, [&] { factory.state->init_state(*factory.state); });
+        bool caller_matches = false;
+        if (!factory.stopped) {
+            auto const &caller = request.at("case").at("caller"); auto const &g = *factory.state->dataGlobal;
+            caller_matches = g.TimeStepsInHour == caller.at("TimeStepsInHour").get<int>() && g.MinutesInTimeStep == caller.at("MinutesInTimeStep").get<int>() &&
+                std::bit_cast<std::uint64_t>(g.TimeStepZone) == std::bit_cast<std::uint64_t>(input_real(caller.at("TimeStepZone"))) &&
+                std::bit_cast<std::uint64_t>(g.TimeStepZoneSec) == std::bit_cast<std::uint64_t>(input_real(caller.at("TimeStepZoneSec")));
+            if (!caller_matches) { factory.stopped = true; factory.stop_reason = "actual_Source_produced_timestep_differs_from_inherited_caller"; }
+        }
+        factory.phase(ledger, "OutputReportPredefined::SetPredefinedTables", errors, [&] { EnergyPlus::OutputReportPredefined::SetPredefinedTables(*factory.state); });
+        factory.phase(ledger, "HeatBalanceManager::SetPreConstructionInputParameters", errors, [&] { EnergyPlus::HeatBalanceManager::SetPreConstructionInputParameters(*factory.state); });
+        factory.phase(ledger, "OutputProcessor::SetupTimePointers(Zone)", errors, [&] { EnergyPlus::OutputProcessor::SetupTimePointers(*factory.state, EnergyPlus::OutputProcessor::TimeStepType::Zone, factory.state->dataGlobal->TimeStepZone); });
+        factory.phase(ledger, "OutputProcessor::SetupTimePointers(System)", errors, [&] { EnergyPlus::OutputProcessor::SetupTimePointers(*factory.state, EnergyPlus::OutputProcessor::TimeStepType::System, factory.state->dataHVACGlobal->TimeStepSys); });
+        factory.phase(ledger, "HeatBalanceManager::GetProjectControlData", errors, [&] { EnergyPlus::HeatBalanceManager::GetProjectControlData(*factory.state, errors); });
+        factory.phase(ledger, "HeatBalanceManager::GetSiteAtmosphereData", errors, [&] { EnergyPlus::HeatBalanceManager::GetSiteAtmosphereData(*factory.state, errors); });
+        factory.phase(ledger, "Material::GetMaterialData", errors, [&] { EnergyPlus::Material::GetMaterialData(*factory.state, errors); });
+        factory.phase(ledger, "HeatBalanceManager::GetConstructData", errors, [&] { EnergyPlus::HeatBalanceManager::GetConstructData(*factory.state, errors); });
+        factory.phase(ledger, "HeatBalanceManager::GetBuildingData", errors, [&] { EnergyPlus::HeatBalanceManager::GetBuildingData(*factory.state, errors); });
+        json geometry = nullptr; std::string copy_error;
+        if (!factory.stopped) {
+            try { geometry = returned_geometry(*factory.state); }
+            catch (std::exception const &error) { factory.integrity_failed = true; copy_error = error.what(); }
+            catch (...) { factory.integrity_failed = true; copy_error = "nonstandard_read_only_geometry_copy_failure"; }
+        }
+        auto const diagnostic = factory.diagnostics(output); auto const final_prefix = factory.observed(errors);
+        admit(root, request); require(file_ref(request_path) == before_request, "Request changed during genuine calls");
+        int const code = factory.integrity_failed ? 2 : 0;
+        json result = {{"schema", "ordinary-geometry-public-loader-results.v1"}, {"actual_request", before_request}, {"actual_binary", file_ref(fs::absolute(argv[0]))},
+            {"EnergyPlusData_constructor", factory.constructor}, {"lifecycle", ledger}, {"actual_loader_ready", !factory.stopped},
+            {"actual_caller_matches_source_timestep", caller_matches}, {"loader_stop_reason", factory.stop_reason},
+            {"selected_geometry_available", !geometry.is_null()}, {"geometry_copy_failure", copy_error}, {"selected_geometry", geometry},
+            {"diagnostics", diagnostic}, {"final_prefix_and_counters", final_prefix}, {"read_only_observer_integrity_failed", factory.integrity_failed},
+            {"actual_helper_exit_code", code}, {"CTF_Init_or_solver_invoked", false}, {"expected_values_read", false},
+            {"numerical_comparison_performed", false}, {"whole_SetupZoneGeometry_PASS_claimed", false}, {"gates_updated", false}};
+        write_text(output / "geometry-loader-results.json", result.dump() + "\n"); return code;
+    } catch (std::exception const &error) { std::cerr << error.what() << '\n'; return 1; }
+}

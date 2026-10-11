@@ -1,0 +1,10 @@
+
+    // This needs to get broken up too
+    struct ConstructionProps
+    {
+        // Members
+        std::string Name;  // Name of construction
+        int TotLayers = 0; // Total number of layers for the construction; for windows
+        //  this is the total of the glass, gas and shade layers
+        int TotSolidLayers = 0; // Total number of solid (glass or shade) layers (windows only)
+        int TotGlassLayers = 0; // Total number of glass layers (windows only)

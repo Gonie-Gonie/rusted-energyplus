@@ -1,0 +1,30 @@
+pub struct ZoneGeometryProperties {
+    /// Actual current Volume, including its original input sentinel before use.
+    pub volume_m3: f64,
+    /// Actual current CeilingHeight.
+    pub ceiling_height_m: f64,
+    /// Set only when height was positive before automatic height assignment.
+    pub ceiling_height_entered: bool,
+    /// Selected prepared Zone.FloorArea.
+    pub floor_area_m2: f64,
+    /// Original lexical floor-area input or AutoCalculate sentinel.
+    pub user_entered_floor_area_m2: f64,
+    /// Prepared geometric FloorArea.
+    pub geometric_floor_area_m2: f64,
+    /// Prepared CeilingArea.
+    pub ceiling_area_m2: f64,
+    /// Prepared geometric CeilingArea.
+    pub geometric_ceiling_area_m2: f64,
+    /// Actual presence of a selected floor.
+    pub has_floor: bool,
+    /// Actual presence of a selected roof/ceiling.
+    pub has_roof: bool,
+    /// Ordered independent Rust base faces used by this owner.
+    pub faces: Vec<ZoneVolumeFace>,
+    /// Selected original VectorsData constructor origin, never Zone.origin.
+    pub p0_m: Point3,
+    /// Actual owner observations and bounded admission result.
+    pub diagnostics: ZoneVolumeDiagnostics,
+    /// Number of actual completed invocations of this Rust volume owner.
+    pub volume_calculation_count: u32,
+}

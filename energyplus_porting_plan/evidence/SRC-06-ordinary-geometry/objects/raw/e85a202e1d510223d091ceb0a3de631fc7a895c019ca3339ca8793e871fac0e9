@@ -1,0 +1,129 @@
+{
+  "schema": "src06-geometry-generated-build-metadata-restoration.v2",
+  "files": [
+    {
+      "actual_before": {
+        "path": ".runtime/ep261-gcc13-o0/CMakeCache.txt",
+        "sha256": "e8ff9f52ee9325da83219a796cbd635a9ad7c3d54f79b1b3571319172a139e57",
+        "size_bytes": 66138
+      },
+      "actual_before_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-02/CMakeCache.txt.after",
+        "sha256": "e8ff9f52ee9325da83219a796cbd635a9ad7c3d54f79b1b3571319172a139e57",
+        "size_bytes": 66138
+      },
+      "restore_to_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-01/CMakeCache.txt.before",
+        "sha256": "ff0f7a23cb3dadc09599fdba3b89d3976640db42733017384d8bc7914838a986",
+        "size_bytes": 65130
+      },
+      "expected": {
+        "path": ".runtime/ep261-gcc13-o0/CMakeCache.txt",
+        "sha256": "ff0f7a23cb3dadc09599fdba3b89d3976640db42733017384d8bc7914838a986",
+        "size_bytes": 65130
+      },
+      "actual_after": {
+        "path": ".runtime/ep261-gcc13-o0/CMakeCache.txt",
+        "sha256": "ff0f7a23cb3dadc09599fdba3b89d3976640db42733017384d8bc7914838a986",
+        "size_bytes": 65130
+      }
+    },
+    {
+      "actual_before": {
+        "path": ".runtime/ep261-gcc13-o0/compile_commands.json",
+        "sha256": "7dd734c4e3db77462a1750cbf62dad963848443289c0353955567484f1fad877",
+        "size_bytes": 3985644
+      },
+      "actual_before_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-02/compile_commands.json.after",
+        "sha256": "7dd734c4e3db77462a1750cbf62dad963848443289c0353955567484f1fad877",
+        "size_bytes": 3985644
+      },
+      "restore_to_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-01/compile_commands.json.before",
+        "sha256": "273a71380a031cadc5b2936f9f6e4310d62caacf01c820642175b3eb31d3377a",
+        "size_bytes": 3979187
+      },
+      "expected": {
+        "path": ".runtime/ep261-gcc13-o0/compile_commands.json",
+        "sha256": "273a71380a031cadc5b2936f9f6e4310d62caacf01c820642175b3eb31d3377a",
+        "size_bytes": 3979187
+      },
+      "actual_after": {
+        "path": ".runtime/ep261-gcc13-o0/compile_commands.json",
+        "sha256": "273a71380a031cadc5b2936f9f6e4310d62caacf01c820642175b3eb31d3377a",
+        "size_bytes": 3979187
+      }
+    },
+    {
+      "actual_before": {
+        "path": ".runtime/ep261-gcc13-o0/build.ninja",
+        "sha256": "0cfdf45648020d1116485f3ea47d304d17339c6462b13ac32bb07419a8fbc1fe",
+        "size_bytes": 4660179
+      },
+      "actual_before_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-02/build.ninja.after",
+        "sha256": "0cfdf45648020d1116485f3ea47d304d17339c6462b13ac32bb07419a8fbc1fe",
+        "size_bytes": 4660179
+      },
+      "restore_to_archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-01/build.ninja.before",
+        "sha256": "599d5792e3d995808ed4156c445a5540dcb62cf8b1675c72fdf586765a4dd093",
+        "size_bytes": 4647918
+      },
+      "expected": {
+        "path": ".runtime/ep261-gcc13-o0/build.ninja",
+        "sha256": "599d5792e3d995808ed4156c445a5540dcb62cf8b1675c72fdf586765a4dd093",
+        "size_bytes": 4647918
+      },
+      "actual_after": {
+        "path": ".runtime/ep261-gcc13-o0/build.ninja",
+        "sha256": "599d5792e3d995808ed4156c445a5540dcb62cf8b1675c72fdf586765a4dd093",
+        "size_bytes": 4647918
+      }
+    }
+  ],
+  "restored_files": 3,
+  "restore_Source": {
+    "path": ".runtime/porting/SRC-06/restore-geometry-build-metadata-Root-02.py",
+    "sha256": "6c3ff55172aa3d8636f24fe3072d76b675d096211ec26941b82d0ba8b3d278bb",
+    "size_bytes": 4600
+  },
+  "geometry_configure_review": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-native-build-02/configure-and-dry-review.json",
+    "sha256": "ed5ad64059759d43ed814f64a7b7632c7cccdd399531f9ec7f7ecc9c586e8257",
+    "size_bytes": 18715
+  },
+  "geometry_compile_execution": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-compile-command-02/receipt.json",
+    "sha256": "86186f10cba3b3830566939ab6594395649914945355eff6351b500fd1382701",
+    "size_bytes": 2871
+  },
+  "actual_provider_inventory": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-providers-01/linked-provider-and-PE-inventory.json",
+    "sha256": "07f561c7b99e483386d1f509e7f4888aac8cf0caf32b6e07f5e89416393ea6a5",
+    "size_bytes": 2989664
+  },
+  "Root_factual_review": {
+    "path": ".runtime/porting/SRC-06/Root-geometry-provider-factual-review-01/review.json",
+    "sha256": "77b59105920d11c479f96dcb7a462f633338c2e60836ef453ffd50a0cc2e402a",
+    "size_bytes": 14430
+  },
+  "independent_factual_review": {
+    "path": ".runtime/porting/SRC-06/Header-geometry-provider-factual-review-01/review.json",
+    "sha256": "2c24b015cd82a8e4fc10120a01fc54259086cef0a02af128eb4f3821078e824e",
+    "size_bytes": 14438
+  },
+  "prior_generated_metadata_restoration": {
+    "path": ".runtime/porting/SRC-06/dispatcher-build-metadata-restore-01/record.json",
+    "sha256": "15156d442e24f5ee4a2d60d4f861758ae2492364f0ae812657faa584cdfcee82",
+    "size_bytes": 4480
+  },
+  "geometry744_graph_retained_as_actual_history": true,
+  "reason": "Read-only v4 observer adds actual Construction names/IDs and complete processInput epJSON; no v3 helper execution occurred.",
+  "Original_scientific_Source_or_binary_changed": false,
+  "Rust_Source_changed": false,
+  "policy_changed": false,
+  "scientific_PASS_claimed": false,
+  "gates_updated": false
+}

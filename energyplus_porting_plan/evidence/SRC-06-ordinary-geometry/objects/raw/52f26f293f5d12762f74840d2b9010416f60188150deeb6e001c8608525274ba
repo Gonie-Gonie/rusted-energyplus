@@ -1,0 +1,78 @@
+{
+  "Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-02/manifest.json",
+    "sha256": "863c5207c2ec3994c4448651b7f2fa154c4e3939760cc437fcaa5217b61db51c",
+    "size_bytes": 25893
+  },
+  "actual_application": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-applied-01/record.json",
+    "sha256": "fa30387b51c8b9e00dbd5dd1d2fcc16965b619daffeeeeb1822a32344f6a8273",
+    "size_bytes": 32889
+  },
+  "actual_formatter_review": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-applied-01/Root-formatter-acceptance.json",
+    "sha256": "07c91afb7351c5b83e31c39ede024695475832fcf7485cb37ad3bf41323802a1",
+    "size_bytes": 1378
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/47/47ebf61d9be4dbfcb30fb9b2f3ae8e962c497b0de8857f4e659dba802a72328b",
+    "sha256": "47ebf61d9be4dbfcb30fb9b2f3ae8e962c497b0de8857f4e659dba802a72328b"
+  },
+  "Native_baseline_acceptance": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-Native-baseline-01/acceptance.json",
+    "sha256": "b9d216a293632f25ab985a45d7cd51aa5480e7b9d64beb98576cd0401766194a",
+    "size_bytes": 2878,
+    "line_count": 63
+  },
+  "protected_dispatcher_application": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-02/record.json",
+    "sha256": "a4eedbee038952b9928cefeeebfc83d51510dafe9c8d030ec4ef401a7a06c488",
+    "size_bytes": 27345
+  },
+  "protected_prior_summary": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-tarp-dispatcher/summary.json",
+    "sha256": "e06573e5cdd079c328b7dd27019c362d8496c9f2629064500ae7a5557101d808",
+    "size_bytes": 13029,
+    "line_count": 320
+  },
+  "numerical_PASS_claimed": false,
+  "whole_geometry_or_ordinary_PASS_claimed": false,
+  "gates_updated": false,
+  "schema": "src06-ordinary-geometry-actual-Rust-capture-custody.v1",
+  "actual_build_record": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-validation-01/record.json",
+    "sha256": "75a5222e7d38da2a5c1d8be2cc574a99d9538f4cebc15c89a21b646aa329515f",
+    "size_bytes": 10594
+  },
+  "actual_Root_artifact_acceptance": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-validation-01/Root-artifact-acceptance.json",
+    "sha256": "899f001dcbeb70a1bfc583d736ca152b8872a439565f28150009cdb9f8423ac2",
+    "size_bytes": 17796
+  },
+  "actual_request": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-Rust-capture-01/request.json",
+    "sha256": "063ba257d8a32f730ab7de9a091ca6edc2d340f07862e3e6aac99b59a3c1974e",
+    "size_bytes": 802
+  },
+  "actual_execution": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-Rust-capture-01/command/receipt.json",
+    "sha256": "7c19d3941bb93701be2027c5fbf68ae75c093c839e70984e8b2f9b344d370bc1",
+    "size_bytes": 4276
+  },
+  "actual_exit_code": 0,
+  "actual_complete_stdout": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-Rust-capture-01/command/stdout.log",
+    "sha256": "e3ed52251ff9093f8d4379c6dc9e194601fcd6e8f20005c125bdf522638baaf8"
+  },
+  "actual_complete_stderr": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-Rust-capture-01/command/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "actual_executable_after": {
+    "path": "target/debug/examples/src06_ordinary_geometry_observer.exe",
+    "sha256": "9a1a7f4a546721e7883abc5303eeaf2e9faadca62fde1dcd370d45f7bdf132e4",
+    "size_bytes": 52768059
+  },
+  "target_execution_performed": true,
+  "comparison_performed": false
+}

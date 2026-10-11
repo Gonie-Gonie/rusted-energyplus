@@ -16,3 +16,4 @@ include!("tests/production_weather.rs");
 include!("tests/ctf02_surface_integration.rs");
 include!("tests/ctf_ordinary_outputs.rs");
 include!("tests/warmup_ordinary_reports.rs");
+include!("tests/initialized_geometry_owners.rs");

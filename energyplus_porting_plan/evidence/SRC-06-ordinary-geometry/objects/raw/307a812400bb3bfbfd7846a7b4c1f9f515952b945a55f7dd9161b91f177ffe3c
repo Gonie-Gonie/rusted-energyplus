@@ -1,0 +1,67 @@
+        BaseSurface = (surf.BaseSurf == 0 || surf.BaseSurf == ThisSurf);
+
+        ThisBaseSurface = surf.BaseSurf; // Dont know if this is still needed or not
+        HeatTransSurf = surf.HeatTransSurf;
+
+        // Kludge for daylighting shelves
+        if (surf.IsShadowing) {
+            ThisBaseSurface = ThisSurf;
+            HeatTransSurf = true;
+        }
+
+        // IF (Surface(ThisSurf)%Name(1:3) /= 'Mir') THEN
+        if (!surf.MirroredSurf) {
+            bool IsCoPlanar;
+            int LastVertexInError;
+            Vectors::CalcCoPlanarNess(surf.Vertex, surf.Sides, IsCoPlanar, OutOfLine, LastVertexInError);
+            if (!IsCoPlanar) {
+                if (OutOfLine > 0.01) {
+                    ShowSevereError(state,
+                                    EnergyPlus::format("{}Suspected non-planar surface:\"{}\", Max \"out of line\"={:.5T} at Vertex # {}",
+                                                       RoutineName,
+                                                       surf.Name,
+                                                       OutOfLine,
+                                                       LastVertexInError));
+                } else {
+                    ShowWarningError(state,
+                                     EnergyPlus::format("{}Possible non-planar surface:\"{}\", Max \"out of line\"={:.5T} at Vertex # {}",
+                                                        RoutineName,
+                                                        surf.Name,
+                                                        OutOfLine,
+                                                        LastVertexInError));
+                }
+                //       ErrorInSurface=.TRUE.
+            }
+        }
+
+        if (BaseSurface) {
+            SurfWorldAz = surf.Azimuth;
+            SurfTilt = surf.Tilt;
+            for (n = 1; n <= surf.Sides; ++n) {
+                state.dataSurfaceGeometry->Xpsv(n) = surf.Vertex(n).x;
+                state.dataSurfaceGeometry->Ypsv(n) = surf.Vertex(n).y;
+                state.dataSurfaceGeometry->Zpsv(n) = surf.Vertex(n).z;
+            }
+            TVect = surf.Vertex(3) - surf.Vertex(2);
+            ThisWidth = Vectors::VecLength(TVect);
+            TVect = surf.Vertex(2) - surf.Vertex(1);
+            ThisHeight = Vectors::VecLength(TVect);
+            surf.Width = ThisWidth;
+            surf.Height = ThisHeight; // For a horizontal surface this is actually length!
+            if (surf.Sides == 3) {
+                surf.Shape = DataSurfaces::SurfaceShape::Triangle;
+            } else if (surf.Sides == 4) {
+                // Test for rectangularity
+                if (isRectangle(state, ThisSurf)) {
+                    surf.Shape = DataSurfaces::SurfaceShape::Rectangle;
+                } else {
+                    surf.Shape = DataSurfaces::SurfaceShape::Quadrilateral;
+                }
+            } else { // Surface( ThisSurf ).Sides > 4
+                surf.Shape = DataSurfaces::SurfaceShape::Polygonal;
+                if (std::abs(ThisHeight * ThisWidth - surf.GrossArea) > 0.001) {
+                    surf.Width = std::sqrt(surf.GrossArea);
+                    surf.Height = surf.Width;
+                    ThisWidth = surf.Width;
+                    ThisHeight = surf.Height;
+                }

@@ -1,0 +1,63 @@
+{
+  "schema": "ordinary-geometry-Native-baseline-acceptance.v1",
+  "accepted": true,
+  "complete_input_owner_prefix_and_custody_review_accepted": true,
+  "Native_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-04/manifest.json",
+    "sha256": "2bcb4620c0519b2c796f96242430651d5bd6e737a5e793db4c24a6c03d9ee21b",
+    "size_bytes": 60112
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/4c/4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce",
+    "sha256": "4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce",
+    "size_bytes": 1635051
+  },
+  "actual_Native_execution": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-native-capture-01/command/receipt.json",
+    "sha256": "bce8cb718e0bc2e8cb85d349df10c48af46d9ec471512db6bb0f9fbd47f5e345",
+    "size_bytes": 3193
+  },
+  "actual_custody": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-native-capture-01/custody.json",
+    "sha256": "ba8324f050b03825b0ef14c0394d1cd537f3b5766ce4815ed07446b8e73a344c",
+    "size_bytes": 2323136
+  },
+  "actual_before": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-native-capture-01/before.json",
+    "sha256": "25bc21289e014ea706b3faa51e8ef57786b5786c5e57524ebe9e4e93b318a441",
+    "size_bytes": 4201521
+  },
+  "actual_authoritative_result": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-native-capture-01/loader-output/geometry-loader-results.json",
+    "sha256": "23e846ecc4c9b82b942921794145490cba86683bfadbb7c774b1ae9260281670",
+    "size_bytes": 145527
+  },
+  "actual_provider_acceptance": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-acceptance-02/acceptance.json",
+    "sha256": "8879554b759d1d25f681f0ec176276c8a3ba4476cca9aa2c93dd81263a26d66f",
+    "size_bytes": 3986
+  },
+  "Root_factual_review": {
+    "path": ".runtime/porting/SRC-06/Root-geometry-Native-factual-review-01/review.json",
+    "sha256": "a1686deaa65fc4744a291b52bba453076c0e9c57001da6acac58b2958c7007cd",
+    "size_bytes": 2593
+  },
+  "independent_FULL_factual_review": {
+    "path": ".runtime/porting/SRC-06/Header-geometry-Native-factual-review-01/review.json",
+    "sha256": "a1686deaa65fc4744a291b52bba453076c0e9c57001da6acac58b2958c7007cd",
+    "size_bytes": 2593
+  },
+  "actual_outer_capture_execution": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-native-capture-command-01/receipt.json",
+    "sha256": "eccd8160d92c8ac9c0d6d4a2c46ce4df15c69060bdb484af3dcd2e930e739155",
+    "size_bytes": 3502
+  },
+  "all_thirteen_actual_loader_calls_returned": true,
+  "whole_geometry_or_ordinary_PASS_claimed": false,
+  "gates_updated": false,
+  "release_Source": {
+    "path": ".runtime/porting/SRC-06/release-geometry-Native-baseline-Root-01.py",
+    "sha256": "18a11e84ffff15c95d1d01845bf9167a35439b7ae5fb05c02dbc81e6f68db291",
+    "size_bytes": 4741
+  }
+}

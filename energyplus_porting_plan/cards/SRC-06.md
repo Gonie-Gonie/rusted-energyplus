@@ -108,11 +108,11 @@ The first comparer stopped before any pairs because Rust's Windows verbatim path
 
 Actual Rust Source 8aa752f4 has 3,929 members; 3,926 unrelated members remain byte-exact across application. Formatter review accepted only the import move, line wrapping and optional trailing commas. Four genuine Source-identical checks passed: fmt, Clippy with warnings denied, focused 346/0/2 and workspace 4,973/0/2 (passed/failed/ignored). The actual standalone dev Cargo executable and argc3 execution, Native provider/core/PE audit, complete observations and uncapped ledgers are retained.
 
-The implementation removes the former EPS-zero branch, upper clamp and nonfinite floor from these selected equations, and reads the actual stored cosine. Production integration remains incomplete: InitIntConvCoeff first-call setup/ordered zone-space traversal, retained space MAT and balance reference air, initial/refresh temperature-array distinction, positive completed-iteration cadence30 after radiation, and immediate surface-term updates require the next caller unit. Kiva/windows/EMS and the full ordinary handoff remain outside this selected proof. All four full-card gates, A 14/54 and B 14/64 remain unchanged.
+The implementation removes the former EPS-zero branch, upper clamp and nonfinite floor from these selected equations, and reads the actual stored cosine. At that selected-math milestone, production integration remained incomplete: InitIntConvCoeff first-call setup/ordered zone-space traversal, retained space MAT and balance reference air, initial/refresh temperature-array distinction, positive completed-iteration cadence30 after radiation, and immediate surface-term updates require the next caller unit. Kiva/windows/EMS and the full ordinary handoff remain outside this selected proof. All four full-card gates, A 14/54 and B 14/64 remain unchanged.
 
 Evidence: [complete selected TARP comparison, application and quality](../evidence/SRC-06-tarp-inside-selected/summary.json).
 
-## Next bounded caller/setup contract (before Rust application)
+## Reviewed dispatcher/setup contract (before its Rust application)
 
 The next unit covers the actual no-user first call of InitIntConvCoeff141–391,
 GetUserConvCoeffs733–1672, unconditional static setup2800–3099 and inactive
@@ -153,3 +153,33 @@ The genuine unchanged-core Native helper processed the frozen physical no-user I
 Applied owners preserve distinct space MAT/ZT/ZTAV, first-call/setup and readiness flags, six explicit absent user families, ordered zone-space HT traversal, actual named temperature arrays, geometry setup, Scan/report state and backend prefixes. The selected disabled-space correction copies MAT and ZT without overwriting ZTAV. Four genuine checks passed on Source4c02bed5:fmt, Clippy with warnings denied, focused354/0/2 and workspace4,981/0/2. The two ignored observer tests remain unchanged. Two earlier Clippy failures, the authenticated owned-path restoration, a comparer custody failure before any pairs, and the bounded Source repairs remain retained rather than replaced by a successful run.
 
 [Complete selected dispatcher evidence](../evidence/SRC-06-tarp-dispatcher/summary.json) retains all four uncapped gzip ledgers and a finite exact-byte archive of426 rows/289 objects. Whole Source payloads and large executable/map/library payloads remain provenance references; this archive does not claim transitive replayability. The selected dispatcher is not yet activated by the ordinary surface manager. Actual raw geometry producers, ordinary space MAT/reset/correction, independent SurfTempInTmp/SurfTempIn/old-temperature owners, post-radiation positive completed-iteration cadence30, immediate balance-term updates and ordinary warmup/handoff still require integration and Native comparison. All full-card gates and A14/54/B14/64 remain unchanged.
+
+## Bounded ordinary geometry producer prerequisite (reviewed before Rust application)
+
+Retain every actual successful GEO03 return once at its existing caller, while
+leaving the Volume consumer and error timing unchanged. The next selected owner
+unit covers no-pop cyclic Surface.Perimeter, base Width/Height, complete six Zone
+bounds and opaque exterior gross-wall/window reset and ordered additions.
+Perimeter follows the actual pow(delta,2) provider path; Width/Height follow the
+separate Vectors::VecLength multiply path. No rectangular shortcut is admitted.
+
+Before application, genuine GetBuildingData/SetupZoneGeometry returned owners,
+exact input and Zone/Space/Surface associations, diagnostics and retained prefixes
+must be captured and independently reviewed. No-transform/no-subsurface/complete
+opaque input admission is required; missing correction branches are unavailable.
+Empty Space uses actual 0/-1 pointers, not an injected 0/0 range. Its separate
+branch needs genuine input evidence; a typed unit assertion is not Native proof.
+
+Whole setup/centroid/scratch, vertex disposal, nonopaque corrections, ordinary
+space MAT/temperature production, cadence30 and handoff remain unfinished.
+This prerequisite supplement promotes no card gate and changes no A/B counts.
+
+## Actual bounded ordinary opaque geometry producers
+
+The unchanged-core Native loader genuinely returned from all 13 selected public calls. Rust parsed and compiled the same physical A-24H input, then called its real initializer once. Returned GEO03 owners are retained once at that caller; the existing Volume consumer is unchanged. Selected new owners cover cyclic no-pop perimeter, Width/Height, six zone bounds and ordered opaque exterior area accumulation. This later proof does not expand the historical GEO03 Volume-only certification.
+
+The actual comparison status is `pass-available-selected-ordinary-geometry-only`. All input-join/pre-owner/selected-endpoint/point-helper counters are copied from the genuine comparison: `{"input_join_comparisons":2255,"pre_owner_comparisons":0,"selected_endpoint_comparisons":36,"point_helper_comparisons":0}`; mismatches 0, required unavailable 0, optional unpaired 19. Optional Native-only contexts remain outside PASS. Full input families/values/order and construction/zone/space/surface identities are joined before selected endpoints, using exact binary64 bits/class/signed zero with zero tolerance. The 13 extra null families created by Original input getters are explicit unpaired metadata, not supplied input objects.
+
+Source47ebf61d passed fmt, Clippy with warnings denied, focused354/0/2 and workspace4988/0/2. The same two ignored observers remain unchanged. Earlier Native compile failure, generated-metadata restoration, input-metadata admission preflight, the two factual-checker transport/Scan-shape failures, and the first comparison, which stopped before any pairs on a recorder-descriptor error, are retained along with the first evidence-publication metadata-shape failure. These transport repairs use the same closed Native/Rust captures without target reruns. The three uncapped ledgers were fully decoded and checked independently; the finite archive stores its selected bytes exactly, while large executable/map/object and whole Source payloads remain provenance references rather than a transitive replay claim.
+
+[Actual bounded geometry evidence](../evidence/SRC-06-ordinary-geometry/summary.json). Whole SetupZoneGeometry, nonopaque corrections, ordinary persistent MAT/reset/correction, independent SurfTempInTmp/SurfTempIn/SurfTempInsOld, radiation-before-positive-completed-iteration30 refresh and immediate cached term rebuild remain separate work. The ordinary dispatcher is not activated by this geometry prerequisite. Weather03 is prepared but unapplied; its cold-guard/backend comparison remains required. All four SRC-06 gates and A14/54/B14/64 stay unchanged.

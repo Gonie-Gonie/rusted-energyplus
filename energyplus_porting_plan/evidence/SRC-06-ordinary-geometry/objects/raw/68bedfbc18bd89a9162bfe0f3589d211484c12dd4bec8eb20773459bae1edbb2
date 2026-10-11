@@ -1,0 +1,31 @@
+{
+  "schema": "ordinary-geometry-Header-Native-Source-review.v1",
+  "accepted": true,
+  "reviewer_role": "Header",
+  "reviewed_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-04/manifest.json",
+    "sha256": "2bcb4620c0519b2c796f96242430651d5bd6e737a5e793db4c24a6c03d9ee21b",
+    "size_bytes": 60112
+  },
+  "narrow_successor_FULL_review_accepted": true,
+  "whole_reference_occurrences": 241,
+  "distinct_physical_refs": 122,
+  "literal_ranges": 26,
+  "exact_incremental_diffs": 8,
+  "helper_and_three_headers_byte_exact03": true,
+  "request_except_Source_refs_byte_exact03": true,
+  "read_only_actual_Construction_allocation_index_name_and_TotConstructs_reviewed": true,
+  "complete_actual_epJSON_copy_reviewed": true,
+  "unique_v4_recipe_inverse_exact": true,
+  "remaining_fixture_admission_and_actual_compile_provider_capture_required": true,
+  "produced_code_imported_or_executed": false,
+  "targets_executed": false,
+  "numerical_results_read": false,
+  "canonical_mutation": false,
+  "gates_updated": false,
+  "review_Source": {
+    "path": ".runtime/porting/SRC-06/review-geometry-Native-Header-04.py",
+    "sha256": "b9a3c40afc139b5e618443fdaa72a4b42a9b0dfdeec45b9a47e59370e92ec1b2",
+    "size_bytes": 4044
+  }
+}

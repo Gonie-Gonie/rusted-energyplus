@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-06\ordinary-geometry-publication-prep-02\publish.py", line 253, in <module>
+    if __name__ == '__main__': sys.exit(main())
+                                        ^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-06\ordinary-geometry-publication-prep-02\publish.py", line 174, in main
+    for row in PREP['historical_Source_preparations']: source_preparation(row, 'retained-historical-Source-preparation')
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\SRC-06\ordinary-geometry-publication-prep-02\publish.py", line 93, in source_preparation
+    if isinstance(item.get(key), dict) and {'path', 'sha256'} <= set(item[key]): select(item[key], role + ':exact-Source-correspondence')
+                  ^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'

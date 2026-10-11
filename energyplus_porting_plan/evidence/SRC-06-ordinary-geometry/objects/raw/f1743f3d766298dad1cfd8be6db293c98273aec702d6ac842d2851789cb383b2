@@ -1,0 +1,350 @@
+"""Root-only factual QA of a closed genuine geometry capture; no geometry arithmetic or parity."""
+import argparse
+import hashlib
+import json
+import math
+from pathlib import Path
+import re
+import struct
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+BASE = ROOT / '.runtime/porting/SRC-06'
+NATIVE = {'path': '.runtime/porting/SRC-06/ordinary-geometry-native-prep-04/manifest.json', 'sha256': '2bcb4620c0519b2c796f96242430651d5bd6e737a5e793db4c24a6c03d9ee21b'}
+DRIVER = {'path': '.runtime/porting/SRC-06/ordinary-geometry-execution-prep-06/manifest.json', 'sha256': 'f88bf1a486d690155ceabee00791531113f887f79d719c3f1029d71622c850f6'}
+RECORDER_SHA = '5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'
+EXTERNAL = [Path('D:/CodexBuild/rusted-energyplus/SRC-06') / n / 'bin' for n in ('ordinary-geometry-native-build-03', 'native-dispatcher-build-01')]
+SEEN = {}
+CLASSES = {}
+COUNTERS = set('loader_ErrorsFound AbortProcessing TotalSevereErrors TotalWarningErrors TotalSevereErrorsDuringWarmup TotalWarningErrorsDuringWarmup TotalSevereErrorsDuringSizing TotalWarningErrorsDuringSizing TotalCoincidentVertices TotalDegenerateSurfaces LastSevereError NumOfZones numSpaces TotSurfaces Zone_allocation space_allocation Surface_allocation TimeStepsInHour MinutesInTimeStep TimeStepZone TimeStepZoneSec isEpJSON preserveIDFOrder DoingInputProcessing printConsoleOutput outputErrorHeader VerStringVar IDDVerString optional_SQLite_present'.split())
+BOOL_COUNTERS = set('loader_ErrorsFound AbortProcessing isEpJSON preserveIDFOrder DoingInputProcessing printConsoleOutput outputErrorHeader optional_SQLite_present'.split())
+TEXT_COUNTERS = {'LastSevereError', 'VerStringVar', 'IDDVerString'}
+DIAGNOSTICS = 'console err audit eso eio mtr bnd debug rdd mdd mtd edd dfs shade'.split()
+
+
+def need(condition, message):
+    if not condition:
+        raise ValueError(message)
+
+
+def full(path):
+    path = path.resolve()
+    with path.open('rb') as stream:
+        digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+    return dict(path=path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else str(path), sha256=digest, size_bytes=path.stat().st_size)
+
+
+def bind(row):
+    path = (ROOT / row['path']).resolve()
+    need(path.is_file() and (path.is_relative_to(ROOT) or any(path.is_relative_to(p) for p in EXTERNAL)), 'missing or escaped factual artifact: ' + row['path'])
+    actual = SEEN.get(path)
+    if actual is None:
+        actual = full(path); SEEN[path] = actual
+    need(actual['sha256'] == row['sha256'] and all(row[k] == actual['size_bytes'] for k in ('size_bytes', 'bytes') if k in row), 'factual artifact bytes differ: ' + row['path'])
+    return path
+
+
+def load(row):
+    return json.loads(bind(row).read_bytes())
+
+
+def operand(token):
+    name, sha = token.rsplit('#', 1)
+    return full(bind(dict(path=name, sha256=sha)))
+
+
+def same(a, b):
+    need(bind(a) == bind(b), 'factual artifact identity differs')
+
+
+def integer(value, minimum=0):
+    need(type(value) is int and value >= minimum, 'actual integer owner required')
+
+
+def keys(value, names, role):
+    need(isinstance(value, dict) and set(value) == set(names.split()), 'complete actual ' + role + ' field set required')
+
+
+def scalar_shapes(values):
+    for value in values:
+        keys(value, 'value value_bits value_class', 'scalar DTO')
+
+
+def outcome(value, called=True):
+    if not called:
+        keys(value, 'status reason', 'unreached call outcome')
+        need(value['status'] == 'source_not_invoked_due_to_unavailable_prerequisite' and isinstance(value['reason'], str), 'actual unreached call reason required')
+        return
+    keys(value, 'status exception_type exception_message', 'invoked call outcome')
+    status = value['status']
+    need(status in ('source_returned', 'source_fatal', 'source_exception', 'source_nonstandard_exception'), 'genuine Source call outcome required')
+    if status in ('source_returned', 'source_nonstandard_exception'):
+        need(value['exception_type'] is None and value['exception_message'] is None, 'actual absent exception owner required')
+    else:
+        need(isinstance(value['exception_type'], str) and isinstance(value['exception_message'], str), 'complete actual exception owner required')
+
+
+def scalar_tree(value):
+    if isinstance(value, dict):
+        if set(value) & {'value_bits', 'value_class'}:
+            need(set(value) == {'value', 'value_bits', 'value_class'}, 'complete scalar DTO required')
+            bits = value['value_bits']; need(isinstance(bits, str) and re.fullmatch('[0-9a-f]{16}', bits), 'literal binary64 DTO bits required')
+            raw = int(bits, 16); number = struct.unpack('>d', bytes.fromhex(bits))[0]
+            kind = 'nan' if math.isnan(number) else ('negative_infinity' if raw >> 63 else 'positive_infinity') if math.isinf(number) else ('negative_zero' if raw >> 63 else 'positive_zero') if number == 0 else 'finite'
+            need(value['value_class'] == kind, 'actual DTO class differs from retained bits')
+            if math.isfinite(number):
+                need(type(value['value']) in (int, float) and struct.pack('>d', float(value['value'])).hex() == bits, 'actual finite DTO decimal does not roundtrip to retained bits')
+            else:
+                need(value['value'] is None, 'nonfinite DTO must retain null decimal and actual bits')
+            CLASSES[kind] = CLASSES.get(kind, 0) + 1
+        else:
+            for key, child in value.items():
+                if key != 'actual_parsed_input_epJSON': scalar_tree(child)
+    elif isinstance(value, list):
+        for child in value: scalar_tree(child)
+
+
+def epvector(shape):
+    need(set(shape) == {'container', 'allocated', 'size', 'operator_parentheses_indexing'}, 'complete EPVector shape required')
+    need(shape['container'] == 'EnergyPlus::EPVector' and type(shape['allocated']) is bool and shape['operator_parentheses_indexing'] == 'one-based; zero is not an allocated member', 'actual EPVector allocation/indexing required')
+    integer(shape['size'])
+
+
+def prefix(value):
+    need(type(value['available']) is bool, 'actual prefix availability required')
+    if not value['available']:
+        keys(value, 'available owners reason', 'unavailable prefix')
+        need(value['owners'] is None and isinstance(value['reason'], str), 'unavailable prefix reason required')
+        return
+    keys(value, 'available reason owners actual_error_prefix actual_console_prefix actual_EIO_prefix actual_callback_count', 'available prefix')
+    need(value['reason'] is None and set(value['owners']) == COUNTERS, 'complete actual counter owner required')
+    for key, item in value['owners'].items():
+        if key in BOOL_COUNTERS: need(type(item) is bool, 'actual boolean counter required: ' + key)
+        elif key in TEXT_COUNTERS: need(isinstance(item, str), 'actual text counter required: ' + key)
+        elif key.endswith('_allocation'): epvector(item)
+        elif key not in ('TimeStepZone', 'TimeStepZoneSec'): integer(item)
+    scalar_shapes([value['owners'][key] for key in ('TimeStepZone','TimeStepZoneSec')])
+    for key in ('actual_error_prefix', 'actual_console_prefix', 'actual_EIO_prefix'): need(isinstance(value[key], str), 'complete actual prefix bytes required')
+    integer(value['actual_callback_count'])
+
+
+def recorded(row, source, allowed=(0,)):
+    value = load(row)
+    need(value['schema'] == 'recorded-porting-command.v1' and value['exit_code'] in allowed and value['launch_error'] is None and value['finished_utc'] is not None and value['source_bytes_match_before_and_after'] is True, 'closed genuine guarded execution required')
+    same(value['source_snapshot'], source)
+    need(full(bind(value['executed_launcher']['archive']))['sha256'] == RECORDER_SHA, 'authentic recorder Source required')
+    bind(value['stdout']); bind(value['stderr'])
+    return value
+
+
+def argument(token, expected):
+    same(operand(token), expected)
+
+
+def source_guard(row):
+    snapshot = load(row)
+    need(snapshot['schema'] == 'rust-command-source-snapshot.v1' and snapshot['bytes_normalized'] is False, 'literal full Source snapshot required')
+    members = {r['historical_path']: r for r in snapshot['files']}
+    paths = set((ROOT / 'crates').rglob('*.rs')) | set((ROOT / 'crates').rglob('Cargo.toml')) | {ROOT / p for p in ('Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml') if (ROOT / p).is_file()}
+    need(len(members) == len(snapshot['files']) and set(members) == {p.relative_to(ROOT).as_posix() for p in paths}, 'complete current Source membership differs')
+    for name, item in members.items():
+        bind(item['archive']); bind(dict(path=name, sha256=item['archive']['sha256'], size_bytes=item['size_bytes']))
+    return members
+
+
+def geometry(value, owner):
+    keys(value, 'capture_boundary zones spaces surfaces actual_parsed_input_family_counts constructions construction_allocation TotConstructs actual_parsed_input_epJSON geometry_context floating_environment internal_GetZoneData_SetupZoneGeometry_call_boundaries_individually_observed values_reconstructed_from_vertices_or_Rust', 'returned geometry')
+    need(value['capture_boundary'] == 'returned HeatBalanceManager::GetBuildingData with actual loader_ErrorsFound false' and value['internal_GetZoneData_SetupZoneGeometry_call_boundaries_individually_observed'] is False and value['values_reconstructed_from_vertices_or_Rust'] is False, 'actual returned owner boundary required')
+    groups = [('zones', 'Zone_allocation'), ('spaces', 'space_allocation'), ('surfaces', 'Surface_allocation')]
+    for name, allocation in groups:
+        need(len(value[name]) == owner[allocation]['size'] and [r['id'] for r in value[name]] == list(range(1, len(value[name]) + 1)), 'full one-based allocated owner rows required: ' + name)
+    for row in value['zones']:
+        keys(row, 'id name volume_m3 ceiling_height_m ceiling_height_entered floor_area_m2 user_entered_floor_area_m2 geometric_floor_area_m2 ceiling_area_m2 geometric_ceiling_area_m2 has_floor has_roof all_surface_first all_surface_last num_spaces space_indexes bounds_m exterior_areas HasWindow Multiplier ListMultiplier', 'zone owner')
+        keys(row['exterior_areas'], 'ExtGrossWallArea ExtNetWallArea ExtWindowArea ExtWindowArea_Multiplied ExtGrossWallArea_Multiplied ExteriorTotalSurfArea ExteriorTotalGroundSurfArea ExtGrossGroundWallArea ExtGrossGroundWallArea_Multiplied extPerimeter TotalSurfArea', 'zone exterior areas')
+        need(len(row['bounds_m']) == 6 and isinstance(row['name'], str) and type(row['HasWindow']) is bool, 'complete actual zone owner required')
+        scalar_shapes([row[key] for key in 'volume_m3 ceiling_height_m floor_area_m2 user_entered_floor_area_m2 geometric_floor_area_m2 ceiling_area_m2 geometric_ceiling_area_m2'.split()] + row['bounds_m'] + list(row['exterior_areas'].values()))
+        need(row['num_spaces'] == len(row['space_indexes']) and all(type(i) is int and 1 <= i <= len(value['spaces']) for i in row['space_indexes']), 'actual ordered zone-space owner IDs required')
+    for row in value['spaces']:
+        keys(row, 'id name zone_id volume_m3 ceiling_height_m floor_area_m2 user_entered_floor_area_m2 has_floor fraction_zone_volume fraction_zone_floor_area is_remainder_space surface_indexes all_surface_first all_surface_last surface_membership_allocation HTSurfaceFirst HTSurfaceLast OpaqOrIntMassSurfaceFirst OpaqOrIntMassSurfaceLast WindowSurfaceFirst WindowSurfaceLast exterior_areas', 'space owner')
+        keys(row['exterior_areas'], 'ExtGrossWallArea ExteriorTotalSurfArea extPerimeter extWindowArea totalSurfArea', 'space exterior areas')
+        epvector(row['surface_membership_allocation'])
+        need(len(row['surface_indexes']) == row['surface_membership_allocation']['size'] and all(type(i) is int and 1 <= i <= len(value['surfaces']) for i in row['surface_indexes']), 'actual full space-surface memberships required')
+        need(isinstance(row['name'], str) and type(row['zone_id']) is int and 0 <= row['zone_id'] <= len(value['zones']), 'actual named optional zone-space association required')
+        if row['zone_id']:
+            need(row['id'] in value['zones'][row['zone_id']-1]['space_indexes'], 'actual zone-space backreference differs')
+        scalar_shapes([row[key] for key in 'volume_m3 ceiling_height_m floor_area_m2 user_entered_floor_area_m2 fraction_zone_volume fraction_zone_floor_area'.split()] + list(row['exterior_areas'].values()))
+    context = value['geometry_context']
+    keys(context, 'p0_m err_count err_count5 show_zone_surface_headers display_extra_warnings is_epjson preserve_idf_order surfaces_allocated temporary_surfaces_allocated zones_allocated spaces_allocated space_count surface_count zone_count geometry_context', 'geometry globals')
+    need(isinstance(context['p0_m'],list) and len(context['p0_m']) == 3, 'full actual global reference vector required')
+    scalar_shapes(context['p0_m'])
+    keys(context['geometry_context'], 'max_vertices_per_surface corner counterclockwise world_coordinate_system aspect_transform first_time no_transform process_one_time_flag input_once_flag total_coincident_vertices total_degenerate_surfaces xpsv ypsv zpsv triangle1 triangle2 zone_cos zone_sin cos_building_relative_north sin_building_relative_north cos_appendix_g_only sin_appendix_g_only', 'inner geometry globals')
+    for name in ('xpsv','ypsv','zpsv','triangle1','triangle2','zone_cos','zone_sin'):
+        shape = context['geometry_context'][name]
+        keys(shape, 'allocated size', 'geometry temporary allocation')
+        need(type(shape['allocated']) is bool, 'actual geometry temporary allocation flag required'); integer(shape['size'])
+    scalar_shapes([context['geometry_context'][key] for key in 'cos_building_relative_north sin_building_relative_north cos_appendix_g_only sin_appendix_g_only'.split()])
+    shape = value['construction_allocation']
+    keys(shape, 'container allocated size lower upper', 'construction allocation')
+    need(shape['container'] == 'ObjexxFCL::Array1D' and type(shape['allocated']) is bool, 'actual construction Array1D required')
+    integer(shape['size']); integer(value['TotConstructs'])
+    need((shape['lower'] is None and shape['upper'] is None and shape['size'] == 0) if not shape['allocated'] else type(shape['lower']) is int and type(shape['upper']) is int and shape['upper']-shape['lower']+1 == shape['size'], 'actual construction bounds differ')
+    ids = list(range(shape['lower'], shape['upper']+1)) if shape['allocated'] else []
+    need(len(value['constructions']) == shape['size'] and [r['id'] for r in value['constructions']] == ids, 'full actual construction rows including allocated tail required')
+    for row in value['constructions']:
+        keys(row, 'id name', 'construction identity')
+        need(isinstance(row['name'], str), 'actual construction name owner required')
+    need(isinstance(value['actual_parsed_input_epJSON'], dict), 'complete actual parsed epJSON object required')
+    family = value['actual_parsed_input_family_counts']
+    need(set(family) == set(value['actual_parsed_input_epJSON']), 'complete actual parsed family witness required')
+    for name, item in family.items():
+        keys(item, 'actual_json_type actual_size', 'parsed family count')
+        raw = value['actual_parsed_input_epJSON'][name]
+        kind = 'object' if isinstance(raw, dict) else 'array' if isinstance(raw, list) else 'null' if raw is None else 'boolean' if type(raw) is bool else 'string' if isinstance(raw, str) else 'number'
+        size = len(raw) if isinstance(raw, (dict, list)) else 0 if raw is None else 1
+        need(item == {'actual_json_type':kind, 'actual_size':size}, 'actual epJSON family count/type differs')
+    observed = unavailable = 0
+    for row in value['surfaces']:
+        keys(row, 'id name zone_id zone_name space_id class construction_id base_surface outside_boundary heat_transfer_surface air_boundary_surface sides vertex_allocation vertices_processed shape is_degenerate is_convex perimeter_m width_m height_m geometry_values_observed geometry world_vertex_bits unavailable_reason', 'surface owner')
+        need(isinstance(row['name'], str) and isinstance(row['zone_name'], str) and type(row['zone_id']) is int and 0 <= row['zone_id'] <= len(value['zones']), 'actual optional surface-zone ID/name owner required')
+        if row['zone_id']:
+            need(row['zone_name'] == value['zones'][row['zone_id']-1]['name'], 'actual surface-zone name backreference differs')
+        need(type(row['space_id']) is int and 0 <= row['space_id'] <= len(value['spaces']), 'actual optional surface-space association required')
+        if row['space_id']:
+            need(row['id'] in value['spaces'][row['space_id']-1]['surface_indexes'] and value['spaces'][row['space_id']-1]['zone_id'] == row['zone_id'], 'actual surface-space backreference differs')
+        need(type(row['construction_id']) is int and (row['construction_id'] == 0 or row['construction_id'] in ids), 'actual optional construction association must resolve to actual name table')
+        for key in ('heat_transfer_surface','air_boundary_surface','vertices_processed','is_degenerate','is_convex','geometry_values_observed'):
+            need(type(row[key]) is bool, 'actual surface boolean required: ' + key)
+        scalar_shapes([row[key] for key in ('perimeter_m','width_m','height_m')])
+        shape = row['vertex_allocation']; need(set(shape) == {'allocated', 'size', 'lower', 'upper'} and type(shape['allocated']) is bool, 'complete Objexx vertex bounds required')
+        integer(shape['size']); integer(row['sides'])
+        need((shape['lower'] is None and shape['upper'] is None) if not shape['allocated'] else type(shape['lower']) is int and type(shape['upper']) is int and shape['upper'] - shape['lower'] + 1 == shape['size'], 'actual Objexx vertex bounds differ')
+        written = row['vertices_processed'] and row['sides'] > 2 and shape['allocated'] and shape['size'] >= row['sides']
+        need(row['geometry_values_observed'] is written, 'actual Source geometry availability predicate differs')
+        if written:
+            keys(row['geometry'], 'area_m2 gross_area_m2 net_area_shadow_m2 azimuth_deg tilt_deg newell_area_vector_m2 newell_normal out_norm centroid_m lcsx lcsy lcsz sin_azimuth cos_azimuth sin_tilt cos_tilt', 'processed surface geometry')
+            for name in ('newell_area_vector_m2','newell_normal','out_norm','centroid_m','lcsx','lcsy','lcsz'):
+                need(isinstance(row['geometry'][name],list) and len(row['geometry'][name]) == 3, 'full actual geometry vector required')
+                scalar_shapes(row['geometry'][name])
+            scalar_shapes([row['geometry'][key] for key in 'area_m2 gross_area_m2 net_area_shadow_m2 azimuth_deg tilt_deg sin_azimuth cos_azimuth sin_tilt cos_tilt'.split()])
+            need(row['geometry'] is not None and row['unavailable_reason'] is None and len(row['world_vertex_bits']) == row['sides'], 'complete processed geometry/vertex owner required')
+            need(all(len(v) == 3 and all(isinstance(b, str) and re.fullmatch('[0-9a-f]{16}', b) for b in v) for v in row['world_vertex_bits']), 'full literal world vertex bits required')
+            observed += 1
+        else:
+            need(row['geometry'] is None and row['world_vertex_bits'] is None and row['unavailable_reason'] == 'actual_vertex_processing_or_complete_vertex_storage_not_available', 'unwritten geometry must remain unavailable')
+            unavailable += 1
+    context = value['floating_environment']
+    keys(context, 'sizeof_float sizeof_double sizeof_long_double FLT_MANT_DIG DBL_MANT_DIG LDBL_MANT_DIG fe_round x87_control_word x87_precision_control_bits x87_precision_bits x87_rounding_control_bits mxcsr mxcsr_rounding_control_bits control_writes_added', 'read-only hardware context')
+    need(context['control_writes_added'] is False, 'read-only actual FP context required')
+    for key, item in context.items():
+        if key not in ('control_writes_added', 'x87_precision_bits'): integer(item, -1 if key == 'fe_round' else 0)
+    cw, mxcsr = context['x87_control_word'], context['mxcsr']
+    need(cw <= 65535 and mxcsr <= 4294967295 and context['x87_precision_control_bits'] == (cw >> 8) & 3 and context['x87_precision_bits'] == {0:24, 1:None, 2:53, 3:64}[(cw >> 8) & 3] and context['x87_rounding_control_bits'] == (cw >> 10) & 3 and context['mxcsr_rounding_control_bits'] == (mxcsr >> 13) & 3, 'actual read-only hardware DTO extraction differs')
+    return dict(zones=len(value['zones']), spaces=len(value['spaces']), surfaces=len(value['surfaces']), constructions=len(value['constructions']), TotConstructs=value['TotConstructs'], parsed_input_families=len(family), surfaces_geometry_observed=observed, surfaces_geometry_unavailable=unavailable)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ('custody', 'outer-execution', 'Root-provider-acceptance', 'output-dir'): parser.add_argument('--' + name, required=True)
+    args = parser.parse_args()
+    custody_ref, outer_ref, approval_ref = (operand(v) for v in (args.custody, args.outer_execution, args.Root_provider_acceptance))
+    custody, approval, native, driver = load(custody_ref), load(approval_ref), load(NATIVE), load(DRIVER)
+    need(custody['schema'] == 'ordinary-geometry-execution-custody.v1' and custody['all_frozen_artifacts_unchanged'] is True, 'complete closed actual capture custody required')
+    before_ref = custody['actual_before']; before = load(before_ref)
+    need(before['schema'] == 'ordinary-geometry-execution-before.v1' and before['FP_controls_modified'] is False and before['driver_FP_controls_observed'] is False and before['helper_FP_control_observation_declared'] is True, 'truthful actual capture boundary required')
+    same(before['Source_preparation'], NATIVE); same(before['reviewed_execution_driver'], driver['runtime_interfaces']['driver']); same(before['Root_provider_acceptance'], approval_ref)
+    need(approval['schema'] == 'ordinary-geometry-Root-provider-acceptance.v1' and approval['accepted'] is True and all(approval[k] is True for k in ('all_sixteen_Original_providers_accepted', 'full_PE_and_core_proof_accepted', 'dry_and_actual_compile_link_commands_byte_exact')), 'actual full Root provider acceptance required')
+    same(approval['provider_inventory'], before['provider_inventory']); same(approval['reviewed_execution_driver'], before['reviewed_execution_driver'])
+    same(approval['reviewed_Source_preparation'],NATIVE)
+    inventory = load(before['provider_inventory'])
+    need(inventory['schema'] == 'ordinary-geometry-actual-linked-provider-and-PE-inventory.v1', 'actual provider inventory schema differs')
+    same(inventory['reviewed_Source_preparation'],NATIVE); same(inventory['configure_preparation'],driver['configure_Source_preparation'])
+    same(approval['provider_collection_preparation'],driver['provider_Source_preparation']); same(inventory['actual_evidence_collector'],approval['actual_evidence_collector'])
+    for key, prior in [('actual_Native_binary','actual_binary'),('actual_full_link_map','actual_link_map'),('actual_helper_object','actual_helper_object'),('Source_snapshot','build_Source_snapshot')]: same(approval[key], before[prior])
+    source_members = source_guard(before['Source_snapshot'])
+    frozen = before['frozen_artifacts']; after = custody['frozen_artifacts_after']
+    need(len({str(bind(r)) for r in frozen}) == len(frozen) == len(after), 'complete unique frozen artifact inventory required')
+    for left, right in zip(frozen, after):
+        need(right['available'] is True, 'frozen artifact unavailable after capture'); same(left, right)
+    request = load(before['actual_input']); same(before['actual_input'], native['prospective_request']); same(before['literal_IDF'], request['case']['input']); same(before['actual_case_metadata'], request['case_metadata'])
+    need(request['schema'] == 'ordinary-geometry-public-loader-request.v1' and len(request['all_45_guard_refs']) == 45 and all(request[k] is False for k in ('expected_values_supplied','expected_exits_supplied','Native_results_supplied','scientific_execution_performed')), 'complete input-only request required')
+    for row in request['all_45_guard_refs'] + request['native_source_files']: bind(row)
+    mandatory = [NATIVE, approval_ref, before['provider_inventory'], before['actual_binary'], before['actual_link_map'], before['actual_helper_object'], before['Source_snapshot'], before['actual_input'], before['literal_IDF'], before['actual_case_metadata'], before['reviewed_execution_driver'], request['fixed_scope'], request['inherited_input_only_request'], *request['all_45_guard_refs'], *request['native_source_files'], *before['pinned_runtime_DLLs']]
+    mandatory += [dict(path=name,sha256=item['archive']['sha256'],size_bytes=item['size_bytes']) for name,item in source_members.items()]
+    frozen_paths = {bind(row) for row in frozen}
+    need(all(bind(row) in frozen_paths for row in mandatory), 'mandatory actual source/input/provider/binary owner omitted from frozen inventory')
+    inner = recorded(custody['actual_command_receipt'], before['Source_snapshot'], (0,2)); outer = recorded(outer_ref, before['Source_snapshot'], (0,2))
+    need(inner['command'] == before['actual_argv'] and len(inner['command']) == 4 and Path(inner['command'][1]).resolve() == ROOT, 'actual helper argc4/root differs')
+    same({'path':inner['command'][0],'sha256':before['actual_binary']['sha256']},before['actual_binary']); same({'path':inner['command'][2],'sha256':before['actual_input']['sha256']},before['actual_input'])
+    command = outer['command']; need(len(command) == 13 and command[1:4] == ['-X','utf8','-B'] and command[5::2] == ['--provider-inventory','--Root-provider-acceptance','--source-snapshot','--output-dir'], 'actual outer reviewed driver argv differs')
+    same({'path':command[4],'sha256':driver['runtime_interfaces']['driver']['sha256']},driver['runtime_interfaces']['driver'])
+    for token, row in zip((command[6],command[8],command[10]),(before['provider_inventory'],approval_ref,before['Source_snapshot'])): argument(token,row)
+    capture = bind(before_ref).parent; loader = Path(inner['command'][3]).resolve()
+    need((ROOT / command[12]).resolve() == capture and loader == capture / 'loader-output' and capture.is_relative_to(BASE), 'fresh contained actual loader output paths differ')
+    need(outer['started_utc'] <= inner['started_utc'] <= inner['finished_utc'] <= outer['finished_utc'] and outer['exit_code'] == inner['exit_code'] == custody['actual_target_exit_code'] == custody['actual_recorder_exit_code'], 'actual execution chronology/exit custody differs')
+    transport_lines = bind(outer['stdout']).read_bytes().splitlines()
+    need(len(transport_lines) == 2 and all(transport_lines), 'full outer stdout must contain exactly the recorder and driver transport records; unexpected stdio cannot be suppressed')
+    transport, summary = [json.loads(line) for line in transport_lines]
+    keys(transport, 'receipt exit_code source_bytes_match_before_and_after', 'inner recorder stdout transport')
+    same(transport['receipt'],custody['actual_command_receipt'])
+    need(transport['exit_code'] == inner['exit_code'] and transport['source_bytes_match_before_and_after'] is True, 'actual inner recorder transport exit/Source differs')
+    keys(summary, 'custody actual_exit_code scientific_PASS_claimed', 'driver stdout transport')
+    same(summary['custody'],custody_ref)
+    need(summary['actual_exit_code'] == inner['exit_code'] and summary['scientific_PASS_claimed'] is False, 'outer full stdout custody differs')
+    for key in ('stdout','stderr'): same(custody['actual_full_output_logs'][key],inner[key])
+    actual_files = custody['produced_loader_files_full_SHA_inventory']; need({bind(r) for r in actual_files} == {p.resolve() for p in loader.rglob('*') if p.is_file()} and len(actual_files) == len({bind(r) for r in actual_files}), 'every actual produced file must be retained')
+    result_ref = custody['actual_authoritative_result']; need(bind(result_ref) == loader / 'geometry-loader-results.json', 'actual authoritative result path differs')
+    result = load(result_ref); need(result['schema'] == 'ordinary-geometry-public-loader-results.v1', 'actual genuine helper result schema required'); same(result['actual_request'],before['actual_input']); same(result['actual_binary'],before['actual_binary'])
+    keys(result, 'schema actual_request actual_binary EnergyPlusData_constructor lifecycle actual_loader_ready actual_caller_matches_source_timestep loader_stop_reason selected_geometry_available geometry_copy_failure selected_geometry diagnostics final_prefix_and_counters read_only_observer_integrity_failed actual_helper_exit_code CTF_Init_or_solver_invoked expected_values_read numerical_comparison_performed whole_SetupZoneGeometry_PASS_claimed gates_updated', 'helper result')
+    need(all(result[k] is False for k in ('CTF_Init_or_solver_invoked','expected_values_read','numerical_comparison_performed','whole_SetupZoneGeometry_PASS_claimed','gates_updated')), 'actual selected observation scope differs')
+    need(result['actual_helper_exit_code'] == inner['exit_code'] == (2 if result['read_only_observer_integrity_failed'] else 0), 'actual helper outcome/integrity differs')
+    scalar_tree(result)
+    diagnostic = result['diagnostics']; callbacks = diagnostic['callbacks']; integer(diagnostic['actual_callback_count'])
+    keys(diagnostic, 'actual_files callbacks actual_callback_count omitted_callback_records callback_copy_integrity_failed optional_SQLite_present SQLite_contents SQLite_contents_role', 'diagnostic owner')
+    need(diagnostic['SQLite_contents'] is None and diagnostic['SQLite_contents_role'] == 'not_observed_or_reconstructed', 'SQLite contents must remain explicitly unobserved')
+    need(len(callbacks) == diagnostic['actual_callback_count'] and [r['ordinal'] for r in callbacks] == list(range(1,len(callbacks)+1)), 'complete actual callback ledger required')
+    for row in callbacks:
+        keys(row, 'ordinal kind level message', 'callback record')
+        need(row['kind'] in ('errorCallback','messageCallback') and isinstance(row['message'],str) and (type(row['level']) is int if row['kind']=='errorCallback' else row['level'] is None), 'actual ordered callback record required')
+    lifecycle = result['lifecycle']; need([r['kind'] for r in lifecycle] == request['loader_phase_order'] and len(lifecycle) == 13, 'all thirteen genuine phase records required')
+    outcome(result['EnergyPlusData_constructor'])
+    active = result['EnergyPlusData_constructor']['status'] == 'source_returned'; reason = '' if active else result['EnergyPlusData_constructor']['status']; previous = None; returned = 0; callback_count = 0
+    for index, row in enumerate(lifecycle):
+        prefix(row['before']); prefix(row['after']); need(type(row['actual_source_invoked']) is bool and row['actual_source_invoked'] is active, 'actual returned-or-stopped invocation order differs')
+        if previous is not None: need(row['before'] == previous, 'actual full phase prefix/counter continuity differs')
+        keys(row, 'kind actual_source_invoked call_outcome before after callback_count_before callback_count_after', 'phase record')
+        integer(row['callback_count_before']); integer(row['callback_count_after']); need(callback_count == row['callback_count_before'] <= row['callback_count_after'] <= len(callbacks), 'actual callback phase bounds/chronology differ')
+        callback_count = row['callback_count_after']
+        for name, key in [('before','callback_count_before'),('after','callback_count_after')]:
+            if row[name]['available']: need(row[name]['actual_callback_count'] == row[key], 'actual prefix callback count differs')
+        call_outcome = row['call_outcome']; outcome(call_outcome, active); status = call_outcome['status']
+        if active:
+            need(status in ('source_returned','source_fatal','source_exception','source_nonstandard_exception'), 'genuine invoked call outcome required')
+            if status == 'source_returned':
+                returned += 1
+                if row['after']['available'] and row['after']['owners']['loader_ErrorsFound']: active=False; reason='actual_loader_ErrorsFound_true'
+            else: active=False; reason=status
+        else: need(status == 'source_not_invoked_due_to_unavailable_prerequisite' and call_outcome['reason'] == reason and row['before'] == row['after'], 'unreached phase must retain full actual prefix')
+        if index == 3 and active and not result['actual_caller_matches_source_timestep']: active=False; reason='actual_Source_produced_timestep_differs_from_inherited_caller'
+        previous = row['after']
+    need(result['actual_loader_ready'] is active and result['loader_stop_reason'] == reason, 'actual loader readiness/stop reason differs')
+    final = result['final_prefix_and_counters']; prefix(final); need(final == previous, 'full final prefix/counters differ from last actual phase')
+    need(callback_count == len(callbacks), 'all actual callbacks must belong to genuine phase prefixes')
+    files = diagnostic['actual_files']; need(set(files) == set(DIAGNOSTICS if result['EnergyPlusData_constructor']['status']=='source_returned' else ['console']), 'complete actual diagnostic files required')
+    for name,row in files.items(): need(bind(row) == loader / (name+'.txt') and bind(row) in {bind(r) for r in actual_files}, 'actual diagnostic file transport differs')
+    if final['available']:
+        for name,key in [('console','actual_console_prefix'),('err','actual_error_prefix'),('eio','actual_EIO_prefix')]: need(bind(files[name]).read_bytes() == final[key].encode('utf8'), 'full diagnostic/prefix bytes differ')
+        need(final['actual_callback_count'] == len(callbacks), 'full final actual callback count differs')
+    need(result['selected_geometry_available'] is (result['selected_geometry'] is not None), 'actual selected geometry availability differs')
+    geometry_counts = geometry(result['selected_geometry'],final['owners']) if result['selected_geometry_available'] else None
+    clean = final['available'] and all(final['owners'][k] == 0 for k in COUNTERS if k.startswith('Total')) and final['owners']['loader_ErrorsFound'] is False and final['owners']['AbortProcessing'] is False
+    releasable = active and returned == 13 and clean and result['actual_caller_matches_source_timestep'] and result['selected_geometry_available'] and result['geometry_copy_failure'] == '' and diagnostic['omitted_callback_records'] == 0 and diagnostic['callback_copy_integrity_failed'] is False and result['read_only_observer_integrity_failed'] is False and inner['exit_code'] == 0 and bind(inner['stdout']).stat().st_size == bind(inner['stderr']).stat().st_size == 0
+    need(all(full(path) == row for path,row in SEEN.items()), 'factual review input changed while being read')
+    output = (ROOT / args.output_dir).resolve(); need(output.is_relative_to(BASE) and output != BASE and not output.exists(), 'fresh ignored factual review directory required'); output.mkdir(parents=True)
+    review = dict(schema='ordinary-geometry-Native-factual-review.v1', accepted=True, baseline_releasable=bool(releasable), actual_custody=custody_ref, actual_execution=outer_ref, actual_Root_provider_acceptance=approval_ref, actual_result=result_ref, Source_snapshot=before['Source_snapshot'], actual_Source_file_count=len(source_members), full_input_guard_count=45, lifecycle_records=len(lifecycle), actual_returned_loader_calls=returned, actual_callbacks=len(callbacks), actual_physical_files=len(actual_files), complete_diagnostic_file_count=len(files), scalar_DTO_classes=CLASSES, selected_geometry_owner_counts=geometry_counts, actual_helper_exit_code=inner['exit_code'], all_full_SHA_and_frozen_before_after_accepted=True, full_physical_file_and_prefix_bytes_accepted=True, no_geometry_arithmetic_recomputed=True, inner_invocation_trace_claimed=False, FP_controls_written=False, observed_helper_FP_context_available=result['selected_geometry_available'], numerical_comparison_performed=False, scientific_PASS_claimed=False, whole_geometry_or_ordinary_PASS_claimed=False, gates_updated=False, factual_checker_source=full(Path(__file__)))
+    with (output/'review.json').open('xb') as stream: stream.write((json.dumps(review,ensure_ascii=False,allow_nan=False,indent=2)+'\n').encode())
+    print(json.dumps(dict(review=full(output/'review.json'),baseline_releasable=bool(releasable),scientific_PASS_claimed=False)))
+    return 0 if releasable else 2
+
+
+if __name__ == '__main__':
+    sys.exit(main())

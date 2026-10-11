@@ -1,0 +1,224 @@
+--- /dev/null
++++ .runtime/porting/SRC-06/ordinary-geometry-owner-prep-02/proposed/crates/ep_runtime/src/geometry/inside_convection_owners.rs
+@@ -0,0 +1,221 @@
++//! Retained real initializer returns and selected opaque geometry producers.
++//!
++//! This does not implement whole SetupZoneGeometry, coincident-vertex disposal,
++//! shading scratch, subsurface correction, or an ordinary convection caller.
++
++use super::{SurfaceGeometryProperties, ZoneGeometryProperties};
++use crate::heat_balance::inside_convection_layout::InsideConvectionLayout;
++use ep_model::{ConstructionKind, OutsideBoundaryCondition, Point3, SurfaceId, SurfaceType, TypedModel, ZoneId};
++use std::fmt::{Display, Formatter};
++
++/// An actual successful GEO03 initializer return, moved once by its caller.
++#[derive(Clone, Debug, PartialEq)]
++pub struct InitializedZoneGeometry {
++    /// Actual typed zone association.
++    pub zone_id: ZoneId,
++    /// Complete returned state, including partial-admission diagnostics.
++    pub returned: ZoneGeometryProperties,
++}
++
++/// Selected final base-surface dimensions from the real source assignments.
++#[derive(Clone, Copy, Debug, PartialEq)]
++pub struct OpaqueSurfaceDimensions {
++    /// Actual surface identity.
++    pub surface_id: SurfaceId,
++    /// GetVertices no-pop perimeter, in original cyclic accumulation order.
++    pub perimeter_m: f64,
++    /// ProcessSurfaceVertices base-surface final Width.
++    pub width_m: f64,
++    /// ProcessSurfaceVertices base-surface final Height.
++    pub height_m: f64,
++}
++
++/// Selected SetupZoneGeometry zone owners for an admitted opaque base set.
++#[derive(Clone, Copy, Debug, PartialEq)]
++pub struct OpaqueZoneGeometry {
++    /// Actual zone identity.
++    pub zone_id: ZoneId,
++    /// MinimumX, MaximumX, MinimumY, MaximumY, MinimumZ, MaximumZ.
++    pub bounds_m: [f64; 6],
++    /// Actual reset then ordered exterior gross-wall-area accumulation.
++    pub exterior_gross_wall_area_m2: f64,
++    /// Actual reset; the admitted opaque base set reaches no window additions.
++    pub exterior_window_area_m2: f64,
++}
++
++/// Selected producer prefix, not a whole geometry/setup success marker.
++#[derive(Clone, Debug, PartialEq)]
++pub struct OpaqueGeometryOwners {
++    /// Actual source traversal order, with within-class input order preserved.
++    pub surface_dimensions: Vec<OpaqueSurfaceDimensions>,
++    /// Actual zone-array order.
++    pub zones: Vec<OpaqueZoneGeometry>,
++}
++
++/// A missing association or an unimplemented source correction prerequisite.
++#[derive(Clone, Copy, Debug, Eq, PartialEq)]
++pub enum GeometryOwnerUnavailable {
++    /// Missing, duplicate, stale or inconsistent owner associations.
++    Association,
++    /// A source perimeter call would require real vertex disposal/diagnostics.
++    CoincidentVertices(SurfaceId),
++    /// A source input/geometry owner cannot be represented by this unit.
++    SurfaceInput(SurfaceId),
++    /// The typed boundary cannot distinguish the required source condition.
++    Boundary(SurfaceId),
++}
++
++impl Display for GeometryOwnerUnavailable {
++    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
++        match self {
++            Self::Association => f.write_str("geometry owner associations are incomplete or inconsistent"),
++            Self::CoincidentVertices(id) => write!(f, "surface {id:?} requires original vertex disposal and diagnostics"),
++            Self::SurfaceInput(id) => write!(f, "surface {id:?} is outside the selected opaque base geometry input"),
++            Self::Boundary(id) => write!(f, "surface {id:?} has an unrepresented original boundary condition"),
++        }
++    }
++}
++
++impl std::error::Error for GeometryOwnerUnavailable {}
++
++/// State-owned initializer returns plus explicitly bounded setup producers.
++#[derive(Clone, Debug, PartialEq)]
++pub struct InitializedGeometryOwners {
++    /// Every actual successful GEO03 return; no second initializer invocation.
++    pub zone_returns: Vec<InitializedZoneGeometry>,
++    /// Selected fields or an honest unavailable prerequisite, never zero fallback.
++    pub opaque_setup: Result<OpaqueGeometryOwners, GeometryOwnerUnavailable>,
++}
++
++// SurfaceGeometry::distance reaches std::pow<double,int> then pow(double,double).
++// This differs from Vectors::VecLength used for the base Width and Height.
++fn perimeter_distance(a: Point3, b: Point3) -> f64 {
++    ((a.x_m - b.x_m).powf(2.0) + (a.y_m - b.y_m).powf(2.0) + (a.z_m - b.z_m).powf(2.0)).sqrt()
++}
++
++fn dimension_length(a: Point3, b: Point3) -> f64 {
++    let x = a.x_m - b.x_m;
++    let y = a.y_m - b.y_m;
++    let z = a.z_m - b.z_m;
++    ((x * x + y * y) + z * z).sqrt()
++}
++
++// std::min/max preserve the first operand on ties, unlike Rust f64::min/max.
++fn source_min(a: f64, b: f64) -> f64 { if b < a { b } else { a } }
++fn source_max(a: f64, b: f64) -> f64 { if a < b { b } else { a } }
++// Outer unqualified EnergyPlus min/max resolves to ObjexxFCL double overloads:
++// min retains the SECOND operand on ties; max retains the FIRST, like std.
++fn source_bound_min(a: f64, b: f64) -> f64 { if a < b { a } else { b } }
++fn source_bound_max(a: f64, b: f64) -> f64 { if a < b { b } else { a } }
++
++/// The unchanged canonical vertex set must already be supplied by the caller.
++/// Coincident-pop, aspect transform and subsurface routes are not approximated.
++pub fn opaque_surface_dimensions(
++    surface_id: SurfaceId,
++    vertices: &[Point3],
++    actual_geometry: &SurfaceGeometryProperties,
++) -> Result<OpaqueSurfaceDimensions, GeometryOwnerUnavailable> {
++    if vertices.len() < 3 || vertices.iter().any(|p| !p.x_m.is_finite() || !p.y_m.is_finite() || !p.z_m.is_finite())
++        || !actual_geometry.gross_area_m2.is_finite() || actual_geometry.gross_area_m2 <= 0.0
++    {
++        return Err(GeometryOwnerUnavailable::SurfaceInput(surface_id));
++    }
++    let mut minimum_distance = f64::MAX;
++    let mut perimeter = 0.0;
++    for index in 0..vertices.len() {
++        let next = if index + 1 == vertices.len() { 0 } else { index + 1 };
++        let value = perimeter_distance(vertices[index], vertices[next]);
++        minimum_distance = source_min(minimum_distance, value);
++        perimeter += value;
++    }
++    // The true first helper pass returns early only at the source 0.01 boundary.
++    if minimum_distance < 0.01 {
++        return Err(GeometryOwnerUnavailable::CoincidentVertices(surface_id));
++    }
++    let mut width = dimension_length(vertices[2], vertices[1]);
++    let mut height = dimension_length(vertices[1], vertices[0]);
++    if vertices.len() > 4 && (height * width - actual_geometry.gross_area_m2).abs() > 0.001 {
++        width = actual_geometry.gross_area_m2.sqrt();
++        height = width;
++    }
++    Ok(OpaqueSurfaceDimensions { surface_id, perimeter_m: perimeter, width_m: width, height_m: height })
++}
++
++/// Consume retained GEO02 outputs; no area/normal/volume initializer is replayed.
++/// This is the selected opaque no-subsurface producer, not raw-input admission.
++/// A Native comparison additionally requires the actual caller's no-transform,
++/// no-subsurface and complete opaque surface-set evidence; TypedModel alone
++/// cannot prove those raw-input facts.
++pub fn opaque_geometry_owners(
++    model: &TypedModel,
++    actual_surfaces: &[(SurfaceId, SurfaceGeometryProperties)],
++) -> Result<OpaqueGeometryOwners, GeometryOwnerUnavailable> {
++    let layout = InsideConvectionLayout::from_typed_model(model).map_err(|_| GeometryOwnerUnavailable::Association)?;
++    if model.zones.iter().any(|zone| zone.spaces.is_empty())
++        || actual_surfaces.len() != model.surfaces.len()
++        || actual_surfaces.iter().map(|r| r.0).collect::<std::collections::BTreeSet<_>>().len() != actual_surfaces.len()
++        || actual_surfaces.iter().any(|r| !model.surfaces.iter().any(|s| s.id == r.0))
++    {
++        return Err(GeometryOwnerUnavailable::Association);
++    }
++    let ordered = layout.groups().iter().flat_map(|group| group.surfaces.iter()).map(|id| {
++        let surface = model.surfaces.iter().find(|s| s.id == *id).ok_or(GeometryOwnerUnavailable::Association)?;
++        let actual = &actual_surfaces.iter().find(|s| s.0 == *id).ok_or(GeometryOwnerUnavailable::Association)?.1;
++        let construction = model.constructions.iter().find(|c| c.id == surface.construction)
++            .ok_or(GeometryOwnerUnavailable::Association)?;
++        if construction.kind != ConstructionKind::Opaque {
++            return Err(GeometryOwnerUnavailable::SurfaceInput(*id));
++        }
++        if matches!(surface.outside_boundary_condition, OutsideBoundaryCondition::Other | OutsideBoundaryCondition::Foundation) {
++            return Err(GeometryOwnerUnavailable::Boundary(*id));
++        }
++        Ok((surface, actual))
++    }).collect::<Result<Vec<_>, _>>()?;
++    let mut dimensions = Vec::with_capacity(ordered.len());
++    for (surface, actual) in &ordered {
++        dimensions.push(opaque_surface_dimensions(surface.id, &surface.vertices, actual)?);
++    }
++    // Source resets the zone family before the actual all-surface area loop.
++    let mut zones = layout.zones().iter().map(|zone_id| OpaqueZoneGeometry {
++        zone_id: *zone_id, bounds_m: [0.0; 6], exterior_gross_wall_area_m2: 0.0, exterior_window_area_m2: 0.0,
++    }).collect::<Vec<_>>();
++    for (surface, actual) in &ordered {
++        let zone = zones.iter_mut().find(|z| z.zone_id == surface.zone).ok_or(GeometryOwnerUnavailable::Association)?;
++        if surface.surface_type == SurfaceType::Wall && surface.outside_boundary_condition == OutsideBoundaryCondition::Outdoors {
++            zone.exterior_gross_wall_area_m2 += actual.gross_area_m2;
++        }
++    }
++    // Later Source bounds loop initializes from AllSurfaceFirst vertex1.
++    for owner in &mut zones {
++        // setSurfaceFirstLast takes Zone.AllSurfaceFirst from the FIRST space,
++        // even when it is empty. Then the constructor zeros remain until the
++        // real per-surface min/max assignments; no first-nonempty substitution.
++        if let Some(surface_id) = layout.groups().iter().find(|g| g.zone_id == owner.zone_id)
++            .and_then(|group| group.surfaces.first()) {
++            let surface = model.surfaces.iter().find(|s| s.id == *surface_id).ok_or(GeometryOwnerUnavailable::Association)?;
++            let first_vertex = surface.vertices.first().ok_or(GeometryOwnerUnavailable::SurfaceInput(*surface_id))?;
++            owner.bounds_m = [first_vertex.x_m, first_vertex.x_m, first_vertex.y_m, first_vertex.y_m, first_vertex.z_m, first_vertex.z_m];
++        }
++        for group in layout.groups().iter().filter(|g| g.zone_id == owner.zone_id) {
++            for surface_id in &group.surfaces {
++                let surface = model.surfaces.iter().find(|s| s.id == *surface_id).ok_or(GeometryOwnerUnavailable::Association)?;
++                let first_vertex = surface.vertices.first().ok_or(GeometryOwnerUnavailable::SurfaceInput(*surface_id))?;
++                for axis in 0..3 {
++                    let component = |p: &Point3| [p.x_m, p.y_m, p.z_m][axis];
++                    let mut minimum = component(first_vertex);
++                    let mut maximum = component(first_vertex);
++                    for vertex in &surface.vertices {
++                        minimum = source_min(minimum, component(vertex));
++                        maximum = source_max(maximum, component(vertex));
++                    }
++                    owner.bounds_m[axis * 2] = source_bound_min(owner.bounds_m[axis * 2], minimum);
++                    owner.bounds_m[axis * 2 + 1] = source_bound_max(owner.bounds_m[axis * 2 + 1], maximum);
++                }
++            }
++        }
++    }
++    Ok(OpaqueGeometryOwners { surface_dimensions: dimensions, zones })
++}
++
++#[cfg(test)]
++mod tests;

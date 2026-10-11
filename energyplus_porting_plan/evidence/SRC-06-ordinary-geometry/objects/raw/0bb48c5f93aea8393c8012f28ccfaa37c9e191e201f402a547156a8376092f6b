@@ -1,0 +1,115 @@
+{
+  "schema": "src06-ordinary-geometry-prospective-pairing-policy.v1",
+  "status": "frozen-before-any-new-Native-or-Rust-geometry-result",
+  "fixed_case": "A-24H",
+  "Native_answers_or_results_used_for_authorship": false,
+  "geometry_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-02/manifest.json",
+    "sha256": "502237329524881eb7427b7721023f3608169cfeed1524cfa7001786b032381a",
+    "size_bytes": 56443,
+    "line_count": 1308
+  },
+  "Native_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-02/manifest.json",
+    "sha256": "4a172ac50b50fd2151baa818919b1a51b496488afe2a2bc80ea3ce3b984cf1f4",
+    "size_bytes": 37743,
+    "line_count": 880
+  },
+  "input_context": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-observer-prep-01/fixed-input-context.json",
+    "sha256": "f9f645bd15fbd6cc96f584ea3d0b058ed0156da2f0bde8ffab56394835e8fa4e",
+    "size_bytes": 2287,
+    "line_count": 59
+  },
+  "admission": {
+    "exact_original_IDF_SHA256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+    "exact_converted_epJSON_SHA256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578",
+    "actual_conversion_success_and_original_staged_bytes_required": true,
+    "complete_Raw_values_family_counts_and_effective_IDF_order_required": true,
+    "actual_Scope_A_preflight_required": true,
+    "complete_zone_space_surface_name_class_construction_association_and_vertex_joins_required": true,
+    "independent_ids_retained": true,
+    "id_pairing": "Require unique normalized names, actual declared/source order and full zone/space/construction links; retain independent IDs; never infer index+1.",
+    "raw_excluded_families_must_be_absent": [
+      "GeometryTransform",
+      "FenestrationSurface:Detailed",
+      "Window",
+      "Door",
+      "GlazedDoor",
+      "InternalMass",
+      "Shading:Site:Detailed",
+      "Shading:Building:Detailed",
+      "Shading:Zone:Detailed",
+      "Construction:AirBoundary"
+    ],
+    "exact_boundary": "Actual Native GetBuildingData outer return with ErrorsFound false; actual Rust HeatBalanceState returned by one public initializer. No imaginary inner checkpoint."
+  },
+  "mandatory_selected_fields": {
+    "surface": [
+      "perimeter_m",
+      "width_m",
+      "height_m"
+    ],
+    "zone_bounds": [
+      "MinimumX",
+      "MaximumX",
+      "MinimumY",
+      "MaximumY",
+      "MinimumZ",
+      "MaximumZ"
+    ],
+    "zone_exterior": [
+      "ExtGrossWallArea",
+      "ExtWindowArea"
+    ],
+    "GEO03_return": [
+      "volume_m3",
+      "ceiling_height_m",
+      "ceiling_height_entered",
+      "floor_area_m2",
+      "user_entered_floor_area_m2",
+      "geometric_floor_area_m2",
+      "ceiling_area_m2",
+      "geometric_ceiling_area_m2",
+      "has_floor",
+      "has_roof"
+    ]
+  },
+  "comparison": {
+    "finite_arithmetic": "exact binary64 bits; no absolute, relative, ULP or epsilon tolerance",
+    "signed_zero": "exact sign and bits",
+    "discrete": "exact values, lengths, order and associations",
+    "nonfinite": "Retain actual bits/class/value unavailable as diagnostic; never numerical PASS.",
+    "missing_selected_owner": "Required unavailable/mismatch, never a zero fallback or PASS.",
+    "all_mismatches_retained_without_cap": true
+  },
+  "complete_copies_not_additional_PASS": [
+    "full actual GEO03 faces, P0, volume call count and diagnostics",
+    "full existing GEO02 Surface geometry bundles",
+    "complete caller Scan/registry/table/backend and error/console/EIO prefixes",
+    "complete Raw input and typed geometry owner witnesses"
+  ],
+  "explicitly_unpaired": [
+    "Native inner helper visits and scratch allocation",
+    "Native warning/error backend and header byte parity",
+    "Space calculated volume/height/floor-area not retained by this Rust unit",
+    "other Native zone ext/net/multiplied/ground area families",
+    "surface shape, convex/degenerate/status and scratch families without Rust owners",
+    "ordinary inside convection setup, MAT/cadence and thermal integration"
+  ],
+  "missing_branch_variants": [
+    "triangular base surface",
+    "more-than-four vertices and nonrectangular dimension branch",
+    "coincident vertex removal and diagnostics",
+    "aspect/GeometryTransform",
+    "subsurface subtraction and windows",
+    "shading and internal-mass handling",
+    "empty-first-space 0/-1 constructor branch and multiple spaces/zones",
+    "unsupported/open/reversed volume topology and repeated volume calls",
+    "source tie/signed-zero and generated overflow/nonfinite diagnostics"
+  ],
+  "outer_status_scope": "A future zero-mismatch selected field comparison is bounded A24 owner evidence only. Missing variants and unpaired context are never whole geometry, full SetupZoneGeometry, ordinary convection or integration PASS.",
+  "gates_updated": false,
+  "whole_geometry_PASS_claimed": false,
+  "ordinary_convection_PASS_claimed": false
+}

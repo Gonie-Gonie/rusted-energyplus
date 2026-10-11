@@ -1,0 +1,1756 @@
+{
+  "schema": "sch01-converted-inputs.v1",
+  "started_utc": "2026-10-09T10:51:00.565215+00:00",
+  "finished_utc": "2026-10-09T10:51:22.615038+00:00",
+  "input_cases": {
+    "path": ".runtime/porting/SCH-01/inputs-01/input-cases.json",
+    "sha256": "ca14990b86fca602637ff584462f4fcd3ff7d0df644c124ee5d0026d2d47637a"
+  },
+  "converter": {
+    "path": ".runtime/energyplus/26.1.0/ConvertInputFormat.exe",
+    "sha256": "04f1327fef7148118ea1d79d9e990fb2447b9731e9c1b28a9a8276b840d7cbfe"
+  },
+  "conversion_recipe": "actual ConvertInputFormat.exe input.idf in each fresh case directory, matching ep_run::oracle input-only route",
+  "conversions": [
+    {
+      "case_id": "normal-constant-types-base",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/normal-constant-types-base.idf",
+        "sha256": "cb5c83784d84ac1b7a9b68c1c342bce1fcc44a7e19565a604663d0e4b1c40243",
+        "size_bytes": 429
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/normal-constant-types-base/input.epJSON",
+        "sha256": "ffbbbfbadd8a24e455cd7d407ed9abde9e9c0f1d92f3d2f1f2c7652ab364f08b",
+        "size_bytes": 1849
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/normal-constant-types-base/conversion.json",
+        "sha256": "db9a4c9f334901cfe294b93d013d409a394cbd2ccf5f945c55a07e8f4d3a64ee",
+        "size_bytes": 2920
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "type-limits-blank-bound-1",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/type-limits-blank-bound-1.idf",
+        "sha256": "482f197c48980570a7d01fc6bf921df55f6759c1d43d8978818cb3a50b1bcdca",
+        "size_bytes": 236
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-blank-bound-1/input.epJSON",
+        "sha256": "a95689c18175bc5bb757f960f4954163f2479e27edcb8fde634265a94227be1d",
+        "size_bytes": 1257
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-blank-bound-1/conversion.json",
+        "sha256": "1681fc98c842aff295d54a4b7a96192d3d68f1169708ce3d01008a687b4a7a68",
+        "size_bytes": 2909
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "type-limits-blank-bound-2",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/type-limits-blank-bound-2.idf",
+        "sha256": "9f82ca2b4a98545f184ea5dd9f5a039bfb99c8dac7adefb2e5bfff98b62dfa84",
+        "size_bytes": 237
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-blank-bound-2/input.epJSON",
+        "sha256": "d8ff3115b16e59341d2b20514cdb8cd6b367ea7d7daad898e6a58f9adee0a67a",
+        "size_bytes": 1294
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-blank-bound-2/conversion.json",
+        "sha256": "4068a9d51b6ee0b873f791e753f6c6ec19d2db17316ab58a85f7c2671b0fdd8e",
+        "size_bytes": 2909
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "type-limits-blank-bound-3",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/type-limits-blank-bound-3.idf",
+        "sha256": "818d8c4b54699717a4fcc2a6a81d4f4990dc973c87233d65b1d4c5ba474d7931",
+        "size_bytes": 237
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-blank-bound-3/input.epJSON",
+        "sha256": "bb06ca43c9ca6c457e2e1bb18d0d932dbd88bd2947fe2904c101f8a916884995",
+        "size_bytes": 1294
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-blank-bound-3/conversion.json",
+        "sha256": "ff5424b26d5bf17e9cda8caa48d3959e8c63ae739f663a8174e124ea77ecaf38",
+        "size_bytes": 2909
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "type-limits-validation-1",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/type-limits-validation-1.idf",
+        "sha256": "c3af6bfe8c7d4e6334a149c5895fa75c9709d83c741e98a03320baa03536d3d9",
+        "size_bytes": 237
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-1/input.epJSON",
+        "sha256": "d46de12b341a634754c2d9c4f1916ba2d2f3aca107596422eb494735f284fc91",
+        "size_bytes": 1330
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-1/conversion.json",
+        "sha256": "a9f6e1a06fa88b95964d2ed4814e7659c21b41d463626c1676a2ab42fccfd845",
+        "size_bytes": 2898
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "type-limits-validation-2",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/type-limits-validation-2.idf",
+        "sha256": "f0499322c514ba49ef9c7dcdef4e5152d8f133e4dd15db1831ac928b500079f5",
+        "size_bytes": 235
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-2/input.epJSON",
+        "sha256": "c1ee3ed133293d6a52e1d2c7da7e56d95dc81cef5741c4481d378e5a7f2a5206",
+        "size_bytes": 1328
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-2/conversion.json",
+        "sha256": "cb5d19007f41b7023eb6d82ac79dbf54181be999e57fb6065cf530fad3fbedcd",
+        "size_bytes": 2898
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "type-limits-validation-3",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/type-limits-validation-3.idf",
+        "sha256": "686bd03e4d354cacf53e7ab1dd7994676d03863a5defe980561cfce0ede8a745",
+        "size_bytes": 235
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-3/input.epJSON",
+        "sha256": "9c7cdd8d794056bee46f75ae63922b0df371f2ffe4ad1f12d46e050346e095b5",
+        "size_bytes": 1328
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-3/conversion.json",
+        "sha256": "55fbf9bffd13e05eb49dc48e0eca62bcded7b3096b8b350d1101676e7aea0d95",
+        "size_bytes": 2898
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "type-limits-validation-4",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/type-limits-validation-4.idf",
+        "sha256": "9ec0d909eb1e53cc13c3347d763c8e53217aff354a2e43c8d09e22f73bbbf5e8",
+        "size_bytes": 241
+      },
+      "epjson_input": null,
+      "available": false,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-4/conversion.json",
+        "sha256": "7027eece3e03c9989d78f91e2c39a4e01926419ebd7c3874cfafd3275fc9bf70",
+        "size_bytes": 2527
+      },
+      "status": "actual-conversion-input-unavailable",
+      "unavailable_reason": "actual converter returned zero without epJSON output"
+    },
+    {
+      "case_id": "type-limits-validation-5",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/type-limits-validation-5.idf",
+        "sha256": "14c81f3eb25923fe1d0c26783c32d48f24d02d71ddced68b1b27a6544c244547",
+        "size_bytes": 246
+      },
+      "epjson_input": null,
+      "available": false,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-5/conversion.json",
+        "sha256": "c25054c4fb4a44ac4dac653bef5a9503dd5abdec7c7dbd871a350ff6ac0bc4c3",
+        "size_bytes": 2527
+      },
+      "status": "actual-conversion-input-unavailable",
+      "unavailable_reason": "actual converter returned zero without epJSON output"
+    },
+    {
+      "case_id": "type-limits-validation-6",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/type-limits-validation-6.idf",
+        "sha256": "fff4492fe86b75c1f971890248bba119ebc83efd1d59b9c7d59d07f6501ea5ac",
+        "size_bytes": 256
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-6/input.epJSON",
+        "sha256": "93f440002bdeeb2af3e71052b6ab2fc58ca984e120fad6467b9a08c9dd81a826",
+        "size_bytes": 1350
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-6/conversion.json",
+        "sha256": "c493b671cd964fa680f7fd9da126af9f1332a2d104691b262d458d30a8b7942c",
+        "size_bytes": 2898
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "type-limits-validation-7",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/type-limits-validation-7.idf",
+        "sha256": "464c0cfc9efabf5dd7637bada66560abc176a51f1ec57b8b831b6dc88ce9b349",
+        "size_bytes": 308
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-7/input.epJSON",
+        "sha256": "2fcd3369e4a746c9474e275ab175211d4aff688facfb90eb970ea21969102784",
+        "size_bytes": 1350
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-7/conversion.json",
+        "sha256": "842307fd000b4ce771b60052fb1497539ce9a03cb45a6a6f7e5e654e629994c3",
+        "size_bytes": 2898
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "type-limits-validation-8",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/type-limits-validation-8.idf",
+        "sha256": "112d9086598ea0c03881e620cd9eb1c22eebe4c172983473130441b4fbd3f8de",
+        "size_bytes": 259
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-8/input.epJSON",
+        "sha256": "2d487c7780d5f75898ed50262cb1352d76d9ea45d086daab01542da558aad6c7",
+        "size_bytes": 1345
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-8/conversion.json",
+        "sha256": "b2451bde6bc616cfbfd2090c3c4f811f61e3012d3d3c8abb132594c22513c939",
+        "size_bytes": 2898
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "type-limits-validation-9",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/type-limits-validation-9.idf",
+        "sha256": "732cdaa4f40db79faab19d0b295da44bccd18e0b76c9dadca34e46e3e9ff99ec",
+        "size_bytes": 288
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-9/input.epJSON",
+        "sha256": "9ecf99876ea615f19d6b739c45d1c643ab70f24660d4d5be870b79ae53dae1f5",
+        "size_bytes": 1345
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-9/conversion.json",
+        "sha256": "f42bdc9dc2409e4d7ce29e8342e2836672f95b12c517dd09b2b692749b51e28b",
+        "size_bytes": 2898
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "type-limits-validation-10",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/type-limits-validation-10.idf",
+        "sha256": "7e2a1dd32270124c398f3278670a86ff1e67496947f110f6cf080d0797d4be9e",
+        "size_bytes": 272
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-10/input.epJSON",
+        "sha256": "e9e8152fcec8727d5dcd735d2f76f79114b489fc50dd7b7060c1620e56870b9a",
+        "size_bytes": 1655
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-10/conversion.json",
+        "sha256": "194c4c30df8ff4a876059ce14e9108df1d73bbf6db6ecd25b94e48b9eff7974b",
+        "size_bytes": 2909
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "type-limits-validation-11",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/type-limits-validation-11.idf",
+        "sha256": "c67b97d980416d4bc6e73b441603d8c9ac74ca1f2d2e3f209456ec15d166c550",
+        "size_bytes": 272
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-11/input.epJSON",
+        "sha256": "7bff3bbb037bd38b0fe0369c4577762d2abd97b91e26a636405f06d6a878b4b7",
+        "size_bytes": 1655
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-11/conversion.json",
+        "sha256": "dcd13d420283726acc03da4d79a48771402fbf4ec7c28a58b78fd750aeecd5e1",
+        "size_bytes": 2909
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "type-limits-validation-12",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/type-limits-validation-12.idf",
+        "sha256": "d39e245ece964f8ecd360614cb010f6f3ae680cf3e24db8d0dfa4ea5daca6ead",
+        "size_bytes": 276
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-12/input.epJSON",
+        "sha256": "5b6a1f726b93e59842d02ca8cf14f2969cd6713833bd49c7dc376bfd50ffed6c",
+        "size_bytes": 1659
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-limits-validation-12/conversion.json",
+        "sha256": "11af57ee308fdc6ac883ab1401a93b74817a1bc91cd91682263c58ccd2244c5d",
+        "size_bytes": 2909
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "type-link-warning-1",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/type-link-warning-1.idf",
+        "sha256": "3175bae2e48a6ed34bfe4868f43dd837723b326175634780491c724dffe89f97",
+        "size_bytes": 258
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-link-warning-1/input.epJSON",
+        "sha256": "24b55e319add04e7a71af9cc423ec5161257078b46d46b1a1c6f18f533fea837",
+        "size_bytes": 1334
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-link-warning-1/conversion.json",
+        "sha256": "0583033f22b55d6fa0cf0bc59614422ea47528ae1e32a98d0d8d540a1320d356",
+        "size_bytes": 2843
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "type-link-warning-2",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/type-link-warning-2.idf",
+        "sha256": "2c9703ee4f50b3b9c12d09ef43f8b463fca85ee1e1dbab16c0cbdf6319da85ec",
+        "size_bytes": 269
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-link-warning-2/input.epJSON",
+        "sha256": "1df0dcbcc64bf1e121923172f3b130258dd60e44b35e20ad8c77b2e5e318d3e8",
+        "size_bytes": 1391
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-link-warning-2/conversion.json",
+        "sha256": "42031a3167f69f0a79387520b8a50a831028fd8b75c2e83c3c27d7f666e45885",
+        "size_bytes": 2843
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "type-link-warning-3",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/type-link-warning-3.idf",
+        "sha256": "fabbccc71640baf719d0ae064931b1b99907d624d99fa95c7e524e33813d8639",
+        "size_bytes": 295
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-link-warning-3/input.epJSON",
+        "sha256": "ccb6f0fa8b145953af5900134df10739e8eea597108c0f6ad7357f53c0565bc5",
+        "size_bytes": 1661
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-link-warning-3/conversion.json",
+        "sha256": "4835515f7708cc9d35aa475eba53599c4faee6e18ee3ad70ba970ab4311dd365",
+        "size_bytes": 2843
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "type-link-warning-4",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/type-link-warning-4.idf",
+        "sha256": "8779d69cb7269ff76dfa6964ba5999387dabe19feb568746897b51c094f2b7e4",
+        "size_bytes": 306
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-link-warning-4/input.epJSON",
+        "sha256": "7f9f32dc650f66c10ca5eb55c1474351fadc588ed8ec228aac12aaf06d94fe18",
+        "size_bytes": 1718
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/type-link-warning-4/conversion.json",
+        "sha256": "abc67c3abd4b497346a49906805ed2883f6a68b409e963ef916c67c0fc1913a0",
+        "size_bytes": 2843
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "constant-missing-value-1",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/constant-missing-value-1.idf",
+        "sha256": "6b64caff6f81f8b5ecfdf763a655b89d9e79e8e1479911a12b671d396be9073e",
+        "size_bytes": 261
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/constant-missing-value-1/input.epJSON",
+        "sha256": "36688f6b48eb88b8abd6cb27bec5cf7b6772ffd232a3fa68db687c1ebb354629",
+        "size_bytes": 1353
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/constant-missing-value-1/conversion.json",
+        "sha256": "0649b7951db8123c7e275829b432a194e99cf38d387ea80905a1d2c95d79a434",
+        "size_bytes": 2898
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "constant-missing-value-2",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/constant-missing-value-2.idf",
+        "sha256": "250ececd9f56ab75dea67dffa34a2d01c2fb7f8e8626c433dbeb2765062e22b1",
+        "size_bytes": 262
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/constant-missing-value-2/input.epJSON",
+        "sha256": "36688f6b48eb88b8abd6cb27bec5cf7b6772ffd232a3fa68db687c1ebb354629",
+        "size_bytes": 1353
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/constant-missing-value-2/conversion.json",
+        "sha256": "80d680928ea671216fe5a2d31ae8423ec1aff4d96098695a820916713a326bf9",
+        "size_bytes": 2898
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "normal-alldays-intervals-base",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/normal-alldays-intervals-base.idf",
+        "sha256": "394ccfcd17ee2989368e5094760917ebacac076b9ec03002f5009d809d2cac1b",
+        "size_bytes": 328
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/normal-alldays-intervals-base/input.epJSON",
+        "sha256": "44dde97cf9c22482f7fc6a2e1d133cf823a15caa5f7d9bf4bcf6398214ba8dc0",
+        "size_bytes": 2020
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/normal-alldays-intervals-base/conversion.json",
+        "sha256": "880c8a6cb53cc7be5e2bb167344ceed78caf95277d463a08f3810630e4b7cd0c",
+        "size_bytes": 2953
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "weekday-otherdays-1",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/weekday-otherdays-1.idf",
+        "sha256": "908663262f1c7c1a2f40054bfb6c28b52f59d6fb6e75563f08d615e86826c988",
+        "size_bytes": 336
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/weekday-otherdays-1/input.epJSON",
+        "sha256": "cd92ac518ce765b2c5322388b78a76f0d02ee28b478981d27c71ee589f983a93",
+        "size_bytes": 1959
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/weekday-otherdays-1/conversion.json",
+        "sha256": "4775f123509aaaf55121316977b4467f6d361afecb983329aad2fe185d28193e",
+        "size_bytes": 2843
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "weekday-otherdays-2",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/weekday-otherdays-2.idf",
+        "sha256": "8b404fdd59f9c46919b93be1cb1ab525458cfc6c30ace77c85704ccfd9aef6d9",
+        "size_bytes": 367
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/weekday-otherdays-2/input.epJSON",
+        "sha256": "59aa1227701d662550258d675d33d1b721408ff0a2c4a42f25482a6386c7cc93",
+        "size_bytes": 2201
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/weekday-otherdays-2/conversion.json",
+        "sha256": "67acab70e21b9d37d91711b939500f293af00151604fdf79b295d9b28e8f3220",
+        "size_bytes": 2843
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "missing-daytypes-base",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/missing-daytypes-base.idf",
+        "sha256": "3d7e5c18ab8476109f6ef6f7ca9b0b191b5c2404ffd2dceaae343e5e2a0bd86c",
+        "size_bytes": 302
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/missing-daytypes-base/input.epJSON",
+        "sha256": "b7e9059b5bfc3a10422486a288dfc523a76c9e569282c4b52324697083db150d",
+        "size_bytes": 1714
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/missing-daytypes-base/conversion.json",
+        "sha256": "04876f9c1967bcff80da549d30da443187457513f3a41f8db00a04e9247aeb96",
+        "size_bytes": 2865
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "for-substring-and-overlap-1",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/for-substring-and-overlap-1.idf",
+        "sha256": "1d1bb32745e684af05ec6cbf05fd7502898ec812f3dce020fe912150fc535865",
+        "size_bytes": 343
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/for-substring-and-overlap-1/input.epJSON",
+        "sha256": "902dc8a48e122a7280f1e655fdcfec1d6c324ef42fc63d0c8782c10345d9e54b",
+        "size_bytes": 1966
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/for-substring-and-overlap-1/conversion.json",
+        "sha256": "a474d35f486e242b811175229302bb9ccd24235841ad0f131966a11ee285d85c",
+        "size_bytes": 2931
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "for-substring-and-overlap-2",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/for-substring-and-overlap-2.idf",
+        "sha256": "baca523e0642ab779e5eea646b26da40ecbd55b344f238c3a12c069736a25e08",
+        "size_bytes": 345
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/for-substring-and-overlap-2/input.epJSON",
+        "sha256": "4a798591a79451e770bad89c627d62a132ce21b387c62bd3a20b272889d7a5f2",
+        "size_bytes": 1968
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/for-substring-and-overlap-2/conversion.json",
+        "sha256": "3da28939bcaf52e835a2dd6f0d0b8eb4c3d8e7812b8acf31cf5e841177da4b77",
+        "size_bytes": 2931
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "for-substring-and-overlap-3",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/for-substring-and-overlap-3.idf",
+        "sha256": "96e15cf204e3c856670447397830d9c99e68baddaad87bfb4fa3ce4b172d5f56",
+        "size_bytes": 343
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/for-substring-and-overlap-3/input.epJSON",
+        "sha256": "915a3dd5c4d74683dc185163eaa453e694c3fbcf855410ae76abc2c0eb997740",
+        "size_bytes": 1966
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/for-substring-and-overlap-3/conversion.json",
+        "sha256": "c50cf45f279dac13ed714f0bb4de0fa4846558bfe3a86d06d1ea0ab7f405318c",
+        "size_bytes": 2931
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "for-substring-and-overlap-4",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/for-substring-and-overlap-4.idf",
+        "sha256": "83233af55d40646dee6f32b4dadf6fb64a6ac1ced6b35232563e466472e581b7",
+        "size_bytes": 336
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/for-substring-and-overlap-4/input.epJSON",
+        "sha256": "25fcf9e2e3c8f7dbad419b7886545080cb7e88c5587157a5753174ff16788744",
+        "size_bytes": 1959
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/for-substring-and-overlap-4/conversion.json",
+        "sha256": "16791abe8c28c6b6240c9173c942f0f1149d396f0656a9f0ca854c7a3628681f",
+        "size_bytes": 2931
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "for-substring-and-overlap-5",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/for-substring-and-overlap-5.idf",
+        "sha256": "51cdebddf2399fbf37a006db92cf49b19a38a5b01ca3b3220b71c4ed29e5e5d9",
+        "size_bytes": 349
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/for-substring-and-overlap-5/input.epJSON",
+        "sha256": "d22e612903e465da8abe6a7136e74881029b44a17d50c681ef044c10a684020d",
+        "size_bytes": 1972
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/for-substring-and-overlap-5/conversion.json",
+        "sha256": "02974aba131cdd068c9bca6b038693fffae65e078d6094275cf537b736e930cd",
+        "size_bytes": 2931
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "duplicate-for-block-base",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/duplicate-for-block-base.idf",
+        "sha256": "1d0089972b0e5e89df4078f09abe505d23f2265fb033be048450f82cea70f96a",
+        "size_bytes": 363
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/duplicate-for-block-base/input.epJSON",
+        "sha256": "1d29ac95c398d821ce469fdf784d742b0989c6e7ff5c1f8d4c1a18f2d473e570",
+        "size_bytes": 2197
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/duplicate-for-block-base/conversion.json",
+        "sha256": "8a7d8314df681ed04aa1f57d44bb1246954cd2fce99924c7d709a46dec1b8bc2",
+        "size_bytes": 2898
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "through-year-and-leap-boundaries-1",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/through-year-and-leap-boundaries-1.idf",
+        "sha256": "f7c76e14af3aec461ea19283e8dfd13ddb7886eba6197f46c732cffc76365058",
+        "size_bytes": 345
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/through-year-and-leap-boundaries-1/input.epJSON",
+        "sha256": "d407d3a40b021acfc6d76f82b8b561a3eff09ad88957f01b7cf313d8b54dd360",
+        "size_bytes": 2039
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/through-year-and-leap-boundaries-1/conversion.json",
+        "sha256": "f9f7dde8915f777c3a087590ccd60c6d521dbc9c0df0efd66767745c1cab2daf",
+        "size_bytes": 3008
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "through-year-and-leap-boundaries-2",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/through-year-and-leap-boundaries-2.idf",
+        "sha256": "8256b491f6ed3a2a225896b7d95c5fd3899d5e4e284d9f54265faf8c63b97b74",
+        "size_bytes": 388
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/through-year-and-leap-boundaries-2/input.epJSON",
+        "sha256": "07441e2084227bfaa16169ea24fd6250697a9fd0253b1646c2be6462cbb4245b",
+        "size_bytes": 2364
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/through-year-and-leap-boundaries-2/conversion.json",
+        "sha256": "12fd2d92ccfb85fd4dd54d8586929f1f41601cd6545cd3e27a3138793441b94c",
+        "size_bytes": 3008
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "through-year-and-leap-boundaries-3",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/through-year-and-leap-boundaries-3.idf",
+        "sha256": "06456b2b074d1cd2ebca29157f0a45a116ffbb1ef10b894402b75e6905a40584",
+        "size_bytes": 345
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/through-year-and-leap-boundaries-3/input.epJSON",
+        "sha256": "a50c7c038b2f2a136815211e9edee1a17ab5f262b5347927b25ea4a0aa102b17",
+        "size_bytes": 2039
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/through-year-and-leap-boundaries-3/conversion.json",
+        "sha256": "a5f24a9c1b42a22e0af4d9458bd68f2571b9363da2861396a94174454192dca2",
+        "size_bytes": 3008
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "missing-overlapping-annual-coverage-1",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/missing-overlapping-annual-coverage-1.idf",
+        "sha256": "b2f5b055aa27295a19267f97d817128a3ec6ba4084e643a2439034f0f337555b",
+        "size_bytes": 303
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/missing-overlapping-annual-coverage-1/input.epJSON",
+        "sha256": "89bda054376cd2f8f8bc8a47fc795542490053e4eb635b14abb04e1ab6f4f52c",
+        "size_bytes": 1715
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/missing-overlapping-annual-coverage-1/conversion.json",
+        "sha256": "41be9bf35f554882d2b1c402361931d98e051f4055efb2dab558e4ce0cc0a2e0",
+        "size_bytes": 3041
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "missing-overlapping-annual-coverage-2",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/missing-overlapping-annual-coverage-2.idf",
+        "sha256": "81873a012b31233e8bbb311254164c0c4e3c99895e2ec87ab4d744646470bd6f",
+        "size_bytes": 346
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/missing-overlapping-annual-coverage-2/input.epJSON",
+        "sha256": "cd9638fdeeb01a63ffa54a10647bec65d0ba18507b85161c97a62f2c40c36cf1",
+        "size_bytes": 2040
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/missing-overlapping-annual-coverage-2/conversion.json",
+        "sha256": "ad958ef42c56f599d7ca3787580dc2469712a5eee781b4c590ab05b765b51b56",
+        "size_bytes": 3041
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "missing-overlapping-annual-coverage-3",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/missing-overlapping-annual-coverage-3.idf",
+        "sha256": "3a5a4a3c2ad476fd3c58e435d04c580bcae10bca8d4ec523877334ea16d0c853",
+        "size_bytes": 389
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/missing-overlapping-annual-coverage-3/input.epJSON",
+        "sha256": "d894a7e686f87202ca163938b5d06ff3d9c278c8182ca3718e354f6722cc5f9b",
+        "size_bytes": 2365
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/missing-overlapping-annual-coverage-3/conversion.json",
+        "sha256": "32e8bb12b19a7fbf06c011d3a1f662fe68c2e694d43fb00cef1e735ea7a14a3f",
+        "size_bytes": 3041
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "interpolation-normalization-1-step4",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/interpolation-normalization-1-step4.idf",
+        "sha256": "0204b912b5d8cb088a20b23a75836d71c1e3ff32b26e120b6f10da687cf7ce25",
+        "size_bytes": 336
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/interpolation-normalization-1-step4/input.epJSON",
+        "sha256": "42db6ec9f66d773eb2ba8e5babc3b4de65fdf27b2901b6eeefccfbb46d098aca",
+        "size_bytes": 2028
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/interpolation-normalization-1-step4/conversion.json",
+        "sha256": "ee15d4a835db6ac649c30966c51e6d692e7718f2572763e499ba166ef01f93b9",
+        "size_bytes": 3019
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "interpolation-normalization-2-step1",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/interpolation-normalization-2-step1.idf",
+        "sha256": "fdb930e9461f9390c85691fd5b5f4fd833586370aaf49150e2d838e3f06952c0",
+        "size_bytes": 351
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/interpolation-normalization-2-step1/input.epJSON",
+        "sha256": "ee70e72b05a577e623d5ef3e93b2be067fa82230409905a1e8765cb113969cb0",
+        "size_bytes": 2114
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/interpolation-normalization-2-step1/conversion.json",
+        "sha256": "15b35dc76d36e0b8e62c9f96d50c320e2c5949dbd5371866f49a399e68c9c490",
+        "size_bytes": 3019
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "interpolation-normalization-2-step3",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/interpolation-normalization-2-step3.idf",
+        "sha256": "9fc79c99c03f5696fa83172e586e8086f7661ff68c8a8fc88051dca009089e79",
+        "size_bytes": 351
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/interpolation-normalization-2-step3/input.epJSON",
+        "sha256": "4f5ee86895a9579a0fd5391169dd93828e810f0e6c881917aa72b2de7f31d706",
+        "size_bytes": 2114
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/interpolation-normalization-2-step3/conversion.json",
+        "sha256": "9a60d03879b4fa6ff8d8fc93ef91ff13abeb9acf96e5a72d617932c6194a1f82",
+        "size_bytes": 3019
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "interpolation-normalization-2-step4",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/interpolation-normalization-2-step4.idf",
+        "sha256": "c2924ced5df31dced4f4b2bb45da1ca617a39728a52f4dd38fa6b37f9eb807cd",
+        "size_bytes": 351
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/interpolation-normalization-2-step4/input.epJSON",
+        "sha256": "285fc0d91aea3d5cb49a4c0f3b56ae54880ac6dbdea3c07c5e5077223c098b1e",
+        "size_bytes": 2114
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/interpolation-normalization-2-step4/conversion.json",
+        "sha256": "5e3f43dd33937414ed7fc49a57ad0676195e6d325a37d64c989a1f79308d07eb",
+        "size_bytes": 3019
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "interpolation-normalization-3-step1",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/interpolation-normalization-3-step1.idf",
+        "sha256": "f654f0e78ab27249019745faac27e4d95abf1927895fcb754aef993fcfb3da70",
+        "size_bytes": 356
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/interpolation-normalization-3-step1/input.epJSON",
+        "sha256": "e88262a1bf957cd70e5f996be79448bd0ba3314623e4a1f91d8c839749b7ca13",
+        "size_bytes": 2119
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/interpolation-normalization-3-step1/conversion.json",
+        "sha256": "fd0c61a52336c3d9adf96b4b813b23f64fe7b48e4197cd7e994ce161964f4aed",
+        "size_bytes": 3019
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "interpolation-normalization-3-step3",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/interpolation-normalization-3-step3.idf",
+        "sha256": "9a7a9687e425f0da67d1b4b726efb4b120ea585b25bc42d1032da86f98aed6d6",
+        "size_bytes": 356
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/interpolation-normalization-3-step3/input.epJSON",
+        "sha256": "71d8ad5563823cdd37554296ab0f579c66111b74ce4622e877a596b81b4c0c97",
+        "size_bytes": 2119
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/interpolation-normalization-3-step3/conversion.json",
+        "sha256": "12eeb6ca0c1abe1d043c94197a7b8fe8b34d754875a23c2c6de45a6591f6d264",
+        "size_bytes": 3019
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "interpolation-normalization-3-step4",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/interpolation-normalization-3-step4.idf",
+        "sha256": "490b3767d20bed3f45ce0cae0c161a18e3d64dc22284b72f5cf4b73769f00152",
+        "size_bytes": 356
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/interpolation-normalization-3-step4/input.epJSON",
+        "sha256": "bdb8a6b0b25510a22860a54611545ebcf983bd373b37bac851af02651ffb7063",
+        "size_bytes": 2119
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/interpolation-normalization-3-step4/conversion.json",
+        "sha256": "596f3444e85f8a7031478d94da7a3635a13b2cb574ccea5e3493a931bfc70e96",
+        "size_bytes": 3019
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "interpolation-normalization-4-step1",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/interpolation-normalization-4-step1.idf",
+        "sha256": "9e36296fd322edd998bebcc4fc68d7f8fdb674b7d0c4b84b2c313659e6100849",
+        "size_bytes": 355
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/interpolation-normalization-4-step1/input.epJSON",
+        "sha256": "3b5949469916d51677a3ab8c982c339e762b5e6cf191f7a687b1e17aeddce0f7",
+        "size_bytes": 2118
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/interpolation-normalization-4-step1/conversion.json",
+        "sha256": "8f118742b2dc63dfe62ce4a3a61e82024949ba70d84a94cdc7b1179e0ce26667",
+        "size_bytes": 3019
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "interpolation-normalization-4-step3",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/interpolation-normalization-4-step3.idf",
+        "sha256": "69fbb2f3f8c93cc51b717533c5cd0e7c1ab6efe24a1d99964e451c42c86394e1",
+        "size_bytes": 355
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/interpolation-normalization-4-step3/input.epJSON",
+        "sha256": "6c612b37d03c180ba3e08ee38e25f4dfc77d4b434147c1a1a14c6eb98916c1e2",
+        "size_bytes": 2118
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/interpolation-normalization-4-step3/conversion.json",
+        "sha256": "23c4bd39b0e854b6275c40bec0db0fa78e177f5b9cf6a5a1d0e2d053a25c17c6",
+        "size_bytes": 3019
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "interpolation-normalization-4-step4",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/interpolation-normalization-4-step4.idf",
+        "sha256": "b26528b61a8cb622a082a2961cdf5e2cee830805cd0a15944e8fd3cfaa3a0fc7",
+        "size_bytes": 355
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/interpolation-normalization-4-step4/input.epJSON",
+        "sha256": "6d004b93edff93c5ad6caaf729130c7697e8d5c7c6c332879610cd861df433a9",
+        "size_bytes": 2118
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/interpolation-normalization-4-step4/conversion.json",
+        "sha256": "b7168175350a12212b635c16dd56a28ecea2d48c861b0a5e30641b38aa183eb3",
+        "size_bytes": 3019
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "until-missing-duplicate-descending-1",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/until-missing-duplicate-descending-1.idf",
+        "sha256": "0f4ee03a5fdb0ff354c498b923d3873c80f7c5e8714de47d5ea77ea1fce5adfc",
+        "size_bytes": 303
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-missing-duplicate-descending-1/input.epJSON",
+        "sha256": "1d02e4e94d1979ed54c8fe43e01cb345409495508124620fa75c0516daf9fb1e",
+        "size_bytes": 1715
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-missing-duplicate-descending-1/conversion.json",
+        "sha256": "83c6f93ef80274cc4bf913f2aad4a3152e936bfb5a91c61300853abbb75534fb",
+        "size_bytes": 3030
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "until-missing-duplicate-descending-2",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/until-missing-duplicate-descending-2.idf",
+        "sha256": "edc2295a3d0d5a87b6e0ef7e90b985caa44081bc9598db054030cad839564ae8",
+        "size_bytes": 336
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-missing-duplicate-descending-2/input.epJSON",
+        "sha256": "028fac193cd74b4e54d155ceac34fdc3aab35ef65cbaa33e1d218695702ba52f",
+        "size_bytes": 2028
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-missing-duplicate-descending-2/conversion.json",
+        "sha256": "ad453439804002258a642249d8d45a75b750fb722d8e2b583c547849e5041e24",
+        "size_bytes": 3030
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "until-missing-duplicate-descending-3",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/until-missing-duplicate-descending-3.idf",
+        "sha256": "db6ed15297f32e62b5900371ea8677d41491ca2f493ad4f5ed65591e1c510cf7",
+        "size_bytes": 336
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-missing-duplicate-descending-3/input.epJSON",
+        "sha256": "6ada6db1d84da84b6fc3169cceab67cfce3d49220b9d70262f4dd7664a4275b5",
+        "size_bytes": 2028
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-missing-duplicate-descending-3/conversion.json",
+        "sha256": "314d6122b1f02bab907e1eca7e3113ccb61fb224447713a991fd4cb4c1d16cd9",
+        "size_bytes": 3030
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "until-decoding-warnings-1",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/until-decoding-warnings-1.idf",
+        "sha256": "1583d578843b2913489fcda522fc4e590431e2004f3b39c794731209ea930ae4",
+        "size_bytes": 303
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-decoding-warnings-1/input.epJSON",
+        "sha256": "2bbdd16e19edc5ec7c381f3c9f8ae1cfc123e3bfda75305608913a65ad278e77",
+        "size_bytes": 1715
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-decoding-warnings-1/conversion.json",
+        "sha256": "42ffc1625effa0c4a29658fa5c2214d4e74beeab56f007460361eb3c163ffbb7",
+        "size_bytes": 2909
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "until-decoding-warnings-2",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/until-decoding-warnings-2.idf",
+        "sha256": "cfe93cfdcda51ba8fa79eb587d7f90b2c9f1f67a1c9203fed11a3041830a20f7",
+        "size_bytes": 303
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-decoding-warnings-2/input.epJSON",
+        "sha256": "73337c9336896693bd1afa3688ae8b489fd3ee51defdd4240e595d384ea236c5",
+        "size_bytes": 1715
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-decoding-warnings-2/conversion.json",
+        "sha256": "142cfe9fdb1f2b29c319737dbb0f87dd73a03f19d02e52521b067f671d886d59",
+        "size_bytes": 2909
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "until-decoding-warnings-3",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/until-decoding-warnings-3.idf",
+        "sha256": "2f1c522b43aaafb4d04f6dd72c28f4a80bfddfa08cbdf9f939e3b399b7538425",
+        "size_bytes": 303
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-decoding-warnings-3/input.epJSON",
+        "sha256": "061c40679b2dae6b1dd3a205d750379f76706a5df9d24a6165e3b43dc310cecd",
+        "size_bytes": 1715
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-decoding-warnings-3/conversion.json",
+        "sha256": "1d53bfdf6848a24785aa7a628aca0306e89ebca4ab0b1f9471319afd20e8f2f4",
+        "size_bytes": 2909
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "until-decoding-warnings-4",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/until-decoding-warnings-4.idf",
+        "sha256": "e15a32c188b27a7f0ef445d47a600608ad98fa571315fd1db1daed72eef0f614",
+        "size_bytes": 320
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-decoding-warnings-4/input.epJSON",
+        "sha256": "7dd20ba5d28cdea79b4ae1d49b2072462ac6f9421bddbb042b788169e9025961",
+        "size_bytes": 1872
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-decoding-warnings-4/conversion.json",
+        "sha256": "aa22e7697d3651e10252a185c3023610f2c022e8543569bcbb9ae25a1c6ff36f",
+        "size_bytes": 2909
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "until-decoding-warnings-5",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/until-decoding-warnings-5.idf",
+        "sha256": "278976f2e8a28cf34b3df5e4aa6560ede6f3f963c07f64b9990ac79765ae1bf4",
+        "size_bytes": 322
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-decoding-warnings-5/input.epJSON",
+        "sha256": "adf84944dd60ac7155fa00e36475095156ab0515e997d2d1faf802145bab3191",
+        "size_bytes": 1874
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-decoding-warnings-5/conversion.json",
+        "sha256": "24340a00d2417bac3e3a0e9fabe1a35b43fb6bbc34f9c3d0e02751917844103d",
+        "size_bytes": 2909
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "until-decoding-warnings-6",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/until-decoding-warnings-6.idf",
+        "sha256": "e374ee70c4aed2f66f36e52226ad8af609ccec43d8ec3362814647fe666c7f69",
+        "size_bytes": 322
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-decoding-warnings-6/input.epJSON",
+        "sha256": "175cd372c5bd104b2d6167129f4a49619b1bb1716f4a33d85d407fe5e9bf304f",
+        "size_bytes": 1874
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-decoding-warnings-6/conversion.json",
+        "sha256": "6603ff60521c0c440c1b7f977be1080c066b3c12855cac9253f2735664328082",
+        "size_bytes": 2909
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "until-decoding-warnings-7",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/until-decoding-warnings-7.idf",
+        "sha256": "f7db7f0a7411eaec11f29f41139b61593a6d813a36deedebfcec8e9562ceb25d",
+        "size_bytes": 319
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-decoding-warnings-7/input.epJSON",
+        "sha256": "a9ce09d33d4867ab7f8fe753290adc10f5eb2886ffcdbd67a5ee14d92f49671f",
+        "size_bytes": 1871
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-decoding-warnings-7/conversion.json",
+        "sha256": "bf4b7a0e9dc65a5605430421af82e0026918c6c8ea34d107d664ef62357838f2",
+        "size_bytes": 2909
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "until-decoding-warnings-8",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/until-decoding-warnings-8.idf",
+        "sha256": "aac48d836c61b3f4299d5c7caf70ce6b631897515fc352fb3b5ba7e53f40fd66",
+        "size_bytes": 320
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-decoding-warnings-8/input.epJSON",
+        "sha256": "e4561944a074d88236005473ddcb8ee5e8f511b6a7ab18c6f974dc60e5f8173c",
+        "size_bytes": 1872
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/until-decoding-warnings-8/conversion.json",
+        "sha256": "8ba5204205f77d6c581cf599fbf45de7ae8cd1af112d7e592ca9b41c81b179d0",
+        "size_bytes": 2909
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "missing-through-or-value-1",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/missing-through-or-value-1.idf",
+        "sha256": "98021275a15d736c1917be32eb2c8f90a643bed9ab030a522b32df3283d7c517",
+        "size_bytes": 289
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/missing-through-or-value-1/input.epJSON",
+        "sha256": "1c9de6c595d4bfc816016bc0bda830aff0cec6514ac99bfd0d157cfecfe95978",
+        "size_bytes": 1630
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/missing-through-or-value-1/conversion.json",
+        "sha256": "ece28cfe703588168b3cb59871b98fd44b5a77edf39fd5b85edce30414d99bfc",
+        "size_bytes": 2920
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "missing-through-or-value-2",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/missing-through-or-value-2.idf",
+        "sha256": "0b81f2df9ccf09fc3e0db8c80419e731b3d3c6482f012fb58ac5baa1e8ac46e3",
+        "size_bytes": 298
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/missing-through-or-value-2/input.epJSON",
+        "sha256": "7c0cafb9f6902f2b8c062ee4e9f8e8b8fba818fd23ca46339682ba6ad2c68e48",
+        "size_bytes": 1641
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/missing-through-or-value-2/conversion.json",
+        "sha256": "a7756889f6d0e893edad9467c9a93b8930407532e31e92deb1407487799fc06c",
+        "size_bytes": 2920
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "missing-through-or-value-3",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/missing-through-or-value-3.idf",
+        "sha256": "55de241496b19720ebeaf7813178d19407dcc0a25dac6e4419c80393ddd3c706",
+        "size_bytes": 311
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/missing-through-or-value-3/input.epJSON",
+        "sha256": "11778fe988d99a527c12714db50acb68ea5e04f2718fc667fcfd15262088fccd",
+        "size_bytes": 1725
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/missing-through-or-value-3/conversion.json",
+        "sha256": "b78b206f80cb7a7707140ca937ebccf1760343878dac63d54455a6f37a962e75",
+        "size_bytes": 2920
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "family-id-order-base",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/family-id-order-base.idf",
+        "sha256": "a2c317cca4b12149ef0551d25c601bdd16d1af7d2d8f0c6912d3c4d7135404be",
+        "size_bytes": 496
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/family-id-order-base/input.epJSON",
+        "sha256": "9a932a46d1cd66647fda85d5aa55bcb0daa0fa2c7fea2f50bf719568c3cb22b1",
+        "size_bytes": 2555
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/family-id-order-base/conversion.json",
+        "sha256": "041e9a84a3043788ff705edf9dab8da7c46dcadd5128cbc3d55367801669e868",
+        "size_bytes": 2854
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "case-and-duplicate-names-1",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/case-and-duplicate-names-1.idf",
+        "sha256": "0af6b3fa113c96890c203f8c69d9ffff666c633e06711217febccc4a53afd64d",
+        "size_bytes": 301
+      },
+      "epjson_input": null,
+      "available": false,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/case-and-duplicate-names-1/conversion.json",
+        "sha256": "cc187ed7d955f4e4f89648db51c1bc33fe582f1390708746eeaaaa2369eb9c4b",
+        "size_bytes": 2545
+      },
+      "status": "actual-conversion-input-unavailable",
+      "unavailable_reason": "actual converter returned zero without epJSON output"
+    },
+    {
+      "case_id": "case-and-duplicate-names-2",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/case-and-duplicate-names-2.idf",
+        "sha256": "477401a871f1d3017288a5bc29b797eadd040a3138f269c12fc9382a473ea5fc",
+        "size_bytes": 317
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/case-and-duplicate-names-2/input.epJSON",
+        "sha256": "edfdf61e6addebb43dec646ca5baddf8c4c6d0b6704082a48827ac3945cdcb27",
+        "size_bytes": 1520
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/case-and-duplicate-names-2/conversion.json",
+        "sha256": "4147a0aff9a323b696cba7ee7ea6e3f70b8713a8f63394ca1d02027c94e62e81",
+        "size_bytes": 2920
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "case-and-duplicate-names-3",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/case-and-duplicate-names-3.idf",
+        "sha256": "d9cbca662fa84bc90bc7cad2d750457f5ebeb45f8b22c50fdccb4f6d8270ce8f",
+        "size_bytes": 275
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/case-and-duplicate-names-3/input.epJSON",
+        "sha256": "cdc58226dc01fa5002cc61869af0478462dc6bf0fa81eff7572a11e2b247206e",
+        "size_bytes": 1475
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/case-and-duplicate-names-3/conversion.json",
+        "sha256": "5823a8e26423b0b57f3143afe9529aeaf9b5bd810d032099b169a0af4c87675c",
+        "size_bytes": 2920
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "case-and-duplicate-names-4",
+      "input": {
+        "path": ".runtime/porting/SCH-01/inputs-01/diagnostics/case-and-duplicate-names-4.idf",
+        "sha256": "19fda1dd95adf3903ea20e2dfdee4a2400e935d420e0bc0f184e5fe219cf4530",
+        "size_bytes": 338
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/case-and-duplicate-names-4/input.epJSON",
+        "sha256": "2f3fae2af4cb71a9e714a9598ec5a29a5ac1cc9b07646ed0aa3427e3b7a3f4c1",
+        "size_bytes": 1866
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/case-and-duplicate-names-4/conversion.json",
+        "sha256": "e897a7ca8e5a24272c58eb370932007f5de495d27b320b16078a4f55bba2f347",
+        "size_bytes": 2920
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "A-24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-24H/input.idf",
+        "sha256": "db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755",
+        "size_bytes": 9275
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/A-24H/input.epJSON",
+        "sha256": "bd5018bf65068eea9260ece1239560fe7ef893452fcc71c83d7872c7c4b54578",
+        "size_bytes": 27734
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/A-24H/conversion.json",
+        "sha256": "edee535e8e7b621962677975eaa1d9ba0f06c915b32b272ce60cee58e2156f4d",
+        "size_bytes": 2684
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "A-72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-72H/input.idf",
+        "sha256": "5ed670b9d698967f8caf834df9ee101ea736b9440a1567d30ee929151d1cdebc",
+        "size_bytes": 9275
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/A-72H/input.epJSON",
+        "sha256": "6ee97be079078607a920ccf780e1bdf6c1ae8595581f588442ed842e07a4099c",
+        "size_bytes": 27734
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/A-72H/conversion.json",
+        "sha256": "ca92580f96d4fca25a3d124b94c293e0d8fedaaa4ff3a6478883f9929bc3f648",
+        "size_bytes": 2684
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "A-ANNUAL",
+      "input": {
+        "path": "energyplus_porting_plan/cases/A-ANNUAL/input.idf",
+        "sha256": "7e5e3aeb6df1bf4f894ddf7cd994e81631c3c1f2f6eefb239958958037f6e4f0",
+        "size_bytes": 9280
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/A-ANNUAL/input.epJSON",
+        "sha256": "ca8c4b8a5e61229af8c75603630558c3a13b8306e6fdd677832b5fc1c0f09ea7",
+        "size_bytes": 27736
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/A-ANNUAL/conversion.json",
+        "sha256": "9f3b0fca78a892e82f2cdff0d4e7b90d489509426732928ddb130f0a64a351ae",
+        "size_bytes": 2717
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "B-NOLIMIT-24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-24H/input.idf",
+        "sha256": "47f2dcfd3e129980e5dbe6fd8412902074cb86dade25c08839c66cf781be9f12",
+        "size_bytes": 13025
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-24H/input.epJSON",
+        "sha256": "593fccbf425883d9edbaf40e506a6a2bbca6e66cfafe017d6132095a7969e1e3",
+        "size_bytes": 37726
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-24H/conversion.json",
+        "sha256": "3ee553c15e2152a7d6dc8b49f65317b1ed25fa19a833c081ebbaf59f975ec44b",
+        "size_bytes": 2775
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "B-NOLIMIT-72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-72H/input.idf",
+        "sha256": "a33c46f701ec5be7602c558f0c82ebffc1c3e3afb07e0899012bbff956e8dcda",
+        "size_bytes": 13025
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-72H/input.epJSON",
+        "sha256": "21811e29c8e589034f3f46ea33faf1a15054eef2512f37d39f8d3e50539f2e70",
+        "size_bytes": 37726
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-72H/conversion.json",
+        "sha256": "805cfce78d57f5e0e07cc6cfbf30d398c94861630d58d7348b119fe74e802ccf",
+        "size_bytes": 2775
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "B-NOLIMIT-ANNUAL",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-NOLIMIT-ANNUAL/input.idf",
+        "sha256": "55cef33449300f43cf83182fce243664b8f50e4035d26b295292fadfba4667cb",
+        "size_bytes": 13030
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-ANNUAL/input.epJSON",
+        "sha256": "f8e5ec1be252a7efe7c1e2533d7f47ed8ae131234ca2a2bd6cda069d6f65e369",
+        "size_bytes": 37728
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-NOLIMIT-ANNUAL/conversion.json",
+        "sha256": "607a8c799254cda407be30c2c3102a729cdfa9290c14fc2843c718fb251b879b",
+        "size_bytes": 2808
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "B-FLOW-24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-24H/input.idf",
+        "sha256": "84f0642ab69cdeaf1cda4d5d57a45f47a3204072e98a2d0ee961252ba84c3ced",
+        "size_bytes": 13042
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-24H/input.epJSON",
+        "sha256": "5a4d64ae7107fd32fff7234179e920912ef993284443d585a58eff60233cb7f4",
+        "size_bytes": 37842
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-24H/conversion.json",
+        "sha256": "24e0bcb4a398879af7f25860465464b6d5556ad62903ce4838afc1b00d0f3674",
+        "size_bytes": 2742
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "B-FLOW-72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-72H/input.idf",
+        "sha256": "3e2aab033792075d912a1063f5a067a43f99f69b482dbe377d91adad6621d64c",
+        "size_bytes": 13042
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-72H/input.epJSON",
+        "sha256": "d01686452f928d9a105ebcfbddd3c1a0dc05d39b6121c034bc28d6bb46f37f00",
+        "size_bytes": 37842
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-72H/conversion.json",
+        "sha256": "b941112ea03544d6534d731c6e7356b3da1f8eb7477d3fad33becea41fa14de8",
+        "size_bytes": 2742
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "B-FLOW-ANNUAL",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-FLOW-ANNUAL/input.idf",
+        "sha256": "ad89411a51e17d4d3a1e39ecacdb7907516ac8ed75baa32fbb85c301f05800d5",
+        "size_bytes": 13047
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-ANNUAL/input.epJSON",
+        "sha256": "ea043bc783f6463af56ce98f79957100cb89a0a60be70c52c72a511050bd9143",
+        "size_bytes": 37844
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-FLOW-ANNUAL/conversion.json",
+        "sha256": "c7309de9ac5e92ee84ea53b54bdeb61e9ec74464951babe0ea4fb4ed2bed41f0",
+        "size_bytes": 2775
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "B-CAPACITY-24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-24H/input.idf",
+        "sha256": "5d1f7375345821e5dad64db2d88b349c73325155e300b8f72151bc02cd7961bf",
+        "size_bytes": 13044
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-24H/input.epJSON",
+        "sha256": "dc079358dc1cd02b32696db3f5bec6a83baf25f3b20e71ac50d9f83465030817",
+        "size_bytes": 37845
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-24H/conversion.json",
+        "sha256": "3236a8038b98eb9bdb8aca294d25ca8bbcbc8c6954ad5fea98c2080f155cc40a",
+        "size_bytes": 2786
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "B-CAPACITY-72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-72H/input.idf",
+        "sha256": "21c562f6a0135d174e1e29a711f6dadcaeb2cf1945c7207d68babe69bcbfc001",
+        "size_bytes": 13044
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-72H/input.epJSON",
+        "sha256": "d4e03f039aa5c1a481a97d51778be6d4db18ede9acf770c0890d261bb1946d79",
+        "size_bytes": 37845
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-72H/conversion.json",
+        "sha256": "470728782f29d47fbf2b47e0b63fa4ed2a7094fcf2d6feb40b09ed81dd48e02d",
+        "size_bytes": 2786
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "B-CAPACITY-ANNUAL",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-CAPACITY-ANNUAL/input.idf",
+        "sha256": "ecc1d78bc2dab6560b0e5bbaad19826a74fdf1241f9ed1e96f9be00002b83a95",
+        "size_bytes": 13049
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-ANNUAL/input.epJSON",
+        "sha256": "054977d7688a0fcbe0183f88179b5d557240343f4ffc67bf58556eb95822820c",
+        "size_bytes": 37847
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-CAPACITY-ANNUAL/conversion.json",
+        "sha256": "445d64f53bcf361edb307c06c05d3e95b0cb9e5d9e5a61d02d4f8b600b2f4da5",
+        "size_bytes": 2819
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "B-BOTH-24H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-24H/input.idf",
+        "sha256": "97bf7c1c732f0e19ca5f563909d1bf6603e1865a1c2bd8cdc0bf5b39365ae1ea",
+        "size_bytes": 13070
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-24H/input.epJSON",
+        "sha256": "aa9d679179f4b93cf4b5dff2f11f2011c101c491c44f1709cdffec5aaa662d9a",
+        "size_bytes": 37971
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-24H/conversion.json",
+        "sha256": "7a7123c9f7d90e33c35343b4a007b9ca49c79d09dcad92fcc487ecf532d92364",
+        "size_bytes": 2742
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "B-BOTH-72H",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-72H/input.idf",
+        "sha256": "237b434b0b7546244dd6eb19ba2296d66765e758c319514efa0d087bbd85a506",
+        "size_bytes": 13070
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-72H/input.epJSON",
+        "sha256": "9b4034052cd58aabe15e7470ed8305a6d97ff11c5a59dc332c271f8a85bf82d0",
+        "size_bytes": 37971
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-72H/conversion.json",
+        "sha256": "ae5fb503177874316afc5a71ac1ba3c5b37318740fa6f0e7e1466a80cc3764e7",
+        "size_bytes": 2742
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    },
+    {
+      "case_id": "B-BOTH-ANNUAL",
+      "input": {
+        "path": "energyplus_porting_plan/cases/B-BOTH-ANNUAL/input.idf",
+        "sha256": "b2a0e8f03cbf6ddbefa26109f20fc60ddb03fa9e34bef93862bdd2f48a3ffe3d",
+        "size_bytes": 13075
+      },
+      "epjson_input": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-ANNUAL/input.epJSON",
+        "sha256": "9b782c66743f558c7192d22678a915389cc71eeb85414dbcc44ea3c827514a7e",
+        "size_bytes": 37973
+      },
+      "available": true,
+      "actual_conversion_execution": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/B-BOTH-ANNUAL/conversion.json",
+        "sha256": "072ced0051d32351ddd185b68874e92281f03b75b90537fafb346ea8a78fab27",
+        "size_bytes": 2775
+      },
+      "status": "actual-converted-input-available",
+      "unavailable_reason": null
+    }
+  ],
+  "case_count": 82,
+  "available_converted_input_count": 79,
+  "unavailable_converted_input_count": 3,
+  "executed_runner_sources": [
+    {
+      "historical_path": ".runtime/porting/SCH-01/input-prep-02/convert_inputs.py",
+      "archive": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/sources/convert_inputs.py",
+        "sha256": "82f27c8327d2409bb3bcba727044ebe6a36641ed8d7c404e08dd4bc92c990dbb",
+        "size_bytes": 7727
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/SCH-01/input-prep-02/input_common.py",
+      "archive": {
+        "path": ".runtime/porting/SCH-01/converted-inputs-01/sources/input_common.py",
+        "sha256": "b38466a0dd8851935d0ef28c079220d7c48f2c05506926d1ad4e7fb463f6de77",
+        "size_bytes": 2765
+      }
+    }
+  ],
+  "scientific_execution_performed": false,
+  "Native_scientific_outputs_used_as_inputs": false,
+  "expected_values_supplied": false,
+  "expected_exits_supplied": false,
+  "failed_conversions_counted_as_PASS": false,
+  "outer_zero_means_factual_input_conversion_ledger_complete": true,
+  "all_conversions_successful_claimed": false,
+  "final_scientific_packet_frozen": false,
+  "gates_updated": false
+}

@@ -1,0 +1,110 @@
+    void TransformVertsByAspect(EnergyPlusData &state,
+                                int const SurfNum, // Current surface number
+                                int const NSides   // Number of sides to figure
+    )
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Brent T Griffith
+        //       DATE WRITTEN   April 2003
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Alter input for surface geometry
+        // Optimizing building design for energy can involve
+        //  altering building geometry.  Rather than assemble routines to transform
+        //  geometry through pre-processing on input, it may be simpler to change
+        //  vertices within EnergyPlus since it already reads the data from the input
+        //  file and there would no longer be a need to rewrite the text data.
+        //  This is essentially a crude hack to allow adjusting geometry with
+        //  a single parameter...
+
+        // METHODOLOGY EMPLOYED:
+        // once vertices have been converted to WCS, change them to reflect a different aspect
+        // ratio for the entire building based on user input.
+        // This routine is called once for each surface by subroutine GetVertices
+
+        static std::string const CurrentModuleObject("GeometryTransform");
+
+        Array1D_string cAlphas(1);
+        Array1D<Real64> rNumerics(2);
+        auto &OldAspectRatio = state.dataSurfaceGeometry->OldAspectRatio;
+        auto &NewAspectRatio = state.dataSurfaceGeometry->NewAspectRatio;
+        int n;
+        Real64 Xo;
+        Real64 XnoRot;
+        Real64 Xtrans;
+        Real64 Yo;
+        Real64 YnoRot;
+        Real64 Ytrans;
+        // begin execution
+        // get user input...
+
+        auto &surfTemp = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
+
+        if (state.dataSurfaceGeometry->firstTime) {
+            if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject) == 1) {
+                int NAlphas;
+                int NNum;
+                int IOStat;
+                auto &s_ipsc = state.dataIPShortCut;
+                auto &transformPlane = state.dataSurfaceGeometry->transformPlane;
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                         CurrentModuleObject,
+                                                                         1,
+                                                                         cAlphas,
+                                                                         NAlphas,
+                                                                         rNumerics,
+                                                                         NNum,
+                                                                         IOStat,
+                                                                         s_ipsc->lNumericFieldBlanks,
+                                                                         s_ipsc->lAlphaFieldBlanks,
+                                                                         s_ipsc->cAlphaFieldNames,
+                                                                         s_ipsc->cNumericFieldNames);
+                OldAspectRatio = rNumerics(1);
+                NewAspectRatio = rNumerics(2);
+                transformPlane = cAlphas(1);
+                if (transformPlane != "XY") {
+                    ShowWarningError(
+                        state, EnergyPlus::format("{}: invalid {}=\"{}...ignored.", CurrentModuleObject, s_ipsc->cAlphaFieldNames(1), cAlphas(1)));
+                }
+                state.dataSurfaceGeometry->firstTime = false;
+                state.dataSurfaceGeometry->noTransform = false;
+                state.dataSurface->AspectTransform = true;
+                if (state.dataSurface->WorldCoordSystem) {
+                    ShowWarningError(state,
+                                     EnergyPlus::format("{}: must use Relative Coordinate System.  Transform request ignored.", CurrentModuleObject));
+                    state.dataSurfaceGeometry->noTransform = true;
+                    state.dataSurface->AspectTransform = false;
+                }
+            } else {
+                state.dataSurfaceGeometry->firstTime = false;
+            }
+        }
+        if (state.dataSurfaceGeometry->noTransform) {
+            return;
+        }
+
+        // check surface type.
+        if (!surfTemp.HeatTransSurf) {
+            // Site Shading do not get transformed.
+            if (surfTemp.Class == SurfaceClass::Detached_F) {
+                return;
+            }
+        }
+
+        // testing method of transforming  x and y coordinates as follows
+
+        // this works if not rotated wrt north axis ... but if it is, then trouble
+        // try to first derotate it , transform by aspect and then rotate back.
+
+        for (n = 1; n <= NSides; ++n) {
+            Xo = surfTemp.Vertex(n).x; // world coordinates.... shifted by relative north angle...
+            Yo = surfTemp.Vertex(n).y;
+            // next derotate the building
+            XnoRot = Xo * state.dataSurfaceGeometry->CosBldgRelNorth + Yo * state.dataSurfaceGeometry->SinBldgRelNorth;
+            YnoRot = Yo * state.dataSurfaceGeometry->CosBldgRelNorth - Xo * state.dataSurfaceGeometry->SinBldgRelNorth;
+            // translate
+            Xtrans = XnoRot * std::sqrt(NewAspectRatio / OldAspectRatio);
+            Ytrans = YnoRot * std::sqrt(OldAspectRatio / NewAspectRatio);
+            // rerotate
+            surfTemp.Vertex(n).x = Xtrans * state.dataSurfaceGeometry->CosBldgRelNorth - Ytrans * state.dataSurfaceGeometry->SinBldgRelNorth;
+

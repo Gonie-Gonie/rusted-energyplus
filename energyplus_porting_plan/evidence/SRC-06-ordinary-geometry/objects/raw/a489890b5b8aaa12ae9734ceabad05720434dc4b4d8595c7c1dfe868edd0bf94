@@ -1,0 +1,27 @@
+{
+  "schema": "ordinary-geometry-execution-Root-Source-review.v1",
+  "accepted": true,
+  "reviewed_manifest": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-06/manifest.json",
+    "sha256": "f88bf1a486d690155ceabee00791531113f887f79d719c3f1029d71622c850f6",
+    "size_bytes": 26529
+  },
+  "parent04_Root_review": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-04/Root-FULL-Source-review-04.json",
+    "sha256": "03d3660b865811314f0861d28605d5a362693a785020c8b0f9ee6f5729d00bf8"
+  },
+  "independent_FULL_Source_review": {
+    "path": ".runtime/porting/SRC-06/Base-geometry-execution-Source-review-06/review.json",
+    "sha256": "a9d4be7925aa3f75f71ec0a8d818deecd0ae1209637676fcca25f12284061e9f",
+    "size_bytes": 900
+  },
+  "full_reference_occurrences": 97,
+  "unique_paths": 68,
+  "cumulative04_plus_full05_and06_diffs_authors_and_added_README_read": true,
+  "exact_declared_ref_target_output_only_replacements_inverse": true,
+  "four_current_narrow_diffs_regenerated": true,
+  "unchanged_loader_math_input_custody_and_FP_readonly_contract": true,
+  "helper_or_driver_executed": false,
+  "numerical_results_read": false,
+  "gates_updated": false
+}

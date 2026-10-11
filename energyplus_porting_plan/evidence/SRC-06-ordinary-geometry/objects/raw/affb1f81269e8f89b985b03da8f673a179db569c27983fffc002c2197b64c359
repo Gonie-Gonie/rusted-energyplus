@@ -1,0 +1,62 @@
+        using Vertices = Array1D<Vector>;
+        using Plane = Vector4<Real64>;
+
+        // Members
+        std::string Name; // User supplied name of the surface (must be unique)
+        int Construction; // Pointer to the construction in the Construct derived type
+
+        int RepresentativeCalcSurfNum; // Index of the surface that is used to calculate the heat balance for this surface. Equal to this surfaces
+                                       // index when not using representative surface calculations.
+
+        std::vector<int> ConstituentSurfaceNums; // A vector of surface numbers which reference this surface for representative calculations
+        int ConstructionStoredInputValue;        // holds the original value for Construction per surface input
+        SurfaceClass Class;
+        SurfaceClass OriginalClass;
+
+        // Geometry related parameters
+        SurfaceShape Shape;       // Surface shape (Triangle=1,Quadrilateral=2,Rectangle=3,
+                                  // Rectangular Window/Door=4,Rectangular Overhang=5,
+                                  // Rectangular Left Fin=6,Rectangular Right Fin=7,
+                                  // Triangular Window=8)
+        int Sides;                // Number of side/vertices for this surface (based on Shape)
+        Real64 Area;              // Surface area of the surface (less any subsurfaces) {m2}
+        Real64 GrossArea;         // Surface area of the surface (including subsurfaces) {m2}
+        Real64 NetAreaShadowCalc; // Area of a wall/floor/ceiling less subsurfaces assuming all windows, if present, have unity multiplier.
+                                  // Wall/floor/ceiling/roof areas that include windows include frame (unity) areas.
+                                  // Areas of Windows including divider (unity) area.
+                                  // These areas are used in shadowing / sunlit area calculations.
+        Real64 Perimeter;         // Perimeter length of the surface {m}
+        Real64 Azimuth;           // Direction the surface outward normal faces (degrees) or FACING
+        Real64 Height;            // Height of the surface (m)
+        Real64 Reveal;            // Depth of the window reveal (m) if this surface is a window
+        Real64 Tilt;              // Angle (deg) between the ground outward normal and the surface outward normal
+        Real64 Width;             // Width of the surface (m)
+
+        // Precomputed parameters for PierceSurface performance
+        ShapeCat shapeCat;   // Shape category
+        Plane plane;         // Plane
+        Surface2D surface2d; // 2D projected surface for efficient intersection testing
+
+        // Vertices
+        Array1D<Vector> NewVertex;
+        Vertices Vertex;          // Surface Vertices are represented by Number of Sides and Vector (type)
+        Vector3<Real64> Centroid; // computed centroid (also known as center of mass or surface balance point)
+        Vector3<Real64> lcsx;
+        Vector3<Real64> lcsy;
+        Vector3<Real64> lcsz;
+        Vector3<Real64> NewellAreaVector;
+        Vector3<Real64> NewellSurfaceNormalVector; // same as OutNormVec in vector notation
+        Vector3<Real64> OutNormVec;                // Direction cosines (outward normal vector) for surface
+        Real64 SinAzim;                            // Sine of surface azimuth angle
+        Real64 CosAzim;                            // Cosine of surface azimuth angle
+        Real64 SinTilt;                            // Sine of surface tilt angle
+        Real64 CosTilt;                            // Cosine of surface tilt angle
+        bool IsConvex;                             // true if the surface is convex.
+        bool IsDegenerate;                         // true if the surface is degenerate.
+        bool VerticesProcessed;                    // true if vertices have been processed (only used for base surfaces)
+        Real64 XShift;                             // relative coordinate shift data - used by child subsurfaces
+        Real64 YShift;                             // relative coordinate shift data - used by child subsurfaces
+
+        // Boundary conditions and interconnections
+        bool HeatTransSurf;                                    // True if surface is a heat transfer surface (light shelf can also be IsShadowing)
+        Sched::Schedule *outsideHeatSourceTermSched = nullptr; // Schedule of additional source of heat flux rate applied to the outside surface

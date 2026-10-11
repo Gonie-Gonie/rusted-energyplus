@@ -1,0 +1,121 @@
+"""Source-only sealer: no project imports, target commands, results, or canonical writes."""
+from pathlib import Path
+import ast, difflib, hashlib, json
+ROOT=Path(__file__).resolve().parents[3]
+BASE=ROOT/'.runtime/porting/SRC-06/ordinary-geometry-observer-prep-01'
+def ref(path):
+    b=path.read_bytes(); return dict(path=path.relative_to(ROOT).as_posix(),sha256=hashlib.sha256(b).hexdigest(),size_bytes=len(b),line_count=len(b.splitlines()))
+def checked(row):
+    p=ROOT/row['path']; b=p.read_bytes(); assert hashlib.sha256(b).hexdigest()==row['sha256']; assert 'size_bytes' not in row or len(b)==row['size_bytes']; return p
+def write(path,b):
+    path.parent.mkdir(parents=True,exist_ok=True)
+    if path.exists():
+        assert path.read_bytes()==b,path
+        return ref(path)
+    with path.open('xb') as s:s.write(b)
+    return ref(path)
+def js(path,v):return write(path,(json.dumps(v,ensure_ascii=False,allow_nan=False,indent=2)+'\n').encode())
+geometry=ROOT/'.runtime/porting/SRC-06/ordinary-geometry-owner-prep-02/manifest.json'
+native=ROOT/'.runtime/porting/SRC-06/ordinary-geometry-native-prep-02/manifest.json'
+assert ref(geometry)['sha256']=='502237329524881eb7427b7721023f3608169cfeed1524cfa7001786b032381a'
+assert ref(native)['sha256']=='4a172ac50b50fd2151baa818919b1a51b496488afe2a2bc80ea3ce3b984cf1f4'
+gm=json.loads(geometry.read_bytes()); nm=json.loads(native.read_bytes())
+old=ROOT/'.runtime/porting/CTF-10/candidate-production-inputs-01/request.json'
+assert ref(old)['sha256']=='10fda19a9c3bb626642f9df80fea428f84d395ab93af57226415e67536dcbbdd'
+legacy=json.loads(old.read_bytes()); selected=[v for v in legacy['model_cases'] if v['id']=='A-24H']; assert len(selected)==1
+case=selected[0]; assert case['conversion_available'] is True and len(case['conversion_proof_bindings'])==6
+for r in case['conversion_proof_bindings']+[case['input'],case['epjson_input']]:checked(r)
+context=dict(schema='src06-ordinary-geometry-fixed-input-context.v1',case_id='A-24H',input=case['input'],epjson_input=case['epjson_input'],conversion_proof_bindings=case['conversion_proof_bindings'],Native_input_request=nm['prospective_request'],existing_input_only_request_authority=ref(old),expected_values_supplied=False,Native_results_supplied=False)
+context_ref=js(BASE/'fixed-input-context.json',context)
+policy=dict(schema='src06-ordinary-geometry-prospective-pairing-policy.v1',status='frozen-before-any-new-Native-or-Rust-geometry-result',fixed_case='A-24H',
+    Native_answers_or_results_used_for_authorship=False,geometry_Source_preparation=ref(geometry),Native_Source_preparation=ref(native),input_context=context_ref,
+    admission=dict(exact_original_IDF_SHA256=case['input']['sha256'],exact_converted_epJSON_SHA256=case['epjson_input']['sha256'],actual_conversion_success_and_original_staged_bytes_required=True,
+        complete_Raw_values_family_counts_and_effective_IDF_order_required=True,actual_Scope_A_preflight_required=True,
+        complete_zone_space_surface_name_class_construction_association_and_vertex_joins_required=True,
+        independent_ids_retained=True,id_pairing='Require unique normalized names, actual declared/source order and full zone/space/construction links; retain independent IDs; never infer index+1.',
+        raw_excluded_families_must_be_absent=['GeometryTransform','FenestrationSurface:Detailed','Window','Door','GlazedDoor','InternalMass','Shading:Site:Detailed','Shading:Building:Detailed','Shading:Zone:Detailed','Construction:AirBoundary'],
+        exact_boundary='Actual Native GetBuildingData outer return with ErrorsFound false; actual Rust HeatBalanceState returned by one public initializer. No imaginary inner checkpoint.'),
+    mandatory_selected_fields=dict(surface=['perimeter_m','width_m','height_m'],zone_bounds=['MinimumX','MaximumX','MinimumY','MaximumY','MinimumZ','MaximumZ'],zone_exterior=['ExtGrossWallArea','ExtWindowArea'],
+        GEO03_return=['Volume','CeilingHeight','CeilingHeightEntered','FloorArea','UserEnteredFloorArea','CalculatedFloorArea','CeilingArea','CalculatedCeilingArea','HasFloor','HasRoof']),
+    comparison=dict(finite_arithmetic='exact binary64 bits; no absolute, relative, ULP or epsilon tolerance',signed_zero='exact sign and bits',discrete='exact values, lengths, order and associations',
+        nonfinite='Retain actual bits/class/value unavailable as diagnostic; never numerical PASS.',missing_selected_owner='Required unavailable/mismatch, never a zero fallback or PASS.',all_mismatches_retained_without_cap=True),
+    complete_copies_not_additional_PASS=['full actual GEO03 faces, P0, volume call count and diagnostics','full existing GEO02 Surface geometry bundles','complete caller Scan/registry/table/backend and error/console/EIO prefixes','complete Raw input and typed geometry owner witnesses'],
+    explicitly_unpaired=['Native inner helper visits and scratch allocation','Native warning/error backend and header byte parity','Space calculated volume/height/floor-area not retained by this Rust unit','other Native zone ext/net/multiplied/ground area families','surface shape, convex/degenerate/status and scratch families without Rust owners','ordinary inside convection setup, MAT/cadence and thermal integration'],
+    missing_branch_variants=['triangular base surface','more-than-four vertices and nonrectangular dimension branch','coincident vertex removal and diagnostics','aspect/GeometryTransform','subsurface subtraction and windows','shading and internal-mass handling','empty-first-space 0/-1 constructor branch and multiple spaces/zones','unsupported/open/reversed volume topology and repeated volume calls','source tie/signed-zero and generated overflow/nonfinite diagnostics'],
+    outer_status_scope='A future zero-mismatch selected field comparison is bounded A24 owner evidence only. Missing variants and unpaired context are never whole geometry, full SetupZoneGeometry, ordinary convection or integration PASS.',
+    gates_updated=False,whole_geometry_PASS_claimed=False,ordinary_convection_PASS_claimed=False)
+policy_ref=js(BASE/'policy.proposed.json',policy)
+main=BASE/'proposed/crates/ep_run/examples/src06_ordinary_geometry_observer.rs'
+b=main.read_bytes()
+if b'@INPUT_CONTEXT_SHA@' in b:
+    assert b.count(b'@INPUT_CONTEXT_SHA@')==1 and b.count(b'@POLICY_SHA@')==1
+    main.write_bytes(b.replace(b'@INPUT_CONTEXT_SHA@',context_ref['sha256'].encode()).replace(b'@POLICY_SHA@',policy_ref['sha256'].encode()))
+else:
+    assert context_ref['sha256'].encode() in b and policy_ref['sha256'].encode() in b
+observer_paths=['crates/ep_run/examples/src06_ordinary_geometry_observer.rs','crates/ep_run/examples/src06_ordinary_geometry_support/fields.rs','crates/ep_runtime/examples/clk02_probe_support/digest.rs']
+api_paths=['crates/ep_run/src/lib.rs','crates/ep_run/src/porting_scope.rs','crates/ep_run/src/porting_scope/settings.rs','crates/ep_run/src/porting_scope/environment.rs','crates/ep_raw_model/src/lib.rs','crates/ep_raw_model/src/idf_order.rs','crates/ep_compiler/src/lib.rs','crates/ep_compiler/src/compiler.rs','crates/ep_model/src/model.rs','crates/ep_model/src/objects/building.rs','crates/ep_model/src/objects/surfaces.rs','crates/ep_model/src/units.rs','crates/ep_runtime/src/error.rs','crates/ep_runtime/src/geometry.rs','crates/ep_runtime/src/geometry/source_geometry.rs','crates/ep_runtime/src/geometry/zone_volume.rs','crates/ep_runtime/src/geometry/inside_convection_owners.rs','crates/ep_runtime/src/heat_balance/inside_convection_layout.rs','crates/ep_runtime/src/heat_balance/state.rs','crates/ep_runtime/src/heat_balance/initialization.rs','crates/ep_runtime/src/heat_balance/initialization/schedule_cache.rs','crates/ep_runtime/src/heat_balance/initialization/state_shell.rs','crates/ep_runtime/src/heat_balance/ctf_initialization_context.rs','crates/ep_runtime/src/heat_balance/error_backend.rs','crates/ep_runtime/src/heat_balance/report_scan.rs','crates/ep_runtime/src/heat_balance/predefined_tables.rs','crates/ep_runtime/src/heat_balance/predefined_tables_names.rs','crates/ep_run/src/ctf_initialization_outputs.rs']
+template=ROOT/'crates/ep_run/examples/ctf10_init_postlude_support/fields.rs'
+t=template.read_text(encoding='utf8')
+copies=t[t.index('fn allocated<T>'):t.index('    pub(super) fn prepare(')]
+copies=copies.replace('unit_fields::scalar','scalar')
+assert 'unit_fields' not in copies
+header='''//! Read-only copies of actual compiled geometry and returned owner state.
+use ep_model::SimulationModel;
+use ep_runtime::error::RuntimeError;
+use ep_runtime::heat_balance::ctf_initialization_context::{CtfInitializationContext,CtfInitializationReports};
+use ep_runtime::heat_balance::error_backend::{SourceErrorBackend,SourceErrorState,SourceErrorTracking};
+use ep_runtime::heat_balance::{HeatBalanceState,initialize_heat_balance_state_with_initialization_context};
+use serde_json::{Value,json};
+include!("../../../ep_runtime/src/heat_balance/predefined_tables_names.rs");
+'''
+header+='pub(super) const OBSERVER_PATHS: &[&str] = &'+json.dumps(observer_paths)+';\n'
+header+='pub(super) const API_PATHS: &[&str] = &'+json.dumps(api_paths)+';\n'
+end='''    pub(super) fn initialize(&mut self, model: &SimulationModel) -> Result<HeatBalanceState,RuntimeError> {
+        // Existing ordinary runtime constructor input; it is not geometry or a Native answer.
+        initialize_heat_balance_state_with_initialization_context(model,23.0,&mut self.context())
+    }
+}
+'''
+tail=BASE/'fields-tail.rs'
+fields=BASE/'proposed'/observer_paths[1]
+write(fields,(header+copies+end+tail.read_text(encoding='utf8')).encode())
+application=[]
+for canonical in observer_paths[:2]:
+    assert not (ROOT/canonical).exists(),canonical
+    p=BASE/'proposed'/canonical; proposal=ref(p)
+    d=write(BASE/'diffs'/(canonical.replace('/','__')+'.diff'),''.join(difflib.unified_diff([],p.read_text(encoding='utf8').splitlines(True),fromfile='/dev/null',tofile=canonical)).encode())
+    application.append(dict(canonical_path=canonical,new_destination_absent=True,proposal=proposal,exact_diff=d))
+dependencies=[ref(geometry),ref(native),ref(old),ref(template),ref(ROOT/observer_paths[2])]+[ref(checked(r)) for r in case['conversion_proof_bindings']]+[context_ref,policy_ref]
+dispatcher=ROOT/'.runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/manifest.json'
+dm=json.loads(dispatcher.read_bytes()); dependencies.append(ref(dispatcher))
+for path in api_paths:
+    selected=[row for row in gm['application_sources']+dm['application_sources'] if row['canonical_path']==path]
+    dependencies.append(selected[0]['proposal'] if selected else ref(ROOT/path))
+ranges=[]
+for path,first,last in [('crates/ep_raw_model/src/lib.rs',15,174),('crates/ep_compiler/src/compiler.rs',320,464),('crates/ep_run/src/porting_scope.rs',85,158),('crates/ep_model/src/objects/building.rs',250,363),('crates/ep_model/src/objects/surfaces.rs',167,197),('crates/ep_runtime/src/geometry/zone_volume.rs',18,160),('crates/ep_runtime/src/geometry/source_geometry.rs',15,48),('crates/ep_run/examples/ctf10_init_postlude_support/fields.rs',56,211)]:
+    raw=(ROOT/path).read_bytes(); lines=raw.splitlines(True); assert last<=len(lines); data=b''.join(lines[first-1:last])
+    archive=write(BASE/'ranges'/f'{len(ranges)+1:02d}.literal',data)
+    ranges.append(dict(path=path,start_line=first,end_line=last,sha256=hashlib.sha256(data).hexdigest(),size_bytes=len(data),literal_archive=archive,whole_source=ref(ROOT/path)))
+readme='''# HELD ordinary A24 geometry observer
+
+Source only. No canonical write, Cargo/configure/build, Native run, new Native result read, or gate update occurred during preparation.
+
+The two new examples consume the exact existing A24 IDF and genuine once-converted epJSON. They call the existing IDF-order parser and compiler once, the public Scope A preflight, then the public initializer once with the existing ordinary 23 C constructor input and actual caller-owned reports/error backend/EIO. They never call a geometry calculator, seed a direct scientific DTO, or read Native results. Complete Raw values, effective family order, typed associations/vertices, the moved GEO03 return, existing GEO02 bundles and selected dimensions/bounds/exterior areas are copied from actual owners. All real errors, cause chains and prefix bytes survive. An initializer Err has no returned State; partial geometry remains explicitly unavailable.
+
+CLI: `src06_ordinary_geometry_observer REQUEST_PATH REQUEST_SHA256` (argc3). The exact request keys are schema/input_context/runtime_source_bindings/pairing_policy. Schema is `src06-ordinary-geometry-observer-request.v1`. Bind fixed-input-context.json and policy.proposed.json by full SHA/size; the observer pins both hashes. Runtime Source bindings are an explicit post-format packet with schema `src06-ordinary-geometry-runtime-source-bindings.v1`, ordered observer_sources3 and actual_public_API_sources28. All current bound bytes are checked again after the scientific call. The ignored request template is prospective; runtime Source hashes must be supplied from actual application/Cargo evidence.
+
+Prerequisites before execution: genuine Native geometry copier02 capture and Root/Header factual release; Root-reviewed geometry02 application/card contract; this observer Source peer; actual formatted runtime bindings; actual same-source quality and Cargo emitted executable/PE/custody. This hold neither creates nor predicts any of them. Source dependency refs to held geometry proposals are historical reviewed authorities, not claims that those files are installed. Full Cargo/recorder SourceSnapshot is launcher custody; this small packet pins the direct observation API paths, not a falsely complete transitive source closure.
+
+The frozen policy requires original/staged/converted input, actual Raw family absence, Scope A admission and complete actual typed associations before endpoint pairing. Independent IDs are preserved and joined by unique names/order/links. Selected finite arithmetic and signed zeros use exact binary64 bits; no tolerance is added. Nonfinite values remain explicit diagnostic/unavailable. Prefixes and extra GEO03 diagnostics are factual context, not automatic Native parity. The fixed A24 case does not verify the listed missing branch variants. No whole geometry, SetupZoneGeometry, convection/cadence, integration or card PASS is claimed.
+
+Storage is stdout-only; the caller records full stdout/stderr and real exit. Exit0 means the initializer returned State, not numerical PASS; exit2 retains actual compile/preflight/initializer unavailability. Bad transport exits through real Rust error handling. Existing templates are disclosed: caller/report/backend read-only serialization from ctf10_init_postlude_support, scalar/copy shapes from GEO02/GEO03 and dispatcher observers, and existing SCH01 historical proof metadata. No equations are copied into this observer.
+'''
+doc=write(BASE/'README.md',readme.encode())
+request_template=js(BASE/'request.template.json',dict(schema='src06-ordinary-geometry-observer-request.v1',input_context=context_ref,runtime_source_bindings='REQUIRED_ACTUAL_POST_FORMAT_SOURCE_PACKET_REF',pairing_policy=policy_ref))
+manifest=dict(schema='src06-ordinary-geometry-observer-Source-preparation.v1',status='HELD-Source-only-unexecuted',own_sources=[ref(main),ref(fields),doc,ref(Path(__file__)),ref(tail)],application_sources=application,
+    runtime_interfaces=dict(example='src06_ordinary_geometry_observer',argc=3,argv=['actual-Cargo-emitted-example','request-path','request-SHA256'],request_schema='src06-ordinary-geometry-observer-request.v1',request_keys=['schema','input_context','runtime_source_bindings','pairing_policy'],result_schema='src06-ordinary-geometry-observer-results.v1',runtime_source_bindings_schema='src06-ordinary-geometry-runtime-source-bindings.v1',ordered_observer_source_paths=observer_paths,ordered_public_API_source_paths=api_paths,geometry_Source_preparation=ref(geometry),Native_Source_preparation=ref(native),fixed_input_context=context_ref,prospective_pairing_policy=policy_ref,request_template=request_template),
+    Source_dependencies=dependencies,Source_context_ranges=ranges,borrowed_caller_serializer_source=ref(template),all_new_example_destinations_absent=True,
+    actual_Cargo_SourceSnapshot_and_emitted_artifact_required_at_execution=True,Native_actual_capture_and_factual_release_required_before_Rust_application=True,
+    Native_or_Rust_geometry_results_read_for_authorship=False,expected_values_supplied=False,canonical_mutation_performed=False,target_or_build_execution_performed=False,scientific_PASS_claimed=False,gates_updated=False)
+ast.parse(Path(__file__).read_bytes())
+print(json.dumps(js(BASE/'manifest.json',manifest)))

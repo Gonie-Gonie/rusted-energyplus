@@ -1,0 +1,40 @@
+{
+  "schema": "src06-ordinary-geometry-actual-comparison-transport.v1",
+  "Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-03/manifest.json",
+    "sha256": "86a7de68a191db1fd5f56d3c6f573d8a2afeb5919b9c3b9cbdffe2fe51653c3c",
+    "size_bytes": 27907
+  },
+  "actual_custody": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-02/comparison-custody.json",
+    "sha256": "64c6be9f5ba02a8b75e7137a8ab38da1d02f54423967555cd656d10a08b19617",
+    "size_bytes": 2430
+  },
+  "actual_comparer": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-prep-04/manifest.json",
+    "sha256": "f6a8b8f2149cedfea0faa8b788218f91fc1a801308ee219d1e72ba7b5a05c7ef",
+    "size_bytes": 35754,
+    "line_count": 884
+  },
+  "actual_execution": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-02/command/receipt.json",
+    "sha256": "d47239a78bf74e563dc30bfdd04f618fe919e567ae0688ef6337896f2e90a886",
+    "size_bytes": 4749
+  },
+  "actual_exit_code": 0,
+  "actual_complete_stdout": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-02/command/stdout.log",
+    "sha256": "0aa714f72194e64019f754a6c6d220f670f5e2041f05158232654dbaf85b4e85"
+  },
+  "actual_complete_stderr": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-02/command/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/47/47ebf61d9be4dbfcb30fb9b2f3ae8e962c497b0de8857f4e659dba802a72328b",
+    "sha256": "47ebf61d9be4dbfcb30fb9b2f3ae8e962c497b0de8857f4e659dba802a72328b"
+  },
+  "numerical_results_parsed": false,
+  "whole_geometry_or_ordinary_PASS_claimed": false,
+  "gates_updated": false
+}

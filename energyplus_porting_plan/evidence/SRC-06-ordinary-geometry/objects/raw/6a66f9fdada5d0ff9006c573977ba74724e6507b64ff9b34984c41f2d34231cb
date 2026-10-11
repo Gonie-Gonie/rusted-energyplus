@@ -1,0 +1,18 @@
+--- crates/ep_runtime/src/geometry.rs
++++ .runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/proposed/crates/ep_runtime/src/geometry.rs
+@@ -2,9 +2,15 @@
+ 
+ pub(crate) mod centroid_precision;
+ pub mod production_trace;
++mod inside_convection_owners;
+ mod source_geometry;
+ mod zone_volume;
+ pub mod zone_volume_trace;
++pub use inside_convection_owners::{
++    GeometryOwnerUnavailable, InitializedGeometryOwners, InitializedZoneGeometry,
++    OpaqueGeometryOwners, OpaqueSurfaceDimensions, OpaqueZoneGeometry,
++    opaque_geometry_owners, opaque_surface_dimensions,
++};
+ pub use source_geometry::{
+     SurfaceGeometryError, SurfaceGeometryProperties, source_triangle_centroid,
+     surface_geometry_properties,

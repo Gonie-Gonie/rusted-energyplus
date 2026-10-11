@@ -1,0 +1,102 @@
+"""Seal geometry provider collector Source only; no compile, binary tool or helper invocation."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+BASE = ROOT / '.runtime/porting/SRC-06'
+OUT = BASE / 'ordinary-geometry-provider-prep-01'
+TEMPLATE = BASE / 'native-dispatcher-observation-prep-01/collect_providers.py'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+
+def write(path, raw):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream: stream.write(raw)
+    return ref(path)
+
+
+specs = [
+    ('input', 'InputProcessor::processInput', 'InputProcessing/InputProcessor.cc', 259, 'EnergyPlus::EnergyPlusData&'),
+    ('post-input', 'SimulationManager::PostIPProcessing', 'SimulationManager.cc', 2777, 'EnergyPlus::EnergyPlusData&'),
+    ('constant-state', 'EnergyPlusData::init_constant_state', 'Data/EnergyPlusData.cc', 579, 'EnergyPlus::EnergyPlusData&'),
+    ('init-state', 'EnergyPlusData::init_state', 'Data/EnergyPlusData.cc', 840, 'EnergyPlus::EnergyPlusData&'),
+    ('predefined', 'OutputReportPredefined::SetPredefinedTables', 'OutputReportPredefined.cc', 77, 'EnergyPlus::EnergyPlusData&'),
+    ('preconstruction', 'HeatBalanceManager::SetPreConstructionInputParameters', 'HeatBalanceManager.cc', 446, 'EnergyPlus::EnergyPlusData&'),
+    ('time-pointer', 'OutputProcessor::SetupTimePointers', 'OutputProcessor.cc', 253, 'EnergyPlus::EnergyPlusData&, EnergyPlus::OutputProcessor::TimeStepType, double&'),
+    ('project', 'HeatBalanceManager::GetProjectControlData', 'HeatBalanceManager.cc', 494, 'EnergyPlus::EnergyPlusData&, bool&'),
+    ('atmosphere', 'HeatBalanceManager::GetSiteAtmosphereData', 'HeatBalanceManager.cc', 1252, 'EnergyPlus::EnergyPlusData&, bool&'),
+    ('materials', 'Material::GetMaterialData', 'Material.cc', 101, 'EnergyPlus::EnergyPlusData&, bool&'),
+    ('construction', 'HeatBalanceManager::GetConstructData', 'HeatBalanceManager.cc', 1319, 'EnergyPlus::EnergyPlusData&, bool&'),
+    ('building', 'HeatBalanceManager::GetBuildingData', 'HeatBalanceManager.cc', 1800, 'EnergyPlus::EnergyPlusData&, bool&'),
+    ('setup-zone-geometry', 'SurfaceGeometry::SetupZoneGeometry', 'SurfaceGeometry.cc', 251, 'EnergyPlus::EnergyPlusData&, bool&'),
+    ('vertices', 'SurfaceGeometry::GetVertices', 'SurfaceGeometry.cc', 9169, 'EnergyPlus::EnergyPlusData&, int, int, ObjexxFCL::Array1S<double>'),
+    ('process-vertices', 'SurfaceGeometry::ProcessSurfaceVertices', 'SurfaceGeometry.cc', 12846, 'EnergyPlus::EnergyPlusData&, int, bool&'),
+    ('zone-volume', 'SurfaceGeometry::CalculateZoneVolume', 'SurfaceGeometry.cc', 12010, 'EnergyPlus::EnergyPlusData&'),
+]
+native_ref = ref(BASE / 'ordinary-geometry-native-prep-03/manifest.json'); assert native_ref['sha256'] == '72f75c5242e2df7457fb9fc065b2cc1fc5922f6bb9673e6b785e145bb54f47a1'
+native = json.loads((ROOT / native_ref['path']).read_bytes()); request = json.loads((ROOT / native['prospective_request']['path']).read_bytes())
+providers, ranges = [], []
+for role, declared, source, first, args in specs:
+    path = ROOT / '.reference/energyplus-src/26.1.0/src/EnergyPlus' / source
+    raw = path.read_bytes().splitlines(keepends=True); end = min(first + 63, len(raw))
+    literal = write(OUT / 'Original-entry-ranges' / (source.replace('/', '_') + f'.{first}-{end}.literal'), b''.join(raw[first - 1:end]))
+    ranges.append(dict(source=ref(path), start_line=first, end_line=end, archive=literal, purpose='Provider definition/entry prefix; whole-file SHA authenticates complete Original Source, not an invocation trace'))
+    providers.append(dict(role=role, declared_provider=declared, symbol='EnergyPlus::' + declared + '(' + args + ')', core_owner='Products/libenergypluslib.a(' + path.name + '.obj)', Original_relative_source=source, start_line=first, end_line=end))
+roles = {r['declared_provider']: r['role'] for r in providers}
+call_mapping = [dict(actual_declared_ordinal=i, call=call, provider_role=roles[call.split('(')[0]]) for i, call in enumerate(request['loader_phase_order'], 1)]
+assert len(call_mapping) == 13 and len({r['provider_role'] for r in call_mapping}) == 12
+assert set(native['runtime_interfaces']['required_Original_provider_APIs']) <= set(roles)
+contract = write(OUT / 'provider-contract.json', (json.dumps(dict(schema='ordinary-geometry-provider-contract.v1', providers=providers, ordered_declared_loader_calls=call_mapping, unique_loader_provider_count=12, additional_inner_geometry_provider_count=4, code_extent_rule='next link-map text symbol in same input text section, otherwise section end; interval can include adjacent code and is not an exclusive-body claim', static_address_proof_is_not_inner_invocation_trace=True, expected_values_supplied=False), indent=2) + '\n').encode())
+body = TEMPLATE.read_text(encoding='utf8')
+for old, new in [
+    ('SRC06 dispatcher link/provider collection', 'SRC06 genuine geometry link/provider collection'),
+    ('native-tarp-dispatcher-prep-02', 'ordinary-geometry-native-prep-03'),
+    ('src06-tarp-dispatcher-frozen-configure-inputs.v1', 'ordinary-geometry-frozen-configure-inputs.v1'),
+    ('src06-tarp-dispatcher-configure-dry-review.v1', 'ordinary-geometry-configure-dry-review.v1'),
+    ('954a7779868d3ac65d88c553aab324f5e5e0a88d5d455a3126aecc5012ca3d50', native_ref['sha256']),
+    ('native-dispatcher-build-prep-02/manifest.json', 'ordinary-geometry-build-prep-03/manifest.json'),
+    ('c54db349f9a874f87850d8c86e8abec9dda44cf34e8758162e91200eca2253ec', 'f5f7885c43eed8be89b558cc9b676fb4e7feeda54d6bc9b3735764336bc34fd4'),
+    ('src06-tarp-dispatcher-configure-Source-preparation.v1', 'ordinary-geometry-configure-Source-preparation.v1'),
+    ('f15f1d50775a04b80a821b08740351112f983df09ae73870d9578269b41938a6', contract['sha256']),
+    ('src06-tarp-dispatcher-provider-contract.v1', 'ordinary-geometry-provider-contract.v1'),
+    ("len(contract['providers']) == 10", "len(contract['providers']) == 16"),
+    ("review['previous_compile_rows'] == 742 and review['current_compile_rows'] == 743", "review['previous_compile_rows'] == 743 and review['current_compile_rows'] == 744"),
+    ('exact_prior_core_link_suffix_preserved_after_declared_SHA_transport', 'exact_prior_core_link_suffix_preserved_without_additional_SHA_transport'),
+    ('src06_tarp_dispatcher_helper', 'geometry_loader_helper_v3'),
+    ('tarp_dispatcher_helper.cpp', 'geometry_loader_helper.cpp'),
+    ('src06-tarp-dispatcher-actual-linked-provider-and-PE-inventory.v1', 'ordinary-geometry-actual-linked-provider-and-PE-inventory.v1'),
+]:
+    assert old in body, old
+    body = body.replace(old, new)
+body = body.replace("assert path.is_relative_to(ROOT) or path.is_relative_to(Path('D:/CodexBuild/rusted-energyplus/SRC-06/native-dispatcher-build-01/bin'))", "assert path.is_relative_to(ROOT) or any(path.is_relative_to(Path(name)) for name in ['D:/CodexBuild/rusted-energyplus/SRC-06/native-dispatcher-build-01/bin', 'D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-geometry-native-build-02/bin'])")
+body = body.replace("assert binary.parent == Path('D:/CodexBuild/rusted-energyplus/SRC-06/native-dispatcher-build-01/bin')", "assert binary.parent == Path('D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-geometry-native-build-02/bin')")
+body = body.replace("assert [r['declared_provider'] for r in contract['providers']] == load(freeze['reviewed_Source_preparation'])['core_address_bound_providers_required']", "actual_native = load(freeze['reviewed_Source_preparation'])\nactual_request = load(actual_native['prospective_request'])\nassert [row['call'] for row in contract['ordered_declared_loader_calls']] == actual_request['loader_phase_order'] and len(contract['ordered_declared_loader_calls']) == 13\nassert len({row['provider_role'] for row in contract['ordered_declared_loader_calls']}) == contract['unique_loader_provider_count'] == 12 and contract['additional_inner_geometry_provider_count'] == 4\nassert set(actual_native['runtime_interfaces']['required_Original_provider_APIs']) <= {r['declared_provider'] for r in contract['providers']}")
+old_history = body[body.index('def historical_configure(freeze):'):body.index('def dump(path, value):')]
+new_history = old_history.replace('inherited D362 build', 'inherited8aa/3929 build, with explicit nested D362/3928 archives').replace("== 3928", "== 3929")
+new_history = new_history.replace("    collect({k: v for k, v in previous.items() if k != 'frozen_Source_and_input'})\n    collect({k: v for k, v in freeze.items() if k != 'inherited_historical_BUILD_Source_aliases'})", "    nested = previous['inherited_historical_BUILD_Source_aliases']\n    assert freeze['prior_nested_historical_BUILD_Source_aliases'] == nested and len(nested) == 3928\n    for row in nested:\n        archive = checked(row['actual_archive'])\n        assert row['historical']['sha256'] == row['actual_archive']['sha256'] and row['historical']['size_bytes'] == ref(archive)['size_bytes']\n    collect({k: v for k, v in previous.items() if k not in ['frozen_Source_and_input', 'inherited_historical_BUILD_Source_aliases']})\n    collect({k: v for k, v in freeze.items() if k not in ['inherited_historical_BUILD_Source_aliases', 'prior_nested_historical_BUILD_Source_aliases']})")
+assert new_history != old_history
+body = body.replace(old_history, new_history, 1)
+body = body.replace("assert len(members) == len(source['files']) and", "assert len(members) == len(source['files']) == 3937 and", 1)
+body = body.replace("reviewed_Source_preparation=freeze['reviewed_Source_preparation'],", "reviewed_Source_preparation=freeze['reviewed_Source_preparation'], declared_loader_call_to_provider_mapping=contract['ordered_declared_loader_calls'], unique_loader_provider_count=12, additional_inner_geometry_provider_count=4, static_address_proof_is_not_inner_invocation_trace=True,", 1)
+ast.parse(body)
+collector = write(OUT / 'collect_providers.py', body.encode())
+before = write(OUT / 'before/dispatcher-collector.py', TEMPLATE.read_bytes())
+delta = write(OUT / 'collect_providers.py.diff', ''.join(difflib.unified_diff(TEMPLATE.read_text(encoding='utf8').splitlines(True), body.splitlines(True), fromfile=before['path'], tofile=collector['path'])).encode())
+doc = write(OUT / 'README.md', b'''# Genuine geometry provider collector - held Source
+
+Root supplies actual closed --frozen-inputs path#SHA, --configure-review path#SHA, --build-execution path#SHA and a fresh ignored --output-dir. The accepted configure03 freezes Native03 and current full4c02/3937 Source, authentic restored743/76-argument parent and exact single-TU744/dry2/core13534 contract. This Source predicts no future compile, binary, map, address, outcome or receipt hash and has not run any tool or target.
+
+The twelve unique public loader functions map explicitly to thirteen declared calls, with one genuine SetupTimePointers provider for both Zone/System. Four additional required inner geometry functions give sixteen unique Original providers. Every map symbol must be unique, have the exact original archive-object owner, resolve to authenticated Original Source, and map to executable PE bytes. Full map/PE/binary/object hashes, complete dependency and Source/core checks, actual compile/dry command equality, actual core-link suffix with exactly one inherited bcrypt, addr2line and every byte of the map-derived disassembly interval are retained. Intervals may contain adjacent code; neither static providers nor thirteen declared calls prove inner invocation/branch traces. No geometry endpoint is read or computed by this collector.
+
+Historical8aa/3929 and nestedD362/3928 canonical aliases are checked only against their declared authentic archive bytes. Current full Source is checked independently, before and after collection. Generated restoration and failed geometry02 metadata remain explicit frozen provenance; no recursive historical JSON traversal or current-path fallback is added. Native03 recipe uses uniquegeometry_loader_helper_v3 and output D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-geometry-native-build-02/bin. Root must independently accept complete actual provider/PE evidence before any helper execution. This hold grants no target launch, canonical/Git mutation, scientific PASS or gate change.
+''')
+dependencies = [native_ref, ref(BASE / 'ordinary-geometry-build-prep-03/manifest.json'), ref(BASE / 'native-dispatcher-observation-prep-01/manifest.json'), ref(ROOT / 'tools/porting/native_pe.py'), ref(ROOT / 'tools/porting/record_command.py'), ref(BASE / 'dispatcher-build-metadata-restore-01/record.json')]
+write(OUT / 'manifest.json', (json.dumps(dict(schema='ordinary-geometry-provider-Source-preparation.v1', status='HELD-Source-only-before-actual-build-provider-collection', own_sources=[collector, contract, doc, ref(Path(__file__))], Native_Source_preparation=native_ref, configure_Source_preparation=dependencies[1], accepted_dispatcher_transport_preparation=dependencies[2], authentic_template=ref(TEMPLATE), source_correspondence=dict(before=before, proposal=collector, exact_diff=delta), Original_provider_entry_ranges=ranges, dependencies=dependencies, runtime_interfaces=dict(collector=collector, required_options=['--frozen-inputs', '--configure-review', '--build-execution', '--output-dir'], output_schema='ordinary-geometry-actual-linked-provider-and-PE-inventory.v1', full_provider_count=16, loader_calls=13, unique_loader_providers=12, inner_geometry_providers=4), numerical_result_values_read=False, expected_values_supplied=False, collector_or_binary_tools_executed=False, helper_executed=False, canonical_mutation_performed=False, scientific_PASS_claimed=False, gates_updated=False), ensure_ascii=False, indent=2) + '\n').encode())
+print(json.dumps(ref(OUT / 'manifest.json')))

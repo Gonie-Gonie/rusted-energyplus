@@ -1,0 +1,64 @@
+    void SetPredefinedTables(EnergyPlusData &state)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Jason Glazer
+        //       DATE WRITTEN   August 2006
+        //       MODIFIED
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        //   Creates the structure of the predefined reports
+        //   including the name and abbreviation of the report
+        //   the subtables involved and the column headings.
+        //   The variables defined for the columns are then
+        //   used throughout the program to assign values
+        //   to the subtables.
+
+        // METHODOLOGY EMPLOYED:
+        //   Simple assignments to public variables.
+
+        // Climate Summary Report
+
+        auto const &s = state.dataOutRptPredefined;
+
+        s->pdrClim = newPreDefReport(state, "ClimaticDataSummary", "Clim", "Climatic Data Summary");
+
+        s->pdstDesDay = newPreDefSubTable(state, s->pdrClim, "SizingPeriod:DesignDay");
+
+        s->pdchDDmaxDB = newPreDefColumn(state, s->pdstDesDay, "Maximum Dry Bulb [C]");
+        s->pdchDDrange = newPreDefColumn(state, s->pdstDesDay, "Daily Temperature Range [deltaC]");
+        s->pdchDDhumid = newPreDefColumn(state, s->pdstDesDay, "Humidity Value");
+        s->pdchDDhumTyp = newPreDefColumn(state, s->pdstDesDay, "Humidity Type");
+        s->pdchDDwindSp = newPreDefColumn(state, s->pdstDesDay, "Wind Speed [m/s]");
+        s->pdchDDwindDr = newPreDefColumn(state, s->pdstDesDay, "Wind Direction");
+
+        s->pdstMonthlyPrec = newPreDefSubTable(state, s->pdrClim, "Monthly Precipitation Summary");
+
+        s->pdchMonthlyTotalPrecInWeather = newPreDefColumn(state, s->pdstMonthlyPrec, "Monthly Total Precipitation from .epw [mm]");
+        s->pdchMonthlyTotalHrRain = newPreDefColumn(state, s->pdstMonthlyPrec, "Monthly Total Hours of Rain from .epw");
+        s->pdchMonthlyTotalPrecInSitePrec = newPreDefColumn(state, s->pdstMonthlyPrec, "Monthly Total Precipitation in Site:Precipitation [mm]");
+        s->pdchMonthlyTotalIrrDep = newPreDefColumn(state, s->pdstMonthlyPrec, "Monthly Total Roof Irrigation Depth [mm]");
+        s->pdchMonthlyTotalRainCol = newPreDefColumn(state, s->pdstMonthlyPrec, "Monthly Total Rain Collection Volume [m3]");
+
+        s->pdstWthr = newPreDefSubTable(state, s->pdrClim, "Weather Statistics File");
+        s->pdchWthrVal = newPreDefColumn(state, s->pdstWthr, "Value");
+
+        // Envelope Report
+
+        s->pdrEnvelope = newPreDefReport(state, "EnvelopeSummary", "Env", "Envelope Summary");
+
+        s->pdstOpaque = newPreDefSubTable(state, s->pdrEnvelope, "Opaque Exterior");
+
+        s->pdchOpCons = newPreDefColumn(state, s->pdstOpaque, "Construction");
+        s->pdchOpZone = newPreDefColumn(state, s->pdstOpaque, "Zone");
+        s->pdchOpSpace = newPreDefColumn(state, s->pdstOpaque, "Space");
+        s->pdchOpRefl = newPreDefColumn(state, s->pdstOpaque, "Reflectance");
+        s->pdchOpUfactFilm = newPreDefColumn(state, s->pdstOpaque, "U-Factor with Film [W/m2-K]");
+        s->pdchOpUfactNoFilm = newPreDefColumn(state, s->pdstOpaque, "U-Factor no Film [W/m2-K]");
+        s->pdchOpGrArea = newPreDefColumn(state, s->pdstOpaque, "Gross Area [m2]");
+        s->pdchOpNetArea = newPreDefColumn(state, s->pdstOpaque, "Net Area [m2]");
+        s->pdchOpAzimuth = newPreDefColumn(state, s->pdstOpaque, "Azimuth [deg]");
+        s->pdchOpTilt = newPreDefColumn(state, s->pdstOpaque, "Tilt [deg]");
+        s->pdchOpDir = newPreDefColumn(state, s->pdstOpaque, "Cardinal Direction");
+
+        s->pdstIntOpaque = newPreDefSubTable(state, s->pdrEnvelope, "Opaque Interior");

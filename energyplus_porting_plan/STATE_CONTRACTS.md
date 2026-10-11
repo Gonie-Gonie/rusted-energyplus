@@ -52,3 +52,7 @@ Natural은 실제 Tsurf−Tamb와 저장된 cosine을 읽고 exact-zero 및 stri
 ## SRC-06 선택 dispatcher의 지속 상태
 
 [실제 선택 초기화 비교](evidence/SRC-06-tarp-dispatcher/summary.json)는 공간별 MAT/ZT/ZTAV를 별개로 보존하고, 비활성 space correction에서 MAT/ZT만 복사한다. 첫 호출·정적 형상·Scan·backend 상태와 실제 zone-space 순서, 명시한 SurfTempInTmp 또는 SurfTempIn을 함께 대조했다. 입력과 전체 pre-owner가 먼저 일치해야 endpoint를 판정하며, 선택 범위 밖264개 문맥은 PASS에 포함하지 않는다. 일반 실행에서의 형상 생산·환경 reset·공기 상태 갱신·두 온도 배열·복사 후 완료 반복30회마다 갱신·즉시 열수지 항 갱신은 아직 별도로 연결하고 검증해야 한다.
+
+## SRC-06 ordinary opaque geometry owners
+
+[Actual producer comparison](evidence/SRC-06-ordinary-geometry/summary.json) binds complete physical input/Raw/typed identity before selected retained GEO03 returns, perimeter/dimensions, six bounds and exterior-area owners. The returned GEO03 object is moved once from its existing initializer call; no observer recomputes an owner. This prerequisite does not activate ordinary space air/reset, named inside-temperature arrays, post-radiation cadence or handoff, and does not expand historical Volume-only certification.

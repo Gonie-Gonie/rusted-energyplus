@@ -1,0 +1,64 @@
+    void GetConstructData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Richard Liesen
+        //       DATE WRITTEN   September 1997
+        //       MODIFIED       January 2003, FCW: accommodate between-glass shading device
+        //                      July 2009, TH: added constructions defined with F and C factors
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This file reads the input through the input processor for Constructions.
+        // Data read in this routine is stored in a derived type (Construct)
+        // defined in the DataHeatBalance module.
+        // This subroutine only sets those parameters which must be obtained
+        // from the input file--all other portions of the Construct derived
+        // type are set during the initializations.
+
+        // Using/Aliasing
+        using namespace DataStringGlobals;
+
+        static constexpr std::string_view routineName = "GetConstructData";
+
+        // If UniqueConstructionNames size, then input has already been gotten
+        if (!state.dataHeatBalMgr->UniqueConstructNames.empty()) {
+            return;
+        }
+
+        int ConstructNumAlpha;                                                   // Number of construction alpha names being passed
+        int DummyNumProp;                                                        // dummy variable for properties being passed
+        int IOStat;                                                              // IO Status when calling get input subroutine
+        Array1D_string ConstructAlphas({0, Construction::MaxLayersInConstruct}); // Construction Alpha names defined
+        Array1D<Real64> DummyProps(5);                                           // Temporary array to transfer construction properties
+        int TotRegConstructs; // Number of "regular" constructions (no embedded sources or sinks and
+
+        int TotFfactorConstructs; // Number of slabs-on-grade or underground floor constructions defined with F factors
+        int TotCfactorConstructs; // Number of underground wall constructions defined with C factors
+
+        // int TotSourceConstructs;  // Number of constructions with embedded sources or sinks
+        int TotWindow5Constructs; // Number of constructions from Window5 data file
+        bool ConstructionFound;   // True if input window construction name is found in the
+        //  Window5 data file
+        bool EOFonW5File; // True if EOF encountered reading Window5 data file
+
+        Array1D_string WConstructNames;
+
+        auto &s_ipsc = state.dataIPShortCut;
+        auto &s_mat = state.dataMaterial;
+
+        // Get the Total number of Constructions from the input
+        TotRegConstructs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction");
+        int totAirBoundaryConstructs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:AirBoundary");
+
+        TotFfactorConstructs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:FfactorGroundFloor");
+        TotCfactorConstructs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:CfactorUndergroundWall");
+
+        if (TotFfactorConstructs > 0) {
+            state.dataHeatBal->NoFfactorConstructionsUsed = false;
+        }
+
+        if (TotCfactorConstructs > 0) {
+            state.dataHeatBal->NoCfactorConstructionsUsed = false;
+        }
+
+        state.dataBSDFWindow->TotComplexFenStates =

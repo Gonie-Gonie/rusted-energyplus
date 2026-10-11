@@ -1,0 +1,142 @@
+"""One bounded Source-only recorder recovery: honest old application/new comparison roles."""
+import ast
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+BASE = ROOT / '.runtime/porting/SRC-06'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+
+def checked(row):
+    path = ROOT / row['path']; actual = ref(path)
+    assert actual['sha256'] == row['sha256'] and ('size_bytes' not in row or actual['size_bytes'] == row['size_bytes'])
+    return path
+
+
+def load(row): return json.loads(checked(row).read_bytes())
+
+
+def write(path, raw):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream: stream.write(raw)
+    return ref(path)
+
+
+def dump(path, value): return write(path, (json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode())
+
+
+def correspondence(out, name, before, raw):
+    prior = checked(before).read_bytes(); archive = write(out / 'before' / name, prior)
+    proposal = write(out / name, raw)
+    delta = write(out / (name + '.diff'), ''.join(difflib.unified_diff(prior.decode().splitlines(True), raw.decode().splitlines(True), fromfile=archive['path'], tofile=proposal['path'])).encode())
+    return dict(before=archive, proposal=proposal, exact_diff=delta)
+
+
+def main():
+    author = ref(Path(__file__))
+    comparer_ref = ref(BASE / 'ordinary-geometry-comparison-prep-04/manifest.json')
+    assert comparer_ref['sha256'] == 'f6a8b8f2149cedfea0faa8b788218f91fc1a801308ee219d1e72ba7b5a05c7ef'
+    comparer = load(comparer_ref)
+    reviews = [ref(BASE / 'ordinary-geometry-comparison-prep-04/Root-Source-review.json'), ref(BASE / 'Header-geometry-comparison-Source-review-04/review.json')]
+    assert [v['sha256'] for v in reviews] == ['c04718bcaf0863c90d556180993d204bad7ea870c0fb58273bc576bbed3083ad', 'fb95d055d8d108df92c908a0a83eb2411357af8886e2ded7f909dea3a3f7ae9f']
+    for row in reviews:
+        value = load(row); assert value['accepted'] is True and checked(value['reviewed_Source_preparation']) == checked(comparer_ref)
+    application_ref = ref(BASE / 'ordinary-geometry-workflow-prep-02/manifest.json')
+    assert application_ref['sha256'] == '863c5207c2ec3994c4448651b7f2fa154c4e3939760cc437fcaa5217b61db51c'
+    parent = load(application_ref); out = BASE / 'ordinary-geometry-workflow-prep-03'; assert not out.exists()
+    before_compare = parent['runtime_interfaces']['compare']; old = checked(before_compare).read_bytes()
+    needle = b"    prep['_actual_operand'] = args.source_preparation\n"
+    replacement = b"    application_ref = prep['actual_application_Source_preparation']\n    A.need(application_ref['sha256'] == '863c5207c2ec3994c4448651b7f2fa154c4e3939760cc437fcaa5217b61db51c', 'immutable actual application workflow02 required')\n    application_prep = A.load(application_ref)\n    for row in application_prep['own_sources']: A.bind(row)\n    application_prep['_actual_operand'] = str(A.bind(application_ref)) + '#' + application_ref['sha256']\n"
+    assert old.count(needle) == 1 and old.count(b'V.application(M, A, prep,') == 2
+    raw = old.replace(needle, replacement).replace(b'V.application(M, A, prep,', b'V.application(M, A, application_prep,')
+    assert raw.replace(replacement, needle).replace(b'V.application(M, A, application_prep,', b'V.application(M, A, prep,') == old
+    ast.parse(raw); changed = correspondence(out, 'compare.py', before_compare, raw)
+    readme_raw = b'''This comparison-only successor preserves the actual application, quality, build and Rust capture under immutable workflow02 authority 863c5207. It does not relabel those records or require replay. Apply/validate remain their exact physical Source01 files. The new compare.py explicitly authenticates the historical workflow02 dictionary for both existing application validations; its bootstrap, reviewed comparer04, new comparison custody and transport record use this workflow03 authority.
+
+Invoke the reviewed ordinary-geometry-workflow-prep-03/compare.py with --source-preparation naming this manifest and its full SHA, plus the unchanged actual application/formatter/Source/Rust-custody/two factual-review operands and a fresh ignored output directory. Source, all ten proposals, own3/API28, Native04 release, four quality commands, Cargo/PE, input-only request and scalar policy remain unchanged.
+
+Comparer04 only normalizes the recorder exact historical_path/sha256 Cargo executable descriptor before the original full-byte and artifact-size checks. The genuine failed comparison01 and its zero-row ledgers remain immutable evidence. No engine, Cargo, capture, comparison or canonical mutation was performed by this author.
+'''
+    readme = correspondence(out, 'README.md', parent['own_sources'][3], readme_raw)
+    workflow = copy.deepcopy(parent)
+    workflow.update(status='HELD-Source-only-comparison-transport-successor-with-historical-actual-application-authority', parent_Source_preparation=application_ref,
+        actual_application_Source_preparation=application_ref, reviewed_comparer_Source_preparation=comparer_ref, comparer_FULL_Source_reviews=reviews,
+        own_sources=parent['own_sources'][:2] + [changed['proposal'], readme['proposal'], author],
+        successor_author_Source=author, narrow_source_correspondence=[changed, readme],
+        successor_scope='Only comparison transport uses current workflow03; all genuine application/build/capture Source_preparation records remain workflow02.')
+    workflow['runtime_interfaces']['compare'] = changed['proposal']
+    workflow_ref = dump(out / 'manifest.json', workflow)
+
+    checker_parent_ref = ref(BASE / 'ordinary-geometry-comparison-factual-checker-prep-01/manifest.json')
+    assert checker_parent_ref['sha256'] == '8b17ddedf2165c790662dec7943fc22547bc631d620a540b5ee0e56c39fd1e2c'
+    cp = load(checker_parent_ref); out = BASE / 'ordinary-geometry-comparison-factual-checker-prep-02'; assert not out.exists()
+    # No factual algorithm depends on application.Source_preparation; preserve its complete literal body.
+    code = correspondence(out, 'check.py', cp['own_sources'][0], checked(cp['own_sources'][0]).read_bytes()); ast.parse(checked(code['proposal']).read_bytes())
+    readme = correspondence(out, 'README.md', cp['own_sources'][1], checked(cp['own_sources'][1]).read_bytes() + b'\nSuccessor02 binds current comparison transport workflow03 and comparer04. The actual application/build/Rust capture remain authenticated historical workflow02; the checker never relabels them. Every factual helper, ledger rule and result schema is literal01. Failed comparison01 remains historical integrity evidence. No outputs were read or checker invoked by this sealer.\n')
+    checker = copy.deepcopy(cp)
+    checker.update(parent_Source_preparation=checker_parent_ref, own_sources=[code['proposal'], readme['proposal'], author], workflow_Source_preparation=workflow_ref,
+        actual_application_Source_preparation=application_ref, comparer_Source_preparation=comparer_ref, exact_Source_correspondence=[code, readme])
+    checker['fixed_dependencies'] = [workflow_ref, comparer_ref, application_ref, *workflow['own_sources'][:3], *comparer['own_sources'][:3], *cp['fixed_dependencies'][8:]]
+    checker['runtime_interfaces']['checker'] = code['proposal']
+    checker_ref = dump(out / 'manifest.json', checker)
+
+    publisher_parent_ref = ref(BASE / 'ordinary-geometry-publication-prep-01/manifest.json')
+    assert publisher_parent_ref['sha256'] == '972ff187ab9133e249fdb2afade2d547f0647b58d29a1b2652744776e3d1e80f'
+    pp = load(publisher_parent_ref); out = BASE / 'ordinary-geometry-publication-prep-02'; assert not out.exists()
+    old = checked(pp['own_sources'][0]).read_bytes()
+    needle = b"    build, guard = load(packet['actual_build_record']), load(packet['actual_Rust_capture_custody']); source = build['Source_snapshot']\n"
+    replacement = b"    same(packet['workflow_Source_preparation'], PREP['workflow_Source_preparation']); same(packet['comparer_Source_preparation'], PREP['comparer_Source_preparation'])\n    application_authority = workflow['actual_application_Source_preparation']; same(application_authority, PREP['actual_application_Source_preparation'])\n    source_preparation(application_authority, 'historical-actual-application-build-capture-workflow02')\n" + needle
+    assert old.count(needle) == 1
+    first = b"same(build['Source_preparation'], packet['workflow_Source_preparation']); same(guard['Source_preparation'], packet['workflow_Source_preparation'])"
+    second = b"application(build['actual_application'], packet['workflow_Source_preparation'], source)"
+    assert old.count(first) == old.count(second) == 1
+    raw = old.replace(needle, replacement).replace(first, b"same(build['Source_preparation'], application_authority); same(guard['Source_preparation'], application_authority)").replace(second, b"application(build['actual_application'], application_authority, source)")
+    assert raw.replace(replacement, needle).replace(b"same(build['Source_preparation'], application_authority); same(guard['Source_preparation'], application_authority)", first).replace(b"application(build['actual_application'], application_authority, source)", second) == old
+    ast.parse(raw); code = correspondence(out, 'publish.py', pp['own_sources'][0], raw)
+    readme = correspondence(out, 'README.md', pp['own_sources'][1], checked(pp['own_sources'][1]).read_bytes() + b'\nSuccessor02 binds the accepted current comparison workflow03/comparer04 separately from immutable actual application/build/capture workflow02. The original scalar policy and all finite selection/storage rules are unchanged. Closed comparison01 is explicitly retained as integrity-failed before any numerical joins, including its transport, both recorder receipts/full logs, all three complete empty gzip ledgers and both factual reviews. Checker failures are reviewer artifacts, never fabricated process receipts. No geometry payload or ledger values were read, publisher imported or executed by this author.\n')
+    failed_transport_ref = ref(BASE / 'ordinary-geometry-comparison-01/record.json'); failed = load(failed_transport_ref)
+    assert failed_transport_ref['sha256'] == 'cd50878793701b05772daeef0d5a87341d48ee8b8b2c0e44087aed4190af0e01'
+    failed_report_ref = ref(BASE / 'ordinary-geometry-comparison-01/comparison/comparison.json'); failed_report = load(failed_report_ref)
+    assert failed_report['status'] == 'integrity-failed' and failed_report['integrity_failure'] == {'type':'KeyError','message':"'path'"} and not any(failed_report['counts'].values())
+    failures = [ref(BASE / 'ordinary-geometry-comparison-command-01/receipt.json'), failed['actual_execution']]
+    retained = [failed_transport_ref, failed_report_ref, failed['actual_custody'], *reviews, workflow_ref, checker_ref]
+    for row in failures:
+        value = load(row); assert value['exit_code'] == 2 and value['source_bytes_match_before_and_after'] is True and value['finished_utc'] is not None
+        retained += [row, value['stdout'], value['stderr'], value['executed_launcher']['archive']]
+    for label, value in failed_report['ledgers'].items():
+        assert value['rows'] == value['decoded_bytes'] == 0; checked(value['artifact']); retained.append(value['artifact'])
+    for name, sha in [('Root-geometry-comparison-factual-review-01/review.json','697f5dc47539b53b301ce93409a352a4e73e93d7996e2a5304aedd8e9f05a36c'), ('Header-geometry-comparison-factual-review-01/review.json','697f5dc47539b53b301ce93409a352a4e73e93d7996e2a5304aedd8e9f05a36c'), ('Header-geometry-Rust-factual-review-failure-01/review.json','a1eed7a6a395930b7ceddd7e0798ac1c08dbb8b88c46559f333790cb5caa2ac9'), ('Header-geometry-Rust-factual-review-failure-02/review-corrected.json','41c67074bbdce10376e0c7c8a2ac6ba8dee1534379bda8b49989692042069afe')]:
+        row = ref(BASE / name); assert row['sha256'] == sha; retained.append(row)
+    publisher = copy.deepcopy(pp)
+    publisher.update(parent_Source_preparation=publisher_parent_ref, own_sources=[code['proposal'], readme['proposal'], author],
+        workflow_Source_preparation=workflow_ref, actual_application_Source_preparation=application_ref, comparer_Source_preparation=comparer_ref,
+        narrow_source_correspondence=[code, readme], fixed_evidence=pp['fixed_evidence'] + retained,
+        historical_Source_preparations=pp['historical_Source_preparations'] + [publisher_parent_ref, checker_parent_ref],
+        retained_closed_failures=pp['retained_closed_failures'] + failures,
+        successor_scope='Only honest historical application/current comparison authority split; complete finite failed comparison01 evidence retained.')
+    publisher['runtime_interfaces']['publisher'] = code['proposal']
+    publisher_ref = dump(out / 'manifest.json', publisher)
+
+    cold = ROOT / '.runtime/porting/SRC-05/cold-guard-native-invocation-plan-01'
+    old_ref = ref(cold / 'prepare_native.py'); assert old_ref['sha256'] == '108d6cce782c25320dda305e844f465fe1a96aa7319155c1005c8c1f825da10e'
+    old = checked(old_ref).read_bytes(); before = b'972ff187ab9133e249fdb2afade2d547f0647b58d29a1b2652744776e3d1e80f'
+    assert old.count(before) == 1
+    raw = old.replace(before, publisher_ref['sha256'].encode()); ast.parse(raw)
+    cold_code = correspondence(cold, 'prepare_native02.py', old_ref, raw)
+    cold_readme = write(cold / 'RUNNER02.md', b'Invoke prepare_native02.py using the same three reviewed runtime operands as RUNNER.md. This successor changes only the exact geometry publisher authority pin from publication01 to publication02; all restore, Source, configure, dry, containment and no-compile checks remain literal previous runner. Original runner108d and basename-fix evidence remain immutable. No restore/configure/target was performed by this author.\n')
+    bundle = dict(schema='src06-geometry-recorder-recovery-Source-bundle.v1', own_author=author, comparer_Source_preparation=comparer_ref,
+        workflow_Source_preparation=workflow_ref, actual_application_Source_preparation=application_ref, factual_checker_Source_preparation=checker_ref,
+        publication_Source_preparation=publisher_ref, cold_runner_source_correspondence=cold_code, cold_runner_README=cold_readme,
+        numerical_outputs_read=False, engine_or_Cargo_or_comparison_executed=False, canonical_or_Git_changed=False, gates_updated=False)
+    print(json.dumps(dump(BASE / 'geometry-recorder-recovery-bundle-01.json', bundle)))
+
+
+if __name__ == '__main__': main()

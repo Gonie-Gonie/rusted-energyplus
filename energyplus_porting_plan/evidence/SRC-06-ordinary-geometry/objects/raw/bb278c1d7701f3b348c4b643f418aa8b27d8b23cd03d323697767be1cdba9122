@@ -1,0 +1,51 @@
+"""Correct only FP-observation custody wording from the actual copied helper Source."""
+import ast
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+BASE = ROOT / '.runtime/porting/SRC-06'
+OLD, OUT = BASE / 'ordinary-geometry-execution-prep-03', BASE / 'ordinary-geometry-execution-prep-04'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+
+def write(path, raw):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream:
+        stream.write(raw)
+    return ref(path)
+
+
+def delta(before, after, target):
+    return write(target, ''.join(difflib.unified_diff((ROOT / before['path']).read_text(encoding='utf8').splitlines(True), (ROOT / after['path']).read_text(encoding='utf8').splitlines(True), fromfile=before['path'], tofile=after['path'])).encode())
+
+
+m = json.loads((OLD / 'manifest.json').read_bytes())
+raw = (OLD / 'run_execution.py').read_bytes()
+assert raw.count(b"'FP_control_words_available': False") == 2
+raw = raw.replace(b"'FP_control_words_available': False", b"'driver_FP_controls_observed': False")
+needle = b"'FP_control_unavailable_reason': 'unchanged genuine helper and driver do not observe FP hardware controls'"
+assert raw.count(needle) == 1
+raw = raw.replace(needle, b"'helper_FP_control_observation_declared': True, 'helper_FP_observation_boundary': 'selected_geometry.floating_environment only when returned_geometry is copied'")
+ast.parse(raw)
+before = write(OUT / 'before/execution03.py', (OLD / 'run_execution.py').read_bytes())
+driver = write(OUT / 'run_execution.py', raw)
+code_delta = delta(before, driver, OUT / 'run_execution.py.diff')
+doc_raw = (OLD / 'README.md').read_bytes()
+needle = b'No FP controls are written; actual hardware control words are explicitly unavailable because neither unchanged helper nor driver observes them.'
+assert doc_raw.count(needle) == 1
+doc_raw = doc_raw.replace(needle, b'No FP controls are written. The driver does not observe hardware controls; the unchanged copied Geo02 helper reads actual x87/MXCSR/rounding context at selected_geometry.floating_environment only when returned_geometry is copied. No context is invented when that owner is unavailable.')
+doc_before = write(OUT / 'before/README03.md', (OLD / 'README.md').read_bytes())
+doc = write(OUT / 'README.md', doc_raw + b'\nSuccessor04 corrects only the custody wording about the existing read-only copied Geo02 floating_environment observation; no helper, execution guard, input, target or numerical policy changes. Earlier03 mistaken unavailability wording remains preserved.\n')
+doc_delta = delta(doc_before, doc, OUT / 'README.md.diff')
+previous_sources = copy.deepcopy(m['own_sources'])
+m.update(own_sources=[driver, doc, ref(Path(__file__))], accepted_predecessor=ref(OLD / 'manifest.json'), predecessor_own_sources=previous_sources, narrow_source_correspondence=dict(before=before, proposal=driver, exact_diff=code_delta), narrow_document_correspondence=dict(before=doc_before, proposal=doc, exact_diff=doc_delta), typed_range_source_correspondence=m['narrow_source_correspondence'], typed_range_document_correspondence=m['narrow_document_correspondence'])
+m['runtime_interfaces']['driver'] = driver
+print(json.dumps(write(OUT / 'manifest.json', (json.dumps(m, ensure_ascii=False, indent=2) + '\n').encode())))

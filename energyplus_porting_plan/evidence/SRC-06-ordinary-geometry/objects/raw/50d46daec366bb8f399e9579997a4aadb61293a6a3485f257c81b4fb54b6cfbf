@@ -1,0 +1,20 @@
+    /// @brief access specified object element
+    /// @sa https://json.nlohmann.me/api/basic_json/operator%5B%5D/
+    reference operator[](typename object_t::key_type key) // NOLINT(performance-unnecessary-value-param)
+    {
+        // implicitly convert null value to an empty object
+        if (is_null())
+        {
+            m_data.m_type = value_t::object;
+            m_data.m_value.object = create<object_t>();
+            assert_invariant();
+        }
+
+        // operator[] only works for objects
+        if (JSON_HEDLEY_LIKELY(is_object()))
+        {
+            auto result = m_data.m_value.object->emplace(std::move(key), nullptr);
+            return set_parent(result.first->second);
+        }
+
+        JSON_THROW(type_error::create(305, detail::concat("cannot use operator[] with a string argument with ", type_name()), this));

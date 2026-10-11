@@ -1,0 +1,54 @@
+"""Seal only v4 authority/target/output substitutions atop accepted execution04."""
+import ast
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+BASE = ROOT / '.runtime/porting/SRC-06'
+OLD, OUT = BASE / 'ordinary-geometry-execution-prep-04', BASE / 'ordinary-geometry-execution-prep-05'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+
+def write(path, raw):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream:
+        stream.write(raw)
+    return ref(path)
+
+
+def body(name, raw):
+    before = write(OUT / 'before' / name, (OLD / name).read_bytes())
+    proposal = write(OUT / name, raw)
+    delta = write(OUT / (name + '.diff'), ''.join(difflib.unified_diff((OLD / name).read_text(encoding='utf8').splitlines(True), raw.decode().splitlines(True), fromfile=before['path'], tofile=proposal['path'])).encode())
+    return proposal, dict(before=before, proposal=proposal, exact_diff=delta)
+
+
+m = json.loads((OLD / 'manifest.json').read_bytes())
+assert ref(OLD / 'manifest.json')['sha256'] == 'c565a7b4298379ae7384d4c0dd41e88a9079c92c3e8ce6388c0c8db63001f2cc'
+native = ref(BASE / 'ordinary-geometry-native-prep-04/manifest.json')
+configure = ref(BASE / 'ordinary-geometry-build-prep-04/manifest.json')
+provider = ref(BASE / 'ordinary-geometry-provider-prep-03/manifest.json')
+assert native['sha256'] == '2bcb4620c0519b2c796f96242430651d5bd6e737a5e793db4c24a6c03d9ee21b'
+assert configure['sha256'] == '7547cf6817ec14417886928b34125c6339de9e223818379066cc1ae6727c761b'
+assert provider['sha256'] == '05689d2f2a757258cc01932ef57b2b145115d741dc5e9766d98f4ef5c4deafcb'
+raw = (OLD / 'run_execution.py').read_text(encoding='utf8')
+for before, after in [('ordinary-geometry-native-prep-03','ordinary-geometry-native-prep-04'), ('72f75c5242e2df7457fb9fc065b2cc1fc5922f6bb9673e6b785e145bb54f47a1',native['sha256']), ('ordinary-geometry-build-prep-03','ordinary-geometry-build-prep-04'), ('f5f7885c43eed8be89b558cc9b676fb4e7feeda54d6bc9b3735764336bc34fd4',configure['sha256']), ('ordinary-geometry-native-build-02','ordinary-geometry-native-build-03'), ('geometry_loader_helper_v3','geometry_loader_helper_v4')]:
+    assert before in raw
+    raw = raw.replace(before, after)
+ast.parse(raw)
+driver, code = body('run_execution.py', raw.encode())
+doc_raw = (OLD / 'README.md').read_bytes()
+doc_raw += b'\nSuccessor05 changes only exact Native04/configure04 authority refs, the distinct geometry_loader_helper_v4 target and fresh ordinary-geometry-native-build-03 D output. Provider03 keeps the same sixteen-provider contract. Constructor identities and complete actual epJSON are read-only helper witnesses, never expected values or substitute inputs. All source/core/PE/provider/argc4/fresh-file/DLL/PATH/before-after and callback custody rules are literal04. Earlier v3 artifacts remain immutable and unexecuted; fresh actual runtime refs are supplied only after their genuine closure and Root acceptance.\n'
+doc, document = body('README.md', doc_raw)
+prior_sources = copy.deepcopy(m['own_sources'])
+m.update(own_sources=[driver,doc,ref(Path(__file__))], accepted_predecessor=ref(OLD/'manifest.json'), predecessor_own_sources=prior_sources, predecessor_narrow_source_correspondence=m['narrow_source_correspondence'], predecessor_narrow_document_correspondence=m['narrow_document_correspondence'], narrow_source_correspondence=code, narrow_document_correspondence=document, Native_Source_preparation=native, configure_Source_preparation=configure, provider_Source_preparation=provider, provider_contract=ref(BASE/'ordinary-geometry-provider-prep-03/provider-contract.json'), exact_input_request=ref(BASE/'ordinary-geometry-native-prep-04/request.proposed.json'))
+m['dependencies'] += [ref(OLD/'manifest.json'),native,configure,provider]
+m['runtime_interfaces']['driver'] = driver
+print(json.dumps(write(OUT/'manifest.json', (json.dumps(m,ensure_ascii=False,allow_nan=False,indent=2)+'\n').encode())))

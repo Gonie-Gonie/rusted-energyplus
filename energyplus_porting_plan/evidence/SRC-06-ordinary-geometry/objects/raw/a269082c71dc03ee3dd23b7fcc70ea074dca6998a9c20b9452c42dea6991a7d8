@@ -1,0 +1,100 @@
+
+D:\CodexBuild\rusted-energyplus\SRC-06\ordinary-geometry-native-build-03\bin\geometry_loader_helper_v4.exe:     file format pei-x86-64
+
+
+Disassembly of section .text:
+
+00000001405b990e <EnergyPlus::SimulationManager::PostIPProcessing(EnergyPlus::EnergyPlusData&)>:
+   1405b990e:	55                   	push   %rbp
+   1405b990f:	53                   	push   %rbx
+   1405b9910:	48 81 ec 98 00 00 00 	sub    $0x98,%rsp
+   1405b9917:	48 8d ac 24 90 00 00 00 	lea    0x90(%rsp),%rbp
+   1405b991f:	48 89 4d 20          	mov    %rcx,0x20(%rbp)
+   1405b9923:	48 8b 45 20          	mov    0x20(%rbp),%rax
+   1405b9927:	48 05 10 0f 00 00    	add    $0xf10,%rax
+   1405b992d:	48 89 c1             	mov    %rax,%rcx
+   1405b9930:	e8 4b 88 ac 01       	call   142082180 <std::unique_ptr<EnergyPlus::DataGlobal, std::default_delete<EnergyPlus::DataGlobal> >::operator->() const>
+   1405b9935:	c6 80 04 01 00 00 00 	movb   $0x0,0x104(%rax)
+   1405b993c:	48 8b 45 20          	mov    0x20(%rbp),%rax
+   1405b9940:	48 05 18 0f 00 00    	add    $0xf18,%rax
+   1405b9946:	48 89 c1             	mov    %rax,%rcx
+   1405b9949:	e8 f2 a7 ac 01       	call   142084140 <std::unique_ptr<EnergyPlus::DataInputProcessing, std::default_delete<EnergyPlus::DataInputProcessing> >::operator->() const>
+   1405b994e:	48 83 c0 08          	add    $0x8,%rax
+   1405b9952:	48 89 c1             	mov    %rax,%rcx
+   1405b9955:	e8 96 91 ac 01       	call   142082af0 <std::unique_ptr<EnergyPlus::InputProcessor, std::default_delete<EnergyPlus::InputProcessor> >::operator->() const>
+   1405b995a:	48 89 c3             	mov    %rax,%rbx
+   1405b995d:	48 8b 45 20          	mov    0x20(%rbp),%rax
+   1405b9961:	48 05 e8 13 00 00    	add    $0x13e8,%rax
+   1405b9967:	48 89 c1             	mov    %rax,%rcx
+   1405b996a:	e8 11 b4 ac 01       	call   142084d80 <std::unique_ptr<EnergyPlus::SimulationManagerData, std::default_delete<EnergyPlus::SimulationManagerData> >::operator->() const>
+   1405b996f:	48 8d 50 0a          	lea    0xa(%rax),%rdx
+   1405b9973:	48 8b 45 20          	mov    0x20(%rbp),%rax
+   1405b9977:	49 89 d0             	mov    %rdx,%r8
+   1405b997a:	48 89 c2             	mov    %rax,%rdx
+   1405b997d:	48 89 d9             	mov    %rbx,%rcx
+   1405b9980:	e8 ef 39 b8 ff       	call   14013d374 <EnergyPlus::InputProcessor::preProcessorCheck(EnergyPlus::EnergyPlusData&, bool&)>
+   1405b9985:	48 8b 45 20          	mov    0x20(%rbp),%rax
+   1405b9989:	48 05 e8 13 00 00    	add    $0x13e8,%rax
+   1405b998f:	48 89 c1             	mov    %rax,%rcx
+   1405b9992:	e8 e9 b3 ac 01       	call   142084d80 <std::unique_ptr<EnergyPlus::SimulationManagerData, std::default_delete<EnergyPlus::SimulationManagerData> >::operator->() const>
+   1405b9997:	0f b6 40 0a          	movzbl 0xa(%rax),%eax
+   1405b999b:	84 c0                	test   %al,%al
+   1405b999d:	74 7a                	je     1405b9a19 <EnergyPlus::SimulationManager::PostIPProcessing(EnergyPlus::EnergyPlusData&)+0x10b>
+   1405b999f:	48 8d 45 b0          	lea    -0x50(%rbp),%rax
+   1405b99a3:	48 89 c1             	mov    %rax,%rcx
+   1405b99a6:	e8 55 f0 e3 01       	call   1423f8a00 <std::optional<std::reference_wrapper<EnergyPlus::InputOutputFile> >::optional()>
+   1405b99ab:	48 8d 45 c0          	lea    -0x40(%rbp),%rax
+   1405b99af:	48 89 c1             	mov    %rax,%rcx
+   1405b99b2:	e8 49 f0 e3 01       	call   1423f8a00 <std::optional<std::reference_wrapper<EnergyPlus::InputOutputFile> >::optional()>
+   1405b99b7:	48 8d 45 f7          	lea    -0x9(%rbp),%rax
+   1405b99bb:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
+   1405b99bf:	90                   	nop
+   1405b99c0:	90                   	nop
+   1405b99c1:	48 8d 55 f7          	lea    -0x9(%rbp),%rdx
+   1405b99c5:	48 8d 45 d0          	lea    -0x30(%rbp),%rax
+   1405b99c9:	49 89 d0             	mov    %rdx,%r8
+   1405b99cc:	48 8d 15 35 75 2d 02 	lea    0x22d7535(%rip),%rdx        # 142890f08 <EnergyPlus::SimulationManager::ReportLoopConnections(EnergyPlus::EnergyPlusData&)::Format_723+0xfe8>
+   1405b99d3:	48 89 c1             	mov    %rax,%rcx
+   1405b99d6:	e8 85 81 da 01       	call   142361b60 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&)>
+   1405b99db:	48 8b 45 c0          	mov    -0x40(%rbp),%rax
+   1405b99df:	48 8b 55 c8          	mov    -0x38(%rbp),%rdx
+   1405b99e3:	48 89 45 a0          	mov    %rax,-0x60(%rbp)
+   1405b99e7:	48 89 55 a8          	mov    %rdx,-0x58(%rbp)
+   1405b99eb:	48 8b 45 b0          	mov    -0x50(%rbp),%rax
+   1405b99ef:	48 8b 55 b8          	mov    -0x48(%rbp),%rdx
+   1405b99f3:	48 89 45 90          	mov    %rax,-0x70(%rbp)
+   1405b99f7:	48 89 55 98          	mov    %rdx,-0x68(%rbp)
+   1405b99fb:	4c 8d 45 90          	lea    -0x70(%rbp),%r8
+   1405b99ff:	48 8d 4d a0          	lea    -0x60(%rbp),%rcx
+   1405b9a03:	48 8d 55 d0          	lea    -0x30(%rbp),%rdx
+   1405b9a07:	48 8b 45 20          	mov    0x20(%rbp),%rax
+   1405b9a0b:	4d 89 c1             	mov    %r8,%r9
+   1405b9a0e:	49 89 c8             	mov    %rcx,%r8
+   1405b9a11:	48 89 c1             	mov    %rax,%rcx
+   1405b9a14:	e8 c8 75 21 00       	call   1407d0fe1 <EnergyPlus::ShowFatalError(EnergyPlus::EnergyPlusData&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::optional<std::reference_wrapper<EnergyPlus::InputOutputFile> >, std::optional<std::reference_wrapper<EnergyPlus::InputOutputFile> >)>
+   1405b9a19:	48 8b 45 20          	mov    0x20(%rbp),%rax
+   1405b9a1d:	48 05 18 0f 00 00    	add    $0xf18,%rax
+   1405b9a23:	48 89 c1             	mov    %rax,%rcx
+   1405b9a26:	e8 15 a7 ac 01       	call   142084140 <std::unique_ptr<EnergyPlus::DataInputProcessing, std::default_delete<EnergyPlus::DataInputProcessing> >::operator->() const>
+   1405b9a2b:	48 83 c0 08          	add    $0x8,%rax
+   1405b9a2f:	48 89 c1             	mov    %rax,%rcx
+   1405b9a32:	e8 b9 90 ac 01       	call   142082af0 <std::unique_ptr<EnergyPlus::InputProcessor, std::default_delete<EnergyPlus::InputProcessor> >::operator->() const>
+   1405b9a37:	48 89 c1             	mov    %rax,%rcx
+   1405b9a3a:	48 8b 45 20          	mov    0x20(%rbp),%rax
+   1405b9a3e:	48 89 c2             	mov    %rax,%rdx
+   1405b9a41:	e8 ae 4e b8 ff       	call   14013e8f4 <EnergyPlus::InputProcessor::preScanReportingVariables(EnergyPlus::EnergyPlusData&)>
+   1405b9a46:	eb 1e                	jmp    1405b9a66 <EnergyPlus::SimulationManager::PostIPProcessing(EnergyPlus::EnergyPlusData&)+0x158>
+   1405b9a48:	48 89 c3             	mov    %rax,%rbx
+   1405b9a4b:	48 8d 45 d0          	lea    -0x30(%rbp),%rax
+   1405b9a4f:	48 89 c1             	mov    %rax,%rcx
+   1405b9a52:	e8 c9 82 da 01       	call   142361d20 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string()>
+   1405b9a57:	48 89 d8             	mov    %rbx,%rax
+   1405b9a5a:	eb 00                	jmp    1405b9a5c <EnergyPlus::SimulationManager::PostIPProcessing(EnergyPlus::EnergyPlusData&)+0x14e>
+   1405b9a5c:	90                   	nop
+   1405b9a5d:	48 89 c1             	mov    %rax,%rcx
+   1405b9a60:	e8 d3 ec 50 01       	call   141ac8738 <_Unwind_Resume>
+   1405b9a65:	90                   	nop
+   1405b9a66:	48 81 c4 98 00 00 00 	add    $0x98,%rsp
+   1405b9a6d:	5b                   	pop    %rbx
+   1405b9a6e:	5d                   	pop    %rbp
+   1405b9a6f:	c3                   	ret

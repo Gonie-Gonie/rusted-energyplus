@@ -1,0 +1,26 @@
+def cargo_artifacts(command: list[str], stdout: Path) -> dict:
+    """Bind Cargo's emitted executable identity immediately after its command.
+
+    Cache hits are valid. No timestamp heuristic identifies a compiled artifact.
+    """
+    requested = (command[:2] == ["cargo", "build"] and
+                 "--message-format=json-render-diagnostics" in command)
+    result = {"requested": requested, "captured_utc": utc_now(),
+              "status": "not_requested", "rows": [], "error": None}
+    if not requested:
+        return result
+    try:
+        with stdout.open(encoding="utf-8") as stream:
+            for line in stream:
+                message = json.loads(line)
+                if message.get("reason") != "compiler-artifact" or message.get("executable") is None:
+                    continue
+                path = contained(Path(message["executable"]), ROOT)
+                result["rows"].append({"cargo_message": message, "executable": {
+                    "historical_path": path.relative_to(ROOT).as_posix(), "sha256": sha(path),
+                }})
+        result["status"] = "pass"
+    except (OSError, UnicodeError, ValueError, TypeError) as error:
+        result["status"], result["error"] = "failed", str(error)
+    return result
+

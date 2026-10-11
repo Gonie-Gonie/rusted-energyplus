@@ -1,0 +1,108 @@
+"""Seal only the prospective consumed boundary/construction input-witness correction."""
+import ast
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+PARENT = ROOT / '.runtime/porting/SRC-06/ordinary-geometry-comparison-prep-01'
+OUT = ROOT / '.runtime/porting/SRC-06/ordinary-geometry-comparison-prep-02'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(raw).hexdigest(), 'size_bytes': len(raw), 'line_count': len(raw.splitlines())}
+
+
+def write(path, raw):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream: stream.write(raw)
+    return ref(path)
+
+
+def dump(path, value):
+    return write(path, (json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode())
+
+
+def main():
+    parent_ref = ref(PARENT / 'manifest.json')
+    assert parent_ref['sha256'] == '43b8a9e86e8aa3ab681c4300c7bde612efd262351c940130bb8ee4a529792fd6'
+    parent = json.loads((PARENT / 'manifest.json').read_bytes())
+    for row in parent['own_sources']:
+        actual = ref(ROOT / row['path'])
+        assert all(actual[key] == row[key] for key in ('sha256', 'size_bytes'))
+    assert not OUT.exists()
+    old = (PARENT / 'input_joins.py').read_text(encoding='utf-8')
+    anchor = "    geometry = native.get('selected_geometry')\n"
+    added = "    for row in typed['constructions']:\n        compare(row['kind'], 'Opaque', 'typed/construction/' + row['name'] + '/consumed-kind', 'input_join')\n"
+    assert old.count(anchor) == 1
+    proposed = old.replace(anchor, added + anchor)
+    anchor2 = "        construction = rconstruct_ids[r['construction_id']]\n"
+    added2 = """        boundary = supplied['outside_boundary_condition']
+        C.need(boundary in ('Outdoors', 'Adiabatic') and supplied.get('outside_boundary_condition_object') is None, 'fixed A24 consumed boundary domain changed')
+        compare(r['outside_boundary_condition'], boundary, 'owner/' + name + '/typed-boundary-input', 'input_join')
+        compare(r['outside_boundary_condition_object'], None, 'owner/' + name + '/typed-boundary-object-input', 'input_join')
+        # Original Outdoors is ExternalEnvironment(0); Adiabatic reconciles to the actual same Surface ID.
+        compare(n['outside_boundary'], 0 if boundary == 'Outdoors' else n['id'], 'owner/' + name + '/actual-Native-boundary', 'input_join')
+"""
+    assert proposed.count(anchor2) == 1
+    proposed = proposed.replace(anchor2, added2 + anchor2)
+    assert proposed.replace(added, '').replace(added2, '') == old
+    old_custody = (PARENT / 'custody.py').read_text(encoding='utf-8')
+    native_old = "        proof = C.load(native_release[name]); C.need(proof['accepted'] is True and proof['gates_updated'] is False, 'both Native full factual acceptances required')\n"
+    native_new = """        proof = C.load(native_release[name])
+        C.need(proof['schema'] == 'ordinary-geometry-Native-factual-review.v1' and proof['accepted'] is True and proof['baseline_releasable'] is True and proof['gates_updated'] is False, 'both released Native full factual acceptances required')
+        for actual_key, release_key in [('actual_custody', 'actual_custody'), ('actual_result', 'actual_authoritative_result'), ('Source_snapshot', 'Source_snapshot'), ('actual_Root_provider_acceptance', 'actual_provider_acceptance')]:
+            identity(C, proof[actual_key], native_release[release_key])
+"""
+    rust_old = "        value = C.load(packet[name]); C.need(value['accepted'] is True and value['gates_updated'] is False, 'both actual Rust factual acceptances required'); identity(C, value['actual_custody'], packet['Rust_execution_custody']); identity(C, value['Source_snapshot'], source)\n"
+    rust_new = "        value = C.load(packet[name]); C.need(value['schema'] == 'src06-ordinary-geometry-Rust-factual-review.v1' and value['accepted'] is True and value['gates_updated'] is False, 'both actual Rust factual acceptances required'); identity(C, value['actual_custody'], packet['Rust_execution_custody']); identity(C, value['Source_snapshot'], source)\n"
+    assert old_custody.count(native_old) == old_custody.count(rust_old) == 1
+    custody = old_custody.replace(native_old, native_new).replace(rust_old, rust_new)
+    assert custody.replace(native_new, native_old).replace(rust_new, rust_old) == old_custody
+    before = []
+    for name in ('compare.py', 'custody.py', 'input_joins.py', 'README.md', 'manifest.json'):
+        before.append(write(OUT / 'before-01' / name, (PARENT / name).read_bytes()))
+    sources = []
+    additions = []
+    narrow = []
+    for name in ('compare.py', 'custody.py', 'input_joins.py'):
+        raw = proposed.encode() if name == 'input_joins.py' else custody.encode() if name == 'custody.py' else (PARENT / name).read_bytes()
+        ast.parse(raw)
+        row = write(OUT / name, raw)
+        sources.append(row)
+        additions.append(write(OUT / (name + '.diff'), ''.join(difflib.unified_diff([], raw.decode().splitlines(True), fromfile='/dev/null', tofile=row['path'])).encode()))
+        narrow.append(write(OUT / (name + '.narrow.diff'), ''.join(difflib.unified_diff((PARENT / name).read_text(encoding='utf-8').splitlines(True), raw.decode().splitlines(True), fromfile=(PARENT / name).relative_to(ROOT).as_posix(), tofile=row['path'])).encode()))
+    readme = (PARENT / 'README.md').read_bytes() + b'\nSuccessor02 adds required consumed-input witnesses: every actual typed Construction must remain Opaque; each fixed A24 Surface boundary and absent boundary object must match the literal converted input; actual Native ExtBoundCond must be Outdoors=0 or Adiabatic=self Surface ID under the pinned Original reconciliation. Both Native factual reviews must use the actual factual schema, be baseline_releasable and bind the same custody/result/Source/provider as the release. Both Rust factual reviews must use the agreed actual Rust factual schema and bind the same custody and Source. No selected endpoint, policy, tolerance, generated-geometry profile or numerical PASS prerequisite changes. Source01 remains immutable.\n'
+    readme_ref = write(OUT / 'README.md', readme)
+    ranges = []
+    for path, start, end, role in [
+        ('crates/ep_compiler/src/compiler.rs', 13974, 13989, 'actual typed boundary/object owner retention'),
+        ('crates/ep_compiler/src/compiler.rs', 17353, 17381, 'actual typed boundary enum parser'),
+        ('crates/ep_model/src/objects/construction.rs', 9, 21, 'actual consumed opaque construction kind'),
+        ('.reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh', 288, 297, 'actual Native outside boundary constants'),
+        ('.reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc', 4017, 4026, 'literal Outdoors and Adiabatic loader branch'),
+        ('.reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc', 1782, 1795, 'actual Adiabatic self Surface ID reconciliation'),
+        ('.runtime/porting/SRC-06/ordinary-geometry-factual-checker-prep-02/check.py', 339, 345, 'reviewed actual Native factual schema and release/custody result provider fields'),
+    ]:
+        whole = ref(ROOT / path)
+        raw = b''.join((ROOT / path).read_bytes().splitlines(True)[start - 1:end])
+        archive = write(OUT / 'literal-source-ranges' / (path.replace('/', '__') + '.' + str(start) + '-' + str(end) + '.literal'), raw)
+        ranges.append({'whole_Source': whole, 'start_line': start, 'end_line': end, 'literal_archive': archive, 'role': role})
+    manifest = copy.deepcopy(parent)
+    manifest['own_sources'] = sources + [readme_ref, ref(Path(__file__))]
+    manifest['exact_addition_diffs'] = additions
+    manifest['runtime_interfaces']['comparer'] = sources[0]
+    manifest['literal_Source_ranges'] += ranges
+    manifest['parent_Source_preparation'] = parent_ref
+    manifest['authentic_before_01_archives'] = before
+    manifest['exact_narrow_diffs'] = narrow
+    manifest['successor_scope'] = 'Required consumed boundary/object/Native ExtBoundCond and actual typed Opaque kind witnesses plus complete typed factual-review/release bindings; no endpoint or policy change.'
+    manifest['runtime_interfaces']['Native_factual_review_schema'] = 'ordinary-geometry-Native-factual-review.v1'
+    manifest['runtime_interfaces']['Rust_factual_review_schema'] = 'src06-ordinary-geometry-Rust-factual-review.v1'
+    print(json.dumps(dump(OUT / 'manifest.json', manifest)))
+
+
+if __name__ == '__main__': main()

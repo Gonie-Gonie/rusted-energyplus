@@ -1,0 +1,3 @@
+        GetWindowShadingControlData(state, ErrorsFound);
+        s_ipsc->cCurrentModuleObject = "FenestrationSurface:Detailed";
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, s_ipsc->cCurrentModuleObject, Loop, SurfaceNumAlpha, SurfaceNumProp);

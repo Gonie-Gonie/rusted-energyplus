@@ -1,0 +1,28 @@
+--- .runtime/porting/SRC-06/ordinary-geometry-workflow-prep-03/before/compare.py
++++ .runtime/porting/SRC-06/ordinary-geometry-workflow-prep-03/compare.py
+@@ -26,10 +26,14 @@
+     V = importlib.util.module_from_spec(spec); spec.loader.exec_module(V)
+     M, A, prep_ref, prep = V.bootstrap(args.source_preparation)
+     A.need(A.bind(prep['runtime_interfaces']['compare']) == Path(__file__).resolve(), 'actual comparison transport Source differs')
+-    prep['_actual_operand'] = args.source_preparation
++    application_ref = prep['actual_application_Source_preparation']
++    A.need(application_ref['sha256'] == '863c5207c2ec3994c4448651b7f2fa154c4e3939760cc437fcaa5217b61db51c', 'immutable actual application workflow02 required')
++    application_prep = A.load(application_ref)
++    for row in application_prep['own_sources']: A.bind(row)
++    application_prep['_actual_operand'] = str(A.bind(application_ref)) + '#' + application_ref['sha256']
+     app_ref, review_ref, source = [A.operand(v) for v in [args.application, args.formatter_review, args.Source_snapshot]]
+     source = {key:source[key] for key in ('path','sha256')}
+-    app, fmt, observer = V.application(M, A, prep, app_ref, review_ref, source)
++    app, fmt, observer = V.application(M, A, application_prep, app_ref, review_ref, source)
+     rust_ref = A.operand(args.Rust_custody); rust = A.load(rust_ref)
+     A.need(rust['schema'] == 'src06-ordinary-geometry-actual-Rust-capture-custody.v1'
+            and rust['actual_application'] == app_ref and rust['Source_snapshot'] == source
+@@ -79,7 +83,7 @@
+            'actual comparison command/Source custody differs')
+     A.need(execution['finished_utc'] <= receipt['started_utc'] and native['finished_utc'] <= receipt['started_utc'], 'both captures must close before comparison')
+     for row in [receipt['stdout'], receipt['stderr'], packet_ref, policy]: A.bind(row)
+-    A.members(source, current=True); V.application(M, A, prep, app_ref, review_ref, source)
++    A.members(source, current=True); V.application(M, A, application_prep, app_ref, review_ref, source)
+     # An actual nonzero comparison remains a retained failure. No result is interpreted here.
+     record = dict(schema='src06-ordinary-geometry-actual-comparison-transport.v1', Source_preparation=prep_ref,
+         actual_custody=packet_ref, actual_comparer=comparer_ref, actual_execution=receipt_ref, actual_exit_code=code,

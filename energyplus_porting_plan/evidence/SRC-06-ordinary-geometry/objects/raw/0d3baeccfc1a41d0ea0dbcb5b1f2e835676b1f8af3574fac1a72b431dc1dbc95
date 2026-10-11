@@ -1,0 +1,64 @@
+    void GetSiteAtmosphereData(EnergyPlusData &state, bool &ErrorsFound)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   January 2006
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Reads the input data for the SITE ATMOSPHERIC VARIATION object.
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Array1D_string AlphArray(1); // Character string data
+        Array1D<Real64> NumArray(3); // Numeric data
+
+        // Formats
+        constexpr const char *Format_720("Environment:Site Atmospheric Variation,{:.3R},{:.3R},{:.6R}\n");
+
+        state.dataHeatBalMgr->CurrentModuleObject = "Site:HeightVariation";
+        int NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
+
+        if (NumObjects == 1) {
+            int NumAlphas; // Number of elements in the alpha array
+            int NumNums;   // Number of elements in the numeric array
+            int IOStat;    // IO Status when calling get input subroutine
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     state.dataHeatBalMgr->CurrentModuleObject,
+                                                                     1,
+                                                                     AlphArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+
+            if (NumNums > 0) {
+                state.dataEnvrn->SiteWindExp = NumArray(1);
+            }
+            if (NumNums > 1) {
+                state.dataEnvrn->SiteWindBLHeight = NumArray(2);
+            }
+            if (NumNums > 2) {
+                state.dataEnvrn->SiteTempGradient = NumArray(3);
+            }
+
+        } else if (NumObjects > 1) {
+            ShowSevereError(state, EnergyPlus::format("Too many {} objects, only 1 allowed.", state.dataHeatBalMgr->CurrentModuleObject));
+            ErrorsFound = true;
+        } else { //  None entered
+            // IDD defaults would have this:
+            // Building object defaults use Terrain to set SiteWindExp and SiteWindBLHeight but would
+            // be overridden by a Site Atmospheric Variation Object.
+            // SiteWindExp = 0.22
+            // SiteWindBLHeight = 370.0
+            state.dataEnvrn->SiteTempGradient = 0.0065;
+        }
+
+        // Write to the initialization output file
+        print(state.files.eio,
+              "! <Environment:Site Atmospheric Variation>,Wind Speed Profile Exponent {{}},Wind Speed Profile Boundary "
+              "Layer Thickness {{m}},Air Temperature Gradient Coefficient {{K/m}}\n");
+

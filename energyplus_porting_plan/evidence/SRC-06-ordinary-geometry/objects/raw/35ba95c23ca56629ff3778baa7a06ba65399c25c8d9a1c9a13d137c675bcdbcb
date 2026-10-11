@@ -1,0 +1,62 @@
+"""Preserve01; uniquely name appended deferred function, with unchanged scientific inputs/copy TU."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+OLD = ROOT / '.runtime/porting/SRC-06/ordinary-geometry-native-prep-01'
+OUT = ROOT / '.runtime/porting/SRC-06/ordinary-geometry-native-prep-02'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(),
+                size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+
+def write(path, raw):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    assert not path.exists(), path
+    path.write_bytes(raw)
+
+
+assert not OUT.exists()
+assert ref(OLD / 'manifest.json')['sha256'] == '378eb22d4679c60f71be03f749829ca67a9257abf50bfbfa9013049ddc35cb8b'
+old = json.loads((OLD / 'manifest.json').read_bytes())
+for name in ['manifest.json', 'README.md', 'request.proposed.json', 'geometry_loader.cmake']:
+    write(OUT / 'before-01' / name, (OLD / name).read_bytes())
+sources = []
+for row in old['own_sources']:
+    before = ROOT / row['path']; raw = before.read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == row['sha256']
+    if before.name == 'geometry_loader.cmake':
+        assert raw.count(b'src06_add_dispatcher_reference') == 2
+        raw = raw.replace(b'src06_add_dispatcher_reference', b'geometry_loader_add_reference')
+    target = OUT / before.name; write(target, raw); sources.append(ref(target))
+request = json.loads((OLD / 'request.proposed.json').read_bytes()); request['native_source_files'] = sources
+write(OUT / 'request.proposed.json', (json.dumps(request, indent=2) + '\n').encode())
+readme = (OLD / 'README.md').read_bytes().replace(b'full13 output text files', b'full14 output text files')
+readme += b'\nSuccessor02 preserves helper/fields/all three copied headers byte exactly. It corrects only the appended CMake function and deferred-call name, avoiding collision with the actual inherited dispatcher function. The recipe variable/target and all scientific input/loader/copy contracts remain unchanged; request Source descriptors relocate to this same-parent closure.01 remains immutable and unexecuted.\n'
+write(OUT / 'README.md', readme)
+deltas = []
+for name in ['geometry_loader.cmake', 'README.md', 'request.proposed.json']:
+    before = OUT / 'before-01' / name; after = OUT / name
+    raw = ''.join(difflib.unified_diff(before.read_bytes().decode().splitlines(True), after.read_bytes().decode().splitlines(True),
+                  fromfile='before-01/' + name, tofile=name)).encode()
+    target = OUT / 'diffs' / (name + '.diff'); write(target, raw)
+    deltas.append(dict(before=ref(before), proposal=ref(after), exact_diff=ref(target), fromfile='before-01/' + name, tofile=name))
+for a, b in zip(old['own_sources'], sources):
+    if Path(a['path']).name != 'geometry_loader.cmake': assert a['sha256'] == b['sha256'] and a['size_bytes'] == b['size_bytes']
+for key in request:
+    if key != 'native_source_files': assert request[key] == json.loads((OLD / 'request.proposed.json').read_bytes())[key]
+new = dict(old)
+new.update(own_sources=sources, authoring_source=ref(Path(__file__).resolve()), README=ref(OUT / 'README.md'),
+    prospective_request=ref(OUT / 'request.proposed.json'), previous_preparation=ref(OLD / 'manifest.json'),
+    authentic_before_manifest=ref(OUT / 'before-01/manifest.json'), incremental_correspondence=deltas,
+    unchanged_helper_fields_and_copied_headers=True, deferred_function_collision_repaired_before_any_execution=True,
+    prior_authoring_source=old['authoring_source'])
+ast.parse(Path(__file__).read_bytes())
+write(OUT / 'manifest.json', (json.dumps(new, ensure_ascii=False, allow_nan=False, indent=2) + '\n').encode())
+print(json.dumps(ref(OUT / 'manifest.json')))

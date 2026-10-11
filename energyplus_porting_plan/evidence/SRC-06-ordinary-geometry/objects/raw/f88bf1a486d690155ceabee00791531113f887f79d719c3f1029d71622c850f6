@@ -1,0 +1,639 @@
+{
+  "schema": "ordinary-geometry-execution-Source-preparation.v1",
+  "status": "HELD-Source-only-before-genuine-helper-execution",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-06/run_execution.py",
+      "sha256": "81ccfdf370e0f66f7c24e2344bafc352f754aad1982e9b0e01c65899a08d0030",
+      "size_bytes": 26783,
+      "line_count": 297
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-06/README.md",
+      "sha256": "280da7451c87e143b9eb563e790b5672d6238dbfc0f89d9cd7a8995b7b911482",
+      "size_bytes": 4828,
+      "line_count": 19
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-geometry-execution-Source-06.py",
+      "sha256": "8507e04d3fbd1da2da392341bcaff78a94d2cc8ac6d12b52b2a1e361b6943958",
+      "size_bytes": 2742,
+      "line_count": 36
+    }
+  ],
+  "Native_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-04/manifest.json",
+    "sha256": "2bcb4620c0519b2c796f96242430651d5bd6e737a5e793db4c24a6c03d9ee21b",
+    "size_bytes": 60112,
+    "line_count": 1355
+  },
+  "configure_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-04/manifest.json",
+    "sha256": "7547cf6817ec14417886928b34125c6339de9e223818379066cc1ae6727c761b",
+    "size_bytes": 20691,
+    "line_count": 503
+  },
+  "provider_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-03/manifest.json",
+    "sha256": "05689d2f2a757258cc01932ef57b2b145115d741dc5e9766d98f4ef5c4deafcb",
+    "size_bytes": 22657,
+    "line_count": 544
+  },
+  "source_correspondence": {
+    "before": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-01/before/dispatcher-execution.py",
+      "sha256": "d1cb3c42f68bea7e037269b3c9acb0bb20f2304244fbf25ad67915a6f5cc6b2d",
+      "size_bytes": 23114,
+      "line_count": 268
+    },
+    "proposal": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-01/run_execution.py",
+      "sha256": "9e6193128908315a5e0a72f8bcfa8fdc7830bc2285368b2807c0d3fd970aae09",
+      "size_bytes": 25860,
+      "line_count": 288
+    },
+    "exact_diff": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-01/run_execution.py.diff",
+      "sha256": "5bffabf3f34ae55b6d19671b0a70f2eb8f602e6ca6ca2e033238c3c2e30b4ae7",
+      "size_bytes": 24803,
+      "line_count": 213
+    }
+  },
+  "provider_contract": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-03/provider-contract.json",
+    "sha256": "512a1ad9657cf23c54067292f4a42375a39340c6c8071f3a1b9480ad46b2e05b",
+    "size_bytes": 8649,
+    "line_count": 221
+  },
+  "exact_input_request": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-04/request.proposed.json",
+    "sha256": "5df01227b42076476151f7d852b22d3feecd859cb63cd91ff35af7244dbdfbd4",
+    "size_bytes": 11398,
+    "line_count": 278
+  },
+  "Original_provider_entry_ranges": [
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/InputProcessing/InputProcessor.cc",
+        "sha256": "2feb4e57345a747d5467c6de0bd89b6d5078ca6e5279525b984228b0ebc91fcb",
+        "size_bytes": 122929,
+        "line_count": 2450
+      },
+      "start_line": 259,
+      "end_line": 322,
+      "archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-01/Original-entry-ranges/InputProcessing_InputProcessor.cc.259-322.literal",
+        "sha256": "46c960d3fabcc2844bb02553dd0abf7793e211a77832fc0b22d11a53fde8b7bb",
+        "size_bytes": 3003,
+        "line_count": 64
+      },
+      "purpose": "Provider definition/entry prefix; whole-file SHA authenticates complete Original Source, not an invocation trace"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SimulationManager.cc",
+        "sha256": "bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685",
+        "size_bytes": 168527,
+        "line_count": 2941
+      },
+      "start_line": 2777,
+      "end_line": 2840,
+      "archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-01/Original-entry-ranges/SimulationManager.cc.2777-2840.literal",
+        "sha256": "0c6002831ee5009a1610f165f7818bea932b672a3e3262e2732ba93c13787007",
+        "size_bytes": 3170,
+        "line_count": 64
+      },
+      "purpose": "Provider definition/entry prefix; whole-file SHA authenticates complete Original Source, not an invocation trace"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.cc",
+        "sha256": "6416c03de88a2b913d33393e82141b4183b9e446cd93fb7e5c7c9fde22d15f9f",
+        "size_bytes": 60978,
+        "line_count": 1104
+      },
+      "start_line": 579,
+      "end_line": 642,
+      "archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-01/Original-entry-ranges/Data_EnergyPlusData.cc.579-642.literal",
+        "sha256": "6d8c25f7f8c03b4dcca3556b18db64c2b33e252d49f9a47fcdcc4a84abaf2e0e",
+        "size_bytes": 3457,
+        "line_count": 64
+      },
+      "purpose": "Provider definition/entry prefix; whole-file SHA authenticates complete Original Source, not an invocation trace"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.cc",
+        "sha256": "6416c03de88a2b913d33393e82141b4183b9e446cd93fb7e5c7c9fde22d15f9f",
+        "size_bytes": 60978,
+        "line_count": 1104
+      },
+      "start_line": 840,
+      "end_line": 903,
+      "archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-01/Original-entry-ranges/Data_EnergyPlusData.cc.840-903.literal",
+        "sha256": "6348c56ba0ed874933e43c9d1da2bda7bf7a52418919909d92d1328ee420d1d5",
+        "size_bytes": 3104,
+        "line_count": 64
+      },
+      "purpose": "Provider definition/entry prefix; whole-file SHA authenticates complete Original Source, not an invocation trace"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputReportPredefined.cc",
+        "sha256": "a833c153bbd89783a6075056c0ff791a2dec041df4badfdfa499fd0bd1b53674",
+        "size_bytes": 169800,
+        "line_count": 2286
+      },
+      "start_line": 77,
+      "end_line": 140,
+      "archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-01/Original-entry-ranges/OutputReportPredefined.cc.77-140.literal",
+        "sha256": "ecf40b8dd8886bec34c70b0b719db80f312c9660bdac902f5540cbefa915b378",
+        "size_bytes": 3625,
+        "line_count": 64
+      },
+      "purpose": "Provider definition/entry prefix; whole-file SHA authenticates complete Original Source, not an invocation trace"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+        "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+        "size_bytes": 371103,
+        "line_count": 6206
+      },
+      "start_line": 446,
+      "end_line": 509,
+      "archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-01/Original-entry-ranges/HeatBalanceManager.cc.446-509.literal",
+        "sha256": "b04dd08c3b8125e77fff4c67361138ac152f2f1d1a09ae4e7d8e410711731b19",
+        "size_bytes": 3665,
+        "line_count": 64
+      },
+      "purpose": "Provider definition/entry prefix; whole-file SHA authenticates complete Original Source, not an invocation trace"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputProcessor.cc",
+        "sha256": "0530ffdb4a9a267992a9e1e21470b88770308660350101e38bd87c3b0d1afc88",
+        "size_bytes": 225982,
+        "line_count": 4921
+      },
+      "start_line": 253,
+      "end_line": 316,
+      "archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-01/Original-entry-ranges/OutputProcessor.cc.253-316.literal",
+        "sha256": "3522ced259fd506b959b868b2a9036daffa44ab65586eb0ca2ad0d1ae93dcb0b",
+        "size_bytes": 3186,
+        "line_count": 64
+      },
+      "purpose": "Provider definition/entry prefix; whole-file SHA authenticates complete Original Source, not an invocation trace"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+        "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+        "size_bytes": 371103,
+        "line_count": 6206
+      },
+      "start_line": 494,
+      "end_line": 557,
+      "archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-01/Original-entry-ranges/HeatBalanceManager.cc.494-557.literal",
+        "sha256": "ed6d05f840043eb7df25e1db922e2e8127825a46d19589fc4ded254067dbedf1",
+        "size_bytes": 3361,
+        "line_count": 64
+      },
+      "purpose": "Provider definition/entry prefix; whole-file SHA authenticates complete Original Source, not an invocation trace"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+        "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+        "size_bytes": 371103,
+        "line_count": 6206
+      },
+      "start_line": 1252,
+      "end_line": 1315,
+      "archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-01/Original-entry-ranges/HeatBalanceManager.cc.1252-1315.literal",
+        "sha256": "0d3baeccfc1a41d0ea0dbcb5b1f2e835676b1f8af3574fac1a72b431dc1dbc95",
+        "size_bytes": 3393,
+        "line_count": 64
+      },
+      "purpose": "Provider definition/entry prefix; whole-file SHA authenticates complete Original Source, not an invocation trace"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Material.cc",
+        "sha256": "6f5bb1801fd401971b2a6152a4f6b53748c68050cc210b7ff5e27e1d520f2a54",
+        "size_bytes": 179008,
+        "line_count": 3562
+      },
+      "start_line": 101,
+      "end_line": 164,
+      "archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-01/Original-entry-ranges/Material.cc.101-164.literal",
+        "sha256": "aa0ad0ec0d2e55072a4cb3bce7b903eb20927b282cb16ff130f2cc4d3c3b4f3f",
+        "size_bytes": 3345,
+        "line_count": 64
+      },
+      "purpose": "Provider definition/entry prefix; whole-file SHA authenticates complete Original Source, not an invocation trace"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+        "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+        "size_bytes": 371103,
+        "line_count": 6206
+      },
+      "start_line": 1319,
+      "end_line": 1382,
+      "archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-01/Original-entry-ranges/HeatBalanceManager.cc.1319-1382.literal",
+        "sha256": "d4282ec075bb482e6fef05e30eaddaf9a1c9508c45923c09883132f4f5e3a168",
+        "size_bytes": 3555,
+        "line_count": 64
+      },
+      "purpose": "Provider definition/entry prefix; whole-file SHA authenticates complete Original Source, not an invocation trace"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+        "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+        "size_bytes": 371103,
+        "line_count": 6206
+      },
+      "start_line": 1800,
+      "end_line": 1863,
+      "archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-01/Original-entry-ranges/HeatBalanceManager.cc.1800-1863.literal",
+        "sha256": "fff51c3e9856cf95951c38c24ef18102b39de88d756522bcba90550d01c0d7db",
+        "size_bytes": 2689,
+        "line_count": 64
+      },
+      "purpose": "Provider definition/entry prefix; whole-file SHA authenticates complete Original Source, not an invocation trace"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+        "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1",
+        "size_bytes": 941682,
+        "line_count": 15690
+      },
+      "start_line": 251,
+      "end_line": 314,
+      "archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-01/Original-entry-ranges/SurfaceGeometry.cc.251-314.literal",
+        "sha256": "1b76d39123bd31cbfc42601270941ec09257fbc21bd6b5ee2b958dba4b23c9fc",
+        "size_bytes": 3495,
+        "line_count": 64
+      },
+      "purpose": "Provider definition/entry prefix; whole-file SHA authenticates complete Original Source, not an invocation trace"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+        "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1",
+        "size_bytes": 941682,
+        "line_count": 15690
+      },
+      "start_line": 9169,
+      "end_line": 9232,
+      "archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-01/Original-entry-ranges/SurfaceGeometry.cc.9169-9232.literal",
+        "sha256": "23025f267b925a8edd06f60810dd21a0431750ef50eba0fabc3850db4ff564a3",
+        "size_bytes": 2502,
+        "line_count": 64
+      },
+      "purpose": "Provider definition/entry prefix; whole-file SHA authenticates complete Original Source, not an invocation trace"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+        "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1",
+        "size_bytes": 941682,
+        "line_count": 15690
+      },
+      "start_line": 12846,
+      "end_line": 12909,
+      "archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-01/Original-entry-ranges/SurfaceGeometry.cc.12846-12909.literal",
+        "sha256": "d7fc39fdf4c324ca79ef9c3934dfe4448a87eec8afd4498affe02f5ec4377289",
+        "size_bytes": 3053,
+        "line_count": 64
+      },
+      "purpose": "Provider definition/entry prefix; whole-file SHA authenticates complete Original Source, not an invocation trace"
+    },
+    {
+      "source": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SurfaceGeometry.cc",
+        "sha256": "aa54c0609250718a79013d8f23850604efeb95365e502ee86f066bb8e4ac0dc1",
+        "size_bytes": 941682,
+        "line_count": 15690
+      },
+      "start_line": 12010,
+      "end_line": 12073,
+      "archive": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-01/Original-entry-ranges/SurfaceGeometry.cc.12010-12073.literal",
+        "sha256": "f882b1a5cc9945fa244734a085214b30d6e4cc76a11d73743b53839b997006a0",
+        "size_bytes": 2591,
+        "line_count": 64
+      },
+      "purpose": "Provider definition/entry prefix; whole-file SHA authenticates complete Original Source, not an invocation trace"
+    }
+  ],
+  "authentic_template": {
+    "path": ".runtime/porting/SRC-06/native-dispatcher-observation-prep-01/run_execution.py",
+    "sha256": "d1cb3c42f68bea7e037269b3c9acb0bb20f2304244fbf25ad67915a6f5cc6b2d",
+    "size_bytes": 23114,
+    "line_count": 268
+  },
+  "dependencies": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-03/manifest.json",
+      "sha256": "72f75c5242e2df7457fb9fc065b2cc1fc5922f6bb9673e6b785e145bb54f47a1",
+      "size_bytes": 48488,
+      "line_count": 1110
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-03/manifest.json",
+      "sha256": "f5f7885c43eed8be89b558cc9b676fb4e7feeda54d6bc9b3735764336bc34fd4",
+      "size_bytes": 16032,
+      "line_count": 398
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-02/manifest.json",
+      "sha256": "5804749eb0d18130331560741dd59be7849d113ca4c4602c318edc4ed655fe87",
+      "size_bytes": 19452,
+      "line_count": 464
+    },
+    {
+      "path": ".runtime/porting/SRC-06/native-dispatcher-observation-prep-01/run_execution.py",
+      "sha256": "d1cb3c42f68bea7e037269b3c9acb0bb20f2304244fbf25ad67915a6f5cc6b2d",
+      "size_bytes": 23114,
+      "line_count": 268
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "size_bytes": 8453,
+      "line_count": 204
+    },
+    {
+      "path": "tools/porting/native_pe.py",
+      "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+      "size_bytes": 20217,
+      "line_count": 346
+    },
+    {
+      "path": ".runtime/porting/SRC-06/dispatcher-build-metadata-restore-01/record.json",
+      "sha256": "15156d442e24f5ee4a2d60d4f861758ae2492364f0ae812657faa584cdfcee82",
+      "size_bytes": 4480,
+      "line_count": 108
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-02/Root-FULL-Source-review-02.json",
+      "sha256": "291dd3f661667fd2490268962fbdd425f879b427a9ea0037aa51360f55d8937d",
+      "size_bytes": 915,
+      "line_count": 22
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-04/manifest.json",
+      "sha256": "c565a7b4298379ae7384d4c0dd41e88a9079c92c3e8ce6388c0c8db63001f2cc",
+      "size_bytes": 23957,
+      "line_count": 575
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-04/manifest.json",
+      "sha256": "2bcb4620c0519b2c796f96242430651d5bd6e737a5e793db4c24a6c03d9ee21b",
+      "size_bytes": 60112,
+      "line_count": 1355
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-04/manifest.json",
+      "sha256": "7547cf6817ec14417886928b34125c6339de9e223818379066cc1ae6727c761b",
+      "size_bytes": 20691,
+      "line_count": 503
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-03/manifest.json",
+      "sha256": "05689d2f2a757258cc01932ef57b2b145115d741dc5e9766d98f4ef5c4deafcb",
+      "size_bytes": 22657,
+      "line_count": 544
+    }
+  ],
+  "runtime_interfaces": {
+    "driver": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-06/run_execution.py",
+      "sha256": "81ccfdf370e0f66f7c24e2344bafc352f754aad1982e9b0e01c65899a08d0030",
+      "size_bytes": 26783,
+      "line_count": 297
+    },
+    "required_options": [
+      "--provider-inventory",
+      "--Root-provider-acceptance",
+      "--source-snapshot",
+      "--output-dir"
+    ],
+    "helper_argc": 4,
+    "output_schema": "ordinary-geometry-execution-custody.v1",
+    "before_schema": "ordinary-geometry-execution-before.v1",
+    "Root_acceptance_schema": "ordinary-geometry-Root-provider-acceptance.v1",
+    "authoritative_result_filename": "geometry-loader-results.json"
+  },
+  "numerical_outputs_read": false,
+  "helper_or_driver_executed": false,
+  "FP_control_writes": false,
+  "canonical_or_Git_changes": false,
+  "scientific_PASS_claimed": false,
+  "gates_updated": false,
+  "accepted_predecessor": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-05/manifest.json",
+    "sha256": "bb30bc77076cda9f6ddd04ba10d7009562a129d216eeb476dbb0f7060cb29fb7",
+    "size_bytes": 26530,
+    "line_count": 639
+  },
+  "predecessor_own_sources": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-05/run_execution.py",
+      "sha256": "409c087d6d554faf980321099f558403676074ff19a03118b123c0a602e6034d",
+      "size_bytes": 26783,
+      "line_count": 297
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-05/README.md",
+      "sha256": "b6f9f9cecca4bcfcdcf5acd2a0dda64da9a03593b97210daa1d9e9201f0bd573",
+      "size_bytes": 4452,
+      "line_count": 17
+    },
+    {
+      "path": ".runtime/porting/SRC-06/prepare-geometry-execution-Source-05.py",
+      "sha256": "1bbcf67da1c4e28f00507885d2cc0636708005c2cd49efc5be354b86f37baa4a",
+      "size_bytes": 4139,
+      "line_count": 54
+    }
+  ],
+  "narrow_source_correspondence": {
+    "before": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-06/before/run_execution.py",
+      "sha256": "409c087d6d554faf980321099f558403676074ff19a03118b123c0a602e6034d",
+      "size_bytes": 26783,
+      "line_count": 297
+    },
+    "proposal": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-06/run_execution.py",
+      "sha256": "81ccfdf370e0f66f7c24e2344bafc352f754aad1982e9b0e01c65899a08d0030",
+      "size_bytes": 26783,
+      "line_count": 297
+    },
+    "exact_diff": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-06/run_execution.py.diff",
+      "sha256": "30734fe5f97869bdb0154d3b37ae2068bc80f5eba1a939a5729e93949ce948f7",
+      "size_bytes": 1211,
+      "line_count": 11
+    }
+  },
+  "narrow_document_correspondence": {
+    "before": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-06/before/README.md",
+      "sha256": "b6f9f9cecca4bcfcdcf5acd2a0dda64da9a03593b97210daa1d9e9201f0bd573",
+      "size_bytes": 4452,
+      "line_count": 17
+    },
+    "proposal": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-06/README.md",
+      "sha256": "280da7451c87e143b9eb563e790b5672d6238dbfc0f89d9cd7a8995b7b911482",
+      "size_bytes": 4828,
+      "line_count": 19
+    },
+    "exact_diff": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-06/README.md.diff",
+      "sha256": "e58eda01d55be6e3c4996174eed626a450bdbb1344c54e833e1fe175b800ee18",
+      "size_bytes": 1412,
+      "line_count": 8
+    }
+  },
+  "earlier_source_correspondence": {
+    "before": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-02/before/execution01.py",
+      "sha256": "9e6193128908315a5e0a72f8bcfa8fdc7830bc2285368b2807c0d3fd970aae09",
+      "size_bytes": 25860,
+      "line_count": 288
+    },
+    "proposal": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-02/run_execution.py",
+      "sha256": "a6178e49b1cfe24b2c250f32e721c4fe203b1aaf197fc556d33844b99280b1b1",
+      "size_bytes": 25925,
+      "line_count": 288
+    },
+    "exact_diff": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-02/run_execution.py.diff",
+      "sha256": "7be73cb50f6a0d2cc8ce7b5f310c5519599fdbbf79b4242a3f7b7788ca4442ff",
+      "size_bytes": 1806,
+      "line_count": 11
+    }
+  },
+  "earlier_document_correspondence": {
+    "before": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-02/before/README01.md",
+      "sha256": "0495d20bfce0532851d145cd4c2b71d19af8c26423545998f7900b6242a209fd",
+      "size_bytes": 2567,
+      "line_count": 9
+    },
+    "proposal": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-02/README.md",
+      "sha256": "209c69aa37a83195d1c21882ff5ecf27835123ee1c3b5ba879f8b1544dc9b115",
+      "size_bytes": 2946,
+      "line_count": 11
+    },
+    "exact_diff": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-02/README.md.diff",
+      "sha256": "ad8b1ee8e493402685c17f6e09e480468d5a65d114514d48b58bd1e4cf9243e9",
+      "size_bytes": 1860,
+      "line_count": 8
+    }
+  },
+  "typed_range_source_correspondence": {
+    "before": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-03/before/execution02.py",
+      "sha256": "a6178e49b1cfe24b2c250f32e721c4fe203b1aaf197fc556d33844b99280b1b1",
+      "size_bytes": 25925,
+      "line_count": 288
+    },
+    "proposal": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-03/run_execution.py",
+      "sha256": "a19f6d658b76fd59b7e8675f233312e35636698375d4e5c062d5eb4afaad4c52",
+      "size_bytes": 26727,
+      "line_count": 297
+    },
+    "exact_diff": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-03/run_execution.py.diff",
+      "sha256": "da121e7c1842d52855b72735657b301490c36ea392748554056f0402994b4bcb",
+      "size_bytes": 1182,
+      "line_count": 18
+    }
+  },
+  "typed_range_document_correspondence": {
+    "before": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-03/before/README02.md",
+      "sha256": "209c69aa37a83195d1c21882ff5ecf27835123ee1c3b5ba879f8b1544dc9b115",
+      "size_bytes": 2946,
+      "line_count": 11
+    },
+    "proposal": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-03/README.md",
+      "sha256": "8c9353343ec643d2cb58cfdaef05c8ed16743ff2949a13b598cb33581f679de8",
+      "size_bytes": 3452,
+      "line_count": 13
+    },
+    "exact_diff": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-03/README.md.diff",
+      "sha256": "06c15b365eec64231f780e3e57220adc7878c628d8cb21b2f97f63fdd557846e",
+      "size_bytes": 1817,
+      "line_count": 8
+    }
+  },
+  "predecessor_narrow_source_correspondence": {
+    "before": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-05/before/run_execution.py",
+      "sha256": "d2d3bff44a1e9b37710b3a86bbd48252e4bef7dbc688a5813338074762b28dbe",
+      "size_bytes": 26783,
+      "line_count": 297
+    },
+    "proposal": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-05/run_execution.py",
+      "sha256": "409c087d6d554faf980321099f558403676074ff19a03118b123c0a602e6034d",
+      "size_bytes": 26783,
+      "line_count": 297
+    },
+    "exact_diff": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-05/run_execution.py.diff",
+      "sha256": "63dec65740bd5e27ef72295eccfcbc6adb89e7208a637a08b5f3ebeaa632e544",
+      "size_bytes": 5971,
+      "line_count": 51
+    }
+  },
+  "predecessor_narrow_document_correspondence": {
+    "before": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-05/before/README.md",
+      "sha256": "63f079bff581ac53b1d842b80850e17d9d2836d35bf33542d72a734b7f85b13e",
+      "size_bytes": 3848,
+      "line_count": 15
+    },
+    "proposal": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-05/README.md",
+      "sha256": "b6f9f9cecca4bcfcdcf5acd2a0dda64da9a03593b97210daa1d9e9201f0bd573",
+      "size_bytes": 4452,
+      "line_count": 17
+    },
+    "exact_diff": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-05/README.md.diff",
+      "sha256": "7045b028c923782a4caf8647810fd64a70bbf56dfa656b574d6eed9d4d065e6a",
+      "size_bytes": 1542,
+      "line_count": 8
+    }
+  }
+}

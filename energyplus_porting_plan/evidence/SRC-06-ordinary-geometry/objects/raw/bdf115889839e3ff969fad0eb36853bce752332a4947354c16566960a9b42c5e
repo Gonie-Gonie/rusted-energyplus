@@ -1,0 +1,24 @@
+This shared read-only factual checker authenticates the reviewed geometry
+workflow02/comparer03, actual comparison transport and its closed outer/inner
+recorder receipts. Invoke check.py with --source-preparation MANIFEST#SHA,
+--comparison-transport RECORD#SHA, --outer-execution RECEIPT#SHA and --output
+FRESH_IGNORED_JSON. Root and the independent reviewer may use the same Source
+with distinct fresh outputs. The checker does not invoke another module.
+
+It reads every raw gzip artifact and every decoded JSONL row in stored order,
+checks raw and decoded hashes/bytes/counts, then reconciles complete mismatch,
+required/optional-unavailable and paired-owner ledgers. IDs/names/order are
+copied from authenticated Native/Rust observations. All thirteen parser-added
+null members and all policy exclusions retain explicit no-PASS markers.
+
+The common factual schema is src06-ordinary-geometry-comparison-factual-review.v1.
+ledger_facts has exactly mismatches/unavailable/paired_owners, each containing
+only rows/decoded_bytes/decoded_sha256. Report phase counters are retained with
+an explicit statement that comparison-call counters were not independently
+recomputed. Ledger counts and hashes are independently recomputed in full.
+
+Factual acceptance can describe an actual selected failure or integrity-only
+outcome; it never assumes zero mismatches. No geometry equation, endpoint
+comparison, engine, comparer or target is run. Full archived Source is checked
+without requiring historical Source bytes to remain current canonical files.
+Scientific, whole-geometry, ordinary-cadence and gate PASS are not claimed.

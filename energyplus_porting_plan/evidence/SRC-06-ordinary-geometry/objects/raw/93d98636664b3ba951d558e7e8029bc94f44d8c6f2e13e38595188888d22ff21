@@ -1,0 +1,408 @@
+{
+  "schema": "src06-geometry-selected-Source-metadata-shape-audit.v1",
+  "Source_preparations": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-01/manifest.json",
+      "sha256": "378eb22d4679c60f71be03f749829ca67a9257abf50bfbfa9013049ddc35cb8b",
+      "size_bytes": 34113
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-02/manifest.json",
+      "sha256": "4a172ac50b50fd2151baa818919b1a51b496488afe2a2bc80ea3ce3b984cf1f4",
+      "size_bytes": 37743
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-03/manifest.json",
+      "sha256": "72f75c5242e2df7457fb9fc065b2cc1fc5922f6bb9673e6b785e145bb54f47a1",
+      "size_bytes": 48488
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-01/manifest.json",
+      "sha256": "fe2c0b521809635fe09c94631f78ca2519a6021da130899133d59bac803b469f",
+      "size_bytes": 5194
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-02/manifest.json",
+      "sha256": "31b632755afdc52f429eb3fe5256f20cffaec0d7c6f30398621e4ef5f3878ed0",
+      "size_bytes": 10136
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-03/manifest.json",
+      "sha256": "f5f7885c43eed8be89b558cc9b676fb4e7feeda54d6bc9b3735764336bc34fd4",
+      "size_bytes": 16032
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-01/manifest.json",
+      "sha256": "d542bab32cabdce4f2154763c1ed4798aa4d010671d31d057d088b7d133c63d7",
+      "size_bytes": 17396
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-02/manifest.json",
+      "sha256": "5804749eb0d18130331560741dd59be7849d113ca4c4602c318edc4ed655fe87",
+      "size_bytes": 19452
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-01/manifest.json",
+      "sha256": "d7c414b3f6b385cbfac52dc933ff60bc4a61a69be3333a84ed9a716f81f73d5b",
+      "size_bytes": 18158
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-02/manifest.json",
+      "sha256": "d618d272a79459f1edede5fa8bd3cb06a2191efbd3f16cac0a7b279fbe0fe2ef",
+      "size_bytes": 20745
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-03/manifest.json",
+      "sha256": "b2e576de96b2537b6111deb44fcbe57a2d7e55446c1c714186ab9b35183702db",
+      "size_bytes": 22346
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-04/manifest.json",
+      "sha256": "c565a7b4298379ae7384d4c0dd41e88a9079c92c3e8ce6388c0c8db63001f2cc",
+      "size_bytes": 23957
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-05/manifest.json",
+      "sha256": "bb30bc77076cda9f6ddd04ba10d7009562a129d216eeb476dbb0f7060cb29fb7",
+      "size_bytes": 26530
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-factual-checker-prep-01/manifest.json",
+      "sha256": "4115cb51f7f1252bb9a7c176f93bbf98daa222fa363f8780640fb4cbaa1d9efd",
+      "size_bytes": 28994
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-factual-checker-prep-02/manifest.json",
+      "sha256": "32716968b516e2a1a007d7d52a56d10da22696d79559c2bbd0728554671e390b",
+      "size_bytes": 31604
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/manifest.json",
+      "sha256": "aa9c906ca88b51beb13947913a265ff6bec937309621a15bf2bbbac9c912a83c",
+      "size_bytes": 46640
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-observer-prep-01/manifest.json",
+      "sha256": "b4ae9289cd60d6ba7f0741a22735f97f1c3326f68b409a51faa2fbecbcc67f10",
+      "size_bytes": 22891
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-prep-01/manifest.json",
+      "sha256": "43b8a9e86e8aa3ab681c4300c7bde612efd262351c940130bb8ee4a529792fd6",
+      "size_bytes": 15121
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-prep-02/manifest.json",
+      "sha256": "91e3da3be59799b3738032700a8db7643bca4019edf08032c6392cf33ea27976",
+      "size_bytes": 22898
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-Rust-factual-checker-prep-01/manifest.json",
+      "sha256": "406799c27c1ea6ca7636197914091a72ce02a39315cf7203734e0597a5eef3b7",
+      "size_bytes": 21128
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-publication-prep-01/manifest.json",
+      "sha256": "972ff187ab9133e249fdb2afade2d547f0647b58d29a1b2652744776e3d1e80f",
+      "size_bytes": 19319,
+      "line_count": 434
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-factual-checker-prep-01/manifest.json",
+      "sha256": "8b17ddedf2165c790662dec7943fc22547bc631d620a540b5ee0e56c39fd1e2c",
+      "size_bytes": 7146,
+      "line_count": 189
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-02/manifest.json",
+      "sha256": "502237329524881eb7427b7721023f3608169cfeed1524cfa7001786b032381a",
+      "size_bytes": 56443
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-observer-prep-02/manifest.json",
+      "sha256": "9c3b3507f9a2b1f8c7fb973b5114397ecf81544a18c7be1313aaaf6cb5d73b75",
+      "size_bytes": 27724
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-04/manifest.json",
+      "sha256": "2bcb4620c0519b2c796f96242430651d5bd6e737a5e793db4c24a6c03d9ee21b",
+      "size_bytes": 60112
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-03/manifest.json",
+      "sha256": "86a7de68a191db1fd5f56d3c6f573d8a2afeb5919b9c3b9cbdffe2fe51653c3c",
+      "size_bytes": 27907
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-prep-04/manifest.json",
+      "sha256": "f6a8b8f2149cedfea0faa8b788218f91fc1a801308ee219d1e72ba7b5a05c7ef",
+      "size_bytes": 35754
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-02/manifest.json",
+      "sha256": "863c5207c2ec3994c4448651b7f2fa154c4e3939760cc437fcaa5217b61db51c",
+      "size_bytes": 25893,
+      "line_count": 568
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-03/manifest.json",
+      "sha256": "05689d2f2a757258cc01932ef57b2b145115d741dc5e9766d98f4ef5c4deafcb",
+      "size_bytes": 22657,
+      "line_count": 544
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-06/manifest.json",
+      "sha256": "f88bf1a486d690155ceabee00791531113f887f79d719c3f1029d71622c850f6"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-04/manifest.json",
+      "sha256": "7547cf6817ec14417886928b34125c6339de9e223818379066cc1ae6727c761b"
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-publication-prep-02/manifest.json",
+      "sha256": "c2cf3136a87af7c37421220d33c5ab5f0abe6f6549e7a3d4151199f7840f76a5",
+      "size_bytes": 28191,
+      "line_count": 643
+    }
+  ],
+  "Source_preparation_count": 32,
+  "exact_single_correspondence_objects": [
+    {
+      "Source_preparation": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-01/manifest.json",
+        "sha256": "d542bab32cabdce4f2154763c1ed4798aa4d010671d31d057d088b7d133c63d7",
+        "size_bytes": 17396
+      },
+      "field": "source_correspondence",
+      "exact_keys": [
+        "before",
+        "proposal",
+        "exact_diff"
+      ]
+    },
+    {
+      "Source_preparation": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-02/manifest.json",
+        "sha256": "5804749eb0d18130331560741dd59be7849d113ca4c4602c318edc4ed655fe87",
+        "size_bytes": 19452
+      },
+      "field": "source_correspondence",
+      "exact_keys": [
+        "before",
+        "proposal",
+        "exact_diff"
+      ]
+    },
+    {
+      "Source_preparation": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-02/manifest.json",
+        "sha256": "5804749eb0d18130331560741dd59be7849d113ca4c4602c318edc4ed655fe87",
+        "size_bytes": 19452
+      },
+      "field": "narrow_source_correspondence",
+      "exact_keys": [
+        "before",
+        "proposal",
+        "exact_diff"
+      ]
+    },
+    {
+      "Source_preparation": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-01/manifest.json",
+        "sha256": "d7c414b3f6b385cbfac52dc933ff60bc4a61a69be3333a84ed9a716f81f73d5b",
+        "size_bytes": 18158
+      },
+      "field": "source_correspondence",
+      "exact_keys": [
+        "before",
+        "proposal",
+        "exact_diff"
+      ]
+    },
+    {
+      "Source_preparation": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-02/manifest.json",
+        "sha256": "d618d272a79459f1edede5fa8bd3cb06a2191efbd3f16cac0a7b279fbe0fe2ef",
+        "size_bytes": 20745
+      },
+      "field": "source_correspondence",
+      "exact_keys": [
+        "before",
+        "proposal",
+        "exact_diff"
+      ]
+    },
+    {
+      "Source_preparation": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-02/manifest.json",
+        "sha256": "d618d272a79459f1edede5fa8bd3cb06a2191efbd3f16cac0a7b279fbe0fe2ef",
+        "size_bytes": 20745
+      },
+      "field": "narrow_source_correspondence",
+      "exact_keys": [
+        "before",
+        "proposal",
+        "exact_diff"
+      ]
+    },
+    {
+      "Source_preparation": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-03/manifest.json",
+        "sha256": "b2e576de96b2537b6111deb44fcbe57a2d7e55446c1c714186ab9b35183702db",
+        "size_bytes": 22346
+      },
+      "field": "source_correspondence",
+      "exact_keys": [
+        "before",
+        "proposal",
+        "exact_diff"
+      ]
+    },
+    {
+      "Source_preparation": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-03/manifest.json",
+        "sha256": "b2e576de96b2537b6111deb44fcbe57a2d7e55446c1c714186ab9b35183702db",
+        "size_bytes": 22346
+      },
+      "field": "narrow_source_correspondence",
+      "exact_keys": [
+        "before",
+        "proposal",
+        "exact_diff"
+      ]
+    },
+    {
+      "Source_preparation": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-04/manifest.json",
+        "sha256": "c565a7b4298379ae7384d4c0dd41e88a9079c92c3e8ce6388c0c8db63001f2cc",
+        "size_bytes": 23957
+      },
+      "field": "source_correspondence",
+      "exact_keys": [
+        "before",
+        "proposal",
+        "exact_diff"
+      ]
+    },
+    {
+      "Source_preparation": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-04/manifest.json",
+        "sha256": "c565a7b4298379ae7384d4c0dd41e88a9079c92c3e8ce6388c0c8db63001f2cc",
+        "size_bytes": 23957
+      },
+      "field": "narrow_source_correspondence",
+      "exact_keys": [
+        "before",
+        "proposal",
+        "exact_diff"
+      ]
+    },
+    {
+      "Source_preparation": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-05/manifest.json",
+        "sha256": "bb30bc77076cda9f6ddd04ba10d7009562a129d216eeb476dbb0f7060cb29fb7",
+        "size_bytes": 26530
+      },
+      "field": "source_correspondence",
+      "exact_keys": [
+        "before",
+        "proposal",
+        "exact_diff"
+      ]
+    },
+    {
+      "Source_preparation": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-05/manifest.json",
+        "sha256": "bb30bc77076cda9f6ddd04ba10d7009562a129d216eeb476dbb0f7060cb29fb7",
+        "size_bytes": 26530
+      },
+      "field": "narrow_source_correspondence",
+      "exact_keys": [
+        "before",
+        "proposal",
+        "exact_diff"
+      ]
+    },
+    {
+      "Source_preparation": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-factual-checker-prep-01/manifest.json",
+        "sha256": "4115cb51f7f1252bb9a7c176f93bbf98daa222fa363f8780640fb4cbaa1d9efd",
+        "size_bytes": 28994
+      },
+      "field": "source_correspondence",
+      "exact_keys": [
+        "before",
+        "proposal",
+        "exact_diff"
+      ]
+    },
+    {
+      "Source_preparation": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-factual-checker-prep-02/manifest.json",
+        "sha256": "32716968b516e2a1a007d7d52a56d10da22696d79559c2bbd0728554671e390b",
+        "size_bytes": 31604
+      },
+      "field": "source_correspondence",
+      "exact_keys": [
+        "before",
+        "proposal",
+        "exact_diff"
+      ]
+    },
+    {
+      "Source_preparation": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-03/manifest.json",
+        "sha256": "05689d2f2a757258cc01932ef57b2b145115d741dc5e9766d98f4ef5c4deafcb",
+        "size_bytes": 22657,
+        "line_count": 544
+      },
+      "field": "source_correspondence",
+      "exact_keys": [
+        "before",
+        "proposal",
+        "exact_diff"
+      ]
+    },
+    {
+      "Source_preparation": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-provider-prep-03/manifest.json",
+        "sha256": "05689d2f2a757258cc01932ef57b2b145115d741dc5e9766d98f4ef5c4deafcb",
+        "size_bytes": 22657,
+        "line_count": 544
+      },
+      "field": "previous_narrow_source_correspondence",
+      "exact_keys": [
+        "before",
+        "proposal",
+        "exact_diff"
+      ]
+    },
+    {
+      "Source_preparation": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-06/manifest.json",
+        "sha256": "f88bf1a486d690155ceabee00791531113f887f79d719c3f1029d71622c850f6"
+      },
+      "field": "source_correspondence",
+      "exact_keys": [
+        "before",
+        "proposal",
+        "exact_diff"
+      ]
+    },
+    {
+      "Source_preparation": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-execution-prep-06/manifest.json",
+        "sha256": "f88bf1a486d690155ceabee00791531113f887f79d719c3f1029d71622c850f6"
+      },
+      "field": "narrow_source_correspondence",
+      "exact_keys": [
+        "before",
+        "proposal",
+        "exact_diff"
+      ]
+    }
+  ],
+  "all_other_selected_list_member_shapes_valid": true,
+  "actual_result_payloads_or_ledger_values_read": false,
+  "publisher_imported_or_executed": false
+}

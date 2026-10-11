@@ -1,0 +1,2 @@
+        s_ipsc->cCurrentModuleObject = "Shading:Zone:Detailed";
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, s_ipsc->cCurrentModuleObject, Loop, NumAlphas, NumNumbers);

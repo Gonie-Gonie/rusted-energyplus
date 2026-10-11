@@ -1,0 +1,25 @@
+--- .runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/before/compare.draft.py
++++ .runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/compare.py
+@@ -1,4 +1,4 @@
+-"""UNSEALED Root-only comparison transport draft; no equations or Native replay."""
++"""Root-only reviewed comparison transport; no equations or Native replay."""
+ import argparse
+ import hashlib
+ import importlib.util
+@@ -28,6 +28,7 @@
+     A.need(A.bind(prep['runtime_interfaces']['compare']) == Path(__file__).resolve(), 'actual comparison transport Source differs')
+     prep['_actual_operand'] = args.source_preparation
+     app_ref, review_ref, source = [A.operand(v) for v in [args.application, args.formatter_review, args.Source_snapshot]]
++    source = {key:source[key] for key in ('path','sha256')}
+     app, fmt, observer = V.application(M, A, prep, app_ref, review_ref, source)
+     rust_ref = A.operand(args.Rust_custody); rust = A.load(rust_ref)
+     A.need(rust['schema'] == 'src06-ordinary-geometry-actual-Rust-capture-custody.v1'
+@@ -53,7 +54,7 @@
+     for row in comparer['own_sources']: A.bind(row)
+     for ref in prep['comparer_FULL_Source_reviews']:
+         review = A.load(ref)
+-        A.need(review['accepted'] is True and A.bind(review['reviewed_manifest']) == A.bind(comparer_ref), 'complete comparer Source review required')
++        A.need(review['accepted'] is True and A.bind(review['reviewed_Source_preparation']) == A.bind(comparer_ref), 'complete comparer Source review required')
+     A.need(len(prep['comparer_FULL_Source_reviews']) == 2, 'Root and independent comparer Source reviews required')
+     interface = comparer['runtime_interfaces']
+     A.need(interface['required_options'] == ['--source-preparation', '--custody', '--output-dir']

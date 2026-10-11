@@ -1,0 +1,64 @@
+    void SetPreConstructionInputParameters(EnergyPlusData &state)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Edwin Lee
+        //       DATE WRITTEN   October 2014
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine sets parameters that need to be established before any heat balance inputs are read
+
+        int NumAlpha;
+        int NumNumber;
+        int IOStat;
+
+        // Get all the construction objects to determine the max layers and use this as the value for DataHeatBalance::MaxSolidWinLayers
+        // The variable MaxSolidWinLayers is initialized to zero to immediately catch any issues with timing of this routine
+
+        // start by setting this to 5; it will satisfy the regular window constructions (Construction) and the Window5 files
+        // (Construction:WindowDataFile)
+        state.dataHeatBal->MaxSolidWinLayers = 7;
+
+        // Construction:ComplexFenestrationState have a limit of 10 layers, so set it up to 10 if they are present
+        if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Construction:ComplexFenestrationState") > 0) {
+            state.dataHeatBal->MaxSolidWinLayers = max(state.dataHeatBal->MaxSolidWinLayers, 10);
+        }
+
+        // then process the rest of the relevant constructions
+        std::string constructName("Construction:WindowEquivalentLayer");
+        int numConstructions(state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, constructName));
+        for (int constructionNum = 1; constructionNum <= numConstructions; ++constructionNum) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     constructName,
+                                                                     constructionNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            int numLayersInThisConstruct(NumAlpha - 1);
+            state.dataHeatBal->MaxSolidWinLayers = max(state.dataHeatBal->MaxSolidWinLayers, numLayersInThisConstruct);
+        }
+
+        // construction types being ignored as they are opaque: Construction:CfactorUndergroundWall, Construction:FfactorGroundFloor,
+    }
+
+    void GetProjectControlData(EnergyPlusData &state, bool &ErrorsFound) // Set to true if errors detected during getting data
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda Lawrie
+        //       DATE WRITTEN   October 2004
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine gets the project control data before the rest of the building data (such as
+        // materials) is obtained.
+
+        // REFERENCES:
+        // This routine gets the following objects:
+        // BUILDING
+        // INSIDE CONVECTION ALGORITHM
+        // OUTSIDE CONVECTION ALGORITHM

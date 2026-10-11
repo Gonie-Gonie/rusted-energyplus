@@ -1,0 +1,28 @@
+                state.dataSurface->ShadingSurfaceLast = SurfNum;
+            }
+            if ((thisSurface.HeatTransSurf && thisSurface.ExtSolar) || thisSurface.IsShadowing) {
+                // Some attached shading surfaces may be true for both
+                state.dataSurface->AllExtSolAndShadingSurfaceList.push_back(SurfNum);
+            }
+            if (thisSurface.Class == SurfaceClass::Shading) {
+                ++state.dataSurface->AttachedShadingCount;
+            }
+            if (thisSurface.Class == SurfaceClass::Detached_F) {
+                ++state.dataSurface->FixedShadingCount;
+            }
+            if (thisSurface.Class == SurfaceClass::Detached_B) {
+                ++state.dataSurface->BuildingShadingCount;
+            }
+
+            if (thisSurface.Class != SurfaceClass::IntMass) {
+                ProcessSurfaceVertices(state, SurfNum, ErrorsFound);
+            }
+        }
+
+        for (auto &e : state.dataHeatBal->Zone) {
+            e.ExtWindowArea = 0.0;
+            e.HasWindow = false;
+            e.ExtGrossWallArea = 0.0;
+            e.ExtNetWallArea = 0.0;
+            e.TotalSurfArea = 0.0;
+        }

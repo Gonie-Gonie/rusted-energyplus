@@ -1,0 +1,57 @@
+"""Source-only successor: update the actual Rust guard, retaining all geometry configure logic."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+BASE = ROOT / '.runtime/porting/SRC-06'
+OLD, NEW = BASE / 'ordinary-geometry-build-prep-01', BASE / 'ordinary-geometry-build-prep-02'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+
+def write(path, raw):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream: stream.write(raw)
+    return ref(path)
+
+
+def body(name, raw):
+    before = write(NEW / 'before' / name, (OLD / name).read_bytes())
+    after = write(NEW / name, raw)
+    delta = write(NEW / (name + '.diff'), ''.join(difflib.unified_diff((OLD / name).read_text(encoding='utf8').splitlines(True), raw.decode().splitlines(True), fromfile=before['path'], tofile=after['path'])).encode())
+    return after, dict(before=before, proposal=after, exact_diff=delta)
+
+
+prior = ref(OLD / 'manifest.json'); assert prior['sha256'] == 'fe2c0b521809635fe09c94631f78ca2519a6021da130899133d59bac803b469f'
+manifest = json.loads((OLD / 'manifest.json').read_bytes())
+app_ref = ref(BASE / 'tarp-dispatcher-applied-02/record.json'); assert app_ref['sha256'] == 'a4eedbee038952b9928cefeeebfc83d51510dafe9c8d030ec4ef401a7a06c488'
+app = json.loads((ROOT / app_ref['path']).read_bytes())
+fmt_ref = ref(BASE / 'tarp-dispatcher-applied-02/Root-formatter-acceptance.json'); assert fmt_ref['sha256'] == '1e93a855803aaa26b5f38be6f09a5c50e96deddbe7ff200dcafc3a37ef617cbf'
+fmt = json.loads((ROOT / fmt_ref['path']).read_bytes())
+source = app['source_final']; assert source['sha256'] == '4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce'
+assert fmt['actual_application']['path'] == app_ref['path'] and fmt['actual_application']['sha256'] == app_ref['sha256'] and fmt['Source_snapshot'] == source and fmt['Root_FULL_formatter_correspondence_accepted'] is True and fmt['independent_FULL_formatter_correspondence_accepted'] is True
+assert app['source_file_count'] == 3937 and app['unrelated_source_files_verified_byte_exact'] == 3929
+source_ref = ref(ROOT / source['path']); assert source_ref['sha256'] == source['sha256']
+old = (OLD / 'prepare_native.py').read_bytes(); before_sha = b'994b014957fb54b1c01608f5fc345f70bbac500be0f7b3b673c252f90bbbc7b7'
+assert old.count(before_sha) == 1
+raw = old.replace(before_sha, source['sha256'].encode(), 1)
+assert raw.replace(source['sha256'].encode(), before_sha, 1) == old
+ast.parse(raw)
+script, script_delta = body('prepare_native.py', raw)
+wrapper, wrapper_delta = body('additive-reference.cmake', (OLD / 'additive-reference.cmake').read_bytes())
+readme = (OLD / 'README.md').read_bytes().replace(b'actual corrected994b full3937 Source', b'actual restored-parent application02 final4c02 full3937 Source', 1)
+readme += b'\nSuccessor02 changes only the runtime full Source SHA guard from historical994b to actual4c02. Actual application a4eedbee and combined Root/independent formatter acceptance1e93a855 are explicit metadata provenance for that current Source. All script functions, Native02 helper/input/policy pins, wrappers, actual inherited743-row/cache/76argv proofs and compile/dry/core/output guards are unchanged. Source-only01 remains preserved and unexecuted; neither version configured or ran a target during preparation. Use the physical02 prepare_native.py and its declared current Source operand. These current Rust provenance refs do not relabel historical Native BUILD aliases.\n'
+doc, doc_delta = body('README.md', readme)
+manifest.update(parent_Source_preparation=prior, own_sources=[script, wrapper, doc, ref(Path(__file__))], source_correspondence=[script_delta, wrapper_delta, doc_delta], inherited_source_correspondence=manifest['source_correspondence'], actual_current_Rust_Source=source_ref, actual_current_Rust_application=app_ref, actual_current_Rust_formatter_acceptance=fmt_ref)
+manifest['runtime_interfaces'] = dict(manifest['runtime_interfaces'], workflow=script, Source_snapshot_sha256=source['sha256'])
+manifest['dependencies'] += [prior, app_ref, fmt_ref, fmt['Root_factual_review'], fmt['independent_factual_review'], source_ref]
+for row in manifest['dependencies']:
+    actual = ref(ROOT / row['path']); assert actual['sha256'] == row['sha256'] and ('size_bytes' not in row or actual['size_bytes'] == row['size_bytes'])
+record = write(NEW / 'manifest.json', (json.dumps(manifest, ensure_ascii=False, allow_nan=False, indent=2) + '\n').encode())
+print(json.dumps(record))

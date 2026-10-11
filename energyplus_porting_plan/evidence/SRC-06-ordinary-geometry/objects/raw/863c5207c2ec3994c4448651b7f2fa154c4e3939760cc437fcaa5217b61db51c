@@ -1,0 +1,568 @@
+{
+  "schema": "src06-ordinary-geometry-workflow-Source-preparation.v1",
+  "status": "HELD-Source-only-unexecuted",
+  "application_authority_supplied": true,
+  "geometry_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-02/manifest.json",
+    "sha256": "502237329524881eb7427b7721023f3608169cfeed1524cfa7001786b032381a",
+    "size_bytes": 56443
+  },
+  "observer_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-observer-prep-02/manifest.json",
+    "sha256": "9c3b3507f9a2b1f8c7fb973b5114397ecf81544a18c7be1313aaaf6cb5d73b75",
+    "size_bytes": 27724
+  },
+  "shared_custody_Source": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-03/apply.py",
+    "sha256": "f156146347a42f0f9ee0d13a6e180ab82773c7a9387c5200e85f464b95ba21c5",
+    "size_bytes": 10854
+  },
+  "CLI_validation_Source": {
+    "path": ".runtime/porting/SRC-05/ordinary-main-thread-application-prep-03/validate.py",
+    "sha256": "e1f58c9d464933a0af9e03790251ee08eea20b2fd3675ebc00f78ae5ac27fb2b",
+    "size_bytes": 14022
+  },
+  "recorder_Source": {
+    "path": "tools/porting/record_command.py",
+    "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+    "size_bytes": 8453
+  },
+  "protected_dispatcher_application": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-02/record.json",
+    "sha256": "a4eedbee038952b9928cefeeebfc83d51510dafe9c8d030ec4ef401a7a06c488",
+    "size_bytes": 27345
+  },
+  "protected_dispatcher_policy": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-observer-prep-02/prospective-pair-policy.json",
+    "sha256": "ff49c35addf3990ff45e46d6be85e16fb71b9ba87b90f6b58416fd0000b27dc4",
+    "size_bytes": 12036
+  },
+  "historical_actual_current_context": {
+    "path": ".runtime/porting/source-objects/4c/4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce",
+    "sha256": "4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce"
+  },
+  "source_before": {
+    "path": ".runtime/porting/source-objects/4c/4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce",
+    "sha256": "4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce"
+  },
+  "fresh_actual_before_rebase": {
+    "Source_snapshot": {
+      "path": ".runtime/porting/source-objects/4c/4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce",
+      "sha256": "4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce"
+    },
+    "application_sources": [
+      {
+        "canonical_path": "crates/ep_runtime/src/geometry.rs",
+        "new_destination_absent": false,
+        "proposal": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/proposed/crates/ep_runtime/src/geometry.rs",
+          "sha256": "36d567d587b85433c325f63a3b0ba4ca7ec8ace4a34c3baf3e4dfd77815391e4",
+          "size_bytes": 4543,
+          "line_count": 126
+        },
+        "actual_before": {
+          "path": "crates/ep_runtime/src/geometry.rs",
+          "sha256": "9d66e91fa8ef526c2eb582bcb91a4f7a5d47b1d9ff017b40c53c01449231dc7e",
+          "size_bytes": 4266,
+          "line_count": 120
+        },
+        "before_archive": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/before/crates/ep_runtime/src/geometry.rs",
+          "sha256": "9d66e91fa8ef526c2eb582bcb91a4f7a5d47b1d9ff017b40c53c01449231dc7e",
+          "size_bytes": 4266,
+          "line_count": 120
+        },
+        "exact_diff": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/diffs/crates__ep_runtime__src__geometry.rs.diff",
+          "sha256": "6a66f9fdada5d0ff9006c573977ba74724e6507b64ff9b34984c41f2d34231cb",
+          "size_bytes": 716,
+          "line_count": 18
+        },
+        "source_preparation": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-02/manifest.json",
+          "sha256": "502237329524881eb7427b7721023f3608169cfeed1524cfa7001786b032381a",
+          "size_bytes": 56443
+        }
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/state.rs",
+        "new_destination_absent": false,
+        "proposal": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/state.rs",
+          "sha256": "17f932d81eef1bc90361dbb30775133fce8df11de4ff7fcf0b6177df02c08fbe",
+          "size_bytes": 52258,
+          "line_count": 1108
+        },
+        "actual_before": {
+          "path": "crates/ep_runtime/src/heat_balance/state.rs",
+          "sha256": "9c710020d660cd25babb843b92ab16c136def1d917f64bd7e880c7cb0406fbd5",
+          "size_bytes": 52097,
+          "line_count": 1106
+        },
+        "before_archive": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/before/crates/ep_runtime/src/heat_balance/state.rs",
+          "sha256": "9c710020d660cd25babb843b92ab16c136def1d917f64bd7e880c7cb0406fbd5",
+          "size_bytes": 52097,
+          "line_count": 1106
+        },
+        "exact_diff": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/diffs/crates__ep_runtime__src__heat_balance__state.rs.diff",
+          "sha256": "7db492ab60a5292ae65c7048348ad2bd783a61b0ed5c04b8b033d65dd383240f",
+          "size_bytes": 686,
+          "line_count": 11
+        },
+        "source_preparation": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-02/manifest.json",
+          "sha256": "502237329524881eb7427b7721023f3608169cfeed1524cfa7001786b032381a",
+          "size_bytes": 56443
+        }
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+        "new_destination_absent": false,
+        "proposal": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/initialization.rs",
+          "sha256": "e81480a38b30d5c72fd3017d2946a0f0138ce43fe1b46c470d5cae0a46f2ff5c",
+          "size_bytes": 14743,
+          "line_count": 296
+        },
+        "actual_before": {
+          "path": "crates/ep_runtime/src/heat_balance/initialization.rs",
+          "sha256": "b6208ebf67b541b9db74bfff0aeaa49e079c0711abed3820c8eb669840c5f98d",
+          "size_bytes": 14135,
+          "line_count": 289
+        },
+        "before_archive": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/before/crates/ep_runtime/src/heat_balance/initialization.rs",
+          "sha256": "b6208ebf67b541b9db74bfff0aeaa49e079c0711abed3820c8eb669840c5f98d",
+          "size_bytes": 14135,
+          "line_count": 289
+        },
+        "exact_diff": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/diffs/crates__ep_runtime__src__heat_balance__initialization.rs.diff",
+          "sha256": "a1abfb033c26e91965b82ff3f7f17a8dac52d7d7563a701958e6544cf3c0678b",
+          "size_bytes": 2545,
+          "line_count": 54
+        },
+        "source_preparation": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-02/manifest.json",
+          "sha256": "502237329524881eb7427b7721023f3608169cfeed1524cfa7001786b032381a",
+          "size_bytes": 56443
+        }
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+        "new_destination_absent": false,
+        "proposal": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+          "sha256": "f2d435813974b26a70e05b4f6cdd7bc0aadb6d58ecedd7c8517584749c2c6ac3",
+          "size_bytes": 3070,
+          "line_count": 56
+        },
+        "actual_before": {
+          "path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+          "sha256": "97745e320b9ea3c5d85e5d2ed691f85452d594aadb43cdade624fe38e00f59af",
+          "size_bytes": 2970,
+          "line_count": 54
+        },
+        "before_archive": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/before/crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+          "sha256": "97745e320b9ea3c5d85e5d2ed691f85452d594aadb43cdade624fe38e00f59af",
+          "size_bytes": 2970,
+          "line_count": 54
+        },
+        "exact_diff": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/diffs/crates__ep_runtime__src__heat_balance__initialization__state_shell.rs.diff",
+          "sha256": "0814a9ef8b8ce940852cacf01f6d65d5e27acf2b1509018d625542c2d5c3307e",
+          "size_bytes": 761,
+          "line_count": 18
+        },
+        "source_preparation": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-02/manifest.json",
+          "sha256": "502237329524881eb7427b7721023f3608169cfeed1524cfa7001786b032381a",
+          "size_bytes": 56443
+        }
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/runtime/tests.rs",
+        "new_destination_absent": false,
+        "proposal": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/proposed/crates/ep_runtime/src/runtime/tests.rs",
+          "sha256": "87a9a2ccfedae2081d426356d6c4edb75b71dbf84c0f0a16cadcddda1f44b8ce",
+          "size_bytes": 643,
+          "line_count": 19
+        },
+        "actual_before": {
+          "path": "crates/ep_runtime/src/runtime/tests.rs",
+          "sha256": "303fe0feccd3f5ba9d58d5ce4f313d69179b88966ca5c1950ba2d4aa54387317",
+          "size_bytes": 593,
+          "line_count": 18
+        },
+        "before_archive": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/before/crates/ep_runtime/src/runtime/tests.rs",
+          "sha256": "303fe0feccd3f5ba9d58d5ce4f313d69179b88966ca5c1950ba2d4aa54387317",
+          "size_bytes": 593,
+          "line_count": 18
+        },
+        "exact_diff": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/diffs/crates__ep_runtime__src__runtime__tests.rs.diff",
+          "sha256": "ed1c3887d2467622c5cf642b893eb37c81e4aa6a9edddc9bdf277f9f0b25521e",
+          "size_bytes": 360,
+          "line_count": 7
+        },
+        "source_preparation": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-02/manifest.json",
+          "sha256": "502237329524881eb7427b7721023f3608169cfeed1524cfa7001786b032381a",
+          "size_bytes": 56443
+        }
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/geometry/inside_convection_owners.rs",
+        "new_destination_absent": true,
+        "proposal": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-02/proposed/crates/ep_runtime/src/geometry/inside_convection_owners.rs",
+          "sha256": "4d37dd51018dcd379ccde59ab4d72eea9d247cdfd1b34a46e6fb6ae2db62af6f",
+          "size_bytes": 11435,
+          "line_count": 221
+        },
+        "exact_diff": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-02/diffs/crates__ep_runtime__src__geometry__inside_convection_owners.rs.diff",
+          "sha256": "52e80d16535c24242ad55de643d55dbc6f1efd2868f2e1f97b1a99320502997c",
+          "size_bytes": 11816,
+          "line_count": 224
+        },
+        "source_preparation": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-02/manifest.json",
+          "sha256": "502237329524881eb7427b7721023f3608169cfeed1524cfa7001786b032381a",
+          "size_bytes": 56443
+        }
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/geometry/inside_convection_owners/tests.rs",
+        "new_destination_absent": true,
+        "proposal": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/proposed/crates/ep_runtime/src/geometry/inside_convection_owners/tests.rs",
+          "sha256": "362eb48d3b4c0f164110fddfa96d36c458442494bbecfedd8d26354872747492",
+          "size_bytes": 2933,
+          "line_count": 49
+        },
+        "exact_diff": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/diffs/crates__ep_runtime__src__geometry__inside_convection_owners__tests.rs.diff",
+          "sha256": "eef72986a31ff7d2367acd2fd6628327f35f32b7ec4c638b5fc2c0c579a77a1f",
+          "size_bytes": 3147,
+          "line_count": 52
+        },
+        "source_preparation": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-02/manifest.json",
+          "sha256": "502237329524881eb7427b7721023f3608169cfeed1524cfa7001786b032381a",
+          "size_bytes": 56443
+        }
+      },
+      {
+        "canonical_path": "crates/ep_runtime/src/runtime/tests/initialized_geometry_owners.rs",
+        "new_destination_absent": true,
+        "proposal": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/proposed/crates/ep_runtime/src/runtime/tests/initialized_geometry_owners.rs",
+          "sha256": "37add97b03c773c0eb7fa52d69896a887c1550935e8b6c044bd234218007b78a",
+          "size_bytes": 2626,
+          "line_count": 48
+        },
+        "exact_diff": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/diffs/crates__ep_runtime__src__runtime__tests__initialized_geometry_owners.rs.diff",
+          "sha256": "04c3923cbe01e573938d8377f9301242d000285f5cf131acc9a5c06d518e481a",
+          "size_bytes": 2841,
+          "line_count": 51
+        },
+        "source_preparation": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-owner-prep-02/manifest.json",
+          "sha256": "502237329524881eb7427b7721023f3608169cfeed1524cfa7001786b032381a",
+          "size_bytes": 56443
+        }
+      },
+      {
+        "canonical_path": "crates/ep_run/examples/src06_ordinary_geometry_observer.rs",
+        "new_destination_absent": true,
+        "proposal": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-observer-prep-02/proposed/crates/ep_run/examples/src06_ordinary_geometry_observer.rs",
+          "sha256": "e28aff95df97e332b8fefbc51acda87f90907c5030ab086905bc9466e3c402d1",
+          "size_bytes": 14163,
+          "line_count": 169
+        },
+        "exact_diff": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-observer-prep-02/diffs/crates__ep_run__examples__src06_ordinary_geometry_observer.rs.diff",
+          "sha256": "c7df0d6f8975244fd774d2af18f2f78d25da72595cae99115516d85536474cbc",
+          "size_bytes": 14427,
+          "line_count": 172
+        },
+        "source_preparation": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-observer-prep-02/manifest.json",
+          "sha256": "9c3b3507f9a2b1f8c7fb973b5114397ecf81544a18c7be1313aaaf6cb5d73b75",
+          "size_bytes": 27724
+        }
+      },
+      {
+        "canonical_path": "crates/ep_run/examples/src06_ordinary_geometry_support/fields.rs",
+        "new_destination_absent": true,
+        "proposal": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-observer-prep-02/proposed/crates/ep_run/examples/src06_ordinary_geometry_support/fields.rs",
+          "sha256": "9ada9683706b72c1213a208415786d11ba36e3aa545abc189f532f6dc5093df8",
+          "size_bytes": 21913,
+          "line_count": 258
+        },
+        "exact_diff": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-observer-prep-02/diffs/crates__ep_run__examples__src06_ordinary_geometry_support__fields.rs.diff",
+          "sha256": "3b55abf27e31da84288aa4a4718f9955619e78832568000dd6a286eb7a923240",
+          "size_bytes": 22272,
+          "line_count": 261
+        },
+        "source_preparation": {
+          "path": ".runtime/porting/SRC-06/ordinary-geometry-observer-prep-02/manifest.json",
+          "sha256": "9c3b3507f9a2b1f8c7fb973b5114397ecf81544a18c7be1313aaaf6cb5d73b75",
+          "size_bytes": 27724
+        }
+      }
+    ]
+  },
+  "Native_baseline_acceptance": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-Native-baseline-01/acceptance.json",
+    "sha256": "b9d216a293632f25ab985a45d7cd51aa5480e7b9d64beb98576cd0401766194a",
+    "size_bytes": 2878,
+    "line_count": 63
+  },
+  "actual_Native_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-native-prep-04/manifest.json",
+    "sha256": "2bcb4620c0519b2c796f96242430651d5bd6e737a5e793db4c24a6c03d9ee21b",
+    "size_bytes": 60112
+  },
+  "bounded_card_acceptance": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-card-contract-01/record.json",
+    "sha256": "370b3aba872fd606277c036245bc398f6260f9cccc9a0126987db523036bcad8",
+    "size_bytes": 2018,
+    "line_count": 52
+  },
+  "protected_prior_summary": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-tarp-dispatcher/summary.json",
+    "sha256": "e06573e5cdd079c328b7dd27019c362d8496c9f2629064500ae7a5557101d808",
+    "size_bytes": 13029,
+    "line_count": 320
+  },
+  "runtime_interfaces": {
+    "apply": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/apply.py",
+      "sha256": "5aee3f6afa4e386bd5a94f556f96a39958177fe1194d0f06fc1533dedf65c636",
+      "size_bytes": 10854,
+      "line_count": 139
+    },
+    "validate": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/validate.py",
+      "sha256": "21e971bd701023e7d8c8b4e14cdbb0a7f4bb8c9ea4204616ccdbcd46f4d8d81c",
+      "size_bytes": 15189,
+      "line_count": 146
+    },
+    "compare": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/compare.py",
+      "sha256": "83cf51fa782769761eef7c2e5779ec7dcac5191c2c7a7ec40b3234710f50a2b5",
+      "size_bytes": 7295,
+      "line_count": 91
+    },
+    "application_paths_count": 10,
+    "new_Source_members_count": 5,
+    "observer_sources_count": 3,
+    "actual_public_API_sources_count": 28
+  },
+  "own_sources": [
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/apply.py",
+      "sha256": "5aee3f6afa4e386bd5a94f556f96a39958177fe1194d0f06fc1533dedf65c636",
+      "size_bytes": 10854,
+      "line_count": 139
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/validate.py",
+      "sha256": "21e971bd701023e7d8c8b4e14cdbb0a7f4bb8c9ea4204616ccdbcd46f4d8d81c",
+      "size_bytes": 15189,
+      "line_count": 146
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/compare.py",
+      "sha256": "83cf51fa782769761eef7c2e5779ec7dcac5191c2c7a7ec40b3234710f50a2b5",
+      "size_bytes": 7295,
+      "line_count": 91
+    },
+    {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-02/README.md",
+      "sha256": "dc483dc09ba9d98092c70cd846cca51851d41a02b094828e2c0b6f2adaaef3f7",
+      "size_bytes": 2113,
+      "line_count": 32
+    },
+    {
+      "path": ".runtime/porting/SRC-06/seal-ordinary-geometry-workflow-01.py",
+      "sha256": "8d474f6d2e05dc45421c2cf8477f231f03716c5ff3b12a7a869a91b20b687928",
+      "size_bytes": 10407,
+      "line_count": 130
+    }
+  ],
+  "application_paths": [
+    "crates/ep_runtime/src/geometry.rs",
+    "crates/ep_runtime/src/heat_balance/state.rs",
+    "crates/ep_runtime/src/heat_balance/initialization.rs",
+    "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+    "crates/ep_runtime/src/runtime/tests.rs",
+    "crates/ep_runtime/src/geometry/inside_convection_owners.rs",
+    "crates/ep_runtime/src/geometry/inside_convection_owners/tests.rs",
+    "crates/ep_runtime/src/runtime/tests/initialized_geometry_owners.rs",
+    "crates/ep_run/examples/src06_ordinary_geometry_observer.rs",
+    "crates/ep_run/examples/src06_ordinary_geometry_support/fields.rs"
+  ],
+  "reviewed_comparer_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-prep-03/manifest.json",
+    "sha256": "c1f7b3e59b4facb70ec9fc7058b2234645dc9422532647f028ed124d8ed1350f",
+    "size_bytes": 33479,
+    "line_count": 828
+  },
+  "comparer_FULL_Source_reviews": [
+    {
+      "path": ".runtime/porting/SRC-06/Root-geometry-comparison-Source-review-03/review.json",
+      "sha256": "ae48e52b074db8dbec6435968274b0bf7941660a61bef82982e30edb801b4965",
+      "size_bytes": 1692,
+      "line_count": 43
+    },
+    {
+      "path": ".runtime/porting/SRC-06/Header-geometry-comparison-Source-review-03/review.json",
+      "sha256": "f268f582dd1e030959e59a90fdc514c6d792f63eb733b8c7bc45dcbd255cc200",
+      "size_bytes": 2065,
+      "line_count": 48
+    }
+  ],
+  "historical_card_archive": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-draft-01/historical-card/SRC-06-before-dispatcher-publication.md",
+    "sha256": "53a3483f72237da7bb4850783151a1c55a89aeee820ce30a4a6eb6c12dbb553b",
+    "size_bytes": 9748,
+    "line_count": 147
+  },
+  "missing_application_prerequisites": [],
+  "authority_operand_contract": "Only a fresh immutable reviewed successor with application_authority_supplied true and all actual prerequisites may invoke the drafted operations.",
+  "future_outcomes_or_hashes_supplied": false,
+  "canonical_mutation_performed": false,
+  "workflow_executed": false,
+  "gates_updated": false,
+  "authentic_before_contract": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-draft-01/draft-contract.json",
+    "sha256": "6a681a7998f25dddc675b846de848498e484925addb868edbe5e9c5ce14f2494",
+    "size_bytes": 6072,
+    "line_count": 137
+  },
+  "source_correspondence": [
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/before/apply.draft.py",
+        "sha256": "4d69021f6e5592df80ff089b4b864854a402d333d56401bd3a6ecc1f161144e4",
+        "size_bytes": 10478,
+        "line_count": 138
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/apply.py",
+        "sha256": "5aee3f6afa4e386bd5a94f556f96a39958177fe1194d0f06fc1533dedf65c636",
+        "size_bytes": 10854,
+        "line_count": 139
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/apply.py.diff",
+        "sha256": "97acb15f53c6374ba4b2eb16a06b86c6e2aed36659fa97f550c757272c766895",
+        "size_bytes": 2301,
+        "line_count": 29
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/before/validate.draft.py",
+        "sha256": "3c247493e610cf4aadc12e5dd5d48917b93eec6e30f82a798dc82a0203bf1d5b",
+        "size_bytes": 15135,
+        "line_count": 145
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/validate.py",
+        "sha256": "21e971bd701023e7d8c8b4e14cdbb0a7f4bb8c9ea4204616ccdbcd46f4d8d81c",
+        "size_bytes": 15189,
+        "line_count": 146
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/validate.py.diff",
+        "sha256": "42a614e0bb40524b62354226b85cec8ab9a25a49a920e52c60cdf2cce08d3160",
+        "size_bytes": 1052,
+        "line_count": 16
+      }
+    },
+    {
+      "before": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/before/compare.draft.py",
+        "sha256": "53e20aa1c0994ad7beabb557f27f7d2fb6050f56fc26804a96e5fa2f8405052d",
+        "size_bytes": 7231,
+        "line_count": 90
+      },
+      "proposal": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/compare.py",
+        "sha256": "83cf51fa782769761eef7c2e5779ec7dcac5191c2c7a7ec40b3234710f50a2b5",
+        "size_bytes": 7295,
+        "line_count": 91
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/compare.py.diff",
+        "sha256": "ab5034bbec7d5f83072fc32951f15a46cb2813c5652c9f2708dfa5b4a03f0e2a",
+        "size_bytes": 1758,
+        "line_count": 25
+      }
+    }
+  ],
+  "actual_before_full_descriptor": {
+    "path": ".runtime/porting/source-objects/4c/4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce",
+    "sha256": "4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce",
+    "size_bytes": 1635051,
+    "line_count": 31503
+  },
+  "parent_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-01/manifest.json",
+    "sha256": "cd95bd5be05765155bba0cd44d44cdfd7fd678a19b98df8f87fcecc0350306cd",
+    "size_bytes": 23949,
+    "line_count": 523
+  },
+  "authentic_before_01_manifest": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-02/before-01/manifest.json",
+    "sha256": "cd95bd5be05765155bba0cd44d44cdfd7fd678a19b98df8f87fcecc0350306cd",
+    "size_bytes": 23949,
+    "line_count": 523
+  },
+  "README_only_correspondence": {
+    "before": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-02/before-01/README.md",
+      "sha256": "06705705bb7839a9aaf070949a28378c9ecb32eb8119c99d22e591752e6561d6",
+      "size_bytes": 2981,
+      "line_count": 39
+    },
+    "proposal": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-02/README.md",
+      "sha256": "dc483dc09ba9d98092c70cd846cca51851d41a02b094828e2c0b6f2adaaef3f7",
+      "size_bytes": 2113,
+      "line_count": 32
+    },
+    "exact_diff": {
+      "path": ".runtime/porting/SRC-06/ordinary-geometry-workflow-prep-02/README.md.diff",
+      "sha256": "0f5e2dcc94127ac1f4d81764d7f4fd18cb61c5d813fd0d03529aead631d371ff",
+      "size_bytes": 5329,
+      "line_count": 69
+    }
+  },
+  "inherited_Root_FULL_runtime_Source_review": {
+    "path": ".runtime/porting/SRC-06/Root-geometry-workflow-Source-review-01/review.json",
+    "sha256": "485443ad90ceb76588a544b175b29f807d10d4cb0f335fbb4e35f8d7121ec884",
+    "size_bytes": 1222,
+    "line_count": 32
+  },
+  "successor_author_Source": {
+    "path": ".runtime/porting/SRC-06/seal-ordinary-geometry-workflow-02.py",
+    "sha256": "34953da5940f02e6d3ab74d281cf46a818ee85485c0ffff9b95962bd34d83a0b",
+    "size_bytes": 4775,
+    "line_count": 84
+  },
+  "successor_scope": "README-only correction; all runtime Source paths/bytes and reviewed ten proposals remain literal01."
+}

@@ -1,0 +1,55 @@
+{
+  "schema": "src06-ordinary-geometry-comparison-custody.v1",
+  "actual_application": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-applied-01/record.json",
+    "sha256": "fa30387b51c8b9e00dbd5dd1d2fcc16965b619daffeeeeb1822a32344f6a8273",
+    "size_bytes": 32889
+  },
+  "actual_formatter_review": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-applied-01/Root-formatter-acceptance.json",
+    "sha256": "07c91afb7351c5b83e31c39ede024695475832fcf7485cb37ad3bf41323802a1",
+    "size_bytes": 1378
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/47/47ebf61d9be4dbfcb30fb9b2f3ae8e962c497b0de8857f4e659dba802a72328b",
+    "sha256": "47ebf61d9be4dbfcb30fb9b2f3ae8e962c497b0de8857f4e659dba802a72328b"
+  },
+  "Native_baseline_acceptance": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-Native-baseline-01/acceptance.json",
+    "sha256": "b9d216a293632f25ab985a45d7cd51aa5480e7b9d64beb98576cd0401766194a",
+    "size_bytes": 2878,
+    "line_count": 63
+  },
+  "Rust_execution_custody": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-Rust-capture-01/custody.json",
+    "sha256": "52f26f293f5d12762f74840d2b9010416f60188150deeb6e001c8608525274ba",
+    "size_bytes": 3476
+  },
+  "Root_Rust_factual_review": {
+    "path": ".runtime/porting/SRC-06/Root-geometry-Rust-factual-review-03/review.json",
+    "sha256": "256f598fc8b435ef525ea384a63c30b2fd54a17d228f5351222d3d0c7fec3baf",
+    "size_bytes": 9870
+  },
+  "independent_Rust_factual_review": {
+    "path": ".runtime/porting/SRC-06/Header-geometry-Rust-factual-review-03/review.json",
+    "sha256": "256f598fc8b435ef525ea384a63c30b2fd54a17d228f5351222d3d0c7fec3baf",
+    "size_bytes": 9870
+  },
+  "prospective_policy": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-observer-prep-02/policy.proposed.json",
+    "sha256": "0bb48c5f93aea8393c8012f28ccfaa37c9e191e201f402a547156a8376092f6b",
+    "size_bytes": 4965,
+    "line_count": 115
+  },
+  "protected_dispatcher_application": {
+    "path": ".runtime/porting/SRC-06/tarp-dispatcher-applied-02/record.json",
+    "sha256": "a4eedbee038952b9928cefeeebfc83d51510dafe9c8d030ec4ef401a7a06c488",
+    "size_bytes": 27345
+  },
+  "protected_prior_summary": {
+    "path": "energyplus_porting_plan/evidence/SRC-06-tarp-dispatcher/summary.json",
+    "sha256": "e06573e5cdd079c328b7dd27019c362d8496c9f2629064500ae7a5557101d808",
+    "size_bytes": 13029,
+    "line_count": 320
+  }
+}

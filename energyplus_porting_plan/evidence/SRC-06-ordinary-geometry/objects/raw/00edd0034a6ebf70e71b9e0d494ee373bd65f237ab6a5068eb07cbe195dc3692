@@ -1,0 +1,28 @@
+{
+  "schema": "ordinary-geometry-configure-Root-Source-review.v1",
+  "accepted": true,
+  "reviewed_manifest": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-04/manifest.json",
+    "sha256": "7547cf6817ec14417886928b34125c6339de9e223818379066cc1ae6727c761b",
+    "size_bytes": 20691
+  },
+  "parent03_accepted_Source_review": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-03/Root-FULL-Source-review-03.json",
+    "sha256": "898eed2c035c9abb1a858679b2db912fe6a401dfbbff82e025de125f71e42ea0"
+  },
+  "all216_parent_lines_plus21_restoration_lines_and_v4_ref_changes_reviewed": true,
+  "full_reference_occurrences": 99,
+  "distinct_paths": 62,
+  "exact_current_diffs_regenerated": 3,
+  "successful_v3_and_prior_failed_lineages_independently_bound": true,
+  "authentic_three_live_generated_files_current743_verified": true,
+  "no_configure_compile_or_target_execution": true,
+  "gates_updated": false,
+  "wrapper14_README9_and_author102_fully_read": true,
+  "supersedes_metadata_note_only": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-build-prep-04/Root-FULL-Source-review-04.json",
+    "sha256": "2575ecde8fe67765df5cf2647948b4c02e97e24be2c7c2722b9f5ea28a902f1a",
+    "size_bytes": 993
+  },
+  "correction": "The previous note incorrectly stated README11/author132; actual complete physical sources are README9/author102. All reviewed bytes, acceptance and checks are unchanged."
+}

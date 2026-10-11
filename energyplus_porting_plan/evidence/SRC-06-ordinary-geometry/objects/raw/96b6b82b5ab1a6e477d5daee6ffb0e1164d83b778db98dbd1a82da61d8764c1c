@@ -1,0 +1,80 @@
+"""Release only the actual provider inventory accepted by both full factual reviews."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+BASE = ROOT / '.runtime/porting/SRC-06'
+
+def ref(path):
+    path = path.resolve()
+    with path.open('rb') as stream:
+        digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=digest, size_bytes=path.stat().st_size)
+
+def bind(row):
+    path = (ROOT / row['path']).resolve()
+    assert path.is_relative_to(ROOT) and path.is_file()
+    actual = ref(path)
+    assert actual['sha256'] == row['sha256'] and ('size_bytes' not in row or actual['size_bytes'] == row['size_bytes'])
+    return path
+
+def load(row):
+    return json.loads(bind(row).read_bytes())
+
+def operand(token):
+    name, digest = token.rsplit('#', 1)
+    return ref(bind(dict(path=name, sha256=digest)))
+
+parser = argparse.ArgumentParser(description=__doc__)
+for name in ('Root-review', 'independent-review', 'output-dir'):
+    parser.add_argument('--' + name, required=True)
+args = parser.parse_args()
+proofs = [operand(args.Root_review), operand(args.independent_review)]
+reviews = [load(row) for row in proofs]
+inventory_ref = reviews[0]['actual_inventory']
+inventory = load(inventory_ref)
+for role, review in zip(('Root', 'Header'), reviews):
+    assert review['schema'] == 'ordinary-geometry-' + role + '-independent-provider-factual-review.v1'
+    assert review['reviewer_role'] == role and review['accepted'] is True and review[role + '_FULL_provider_PE_and_custody_accepted'] is True
+    assert bind(review['actual_inventory']) == bind(inventory_ref)
+    assert review['providers'] and len(review['providers']) == 16
+    assert review['exact_compile_link_steps'] == 2 and review['graph_before'] == 743 and review['graph_after'] == 744
+    assert review['PE_sections'] == 20 and review['PE_directories'] == 16 and review['Source_members'] == 3937
+    assert review['map_next_symbol_and_original_core_LOAD_exact'] is True and review['addr2line_Original_Source_exact'] is True
+    assert all(review[k] is False for k in ('helper_executed', 'numerical_results_read', 'scientific_PASS_claim', 'gates_updated'))
+assert bind(reviews[0]['actual_collection_execution']) == bind(reviews[1]['actual_collection_execution'])
+outer = load(reviews[0]['actual_collection_execution'])
+assert outer['exit_code'] == 0 and outer['source_bytes_match_before_and_after'] is True
+assert inventory['schema'] == 'ordinary-geometry-actual-linked-provider-and-PE-inventory.v1'
+assert all(inventory[k] is True for k in ('dry_and_actual_compile_link_commands_byte_exact', 'current_compile_graph_cache_and_core_preserved'))
+assert all(inventory[k] is False for k in ('helper_executed', 'numerical_results_read', 'production_math_changed', 'gates_updated'))
+driver_manifest = dict(path='.runtime/porting/SRC-06/ordinary-geometry-execution-prep-06/manifest.json', sha256='f88bf1a486d690155ceabee00791531113f887f79d719c3f1029d71622c850f6')
+driver = load(driver_manifest)
+native, collector = driver['Native_Source_preparation'], driver['provider_Source_preparation']
+assert native['sha256'] == '2bcb4620c0519b2c796f96242430651d5bd6e737a5e793db4c24a6c03d9ee21b'
+assert collector['sha256'] == '05689d2f2a757258cc01932ef57b2b145115d741dc5e9766d98f4ef5c4deafcb'
+assert bind(native) == bind(inventory['reviewed_Source_preparation'])
+collection = load(collector)
+assert bind(collection['runtime_interfaces']['collector']) == bind(inventory['actual_evidence_collector'])
+assert bind(driver['configure_Source_preparation']) == bind(inventory['configure_preparation'])
+assert driver['runtime_interfaces']['driver']['sha256'] == '81ccfdf370e0f66f7c24e2344bafc352f754aad1982e9b0e01c65899a08d0030'
+bind(driver['runtime_interfaces']['driver'])
+source = inventory['Source_snapshot']; bind(source)
+assert source['sha256'] == '4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce'
+result = dict(schema='ordinary-geometry-Root-provider-acceptance.v1', accepted=True, provider_inventory=inventory_ref,
+    reviewed_Source_preparation=native, actual_Native_binary=inventory['actual_Native_binary'], actual_full_link_map=inventory['actual_full_link_map'],
+    actual_helper_object=inventory['actual_helper_object'], actual_build_execution=inventory['actual_build_execution'], Source_snapshot=source,
+    provider_collection_preparation=collector, actual_evidence_collector=inventory['actual_evidence_collector'], reviewed_execution_driver=driver['runtime_interfaces']['driver'],
+    reviewed_execution_Source_preparation=driver_manifest, Root_factual_review=proofs[0], independent_FULL_factual_review=proofs[1],
+    all_sixteen_Original_providers_accepted=True, full_PE_and_core_proof_accepted=True, dry_and_actual_compile_link_commands_byte_exact=True,
+    static_provider_intervals_are_not_inner_invocation_traces=True, helper_executed=False, numerical_results_read=False, scientific_PASS_claimed=False,
+    whole_geometry_or_ordinary_PASS_claimed=False, gates_updated=False, release_Source=ref(Path(__file__)))
+output = (ROOT / args.output_dir).resolve()
+assert output.is_relative_to(BASE) and output != BASE and not output.exists()
+output.mkdir(parents=True)
+target = output / 'acceptance.json'
+with target.open('xb') as stream:
+    stream.write((json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode())
+print(json.dumps(ref(target)))

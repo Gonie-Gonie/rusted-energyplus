@@ -1,0 +1,18 @@
+// max( double, double )
+inline
+double
+max( double const a, double const b )
+{
+	return ( a < b ? b : a );
+}
+
+// max( long double, long double )
+inline
+long double
+max( long double const a, long double const b )
+{
+	return ( a < b ? b : a );
+}
+
+// Use std::max for 2 arguments not covered by the above overloads
+using std::max;

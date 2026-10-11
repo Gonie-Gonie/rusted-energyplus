@@ -1,0 +1,18 @@
+--- crates/ep_runtime/src/heat_balance/initialization/state_shell.rs
++++ .runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/initialization/state_shell.rs
+@@ -7,6 +7,7 @@
+ 
+ pub(super) fn finish_heat_balance_state(
+     zones: Vec<ZoneHeatBalanceState>,
++    initialized_geometry: crate::geometry::InitializedGeometryOwners,
+     surfaces: Vec<SurfaceHeatBalanceState>,
+     surface_indexes: HeatBalanceSurfaceIndexes,
+     mut construction_thermal_data: ConstructionThermalDataCache,
+@@ -15,6 +16,7 @@
+     HeatBalanceState {
+         timestep_index: 0,
+         zones,
++        initialized_geometry,
+         warmup_convergence: None,
+         zone_air_environment_guard: Default::default(),
+         surfaces,

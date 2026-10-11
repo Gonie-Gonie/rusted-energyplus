@@ -1,0 +1,102 @@
+"""Seal only v4 configure/dry Source; never configure, compile, collect, or execute."""
+import argparse
+import ast
+import copy
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+BASE = ROOT / '.runtime/porting/SRC-06'
+OLD, OUT = BASE / 'ordinary-geometry-build-prep-03', BASE / 'ordinary-geometry-build-prep-04'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+
+def authenticated(text):
+    name, digest = text.rsplit('#', 1)
+    row = ref((ROOT / name).resolve())
+    assert row['sha256'] == digest
+    return row
+
+
+def write(path, raw):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream: stream.write(raw)
+    return ref(path)
+
+
+def body(name, raw):
+    before = write(OUT / 'before' / name, (OLD / name).read_bytes())
+    after = write(OUT / name, raw)
+    delta = write(OUT / (name + '.diff'), ''.join(difflib.unified_diff((OLD / name).read_text(encoding='utf8').splitlines(True), raw.decode().splitlines(True), fromfile=before['path'], tofile=after['path'])).encode())
+    return after, dict(before=before, proposal=after, exact_diff=delta)
+
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--Native-preparation', required=True)
+args = parser.parse_args()
+prior = ref(OLD / 'manifest.json'); assert prior['sha256'] == 'f5f7885c43eed8be89b558cc9b676fb4e7feeda54d6bc9b3735764336bc34fd4'
+native = authenticated(args.Native_preparation)
+assert native['path'] == '.runtime/porting/SRC-06/ordinary-geometry-native-prep-04/manifest.json'
+native_value = json.loads((ROOT / native['path']).read_bytes())
+assert native_value['schema'] == 'ordinary-geometry-public-loader-Source-preparation.v1'
+restore = ref(BASE / 'geometry-build-metadata-restore-02/record.json'); assert restore['sha256'] == 'e85a202e1d510223d091ceb0a3de631fc7a895c019ca3339ca8793e871fac0e9'
+restoration = json.loads((ROOT / restore['path']).read_bytes())
+raw = (OLD / 'prepare_native.py').read_text(encoding='utf8')
+replacements = [('ordinary-geometry-native-build-02', 'ordinary-geometry-native-build-03'), ('ordinary-geometry-native-prep-03', 'ordinary-geometry-native-prep-04'), ('72f75c5242e2df7457fb9fc065b2cc1fc5922f6bb9673e6b785e145bb54f47a1', native['sha256']), ('GEOMETRY_LOADER_V3_', 'GEOMETRY_LOADER_V4_'), ('geometry_loader_helper_v3', 'geometry_loader_helper_v4'), ("prep['own_sources'][0]['line_count'] == 200", "prep['own_sources'][0]['line_count'] == " + str(native_value['own_sources'][0]['line_count']))]
+for before, after in replacements:
+    assert before in raw, before
+    raw = raw.replace(before, after)
+guard = '''# Actual successful v3 metadata and full provider facts remain historical after Root's second restoration.
+current_restoration_ref = dict(path='.runtime/porting/SRC-06/geometry-build-metadata-restore-02/record.json', sha256='e85a202e1d510223d091ceb0a3de631fc7a895c019ca3339ca8793e871fac0e9')
+current_restoration = load(current_restoration_ref)
+assert current_restoration['schema'] == 'src06-geometry-generated-build-metadata-restoration.v2' and current_restoration['restored_files'] == 3
+assert current_restoration['geometry744_graph_retained_as_actual_history'] is True and all(current_restoration[k] is False for k in ['Original_scientific_Source_or_binary_changed', 'Rust_Source_changed', 'policy_changed', 'scientific_PASS_claimed', 'gates_updated'])
+assert checked(current_restoration['prior_generated_metadata_restoration']) == checked(restoration_ref)
+assert [Path(row['expected']['path']).name for row in current_restoration['files']] == ['CMakeCache.txt', 'compile_commands.json', 'build.ninja']
+for row in current_restoration['files']:
+    before_archive = checked(row['actual_before_archive']); archive = checked(row['restore_to_archive'])
+    assert full(before_archive)['sha256'] == row['actual_before']['sha256'] and full(before_archive)['size_bytes'] == row['actual_before']['size_bytes']
+    expected = row['expected']; actual = full(BUILD / Path(expected['path']).name)
+    assert actual == row['actual_after'] == expected and actual['sha256'] == full(archive)['sha256'] and actual['size_bytes'] == full(archive)['size_bytes']
+successful_geometry = load(current_restoration['geometry_compile_execution'])
+assert successful_geometry['exit_code'] == 0 and successful_geometry['launch_error'] is None and successful_geometry['finished_utc'] is not None and successful_geometry['source_bytes_match_before_and_after'] is True and successful_geometry['source_snapshot'] == snapshot
+checked(successful_geometry['stdout']); checked(successful_geometry['stderr']); checked(successful_geometry['executed_launcher']['archive'])
+checked(current_restoration['restore_Source']); checked(current_restoration['geometry_configure_review'])
+prior_inventory = load(current_restoration['actual_provider_inventory'])
+assert prior_inventory['Source_snapshot'] == snapshot and prior_inventory['helper_executed'] is False and prior_inventory['production_math_changed'] is False
+for key, flag in [('Root_factual_review', 'Root_FULL_provider_PE_and_custody_accepted'), ('independent_factual_review', 'Header_FULL_provider_PE_and_custody_accepted')]:
+    proof = load(current_restoration[key])
+    assert proof['accepted'] is True and proof[flag] is True and checked(proof['actual_inventory']) == checked(current_restoration['actual_provider_inventory'])
+'''
+assert raw.count('assert not RAW.exists() and not OUTPUT.exists()') == 1
+raw = raw.replace('assert not RAW.exists() and not OUTPUT.exists()', guard + 'assert not RAW.exists() and not OUTPUT.exists()', 1)
+raw = raw.replace('generated_BUILD_metadata_restoration=restoration_ref,', "generated_BUILD_metadata_restoration=current_restoration_ref, prior_generated_BUILD_metadata_restoration=restoration_ref, retained_successful_v3_configure_review=current_restoration['geometry_configure_review'], retained_successful_v3_compile_execution=current_restoration['geometry_compile_execution'], retained_successful_v3_provider_inventory=current_restoration['actual_provider_inventory'], retained_successful_v3_provider_reviews={k: current_restoration[k] for k in ['Root_factual_review', 'independent_factual_review']},", 1)
+ast.parse(raw)
+script, script_diff = body('prepare_native.py', raw.encode())
+wrapper = (OLD / 'additive-reference.cmake').read_bytes().replace(b'GEOMETRY_LOADER_V3_', b'GEOMETRY_LOADER_V4_').replace(b'geometry_loader_v3_', b'geometry_loader_v4_').replace(b'geometry_loader_helper_v3', b'geometry_loader_helper_v4')
+wrapper_ref, wrapper_diff = body('additive-reference.cmake', wrapper)
+doc_text = '''# Geometry v4 configure and dry-run - held Source
+
+This successor binds Native04's read-only actual Construction index/name/allocation table and complete InputProcessor epJSON. Original engine/math and Rust Source remain unchanged. Root's actual restoration02 preserves successful v3 graph/build/provider facts and restores only the three generated metadata files to the authentic dispatcher743 parent. Both restorations and the prior failed compile remain explicit, separately authenticated history.
+
+The unchanged configure/dry protocol copies the actual76-argument dispatcher configure, changes only CMAKE_PROJECT_INCLUDE, and appends four unique GEOMETRY_LOADER_V4 variables. It preserves all743 prior rows, adds one same-parent v4 TU to744, verifies exactly two dry steps, retains the exact core link suffix with one inherited bcrypt token, checks official13534 before/after, and requires absent fresh object/executable. It never compiles or executes a helper.
+
+    python -X utf8 -B .runtime/porting/SRC-06/ordinary-geometry-build-prep-04/prepare_native.py --source-snapshot <actual4c02-snapshot-path>#4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce
+
+Fresh metadata: ordinary-geometry-native-build-03. Fresh output: D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-geometry-native-build-03/bin. Target: geometry_loader_helper_v4. Existing v3/helper/provider facts remain historical; no helper execution or numerical result has been introduced by this Source author.
+'''
+doc, doc_diff = body('README.md', doc_text.encode())
+m = copy.deepcopy(json.loads((OLD / 'manifest.json').read_bytes()))
+m.update(parent_Source_preparation=prior, own_sources=[script, wrapper_ref, doc, ref(Path(__file__))], source_correspondence=[script_diff, wrapper_diff, doc_diff], previous_source_correspondence=m['source_correspondence'], actual_restored_BUILD_metadata=restore, retained_successful_v3_facts={k: restoration[k] for k in ['geometry_configure_review', 'geometry_compile_execution', 'actual_provider_inventory', 'Root_factual_review', 'independent_factual_review']})
+m['dependencies'] += [prior, native, restore, restoration['restore_Source'], *m['retained_successful_v3_facts'].values(), *[r[k] for r in restoration['files'] for k in ['actual_before_archive', 'restore_to_archive']]]
+m['runtime_interfaces'].update(workflow=script, compile_target='geometry_loader_helper_v4')
+for row in m['dependencies']:
+    actual = ref(ROOT / row['path']); assert actual['sha256'] == row['sha256'] and ('size_bytes' not in row or actual['size_bytes'] == row['size_bytes'])
+assert not OUT.joinpath('manifest.json').exists()
+print(json.dumps(write(OUT / 'manifest.json', (json.dumps(m, ensure_ascii=False, allow_nan=False, indent=2) + '\n').encode())))

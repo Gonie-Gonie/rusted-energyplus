@@ -1,0 +1,64 @@
+void EnergyPlusData::init_constant_state(EnergyPlusData &state)
+{
+    if (this->init_constant_state_called) {
+        return;
+    }
+
+    this->init_constant_state_called = true;
+
+    // The order of these should not matter, but we are mirroring init_state() order which does matter.
+    this->dataSimulationManager->init_constant_state(state);
+    this->dataEMSMgr->init_constant_state(state);
+    this->dataPsychrometrics->init_constant_state(state);
+    this->dataFluid->init_constant_state(state);
+    this->dataSched->init_constant_state(state);
+    this->dataCurveManager->init_constant_state(state);
+
+    this->dataAirLoop->init_constant_state(state);
+    this->dataAirLoopHVACDOAS->init_constant_state(state);
+    this->dataAirSystemsData->init_constant_state(state);
+    this->afn->init_constant_state(state);
+    this->dataBSDFWindow->init_constant_state(state);
+    this->dataBaseSizerFanHeatInputs->init_constant_state(state);
+    this->dataBaseSizerScalableInputs->init_constant_state(state);
+    this->dataBaseboardElectric->init_constant_state(state);
+    this->dataBaseboardRadiator->init_constant_state(state);
+    this->dataBoilerSteam->init_constant_state(state);
+    this->dataBoilers->init_constant_state(state);
+    this->dataBranchAirLoopPlant->init_constant_state(state);
+    this->dataBranchInputManager->init_constant_state(state);
+    this->dataBranchNodeConnections->init_constant_state(state);
+    this->dataCHPElectGen->init_constant_state(state);
+    this->dataCTElectricGenerator->init_constant_state(state);
+    this->dataChilledCeilingPanelSimple->init_constant_state(state);
+    this->dataChillerAbsorber->init_constant_state(state);
+    this->dataChillerElectricEIR->init_constant_state(state);
+    this->dataChillerExhaustAbsorption->init_constant_state(state);
+    this->dataChillerGasAbsorption->init_constant_state(state);
+    this->dataChillerIndirectAbsorption->init_constant_state(state);
+    this->dataChillerReformulatedEIR->init_constant_state(state);
+    this->dataChillerElectricASHRAE205->init_constant_state(state);
+    this->dataCoilCoolingDX->init_constant_state(state);
+    this->dataCondenserLoopTowers->init_constant_state(state);
+    this->dataConstruction->init_constant_state(state);
+    this->dataContaminantBalance->init_constant_state(state);
+    this->dataConvect->init_constant_state(state);
+    this->dataConvergeParams->init_constant_state(state);
+    this->dataCoolTower->init_constant_state(state);
+    this->dataCostEstimateManager->init_constant_state(state);
+    this->dataCrossVentMgr->init_constant_state(state);
+    this->dataDXCoils->init_constant_state(state);
+    this->dataDXFEarClipping->init_constant_state(state);
+    this->dataDaylightingDevices->init_constant_state(state);
+    this->dataDaylightingDevicesData->init_constant_state(state);
+    this->dataDayltg->init_constant_state(state);
+    this->dataDefineEquipment->init_constant_state(state);
+    this->dataDemandManager->init_constant_state(state);
+    this->dataDesiccantDehumidifiers->init_constant_state(state);
+    this->dataDispVentMgr->init_constant_state(state);
+    this->dataDualDuct->init_constant_state(state);
+    this->dataEIRFuelFiredHeatPump->init_constant_state(state);
+    this->dataEIRPlantLoopHeatPump->init_constant_state(state);
+    this->dataHeatPumpAirToWater->init_constant_state(state);
+    this->dataEarthTube->init_constant_state(state);
+    this->dataEcoRoofMgr->init_constant_state(state);

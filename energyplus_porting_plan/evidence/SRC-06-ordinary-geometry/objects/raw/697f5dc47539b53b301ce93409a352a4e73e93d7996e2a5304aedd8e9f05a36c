@@ -1,0 +1,81 @@
+{
+  "schema": "src06-ordinary-geometry-comparison-factual-review.v1",
+  "accepted": true,
+  "actual_comparison": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-01/comparison/comparison.json",
+    "sha256": "48b4cfbf0b0dec46b04df4f6a46916253d26b3d37a9de4ad627ab1114b38b88b",
+    "size_bytes": 2760
+  },
+  "actual_execution": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-01/command/receipt.json",
+    "sha256": "09cae1d199853eacf478062ea291c794948d9934336828e5379c673d082bf31f",
+    "size_bytes": 4749
+  },
+  "actual_custody": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-01/comparison-custody.json",
+    "sha256": "64c6be9f5ba02a8b75e7137a8ab38da1d02f54423967555cd656d10a08b19617",
+    "size_bytes": 2430
+  },
+  "Source_snapshot": {
+    "path": ".runtime/porting/source-objects/47/47ebf61d9be4dbfcb30fb9b2f3ae8e962c497b0de8857f4e659dba802a72328b",
+    "sha256": "47ebf61d9be4dbfcb30fb9b2f3ae8e962c497b0de8857f4e659dba802a72328b"
+  },
+  "actual_transport": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-01/record.json",
+    "sha256": "cd50878793701b05772daeef0d5a87341d48ee8b8b2c0e44087aed4190af0e01",
+    "size_bytes": 1774
+  },
+  "actual_outer_execution": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-command-01/receipt.json",
+    "sha256": "df0e4d332687bbf416d6fbeb0a6296083633fc84a4759811c5b1111850d93738",
+    "size_bytes": 5374
+  },
+  "counts": {
+    "input_join_comparisons": 0,
+    "pre_owner_comparisons": 0,
+    "selected_endpoint_comparisons": 0,
+    "point_helper_comparisons": 0
+  },
+  "mismatch_count": 0,
+  "required_unavailable_count": 0,
+  "optional_unpaired_count": 0,
+  "ledger_facts": {
+    "mismatches": {
+      "rows": 0,
+      "decoded_bytes": 0,
+      "decoded_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "unavailable": {
+      "rows": 0,
+      "decoded_bytes": 0,
+      "decoded_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "paired_owners": {
+      "rows": 0,
+      "decoded_bytes": 0,
+      "decoded_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "actual_paired_owner_rows": 0,
+  "actual_mismatch_phase_counts": {},
+  "actual_status": "integrity-failed",
+  "full_archived_Source_members_verified": 3942,
+  "all_three_ledgers_full_hash_integrity_and_rows_accepted": true,
+  "all_ledger_rows_processed_in_recorded_order": true,
+  "comparison_call_counters_independently_recomputed": false,
+  "geometry_equations_recomputed": false,
+  "comparer_or_engine_invoked": false,
+  "scientific_PASS_claimed": false,
+  "whole_geometry_or_ordinary_PASS_claimed": false,
+  "gates_updated": false,
+  "review_Source": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-factual-checker-prep-01/check.py",
+    "sha256": "9e7bdf14b4fd9bc02c2891e6234311543f8509bff77ee0b195bfd1d0a4f69be3",
+    "size_bytes": 19487
+  },
+  "review_Source_preparation": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-comparison-factual-checker-prep-01/manifest.json",
+    "sha256": "8b17ddedf2165c790662dec7943fc22547bc631d620a540b5ee0e56c39fd1e2c",
+    "size_bytes": 7146
+  }
+}

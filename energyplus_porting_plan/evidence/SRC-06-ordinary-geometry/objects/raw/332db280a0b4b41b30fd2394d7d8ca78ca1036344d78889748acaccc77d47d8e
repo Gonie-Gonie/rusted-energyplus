@@ -1,0 +1,29 @@
+{
+  "schema": "src06-ordinary-geometry-observer-Root-Source-review.v2",
+  "accepted": true,
+  "Root_FULL_Source_accepted": true,
+  "reviewed_manifest": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-observer-prep-02/manifest.json",
+    "sha256": "9c3b3507f9a2b1f8c7fb973b5114397ecf81544a18c7be1313aaaf6cb5d73b75",
+    "size_bytes": 27724
+  },
+  "unique_full_refs": 67,
+  "literal_context_ranges_verified": 8,
+  "all_five_exact_diffs_regenerated": true,
+  "main169_fields258_policy115_both_authors_README_FULL_read": true,
+  "real_once_Raw_compile_scope_A_public_initializer_and_returned_owners_reviewed": true,
+  "complete_actual_IDF_conversion_and_actual_runtime31_source_bindings_required": true,
+  "no_Native_answers_or_recalculated_geometry": true,
+  "actual_failure_backend_prefix_retained": true,
+  "prospective_policy": {
+    "path": ".runtime/porting/SRC-06/ordinary-geometry-observer-prep-02/policy.proposed.json",
+    "sha256": "0bb48c5f93aea8393c8012f28ccfaa37c9e191e201f402a547156a8376092f6b",
+    "size_bytes": 4965,
+    "line_count": 115
+  },
+  "genuine_Native_capture_release_and_actual_application_quality_Cargo_PE_required": true,
+  "targets_executed": false,
+  "canonical_changes_performed": false,
+  "scientific_PASS_claimed": false,
+  "gates_updated": false
+}

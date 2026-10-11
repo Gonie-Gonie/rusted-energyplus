@@ -1,0 +1,77 @@
+"""Source-only additive geometry configure/dry preparation; never invoke proposed workflow."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+BASE = ROOT / '.runtime/porting/SRC-06'
+OLD = BASE / 'native-dispatcher-build-prep-02'
+NEW = BASE / 'ordinary-geometry-build-prep-01'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+
+def write(path, raw):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream: stream.write(raw)
+    return ref(path)
+
+
+before = (OLD / 'prepare_native.py').read_text(encoding='utf8')
+after = before
+edits = [
+    ('Root-only SRC06 additive configure', 'Root-only geometry additive configure'),
+    ("RAW = ROOT / '.runtime/porting/SRC-06/native-dispatcher-build-01'", "RAW = ROOT / '.runtime/porting/SRC-06/ordinary-geometry-native-build-01'"),
+    ("CODE = ROOT / '.runtime/porting/SRC-06/native-tarp-dispatcher-prep-02'", "CODE = ROOT / '.runtime/porting/SRC-06/ordinary-geometry-native-prep-02'"),
+    ("PRIOR = ROOT / '.runtime/porting/SRC-06/native-build-01'", "PRIOR = ROOT / '.runtime/porting/SRC-06/native-dispatcher-build-01'"),
+    ("OUTPUT = Path('D:/CodexBuild/rusted-energyplus/SRC-06/native-dispatcher-build-01/bin')", "OUTPUT = Path('D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-geometry-native-build-01/bin')"),
+    ("return dict(path=path.relative_to(ROOT).as_posix(), sha256=sha, size_bytes=path.stat().st_size)", "return dict(path=path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else str(path), sha256=sha, size_bytes=path.stat().st_size)"),
+    ('assert path.is_relative_to(ROOT) and path.is_file()', "assert (path.is_relative_to(ROOT) or path in PROTECTED_EXTERNAL) and path.is_file()"),
+    ("assert len(rows) == len(snapshot['files']) == 3928", "assert len(rows) == len(snapshot['files']) == 3929"),
+    ("collect({k: v for k, v in frozen.items() if k != 'frozen_Source_and_input'})", "for alias in frozen['inherited_historical_BUILD_Source_aliases']:\n        checked(alias['actual_archive'])\n        assert alias['historical']['sha256'] == alias['actual_archive']['sha256'] and alias['historical']['size_bytes'] == full(checked(alias['actual_archive']))['size_bytes']\n    collect({k: v for k, v in frozen.items() if k not in ['frozen_Source_and_input', 'inherited_historical_BUILD_Source_aliases']})"),
+    ("source_current(snapshot)\nassert full(PREP)", "assert snapshot['sha256'] == '994b014957fb54b1c01608f5fc345f70bbac500be0f7b3b673c252f90bbbc7b7'\nsource_current(snapshot)\nassert full(PREP)"),
+    ("954a7779868d3ac65d88c553aab324f5e5e0a88d5d455a3126aecc5012ca3d50", "4a172ac50b50fd2151baa818919b1a51b496488afe2a2bc80ea3ce3b984cf1f4"),
+    ("prep = load(full(PREP)); collect(prep)\nassert prep['schema'] == 'src06-tarp-dispatcher-Native-source-preparation.v1' and len(prep['compiled_source_files']) == 1\nassert prep['compiled_source_files'][0] == prep['own_sources'][0] and prep['own_sources'][0]['line_count'] == 286", "prep = load(full(PREP))\nassert prep['schema'] == 'ordinary-geometry-public-loader-Source-preparation.v1' and prep['runtime_interfaces']['compiled_TU_count'] == 1\nassert prep['own_sources'][0]['path'].endswith('/geometry_loader_helper.cpp') and prep['own_sources'][0]['line_count'] == 200\nfor key in ['own_sources', 'authoring_source', 'README', 'prospective_request', 'exact_copied_source_parents', 'authentic_loader_parent', 'authentic_recipe_parent', 'source_correspondence', 'whole_Original_sources', 'protected_dispatcher_eight_proposals', 'previous_preparation', 'authentic_before_manifest', 'incremental_correspondence', 'prior_authoring_source']:\n    collect(prep[key])\nfor row in prep['Source_ranges']:\n    raw = checked(row['whole_Source']).read_bytes().splitlines(keepends=True)\n    selected = b''.join(raw[row['start_line'] - 1:row['end_line']])\n    assert len(selected) == row['size_bytes'] and hashlib.sha256(selected).hexdigest() == row['sha256'] and checked(row['literal_archive']).read_bytes() == selected"),
+    ('7cfec3798c9991155e367f3257193f6d4745bab5532026c29e1a01af3d3419b7', 'b3f2f7c26a52ac7d5b17662adcf5063133ca3ac761b16b544603ffca180408dd'),
+    ('398a694835e18ed7851857312b0e25dd3b8e1d704098686f1a5c44d8213313fd', 'd0ee2ec26aed08c39efb8c2079b1384910a9337a7c26b2cf6c3f19320c4ee551'),
+    ('cc2f9630474ad1a7ad8a18ce2994a384fabef72a982715cac876af03e8c6ebdf', 'c3b3da21445f8fa0d25a11cd74f863a65e34dc585ea6f07cfa042faad2f437bb'),
+    ('e1358b349918be68af7cdb9af6954bf9c783575c8935ce54082a6969d9b89496', 'ff0f7a23cb3dadc09599fdba3b89d3976640db42733017384d8bc7914838a986'),
+    ('697cb8914c8a50331e26b2599e778eb3800af3586d0a28d7180d390509294032', '273a71380a031cadc5b2936f9f6e4310d62caacf01c820642175b3eb31d3377a'),
+    ("assert len(before_graph) == 742 and review['current_compile_rows'] == 742", "assert len(before_graph) == 743 and review['current_compile_rows'] == 743"),
+    ("old_command = previous['command']; assert len(old_command) == 72", "old_command = previous['command']; assert len(old_command) == 76"),
+    ("len(after_graph) == 743", "len(after_graph) == 744"),
+    ("previous_compile_rows=742, current_compile_rows=743", "previous_compile_rows=743, current_compile_rows=744"),
+    ("assert link_suffix == '  -lbcrypt' + prior_link_suffix", "assert prior_link_suffix.split().count('-lbcrypt') == 1 and link_suffix == prior_link_suffix"),
+    ("exact_prior_core_link_suffix_preserved_after_declared_SHA_transport=True", "exact_prior_core_link_suffix_preserved_without_additional_SHA_transport=True"),
+]
+for left, right in edits:
+    assert after.count(left) == 1, left
+    after = after.replace(left, right, 1)
+after = after.replace('src06_tarp_dispatcher_helper', 'geometry_loader_helper').replace('tarp_dispatcher_helper.cpp', 'geometry_loader_helper.cpp').replace('tarp_dispatcher.cmake', 'geometry_loader.cmake').replace('SRC06_DISPATCHER_', 'GEOMETRY_LOADER_').replace('src06-tarp-dispatcher-frozen-configure-inputs.v1', 'ordinary-geometry-frozen-configure-inputs.v1').replace('src06-tarp-dispatcher-configure-dry-review.v1', 'ordinary-geometry-configure-dry-review.v1')
+after = after.replace('PINS = {}', "PINS = {}\nPROTECTED_EXTERNAL = {Path('D:/CodexBuild/rusted-energyplus/SRC-06/native-dispatcher-build-01/bin/' + name).resolve() for name in ['src06_tarp_dispatcher_helper.exe', 'src06_tarp_dispatcher_helper.map']}", 1)
+needle = "assert not RAW.exists() and not OUTPUT.exists()"
+after = after.replace(needle, "provider_ref = dict(path='.runtime/porting/SRC-06/native-dispatcher-provider-review-01/linked-provider-and-PE-inventory.json', sha256='225baaf1541e54036c6277b0302891e18c0fb0ddb53e7ab4a8548f95f180ba63')\nprovider = load(provider_ref)\nfor key in ['actual_Native_binary', 'actual_full_link_map', 'actual_helper_object']: checked(provider[key])\n" + needle, 1)
+after = after.replace("assert not Path(new[0]['output']).exists()", "new_object = Path(new[0]['output'])\nif not new_object.is_absolute(): new_object = Path(new[0]['directory']) / new_object\nassert not new_object.exists()", 1)
+after = after.replace("assert not Path(new[0]['output']).exists()", "assert not new_object.exists()", 1)
+after = after.replace("inherited_historical_BUILD_Source_aliases=historical_aliases,", "inherited_historical_BUILD_Source_aliases=historical_aliases, prior_nested_historical_BUILD_Source_aliases=prior_frozen['inherited_historical_BUILD_Source_aliases'], protected_previous_target_outputs={k: provider[k] for k in ['actual_Native_binary', 'actual_full_link_map', 'actual_helper_object']},", 1)
+ast.parse(after)
+old_functions = {n.name: ast.dump(n) for n in ast.parse(before).body if isinstance(n, ast.FunctionDef)}
+new_functions = {n.name: ast.dump(n) for n in ast.parse(after).body if isinstance(n, ast.FunctionDef)}
+assert all(old_functions[n] == new_functions[n] for n in old_functions if n not in ['full', 'checked', 'historical_configure'])
+workflow = write(NEW / 'prepare_native.py', after.encode())
+archived = write(NEW / 'before/prepare_native.py', before.encode())
+delta = write(NEW / 'prepare_native.py.diff', ''.join(difflib.unified_diff(before.splitlines(True), after.splitlines(True), fromfile=archived['path'], tofile=workflow['path'])).encode())
+old_wrapper = (OLD / 'additive-reference.cmake').read_text(encoding='utf8')
+wrapper = old_wrapper.replace('SRC06_DISPATCHER_', 'GEOMETRY_LOADER_').replace('src06_place_dispatcher_reference', 'geometry_loader_place_reference').replace('src06_tarp_dispatcher_helper', 'geometry_loader_helper').replace('_src06_link_options', '_geometry_loader_link_options')
+wrapper_ref = write(NEW / 'additive-reference.cmake', wrapper.encode())
+wrapper_before = write(NEW / 'before/additive-reference.cmake', old_wrapper.encode())
+wrapper_delta = write(NEW / 'additive-reference.cmake.diff', ''.join(difflib.unified_diff(old_wrapper.splitlines(True), wrapper.splitlines(True), fromfile=wrapper_before['path'], tofile=wrapper_ref['path'])).encode())
+readme = write(NEW / 'README.md', b'# Geometry additive configure and dry workflow - held\n\nRoot-only prepare_native.py takes one --source-snapshot path#SHA operand, the actual corrected994b full3937 Source. It does not compile or execute any target. It requires actual completed dispatcher configure76argv, cacheff0f/graph273a with743 exact rows, unchanged official core13534 check, and accepted geometry Native02 4a172ac5.\n\nThe fresh ignored work directory is ordinary-geometry-native-build-01, with fresh D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-geometry-native-build-01/bin. A unique wrapper includes the genuine geometry02 recipe then relocates only the new target exe/map. It replaces the inherited CMAKE_PROJECT_INCLUDE and appends four GEOMETRY_LOADER variables, preserving every other76argv operand. Cache changes must be exactly these five keys; graph744 must contain all743 rows literally plus only geometry_loader_helper.cpp. Dry-run must be exactly one TU compile and one link at unchanged O0/assert/FP flags; no target object/exe may exist. The complete post-core link suffix, already containing exactly one bcrypt, must be byte-exact inherited dispatcher suffix. No duplicate token is added.\n\nCurrent Source3937 is checked independently. Prior dispatcher BUILD Source8aa/3929 and nested predecessor3928 aliases resolve only through exact archived snapshot members. Named historical canonical descriptors are never rebound to current Rust. Full prior dispatcher exe/map/object hashes are protected in addition to all inherited source/core and current Source guards. Official checker runs before and after configure; no scientific Source or options change. Related Rust proposal manifests are historical metadata only; Native own/header/Original/range/input bytes are frozen explicitly, never recursively followed into obsolete current aliases. Root must independently accept actual configure/dry results before any compile.\n')
+refs = [ref(OLD / 'manifest.json'), ref(BASE / 'ordinary-geometry-native-prep-02/manifest.json'), ref(BASE / 'native-dispatcher-build-01/configure-and-dry-review.json'), ref(BASE / 'native-dispatcher-build-01/frozen-build-inputs.json'), ref(BASE / 'native-dispatcher-build-01/configure-command/receipt.json'), ref(BASE / 'native-dispatcher-provider-review-01/linked-provider-and-PE-inventory.json'), ref(ROOT / 'tools/porting/record_command.py')]
+manifest = dict(schema='ordinary-geometry-configure-dry-Source-preparation.v1', status='HELD-Source-only-unexecuted', own_sources=[workflow, wrapper_ref, readme, ref(Path(__file__))], dependencies=refs, source_correspondence=[dict(before=archived, proposal=workflow, exact_diff=delta), dict(before=wrapper_before, proposal=wrapper_ref, exact_diff=wrapper_delta)], runtime_interfaces=dict(workflow=workflow, CLI=['--source-snapshot'], Source_snapshot_sha256='994b014957fb54b1c01608f5fc345f70bbac500be0f7b3b673c252f90bbbc7b7', compile_target='geometry_loader_helper', prior_compile_rows=743, current_compile_rows=744, expected_dry_steps=2, configure_argc=80), configuration_or_target_execution_performed=False, canonical_mutation_performed=False, numerical_values_read=False, gates_updated=False)
+print(json.dumps(write(NEW / 'manifest.json', (json.dumps(manifest, ensure_ascii=False, allow_nan=False, indent=2) + '\n').encode())))

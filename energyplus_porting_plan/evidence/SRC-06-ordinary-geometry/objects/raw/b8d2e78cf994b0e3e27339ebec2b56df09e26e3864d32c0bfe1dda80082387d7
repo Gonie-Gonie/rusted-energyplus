@@ -1,0 +1,160 @@
+"""Seal one public Original loader copier and input-only fixed A24 request; no imports/targets."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd()
+OUT = ROOT / '.runtime/porting/SRC-06/ordinary-geometry-native-prep-01'
+ORIGINAL = ROOT / '.reference/energyplus-src/26.1.0/src/EnergyPlus'
+
+
+def ref(path):
+    raw = path.read_bytes()
+    return dict(path=path.relative_to(ROOT).as_posix(), sha256=hashlib.sha256(raw).hexdigest(),
+                size_bytes=len(raw), line_count=len(raw.splitlines()))
+
+
+def write(path, raw):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    assert not path.exists(), path
+    path.write_bytes(raw)
+
+
+def metadata(path, value):
+    write(path, (json.dumps(value, ensure_ascii=False, allow_nan=False, indent=2) + '\n').encode())
+
+
+def copy(path, target):
+    write(target, path.read_bytes())
+    return dict(before=ref(path), proposal=ref(target), bytes_exact=True)
+
+
+def physical_range(path, first, last, purpose):
+    raw = path.read_bytes()
+    lines = raw.splitlines(keepends=True)
+    assert 1 <= first <= last <= len(lines)
+    selected = b''.join(lines[first - 1:last])
+    target = OUT / 'ranges' / (path.name + '.' + str(first) + '-' + str(last) + '.literal')
+    write(target, selected)
+    return dict(path=path.relative_to(ROOT).as_posix(), whole_Source=ref(path), start_line=first, end_line=last,
+                sha256=hashlib.sha256(selected).hexdigest(), size_bytes=len(selected), literal_archive=ref(target), purpose=purpose)
+
+
+def correspondence(before, after, before_label, after_label):
+    old = before.read_bytes() if before is not None else b''
+    new = after.read_bytes()
+    delta = ''.join(difflib.unified_diff(old.decode().splitlines(True), new.decode().splitlines(True),
+                                       fromfile=before_label, tofile=after_label)).encode()
+    target = OUT / 'diffs' / (after.name + '.diff')
+    write(target, delta)
+    return dict(before=ref(before) if before is not None else None, before_bytes_empty=before is None,
+                proposal=ref(after), exact_diff=ref(target), fromfile=before_label, tofile=after_label)
+
+
+assert not (OUT / 'manifest.json').exists()
+own_script = Path(__file__).resolve()
+ast.parse(own_script.read_bytes())
+rust = ROOT / '.runtime/porting/SRC-06/ordinary-geometry-owner-prep-01/manifest.json'
+assert ref(rust)['sha256'] == 'aa9c906ca88b51beb13947913a265ff6bec937309621a15bf2bbbac9c912a83c'
+rust_hold = json.loads(rust.read_bytes())
+protected = []
+for path in [ROOT / '.runtime/porting/SRC-06/tarp-dispatcher-rust-prep-02/manifest.json',
+             ROOT / '.runtime/porting/SRC-06/tarp-dispatcher-observer-prep-02/manifest.json']:
+    hold = json.loads(path.read_bytes())
+    for row in hold['application_sources']:
+        protected.append(row['proposal'])
+for row in protected:
+    observed = ref(ROOT / row['path'])
+    assert observed['sha256'] == row['sha256'] and observed['size_bytes'] == row['size_bytes']
+
+templates = {
+    'ctf01_reference_metadata.hh': ROOT / '.runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_metadata.hh',
+    'geo02_reference_fields.hh': ROOT / '.runtime/porting/GEO-02/independent-native-source-review-01/reviewed-source/geo02_reference_fields.hh',
+    'geo03_reference_fields.hh': ROOT / '.runtime/porting/GEO-03/original-helper-first-01/source/geo03_reference_fields.hh',
+}
+copies = [copy(source, OUT / name) for name, source in templates.items()]
+recipe_template = ROOT / '.runtime/porting/SRC-06/native-tarp-dispatcher-prep-02/tarp_dispatcher.cmake'
+recipe = recipe_template.read_bytes().decode().replace('SRC06_DISPATCHER', 'GEOMETRY_LOADER').replace('src06_dispatcher', 'geometry_loader')
+recipe = recipe.replace('SRC06 dispatcher', 'Geometry loader').replace('src06_tarp_dispatcher_helper', 'geometry_loader_helper').replace('tarp_dispatcher_helper.cpp', 'geometry_loader_helper.cpp')
+write(OUT / 'geometry_loader.cmake', recipe.encode())
+compiled = [ref(OUT / name) for name in ['geometry_loader_helper.cpp', 'geometry_loader_fields.hh',
+             'ctf01_reference_metadata.hh', 'geo02_reference_fields.hh', 'geo03_reference_fields.hh', 'geometry_loader.cmake']]
+upstream_path = ROOT / '.runtime/porting/CTF-10/production-frozen-packet-01/helper-request.json'
+assert ref(upstream_path)['sha256'] == '19bc203662dff7bf3611e45bf1bd002c1ce7df5d5225d19a7cd7a098efe08443'
+upstream = json.loads(upstream_path.read_bytes())
+case = next(row for row in upstream['model_cases'] if row['id'] == 'A-24H')
+assert case['input']['sha256'] == 'db66ac75d3ed26b6e7cd35c6f09b02a05110e800a16713eccee47e387d6c3755'
+request = dict(schema='ordinary-geometry-public-loader-request.v1', energyplus_commit=upstream['energyplus_commit'],
+    case=case, case_metadata=ref(ROOT / 'energyplus_porting_plan/cases/A-24H/metadata.json'),
+    fixed_scope=upstream['fixed_scope'], all_45_guard_refs=upstream['all_45_guard_refs'],
+    inherited_input_only_request=ref(upstream_path), loader_phase_order=upstream['loader_phase_order'],
+    native_source_files=compiled, expected_values_supplied=False, expected_exits_supplied=False,
+    Native_results_supplied=False, scientific_execution_performed=False)
+metadata(OUT / 'request.proposed.json', request)
+readme = '''This immutable Source-only proposal appends one public-API TU to unchanged Original energypluslib. Its exact input is existing A24 raw IDF, metadata, fixed scope and all45 inherited guards. Its13 public loader calls preserve the reviewed CTF10 sequence through actual returned GetBuildingData, whose unchanged Original body invokes GetShadowingInput, GetZoneData and SetupZoneGeometry. No construction/CTF initialization, heat-balance simulation, weather consumption, exogenous geometry seed or copied equation is invoked.
+
+The result copies complete actual allocated Zone/Space/Surface membership and IDs/names/associations. The selected return includes the real GEO03 ten fields and ordered spaces/faces; actual Perimeter/Width/Height; all six Zone bounds; exterior gross/net/window/multiplied/ground areas and space area owners. Geometry vector reads require actual vertex-processing and complete allocated vertex bounds; otherwise the row remains explicitly unavailable. Constructor/partial-loader phases copy only safe counters/allocation and real diagnostic/error/console/EIO prefixes. GetBuildingData and its inner routines are not separately instrumented; the available geometry witness is after the real outer return with ErrorsFound false, not an invented inner trace.
+
+The copied Geo02/Geo03 headers and CTF01 byte/IEEE primitives remain byte exact accepted Sources. Real callback order/count and all12 actual output sinks are retained without caps; optional SQLite presence is read from its actual owner and its contents remain unobserved. Authored I/O destinations are the only helper assignments outside original constructors and loader APIs. Source-produced timestep is compared to the unchanged inherited caller bits, never assigned. Genuine loader fatal/error prefixes and unavailable geometry survive the result. Exit0 is only complete observer integrity, even when a scientific loader prerequisite is unavailable; no numerical or setup success is manufactured.
+
+The request is input only and remains distinct from an actual recorded freeze. Prospective CLI is `geometry_loader_helper.exe REPOSITORY_ROOT REQUEST_PATH FRESH_REPOSITORY_SRC06_OUTPUT`. Root must authenticate the helper binary, request and all source/build inputs before/after through record_command and a fresh current Rust Source snapshot, after both full Source reviews and bounded card contract. The authoritative result is the full geometry-loader-results.json plus raw stdio and full13 output text files. The helper restores cout on scope exit; no result stdout is required. Source-only preparation performs no configure/build/helper execution or event/result read.
+
+The28-line recipe appends exactly this one helper target while including the genuine current inherited recipe and matching energypluslib definitions/includes/options/ABI. Actual configure/dry must preserve every inherited graph row and require precisely one helper compile plus link, opt0/j1, unchanged official Original13534 blobs/core. Actual link map/provider/PE/DLL/addr2line proofs must resolve GetBuildingData, SetupZoneGeometry, GetVertices, ProcessSurfaceVertices and CalculateZoneVolume to Original Source before capture. Output executable/map may use a separately reviewed output wrapper on D; no copy/delete of protected core is prescribed.
+
+This fixed A24 capture cannot prove nonrectangular/near-edge or empty-first-space branches. Source default empty Space range is0/-1 and emits a warning; a0/0 range would access invalid EPVector member0 and is not admitted as equivalent. Those prospective input-only unit variants need genuine separate raw-input admission/capture before their Rust pairing. Raw parsed family counts, actual transform flags and actual class/vertex owners establish the later bounded A join; typed model absence alone is not Raw input evidence. Full SetupZoneGeometry side effects, internal branch traces, runtime dispatcher/cadence and all card gates remain unfinished/unpaired.
+'''
+write(OUT / 'README.md', readme.encode())
+old_helper = ROOT / '.runtime/porting/CTF-10/native-init-postlude-prep-06/ctf10_production_helper.cpp'
+copy(old_helper, OUT / 'before' / old_helper.name)
+copy(recipe_template, OUT / 'before' / recipe_template.name)
+deltas = [correspondence(OUT / 'before' / old_helper.name, OUT / 'geometry_loader_helper.cpp', 'accepted-CTF10-loader.cpp', 'geometry_loader_helper.cpp'),
+          correspondence(None, OUT / 'geometry_loader_fields.hh', '/dev/null', 'geometry_loader_fields.hh'),
+          correspondence(OUT / 'before' / recipe_template.name, OUT / 'geometry_loader.cmake', 'accepted-dispatcher.cmake', 'geometry_loader.cmake')]
+for row in copies:
+    deltas.append(correspondence(ROOT / row['before']['path'], ROOT / row['proposal']['path'], row['before']['path'], row['proposal']['path']))
+ranges = [physical_range(ORIGINAL / filename, first, last, purpose) for filename, first, last, purpose in [
+    ('HeatBalanceManager.cc', 1800, 1820, 'genuine GetBuildingData public return and unchanged direct loader calls'),
+    ('SurfaceGeometry.cc', 251, 317, 'real setup prerequisite/GetSurfaceData/error early-return and no manual geometry setup'),
+    ('SurfaceGeometry.cc', 337, 425, 'real ProcessSurfaceVertices and exterior area reset/addition'),
+    ('SurfaceGeometry.cc', 550, 605, 'complete bound initialization/traversal and actual source checks'),
+    ('SurfaceGeometry.cc', 3005, 3077, 'real empty-Space warning and actual retained pointer/ordered membership producer'),
+    ('SurfaceGeometry.cc', 9108, 9167, 'real cyclic perimeter and coincident-disposal threshold helper'),
+    ('SurfaceGeometry.cc', 9316, 9389, 'GetVertices real perimeter/disposal/error/geometry storage'),
+    ('SurfaceGeometry.cc', 12917, 12983, 'actual base Width/Height and selected polygon branch'),
+    ('SurfaceGeometry.cc', 12005, 12275, 'actual CalculateZoneVolume result producer and real space fractions'),
+    ('DataHeatBalance.hh', 434, 501, 'real ZoneSpace/Space constructor owners, empty ranges and ordered IDs'),
+    ('DataHeatBalance.hh', 571, 632, 'real Zone return/bounds/extarea members and defaults'),
+    ('DataSurfaces.hh', 691, 752, 'real geometry member types/vertices/readability flags'),
+    ('DataSurfaces.hh', 831, 848, 'actual Surface constructor initialized owners; no allocated-vertex assumption'),
+    ('EPVector.hh', 60, 154, 'actual allocation and one-based parenthesis indexing; no0 member'),
+    ('InputProcessing/InputProcessor.hh', 310, 319, 'actual public processInput epJSON output copied without extra getter'),
+    ('DataErrorTracking.hh', 203, 245, 'real retained error counters/LastSevereError and defaults'),
+    ('IOFiles.cc', 247, 267, 'real stringstream sink and nondraining get_output'),
+    ('UtilityRoutines.cc', 1381, 1423, 'real header/error output and optional sinks'),
+    ('SQLiteProcedures.hh', 1018, 1033, 'actual optional SQLite owner declaration')]]
+# The exact end of the final owner range is checked, not guessed silently.
+whole = {}
+for row in ranges: whole[row['whole_Source']['path']] = row['whole_Source']
+for row in protected:
+    observed = ref(ROOT / row['path']); assert observed['sha256'] == row['sha256'] and observed['size_bytes'] == row['size_bytes']
+manifest = dict(schema='ordinary-geometry-public-loader-Source-preparation.v1', status='HELD_SOURCE_ONLY',
+    Original_version='26.1.0', Original_commit=upstream['energyplus_commit'], own_sources=compiled,
+    authoring_source=ref(own_script), README=ref(OUT / 'README.md'), prospective_request=ref(OUT / 'request.proposed.json'),
+    exact_copied_source_parents=copies, authentic_loader_parent=ref(old_helper), authentic_recipe_parent=ref(recipe_template),
+    source_correspondence=deltas, Source_ranges=ranges, whole_Original_sources=list(whole.values()),
+    related_held_Rust_proposal=ref(rust), protected_dispatcher_eight_proposals=protected,
+    protected_dispatcher_eight_proposal_bytes_unchanged=True,
+    runtime_interfaces=dict(target='geometry_loader_helper', compiled_TU_count=1, helper_argc=4,
+        argv=['geometry_loader_helper.exe','repository-root','request-path','fresh-contained-SRC06-output'],
+        result_schema='ordinary-geometry-public-loader-results.v1', authoritative_result_filename='geometry-loader-results.json',
+        CMake_Source_directory_variable='GEOMETRY_LOADER_SOURCE_DIR', inherited_recipe_variable='GEOMETRY_LOADER_INHERITED_RECIPE',
+        required_current_Source_snapshot='explicit actual Root runtime operand, not predicted historical Rust hash',
+        required_Original_provider_APIs=['HeatBalanceManager::GetBuildingData','SurfaceGeometry::SetupZoneGeometry','SurfaceGeometry::GetVertices','SurfaceGeometry::ProcessSurfaceVertices','SurfaceGeometry::CalculateZoneVolume'],
+        full_output_caps=None, internal_call_trace_available=False, binary_build_or_execution_authorized_by_this_manifest=False),
+    source_only=True, actual_input_freeze_or_capture_created=False, expected_values_supplied=False,
+    Native_or_Rust_result_values_read_during_authorship=False, target_or_build_or_configuration_performed=False,
+    canonical_or_Git_mutation_performed=False, numerical_PASS_claimed=False, whole_geometry_or_ordinary_PASS_claimed=False, gates_updated=False)
+metadata(OUT / 'manifest.json', manifest)
+print(json.dumps(ref(OUT / 'manifest.json')))

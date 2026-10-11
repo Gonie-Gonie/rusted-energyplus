@@ -1,0 +1,33 @@
+    Ok(model)
+}
+
+/// Parses converted epJSON and overlays configured declaration order from staged IDF text.
+pub fn parse_epjson_str_with_idf_order(epjson: &str, idf: &str) -> Result<RawModel, EpJsonError> {
+    let mut model = parse_epjson_str(epjson)?;
+    apply_idf_declaration_order(&mut model, idf, IDF_ORDER_TARGETS)?;
+    Ok(model)
+}
+
+fn raw_value_from_json(value: &serde_json::Value) -> RawValue {
+    match value {
+        serde_json::Value::Null => RawValue::Null,
+        serde_json::Value::Bool(value) => RawValue::Bool(*value),
+        serde_json::Value::Number(value) => RawValue::Number(value.to_string()),
+        serde_json::Value::String(value) => RawValue::String(value.clone()),
+        serde_json::Value::Array(values) => {
+            RawValue::Array(values.iter().map(raw_value_from_json).collect())
+        }
+        serde_json::Value::Object(values) => RawValue::Object(
+            values
+                .iter()
+                .map(|(field_name, value)| {
+                    (FieldName(field_name.clone()), raw_value_from_json(value))
+                })
+                .collect(),
+        ),
+    }
+}
+
+fn extract_version(model: &RawModel) -> Option<String> {
+    let version_objects = model.objects.get(&ObjectType("Version".to_string()))?;
+    for object in version_objects.values() {

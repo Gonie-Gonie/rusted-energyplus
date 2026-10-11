@@ -1,0 +1,5 @@
+        : BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"}),
+          SubSurfCls(6, {"WINDOW", "DOOR", "GLASSDOOR", "SHADING", "TUBULARDAYLIGHTDOME", "TUBULARDAYLIGHTDIFFUSER"}),
+          BaseSurfIDs(3, {DataSurfaces::SurfaceClass::Wall, DataSurfaces::SurfaceClass::Floor, DataSurfaces::SurfaceClass::Roof}),
+          SubSurfIDs(6,
+                     {DataSurfaces::SurfaceClass::Window,

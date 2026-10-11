@@ -1,0 +1,18 @@
+
+        auto &surfExtConv = state.dataSurface->surfExtConv(surfNum);
+        if ((surf.Tilt >= 45.0) && (surf.Tilt < 135.0)) { // treat as vertical wall
+            DataSurfaces::Compass8 compass8 = AzimuthToCompass8(surf.Azimuth);
+            auto const &facade = geoSummaryFacades[(int)compass8];
+
+            surfExtConv.faceArea = max(facade.Area, surf.GrossArea);
+            surfExtConv.facePerimeter = max(facade.Perimeter, surf.Perimeter);
+            surfExtConv.faceHeight = max(facade.Height, z_del);
+        } else if (surf.Tilt < 45.0) { // assume part of roof
+            surfExtConv.faceArea = max(geoSummaryRoof.Area, surf.GrossArea);
+            surfExtConv.facePerimeter = max(geoSummaryRoof.Perimeter, surf.Perimeter);
+            surfExtConv.faceHeight = max(geoSummaryRoof.Height, z_del);
+        } else if (surf.Tilt >= 135.0) { // assume floor over exterior, just use surface's geometry
+            surfExtConv.faceArea = surf.GrossArea;
+            surfExtConv.facePerimeter = surf.Perimeter;
+            surfExtConv.faceHeight = z_del;
+        }

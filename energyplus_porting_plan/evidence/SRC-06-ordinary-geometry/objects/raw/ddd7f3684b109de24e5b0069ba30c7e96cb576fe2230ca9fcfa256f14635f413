@@ -1,0 +1,15 @@
+        // Calculated after input
+        Real64 geometricFloorArea = 0.0;   // Calculated floor area including air boundary surfaces
+        Real64 CeilingArea = 0.0;          // Ceiling area excluding air boundary surfaces
+        Real64 geometricCeilingArea = 0.0; // Ceiling area area including air boundary surfaces
+        bool ceilingHeightEntered = false; // True is user input ceiling height
+        bool HasFloor = false;             // Has "Floor" surface
+        bool HasRoof = false;              // Has "Roof" or "Ceiling" Surface
+        bool HasWindow = false;            // Window(s) present in this zone
+        Real64 AirCapacity = 0.0;
+        Real64 ExtWindowArea = 0.0;               // Exterior Window Area for Zone
+        Real64 ExtWindowArea_Multiplied = 0.0;    // Exterior Window Area for Zone with multipliers
+        Real64 ExtGrossWallArea_Multiplied = 0.0; // Exterior Wall Area for Zone (Gross) with multipliers
+        Real64 ExtNetWallArea = 0.0;              // Exterior Wall Area for Zone (Net)
+        Real64 TotalSurfArea = 0.0;               // Total surface area for Zone
+        // (ignoring windows as they will be included in their base surfaces)

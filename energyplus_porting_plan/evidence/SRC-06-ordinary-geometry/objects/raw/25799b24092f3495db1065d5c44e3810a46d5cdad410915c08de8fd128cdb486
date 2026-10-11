@@ -1,0 +1,216 @@
+"""Root-only geometry additive configure and dry-run; never compile or execute the helper."""
+import argparse
+import difflib
+import hashlib
+import json
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[4]
+HERE = Path(__file__).resolve().parent
+RAW = ROOT / '.runtime/porting/SRC-06/ordinary-geometry-native-build-02'
+BUILD = ROOT / '.runtime/ep261-gcc13-o0'
+CODE = ROOT / '.runtime/porting/SRC-06/ordinary-geometry-native-prep-03'
+PREP = CODE / 'manifest.json'
+PRIOR = ROOT / '.runtime/porting/SRC-06/native-dispatcher-build-01'
+OUTPUT = Path('D:/CodexBuild/rusted-energyplus/SRC-06/ordinary-geometry-native-build-02/bin')
+RECORDER = ROOT / 'tools/porting/record_command.py'
+PINS = {}
+PROTECTED_EXTERNAL = {Path('D:/CodexBuild/rusted-energyplus/SRC-06/native-dispatcher-build-01/bin/' + name).resolve() for name in ['src06_tarp_dispatcher_helper.exe', 'src06_tarp_dispatcher_helper.map']}
+
+
+def full(path):
+    with path.open('rb') as stream:
+        sha = hashlib.file_digest(stream, 'sha256').hexdigest()
+    return dict(path=path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else str(path), sha256=sha, size_bytes=path.stat().st_size)
+
+
+def checked(row):
+    path = (ROOT / row['path']).resolve()
+    assert (path.is_relative_to(ROOT) or path in PROTECTED_EXTERNAL) and path.is_file()
+    actual = full(path)
+    assert actual['sha256'] == row['sha256']
+    assert all(key not in row or actual['size_bytes'] == row[key] for key in ('size_bytes', 'bytes'))
+    PINS[path] = actual
+    return path
+
+
+def load(row):
+    return json.loads(checked(row).read_bytes())
+
+
+def collect(value):
+    if isinstance(value, dict):
+        if 'path' in value and 'sha256' in value:
+            checked(value)
+        for child in value.values():
+            collect(child)
+    elif isinstance(value, list):
+        for child in value:
+            collect(child)
+
+
+def historical_configure(frozen):
+    # These aliases belong to the actual inherited BUILD Source, not current Rust.
+    snapshot = load(frozen['Source_snapshot'])
+    assert snapshot['schema'] == 'rust-command-source-snapshot.v1' and snapshot['bytes_normalized'] is False
+    rows = {r['historical_path']: r for r in snapshot['files']}
+    assert len(rows) == len(snapshot['files']) == 3929
+    aliases = []
+    for row in frozen['frozen_Source_and_input']:
+        if row['path'] in rows:
+            archived = rows[row['path']]
+            assert row['sha256'] == archived['archive']['sha256'] and row['size_bytes'] == archived['size_bytes']
+            checked(archived['archive'])
+            aliases.append(dict(historical=row, actual_archive=archived['archive']))
+        else:
+            checked(row)
+    assert len(aliases) == len(rows) and {r['historical']['path'] for r in aliases} == set(rows)
+    for alias in frozen['inherited_historical_BUILD_Source_aliases']:
+        checked(alias['actual_archive'])
+        assert alias['historical']['sha256'] == alias['actual_archive']['sha256'] and alias['historical']['size_bytes'] == full(checked(alias['actual_archive']))['size_bytes']
+    collect({k: v for k, v in frozen.items() if k not in ['frozen_Source_and_input', 'inherited_historical_BUILD_Source_aliases']})
+    return aliases
+
+
+def dump(path, value):
+    with path.open('xb') as stream:
+        stream.write((json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode())
+
+
+def source_current(snapshot):
+    value = load(snapshot)
+    assert value['schema'] == 'rust-command-source-snapshot.v1' and value['bytes_normalized'] is False
+    rows = {r['historical_path']: r for r in value['files']}
+    paths = set((ROOT / 'crates').rglob('*.rs')) | set((ROOT / 'crates').rglob('Cargo.toml'))
+    paths |= {ROOT / n for n in ('Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', '.cargo/config.toml') if (ROOT / n).is_file()}
+    assert len(rows) == len(value['files']) and {p.relative_to(ROOT).as_posix() for p in paths} == set(rows)
+    for name, row in rows.items():
+        checked(row['archive'])
+        checked(dict(path=name, sha256=row['archive']['sha256'], size_bytes=row['size_bytes']))
+
+
+def recorded(command, role, snapshot):
+    directory = RAW / role
+    code = subprocess.run([sys.executable, '-X', 'utf8', '-B', str(RECORDER), '--output-dir', directory.relative_to(ROOT).as_posix(), '--', *command], cwd=ROOT).returncode
+    row = full(directory / 'receipt.json'); value = load(row)
+    assert value['command'] == command and value['exit_code'] == code == 0 and value['launch_error'] is None
+    assert value['source_snapshot'] == snapshot and value['source_bytes_match_before_and_after'] is True
+    checked(value['stdout']); checked(value['stderr'])
+    assert checked(value['executed_launcher']['archive']).read_bytes() == RECORDER.read_bytes()
+    return row, value
+
+
+def cache(path):
+    return dict(line.split('=', 1) for line in path.read_text(encoding='utf-8').splitlines() if line and not line.startswith(('#', '//')) and '=' in line)
+
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--source-snapshot', required=True)
+args = parser.parse_args()
+name, digest = args.source_snapshot.rsplit('#', 1)
+source_path = checked(dict(path=name, sha256=digest))
+snapshot = {key: full(source_path)[key] for key in ('path', 'sha256')}
+assert snapshot['sha256'] == '4c02bed5f820021e42058ebe2f9ea8ccc7026cc121aa7f3e99dea3f224851dce'
+source_current(snapshot)
+assert full(PREP)['sha256'] == '72f75c5242e2df7457fb9fc065b2cc1fc5922f6bb9673e6b785e145bb54f47a1'
+prep = load(full(PREP))
+assert prep['schema'] == 'ordinary-geometry-public-loader-Source-preparation.v1' and prep['runtime_interfaces']['compiled_TU_count'] == 1
+assert prep['own_sources'][0]['path'].endswith('/geometry_loader_helper.cpp') and prep['own_sources'][0]['line_count'] == 200
+for key in ['own_sources', 'authoring_source', 'README', 'prospective_request', 'exact_copied_source_parents', 'authentic_loader_parent', 'authentic_recipe_parent', 'source_correspondence', 'whole_Original_sources', 'protected_dispatcher_eight_proposals', 'previous_preparation', 'authentic_before_manifest', 'incremental_correspondence', 'prior_authoring_source', 'genuine_qualified_Vector_precedent', 'retained_failed_compile_execution', 'retained_failed_compile_logs']:
+    collect(prep[key])
+for row in prep['Source_ranges']:
+    raw = checked(row['whole_Source']).read_bytes().splitlines(keepends=True)
+    selected = b''.join(raw[row['start_line'] - 1:row['end_line']])
+    assert len(selected) == row['size_bytes'] and hashlib.sha256(selected).hexdigest() == row['sha256'] and checked(row['literal_archive']).read_bytes() == selected
+assert full(RECORDER)['sha256'] == '5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba'
+checked(full(RECORDER)); checked(full(Path(__file__).resolve())); checked(full(HERE / 'additive-reference.cmake'))
+previous_ref = dict(path=(PRIOR / 'configure-command/receipt.json').relative_to(ROOT).as_posix(), sha256='b3f2f7c26a52ac7d5b17662adcf5063133ca3ac761b16b544603ffca180408dd')
+previous = load(previous_ref)
+assert previous['exit_code'] == 0 and previous['source_bytes_match_before_and_after'] is True
+review_ref = dict(path=(PRIOR / 'configure-and-dry-review.json').relative_to(ROOT).as_posix(), sha256='d0ee2ec26aed08c39efb8c2079b1384910a9337a7c26b2cf6c3f19320c4ee551')
+review = load(review_ref); collect(review); collect(previous)
+assert review['configure_execution']['sha256'] == previous_ref['sha256'] and review['exact_previous_rows_preserved'] is True
+prior_frozen = load(review['frozen_build_inputs']); historical_aliases = historical_configure(prior_frozen)
+assert prior_frozen['actual_configure_command'] == previous['command']
+inherited = checked(dict(path=(PRIOR / 'additive-reference.cmake').relative_to(ROOT).as_posix(), sha256='c3b3da21445f8fa0d25a11cd74f863a65e34dc585ea6f07cfa042faad2f437bb'))
+assert full(BUILD / 'CMakeCache.txt')['sha256'] == review['actual_cache_after']['sha256'] == 'ff0f7a23cb3dadc09599fdba3b89d3976640db42733017384d8bc7914838a986'
+assert full(BUILD / 'compile_commands.json')['sha256'] == review['actual_graph_after']['sha256'] == '273a71380a031cadc5b2936f9f6e4310d62caacf01c820642175b3eb31d3377a'
+core_ref = dict(path='.runtime/porting/reference-energyplus-26.1.0/native-core-build.json', sha256='68682bdaaf61e5381084a5d138d07f511e2f431082f1426230be0d3231f9193b')
+core = load(core_ref); collect(core)
+assert core['checks_passed'] is True and core['scientific_source_patches'] is False
+checker = ROOT / 'tools/porting/build_original_reference.py'
+checked(full(checker)); checked(full(ROOT / 'tools/porting/setup_reference_tools.py')); checked(full(ROOT / 'tools/porting/reference_tools.json'))
+provider_ref = dict(path='.runtime/porting/SRC-06/native-dispatcher-provider-review-01/linked-provider-and-PE-inventory.json', sha256='225baaf1541e54036c6277b0302891e18c0fb0ddb53e7ab4a8548f95f180ba63')
+provider = load(provider_ref)
+for key in ['actual_Native_binary', 'actual_full_link_map', 'actual_helper_object']: checked(provider[key])
+# The failed geometry744 graph is retained as history; actual restored743 is the live parent.
+restoration_ref = dict(path='.runtime/porting/SRC-06/dispatcher-build-metadata-restore-01/record.json', sha256='15156d442e24f5ee4a2d60d4f861758ae2492364f0ae812657faa584cdfcee82')
+restoration = load(restoration_ref)
+assert restoration['schema'] == 'src06-dispatcher-generated-build-metadata-restoration.v1' and restoration['restored_files'] == 3
+assert restoration['geometry744_graph_retained_as_actual_history'] is True and all(restoration[k] is False for k in ['Original_scientific_Source_or_binary_changed', 'Rust_Source_changed', 'policy_changed', 'gates_updated'])
+assert [Path(row['expected']['path']).name for row in restoration['files']] == ['CMakeCache.txt', 'compile_commands.json', 'build.ninja']
+for row in restoration['files']:
+    checked(row['actual_before_archive']); archive = checked(row['restore_to_archive'])
+    expected = row['expected']; actual = full(BUILD / Path(expected['path']).name)
+    assert actual == row['actual_after'] == expected and actual['sha256'] == full(archive)['sha256'] and actual['size_bytes'] == full(archive)['size_bytes']
+failed_geometry = load(restoration['geometry_failed_compile_receipt'])
+assert failed_geometry['schema'] == 'recorded-porting-command.v1' and failed_geometry['exit_code'] == 1 and failed_geometry['finished_utc'] is not None and failed_geometry['launch_error'] is None and failed_geometry['source_bytes_match_before_and_after'] is True
+assert failed_geometry['source_snapshot'] == snapshot
+checked(failed_geometry['stdout']); checked(failed_geometry['stderr']); checked(failed_geometry['executed_launcher']['archive'])
+failed_configure_review = load(restoration['geometry_configure_review'])
+assert failed_configure_review['previous_compile_rows'] == 743 and failed_configure_review['current_compile_rows'] == 744 and failed_configure_review['exact_previous_rows_preserved'] is True
+for key in ['actual_cache_before', 'actual_cache_after', 'actual_graph_before', 'actual_graph_after']: checked(failed_configure_review[key])
+assert not RAW.exists() and not OUTPUT.exists()
+RAW.mkdir(); OUTPUT.mkdir(parents=True)
+core_before, core_value = recorded([sys.executable, '-X', 'utf8', '-B', 'tools/porting/build_original_reference.py', '--check'], 'core-before-command', snapshot)
+assert b'13534 byte-identical official blobs' in checked(core_value['stdout']).read_bytes()
+wrapper = RAW / 'additive-reference.cmake'; wrapper.write_bytes(checked(full(HERE / 'additive-reference.cmake')).read_bytes()); checked(full(wrapper))
+for item in ('CMakeCache.txt', 'compile_commands.json', 'build.ninja'):
+    shutil.copyfile(BUILD / item, RAW / (item + '.before'))
+before_graph = json.loads((RAW / 'compile_commands.json.before').read_bytes())
+assert len(before_graph) == 743 and review['current_compile_rows'] == 743
+old_command = previous['command']; assert len(old_command) == 76
+command = [('-DCMAKE_PROJECT_INCLUDE=' + str(wrapper)) if v.startswith('-DCMAKE_PROJECT_INCLUDE=') else v for v in old_command]
+assert sum(a != b for a, b in zip(command, old_command)) == 1
+command += ['-DGEOMETRY_LOADER_V3_SOURCE_DIR=' + str(CODE), '-DGEOMETRY_LOADER_V3_INHERITED_RECIPE=' + str(inherited), '-DGEOMETRY_LOADER_V3_REFERENCE_RECIPE=' + str(CODE / 'geometry_loader.cmake'), '-DGEOMETRY_LOADER_V3_OUTPUT_DIR=' + str(OUTPUT)]
+assert '-DCMAKE_CXX_FLAGS_RELWITHDEBINFO=-O0 -g -DNDEBUG' in command and '-DCMAKE_CXX_FLAGS=-Wa,-mbig-obj -ffp-contract=off' in command
+dump(RAW / 'frozen-build-inputs.json', dict(schema='ordinary-geometry-frozen-configure-inputs.v1', reviewed_Source_preparation=full(PREP), frozen_Source_and_input=list(PINS.values()), Source_snapshot=snapshot, original_core_receipt=core_ref, actual_core_before=core_before, inherited_configure_review=review_ref, inherited_frozen_build_inputs=review['frozen_build_inputs'], inherited_historical_BUILD_Source_aliases=historical_aliases, generated_BUILD_metadata_restoration=restoration_ref, retained_failed_geometry_configure_review=restoration['geometry_configure_review'], retained_failed_geometry_compile_execution=restoration['geometry_failed_compile_receipt'], prior_nested_historical_BUILD_Source_aliases=prior_frozen['inherited_historical_BUILD_Source_aliases'], protected_previous_target_outputs={k: provider[k] for k in ['actual_Native_binary', 'actual_full_link_map', 'actual_helper_object']}, previous_actual_configure=previous_ref, previous_configure_command=old_command, actual_configure_command=command, inherited_actual_wrapper=full(inherited), actual_additive_wrapper=full(wrapper), actual_cache_before=full(RAW / 'CMakeCache.txt.before'), actual_graph_before=full(RAW / 'compile_commands.json.before'), actual_build_ninja_before=full(RAW / 'build.ninja.before'), actual_output_directory=str(OUTPUT), compile_performed=False, helper_executed=False, gates_updated=False))
+configure_ref, _ = recorded(command, 'configure-command', snapshot)
+for item in ('CMakeCache.txt', 'compile_commands.json', 'build.ninja'):
+    shutil.copyfile(BUILD / item, RAW / (item + '.after'))
+after_graph = json.loads((RAW / 'compile_commands.json.after').read_bytes())
+new = [row for row in after_graph if Path(row['file']).resolve() == (CODE / 'geometry_loader_helper.cpp').resolve()]
+assert len(new) == 1 and len(after_graph) == 744 and [r for r in after_graph if r not in new] == before_graph
+assert '-O0 ' in new[0]['command'] and '-ffp-contract=off' in new[0]['command'] and '-Werror ' in new[0]['command'] and '-UNDEBUG ' in new[0]['command']
+new_object = Path(new[0]['output'])
+if not new_object.is_absolute(): new_object = Path(new[0]['directory']) / new_object
+assert not new_object.exists() and not (OUTPUT / 'geometry_loader_helper_v3.exe').exists()
+old_cache, new_cache = cache(RAW / 'CMakeCache.txt.before'), cache(RAW / 'CMakeCache.txt.after')
+changes = {k: [old_cache.get(k), new_cache.get(k)] for k in old_cache.keys() | new_cache.keys() if old_cache.get(k) != new_cache.get(k)}
+assert set(changes) == {'CMAKE_PROJECT_INCLUDE:UNINITIALIZED'} | {'GEOMETRY_LOADER_V3_' + k + ':UNINITIALIZED' for k in ('SOURCE_DIR', 'INHERITED_RECIPE', 'REFERENCE_RECIPE', 'OUTPUT_DIR')}
+ninja = next(v.split('=', 1)[1] for v in command if v.startswith('-DCMAKE_MAKE_PROGRAM='))
+dry_command = [ninja, '-C', str(BUILD), '-n', '-j1', '-v', 'geometry_loader_helper_v3']
+dry_ref, dry = recorded(dry_command, 'dry-verbose-command', snapshot)
+steps = [line for line in checked(dry['stdout']).read_text(encoding='utf-8').splitlines() if re.match(r'^\[\d+/\d+\]', line)]
+assert len(steps) == 2 and steps[0].startswith('[1/2] ') and steps[1].startswith('[2/2] ')
+assert '-c ' in steps[0] and 'geometry_loader_helper.cpp' in steps[0] and '-O0 ' in steps[0]
+assert 'geometry_loader_helper_v3.exe' in steps[1] and 'geometry_loader_helper_v3.map' in steps[1]
+link_suffix = steps[1].split('Products/libenergypluslib.a', 1)[1]
+prior_link_suffix = review['dry_steps'][1].split('Products/libenergypluslib.a', 1)[1]
+assert link_suffix.split().count('-lbcrypt') == 1
+assert prior_link_suffix.split().count('-lbcrypt') == 1 and link_suffix == prior_link_suffix
+core_after, core_value = recorded([sys.executable, '-X', 'utf8', '-B', 'tools/porting/build_original_reference.py', '--check'], 'core-after-command', snapshot)
+assert b'13534 byte-identical official blobs' in checked(core_value['stdout']).read_bytes()
+source_current(snapshot)
+assert all(full(path) == row for path, row in PINS.items())
+assert not new_object.exists() and not (OUTPUT / 'geometry_loader_helper_v3.exe').exists()
+for item in ('CMakeCache.txt', 'compile_commands.json', 'build.ninja'):
+    assert full(BUILD / item)['sha256'] == full(RAW / (item + '.after'))['sha256']
+delta = RAW / 'CMakeCache.diff'
+delta.write_bytes(''.join(difflib.unified_diff((RAW / 'CMakeCache.txt.before').read_text().splitlines(True), (RAW / 'CMakeCache.txt.after').read_text().splitlines(True), fromfile='CMakeCache.txt.before', tofile='CMakeCache.txt.after')).encode())
+dump(RAW / 'configure-and-dry-review.json', dict(schema='ordinary-geometry-configure-dry-review.v1', frozen_build_inputs=full(RAW / 'frozen-build-inputs.json'), configure_execution=configure_ref, dry_execution=dry_ref, actual_core_before=core_before, actual_core_after=core_after, actual_graph_before=full(RAW / 'compile_commands.json.before'), actual_graph_after=full(RAW / 'compile_commands.json.after'), actual_cache_before=full(RAW / 'CMakeCache.txt.before'), actual_cache_after=full(RAW / 'CMakeCache.txt.after'), actual_cache_diff=full(delta), cache_changes=changes, previous_compile_rows=743, current_compile_rows=744, exact_previous_rows_preserved=True, new_compile_row=new[0], dry_steps=steps, declared_SHA_transport_link_token='-lbcrypt', declared_SHA_transport_immediately_after_core=True, exact_prior_core_link_suffix_preserved_without_additional_SHA_transport=True, prospective_compile_command=[ninja, '-C', str(BUILD), '-j1', '-v', 'geometry_loader_helper_v3'], compile_performed=False, helper_executed=False, gates_updated=False))
+print(json.dumps(dict(review=full(RAW / 'configure-and-dry-review.json'), compile_performed=False, helper_executed=False)))
