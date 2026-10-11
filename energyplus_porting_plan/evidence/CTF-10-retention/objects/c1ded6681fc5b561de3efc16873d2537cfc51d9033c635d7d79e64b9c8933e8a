@@ -1,0 +1,52 @@
+{
+  "schema": "ctf10-retirement-source-draft-inventory.v1",
+  "status": "pending-actual-CTF10-evidence-not-executable-ready",
+  "accepted_predecessor": {
+    "path": ".runtime/porting/CTF-09/retirement-plan-prep-02/manifest.json",
+    "sha256": "afacc1bc268d0332ca6b7daa155604d0cb5377f69c9394de5f25cb1cb19f8066",
+    "size_bytes": 21455,
+    "before_copy": ".runtime/porting/CTF-10/retirement-plan-prep-01/before-CTF09/manifest.json"
+  },
+  "before_sources": [
+    {
+      "path": ".runtime/porting/CTF-09/retirement-plan-prep-02/common.py",
+      "sha256": "0952bbe0d8e737cae41d4e33a9d6673d428457a207e3fedf2fe7bd2aaefc2f78",
+      "size_bytes": 9809,
+      "before_copy": ".runtime/porting/CTF-10/retirement-plan-prep-01/before-CTF09/common.py"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retirement-plan-prep-02/proofs.py",
+      "sha256": "f45c526b8834cf6a9a60f1e3e7e07f0b8ed438024fc1783fcadc30f1252cb560",
+      "size_bytes": 26050,
+      "before_copy": ".runtime/porting/CTF-10/retirement-plan-prep-01/before-CTF09/proofs.py"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retirement-plan-prep-02/write_plan.py",
+      "sha256": "70eb5ac4d4bf12a70556c4b0f6fbcd61aa5b463d9912f443363ae944d4c9cbbc",
+      "size_bytes": 5452,
+      "before_copy": ".runtime/porting/CTF-10/retirement-plan-prep-01/before-CTF09/write_plan.py"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retirement-plan-prep-02/retire.py",
+      "sha256": "1d7ca595fe058541d274b8349d6e0646309a82f68089eaba8f64140b17b8034c",
+      "size_bytes": 11471,
+      "before_copy": ".runtime/porting/CTF-10/retirement-plan-prep-01/before-CTF09/retire.py"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retirement-plan-prep-02/README.md",
+      "sha256": "410c64fcbc0ca004214c4ea97355e68e158ca57075ba2e36ce498ccc021ed69e",
+      "size_bytes": 11457,
+      "before_copy": ".runtime/porting/CTF-10/retirement-plan-prep-01/before-CTF09/README.md"
+    },
+    {
+      "path": ".runtime/porting/CTF-09/retirement-plan-prep-02/manifest.json",
+      "sha256": "afacc1bc268d0332ca6b7daa155604d0cb5377f69c9394de5f25cb1cb19f8066",
+      "size_bytes": 21455,
+      "before_copy": ".runtime/porting/CTF-10/retirement-plan-prep-01/before-CTF09/manifest.json"
+    }
+  ],
+  "future_runtime_identities_supplied": false,
+  "guessed_future_hashes_or_results": false,
+  "plan_or_deletion_performed": false,
+  "held_executable_source_package": false
+}

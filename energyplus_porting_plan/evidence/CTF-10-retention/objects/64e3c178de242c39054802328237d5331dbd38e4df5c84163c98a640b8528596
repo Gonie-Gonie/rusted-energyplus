@@ -1,0 +1,14 @@
+$ErrorActionPreference = 'Stop'
+$workspacePath = (Get-Location).Path
+if ($workspacePath -ne 'C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus') { throw 'Exact repository cwd required' }
+$productsPath = (Resolve-Path -LiteralPath 'C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\ep261-gcc13-o0\Products').Path
+$productsItem = Get-Item -LiteralPath $productsPath
+if ($productsPath -ne 'C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\ep261-gcc13-o0\Products' -or ($productsItem.Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw 'Exact non-reparse Products directory required' }
+$targetPath = (Resolve-Path -LiteralPath 'C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\ep261-gcc13-o0\Products\ctf10_production_helper.exe').Path
+$targetItem = Get-Item -LiteralPath $targetPath
+if ($targetItem.PSIsContainer -or ($targetItem.Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw 'Regular non-reparse file required' }
+if ([IO.Path]::GetDirectoryName($targetPath) -ne $productsPath -or $targetItem.Name -ne 'ctf10_production_helper.exe') { throw 'Target outside exact Products file' }
+if ($targetItem.Length -ne 1307554683 -or (Get-FileHash -LiteralPath $targetPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'd77075af7ed4a6a30719e19913b3c62c160a0007454899a16015fd4a7c4f5785') { throw 'Actual pre-action file identity differs' }
+Remove-Item -LiteralPath $targetPath -Force
+if (Test-Path -LiteralPath 'C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\ep261-gcc13-o0\Products\ctf10_production_helper.exe') { throw 'Original still present' }
+Write-Output 'Removed exact validated new ctf10_production_helper debug original; actual absence verified.'

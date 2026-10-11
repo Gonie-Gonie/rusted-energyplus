@@ -1,0 +1,92 @@
+--- .runtime/porting/CTF-09/retirement-plan-prep-02/common.py
++++ .runtime/porting/CTF-10/retirement-plan-prep-01/common.py
+@@ -1,4 +1,4 @@
+-"""Byte guards for Root's exact two-original CTF09 retention action."""
++"""Byte guards for Root's exact two-original CTF10 retention action."""
+ from __future__ import annotations
+ from datetime import datetime, timezone
+ import hashlib
+@@ -8,42 +8,43 @@
+ import stat
+ 
+ ROOT = Path(__file__).resolve().parents[4]
+-BASE = '.runtime/porting/CTF-09/'
++BASE = '.runtime/porting/CTF-10/'
+ NAMES = ['common.py', 'proofs.py', 'write_plan.py', 'retire.py']
+-TARGETS = {'ctf09_unit_helper': {'historical_path': '.runtime/ep261-gcc13-o0/Products/ctf09_unit_helper.exe',
+-                       'sha256': '705d572419f0e4941315cd747522068138084c921d3b6f08b9cfa6a349d8fe9c',
+-                       'size_bytes': 1302384418},
+- 'ctf09_production_helper': {'historical_path': '.runtime/ep261-gcc13-o0/Products/ctf09_production_helper.exe',
+-                             'sha256': '00119c18cca3a2df3874508d2655d1f802b59f62c7c4c5abe7116b76de4af692',
+-                             'size_bytes': 1304803868}}
+-BUILDS = {'unit': {'path': '.runtime/porting/CTF-09/native-build-01/unit/native-build.json',
+-          'sha256': 'd5a4536610c71fbd97e0eb8bb73106e4ba4cef012e8fe501ab99904a970cc615',
+-          'size_bytes': 5386},
+- 'production': {'path': '.runtime/porting/CTF-09/native-build-01/production/native-build.json',
+-                'sha256': '9213aa14384f31124d1d40d00058c7926fbceaa9ab5a68d2e57434c25d299fc8',
+-                'size_bytes': 5452}}
+-BEFORE = {'path': '.runtime/porting/CTF-09/native-build-01/before/preservation.json',
+- 'sha256': '01c14bfbc4334e15db8b793233b5f6c723e877f711b78838a14bf478bae0444a',
+- 'size_bytes': 165145}
+-QUALITY_SOURCE_METADATA = {'final_source_manifest': {'path': '.runtime/porting/CTF-09/applied-final-source-04/manifest.json',
+-                           'sha256': '9cc9af5e0728317a61e2b906bf9b669f48debce7ac13df47d8f83667632dab44',
+-                           'size_bytes': 31900},
+- 'prior_formatted_source_manifest': {'path': '.runtime/porting/CTF-09/applied-final-source-01/manifest.json',
+-                                     'sha256': '2100d5ad11678207df87044417159574547ca446ad9c289ba79f14b6ed057582',
+-                                     'size_bytes': 29886}}
+-SCOPE_METADATA = {'amendment': {'path': '.runtime/porting/CTF-09/scope-amendment-01/amendment.json',
+-               'sha256': 'cf2d45db4be3d1e2d752205f45db1b9796bf6c1a7f7eb6169240e58fe6bb065d',
+-               'size_bytes': 2310},
+- 'execution': {'path': '.runtime/porting/CTF-09/scope-check-command-01/receipt.json',
+-               'sha256': '4eae4d1ddd57a216feb5dc7fcfcb0c476d2d271666f4af8e348c27cd94cdd7e2',
+-               'size_bytes': 3006}}
++TARGETS = {'ctf10_unit_helper': {'historical_path': '.runtime/ep261-gcc13-o0/Products/ctf10_unit_helper.exe',
++                       'sha256': '4170150ee57bef9fa43c98c2c6fec75177155adfc7cc4d1d9b855ddd18e768cc',
++                       'size_bytes': 1305139302},
++ 'ctf10_production_helper': {'historical_path': '.runtime/ep261-gcc13-o0/Products/ctf10_production_helper.exe',
++                             'sha256': 'd77075af7ed4a6a30719e19913b3c62c160a0007454899a16015fd4a7c4f5785',
++                             'size_bytes': 1307554683}}
++BUILDS = {'unit': {'path': '.runtime/porting/CTF-10/native-build-01/unit/native-build.json',
++          'sha256': '3386067708a51ede6b05a1f0700b92b76b565df76bc0d05d63d28e6cf627902b',
++          'size_bytes': 5619},
++ 'production': {'path': '.runtime/porting/CTF-10/native-build-01/production/native-build.json',
++                'sha256': '355f8f09ec844ae49d33cce4e127081b369d0b27a0bb8c1573a5bce646a3ce7e',
++                'size_bytes': 5686}}
++BEFORE = {'path': '.runtime/porting/CTF-10/native-build-01/before/preservation.json',
++ 'sha256': '3a28b897d6ee601a5ac31e7cb1c8dc7698b8b60c0f1929c7ae6c15022a03800e',
++ 'size_bytes': 165595}
++QUALITY_SOURCE_METADATA = {'final_source_manifest': {'path': '.runtime/porting/CTF-10/applied-final-source-02/manifest.json',
++                           'sha256': '7b1dbbec2084e09bbc29bb1cde37bcc3fd539c6bb452e4a01d596753d2b1ea0c',
++                           'size_bytes': 26984},
++ 'prior_formatted_source_manifest': {'path': '.runtime/porting/CTF-10/applied-final-source-01/manifest.json',
++                                     'sha256': 'a6677ae510e7da99326731a37d1de8f2a57e9179a44aa97aca7a4bf1782c15fc',
++                                     'size_bytes': 21564}}
++SCOPE_METADATA = {'amendment': {'path': '.runtime/porting/CTF-10/scope-amendment-01/amendment.json',
++               'sha256': '807e1969d45c31544858c71d7e47d700dc2dc9ce63ac659d0a62d0483701543f',
++               'size_bytes': 2273},
++ 'execution': {'path': '.runtime/porting/CTF-10/scope-check-command-01/receipt.json',
++               'sha256': 'a2720011e1adf8ca7f9017c894c608e12dad5ce7f901feae08d99b92038db954',
++               'size_bytes': 2873}}
+ PRIOR_RETIRED_CTF04_ORIGINAL_PATHS = ['.runtime/ep261-gcc13-o0/Products/ctf04_unit_helper.exe', '.runtime/ep261-gcc13-o0/Products/ctf04_production_helper.exe']
+ PRIOR_RETIRED_CTF06_ORIGINAL_PATHS = ['.runtime/ep261-gcc13-o0/Products/ctf06_unit_helper.exe', '.runtime/ep261-gcc13-o0/Products/ctf06_production_helper.exe']
+ PRIOR_RETIRED_CTF07_ORIGINAL_PATHS = ['.runtime/ep261-gcc13-o0/Products/ctf07_unit_helper.exe', '.runtime/ep261-gcc13-o0/Products/ctf07_production_helper.exe']
+ PRIOR_RETIRED_CTF08_ORIGINAL_PATHS = ['.runtime/ep261-gcc13-o0/Products/ctf08_unit_helper.exe', '.runtime/ep261-gcc13-o0/Products/ctf08_production_helper.exe']
+-RETRY_POLICY_METADATA = {'path': '.runtime/porting/CTF-09/native-helper-prep-01/projection-policy-proposal.json',
+- 'sha256': '233438c166c0aabe0df6a9f6e1600b711bc94fbda21b0bb134074670c43782ef',
+- 'size_bytes': 39665}
++PRIOR_RETIRED_CTF09_ORIGINAL_PATHS = ['.runtime/ep261-gcc13-o0/Products/ctf09_unit_helper.exe', '.runtime/ep261-gcc13-o0/Products/ctf09_production_helper.exe']
++PUBLIC_POLICY_METADATA = {'path': '.runtime/porting/CTF-10/native-helper-prep-01/projection-policy-proposal.json',
++ 'sha256': 'fb7f4677722703d8083e98311242dc59c787bc08a958f46d4f38f742599c02f1',
++ 'size_bytes': 46954}
+ SEEN = {}
+ 
+ 
+@@ -203,7 +204,7 @@
+ 
+ def approved_sources(manifest_ref, approved_sha, entry):
+     manifest = read(manifest_ref)
+-    require(manifest['schema'] == 'ctf09-two-original-retention-source-proposal.v1', 'Reviewed exact source manifest required')
++    require(manifest['schema'] == 'ctf10-two-original-retention-source-proposal.v1', 'Reviewed exact source manifest required')
+     rows = manifest['own_sources']
+     require([Path(row['path']).name for row in rows] == NAMES, 'Exactly four ordered source files required')
+     for name, row in zip(NAMES, rows):

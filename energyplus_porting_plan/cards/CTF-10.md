@@ -108,3 +108,9 @@ Selected public storage verification does not complete the unit gate: generated-
 ## Actual fixed six ordinary CLI executions
 
 A-24H, A-72H, B-NOLIMIT-24H, B-FLOW-24H, B-CAPACITY-24H and B-BOTH-24H all exit0 on the same final10 source. Each actual source-order gate matches; hours override is absent and compare_oracle=false. All45 original input/weather/metadata guards remain unchanged. This establishes ordinary run regression evidence only; no numerical or integration/production/full-card PASS is inferred. Evidence: evidence/CTF-10-production-cli/{manifest,summary}.json.
+
+## Actual exact-pair Original retirement
+
+The two new10 linked debug Originals were removed through the reviewed exact LiteralPath mechanism after the committed comparison/quality/CLI proof. Actual removed bytes2612693985; both paths are absent. Prior46 protected artifacts, both10 runtime derivatives and631 core objects remain unchanged;12 absent registered paths and all prior04/06/07/08/09 Original absences remain unchanged. No registry/history rewrite or scientific rerun. Evidence: evidence/CTF-10-retention/{manifest,summary}.json. Integration/production/full-card gates remain pending.
+
+Completed10 ordinary CLI traces (6 files) were transparently compressed with NTFS LZX. Their paths, lengths and SHA256 bytes are unchanged before/after; no trace was deleted or moved. The actual operation and command receipt are included in this selected retention archive.

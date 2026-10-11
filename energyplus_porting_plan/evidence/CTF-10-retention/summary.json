@@ -1,0 +1,59 @@
+{
+  "schema": "ctf10-actual-precise-original-retirement-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-retention/manifest.json",
+    "sha256": "44dca08e42f2f257d4377f06ab623fb70b13d954af19ac7936e8176baf16418a",
+    "size_bytes": 64246
+  },
+  "actual_plan": {
+    "path": ".runtime/porting/CTF-10/retirement-plan-01/plan.json",
+    "sha256": "89715c2ecb296220df4d948498c4d353fbf3f452754c9b33aa6835c921fbe291",
+    "size_bytes": 188893
+  },
+  "actual_plan_execution": {
+    "path": ".runtime/porting/CTF-10/retirement-plan-command-01/receipt.json",
+    "sha256": "40e8c041f3a5afbae0ca59c22395282836c20d09bfaa6e714abcd5b4720d6a76",
+    "size_bytes": 3200
+  },
+  "actual_retirement": {
+    "path": ".runtime/porting/CTF-10/retirement-01/retirement.json",
+    "sha256": "a8cac203eab531845f22b6f1e4e358d0d5416c6b4a43730cf64a42114d23636b",
+    "size_bytes": 179224
+  },
+  "actual_retirement_execution": {
+    "path": ".runtime/porting/CTF-10/retirement-command-01/receipt.json",
+    "sha256": "d25815234c2994055bf4c99d183792e6c0fef6bbbd0d5a396766f0cde178b783",
+    "size_bytes": 3403
+  },
+  "actual_indexed_archive_commit": "38cf45c9372a2cbfc26e0970369d07a01e1b3038",
+  "indexed_archive_files": 524,
+  "exact_new_Original_pair_removed_bytes": 2612693985,
+  "both_exact_new_originals_absent": true,
+  "prior_protected_artifacts_retained": 46,
+  "new_verified_derivatives_retained": 2,
+  "registered_core_present_unchanged": 631,
+  "registered_core_absent_unchanged": 12,
+  "prior_CTF04_CTF06_CTF07_CTF08_CTF09_Originals_remain_absent": true,
+  "registry_rewritten": false,
+  "previous_history_or_refs_reinterpreted": false,
+  "scientific_execution_repeated": false,
+  "complete_CTF04_PASS_claimed": false,
+  "complete_CTF05_PASS_claimed": false,
+  "complete_CTF06_PASS_claimed": false,
+  "complete_CTF07_PASS_claimed": false,
+  "complete_CTF08_PASS_claimed": false,
+  "complete_CTF09_PASS_claimed": false,
+  "complete_CTF10_PASS_claimed": false,
+  "discarded_debug_bytes_recoverable_from_hash_or_map": false,
+  "actual_transparent_CLI_trace_storage_compression": {
+    "path": ".runtime/porting/CTF-10/cli-trace-storage-compression-01/record.json",
+    "sha256": "c5ead443c9e9d37655cd0ccf40860adc4baac23213b9d07fb474f2d471f1c303",
+    "size_bytes": 7197
+  },
+  "actual_transparent_CLI_trace_storage_compression_execution": {
+    "path": ".runtime/porting/CTF-10/cli-trace-storage-compression-command-01/receipt.json",
+    "sha256": "e67812bc42669a63f85496f76179e5d25e4ef3cb22bb23b7c472da119b53bd9d",
+    "size_bytes": 2715
+  },
+  "all6_CLI_trace_bytes_and_paths_unchanged": true
+}

@@ -1,0 +1,214 @@
+"""Byte guards for Root's exact two-original CTF10 retention action."""
+from __future__ import annotations
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import re
+import stat
+
+ROOT = Path(__file__).resolve().parents[4]
+BASE = '.runtime/porting/CTF-10/'
+NAMES = ['common.py', 'proofs.py', 'write_plan.py', 'retire.py']
+TARGETS = {'ctf10_unit_helper': {'historical_path': '.runtime/ep261-gcc13-o0/Products/ctf10_unit_helper.exe',
+                       'sha256': '4170150ee57bef9fa43c98c2c6fec75177155adfc7cc4d1d9b855ddd18e768cc',
+                       'size_bytes': 1305139302},
+ 'ctf10_production_helper': {'historical_path': '.runtime/ep261-gcc13-o0/Products/ctf10_production_helper.exe',
+                             'sha256': 'd77075af7ed4a6a30719e19913b3c62c160a0007454899a16015fd4a7c4f5785',
+                             'size_bytes': 1307554683}}
+BUILDS = {'unit': {'path': '.runtime/porting/CTF-10/native-build-01/unit/native-build.json',
+          'sha256': '3386067708a51ede6b05a1f0700b92b76b565df76bc0d05d63d28e6cf627902b',
+          'size_bytes': 5619},
+ 'production': {'path': '.runtime/porting/CTF-10/native-build-01/production/native-build.json',
+                'sha256': '355f8f09ec844ae49d33cce4e127081b369d0b27a0bb8c1573a5bce646a3ce7e',
+                'size_bytes': 5686}}
+BEFORE = {'path': '.runtime/porting/CTF-10/native-build-01/before/preservation.json',
+ 'sha256': '3a28b897d6ee601a5ac31e7cb1c8dc7698b8b60c0f1929c7ae6c15022a03800e',
+ 'size_bytes': 165595}
+QUALITY_SOURCE_METADATA = {'final_source_manifest': {'path': '.runtime/porting/CTF-10/applied-final-source-02/manifest.json',
+                           'sha256': '7b1dbbec2084e09bbc29bb1cde37bcc3fd539c6bb452e4a01d596753d2b1ea0c',
+                           'size_bytes': 26984},
+ 'prior_formatted_source_manifest': {'path': '.runtime/porting/CTF-10/applied-final-source-01/manifest.json',
+                                     'sha256': 'a6677ae510e7da99326731a37d1de8f2a57e9179a44aa97aca7a4bf1782c15fc',
+                                     'size_bytes': 21564}}
+SCOPE_METADATA = {'amendment': {'path': '.runtime/porting/CTF-10/scope-amendment-01/amendment.json',
+               'sha256': '807e1969d45c31544858c71d7e47d700dc2dc9ce63ac659d0a62d0483701543f',
+               'size_bytes': 2273},
+ 'execution': {'path': '.runtime/porting/CTF-10/scope-check-command-01/receipt.json',
+               'sha256': 'a2720011e1adf8ca7f9017c894c608e12dad5ce7f901feae08d99b92038db954',
+               'size_bytes': 2873}}
+PRIOR_RETIRED_CTF04_ORIGINAL_PATHS = ['.runtime/ep261-gcc13-o0/Products/ctf04_unit_helper.exe', '.runtime/ep261-gcc13-o0/Products/ctf04_production_helper.exe']
+PRIOR_RETIRED_CTF06_ORIGINAL_PATHS = ['.runtime/ep261-gcc13-o0/Products/ctf06_unit_helper.exe', '.runtime/ep261-gcc13-o0/Products/ctf06_production_helper.exe']
+PRIOR_RETIRED_CTF07_ORIGINAL_PATHS = ['.runtime/ep261-gcc13-o0/Products/ctf07_unit_helper.exe', '.runtime/ep261-gcc13-o0/Products/ctf07_production_helper.exe']
+PRIOR_RETIRED_CTF08_ORIGINAL_PATHS = ['.runtime/ep261-gcc13-o0/Products/ctf08_unit_helper.exe', '.runtime/ep261-gcc13-o0/Products/ctf08_production_helper.exe']
+PRIOR_RETIRED_CTF09_ORIGINAL_PATHS = ['.runtime/ep261-gcc13-o0/Products/ctf09_unit_helper.exe', '.runtime/ep261-gcc13-o0/Products/ctf09_production_helper.exe']
+PUBLIC_POLICY_METADATA = {'path': '.runtime/porting/CTF-10/native-helper-prep-01/projection-policy-proposal.json',
+ 'sha256': 'fb7f4677722703d8083e98311242dc59c787bc08a958f46d4f38f742599c02f1',
+ 'size_bytes': 46954}
+SEEN = {}
+
+
+def require(ok, message):
+    if not ok:
+        raise ValueError(message)
+
+
+def now():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def time_of(value):
+    stamp = datetime.fromisoformat(value)
+    require(stamp.tzinfo is not None and stamp.utcoffset().total_seconds() == 0, 'Actual UTC timestamp required')
+    return stamp
+
+
+def raw_path(value):
+    require(isinstance(value, (str, Path)), 'Typed path required')
+    text = str(value)
+    if text.startswith('\\\\?\\'):
+        require(re.match(r'^\\\\\?\\[A-Za-z]:\\', text) is not None, 'Only verbatim drive paths admitted')
+        text = text[4:]
+    require(not text.startswith(('\\\\', '//')), 'UNC and device paths are outside this scope')
+    raw = Path(text)
+    raw = raw if raw.is_absolute() else ROOT / raw
+    require(raw.is_relative_to(ROOT) and raw != ROOT and '..' not in raw.parts, 'Literal contained path required')
+    return raw
+
+
+def path_of(value, exists=True):
+    raw = raw_path(value)
+    current = ROOT
+    for part in raw.relative_to(ROOT).parts:
+        current /= part
+        try:
+            info = current.lstat()
+        except FileNotFoundError:
+            require(not exists, 'Required path is absent: ' + str(value))
+            break
+        require(not getattr(info, 'st_file_attributes', 0) & 0x400 and not stat.S_ISLNK(info.st_mode),
+                'Reparse paths are not admitted: ' + str(value))
+    path = raw.resolve(strict=exists)
+    require(path.is_relative_to(ROOT) and path != ROOT, 'Path escapes repository')
+    return path
+
+
+def absent(value):
+    raw = path_of(value, exists=False)
+    try:
+        raw.lstat()
+    except FileNotFoundError:
+        return True
+    return False
+
+
+def regular(value):
+    path = path_of(value)
+    require(stat.S_ISREG(path.lstat().st_mode), 'Regular non-reparse file required: ' + str(value))
+    return path
+
+
+def digest(path, algorithm='sha256', prefix=b''):
+    before = path.stat()
+    hasher = hashlib.new(algorithm)
+    hasher.update(prefix)
+    with path.open('rb') as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b''):
+            hasher.update(block)
+    after = path.stat()
+    require((before.st_size, before.st_mtime_ns, before.st_ctime_ns)
+            == (after.st_size, after.st_mtime_ns, after.st_ctime_ns), 'Bytes changed while hashing')
+    return hasher.hexdigest()
+
+
+def ref(value, expected=None, size=None, remember=True):
+    path = regular(value)
+    sha = digest(path)
+    require(expected is None or sha == expected, 'Bound SHA differs: ' + str(value))
+    require(size is None or type(size) is int and path.stat().st_size == size, 'Bound size differs')
+    if remember:
+        require(path not in SEEN or SEEN[path] == sha, 'Previously read bytes changed')
+        SEEN[path] = sha
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': sha}
+
+
+def bound(value, remember=True):
+    require(type(value) is dict and {'path', 'sha256'} <= set(value)
+            and set(value) <= {'path', 'sha256', 'size_bytes', 'line_count'}, 'Exact file identity required')
+    result = ref(value['path'], value['sha256'], value.get('size_bytes'), remember)
+    require(result['path'] == value['path'], 'Literal repository-relative file identity required')
+    return result
+
+
+def same(left, right):
+    require(bound(left) == bound(right), 'Actual file identities differ')
+
+
+def pin(value):
+    path, separator, sha = str(value).rpartition('#')
+    require(separator and re.fullmatch(r'[0-9a-f]{64}', sha), 'Required actual path#SHA256 input')
+    return ref(path, sha)
+
+
+def read(value, expected=None):
+    binding = bound(value) if type(value) is dict else ref(value, expected)
+    path = regular(binding['path'])
+    require(path.stat().st_size <= 32 * 1024 * 1024, 'Only bounded metadata JSON is parsed')
+    def pairs(rows):
+        out = {}
+        for key, item in rows:
+            require(key not in out, 'Duplicate JSON key')
+            out[key] = item
+        return out
+    def invalid(token):
+        raise ValueError('Nonstandard JSON token: ' + token)
+    return json.loads(path.read_text(encoding='utf8'), object_pairs_hook=pairs, parse_constant=invalid)
+
+
+def recorded(value):
+    item = read(value)
+    require(item['schema'] == 'recorded-porting-command.v1' and type(item['exit_code']) is int
+            and item['exit_code'] == 0 and item['launch_error'] is None
+            and item['source_bytes_match_before_and_after'] is True
+            and item['recorder_updates_gates'] is False and item['recorder_supplies_reference_answers'] is False,
+            'Actual successful guarded recorded command required')
+    require(Path(item['cwd']).resolve() == ROOT, 'Actual repository cwd required')
+    require(item['repository_before']['head'] == item['repository_after']['head'], 'Recorded HEAD changed')
+    for key in ['stdout', 'stderr', 'source_snapshot']:
+        bound(item[key])
+    bound(item['executed_launcher']['archive'])
+    require(time_of(item['started_utc']) <= time_of(item['finished_utc']), 'Actual command interval differs')
+    return item
+
+
+def unchanged():
+    for path, sha in SEEN.items():
+        require(regular(path) == path and digest(path) == sha, 'Retained proof bytes changed: ' + str(path))
+
+
+def fresh_output(value):
+    output = path_of(value, exists=False)
+    require(output.is_relative_to(ROOT / BASE) and output != ROOT / BASE and not output.exists(), 'Fresh ignored output required')
+    return output
+
+
+def encoded(value):
+    return (json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode('utf8')
+
+
+def write(output, name, value):
+    with (output / name).open('xb') as stream:
+        stream.write(encoded(value))
+    return ref(output / name)
+
+
+def approved_sources(manifest_ref, approved_sha, entry):
+    manifest = read(manifest_ref)
+    require(manifest['schema'] == 'ctf10-two-original-retention-source-proposal.v1', 'Reviewed exact source manifest required')
+    rows = manifest['own_sources']
+    require([Path(row['path']).name for row in rows] == NAMES, 'Exactly four ordered source files required')
+    for name, row in zip(NAMES, rows):
+        require(regular(row['path']) == Path(__file__).parent / name, 'Approved source owner differs')
+        bound(row)
+    require(ref(Path(__file__).parent / entry)['sha256'] == approved_sha, 'Explicit Root-approved executed source SHA differs')
+    return bound(manifest_ref)

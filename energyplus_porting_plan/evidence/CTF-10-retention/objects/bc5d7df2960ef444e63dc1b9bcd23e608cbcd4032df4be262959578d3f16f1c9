@@ -1,0 +1,6 @@
+tree b6e7d4f80deb93f626e25abb3390b5222948a628
+parent dc70890dfaa6da0e14504aeaabd2b898a5ed5e39
+author Hyeong-Gon Jo <hg221089@gmail.com> 1791677055 +0900
+committer Hyeong-Gon Jo <hg221089@gmail.com> 1791677055 +0900
+
+test(ctf): record six CLI regressions for public coefficient storage
