@@ -1,0 +1,11 @@
+--- before/part01.rs
++++ proposed/part01.rs
+@@ -15,7 +15,7 @@
+         QuickOutsideConductionContext, ResultStore, RuntimeError, SECONDS_PER_HOUR,
+         STEFAN_BOLTZMANN_W_PER_M2_K4, ScheduleSeriesKind, SimulationMode, SimulationState,
+         SurfaceBoundaryBalanceResult, SurfaceCtfState, SurfaceExteriorReportTerms,
+-        SurfaceOutsideBalanceDiagnostics, advance_heat_balance_state_one_timestep,
++        SurfaceOutsideBalanceDiagnostics,
+         advance_heat_balance_state_one_timestep_internal, advance_surface_ctf_histories,
+         advance_surface_ctf_histories_with_outside_temperature_override,
+         append_surface_incident_solar_radiation_series,

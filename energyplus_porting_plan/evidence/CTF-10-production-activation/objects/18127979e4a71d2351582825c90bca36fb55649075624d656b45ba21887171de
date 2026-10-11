@@ -1,0 +1,39 @@
+--- .runtime/porting/CTF-10/production-activation-publication-prep-02/before-01/README.md
++++ .runtime/porting/CTF-10/production-activation-publication-prep-02/README.md
+@@ -8,7 +8,7 @@
+ 
+ Runtime CLI (all identities are actual future Root operands):
+ 
+-    python -X utf8 -B <held>/archive-production-activation.py --final-inventory <path#sha256> --comparison <path#sha256> --comparison-execution <path#sha256> --quality fmt-check=<receipt#sha256> --quality clippy=<receipt#sha256> --quality focused=<receipt#sha256> --quality workspace=<receipt#sha256> --prior-evidence <path#sha256> [--prior-evidence <path#sha256> ...] --lineage <role=path#sha256> [--lineage <role=path#sha256> ...] --output-dir <fresh-evidence-directory>
++    python -X utf8 -B <held>/archive-production-activation.py --final-inventory <path#sha256> --comparison <path#sha256> --comparison-execution <path#sha256> --quality fmt-check=<receipt#sha256> --quality clippy=<receipt#sha256> --quality focused=<receipt#sha256> --quality workspace=<receipt#sha256> --prior-evidence <path#sha256> [--prior-evidence <path#sha256> ...] --lineage <role=path#sha256> [--lineage <role=path#sha256> ...] [--lineage-receipt <role=receipt-path#sha256> ...] --output-dir <fresh-evidence-directory>
+ 
+ The final03 inventory must carry true reviewed correspondence. Every canonical
+ body must match its final archive before/after storage; the raw shared Source
+@@ -25,10 +25,13 @@
+ - Four quality02 receipts, complete stdout/stderr, shared raw snapshot and
+   executed recorder Source. No recursive copy of every workspace snapshot body.
+ - Explicit real failure-to-fix lineage: selected quality/runtime failure
+-  receipts and their full logs/snapshots, corresponding immutable fix manifests,
++  receipts via --lineage-receipt and their full logs/snapshots, corresponding immutable fix manifests,
+   exact before/proposed/diff files and application/formatter records. Supply
+-  each needed standalone Source/diff object explicitly with --lineage; the
+-  template never walks an arbitrary manifest's transitive closure or invents
++  each needed standalone Source/diff/manifest/application object explicitly with
++  --lineage; these authenticated files are copied opaquely without JSON parsing.
++  Explicit --lineage-receipt operands must be recorded-porting-command.v1 JSON
++  receipts; their actual stdout/stderr, raw snapshot and executed launcher are
++  retained. Roles must be distinct across both options. The template never walks an arbitrary manifest's transitive closure or invents
+   a failure classification. Root's summary explains the actual association.
+ - Replay02 build/candidate/comparison receipts and logs, comparison report,
+   actual compiled observer2/API14 bindings and the complete new Rust stdout.
+@@ -71,3 +74,10 @@
+ Preparation used source reads and stdlib AST/hash/diff checks only. No reviewed
+ script/project import, formatter, Cargo, test, engine, Git, canonical mutation,
+ scientific result, executable/binary or weather payload read occurred.
++
++Fresh02 repairs the pre-execution Source interface found by independent Base
++review:01 incorrectly JSON-decoded every lineage file, despite requiring opaque
++Source/diff objects.01 remains immutable and unexecuted. Only explicit receipt
++lineage is inspected as a recorder packet. All quality/result/canonical guards,
++lossless storage, prior authority reuse and pending gates remain unchanged.
++No future actual receipt, success identity or numerical outcome is supplied.

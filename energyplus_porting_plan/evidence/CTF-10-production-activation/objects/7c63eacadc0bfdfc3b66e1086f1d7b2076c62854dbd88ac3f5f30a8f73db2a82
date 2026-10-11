@@ -1,0 +1,12 @@
+--- accepted-literal
++++ actual-formatted
+@@ -102,7 +102,8 @@
+             Some(clock),
+             |_state| Ok::<(), super::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable>(()),
+         )
+-    }).map_err(crate::error::RuntimeError::CtfSurfaceLifecycle)
++    })
++    .map_err(crate::error::RuntimeError::CtfSurfaceLifecycle)
+ }
+ 
+ pub(crate) fn advance_heat_balance_state_one_timestep_internal(

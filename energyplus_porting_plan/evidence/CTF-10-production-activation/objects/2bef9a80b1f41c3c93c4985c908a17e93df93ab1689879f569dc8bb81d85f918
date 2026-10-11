@@ -1,0 +1,26 @@
+--- before/ideal_loads/binding.rs
++++ proposed/ideal_loads/binding.rs
+@@ -1435,6 +1435,8 @@
+ /// predictor/corrector loop.
+ #[derive(Clone, Debug, PartialEq)]
+ pub enum DirectZonePurchasedAirRuntimeStepError {
++    /// Actual selected surface coefficient/history owner rejected this step.
++    CtfSurfaceLifecycle(crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable),
+     /// The heat-balance state initialized from the bound model did not retain
+     /// the bound Zone.
+     MissingBoundZoneState {
+@@ -1443,6 +1445,14 @@
+     },
+     /// CP301 rejected the active schedule sample or dynamic state.
+     ScheduledCoupling(DirectZonePurchasedAirScheduledCouplingError),
++}
++
++impl From<crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable>
++    for DirectZonePurchasedAirRuntimeStepError
++{
++    fn from(value: crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable) -> Self {
++        Self::CtfSurfaceLifecycle(value)
++    }
+ }
+ 
+ /// Values sampled before one model-bound CP300 call.

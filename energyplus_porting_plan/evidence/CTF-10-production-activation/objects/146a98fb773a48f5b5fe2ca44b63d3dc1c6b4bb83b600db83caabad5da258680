@@ -1,0 +1,176 @@
+{
+  "schema": "ctf10-retained-thermal-history-replay-runner-source-preparation.v1",
+  "status": "SOURCE-READY HELD - unexecuted existing Root runner adaptation",
+  "held_immutable": true,
+  "own_sources": [
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-replay-runner-prep-01/run-thermal-history-candidate-02.py",
+      "sha256": "8e5014358e0ff12c7b260f535f0c80541341ba03d63f7adae79956692f53d82f",
+      "size_bytes": 8127,
+      "line_count": 88
+    }
+  ],
+  "documentation": {
+    "path": ".runtime/porting/CTF-10/thermal-history-replay-runner-prep-01/README.md",
+    "sha256": "7405b752933b1a9cd50d53b0455464266e8344173236cc6c045a52db5f01dd82",
+    "size_bytes": 2846,
+    "line_count": 43
+  },
+  "before_template": {
+    "original": {
+      "path": ".runtime/porting/CTF-10/run-thermal-history-candidate-01.py",
+      "sha256": "1c5c645ccb1347170e54b0dcb4c4683c2640b1aad544331819d368e530fa4520",
+      "size_bytes": 5288,
+      "line_count": 47
+    },
+    "archive": {
+      "path": ".runtime/porting/CTF-10/thermal-history-replay-runner-prep-01/before/run-thermal-history-candidate-01.py",
+      "sha256": "1c5c645ccb1347170e54b0dcb4c4683c2640b1aad544331819d368e530fa4520",
+      "size_bytes": 5288,
+      "line_count": 47
+    },
+    "exact_diff": {
+      "path": ".runtime/porting/CTF-10/thermal-history-replay-runner-prep-01/diffs/runner.diff",
+      "sha256": "f062d08b0551e4ed2f159454033cf0ea41a7d7418427708ec52ffc72a4ab35c1",
+      "size_bytes": 10748,
+      "line_count": 106
+    }
+  },
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/CTF-10/production-activation-quality-prep-01/manifest.json",
+      "sha256": "fad572099bf0679a7ac3b8067213a73c415b3f508ad9e748eb61f9e2605c944a",
+      "size_bytes": 5753,
+      "line_count": 135
+    },
+    {
+      "path": ".runtime/porting/CTF-10/production-activation-quality-prep-01/run-production-activation-quality-01.py",
+      "sha256": "c1642bc149f8cde7032e572e66b6489a2aa92bbf34c0751a391d551c48c5a350",
+      "size_bytes": 2670,
+      "line_count": 36
+    },
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-unit-comparison-prep-01/manifest.json",
+      "sha256": "92bff4190395851eb4b80b1672c436dae757d909e766404e49d89a030eff1be0",
+      "size_bytes": 16527,
+      "line_count": 412
+    },
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-unit-comparison-prep-01/compare_units.py",
+      "sha256": "1b915c830af575f5cb0792f9ddd627309397d3411a7005f93798f389c9c7dfcd",
+      "size_bytes": 29821,
+      "line_count": 322
+    },
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-unit-comparison-prep-01/history_unit_common.py",
+      "sha256": "7808162aa42c0d06c3893acf325346c473455df993d2705ac1f7a3888f1dd74c",
+      "size_bytes": 15391,
+      "line_count": 222
+    },
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-rust-observer-prep-01/manifest.json",
+      "sha256": "202759a7affb854fbad35d9368d75fdfdb202de8376b5c7f96f29780842c1183",
+      "size_bytes": 23079,
+      "line_count": 597
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "size_bytes": 8125,
+      "line_count": 194
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "path": "tools/porting/record_command.py",
+      "first_line": 57,
+      "last_line": 94,
+      "sha256": "1ce1bec203898787b06b206e3b36205abfa82b43c70d1245691f9f3744f547a2",
+      "size_bytes": 1497,
+      "purpose": "Actual raw source snapshot paths/schema and unchanged-source verification"
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "first_line": 135,
+      "last_line": 179,
+      "sha256": "b663d1cd6caa844b2a3169c2200ef5569dd6a454f8f39d8cbb3fbcb213f6445b",
+      "size_bytes": 2686,
+      "purpose": "Existing recorder CLI, real child, receipt/source and Cargo artifact capture"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/production-activation-quality-prep-01/run-production-activation-quality-01.py",
+      "first_line": 24,
+      "last_line": 36,
+      "sha256": "c5cdaae66e39a80fed5a38ab25b10dee78c32c8dc8814e7011f043531808c012",
+      "size_bytes": 1355,
+      "purpose": "Established exact four quality commands and low-disk Cargo settings"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-unit-comparison-prep-01/compare_units.py",
+      "first_line": 140,
+      "last_line": 180,
+      "sha256": "984fac429be78d4c1c1af2b4f094dc172840048e9880b7d8358ccfa0401f0c7b",
+      "size_bytes": 4853,
+      "purpose": "Dynamic actual Cargo/observer2/API14 and timestamp binding"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-unit-comparison-prep-01/compare_units.py",
+      "first_line": 314,
+      "last_line": 322,
+      "sha256": "0a28902d6ce4795395d052cf45e9e7fa700a1e90ffc3c5e013fce062762f3284",
+      "size_bytes": 483,
+      "purpose": "Unchanged comparer CLI and factual allowed outcome"
+    }
+  ],
+  "retained_small_metadata_authorities": [
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-projection-01/projection.json",
+      "sha256": "5667d39d42c6ca6c1b53cc0b023c8d1f3d2c92efd3fd2d965ad3ae527c4e6998",
+      "size_bytes": 11273,
+      "line_count": 289
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer05-original-stages-02/original-data-review/review.json",
+      "sha256": "59b16aa6d6fa4f1417b98baa85a02a6e6942a28efc2c2ed8f1ac70f47145f82a",
+      "size_bytes": 36895,
+      "line_count": 978
+    }
+  ],
+  "runtime_operands": [
+    "actual current final Source inventory path",
+    "actual current final Source inventory SHA256",
+    "actual fmt receipt path#SHA256",
+    "actual clippy receipt path#SHA256",
+    "actual focused heat_balance receipt path#SHA256",
+    "actual workspace receipt path#SHA256"
+  ],
+  "required_final_inventory_contract": {
+    "actual_sources": "unique canonical_path / actual_final_source path,sha256,optional size rows",
+    "Root_and_other_author_FULL_formatter_correspondence_accepted": true,
+    "five_direct_history_paths_required": true,
+    "extra_current_correction_source_rows_preserved": true,
+    "future_actual_identity_supplied_here": false
+  },
+  "fresh_destinations": [
+    "thermal-history-candidate-launch-inputs-02",
+    "thermal-history-candidate-build-command-02",
+    "thermal-history-candidate-unit-command-02",
+    "thermal-history-unit-comparison-command-02",
+    "thermal-history-unit-comparison-02"
+  ],
+  "unchanged_comparer_required": ".runtime/porting/CTF-10/thermal-history-unit-comparison-prep-01/manifest.json",
+  "comparer_source_repair_required": false,
+  "retained_input_cases_payload_read_or_hashed_during_authoring": false,
+  "old_Source_b8_or_five_file_final02_treated_as_current": false,
+  "all_cases_and_all_events_and_profiles_preserved": true,
+  "new_scientific_policy_or_fixture": false,
+  "future_receipts_or_outcomes_supplied": false,
+  "stdlib_AST_parsed_not_executed": true,
+  "exact_diff_regenerated": true,
+  "canonical_mutations": false,
+  "project_imports_or_Cargo_or_formatter_or_tests_or_targets_or_engines_executed": false,
+  "scientific_results_binaries_weather_payloads_read": false,
+  "Git_actions": false,
+  "integration_or_full_card_PASS_claimed": false,
+  "author": "Base; existing observer transport and comparer author; no independent own-math or science certificate"
+}

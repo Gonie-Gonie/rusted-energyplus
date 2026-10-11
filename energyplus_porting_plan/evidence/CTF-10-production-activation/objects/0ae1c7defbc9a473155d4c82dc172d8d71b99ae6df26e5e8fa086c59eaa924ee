@@ -1,0 +1,18 @@
+--- before/heat_balance/surface_boundary.rs
++++ proposed/heat_balance/surface_boundary.rs
+@@ -21,6 +21,7 @@
+     state: &mut HeatBalanceState,
+     initial_outdoor_dry_bulb_c: f64,
+ ) {
++    if state.ctf_surface_lifecycle.is_some() { return; }
+     let zone_temperatures = state
+         .zones
+         .iter()
+@@ -67,6 +68,7 @@
+     initial_surface_temperature_c: f64,
+     initial_outdoor_dry_bulb_c: f64,
+ ) {
++    if state.ctf_surface_lifecycle.is_some() { return; }
+     let zone_temperatures = state
+         .zones
+         .iter()

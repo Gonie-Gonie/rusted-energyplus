@@ -1,0 +1,131 @@
+{
+  "schema": "ctf10-actual-publication-source-and-finalization.v1",
+  "selected_files": [
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/production-activation-publication-helper-prep-01/manifest.json",
+        "sha256": "36e66365febc64f3ac797ffba6f1dae9abb496a448eb1b954c92981f63235601",
+        "size_bytes": 5328
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-production-activation/objects/36e66365febc64f3ac797ffba6f1dae9abb496a448eb1b954c92981f63235601",
+        "sha256": "36e66365febc64f3ac797ffba6f1dae9abb496a448eb1b954c92981f63235601",
+        "size_bytes": 5328
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/production-activation-publication-helper-prep-01/publish-production-activation-validation-and-commit.py",
+        "sha256": "1638cc8eb18b0c04380172f0e0fd6626707972057d644cae41210aff9988b028",
+        "size_bytes": 8279
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-production-activation/objects/1638cc8eb18b0c04380172f0e0fd6626707972057d644cae41210aff9988b028",
+        "sha256": "1638cc8eb18b0c04380172f0e0fd6626707972057d644cae41210aff9988b028",
+        "size_bytes": 8279
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/production-activation-publication-helper-prep-01/README.md",
+        "sha256": "b88d0141e3dac05165375700279a794b36037bc54e2c399f7e157f0c52f56ced",
+        "size_bytes": 3713
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-production-activation/objects/b88d0141e3dac05165375700279a794b36037bc54e2c399f7e157f0c52f56ced",
+        "sha256": "b88d0141e3dac05165375700279a794b36037bc54e2c399f7e157f0c52f56ced",
+        "size_bytes": 3713
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/production-activation-publication-helper-prep-01/before/publish-thermal-history-validation-and-commit-01.py",
+        "sha256": "8e3a6fbff04bf48ad724181ebaecfc7d03e44ea30ca97289d6e8150cb0d706f5",
+        "size_bytes": 3772
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-production-activation/objects/8e3a6fbff04bf48ad724181ebaecfc7d03e44ea30ca97289d6e8150cb0d706f5",
+        "sha256": "8e3a6fbff04bf48ad724181ebaecfc7d03e44ea30ca97289d6e8150cb0d706f5",
+        "size_bytes": 3772
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/production-activation-publication-helper-prep-01/diffs/publisher.diff",
+        "sha256": "6077cd45f2f21dd8c2e21d6b87be6aef834cb49767d1df861a55a52281add26a",
+        "size_bytes": 12458
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-production-activation/objects/6077cd45f2f21dd8c2e21d6b87be6aef834cb49767d1df861a55a52281add26a",
+        "sha256": "6077cd45f2f21dd8c2e21d6b87be6aef834cb49767d1df861a55a52281add26a",
+        "size_bytes": 12458
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/production-activation-finalize-command-01/receipt.json",
+        "sha256": "28390ce5218de9fde045347683984cd43e26b61e3c28e89d4e8f3ded026fd3e0",
+        "size_bytes": 7382
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-production-activation/objects/28390ce5218de9fde045347683984cd43e26b61e3c28e89d4e8f3ded026fd3e0",
+        "sha256": "28390ce5218de9fde045347683984cd43e26b61e3c28e89d4e8f3ded026fd3e0",
+        "size_bytes": 7382
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/production-activation-finalize-command-01/stdout.log",
+        "sha256": "412821441496dec440c16937a617a07f252db17c68566d66957611a1675caf61",
+        "size_bytes": 257
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-production-activation/objects/412821441496dec440c16937a617a07f252db17c68566d66957611a1675caf61",
+        "sha256": "412821441496dec440c16937a617a07f252db17c68566d66957611a1675caf61",
+        "size_bytes": 257
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/production-activation-finalize-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-production-activation/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/8f/8f448858790b56e3ff7ed97109aea23be1c936ad8e94bd3c4999c016a92c7216",
+        "sha256": "8f448858790b56e3ff7ed97109aea23be1c936ad8e94bd3c4999c016a92c7216",
+        "size_bytes": 1614618
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-production-activation/objects/8f448858790b56e3ff7ed97109aea23be1c936ad8e94bd3c4999c016a92c7216",
+        "sha256": "8f448858790b56e3ff7ed97109aea23be1c936ad8e94bd3c4999c016a92c7216",
+        "size_bytes": 1614618
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/84/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+        "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+        "size_bytes": 8125
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-production-activation/objects/8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+        "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+        "size_bytes": 8125
+      }
+    }
+  ],
+  "actual_finalization_execution": {
+    "path": ".runtime/porting/CTF-10/production-activation-finalize-command-01/receipt.json",
+    "sha256": "28390ce5218de9fde045347683984cd43e26b61e3c28e89d4e8f3ded026fd3e0",
+    "size_bytes": 7382
+  },
+  "Root_commit_and_push_still_pending": true
+}

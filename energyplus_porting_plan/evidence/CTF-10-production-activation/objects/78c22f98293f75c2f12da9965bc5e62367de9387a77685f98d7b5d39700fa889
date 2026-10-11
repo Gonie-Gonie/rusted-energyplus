@@ -1,0 +1,108 @@
+# CTF-10 whole Init postlude Source audit
+
+This is an isolated Source-only audit, not an implementation or gate change.
+The downloaded instruction and current CTF-10 task require the actual selected
+function/caller contract, not completion inferred from public/history/cache tests.
+No target, project import, formatter, scientific result or binary was used.
+Current plan/card identities are documentary snapshots, not future live pins.
+
+The remaining function boundary is HeatBalanceManager.cc6153?6202. Existing
+Rust owns the declared per-construction public prefix. After each actual return,
+Native updates SimpleCTFOnly/MaxCTFTerms. Its remaining order is:
+
+1. AnyInternalHeatSourceInInput forces SimpleCTFOnly false (6166?6168).
+2. In declared order, every IsUsedCTF construction reports its layers, even when
+   construction EIO reporting is disabled (6170?6175).
+3. Actual ScanForReports assigns InitCTFDoReport (6177?6178). It is unavailable
+   before assignment; the flag is not an initial false observation.
+4. InitCTFDoReport OR DoCTFErrorReport emits four exact headers, then used
+   constructions report in declared order. cCounter increments for unused rows
+   too; it is the 1-based declared index, not used-rank or typed ConstructionId.
+5. Only after reports, ErrorsFound invokes the real fatal helper (6199?6201).
+   Fatal produces no successful function or parent return.
+
+Current Rust finish_declared_loop explicitly excludes these later stages.
+ConstructionThermalDataCache currently finishes that prefix and allocates the
+surface lifecycle without a postlude. Final shared flags are local to its loop;
+retain the actual final owner before moving data, rather than reconstructing flags.
+The whole postlude belongs before normal public/surface handoff. An existing typed
+scope stop or early FatalNoCtfs must remain distinct from final ErrorsFound fatal.
+No stopped prefix may be promoted to complete Init.
+
+## Genuine report prerequisites
+
+A-24H input331?338 requests VariableDictionary=IDF, Drawing=dxf:wireframe and
+Constructions=Constructions. B-NOLIMIT-24H requests VariableDictionary=Regular.
+Thus a Constructions-only selector or fabricated absence of other report input
+would lose real first-scan side effects. General.cc1130?1469 reads all report
+families once, in fixed family order and actual within-family input order, retains
+all flags/options, then clears GetReportInput. Later scans reuse that cache.
+Constructions and Materials selectors remain distinct; second alpha is read only
+when Native NumNames>1. Existing RuntimeOutputRequest is an output-variable key/
+name/frequency request, not this report-input/cache contract. SimulationModel owns
+TypedModel/graph only; no raw report request survives there today.
+
+Reuse RawModel/ordered_instances and existing compiler default/provenance machinery
+for typed report preservation. Preserve default-applied strings and actual count/
+blank/order facts. Retain genuine scan state, including drawing/dictionary flags,
+not just InitCTFDoReport. Invalid surface-list input reaches warning/continue
+helpers; their ordered messages and real backend effects require explicit coverage.
+
+reportLayers writes genuine predefined string entries (column, object name,
+material name) through the allocation/count/growth owner. Existing Rust heat-balance
+reports are timestep ResultStore series, not that table. Native creates ten layer
+columns; ordinary compiler admission also permits ten opaque layers. Standalone
+Native eleven-layer input has an unchecked column-index risk when columns exist;
+this audit introduces no clamp, extra column, artificial failure or wider admission.
+
+reportTransferFunction consumes actual public coefficients, material IDs/names and
+loader properties, outside/inside absorptances and outside roughness. Typed regular/
+NoMass properties exist. NoMass thickness/conductivity/density/cp report zeros must
+come from actual MaterialBase defaults, not guessed missing values. Coefficient
+rows descend NumCTFTerms through zero; zero omits Flux. Exact Native F/G formatting,
+widths, precision and headers are output behavior that needs a real EIO sink and
+same-input verification. Source/QTF branches remain outside CON-01 no-source scope.
+Fixed19 capacity remains an honest representation boundary; no truncation or clamp.
+
+ShowFatalError writes actual error/display/summary messages, reads severe count/
+last severe text, optionally updates/commits SQLite, calls an actual error callback,
+then throws. ShowErrorMessage has output-header/input-processing/stream behavior;
+DisplayString has message callbacks and kickoff/console conditions. A Rust typed
+RuntimeError alone does not certify these backends. Optional backend scope must be
+represented or explicitly separately pending, never replaced by an invocation marker.
+
+## Smallest valid sequential implementation units
+
+1. Preserve actual report objects/defaults/order through compiler?TypedModel; port
+   the real ScanForReports cache/update/request logic and assigned diagnostics.
+   Hold this independently; it does not activate or complete the postlude.
+2. Add genuine predefined string table and EIO reporting over borrowed real public/
+   material owners, including literal headers/descending row order/F/G semantics.
+3. Compose the completed prefix, actual final flags, AnyInternalHeatSource read,
+   report helpers and final fatal at the cache producer before surface allocation.
+   Propagate authentic outcome and retain output owners through State/run output.
+
+These units must compose before ordinary A24 activation; unit1 must not add an
+unsupported-report rejection for current inputs. No new proof/QA framework is needed.
+
+## Required tests and actual Native observation
+
+Source-focused tests should cover empty/mixed used+unused/reverse declarations,
+true declared-index reporting, empty/nonempty predefined columns and table growth,
+first scan/repeated scan, real A/B report requests, Materials-only vs Constructions,
+second-alpha order, option overwrite order, warning/continue order, exact zero-term
+Flux omission, boundary representable terms and signed-zero/IEEE formatting.
+Verify DoCTFErrorReport forces reporting without a request, reports precede final
+fatal, stopped math never invokes postlude, repeated Init retains incoming globals,
+and real invalidation/fresh initialization covers report input/owner dependencies.
+Do not calculate expected coefficient arrays or manufacture a Native fatal fixture.
+
+Reuse the accepted Native whole-Init15-event ledger and true once-only production
+caller. It already observes order, shared flags, assigned scan flag, aggregate,
+table counts and return/unwind. It does not copy actual table entry contents, full
+General report cache or per-helper EIO operand/byte association. Add only output-
+side observations needed to bind those real owners and actual backend outcomes.
+All visits/partial failures/omissions and parent return must remain authentic.
+Actual same-input comparison, ordinary output wiring and final backend evidence
+remain prerequisites. Missing/unreached/excluded paths receive no PASS. No CTF-10
+unit/integration/production or whole-card gate is changed by this audit.

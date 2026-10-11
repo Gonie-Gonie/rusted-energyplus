@@ -1,0 +1,32 @@
+{
+  "schema": "root-retained-rust-output-transparent-compression.v1",
+  "actual_before_authority": {
+    "path": ".runtime/porting/CTF-10/thermal-history-unit-comparison-02/comparison.json",
+    "sha256": "bd01b399e5a7588d94fef91726173d5ea8f6ae52dbe9b475cfa84ad5ac887de5",
+    "size_bytes": 28524
+  },
+  "operation": "NTFS compact.exe /C /EXE:LZX /Q exact retained genuine Rust complete output",
+  "file_before": {
+    "path": ".runtime/porting/CTF-10/thermal-history-candidate-unit-command-02/stdout.log",
+    "sha256": "c5a9f8c314838929bf6b002f7ccf3ec2b9eaf328e2f4e382ba0cf88adc8a7e99",
+    "size_bytes": 378376951
+  },
+  "file_after": {
+    "path": ".runtime/porting/CTF-10/thermal-history-candidate-unit-command-02/stdout.log",
+    "sha256": "c5a9f8c314838929bf6b002f7ccf3ec2b9eaf328e2f4e382ba0cf88adc8a7e99",
+    "size_bytes": 378376951
+  },
+  "compact_exit_code": 0,
+  "command_log": {
+    "path": ".runtime/porting/CTF-10/thermal-history-rust-output-storage-compression-02/compact.log",
+    "sha256": "8eb2b79f0036d5d917a97164dae458cced146be8ab8fa9d153d3d132f2f6d472",
+    "size_bytes": 300
+  },
+  "bytes_and_path_unchanged": true,
+  "file_deleted_or_moved": false,
+  "scientific_values_recomputed": false,
+  "observed_free_bytes_before": 1184272384,
+  "observed_free_bytes_after": 1543868416,
+  "physical_free_change_is_observation_not_exclusive_attribution": true,
+  "gates_updated": false
+}

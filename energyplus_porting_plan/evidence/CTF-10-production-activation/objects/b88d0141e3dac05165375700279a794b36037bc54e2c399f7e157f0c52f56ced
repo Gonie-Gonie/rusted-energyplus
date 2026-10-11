@@ -1,0 +1,21 @@
+# Root activation publication helper
+
+SOURCE-READY HELD; unexecuted. This is a compact adaptation of the existing59-line thermal-history validation/index publisher. Root alone reviews and invokes it after genuine activation archive/summary/docs and the new full check_plan command complete.
+
+```text
+python -X utf8 -B .runtime/porting/CTF-10/production-activation-publication-helper-prep-01/publish-production-activation-validation-and-commit.py <actual-production-activation-plan-check-receipt-SHA256>
+```
+
+The only runtime operand is the actual SHA of the fixed `.runtime/porting/CTF-10/production-activation-plan-check-command-01/receipt.json`. No future SHA or success is supplied. It must record exactly `python -X utf8 -B tools/porting/check_plan.py --check`, actual integer exit0, no launch error, source guard true and actual SourceSnapshot8f448858. Its stdout/stderr identities are authenticated.
+
+Existing actual authorities are final03 `2626c66e...`, its38 unique canonical/final archive rows, raw SourceSnapshot `8f448858...`, and all four actual quality02 receipts. The exact existing fmt/Clippy/focused/workspace commands and receipt SHA values are pinned; all require real0 and that same raw snapshot. All current workspace snapshot Source paths/bytes and every final canonical/archive body must remain exact. No project Source is changed.
+
+The future OUT is `energyplus_porting_plan/evidence/CTF-10-production-activation`. It must already contain the reviewed selected evidence manifest, actual summary and objects directory, with the correct final-inventory and quality refs. The helper creates fresh validation.json and exact copies of the real plan-check receipt/stdout/stderr. Stored raw object SHA/size must match their historical original identities; old canonical paths are not rebound as live. Compressed observations retain their actual stored identity and prior decompressed metadata assertion; this helper does not reevaluate numerical values or decompress/recompute science.
+
+Selected paths are all OUT files, the actual four documents (`plan.json`, `cards/CTF-10.md`, `CHECKLIST.md`, `energyplus_porting_checklist.html`) and all38 final Source paths. Unrelated pre-existing staged paths are rejected before archive writes; unrelated staged paths remain forbidden after git add. The index check always includes all OUT files, including gzip, all38 Source paths including the two unchanged observers, documents and selected stored objects.
+
+The existing `git cat-file --batch` mechanism compares each complete indexed blob to live bytes, verifies Git SHA1 framing and SHA256, and rejects missing/malformed/trailing data. It then rechecks current Source, document hashes, actual quality and plan-check identities before committing exactly `feat(ctf): connect ordinary surface history lifecycle`. It requires a clean worktree after commit and prints the actual commit. Push is a separate Root action; this helper neither pushes nor claims upstream equality.
+
+Root retains responsibility for the factual summary, CLI6 results, gate decisions, plan/card/view synchronization, actual check_plan order and final evidence review. The helper creates no numerical/full-card certificate, gate change, engine/Cargo invocation or new proof framework. Failed attempts and all prior evidence remain immutable.
+
+Full old publisher/current draft, approved archive interface, final38 metadata, actual four quality receipt metadata, recorder source-capture interface and literal document paths were read. Stdlib AST/diff/reference checks only were used while authoring; no generated helper/project import, target, Cargo, formatter, Git command, canonical edit or scientific/binary payload read occurred.

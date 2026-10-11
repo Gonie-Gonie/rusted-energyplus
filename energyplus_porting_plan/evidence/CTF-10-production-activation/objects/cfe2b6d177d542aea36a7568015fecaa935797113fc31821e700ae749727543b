@@ -1,0 +1,185 @@
+--- accepted-literal/crates/ep_runtime/src/heat_balance/timestep.rs
++++ actual-formatted/crates/ep_runtime/src/heat_balance/timestep.rs
+@@ -229,10 +229,17 @@
+     PredictorHook: FnOnce(&mut HeatBalanceState) -> Result<Output, Error>,
+     Error: From<super::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable>,
+ {
+-    let history_clock = weather_context.and_then(|context| context.owned)
++    let history_clock = weather_context
++        .and_then(|context| context.owned)
+         .and_then(|context| context.ctf_history_clock);
+-    super::ctf_surface_lifecycle::begin_step(model, state, history_clock, input.outdoor_dry_bulb_c, input.timestep_seconds)
+-        .map_err(Error::from)?;
++    super::ctf_surface_lifecycle::begin_step(
++        model,
++        state,
++        history_clock,
++        input.outdoor_dry_bulb_c,
++        input.timestep_seconds,
++    )
++    .map_err(Error::from)?;
+     // Observe the actual state consumed by either solver before any history push.
+     super::zone_air_initialization_trace::record_timestep_entry(state);
+     let hour_ending = input.hour_ending.clamp(1, 24);
+@@ -687,78 +694,82 @@
+     // Legacy diagnostics retain their old order. The real public-history
+     // owner follows ManageAirHeatBalance/CorrectStep before final/history.
+     let finish_surface_histories = |state: &mut HeatBalanceState| -> Result<(), Error> {
+-    let adiabatic_report_history_outside_temperature_snapshots =
+-        surface_manager::update_final_surface_heat_balance_source_order_path(|| {
+-            if sync_adiabatic_outside_to_current_inside_before_history {
+-                sync_adiabatic_outside_faces_to_inside_faces(&mut state.surfaces);
++        let adiabatic_report_history_outside_temperature_snapshots =
++            surface_manager::update_final_surface_heat_balance_source_order_path(|| {
++                if sync_adiabatic_outside_to_current_inside_before_history {
++                    sync_adiabatic_outside_faces_to_inside_faces(&mut state.surfaces);
++                }
++                if sync_adiabatic_outside_to_current_inside_for_report_only {
++                    let snapshots = state
++                        .surfaces
++                        .iter()
++                        .filter(|surface| {
++                            surface.outside_boundary_condition
++                                == OutsideBoundaryCondition::Adiabatic
++                        })
++                        .map(|surface| (surface.surface_id, surface.outside_face_temperature_c))
++                        .collect::<BTreeMap<_, _>>();
++                    sync_adiabatic_outside_faces_to_inside_faces(&mut state.surfaces);
++                    Some(snapshots)
++                } else {
++                    None
++                }
++            });
++
++        surface_manager::update_thermal_histories_source_order_path(|| -> Result<(), Error> {
++            state.last_ctf_history_slot_terms =
++                heat_balance_ctf_history_slot_samples(&state.surfaces);
++            let inside_ctf_outside_temperature_history_commit_snapshots =
++                interleaved_surface_zone_balance_result
++                    .as_ref()
++                    .and_then(|result| result.inside_ctf_outside_temperature_snapshots.as_ref());
++            if state.ctf_surface_lifecycle.is_some() {
++                super::ctf_surface_lifecycle::commit_step(model, state, input.outdoor_dry_bulb_c)
++                    .map_err(Error::from)?;
++            } else {
++                for surface in &mut state.surfaces {
++                    if commit_adiabatic_current_inside_to_history_only
++                        && surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic
++                    {
++                        advance_surface_ctf_histories_with_outside_temperature_override(
++                            surface,
++                            Some(surface.inside_face_temperature_c),
++                        );
++                    } else if let Some(outside_temperature_c) =
++                        adiabatic_report_history_outside_temperature_snapshots
++                            .as_ref()
++                            .and_then(|snapshots| snapshots.get(&surface.surface_id).copied())
++                    {
++                        advance_surface_ctf_histories_with_outside_temperature_override(
++                            surface,
++                            Some(outside_temperature_c),
++                        );
++                    } else if let Some(outside_temperature_c) =
++                        inside_ctf_outside_temperature_history_commit_override_c(
++                            surface,
++                            commit_inside_ctf_outside_temperature_to_history,
++                            inside_ctf_outside_temperature_history_commit_snapshots,
++                        )
++                    {
++                        advance_surface_ctf_histories_with_outside_temperature_override(
++                            surface,
++                            Some(outside_temperature_c),
++                        );
++                    } else {
++                        advance_surface_ctf_histories(surface);
++                    }
++                }
+             }
+-            if sync_adiabatic_outside_to_current_inside_for_report_only {
+-                let snapshots = state
+-                    .surfaces
+-                    .iter()
+-                    .filter(|surface| {
+-                        surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic
+-                    })
+-                    .map(|surface| (surface.surface_id, surface.outside_face_temperature_c))
+-                    .collect::<BTreeMap<_, _>>();
+-                sync_adiabatic_outside_faces_to_inside_faces(&mut state.surfaces);
+-                Some(snapshots)
+-            } else {
+-                None
+-            }
+-        });
+-
+-    surface_manager::update_thermal_histories_source_order_path(|| -> Result<(), Error> {
+-        state.last_ctf_history_slot_terms = heat_balance_ctf_history_slot_samples(&state.surfaces);
+-        let inside_ctf_outside_temperature_history_commit_snapshots =
+-            interleaved_surface_zone_balance_result
+-                .as_ref()
+-                .and_then(|result| result.inside_ctf_outside_temperature_snapshots.as_ref());
+-        if state.ctf_surface_lifecycle.is_some() {
+-            super::ctf_surface_lifecycle::commit_step(model, state, input.outdoor_dry_bulb_c)
+-                .map_err(Error::from)?;
+-        } else {
+-        for surface in &mut state.surfaces {
+-            if commit_adiabatic_current_inside_to_history_only
+-                && surface.outside_boundary_condition == OutsideBoundaryCondition::Adiabatic
+-            {
+-                advance_surface_ctf_histories_with_outside_temperature_override(
+-                    surface,
+-                    Some(surface.inside_face_temperature_c),
+-                );
+-            } else if let Some(outside_temperature_c) =
+-                adiabatic_report_history_outside_temperature_snapshots
+-                    .as_ref()
+-                    .and_then(|snapshots| snapshots.get(&surface.surface_id).copied())
+-            {
+-                advance_surface_ctf_histories_with_outside_temperature_override(
+-                    surface,
+-                    Some(outside_temperature_c),
+-                );
+-            } else if let Some(outside_temperature_c) =
+-                inside_ctf_outside_temperature_history_commit_override_c(
+-                    surface,
+-                    commit_inside_ctf_outside_temperature_to_history,
+-                    inside_ctf_outside_temperature_history_commit_snapshots,
+-                )
+-            {
+-                advance_surface_ctf_histories_with_outside_temperature_override(
+-                    surface,
+-                    Some(outside_temperature_c),
+-                );
+-            } else {
+-                advance_surface_ctf_histories(surface);
+-            }
+-        }
+-        }
+-        state.last_ctf_history_slot_terms_after_advance =
+-            heat_balance_ctf_history_slot_samples(&state.surfaces);
+-        Ok(())
+-    })?;
++            state.last_ctf_history_slot_terms_after_advance =
++                heat_balance_ctf_history_slot_samples(&state.surfaces);
++            Ok(())
++        })?;
+ 
+         Ok(())
+     };
+-    if state.ctf_surface_lifecycle.is_none() { finish_surface_histories(state)?; }
++    if state.ctf_surface_lifecycle.is_none() {
++        finish_surface_histories(state)?;
++    }
+ 
+     zone_predictor_corrector::manage_zone_air_updates_compat(
+         zone_predictor_corrector::PredictorCorrectorCtrl::CorrectStep,
+@@ -808,7 +819,9 @@
+             });
+         },
+     );
+-    if state.ctf_surface_lifecycle.is_some() { finish_surface_histories(state)?; }
++    if state.ctf_surface_lifecycle.is_some() {
++        finish_surface_histories(state)?;
++    }
+     state.last_inside_surface_iteration_count = interleaved_surface_zone_balance_result
+         .as_ref()
+         .map(|result| result.inside_surface_iteration_count)

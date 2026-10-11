@@ -1,0 +1,13 @@
+--- accepted-literal/crates/ep_runtime/src/ideal_loads/binding.rs
++++ actual-formatted/crates/ep_runtime/src/ideal_loads/binding.rs
+@@ -1450,7 +1450,9 @@
+ impl From<crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable>
+     for DirectZonePurchasedAirRuntimeStepError
+ {
+-    fn from(value: crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable) -> Self {
++    fn from(
++        value: crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable,
++    ) -> Self {
+         Self::CtfSurfaceLifecycle(value)
+     }
+ }

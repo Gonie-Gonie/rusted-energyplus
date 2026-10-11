@@ -1,0 +1,14 @@
+--- before/weather_day/production.rs
++++ proposed/weather_day/production.rs
+@@ -37,8 +37,9 @@
+     pub equation_of_time_hours: f64,
+ }
+ 
+-/// Actual weather caller clock copied before the thermal consumer; no clock is
+-/// reconstructed from a surface counter or a coefficient timestep.
++/// Explicit caller clock copied before the thermal consumer. Production weather
++/// supplies its actual owner; prepared manual/legacy callers own a separate
++/// lifecycle. No clock is reconstructed from a surface counter or coefficient.
+ #[derive(Clone, Copy, Debug, PartialEq)]
+ pub struct ProductionCtfHistoryClock {
+     /// Actual owned weather phase, including independent warmup-day identity.

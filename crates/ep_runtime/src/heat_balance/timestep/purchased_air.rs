@@ -51,6 +51,7 @@ pub(crate) fn advance_heat_balance_state_one_timestep_with_direct_zone_purchased
             surface_iteration_count,
             inside_hconv_reevaluation_interval,
             surface_loop_zone_air_correction,
+            None,
             |state| {
                 // CP299 consumes current non-system predictor terms. Materialize
                 // them after history/internal-gain preparation, without

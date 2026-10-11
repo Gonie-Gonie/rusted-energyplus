@@ -107,7 +107,7 @@ use crate::heat_balance::surface_weather::{
 pub(crate) use crate::heat_balance::timestep::advance_heat_balance_state_one_timestep_internal_with_schedule_cache_profiled;
 #[cfg(test)]
 pub(crate) use crate::heat_balance::timestep::{
-    advance_heat_balance_state_one_timestep, advance_heat_balance_state_one_timestep_internal,
+    advance_heat_balance_state_one_timestep_internal,
     advance_heat_balance_state_one_timestep_internal_with_live_schedule_profiled,
     advance_heat_balance_state_one_timestep_internal_with_schedule_cache,
 };

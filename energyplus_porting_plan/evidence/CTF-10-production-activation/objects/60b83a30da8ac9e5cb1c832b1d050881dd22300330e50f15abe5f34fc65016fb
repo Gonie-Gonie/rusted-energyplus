@@ -1,0 +1,259 @@
+use super::*;
+use crate::heat_balance::initialization::initialize_heat_balance_state;
+use ep_model::{
+    AutoOrNumber, Construction, ConstructionId, ConstructionKind, Material, MaterialDefinition,
+    MaterialId, MaterialSurfaceRoughness, NormalizedName, OpaqueSurfaceProperties,
+    OutsideBoundaryCondition, Point3, RegularMaterial, SimulationModel, Space, SpaceId,
+    SpaceOrigin, SpaceTypeId, SunExposure, Surface, WindExposure, Zone, ZoneId,
+};
+
+type TestResult<T = ()> = Result<T, String>;
+
+fn model() -> SimulationModel {
+    // Authored input primitives only. Public coefficients and retry workspaces
+    // must come from the actual ordinary initializer, never a Native endpoint.
+    let mut model = TypedModel::default();
+    model.timestep.number_of_timesteps_per_hour = 3;
+    model.materials.push(Material {
+        id: MaterialId(5), name: NormalizedName::new("M5"),
+        definition: MaterialDefinition::Regular(RegularMaterial {
+            roughness: MaterialSurfaceRoughness::MediumRough,
+            thickness_m: 0.2, conductivity_w_per_m_k: 1.0,
+            density_kg_per_m3: 1000.0, specific_heat_j_per_kg_k: 1000.0,
+            thermal_resistance_m2_k_per_w: 0.2, surface: OpaqueSurfaceProperties::default(),
+        }),
+    });
+    model.constructions.push(Construction {
+        id: ConstructionId(30), name: NormalizedName::new("C30"), kind: ConstructionKind::Opaque,
+        outside_layer: Some(MaterialId(5)), layers: vec![MaterialId(5)], thermochromic_master: None,
+        ground_factor: None, air_boundary: None, complex_fenestration: None,
+        window_equivalent_layer: None, internal_heat_source: None,
+    });
+    model.zones.push(Zone {
+        id: ZoneId(9), name: NormalizedName::new("Z9"), direction_of_relative_north_deg: 0.0,
+        origin: Point3 { x_m: 0.0, y_m: 0.0, z_m: 0.0 }, zone_type: 1,
+        multiplier: 1, list_multiplier: 1, list_group: None,
+        ceiling_height: AutoOrNumber::Value(1.0), volume: AutoOrNumber::Value(1.0),
+        floor_area: AutoOrNumber::Value(1.0),
+        inside_convection_algorithm: ep_model::ZoneConvectionAlgorithm::Inherited(
+            ep_model::InsideSurfaceConvectionAlgorithm::Tarp),
+        outside_convection_algorithm: ep_model::ZoneConvectionAlgorithm::Inherited(
+            ep_model::OutsideSurfaceConvectionAlgorithm::Doe2),
+        is_part_of_total_floor_area: true, is_nominal_controlled: false,
+        linked_outdoor_air_node: None, spaces: vec![SpaceId(3)],
+    });
+    model.spaces.push(Space {
+        id: SpaceId(3), name: NormalizedName::new("S3"), zone: ZoneId(9),
+        ceiling_height: AutoOrNumber::AutoCalculate, volume: AutoOrNumber::AutoCalculate,
+        floor_area: AutoOrNumber::AutoCalculate, space_type: NormalizedName::new("GENERAL"),
+        space_type_id: SpaceTypeId(0), tags: Vec::new(), origin: SpaceOrigin::Authored,
+    });
+    model.surfaces.push(Surface {
+        id: SurfaceId(500), name: NormalizedName::new("W500"), surface_type: SurfaceType::Wall,
+        construction: ConstructionId(30), zone: ZoneId(9), space: SpaceId(3),
+        outside_boundary_condition: OutsideBoundaryCondition::Outdoors,
+        outside_boundary_condition_object: None, sun_exposure: SunExposure::NoSun,
+        wind_exposure: WindExposure::NoWind, view_factor_to_ground: AutoOrNumber::Value(0.0),
+        vertices: vec![
+            Point3 { x_m: 0.0, y_m: 0.0, z_m: 0.0 }, Point3 { x_m: 1.0, y_m: 0.0, z_m: 0.0 },
+            Point3 { x_m: 1.0, y_m: 0.0, z_m: 1.0 }, Point3 { x_m: 0.0, y_m: 0.0, z_m: 1.0 },
+        ], computed_geometry: None,
+    });
+    SimulationModel::from_typed(model)
+}
+
+fn state(model: &SimulationModel) -> TestResult<HeatBalanceState> {
+    initialize_heat_balance_state(model, 20.0).map_err(|error| format!("initializer: {error:?}"))
+}
+
+fn clock(step: i32, begin: bool) -> ProductionCtfHistoryClock {
+    ProductionCtfHistoryClock {
+        phase: crate::weather::day::WeatherDayPhase::Warmup { day: 1 }, record_index: 0,
+        begin_simulation: begin, begin_environment: begin, day_of_sim: 1, hour_of_day: 1,
+        time_step: step, sim_time_steps: step, time_step_zone: 1.0 / 3.0,
+        time_step_zone_seconds: 1200.0,
+    }
+}
+
+#[test]
+fn ordinary_initializer_moves_real_public_storage_and_allocates_full19() -> TestResult {
+    let model = model();
+    let state = state(&model)?;
+    let owner = state.ctf_surface_lifecycle.as_ref().ok_or("owner missing")?;
+    assert!(!owner.initialized);
+    assert_eq!(owner.history.surface_ids, [SurfaceId(500)]);
+    assert!(owner.history.normal.inside_temperature.iter().all(|row| row == &[0.0]));
+    assert!(owner.history.scratch.is_none());
+    let public = state.construction_ctf10_public_initialization.as_ref().ok_or("public missing")?;
+    let storage = &public.constructions[0].result.as_ref().map_err(|e| format!("public: {e:?}"))?.storage;
+    assert_eq!(state.surfaces[0].ctf.public_num_ctf_terms, Some(storage.num_ctf_terms));
+    assert_eq!(state.surfaces[0].ctf.cross_0_w_per_m2_k.to_bits(), storage.cross[0].to_bits());
+    assert_eq!(owner.history.masters.is_some(), !public.aggregate_after_returned_calls.simple_ctf_only);
+    assert!(state.construction_ctf04_first_assembly.is_empty());
+    assert!(!state.construction_ctf09_retry_driver[0].result.as_ref()
+        .map_err(|e| format!("retry: {e:?}"))?.attempts.is_empty());
+    Ok(())
+}
+
+#[test]
+fn actual_environment_entry_initializes23_without_using_air20() -> TestResult {
+    let model = model(); let mut state = state(&model)?;
+    begin_step(&model.typed, &mut state, Some(clock(1, true)), 7.0, 1200.0)
+        .map_err(|e| format!("begin: {e:?}"))?;
+    let owner = state.ctf_surface_lifecycle.as_ref().ok_or("owner missing")?;
+    assert!(owner.initialized);
+    assert_eq!(state.surfaces[0].inside_face_temperature_c.to_bits(), 23.0_f64.to_bits());
+    assert_eq!(state.surfaces[0].outside_face_temperature_c.to_bits(), 0.0_f64.to_bits());
+    assert_eq!(state.surfaces[0].inside_ctf_outside_temperature_c.to_bits(),
+        owner.history.normal.outside_temperature[0][0].to_bits());
+    assert_eq!(state.zones[0].mean_air_temperature_c.to_bits(), 20.0_f64.to_bits());
+    Ok(())
+}
+
+#[test]
+fn real_commit_is_once_per_clock_and_does_not_advance_zone_counter() -> TestResult {
+    let model = model(); let mut state = state(&model)?;
+    begin_step(&model.typed, &mut state, Some(clock(1, true)), 7.0, 1200.0)
+        .map_err(|e| format!("begin: {e:?}"))?;
+    commit_step(&model.typed, &mut state, 7.0).map_err(|e| format!("commit: {e:?}"))?;
+    assert_eq!(state.timestep_index, 0); // Only the completed outer timestep owns this increment.
+    let before = state.ctf_surface_lifecycle.as_ref().ok_or("owner missing")?.history.clone();
+    assert_eq!(begin_step(&model.typed, &mut state, Some(clock(1, true)), 7.0, 1200.0),
+        Err(CtfSurfaceLifecycleUnavailable::DuplicateCommit));
+    assert_eq!(before, state.ctf_surface_lifecycle.as_ref().ok_or("owner missing")?.history);
+    Ok(())
+}
+
+#[test]
+fn primitive_change_rejects_stale_generation_before_any_history_mutation() -> TestResult {
+    let mut model = model(); let mut state = state(&model)?;
+    let before = state.ctf_surface_lifecycle.as_ref().ok_or("owner missing")?.history.clone();
+    if let MaterialDefinition::Regular(material) = &mut model.typed.materials[0].definition {
+        material.density_kg_per_m3 = f64::from_bits(material.density_kg_per_m3.to_bits() + 1);
+    }
+    assert_eq!(begin_step(&model.typed, &mut state, Some(clock(1, true)), 7.0, 1200.0),
+        Err(CtfSurfaceLifecycleUnavailable::StaleGeneration));
+    assert_eq!(before, state.ctf_surface_lifecycle.as_ref().ok_or("owner missing")?.history);
+    Ok(())
+}
+
+#[test]
+fn real_reinitialization_recovers_after_a_stored_material_member_changes() -> TestResult {
+    let mut model = model(); let mut old = state(&model)?;
+    let old_key = old.ctf_surface_lifecycle.as_ref().ok_or("owner missing")?.generation_key.clone();
+    if let MaterialDefinition::Regular(material) = &mut model.typed.materials[0].definition {
+        // Keep the actual thickness/k and aggregate mass unchanged. The stored
+        // material R is still a genuine declared producer input in the key.
+        material.thermal_resistance_m2_k_per_w =
+            f64::from_bits(material.thermal_resistance_m2_k_per_w.to_bits() + 1);
+    }
+    assert!(begin_step(&model.typed, &mut old, Some(clock(1, true)), 7.0, 1200.0).is_err());
+    let mut fresh = state(&model)?; // Actual ordinary producer runs once for this fresh state.
+    assert_ne!(old_key, fresh.ctf_surface_lifecycle.as_ref().ok_or("fresh owner missing")?.generation_key);
+    begin_step(&model.typed, &mut fresh, Some(clock(1, true)), 7.0, 1200.0)
+        .map_err(|e| format!("fresh begin: {e:?}"))?;
+    assert!(fresh.ctf_surface_lifecycle.as_ref().ok_or("fresh owner missing")?.failure.is_none());
+    Ok(())
+}
+
+#[test]
+fn same_count_identity_membership_and_timestep_changes_cannot_refresh_old_authority() -> TestResult {
+    let mutations: [fn(&mut TypedModel); 7] = [
+        |model| model.surfaces[0].id = SurfaceId(501),
+        |model| model.surfaces[0].construction = ConstructionId(31),
+        |model| model.surfaces[0].outside_boundary_condition = OutsideBoundaryCondition::Adiabatic,
+        |model| model.surfaces[0].surface_type = SurfaceType::Roof,
+        |model| model.zones[0].spaces.clear(),
+        |model| model.spaces[0].zone = ZoneId(8),
+        |model| model.timestep.number_of_timesteps_per_hour = 4,
+    ];
+    for mutate in mutations {
+        let mut model = model(); let mut state = state(&model)?;
+        let before = state.ctf_surface_lifecycle.as_ref().ok_or("owner missing")?.history.clone();
+        mutate(&mut model.typed);
+        assert!(begin_step(&model.typed, &mut state, Some(clock(1, true)), 7.0, 1200.0).is_err());
+        let owner = state.ctf_surface_lifecycle.as_ref().ok_or("owner missing")?;
+        assert_eq!(before, owner.history);
+        assert!(owner.current_clock.is_none());
+        assert!(owner.last_committed_clock.is_none());
+        assert_eq!(state.timestep_index, 0);
+    }
+    Ok(())
+}
+
+#[test]
+fn copied_lagged_bits_and_caller_duration_are_checked_before_mutation() -> TestResult {
+    let model = model(); let mut state = state(&model)?;
+    state.surfaces[0].ctf.outside_temperature_history_c[0] = -0.0;
+    let before = state.ctf_surface_lifecycle.as_ref().ok_or("owner missing")?.history.clone();
+    assert_eq!(begin_step(&model.typed, &mut state, Some(clock(1, true)), 7.0, 1200.0),
+        Err(CtfSurfaceLifecycleUnavailable::ConsumerView));
+    assert_eq!(before, state.ctf_surface_lifecycle.as_ref().ok_or("owner missing")?.history);
+    let mut other = self::state(&model)?;
+    assert_eq!(begin_step(&model.typed, &mut other, Some(clock(1, true)), 7.0, 900.0),
+        Err(CtfSurfaceLifecycleUnavailable::TimeStepAssociation));
+    Ok(())
+}
+
+#[test]
+fn ordinary_generation_uses_exact_compiler_owned_source_witnesses() -> TestResult {
+    let model = model(); let state = state(&model)?;
+    let revision = state.ctf_surface_lifecycle.as_ref().ok_or("owner missing")?
+        .generation_context.producer_revision;
+    assert_eq!(revision, CtfSurfaceProducerRevision::Compiled(PRODUCER_SOURCES));
+    assert!(PRODUCER_SOURCES.iter().any(|(name, source)| *name == "history"
+        && *source == include_str!("ctf_thermal_history.rs")));
+    assert!(PRODUCER_SOURCES.iter().any(|(name, source)| *name == "construction_cache"
+        && *source == include_str!("surface_manager/construction_cache.rs")));
+    Ok(())
+}
+
+#[test]
+fn actual_same_count_surface_order_invalidates_the_retained_producer_key() -> TestResult {
+    let mut model = model();
+    let mut second = model.typed.surfaces[0].clone();
+    second.id = SurfaceId(7); second.name = NormalizedName::new("W7");
+    model.typed.surfaces.push(second);
+    let mut state = state(&model)?;
+    let before = state.ctf_surface_lifecycle.as_ref().ok_or("owner missing")?.history.clone();
+    model.typed.surfaces.swap(0, 1);
+    assert_eq!(begin_step(&model.typed, &mut state, Some(clock(1, true)), 7.0, 1200.0),
+        Err(CtfSurfaceLifecycleUnavailable::StaleGeneration));
+    assert_eq!(before, state.ctf_surface_lifecycle.as_ref().ok_or("owner missing")?.history);
+    Ok(())
+}
+
+#[test]
+fn unsupported_ordinary_boundary_does_not_fall_back_to_steady_coefficients() -> TestResult {
+    let mut model = model();
+    model.typed.surfaces[0].outside_boundary_condition = OutsideBoundaryCondition::Ground;
+    assert!(matches!(initialize_heat_balance_state(&model, 20.0),
+        Err(crate::error::RuntimeError::CtfSurfaceLifecycle(
+            CtfSurfaceLifecycleUnavailable::Binding(CtfSurfaceBindingUnavailable::UnsupportedBoundary(SurfaceId(500)))))));
+    Ok(())
+}
+
+#[test]
+fn missing_clock_and_corrupted_consumer_vectors_are_typed_stops() -> TestResult {
+    let model = model(); let mut first = state(&model)?;
+    assert_eq!(begin_step(&model.typed, &mut first, None, 7.0, 1200.0),
+        Err(CtfSurfaceLifecycleUnavailable::MissingCallerClock));
+    let mut second = state(&model)?;
+    second.surfaces[0].ctf.inside_temperature_history_c.clear();
+    assert_eq!(begin_step(&model.typed, &mut second, Some(clock(1, true)), 7.0, 1200.0),
+        Err(CtfSurfaceLifecycleUnavailable::ConsumerView));
+    Ok(())
+}
+
+#[test]
+fn actual_space_then_class_order_is_independent_of_allocated_surface_order() -> TestResult {
+    let mut model = model().typed;
+    let mut roof = model.surfaces[0].clone(); roof.id = SurfaceId(7); roof.surface_type = SurfaceType::Roof;
+    let mut floor = roof.clone(); floor.id = SurfaceId(2); floor.surface_type = SurfaceType::Floor;
+    model.surfaces.insert(0, roof); model.surfaces.insert(1, floor);
+    assert_eq!(ordinary_orders(&model).map_err(|e| format!("order: {e:?}"))?,
+        [vec![SurfaceId(500), SurfaceId(2), SurfaceId(7)]]);
+    model.zones[0].spaces.clear();
+    assert_eq!(ordinary_orders(&model), Err(CtfSurfaceLifecycleUnavailable::Association));
+    Ok(())
+}

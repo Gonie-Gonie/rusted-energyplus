@@ -99,12 +99,24 @@
     #[test]
     fn heat_balance_timestep_uses_previous_surface_temperature_for_ctf_damping()
     -> Result<(), Box<dyn std::error::Error>> {
-        let typed = cube_model();
+        let mut typed = cube_model();
+        typed.timestep.number_of_timesteps_per_hour = 60; // Actual authored 60-second step.
         let model = SimulationModel::from_typed(typed.clone());
         let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        let mut caller = crate::heat_balance::ctf_caller_clock::CtfHistoryCallerClock::begin();
+        let first_clock = caller.prepare(crate::weather::day::WeatherDayPhase::Run { day: 1 },
+            0, 60, 1, 60.0).map_err(RuntimeError::CtfSurfaceLifecycle)?;
+        crate::heat_balance::advance_heat_balance_state_one_timestep_with_clock(
+            &typed, &mut state, HeatBalanceStepInput { outdoor_dry_bulb_c: 20.0,
+                hour_ending: 1, timestep_seconds: 60.0 }, first_clock)?;
+        caller.commit(first_clock).map_err(RuntimeError::CtfSurfaceLifecycle)?;
+        // The actual environment already initialized; this is now a prior
+        // current surface temperature for the next genuine step.
         state.surfaces[0].inside_face_temperature_c = 40.0;
+        let next_clock = caller.prepare(crate::weather::day::WeatherDayPhase::Run { day: 1 },
+            0, 60, 2, 60.0).map_err(RuntimeError::CtfSurfaceLifecycle)?;
 
-        advance_heat_balance_state_one_timestep(
+        crate::heat_balance::advance_heat_balance_state_one_timestep_with_clock(
             &typed,
             &mut state,
             HeatBalanceStepInput {
@@ -112,7 +124,8 @@
                 hour_ending: 1,
                 timestep_seconds: 60.0,
             },
-        );
+            next_clock,
+        )?;
 
         assert!(
             state.surfaces[0].inside_face_temperature_c > 25.0,
@@ -133,7 +146,7 @@
         let model = SimulationModel::from_typed(typed.clone());
         let mut state = initialize_heat_balance_state(&model, 20.0)?;
 
-        advance_heat_balance_state_one_timestep(
+        crate::heat_balance::advance_heat_balance_state_one_timestep_with_clock(
             &typed,
             &mut state,
             HeatBalanceStepInput {
@@ -141,7 +154,8 @@
                 hour_ending: 1,
                 timestep_seconds: 600.0,
             },
-        );
+            first_manual_ctf_test_clock(typed.timestep.number_of_timesteps_per_hour, 1, 1, 600.0)?,
+        )?;
 
         assert!(state.zones[0].mean_air_temperature_c > 20.0);
         assert!((state.zones[0].opaque_surface_heat_gain_w).abs() < 1.0e-9);
@@ -162,15 +176,27 @@
     }
 
     #[test]
-    fn heat_balance_interzone_surface_uses_adjacent_zone_temperature()
+    fn diagnostic_interzone_surface_uses_adjacent_zone_temperature()
     -> Result<(), Box<dyn std::error::Error>> {
-        let typed = two_zone_interzone_model();
+        let mut typed = two_zone_interzone_model();
+        typed.timestep.number_of_timesteps_per_hour = 60; // This case supplies 60 seconds.
         let model = SimulationModel::from_typed(typed.clone());
-        let mut state = initialize_heat_balance_state(&model, 20.0)?;
+        // Authored diagnostic all-R coefficients isolate existing boundary
+        // and zone/surface algorithms. They are not Native result rows.
+        let coefficients = [
+            ConstructionCtfCoefficientOverride { construction_name: "Wall".to_owned(),
+                time_index: 0, outside_w_per_m2_k: 1.0, cross_w_per_m2_k: 1.0,
+                inside_w_per_m2_k: 1.0, flux: Some(1.0) },
+            ConstructionCtfCoefficientOverride { construction_name: "Wall".to_owned(),
+                time_index: 1, outside_w_per_m2_k: 0.0, cross_w_per_m2_k: 0.0,
+                inside_w_per_m2_k: 0.0, flux: Some(0.0) },
+        ];
+        let mut state = initialize_heat_balance_state_with_ctf_coefficients(&model, 20.0, &coefficients)?;
+        assert!(state.ctf_surface_lifecycle.is_none());
         state.zones[0].mean_air_temperature_c = 20.0;
         state.zones[1].mean_air_temperature_c = 10.0;
 
-        advance_heat_balance_state_one_timestep(
+        crate::heat_balance::advance_heat_balance_state_one_timestep_with_clock(
             &typed,
             &mut state,
             HeatBalanceStepInput {
@@ -178,7 +204,8 @@
                 hour_ending: 1,
                 timestep_seconds: 60.0,
             },
-        );
+            first_manual_ctf_test_clock(typed.timestep.number_of_timesteps_per_hour, 1, 1, 60.0)?,
+        )?;
 
         let warm_zone = state
             .zones
@@ -222,8 +249,25 @@
             warm_zone.mean_air_temperature_c
         );
         assert!(cool_surface.heat_gain_to_zone_w > 0.0);
+        let zone_temperatures = state.zones.iter().map(|zone|
+            (zone.zone_id, zone.mean_air_temperature_c)).collect::<BTreeMap<_, _>>();
+        assert_eq!(crate::heat_balance::surface_boundary::surface_boundary_temperature_c(
+            warm_surface, &zone_temperatures, 0.0, warm_zone.mean_air_temperature_c),
+            cool_zone.mean_air_temperature_c);
+        assert_eq!(crate::heat_balance::surface_boundary::surface_boundary_temperature_c(
+            cool_surface, &zone_temperatures, 0.0, cool_zone.mean_air_temperature_c),
+            warm_zone.mean_air_temperature_c);
 
         Ok(())
+    }
+
+    #[test]
+    fn ordinary_interzone_surface_retains_explicit_unsupported_boundary() {
+        let model = SimulationModel::from_typed(two_zone_interzone_model());
+        assert!(matches!(initialize_heat_balance_state(&model, 20.0),
+            Err(RuntimeError::CtfSurfaceLifecycle(
+                crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable::Binding(
+                    crate::heat_balance::ctf_surface_binding::CtfSurfaceBindingUnavailable::UnsupportedBoundary(SurfaceId(0)))))));
     }
 
     #[test]
@@ -547,7 +591,14 @@
         let mut last_surface_convection = 0.0;
         let mut last_air_storage = 0.0;
 
-        for _substep in 1..=steps {
+        for substep in 1..=steps {
+            let clock = state.ctf_history_caller_clock.prepare(
+                crate::weather::day::WeatherDayPhase::Run { day: 1 },
+                0,
+                steps,
+                substep,
+                timestep_seconds,
+            ).map_err(RuntimeError::CtfSurfaceLifecycle)?;
             advance_heat_balance_state_one_timestep_internal(
                 &model.typed,
                 &mut state,
@@ -562,6 +613,9 @@
                 options.inside_hconv_reevaluation_interval,
                 options.surface_loop_zone_air_correction,
             );
+            crate::heat_balance::ctf_surface_lifecycle::ensure_available(&state)?;
+            state.ctf_history_caller_clock.commit(clock)
+                .map_err(RuntimeError::CtfSurfaceLifecycle)?;
             let zone = &state.zones[0];
             last_surface_convection = zone_air_heat_balance_surface_convection_rate_w(zone);
             last_air_storage = zone_air_heat_balance_air_storage_rate_w(
@@ -611,6 +665,7 @@
         let zone_id = state.zones[0].zone_id;
         for surface in &mut state.surfaces {
             surface.ctf = SurfaceCtfState {
+        public_num_ctf_terms: None,
                 outside_0_w_per_m2_k: 0.0,
                 cross_0_w_per_m2_k: 0.0,
                 inside_0_w_per_m2_k: 0.0,

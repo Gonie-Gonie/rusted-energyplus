@@ -1,0 +1,88 @@
+"""Root replays retained genuine history inputs after corrected current Source quality."""
+from datetime import datetime,timezone
+import hashlib,json,re,subprocess,sys
+from pathlib import Path
+ROOT=Path.cwd();BASE=ROOT/'.runtime/porting/CTF-10'
+def read(p):return json.loads(p.read_bytes())
+def sha(p):
+ with p.open('rb')as s:return hashlib.file_digest(s,'sha256').hexdigest()
+def ref(p):return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+def arg(p):return ref(p)['path']+'#'+sha(p)
+def write(p,v):p.write_bytes((json.dumps(v,indent=2,allow_nan=False)+'\n').encode('utf8'))
+assert len(sys.argv)==7
+final=(ROOT/sys.argv[1]).resolve();assert final.is_relative_to(BASE) and sha(final)==sys.argv[2]
+v=read(final);assert v['Root_and_other_author_FULL_formatter_correspondence_accepted']is True
+final_rows=v['actual_sources'];paths=[row['canonical_path']for row in final_rows]
+assert len(paths)==len(set(paths)) and {
+ 'crates/ep_runtime/src/heat_balance/ctf_thermal_history.rs',
+ 'crates/ep_runtime/src/heat_balance/ctf_thermal_history_tests.rs',
+ 'crates/ep_run/examples/ctf10_thermal_history_unit_observer.rs',
+ 'crates/ep_run/examples/ctf10_thermal_history_unit_support/fields.rs',
+ 'crates/ep_runtime/src/heat_balance/mod.rs',
+}.issubset(paths)
+def final_sources_unchanged():
+ assert sha(final)==sys.argv[2]
+ for row in final_rows:
+  archive=ROOT/row['actual_final_source']['path'];canonical=ROOT/row['canonical_path']
+  assert sha(archive)==sha(canonical)==row['actual_final_source']['sha256']
+  if 'size_bytes'in row['actual_final_source']:assert archive.stat().st_size==canonical.stat().st_size==row['actual_final_source']['size_bytes']
+def supplied(text):
+ name,separator,digest=text.rpartition('#');p=(ROOT/name).resolve()
+ assert separator and len(digest)==64 and all(c in '0123456789abcdef'for c in digest)
+ assert p.is_relative_to(BASE) and sha(p)==digest
+ return p
+settings=['--config','profile.dev.debug=0','--config','profile.test.debug=0','--config','build.incremental=false','--locked']
+commands=[['cargo','fmt','--all','--','--check'],['cargo','clippy',*settings,'--workspace','--all-targets','--','-D','warnings'],['cargo','test',*settings,'-p','ep_runtime','--lib','heat_balance::'],['cargo','test',*settings,'--workspace']]
+source=None;quality=[]
+for operand,command in zip(sys.argv[3:],commands):
+ p=supplied(operand);r=read(p)
+ assert r['schema']=='recorded-porting-command.v1' and r['command']==command and Path(r['cwd']).resolve()==ROOT
+ assert type(r['exit_code'])is int and r['exit_code']==0 and r['launch_error']is None and r['source_bytes_match_before_and_after']is True
+ started=datetime.fromisoformat(r['started_utc'].replace('Z','+00:00'));finished=datetime.fromisoformat(r['finished_utc'].replace('Z','+00:00'))
+ assert started.tzinfo is not None and finished.tzinfo is not None and started<=finished<=datetime.now(timezone.utc)
+ if source is None:source=r['source_snapshot']
+ else:assert r['source_snapshot']==source
+ quality.append((p,sha(p)))
+snapshot_path=ROOT/source['path'];assert sha(snapshot_path)==source['sha256']
+snapshot=read(snapshot_path);assert snapshot['schema']=='rust-command-source-snapshot.v1' and snapshot['bytes_normalized']is False
+captured={row['historical_path']:row['archive']for row in snapshot['files']};assert len(captured)==len(snapshot['files'])
+for row in final_rows:
+ assert captured[row['canonical_path']]['sha256']==row['actual_final_source']['sha256']
+final_sources_unchanged()
+projection=BASE/'thermal-history-projection-01/projection.json';assert sha(projection)=='5667d39d42c6ca6c1b53cc0b023c8d1f3d2c92efd3fd2d965ad3ae527c4e6998'
+projected=read(projection);assert projected['projected_case_count']==2029
+cases=ROOT/projected['input_cases']['path'];assert ref(cases)==projected['input_cases']
+qa=BASE/'surface-consumer05-original-stages-02/original-data-review/review.json';assert sha(qa)=='59b16aa6d6fa4f1417b98baa85a02a6e6942a28efc2c2ed8f1ac70f47145f82a'
+inputs=BASE/'thermal-history-candidate-launch-inputs-02'
+for name in ['thermal-history-candidate-launch-inputs-02','thermal-history-candidate-build-command-02','thermal-history-candidate-unit-command-02','thermal-history-unit-comparison-command-02','thermal-history-unit-comparison-02']:assert not (BASE/name).exists()
+inputs.mkdir()
+main=(ROOT/'crates/ep_run/examples/ctf10_thermal_history_unit_observer.rs').read_text(encoding='utf8')
+inventory={'schema':'ctf10-thermal-history-unit-runtime-source-bindings.v1'}
+for key,constant,count in [('observer_sources','OBSERVER_PATHS',2),('actual_public_API_sources','API_PATHS',14)]:
+ block=re.search(r'const '+constant+r':.*?= &\[(.*?)\];',main,re.S).group(1);paths=re.findall(r'"([^"]+)"',block);assert len(paths)==count
+ inventory[key]=[ref(ROOT/p)for p in paths]
+write(inputs/'runtime-source-bindings.json',inventory)
+def record(name,command,allowed=(0,)):
+ final_sources_unchanged()
+ assert sha(snapshot_path)==source['sha256']
+ for path,digest in quality:assert sha(path)==digest
+ with(inputs/(name+'.orchestration.log')).open('xb')as s:
+  subprocess.run(['python','-X','utf8','-B','tools/porting/record_command.py','--output-dir',(BASE/name).relative_to(ROOT).as_posix(),'--',*command],stdout=s,stderr=subprocess.STDOUT,check=False)
+ r=read(BASE/name/'receipt.json');assert r['exit_code']in allowed and r['launch_error']is None and r['source_bytes_match_before_and_after']and r['source_snapshot']==source
+ final_sources_unchanged()
+ assert sha(snapshot_path)==source['sha256']
+ for path,digest in quality:assert sha(path)==digest
+ print('Root actual thermal stage completed',name,ref(BASE/name/'receipt.json'),'exit',r['exit_code'],flush=True);return r
+build=record('thermal-history-candidate-build-command-02',['cargo','build','--locked','--config','profile.dev.debug=0','--config','profile.test.debug=0','--config','build.incremental=false','-p','ep_run','--example','ctf10_thermal_history_unit_observer','--message-format=json-render-diagnostics'])
+capture=build['cargo_compiler_artifacts_capture'];assert capture['status']=='pass'and capture['error']is None
+compiler_rows=[r for r in capture['rows']if r['cargo_message']['target']['name']=='ctf10_thermal_history_unit_observer'and'example'in r['cargo_message']['target']['kind']];assert len(compiler_rows)==1
+artifact=compiler_rows[0]['executable'];binary=ROOT/artifact['historical_path'];assert sha(binary)==artifact['sha256']
+record('thermal-history-candidate-unit-command-02',[str(binary),projected['input_cases']['path'],projected['input_cases']['sha256'],projection.relative_to(ROOT).as_posix(),sha(projection),(inputs/'runtime-source-bindings.json').relative_to(ROOT).as_posix()],allowed=(0,2))
+assert ref(cases)==projected['input_cases']and sha(binary)==artifact['sha256']
+prep=BASE/'thermal-history-unit-comparison-prep-01/manifest.json';assert sha(prep)=='92bff4190395851eb4b80b1672c436dae757d909e766404e49d89a030eff1be0'
+for row in read(prep)['own_sources']:assert sha(ROOT/row['path'])==row['sha256']
+reader=prep.parent/'compare_units.py'
+command=['python','-X','utf8','-B',str(reader),'--approved-source-sha256',sha(reader),'--source-manifest',arg(prep),'--original-data-review',arg(qa),'--original-data-review-execution',arg(BASE/'surface-consumer05-original-stages-02/surface-consumer-original-data-review-command-01/receipt.json'),'--projection',arg(projection),'--projection-execution',arg(BASE/'thermal-history-projection-command-01/receipt.json'),'--input-cases',arg(cases),'--Rust-build-execution',arg(BASE/'thermal-history-candidate-build-command-02/receipt.json'),'--Rust-execution',arg(BASE/'thermal-history-candidate-unit-command-02/receipt.json'),'--Rust-results',arg(BASE/'thermal-history-candidate-unit-command-02/stdout.log'),'--output-dir',(BASE/'thermal-history-unit-comparison-02').relative_to(ROOT).as_posix()]
+record('thermal-history-unit-comparison-command-02',command,allowed=(0,1))
+comparison=read(BASE/'thermal-history-unit-comparison-02/comparison.json')
+print('Actual thermal comparison',comparison['status'],comparison['actual_case_counts'],comparison['comparison_counts'],'full lifecycle remains pending',flush=True)

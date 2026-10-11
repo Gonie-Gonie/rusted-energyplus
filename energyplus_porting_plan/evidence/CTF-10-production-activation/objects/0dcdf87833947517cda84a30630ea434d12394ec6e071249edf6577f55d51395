@@ -1,0 +1,71 @@
+--- accepted-literal
++++ actual-formatted
+@@ -560,31 +560,56 @@
+     let mut state = state(&model)?;
+     assert_eq!(state.zones.len(), 1);
+     assert!(state.surfaces.is_empty());
+-    let public = state.construction_ctf10_public_initialization.as_ref().ok_or("public missing")?;
++    let public = state
++        .construction_ctf10_public_initialization
++        .as_ref()
++        .ok_or("public missing")?;
+     assert!(public.aggregate_after_returned_calls.simple_ctf_only);
+     assert_eq!(public.aggregate_after_returned_calls.max_ctf_terms, 0);
+     for step in 1..=2 {
+-        begin_step(&model.typed, &mut state, Some(clock(step, step == 1)), 7.0, 1200.0)
+-            .map_err(|error| format!("empty begin: {error:?}"))?;
++        begin_step(
++            &model.typed,
++            &mut state,
++            Some(clock(step, step == 1)),
++            7.0,
++            1200.0,
++        )
++        .map_err(|error| format!("empty begin: {error:?}"))?;
+         commit_step(&model.typed, &mut state, 7.0)
+             .map_err(|error| format!("empty commit: {error:?}"))?;
+     }
+-    let owner = state.ctf_surface_lifecycle.as_ref().ok_or("owner missing")?;
++    let owner = state
++        .ctf_surface_lifecycle
++        .as_ref()
++        .ok_or("owner missing")?;
+     assert!(owner.initialized);
+     assert!(owner.failure.is_none());
+     assert!(owner.current_clock.is_none());
+     assert_eq!(owner.last_committed_clock, Some(clock(2, false)));
+     assert!(owner.history.surface_ids.is_empty());
+-    assert!([
+-        &owner.history.normal.inside_temperature, &owner.history.normal.outside_temperature,
+-        &owner.history.normal.inside_flux, &owner.history.normal.outside_flux,
+-    ].iter().all(|arrays| arrays.iter().all(|row| row.is_empty())));
++    assert!(
++        [
++            &owner.history.normal.inside_temperature,
++            &owner.history.normal.outside_temperature,
++            &owner.history.normal.inside_flux,
++            &owner.history.normal.outside_flux,
++        ]
++        .iter()
++        .all(|arrays| arrays.iter().all(|row| row.is_empty()))
++    );
+     assert!(!owner.history.update_first_time);
+     let scratch = owner.history.scratch.as_ref().ok_or("scratch missing")?;
+-    assert!([
+-        &scratch.outside_flux_first, &scratch.inside_flux_first,
+-        &scratch.inside_temperature_first, &scratch.outside_temperature_first, &scratch.sum_time,
+-    ].iter().all(|row| row.is_empty()));
++    assert!(
++        [
++            &scratch.outside_flux_first,
++            &scratch.inside_flux_first,
++            &scratch.inside_temperature_first,
++            &scratch.outside_temperature_first,
++            &scratch.sum_time,
++        ]
++        .iter()
++        .all(|row| row.is_empty())
++    );
+     assert_eq!(state.timestep_index, 0);
+     Ok(())
+ }

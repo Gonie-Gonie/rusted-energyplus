@@ -16,12 +16,21 @@ use ep_model::{
 };
 use std::collections::BTreeSet;
 
+/// Producer identity retained by exact equality, without runtime source I/O.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum CtfSurfaceProducerRevision {
+    /// Existing explicitly supplied fixture/source identity.
+    Explicit([u8; 32]),
+    /// Actual compiler-owned direct producer source witnesses.
+    Compiled(&'static [(&'static str, &'static str)]),
+}
+
 /// Actual producer/caller inputs, supplied by its ordinary initialization owner.
 /// No revision, timestep, flag or incoming aggregate is inferred from coefficients.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct CtfSurfaceGenerationContext {
-    /// Actual producer-source revision identity; never a Native answer digest.
-    pub producer_revision: [u8; 32],
+    /// Actual compiler witness or explicit source/fixture identity; never an answer digest.
+    pub producer_revision: CtfSurfaceProducerRevision,
     /// Actual TimeStepZone supplied to preprocessing/initial/retry generation.
     pub time_step_zone_hours: f64,
     /// Shared flags before the first declared construction's preprocessing.
@@ -40,10 +49,31 @@ pub struct CtfSurfaceGenerationContext {
 struct MaterialKey {
     id: MaterialId,
     name: String,
-    roughness: MaterialSurfaceRoughness,
-    resistance_only: bool,
-    // thickness, k, rho, cp, stored R, thermal/solar/visible absorptance.
-    bits: [u64; 8],
+    definition: MaterialInputKey,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+enum MaterialInputKey {
+    Ordinary {
+        roughness: MaterialSurfaceRoughness,
+        resistance_only: bool,
+        // thickness, k, rho, cp, stored R, thermal/solar/visible absorptance.
+        bits: [u64; 8],
+    },
+    // Unread payloads have no selected physics inputs; retain their real variant.
+    UnreadUnsupported(ep_model::MaterialKind),
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+struct ConstructionKey {
+    id: ConstructionId,
+    name: String,
+    kind: ep_model::ConstructionKind,
+    // Ground, internal-source, thermochromic, air-boundary, complex, equivalent-layer.
+    excluded_metadata_present: [bool; 6],
+    outside_layer: Option<MaterialId>,
+    layers: Vec<MaterialId>,
+    effective_layers: Vec<MaterialId>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -89,6 +119,7 @@ struct PublicKey {
     invoked: bool,
     entry: Option<CtfCallerSharedFlags>,
     returned: Option<CtfCallerSharedFlags>,
+    unused_reset_flags: Option<CtfCallerSharedFlags>,
     result: Result<(CtfPublicReturnRoute, StorageKey), CtfPublicInitializationUnavailable>,
 }
 
@@ -96,7 +127,7 @@ struct PublicKey {
 /// Private fields prevent callers from dropping inputs before comparing keys.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct CtfSurfaceGenerationKey {
-    revision: [u8; 32],
+    revision: CtfSurfaceProducerRevision,
     timestep_count: u32,
     timestep_bits: u64,
     initial_flags: CtfCallerSharedFlags,
@@ -104,15 +135,19 @@ pub struct CtfSurfaceGenerationKey {
     dynamic_flags: (bool, bool),
     materials: Vec<MaterialKey>,
     // Full declared order, raw outside_layer/layers and effective original stack.
-    constructions: Vec<(
-        ConstructionId,
-        String,
-        Option<MaterialId>,
-        Vec<MaterialId>,
-        Vec<MaterialId>,
-    )>,
+    constructions: Vec<ConstructionKey>,
     // These are coefficient-use/binding inputs, not weather/geometry histories.
-    surfaces: Vec<(SurfaceId, ConstructionId, OutsideBoundaryCondition)>,
+    surfaces: Vec<(
+        SurfaceId,
+        ConstructionId,
+        OutsideBoundaryCondition,
+        ep_model::ZoneId,
+        ep_model::SpaceId,
+        ep_model::SurfaceType,
+        Vec<[u64; 3]>,
+    )>,
+    zone_spaces: Vec<(ep_model::ZoneId, Vec<ep_model::SpaceId>)>,
+    spaces: Vec<(ep_model::SpaceId, ep_model::ZoneId)>,
     public: Vec<PublicKey>,
     aggregate: CtfPublicInitAggregate,
     stop: Option<CtfPublicInitStop>,
@@ -136,7 +171,7 @@ pub enum CtfSurfaceBindingUnavailable {
     MissingSurface(SurfaceId),
     /// Only plain ordinary opaque no-source constructions are supported here.
     UnsupportedConstruction(ConstructionId),
-    /// Only genuine Regular and NoMass member inputs are supported here.
+    /// Used layers support only genuine Regular and NoMass member inputs.
     UnsupportedMaterial(MaterialId),
     /// Only the CON-01 Outdoors/Adiabatic surface boundary subset is bound.
     UnsupportedBoundary(SurfaceId),
@@ -176,7 +211,8 @@ pub struct CtfPublicSurfaceGeneration<'a> {
 
 /// Capture complete selected ordinary generation dependencies and returned bits.
 /// No material resistance, coefficient, timestep/history ratio or aggregate is
-/// recomputed. Unsupported families are explicit; no EIO/fallback substitution.
+/// recomputed. Unread declarations retain identity/variant witnesses; used
+/// families remain restricted. No EIO/fallback substitution is performed.
 pub fn capture_public_ctf_surface_generation<'a>(
     model: &'a TypedModel,
     initialization: &'a OrderedCtfPublicInitialization,
@@ -186,6 +222,17 @@ pub fn capture_public_ctf_surface_generation<'a>(
     if context.any_ems_in_model || context.any_construction_overrides {
         return Err(Error::DynamicControls);
     }
+    let used: BTreeSet<_> = model
+        .surfaces
+        .iter()
+        .map(|surface| surface.construction)
+        .collect();
+    let used_materials: BTreeSet<_> = model
+        .constructions
+        .iter()
+        .filter(|construction| used.contains(&construction.id))
+        .flat_map(|construction| construction.effective_layers().iter().copied())
+        .collect();
     let mut material_ids = BTreeSet::new();
     let mut materials = Vec::with_capacity(model.materials.len());
     for material in &model.materials {
@@ -211,23 +258,35 @@ pub fn capture_public_ctf_surface_generation<'a>(
                 [0.0, 0.0, 0.0, 0.0, value.thermal_resistance_m2_k_per_w],
                 value.surface,
             ),
-            _ => return Err(Error::UnsupportedMaterial(material.id)),
+            _ if used_materials.contains(&material.id) => {
+                return Err(Error::UnsupportedMaterial(material.id));
+            }
+            _ => {
+                materials.push(MaterialKey {
+                    id: material.id,
+                    name: material.name.0.clone(),
+                    definition: MaterialInputKey::UnreadUnsupported(material.kind()),
+                });
+                continue;
+            }
         };
         materials.push(MaterialKey {
             id: material.id,
             name: material.name.0.clone(),
-            roughness,
-            resistance_only,
-            bits: [
-                members[0].to_bits(),
-                members[1].to_bits(),
-                members[2].to_bits(),
-                members[3].to_bits(),
-                members[4].to_bits(),
-                surface.thermal_absorptance.to_bits(),
-                surface.solar_absorptance.to_bits(),
-                surface.visible_absorptance.to_bits(),
-            ],
+            definition: MaterialInputKey::Ordinary {
+                roughness,
+                resistance_only,
+                bits: [
+                    members[0].to_bits(),
+                    members[1].to_bits(),
+                    members[2].to_bits(),
+                    members[3].to_bits(),
+                    members[4].to_bits(),
+                    surface.thermal_absorptance.to_bits(),
+                    surface.solar_absorptance.to_bits(),
+                    surface.visible_absorptance.to_bits(),
+                ],
+            },
         });
     }
     let mut construction_ids = BTreeSet::new();
@@ -236,12 +295,13 @@ pub fn capture_public_ctf_surface_generation<'a>(
         if !construction_ids.insert(construction.id) {
             return Err(Error::DuplicateConstruction(construction.id));
         }
-        if !construction.is_ordinary_opaque()
-            || construction.has_internal_heat_source()
-            || construction.thermochromic_master.is_some()
-            || construction.air_boundary.is_some()
-            || construction.complex_fenestration.is_some()
-            || construction.window_equivalent_layer.is_some()
+        if used.contains(&construction.id)
+            && (!construction.is_ordinary_opaque()
+                || construction.has_internal_heat_source()
+                || construction.thermochromic_master.is_some()
+                || construction.air_boundary.is_some()
+                || construction.complex_fenestration.is_some()
+                || construction.window_equivalent_layer.is_some())
         {
             return Err(Error::UnsupportedConstruction(construction.id));
         }
@@ -250,16 +310,24 @@ pub fn capture_public_ctf_surface_generation<'a>(
                 return Err(Error::MissingMaterial(*material));
             }
         }
-        constructions.push((
-            construction.id,
-            construction.name.0.clone(),
-            construction.outside_layer,
-            construction.layers.clone(),
-            construction.effective_layers().to_vec(),
-        ));
+        constructions.push(ConstructionKey {
+            id: construction.id,
+            name: construction.name.0.clone(),
+            kind: construction.kind,
+            excluded_metadata_present: [
+                construction.ground_factor.is_some(),
+                construction.has_internal_heat_source(),
+                construction.thermochromic_master.is_some(),
+                construction.air_boundary.is_some(),
+                construction.complex_fenestration.is_some(),
+                construction.window_equivalent_layer.is_some(),
+            ],
+            outside_layer: construction.outside_layer,
+            layers: construction.layers.clone(),
+            effective_layers: construction.effective_layers().to_vec(),
+        });
     }
     let mut surface_ids = BTreeSet::new();
-    let mut used = BTreeSet::new();
     let mut surfaces = Vec::with_capacity(model.surfaces.len());
     for surface in &model.surfaces {
         if !surface_ids.insert(surface.id) {
@@ -274,11 +342,24 @@ pub fn capture_public_ctf_surface_generation<'a>(
         ) {
             return Err(Error::UnsupportedBoundary(surface.id));
         }
-        used.insert(surface.construction);
         surfaces.push((
             surface.id,
             surface.construction,
             surface.outside_boundary_condition,
+            surface.zone,
+            surface.space,
+            surface.surface_type,
+            surface
+                .vertices
+                .iter()
+                .map(|point| {
+                    [
+                        point.x_m.to_bits(),
+                        point.y_m.to_bits(),
+                        point.z_m.to_bits(),
+                    ]
+                })
+                .collect(),
         ));
     }
     if initialization.constructions.len() != model.constructions.len() {
@@ -306,6 +387,7 @@ pub fn capture_public_ctf_surface_generation<'a>(
             invoked: row.public_initializer_invoked,
             entry: row.retry_flags_on_entry,
             returned: row.retry_flags_on_return,
+            unused_reset_flags: row.unused_reset_flags,
             result: row
                 .result
                 .as_ref()
@@ -326,6 +408,16 @@ pub fn capture_public_ctf_surface_generation<'a>(
         materials,
         constructions,
         surfaces,
+        zone_spaces: model
+            .zones
+            .iter()
+            .map(|zone| (zone.id, zone.spaces.clone()))
+            .collect(),
+        spaces: model
+            .spaces
+            .iter()
+            .map(|space| (space.id, space.zone))
+            .collect(),
         public,
         aggregate: initialization.aggregate_after_returned_calls,
         stop: initialization.selected_stop,
@@ -416,11 +508,25 @@ impl<'a> CtfPublicSurfaceGeneration<'a> {
             return Err(Error::IncompleteDeclaredLoop);
         }
         for value in &self.initialization.constructions {
-            value
+            let returned = value
                 .result
                 .as_ref()
                 .map_err(|reason| Error::PublicOwner(*reason))?;
-            if value
+            if let Some(flags) = value.unused_reset_flags {
+                if value.is_used_ctf
+                    || !value.public_initializer_invoked
+                    || value.retry_flags_on_entry.is_some()
+                    || value.retry_flags_on_return.is_some()
+                    || returned.route != CtfPublicReturnRoute::UnusedReset
+                    || StorageKey::from(&returned.storage)
+                        != StorageKey::from(&CtfPublicCoefficientStorage::reset())
+                {
+                    return Err(Error::Association);
+                }
+                if flags.errors_found {
+                    return Err(Error::SharedErrors);
+                }
+            } else if value
                 .retry_flags_on_return
                 .is_none_or(|flags| flags.errors_found)
             {

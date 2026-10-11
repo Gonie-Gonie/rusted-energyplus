@@ -1,0 +1,178 @@
+{
+  "schema": "ctf10-profiled-and-report-manual-clock-tests-source-preparation.v1",
+  "status": "SOURCE-READY HELD; Root and independent FULL Source review required",
+  "held_immutable": true,
+  "author": "Header; actual explicit-clock/test boundary author, no independent scientific certification",
+  "readme": {
+    "path": ".runtime/porting/CTF-10/production-profiled-report-clock-tests-prep-02/README.md",
+    "sha256": "ef730bec37da65230c32594d94d0eecc1bcc8b48d9aab6fae6fc0de1260f4643",
+    "size_bytes": 2481,
+    "line_count": 38
+  },
+  "actual_before_application": {
+    "path": ".runtime/porting/CTF-10/production-runtime-contract-fixes-applied-01/record.json",
+    "sha256": "912c42c32b47f5d98fab0a64be044379e37a1fbd6af883fc26fa34725d1d30d6",
+    "size_bytes": 15527,
+    "line_count": 334
+  },
+  "predecessor_test_preparation": {
+    "path": ".runtime/porting/CTF-10/production-phase-contract-tests-prep-01/manifest.json",
+    "sha256": "b72cecba481c7abd9b7faf53315af866c82753374b58d03cedd0dc88e9f8be91",
+    "size_bytes": 12238,
+    "line_count": 282
+  },
+  "changed_sources": [
+    {
+      "canonical_path": "crates/ep_runtime/src/runtime/tests/part05.rs",
+      "before": {
+        "path": ".runtime/porting/CTF-10/production-profiled-report-clock-tests-prep-02/before/part05.rs",
+        "sha256": "eae4eabc6410f9537f7d06f14a480a06176af40aa4b30ac47438f492d2104523",
+        "size_bytes": 30298,
+        "line_count": 706
+      },
+      "actual_applied_final_member": {
+        "path": ".runtime/porting/CTF-10/production-runtime-contract-fixes-applied-01/3/final.rs",
+        "sha256": "eae4eabc6410f9537f7d06f14a480a06176af40aa4b30ac47438f492d2104523",
+        "size_bytes": 30298
+      },
+      "before_unexecuted_01": {
+        "path": ".runtime/porting/CTF-10/production-profiled-report-clock-tests-prep-02/before-01/part05.rs",
+        "sha256": "21d188783e191fc10a32d9bb4044f256b1ce585bb4e8922c099f39152b3f85a0",
+        "size_bytes": 30690,
+        "line_count": 715
+      },
+      "proposed": {
+        "path": ".runtime/porting/CTF-10/production-profiled-report-clock-tests-prep-02/proposed/part05.rs",
+        "sha256": "d301f5fe35d8c4f2a3be714220dd83a1ce9c5d604b79a71aa52cfc2fa76a5e44",
+        "size_bytes": 30793,
+        "line_count": 716
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/production-profiled-report-clock-tests-prep-02/diffs/part05.rs.diff",
+        "sha256": "9d5d9a87fabd3a3a41b6bcdc13da845c49185c201aa5a9f20928dd13c6ac7546",
+        "size_bytes": 1343,
+        "line_count": 28
+      },
+      "exact_from_01_diff": {
+        "path": ".runtime/porting/CTF-10/production-profiled-report-clock-tests-prep-02/diffs-from-01/part05.rs.diff",
+        "sha256": "588c9cbdb294e76233ff7d174e2d8fc86c0d6f502c9f45241976c02d2595d7b8",
+        "size_bytes": 1041,
+        "line_count": 21
+      },
+      "current_before_equal_at_seal": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/runtime/tests/part13.rs",
+      "before": {
+        "path": ".runtime/porting/CTF-10/production-profiled-report-clock-tests-prep-02/before/part13.rs",
+        "sha256": "cff6cf81fd878a226ddd6a652a308165f7b0dc0e959bb6350de93441d54b499a",
+        "size_bytes": 12981,
+        "line_count": 295
+      },
+      "actual_applied_final_member": {
+        "path": ".runtime/porting/CTF-10/production-runtime-contract-fixes-applied-01/4/final.rs",
+        "sha256": "cff6cf81fd878a226ddd6a652a308165f7b0dc0e959bb6350de93441d54b499a",
+        "size_bytes": 12981
+      },
+      "before_unexecuted_01": {
+        "path": ".runtime/porting/CTF-10/production-profiled-report-clock-tests-prep-02/before-01/part13.rs",
+        "sha256": "5fd1fce84212027e5587bcaa70bdae085612c97b5af19b91bc984219fcd63544",
+        "size_bytes": 14105,
+        "line_count": 315
+      },
+      "proposed": {
+        "path": ".runtime/porting/CTF-10/production-profiled-report-clock-tests-prep-02/proposed/part13.rs",
+        "sha256": "62e4fd7407c17d16b12a3660aa4da5a7df425cb00b66c2f9fd381c60e5f79ff8",
+        "size_bytes": 14321,
+        "line_count": 317
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/production-profiled-report-clock-tests-prep-02/diffs/part13.rs.diff",
+        "sha256": "19bb4691bdcdc1bc33ea7175f007fee34effceae24c4265110bcbe972e8e15cf",
+        "size_bytes": 2719,
+        "line_count": 52
+      },
+      "exact_from_01_diff": {
+        "path": ".runtime/porting/CTF-10/production-profiled-report-clock-tests-prep-02/diffs-from-01/part13.rs.diff",
+        "sha256": "1b4f3ba36607e69baa704c19768ad21cbfee712efaa981982fea681fb687237c",
+        "size_bytes": 2371,
+        "line_count": 45
+      },
+      "current_before_equal_at_seal": true
+    }
+  ],
+  "read_source_contexts": [
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_caller_clock.rs",
+      "sha256": "1fdfb1ced5ee153999d7e9282d2816d49f2b3faebcf7ff182bfdecc7ced4d14a",
+      "size_bytes": 5949,
+      "line_count": 173
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/timestep.rs",
+      "sha256": "0f6be50452528c8bc87cc5920f10a742f6c6bed8281b72b8b2186955aefbc81a",
+      "size_bytes": 42306,
+      "line_count": 876
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle.rs",
+      "sha256": "74de5eadbbde6f1f9d52f63d728704c06039465fe15b518033b5fcbb8e8f5dd8",
+      "size_bytes": 26856,
+      "line_count": 630
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests/part09.rs",
+      "sha256": "2d9a6bc79a0488b189668754d6527c4e5586f1e391097d513231125588757d9a",
+      "size_bytes": 15358,
+      "line_count": 407
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/run_period.rs",
+      "sha256": "65f03a7abf0053e0a5068b58e1c380de9fc9b19c71093924d513b75d17f3b74b",
+      "size_bytes": 55417,
+      "line_count": 944
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "4a22e30b308110deaa4c1fc5774d416a163bfa433c7f591875de3ae7b714b5c2",
+      "size_bytes": 50091,
+      "line_count": 1050
+    },
+    {
+      "path": "crates/ep_runtime/src/error.rs",
+      "sha256": "e93b95a35b4c75ef8a97b1b27199a4a0e87dce2799b36dc668d6a7368f2a609b",
+      "size_bytes": 8753,
+      "line_count": 227
+    }
+  ],
+  "scope": {
+    "changed_existing_tests": 2,
+    "production_sources_changed": false,
+    "original_numeric_bit_count_report_assertions_unchanged": true,
+    "caller_context_from_actual_model_and_input_loops": true,
+    "commit_only_after_retained_success": true,
+    "failed_attempt_records_or_prior_holds_mutated": false
+  },
+  "validation": {
+    "exact_diffs_regenerated": 2,
+    "inverse_replacements_restore_actual_before": true,
+    "actual_before_member_equal": true,
+    "exact_from_01_diffs_regenerated": 2,
+    "clock_error_transport_matches_existing_RuntimeError_mapping": true,
+    "hour_record_index_checked_conversion": true
+  },
+  "canonical_changes": false,
+  "project_import_or_formatter_or_Cargo_or_tests_or_engines_executed": false,
+  "scientific_results_or_binaries_or_weather_payloads_read": false,
+  "Git_actions": false,
+  "profiles_or_gates_changed": false,
+  "PASS_claimed": false,
+  "future_application_or_quality_receipt": null,
+  "predecessor_unexecuted_source_attempt": {
+    "path": ".runtime/porting/CTF-10/production-profiled-report-clock-tests-prep-01/manifest.json",
+    "sha256": "9e0b7463ca6c2b5eb8238b04411b5aa527978678c862642b0ad9a2d8903bc7c6",
+    "size_bytes": 5542,
+    "line_count": 134
+  },
+  "predecessor_01_released_for_application": false
+}

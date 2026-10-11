@@ -1,0 +1,60 @@
+{
+  "schema": "ctf10-consolidated-card-source-proposal.v1",
+  "status": "SOURCE-READY HELD - narrow fatal-boundary and pending-whole-unit wording successor",
+  "held_immutable": true,
+  "predecessor_source_proposal": {
+    "path": ".runtime/porting/CTF-10/production-activation-card-consolidation-prep-01/manifest.json",
+    "sha256": "b2ab6ed730c18e286cd1dfd65ae0e87d1d20d42ad15ecae4440bdbbb24f6842a",
+    "size_bytes": 13088,
+    "line_count": 341
+  },
+  "before_01_proposed": {
+    "path": ".runtime/porting/CTF-10/production-activation-card-consolidation-prep-02/before-01/CTF-10.proposed.md",
+    "sha256": "1c9ab1641476b4ec7d24e2424fb37cbed076daf2f627d48cc8be9392d35d365d",
+    "size_bytes": 10153,
+    "line_count": 108
+  },
+  "before_01_manifest": {
+    "path": ".runtime/porting/CTF-10/production-activation-card-consolidation-prep-02/before-01/manifest.json",
+    "sha256": "b2ab6ed730c18e286cd1dfd65ae0e87d1d20d42ad15ecae4440bdbbb24f6842a",
+    "size_bytes": 13088,
+    "line_count": 341
+  },
+  "canonical_card_path": "energyplus_porting_plan/cards/CTF-10.md",
+  "original_before_card": {
+    "path": ".runtime/porting/CTF-10/production-activation-card-consolidation-prep-01/before/CTF-10.md",
+    "sha256": "52e2dbceade2cd4ac930a42ca0a064c975e8db8f10988b922365be610fd40a54",
+    "size_bytes": 13611,
+    "line_count": 142
+  },
+  "proposed_card": {
+    "path": ".runtime/porting/CTF-10/production-activation-card-consolidation-prep-02/CTF-10.proposed.md",
+    "sha256": "b87626a6ca919e067a73314e824250e40978aab1c172f02e89d6c0c1493c40a2",
+    "size_bytes": 10397,
+    "line_count": 109
+  },
+  "exact_from_01_diff": {
+    "path": ".runtime/porting/CTF-10/production-activation-card-consolidation-prep-02/diffs/card-from-01.diff",
+    "sha256": "80b63ba54411cc5a7ce2fbbf033535ffb1d27d400ebc841b8864c3f75bcef268",
+    "size_bytes": 1988,
+    "line_count": 21
+  },
+  "exact_cumulative_diff": {
+    "path": ".runtime/porting/CTF-10/production-activation-card-consolidation-prep-02/diffs/card-cumulative.diff",
+    "sha256": "86624cf1ac9bb4037081b23808ec5e46dea79951cec6b7746a03102dcfd24008",
+    "size_bytes": 23921,
+    "line_count": 219
+  },
+  "narrow_changes": [
+    "Construction FatalNoCtfs939 is distinguished from whole Init final ErrorsFound6200 after actual report path",
+    "Selected cache-invalidation regressions already passed; whole unit checkbox remains pending actual whole Init/helper/report/fatal evidence"
+  ],
+  "all_other_proposed_bytes_restored_by_exact_inverse": true,
+  "inherited_scope_ranges_evidence_refs_quality_replay_and_cutoff": "literal predecessor01; no numerical or runtime identity change",
+  "activation_CLI6_outcome_claimed": false,
+  "new_summary_already_published_claimed": false,
+  "unit_integration_production_gates": "existing unconfirmed unchanged",
+  "Root_requested_whole_unit_wording": true,
+  "canonical_mutations_Git_targets_or_scientific_payload_actions": false,
+  "author": "Base; documentation Source proposal only, Root final publication and gate decision required"
+}

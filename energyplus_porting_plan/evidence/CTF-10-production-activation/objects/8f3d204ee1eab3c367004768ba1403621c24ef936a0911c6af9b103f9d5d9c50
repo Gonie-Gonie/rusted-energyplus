@@ -1,0 +1,81 @@
+--- accepted-literal/crates/ep_runtime/src/heat_balance/initialization.rs
++++ actual-formatted/crates/ep_runtime/src/heat_balance/initialization.rs
+@@ -101,8 +101,10 @@
+         ConstructionThermalDataCache::build(&model.typed, &ctf_coefficients_by_construction)?;
+     let construction_cache_token = construction_thermal_data.invalidation_token();
+     debug_assert!(!construction_thermal_data.is_invalidated_by(construction_cache_token));
+-    let ctf_surface_lifecycle = construction_thermal_data.take_public_surface_lifecycle()
+-        .transpose().map_err(RuntimeError::CtfSurfaceLifecycle)?;
++    let ctf_surface_lifecycle = construction_thermal_data
++        .take_public_surface_lifecycle()
++        .transpose()
++        .map_err(RuntimeError::CtfSurfaceLifecycle)?;
+     let public_generation = if ctf_surface_lifecycle.is_some() {
+         Some(crate::heat_balance::ctf_surface_binding::capture_public_ctf_surface_generation(
+             &model.typed,
+@@ -110,7 +112,9 @@
+                 crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable::MissingPublicOwner))?,
+             construction_thermal_data.generation_context,
+         ).map_err(|error| RuntimeError::CtfSurfaceLifecycle(error.into()))?)
+-    } else { None };
++    } else {
++        None
++    };
+     let mut surfaces = model
+         .typed
+         .surfaces
+@@ -130,28 +134,33 @@
+             let steady_ctf_w_per_m2_k =
+                 steady_ctf_coefficient_w_per_m2_k(area_m2, thermal.thermal_resistance_m2_k_per_w);
+             let ctf = if let Some(generation) = &public_generation {
+-                let binding = generation.bind_surface(surface.id)
++                let binding = generation
++                    .bind_surface(surface.id)
+                     .map_err(|error| RuntimeError::CtfSurfaceLifecycle(error.into()))?;
+-                crate::heat_balance::ctf::surface_ctf_state_from_public_storage(binding.coefficients)
+-            } else { surface_ctf_state_from_coefficient_rows(
+-                &thermal.ctf_coefficients,
+-                initial_zone_air_temperature_c,
+-            )
+-            .unwrap_or_else(|| {
+-                match (
+-                    thermal.ctf_coefficients.is_empty(),
+-                    &thermal.ctf02_coefficients.result,
+-                ) {
+-                    (true, Ok(coefficients)) => all_resistive_surface_ctf_state(
+-                        coefficients,
+-                        initial_zone_air_temperature_c,
+-                    ),
+-                    _ => steady_surface_ctf_state(
+-                        steady_ctf_w_per_m2_k,
+-                        initial_zone_air_temperature_c,
+-                    ),
+-                }
+-            }) };
++                crate::heat_balance::ctf::surface_ctf_state_from_public_storage(
++                    binding.coefficients,
++                )
++            } else {
++                surface_ctf_state_from_coefficient_rows(
++                    &thermal.ctf_coefficients,
++                    initial_zone_air_temperature_c,
++                )
++                .unwrap_or_else(|| {
++                    match (
++                        thermal.ctf_coefficients.is_empty(),
++                        &thermal.ctf02_coefficients.result,
++                    ) {
++                        (true, Ok(coefficients)) => all_resistive_surface_ctf_state(
++                            coefficients,
++                            initial_zone_air_temperature_c,
++                        ),
++                        _ => steady_surface_ctf_state(
++                            steady_ctf_w_per_m2_k,
++                            initial_zone_air_temperature_c,
++                        ),
++                    }
++                })
++            };
+ 
+             Ok(SurfaceHeatBalanceState {
+                 surface_id: surface.id,

@@ -1,0 +1,43 @@
+--- accepted-literal
++++ actual-formatted
+@@ -222,9 +222,14 @@
+     if context.any_ems_in_model || context.any_construction_overrides {
+         return Err(Error::DynamicControls);
+     }
+-    let used: BTreeSet<_> = model.surfaces.iter()
+-        .map(|surface| surface.construction).collect();
+-    let used_materials: BTreeSet<_> = model.constructions.iter()
++    let used: BTreeSet<_> = model
++        .surfaces
++        .iter()
++        .map(|surface| surface.construction)
++        .collect();
++    let used_materials: BTreeSet<_> = model
++        .constructions
++        .iter()
+         .filter(|construction| used.contains(&construction.id))
+         .flat_map(|construction| construction.effective_layers().iter().copied())
+         .collect();
+@@ -503,7 +508,9 @@
+             return Err(Error::IncompleteDeclaredLoop);
+         }
+         for value in &self.initialization.constructions {
+-            let returned = value.result.as_ref()
++            let returned = value
++                .result
++                .as_ref()
+                 .map_err(|reason| Error::PublicOwner(*reason))?;
+             if let Some(flags) = value.unused_reset_flags {
+                 if value.is_used_ctf
+@@ -519,7 +526,10 @@
+                 if flags.errors_found {
+                     return Err(Error::SharedErrors);
+                 }
+-            } else if value.retry_flags_on_return.is_none_or(|flags| flags.errors_found) {
++            } else if value
++                .retry_flags_on_return
++                .is_none_or(|flags| flags.errors_found)
++            {
+                 return Err(Error::SharedErrors);
+             }
+         }

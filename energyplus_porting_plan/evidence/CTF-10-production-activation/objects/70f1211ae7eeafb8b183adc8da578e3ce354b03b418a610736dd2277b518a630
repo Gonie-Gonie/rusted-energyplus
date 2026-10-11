@@ -1,0 +1,65 @@
+--- accepted-literal/crates/ep_runtime/src/heat_balance/ctf_surface_binding.rs
++++ actual-formatted/crates/ep_runtime/src/heat_balance/ctf_surface_binding.rs
+@@ -121,7 +121,15 @@
+         Vec<MaterialId>,
+     )>,
+     // These are coefficient-use/binding inputs, not weather/geometry histories.
+-    surfaces: Vec<(SurfaceId, ConstructionId, OutsideBoundaryCondition, ep_model::ZoneId, ep_model::SpaceId, ep_model::SurfaceType, Vec<[u64; 3]>)>,
++    surfaces: Vec<(
++        SurfaceId,
++        ConstructionId,
++        OutsideBoundaryCondition,
++        ep_model::ZoneId,
++        ep_model::SpaceId,
++        ep_model::SurfaceType,
++        Vec<[u64; 3]>,
++    )>,
+     zone_spaces: Vec<(ep_model::ZoneId, Vec<ep_model::SpaceId>)>,
+     spaces: Vec<(ep_model::SpaceId, ep_model::ZoneId)>,
+     public: Vec<PublicKey>,
+@@ -286,7 +294,25 @@
+             return Err(Error::UnsupportedBoundary(surface.id));
+         }
+         used.insert(surface.construction);
+-        surfaces.push((surface.id, surface.construction, surface.outside_boundary_condition, surface.zone, surface.space, surface.surface_type, surface.vertices.iter().map(|point| [point.x_m.to_bits(), point.y_m.to_bits(), point.z_m.to_bits()]).collect()));
++        surfaces.push((
++            surface.id,
++            surface.construction,
++            surface.outside_boundary_condition,
++            surface.zone,
++            surface.space,
++            surface.surface_type,
++            surface
++                .vertices
++                .iter()
++                .map(|point| {
++                    [
++                        point.x_m.to_bits(),
++                        point.y_m.to_bits(),
++                        point.z_m.to_bits(),
++                    ]
++                })
++                .collect(),
++        ));
+     }
+     if initialization.constructions.len() != model.constructions.len() {
+         return Err(Error::Association);
+@@ -333,8 +359,16 @@
+         materials,
+         constructions,
+         surfaces,
+-        zone_spaces: model.zones.iter().map(|zone| (zone.id, zone.spaces.clone())).collect(),
+-        spaces: model.spaces.iter().map(|space| (space.id, space.zone)).collect(),
++        zone_spaces: model
++            .zones
++            .iter()
++            .map(|zone| (zone.id, zone.spaces.clone()))
++            .collect(),
++        spaces: model
++            .spaces
++            .iter()
++            .map(|space| (space.id, space.zone))
++            .collect(),
+         public,
+         aggregate: initialization.aggregate_after_returned_calls,
+         stop: initialization.selected_stop,

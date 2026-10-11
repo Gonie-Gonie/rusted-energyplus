@@ -1,0 +1,3 @@
+    Finished `test` profile [unoptimized] target(s) in 0.24s
+     Running unittests src\lib.rs (target\debug\deps\ep_runtime-880f77a2e9883822.exe)
+error: test failed, to rerun pass `-p ep_runtime --lib`

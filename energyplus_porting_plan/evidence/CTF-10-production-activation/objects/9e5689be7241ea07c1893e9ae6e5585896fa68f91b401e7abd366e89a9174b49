@@ -1,0 +1,79 @@
+{
+  "schema": "ctf10-current-final-source-inventory-helper-source-preparation.v1",
+  "status": "SOURCE-READY HELD - Root and independent FULL Source peer required before use",
+  "held_immutable": true,
+  "own_source": {
+    "path": ".runtime/porting/CTF-10/production-final-source-inventory-prep-01/construct-current-final-source-03.py",
+    "sha256": "3a1ed0a6029abfc8eb54e2ff12481a5883d4c1a58b4f513047889b2d0ef0d988",
+    "size_bytes": 7988,
+    "line_count": 90
+  },
+  "readme": {
+    "path": ".runtime/porting/CTF-10/production-final-source-inventory-prep-01/README.md",
+    "sha256": "33588eb0468c8cac9de499d4132d8b033433bcac3b912f7ac8c8957fa56e9ebd",
+    "size_bytes": 1458,
+    "line_count": 25
+  },
+  "new_source_exact_diff": {
+    "path": ".runtime/porting/CTF-10/production-final-source-inventory-prep-01/new-source.diff",
+    "sha256": "2dbc625983660d8aaf8075e60bf3c1a914e0d1d7c2fcf0e5ab0c112af4bc3ac8",
+    "size_bytes": 8150,
+    "line_count": 93
+  },
+  "actual_source_records_chronological": [
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-applied-final-source-02/manifest.json",
+      "sha256": "d0cfd8b5bd3a54e195932efe29ceca043d2fac60c72211a4d46fd1ff071a1bc9",
+      "size_bytes": 8308,
+      "line_count": 158
+    },
+    {
+      "path": ".runtime/porting/CTF-10/production-activation-applied-final-source-02/manifest.json",
+      "sha256": "b75c7f596ecc7b5e132b1069d4c1949675b517b1e9c6c7c287ef3854cca55cef",
+      "size_bytes": 41231,
+      "line_count": 765
+    },
+    {
+      "path": ".runtime/porting/CTF-10/production-activation-fixture-ownership-applied-01/record.json",
+      "sha256": "07b19c500afd727135c81e2b0ea4d49e820741a7f93a07487a1c5c893d7ebc45",
+      "size_bytes": 1677,
+      "line_count": 37
+    },
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-applied-01/record.json",
+      "sha256": "0fc8ee97d1be6a6120e273c01bcbd79c8efeabb11f36e8ba8a014e5f4ae73aa3",
+      "size_bytes": 3923,
+      "line_count": 87
+    },
+    {
+      "path": ".runtime/porting/CTF-10/production-caller-clock-applied-01/record.json",
+      "sha256": "21e9e47fd7f2a1f7fbeab2546cc662bda841f15207694c45d9e9734a02a6189a",
+      "size_bytes": 14955,
+      "line_count": 334
+    },
+    {
+      "path": ".runtime/porting/CTF-10/production-runtime-contract-fixes-applied-01/record.json",
+      "sha256": "912c42c32b47f5d98fab0a64be044379e37a1fbd6af883fc26fa34725d1d30d6",
+      "size_bytes": 15527,
+      "line_count": 334
+    },
+    {
+      "path": ".runtime/porting/CTF-10/production-profiled-report-clock-tests-applied-02/record.json",
+      "sha256": "633f030cfe74630e7067c45dfcd7acdc31a1f7b656f1883fd2ca1491118553de",
+      "size_bytes": 2918,
+      "line_count": 64
+    }
+  ],
+  "scope": "Construct the current union; authenticate all prior Source archives/current latest rows before CRLF-only normalization; false candidate then explicit actual reviewed acceptance",
+  "required_output_directory": ".runtime/porting/CTF-10/production-activation-applied-final-source-03",
+  "runtime_accept_operand": "actual candidate.json SHA supplied by Root only after actual Source correspondence peer",
+  "existing_readonly_Git_mechanism": "git status --porcelain=v1 -z --untracked-files=all; no Git mutation/settings",
+  "future_hashes_or_receipts_or_quality_or_scientific_outcomes_supplied": false,
+  "stdlib_AST_parsed_not_helper_executed": true,
+  "exact_new_source_diff_regenerated": true,
+  "canonical_changes_during_authoring": false,
+  "project_imports_formatter_Cargo_tests_targets_or_engines_executed": false,
+  "scientific_binaries_weather_payloads_read": false,
+  "Git_actions_during_authoring": false,
+  "PASS_or_gate_claim": false
+}

@@ -1,0 +1,25 @@
+# Current final03 Source inventory
+
+Unexecuted Root-only helper. The seven literal chronological actual record pins
+are the complete source authority; their schemas/approval flags, archived bodies,
+chronological before/after custody and latest canonical bytes are checked first.
+The union must equal actual read-only Git dirty Rust paths plus observer2.
+
+    python -X utf8 -B <held>/construct-current-final-source-03.py apply
+
+Requires fresh production-activation-applied-final-source-03. All before/final
+archives are written before any canonical mutation. Only CRLF bytes become LF;
+bare CR is rejected, UTF-8 remains valid, and every per-file exact diff is kept.
+No formatter, Cargo, targets, Git mutation/settings or other transformation runs.
+The resulting candidate.json has the correspondence approval flag false.
+
+Root and an independent Source peer review the actual candidate/archives/diffs.
+Only after that review Root may explicitly run:
+
+    python -X utf8 -B <held>/construct-current-final-source-03.py accept <actual-candidate-sha256>
+
+Accept rechecks all seven inputs, archive/current bytes, CRLF-only inversion,
+exact diffs and path closure; then writes manifest.json with true approval once.
+Candidate remains immutable. No quality/scientific execution or gate is claimed.
+Authoring used stdlib AST/hash/diff checks only, with no helper/project execution,
+canonical mutation, Git command, target or scientific/binary/weather payload read.

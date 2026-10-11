@@ -1,0 +1,219 @@
+{
+  "schema": "ctf10-selected-ordinary-surface-lifecycle-activation.v1",
+  "card": "CTF-10",
+  "status": "ordinary lifecycle activated; quality and selected direct replay passed; whole card pending",
+  "actual_source_snapshot": {
+    "path": ".runtime/porting/source-objects/8f/8f448858790b56e3ff7ed97109aea23be1c936ad8e94bd3c4999c016a92c7216",
+    "sha256": "8f448858790b56e3ff7ed97109aea23be1c936ad8e94bd3c4999c016a92c7216"
+  },
+  "actual_final_source_inventory": {
+    "path": ".runtime/porting/CTF-10/production-activation-applied-final-source-03/manifest.json",
+    "sha256": "2626c66ee2fe7171cfc8102b694324959cd7b6c2121087a160c3136ee112cafb",
+    "size_bytes": 65419
+  },
+  "selected_evidence_manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-production-activation/manifest.json",
+    "sha256": "6f3dfa9799c00b52baf1bb024416e718c4c5a2e881c3033ba38d767be0035be3",
+    "size_bytes": 588449
+  },
+  "actual_archive_execution": {
+    "path": ".runtime/porting/CTF-10/production-activation-archive-command-01/receipt.json",
+    "sha256": "6997999c7acb88fb87418c48fb886669cf0422bdb2e9e5a114e41167745190ac",
+    "size_bytes": 7172
+  },
+  "publication_supplement": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-production-activation/supplement.json",
+    "sha256": "dfd07d47f046981949e7e0991193498edb3f304178675c0cd1c9c67967323101",
+    "size_bytes": 21391
+  },
+  "implementation": [
+    "Move independently generated fixed19 public owners into actual construction cache and surface associations.",
+    "Connect initialization, current/history owners and once-per-step selected thermal-history update after the existing CorrectStep air tail.",
+    "Use actual ProductionWeather/environment caller clock; validate and commit pending clock once, with typed duplicate/stale/missing-clock stops.",
+    "Retain actual shared flags and unused reset before reading unsupported unused physics.",
+    "Bind generation freshness to material/construction/order/source/caller dependencies and retain boundary validation.",
+    "Repair test Space ownership and explicit clock/phase setup while retaining prior numerical assertions."
+  ],
+  "actual_quality": {
+    "fmt-check": {
+      "actual_execution": {
+        "path": ".runtime/porting/CTF-10/production-activation-fmt-check-command-02/receipt.json",
+        "sha256": "0471fa88341037fc8ca850274894aa81e0e10f71a97789120f371b8fd68c17fa",
+        "size_bytes": 7046
+      },
+      "exit_code": 0,
+      "test_groups": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0
+    },
+    "clippy": {
+      "actual_execution": {
+        "path": ".runtime/porting/CTF-10/production-activation-clippy-command-02/receipt.json",
+        "sha256": "809d7bc9e63791757c0ef1b404d97eecdbe3072382d5e48b216cf24dd12446c5",
+        "size_bytes": 7231
+      },
+      "exit_code": 0,
+      "test_groups": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0
+    },
+    "focused": {
+      "actual_execution": {
+        "path": ".runtime/porting/CTF-10/production-activation-focused-command-02/receipt.json",
+        "sha256": "4bc6726fe93e6cc19226d40e97e4d2ba27b6b4daf507fc6cdcd1dc2a582dd86f",
+        "size_bytes": 7218
+      },
+      "exit_code": 0,
+      "test_groups": 1,
+      "passed": 245,
+      "failed": 0,
+      "ignored": 0
+    },
+    "workspace": {
+      "actual_execution": {
+        "path": ".runtime/porting/CTF-10/production-activation-workspace-command-02/receipt.json",
+        "sha256": "001c0198430d023b06952a822525005945a8feb202aff45ed0080deddcf78811",
+        "size_bytes": 7179
+      },
+      "exit_code": 0,
+      "test_groups": 21,
+      "passed": 4851,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "actual_retained_same_input_replay": {
+    "comparison": {
+      "path": ".runtime/porting/CTF-10/thermal-history-unit-comparison-02/comparison.json",
+      "sha256": "bd01b399e5a7588d94fef91726173d5ea8f6ae52dbe9b475cfa84ad5ac887de5",
+      "size_bytes": 28524
+    },
+    "cases": 2029,
+    "numeric_observations": 973854,
+    "exact_observations": 5671425,
+    "mismatches": 0,
+    "observed_profiles": [
+      "SurfInsideTempHist",
+      "SurfOutsideTempHist",
+      "SurfInsideFluxHist",
+      "SurfOutsideFluxHist",
+      "QExt1",
+      "QInt1",
+      "TempInt1",
+      "TempExt1",
+      "SumTime",
+      "SurfOpaqInsFaceCond",
+      "SurfOpaqInsFaceCondFlux",
+      "SurfOpaqOutFaceCond",
+      "SurfOpaqOutFaceCondFlux"
+    ],
+    "observed_profile_maximum_absolute_and_l2_errors": 0,
+    "unobserved_profiles": [
+      "SurfInsideTempHistMaster",
+      "SurfOutsideTempHistMaster",
+      "SurfInsideFluxHistMaster",
+      "SurfOutsideFluxHistMaster"
+    ],
+    "unobserved_counted_as_PASS": false,
+    "actual_Native_reexecuted": false,
+    "all_retained_Native_events_and_projected_cases_consumed": true,
+    "Native_expected_endpoints_supplied_to_Rust": false
+  },
+  "actual_ordinary_CLI": {
+    "execution_summary": {
+      "path": ".runtime/porting/CTF-10/production-activation-cli6-inputs-01/execution-summary.json",
+      "sha256": "253c23c108d0a82393f7f044283254f76cacfcc501059515a4f8ce2e54576015",
+      "size_bytes": 4424
+    },
+    "case_ids": [
+      "A-24H",
+      "A-72H",
+      "B-NOLIMIT-24H",
+      "B-FLOW-24H",
+      "B-CAPACITY-24H",
+      "B-BOTH-24H"
+    ],
+    "all6_exit0": true,
+    "all45_input_guards_unchanged": true,
+    "hours_override_supplied": false,
+    "EIO_or_Native_expected_values_supplied": false,
+    "numeric_equivalence_certified": false
+  },
+  "retained_actual_failure_stages": [
+    {
+      "actual_execution": {
+        "path": ".runtime/porting/CTF-10/production-activation-workspace-command-01/receipt.json",
+        "sha256": "7c9d968b5e44f91c434bccfbcf1e1ee640b739677e33e63c961cdab10cfcbd59",
+        "size_bytes": 5428
+      },
+      "exit_code": 101,
+      "failing_test_group_passed": 12,
+      "failing_test_group_failed": 2,
+      "all_reported_groups_passed": 1618,
+      "all_reported_groups_failed": 2,
+      "immutable_original_logs_and_snapshot_retained_in_manifest": true
+    },
+    {
+      "actual_execution": {
+        "path": ".runtime/porting/CTF-10/production-activation-runtime-regressions-command-01/receipt.json",
+        "sha256": "7d65efab96d26b62d6e573cdc9111378482c58894f4a79cde805a5d32b80cbaa",
+        "size_bytes": 5470
+      },
+      "exit_code": 101,
+      "failing_test_group_passed": 3116,
+      "failing_test_group_failed": 88,
+      "all_reported_groups_passed": 3116,
+      "all_reported_groups_failed": 88,
+      "immutable_original_logs_and_snapshot_retained_in_manifest": true
+    },
+    {
+      "actual_execution": {
+        "path": ".runtime/porting/CTF-10/production-activation-runtime-fixture-regressions-command-01/receipt.json",
+        "sha256": "44a72271931c329bfdca62f3013936eb0f10f052cac37499853f8ca7fb7a521d",
+        "size_bytes": 5618
+      },
+      "exit_code": 101,
+      "failing_test_group_passed": 450,
+      "failing_test_group_failed": 51,
+      "all_reported_groups_passed": 450,
+      "all_reported_groups_failed": 51,
+      "immutable_original_logs_and_snapshot_retained_in_manifest": true
+    },
+    {
+      "actual_execution": {
+        "path": ".runtime/porting/CTF-10/production-activation-clock-runtime-regressions-command-01/receipt.json",
+        "sha256": "e4d8a933a4be0a7241a34eff5b5737eab2dd51dcfba153eeb872137f007119ef",
+        "size_bytes": 6406
+      },
+      "exit_code": 101,
+      "failing_test_group_passed": 490,
+      "failing_test_group_failed": 11,
+      "all_reported_groups_passed": 490,
+      "all_reported_groups_failed": 11,
+      "immutable_original_logs_and_snapshot_retained_in_manifest": true
+    }
+  ],
+  "source_only_preexecution_corrections": [
+    "Initial formatter token issue fixed before quality.",
+    "Manual-clock fixture conversions corrected before compilation.",
+    "Archiver opaque-lineage versus receipt JSON interface corrected before archive execution."
+  ],
+  "remaining": [
+    "Whole Init reportLayers, actual ScanForReports, predefined-table/EIO reporting and final ErrorsFound fatal/backend composition.",
+    "Ordinary Rust/Native call/state/clock and persistent-history numerical pairing.",
+    "Four unobserved master-history profiles remain unverified; prerequisites and downstream production gates remain pending."
+  ],
+  "storage": {
+    "full_current_Rust_stdout_losslessly_archived": true,
+    "six_completed_traces_transparently_compressed_without_byte_or_path_changes": true,
+    "scientific_values_recomputed_by_storage": false
+  },
+  "unit_gate_promoted": false,
+  "integration_gate_promoted": false,
+  "production_gate_promoted": false,
+  "complete_CTF10_PASS_claimed": false,
+  "gates_updated": false,
+  "selected_archive_is_transitive_replay_closure": false
+}

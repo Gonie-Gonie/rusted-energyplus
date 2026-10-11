@@ -1,0 +1,267 @@
+{
+  "schema": "ctf10-thermal-history-empty-layout-narrow-source-preparation.v1",
+  "status": "SOURCE-READY HELD; Root and other-author FULL Source review before application",
+  "held_immutable": true,
+  "author": "Base; Source-only empty-layout representability correction, not Native scientific certification",
+  "readme": {
+    "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-prep-01/README.md",
+    "sha256": "63ed28ec4de88deffa2ca8fe2456324bd5aad990ca4926ddd522f550523bfdf5",
+    "size_bytes": 2649,
+    "line_count": 39
+  },
+  "changed_sources": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_thermal_history.rs",
+      "before": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-prep-01/before/ctf_thermal_history.rs",
+        "sha256": "48a5d8efc802ab7f656c1429b24b0fb49420b26c202e899e1c25a052acff530c",
+        "size_bytes": 27721,
+        "line_count": 600
+      },
+      "proposed": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-prep-01/proposed/ctf_thermal_history.rs",
+        "sha256": "7dfaeb87ca080c7f9bca89ff87865e5859a4d21858d9e37a15b74d1911bc9709",
+        "size_bytes": 27756,
+        "line_count": 600
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-prep-01/diffs/ctf_thermal_history.rs.diff",
+        "sha256": "7d268c125748f30050d175ae201165bb7186fa10e37bc95900ff007856181348",
+        "size_bytes": 1070,
+        "line_count": 20
+      },
+      "current_canonical_equal_before_at_seal": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_thermal_history_tests.rs",
+      "before": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-prep-01/before/ctf_thermal_history_tests.rs",
+        "sha256": "747e334630efcd27a5068d2019d8f90546503d14da5353f2c1849bdc1c6a2288",
+        "size_bytes": 13798,
+        "line_count": 363
+      },
+      "proposed": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-prep-01/proposed/ctf_thermal_history_tests.rs",
+        "sha256": "2a606a6e7b4e493853882c4834c21fe12e1007f7b5984e35a33590c57d259586",
+        "size_bytes": 15795,
+        "line_count": 422
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-prep-01/diffs/ctf_thermal_history_tests.rs.diff",
+        "sha256": "8c2646306cb025585102044653ea8f1b2f63f595fce06d7ea425ec4b8386c366",
+        "size_bytes": 2297,
+        "line_count": 65
+      },
+      "current_canonical_equal_before_at_seal": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle_tests.rs",
+      "before": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-prep-01/before/ctf_surface_lifecycle_tests.rs",
+        "sha256": "dae1d436f4e2e1d8c360d416ecdf7d348ba448c3253d2a31c8833153d55da1ac",
+        "size_bytes": 18198,
+        "line_count": 549
+      },
+      "proposed": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-prep-01/proposed/ctf_surface_lifecycle_tests.rs",
+        "sha256": "25deb4a1c66c68f1c45895bf6a4a17e5d1fee7ce0c037ca35059bbc9b439a8eb",
+        "size_bytes": 20148,
+        "line_count": 590
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-prep-01/diffs/ctf_surface_lifecycle_tests.rs.diff",
+        "sha256": "cdf78c043b07d6b4a6faa8785718b7550d0e4a9e0089c6fc368b487e5b3677b0",
+        "size_bytes": 2249,
+        "line_count": 47
+      },
+      "current_canonical_equal_before_at_seal": true
+    }
+  ],
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-applied-final-source-02/manifest.json",
+      "sha256": "d0cfd8b5bd3a54e195932efe29ceca043d2fac60c72211a4d46fd1ff071a1bc9",
+      "size_bytes": 8308,
+      "line_count": 158
+    },
+    {
+      "path": ".runtime/porting/CTF-10/production-activation-applied-final-source-02/manifest.json",
+      "sha256": "b75c7f596ecc7b5e132b1069d4c1949675b517b1e9c6c7c287ef3854cca55cef",
+      "size_bytes": 41231,
+      "line_count": 765
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "sha256": "0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c",
+      "size_bytes": 698972,
+      "line_count": 10119
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array1D.hh",
+      "sha256": "071a06b62da9ab4aefe4ad0fbfa2bfd07b48a484b2ef346188885db5db2e6e83",
+      "size_bytes": 55083,
+      "line_count": 2509
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array1.hh",
+      "sha256": "d1f4dade3becca09d780cb4c8da044876be5d67a9ae5ad8f8568faabf06fe066",
+      "size_bytes": 36387,
+      "line_count": 1736
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array.hh",
+      "sha256": "1c8e5f14bbdd577f8a6cc56d378308dcb72bf6cbdf0fa051ee9a4eaf7f1b823e",
+      "size_bytes": 57551,
+      "line_count": 2397
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "first_line": 1455,
+      "last_line": 1464,
+      "sha256": "b638cf62d3013fe5817a3af156b50d29cfa42174e505cec2fed86cdca1b5b188",
+      "size_bytes": 818,
+      "line_count": 10,
+      "purpose": "Fixed history rows dimensioned to actual TotSurfaces"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "first_line": 5245,
+      "last_line": 5256,
+      "sha256": "37fe266c9a43a37566bd8c689c23bb55fe788a981027060cd1fab14e6169ea39",
+      "size_bytes": 950,
+      "line_count": 12,
+      "purpose": "Actual first-time scratch allocation and flag write"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+      "first_line": 5260,
+      "last_line": 5365,
+      "sha256": "a2fb68fc82b70d6d198cec63985cfd2da40b1c5bec12c8765621d8db2f3f1119",
+      "size_bytes": 8548,
+      "line_count": 106,
+      "purpose": "Complete selected ordinary flux loops and simple move/copy/return"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array1D.hh",
+      "first_line": 113,
+      "last_line": 122,
+      "sha256": "d3afdc94ba39e5fc7254857ae19daad59f72ac7a3c5d0f68763daa73e43965b8",
+      "size_bytes": 160,
+      "line_count": 10,
+      "purpose": "Literal Array1D copy and move constructors"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array1D.hh",
+      "first_line": 471,
+      "last_line": 497,
+      "sha256": "b7570f1272e6c699114d1a9b9812256d3f2822dc064168a15fe82c163fc9939c",
+      "size_bytes": 480,
+      "line_count": 27,
+      "purpose": "Literal Array1D copy and move assignment routing"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array1.hh",
+      "first_line": 109,
+      "last_line": 121,
+      "sha256": "d85230ebeaf8810a56471dd80028d0f158af060741bcff71f9486a29411d58fa",
+      "size_bytes": 202,
+      "line_count": 13,
+      "purpose": "Array1 move clears source range"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array1.hh",
+      "first_line": 1220,
+      "last_line": 1226,
+      "sha256": "230262bf5b6b8888c7b48af66fbbc19f4e736862d5e84fb14750fb7b64a36f96",
+      "size_bytes": 76,
+      "line_count": 7,
+      "purpose": "Actual moved-from range clearing"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array.hh",
+      "first_line": 132,
+      "last_line": 146,
+      "sha256": "ffccb3e7bf2fb8aa62ccdde2d8357fd54aafb76a7b8159283251b5dacafc7472",
+      "size_bytes": 325,
+      "line_count": 15,
+      "purpose": "Base move transfers and clears size tozero"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array.hh",
+      "first_line": 399,
+      "last_line": 418,
+      "sha256": "8e9121f0b8d4b9dc9d205486ac16ad70c0aa9ced1890b05d816b91c7191bb99d",
+      "size_bytes": 445,
+      "line_count": 20,
+      "purpose": "Base copy validates equal bounded size and performs size element loops"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array.hh",
+      "first_line": 2075,
+      "last_line": 2089,
+      "sha256": "59e1319534909848d4f033021523e443c2f79582fc6c7ff5c7408af2a717bc4e",
+      "size_bytes": 310,
+      "line_count": 15,
+      "purpose": "Conformable move clears source size"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-prep-01/before/ctf_thermal_history.rs",
+      "first_line": 188,
+      "last_line": 305,
+      "sha256": "8d66ceb44e55b5ebd8f6ef6a3ca9cddd096d091fc61fd9573fb357e8924cf34f",
+      "size_bytes": 4051,
+      "line_count": 118,
+      "purpose": "Existing complete layout/loop/array/report prepare validation"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-prep-01/before/ctf_thermal_history.rs",
+      "first_line": 397,
+      "last_line": 497,
+      "sha256": "7a69b0663518c297ed1304bfebb58fb81735e1ccee1362ca98de992910ecfd76",
+      "size_bytes": 4778,
+      "line_count": 101,
+      "purpose": "Actual update preflight and unchanged literal simple shift"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-prep-01/before/ctf_thermal_history_tests.rs",
+      "first_line": 321,
+      "last_line": 363,
+      "sha256": "01409efb30ebb0e90a3ecae9f61ce2a9f8b1cbb41634ca44031d674fd75d6a54",
+      "size_bytes": 1677,
+      "line_count": 43,
+      "purpose": "Preserved existing nonempty global0 rejection"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-prep-01/before/ctf_surface_lifecycle_tests.rs",
+      "first_line": 12,
+      "last_line": 138,
+      "sha256": "802141abc6f93c6ded2894644e342a840908c4720fe49a3992a23e441e9a8a13",
+      "size_bytes": 4329,
+      "line_count": 127,
+      "purpose": "Authentic ordinary model/initializer/prepared clock fixtures"
+    }
+  ],
+  "proposed_tests_not_executed": {
+    "new_count": 3,
+    "topics": [
+      "Empty global0 simple shift and repeat retains zero-element shape",
+      "Malformed empty layout rejects nonempty row before mutation",
+      "Real one-Zone zero-surface ordinary owner commits twice with actual returned aggregate0 and prepared clocks"
+    ],
+    "existing_nonempty_zero_guard_test_retained": true,
+    "Native_endpoint_answers_used": false,
+    "production_weather_driver_claimed": false
+  },
+  "validation": {
+    "math_changes": "one guard conjunction plus nonempty variant doc qualification",
+    "all_other_mathematical_operation_bytes_unchanged": true,
+    "old_test_bytes_preserved_as_complete_prefix": true,
+    "exact_inverse_restores_three_before_files": true,
+    "canonical_mutation_performed": false,
+    "target_execution_performed": false,
+    "scientific_payload_read": false,
+    "future_results_or_hashes_invented": false
+  }
+}

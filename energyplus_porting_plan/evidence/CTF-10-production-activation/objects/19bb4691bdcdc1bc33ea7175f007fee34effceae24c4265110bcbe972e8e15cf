@@ -1,0 +1,52 @@
+--- crates/ep_runtime/src/runtime/tests/part13.rs (actual applied before)
++++ crates/ep_runtime/src/runtime/tests/part13.rs (typed explicit caller clocks proposal)
+@@ -145,6 +145,8 @@
+     fn cached_and_live_internal_gain_timestep_paths_are_bit_equal_with_nonvacuous_operation_counts()
+     -> Result<(), Box<dyn std::error::Error>> {
+         let mut typed = cube_model();
++        // This fixture authors one real hourly step for each schedule sample.
++        typed.timestep.number_of_timesteps_per_hour = 1;
+         typed.other_equipment[0].fraction_radiant = 0.2;
+         typed.schedules.clear();
+         typed.compact_schedules.push(ScheduleCompact {
+@@ -207,6 +209,13 @@
+                 hour_ending,
+                 timestep_seconds: SECONDS_PER_HOUR,
+             };
++            let cached_clock = cached_state.ctf_history_caller_clock.prepare(
++                crate::weather::day::WeatherDayPhase::Run { day: 1 },
++                usize::try_from(hour_ending - 1)?,
++                model.typed.timestep.number_of_timesteps_per_hour,
++                1,
++                input.timestep_seconds,
++            ).map_err(RuntimeError::CtfSurfaceLifecycle)?;
+             super::advance_heat_balance_state_one_timestep_internal_with_schedule_cache_profiled(
+                 &model.typed,
+                 &schedule_cache,
+@@ -219,6 +228,16 @@
+                 None,
+                 HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,
+             );
++            crate::heat_balance::ctf_surface_lifecycle::ensure_available(&cached_state)?;
++            cached_state.ctf_history_caller_clock.commit(cached_clock)
++                .map_err(RuntimeError::CtfSurfaceLifecycle)?;
++            let live_clock = live_state.ctf_history_caller_clock.prepare(
++                crate::weather::day::WeatherDayPhase::Run { day: 1 },
++                usize::try_from(hour_ending - 1)?,
++                model.typed.timestep.number_of_timesteps_per_hour,
++                1,
++                input.timestep_seconds,
++            ).map_err(RuntimeError::CtfSurfaceLifecycle)?;
+             super::advance_heat_balance_state_one_timestep_internal_with_live_schedule_profiled(
+                 &model.typed,
+                 &mut live_operations,
+@@ -230,6 +249,9 @@
+                 None,
+                 HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,
+             );
++            crate::heat_balance::ctf_surface_lifecycle::ensure_available(&live_state)?;
++            live_state.ctf_history_caller_clock.commit(live_clock)
++                .map_err(RuntimeError::CtfSurfaceLifecycle)?;
+ 
+             assert_eq!(
+                 cached_state.zones[0].convective_internal_gain_w.to_bits(),

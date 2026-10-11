@@ -96,8 +96,9 @@
             is_part_of_total_floor_area: true,
             is_nominal_controlled: false,
             linked_outdoor_air_node: None,
-            spaces: Vec::new(),
+            spaces: vec![ep_model::SpaceId(0)],
         });
+        model.spaces.push(fixture_default_space(0, ZoneId(0), "Zone One"));
         model.other_equipment.push(OtherEquipment {
             id: InternalGainId(0),
             name: NormalizedName::new("Plug Load"),
@@ -197,8 +198,9 @@
             is_part_of_total_floor_area: true,
             is_nominal_controlled: false,
             linked_outdoor_air_node: None,
-            spaces: Vec::new(),
+            spaces: vec![ep_model::SpaceId(0)],
         });
+        model.spaces.push(fixture_default_space(0, ZoneId(0), "Zone A"));
         model.zones.push(Zone {
             id: ZoneId(1),
             name: NormalizedName::new("Zone B"),
@@ -220,8 +222,9 @@
             is_part_of_total_floor_area: true,
             is_nominal_controlled: false,
             linked_outdoor_air_node: None,
-            spaces: Vec::new(),
+            spaces: vec![ep_model::SpaceId(1)],
         });
+        model.spaces.push(fixture_default_space(1, ZoneId(1), "Zone B"));
         model.surfaces.push(interzone_surface(
             0,
             "A Wall",
@@ -372,7 +375,7 @@
             surface_type: SurfaceType::Wall,
             construction: ConstructionId(0),
             zone,
-            space: ep_model::SpaceId(0),
+            space: ep_model::SpaceId(zone.0),
             outside_boundary_condition: OutsideBoundaryCondition::Surface,
             outside_boundary_condition_object: Some(NormalizedName::new(target_surface)),
             sun_exposure: ep_model::SunExposure::NoSun,
@@ -380,6 +383,22 @@
             view_factor_to_ground: AutoOrNumber::AutoCalculate,
             vertices: vertices.to_vec(),
             computed_geometry: None,
+        }
+    }
+
+    // Prepared typed models retain the compiler's ordinary whole-zone owner.
+    fn fixture_default_space(id: u32, zone: ZoneId, name: &str) -> ep_model::Space {
+        ep_model::Space {
+            id: ep_model::SpaceId(id),
+            name: NormalizedName::new(name),
+            zone,
+            ceiling_height: AutoOrNumber::AutoCalculate,
+            volume: AutoOrNumber::AutoCalculate,
+            floor_area: AutoOrNumber::AutoCalculate,
+            space_type: NormalizedName::new("GENERAL"),
+            space_type_id: ep_model::SpaceTypeId(0),
+            tags: Vec::new(),
+            origin: ep_model::SpaceOrigin::AutoZoneDefault,
         }
     }
 

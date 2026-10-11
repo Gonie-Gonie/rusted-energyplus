@@ -1,0 +1,20 @@
+--- before/heat_balance/ctf_surface_binding_tests.rs
++++ proposed/heat_balance/ctf_surface_binding_tests.rs
+@@ -19,7 +19,7 @@
+ 
+ fn context() -> CtfSurfaceGenerationContext {
+     CtfSurfaceGenerationContext {
+-        producer_revision: [1; 32],
++        producer_revision: CtfSurfaceProducerRevision::Explicit([1; 32]),
+         time_step_zone_hours: 0.25,
+         initial_flags: CtfCallerSharedFlags {
+             errors_found: false,
+@@ -271,7 +271,7 @@
+     assert_ne!(before_count, *capture(&model, &public)?.key());
+     for changed in [
+         CtfSurfaceGenerationContext {
+-            producer_revision: [2; 32],
++            producer_revision: CtfSurfaceProducerRevision::Explicit([2; 32]),
+             ..context()
+         },
+         CtfSurfaceGenerationContext {

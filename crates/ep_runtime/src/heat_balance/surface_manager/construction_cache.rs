@@ -3,7 +3,7 @@
 use super::ctf_all_resistive::{
     ConstructionCtfAllResistive, CtfAllResistiveUnavailable, generate_all_resistive_ctf,
 };
-use super::ctf_caller_stability::{CtfCallerDiagnosticNames, CtfCallerSharedFlags};
+use super::ctf_caller_stability::CtfCallerDiagnosticNames;
 use super::ctf_layer_preprocessing::{
     ConstructionCtfLayerPreprocessing, CtfLayerContext, material_layer_inputs,
     preprocess_ctf_layers,
@@ -69,6 +69,14 @@ pub(crate) struct ConstructionThermalDataCache {
     first_private_coefficients: Vec<ConstructionCtfFirstFinalCoefficients>,
     retry_initializations: Vec<ConstructionCtfRetryInitialization>,
     public_initialization: Option<OrderedCtfPublicInitialization>,
+    public_surface_lifecycle: Option<
+        Result<
+            crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycle,
+            crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable,
+        >,
+    >,
+    pub(crate) generation_context:
+        crate::heat_balance::ctf_surface_binding::CtfSurfaceGenerationContext,
     construction_slots: TypedIdSlotIndex,
     entry_index_by_construction_slot: Vec<Option<usize>>,
     pub(crate) no_mass_construction_ids: Vec<ConstructionId>,
@@ -120,21 +128,30 @@ impl ConstructionThermalDataCache {
             .iter()
             .map(|surface| surface.construction.0)
             .collect::<BTreeSet<_>>();
-        let mut shared_flags = CtfCallerSharedFlags {
-            errors_found: false,
-            do_ctf_error_report: false,
-        };
+        let generation_context =
+            crate::heat_balance::ctf_surface_lifecycle::fresh_generation_context(
+                time_step_zone_hours,
+            );
+        let mut shared_flags = generation_context.initial_flags;
         let mut selected_chain_stop = None;
         // Fresh ordinary state uses DataHeatBalance.hh SimpleCTFOnly=true/MaxCTFTerms=0.
         // This is a selected public/aggregate prefix, not report/fatal completion.
-        let mut public_initialization = OrderedCtfPublicInitialization::begin(true, 0);
+        let mut public_initialization = OrderedCtfPublicInitialization::begin(
+            generation_context.initial_simple_ctf_only,
+            generation_context.initial_max_ctf_terms,
+        );
         for (construction_index, construction) in model.constructions.iter().enumerate() {
             if !construction.is_ordinary_opaque() {
-                public_initialization.record_excluded(
-                    construction_index,
-                    construction,
-                    used_ctf_constructions.contains(&construction.id.0),
-                );
+                if used_ctf_constructions.contains(&construction.id.0) {
+                    public_initialization.record_excluded(construction_index, construction, true);
+                } else {
+                    // Source public reset/unused return precedes all layer/retry reads.
+                    public_initialization.record_unused_reset(
+                        construction_index,
+                        construction,
+                        shared_flags,
+                    );
+                }
                 continue;
             }
             let context = CtfLayerContext {
@@ -228,6 +245,19 @@ impl ConstructionThermalDataCache {
         validate_surface_construction_families(model, &construction_slots)?;
 
         let coefficient_cache_hash = construction_cache_hash(&entries);
+        // Capture at the single actual producer call, before its owners move.
+        // Explicit EIO diagnostics retain their separate legacy numerical route.
+        let public_surface_lifecycle = if ctf_coefficients_by_construction.is_empty() {
+            Some(
+                crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycle::allocate(
+                    model,
+                    &public_initialization,
+                    generation_context,
+                ),
+            )
+        } else {
+            None
+        };
         Ok(Self {
             entries,
             initial_discretizations,
@@ -238,6 +268,8 @@ impl ConstructionThermalDataCache {
             first_private_coefficients,
             retry_initializations,
             public_initialization: Some(public_initialization),
+            public_surface_lifecycle,
+            generation_context,
             construction_slots,
             entry_index_by_construction_slot,
             no_mass_construction_ids,
@@ -290,15 +322,32 @@ impl ConstructionThermalDataCache {
         std::mem::take(&mut self.retry_initializations)
     }
 
-    /// Move the actual new public/aggregate prefix; legacy surface/cache behavior is separate.
+    /// Move the actual public/aggregate prefix retained by the ordinary surface lifecycle.
     pub(crate) fn take_public_initialization(&mut self) -> Option<OrderedCtfPublicInitialization> {
         self.public_initialization.take()
+    }
+
+    pub(crate) fn public_initialization(&self) -> Option<&OrderedCtfPublicInitialization> {
+        self.public_initialization.as_ref()
+    }
+
+    pub(crate) fn take_public_surface_lifecycle(
+        &mut self,
+    ) -> Option<
+        Result<
+            crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycle,
+            crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable,
+        >,
+    > {
+        self.public_surface_lifecycle.take()
     }
 
     pub(crate) fn len(&self) -> usize {
         self.entries.len()
     }
 
+    // Legacy report/diagnostic identity only. Ordinary reuse is authorized by
+    // CtfSurfaceLifecycle::generation_key(), which contains the full public/input witnesses.
     pub(crate) fn invalidation_token(&self) -> ConstructionCacheInvalidationToken {
         ConstructionCacheInvalidationToken::from_coefficient_cache_hash(self.coefficient_cache_hash)
     }

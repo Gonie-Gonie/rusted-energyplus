@@ -203,6 +203,17 @@ where
             if capture_sky_transport {
                 hour_sky_transport_stamp = sky_transport_stamp;
             }
+            let prepared_legacy_clock = super::ctf_caller_clock::prepare_legacy_step(
+                state,
+                weather_driver,
+                WeatherDayPhase::Run {
+                    day: hour_index / 24 + 1,
+                },
+                hour_index,
+                steps,
+                substep,
+                seconds_per_timestep,
+            )?;
             let timestep_output = step_driver(
                 &mut *state,
                 HeatBalanceStepInput {
@@ -214,6 +225,7 @@ where
                 hour_index,
                 substep,
             )?;
+            super::ctf_caller_clock::commit_legacy_step(state, prepared_legacy_clock)?;
             timestep_outputs.push(timestep_output);
 
             for sample in &state.last_ctf_history_slot_terms {

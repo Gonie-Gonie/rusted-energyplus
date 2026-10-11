@@ -37,6 +37,43 @@ pub struct ProductionSolarMetadata {
     pub equation_of_time_hours: f64,
 }
 
+/// Explicit caller clock copied before the thermal consumer. Production weather
+/// supplies its actual owner; prepared manual/legacy callers own a separate
+/// lifecycle. No clock is reconstructed from a surface counter or coefficient.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ProductionCtfHistoryClock {
+    /// Actual owned weather phase, including independent warmup-day identity.
+    pub phase: WeatherDayPhase,
+    /// Actual raw-hour request index.
+    pub record_index: usize,
+    /// Actual BeginSimFlag.
+    pub begin_simulation: bool,
+    /// Actual BeginEnvrnFlag.
+    pub begin_environment: bool,
+    /// Actual DayOfSim.
+    pub day_of_sim: i32,
+    /// Actual HourOfDay.
+    pub hour_of_day: i32,
+    /// Actual TimeStep.
+    pub time_step: i32,
+    /// Actual SimTimeSteps, retained independently of the phase/index key.
+    pub sim_time_steps: i32,
+    /// Actual TimeStepZone in hours.
+    pub time_step_zone: f64,
+    /// Actual TimeStepZoneSec.
+    pub time_step_zone_seconds: f64,
+}
+
+impl ProductionCtfHistoryClock {
+    pub(crate) fn same_zone_step(self, other: Self) -> bool {
+        self.phase == other.phase
+            && self.record_index == other.record_index
+            && self.day_of_sim == other.day_of_sim
+            && self.hour_of_day == other.hour_of_day
+            && self.time_step == other.time_step
+    }
+}
+
 /// Owned operands from the actual Today owner at one thermal timestep.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ProductionWeatherContext {
@@ -54,6 +91,8 @@ pub struct ProductionWeatherContext {
     pub local_hour: f64,
     /// Passive actual Current completion identity; absent outside C6 capture.
     pub sky_transport_stamp: Option<SkyTransportStamp>,
+    /// Genuine caller clock; explicit standalone contexts may have no lifecycle.
+    pub ctf_history_clock: Option<ProductionCtfHistoryClock>,
 }
 
 /// Production weather lifecycle shared by A and B consumers.
@@ -260,9 +299,22 @@ impl ProductionWeatherTimestepSeries {
                 ordinal as u32,
                 period_days,
             );
+        let ctf_history_clock = ProductionCtfHistoryClock {
+            phase,
+            record_index,
+            begin_simulation: session.state.global.begin_sim_flag,
+            begin_environment: session.state.global.begin_envrn_flag,
+            day_of_sim: session.state.global.day_of_sim,
+            hour_of_day: session.state.global.hour_of_day,
+            time_step: session.state.global.time_step,
+            sim_time_steps: session.state.global.sim_time_steps,
+            time_step_zone: session.state.global.time_step_zone,
+            time_step_zone_seconds: session.state.global.time_step_zone_sec,
+        };
         let context = ProductionWeatherContext {
             record,
             sample,
+            ctf_history_clock: Some(ctf_history_clock),
             sky_transport_stamp: *self.current_step_stamp.borrow(),
             weather,
             current_weather,

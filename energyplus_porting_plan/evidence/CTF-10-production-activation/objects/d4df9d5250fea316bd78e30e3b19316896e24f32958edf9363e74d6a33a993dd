@@ -1,0 +1,60 @@
+# Prepared caller clock Source proposal
+
+This immutable proposal supplies the missing authored caller lifecycle for
+ordinary manual and legacy run-period thermal steps. It contains nine changed
+existing Rust files and two new Rust files. No canonical source was changed and
+no formatter, compiler, project test, engine or scientific output was used.
+
+`CtfHistoryCallerClock` is a distinct owner in `HeatBalanceState`, allocated by
+the actual ordinary initializer. Its flags begin true and its committed count
+begins zero. The actual warmup/run loops supply their phase/day/hour request,
+zone substep, steps/hour and duration. Preparing retains a pending stamp;
+committing clears the first flags only after the real thermal return succeeds.
+Neither clock construction nor its commit reads the surface timestep counter,
+coefficient timestep or a Native observation.
+
+Warmup uses its existing typed retained-failure check after the void callback.
+The shared run-period driver commits only after its Result returns Ok and the
+same retained-failure check succeeds. An error keeps the pending clock, count
+and first flags; another attempt cannot replay that step. No failed caller
+return refreshes producer authority or records a completed thermal step.
+
+The shared loop covers standalone heat balance and the actual coupled
+PurchasedAir run-period caller. Its predictor-hook signature and existing
+temperature/humidity/history/report ordering remain intact. This proposal adds
+clock preparation before that hook and caller commit before output collection.
+It does not change the purchased-air `begin_environment` operand.
+
+Production weather remains authoritative: the presence of an owned Production
+context selects that context's actual clock, including genuine unavailable
+None. The legacy caller never supplies a replacement for Production. Legacy
+dry-bulb and Legacy weather-series paths use the actual prepared loop clock.
+
+The new public `advance_heat_balance_state_one_timestep_with_clock` returns
+Result and invokes the existing source-order body once. An ordinary manual
+caller can own `CtfHistoryCallerClock`, call prepare with explicit caller
+operands, pass that stamp to the fallible entry and commit only after Ok. The
+existing three-argument void entry supplies no clock; ordinary ownership still
+retains its honest MissingCallerClock error. No implicit fallback is added.
+
+The compile-time producer witness list adds the actual clock/timestep/caller
+sources and production weather source. It continues to use literal include_str
+bytes without runtime filesystem I/O, custom digest or dependency. No existing
+generation primitive, public coefficient or consumer-view check is weakened.
+
+Three new tests use the real ordinary massive construction initializer with
+authored Zone/Space membership: two distinct manual steps/weather values,
+actual legacy warmup-to-run loops sharing one first-environment lifecycle, and
+an actual material mutation which fails before commit and cannot replay.
+Their expectations concern ownership, clocks and successful calls, with no
+calculated expected temperatures or Native endpoint values. The fixture body
+is copied exactly from the existing lifecycle test model, recorded separately.
+The tests are unexecuted Source proposals.
+
+Existing lifecycle/math tests and the separate Base fixture/empty-layout fixes
+are untouched. Before refs are the actual current formatted activation Source;
+the manifest records the actual formatted inventory membership where present.
+Root must merge any independently accepted concurrent parent changes, perform
+FULL source review and obtain an independent peer before applying this package.
+Broader interzone/material admission, diagnostics, physics assertions, Native
+whole-runtime evidence and CTF gates are unchanged by this proposal.

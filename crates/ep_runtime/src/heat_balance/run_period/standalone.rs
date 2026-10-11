@@ -49,7 +49,7 @@ pub(crate) fn sample_heat_balance_run_period(
                 options.inside_hconv_reevaluation_interval,
                 options.surface_loop_zone_air_correction,
             );
-            Ok::<(), RuntimeError>(())
+            crate::heat_balance::ctf_surface_lifecycle::ensure_available(state)
         },
     );
     sampled.map(|(samples, _)| samples)

@@ -1,0 +1,71 @@
+--- before/heat_balance/ctf.rs
++++ proposed/heat_balance/ctf.rs
+@@ -51,6 +51,7 @@
+     initial_temperature_c: f64,
+ ) -> SurfaceCtfState {
+     SurfaceCtfState {
++        public_num_ctf_terms: None,
+         outside_0_w_per_m2_k: coefficient_w_per_m2_k,
+         cross_0_w_per_m2_k: coefficient_w_per_m2_k,
+         inside_0_w_per_m2_k: coefficient_w_per_m2_k,
+@@ -75,6 +76,7 @@
+ ) -> SurfaceCtfState {
+     let end = coefficients.num_ctf_terms + 1;
+     SurfaceCtfState {
++        public_num_ctf_terms: None,
+         outside_0_w_per_m2_k: coefficients.outside[0],
+         cross_0_w_per_m2_k: coefficients.cross[0],
+         inside_0_w_per_m2_k: coefficients.inside[0],
+@@ -92,6 +94,28 @@
+     }
+ }
+ 
++pub(crate) fn surface_ctf_state_from_public_storage(
++    coefficients: &super::surface_manager::ctf_public_storage::CtfPublicCoefficientStorage,
++) -> SurfaceCtfState {
++    // Binding has checked the actual inclusive fixed19 capacity before this call.
++    let terms = coefficients.num_ctf_terms as usize;
++    let end = terms + 1;
++    SurfaceCtfState {
++        public_num_ctf_terms: Some(coefficients.num_ctf_terms),
++        outside_0_w_per_m2_k: coefficients.outside[0], cross_0_w_per_m2_k: coefficients.cross[0],
++        inside_0_w_per_m2_k: coefficients.inside[0], flux_0: Some(coefficients.flux[0]),
++        const_in_part_w_per_m2: 0.0, const_out_part_w_per_m2: 0.0,
++        outside_history_w_per_m2_k: coefficients.outside[1..end].to_vec(),
++        cross_history_w_per_m2_k: coefficients.cross[1..end].to_vec(),
++        inside_history_w_per_m2_k: coefficients.inside[1..end].to_vec(),
++        flux_history: coefficients.flux[1..end].to_vec(),
++        // Actual allocation zero only; genuine BeginEnvrn fills these from the
++        // sole normal19 owner before a selected surface calculation is allowed.
++        outside_temperature_history_c: vec![0.0; terms], inside_temperature_history_c: vec![0.0; terms],
++        outside_flux_history_w_per_m2: vec![0.0; terms], inside_flux_history_w_per_m2: vec![0.0; terms],
++    }
++}
++
+ pub(crate) fn construction_ctf_coefficients_by_name(
+     coefficients: &[ConstructionCtfCoefficientOverride],
+ ) -> BTreeMap<String, Vec<&ConstructionCtfCoefficientOverride>> {
+@@ -126,6 +150,7 @@
+     let history_terms = history.len();
+ 
+     Some(SurfaceCtfState {
++        public_num_ctf_terms: None,
+         outside_0_w_per_m2_k: zero.outside_w_per_m2_k,
+         cross_0_w_per_m2_k: zero.cross_w_per_m2_k,
+         inside_0_w_per_m2_k: zero.inside_w_per_m2_k,
+@@ -673,6 +698,7 @@
+ 
+ pub(crate) fn surface_ctf_const_in_part_w_per_m2(surface: &SurfaceHeatBalanceState) -> f64 {
+     let mut const_in_part_w_per_m2 = 0.0;
++    if surface.ctf.public_num_ctf_terms.is_some_and(|count| count <= 1) { return const_in_part_w_per_m2; }
+     let terms = surface_ctf_history_term_count(surface);
+ 
+     for term in 0..terms {
+@@ -717,6 +743,7 @@
+ 
+ pub(crate) fn surface_ctf_const_out_part_w_per_m2(surface: &SurfaceHeatBalanceState) -> f64 {
+     let mut const_out_part_w_per_m2 = 0.0;
++    if surface.ctf.public_num_ctf_terms.is_some_and(|count| count <= 1) { return const_out_part_w_per_m2; }
+     let terms = surface_ctf_history_term_count(surface);
+ 
+     for term in 0..terms {

@@ -12231,6 +12231,11 @@
         "path": "energyplus_porting_plan/evidence/CTF-10-thermal-history-unit/summary.json",
         "sha256": "166cdbeca01f8551d1e3ece22ea0c3c4a2c9492233db46104f99f22c8e15fdaf",
         "size_bytes": 12623
+      },
+      "actual_current_ordinary_surface_lifecycle_activation": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-production-activation/summary.json",
+        "sha256": "5eae409a99dcbcca1818250cc957817c8afe164def8fed7113d15c2d00f4b768",
+        "size_bytes": 8727
       }
     },
     {

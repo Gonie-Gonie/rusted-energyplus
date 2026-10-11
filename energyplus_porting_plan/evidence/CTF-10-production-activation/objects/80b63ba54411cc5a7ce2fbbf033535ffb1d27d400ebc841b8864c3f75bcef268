@@ -1,0 +1,21 @@
+--- .runtime/porting/CTF-10/production-activation-card-consolidation-prep-02/before-01/CTF-10.proposed.md
++++ .runtime/porting/CTF-10/production-activation-card-consolidation-prep-02/CTF-10.proposed.md
+@@ -34,7 +34,8 @@
+ Inputs are actual construction/material/layer IDs, use, incoming flags and timestep. Outputs are independently generated public owners by original ConstructionId and ordered initialization outcomes.
+ All twelve public arrays retain19 slots. NumCTFTerms/NumHistories, timestep/UValue, reverse provider and shared flag lifetimes remain distinct.
+ The selected Rust fixed19 owner represents inclusive term0..18. PublicCapacity is a Rust limitation, not a Native guard, safe-store inference or return outcome.
+-Fatal bypasses stores/aggregate; severe break reaches actual stores. Missing return, unavailable, excluded and unrepresentable owners cannot become zero or PASS.
++Construction FatalNoCtfs stops before its public stores and its caller's postreturn aggregate; severe break reaches stores.
++Whole Init final ErrorsFound fatal occurs after returned-call aggregates, reportLayers, ScanForReports and any reached conditional reporting. Missing return, unavailable, excluded and unrepresentable owners cannot become zero or PASS.
+ CON-01 exclusions are retained; this card does not expand unsupported surface/material families.
+ 
+ ## Frozen numerical and custody policies
+@@ -99,7 +100,7 @@
+ ## Remaining scope and completion checks
+ 
+ - [x] Original scope and input/output/mutated-owner contracts fixed
+-- [ ] Whole unit gate: final evidence decision for reached branches and generated-cache invalidation
++- [ ] Whole unit gate: remaining whole Init/helper/report/fatal evidence; selected cache-invalidation regressions already passed in current quality
+ - [ ] Integration gate: ordinary Rust/Native time/state/call-order and persistent-history numerical pairing
+ - [ ] Production gate: ordinary path, prerequisite gates and absence of EP/fixture answer injection
+ 

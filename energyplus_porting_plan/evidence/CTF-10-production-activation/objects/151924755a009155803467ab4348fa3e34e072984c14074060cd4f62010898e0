@@ -1,0 +1,10 @@
+--- before/heat_balance/timestep/purchased_air.rs
++++ proposed/heat_balance/timestep/purchased_air.rs
+@@ -51,6 +51,7 @@
+             surface_iteration_count,
+             inside_hconv_reevaluation_interval,
+             surface_loop_zone_air_correction,
++            None,
+             |state| {
+                 // CP299 consumes current non-system predictor terms. Materialize
+                 // them after history/internal-gain preparation, without

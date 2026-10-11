@@ -1,0 +1,37 @@
+"""Root runs the established gates on an actual reviewed current Source inventory."""
+import hashlib,json,subprocess,sys
+from pathlib import Path
+ROOT=Path.cwd().resolve(); BASE=ROOT/'.runtime/porting/CTF-10'
+def read(p): return json.loads(p.read_bytes())
+def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
+assert len(sys.argv)==3
+final=(ROOT/sys.argv[1]).resolve(); assert final==BASE/'production-activation-applied-final-source-03/manifest.json'
+assert sha(final)==sys.argv[2]
+v=read(final); assert v['Root_and_other_author_FULL_formatter_correspondence_accepted'] is True
+rows=v['actual_sources']; paths={row['canonical_path'] for row in rows}
+assert len(paths)==len(rows) and len(rows)>=29
+observer_paths={'crates/ep_run/examples/ctf10_thermal_history_unit_observer.rs','crates/ep_run/examples/ctf10_thermal_history_unit_support/fields.rs'}
+assert observer_paths.issubset(paths)
+required=['ctf_caller_clock.rs','ctf_surface_lifecycle.rs','ctf_thermal_history.rs','ctf_public_initialization.rs','ctf_surface_binding.rs']
+assert all('crates/ep_runtime/src/heat_balance/'+name in paths for name in required)
+def current_sources_unchanged():
+ assert sha(final)==sys.argv[2]
+ changed=subprocess.check_output(['git','status','--porcelain=v1','-z','-uall']).decode().split('\0')[:-1]
+ source_paths={row[3:] for row in changed if row[3:].startswith('crates/') and row[3:].endswith('.rs')}
+ assert source_paths | observer_paths==paths,((source_paths | observer_paths)-paths,paths-(source_paths | observer_paths))
+ for row in rows:
+  archive=ROOT/row['actual_final_source']['path']; canonical=ROOT/row['canonical_path']
+  assert sha(archive)==row['actual_final_source']['sha256'] and sha(canonical)==row['actual_final_source']['sha256']
+  assert archive.stat().st_size==row['actual_final_source']['size_bytes']==canonical.stat().st_size
+current_sources_unchanged()
+settings=['--config','profile.dev.debug=0','--config','profile.test.debug=0','--config','build.incremental=false','--locked']
+commands=[('production-activation-fmt-check-command-02',['cargo','fmt','--all','--','--check']),('production-activation-clippy-command-02',['cargo','clippy',*settings,'--workspace','--all-targets','--','-D','warnings']),('production-activation-focused-command-02',['cargo','test',*settings,'-p','ep_runtime','--lib','heat_balance::']),('production-activation-workspace-command-02',['cargo','test',*settings,'--workspace'])]
+source=None
+for name,command in commands:
+ current_sources_unchanged()
+ subprocess.run(['python','-X','utf8','-B','tools/porting/record_command.py','--output-dir',(BASE/name).relative_to(ROOT).as_posix(),'--',*command],check=True)
+ receipt=read(BASE/name/'receipt.json'); assert receipt['exit_code']==0 and receipt['source_bytes_match_before_and_after'] and receipt['launch_error'] is None
+ if source is None: source=receipt['source_snapshot']
+ else: assert receipt['source_snapshot']==source
+ current_sources_unchanged()
+ print('Root current activation quality completed',name,source['sha256'],flush=True)

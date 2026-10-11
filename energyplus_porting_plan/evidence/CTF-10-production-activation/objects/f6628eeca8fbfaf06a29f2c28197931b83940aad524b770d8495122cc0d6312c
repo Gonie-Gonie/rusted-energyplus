@@ -1,0 +1,19 @@
+--- before/error.rs
++++ proposed/error.rs
+@@ -7,6 +7,8 @@
+ /// Runtime error for the first simulation subset.
+ #[derive(Debug, PartialEq)]
+ pub enum RuntimeError {
++    /// Actual selected public/history lifecycle stopped; no fallback or Native fatal is inferred.
++    CtfSurfaceLifecycle(crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable),
+     /// No zones were available to simulate.
+     NoZones,
+     /// No air-side nodes were available for a node-state projection.
+@@ -109,6 +111,7 @@
+ impl Display for RuntimeError {
+     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+         match self {
++            Self::CtfSurfaceLifecycle(error) => write!(f, "selected public CTF/history lifecycle unavailable: {error:?}"),
+             Self::NoZones => write!(
+                 formatter,
+                 "first-zone simulation requires at least one Zone"

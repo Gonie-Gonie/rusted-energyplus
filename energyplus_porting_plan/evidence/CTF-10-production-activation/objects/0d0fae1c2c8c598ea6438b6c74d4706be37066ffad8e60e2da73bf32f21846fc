@@ -1,0 +1,16 @@
+--- before/heat_balance/ctf_surface_lifecycle.rs
++++ proposed/heat_balance/ctf_surface_lifecycle.rs
+@@ -23,6 +23,13 @@
+ // Exact compiler-owned source witnesses. They are neither an answer digest nor
+ // runtime filesystem reads, and are automatically the actual compiled bytes.
+ const PRODUCER_SOURCES: &[(&str, &str)] = &[
++    ("caller_clock", include_str!("ctf_caller_clock.rs")),
++    ("timestep", include_str!("timestep.rs")),
++    ("purchased_air_step", include_str!("timestep/purchased_air.rs")),
++    ("warmup", include_str!("warmup.rs")),
++    ("run_period", include_str!("run_period.rs")),
++    ("run_period_standalone", include_str!("run_period/standalone.rs")),
++    ("production_weather", include_str!("../weather_day/production.rs")),
+     (
+         "construction_cache",
+         include_str!("surface_manager/construction_cache.rs"),

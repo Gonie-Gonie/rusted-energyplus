@@ -1,0 +1,60 @@
+--- accepted-literal/crates/ep_runtime/src/heat_balance/ctf.rs
++++ actual-formatted/crates/ep_runtime/src/heat_balance/ctf.rs
+@@ -102,17 +102,22 @@
+     let end = terms + 1;
+     SurfaceCtfState {
+         public_num_ctf_terms: Some(coefficients.num_ctf_terms),
+-        outside_0_w_per_m2_k: coefficients.outside[0], cross_0_w_per_m2_k: coefficients.cross[0],
+-        inside_0_w_per_m2_k: coefficients.inside[0], flux_0: Some(coefficients.flux[0]),
+-        const_in_part_w_per_m2: 0.0, const_out_part_w_per_m2: 0.0,
++        outside_0_w_per_m2_k: coefficients.outside[0],
++        cross_0_w_per_m2_k: coefficients.cross[0],
++        inside_0_w_per_m2_k: coefficients.inside[0],
++        flux_0: Some(coefficients.flux[0]),
++        const_in_part_w_per_m2: 0.0,
++        const_out_part_w_per_m2: 0.0,
+         outside_history_w_per_m2_k: coefficients.outside[1..end].to_vec(),
+         cross_history_w_per_m2_k: coefficients.cross[1..end].to_vec(),
+         inside_history_w_per_m2_k: coefficients.inside[1..end].to_vec(),
+         flux_history: coefficients.flux[1..end].to_vec(),
+         // Actual allocation zero only; genuine BeginEnvrn fills these from the
+         // sole normal19 owner before a selected surface calculation is allowed.
+-        outside_temperature_history_c: vec![0.0; terms], inside_temperature_history_c: vec![0.0; terms],
+-        outside_flux_history_w_per_m2: vec![0.0; terms], inside_flux_history_w_per_m2: vec![0.0; terms],
++        outside_temperature_history_c: vec![0.0; terms],
++        inside_temperature_history_c: vec![0.0; terms],
++        outside_flux_history_w_per_m2: vec![0.0; terms],
++        inside_flux_history_w_per_m2: vec![0.0; terms],
+     }
+ }
+ 
+@@ -698,7 +703,13 @@
+ 
+ pub(crate) fn surface_ctf_const_in_part_w_per_m2(surface: &SurfaceHeatBalanceState) -> f64 {
+     let mut const_in_part_w_per_m2 = 0.0;
+-    if surface.ctf.public_num_ctf_terms.is_some_and(|count| count <= 1) { return const_in_part_w_per_m2; }
++    if surface
++        .ctf
++        .public_num_ctf_terms
++        .is_some_and(|count| count <= 1)
++    {
++        return const_in_part_w_per_m2;
++    }
+     let terms = surface_ctf_history_term_count(surface);
+ 
+     for term in 0..terms {
+@@ -743,7 +754,13 @@
+ 
+ pub(crate) fn surface_ctf_const_out_part_w_per_m2(surface: &SurfaceHeatBalanceState) -> f64 {
+     let mut const_out_part_w_per_m2 = 0.0;
+-    if surface.ctf.public_num_ctf_terms.is_some_and(|count| count <= 1) { return const_out_part_w_per_m2; }
++    if surface
++        .ctf
++        .public_num_ctf_terms
++        .is_some_and(|count| count <= 1)
++    {
++        return const_out_part_w_per_m2;
++    }
+     let terms = surface_ctf_history_term_count(surface);
+ 
+     for term in 0..terms {

@@ -1,0 +1,274 @@
+{
+  "schema": "ctf10-unused-public-reset-producer-source-preparation.v1",
+  "status": "SOURCE-READY HELD; Root and independent FULL Source reviews and composed binding successor required before application",
+  "held_immutable": true,
+  "author": "Raw; Source reset/identity/caller custody only, no new selected physics or Native outcomes",
+  "readme": {
+    "path": ".runtime/porting/CTF-10/public-unused-reset-prep-01/README.md",
+    "sha256": "1d298cf32132f3eed8ca7dbe38e1d2fbc34e5ba280674e1e8d86b129d3ad5726",
+    "size_bytes": 2698,
+    "line_count": 42
+  },
+  "changed_sources": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_public_initialization.rs",
+      "before": {
+        "path": ".runtime/porting/CTF-10/public-unused-reset-prep-01/before/ctf_public_initialization.rs",
+        "sha256": "7841dfe0c3ef162cc5625fb332a47030bc2dc6792741cc80e50d35421104c006",
+        "size_bytes": 20519,
+        "line_count": 466
+      },
+      "proposed": {
+        "path": ".runtime/porting/CTF-10/public-unused-reset-prep-01/proposed/ctf_public_initialization.rs",
+        "sha256": "5a8c4e40a4978964e47319d46d4c65b7266b4db14d735d3de4c827076f82e42d",
+        "size_bytes": 22078,
+        "line_count": 502
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/public-unused-reset-prep-01/diffs/ctf_public_initialization.rs.diff",
+        "sha256": "06b9f5cb3969acb47fac7407c6889e28c4bdf1ab92fdef25b0e59f8d249e741c",
+        "size_bytes": 2875,
+        "line_count": 66
+      },
+      "current_canonical_equal_before_at_seal": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_public_initialization_tests.rs",
+      "before": {
+        "path": ".runtime/porting/CTF-10/public-unused-reset-prep-01/before/ctf_public_initialization_tests.rs",
+        "sha256": "6d941cc5d175541447d9d311389edc267a4d433c167b8da30b47d728080450df",
+        "size_bytes": 13161,
+        "line_count": 410
+      },
+      "proposed": {
+        "path": ".runtime/porting/CTF-10/public-unused-reset-prep-01/proposed/ctf_public_initialization_tests.rs",
+        "sha256": "dc748ea758086cd4f6f58e3af669730d47d4eb8032ae78b99eef7645dcfce540",
+        "size_bytes": 17852,
+        "line_count": 501
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/public-unused-reset-prep-01/diffs/ctf_public_initialization_tests.rs.diff",
+        "sha256": "33633e89c961a56695d43eca7cd120942d0917350bf0c1040261a22cdffd443b",
+        "size_bytes": 5277,
+        "line_count": 104
+      },
+      "current_canonical_equal_before_at_seal": true
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+      "before": {
+        "path": ".runtime/porting/CTF-10/public-unused-reset-prep-01/before/construction_cache.rs",
+        "sha256": "1b8b575c128e44da23a1328fdb61ee80afdc56c5e6f64f4d55794204078e125d",
+        "size_bytes": 25702,
+        "line_count": 631
+      },
+      "proposed": {
+        "path": ".runtime/porting/CTF-10/public-unused-reset-prep-01/proposed/construction_cache.rs",
+        "sha256": "90eac4ea06ca40b8a121f0845fc8f85c58f1510af8546d364e8cda23e4fcc933",
+        "size_bytes": 26086,
+        "line_count": 640
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/public-unused-reset-prep-01/diffs/construction_cache.rs.diff",
+        "sha256": "b2028c6e1305a6f64271d96f2dc45a1b8fb40f5e0f61622444896bb176a7b6e2",
+        "size_bytes": 1314,
+        "line_count": 28
+      },
+      "current_canonical_equal_before_at_seal": true
+    }
+  ],
+  "authentic_actual_formatted_before_authorities": [
+    {
+      "manifest": {
+        "path": ".runtime/porting/CTF-10/applied-final-source-02/manifest.json",
+        "sha256": "7b1dbbec2084e09bbc29bb1cde37bcc3fd539c6bb452e4a01d596753d2b1ea0c",
+        "size_bytes": 26984,
+        "line_count": 525
+      },
+      "members": [
+        {
+          "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_public_initialization.rs",
+          "actual_formatted_source": {
+            "path": ".runtime/porting/CTF-10/applied-final-source-02/crates/ep_runtime/src/heat_balance/ctf_public_initialization.rs",
+            "sha256": "7841dfe0c3ef162cc5625fb332a47030bc2dc6792741cc80e50d35421104c006",
+            "size_bytes": 20519
+          }
+        },
+        {
+          "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_public_initialization_tests.rs",
+          "actual_formatted_source": {
+            "path": ".runtime/porting/CTF-10/applied-final-source-02/crates/ep_runtime/src/heat_balance/ctf_public_initialization_tests.rs",
+            "sha256": "6d941cc5d175541447d9d311389edc267a4d433c167b8da30b47d728080450df",
+            "size_bytes": 13161
+          }
+        }
+      ]
+    },
+    {
+      "manifest": {
+        "path": ".runtime/porting/CTF-10/production-activation-applied-final-source-02/manifest.json",
+        "sha256": "b75c7f596ecc7b5e132b1069d4c1949675b517b1e9c6c7c287ef3854cca55cef",
+        "size_bytes": 41231,
+        "line_count": 765
+      },
+      "members": [
+        {
+          "canonical_path": "crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+          "actual_formatted_source": {
+            "path": ".runtime/porting/CTF-10/production-activation-applied-final-source-01/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs",
+            "sha256": "1b8b575c128e44da23a1328fdb61ee80afdc56c5e6f64f4d55794204078e125d",
+            "size_bytes": 25702
+          }
+        }
+      ]
+    }
+  ],
+  "source_dependencies": [
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs",
+      "sha256": "3327c29942113e0b5cd2fcf502d70933b080efa6b4e76ebca83dd36a534fe5a9",
+      "size_bytes": 9057,
+      "line_count": 198
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests/part03.rs",
+      "sha256": "ebd2f380dde5e33258eea080602bf723de88a7fef0dc0972670aa40ea18b018c",
+      "size_bytes": 46864,
+      "line_count": 1161
+    },
+    {
+      "path": "crates/ep_run/examples/ctf10_candidate_unit_support/fields.rs",
+      "sha256": "6d2d9a111da360943cc35f881bbfc7afc9fe8ef5af68461c2b2f07c1acf6788e",
+      "size_bytes": 37889,
+      "line_count": 685
+    },
+    {
+      "path": "crates/ep_run/examples/ctf10_candidate_production_support/unit_fields.rs",
+      "sha256": "6d2d9a111da360943cc35f881bbfc7afc9fe8ef5af68461c2b2f07c1acf6788e",
+      "size_bytes": 37889,
+      "line_count": 685
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "sha256": "d85937a0de02afa4ceb7e4ae03210cf513ffb9f1b86505d2900496393e7a7695",
+      "size_bytes": 110319,
+      "line_count": 2115
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+      "size_bytes": 371103,
+      "line_count": 6206
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Construction.cc",
+      "first_line": 146,
+      "last_line": 180,
+      "sha256": "3f1a184daf702cb73b5be279447e4f12cc746e7e0b1a9586c97c63d07e1abae8",
+      "size_bytes": 1883,
+      "purpose": "Actual reset and unused return before any layer/retry reads"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "first_line": 6154,
+      "last_line": 6166,
+      "sha256": "efa762f4e5581286b4e1cdb9c17a3b8d0bd94af0cb016a1d4affb56668642aaa",
+      "size_bytes": 632,
+      "purpose": "Actual postreturn simple/max aggregate order"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/public-unused-reset-prep-01/before/ctf_public_initialization.rs",
+      "first_line": 113,
+      "last_line": 158,
+      "sha256": "c3d6d959ada8c8c70f37ded294a276f29da919dba885f7efce6d1cca282a0f61",
+      "size_bytes": 2490,
+      "purpose": "Original public row/aggregate and honest retry flags"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/public-unused-reset-prep-01/before/ctf_public_initialization.rs",
+      "first_line": 177,
+      "last_line": 235,
+      "sha256": "42aabd506af27dd6183af4f3c949415739470abec67b1d2f8b34816f09ba9c50",
+      "size_bytes": 2787,
+      "purpose": "Unchanged append and actual old exclusion stop"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/public-unused-reset-prep-01/before/ctf_public_initialization.rs",
+      "first_line": 282,
+      "last_line": 345,
+      "sha256": "60b3ac7ab1de2f456c6f93f12775b7ffdeb3c7585d9a58553aee5d391fd0f235",
+      "size_bytes": 2424,
+      "purpose": "Existing ordinary unused reset and loading error distinction"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/public-unused-reset-prep-01/before/construction_cache.rs",
+      "first_line": 124,
+      "last_line": 160,
+      "sha256": "3adc718f8915695180a10c78ac56ef47267a427e0a3618c2abe4779929d7609a",
+      "size_bytes": 1904,
+      "purpose": "Real surface membership/caller flags/nonordinary dispatch"
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs",
+      "first_line": 47,
+      "last_line": 73,
+      "sha256": "f974360575b01a4eecd761c12a17931968ae37c83246cf9d6a04520c663ef85d",
+      "size_bytes": 1131,
+      "purpose": "Accepted positive-zero Source reset owner"
+    },
+    {
+      "path": "crates/ep_runtime/src/runtime/tests/part03.rs",
+      "first_line": 234,
+      "last_line": 269,
+      "sha256": "bb30bf3ad53ca788d90490c70687de776472eb26f7ac25b1e7965e8b4e3e6083",
+      "size_bytes": 1379,
+      "purpose": "Unchanged genuine ordinary initializer regression"
+    },
+    {
+      "path": "crates/ep_run/examples/ctf10_candidate_unit_support/fields.rs",
+      "first_line": 647,
+      "last_line": 669,
+      "sha256": "60d77dbbe1ccc4a6f78d7aa4f25214c7e38662f1731c8d863a17aef12fab0f8c",
+      "size_bytes": 1226,
+      "purpose": "Existing observer borrows retry flags; new unused flags not exposed"
+    }
+  ],
+  "current_public_row_literal_inventory": [
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_public_initialization.rs",
+      "line": 226
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_public_initialization.rs",
+      "line": 262
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_public_initialization_tests.rs",
+      "line": 339
+    }
+  ],
+  "new_owner_contract": {
+    "field": "unused_reset_flags: Option<CtfCallerSharedFlags>",
+    "unused_reset_invoked": "true only without an actual prior selected stop",
+    "retry_flags_on_entry_and_return": "None on new early reset, no retry owner fabricated",
+    "used_excluded": "Existing typed exclusion unchanged",
+    "caller_flags_and_order": "Actual cache shared flags copied unchanged; original declaration order retained",
+    "all_existing_append_and_suffix_arithmetic_byte_exact": true
+  },
+  "proposed_tests_not_executed": {
+    "new_count": 3,
+    "existing_runtime_regression_unchanged": true,
+    "Native_expected_outputs_supplied": false
+  },
+  "joint_application_obligation": "Requires reviewed surface-binding-unread-definitions-prep-02; neither partial package claims the runtime regression passes",
+  "validation": {
+    "diffs_regenerated": 3,
+    "canonical_mutation_performed": false,
+    "target_or_Cargo_or_formatter_or_test_execution_performed": false,
+    "scientific_payload_or_binary_read": false,
+    "Git_performed": false,
+    "scope_profiles_evidence_or_gates_changed": false
+  }
+}

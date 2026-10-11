@@ -1,0 +1,33 @@
+--- before/initialization.rs
++++ proposed/initialization.rs
+@@ -97,6 +97,12 @@
+         });
+     }
+ 
++    // Validate actual declared references before selected public generation
++    // can reject an unsupported boundary family. Preserve the existing
++    // MissingSurface/ZoneBoundaryTarget contract without widening support.
++    let boundary_targets = model.typed.surfaces.iter()
++        .map(|surface| resolve_surface_boundary_target(&model.typed, surface))
++        .collect::<Result<Vec<_>, _>>()?;
+     let mut construction_thermal_data =
+         ConstructionThermalDataCache::build(&model.typed, &ctf_coefficients_by_construction)?;
+     let construction_cache_token = construction_thermal_data.invalidation_token();
+@@ -119,7 +125,8 @@
+         .typed
+         .surfaces
+         .iter()
+-        .map(|surface| {
++        .zip(boundary_targets)
++        .map(|(surface, boundary)| {
+             let geometry = crate::geometry::surface_geometry_properties(&surface.vertices)
+                 .map_err(|error| RuntimeError::InvalidSurfaceGeometry {
+                     surface_name: surface.name.0.clone(),
+@@ -129,7 +136,6 @@
+             let azimuth_deg = geometry.azimuth_deg;
+             let tilt_deg = geometry.tilt_deg;
+             let thermal = construction_thermal_data.data_for_surface(surface)?;
+-            let boundary = resolve_surface_boundary_target(&model.typed, surface)?;
+             let conductance_w_per_k = area_m2 / thermal.thermal_resistance_m2_k_per_w;
+             let steady_ctf_w_per_m2_k =
+                 steady_ctf_coefficient_w_per_m2_k(area_m2, thermal.thermal_resistance_m2_k_per_w);

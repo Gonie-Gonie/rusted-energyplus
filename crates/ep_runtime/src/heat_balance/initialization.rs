@@ -97,15 +97,39 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
         });
     }
 
-    let construction_thermal_data =
+    // Validate actual declared references before selected public generation
+    // can reject an unsupported boundary family. Preserve the existing
+    // MissingSurface/ZoneBoundaryTarget contract without widening support.
+    let boundary_targets = model
+        .typed
+        .surfaces
+        .iter()
+        .map(|surface| resolve_surface_boundary_target(&model.typed, surface))
+        .collect::<Result<Vec<_>, _>>()?;
+    let mut construction_thermal_data =
         ConstructionThermalDataCache::build(&model.typed, &ctf_coefficients_by_construction)?;
     let construction_cache_token = construction_thermal_data.invalidation_token();
     debug_assert!(!construction_thermal_data.is_invalidated_by(construction_cache_token));
+    let ctf_surface_lifecycle = construction_thermal_data
+        .take_public_surface_lifecycle()
+        .transpose()
+        .map_err(RuntimeError::CtfSurfaceLifecycle)?;
+    let public_generation = if ctf_surface_lifecycle.is_some() {
+        Some(crate::heat_balance::ctf_surface_binding::capture_public_ctf_surface_generation(
+            &model.typed,
+            construction_thermal_data.public_initialization().ok_or(RuntimeError::CtfSurfaceLifecycle(
+                crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable::MissingPublicOwner))?,
+            construction_thermal_data.generation_context,
+        ).map_err(|error| RuntimeError::CtfSurfaceLifecycle(error.into()))?)
+    } else {
+        None
+    };
     let mut surfaces = model
         .typed
         .surfaces
         .iter()
-        .map(|surface| {
+        .zip(boundary_targets)
+        .map(|(surface, boundary)| {
             let geometry = crate::geometry::surface_geometry_properties(&surface.vertices)
                 .map_err(|error| RuntimeError::InvalidSurfaceGeometry {
                     surface_name: surface.name.0.clone(),
@@ -115,29 +139,37 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
             let azimuth_deg = geometry.azimuth_deg;
             let tilt_deg = geometry.tilt_deg;
             let thermal = construction_thermal_data.data_for_surface(surface)?;
-            let boundary = resolve_surface_boundary_target(&model.typed, surface)?;
             let conductance_w_per_k = area_m2 / thermal.thermal_resistance_m2_k_per_w;
             let steady_ctf_w_per_m2_k =
                 steady_ctf_coefficient_w_per_m2_k(area_m2, thermal.thermal_resistance_m2_k_per_w);
-            let ctf = surface_ctf_state_from_coefficient_rows(
-                &thermal.ctf_coefficients,
-                initial_zone_air_temperature_c,
-            )
-            .unwrap_or_else(|| {
-                match (
-                    thermal.ctf_coefficients.is_empty(),
-                    &thermal.ctf02_coefficients.result,
-                ) {
-                    (true, Ok(coefficients)) => all_resistive_surface_ctf_state(
-                        coefficients,
-                        initial_zone_air_temperature_c,
-                    ),
-                    _ => steady_surface_ctf_state(
-                        steady_ctf_w_per_m2_k,
-                        initial_zone_air_temperature_c,
-                    ),
-                }
-            });
+            let ctf = if let Some(generation) = &public_generation {
+                let binding = generation
+                    .bind_surface(surface.id)
+                    .map_err(|error| RuntimeError::CtfSurfaceLifecycle(error.into()))?;
+                crate::heat_balance::ctf::surface_ctf_state_from_public_storage(
+                    binding.coefficients,
+                )
+            } else {
+                surface_ctf_state_from_coefficient_rows(
+                    &thermal.ctf_coefficients,
+                    initial_zone_air_temperature_c,
+                )
+                .unwrap_or_else(|| {
+                    match (
+                        thermal.ctf_coefficients.is_empty(),
+                        &thermal.ctf02_coefficients.result,
+                    ) {
+                        (true, Ok(coefficients)) => all_resistive_surface_ctf_state(
+                            coefficients,
+                            initial_zone_air_temperature_c,
+                        ),
+                        _ => steady_surface_ctf_state(
+                            steady_ctf_w_per_m2_k,
+                            initial_zone_air_temperature_c,
+                        ),
+                    }
+                })
+            };
 
             Ok(SurfaceHeatBalanceState {
                 surface_id: surface.id,
@@ -228,5 +260,6 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
         surfaces,
         surface_indexes,
         construction_thermal_data,
+        ctf_surface_lifecycle,
     ))
 }

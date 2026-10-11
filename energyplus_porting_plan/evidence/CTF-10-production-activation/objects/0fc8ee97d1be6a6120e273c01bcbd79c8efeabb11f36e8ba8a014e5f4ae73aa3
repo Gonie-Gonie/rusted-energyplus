@@ -1,0 +1,87 @@
+{
+  "schema": "actual-empty-history-layout-application.v1",
+  "accepted_manifest": {
+    "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-prep-01/manifest.json",
+    "sha256": "c90272c72a0628777fec9b8ac4aac314fc4aa0eefa0bb9b04c698e1ddfeb74d0",
+    "size_bytes": 11201
+  },
+  "changed_sources": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_thermal_history.rs",
+      "actual_before": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-applied-01/0/before.rs",
+        "sha256": "48a5d8efc802ab7f656c1429b24b0fb49420b26c202e899e1c25a052acff530c",
+        "size_bytes": 27721
+      },
+      "actual_literal": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-applied-01/0/literal.rs",
+        "sha256": "7dfaeb87ca080c7f9bca89ff87865e5859a4d21858d9e37a15b74d1911bc9709",
+        "size_bytes": 27756
+      },
+      "actual_final": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-applied-01/0/final.rs",
+        "sha256": "7dfaeb87ca080c7f9bca89ff87865e5859a4d21858d9e37a15b74d1911bc9709",
+        "size_bytes": 27756
+      },
+      "formatter_diff": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-applied-01/0/formatter.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_thermal_history_tests.rs",
+      "actual_before": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-applied-01/1/before.rs",
+        "sha256": "747e334630efcd27a5068d2019d8f90546503d14da5353f2c1849bdc1c6a2288",
+        "size_bytes": 13798
+      },
+      "actual_literal": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-applied-01/1/literal.rs",
+        "sha256": "2a606a6e7b4e493853882c4834c21fe12e1007f7b5984e35a33590c57d259586",
+        "size_bytes": 15795
+      },
+      "actual_final": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-applied-01/1/final.rs",
+        "sha256": "04450b92542d1530c0ae56b3fca4881b4023b3311651c327f2a9757eb82128b1",
+        "size_bytes": 15902
+      },
+      "formatter_diff": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-applied-01/1/formatter.diff",
+        "sha256": "a95552d7641c373c8724bdaba304826549888f31dbfdbca62e0586ca8c39d973",
+        "size_bytes": 1051
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle_tests.rs",
+      "actual_before": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-applied-01/2/before.rs",
+        "sha256": "dae1d436f4e2e1d8c360d416ecdf7d348ba448c3253d2a31c8833153d55da1ac",
+        "size_bytes": 18198
+      },
+      "actual_literal": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-applied-01/2/literal.rs",
+        "sha256": "25deb4a1c66c68f1c45895bf6a4a17e5d1fee7ce0c037ca35059bbc9b439a8eb",
+        "size_bytes": 20148
+      },
+      "actual_final": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-applied-01/2/final.rs",
+        "sha256": "242cbcde426f22768e625035052b20d853da20d04df73e35a323708055ed2406",
+        "size_bytes": 20417
+      },
+      "formatter_diff": {
+        "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-applied-01/2/formatter.diff",
+        "sha256": "0dcdf87833947517cda84a30630ea434d12394ec6e071249edf6577f55d51395",
+        "size_bytes": 2820
+      }
+    }
+  ],
+  "actual_formatter_execution": {
+    "path": ".runtime/porting/CTF-10/thermal-history-empty-layout-format-command-01/receipt.json",
+    "sha256": "ab5477bd39e2154c5f77c383942fddea419322557d1a69fb61f1a3124ca1fcb1",
+    "size_bytes": 5662
+  },
+  "Root_and_independent_Source_review_accepted": true,
+  "quality_or_scientific_execution_claimed": false,
+  "gates_updated": false
+}

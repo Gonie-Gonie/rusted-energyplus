@@ -336,6 +336,7 @@
         surface.outside_face_temperature_c = 10.0;
         surface.inside_face_temperature_c = 20.0;
         surface.ctf = SurfaceCtfState {
+        public_num_ctf_terms: None,
             outside_0_w_per_m2_k: 4.0,
             cross_0_w_per_m2_k: 2.0,
             inside_0_w_per_m2_k: 3.0,

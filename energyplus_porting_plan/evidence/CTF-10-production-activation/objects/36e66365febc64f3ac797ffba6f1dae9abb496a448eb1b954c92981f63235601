@@ -1,0 +1,125 @@
+{
+  "schema": "ctf10-production-activation-validation-publication-helper-source-preparation.v1",
+  "status": "SOURCE-READY HELD - Root-only existing publisher adaptation; no execution",
+  "held_immutable": true,
+  "own_source": {
+    "path": ".runtime/porting/CTF-10/production-activation-publication-helper-prep-01/publish-production-activation-validation-and-commit.py",
+    "sha256": "1638cc8eb18b0c04380172f0e0fd6626707972057d644cae41210aff9988b028",
+    "size_bytes": 8279,
+    "line_count": 88
+  },
+  "documentation": {
+    "path": ".runtime/porting/CTF-10/production-activation-publication-helper-prep-01/README.md",
+    "sha256": "b88d0141e3dac05165375700279a794b36037bc54e2c399f7e157f0c52f56ced",
+    "size_bytes": 3713,
+    "line_count": 21
+  },
+  "before_original": {
+    "path": ".runtime/porting/CTF-10/publish-thermal-history-validation-and-commit-01.py",
+    "sha256": "8e3a6fbff04bf48ad724181ebaecfc7d03e44ea30ca97289d6e8150cb0d706f5",
+    "size_bytes": 3772,
+    "line_count": 59
+  },
+  "before_archive": {
+    "path": ".runtime/porting/CTF-10/production-activation-publication-helper-prep-01/before/publish-thermal-history-validation-and-commit-01.py",
+    "sha256": "8e3a6fbff04bf48ad724181ebaecfc7d03e44ea30ca97289d6e8150cb0d706f5",
+    "size_bytes": 3772,
+    "line_count": 59
+  },
+  "exact_diff": {
+    "path": ".runtime/porting/CTF-10/production-activation-publication-helper-prep-01/diffs/publisher.diff",
+    "sha256": "6077cd45f2f21dd8c2e21d6b87be6aef834cb49767d1df861a55a52281add26a",
+    "size_bytes": 12458,
+    "line_count": 149
+  },
+  "source_and_actual_metadata_dependencies": [
+    {
+      "path": ".runtime/porting/CTF-10/production-activation-applied-final-source-03/manifest.json",
+      "sha256": "2626c66ee2fe7171cfc8102b694324959cd7b6c2121087a160c3136ee112cafb",
+      "size_bytes": 65419,
+      "line_count": 1197
+    },
+    {
+      "path": ".runtime/porting/source-objects/8f/8f448858790b56e3ff7ed97109aea23be1c936ad8e94bd3c4999c016a92c7216",
+      "sha256": "8f448858790b56e3ff7ed97109aea23be1c936ad8e94bd3c4999c016a92c7216",
+      "size_bytes": 1614618,
+      "line_count": 31047
+    },
+    {
+      "path": ".runtime/porting/CTF-10/production-activation-publication-prep-02/manifest.json",
+      "sha256": "011457efb703bbbd6cdb87be90676dad9de618ecdd3aa5f3b0cbf9187983f303",
+      "size_bytes": 9372,
+      "line_count": 221
+    },
+    {
+      "path": ".runtime/porting/CTF-10/production-activation-publication-prep-02/archive-production-activation.py",
+      "sha256": "ec5cac079c449b7ea20628a641fdda04f7be900129ef214c4012f8dddac2d74f",
+      "size_bytes": 9932,
+      "line_count": 115
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "size_bytes": 8125,
+      "line_count": 194
+    },
+    {
+      "path": "tools/porting/check_plan.py",
+      "sha256": "ec1df8718fd23cc135e97e28220e2377dcf48fe960c611dbc25976039629208d",
+      "size_bytes": 23809,
+      "line_count": 456
+    },
+    {
+      "path": "tools/porting/sync_plan_views.py",
+      "sha256": "64cd404807bf70b1c7495fa4b37e6a98f9cf3f7d46f9dd3646e02945a65aab3a",
+      "size_bytes": 3986,
+      "line_count": 99
+    }
+  ],
+  "actual_quality_receipts": [
+    {
+      "path": ".runtime/porting/CTF-10/production-activation-fmt-check-command-02/receipt.json",
+      "sha256": "0471fa88341037fc8ca850274894aa81e0e10f71a97789120f371b8fd68c17fa",
+      "size_bytes": 7046,
+      "line_count": 72
+    },
+    {
+      "path": ".runtime/porting/CTF-10/production-activation-clippy-command-02/receipt.json",
+      "sha256": "809d7bc9e63791757c0ef1b404d97eecdbe3072382d5e48b216cf24dd12446c5",
+      "size_bytes": 7231,
+      "line_count": 81
+    },
+    {
+      "path": ".runtime/porting/CTF-10/production-activation-focused-command-02/receipt.json",
+      "sha256": "4bc6726fe93e6cc19226d40e97e4d2ba27b6b4daf507fc6cdcd1dc2a582dd86f",
+      "size_bytes": 7218,
+      "line_count": 80
+    },
+    {
+      "path": ".runtime/porting/CTF-10/production-activation-workspace-command-02/receipt.json",
+      "sha256": "001c0198430d023b06952a822525005945a8feb202aff45ed0080deddcf78811",
+      "size_bytes": 7179,
+      "line_count": 77
+    }
+  ],
+  "runtime_operand": "actual SHA256 of production-activation-plan-check-command-01/receipt.json; no future identity supplied",
+  "fixed_output": "energyplus_porting_plan/evidence/CTF-10-production-activation",
+  "selected_documents": [
+    "energyplus_porting_plan/plan.json",
+    "energyplus_porting_plan/cards/CTF-10.md",
+    "energyplus_porting_plan/CHECKLIST.md",
+    "energyplus_porting_plan/energyplus_porting_checklist.html"
+  ],
+  "source_path_count": 38,
+  "all_OUT_gzip_and_unchanged_observer2_indexed_bytes_checked": true,
+  "unrelated_preexisting_staged_paths_forbidden": true,
+  "commit_message": "feat(ctf): connect ordinary surface history lifecycle",
+  "push_is_separate_Root_action": true,
+  "actual_OUT_summary_validation_or_commit_claimed": false,
+  "future_receipts_or_successes_fabricated": false,
+  "Source_AST_parsed_and_diff_regenerated_not_executed": true,
+  "canonical_Git_target_Cargo_formatter_actions": false,
+  "scientific_or_binary_payloads_read": false,
+  "new_framework_or_numerical_gate": false,
+  "author": "Base; existing Root mechanisms Source adaptation only"
+}

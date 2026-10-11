@@ -1,0 +1,27 @@
+--- before/part13.rs
++++ proposed/part13.rs
+@@ -22,6 +22,9 @@
+             hour_ending: 7,
+             timestep_seconds: SECONDS_PER_HOUR / 6.0,
+         };
++        let cached_clock = cached_state.ctf_history_caller_clock.prepare(
++            crate::weather::day::WeatherDayPhase::Run { day: 1 }, 6, 6, 1, input.timestep_seconds)
++            .map_err(RuntimeError::CtfSurfaceLifecycle)?;
+         super::advance_heat_balance_state_one_timestep_internal_with_schedule_cache(
+             &model.typed,
+             &schedule_cache,
+@@ -33,7 +36,13 @@
+             None,
+             HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,
+         );
+-        advance_heat_balance_state_one_timestep(&model.typed, &mut fallback_state, input);
++        crate::heat_balance::ctf_surface_lifecycle::ensure_available(&cached_state)?;
++        cached_state.ctf_history_caller_clock.commit(cached_clock)
++            .map_err(RuntimeError::CtfSurfaceLifecycle)?;
++        crate::heat_balance::advance_heat_balance_state_one_timestep_with_clock(
++            &model.typed, &mut fallback_state, input,
++            first_manual_ctf_test_clock(model.typed.timestep.number_of_timesteps_per_hour,
++                input.hour_ending, 1, input.timestep_seconds)?)?;
+ 
+         let full_schedule_convective_w = 12.0 * (1.0 - 0.2);
+         assert_eq!(

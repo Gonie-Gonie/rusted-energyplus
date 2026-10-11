@@ -1,0 +1,103 @@
+{
+  "schema": "ctf10-actual-production-activation-plan-validation.v1",
+  "role": "actual-plan-validation-after-ordinary-activation-quality-and-retained-history-replay",
+  "actual_execution": {
+    "path": ".runtime/porting/CTF-10/production-activation-plan-check-command-01/receipt.json",
+    "sha256": "1469048ddbd86a6102fc052c6a90a89342466a2275861042cb3e852cffbddd60",
+    "size_bytes": 7626
+  },
+  "exit_code": 0,
+  "source_bytes_match_before_and_after": true,
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/8f/8f448858790b56e3ff7ed97109aea23be1c936ad8e94bd3c4999c016a92c7216",
+    "sha256": "8f448858790b56e3ff7ed97109aea23be1c936ad8e94bd3c4999c016a92c7216"
+  },
+  "actual_final_inventory": {
+    "path": ".runtime/porting/CTF-10/production-activation-applied-final-source-03/manifest.json",
+    "sha256": "2626c66ee2fe7171cfc8102b694324959cd7b6c2121087a160c3136ee112cafb",
+    "size_bytes": 65419
+  },
+  "actual_quality": {
+    "fmt-check": {
+      "path": ".runtime/porting/CTF-10/production-activation-fmt-check-command-02/receipt.json",
+      "sha256": "0471fa88341037fc8ca850274894aa81e0e10f71a97789120f371b8fd68c17fa",
+      "size_bytes": 7046
+    },
+    "clippy": {
+      "path": ".runtime/porting/CTF-10/production-activation-clippy-command-02/receipt.json",
+      "sha256": "809d7bc9e63791757c0ef1b404d97eecdbe3072382d5e48b216cf24dd12446c5",
+      "size_bytes": 7231
+    },
+    "focused": {
+      "path": ".runtime/porting/CTF-10/production-activation-focused-command-02/receipt.json",
+      "sha256": "4bc6726fe93e6cc19226d40e97e4d2ba27b6b4daf507fc6cdcd1dc2a582dd86f",
+      "size_bytes": 7218
+    },
+    "workspace": {
+      "path": ".runtime/porting/CTF-10/production-activation-workspace-command-02/receipt.json",
+      "sha256": "001c0198430d023b06952a822525005945a8feb202aff45ed0080deddcf78811",
+      "size_bytes": 7179
+    }
+  },
+  "selected_files": [
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/production-activation-plan-check-command-01/receipt.json",
+        "sha256": "1469048ddbd86a6102fc052c6a90a89342466a2275861042cb3e852cffbddd60",
+        "size_bytes": 7626
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-production-activation/objects/1469048ddbd86a6102fc052c6a90a89342466a2275861042cb3e852cffbddd60",
+        "sha256": "1469048ddbd86a6102fc052c6a90a89342466a2275861042cb3e852cffbddd60",
+        "size_bytes": 7626
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/production-activation-plan-check-command-01/stdout.log",
+        "sha256": "d876fbdcdbfd728e64dfa7f80ad8f3964264616ef3dd197d29d38311a93e9b7c",
+        "size_bytes": 415
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-production-activation/objects/d876fbdcdbfd728e64dfa7f80ad8f3964264616ef3dd197d29d38311a93e9b7c",
+        "sha256": "d876fbdcdbfd728e64dfa7f80ad8f3964264616ef3dd197d29d38311a93e9b7c",
+        "size_bytes": 415
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/production-activation-plan-check-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-production-activation/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    }
+  ],
+  "validated_documents": [
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "415bcfb1b1fda854848c62b574e8354278821a785625495e0059ebbd048e788c",
+      "size_bytes": 779800
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CTF-10.md",
+      "sha256": "263d7c37615b971392a01253342a4e07fe35e08d9c3157fcdf6b33ca09d2fab0",
+      "size_bytes": 10396
+    },
+    {
+      "path": "energyplus_porting_plan/CHECKLIST.md",
+      "sha256": "48ff5965e7627a07fe88e1064cf39fa3153c7a0134ebf3da15e50c430224bb90",
+      "size_bytes": 16639
+    },
+    {
+      "path": "energyplus_porting_plan/energyplus_porting_checklist.html",
+      "sha256": "78d64909bdb3a3f4c863d91d9abccb41f7deddb7cb35abfac91ab671213de3b7",
+      "size_bytes": 627392
+    }
+  ],
+  "scientific_PASS_produced_by_check_plan": false
+}

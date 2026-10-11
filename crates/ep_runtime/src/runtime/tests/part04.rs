@@ -167,6 +167,7 @@
         surface.inside_radiant_hvac_w_per_m2 = 0.0;
         surface.inside_net_longwave_w_per_m2 = 0.0;
         surface.ctf = SurfaceCtfState {
+        public_num_ctf_terms: None,
             outside_0_w_per_m2_k: 4.0,
             cross_0_w_per_m2_k: 0.5,
             inside_0_w_per_m2_k: 3.0,
@@ -254,6 +255,7 @@
         surface.inside_radiant_hvac_w_per_m2 = 0.0;
         surface.inside_net_longwave_w_per_m2 = 0.0;
         surface.ctf = SurfaceCtfState {
+        public_num_ctf_terms: None,
             outside_0_w_per_m2_k: 4.0,
             cross_0_w_per_m2_k: 0.5,
             inside_0_w_per_m2_k: 3.0,
@@ -643,7 +645,7 @@
         let model = SimulationModel::from_typed(typed.clone());
         let mut state = initialize_heat_balance_state(&model, 20.0)?;
 
-        advance_heat_balance_state_one_timestep(
+        crate::heat_balance::advance_heat_balance_state_one_timestep_with_clock(
             &typed,
             &mut state,
             HeatBalanceStepInput {
@@ -651,7 +653,8 @@
                 hour_ending: 1,
                 timestep_seconds: 600.0,
             },
-        );
+            first_manual_ctf_test_clock(typed.timestep.number_of_timesteps_per_hour, 1, 1, 600.0)?,
+        )?;
 
         assert_eq!(state.timestep_index, 1);
         assert_eq!(state.zones[0].previous_mean_air_temperatures_c, [20.0; 3]);

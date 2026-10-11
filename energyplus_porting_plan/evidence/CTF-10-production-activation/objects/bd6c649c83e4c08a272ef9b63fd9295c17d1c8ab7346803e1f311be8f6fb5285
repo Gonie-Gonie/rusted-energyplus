@@ -1,0 +1,791 @@
+
+running 501 tests
+test ideal_loads::coupled_runtime::tests::cooling_capacity_zero_flow_reset_partition_overflow_fails_closed ... ok
+test ideal_loads::coupled_runtime::tests::cooling_dehumidification_flow_partition_overflow_fails_closed ... ok
+test ideal_loads::coupled_runtime::tests::cooling_economizer_body_partition_overflow_fails_closed ... ok
+test ideal_loads::coupled_runtime::tests::cooling_economizer_condition_partition_overflow_fails_closed ... ok
+test ideal_loads::coupled_runtime::tests::cooling_economizer_guard_partition_overflow_fails_closed ... ok
+test ideal_loads::coupled_runtime::tests::cooling_entry_count_partitions_reject_both_overflow_routes ... ok
+test ideal_loads::coupled_runtime::tests::cooling_entry_mode_reconciliation_rejects_forged_numerical_modes ... ok
+test ideal_loads::coupled_runtime::tests::cooling_entry_wrapper_requires_dual_heat_cool_and_finite_active_demand ... ok
+test ideal_loads::coupled_runtime::tests::cooling_humidification_flow_partition_overflow_fails_closed ... ok
+test ideal_loads::coupled_runtime::tests::cooling_mixed_air_call_partition_overflow_fails_closed ... ok
+test ideal_loads::coupled_runtime::tests::cooling_oa_max_flow_body_partition_overflow_fails_closed ... ok
+test ideal_loads::coupled_runtime::tests::binder_failure_is_returned_before_coupled_execution ... ok
+test ideal_loads::coupled_runtime::tests::cooling_oa_max_flow_count_arithmetic_rejects_overflow_and_underflow ... ok
+test ideal_loads::coupled_runtime::tests::cooling_positive_supply_cp_air_assignment_partition_overflow_fails_closed ... ok
+test ideal_loads::coupled_runtime::tests::cooling_positive_supply_temperature_assignment_partition_overflow_fails_closed ... ok
+test ideal_loads::coupled_runtime::tests::cooling_positive_supply_temperature_minimum_limit_partition_overflow_fails_closed ... ok
+test ideal_loads::coupled_runtime::tests::cooling_sensible_flow_partition_overflow_fails_closed ... ok
+test ideal_loads::coupled_runtime::tests::cooling_supply_mass_flow_ems_override_body_partition_overflow_fails_closed ... ok
+test ideal_loads::coupled_runtime::tests::cooling_supply_mass_flow_ems_override_guard_partition_overflow_fails_closed ... ok
+test ideal_loads::coupled_runtime::tests::cooling_supply_mass_flow_limit_body_partition_overflow_fails_closed ... ok
+test ideal_loads::coupled_runtime::tests::cooling_oa_max_flow_gate_reconciles_every_release_limit_shape ... FAILED
+test ideal_loads::coupled_runtime::tests::cooling_mixed_air_call_executes_for_active_positive_zero_supply_flow ... FAILED
+test ideal_loads::coupled_runtime::tests::all_hard_sized_finite_limit_branches_run_with_source_threshold_demand ... FAILED
+test ideal_loads::coupled_runtime::tests::cooling_supply_mass_flow_limit_guard_partition_overflow_fails_closed ... ok
+test ideal_loads::coupled_runtime::tests::cooling_sensible_flow_lifecycle_records_unit_off_without_source_execution ... FAILED
+test ideal_loads::coupled_runtime::tests::cooling_supply_mass_flow_maximum_partition_overflow_fails_closed ... ok
+test ideal_loads::coupled_runtime::tests::cooling_supply_mass_flow_positive_guard_partition_overflow_fails_closed ... ok
+test ideal_loads::coupled_runtime::tests::cooling_supply_mass_flow_very_small_guard_body_partition_overflow_fails_closed ... ok
+test ideal_loads::coupled_runtime::tests::cooling_supply_mass_flow_very_small_guard_partition_overflow_fails_closed ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp355::cp355_coupled_direct_none_route_is_complete_skip_and_numerical_humidity_remains_unfed ... FAILED
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp356::cp356_coupled_direct_none_route_is_complete_skip_and_numerical_humidity_remains_unfed ... FAILED
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp357::cp357_coupled_direct_none_route_is_complete_skip_and_numerical_humidity_remains_unfed ... FAILED
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp358::cp358_coupled_direct_none_is_exact_skip_and_cp345_remains_numerical_owner ... FAILED
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp359::cp359_coupled_direct_none_is_exact_skip_and_cp345_remains_numerical_owner ... FAILED
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp360::cp360_coupled_direct_none_is_exact_null_skip_and_cp345_stays_owner ... FAILED
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp361::cp361_coupled_direct_none_is_exact_null_skip_and_cp345_stays_owner ... FAILED
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp363::cp363_route_source_latest_and_predecessor_corruption_are_rejected ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp364::cp364_lifecycle_matches_outputs_and_cp363 ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp366::cp366_expected_snapshot_maps_q_h_and_csh_predecessor_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp364::cp364_expected_snapshot_maps_valid_q_h_and_csh_predecessor_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp363::cp363_expected_snapshot_maps_q_h_and_csh_predecessor_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp365::cp365_route_source_latest_and_predecessor_corruption_are_rejected ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp367::cp367_lifecycle_matches_outputs_and_cp366_without_feeding_numerical_result ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp371::cp371_direct_site_count_and_latest_corruption_are_rejected ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp366::cp366_route_source_latest_and_predecessor_corruption_are_rejected ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp367::cp367_expected_snapshot_maps_all_typed_selected_routes_to_default_skip ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp364::cp364_route_source_latest_and_predecessor_corruption_are_rejected ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp362::coupled_route_source_and_latest_corruption_fail_closed ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp370::cp370_lifecycle_matches_cp369_and_does_not_feed_numerical_result ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp366::cp366_lifecycle_matches_outputs_and_cp365 ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp363::cp363_lifecycle_matches_outputs_and_cp362 ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp368::cp368_expected_snapshot_maps_all_typed_selected_routes_to_default_break_skip ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp368::cp368_lifecycle_matches_outputs_and_cp367_without_feeding_numerical_result ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp368::cp368_route_source_latest_and_predecessor_corruption_are_rejected ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp365::cp365_lifecycle_matches_cp364_as_a_complete_null_direct_skip ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp367::cp367_route_source_latest_and_predecessor_corruption_are_rejected ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp369::cp369_guard_count_and_latest_corruption_are_rejected ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp370::cp370_guard_count_and_latest_corruption_are_rejected ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp369::cp369_lifecycle_matches_cp368_and_does_not_feed_numerical_result ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp365::cp365_snapshot_matching_rejects_signed_zero_numeric_corruption ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp373::cp373_lifecycle_matches_cp372_and_does_not_feed_numerical_result ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp372::cp372_lifecycle_matches_cp371_and_does_not_feed_numerical_result ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp373::cp373_direct_counters_and_latest_corruption_are_rejected ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp376::cp376_lifecycle_follows_cp375_copies_cp347_and_does_not_feed_numerical_result ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp372::cp372_direct_counters_and_latest_corruption_are_rejected ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp378::cp378_counter_latest_and_numerical_corruption_are_rejected ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp376::cp376_release_match_rejects_coordinated_foreign_predecessor_identities ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp376::cp376_latest_output_snapshot_comparison_preserves_ieee_bits ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp377::cp377_counter_owner_and_latest_corruption_are_rejected ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp375::cp375_lifecycle_matches_cp374_and_does_not_feed_numerical_result ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp375::cp375_direct_counters_and_latest_corruption_are_rejected ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp378::cp378_latest_comparison_preserves_ieee_bits ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp374::cp374_direct_counters_and_latest_corruption_are_rejected ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp377::cp377_latest_comparison_preserves_ieee_bits ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp377::cp377_follows_cp376_records_four_sites_and_does_not_feed_numerical_result ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp379::cp379_follows_cp378_records_four_sites_and_uses_the_canonical_helper ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp374::cp374_lifecycle_matches_cp373_and_does_not_feed_numerical_result ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp371::cp371_lifecycle_matches_cp370_and_does_not_feed_numerical_result ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp379::cp379_latest_comparison_preserves_ieee_bits ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp379::cp379_rejects_evidence_corruption_and_keeps_numerical_mutation_independent ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp378::cp378_follows_cp377_records_four_sites_and_reconciles_all_humidity_projections ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp376::cp376_counter_owner_and_latest_corruption_are_rejected ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp380::cp380_rejects_control_corruption_but_ignores_numerical_results ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp383::cp383_rejects_both_capacity_owner_drifts ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp381::cp381_rejects_lineage_corruption_but_does_not_consume_numerical_results ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp383::cp383_is_evidence_only_and_does_not_consume_numerical_results ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp382::cp382_rejects_owner_bit_corruption_but_does_not_consume_numerical_results ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp386::cp386_is_evidence_only_and_does_not_consume_result_node_report_or_feedback ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp385::cp385_rejects_one_bit_drift_in_cp384_and_cp382_retained_operands ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp384::cp384_is_evidence_only_and_does_not_consume_numerical_results ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp387::cp387_is_evidence_only_and_does_not_consume_load_result_node_report_or_feedback ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp385::cp385_is_evidence_only_and_does_not_consume_result_node_report_or_feedback ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp387::cp387_rejects_one_bit_drift_in_cp386_retained_enthalpy ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp386::cp386_rejects_one_bit_drift_in_cp385_retained_enthalpy ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp384::cp384_rejects_drift_in_cp383_retained_maximum_bits ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp387::cp387_rejects_predecessor_route_count_drift ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp380::cp380_follows_cp379_and_locks_all_four_selector_shapes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp388::cp388_rejects_one_bit_drift_in_cp387_retained_enthalpy ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp388::cp388_is_evidence_only_and_does_not_consume_load_calculation_node_report_or_feedback ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp388::cp388_rejects_predecessor_route_count_drift ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp387::cp387_completes_as_inactive_for_every_direct_none_selector_route ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp386::cp386_dispatches_none_only_on_cp385_assignment_and_preserves_enthalpy_bits ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp386::cp386_replay_accumulates_counts_and_keeps_latest_lineage ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp389::cp389_rejects_one_bit_drift_in_cp388_retained_result ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp389::cp389_is_evidence_only_under_numerical_output_mutations ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp385::cp385_replay_accumulates_counts_and_keeps_latest_lineage ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp390::cp390_rejects_cp389_source_order_corruption ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp387::cp387_replay_accumulates_inactive_counts_and_keeps_latest_lineage ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp390::cp390_rejects_one_bit_drift_in_cp389_retained_result ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp389::cp389_preserves_cp379_temperature_on_representative_direct_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp390::cp390_preserves_cp389_temperature_on_representative_direct_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp381::cp381_follows_cp380_and_locks_true_false_and_outer_false_shapes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp385::cp385_closes_outer_guard_false_and_assignment_routes_with_exact_arithmetic ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp382::cp382_follows_cp381_and_locks_assignment_false_and_outer_false_shapes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp388::cp388_completes_as_inactive_for_every_direct_none_selector_route ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp391::cp391_rejects_cp390_source_order_corruption ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp391::cp391_rejects_one_bit_drift_in_cp390_retained_result ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp391::cp391_preserves_cp390_enthalpy_and_temperature_on_representative_direct_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp392::cp392_rejects_cp391_source_order_corruption ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp388::cp388_replay_accumulates_inactive_counts_and_keeps_latest_lineage ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp392::cp392_rejects_one_bit_drift_in_cp391_retained_result ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp389::cp389_rejects_route_drift_and_accepts_replay ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp383::cp383_follows_cp382_and_locks_guard_false_body_and_outer_false_shapes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp390::cp390_rejects_route_drift_and_remains_evidence_only ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp392::cp392_preserves_cp391_enthalpy_temperature_and_nulls_source_locals_on_direct_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp384::cp384_preserves_all_cp383_routes_and_locks_guard_false_and_assignment_values ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp393::cp393_preserves_cp392_terminal_carriers_and_skips_break_on_direct_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp394::cp394_preserves_cp393_terminal_carriers_and_skips_humidistat_entry_on_direct_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp395::cp395_preserves_cp394_recursive_carriers_and_skips_assignment_on_direct_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp396::cp396_preserves_cp395_terminal_carriers_and_skips_break_on_direct_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp391::cp391_rejects_route_drift_and_remains_evidence_only ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp392::cp392_rejects_route_drift_and_remains_evidence_only ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp397::cp397_preserves_cp396_terminal_carriers_and_tracks_direct_none_entry ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp394::cp394_rejects_cp393_carrier_bit_drift_and_route_drift ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp393::cp393_validation_remains_independent_of_numerical_output_state ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp393::cp393_rejects_cp392_carrier_bit_drift_and_route_drift ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp400::cp400_executes_public_routes_with_exact_owner_order_and_preserves_carriers ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp400::cp400_rejects_predecessor_and_independent_owner_bit_drift ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp398::cp398_preserves_cp397_terminal_carriers_and_tracks_direct_none_entry ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp394::cp394_validation_remains_independent_of_numerical_output_state ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp395::cp395_rejects_cp394_recursive_carrier_bit_drift_and_route_drift ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp399::cp399_executes_public_none_routes_from_cp329_and_preserves_all_carriers ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp400::cp400_validation_is_independent_of_numerical_coupling_state ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp401::cp401_executes_public_routes_with_cp384_owner_cp385_corroboration_and_preserves_carriers ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp396::cp396_rejects_cp395_carrier_bit_drift_and_route_drift ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp396::cp396_validation_remains_independent_of_numerical_output_state ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp401::cp401_rejects_predecessor_owner_and_corroborator_bit_drift ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp401::cp401_rejects_non_direct_route_accounting ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp397::cp397_rejects_cp396_carrier_bit_drift_and_route_drift ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp401::cp401_validation_is_independent_of_numerical_coupling_state ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp403::cp403_rejects_cp329_owner_and_cp402_corroborator_drift ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp397::cp397_validation_remains_independent_of_numerical_output_state ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp403::cp403_rejects_non_direct_route_accounting ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp403::cp403_validation_has_no_numerical_coupling_dto_feed ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp398::cp398_rejects_cp397_carrier_bit_drift_and_route_drift ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp404::cp404_rejects_cp403_temperature_and_cp385_enthalpy_owner_drift ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp402::cp402_rejects_cp401_owner_cp321_owner_and_cp340_corroborator_drift ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp398::cp398_validation_remains_independent_of_numerical_output_state ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp404::cp404_rejects_non_direct_route_accounting ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp404::cp404_validation_has_no_numerical_coupling_dto_feed ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp409::cp409_flattened_route_contract_is_36_total_12_active_24_inactive ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp402::cp402_validation_has_no_numerical_coupling_dto_feed ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp410::cp410_flattened_route_contract_is_36_total_and_all_default_routes_are_inactive ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp399::cp399_validation_is_independent_of_numerical_output_state ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp402::cp402_rejects_non_direct_route_accounting ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp405::cp405_rejects_cp404_retained_capacity_drift ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp399::cp399_rejects_cp398_and_cp329_bit_drift ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp411::cp411_flattened_route_contract_has_18_active_routes_and_four_public_active_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp405::cp405_rejects_non_direct_route_accounting ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp405::cp405_validation_has_no_numerical_coupling_dto_feed ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp412::cp412_flattened_route_contract_has_18_active_routes_and_four_public_active_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp403::cp403_preserves_observed_routes_and_assigns_temperature_on_true_body ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp406::cp406_validation_has_no_numerical_coupling_dto_feed ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp413::cp413_conceptual_contract_has_54_outcomes_126_sites_and_expected_carrier_presence ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp404::cp404_preserves_observed_routes_and_assigns_psychrometric_humidity_ratio ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp407::cp407_evidence_does_not_feed_or_replace_numerical_coupling_dto ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp408::cp408_evidence_does_not_feed_or_replace_numerical_coupling_dto ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp414::cp414_conceptual_contract_has_54_outcomes_72_sites_and_expected_carrier_ownership ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp414::cp414_new_state_has_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp415::cp415_conceptual_contract_has_54_outcomes_72_sites_and_expected_carrier_ownership ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp415::cp415_new_state_has_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp416::cp416_conceptual_contract_has_54_outcomes_72_sites_and_expected_carrier_ownership ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp416::cp416_new_state_has_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp417::cp417_conceptual_contract_has_54_outcomes_72_sites_and_expected_carrier_ownership ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp417::cp417_new_state_has_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp418::cp418_conceptual_contract_has_54_outcomes_5_else_entries_and_preserves_all_carriers ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp418::cp418_new_state_has_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp419::cp419_conceptual_contract_has_54_outcomes_49_inactive_5_assignments_and_15_sites ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp419::cp419_new_state_has_nine_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp420::cp420_binding_and_pipeline_keep_numerical_dto_unchanged ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp420::cp420_conceptual_contract_has_54_outcomes_49_inactive_5_assignments_and_40_sites ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp420::cp420_new_state_has_ten_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp421::cp421_binding_and_pipeline_keep_numerical_dto_unchanged ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp421::cp421_conceptual_contract_has_59_outcomes_49_inactive_5_false_5_body_and_four_sites ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp409::cp409_evidence_does_not_feed_or_replace_numerical_coupling_dto ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp421::cp421_new_state_has_three_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp422::cp422_binding_and_pipeline_keep_numerical_dto_unchanged ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp422::cp422_conceptual_contract_has_59_outcomes_49_inactive_5_false_5_assignments_and_two_sites ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp422::cp422_new_state_has_three_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp423::cp423_binding_and_pipeline_keep_numerical_dto_unchanged ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp423::cp423_conceptual_contract_has_59_outcomes_49_inactive_5_false_5_assignments_and_eight_sites ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp423::cp423_new_state_has_three_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp424::cp424_binding_and_pipeline_keep_numerical_dto_unchanged ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp424::cp424_conceptual_contract_has_59_outcomes_58_inactive_one_entry_and_one_site ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp424::cp424_integration_roots_stay_within_historical_caps ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp424::cp424_new_state_has_two_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp424::cp424_snapshot_schema_is_exactly_263_94_2_1_and_current_binding_is_133 ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp425::cp425_binding_and_pipeline_keep_numerical_dto_unchanged ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp425::cp425_conceptual_contract_has_59_outcomes_58_inactive_one_assignment_and_two_sites ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp425::cp425_integration_roots_stay_within_historical_caps ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp425::cp425_new_state_has_two_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp425::cp425_snapshot_schema_is_exactly_275_99_2_1_and_current_binding_is_133 ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp410::cp410_evidence_does_not_feed_or_replace_numerical_coupling_dto ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp426::cp426_binding_pipeline_and_validator_keep_numerical_dto_unchanged ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp426::cp426_conceptual_contract_has_59_outcomes_58_inactive_one_assignment_and_two_sites ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp426::cp426_integration_roots_stay_within_historical_caps ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp426::cp426_new_state_has_two_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp426::cp426_snapshot_schema_is_exactly_287_104_2_1_and_binding_is_133 ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp427::cp427_binding_pipeline_and_validator_keep_numerical_dto_unchanged ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp427::cp427_conceptual_contract_has_59_outcomes_58_inactive_one_assignment_and_two_sites ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp427::cp427_integration_roots_stay_within_historical_caps ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp427::cp427_new_state_has_two_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp427::cp427_snapshot_schema_is_exactly_299_109_2_1_and_binding_is_133 ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp428::cp428_binding_pipeline_and_validator_keep_numerical_dto_unchanged ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp428::cp428_conceptual_contract_has_59_outcomes_58_inactive_one_assignment_and_one_site ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp428::cp428_integration_roots_stay_within_historical_caps ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp428::cp428_new_state_has_two_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp428::cp428_snapshot_schema_is_exactly_308_113_2_1_and_binding_is_133 ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp429::cp429_binding_pipeline_and_validator_keep_numerical_dto_unchanged ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp429::cp429_conceptual_contract_has_59_outcomes_58_inactive_one_assignment_and_one_site ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp429::cp429_integration_roots_stay_within_historical_caps ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp429::cp429_new_state_has_two_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp429::cp429_snapshot_schema_is_exactly_317_117_2_1_and_binding_is_133 ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp430::cp430_binding_pipeline_and_validator_keep_numerical_dto_unchanged ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp430::cp430_conceptual_contract_is_one_public_entry_and_no_numerical_feed ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp430::cp430_integration_roots_stay_within_historical_caps ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp430::cp430_new_state_has_two_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp431::cp431_combined_fallthrough_and_single_cool_scalar_are_accounting_complete ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp431::cp431_conceptual_contract_is_exactly_three_active_variants_and_no_numerical_feed ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp431::cp431_integration_roots_stay_within_historical_caps ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp431::cp431_new_state_has_four_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp431::cp431_validator_locks_deadband_heating_and_inactive_injection_regressions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp432::cp432_contract_locks_61_transitions_and_current_schema_and_binding ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp432::cp432_is_ordered_after_cp431_and_cannot_feed_numerical_coupling ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp432::cp432_new_state_has_four_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp433::cp433_contract_locks_61_transitions_two_entries_and_current_binding ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp433::cp433_is_ordered_after_cp432_and_cannot_feed_or_reconcile_deadband_numerics ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp433::cp433_new_state_has_two_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp434::cp434_contract_locks_exhaustive_routes_current_schema_and_binding ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp434::cp434_is_ordered_after_cp433_and_reconciles_without_feeding_numerics ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp434::cp434_new_state_has_two_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp435::cp435_contract_locks_exhaustive_routes_current_schema_and_binding ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp435::cp435_is_ordered_after_cp434_and_does_not_feed_numerics ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp435::cp435_new_state_has_three_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp436::cp436_contract_locks_exhaustive_routes_current_schema_and_binding ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp436::cp436_is_ordered_after_cp435_and_does_not_feed_numerics ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp436::cp436_new_state_has_four_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp437::cp437_contract_locks_exhaustive_routes_current_schema_and_binding ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp437::cp437_is_ordered_after_cp436_and_does_not_feed_numerics ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp437::cp437_new_state_has_six_zeroed_lossless_route_partitions_and_owned_counter ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp438::cp438_contract_locks_routes_schema_json_and_binding ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp438::cp438_is_ordered_after_cp437_and_does_not_feed_numerics ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp438::cp438_new_state_has_seven_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp439::cp439_contract_locks_routes_schema_json_and_current_binding ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp439::cp439_is_ordered_after_cp438_and_does_not_feed_numerics_or_services ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp439::cp439_new_state_has_eight_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp440::cp440_contract_locks_routes_schema_json_and_current_binding ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp440::cp440_is_ordered_after_cp439_and_does_not_feed_numerics_or_services ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp440::cp440_new_state_has_nine_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp441::cp441_contract_locks_routes_schema_json_and_current_binding ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp441::cp441_is_ordered_after_cp440_and_does_not_feed_numerics_or_services ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp441::cp441_new_state_has_ten_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp442::cp442_contract_locks_routes_schema_json_and_current_binding ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp442::cp442_is_ordered_after_cp441_and_does_not_feed_numerics_or_services ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp442::cp442_new_state_has_two_zeroed_lossless_route_partitions ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp411::cp411_evidence_does_not_feed_or_replace_numerical_coupling_dto ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_weather_day::b_reports_weather_source_fatal_without_thermal_or_end_environment_fallback ... ok
+test ideal_loads::coupled_runtime::tests::cp347_coupled_snapshot_validator_rejects_lineage_bit_and_source_order_corruption ... FAILED
+test ideal_loads::coupled_runtime::tests::cp347_direct_coupled_runtime_completes_none_case_after_g_f_l_and_skips_unit_off ... FAILED
+test ideal_loads::coupled_runtime::tests::cp347_direct_coupled_runtime_covers_non_cooling_and_positive_guard_false_skips ... FAILED
+test ideal_loads::coupled_runtime::tests::cp348_coupled_direct_none_route_is_complete_skip_and_corruption_fails_closed ... FAILED
+test ideal_loads::coupled_runtime::tests::cp349_coupled_direct_none_route_is_complete_skip_and_corruption_fails_closed ... FAILED
+test ideal_loads::coupled_runtime::tests::cp350_coupled_direct_none_route_is_complete_skip_and_corruption_fails_closed ... FAILED
+test ideal_loads::coupled_runtime::tests::cp351_coupled_direct_none_route_is_complete_skip_and_numerical_output_remains_unfed ... FAILED
+test ideal_loads::coupled_runtime::tests::cp352_coupled_direct_none_route_is_complete_skip_and_numerical_enthalpy_remains_unfed ... FAILED
+test ideal_loads::coupled_runtime::tests::cp353_coupled_direct_none_route_is_complete_skip_and_numerical_enthalpy_remains_unfed ... FAILED
+test ideal_loads::coupled_runtime::tests::cp354_coupled_direct_none_route_is_complete_skip_and_numerical_humidity_remains_unfed ... FAILED
+test ideal_loads::coupled_runtime::tests::exact_model_runs_one_source_threshold_coupling_per_fixed_timestep ... FAILED
+test ideal_loads::coupled_runtime::tests::live_coupling_uses_weather_pressure_for_supply_saturation ... FAILED
+test ideal_loads::coupled_runtime::tests::one_step_forced_heating_commits_feedback_into_the_returned_state ... FAILED
+test ideal_loads::coupled_runtime::tests::undersized_schedule_cache_is_a_preflight_coverage_error ... ok
+test ideal_loads::runtime::tests::ideal_loads_outdoor_air_context_uses_surface_area_for_autocalculated_zone_floor ... ok
+test runtime::tests::a_live_weather_reaches_reports_and_preserves_raw_initial_ctf_seed ... FAILED
+test runtime::tests::adiabatic_history_commit_override_preserves_report_face_and_uses_inside_for_ctf_history ... ok
+test runtime::tests::anisotropic_sky_circumsolar_uses_sunlit_fraction ... ok
+test runtime::tests::approximate_view_factors_match_energyplus_1zone_eio ... ok
+test runtime::tests::cached_and_live_internal_gain_timestep_paths_are_bit_equal_with_nonvacuous_operation_counts ... FAILED
+test runtime::tests::cached_heat_balance_step_keeps_precomputed_schedule_while_public_step_reads_live_model ... FAILED
+test runtime::tests::compact_schedule_environment_axis_applies_no_average_and_linear_interpolation ... ok
+test runtime::tests::compact_schedule_environment_axis_selects_each_zone_timestep_end_minute ... ok
+test runtime::tests::compact_schedule_linear_interpolation_keeps_first_interval_flat_across_hour_boundary ... ok
+test runtime::tests::compact_schedule_time_axis_consumes_cross_year_period_day_type_and_hour ... ok
+test runtime::tests::compact_schedule_time_axis_selects_until_segment_by_hour ... ok
+test runtime::tests::compact_schedule_trace_uses_until_segments ... ok
+test runtime::tests::compat_candidate_report_flags_follow_runtime_config ... ok
+test runtime::tests::constant_schedule_trace_repeats_hourly_value ... ok
+test runtime::tests::construction_thermal_cache_indexes_sparse_reordered_and_filtered_ids ... ok
+test runtime::tests::convection_sum_consumes_the_recorded_area_and_invalid_geometry_stops_initialization ... ok
+test runtime::tests::converged_surface_probe_changes_fixed_iteration_cap ... FAILED
+test runtime::tests::cross_year_daylight_saving_reuses_the_source_start_year_annual_table ... ok
+test runtime::tests::cross_year_special_days_reuse_the_source_start_year_annual_table ... ok
+test runtime::tests::ctf02_generated_surface_owner_drives_inside_boundary_and_damping_operands ... ok
+test runtime::tests::ctf02_generated_surface_owner_retains_report_signs_phase_and_history_commit ... ok
+test runtime::tests::ctf02_ordinary_initialization_carries_timestep_and_fresh_surface_history ... FAILED
+test runtime::tests::current_adiabatic_history_probe_syncs_adiabatic_outside_face_after_solve ... FAILED
+test runtime::tests::default_time_axis_has_one_day ... ok
+test runtime::tests::detailed_schedule_dst_hour_24_wraps_schedule_ordinal_367_to_one ... ok
+test runtime::tests::detailed_schedule_dst_shift_uses_tomorrow_type_and_final_stale_type ... ok
+test runtime::tests::detailed_schedule_environment_axis_preserves_zone_timestep_across_dst_shift_and_wrap ... ok
+test runtime::tests::disabling_epw_holidays_does_not_disable_input_file_special_days ... ok
+test runtime::tests::energyplus_analytical_zone_air_temperature_matches_predictor_branch ... ok
+test runtime::tests::energyplus_average_solar_coefficients_match_shadowing_period ... ok
+test runtime::tests::energyplus_ctf_inside_face_balance_handles_standard_and_adiabatic ... ok
+test runtime::tests::energyplus_ctf_outside_face_balance_uses_ctf_zero_terms ... ok
+test runtime::tests::energyplus_ctf_quick_outside_face_balance_uses_inside_balance_term ... ok
+test runtime::tests::energyplus_daily_solar_coefficients_match_reference_day ... ok
+test runtime::tests::energyplus_doe2_outside_convection_uses_wind_side_and_roughness ... ok
+test runtime::tests::energyplus_down_interpolate_three_history_values_matches_source_ratios ... ok
+test runtime::tests::energyplus_initial_ctf_history_seeding_applies_boundary_reset_and_steady_flux ... ok
+test runtime::tests::energyplus_outdoor_wet_bulb_matches_original_cached_rh_to_twb_chain ... ok
+test runtime::tests::energyplus_outdoor_wet_bulb_uses_energyplus_iterate_branch_near_freezing ... ok
+test runtime::tests::energyplus_surface_wind_speed_uses_terrain_and_centroid_height ... ok
+test runtime::tests::energyplus_tarp_inside_convection_uses_surface_orientation_and_limits ... ok
+test runtime::tests::energyplus_tarp_natural_convection_matches_ashrae_branches ... ok
+test runtime::tests::energyplus_third_order_zone_air_temperature_matches_predictor_branch ... ok
+test runtime::tests::energyplus_weather_context_uses_timestep_rain_and_dry_bulb_interpolation ... ok
+test runtime::tests::energyplus_weather_record_day_of_year_ignores_tmy_source_leap_year ... ok
+test runtime::tests::energyplus_weather_record_is_rain_uses_hourly_threshold ... ok
+test runtime::tests::energyplus_wet_timestep_fraction_uses_weather_interpolation ... ok
+test runtime::tests::energyplus_zone_air_heat_capacity_uses_moist_air_psychrometrics ... ok
+test runtime::tests::energyplus_zone_air_temperature_coefficients_match_predictor_terms ... ok
+test runtime::tests::environment_time_axes_include_every_run_period_and_fallback ... ok
+test runtime::tests::environment_time_axis_uses_zone_timestep_source_order_and_flags ... ok
+test runtime::tests::execution_plan_includes_thermostat_and_ideal_loads_steps ... ok
+test runtime::tests::execution_plan_uses_heat_balance_source_order_stages ... ok
+test runtime::tests::exterior_longwave_air_component_uses_air_reference_temperature ... ok
+test runtime::tests::exterior_longwave_terms_use_energyplus_sky_air_ground_split ... ok
+test runtime::tests::exterior_report_terms_use_energyplus_wet_surface_rain_override ... ok
+test runtime::tests::first_hour_weather_interpolation_uses_run_period_day_seed ... ok
+test runtime::tests::first_zone_simulation_writes_zone_temperature_results ... ok
+test runtime::tests::frozen_reference_air_probe_changes_interleaved_surface_reference_air ... FAILED
+test runtime::tests::geometry_report_recomputation_is_unobserved_while_physical_coefficient_calls_remain_live ... ok
+test runtime::tests::ground_ctf_history_seeding_uses_energyplus_building_surface_default ... ok
+test runtime::tests::heat_balance_adiabatic_surfaces_do_not_create_artificial_losses ... FAILED
+test runtime::tests::heat_balance_cache_ignores_unreferenced_invalid_compact_schedule ... FAILED
+test runtime::tests::heat_balance_cache_reuses_hour_samples_across_substeps_warmup_and_two_days ... FAILED
+test runtime::tests::heat_balance_compatibility_stages_follow_energyplus_source_order ... ok
+test runtime::tests::heat_balance_interzone_surface_uses_adjacent_zone_temperature ... FAILED
+test runtime::tests::heat_balance_missing_interzone_surface_target_fails ... FAILED
+test runtime::tests::heat_balance_options_track_initial_ctf_history_policy ... ok
+test runtime::tests::heat_balance_source_order_wrappers_pass_through_runtime_blocks ... ok
+test runtime::tests::heat_balance_state_applies_construction_ctf_coefficients ... ok
+test runtime::tests::heat_balance_state_orders_energyplus_ctf_history_indices_for_runtime_slots ... ok
+test runtime::tests::heat_balance_state_shell_initializes_cube_metrics ... FAILED
+test runtime::tests::heat_balance_state_uses_inside_layer_absorptance_for_interior_sources ... ok
+test runtime::tests::heat_balance_summary_captures_run_period_initial_ctf_history_slots ... ok
+test runtime::tests::heat_balance_surface_first_probe_uses_distinct_zone_air_order ... FAILED
+test runtime::tests::heat_balance_surface_loop_zone_air_correction_runs_after_loop_probe ... FAILED
+test runtime::tests::heat_balance_third_order_probe_runs_as_diagnostic_option ... FAILED
+test runtime::tests::heat_balance_timestep_advances_zone_air_state ... FAILED
+test runtime::tests::heat_balance_timestep_uses_previous_surface_temperature_for_ctf_damping ... ok
+test runtime::tests::heat_balance_trace_writes_zone_air_temperature_results ... FAILED
+test runtime::tests::heat_balance_uses_source_declared_doe2_outside_convection ... ok
+test runtime::tests::heat_balance_warmup_convergence_uses_daily_temperature_extrema ... ok
+test runtime::tests::heat_balance_warmup_minimum_override_preserves_disabled_boundary ... ok
+test runtime::tests::heat_balance_warmup_uses_weather_context_for_exterior_forcing ... FAILED
+test runtime::tests::heat_balance_zone_air_algorithm_lanes_separate_compatibility_and_diagnostics ... ok
+test runtime::tests::heat_balance_zone_air_algorithm_option_defaults_to_simplified ... ok
+test runtime::tests::heat_balance_zone_air_rate_outputs_follow_report_sampling ... FAILED
+test runtime::tests::horizontal_roof_sky_diffuse_matches_energyplus_shadowing_sunrise_edge ... ok
+test runtime::tests::horizontal_surface_azimuth_matches_energyplus_second_edge_rule ... ok
+test runtime::tests::hour_24_solar_is_independent_of_the_next_accepted_days_hour_1 ... ok
+test runtime::tests::hour_only_schedule_consumers_fail_closed_when_hourly_aggregation_is_required ... ok
+test runtime::tests::hour_only_schedule_consumers_reject_calendar_variation_and_missing_ids ... ok
+test runtime::tests::hourly_timestamp_label_uses_projected_calendar_state ... ok
+test runtime::tests::ideal_loads_node_state_projection_expands_nodelist_and_writes_series ... ok
+test runtime::tests::ideal_loads_node_state_projection_resolves_supply_zone_and_return_node_ids ... ok
+test runtime::tests::initial_ctf_history_seeding_uses_boundary_temperature_and_u_value ... ok
+test runtime::tests::input_file_custom_day_overwrites_weather_file_holiday_on_the_same_date ... ok
+test runtime::tests::input_file_daylight_saving_overrides_weather_file_period_and_run_period_policy ... ok
+test runtime::tests::inside_ctf_outside_history_commit_override_only_uses_outdoor_snapshots ... ok
+test runtime::tests::interior_longwave_probe_conserves_zone_exchange_signs ... ok
+test runtime::tests::interior_longwave_probe_is_zero_for_equal_surface_temperatures ... ok
+test runtime::tests::interleaved_longwave_probe_freezes_adiabatic_outside_ctf_report_state ... FAILED
+test runtime::tests::later_typed_special_day_definition_overwrites_an_earlier_definition ... ok
+test runtime::tests::metadata_aware_calendar_applies_cross_year_leap_policy ... ok
+test runtime::tests::metadata_aware_calendar_rejects_actual_weather_for_both_leap_policies ... ok
+test runtime::tests::model_special_day_overrides_both_axes_for_every_hour_of_leap_day ... ok
+test runtime::tests::node_state_store_initializes_without_ideal_loads_result_structs ... ok
+test runtime::tests::nonexistent_nth_weekday_daylight_saving_rule_is_rejected ... ok
+test runtime::tests::nth_and_last_special_day_rules_resolve_and_nonexistent_nth_is_rejected ... ok
+test runtime::tests::opaque_runtime_filters_and_rejects_air_boundary_construction ... ok
+test runtime::tests::opaque_runtime_filters_and_rejects_ground_factor_construction ... ok
+test runtime::tests::opaque_runtime_filters_unreferenced_fenestration_construction ... FAILED
+test runtime::tests::opaque_runtime_rejects_fenestration_material_in_opaque_construction ... ok
+test runtime::tests::opaque_runtime_rejects_surface_using_fenestration_construction ... ok
+test runtime::tests::other_equipment_design_level_methods_drive_internal_gains ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp412::cp412_evidence_does_not_feed_numerical_result ... ok
+test runtime::tests::parses_epw_dry_bulb_values_after_header ... ok
+test runtime::tests::parses_epw_records_after_header ... ok
+test runtime::tests::owned_today_drives_solar_rain_and_sky_with_no_legacy_record_array ... ok
+test runtime::tests::positive_authored_zone_floor_area_overrides_surface_geometry_area ... ok
+test runtime::tests::positive_entered_volume_retains_inward_thermal_fixture_while_auto_is_rejected ... ok
+test runtime::tests::previous_boundary_probe_keeps_adiabatic_outside_face_history ... FAILED
+test runtime::tests::quick_outside_balance_freezes_exterior_coefficient_temperature ... ok
+test runtime::tests::quick_outside_probe_reuses_cached_exterior_report_terms ... ok
+test runtime::tests::result_store_diagnostics_report_duplicate_handles ... ok
+test runtime::tests::radiant_internal_gains_follow_energyplus_area_absorptance_distribution ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_weather_day::b_live_weather_reaches_hourly_reports_without_warmup ... FAILED
+test runtime::tests::result_store_diagnostics_report_duplicate_system_node_handles ... ok
+test runtime::tests::result_store_finds_series_case_insensitively ... ok
+test runtime::tests::run_period_calendar_rejects_pre_gregorian_start_and_end_year_without_start ... ok
+test runtime::tests::run_period_calendar_rolls_omitted_end_year_and_finds_next_leap_day ... ok
+test runtime::tests::run_period_calendar_uses_energyplus_yearless_weekday_lookup_and_correction ... ok
+test runtime::tests::run_period_time_axis_counts_inclusive_days ... ok
+test runtime::tests::run_period_can_disable_the_declared_weather_file_daylight_saving_period ... ok
+test runtime::tests::run_period_flag_enables_epw_sunday_type_holiday_on_both_time_axes ... ok
+test runtime::tests::run_period_time_axis_handles_leap_year ... ok
+test runtime::tests::runtime_diagnostic_codes_cover_conformance_blockers ... ok
+test runtime::tests::runtime_meter_aggregation_kind_resolves_facility_meter_families ... ok
+test runtime::tests::runtime_meter_registry_resolves_ideal_loads_facility_meters ... ok
+test runtime::tests::runtime_meter_registry_diagnoses_unavailable_meter ... ok
+test runtime::tests::runtime_output_registry_diagnoses_unavailable_output ... ok
+test runtime::tests::runtime_output_registry_resolves_system_node_setpoint_output ... ok
+test runtime::tests::runtime_output_registry_records_duplicate_registration_diagnostic ... ok
+test runtime::tests::runtime_output_registry_resolves_declared_model_outputs ... ok
+test runtime::tests::runtime_output_registry_skips_no_sun_surface_solar_output ... ok
+test runtime::tests::schedule_value_series_can_compile_from_time_axis ... ok
+test runtime::tests::same_model_heat_balance_states_reset_and_remain_independent ... ok
+test runtime::tests::schedule_value_series_precomputes_supported_schedules ... ok
+test runtime::tests::scriptf_from_view_factors_matches_energyplus_1zone_eio_orientation ... ok
+test runtime::tests::scriptf_interior_longwave_probe_conserves_zone_exchange_signs ... ok
+test runtime::tests::scriptf_interior_longwave_probe_is_zero_for_equal_surface_temperatures ... ok
+test runtime::tests::shadowing_period_solar_coefficients_use_energyplus_update_frequency ... ok
+test runtime::tests::single_system_timestep_syncs_adaptive_history ... ok
+test runtime::tests::solar_next_hour_record_wraps_within_each_accepted_day ... ok
+test runtime::tests::solar_position_uses_energyplus_hour_angle_convention ... ok
+test runtime::tests::solar_weather_interpolation_matches_energyplus_even_timestep_weights ... ok
+test runtime::tests::special_day_duration_is_inclusive_and_wraps_the_same_year_annual_table ... ok
+test runtime::tests::state_defaults_to_first_timestep ... ok
+test runtime::tests::stored_geometry_height_consumers_ignore_later_typed_vertex_mutation ... ok
+test runtime::tests::surface_area_handles_3d_rectangles ... ok
+test runtime::tests::surface_balance_pass_can_freeze_inside_ctf_outside_snapshot_without_mutating_report_state ... ok
+test runtime::tests::surface_balance_pass_can_freeze_outside_snapshot_for_inside_ctf_solve ... ok
+test runtime::tests::surface_ctf_conduction_report_signs_match_energyplus_storage_convention ... ok
+test runtime::tests::surface_ctf_history_terms_update_flux_constants ... FAILED
+test runtime::tests::surface_ctf_inside_current_inside_term_uses_named_source_equation ... ok
+test runtime::tests::surface_geometry_summary_retains_typed_cube_vertex_winding ... ok
+test runtime::tests::surface_incident_solar_diagnostic_appends_roof_series ... FAILED
+test runtime::tests::surface_inside_ctf_source_terms_follow_energyplus_temp_term_slots ... ok
+test runtime::tests::runtime_precomputed_data_caches_registry_used_by_plan ... ok
+test runtime::tests::surface_solar_uses_shadowing_sunlit_fraction_at_sunrise_edge ... ok
+test runtime::tests::system_timestep_air_storage_report_uses_weather_proxy_capacity ... ok
+test runtime::tests::weather_calendar_separates_gregorian_weather_and_schedule_leap_state ... ok
+test runtime::tests::weather_calendar_uses_non_leap_ordinals_for_february_29_endpoints ... ok
+test runtime::tests::weather_context_updates_zone_air_heat_capacity_from_pressure_and_zone_humidity ... ok
+test runtime::tests::weather_file_daylight_saving_range_wraps_across_the_weather_year ... ok
+test runtime::tests::weather_file_last_weekday_daylight_saving_rules_resolve_like_energyplus ... ok
+test runtime::tests::weather_file_nth_weekday_daylight_saving_rules_resolve_like_energyplus ... ok
+test runtime::tests::weather_file_nth_weekday_daylight_saving_preserves_run_period_month_weekdays ... ok
+test runtime::tests::weather_record_exterior_balance_forces_exterior_conduction ... FAILED
+test runtime::tests::weather_file_fixed_date_daylight_saving_is_inclusive_on_both_time_axes ... ok
+test runtime::tests::weather_timestep_series_precomputes_full_weather_fields ... ok
+test runtime::tests::weather_timestep_series_precomputes_interpolated_samples ... ok
+test runtime::tests::weekend_rule_shifts_only_fixed_single_day_special_days_to_monday ... ok
+test runtime::tests::zone_air_heat_balance_storage_rate_uses_source_algorithm_branch ... ok
+test runtime::tests::zone_air_heat_balance_surface_convection_can_use_report_air_temperature ... ok
+test runtime::tests::zone_geometry_summary_reports_cube_metrics ... ok
+test runtime::tests::zone_internal_convective_gain_trace_excludes_radiant_fraction ... ok
+test runtime::tests::zone_surface_report_conduction_rates_sum_surface_report_terms ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp406::cp406_preserves_all_route_classes_and_enters_only_guard_false_else_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp406::cp406_rejects_cp405_carrier_and_route_drift ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp413::cp413_evidence_does_not_feed_numerical_result ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp407::cp407_preserves_three_partitions_and_uses_only_cp378_cp385_operands ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp408::cp408_preserves_partitions_and_uses_only_cp407_cp329_operands ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp409::cp409_breaks_after_both_cp408_guard_outcomes_and_preserves_carriers ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp405::cp405_preserves_all_route_classes_and_bit_copies_maximum_capacity ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp407::cp407_validation_rejects_owner_and_route_drift ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp408::cp408_validation_rejects_owner_and_route_drift ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp424::cp424_validation_has_no_numerical_coupling_dto_feed ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp425::cp425_validation_has_no_numerical_coupling_dto_feed ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp409::cp409_validation_rejects_cp408_carrier_drift_and_non_direct_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp410::cp410_validation_rejects_true_default_execution_and_non_direct_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp410::cp410_skips_the_untyped_default_after_every_retained_cp409_outcome ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp411::cp411_validation_rejects_changed_assignment_lineage_and_non_direct_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp411::cp411_copies_the_cp410_humidity_ratio_on_active_routes_and_skips_inactive_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp402::cp402_executes_public_routes_with_raw_greater_than_or_equal_comparison ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp412::cp412_uses_cp411_temperature_and_current_pressure_only_on_active_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp412::cp412_validation_rejects_changed_assignment_lineage_and_non_direct_routes ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp413::cp413_reads_cp412_saturation_and_recursively_retained_cp411_original_only_when_active ... ok
+test ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp413::cp413_validation_rejects_changed_operand_lineage_and_non_direct_routes ... ok
+
+failures:
+
+---- ideal_loads::coupled_runtime::tests::cooling_oa_max_flow_gate_reconciles_every_release_limit_shape stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::cooling_oa_max_flow_gate_reconciles_every_release_limit_shape' (984) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs:3237:10:
+CP313 release limit shape: RuntimeStep(CtfSurfaceLifecycle(MissingCallerClock))
+
+---- ideal_loads::coupled_runtime::tests::cooling_mixed_air_call_executes_for_active_positive_zero_supply_flow stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::cooling_mixed_air_call_executes_for_active_positive_zero_supply_flow' (29048) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs:4735:6:
+active zero-flow CP329 call: RuntimeStep(CtfSurfaceLifecycle(MissingCallerClock))
+
+---- ideal_loads::coupled_runtime::tests::all_hard_sized_finite_limit_branches_run_with_source_threshold_demand stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::all_hard_sized_finite_limit_branches_run_with_source_threshold_demand' (38944) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs:2991:10:
+hard-sized finite branch in the live coupled loop: RuntimeStep(CtfSurfaceLifecycle(MissingCallerClock))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- ideal_loads::coupled_runtime::tests::cooling_sensible_flow_lifecycle_records_unit_off_without_source_execution stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::cooling_sensible_flow_lifecycle_records_unit_off_without_source_execution' (31660) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs:2718:6:
+one-step unit-off release: RuntimeStep(CtfSurfaceLifecycle(MissingCallerClock))
+
+---- ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp355::cp355_coupled_direct_none_route_is_complete_skip_and_numerical_humidity_remains_unfed stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp355::cp355_coupled_direct_none_route_is_complete_skip_and_numerical_humidity_remains_unfed' (46704) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests_cp355.rs:23:6:
+valid CP355 direct simulation: RuntimeStep(CtfSurfaceLifecycle(MissingCallerClock))
+
+---- ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp356::cp356_coupled_direct_none_route_is_complete_skip_and_numerical_humidity_remains_unfed stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp356::cp356_coupled_direct_none_route_is_complete_skip_and_numerical_humidity_remains_unfed' (21520) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests_cp356.rs:23:6:
+valid CP356 direct simulation: RuntimeStep(CtfSurfaceLifecycle(MissingCallerClock))
+
+---- ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp357::cp357_coupled_direct_none_route_is_complete_skip_and_numerical_humidity_remains_unfed stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp357::cp357_coupled_direct_none_route_is_complete_skip_and_numerical_humidity_remains_unfed' (46848) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests_cp357.rs:26:5:
+valid CP357 direct simulation
+
+---- ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp358::cp358_coupled_direct_none_is_exact_skip_and_cp345_remains_numerical_owner stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp358::cp358_coupled_direct_none_is_exact_skip_and_cp345_remains_numerical_owner' (11080) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests_cp358.rs:22:5:
+assertion failed: simulation_result.is_ok()
+
+---- ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp359::cp359_coupled_direct_none_is_exact_skip_and_cp345_remains_numerical_owner stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp359::cp359_coupled_direct_none_is_exact_skip_and_cp345_remains_numerical_owner' (22976) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests_cp359.rs:22:5:
+assertion failed: simulation_result.is_ok()
+
+---- ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp360::cp360_coupled_direct_none_is_exact_null_skip_and_cp345_stays_owner stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp360::cp360_coupled_direct_none_is_exact_null_skip_and_cp345_stays_owner' (55320) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests_cp360.rs:22:5:
+assertion failed: simulation_result.is_ok()
+
+---- ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp361::cp361_coupled_direct_none_is_exact_null_skip_and_cp345_stays_owner stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp361::cp361_coupled_direct_none_is_exact_null_skip_and_cp345_stays_owner' (50776) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests_cp361.rs:22:5:
+assertion failed: simulation_result.is_ok()
+
+---- ideal_loads::coupled_runtime::tests::cp347_coupled_snapshot_validator_rejects_lineage_bit_and_source_order_corruption stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::cp347_coupled_snapshot_validator_rejects_lineage_bit_and_source_order_corruption' (27748) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs:1251:6:
+valid CP347 direct simulation: RuntimeStep(CtfSurfaceLifecycle(MissingCallerClock))
+
+---- ideal_loads::coupled_runtime::tests::cp347_direct_coupled_runtime_completes_none_case_after_g_f_l_and_skips_unit_off stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::cp347_direct_coupled_runtime_completes_none_case_after_g_f_l_and_skips_unit_off' (52048) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs:336:10:
+CP344 route must pass per-step and final coupled validation: RuntimeStep(CtfSurfaceLifecycle(MissingCallerClock))
+
+---- ideal_loads::coupled_runtime::tests::cp347_direct_coupled_runtime_covers_non_cooling_and_positive_guard_false_skips stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::cp347_direct_coupled_runtime_covers_non_cooling_and_positive_guard_false_skips' (50388) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs:1086:10:
+CP345 N/P route must pass per-step and final coupled validation: RuntimeStep(CtfSurfaceLifecycle(MissingCallerClock))
+
+---- ideal_loads::coupled_runtime::tests::cp348_coupled_direct_none_route_is_complete_skip_and_corruption_fails_closed stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::cp348_coupled_direct_none_route_is_complete_skip_and_corruption_fails_closed' (47844) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs:5317:6:
+valid CP348 direct simulation: RuntimeStep(CtfSurfaceLifecycle(MissingCallerClock))
+
+---- ideal_loads::coupled_runtime::tests::cp349_coupled_direct_none_route_is_complete_skip_and_corruption_fails_closed stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::cp349_coupled_direct_none_route_is_complete_skip_and_corruption_fails_closed' (27744) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs:5397:6:
+valid CP349 direct simulation: RuntimeStep(CtfSurfaceLifecycle(MissingCallerClock))
+
+---- ideal_loads::coupled_runtime::tests::cp350_coupled_direct_none_route_is_complete_skip_and_corruption_fails_closed stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::cp350_coupled_direct_none_route_is_complete_skip_and_corruption_fails_closed' (30288) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs:5502:6:
+valid CP350 direct simulation: RuntimeStep(CtfSurfaceLifecycle(MissingCallerClock))
+
+---- ideal_loads::coupled_runtime::tests::cp351_coupled_direct_none_route_is_complete_skip_and_numerical_output_remains_unfed stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::cp351_coupled_direct_none_route_is_complete_skip_and_numerical_output_remains_unfed' (5688) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs:5616:6:
+valid CP351 direct simulation: RuntimeStep(CtfSurfaceLifecycle(MissingCallerClock))
+
+---- ideal_loads::coupled_runtime::tests::cp352_coupled_direct_none_route_is_complete_skip_and_numerical_enthalpy_remains_unfed stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::cp352_coupled_direct_none_route_is_complete_skip_and_numerical_enthalpy_remains_unfed' (54736) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs:5719:6:
+valid CP352 direct simulation: RuntimeStep(CtfSurfaceLifecycle(MissingCallerClock))
+
+---- ideal_loads::coupled_runtime::tests::cp353_coupled_direct_none_route_is_complete_skip_and_numerical_enthalpy_remains_unfed stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::cp353_coupled_direct_none_route_is_complete_skip_and_numerical_enthalpy_remains_unfed' (54808) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs:5831:6:
+valid CP353 direct simulation: RuntimeStep(CtfSurfaceLifecycle(MissingCallerClock))
+
+---- ideal_loads::coupled_runtime::tests::cp354_coupled_direct_none_route_is_complete_skip_and_numerical_humidity_remains_unfed stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::cp354_coupled_direct_none_route_is_complete_skip_and_numerical_humidity_remains_unfed' (12440) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs:5949:6:
+valid CP354 direct simulation: RuntimeStep(CtfSurfaceLifecycle(MissingCallerClock))
+
+---- ideal_loads::coupled_runtime::tests::exact_model_runs_one_source_threshold_coupling_per_fixed_timestep stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::exact_model_runs_one_source_threshold_coupling_per_fixed_timestep' (36340) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs:1840:6:
+exact bounded direct-Zone model: RuntimeStep(CtfSurfaceLifecycle(MissingCallerClock))
+
+---- ideal_loads::coupled_runtime::tests::live_coupling_uses_weather_pressure_for_supply_saturation stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::live_coupling_uses_weather_pressure_for_supply_saturation' (17756) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs:4953:6:
+live finite cooling with weather-derived saturation pressure: RuntimeStep(CtfSurfaceLifecycle(MissingCallerClock))
+
+---- ideal_loads::coupled_runtime::tests::one_step_forced_heating_commits_feedback_into_the_returned_state stdout ----
+
+thread 'ideal_loads::coupled_runtime::tests::one_step_forced_heating_commits_feedback_into_the_returned_state' (20896) panicked at crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs:5025:6:
+one forced-heating predictor/PurchasedAir/corrector step: RuntimeStep(CtfSurfaceLifecycle(MissingCallerClock))
+
+---- runtime::tests::a_live_weather_reaches_reports_and_preserves_raw_initial_ctf_seed stdout ----
+Error: CtfSurfaceLifecycle(MissingCallerClock)
+
+---- runtime::tests::cached_and_live_internal_gain_timestep_paths_are_bit_equal_with_nonvacuous_operation_counts stdout ----
+
+thread 'runtime::tests::cached_and_live_internal_gain_timestep_paths_are_bit_equal_with_nonvacuous_operation_counts' (48284) panicked at crates\ep_runtime\src\runtime\tests/part13.rs:253:9:
+assertion `left == right` failed
+  left: 0
+ right: 96
+
+---- runtime::tests::cached_heat_balance_step_keeps_precomputed_schedule_while_public_step_reads_live_model stdout ----
+
+thread 'runtime::tests::cached_heat_balance_step_keeps_precomputed_schedule_while_public_step_reads_live_model' (39696) panicked at crates\ep_runtime\src\runtime\tests/part13.rs:43:9:
+assertion `left == right` failed
+  left: 9.600000000000001
+ right: 2.4000000000000004
+
+---- runtime::tests::converged_surface_probe_changes_fixed_iteration_cap stdout ----
+Error: CtfSurfaceLifecycle(MissingCallerClock)
+
+---- runtime::tests::ctf02_ordinary_initialization_carries_timestep_and_fresh_surface_history stdout ----
+
+thread 'runtime::tests::ctf02_ordinary_initialization_carries_timestep_and_fresh_surface_history' (19244) panicked at crates\ep_runtime\src\runtime\tests/ctf02_surface_integration.rs:94:9:
+assertion `left == right` failed
+  left: [0.0]
+ right: [17.25]
+
+---- runtime::tests::current_adiabatic_history_probe_syncs_adiabatic_outside_face_after_solve stdout ----
+Error: CtfSurfaceLifecycle(MissingCallerClock)
+
+---- runtime::tests::frozen_reference_air_probe_changes_interleaved_surface_reference_air stdout ----
+Error: CtfSurfaceLifecycle(MissingCallerClock)
+
+---- runtime::tests::heat_balance_adiabatic_surfaces_do_not_create_artificial_losses stdout ----
+
+thread 'runtime::tests::heat_balance_adiabatic_surfaces_do_not_create_artificial_losses' (54940) panicked at crates\ep_runtime\src\runtime\tests/part05.rs:146:9:
+assertion failed: state.zones[0].mean_air_temperature_c > 20.0
+
+---- runtime::tests::heat_balance_cache_ignores_unreferenced_invalid_compact_schedule stdout ----
+Error: CtfSurfaceLifecycle(MissingCallerClock)
+
+---- runtime::tests::heat_balance_cache_reuses_hour_samples_across_substeps_warmup_and_two_days stdout ----
+Error: CtfSurfaceLifecycle(MissingCallerClock)
+
+---- runtime::tests::heat_balance_interzone_surface_uses_adjacent_zone_temperature stdout ----
+Error: CtfSurfaceLifecycle(Binding(UnsupportedBoundary(SurfaceId(0))))
+
+---- runtime::tests::heat_balance_missing_interzone_surface_target_fails stdout ----
+
+thread 'runtime::tests::heat_balance_missing_interzone_surface_target_fails' (52504) panicked at crates\ep_runtime\src\runtime\tests/part05.rs:236:9:
+assertion failed: matches!(initialize_heat_balance_state(&model, 20.0),
+    Err(RuntimeError::MissingSurfaceBoundaryTarget { .. }))
+
+---- runtime::tests::heat_balance_state_shell_initializes_cube_metrics stdout ----
+
+thread 'runtime::tests::heat_balance_state_shell_initializes_cube_metrics' (46092) panicked at crates\ep_runtime\src\runtime\tests/part03.rs:170:9:
+assertion `left == right` failed
+  left: [0.0]
+ right: [20.0]
+
+---- runtime::tests::heat_balance_surface_first_probe_uses_distinct_zone_air_order stdout ----
+Error: CtfSurfaceLifecycle(MissingCallerClock)
+
+---- runtime::tests::heat_balance_surface_loop_zone_air_correction_runs_after_loop_probe stdout ----
+Error: CtfSurfaceLifecycle(MissingCallerClock)
+
+---- runtime::tests::heat_balance_third_order_probe_runs_as_diagnostic_option stdout ----
+Error: CtfSurfaceLifecycle(MissingCallerClock)
+
+---- runtime::tests::heat_balance_timestep_advances_zone_air_state stdout ----
+
+thread 'runtime::tests::heat_balance_timestep_advances_zone_air_state' (43916) panicked at crates\ep_runtime\src\runtime\tests/part04.rs:658:9:
+assertion `left == right` failed
+  left: 0
+ right: 1
+
+---- runtime::tests::heat_balance_trace_writes_zone_air_temperature_results stdout ----
+Error: CtfSurfaceLifecycle(MissingCallerClock)
+
+---- runtime::tests::heat_balance_warmup_uses_weather_context_for_exterior_forcing stdout ----
+Error: CtfSurfaceLifecycle(MissingCallerClock)
+
+---- runtime::tests::heat_balance_zone_air_rate_outputs_follow_report_sampling stdout ----
+Error: CtfSurfaceLifecycle(MissingCallerClock)
+
+---- runtime::tests::interleaved_longwave_probe_freezes_adiabatic_outside_ctf_report_state stdout ----
+Error: CtfSurfaceLifecycle(MissingCallerClock)
+
+---- runtime::tests::opaque_runtime_filters_unreferenced_fenestration_construction stdout ----
+Error: CtfSurfaceLifecycle(Binding(UnsupportedMaterial(MaterialId(1))))
+
+---- runtime::tests::previous_boundary_probe_keeps_adiabatic_outside_face_history stdout ----
+Error: CtfSurfaceLifecycle(MissingCallerClock)
+
+---- ideal_loads::coupled_runtime::tests::coupled_runtime_tests_weather_day::b_live_weather_reaches_hourly_reports_without_warmup stdout ----
+Error: RuntimeStep(CtfSurfaceLifecycle(History(SimpleCurrentRowMove)))
+
+---- runtime::tests::surface_ctf_history_terms_update_flux_constants stdout ----
+
+thread 'runtime::tests::surface_ctf_history_terms_update_flux_constants' (30804) panicked at crates\ep_runtime\src\runtime\tests/part03.rs:790:9:
+assertion failed: (surface.ctf.const_in_part_w_per_m2 - (-3.15)).abs() < 1.0e-12
+
+---- runtime::tests::surface_incident_solar_diagnostic_appends_roof_series stdout ----
+Error: CtfSurfaceLifecycle(MissingCallerClock)
+
+---- runtime::tests::weather_record_exterior_balance_forces_exterior_conduction stdout ----
+Error: CtfSurfaceLifecycle(MissingCallerClock)
+
+
+failures:
+    ideal_loads::coupled_runtime::tests::all_hard_sized_finite_limit_branches_run_with_source_threshold_demand
+    ideal_loads::coupled_runtime::tests::cooling_mixed_air_call_executes_for_active_positive_zero_supply_flow
+    ideal_loads::coupled_runtime::tests::cooling_oa_max_flow_gate_reconciles_every_release_limit_shape
+    ideal_loads::coupled_runtime::tests::cooling_sensible_flow_lifecycle_records_unit_off_without_source_execution
+    ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp355::cp355_coupled_direct_none_route_is_complete_skip_and_numerical_humidity_remains_unfed
+    ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp356::cp356_coupled_direct_none_route_is_complete_skip_and_numerical_humidity_remains_unfed
+    ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp357::cp357_coupled_direct_none_route_is_complete_skip_and_numerical_humidity_remains_unfed
+    ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp358::cp358_coupled_direct_none_is_exact_skip_and_cp345_remains_numerical_owner
+    ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp359::cp359_coupled_direct_none_is_exact_skip_and_cp345_remains_numerical_owner
+    ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp360::cp360_coupled_direct_none_is_exact_null_skip_and_cp345_stays_owner
+    ideal_loads::coupled_runtime::tests::coupled_runtime_tests_cp361::cp361_coupled_direct_none_is_exact_null_skip_and_cp345_stays_owner
+    ideal_loads::coupled_runtime::tests::coupled_runtime_tests_weather_day::b_live_weather_reaches_hourly_reports_without_warmup
+    ideal_loads::coupled_runtime::tests::cp347_coupled_snapshot_validator_rejects_lineage_bit_and_source_order_corruption
+    ideal_loads::coupled_runtime::tests::cp347_direct_coupled_runtime_completes_none_case_after_g_f_l_and_skips_unit_off
+    ideal_loads::coupled_runtime::tests::cp347_direct_coupled_runtime_covers_non_cooling_and_positive_guard_false_skips
+    ideal_loads::coupled_runtime::tests::cp348_coupled_direct_none_route_is_complete_skip_and_corruption_fails_closed
+    ideal_loads::coupled_runtime::tests::cp349_coupled_direct_none_route_is_complete_skip_and_corruption_fails_closed
+    ideal_loads::coupled_runtime::tests::cp350_coupled_direct_none_route_is_complete_skip_and_corruption_fails_closed
+    ideal_loads::coupled_runtime::tests::cp351_coupled_direct_none_route_is_complete_skip_and_numerical_output_remains_unfed
+    ideal_loads::coupled_runtime::tests::cp352_coupled_direct_none_route_is_complete_skip_and_numerical_enthalpy_remains_unfed
+    ideal_loads::coupled_runtime::tests::cp353_coupled_direct_none_route_is_complete_skip_and_numerical_enthalpy_remains_unfed
+    ideal_loads::coupled_runtime::tests::cp354_coupled_direct_none_route_is_complete_skip_and_numerical_humidity_remains_unfed
+    ideal_loads::coupled_runtime::tests::exact_model_runs_one_source_threshold_coupling_per_fixed_timestep
+    ideal_loads::coupled_runtime::tests::live_coupling_uses_weather_pressure_for_supply_saturation
+    ideal_loads::coupled_runtime::tests::one_step_forced_heating_commits_feedback_into_the_returned_state
+    runtime::tests::a_live_weather_reaches_reports_and_preserves_raw_initial_ctf_seed
+    runtime::tests::cached_and_live_internal_gain_timestep_paths_are_bit_equal_with_nonvacuous_operation_counts
+    runtime::tests::cached_heat_balance_step_keeps_precomputed_schedule_while_public_step_reads_live_model
+    runtime::tests::converged_surface_probe_changes_fixed_iteration_cap
+    runtime::tests::ctf02_ordinary_initialization_carries_timestep_and_fresh_surface_history
+    runtime::tests::current_adiabatic_history_probe_syncs_adiabatic_outside_face_after_solve
+    runtime::tests::frozen_reference_air_probe_changes_interleaved_surface_reference_air
+    runtime::tests::heat_balance_adiabatic_surfaces_do_not_create_artificial_losses
+    runtime::tests::heat_balance_cache_ignores_unreferenced_invalid_compact_schedule
+    runtime::tests::heat_balance_cache_reuses_hour_samples_across_substeps_warmup_and_two_days
+    runtime::tests::heat_balance_interzone_surface_uses_adjacent_zone_temperature
+    runtime::tests::heat_balance_missing_interzone_surface_target_fails
+    runtime::tests::heat_balance_state_shell_initializes_cube_metrics
+    runtime::tests::heat_balance_surface_first_probe_uses_distinct_zone_air_order
+    runtime::tests::heat_balance_surface_loop_zone_air_correction_runs_after_loop_probe
+    runtime::tests::heat_balance_third_order_probe_runs_as_diagnostic_option
+    runtime::tests::heat_balance_timestep_advances_zone_air_state
+    runtime::tests::heat_balance_trace_writes_zone_air_temperature_results
+    runtime::tests::heat_balance_warmup_uses_weather_context_for_exterior_forcing
+    runtime::tests::heat_balance_zone_air_rate_outputs_follow_report_sampling
+    runtime::tests::interleaved_longwave_probe_freezes_adiabatic_outside_ctf_report_state
+    runtime::tests::opaque_runtime_filters_unreferenced_fenestration_construction
+    runtime::tests::previous_boundary_probe_keeps_adiabatic_outside_face_history
+    runtime::tests::surface_ctf_history_terms_update_flux_constants
+    runtime::tests::surface_incident_solar_diagnostic_appends_roof_series
+    runtime::tests::weather_record_exterior_balance_forces_exterior_conduction
+
+test result: FAILED. 450 passed; 51 failed; 0 ignored; 0 measured; 2703 filtered out; finished in 27.55s
+

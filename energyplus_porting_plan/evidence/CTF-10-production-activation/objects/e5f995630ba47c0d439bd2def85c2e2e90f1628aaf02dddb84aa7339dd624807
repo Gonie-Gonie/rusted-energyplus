@@ -1,0 +1,68 @@
+--- before/heat_balance/ctf_surface_binding.rs
++++ proposed/heat_balance/ctf_surface_binding.rs
+@@ -16,12 +16,21 @@
+ };
+ use std::collections::BTreeSet;
+ 
++/// Producer identity retained by exact equality, without runtime source I/O.
++#[derive(Clone, Copy, Debug, Eq, PartialEq)]
++pub enum CtfSurfaceProducerRevision {
++    /// Existing explicitly supplied fixture/source identity.
++    Explicit([u8; 32]),
++    /// Actual compiler-owned direct producer source witnesses.
++    Compiled(&'static [(&'static str, &'static str)]),
++}
++
+ /// Actual producer/caller inputs, supplied by its ordinary initialization owner.
+ /// No revision, timestep, flag or incoming aggregate is inferred from coefficients.
+ #[derive(Clone, Copy, Debug, PartialEq)]
+ pub struct CtfSurfaceGenerationContext {
+-    /// Actual producer-source revision identity; never a Native answer digest.
+-    pub producer_revision: [u8; 32],
++    /// Actual compiler witness or explicit source/fixture identity; never an answer digest.
++    pub producer_revision: CtfSurfaceProducerRevision,
+     /// Actual TimeStepZone supplied to preprocessing/initial/retry generation.
+     pub time_step_zone_hours: f64,
+     /// Shared flags before the first declared construction's preprocessing.
+@@ -96,7 +105,7 @@
+ /// Private fields prevent callers from dropping inputs before comparing keys.
+ #[derive(Clone, Debug, Eq, PartialEq)]
+ pub struct CtfSurfaceGenerationKey {
+-    revision: [u8; 32],
++    revision: CtfSurfaceProducerRevision,
+     timestep_count: u32,
+     timestep_bits: u64,
+     initial_flags: CtfCallerSharedFlags,
+@@ -112,7 +121,9 @@
+         Vec<MaterialId>,
+     )>,
+     // These are coefficient-use/binding inputs, not weather/geometry histories.
+-    surfaces: Vec<(SurfaceId, ConstructionId, OutsideBoundaryCondition)>,
++    surfaces: Vec<(SurfaceId, ConstructionId, OutsideBoundaryCondition, ep_model::ZoneId, ep_model::SpaceId, ep_model::SurfaceType, Vec<[u64; 3]>)>,
++    zone_spaces: Vec<(ep_model::ZoneId, Vec<ep_model::SpaceId>)>,
++    spaces: Vec<(ep_model::SpaceId, ep_model::ZoneId)>,
+     public: Vec<PublicKey>,
+     aggregate: CtfPublicInitAggregate,
+     stop: Option<CtfPublicInitStop>,
+@@ -275,11 +286,7 @@
+             return Err(Error::UnsupportedBoundary(surface.id));
+         }
+         used.insert(surface.construction);
+-        surfaces.push((
+-            surface.id,
+-            surface.construction,
+-            surface.outside_boundary_condition,
+-        ));
++        surfaces.push((surface.id, surface.construction, surface.outside_boundary_condition, surface.zone, surface.space, surface.surface_type, surface.vertices.iter().map(|point| [point.x_m.to_bits(), point.y_m.to_bits(), point.z_m.to_bits()]).collect()));
+     }
+     if initialization.constructions.len() != model.constructions.len() {
+         return Err(Error::Association);
+@@ -326,6 +333,8 @@
+         materials,
+         constructions,
+         surfaces,
++        zone_spaces: model.zones.iter().map(|zone| (zone.id, zone.spaces.clone())).collect(),
++        spaces: model.spaces.iter().map(|space| (space.id, space.zone)).collect(),
+         public,
+         aggregate: initialization.aggregate_after_returned_calls,
+         stop: initialization.selected_stop,

@@ -10,6 +10,7 @@ pub(super) fn finish_heat_balance_state(
     surfaces: Vec<SurfaceHeatBalanceState>,
     surface_indexes: HeatBalanceSurfaceIndexes,
     mut construction_thermal_data: ConstructionThermalDataCache,
+    ctf_surface_lifecycle: Option<super::super::ctf_surface_lifecycle::CtfSurfaceLifecycle>,
 ) -> HeatBalanceState {
     HeatBalanceState {
         timestep_index: 0,
@@ -30,6 +31,8 @@ pub(super) fn finish_heat_balance_state(
         construction_ctf09_retry_driver: construction_thermal_data.take_retry_initializations(),
         construction_ctf10_public_initialization: construction_thermal_data
             .take_public_initialization(),
+        ctf_surface_lifecycle,
+        ctf_history_caller_clock: Default::default(),
         construction_cache_build_wall_seconds: construction_thermal_data.build_wall_seconds,
         construction_cache_entry_count: construction_thermal_data.len(),
         construction_cache_no_mass_count: construction_thermal_data.no_mass_construction_ids.len(),

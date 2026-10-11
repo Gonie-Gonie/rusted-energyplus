@@ -1,0 +1,87 @@
+{
+  "schema": "ctf10-thermal-history-unit-runtime-source-bindings.v1",
+  "observer_sources": [
+    {
+      "path": "crates/ep_run/examples/ctf10_thermal_history_unit_observer.rs",
+      "sha256": "5f8df9f5c7e9ffe012887591fea79f78dd6eae081269c2d6d7277759aee4af57",
+      "size_bytes": 15715
+    },
+    {
+      "path": "crates/ep_run/examples/ctf10_thermal_history_unit_support/fields.rs",
+      "sha256": "e075c79affd2e8c1782a83583a7c262332fb8dc7c5cf214599f7e7dfaad6ac3a",
+      "size_bytes": 25593
+    }
+  ],
+  "actual_public_API_sources": [
+    {
+      "path": "crates/ep_run/Cargo.toml",
+      "sha256": "7739bf48b53716089466f6e9d734d1f97038d9cb919787de75804eab474aa2bd",
+      "size_bytes": 524
+    },
+    {
+      "path": "crates/ep_runtime/Cargo.toml",
+      "sha256": "bb81b5793debafd84300ec9905f0cda65ab32d216633543bab375b30a7a379e9",
+      "size_bytes": 327
+    },
+    {
+      "path": "crates/ep_runtime/src/lib.rs",
+      "sha256": "f3c569d10f96a1c4922c682ae88ff523b48e01d1bf267bfa107f2afca08bddb7",
+      "size_bytes": 868
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "sha256": "f9d8ac68da094b48c7b555ac4bc0e903485d605289c8bc26fc4a9660c93a70a8",
+      "size_bytes": 1905
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/ctf_thermal_history.rs",
+      "sha256": "7dfaeb87ca080c7f9bca89ff87865e5859a4d21858d9e37a15b74d1911bc9709",
+      "size_bytes": 27756
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager.rs",
+      "sha256": "15165c7b9b347d3841136b088d3085d0d0aa9b8d428625f61f923b715a970371",
+      "size_bytes": 6171
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_public_storage.rs",
+      "sha256": "3327c29942113e0b5cd2fcf502d70933b080efa6b4e76ebca83dd36a534fe5a9",
+      "size_bytes": 9057
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/surface_manager/ctf_all_resistive.rs",
+      "sha256": "8e02f58b2da67416342b15f281cd270f80c1bafcd7600931899aef2f920f2bfc",
+      "size_bytes": 4902
+    },
+    {
+      "path": "crates/ep_model/Cargo.toml",
+      "sha256": "80483c7b8bd8e1f878c5576d2d4973826123a744c269d4a1d19ec3c02c811da0",
+      "size_bytes": 188
+    },
+    {
+      "path": "crates/ep_model/src/lib.rs",
+      "sha256": "2a756532553034fb2b92c892cb2e6f3c147aa129f6dce64b63763f364cb3cee4",
+      "size_bytes": 284
+    },
+    {
+      "path": "crates/ep_model/src/ids.rs",
+      "sha256": "83b32ebf02684f459cb0a789f498de08b849b94a7072f1f5870663a4b3cca7be",
+      "size_bytes": 2029
+    },
+    {
+      "path": "crates/ep_model/src/objects/mod.rs",
+      "sha256": "cb752e4c143386ce432adc84dc8d36d8358bd0ea1b0fc2b01f240795c7ec96c1",
+      "size_bytes": 2068
+    },
+    {
+      "path": "crates/ep_model/src/objects/surfaces.rs",
+      "sha256": "54569b984efd25320447a8eecb94f351037ab6b63a5cfb31d0af1ecc225a1755",
+      "size_bytes": 6656
+    },
+    {
+      "path": "crates/ep_runtime/examples/clk02_probe_support/digest.rs",
+      "sha256": "23af1d1177b51ba0b7b321b8cadffeb2a937868ad04ebf3851971ecbf5defc74",
+      "size_bytes": 3172
+    }
+  ]
+}

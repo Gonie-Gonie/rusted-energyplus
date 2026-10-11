@@ -21,6 +21,9 @@ pub(crate) fn seed_initial_surface_ctf_boundary_histories(
     state: &mut HeatBalanceState,
     initial_outdoor_dry_bulb_c: f64,
 ) {
+    if state.ctf_surface_lifecycle.is_some() {
+        return;
+    }
     let zone_temperatures = state
         .zones
         .iter()
@@ -67,6 +70,9 @@ pub(crate) fn seed_energyplus_initial_surface_ctf_histories(
     initial_surface_temperature_c: f64,
     initial_outdoor_dry_bulb_c: f64,
 ) {
+    if state.ctf_surface_lifecycle.is_some() {
+        return;
+    }
     let zone_temperatures = state
         .zones
         .iter()

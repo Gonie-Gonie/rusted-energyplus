@@ -160,7 +160,7 @@ pub enum CtfThermalHistoryUnavailable {
     ScratchUnallocated,
     /// A supplied count would index beyond the fixed19 history owner.
     HistoryCapacity,
-    /// Global max0 moves the current row itself in the simple Native branch;
+    /// Nonempty global max0 moves the current row in the simple Native branch;
     /// this fixed fully allocated owner declines that unrepresented moved state.
     SimpleCurrentRowMove,
     /// Native i32 increment has no representable successor; not a saturation.
@@ -402,7 +402,7 @@ pub fn update_selected_ctf_thermal_histories(
     use CtfThermalHistoryUnavailable as Error;
     let orders = prepare(state, surfaces, context)?;
     let simple = context.simple_ctf_only && !context.any_construction_overrides;
-    if simple && orders.global_last == 0 {
+    if simple && orders.global_last == 0 && !state.surface_ids.is_empty() {
         return Err(Error::SimpleCurrentRowMove);
     }
     if !state.update_first_time {

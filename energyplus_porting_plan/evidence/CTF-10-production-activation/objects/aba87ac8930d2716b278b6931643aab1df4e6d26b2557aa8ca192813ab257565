@@ -1,0 +1,14 @@
+--- accepted-literal
++++ actual-formatted
+@@ -100,7 +100,10 @@
+     // Validate actual declared references before selected public generation
+     // can reject an unsupported boundary family. Preserve the existing
+     // MissingSurface/ZoneBoundaryTarget contract without widening support.
+-    let boundary_targets = model.typed.surfaces.iter()
++    let boundary_targets = model
++        .typed
++        .surfaces
++        .iter()
+         .map(|surface| resolve_surface_boundary_target(&model.typed, surface))
+         .collect::<Result<Vec<_>, _>>()?;
+     let mut construction_thermal_data =

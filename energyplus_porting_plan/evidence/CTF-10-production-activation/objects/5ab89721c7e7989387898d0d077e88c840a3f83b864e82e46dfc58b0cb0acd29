@@ -1,0 +1,25 @@
+--- accepted-literal/crates/ep_runtime/src/weather_day/production.rs
++++ actual-formatted/crates/ep_runtime/src/weather_day/production.rs
+@@ -65,8 +65,10 @@
+ 
+ impl ProductionCtfHistoryClock {
+     pub(crate) fn same_zone_step(self, other: Self) -> bool {
+-        self.phase == other.phase && self.record_index == other.record_index
+-            && self.day_of_sim == other.day_of_sim && self.hour_of_day == other.hour_of_day
++        self.phase == other.phase
++            && self.record_index == other.record_index
++            && self.day_of_sim == other.day_of_sim
++            && self.hour_of_day == other.hour_of_day
+             && self.time_step == other.time_step
+     }
+ }
+@@ -297,7 +299,8 @@
+                 period_days,
+             );
+         let ctf_history_clock = ProductionCtfHistoryClock {
+-            phase, record_index,
++            phase,
++            record_index,
+             begin_simulation: session.state.global.begin_sim_flag,
+             begin_environment: session.state.global.begin_envrn_flag,
+             day_of_sim: session.state.global.day_of_sim,

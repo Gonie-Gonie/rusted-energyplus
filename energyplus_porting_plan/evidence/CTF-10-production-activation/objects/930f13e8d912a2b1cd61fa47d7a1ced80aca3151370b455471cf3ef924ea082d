@@ -1,0 +1,29 @@
+"""Root compresses six completed ordinary traces, retaining their exact bytes."""
+import hashlib,json,shutil,subprocess,sys
+from pathlib import Path
+ROOT=Path.cwd().resolve();BASE=ROOT/'.runtime/porting/CTF-10';OUT=BASE/'production-activation-cli6-trace-storage-compression-01'
+def sha(p):
+ with p.open('rb')as s:return hashlib.file_digest(s,'sha256').hexdigest()
+def ref(p):return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+assert len(sys.argv)==2
+authority=BASE/'production-activation-cli6-inputs-01/execution-summary.json';assert sha(authority)==sys.argv[1]
+summary=json.loads(authority.read_bytes());assert summary['all6_exit0_and_source_unchanged']is True
+assert [r['id']for r in summary['executions']]==['A-24H','A-72H','B-NOLIMIT-24H','B-FLOW-24H','B-CAPACITY-24H','B-BOTH-24H']
+prepared=[]
+for row in summary['executions']:
+ receipt=ROOT/row['receipt']['path'];assert sha(receipt)==row['receipt']['sha256'];r=json.loads(receipt.read_bytes())
+ assert r['exit_code']==0 and r['launch_error']is None and r['source_bytes_match_before_and_after']is True and r['source_snapshot']==summary['same_actual_source_snapshot']
+ directory=BASE/'production-activation-cli6-output-01'/row['id'];assert Path(r['command'][r['command'].index('--output-dir')+1]).resolve()==directory
+ p=(directory/'clk03-weather-day-production-trace.json').resolve(strict=True)
+ assert p.parent==directory and p.is_file() and not p.is_symlink() and not p.is_junction() and not(p.stat().st_file_attributes&0x400)
+ prepared.append((row, p, ref(p)))
+assert not OUT.exists();OUT.mkdir();free_before=shutil.disk_usage(ROOT).free;rows=[]
+for row,p,before in prepared:
+ assert ref(p)==before;log=OUT/(row['id']+'.log')
+ with log.open('xb')as stream:result=subprocess.run(['compact.exe','/C','/EXE:LZX','/Q',str(p)],stdout=stream,stderr=subprocess.STDOUT)
+ after=ref(p);assert result.returncode==0 and after==before
+ rows.append({'actual_completed_execution':row['receipt'],'file_before':before,'file_after':after,'compact_exit_code':result.returncode,'command_log':ref(log),'bytes_and_path_unchanged':True})
+ print('Root transparent activation trace compression',row['id'],before['size_bytes'],'bytes unchanged',flush=True)
+assert sha(authority)==sys.argv[1]
+record={'schema':'root-completed-cli-trace-transparent-compression.v1','actual_completed_summary':ref(authority),'operation':'NTFS compact.exe /C /EXE:LZX /Q exact6 completed ordinary CLI trace files','files':rows,'observed_free_bytes_before':free_before,'observed_free_bytes_after':shutil.disk_usage(ROOT).free,'physical_free_change_is_observation_not_exclusive_attribution':True,'all6_bytes_and_paths_unchanged':len(rows)==6,'file_deleted_or_moved':False,'scientific_values_recomputed':False,'gates_updated':False}
+(OUT/'record.json').write_bytes((json.dumps(record,indent=2)+'\n').encode())

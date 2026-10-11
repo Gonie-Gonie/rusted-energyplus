@@ -1,0 +1,21 @@
+# Boundary-reference validation before selected generation
+
+This single-file Source proposal restores the existing concrete missing-target
+validation contract. It calls the unchanged resolve_surface_boundary_target
+once per declared surface, in original declared order, before public generation.
+The actual returned IDs are moved alongside the same surface into initialization.
+
+An invalid Surface/Zone reference returns its existing specific RuntimeError.
+A valid interzone reference still reaches selected binding and remains genuinely
+UnsupportedBoundary. This does not broaden CON-01, supply coefficients, activate
+legacy fallback or change any boundary temperature/flux operation.
+
+The existing missing-interzone-target runtime regression remains the relevant
+failure contract. The separate test-phase hold adds a true ordinary unsupported
+regression and an explicitly authored diagnostic boundary test. No new framework
+or synthetic owner is introduced here.
+
+Before bytes are the current actual Source. Root must FULL review this production
+validation-order change and obtain an independent peer before any application.
+No canonical edits, project imports, formatter, Cargo, test, engine, payload,
+binary, weather or Git actions were performed. No numerical or gate PASS claimed.

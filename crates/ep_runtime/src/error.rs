@@ -7,6 +7,8 @@ use ep_model::{ConstructionKind, MaterialFamily};
 /// Runtime error for the first simulation subset.
 #[derive(Debug, PartialEq)]
 pub enum RuntimeError {
+    /// Actual selected public/history lifecycle stopped; no fallback or Native fatal is inferred.
+    CtfSurfaceLifecycle(crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable),
     /// No zones were available to simulate.
     NoZones,
     /// No air-side nodes were available for a node-state projection.
@@ -109,6 +111,10 @@ pub enum RuntimeError {
 impl Display for RuntimeError {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::CtfSurfaceLifecycle(error) => write!(
+                formatter,
+                "selected public CTF/history lifecycle unavailable: {error:?}"
+            ),
             Self::NoZones => write!(
                 formatter,
                 "first-zone simulation requires at least one Zone"

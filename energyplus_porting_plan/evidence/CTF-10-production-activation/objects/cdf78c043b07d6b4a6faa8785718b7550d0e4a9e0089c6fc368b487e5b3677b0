@@ -1,0 +1,47 @@
+--- crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle_tests.rs (actual before)
++++ crates/ep_runtime/src/heat_balance/ctf_surface_lifecycle_tests.rs (empty-layout proposal)
+@@ -547,3 +547,44 @@
+     assert_eq!(state.timestep_index, 0);
+     Ok(())
+ }
++
++#[test]
++fn ordinary_zero_surface_model_commits_empty_history_without_fallback() -> TestResult {
++    let mut typed = model().typed;
++    typed.materials.clear();
++    typed.constructions.clear();
++    typed.surfaces.clear();
++    typed.spaces.clear();
++    typed.zones[0].spaces.clear();
++    let model = SimulationModel::from_typed(typed);
++    let mut state = state(&model)?;
++    assert_eq!(state.zones.len(), 1);
++    assert!(state.surfaces.is_empty());
++    let public = state.construction_ctf10_public_initialization.as_ref().ok_or("public missing")?;
++    assert!(public.aggregate_after_returned_calls.simple_ctf_only);
++    assert_eq!(public.aggregate_after_returned_calls.max_ctf_terms, 0);
++    for step in 1..=2 {
++        begin_step(&model.typed, &mut state, Some(clock(step, step == 1)), 7.0, 1200.0)
++            .map_err(|error| format!("empty begin: {error:?}"))?;
++        commit_step(&model.typed, &mut state, 7.0)
++            .map_err(|error| format!("empty commit: {error:?}"))?;
++    }
++    let owner = state.ctf_surface_lifecycle.as_ref().ok_or("owner missing")?;
++    assert!(owner.initialized);
++    assert!(owner.failure.is_none());
++    assert!(owner.current_clock.is_none());
++    assert_eq!(owner.last_committed_clock, Some(clock(2, false)));
++    assert!(owner.history.surface_ids.is_empty());
++    assert!([
++        &owner.history.normal.inside_temperature, &owner.history.normal.outside_temperature,
++        &owner.history.normal.inside_flux, &owner.history.normal.outside_flux,
++    ].iter().all(|arrays| arrays.iter().all(|row| row.is_empty())));
++    assert!(!owner.history.update_first_time);
++    let scratch = owner.history.scratch.as_ref().ok_or("scratch missing")?;
++    assert!([
++        &scratch.outside_flux_first, &scratch.inside_flux_first,
++        &scratch.inside_temperature_first, &scratch.outside_temperature_first, &scratch.sum_time,
++    ].iter().all(|row| row.is_empty()));
++    assert_eq!(state.timestep_index, 0);
++    Ok(())
++}

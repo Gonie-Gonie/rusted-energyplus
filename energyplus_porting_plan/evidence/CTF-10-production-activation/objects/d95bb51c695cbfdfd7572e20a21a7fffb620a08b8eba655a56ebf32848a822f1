@@ -1,0 +1,126 @@
+--- before/heat_balance/ctf_caller_clock.rs
++++ proposed/heat_balance/ctf_caller_clock.rs
+@@ -0,0 +1,123 @@
++//! Explicit caller-owned clock for prepared manual and legacy thermal steps.
++//!
++//! Production weather retains its own clock. This owner never reads a surface
++//! counter, coefficient timestep, Native observation or weather cache.
++
++use super::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable as Error;
++use super::state::HeatBalanceState;
++use super::weather_driver::HeatBalanceWeatherDriver;
++use crate::error::RuntimeError;
++use crate::weather::day::{ProductionCtfHistoryClock, WeatherDayPhase};
++
++/// One authored caller lifecycle shared across actual warmup and run loops.
++/// Preparing a step does not commit it or clear its first-environment flags.
++#[derive(Clone, Debug, PartialEq)]
++pub struct CtfHistoryCallerClock {
++    begin_simulation: bool,
++    begin_environment: bool,
++    committed_steps: i32,
++    pending: Option<ProductionCtfHistoryClock>,
++    last_committed: Option<ProductionCtfHistoryClock>,
++}
++
++impl Default for CtfHistoryCallerClock {
++    fn default() -> Self { Self::begin() }
++}
++
++impl CtfHistoryCallerClock {
++    /// Begin a genuine new prepared caller environment before any step.
++    #[must_use]
++    pub const fn begin() -> Self {
++        Self { begin_simulation: true, begin_environment: true,
++            committed_steps: 0, pending: None, last_committed: None }
++    }
++
++    /// The explicit pending stamp supplied by this caller, if any.
++    #[must_use]
++    pub const fn pending(&self) -> Option<ProductionCtfHistoryClock> { self.pending }
++
++    /// Number of actual caller steps committed after successful returns.
++    #[must_use]
++    pub const fn committed_steps(&self) -> i32 { self.committed_steps }
++
++    /// The last successfully committed actual caller stamp.
++    #[must_use]
++    pub const fn last_committed(&self) -> Option<ProductionCtfHistoryClock> {
++        self.last_committed
++    }
++
++    /// Prepare a clock from the actual loop's phase, hour request and substep.
++    /// `seconds` is the caller's zone-step duration, never a coefficient value.
++    /// A pending or duplicate call is rejected before changing this owner.
++    pub fn prepare(
++        &mut self, phase: WeatherDayPhase, record_index: usize,
++        zone_steps_per_hour: u32, zone_timestep: u32, seconds: f64,
++    ) -> Result<ProductionCtfHistoryClock, Error> {
++        if self.pending.is_some() { return Err(Error::DuplicateCommit); }
++        if zone_steps_per_hour == 0 || zone_timestep == 0
++            || zone_timestep > zone_steps_per_hour || !seconds.is_finite()
++            || seconds <= 0.0
++            || seconds.to_bits() != (3600.0 / f64::from(zone_steps_per_hour)).to_bits()
++        { return Err(Error::TimeStepAssociation); }
++        let day_of_sim = match phase {
++            WeatherDayPhase::Warmup { day } => i32::try_from(day),
++            WeatherDayPhase::Run { day } => i32::try_from(day),
++        }.map_err(|_| Error::Association)?;
++        if day_of_sim <= 0 { return Err(Error::Association); }
++        let clock = ProductionCtfHistoryClock {
++            phase, record_index, begin_simulation: self.begin_simulation,
++            begin_environment: self.begin_environment, day_of_sim,
++            hour_of_day: i32::try_from(record_index % 24 + 1).map_err(|_| Error::Association)?,
++            time_step: i32::try_from(zone_timestep).map_err(|_| Error::Association)?,
++            sim_time_steps: self.committed_steps.checked_add(1).ok_or(Error::Association)?,
++            time_step_zone: 1.0 / f64::from(zone_steps_per_hour),
++            time_step_zone_seconds: seconds,
++        };
++        if self.last_committed.is_some_and(|last| last.same_zone_step(clock)) {
++            return Err(Error::DuplicateCommit);
++        }
++        self.pending = Some(clock);
++        Ok(clock)
++    }
++
++    /// Commit the exact prepared stamp only after the actual step returned Ok.
++    /// Failed steps retain their pending owner and first-environment flags.
++    pub fn commit(&mut self, clock: ProductionCtfHistoryClock) -> Result<(), Error> {
++        if self.pending != Some(clock) { return Err(Error::Association); }
++        self.committed_steps = clock.sim_time_steps;
++        self.last_committed = Some(clock);
++        self.pending = None;
++        self.begin_simulation = false;
++        self.begin_environment = false;
++        Ok(())
++    }
++}
++
++pub(crate) fn prepare_legacy_step(
++    state: &mut HeatBalanceState, driver: Option<HeatBalanceWeatherDriver<'_>>,
++    phase: WeatherDayPhase, record_index: usize, steps: u32, substep: u32, seconds: f64,
++) -> Result<bool, RuntimeError> {
++    super::ctf_surface_lifecycle::ensure_available(state)?;
++    if matches!(driver, Some(HeatBalanceWeatherDriver::Production(_))) {
++        // This route must consume the genuine weather owner's clock, including
++        // its first flags. An absent Production clock is never substituted.
++        return Ok(false);
++    }
++    state.ctf_history_caller_clock.prepare(phase, record_index, steps, substep, seconds)
++        .map_err(RuntimeError::CtfSurfaceLifecycle)?;
++    Ok(true)
++}
++
++pub(crate) fn commit_legacy_step(state: &mut HeatBalanceState, prepared: bool) -> Result<(), RuntimeError> {
++    super::ctf_surface_lifecycle::ensure_available(state)?;
++    if prepared {
++        let clock = state.ctf_history_caller_clock.pending().ok_or(
++            RuntimeError::CtfSurfaceLifecycle(Error::MissingCallerClock))?;
++        state.ctf_history_caller_clock.commit(clock).map_err(RuntimeError::CtfSurfaceLifecycle)?;
++    }
++    Ok(())
++}
++
++#[cfg(test)]
++#[path = "ctf_caller_clock_tests.rs"]
++mod tests;
