@@ -1,0 +1,10 @@
+    match scope {
+        PortingScope::A => {
+            if !model.ideal_loads_air_systems.is_empty() || !model.zone_thermostats.is_empty() {
+                violations.push(
+                    "conditioning/thermostat declarations are outside unconditioned scope A".into(),
+                );
+            }
+        }
+        PortingScope::B => validate_ideal_loads(model, violations),
+    }

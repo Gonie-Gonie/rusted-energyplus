@@ -209,7 +209,7 @@ fn legacy_warmup_to_run_keeps_one_environment_and_real_clock_owner() -> TestResu
     let mut clocks = Vec::new();
     let mut day_end = Vec::new();
     let warmup = run_heat_balance_run_period_warmup(
-        &model.typed,
+        &model,
         &mut state,
         &[7.0],
         None,
@@ -234,6 +234,19 @@ fn legacy_warmup_to_run_keeps_one_environment_and_real_clock_owner() -> TestResu
     )
     .map_err(|error| format!("warmup: {error:?}"))?;
     assert_eq!(warmup.timestep_count, 3);
+    let daily = state
+        .warmup_convergence
+        .as_ref()
+        .ok_or("missing actual daily owner")?;
+    assert_eq!(daily.checked_day, 1);
+    assert!(!daily.warmup_flag);
+    assert_eq!(daily.zones.len(), model.typed.zones.len());
+    for zone in &daily.zones {
+        assert_eq!(zone.air_system_sensible_rates_w, Some((0.0, 0.0)));
+        assert_eq!(zone.sensible_report_timestep, Some(2));
+        assert_eq!(&zone.pass_flags[2..], &[2, 2]);
+        assert_eq!(zone.current, [-9999.0, -9999.0, -9999.0, 1000.0]);
+    }
     let (_, outputs) = sample_heat_balance_run_period_with_step_driver(
         &model,
         &mut state,
@@ -309,7 +322,7 @@ fn failed_legacy_step_keeps_pending_clock_and_cannot_replay() -> TestResult {
     let mut day_end = Vec::new();
     for _ in 0..2 {
         let result = run_heat_balance_run_period_warmup(
-            &model.typed,
+            &model,
             &mut state,
             &[7.0],
             None,
@@ -345,6 +358,46 @@ fn failed_legacy_step_keeps_pending_clock_and_cannot_replay() -> TestResult {
         assert_eq!(state.timestep_index, 0);
     }
     assert_eq!(calls.get(), 1);
+    assert!(day_end.is_empty());
+    Ok(())
+}
+
+#[test]
+fn controlled_graph_cannot_supply_default_warmup_zero_loads() -> TestResult {
+    let mut model = model();
+    let mut state = state(&model)?;
+    model.graph.zone_air_nodes.push(ep_model::ZoneAirNodeEdge {
+        zone: model.typed.zones[0].id,
+        node: ep_model::NodeId(0),
+    });
+    let mut day_end = Vec::new();
+    let calls = std::cell::Cell::new(0);
+    let result = run_heat_balance_run_period_warmup(
+        &model,
+        &mut state,
+        &[7.0],
+        None,
+        None,
+        3,
+        1200.0,
+        warmup_options(),
+        HeatBalanceZoneAirAlgorithm::SimplifiedAnalytical.runtime_config(),
+        1,
+        None,
+        HeatBalanceSurfaceLoopZoneAirCorrection::EachSurfaceIteration,
+        ep_model::FirstHourInterpolationStartingValues::Hour1,
+        &mut day_end,
+        |_, _, _, _, _, _, _, _| {
+            calls.set(calls.get() + 1);
+        },
+    );
+    assert!(matches!(
+        result,
+        Err(crate::error::RuntimeError::WarmupUnavailable { .. })
+    ));
+    assert_eq!(calls.get(), 0);
+    assert_eq!(state.timestep_index, 0);
+    assert!(state.warmup_convergence.is_none());
     assert!(day_end.is_empty());
     Ok(())
 }

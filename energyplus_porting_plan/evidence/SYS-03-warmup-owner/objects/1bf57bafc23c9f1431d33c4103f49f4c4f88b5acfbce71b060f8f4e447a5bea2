@@ -1,0 +1,13 @@
+            zone_air_nodes: model
+                .zone_equipment_connections
+                .iter()
+                .filter_map(|connection| {
+                    model
+                        .node_names
+                        .resolve(&connection.zone_air_node_name.0)
+                        .map(|node| ZoneAirNodeEdge {
+                            zone: connection.zone,
+                            node,
+                        })
+                })
+                .collect(),

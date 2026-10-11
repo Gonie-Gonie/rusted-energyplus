@@ -1,0 +1,50 @@
+pub const OBSERVATION_LIMIT: usize = 10_000;
+
+/// Actual owner state before or after an executed selected weather operation.
+#[derive(Clone, Debug)]
+pub struct WeatherSessionSnapshot {
+    /// Full current daily and auxiliary owners.
+    pub state: WeatherDayState,
+    /// Actual raw header storage.
+    pub header: RawEpwHeaderState,
+    /// Actual semantic stream flags and available position.
+    pub stream: RawEpwStreamState,
+    /// Last actual parser reference-argument writes.
+    pub raw_arguments: RawEpwOutputs,
+    /// Actual supplied-byte cursor, including failed tellg states.
+    pub cursor_byte: usize,
+    /// Actual cumulative getline attempts.
+    pub line_read_count: usize,
+    /// Actual Rust parser invocations, independent of native local variables.
+    pub interpret_count: usize,
+    /// Selected environment availability.
+    pub available: bool,
+    /// Actual nonfatal header/caller error flag.
+    pub errors_found: bool,
+    /// Actual environment-stamp request.
+    pub print_environment_stamp: bool,
+    /// Selected source environment's first-day search cycle.
+    pub current_cycle: i32,
+    /// Selected source environment's weekday setup flag.
+    pub set_week_days: bool,
+}
+impl WeatherSessionSnapshot {
+    /// Copies actual owners without reading input or producing weather values.
+    #[must_use]
+    pub fn from_session(session: &WeatherSession) -> Self {
+        Self {
+            state: session.state.clone(),
+            header: session.cursor.header().clone(),
+            stream: session.cursor.stream_state(),
+            raw_arguments: *session.cursor.last_arguments(),
+            cursor_byte: session.cursor.byte_cursor(),
+            line_read_count: session.cursor.line_reads(),
+            interpret_count: session.cursor.interpret_count(),
+            available: session.available,
+            errors_found: session.errors_found,
+            print_environment_stamp: session.print_environment_stamp,
+            current_cycle: session.current_cycle,
+            set_week_days: session.set_week_days,
+        }
+    }
+}

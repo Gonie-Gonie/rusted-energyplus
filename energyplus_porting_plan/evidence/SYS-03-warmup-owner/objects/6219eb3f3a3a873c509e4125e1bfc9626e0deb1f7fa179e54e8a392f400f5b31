@@ -1,0 +1,153 @@
+                state.dataSQLiteProcedures->sqlite->createSQLiteEnvironmentPeriodRecord(
+                    state.dataEnvrn->CurEnvirNum, state.dataEnvrn->EnvironmentName, state.dataGlobal->KindOfSim);
+                state.dataSQLiteProcedures->sqlite->sqliteCommit();
+            }
+
+            state.dataErrTracking->ExitDuringSimulations = true;
+            SimsDone = true;
+            DisplayString(state, "Initializing New Environment Parameters");
+
+            state.dataGlobal->BeginEnvrnFlag = true;
+            state.dataGlobal->EndEnvrnFlag = false;
+            state.dataEnvrn->EndMonthFlag = false;
+            state.dataGlobal->WarmupFlag = true;
+            state.dataGlobal->DayOfSim = 0;
+            state.dataGlobal->DayOfSimChr = "0";
+            state.dataReportFlag->NumOfWarmupDays = 0;
+            if (state.dataEnvrn->CurrentYearIsLeapYear) {
+                if (state.dataGlobal->NumOfDayInEnvrn <= 366) {
+                    state.dataOutputProcessor->isFinalYear = true;
+                }
+            } else {
+                if (state.dataGlobal->NumOfDayInEnvrn <= 365) {
+                    state.dataOutputProcessor->isFinalYear = true;
+                }
+            }
+
+            HVACManager::ResetNodeData(state); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
+
+            bool anyEMSRan;
+            ManageEMS(state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
+
+            while ((state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) || (state.dataGlobal->WarmupFlag)) { // Begin day loop ...
+                if (state.dataGlobal->stopSimulation) {
+                    break;
+                }
+
+                if (state.dataSQLiteProcedures->sqlite) {
+                    state.dataSQLiteProcedures->sqlite->sqliteBegin(); // setup for one transaction per day
+                }
+
+                ++state.dataGlobal->DayOfSim;
+                state.dataGlobal->DayOfSimChr = fmt::to_string(state.dataGlobal->DayOfSim);
+                if (!state.dataGlobal->WarmupFlag) {
+                    ++state.dataEnvrn->CurrentOverallSimDay;
+                    DisplaySimDaysProgress(state, state.dataEnvrn->CurrentOverallSimDay, state.dataEnvrn->TotalOverallSimDays);
+                } else {
+                    state.dataGlobal->DayOfSimChr = "0";
+                }
+                state.dataGlobal->BeginDayFlag = true;
+                state.dataGlobal->EndDayFlag = false;
+
+                if (state.dataGlobal->WarmupFlag) {
+                    ++state.dataReportFlag->NumOfWarmupDays;
+                    state.dataReportFlag->cWarmupDay = fmt::to_string(state.dataReportFlag->NumOfWarmupDays);
+                    DisplayString(state, "Warming up {" + state.dataReportFlag->cWarmupDay + '}');
+                } else if (state.dataGlobal->DayOfSim == 1) {
+                    if (state.dataSysVars->ReportDuringWarmup) {
+                        OutputProcessor::ResetAccumulationWhenWarmupComplete(state);
+                    }
+                    if (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather) {
+                        DisplayString(state, "Starting Simulation at " + state.dataEnvrn->CurMnDyYr + " for " + state.dataEnvrn->EnvironmentName);
+                    } else {
+                        DisplayString(state, "Starting Simulation at " + state.dataEnvrn->CurMnDy + " for " + state.dataEnvrn->EnvironmentName);
+                    }
+                    static constexpr std::string_view Format_700("Environment:WarmupDays,{:3}\n");
+                    print(state.files.eio, Format_700, state.dataReportFlag->NumOfWarmupDays);
+                } else if (state.dataReportFlag->DisplayPerfSimulationFlag) {
+                    if (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather) {
+                        DisplayString(state, "Continuing Simulation at " + state.dataEnvrn->CurMnDyYr + " for " + state.dataEnvrn->EnvironmentName);
+                    } else {
+                        DisplayString(state, "Continuing Simulation at " + state.dataEnvrn->CurMnDy + " for " + state.dataEnvrn->EnvironmentName);
+                    }
+                    state.dataReportFlag->DisplayPerfSimulationFlag = false;
+                }
+                // for simulations that last longer than a week, identify when the last year of the simulation is started
+                if ((state.dataGlobal->DayOfSim > 365) && ((state.dataGlobal->NumOfDayInEnvrn - state.dataGlobal->DayOfSim) == 364) &&
+                    !state.dataGlobal->WarmupFlag) {
+                    DisplayString(state, "Starting last  year of environment at:  " + state.dataGlobal->DayOfSimChr);
+                    OutputReportTabular::ResetTabularReports(state);
+                }
+
+                for (state.dataGlobal->HourOfDay = 1; state.dataGlobal->HourOfDay <= 24; ++state.dataGlobal->HourOfDay) { // Begin hour loop ...
+                    if (state.dataGlobal->stopSimulation) {
+                        break;
+                    }
+
+                    state.dataGlobal->BeginHourFlag = true;
+                    state.dataGlobal->EndHourFlag = false;
+
+                    for (state.dataGlobal->TimeStep = 1; state.dataGlobal->TimeStep <= state.dataGlobal->TimeStepsInHour;
+                         ++state.dataGlobal->TimeStep) {
+                        if (state.dataGlobal->stopSimulation) {
+                            break;
+                        }
+
+                        if (state.dataGlobal->AnySlabsInModel || state.dataGlobal->AnyBasementsInModel) {
+                            PlantPipingSystemsManager::SimulateGroundDomains(state, false);
+                        }
+
+                        if (AnyUnderwaterBoundaries) {
+                            Weather::UpdateUnderwaterBoundaries(state);
+                        }
+
+                        if (state.dataEnvrn->varyingLocationLatSched != nullptr || state.dataEnvrn->varyingLocationLongSched != nullptr ||
+                            state.dataEnvrn->varyingOrientationSched != nullptr) {
+                            Weather::UpdateLocationAndOrientation(state);
+                        }
+
+                        state.dataGlobal->BeginTimeStepFlag = true;
+                        ExternalInterfaceExchangeVariables(state);
+
+                        // Set the End__Flag variables to true if necessary.  Note that
+                        // each flag builds on the previous level.  EndDayFlag cannot be
+                        // .TRUE. unless EndHourFlag is also .TRUE., etc.  Note that the
+                        // EndEnvrnFlag and the EndSimFlag cannot be set during warmup.
+                        // Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
+                        // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
+
+                        if (state.dataGlobal->TimeStep == state.dataGlobal->TimeStepsInHour) {
+                            state.dataGlobal->EndHourFlag = true;
+                            if (state.dataGlobal->HourOfDay == 24) {
+                                state.dataGlobal->EndDayFlag = true;
+                                if ((!state.dataGlobal->WarmupFlag) && (state.dataGlobal->DayOfSim == state.dataGlobal->NumOfDayInEnvrn)) {
+                                    state.dataGlobal->EndEnvrnFlag = true;
+                                }
+                            }
+                        }
+
+                        Weather::ManageWeather(state);
+
+                        ExteriorEnergyUse::ManageExteriorEnergyUse(state);
+
+                        ManageHeatBalance(state);
+
+                        if (oneTimeUnderwaterBoundaryCheck) {
+                            AnyUnderwaterBoundaries = Weather::CheckIfAnyUnderwaterBoundaries(state);
+                            oneTimeUnderwaterBoundaryCheck = false;
+                        }
+
+                        state.dataGlobal->BeginHourFlag = false;
+                        state.dataGlobal->BeginDayFlag = false;
+                        state.dataGlobal->BeginEnvrnFlag = false;
+                        state.dataGlobal->BeginSimFlag = false;
+                    } // TimeStep loop
+
+                    state.dataGlobal->PreviousHour = state.dataGlobal->HourOfDay;
+
+                } // ... End hour loop.
+
+                if (state.dataSQLiteProcedures->sqlite) {
+                    state.dataSQLiteProcedures->sqlite->sqliteCommit(); // one transaction per day
+                }
+

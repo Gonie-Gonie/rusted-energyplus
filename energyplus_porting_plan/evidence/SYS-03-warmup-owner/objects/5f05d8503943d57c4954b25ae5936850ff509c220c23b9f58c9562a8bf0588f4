@@ -1,0 +1,7 @@
+void ZoneSystemSensibleDemand::reportZoneAirSystemSensibleLoads(EnergyPlusData &state, Real64 const SNLoad)
+{
+    this->airSysHeatRate = max(SNLoad, 0.0);
+    this->airSysCoolRate = std::abs(min(SNLoad, 0.0));
+    this->airSysHeatEnergy = this->airSysHeatRate * state.dataHVACGlobal->TimeStepSysSec;
+    this->airSysCoolEnergy = this->airSysCoolRate * state.dataHVACGlobal->TimeStepSysSec;
+}

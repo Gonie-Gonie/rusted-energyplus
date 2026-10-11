@@ -418,7 +418,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         })?;
     let mut warmup_day_end_zone_air_states = Vec::new();
     let warmup = run_heat_balance_run_period_warmup(
-        &model.typed,
+        model,
         &mut state,
         weather_dry_bulb_c,
         weather_records,

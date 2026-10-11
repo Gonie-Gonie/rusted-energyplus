@@ -180,6 +180,33 @@ impl ProductionWeatherTimestepSeries {
         Ok(())
     }
 
+    /// Actual CheckWarmupConvergence -> ManageHeatBalance day-zero boundary.
+    /// No weather buffer, cursor, previous-hour or timestep owner is transported.
+    pub fn finish_warmup(&self) -> Result<(), WeatherDayError> {
+        let mut session = self.session.borrow_mut();
+        let actual_last_step = self
+            .last_consumed
+            .borrow()
+            .is_some_and(|(index, timestep)| {
+                index % 24 == 23 && timestep == session.configuration.steps()
+            });
+        if !matches!(
+            *self.current_phase.borrow(),
+            Some(WeatherDayPhase::Warmup { .. })
+        ) || !session.state.global.warmup_flag
+            || !session.state.global.end_day_flag
+            || !actual_last_step
+        {
+            return Err(WeatherDayError::admission(
+                "warmup exit requires the actual consumed warmup EndDay",
+            ));
+        }
+        session.state.global.warmup_flag = false;
+        session.state.global.day_of_sim = 0;
+        session.state.global.day_of_sim_chr = "0".into();
+        Ok(())
+    }
+
     fn admit_phase(&self, phase: WeatherDayPhase) -> Result<(), WeatherDayError> {
         let valid = match phase {
             WeatherDayPhase::Warmup { day } => day > 0,

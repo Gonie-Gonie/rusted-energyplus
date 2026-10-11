@@ -35,6 +35,13 @@ impl<'a> HeatBalanceWeatherDriver<'a> {
         Ok(())
     }
 
+    pub(crate) fn finish_warmup(self) -> Result<(), RuntimeError> {
+        if let Self::Production(series) = self {
+            series.finish_warmup()?;
+        }
+        Ok(())
+    }
+
     pub(crate) fn finish_environment(self) -> Result<(), RuntimeError> {
         if let Self::Production(series) = self {
             series.finish_environment()?;

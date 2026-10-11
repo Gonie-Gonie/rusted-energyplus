@@ -1,0 +1,20 @@
+--- crates/ep_runtime/src/heat_balance/summary.rs
++++ .runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/summary.rs
+@@ -22,7 +22,7 @@
+     pub maximum_days: u32,
+     /// Zone end-state temperature convergence tolerance in delta C.
+     pub temperature_convergence_tolerance_delta_c: f64,
+-    /// Zone load convergence tolerance in W from the Building object.
++    /// Dimensionless normalized load tolerance from Building; `_w` retains API compatibility.
+     pub loads_convergence_tolerance_w: f64,
+     /// Number of warmup days actually executed.
+     pub day_count: u32,
+@@ -30,7 +30,7 @@
+     pub timestep_count: usize,
+     /// Number of weather hours repeated for one warmup day.
+     pub hours_per_day: usize,
+-    /// Whether the repeated-day end state converged before max days.
++    /// Whether all four per-zone checks passed at the warmup exit, distinct from a forced limit.
+     pub converged: bool,
+     /// Final max delta between repeated-day zone air temperature extrema.
+     pub final_max_zone_temperature_delta_c: f64,

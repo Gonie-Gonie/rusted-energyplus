@@ -1,0 +1,35 @@
+{
+  "schema": "sys03-bounded-uncontrolled-warmup-source-readiness.v1",
+  "status": "held-source-only-not-executed",
+  "supported_branch": "actual-uncontrolled-A-no-system-zone-node",
+  "controlled_B_warmup_activated": false,
+  "synthetic_loads_supplied": false,
+  "unknown_or_controlled_demand_defaulted_to_zero": false,
+  "required_controlled_future_operands": [
+    "accepted SystemZoneNodeNumber/Node identity",
+    "SystemNode MassFlowRate",
+    "SystemNode Temp after correctAirTemp",
+    "current airHumRat/PsyCpAirFnW",
+    "Zone Multiplier/ListMultiplier",
+    "NonAirSystemResponse",
+    "SysDepZoneLoadsLagged",
+    "actual SumSysMCpT"
+  ],
+  "actual_seams": {
+    "ordinary_A_options": "existing Building-based hourly_samples_with_model_warmup; separate diagnostic/B unchanged",
+    "admission": "warmup entry actual SimulationModel graph and typed connection absence",
+    "demand_report": "CorrectStep temperature return before humidity; active admitted owner only",
+    "daily_record": "after successful actual timestep/lifecycle/clock commit",
+    "daily_check": "per-Zone four checks then retain/reset; max-day diagnostic transport remains unverified",
+    "handoff": "real EndDay WarmupFlag false and DayOfSim/Chr0 before existing Run1 BeginDay"
+  },
+  "remaining_actual_prerequisites": [
+    "maximum-day severe/continue backend and environment operands",
+    "first RunPeriod convergence report and full daily trace owner parity",
+    "controlled demand producer and B warmup caller",
+    "SYS02/SCH03/SUR06 predecessor gates"
+  ],
+  "current_capture_must_remain_frozen": true,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false
+}

@@ -1,0 +1,61 @@
+/// Runtime-ready immutable model plus graph relations.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SimulationModel {
+    /// Typed model payload.
+    pub typed: TypedModel,
+    /// Static model graph.
+    pub graph: ModelGraph,
+}
+
+impl SimulationModel {
+    /// Builds a runtime-ready model from an already reference-resolved typed model.
+    #[must_use]
+    pub fn from_typed(typed: TypedModel) -> Self {
+        let graph = ModelGraph::from_typed(&typed);
+        Self { typed, graph }
+    }
+}
+
+/// Static model graph used for validation and execution planning.
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
+pub struct ModelGraph {
+    /// Zone to surface edges.
+    pub zone_surfaces: Vec<ZoneSurfaceEdge>,
+    /// Construction to material edges.
+    pub construction_materials: Vec<ConstructionMaterialEdge>,
+    /// Zone to thermostat edges.
+    pub zone_thermostats: Vec<ZoneThermostatEdge>,
+    /// Thermostat to dual setpoint edges.
+    pub thermostat_setpoints: Vec<ThermostatSetpointEdge>,
+    /// Zone to IdealLoads equipment edges through equipment connections/lists.
+    pub zone_ideal_loads: Vec<ZoneIdealLoadsEdge>,
+    /// NodeList membership edges.
+    pub node_list_members: Vec<NodeListMemberEdge>,
+    /// IdealLoads supply-node edges.
+    pub ideal_loads_supply_nodes: Vec<IdealLoadsSupplyNodeEdge>,
+    /// IdealLoads outdoor-air design specification edges.
+    pub ideal_loads_outdoor_air_specs: Vec<IdealLoadsOutdoorAirSpecEdge>,
+    /// Zone air-node edges.
+    pub zone_air_nodes: Vec<ZoneAirNodeEdge>,
+    /// Plant loop to branch-list edges.
+    pub plant_loop_branch_lists: Vec<PlantLoopBranchListEdge>,
+    /// Branch-list membership edges.
+    pub plant_branch_list_members: Vec<PlantBranchListMemberEdge>,
+    /// Connector-list membership edges.
+    pub plant_connector_list_members: Vec<PlantConnectorListMemberEdge>,
+    /// Branch to component edges.
+    pub plant_branch_components: Vec<PlantBranchComponentEdge>,
+    /// Plant-loop graph skeleton.
+    pub plant_loop_graph: PlantLoopGraph,
+    /// Air-loop graph skeleton.
+    pub air_loop_graph: AirLoopGraph,
+    /// HVAC/plant/zone component registry.
+    pub component_registry: ComponentRegistry,
+    /// Node graph with component ownership and node diagnostics.
+    pub node_graph: NodeGraph,
+}
+
+impl ModelGraph {
+    /// Builds static graph edges from the typed subset.
+    #[must_use]
+    pub fn from_typed(model: &TypedModel) -> Self {

@@ -1,0 +1,28 @@
+
+/// Caller-owned reference argument storage for `InterpretWeatherDataLine`.
+///
+/// Defaults initialize this Rust caller's storage to zero. They do not represent
+/// a WeatherManager record constructor. A failure preserves the writes already
+/// performed by the method, so callers may supply explicit initial values.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct RawEpwOutputs {
+    /// The source resets this flag before reading any field.
+    pub error_found: bool,
+    /// Raw record date fields; the source year is separate from civil calendar.
+    pub dates: [i32; 5],
+    /// Raw mandatory fields without missing-value or physical normalization.
+    pub mandatory_reals: [f64; 20],
+    /// Rounded raw weather observation indicator, written after optional fields.
+    pub observation_indicator: i32,
+    /// Nine observed weather codes, interpreted only when the indicator is zero.
+    pub weather_codes: [i32; 9],
+    /// Optional raw fields; missing or empty fields become the source value 999.
+    pub optional_reals: [f64; 6],
+}
+
+impl Default for RawEpwOutputs {
+    fn default() -> Self {
+        Self {
+            error_found: false,
+            dates: [0; 5],
+            mandatory_reals: [0.0; 20],

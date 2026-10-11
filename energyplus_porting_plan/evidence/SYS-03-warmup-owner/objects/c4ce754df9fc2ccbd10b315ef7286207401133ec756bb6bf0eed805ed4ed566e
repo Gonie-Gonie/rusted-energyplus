@@ -1,0 +1,18 @@
+    match runtime_class {
+        RuntimeClass::OneZoneHeatBalanceCompatibility
+        | RuntimeClass::HeatBalanceZoneAirDiagnostic => {
+            let weather_series = runtime_inputs.weather_series.as_ref().ok_or_else(|| {
+                "weather records are required for heat-balance runtime".to_string()
+            })?;
+            let _runtime_time_axis_samples = runtime_inputs.time_axis.sample_count();
+            let _runtime_precomputed_schedule_count = runtime_inputs.schedule_cache.len();
+            let options = HeatBalanceSimulationOptions::hourly_samples(sample_count);
+            let mut initialization = ctf_outputs.context();
+            let simulation = simulate_heat_balance_zone_air_temperatures_with_production_weather_and_initialization_context(
+                model,
+                weather_series,
+                options,
+                &mut initialization,
+            )
+            .map_err(|error| error.to_string())?;
+            Ok(RustRuntimeResult {

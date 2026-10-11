@@ -1,0 +1,7 @@
+/// Predicts direct-Zone demand, simulates PurchasedAir, and commits system-air feedback.
+///
+/// The function is transactional with respect to `zone_state`: CP299 and
+/// PurchasedAir run against immutable snapshots, every feedback scalar is
+/// validated in a local buffer, and only then are `sum_sys_mcp_w_per_k` and
+/// `sum_sys_mcp_t_w` overwritten. `system_dependent_zone_loads_lagged_w` and all
+/// other heat-balance fields are deliberately left unchanged.

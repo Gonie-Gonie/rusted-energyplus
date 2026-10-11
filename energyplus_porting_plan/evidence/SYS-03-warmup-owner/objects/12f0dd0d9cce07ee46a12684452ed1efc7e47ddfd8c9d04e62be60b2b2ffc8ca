@@ -1,0 +1,168 @@
+    void CheckWarmupConvergence(EnergyPlusData &state)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Rick Strand
+        //       DATE WRITTEN   April 1997
+        //       MODIFIED       June 2011, Daeho Kang for individual zone comparison
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine checks warmup convergence values.
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        Real64 constexpr MinLoad(100.0); // Minimum loads for convergence check
+        // To avoid big percentage difference in low load situations
+
+        // Convergence criteria for warmup days:
+        // Perform another warmup day unless both the % change in loads and
+        // absolute change in zone temp min & max are less than their criteria.
+
+        if (state.dataGlobal->NumOfZones <= 0) { // if there are no zones, immediate convergence
+            state.dataGlobal->WarmupFlag = false;
+        } else {
+            bool ConvergenceChecksFailed = false;
+
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+
+                state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMaxTempValue =
+                    std::abs(state.dataHeatBalMgr->MaxTempPrevDay(ZoneNum) - state.dataHeatBalMgr->MaxTempZone(ZoneNum));
+                state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMinTempValue =
+                    std::abs(state.dataHeatBalMgr->MinTempPrevDay(ZoneNum) - state.dataHeatBalMgr->MinTempZone(ZoneNum));
+                if (state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMaxTempValue <= state.dataHeatBal->TempConvergTol) {
+                    state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(1) = 2;
+                } else {
+                    ConvergenceChecksFailed = true;
+                    state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(1) = 1;
+                }
+
+                if (state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMinTempValue <= state.dataHeatBal->TempConvergTol) {
+                    state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(2) = 2;
+                } else {
+                    ConvergenceChecksFailed = true;
+                    state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(2) = 1;
+                }
+
+                if (state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum) > 1.0e-4) { // make sure load big enough to divide
+                    state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum) = std::abs(max(state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum), MinLoad));
+                    state.dataHeatBalMgr->MaxHeatLoadPrevDay(ZoneNum) = std::abs(max(state.dataHeatBalMgr->MaxHeatLoadPrevDay(ZoneNum), MinLoad));
+                    state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMaxHeatLoadValue =
+                        std::abs((state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum) - state.dataHeatBalMgr->MaxHeatLoadPrevDay(ZoneNum)) /
+                                 state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum));
+                    if (state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMaxHeatLoadValue <= state.dataHeatBal->LoadsConvergTol) {
+                        state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(3) = 2;
+                    } else {
+                        ConvergenceChecksFailed = true;
+                        state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(3) = 1;
+                    }
+                } else {
+                    state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(3) = 2;
+                }
+
+                if (state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum) > 1.0e-4) {
+                    state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum) = std::abs(max(state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum), MinLoad));
+                    state.dataHeatBalMgr->MaxCoolLoadPrevDay(ZoneNum) = std::abs(max(state.dataHeatBalMgr->MaxCoolLoadPrevDay(ZoneNum), MinLoad));
+                    state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMaxCoolLoadValue =
+                        std::abs((state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum) - state.dataHeatBalMgr->MaxCoolLoadPrevDay(ZoneNum)) /
+                                 state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum));
+                    if (state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMaxCoolLoadValue <= state.dataHeatBal->LoadsConvergTol) {
+                        state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(4) = 2;
+                    } else {
+                        ConvergenceChecksFailed = true;
+                        state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(4) = 1;
+                    }
+                } else {
+                    state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(4) = 2;
+                }
+
+                if (state.dataGlobal->DayOfSim >= state.dataHeatBal->MaxNumberOfWarmupDays && state.dataGlobal->WarmupFlag) {
+                    // Check convergence for individual zone
+                    if (sum(state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag) != 8) { // pass=2 * 4 values for convergence
+                        ShowSevereError(
+                            state,
+                            EnergyPlus::format("CheckWarmupConvergence: Loads Initialization, Zone=\"{}\" did not converge after {} warmup days.",
+                                               state.dataHeatBal->Zone(ZoneNum).Name,
+                                               state.dataHeatBal->MaxNumberOfWarmupDays));
+                        if (!state.dataHeatBalMgr->WarmupConvergenceWarning && !state.dataGlobal->DoingSizing) {
+                            ShowContinueError(state, "See Warmup Convergence Information in .eio file for details.");
+                            state.dataHeatBalMgr->WarmupConvergenceWarning = true;
+                        } else if (!state.dataHeatBalMgr->SizingWarmupConvergenceWarning && state.dataGlobal->DoingSizing) {
+                            ShowContinueError(state, "Warmup Convergence failing during sizing.");
+                            state.dataHeatBalMgr->SizingWarmupConvergenceWarning = true;
+                        }
+                        if (state.dataEnvrn->RunPeriodEnvironment) {
+                            ShowContinueError(state, EnergyPlus::format("...Environment(RunPeriod)=\"{}\"", state.dataEnvrn->EnvironmentName));
+                        } else {
+                            ShowContinueError(state, EnergyPlus::format("...Environment(SizingPeriod)=\"{}\"", state.dataEnvrn->EnvironmentName));
+                        }
+
+                        ShowContinueError(
+                            state,
+                            EnergyPlus::format("..Max Temp Comparison = {:.2R} vs Temperature Convergence Tolerance={:.2R} - {} Convergence",
+                                               state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMaxTempValue,
+                                               state.dataHeatBal->TempConvergTol,
+                                               PassFail(state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(1))));
+                        ShowContinueError(
+                            state,
+                            EnergyPlus::format("..Min Temp Comparison = {:.2R} vs Temperature Convergence Tolerance={:.2R} - {} Convergence",
+                                               state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMinTempValue,
+                                               state.dataHeatBal->TempConvergTol,
+                                               PassFail(state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(2))));
+                        ShowContinueError(
+                            state,
+                            EnergyPlus::format("..Max Heat Load Comparison = {:.4R} vs Loads Convergence Tolerance={:.2R} - {} Convergence",
+                                               state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMaxHeatLoadValue,
+                                               state.dataHeatBal->LoadsConvergTol,
+                                               PassFail(state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(3))));
+                        ShowContinueError(
+                            state,
+                            EnergyPlus::format("..Max Cool Load Comparison = {:.4R} vs Loads Convergence Tolerance={:.2R} - {} Convergence",
+                                               state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).TestMaxCoolLoadValue,
+                                               state.dataHeatBal->LoadsConvergTol,
+                                               PassFail(state.dataHeatBalMgr->WarmupConvergenceValues(ZoneNum).PassFlag(4))));
+                    }
+                }
+
+                // Transfer current daily max and min loads and temperatures to the
+                // variables containing the last day's values
+                state.dataHeatBalMgr->MaxHeatLoadPrevDay(ZoneNum) = state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum);
+                state.dataHeatBalMgr->MaxCoolLoadPrevDay(ZoneNum) = state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum);
+                state.dataHeatBalMgr->MaxTempPrevDay(ZoneNum) = state.dataHeatBalMgr->MaxTempZone(ZoneNum);
+                state.dataHeatBalMgr->MinTempPrevDay(ZoneNum) = state.dataHeatBalMgr->MinTempZone(ZoneNum);
+
+                state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum) = -9999.0;
+                state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum) = -9999.0;
+                state.dataHeatBalMgr->MaxTempZone(ZoneNum) = -9999.0;
+                state.dataHeatBalMgr->MinTempZone(ZoneNum) = 1000.0;
+            }
+
+            // Limit the number of warmup days, regardless of the number of zones
+            // in the building, to some arbitrary value based on common sense and
+            // experience with the (I)BLAST program.  If too many warmup days were
+            // required, notify the program user.
+
+            if ((state.dataGlobal->DayOfSim >= state.dataHeatBal->MaxNumberOfWarmupDays) && state.dataGlobal->WarmupFlag && ConvergenceChecksFailed) {
+                if (state.dataHeatBal->MaxNumberOfWarmupDays < DataHeatBalance::DefaultMaxNumberOfWarmupDays) {
+                    ShowSevereError(state,
+                                    EnergyPlus::format("CheckWarmupConvergence: User supplied maximum warmup days={} is insufficient.",
+                                                       state.dataHeatBal->MaxNumberOfWarmupDays));
+                    ShowContinueError(state,
+                                      EnergyPlus::format("Suggest setting maximum number of warmup days to at least {}.",
+                                                         DataHeatBalance::DefaultMaxNumberOfWarmupDays));
+                }
+            }
+
+            // Set warmup flag to true depending on value of ConvergenceChecksFailed (true=fail)
+            // and minimum number of warmup days
+            if (!ConvergenceChecksFailed && state.dataGlobal->DayOfSim >= state.dataHeatBal->MinNumberOfWarmupDays) {
+                state.dataGlobal->WarmupFlag = false;
+            } else if (!ConvergenceChecksFailed && state.dataGlobal->DayOfSim < state.dataHeatBal->MinNumberOfWarmupDays) {
+                state.dataGlobal->WarmupFlag = true;
+            }
+
+            // If max warmup days reached and still WarmupFlag, then go to non-warmup state.
+            // prior messages will have been displayed
+            if ((state.dataGlobal->DayOfSim >= state.dataHeatBal->MaxNumberOfWarmupDays) && state.dataGlobal->WarmupFlag) {
+                state.dataGlobal->WarmupFlag = false;
+            }
+        }
+    }

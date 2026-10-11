@@ -15,6 +15,7 @@ pub(super) fn finish_heat_balance_state(
     HeatBalanceState {
         timestep_index: 0,
         zones,
+        warmup_convergence: None,
         zone_air_environment_guard: Default::default(),
         surfaces,
         surface_indexes,

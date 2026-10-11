@@ -1,0 +1,44 @@
+            // Maximum Number of Warmup Days
+            if (!state.dataIPShortCut->lNumericFieldBlanks(4)) {
+                state.dataHeatBal->MaxNumberOfWarmupDays = BuildingNumbers(4);
+                if (state.dataHeatBal->MaxNumberOfWarmupDays <= 0) {
+                    ShowSevereError(state,
+                                    EnergyPlus::format("{}{}: {} invalid, [{}], {} will be used",
+                                                       RoutineName,
+                                                       state.dataHeatBalMgr->CurrentModuleObject,
+                                                       state.dataIPShortCut->cNumericFieldNames(4),
+                                                       state.dataHeatBal->MaxNumberOfWarmupDays,
+                                                       DataHeatBalance::DefaultMaxNumberOfWarmupDays));
+                    state.dataHeatBal->MaxNumberOfWarmupDays = DataHeatBalance::DefaultMaxNumberOfWarmupDays;
+                }
+            } else {
+                state.dataHeatBal->MaxNumberOfWarmupDays = DataHeatBalance::DefaultMaxNumberOfWarmupDays;
+            }
+            // Minimum Number of Warmup Days
+            if (!state.dataIPShortCut->lNumericFieldBlanks(5)) {
+                state.dataHeatBal->MinNumberOfWarmupDays = BuildingNumbers(5);
+                if (state.dataHeatBal->MinNumberOfWarmupDays <= 0) {
+                    ShowWarningError(state,
+                                     EnergyPlus::format("{}{}: {} invalid, [{}], {} will be used",
+                                                        RoutineName,
+                                                        state.dataHeatBalMgr->CurrentModuleObject,
+                                                        state.dataIPShortCut->cNumericFieldNames(5),
+                                                        state.dataHeatBal->MinNumberOfWarmupDays,
+                                                        DataHeatBalance::DefaultMinNumberOfWarmupDays));
+                    state.dataHeatBal->MinNumberOfWarmupDays = DataHeatBalance::DefaultMinNumberOfWarmupDays;
+                }
+            } else {
+                state.dataHeatBal->MinNumberOfWarmupDays = DataHeatBalance::DefaultMinNumberOfWarmupDays;
+            }
+            if (state.dataHeatBal->MinNumberOfWarmupDays > state.dataHeatBal->MaxNumberOfWarmupDays) {
+                ShowWarningError(state,
+                                 EnergyPlus::format("{}{}: {} [{}]  is greater than {} [{}], {} will be used.",
+                                                    RoutineName,
+                                                    state.dataHeatBalMgr->CurrentModuleObject,
+                                                    state.dataIPShortCut->cNumericFieldNames(5),
+                                                    state.dataHeatBal->MinNumberOfWarmupDays,
+                                                    state.dataIPShortCut->cNumericFieldNames(4),
+                                                    state.dataHeatBal->MaxNumberOfWarmupDays,
+                                                    state.dataHeatBal->MinNumberOfWarmupDays));
+                state.dataHeatBal->MaxNumberOfWarmupDays = state.dataHeatBal->MinNumberOfWarmupDays;
+            }

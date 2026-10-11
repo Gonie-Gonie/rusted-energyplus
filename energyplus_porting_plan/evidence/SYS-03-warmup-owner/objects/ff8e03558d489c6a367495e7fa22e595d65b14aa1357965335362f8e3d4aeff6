@@ -1,0 +1,14 @@
+
+/// Semantic stream state; no synthetic native rdstate bits or error wording.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct RawEpwStreamState {
+    /// Open-state observation.
+    pub is_open: bool,
+    /// All stream flags are clear, as InputFile::good actually implements.
+    pub good: bool,
+    /// EOF-state observation.
+    pub eof: bool,
+    /// Failed-extraction-state observation.
+    pub fail: bool,
+    /// Bad-stream-state observation.
+    pub bad: bool,

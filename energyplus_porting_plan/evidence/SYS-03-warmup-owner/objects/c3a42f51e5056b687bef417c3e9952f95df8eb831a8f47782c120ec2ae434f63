@@ -1,0 +1,65 @@
+--- crates/ep_runtime/src/heat_balance/state.rs
++++ .runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/state.rs
+@@ -48,6 +48,9 @@
+     pub timestep_index: usize,
+     /// Per-zone heat-balance state.
+     pub zones: Vec<ZoneHeatBalanceState>,
++    /// Actual admitted uncontrolled warmup demand/daily convergence owners.
++    /// None means no warmup owner has been invoked; it supplies no zero loads.
++    pub warmup_convergence: Option<HeatBalanceWarmupConvergenceState>,
+     /// Persistent selected global BeginEnvrn guard shared by all zone owners.
+     pub zone_air_environment_guard: ZoneAirEnvironmentGuard,
+     /// Per-surface heat-balance state.
+@@ -877,6 +880,43 @@
+     pub surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
+ }
+ 
++/// Actual demand report and daily warmup owners for one admitted uncontrolled Zone.
++#[derive(Clone, Debug, PartialEq)]
++pub struct HeatBalanceWarmupZoneConvergence {
++    /// Actual Zone identity in the caller's declared order.
++    pub zone_id: ep_model::ZoneId,
++    /// Actual unmultiplied air-system heating/cooling rates after the report seam.
++    /// None is not an observed zero and cannot be sampled by RecKeep.
++    pub air_system_sensible_rates_w: Option<(f64, f64)>,
++    /// Actual zero-based timestep at which corrector reporting was reached.
++    pub sensible_report_timestep: Option<usize>,
++    /// Current daily MaxHeatLoadZone, MaxCoolLoadZone, MaxTempZone and MinTempZone.
++    pub current: [f64; 4],
++    /// Retained prior-day values in the same order; BeginEnvrn initializes zero.
++    pub previous: [f64; 4],
++    /// Native PassFlag order: max temperature, min temperature, heat, cool; 2=pass.
++    pub pass_flags: [u8; 4],
++    /// Actual corresponding comparison values; no-load guards retain prior metrics.
++    pub test_values: [f64; 4],
++}
++
++/// Retained real per-zone warmup state, separate from MAT/CTF state and summary.
++#[derive(Clone, Debug, PartialEq)]
++pub struct HeatBalanceWarmupConvergenceState {
++    /// Complete admitted Zone owner order; no filtering or zip truncation.
++    pub zones: Vec<HeatBalanceWarmupZoneConvergence>,
++    /// Actual last CheckWarmupConvergence day.
++    pub checked_day: u32,
++    /// Actual convergence-check result, distinct from the maximum-day exit.
++    pub convergence_checks_failed: bool,
++    /// Current selected warmup flag after its actual day-end decision.
++    pub warmup_flag: bool,
++    /// Whether the maximum-day condition forced a nonconverged exit.
++    pub maximum_day_forced_exit: bool,
++    /// Sticky representability failure at the demand-report seam.
++    pub unavailable_reason: Option<&'static str>,
++}
++
+ /// Warmup settings for heat-balance diagnostic traces.
+ #[derive(Clone, Copy, Debug, PartialEq)]
+ pub struct HeatBalanceWarmupOptions {
+@@ -888,7 +928,7 @@
+     pub maximum_days: u32,
+     /// Zone end-state convergence tolerance in delta C.
+     pub temperature_convergence_tolerance_delta_c: f64,
+-    /// Zone load convergence tolerance in W.
++    /// Dimensionless normalized load convergence tolerance; `_w` is retained API spelling.
+     pub loads_convergence_tolerance_w: f64,
+ }
+ 

@@ -1,0 +1,962 @@
+{
+  "schema": "sys03-bounded-uncontrolled-warmup-source-preparation.v1",
+  "status": "held-source-only-not-executed",
+  "application_sources": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "e4a903ad226410b9f84530e675d6dbfafa528212c2bf10a5e5686de2df2e383e",
+        "size_bytes": 49041,
+        "line_count": 1050
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/before/crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "e4a903ad226410b9f84530e675d6dbfafa528212c2bf10a5e5686de2df2e383e",
+        "size_bytes": 49041,
+        "line_count": 1050
+      },
+      "proposal": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/state.rs",
+        "sha256": "aeec5163ad5c4063f934f762247d9bfed786d37041026763f087b16fc7d21a81",
+        "size_bytes": 51184,
+        "line_count": 1090
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/diffs/crates__ep_runtime__src__heat_balance__state.rs.diff",
+        "sha256": "c3a42f51e5056b687bef417c3e9952f95df8eb831a8f47782c120ec2ae434f63",
+        "size_bytes": 3202,
+        "line_count": 65
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+        "sha256": "c54f4de5dfd0cd58c56a913495d7c98ccc124ea11ff272d92e51e56e84b444ef",
+        "size_bytes": 2936,
+        "line_count": 53
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/before/crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+        "sha256": "c54f4de5dfd0cd58c56a913495d7c98ccc124ea11ff272d92e51e56e84b444ef",
+        "size_bytes": 2936,
+        "line_count": 53
+      },
+      "proposal": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+        "sha256": "97745e320b9ea3c5d85e5d2ed691f85452d594aadb43cdade624fe38e00f59af",
+        "size_bytes": 2970,
+        "line_count": 54
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/diffs/crates__ep_runtime__src__heat_balance__initialization__state_shell.rs.diff",
+        "sha256": "49ddb4e083fb62052861eaccf6a1cd0ccee0e62132eb1afd4b00ede70173fc6b",
+        "size_bytes": 415,
+        "line_count": 10
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/error.rs",
+      "actual_before": {
+        "path": "crates/ep_runtime/src/error.rs",
+        "sha256": "0b2cc9b5d3add64df91f27c632b41a76f48f477e2b7cb2b9ae13260c380f924f",
+        "size_bytes": 9509,
+        "line_count": 246
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/before/crates/ep_runtime/src/error.rs",
+        "sha256": "0b2cc9b5d3add64df91f27c632b41a76f48f477e2b7cb2b9ae13260c380f924f",
+        "size_bytes": 9509,
+        "line_count": 246
+      },
+      "proposal": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/error.rs",
+        "sha256": "df29c6fc7667b216ed0bf41bfc15559200fcafa35e528227864c4187f2ba3178",
+        "size_bytes": 9843,
+        "line_count": 252
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/diffs/crates__ep_runtime__src__error.rs.diff",
+        "sha256": "bd57bd1ca67522666803e41831face6faefbb56d71f1934d210ad28d4706d775",
+        "size_bytes": 1096,
+        "line_count": 22
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/warmup.rs",
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/warmup.rs",
+        "sha256": "dcc3c12be0758471a111ef5c3166d9df2a9757627b21565eb452375a35191474",
+        "size_bytes": 9726,
+        "line_count": 244
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/before/crates/ep_runtime/src/heat_balance/warmup.rs",
+        "sha256": "dcc3c12be0758471a111ef5c3166d9df2a9757627b21565eb452375a35191474",
+        "size_bytes": 9726,
+        "line_count": 244
+      },
+      "proposal": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/warmup.rs",
+        "sha256": "317b78691ec03d29d44ce49ea6c726f02890be5d7b3f3dc6059671e10744228e",
+        "size_bytes": 18844,
+        "line_count": 420
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/diffs/crates__ep_runtime__src__heat_balance__warmup.rs.diff",
+        "sha256": "58240dd17526530b0af86ea0fa5c9ad64caaa951e406b1e1a470cf20f0186ac2",
+        "size_bytes": 19388,
+        "line_count": 440
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/timestep.rs",
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/timestep.rs",
+        "sha256": "0f6be50452528c8bc87cc5920f10a742f6c6bed8281b72b8b2186955aefbc81a",
+        "size_bytes": 42306,
+        "line_count": 876
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/before/crates/ep_runtime/src/heat_balance/timestep.rs",
+        "sha256": "0f6be50452528c8bc87cc5920f10a742f6c6bed8281b72b8b2186955aefbc81a",
+        "size_bytes": 42306,
+        "line_count": 876
+      },
+      "proposal": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/timestep.rs",
+        "sha256": "c839fa3fa3ef0b719fc94ecfd2507a391d803857dba60db92469309d75061ba0",
+        "size_bytes": 42545,
+        "line_count": 879
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/diffs/crates__ep_runtime__src__heat_balance__timestep.rs.diff",
+        "sha256": "1b3f1538c0aa086782bd613887eca72aa79ba416711e13eb9f67cfac232c5d02",
+        "size_bytes": 744,
+        "line_count": 12
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/runtime.rs",
+      "actual_before": {
+        "path": "crates/ep_runtime/src/runtime.rs",
+        "sha256": "3d9fa35b763a43d0a9b9b1a559ae4a0dacf5ff6ae02790d044894190e08f3a49",
+        "size_bytes": 25403,
+        "line_count": 578
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/before/crates/ep_runtime/src/runtime.rs",
+        "sha256": "3d9fa35b763a43d0a9b9b1a559ae4a0dacf5ff6ae02790d044894190e08f3a49",
+        "size_bytes": 25403,
+        "line_count": 578
+      },
+      "proposal": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/runtime.rs",
+        "sha256": "f9eb44466b922d3a8592b31a9e7dc63bce8dfb04df9e2df50903a59f5ac37e1b",
+        "size_bytes": 25396,
+        "line_count": 578
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/diffs/crates__ep_runtime__src__runtime.rs.diff",
+        "sha256": "7af3f359e1cb2d1fc24c3a82152af71de085699a7a0ac0082a87691c12256b46",
+        "size_bytes": 389,
+        "line_count": 11
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/runtime/tests/part07.rs",
+      "actual_before": {
+        "path": "crates/ep_runtime/src/runtime/tests/part07.rs",
+        "sha256": "af090310c18870af72a692f3d698cd14844e91d52ce72f5ba7bb392745ee9c7f",
+        "size_bytes": 27131,
+        "line_count": 688
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/before/crates/ep_runtime/src/runtime/tests/part07.rs",
+        "sha256": "af090310c18870af72a692f3d698cd14844e91d52ce72f5ba7bb392745ee9c7f",
+        "size_bytes": 27131,
+        "line_count": 688
+      },
+      "proposal": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/runtime/tests/part07.rs",
+        "sha256": "ba23468529b2d578c158683d62d2b1c65b2d9629d84e1bcb85deb10e8cc3f0bd",
+        "size_bytes": 27219,
+        "line_count": 689
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/diffs/crates__ep_runtime__src__runtime__tests__part07.rs.diff",
+        "sha256": "ec0dce18000df4fe43cbe08fe9508a230bd873c5a41a7595e1282dd2c96af725",
+        "size_bytes": 1394,
+        "line_count": 37
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/ctf_caller_clock_tests.rs",
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_caller_clock_tests.rs",
+        "sha256": "4478ebf70f93f7f78dc868e29320705e6d2611b4ee5276d809bad367db50174b",
+        "size_bytes": 12372,
+        "line_count": 350
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/before/crates/ep_runtime/src/heat_balance/ctf_caller_clock_tests.rs",
+        "sha256": "4478ebf70f93f7f78dc868e29320705e6d2611b4ee5276d809bad367db50174b",
+        "size_bytes": 12372,
+        "line_count": 350
+      },
+      "proposal": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_caller_clock_tests.rs",
+        "sha256": "54197507bd0cf91ad72a1dd2efb332b04f063cbc87a0126101cb63a44b08b9e6",
+        "size_bytes": 13938,
+        "line_count": 385
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/diffs/crates__ep_runtime__src__heat_balance__ctf_caller_clock_tests.rs.diff",
+        "sha256": "2a8ba5fff6f41d61c68e331579d4d6b81e052234503b44addd7d94005d7c3bb0",
+        "size_bytes": 2586,
+        "line_count": 66
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/summary.rs",
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/summary.rs",
+        "sha256": "c6c0c2e0da04ce2e8ba319764f23188eb67dd812d867705f323ad697d8b3a955",
+        "size_bytes": 8113,
+        "line_count": 156
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/before/crates/ep_runtime/src/heat_balance/summary.rs",
+        "sha256": "c6c0c2e0da04ce2e8ba319764f23188eb67dd812d867705f323ad697d8b3a955",
+        "size_bytes": 8113,
+        "line_count": 156
+      },
+      "proposal": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/summary.rs",
+        "sha256": "12be11f8a305ddf8eb3b8762184e9b9da8aea042639879a7d3bf49d553f2a8c7",
+        "size_bytes": 8165,
+        "line_count": 156
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/diffs/crates__ep_runtime__src__heat_balance__summary.rs.diff",
+        "sha256": "b822d348594de6f34ca7889d2443729c78e49fe4857bd386683f2634ef79f943",
+        "size_bytes": 1080,
+        "line_count": 20
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/weather_driver.rs",
+      "actual_before": {
+        "path": "crates/ep_runtime/src/heat_balance/weather_driver.rs",
+        "sha256": "c3de8d274556aaaeb474aab9e36f1c4589226d9fe9f40740d07ec049f80c8a0b",
+        "size_bytes": 2868,
+        "line_count": 83
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/before/crates/ep_runtime/src/heat_balance/weather_driver.rs",
+        "sha256": "c3de8d274556aaaeb474aab9e36f1c4589226d9fe9f40740d07ec049f80c8a0b",
+        "size_bytes": 2868,
+        "line_count": 83
+      },
+      "proposal": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/weather_driver.rs",
+        "sha256": "827538d4046a50d450f066639e09e1555e47cddcd228d188102a22451f0623a9",
+        "size_bytes": 3034,
+        "line_count": 88
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/diffs/crates__ep_runtime__src__heat_balance__weather_driver.rs.diff",
+        "sha256": "7621354f6afe4cbf7e7441969c8fcea41758f7a7fd0674a8b0303abef5899a05",
+        "size_bytes": 483,
+        "line_count": 14
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/weather_day/production.rs",
+      "actual_before": {
+        "path": "crates/ep_runtime/src/weather_day/production.rs",
+        "sha256": "164a84212d2244d43844e449b6d4b1bdf510d37de417364b8d2cb5e778cae2b6",
+        "size_bytes": 17212,
+        "line_count": 399
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/before/crates/ep_runtime/src/weather_day/production.rs",
+        "sha256": "164a84212d2244d43844e449b6d4b1bdf510d37de417364b8d2cb5e778cae2b6",
+        "size_bytes": 17212,
+        "line_count": 399
+      },
+      "proposal": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/weather_day/production.rs",
+        "sha256": "8d11ea1f229651748d9cce2de0f3c35005df5d513829277910ede9f1f6023f69",
+        "size_bytes": 18196,
+        "line_count": 419
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/diffs/crates__ep_runtime__src__weather_day__production.rs.diff",
+        "sha256": "6d785d89fa103ed2c1e8bbbd2056743b5fadbd279b03729cba46b14a7f2ec491",
+        "size_bytes": 1347,
+        "line_count": 29
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/weather_day/lifecycle_tests.rs",
+      "actual_before": {
+        "path": "crates/ep_runtime/src/weather_day/lifecycle_tests.rs",
+        "sha256": "12aaa76386d9ee782f7e5e83899281693da2cf11af5c5fd19432e27c4664fe66",
+        "size_bytes": 8830,
+        "line_count": 218
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/before/crates/ep_runtime/src/weather_day/lifecycle_tests.rs",
+        "sha256": "12aaa76386d9ee782f7e5e83899281693da2cf11af5c5fd19432e27c4664fe66",
+        "size_bytes": 8830,
+        "line_count": 218
+      },
+      "proposal": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/weather_day/lifecycle_tests.rs",
+        "sha256": "969d499b078beb4bd06aeaca5586a1ff0131b1ccc9559d741a1ead503495f41f",
+        "size_bytes": 10660,
+        "line_count": 255
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/diffs/crates__ep_runtime__src__weather_day__lifecycle_tests.rs.diff",
+        "sha256": "4a4b668ad1ccce5963d131093f587297ec7b5c8ba7aaf0e955a604f3fbf910d1",
+        "size_bytes": 2786,
+        "line_count": 57
+      }
+    },
+    {
+      "canonical_path": "crates/ep_run/src/pipeline.rs",
+      "actual_before": {
+        "path": "crates/ep_run/src/pipeline.rs",
+        "sha256": "a12f7e5bec9dc1df72007568a84a2b8a149822ceff58d3974652e099e8a667b3",
+        "size_bytes": 822206,
+        "line_count": 14613
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/before/crates/ep_run/src/pipeline.rs",
+        "sha256": "a12f7e5bec9dc1df72007568a84a2b8a149822ceff58d3974652e099e8a667b3",
+        "size_bytes": 822206,
+        "line_count": 14613
+      },
+      "proposal": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_run/src/pipeline.rs",
+        "sha256": "359334b745c4c52a6fa99c7529c8809313968e84ccdfd1f612ffc260e6bbf878",
+        "size_bytes": 822425,
+        "line_count": 14617
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/diffs/crates__ep_run__src__pipeline.rs.diff",
+        "sha256": "40c053fff24e28849ba61ab8b75dcdfaa09dff62a2f88ea8df931839dac28009",
+        "size_bytes": 950,
+        "line_count": 15
+      }
+    },
+    {
+      "canonical_path": "energyplus_porting_plan/cards/SYS-03.md",
+      "actual_before": {
+        "path": "energyplus_porting_plan/cards/SYS-03.md",
+        "sha256": "8366cf0c13abf8d47806f73583a5c982d8f9e6bcf5949084cd4ae49e278cd154",
+        "size_bytes": 2954,
+        "line_count": 70
+      },
+      "before_archive": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/before/energyplus_porting_plan/cards/SYS-03.md",
+        "sha256": "8366cf0c13abf8d47806f73583a5c982d8f9e6bcf5949084cd4ae49e278cd154",
+        "size_bytes": 2954,
+        "line_count": 70
+      },
+      "proposal": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/energyplus_porting_plan/cards/SYS-03.md",
+        "sha256": "011cbfe144df71de11b3da23cfcc1a4538be0e6fc4e39c5d1de78b3579ef84d8",
+        "size_bytes": 5895,
+        "line_count": 84
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/diffs/energyplus_porting_plan__cards__SYS-03.md.diff",
+        "sha256": "a5ed14d1cccb1a9624d5b7038eb353403a51516d5c5ccea5d07f4345f21821af",
+        "size_bytes": 3201,
+        "line_count": 20
+      }
+    }
+  ],
+  "own_sources": [
+    {
+      "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "aeec5163ad5c4063f934f762247d9bfed786d37041026763f087b16fc7d21a81",
+      "size_bytes": 51184,
+      "line_count": 1090
+    },
+    {
+      "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/initialization/state_shell.rs",
+      "sha256": "97745e320b9ea3c5d85e5d2ed691f85452d594aadb43cdade624fe38e00f59af",
+      "size_bytes": 2970,
+      "line_count": 54
+    },
+    {
+      "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/error.rs",
+      "sha256": "df29c6fc7667b216ed0bf41bfc15559200fcafa35e528227864c4187f2ba3178",
+      "size_bytes": 9843,
+      "line_count": 252
+    },
+    {
+      "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/warmup.rs",
+      "sha256": "317b78691ec03d29d44ce49ea6c726f02890be5d7b3f3dc6059671e10744228e",
+      "size_bytes": 18844,
+      "line_count": 420
+    },
+    {
+      "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/timestep.rs",
+      "sha256": "c839fa3fa3ef0b719fc94ecfd2507a391d803857dba60db92469309d75061ba0",
+      "size_bytes": 42545,
+      "line_count": 879
+    },
+    {
+      "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/runtime.rs",
+      "sha256": "f9eb44466b922d3a8592b31a9e7dc63bce8dfb04df9e2df50903a59f5ac37e1b",
+      "size_bytes": 25396,
+      "line_count": 578
+    },
+    {
+      "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/runtime/tests/part07.rs",
+      "sha256": "ba23468529b2d578c158683d62d2b1c65b2d9629d84e1bcb85deb10e8cc3f0bd",
+      "size_bytes": 27219,
+      "line_count": 689
+    },
+    {
+      "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_caller_clock_tests.rs",
+      "sha256": "54197507bd0cf91ad72a1dd2efb332b04f063cbc87a0126101cb63a44b08b9e6",
+      "size_bytes": 13938,
+      "line_count": 385
+    },
+    {
+      "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/summary.rs",
+      "sha256": "12be11f8a305ddf8eb3b8762184e9b9da8aea042639879a7d3bf49d553f2a8c7",
+      "size_bytes": 8165,
+      "line_count": 156
+    },
+    {
+      "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/weather_driver.rs",
+      "sha256": "827538d4046a50d450f066639e09e1555e47cddcd228d188102a22451f0623a9",
+      "size_bytes": 3034,
+      "line_count": 88
+    },
+    {
+      "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/weather_day/production.rs",
+      "sha256": "8d11ea1f229651748d9cce2de0f3c35005df5d513829277910ede9f1f6023f69",
+      "size_bytes": 18196,
+      "line_count": 419
+    },
+    {
+      "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/weather_day/lifecycle_tests.rs",
+      "sha256": "969d499b078beb4bd06aeaca5586a1ff0131b1ccc9559d741a1ead503495f41f",
+      "size_bytes": 10660,
+      "line_count": 255
+    },
+    {
+      "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_run/src/pipeline.rs",
+      "sha256": "359334b745c4c52a6fa99c7529c8809313968e84ccdfd1f612ffc260e6bbf878",
+      "size_bytes": 822425,
+      "line_count": 14617
+    },
+    {
+      "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/proposed/energyplus_porting_plan/cards/SYS-03.md",
+      "sha256": "011cbfe144df71de11b3da23cfcc1a4538be0e6fc4e39c5d1de78b3579ef84d8",
+      "size_bytes": 5895,
+      "line_count": 84
+    }
+  ],
+  "source_dependencies": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "sha256": "d810cb331f9c0dfe13d8371252ea2fe863a8043480f1f72384d824428c98d2b1",
+      "size_bytes": 371103,
+      "line_count": 6206
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.hh",
+      "sha256": "2080fdb48dc3a03429f093dfe4f7ce2fffa01519b7783db250410ea8b1bfcd69",
+      "size_bytes": 13588,
+      "line_count": 282
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "sha256": "9b0aff100fff104dcf9268b46328c1bda5452a28894a6ecb1385bb63ef975ab6",
+      "size_bytes": 404705,
+      "line_count": 7244
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEnergyDemands.cc",
+      "sha256": "bd111315b3d8695df31f722088c9ae08d7369d40f3d445bb96d976d4f9c875b7",
+      "size_bytes": 21954,
+      "line_count": 395
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEnergyDemands.hh",
+      "sha256": "048718252c585868e46f3f0b5bad49a6e2b10835d4eb3efef77008348f7ad3c2",
+      "size_bytes": 12483,
+      "line_count": 191
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SimulationManager.cc",
+      "sha256": "bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685",
+      "size_bytes": 168527,
+      "line_count": 2941
+    },
+    {
+      "path": "crates/ep_model/src/model.rs",
+      "sha256": "334ae93fc3cdd32580f1e49349ecbe07fb1dab83809e371c16b4ac5fadd20ba7",
+      "size_bytes": 93321,
+      "line_count": 2332
+    },
+    {
+      "path": "crates/ep_run/src/porting_scope.rs",
+      "sha256": "66665f9026988f91a7455b0f18d8f32048572a46f8e8d8765e7d05263fcc7eeb",
+      "size_bytes": 17114,
+      "line_count": 458
+    },
+    {
+      "path": "crates/ep_run/src/pipeline.rs",
+      "sha256": "a12f7e5bec9dc1df72007568a84a2b8a149822ceff58d3974652e099e8a667b3",
+      "size_bytes": 822206,
+      "line_count": 14613
+    },
+    {
+      "path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "sha256": "e4a903ad226410b9f84530e675d6dbfafa528212c2bf10a5e5686de2df2e383e",
+      "size_bytes": 49041,
+      "line_count": 1050
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/current.rs",
+      "sha256": "d8213bee33608bbb662e30d70eaa3c00ccfc9c47a535ee3bea7856bba05d5eb3",
+      "size_bytes": 8803,
+      "line_count": 207
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/production_trace.rs",
+      "sha256": "479734d9f839df09b07458340bef0b3c2c3e67122c203cfb3615daf772a9766f",
+      "size_bytes": 7480,
+      "line_count": 206
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/state.rs",
+      "sha256": "aa34b4daa3a9136866283c76664580edddd7eb3ee0fa3d030ca19eb9c5642f5f",
+      "size_bytes": 9634,
+      "line_count": 279
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_raw/header_state.rs",
+      "sha256": "bada442e26a4b3ff5333c42967220ae823dea0aaba5d7f13c6fc82f33981bd0d",
+      "size_bytes": 9195,
+      "line_count": 257
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_raw/input.rs",
+      "sha256": "b69ce6654d719e4f92e195ecd5f57416d72ec3f7cd1f505d9cbb5ef641dc01c0",
+      "size_bytes": 11635,
+      "line_count": 326
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_raw/record_types.rs",
+      "sha256": "6fb4182a46f19a5c04cc925cc505e910e99c18e8aadfe68e3e758fb632fa354a",
+      "size_bytes": 4768,
+      "line_count": 136
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/coupling.rs",
+      "sha256": "21a8f85fe33f2dadac6f6d847bd767deedb05e35bcd4d496b3ee809d72e38b47",
+      "size_bytes": 49620,
+      "line_count": 1253
+    },
+    {
+      "path": "crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+      "sha256": "064b727d522fad72b74f11d54e26216d89e79c2762985bb66641f4321b4d0b5f",
+      "size_bytes": 597445,
+      "line_count": 10406
+    },
+    {
+      "path": "crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "sha256": "6f32927b566977f5f98756b8b8bd7134c80398d5edf4035fa6466f9c4c6e5a51",
+      "size_bytes": 21564,
+      "line_count": 502
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "source_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "start_line": 180,
+      "end_line": 244,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__HeatBalanceManager.cc.180-244.txt",
+        "sha256": "71b4e547a55f9651095fdee9ba71a64271befd6698dbeffd993b5e00ab69d3ee",
+        "size_bytes": 3288,
+        "line_count": 65
+      }
+    },
+    {
+      "source_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "start_line": 651,
+      "end_line": 694,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__HeatBalanceManager.cc.651-694.txt",
+        "sha256": "19431a0fedec2a9a5f3c98b6b3cd8eba4e0460b10bc36dc67976a8ea624979b8",
+        "size_bytes": 3285,
+        "line_count": 44
+      }
+    },
+    {
+      "source_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "start_line": 2598,
+      "end_line": 2663,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__HeatBalanceManager.cc.2598-2663.txt",
+        "sha256": "48afeb89284b8c830a7bfb27633e87c300408d2c2577d7dc8c515e961d66545e",
+        "size_bytes": 3520,
+        "line_count": 66
+      }
+    },
+    {
+      "source_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "start_line": 2880,
+      "end_line": 2918,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__HeatBalanceManager.cc.2880-2918.txt",
+        "sha256": "ecb0cb3274fe2aa59d0818842da41ca5356e3c7d7c372bf8971cce594615758e",
+        "size_bytes": 3908,
+        "line_count": 39
+      }
+    },
+    {
+      "source_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "start_line": 2971,
+      "end_line": 3057,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__HeatBalanceManager.cc.2971-3057.txt",
+        "sha256": "18b7c9199c1a7adf5f18a47fb22ccd8917965d03033e2fd17e29102a0503c089",
+        "size_bytes": 5610,
+        "line_count": 87
+      }
+    },
+    {
+      "source_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.cc",
+      "start_line": 3059,
+      "end_line": 3226,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__HeatBalanceManager.cc.3059-3226.txt",
+        "sha256": "12f0dd0d9cce07ee46a12684452ed1efc7e47ddfd8c9d04e62be60b2b2ffc8ca",
+        "size_bytes": 11832,
+        "line_count": 168
+      }
+    },
+    {
+      "source_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.hh",
+      "start_line": 63,
+      "end_line": 91,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__HeatBalanceManager.hh.63-91.txt",
+        "sha256": "2b16cbe9a1e0c2c687d76b668cc0b371fb82558c0e8ea6fd6766ea4020173fce",
+        "size_bytes": 1352,
+        "line_count": 29
+      }
+    },
+    {
+      "source_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceManager.hh",
+      "start_line": 193,
+      "end_line": 229,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__HeatBalanceManager.hh.193-229.txt",
+        "sha256": "535acc9d20f07b7dd2facde08d2f2b8ac9eb28ceffd51a9c71710b66b581aa05",
+        "size_bytes": 2469,
+        "line_count": 37
+      }
+    },
+    {
+      "source_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "start_line": 3863,
+      "end_line": 3940,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__ZoneTempPredictorCorrector.cc.3863-3940.txt",
+        "sha256": "7e06231b576d34838f5f81ac98f01352b4e7bdb20f4ed047c30a58f3d9cf1b4c",
+        "size_bytes": 3353,
+        "line_count": 78
+      }
+    },
+    {
+      "source_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/ZoneTempPredictorCorrector.cc",
+      "start_line": 4043,
+      "end_line": 4128,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__ZoneTempPredictorCorrector.cc.4043-4128.txt",
+        "sha256": "dd1b40e4b33a3b0e1e580150495fd854ef4c85ecfddcfbb4aa75f63a37a01786",
+        "size_bytes": 4128,
+        "line_count": 86
+      }
+    },
+    {
+      "source_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEnergyDemands.cc",
+      "start_line": 60,
+      "end_line": 76,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__DataZoneEnergyDemands.cc.60-76.txt",
+        "sha256": "50c0311a8a17c4e886afbb44f1bd2e8b97ad0b8fe68c5b9358ad62c74846fb3a",
+        "size_bytes": 619,
+        "line_count": 17
+      }
+    },
+    {
+      "source_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEnergyDemands.cc",
+      "start_line": 323,
+      "end_line": 329,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__DataZoneEnergyDemands.cc.323-329.txt",
+        "sha256": "5f05d8503943d57c4954b25ae5936850ff509c220c23b9f58c9562a8bf0588f4",
+        "size_bytes": 392,
+        "line_count": 7
+      }
+    },
+    {
+      "source_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataZoneEnergyDemands.hh",
+      "start_line": 84,
+      "end_line": 121,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__DataZoneEnergyDemands.hh.84-121.txt",
+        "sha256": "a9b611d598f94c2458d6f2b235068ca08ab64ca3e53a4b58da170a12430ced2f",
+        "size_bytes": 2934,
+        "line_count": 38
+      }
+    },
+    {
+      "source_path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SimulationManager.cc",
+      "start_line": 404,
+      "end_line": 556,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/.reference__energyplus-src__26.1.0__src__EnergyPlus__SimulationManager.cc.404-556.txt",
+        "sha256": "6219eb3f3a3a873c509e4125e1bfc9626e0deb1f7fa179e54e8a392f400f5b31",
+        "size_bytes": 8530,
+        "line_count": 153
+      }
+    },
+    {
+      "source_path": "crates/ep_model/src/model.rs",
+      "start_line": 557,
+      "end_line": 617,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/crates__ep_model__src__model.rs.557-617.txt",
+        "sha256": "51fc08f0cd3b1da394bf81180da127765d450b003acd383f3b8229e747839a04",
+        "size_bytes": 2438,
+        "line_count": 61
+      }
+    },
+    {
+      "source_path": "crates/ep_model/src/model.rs",
+      "start_line": 709,
+      "end_line": 721,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/crates__ep_model__src__model.rs.709-721.txt",
+        "sha256": "1bf57bafc23c9f1431d33c4103f49f4c4f88b5acfbce71b060f8f4e447a5bea2",
+        "size_bytes": 487,
+        "line_count": 13
+      }
+    },
+    {
+      "source_path": "crates/ep_model/src/model.rs",
+      "start_line": 1738,
+      "end_line": 1750,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/crates__ep_model__src__model.rs.1738-1750.txt",
+        "sha256": "94a7e2ac8294856ee7ac6e326104f9fe000c80e77750462390743b28434113d5",
+        "size_bytes": 301,
+        "line_count": 13
+      }
+    },
+    {
+      "source_path": "crates/ep_run/src/porting_scope.rs",
+      "start_line": 159,
+      "end_line": 200,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/crates__ep_run__src__porting_scope.rs.159-200.txt",
+        "sha256": "5469195b64908edf1a8c723f003277d04da3712451acc0608f7c1764f41ce3a7",
+        "size_bytes": 1336,
+        "line_count": 42
+      }
+    },
+    {
+      "source_path": "crates/ep_run/src/porting_scope.rs",
+      "start_line": 349,
+      "end_line": 358,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/crates__ep_run__src__porting_scope.rs.349-358.txt",
+        "sha256": "02fd40b31d0df0b7d20ce82fb270a06b146d55e4b6f235d572cca5fd5c8cb295",
+        "size_bytes": 395,
+        "line_count": 10
+      }
+    },
+    {
+      "source_path": "crates/ep_run/src/pipeline.rs",
+      "start_line": 883,
+      "end_line": 895,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/crates__ep_run__src__pipeline.rs.883-895.txt",
+        "sha256": "63c1284368134d29f4cc1de3c4c9c955403342a5afb201dd2fe7dca36c8e60b8",
+        "size_bytes": 548,
+        "line_count": 13
+      }
+    },
+    {
+      "source_path": "crates/ep_run/src/pipeline.rs",
+      "start_line": 3597,
+      "end_line": 3614,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/crates__ep_run__src__pipeline.rs.3597-3614.txt",
+        "sha256": "c4ce754df9fc2ccbd10b315ef7286207401133ec756bb6bf0eed805ed4ed566e",
+        "size_bytes": 991,
+        "line_count": 18
+      }
+    },
+    {
+      "source_path": "crates/ep_runtime/src/heat_balance/state.rs",
+      "start_line": 909,
+      "end_line": 958,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/crates__ep_runtime__src__heat_balance__state.rs.909-958.txt",
+        "sha256": "ed7f97c5da3f5f8a973ab85a938dd4155623619cce2aa32366692ac007bc4bdf",
+        "size_bytes": 2566,
+        "line_count": 50
+      }
+    },
+    {
+      "source_path": "crates/ep_runtime/src/weather_day/current.rs",
+      "start_line": 114,
+      "end_line": 154,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/crates__ep_runtime__src__weather_day__current.rs.114-154.txt",
+        "sha256": "ecb0658736068d30eae6fd75033c1de78de240d3bd5eb4332b24908ad399db2d",
+        "size_bytes": 1988,
+        "line_count": 41
+      }
+    },
+    {
+      "source_path": "crates/ep_runtime/src/weather_day/production_trace.rs",
+      "start_line": 10,
+      "end_line": 59,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/crates__ep_runtime__src__weather_day__production_trace.rs.10-59.txt",
+        "sha256": "35af878a255498f87e70b0b331f44e99695fd9b33296ecad0a109ab9dfdc8e68",
+        "size_bytes": 2075,
+        "line_count": 50
+      }
+    },
+    {
+      "source_path": "crates/ep_runtime/src/weather_day/state.rs",
+      "start_line": 250,
+      "end_line": 270,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/crates__ep_runtime__src__weather_day__state.rs.250-270.txt",
+        "sha256": "4720944c4f28e4ee63548893737ca000a4bdf65c9c6f54595329c4938dc09a56",
+        "size_bytes": 888,
+        "line_count": 21
+      }
+    },
+    {
+      "source_path": "crates/ep_runtime/src/weather_raw/header_state.rs",
+      "start_line": 141,
+      "end_line": 163,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/crates__ep_runtime__src__weather_raw__header_state.rs.141-163.txt",
+        "sha256": "076f26d0423c1bd8611f25e7687dc6bcacf5a69557287957a0527fe8878564cb",
+        "size_bytes": 923,
+        "line_count": 23
+      }
+    },
+    {
+      "source_path": "crates/ep_runtime/src/weather_raw/input.rs",
+      "start_line": 25,
+      "end_line": 38,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/crates__ep_runtime__src__weather_raw__input.rs.25-38.txt",
+        "sha256": "ff8e03558d489c6a367495e7fa22e595d65b14aa1357965335362f8e3d4aeff6",
+        "size_bytes": 478,
+        "line_count": 14
+      }
+    },
+    {
+      "source_path": "crates/ep_runtime/src/weather_raw/record_types.rs",
+      "start_line": 41,
+      "end_line": 68,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/crates__ep_runtime__src__weather_raw__record_types.rs.41-68.txt",
+        "sha256": "33ad34f50b1cb725a67cbbdf98639ac3091e990fb65a65da4f12dcccb2faf87d",
+        "size_bytes": 1222,
+        "line_count": 28
+      }
+    },
+    {
+      "source_path": "crates/ep_runtime/src/ideal_loads/coupling.rs",
+      "start_line": 163,
+      "end_line": 169,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/crates__ep_runtime__src__ideal_loads__coupling.rs.163-169.txt",
+        "sha256": "26d29f1ff70f5e0a55e06c700f9e9aeb6d895431daba6867dfbb346339f3b0f0",
+        "size_bytes": 465,
+        "line_count": 7
+      }
+    },
+    {
+      "source_path": "crates/ep_runtime/src/ideal_loads/coupling.rs",
+      "start_line": 226,
+      "end_line": 239,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/crates__ep_runtime__src__ideal_loads__coupling.rs.226-239.txt",
+        "sha256": "7323cb9735cf1b92dc90d615b8c1366363bb98acbf2be957ece7cfe3eef180b1",
+        "size_bytes": 399,
+        "line_count": 14
+      }
+    },
+    {
+      "source_path": "crates/ep_runtime/src/ideal_loads/coupled_runtime.rs",
+      "start_line": 5904,
+      "end_line": 5919,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/crates__ep_runtime__src__ideal_loads__coupled_runtime.rs.5904-5919.txt",
+        "sha256": "aa6722731811fa05d50be53d01e0c4368773bc018def6bf8376282ea7698458c",
+        "size_bytes": 698,
+        "line_count": 16
+      }
+    },
+    {
+      "source_path": "crates/ep_runtime/src/weather_day/lifecycle.rs",
+      "start_line": 396,
+      "end_line": 411,
+      "literal_range": {
+        "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/ranges/crates__ep_runtime__src__weather_day__lifecycle.rs.396-411.txt",
+        "sha256": "9e12261d3be4b356a422197e2c75e445957e5830f1c21c054b8e414c083419bf",
+        "size_bytes": 824,
+        "line_count": 16
+      }
+    }
+  ],
+  "readiness": {
+    "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/readiness.json",
+    "sha256": "a243510d292248913a34cba412179f4a1cdddbb7a7d8c6ea9c770868ad508836",
+    "size_bytes": 1694,
+    "line_count": 35
+  },
+  "README": {
+    "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/README.md",
+    "sha256": "c657284ae8cbd9ec200208d6f0537163f23662a8189ec78a61dee06d3aa4c6f1",
+    "size_bytes": 2805,
+    "line_count": 42
+  },
+  "author": {
+    "path": ".runtime/porting/SYS-03/warmup-owner-prep-01/author.py",
+    "sha256": "1c94e5897a02829d740ec115b3384ffaa59aa1b4a860cca7d7c668b5e561168c",
+    "size_bytes": 38902,
+    "line_count": 663
+  },
+  "canonical_mutation_performed": false,
+  "Native_or_candidate_execution_performed": false,
+  "numerical_PASS_claimed": false,
+  "gates_updated": false
+}

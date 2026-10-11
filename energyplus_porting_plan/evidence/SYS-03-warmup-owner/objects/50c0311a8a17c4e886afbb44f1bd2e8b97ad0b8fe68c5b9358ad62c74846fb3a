@@ -1,0 +1,17 @@
+    this->TotalOutputRequired = 0.0;
+    if (allocated(this->SequencedOutputRequired)) {
+        for (int equipNum = 1; equipNum <= this->NumZoneEquipment; ++equipNum) {
+            this->SequencedOutputRequired(equipNum) = 0.0;
+            this->SequencedOutputRequiredToHeatingSP(equipNum) = 0.0;
+            this->SequencedOutputRequiredToCoolingSP(equipNum) = 0.0;
+        }
+    }
+    this->airSysHeatEnergy = 0.0;
+    this->airSysCoolEnergy = 0.0;
+    this->airSysHeatRate = 0.0;
+    this->airSysCoolRate = 0.0;
+    this->predictedRate = 0.0;
+    this->predictedHSPRate = 0.0;
+    this->predictedCSPRate = 0.0;
+}
+

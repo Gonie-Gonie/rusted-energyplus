@@ -185,3 +185,5 @@ CTF-10 관측 예제를 기존 A 범위 진입 함수에 연결했습니다. Den
 CTF-10 observer now uses the existing CLI 8 MiB worker stack with strict A/Deny. Focused316/workspace4,940 tests passed with zero failed/ignored. [Actual entry and quality](evidence/CTF-10-ordinary-history-capture-source/entry-and-quality.json). Ordinary reachability and numerical comparison remain unverified.
 
 CTF-10 genuine A ordinary history capture completed (578 events, runtime exit0); full comparison retained FAIL (192 paired stages,3,898 required unavailable/unmatched,35,031 mismatches). [Full evidence and remaining issues](evidence/CTF-10-ordinary-history-comparison/summary.json). Card gates remain unchanged.
+
+SYS-03 uncontrolled warmup owner applied in strict ordinary A; focused323/workspace4,947 tests passed. [Source and quality](evidence/SYS-03-warmup-owner/summary.json). Native numerical/handoff parity and report/backend obligations remain pending; gates unchanged.

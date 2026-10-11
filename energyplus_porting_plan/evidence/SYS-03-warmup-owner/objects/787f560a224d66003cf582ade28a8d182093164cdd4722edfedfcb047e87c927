@@ -1,0 +1,95 @@
+"""Archive the applied warmup owner and real quality results without gate promotion."""
+import copy
+import hashlib
+import json
+from pathlib import Path
+import re
+import shutil
+import subprocess
+
+ROOT = Path.cwd()
+RAW = ROOT / '.runtime/porting/SYS-03'
+OUT = ROOT / 'energyplus_porting_plan/evidence/SYS-03-warmup-owner'
+
+
+def ref(path):
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.file_digest(path.open('rb'), 'sha256').hexdigest(), 'size_bytes': path.stat().st_size}
+
+
+def load(path):
+    return json.loads(path.read_bytes())
+
+
+def dump(path, value):
+    path.write_text(json.dumps(value, ensure_ascii=False, allow_nan=False, indent=2) + '\n', encoding='utf8', newline='\n')
+
+
+assert not OUT.exists()
+post_path = RAW / 'warmup-owner-applied-01/record.json'
+post = load(post_path)
+assert ref(post_path)['sha256'] == 'b1172586b54f96d87e6f0378a323f0f1ff695d22d35d0618be1d9a15814b991a'
+snapshot = post['source_final']
+assert snapshot['sha256'] == '8fc2a29bcaffe86bd59eeba73792e9f731ee37007ea250488980bccae62f6687'
+assert post['source_file_count'] == 3915 and post['unrelated_source_files_verified_byte_exact'] == 3902
+selected = {Path(__file__).resolve(), RAW / 'apply-warmup-owner-01.py'}
+for name in ['warmup-owner-prep-01', 'warmup-owner-applied-01', 'warmup-owner-format-command-01', 'warmup-owner-application-command-01', 'warmup-owner-quality-01']:
+    selected.update(p for p in (RAW / name).rglob('*') if p.is_file() and '__pycache__' not in p.parts)
+for name in ['source_before', 'source_literal', 'source_final']:
+    selected.add(ROOT / post[name]['path'])
+for row in post['application']:
+    selected.add(ROOT / row['actual_final_archive']['path'])
+    assert ref(ROOT / row['canonical_path']) == row['actual_final']
+quality = []
+for role in ['fmt-check', 'clippy', 'focused', 'workspace']:
+    path = RAW / f'warmup-owner-quality-01/{role}-command/receipt.json'
+    value = load(path)
+    assert value['exit_code'] == 0 and value['source_bytes_match_before_and_after'] is True and value['source_snapshot'] == snapshot
+    text = (ROOT / value['stdout']['path']).read_text(encoding='utf8')
+    groups = re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored;', text)
+    totals = [sum(int(row[i]) for row in groups) for i in range(3)]
+    assert totals == ([323, 0, 0] if role == 'focused' else [4947, 0, 0] if role == 'workspace' else [0, 0, 0])
+    quality.append({'role': role, 'execution': ref(path), 'test_totals': totals, 'test_result_groups': len(groups)})
+stored = {}
+for object_dir in (ROOT / 'energyplus_porting_plan/evidence').glob('*/objects'):
+    for path in object_dir.iterdir():
+        if path.is_file() and re.fullmatch('[0-9a-f]{64}', path.name):
+            stored.setdefault(path.name, path)
+OUT.mkdir()
+(OUT / 'objects').mkdir()
+objects = []
+for path in sorted(selected):
+    original = ref(path)
+    target = stored.get(original['sha256'], OUT / 'objects' / original['sha256'])
+    if not target.exists():
+        shutil.copyfile(path, target)
+    actual = ref(target)
+    assert actual['sha256'] == original['sha256'] and actual['size_bytes'] == original['size_bytes']
+    stored[original['sha256']] = target
+    objects.append({'original': original, 'stored': actual})
+summary_path = OUT / 'summary.json'
+dump(summary_path, {'schema': 'sys03-applied-uncontrolled-warmup-owner.v1', 'actual_application': ref(post_path), 'Source_snapshot': snapshot,
+    'Source_file_count': 3915, 'unrelated_Source_files_verified_byte_exact': 3902, 'actual_quality': quality, 'selected_objects': objects,
+    'behavior': 'Enable model warmup in strict ordinary A; retain all-zone four-criterion convergence owners and actual uncontrolled sensible-report stamps; hand off accepted final EndDay through weather Day0 without rebuilding weather or thermal state.',
+    'Native_same_input_unit_comparison_passed': False, 'ordinary_Native_handoff_parity_passed': False,
+    'whole_SYS03_PASS_claimed': False, 'card_gates_updated': False,
+    'remaining_issues': ['Genuine same-input Native four-criterion unit comparison remains pending.', 'Full rolling RecKeep and first-Run report arrays/EIO/backend diagnostic effects remain pending.', 'Controlled demand producer, kickoff/environment lifecycle and upstream SYS02/SCH03/SUR06 gates remain pending.']})
+summary = ref(summary_path)
+plan_path = ROOT / 'energyplus_porting_plan/plan.json'
+plan = load(plan_path)
+old_plan = copy.deepcopy(plan)
+task = next(row for row in plan['tasks'] if row['id'] == 'SYS-03')
+field = 'actual_uncontrolled_warmup_owner_and_quality'
+assert field not in task
+task[field] = summary
+inverse = copy.deepcopy(plan)
+del next(row for row in inverse['tasks'] if row['id'] == 'SYS-03')[field]
+assert inverse == old_plan
+dump(plan_path, plan)
+with (ROOT / 'energyplus_porting_plan/cards/SYS-03.md').open('a', encoding='utf8', newline='\n') as stream:
+    stream.write('\n## Applied uncontrolled warmup owner and quality\n\n')
+    stream.write('Actual Source8fc2a29b retains3,915 files with3,902 unrelated files byte-exact. The strict ordinary A caller now enables model warmup; actual uncontrolled sensible reports feed all-zone four-criterion convergence and the final accepted EndDay hands weather globals through Day0. fmt/Clippy passed; focused323/workspace4,947 tests passed, zero failed/ignored. Native same-input numerical comparison and ordinary handoff parity remain unverified. Full rolling/report/EIO/diagnostic effects and controlled demand remain pending; no card gates changed.\n')
+    stream.write(f'Evidence: [actual application and quality](../evidence/SYS-03-warmup-owner/summary.json) (`{summary["sha256"]}`).\n')
+with (ROOT / 'energyplus_porting_plan/CHECKLIST.md').open('a', encoding='utf8', newline='\n') as stream:
+    stream.write('\nSYS-03 uncontrolled warmup owner applied in strict ordinary A; focused323/workspace4,947 tests passed. [Source and quality](evidence/SYS-03-warmup-owner/summary.json). Native numerical/handoff parity and report/backend obligations remain pending; gates unchanged.\n')
+assert subprocess.run(['python', '-X', 'utf8', '-B', 'tools/porting/sync_plan_views.py', '--write']).returncode == 0
+print(json.dumps({'summary': summary, 'archived_paths': len(objects), 'gates_changed': False}))

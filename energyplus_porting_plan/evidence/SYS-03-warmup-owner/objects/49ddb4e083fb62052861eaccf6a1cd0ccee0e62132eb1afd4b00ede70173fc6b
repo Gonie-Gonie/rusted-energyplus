@@ -1,0 +1,10 @@
+--- crates/ep_runtime/src/heat_balance/initialization/state_shell.rs
++++ .runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/initialization/state_shell.rs
+@@ -15,6 +15,7 @@
+     HeatBalanceState {
+         timestep_index: 0,
+         zones,
++        warmup_convergence: None,
+         zone_air_environment_guard: Default::default(),
+         surfaces,
+         surface_indexes,

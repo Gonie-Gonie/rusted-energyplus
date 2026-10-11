@@ -68,3 +68,22 @@ CON-01에서 제외한 입력·분기는 구현 대상에 넣지 않는다. 생�
 증거 경로:  
 최대오차/RMSE/상태 불일치:  
 추가 검토할 helper:  
+
+## Bounded warmup owner/caller amendment (Source proposal; all gates remain pending)
+
+- Pin HeatBalanceManager.cc 180-244 (caller), 2598-2663 and 2880-2918 (actual allocation/BeginEnvrn), 2971-3057 (RecKeepHeatBalance), and 3059-3226 (CheckWarmupConvergence). The daily owner is per Zone, distinct from MAT, CTF history and summary.
+- Direct demand prerequisites are ZoneTempPredictorCorrector.cc 3863-3940, 4043-4128 and DataZoneEnergyDemands.cc 323-329 with its actual declarations. Only the real absent system-zone-node branch supplies literal SNLoad=0; predicted demand, PurchasedAir supply output or missing metadata must never become its replacement.
+- BeginEnvrn previous heat/cool/max/min owners start at +0. Current heat/cool/max start at -9999 and min at 1000. Record actual ZTAV and accepted unmultiplied airSysHeatRate/airSysCoolRate after each real timestep; never substitute MAT for unavailable ZTAV.
+- Check every Zone's max/min temperature differences and normalized heat/cool changes in Native order. Preserve the strict >1e-4 load guard, in-place 100 W floor, retained comparison values in inactive branches, then per-zone transfer/reset. LoadsConvergTol is dimensionless; the existing Rust `_w` spelling is historical.
+- The bounded first implementation admits actual uncontrolled A topology through real ModelGraph node absence plus real equipment-connection absence. Controlled or unknown demand ownership is explicitly unavailable; no B warmup activation or synthetic load producer is included.
+- The genuine ordinary A pipeline must choose the existing Building-based warmup options producer; the current hourly_samples call disables warmup. The separate diagnostic branch keeps its explicit old options, and B is unchanged.
+- Native maximum-day severe/continue effects and first-RunPeriod convergence reports remain required actual backend/environment prerequisites. A forced maximum-day exit is not convergence, and this bounded unit does not close those report/error gates.
+- After the actual final warmup EndDay decision, retain all thermal/demand/daily owners, set the real WarmupFlag false and DayOfSim/DayOfSimChr to zero without weather transport, then let the existing next RunPeriod BeginDay establish day 1. Pin SimulationManager.cc 404-556 and the direct weather caller/owner declarations.
+- Required tests include first-day previous-zero behavior, all four tests including real load failure, floor/guard/retained-value ordering, actual uncontrolled report reachability, rejection before callback for controlled topology, and warmup-to-RunPeriod owner/clock retention. Any future Native comparison uses genuine same inputs and all reached owners; no result-based fixtures or convergence-count expectations.
+
+This amendment and proposed Rust changes are held Source only. No Native/candidate execution, numerical PASS, completed scope/unit/integration/production gate or predecessor completion is claimed.
+
+## Applied uncontrolled warmup owner and quality
+
+Actual Source8fc2a29b retains3,915 files with3,902 unrelated files byte-exact. The strict ordinary A caller now enables model warmup; actual uncontrolled sensible reports feed all-zone four-criterion convergence and the final accepted EndDay hands weather globals through Day0. fmt/Clippy passed; focused323/workspace4,947 tests passed, zero failed/ignored. Native same-input numerical comparison and ordinary handoff parity remain unverified. Full rolling/report/EIO/diagnostic effects and controlled demand remain pending; no card gates changed.
+Evidence: [actual application and quality](../evidence/SYS-03-warmup-owner/summary.json) (`3922d1a4dae0c8f190903bc6c8e3d2833ef2fb36a8c20158fdbbeb396c509e71`).

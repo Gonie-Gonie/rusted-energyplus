@@ -1,0 +1,22 @@
+--- crates/ep_runtime/src/error.rs
++++ .runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/error.rs
+@@ -13,6 +13,11 @@
+     CtfSurfaceLifecycle(crate::heat_balance::ctf_surface_lifecycle::CtfSurfaceLifecycleUnavailable),
+     /// No zones were available to simulate.
+     NoZones,
++    /// Actual warmup demand/topology/daily owner is outside this bounded Source route.
++    WarmupUnavailable {
++        /// Missing or unrepresentable real owner; never a fabricated Native fatal.
++        reason: String,
++    },
+     /// No air-side nodes were available for a node-state projection.
+     NoNodeStateProjectionNodes,
+     /// No plant loops were available for a plant-state projection.
+@@ -118,6 +123,7 @@
+                 formatter,
+                 "selected public CTF/history lifecycle unavailable: {error:?}"
+             ),
++            Self::WarmupUnavailable { reason } => write!(formatter, "warmup owner unavailable: {reason}"),
+             Self::NoZones => write!(
+                 formatter,
+                 "first-zone simulation requires at least one Zone"

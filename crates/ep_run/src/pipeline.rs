@@ -3602,7 +3602,11 @@ fn execute_rust_runtime(
             })?;
             let _runtime_time_axis_samples = runtime_inputs.time_axis.sample_count();
             let _runtime_precomputed_schedule_count = runtime_inputs.schedule_cache.len();
-            let options = HeatBalanceSimulationOptions::hourly_samples(sample_count);
+            let options = if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility {
+                HeatBalanceSimulationOptions::hourly_samples_with_model_warmup(model, sample_count)
+            } else {
+                HeatBalanceSimulationOptions::hourly_samples(sample_count)
+            };
             let mut initialization = ctf_outputs.context();
             let simulation = simulate_heat_balance_zone_air_temperatures_with_production_weather_and_initialization_context(
                 model,

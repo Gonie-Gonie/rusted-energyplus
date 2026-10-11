@@ -1,0 +1,303 @@
+--- .runtime/porting/SYS-03/warmup-owner-prep-01/proposed/crates/ep_runtime/src/heat_balance/warmup.rs
++++ crates/ep_runtime/src/heat_balance/warmup.rs
+@@ -4,8 +4,8 @@
+ use crate::heat_balance::algorithm::HeatBalanceRuntimeConfig;
+ use crate::heat_balance::state::{
+     HeatBalanceState, HeatBalanceStepInput, HeatBalanceSurfaceLoopZoneAirCorrection,
+-    HeatBalanceWarmupConvergenceState, HeatBalanceWarmupZoneConvergence,
+-    HeatBalanceWarmupDayEndZoneAirStateSample, HeatBalanceWarmupOptions,
++    HeatBalanceWarmupConvergenceState, HeatBalanceWarmupDayEndZoneAirStateSample,
++    HeatBalanceWarmupOptions, HeatBalanceWarmupZoneConvergence,
+ };
+ use crate::heat_balance::summary::HeatBalanceWarmupSummary;
+ use crate::heat_balance::trace::heat_balance_zone_air_state_sample;
+@@ -53,7 +53,9 @@
+     }
+ 
+     admit_uncontrolled_warmup(simulation_model, state)?;
+-    if !options.temperature_convergence_tolerance_delta_c.is_finite()
++    if !options
++        .temperature_convergence_tolerance_delta_c
++        .is_finite()
+         || options.temperature_convergence_tolerance_delta_c < 0.0
+         || !options.loads_convergence_tolerance_w.is_finite()
+         || options.loads_convergence_tolerance_w < 0.0
+@@ -62,7 +64,11 @@
+     }
+     let model = &simulation_model.typed;
+     state.warmup_convergence = Some(HeatBalanceWarmupConvergenceState {
+-        zones: state.zones.iter().map(|zone| HeatBalanceWarmupZoneConvergence::new(zone.zone_id)).collect(),
++        zones: state
++            .zones
++            .iter()
++            .map(|zone| HeatBalanceWarmupZoneConvergence::new(zone.zone_id))
++            .collect(),
+         checked_day: 0,
+         convergence_checks_failed: false,
+         warmup_flag: true,
+@@ -134,7 +140,10 @@
+                 );
+                 super::ctf_surface_lifecycle::ensure_available(state)?;
+                 super::ctf_caller_clock::commit_legacy_step(state, prepared_legacy_clock)?;
+-                let owner = state.warmup_convergence.as_mut().ok_or_else(|| unavailable("missing actual convergence owner"))?;
++                let owner = state
++                    .warmup_convergence
++                    .as_mut()
++                    .ok_or_else(|| unavailable("missing actual convergence owner"))?;
+                 owner.record_state(&state.zones, state.timestep_index)?;
+             }
+         }
+@@ -145,9 +154,16 @@
+                 state: heat_balance_zone_air_state_sample(zone),
+             }
+         }));
+-        let owner = state.warmup_convergence.as_mut().ok_or_else(|| unavailable("missing actual convergence owner"))?;
++        let owner = state
++            .warmup_convergence
++            .as_mut()
++            .ok_or_else(|| unavailable("missing actual convergence owner"))?;
+         owner.check_day(day, options);
+-        final_delta = owner.zones.iter().map(|zone| zone.test_values[0].max(zone.test_values[1])).fold(0.0, f64::max);
++        final_delta = owner
++            .zones
++            .iter()
++            .map(|zone| zone.test_values[0].max(zone.test_values[1]))
++            .fold(0.0, f64::max);
+         if !owner.warmup_flag {
+             let converged = !owner.convergence_checks_failed;
+             if let Some(driver) = weather_driver {
+@@ -183,25 +199,38 @@
+ }
+ 
+ fn unavailable(reason: impl Into<String>) -> RuntimeError {
+-    RuntimeError::WarmupUnavailable { reason: reason.into() }
++    RuntimeError::WarmupUnavailable {
++        reason: reason.into(),
++    }
+ }
+ 
+ // Native correctAirTemp selects its uncontrolled branch by the actual absent
+ // system-zone node. Empty IdealLoads alone does not establish that prerequisite.
+-fn admit_uncontrolled_warmup(model: &SimulationModel, state: &HeatBalanceState) -> Result<(), RuntimeError> {
++fn admit_uncontrolled_warmup(
++    model: &SimulationModel,
++    state: &HeatBalanceState,
++) -> Result<(), RuntimeError> {
+     if !model.graph.zone_air_nodes.is_empty()
+         || !model.graph.zone_ideal_loads.is_empty()
+         || !model.typed.zone_equipment_connections.is_empty()
+         || !model.typed.zone_equipment_lists.is_empty()
+         || !model.typed.ideal_loads_air_systems.is_empty()
+     {
+-        return Err(unavailable("controlled or unresolved system-zone-node demand producer"));
++        return Err(unavailable(
++            "controlled or unresolved system-zone-node demand producer",
++        ));
+     }
+     if state.zones.is_empty()
+         || state.zones.len() != model.typed.zones.len()
+-        || state.zones.iter().zip(&model.typed.zones).any(|(actual, declared)| actual.zone_id != declared.id)
++        || state
++            .zones
++            .iter()
++            .zip(&model.typed.zones)
++            .any(|(actual, declared)| actual.zone_id != declared.id)
+     {
+-        return Err(unavailable("actual Zone owner order differs from declared topology"));
++        return Err(unavailable(
++            "actual Zone owner order differs from declared topology",
++        ));
+     }
+     Ok(())
+ }
+@@ -209,10 +238,18 @@
+ /// Actual uncontrolled corrector report seam, after MAT and before humidity.
+ /// Only the caller-admitted warmup owner can reach this literal SNLoad=0 branch.
+ pub(crate) fn report_uncontrolled_sensible_loads(state: &mut HeatBalanceState) {
+-    let Some(owner) = state.warmup_convergence.as_mut() else { return; };
+-    if !owner.warmup_flag { return; }
++    let Some(owner) = state.warmup_convergence.as_mut() else {
++        return;
++    };
++    if !owner.warmup_flag {
++        return;
++    }
+     if owner.zones.len() != state.zones.len()
+-        || owner.zones.iter().zip(&state.zones).any(|(owner, actual)| owner.zone_id != actual.zone_id)
++        || owner
++            .zones
++            .iter()
++            .zip(&state.zones)
++            .any(|(owner, actual)| owner.zone_id != actual.zone_id)
+     {
+         owner.unavailable_reason = Some("Zone ownership changed before sensible reporting");
+         return;
+@@ -238,10 +275,18 @@
+     }
+ 
+     fn record(&mut self, ztav: f64, heat_rate: f64, cool_rate: f64) {
+-        if ztav > self.current[2] { self.current[2] = ztav; }
+-        if ztav < self.current[3] { self.current[3] = ztav; }
+-        if heat_rate > self.current[0] { self.current[0] = heat_rate; }
+-        if cool_rate > self.current[1] { self.current[1] = cool_rate; }
++        if ztav > self.current[2] {
++            self.current[2] = ztav;
++        }
++        if ztav < self.current[3] {
++            self.current[3] = ztav;
++        }
++        if heat_rate > self.current[0] {
++            self.current[0] = heat_rate;
++        }
++        if cool_rate > self.current[1] {
++            self.current[1] = cool_rate;
++        }
+     }
+ 
+     fn check(&mut self, temperature_tolerance: f64, load_tolerance: f64) -> bool {
+@@ -269,7 +314,9 @@
+         if self.current[load_index] > 1.0e-4 {
+             self.current[load_index] = self.current[load_index].max(100.0).abs();
+             self.previous[load_index] = self.previous[load_index].max(100.0).abs();
+-            self.test_values[test_index] = ((self.current[load_index] - self.previous[load_index]) / self.current[load_index]).abs();
++            self.test_values[test_index] = ((self.current[load_index] - self.previous[load_index])
++                / self.current[load_index])
++                .abs();
+             if self.test_values[test_index] <= load_tolerance {
+                 self.pass_flags[test_index] = 2;
+             } else {
+@@ -292,17 +339,39 @@
+ }
+ 
+ impl HeatBalanceWarmupConvergenceState {
+-    fn record_state(&mut self, zones: &[super::state::ZoneHeatBalanceState], next_timestep: usize) -> Result<(), RuntimeError> {
+-        if let Some(reason) = self.unavailable_reason { return Err(unavailable(reason)); }
+-        if self.zones.len() != zones.len() { return Err(unavailable("incomplete daily Zone owner array")); }
++    fn record_state(
++        &mut self,
++        zones: &[super::state::ZoneHeatBalanceState],
++        next_timestep: usize,
++    ) -> Result<(), RuntimeError> {
++        if let Some(reason) = self.unavailable_reason {
++            return Err(unavailable(reason));
++        }
++        if self.zones.len() != zones.len() {
++            return Err(unavailable("incomplete daily Zone owner array"));
++        }
+         for (owner, actual) in self.zones.iter_mut().zip(zones) {
+-            if owner.zone_id != actual.zone_id || owner.sensible_report_timestep.and_then(|step| step.checked_add(1)) != Some(next_timestep) {
++            if owner.zone_id != actual.zone_id
++                || owner
++                    .sensible_report_timestep
++                    .and_then(|step| step.checked_add(1))
++                    != Some(next_timestep)
++            {
+                 return Err(unavailable("missing actual accepted sensible-load report"));
+             }
+-            let (heat, cool) = owner.air_system_sensible_rates_w.ok_or_else(|| unavailable("unobserved sensible demand rates"))?;
++            let (heat, cool) = owner
++                .air_system_sensible_rates_w
++                .ok_or_else(|| unavailable("unobserved sensible demand rates"))?;
+             let ztav = actual.zone_timestep_average_air_temperature_c;
+-            if !ztav.is_finite() || !heat.is_finite() || !cool.is_finite() || heat < 0.0 || cool < 0.0 {
+-                return Err(unavailable("nonfinite or negative actual daily observation"));
++            if !ztav.is_finite()
++                || !heat.is_finite()
++                || !cool.is_finite()
++                || heat < 0.0
++                || cool < 0.0
++            {
++                return Err(unavailable(
++                    "nonfinite or negative actual daily observation",
++                ));
+             }
+             owner.record(ztav, heat, cool);
+         }
+@@ -312,16 +381,23 @@
+     fn check_day(&mut self, day: u32, options: HeatBalanceWarmupOptions) {
+         self.convergence_checks_failed = false;
+         for zone in &mut self.zones {
+-            self.convergence_checks_failed |= zone.check(options.temperature_convergence_tolerance_delta_c, options.loads_convergence_tolerance_w);
++            self.convergence_checks_failed |= zone.check(
++                options.temperature_convergence_tolerance_delta_c,
++                options.loads_convergence_tolerance_w,
++            );
+             // Native maximum-day severe/continue transport precedes this point.
+             // That actual backend/environment prerequisite remains outside this bounded unit.
+             zone.retain_and_reset();
+         }
+         self.checked_day = day;
+-        if !self.convergence_checks_failed { self.warmup_flag = day < options.minimum_days; }
++        if !self.convergence_checks_failed {
++            self.warmup_flag = day < options.minimum_days;
++        }
+         let maximum_days = options.maximum_days.max(options.minimum_days).max(1);
+         self.maximum_day_forced_exit = day >= maximum_days && self.warmup_flag;
+-        if day >= maximum_days && self.warmup_flag { self.warmup_flag = false; }
++        if day >= maximum_days && self.warmup_flag {
++            self.warmup_flag = false;
++        }
+     }
+ }
+ 
+@@ -384,14 +460,23 @@
+         passed.previous = [0.0, 0.0, 12.0, 12.0];
+         passed.record(12.0, 0.0, 0.0);
+         let mut owner = HeatBalanceWarmupConvergenceState {
+-            zones: vec![failed, passed], checked_day: 0,
+-            convergence_checks_failed: false, warmup_flag: true,
+-            maximum_day_forced_exit: false, unavailable_reason: None,
++            zones: vec![failed, passed],
++            checked_day: 0,
++            convergence_checks_failed: false,
++            warmup_flag: true,
++            maximum_day_forced_exit: false,
++            unavailable_reason: None,
+         };
+-        owner.check_day(1, HeatBalanceWarmupOptions {
+-            enabled: true, minimum_days: 1, maximum_days: 3,
+-            temperature_convergence_tolerance_delta_c: 0.0, loads_convergence_tolerance_w: 0.0,
+-        });
++        owner.check_day(
++            1,
++            HeatBalanceWarmupOptions {
++                enabled: true,
++                minimum_days: 1,
++                maximum_days: 3,
++                temperature_convergence_tolerance_delta_c: 0.0,
++                loads_convergence_tolerance_w: 0.0,
++            },
++        );
+         assert!(owner.convergence_checks_failed);
+         assert!(owner.warmup_flag);
+         assert_eq!(owner.zones[0].pass_flags, [1, 1, 2, 2]);
+@@ -404,14 +489,23 @@
+     fn forced_maximum_exit_is_not_convergence() {
+         let mut owner = HeatBalanceWarmupConvergenceState {
+             zones: vec![HeatBalanceWarmupZoneConvergence::new(ep_model::ZoneId(0))],
+-            checked_day: 0, convergence_checks_failed: false, warmup_flag: true,
+-            maximum_day_forced_exit: false, unavailable_reason: None,
++            checked_day: 0,
++            convergence_checks_failed: false,
++            warmup_flag: true,
++            maximum_day_forced_exit: false,
++            unavailable_reason: None,
+         };
+         owner.zones[0].record(20.0, 0.0, 0.0);
+-        owner.check_day(1, HeatBalanceWarmupOptions {
+-            enabled: true, minimum_days: 1, maximum_days: 1,
+-            temperature_convergence_tolerance_delta_c: 0.0, loads_convergence_tolerance_w: 0.0,
+-        });
++        owner.check_day(
++            1,
++            HeatBalanceWarmupOptions {
++                enabled: true,
++                minimum_days: 1,
++                maximum_days: 1,
++                temperature_convergence_tolerance_delta_c: 0.0,
++                loads_convergence_tolerance_w: 0.0,
++            },
++        );
+         assert!(owner.convergence_checks_failed);
+         assert!(owner.maximum_day_forced_exit);
+         assert!(!owner.warmup_flag);
