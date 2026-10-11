@@ -48,6 +48,8 @@ pub struct TypedModel {
     pub surface_convection_algorithms: SurfaceConvectionAlgorithms,
     /// Actual input-only report requests read by General::ScanForReports.
     pub report_inputs: crate::ReportInputs,
+    /// Source loader spelling for selected construction/material reporting.
+    pub ctf_report_names: crate::CtfReportNames,
     /// Run periods.
     pub run_periods: Vec<RunPeriod>,
     /// Run period names.
@@ -301,6 +303,7 @@ impl Default for TypedModel {
             timestep: TimestepConfig::default(),
             surface_convection_algorithms: SurfaceConvectionAlgorithms::default(),
             report_inputs: crate::ReportInputs::default(),
+            ctf_report_names: crate::CtfReportNames::default(),
             run_periods: Vec::new(),
             run_period_names: NameMap::default(),
             run_period_special_days: Vec::new(),

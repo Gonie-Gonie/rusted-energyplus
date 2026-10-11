@@ -1,0 +1,11 @@
+--- formatted held observer
++++ actual corrected observer
+@@ -168,7 +168,7 @@
+     let Some(model) = compiled.model else {
+         *unavailable += 1;
+         return Ok(
+-            json!({"case_id":row["case_id"],"status":"typed-input-unavailable","actual_API_invocations":0,"queries":[],"compiler_diagnostics":format!("{:?}",compiled.diagnostics)}),
++            json!({"case_id":row["case_id"],"status":"typed-input-unavailable","actual_API_invocations":0,"queries":[],"compiler_diagnostics":format!("{:?}",compiled.report.diagnostics)}),
+         );
+     };
+     let mut owner = ReportScanState::default();

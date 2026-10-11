@@ -1,0 +1,81 @@
+//! Selected ordinary fmt8 F/G text formatting used by the CTF report helpers.
+
+use super::CtfReportUnavailable;
+
+fn nonfinite(value: f64) -> String {
+    let word = if value.is_infinite() { "INF" } else { "NAN" };
+    if value.is_sign_negative() {
+        format!("-{word}")
+    } else {
+        word.to_string()
+    }
+}
+
+fn padded(text: String, width: usize) -> String {
+    format!("{text:>width$}")
+}
+
+pub(super) fn fixed(value: f64, width: usize, precision: usize) -> String {
+    let text = if value.is_finite() {
+        format!("{value:.precision$}")
+    } else {
+        nonfinite(value)
+    };
+    padded(text, width)
+}
+
+pub(super) fn general(
+    value: f64,
+    width: usize,
+    precision: usize,
+) -> Result<String, CtfReportUnavailable> {
+    if !value.is_finite() {
+        return Ok(padded(nonfinite(value), width));
+    }
+    // fmt8 uses significant decimal digits, rounded once, then chooses notation
+    // from that rounded exponent. Do not rescale or recompute a source value.
+    let decimal_places = precision
+        .checked_sub(1)
+        .ok_or(CtfReportUnavailable::DecimalRepresentation)?;
+    let rounded = format!("{:.*e}", decimal_places, value.abs());
+    let (mantissa, exponent) = rounded
+        .split_once('e')
+        .ok_or(CtfReportUnavailable::DecimalRepresentation)?;
+    let exponent: i32 = exponent
+        .parse()
+        .map_err(|_| CtfReportUnavailable::DecimalRepresentation)?;
+    let mut digits = mantissa.replace('.', "");
+    while digits.len() > 1 && digits.ends_with('0') {
+        digits.pop();
+    }
+    let precision =
+        i32::try_from(precision).map_err(|_| CtfReportUnavailable::DecimalRepresentation)?;
+    let mut text = if exponent < -4 || exponent >= precision {
+        let mut text = digits[..1].to_string();
+        if digits.len() > 1 {
+            text.push('.');
+            text.push_str(&digits[1..]);
+        }
+        text.push('E');
+        text.push(if exponent < 0 { '-' } else { '+' });
+        text.push_str(&format!("{:02}", exponent.unsigned_abs()));
+        text
+    } else {
+        let point = exponent + 1;
+        if point <= 0 {
+            format!("0.{}{}", "0".repeat(point.unsigned_abs() as usize), digits)
+        } else {
+            let point =
+                usize::try_from(point).map_err(|_| CtfReportUnavailable::DecimalRepresentation)?;
+            if point >= digits.len() {
+                format!("{}{}", digits, "0".repeat(point - digits.len()))
+            } else {
+                format!("{}.{}", &digits[..point], &digits[point..])
+            }
+        }
+    };
+    if value.is_sign_negative() {
+        text.insert(0, '-');
+    }
+    Ok(padded(text, width))
+}

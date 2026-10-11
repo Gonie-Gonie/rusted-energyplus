@@ -1,0 +1,10 @@
+--- .runtime/porting/CTF-10/error-backend-prep-02/before/crates/ep_runtime/src/heat_balance/mod.rs
++++ crates/ep_runtime/src/heat_balance/mod.rs
+@@ -27,6 +27,7 @@
+ pub mod ctf_surface_binding;
+ pub mod ctf_surface_lifecycle;
+ pub mod ctf_thermal_history;
++pub mod error_backend;
+ pub(crate) mod id_slot_index;
+ pub mod initialization;
+ pub mod inside_convection;

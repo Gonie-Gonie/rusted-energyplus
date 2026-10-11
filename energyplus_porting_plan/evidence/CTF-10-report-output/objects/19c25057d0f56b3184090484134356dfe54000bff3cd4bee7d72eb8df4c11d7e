@@ -1,0 +1,273 @@
+{
+  "schema": "ctf10-predefined-and-EIO-report-source-preparation.v1",
+  "status": "SOURCE-READY HELD - implementation unit 2; unapplied and unexecuted",
+  "held_immutable": true,
+  "author": "Header",
+  "authorship_limit": "Author of prior selected public/lifecycle and report-input owners; independent reviewer required, no independent scientific certificate.",
+  "ep_version": "26.1.0",
+  "ep_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "prior_bounded_audit": {
+    "path": ".runtime/porting/CTF-10/whole-init-postlude-audit-prep-01/manifest.json",
+    "sha256": "4c973f1d1b5f71408645d0cb73cfef4489977c5b7aa40508a58d336af8ba1a65",
+    "size_bytes": 18226,
+    "line_count": 481
+  },
+  "prior_input_scan_preparation": {
+    "path": ".runtime/porting/CTF-10/report-input-scan-prep-01/manifest.json",
+    "sha256": "0f1570074b6aea63132ecf904d262bf4fc1b6a3a00a9268756703f83734562d7",
+    "size_bytes": 21938,
+    "line_count": 560
+  },
+  "actual_unit1_formatted_source_record": {
+    "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/record.json",
+    "sha256": "f7f6c3b52aca53ae456a25629563ea8f7ac3256d6eef3a25644a08f75a123e61",
+    "size_bytes": 9109,
+    "line_count": 204
+  },
+  "actual_unit1_formatter_acceptance": {
+    "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/accepted.json",
+    "sha256": "98bd31df09d2b4697592be1adc1e0978cfd9a384771f0bf850e39ab60d2da3ae",
+    "size_bytes": 8854,
+    "line_count": 198
+  },
+  "own_sources": [
+    {
+      "target": "crates/ep_model/src/report_inputs.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/proposed/crates/ep_model/src/report_inputs.rs",
+        "sha256": "dddc3643d927a95206ec903d40c48dd39478ccbf9d82e64e7a10427bc29d5efc",
+        "size_bytes": 3292,
+        "line_count": 88
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/before/crates/ep_model/src/report_inputs.rs",
+        "sha256": "42b11d92394443df14f46e0e7d609281a102f79d56659eb7923087ffff7dbb04",
+        "size_bytes": 2846,
+        "line_count": 79
+      },
+      "actual_unit1_final_archive": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/final/04-report_inputs.rs",
+        "sha256": "42b11d92394443df14f46e0e7d609281a102f79d56659eb7923087ffff7dbb04",
+        "size_bytes": 2846
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/diffs/crates__ep_model__src__report_inputs.rs.diff",
+        "sha256": "58730516e9ee3a672e3b9fef2827d59bcc863e1a3545398831143e7d42b0685b",
+        "size_bytes": 581,
+        "line_count": 15
+      }
+    },
+    {
+      "target": "crates/ep_model/src/model.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/proposed/crates/ep_model/src/model.rs",
+        "sha256": "3cb60e0181fd0db7bdbed8fa1ad0d50ec67738ed2f5b20cffacbe3f214292e5e",
+        "size_bytes": 93095,
+        "line_count": 2329
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/before/crates/ep_model/src/model.rs",
+        "sha256": "0f76bbf0675145f8da3b56f711ced71e25bcbdafc0160f60b386978fe3be8db4",
+        "size_bytes": 92905,
+        "line_count": 2326
+      },
+      "actual_unit1_final_archive": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/final/03-model.rs",
+        "sha256": "0f76bbf0675145f8da3b56f711ced71e25bcbdafc0160f60b386978fe3be8db4",
+        "size_bytes": 92905
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/diffs/crates__ep_model__src__model.rs.diff",
+        "sha256": "1f1cc046d562804553b958bbbc76a137f2112ecae1fd87f119a0e7b87236a486",
+        "size_bytes": 911,
+        "line_count": 19
+      }
+    },
+    {
+      "target": "crates/ep_compiler/src/compiler.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/proposed/crates/ep_compiler/src/compiler.rs",
+        "sha256": "d5d9732ca324af10be0b4661dd5cd12c898fa0d18549788f1ade512124ef86af",
+        "size_bytes": 772369,
+        "line_count": 19749
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/before/crates/ep_compiler/src/compiler.rs",
+        "sha256": "90c40535d6393e8cd6def34b498bc88d43509ff2efa1bc51e0ba5fada0e62825",
+        "size_bytes": 772042,
+        "line_count": 19745
+      },
+      "actual_unit1_final_archive": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/final/01-compiler.rs",
+        "sha256": "90c40535d6393e8cd6def34b498bc88d43509ff2efa1bc51e0ba5fada0e62825",
+        "size_bytes": 772042
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/diffs/crates__ep_compiler__src__compiler.rs.diff",
+        "sha256": "15060b05ca7473eb82d2d0bc2cbbf5bd2a3e3c8608a44595d6848560bce50233",
+        "size_bytes": 1123,
+        "line_count": 34
+      }
+    },
+    {
+      "target": "crates/ep_compiler/src/compiler/report_inputs.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/proposed/crates/ep_compiler/src/compiler/report_inputs.rs",
+        "sha256": "2e8e7a0d582a7cd3993981232a719859eb8a688a43ed7eacfc7ab1146ced14a9",
+        "size_bytes": 9779,
+        "line_count": 220
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/before/crates/ep_compiler/src/compiler/report_inputs.rs",
+        "sha256": "ceabfc0a545b5f226e8ada9970c41481092d0cfb514cacb6c29f2306a969c744",
+        "size_bytes": 8254,
+        "line_count": 195
+      },
+      "actual_unit1_final_archive": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/final/00-report_inputs.rs",
+        "sha256": "ceabfc0a545b5f226e8ada9970c41481092d0cfb514cacb6c29f2306a969c744",
+        "size_bytes": 8254
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/diffs/crates__ep_compiler__src__compiler__report_inputs.rs.diff",
+        "sha256": "3eac956873a3b9ebdabb351af0a117cbb764f28129cc55838037efd84f58bbdf",
+        "size_bytes": 1707,
+        "line_count": 31
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/proposed/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "71f4b1357587c78f0003180f8ab2a3b2bd23df5eb270ce2f5aa63eb1e5902d7d",
+        "size_bytes": 1947,
+        "line_count": 77
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/before/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "705e5c6008317973c5498fc15ddd372b357ac295c0a718c4c8260afb113e5182",
+        "size_bytes": 1926,
+        "line_count": 76
+      },
+      "actual_unit1_final_archive": {
+        "path": ".runtime/porting/CTF-10/report-input-scan-applied-01/final/06-mod.rs",
+        "sha256": "705e5c6008317973c5498fc15ddd372b357ac295c0a718c4c8260afb113e5182",
+        "size_bytes": 1926
+      },
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/diffs/crates__ep_runtime__src__heat_balance__mod.rs.diff",
+        "sha256": "7d4f43971caf8ee6e3bfd08a63547707f066ff19cdd5f6b5626787c1a8df2510",
+        "size_bytes": 258,
+        "line_count": 10
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+        "sha256": "8193bbb0c0edaa006f25bcd772d9499de4ec39ee167779b03008f7d2df275cc8",
+        "size_bytes": 14585,
+        "line_count": 269
+      },
+      "before": null,
+      "actual_unit1_final_archive": null,
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/diffs/crates__ep_runtime__src__heat_balance__ctf_reports.rs.diff",
+        "sha256": "31379cdc0ef3c485bfeedecf9c6c62c5592300d63168f1bb17d7fa1a9594e329",
+        "size_bytes": 14942,
+        "line_count": 272
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/ctf_reports_format.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_reports_format.rs",
+        "sha256": "38d6d665a9ae45422bbd69b6cb03e1ed3b5329ed25271eb46c08642617dd9786",
+        "size_bytes": 2561,
+        "line_count": 65
+      },
+      "before": null,
+      "actual_unit1_final_archive": null,
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/diffs/crates__ep_runtime__src__heat_balance__ctf_reports_format.rs.diff",
+        "sha256": "db48f9b8b9757f58dbc15fd3648c289d55dfee26a70c2f130f7bccc9311376f9",
+        "size_bytes": 2720,
+        "line_count": 68
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/ctf_reports_tests.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_reports_tests.rs",
+        "sha256": "f38ac98a0646d4d5626e74a5d1f89665d8cc6710bc293bc57872ce4e4b528158",
+        "size_bytes": 7587,
+        "line_count": 150
+      },
+      "before": null,
+      "actual_unit1_final_archive": null,
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/diffs/crates__ep_runtime__src__heat_balance__ctf_reports_tests.rs.diff",
+        "sha256": "dc5cab3f5d14d1d9ea7e3029c9e5c4b5983eaeff95b0644a94b921d33628bec5",
+        "size_bytes": 7831,
+        "line_count": 153
+      }
+    }
+  ],
+  "source_context": {
+    "path": ".runtime/porting/CTF-10/report-output-prep-01/source-context.json",
+    "sha256": "b1f01b9fe286ac588447f95842bd5891f763296fa4ba9e1f79f6e7f0d456f848",
+    "size_bytes": 17925,
+    "line_count": 460
+  },
+  "README": {
+    "path": ".runtime/porting/CTF-10/report-output-prep-01/README.md",
+    "sha256": "12cc08457ef76a3ba7ac27d400415c5fe5141578d8accee8721c1bf59e29861f",
+    "size_bytes": 5751,
+    "line_count": 94
+  },
+  "runtime_interfaces": {
+    "loader_name_owner": "TypedModel.ctf_report_names: CtfReportNames {materials: Vec<(MaterialId,String)>,constructions: Vec<(ConstructionId,String)>}",
+    "prepare": "prepare_ctf_construction_report(&TypedModel,&ConstructionCtfPublicInitialization) -> Result<CtfConstructionReport,CtfReportUnavailable>",
+    "table": "PredefinedStringTable {entries: Option<Vec<PredefinedTableEntry>>,size_table_entry:i32,num_table_entry:i32}",
+    "layer_report": "report_ctf_layers(&CtfConstructionReport,&[i32],&mut PredefinedStringTable) -> Result<(),CtfReportUnavailable>",
+    "headers": "write_ctf_report_headers(&mut impl std::io::Write) -> std::io::Result<()>",
+    "EIO": "report_ctf_transfer_function(&CtfConstructionReport,&mut impl std::io::Write) -> Result<(),CtfReportError>",
+    "prefix_ownership": "Actual predefined table and Write sink remain caller-owned through any error and later fatal; no endpoint/diagnostic generated in an error replacement.",
+    "caller_requirements": [
+      "same genuine compiled/public generation",
+      "actual initialized pdchOpqConsLayCol registry supplied without invented IDs",
+      "actual completed ordered public loop and used flags",
+      "fresh local ErrorsFound/DoCTFErrorReport and real Scan cache/options/warnings",
+      "layer reports before Scan; selected headers and declared-counter EIO rows before final fatal"
+    ]
+  },
+  "source_checks": {
+    "five_parent_befores_equal_current_and_actual_unit1_final_archives": true,
+    "three_new_destinations_absent": true,
+    "compiler_only_four_successful_loader_name_insertions": true,
+    "other_parent_deltas_additive_only_with_exact_inverse": true,
+    "eight_exact_unified_diffs": true,
+    "new_tests_proposed": 8,
+    "tests_executed": false
+  },
+  "future_requirements": [
+    "Root and other-author FULL Source review before apply",
+    "actual same-input Native F/G byte comparisons including tie/carry/IEEE extremes",
+    "genuine initialized predefined registry and full table entry observations",
+    "genuine original layer/Name/material/public/EIO report observation custody",
+    "ordinary whole Init report/final-fatal backend composition remains next unit"
+  ],
+  "claims": {
+    "ordinary_postlude_activated": false,
+    "full_SetPredefinedTables_catalog_ported": false,
+    "source_QTF_suffix_supported": false,
+    "Native_stream_error_outcome_inferred": false,
+    "Native_report_or_numeric_PASS_claimed": false,
+    "CTF10_complete_claimed": false,
+    "canonical_edited": false,
+    "project_imported_or_executed": false,
+    "targets_or_formatter_run": false,
+    "scientific_outputs_or_binaries_read": false,
+    "Git_used": false
+  }
+}

@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -41,12 +42,21 @@ def store_bytes(data: bytes) -> dict:
     digest = hashlib.sha256(data).hexdigest()
     path = contained(OBJECTS / digest[:2] / digest, RAW)
     path.parent.mkdir(parents=True, exist_ok=True)
-    if path.exists():
-        if path.read_bytes() != data:
-            raise ValueError(f"Immutable source object differs: {path}")
-    else:
-        with path.open("xb") as stream:
+    if not path.exists():
+        with tempfile.NamedTemporaryFile(dir=path.parent, delete=False) as stream:
+            temporary = Path(stream.name)
             stream.write(data)
+            stream.flush()
+            os.fsync(stream.fileno())
+        try:
+            try:
+                os.link(temporary, path)
+            except FileExistsError:
+                pass
+        finally:
+            temporary.unlink()
+    if path.read_bytes() != data:
+        raise ValueError(f"Immutable source object differs: {path}")
     return {"path": path.relative_to(ROOT).as_posix(), "sha256": digest}
 
 

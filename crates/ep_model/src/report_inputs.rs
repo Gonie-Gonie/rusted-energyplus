@@ -77,3 +77,12 @@ impl Default for ReportInputs {
         }
     }
 }
+
+/// Actual selected loader name members retained separately from normalized IDs.
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
+pub struct CtfReportNames {
+    /// Regular names keep the JSON key; NoMass/AirGap getObjectItem names are uppercase.
+    pub materials: Vec<(crate::MaterialId, String)>,
+    /// Ordinary Construction getObjectItem Name members, in true producer order.
+    pub constructions: Vec<(crate::ConstructionId, String)>,
+}

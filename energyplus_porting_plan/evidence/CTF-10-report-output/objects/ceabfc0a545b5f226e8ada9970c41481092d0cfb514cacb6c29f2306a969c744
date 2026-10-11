@@ -1,0 +1,195 @@
+use ep_model::{ReportInputObject, ReportInputObjectType as Kind, TypedModel};
+use ep_raw_model::{FieldName, ObjectType, RawValue};
+
+use super::{Compiler, field_value};
+
+type AlphaField = (&'static str, Option<&'static str>);
+type ReportFamily = (Kind, &'static [AlphaField], u8);
+
+impl Compiler<'_> {
+    pub(super) fn parse_report_inputs(&mut self, model: &mut TypedModel) {
+        let families: [ReportFamily; 5] = [
+            (
+                Kind::SurfacesList,
+                &[("report_type", None), ("report_specifications", None)],
+                0,
+            ),
+            (
+                Kind::SurfacesDrawing,
+                &[
+                    ("report_type", None),
+                    ("report_specifications_1", Some("Triangulate3DFace")),
+                    ("report_specifications_2", None),
+                ],
+                0,
+            ),
+            (
+                Kind::VariableDictionary,
+                &[("key_field", Some("regular")), ("sort_option", None)],
+                1,
+            ),
+            (
+                Kind::Constructions,
+                &[("details_type_1", None), ("details_type_2", None)],
+                0,
+            ),
+            (
+                Kind::EnergyManagementSystem,
+                &[
+                    ("actuator_availability_dictionary_reporting", Some("None")),
+                    (
+                        "internal_variable_availability_dictionary_reporting",
+                        Some("None"),
+                    ),
+                    ("ems_runtime_language_debug_output_level", Some("None")),
+                ],
+                0,
+            ),
+        ];
+        model.report_inputs.legacy_variable_dictionary_sections = match self
+            .raw_model
+            .objects
+            .get(&ObjectType("Report Variable Dictionary".to_string()))
+        {
+            None => -1,
+            Some(objects) => match i32::try_from(objects.len()) {
+                Ok(count) => count,
+                Err(_) => {
+                    self.error(
+                        "TooManyReportObjects",
+                        "Report Variable Dictionary",
+                        None,
+                        None,
+                        "section count exceeds the source integer owner".to_string(),
+                    );
+                    0
+                }
+            },
+        };
+        for (kind, fields, min_fields) in families {
+            let object_type = kind.source_name();
+            let is_epjson = !self.raw_model.has_idf_declaration_order(object_type);
+            for (name, object) in self.objects(object_type) {
+                let mut alphas: [String; 3] = Default::default();
+                let mut alpha_blank = [true; 3];
+                let mut default_applied = [false; 3];
+                let mut max_fields = min_fields;
+                let mut valid = true;
+                for (index, (field, default)) in fields.iter().enumerate() {
+                    if object.fields.contains_key(&FieldName((*field).to_string())) {
+                        max_fields = max_fields.max([1, 2, 3][index]);
+                    }
+                    let text = match field_value(&object, field) {
+                        None => "",
+                        Some(RawValue::String(text)) => text,
+                        Some(_) => {
+                            self.error(
+                                "InvalidFieldType",
+                                object_type,
+                                Some(&name),
+                                Some(field),
+                                "report alpha field requires a string".to_string(),
+                            );
+                            valid = false;
+                            ""
+                        }
+                    };
+                    alpha_blank[index] = text.is_empty();
+                    let actual = if text.is_empty() {
+                        if let Some(default) = default {
+                            self.record_default(object_type, &name, field, default);
+                            default_applied[index] = true;
+                            *default
+                        } else {
+                            ""
+                        }
+                    } else {
+                        text
+                    };
+                    alphas[index] = actual.to_ascii_uppercase();
+                }
+                if !is_epjson {
+                    match field_value(&object, "idf_max_fields") {
+                        Some(RawValue::Number(value)) => match value.parse::<u8>() {
+                            Ok(value) if usize::from(value) <= fields.len() => {
+                                max_fields = value.max(min_fields)
+                            }
+                            _ => {
+                                self.error(
+                                    "InvalidIdfReportFieldCount",
+                                    object_type,
+                                    Some(&name),
+                                    None,
+                                    "actual staged-IDF report field count is not representable"
+                                        .to_string(),
+                                );
+                                valid = false;
+                            }
+                        },
+                        _ => {
+                            self.error("MissingIdfReportFieldCount", object_type, Some(&name), None, "validated IDF report order must retain its actual physical field count".to_string());
+                            valid = false;
+                        }
+                    }
+                }
+                if valid {
+                    model.report_inputs.objects.push(ReportInputObject {
+                        object_name: name,
+                        object_type: kind,
+                        alphas,
+                        alpha_blank,
+                        default_applied,
+                        num_alphas: max_fields,
+                        is_epjson,
+                    });
+                }
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::compile_raw_model;
+    use ep_raw_model::{parse_epjson_str, parse_epjson_str_with_idf_order};
+
+    #[test]
+    fn actual_a_report_requests_keep_native_default_and_blank_owners()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw = parse_epjson_str(
+            r#"{"Output:VariableDictionary":{"dictionary":{"key_field":"IDF"}},"Output:Surfaces:Drawing":{"drawing":{"report_type":"dxf:wireframe"}},"Output:Constructions":{"ctf":{"details_type_1":"Constructions"}}}"#,
+        )?;
+        let result = compile_raw_model(&raw);
+        let model = result.model.ok_or("typed report input unavailable")?;
+        let drawing = &model.report_inputs.objects[0];
+        assert_eq!(drawing.object_type, Kind::SurfacesDrawing);
+        assert_eq!(drawing.alphas, ["DXF:WIREFRAME", "TRIANGULATE3DFACE", ""]);
+        assert_eq!(drawing.alpha_blank, [false, true, true]);
+        assert_eq!(drawing.default_applied, [false, true, false]);
+        assert_eq!(drawing.num_alphas, 1);
+        assert_eq!(model.report_inputs.objects[1].alphas[0], "IDF");
+        assert_eq!(model.report_inputs.objects[2].alphas[0], "CONSTRUCTIONS");
+        Ok(())
+    }
+
+    #[test]
+    fn idf_unnamed_order_and_explicit_blank_second_alpha_survive()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw = parse_epjson_str_with_idf_order(
+            r#"{"Output:Constructions":{"Output:Constructions 1":{"details_type_1":"Materials"},"Output:Constructions 2":{"details_type_1":"Constructions"}}}"#,
+            "Output:Constructions, Materials,; Output:Constructions, Constructions;",
+        )?;
+        let model = compile_raw_model(&raw)
+            .model
+            .ok_or("typed report input unavailable")?;
+        let rows = &model.report_inputs.objects;
+        assert_eq!(rows[0].object_name, "Output:Constructions 1");
+        assert_eq!(rows[0].num_alphas, 2);
+        assert_eq!(rows[1].num_alphas, 1);
+        assert!(!rows[0].is_epjson);
+        assert_eq!(rows[0].alphas[1], "");
+        assert!(rows[0].alpha_blank[1]);
+        Ok(())
+    }
+}

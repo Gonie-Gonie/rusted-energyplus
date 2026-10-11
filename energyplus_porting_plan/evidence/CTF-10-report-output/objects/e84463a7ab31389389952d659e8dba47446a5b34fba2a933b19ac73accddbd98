@@ -1,0 +1,352 @@
+--- .runtime/porting/CTF-10/report-output-prep-01/proposed/crates/ep_runtime/src/heat_balance/ctf_reports.rs
++++ crates/ep_runtime/src/heat_balance/ctf_reports.rs
+@@ -1,9 +1,12 @@
+ //! Actual predefined string entries and selected no-source CTF EIO reporting.
+ 
+-use std::io::{self, Write};
+-use ep_model::{ConstructionId, Material, MaterialDefinition, MaterialId, MaterialSurfaceRoughness, NormalizedName, TypedModel};
+ use super::ctf_public_initialization::ConstructionCtfPublicInitialization;
+ use super::surface_manager::ctf_public_storage::CtfPublicCoefficientStorage;
++use ep_model::{
++    ConstructionId, Material, MaterialDefinition, MaterialId, MaterialSurfaceRoughness,
++    NormalizedName, TypedModel,
++};
++use std::io::{self, Write};
+ 
+ #[path = "ctf_reports_format.rs"]
+ mod formatting;
+@@ -45,15 +48,21 @@
+ }
+ 
+ impl From<CtfReportUnavailable> for CtfReportError {
+-    fn from(error: CtfReportUnavailable) -> Self { Self::Unavailable(error) }
++    fn from(error: CtfReportUnavailable) -> Self {
++        Self::Unavailable(error)
++    }
+ }
+ impl From<io::Error> for CtfReportError {
+-    fn from(error: io::Error) -> Self { Self::Io(error) }
++    fn from(error: io::Error) -> Self {
++        Self::Io(error)
++    }
+ }
+ impl std::fmt::Display for CtfReportError {
+     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+         match self {
+-            Self::Unavailable(error) => write!(formatter, "selected CTF report unavailable: {error:?}"),
++            Self::Unavailable(error) => {
++                write!(formatter, "selected CTF report unavailable: {error:?}")
++            }
+             Self::Io(error) => std::fmt::Display::fmt(error, formatter),
+         }
+     }
+@@ -95,16 +104,35 @@
+ impl PredefinedStringTable {
+     /// Literal incrementTableEntry then the string PreDefTableEntry assignments.
+     /// The real column ID is retained; this helper creates no substitute registry.
+-    pub fn string_entry(&mut self, column: i32, object: &str, text: &str) -> Result<(), CtfReportUnavailable> {
++    pub fn string_entry(
++        &mut self,
++        column: i32,
++        object: &str,
++        text: &str,
++    ) -> Result<(), CtfReportUnavailable> {
+         let index = if let Some(entries) = &mut self.entries {
+-            let size = usize::try_from(self.size_table_entry).map_err(|_| CtfReportUnavailable::TableOwner)?;
+-            if size == 0 || entries.len() != size || self.num_table_entry < 0 || self.num_table_entry > self.size_table_entry {
++            let size = usize::try_from(self.size_table_entry)
++                .map_err(|_| CtfReportUnavailable::TableOwner)?;
++            if size == 0
++                || entries.len() != size
++                || self.num_table_entry < 0
++                || self.num_table_entry > self.size_table_entry
++            {
+                 return Err(CtfReportUnavailable::TableOwner);
+             }
+-            let next = self.num_table_entry.checked_add(1).ok_or(CtfReportUnavailable::TableCapacity)?;
++            let next = self
++                .num_table_entry
++                .checked_add(1)
++                .ok_or(CtfReportUnavailable::TableCapacity)?;
+             if next > self.size_table_entry {
+-                let new_size = self.size_table_entry.checked_mul(2).ok_or(CtfReportUnavailable::TableCapacity)?;
+-                entries.resize(usize::try_from(new_size).map_err(|_| CtfReportUnavailable::TableCapacity)?, PredefinedTableEntry::default());
++                let new_size = self
++                    .size_table_entry
++                    .checked_mul(2)
++                    .ok_or(CtfReportUnavailable::TableCapacity)?;
++                entries.resize(
++                    usize::try_from(new_size).map_err(|_| CtfReportUnavailable::TableCapacity)?,
++                    PredefinedTableEntry::default(),
++                );
+                 self.size_table_entry = new_size;
+             }
+             self.num_table_entry = next;
+@@ -115,7 +143,10 @@
+             self.num_table_entry = 1;
+             0
+         };
+-        let entry = self.entries.as_mut().and_then(|entries| entries.get_mut(index))
++        let entry = self
++            .entries
++            .as_mut()
++            .and_then(|entries| entries.get_mut(index))
+             .ok_or(CtfReportUnavailable::TableOwner)?;
+         entry.char_entry = text.to_string();
+         entry.object_name = object.to_string();
+@@ -140,21 +171,50 @@
+ 
+ fn loader_name<I: Copy + Eq>(names: &[(I, String)], id: I) -> Result<&str, CtfReportUnavailable> {
+     let mut found = names.iter().filter(|(key, _)| *key == id);
+-    let value = found.next().ok_or(CtfReportUnavailable::LoaderNameUnavailable)?;
+-    if found.next().is_some() { return Err(CtfReportUnavailable::Association); }
++    let value = found
++        .next()
++        .ok_or(CtfReportUnavailable::LoaderNameUnavailable)?;
++    if found.next().is_some() {
++        return Err(CtfReportUnavailable::Association);
++    }
+     Ok(&value.1)
+ }
+ 
+-fn material_report<'a>(model: &'a TypedModel, material: &'a Material) -> Result<CtfMaterialReport<'a>, CtfReportUnavailable> {
++fn material_report<'a>(
++    model: &'a TypedModel,
++    material: &'a Material,
++) -> Result<CtfMaterialReport<'a>, CtfReportUnavailable> {
+     let name = loader_name(&model.ctf_report_names.materials, material.id)?;
+-    if NormalizedName::new(name) != material.name { return Err(CtfReportUnavailable::Association); }
++    if NormalizedName::new(name) != material.name {
++        return Err(CtfReportUnavailable::Association);
++    }
+     let (air_gap, values) = match material.definition {
+-        MaterialDefinition::Regular(value) => (false, [value.thickness_m, value.conductivity_w_per_m_k, value.density_kg_per_m3, value.specific_heat_j_per_kg_k, value.thermal_resistance_m2_k_per_w]),
+-        MaterialDefinition::NoMass(value) => (false, [0.0, 0.0, 0.0, 0.0, value.thermal_resistance_m2_k_per_w]),
+-        MaterialDefinition::AirGap(value) => (true, [0.0, 0.0, 0.0, 0.0, value.thermal_resistance_m2_k_per_w]),
++        MaterialDefinition::Regular(value) => (
++            false,
++            [
++                value.thickness_m,
++                value.conductivity_w_per_m_k,
++                value.density_kg_per_m3,
++                value.specific_heat_j_per_kg_k,
++                value.thermal_resistance_m2_k_per_w,
++            ],
++        ),
++        MaterialDefinition::NoMass(value) => (
++            false,
++            [0.0, 0.0, 0.0, 0.0, value.thermal_resistance_m2_k_per_w],
++        ),
++        MaterialDefinition::AirGap(value) => (
++            true,
++            [0.0, 0.0, 0.0, 0.0, value.thermal_resistance_m2_k_per_w],
++        ),
+         _ => return Err(CtfReportUnavailable::Material(material.id)),
+     };
+-    Ok(CtfMaterialReport { material_id: material.id, name, air_gap, values })
++    Ok(CtfMaterialReport {
++        material_id: material.id,
++        name,
++        air_gap,
++        values,
++    })
+ }
+ 
+ /// Borrowed actual construction/public/material report operands, without generation.
+@@ -178,36 +238,91 @@
+ 
+ /// Reuse actual compiled ordinary members and the same returned public row.
+ /// Used-row selection and completed-loop/fatal custody remain actual caller duties.
+-pub fn prepare_ctf_construction_report<'a>(model: &'a TypedModel, row: &'a ConstructionCtfPublicInitialization) -> Result<CtfConstructionReport<'a>, CtfReportUnavailable> {
+-    let construction = model.constructions.get(row.declared_index).ok_or(CtfReportUnavailable::Association)?;
+-    if construction.id != row.construction_id || construction.effective_layers() != row.original_material_ids || !construction.is_ordinary_opaque() || construction.internal_heat_source.is_some() {
++pub fn prepare_ctf_construction_report<'a>(
++    model: &'a TypedModel,
++    row: &'a ConstructionCtfPublicInitialization,
++) -> Result<CtfConstructionReport<'a>, CtfReportUnavailable> {
++    let construction = model
++        .constructions
++        .get(row.declared_index)
++        .ok_or(CtfReportUnavailable::Association)?;
++    if construction.id != row.construction_id
++        || construction.effective_layers() != row.original_material_ids
++        || !construction.is_ordinary_opaque()
++        || construction.internal_heat_source.is_some()
++    {
+         return Err(CtfReportUnavailable::UnsupportedConstruction);
+     }
+     let name = loader_name(&model.ctf_report_names.constructions, construction.id)?;
+-    if NormalizedName::new(name) != construction.name { return Err(CtfReportUnavailable::Association); }
+-    let public = &row.result.as_ref().map_err(|_| CtfReportUnavailable::PublicOwnerUnavailable)?.storage;
+-    let materials = row.original_material_ids.iter().map(|id| model.materials.iter().find(|material| material.id == *id).ok_or(CtfReportUnavailable::Material(*id))).collect::<Result<Vec<_>, _>>()?;
++    if NormalizedName::new(name) != construction.name {
++        return Err(CtfReportUnavailable::Association);
++    }
++    let public = &row
++        .result
++        .as_ref()
++        .map_err(|_| CtfReportUnavailable::PublicOwnerUnavailable)?
++        .storage;
++    let materials = row
++        .original_material_ids
++        .iter()
++        .map(|id| {
++            model
++                .materials
++                .iter()
++                .find(|material| material.id == *id)
++                .ok_or(CtfReportUnavailable::Material(*id))
++        })
++        .collect::<Result<Vec<_>, _>>()?;
+     let outside = materials.first().ok_or(CtfReportUnavailable::Association)?;
+     let inside = materials.last().ok_or(CtfReportUnavailable::Association)?;
+-    let outside_properties = *outside.surface_properties().ok_or(CtfReportUnavailable::Material(outside.id))?;
+-    let inside_properties = *inside.surface_properties().ok_or(CtfReportUnavailable::Material(inside.id))?;
+-    let outside_roughness = outside.roughness().ok_or(CtfReportUnavailable::Material(outside.id))?;
+-    let layers = materials.into_iter().map(|material| material_report(model, material)).collect::<Result<Vec<_>, _>>()?;
++    let outside_properties = *outside
++        .surface_properties()
++        .ok_or(CtfReportUnavailable::Material(outside.id))?;
++    let inside_properties = *inside
++        .surface_properties()
++        .ok_or(CtfReportUnavailable::Material(inside.id))?;
++    let outside_roughness = outside
++        .roughness()
++        .ok_or(CtfReportUnavailable::Material(outside.id))?;
++    let layers = materials
++        .into_iter()
++        .map(|material| material_report(model, material))
++        .collect::<Result<Vec<_>, _>>()?;
+     Ok(CtfConstructionReport {
+         construction_id: construction.id,
+-        declared_counter: i32::try_from(row.declared_index.checked_add(1).ok_or(CtfReportUnavailable::DeclaredCounter)?).map_err(|_| CtfReportUnavailable::DeclaredCounter)?,
+-        name, layers, public,
+-        absorptance: [outside_properties.thermal_absorptance, inside_properties.thermal_absorptance, outside_properties.solar_absorptance, inside_properties.solar_absorptance],
++        declared_counter: i32::try_from(
++            row.declared_index
++                .checked_add(1)
++                .ok_or(CtfReportUnavailable::DeclaredCounter)?,
++        )
++        .map_err(|_| CtfReportUnavailable::DeclaredCounter)?,
++        name,
++        layers,
++        public,
++        absorptance: [
++            outside_properties.thermal_absorptance,
++            inside_properties.thermal_absorptance,
++            outside_properties.solar_absorptance,
++            inside_properties.solar_absorptance,
++        ],
+         outside_roughness,
+     })
+ }
+ 
+ /// Actual reportLayers writes; an empty registry returns without any entry writes.
+ /// Supplied columns must be genuine pdchOpqConsLayCol IDs from the real registry.
+-pub fn report_ctf_layers(report: &CtfConstructionReport<'_>, columns: &[i32], table: &mut PredefinedStringTable) -> Result<(), CtfReportUnavailable> {
+-    if columns.is_empty() { return Ok(()); }
++pub fn report_ctf_layers(
++    report: &CtfConstructionReport<'_>,
++    columns: &[i32],
++    table: &mut PredefinedStringTable,
++) -> Result<(), CtfReportUnavailable> {
++    if columns.is_empty() {
++        return Ok(());
++    }
+     for (index, material) in report.layers.iter().enumerate() {
+-        let column = columns.get(index).ok_or(CtfReportUnavailable::MissingLayerColumn)?;
++        let column = columns
++            .get(index)
++            .ok_or(CtfReportUnavailable::MissingLayerColumn)?;
+         table.string_entry(*column, report.name, material.name)?;
+     }
+     Ok(())
+@@ -220,7 +335,9 @@
+         "! <Material CTF Summary>,Material Name,Thickness {m},Conductivity {w/m-K},Density {kg/m3},Specific Heat {J/kg-K},ThermalResistance {m2-K/w}\n",
+         "! <Material:Air CTF Summary>,Material Name,ThermalResistance {m2-K/w}\n",
+         "! <CTF>,Time,Outside,Cross,Inside,Flux (except final one)\n",
+-    ] { sink.write_all(header.as_bytes())?; }
++    ] {
++        sink.write_all(header.as_bytes())?;
++    }
+     Ok(())
+ }
+ 
+@@ -237,27 +354,69 @@
+ 
+ /// Literal selected no-source reportTransferFunction rows; no coefficient is
+ /// reevaluated. Actual Rust writer failures retain the already written prefix.
+-pub fn report_ctf_transfer_function(report: &CtfConstructionReport<'_>, sink: &mut impl Write) -> Result<(), CtfReportError> {
++pub fn report_ctf_transfer_function(
++    report: &CtfConstructionReport<'_>,
++    sink: &mut impl Write,
++) -> Result<(), CtfReportError> {
+     use formatting::{fixed as f, general as g};
+     let p = report.public;
+-    let terms = usize::try_from(p.num_ctf_terms).map_err(|_| CtfReportUnavailable::PublicCapacity(p.num_ctf_terms))?;
+-    if terms >= p.outside.len() { return Err(CtfReportUnavailable::PublicCapacity(p.num_ctf_terms).into()); }
+-    let row = format!(" Construction CTF,{},{:4},{:4},{:4},{},{},{},{},{},{},{}\n", report.name, report.declared_counter, report.layers.len(), p.num_ctf_terms, f(p.ctf_time_step,8,3),g(p.u_value,15,4)?,f(report.absorptance[0],8,3),f(report.absorptance[1],8,3),f(report.absorptance[2],8,3),f(report.absorptance[3],8,3),roughness_name(report.outside_roughness));
++    let terms = usize::try_from(p.num_ctf_terms)
++        .map_err(|_| CtfReportUnavailable::PublicCapacity(p.num_ctf_terms))?;
++    if terms >= p.outside.len() {
++        return Err(CtfReportUnavailable::PublicCapacity(p.num_ctf_terms).into());
++    }
++    let row = format!(
++        " Construction CTF,{},{:4},{:4},{:4},{},{},{},{},{},{},{}\n",
++        report.name,
++        report.declared_counter,
++        report.layers.len(),
++        p.num_ctf_terms,
++        f(p.ctf_time_step, 8, 3),
++        g(p.u_value, 15, 4)?,
++        f(report.absorptance[0], 8, 3),
++        f(report.absorptance[1], 8, 3),
++        f(report.absorptance[2], 8, 3),
++        f(report.absorptance[3], 8, 3),
++        roughness_name(report.outside_roughness)
++    );
+     sink.write_all(row.as_bytes())?;
+     for material in &report.layers {
+         let v = material.values;
+         let row = if material.air_gap {
+-            format!(" Material:Air CTF Summary,{},{}\n", material.name, g(v[4],12,4)?)
++            format!(
++                " Material:Air CTF Summary,{},{}\n",
++                material.name,
++                g(v[4], 12, 4)?
++            )
+         } else {
+-            format!(" Material CTF Summary,{},{},{},{},{},{}\n",material.name,f(v[0],8,4),f(v[1],14,3),f(v[2],11,3),f(v[3],13,3),g(v[4],12,4)?)
++            format!(
++                " Material CTF Summary,{},{},{},{},{},{}\n",
++                material.name,
++                f(v[0], 8, 4),
++                f(v[1], 14, 3),
++                f(v[2], 11, 3),
++                f(v[3], 13, 3),
++                g(v[4], 12, 4)?
++            )
+         };
+         sink.write_all(row.as_bytes())?;
+     }
+     for index in (0..=terms).rev() {
+         let row = if index != 0 {
+-            format!(" CTF,{index:4},{},{},{},{}\n",g(p.outside[index],20,8)?,g(p.cross[index],20,8)?,g(p.inside[index],20,8)?,g(p.flux[index],20,8)?)
++            format!(
++                " CTF,{index:4},{},{},{},{}\n",
++                g(p.outside[index], 20, 8)?,
++                g(p.cross[index], 20, 8)?,
++                g(p.inside[index], 20, 8)?,
++                g(p.flux[index], 20, 8)?
++            )
+         } else {
+-            format!(" CTF,{index:4},{},{},{}\n",g(p.outside[index],20,8)?,g(p.cross[index],20,8)?,g(p.inside[index],20,8)?)
++            format!(
++                " CTF,{index:4},{},{},{}\n",
++                g(p.outside[index], 20, 8)?,
++                g(p.cross[index], 20, 8)?,
++                g(p.inside[index], 20, 8)?
++            )
+         };
+         sink.write_all(row.as_bytes())?;
+     }

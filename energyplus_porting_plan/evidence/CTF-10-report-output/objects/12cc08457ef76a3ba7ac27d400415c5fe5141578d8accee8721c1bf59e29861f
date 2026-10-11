@@ -1,0 +1,94 @@
+# CTF-10 report output: implementation unit 2
+
+SOURCE-READY HELD. This package proposes real predefined string-table mutation
+and selected ordinary no-source CTF EIO reporting. It is unapplied and unexecuted.
+Root and another author must fully review it before application or execution.
+
+The prior whole-Init audit and input/Scan unit 1 remain immutable. Five parent
+befores are the current canonical bytes, also byte-identical to the actual unit1
+formatted archive rows. New files are confined to this preparation directory.
+
+## Actual source operands
+
+`prepare_ctf_construction_report` borrows a returned
+`ConstructionCtfPublicInitialization` row and the same compiled model. It keeps
+the original declared counter separately from ConstructionId, original unmerged
+outside-to-inside material order, public count/dt/U/coefficient buffers, selected
+surface absorptances and roughness. It invokes no CTF or material arithmetic.
+The caller must retain the real model/public generation and used-row selection.
+
+Regular Material uses the actual original JSON/IDF key spelling in Native Name.
+NoMass, AirGap and ordinary Construction use uppercase getObjectItem names.
+NormalizedName loses this distinction. The four successful compiler loaders now
+retain those actual names by original typed ID in `CtfReportNames`. No derived
+F/C construction or unsupported material name is invented. Existing coefficient
+generation, object counts, material values and declaration order are unchanged.
+
+NoMass's Thickness/Conductivity/Density/SpecHeat report as the four actual
+positive-zero MaterialBase defaults. Its stored Resistance is copied. Regular
+copies its five actual stored members, including loader Resistance; AirGap uses
+the distinct air-material row and stored Resistance. Original layer IDs are used
+directly, without merging, recomputing R, or consulting output files.
+
+## Table owner and output sink
+
+`PredefinedStringTable` retains actual allocation, occupied count, declared size
+and all eight members of every allocated TableEntryType slot. The unallocated
+branch allocates 100 and replaces both counters. The allocated branch increments
+and doubles only when required. A string entry then assigns only charEntry,
+objectName and indexColumn; untouched members and unused slots remain retained.
+
+`report_ctf_layers` uses supplied genuine pdchOpqConsLayCol column IDs. An empty
+column vector returns without writes, as Native does. This unit does not invent
+a registry or port the entire SetPredefinedTables catalog. A later ordinary
+caller needs its real initialized registry and allocation/counter owners. The
+selected Native catalog has ten layer columns; a missing column is a typed Rust
+representation boundary after any already written prefix, not a new Native
+guard or certification of its unchecked access.
+
+`write_ctf_report_headers` writes the four literal Init headers. Then
+`report_ctf_transfer_function` writes the actual construction row, original
+material rows and descending NumCTFTerms through zero. The zero row omits Flux.
+The selected no-internal-source boundary excludes the source/user QTF suffix.
+Counts outside fixed19 are explicit unavailable; no clipping or guessed output.
+
+The EIO sink is a caller-owned `std::io::Write`. Each real row writes immediately;
+there is no report buffer hidden inside an error. Actual writer errors return
+`CtfReportError::Io` while preserving the already written sink prefix. Typed
+scope/owner errors remain separate. Native stream failure/SQLite/callback/global
+fatal behavior is not inferred from these Rust sink errors.
+
+## Formatting and verification requirements
+
+Native IOFiles applies its custom rounding only to R/T formats. These report
+helpers use ordinary fmt8 F/G. The local formatter retains fixed widths, uppercase
+INF/NAN and exponent E, sign bits including negative zero/NaN, significant digits,
+rounded-exponent G notation choice and trailing-zero removal. It rounds once via
+Rust's standard decimal formatter, then changes decimal text layout only.
+No floating rescaling, tolerance, coefficient recomputation or expected array is
+introduced. Actual same-input Native byte comparisons across finite boundaries,
+ties/carry, large/subnormal values and nonfinite signs remain required before
+claiming formatter equivalence.
+
+Eight proposed tests cover formatting boundaries, table allocation/doubling and
+retained members, empty/real/missing columns, NoMass defaults/name absence,
+descending EIO rows/zero omission, fixed19 capacity, actual writer prefix failure,
+and the genuine compiler loader name rules. Test values are explicit report
+inputs or formatting literals, never Native endpoint observations. No tests ran.
+
+## Composition still required
+
+This unit does not activate ordinary postlude reporting. The real whole-Init
+caller must retain fresh local ErrorsFound/DoCTFErrorReport, global aggregates,
+all used layer-report writes before Scan, actual Scan cache/options/warnings,
+request-or-error header selection, declared-order used EIO writes, and final
+fatal after reporting. Unit3 owns the genuine error/display/backend integration.
+The table and EIO owners must remain caller-owned through that terminal failure.
+Full predefined registry creation, report input/Scan Native observations, real
+table and EIO byte observations, and ordinary whole-Init completion are pending.
+No gate, report completion, Native PASS, or scientific equivalence is claimed.
+
+Header authored the earlier selected public/lifecycle owners and this proposal;
+that authorship is not an independent formula certificate. Only Source was read
+or written. No project import, target, Cargo, formatter, engine, binary, scientific
+payload, weather payload, canonical edit or Git operation occurred.

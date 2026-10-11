@@ -1,0 +1,9 @@
+{
+  "schema": "immutable-source-publication-regression.v1",
+  "concurrent_processes": 8,
+  "writes_per_process": 3,
+  "all_readers_saw_complete_bytes": true,
+  "existing_corruption_rejected_without_overwrite": true,
+  "temporary_publish_files_remaining": 0,
+  "actual_recorder_sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba"
+}

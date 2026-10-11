@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "C:\Users\GonieGonie\Documents\GitHub\rusted-energyplus\.runtime\porting\CTF-10\run-report-output-quality-01.py", line 8, in <module>
+    subprocess.run(['python','-X','utf8','-B','tools/porting/record_command.py','--output-dir',str(destination),'--',*prior['command']],check=True)
+  File "C:\Users\GonieGonie\AppData\Local\Programs\Python\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['python', '-X', 'utf8', '-B', 'tools/porting/record_command.py', '--output-dir', '.runtime\\porting\\CTF-10\\report-output-clippy-command-01', '--', 'cargo', 'clippy', '--config', 'profile.dev.debug=0', '--config', 'profile.test.debug=0', '--config', 'build.incremental=false', '--locked', '--workspace', '--all-targets', '--', '-D', 'warnings']' returned non-zero exit status 101.

@@ -193,3 +193,56 @@ mod tests {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod ctf_report_name_tests {
+    use crate::compile_raw_model;
+    use ep_raw_model::parse_epjson_str;
+
+    #[test]
+    fn actual_selected_loaders_keep_distinct_report_name_rules()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw = parse_epjson_str(
+            r#"{
+            "Material":{"MiXeD regular":{"roughness":"Smooth","thickness":0.1,"conductivity":0.5,"density":1000.0,"specific_heat":1000.0}},
+            "Material:NoMass":{"MiXeD noMass":{"roughness":"Rough","thermal_resistance":0.25}},
+            "Material:AirGap":{"MiXeD gap":{"thermal_resistance":0.15}},
+            "Construction":{"MiXeD construction":{"outside_layer":"MiXeD regular","layer_2":"MiXeD gap","layer_3":"MiXeD noMass"}}
+        }"#,
+        )?;
+        let model = compile_raw_model(&raw)
+            .model
+            .ok_or("selected compiled report owners unavailable")?;
+        assert_eq!(
+            model
+                .ctf_report_names
+                .materials
+                .iter()
+                .map(|(_, name)| name.as_str())
+                .collect::<Vec<_>>(),
+            ["MiXeD regular", "MIXED NOMASS", "MIXED GAP"]
+        );
+        assert_eq!(
+            model
+                .ctf_report_names
+                .constructions
+                .iter()
+                .map(|(_, name)| name.as_str())
+                .collect::<Vec<_>>(),
+            ["MIXED CONSTRUCTION"]
+        );
+        for (id, name) in &model.ctf_report_names.materials {
+            let material = model
+                .materials
+                .iter()
+                .find(|material| material.id == *id)
+                .ok_or("original material ID missing")?;
+            assert_eq!(material.name, ep_model::NormalizedName::new(name));
+        }
+        assert_eq!(
+            model.constructions[0].id,
+            model.ctf_report_names.constructions[0].0
+        );
+        Ok(())
+    }
+}

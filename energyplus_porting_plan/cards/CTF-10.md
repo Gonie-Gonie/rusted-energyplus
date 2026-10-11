@@ -97,6 +97,12 @@ The [report-input and Scan evidence](../evidence/CTF-10-report-input-scan/summar
 Same-input genuine Native getter/cache/query comparison remains pending. The scan is not yet called by the ordinary whole-Init postlude; predefined/EIO reporting and final fatal backend composition remain pending.
 This milestone promotes no card gate; the earlier activation replay and ordinary CLI results retain their own recorded source identity.
 
+## Report output and error backend implementation
+
+Actual compiler names, construction layers, retained predefined string entries and borrowed EIO output are implemented. Source warning/continue/fatal output, counters, optional callbacks and SQLite adapter boundaries retain their real order and output prefix on failure.
+The [report output/backend evidence](../evidence/CTF-10-report-output/summary.json) records fmt/Clippy0, focused270 and workspace4880 PASS with21 added tests. The observer compilation failure and exact correction are retained. Concurrent recorder publication passed eight-process regression.
+Native Scan/getter and numeric-format byte comparisons, full registry/severe producer plumbing and ordinary whole-Init composition remain pending. No card gate is promoted.
+
 ## Retained failure-to-fix lineage
 
 The earlier public Clippy clone warning and borrowed-slice correction remain in the public-storage evidence.

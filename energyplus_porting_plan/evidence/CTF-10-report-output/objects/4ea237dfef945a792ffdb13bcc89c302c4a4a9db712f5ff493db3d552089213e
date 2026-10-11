@@ -1,0 +1,84 @@
+{
+  "schema": "ctf10-Root-error-backend-applied-source.v1",
+  "reviewed_source_preparation": {
+    "path": ".runtime/porting/CTF-10/error-backend-prep-02/manifest.json",
+    "sha256": "7b8d7401634f833fd9ccfbeaf42eab36144d53ae913ca0a28bfa2914405c276d",
+    "size_bytes": 19951
+  },
+  "Root_and_other_author_Source_review_accepted": true,
+  "actual_sources": [
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/error_backend.rs",
+      "held_source": {
+        "path": ".runtime/porting/CTF-10/error-backend-prep-02/proposed/crates/ep_runtime/src/heat_balance/error_backend.rs",
+        "sha256": "6bdf2fc63b1c7345039c636bcd6f70664e7a6a9017f9e9eca6df2a92e601f2a6",
+        "size_bytes": 13766,
+        "line_count": 271
+      },
+      "held_before": null,
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/error-backend-applied-01/final/00-error_backend.rs",
+        "sha256": "09f7e7b615e098d20decdeda2e88d7f945af6441b7a08ac5ff7db4151ca5b2ab",
+        "size_bytes": 15018
+      },
+      "actual_formatter_diff": {
+        "path": ".runtime/porting/CTF-10/error-backend-applied-01/format-diffs/00.diff",
+        "sha256": "b34355b67c6c9cb5e498a8dc70f93acd4ac8d7d6b9ff420a4b64a90c6b9f8c73",
+        "size_bytes": 13891
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/error_backend_tests.rs",
+      "held_source": {
+        "path": ".runtime/porting/CTF-10/error-backend-prep-02/proposed/crates/ep_runtime/src/heat_balance/error_backend_tests.rs",
+        "sha256": "68a8535d6d7cca5aeb4d33782ba5c8676f6192eadef49ef4c5a34548ca95e8ac",
+        "size_bytes": 14698,
+        "line_count": 248
+      },
+      "held_before": null,
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/error-backend-applied-01/final/01-error_backend_tests.rs",
+        "sha256": "d2e723cc9f519c72e373cdd8276224fecfd300506f6047cceb9405732feaa161",
+        "size_bytes": 16688
+      },
+      "actual_formatter_diff": {
+        "path": ".runtime/porting/CTF-10/error-backend-applied-01/format-diffs/01.diff",
+        "sha256": "c0e65de8db6de7d2c082b11155da380d7fdca0071e988f229c9a92a109fb2f23",
+        "size_bytes": 29876
+      }
+    },
+    {
+      "canonical_path": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "held_source": {
+        "path": ".runtime/porting/CTF-10/error-backend-prep-02/proposed/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "954197538ee3821bb133e1162464026aa7c3dfe8f9737da07db30339d305f34a",
+        "size_bytes": 1970,
+        "line_count": 78
+      },
+      "held_before": {
+        "path": ".runtime/porting/CTF-10/error-backend-prep-02/before/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "afe0802945648e97edb4aff129e6477c009ec5fb9595e690e89c640b832b302d",
+        "size_bytes": 1947,
+        "line_count": 77
+      },
+      "actual_final_source": {
+        "path": ".runtime/porting/CTF-10/error-backend-applied-01/final/02-mod.rs",
+        "sha256": "954197538ee3821bb133e1162464026aa7c3dfe8f9737da07db30339d305f34a",
+        "size_bytes": 1970
+      },
+      "actual_formatter_diff": {
+        "path": ".runtime/porting/CTF-10/error-backend-applied-01/format-diffs/02.diff",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    }
+  ],
+  "actual_formatter_execution": {
+    "path": ".runtime/porting/CTF-10/error-backend-format-command-01/receipt.json",
+    "sha256": "8778260db30960cbab964d79415407873c9c9a80ebf45fec9550ead0653015de",
+    "size_bytes": 3716
+  },
+  "formatter_correspondence_review_still_required": true,
+  "whole_Init_ordinary_postlude_activated": false,
+  "gates_updated": false
+}

@@ -12241,6 +12241,11 @@
         "path": "energyplus_porting_plan/evidence/CTF-10-report-input-scan/summary.json",
         "sha256": "9002f3a5a288bae27d5915122f2169be621636cad672fd8d03ac1f70acc8d772",
         "size_bytes": 4317
+      },
+      "actual_report_output_backend_implementation": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-report-output/summary.json",
+        "sha256": "35593be9f41b8e056c5d944371140820c9908be4b31a91f3348ff729384d61bd",
+        "size_bytes": 3873
       }
     },
     {
