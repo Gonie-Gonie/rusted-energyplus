@@ -1,0 +1,41 @@
+--- before/crates/ep_model/src/report_inputs.rs
++++ proposed/crates/ep_model/src/report_inputs.rs
+@@ -86,3 +86,38 @@
+     /// Ordinary Construction getObjectItem Name members, in true producer order.
+     pub constructions: Vec<(crate::ConstructionId, String)>,
+ }
++
++/// Genuine first SimulationControl getObjectItem alpha projection for the two
++/// sizing flags consumed by SetPredefinedTables. Other control fields are separate.
++#[derive(Clone, Debug, Eq, PartialEq)]
++pub struct SimulationControlSizingInput {
++    /// Actual first unique object's epJSON/IdfParser identity.
++    pub object_name: String,
++    /// Actual uppercase/default-applied zone and system sizing alpha owners.
++    pub alphas: [String; 2],
++    /// Actual missing/empty field facts before default substitution.
++    pub alpha_blank: [bool; 2],
++    /// Actual IDD No substitution facts, independent of the resulting value.
++    pub default_applied: [bool; 2],
++}
++
++/// Input-only prerequisite for the complete predefined registry.
++#[derive(Clone, Debug, Default, Eq, PartialEq)]
++pub struct PredefinedTableSizing {
++    /// None means no actual SimulationControl getter invocation was required.
++    pub first_object: Option<SimulationControlSizingInput>,
++}
++
++impl PredefinedTableSizing {
++    /// Literal GetProjectData false reset followed by the two actual YES tests.
++    #[must_use]
++    pub fn actual_flags(&self) -> (bool, bool) {
++        let mut do_zone_sizing = false;
++        let mut do_system_sizing = false;
++        if let Some(input) = &self.first_object {
++            if input.alphas[0] == "YES" { do_zone_sizing = true; }
++            if input.alphas[1] == "YES" { do_system_sizing = true; }
++        }
++        (do_zone_sizing, do_system_sizing)
++    }
++}

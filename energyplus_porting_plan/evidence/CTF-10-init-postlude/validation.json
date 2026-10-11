@@ -1,0 +1,141 @@
+{
+  "schema": "ctf10-init-postlude-actual-plan-validation.v1",
+  "actual_execution": {
+    "path": ".runtime/porting/CTF-10/postlude-registry-severe-plan-check-command-01/receipt.json",
+    "sha256": "9f6c0426495de4408dfa19659c284d29e9b40e971fc8beb8a372164b8957d6cd",
+    "size_bytes": 6508
+  },
+  "selected_files": [
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/postlude-registry-severe-finalize-command-01/receipt.json",
+        "sha256": "ccbbdb12b1f94e3ec25107971b6ba9b0d9e726e8c386f3485040333c0bcaca35",
+        "size_bytes": 6195
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-init-postlude/objects/ccbbdb12b1f94e3ec25107971b6ba9b0d9e726e8c386f3485040333c0bcaca35",
+        "sha256": "ccbbdb12b1f94e3ec25107971b6ba9b0d9e726e8c386f3485040333c0bcaca35",
+        "size_bytes": 6195
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/postlude-registry-severe-finalize-command-01/stdout.log",
+        "sha256": "e05a4f12e25bc95a9861d2180bbdac4e2956e36fdb3774d019696b44b6e72712",
+        "size_bytes": 178
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-init-postlude/objects/e05a4f12e25bc95a9861d2180bbdac4e2956e36fdb3774d019696b44b6e72712",
+        "sha256": "e05a4f12e25bc95a9861d2180bbdac4e2956e36fdb3774d019696b44b6e72712",
+        "size_bytes": 178
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/postlude-registry-severe-finalize-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-init-postlude/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/87/8790104a80664af191a9c49103364ca57edb7068aa814f25a8d3b1816b2fe807",
+        "sha256": "8790104a80664af191a9c49103364ca57edb7068aa814f25a8d3b1816b2fe807",
+        "size_bytes": 1620653
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-init-postlude/objects/8790104a80664af191a9c49103364ca57edb7068aa814f25a8d3b1816b2fe807",
+        "sha256": "8790104a80664af191a9c49103364ca57edb7068aa814f25a8d3b1816b2fe807",
+        "size_bytes": 1620653
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/publish-postlude-registry-severe-01.py",
+        "sha256": "43a73e80ba72627e29f8a6b9415c38a314e7d7ab27eb4b0c82f6fe7081021a9b",
+        "size_bytes": 5249
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-init-postlude/objects/43a73e80ba72627e29f8a6b9415c38a314e7d7ab27eb4b0c82f6fe7081021a9b",
+        "sha256": "43a73e80ba72627e29f8a6b9415c38a314e7d7ab27eb4b0c82f6fe7081021a9b",
+        "size_bytes": 5249
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/postlude-registry-severe-plan-check-command-01/receipt.json",
+        "sha256": "9f6c0426495de4408dfa19659c284d29e9b40e971fc8beb8a372164b8957d6cd",
+        "size_bytes": 6508
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-init-postlude/objects/9f6c0426495de4408dfa19659c284d29e9b40e971fc8beb8a372164b8957d6cd",
+        "sha256": "9f6c0426495de4408dfa19659c284d29e9b40e971fc8beb8a372164b8957d6cd",
+        "size_bytes": 6508
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/postlude-registry-severe-plan-check-command-01/stdout.log",
+        "sha256": "d876fbdcdbfd728e64dfa7f80ad8f3964264616ef3dd197d29d38311a93e9b7c",
+        "size_bytes": 415
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-init-postlude/objects/d876fbdcdbfd728e64dfa7f80ad8f3964264616ef3dd197d29d38311a93e9b7c",
+        "sha256": "d876fbdcdbfd728e64dfa7f80ad8f3964264616ef3dd197d29d38311a93e9b7c",
+        "size_bytes": 415
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/postlude-registry-severe-plan-check-command-01/stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-init-postlude/objects/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/source-objects/87/8790104a80664af191a9c49103364ca57edb7068aa814f25a8d3b1816b2fe807",
+        "sha256": "8790104a80664af191a9c49103364ca57edb7068aa814f25a8d3b1816b2fe807",
+        "size_bytes": 1620653
+      },
+      "stored": {
+        "path": "energyplus_porting_plan/evidence/CTF-10-init-postlude/objects/8790104a80664af191a9c49103364ca57edb7068aa814f25a8d3b1816b2fe807",
+        "sha256": "8790104a80664af191a9c49103364ca57edb7068aa814f25a8d3b1816b2fe807",
+        "size_bytes": 1620653
+      }
+    }
+  ],
+  "validated_documents": [
+    {
+      "path": "energyplus_porting_plan/plan.json",
+      "sha256": "ba8d1dfb4e696ef84d5637ccd84ee133d32abb459923505d29da50315ba88110",
+      "size_bytes": 780853
+    },
+    {
+      "path": "energyplus_porting_plan/cards/CTF-10.md",
+      "sha256": "5baeb682b8324fb511aa3554f0e6f0edbd66f9c2932f0a31f1b63a5c76206ef5",
+      "size_bytes": 13778
+    },
+    {
+      "path": "energyplus_porting_plan/CHECKLIST.md",
+      "sha256": "cc9e4fabfbc5253acc93da9c456e183af614728f147541c6efe1f8588ac65f90",
+      "size_bytes": 17727
+    },
+    {
+      "path": "energyplus_porting_plan/energyplus_porting_checklist.html",
+      "sha256": "0e835c93049aaa68ca61d84ac96112e083283eacbda0b09ca2ba78c67cef572e",
+      "size_bytes": 628293
+    }
+  ],
+  "gates_updated": false
+}

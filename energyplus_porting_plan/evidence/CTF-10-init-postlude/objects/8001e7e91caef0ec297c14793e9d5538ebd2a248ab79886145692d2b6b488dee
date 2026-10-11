@@ -1,0 +1,53 @@
+--- .runtime/porting/CTF-10/postlude-registry-severe-applied-01/held/crates__ep_runtime__src__heat_balance__error_backend.rs
++++ crates/ep_runtime/src/heat_balance/error_backend.rs
+@@ -341,26 +341,41 @@
+ 
+     /// Literal ShowSevereError counters/output/last text/SQLite/callback order.
+     pub fn show_severe_error(&mut self, message: &str) -> Result<(), SourceErrorBackendFailure> {
+-        for (&needle, count) in MESSAGE_SEARCH.iter().zip(&mut self.state.tracking.match_counts) {
++        for (&needle, count) in MESSAGE_SEARCH
++            .iter()
++            .zip(&mut self.state.tracking.match_counts)
++        {
+             if message.contains(needle) {
+                 increment(count, "MatchCounts")?;
+             }
+         }
+-        increment(&mut self.state.tracking.total_severe_errors, "TotalSevereErrors")?;
+-        if self.state.warmup_flag && !self.state.doing_sizing
+-            && !self.state.kickoff_simulation && !self.state.tracking.abort_processing
++        increment(
++            &mut self.state.tracking.total_severe_errors,
++            "TotalSevereErrors",
++        )?;
++        if self.state.warmup_flag
++            && !self.state.doing_sizing
++            && !self.state.kickoff_simulation
++            && !self.state.tracking.abort_processing
+         {
+-            increment(&mut self.state.tracking.total_severe_errors_during_warmup,
+-                "TotalSevereErrorsDuringWarmup")?;
++            increment(
++                &mut self.state.tracking.total_severe_errors_during_warmup,
++                "TotalSevereErrorsDuringWarmup",
++            )?;
+         }
+         if self.state.doing_sizing {
+-            increment(&mut self.state.tracking.total_severe_errors_during_sizing,
+-                "TotalSevereErrorsDuringSizing")?;
++            increment(
++                &mut self.state.tracking.total_severe_errors_during_sizing,
++                "TotalSevereErrorsDuringSizing",
++            )?;
+         }
+         self.show_error_message(&format!(" ** Severe  ** {message}"))?;
+         self.state.tracking.last_severe_error = message.to_owned();
+         if let Some(sqlite) = self.sqlite.as_deref_mut() {
+-            effect("SQLite create severe", sqlite.create_error_record(1, 1, message, 1))?;
++            effect(
++                "SQLite create severe",
++                sqlite.create_error_record(1, 1, message, 1),
++            )?;
+         }
+         if let Some(callback) = self.error_callback.as_deref_mut() {
+             callback(self.state, SourceErrorLevel::Severe, message);

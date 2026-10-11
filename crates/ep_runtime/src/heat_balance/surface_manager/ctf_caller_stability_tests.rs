@@ -328,3 +328,41 @@ fn scope_rejects_changed_attempt_bad_owner_and_undefined_increment() {
         Err(CtfCallerStabilityScopeError::OriginalLayerNames)
     );
 }
+
+#[test]
+fn severe_callback_failure_stops_before_continue_and_outgoing_flag_assignments() {
+    let mut value = coefficients(1, 1, 1.0, 1.0, 1.0);
+    value.context.ctf_time_step = 7.0;
+    let mut calls = Vec::new();
+    let result =
+        try_decide_selected_ctf_caller_stability(&value, value.context, flags(), names(), |call| {
+            calls.push(call.clone());
+            Err("actual severe output failure")
+        });
+    assert_eq!(
+        result,
+        Err(CtfCallerStabilityFailure::Diagnostic(
+            "actual severe output failure"
+        ))
+    );
+    assert_eq!(calls.len(), 1);
+    assert_eq!(calls[0].level, CtfCallerDiagnosticLevel::Severe);
+    assert_eq!(value.context.ctf_time_step.to_bits(), 7.0_f64.to_bits());
+}
+
+#[test]
+fn real_fatal_callback_stop_cannot_return_a_completed_caller_decision() {
+    let mut value = coefficients(1, 1, 0.0, 0.0, 0.0);
+    value.context.ctf_time_step = 8.0;
+    let mut calls = Vec::new();
+    let result =
+        try_decide_selected_ctf_caller_stability(&value, value.context, flags(), names(), |call| {
+            calls.push(call.level);
+            Err("actual fatal stop")
+        });
+    assert_eq!(
+        result,
+        Err(CtfCallerStabilityFailure::Diagnostic("actual fatal stop"))
+    );
+    assert_eq!(calls, [CtfCallerDiagnosticLevel::Fatal]);
+}

@@ -1,0 +1,100 @@
+# Complete predefined registry Source proposal
+
+This held proposal implements the complete pinned EnergyPlus 26.1
+`SetPredefinedTables` registration sequence and its three allocation helpers
+plus `addFootNoteSubTable`. It is unapplied and unexecuted. It supplies the
+genuine layer-column registry needed by the accepted CTF reportLayers owner;
+ordinary Init/backend/report completion and numerical gates remain pending.
+
+`PredefinedRegistry` retains the full allocated reportName, subTable and
+columnTag arrays, independent integer capacities and occupied counts, all
+1,301 named ID members and the actual pdchOpqConsLayCol vector. The three
+record types preserve every Source member. TableEntry, component-size,
+shadow and unrelated predefined aggregates remain separate caller owners;
+SetPredefinedTables does not touch them.
+
+`set_predefined_tables(&mut self, do_zone_sizing, do_system_sizing)` executes
+the whole literal sequence. The catalog contains 19 report calls, 113
+subtable calls, 1,053 column calls (including ten real layer-vector pushes),
+and 21 footnote calls. All strings, assignment names, parent operands,
+call order and the sole sizing conditional were checked against Source.
+The sizing branch contains one report, eight subtables and 85 columns.
+These are static Source inventories, not expected Native result records.
+
+The complete catalog is a separate Rust include, with one literal call per
+Source operation. The member-name include lists each actual declaration.
+These large static lists account for most proposal lines; there is no
+operation interpreter, generated runtime registry, added dependency or
+replacement proof framework.
+
+Default denotes the actual value-initialized registry created by
+EnergyPlusData's make_unique<OutputReportPredefinedData>() (or clear_state's
+value-initialized replacement). HH has 1,298 explicit zero member
+initializers and three AWHP integers without in-class initializers. Those
+three are zero in this genuine value-initialization context. Default does
+not assert initialized values for arbitrary default-initialized C++ storage.
+
+For unallocated arrays, each original helper allocates 100 records and
+resets its capacity/count to 100/1, even when supplied counters were stale.
+Allocated arrays increment the real count, double capacity when necessary,
+retain old slots and default-construct the new tail. Report creation writes
+all four report members and resets show=false. Subtable creation writes only
+name/report index, retaining a footnote in an existing next slot. Column
+creation writes heading/subtable index. Helpers accept the Source parent
+integers without inventing parent-index validation.
+
+Repeated Set calls append real records and ten more layer IDs. Named IDs
+assigned on that visit are replaced; skipped sizing IDs retain prior values.
+The retained vector is borrowed through opaque_layer_columns()->&[i32] by
+the accepted reportLayers function. No hardcoded layer column numbers or
+second independent registry are introduced.
+
+Rust representation failures reuse CtfReportUnavailable::TableOwner and
+TableCapacity. Missing/extra named members, incompatible allocated shape or
+unrepresentable signed arithmetic are unavailable, not invented Native
+diagnostics or successful returns. The literal footnote guard ignores
+negative/out-of-range indices; Source index zero passes its guard and then
+dereferences outside the one-based array. This Rust owner returns unavailable
+for that case and makes no full Native behavior claim. Allocation failure
+and arbitrary non-one-based imported arrays are outside this fixed owner.
+
+Eight unexecuted tests cover the genuine constructor context, allocation
+reset/growth with retained slots, selective member writes, actual catalog
+parent/layer associations, either sizing flag, repeated registration and
+skipped-ID retention, footnote boundaries and malformed imported owners.
+The catalog correspondence JSON records text-only checks, with no execution
+of Rust or Original and no endpoint values.
+
+The sole parent edit adds pub mod predefined_tables to actual formatted
+backend parent78. Four new module/include/test destinations are absent.
+Before bytes equal the immutable actual backend final archive. Another
+postlude declaration must be composed through a later actual-parent rebase;
+neither proposal may replace the other's declaration.
+
+Ordinary production connection is still required. Native ManageSimulation
+calls SetPredefinedTables after real state initialization/checks and before
+SetPreConstructionInputParameters. Native GetProjectData resets sizing flags
+false, then reads the first actual SimulationControl object and its YES
+fields. Current TypedModel/compiler do not retain these sizing flags. A
+future ordinary input/state producer must preserve that real default/getter
+sequence; this proposal takes the actual flags explicitly and does not force
+false. The current postlude will borrow this retained registry's layer IDs
+alongside its separate actual table, Scan state and caller-owned sinks.
+
+Genuine Native verification should capture constructor/retained arrays,
+counts, capacities, all named IDs and the layer vector before/after complete
+Set calls for both sizing conditions and repeated calls, plus the real
+reportLayers entries referencing these IDs. No output/hash/count/outcome or
+SourceSnapshot is predicted here. Root and an independent full Source peer
+must accept this hold before application; later actual comparison is needed
+before any registry/report equivalence claim. No canonical, Git, target,
+formatter, binary, weather or scientific-result operation was performed.
+
+## Fresh02 test transport correction
+
+The first hold is preserved. All eight tests now return Result and propagate
+successful helper and owner-access failures through ?/ok_or/map_err instead of
+unwrap, respecting the real workspace all-targets unwrap lint. No lint allowance,
+assertion, input, expected relation or production behavior changed. Registry,
+catalog, names and parent bytes are exact01; the complete Source checks carry
+forward. No formatter, compiler or test was executed.

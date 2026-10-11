@@ -60,6 +60,20 @@ pub enum CtfCallerStabilityScopeError {
     UndefinedHistoryIncrement,
 }
 
+/// A caller-domain rejection remains distinct from an actual diagnostic failure.
+#[derive(Debug, PartialEq)]
+pub enum CtfCallerStabilityFailure<E> {
+    /// Original selected caller domain/custody rejection.
+    Unavailable(CtfCallerStabilityScopeError),
+    /// The actual diagnostic callback stopped at this reached callpoint.
+    Diagnostic(E),
+}
+impl<E> From<CtfCallerStabilityScopeError> for CtfCallerStabilityFailure<E> {
+    fn from(value: CtfCallerStabilityScopeError) -> Self {
+        Self::Unavailable(value)
+    }
+}
+
 /// Only the two source branches which increment the next timestep/history.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CtfCallerRetryReason {
@@ -158,15 +172,19 @@ fn increment_history(context: &mut CtfAssemblyContext) -> Result<(), CtfCallerSt
     Ok(())
 }
 
-fn emit(
+fn emit<E>(
+    diagnostic: &mut impl FnMut(&CtfCallerDiagnostic) -> Result<(), E>,
     records: &mut Vec<CtfCallerDiagnostic>,
     level: CtfCallerDiagnosticLevel,
     message: impl Into<String>,
-) {
-    records.push(CtfCallerDiagnostic {
+) -> Result<(), CtfCallerStabilityFailure<E>> {
+    let record = CtfCallerDiagnostic {
         level,
         message: message.into(),
-    });
+    };
+    diagnostic(&record).map_err(CtfCallerStabilityFailure::Diagnostic)?;
+    records.push(record);
+    Ok(())
 }
 
 /// Consume one actually returned private08 owner and the same caller stamp.
@@ -180,10 +198,32 @@ pub fn decide_selected_ctf_caller_stability(
     flags: CtfCallerSharedFlags,
     names: CtfCallerDiagnosticNames<'_>,
 ) -> Result<CtfCallerStabilityDecision, CtfCallerStabilityScopeError> {
+    match try_decide_selected_ctf_caller_stability(
+        coefficients,
+        caller_context,
+        flags,
+        names,
+        |_| Ok::<(), std::convert::Infallible>(()),
+    ) {
+        Ok(actual) => Ok(actual),
+        Err(CtfCallerStabilityFailure::Unavailable(error)) => Err(error),
+        Err(CtfCallerStabilityFailure::Diagnostic(never)) => match never {},
+    }
+}
+
+/// Invoke each real diagnostic at its Source callpoint before flags/break/return.
+/// A callback error returns immediately; the caller retains its actual output prefix.
+pub fn try_decide_selected_ctf_caller_stability<E>(
+    coefficients: &CtfFinalCoefficients,
+    caller_context: CtfAssemblyContext,
+    flags: CtfCallerSharedFlags,
+    names: CtfCallerDiagnosticNames<'_>,
+    mut diagnostic: impl FnMut(&CtfCallerDiagnostic) -> Result<(), E>,
+) -> Result<CtfCallerStabilityDecision, CtfCallerStabilityFailure<E>> {
     use CtfCallerDiagnosticLevel::{Continue, Fatal, Severe};
     use CtfCallerStabilityScopeError as Error;
     if let CtfAssemblyRoute::Unavailable(_) = caller_context.route {
-        return Err(Error::UnavailableRoute);
+        return Err(Error::UnavailableRoute.into());
     }
     if caller_context.solution_dimensions != 1
         || caller_context.source_sink_present
@@ -191,10 +231,10 @@ pub fn decide_selected_ctf_caller_stability(
         || caller_context.node_user_temp != 0
         || caller_context.attempt_ordinal == 0
     {
-        return Err(Error::UnsupportedContext);
+        return Err(Error::UnsupportedContext.into());
     }
     if !same_context(coefficients.context, caller_context) {
-        return Err(Error::AttemptContextMismatch);
+        return Err(Error::AttemptContextMismatch.into());
     }
     let n = usize::try_from(coefficients.rcmax)
         .ok()
@@ -204,7 +244,7 @@ pub fn decide_selected_ctf_caller_stability(
     let terms =
         usize::try_from(coefficients.num_ctf_terms).map_err(|_| Error::PrivateOwnerShape)?;
     if coefficients.s.len() != history_size || coefficients.e.len() != n || terms > n {
-        return Err(Error::PrivateOwnerShape);
+        return Err(Error::PrivateOwnerShape.into());
     }
     let mut result = CtfCallerStabilityDecision {
         input_context: caller_context,
@@ -265,13 +305,14 @@ pub fn decide_selected_ctf_caller_stability(
             }
         } else {
             emit(
+                &mut diagnostic,
                 &mut result.diagnostics,
                 Fatal,
                 format!(
                     "Illegal construction definition, no CTFs calculated for {}",
                     names.construction_name
                 ),
-            );
+            )?;
             result.outcome = CtfCallerStabilityOutcome::FatalNoCtfs;
             return Ok(result);
         }
@@ -282,45 +323,50 @@ pub fn decide_selected_ctf_caller_stability(
             .filter(|&count| count > 0)
             .ok_or(Error::OriginalLayerNames)?;
         if names.original_layer_material_names.len() != count {
-            return Err(Error::OriginalLayerNames);
+            return Err(Error::OriginalLayerNames.into());
         }
         emit(
+            &mut diagnostic,
             &mut result.diagnostics,
             Severe,
             format!(
                 "CTF calculation convergence problem for Construction=\"{}\".",
                 names.construction_name
             ),
-        );
+        )?;
         emit(
+            &mut diagnostic,
             &mut result.diagnostics,
             Continue,
             "...with Materials (outside layer to inside)",
-        );
+        )?;
         emit(
+            &mut diagnostic,
             &mut result.diagnostics,
             Continue,
             format!("(outside)=\"{}\"", names.original_layer_material_names[0]),
-        );
+        )?;
         for layer in 2..=count {
             if layer != count {
                 emit(
+                    &mut diagnostic,
                     &mut result.diagnostics,
                     Continue,
                     format!(
                         "(next)=\"{}\"",
                         names.original_layer_material_names[layer - 1]
                     ),
-                );
+                )?;
             } else {
                 emit(
+                    &mut diagnostic,
                     &mut result.diagnostics,
                     Continue,
                     format!(
                         "(inside)=\"{}\"",
                         names.original_layer_material_names[layer - 1]
                     ),
-                );
+                )?;
             }
         }
         for message in [
@@ -338,7 +384,7 @@ pub fn decide_selected_ctf_caller_stability(
             "may also result in problems.  After confirming that the input is correct and",
             "realistic, the user should contact the EnergyPlus support team.",
         ] {
-            emit(&mut result.diagnostics, Continue, message);
+            emit(&mut diagnostic, &mut result.diagnostics, Continue, message)?;
         }
         result.flags_after.do_ctf_error_report = true;
         result.flags_after.errors_found = true;

@@ -1,0 +1,78 @@
+"""Verify tested bytes and Git LF conversion, then commit/push the producer batch."""
+import hashlib
+import io
+import json
+import shutil
+import subprocess
+from pathlib import Path
+ROOT = Path.cwd().resolve()
+BASE = ROOT / '.runtime/porting/CTF-10'
+OUT = ROOT / 'energyplus_porting_plan/evidence/CTF-10-init-postlude'
+SOURCE = '8790104a80664af191a9c49103364ca57edb7068aa814f25a8d3b1816b2fe807'
+def read(path): return json.loads(path.read_bytes())
+def ref(path):
+    data = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(data).hexdigest(), 'size_bytes': len(data)}
+def write(path, value): path.write_bytes((json.dumps(value, indent=2, allow_nan=False) + '\n').encode())
+accepted = read(OUT / 'accepted.json')
+assert accepted['independent_Source_and_formatter_correspondence_review_accepted'] is True
+sources = [row['canonical_path'] for row in accepted['actual_sources']]
+assert len(sources) == 24
+for row in accepted['actual_sources']: assert ref(ROOT / row['canonical_path'])['sha256'] == row['actual_final_source']['sha256']
+docs = ['energyplus_porting_plan/' + name for name in ['plan.json', 'cards/CTF-10.md', 'CHECKLIST.md', 'energyplus_porting_checklist.html']]
+validation_path = BASE / 'postlude-registry-severe-plan-check-command-01/receipt.json'
+validation = read(validation_path)
+assert validation['command'] == ['python', '-X', 'utf8', '-B', 'tools/porting/check_plan.py', '--check']
+rows = []
+for name in ['postlude-registry-severe-finalize-command-01', 'postlude-registry-severe-plan-check-command-01']:
+    path = BASE / name / 'receipt.json'
+    receipt = read(path)
+    assert receipt['exit_code'] == 0 and receipt['source_bytes_match_before_and_after'] is True and receipt['source_snapshot']['sha256'] == SOURCE
+    files = [path, *[ROOT / receipt[key]['path'] for key in ['stdout', 'stderr', 'source_snapshot']]]
+    if name.endswith('finalize-command-01'): files.append(Path(__file__).resolve())
+    for file in files:
+        original = ref(file)
+        stored = OUT / 'objects' / original['sha256']
+        if not stored.exists(): shutil.copyfile(file, stored)
+        assert stored.read_bytes() == file.read_bytes()
+        rows.append({'original': original, 'stored': ref(stored)})
+write(OUT / 'validation.json', {'schema': 'ctf10-init-postlude-actual-plan-validation.v1',
+    'actual_execution': ref(validation_path), 'selected_files': rows, 'validated_documents': [ref(ROOT / name) for name in docs], 'gates_updated': False})
+prefix = OUT.relative_to(ROOT).as_posix() + '/'
+def staged(): return set(subprocess.check_output(['git', 'diff', '--cached', '--name-only', '--no-renames', '-z']).decode().split('\0')[:-1])
+def allowed(name): return name in sources or name in docs or name.startswith(prefix)
+assert all(allowed(name) for name in staged())
+subprocess.run(['git', 'diff', '--check'], check=True)
+subprocess.run(['git', 'add', '--', *sources, *docs, OUT.relative_to(ROOT).as_posix()], check=True)
+conversions = []
+for name in sources:
+    actual = (ROOT / name).read_bytes()
+    indexed = subprocess.check_output(['git', 'show', ':' + name])
+    assert indexed == actual.replace(b'\r\n', b'\n')
+    if indexed != actual:
+        assert name == 'crates/ep_model/src/model.rs'
+        conversions.append({'canonical_path': name, 'actual_tested_worktree_source': ref(ROOT / name),
+            'actual_index_SHA256': hashlib.sha256(indexed).hexdigest(), 'actual_index_size_bytes': len(indexed),
+            'conversion': 'Git text=auto eol=lf converts CRLF to LF on staging; raw tested worktree/archive remains unchanged.'})
+write(OUT / 'git-index-normalization.json', {'schema': 'ctf10-actual-index-line-endings.v1',
+    'actual_gitattributes': ref(ROOT / '.gitattributes'), 'actual_conversions': conversions,
+    'raw_worktree_Source_modified_by_publication': False})
+subprocess.run(['git', 'add', '--', OUT.relative_to(ROOT).as_posix()], check=True)
+names = sorted(staged())
+assert names and all(allowed(name) for name in names)
+stream = io.BytesIO(subprocess.check_output(['git', 'cat-file', '--batch'], input=('\n'.join(':' + name for name in names) + '\n').encode()))
+for name in names:
+    header = stream.readline().decode().strip().split()
+    assert len(header) == 3 and header[1] == 'blob'
+    body = stream.read(int(header[2]))
+    actual = (ROOT / name).read_bytes()
+    expected = actual.replace(b'\r\n', b'\n') if name in sources else actual
+    assert stream.read(1) == b'\n' and body == expected
+    assert hashlib.sha1(b'blob ' + str(len(body)).encode() + b'\0' + body).hexdigest() == header[0]
+assert stream.read() == b''
+print('Verified complete indexed files:', len(names), 'explicit LF conversions:', len(conversions), flush=True)
+subprocess.run(['git', 'commit', '--quiet', '-m', 'feat(ctf): complete registry and initialization postlude'], check=True)
+subprocess.run(['git', 'push', 'origin', 'main'], check=True)
+assert not subprocess.check_output(['git', 'status', '--porcelain'])
+assert subprocess.check_output(['git', 'rev-list', '--left-right', '--count', 'HEAD...origin/main']).decode().strip() == '0\t0'
+print('Committed and pushed clean producer batch:', subprocess.check_output(['git', 'rev-parse', 'HEAD']).decode().strip(), flush=True)

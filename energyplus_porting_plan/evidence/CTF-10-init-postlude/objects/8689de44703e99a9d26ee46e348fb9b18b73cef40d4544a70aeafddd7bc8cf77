@@ -1,0 +1,284 @@
+use super::*;
+use ep_model::{
+    MaterialSurfaceRoughness, NoMassMaterial, NormalizedName, OpaqueSurfaceProperties,
+    RegularMaterial,
+};
+
+type TestResult = Result<(), Box<dyn std::error::Error>>;
+
+fn context() -> CtfLayerContext {
+    CtfLayerContext {
+        is_used_ctf: true,
+        errors_found: false,
+        source_sink_present: false,
+        solution_dimensions: 1,
+    }
+}
+
+fn mass(id: u32) -> CtfLayerInput {
+    CtfLayerInput {
+        material_id: MaterialId(id),
+        thickness: 0.1,
+        conductivity: 2.0,
+        density: 2000.0,
+        specific_heat: 800.0,
+        resistance: 0.05,
+        resistance_only: false,
+    }
+}
+
+fn no_mass(id: u32, resistance: f64) -> CtfLayerInput {
+    CtfLayerInput {
+        material_id: MaterialId(id),
+        thickness: 0.0,
+        conductivity: 0.0,
+        density: 0.0,
+        specific_heat: 0.0,
+        resistance,
+        resistance_only: true,
+    }
+}
+
+fn execute(
+    inputs: &[CtfLayerInput],
+    context: CtfLayerContext,
+) -> Result<CtfLayerPreprocessing, Box<dyn std::error::Error>> {
+    preprocess_ctf_layers(inputs, context)
+        .map_err(|error| std::io::Error::other(format!("selected preprocessing: {error:?}")).into())
+}
+
+#[test]
+fn adapter_copies_the_stored_regular_resistance_without_recomputing() -> TestResult {
+    let material = Material {
+        id: MaterialId(7),
+        name: NormalizedName::new("stored"),
+        definition: MaterialDefinition::Regular(RegularMaterial {
+            roughness: MaterialSurfaceRoughness::MediumRough,
+            thickness_m: 0.1,
+            conductivity_w_per_m_k: 2.0,
+            density_kg_per_m3: 2000.0,
+            specific_heat_j_per_kg_k: 800.0,
+            thermal_resistance_m2_k_per_w: 0.75,
+            surface: OpaqueSurfaceProperties::default(),
+        }),
+    };
+    let inputs = material_layer_inputs(&[&material])
+        .map_err(|error| std::io::Error::other(format!("material input: {error:?}")))?;
+    assert_eq!(inputs[0].resistance, 0.75);
+    assert!(!inputs[0].resistance_only);
+    Ok(())
+}
+
+#[test]
+fn adapter_copies_no_mass_resistance_with_source_base_defaults() -> TestResult {
+    let material = Material {
+        id: MaterialId(8),
+        name: NormalizedName::new("R"),
+        definition: MaterialDefinition::NoMass(NoMassMaterial {
+            roughness: MaterialSurfaceRoughness::MediumRough,
+            thermal_resistance_m2_k_per_w: 0.25,
+            surface: OpaqueSurfaceProperties::default(),
+        }),
+    };
+    let inputs = material_layer_inputs(&[&material])
+        .map_err(|error| std::io::Error::other(format!("material input: {error:?}")))?;
+    assert_eq!(inputs, [no_mass(8, 0.25)]);
+    Ok(())
+}
+
+#[test]
+fn ordinary_mass_keeps_si_fields_then_converts_in_source_order() -> TestResult {
+    let input = mass(1);
+    let result = execute(&[input], context())?;
+    let loaded = result
+        .after_load
+        .ok_or_else(|| std::io::Error::other("after load"))?;
+    let converted = result
+        .after_conversion
+        .ok_or_else(|| std::io::Error::other("converted"))?;
+    assert_eq!(loaded.layers[0].cp, input.specific_heat);
+    assert!(!loaded.layers[0].res_layer);
+    let layer = converted.active.layers[0];
+    assert_eq!(
+        layer.lr.to_bits(),
+        ((input.thickness / input.conductivity) * CFU).to_bits()
+    );
+    assert_eq!(layer.dl.to_bits(), (input.thickness / CFL).to_bits());
+    assert_eq!(layer.rk.to_bits(), (input.conductivity / CFK).to_bits());
+    assert_eq!(layer.rho.to_bits(), (input.density / CFD).to_bits());
+    assert_eq!(
+        layer.cp.to_bits(),
+        (input.specific_heat / (CFC * 1000.0)).to_bits()
+    );
+    assert_eq!(converted.dyn_spacing, 0.0);
+    assert_eq!(converted.conductance.to_bits(), (1.0 / layer.lr).to_bits());
+    Ok(())
+}
+
+#[test]
+fn boundary_resistive_layers_use_air_but_interior_no_mass_is_exact() -> TestResult {
+    let result = execute(
+        &[no_mass(1, 0.25), no_mass(2, 0.5), no_mass(3, 1.0)],
+        context(),
+    )?;
+    let loaded = result
+        .after_load
+        .ok_or_else(|| std::io::Error::other("after load"))?;
+    assert_eq!(loaded.num_res_layers, 3);
+    assert!(loaded.layers.iter().all(|layer| layer.res_layer));
+    for index in [0, 2] {
+        let layer = loaded.layers[index];
+        assert_eq!((layer.cp, layer.rho, layer.rk), (1.007, 1.1614, 0.0263));
+        assert_eq!(layer.dl.to_bits(), (layer.rk * layer.lr).to_bits());
+    }
+    assert_eq!(
+        (
+            loaded.layers[1].cp,
+            loaded.layers[1].rho,
+            loaded.layers[1].rk
+        ),
+        (0.0, 0.0, 1.0)
+    );
+    assert_eq!(loaded.layers[1].dl, loaded.layers[1].lr);
+    assert_eq!(result.after_merge.map(|value| value.layers.len()), Some(3));
+    Ok(())
+}
+
+#[test]
+fn adjacent_interior_resistive_layers_merge_left_to_right_only() -> TestResult {
+    let inputs = [
+        mass(0),
+        no_mass(1, 0.125),
+        no_mass(2, 0.25),
+        no_mass(3, 0.5),
+        mass(4),
+    ];
+    let original = inputs;
+    let result = execute(&inputs, context())?;
+    let loaded = result
+        .after_load
+        .ok_or_else(|| std::io::Error::other("after load"))?;
+    let merged = result
+        .after_merge
+        .ok_or_else(|| std::io::Error::other("after merge"))?;
+    assert_eq!(inputs, original);
+    assert_eq!(loaded.layers.len(), 5);
+    assert_eq!(merged.layers.len(), 3);
+    assert_eq!(merged.num_res_layers, 1);
+    assert_eq!(
+        merged.layers[1].lr.to_bits(),
+        ((0.125_f64 + 0.25) + 0.5).to_bits()
+    );
+    assert_eq!(
+        (
+            merged.layers[1].cp,
+            merged.layers[1].rho,
+            merged.layers[1].rk
+        ),
+        (0.0, 0.0, 1.0)
+    );
+    assert_eq!(merged.layers[0], loaded.layers[0]);
+    assert_eq!(merged.layers[2], loaded.layers[4]);
+    Ok(())
+}
+
+#[test]
+fn res_layer_is_distinct_from_material_r_only() -> TestResult {
+    let mut thin = mass(2);
+    thin.thickness = 1.0e-12;
+    thin.resistance = 0.25;
+    let result = execute(&[mass(1), thin, mass(3)], context())?;
+    let loaded = result
+        .after_load
+        .ok_or_else(|| std::io::Error::other("after load"))?;
+    assert!(loaded.layers[1].res_layer);
+    assert!(!thin.resistance_only);
+    assert_eq!(loaded.layers[1].lr, thin.resistance);
+    assert_eq!(loaded.layers[1].cp, 1.007);
+    Ok(())
+}
+
+#[test]
+fn conductivity_limit_is_inclusive_and_thin_limit_is_strict() -> TestResult {
+    let mut low_k = mass(1);
+    low_k.conductivity = 1.0e-6;
+    let mut at_thin_limit = mass(2);
+    at_thin_limit.thickness = 1.0e-6;
+    at_thin_limit.conductivity = 1.0;
+    at_thin_limit.density = 1.0;
+    at_thin_limit.specific_heat = 1.0;
+    let result = execute(&[low_k, at_thin_limit], context())?;
+    let loaded = result
+        .after_load
+        .ok_or_else(|| std::io::Error::other("after load"))?;
+    assert!(loaded.layers[0].res_layer);
+    assert!(!loaded.layers[1].res_layer);
+    Ok(())
+}
+
+#[test]
+fn errors_are_sticky_and_loading_does_not_stop_at_first_error() -> TestResult {
+    let mut thick = mass(1);
+    thick.thickness = 3.1;
+    let result = execute(&[thick, no_mass(2, 0.0001), mass(3)], context())?;
+    assert!(result.errors_found);
+    assert_eq!(
+        result.issues,
+        [
+            CtfLayerIssue::MaterialTooThick(1),
+            CtfLayerIssue::ResistanceBelowMinimum(2)
+        ]
+    );
+    assert_eq!(result.after_load.map(|value| value.layers.len()), Some(3));
+    assert!(result.after_merge.is_none());
+    assert!(result.after_conversion.is_none());
+    let incoming = execute(
+        &[mass(1)],
+        CtfLayerContext {
+            errors_found: true,
+            ..context()
+        },
+    )?;
+    assert!(incoming.after_load.is_some());
+    assert!(incoming.after_merge.is_none());
+    Ok(())
+}
+
+#[test]
+fn unused_returns_before_scope_or_material_loading() -> TestResult {
+    let result = execute(
+        &[],
+        CtfLayerContext {
+            is_used_ctf: false,
+            errors_found: true,
+            source_sink_present: true,
+            solution_dimensions: 2,
+        },
+    )?;
+    assert!(result.skipped_unused && result.errors_found);
+    assert!(result.after_load.is_none());
+    Ok(())
+}
+
+#[test]
+fn source_nonfinite_division_is_not_normalized_or_guarded() -> TestResult {
+    let mut input = mass(1);
+    input.thickness = 0.0;
+    input.density = f64::NAN;
+    let result = execute(&[input], context())?;
+    let converted = result
+        .after_conversion
+        .ok_or_else(|| std::io::Error::other("converted"))?;
+    assert_eq!(converted.total_resistance, 0.0);
+    assert_eq!(converted.conductance, f64::INFINITY);
+    input.thickness = f64::NAN;
+    let result = execute(&[input], context())?;
+    assert!(
+        result
+            .after_conversion
+            .ok_or_else(|| std::io::Error::other("converted"))?
+            .conductance
+            .is_nan()
+    );
+    Ok(())
+}

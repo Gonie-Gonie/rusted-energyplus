@@ -241,7 +241,8 @@ impl ConstructionThermalDataCache {
             entries.push(entry);
         }
 
-        public_initialization.finish_declared_loop(model.constructions.len());
+        public_initialization
+            .finish_declared_loop_with_flags(model.constructions.len(), shared_flags);
         validate_surface_construction_families(model, &construction_slots)?;
 
         let coefficient_cache_hash = construction_cache_hash(&entries);

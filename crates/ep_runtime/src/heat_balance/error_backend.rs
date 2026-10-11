@@ -15,6 +15,8 @@ pub enum SourceErrorLevel {
     Continue = 0,
     /// ShowWarningError's unformatted callback argument.
     Warning = 2,
+    /// ShowSevereError's unformatted callback argument.
+    Severe = 3,
     /// ShowFatalError's final callback before termination.
     Fatal = 4,
 }
@@ -28,6 +30,10 @@ pub struct SourceErrorTracking {
     pub abort_processing: bool,
     /// Actual severe count read by the fatal summary; fatal does not increment it.
     pub total_severe_errors: i32,
+    /// Actual severe warmup count, with the original warmup guards.
+    pub total_severe_errors_during_warmup: i32,
+    /// Actual severe sizing count.
+    pub total_severe_errors_during_sizing: i32,
     /// Actual last severe text read by the fatal summary.
     pub last_severe_error: String,
     /// Actual warning total, incremented by ShowWarningError only.
@@ -329,6 +335,50 @@ impl SourceErrorBackend<'_> {
         }
         if let Some(callback) = self.error_callback.as_deref_mut() {
             callback(self.state, SourceErrorLevel::Warning, message);
+        }
+        Ok(())
+    }
+
+    /// Literal ShowSevereError counters/output/last text/SQLite/callback order.
+    pub fn show_severe_error(&mut self, message: &str) -> Result<(), SourceErrorBackendFailure> {
+        for (&needle, count) in MESSAGE_SEARCH
+            .iter()
+            .zip(&mut self.state.tracking.match_counts)
+        {
+            if message.contains(needle) {
+                increment(count, "MatchCounts")?;
+            }
+        }
+        increment(
+            &mut self.state.tracking.total_severe_errors,
+            "TotalSevereErrors",
+        )?;
+        if self.state.warmup_flag
+            && !self.state.doing_sizing
+            && !self.state.kickoff_simulation
+            && !self.state.tracking.abort_processing
+        {
+            increment(
+                &mut self.state.tracking.total_severe_errors_during_warmup,
+                "TotalSevereErrorsDuringWarmup",
+            )?;
+        }
+        if self.state.doing_sizing {
+            increment(
+                &mut self.state.tracking.total_severe_errors_during_sizing,
+                "TotalSevereErrorsDuringSizing",
+            )?;
+        }
+        self.show_error_message(&format!(" ** Severe  ** {message}"))?;
+        self.state.tracking.last_severe_error = message.to_owned();
+        if let Some(sqlite) = self.sqlite.as_deref_mut() {
+            effect(
+                "SQLite create severe",
+                sqlite.create_error_record(1, 1, message, 1),
+            )?;
+        }
+        if let Some(callback) = self.error_callback.as_deref_mut() {
+            callback(self.state, SourceErrorLevel::Severe, message);
         }
         Ok(())
     }

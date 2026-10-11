@@ -4,10 +4,10 @@ use super::ctf_first_assembly_owner::{ConstructionCtfFirstAssembly, CtfFirstAsse
 use super::ctf_initial_owner::CtfInitialUnavailable;
 use super::ctf_retry_driver::{
     ConstructionCtfRetryDriver, CtfRetryDriverOutcome, CtfRetryDriverStop,
-    run_selected_construction_ctf_retry_driver,
+    try_run_selected_construction_ctf_retry_driver,
 };
 use super::surface_manager::ctf_caller_stability::{
-    CtfCallerDiagnosticNames, CtfCallerSharedFlags,
+    CtfCallerDiagnostic, CtfCallerDiagnosticNames, CtfCallerSharedFlags,
 };
 use ep_model::ConstructionId;
 
@@ -115,10 +115,25 @@ pub fn initialize_construction_ctf_retry(
     flags: CtfCallerSharedFlags,
     names: CtfCallerDiagnosticNames<'_>,
 ) -> ConstructionCtfRetryInitialization {
+    match try_initialize_construction_ctf_retry(first, flags, names, |_| {
+        Ok::<(), std::convert::Infallible>(())
+    }) {
+        Ok(actual) => actual,
+        Err(never) => match never {},
+    }
+}
+
+/// Consume the original owner once; real diagnostic failure stops before public stores.
+pub fn try_initialize_construction_ctf_retry<E>(
+    first: ConstructionCtfFirstAssembly,
+    flags: CtfCallerSharedFlags,
+    names: CtfCallerDiagnosticNames<'_>,
+    diagnostic: impl FnMut(&CtfCallerDiagnostic) -> Result<(), E>,
+) -> Result<ConstructionCtfRetryInitialization, E> {
     let construction_id = first.construction_id;
-    let actual = run_selected_construction_ctf_retry_driver(first, flags, names);
+    let actual = try_run_selected_construction_ctf_retry_driver(first, flags, names, diagnostic)?;
     let selected_chain_stop = selected_ctf_retry_chain_stop(&actual);
-    ConstructionCtfRetryInitialization {
+    Ok(ConstructionCtfRetryInitialization {
         construction_id,
         construction_name: names.construction_name.to_string(),
         original_tot_layers: names.original_tot_layers,
@@ -131,7 +146,7 @@ pub fn initialize_construction_ctf_retry(
         flags_on_return: actual.flags_on_return,
         result: Ok(actual),
         selected_chain_stop,
-    }
+    })
 }
 
 /// Retain a later declared construction without invoking its selected chain.

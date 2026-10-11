@@ -1,0 +1,64 @@
+--- .runtime/porting/CTF-10/postlude-registry-severe-applied-01/held/crates__ep_runtime__src__heat_balance__surface_manager__ctf_layer_preprocessing.rs
++++ crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs
+@@ -107,7 +107,9 @@
+     Diagnostic(E),
+ }
+ impl<E> From<CtfLayerScopeError> for CtfLayerFailure<E> {
+-    fn from(value: CtfLayerScopeError) -> Self { Self::Unavailable(value) }
++    fn from(value: CtfLayerScopeError) -> Self {
++        Self::Unavailable(value)
++    }
+ }
+ 
+ /// One local active layer; its numerical fields change units between checkpoints.
+@@ -256,9 +258,7 @@
+         return Err(CtfLayerScopeError::InternalSource.into());
+     }
+     if context.solution_dimensions != 1 {
+-        return Err(CtfLayerScopeError::UnsupportedDimensions(
+-            context.solution_dimensions,
+-        ).into());
++        return Err(CtfLayerScopeError::UnsupportedDimensions(context.solution_dimensions).into());
+     }
+     if inputs.is_empty() || inputs.len() > 11 {
+         return Err(CtfLayerScopeError::LayerCount(inputs.len()).into());
+@@ -275,10 +275,14 @@
+             res_layer: false,
+         };
+         if input.thickness > 3.0 {
+-            diagnostic(CtfLayerDiagnostic::MaterialTooThick { layer_ordinal: index + 1 })
+-                .map_err(CtfLayerFailure::Diagnostic)?;
+-            diagnostic(CtfLayerDiagnostic::MaterialName { layer_ordinal: index + 1 })
+-                .map_err(CtfLayerFailure::Diagnostic)?;
++            diagnostic(CtfLayerDiagnostic::MaterialTooThick {
++                layer_ordinal: index + 1,
++            })
++            .map_err(CtfLayerFailure::Diagnostic)?;
++            diagnostic(CtfLayerDiagnostic::MaterialName {
++                layer_ordinal: index + 1,
++            })
++            .map_err(CtfLayerFailure::Diagnostic)?;
+             result
+                 .issues
+                 .push(CtfLayerIssue::MaterialTooThick(index + 1));
+@@ -294,11 +298,16 @@
+             num_res_layers += 1;
+             layer.lr = input.resistance;
+             if layer.lr < 1.0e-3 {
+-                diagnostic(CtfLayerDiagnostic::ResistanceBelowMinimum { layer_ordinal: index + 1 })
+-                    .map_err(CtfLayerFailure::Diagnostic)?;
++                diagnostic(CtfLayerDiagnostic::ResistanceBelowMinimum {
++                    layer_ordinal: index + 1,
++                })
++                .map_err(CtfLayerFailure::Diagnostic)?;
+                 diagnostic(CtfLayerDiagnostic::ResistanceValues {
+-                    layer_ordinal: index + 1, minimum: 1.0e-3, resistance: layer.lr,
+-                }).map_err(CtfLayerFailure::Diagnostic)?;
++                    layer_ordinal: index + 1,
++                    minimum: 1.0e-3,
++                    resistance: layer.lr,
++                })
++                .map_err(CtfLayerFailure::Diagnostic)?;
+                 result
+                     .issues
+                     .push(CtfLayerIssue::ResistanceBelowMinimum(index + 1));

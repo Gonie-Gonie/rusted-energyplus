@@ -1,0 +1,72 @@
+{
+  "schema": "recorded-porting-command.v1",
+  "command": [
+    "python",
+    "-X",
+    "utf8",
+    "-B",
+    ".runtime/porting/CTF-10/apply-postlude-registry-severe-01.py"
+  ],
+  "cwd": "C:/Users/GonieGonie/Documents/GitHub/rusted-energyplus",
+  "exit_code": 0,
+  "launch_error": null,
+  "started_utc": "2026-10-11T06:58:07.143769+00:00",
+  "finished_utc": "2026-10-11T06:58:26.453900+00:00",
+  "elapsed_seconds": 19.31033340000431,
+  "repository_before": {
+    "head": "d4df100c72fd22bb97e9a8536d8ff42af5aeda4a",
+    "worktree_clean": true,
+    "porcelain_v1_nul_utf8": ""
+  },
+  "repository_after": {
+    "head": "d4df100c72fd22bb97e9a8536d8ff42af5aeda4a",
+    "worktree_clean": false,
+    "porcelain_v1_nul_utf8": " M crates/ep_compiler/src/compiler/report_inputs.rs\u0000 M crates/ep_model/src/model.rs\u0000 M crates/ep_model/src/report_inputs.rs\u0000 M crates/ep_runtime/src/heat_balance/ctf_public_initialization.rs\u0000 M crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs\u0000 M crates/ep_runtime/src/heat_balance/ctf_retry_driver_tests.rs\u0000 M crates/ep_runtime/src/heat_balance/ctf_retry_initialization.rs\u0000 M crates/ep_runtime/src/heat_balance/error_backend.rs\u0000 M crates/ep_runtime/src/heat_balance/error_backend_tests.rs\u0000 M crates/ep_runtime/src/heat_balance/mod.rs\u0000 M crates/ep_runtime/src/heat_balance/report_scan.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/ctf_caller_stability_tests.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing.rs\u0000 M crates/ep_runtime/src/heat_balance/surface_manager/ctf_layer_preprocessing/tests.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_init_postlude_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_source_diagnostics.rs\u0000?? crates/ep_runtime/src/heat_balance/ctf_source_diagnostics_tests.rs\u0000?? crates/ep_runtime/src/heat_balance/predefined_tables.rs\u0000?? crates/ep_runtime/src/heat_balance/predefined_tables_catalog.rs\u0000?? crates/ep_runtime/src/heat_balance/predefined_tables_names.rs\u0000?? crates/ep_runtime/src/heat_balance/predefined_tables_tests.rs\u0000"
+  },
+  "source_snapshot": {
+    "path": ".runtime/porting/source-objects/3f/3f7582828a91af70bfca8aa3c0094cbaa5d8075ff5ee0a89c020d50fb48c3811",
+    "sha256": "3f7582828a91af70bfca8aa3c0094cbaa5d8075ff5ee0a89c020d50fb48c3811"
+  },
+  "source_bytes_match_before_and_after": false,
+  "executed_launcher": {
+    "historical_path": "tools/porting/record_command.py",
+    "archive": {
+      "path": ".runtime/porting/source-objects/57/5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba",
+      "sha256": "5745ad9809e196af00b858fcdc0d3d783531628fa2abf1e086f75c7d293514ba"
+    }
+  },
+  "python": {
+    "version": "3.12.7 (tags/v3.12.7:0b05ead, Oct  1 2024, 03:06:41) [MSC v.1941 64 bit (AMD64)]",
+    "executable": "C:\\Users\\GonieGonie\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "sha256": "ca60cf785b2314a6d6599eced15bdf094e6db171bec996b97a70b995942c3c37"
+  },
+  "stdout": {
+    "path": ".runtime/porting/CTF-10/postlude-registry-severe-apply-command-01/stdout.log",
+    "sha256": "145b7460803974c78e169e2f999dda5dba8e81098ddad2b9bc7095f842cd18ae"
+  },
+  "stderr": {
+    "path": ".runtime/porting/CTF-10/postlude-registry-severe-apply-command-01/stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "cargo_compiler_artifacts_capture": {
+    "requested": false,
+    "captured_utc": "2026-10-11T06:58:26.453900+00:00",
+    "status": "not_requested",
+    "rows": [],
+    "error": null
+  },
+  "launch_environment_selected": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_BUILD_TARGET": null,
+    "CARGO_TARGET_DIR": null,
+    "RUSTUP_TOOLCHAIN": null,
+    "RUSTC": null,
+    "RUSTC_WRAPPER": null,
+    "RUSTC_WORKSPACE_WRAPPER": null,
+    "CARGO_HOME": null
+  },
+  "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
+  "recorder_updates_gates": false,
+  "recorder_supplies_reference_answers": false
+}

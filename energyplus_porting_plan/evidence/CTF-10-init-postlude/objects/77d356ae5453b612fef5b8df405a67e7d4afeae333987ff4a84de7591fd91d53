@@ -1,0 +1,14 @@
+--- .runtime/porting/CTF-10/postlude-registry-severe-applied-01/held/crates__ep_runtime__src__heat_balance__surface_manager__construction_cache.rs
++++ crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
+@@ -241,9 +241,8 @@
+             entries.push(entry);
+         }
+ 
+-        public_initialization.finish_declared_loop_with_flags(
+-            model.constructions.len(), shared_flags,
+-        );
++        public_initialization
++            .finish_declared_loop_with_flags(model.constructions.len(), shared_flags);
+         validate_surface_construction_families(model, &construction_slots)?;
+ 
+         let coefficient_cache_hash = construction_cache_hash(&entries);

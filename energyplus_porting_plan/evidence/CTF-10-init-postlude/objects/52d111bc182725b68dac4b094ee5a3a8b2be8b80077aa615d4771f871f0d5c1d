@@ -1,0 +1,13 @@
+--- .runtime/porting/CTF-10/whole-init-postlude-prep-01/before/crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
++++ crates/ep_runtime/src/heat_balance/surface_manager/construction_cache.rs
+@@ -241,7 +241,9 @@
+             entries.push(entry);
+         }
+ 
+-        public_initialization.finish_declared_loop(model.constructions.len());
++        public_initialization.finish_declared_loop_with_flags(
++            model.constructions.len(), shared_flags,
++        );
+         validate_surface_construction_families(model, &construction_slots)?;
+ 
+         let coefficient_cache_hash = construction_cache_hash(&entries);

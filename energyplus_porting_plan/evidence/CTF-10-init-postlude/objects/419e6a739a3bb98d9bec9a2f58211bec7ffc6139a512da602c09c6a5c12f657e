@@ -1,0 +1,396 @@
+{
+  "schema": "ctf10-complete-predefined-registry-source-preparation.v1",
+  "status": "SOURCE-READY HELD - complete registry; unapplied and unexecuted",
+  "held_immutable": true,
+  "author": "Header",
+  "authorship_limit": "Author of accepted report input/output/public/history ownership. Independent other-author FULL Source review required; no independent numerical or Native reporting certificate.",
+  "ep_version": "26.1.0",
+  "ep_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "own_sources": [
+    {
+      "target": "crates/ep_runtime/src/heat_balance/mod.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-10/predefined-registry-prep-01/proposed/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "1a11316d95c2fb46fe951e7781d2c56fb32695ece8b1ba4833bf181ea94a8d5a",
+        "size_bytes": 1997,
+        "line_count": 79
+      },
+      "before": {
+        "path": ".runtime/porting/CTF-10/predefined-registry-prep-01/before/crates/ep_runtime/src/heat_balance/mod.rs",
+        "sha256": "954197538ee3821bb133e1162464026aa7c3dfe8f9737da07db30339d305f34a",
+        "size_bytes": 1970,
+        "line_count": 78
+      },
+      "new_destination_absent_at_hold": false,
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/predefined-registry-prep-01/diffs/crates__ep_runtime__src__heat_balance__mod.rs.diff",
+        "sha256": "2a7eb53b485a858d09107f6b1f971f70cfac4d025947f9dfe372777daedee6b7",
+        "size_bytes": 279,
+        "line_count": 10
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/predefined_tables.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-10/predefined-registry-prep-01/proposed/crates/ep_runtime/src/heat_balance/predefined_tables.rs",
+        "sha256": "1a8b580b5023452a4775840d77a4da4efc26e297419018837ca306a1bab6fb51",
+        "size_bytes": 9109,
+        "line_count": 208
+      },
+      "before": null,
+      "new_destination_absent_at_hold": true,
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/predefined-registry-prep-01/diffs/crates__ep_runtime__src__heat_balance__predefined_tables.rs.diff",
+        "sha256": "9f4c2508dec927ef9ee56280b7bc8b10c5613072201d052d6b268d7b51cc74cf",
+        "size_bytes": 9471,
+        "line_count": 211
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/predefined_tables_catalog.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-10/predefined-registry-prep-01/proposed/crates/ep_runtime/src/heat_balance/predefined_tables_catalog.rs",
+        "sha256": "b0a3515673a61e9b15cdff6691f5f3d0dd583697b91ecbe5dc1e4f3cfe728984",
+        "size_bytes": 126416,
+        "line_count": 1214
+      },
+      "before": null,
+      "new_destination_absent_at_hold": true,
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/predefined-registry-prep-01/diffs/crates__ep_runtime__src__heat_balance__predefined_tables_catalog.rs.diff",
+        "sha256": "955292724fb6e997aa3b45536321fb61bb0688c9961f5447ed4115e5d0846388",
+        "size_bytes": 127801,
+        "line_count": 1217
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/predefined_tables_names.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-10/predefined-registry-prep-01/proposed/crates/ep_runtime/src/heat_balance/predefined_tables_names.rs",
+        "sha256": "940e50d664865c17cbe00d1d0f2f29d03b158adb5942e89a0aaedf1071a64687",
+        "size_bytes": 31107,
+        "line_count": 331
+      },
+      "before": null,
+      "new_destination_absent_at_hold": true,
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/predefined-registry-prep-01/diffs/crates__ep_runtime__src__heat_balance__predefined_tables_names.rs.diff",
+        "sha256": "0b271be402933748db0e1043807afe0bbdbe935ff9f993720a73cc0bd42010bf",
+        "size_bytes": 31604,
+        "line_count": 334
+      }
+    },
+    {
+      "target": "crates/ep_runtime/src/heat_balance/predefined_tables_tests.rs",
+      "source": {
+        "path": ".runtime/porting/CTF-10/predefined-registry-prep-01/proposed/crates/ep_runtime/src/heat_balance/predefined_tables_tests.rs",
+        "sha256": "ac05415a12d0fc6b2aacc2a8336575a4d7a482f8e12623e9e3f409a553becd3f",
+        "size_bytes": 5987,
+        "line_count": 128
+      },
+      "before": null,
+      "new_destination_absent_at_hold": true,
+      "exact_diff": {
+        "path": ".runtime/porting/CTF-10/predefined-registry-prep-01/diffs/crates__ep_runtime__src__heat_balance__predefined_tables_tests.rs.diff",
+        "sha256": "0d4f2e1fe92dbd15ac3d8514dde34da15807001195e1734ebcc90c61bc002112",
+        "size_bytes": 6281,
+        "line_count": 131
+      }
+    }
+  ],
+  "source_context": {
+    "whole_source_or_metadata_identities": [
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputReportPredefined.cc",
+        "sha256": "a833c153bbd89783a6075056c0ff791a2dec041df4badfdfa499fd0bd1b53674",
+        "size_bytes": 169800,
+        "line_count": 2286
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputReportPredefined.hh",
+        "sha256": "0f6469e250751848f4256d4e1dc380776391c6f93f93f5879941ca19b65b108a",
+        "size_bytes": 61093,
+        "line_count": 1731
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.cc",
+        "sha256": "6416c03de88a2b913d33393e82141b4183b9e446cd93fb7e5c7c9fde22d15f9f",
+        "size_bytes": 60978,
+        "line_count": 1104
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SimulationManager.cc",
+        "sha256": "bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685",
+        "size_bytes": 168527,
+        "line_count": 2941
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+        "sha256": "2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25",
+        "size_bytes": 13547,
+        "line_count": 198
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array1D.hh",
+        "sha256": "071a06b62da9ab4aefe4ad0fbfa2bfd07b48a484b2ef346188885db5db2e6e83",
+        "size_bytes": 55083,
+        "line_count": 2509
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+        "sha256": "c645bf2d52dcd8722025899b5609ae737b3fc591aa1f5fd00e19cd3573cef21f",
+        "size_bytes": 16349,
+        "line_count": 428
+      },
+      {
+        "path": ".runtime/porting/CTF-10/whole-init-postlude-audit-prep-01/manifest.json",
+        "sha256": "4c973f1d1b5f71408645d0cb73cfef4489977c5b7aa40508a58d336af8ba1a65",
+        "size_bytes": 18226,
+        "line_count": 481
+      },
+      {
+        "path": ".runtime/porting/CTF-10/report-output-prep-01/manifest.json",
+        "sha256": "19c25057d0f56b3184090484134356dfe54000bff3cd4bee7d72eb8df4c11d7e",
+        "size_bytes": 12996,
+        "line_count": 273
+      },
+      {
+        "path": ".runtime/porting/CTF-10/report-output-applied-01/record.json",
+        "sha256": "d1069357fd2bff8cffbcf07d74debf789e597d8b630663735c5dc8388bdbfaf0",
+        "size_bytes": 9130,
+        "line_count": 204
+      },
+      {
+        "path": ".runtime/porting/CTF-10/error-backend-applied-01/record.json",
+        "sha256": "4ea237dfef945a792ffdb13bcc89c302c4a4a9db712f5ff493db3d552089213e",
+        "size_bytes": 3696,
+        "line_count": 84
+      },
+      {
+        "path": ".runtime/porting/CTF-10/error-backend-applied-01/final/02-mod.rs",
+        "sha256": "954197538ee3821bb133e1162464026aa7c3dfe8f9737da07db30339d305f34a",
+        "size_bytes": 1970,
+        "line_count": 78
+      }
+    ],
+    "selected_ranges_encoding": "UTF-8, selected logical lines joined with LF and one trailing LF",
+    "selected_ranges": [
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputReportPredefined.cc",
+        "first_line": 77,
+        "last_line": 1764,
+        "sha256": "36a06d64f57e0c81049a65b6d66696dff8622ace179b3b6c8bcd2f1624457c26",
+        "size_bytes": 144593,
+        "purpose": "Whole SetPredefinedTables literal registration sequence and sole sizing branch"
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputReportPredefined.cc",
+        "first_line": 2083,
+        "last_line": 2138,
+        "sha256": "f543ad4e72b93ffdeb1571ef00d3d6a1e8af2035358d433ad08615221a7958f1",
+        "size_bytes": 2283,
+        "purpose": "Whole newPreDefReport"
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputReportPredefined.cc",
+        "first_line": 2140,
+        "last_line": 2191,
+        "sha256": "6df6e3abe9df5c0d58dd605c8e556cb9c9b74eb5d785e0c2cae299c9d2a094ce",
+        "size_bytes": 1946,
+        "purpose": "Whole newPreDefSubTable"
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputReportPredefined.cc",
+        "first_line": 2193,
+        "last_line": 2228,
+        "sha256": "f2cd82a46c20a6fdf0a2dc5c039fb7096f68677e852ba7461e1c6465ae7dafb7",
+        "size_bytes": 1023,
+        "purpose": "Whole addFootNoteSubTable"
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputReportPredefined.cc",
+        "first_line": 2230,
+        "last_line": 2283,
+        "sha256": "17eb685a798e782542f8dfa9580781290e6f7f544f9bd639dab716522568bd63",
+        "size_bytes": 2043,
+        "purpose": "Whole newPreDefColumn"
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputReportPredefined.hh",
+        "first_line": 64,
+        "last_line": 134,
+        "sha256": "8c700c0305eaecab369596ed2737458e86ff4080724125e2b821d5298c60f0ad",
+        "size_bytes": 1646,
+        "purpose": "Size increment and all actual registry/string-entry record members/default constructors"
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputReportPredefined.hh",
+        "first_line": 202,
+        "last_line": 1664,
+        "sha256": "a991d731fa4bd78774b5dd710de28b3698cbb48cb68c8b5d22b6d7312b0ca93b",
+        "size_bytes": 50254,
+        "purpose": "Complete registry named-index declarations, with actual layer vector at676"
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/OutputReportPredefined.hh",
+        "first_line": 1666,
+        "last_line": 1727,
+        "sha256": "57c8c979234ec8def26c8535722161b942de3a653f98fc9c084025dd7d57ae46",
+        "size_bytes": 2767,
+        "purpose": "Retained counts/arrays and value-initialized clear_state replacement"
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.cc",
+        "first_line": 182,
+        "last_line": 194,
+        "sha256": "3c2789e5f1d725254efe1c1c1c7208b7ed65ea87ba6577f77c4a856320ecec28",
+        "size_bytes": 911,
+        "purpose": "Actual value-initialized predefined owner at190"
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SimulationManager.cc",
+        "first_line": 178,
+        "last_line": 222,
+        "sha256": "ca79ca7c20f61cc24a9c135383149a2f15ca8a53d86020e9d67d12b1d7879e8f",
+        "size_bytes": 2304,
+        "purpose": "Actual preceding ManageSimulation state/check sequence and Set before construction bounds"
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SimulationManager.cc",
+        "first_line": 1106,
+        "last_line": 1134,
+        "sha256": "8454797ee5d0c3ec456c04e3cb38b19854b51aed8eff346b84818739532e859b",
+        "size_bytes": 1907,
+        "purpose": "Actual GetProjectData sizing defaults and first SimulationControl getter/YES flags"
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+        "first_line": 112,
+        "last_line": 123,
+        "sha256": "080b2c7529c70f9c23ad0d2c3a955b18cad1b2404d6b571397c9bb1ebbf86925",
+        "size_bytes": 928,
+        "purpose": "Actual sizing flag declarations and false defaults"
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array1D.hh",
+        "first_line": 929,
+        "last_line": 935,
+        "sha256": "f432ddd7494252ac0ff8cb4a3d949d5b1d357149f20bfa507936d1ebd184f9a0",
+        "size_bytes": 110,
+        "purpose": "Actual allocate delegates to dimension_real"
+      },
+      {
+        "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array1D.hh",
+        "first_line": 1005,
+        "last_line": 1084,
+        "sha256": "44f951f6cf041cf7a816580f40321ebf716c9072d67cedc5a496d337e6446607",
+        "size_bytes": 2687,
+        "purpose": "Actual data-preserving redimension and new-tail default construction"
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+        "first_line": 16,
+        "last_line": 40,
+        "sha256": "72826ea79aaf09b994f093f813e4a48df84d83646b53d48ec608ef35461d6e74",
+        "size_bytes": 1105,
+        "purpose": "Reused typed unavailable variants"
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+        "first_line": 68,
+        "last_line": 103,
+        "sha256": "d369d5fe65b5ac535eb6e733f2de2cf012628b5db2cbf514943644368da342ea",
+        "size_bytes": 1428,
+        "purpose": "Separate actual retained table-entry owner"
+      },
+      {
+        "path": "crates/ep_runtime/src/heat_balance/ctf_reports.rs",
+        "first_line": 312,
+        "last_line": 329,
+        "sha256": "ff01458e62c30c34089a90a849b1a4dc993512865fd80cf4e9d09a153294fe47",
+        "size_bytes": 655,
+        "purpose": "Actual reportLayers consumes genuine layer-column indices"
+      }
+    ]
+  },
+  "actual_parent_before_authority": {
+    "path": ".runtime/porting/CTF-10/error-backend-applied-01/final/02-mod.rs",
+    "sha256": "954197538ee3821bb133e1162464026aa7c3dfe8f9737da07db30339d305f34a",
+    "size_bytes": 1970,
+    "line_count": 78
+  },
+  "literal_catalog_correspondence": {
+    "path": ".runtime/porting/CTF-10/predefined-registry-prep-01/literal-catalog-correspondence.json",
+    "sha256": "1c4fb6661f90095d07c45d83e13e9632cdc02e736fed9d372d9db511fd17c694",
+    "size_bytes": 713,
+    "line_count": 26
+  },
+  "README": {
+    "path": ".runtime/porting/CTF-10/predefined-registry-prep-01/README.md",
+    "sha256": "7b0800795ad35245966d3e1bbbef49f5e10ad02b77b11f84efebe99773b98c80",
+    "size_bytes": 5627,
+    "line_count": 91
+  },
+  "runtime_interfaces": {
+    "module": "ep_runtime::heat_balance::predefined_tables",
+    "owner": "PredefinedRegistry: retained report/subtable/column allocated slots, six independent counters/capacities, 1301 named member IDs and retained opaque-layer vector",
+    "constructor_context": "Default only denotes genuine value-initialized EnergyPlusData registry, not arbitrary default-initialized C++ storage",
+    "set": "set_predefined_tables(&mut self, do_zone_sizing:bool, do_system_sizing:bool)->Result<(),CtfReportUnavailable>",
+    "layer_columns": "opaque_layer_columns(&self)->&[i32]; borrow into accepted report_ctf_layers/complete_ctf_init_postlude",
+    "helpers": [
+      "new_report",
+      "new_subtable",
+      "new_column",
+      "add_footnote"
+    ],
+    "actual_sizing_flags_required": true,
+    "ordinary_SimulationControl_flag_producer_preservation_still_required": true,
+    "table_entries_and_unrelated_predefined_aggregates_remain_separate_caller_owned": true
+  },
+  "source_checks": {
+    "ordered_call_inventory": {
+      "report": 19,
+      "subtable": 113,
+      "column": 1043,
+      "layer_column": 10,
+      "footnote": 21
+    },
+    "sizing_only_call_inventory": {
+      "report": 1,
+      "subtable": 8,
+      "column": 85
+    },
+    "all1206_call_strings_binding_parent_order_and_conditional_match_Source": true,
+    "all1301_named_members_declaration_order_match_Source": true,
+    "explicit_zero_member_initializers": 1298,
+    "three_remaining_members_bound_to_actual_value_initialized_constructor": [
+      "pdchAWHPDesSizeRefAirTemp",
+      "pdchAWHPDesEnterWaterTemp",
+      "pdchAWHPDesLeaveWaterTemp"
+    ],
+    "unexecuted_tests": 8,
+    "own_sources": 5,
+    "exact_regenerated_diffs": 5,
+    "before_members": 1,
+    "new_destinations_absent": 4,
+    "actual_before_equals_current_and_immutable_backend_final_archive": true
+  },
+  "future_requirements": [
+    "Root and independent other-author FULL Source acceptance before application",
+    "Compose any postlude module declaration against actual future formatted parent, retaining both changes",
+    "Genuine ordinary producer retains SimulationControl first-object sizing flags and registry call order",
+    "Genuine Native capture and same-input comparison for full arrays/counters/capacities/named IDs/layer vector, both sizing conditions, repeated calls and real layer-entry references",
+    "Actual report formatter bytes, ordinary postlude/backend and full-card evidence remain separate pending obligations"
+  ],
+  "claims": {
+    "canonical_changed": false,
+    "project_imported_or_executed": false,
+    "formatter_or_tests_executed": false,
+    "Native_or_Rust_scientific_values_read_or_computed": false,
+    "registry_Native_equivalence_claimed": false,
+    "ordinary_postlude_activated": false,
+    "whole_CTF10_PASS_claimed": false,
+    "gates_changed": false,
+    "Git_used": false
+  }
+}

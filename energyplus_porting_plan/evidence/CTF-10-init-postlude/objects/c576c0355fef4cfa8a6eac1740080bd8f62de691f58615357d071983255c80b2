@@ -1,0 +1,115 @@
+--- .runtime/porting/CTF-10/postlude-registry-severe-applied-01/held/crates__ep_runtime__src__heat_balance__ctf_init_postlude.rs
++++ crates/ep_runtime/src/heat_balance/ctf_init_postlude.rs
+@@ -5,9 +5,8 @@
+ 
+ use super::ctf_public_initialization::OrderedCtfPublicInitialization;
+ use super::ctf_reports::{
+-    CtfReportError, CtfReportUnavailable, PredefinedStringTable,
+-    prepare_ctf_construction_report, report_ctf_layers, report_ctf_transfer_function,
+-    write_ctf_report_headers,
++    CtfReportError, CtfReportUnavailable, PredefinedStringTable, prepare_ctf_construction_report,
++    report_ctf_layers, report_ctf_transfer_function, write_ctf_report_headers,
+ };
+ use super::error_backend::{SourceErrorBackend, SourceErrorBackendFailure, SourceFatalStop};
+ use super::report_scan::{
+@@ -50,13 +49,17 @@
+ }
+ 
+ impl From<CtfReportError> for CtfInitPostludeError {
+-    fn from(value: CtfReportError) -> Self { Self::Report(value) }
++    fn from(value: CtfReportError) -> Self {
++        Self::Report(value)
++    }
+ }
+ 
+ impl std::fmt::Display for CtfInitPostludeError {
+     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+         match self {
+-            Self::Unavailable(value) => write!(formatter, "whole CTF postlude unavailable: {value:?}"),
++            Self::Unavailable(value) => {
++                write!(formatter, "whole CTF postlude unavailable: {value:?}")
++            }
+             Self::Report(value) => std::fmt::Display::fmt(value, formatter),
+             Self::Scan(value) => write!(formatter, "report scan unavailable: {value:?}"),
+             Self::Backend(value) => std::fmt::Display::fmt(value, formatter),
+@@ -104,19 +107,24 @@
+ ) -> Result<(), CtfInitPostludeError> {
+     use CtfInitPostludeUnavailable as Unavailable;
+     if !public.selected_declared_loop_completed || public.selected_stop.is_some() {
+-        return Err(CtfInitPostludeError::Unavailable(Unavailable::IncompleteConstructionLoop));
++        return Err(CtfInitPostludeError::Unavailable(
++            Unavailable::IncompleteConstructionLoop,
++        ));
+     }
+     if public.constructions.len() != model.constructions.len()
+         || public.constructions.iter().enumerate().any(|(index, row)| {
+-            row.declared_index != index || row.construction_id != model.constructions[index].id
++            row.declared_index != index
++                || row.construction_id != model.constructions[index].id
+                 || row.result.is_err()
+         })
+     {
+         return Err(CtfInitPostludeError::Unavailable(Unavailable::Association));
+     }
+-    let flags = public.final_shared_flags.ok_or(CtfInitPostludeError::Unavailable(
+-        Unavailable::MissingFinalSharedFlags,
+-    ))?;
++    let flags = public
++        .final_shared_flags
++        .ok_or(CtfInitPostludeError::Unavailable(
++            Unavailable::MissingFinalSharedFlags,
++        ))?;
+     if any_internal_heat_source_in_input {
+         public.aggregate_after_returned_calls.simple_ctf_only = false;
+     }
+@@ -124,19 +132,29 @@
+     // Prepare only the reached used row. A later unavailable row cannot erase
+     // or prevent the already completed earlier table writes.
+     for row in &public.constructions {
+-        if !row.is_used_ctf { continue; }
++        if !row.is_used_ctf {
++            continue;
++        }
+         let report = prepare_ctf_construction_report(model, row)?;
+         report_ctf_layers(&report, layer_columns, table)?;
+-        progress.layer_report_declared_indices.push(row.declared_index);
++        progress
++            .layer_report_declared_indices
++            .push(row.declared_index);
+     }
+ 
+     let do_report = try_scan_for_reports(
+-        &model.report_inputs, scan, "Constructions", Some("Constructions"), None, None,
++        &model.report_inputs,
++        scan,
++        "Constructions",
++        Some("Constructions"),
++        None,
++        None,
+         |diagnostic| match diagnostic {
+             ReportScanDiagnostic::Warning(message) => backend.show_warning_error(&message),
+             ReportScanDiagnostic::Continue(message) => backend.show_continue_error(&message),
+         },
+-    ).map_err(|error| match error {
++    )
++    .map_err(|error| match error {
+         ReportScanFailure::Unavailable(value) => CtfInitPostludeError::Scan(value),
+         ReportScanFailure::Diagnostic(value) => CtfInitPostludeError::Backend(value),
+     })?;
+@@ -147,10 +165,14 @@
+         // The declared counter includes unused rows through each row's original
+         // declaration index; no filtered-vector index substitutes for it.
+         for row in &public.constructions {
+-            if !row.is_used_ctf { continue; }
++            if !row.is_used_ctf {
++                continue;
++            }
+             let report = prepare_ctf_construction_report(model, row)?;
+             report_ctf_transfer_function(&report, eio)?;
+-            progress.coefficient_report_declared_indices.push(row.declared_index);
++            progress
++                .coefficient_report_declared_indices
++                .push(row.declared_index);
+         }
+     }
+     if flags.errors_found {

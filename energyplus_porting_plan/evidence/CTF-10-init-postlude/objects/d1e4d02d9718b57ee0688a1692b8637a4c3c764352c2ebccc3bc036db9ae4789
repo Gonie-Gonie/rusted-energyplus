@@ -1,0 +1,22 @@
+--- crates/ep_runtime/src/heat_balance/ctf_retry_driver_tests.rs
++++ crates/ep_runtime/src/heat_balance/ctf_retry_driver_tests.rs
+@@ -561,3 +561,19 @@
+     }
+     Ok(())
+ }
++
++#[test]
++fn actual_diagnostic_stop_propagates_out_of_real_driver_without_public_return() -> TestResult {
++    let mut first = first_assembly()?;
++    let original = actual(&mut first)?;
++    original.b_mat = [0.0; 3];
++    original.d_mat = [0.0; 2];
++    let mut calls = Vec::new();
++    let result = try_run_selected_construction_ctf_retry_driver(first, flags(), names(), |call| {
++        calls.push(call.level);
++        Err("actual caller backend stop")
++    });
++    assert!(matches!(result, Err("actual caller backend stop")));
++    assert_eq!(calls, [crate::heat_balance::surface_manager::ctf_caller_stability::CtfCallerDiagnosticLevel::Fatal]);
++    Ok(())
++}

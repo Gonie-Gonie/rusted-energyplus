@@ -1,0 +1,74 @@
+--- .runtime/porting/CTF-10/postlude-registry-severe-applied-01/held/crates__ep_runtime__src__heat_balance__ctf_retry_driver.rs
++++ crates/ep_runtime/src/heat_balance/ctf_retry_driver.rs
+@@ -2,9 +2,9 @@
+ 
+ use super::ctf_first_assembly_owner::{ConstructionCtfFirstAssembly, CtfFirstAssemblyUnavailable};
+ use super::surface_manager::ctf_caller_stability::{
+-    CtfCallerDiagnostic, CtfCallerDiagnosticNames, CtfCallerSharedFlags, CtfCallerStabilityDecision,
+-    CtfCallerStabilityFailure, CtfCallerStabilityOutcome, CtfCallerStabilityScopeError,
+-    try_decide_selected_ctf_caller_stability,
++    CtfCallerDiagnostic, CtfCallerDiagnosticNames, CtfCallerSharedFlags,
++    CtfCallerStabilityDecision, CtfCallerStabilityFailure, CtfCallerStabilityOutcome,
++    CtfCallerStabilityScopeError, try_decide_selected_ctf_caller_stability,
+ };
+ use super::surface_manager::ctf_exponential_matrix::{
+     CtfExponentialInput, CtfExponentialObservation, CtfExponentialScopeError,
+@@ -321,7 +321,11 @@
+         Ok(CtfFinalCoefficientObservation::Coefficients(actual)) => actual,
+     };
+     let caller_result = match try_decide_selected_ctf_caller_stability(
+-        coefficients, context, flags, names, diagnostic,
++        coefficients,
++        context,
++        flags,
++        names,
++        diagnostic,
+     ) {
+         Ok(actual) => Ok(actual),
+         Err(CtfCallerStabilityFailure::Unavailable(error)) => Err(error),
+@@ -373,9 +377,9 @@
+     flags: CtfCallerSharedFlags,
+     names: CtfCallerDiagnosticNames<'_>,
+ ) -> ConstructionCtfRetryDriver {
+-    match try_run_selected_construction_ctf_retry_driver(first, flags, names,
+-        |_| Ok::<(), std::convert::Infallible>(()))
+-    {
++    match try_run_selected_construction_ctf_retry_driver(first, flags, names, |_| {
++        Ok::<(), std::convert::Infallible>(())
++    }) {
+         Ok(actual) => actual,
+         Err(never) => match never {},
+     }
+@@ -394,10 +398,20 @@
+     let id = first.construction_id;
+     let mut assembly = match first.result {
+         Err(reason) => {
+-            return Ok(stopped_before_methods(id, flags, None, Stop::FirstAssembly(reason)));
++            return Ok(stopped_before_methods(
++                id,
++                flags,
++                None,
++                Stop::FirstAssembly(reason),
++            ));
+         }
+         Ok(CtfAssemblyObservation::Unavailable(reason)) => {
+-            return Ok(stopped_before_methods(id, flags, None, Stop::FirstAssemblyRoute(reason)));
++            return Ok(stopped_before_methods(
++                id,
++                flags,
++                None,
++                Stop::FirstAssemblyRoute(reason),
++            ));
+         }
+         Ok(CtfAssemblyObservation::Assembled(actual)) => actual,
+     };
+@@ -424,7 +438,8 @@
+     let mut flags_on_return = flags;
+     let mut last_postcheck_context = None;
+     let outcome = loop {
+-        let (attempt, control) = invoke_attempt(&assembly, flags_on_return, names, &mut diagnostic)?;
++        let (attempt, control) =
++            invoke_attempt(&assembly, flags_on_return, names, &mut diagnostic)?;
+         attempts.push(attempt);
+         match control {
+             AttemptControl::Stop(reason) => {

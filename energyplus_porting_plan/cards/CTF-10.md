@@ -97,6 +97,11 @@ The [report-input and Scan evidence](../evidence/CTF-10-report-input-scan/summar
 Same-input genuine Native getter/cache/query comparison remains pending. The scan is not yet called by the ordinary whole-Init postlude; predefined/EIO reporting and final fatal backend composition remain pending.
 This milestone promotes no card gate; the earlier activation replay and ordinary CLI results retain their own recorded source identity.
 
+## Complete registry, producer diagnostics and Init postlude
+
+The full predefined registry retains1301 named indices, all1206 ordered calls, the actual sizing branch and opaque-layer IDs. Genuine first SimulationControl sizing inputs are retained. Selected loading/retry Severe/Continue/Fatal effects execute at their producer callpoints before later flags/stores, through borrowed real backend owners. Final shared flags and the complete ordered report/Scan/EIO/fatal postlude are implemented.
+The [Init postlude implementation evidence](../evidence/CTF-10-init-postlude/summary.json) records fmt/Clippy0, focused299 and workspace4914 PASS, adding34 tests. Independent Source and actual formatter/composed-module reviews passed. Ordinary caller connection and Native registry/backend/whole-Init comparison remain pending; no card gate is promoted.
+
 ## Actual selected Scan comparison
 
 The genuine EnergyPlus helper and current Rust observer executed the same frozen inputs. All12 cases,264 queries,64 getter records and4 ordered diagnostics passed21,405 exact comparisons with0 mismatches and no missing or unavailable records. All31 cache members, optional arguments, getter contents and query association were required.

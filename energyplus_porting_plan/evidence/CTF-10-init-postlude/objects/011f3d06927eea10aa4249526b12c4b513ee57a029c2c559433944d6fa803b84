@@ -1,0 +1,33 @@
+--- .runtime/porting/CTF-10/predefined-sizing-input-prep-02/before-01/README.md
++++ .runtime/porting/CTF-10/predefined-sizing-input-prep-02/README.md
+@@ -20,7 +20,7 @@
+ describe normal input processing, not arbitrary bypassed Native getter state.
+ The method resets the input owner before parsing and uses existing default
+ recording rather than a second default mechanism. The existing report parser
+-calls it once; all five report-family parsing bodies otherwise remain exact.
++calls it once; all five report-family parsing bodies otherwise remain logical-LF exact.
+ 
+ Native InputProcessor substitutes the schema default for empty/missing alpha
+ fields, marks them blank and uppercases non-retaincase fields. The pinned IDD
+@@ -45,7 +45,7 @@
+ Only report_inputs.rs, model.rs and compiler/report_inputs.rs change. Exact
+ current before archives, all three regenerated diffs and bounded Native/current
+ Source ranges are pinned. Model field/Default and the parser's single call are
+-additive. All prior report parsing, tests and typed-count code remain literal.
++additive. All prior report parsing, tests and typed-count code remain logical-LF exact.
+ The registry itself remains immutable in its separately held final02 package.
+ 
+ Root and another author must FULL-review this hold before application. Ordinary
+@@ -55,3 +55,12 @@
+ there is no registry, report, whole Init or CTF10 PASS claim here. No project
+ import, compiler, test, formatter, target, binary, scientific output, canonical
+ edit or Git operation was performed.
++
++Fresh02 corrects the ep_model/lib.rs selected range from 1-18 to its actual
++1-17 lines; selected bytes, hash and size are unchanged. The three Rust
++proposals, before archives and source diffs are borrowed byte-for-byte
++from immutable01. The existing compiler/report_inputs.rs and model.rs
++proposals use CRLF while their actual before archives use LF. Their
++unchanged-body inverse checks are logical-LF comparisons, not raw-byte
++inverses. This successor changes only metadata/documentation and makes
++no new implementation, execution or gate claim.

@@ -1,0 +1,46 @@
+--- .runtime/porting/CTF-10/postlude-registry-severe-applied-01/held/crates__ep_runtime__src__heat_balance__report_scan.rs
++++ crates/ep_runtime/src/heat_balance/report_scan.rs
+@@ -135,10 +135,18 @@
+     option2: Option<&mut String>,
+     mut diagnostic: impl FnMut(ReportScanDiagnostic),
+ ) -> Result<bool, ReportScanUnavailable> {
+-    match try_scan_for_reports(input, state, report_name, report_key, option1, option2, |value| {
+-        diagnostic(value);
+-        Ok::<(), std::convert::Infallible>(())
+-    }) {
++    match try_scan_for_reports(
++        input,
++        state,
++        report_name,
++        report_key,
++        option1,
++        option2,
++        |value| {
++            diagnostic(value);
++            Ok::<(), std::convert::Infallible>(())
++        },
++    ) {
+         Ok(value) => Ok(value),
+         Err(ReportScanFailure::Unavailable(value)) => Err(value),
+         Err(ReportScanFailure::Diagnostic(never)) => match never {},
+@@ -185,7 +193,8 @@
+                     diagnostic(ReportScanDiagnostic::Warning(format!(
+                         "Output:Surfaces:List: No {} supplied.",
+                         object.report_type_field_name()
+-                    ))).map_err(ReportScanFailure::Diagnostic)?;
++                    )))
++                    .map_err(ReportScanFailure::Diagnostic)?;
+                     diagnostic(ReportScanDiagnostic::Continue(
+                         " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\".".to_string())).map_err(ReportScanFailure::Diagnostic)?;
+                 }
+@@ -289,7 +298,9 @@
+             );
+         }
+         "SURFACES" => match report_key
+-            .ok_or(ReportScanFailure::Unavailable(ReportScanUnavailable::MissingSurfacesKey))?
++            .ok_or(ReportScanFailure::Unavailable(
++                ReportScanUnavailable::MissingSurfacesKey,
++            ))?
+             .to_ascii_uppercase()
+             .as_str()
+         {

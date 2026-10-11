@@ -69,6 +69,49 @@ pub enum CtfLayerIssue {
     ResistanceBelowMinimum(usize),
 }
 
+/// One actual loading diagnostic call boundary, before its subsequent assignments.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum CtfLayerDiagnostic {
+    /// Construction.cc258 ShowSevereError before its material-name continuation.
+    MaterialTooThick {
+        /// Actual original one-based layer.
+        layer_ordinal: usize,
+    },
+    /// Construction.cc259 ShowContinueError with the actual original material name.
+    MaterialName {
+        /// Actual original one-based layer.
+        layer_ordinal: usize,
+    },
+    /// Construction.cc282 ShowSevereError before the R-value continuation.
+    ResistanceBelowMinimum {
+        /// Actual original one-based layer.
+        layer_ordinal: usize,
+    },
+    /// Construction.cc283 ShowContinueError with these branch-assigned R values.
+    ResistanceValues {
+        /// Actual original one-based layer.
+        layer_ordinal: usize,
+        /// Source RValueLowLimit literal.
+        minimum: f64,
+        /// Actual local lr, not a recomputed material accessor.
+        resistance: f64,
+    },
+}
+
+/// A real diagnostic failure stops before later loading assignments/checkpoints.
+#[derive(Debug, PartialEq)]
+pub enum CtfLayerFailure<E> {
+    /// The original selected source-domain rejection.
+    Unavailable(CtfLayerScopeError),
+    /// The actual caller-owned diagnostic callback did not complete.
+    Diagnostic(E),
+}
+impl<E> From<CtfLayerScopeError> for CtfLayerFailure<E> {
+    fn from(value: CtfLayerScopeError) -> Self {
+        Self::Unavailable(value)
+    }
+}
+
 /// One local active layer; its numerical fields change units between checkpoints.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct CtfNormalizedLayer {
@@ -186,6 +229,20 @@ pub fn preprocess_ctf_layers(
     inputs: &[CtfLayerInput],
     context: CtfLayerContext,
 ) -> Result<CtfLayerPreprocessing, CtfLayerScopeError> {
+    match try_preprocess_ctf_layers(inputs, context, |_| Ok::<(), std::convert::Infallible>(())) {
+        Ok(actual) => Ok(actual),
+        Err(CtfLayerFailure::Unavailable(error)) => Err(error),
+        Err(CtfLayerFailure::Diagnostic(never)) => match never {},
+    }
+}
+
+/// Execute actual diagnostic callbacks at their original loading callpoints.
+/// A callback failure returns before the issue ledger and sticky flag assignment.
+pub fn try_preprocess_ctf_layers<E>(
+    inputs: &[CtfLayerInput],
+    context: CtfLayerContext,
+    mut diagnostic: impl FnMut(CtfLayerDiagnostic) -> Result<(), E>,
+) -> Result<CtfLayerPreprocessing, CtfLayerFailure<E>> {
     let mut result = CtfLayerPreprocessing {
         skipped_unused: !context.is_used_ctf,
         errors_found: context.errors_found,
@@ -198,15 +255,13 @@ pub fn preprocess_ctf_layers(
         return Ok(result);
     }
     if context.source_sink_present {
-        return Err(CtfLayerScopeError::InternalSource);
+        return Err(CtfLayerScopeError::InternalSource.into());
     }
     if context.solution_dimensions != 1 {
-        return Err(CtfLayerScopeError::UnsupportedDimensions(
-            context.solution_dimensions,
-        ));
+        return Err(CtfLayerScopeError::UnsupportedDimensions(context.solution_dimensions).into());
     }
     if inputs.is_empty() || inputs.len() > 11 {
-        return Err(CtfLayerScopeError::LayerCount(inputs.len()));
+        return Err(CtfLayerScopeError::LayerCount(inputs.len()).into());
     }
     let mut layers = Vec::with_capacity(inputs.len());
     let mut num_res_layers = 0;
@@ -220,6 +275,14 @@ pub fn preprocess_ctf_layers(
             res_layer: false,
         };
         if input.thickness > 3.0 {
+            diagnostic(CtfLayerDiagnostic::MaterialTooThick {
+                layer_ordinal: index + 1,
+            })
+            .map_err(CtfLayerFailure::Diagnostic)?;
+            diagnostic(CtfLayerDiagnostic::MaterialName {
+                layer_ordinal: index + 1,
+            })
+            .map_err(CtfLayerFailure::Diagnostic)?;
             result
                 .issues
                 .push(CtfLayerIssue::MaterialTooThick(index + 1));
@@ -235,6 +298,16 @@ pub fn preprocess_ctf_layers(
             num_res_layers += 1;
             layer.lr = input.resistance;
             if layer.lr < 1.0e-3 {
+                diagnostic(CtfLayerDiagnostic::ResistanceBelowMinimum {
+                    layer_ordinal: index + 1,
+                })
+                .map_err(CtfLayerFailure::Diagnostic)?;
+                diagnostic(CtfLayerDiagnostic::ResistanceValues {
+                    layer_ordinal: index + 1,
+                    minimum: 1.0e-3,
+                    resistance: layer.lr,
+                })
+                .map_err(CtfLayerFailure::Diagnostic)?;
                 result
                     .issues
                     .push(CtfLayerIssue::ResistanceBelowMinimum(index + 1));
@@ -270,7 +343,7 @@ pub fn preprocess_ctf_layers(
         }
         for index in adjacent {
             if !layers[index].res_layer || !layers[index + 1].res_layer {
-                return Err(CtfLayerScopeError::AdjacentResistiveInvariant);
+                return Err(CtfLayerScopeError::AdjacentResistiveInvariant.into());
             }
             layers[index].cp = 0.0;
             layers[index].rho = 0.0;

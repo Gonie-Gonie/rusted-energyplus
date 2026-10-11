@@ -1,0 +1,89 @@
+"""Compose reviewed postlude, real registry/sizing and producer diagnostics."""
+import difflib
+import hashlib
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path.cwd().resolve()
+BASE = Path('.runtime/porting/CTF-10')
+OUT = BASE / 'postlude-registry-severe-applied-01'
+def ref(path):
+    data = path.read_bytes()
+    return {'path': path.resolve().relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(data).hexdigest(), 'size_bytes': len(data)}
+def exact(row):
+    path = Path(row['path'])
+    assert ref(path)['sha256'] == row['sha256'] and len(path.read_bytes()) == row['size_bytes']
+    return path.read_bytes()
+def write_json(path, value): path.write_bytes((json.dumps(value, indent=2, allow_nan=False) + '\n').encode())
+
+assert not OUT.exists() and not subprocess.check_output(['git', 'status', '--porcelain'])
+preparations = [
+    ('whole-init-postlude-prep-01', '6954e57a81776d1f883c55e268aa8ac9765be695c7481e90f686eef42755305d'),
+    ('predefined-registry-prep-02', '04ca2b9507192ab8899d251a60d49a3f70046174788e721116cf63b39853ea8f'),
+    ('predefined-sizing-input-prep-02', '95becab5937dd47b9b42ea74f3d4e3242fdc2340323b2fed252b276f71af45a8'),
+    ('severe-producer-prep-01', 'bde6206ea17849df04c7dcc660d35494ae981271b7e70079112ef3ea56eed7ef')]
+mod_path = 'crates/ep_runtime/src/heat_balance/mod.rs'
+mod_before = Path(mod_path).read_bytes()
+planned = {}
+authorities = {}
+module_additions = []
+for name, digest in preparations:
+    manifest_path = BASE / name / 'manifest.json'
+    assert ref(manifest_path)['sha256'] == digest
+    manifest = json.loads(manifest_path.read_bytes())
+    for row in manifest['own_sources']:
+        target = row.get('canonical_path', row.get('target'))
+        proposed = row.get('proposed', row.get('source'))
+        body = exact(proposed)
+        before = exact(row['before']) if row['before'] else None
+        if target == mod_path:
+            assert before == mod_before
+            added = [line for line in body.splitlines(keepends=True) if line not in before.splitlines(keepends=True)]
+            assert len(added) == 1 and added[0].startswith(b'pub mod ') and body.replace(added[0], b'', 1) == before
+            module_additions.append(added[0])
+            authorities.setdefault(target, []).append(proposed)
+            continue
+        current = planned.get(target, Path(target).read_bytes() if Path(target).exists() else None)
+        assert current == before, 'Reviewed actual/prospective parent differs: ' + target
+        planned[target] = body
+        authorities.setdefault(target, []).append(proposed)
+assert len(module_additions) == 3 and len(set(module_additions)) == 3
+mod_after = mod_before
+for addition, anchor in [(b'pub mod ctf_init_postlude;\n', b'pub mod ctf_initial_owner;\n'),
+                         (b'pub mod ctf_source_diagnostics;\n', b'pub mod ctf_surface_binding;\n'),
+                         (b'pub mod predefined_tables;\n', b'pub mod radiation;\n')]:
+    assert addition in module_additions and mod_after.count(anchor) == 1
+    mod_after = mod_after.replace(anchor, addition + anchor)
+planned[mod_path] = mod_after
+(OUT / 'before').mkdir(parents=True)
+(OUT / 'held').mkdir()
+for target, body in planned.items():
+    name = target.replace('/', '__')
+    path = Path(target)
+    if path.exists(): (OUT / 'before' / name).write_bytes(path.read_bytes())
+    (OUT / 'held' / name).write_bytes(body)
+    path.write_bytes(body)
+fmt_dir = BASE / 'postlude-registry-severe-format-command-01'
+assert not fmt_dir.exists()
+result = subprocess.run([sys.executable, '-X', 'utf8', '-B', 'tools/porting/record_command.py', '--output-dir', str(fmt_dir), '--', 'cargo', 'fmt', '--all'], stdout=subprocess.DEVNULL)
+assert result.returncode == 0
+(OUT / 'formatted').mkdir()
+(OUT / 'formatter-diffs').mkdir()
+sources = []
+for target, body in planned.items():
+    name = target.replace('/', '__')
+    final = Path(target).read_bytes()
+    archive = OUT / 'formatted' / name
+    archive.write_bytes(final)
+    delta = OUT / 'formatter-diffs' / (name + '.diff')
+    delta.write_bytes(''.join(difflib.unified_diff(body.decode().splitlines(True), final.decode().splitlines(True), fromfile=(OUT / 'held' / name).as_posix(), tofile=target)).encode())
+    sources.append({'canonical_path': target, 'reviewed_source_authorities': authorities[target], 'actual_composed_source': ref(OUT / 'held' / name), 'actual_final_source': ref(archive), 'actual_formatter_diff': ref(delta)})
+write_json(OUT / 'record.json', {'schema': 'ctf10-postlude-registry-severe-actual-application.v1',
+    'source_preparations': [ref(BASE / name / 'manifest.json') for name, _ in preparations],
+    'actual_sources': sources, 'actual_format_execution': ref(fmt_dir / 'receipt.json'),
+    'actual_Root_source': ref(Path(__file__)), 'Root_and_other_author_Source_review_accepted': True,
+    'shared_module_composition': 'Preserve actual mod78 and add all three reviewed declarations; prospective postlude test is updated by severe producer.',
+    'ordinary_production_connection_applied': False, 'scientific_PASS_claimed': False, 'gates_updated': False})
+print(json.dumps({'record': ref(OUT / 'record.json'), 'actual_canonical_files': len(sources)}), flush=True)

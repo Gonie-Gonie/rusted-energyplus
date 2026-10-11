@@ -1,0 +1,10 @@
+--- crates/ep_runtime/src/heat_balance/ctf_init_postlude_tests.rs
++++ crates/ep_runtime/src/heat_balance/ctf_init_postlude_tests.rs
+@@ -75,6 +75,7 @@
+         warmup_flag: false, doing_sizing: false,
+         tracking: SourceErrorTracking {
+             match_counts: [0; 20], abort_processing: false, total_severe_errors: 3,
++            total_severe_errors_during_warmup: 0, total_severe_errors_during_sizing: 0,
+             last_severe_error: "incoming actual severe owner".into(), total_warning_errors: 0,
+             total_warning_errors_during_warmup: 0, total_warning_errors_during_sizing: 0,
+         },

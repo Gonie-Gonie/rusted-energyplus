@@ -116,6 +116,8 @@ CTF-10은 일반 표면·이력 수명주기를 연결했고 전체 테스트 4,
 
 CTF-10의 실제 원본·Rust 조회 비교는 12개 입력·264개 조회·21,405개 항목에서 차이 0으로 통과했습니다. [비교 증거](evidence/CTF-10-report-scan-comparison/summary.json)를 보존했으며 전체 초기화·일반 실행 통합은 계속 진행합니다.
 
+CTF-10의 전체 보고서 등록·실제 오류 발생 지점·초기화 후처리를 구현하고 추가 34개를 포함한 전체 4,914개 테스트를 통과했습니다. [구현 증거](evidence/CTF-10-init-postlude/summary.json)를 보존했으며 일반 실행 경로 연결과 원본 통합 비교는 계속 진행합니다.
+
 | [ ] | [CTF-10](cards/CTF-10.md) | 구성체별 생성 연결·역순 재사용 | `HeatBalanceManager.cc` · `InitConductionTransferFunctions; ConstructionProps::calculateTransferFunction` | CTF-02, CTF-09 |
 
 ### 05 열원·외부 경계
