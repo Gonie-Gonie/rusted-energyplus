@@ -11830,19 +11830,6 @@
         "path": "energyplus_porting_plan/evidence/CTF-10-storage-maintenance/summary.json",
         "sha256": "1252f8d0fdb42790e06d9bd91980872ff0a31e04127ec72427bfb75ec945a12b",
         "size_bytes": 1158
-      },
-      "prospective_ordinary_surface_lifecycle_capture": {
-        "native_source_manifest": {
-          "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/manifest.json",
-          "sha256": "4cfaf1868257599cae0667fe98c3e24952637b00417141325daf98537264a03d",
-          "size_bytes": 12929
-        },
-        "selected_case_id": "A-24H",
-        "scope": "Complete ordinary Original lifecycle, including all actual initialization, kickoff, warmup and weather calls. Passive51 callback sites; actual SurfaceId/ConstructionId association, all allocated current/master histories, counters, scratch and flux reports. Native observations may later supply direct-unit test operands only. Independent Rust coefficient generation, lifecycle and production handoff remain unproven.",
-        "observation_max_bytes": 4294967296,
-        "actual_capture_available": false,
-        "thermal_history_Rust_arithmetic_applied": false,
-        "full_card_gates_updated": false
       }
     },
     {

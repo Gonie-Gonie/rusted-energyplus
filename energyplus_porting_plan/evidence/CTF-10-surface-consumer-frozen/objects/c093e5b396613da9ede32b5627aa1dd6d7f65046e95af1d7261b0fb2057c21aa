@@ -1,0 +1,40 @@
+--- before/ctf10_reference.cmake
++++ surface_consumer_reference.cmake
+@@ -36,3 +36,37 @@
+     cmake_language(DEFER CALL ctf10_add_reference)
+   endif()
+ endif()
++
++# New source-only normal-engine surface capture; all CTF10 targets above unchanged.
++if(NOT DEFINED SURFACE_CONSUMER_SOURCE_DIR)
++  message(FATAL_ERROR "Surface consumer requires explicit reviewed source directory")
++endif()
++if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
++  get_property(_surface_consumer_scheduled GLOBAL PROPERTY SURFACE_CONSUMER_SCHEDULED)
++  if(NOT _surface_consumer_scheduled)
++    set_property(GLOBAL PROPERTY SURFACE_CONSUMER_SCHEDULED TRUE)
++    function(surface_consumer_add_reference)
++      if(NOT TARGET energypluslib)
++        message(FATAL_ERROR "Surface consumer requires genuine unchanged energypluslib")
++      endif()
++      get_target_property(_surface_consumer_defs energypluslib COMPILE_DEFINITIONS)
++      get_directory_property(_surface_consumer_dir_defs DIRECTORY "${CMAKE_SOURCE_DIR}/src/EnergyPlus" COMPILE_DEFINITIONS)
++      list(APPEND _surface_consumer_defs ${_surface_consumer_dir_defs})
++      list(FILTER _surface_consumer_defs EXCLUDE REGEX "-NOTFOUND$")
++      list(REMOVE_DUPLICATES _surface_consumer_defs)
++      add_executable(surface_consumer_helper
++        "${SURFACE_CONSUMER_SOURCE_DIR}/surface_consumer_main.cpp"
++        "${SURFACE_CONSUMER_SOURCE_DIR}/HeatBalanceSurfaceManager.surface_consumer.cc"
++        "${SURFACE_CONSUMER_SOURCE_DIR}/surface_consumer_observer.cc"
++        "${CMAKE_SOURCE_DIR}/src/EnergyPlus/api/EnergyPlusPgm.cc"
++        "${CMAKE_SOURCE_DIR}/src/EnergyPlus/CommandLineInterface.cc")
++      target_include_directories(surface_consumer_helper PRIVATE
++        "$<TARGET_PROPERTY:energypluslib,INCLUDE_DIRECTORIES>" "${SURFACE_CONSUMER_SOURCE_DIR}")
++      target_compile_definitions(surface_consumer_helper PRIVATE ${_surface_consumer_defs} ENERGYPLUS_STATIC_API)
++      target_link_libraries(surface_consumer_helper PRIVATE energypluslib project_options project_fp_options project_warnings bcrypt)
++      target_compile_features(surface_consumer_helper PRIVATE cxx_std_20)
++      target_link_options(surface_consumer_helper PRIVATE "-Wl,-Map,${CMAKE_CURRENT_BINARY_DIR}/surface_consumer_helper.map")
++    endfunction()
++    cmake_language(DEFER CALL surface_consumer_add_reference)
++  endif()
++endif()

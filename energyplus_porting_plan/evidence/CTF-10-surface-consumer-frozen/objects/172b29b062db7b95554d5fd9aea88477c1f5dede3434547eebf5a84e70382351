@@ -1,0 +1,216 @@
+{
+  "schema": "ctf10-surface-consumer-native-source-preparation.v1",
+  "status": "held-source-only-not-built-or-executed",
+  "author": "/root/clk02_raw_port",
+  "design": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-design-prep-02/manifest.json",
+    "sha256": "ccba92e3f8f1301a11a825e25779a9bc03f95b8eefdb5268ead490dae897734e",
+    "size_bytes": 3281,
+    "line_count": 86
+  },
+  "own_source_and_metadata": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/surface_consumer_observer.hh",
+      "sha256": "1d9befcc41cba45b74d36d27f75836249d9ce20f44173c84a195b446d8f2e7dd",
+      "size_bytes": 2403,
+      "line_count": 66
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/surface_consumer_observer.cc",
+      "sha256": "99b6e3e516f8bb5ac0cff61d5a61f45368ce89acd997c0021d4f1d3a8e6b78ea",
+      "size_bytes": 16904,
+      "line_count": 302
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/surface_consumer_main.cpp",
+      "sha256": "348f95e60fefa9c4027388b49a47ab25d2ac9fbd7e35e5c66a21895e73ee56d2",
+      "size_bytes": 2184,
+      "line_count": 53
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/HeatBalanceSurfaceManager.surface_consumer.cc",
+      "sha256": "e37acaa62973ff87aa15dd113ebf77bbc459091a6ff8fc72c9baada1d93c17ce",
+      "size_bytes": 713540,
+      "line_count": 10279
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/surface_consumer_reference.cmake",
+      "sha256": "f4f25bd910c81a494b2b5b023f95abd91097376c9d0664826cad02851e685c67",
+      "size_bytes": 4527,
+      "line_count": 72
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/additions.json",
+      "sha256": "fb155a1ddacd1d3a42f8c1aeef3a55f5d1c0b400b08c30d37517937a2b3459ef",
+      "size_bytes": 24762,
+      "line_count": 308
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/source-context.json",
+      "sha256": "fec7d7338678a3139dfec5bcb9c9f612ec44c3e83317cf164bfa7ffe6ec059c7",
+      "size_bytes": 25087,
+      "line_count": 628
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/README.md",
+      "sha256": "38f8a200b770f24f6ec3fa4293c3f9bceaa8f4147f2886654b09609d122985df",
+      "size_bytes": 7585,
+      "line_count": 104
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/prepare_successor.py",
+      "sha256": "e14ccbb61f09a1f33763754f298244dc581625b69ee0f40550e1c88d52aeefc7",
+      "size_bytes": 6562,
+      "line_count": 121
+    }
+  ],
+  "exact_source_diffs": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/diffs/HeatBalanceSurfaceManager.surface_consumer.cc.diff",
+      "sha256": "324d141b6f53aacc000de170aab6043f58473de688a7ca67139d2b7eb0ce2b8a",
+      "size_bytes": 28646,
+      "line_count": 454
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/diffs/surface_consumer_reference.cmake.diff",
+      "sha256": "c093e5b396613da9ede32b5627aa1dd6d7f65046e95af1d7261b0fb2057c21aa",
+      "size_bytes": 2356,
+      "line_count": 40
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/diffs/surface_consumer_observer.hh.diff",
+      "sha256": "cf5240cc16ea00897b3013b3e77acdb4d1a1c04dbbd611aec727a40a3fcf6741",
+      "size_bytes": 2533,
+      "line_count": 69
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/diffs/surface_consumer_observer.cc.diff",
+      "sha256": "863ec9a111e535d51b01db1a3b4514f829710bd05a7b38f1f075ad45b655393b",
+      "size_bytes": 17271,
+      "line_count": 305
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/diffs/surface_consumer_main.cpp.diff",
+      "sha256": "b6ee8bee39d859c0cd1d90404b71115fb28e3d2a90fdc1063955ceffe5bd191a",
+      "size_bytes": 2298,
+      "line_count": 56
+    }
+  ],
+  "source_archives": [
+    {
+      "original": {
+        "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
+        "sha256": "0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c",
+        "size_bytes": 698972,
+        "line_count": 10119
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/before/HeatBalanceSurfaceManager.cc",
+        "sha256": "0d50903b9cebab76608a76c8643a4686f94f053c82030d7577d652971b67f73c",
+        "size_bytes": 698972,
+        "line_count": 10119
+      }
+    },
+    {
+      "original": {
+        "path": ".runtime/porting/CTF-10/native-helper-prep-01/ctf10_reference.cmake",
+        "sha256": "51eaa70ce28d4c91fb63ad42b72d3ad20c86ce440de3d25bb4986f079ac03f9f",
+        "size_bytes": 2366,
+        "line_count": 38
+      },
+      "archive": {
+        "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/before/ctf10_reference.cmake",
+        "sha256": "51eaa70ce28d4c91fb63ad42b72d3ad20c86ce440de3d25bb4986f079ac03f9f",
+        "size_bytes": 2366,
+        "line_count": 38
+      }
+    }
+  ],
+  "prospective_Rust_adapter": {
+    "path": ".runtime/porting/CTF-10/surface-binding-prep-01/manifest.json",
+    "sha256": "f1c291242acdbeedce392f2db0cb5d41efd28d95e3a53268c825e939655864eb",
+    "size_bytes": 21534,
+    "line_count": 547
+  },
+  "callback_blocks": 51,
+  "whole_Original_HBSM_inverse_byte_exact": true,
+  "old_CTF10_recipe_prefix_byte_exact": true,
+  "observation_transport": "complete compact JSON event array streamed in actual callback order",
+  "scientific_or_binary_or_weather_payloads_read": false,
+  "canonical_or_prior_hold_mutated": false,
+  "build_or_target_or_project_import_performed": false,
+  "selected_inputs_or_duration_or_tolerances_chosen": false,
+  "future_execution_policy_or_actual_refs": null,
+  "integration_PASS_claimed": false,
+  "predecessor_manifest": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-01/manifest.json",
+    "sha256": "cfd26478d91bcd6916f1060ec09f3dda9f294402f19a21422c27cdddc1e767f1",
+    "size_bytes": 5888,
+    "line_count": 145
+  },
+  "historical_source_emitter_not_for_reexecution": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-01/prepare_sources.py",
+    "sha256": "b98a14f39936aa6700f8db40c69368639c142406e4242a242db3a72a2a6f9152",
+    "size_bytes": 13796,
+    "line_count": 203
+  },
+  "before_predecessor_archives": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/before-01/surface_consumer_observer.cc",
+      "sha256": "5cdeb337caa622f2ac9271ed7fe49df96b06a1a408c544a58120185623200954",
+      "size_bytes": 16920,
+      "line_count": 302
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/before-01/source-context.json",
+      "sha256": "135f69a771421d19f44c7444cdf97f0c42d7507230af9427bd537039ce9ae03f",
+      "size_bytes": 24502,
+      "line_count": 614
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/before-01/README.md",
+      "sha256": "6c2158ff48166925cf9af6cb0ad737cce6b479286842edfdf99ac7641ebc193d",
+      "size_bytes": 6635,
+      "line_count": 90
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/before-01/manifest.json",
+      "sha256": "cfd26478d91bcd6916f1060ec09f3dda9f294402f19a21422c27cdddc1e767f1",
+      "size_bytes": 5888,
+      "line_count": 145
+    }
+  ],
+  "exact_from_predecessor_diffs": [
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/from-01/surface_consumer_observer.cc.diff",
+      "sha256": "cea91f124a04280e09732e66231bb372c2091823ac2ace41da6602a5893f2582",
+      "size_bytes": 1646,
+      "line_count": 24
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/from-01/source-context.json.diff",
+      "sha256": "7ab0589260dcb2a84f3b5cdf8904388de266ba4ca14de31905dfb36e2277191b",
+      "size_bytes": 1189,
+      "line_count": 30
+    },
+    {
+      "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-02/from-01/README.md.diff",
+      "sha256": "311ab777b5107254bae7bc906dd87772a3c5ad96d1f57d440b040935159844aa",
+      "size_bytes": 1366,
+      "line_count": 20
+    }
+  ],
+  "repair_scope": {
+    "only_executable_changes": "three catalog Surface/Zone/space EPVector loop bounds l/u -> 1/isize",
+    "Construct_Array1D_bounds_unchanged": true,
+    "other_four_build_source_bodies_byte_exact_01": true,
+    "Source_API_authority": {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EPVector.hh",
+      "sha256": "155ac5aaf6bd6138ad1a397edf68e2c660a6595d94f291bcf671ebc040c335e2",
+      "size_bytes": 11096,
+      "line_count": 357
+    },
+    "actual_predecessor_compile_or_execution_performed": false,
+    "Root_and_independent_narrow_review_pending": true
+  }
+}

@@ -1,0 +1,122 @@
+# Held normal-engine surface-consumer build adapters
+
+Source-only adaptation of accepted RAD01 build-prep03 (the three physical
+scripts are in RAD01 build-prep02). This proposal changes the existing
+configure/build, derive/correspondence and metadata-completion stages. It adds
+no QA stage and invokes no engine. The reviewed consumer03 producer remains
+unchanged. Root and an independent source reviewer must review this hold
+before Root executes these adapters.
+
+## Actual authorities and pending operands
+
+The immediate CTF10 retirement metadata provides 46 legacy artifacts plus two
+retained CTF10 derivatives, 631 present core objects and 12 registered absent
+objects. Its literal previous pair-retirement records plus its own tombstones
+provide 12 absent Original paths. The actual RAD01 native-build02 metadata
+adds its retained linked Original and accepted derivative to the protected
+set: 50 distinct paths. Their actual identities and sizes are taken from
+metadata, not from a future hash or a rewritten registry. This authoring pass
+does not read/hash those binary or core payloads. Root's future preflight
+freshly hashes all50 and631 against the authenticated authority metadata.
+
+The prior CTF10 compile-command archive has 717 actual rows. Root must first
+record the exact old CTF10 configure argv, successfully restoring the live
+compile-command bytes to that archive. The new adapter only validates that
+restoration; it never performs it or edits the row ledger. RAD01's actual
+720-row registration is replaced through genuine CMake configuration, while
+both RAD binaries stay protected. The consumer recipe preserves all old
+CTF10/inherited targets and adds five registration rows: the expected
+obligation is717+5, checked against actual output rather than claimed now.
+
+Root supplies actual current scope and freeze metadata, both before capture:
+
+- `ctf10-surface-consumer-scope-amendment.v1`
+- `ctf10-surface-consumer-input-freeze.v1`
+
+Both bind the reviewed consumer03 manifest, exact CON scope, unchanged45
+input guards from the actual CTF10 production CLI input manifest, A-24H input
+and weather, three current documents in exact plan/card/HTML order, and
+`observation_max_bytes=4294967296`. Scientific execution, expected values,
+integration PASS and full-card gate updates are explicitly false. The freeze
+additionally binds the actual scope document and recorder, the before-capture
+flag, actual IDD, seven ordinary forwarded CLI strings and observation path.
+The argument grammar is exactly `-i IDD -w WEATHER -d OUTPUT INPUT`; no time,
+annual/design-day/report override is inserted. Output parent directories need
+not exist during this build. The observation file must still be fresh. The
+4GiB bound is future full-file OriginalQA admission, never producer truncation.
+Scope, freeze and restoration receipts must each be genuine zero-exit,
+source-guarded records of the same actual current SourceSnapshot. No pending
+document, receipt, output digest or SourceSnapshot is invented in this hold.
+Scope execution is the existing `check_plan.py --check --card CTF-10` receipt;
+its diagnostic stdout is not parsed as scope JSON. The separate literal
+freeze writer receipt's complete stdout must exactly equal the frozen packet.
+
+## Existing operational interfaces
+
+`run-native-build.py` accepts `--output-dir` and these authenticated `path#SHA`
+operands (plus optional `--root`):
+
+- `--build-source-manifest`, `--native-source-manifest`
+- `--freeze-receipt`, `--freeze-execution`, `--scope-amendment`, `--scope-execution`
+- `--fixed-input-guards-source`
+- `--prior-final-preservation`, `--prior-retirement`, `--prior-retirement-execution`
+- `--prior-native-build`, `--rad-native-build`
+- `--prior-configure-execution`, `--prior-compile-execution`
+- `--restore-configure-execution`
+
+It keeps the prior CMake toolchain, arithmetic/warning options, source-dir
+arguments and all inherited dependencies; changes only the project include
+to the reviewed consumer recipe; adds `SURFACE_CONSUMER_SOURCE_DIR`; changes
+only the target list to `surface_consumer_helper`, keeping parallel1/verbose.
+It writes the same existing before-preservation and two command-receipt
+shapes, with consumer-specific schema and direct actual authority refs.
+
+`derive-and-describe-native-build.py` accepts `--before-preservation path#SHA`,
+`--prior-derivation-execution path#SHA`, `--output-dir` (optional `--root`).
+It requires exactly five new target object outputs and exactly five fresh
+compile command lines. New registration rows are selected by resolved
+`CMakeFiles/surface_consumer_helper.dir` output containment AND the exact five
+Source paths. This is essential: the preserved717 already includes original
+Pgm/CLI sources under energyplusapi. Source-filename-only selection would
+wrongly remove those two old rows. Removing only the five new target rows
+must leave the original717 dictionaries in their original order, unchanged.
+No prior core/API object compilation is allowed; the two intentional new
+target objects from original Pgm/CLI source are explicitly distinguished.
+
+The generic `derive_native_helper.py` and `native_pe.py` are unchanged. The
+prior accepted derivation argv supplies its exact strip authentication and
+PE mechanism; only actual new Original path/SHA and fresh output directory
+are replaced. Both Original and derivative are retained, with all existing
+strict runtime-section/directory comparisons. The adapter has no strip,
+provider or PE bypass, and supplies no retirement intent.
+
+`complete-native-build-metadata.py` accepts `--before-preservation path#SHA`,
+`--output-dir` (optional `--root`). It rechecks the exact ledger, source
+identities, all50 protected objects, core631/12 and12 Original absences.
+It records actual `path/sha256/size_bytes` for both new binaries. The output
+build schema is `ctf10-surface-consumer-native-build.v1`, target
+`surface_consumer_helper`, status `pass-actual-5TU-link-and-preservation`.
+`native_source_files` contains five TUs plus the header and recipe;
+`compiled_source_files` contains only the five actual TUs.
+
+## Actual link-provider obligation
+
+Five target object LOAD records must precede `Products/libenergypluslib.a`.
+Eight selected actual symbol definitions must each fall inside the latest
+actual `.text` section's address range and have the exact target provider:
+six HBSM entry/history/report/CTF-only functions from the reviewed full derived
+HBSM, global `EnergyPlusPgm` from original Pgm, and `ProcessArgs` from original
+CLI. Selection uses source-owned function names, not a guessed ABI signature.
+Any selected original core HBSM object occurrence fails. Genuine core HBM and
+Construction remain allowed and required by the unchanged normal engine;
+old RAD/CTF no-provider predicates are not misapplied to this target.
+
+The preservation output stores `address_bound_selected_providers` (actual
+symbol and section lines), actual five target LOAD records,
+`selected_core_HeatBalanceSurfaceManager_object_hits`, compile correspondence,
+direct restoration/RAD/scope/freeze identities and the actual SourceSnapshot.
+This certifies build/custody only. Future full ordinary-engine capture,
+streamed-event validation, Rust consumer matching and scientific integration
+remain separate pending work. No engine, compiler, target, project import,
+formatter, Git, canonical mutation or scientific/binary/weather payload read
+was performed to prepare this Source hold.

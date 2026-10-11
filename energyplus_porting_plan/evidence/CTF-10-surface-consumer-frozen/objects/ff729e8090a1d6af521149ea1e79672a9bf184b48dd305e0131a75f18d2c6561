@@ -1,0 +1,36 @@
+"""Root declares an input-only ordinary Native lifecycle capture before any output."""
+import hashlib,json,shutil,subprocess
+from datetime import datetime,timezone
+from pathlib import Path
+ROOT=Path.cwd(); BASE=ROOT/'.runtime/porting/CTF-10'; OUT=BASE/'surface-consumer-scope-amendment-01'
+def read(p): return json.loads(p.read_bytes())
+def sha(p):
+ with p.open('rb') as s: return hashlib.file_digest(s,'sha256').hexdigest()
+def ref(p): return {'path':p.relative_to(ROOT).as_posix(),'sha256':sha(p),'size_bytes':p.stat().st_size}
+def write(p,v): p.write_bytes((json.dumps(v,ensure_ascii=False,indent=2,allow_nan=False)+'\n').encode('utf8'))
+native=BASE/'surface-consumer-native-prep-03/manifest.json'; assert sha(native)=='4cfaf1868257599cae0667fe98c3e24952637b00417141325daf98537264a03d'
+assert not subprocess.check_output(['git','status','--porcelain'])
+assert subprocess.check_output(['git','rev-parse','HEAD'])==subprocess.check_output(['git','rev-parse','@{u}'])
+assert not OUT.exists(); (OUT/'before').mkdir(parents=True)
+documents=[ROOT/'energyplus_porting_plan/plan.json',ROOT/'energyplus_porting_plan/cards/CTF-10.md',ROOT/'energyplus_porting_plan/energyplus_porting_checklist.html']
+before=[]
+for p in documents:
+ archive=OUT/'before'/p.name; shutil.copyfile(p,archive); assert p.read_bytes()==archive.read_bytes(); before.append({'original':ref(p),'archive':ref(archive)})
+plan=read(documents[0]); task=next(r for r in plan['tasks'] if r['id']=='CTF-10')
+assert all(task[k]=='\uBBF8\uD655\uC778' for k in ['unit_gate','integration_gate','production_gate'])
+task['prospective_ordinary_surface_lifecycle_capture']={'native_source_manifest':ref(native),'selected_case_id':'A-24H','scope':'Complete ordinary Original lifecycle, including all actual initialization, kickoff, warmup and weather calls. Passive51 callback sites; actual SurfaceId/ConstructionId association, all allocated current/master histories, counters, scratch and flux reports. Native observations may later supply direct-unit test operands only. Independent Rust coefficient generation, lifecycle and production handoff remain unproven.','observation_max_bytes':4294967296,'actual_capture_available':False,'thermal_history_Rust_arithmetic_applied':False,'full_card_gates_updated':False}
+write(documents[0],plan)
+text=documents[1].read_text(encoding='utf8')
+text+='\n## Prospective ordinary surface lifecycle capture\n\nThe held passive consumer03 observes the complete unchanged A-24H input and weather through genuine EnergyPlusPgm, with no duration override, design-day-only switch, warmup shortcut or seeded engine state. All actual procedure order, flags, owner identities, allocations and full history bounds are retained at51 existing passive sites. Entry observations include scratch/report/counter arrays; absence remains absence. A prospective4GiB full-file QA resource bound rejects excess and never truncates the producer.\n\nRoot and another author completed cumulative FULL collector/fork/recipe Source reviews. Actual build, strict PE review, capture and factual OriginalDataQA remain pending. Captured Native operands are permitted only for future same-input direct-unit tests; ordinary Rust production must generate its own coefficients/state. Standalone thermal-history Source remains unapplied until genuine same-input observations are reviewed. No unit/integration/production gate is changed by this scope.\n'
+documents[1].write_bytes(text.encode('utf8'))
+subprocess.run(['python','-X','utf8','-B','tools/porting/sync_plan_views.py','--write'],check=True)
+packet_path=BASE/'production-cli-inputs-01/manifest.json'; packet=read(packet_path)
+guards=[packet['fixed_scope']]+[r['actual'] for r in packet['all45_fixed_input_guards']]; assert len(guards)==46
+for row in guards: assert ref(ROOT/row['path'])==row
+selected={r['kind']:r['actual'] for r in packet['all45_fixed_input_guards'] if r['case_id']=='A-24H'}
+idd=ROOT/'.runtime/energyplus/26.1.0/Energy+.idd'
+native_output=BASE/'surface-consumer-native-output-01/A-24H'; observation=BASE/'surface-consumer-native-output-01/A-24H.observation.json'
+assert not native_output.exists() and not observation.exists()
+scope={'schema':'ctf10-surface-consumer-scope-amendment.v1','created_utc':datetime.now(timezone.utc).isoformat(),'native_source_manifest':ref(native),'source_authorities':{'current_after_documents':[ref(p) for p in documents],'before_documents':before,'actual_scope_check_role':'real-CTF-10-check-only'},'prior_input_only_packet':ref(packet_path),'fixed_scope':packet['fixed_scope'],'all45_fixed_input_guards':packet['all45_fixed_input_guards'],'selected_case_id':'A-24H','selected_input':selected['input'],'selected_weather':selected['weather'],'selected_metadata':selected['metadata'],'selected_idd':ref(idd),'forwarded_native_arguments':['-i',str(idd),'-w',str(ROOT/selected['weather']['path']),'-d',str(native_output),str(ROOT/selected['input']['path'])],'observation_output_path':str(observation),'observation_max_bytes':4294967296,'scientific_execution_performed':False,'expected_values_supplied':False,'integration_PASS_claimed':False,'full_card_gates_updated':False,'Root_and_other_author_FULL_native_source_accepted':True,'Native_observations_used_as_ordinary_Rust_production_inputs':False,'thermal_history_Rust_arithmetic_applied':False,'numerical_policy_for_future_comparison_claimed':False}
+write(OUT/'amendment.json',scope)
+print('Root input-only surface consumer scope prepared',ref(OUT/'amendment.json'),flush=True)

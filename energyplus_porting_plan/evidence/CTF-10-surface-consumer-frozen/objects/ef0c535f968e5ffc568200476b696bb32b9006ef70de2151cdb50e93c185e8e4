@@ -1,0 +1,360 @@
+--- /dev/null
++++ surface_consumer_observer.cc
+@@ -0,0 +1,357 @@
++// Passive copies only. No callback evaluates a heat-balance expression.
++#include "surface_consumer_observer.hh"
++#include <EnergyPlus/Data/EnergyPlusData.hh>
++#include <EnergyPlus/Construction.hh>
++#include <EnergyPlus/DataEnvironment.hh>
++#include <EnergyPlus/DataGlobals.hh>
++#include <EnergyPlus/DataHeatBalance.hh>
++#include <EnergyPlus/DataHeatBalSurface.hh>
++#include <EnergyPlus/DataHeatBalFanSys.hh>
++#include <EnergyPlus/DataSurfaces.hh>
++#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
++#include <nlohmann/json.hpp>
++#include <cstring>
++#include <exception>
++#include <limits>
++#include <ostream>
++#include <string>
++#include <utility>
++
++namespace SurfaceConsumerObservation {
++namespace {
++using json = nlohmann::json;
++thread_local Capture *active = nullptr;
++thread_local Scope *current_scope = nullptr;
++char const *procedure_name(Procedure p) noexcept
++{
++    switch (p) {
++    case Procedure::Manage: return "ManageSurfaceHeatBalance";
++    case Procedure::Initialize: return "InitSurfaceHeatBalance";
++    case Procedure::InitializeHistories: return "InitThermalAndFluxHistories";
++    case Procedure::UpdateHistories: return "UpdateThermalHistories";
++    case Procedure::InsideCTF: return "CalcHeatBalanceInsideSurf2CTFOnly";
++    case Procedure::Report: return "ReportSurfaceHeatBalance";
++    default: return "unknown-observer-procedure";
++    }
++}
++bool increment(std::uint64_t &counter) noexcept
++{
++    if (counter == std::numeric_limits<std::uint64_t>::max()) {
++        active->counter_overflow = true;
++        return false;
++    }
++    ++counter;
++    return true;
++}
++json scalar(double value)
++{
++    static_assert(sizeof(double) == sizeof(std::uint64_t));
++    static_assert(std::numeric_limits<double>::is_iec559);
++    std::uint64_t bits;
++    std::memcpy(&bits, &value, sizeof(bits));
++    char text[17];
++    char const *hex = "0123456789abcdef";
++    for (unsigned i = 0; i < 16; ++i) text[i] = hex[(bits >> ((15 - i) * 4)) & 15];
++    text[16] = '\0';
++    auto const magnitude = bits & 0x7fffffffffffffffULL;
++    bool const negative = (bits >> 63) != 0;
++    char const *kind = magnitude > 0x7ff0000000000000ULL ? "nan" :
++        magnitude == 0x7ff0000000000000ULL ? (negative ? "negative_infinity" : "positive_infinity") :
++        magnitude == 0 ? (negative ? "negative_zero" : "positive_zero") : "finite";
++    // Bits/class are authoritative; no decimal evaluation or duplicate payload.
++    return {{"value_bits", text}, {"value_class", kind}};
++}
++template<class Array> json real_at(Array const &values, int index)
++{
++    if (!values.allocated() || !values.contains(index)) return nullptr;
++    return scalar(values(index));
++}
++template<class Array> json integer_at(Array const &values, int index)
++{
++    if (!values.allocated() || !values.contains(index)) return nullptr;
++    return values(index);
++}
++template<class Array> json history_at(Array const &values, int surface)
++{
++    json out{{"allocated", values.allocated()}, {"terms", nullptr}};
++    if (!values.allocated()) return out;
++    out["lower"] = values.l(); out["upper"] = values.u();
++    out["terms"] = json::array();
++    // All actual allocated term slots, without a selected-term clamp.
++    for (int term = values.l(); term <= values.u(); ++term) {
++        auto const &slot = values(term);
++        out["terms"].push_back({{"term", term}, {"surface_lower", slot.l()},
++            {"surface_upper", slot.u()}, {"surface_allocated", slot.allocated()},
++            {"value", real_at(slot, surface)}});
++    }
++    return out;
++}
++template<class Array> json term_at(Array const &values, int term, int surface)
++{
++    if (!values.allocated() || !values.contains(term)) return nullptr;
++    return real_at(values(term), surface);
++}
++json clock(EnergyPlus::EnergyPlusData const &state)
++{
++    auto const &g = *state.dataGlobal;
++    auto const &e = *state.dataEnvrn;
++    auto const &h = *state.dataHeatBal;
++    return {{"state_address", reinterpret_cast<std::uintptr_t>(&state)},
++        {"environment_index", e.CurEnvirNum}, {"environment_name", e.EnvironmentName},
++        {"CalendarYear", g.CalendarYear}, {"Month", e.Month}, {"DayOfMonth", e.DayOfMonth},
++        {"DayOfSim", g.DayOfSim}, {"HourOfDay", g.HourOfDay}, {"TimeStep", g.TimeStep},
++        {"TimeStepZone", scalar(g.TimeStepZone)}, {"TimeStepZoneSec", scalar(g.TimeStepZoneSec)},
++        {"KickOffSimulation", g.KickOffSimulation}, {"WarmupFlag", g.WarmupFlag},
++        {"BeginSimFlag", g.BeginSimFlag}, {"BeginEnvrnFlag", g.BeginEnvrnFlag},
++        {"BeginDayFlag", g.BeginDayFlag}, {"BeginHourFlag", g.BeginHourFlag},
++        {"BeginTimeStepFlag", g.BeginTimeStepFlag}, {"ZoneSizingCalc", g.ZoneSizingCalc},
++        {"AllCTF", h.AllCTF}, {"AnyCTF", h.AnyCTF}, {"SimpleCTFOnly", h.SimpleCTFOnly},
++        {"MaxCTFTerms", h.MaxCTFTerms}, {"InsideSurfIterations", h.InsideSurfIterations},
++        {"AnyInternalHeatSourceInInput", h.AnyInternalHeatSourceInInput},
++        {"UpdateThermalHistoriesFirstTimeFlag", state.dataHeatBalSurfMgr->UpdateThermalHistoriesFirstTimeFlag},
++        {"AnyEMS", g.AnyEnergyManagementSystemInModel},
++        {"AnyConstrOverrides", g.AnyConstrOverridesInModel},
++        {"AnySurfPropOverrides", g.AnySurfPropOverridesInModel}};
++}
++json catalog(EnergyPlus::EnergyPlusData const &state)
++{
++    json out{{"surfaces", json::array()}, {"constructions", json::array()},
++             {"zones", json::array()}, {"spaces", json::array()},
++             {"AllHTSurfaceList", state.dataSurface->AllHTSurfaceList}};
++    auto const &surfaces = state.dataSurface->Surface;
++    if (surfaces.allocated()) for (int i = 1; i <= surfaces.isize(); ++i) {
++        auto const &s = surfaces(i);
++        out["surfaces"].push_back({{"index", i}, {"Name", s.Name}, {"Construction", s.Construction},
++            {"Class", static_cast<int>(s.Class)}, {"OriginalClass", static_cast<int>(s.OriginalClass)},
++            {"HeatTransferAlgorithm", static_cast<int>(s.HeatTransferAlgorithm)},
++            {"Zone", s.Zone}, {"Space", s.spaceNum}, {"ExtBoundCond", s.ExtBoundCond},
++            {"Area", scalar(s.Area)}});
++    }
++    auto const &constructions = state.dataConstruction->Construct;
++    if (constructions.allocated()) for (int i = constructions.l(); i <= constructions.u(); ++i) {
++        auto const &c = constructions(i);
++        json row{{"index", i}, {"Name", c.Name}, {"TotLayers", c.TotLayers}, {"LayerPoint", json::array()},
++            {"IsUsedCTF", c.IsUsedCTF}, {"SourceSinkPresent", c.SourceSinkPresent},
++            {"SolutionDimensions", c.SolutionDimensions}, {"NumCTFTerms", c.NumCTFTerms},
++            {"NumHistories", c.NumHistories}, {"CTFTimeStep", scalar(c.CTFTimeStep)}, {"UValue", scalar(c.UValue)}};
++        for (int j = c.LayerPoint.l(); j <= c.LayerPoint.u(); ++j) row["LayerPoint"].push_back(c.LayerPoint(j));
++        auto copy_fixed = [&](char const *name, auto const &values) {
++            row[name] = json::array();
++            for (auto const value : values) row[name].push_back(scalar(value));
++        };
++        copy_fixed("CTFOutside", c.CTFOutside); copy_fixed("CTFCross", c.CTFCross);
++        copy_fixed("CTFInside", c.CTFInside); copy_fixed("CTFFlux", c.CTFFlux);
++        copy_fixed("CTFSourceIn", c.CTFSourceIn); copy_fixed("CTFSourceOut", c.CTFSourceOut);
++        copy_fixed("CTFTSourceOut", c.CTFTSourceOut); copy_fixed("CTFTSourceIn", c.CTFTSourceIn);
++        copy_fixed("CTFTSourceQ", c.CTFTSourceQ); copy_fixed("CTFTUserOut", c.CTFTUserOut);
++        copy_fixed("CTFTUserIn", c.CTFTUserIn); copy_fixed("CTFTUserSource", c.CTFTUserSource);
++        out["constructions"].push_back(std::move(row));
++    }
++    auto const &zones = state.dataHeatBal->Zone;
++    if (zones.allocated()) for (int i = 1; i <= zones.isize(); ++i)
++        out["zones"].push_back({{"index", i}, {"Name", zones(i).Name}, {"spaceIndexes", zones(i).spaceIndexes}});
++    auto const &spaces = state.dataHeatBal->space;
++    if (spaces.allocated()) for (int i = 1; i <= spaces.isize(); ++i) {
++        auto const &s = spaces(i);
++        out["spaces"].push_back({{"index", i}, {"Name", s.Name}, {"HTSurfaceFirst", s.HTSurfaceFirst},
++            {"HTSurfaceLast", s.HTSurfaceLast}, {"OpaqOrIntMassSurfaceFirst", s.OpaqOrIntMassSurfaceFirst},
++            {"OpaqOrIntMassSurfaceLast", s.OpaqOrIntMassSurfaceLast}});
++    }
++    return out;
++}
++json surface_copy(EnergyPlus::EnergyPlusData const &state, Copy kind, int surface, int term)
++{
++    auto const &s = *state.dataHeatBalSurf;
++    auto const &m = *state.dataHeatBalSurfMgr;
++    json out{{"surface_index", surface}};
++#define REAL(owner, field) out[#field] = real_at(owner.field, surface)
++#define INTEGER(owner, field) out[#field] = integer_at(owner.field, surface)
++#define HIST(field) out[#field] = history_at(s.field, surface)
++    if (kind == Copy::Environment) {
++        REAL((*state.dataSurface), SurfOutDryBulbTemp); REAL((*state.dataSurface), SurfOutWetBulbTemp);
++        REAL((*state.dataSurface), SurfOutWindSpeed); REAL((*state.dataSurface), SurfOutWindDir);
++    } else if (kind == Copy::Histories || kind == Copy::HistorySurface) {
++        HIST(SurfInsideTempHist); HIST(SurfOutsideTempHist); HIST(SurfInsideFluxHist); HIST(SurfOutsideFluxHist);
++        HIST(SurfInsideTempHistMaster); HIST(SurfOutsideTempHistMaster);
++        HIST(SurfInsideFluxHistMaster); HIST(SurfOutsideFluxHistMaster); INTEGER(s, SurfCurrNumHist);
++    } else if (kind == Copy::HistoryTerm) {
++        out["term"] = term;
++        out["SurfOutsideFluxHist_slot2"] = term_at(s.SurfOutsideFluxHist, 2, surface);
++        out["SurfOutsideTempHist_term"] = term_at(s.SurfOutsideTempHist, term, surface);
++        out["SurfInsideTempHist_term"] = term_at(s.SurfInsideTempHist, term, surface);
++        out["SurfOutsideFluxHist_term"] = term_at(s.SurfOutsideFluxHist, term, surface);
++        out["SurfInsideFluxHist_term"] = term_at(s.SurfInsideFluxHist, term, surface);
++        out["SurfOutsideTempHist_slot1"] = term_at(s.SurfOutsideTempHist, 1, surface);
++        out["SurfInsideTempHist_slot1"] = term_at(s.SurfInsideTempHist, 1, surface);
++    } else if (kind == Copy::Constants) {
++        REAL(s, SurfCTFConstInPart); REAL(s, SurfCTFConstOutPart);
++    } else if (kind == Copy::Cache) {
++        REAL(s, SurfCTFCross0); REAL(s, SurfCTFInside0); REAL(s, SurfCTFSourceIn0); REAL(s, SurfTempOutHist);
++        INTEGER(s, SurfIsAdiabatic); INTEGER(s, SurfIsSourceOrSink);
++    } else if (kind == Copy::Inside) {
++        REAL(s, SurfTempTerm); REAL(s, SurfTempDiv); REAL(s, SurfTempInsOld); REAL(s, SurfTempInTmp);
++        REAL(s, SurfTempIn); REAL(s, SurfCTFCross0); REAL(s, SurfCTFInside0); REAL(s, SurfTempOutHist);
++        REAL(s, SurfCTFConstInPart); REAL(s, SurfCTFSourceIn0); REAL(s, SurfQSourceSinkHist);
++        REAL(s, SurfQdotRadNetLWInPerArea); REAL(s, SurfHConvInt); REAL(m, RefAirTemp);
++        REAL(s, SurfOpaqQRadSWInAbs); REAL(s, SurfQAdditionalHeatSourceInside);
++        REAL(s, SurfQdotRadHVACInPerArea); REAL((*state.dataHeatBal), SurfQdotRadIntGainsInPerArea);
++        REAL((*state.dataHeatBalFanSys), QPoolSurfNumerator); REAL((*state.dataHeatBalFanSys), PoolHeatTransCoefs);
++        REAL((*state.dataHeatBalFanSys), QRadSurfAFNDuct);
++        INTEGER(s, SurfIsAdiabatic); INTEGER(s, SurfIsSourceOrSink); INTEGER(s, SurfIsOperatingPool);
++    } else if (kind == Copy::InsideResult) {
++        REAL(s, SurfTempInTmp); REAL(s, SurfTempIn);
++    } else if (kind == Copy::Flux) {
++        out["SurfOutsideTempHist_slot1"] = term_at(s.SurfOutsideTempHist, 1, surface);
++        out["SurfInsideTempHist_slot1"] = term_at(s.SurfInsideTempHist, 1, surface);
++        out["SurfOutsideFluxHist_slot1"] = term_at(s.SurfOutsideFluxHist, 1, surface);
++        out["SurfInsideFluxHist_slot1"] = term_at(s.SurfInsideFluxHist, 1, surface);
++        REAL(s, SurfTempIn); REAL(s, SurfCTFConstInPart); REAL(s, SurfCTFConstOutPart);
++        REAL(s, SurfOpaqInsFaceCond); REAL(s, SurfOpaqInsFaceCondFlux);
++        REAL(s, SurfOpaqOutFaceCond); REAL(s, SurfOpaqOutFaceCondFlux);
++    } else if (kind == Copy::Scratch) {
++        REAL(m, TempExt1); REAL(m, TempInt1); REAL(m, QExt1); REAL(m, QInt1); REAL(m, SumTime);
++        INTEGER(s, SurfCurrNumHist);
++    } else if (kind == Copy::Reports) {
++        REAL(s, SurfOpaqInsFaceCond); REAL(s, SurfOpaqInsFaceCondFlux); REAL(s, SurfOpaqInsFaceCondEnergy);
++        REAL(s, SurfOpaqOutFaceCond); REAL(s, SurfOpaqOutFaceCondFlux); REAL(s, SurfOpaqOutFaceCondEnergy);
++        REAL(s, SurfOpaqAvgFaceCond); REAL(s, SurfOpaqAvgFaceCondFlux); REAL(s, SurfOpaqAvgFaceCondEnergy);
++        REAL(s, SurfOpaqStorageCond); REAL(s, SurfOpaqStorageCondFlux); REAL(s, SurfOpaqStorageCondEnergy);
++    }
++#undef REAL
++#undef INTEGER
++#undef HIST
++    return out;
++}
++
++// Complete actual allocated scalar arrays; absence never becomes an empty zero owner.
++template<class Array, class CopyValue> json allocated_array_copy(Array const &values, CopyValue copy)
++{
++    json out{{"allocated", values.allocated()}, {"lower", nullptr}, {"upper", nullptr}, {"values", nullptr}};
++    if (!values.allocated()) return out;
++    out["lower"] = values.l(); out["upper"] = values.u(); out["values"] = json::array();
++    for (int index = values.l(); index <= values.u(); ++index)
++        out["values"].push_back({{"index", index}, {"value", copy(values(index))}});
++    return out;
++}
++json history_entry_context(EnergyPlus::EnergyPlusData const &state)
++{
++    auto const &s = *state.dataHeatBalSurf;
++    auto const &m = *state.dataHeatBalSurfMgr;
++    auto const &surfaces = state.dataSurface->Surface;
++    auto const &all_ht = state.dataSurface->AllHTSurfaceList;
++    auto const real_copy = [](double value) { return scalar(value); };
++    auto const integer_copy = [](int value) { return json(value); };
++    json out{{"protocol", "ctf10-surface-history-entry-context.v1"},
++        {"TotSurfaces", state.dataSurface->TotSurfaces}, {"NumOfZones", state.dataGlobal->NumOfZones},
++        {"Surface_allocated", surfaces.allocated()}, {"AllHTSurfaceList", all_ht},
++        {"allocated_surfaces", json::array()}, {"non_AllHT_history_owners", json::array()},
++        {"SurfCurrNumHist", allocated_array_copy(s.SurfCurrNumHist, integer_copy)},
++        {"scratch", json::object()}, {"flux_reports", json::object()}, {"surface_operands", json::object()}};
++    // AllHT history rows are already in the unchanged event.owners. Copy only
++    // the other actual declared surfaces here, retaining their full term bounds.
++    if (surfaces.allocated()) for (int index = 1; index <= surfaces.isize(); ++index) {
++        auto const &surface = surfaces(index);
++        out["allocated_surfaces"].push_back({{"index", index}, {"Name", surface.Name},
++            {"Construction", surface.Construction}, {"Class", static_cast<int>(surface.Class)},
++            {"HeatTransferAlgorithm", static_cast<int>(surface.HeatTransferAlgorithm)},
++            {"ExtBoundCond", surface.ExtBoundCond}, {"Area", scalar(surface.Area)}});
++        bool in_all_ht = false;
++        for (int const actual_ht_index : all_ht) {
++            if (actual_ht_index == index) { in_all_ht = true; break; }
++        }
++        if (!in_all_ht) out["non_AllHT_history_owners"].push_back(surface_copy(state, Copy::Histories, index, 0));
++    }
++#define ARRAY(group, owner, field) out[group][#field] = allocated_array_copy(owner.field, real_copy)
++    ARRAY("scratch", m, QExt1); ARRAY("scratch", m, QInt1);
++    ARRAY("scratch", m, TempInt1); ARRAY("scratch", m, TempExt1); ARRAY("scratch", m, SumTime);
++    ARRAY("flux_reports", s, SurfOpaqInsFaceCond); ARRAY("flux_reports", s, SurfOpaqInsFaceCondFlux);
++    ARRAY("flux_reports", s, SurfOpaqOutFaceCond); ARRAY("flux_reports", s, SurfOpaqOutFaceCondFlux);
++    ARRAY("surface_operands", s, SurfTempIn);
++    ARRAY("surface_operands", s, SurfCTFConstInPart); ARRAY("surface_operands", s, SurfCTFConstOutPart);
++    ARRAY("surface_operands", (*state.dataSurface), SurfOutDryBulbTemp);
++#undef ARRAY
++    return out;
++}
++} // namespace
++
++Binding::Binding(Capture &capture) noexcept : previous(active) { active = &capture; }
++Binding::~Binding() noexcept { active = previous; }
++Scope::Scope(EnergyPlus::EnergyPlusData &owner, Procedure p) noexcept
++    : procedure(p), parent(current_scope), state(owner), exceptions_on_entry(std::uncaught_exceptions())
++{
++    current_scope = this;
++    if (active) {
++        auto &calls = active->procedure_calls[static_cast<unsigned>(procedure)];
++        if (increment(calls)) ordinal = calls;
++    }
++    record(state, "scope_entry");
++}
++Scope::~Scope() noexcept
++{
++    record(state, std::uncaught_exceptions() > exceptions_on_entry ? "scope_unwinding" : "scope_normal_exit");
++    current_scope = parent;
++}
++void record(EnergyPlus::EnergyPlusData &state, char const *checkpoint, Copy kind,
++            int surface, int term, std::initializer_list<RealField> reals,
++            std::initializer_list<IntegerField> integers) noexcept
++{
++    if (!active) return;
++    if (!increment(active->attempted_events)) return;
++    auto const ordinal = active->attempted_events;
++    try {
++        json event{{"event_ordinal", ordinal}, {"checkpoint", checkpoint}, {"copy_kind", static_cast<unsigned>(kind)}, {"clock", clock(state)},
++                   {"procedure", current_scope ? json(procedure_name(current_scope->procedure)) : json(nullptr)},
++                   {"invocation_ordinal", current_scope ? json(current_scope->ordinal) : json(nullptr)},
++                   {"parent_procedure", current_scope && current_scope->parent ? json(procedure_name(current_scope->parent->procedure)) : json(nullptr)},
++                   {"parent_invocation_ordinal", current_scope && current_scope->parent ? json(current_scope->parent->ordinal) : json(nullptr)},
++                   {"locals", json::object()}, {"owners", nullptr}, {"counted_as_PASS", false}};
++        for (auto const &r : reals) event["locals"][r.name] = scalar(r.value);
++        for (auto const &i : integers) event["locals"][i.name] = i.value;
++        if (kind == Copy::Catalog) event["owners"] = catalog(state);
++        else if (kind != Copy::None) {
++            if (surface != 0) event["owners"] = surface_copy(state, kind, surface, term);
++            else {
++                event["owners"] = json::array();
++                for (int index : state.dataSurface->AllHTSurfaceList)
++                    event["owners"].push_back(surface_copy(state, kind, index, term));
++            }
++        }
++        if (std::strcmp(checkpoint, "history_initialization_entry_owners") == 0 ||
++            std::strcmp(checkpoint, "history_update_entry_owners") == 0)
++            event["history_entry_context"] = history_entry_context(state);
++        auto const bytes = event.dump(); // Complete one event before touching the stream.
++        if (!active->first_event) active->output << ',';
++        active->output << bytes;
++        if (!active->output) {
++            active->stream_failed = true;
++            increment(active->stream_failed_events);
++            return;
++        }
++        active->first_event = false;
++        increment(active->retained_events);
++    } catch (...) {
++        increment(active->copy_failures[static_cast<unsigned>(kind)]);
++        if (active->first_failed_event == 0) active->first_failed_event = ordinal;
++        active->last_failed_event = ordinal;
++    }
++}
++bool finish(Capture &capture, bool returned, int exit_code, char const *caught) noexcept
++{
++    try {
++        json summary{{"actual_engine_entry_returned", returned},
++            {"actual_engine_exit_code", returned ? json(exit_code) : json(nullptr)},
++            {"outer_caught_exception_class", caught ? json(caught) : json(nullptr)},
++            {"procedure_calls", capture.procedure_calls}, {"attempted_events", capture.attempted_events},
++            {"retained_events", capture.retained_events}, {"copy_failures_by_Copy_enum", capture.copy_failures},
++            {"first_failed_event", capture.first_failed_event}, {"last_failed_event", capture.last_failed_event},
++            {"stream_failed_events", capture.stream_failed_events}, {"counter_overflow", capture.counter_overflow},
++            {"stream_failed", capture.stream_failed}, {"all_source_calls_or_complete_history_lifecycle_certified", false},
++            {"numeric_profiles_chosen", false}, {"integration_PASS_claimed", false}};
++        capture.output << "],\"summary\":" << summary.dump() << '}';
++        capture.output.flush();
++        bool copies_ok = true;
++        for (auto const failures : capture.copy_failures) if (failures != 0) copies_ok = false;
++        return static_cast<bool>(capture.output) && !capture.stream_failed && !capture.counter_overflow && copies_ok;
++    } catch (...) { return false; }
++}
++} // namespace SurfaceConsumerObservation

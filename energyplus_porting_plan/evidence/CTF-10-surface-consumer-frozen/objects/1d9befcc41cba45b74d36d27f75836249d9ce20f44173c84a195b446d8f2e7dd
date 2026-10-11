@@ -1,0 +1,66 @@
+#pragma once
+
+#include <array>
+#include <cstdint>
+#include <initializer_list>
+#include <iosfwd>
+
+namespace EnergyPlus { struct EnergyPlusData; }
+
+namespace SurfaceConsumerObservation {
+
+enum class Procedure { Manage, Initialize, InitializeHistories, UpdateHistories, InsideCTF, Report, Count };
+enum class Copy { None, Catalog, Environment, Histories, HistoryTerm, Constants, Cache, Inside, InsideResult, Flux, Scratch, HistorySurface, Reports, Count };
+struct RealField { char const *name; double value; };
+struct IntegerField { char const *name; std::int64_t value; };
+
+// Counters describe observer custody, never source convergence or equivalence.
+struct Capture {
+    explicit Capture(std::ostream &output) noexcept : output(output) {}
+    std::ostream &output;
+    std::array<std::uint64_t, static_cast<unsigned>(Procedure::Count)> procedure_calls{};
+    std::array<std::uint64_t, static_cast<unsigned>(Copy::Count)> copy_failures{};
+    std::uint64_t attempted_events = 0;
+    std::uint64_t retained_events = 0;
+    std::uint64_t first_failed_event = 0;
+    std::uint64_t last_failed_event = 0;
+    std::uint64_t stream_failed_events = 0;
+    bool counter_overflow = false;
+    bool first_event = true;
+    bool stream_failed = false;
+};
+
+class Binding {
+public:
+    explicit Binding(Capture &) noexcept;
+    ~Binding() noexcept;
+    Binding(Binding const &) = delete;
+    Binding &operator=(Binding const &) = delete;
+private:
+    Capture *previous;
+};
+
+// Normal scope exit is distinct from a reached return at an actual caller.
+class Scope {
+public:
+    Scope(EnergyPlus::EnergyPlusData &, Procedure) noexcept;
+    ~Scope() noexcept;
+    Scope(Scope const &) = delete;
+    Scope &operator=(Scope const &) = delete;
+    Procedure procedure;
+    std::uint64_t ordinal = 0;
+    Scope *parent = nullptr;
+private:
+    EnergyPlus::EnergyPlusData &state;
+    int exceptions_on_entry;
+};
+
+void record(EnergyPlus::EnergyPlusData &, char const *checkpoint, Copy = Copy::None,
+            int surface = 0, int term = 0,
+            std::initializer_list<RealField> reals = {},
+            std::initializer_list<IntegerField> integers = {}) noexcept;
+// Called only by the small main after the actual global engine entry returns/throws.
+bool finish(Capture &, bool engine_returned, int engine_exit_code,
+            char const *caught_exception_class) noexcept;
+
+} // namespace SurfaceConsumerObservation

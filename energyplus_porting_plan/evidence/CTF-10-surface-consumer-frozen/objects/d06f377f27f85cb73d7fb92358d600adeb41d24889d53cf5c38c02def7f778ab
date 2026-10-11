@@ -1,0 +1,78 @@
+--- .runtime/porting/CTF-10/surface-consumer-native-build-prep-01/before/derive-and-describe-native-build.py
++++ .runtime/porting/CTF-10/surface-consumer-native-build-prep-01/derive-and-describe-native-build.py
+@@ -1,4 +1,4 @@
+-"""Root-only existing derivative mechanism and actual RAD01 compile correspondence."""
++"""Root-only existing derivative mechanism and target-qualified five-TU correspondence."""
+ import argparse
+ import hashlib
+ import json
+@@ -26,42 +26,51 @@
+     assert receipt['source_bytes_match_before_and_after'] and receipt['launch_error'] is None
+ 
+ OUT = contained(a.output_dir); before_path, before = bound(a.before_preservation)
+-assert before_path == OUT / 'before/preservation.json'
++assert before_path == OUT / 'before/preservation.json' and before['schema'] == 'ctf10-surface-consumer-actual-before-build-preservation.v1'
++prep_path = contained(before['build_source_manifest']['path']); assert ref(prep_path) == before['build_source_manifest']; prep = read(prep_path)
++for row in prep['own_sources'] + prep['mechanism_sources']:
++    actual = ref(contained(row['path'])); assert all(actual[key] == row[key] for key in ['path', 'sha256', 'size_bytes'])
++assert Path(__file__).resolve() in {contained(row['path']) for row in prep['own_sources']}
+ compile_path = OUT / 'native-compile-command-01/receipt.json'; compile = read(compile_path); good(compile)
+-native_path = contained(before['native_source_manifest']['path']); assert sha(native_path) == before['native_source_manifest']['sha256']; native = read(native_path)
+-sources = [contained(row['path']) for row in native['native_source_files'] if Path(row['path']).suffix == '.cpp' or Path(row['path']).suffix == '.cc']
+-assert len(sources) == 3
++assert compile['source_snapshot'] == before['source_snapshot']
++native_path = contained(before['native_source_manifest']['path']); assert ref(native_path) == before['native_source_manifest']
++sources = [contained(row['path']) for row in before['compiled_source_files']]; assert len(sources) == len(set(sources)) == 5
+ directory = contained(before['build_directory']); after = OUT / 'after'; assert not after.exists(); after.mkdir()
+ live = directory / 'compile_commands.json'; copy = after / 'compile_commands.json'; shutil.copyfile(live, copy); assert sha(live) == sha(copy)
+ old_path = contained(before['compile_commands']['path']); assert sha(old_path) == before['compile_commands']['sha256']
+ old, new = read(old_path), read(copy)
+ def row_source(row): return (Path(row['directory']) / row['file']).resolve()
+-added = [row for row in new if row_source(row) in sources]; remaining = [row for row in new if row_source(row) not in sources]
+-assert len(old) == before['previous_compile_rows'] and len(new) == len(old) + 3
+-assert len(added) == 3 and {row_source(row) for row in added} == set(sources) and remaining == old
++def target_row(row):
++    output = (Path(row['directory']) / row['output']).resolve()
++    return output.is_relative_to(directory / 'CMakeFiles/surface_consumer_helper.dir')
++added = [row for row in new if target_row(row)]; remaining = [row for row in new if not target_row(row)]
++assert len(old) == before['previous_compile_rows'] == 717 and len(new) == len(old) + 5
++assert len(added) == 5 and {row_source(row) for row in added} == set(sources) and remaining == old
++assert len({row['output'] for row in added}) == 5
+ stdout = contained(compile['stdout']['path']); assert sha(stdout) == compile['stdout']['sha256']
+ compiled = [line for line in stdout.read_text(encoding='utf8').splitlines() if re.match(r'^\[\d+/\d+\] ', line) and ' -c ' in line]
+-assert len(compiled) == 3
++assert len(compiled) == 5
+ compiled_sources = []
+ for line in compiled:
+     normalized = line.replace('\\', '/').casefold()
+-    assert 'cmakefiles/rad01_unit_helper.dir/' in normalized
++    assert 'cmakefiles/surface_consumer_helper.dir/' in normalized
+     matched = [source for source in sources if source.as_posix().casefold() in normalized]
+     assert len(matched) == 1; compiled_sources += matched
+-assert set(compiled_sources) == set(sources)
+-write(after / 'compile-row-correspondence.json', {'schema': 'rad01-actual-compile-row-correspondence.v1',
++assert len(compiled_sources) == len(set(compiled_sources)) == 5 and set(compiled_sources) == set(sources)
++write(after / 'compile-row-correspondence.json', {'schema': 'ctf10-surface-consumer-actual-compile-row-correspondence.v1',
+     'before': before['compile_commands'], 'after': ref(copy), 'previous_rows': len(old), 'current_rows': len(new),
+     'all_prior_rows_unchanged_in_relative_order': True, 'new_rows': added, 'actual_compile_stdout': compile['stdout'],
+-    'actual_three_new_TU_compile_commands': compiled, 'no_prior_core_source_compile_command_observed': True})
++    'actual_five_new_TU_compile_commands': compiled, 'new_rows_selected_by_target_output_and_exact_source_set': True,
++    'no_prior_core_or_API_object_compile_command_observed': True})
+ prior_path, prior = bound(a.prior_derivation_execution); good(prior)
+-original = directory / 'Products/rad01_unit_helper.exe'; original_ref = ref(original)
++original = directory / 'Products/surface_consumer_helper.exe'; original_ref = ref(original)
+ args = prior['command'][:]
+ assert args[:5] == ['python', '-X', 'utf8', '-B', 'tools/porting/derive_native_helper.py']
+ derivation = OUT / 'derivation'; assert not derivation.exists()
+ for flag, value in [('--original', original.relative_to(ROOT).as_posix()), ('--original-sha256', original_ref['sha256']), ('--output-dir', derivation.relative_to(ROOT).as_posix())]:
+-    args[args.index(flag) + 1] = value
++    assert args.count(flag) == 1; args[args.index(flag) + 1] = value
+ env = dict(os.environ); env['PATH'] = str(ROOT / '.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin') + os.pathsep + env['PATH']
+-subprocess.run(['python', '-X', 'utf8', '-B', 'tools/porting/record_command.py', '--output-dir', (OUT / 'native-unit-derive-command-01').relative_to(ROOT).as_posix(), '--', *args], cwd=ROOT, check=True, env=env)
+-good(read(OUT / 'native-unit-derive-command-01/receipt.json'))
+-write(after / 'derivation-command-authority.json', {'schema': 'rad01-actual-derivation-command-authority.v1', 'prior_derivation_execution': ref(prior_path), 'linked_original': original_ref, 'scientific_execution_performed': False})
+-print(json.dumps({'compile_correspondence': ref(after / 'compile-row-correspondence.json'), 'derivation_execution': ref(OUT / 'native-unit-derive-command-01/receipt.json')}), flush=True)
++subprocess.run(['python', '-X', 'utf8', '-B', 'tools/porting/record_command.py', '--output-dir', (OUT / 'native-derive-command-01').relative_to(ROOT).as_posix(), '--', *args], cwd=ROOT, check=True, env=env)
++receipt = read(OUT / 'native-derive-command-01/receipt.json'); good(receipt); assert receipt['source_snapshot'] == before['source_snapshot']
++write(after / 'derivation-command-authority.json', {'schema': 'ctf10-surface-consumer-actual-derivation-command-authority.v1', 'prior_derivation_execution': ref(prior_path), 'linked_original': original_ref, 'scientific_execution_performed': False})
++print(json.dumps({'compile_correspondence': ref(after / 'compile-row-correspondence.json'), 'derivation_execution': ref(OUT / 'native-derive-command-01/receipt.json')}), flush=True)

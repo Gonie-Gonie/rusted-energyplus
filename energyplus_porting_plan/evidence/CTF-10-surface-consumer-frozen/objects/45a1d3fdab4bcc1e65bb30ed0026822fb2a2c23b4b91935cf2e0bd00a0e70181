@@ -1,0 +1,122 @@
+"""Author this ignored Source/metadata package only; never import its adapters."""
+import ast
+import difflib
+import hashlib
+import json
+import shutil
+from pathlib import Path
+
+ROOT = Path.cwd().resolve()
+OUT = ROOT / '.runtime/porting/CTF-10/surface-consumer-native-build-prep-01'
+PREVIOUS = ROOT / '.runtime/porting/RAD-01/native-build-prep-02'
+def data(path): return json.loads(path.read_bytes())
+def identity(path):
+    b = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(b).hexdigest(), 'size_bytes': len(b)}
+def describe(path):
+    return {**identity(path), 'line_count': len(path.read_bytes().splitlines())}
+def write(path, value):
+    with path.open('x', encoding='utf8', newline='\n') as stream: json.dump(value, stream, indent=2); stream.write('\n')
+def exact(row):
+    actual = identity(ROOT / row['path'])
+    assert all(actual[key] == row[key] for key in ['path', 'sha256', 'size_bytes'])
+
+assert not (OUT / 'manifest.json').exists()
+before = OUT / 'before'; before.mkdir()
+diffs = OUT / 'diffs'; diffs.mkdir()
+names = ['run-native-build.py', 'derive-and-describe-native-build.py', 'complete-native-build-metadata.py']
+own = []; archives = []; changes = []
+for name in names:
+    old, new = PREVIOUS / name, OUT / name
+    ast.parse(new.read_bytes(), filename=new.as_posix())
+    copied = before / name; shutil.copyfile(old, copied); assert old.read_bytes() == copied.read_bytes()
+    patch = ''.join(difflib.unified_diff(copied.read_text(encoding='utf8').splitlines(keepends=True),
+        new.read_text(encoding='utf8').splitlines(keepends=True), fromfile=copied.relative_to(ROOT).as_posix(), tofile=new.relative_to(ROOT).as_posix()))
+    destination = diffs / (name + '.diff'); destination.write_text(patch, encoding='utf8', newline='\n')
+    own.append(describe(new)); archives.append({'historical_path': old.relative_to(ROOT).as_posix(), 'archive': describe(copied), 'archive_bytes_equal_original': True})
+    changes.append({'before': describe(copied), 'after': describe(new), 'diff': describe(destination)})
+
+predecessor = ROOT / '.runtime/porting/RAD-01/native-build-prep-03/manifest.json'
+previous_manifest = data(predecessor)
+assert [identity(PREVIOUS / name) for name in names] == [{key: row[key] for key in ['path', 'sha256', 'size_bytes']} for row in previous_manifest['own_sources']]
+inherited = [row for row in previous_manifest['inherited_recipe_sources'] if '/RAD-01/' not in row['path']]
+for row in inherited: exact(row)
+native = ROOT / '.runtime/porting/CTF-10/surface-consumer-native-prep-03/manifest.json'
+native_manifest = data(native)
+assert identity(native)['sha256'] == '4cfaf1868257599cae0667fe98c3e24952637b00417141325daf98537264a03d'
+build_names = {'surface_consumer_main.cpp', 'HeatBalanceSurfaceManager.surface_consumer.cc', 'surface_consumer_observer.cc',
+               'surface_consumer_observer.hh', 'surface_consumer_reference.cmake', 'source-context.json'}
+native_sources = [row for row in native_manifest['own_source_and_metadata'] if Path(row['path']).name in build_names]
+for row in native_sources: exact(row)
+context = data(native.parent / 'source-context.json')
+original_paths = {'.reference/energyplus-src/26.1.0/src/EnergyPlus/api/EnergyPlusPgm.cc',
+                  '.reference/energyplus-src/26.1.0/src/EnergyPlus/CommandLineInterface.cc'}
+original_sources = [row for row in context['sources'] if row['path'] in original_paths]
+assert len(original_sources) == 2
+for row in original_sources: exact(row)
+mechanisms = [describe(ROOT / path) for path in ['tools/porting/record_command.py', 'tools/porting/derive_native_helper.py', 'tools/porting/native_pe.py']]
+metadata_paths = [
+    '.runtime/porting/CTF-10/retirement-01/after-retirement.json',
+    '.runtime/porting/CTF-10/retirement-01/retirement.json',
+    '.runtime/porting/CTF-10/retirement-command-01/receipt.json',
+    '.runtime/porting/CTF-10/native-build-01/unit/native-build.json',
+    '.runtime/porting/CTF-10/native-build-01/unit/preservation-after.json',
+    '.runtime/porting/CTF-10/native-build-01/after/compile_commands.json',
+    '.runtime/porting/CTF-10/native-configure-command-01/receipt.json',
+    '.runtime/porting/CTF-10/native-compile-command-01/receipt.json',
+    '.runtime/porting/CTF-10/native-unit-derive-command-01/receipt.json',
+    '.runtime/porting/RAD-01/native-build-02/native-build.json',
+    '.runtime/porting/RAD-01/native-build-02/preservation-after.json',
+    '.runtime/porting/RAD-01/native-build-02/after/compile-row-correspondence.json',
+    '.runtime/porting/RAD-01/native-build-02/derivation/receipt.json',
+    '.runtime/porting/CTF-10/production-cli-inputs-01/manifest.json']
+metadata = [describe(ROOT / path) for path in metadata_paths]
+read_ranges = []
+for path, start, end, purpose in [
+    (PREVIOUS / names[0], 38, 117, 'Accepted dynamic authority/preflight/configure/compile adaptation'),
+    (PREVIOUS / names[1], 28, 67, 'Accepted correspondence and unchanged generic derivative command reuse'),
+    (PREVIOUS / names[2], 26, 94, 'Accepted metadata/provider/protected/core strict completion'),
+    (native.parent / 'surface_consumer_reference.cmake', 1, 72, 'Exact unchanged CTF10 prefix and actual additional five-TU target'),
+    (native.parent / 'surface_consumer_main.cpp', 13, 53, 'Genuine global engine entry and complete streamed capture transport'),
+    (ROOT / 'tools/porting/derive_native_helper.py', 138, 241, 'Unchanged strict Original/derivative PE and tool provenance mechanism'),
+    (ROOT / 'tools/porting/native_pe.py', 191, 340, 'Existing strict runtime PE inspect/compare semantics'),
+    (ROOT / '.reference/energyplus-src/26.1.0/src/EnergyPlus/api/EnergyPlusPgm.cc', 227, 242, 'Actual global executable entry name and ProcessArgs call'),
+    (ROOT / '.reference/energyplus-src/26.1.0/src/EnergyPlus/CommandLineInterface.cc', 65, 90, 'Actual ProcessArgs namespace/function provider name'),
+    (ROOT / '.reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.hh', 86, 151, 'Actual selected HBSM lifecycle/history/report exported function declarations'),
+    (ROOT / '.reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.hh', 180, 202, 'Actual selected CTF-only function declaration')]:
+    lines = path.read_bytes().splitlines(keepends=True); assert 1 <= start <= end <= len(lines)
+    b = b''.join(lines[start - 1:end])
+    read_ranges.append({'path': path.relative_to(ROOT).as_posix(), 'start_line': start, 'end_line': end,
+        'sha256': hashlib.sha256(b).hexdigest(), 'size_bytes': len(b), 'purpose': purpose})
+source_dependencies = [describe(predecessor), describe(native)] + native_sources + original_sources + [
+    describe(ROOT / '.reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.hh')]
+manifest = {'schema': 'ctf10-surface-consumer-native-build-source-preparation.v1',
+    'status': 'held-source-only-awaiting-Root-and-independent-full-review-before-execution', 'author': '/root/clk02_baseline_audit',
+    'own_sources': own, 'before_archives': archives, 'exact_diffs': changes, 'documentation': describe(OUT / 'README.md'),
+    'authoring_source_metadata_only': describe(Path(__file__).resolve()), 'accepted_predecessor': describe(predecessor),
+    'native_source_manifest': identity(native), 'actual_RAD_build_identity_metadata': identity(ROOT / '.runtime/porting/RAD-01/native-build-02/native-build.json'),
+    'fixed_input_guards_source': identity(ROOT / '.runtime/porting/CTF-10/production-cli-inputs-01/manifest.json'),
+    'current_after_document_paths': ['energyplus_porting_plan/plan.json', 'energyplus_porting_plan/cards/CTF-10.md', 'energyplus_porting_plan/energyplus_porting_checklist.html'],
+    'inherited_recipe_sources': inherited, 'mechanism_sources': mechanisms, 'source_dependencies': source_dependencies,
+    'actual_identity_and_receipt_metadata_read_only': metadata, 'read_source_ranges': read_ranges,
+    'runtime_interfaces': {'run': [option for option in ['freeze-receipt', 'freeze-execution', 'scope-amendment', 'scope-execution',
+        'fixed-input-guards-source', 'prior-final-preservation', 'prior-retirement', 'prior-retirement-execution',
+        'prior-configure-execution', 'prior-compile-execution', 'restore-configure-execution', 'prior-native-build',
+        'rad-native-build', 'native-source-manifest', 'build-source-manifest']],
+        'derive': ['before-preservation', 'prior-derivation-execution'], 'complete': ['before-preservation'], 'common': ['output-dir', 'root(optional)']},
+    'prospective_contract': {'build_schema': 'ctf10-surface-consumer-native-build.v1', 'target': 'surface_consumer_helper',
+        'build_status': 'pass-actual-5TU-link-and-preservation', 'scope_schema': 'ctf10-surface-consumer-scope-amendment.v1',
+        'freeze_schema': 'ctf10-surface-consumer-input-freeze.v1', 'expected_new_compile_rows': 5, 'required_restored_prior_rows': 717,
+        'protected_refs': 50, 'core_registered': 643, 'core_present': 631, 'core_absent': 12, 'prior_Original_absent_paths': 12,
+        'observation_max_bytes': 4294967296, 'resource_bound_is_QA_full_file_only_no_producer_truncation': True,
+        'added_rows_selected_by_target_object_output_and_exact_five_sources': True,
+        'Pgm_and_CLI_preexisting_API_rows_preserved': True, 'generic_deriver_and_PE_reader_unchanged': True,
+        'runtime_Source_scope_freeze_restore_and_build_outcomes_supplied_by_Root_later': True},
+    'authorship_and_limits': 'Author previously wrote RAD Native/math/transport; new build custody/provenance requires independent Source review, no scientific self-certification.',
+    'source_only_preparation': {'project_import_or_execution': False, 'compiler_or_target_or_engine_execution': False,
+        'scientific_or_binary_or_weather_payload_read_or_hashed': False, 'canonical_or_Git_mutation': False,
+        'future_receipt_or_binary_or_SourceSnapshot_identity_invented': False, 'new_QA_or_proof_framework': False,
+        'integration_or_scientific_PASS_claimed': False}}
+write(OUT / 'manifest.json', manifest)
+print(json.dumps({'manifest': describe(OUT / 'manifest.json'), 'own_source_lines': sum(row['line_count'] for row in own),
+    'exact_diff_lines': sum(row['diff']['line_count'] for row in changes), 'typed_ranges': len(read_ranges)}, indent=2))

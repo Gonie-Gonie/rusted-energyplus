@@ -1,0 +1,69 @@
+{
+  "schema": "ctf10-surface-consumer-before-output-freeze-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-surface-consumer-frozen/manifest.json",
+    "sha256": "fe7ff349dd4b35e225847023aaa094ab6c2a22d1a67b2d3ecb4f747315fdbd72",
+    "size_bytes": 41693
+  },
+  "actual_scope_amendment": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-scope-amendment-01/amendment.json",
+    "sha256": "34a36cf66306e2cc54f316d14bd2e54ad0878bf211d342ba01e883f3163cc18f",
+    "size_bytes": 18099
+  },
+  "actual_input_freeze": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-frozen-inputs-01/freeze-receipt.json",
+    "sha256": "fd9ff53ad233ceb99abe040691640c72e44ff74d680849e148f50599384b123f",
+    "size_bytes": 18816
+  },
+  "actual_executions": {
+    "surface-consumer-restore-launch-command-01": {
+      "path": ".runtime/porting/CTF-10/surface-consumer-restore-launch-command-01/receipt.json",
+      "sha256": "2c7dd7fdbd37aa5a8ffd4fc8365ffd48136cd94034424134e22801ae0a25ed71",
+      "size_bytes": 2731
+    },
+    "surface-consumer-restore-configure-command-01": {
+      "path": ".runtime/porting/CTF-10/surface-consumer-restore-configure-command-01/receipt.json",
+      "sha256": "f02d4019aac9605aca8c01651f4c84ce035b7ec019ec0d4acbe3937494a47878",
+      "size_bytes": 7418
+    },
+    "surface-consumer-scope-check-command-01": {
+      "path": ".runtime/porting/CTF-10/surface-consumer-scope-check-command-01/receipt.json",
+      "sha256": "abe7e488677314e5844a3e7c6ab826ffcfe5b23107007b6ef7f1d14d3b5ba89d",
+      "size_bytes": 3040
+    },
+    "surface-consumer-freeze-command-01": {
+      "path": ".runtime/porting/CTF-10/surface-consumer-freeze-command-01/receipt.json",
+      "sha256": "d3f97a40d70051cf33923766d825923d0a658681233f881a7e3e3c7c33260685",
+      "size_bytes": 3019
+    }
+  },
+  "actual_restoration_preservation": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-restore-preservation-01/preservation.json",
+    "sha256": "da2da92d7ea21b0fb3ca1314b341097c8959001d8a15af2dd296aee9b80299cf",
+    "size_bytes": 331040
+  },
+  "native_source_manifest": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-prep-03/manifest.json",
+    "sha256": "4cfaf1868257599cae0667fe98c3e24952637b00417141325daf98537264a03d",
+    "size_bytes": 12929
+  },
+  "build_adapter_Source_manifest": {
+    "path": ".runtime/porting/CTF-10/surface-consumer-native-build-prep-01/manifest.json",
+    "sha256": "eb2ec710143f5cadf9b47fdab9390d9180b7e0615e7786b23f3f8e3feffcbb6e",
+    "size_bytes": 24439
+  },
+  "Root_and_other_author_cumulative_FULL_native_consumer_Source_accepted": true,
+  "Root_FULL_build_adapters_Source_read": true,
+  "build_adapters_independent_FULL_peer_pending": true,
+  "selected_case_id": "A-24H",
+  "all45_input_guards_preserved": true,
+  "observation_max_bytes": 4294967296,
+  "bound_applies_to_full_file_QA_only_no_producer_truncation": true,
+  "all_initialization_kickoff_warmup_weather_calls_retained": true,
+  "actual_surface_consumer_build_available": false,
+  "actual_capture_or_OriginalDataQA_available": false,
+  "scientific_PASS_claimed": false,
+  "thermal_history_Rust_arithmetic_applied": false,
+  "Native_trace_used_as_ordinary_Rust_production_input": false,
+  "full_card_gates_updated": false
+}

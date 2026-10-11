@@ -1,0 +1,78 @@
+--- .runtime/porting/CTF-10/surface-consumer-native-prep-02/surface_consumer_observer.cc
++++ surface_consumer_observer.cc
+@@ -107,6 +107,8 @@
+         {"BeginTimeStepFlag", g.BeginTimeStepFlag}, {"ZoneSizingCalc", g.ZoneSizingCalc},
+         {"AllCTF", h.AllCTF}, {"AnyCTF", h.AnyCTF}, {"SimpleCTFOnly", h.SimpleCTFOnly},
+         {"MaxCTFTerms", h.MaxCTFTerms}, {"InsideSurfIterations", h.InsideSurfIterations},
++        {"AnyInternalHeatSourceInInput", h.AnyInternalHeatSourceInInput},
++        {"UpdateThermalHistoriesFirstTimeFlag", state.dataHeatBalSurfMgr->UpdateThermalHistoriesFirstTimeFlag},
+         {"AnyEMS", g.AnyEnergyManagementSystemInModel},
+         {"AnyConstrOverrides", g.AnyConstrOverridesInModel},
+         {"AnySurfPropOverrides", g.AnySurfPropOverridesInModel}};
+@@ -220,6 +222,56 @@
+ #undef HIST
+     return out;
+ }
++
++// Complete actual allocated scalar arrays; absence never becomes an empty zero owner.
++template<class Array, class CopyValue> json allocated_array_copy(Array const &values, CopyValue copy)
++{
++    json out{{"allocated", values.allocated()}, {"lower", nullptr}, {"upper", nullptr}, {"values", nullptr}};
++    if (!values.allocated()) return out;
++    out["lower"] = values.l(); out["upper"] = values.u(); out["values"] = json::array();
++    for (int index = values.l(); index <= values.u(); ++index)
++        out["values"].push_back({{"index", index}, {"value", copy(values(index))}});
++    return out;
++}
++json history_entry_context(EnergyPlus::EnergyPlusData const &state)
++{
++    auto const &s = *state.dataHeatBalSurf;
++    auto const &m = *state.dataHeatBalSurfMgr;
++    auto const &surfaces = state.dataSurface->Surface;
++    auto const &all_ht = state.dataSurface->AllHTSurfaceList;
++    auto const real_copy = [](double value) { return scalar(value); };
++    auto const integer_copy = [](int value) { return json(value); };
++    json out{{"protocol", "ctf10-surface-history-entry-context.v1"},
++        {"TotSurfaces", state.dataSurface->TotSurfaces}, {"NumOfZones", state.dataGlobal->NumOfZones},
++        {"Surface_allocated", surfaces.allocated()}, {"AllHTSurfaceList", all_ht},
++        {"allocated_surfaces", json::array()}, {"non_AllHT_history_owners", json::array()},
++        {"SurfCurrNumHist", allocated_array_copy(s.SurfCurrNumHist, integer_copy)},
++        {"scratch", json::object()}, {"flux_reports", json::object()}, {"surface_operands", json::object()}};
++    // AllHT history rows are already in the unchanged event.owners. Copy only
++    // the other actual declared surfaces here, retaining their full term bounds.
++    if (surfaces.allocated()) for (int index = 1; index <= surfaces.isize(); ++index) {
++        auto const &surface = surfaces(index);
++        out["allocated_surfaces"].push_back({{"index", index}, {"Name", surface.Name},
++            {"Construction", surface.Construction}, {"Class", static_cast<int>(surface.Class)},
++            {"HeatTransferAlgorithm", static_cast<int>(surface.HeatTransferAlgorithm)},
++            {"ExtBoundCond", surface.ExtBoundCond}, {"Area", scalar(surface.Area)}});
++        bool in_all_ht = false;
++        for (int const actual_ht_index : all_ht) {
++            if (actual_ht_index == index) { in_all_ht = true; break; }
++        }
++        if (!in_all_ht) out["non_AllHT_history_owners"].push_back(surface_copy(state, Copy::Histories, index, 0));
++    }
++#define ARRAY(group, owner, field) out[group][#field] = allocated_array_copy(owner.field, real_copy)
++    ARRAY("scratch", m, QExt1); ARRAY("scratch", m, QInt1);
++    ARRAY("scratch", m, TempInt1); ARRAY("scratch", m, TempExt1); ARRAY("scratch", m, SumTime);
++    ARRAY("flux_reports", s, SurfOpaqInsFaceCond); ARRAY("flux_reports", s, SurfOpaqInsFaceCondFlux);
++    ARRAY("flux_reports", s, SurfOpaqOutFaceCond); ARRAY("flux_reports", s, SurfOpaqOutFaceCondFlux);
++    ARRAY("surface_operands", s, SurfTempIn);
++    ARRAY("surface_operands", s, SurfCTFConstInPart); ARRAY("surface_operands", s, SurfCTFConstOutPart);
++    ARRAY("surface_operands", (*state.dataSurface), SurfOutDryBulbTemp);
++#undef ARRAY
++    return out;
++}
+ } // namespace
+ 
+ Binding::Binding(Capture &capture) noexcept : previous(active) { active = &capture; }
+@@ -264,6 +316,9 @@
+                     event["owners"].push_back(surface_copy(state, kind, index, term));
+             }
+         }
++        if (std::strcmp(checkpoint, "history_initialization_entry_owners") == 0 ||
++            std::strcmp(checkpoint, "history_update_entry_owners") == 0)
++            event["history_entry_context"] = history_entry_context(state);
+         auto const bytes = event.dump(); // Complete one event before touching the stream.
+         if (!active->first_event) active->output << ',';
+         active->output << bytes;

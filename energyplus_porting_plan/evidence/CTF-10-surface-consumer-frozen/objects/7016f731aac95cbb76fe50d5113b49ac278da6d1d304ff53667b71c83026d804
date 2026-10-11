@@ -1,0 +1,45 @@
+--- .runtime/porting/CTF-10/surface-consumer-native-prep-02/source-context.json
++++ source-context.json
+@@ -623,6 +623,41 @@
+       "sha256": "0d5db6b43bef4d5ebd44fdc43669ef1491eb2e2c13e4122401f19e99a386e531",
+       "size_bytes": 2226,
+       "purpose": "actual Surface/Zone/space EPVector one-based access, allocated and isize APIs; no l/u members"
++    },
++    {
++      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc",
++      "start_line": 1416,
++      "end_line": 1530,
++      "sha256": "4470d20d8da5bf6493b066d601e72a9af52ff74850c74c5964a94a718fe282b6",
++      "size_bytes": 8750,
++      "purpose": "actual total-surface allocation/zero initialization of ordinary histories, optional masters/counters, current temperature/constants and flux reports"
+     }
+-  ]
++  ],
++  "history_entry_output_only_augmentation": {
++    "actual_entry_checkpoints": [
++      "history_initialization_entry_owners",
++      "history_update_entry_owners"
++    ],
++    "Original_lines": [
++      2209,
++      5222
++    ],
++    "new_HBSM_callbacks": 0,
++    "new_clock_flags": [
++      "AnyInternalHeatSourceInInput",
++      "UpdateThermalHistoriesFirstTimeFlag"
++    ],
++    "fixed_history_shape_is_observed_not_clamped": true,
++    "AllHT_history_rows_remain_in_existing_owners": true,
++    "other_declared_surface_rows": "history_entry_context.non_AllHT_history_owners",
++    "complete_allocated_scratch_and_report_and_counter_arrays": true,
++    "prospective_standalone_history_owner": {
++      "path": ".runtime/porting/CTF-10/thermal-history-prep-01/manifest.json",
++      "sha256": "343fb38575bdf76f6fc6d671fae06a03422384b9b920dde65c2553acddcf5c83",
++      "size_bytes": 26081,
++      "line_count": 637
++    },
++    "Native_entry_values_are_not_ordinary_Rust_production_inputs": true,
++    "Root_and_independent_Source_review_required_before_capture": true
++  }
+ }

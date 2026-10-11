@@ -1,0 +1,45 @@
+--- .runtime/porting/CTF-10/surface-consumer-native-prep-02/README.md
++++ README.md
+@@ -102,3 +102,42 @@
+ build result. Prep01 stays immutable and unexecuted. Its original emitter remains
+ an explicitly historical source reference and must not be rerun to overwrite01;
+ prepare_successor.py is this fresh package's metadata-only authoring source.
++
++
++Fresh03 adds output-only entry custody needed by the pending standalone selected
++history comparison. The entire derived HBSM TU, all51 insertion blocks/additions,
++header, main and CMake remain byte-identical02; no new callback or engine path is
++introduced. The collector adds two actual initialized flags to every event.clock:
++AnyInternalHeatSourceInInput and UpdateThermalHistoriesFirstTimeFlag. Existing
++callbacks consequently retain the real first-time flag before and after allocation.
++
++Only the two already-reached history entry checkpoint events gain
++history_entry_context (protocol ctf10-surface-history-entry-context.v1). It copies
++actual TotSurfaces/NumOfZones, Surface allocation/declared order/current identity,
++AllHT order, complete allocated SurfCurrNumHist, scratch QExt1/QInt1/TempInt1/
++TempExt1/SumTime, four flux report arrays, and actual SurfTempIn/CTF constants/
++outside drybulb arrays. Each array states allocation and actual lower/upper bounds;
++unallocated values/bounds are null. All allocated elements are copied in index
++order with authoritative bits/class; no values or allocation flags are defaulted.
++
++Existing event.owners retains the original AllHT history rows without duplication.
++non_AllHT_history_owners adds every other actual declared Surface row with the
++same four ordinary/four optional master histories and counter copier. Together
++these retain the actual full declared surface layout. Each actual allocated term
++and inner surface bound stays explicit, including absent/moved owners; there is
++no fixed19 clamp. Future shape admission must verify the actual fixed19/full-layout
++owners before pairing the standalone API. No missing allocation is synthesized.
++Array allocation initializes these ordinary fields in Original1416-1530; scratch
++initialization remains only the actual Update5245-5256. Entry before that source
++allocation can truthfully contain unallocated scratch. No unassigned local such
++as sum_steps is read; the existing interpolation checkpoint alone copies it.
++
++The existing event try/catch and attempted/retained/failure-by-Copy counters cover
++the whole added entry copy. A failure omits that actual event and fails custody;
++no cap, sample, recovery or artificial successful event is added. Native entry
++snapshots are later direct-unit operand evidence, never Native answers injected
++into ordinary Rust production. Same-input policy/freeze, exact owner association,
++genuine independent Rust state and OriginalDataQA remain unimplemented prerequisites.
++No history math/lifecycle/integration PASS or actual build result is claimed.
++Prep01/02 remain immutable. prepare_successor.py only authors this ignored source
++and metadata package using the Python standard library; it runs no proposed code.

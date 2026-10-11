@@ -1,0 +1,117 @@
+"""Root-only actual five-TU providers and unchanged-artifact metadata author."""
+import argparse
+import hashlib
+import json
+import re
+from datetime import datetime, timezone
+from pathlib import Path
+
+p = argparse.ArgumentParser(); p.add_argument('--root', type=Path, default=Path.cwd())
+p.add_argument('--before-preservation', required=True); p.add_argument('--output-dir', required=True)
+a = p.parse_args(); ROOT = a.root.resolve()
+def contained(value):
+    path = (ROOT / value).resolve(); assert path.is_relative_to(ROOT) and path != ROOT; return path
+def read(path): return json.loads(path.read_bytes())
+def sha(path):
+    with path.open('rb') as stream: return hashlib.file_digest(stream, 'sha256').hexdigest()
+def ref(path): return {'path': path.relative_to(ROOT).as_posix(), 'sha256': sha(path), 'size_bytes': path.stat().st_size}
+def bound(value):
+    path, expected = value.rsplit('#', 1); path = contained(path); assert sha(path) == expected; return path, read(path)
+def write(path, value):
+    with path.open('x', encoding='utf8', newline='\n') as stream: json.dump(value, stream, indent=2); stream.write('\n')
+def good(receipt):
+    assert receipt['schema'] == 'recorded-porting-command.v1' and receipt['exit_code'] == 0
+    assert receipt['source_bytes_match_before_and_after'] and receipt['launch_error'] is None
+
+OUT = contained(a.output_dir); before_path, before = bound(a.before_preservation); assert before_path == OUT / 'before/preservation.json'
+assert before['schema'] == 'ctf10-surface-consumer-actual-before-build-preservation.v1'
+prep_path = contained(before['build_source_manifest']['path']); assert ref(prep_path) == before['build_source_manifest']; prep = read(prep_path)
+for row in prep['own_sources'] + prep['inherited_recipe_sources'] + prep['mechanism_sources'] + before['native_source_files']:
+    actual = ref(contained(row['path'])); assert all(actual[key] == row[key] for key in ['path', 'sha256', 'size_bytes'])
+assert Path(__file__).resolve() in {contained(row['path']) for row in prep['own_sources']}
+native_path = contained(before['native_source_manifest']['path']); assert ref(native_path) == before['native_source_manifest']
+receipts = {name: read(OUT / name / 'receipt.json') for name in ['native-configure-command-01', 'native-compile-command-01', 'native-derive-command-01']}
+for receipt in receipts.values(): good(receipt); assert receipt['source_snapshot'] == before['source_snapshot']
+directory = contained(before['build_directory']); copy = OUT / 'after/compile_commands.json'; correspondence = read(OUT / 'after/compile-row-correspondence.json')
+assert ref(copy) == correspondence['after'] and sha(directory / 'compile_commands.json') == sha(copy)
+old_path = contained(before['compile_commands']['path']); assert sha(old_path) == before['compile_commands']['sha256']
+sources = {contained(row['path']) for row in before['compiled_source_files']}
+old, new = read(old_path), read(copy)
+def target_row(row): return (Path(row['directory']) / row['output']).resolve().is_relative_to(directory / 'CMakeFiles/surface_consumer_helper.dir')
+added = [row for row in new if target_row(row)]
+assert len(old) == before['previous_compile_rows'] == 717 and len(new) == len(old) + 5
+assert len(sources) == len(added) == len({row['output'] for row in added}) == 5
+assert {(Path(row['directory']) / row['file']).resolve() for row in added} == sources and [row for row in new if not target_row(row)] == old
+assert correspondence['new_rows'] == added and correspondence['new_rows_selected_by_target_output_and_exact_source_set'] is True
+assert correspondence['no_prior_core_or_API_object_compile_command_observed'] is True
+assert correspondence['actual_compile_stdout'] == receipts['native-compile-command-01']['stdout']
+stdout = contained(correspondence['actual_compile_stdout']['path']); assert sha(stdout) == correspondence['actual_compile_stdout']['sha256']
+compiled = [line for line in stdout.read_text(encoding='utf8').splitlines() if re.match(r'^\[\d+/\d+\] ', line) and ' -c ' in line]
+assert compiled == correspondence['actual_five_new_TU_compile_commands'] and len(compiled) == 5
+for line in compiled:
+    normalized = line.replace('\\', '/').casefold()
+    assert 'cmakefiles/surface_consumer_helper.dir/' in normalized and sum(source.as_posix().casefold() in normalized for source in sources) == 1
+for key in ['protected_refs', 'present_objects']:
+    for row in before[key]: assert ref(contained(row['path'])) == row
+for path in before['absent_registered_object_paths'] + before['prior_original_absent_paths']: assert not contained(path).exists()
+assert before['core_registered'] == len(before['present_objects']) + len(before['absent_registered_object_paths']) == 643
+assert len(before['present_objects']) == 631 and len(before['absent_registered_object_paths']) == 12
+assert len(before['prior_original_absent_paths']) == len(set(before['prior_original_absent_paths'])) == 12
+assert len(before['protected_refs']) == len({row['path'] for row in before['protected_refs']}) == before['protected_ref_count'] == 50
+original = ref(directory / 'Products/surface_consumer_helper.exe'); derivative_path = OUT / 'derivation/receipt.json'; derivative = read(derivative_path)
+assert derivative['status'] == 'pass-exact-retained-runtime-sections-and-directories'
+assert derivative['original_before'] == derivative['original_after'] and derivative['original_before']['historical_path'] == original['path']
+assert all(derivative['original_before'][key] == original[key] for key in ['sha256', 'size_bytes'])
+assert derivative['accepted_derivative'] == derivative['observed_derivative']
+helper = ref(contained(derivative['accepted_derivative']['path'])); assert all(helper[key] == derivative['accepted_derivative'][key] for key in ['path', 'sha256', 'size_bytes'])
+link_map = directory / 'surface_consumer_helper.map'; loads = []; core_load = None; core_hits = 0; section = None
+namespace = 'EnergyPlus::HeatBalanceSurfaceManager::'
+providers = {namespace + name + '(': 'HeatBalanceSurfaceManager.surface_consumer.cc.obj' for name in
+    ['ManageSurfaceHeatBalance', 'InitSurfaceHeatBalance', 'InitThermalAndFluxHistories',
+     'UpdateThermalHistories', 'ReportSurfaceHeatBalance', 'CalcHeatBalanceInsideSurf2CTFOnly']}
+providers.update({'EnergyPlusPgm(': 'EnergyPlusPgm.cc.obj', 'EnergyPlus::CommandLineInterface::ProcessArgs(': 'CommandLineInterface.cc.obj'})
+hits = {key: [] for key in providers}
+with link_map.open('r', encoding='utf8', errors='strict') as stream:
+    for number, line in enumerate(stream, 1):
+        if line.startswith(' .text '): section = (number, line)
+        fields = line.split()
+        if len(fields) >= 2 and fields[0].startswith('0x'):
+            symbol = line.strip().split(None, 1)[1]
+            for prefix, owner in providers.items():
+                if symbol.startswith(prefix):
+                    assert section is not None and 'CMakeFiles/surface_consumer_helper.dir/' in section[1] and owner in section[1]
+                    section_fields = section[1].split(); address = int(fields[0], 16)
+                    assert int(section_fields[1], 16) <= address < int(section_fields[1], 16) + int(section_fields[2], 16)
+                    hits[prefix].append({'symbol_line': number, 'symbol': line.rstrip('\n'), 'section_provider': {'line': section[0], 'text': section[1].rstrip('\n')}})
+        if line.startswith('LOAD '):
+            if 'CMakeFiles/surface_consumer_helper.dir/' in line: loads.append({'line': number, 'text': line.rstrip('\n')})
+            if line.strip() == 'LOAD Products/libenergypluslib.a': assert core_load is None; core_load = number
+        if 'libenergypluslib.a(HeatBalanceSurfaceManager.cc.obj)' in line: core_hits += 1
+assert all(len(rows) == 1 for rows in hits.values()) and len(loads) == 5 and core_load is not None and max(row['line'] for row in loads) < core_load and core_hits == 0
+assert all(sum(Path(row['path']).name + '.obj' in load['text'] for load in loads) == 1 for row in before['compiled_source_files'])
+after = {'schema': 'ctf10-surface-consumer-native-preservation-after.v1', 'observed_utc': datetime.now(timezone.utc).isoformat(),
+    'protected_refs': before['protected_refs'], 'protected_ref_count': len(before['protected_refs']), 'core_registered': 643,
+    'present_objects': before['present_objects'], 'absent_registered_object_paths': before['absent_registered_object_paths'],
+    'prior_original_absent_paths': before['prior_original_absent_paths'], 'all_protected_refs_unchanged': True,
+    'all_present_core_objects_unchanged': True, 'absent_registered_objects_still_absent': True, 'prior_originals_still_absent': True,
+    'previous_compile_rows': len(old), 'current_compile_rows': len(new), 'all_previous_compile_commands_unchanged': True,
+    'no_prior_core_or_API_object_compile_command_observed': True, 'actual_compile_correspondence': ref(OUT / 'after/compile-row-correspondence.json'),
+    'link_map': ref(link_map), 'address_bound_selected_providers': {key: rows[0] for key, rows in hits.items()}, 'target_objects_before_core_archive': 5,
+    'actual_target_object_loads': loads, 'selected_core_HeatBalanceSurfaceManager_object_hits': core_hits, 'linked_original': original,
+    'actual_before_preservation': ref(before_path), 'actual_after_compile_commands': ref(copy)}
+write(OUT / 'preservation-after.json', after)
+build = {'schema': 'ctf10-surface-consumer-native-build.v1', 'target': 'surface_consumer_helper', 'status': 'pass-actual-5TU-link-and-preservation',
+    'authorship': 'Root assembled genuine recorded configure/compile/derivation, actual address-bound HBSM/Pgm/CLI providers and fresh50 protected/core hashes. No engine/scientific claim.',
+    'observed_utc': datetime.now(timezone.utc).isoformat(), 'helper_binary': helper, 'linked_original': original,
+    'native_source_manifest': before['native_source_manifest'], 'build_source_manifest': before['build_source_manifest'],
+    'native_source_files': before['native_source_files'], 'compiled_source_files': before['compiled_source_files'],
+    'configure_execution': ref(OUT / 'native-configure-command-01/receipt.json'), 'compile_execution': ref(OUT / 'native-compile-command-01/receipt.json'),
+    'derivation_execution': ref(OUT / 'native-derive-command-01/receipt.json'), 'validated_derivative': ref(derivative_path), 'preservation': ref(OUT / 'preservation-after.json'),
+    'actual_restore_configure_execution': before['actual_restore_configure_execution'], 'actual_RAD_build_identity_metadata': before['actual_RAD_build_identity_metadata'],
+    'freeze_receipt': before['freeze_receipt'], 'freeze_execution': before['freeze_execution'], 'scope_amendment': before['scope_amendment'], 'scope_execution': before['scope_execution'],
+    'core_before_check': before['core_before_check'], 'previous_compile_rows': len(old), 'current_compile_rows': len(new), 'core_registered': 643, 'core_present': 631, 'core_absent': 12,
+    'all_previous_compile_commands_unchanged': True, 'protected_artifacts_and_present_core_objects_unchanged': True,
+    'link_provider_verified': True, 'protected_ref_count': len(before['protected_refs']), 'source_snapshot': before['source_snapshot'],
+    'scientific_execution_certified': False, 'integration_PASS_claimed': False, 'gates_updated': False}
+write(OUT / 'native-build.json', build)
+print(json.dumps({'build': ref(OUT / 'native-build.json')}), flush=True)

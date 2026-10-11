@@ -1,0 +1,212 @@
+"""Author the output-only history entry context; stdlib/source metadata only."""
+from pathlib import Path
+import ast
+import copy
+import difflib
+import hashlib
+import json
+
+ROOT = Path.cwd()
+OLD = ROOT / '.runtime/porting/CTF-10/surface-consumer-native-prep-02'
+OUT = ROOT / '.runtime/porting/CTF-10/surface-consumer-native-prep-03'
+assert not (OUT / 'manifest.json').exists()
+assert hashlib.sha256((OLD / 'manifest.json').read_bytes()).hexdigest() == '172b29b062db7b95554d5fd9aea88477c1f5dede3434547eebf5a84e70382351'
+old = json.loads((OLD / 'manifest.json').read_bytes())
+
+def ref(path):
+    raw = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(raw).hexdigest(),
+            'size_bytes': len(raw), 'line_count': len(raw.splitlines())}
+
+def put(name, raw):
+    path = OUT / name
+    assert not path.exists(), path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(raw if isinstance(raw, bytes) else raw.encode('utf-8'))
+    return path
+
+def store(name, value):
+    return put(name, json.dumps(value, indent=2) + '\n')
+
+build_names = ['surface_consumer_observer.hh', 'surface_consumer_observer.cc',
+               'surface_consumer_main.cpp', 'HeatBalanceSurfaceManager.surface_consumer.cc',
+               'surface_consumer_reference.cmake']
+for name in build_names + ['source-context.json', 'README.md', 'additions.json', 'manifest.json']:
+    put('before-02/' + name, (OLD / name).read_bytes())
+for name in build_names + ['additions.json']:
+    if name != 'surface_consumer_observer.cc':
+        put(name, (OLD / name).read_bytes())
+for name in ['HeatBalanceSurfaceManager.cc', 'ctf10_reference.cmake']:
+    put('before/' + name, (OLD / 'before' / name).read_bytes())
+
+collector = (OLD / 'surface_consumer_observer.cc').read_bytes()
+anchor = b'        {"MaxCTFTerms", h.MaxCTFTerms}, {"InsideSurfIterations", h.InsideSurfIterations},\n'
+assert collector.count(anchor) == 1
+collector = collector.replace(anchor, anchor + b'        {"AnyInternalHeatSourceInInput", h.AnyInternalHeatSourceInInput},\n        {"UpdateThermalHistoriesFirstTimeFlag", state.dataHeatBalSurfMgr->UpdateThermalHistoriesFirstTimeFlag},\n', 1)
+addition = '''
+// Complete actual allocated scalar arrays; absence never becomes an empty zero owner.
+template<class Array, class CopyValue> json allocated_array_copy(Array const &values, CopyValue copy)
+{
+    json out{{"allocated", values.allocated()}, {"lower", nullptr}, {"upper", nullptr}, {"values", nullptr}};
+    if (!values.allocated()) return out;
+    out["lower"] = values.l(); out["upper"] = values.u(); out["values"] = json::array();
+    for (int index = values.l(); index <= values.u(); ++index)
+        out["values"].push_back({{"index", index}, {"value", copy(values(index))}});
+    return out;
+}
+json history_entry_context(EnergyPlus::EnergyPlusData const &state)
+{
+    auto const &s = *state.dataHeatBalSurf;
+    auto const &m = *state.dataHeatBalSurfMgr;
+    auto const &surfaces = state.dataSurface->Surface;
+    auto const &all_ht = state.dataSurface->AllHTSurfaceList;
+    auto const real_copy = [](double value) { return scalar(value); };
+    auto const integer_copy = [](int value) { return json(value); };
+    json out{{"protocol", "ctf10-surface-history-entry-context.v1"},
+        {"TotSurfaces", state.dataSurface->TotSurfaces}, {"NumOfZones", state.dataGlobal->NumOfZones},
+        {"Surface_allocated", surfaces.allocated()}, {"AllHTSurfaceList", all_ht},
+        {"allocated_surfaces", json::array()}, {"non_AllHT_history_owners", json::array()},
+        {"SurfCurrNumHist", allocated_array_copy(s.SurfCurrNumHist, integer_copy)},
+        {"scratch", json::object()}, {"flux_reports", json::object()}, {"surface_operands", json::object()}};
+    // AllHT history rows are already in the unchanged event.owners. Copy only
+    // the other actual declared surfaces here, retaining their full term bounds.
+    if (surfaces.allocated()) for (int index = 1; index <= surfaces.isize(); ++index) {
+        auto const &surface = surfaces(index);
+        out["allocated_surfaces"].push_back({{"index", index}, {"Name", surface.Name},
+            {"Construction", surface.Construction}, {"Class", static_cast<int>(surface.Class)},
+            {"HeatTransferAlgorithm", static_cast<int>(surface.HeatTransferAlgorithm)},
+            {"ExtBoundCond", surface.ExtBoundCond}, {"Area", scalar(surface.Area)}});
+        bool in_all_ht = false;
+        for (int const actual_ht_index : all_ht) {
+            if (actual_ht_index == index) { in_all_ht = true; break; }
+        }
+        if (!in_all_ht) out["non_AllHT_history_owners"].push_back(surface_copy(state, Copy::Histories, index, 0));
+    }
+#define ARRAY(group, owner, field) out[group][#field] = allocated_array_copy(owner.field, real_copy)
+    ARRAY("scratch", m, QExt1); ARRAY("scratch", m, QInt1);
+    ARRAY("scratch", m, TempInt1); ARRAY("scratch", m, TempExt1); ARRAY("scratch", m, SumTime);
+    ARRAY("flux_reports", s, SurfOpaqInsFaceCond); ARRAY("flux_reports", s, SurfOpaqInsFaceCondFlux);
+    ARRAY("flux_reports", s, SurfOpaqOutFaceCond); ARRAY("flux_reports", s, SurfOpaqOutFaceCondFlux);
+    ARRAY("surface_operands", s, SurfTempIn);
+    ARRAY("surface_operands", s, SurfCTFConstInPart); ARRAY("surface_operands", s, SurfCTFConstOutPart);
+    ARRAY("surface_operands", (*state.dataSurface), SurfOutDryBulbTemp);
+#undef ARRAY
+    return out;
+}
+'''
+anchor = b'} // namespace\n\nBinding::Binding'
+assert collector.count(anchor) == 1
+collector = collector.replace(anchor, addition.encode() + anchor, 1)
+anchor = b'        auto const bytes = event.dump(); // Complete one event before touching the stream.\n'
+assert collector.count(anchor) == 1
+collector = collector.replace(anchor, b'        if (std::strcmp(checkpoint, "history_initialization_entry_owners") == 0 ||\n            std::strcmp(checkpoint, "history_update_entry_owners") == 0)\n            event["history_entry_context"] = history_entry_context(state);\n' + anchor, 1)
+put('surface_consumer_observer.cc', collector)
+
+context = json.loads((OLD / 'source-context.json').read_bytes())
+original = ROOT / '.reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceSurfaceManager.cc'
+raw = b''.join(original.read_bytes().splitlines(keepends=True)[1415:1530])
+context['reviewed_selected_ranges'].append({
+    'path': original.relative_to(ROOT).as_posix(), 'start_line': 1416, 'end_line': 1530,
+    'sha256': hashlib.sha256(raw).hexdigest(), 'size_bytes': len(raw),
+    'purpose': 'actual total-surface allocation/zero initialization of ordinary histories, optional masters/counters, current temperature/constants and flux reports'})
+context['history_entry_output_only_augmentation'] = {
+    'actual_entry_checkpoints': ['history_initialization_entry_owners', 'history_update_entry_owners'],
+    'Original_lines': [2209, 5222], 'new_HBSM_callbacks': 0,
+    'new_clock_flags': ['AnyInternalHeatSourceInInput', 'UpdateThermalHistoriesFirstTimeFlag'],
+    'fixed_history_shape_is_observed_not_clamped': True,
+    'AllHT_history_rows_remain_in_existing_owners': True,
+    'other_declared_surface_rows': 'history_entry_context.non_AllHT_history_owners',
+    'complete_allocated_scratch_and_report_and_counter_arrays': True,
+    'prospective_standalone_history_owner': ref(ROOT / '.runtime/porting/CTF-10/thermal-history-prep-01/manifest.json'),
+    'Native_entry_values_are_not_ordinary_Rust_production_inputs': True,
+    'Root_and_independent_Source_review_required_before_capture': True}
+store('source-context.json', context)
+readme = (OLD / 'README.md').read_text(encoding='utf-8') + '''
+
+Fresh03 adds output-only entry custody needed by the pending standalone selected
+history comparison. The entire derived HBSM TU, all51 insertion blocks/additions,
+header, main and CMake remain byte-identical02; no new callback or engine path is
+introduced. The collector adds two actual initialized flags to every event.clock:
+AnyInternalHeatSourceInInput and UpdateThermalHistoriesFirstTimeFlag. Existing
+callbacks consequently retain the real first-time flag before and after allocation.
+
+Only the two already-reached history entry checkpoint events gain
+history_entry_context (protocol ctf10-surface-history-entry-context.v1). It copies
+actual TotSurfaces/NumOfZones, Surface allocation/declared order/current identity,
+AllHT order, complete allocated SurfCurrNumHist, scratch QExt1/QInt1/TempInt1/
+TempExt1/SumTime, four flux report arrays, and actual SurfTempIn/CTF constants/
+outside drybulb arrays. Each array states allocation and actual lower/upper bounds;
+unallocated values/bounds are null. All allocated elements are copied in index
+order with authoritative bits/class; no values or allocation flags are defaulted.
+
+Existing event.owners retains the original AllHT history rows without duplication.
+non_AllHT_history_owners adds every other actual declared Surface row with the
+same four ordinary/four optional master histories and counter copier. Together
+these retain the actual full declared surface layout. Each actual allocated term
+and inner surface bound stays explicit, including absent/moved owners; there is
+no fixed19 clamp. Future shape admission must verify the actual fixed19/full-layout
+owners before pairing the standalone API. No missing allocation is synthesized.
+Array allocation initializes these ordinary fields in Original1416-1530; scratch
+initialization remains only the actual Update5245-5256. Entry before that source
+allocation can truthfully contain unallocated scratch. No unassigned local such
+as sum_steps is read; the existing interpolation checkpoint alone copies it.
+
+The existing event try/catch and attempted/retained/failure-by-Copy counters cover
+the whole added entry copy. A failure omits that actual event and fails custody;
+no cap, sample, recovery or artificial successful event is added. Native entry
+snapshots are later direct-unit operand evidence, never Native answers injected
+into ordinary Rust production. Same-input policy/freeze, exact owner association,
+genuine independent Rust state and OriginalDataQA remain unimplemented prerequisites.
+No history math/lifecycle/integration PASS or actual build result is claimed.
+Prep01/02 remain immutable. prepare_successor.py only authors this ignored source
+and metadata package using the Python standard library; it runs no proposed code.
+'''
+put('README.md', readme)
+
+def diff(before, after, name, from_name=None):
+    text = ''.join(difflib.unified_diff(before.splitlines(keepends=True), after.splitlines(keepends=True),
+        fromfile=from_name or name, tofile=name))
+    return text
+
+diffs = []
+for before, name in [('before/HeatBalanceSurfaceManager.cc', 'HeatBalanceSurfaceManager.surface_consumer.cc'),
+                     ('before/ctf10_reference.cmake', 'surface_consumer_reference.cmake'),
+                     (None, 'surface_consumer_observer.hh'), (None, 'surface_consumer_observer.cc'),
+                     (None, 'surface_consumer_main.cpp')]:
+    a = (OUT / before).read_text(encoding='utf-8') if before else ''
+    diffs.append(ref(put('diffs/' + name + '.diff', diff(a, (OUT / name).read_text(encoding='utf-8'), name, before or '/dev/null'))))
+narrow = []
+for name in build_names + ['source-context.json', 'README.md', 'additions.json']:
+    narrow.append(ref(put('from-02/' + name + '.diff', diff((OLD / name).read_text(encoding='utf-8'),
+        (OUT / name).read_text(encoding='utf-8'), name, (OLD / name).relative_to(ROOT).as_posix()))))
+
+# Structural inverse only; no C++/history execution.
+restored = collector.replace(addition.encode(), b'', 1)
+restored = restored.replace(b'        {"AnyInternalHeatSourceInInput", h.AnyInternalHeatSourceInInput},\n        {"UpdateThermalHistoriesFirstTimeFlag", state.dataHeatBalSurfMgr->UpdateThermalHistoriesFirstTimeFlag},\n', b'', 1)
+restored = restored.replace(b'        if (std::strcmp(checkpoint, "history_initialization_entry_owners") == 0 ||\n            std::strcmp(checkpoint, "history_update_entry_owners") == 0)\n            event["history_entry_context"] = history_entry_context(state);\n', b'', 1)
+assert restored == (OLD / 'surface_consumer_observer.cc').read_bytes()
+whole = (OUT / 'HeatBalanceSurfaceManager.surface_consumer.cc').read_bytes()
+for row in json.loads((OUT / 'additions.json').read_bytes()):
+    inserted = row['insertion'].encode()
+    assert whole.count(inserted) == 1
+    whole = whole.replace(inserted, b'', 1)
+assert whole == (OUT / 'before/HeatBalanceSurfaceManager.cc').read_bytes()
+assert (OUT / 'surface_consumer_reference.cmake').read_bytes().startswith((OUT / 'before/ctf10_reference.cmake').read_bytes())
+ast.parse((OUT / 'prepare_successor.py').read_text(encoding='utf-8'))
+manifest = copy.deepcopy(old)
+manifest['predecessor_manifest'] = ref(OLD / 'manifest.json')
+manifest['historical_predecessor_authoring_source'] = ref(OLD / 'prepare_successor.py')
+manifest['own_source_and_metadata'] = [ref(OUT / name) for name in build_names + ['additions.json', 'source-context.json', 'README.md', 'prepare_successor.py']]
+manifest['exact_source_diffs'] = diffs
+manifest['before_predecessor_archives'] = [ref(OUT / 'before-02' / name) for name in build_names + ['additions.json', 'source-context.json', 'README.md', 'manifest.json']]
+manifest['exact_from_predecessor_diffs'] = narrow
+for row in manifest['source_archives']:
+    row['archive'] = ref(OUT / 'before' / Path(row['archive']['path']).name)
+manifest['historical_02_repair_scope'] = manifest.pop('repair_scope')
+manifest['entry_context_augmentation'] = context['history_entry_output_only_augmentation']
+manifest['entry_context_augmentation']['four_other_build_source_bodies_and_additions_exact02'] = True
+manifest['entry_context_augmentation']['collector_inverse_restores02_exactly'] = True
+manifest['entry_context_augmentation']['counter_and_failure_protocol_unchanged'] = True
+store('manifest.json', manifest)
+print(json.dumps({'manifest': ref(OUT / 'manifest.json'), 'collector': ref(OUT / 'surface_consumer_observer.cc'),
+                  'narrow_nonempty': [row for row in narrow if row['size_bytes']]}, indent=2))

@@ -1,0 +1,454 @@
+--- before/HeatBalanceSurfaceManager.cc
++++ HeatBalanceSurfaceManager.surface_consumer.cc
+@@ -124,6 +124,9 @@
+ #include <WCESingleLayerOptics.hpp>
+ #include <WCETarcog.hpp>
+ 
++// SURFACE_OBSERVER_BEGIN include
++#include "surface_consumer_observer.hh"
++// SURFACE_OBSERVER_END include
+ namespace EnergyPlus::HeatBalanceSurfaceManager {
+ 
+ // Module containing the routines dealing with the Heat Balance of the surfaces
+@@ -144,6 +147,9 @@
+ 
+ void ManageSurfaceHeatBalance(EnergyPlusData &state)
+ {
++// SURFACE_OBSERVER_BEGIN scope_Manage
++    ::SurfaceConsumerObservation::Scope surface_observation_scope(state, ::SurfaceConsumerObservation::Procedure::Manage);
++// SURFACE_OBSERVER_END scope_Manage
+ 
+     // SUBROUTINE INFORMATION:
+     //       AUTHOR         Richard Liesen
+@@ -159,6 +165,9 @@
+         DisplayString(state, "Initializing Surfaces");
+     }
+     InitSurfaceHeatBalance(state); // Initialize all heat balance related parameters
++// SURFACE_OBSERVER_BEGIN actual_InitSurfaceHeatBalance_return
++    ::SurfaceConsumerObservation::record(state, "actual_InitSurfaceHeatBalance_return", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});
++// SURFACE_OBSERVER_END actual_InitSurfaceHeatBalance_return
+ 
+     // Solve the zone heat balance 'Detailed' solution
+     // Call the outside and inside surface heat balances
+@@ -166,10 +175,16 @@
+         DisplayString(state, "Calculate Outside Surface Heat Balance");
+     }
+     CalcHeatBalanceOutsideSurf(state);
++// SURFACE_OBSERVER_BEGIN actual_outside_surface_return
++    ::SurfaceConsumerObservation::record(state, "actual_outside_surface_return", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});
++// SURFACE_OBSERVER_END actual_outside_surface_return
+     if (state.dataHeatBalSurfMgr->ManageSurfaceHeatBalancefirstTime) {
+         DisplayString(state, "Calculate Inside Surface Heat Balance");
+     }
+     CalcHeatBalanceInsideSurf(state);
++// SURFACE_OBSERVER_BEGIN actual_inside_surface_return
++    ::SurfaceConsumerObservation::record(state, "actual_inside_surface_return", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});
++// SURFACE_OBSERVER_END actual_inside_surface_return
+ 
+     // The air heat balance must be called before the temperature history
+     // updates because there may be a radiant system in the building
+@@ -177,15 +192,24 @@
+         DisplayString(state, "Calculate Air Heat Balance");
+     }
+     HeatBalanceAirManager::ManageAirHeatBalance(state);
++// SURFACE_OBSERVER_BEGIN actual_air_heat_balance_return
++    ::SurfaceConsumerObservation::record(state, "actual_air_heat_balance_return", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});
++// SURFACE_OBSERVER_END actual_air_heat_balance_return
+ 
+     // IF NECESSARY, do one final "average" heat balance pass.  This is only
+     // necessary if a radiant system is present and it was actually on for
+     // part or all of the time step.
+     UpdateFinalSurfaceHeatBalance(state);
++// SURFACE_OBSERVER_BEGIN actual_final_surface_update_return
++    ::SurfaceConsumerObservation::record(state, "actual_final_surface_update_return", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});
++// SURFACE_OBSERVER_END actual_final_surface_update_return
+ 
+     // Before we leave the Surface Manager the thermal histories need to be updated
+     if (state.dataHeatBal->AnyCTF || state.dataHeatBal->AnyEMPD) {
+         UpdateThermalHistories(state); // Update the thermal histories
++// SURFACE_OBSERVER_BEGIN actual_UpdateThermalHistories_return
++    ::SurfaceConsumerObservation::record(state, "actual_UpdateThermalHistories_return", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});
++// SURFACE_OBSERVER_END actual_UpdateThermalHistories_return
+     }
+ 
+     if (state.dataHeatBal->AnyCondFD) {
+@@ -208,6 +232,9 @@
+     ThermalComfort::ManageThermalComfort(state, false); // "Record keeping" for the zone
+ 
+     ReportSurfaceHeatBalance(state);
++// SURFACE_OBSERVER_BEGIN actual_ReportSurfaceHeatBalance_return
++    ::SurfaceConsumerObservation::record(state, "actual_ReportSurfaceHeatBalance_return", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});
++// SURFACE_OBSERVER_END actual_ReportSurfaceHeatBalance_return
+     if (state.dataGlobal->ZoneSizingCalc) {
+         OutputReportTabular::GatherComponentLoadsSurface(state);
+     }
+@@ -271,6 +298,9 @@
+ 
+ void InitSurfaceHeatBalance(EnergyPlusData &state)
+ {
++// SURFACE_OBSERVER_BEGIN scope_Initialize
++    ::SurfaceConsumerObservation::Scope surface_observation_scope(state, ::SurfaceConsumerObservation::Procedure::Initialize);
++// SURFACE_OBSERVER_END scope_Initialize
+ 
+     // SUBROUTINE INFORMATION:
+     //       AUTHOR         Richard J. Liesen
+@@ -309,10 +339,16 @@
+     // Bulk Initialization for Temperatures & WindSpeed
+     // using the surface centroids, modify the surface Dry/Wet BulbTemps
+     DataSurfaces::SetSurfaceOutBulbTempAt(state);
++// SURFACE_OBSERVER_BEGIN actual_surface_bulb_setter_return
++    ::SurfaceConsumerObservation::record(state, "actual_surface_bulb_setter_return", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});
++// SURFACE_OBSERVER_END actual_surface_bulb_setter_return
+     DataSurfaces::CheckSurfaceOutBulbTempAt(state);
+ 
+     DataSurfaces::SetSurfaceWindSpeedAt(state);
+     DataSurfaces::SetSurfaceWindDirAt(state);
++// SURFACE_OBSERVER_BEGIN actual_surface_wind_setters_return
++    ::SurfaceConsumerObservation::record(state, "actual_surface_wind_setters_return", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});
++// SURFACE_OBSERVER_END actual_surface_wind_setters_return
+     if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
+         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+             if (state.dataSurface->Surface(SurfNum).SurfLinkedOutAirNode > 0) {
+@@ -345,9 +381,15 @@
+         }
+     }
+ 
++// SURFACE_OBSERVER_BEGIN effective_surface_environment
++    ::SurfaceConsumerObservation::record(state, "effective_surface_environment", ::SurfaceConsumerObservation::Copy::Environment, 0, 0, {}, {});
++// SURFACE_OBSERVER_END effective_surface_environment
+     // Do the Begin Simulation initializations
+     if (state.dataGlobal->BeginSimFlag) {
+         AllocateSurfaceHeatBalArrays(state); // Allocate the Module Arrays before any inits take place
++// SURFACE_OBSERVER_BEGIN actual_surface_allocation_return
++    ::SurfaceConsumerObservation::record(state, "actual_surface_allocation_return", ::SurfaceConsumerObservation::Copy::Catalog, 0, 0, {}, {});
++// SURFACE_OBSERVER_END actual_surface_allocation_return
+         state.dataHeatBalSurf->InterZoneWindow =
+             std::any_of(state.dataViewFactor->EnclSolInfo.begin(),
+                         state.dataViewFactor->EnclSolInfo.end(),
+@@ -381,6 +423,9 @@
+             DisplayString(state, "Initializing Temperature and Flux Histories");
+         }
+         InitThermalAndFluxHistories(state); // Set initial temperature and flux histories
++// SURFACE_OBSERVER_BEGIN actual_InitThermalAndFluxHistories_return
++    ::SurfaceConsumerObservation::record(state, "actual_InitThermalAndFluxHistories_return", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});
++// SURFACE_OBSERVER_END actual_InitThermalAndFluxHistories_return
+     }
+ 
+     // Calc movable insulation properties
+@@ -502,9 +547,18 @@
+ 
+                 int const ConstrNum = surface.Construction;
+                 auto const &construct = state.dataConstruction->Construct(ConstrNum);
++// SURFACE_OBSERVER_BEGIN constant_before_reset
++    ::SurfaceConsumerObservation::record(state, "constant_before_reset", ::SurfaceConsumerObservation::Copy::Constants, SurfNum, 0, {}, {});
++// SURFACE_OBSERVER_END constant_before_reset
+                 state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) = 0.0;
+                 state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) = 0.0;
++// SURFACE_OBSERVER_BEGIN constant_after_reset
++    ::SurfaceConsumerObservation::record(state, "constant_after_reset", ::SurfaceConsumerObservation::Copy::Constants, SurfNum, 0, {}, {});
++// SURFACE_OBSERVER_END constant_after_reset
+                 if (construct.NumCTFTerms <= 1) {
++// SURFACE_OBSERVER_BEGIN constant_skipped_num_terms_le_one
++    ::SurfaceConsumerObservation::record(state, "constant_skipped_num_terms_le_one", ::SurfaceConsumerObservation::Copy::None, SurfNum, 0, {}, {{"SurfNum", SurfNum}, {"NumCTFTerms", construct.NumCTFTerms}});
++// SURFACE_OBSERVER_END constant_skipped_num_terms_le_one
+                     continue;
+                 }
+ 
+@@ -530,6 +584,9 @@
+ 
+                     state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +=
+                         construct.CTFOutside[Term] * TH11 - ctf_cross * TH12 + construct.CTFFlux[Term] * QH11;
++// SURFACE_OBSERVER_BEGIN constant_after_each_ordered_term
++    ::SurfaceConsumerObservation::record(state, "constant_after_each_ordered_term", ::SurfaceConsumerObservation::Copy::Constants, SurfNum, Term, {{"ctf_cross", ctf_cross}, {"TH11", TH11}, {"TH12", TH12}, {"QH11", QH11}, {"QH12", QH12}}, {{"Term", Term}, {"ConstrNum", ConstrNum}});
++// SURFACE_OBSERVER_END constant_after_each_ordered_term
+                 }
+             }
+         }
+@@ -2207,6 +2264,12 @@
+ 
+ void InitThermalAndFluxHistories(EnergyPlusData &state)
+ {
++// SURFACE_OBSERVER_BEGIN scope_InitializeHistories
++    ::SurfaceConsumerObservation::Scope surface_observation_scope(state, ::SurfaceConsumerObservation::Procedure::InitializeHistories);
++// SURFACE_OBSERVER_END scope_InitializeHistories
++// SURFACE_OBSERVER_BEGIN history_initialization_entry_owners
++    ::SurfaceConsumerObservation::record(state, "history_initialization_entry_owners", ::SurfaceConsumerObservation::Copy::Histories, 0, 0, {}, {});
++// SURFACE_OBSERVER_END history_initialization_entry_owners
+ 
+     // SUBROUTINE INFORMATION:
+     //       AUTHOR         George Walton
+@@ -2392,10 +2455,16 @@
+                     state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::FCFactorMethod];
+             }
+             // Initialize the flux histories
++// SURFACE_OBSERVER_BEGIN history_initialization_before_flux
++    ::SurfaceConsumerObservation::record(state, "history_initialization_before_flux", ::SurfaceConsumerObservation::Copy::HistoryTerm, SurfNum, CTFTermNum, {}, {});
++// SURFACE_OBSERVER_END history_initialization_before_flux
+             state.dataHeatBalSurf->SurfOutsideFluxHist(CTFTermNum)(SurfNum) =
+                 state.dataConstruction->Construct(surface.Construction).UValue *
+                 (state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) - state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum));
+             state.dataHeatBalSurf->SurfInsideFluxHist(CTFTermNum)(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(2)(SurfNum);
++// SURFACE_OBSERVER_BEGIN history_initialization_after_flux
++    ::SurfaceConsumerObservation::record(state, "history_initialization_after_flux", ::SurfaceConsumerObservation::Copy::HistoryTerm, SurfNum, CTFTermNum, {}, {});
++// SURFACE_OBSERVER_END history_initialization_after_flux
+         }
+     }
+     for (int SurfNum : state.dataSurface->AllHTSurfaceList) {
+@@ -2444,6 +2513,9 @@
+             thisOSC.HRad = 4.0;
+         }
+     }
++// SURFACE_OBSERVER_BEGIN history_initialization_final_owners
++    ::SurfaceConsumerObservation::record(state, "history_initialization_final_owners", ::SurfaceConsumerObservation::Copy::Histories, 0, 0, {}, {});
++// SURFACE_OBSERVER_END history_initialization_final_owners
+ }
+ 
+ void EvalOutsideMovableInsulation(EnergyPlusData &state)
+@@ -5220,6 +5292,12 @@
+ 
+ void UpdateThermalHistories(EnergyPlusData &state)
+ {
++// SURFACE_OBSERVER_BEGIN scope_UpdateHistories
++    ::SurfaceConsumerObservation::Scope surface_observation_scope(state, ::SurfaceConsumerObservation::Procedure::UpdateHistories);
++// SURFACE_OBSERVER_END scope_UpdateHistories
++// SURFACE_OBSERVER_BEGIN history_update_entry_owners
++    ::SurfaceConsumerObservation::record(state, "history_update_entry_owners", ::SurfaceConsumerObservation::Copy::Histories, 0, 0, {}, {});
++// SURFACE_OBSERVER_END history_update_entry_owners
+ 
+     // SUBROUTINE INFORMATION:
+     //       AUTHOR         Russ Taylor
+@@ -5254,6 +5332,9 @@
+             state.dataHeatBalSurfMgr->Tuser1.dimension(state.dataSurface->TotSurfaces, 0.0);
+         }
+         state.dataHeatBalSurfMgr->UpdateThermalHistoriesFirstTimeFlag = false;
++// SURFACE_OBSERVER_BEGIN actual_history_scratch_allocation_return
++    ::SurfaceConsumerObservation::record(state, "actual_history_scratch_allocation_return", ::SurfaceConsumerObservation::Copy::Scratch, 0, 0, {}, {});
++// SURFACE_OBSERVER_END actual_history_scratch_allocation_return
+     }
+ 
+     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+@@ -5274,6 +5355,9 @@
+                 auto const &construct = state.dataConstruction->Construct(ConstrNum);
+ 
+                 if (construct.NumCTFTerms == 0) {
++// SURFACE_OBSERVER_BEGIN history_flux_skipped_zero_terms
++    ::SurfaceConsumerObservation::record(state, "history_flux_skipped_zero_terms", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {{"SurfNum", SurfNum}, {"ConstrNum", ConstrNum}, {"NumCTFTerms", construct.NumCTFTerms}});
++// SURFACE_OBSERVER_END history_flux_skipped_zero_terms
+                     continue; // Skip surfaces with no history terms
+                 }
+ 
+@@ -5298,6 +5382,9 @@
+                 state.dataHeatBalSurf->SurfOpaqInsFaceCond(SurfNum) = surface.Area * SurfInsideFluxHistCurr;
+                 state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(SurfNum) = SurfInsideFluxHistCurr; // for reporting
+                 state.dataHeatBalSurf->SurfInsideFluxHist(1)(SurfNum) = SurfInsideFluxHistCurr;
++// SURFACE_OBSERVER_BEGIN history_actual_inside_flux_assigned
++    ::SurfaceConsumerObservation::record(state, "history_actual_inside_flux_assigned", ::SurfaceConsumerObservation::Copy::Flux, SurfNum, 0, {{"SurfInsideFluxHistCurr", SurfInsideFluxHistCurr}, {"SurfOutsideTempCurr", SurfOutsideTempCurr}}, {});
++// SURFACE_OBSERVER_END history_actual_inside_flux_assigned
+ 
+                 // Update the temperature at the source/sink location (if one is present)
+                 if (construct.SourceSinkPresent) {
+@@ -5325,6 +5412,9 @@
+                 // switch sign for balance at outside face
+                 state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(SurfNum) = -state.dataHeatBalSurf->SurfOutsideFluxHist(1)(SurfNum);
+                 state.dataHeatBalSurf->SurfOpaqOutFaceCond(SurfNum) = surface.Area * state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(SurfNum);
++// SURFACE_OBSERVER_BEGIN history_actual_outside_flux_and_report_assigned
++    ::SurfaceConsumerObservation::record(state, "history_actual_outside_flux_and_report_assigned", ::SurfaceConsumerObservation::Copy::Flux, SurfNum, 0, {}, {});
++// SURFACE_OBSERVER_END history_actual_outside_flux_and_report_assigned
+             }
+         }
+     } // ...end of loop over all (heat transfer) surfaces...
+@@ -5352,6 +5442,9 @@
+         state.dataHeatBalSurf->SurfOutsideTempHist(2) = state.dataHeatBalSurf->SurfOutsideTempHist(1);
+         state.dataHeatBalSurf->SurfInsideFluxHist(2) = state.dataHeatBalSurf->SurfInsideFluxHist(1);
+         state.dataHeatBalSurf->SurfOutsideFluxHist(2) = state.dataHeatBalSurf->SurfOutsideFluxHist(1);
++// SURFACE_OBSERVER_BEGIN simple_history_hard_copy_complete
++    ::SurfaceConsumerObservation::record(state, "simple_history_hard_copy_complete", ::SurfaceConsumerObservation::Copy::Histories, 0, 0, {}, {});
++// SURFACE_OBSERVER_END simple_history_hard_copy_complete
+         return;
+     }
+ 
+@@ -5372,6 +5465,9 @@
+                     state.dataHeatBalSurfMgr->TempInt1(SurfNum) = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum);
+                     state.dataHeatBalSurfMgr->QExt1(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHist(1)(SurfNum);
+                     state.dataHeatBalSurfMgr->QInt1(SurfNum) = state.dataHeatBalSurf->SurfInsideFluxHist(1)(SurfNum);
++// SURFACE_OBSERVER_BEGIN master_history_begin_block_scratch_assigned
++    ::SurfaceConsumerObservation::record(state, "master_history_begin_block_scratch_assigned", ::SurfaceConsumerObservation::Copy::Scratch, SurfNum, 0, {}, {});
++// SURFACE_OBSERVER_END master_history_begin_block_scratch_assigned
+                 }
+             }
+         }
+@@ -5420,6 +5516,9 @@
+ 
+                 ++state.dataHeatBalSurf->SurfCurrNumHist(SurfNum);
+                 state.dataHeatBalSurfMgr->SumTime(SurfNum) = double(state.dataHeatBalSurf->SurfCurrNumHist(SurfNum)) * state.dataGlobal->TimeStepZone;
++// SURFACE_OBSERVER_BEGIN master_history_counter_and_sumtime_assigned
++    ::SurfaceConsumerObservation::record(state, "master_history_counter_and_sumtime_assigned", ::SurfaceConsumerObservation::Copy::Scratch, SurfNum, 0, {}, {});
++// SURFACE_OBSERVER_END master_history_counter_and_sumtime_assigned
+ 
+                 if (state.dataHeatBalSurf->SurfCurrNumHist(SurfNum) == construct.NumHistories) {
+                     state.dataHeatBalSurf->SurfCurrNumHist(SurfNum) = 0;
+@@ -5455,8 +5554,14 @@
+                     state.dataHeatBalSurf->SurfInsideTempHist(2)(SurfNum) = state.dataHeatBalSurf->SurfInsideTempHistMaster(2)(SurfNum);
+                     state.dataHeatBalSurf->SurfOutsideFluxHist(2)(SurfNum) = state.dataHeatBalSurf->SurfOutsideFluxHistMaster(2)(SurfNum);
+                     state.dataHeatBalSurf->SurfInsideFluxHist(2)(SurfNum) = state.dataHeatBalSurf->SurfInsideFluxHistMaster(2)(SurfNum);
++// SURFACE_OBSERVER_BEGIN master_history_completed_block
++    ::SurfaceConsumerObservation::record(state, "master_history_completed_block", ::SurfaceConsumerObservation::Copy::HistorySurface, SurfNum, 0, {}, {});
++// SURFACE_OBSERVER_END master_history_completed_block
+                 } else {
+                     Real64 const sum_steps(state.dataHeatBalSurfMgr->SumTime(SurfNum) / construct.CTFTimeStep);
++// SURFACE_OBSERVER_BEGIN master_history_interpolation_fraction_assigned
++    ::SurfaceConsumerObservation::record(state, "master_history_interpolation_fraction_assigned", ::SurfaceConsumerObservation::Copy::Scratch, SurfNum, 0, {{"sum_steps", sum_steps}}, {});
++// SURFACE_OBSERVER_END master_history_interpolation_fraction_assigned
+                     if (construct.NumCTFTerms > 1) {
+                         int const numCTFTerms(construct.NumCTFTerms);
+                         for (int HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum) { // Tuned Linear indexing
+@@ -5490,6 +5595,9 @@
+                     state.dataHeatBalSurf->SurfInsideFluxHist(2)(SurfNum) =
+                         state.dataHeatBalSurf->SurfInsideFluxHistMaster(2)(SurfNum) -
+                         (state.dataHeatBalSurf->SurfInsideFluxHistMaster(2)(SurfNum) - state.dataHeatBalSurfMgr->QInt1(SurfNum)) * sum_steps;
++// SURFACE_OBSERVER_BEGIN master_history_interpolation_complete
++    ::SurfaceConsumerObservation::record(state, "master_history_interpolation_complete", ::SurfaceConsumerObservation::Copy::HistorySurface, SurfNum, 0, {{"sum_steps", sum_steps}}, {});
++// SURFACE_OBSERVER_END master_history_interpolation_complete
+                 }
+             }
+         }
+@@ -6604,6 +6712,9 @@
+ 
+ void ReportSurfaceHeatBalance(EnergyPlusData &state)
+ {
++// SURFACE_OBSERVER_BEGIN scope_Report
++    ::SurfaceConsumerObservation::Scope surface_observation_scope(state, ::SurfaceConsumerObservation::Procedure::Report);
++// SURFACE_OBSERVER_END scope_Report
+ 
+     // SUBROUTINE INFORMATION:
+     //       AUTHOR         Linda Lawrie
+@@ -6742,6 +6853,9 @@
+     }
+ 
+     // Opaque heat transfer surfaces
++// SURFACE_OBSERVER_BEGIN opaque_conduction_report_loop_reached
++    ::SurfaceConsumerObservation::record(state, "opaque_conduction_report_loop_reached", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {});
++// SURFACE_OBSERVER_END opaque_conduction_report_loop_reached
+     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+         for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+             auto const &thisSpace = state.dataHeatBal->space(spaceNum);
+@@ -6768,6 +6882,9 @@
+                 state.dataHeatBal->SurfSWInAbsTotalReport(surfNum) = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum) * surface.Area;
+ 
+                 // inside face conduction updates
++// SURFACE_OBSERVER_BEGIN conduction_reports_before_face_assignments
++    ::SurfaceConsumerObservation::record(state, "conduction_reports_before_face_assignments", ::SurfaceConsumerObservation::Copy::Reports, surfNum, 0, {}, {});
++// SURFACE_OBSERVER_END conduction_reports_before_face_assignments
+                 state.dataHeatBalSurf->SurfOpaqInsFaceCond(surfNum) = state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(surfNum) * surface.Area;
+                 state.dataHeatBalSurf->SurfOpaqInsFaceCondEnergy(surfNum) =
+                     state.dataHeatBalSurf->SurfOpaqInsFaceCond(surfNum) * state.dataGlobal->TimeStepZoneSec;
+@@ -6822,6 +6939,9 @@
+                 } else {
+                     state.dataHeatBalSurf->SurfOpaqStorageCondLossRep(surfNum) = -state.dataHeatBalSurf->SurfOpaqStorageCond(surfNum);
+                 }
++// SURFACE_OBSERVER_BEGIN conduction_reports_after_storage_assignments
++    ::SurfaceConsumerObservation::record(state, "conduction_reports_after_storage_assignments", ::SurfaceConsumerObservation::Copy::Reports, surfNum, 0, {}, {});
++// SURFACE_OBSERVER_END conduction_reports_after_storage_assignments
+             }
+         }
+     }
+@@ -8661,6 +8781,22 @@
+                                        const std::vector<int> &IZSurfs, // Last zone to simulate
+                                        ObjexxFCL::Optional_int_const ZoneToResimulate)
+ {
++// SURFACE_OBSERVER_BEGIN scope_InsideCTF
++    ::SurfaceConsumerObservation::Scope surface_observation_scope(state, ::SurfaceConsumerObservation::Procedure::InsideCTF);
++// SURFACE_OBSERVER_END scope_InsideCTF
++// SURFACE_OBSERVER_BEGIN inside_ctf_actual_caller_bounds
++    ::SurfaceConsumerObservation::record(state, "inside_ctf_actual_caller_bounds", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {{"FirstZone", FirstZone}, {"LastZone", LastZone}, {"ZoneToResimulate_present", static_cast<int>(ZoneToResimulate.present())}, {"IZSurfs_size", static_cast<std::int64_t>(IZSurfs.size())}});
++// SURFACE_OBSERVER_END inside_ctf_actual_caller_bounds
++// SURFACE_OBSERVER_BEGIN inside_ctf_actual_optional_input
++    if (ZoneToResimulate.present()) {
++        ::SurfaceConsumerObservation::record(state, "inside_ctf_actual_resimulation_zone", ::SurfaceConsumerObservation::Copy::None,
++            0, 0, {}, {{"ZoneToResimulate", ZoneToResimulate()}});
++    }
++    for (int const id : IZSurfs) {
++        ::SurfaceConsumerObservation::record(state, "inside_ctf_actual_interzone_input", ::SurfaceConsumerObservation::Copy::None,
++            0, 0, {}, {{"actual_surface_index", id}});
++    }
++// SURFACE_OBSERVER_END inside_ctf_actual_optional_input
+ 
+     // This function performs a heat balance on the inside face of each
+     // surface in the building. It is a copy of CalcHeatBalanceInsideSurf,
+@@ -8723,6 +8859,9 @@
+                 state.dataHeatBalSurf->SurfCTFInside0(surfNum) = construct.CTFInside[0];
+                 state.dataHeatBalSurf->SurfCTFSourceIn0(surfNum) = construct.CTFSourceIn[0];
+                 state.dataHeatBalSurf->SurfTempOutHist(surfNum) = state.dataHeatBalSurf->SurfOutsideTempHist(1)(surfNum);
++// SURFACE_OBSERVER_BEGIN inside_ctf_cache_assigned
++    ::SurfaceConsumerObservation::record(state, "inside_ctf_cache_assigned", ::SurfaceConsumerObservation::Copy::Cache, surfNum, 0, {}, {});
++// SURFACE_OBSERVER_END inside_ctf_cache_assigned
+                 if (construct.SourceSinkPresent) {
+                     state.dataHeatBalSurf->SurfQSourceSinkHist(surfNum) = state.dataHeatBalSurf->SurfQsrcHist(surfNum, 1);
+                 }
+@@ -8798,6 +8937,9 @@
+                      state.dataHeatBalSurf->SurfIsOperatingPool(surfNum) * state.dataHeatBalFanSys->PoolHeatTransCoefs(surfNum) +
+                      static_cast<double>(state.dataHeatBalSurf->SurfIsOperatingPool(surfNum) == 0) * state.dataHeatBalSurf->SurfHConvInt(surfNum) +
+                      iterDampConstant);
++// SURFACE_OBSERVER_BEGIN inside_ctf_precalculation_assigned
++    ::SurfaceConsumerObservation::record(state, "inside_ctf_precalculation_assigned", ::SurfaceConsumerObservation::Copy::Inside, surfNum, 0, {{"iterDampConstant", iterDampConstant}, {"timeStepZoneSeconds", timeStepZoneSeconds}}, {});
++// SURFACE_OBSERVER_END inside_ctf_precalculation_assigned
+             }
+         }
+     }
+@@ -8910,6 +9052,9 @@
+                     //                                        * TH11) * TempDiv;
+ 
+                     // Calculate the current inside surface temperature
++// SURFACE_OBSERVER_BEGIN inside_ctf_before_temperature_assignment
++    ::SurfaceConsumerObservation::record(state, "inside_ctf_before_temperature_assignment", ::SurfaceConsumerObservation::Copy::Inside, surfNum, 0, {{"iterDampConstant", iterDampConstant}}, {});
++// SURFACE_OBSERVER_END inside_ctf_before_temperature_assignment
+                     state.dataHeatBalSurf->SurfTempInTmp(surfNum) =
+                         (static_cast<double>(state.dataHeatBalSurf->SurfIsOperatingPool(surfNum) == 0) *
+                              (state.dataHeatBalSurf->SurfTempTerm(surfNum) + state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(surfNum)) +
+@@ -8931,6 +9076,9 @@
+                     // Convection and damping term | Radiation from AFN ducts
+ 
+                     state.dataHeatBalSurf->SurfTempIn(surfNum) = state.dataHeatBalSurf->SurfTempInTmp(surfNum);
++// SURFACE_OBSERVER_BEGIN inside_ctf_after_temperature_assignment
++    ::SurfaceConsumerObservation::record(state, "inside_ctf_after_temperature_assignment", ::SurfaceConsumerObservation::Copy::InsideResult, surfNum, 0, {}, {});
++// SURFACE_OBSERVER_END inside_ctf_after_temperature_assignment
+                 }
+ 
+                 // Loop over non-window surfaces (includes TubularDaylightingDomes)
+@@ -9172,6 +9320,9 @@
+                     Real64 &TH12 = state.dataHeatBalSurf->SurfInsideTempHist(1)(surfNum);
+                     TH12 = state.dataHeatBalSurf->SurfTempIn(surfNum);
+                     state.dataHeatBalSurf->SurfTempOut(surfNum) = TH11;                                                  // For reporting
++// SURFACE_OBSERVER_BEGIN inside_ctf_current_temperature_history_assigned
++    ::SurfaceConsumerObservation::record(state, "inside_ctf_current_temperature_history_assigned", ::SurfaceConsumerObservation::Copy::None, 0, 0, {{"TH11", TH11}, {"TH12", TH12}}, {{"surfNum", surfNum}});
++// SURFACE_OBSERVER_END inside_ctf_current_temperature_history_assigned
+                     if (state.dataSurface->Surface(surfNum).OriginalClass == DataSurfaces::SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
+                         // Tubular daylighting devices are treated as one big object with an effective R value.
+                         // The outside face temperature of the TDD:DOME and the inside face temperature of the
+@@ -9245,6 +9396,9 @@
+         if (state.dataHeatBal->InsideSurfIterations < state.dataHeatBalSurf->MinIterations) {
+             Converged = false;
+         }
++// SURFACE_OBSERVER_BEGIN inside_ctf_convergence_checks_reached
++    ::SurfaceConsumerObservation::record(state, "inside_ctf_convergence_checks_reached", ::SurfaceConsumerObservation::Copy::None, 0, 0, {{"MaxDelTemp", MaxDelTemp}}, {{"Converged", static_cast<int>(Converged)}});
++// SURFACE_OBSERVER_END inside_ctf_convergence_checks_reached
+ 
+         if (state.dataHeatBal->InsideSurfIterations > DataHeatBalSurface::MaxIterations) {
+             if (!state.dataGlobal->WarmupFlag) {
+@@ -9268,10 +9422,16 @@
+                                                    "[C]");
+                 }
+             }
++// SURFACE_OBSERVER_BEGIN inside_ctf_max_iteration_break_reached
++    ::SurfaceConsumerObservation::record(state, "inside_ctf_max_iteration_break_reached", ::SurfaceConsumerObservation::Copy::None, 0, 0, {{"MaxDelTemp", MaxDelTemp}}, {{"Converged", static_cast<int>(Converged)}});
++// SURFACE_OBSERVER_END inside_ctf_max_iteration_break_reached
+             break; // iteration loop
+         }
+ 
+     } // ...end of main inside heat balance iteration loop (ends when Converged)
++// SURFACE_OBSERVER_BEGIN inside_ctf_loop_exited
++    ::SurfaceConsumerObservation::record(state, "inside_ctf_loop_exited", ::SurfaceConsumerObservation::Copy::None, 0, 0, {}, {{"Converged", static_cast<int>(Converged)}});
++// SURFACE_OBSERVER_END inside_ctf_loop_exited
+ }
+ 
+ void sumSurfQdotRadHVAC(EnergyPlusData &state)
