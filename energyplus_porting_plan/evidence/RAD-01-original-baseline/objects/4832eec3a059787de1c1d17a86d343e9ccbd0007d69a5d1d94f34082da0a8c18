@@ -1,0 +1,138 @@
+{
+  "schema": "rad01-native-build-review-source-preparation.v1",
+  "card": "RAD-01",
+  "status": "SOURCE-ONLY-held-unexecuted-awaiting-Root-and-other-author-FULL-review",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/RAD-01/native-build-review-prep-01/review_build.py",
+      "sha256": "eabb730f94984239a88ece66b7492d5812338b4f258d8dd93cdffad68e1e77f7",
+      "size_bytes": 5493,
+      "line_count": 105
+    }
+  ],
+  "authoring_source": {
+    "path": ".runtime/porting/RAD-01/native-build-review-prep-01/prepare_source.py",
+    "sha256": "4da3a75b7f67b1809c8ec04aa306aa54812c539209d1bb78cd139a351889b199",
+    "size_bytes": 4821,
+    "line_count": 72
+  },
+  "readme": {
+    "path": ".runtime/porting/RAD-01/native-build-review-prep-01/README.md",
+    "sha256": "b9249414c2f27d253ff054c8410679b366ca3af207902f09f628b36ce7e0d9fc",
+    "size_bytes": 1827,
+    "line_count": 13
+  },
+  "before_sources": [
+    {
+      "path": ".runtime/porting/RAD-01/native-build-review-prep-01/before/review_build.py",
+      "sha256": "1dbb0054716d64aa030837aa7f011cdf4681772e00db7e90e1595501d84ff95e",
+      "size_bytes": 6410,
+      "line_count": 111
+    }
+  ],
+  "predecessor_sources": [
+    {
+      "path": ".runtime/porting/CTF-10/native-build-review-prep-01/review_build.py",
+      "sha256": "1dbb0054716d64aa030837aa7f011cdf4681772e00db7e90e1595501d84ff95e",
+      "size_bytes": 6410,
+      "line_count": 111
+    }
+  ],
+  "exact_diffs": [
+    {
+      "path": ".runtime/porting/RAD-01/native-build-review-prep-01/review_build.py.diff",
+      "sha256": "32daeb0c19d6216c9b57a086f61ef58dfd22e35ae5ebc787d14eddf3d3daa266",
+      "size_bytes": 5485,
+      "line_count": 80
+    }
+  ],
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/manifest.json",
+      "sha256": "489a7caa4086722bb5057cfc8489803b21ce7723f881ffcbe54252d604e86618",
+      "size_bytes": 21959,
+      "line_count": 545
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_helper.cpp",
+      "sha256": "1f16572cbd9da579a6f8e4c79cec64a687e7cecd70d823f1a16a1973cfdfad86",
+      "size_bytes": 11938,
+      "line_count": 140
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_metadata.hh",
+      "sha256": "00894557c7d1a186f4220c93f03cb54b1f16ddfb29c3cf55a7eceb1403aa2ac1",
+      "size_bytes": 7420,
+      "line_count": 147
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_admission.hh",
+      "sha256": "9b2c28fc02ff5eba7c8b1fd0bfe5cb23552def15c5ee8d9ba4745bc81f744600",
+      "size_bytes": 9313,
+      "line_count": 115
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_observer.hh",
+      "sha256": "362166c03ca9596ffaa97942d258c3d50f1b5fd0b0edcc26ae1d6203600a7dac",
+      "size_bytes": 2142,
+      "line_count": 49
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_observer.cc",
+      "sha256": "f92a72e0f417ffff9ff9bf0178347919de95dbe20d13e74d87e0db334067981a",
+      "size_bytes": 4899,
+      "line_count": 89
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/HeatBalanceIntRadExchange.rad01.cc",
+      "sha256": "e3ef247c59f1fbac29e1d619e3d2d6b9826aa5ff52947e77e21c51efefb16551",
+      "size_bytes": 120257,
+      "line_count": 2124
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_reference.cmake",
+      "sha256": "91bdacdbd4b3a3198356564c91d04096501c8fe6c4a83a118448d4b74b96e1d0",
+      "size_bytes": 1845,
+      "line_count": 29
+    },
+    {
+      "path": "tools/porting/native_pe.py",
+      "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+      "size_bytes": 20217,
+      "line_count": 346
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "size_bytes": 8125,
+      "line_count": 194
+    }
+  ],
+  "runtime_protocol": {
+    "build_schema": "rad01-native-build.v1",
+    "target": "rad01_unit_helper",
+    "build_status": "pass-actual-3TU-link-and-preservation",
+    "new_compile_rows": 3,
+    "native_source_files": 6,
+    "core_counts": [
+      643,
+      631,
+      12
+    ],
+    "protected_count": "actual-before-inventory-only",
+    "review_schema": "rad01-independent-build-PE-review.v1",
+    "review_status": "pass-exact-retained-PE-runtime-and-actual-build-identity",
+    "stdout_keys": [
+      "review",
+      "status"
+    ],
+    "actual_future_refs": null
+  },
+  "proof_boundary": {
+    "target_import_build_or_execution_performed": false,
+    "binary_payload_read": false,
+    "canonical_files_modified": false,
+    "retirement_or_deletion_performed": false,
+    "gates_updated": false
+  }
+}

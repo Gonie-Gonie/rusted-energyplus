@@ -1,0 +1,13 @@
+# RAD-01 existing independent build/PE reader source adaptation
+
+This unexecuted source keeps the existing CTF-10 strict `tools/porting/native_pe.py` inspection and retained-runtime comparison. The single target is `rad01_unit_helper`, built from three genuine translation units with six admitted source files. Actual prior/current compile counts are supplied by Root build metadata, with current=prior+3. Core counts remain 643 registered, 631 present and 12 absent; protected count is the actual before-inventory count, never a guessed future count.
+
+The build schema is `rad01-native-build.v1`, status `pass-actual-3TU-link-and-preservation`. Preservation must show zero selected original core HeatBalanceIntRadExchange object hits and the actual derived `HeatBalanceIntRadExchange.rad01.cc.obj` text provider. Both actual linked original and derivative PE maps are inspected and matched to the authentic derivation maps. The output schema is `rad01-independent-build-PE-review.v1` with the same exact-retained-runtime success status and compact `{review,status}` stdout. No engine or scientific comparison is performed.
+
+Future invocation, only after Root and another author fully review the source:
+
+```text
+python -X utf8 -B <this review_build.py> --build <actual native-build.json path#SHA> --output-dir <fresh review directory>
+```
+
+Configure/compile/derivation recorder refs, actual build identity, original/derivative hashes, provider map, preservation and dynamic counts are future runtime inputs. This preparation claims none of their outcomes. It introduces no retirement intent, deletion or proof stage. Final CTF-10 retirement authority stays literal; its retired originals are not relaunched. The unchanged strict PE primitive is imported only by that future approved invocation, not during Source preparation.

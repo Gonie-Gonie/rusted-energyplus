@@ -1,0 +1,96 @@
+{
+  "schema": "rad01-native-build.v1",
+  "target": "rad01_unit_helper",
+  "status": "pass-actual-3TU-link-and-preservation",
+  "authorship": "Root assembled genuine recorded configure/compile/derivation, actual map provider and fresh protected/core hashes. Before SHAs explicitly reuse the immediate CTF10 retirement guard. No engine/scientific claim.",
+  "observed_utc": "2026-10-11T01:07:41.362494+00:00",
+  "helper_binary": {
+    "path": ".runtime/porting/RAD-01/native-build-02/derivation/derived-helper.exe",
+    "sha256": "42225701397f847133f19bf4ac33d0c1aa46b9ac9ca5a775eefaafb390f909ba",
+    "size_bytes": 150222647
+  },
+  "linked_original": {
+    "path": ".runtime/ep261-gcc13-o0/Products/rad01_unit_helper.exe",
+    "sha256": "bdc4f8dcb73f40ba5f64153d2ba0d191d7df47c12004e0f271031a8c336b7707",
+    "size_bytes": 1299982430
+  },
+  "native_source_files": [
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-02/rad01_helper.cpp",
+      "sha256": "ac4d14e13856db555f8888951972cd51ecac1a7e54dd32a53079a0f60146412c",
+      "size_bytes": 12022,
+      "line_count": 153
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_metadata.hh",
+      "sha256": "00894557c7d1a186f4220c93f03cb54b1f16ddfb29c3cf55a7eceb1403aa2ac1",
+      "size_bytes": 7420,
+      "line_count": 147
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_admission.hh",
+      "sha256": "9b2c28fc02ff5eba7c8b1fd0bfe5cb23552def15c5ee8d9ba4745bc81f744600",
+      "size_bytes": 9313,
+      "line_count": 115
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_observer.hh",
+      "sha256": "362166c03ca9596ffaa97942d258c3d50f1b5fd0b0edcc26ae1d6203600a7dac",
+      "size_bytes": 2142,
+      "line_count": 49
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_observer.cc",
+      "sha256": "f92a72e0f417ffff9ff9bf0178347919de95dbe20d13e74d87e0db334067981a",
+      "size_bytes": 4899,
+      "line_count": 89
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/HeatBalanceIntRadExchange.rad01.cc",
+      "sha256": "e3ef247c59f1fbac29e1d619e3d2d6b9826aa5ff52947e77e21c51efefb16551",
+      "size_bytes": 120257,
+      "line_count": 2124
+    }
+  ],
+  "configure_execution": {
+    "path": ".runtime/porting/RAD-01/native-build-02/native-configure-command-01/receipt.json",
+    "sha256": "a7ae9be99af562617d7331ad34d95a778dbd568a588bac32770c936aef320757",
+    "size_bytes": 7551
+  },
+  "compile_execution": {
+    "path": ".runtime/porting/RAD-01/native-build-02/native-compile-command-01/receipt.json",
+    "sha256": "177834df0572f09df0ac23512a8e86d850402497b9e214bfb17b6b961751ce57",
+    "size_bytes": 2951
+  },
+  "derivation_execution": {
+    "path": ".runtime/porting/RAD-01/native-build-02/native-unit-derive-command-01/receipt.json",
+    "sha256": "08da89d2eda6cdda5de4ebddbe5dc879288542fffcc45a393ee41feb8a532a42",
+    "size_bytes": 3239
+  },
+  "validated_derivative": {
+    "path": ".runtime/porting/RAD-01/native-build-02/derivation/receipt.json",
+    "sha256": "47a23312c648477aa109cf2d678f2d71f184f77006076922f10b0b359ff77ecf",
+    "size_bytes": 12613
+  },
+  "preservation": {
+    "path": ".runtime/porting/RAD-01/native-build-02/preservation-after.json",
+    "sha256": "fb5704bebf0e1a3818a9de9a056a688bfcf9088315056510b037d5e31214f0da",
+    "size_bytes": 167584
+  },
+  "core_before_check": {
+    "path": ".runtime/porting/CTF-01/native-core-before-check-command-01/receipt.json",
+    "sha256": "e1da6904b99a635a16994406919608fa7284f19276d8d3a45eb4f3df8c807702",
+    "size_bytes": 3019
+  },
+  "previous_compile_rows": 717,
+  "current_compile_rows": 720,
+  "core_registered": 643,
+  "core_present": 631,
+  "core_absent": 12,
+  "all_previous_compile_commands_unchanged": true,
+  "protected_artifacts_and_present_core_objects_unchanged": true,
+  "link_provider_verified": true,
+  "protected_ref_count": 48,
+  "scientific_execution_certified": false,
+  "gates_updated": false
+}

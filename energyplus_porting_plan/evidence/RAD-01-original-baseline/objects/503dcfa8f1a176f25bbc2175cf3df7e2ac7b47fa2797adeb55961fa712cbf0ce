@@ -1,0 +1,263 @@
+"""Factual Original RAD data/provenance review; no engine, evaluator or comparison."""
+import argparse
+import hashlib
+import importlib.util
+import json
+import re
+from datetime import datetime, timezone
+from pathlib import Path
+
+PREP = Path(__file__).resolve().parent
+IO_SHA = "d038fcddb3319eb0494e059ffdd5453355ceff2494872c96c5d60c2492d623c9"
+SHAPE_SHA = "682a2ed4fd087cbbcdff05fef90ea6aa7bec6b618b12d72aca4fa87dc3b1d15d"
+PE_READER_SHA = "eabb730f94984239a88ece66b7492d5812338b4f258d8dd93cdffad68e1e77f7"
+NATIVE = {"path": ".runtime/porting/RAD-01/native-helper-prep-02/manifest.json",
+          "sha256": "b4e10bd483af44f6f5d0b6f5fa13051d106d6d672d1ec0af1b79bbf5d5986b89"}
+WRITER = {"path": ".runtime/porting/RAD-01/input-writer-prep-03/manifest.json",
+          "sha256": "c3f140b8b4384e61a1fc5ba5e198b4f1facc39082f1521b68c895ea53974aace"}
+PE_PREPARATION = {"path": ".runtime/porting/RAD-01/native-build-review-prep-01/manifest.json",
+                  "sha256": "4832eec3a059787de1c1d17a86d343e9ccbd0007d69a5d1d94f34082da0a8c18"}
+
+
+def boot(name, filename, digest):
+    path = PREP / filename
+    if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+        raise ValueError("Reviewed stdlib reader dependency differs before import")
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module
+
+
+def run(args):
+    m = boot("rad01_data_io", "packet_io.py", IO_SHA)
+    shape = boot("rad01_data_shape", "shape.py", SHAPE_SHA)
+    started = datetime.now(timezone.utc).isoformat()
+    m.require(m.identity(__file__)["sha256"] == args.approved_source_sha256 and Path.cwd().resolve() == m.ROOT,
+              "Root-reviewed reader SHA and recorded repository cwd required")
+
+    def same(left, right):
+        for row in [left, right]: m.require(re.fullmatch("[0-9a-f]{64}", row["sha256"]), "Actual reference SHA required")
+        m.require(m.contained(left["path"], existing=False) == m.contained(right["path"], existing=False) and
+                  left["sha256"] == right["sha256"], "Actual direct artifact identities differ")
+
+    def instant(text):
+        value = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        m.require(value.tzinfo is not None, "Aware actual UTC interval required")
+        return value
+
+    def recorded(ref, before=None, require_zero=True):
+        value = m.load(ref)
+        exit_known = type(value["exit_code"]) is int
+        launch_unknown = (not require_zero and value["exit_code"] is None and
+                          isinstance(value["launch_error"], str) and bool(value["launch_error"]))
+        m.require(value["schema"] == "recorded-porting-command.v1" and (exit_known or launch_unknown) and
+                  value["source_bytes_match_before_and_after"] is True and Path(value["cwd"]).resolve() == m.ROOT,
+                  "Genuine source-preserving repository recorder required")
+        if require_zero: m.require(value["exit_code"] == 0 and value["launch_error"] is None, "Actual recorded command0 required")
+        m.require(instant(value["started_utc"]) <= instant(value["finished_utc"]), "Actual command interval differs")
+        if before is not None: m.require(instant(value["finished_utc"]) <= instant(before), "Required preceding actual command is later")
+        for key in ["stdout", "stderr", "source_snapshot"]: m.bind(value[key])
+        m.require(value["executed_launcher"]["historical_path"] == "tools/porting/record_command.py", "Actual recorder source owner differs")
+        m.bind(value["executed_launcher"]["archive"])
+        return value
+
+    def python_command(command, reader, options):
+        m.require(len(command) == 5 + 2 * len(options) and Path(command[0]).name.lower() in ["python", "python.exe"] and
+                  command[1:4] == ["-X", "utf8", "-B"] and m.contained(command[4]) == m.contained(reader["path"]),
+                  "Actual approved reader/writer CLI differs")
+        pairs = list(zip(command[5::2], command[6::2]))
+        m.require(len({key for key, _ in pairs}) == len(pairs) and {key for key, _ in pairs} == set(options), "Exact actual CLI options required")
+        return dict(pairs)
+
+    names = ["native-execution", "results", "freeze-receipt", "freeze-execution", "build", "build-execution", "build-review", "build-review-execution"]
+    refs = {name: m.argument(getattr(args, name.replace("-", "_"))) for name in names if name != "results"}
+    native = recorded(refs["native-execution"], started, require_zero=False)
+    freeze = m.load(refs["freeze-receipt"])
+    frozen_command = recorded(refs["freeze-execution"], native["started_utc"])
+    m.require(m.load(frozen_command["stdout"]) == freeze and freeze["schema"] == "rad01-frozen-packet.v1" and
+              freeze["status"] == "frozen-literal-input-and-policy-before-numerical-execution" and
+              freeze["frozen_before_numerical_execution"] is True and freeze["numerical_PASS_claimed"] is False,
+              "Genuine input-only freeze0/full recorder stdout required")
+    native_ref, writer_ref, pe_preparation_ref = m.bind(NATIVE), m.bind(WRITER), m.bind(PE_PREPARATION)
+    native_prep, writer_prep, pe_prep = m.load(native_ref), m.load(writer_ref), m.load(pe_preparation_ref)
+    writer_sources = [m.bind(row) for row in writer_prep["own_sources"]]
+    approval = freeze["source_preparation_approval"]
+    same(approval["source_manifest"], writer_ref)
+    m.require(approval["reviewed_sources"] == writer_sources and approval["approved_writer_sha256"] == writer_sources[0]["sha256"],
+              "Actual reviewed two-source freezer approval required")
+    writer_options = python_command(frozen_command["command"], writer_sources[0], ["--approved-source-sha256", "--source-manifest",
+        "--current-card", "--actual-scope-amendment", "--actual-scope-amendment-execution", "--output-dir"])
+    same(m.argument(writer_options["--source-manifest"]), writer_ref)
+    m.require(writer_options["--approved-source-sha256"] == writer_sources[0]["sha256"] and
+              m.contained(writer_options["--output-dir"], existing=False) == m.contained(refs["freeze-receipt"]["path"]).parent,
+              "Actual freezer approved-source/output operands differ")
+    archived = freeze["reviewed_source_archives"]
+    for row in archived: m.bind(row["archive"])
+    m.require(freeze["executed_writer_sources"] == archived[:2] and len(archived) >= 2, "Actual executed writer archives required")
+    for source, row in zip(writer_sources, archived[:2]):
+        m.require(row["historical_path"] == source["path"] and row["archive"]["sha256"] == source["sha256"], "Executed writer archive differs")
+    request_ref, admission_ref, projection_ref = freeze["helper_request"], freeze["native_admission_contract"], freeze["projection"]
+    request, admission, projection = m.load(request_ref), m.load(admission_ref), m.load(projection_ref)
+    m.require(request["schema"] == "rad01-helper-cases.v1" and admission["schema"] == "rad01-native-admission-contract.v1" and
+              projection["schema"] == "rad01-observation-projection.v1", "Actual frozen RAD packet schemas required")
+    same(admission["helper_request"], request_ref); same(admission["projection"], projection_ref); same(projection["helper_request"], request_ref)
+    m.require(set(request["contracts"]) == {"source", "tolerances"} and set(admission["contracts"]) == {"source", "cases", "tolerances"} and
+              admission["contracts"] == projection["contracts"] == freeze["contracts"], "Actual one-way contract DAG differs")
+    contracts = {key: m.load(ref) for key, ref in freeze["contracts"].items()}
+    for key, contract in contracts.items():
+        m.require(contract["schema"] == "rad01-" + key + "-contract.v1" and contract["frozen_before_numerical_execution"] is True, "Frozen contract differs")
+        if key in request["contracts"]: same(request["contracts"][key], freeze["contracts"][key])
+    same(contracts["cases"]["helper_request"], request_ref)
+    for key in ["source", "tolerances"]: same(contracts["cases"][key], freeze["contracts"][key])
+    fixture_ref, policy_ref = m.bind(native_prep["input_fixture_proposal"]), m.bind(native_prep["observation_policy_proposal"])
+    fixture, policy = m.load(fixture_ref), m.load(policy_ref)
+    m.require(request["model_cases"] == fixture["model_cases"] and request["requested_counts"] == fixture["proposed_counts"] ==
+              {"model_cases": len(request["model_cases"]), "CalcApproximateViewFactors": len(request["model_cases"])} and
+              len(request["model_cases"]) == 21, "Exact literal21 models/counts required; no expected source outcomes")
+    for packet in [freeze, request, admission, projection, *contracts.values()]:
+        for key in ["frozen_before_this_RAD01_helper_execution", "frozen_before_numerical_execution"]: m.require(packet[key] is True, "Pre-output frozen flag required")
+        for key in ["expected_values_supplied", "expected_exits_supplied", "scientific_execution_performed", "full_engine_production_geometry_supplied"]:
+            m.require(packet[key] is False, "Input-only declared-geometry boundary differs")
+    for packet in [request, admission, projection, contracts["tolerances"]]: m.require(packet["observation_policy"] == policy, "Literal exact policy differs")
+    authority = freeze["source_authorities"]
+    m.require(authority == projection["source_authorities"] == contracts["source"]["source_authorities"] and
+              authority["actual_scope_check_role"] == "real-RAD-01-check-only", "Actual scope authority/role differs")
+    for key, expected in [("native_helper_source_manifest", native_ref), ("writer_source_manifest", writer_ref),
+                          ("input_fixture_proposal", fixture_ref), ("observation_policy_proposal", policy_ref)]: same(authority[key], expected)
+    scope_ref, scope_execution_ref = authority["actual_scope_amendment"], authority["actual_scope_amendment_execution"]
+    scope = m.load(scope_ref); scope_execution = recorded(scope_execution_ref, frozen_command["started_utc"])
+    inventory = {"native_helper": native_ref, "input_fixture": fixture_ref, "observation_policy": policy_ref, "input_writer": writer_ref}
+    m.require(scope["schema"] == "rad01-source-scope-amendment.v1" and scope["cards"] == ["RAD-01"] and
+              scope["rad_policy_source_inventory"] == inventory and scope["all_other_gates_pending"] is True and
+              scope["strict_profiles_settled_before_outputs"] is True and scope["actual_RAD01_successful_build_or_engine_execution_performed"] is False and
+              scope["requested_counts"] == request["requested_counts"] and scope_execution["command"] ==
+              ["python", "-X", "utf8", "-B", "tools/porting/check_plan.py", "--check", "--card", "RAD-01"], "Actual honest pre-output scope/check0 required")
+    for packet in [request, admission, projection]:
+        same(packet["actual_scope_amendment"], scope_ref); same(packet["actual_scope_amendment_execution"], scope_execution_ref)
+    for key, ref in [("--current-card", authority["current_card"]), ("--actual-scope-amendment", scope_ref),
+                     ("--actual-scope-amendment-execution", scope_execution_ref)]: same(m.argument(writer_options[key]), ref)
+    m.require(authority["current_card"]["path"] == "energyplus_porting_plan/cards/RAD-01.md" and
+              authority["historical_before_documents"] == [m.bind(row) for row in scope["before_documents"]] and
+              authority["current_after_documents"] == [m.bind(row) for row in scope["after_documents"]] and
+              m.bind(authority["current_card"]) in authority["current_after_documents"], "Actual archive-before/current-after document custody differs")
+    original_sources = [m.bind(row) for row in native_prep["source_dependencies"] if row["path"].startswith(".reference/energyplus-src/26.1.0/")]
+    m.require(contracts["source"]["source_files"] == original_sources and contracts["source"]["primary_source_ranges"] == native_prep["read_source_ranges"],
+              "Exact whole Original source/range authority required")
+    for row in native_prep["read_source_ranges"]:
+        raw = b"".join(m.contained(row["path"]).read_bytes().splitlines(keepends=True)[row["start_line"] - 1:row["end_line"]])
+        m.require(hashlib.sha256(raw).hexdigest() == row["sha256"] and len(raw) == row["size_bytes"], "Selected source range identity differs")
+    for source in [*original_sources, *[m.bind(row) for row in native_prep["native_source_files"]], *authority["current_after_documents"]]:
+        m.require(any(row["historical_path"] == source["path"] and row["archive"]["sha256"] == source["sha256"] for row in archived), "Required actual source/document archive missing")
+    build, peer = m.load(refs["build"]), m.load(refs["build-review"])
+    compile_command = recorded(refs["build-execution"], native["started_utc"])
+    peer_command = recorded(refs["build-review-execution"], native["started_utc"])
+    m.require(build["schema"] == "rad01-native-build.v1" and build["status"] == "pass-actual-3TU-link-and-preservation" and
+              build["target"] == "rad01_unit_helper", "Actual reviewed RAD3TU build identity required")
+    for key in ["all_previous_compile_commands_unchanged", "protected_artifacts_and_present_core_objects_unchanged", "link_provider_verified"]:
+        m.require(build[key] is True, "Actual build preservation/provider proof required")
+    for key in ["previous_compile_rows", "current_compile_rows", "core_registered", "core_present", "core_absent", "protected_ref_count"]:
+        m.require(type(build[key]) is int and build[key] >= 0, "Typed actual build counts required")
+    m.require(build["current_compile_rows"] == build["previous_compile_rows"] + 3 and
+              (build["core_registered"], build["core_present"], build["core_absent"]) == (643, 631, 12) and build["protected_ref_count"] > 0,
+              "Actual before-derived build/core/protected counts differ")
+    same(build["compile_execution"], refs["build-execution"])
+    for key in ["configure_execution", "derivation_execution"]: recorded(build[key], native["started_utc"])
+    m.bind(build["validated_derivative"])
+    m.require(peer["schema"] == "rad01-independent-build-PE-review.v1" and peer["status"] ==
+              "pass-exact-retained-PE-runtime-and-actual-build-identity" and peer["retained_runtime_exact"] is True,
+              "Actual independent strict PE review required")
+    same(peer["build"], refs["build"])
+    peer_reader = m.bind(peer["executed_reader"])
+    same(peer_reader, pe_prep["own_sources"][0]); m.require(peer_reader["sha256"] == PE_READER_SHA, "Exact approved PE reader source required")
+    peer_options = python_command(peer_command["command"], peer_reader, ["--build", "--output-dir"])
+    same(m.argument(peer_options["--build"]), refs["build"])
+    m.require(m.contained(peer_options["--output-dir"], existing=False) == m.contained(refs["build-review"]["path"]).parent, "Actual PE output operand differs")
+    peer_stdout = m.load(peer_command["stdout"])
+    m.require(set(peer_stdout) == {"review", "status"} and peer_stdout["status"] == peer["status"], "Genuine compact PE stdout required")
+    same(peer_stdout["review"], refs["build-review"])
+    for key in ["helper_binary", "linked_original", "validated_derivative"]: same(peer[key], build[key])
+    m.bind(peer["native_pe_source"])
+    maps = {key: m.load(peer["maps"][key]) for key in ["original", "derived", "comparison"]}
+    m.require(maps["comparison"]["status"] == "pass-exact-retained-runtime-sections-and-directories", "Actual strict runtime comparison required")
+    for key, binary in [("original", "linked_original"), ("derived", "helper_binary")]:
+        m.require(maps[key]["sha256"] == build[binary]["sha256"] and type(maps[key]["size_bytes"]) is int and
+                  maps[key]["size_bytes"] == build[binary]["size_bytes"] > 0, "Actual PE map binary identity/size differs")
+    declared_sources = [m.bind(row) for row in native_prep["native_source_files"]]
+    m.require(len(declared_sources) == len(admission["native_source_files"]) == len(build["native_source_files"]) == 6, "Exact Native source6 required")
+    for expected, admitted, compiled in zip(declared_sources, admission["native_source_files"], build["native_source_files"]):
+        same(expected, admitted); same(expected, compiled)
+    m.require(instant(frozen_command["finished_utc"]) <= instant(compile_command["started_utc"]) and
+              instant(compile_command["finished_utc"]) <= instant(peer_command["started_utc"]), "Actual freeze/build/PE ordering differs")
+    result_name, separator, result_sha = args.results.rpartition("#")
+    if not separator: result_name, result_sha = args.results, None
+    m.require(result_sha is None or re.fullmatch("[0-9a-f]{64}", result_sha), "Preserved result requires explicit actual SHA")
+    result_path = m.contained(result_name, existing=False)
+    m.require(result_path.name == "rad01-helper-results.json", "Genuine helper result filename required")
+    command = native["command"]
+    m.require(len(command) == 5 and m.contained(command[0], existing=False) == m.contained(build["helper_binary"]["path"], existing=False) and
+              Path(command[1]).resolve() == m.ROOT and m.contained(command[2]) == m.contained(request_ref["path"]) and
+              m.contained(command[3]) == m.contained(admission_ref["path"]) and m.contained(command[4], existing=False) == result_path.parent,
+              "Actual direct Native argc5 command differs")
+    counts, integrity, result_ref, complete = None, [], None, False
+    if result_path.is_file() and native["launch_error"] is None:
+        m.require(result_sha is not None, "Existing actual result requires its supplied SHA")
+        result_ref = m.bind({"path": result_name, "sha256": result_sha}); result = m.load(result_ref)
+        m.require(result["schema"] == "rad01-helper-results.v1" and result["complete_requested_record_ledger"] is True and
+                  result["energyplus_commit"] == request["energyplus_commit"] and set(result["contracts"]) == set(freeze["contracts"]) and
+                  result["requested_counts"] == request["requested_counts"] ==
+                  admission["requested_counts"] == freeze["requested_counts"] and result["observation_policy"] == policy,
+                  "Actual complete result ledger/input/policy differs")
+        for key, ref in freeze["contracts"].items(): same(result["contracts"][key], ref)
+        for key, ref in [("actual_request", request_ref), ("native_admission_contract", admission_ref), ("observation_projection", projection_ref),
+                         ("actual_binary", build["helper_binary"]), ("actual_scope_amendment", scope_ref), ("actual_scope_amendment_execution", scope_execution_ref)]:
+            same(result[key], ref)
+        m.require(result["actual_binary"]["size_bytes"] == maps["derived"]["size_bytes"] and result["native_source_files"] == admission["native_source_files"],
+                  "Actual binary/source-copy identity differs")
+        for key in ["unreached_observations_counted_as_PASS", "full_engine_production_geometry_certified", "RAD02_RAD03_or_production_integration_certified",
+                    "scientific_comparison_performed", "numerical_PASS_claimed", "gates_updated"]: m.require(result[key] is False, "Actual result exceeds selected Source scope")
+        counts, integrity = shape.review(result, request, m.require, m.bind)
+        expected_exit = 2 if integrity else 0
+        m.require(type(result["actual_helper_exit_code"]) is int and result["actual_helper_exit_code"] == native["exit_code"] == expected_exit,
+                  "Actual process/complete-ledger integrity exit differs")
+        actual_files = {path.resolve() for path in result_path.parent.rglob("*") if path.is_file()}
+        declared_files = {result_path}
+        for model in result["model_cases"]:
+            log = model["observations"]["err_stream"]
+            if log is not None:
+                path = m.contained(log["path"])
+                m.require(path.parent == result_path.parent and path.name == model["id"] + ".err", "Actual per-model diagnostic log association escapes output")
+                declared_files.add(path)
+        m.require(actual_files == declared_files, "Actual Native result/diagnostic file inventory differs")
+        complete = True
+    release = complete and not integrity and native["exit_code"] == 0 and native["launch_error"] is None
+    output = m.contained(args.output_dir, existing=False)
+    m.require(output.is_relative_to(m.BASE) and output != m.BASE and not output.exists(), "Fresh contained OriginalDataQA output required")
+    output.mkdir(parents=True, exist_ok=False)
+    sources = [m.archive(m.identity(path), output, index) for index, path in enumerate([Path(__file__), PREP / "shape.py", PREP / "packet_io.py"])]
+    review = {"schema": "rad01-independent-original-data-review.v1", "status": "pass-actual-original-data-and-provenance-before-Rust" if release else
+        "fail-original-process-or-observation-integrity-before-Rust", "started_utc": started, "finished_utc": datetime.now(timezone.utc).isoformat(),
+        "reviewed_results": result_ref, "reviewed_native_execution": refs["native-execution"], "reviewed_request": request_ref,
+        "reviewed_native_admission_contract": admission_ref, "reviewed_projection": projection_ref, "reviewed_contracts": freeze["contracts"],
+        "reviewed_build": refs["build"], "reviewed_build_execution": refs["build-execution"], "reviewed_build_review": refs["build-review"],
+        "reviewed_build_review_execution": refs["build-review-execution"], "actual_packet_freeze": refs["freeze-receipt"],
+        "actual_packet_freeze_execution": refs["freeze-execution"], "actual_native_process_exit_code": native["exit_code"],
+        "actual_native_launch_error": native["launch_error"], "complete_requested_record_ledger_validated": complete,
+        "actual_observation_counts": counts, "actual_method_counts_unknown": not complete, "observation_integrity_failures": integrity,
+        "reviewed_observation_policy": policy, "reviewed_actual_scope_amendment": scope_ref, "reviewed_actual_scope_check_execution": scope_execution_ref,
+        "Rust_baseline_released": release, "requested_counts": request["requested_counts"], "executed_reader_sources": sources,
+        "executed_reader_source_archive": sources[0]["archive"], "native_binary_payloads_rehashed_or_parsed": False,
+        "build_compile_recorder_authored_build_metadata_claimed": False, "scientific_values_recomputed_or_compared": False,
+        "numerical_comparison_count": None, "numerical_mismatch_count": None, "numerical_PASS_claimed": False,
+        "unreached_or_uninvoked_observation_counted_as_PASS": False, "scientific_execution_performed": False,
+        "full_engine_production_geometry_certified": False, "RAD02_RAD03_or_production_integration_certified": False, "gates_updated": False,
+        "authorship_limits": "Raw adapted transport and owner review; Native RAD evaluator/passive source and pure Rust RAD were authored by Base. This is no formula certificate."}
+    m.recheck(); m.emit(output / "review.json", review); m.recheck()
+    print(json.dumps(review, allow_nan=False, indent=2))
+    return 0 if release else 1
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ["approved-source-sha256", "native-execution", "results", "freeze-receipt", "freeze-execution", "build", "build-execution", "build-review", "build-review-execution", "output-dir"]:
+        parser.add_argument("--" + name, required=True)
+    raise SystemExit(run(parser.parse_args()))

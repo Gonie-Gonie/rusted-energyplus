@@ -1,0 +1,5 @@
+Program Version,,
+   ** Warning ** CalcApproximateViewFactors: Zero area for all other zone surfaces.
+   **   ~~~   ** Happens for Surface="surface-9" in Zone=selected-zone
+   ** Warning ** CalcApproximateViewFactors: Zero area for all other zone surfaces.
+   **   ~~~   ** Happens for Surface="surface-2" in Zone=selected-zone

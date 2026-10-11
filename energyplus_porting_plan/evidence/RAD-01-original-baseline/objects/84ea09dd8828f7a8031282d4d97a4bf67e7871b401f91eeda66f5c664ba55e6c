@@ -1,0 +1,61 @@
+{
+  "schema": "rad01-independent-build-PE-review.v1",
+  "status": "pass-exact-retained-PE-runtime-and-actual-build-identity",
+  "observed_utc": "2026-10-11T01:08:09.407570+00:00",
+  "lane": "unit",
+  "target": "rad01_unit_helper",
+  "actual_previous_compile_rows": 717,
+  "actual_current_compile_rows": 720,
+  "actual_protected_ref_count": 48,
+  "build": {
+    "path": ".runtime/porting/RAD-01/native-build-02/native-build.json",
+    "sha256": "3bf6a649c4ee2c67a4d9ae0c6a01c4fef1f987243685fdb205f46289cef62fed",
+    "size_bytes": 3989
+  },
+  "helper_binary": {
+    "path": ".runtime/porting/RAD-01/native-build-02/derivation/derived-helper.exe",
+    "sha256": "42225701397f847133f19bf4ac33d0c1aa46b9ac9ca5a775eefaafb390f909ba",
+    "size_bytes": 150222647
+  },
+  "linked_original": {
+    "path": ".runtime/ep261-gcc13-o0/Products/rad01_unit_helper.exe",
+    "sha256": "bdc4f8dcb73f40ba5f64153d2ba0d191d7df47c12004e0f271031a8c336b7707",
+    "size_bytes": 1299982430
+  },
+  "validated_derivative": {
+    "path": ".runtime/porting/RAD-01/native-build-02/derivation/receipt.json",
+    "sha256": "47a23312c648477aa109cf2d678f2d71f184f77006076922f10b0b359ff77ecf",
+    "size_bytes": 12613
+  },
+  "native_pe_source": {
+    "path": "tools/porting/native_pe.py",
+    "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+    "size_bytes": 20217
+  },
+  "executed_reader": {
+    "path": ".runtime/porting/RAD-01/native-build-review-prep-01/review_build.py",
+    "sha256": "eabb730f94984239a88ece66b7492d5812338b4f258d8dd93cdffad68e1e77f7",
+    "size_bytes": 5493
+  },
+  "maps": {
+    "original": {
+      "path": ".runtime/porting/RAD-01/native-build-review-01/original-pe.json",
+      "sha256": "9355ce690e45daadfedf3e2f255c607486cc86bc6fc279f660649aa14367cf6d",
+      "size_bytes": 16047
+    },
+    "derived": {
+      "path": ".runtime/porting/RAD-01/native-build-review-01/derived-pe.json",
+      "sha256": "8eaa757cdf7d285b0c5dcb0750767e78386f41d67f154483fab3db8e3cb7d277",
+      "size_bytes": 12193
+    },
+    "comparison": {
+      "path": ".runtime/porting/RAD-01/native-build-review-01/comparison-pe.json",
+      "sha256": "393d3041af4e7421fe93058f8b81467d43696eec6d41d46f8c39cc52ce7ba31a",
+      "size_bytes": 4820
+    }
+  },
+  "retained_runtime_exact": true,
+  "engine_invoked": false,
+  "scientific_execution_certified": false,
+  "gates_updated": false
+}

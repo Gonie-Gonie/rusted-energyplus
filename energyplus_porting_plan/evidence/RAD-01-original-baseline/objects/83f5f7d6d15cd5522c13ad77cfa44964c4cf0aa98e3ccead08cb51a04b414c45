@@ -1,0 +1,163 @@
+{
+  "schema": "rad01-independent-original-data-review.v1",
+  "status": "fail-original-process-or-observation-integrity-before-Rust",
+  "started_utc": "2026-10-11T01:08:32.907773+00:00",
+  "finished_utc": "2026-10-11T01:08:33.129681+00:00",
+  "reviewed_results": null,
+  "reviewed_native_execution": {
+    "path": ".runtime/porting/RAD-01/native-unit-command-01/receipt.json",
+    "sha256": "1f0b3558dec9e413b8de42bb143701d04e63fc015bdfc575f5239fd391178db6",
+    "size_bytes": 3184
+  },
+  "reviewed_request": {
+    "path": ".runtime/porting/RAD-01/frozen-packet-02/helper-request.json",
+    "sha256": "a614ee77cd37acb35d8e1f6a44930130eb1214efdd3189da5f05e150235c957c",
+    "size_bytes": 36373
+  },
+  "reviewed_native_admission_contract": {
+    "path": ".runtime/porting/RAD-01/frozen-packet-02/native-admission-contract.json",
+    "sha256": "5e315968bcd4774c952177e97fbe91391c90f413b01e02a9c81f03cabaf6bde4",
+    "size_bytes": 4009
+  },
+  "reviewed_projection": {
+    "path": ".runtime/porting/RAD-01/frozen-packet-02/projection.json",
+    "sha256": "a148b401e2b6af8b1651074aedad0ca98ce15a11af17bcaecdd68396789da361",
+    "size_bytes": 5163
+  },
+  "reviewed_contracts": {
+    "source": {
+      "path": ".runtime/porting/RAD-01/frozen-packet-02/source.json",
+      "sha256": "a24be68e2ed62eb9d9f3f9dfbe282927c669e62ff786f9b1b51ae9ad0e9c27ca",
+      "size_bytes": 12909
+    },
+    "cases": {
+      "path": ".runtime/porting/RAD-01/frozen-packet-02/cases.json",
+      "sha256": "22803157955aa591a8479edb4729faecd3a6a19be88f50e0deade6b2489719f1",
+      "size_bytes": 1297
+    },
+    "tolerances": {
+      "path": ".runtime/porting/RAD-01/frozen-packet-02/tolerances.json",
+      "sha256": "3e477ed896353f1eaaefd8d4cd287bf9b0af11053fe7291386631503c1bd085c",
+      "size_bytes": 1323
+    }
+  },
+  "reviewed_build": {
+    "path": ".runtime/porting/RAD-01/native-build-02/native-build.json",
+    "sha256": "3bf6a649c4ee2c67a4d9ae0c6a01c4fef1f987243685fdb205f46289cef62fed",
+    "size_bytes": 3989
+  },
+  "reviewed_build_execution": {
+    "path": ".runtime/porting/RAD-01/native-build-02/native-compile-command-01/receipt.json",
+    "sha256": "177834df0572f09df0ac23512a8e86d850402497b9e214bfb17b6b961751ce57",
+    "size_bytes": 2951
+  },
+  "reviewed_build_review": {
+    "path": ".runtime/porting/RAD-01/native-build-review-01/review.json",
+    "sha256": "84ea09dd8828f7a8031282d4d97a4bf67e7871b401f91eeda66f5c664ba55e6c",
+    "size_bytes": 2438
+  },
+  "reviewed_build_review_execution": {
+    "path": ".runtime/porting/RAD-01/native-build-review-command-01/receipt.json",
+    "sha256": "071e9e2f361586b96d14161c8f06a234f56b850f7bdf0b899555a02f03bb508a",
+    "size_bytes": 2925
+  },
+  "actual_packet_freeze": {
+    "path": ".runtime/porting/RAD-01/frozen-packet-02/freeze-receipt.json",
+    "sha256": "3fd04656d897306acb216fd2df56e121014c7402d20f50e7b22145c33ff73cd0",
+    "size_bytes": 15336
+  },
+  "actual_packet_freeze_execution": {
+    "path": ".runtime/porting/RAD-01/freeze-command-02/receipt.json",
+    "sha256": "6ee6ba94380decb69ae4a95e7d083c52edb113b601b566d74502de2d78fa5e67",
+    "size_bytes": 3654
+  },
+  "actual_native_process_exit_code": 3221225781,
+  "actual_native_launch_error": null,
+  "complete_requested_record_ledger_validated": false,
+  "actual_observation_counts": null,
+  "actual_method_counts_unknown": true,
+  "observation_integrity_failures": [],
+  "reviewed_observation_policy": {
+    "scope": "direct-declared-geometry-CalcApproximateViewFactors-only",
+    "arithmetic_profiles_by_variable": {
+      "ZoneArea": {
+        "atol": 0.0,
+        "rtol": 0.0,
+        "value_class_exact": true,
+        "signed_zero_exact": true,
+        "shape_exact": true
+      },
+      "F": {
+        "atol": 0.0,
+        "rtol": 0.0,
+        "value_class_exact": true,
+        "signed_zero_exact": true,
+        "shape_exact": true
+      }
+    },
+    "copied_input_bits_and_owner_ids_exact": true,
+    "warning_identity_and_order_exact": true,
+    "required_reached_owner_absence_fails": true,
+    "unreached_owner_counted_as_PASS": false,
+    "row_first_F_destination_source_layout": true,
+    "full_engine_geometry_or_RAD02_RAD03_claimed": false
+  },
+  "reviewed_actual_scope_amendment": {
+    "path": ".runtime/porting/RAD-01/scope-amendment-02/amendment.json",
+    "sha256": "18c8882af64d38926e7ec56e1b2920944c4124a727f85d84db21637dc7551952",
+    "size_bytes": 3690
+  },
+  "reviewed_actual_scope_check_execution": {
+    "path": ".runtime/porting/RAD-01/scope-check-command-02/receipt.json",
+    "sha256": "59d43659d5662573fe99db3e0c8e46cd5a277aad0e40e1fa3b3544034c303b68",
+    "size_bytes": 2874
+  },
+  "Rust_baseline_released": false,
+  "requested_counts": {
+    "model_cases": 21,
+    "CalcApproximateViewFactors": 21
+  },
+  "executed_reader_sources": [
+    {
+      "historical_path": ".runtime/porting/RAD-01/original-data-review-prep-03/review_data.py",
+      "archive": {
+        "path": ".runtime/porting/RAD-01/original-data-review-01/000-review_data.py",
+        "sha256": "503dcfa8f1a176f25bbc2175cf3df7e2ac7b47fa2797adeb55961fa712cbf0ce",
+        "size_bytes": 23767
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/RAD-01/original-data-review-prep-03/shape.py",
+      "archive": {
+        "path": ".runtime/porting/RAD-01/original-data-review-01/001-shape.py",
+        "sha256": "682a2ed4fd087cbbcdff05fef90ea6aa7bec6b618b12d72aca4fa87dc3b1d15d",
+        "size_bytes": 14075
+      }
+    },
+    {
+      "historical_path": ".runtime/porting/RAD-01/original-data-review-prep-03/packet_io.py",
+      "archive": {
+        "path": ".runtime/porting/RAD-01/original-data-review-01/002-packet_io.py",
+        "sha256": "d038fcddb3319eb0494e059ffdd5453355ceff2494872c96c5d60c2492d623c9",
+        "size_bytes": 3893
+      }
+    }
+  ],
+  "executed_reader_source_archive": {
+    "path": ".runtime/porting/RAD-01/original-data-review-01/000-review_data.py",
+    "sha256": "503dcfa8f1a176f25bbc2175cf3df7e2ac7b47fa2797adeb55961fa712cbf0ce",
+    "size_bytes": 23767
+  },
+  "native_binary_payloads_rehashed_or_parsed": false,
+  "build_compile_recorder_authored_build_metadata_claimed": false,
+  "scientific_values_recomputed_or_compared": false,
+  "numerical_comparison_count": null,
+  "numerical_mismatch_count": null,
+  "numerical_PASS_claimed": false,
+  "unreached_or_uninvoked_observation_counted_as_PASS": false,
+  "scientific_execution_performed": false,
+  "full_engine_production_geometry_certified": false,
+  "RAD02_RAD03_or_production_integration_certified": false,
+  "gates_updated": false,
+  "authorship_limits": "Raw adapted transport and owner review; Native RAD evaluator/passive source and pure Rust RAD were authored by Base. This is no formula certificate."
+}

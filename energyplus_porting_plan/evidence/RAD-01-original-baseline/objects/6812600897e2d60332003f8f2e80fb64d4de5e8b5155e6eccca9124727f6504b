@@ -1,0 +1,32 @@
+﻿"""Root's one-off sequential use of accepted PE, Native helper and OriginalDataQA stages."""
+import hashlib,json,os,subprocess,sys
+from pathlib import Path
+ROOT=Path.cwd(); BASE=ROOT/'.runtime/porting/RAD-01'
+os.environ['PATH']=str(ROOT/'.runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin')+os.pathsep+str(ROOT/'.runtime/ep261-gcc13-o0/Products')+os.pathsep+os.environ['PATH']
+def read(p): return json.loads(p.read_bytes())
+def ref(p): return p.relative_to(ROOT).as_posix()+'#'+hashlib.sha256(p.read_bytes()).hexdigest()
+def recorded(name,command,check=True):
+ p=BASE/name
+ result=subprocess.run(['python','-X','utf8','-B','tools/porting/record_command.py','--output-dir',p.relative_to(ROOT).as_posix(),'--',*command])
+ if check: result.check_returncode()
+ return p/'receipt.json'
+assert len(sys.argv)==2
+prep=BASE/'original-data-review-prep-03'; manifest=prep/'manifest.json'
+assert ref(manifest).endswith('#'+sys.argv[1])
+for row in read(manifest)['own_sources']:
+ assert hashlib.sha256((ROOT/row['path']).read_bytes()).hexdigest()==row['sha256']
+build_path=BASE/'native-build-02/native-build.json'; build=read(build_path)
+assert build['status']=='pass-actual-3TU-link-and-preservation'
+pe_execution=BASE/'native-build-review-command-01/receipt.json'
+assert read(pe_execution)['exit_code']==0 and read(pe_execution)['source_bytes_match_before_and_after']
+assert read(BASE/'native-unit-command-01/receipt.json')['exit_code']==0xc0000135
+assert read(BASE/'original-data-review-01/review.json')['Rust_baseline_released'] is False
+freeze_path=BASE/'frozen-packet-02/freeze-receipt.json'; freeze=read(freeze_path)
+helper=ROOT/build['helper_binary']['path']; request=ROOT/freeze['helper_request']['path']; admission=ROOT/freeze['native_admission_contract']['path']; output=BASE/'native-unit-output-02'
+native_execution=recorded('native-unit-command-02',[str(helper),str(ROOT),str(request),str(admission),str(output)],False)
+options={'native-execution':native_execution,'results':output/'rad01-helper-results.json','freeze-receipt':freeze_path,'freeze-execution':BASE/'freeze-command-02/receipt.json','build':build_path,'build-execution':ROOT/build['compile_execution']['path'],'build-review':BASE/'native-build-review-01/review.json','build-review-execution':pe_execution}
+reader=prep/'review_data.py'; command=['python','-X','utf8','-B',reader.relative_to(ROOT).as_posix(),'--approved-source-sha256',hashlib.sha256(reader.read_bytes()).hexdigest()]
+for name,p in options.items(): command+=['--'+name,ref(p) if p.exists() else p.relative_to(ROOT).as_posix()]
+command+=['--output-dir',(BASE/'original-data-review-02').relative_to(ROOT).as_posix()]
+recorded('original-data-review-command-02',command)
+print('Root actual Original stages finished; inspect actual ledger before any Rust science application.',flush=True)

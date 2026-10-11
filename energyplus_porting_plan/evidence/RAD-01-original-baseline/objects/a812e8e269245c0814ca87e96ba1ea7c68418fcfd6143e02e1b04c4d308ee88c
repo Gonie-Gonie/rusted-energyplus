@@ -1,0 +1,52 @@
+{
+  "schema": "rad01-native-runtime-loader-post-execution-identity.v1",
+  "observed_utc": "2026-10-11T01:10:44.077787+00:00",
+  "identity_check_timing": "after actual Native02 and OriginalDataQA02; before Rust application",
+  "executed_Root_launcher": {
+    "path": ".runtime/porting/RAD-01/run-original-stages-02.py",
+    "sha256": "6812600897e2d60332003f8f2e80fb64d4de5e8b5155e6eccca9124727f6504b",
+    "size_bytes": 2827
+  },
+  "PATH_prepend_as_supplied_by_launcher": [
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\reference-tools\\winlibs-gcc13.2.0-ucrt-r3\\mingw64\\bin",
+    "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\ep261-gcc13-o0\\Products"
+  ],
+  "runtime_DLL_files": [
+    {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/libgcc_s_seh-1.dll",
+      "sha256": "403b4169b307d0bfb27a9cbcccbca491efe634eb0462fc1f3fc5ace373bd2827",
+      "size_bytes": 740183
+    },
+    {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/libstdc++-6.dll",
+      "sha256": "748b10c9f25828fbc78e8eaf50355e7f178d0ed0438d2c396565b56c5bd4ac0a",
+      "size_bytes": 2304720
+    },
+    {
+      "path": ".runtime/reference-tools/winlibs-gcc13.2.0-ucrt-r3/mingw64/bin/libwinpthread-1.dll",
+      "sha256": "a086938c9612746fda0ab8640b8d21e8d36bc3e53c1e8e70f9896888b41607dd",
+      "size_bytes": 94355
+    }
+  ],
+  "all_DLL_file_bytes_equal_prior_actual_CTF10_inventory": true,
+  "prior_runtime_environment": {
+    "path": ".runtime/porting/CTF-10/native-launch-inputs-01/environment.json",
+    "sha256": "9b7959358ff704a315fe429d0dc21ee1df548585a8e7cf13f3ad4b3145005de5",
+    "size_bytes": 1307
+  },
+  "actual_loaded_DLL_modules_observed": false,
+  "linked_original_and_derivative_bytes_unchanged_after_Native02": true,
+  "prior_failed_Native_execution": {
+    "path": ".runtime/porting/RAD-01/native-unit-command-01/receipt.json",
+    "sha256": "1f0b3558dec9e413b8de42bb143701d04e63fc015bdfc575f5239fd391178db6",
+    "size_bytes": 3184
+  },
+  "prior_loader_exit_hex": "0xc0000135",
+  "failed_attempt_has_no_results": true,
+  "actual_successful_Native_execution": {
+    "path": ".runtime/porting/RAD-01/native-unit-command-02/receipt.json",
+    "sha256": "6d2762f05363b253ddfadb199f1a4a612d8f15c742c1a701fe139e1fc14787dd",
+    "size_bytes": 3173
+  },
+  "scientific_policy_or_input_changed": false
+}

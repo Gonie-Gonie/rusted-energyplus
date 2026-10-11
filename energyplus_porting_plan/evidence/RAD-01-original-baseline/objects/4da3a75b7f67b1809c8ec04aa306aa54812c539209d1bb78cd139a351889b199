@@ -1,0 +1,72 @@
+"""Author a minimal existing-reader adaptation and metadata; do not run it."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path.cwd().resolve()
+OUT = ROOT / '.runtime/porting/RAD-01/native-build-review-prep-01'
+ORIGIN = ROOT / '.runtime/porting/CTF-10/native-build-review-prep-01/review_build.py'
+
+
+def ref(path):
+    path = path if isinstance(path, Path) else ROOT / path
+    raw = path.read_bytes()
+    return {'path': path.relative_to(ROOT).as_posix(), 'sha256': hashlib.sha256(raw).hexdigest(),
+            'size_bytes': len(raw), 'line_count': len(raw.splitlines())}
+
+
+def change(text, old, new):
+    assert text.count(old) == 1, old
+    return text.replace(old, new)
+
+
+before = OUT / 'before'
+before.mkdir(exist_ok=False)
+(before / ORIGIN.name).write_bytes(ORIGIN.read_bytes())
+text = ORIGIN.read_text(encoding='utf-8')
+text = change(text, 'Independent actual CTF10 build/PE inspection', 'Independent actual RAD01 build/PE inspection')
+text = change(text, "parser.add_argument('--lane', choices=('unit', 'production'), required=True)\n", '')
+text = change(text, "prefix = 'ctf10' if args.lane == 'unit' else 'ctf10-production'", "prefix = 'rad01'")
+text = change(text, "target = 'ctf10_' + args.lane + '_helper'", "target = 'rad01_unit_helper'")
+text = change(text, 'pass-actual-4TU-link-and-preservation', 'pass-actual-3TU-link-and-preservation')
+lines = text.splitlines(True)
+text = ''.join(line for line in lines if not line.startswith('RETENTION_INTENT = ') and
+               line != "assert build['linked_original_retention_intent'] == RETENTION_INTENT\n" and
+               "'linked_original_retention_intent': RETENTION_INTENT," not in line)
+text = change(text, '# Two new targets with four genuine source objects each; actual before inventory is Root-owned.',
+              '# One new target with three genuine source objects; actual before inventory is Root-owned.')
+text = change(text, "build['previous_compile_rows'] + 8", "build['previous_compile_rows'] + 3")
+text = change(text, "len(build['native_source_files']) == 9", "len(build['native_source_files']) == 6")
+text = change(text, "selected_core_Construction_object_hits", "selected_core_HeatBalanceIntRadExchange_object_hits")
+text = change(text, "assert preservation['selected_core_HeatBalanceManager_object_hits'] == 0\n", '')
+text = change(text, 'Construction.ctf10.cc.obj', 'HeatBalanceIntRadExchange.rad01.cc.obj')
+text = change(text, "assert 'HeatBalanceManager.ctf10.cc.obj' in preservation['derived_HeatBalanceManager_provider']['section_provider']['text']\n", '')
+text = change(text, "'actual_ctf_pe'", "'actual_rad_pe'")
+text = change(text, "'lane': args.lane, 'target': target,", "'lane': 'unit', 'target': target,")
+source = OUT / 'review_build.py'
+source.write_bytes(text.encode('utf-8'))
+ast.parse(text)
+patch = ''.join(difflib.unified_diff(ORIGIN.read_text(encoding='utf-8').splitlines(True), text.splitlines(True),
+            fromfile=ref(before / ORIGIN.name)['path'], tofile=ref(source)['path']))
+(OUT / 'review_build.py.diff').write_bytes(patch.encode('utf-8'))
+native_path = ROOT / '.runtime/porting/RAD-01/native-helper-prep-01/manifest.json'
+native = json.loads(native_path.read_text(encoding='utf-8'))
+manifest = {'schema': 'rad01-native-build-review-source-preparation.v1', 'card': 'RAD-01',
+    'status': 'SOURCE-ONLY-held-unexecuted-awaiting-Root-and-other-author-FULL-review',
+    'own_sources': [ref(source)], 'authoring_source': ref(Path(__file__).resolve()), 'readme': ref(OUT / 'README.md'),
+    'before_sources': [ref(before / ORIGIN.name)], 'predecessor_sources': [ref(ORIGIN)],
+    'exact_diffs': [ref(OUT / 'review_build.py.diff')],
+    'source_dependencies': [ref(native_path), *native['own_sources'], ref(ROOT / 'tools/porting/native_pe.py'),
+        ref(ROOT / 'tools/porting/record_command.py')],
+    'runtime_protocol': {'build_schema': 'rad01-native-build.v1', 'target': 'rad01_unit_helper',
+        'build_status': 'pass-actual-3TU-link-and-preservation', 'new_compile_rows': 3, 'native_source_files': 6,
+        'core_counts': [643, 631, 12], 'protected_count': 'actual-before-inventory-only',
+        'review_schema': 'rad01-independent-build-PE-review.v1',
+        'review_status': 'pass-exact-retained-PE-runtime-and-actual-build-identity',
+        'stdout_keys': ['review', 'status'], 'actual_future_refs': None},
+    'proof_boundary': {'target_import_build_or_execution_performed': False, 'binary_payload_read': False,
+        'canonical_files_modified': False, 'retirement_or_deletion_performed': False, 'gates_updated': False}}
+(OUT / 'manifest.json').write_bytes((json.dumps(manifest, indent=2) + '\n').encode('utf-8'))
+print(json.dumps({'manifest': ref(OUT / 'manifest.json'), 'own_sources': manifest['own_sources'], 'diffs': manifest['exact_diffs']}))

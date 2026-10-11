@@ -1,0 +1,750 @@
+{
+  "schema": "rad01-original-data-review-source-preparation.v1",
+  "card": "RAD-01",
+  "status": "SOURCE-ONLY-held-unexecuted-awaiting-Root-and-other-author-FULL-review",
+  "own_sources": [
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-03/review_data.py",
+      "sha256": "503dcfa8f1a176f25bbc2175cf3df7e2ac7b47fa2797adeb55961fa712cbf0ce",
+      "size_bytes": 23767,
+      "line_count": 263
+    },
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-03/shape.py",
+      "sha256": "682a2ed4fd087cbbcdff05fef90ea6aa7bec6b618b12d72aca4fa87dc3b1d15d",
+      "size_bytes": 14075,
+      "line_count": 179
+    },
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-03/packet_io.py",
+      "sha256": "d038fcddb3319eb0494e059ffdd5453355ceff2494872c96c5d60c2492d623c9",
+      "size_bytes": 3893,
+      "line_count": 105
+    }
+  ],
+  "authoring_source": {
+    "path": ".runtime/porting/RAD-01/input-writer-prep-03/prepare_successors.py",
+    "sha256": "20a5e2b9ea2172cda1c4f1521e1fd286db840353397ebe09c5d76c3a93d9d153",
+    "size_bytes": 7926,
+    "line_count": 129
+  },
+  "readme": {
+    "path": ".runtime/porting/RAD-01/original-data-review-prep-03/README.md",
+    "sha256": "725cc2af7f20505b0f3708b500dc0db4e528230c6fe2f884941afd3d8b51c761",
+    "size_bytes": 5562,
+    "line_count": 23
+  },
+  "before_sources": [
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-03/before/review_data.py",
+      "sha256": "4bd6a0b318ceab52bcb83e4fa9605c0d5191daf3883c505c4e14266385b18832",
+      "size_bytes": 15496,
+      "line_count": 184
+    },
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-03/before/shape.py",
+      "sha256": "630dbe680630ea5e5245d8ad3caee6cba62ebc90383229bc736551bbdc405b22",
+      "size_bytes": 18201,
+      "line_count": 220
+    },
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-03/before/packet_io.py",
+      "sha256": "023296e2524afe4a3df24bba1bfe379dfa9197b2f2681ef833350769a3aff16d",
+      "size_bytes": 3892,
+      "line_count": 105
+    }
+  ],
+  "predecessor_sources": [
+    {
+      "path": ".runtime/porting/CTF-01/original-data-review-prep-02/review_data.py",
+      "sha256": "4bd6a0b318ceab52bcb83e4fa9605c0d5191daf3883c505c4e14266385b18832",
+      "size_bytes": 15496,
+      "line_count": 184
+    },
+    {
+      "path": ".runtime/porting/CTF-01/original-data-review-prep-02/shape.py",
+      "sha256": "630dbe680630ea5e5245d8ad3caee6cba62ebc90383229bc736551bbdc405b22",
+      "size_bytes": 18201,
+      "line_count": 220
+    },
+    {
+      "path": ".runtime/porting/CTF-01/unit-comparer-prep-02/packet_io.py",
+      "sha256": "023296e2524afe4a3df24bba1bfe379dfa9197b2f2681ef833350769a3aff16d",
+      "size_bytes": 3892,
+      "line_count": 105
+    }
+  ],
+  "exact_diffs": [
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-03/review_data.py.diff",
+      "sha256": "f073bb482c4e7fa9a0c9c4fa9d2cfddb635c9f450f1add7225248ed16a03d18b",
+      "size_bytes": 30712,
+      "line_count": 321
+    },
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-03/shape.py.diff",
+      "sha256": "ed0e1fdd360d6e4c9b43a3b98db8442d4e6a376ce46fc818e5a553b5f5744f28",
+      "size_bytes": 31769,
+      "line_count": 372
+    },
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-03/packet_io.py.diff",
+      "sha256": "6dad292475d9a27290f20e6836f2d00867bb07bf7564f4f50760ff76de9cda6b",
+      "size_bytes": 334,
+      "line_count": 11
+    }
+  ],
+  "source_dependencies": [
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-02/manifest.json",
+      "sha256": "b4e10bd483af44f6f5d0b6f5fa13051d106d6d672d1ec0af1b79bbf5d5986b89",
+      "size_bytes": 24281,
+      "line_count": 604
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-02/rad01_helper.cpp",
+      "sha256": "ac4d14e13856db555f8888951972cd51ecac1a7e54dd32a53079a0f60146412c",
+      "size_bytes": 12022,
+      "line_count": 153
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_metadata.hh",
+      "sha256": "00894557c7d1a186f4220c93f03cb54b1f16ddfb29c3cf55a7eceb1403aa2ac1",
+      "size_bytes": 7420,
+      "line_count": 147
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_admission.hh",
+      "sha256": "9b2c28fc02ff5eba7c8b1fd0bfe5cb23552def15c5ee8d9ba4745bc81f744600",
+      "size_bytes": 9313,
+      "line_count": 115
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_observer.hh",
+      "sha256": "362166c03ca9596ffaa97942d258c3d50f1b5fd0b0edcc26ae1d6203600a7dac",
+      "size_bytes": 2142,
+      "line_count": 49
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_observer.cc",
+      "sha256": "f92a72e0f417ffff9ff9bf0178347919de95dbe20d13e74d87e0db334067981a",
+      "size_bytes": 4899,
+      "line_count": 89
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/HeatBalanceIntRadExchange.rad01.cc",
+      "sha256": "e3ef247c59f1fbac29e1d619e3d2d6b9826aa5ff52947e77e21c51efefb16551",
+      "size_bytes": 120257,
+      "line_count": 2124
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-02/rad01_reference.cmake",
+      "sha256": "68d30d74659ce001939e0bb9be4befbfca551e3e005545209bd0215379bab40e",
+      "size_bytes": 2006,
+      "line_count": 30
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.cc",
+      "sha256": "36e3f002a5298dc4d52b9eb4697a4b07f9d9dc7c25e2434a059dcbd06eeeb3b3",
+      "size_bytes": 120027,
+      "line_count": 2118
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.hh",
+      "sha256": "ef4fd977481582cc4ada7b140b97782af7a7945010bf3e36b440e7a6b0c3e3e5",
+      "size_bytes": 11786,
+      "line_count": 208
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+      "sha256": "87bd8b6fac7001e26ffc08f5e3457a3f644098793a2734524c56de946c761ff2",
+      "size_bytes": 81995,
+      "line_count": 1813
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.hh",
+      "sha256": "e7a3a24bdc834e39564962e6af38cc631b13552109c128bb6da11da9f942a07f",
+      "size_bytes": 33012,
+      "line_count": 717
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.cc",
+      "sha256": "6416c03de88a2b913d33393e82141b4183b9e446cd93fb7e5c7c9fde22d15f9f",
+      "size_bytes": 60978,
+      "line_count": 1104
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+      "sha256": "7eea2e660914574ce9b5b633ac2099d49b09255d6c215b84e47edccbbb5cffae",
+      "size_bytes": 113537,
+      "line_count": 1850
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "sha256": "d1112ad66d13c1c34d224c7cfa776113979b2bceafc1bf17c76e654b9fdab5fa",
+      "size_bytes": 133816,
+      "line_count": 2059
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataErrorTracking.hh",
+      "sha256": "966cc13df0bd9ff48d9995a390bce9005e141f45e534438591ff96f6614b7f58",
+      "size_bytes": 18669,
+      "line_count": 251
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+      "sha256": "2a8e72eb70d669df625fb7933037e6f129986217129f6ef1dc8ef1014f225c25",
+      "size_bytes": 13547,
+      "line_count": 198
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EPVector.hh",
+      "sha256": "155ac5aaf6bd6138ad1a397edf68e2c660a6595d94f291bcf671ebc040c335e2",
+      "size_bytes": 11096,
+      "line_count": 357
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh",
+      "sha256": "9605dc5fea21ba3923897ce8a3684b96209bb6c48666b43bccf990754dac9c68",
+      "size_bytes": 32371,
+      "line_count": 842
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "sha256": "9228be3483674ab79ea9faafffb20f5d26eecbd857d32a0c3e3d95e8247233a5",
+      "size_bytes": 22000,
+      "line_count": 1060
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_metadata.hh",
+      "sha256": "6332546299553c1c8f4d0de36676067decf6921c7e3e27ebc7bd2d6ca6f0dee9",
+      "size_bytes": 7434,
+      "line_count": 147
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_helper.cpp",
+      "sha256": "3235fbdd246544bc3f01e6588efb1d58a32d769abf35f12bfc9f56b2479a905f",
+      "size_bytes": 15543,
+      "line_count": 214
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-helper-prep-01/ctf10_reference.cmake",
+      "sha256": "51eaa70ce28d4c91fb63ad42b72d3ad20c86ce440de3d25bb4986f079ac03f9f",
+      "size_bytes": 2366,
+      "line_count": 38
+    },
+    {
+      "path": ".runtime/porting/RAD-01/source-prep-03/manifest.json",
+      "sha256": "7eccdc42462b91539e963715eed808f02ed4d37d14d479dacdaeb4004a9dd3c1",
+      "size_bytes": 16463,
+      "line_count": 418
+    },
+    {
+      "path": ".runtime/porting/RAD-01/source-prep-02/new/radiation.rs",
+      "sha256": "39868c0acaf663b36df4f11067d2ee645ffad1139d2e458c233581c9ea500184",
+      "size_bytes": 27191,
+      "line_count": 697
+    },
+    {
+      "path": ".runtime/porting/RAD-01/source-prep-02/new/radiation_approximate_view_factor_tests.rs",
+      "sha256": "878b7d67710cee3b79cae8b7c342fca98db8d56b3212cd22b8f0c09a31ab81fc",
+      "size_bytes": 6999,
+      "line_count": 157
+    },
+    {
+      "path": ".runtime/porting/RAD-01/source-prep-02/before/RAD-01.md",
+      "sha256": "6a0be76be4299e401380db885b65d12b37c3079e9a25a6489f5b7055e9902d37",
+      "size_bytes": 2636,
+      "line_count": 70
+    },
+    {
+      "path": ".runtime/porting/RAD-01/source-prep-02/before/CON-01.md",
+      "sha256": "ee5472f255d63e2049da8abaf42780a96a3facc94c4e565b7982a06ad11dd656",
+      "size_bytes": 6265,
+      "line_count": 114
+    },
+    {
+      "path": ".runtime/porting/RAD-01/source-prep-02/before/scope.json",
+      "sha256": "b88a28d207400744a108a2aae704f8067fd6b6fd30a5812df53cd8094e94a879",
+      "size_bytes": 15325,
+      "line_count": 418
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/input-fixture-proposal.json",
+      "sha256": "5bf064f4f61f7e271f6f5a1306855c3e986d942cf859faf152ab5e6d5e4146f7",
+      "size_bytes": 38084,
+      "line_count": 1511
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/observation-policy-proposal.json",
+      "sha256": "7dfb0ccc1b50f34c8a7e30a0e34369e022faa79c507f41c60b47d2b5bad4d5a4",
+      "size_bytes": 710,
+      "line_count": 25
+    },
+    {
+      "path": ".runtime/porting/RAD-01/input-writer-prep-03/manifest.json",
+      "sha256": "c3f140b8b4384e61a1fc5ba5e198b4f1facc39082f1521b68c895ea53974aace",
+      "size_bytes": 23365,
+      "line_count": 585
+    },
+    {
+      "path": ".runtime/porting/RAD-01/input-writer-prep-03/freeze_packet.py",
+      "sha256": "f8861c866f55650aec715c0181e2c5ba5c75a18c1e3082baa4cf0ad676e396f2",
+      "size_bytes": 13413,
+      "line_count": 162
+    },
+    {
+      "path": ".runtime/porting/RAD-01/input-writer-prep-03/packet_io.py",
+      "sha256": "d038fcddb3319eb0494e059ffdd5453355ceff2494872c96c5d60c2492d623c9",
+      "size_bytes": 3893,
+      "line_count": 105
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-build-review-prep-01/manifest.json",
+      "sha256": "4832eec3a059787de1c1d17a86d343e9ccbd0007d69a5d1d94f34082da0a8c18",
+      "size_bytes": 4744,
+      "line_count": 138
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-build-review-prep-01/review_build.py",
+      "sha256": "eabb730f94984239a88ece66b7492d5812338b4f258d8dd93cdffad68e1e77f7",
+      "size_bytes": 5493,
+      "line_count": 105
+    },
+    {
+      "path": "tools/porting/native_pe.py",
+      "sha256": "afef047aec5a0bb5be90b6da155688b9bbaa672dd4dd90615569396d306cba56",
+      "size_bytes": 20217,
+      "line_count": 346
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "sha256": "8468072e78d90a17051c9eac4766bbcbe2e079c399981b9e00d23ff500ec7d3c",
+      "size_bytes": 8125,
+      "line_count": 194
+    },
+    {
+      "path": "tools/porting/check_plan.py",
+      "sha256": "ec1df8718fd23cc135e97e28220e2377dcf48fe960c611dbc25976039629208d",
+      "size_bytes": 23809,
+      "line_count": 456
+    }
+  ],
+  "read_source_ranges": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.cc",
+      "start_line": 1406,
+      "end_line": 1519,
+      "sha256": "a1a29a01e53f10bc25fdfa3c2e3fefdd5007fd1c8c962f826a88771ccfb6e51b",
+      "size_bytes": 6927,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "whole original selected function; three passive sites/lifetime"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/HeatBalanceIntRadExchange.hh",
+      "start_line": 109,
+      "end_line": 116,
+      "sha256": "8aaf46c8e20a39ecd7c2a9f8585f6d6265129eef08d9c82cadbef43d5d678b62",
+      "size_bytes": 733,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "public function signature"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+      "start_line": 870,
+      "end_line": 890,
+      "sha256": "7f91a800f0b638518c3e002c9878e0574a18232d6aabfff4188ad41d860f8283",
+      "size_bytes": 806,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "actual Continue diagnostic output/callback"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+      "start_line": 980,
+      "end_line": 1017,
+      "sha256": "05071f9a5c0f1edd57f6ad88075aaf0b512e83d3e5c554d0c76b9f89ec00a209",
+      "size_bytes": 1469,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "actual Warning counter/output/callback"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/UtilityRoutines.cc",
+      "start_line": 1381,
+      "end_line": 1424,
+      "sha256": "4be297eae667ec8a88545bb4cde3d397e56000c21a20a654f14acf69bb15f717",
+      "size_bytes": 1690,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "real err_stream output and actual header flag"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/Data/EnergyPlusData.cc",
+      "start_line": 54,
+      "end_line": 309,
+      "sha256": "4a51e03a0fc6644d1662f6102b6b8a2e369271519ceba9edd5607ba3bf12917d",
+      "size_bytes": 18320,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "whole real EnergyPlusData constructor/default destructor"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+      "start_line": 149,
+      "end_line": 168,
+      "sha256": "90f9ed24225a7249642e49df06f1a90dd6d0e8ceaac225c25df18fb3f4a384a1",
+      "size_bytes": 638,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "actual Native class enum, Ceiling absent"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+      "start_line": 687,
+      "end_line": 749,
+      "sha256": "5f59d4bc66f541b8d3ea9660dab182ea0b1fecf63c1fcc1ea7afc45512d77bf2",
+      "size_bytes": 4175,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "actual Surface fields copied/seeded"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+      "start_line": 756,
+      "end_line": 766,
+      "sha256": "032bef9f99fbbf852db7e18da7b794ae982349612234220b3d73fd902d08294f",
+      "size_bytes": 1098,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "actual Surface Zone association"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataSurfaces.hh",
+      "start_line": 1811,
+      "end_line": 1820,
+      "sha256": "848eb3ebdfc22915349bb66b7aa1744a564bfa9a608c480f6b06058b3bf562c2",
+      "size_bytes": 461,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "actual Surface EPVector owner"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "start_line": 434,
+      "end_line": 449,
+      "sha256": "9a5d7e244cc961051688b971cf3f847745d1666d4e445e9675e5da2fc9d26284",
+      "size_bytes": 1288,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "actual Zone Name base owner"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataHeatBalance.hh",
+      "start_line": 1998,
+      "end_line": 2009,
+      "sha256": "b1dbba5b687915d75f4303606e4cf5d7f45f6ea9aaa2f4dfac38a29a1594bf5d",
+      "size_bytes": 674,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "actual Zone EPVector owner"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataErrorTracking.hh",
+      "start_line": 205,
+      "end_line": 247,
+      "sha256": "1140485faf19991f6d39d5cf425d82a257fb9b02d5fb65f5f2ca846ee86cf4e9",
+      "size_bytes": 1877,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "actual MatchCounts ctor/default warning counters"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/DataGlobals.hh",
+      "start_line": 168,
+      "end_line": 174,
+      "sha256": "b621b7db41124f696a6b5a05406a94285cb2a76a8e9485f6c0c18504c01e145f",
+      "size_bytes": 384,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "actual diagnostic callback owner signature"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/EPVector.hh",
+      "start_line": 56,
+      "end_line": 150,
+      "sha256": "0d5db6b43bef4d5ebd44fdc43669ef1491eb2e2c13e4122401f19e99a386e531",
+      "size_bytes": 2226,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "actual EPVector one-based access/allocation/size contract"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/IOFiles.hh",
+      "start_line": 656,
+      "end_line": 675,
+      "sha256": "ca8f2411007cb8241b77750b6ad0d9bd13487c9f1fde72c79724e0cf7c99be67",
+      "size_bytes": 596,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "actual err_stream owner"
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/ObjexxFCL/src/ObjexxFCL/Array2.hh",
+      "start_line": 604,
+      "end_line": 627,
+      "sha256": "e2066f9de8074f111d83e0e524b6368ba5c0ffa8f94131d04c2195b90f47747d",
+      "size_bytes": 448,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "actual row-first Array2 offset"
+    },
+    {
+      "path": ".runtime/porting/CTF-01/native-helper-prep-01/ctf01_reference_metadata.hh",
+      "start_line": 1,
+      "end_line": 147,
+      "sha256": "6332546299553c1c8f4d0de36676067decf6921c7e3e27ebc7bd2d6ca6f0dee9",
+      "size_bytes": 7434,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "accepted metadata/binary64 authentication mechanism"
+    },
+    {
+      "path": ".runtime/porting/CTF-10/native-helper-prep-01/ctf10_reference.cmake",
+      "start_line": 1,
+      "end_line": 38,
+      "sha256": "51eaa70ce28d4c91fb63ad42b72d3ad20c86ce440de3d25bb4986f079ac03f9f",
+      "size_bytes": 2366,
+      "hash_kind": "exact_line_range_including_original_line_endings",
+      "label": "accepted existing four-TU target recipe unchanged inclusion"
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-02/rad01_helper.cpp",
+      "start_line": 16,
+      "end_line": 121,
+      "sha256": "2d6121d677cfc581f64459db025660e9a976a87afd65c031affcf846fafb596b",
+      "size_bytes": 8349,
+      "purpose": "actual outcome/input/scalar/partial callback/diagnostic serialization"
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-02/rad01_helper.cpp",
+      "start_line": 124,
+      "end_line": 153,
+      "sha256": "ad1ee7c2166a7f1d5a73d985f50120fb69ff9ce1673cc10c84cdc29a19791d72",
+      "size_bytes": 3142,
+      "purpose": "actual argc5/source guard/complete ledger/exit0or2"
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "start_line": 67,
+      "end_line": 93,
+      "sha256": "4162202eb2ef72cb1ce524faa37bfdc67aa92bb6cdfe06e7b27793c5df341751",
+      "size_bytes": 1146,
+      "purpose": "actual SourceSnapshot and archive guard semantics"
+    },
+    {
+      "path": "tools/porting/record_command.py",
+      "start_line": 137,
+      "end_line": 184,
+      "sha256": "9ef0e22bcf35a8039fd941cfef9589e4646f24f8311148586534a334a7e67a2e",
+      "size_bytes": 2781,
+      "purpose": "actual subprocess recorder/source guard/launcher/streams"
+    }
+  ],
+  "runtime_protocol": {
+    "report_schema": "rad01-independent-original-data-review.v1",
+    "success_status": "pass-actual-original-data-and-provenance-before-Rust",
+    "failure_status": "fail-original-process-or-observation-integrity-before-Rust",
+    "executed_reader_source_archives": 3,
+    "model_cases": 21,
+    "native_source_files": 6,
+    "native_argc": 5,
+    "PE_reader_command_argc": 9,
+    "metadata_file_bound_bytes": 16000000,
+    "identity_file_bound_bytes": 64000000,
+    "scope_schema": "rad01-source-scope-amendment.v1",
+    "scope_inventory_key": "rad_policy_source_inventory",
+    "scope_check_role": "real-RAD-01-check-only",
+    "actual_future_refs": null,
+    "scope_successful_build_or_engine_flag": "actual_RAD01_successful_build_or_engine_execution_performed",
+    "failed_build_attempt_is_historical_context_not_scientific_execution": true
+  },
+  "proof_boundary": {
+    "target_import_build_or_execution_performed": false,
+    "actual_results_or_binary_payloads_read": false,
+    "physics_or_warning_predicates_evaluated": false,
+    "canonical_files_modified": false,
+    "production_geometry_certified": false,
+    "numerical_PASS_claimed": false,
+    "gates_updated": false
+  },
+  "predecessor_01": {
+    "path": ".runtime/porting/RAD-01/original-data-review-prep-01/manifest.json",
+    "sha256": "aae58944f7e109a0e652a53f335c79332577b99432c406e93e686f55c6fea0d4",
+    "size_bytes": 22076,
+    "line_count": 563
+  },
+  "before_01": [
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-02/before-01/manifest.json",
+      "sha256": "aae58944f7e109a0e652a53f335c79332577b99432c406e93e686f55c6fea0d4",
+      "size_bytes": 22076,
+      "line_count": 563
+    },
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-02/before-01/packet_io.py",
+      "sha256": "d038fcddb3319eb0494e059ffdd5453355ceff2494872c96c5d60c2492d623c9",
+      "size_bytes": 3893,
+      "line_count": 105
+    },
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-02/before-01/README.md",
+      "sha256": "7d608aa7753411bf7561ebc9f2eba86d5a9481822c89d448ac84ce3acb55ab71",
+      "size_bytes": 4399,
+      "line_count": 19
+    },
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-02/before-01/review_data.py",
+      "sha256": "83e98e2ca022356623a5564a4bb0d3694a4d0d2d1a358c5e6fa66c9e6edc3d24",
+      "size_bytes": 23528,
+      "line_count": 260
+    },
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-02/before-01/shape.py",
+      "sha256": "682a2ed4fd087cbbcdff05fef90ea6aa7bec6b618b12d72aca4fa87dc3b1d15d",
+      "size_bytes": 14075,
+      "line_count": 179
+    }
+  ],
+  "from_01_diffs": [
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-02/review_data.py.from-01.diff",
+      "sha256": "5999427df6f1302e4ea8cd327fe3152c9eb0aa98a35be853adc59ab5b10e76a6",
+      "size_bytes": 1032,
+      "line_count": 14
+    },
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-02/shape.py.from-01.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-02/packet_io.py.from-01.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-02/README.md.from-01.diff",
+      "sha256": "6d9f3c4c4af4111f22204670255d4f90150f567c467b908e2d899c0dd9565b40",
+      "size_bytes": 1691,
+      "line_count": 8
+    }
+  ],
+  "successor_change": "Fresh03 only rebinds reviewed Native02 and freezer03 and requires the same truthful prospective `actual_RAD01_successful_build_or_engine_execution_performed:false` scope key. Genuine failed build and restore attempts stay historical Root documentary context; no Native scientific outcome is inferred. Shape and IO are byte-identical02. All recorder, int0 predecessor, native OS-launch unknown, source/archive, 21-input, warning, partial-owner, PE binary-size/provider, ordering, integrity and release criteria are unchanged. Helper range metadata follows its reviewed13-line reflow; old ranges remain historical. Held01/02 and every actual failed receipt remain preserved. This preparation invokes no proposed stage.",
+  "historical_dependencies_superseded_by_03": [
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/manifest.json",
+      "sha256": "489a7caa4086722bb5057cfc8489803b21ce7723f881ffcbe54252d604e86618",
+      "size_bytes": 21959,
+      "line_count": 545
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_helper.cpp",
+      "sha256": "1f16572cbd9da579a6f8e4c79cec64a687e7cecd70d823f1a16a1973cfdfad86",
+      "size_bytes": 11938,
+      "line_count": 140
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_reference.cmake",
+      "sha256": "91bdacdbd4b3a3198356564c91d04096501c8fe6c4a83a118448d4b74b96e1d0",
+      "size_bytes": 1845,
+      "line_count": 29
+    },
+    {
+      "path": ".runtime/porting/RAD-01/input-writer-prep-02/manifest.json",
+      "sha256": "fac0f91eebebab8edd5a9feb58bd30ca9281932c04fef291274524eba9b6810c",
+      "size_bytes": 20173,
+      "line_count": 517
+    },
+    {
+      "path": ".runtime/porting/RAD-01/input-writer-prep-02/freeze_packet.py",
+      "sha256": "f4727575c348bd4a5eb5128b67eafc5b823fb56ee0726ab0e826641bee0c04f2",
+      "size_bytes": 13402,
+      "line_count": 162
+    },
+    {
+      "path": ".runtime/porting/RAD-01/input-writer-prep-02/packet_io.py",
+      "sha256": "d038fcddb3319eb0494e059ffdd5453355ceff2494872c96c5d60c2492d623c9",
+      "size_bytes": 3893,
+      "line_count": 105
+    }
+  ],
+  "historical_helper_ranges_before_03": [
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_helper.cpp",
+      "start_line": 16,
+      "end_line": 108,
+      "sha256": "bd33f18fdd6411cc831599f2c98a8a6efa15da81315f6065492da2e2f130c1d6",
+      "size_bytes": 8265,
+      "purpose": "actual outcome/input/scalar/partial callback/diagnostic serialization"
+    },
+    {
+      "path": ".runtime/porting/RAD-01/native-helper-prep-01/rad01_helper.cpp",
+      "start_line": 111,
+      "end_line": 140,
+      "sha256": "ad1ee7c2166a7f1d5a73d985f50120fb69ff9ce1673cc10c84cdc29a19791d72",
+      "size_bytes": 3142,
+      "purpose": "actual argc5/source guard/complete ledger/exit0or2"
+    }
+  ],
+  "predecessor_02": {
+    "path": ".runtime/porting/RAD-01/original-data-review-prep-02/manifest.json",
+    "sha256": "661b38f57a7af736515d93b7e3debb780f69ec529e4e290b10c7269dda679fdd",
+    "size_bytes": 24651,
+    "line_count": 628
+  },
+  "before_02": [
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-03/before-02/review_data.py",
+      "sha256": "6c0a1980136944907122aaeefe3261a3c8e766427f9dc253124815d2b1790dcc",
+      "size_bytes": 23756,
+      "line_count": 263
+    },
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-03/before-02/shape.py",
+      "sha256": "682a2ed4fd087cbbcdff05fef90ea6aa7bec6b618b12d72aca4fa87dc3b1d15d",
+      "size_bytes": 14075,
+      "line_count": 179
+    },
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-03/before-02/packet_io.py",
+      "sha256": "d038fcddb3319eb0494e059ffdd5453355ceff2494872c96c5d60c2492d623c9",
+      "size_bytes": 3893,
+      "line_count": 105
+    },
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-03/before-02/manifest.json",
+      "sha256": "661b38f57a7af736515d93b7e3debb780f69ec529e4e290b10c7269dda679fdd",
+      "size_bytes": 24651,
+      "line_count": 628
+    },
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-03/before-02/README.md",
+      "sha256": "1e179a3c288f37a98a9855f8e9cfb078462753dfb14c3012bb4b3ec5235a0d91",
+      "size_bytes": 4844,
+      "line_count": 21
+    }
+  ],
+  "from_02_diffs": [
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-03/review_data.py.from-02.diff",
+      "sha256": "224316102a916dc7ec0bf0f9652765a20c56006ea2e5b321013b03482989f43b",
+      "size_bytes": 2291,
+      "line_count": 26
+    },
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-03/shape.py.from-02.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-03/packet_io.py.from-02.diff",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "line_count": 0
+    },
+    {
+      "path": ".runtime/porting/RAD-01/original-data-review-prep-03/README.md.from-02.diff",
+      "sha256": "64812fcdc1b1674fcd348d4ee9cdce7c7eee000f27f48264be17ef5fee59f109",
+      "size_bytes": 1678,
+      "line_count": 8
+    }
+  ]
+}

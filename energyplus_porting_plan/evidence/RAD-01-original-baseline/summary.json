@@ -1,0 +1,89 @@
+{
+  "schema": "rad01-actual-Original-baseline-summary.v1",
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/RAD-01-original-baseline/manifest.json",
+    "sha256": "578df93879dc8418c739287ae487706c7c6efdda1e8a9475bb3c1502652dcc83",
+    "size_bytes": 59960
+  },
+  "OriginalDataQA": {
+    "path": ".runtime/porting/RAD-01/original-data-review-02/review.json",
+    "sha256": "77e4b9421e662bf403d1584bf7af4c0be59600a26839e183455ab5e9174af319",
+    "size_bytes": 7604
+  },
+  "OriginalDataQA_execution": {
+    "path": ".runtime/porting/RAD-01/original-data-review-command-02/receipt.json",
+    "sha256": "4c54e61292168985ce53a765a44e8acb8f3d3fd1c1e76db737276688c09f4c02",
+    "size_bytes": 4162
+  },
+  "actual_observation_counts": {
+    "scalar_DTO_visits": 815,
+    "actual_input_snapshots": 21,
+    "actual_zone_area_callback_count": 21,
+    "actual_matrix_callback_count": 21,
+    "actual_warning_callback_count": 11,
+    "actual_diagnostic_callback_count": 22,
+    "omitted_warning_records": 0,
+    "omitted_diagnostic_records": 0,
+    "model_cases": 21,
+    "actual_source_invocations": 21,
+    "returned_ZoneArea_owners": 21,
+    "returned_F_owners": 21,
+    "retained_warning_records": 11,
+    "retained_diagnostic_records": 22,
+    "actual_source_status_counts": {
+      "source_returned": 21
+    },
+    "actual_constructor_status_counts": {
+      "source_returned": 21
+    },
+    "actual_member_seed_status_counts": {
+      "source_returned": 21
+    }
+  },
+  "actual_Native_execution": {
+    "path": ".runtime/porting/RAD-01/native-unit-command-02/receipt.json",
+    "sha256": "6d2762f05363b253ddfadb199f1a4a612d8f15c742c1a701fe139e1fc14787dd",
+    "size_bytes": 3173
+  },
+  "post_runtime_loader_and_binary_identity": {
+    "path": ".runtime/porting/RAD-01/native-launch-inputs-02/environment.json",
+    "sha256": "a812e8e269245c0814ca87e96ba1ea7c68418fcfd6143e02e1b04c4d308ee88c",
+    "size_bytes": 2398
+  },
+  "preserved_failed_Native_execution": {
+    "path": ".runtime/porting/RAD-01/native-unit-command-01/receipt.json",
+    "sha256": "1f0b3558dec9e413b8de42bb143701d04e63fc015bdfc575f5239fd391178db6",
+    "size_bytes": 3184
+  },
+  "preserved_failed_OriginalDataQA": {
+    "path": ".runtime/porting/RAD-01/original-data-review-command-01/receipt.json",
+    "sha256": "7e594ebe305c5576a0df80b1ceb0493e09dc0ab98adf2453c1282cc387aad669",
+    "size_bytes": 4097
+  },
+  "actual_native_build": {
+    "path": ".runtime/porting/RAD-01/native-build-02/native-build.json",
+    "sha256": "3bf6a649c4ee2c67a4d9ae0c6a01c4fef1f987243685fdb205f46289cef62fed",
+    "size_bytes": 3989
+  },
+  "actual_PE_review": {
+    "path": ".runtime/porting/RAD-01/native-build-review-01/review.json",
+    "sha256": "84ea09dd8828f7a8031282d4d97a4bf67e7871b401f91eeda66f5c664ba55e6c",
+    "size_bytes": 2438
+  },
+  "Rust_arithmetic_applied": false,
+  "old_private_F_only_probe_public_ZoneArea_warning_context_owner_available": false,
+  "old_private_API_scientific_comparison_performed": false,
+  "new_public_Rust_Source03_pending_application": {
+    "path": ".runtime/porting/RAD-01/source-prep-03/manifest.json",
+    "sha256": "7eccdc42462b91539e963715eed808f02ed4d37d14d479dacdaeb4004a9dd3c1",
+    "size_bytes": 16463
+  },
+  "actual_protected_ref_count": 48,
+  "prior_protected_and_core_hashes_unchanged": true,
+  "all21_required_calls_returned_with_both_owners": true,
+  "numerical_comparison_count": 0,
+  "numerical_PASS_claimed": false,
+  "full_card_gates_updated": false,
+  "full_engine_geometry_or_RAD02_RAD03_certified": false,
+  "current_frozen_plan_and_card_kept_literal_until_comparison": true
+}

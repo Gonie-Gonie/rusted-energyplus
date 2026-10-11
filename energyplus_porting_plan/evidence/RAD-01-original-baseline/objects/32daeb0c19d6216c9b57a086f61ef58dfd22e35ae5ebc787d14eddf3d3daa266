@@ -1,0 +1,80 @@
+--- .runtime/porting/RAD-01/native-build-review-prep-01/before/review_build.py
++++ .runtime/porting/RAD-01/native-build-review-prep-01/review_build.py
+@@ -1,4 +1,4 @@
+-"""Independent actual CTF10 build/PE inspection; no engine is invoked."""
++"""Independent actual RAD01 build/PE inspection; no engine is invoked."""
+ from pathlib import Path
+ import argparse
+ import datetime
+@@ -8,7 +8,6 @@
+ 
+ ROOT = Path.cwd().resolve()
+ parser = argparse.ArgumentParser()
+-parser.add_argument('--lane', choices=('unit', 'production'), required=True)
+ parser.add_argument('--build', required=True, help='Actual build manifest path#sha256')
+ parser.add_argument('--output-dir', required=True)
+ args = parser.parse_args()
+@@ -44,13 +43,11 @@
+ assert separator and len(build_sha) == 64 and all(c in '0123456789abcdef' for c in build_sha)
+ build_path = bound({'path': build_name, 'sha256': build_sha})
+ build = json.loads(build_path.read_text(encoding='utf-8'))
+-prefix = 'ctf10' if args.lane == 'unit' else 'ctf10-production'
+-target = 'ctf10_' + args.lane + '_helper'
++prefix = 'rad01'
++target = 'rad01_unit_helper'
+ assert build['schema'] == prefix + '-native-build.v1'
+ assert build['target'] == target
+-assert build['status'] == 'pass-actual-4TU-link-and-preservation'
+-RETENTION_INTENT = {'schema': 'ctf10-debug-original-retention-intent.v1', 'role': 'prospective-debug-original', 'scope': 'new-CTF10-linked-originals-only', 'actual_file_identity_required': True, 'both_original_and_helper_verified_before_execution': True, 'retain_through_PE_validation_and_current_helper_execution': True, 'removal_requires_separate_Root_authorized_actual_retention_record': True, 'earlier_live_refs_reinterpreted': False, 'deletion_performed': False}
+-assert build['linked_original_retention_intent'] == RETENTION_INTENT
++assert build['status'] == 'pass-actual-3TU-link-and-preservation'
+ for key in ('configure_execution', 'compile_execution', 'derivation_execution'):
+     receipt = json.loads(bound(build[key]).read_text(encoding='utf-8'))
+     assert receipt['exit_code'] == 0 and receipt['source_bytes_match_before_and_after']
+@@ -61,25 +58,23 @@
+     assert build[key] is True
+ for key in ('previous_compile_rows', 'current_compile_rows', 'core_registered', 'core_present', 'core_absent', 'protected_ref_count'):
+     assert type(build[key]) is int and build[key] >= 0
+-# Two new targets with four genuine source objects each; actual before inventory is Root-owned.
+-assert build['current_compile_rows'] == build['previous_compile_rows'] + 8
++# One new target with three genuine source objects; actual before inventory is Root-owned.
++assert build['current_compile_rows'] == build['previous_compile_rows'] + 3
+ assert (build['core_registered'], build['core_present'], build['core_absent']) == (643, 631, 12)
+ assert build['protected_ref_count'] > 0
+-assert len(build['native_source_files']) == 9
++assert len(build['native_source_files']) == 6
+ for binding in build['native_source_files']:
+     bound(binding)
+ preservation = json.loads(bound(build['preservation']).read_text(encoding='utf-8'))
+-assert preservation['selected_core_Construction_object_hits'] == 0
+-assert preservation['selected_core_HeatBalanceManager_object_hits'] == 0
+-assert 'Construction.ctf10.cc.obj' in preservation['derived_provider']['section_provider']['text']
+-assert 'HeatBalanceManager.ctf10.cc.obj' in preservation['derived_HeatBalanceManager_provider']['section_provider']['text']
++assert preservation['selected_core_HeatBalanceIntRadExchange_object_hits'] == 0
++assert 'HeatBalanceIntRadExchange.rad01.cc.obj' in preservation['derived_provider']['section_provider']['text']
+ assert len(preservation['present_objects']) == build['core_present']
+ assert len(preservation['protected_refs']) == build['protected_ref_count']
+ assert all(preservation[key] == build[key] for key in ('previous_compile_rows', 'current_compile_rows', 'core_registered'))
+ derivation = json.loads(bound(build['validated_derivative']).read_text(encoding='utf-8'))
+ assert derivation['status'] == 'pass-exact-retained-runtime-sections-and-directories'
+ reader = ROOT / 'tools/porting/native_pe.py'
+-spec = importlib.util.spec_from_file_location('actual_ctf_pe', reader)
++spec = importlib.util.spec_from_file_location('actual_rad_pe', reader)
+ module = importlib.util.module_from_spec(spec)
+ spec.loader.exec_module(module)
+ original = module.inspect(bound(build['linked_original']))
+@@ -97,13 +92,12 @@
+ report = {'schema': prefix + '-independent-build-PE-review.v1',
+           'status': 'pass-exact-retained-PE-runtime-and-actual-build-identity',
+           'observed_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+-          'lane': args.lane, 'target': target,
++          'lane': 'unit', 'target': target,
+           'actual_previous_compile_rows': build['previous_compile_rows'],
+           'actual_current_compile_rows': build['current_compile_rows'],
+           'actual_protected_ref_count': build['protected_ref_count'],
+           'build': ref(build_path), 'helper_binary': build['helper_binary'],
+           'linked_original': build['linked_original'], 'validated_derivative': build['validated_derivative'],
+-          'linked_original_retention_intent': RETENTION_INTENT,
+           'native_pe_source': ref(reader), 'executed_reader': ref(Path(__file__).resolve()),
+           'maps': maps, 'retained_runtime_exact': True,
+           'engine_invoked': False, 'scientific_execution_certified': False, 'gates_updated': False}
