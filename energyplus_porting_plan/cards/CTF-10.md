@@ -118,3 +118,7 @@ Completed10 ordinary CLI traces (6 files) were transparently compressed with NTF
 ## Actual standalone surface coefficient binding
 
 The public heat_balance::ctf_surface_binding module borrows actual ordered public owners and typed surface/construction identities. It preserves all12x19 coefficient bits, counts, timestep and U; its exact generation key includes material/caller/order/route/global dependencies and exposes uninitialized history requirements. It has no ordinary runtime, producer cache, weather or thermal-history caller. Seven contract tests and the focused/workspace suites, Clippy and format check were executed on the source snapshot recorded in evidence/CTF-10-surface-binding/summary.json. The prior Native public-storage comparisons were not rerun. Actual producer invalidation, history activation, Native consumer comparison and all three CTF10 gates remain pending.
+
+## Protected Original storage maintenance
+
+Four older CTF01/02 protected Original executables were transparently compressed with NTFS LZX. Before/after logical bytes, SHA256 and original paths match exactly; none were deleted, moved or executed. Actual command, logs and free-space observations are archived in evidence/CTF-10-storage-maintenance. This is storage maintenance and changes no scientific gate.

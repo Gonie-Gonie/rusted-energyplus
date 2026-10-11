@@ -1,0 +1,96 @@
+{
+  "schema": "root-protected-original-transparent-compression.v1",
+  "created_utc": "2026-10-11T00:33:43.958656+00:00",
+  "actual_before_authority": {
+    "path": ".runtime/porting/CTF-10/retirement-01/after-retirement.json",
+    "sha256": "dd6de8e9ad7f6246909391ecea53ee8f66202266b233c53ad0aaa22c0aad89cf",
+    "size_bytes": 176671
+  },
+  "operation": "NTFS compact.exe /C /EXE:LZX /Q exact4 protected older Originals",
+  "files": [
+    {
+      "file_before": {
+        "path": ".runtime/ep261-gcc13-o0/Products/ctf01_reference_helper.exe",
+        "sha256": "2335018497cb99ada74e95d6aeb2965982d48ec7e03031a781edcc068cb97865",
+        "size_bytes": 1296573481
+      },
+      "file_after": {
+        "path": ".runtime/ep261-gcc13-o0/Products/ctf01_reference_helper.exe",
+        "sha256": "2335018497cb99ada74e95d6aeb2965982d48ec7e03031a781edcc068cb97865",
+        "size_bytes": 1296573481
+      },
+      "compact_exit_code": 0,
+      "command_log": {
+        "path": ".runtime/porting/CTF-10/protected-original-storage-compression-01/ctf01_reference_helper.exe.log",
+        "sha256": "138ea0b2e0509f5518cfc44dcb94c7b66e8d783ae2916c53f183b5ebd74cc7ad",
+        "size_bytes": 269
+      },
+      "bytes_and_path_unchanged": true
+    },
+    {
+      "file_before": {
+        "path": ".runtime/ep261-gcc13-o0/Products/ctf01_production_helper.exe",
+        "sha256": "5d891767bb9d3baaa77e93041a4cdf6ab25bc63978fd1b80668b8be5e6fcbdaf",
+        "size_bytes": 1299650087
+      },
+      "file_after": {
+        "path": ".runtime/ep261-gcc13-o0/Products/ctf01_production_helper.exe",
+        "sha256": "5d891767bb9d3baaa77e93041a4cdf6ab25bc63978fd1b80668b8be5e6fcbdaf",
+        "size_bytes": 1299650087
+      },
+      "compact_exit_code": 0,
+      "command_log": {
+        "path": ".runtime/porting/CTF-10/protected-original-storage-compression-01/ctf01_production_helper.exe.log",
+        "sha256": "e6803ffd0e1e9eb2cd0e3fbd864ce4e5659bf5f1b1b7d029f7b863441f969b12",
+        "size_bytes": 269
+      },
+      "bytes_and_path_unchanged": true
+    },
+    {
+      "file_before": {
+        "path": ".runtime/ep261-gcc13-o0/Products/ctf02_unit_helper.exe",
+        "sha256": "5510d289139f4addbe107a0fcdcfb4b3cc1b564da74eae33fdc3a6920aa74095",
+        "size_bytes": 1297364847
+      },
+      "file_after": {
+        "path": ".runtime/ep261-gcc13-o0/Products/ctf02_unit_helper.exe",
+        "sha256": "5510d289139f4addbe107a0fcdcfb4b3cc1b564da74eae33fdc3a6920aa74095",
+        "size_bytes": 1297364847
+      },
+      "compact_exit_code": 0,
+      "command_log": {
+        "path": ".runtime/porting/CTF-10/protected-original-storage-compression-01/ctf02_unit_helper.exe.log",
+        "sha256": "55ccda067f63faaee2fa6e57fa8e7564cef0bd58255c8d832e161b7c604dee23",
+        "size_bytes": 269
+      },
+      "bytes_and_path_unchanged": true
+    },
+    {
+      "file_before": {
+        "path": ".runtime/ep261-gcc13-o0/Products/ctf02_production_helper.exe",
+        "sha256": "6d9e2924ab5095686210d36311c1017b6afa3869493a772d54681a078540ce7e",
+        "size_bytes": 1299973447
+      },
+      "file_after": {
+        "path": ".runtime/ep261-gcc13-o0/Products/ctf02_production_helper.exe",
+        "sha256": "6d9e2924ab5095686210d36311c1017b6afa3869493a772d54681a078540ce7e",
+        "size_bytes": 1299973447
+      },
+      "compact_exit_code": 0,
+      "command_log": {
+        "path": ".runtime/porting/CTF-10/protected-original-storage-compression-01/ctf02_production_helper.exe.log",
+        "sha256": "8b2581b95c2a62a18d14b4e520c0d29250f39ccfbdbbf16c1b40bc7614c2134f",
+        "size_bytes": 269
+      },
+      "bytes_and_path_unchanged": true
+    }
+  ],
+  "observed_free_bytes_before": 3731795968,
+  "observed_free_bytes_after": 7879991296,
+  "physical_free_change_is_observation_not_exclusive_attribution": true,
+  "all4_bytes_and_paths_unchanged": true,
+  "file_deleted_or_moved": false,
+  "scientific_values_recomputed": false,
+  "original_executable_executed": false,
+  "gates_updated": false
+}

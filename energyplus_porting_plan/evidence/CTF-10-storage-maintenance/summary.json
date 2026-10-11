@@ -1,0 +1,25 @@
+{
+  "schema": "ctf10-actual-protected-original-transparent-compression.v1",
+  "actual_record": {
+    "path": ".runtime/porting/CTF-10/protected-original-storage-compression-01/record.json",
+    "sha256": "97e94f8d709d6d00b91c8c792bde3ac740f18c295e3937f7301407b1c39b5f77",
+    "size_bytes": 3979
+  },
+  "actual_execution": {
+    "path": ".runtime/porting/CTF-10/protected-original-storage-compression-command-01/receipt.json",
+    "sha256": "48b0f39eb0c101fa2230bbce06d175fde25370f1af43a9abd1d21562ac21cb27",
+    "size_bytes": 2738
+  },
+  "manifest": {
+    "path": "energyplus_porting_plan/evidence/CTF-10-storage-maintenance/manifest.json",
+    "sha256": "290b63fcb426590664de65dd2c6c5f9cc6b3601a237522dbd282b39be0afe881",
+    "size_bytes": 5136
+  },
+  "all4_logical_bytes_and_original_paths_unchanged": true,
+  "operation": "NTFS transparent LZX compression; exact4 protected older Original files",
+  "observed_free_bytes_before": 3731795968,
+  "observed_free_bytes_after": 7879991296,
+  "physical_free_change_is_observation_not_exclusive_attribution": true,
+  "originals_deleted_moved_or_executed": false,
+  "scientific_or_full_card_PASS_claimed": false
+}
